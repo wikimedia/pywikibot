@@ -22,8 +22,7 @@ class API:
     def query(prop, **kwargs):
         params = dict(kwargs)
         params['action'] = 'query'
-        if not params.has_key('format'): #Most probably, we want the XML format
-            params['format'] = 'xml'
-        address = '/w/api.php?' + urllib.urlencode(params)
+        if not params.has_key('format'): #Most probably, we want the JSON format
+            params['format'] = 'json'
 
-        return http.HTTP(None).GET(address) #TODO: Use site's HTTP object instead
+        return http.HTTP(None).POST('/w/api.php',params) #TODO: Use site's HTTP object instead

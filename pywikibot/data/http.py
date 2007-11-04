@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 """
-Basic HTTP access interface (GET/POST wrappers).
+Basic HTTP access interface (GET/POST/HEAD wrappers).
 """
 #
 # (C) Pywikipedia bot team, 2007
@@ -10,7 +10,7 @@ Basic HTTP access interface (GET/POST wrappers).
 __version__ = '$Id: $'
 
 
-import httplib
+import urllib, httplib
 
 
 class HTTP:
@@ -20,16 +20,26 @@ class HTTP:
         self.useragent = 'PythonWikipediaBot/2.0'
         #TODO: Initiate persistent connection here?
 
+    def GET(self, address, query={}):
+        return self._request('GET',address + '?' + urllib.urlencode(query))
 
-    def GET(self, address):
+    def POST(self, address, query={}):
+        return self._request('POST',address,urllib.urlencode(query))
+
+    def HEAD(self, address, query={}):
+        return self._request('HEAD',address + '?' + urllib.urlencode(query))
+
+    def _request(self, method, address, data=''):
         #TODO: Resuse said connection.
         conn = httplib.HTTPConnection('en.wikipedia.org',80) #TODO: Obviously, get these from the site object (unimplemented yet)
-        conn.putrequest('GET',address)
+        conn.putrequest(method,address)
         conn.putheader('User-agent',self.useragent)
+        conn.putheader('Content-type','application/x-www-form-urlencoded')
+        conn.putheader('Content-Length',len(data))
         conn.endheaders()
-        conn.send('')
+        conn.send(data)
 
         response = conn.getresponse()
-        data = response.read()
+        rdata = response.read()
 
-        return response.status, data
+        return response.status, rdata
