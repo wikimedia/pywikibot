@@ -1,5 +1,4 @@
 ﻿# -*- coding: utf-8  -*-
-
 """ Httplib2 threaded cookie layer
     This class extends Httplib2, adding support for:
       * Cookies, guarded for cross-site redirects
@@ -239,9 +238,11 @@ class HttpProcessor(threading.Thread):
     def run(self):
         # The Queue item is expected to either an HttpRequest object
         # or None (to shut down the thread)
+        logging.debug('Thread started, waiting for requests.')
         while (True):
             item = self.queue.get()
             if item is None:
+                logging.debug('Shutting down thread.')
                 return
             try:
                 item.data = self.http.request(*item.args, **item.kwargs)

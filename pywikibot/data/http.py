@@ -1,45 +1,73 @@
-# -*- coding: utf-8  -*-
+﻿# -*- coding: utf-8  -*-
 """
-Basic HTTP access interface (GET/POST/HEAD wrappers).
+Basic HTTP access interface.
+
+This module handles communication between the bot and the HTTP threads.
+
+This module is responsible for
+    * Setting up a connection pool
+    * Providing a (blocking) interface for HTTP requests
+    * Translate site objects with query strings into urls
+    * Urlencoding all data
+    * Basic HTTP error handling
 """
+
 #
 # (C) Pywikipedia bot team, 2007
 #
 # Distributed under the terms of the MIT license.
 #
+
 __version__ = '$Id: $'
+__docformat__ = 'epytext'
+
+import Queue
+import urllib
+import urlparse
+import logging
+import atexit
+
+import threadedhttp
 
 
-import urllib, httplib
+# global variables
 
+useragent = 'Pywikipediabot/2.0' # This should include some global version string
+numthreads = 1
+threads = []
 
-class HTTP:
+connection_pool = threadedhttp.ConnectionPool()
+cookie_jar = threadedhttp.LockableCookieJar()
+http_queue = Queue.Queue()
 
-    def __init__(self, site):
-        self.site = site
-        self.useragent = 'PythonWikipediaBot/2.0'
-        #TODO: Initiate persistent connection here?
+# Build up HttpProcessors
+logging.info('Starting %i threads...' % numthreads)
+for i in range(numthreads):
+    proc = threadedhttp.HttpProcessor(http_queue, cookie_jar, connection_pool)
+    threads.append(proc)
+    proc.start()
 
-    def GET(self, address, query={}):
-        return self._request('GET',address + '?' + urllib.urlencode(query))
-
-    def POST(self, address, query={}):
-        return self._request('POST',address,urllib.urlencode(query))
-
-    def HEAD(self, address, query={}):
-        return self._request('HEAD',address + '?' + urllib.urlencode(query))
-
-    def _request(self, method, address, data=''):
-        #TODO: Resuse said connection.
-        conn = httplib.HTTPConnection('en.wikipedia.org',80) #TODO: Obviously, get these from the site object (unimplemented yet)
-        conn.putrequest(method,address)
-        conn.putheader('User-agent',self.useragent)
-        conn.putheader('Content-type','application/x-www-form-urlencoded')
-        conn.putheader('Content-Length',len(data))
-        conn.endheaders()
-        conn.send(data)
-
-        response = conn.getresponse()
-        rdata = response.read()
-
-        return response.status, rdata
+# Prepare flush on quit
+def _flush():
+    for i in threads:
+        http_queue.put(None)
+    logging.info('Waiting for threads to finish... ')
+    for i in threads:
+        i.join()
+atexit.register(_flush)
+        
+def request(site, uri, *args, **kwargs):
+    """ @param site The Site to connect to
+        All other parameters are the same as `Http.request`, but the uri is relative
+        Returns: The recieved data.
+    """
+    baseuri = site #.baseuri(), etc
+    uri = urlparse.urljoin(baseuri, uri)
+    
+    request = threadedhttp.HttpRequest(uri, *args, **kwargs)
+    http_queue.put(request)
+    request.lock.acquire()
+    
+    #do some error correcting stuff
+    
+    return request.data[1]    
