@@ -10,47 +10,117 @@ Interface functions to Mediawiki's api.php
 __version__ = '$Id: $'
 
 
+from UserDict import DictMixin
 import urllib
 import http
 import simplejson as json
 import warnings
 
+
 class APIError(Exception):
     """The wiki site returned an error message."""
-    def __init__(self, errordict):
+    def __init__(self, code, info, **kwargs):
         """Save error dict returned by MW API."""
-        self.errors = errordict
-
+        self.code = code
+        self.info = info
+        self.other = kwargs
+    def __repr__(self):
+        return 'APIError("%(code)s", "%(info)s", %(other)s)' % self.__dict__
     def __str__(self):
-        return "%(code)s: %(info)s" % self.errors
+        return "%(code)s: %(info)s" % self.__dict__
 
 
-class API:
+class Request(DictMixin):
+    """A request to a Site's api.php interface.
 
-    def __init__(self, site):
-        self.site = site
+    Attributes of this object get passed as commands to api.php, and can be
+    get or set using the dict interface.  All attributes must be strings
+    (unicode). Attributes supplied without values are passed to the API as
+    keys.
+    
+    @param   site: The Site to which the request will be submitted. If not
+                   supplied, uses the user's configured default Site.
+    @param format: (optional) Defaults to "json"
 
-    def request(self, **params):
-        if not params.has_key('format'): #Most probably, we want the JSON format
-            params['format'] = 'json'
-        return http.HTTP(None).POST('/w/api.php',params) #TODO: Use site's HTTP object instead
+    Example:
 
-    def query(self, **params):
-        if not params.has_key('action'):
-            params['action'] = 'query'
-        return self.request(**params)
+    >>> r = Request(site=mysite, action="query", meta="userinfo")
+    >>> # This is equivalent to
+    >>> # http://[path]/api.php?action=query&meta=userinfo&format=json
+    >>> # change a parameter
+    >>> r['meta'] = "userinfo|siteinfo"
+    >>> # add a new parameter
+    >>> r['siprop'] = "namespaces"
+    >>> r.params
+    {'action': 'query', 'meta': 'userinfo|siteinfo', 'siprop': 'namespaces',
+    'format': 'json'}
+    >>> data = r.submit()
+    >>> type(data)
+    <type 'dict'>    
+    
+    """
+    def __init__(self, *args, **kwargs):
+        if "site" in kwargs:
+            self.site = kwargs["site"]
+            del kwargs["site"]
+            # else use defaultSite() ... when written
+        self.params = {}
+        if not "format" in kwargs:
+            self.params["format"] = "json"
+        self.update(*args, **kwargs)
 
-    def query_response(self, **params):
-        """Submit a query and parse the response, returning a dict or None."""
-        if params.has_key('format') and params['format'] != 'json':
-            raise TypeError("Query format '%s' cannot be parsed." % params['format'])
+    # implement dict interface
+    def __getitem__(self, key):
+        return self.params[key]
+
+    def __setitem__(self, key, value):
+        self.params[key] = value
+
+    def __delitem__(self, key):
+        del self.params[key]
+
+    def keys(self):
+        return self.params.keys()
+
+    def __contains__(self, key):
+        return self.params.__contains__(key)
+
+    def __iter__(self):
+        return self.params.__iter__()
+
+    def iteritems(self):
+        return self.params.iteritems()
+    
+    def update(self, *args, **kwargs):
+        """Update the request parameters"""
+        self.params.update(kwargs)
+        for arg in args:
+            if arg not in self.params:
+                self.params[arg] = ""
+
+    def submit(self):
+        """Submit a query and parse the response.
+
+        @return:       The data retrieved from api.php (a dict)
+        
+        """
+        if self.params['format'] != 'json':
+            raise TypeError("Query format '%s' cannot be parsed."
+                            % self.params['format'])
+        uri = self.site.script_path() + "api.php"
+        params = urllib.urlencode(self.params)
         while True:
-            httpcode, rawdata = self.query(**params)
-            if httpcode != 200:
-                raise APIError(
-                    {'code': httpcode,
-                     'info': "HTTP error code received.",
-                     'data': rawdata})
+            # TODO wait on errors
+            # TODO catch http errors
+            if self.params.get("action", "") in ("login",):
+                rawdata = http.request(self.site, uri, method="POST",
+                                headers={'Content-Type':
+                                        'application/x-www-form-urlencoded'},
+                                body=params)
+                return rawdata
+            else:
+                uri = uri + "?" + params
+                rawdata = http.request(self.site, uri)
             if rawdata.startswith(u"unknown_action"):
                 e = {'code': data[:14], 'info': data[16:]}
                 raise APIError(e)
@@ -63,27 +133,31 @@ class API:
                 warnings.warn(
 "Non-JSON response received from server %s; the server may be down."
                               % self.site)
+                print rawdata
                 continue
+            if not result:
+                return {}
             if type(result) is dict:
-                if result.has_key("error"):
+                if "error" in result:
+                    if "code" in result["error"]:
+                        code = result["error"]["code"]
+                        del result["error"]["code"]
+                    else:
+                        code = "Unknown"
+                    if "info" in result["error"]:
+                        info = result["error"]["info"]
+                        del result["error"]["info"]
+                    else:
+                        info = None
                     # raise error
-                    raise APIError(result['error'])
-                if result.has_key("query"):
-                    return result
-                raise APIError(
-                    {'code': "Unknown API error",
-                     'info': "Response received with no 'query' key.",
-                     'data': result})
-            if type(result) is list:
-                if result == []:
-                    return None
-                raise APIError(
-                    {'code': "Unknown API error",
-                     'info': "Query returned a list instead of a dict.",
-                     'data': result})
-            raise APIError(
-                {'code': "Unknown API error",
-                 'info': "Unable to process query response of type %s."
-                         % type(result),
-                 'data': result})
+                    raise APIError(code, info, **result["error"])
+                return result
+            raise APIError("Unknown",
+                           "Unable to process query response of type %s."
+                               % type(result),
+                           {'data': result})
+
+if __name__ == "__main__":
+    from pywikibot.tests.dummy import TestSite as Site
+    mysite = Site("en.wikipedia.org")
     

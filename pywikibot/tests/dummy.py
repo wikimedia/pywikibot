@@ -11,13 +11,16 @@ __version__ = '$Id: $'
 
 class TestSite(object):
     """Mimic a Site object."""
-    def __init__(self, hostname, protocol="http"):
+    def __init__(self, hostname, protocol="http", path="w/"):
         self._hostname = hostname
         self._protocol = protocol
+        self._path = path
     def protocol(self):
         return self._protocol
     def hostname(self):
         return self._hostname
+    def script_path(self):
+        return self._path
     def cookies(self, sysop=False):
         if hasattr(self, "_cookies"):
             return self._cookies

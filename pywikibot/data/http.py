@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8  -*-
+# -*- coding: utf-8  -*-
 """
 Basic HTTP access interface.
 
@@ -58,12 +58,13 @@ atexit.register(_flush)
         
 def request(site, uri, *args, **kwargs):
     """ @param site The Site to connect to
-        All other parameters are the same as `Http.request`, but the uri is relative
-        Returns: The recieved data.
+        All other parameters are the same as L{httplib2.Http.request}, but
+        the uri is relative
+        @return The received data (a unicode string).
     """
-    baseuri = site #.baseuri(), etc
+    baseuri = "%s://%s/" % (site.protocol(), site.hostname())
     uri = urlparse.urljoin(baseuri, uri)
-    
+
     request = threadedhttp.HttpRequest(uri, *args, **kwargs)
     http_queue.put(request)
     request.lock.acquire()
