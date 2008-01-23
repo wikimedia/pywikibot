@@ -9,13 +9,17 @@ Interface functions to Mediawiki's api.php
 #
 __version__ = '$Id: $'
 
-
 from UserDict import DictMixin
-import urllib
 import http
 import simplejson as json
-import warnings
+import logging
+import re
+import traceback
+import time
+import urllib
 
+
+lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
 class APIError(Exception):
     """The wiki site returned an error message."""
@@ -30,17 +34,26 @@ class APIError(Exception):
         return "%(code)s: %(info)s" % self.__dict__
 
 
+class TimeoutError(Exception):
+    pass
+
+
 class Request(DictMixin):
     """A request to a Site's api.php interface.
 
-    Attributes of this object get passed as commands to api.php, and can be
-    get or set using the dict interface.  All attributes must be strings
-    (unicode). Attributes supplied without values are passed to the API as
-    keys.
+    Attributes of this object (except for the special parameters listed
+    below) get passed as commands to api.php, and can be get or set using
+    the dict interface.  All attributes must be strings (unicode).
+    Attributes supplied without values are passed to the API as keys.
     
-    @param   site: The Site to which the request will be submitted. If not
-                   supplied, uses the user's configured default Site.
+    @param site: The Site to which the request will be submitted. If not
+           supplied, uses the user's configured default Site.
     @param format: (optional) Defaults to "json"
+    @param max_retries: (optional) Maximum number of times to retry after
+           errors, defaults to 25
+    @param retry_wait: (optional) Minimum time to wait after an error,
+           defaults to 5 seconds (doubles each retry until max of 120 is
+           reached)
 
     Example:
 
@@ -60,13 +73,15 @@ class Request(DictMixin):
     
     """
     def __init__(self, *args, **kwargs):
-        if "site" in kwargs:
-            self.site = kwargs["site"]
-            del kwargs["site"]
+        self.site = kwargs.pop("site", None)
             # else use defaultSite() ... when written
+        self.max_retries = kwargs.pop("max_retries", 25)
+        self.retry_wait = kwargs.pop("retry_wait", 5)
         self.params = {}
-        if not "format" in kwargs:
+        if "format" not in kwargs:
             self.params["format"] = "json"
+        if "maxlag" not in kwargs:
+            self.params["maxlag"] = "5"
         self.update(*args, **kwargs)
 
     # implement dict interface
@@ -101,7 +116,7 @@ class Request(DictMixin):
     def submit(self):
         """Submit a query and parse the response.
 
-        @return:       The data retrieved from api.php (a dict)
+        @return:  The data retrieved from api.php (a dict)
         
         """
         if self.params['format'] != 'json':
@@ -112,52 +127,70 @@ class Request(DictMixin):
         while True:
             # TODO wait on errors
             # TODO catch http errors
-            if self.params.get("action", "") in ("login",):
-                rawdata = http.request(self.site, uri, method="POST",
+            try:
+                if self.params.get("action", "") in ("login",):
+                    rawdata = http.request(self.site, uri, method="POST",
                                 headers={'Content-Type':
-                                        'application/x-www-form-urlencoded'},
+                                         'application/x-www-form-urlencoded'},
                                 body=params)
-                return rawdata
-            else:
-                uri = uri + "?" + params
-                rawdata = http.request(self.site, uri)
+                else:
+                    uri = uri + "?" + params
+                    rawdata = http.request(self.site, uri)
+            except Exception, e: #TODO: what exceptions can occur here?
+                logging.warning(traceback.format_exc())
+                self.wait()
+                continue
             if rawdata.startswith(u"unknown_action"):
-                e = {'code': data[:14], 'info': data[16:]}
-                raise APIError(e)
+                raise APIError(rawdata[:14], rawdata[16:])
             try:
                 result = json.loads(rawdata)
             except ValueError:
                 # if the result isn't valid JSON, there must be a server
                 # problem.  Wait a few seconds and try again
                 # TODO: implement a throttle
-                warnings.warn(
+                logging.warning(
 "Non-JSON response received from server %s; the server may be down."
                               % self.site)
                 print rawdata
+                self.wait(max_retries, retry_wait)
                 continue
             if not result:
-                return {}
-            if type(result) is dict:
-                if "error" in result:
-                    if "code" in result["error"]:
-                        code = result["error"]["code"]
-                        del result["error"]["code"]
-                    else:
-                        code = "Unknown"
-                    if "info" in result["error"]:
-                        info = result["error"]["info"]
-                        del result["error"]["info"]
-                    else:
-                        info = None
-                    # raise error
-                    raise APIError(code, info, **result["error"])
+                result = {}
+            if type(result) is not dict:
+                raise APIError("Unknown",
+                               "Unable to process query response of type %s."
+                                   % type(result),
+                               {'data': result})
+            if "error" not in result:
                 return result
-            raise APIError("Unknown",
-                           "Unable to process query response of type %s."
-                               % type(result),
-                           {'data': result})
+            code = result["error"].pop("code", "Unknown")
+            info = result["error"].pop("info", None)
+            if code == "maxlag":
+                lag = lagpattern.search(info)
+                if lag:
+                    logging.info(
+                        "Pausing due to database lag: " + info)
+                    self.wait(int(lag.group("lag")))
+                    continue
+            # raise error
+            raise APIError(code, info, **result["error"])
+
+
+    def wait(self, lag=None):
+        """Determine how long to wait after a failed request."""
+        self.max_retries -= 1
+        if self.max_retries < 0:
+            raise TimeoutError("Maximum retries attempted without success.")
+        
+        if lag is not None:
+            if lag > 2 * self.retry_wait:
+                self.retry_wait = min(120, lag // 2)
+        logging.warn("Waiting %s seconds before retrying." % self.retry_wait)
+        time.sleep(self.retry_wait)
+        self.retry_wait = min(120, self.retry_wait * 2)
+        
 
 if __name__ == "__main__":
     from pywikibot.tests.dummy import TestSite as Site
     mysite = Site("en.wikipedia.org")
-    
+    logging.getLogger().setLevel(logging.DEBUG)

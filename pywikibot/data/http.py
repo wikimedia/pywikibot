@@ -5,11 +5,12 @@ Basic HTTP access interface.
 This module handles communication between the bot and the HTTP threads.
 
 This module is responsible for
-    * Setting up a connection pool
-    * Providing a (blocking) interface for HTTP requests
-    * Translate site objects with query strings into urls
-    * Urlencoding all data
-    * Basic HTTP error handling
+
+- Setting up a connection pool
+- Providing a (blocking) interface for HTTP requests
+- Translate site objects with query strings into urls
+- Urlencoding all data
+- Basic HTTP error handling
 """
 
 #
@@ -68,7 +69,14 @@ def request(site, uri, *args, **kwargs):
     request = threadedhttp.HttpRequest(uri, *args, **kwargs)
     http_queue.put(request)
     request.lock.acquire()
-    
+
     #do some error correcting stuff
-    
+
+    #if all else fails
+    if isinstance(request.data, Exception):
+        raise request.data
+
+    if request.data[0].status != 200:
+        logging.warning("Http response status %s" % request.data[0].status)
+
     return request.data[1]    
