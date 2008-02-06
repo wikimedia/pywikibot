@@ -32,7 +32,6 @@ class TestPage(object):
     def __init__(self, site, title):
         self._site = site
         self._title = title
-
     def site(self):
         return self._site
     def title(self):

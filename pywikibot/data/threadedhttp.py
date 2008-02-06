@@ -1,11 +1,11 @@
 # -*- coding: utf-8  -*-
 """ Httplib2 threaded cookie layer
 
-This class extends Httplib2, adding support for:
-- Cookies, guarded for cross-site redirects
-- Thread safe ConnectionPool and LockableCookieJar classes
-- HttpProcessor thread class
-- HttpRequest object
+This class extends httplib2, adding support for:
+    - Cookies, guarded for cross-site redirects
+    - Thread safe ConnectionPool and LockableCookieJar classes
+    - HttpProcessor thread class
+    - HttpRequest object
 
 """
 
@@ -36,13 +36,14 @@ import httplib2
 
 
 class ConnectionPool(object):
-    """A thread-safe connection pool.
-
-    @param maxnum: Maximum number of connections per identifier.
-                   The pool drops excessive connections added.
-
-    """
+    """A thread-safe connection pool."""
+    
     def __init__(self, maxnum=5):
+        """
+        @param maxnum: Maximum number of connections per identifier.
+                       The pool drops excessive connections added.
+
+        """
         self.connections = {}
         self.lock = threading.Lock()
         self.maxnum = maxnum
@@ -98,7 +99,7 @@ class ConnectionPool(object):
             self.lock.release()
 
 class LockableCookieJar(cookielib.CookieJar):
-    """ CookieJar with integrated Lock object """
+    """CookieJar with integrated Lock object."""
     def __init__(self, *args, **kwargs):
         cookielib.CookieJar.__init__(self, *args, **kwargs)
         self.lock = threading.Lock()
@@ -109,15 +110,17 @@ class Http(httplib2.Http):
     Overrides httplib2's internal redirect support to prevent cookies being
     eaten by the wrong sites.
 
-    @param cookiejar: (optional) CookieJar to use. A new one will be used
-           when not supplied.
-    @param connection_pool: (optional) Connection pool to use. A new one
-           will be used when not supplied.
-    @param max_redirects: (optional) The maximum number of redirects to
-           follow. 5 is default.
-
     """
     def __init__(self, *args, **kwargs):
+        """
+        @param cookiejar: (optional) CookieJar to use. A new one will be
+               used when not supplied.
+        @param connection_pool: (optional) Connection pool to use. A new one
+               will be used when not supplied.
+        @param max_redirects: (optional) The maximum number of redirects to
+               follow. 5 is default.
+
+        """
         self.cookiejar = kwargs.pop('cookiejar', LockableCookieJar())
         self.connection_pool = kwargs.pop('connection_pool', ConnectionPool())
         self.max_redirects = kwargs.pop('max_redirects', 5)
@@ -268,6 +271,7 @@ class HttpRequest(object):
     
     """
     def __init__(self, *args, **kwargs):
+        """See C{Http.request} for parameters."""
         self.args = args
         self.kwargs = kwargs
         self.data = None
@@ -275,17 +279,17 @@ class HttpRequest(object):
 
 
 class HttpProcessor(threading.Thread):
-    """ Thread object to spawn multiple HTTP connection threads.
-
-    @param queue: The C{Queue.Queue} object that contains L{HttpRequest}
-           objects.
-    @param cookiejar: The C{LockableCookieJar} cookie object to share among
-           requests.
-    @param connection_pool: The C{ConnectionPool} object which contains
-           connections to share among requests.
-
-    """
+    """Thread object to spawn multiple HTTP connection threads."""
     def __init__(self, queue, cookiejar, connection_pool):
+        """
+        @param queue: The C{Queue.Queue} object that contains L{HttpRequest}
+               objects.
+        @param cookiejar: The C{LockableCookieJar} cookie object to share among
+               requests.
+        @param connection_pool: The C{ConnectionPool} object which contains
+               connections to share among requests.
+
+        """
         threading.Thread.__init__(self)
         self.queue = queue
         self.http = Http(cookiejar=cookiejar, connection_pool=connection_pool)
@@ -305,7 +309,7 @@ class HttpProcessor(threading.Thread):
                 if item.lock:
                     item.lock.release()
 
-      
+
 # Metaweb Technologies, Inc. License:
  # ========================================================================
  # The following dummy classes are:
