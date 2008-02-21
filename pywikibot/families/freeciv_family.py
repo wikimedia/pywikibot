@@ -43,8 +43,8 @@ class Family(family.Family):
             '_default': u'Forum talk',
         }
 
-    def path(self, code):
-        return '/index.php'
+    def scriptpath(self, code):
+        return ''
 
     def version(self, code):
         return "1.10alpha"

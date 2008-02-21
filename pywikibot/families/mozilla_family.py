@@ -26,7 +26,11 @@ class Family(family.Family):
         return r'<li\s*><a href=".*?title=.*?&amp;action=history".*?>.*?</a></li>'
 
     def version(self, code):
-        return "1.6.8"
+        return "1.10.2"
 
-    def path(self, code):
-        return '/index.php'
+    def scriptpath(self, code):
+        return ''
+
+    def apipath(self, code):
+        raise NotImplementedError(
+            "The mozilla family does not support api.php")

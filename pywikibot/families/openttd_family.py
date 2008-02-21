@@ -7,14 +7,14 @@ import family
 # The project wiki of OpenTTD, an open source game (Transport Tycoon Deluxe clone).
 
 class Family(family.Family):
-    
+
     def __init__(self):
         family.Family.__init__(self)
         self.name = 'openttd'
         self.langs = {
             'en': 'wiki.openttd.org',
         }
-        
+
         self.namespaces[4] = {
             '_default': [u'OpenTTD', self.namespaces[4]['_default']],
         }
@@ -28,12 +28,12 @@ class Family(family.Family):
             '_default': u'Development',
         }
 
-    def path(self, code):
-        return '/index.php'
-
-    def querypath(self, code):
-        return '/query.php'
+    def scriptpath(self, code):
+        return ''
 
     def version(self, code):
         return "1.9.1"
 
+    def apipath(self, code):
+        raise NotImplementedError(
+            "The openttd family does not support api.php")

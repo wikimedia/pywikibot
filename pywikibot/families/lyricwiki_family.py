@@ -2,7 +2,7 @@
 
 import family
 
-# The LiricWiki family
+# The LyricWiki family
 
 # user_config.py:
 # usernames['lyricwiki']['en'] = 'user'
@@ -14,7 +14,7 @@ class Family(family.Family):
         self.langs = {
             'en': 'www.lyricwiki.org',
            }
-        
+
         self.namespaces[4] = {
             '_default': [u'LyricWiki', self.namespaces[4]['_default']],
         }
@@ -25,5 +25,9 @@ class Family(family.Family):
     def version(self, code):
         return "1.7.1"
 
-    def path(self, code):
-        return '/index.php'
+    def scriptpath(self, code):
+        return ''
+
+    def apipath(self, code):
+        raise NotImplementedError(
+            "The lyricwiki family does not support api.php")

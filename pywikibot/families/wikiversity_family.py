@@ -42,19 +42,23 @@ class Family(family.Family):
         }
 
         self.namespaces[100] = {
+            'el': u'Σχολή',
             'en': u'School',
             'it': u'Facoltà',
         }
         self.namespaces[101] = {
+            'el': u'Συζήτηση Σχολής',
             'en': u'School talk',
             'it': u'Discussioni facoltà',
         }
         self.namespaces[102] = {
+            'el': u'Τμήμα',
             'en': u'Portal',
             'fr': u'Projet',
             'it': u'Corso',
         }
         self.namespaces[103] = {
+            'el': u'Συζήτηση Τμήματος',
             'en': u'Portal talk',
             'fr': u'Discussion Projet',
             'it': u'Discussioni corso',

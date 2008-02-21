@@ -25,5 +25,10 @@ class Family(family.Family):
     def version(self, code):
         return "1.5.4"  #The MediaWiki version used. Not very important in most cases.
 
-    def path(self, code):
-        return '/beta/index.php' #The path of index.php
+    def scriptpath(self, code):
+        return '/beta' #The value of {{SCRIPTPATH}} on this wiki
+
+    def apipath(self, code):
+        # Betawiki uses old, pre-API MediaWiki version
+        raise NotImplementedError(
+            "The %s family does not support api.php" % self.name)

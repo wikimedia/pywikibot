@@ -2,34 +2,54 @@
 import family
     
 # The Uncyclopaedia family, a satirical set of encyclopaedia wikis.
-#        
+#
+
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)
         self.name = 'uncyclopedia'
     
         self.langs = {
-            'ar': 'beidipedia.wikia.com',
-            'ca': 'valenciclopedia.wikia.com',
-            'da': 'da.uncyclopedia.wikia.com',
-            'de': 'de.uncyclopedia.wikia.com',
-            'el': 'anegkyklopaideia.wikia.com',
-            'en': 'uncyclopedia.org',
-            'es': 'inciclopedia.wikia.com',
-            'fr': 'desencyclopedie.com',
-            'he': 'eincyclopedia.wikia.com',
-            'hu': 'hu.uncyclopedia.info',
-            'it': 'nonciclopedia.wikia.com',
-            'ja': 'ja.uncyclopedia.info',
-            'la': 'uncapaedia.wikia.com',
-            'no': 'ikkepedia.net',
-            'pl': 'nonsensopedia.wikia.com',
-            'pt': 'pt.uncyclopedia.info',
-            'ru': 'absurdopedia.wikia.com',
-            'sv': 'psyklopedin.hehu.se',
-            'zh': 'zh.uncyclopedia.wikia.com',
-            'zh-tw': 'zh.uncyclopedia.info',
-            }
+            "ar": "beidipedia.wikia.com",
+            "ast": "nunyepedia.wikia.com",
+            "ca": "valenciclopedia.wikia.com",
+            "cs": "necyklopedie.wikia.com",
+            "da": "spademanns.wikia.com",
+            "de": "de.uncyclopedia.org",
+            "el": "frikipaideia.wikia.com", 
+            "en": "uncyclopedia.org", 
+            "eo": "neciklopedio.wikia.com", 
+            "es": "inciclopedia.wikia.com", 
+            "fa": "fa.uncyc.org", 
+            "fi": "hiki.pedia.ws", 
+            "fr": "desencyclopedie.wikia.com", 
+            "he": "eincyclopedia.wikia.com", 
+            "hr": "hr.neciklopedija.org", 
+            "hu": "unciklopedia.org", 
+            "id": "tolololpedia.wikia.com", 
+            "it": "nonciclopedia.wikia.com", 
+            "ja": "ja.uncyclopedia.info", 
+            "ko": "ko.uncyclopedia.info", 
+            "la": "uncapaedia.wikia.com", 
+            "lt": "nesamopedija.wikia.com", 
+            "lv": "lv.neciklopedija.org", 
+            "nl": "oncyclopedia.net", 
+            "nn": "ikkepedia.org", 
+            "no": "ikkepedia.wikia.com", 
+            "pl": "nonsensopedia.wikia.com", 
+            "pt": "desciclo.pedia.ws", 
+            "ru": "absurdopedia.wikia.com", 
+            "sk": "necyklopedia.wikia.com", 
+            "sl": "butalo.pedija.org", 
+            "sr": "sr.neciklopedija.org", 
+            "sv": "psyklopedin.org", 
+            "th": "th.uncyclopedia.info", 
+            "tr": "yansiklopedi.org", 
+            "yi": "keinziklopedie.wikia.com", 
+            "zh": "zh.uncyclopedia.wikia.com", 
+            "zh-hk": "zh.uncyclopedia.info", 
+            "zh-tw": "zh.uncyclopedia.info",
+        }
     
         # Most namespaces are inherited from family.Family.
         self.namespaces[1] = {
@@ -247,22 +267,8 @@ class Family(family.Family):
     def hostname(self,code):
         return self.langs[code]
 
-    def path(self, code):
-        if code=='ar':
-           return '/index.php'
-        if code=='fi':
-           return '/hikipedia/index.php'
-        if code=='hu':
-           return '/index.php'
-        if code=='ja':
-           return '/index.php'
-        if code=='no':
-           return '/index.php'
-        if code=='sv':
-           return '/w/index.php'
-        if code=='zh-tw':
-           return '/index.php'
-        return '/wiki/index.php'
+    def scriptpath(self, code):
+        return ''
 
     def version(self, code):
-        return "1.9.3"
+        return "1.12alpha"

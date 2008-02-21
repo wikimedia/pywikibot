@@ -2739,14 +2739,28 @@ class Family:
     def hostname(self, code):
         return self.langs[code]
 
+    def scriptpath(self, code):
+        """The prefix used to locate scripts on this wiki.
+
+        This is the value displayed when you enter {{SCRIPTPATH}} on a
+        wiki page (often displayed at [[Help:Variables]] if the wiki has
+        copied the master help page correctly).
+
+        The default value is the one used on Wikimedia Foundation wikis,
+        but needs to be overridden in the family file for any wiki that
+        uses a different value.
+
+        """
+        return '/w'
+
     def path(self, code):
-        return '/w/index.php'
+        return '%s/index.php' % self.scriptpath(code)
 
     def querypath(self, code):
-        return '/w/query.php'
+        return '%s/query.php' % self.scriptpath(code)
 
     def apipath(self, code):
-        return '/w/api.php'
+        return '%s/api.php' % self.scriptpath(code)
 
     def nicepath(self, code):
         return '/wiki/'

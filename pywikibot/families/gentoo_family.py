@@ -64,8 +64,13 @@ class Family(family.Family):
 
         self.known_families.pop('gentoo-wiki')
 
-    def path(self, code):
-        return '/index.php'
+    def scriptpath(self, code):
+        return ''
+
+    def apipath(self, code):
+        # API not implemented on this wiki
+        raise NotImplementedError(
+            "The %s family does not yet support api.php." % self.name())
 
     def nicepath(self, code):
         return '/'

@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 import family
-    
+
 # The Lovetoknow internal family, for lovetoknow wikis, including those
 # not yet open to the public.
 
@@ -68,15 +68,19 @@ class Family(family.Family):
 
         self.disambcatname = {
             '1911': 'Disambiguation',}
-        
-    def path(self, code):
+
+    def scriptpath(self, code):
         if code in ['1911','shoes','insurance','makeup','skincare','lingerie',
                     'mortgage','interiordesign','tattoos','hair','dating',
                     'cellphones','college','yoga','celebrity','sunglasses',
                     'divorce','creditcards','cats','swimsuits']:
-            return '/index.php'
+            return ''
         else:
-            return '/w/index.php'
+            return '/w'
+
+    def apipath(self, code):
+        raise NotImplementedError(
+            "The lovetoknow family does not support api.php")
 
     def nice_get_address(self, code, name):
         if code in ['recipes','garden','guru']:
@@ -86,7 +90,7 @@ class Family(family.Family):
 
     # Which version of MediaWiki is used?
     def version(self, code):
-        return "1.4.5"
+        return "1.8.2"
 
     def hostname(self,code):
         if code == '1911':

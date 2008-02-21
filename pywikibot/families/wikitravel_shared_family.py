@@ -20,7 +20,6 @@ class Family(family.Family):
         self.namespaces[5] = {
             '_default': [u'Wikitravel Shared talk', self.namespaces[5]['_default']],
         }
-        
         self.namespaces[200] = {
             '_default': [u'Tech', self.namespaces[5]['_default']],
         }
@@ -30,12 +29,16 @@ class Family(family.Family):
 
         self.interwiki_forward = 'wikitravel'
 
-    def path(self, code):
-        return '/wiki/shared/index.php'
+    def scriptpath(self, code):
+        return '/wiki/shared'
+
+    def apipath(self, code):
+        raise NotImplementedError(
+            "The wikitravel_shared family does not support api.php")
 
     def shared_image_repository(self, code):
         return ('wikitravel_shared', 'wikitravel_shared')
 
     def version(self, code):
-        return "1.11alpha"
+        return "1.10.1"
 

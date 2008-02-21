@@ -2,7 +2,8 @@
 
 import family
 
-# I added this becouse someone asked me to. The url op the wiki:  nl.wikibond.org
+# I added this becouse someone asked me to.
+# The url op the wiki:  nl.wikibond.org
 
 class Family(family.Family):
    
@@ -19,8 +20,12 @@ class Family(family.Family):
             'nl': [u'Overleg WikiBond'],
         }
 
-    def path(self, code):
-        return '/wikibond/index.php'
+    def scriptpath(self, code):
+        return '/wikibond'
 
     def version(self, code):
         return "1.11alpha"
+
+    def apipath(self, code):
+        raise NotImplementedError(
+            "The wikibond family does not support api.php")

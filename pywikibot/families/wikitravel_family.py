@@ -49,11 +49,15 @@ class Family(family.Family):
     def hostname(self,code):
         return 'wikitravel.org'
 
-    def path(self, code):
-        return '/wiki/%s/index.php' % code
+    def scriptpath(self, code):
+        return '/wiki/%s' % code
+
+    def apipath(self, code):
+        raise NotImplementedError(
+            "The wikitravel family does not support api.php")
 
     def shared_image_repository(self, code):
         return ('wikitravel_shared', 'wikitravel_shared')
 
     def version(self, code):
-        return "1.9.3"
+        return "1.10.1"

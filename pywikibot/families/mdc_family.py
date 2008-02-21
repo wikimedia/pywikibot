@@ -27,6 +27,7 @@ class Family(family.Family):
         self.namespaces[4] = {
             '_default': u'MDC',
         }
+
         self.namespaces[5] = {
             '_default': u'MDC talk',
             'ca': u'MDC Discussió',
@@ -45,8 +46,12 @@ class Family(family.Family):
     def hostname(self,code):
         return 'developer.mozilla.org'
 
-    def path(self, code):
-        return '/'+code+'/docs/index.php'
+    def scriptpath(self, code):
+        return '/'+code+'/docs'
+
+    def apipath(self, code):
+        raise NotImplementedError(
+            "The mdc family does not support api.php")
 
     def version(self, code):
-        return "1.5"
+        return "1.9.3"

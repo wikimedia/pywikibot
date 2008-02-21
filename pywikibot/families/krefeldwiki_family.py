@@ -57,5 +57,8 @@ class Family(family.Family):
     def version(self, code):
         return "1.10.1"
 
+    def scriptpath(self, code):
+        return '/w'
+
     def path(self, code):
-        return '/w/index.php5'
+        return '%s/index.php5' % self.scriptpath(code)
