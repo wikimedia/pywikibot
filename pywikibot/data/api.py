@@ -19,6 +19,7 @@ import traceback
 import time
 import urllib
 
+import pywikibot
 from pywikibot import login
 
 
@@ -241,10 +242,10 @@ class PageGenerator(object):
             # method that converts the dict info to a Page object
             if isinstance(query["pages"], dict):
                 for v in query["pages"].itervalues():
-                    yield Page(self.site, v['title']) 
+                    yield pywikibot.Page(self.site, v['title']) 
             elif isinstance(query["pages"], list):
                 for v in query["pages"]:
-                    yield Page(self.site, v['title'])
+                    yield pywikibot.Page(self.site, v['title'])
             else:
                 raise APIError("Unknown",
                                "Unknown format in ['query']['pages'] value.",

@@ -1,8 +1,8 @@
 import unittest
+import pywikibot
 import pywikibot.data.api as api
 
-from pywikibot.tests.dummy import TestSite as Site, TestPage as Page
-mysite = Site('en.wikipedia.org')
+mysite = pywikibot.Site('en', 'wikipedia')
 
 
 class TestApiFunctions(unittest.TestCase):
@@ -59,7 +59,7 @@ class TestPageGenerator(unittest.TestCase):
         results = [p for p in self.gen]
         self.assertEqual(len(results), 4)
         for page in results:
-            self.assertEqual(type(page), Page)
+            self.assertEqual(type(page), pywikibot.Page)
             self.assertEqual(page.site(), mysite)
             self.assert_(page.title() in titles)
 
