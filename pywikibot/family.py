@@ -2963,6 +2963,16 @@ class Family:
            wiki"""
         return self.code2encoding(code),
 
+    # aliases
+    def encoding(self, code):
+        """Return the encoding for a specific language wiki"""
+        return self.code2encoding(code)
+
+    def encodings(self, code):
+        """Return a list of historical encodings for a specific language
+           wiki"""
+        return self.code2encodings(code)
+
     def __cmp__(self, otherfamily):
         try:
             return cmp(self.name, otherfamily.name)
@@ -2971,6 +2981,9 @@ class Family:
 
     def __hash__(self):
         return hash(self.name)
+
+    def __repr__(self):
+        return 'Family("%s")' % self.name
 
     def RversionTab(self, code):
         """Change this to some regular expression that shows the page we

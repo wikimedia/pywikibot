@@ -25,7 +25,7 @@ class TestApiFunctions(unittest.TestCase):
         self.assert_(all(len(item) == 2 for item in req.items()))
 
 
-class TestListGenerator(unittest.TestCase):
+class TestPageGenerator(unittest.TestCase):
     def setUp(self):
         self.gen = api.PageGenerator(site=mysite,
                                      generator="links",

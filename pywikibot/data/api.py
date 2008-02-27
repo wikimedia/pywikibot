@@ -10,6 +10,7 @@ Interface functions to Mediawiki's api.php
 __version__ = '$Id: $'
 
 from UserDict import DictMixin
+from datetime import datetime, timedelta
 import http
 import simplejson as json
 import logging
@@ -17,8 +18,8 @@ import re
 import traceback
 import time
 import urllib
-# TODO - replace when Page object is written
-from pywikibot.tests.dummy import TestPage as Page
+
+from pywikibot import login
 
 
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
@@ -127,7 +128,7 @@ class Request(DictMixin):
         if self.params['format'] != 'json':
             raise TypeError("Query format '%s' cannot be parsed."
                             % self.params['format'])
-        uri = self.site.script_path() + "api.php"
+        uri = self.site.scriptpath() + "/api.php"
         params = urllib.urlencode(self.params)
         while True:
             # TODO wait on errors
@@ -143,6 +144,7 @@ class Request(DictMixin):
                     rawdata = http.request(self.site, uri)
             except Exception, e: #TODO: what exceptions can occur here?
                 logging.warning(traceback.format_exc())
+                print uri, params
                 self.wait()
                 continue
             if rawdata.startswith(u"unknown_action"):
@@ -257,9 +259,44 @@ class PageGenerator(object):
             del self.data
 
 
+class LoginManager(login.LoginManager):
+    """Supplies getCookie() method to use API interface."""
+    def getCookie(self, remember=True, captchaId=None, captchaAnswer=None):
+        """
+        Login to the site.
+
+        Paramters are all ignored.
+
+        Returns cookie data if succesful, None otherwise.
+        """
+        if hasattr(self, '_waituntil'):
+            if datetime.now() < self._waituntil:
+                time.sleep(self._waituntil - datetime.now())
+        login_request = Request(site=self.site,
+                                action="login",
+                                lgname=self.username,
+                                lgpassword=self.password
+                               )
+        login_result = login_request.submit()
+        if u"login" not in login_result:
+            raise RuntimeError("API login response does not have 'login' key.")
+        if login_result['login']['result'] != u'Success':
+            self._waituntil = datetime.datetime.now() + datetime.timedelta(seconds=60)
+            return None
+
+        prefix = login_result['login']['cookieprefix']
+        cookies = []
+        for key in ('Token', 'UserID', 'UserName'):
+            cookies.append("%s%s=%s"
+                           % (prefix, key,
+                              login_result['login']['lg'+key.lower()]))
+        self.username = login_result['login']['lgusername']
+        return "\n".join(cookies)
+
+
 if __name__ == "__main__":
-    from pywikibot.tests.dummy import TestSite as Site, TestPage as Page
-    mysite = Site("en.wikipedia.org")
+    from pywikibot import Site
+    mysite = Site("en", "wikipedia")
     logging.getLogger().setLevel(logging.DEBUG)
     def _test():
         import doctest
