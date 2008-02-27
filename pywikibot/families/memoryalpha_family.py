@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-import family
+from pywikibot import family
 
 # The Memory Alpha family, a set of StarTrek wikis.
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
-
 import urllib
-import family, config
+from pywikibot import family
+import config
 
 __version__ = '$Id$'
 
@@ -14,18 +14,18 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'fr', 'en', 'vi', 'tr', 'ru', 'io', 'zh', 'el', 'ar', 'pl',
-            'fi', 'it', 'de',  'sv', 'hu', 'pt', 'ku', 'ko', 'id', 'te',
-            'es', 'nl', 'ja', 'bg', 'lt', 'vo', 'gl', 'li', 'et', 'sr',
+            'fi', 'it', 'de', 'hu', 'sv', 'pt', 'ku', 'ko', 'id', 'te',
+            'es', 'nl', 'ja', 'lt', 'bg', 'vo', 'gl', 'li', 'et', 'sr',
             'fa', 'is', 'ro', 'af', 'scn', 'br', 'sl', 'ta', 'hy', 'zh-min-nan',
-            'no', 'he', 'la', 'sq', 'ur', 'da', 'simple', 'ca', 'ast', 'tlh',
-            'fy', 'cs', 'uk', 'hr', 'sw', 'oc', 'ang', 'kk', 'ml', 'hi',
-            'ia', 'csb', 'co', 'st', 'sk', 'eo', 'kl', 'nds', 'ky', 'ms',
-            'sd', 'ug', 'az', 'th', 'ga', 'tt', 'ti', 'gu', 'mk', 'tl',
-            'ts', 'fo', 'qu', 'rw', 'cy', 'bs', 'mr', 'su', 'ie', 'chr',
-            'an', 'am', 'yi', 'wo', 'kn', 'mn', 'nah', 'gd', 'be', 'pa',
-            'lv', 'zu', 'nn', 'km', 'ps', 'mi', 'so', 'dv', 'bn', 'tg',
+            'no', 'he', 'la', 'sq', 'ur', 'simple', 'da', 'ca', 'ast', 'tlh',
+            'fy', 'uk', 'cs', 'hr', 'sw', 'oc', 'ang', 'kk', 'ml', 'hi',
+            'ia', 'co', 'csb', 'st', 'eo', 'sk', 'kl', 'nds', 'ms', 'ky',
+            'ug', 'sd', 'ga', 'az', 'th', 'tt', 'mk', 'ti', 'gu', 'tl',
+            'ts', 'fo', 'qu', 'rw', 'cy', 'bs', 'mr', 'su', 'an', 'ie',
+            'chr', 'am', 'yi', 'wo', 'kn', 'mn', 'nah', 'gd', 'be', 'pa',
+            'lv', 'zu', 'nn', 'km', 'ps', 'mi', 'so', 'dv', 'tg', 'bn',
             'mg', 'ha', 'ka', 'na', 'sa', 'gv', 'tpi', 'ay', 'ss', 'eu',
-            'ne', 'jbo', 'uz', 'tn', 'gn', 'as', 'mt', 'ch', 'jv', 'pi',
+            'ne', 'jbo', 'uz', 'gn', 'tn', 'ch', 'as', 'mt', 'jv', 'pi',
             'sh', 'lb', 'ks', 'tk', 'iu', 'sg', 'fj', 'als', 'xh', 'ik',
             'kw', 'ln', 'sm', 'si', 'za', 'roa-rup', 'mh', 'ba', 'or', 'sn',
             'ak', 'bh', 'lo', 'bm', 'yo', 'bi', 'to', 'aa', 'av', 'rn',

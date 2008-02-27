@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-import family
+from pywikibot import family
 
 # I added this becouse someone asked me to.
 # The url op the wiki:  nl.wikibond.org

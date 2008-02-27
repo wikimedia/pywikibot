@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-import family
+from pywikibot import family
 
 # The Mozilla Developer Center, Official Mozilla Documents.
 

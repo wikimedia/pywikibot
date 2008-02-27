@@ -1,10 +1,11 @@
 # -*- coding: utf-8  -*-
 import urllib
-import family, config
+from pywikibot import family
+import config
 
 __version__ = '$Id$'
 
-# The wikimedia family that is known as Wikibooks
+# The Wikimedia family that is known as Wikibooks
 
 class Family(family.Family):
     def __init__(self):
@@ -12,14 +13,14 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'pt', 'fr', 'hu', 'es', 'it', 'ja', 'pl', 'nl',
+            'en', 'de', 'fr', 'pt', 'hu', 'es', 'it', 'ja', 'pl', 'nl',
             'he', 'sq', 'fi', 'sv', 'hr', 'da', 'vi', 'mk', 'cs', 'ru',
             'zh', 'fa', 'is', 'id', 'ta', 'tr', 'no', 'ar', 'eo', 'ko',
-            'ka', 'bg', 'lt', 'ca', 'th', 'gl', 'simple', 'sk', 'ia', 'ro',
+            'ka', 'bg', 'ca', 'lt', 'th', 'gl', 'simple', 'ro', 'sk', 'ia',
             'sr', 'ang', 'mr', 'uk', 'sl', 'als', 'et', 'oc', 'el', 'ur',
-            'la', 'ml', 'cv', 'ie', 'hi', 'fy', 'lv', 'hy', 'eu', 'ky',
-            'pa', 'bn', 'bs', 'tl', 'be', 'ms', 'tg', 'te', 'af', 'cy',
-            'ast', 'tt', 'az', 'ku', 'mg', 'si', 'co', 'sa', 'sw', 'tk',
+            'la', 'ml', 'cv', 'ie', 'hi', 'fy', 'lv', 'hy', 'eu', 'pa',
+            'ky', 'bn', 'tl', 'bs', 'be', 'ms', 'tg', 'te', 'af', 'cy',
+            'ast', 'tt', 'sa', 'az', 'mg', 'ku', 'si', 'co', 'sw', 'tk',
             'ne', 'qu', 'bm', 'ak', 'vo', 'uz', 'ks', 'bo', 'gu', 'su',
             'na', 'se', 'ps', 'kn', 'kk', 'zh-min-nan', 'ay', 'lb', 'got', 'nah',
             'as', 'aa', 'mn', 'ch', 'gn', 'ln', 'ug', 'km', 'yo', 'nds',

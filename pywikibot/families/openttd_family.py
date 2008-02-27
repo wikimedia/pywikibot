@@ -2,7 +2,7 @@
 
 __version__ = '$Id$'
 
-import family
+from pywikibot import family
 
 # The project wiki of OpenTTD, an open source game (Transport Tycoon Deluxe clone).
 

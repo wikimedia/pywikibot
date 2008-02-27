@@ -2,7 +2,7 @@
 
 __version__ = '$Id$'
 
-import family
+from pywikibot import family
 
 # The MediaWiki family
 # user-config.py: usernames['mediawiki']['mediawiki'] = 'User name'

@@ -1,7 +1,8 @@
 # -*- coding: utf-8  -*-
 
 import urllib
-import family, wikipedia
+from pywikibot import family
+import wikipedia
 
 # The wikimedia family that is known as Wesolve
 

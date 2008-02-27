@@ -2,7 +2,7 @@
 
 __version__ = '$Id$'
 
-import family
+from pywikibot import family
 
 # The project wiki of Freeciv, an open source strategy game.
 
@@ -27,20 +27,26 @@ class Family(family.Family):
 
         self.namespaces[5] = {
             '_default': u'Freeciv talk',
+            'da': u'Freeciv-diskussion',
+            'de': u'Freeciv Diskussion',
+            'es': u'Freeciv Discusión',
             'fi': u'Keskustelu FreeCiv wiki Suomalaisillesta',
+            'fr': u'Discussion Freeciv',
         }
 
-        self.namespaces[8]['fi'] = u'MediaWiki'
+        self.namespaces[8]['fi'] = u'Järjestelmäviesti'
 
-        self.namespaces[9]['da'] = u'MediaWiki diskussion'
-        self.namespaces[9]['fi'] = u'MediaWiki talk'
+        self.namespaces[9]['da'] = u'MediaWiki-diskussion'
+        self.namespaces[9]['fi'] = u'Keskustelu järjestelmäviestistä'
 
         self.namespaces[110] = {
             '_default': u'Forum',
+            'fi': u'Foorumi',
         }
 
         self.namespaces[111] = {
             '_default': u'Forum talk',
+            'fi': u'Keskustelu foorumista',
         }
 
     def scriptpath(self, code):

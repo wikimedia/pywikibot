@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
-
 import urllib
-import family, config
+from pywikibot import family
+import config
 
 __version__ = '$Id$'
 
@@ -14,30 +14,30 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'pl', 'ja', 'it', 'nl', 'pt', 'es', 'sv',
-            'ru', 'zh', 'no', 'fi', 'vo', 'ca', 'ro', 'tr', 'eo', 'uk',
-            'cs', 'sk', 'hu', 'da', 'id', 'he', 'lt', 'sr', 'sl', 'ar',
+            'ru', 'zh', 'no', 'fi', 'vo', 'ca', 'ro', 'tr', 'uk', 'eo',
+            'cs', 'hu', 'sk', 'da', 'id', 'he', 'lt', 'sr', 'sl', 'ar',
             'ko', 'bg', 'et', 'new', 'hr', 'te', 'ceb', 'gl', 'th', 'el',
             'fa', 'vi', 'nn', 'ms', 'simple', 'eu', 'bpy', 'bs', 'lb', 'ka',
-            'is', 'sq', 'br', 'la', 'az', 'bn', 'hi', 'mr', 'tl', 'io',
-            'sh', 'mk', 'cy', 'pms', 'su', 'lv', 'ta', 'nap', 'jv', 'nds',
-            'scn', 'oc', 'ast', 'ku', 'wa', 'ht', 'be', 'af', 'tg', 'be-x-old',
-            'an', 'roa-tara', 'ksh', 'vec', 'zh-yue', 'cv', 'fy', 'ur', 'sw', 'uz',
-            'yo', 'mi', 'qu', 'ga', 'bat-smg', 'ml', 'co', 'kn', 'gd', 'hsb',
-            'yi', 'pam', 'nah', 'lmo', 'tt', 'ia', 'sa', 'li', 'hy', 'als',
-            'roa-rup', 'map-bms', 'am', 'pag', 'nrm', 'zh-min-nan', 'fo', 'vls', 'se', 'nds-nl',
-            'war', 'ne', 'fur', 'bh', 'lij', 'nov', 'pi', 'dv', 'ilo', 'sco',
-            'rm', 'diq', 'frp', 'zh-classical', 'kk', 'mt', 'os', 'pdc', 'lad', 'csb',
-            'kw', 'wuu', 'fiu-vro', 'to', 'bar', 'ps', 'mn', 'haw', 'ang', 'ln',
-            'tk', 'ie', 'km', 'jbo', 'crh', 'tpi', 'wo', 'eml', 'ig', 'or',
-            'zea', 'mg', 'ty', 'kg', 'glk', 'cbk-zam', 'si', 'ky', 'ay', 'arc',
-            'sc', 'gu', 'kab', 'ks', 'so', 'gn', 'cu', 'udm', 'tet', 'mzn',
-            'gv', 'sd', 'pa', 'ba', 'rmy', 'na', 'iu', 'lo', 'bo', 'got',
-            'chr', 'ce', 'stq', 'om', 'ug', 'sm', 'bcl', 'ee', 'ti', 'as',
-            'hak', 'cdo', 'av', 'bm', 'zu', 'nv', 'dsb', 'pih', 'my', 'pap',
-            'cr', 've', 'rw', 'ss', 'xh', 'kl', 'tlh', 'ik', 'dz', 'ts',
-            'bi', 'kv', 'bug', 'xal', 'st', 'tn', 'ch', 'ak', 'bxr', 'tw',
-            'ab', 'fj', 'ny', 'lbe', 'za', 'ff', 'tum', 'sn', 'ha', 'sg',
-            'lg', 'ki', 'rn', 'chy', 'aa', 'mh', 'ng',
+            'is', 'sq', 'br', 'la', 'az', 'bn', 'hi', 'mr', 'tl', 'mk',
+            'sh', 'io', 'cy', 'pms', 'su', 'lv', 'ta', 'nap', 'jv', 'ht',
+            'nds', 'scn', 'oc', 'ast', 'ku', 'wa', 'be', 'af', 'tg', 'be-x-old',
+            'an', 'roa-tara', 'vec', 'ksh', 'zh-yue', 'cv', 'fy', 'ur', 'sw', 'yo',
+            'uz', 'mi', 'qu', 'ga', 'bat-smg', 'ml', 'co', 'kn', 'gd', 'hsb',
+            'yi', 'pam', 'nah', 'tt', 'ia', 'sa', 'li', 'hy', 'als', 'roa-rup',
+            'lmo', 'map-bms', 'am', 'pag', 'zh-min-nan', 'nrm', 'fo', 'vls', 'se', 'nds-nl',
+            'war', 'ne', 'wuu', 'fur', 'bh', 'lij', 'rm', 'nov', 'dv', 'pi',
+            'ilo', 'sco', 'diq', 'frp', 'zh-classical', 'kk', 'mt', 'os', 'lad', 'pdc',
+            'csb', 'kw', 'fiu-vro', 'bar', 'to', 'ps', 'haw', 'mn', 'ang', 'ln',
+            'tk', 'km', 'ie', 'crh', 'jbo', 'tpi', 'wo', 'eml', 'or', 'zea',
+            'ig', 'mg', 'ty', 'ay', 'kg', 'glk', 'cbk-zam', 'si', 'ky', 'arc',
+            'sc', 'gu', 'kab', 'ks', 'so', 'gn', 'mzn', 'gv', 'cu', 'udm',
+            'tet', 'sd', 'pa', 'ba', 'rmy', 'na', 'iu', 'lo', 'ce', 'bo',
+            'got', 'stq', 'chr', 'om', 'ug', 'sm', 'bcl', 'hak', 'ee', 'ti',
+            'as', 'cdo', 'av', 'bm', 'zu', 'dsb', 'nv', 'my', 'pih', 'pap',
+            'cr', 've', 'rw', 'xh', 'ss', 'kl', 'ik', 'dz', 'ts', 'bug',
+            'bi', 'kv', 'xal', 'st', 'tn', 'ch', 'ak', 'bxr', 'ny', 'tw',
+            'ab', 'fj', 'lbe', 'za', 'ff', 'tum', 'sn', 'ha', 'sg', 'lg',
+            'ki', 'rn', 'chy', 'aa', 'mh', 'ng',
         ]
 
         for lang in self.languages_by_size:
@@ -82,6 +82,7 @@ class Family(family.Family):
             'fur': u'Vichipedie',
             'fy': u'Wikipedy',
             'ga': u'Vicipéid',
+            'gn': u'Vikipetã',
             'gu': u'વિકિપીડિયા',
             'he': u'ויקיפדיה',
             'hi': u'विकिपीडिया',
@@ -89,6 +90,7 @@ class Family(family.Family):
             'hsb': u'Wikipedija',
             'ht': u'Wikipedya',
             'hu': u'Wikipédia',
+            'hy': u'Վիքիփեդիա',
             'io': u'Wikipedio',
             'ka': u'ვიკიპედია',
             'kk': u'Уикипедия',
@@ -180,7 +182,7 @@ class Family(family.Family):
             'ga': u'Plé Vicipéide',
             'gl': u'Conversa Wikipedia',
             'glk': u'بحث Wikipedia',
-            'gn': u'Wikipedia Discusión',
+            'gn': u'Vikipetã myangekõi',
             'gu': u'વિકિપીડિયા talk',
             'he': u'שיחת ויקיפדיה',
             'hi': u'विकिपीडिया वार्ता',
@@ -188,7 +190,7 @@ class Family(family.Family):
             'hsb': u'Wikipedija diskusija',
             'ht': u'Diskisyon Wikipedya',
             'hu': u'Wikipédia vita',
-            'hy': u'Wikipedia քննարկում',
+            'hy': u'Վիքիփեդիայի քննարկում',
             'ia': u'Discussion Wikipedia',
             'id': u'Pembicaraan Wikipedia',
             'io': u'Wikipedio Debato',
@@ -279,6 +281,7 @@ class Family(family.Family):
         self.namespaces[100] = {
             'als': u'Portal',
             'ar': u'بوابة',
+            'bg': u'Портал',
             'bpy': u'হমিলদুৱার',
             'ca': u'Portal',
             'cs': u'Portál',
@@ -342,6 +345,7 @@ class Family(family.Family):
         self.namespaces[101] = {
             'als': u'Portal Diskussion',
             'ar': u'نقاش البوابة',
+            'bg': u'Портал беседа',
             'bpy': u'হমিলদুৱার য়্যারী',
             'ca': u'Portal Discussió',
             'cs': u'Portál diskuse',
@@ -516,6 +520,7 @@ class Family(family.Family):
             'ko':  [u'Disambig', u'동음이의', u'동음이의어'],
             'ku':  [u'Cudakirin'],
             'kw':  [u'Klerheans'],
+            'ksh': [u'Disambig',  u'disambig'],
             'la':  [u'Discretiva'],
             'lb':  [u'Homonymie', u'Disambig'],
             'li':  [u'Verdudeliking', u'Verdudelikingpazjena', u'Vp'],
@@ -614,6 +619,7 @@ class Family(family.Family):
             'kw':  u'Folennow klerheans',
             'ko':  u'동음이의어 문서',
             'ku':  u'Rûpelên cudakirinê',
+            'ksh': u'Woot met mieh wi ëijnem Senn',
             'la':  u'Discretiva',
             'lb':  u'Homonymie',
             'li':  u'Verdudelikingspazjena',
@@ -727,7 +733,7 @@ class Family(family.Family):
             'he': ['en'],
             'hu': ['en'],
             'lb': self.alphabetic_lb,
-            'nds': ['nds-nl','pdt'] + self.alphabetic, # Note: as of 2008-01-16, pdt: (Plattdeutsch) is still in the Incubator.
+            'nds': ['nds-nl','pdt'] + self.alphabetic, # Note: as of 2008-02-24, pdt: (Plautdietsch) is still in the Incubator.
             'nn': ['no','nb','sv','da'] + self.alphabetic,
             'no': self.alphabetic,
             'pl': self.alphabetic,
@@ -751,6 +757,7 @@ class Family(family.Family):
             'nb': 'no',
             'jp': 'ja',
             'ru-sib': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Siberian_Wikipedia
+            'tlh': None,
             'tokipona': None,
             'zh-tw': 'zh',
             'zh-cn': 'zh'

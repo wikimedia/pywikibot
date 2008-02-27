@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-import family
+from pywikibot import family
 
 # The official Beta Wiki.
 class Family(family.Family):

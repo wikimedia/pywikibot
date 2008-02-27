@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
-import family, config
+from pywikibot import family
+import config
 
 # ZRHwiki, formerly known as SouthernApproachWiki, a wiki about Zürich Airport.
 

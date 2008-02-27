@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-import family
+from pywikibot import family
 
 # The city wiki of Krefeld, Germany, Europe.
 

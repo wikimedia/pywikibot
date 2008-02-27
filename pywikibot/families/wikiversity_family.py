@@ -1,10 +1,11 @@
 # -*- coding: utf-8  -*-
 import urllib
-import family, config
+from pywikibot import family
+import config
 
 __version__ = '$Id$'
 
-# The wikimedia family that is known as Wikiversity
+# The Wikimedia family that is known as Wikiversity
 
 class Family(family.Family):
     def __init__(self):

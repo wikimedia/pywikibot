@@ -1,4 +1,5 @@
-import family, config
+from pywikibot import family
+import config
 
 # The wikitravel family
 

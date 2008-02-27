@@ -2,7 +2,7 @@
 
 __version__ = '$Id$'
 
-import family
+from pywikibot import family
 
 # The project wiki of SuperTux, an open source arcade game.
 

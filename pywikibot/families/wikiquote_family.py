@@ -1,10 +1,11 @@
 # -*- coding: utf-8  -*-
 import urllib
-import family, config
+from pywikibot import family
+import config
 
 __version__ = '$Id$'
 
-# The wikimedia family that is known as Wikiquote
+# The Wikimedia family that is known as Wikiquote
 
 class Family(family.Family):
     def __init__(self):
@@ -13,11 +14,11 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'it', 'pl', 'sk', 'pt', 'ru', 'bg', 'bs', 'sl',
-            'es', 'tr', 'he', 'zh', 'lt', 'fr', 'cs', 'id', 'el', 'uk',
+            'es', 'tr', 'he', 'zh', 'fr', 'lt', 'cs', 'id', 'el', 'uk',
             'sv', 'hu', 'ja', 'no', 'nl', 'fa', 'fi', 'ca', 'ku', 'ar',
-            'eo', 'ro', 'hr', 'gl', 'ko', 'af', 'is', 'et', 'nn', 'li',
+            'eo', 'ro', 'hr', 'gl', 'ko', 'is', 'af', 'et', 'nn', 'li',
             'ka', 'sr', 'ml', 'da', 'th', 'simple', 'vi', 'sq', 'te',
-            'la', 'br', 'eu', 'hi', 'az', 'ast', 'uz', 'be', 'ang',
+            'la', 'az', 'br', 'eu', 'hi', 'ast', 'uz', 'be', 'ang',
             'zh-min-nan', 'lb', 'mr', 'su', 'ur', 'kn', 'ta', 'wo', 'ky', 'gu',
             'cy', 'hy', 'am', 'tt', 'co', 'qu', 'bm', 'ug', 'kw', 'na',
             'tk', 'vo', 'ga', 'kr', 'nds', 'cr', 'kk', 'ks', 'za', 'als',

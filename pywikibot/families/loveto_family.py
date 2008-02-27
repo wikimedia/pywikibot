@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-import family
+from pywikibot import family
 
 # The Lovetoknow internal family, for lovetoknow wikis, including those
 # not yet open to the public.

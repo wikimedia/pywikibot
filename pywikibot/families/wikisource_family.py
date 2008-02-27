@@ -1,9 +1,11 @@
 # -*- coding: utf-8  -*-
-import family, config
+import urllib
+from pywikibot import family
+import config
 
 __version__ = '$Id$'
 
-# The wikimedia family that is known as Wikisource
+# The Wikimedia family that is known as Wikisource
 
 class Family(family.Family):
     def __init__(self):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-import family
+from pywikibot import family
 
 # Bot wiki - the (semi-)official pywikipedia wiki
 

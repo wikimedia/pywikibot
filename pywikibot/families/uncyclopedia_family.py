@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-import family
+from pywikibot import family
     
 # The Uncyclopaedia family, a satirical set of encyclopaedia wikis.
 #

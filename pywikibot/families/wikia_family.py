@@ -2,7 +2,7 @@
 
 __version__ = '$Id:  $'
 
-import family
+from pywikibot import family
 
 # The Wikia Search family
 # user-config.py: usernames['wikia']['wikia'] = 'User name'
