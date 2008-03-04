@@ -48,7 +48,6 @@ import re
 import urllib2
 import config
 import pywikibot
-from pywikibot import Page
 from pywikibot.exceptions import *
 
 # On some wikis you are only allowed to run a bot if there is a link to
@@ -91,7 +90,7 @@ class LoginManager:
         return True # DEBUG
         if botList.has_key(self.site.family.name) and botList[self.site.family.name].has_key(self.site.language()):
             botListPageTitle = botList[self.site.family.name][self.site.language()]
-            botListPage = Page(self.site, botListPageTitle)
+            botListPage = pywikibot.Page(self.site, botListPageTitle)
             for linkedPage in botListPage.linkedPages():
                 if linkedPage.titleWithoutNamespace() == self.username:
                     return True

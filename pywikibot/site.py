@@ -106,15 +106,14 @@ class BaseSite(object):
             return self._username
         return None
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr, *args, **kwargs):
         """Calls to methods not defined in this object are passed to Family."""
         try:
             method = getattr(self.family(), attr)
-            return lambda self=self: method(self.language())
+            return lambda self=self: method(self.language(), *args, **kwargs)
         except AttributeError:
             raise AttributeError("%s instance has no attribute '%s'"
-                                 % (self.__class__.__name__, attr)
-                                )
+                                 % (self.__class__.__name__, attr)  )
 
     def sitename(self):
         """Return string representing this Site's name and language."""
@@ -135,7 +134,16 @@ class BaseSite(object):
 
     def getNamespaceIndex(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
-        return self.family().getNamespaceIndex(self.language(), namespace)
+        if self.case() == "first-letter":
+            namespace = namespace[:1].upper() + namespace[1:]
+        for ns in self._namespaces:
+            if namespace in self._namespaces[ns]:
+                return ns
+        return None
+
+    def namespaces(self):
+        """Return dict of valid namespaces on this wiki."""
+        return self._namespaces
 
 
 class APISite(BaseSite):
@@ -158,7 +166,6 @@ class APISite(BaseSite):
 ##    postForm: Post form data to an address at this site.
 ##    postData: Post encoded form data to an http address at this site.
 ##
-##    namespace(num): Return local name of namespace 'num'.
 ##    normalizeNamespace(value): Return preferred name for namespace 'value' in
 ##        this Site's language.
 ##    namespaces: Return list of canonical namespace names for this Site.
@@ -308,8 +315,9 @@ class APISite(BaseSite):
             14: [u"Category"],
             15: [u"Category talk"],
             }
+        self.getsiteinfo()
         return
-# START HERE
+# ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
         self._mediawiki_messages = {}
         self.nocapitalize = self._lang in self.family().nocapitalize
         self._userData = [False, False]
@@ -451,7 +459,7 @@ class APISite(BaseSite):
         """
         return self._namespaces[num][0]
 
-
+#### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
 class NotImplementedYet:
 
     def isBlocked(self, sysop = False):

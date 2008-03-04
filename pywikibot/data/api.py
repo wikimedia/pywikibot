@@ -26,7 +26,7 @@ from pywikibot import login
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
 
-class APIError(Exception):
+class APIError(pywikibot.Error):
     """The wiki site returned an error message."""
     def __init__(self, code, info, **kwargs):
         """Save error dict returned by MW API."""
@@ -39,7 +39,7 @@ class APIError(Exception):
         return "%(code)s: %(info)s" % self.__dict__
 
 
-class TimeoutError(Exception):
+class TimeoutError(pywikibot.Error):
     pass
 
 

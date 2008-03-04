@@ -10,7 +10,7 @@ Objects representing various types of MediaWiki pages.
 __version__ = '$Id: $'
 
 import pywikibot
-from pywikibot.exceptions import *
+import pywikibot.site
 
 import htmlentitydefs
 import logging
@@ -28,109 +28,84 @@ class Page(object):
     reading from or writing to the wiki.  All other methods are delegated
     to the Site object. 
 
-    Methods available:
-     - site: The wiki this page is in
-     - title: The name of the page, with various presentation options
-     - namespace: The namespace in which the page is found
-     - section: The section of the page (the part of the title after '#', if
-         any)
-     - isAutoTitle: Title can be translated using the autoFormat method
-     - autoFormat: Auto-format certain dates and other standard format page
-         titles
-     - isCategory: True if the page is a category
-     - isDisambig (*): True if the page is a disambiguation page
-     - isImage: True if the page is an image
-     - isRedirectPage (*): True if the page is a redirect, false otherwise
-     - getRedirectTarget (*): The page the page redirects to
-     - isTalkPage: True if the page is in any "talk" namespace
-     - toggleTalkPage: Return the talk page (if this is one, return the
-         non-talk page)
-     - get (*): The text of the page
-     - latestRevision (*): The page's current revision id
-     - userName: Last user to edit page
-     - isIpEdit: True if last editor was unregistered
-     - editTime: Timestamp of the last revision to the page
-     - previousRevision (*): The revision id of the previous version
-     - permalink (*): The url of the permalink of the current version
-     - getOldVersion(id) (*): The text of a previous version of the page
-     - getVersionHistory: Load the version history information from wiki
-     - getVersionHistoryTable: Create a wiki table from the history data
-     - fullVersionHistory: Return all past versions including wikitext
-     - contributingUsers: Return set of users who have edited page
-     - exists (*): True if the page actually exists, false otherwise
-     - isEmpty (*): True if the page has 4 characters or less content, not
-         counting interwiki and category links
-     - interwiki (*): The interwiki links from the page (list of Pages)
-     - categories (*): The categories the page is in (list of Pages)
-     - linkedPages (*): The normal pages linked from the page (list of
-         Pages)
-     - imagelinks (*): The pictures on the page (list of ImagePages)
-     - templates (*): All templates referenced on the page (list of Pages)
-     - templatesWithParams(*): All templates on the page, with list of
-         parameters
-     - isDisambig (*): True if the page is a disambiguation page
-     - getReferences: List of pages linking to the page
-     - canBeEdited (*): True if page is unprotected or user has edit
-         privileges
-     - botMayEdit (*): True if bot is allowed to edit page
-     - put(newtext): Saves the page
-     - put_async(newtext): Queues the page to be saved asynchronously
-     - move: Move the page to another title
-     - delete: Deletes the page (requires being logged in)
-     - protect: Protect or unprotect a page (requires sysop status)
-     - removeImage: Remove all instances of an image from this page
-     - replaceImage: Replace all instances of an image with another
-     - loadDeletedRevisions: Load all deleted versions of this page
-     - getDeletedRevision: Return a particular deleted revision
-     - markDeletedRevision: Mark a version to be undeleted, or not
-     - undelete: Undelete past version(s) of the page
-
-    Deprecated methods (preserved for backwards-compatibility):
-     - urlname: Title, in a form suitable for a URL 
-     - titleWithoutNamespace: Title, with the namespace part removed
-     - sectionFreeTitle: Title, without the section part
-     - aslink: Title in the form [[Title]] or [[lang:Title]]
-     - encoding: The encoding of the page
-
-    (*) This loads the page if it has not been loaded before; permalink might
-        even reload it if it has been loaded before
-
     """
-    def __init__(self, site, title, insite=None,
-                 defaultNamespace=0):
-        """Parameters:
+    def __init__(self, source, title=u"", ns=0, insite=None,
+                 defaultNamespace=None):
+        """Instantiate a Page object.
 
-        @param site: the wikimedia Site on which the page resides
-        @param title: title of the page
+        Three calling formats are supported:
+
+          - If the first argument is a Page, create a copy of that object.
+            This can be used to convert an existing Page into a subclass
+            object, such as Category or ImagePage.
+          - If the first argument is a Site, create a Page on that Site
+            using the second argument as the title (may include a section),
+            and the third as the namespace number. The namespace number is
+            mandatory, even if the title includes the namespace prefix. This
+            is the preferred syntax when using an already-normalized title
+            obtained from api.php or a database dump.  WARNING: may produce
+            invalid objects if page title isn't in normal form!
+          - If the first argument is a Link, create a Page from that link.
+            This is the preferred syntax when using a title scraped from
+            wikitext, URLs, or another non-normalized source.
+
+        @param source: the source of the page
+        @type source: Link, Page (or subclass), or Site
+        @param title: normalized title of the page; required if source is a
+            Site, ignored otherwise
         @type title: unicode
-        @param insite: (optional) a wikimedia Site where this link was found
-            (to help decode interwiki links)
-        @param defaultNamespace: (optional) A namespace to use if the link
-            does not contain one
-        @type defaultNamespace: int
+        @param ns: namespace number; required if source is a Site, ignored
+            otherwise
+        @type ns: int
+        @param insite: DEPRECATED (use Link instead)
+        @param defaultNamespace: DEPRECATED (use Link instead)
 
         """
-        if site == None:
-            self._site = pywikibot.Site()
-        elif isinstance(site, basestring):
-            self._site = pywikibot.Site(site)
+        if insite is not None:
+            logging.debug(
+                "The 'insite' option in Page constructor is deprecated.")
+        if defaultNamespace is not None:
+            logging.debug(
+            "The 'defaultNamespace' option in Page constructor is deprecated.")
+        if isinstance(source, pywikibot.site.BaseSite):
+            self._site = source
+            if ns not in source.namespaces():
+                raise pywikibot.Error(
+                      "Invalid namespace '%i' for site %s."
+                      % (ns, source.sitename()))
+            self._ns = ns
+            if ns and not title.startswith(source.namespace(ns)+u":"):
+                title = source.namespace(ns) + u":" + title
+            elif not ns and u":" in title:
+                nsindex = source.getNamespaceIndex(title[ :title.index(u":")])
+                if nsindex:
+                    self._ns = nsindex
+            if u"#" in title:
+                title, self._section = title.split(u"#", 1)
+            else:
+                self._section = None
+            if not title:
+                raise pywikibot.Error(
+                      "Page object cannot be created from Site without title.")
+            self._title = title
+        elif isinstance(source, Page):
+            # copy all of source's attributes to this object
+            self.__dict__ = source.__dict__
+        elif isinstance(source, Link):
+            self._site = link.site
+            self._section = link.section
+            self._ns = link.namespace
+            self._title = link.title
+            # reassemble the canonical title from components
+            if self._ns:
+                self._title = "%s:%s" % (self.site().namespace(self._ns),
+                                         self._title)
         else:
-            self._site = site
-
-        if not insite: insite = self._site
-
-        # parse the title
-        # this can throw various exceptions if the title is invalid
-        link = Link(title, insite, defaultNamespace)
-        self._site = link.site
-        self._section = link.section
-        self._ns = link.namespace
-        self._title = link.title
-        # reassemble the canonical title from components
+            raise pywikibot.Error(
+                  "Invalid argument type '%s' in Page constructor: %s"
+                  % (type(source), source))
         if self._section is not None:
             self._title = self._title + "#" + self._section
-        if self._ns:
-            self._title = self.site().namespace(self._ns) + ":" + self._title
         self._revisions = {}
 
     def site(self):
@@ -138,14 +113,7 @@ class Page(object):
         return self._site
 
     def namespace(self):
-        """Return the number of the namespace of the page.
-
-        Only recognizes those namespaces defined in family.py.
-        If not defined, it will return 0 (the main namespace).
-
-        @return: int
-
-        """
+        """Return the number of the namespace of the page."""
         return self._ns
 
     def title(self, underscore=False, savetitle=False, withNamespace=True,
@@ -186,13 +154,12 @@ class Page(object):
                     allowInterwiki and self.site() != pywikibot.Site()):
                 if self.site().family() != pywikibot.Site().family() \
                         and self.site().family().name != self.site().language():
-# FIXME: Interwiki links shouldn't be fully urlencoded
                     return u'[[%s:%s:%s]]' % (self.site().family().name,
                                               self.site().language(),
-                                              self.title(asUrl=True))
+                                              self._title)
                 else:
                     return u'[[%s:%s]]' % (self.site().language(),
-                                           self.title(asUrl=True))
+                                           self._title)
             elif textlink and (self.isImage() or self.isCategory()):
                     return u'[[:%s]]' % title
             else:
@@ -225,7 +192,12 @@ class Page(object):
         return u"%s(%s)" % (self.__class__.__name__, self.title())
 
     def __cmp__(self, other):
-        """Test for equality and inequality of Page objects"""
+        """Test for equality and inequality of Page objects.
+
+        Page objects are "equal" if and only if they are on the same site
+        and have the same normalized title, including section if any.
+
+        """
         if not isinstance(other, Page):
             # especially, return -1 if other is None
             return -1
@@ -302,7 +274,7 @@ class Page(object):
         else:
             # Make sure we re-raise an exception we got on an earlier attempt
             if hasattr(self, '_redirarg') and not get_redirect:
-                raise IsRedirectPage, self._redirarg
+                raise pywikibot.IsRedirectPage, self._redirarg
             elif hasattr(self, '_getexception'):
                 raise self._getexception
         if force or not hasattr(self, "_revid") \
@@ -517,7 +489,9 @@ class Page(object):
             return True
         try:
             templates = self.templatesWithParams();
-        except (NoPage, IsRedirectPage, SectionError):
+        except (pywikibot.NoPage,
+                pywikibot.IsRedirectPage,
+                pywikibot.SectionError):
             return True
         for template in templates:
             title = template[0].title(withNamespace=False)
@@ -980,8 +954,8 @@ class ImagePage(Page):
     usingPages                : Iterate Pages on which the image is displayed.
 
     """
-    def __init__(self, site, title, insite = None):
-        Page.__init__(self, site, title, insite, defaultNamespace=6)
+    def __init__(self, source, title=u"", insite=None):
+        Page.__init__(self, source, title, 6)
         if self.namespace() != 6:
             raise ValueError(u"'%s' is not in the image namespace!" % title)
 
@@ -1065,17 +1039,16 @@ class ImagePage(Page):
 class Category(Page):
     """A page in the Category: namespace"""
 
-    def __init__(self, site, title, insite=None, sortKey=None):
+    def __init__(self, source, title, insite=None, sortKey=None):
         """All parameters are the same as for Page() constructor, except:
 
         @param sortKey: DEPRECATED (use .aslink() method instead)
 
         """
-        Page.__init__(self, site=site, title=title, insite=insite,
-                      defaultNamespace=14)
         if sortKey is not None:
             logging.debug(
                 "The 'sortKey' option in Category constructor is deprecated.")
+        Page.__init__(self, source, title, 14)
         if self.namespace() != 14:
             raise ValueError(u"'%s' is not in the category namespace!"
                              % title)
@@ -1358,78 +1331,70 @@ class Link(object):
         # This code was adapted from Title.php : secureAndSplit()
         #
         if u'\ufffd' in t:
-            raise Error("Title contains illegal char (\\uFFFD)")
+            raise pywikibot.Error("Title contains illegal char (\\uFFFD)")
         self.namespace = defaultNamespace
 
         # Replace underscores by spaces
-        t = t.replace(u'_', u' ')
+        t = t.replace(u"_", u" ")
         # replace multiple spaces and underscores with a single space
         while u"  " in t: t = t.replace(u"  ", u" ")
         # Strip spaces at both ends
-        t = t.strip()
+        t = t.strip(" ")
         # Remove left-to-right and right-to-left markers.
-        t = t.replace(u'\u200e', u'').replace(u'\u200f', u'')
+        t = t.replace(u"\u200e", u"").replace(u"\u200f", u"")
 
-        # Initial colon indicates main namespace rather than specified default
-        if t.startswith(u':'):
-            self.namespace = 0
-            # remove the colon but continue processing
-            # remove any subsequent whitespace
-            t = t[1:].strip()
-
-        # Namespace or interwiki prefix
         firstPass = True
-        while True:
-            fam = self.site.family
+        while u":" in t:
+            # Initial colon indicates main namespace rather than default
+            if t.startswith(u":"):
+                self.namespace = 0
+                # remove the colon but continue processing
+                # remove any subsequent whitespace
+                t = t.lstrip(u":").lstrip(u" ")
+                continue
 
-            m = Link.namespace_pattern.match(t)
-            if m:
-                pre = m.group(1).lower()
-                ns = self.site.getNamespaceIndex(pre)
-                if ns:
-                    # Ordinary namespace
-                    t = m.group(2)
-                    self.namespace = ns
-                elif pre in fam.langs.keys()\
-                     or pre in fam.get_known_families(site=self.site):
-
-                    if not firstPass:
-                        # Can't make a local interwiki link to an interwiki link.
-                        # That's just crazy!
-                        raise Error("Improperly formatted interwiki link '%s'"
-                                    % text)
-
-                    # Interwiki link
-                    t = m.group(2)
-                    if pre in fam.langs.keys():
-                        newsite = pywikibot.Site(pre, fam)
-                    else:
-                        otherlang = self.site.lang
-                        familyName = fam.get_known_families(site=self.site)[pre]
-                        if familyName in ['commons', 'meta']:
-                            otherlang = familyName
-                        try:
-                            newsite = pywikibot.Site(otherlang, familyName)
-                        except ValueError:
-                            raise Error("""\
+            fam = self.site.family()
+            prefix = t[ :t.index(u":")].lower()
+            ns = self.site.getNamespaceIndex(prefix)
+            if ns:
+                # Ordinary namespace
+                t = t[t.index(u":"): ].lstrip(u":").lstrip(u" ")
+                self.namespace = ns
+                break
+            if prefix in fam.langs.keys()\
+                   or prefix in fam.get_known_families(site=self.site):
+                # looks like an interwiki link
+                if not firstPass:
+                    # Can't make a local interwiki link to an interwiki link.
+                    # That's just crazy!
+                    raise pywikibot.Error(
+                          "Improperly formatted interwiki link '%s'"
+                          % text)
+                t = t[t.index(u":"): ].lstrip(u":").lstrip(u" ")
+                if prefix in fam.langs.keys():
+                    newsite = pywikibot.Site(pre, fam)
+                else:
+                    otherlang = self.site.lang
+                    familyName = fam.get_known_families(site=self.site)[pre]
+                    if familyName in ['commons', 'meta']:
+                        otherlang = familyName
+                    try:
+                        newsite = pywikibot.Site(otherlang, familyName)
+                    except ValueError:
+                        raise pywikibot.Error("""\
 %s is not a local page on %s, and the %s family is
 not supported by PyWikiBot!"""
-                                  % (title, self.site(), familyName))
+                              % (title, self.site(), familyName))
 
-                    # Redundant interwiki prefix to the local wiki
-                    if newsite == self.site:
-                        if not t:
-                            # Can't have an empty self-link
-                            raise Error("Invalid link title: '%s'" % text)
-                        firstPass = False
-                        continue
-                    self.site = newsite
-                    # If there's an initial colon after the interwiki, that also
-                    # resets the default namespace
-                    if t.startswith(":"):
-                        self.namespace = 0
-                        t = t[1:]
-            break
+                # Redundant interwiki prefix to the local wiki
+                if newsite == self.site:
+                    if not t:
+                        # Can't have an empty self-link
+                        raise pywikibot.Error(
+                              "Invalid link title: '%s'" % text)
+                    firstPass = False
+                    continue
+                self.site = newsite
 
         if u"#" in t:
             t, sec = t.split(u'#', 1)
@@ -1438,8 +1403,10 @@ not supported by PyWikiBot!"""
             self.section = None
 
         # Reject illegal characters.
-        if Link.illegal_titles_pattern.search(t):
-            raise Error("Invalid title (contains illegal char(s)): '%s'" % text)
+        m = Link.illegal_titles_pattern.search(t)
+        if m:
+            raise pywikibot.Error(
+                  "Invalid title: contains illegal char(s) '%s'" % m.group(0))
 
         # Pages with "/./" or "/../" appearing in the URLs will
         # often be unreachable due to the way web browsers deal
@@ -1454,15 +1421,16 @@ not supported by PyWikiBot!"""
                 or t.endswith(u"/.")
                 or t.endswith(u"/..")
         ):
-            raise Error("Invalid title (contains . / combinations): '%s'"
+            raise pywikibot.Error(
+                  "Invalid title (contains . / combinations): '%s'"
                         % text)
 
         # Magic tilde sequences? Nu-uh!
         if u"~~~" in t:
-            raise Error("Invalid title (contains ~~~): '%s'" % text)
+            raise pywikibot.Error("Invalid title (contains ~~~): '%s'" % text)
 
         if self.namespace != -1 and len(t) > 255:
-            raise Error("Invalid title (over 255 bytes): '%s'" % t)
+            raise pywikibot.Error("Invalid title (over 255 bytes): '%s'" % t)
 
         if self.site.case() == 'first-letter':
             t = t[:1].upper() + t[1:]

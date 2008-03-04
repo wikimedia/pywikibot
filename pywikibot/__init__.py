@@ -65,3 +65,6 @@ def input(prompt, password=False):
         import getpass
         return getpass.getpass(prompt)
     return raw_input(prompt)
+
+import logging
+logging.getLogger().setLevel(logging.DEBUG)

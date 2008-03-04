@@ -773,7 +773,7 @@ class Family(family.Family):
     def get_known_families(self, site):
         # In Swedish Wikipedia 's:' is part of page title not a family
         # prefix for 'wikisource'.
-        if site.lang == 'sv':
+        if site.language() == 'sv':
             d = self.known_families.copy()
             d.pop('s') ; d['src'] = 'wikisource'
             return d
