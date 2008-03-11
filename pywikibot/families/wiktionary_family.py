@@ -30,6 +30,7 @@ class Family(family.Family):
             'kw', 'ln', 'sm', 'si', 'za', 'roa-rup', 'mh', 'ba', 'or', 'sn',
             'ak', 'bh', 'lo', 'bm', 'yo', 'bi', 'to', 'aa', 'av', 'rn',
             'dz', 'tw', 'om', 'ab', 'my', 'wa', 'sc', 'cr', 'bo', 'rm',
+            'hsb',
         ]
 
         for lang in self.languages_by_size:
@@ -65,6 +66,7 @@ class Family(family.Family):
             'hi': u'विक्षनरी',
             'hr': u'Wječnik',
             'hu': u'Wikiszótár',
+            'hy': u'Վիքիբառարան',
             'io': u'Wikivortaro',
             'is': u'Wikiorðabók',
             'it': u'Wikizionario',
@@ -128,14 +130,14 @@ class Family(family.Family):
             'fy': u'Wiktionary oerlis',
             'ga': u'Plé Vicífhoclóra',
             'gl': u'Conversa Wiktionary',
-            'gn': u'Wiktionary Discusión',
+            'gn': u'Wiktionary myangekõi',
             'gu': u'વિક્ષનરી talk',
             'he': u'שיחת ויקימילון',
             'hi': u'विक्षनरी वार्ता',
             'hr': u'Razgovor Wječnik',
             'hsb': u'Wiktionary diskusija',
             'hu': u'Wikiszótár vita',
-            'hy': u'Wiktionary քննարկում',
+            'hy': u'Վիքիբառարանի քննարկում',
             'ia': u'Discussion Wiktionary',
             'id': u'Pembicaraan Wiktionary',
             'io': u'Wikivortaro Debato',
@@ -145,6 +147,7 @@ class Family(family.Family):
             'jv': u'Dhiskusi Wiktionary',
             'ka': u'ვიქსიკონი განხილვა',
             'kk': u'Уикисөздік талқылауы',
+            'km': u'Wiktionary ពិភាក្សា',
             'kn': u'Wiktionary ಚರ್ಚೆ',
             'ko': u'위키낱말사전토론',
             'ku': u'Wiktionary nîqaş',
@@ -152,6 +155,7 @@ class Family(family.Family):
             'lb': u'Wiktionary Diskussioun',
             'li': u'Euverlèk Wiktionary',
             'ln': u'Discussion Wiktionary',
+            'lo': u'ສົນທະນາກ່ຽວກັບWiktionary',
             'lt': u'Vikižodyno aptarimas',
             'lv': u'Wiktionary diskusija',
             'mg': u'Discussion Wiktionary',
@@ -167,6 +171,7 @@ class Family(family.Family):
             'oc': u'Discussion Wikiccionari',
             'pa': u'Wiktionary ਚਰਚਾ',
             'pl': u'Wikidyskusja',
+            'ps': u'د Wiktionary خبرې اترې',
             'pt': u'Wikcionário Discussão',
             'qu': u'Wiktionary rimanakuy',
             'ro': u'Discuţie Wikţionar',
@@ -370,7 +375,7 @@ class Family(family.Family):
         self.interwiki_attop = ['pl']
 
     def version(self, code):
-        return "1.12alpha"
+        return '1.13alpha'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

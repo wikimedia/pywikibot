@@ -11,10 +11,15 @@ on the same topic in different languages).
 __version__ = '$Id: $'
 
 import pywikibot
-from pywikibot.exceptions import *
 from pywikibot.data import api
 
 import os
+import threading
+
+
+class PageInUse(pywikibot.Error):
+    """Page cannot be reserved for writing due to existing lock."""
+
 
 def Family(fam=None, fatal=True):
     """Import the named family.
@@ -90,6 +95,10 @@ class BaseSite(object):
 ##                                 % (self._lang, self._family.name))
         self._username = user
 
+        # following are for use with lock_page and unlock_page methods
+        self._mutex = threading.Lock()
+        self._locked_pages = []
+
     def family(self):
         """Return the associated Family object."""
         return self._family
@@ -134,16 +143,50 @@ class BaseSite(object):
 
     def getNamespaceIndex(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
-        if self.case() == "first-letter":
-            namespace = namespace[:1].upper() + namespace[1:]
         for ns in self._namespaces:
-            if namespace in self._namespaces[ns]:
+            if namespace.lower() in [name.lower()
+                                      for name in self._namespaces[ns]]:
                 return ns
         return None
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
         return self._namespaces
+
+    def lock_page(self, page, block=True):
+        """Lock page for writing.  Must be called before writing any page.
+
+        We don't want different threads trying to write to the same page
+        at the same time, even to different sections.
+
+        @param page: the page to be locked
+        @type page: pywikibot.Page
+        @param block: if true, wait until the page is available to be locked;
+            otherwise, raise an exception if page can't be locked
+
+        """
+        self._mutex.acquire()
+        try:
+            while page in self._locked_pages:
+                if not block:
+                    raise PageInUse
+                time.sleep(.25)
+            self._locked_pages.append(page.title(withSection=False))
+        finally:
+            self._mutex.release()
+
+    def unlock_page(self, page):
+        """Unlock page.  Call as soon as a write operation has completed.
+
+        @param page: the page to be locked
+        @type page: pywikibot.Page
+
+        """
+        self._mutex.acquire()
+        try:
+            self._locked_pages.remove(page.title(withSection=False))
+        finally:
+            self._mutex.release()
 
 
 class APISite(BaseSite):
@@ -296,6 +339,8 @@ class APISite(BaseSite):
         self._namespaces = {
             # these are the MediaWiki built-in names, which always work
             # localized names are loaded later upon accessing the wiki
+            # namespace prefixes are always case-insensitive, but the
+            # canonical forms are capitalized
             -2: [u"Media"],
             -1: [u"Special"],
              0: [u""],
@@ -315,7 +360,7 @@ class APISite(BaseSite):
             14: [u"Category"],
             15: [u"Category talk"],
             }
-        self.getsiteinfo()
+#        self.getsiteinfo()
         return
 # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
         self._mediawiki_messages = {}
@@ -450,14 +495,52 @@ class APISite(BaseSite):
     def case(self):
         return self.getsiteinfo()['case']
 
+    def namespaces(self):
+        """Return dict of valid namespaces on this wiki."""
+        self.getsiteinfo()
+        return self._namespaces
+
     def namespace(self, num, all = False):
         """Return string containing local name of namespace 'num'.
 
-        If optional argument 'all' is true, return a tuple of all recognized
+        If optional argument 'all' is true, return a list of all recognized
         values for this namespace.
 
         """
+        self.getsiteinfo()
+        if all:
+            return self._namespaces[num]
         return self._namespaces[num][0]
+
+    # following group of methods map more-or-less directly to API queries
+
+    def getbacklinks(self, page, followRedirects, filterRedirects,
+                     namespaces=None):
+        """Retrieve all pages that link to the given page.
+
+        @param page: The Page to get links to.
+        @param followRedirects: Also return links to redirects pointing to
+            the given page. [Not yet implemented on API]
+        @param filterRedirects: If True, only return redirects to the given
+            page. If False, only return non-redirect links. If None, return
+            both (no filtering).
+        @param namespaces: If present, only return links from the namespaces
+            in this list.
+        
+        """
+        bltitle = page.title(withSection=False)
+        blgen = api.PageGenerator("backlinks", gbltitle=bltitle,
+                                  gbllimit="5000")
+        if namespaces is not None:
+            blgen.request["gblnamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        if filterRedirects is not None:
+            blgen.request["gblfilterredir"] = filterRedirects and "redirects"\
+                                                              or "nonredirects"
+        if followRedirects:
+            blgen.request["gblredirect"] = ""
+        return blgen
+        
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
 class NotImplementedYet:

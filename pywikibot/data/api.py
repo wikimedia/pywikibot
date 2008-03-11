@@ -87,8 +87,7 @@ class Request(DictMixin):
     
     """
     def __init__(self, **kwargs):
-        self.site = kwargs.pop("site", None)
-            # else use defaultSite() ... when written
+        self.site = kwargs.pop("site", pywikibot.Site())
         self.max_retries = kwargs.pop("max_retries", 25)
         self.retry_wait = kwargs.pop("retry_wait", 5)
         self.params = {}
@@ -242,10 +241,10 @@ class PageGenerator(object):
             # method that converts the dict info to a Page object
             if isinstance(query["pages"], dict):
                 for v in query["pages"].itervalues():
-                    yield pywikibot.Page(self.site, v['title']) 
+                    yield self.make_page(v) 
             elif isinstance(query["pages"], list):
                 for v in query["pages"]:
-                    yield pywikibot.Page(self.site, v['title'])
+                    yield self.make_page(v)
             else:
                 raise APIError("Unknown",
                                "Unknown format in ['query']['pages'] value.",
@@ -258,6 +257,18 @@ class PageGenerator(object):
                                data=self.data["query-continue"])
             self.request.update(self.data["query-continue"][self.generator])
             del self.data
+
+    def make_page(self, pagedata):
+        """Convert page dict entry from api to Page object."""
+        p = pywikibot.Page(self.site, pagedata['title'], pagedata['ns'])
+        if 'lastrevid' in pagedata:
+            p._revid = pagedata['lastrevid']
+        if 'touched' in pagedata:
+            p._timestamp = pagedata['touched']
+        if 'protection' in pagedata:
+            for item in pagedata['protection']:
+                p._protection[item['key']] = item['level']
+        return p
 
 
 class LoginManager(login.LoginManager):

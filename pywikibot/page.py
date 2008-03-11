@@ -15,6 +15,7 @@ import pywikibot.site
 import htmlentitydefs
 import logging
 import re
+import sys
 import unicodedata
 import urllib
 
@@ -185,6 +186,9 @@ class Page(object):
 
     def __str__(self):
         """Return a console representation of the pagelink."""
+        return self.title(asLink=True, forceInterwiki=True).encode(sys.stderr.encoding)
+
+    def __unicode__(self):
         return self.title(asLink=True, forceInterwiki=True)
 
     def __repr__(self):
@@ -211,7 +215,7 @@ class Page(object):
         # Pseudo method that makes it possible to store Page objects as keys
         # in hash-tables. This relies on the fact that the string
         # representation of an instance can not change after the construction.
-        return hash(str(self))
+        return hash(unicode(self))
 
     def autoFormat(self):
         """Return L{date.autoFormat} dictName and value, if any.
@@ -828,8 +832,8 @@ class Page(object):
                         u'Please enter a reason for the undeletion:')
         return self.site().undelete(self, comment)
 
-    def protect(self, edit='sysop', move='sysop', create='sysop',
-                unprotect=False, reason=None, prompt=True, throttle=None):
+    def protect(self, edit='sysop', move='sysop', unprotect=False,
+                reason=None, prompt=True, throttle=None):
         """(Un)protect a wiki page. Requires administrator status.
 
         Valid protection levels (in MediaWiki 1.12) are '' (equivalent to
@@ -837,7 +841,6 @@ class Page(object):
 
         @param edit: Level of edit protection
         @param move: Level of move protection
-        @param create: Level of create protection
         @param unprotect: If true, unprotect the page (equivalent to setting
             all protection levels to '')
         @param reason: Edit summary.
@@ -857,7 +860,7 @@ class Page(object):
                              % (un, self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the action:')
         if unprotect:
-            edit = move = create = ""
+            edit = move = ""
         answer = 'y'
         if prompt and not hasattr(self.site(), '_noProtectPrompt'):
             answer = pywikibot.inputChoice(
@@ -868,7 +871,7 @@ class Page(object):
                 answer = 'y'
                 self.site()._noProtectPrompt = True
         if answer in ['y', 'Y']:
-            return self.site().protect(self, edit, move, create, reason)
+            return self.site().protect(self, edit, move, reason)
 
 ######## DEPRECATED METHODS ########
 
@@ -1279,7 +1282,7 @@ class Link(object):
     """
     illegal_titles_pattern = re.compile(
         # Matching titles will be held as illegal.
-            u'''[^ %!\"$&'()*,\\-.\\/0-9:;=?@A-Z\\\\^_`a-z~\\x80-\\xFF+]'''
+            u'''[^ %!\"$&'()*,\\-.\\/0-9:;=?@A-Z\\\\^_`a-z~\u0080-\uFFFF+]'''
             # URL percent encoding sequences interfere with the ability
             # to round-trip titles -- you can't link to them consistently.
             u'|%[0-9A-Fa-f]{2}' 
@@ -1288,7 +1291,6 @@ class Link(object):
             u'|&#[0-9]+;'
             u'|&#x[0-9A-Fa-f]+;'
         )
-    namespace_pattern = re.compile("^(.+?)_*:_*(.*)$")
 
     def __init__(self, text, source=None, defaultNamespace=0):
         """Parse text into a Link object.
@@ -1366,7 +1368,6 @@ class Link(object):
                 # looks like an interwiki link
                 if not firstPass:
                     # Can't make a local interwiki link to an interwiki link.
-                    # That's just crazy!
                     raise pywikibot.Error(
                           "Improperly formatted interwiki link '%s'"
                           % text)
@@ -1395,6 +1396,8 @@ not supported by PyWikiBot!"""
                     firstPass = False
                     continue
                 self.site = newsite
+            else:
+                break   # text before : doesn't match any known prefix
 
         if u"#" in t:
             t, sec = t.split(u'#', 1)
@@ -1406,7 +1409,7 @@ not supported by PyWikiBot!"""
         m = Link.illegal_titles_pattern.search(t)
         if m:
             raise pywikibot.Error(
-                  "Invalid title: contains illegal char(s) '%s'" % m.group(0))
+                  u"Invalid title: contains illegal char(s) '%s'" % m.group(0))
 
         # Pages with "/./" or "/../" appearing in the URLs will
         # often be unreachable due to the way web browsers deal

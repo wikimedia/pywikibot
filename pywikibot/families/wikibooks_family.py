@@ -56,6 +56,7 @@ class Family(family.Family):
             'he': u'ויקיספר',
             'hr': u'Wikiknjige',
             'hu': u'Wikikönyvek',
+            'hy': u'Վիքիգրքեր',
             'is': u'Wikibækur',
             'ka': u'ვიკიწიგნები',
             'kk': u'Уикикітап',
@@ -105,12 +106,12 @@ class Family(family.Family):
             'fy': u'Wikibooks oerlis',
             'ga': u'Plé Vicíleabhar',
             'gl': u'Conversa Wikibooks',
-            'gn': u'Wikibooks Discusión',
+            'gn': u'Wikibooks myangekõi',
             'he': u'שיחת ויקיספר',
             'hi': u'Wikibooks वार्ता',
             'hr': u'Razgovor Wikiknjige',
             'hu': u'Wikikönyvek vita',
-            'hy': u'Wikibooks քննարկում',
+            'hy': u'Վիքիգրքերի քննարկում',
             'ia': u'Discussion Wikibooks',
             'id': u'Pembicaraan Wikibooks',
             'is': u'Wikibækurspjall',
@@ -118,6 +119,7 @@ class Family(family.Family):
             'ja': u'Wikibooks‐ノート',
             'ka': u'ვიკიწიგნები განხილვა',
             'kk': u'Уикикітап талқылауы',
+            'km': u'Wikibooks ពិភាក្សា',
             'kn': u'Wikibooks ಚರ್ಚೆ',
             'ko': u'위키책토론',
             'ku': u'Wikibooks nîqaş',
@@ -138,6 +140,7 @@ class Family(family.Family):
             'oc': u'Discussion Wikilibres',
             'pa': u'Wikibooks ਚਰਚਾ',
             'pl': u'Dyskusja Wikibooks',
+            'ps': u'د Wikibooks خبرې اترې',
             'pt': u'Wikibooks Discussão',
             'qu': u'Wikibooks rimanakuy',
             'ro': u'Discuţie Wikimanuale',
@@ -164,22 +167,24 @@ class Family(family.Family):
         }
 
         self.namespaces[100] = {
-            'id': u'Resep',
             'fr': u'Transwiki',
             'he': u'שער',
+            'id': u'Resep',
             'it': u'Progetto',
             'ms': u'Resipi',
             'ro': u'Raft',
+            'ru': u'Полка',
             'tr': u'Yemek',
         }
 
         self.namespaces[101] = {
-            'id': u'Pembicaraan Resep',
             'fr': u'Discussion Transwiki',
             'he': u'שיחת שער',
+            'id': u'Pembicaraan Resep',
             'it': u'Discussioni progetto',
             'ms': u'Perbualan Resipi',
             'ro': u'Discuţie Raft',
+            'ru': u'Обсуждение полки',
             'tr': u'Yemek tartışma',
         }
 
@@ -191,6 +196,8 @@ class Family(family.Family):
             'id': u'Wisata',
             'it': u'Ripiano',
             'nl': u'Transwiki',
+            'ro': u'Wikijunior',
+            'ru': u'Импортировано',
             'sr': u'Кувар',
         }
 
@@ -202,6 +209,8 @@ class Family(family.Family):
             'id': u'Pembicaraan Wisata',
             'it': u'Discussioni ripiano',
             'nl': u'Overleg transwiki',
+            'ro': u'Discuţie Wikijunior',
+            'ru': u'Обсуждение импортированного',
             'sr': u'Разговор о кувару',
         }
 
@@ -209,12 +218,24 @@ class Family(family.Family):
             'he': u'מדף',
             'ka': u'თარო',
             'nl': u'Wikijunior',
+            'ro': u'Carte de bucate',
+            'ru': u'Рецепт',
         }
 
         self.namespaces[105] = {
             'he': u'שיחת מדף',
             'ka': u'თარო განხილვა',
             'nl': u'Overleg Wikijunior',
+            'ro': u'Discuţie Carte de bucate',
+            'ru': u'Обсуждение рецепта',
+        }
+
+        self.namespaces[106] = {
+            'ru': u'Задача',
+        }
+
+        self.namespaces[107] = {
+            'ru': u'Обсуждение задачи',
         }
 
         self.namespaces[108] = {
@@ -281,7 +302,7 @@ class Family(family.Family):
         }
 
     def version(self, code):
-        return "1.12alpha"
+        return '1.13alpha'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

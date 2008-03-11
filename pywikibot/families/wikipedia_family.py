@@ -201,6 +201,7 @@ class Family(family.Family):
             'ka': u'ვიკიპედია განხილვა',
             'kab': u'Amyannan n Wikipedia',
             'kk': u'Уикипедия талқылауы',
+            'km': u'Wikipedia ពិភាក្សា',
             'kn': u'ವಿಕಿಪೀಡಿಯ ಚರ್ಚೆ',
             'ko': u'위키백과토론',
             'ksh': u'Wikipedia Klaaf',
@@ -238,6 +239,7 @@ class Family(family.Family):
             'pdc': u'Wikipedia Diskussion',
             'pl': u'Dyskusja Wikipedii',
             'pms': u'Discussion ant sla Wikipedia',
+            'ps': u'د Wikipedia خبرې اترې',
             'pt': u'Wikipedia Discussão',
             'qu': u'Wikipedia rimanakuy',
             'rmy': u'Vikipidiyake vakyarimata',
@@ -733,6 +735,7 @@ class Family(family.Family):
             'he': ['en'],
             'hu': ['en'],
             'lb': self.alphabetic_lb,
+            'ms': self.alphabetic_revised,
             'nds': ['nds-nl','pdt'] + self.alphabetic, # Note: as of 2008-02-24, pdt: (Plautdietsch) is still in the Incubator.
             'nn': ['no','nb','sv','da'] + self.alphabetic,
             'no': self.alphabetic,
@@ -781,7 +784,7 @@ class Family(family.Family):
             return self.known_families
 
     def version(self, code):
-        return "1.12alpha"
+        return '1.13alpha'
 
     def dbName(self, code):
         # returns the name of the MySQL database

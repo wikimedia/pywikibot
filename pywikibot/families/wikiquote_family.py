@@ -47,6 +47,7 @@ class Family(family.Family):
             'he': u'ויקיציטוט',
             'hr': u'Wikicitat',
             'hu': u'Wikidézet',
+            'hy': u'Վիքիքաղվածք',
             'is': u'Wikivitnun',
             'ka': [u'ვიკიციტატა', u'Wikiquote'],
             'kk': u'Уикидәйек',
@@ -93,7 +94,7 @@ class Family(family.Family):
             'hi': u'Wikiquote वार्ता',
             'hr': u'Razgovor Wikicitat',
             'hu': u'Wikidézet vita',
-            'hy': u'Wikiquote քննարկում',
+            'hy': u'Վիքիքաղվածքի քննարկում',
             'id': u'Pembicaraan Wikiquote',
             'is': u'Wikivitnunspjall',
             'it': u'Discussioni Wikiquote',
@@ -236,7 +237,7 @@ class Family(family.Family):
         }
 
     def version(self, code):
-        return "1.12alpha"
+        return '1.13alpha'
 
     def code2encodings(self, code):
         """

@@ -24,7 +24,7 @@ class Family(family.Family):
         self.interwiki_forward = 'wikipedia'
 
     def version(self,code):
-        return "1.12alpha"
+        return '1.13alpha'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
