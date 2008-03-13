@@ -288,14 +288,18 @@ maxthrottle = 10
 # Slow down the robot such that it never makes a second change within
 # 'put_throttle' seconds.
 put_throttle = 10
+# By default, the get_throttle is turned off, and 'maxlag' is used to
+# control the rate of server access.  Set this to non-zero to use a throttle
+# on read access.
+get_throttle = 0
 # Sometimes you want to know when a delay is inserted. If a delay is larger
 # than 'noisysleep' seconds, it is logged on the screen.
 noisysleep = 3.0
 
 # Defer bot edits during periods of database server lag.  For details, see
 # http://www.mediawiki.org/wiki/Maxlag_parameter
-# You can set this variable to a number of seconds, or to None to disable
-# this behavior.
+# You can set this variable to a number of seconds, or to None (or 0) to
+# disable this behavior.
 # It is recommended that you do not change this parameter unless you know
 # what you are doing and have a good reason for it!
 maxlag = 5

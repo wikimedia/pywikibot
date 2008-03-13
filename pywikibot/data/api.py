@@ -19,9 +19,9 @@ import traceback
 import time
 import urllib
 
+import config
 import pywikibot
 from pywikibot import login
-
 
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
@@ -94,7 +94,7 @@ class Request(DictMixin):
         if "format" not in kwargs:
             self.params["format"] = "json"
         if "maxlag" not in kwargs:
-            self.params["maxlag"] = "5" # replace with configurable constant?
+            self.params["maxlag"] = str(config.maxlag)
         self.update(**kwargs)
 
     # implement dict interface
@@ -229,6 +229,7 @@ class PageGenerator(object):
             # following "if" is used for testing with plugged-in data; it wouldn't
             # be needed for actual usage
             if not hasattr(self, "data"):
+                site.get_throttle()
                 self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 raise StopIteration

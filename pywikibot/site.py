@@ -11,7 +11,9 @@ on the same topic in different languages).
 __version__ = '$Id: $'
 
 import pywikibot
+from pywikibot.throttle import Throttle
 from pywikibot.data import api
+import config
 
 import os
 import threading
@@ -98,6 +100,14 @@ class BaseSite(object):
         # following are for use with lock_page and unlock_page methods
         self._mutex = threading.Lock()
         self._locked_pages = []
+
+        pt_min = min(config.minthrottle, config.put_throttle)
+        self.put_throttle = Throttle(pt_min, config.maxthrottle)
+        self.put_throttle.setDelay(config.put_throttle)
+        
+        gt_min = min(config.minthrottle, config.get_throttle)
+        self.get_throttle = Throttle(gt_min, config.maxthrottle)
+        self.get_throttle.setDelay(config.get_throttle)
 
     def family(self):
         """Return the associated Family object."""
@@ -188,7 +198,7 @@ class BaseSite(object):
         finally:
             self._mutex.release()
 
-
+    
 class APISite(BaseSite):
     """API interface to MediaWiki site.
 
@@ -500,7 +510,7 @@ class APISite(BaseSite):
         self.getsiteinfo()
         return self._namespaces
 
-    def namespace(self, num, all = False):
+    def namespace(self, num, all=False):
         """Return string containing local name of namespace 'num'.
 
         If optional argument 'all' is true, return a list of all recognized
@@ -528,9 +538,15 @@ class APISite(BaseSite):
             in this list.
         
         """
+        if 'bot' in self.getuserinfo()['groups']:
+            limit = 5000
+        else:
+            limit = 500
+        if followRedirects:
+            limit = limit / 2
         bltitle = page.title(withSection=False)
         blgen = api.PageGenerator("backlinks", gbltitle=bltitle,
-                                  gbllimit="5000")
+                                  gbllimit=str(limit))
         if namespaces is not None:
             blgen.request["gblnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)

@@ -48,7 +48,7 @@ class TestLinkObject(unittest.TestCase):
         u"Hispanic  (U.S.  Census)"     : u"Hispanic (U.S. Census)",
         u"Stołpce"                      : u"Stołpce",
         u"Nowy_Sącz"                    : u"Nowy Sącz",
-        u"battle of Węgierska Górka"    : u"Battle of Węgierska Górka",
+        u"battle of Węgierska  Górka"   : u"Battle of Węgierska Górka",
     }
     # random bunch of possible section titles
     sections = [u"",
@@ -68,6 +68,16 @@ class TestLinkObject(unittest.TestCase):
                 m = pywikibot.page.Link(prefix.lower()+self.titles.keys()[1],
                                         site)
                 self.assertEqual(m.namespace, num)
+
+    def testTitles(self):
+        """Test that Link() normalizes titles"""
+        for title in self.titles:
+            for num in (0, 1):
+                l = pywikibot.page.Link(self.namespaces[num][0]+title)
+                self.assertEqual(l.title, self.titles[title])
+                # prefixing name with ":" shouldn't change result
+                m = pywikibot.page.Link(":"+self.namespaces[num][0]+title)
+                self.assertEqual(m.title, self.titles[title])
 
 
 class TestPageObject(unittest.TestCase):

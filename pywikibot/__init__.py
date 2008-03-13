@@ -51,6 +51,8 @@ def Site(code=None, fam=None, user=None, interface=None):
     key = '%s:%s:%s' % (fam, code, user)
     if not _sites.has_key(key):
         _sites[key] = __Site(code=code, fam=fam, user=user)
+        _sites[key].getsiteinfo()
+        _sites[key].login(False)
     return _sites[key]
 
 getSite = Site # alias for backwards-compability
@@ -68,3 +70,17 @@ def input(prompt, password=False):
 
 import logging
 logging.getLogger().setLevel(logging.DEBUG)
+
+def stopme():
+    """Drop this process from the throttle log.
+
+    Can be called manually if desired, but if not, will be called automatically
+    at Python exit.
+
+    """
+    # only need one drop() call because all throttles use the same global pid
+    Site().get_throttle.drop()
+
+import atexit
+atexit.register(stopme)
+
