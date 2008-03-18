@@ -15,7 +15,9 @@ from pywikibot.throttle import Throttle
 from pywikibot.data import api
 import config
 
+import logging
 import os
+import sys
 import threading
 
 
@@ -78,23 +80,23 @@ class BaseSite(object):
         else:
             self._family = fam
 
-##        # if we got an outdated language code, use the new one instead.
-##        if self._family.obsolete.has_key(self._lang):
-##            if self._family.obsolete[self._lang] is not None:
-##                self._lang = self._family.obsolete[self._lang]
-##            else:
-##                # no such language anymore
-##                raise NoSuchSite("Language %s in family %s is obsolete"
-##                                 % (self._lang, self._family.name))
-##
-##        if self._lang not in self.languages():
-##            if self._lang == 'zh-classic' and 'zh-classical' in self.languages():
-##                self._lang = 'zh-classical'
-##                # database hack (database is varchar[10] -> zh-classical
-##                # is cut to zh-classic.
-##            else:
-##                raise NoSuchSite("Language %s does not exist in family %s"
-##                                 % (self._lang, self._family.name))
+        # if we got an outdated language code, use the new one instead.
+        if self._family.obsolete.has_key(self._lang):
+            if self._family.obsolete[self._lang] is not None:
+                self._lang = self._family.obsolete[self._lang]
+            else:
+                # no such language anymore
+                raise NoSuchSite("Language %s in family %s is obsolete"
+                                 % (self._lang, self._family.name))
+        if self._lang not in self.languages():
+            if self._lang == 'zh-classic' and 'zh-classical' in self.languages():
+                self._lang = 'zh-classical'
+                # database hack (database is varchar[10] -> zh-classical
+                # is cut to zh-classic.
+            else:
+                raise NoSuchSite("Language %s does not exist in family %s"
+                                 % (self._lang, self._family.name))
+
         self._username = user
 
         # following are for use with lock_page and unlock_page methods
@@ -102,11 +104,11 @@ class BaseSite(object):
         self._locked_pages = []
 
         pt_min = min(config.minthrottle, config.put_throttle)
-        self.put_throttle = Throttle(pt_min, config.maxthrottle)
+        self.put_throttle = Throttle(self, pt_min, config.maxthrottle)
         self.put_throttle.setDelay(config.put_throttle)
         
         gt_min = min(config.minthrottle, config.get_throttle)
-        self.get_throttle = Throttle(gt_min, config.maxthrottle)
+        self.get_throttle = Throttle(self, gt_min, config.maxthrottle)
         self.get_throttle.setDelay(config.get_throttle)
 
     def family(self):
@@ -125,11 +127,15 @@ class BaseSite(object):
             return self._username
         return None
 
-    def __getattr__(self, attr, *args, **kwargs):
+    def __getattr__(self, attr):
         """Calls to methods not defined in this object are passed to Family."""
         try:
             method = getattr(self.family(), attr)
-            return lambda self=self: method(self.language(), *args, **kwargs)
+            f = lambda *args, **kwargs: \
+                       method(self.language(), *args, **kwargs)
+            if hasattr(method, "__doc__"):
+                f.__doc__ = method.__doc__
+            return f
         except AttributeError:
             raise AttributeError("%s instance has no attribute '%s'"
                                  % (self.__class__.__name__, attr)  )
@@ -143,6 +149,9 @@ class BaseSite(object):
     def __repr__(self):
         return 'Site("%s", "%s")' % (self.language(), self.family().name)
 
+    def __hash__(self):
+        return hash(repr(self))
+
     def linktrail(self):
         """Return regex for trailing chars displayed as part of a link."""
         return self.family().linktrail(self.language())
@@ -155,13 +164,44 @@ class BaseSite(object):
         """Given a namespace name, return its int index, or None if invalid."""
         for ns in self._namespaces:
             if namespace.lower() in [name.lower()
-                                      for name in self._namespaces[ns]]:
+                                     for name in self._namespaces[ns]]:
                 return ns
         return None
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
         return self._namespaces
+
+    def normalize_namespace(self, value):
+        """Return canonical local form of namespace name.
+
+        @param value: A namespace name
+        @type value: unicode
+
+        """
+        index = self.getNamespaceIndex(value)
+        return self.namespace(index)
+
+    # alias for backwards-compatibility
+    normalizeNamespace = normalize_namespace
+
+    def redirect(self, default=True):
+        """Return the localized redirect tag for the site.
+
+        If default is True, falls back to 'REDIRECT' if the site has no
+        special redirect tag.
+
+        """
+        if default:
+            if self.language() == 'ar':
+                # It won't work with REDIRECT[[]] but it work with the local,
+                # if problems, try to find a work around. FixMe!
+                return self.family().redirect.get(self.language(), [u"تحويل"])[0]
+            else:
+                return self.family().redirect.get(self.language(), [u"REDIRECT"])[0]
+        else:
+            return self.family().redirect.get(self.language(), None)
+
 
     def lock_page(self, page, block=True):
         """Lock page for writing.  Must be called before writing any page.
@@ -219,12 +259,6 @@ class APISite(BaseSite):
 ##    postForm: Post form data to an address at this site.
 ##    postData: Post encoded form data to an http address at this site.
 ##
-##    normalizeNamespace(value): Return preferred name for namespace 'value' in
-##        this Site's language.
-##    namespaces: Return list of canonical namespace names for this Site.
-##    getNamespaceIndex(name): Return the int index of namespace 'name', or None
-##        if invalid.
-##
 ##    redirect: Return the localized redirect tag for the site.
 ##    redirectRegex: Return compiled regular expression matching on redirect
 ##                   pages.
@@ -276,73 +310,6 @@ class APISite(BaseSite):
 ##        unusedfiles(): Special:Unusedimages (yields ImagePage)
 ##        withoutinterwiki: Special:Withoutinterwiki
 ##        linksearch: Special:Linksearch
-##
-##    Convenience methods that provide access to properties of the wiki Family
-##    object; all of these are read-only and return a unicode string unless
-##    noted --
-##
-##        encoding: The current encoding for this site.
-##        encodings: List of all historical encodings for this site.
-##        category_namespace: Canonical name of the Category namespace on this
-##            site.
-##        category_namespaces: List of all valid names for the Category
-##            namespace.
-##        image_namespace: Canonical name of the Image namespace on this site.
-##        template_namespace: Canonical name of the Template namespace on this
-##            site.
-##        protocol: Protocol ('http' or 'https') for access to this site.
-##        hostname: Host portion of site URL.
-##        path: URL path for index.php on this Site.
-##        dbName: MySQL database name.
-##
-##    Methods that return addresses to pages on this site (usually in
-##    Special: namespace); these methods only return URL paths, they do not
-##    interact with the wiki --
-##
-##        export_address: Special:Export.
-##        query_address: URL path + '?' for query.php
-##        api_address: URL path + '?' for api.php
-##        apipath: URL path for api.php
-##        move_address: Special:Movepage.
-##        delete_address(s): Delete title 's'.
-##        undelete_view_address(s): Special:Undelete for title 's'
-##        undelete_address: Special:Undelete.
-##        protect_address(s): Protect title 's'.
-##        unprotect_address(s): Unprotect title 's'.
-##        put_address(s): Submit revision to page titled 's'.
-##        get_address(s): Retrieve page titled 's'.
-##        nice_get_address(s): Short URL path to retrieve page titled 's'.
-##        edit_address(s): Edit form for page titled 's'.
-##        purge_address(s): Purge cache and retrieve page 's'.
-##        block_address: Block an IP address.
-##        unblock_address: Unblock an IP address.
-##        blocksearch_address(s): Search for blocks on IP address 's'.
-##        linksearch_address(s): Special:Linksearch for target 's'.
-##        search_address(q): Special:Search for query 'q'.
-##        allpages_address(s): Special:Allpages.
-##        newpages_address: Special:Newpages.
-##        longpages_address: Special:Longpages.
-##        shortpages_address: Special:Shortpages.
-##        unusedfiles_address: Special:Unusedimages.
-##        categories_address: Special:Categories.
-##        deadendpages_address: Special:Deadendpages.
-##        ancientpages_address: Special:Ancientpages.
-##        lonelypages_address: Special:Lonelypages.
-##        unwatchedpages_address: Special:Unwatchedpages.
-##        uncategorizedcategories_address: Special:Uncategorizedcategories.
-##        uncategorizedimages_address: Special:Uncategorizedimages.
-##        uncategorizedpages_address: Special:Uncategorizedpages.
-##        unusedcategories_address: Special:Unusedcategories.
-##        withoutinterwiki_address: Special:Withoutinterwiki.
-##        references_address(s): Special:Whatlinksere for page 's'.
-##        allmessages_address: Special:Allmessages.
-##        upload_address: Special:Upload.
-##        double_redirects_address: Special:Doubleredirects.
-##        broken_redirects_address: Special:Brokenredirects.
-##        login_address: Special:Userlogin.
-##        captcha_image_address(id): Special:Captcha for image 'id'.
-##        watchlist_address: Special:Watchlist editor.
-##        contribs_address(target): Special:Contributions for user 'target'.
 
     def __init__(self, code, fam=None, user=None):
         BaseSite.__init__(self, code, fam, user)
@@ -524,9 +491,9 @@ class APISite(BaseSite):
 
     # following group of methods map more-or-less directly to API queries
 
-    def getbacklinks(self, page, followRedirects, filterRedirects,
+    def getbacklinks(self, page, followRedirects=False, filterRedirects=None,
                      namespaces=None):
-        """Retrieve all pages that link to the given page.
+        """Iterate all pages that link to the given page.
 
         @param page: The Page to get links to.
         @param followRedirects: Also return links to redirects pointing to
@@ -556,7 +523,51 @@ class APISite(BaseSite):
         if followRedirects:
             blgen.request["gblredirect"] = ""
         return blgen
-        
+
+    def getembeddedin(self, page, followRedirects=False, filterRedirects=None,
+                      namespaces=None):
+        """Iterate all pages that embedded the given page as a template.
+
+        @param page: The Page to get inclusions for.
+        @param followRedirects: Also return pages transcluding redirects to
+            the given page. [Not yet implemented on API]
+        @param filterRedirects: If True, only return redirects that embed
+            the given page. If False, only return non-redirect links. If
+            None, return both (no filtering).
+        @param namespaces: If present, only return links from the namespaces
+            in this list.
+
+        """
+        eititle = page.title(withSection=False)
+        if 'bot' in self.getuserinfo()['groups']:
+            limit = 5000
+        else:
+            limit = 500
+        eigen = api.PageGenerator("embeddedin", geititle=eititle,
+                                  geilimit=str(limit))
+        if namespaces is not None:
+            eigen.request["geinamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        if filterRedirects is not None:
+            eigen.request["geifilterredir"] = filterRedirects and "redirects"\
+                                                              or "nonredirects"
+        if followRedirects:
+            eigen.request["geiredirect"] = ""
+        return eigen
+
+    def getreferences(self, page, followRedirects, filterRedirects,
+                      withTemplateInclusion, onlyTemplateInclusion):
+        """Convenience method combining getbacklinks and getembeddedin."""
+        if onlyTemplateInclusion:
+            return self.getembeddedin(page)
+        if not withTemplateInclusion:
+            return self.getbacklinks(page, follow_redirects)
+        import itertools
+        return itertools.chain(self.getbacklinks(
+                                    page, followRedirects, filterRedirects),
+                               self.getembeddedin(
+                                    page, followRedirects, filterRedirects)
+                              )
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
 class NotImplementedYet:
@@ -1617,23 +1628,6 @@ your connection is down. Retrying in %i minutes..."""
                 return True
         return False
 
-    def redirect(self, default = False):
-        """Return the localized redirect tag for the site.
-
-        If default is True, falls back to 'REDIRECT' if the site has no
-        special redirect tag.
-
-        """
-        if default:
-            if self.language() == 'ar':
-                # It won't work with REDIRECT[[]] but it work with the local,
-                # if problems, try to find a work around. FixMe!
-                return self.family().redirect.get(self.language(), [u"تحويل"])[0]
-            else:
-                return self.family().redirect.get(self.language(), [u"REDIRECT"])[0]
-        else:
-            return self.family().redirect.get(self.language(), None)
-
     def redirectRegex(self):
         """Return a compiled regular expression matching on redirect pages.
 
@@ -1663,238 +1657,6 @@ your connection is down. Retrying in %i minutes..."""
         return re.compile(r'#' + redirKeywordsR +
                                    '.*?\[\[(.*?)(?:\|.*?)?\]\]',
                           re.IGNORECASE | re.UNICODE | re.DOTALL)
-
-    # The following methods are for convenience, so that you can access
-    # methods of the Family class easily.
-    def encoding(self):
-        """Return the current encoding for this site."""
-        return self.family().code2encoding(self.language())
-
-    def encodings(self):
-        """Return a list of all historical encodings for this site."""
-        return self.family().code2encodings(self.language())
-
-    def category_namespace(self):
-        """Return the canonical name of the Category namespace on this site."""
-        # equivalent to self.namespace(14)?
-        return self.family().category_namespace(self.language())
-
-    def category_namespaces(self):
-        """Return a list of all valid names for the Category namespace."""
-        return self.family().category_namespaces(self.language())
-
-    def image_namespace(self, fallback = '_default'):
-        """Return the canonical name of the Image namespace on this site."""
-        # equivalent to self.namespace(6)?
-        return self.family().image_namespace(self.language(), fallback)
-
-    def template_namespace(self, fallback = '_default'):
-        """Return the canonical name of the Template namespace on this site."""
-        # equivalent to self.namespace(10)?
-        return self.family().template_namespace(self.language(), fallback)
-
-    def export_address(self):
-        """Return URL path for Special:Export."""
-        return self.family().export_address(self.language())
-
-    def query_address(self):
-        """Return URL path + '?' for query.php (if enabled on this Site)."""
-        return self.family().query_address(self.language())
-
-    def api_address(self):
-        """Return URL path + '?' for api.php (if enabled on this Site)."""
-        return self.family().api_address(self.language())
-
-    def apipath(self):
-        """Return URL path for api.php (if enabled on this Site)."""
-        return self.family().apipath(self.language())
-
-    def protocol(self):
-        """Return protocol ('http' or 'https') for access to this site."""
-        return self.family().protocol(self.language())
-
-    def hostname(self):
-        """Return host portion of site URL."""
-        return self.family().hostname(self.language())
-
-    def path(self):
-        """Return URL path for index.php on this Site."""
-        return self.family().path(self.language())
-
-    def dbName(self):
-        """Return MySQL database name."""
-        return self.family().dbName(self.language())
-
-    def move_address(self):
-        """Return URL path for Special:Movepage."""
-        return self.family().move_address(self.language())
-
-    def delete_address(self, s):
-        """Return URL path to delete title 's'."""
-        return self.family().delete_address(self.language(), s)
-
-    def undelete_view_address(self, s, ts=''):
-        """Return URL path to view Special:Undelete for title 's'
-
-        Optional argument 'ts' returns path to view specific deleted version.
-
-        """
-        return self.family().undelete_view_address(self.language(), s, ts)
-
-    def undelete_address(self):
-        """Return URL path to Special:Undelete."""
-        return self.family().undelete_address(self.language())
-
-    def protect_address(self, s):
-        """Return URL path to protect title 's'."""
-        return self.family().protect_address(self.language(), s)
-
-    def unprotect_address(self, s):
-        """Return URL path to unprotect title 's'."""
-        return self.family().unprotect_address(self.language(), s)
-
-    def put_address(self, s):
-        """Return URL path to submit revision to page titled 's'."""
-        return self.family().put_address(self.language(), s)
-
-    def get_address(self, s):
-        """Return URL path to retrieve page titled 's'."""
-        return self.family().get_address(self.language(), s)
-
-    def nice_get_address(self, s):
-        """Return shorter URL path to retrieve page titled 's'."""
-        return self.family().nice_get_address(self.language(), s)
-
-    def edit_address(self, s):
-        """Return URL path for edit form for page titled 's'."""
-        return self.family().edit_address(self.language(), s)
-
-    def purge_address(self, s):
-        """Return URL path to purge cache and retrieve page 's'."""
-        return self.family().purge_address(self.language(), s)
-
-    def block_address(self):
-        """Return path to block an IP address."""
-        return self.family().block_address(self.language())
-
-    def unblock_address(self):
-        """Return path to unblock an IP address."""
-        return self.family().unblock_address(self.language())
-
-    def blocksearch_address(self, s):
-        """Return path to search for blocks on IP address 's'."""
-        return self.family().blocksearch_address(self.language(), s)
-
-    def linksearch_address(self, s, limit=500, offset=0):
-        """Return path to Special:Linksearch for target 's'."""
-        return self.family().linksearch_address(self.language(), s, limit=limit, offset=offset)
-
-    def search_address(self, q, n=50, ns=0):
-        """Return path to Special:Search for query 'q'."""
-        return self.family().search_address(self.language(), q, n, ns)
-
-    def allpages_address(self, s, ns = 0):
-        """Return path to Special:Allpages."""
-        return self.family().allpages_address(self.language(), start=s, namespace = ns)
-
-    def log_address(self, n=50, mode = ''):
-        """Return path to Special:Log."""
-        return self.family().log_address(self.language(), n, mode)
-
-    def newpages_address(self, n=50):
-        """Return path to Special:Newpages."""
-        return self.family().newpages_address(self.language(), n)
-
-    def longpages_address(self, n=500):
-        """Return path to Special:Longpages."""
-        return self.family().longpages_address(self.language(), n)
-
-    def shortpages_address(self, n=500):
-        """Return path to Special:Shortpages."""
-        return self.family().shortpages_address(self.language(), n)
-
-    def unusedfiles_address(self, n=500):
-        """Return path to Special:Unusedimages."""
-        return self.family().unusedfiles_address(self.language(), n)
-
-    def categories_address(self, n=500):
-        """Return path to Special:Categories."""
-        return self.family().categories_address(self.language(), n)
-
-    def deadendpages_address(self, n=500):
-        """Return path to Special:Deadendpages."""
-        return self.family().deadendpages_address(self.language(), n)
-
-    def ancientpages_address(self, n=500):
-        """Return path to Special:Ancientpages."""
-        return self.family().ancientpages_address(self.language(), n)
-
-    def lonelypages_address(self, n=500):
-        """Return path to Special:Lonelypages."""
-        return self.family().lonelypages_address(self.language(), n)
-
-    def unwatchedpages_address(self, n=500):
-        """Return path to Special:Unwatchedpages."""
-        return self.family().unwatchedpages_address(self.language(), n)
-
-    def uncategorizedcategories_address(self, n=500):
-        """Return path to Special:Uncategorizedcategories."""
-        return self.family().uncategorizedcategories_address(self.language(), n)
-
-    def uncategorizedimages_address(self, n=500):
-        """Return path to Special:Uncategorizedimages."""
-        return self.family().uncategorizedimages_address(self.language(), n)
-
-    def uncategorizedpages_address(self, n=500):
-        """Return path to Special:Uncategorizedpages."""
-        return self.family().uncategorizedpages_address(self.language(), n)
-
-    def unusedcategories_address(self, n=500):
-        """Return path to Special:Unusedcategories."""
-        return self.family().unusedcategories_address(self.language(), n)
-
-    def withoutinterwiki_address(self, n=500):
-        """Return path to Special:Withoutinterwiki."""
-        return self.family().withoutinterwiki_address(self.language(), n)
-
-    def references_address(self, s):
-        """Return path to Special:Whatlinksere for page 's'."""
-        return self.family().references_address(self.language(), s)
-
-    def allmessages_address(self):
-        """Return path to Special:Allmessages."""
-        return self.family().allmessages_address(self.language())
-
-    def upload_address(self):
-        """Return path to Special:Upload."""
-        return self.family().upload_address(self.language())
-
-    def double_redirects_address(self, default_limit = True):
-        """Return path to Special:Doubleredirects."""
-        return self.family().double_redirects_address(self.language(), default_limit)
-
-    def broken_redirects_address(self, default_limit = True):
-        """Return path to Special:Brokenredirects."""
-        return self.family().broken_redirects_address(self.language(), default_limit)
-
-    def login_address(self):
-        """Return path to Special:Userlogin."""
-        return self.family().login_address(self.language())
-
-    def captcha_image_address(self, id):
-        """Return path to Special:Captcha for image 'id'."""
-        return self.family().captcha_image_address(self.language(), id)
-
-    def watchlist_address(self):
-        """Return path to Special:Watchlist editor."""
-        return self.family().watchlist_address(self.language())
-
-    def contribs_address(self, target, limit=500, offset=''):
-        """Return path to Special:Contributions for user 'target'."""
-        return self.family().contribs_address(self.language(),target,limit,offset)
-
-    def __hash__(self):
-        return hash(repr(self))
 
     def version(self):
         """Return MediaWiki version number as a string."""
@@ -1985,49 +1747,6 @@ your connection is down. Retrying in %i minutes..."""
     def getSite(self, code):
         """Return Site object for language 'code' in this Family."""
         return getSite(code = code, fam = self.family(), user=self.user)
-
-    def namespace(self, num, all = False):
-        """Return string containing local name of namespace 'num'.
-
-        If optional argument 'all' is true, return a tuple of all recognized
-        values for this namespace.
-
-        """
-        return self.family().namespace(self.language(), num, all = all)
-
-    def normalizeNamespace(self, value):
-        """Return canonical name for namespace 'value' in this Site's language.
-
-        'Value' should be a string or unicode.
-        If no match, return 'value' unmodified.
-
-        """
-        if not self.nocapitalize and value[0].islower():
-            value = value[0].upper() + value[1:]
-        return self.family().normalizeNamespace(self.language(), value)
-
-    def namespaces(self):
-        """Return list of canonical namespace names for this Site."""
-
-        # n.b.: this does not return namespace numbers; to determine which
-        # numeric namespaces the framework recognizes for this Site (which
-        # may or may not actually exist on the wiki), use
-        # self.family().namespaces.keys()
-
-        if _namespaceCache.has_key(self):
-            return _namespaceCache[self]
-        else:
-            nslist = []
-            for n in self.family().namespaces:
-                try:
-                    ns = self.family().namespace(self.language(), n)
-                except KeyError:
-                    # No default namespace defined
-                    continue
-                if ns is not None:
-                    nslist.append(self.family().namespace(self.language(), n))
-            _namespaceCache[self] = nslist
-            return nslist
 
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""

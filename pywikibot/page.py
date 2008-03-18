@@ -445,10 +445,9 @@ class Page(object):
         # to implement those methods in the site interface and then combine
         # the results for this method, or to implement this method and then
         # split up the results for the others. 
-        return self.site().getreferences(self, follow_redirects,
-                                         withTemplateInclusion,
-                                         onlyTemplateInclusion,
-                                         redirectsOnly)
+        return self.site().getreferences(
+                           self, follow_redirects, redirectsOnly,
+                           withTemplateInclusion, onlyTemplateInclusion)
 
     def backlinks(self, followRedirects=True, filterRedirects=None):
         """Yield all pages that contain ordinary wikilinks to this page.

@@ -52,7 +52,10 @@ def Site(code=None, fam=None, user=None, interface=None):
     if not _sites.has_key(key):
         _sites[key] = __Site(code=code, fam=fam, user=user)
         _sites[key].getsiteinfo()
-        _sites[key].login(False)
+        try:
+            _sites[key].login(False)
+        except NoUsername:
+            pass
     return _sites[key]
 
 getSite = Site # alias for backwards-compability

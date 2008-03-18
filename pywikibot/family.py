@@ -1,5 +1,9 @@
 # -*- coding: utf-8  -*-
-import config, urllib, re
+import config
+
+import logging
+import re
+import urllib
 
 __version__='$Id$'
 

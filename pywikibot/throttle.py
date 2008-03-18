@@ -13,6 +13,7 @@ import config
 import pywikibot
 
 import logging
+import math
 import threading
 import time
 
@@ -32,10 +33,11 @@ class Throttle(object):
     objects.
 
     """
-    def __init__(self, mindelay=config.minthrottle,
+    def __init__(self, site, mindelay=config.minthrottle,
                        maxdelay=config.maxthrottle,
                        multiplydelay=True):
         self.lock = threading.RLock()
+        self.mysite = str(site)
         self.mindelay = mindelay
         self.maxdelay = maxdelay
         self.now = 0
@@ -58,7 +60,7 @@ class Throttle(object):
         self.lock.acquire()
         logging.debug("Checking multiplicity: pid = %s" % pid)
         try:
-            processes = {}
+            processes = []
             my_pid = 1
             count = 1
             try:
@@ -75,24 +77,34 @@ class Throttle(object):
                         line = line.split(' ')
                         this_pid = int(line[0])
                         ptime = int(line[1].split('.')[0])
-                        if now - ptime <= self.releasepid:
-                            if now - ptime <= self.dropdelay \
-                                    and this_pid != pid:
-                                count += 1
-                            processes[this_pid] = ptime
-                            if this_pid >= my_pid:
-                                my_pid = this_pid+1
+                        this_site = line[2].rstrip()
                     except (IndexError, ValueError):
-                        pass    # Sometimes the file gets corrupted
-                                # ignore that line
+                        continue    # Sometimes the file gets corrupted
+                                    # ignore that line
+                    if now - ptime > self.releasepid:
+                        continue    # process has expired, drop from file
+                    if now - ptime <= self.dropdelay \
+                            and this_site == self.mysite \
+                            and this_pid != pid:
+                        count += 1
+                    print line,
+                    if this_site != self.mysite or this_pid != pid:
+                        processes.append({'pid': this_pid,
+                                          'time': ptime,
+                                          'site': this_site})
+                    if not pid and this_pid >= my_pid:
+                        my_pid = this_pid+1
 
             if not pid:
                 pid = my_pid
             self.checktime = time.time()
-            processes[pid] = self.checktime
+            processes.append({'pid': my_pid,
+                              'time': self.checktime,
+                              'site': self.mysite})
             f = open(self.logfn(), 'w')
-            for p in processes.keys():
-                f.write(str(p)+' '+str(processes[p])+'\n')
+            processes.sort(key=lambda p:(p['pid'], p['site']))
+            for p in processes:
+                f.write("%(pid)s %(time)s %(site)s\n" % p)
             f.close()
             self.process_multiplicity = count
             pywikibot.output(
@@ -149,7 +161,7 @@ class Throttle(object):
     def drop(self):
         """Remove me from the list of running bots processes."""
         self.checktime = 0
-        processes = {}
+        processes = []
         try:
             f = open(self.logfn(), 'r')
         except IOError:
@@ -161,13 +173,19 @@ class Throttle(object):
                     line = line.split(' ')
                     this_pid = int(line[0])
                     ptime = int(line[1].split('.')[0])
-                    if now - ptime <= self.releasepid and this_pid != pid:
-                        processes[this_pid] = ptime
+                    this_site = line[2].rstrip()
                 except (IndexError,ValueError):
-                    pass    # Sometimes the file gets corrupted - ignore that line
+                    continue    # Sometimes the file gets corrupted
+                                # ignore that line
+                if now - ptime <= self.releasepid \
+                        and this_pid != pid:
+                    processes.append({'pid': this_pid,
+                                      'time': ptime,
+                                      'site': this_site})
         f = open(self.logfn(), 'w')
-        for p in processes.keys():
-            f.write(str(p)+' '+str(processes[p])+'\n')
+        processes.sort(key=lambda p:p['pid'])
+        for p in processes:
+            f.write("%(pid)s %(time)s %(site)s\n" % p)
         f.close()
 
     def __call__(self, requestsize=1):

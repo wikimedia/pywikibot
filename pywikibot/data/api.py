@@ -222,34 +222,33 @@ class PageGenerator(object):
         self.request = Request(action="query", generator=generator, **kwargs)
         self.generator = generator
         self.site = self.request.site
+        self.resultkey = "pages" # element to look for in result
 
     def __iter__(self):
-        """Iterate Page objects for pages found in response."""
+        """Iterate objects for elements found in response."""
+        # FIXME: this won't handle generators with <redirlinks> subelements
+        #        correctly yet
         while True:
-            # following "if" is used for testing with plugged-in data; it wouldn't
-            # be needed for actual usage
-            if not hasattr(self, "data"):
-                site.get_throttle()
-                self.data = self.request.submit()
+            self.site.get_throttle()
+            self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 raise StopIteration
             if not "query" in self.data:
                 raise StopIteration
             query = self.data["query"]
-            if not "pages" in query:
+            if not self.resultkey in query:
                 raise StopIteration
-            # TODO: instead of "yield Page", yield a Page returned by a
-            # method that converts the dict info to a Page object
-            if isinstance(query["pages"], dict):
-                for v in query["pages"].itervalues():
-                    yield self.make_page(v) 
-            elif isinstance(query["pages"], list):
-                for v in query["pages"]:
-                    yield self.make_page(v)
+            if isinstance(query[self.resultkey], dict):
+                for v in query[self.resultkey].itervalues():
+                    yield self.result(v) 
+            elif isinstance(query[self.resultkey], list):
+                for v in query[self.resultkey]:
+                    yield self.result(v)
             else:
                 raise APIError("Unknown",
-                               "Unknown format in ['query']['pages'] value.",
-                               data=query["pages"])
+                               "Unknown format in ['query']['%s'] value."
+                                 % self.resultkey,
+                               data=query[self.resultkey])
             if not "query-continue" in self.data:
                 return
             if not self.generator in self.data["query-continue"]:
@@ -257,10 +256,14 @@ class PageGenerator(object):
                                "Missing '%s' key in ['query-continue'] value.",
                                data=self.data["query-continue"])
             self.request.update(self.data["query-continue"][self.generator])
-            del self.data
 
-    def make_page(self, pagedata):
-        """Convert page dict entry from api to Page object."""
+    def result(self, pagedata):
+        """Convert page dict entry from api to Page object.
+
+        This can be overridden in subclasses to return a different type
+        of object.
+        
+        """
         p = pywikibot.Page(self.site, pagedata['title'], pagedata['ns'])
         if 'lastrevid' in pagedata:
             p._revid = pagedata['lastrevid']
