@@ -160,6 +160,46 @@ class TestPageObject(unittest.TestCase):
         self.assertEqual(p2.isCategory(), True)
         self.assertEqual(p3.isCategory(), False)
 
+    # testIsImage -- todo
+    
+    def testApiMethods(self):
+        """Test various methods that rely on API."""
+        # since there is no way to predict what data the wiki will return,
+        # we only check that the returned objects are of correct type.
+        main = pywikibot.Page(site, u"Main Page")
+        self.assertEqual(type(main.get()), unicode)
+        self.assertEqual(type(main.latestRevision()), int)
+        self.assertEqual(type(main.userName()), unicode)
+        self.assertEqual(type(main.isIpEdit()), bool)
+        self.assertEqual(type(main.exists()), bool)
+        self.assertEqual(type(main.isRedirectPage()), bool)
+        self.assertEqual(type(main.isEmpty()), bool)
+        self.assertEqual(type(main.toggleTalkPage()), type(main))
+        self.assertEqual(type(main.isDisambig()), bool)
+        self.assertEqual(type(main.canBeEdited()), bool)
+        self.assertEqual(type(main.botMayEdit()), bool)
+        for p in main.getReferences():
+            self.assertEqual(type(p), type(main))
+        for p in main.backlinks():
+            self.assertEqual(type(p), type(main))
+        for p in main.embeddedin():
+            self.assertEqual(type(p), type(main))
+        for p in main.linkedPages():
+            self.assertEqual(type(p), type(main))
+        for p in main.interwiki():
+            self.assertEqual(type(p), pywikibot.page.Link)
+        for p in main.langlinks():
+            self.assertEqual(type(p), pywikibot.page.Link)
+        for p in main.imagelinks():
+            self.assertEqual(type(p), pywikibot.page.ImagePage)
+        for p in main.templates():
+            self.assertEqual(type(p), type(main))
+        # todo - templatesWithParameters
+        for p in main.categories():
+            self.assertEqual(type(p), pywikibot.page.Category)
+        for p in main.extlinks():
+            self.assertEqual(type(p), unicode)
+        # more to come
 
 if __name__ == '__main__':
     try:

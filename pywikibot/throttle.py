@@ -87,7 +87,6 @@ class Throttle(object):
                             and this_site == self.mysite \
                             and this_pid != pid:
                         count += 1
-                    print line,
                     if this_site != self.mysite or this_pid != pid:
                         processes.append({'pid': this_pid,
                                           'time': ptime,

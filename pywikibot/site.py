@@ -72,7 +72,7 @@ class BaseSite(object):
         @type fam: str or Family
         @param user: bot user name (optional)
         @type user: str
-        
+
         """
         self._lang = code.lower()
         if isinstance(fam, basestring) or fam is None:
@@ -106,7 +106,7 @@ class BaseSite(object):
         pt_min = min(config.minthrottle, config.put_throttle)
         self.put_throttle = Throttle(self, pt_min, config.maxthrottle)
         self.put_throttle.setDelay(config.put_throttle)
-        
+
         gt_min = min(config.minthrottle, config.get_throttle)
         self.get_throttle = Throttle(self, gt_min, config.maxthrottle)
         self.get_throttle.setDelay(config.get_throttle)
@@ -119,6 +119,7 @@ class BaseSite(object):
         """Return the site's language code."""
         # N.B. this code does not always identify a language as such, but
         #      may identify a wiki that is part of any family grouping
+        # FIXME: need to separate language (for L18N purposes) from code
         return self._lang
 
     def user(self):
@@ -145,7 +146,7 @@ class BaseSite(object):
         return self.family().name+':'+self.language()
 
     __str__ = sitename
-    
+
     def __repr__(self):
         return 'Site("%s", "%s")' % (self.language(), self.family().name)
 
@@ -238,7 +239,7 @@ class BaseSite(object):
         finally:
             self._mutex.release()
 
-    
+
 class APISite(BaseSite):
     """API interface to MediaWiki site.
 
@@ -337,8 +338,8 @@ class APISite(BaseSite):
             14: [u"Category"],
             15: [u"Category talk"],
             }
-#        self.getsiteinfo()
         return
+
 # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
         self._mediawiki_messages = {}
         self.nocapitalize = self._lang in self.family().nocapitalize
@@ -368,7 +369,7 @@ class APISite(BaseSite):
         if self._userinfo['name'] != self._username:
             return False
         return (not sysop) or 'sysop' in self._userinfo['groups']
-        
+
     def loggedInAs(self, sysop = False):
         """Return the current username if logged in, otherwise return None.
 
@@ -417,10 +418,9 @@ class APISite(BaseSite):
             uidata = uirequest.submit()
             assert 'query' in uidata, \
                    "API userinfo response lacks 'query' key"
-            uidata = uidata['query']
-            assert 'userinfo' in uidata, \
+            assert 'userinfo' in uidata['query'], \
                    "API userinfo response lacks 'userinfo' key"
-            self._userinfo = uidata['userinfo']
+            self._userinfo = uidata['query']['userinfo']
         return self._userinfo
 
     def getsiteinfo(self):
@@ -436,6 +436,7 @@ class APISite(BaseSite):
                 sidata = sirequest.submit()
             except api.APIError:
                 # hack for older sites that don't support 1.12 properties
+                # probably should delete if we're not going to support pre-1.12
                 sirequest = api.Request(
                                     site=self,
                                     action="query",
@@ -443,7 +444,7 @@ class APISite(BaseSite):
                                     siprop="general|namespaces"
                                 )
                 sidata = sirequest.submit()
-                
+
             assert 'query' in sidata, \
                    "API siteinfo response lacks 'query' key"
             sidata = sidata['query']
@@ -497,23 +498,16 @@ class APISite(BaseSite):
 
         @param page: The Page to get links to.
         @param followRedirects: Also return links to redirects pointing to
-            the given page. [Not yet implemented on API]
+            the given page.
         @param filterRedirects: If True, only return redirects to the given
             page. If False, only return non-redirect links. If None, return
             both (no filtering).
         @param namespaces: If present, only return links from the namespaces
             in this list.
-        
+
         """
-        if 'bot' in self.getuserinfo()['groups']:
-            limit = 5000
-        else:
-            limit = 500
-        if followRedirects:
-            limit = limit / 2
         bltitle = page.title(withSection=False)
-        blgen = api.PageGenerator("backlinks", gbltitle=bltitle,
-                                  gbllimit=str(limit))
+        blgen = api.PageGenerator("backlinks", gbltitle=bltitle)
         if namespaces is not None:
             blgen.request["gblnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
@@ -524,13 +518,10 @@ class APISite(BaseSite):
             blgen.request["gblredirect"] = ""
         return blgen
 
-    def getembeddedin(self, page, followRedirects=False, filterRedirects=None,
-                      namespaces=None):
+    def getembeddedin(self, page, filterRedirects=None, namespaces=None):
         """Iterate all pages that embedded the given page as a template.
 
         @param page: The Page to get inclusions for.
-        @param followRedirects: Also return pages transcluding redirects to
-            the given page. [Not yet implemented on API]
         @param filterRedirects: If True, only return redirects that embed
             the given page. If False, only return non-redirect links. If
             None, return both (no filtering).
@@ -539,20 +530,13 @@ class APISite(BaseSite):
 
         """
         eititle = page.title(withSection=False)
-        if 'bot' in self.getuserinfo()['groups']:
-            limit = 5000
-        else:
-            limit = 500
-        eigen = api.PageGenerator("embeddedin", geititle=eititle,
-                                  geilimit=str(limit))
+        eigen = api.PageGenerator("embeddedin", geititle=eititle)
         if namespaces is not None:
             eigen.request["geinamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
         if filterRedirects is not None:
             eigen.request["geifilterredir"] = filterRedirects and "redirects"\
                                                               or "nonredirects"
-        if followRedirects:
-            eigen.request["geiredirect"] = ""
         return eigen
 
     def getreferences(self, page, followRedirects, filterRedirects,
@@ -565,9 +549,64 @@ class APISite(BaseSite):
         import itertools
         return itertools.chain(self.getbacklinks(
                                     page, followRedirects, filterRedirects),
-                               self.getembeddedin(
-                                    page, followRedirects, filterRedirects)
+                               self.getembeddedin(page, filterRedirects)
                               )
+
+    def getlinks(self, page, namespaces=None):
+        """Iterate internal wikilinks contained (or transcluded) on page."""
+        pltitle = page.title(withSection=False)
+        plgen = api.PageGenerator("links", titles=pltitle)
+        if namespaces is not None:
+            plgen.request["gplnamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        return plgen
+
+    def getcategories(self, page, withSortKey=False):
+        """Iterate categories to which page belongs."""
+        # Sortkey doesn't seem to work with generator; FIXME
+        cltitle = page.title(withSection=False)
+        clgen = api.CategoryPageGenerator("categories", titles=cltitle)
+        return clgen
+
+    def getimages(self, page):
+        """Iterate images used (not just linked) on the page."""
+        imtitle = page.title(withSection=False)
+        imgen = api.ImagePageGenerator("images", titles=imtitle)
+        return imgen
+
+    def gettemplates(self, page, namespaces=None):
+        """Iterate templates transcluded (not just linked) on the page."""
+        tltitle = page.title(withSection=False)
+        tlgen = api.PageGenerator("templates", titles=tltitle)
+        if namespaces is not None:
+            tlgen.request["gtlnamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        return tlgen
+
+    def getcategorymembers(self, category, namespaces=None):
+        """Iterate members of specified category.
+
+        @param category: The Category to iterate.
+        @param namespaces: If present, only return category members from
+            these namespaces. For example, use namespaces=[14] to yield
+            subcategories, use namespaces=[6] to yield image files, etc. Note,
+            however, that the iterated values are always Page objects, even
+            if in the Category or Image namespace.
+        @type namespaces: list of ints
+
+        """
+        if category.namespace() != 14:
+            raise ValueError(
+                "Cannot get category members of non-Category page '%s'"
+                % category.title())
+        cmtitle = category.title(withSection=False)
+        cmgen = api.PageGenerator("categorymembers", gcmtitle=cmtitle,
+                                  gcmprop="ids|title|sortkey")
+        if namespaces is not None:
+            cmgen.request["gcmnamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        return cmgen
+
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
 class NotImplementedYet:
@@ -660,7 +699,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 continue
             l.append(key + '=' + value)
 
-        # wpEditToken is explicitly added as last value.
+        # wpEditToken is explicicmy added as last value.
         # If a premature connection abort occurs while putting, the server will
         # not have received an edit token and thus refuse saving the page
         if wpEditToken != None:

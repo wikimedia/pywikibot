@@ -594,19 +594,21 @@ class Page(object):
         """
         return self.site().getlanglinks(self)
 
-    def imagelinks(self, followRedirects=False, loose=None):
+    def imagelinks(self, followRedirects=None, loose=None):
         """Iterate ImagePage objects for images displayed on this Page.
 
-        @param followRedirects: if an image link redirects to another page,
-            yield the redirect target instead of the original link
+        @param followRedirects: DEPRECATED and ignored
         @param loose: DEPRECATED and ignored
         @return: a generator that yields ImagePage objects.
 
         """
+        if followRedirects is not None:
+            logging.debug(
+                u"Page.imagelinks(followRedirects) option is deprecated.")
         if loose is not None:
             logging.debug(
                 u"Page.imagelinks(loose) option is deprecated.")
-        return self.site().getimages(followRedirects)
+        return self.site().getimages(self)
 
     def templates(self):
         """Iterate Page objects for templates used on this Page.
@@ -641,7 +643,7 @@ class Page(object):
         if nofollow_redirects is not None:
             logging.debug(
                 u"Page.categories(nofollow_redirects) option is deprecated.")
-        return self.site().categories(withSortKey=withSortKey)
+        return self.site().getcategories(self, withSortKey=withSortKey)
 
     def extlinks(self):
         """Iterate all external URLs (not interwiki links) from this page.
@@ -1041,7 +1043,7 @@ class ImagePage(Page):
 class Category(Page):
     """A page in the Category: namespace"""
 
-    def __init__(self, source, title, insite=None, sortKey=None):
+    def __init__(self, source, title=u"", insite=None, sortKey=None):
         """All parameters are the same as for Page() constructor, except:
 
         @param sortKey: DEPRECATED (use .aslink() method instead)
@@ -1094,9 +1096,9 @@ class Category(Page):
             recurse = recurse - 1
         if not hasattr(self, "_subcats"):
             self._subcats = []
-            for member in self.site().categorymembers(self, namespaces=[14]):
+            for member in self.site().getcategorymembers(self, namespaces=[14]):
                 subcat = Category(self.site(), member.title())
-                self.subcats.append(subcat)
+                self._subcats.append(subcat)
                 yield subcat
                 if recurse:
                     for item in subcat.subcategories(recurse):
@@ -1119,9 +1121,10 @@ class Category(Page):
         @type recurse: int or bool
 
         """
-        namespaces = self.site().namespaces()
-        namespaces.remove(14)
-        for member in self.site().categorymembers(self, namespaces=namespaces):
+        namespaces = [x for x in self.site().namespaces().keys()
+                      if x>=0 and x!=14]
+        for member in self.site().getcategorymembers(self,
+                                                     namespaces=namespaces):
             yield member
         if recurse:
             if not isinstance(recurse, bool) and recurse:

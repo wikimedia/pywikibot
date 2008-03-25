@@ -91,6 +91,18 @@ class Request(DictMixin):
         self.max_retries = kwargs.pop("max_retries", 25)
         self.retry_wait = kwargs.pop("retry_wait", 5)
         self.params = {}
+        if "action" not in kwargs:
+            raise ValueError("'action' specification missing from Request.")
+        if kwargs["action"] == 'query':
+            if "meta" in kwargs:
+                if "userinfo" not in kwargs["meta"]:
+                    kwargs["meta"] += "|userinfo"
+            else:
+                kwargs["meta"] = "userinfo"
+            if "uiprop" in kwargs:
+                kwargs["uiprop"] += "|blockinfo|hasmsg"
+            else:
+                kwargs["uiprop"] = "blockinfo|hasmsg"
         if "format" not in kwargs:
             self.params["format"] = "json"
         if "maxlag" not in kwargs:
@@ -131,7 +143,6 @@ class Request(DictMixin):
         uri = self.site.scriptpath() + "/api.php"
         params = urllib.urlencode(self.params)
         while True:
-            # TODO wait on errors
             # TODO catch http errors
             try:
                 if self.params.get("action", "") in ("login",):
@@ -154,7 +165,6 @@ class Request(DictMixin):
             except ValueError:
                 # if the result isn't valid JSON, there must be a server
                 # problem.  Wait a few seconds and try again
-                # TODO: implement a throttle
                 logging.warning(
 "Non-JSON response received from server %s; the server may be down."
                               % self.site)
@@ -168,6 +178,13 @@ class Request(DictMixin):
                                "Unable to process query response of type %s."
                                    % type(result),
                                {'data': result})
+            if self['action'] == 'query':
+                if 'userinfo' in result.get('query', ()):
+                    if hasattr(self.site, '_userinfo'):
+                        self.site._userinfo.update(result['query']['userinfo'])
+                    else:
+                        self.site._userinfo = result['query']['userinfo']
+
             if "error" not in result:
                 return result
             if "*" in result["error"]:
@@ -196,14 +213,15 @@ class Request(DictMixin):
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError("Maximum retries attempted without success.")
-
         wait = self.retry_wait
         if lag is not None:
-            if lag > 2 * self.retry_wait:
-                wait = min(120, lag // 2)
-        logging.warn("Waiting %s seconds before retrying." % self.retry_wait)
+            # in case of database lag, wait half the lag time,
+            # but not less than 5 or more than 120 seconds
+            wait = max(5, min(lag // 2, 120))
+        logging.warn("Waiting %s seconds before retrying." % wait)
         time.sleep(wait)
-        self.retry_wait = min(120, self.retry_wait * 2)
+        if lag is None:
+            self.retry_wait = min(120, self.retry_wait * 2)
 
 
 class PageGenerator(object):
@@ -219,10 +237,47 @@ class PageGenerator(object):
         """
         if not generator:
             raise ValueError("generator argument is required.")
+        if generator not in self.limits:
+            raise ValueError("Unrecognized generator '%s'" % generator)
         self.request = Request(action="query", generator=generator, **kwargs)
+        # set limit to max, if applicable
+        if self.limits[generator]:
+            self.request['g'+self.limits[generator]] = "max"
+        if 'prop' in self.request:
+            self.request['prop'] += "|info|imageinfo"
+        else:
+            self.request['prop'] = 'info|imageinfo'
+        if "inprop" in self.request:
+            if "protection" not in self.request["inprop"]:
+                self.request["inprop"] += "|protection"
+        else:
+            self.request['inprop'] = 'protection'
+        if "iiprop" in self.request:
+            self.request["iiprop"] += 'timestamp|user|comment|url|size|sha1|metadata'
+        else:
+            self.request['iiprop'] = 'timestamp|user|comment|url|size|sha1|metadata'
         self.generator = generator
         self.site = self.request.site
         self.resultkey = "pages" # element to look for in result
+
+    # dict mapping generator types to their limit parameter names
+
+    limits = {'links': None,
+              'images': None,
+              'templates': None,
+              'categories': None,
+              'allpages': 'aplimit',
+              'alllinks': 'allimit',
+              'allcategories': 'aclimit',
+              'backlinks': 'bllimit',
+              'categorymembers': 'cmlimit',
+              'embeddedin': 'eilimit',
+              'imageusage': 'iulimit',
+              'search': 'srlimit',
+              'watchlist': 'wllimit',
+              'exturlusage': 'eulimit',
+              'random': 'rnlimit',
+             }
 
     def __iter__(self):
         """Iterate objects for elements found in response."""
@@ -270,9 +325,27 @@ class PageGenerator(object):
         if 'touched' in pagedata:
             p._timestamp = pagedata['touched']
         if 'protection' in pagedata:
+            p._protection = {}
             for item in pagedata['protection']:
-                p._protection[item['key']] = item['level']
+                p._protection[item['type']] = item['level']
         return p
+
+
+class CategoryPageGenerator(PageGenerator):
+    """Generator that yields Category objects instead of Pages."""
+    def result(self, pagedata):
+        p = PageGenerator.result(self, pagedata)
+        return pywikibot.Category(p)
+
+
+class ImagePageGenerator(PageGenerator):
+    """Generator that yields ImagePage objects instead of Pages."""
+    def result(self, pagedata):
+        p = PageGenerator.result(self, pagedata)
+        image = pywikibot.ImagePage(p)
+        if 'imageinfo' in pagedata:
+            image._imageinfo = pagedata['imageinfo']
+        return image
 
 
 class LoginManager(login.LoginManager):
