@@ -145,19 +145,23 @@ class Request(DictMixin):
         while True:
             # TODO catch http errors
             try:
-                if self.params.get("action", "") in ("login",):
-                    rawdata = http.request(self.site, uri, method="POST",
-                                headers={'Content-Type':
-                                         'application/x-www-form-urlencoded'},
-                                body=params)
-                else:
-                    uri = uri + "?" + params
-                    rawdata = http.request(self.site, uri)
-            except Exception, e: #TODO: what exceptions can occur here?
-                logging.warning(traceback.format_exc())
-                print uri, params
-                self.wait()
-                continue
+                self.site.sitelock.acquire()
+                try:
+                    if self.params.get("action", "") in ("login",):
+                        rawdata = http.request(self.site, uri, method="POST",
+                                    headers={'Content-Type':
+                                             'application/x-www-form-urlencoded'},
+                                    body=params)
+                    else:
+                        uri = uri + "?" + params
+                        rawdata = http.request(self.site, uri)
+                except Exception, e: #TODO: what exceptions can occur here?
+                    logging.warning(traceback.format_exc())
+                    print uri, params
+                    self.wait()
+                    continue
+            finally:
+                self.site.sitelock.release()
             if rawdata.startswith(u"unknown_action"):
                 raise APIError(rawdata[:14], rawdata[16:])
             try:
@@ -197,7 +201,7 @@ class Request(DictMixin):
                 if lag:
                     logging.info(
                         "Pausing due to database lag: " + info)
-                    self.wait(int(lag.group("lag")))
+                    self.lag_wait(int(lag.group("lag")))
                     continue
             if code in (u'internal_api_error_DBConnectionError', ):
                 self.wait()
@@ -208,25 +212,32 @@ class Request(DictMixin):
             except TypeError:
                 raise RuntimeError(result)
 
-    def wait(self, lag=None):
+    def wait(self):
         """Determine how long to wait after a failed request."""
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError("Maximum retries attempted without success.")
-        wait = self.retry_wait
-        if lag is not None:
-            # in case of database lag, wait half the lag time,
-            # but not less than 5 or more than 120 seconds
-            wait = max(5, min(lag // 2, 120))
         logging.warn("Waiting %s seconds before retrying." % wait)
-        time.sleep(wait)
-        if lag is None:
-            self.retry_wait = min(120, self.retry_wait * 2)
+        time.sleep(self.retry_wait)
+        # double the next wait, but do not exceed 120 seconds
+        self.retry_wait = min(120, self.retry_wait * 2)
+
+    def lag_wait(self, lag):
+        """Wait due to server lag."""
+        # unlike regular wait, this shuts down all access to site
+        self.site.sitelock.acquire()
+        try:
+            # wait at least 5 seconds, no more than 120
+            wait = max(5, min(120, lag//2))
+            logging.warn("Pausing %s seconds due to server lag." % wait)
+            time.sleep(wait)
+        finally:
+            self.site.sitelock.release()
 
 
 class PageGenerator(object):
     """Iterator for response to a request of type action=query&generator=foo."""
-    def __init__(self, generator="", **kwargs):
+    def __init__(self, generator, **kwargs):
         """
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and generator is required.
@@ -235,8 +246,6 @@ class PageGenerator(object):
         @type generator: str
 
         """
-        if not generator:
-            raise ValueError("generator argument is required.")
         if generator not in self.limits:
             raise ValueError("Unrecognized generator '%s'" % generator)
         self.request = Request(action="query", generator=generator, **kwargs)
@@ -261,7 +270,6 @@ class PageGenerator(object):
         self.resultkey = "pages" # element to look for in result
 
     # dict mapping generator types to their limit parameter names
-
     limits = {'links': None,
               'images': None,
               'templates': None,
@@ -346,6 +354,75 @@ class ImagePageGenerator(PageGenerator):
         if 'imageinfo' in pagedata:
             image._imageinfo = pagedata['imageinfo']
         return image
+
+
+class PropertyGenerator(object):
+    """Generator for queries of type action=query&property=..."""
+
+    def __init__(self, prop, **kwargs):
+        """
+        Required and optional parameters are as for C{Request}, except that
+        action=query is assumed and prop is required.
+        
+        @param prop: the "property=" type from api.php
+        @type prop: str
+
+        """
+        self.request = Request(action="query", prop=prop, **kwargs)
+        if prop not in self.limits:
+            raise ValueError("Unrecognized property '%s'" % prop)
+        # set limit to max, if applicable
+        if self.limits[prop] and kwargs.pop("getAll", False):
+            self.request['g'+self.limits[generator]] = "max"
+        self.site = self.request.site
+        self.resultkey = prop # element to look for in result
+
+    # dict mapping property types to their limit parameter names
+    limits = {'revisions': 'rvlimit',
+              'imageinfo': 'iilimit',
+              'info': None,
+              'links': None,
+              'langlinks': None,
+              'images': None,
+              'imageinfo': None,
+              'templates': None,
+              'categories': None,
+              'extlinks': None,
+             }
+
+    def __iter__(self):
+        """Iterate objects for elements found in response."""
+        # this looks for the resultkey ''inside'' a <page> entry
+        while True:
+            self.site.get_throttle()
+            self.data = self.request.submit()
+            if not self.data or not isinstance(self.data, dict):
+                raise StopIteration
+            if not ("query" in self.data and "pages" in self.data["query"]):
+                raise StopIteration
+            pagedata = self.data["query"]["pages"].values()
+            assert len(pagedata)==1
+            pagedata = pagedata[0]
+            if not self.resultkey in pagedata:
+                raise StopIteration
+            if isinstance(pagedata[self.resultkey], dict):
+                for v in pagedata[self.resultkey].itervalues():
+                    yield v 
+            elif isinstance(pagedata[self.resultkey], list):
+                for v in pagedata[self.resultkey]:
+                    yield v
+            else:
+                raise APIError("Unknown",
+                               "Unknown format in ['%s'] value."
+                                 % self.resultkey,
+                               data=pagedata[self.resultkey])
+            if not "query-continue" in self.data:
+                return
+            if not self.resultkey in self.data["query-continue"]:
+                raise APIError("Unknown",
+                               "Missing '%s' key in ['query-continue'] value.",
+                               data=self.data["query-continue"])
+            self.request.update(self.data["query-continue"][self.resultkey])
 
 
 class LoginManager(login.LoginManager):

@@ -283,7 +283,7 @@ class Page(object):
                 raise self._getexception
         if force or not hasattr(self, "_revid") \
                  or not self._revid in self._revisions:
-            self.site().getrevisions(self, getText=True, ids=None, sysop=sysop)
+            self.site().getrevisions(self, getText=True, sysop=sysop)
             # TODO: Exception handling for no-page, redirects, etc.
 
         return self._revisions[self._revid].text
@@ -307,7 +307,8 @@ class Page(object):
                 "Page.getOldVersion(change_edit_time) option is deprecated.")
         if force or not oldid in self._revisions:
             self.site().getrevisions(self, getText=True, ids=oldid,
-                                     redirs=get_redirect, sysop=sysop)
+                                     sysop=sysop)
+        # TODO: what about redirects, errors?
         return self._revisions[oldid].text
 
     def permalink(self):
@@ -678,7 +679,7 @@ class Page(object):
         else:
             limit = revCount
         return self.site().getrevisions(self, withText=False,
-                                        older=reverseOrder, limit=limit)
+                                        older=not reverseOrder, limit=limit)
 
     def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
                                getAll=False, revCount=500):
@@ -701,8 +702,7 @@ class Page(object):
         @return: A generator that yields tuples consisting of revision ID,
             edit date/time, user name and content
         """
-        return self.site().getrevisions(self, withText=True,
-                                        older=reverseOrder, limit=None)
+        return self.site().getrevisions(self, withText=True)
 
     def contributingUsers(self):
         """Return a set of usernames (or IPs) of users who edited this page."""

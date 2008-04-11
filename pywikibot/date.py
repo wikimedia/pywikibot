@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8  -*-
+# -*- coding: utf-8  -*-
 """
 This file is not runnable, but it only consists of various
 lists which are required by some other programs.
@@ -17,8 +17,6 @@ __version__='$Id$'
 # used for date recognition
 import types
 import re
-import wikipedia
-
 
 #
 # Different collections of well known formats
@@ -1523,7 +1521,7 @@ def printMonthArray( lang, pattern, capitalize ):
     """
     """
     for s in makeMonthNamedList( lang, pattern, capitalize ):
-        wikipedia.output( s )
+        print( s )
 
 
 def testMapEntry( formatName, showAll = True, value = None ):
@@ -1542,7 +1540,7 @@ def testMapEntry( formatName, showAll = True, value = None ):
     if value is not None:
         start, stop = value, value+1
     if showAll:
-        wikipedia.output(u"Processing %s with limits from %d to %d and step %d" % (formatName, start,stop-1,step))
+        print(u"Processing %s with limits from %d to %d and step %d" % (formatName, start,stop-1,step))
     
     for code, convFunc in formats[formatName].iteritems():
 #        import time
@@ -1555,18 +1553,21 @@ def testMapEntry( formatName, showAll = True, value = None ):
                 if newValue != value:
                     raise AssertionError("     %s != %s: assert failed, values didn't match" % (newValue, value))
                 if showAll:
-                    wikipedia.output(u"date.formats['%s']['%s'](%d): '%s' -> %d" % (formatName, code, value, convFunc(value), newValue))
+                    print(u"date.formats['%s']['%s'](%d): '%s' -> %d" % (formatName, code, value, convFunc(value), newValue))
             except:
-                wikipedia.output(u"********** Error in date.formats['%s']['%s'](%d)" % (formatName, code, value))
+                print(u"********** Error in date.formats['%s']['%s'](%d)" % (formatName, code, value))
                 raise
-#        wikipedia.output( u"%s\t%s\t%f" % (formatName, code, time.clock() - startClock) )
+#        print( u"%s\t%s\t%f" % (formatName, code, time.clock() - startClock) )
 
 def test(quick = False, showAll = False):
-    """This is a test function, to be used interactivelly to test entire format convesion map at once
+    """This is a test function, to be used interactively to test entire
+    format conversion map at once
+    
     Usage example:
         run python interpreter
         >>> import date
         >>> date.test()
+        
     """
     for formatName in formats.keys():
     
@@ -1574,13 +1575,13 @@ def test(quick = False, showAll = False):
             testMapEntry( formatName, showAll, formatLimits[formatName][1] )     # Only test the first value in the test range
         else:
             testMapEntry( formatName, showAll )     # Extensive test!        # Test decade rounding
-            wikipedia.output(u"'%s' complete." % formatName)
+            print(u"'%s' complete." % formatName)
     
     if quick:
-        #wikipedia.output(u'Date module quick consistency test passed')
+        #print(u'Date module quick consistency test passed')
         pass
     else:
-        wikipedia.output(u'Date module has been fully tested')
+        print(u'Date module has been fully tested')
 
 
 #

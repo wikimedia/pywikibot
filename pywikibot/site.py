@@ -100,11 +100,12 @@ class BaseSite(object):
         self._username = user
 
         # following are for use with lock_page and unlock_page methods
-        self._mutex = threading.Lock()
+        self._pagemutex = threading.Lock()
         self._locked_pages = []
 
         pt_min = min(config.minthrottle, config.put_throttle)
-        self.put_throttle = Throttle(self, pt_min, config.maxthrottle)
+        self.put_throttle = Throttle(self, pt_min, config.maxthrottle,
+                                     verbosedelay=True)
         self.put_throttle.setDelay(config.put_throttle)
 
         gt_min = min(config.minthrottle, config.get_throttle)
@@ -203,7 +204,6 @@ class BaseSite(object):
         else:
             return self.family().redirect.get(self.language(), None)
 
-
     def lock_page(self, page, block=True):
         """Lock page for writing.  Must be called before writing any page.
 
@@ -216,7 +216,7 @@ class BaseSite(object):
             otherwise, raise an exception if page can't be locked
 
         """
-        self._mutex.acquire()
+        self._pagemutex.acquire()
         try:
             while page in self._locked_pages:
                 if not block:
@@ -224,7 +224,7 @@ class BaseSite(object):
                 time.sleep(.25)
             self._locked_pages.append(page.title(withSection=False))
         finally:
-            self._mutex.release()
+            self._pagemutex.release()
 
     def unlock_page(self, page):
         """Unlock page.  Call as soon as a write operation has completed.
@@ -233,11 +233,11 @@ class BaseSite(object):
         @type page: pywikibot.Page
 
         """
-        self._mutex.acquire()
+        self._pagemutex.acquire()
         try:
             self._locked_pages.remove(page.title(withSection=False))
         finally:
-            self._mutex.release()
+            self._pagemutex.release()
 
 
 class APISite(BaseSite):
@@ -338,6 +338,7 @@ class APISite(BaseSite):
             14: [u"Category"],
             15: [u"Category talk"],
             }
+        self.sitelock = threading.Lock()
         return
 
 # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
@@ -600,13 +601,70 @@ class APISite(BaseSite):
                 "Cannot get category members of non-Category page '%s'"
                 % category.title())
         cmtitle = category.title(withSection=False)
-        cmgen = api.PageGenerator("categorymembers", gcmtitle=cmtitle,
+        cmgen = api.PageGenerator(u"categorymembers", gcmtitle=cmtitle,
                                   gcmprop="ids|title|sortkey")
         if namespaces is not None:
-            cmgen.request["gcmnamespace"] = u"|".join(unicode(ns)
+            cmgen.request[u"gcmnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
         return cmgen
 
+    def getrevisions(self, page=None, getText=False, revids=None,
+                     older=True, limit=None, sysop=False, user=None,
+                     excludeuser=None):
+        """Retrieve and store revision information.
+
+        @param page: retrieve the history of this Page (required unless ids
+            is specified)
+        @param getText: if True, retrieve the wiki-text of each revision as
+            well
+        @param revids: retrieve only the specified revision ids (required
+            unless page is specified)
+        @param older: if True, retrieve newest revisions first; otherwise,
+            retrieve oldest revisions first
+        @param limit: if specified, retrieve no more than this number of
+            revisions (defaults to latest revision only)
+        @type limit: int
+        @param user: retrieve only revisions authored by this user
+        @param excludeuser: retrieve all revisions not authored by this user
+        @param sysop: if True, switch to sysop account (if available) to
+            retrieve this page
+
+        """
+        if page is None and revids is None:
+            raise ValueError(
+                "getrevisions needs either page or revids argument.")
+        if page is not None:
+            rvtitle = page.title(withSection=False)
+            rvgen = api.PropertyGenerator(u"revisions", titles=rvtitle)
+        else:
+            ids = u"|".join(unicode(r) for r in revids)
+            rvgen = api.PropertyGenerator(u"revisions", revids=ids)
+        if getText:
+            rvgen.request[u"rvprop"] = \
+                    u"ids|flags|timestamp|user|comment|content"
+            if page.section():
+                rvgen.request[u"rvsection"] = unicode(page.section())
+        if limit:
+            rvgen.request[u"rvlimit"] = unicode(limit)
+        if not older:
+            rvgen.request[u"rvdir"] = u"newer"
+        if user:
+            rvgen.request[u"rvuser"] = user
+        elif excludeuser:
+            rvgen.request[u"rvexcludeuser"] = excludeuser
+        # TODO if sysop:
+        for rev in rvgen:
+            revision = pywikibot.page.Revision(revid=rev['revid'],
+                                               timestamp=rev['timestamp'],
+                                               user=rev['user'],
+                                               anon=rev.has_key('anon'),
+                                               comment=rev.get('comment', u''),
+                                               minor=rev.has_key('minor'),
+                                               text=rev.get('*', None))
+            page._revisions[revision.revid] = revision
+            if revids is None and limit is None and user is None and excludeuser is None:
+                page._revid = revision.revid
+                                
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
 class NotImplementedYet:

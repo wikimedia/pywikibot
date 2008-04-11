@@ -35,7 +35,7 @@ class Throttle(object):
     """
     def __init__(self, site, mindelay=config.minthrottle,
                        maxdelay=config.maxthrottle,
-                       multiplydelay=True):
+                       multiplydelay=True, verbosedelay=False):
         self.lock = threading.RLock()
         self.mysite = str(site)
         self.mindelay = mindelay
@@ -48,6 +48,7 @@ class Throttle(object):
         self.releasepid = 1800 # Free the process id after this many seconds
         self.lastwait = 0.0
         self.delay = 0
+        self.verbosedelay = verbosedelay
         if multiplydelay:
             self.checkMultiplicity()
         self.setDelay(mindelay)
@@ -106,9 +107,10 @@ class Throttle(object):
                 f.write("%(pid)s %(time)s %(site)s\n" % p)
             f.close()
             self.process_multiplicity = count
-            pywikibot.output(
+            if self.verbosedelay:
+                pywikibot.output(
                 u"Found %s processes running, including the current process."
-                % count)
+                    % count)
         finally:
             self.lock.release()
 
