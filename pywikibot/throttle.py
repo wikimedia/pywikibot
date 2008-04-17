@@ -27,22 +27,24 @@ class Throttle(object):
     Calling this object blocks the calling thread until at least 'delay'
     seconds have passed since the previous call.
 
-    Each Site initiates two Throttle objects: get_throttle to control
-    the rate of read access, and put_throttle to control the rate of write
-    access. These are available as the Site.get_throttle and Site.put_throttle
-    objects.
+    Each Site initiates one Throttle object (site.throttle) to control the
+    rate of access.
 
     """
     def __init__(self, site, mindelay=config.minthrottle,
                        maxdelay=config.maxthrottle,
+                       writedelay=config.put_throttle,
                        multiplydelay=True, verbosedelay=False):
         self.lock = threading.RLock()
         self.mysite = str(site)
+        self.logfn = config.datafilepath('throttle.log')
         self.mindelay = mindelay
         self.maxdelay = maxdelay
-        self.now = 0
+        self.writedelay = writedelay
+        self.last_read = 0
+        self.last_write = 0
         self.next_multiplicity = 1.0
-        self.checkdelay = 240  # Check logfile again after this many seconds
+        self.checkdelay = 120  # Check logfile again after this many seconds
         self.dropdelay = 360   # Ignore processes that have not made
                                # a check in this many seconds
         self.releasepid = 1800 # Free the process id after this many seconds
@@ -51,10 +53,7 @@ class Throttle(object):
         self.verbosedelay = verbosedelay
         if multiplydelay:
             self.checkMultiplicity()
-        self.setDelay(mindelay)
-
-    def logfn(self):
-        return config.datafilepath('throttle.log')
+        self.setDelays()
 
     def checkMultiplicity(self):
         global pid
@@ -65,7 +64,7 @@ class Throttle(object):
             my_pid = 1
             count = 1
             try:
-                f = open(self.logfn(), 'r')
+                f = open(self.logfn, 'r')
             except IOError:
                 if not pid:
                     pass
@@ -101,7 +100,7 @@ class Throttle(object):
             processes.append({'pid': my_pid,
                               'time': self.checktime,
                               'site': self.mysite})
-            f = open(self.logfn(), 'w')
+            f = open(self.logfn, 'w')
             processes.sort(key=lambda p:(p['pid'], p['site']))
             for p in processes:
                 f.write("%(pid)s %(time)s %(site)s\n" % p)
@@ -114,20 +113,24 @@ class Throttle(object):
         finally:
             self.lock.release()
 
-    def setDelay(self, delay=config.minthrottle, absolute=False):
-        """Set the nominal delay in seconds."""
+    def setDelays(self, delay=None, absolute=False):
+        """Set the nominal delays in seconds. Defaults to config values."""
         self.lock.acquire()
         try:
+            if delay is None:
+                delay = self.mindelay
             if absolute:
                 self.maxdelay = delay
                 self.mindelay = delay
             self.delay = delay
+            self.writedelay = min(max(self.mindelay, self.writedelay),
+                                  self.maxdelay)
             # Start the delay count now, not at the next check
-            self.now = time.time()
+            self.last_read = self.last_write = time.time()
         finally:
             self.lock.release()
 
-    def getDelay(self):
+    def getDelay(self, write=False):
         """Return the actual delay, accounting for multiple processes.
 
         This value is the maximum wait between reads/writes, not taking
@@ -135,7 +138,10 @@ class Throttle(object):
 
         """
         global pid
-        thisdelay = self.delay
+        if write:
+            thisdelay = self.writedelay
+        else:
+            thisdelay = self.delay
         if pid: # If set, we're checking for multiple processes
             if time.time() > self.checktime + self.checkdelay:
                 self.checkMultiplicity()
@@ -146,13 +152,16 @@ class Throttle(object):
             thisdelay *= self.process_multiplicity
         return thisdelay
 
-    def waittime(self):
+    def waittime(self, write=False):
         """Return waiting time in seconds if a query would be made right now"""
         # Take the previous requestsize in account calculating the desired
         # delay this time
-        thisdelay = self.getDelay()
+        thisdelay = self.getDelay(write=write)
         now = time.time()
-        ago = now - self.now
+        if write:
+            ago = now - self.last_write
+        else:
+            ago = now - self.last_read
         if ago < thisdelay:
             delta = thisdelay - ago
             return delta
@@ -164,7 +173,7 @@ class Throttle(object):
         self.checktime = 0
         processes = []
         try:
-            f = open(self.logfn(), 'r')
+            f = open(self.logfn, 'r')
         except IOError:
             return
         else:
@@ -183,13 +192,13 @@ class Throttle(object):
                     processes.append({'pid': this_pid,
                                       'time': ptime,
                                       'site': this_site})
-        f = open(self.logfn(), 'w')
+        f = open(self.logfn, 'w')
         processes.sort(key=lambda p:p['pid'])
         for p in processes:
             f.write("%(pid)s %(time)s %(site)s\n" % p)
         f.close()
 
-    def __call__(self, requestsize=1):
+    def __call__(self, requestsize=1, write=False):
         """
         Block the calling program if the throttle time has not expired.
 
@@ -198,7 +207,7 @@ class Throttle(object):
         """
         self.lock.acquire()
         try:
-            waittime = self.waittime()
+            waittime = self.waittime(write=write)
             # Calculate the multiplicity of the next delay based on how
             # big the request is that is being posted now.
             # We want to add "one delay" for each factor of two in the
@@ -213,7 +222,10 @@ class Throttle(object):
                                                   time.localtime()))
                                  )
             time.sleep(waittime)
-            self.now = time.time()
+            if write:
+                self.last_write = time.time()
+            else:
+                self.last_read = time.time()
         finally:
             self.lock.release()
 

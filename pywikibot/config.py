@@ -282,16 +282,16 @@ upload_to_commons = False
 # 'minthrottle' seconds. This can be lengthened if the server is slow,
 # but never more than 'maxthrottle' seconds. However - if you are running
 # more than one bot in parallel the times are lengthened.
-minthrottle = 1
+# By default, the get_throttle is turned off, and 'maxlag' is used to
+# control the rate of server access.  Set minthrottle to non-zero to use a
+# throttle on read access.
+minthrottle = 0
 maxthrottle = 10
 
-# Slow down the robot such that it never makes a second change within
+# Slow down the robot such that it never makes a second page edit within
 # 'put_throttle' seconds.
 put_throttle = 10
-# By default, the get_throttle is turned off, and 'maxlag' is used to
-# control the rate of server access.  Set this to non-zero to use a throttle
-# on read access.
-get_throttle = 0
+
 # Sometimes you want to know when a delay is inserted. If a delay is larger
 # than 'noisysleep' seconds, it is logged on the screen.
 noisysleep = 3.0
@@ -299,9 +299,11 @@ noisysleep = 3.0
 # Defer bot edits during periods of database server lag.  For details, see
 # http://www.mediawiki.org/wiki/Maxlag_parameter
 # You can set this variable to a number of seconds, or to None (or 0) to
-# disable this behavior.
-# It is recommended that you do not change this parameter unless you know
-# what you are doing and have a good reason for it!
+# disable this behavior.  Higher values are more aggressive in seeking
+# access to the wiki.
+# Non-Wikimedia wikis may or may not support this feature; for families
+# that do not use it, it is recommended to set minthrottle (above) to
+# at least 1 second.
 maxlag = 5
 
 # Maximum of pages which can be retrieved by special pages. Increase this if

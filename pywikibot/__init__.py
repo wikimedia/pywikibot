@@ -9,10 +9,10 @@ The initialization file for the Pywikibot framework.
 #
 __version__ = '$Id: $'
 
+import logging
+logging.getLogger().setLevel(logging.DEBUG)
 
 from exceptions import *
-
-from page import Page, ImagePage, Category
 
 import config
 
@@ -60,6 +60,20 @@ def Site(code=None, fam=None, user=None, interface=None):
 
 getSite = Site # alias for backwards-compability
 
+from page import Page, ImagePage, Category
+
+##def Page(*args, **kwargs):
+##    from page import Page as _Page
+##    return _Page(*args, **kwargs)
+##
+##def ImagePage(*args, **kwargs):
+##    from page import ImagePage as _ImagePage
+##    return _ImagePage(*args, **kwargs)
+##
+##def Category(*args, **kwargs):
+##    from page import Category as _Category
+##    return _Category(*args, **kwargs)
+
 # DEBUG
 
 def output(text):
@@ -71,9 +85,6 @@ def input(prompt, password=False):
         return getpass.getpass(prompt)
     return raw_input(prompt)
 
-import logging
-logging.getLogger().setLevel(logging.DEBUG)
-
 def stopme():
     """Drop this process from the throttle log.
 
@@ -82,7 +93,11 @@ def stopme():
 
     """
     # only need one drop() call because all throttles use the same global pid
-    Site().get_throttle.drop()
+    try:
+        _sites[_sites.keys()[0]].throttle.drop()
+        logging.info("Dropped throttle(s).")
+    except IndexError:
+        pass
 
 import atexit
 atexit.register(stopme)

@@ -103,14 +103,7 @@ class BaseSite(object):
         self._pagemutex = threading.Lock()
         self._locked_pages = []
 
-        pt_min = min(config.minthrottle, config.put_throttle)
-        self.put_throttle = Throttle(self, pt_min, config.maxthrottle,
-                                     verbosedelay=True)
-        self.put_throttle.setDelay(config.put_throttle)
-
-        gt_min = min(config.minthrottle, config.get_throttle)
-        self.get_throttle = Throttle(self, gt_min, config.maxthrottle)
-        self.get_throttle.setDelay(config.get_throttle)
+        self.throttle = Throttle(self, multiplydelay=True, verbosedelay=True)
 
     def family(self):
         """Return the associated Family object."""
@@ -409,7 +402,7 @@ class APISite(BaseSite):
           - blockinfo: present if user is blocked (dict)
 
         """
-        if not hasattr(self, "_userinfo"):
+        if not hasattr(self, "_userinfo") or "rights" not in self._userinfo:
             uirequest = api.Request(
                                 site=self,
                                 action="query",

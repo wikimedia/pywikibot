@@ -11,7 +11,6 @@ __version__ = '$Id: $'
 
 from UserDict import DictMixin
 from datetime import datetime, timedelta
-import http
 import simplejson as json
 import logging
 import re
@@ -65,7 +64,7 @@ class Request(DictMixin):
 
     >>> r = Request(site=mysite, action="query", meta="userinfo")
     >>> # This is equivalent to
-    >>> # http://[path]/api.php?action=query&meta=userinfo&format=json
+    >>> # http://{path}/api.php?action=query&meta=userinfo&format=json
     >>> # r.data is undefined until request is submitted
     >>> print r.data
     Traceback (most recent call last):
@@ -75,8 +74,9 @@ class Request(DictMixin):
     >>> r['meta'] = "userinfo|siteinfo"
     >>> # add a new parameter
     >>> r['siprop'] = "namespaces"
+    >>> # note that "uiprop" param gets added automatically
     >>> r.params
-    {'action': 'query', 'meta': 'userinfo|siteinfo', 'maxlag': '5', 'siprop': 'namespaces', 'format': 'json'}
+    {'maxlag': '5', 'format': 'json', 'meta': 'userinfo|siteinfo', 'action': 'query', 'siprop': 'namespaces', 'uiprop': 'blockinfo|hasmsg'}
     >>> data = r.submit()
     >>> type(data)
     <type 'dict'>
@@ -137,6 +137,7 @@ class Request(DictMixin):
         @return:  The data retrieved from api.php (a dict)
         
         """
+        from pywikibot.comms import http
         if self.params['format'] != 'json':
             raise TypeError("Query format '%s' cannot be parsed."
                             % self.params['format'])
@@ -292,7 +293,7 @@ class PageGenerator(object):
         # FIXME: this won't handle generators with <redirlinks> subelements
         #        correctly yet
         while True:
-            self.site.get_throttle()
+            self.site.throttle()
             self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 raise StopIteration
@@ -394,7 +395,7 @@ class PropertyGenerator(object):
         """Iterate objects for elements found in response."""
         # this looks for the resultkey ''inside'' a <page> entry
         while True:
-            self.site.get_throttle()
+            self.site.throttle()
             self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 raise StopIteration
@@ -459,6 +460,9 @@ class LoginManager(login.LoginManager):
         self.username = login_result['login']['lgusername']
         return "\n".join(cookies)
 
+    def storecookiedata(self, data):
+        pywikibot.cookie_jar.save()
+
 
 if __name__ == "__main__":
     from pywikibot import Site
@@ -468,5 +472,5 @@ if __name__ == "__main__":
         import doctest
         doctest.testmod()
     _test()
-
+    pywikibot.stopme()
 

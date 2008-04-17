@@ -17,7 +17,7 @@ This class extends httplib2, adding support for:
 # Partially distributed under Metaweb Technologies, Incs license
 #    which is compatible with the MIT license
 
-__version__ = '$Id$'
+__version__ = '$Id: threadedhttp.py 4984 2008-02-06 16:21:18Z russblau $'
 __docformat__ = 'epytext'
 
 # standard python libraries
@@ -37,46 +37,51 @@ import httplib2
 
 class ConnectionPool(object):
     """A thread-safe connection pool."""
-    
+
     def __init__(self, maxnum=5):
         """
         @param maxnum: Maximum number of connections per identifier.
                        The pool drops excessive connections added.
 
         """
+        logging.debug("Creating connection pool.")
         self.connections = {}
         self.lock = threading.Lock()
         self.maxnum = maxnum
-    
+
     def __del__(self):
         """Destructor to close all connections in the pool."""
         self.lock.acquire()
         try:
+            logging.debug("Closing connection pool (%s connections)"
+                         % len(self.connections))
             for key in self.connections:
                 for connection in self.connections[key]:
                     connection.close()
         finally:
             self.lock.release()
-            
+
     def __repr__(self):
         return self.connections.__repr__()
-        
+
     def pop_connection(self, identifier):
         """Get a connection from identifier's connection pool.
 
         @param identifier: The pool identifier
         @return: A connection object if found, None otherwise
-        
+
         """
         self.lock.acquire()
         try:
             if identifier in self.connections:
                 if len(self.connections[identifier]) > 0:
+                    logging.debug("Retrieved connection from '%s' pool."
+                                  % identifier)
                     return self.connections[identifier].pop()
             return None
         finally:
             self.lock.release()
-            
+
     def push_connection(self, identifier, connection):
         """Add a connection to identifier's connection pool.
 
@@ -88,9 +93,10 @@ class ConnectionPool(object):
         try:
             if identifier not in self.connections:
                 self.connections[identifier] = []
-            
+
             if len(self.connections[identifier]) == self.maxnum:
-                logging.debug('closing %s connection %r' % (identifier, connection))
+                logging.debug('closing %s connection %r'
+                              % (identifier, connection))
                 connection.close()
                 del connection
             else:
@@ -98,11 +104,13 @@ class ConnectionPool(object):
         finally:
             self.lock.release()
 
-class LockableCookieJar(cookielib.CookieJar):
+
+class LockableCookieJar(cookielib.LWPCookieJar):
     """CookieJar with integrated Lock object."""
     def __init__(self, *args, **kwargs):
-        cookielib.CookieJar.__init__(self, *args, **kwargs)
+        cookielib.LWPCookieJar.__init__(self, *args, **kwargs)
         self.lock = threading.Lock()
+
 
 class Http(httplib2.Http):
     """Subclass of httplib2.Http that stores cookies.
@@ -121,8 +129,14 @@ class Http(httplib2.Http):
                follow. 5 is default.
 
         """
-        self.cookiejar = kwargs.pop('cookiejar', LockableCookieJar())
-        self.connection_pool = kwargs.pop('connection_pool', ConnectionPool())
+        try:
+            self.cookiejar = kwargs.pop('cookiejar')
+        except KeyError:
+            self.cookiejar = LockableCookieJar()
+        try:
+            self.connection_pool = kwargs.pop('connection_pool')
+        except KeyError:
+            self.connection_pool = ConnectionPool()
         self.max_redirects = kwargs.pop('max_redirects', 5)
         httplib2.Http.__init__(self, *args, **kwargs)
 
@@ -142,7 +156,7 @@ class Http(httplib2.Http):
         @param connection_type: (optional) see L{httplib2.Http.request}
 
         @return: (response, content) tuple
-        
+
         """ 
         if max_redirects is None:
             max_redirects = self.max_redirects
@@ -157,20 +171,20 @@ class Http(httplib2.Http):
         finally:
             self.cookiejar.lock.release()
         headers = req.headers
-        
+
         # Wikimedia squids: add connection: keep-alive to request headers
         # unless overridden
         headers['connection'] = headers.pop('connection', 'keep-alive')
-        
+
         # determine connection pool key and fetch connection
         (scheme, authority, request_uri, defrag_uri) = httplib2.urlnorm(
                                                         httplib2.iri2uri(uri))
         conn_key = scheme+":"+authority
-        
+
         connection = self.connection_pool.pop_connection(conn_key)
         if connection is not None:
             self.connections[conn_key] = connection
-        
+
         # Redirect hack: we want to regulate redirects
         follow_redirects = self.follow_redirects
         self.follow_redirects = False
@@ -184,19 +198,19 @@ class Http(httplib2.Http):
             # return exception instance to be retrieved by the calling thread
             return e
         self.follow_redirects = follow_redirects
-        
+
         # return connection to pool
         self.connection_pool.push_connection(conn_key,
                                              self.connections[conn_key])
         del self.connections[conn_key]
-                
+
         # First write cookies 
         self.cookiejar.lock.acquire()
         try:           
             self.cookiejar.extract_cookies(DummyResponse(response), req)
         finally:
             self.cookiejar.lock.release()
-        
+
         # Check for possible redirects
         redirectable_response = ((response.status == 303) or
                                  (response.status in [300, 301, 302, 307] and
@@ -239,10 +253,10 @@ class Http(httplib2.Http):
                 response['content-location'] = absolute_uri 
             httplib2._updateCache(headers, response, content, self.cache,
                                   cachekey)
-        
+
         headers.pop('if-none-match', None)
         headers.pop('if-modified-since', None)
-        
+
         if response.has_key('location'):
             location = response['location']
             redirect_method = ((response.status == 303) and
@@ -266,9 +280,9 @@ class HttpRequest(object):
     >>> queue.put(request)
     >>> request.lock.acquire()
     >>> print request.data
-    
+
     C{request.lock.acquire()} will block until the data is available.
-    
+
     """
     def __init__(self, *args, **kwargs):
         """See C{Http.request} for parameters."""
@@ -293,7 +307,7 @@ class HttpProcessor(threading.Thread):
         threading.Thread.__init__(self)
         self.queue = queue
         self.http = Http(cookiejar=cookiejar, connection_pool=connection_pool)
-        
+
     def run(self):
         # The Queue item is expected to either an HttpRequest object
         # or None (to shut down the thread)

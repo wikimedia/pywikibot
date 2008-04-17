@@ -93,10 +93,10 @@ class Page(object):
             # copy all of source's attributes to this object
             self.__dict__ = source.__dict__
         elif isinstance(source, Link):
-            self._site = link.site
-            self._section = link.section
-            self._ns = link.namespace
-            self._title = link.title
+            self._site = source.site
+            self._section = source.section
+            self._ns = source.namespace
+            self._title = source.title
             # reassemble the canonical title from components
             if self._ns:
                 self._title = "%s:%s" % (self.site().namespace(self._ns),

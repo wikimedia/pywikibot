@@ -26,15 +26,15 @@ Parameters:
 
    -force       Ignores if the user is already logged in, and tries to log in.
 
-If not given as parameter, the script will ask for your username and password
-(password entry will be hidden), log in to your home wiki using this
-combination, and store the resulting cookies (containing your password hash,
-so keep it secured!) in a file in the login-data subdirectory.
+If not given as parameter, the script will ask for your username and
+password (password entry will be hidden), log in to your home wiki using
+this combination, and store the resulting cookies (containing your password
+hash, so keep it secured!) in a file in the data subdirectory.
 
-All scripts in this library will be looking for this cookie file and will use the
-login information if it is present.
+All scripts in this library will be looking for this cookie file and will
+use the login information if it is present.
 
-To log out, throw away the XX-login.data file that is created in the login-data
+To log out, throw away the *.lwp file that is created in the data
 subdirectory.
 """
 #
@@ -169,7 +169,7 @@ usernames['%s']['%s'] = 'myUsername'"""
                 if match:
                     id = match.group('id')
                     if not config.solve_captcha:
-                        raise wikipedia.CaptchaError(id)
+                        raise pywikibot.CaptchaError(id)
                     url = self.site.protocol() + '://' + self.site.hostname() + self.site.captcha_image_address(id)
                     answer = wikipedia.ui.askForCaptcha(url)
                     return self.getCookie(remember = remember, captchaId = id, captchaAnswer = answer)
@@ -255,7 +255,7 @@ def main():
     for arg in wikipedia.handleArgs():
         if arg.startswith("-pass"):
             if len(arg) == 5:
-                password = wikipedia.input(u'Password for all accounts:', password = True)
+                password = pywikibot.input(u'Password for all accounts:', password = True)
             else:
                 password = arg[6:]
         elif arg == "-sysop":
@@ -274,9 +274,9 @@ def main():
             namedict = config.usernames
         for familyName in namedict.iterkeys():
             for lang in namedict[familyName].iterkeys():
-                site = wikipedia.getSite(code=lang, fam=familyName)
+                site = pywikibot.getSite(code=lang, fam=familyName)
                 if not forceLogin and site.loggedInAs(sysop = sysop) != None:
-                    wikipedia.output(u'Already logged in on %s' % site)
+                    pywikibot.output(u'Already logged in on %s' % site)
                 else:
                     loginMan = LoginManager(password, sysop = sysop, site = site)
                     loginMan.login()
@@ -288,4 +288,4 @@ if __name__ == "__main__":
     try:
         main()
     finally:
-        wikipedia.stopme()
+        pywikibot.stopme()
