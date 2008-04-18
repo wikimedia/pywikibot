@@ -142,7 +142,8 @@ class Request(DictMixin):
             raise TypeError("Query format '%s' cannot be parsed."
                             % self.params['format'])
         uri = self.site.scriptpath() + "/api.php"
-        params = urllib.urlencode(self.params)
+        params = urllib.urlencode([(k, v.encode("utf8"))
+                                   for (k, v) in self.params.items()])
         while True:
             # TODO catch http errors
             try:
