@@ -62,18 +62,6 @@ getSite = Site # alias for backwards-compability
 
 from page import Page, ImagePage, Category
 
-##def Page(*args, **kwargs):
-##    from page import Page as _Page
-##    return _Page(*args, **kwargs)
-##
-##def ImagePage(*args, **kwargs):
-##    from page import ImagePage as _ImagePage
-##    return _ImagePage(*args, **kwargs)
-##
-##def Category(*args, **kwargs):
-##    from page import Category as _Category
-##    return _Category(*args, **kwargs)
-
 # DEBUG
 
 def output(text):

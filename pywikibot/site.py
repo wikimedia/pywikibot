@@ -484,6 +484,17 @@ class APISite(BaseSite):
             return self._namespaces[num]
         return self._namespaces[num][0]
 
+    def page_exists(self, page):
+        """Return True if and only if page is an existing page on site."""
+        if not hasattr(page, "_pageid"):
+            query = api.PropertyGenerator(
+                        "info", inprop="protection|talkid|subjectid",
+                        titles=page.title(withSection=False
+                                          ).encode(self.encoding()))
+            for item in query():
+                pass #FIXME
+        return page._pageid > 0
+
     # following group of methods map more-or-less directly to API queries
 
     def getbacklinks(self, page, followRedirects=False, filterRedirects=None,
@@ -500,7 +511,7 @@ class APISite(BaseSite):
             in this list.
 
         """
-        bltitle = page.title(withSection=False)
+        bltitle = page.title(withSection=False).encode(self.encoding())
         blgen = api.PageGenerator("backlinks", gbltitle=bltitle)
         if namespaces is not None:
             blgen.request["gblnamespace"] = u"|".join(unicode(ns)
@@ -523,7 +534,7 @@ class APISite(BaseSite):
             in this list.
 
         """
-        eititle = page.title(withSection=False)
+        eititle = page.title(withSection=False).encode(self.encoding())
         eigen = api.PageGenerator("embeddedin", geititle=eititle)
         if namespaces is not None:
             eigen.request["geinamespace"] = u"|".join(unicode(ns)
@@ -548,8 +559,12 @@ class APISite(BaseSite):
 
     def getlinks(self, page, namespaces=None):
         """Iterate internal wikilinks contained (or transcluded) on page."""
-        pltitle = page.title(withSection=False)
-        plgen = api.PageGenerator("links", titles=pltitle)
+        plgen = api.PageGenerator("links")
+        if hasattr(page, "_pageid"):
+            plgen.request['pageids'] = str(page._pageid)
+        else:
+            pltitle = page.title(withSection=False).encode(self.encoding())
+            plgen.request['titles'] = pltitle
         if namespaces is not None:
             plgen.request["gplnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
@@ -557,20 +572,24 @@ class APISite(BaseSite):
 
     def getcategories(self, page, withSortKey=False):
         """Iterate categories to which page belongs."""
-        # Sortkey doesn't seem to work with generator; FIXME
-        cltitle = page.title(withSection=False)
-        clgen = api.CategoryPageGenerator("categories", titles=cltitle)
+        # Sortkey doesn't work with generator; FIXME or deprecate
+        clgen = api.CategoryPageGenerator("categories")
+        if hasattr(page, "_pageid"):
+            clgen.request['pageids'] = str(page._pageid)
+        else:
+            cltitle = page.title(withSection=False).encode(self.encoding())
+            clgen.request['titles'] = cltitle
         return clgen
 
     def getimages(self, page):
         """Iterate images used (not just linked) on the page."""
-        imtitle = page.title(withSection=False)
+        imtitle = page.title(withSection=False).encode(self.encoding())
         imgen = api.ImagePageGenerator("images", titles=imtitle)
         return imgen
 
     def gettemplates(self, page, namespaces=None):
         """Iterate templates transcluded (not just linked) on the page."""
-        tltitle = page.title(withSection=False)
+        tltitle = page.title(withSection=False).encode(self.encoding())
         tlgen = api.PageGenerator("templates", titles=tltitle)
         if namespaces is not None:
             tlgen.request["gtlnamespace"] = u"|".join(unicode(ns)
@@ -593,7 +612,7 @@ class APISite(BaseSite):
             raise ValueError(
                 "Cannot get category members of non-Category page '%s'"
                 % category.title())
-        cmtitle = category.title(withSection=False)
+        cmtitle = category.title(withSection=False).encode(self.encoding())
         cmgen = api.PageGenerator(u"categorymembers", gcmtitle=cmtitle,
                                   gcmprop="ids|title|sortkey")
         if namespaces is not None:
@@ -626,8 +645,8 @@ class APISite(BaseSite):
         if page is None and revids is None:
             raise ValueError(
                 "getrevisions needs either page or revids argument.")
-        if page is not None:
-            rvtitle = page.title(withSection=False)
+        if revids is None:
+            rvtitle = page.title(withSection=False).encode(self.encoding())
             rvgen = api.PropertyGenerator(u"revisions", titles=rvtitle)
         else:
             ids = u"|".join(unicode(r) for r in revids)

@@ -142,8 +142,10 @@ class Request(DictMixin):
             raise TypeError("Query format '%s' cannot be parsed."
                             % self.params['format'])
         uri = self.site.scriptpath() + "/api.php"
-        params = urllib.urlencode([(k, v.encode("utf8"))
-                                   for (k, v) in self.params.items()])
+        for key in self.params:
+            if isinstance(self.params[key], unicode):
+                self.params[key] = self.params[key].encode(self.site.encoding())
+        params = urllib.urlencode(self.params)
         while True:
             # TODO catch http errors
             try:
@@ -330,6 +332,14 @@ class PageGenerator(object):
         
         """
         p = pywikibot.Page(self.site, pagedata['title'], pagedata['ns'])
+        if "pageid" in pagedata:
+            self._pageid = int(pagedata['pageid'])
+        elif "missing" in pagedata:
+            self._pageid = 0    # Non-existent page
+        else:
+            raise AssertionError(
+                "Page %s has neither 'pageid' nor 'missing' attribute"
+                 % pagedata['title'])
         if 'lastrevid' in pagedata:
             p._revid = pagedata['lastrevid']
         if 'touched' in pagedata:
