@@ -11,6 +11,19 @@ pywikibot.  Unless noted in this document, other names have not changed; for
 example, wikipedia.Page can be replaced by pywikibot.Page throughout any
 bot.
 
+With pywikipedia scripts were importing "wikipedia" or "pagegenerators"
+librairies; pywikibot is now written as a standard module. 
+(To use it, just import "pywikibot", assuming that pywikibot/ is in sys.path)
+
+== Python librairies ==
+
+You will need, to run pywikibot, httplib2 and setuptools
+* httplib2 : http://code.google.com/p/httplib2/
+* setuptools : http://pypi.python.org/pypi/setuptools/
+
+If you run into errors involving httplib2.urlnorm, update httplib2 to
+0.4.0 (Ubuntu package python-httlib2 for example, is outdated)
+
 == Page objects ==
 
 The constructor syntax for Pages has been modified; existing calls in the
