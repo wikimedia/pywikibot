@@ -28,9 +28,14 @@ import logging
 
 import urllib
 import cookielib
+import sys
 
 # easy_install safeguarded dependencies
-import pkg_resources
+try:
+    import pkg_resources
+except ImportError:
+    print "Error : You need the python module setuptools to use this module"
+    sys.exit(1)
 pkg_resources.require("httplib2")
 import httplib2
 

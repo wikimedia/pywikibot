@@ -177,7 +177,7 @@ class Request(DictMixin):
 "Non-JSON response received from server %s; the server may be down."
                               % self.site)
                 print rawdata
-                self.wait(max_retries, retry_wait)
+                self.wait()
                 continue
             if not result:
                 result = {}
@@ -221,7 +221,7 @@ class Request(DictMixin):
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError("Maximum retries attempted without success.")
-        logging.warn("Waiting %s seconds before retrying." % wait)
+        logging.warn("Waiting %s seconds before retrying." % self.retry_wait)
         time.sleep(self.retry_wait)
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
