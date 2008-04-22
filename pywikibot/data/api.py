@@ -141,31 +141,28 @@ class Request(DictMixin):
         if self.params['format'] != 'json':
             raise TypeError("Query format '%s' cannot be parsed."
                             % self.params['format'])
-        uri = self.site.scriptpath() + "/api.php"
         for key in self.params:
             if isinstance(self.params[key], unicode):
                 self.params[key] = self.params[key].encode(self.site.encoding())
         params = urllib.urlencode(self.params)
         while True:
             # TODO catch http errors
+            self.site.throttle()  # TODO: add write=True when needed
+            uri = self.site.scriptpath() + "/api.php"
             try:
-                self.site.sitelock.acquire()
-                try:
-                    if self.params.get("action", "") in ("login",):
-                        rawdata = http.request(self.site, uri, method="POST",
-                                    headers={'Content-Type':
-                                             'application/x-www-form-urlencoded'},
-                                    body=params)
-                    else:
-                        uri = uri + "?" + params
-                        rawdata = http.request(self.site, uri)
-                except Exception, e: #TODO: what exceptions can occur here?
-                    logging.warning(traceback.format_exc())
-                    print uri, params
-                    self.wait()
-                    continue
-            finally:
-                self.site.sitelock.release()
+                if self.params.get("action", "") in ("login",):
+                    rawdata = http.request(self.site, uri, method="POST",
+                                headers={'Content-Type':
+                                         'application/x-www-form-urlencoded'},
+                                body=params)
+                else:
+                    uri = uri + "?" + params
+                    rawdata = http.request(self.site, uri)
+            except Exception, e: #TODO: what exceptions can occur here?
+                logging.warning(traceback.format_exc())
+                print uri, params
+                self.wait()
+                continue
             if rawdata.startswith(u"unknown_action"):
                 raise APIError(rawdata[:14], rawdata[16:])
             try:
@@ -205,7 +202,7 @@ class Request(DictMixin):
                 if lag:
                     logging.info(
                         "Pausing due to database lag: " + info)
-                    self.lag_wait(int(lag.group("lag")))
+                    self.site.throttle.lag(int(lag.group("lag")))
                     continue
             if code in (u'internal_api_error_DBConnectionError', ):
                 self.wait()
@@ -443,7 +440,7 @@ class LoginManager(login.LoginManager):
         """
         Login to the site.
 
-        Paramters are all ignored.
+        Parameters are all ignored.
 
         Returns cookie data if succesful, None otherwise.
         """
@@ -477,11 +474,14 @@ class LoginManager(login.LoginManager):
 
 if __name__ == "__main__":
     from pywikibot import Site
-    mysite = Site("en", "wikipedia")
     logging.getLogger().setLevel(logging.DEBUG)
+    mysite = Site("en", "wikipedia")
+    print "starting test...."
     def _test():
         import doctest
         doctest.testmod()
-    _test()
-    pywikibot.stopme()
+    try:
+        _test()
+    finally:
+        pywikibot.stopme()
 

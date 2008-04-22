@@ -229,3 +229,23 @@ class Throttle(object):
         finally:
             self.lock.release()
 
+    def lag(self, lagtime):
+        """
+        Seize the throttle lock due to server lag.
+
+        This will prevent any thread from accessing this site.
+
+        """
+        started = time.time()
+        self.lock.acquire()
+        try:
+            # start at 1/2 the current server lag time
+            # wait at least 5 seconds but not more than 120 seconds
+            delay = min(max(5, lagtime//2), 120)
+            # account for any time we waited while acquiring the lock
+            wait = delay - (time.time() - started)
+            if wait > 0:
+                time.sleep(wait)
+        finally:
+            self.lock.release()
+        
