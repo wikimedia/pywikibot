@@ -12,14 +12,26 @@ example, wikipedia.Page can be replaced by pywikibot.Page throughout any
 bot.
 
 With pywikipedia scripts were importing "wikipedia" or "pagegenerators"
-librairies; pywikibot is now written as a standard module. 
+libraries; pywikibot is now written as a standard package, and other modules
+are contained within it (e.g., pywikibot.site contains Site classes). However,
+most commonly-used names are imported into the pywikibot namespace, so that
+module names don't need to be used unless specified in the documentation.
+
 (To use it, just import "pywikibot", assuming that pywikibot/ is in sys.path)
 
 == Python librairies ==
 
-You will need, to run pywikibot, httplib2 and setuptools
-* httplib2 : http://code.google.com/p/httplib2/
+[Note: the goal will be to package pywikibot with setuptools easy_install,
+so that these dependencies will be loaded automatically when the package is
+installed, and users won't need to worry about this...]
+
+To run pywikibot, you will need the httplib2, simplejson, and setuptools packages--
+* httplib2   : http://code.google.com/p/httplib2/
 * setuptools : http://pypi.python.org/pypi/setuptools/
+* simplejson : http://https://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7.1/docs/index.html
+
+or, if you already have setuptools installed, just execute 'easy_install httplib2'
+and 'easy_install simplejson'
 
 If you run into errors involving httplib2.urlnorm, update httplib2 to
 0.4.0 (Ubuntu package python-httlib2 for example, is outdated)

@@ -491,8 +491,12 @@ class APISite(BaseSite):
                         "info", inprop="protection|talkid|subjectid",
                         titles=page.title(withSection=False
                                           ).encode(self.encoding()))
-            for item in query():
-                pass #FIXME
+            for pageitem in query:
+                if pageitem['title'] != page.title(withSection=False):
+                    raise RuntimeError(
+                        "page_exists: Query on %s returned data on '%s'"
+                        % (page, pageitem['title']))
+                page._pageid = pageitem['pageid']
         return page._pageid > 0
 
     # following group of methods map more-or-less directly to API queries
@@ -621,30 +625,80 @@ class APISite(BaseSite):
         return cmgen
 
     def getrevisions(self, page=None, getText=False, revids=None,
-                     older=True, limit=None, sysop=False, user=None,
-                     excludeuser=None):
+                     limit=None, startid=None, endid=None, starttime=None,
+                     endtime=None, rvdir=None, user=None, excludeuser=None,
+                     section=None, sysop=False):
         """Retrieve and store revision information.
 
-        @param page: retrieve the history of this Page (required unless ids
+        By default, retrieves the last (current) revision of the page,
+        I{unless} any of the optional parameters revids, startid, endid,
+        starttime, endtime, rvdir, user, excludeuser, or limit are
+        specified. Unless noted below, all parameters not specified
+        default to False.
+
+        If rvdir is False or not specified, startid must be greater than
+        endid if both are specified; likewise, starttime must be greater
+        than endtime. If rvdir is True, these relationships are reversed.
+
+        @param page: retrieve revisions of this Page (required unless ids
             is specified)
-        @param getText: if True, retrieve the wiki-text of each revision as
-            well
+        @param getText: if True, retrieve the wiki-text of each revision;
+            otherwise, only retrieve the revision metadata (default)
+        @param section: if specified, retrieve only this section of the text
+            (getText must be True); section must be given by number (top of
+            the article is section 0), not name
+        @type section: int
         @param revids: retrieve only the specified revision ids (required
             unless page is specified)
-        @param older: if True, retrieve newest revisions first; otherwise,
-            retrieve oldest revisions first
-        @param limit: if specified, retrieve no more than this number of
-            revisions (defaults to latest revision only)
+        @type revids: list of ints
+        @param limit: Retrieve no more than this number of revisions
         @type limit: int
+        @param startid: retrieve revisions starting with this revid
+        @param endid: stop upon retrieving this revid
+        @param starttime: retrieve revisions starting at this timestamp
+        @param endtime: stop upon reaching this timestamp
+        @param rvdir: if false, retrieve newest revisions first (default);
+            if true, retrieve earliest first
         @param user: retrieve only revisions authored by this user
         @param excludeuser: retrieve all revisions not authored by this user
         @param sysop: if True, switch to sysop account (if available) to
             retrieve this page
 
         """
+        latest = (revids is None and
+                  startid is None and
+                  endid is None and
+                  starttime is None and
+                  endtime is None and
+                  rvdir is None and
+                  user is None and
+                  excludeuser is None and
+                  limit is None)  # if True, we are retrieving current revision
+
+        # check for invalid argument combinations
         if page is None and revids is None:
             raise ValueError(
-                "getrevisions needs either page or revids argument.")
+                "getrevisions:  either page or revids argument required")
+        if (startid is not None or endid is not None) and \
+                (starttime is not None or endtime is not None):
+            raise ValueError(
+                "getrevisions: startid/endid combined with starttime/endtime")
+        if starttime is not None and endtime is not None:
+            if rvdir and starttime >= endtime:
+                raise ValueError(
+                    "getrevisions: starttime > endtime with rvdir=True")
+            if (not rvdir) and endtime >= starttime:
+                raise ValueError(
+                    "getrevisions: endtime > starttime with rvdir=False")
+        if startid is not None and endid is not None:
+            if rvdir and startid >= endid:
+                raise ValueError(
+                    "getrevisions: startid > endid with rvdir=True")
+            if (not rvdir) and endid >= startid:
+                raise ValueError(
+                    "getrevisions: endid > startid with rvdir=False")
+
+        # assemble API request
         if revids is None:
             rvtitle = page.title(withSection=False).encode(self.encoding())
             rvgen = api.PropertyGenerator(u"revisions", titles=rvtitle)
@@ -654,28 +708,50 @@ class APISite(BaseSite):
         if getText:
             rvgen.request[u"rvprop"] = \
                     u"ids|flags|timestamp|user|comment|content"
-            if page.section():
-                rvgen.request[u"rvsection"] = unicode(page.section())
+            if section is not None:
+                rvgen.request[u"rvsection"] = unicode(section)
         if limit:
             rvgen.request[u"rvlimit"] = unicode(limit)
-        if not older:
+        if rvdir:
             rvgen.request[u"rvdir"] = u"newer"
+        elif rvdir is not None:
+            rvgen.request[u"rvdir"] = u"older"
+        if startid:
+            rvgen.request[u"rvstartid"] = startid
+        if endid:
+            rvgen.request[u"rvendid"] = endid
+        if starttime:
+            rvgen.request[u"rvstart"] = starttime
+        if endtime:
+            rvgen.request[u"rvend"] = endtime
         if user:
             rvgen.request[u"rvuser"] = user
         elif excludeuser:
             rvgen.request[u"rvexcludeuser"] = excludeuser
-        # TODO if sysop:
-        for rev in rvgen:
-            revision = pywikibot.page.Revision(revid=rev['revid'],
-                                               timestamp=rev['timestamp'],
-                                               user=rev['user'],
-                                               anon=rev.has_key('anon'),
-                                               comment=rev.get('comment', u''),
-                                               minor=rev.has_key('minor'),
-                                               text=rev.get('*', None))
-            page._revisions[revision.revid] = revision
-            if revids is None and limit is None and user is None and excludeuser is None:
-                page._revid = revision.revid
+        # TODO if sysop: something
+        for pagedata in rvgen:
+            if page is not None:
+                if pagedata['title'] != page.title(withSection=False):
+                    raise RuntimeError(
+                        "getrevisions: Query on %s returned data on '%s'"
+                        % (page, pagedata['title']))
+            else:
+                page = Page(self, pagedata['title'])
+            api.update_page(page, pagedata)
+
+            for rev in pagedata['revisions']:
+                revision = pywikibot.page.Revision(
+                                            revid=rev['revid'],
+                                            timestamp=rev['timestamp'],
+                                            user=rev['user'],
+                                            anon=rev.has_key('anon'),
+                                            comment=rev.get('comment',  u''),
+                                            minor=rev.has_key('minor'),
+                                            text=rev.get('*', None)
+                                          )
+                page._revisions[revision.revid] = revision
+                if latest:
+                    page._revid = revision.revid
                                 
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####

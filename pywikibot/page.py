@@ -678,8 +678,8 @@ class Page(object):
             limit = None
         else:
             limit = revCount
-        return self.site().getrevisions(self, withText=False,
-                                        older=not reverseOrder, limit=limit)
+        return self.site().getrevisions(self, getText=False,
+                                        rvdir=not reverseOrder, limit=limit)
 
     def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
                                getAll=False, revCount=500):

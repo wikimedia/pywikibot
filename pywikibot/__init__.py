@@ -60,7 +60,7 @@ def Site(code=None, fam=None, user=None, interface=None):
 
 getSite = Site # alias for backwards-compability
 
-from page import Page, ImagePage, Category
+from page import Page, ImagePage, Category, Link
 
 # DEBUG
 

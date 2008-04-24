@@ -329,22 +329,7 @@ class PageGenerator(object):
         
         """
         p = pywikibot.Page(self.site, pagedata['title'], pagedata['ns'])
-        if "pageid" in pagedata:
-            self._pageid = int(pagedata['pageid'])
-        elif "missing" in pagedata:
-            self._pageid = 0    # Non-existent page
-        else:
-            raise AssertionError(
-                "Page %s has neither 'pageid' nor 'missing' attribute"
-                 % pagedata['title'])
-        if 'lastrevid' in pagedata:
-            p._revid = pagedata['lastrevid']
-        if 'touched' in pagedata:
-            p._timestamp = pagedata['touched']
-        if 'protection' in pagedata:
-            p._protection = {}
-            for item in pagedata['protection']:
-                p._protection[item['type']] = item['level']
+        update_page(p, pagedata)
         return p
 
 
@@ -366,7 +351,11 @@ class ImagePageGenerator(PageGenerator):
 
 
 class PropertyGenerator(object):
-    """Generator for queries of type action=query&property=..."""
+    """Generator for queries of type action=query&property=...
+
+    Note that this generator yields one or more dict object(s) corresponding
+    to each "page" item(s) from the API response; the calling module has to
+    decide what to do with the contents of the dict."""
 
     def __init__(self, prop, **kwargs):
         """
@@ -384,7 +373,7 @@ class PropertyGenerator(object):
         if self.limits[prop] and kwargs.pop("getAll", False):
             self.request['g'+self.limits[generator]] = "max"
         self.site = self.request.site
-        self.resultkey = prop # element to look for in result
+        self.resultkey = prop
 
     # dict mapping property types to their limit parameter names
     limits = {'revisions': 'rvlimit',
@@ -410,21 +399,8 @@ class PropertyGenerator(object):
             if not ("query" in self.data and "pages" in self.data["query"]):
                 raise StopIteration
             pagedata = self.data["query"]["pages"].values()
-            assert len(pagedata)==1
-            pagedata = pagedata[0]
-            if not self.resultkey in pagedata:
-                raise StopIteration
-            if isinstance(pagedata[self.resultkey], dict):
-                for v in pagedata[self.resultkey].itervalues():
-                    yield v 
-            elif isinstance(pagedata[self.resultkey], list):
-                for v in pagedata[self.resultkey]:
-                    yield v
-            else:
-                raise APIError("Unknown",
-                               "Unknown format in ['%s'] value."
-                                 % self.resultkey,
-                               data=pagedata[self.resultkey])
+            for item in pagedata:
+                yield item
             if not "query-continue" in self.data:
                 return
             if not self.resultkey in self.data["query-continue"]:
@@ -471,6 +447,32 @@ class LoginManager(login.LoginManager):
     def storecookiedata(self, data):
         pywikibot.cookie_jar.save()
 
+
+def update_page(page, pagedict):
+    """Update attributes of Page object page, based on query data in pagequery
+
+    @param page: object to be updated
+    @type page: Page
+    @param pagedict: the contents of a "page" element of a query response
+    @type pagedict: dict
+
+    """
+    if "pageid" in pagedict:
+        page._pageid = int(pagedict['pageid'])
+    elif "missing" in pagedict:
+        page._pageid = 0    # Non-existent page
+    else:
+        raise AssertionError(
+            "Page %s has neither 'pageid' nor 'missing' attribute"
+             % pagedict['title'])
+    if 'lastrevid' in pagedict:
+        page._revid = pagedict['lastrevid']
+    if 'touched' in pagedict:
+        page._timestamp = pagedict['touched']
+    if 'protection' in pagedict:
+        page._protection = {}
+        for item in pagedict['protection']:
+            page._protection[item['type']] = item['level'], item['expiry']
 
 if __name__ == "__main__":
     from pywikibot import Site
