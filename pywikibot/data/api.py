@@ -223,18 +223,6 @@ class Request(DictMixin):
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
 
-    def lag_wait(self, lag):
-        """Wait due to server lag."""
-        # unlike regular wait, this shuts down all access to site
-        self.site.sitelock.acquire()
-        try:
-            # wait at least 5 seconds, no more than 120
-            wait = max(5, min(120, lag//2))
-            logging.warn("Pausing %s seconds due to server lag." % wait)
-            time.sleep(wait)
-        finally:
-            self.site.sitelock.release()
-
 
 class PageGenerator(object):
     """Iterator for response to a request of type action=query&generator=foo."""
@@ -293,7 +281,6 @@ class PageGenerator(object):
         # FIXME: this won't handle generators with <redirlinks> subelements
         #        correctly yet
         while True:
-            self.site.throttle()
             self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 raise StopIteration
@@ -392,7 +379,6 @@ class PropertyGenerator(object):
         """Iterate objects for elements found in response."""
         # this looks for the resultkey ''inside'' a <page> entry
         while True:
-            self.site.throttle()
             self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 raise StopIteration

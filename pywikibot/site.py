@@ -103,7 +103,17 @@ class BaseSite(object):
         self._pagemutex = threading.Lock()
         self._locked_pages = []
 
-        self.throttle = Throttle(self, multiplydelay=True, verbosedelay=True)
+    @property
+    def throttle(self):
+        """Return this Site's throttle.  Initialize a new one if needed."""
+        if not hasattr(self, "_throttle"):
+            self._throttle = Throttle(self, multiplydelay=True, verbosedelay=True)
+            self.getsiteinfo()
+            try:
+                self.login(False)
+            except pywikibot.NoUsername:
+                pass
+        return self._throttle
 
     def family(self):
         """Return the associated Family object."""
@@ -124,6 +134,8 @@ class BaseSite(object):
 
     def __getattr__(self, attr):
         """Calls to methods not defined in this object are passed to Family."""
+        if hasattr(self.__class__, attr):
+            return self.__class__.attr
         try:
             method = getattr(self.family(), attr)
             f = lambda *args, **kwargs: \
@@ -509,7 +521,42 @@ class APISite(BaseSite):
         if not hasattr(page, "_redir"):
             self.getpageinfo(page)
         return bool(page._redir)
-        
+
+    def getredirtarget(self, page):
+        """Return Page object for the redirect target of page."""
+        if not hasattr(page, "_redir"):
+            self.getpageinfo(page)
+        if not page._redir:
+            raise pywikibot.IsNotRedirectPage
+        title = page.title(withSection=False)
+        query = api.Request(site=self, action="query", property="info",
+                            inprop="protection|talkid|subjectid",
+                            titles=title.encode(self.encoding()),
+                            redirects="")
+        result = query.submit()
+        if "query" not in result or "redirects" not in result["query"]:
+            raise RuntimeError(
+                "getredirtarget: No 'redirects' found for page %s."
+                % title)
+        redirmap = dict((item['from'], item['to'])
+                            for item in result['query']['redirects'])
+        if title not in redirmap:
+            raise RuntimeError(
+                "getredirtarget: 'redirects' contains no key for page %s."
+                % title)
+        if "pages" not in result['query']:
+            # no "pages" element indicates a circular redirect
+            raise pywikibot.CircularRedirect(redirmap[title])
+        for pagedata in result['query']['pages'].values():
+            # there should be only one value in 'pages', and it is the target
+            if pagedata['title'] not in redirmap.values():
+                raise RuntimeError(
+                    "getredirtarget: target page '%s' not found in 'redirects'"
+                    % pagedata['title'])
+            target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
+            api.update_page(target, pagedata)
+            page._redir = target
+
     # following group of methods map more-or-less directly to API queries
 
     def getbacklinks(self, page, followRedirects=False, filterRedirects=None,
@@ -782,6 +829,21 @@ class APISite(BaseSite):
             for linkdata in pageitem['langlinks']:
                 yield pywikibot.Link(linkdata['*'],
                                      source=pywikibot.Site(linkdata['lang']))
+
+    def getextlinks(self, page):
+        """Iterate all external links on page, yielding URL strings."""
+        eltitle = page.title(withSection=False)
+        elquery = api.PropertyGenerator("extlinks",
+                                        titles=eltitle.encode(self.encoding())
+                                       )
+        for pageitem in elquery:
+            if pageitem['title'] != eltitle:
+                raise RuntimeError(
+                    "getlanglinks: Query on %s returned data on '%s'"
+                    % (page, pageitem['title']))
+            for linkdata in pageitem['extlinks']:
+                yield linkdata['*']
+
 
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####

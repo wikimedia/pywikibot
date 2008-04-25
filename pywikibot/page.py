@@ -660,7 +660,11 @@ class Page(object):
         exception. This method also can raise a NoPage exception.
 
         """
-        return self.site().follow_redirect(self)
+        if not self.isRedirectPage():
+            raise pywikibot.IsNotRedirectPage
+        if not isinstance(self._redir, Page):
+            self.site().getredirtarget(self)
+        return self._redir
 
     def getVersionHistory(self, forceReload=False, reverseOrder=False,
                           getAll=False, revCount=500):

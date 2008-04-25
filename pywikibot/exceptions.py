@@ -31,6 +31,15 @@ class IsRedirectPage(Error):
 class IsNotRedirectPage(Error):
     """Page is not a redirect page"""
 
+class CircularRedirect(Error):
+    """Page is a circular redirect
+
+    Exception argument is the redirect target; this may be the same title
+    as this page or a different title (in which case the target page directly
+    or indirectly redirects back to this one)
+
+    """
+
 class LockedPage(Error):
     """Page is locked"""
 
