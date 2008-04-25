@@ -203,6 +203,9 @@ class TestPageObject(unittest.TestCase):
 
 if __name__ == '__main__':
     try:
-        unittest.main()
-    except SystemExit:
-        pass
+        try:
+            unittest.main()
+        except SystemExit:
+            pass
+    finally:
+        pywikibot.stopme()

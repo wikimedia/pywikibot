@@ -465,6 +465,7 @@ def update_page(page, pagedict):
         raise AssertionError(
             "Page %s has neither 'pageid' nor 'missing' attribute"
              % pagedict['title'])
+    page._redir = 'redirect' in pagedict
     if 'lastrevid' in pagedict:
         page._revid = pagedict['lastrevid']
     if 'touched' in pagedict:

@@ -520,7 +520,6 @@ class Page(object):
         # no restricting template found
         return True
 
-
     def put(self, newtext, comment=None, watchArticle=None, minorEdit=True,
             force=False):
         """Save the page with the contents of the first argument as the text.

@@ -484,21 +484,32 @@ class APISite(BaseSite):
             return self._namespaces[num]
         return self._namespaces[num][0]
 
+    def getpageinfo(self, page):
+        """Load page info from api and save in page attributes"""
+        title = page.title(withSection=False)
+        query = api.PropertyGenerator(
+                    "info",
+                    inprop="protection|talkid|subjectid",
+                    titles=title.encode(self.encoding()))
+        for pageitem in query:
+            if pageitem['title'] != title:
+                raise RuntimeError(
+                    "getpageinfo: Query on %s returned data on '%s'"
+                    % (page, pageitem['title']))
+            api.update_page(page, pageitem)
+
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
         if not hasattr(page, "_pageid"):
-            query = api.PropertyGenerator(
-                        "info", inprop="protection|talkid|subjectid",
-                        titles=page.title(withSection=False
-                                          ).encode(self.encoding()))
-            for pageitem in query:
-                if pageitem['title'] != page.title(withSection=False):
-                    raise RuntimeError(
-                        "page_exists: Query on %s returned data on '%s'"
-                        % (page, pageitem['title']))
-                page._pageid = pageitem['pageid']
+            self.getpageinfo(page)
         return page._pageid > 0
 
+    def page_isredirect(self, page):
+        """Return True if and only if page is a redirect."""
+        if not hasattr(page, "_redir"):
+            self.getpageinfo(page)
+        return bool(page._redir)
+        
     # following group of methods map more-or-less directly to API queries
 
     def getbacklinks(self, page, followRedirects=False, filterRedirects=None,
@@ -752,7 +763,26 @@ class APISite(BaseSite):
                 page._revisions[revision.revid] = revision
                 if latest:
                     page._revid = revision.revid
-                                
+
+    def getinterwiki(self, page):
+        # TODO
+        raise NotImplementedError
+
+    def getlanglinks(self, page):
+        """Iterate all interlanguage links on page, yielding Link objects."""
+        lltitle = page.title(withSection=False)
+        llquery = api.PropertyGenerator("langlinks",
+                                        titles=lltitle.encode(self.encoding())
+                                       )
+        for pageitem in llquery:
+            if pageitem['title'] != lltitle:
+                raise RuntimeError(
+                    "getlanglinks: Query on %s returned data on '%s'"
+                    % (page, pageitem['title']))
+            for linkdata in pageitem['langlinks']:
+                yield pywikibot.Link(linkdata['*'],
+                                     source=pywikibot.Site(linkdata['lang']))
+
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
 class NotImplementedYet:
