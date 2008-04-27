@@ -75,12 +75,15 @@ class Page(object):
                       "Invalid namespace '%i' for site %s."
                       % (ns, source.sitename()))
             self._ns = ns
+            title = title[0].upper() + title[1:]
             if ns and not title.startswith(source.namespace(ns)+u":"):
                 title = source.namespace(ns) + u":" + title
             elif not ns and u":" in title:
-                nsindex = source.getNamespaceIndex(title[ :title.index(u":")])
+                pos = title.index(u':')
+                nsindex = source.getNamespaceIndex(title[ :pos])
                 if nsindex:
                     self._ns = nsindex
+                    title = title[:pos+1] + title[pos+1].upper() + title[pos+2:]
             if u"#" in title:
                 title, self._section = title.split(u"#", 1)
             else:
@@ -89,7 +92,7 @@ class Page(object):
                 raise pywikibot.Error(
                       "Page object cannot be created from Site without title.")
             self._title = title
-        elif isinstance(source, Page):
+        elif isinstance(source, Page): 
             # copy all of source's attributes to this object
             self.__dict__ = source.__dict__
         elif isinstance(source, Link):

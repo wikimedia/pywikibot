@@ -72,7 +72,7 @@ class LoginManager:
             try:
                 self.username = config.sysopnames[self.site.family().name][self.site.language()]
             except:
-                raise NoUsername(u'ERROR: Sysop username for %s:%s is undefined.\nIf you have a sysop account for that site, please add such a line to user-config.py:\n\nsysopnames[\'%s\'][\'%s\'] = \'myUsername\'' % (self.site.family.name, self.site.lang, self.site.family.name, self.site.lang))
+                raise NoUsername(u'ERROR: Sysop username for %s:%s is undefined.\nIf you have a sysop account for that site, please add such a line to user-config.py:\n\nsysopnames[\'%s\'][\'%s\'] = \'myUsername\'' % (self.site.family().name, self.site.language(), self.site.family().name, self.site.language()))
         else:
             try:
                 self.username = config.usernames[self.site.family().name][self.site.language()]

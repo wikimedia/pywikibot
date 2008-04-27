@@ -13,6 +13,7 @@ __version__ = '$Id: $'
 import pywikibot
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
+from exceptions import *
 import config
 
 import logging
@@ -505,8 +506,8 @@ class APISite(BaseSite):
                     titles=title.encode(self.encoding()))
         for pageitem in query:
             if pageitem['title'] != title:
-                raise RuntimeError(
-                    "getpageinfo: Query on %s returned data on '%s'"
+                raise Error(
+                    u"getpageinfo: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
             api.update_page(page, pageitem)
 
@@ -515,6 +516,28 @@ class APISite(BaseSite):
         if not hasattr(page, "_pageid"):
             self.getpageinfo(page)
         return page._pageid > 0
+   
+    def page_restrictions(self, page):
+        """Returns a dictionary reflecting page protections"""
+        if not self.page_exists(page):
+            raise NoPage(u'No page %s.' % page)
+        # page_exists called getpageinfo which set protection levels
+        return page._protection
+
+    def page_can_be_edited(self, page):
+        """
+        Returns True if and only if:
+          - page is unprotected, and bot has an account for this site, or
+          - page is protected, and bot has a sysop account for this site.
+
+        """
+        rest = self.page_restrictions(page)
+        sysop_protected = rest.has_key('edit') and rest['edit'][0] == 'sysop'
+        try:
+            api.LoginManager(site=self, sysop=sysop_protected)
+        except NoUsername:
+            return False
+        return True
 
     def page_isredirect(self, page):
         """Return True if and only if page is a redirect."""
@@ -672,7 +695,7 @@ class APISite(BaseSite):
         """
         if category.namespace() != 14:
             raise ValueError(
-                "Cannot get category members of non-Category page '%s'"
+                u"Cannot get category members of non-Category page '%s'"
                 % category.title())
         cmtitle = category.title(withSection=False).encode(self.encoding())
         cmgen = api.PageGenerator(u"categorymembers", gcmtitle=cmtitle,
@@ -790,8 +813,8 @@ class APISite(BaseSite):
         for pagedata in rvgen:
             if page is not None:
                 if pagedata['title'] != page.title(withSection=False):
-                    raise RuntimeError(
-                        "getrevisions: Query on %s returned data on '%s'"
+                    raise Error(
+                        u"getrevisions: Query on %s returned data on '%s'"
                         % (page, pagedata['title']))
             else:
                 page = Page(self, pagedata['title'])
@@ -823,8 +846,8 @@ class APISite(BaseSite):
                                        )
         for pageitem in llquery:
             if pageitem['title'] != lltitle:
-                raise RuntimeError(
-                    "getlanglinks: Query on %s returned data on '%s'"
+                raise Error(
+                    u"getlanglinks: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
             for linkdata in pageitem['langlinks']:
                 yield pywikibot.Link(linkdata['*'],
@@ -2036,7 +2059,7 @@ your connection is down. Retrying in %i minutes..."""
             return catlib.Category(self,
                     self.namespace(14)+':'+self.family().disambcatname[self.language()])
         except KeyError:
-            raise NoPage
+            raise NoPage(u'No page %s.' % page)
 
     def getToken(self, getalways = True, getagain = False, sysop = False):
         index = self._userIndex(sysop)

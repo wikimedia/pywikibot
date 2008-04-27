@@ -10,11 +10,17 @@ Exception classes used throughout the framework.
 __version__ = '$Id: $'
 
 
+import sys
+
 # TODO: These are copied from wikipedia.py; not certain that all of them
 # will be needed in the rewrite.
 
 class Error(Exception):
     """Wikipedia error"""
+    def __init__(self, arg):
+        self.string = arg.encode(sys.stdout.encoding)
+    def __str__(self):
+        return self.string
 
 class NoUsername(Error):
     """Username is not in user-config.py"""
