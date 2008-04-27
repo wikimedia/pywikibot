@@ -18,7 +18,10 @@ import sys
 class Error(Exception):
     """Wikipedia error"""
     def __init__(self, arg):
-        self.string = arg.encode(sys.stdout.encoding)
+        try:
+            self.string = arg.encode(sys.stderr.encoding, "xmlcharrefreplace")
+        except (AttributeError, TypeError):
+            self.string = arg.encode("ascii", "xmlcharrefreplace")
     def __str__(self):
         return self.string
 
