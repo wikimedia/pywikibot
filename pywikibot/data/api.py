@@ -93,20 +93,6 @@ class Request(DictMixin):
         self.params = {}
         if "action" not in kwargs:
             raise ValueError("'action' specification missing from Request.")
-        if kwargs["action"] == 'query':
-            if "meta" in kwargs:
-                if "userinfo" not in kwargs["meta"]:
-                    kwargs["meta"] += "|userinfo"
-            else:
-                kwargs["meta"] = "userinfo"
-            if "uiprop" in kwargs:
-                kwargs["uiprop"] += "|blockinfo|hasmsg"
-            else:
-                kwargs["uiprop"] = "blockinfo|hasmsg"
-        if "format" not in kwargs:
-            self.params["format"] = "json"
-        if "maxlag" not in kwargs:
-            self.params["maxlag"] = str(config.maxlag)
         self.update(**kwargs)
 
     # implement dict interface
@@ -138,10 +124,32 @@ class Request(DictMixin):
         
         """
         from pywikibot.comms import http
-        if self.params['format'] != 'json':
+
+        for key in self.params:
+            if isinstance(self.params[key], basestring):
+                self.params[key] = self.params[key].split("|")
+        if self.params["action"] == ['query']:
+            meta = self.params.get("meta", [])
+            if "userinfo" not in meta:
+                meta.append("userinfo")
+                self.params["meta"] = meta
+            uiprop = self.params.get("uiprop", [])
+            uiprop = set(uiprop + ["blockinfo", "hasmsg"])
+            self.params["uiprop"] = list(uiprop)
+            if "properties" in self.params:
+                if "info" in self.params["properties"]:
+                    inprop = self.params.get("inprop", [])
+                    info = set(info + ["protection", "talkid", "subjectid"])
+                    self.params["info"] = list(info)
+        if "maxlag" not in self.params:
+            self.params["maxlag"] = [str(config.maxlag)]
+        if "format" not in self.params:
+            self.params["format"] = ["json"]
+        if self.params['format'] != ["json"]:
             raise TypeError("Query format '%s' cannot be parsed."
                             % self.params['format'])
         for key in self.params:
+            self.params[key] = "|".join(self.params[key])
             if isinstance(self.params[key], unicode):
                 self.params[key] = self.params[key].encode(self.site.encoding())
         params = urllib.urlencode(self.params)
@@ -353,12 +361,17 @@ class PropertyGenerator(object):
         @type prop: str
 
         """
-        self.request = Request(action="query", prop=prop, **kwargs)
-        if prop not in self.limits:
-            raise ValueError("Unrecognized property '%s'" % prop)
+        if isinstance(prop, basestring):
+            prop = prop.split("|")
+        for p in prop:
+            if p not in self.limits:
+                raise ValueError("Unrecognized property '%s'" % p)
+        self.request = Request(action="query", prop="|".join(prop))
         # set limit to max, if applicable
-        if self.limits[prop] and kwargs.pop("getAll", False):
-            self.request['g'+self.limits[generator]] = "max"
+        for p in prop:
+            if self.limits[p] and kwargs.pop("getAll", False):
+                self.request['g'+self.limits[generator]] = "max"
+        self.request.params.update(kwargs)
         self.site = self.request.site
         self.resultkey = prop
 
