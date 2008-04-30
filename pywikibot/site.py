@@ -578,65 +578,48 @@ class APISite(BaseSite):
             api.update_page(target, pagedata)
             page._redir = target
 
-    def preloadpages(self, pagelist, size=60, lookahead=0):
+    def preloadpages(self, pagelist, groupsize=60):
         """Return a generator to a list of preloaded pages.
 
         @param pagelist: an iterable that returns Page objects
-        @param size: how many Pages to query at a time
-        @type size: int
-        @param lookahead: if greater than zero, preload pages in a
-            separate thread for greater responsiveness; higher values
-            result in more aggressive preloading
-        @type lookahead: int
+        @param groupsize: how many Pages to query at a time
+        @type groupsize: int
 
         """
-        from pywikibot.tools import itergroup, ThreadedGenerator
-        gen = ThreadedGenerator(target=itergroup,
-                                args=(pagelist, size),
-                                qsize=lookahead)
-        try:
-            for sublist in gen:
-                pageids = []
-                cache = {}
-                for p in sublist:
-                    if pageids is not None:
-                        if hasattr(p, "_pageid"):
-                            pageids.append(str(p._pageid))
-                        else:
-                            # only use pageids if all pages have them
-                            pageids = None
-                    cache[p.title(withSection=False)] = p
-                rvgen = api.PropertyGenerator("revisions|info")
-                if pageids is not None:
-                    rvgen.request["pageids"] = "|".join(pageids)
-                else:
-                    rvgen.request["titles"] = "|".join(cache.keys())
-                rvgen.request[u"rvprop"] = \
-                        u"ids|flags|timestamp|user|comment|content"
-                for pagedata in rvgen:
-                    if pagedata['title'] not in cache:
-                        raise Error(
+        from pywikibot.tools import itergroup
+        for sublist in itergroup(pagelist, groupsize):
+            pageids = [str(p._pageid) for p in sublist if hasattr(p, "_pageid")]
+            cache = dict((p.title(withSection=False), p) for p in sublist)
+            rvgen = api.PropertyGenerator("revisions|info")
+            if len(pageids) == len(sublist):
+                # only use pageids if all pages have them
+                rvgen.request["pageids"] = "|".join(pageids)
+            else:
+                rvgen.request["titles"] = "|".join(cache.keys())
+            rvgen.request[u"rvprop"] = \
+                    u"ids|flags|timestamp|user|comment|content"
+            for pagedata in rvgen:
+                if pagedata['title'] not in cache:
+                    raise Error(
                         u"preloadpages: Query returned unexpected title '%s'"
-                             % pagedata['title']
-                        )
-                    page = cache[pagedata['title']]
-                    api.update_page(page, pagedata)
-                    if 'revisions' in pagedata: # true if page exists
-                        for rev in pagedata['revisions']:
-                            revision = pywikibot.page.Revision(
-                                                revid=rev['revid'],
-                                                timestamp=rev['timestamp'],
-                                                user=rev['user'],
-                                                anon=rev.has_key('anon'),
-                                                comment=rev.get('comment',  u''),
-                                                minor=rev.has_key('minor'),
-                                                text=rev.get('*', None)
-                                       )
-                            page._revisions[revision.revid] = revision
-                            page._revid = revision.revid
-                    yield page
-        finally:
-            gen.stop()
+                         % pagedata['title']
+                    )
+                page = cache[pagedata['title']]
+                api.update_page(page, pagedata)
+                if 'revisions' in pagedata: # true if page exists
+                    for rev in pagedata['revisions']:
+                        revision = pywikibot.page.Revision(
+                                            revid=rev['revid'],
+                                            timestamp=rev['timestamp'],
+                                            user=rev['user'],
+                                            anon=rev.has_key('anon'),
+                                            comment=rev.get('comment',  u''),
+                                            minor=rev.has_key('minor'),
+                                            text=rev.get('*', None)
+                                   )
+                        page._revisions[revision.revid] = revision
+                        page._revid = revision.revid
+                yield page
 
     # following group of methods map more-or-less directly to API queries
 

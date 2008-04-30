@@ -114,14 +114,14 @@ def itergroup(iterable, size):
     StopIteration
 
     """
-    chunk = []
-    for item in iter(iterable):
-        chunk.append(item)
-        if len(chunk) == size:
-            yield chunk
-            chunk = []
-    if chunk:
-        yield chunk
+    group = []
+    for item in iterable:
+        group.append(item)
+        if len(group) == size:
+            yield group
+            group = []
+    if group:
+        yield group
 
             
 if __name__ == "__main__":
