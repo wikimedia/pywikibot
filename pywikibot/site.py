@@ -13,7 +13,7 @@ __version__ = '$Id: $'
 import pywikibot
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
-from exceptions import *
+from pywikibot.exceptions import *
 import config
 
 import logging
@@ -49,15 +49,13 @@ def Family(fam=None, fatal=True):
             exec "import %s_family as myfamily" % fam
         except ImportError:
             if fatal:
-                output(u"""\
+                logging.exception(u"""\
 Error importing the %s family. This probably means the family
 does not exist. Also check your configuration file."""
                            % fam)
-                import traceback
-                traceback.print_stack()
                 sys.exit(1)
             else:
-                raise ValueError("Family %s does not exist" % repr(fam))
+                raise Error("Family %s does not exist" % fam)
     return myfamily.Family()
 
 

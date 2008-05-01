@@ -169,7 +169,7 @@ usernames['%s']['%s'] = 'myUsername'"""
                 if match:
                     id = match.group('id')
                     if not config.solve_captcha:
-                        raise pywikibot.CaptchaError(id)
+                        raise CaptchaError(id)
                     url = self.site.protocol() + '://' + self.site.hostname() + self.site.captcha_image_address(id)
                     answer = wikipedia.ui.askForCaptcha(url)
                     return self.getCookie(remember = remember, captchaId = id, captchaAnswer = answer)
@@ -227,17 +227,17 @@ usernames['%s']['%s'] = 'myUsername'"""
 
 #        self.password = self.password.encode(self.site.encoding())
 
-        pywikibot.output(u"Logging in to %s as %s" % (self.site, self.username))
+        logging.info(u"Logging in to %s as %s" % (self.site, self.username))
         cookiedata = self.getCookie()
         if cookiedata:
             self.storecookiedata(cookiedata)
-            pywikibot.output(u"Should be logged in now")
+            logging.info(u"Should be logged in now")
             # Show a warning according to the local bot policy
             if not self.botAllowed():
-                pywikibot.output(u'*** Your username is not listed on [[%s]].\n*** Please make sure you are allowed to use the robot before actually using it!' % botList[self.site.family.name][self.site.lang])
+                logging.error(u'*** Your username is not listed on [[%s]].\n*** Please make sure you are allowed to use the robot before actually using it!' % botList[self.site.family.name][self.site.lang])
             return True
         else:
-            pywikibot.output(u"Login failed. Wrong password or CAPTCHA answer?")
+            logging.error(u"Login failed. Wrong password or CAPTCHA answer?")
             if retry:
                 self.password = None
                 return self.login(retry = True)
@@ -276,7 +276,7 @@ def main():
             for lang in namedict[familyName].iterkeys():
                 site = pywikibot.getSite(code=lang, fam=familyName)
                 if not forceLogin and site.loggedInAs(sysop = sysop) != None:
-                    pywikibot.output(u'Already logged in on %s' % site)
+                    logging.info(u'Already logged in on %s' % site)
                 else:
                     loginMan = LoginManager(password, sysop = sysop, site = site)
                     loginMan.login()

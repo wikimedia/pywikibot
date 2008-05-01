@@ -735,7 +735,7 @@ class Page(object):
             logging.debug(
                 u"Page.move: throttle option is deprecated.")
         if reason is None:
-            pywikibot.output(u'Moving %s to [[%s]].'
+            logging.info(u'Moving %s to [[%s]].'
                              % (self.title(asLink=True), newtitle))
             reason = pywikibot.input(u'Please enter a reason for the move:')
         return self.site().move(self, newtitle, reason,
@@ -755,7 +755,7 @@ class Page(object):
             logging.debug(
                 u"Page.delete: throttle option is deprecated.")
         if reason is None:
-            pywikibot.output(u'Deleting %s.' % (self.title(asLink=True)))
+            logging.info(u'Deleting %s.' % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the deletion:')
         answer = u'y'
         if prompt and not hasattr(self.site(), '_noDeletePrompt'):
@@ -833,7 +833,7 @@ class Page(object):
             logging.debug(
                 u"Page.undelete: throttle option is deprecated.")
         if comment is None:
-            pywikibot.output(u'Preparing to undelete %s.'
+            logging.info(u'Preparing to undelete %s.'
                              % (self.title(asLink=True)))
             comment = pywikibot.input(
                         u'Please enter a reason for the undeletion:')
@@ -863,7 +863,7 @@ class Page(object):
                 un = u'un'
             else:
                 un = u''
-            pywikibot.output(u'Preparing to %sprotect %s.'
+            logging.info(u'Preparing to %sprotect %s.'
                              % (un, self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the action:')
         if unprotect:
@@ -1158,11 +1158,11 @@ class Category(Page):
         catname = self.site().category_namespace() + ':' + catname
         targetCat = Category(self.site(), catname)
         if targetCat.exists():
-            pywikibot.output('Target page %s already exists!'
+            logging.warn('Target page %s already exists!'
                              % targetCat.title())
             return False
         else:
-            pywikibot.output('Moving text from %s to %s.'
+            logging.info('Moving text from %s to %s.'
                              % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
             creationSummary = pywikibot.translate(
@@ -1194,11 +1194,11 @@ class Category(Page):
         catname = self.site().category_namespace() + ':' + catname
         targetCat = Category(self.site(), catname)
         if targetCat.exists():
-            pywikibot.output('Target page %s already exists!'
+            logging.warn('Target page %s already exists!'
                              % targetCat.title())
             return False
         else:
-            pywikibot.output('Moving text from %s to %s.'
+            logging.info('Moving text from %s to %s.'
                              % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
             creationSummary = pywikibot.translate(
