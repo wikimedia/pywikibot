@@ -34,7 +34,8 @@ import sys
 try:
     import pkg_resources
 except ImportError:
-    print "Error : You need the python module setuptools to use this module"
+    logging.critical(
+        "Error : You need the python module setuptools to use this module")
     sys.exit(1)
 pkg_resources.require("httplib2")
 import httplib2
@@ -194,7 +195,8 @@ class Http(httplib2.Http):
         follow_redirects = self.follow_redirects
         self.follow_redirects = False
         logging.debug('%r' % (
-            (uri, method, body, headers, max_redirects, connection_type),))
+            (uri.replace("%7C","|"),
+             method, body, headers, max_redirects, connection_type),))
         try:
             (response, content) = httplib2.Http.request(
                                     self, uri, method, body, headers,

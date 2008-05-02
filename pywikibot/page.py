@@ -75,7 +75,6 @@ class Page(object):
                       "Invalid namespace '%i' for site %s."
                       % (ns, source.sitename()))
             self._ns = ns
-            title = title[0].upper() + title[1:]
             if ns and not title.startswith(source.namespace(ns)+u":"):
                 title = source.namespace(ns) + u":" + title
             elif not ns and u":" in title:
@@ -83,7 +82,6 @@ class Page(object):
                 nsindex = source.getNamespaceIndex(title[ :pos])
                 if nsindex:
                     self._ns = nsindex
-                    title = title[:pos+1] + title[pos+1].upper() + title[pos+2:]
             if u"#" in title:
                 title, self._section = title.split(u"#", 1)
             else:
@@ -1381,10 +1379,10 @@ class Link(object):
                           % text)
                 t = t[t.index(u":"): ].lstrip(u":").lstrip(u" ")
                 if prefix in fam.langs.keys():
-                    newsite = pywikibot.Site(pre, fam)
+                    newsite = pywikibot.Site(prefix, fam)
                 else:
-                    otherlang = self.site.lang
-                    familyName = fam.get_known_families(site=self.site)[pre]
+                    otherlang = self.site.language()
+                    familyName = fam.get_known_families(site=self.site)[prefix]
                     if familyName in ['commons', 'meta']:
                         otherlang = familyName
                     try:

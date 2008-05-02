@@ -168,9 +168,9 @@ class BaseSite(object):
 
     def getNamespaceIndex(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
-        for ns in self._namespaces:
+        for ns in self.namespaces():
             if namespace.lower() in [name.lower()
-                                     for name in self._namespaces[ns]]:
+                                     for name in self.namespaces()[ns]]:
                 return ns
         return None
 
@@ -490,10 +490,9 @@ class APISite(BaseSite):
         values for this namespace.
 
         """
-        self.getsiteinfo()
         if all:
-            return self._namespaces[num]
-        return self._namespaces[num][0]
+            return self.namespaces()[num]
+        return self.namespaces()[num][0]
 
     def getpageinfo(self, page):
         """Load page info from api and save in page attributes"""
