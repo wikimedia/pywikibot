@@ -79,32 +79,31 @@ def _get_base_dir():
     This is determined in the following order -
     1.  If the script was called with a -dir: argument, use the directory
         provided in this argument
-    2.  If the user has a PYWIKIBOT_DIR environment variable, use the value
+    2.  If the user has a PYWIKIBOT2_DIR environment variable, use the value
         of it
-    3.  If the script was started from a directory that contains a
-        user-config.py file, use this directory as the base
-    4.  If all else fails, use the directory from which this module was
-        loaded.
+    3.  Use (and if necessary create) a 'pywikibot' folder (Windows) or
+        '.pywikibot' directory (Unix and similar) under the user's home
+        directory.
     
     """
+    NAME = "pywikibot"
     for arg in __sys.argv[1:]:
         if arg.startswith("-dir:"):
             base_dir = arg[5:]
             __sys.argv.remove(arg)
             break
     else:
-        if os.environ.has_key("PYWIKIBOT_DIR"):
-            base_dir = os.environ["PYWIKIBOT_DIR"]
+        if os.environ.has_key("PYWIKIBOT2_DIR"):
+            base_dir = os.environ["PYWIKIBOT2_DIR"]
         else:
-            if os.path.exists('user-config.py'):
-                base_dir = '.'
-            else:
-                try:
-                    base_dir = os.path.split(
-                                __sys.modules['wikipediatools'].__file__)[0]
-                except KeyError:
-                    print __sys.modules
-                    base_dir = '.'
+            is_windows = __sys.platform == 'win32' 
+            home = os.path.expanduser("~") 
+            if is_windows: 
+                base_dir = os.path.join(home, "Application Data", NAME) 
+            else: 
+                base_dir = os.path.join(home, "."+NAME) 
+            if not os.path.isdir(base_dir): 
+                os.makedirs(base_dir, mode=0700) 
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file
@@ -116,11 +115,11 @@ def _get_base_dir():
     return base_dir
 
 _base_dir = _get_base_dir()
-_RfamilyFile = re.compile('(?P<name>.+)_family.py$')
-for _filename in os.listdir(os.path.join(_base_dir, 'families')):
-    _m = _RfamilyFile.match(_filename)
-    if _m:
-        familyName = _m.group('name')
+# families/ is a subdirectory of the directory in which config.py is found
+for _filename in os.listdir(
+                    os.path.join(os.path.dirname(__file__), 'families')):
+    if _filename.endswith("_family.py"):
+        familyName = _filename[ : -len("_family.py")]
         usernames[familyName] = {}
         sysopnames[familyName] = {}
         disambiguation_comment[familyName] = {}
@@ -526,13 +525,12 @@ def datafilepath(*filename):
     """Return an absolute path to a data file in a standard location.
 
     Argument(s) are zero or more directory names, optionally followed by a
-    data file name. The return path is offset to the "data" subdirectory of
-    config.base_dir. Any directories in the path that do not already exist
-    are created.
+    data file name. The return path is offset to config.base_dir. Any
+    directories in the path that do not already exist are created.
 
     """
     import os
-    return makepath(os.path.join(os.path.join(base_dir, "data"), *filename))
+    return makepath(os.path.join(base_dir, *filename))
 
 def shortpath(path):
     """Return a file path relative to config.base_dir."""
