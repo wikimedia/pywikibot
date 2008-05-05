@@ -245,6 +245,12 @@ class Throttle(object):
             # account for any time we waited while acquiring the lock
             wait = delay - (time.time() - started)
             if wait > 0:
+                if wait > config.noisysleep:
+                    logging.warn(u"Sleeping for %.1f seconds, %s"
+                                  % (wait,
+                                     time.strftime("%Y-%m-%d %H:%M:%S",
+                                                   time.localtime()))
+                                     )
                 time.sleep(wait)
         finally:
             self.lock.release()

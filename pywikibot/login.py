@@ -44,6 +44,7 @@ subdirectory.
 #
 __version__='$Id$'
 
+import logging
 import re
 import urllib2
 import config

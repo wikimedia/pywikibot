@@ -578,6 +578,9 @@ class APISite(BaseSite):
     def preloadpages(self, pagelist, groupsize=60):
         """Return a generator to a list of preloaded pages.
 
+        Note that [at least in current implementation] pages may be iterated
+        in a different order than in the underlying pagelist.
+
         @param pagelist: an iterable that returns Page objects
         @param groupsize: how many Pages to query at a time
         @type groupsize: int
@@ -585,7 +588,9 @@ class APISite(BaseSite):
         """
         from pywikibot.tools import itergroup
         for sublist in itergroup(pagelist, groupsize):
-            pageids = [str(p._pageid) for p in sublist if hasattr(p, "_pageid")]
+            pageids = [str(p._pageid) for p in sublist
+                                      if hasattr(p, "_pageid")
+                                         and p._pageid > 0]
             cache = dict((p.title(withSection=False), p) for p in sublist)
             rvgen = api.PropertyGenerator("revisions|info")
             if len(pageids) == len(sublist):
@@ -595,12 +600,21 @@ class APISite(BaseSite):
                 rvgen.request["titles"] = "|".join(cache.keys())
             rvgen.request[u"rvprop"] = \
                     u"ids|flags|timestamp|user|comment|content"
+            logging.info(u"Retrieving %s pages from %s."
+                           % (len(cache), self)
+                        )
             for pagedata in rvgen:
-                if pagedata['title'] not in cache:
-                    raise Error(
+                try:
+                    if pagedata['title'] not in cache:
+                        raise Error(
                         u"preloadpages: Query returned unexpected title '%s'"
-                         % pagedata['title']
-                    )
+                             % pagedata['title']
+                        )
+                except KeyError:
+                    logging.debug("No 'title' in %s" % pagedata)
+                    logging.debug("pageids=%s" % pageids)
+                    logging.debug("titles=%s" % cache.keys())
+                    continue
                 page = cache[pagedata['title']]
                 api.update_page(page, pagedata)
                 if 'revisions' in pagedata: # true if page exists
