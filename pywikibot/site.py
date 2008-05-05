@@ -540,7 +540,7 @@ class APISite(BaseSite):
             self.getpageinfo(page)
         return bool(page._redir)
 
-    def getredirtarget(self, page):
+    def pageredirtarget(self, page):
         """Return Page object for the redirect target of page."""
         if not hasattr(page, "_redir"):
             self.getpageinfo(page)
@@ -554,13 +554,13 @@ class APISite(BaseSite):
         result = query.submit()
         if "query" not in result or "redirects" not in result["query"]:
             raise RuntimeError(
-                "getredirtarget: No 'redirects' found for page %s."
+                "pageredirtarget: No 'redirects' found for page %s."
                 % title)
         redirmap = dict((item['from'], item['to'])
                             for item in result['query']['redirects'])
         if title not in redirmap:
             raise RuntimeError(
-                "getredirtarget: 'redirects' contains no key for page %s."
+                "pageredirtarget: 'redirects' contains no key for page %s."
                 % title)
         if "pages" not in result['query']:
             # no "pages" element indicates a circular redirect
@@ -569,7 +569,7 @@ class APISite(BaseSite):
             # there should be only one value in 'pages', and it is the target
             if pagedata['title'] not in redirmap.values():
                 raise RuntimeError(
-                    "getredirtarget: target page '%s' not found in 'redirects'"
+                    "pageredirtarget: target page '%s' not found in 'redirects'"
                     % pagedata['title'])
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
             api.update_page(target, pagedata)
@@ -620,7 +620,7 @@ class APISite(BaseSite):
 
     # following group of methods map more-or-less directly to API queries
 
-    def getbacklinks(self, page, followRedirects=False, filterRedirects=None,
+    def pagebacklinks(self, page, followRedirects=False, filterRedirects=None,
                      namespaces=None):
         """Iterate all pages that link to the given page.
 
@@ -646,7 +646,7 @@ class APISite(BaseSite):
             blgen.request["gblredirect"] = ""
         return blgen
 
-    def getembeddedin(self, page, filterRedirects=None, namespaces=None):
+    def page_embeddedin(self, page, filterRedirects=None, namespaces=None):
         """Iterate all pages that embedded the given page as a template.
 
         @param page: The Page to get inclusions for.
@@ -667,20 +667,20 @@ class APISite(BaseSite):
                                                               or "nonredirects"
         return eigen
 
-    def getreferences(self, page, followRedirects, filterRedirects,
+    def pagereferences(self, page, followRedirects, filterRedirects,
                       withTemplateInclusion, onlyTemplateInclusion):
-        """Convenience method combining getbacklinks and getembeddedin."""
+        """Convenience method combining pagebacklinks and page_embeddedin."""
         if onlyTemplateInclusion:
-            return self.getembeddedin(page)
+            return self.page_embeddedin(page)
         if not withTemplateInclusion:
-            return self.getbacklinks(page, follow_redirects)
+            return self.pagebacklinks(page, follow_redirects)
         import itertools
-        return itertools.chain(self.getbacklinks(
+        return itertools.chain(self.pagebacklinks(
                                     page, followRedirects, filterRedirects),
-                               self.getembeddedin(page, filterRedirects)
+                               self.page_embeddedin(page, filterRedirects)
                               )
 
-    def getlinks(self, page, namespaces=None):
+    def pagelinks(self, page, namespaces=None):
         """Iterate internal wikilinks contained (or transcluded) on page."""
         plgen = api.PageGenerator("links")
         if hasattr(page, "_pageid"):
@@ -693,7 +693,7 @@ class APISite(BaseSite):
                                                       for ns in namespaces)
         return plgen
 
-    def getcategories(self, page, withSortKey=False):
+    def pagecategories(self, page, withSortKey=False):
         """Iterate categories to which page belongs."""
         # Sortkey doesn't work with generator; FIXME or deprecate
         clgen = api.CategoryPageGenerator("categories")
@@ -704,13 +704,13 @@ class APISite(BaseSite):
             clgen.request['titles'] = cltitle
         return clgen
 
-    def getimages(self, page):
+    def pageimages(self, page):
         """Iterate images used (not just linked) on the page."""
         imtitle = page.title(withSection=False).encode(self.encoding())
         imgen = api.ImagePageGenerator("images", titles=imtitle)
         return imgen
 
-    def gettemplates(self, page, namespaces=None):
+    def pagetemplates(self, page, namespaces=None):
         """Iterate templates transcluded (not just linked) on the page."""
         tltitle = page.title(withSection=False).encode(self.encoding())
         tlgen = api.PageGenerator("templates", titles=tltitle)
@@ -719,7 +719,7 @@ class APISite(BaseSite):
                                                       for ns in namespaces)
         return tlgen
 
-    def getcategorymembers(self, category, namespaces=None):
+    def pagecategorymembers(self, category, namespaces=None):
         """Iterate members of specified category.
 
         @param category: The Category to iterate.
@@ -873,11 +873,11 @@ class APISite(BaseSite):
                 if latest:
                     page._revid = revision.revid
 
-    def getinterwiki(self, page):
+    def pageinterwiki(self, page):
         # TODO
         raise NotImplementedError
 
-    def getlanglinks(self, page):
+    def pagelanglinks(self, page):
         """Iterate all interlanguage links on page, yielding Link objects."""
         lltitle = page.title(withSection=False)
         llquery = api.PropertyGenerator("langlinks",
@@ -894,7 +894,7 @@ class APISite(BaseSite):
                 yield pywikibot.Link(linkdata['*'],
                                      source=pywikibot.Site(linkdata['lang']))
 
-    def getextlinks(self, page):
+    def page_extlinks(self, page):
         """Iterate all external links on page, yielding URL strings."""
         eltitle = page.title(withSection=False)
         elquery = api.PropertyGenerator("extlinks",

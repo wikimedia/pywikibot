@@ -447,7 +447,7 @@ class Page(object):
         # to implement those methods in the site interface and then combine
         # the results for this method, or to implement this method and then
         # split up the results for the others. 
-        return self.site().getreferences(
+        return self.site().pagereferences(
                            self, follow_redirects, redirectsOnly,
                            withTemplateInclusion, onlyTemplateInclusion)
 
@@ -460,11 +460,11 @@ class Page(object):
             omit redirects; if None, do not filter
 
         """
-        return self.site().getbacklinks(self, followRedirects, filterRedirects)
+        return self.site().pagebacklinks(self, followRedirects, filterRedirects)
 
     def embeddedin(self):
         """Yield all pages that embed this page as a template."""
-        return self.site().getembeddedin(self)
+        return self.site().page_embeddedin(self)
 
     def canBeEdited(self):
         """Return bool indicating whether this page can be edited.
@@ -574,7 +574,7 @@ class Page(object):
         @return: a generator that yields Page objects.
 
         """
-        return self.site().getlinks(self)
+        return self.site().pagelinks(self)
 
     def interwiki(self):
         """Iterate interwiki links in the page text.
@@ -582,7 +582,7 @@ class Page(object):
         @return: a generator that yields Link objects.
 
         """
-        return self.site().getinterwiki(self)
+        return self.site().pageinterwiki(self)
 
     def langlinks(self):
         """Iterate all interlanguage links on this page.
@@ -593,7 +593,7 @@ class Page(object):
         @return: a generator that yields Link objects.
 
         """
-        return self.site().getlanglinks(self)
+        return self.site().pagelanglinks(self)
 
     def imagelinks(self, followRedirects=None, loose=None):
         """Iterate ImagePage objects for images displayed on this Page.
@@ -609,7 +609,7 @@ class Page(object):
         if loose is not None:
             logging.debug(
                 u"Page.imagelinks(loose) option is deprecated.")
-        return self.site().getimages(self)
+        return self.site().pageimages(self)
 
     def templates(self):
         """Iterate Page objects for templates used on this Page.
@@ -619,7 +619,7 @@ class Page(object):
         a normal link.
 
         """
-        return self.site().gettemplates(self)
+        return self.site().pagetemplates(self)
 
     def templatesWithParams(self):
         """Iterate templates used on this Page.
@@ -644,7 +644,7 @@ class Page(object):
         if nofollow_redirects is not None:
             logging.debug(
                 u"Page.categories(nofollow_redirects) option is deprecated.")
-        return self.site().getcategories(self, withSortKey=withSortKey)
+        return self.site().pagecategories(self, withSortKey=withSortKey)
 
     def extlinks(self):
         """Iterate all external URLs (not interwiki links) from this page.
@@ -652,7 +652,7 @@ class Page(object):
         @return: a generator that yields unicode objects containing URLs.
 
         """
-        return self.site().getextlinks(self)
+        return self.site().page_extlinks(self)
 
     def getRedirectTarget(self):
         """Return a Page object for the target this Page redirects to.
@@ -664,7 +664,7 @@ class Page(object):
         if not self.isRedirectPage():
             raise pywikibot.IsNotRedirectPage
         if not isinstance(self._redir, Page):
-            self.site().getredirtarget(self)
+            self.site().pageredirtarget(self)
         return self._redir
 
     def getVersionHistory(self, forceReload=False, reverseOrder=False,
@@ -1100,7 +1100,7 @@ class Category(Page):
             recurse = recurse - 1
         if not hasattr(self, "_subcats"):
             self._subcats = []
-            for member in self.site().getcategorymembers(self, namespaces=[14]):
+            for member in self.site().pagecategorymembers(self, namespaces=[14]):
                 subcat = Category(self.site(), member.title())
                 self._subcats.append(subcat)
                 yield subcat
@@ -1127,7 +1127,7 @@ class Category(Page):
         """
         namespaces = [x for x in self.site().namespaces().keys()
                       if x>=0 and x!=14]
-        for member in self.site().getcategorymembers(self,
+        for member in self.site().pagecategorymembers(self,
                                                      namespaces=namespaces):
             yield member
         if recurse:
