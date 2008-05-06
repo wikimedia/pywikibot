@@ -34,10 +34,9 @@ class Family(family.Family):
         self.namespaces[113] = {
             '_default': u'Mini talk',
         }
-        
+
     def code2encoding(self, code):
         return 'iso-8859-1'
-    
+
     def version(self, code):
         return "1.12alpha"
-    

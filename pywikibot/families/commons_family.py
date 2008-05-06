@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+﻿# -*- coding: utf-8  -*-
 
 __version__ = '$Id$'
 
@@ -28,6 +28,13 @@ class Family(family.Family):
         }
 
         self.interwiki_forward = 'wikipedia'
+        self.disambiguationTemplates = {
+
+            'commons': [u'Disambig', u'Disambiguation', u'Razločitev']
+        }
+        self.disambcatname = {
+            'commons':  u'Disambiguation'
+        }
 
     def version(self, code):
         return '1.13alpha'
