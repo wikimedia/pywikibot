@@ -20,6 +20,7 @@ import logging
 import os
 import sys
 import threading
+import re
 
 
 class PageInUse(pywikibot.Error):
@@ -427,6 +428,16 @@ class APISite(BaseSite):
                    "API userinfo response lacks 'userinfo' key"
             self._userinfo = uidata['query']['userinfo']
         return self._userinfo
+
+    def getcurrenttimestamp(self):
+        """Returns a (Mediawiki) timestamp, {{CURRENTTIMESTAMP}},
+           the server time.
+           Format is yyyymmddhhmmss"""
+        r = api.Request(site=self,
+                        action="parse",
+                        text="{{CURRENTTIMESTAMP}}")
+        result = r.submit()
+        return re.search('\d+', result['parse']['text']['*']).group()
 
     def getsiteinfo(self):
         """Retrieve siteinfo from site and store in _siteinfo attribute."""
