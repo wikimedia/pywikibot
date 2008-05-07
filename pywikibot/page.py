@@ -284,7 +284,7 @@ class Page(object):
                 raise self._getexception
         if force or not hasattr(self, "_revid") \
                  or not self._revid in self._revisions:
-            self.site().getrevisions(self, getText=True, sysop=sysop)
+            self.site().loadrevisions(self, getText=True, sysop=sysop)
             # TODO: Exception handling for no-page, redirects, etc.
 
         return self._revisions[self._revid].text
@@ -307,7 +307,7 @@ class Page(object):
             logging.debug(
                 "Page.getOldVersion(change_edit_time) option is deprecated.")
         if force or not oldid in self._revisions:
-            self.site().getrevisions(self, getText=True, ids=oldid,
+            self.site().loadrevisions(self, getText=True, ids=oldid,
                                      sysop=sysop)
         # TODO: what about redirects, errors?
         return self._revisions[oldid].text
@@ -324,7 +324,7 @@ class Page(object):
     def latestRevision(self):
         """Return the current revision id for this page."""
         if not hasattr(self, '_revid'):
-            self.site().getrevisions(self)
+            self.site().loadrevisions(self)
         return self._revid
 
     def userName(self):
@@ -664,7 +664,7 @@ class Page(object):
         if not self.isRedirectPage():
             raise pywikibot.IsNotRedirectPage
         if not isinstance(self._redir, Page):
-            self.site().pageredirtarget(self)
+            self.site().getredirtarget(self)
         return self._redir
 
     def getVersionHistory(self, forceReload=False, reverseOrder=False,
@@ -682,7 +682,7 @@ class Page(object):
             limit = None
         else:
             limit = revCount
-        return self.site().getrevisions(self, getText=False,
+        return self.site().loadrevisions(self, getText=False,
                                         rvdir=not reverseOrder, limit=limit)
 
     def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
@@ -706,7 +706,7 @@ class Page(object):
         @return: A generator that yields tuples consisting of revision ID,
             edit date/time, user name and content
         """
-        return self.site().getrevisions(self, withText=True)
+        return self.site().loadrevisions(self, withText=True)
 
     def contributingUsers(self):
         """Return a set of usernames (or IPs) of users who edited this page."""
@@ -1100,7 +1100,7 @@ class Category(Page):
             recurse = recurse - 1
         if not hasattr(self, "_subcats"):
             self._subcats = []
-            for member in self.site().pagecategorymembers(self, namespaces=[14]):
+            for member in self.site().categorymembers(self, namespaces=[14]):
                 subcat = Category(self.site(), member.title())
                 self._subcats.append(subcat)
                 yield subcat
@@ -1127,7 +1127,7 @@ class Category(Page):
         """
         namespaces = [x for x in self.site().namespaces().keys()
                       if x>=0 and x!=14]
-        for member in self.site().pagecategorymembers(self,
+        for member in self.site().categorymembers(self,
                                                      namespaces=namespaces):
             yield member
         if recurse:

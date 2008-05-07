@@ -231,6 +231,7 @@ class Request(DictMixin):
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
 
+#TODO - refactor all these generator classes into a parent/subclass hierarchy
 
 class PageGenerator(object):
     """Iterator for response to a request of type action=query&generator=foo."""
@@ -247,8 +248,11 @@ class PageGenerator(object):
             raise ValueError("Unrecognized generator '%s'" % generator)
         self.request = Request(action="query", generator=generator, **kwargs)
         # set limit to max, if applicable
+        # FIXME: need to distinguish between the "limit" per API request and an
+        #        overall limit on the number of pages to be iterated
         if self.limits[generator]:
-            self.request['g'+self.limits[generator]] = "max"
+            limitkey = 'g' + self.limits[generator]
+            self.request.setdefault(limitkey, "max")
         if 'prop' in self.request:
             self.request['prop'] += "|info|imageinfo"
         else:
@@ -330,6 +334,7 @@ class PageGenerator(object):
 
 class CategoryPageGenerator(PageGenerator):
     """Generator that yields Category objects instead of Pages."""
+
     def result(self, pagedata):
         p = PageGenerator.result(self, pagedata)
         return pywikibot.Category(p)
@@ -337,6 +342,7 @@ class CategoryPageGenerator(PageGenerator):
 
 class ImagePageGenerator(PageGenerator):
     """Generator that yields ImagePage objects instead of Pages."""
+
     def result(self, pagedata):
         p = PageGenerator.result(self, pagedata)
         image = pywikibot.ImagePage(p)
@@ -350,8 +356,9 @@ class PropertyGenerator(object):
 
     Note that this generator yields one or more dict object(s) corresponding
     to each "page" item(s) from the API response; the calling module has to
-    decide what to do with the contents of the dict."""
+    decide what to do with the contents of the dict.
 
+    """
     def __init__(self, prop, **kwargs):
         """
         Required and optional parameters are as for C{Request}, except that
@@ -399,6 +406,76 @@ class PropertyGenerator(object):
                 raise StopIteration
             pagedata = self.data["query"]["pages"].values()
             for item in pagedata:
+                yield item
+            if not "query-continue" in self.data:
+                return
+            if not self.resultkey in self.data["query-continue"]:
+                raise APIError("Unknown",
+                               "Missing '%s' key in ['query-continue'] value.",
+                               data=self.data["query-continue"])
+            self.request.update(self.data["query-continue"][self.resultkey])
+
+
+class ListGenerator(object):
+    """Iterator for queries with action=query&list=... parameters"""
+
+    def __init__(self, listaction, **kwargs):
+        """
+        Required and optional parameters are as for C{Request}, except that
+        action=query is assumed and listaction is required.
+        
+        @param listaction: the "list=" type from api.php
+        @type listaction: str
+
+        """
+        if listaction not in self.limits:
+            raise ValueError("Unrecognized list type '%s'" % listaction)
+        self.request = Request(action="query", list=listaction, **kwargs)
+        # set limit to max, if applicable
+        # FIXME: need to distinguish between the "limit" per API request and an
+        #        overall limit on the number of pages to be iterated
+        if self.limits[listaction]:
+            limitkey = self.limits[listaction]
+            self.request.setdefault(limitkey, "max")
+        self.resultkey = listaction
+        self.site = self.request.site
+
+    # dict mapping generator types to their limit parameter names
+    
+    limits = {'allpages': 'aplimit',
+              'alllinks': 'allimit',
+              'allcategories': 'aclimit',
+              'allusers': 'aulimit',
+              'allimages': 'ailimit',
+              'backlinks': 'bllimit',
+              'blocks': 'bklimit',
+              'categorymembers': 'cmlimit',
+              'embeddedin': 'eilimit',
+              'exturlusage': 'eulimit',
+              'imageusage': 'iulimit',
+              'logevents': 'lelimit',
+              'recentchanges': 'rclimit',
+              'search': 'srlimit',
+              'usercontribs': 'uclimit',
+              'watchlist': 'wllimit',
+              'deletedrevs': 'drlimit',
+              'users': None,
+              'random': 'rnlimit',
+             }
+
+    def __iter__(self):
+        """Iterate objects for elements found in response."""
+        # this looks for the resultkey in the 'query' element
+        while True:
+            self.data = self.request.submit()
+            if not self.data or not isinstance(self.data, dict):
+                raise StopIteration
+            if not ("query" in self.data
+                    and self.resultkey in self.data["query"]):
+                raise StopIteration
+            resultdata = self.data["query"][self.resultkey]
+            assert isinstance(resultdata, list)
+            for item in resultdata:
                 yield item
             if not "query-continue" in self.data:
                 return

@@ -494,7 +494,7 @@ class APISite(BaseSite):
             return self.namespaces()[num]
         return self.namespaces()[num][0]
 
-    def getpageinfo(self, page):
+    def loadpageinfo(self, page):
         """Load page info from api and save in page attributes"""
         title = page.title(withSection=False)
         query = api.PropertyGenerator("info",
@@ -502,21 +502,21 @@ class APISite(BaseSite):
         for pageitem in query:
             if pageitem['title'] != title:
                 raise Error(
-                    u"getpageinfo: Query on %s returned data on '%s'"
+                    u"loadpageinfo: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
             api.update_page(page, pageitem)
 
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
         if not hasattr(page, "_pageid"):
-            self.getpageinfo(page)
+            self.loadpageinfo(page)
         return page._pageid > 0
    
     def page_restrictions(self, page):
         """Returns a dictionary reflecting page protections"""
         if not self.page_exists(page):
             raise NoPage(u'No page %s.' % page)
-        # page_exists called getpageinfo which set protection levels
+        # page_exists called loadpageinfo which set protection levels
         return page._protection
 
     def page_can_be_edited(self, page):
@@ -537,13 +537,13 @@ class APISite(BaseSite):
     def page_isredirect(self, page):
         """Return True if and only if page is a redirect."""
         if not hasattr(page, "_redir"):
-            self.getpageinfo(page)
+            self.loadpageinfo(page)
         return bool(page._redir)
 
-    def pageredirtarget(self, page):
+    def getredirtarget(self, page):
         """Return Page object for the redirect target of page."""
         if not hasattr(page, "_redir"):
-            self.getpageinfo(page)
+            self.loadpageinfo(page)
         if not page._redir:
             raise pywikibot.IsNotRedirectPage
         title = page.title(withSection=False)
@@ -554,13 +554,13 @@ class APISite(BaseSite):
         result = query.submit()
         if "query" not in result or "redirects" not in result["query"]:
             raise RuntimeError(
-                "pageredirtarget: No 'redirects' found for page %s."
+                "getredirtarget: No 'redirects' found for page %s."
                 % title)
         redirmap = dict((item['from'], item['to'])
                             for item in result['query']['redirects'])
         if title not in redirmap:
             raise RuntimeError(
-                "pageredirtarget: 'redirects' contains no key for page %s."
+                "getredirtarget: 'redirects' contains no key for page %s."
                 % title)
         if "pages" not in result['query']:
             # no "pages" element indicates a circular redirect
@@ -569,7 +569,7 @@ class APISite(BaseSite):
             # there should be only one value in 'pages', and it is the target
             if pagedata['title'] not in redirmap.values():
                 raise RuntimeError(
-                    "pageredirtarget: target page '%s' not found in 'redirects'"
+                    "getredirtarget: target page '%s' not found in 'redirects'"
                     % pagedata['title'])
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
             api.update_page(target, pagedata)
@@ -733,7 +733,7 @@ class APISite(BaseSite):
                                                       for ns in namespaces)
         return tlgen
 
-    def pagecategorymembers(self, category, namespaces=None):
+    def categorymembers(self, category, namespaces=None):
         """Iterate members of specified category.
 
         @param category: The Category to iterate.
@@ -757,7 +757,7 @@ class APISite(BaseSite):
                                                       for ns in namespaces)
         return cmgen
 
-    def getrevisions(self, page=None, getText=False, revids=None,
+    def loadrevisions(self, page=None, getText=False, revids=None,
                      limit=None, startid=None, endid=None, starttime=None,
                      endtime=None, rvdir=None, user=None, excludeuser=None,
                      section=None, sysop=False):
@@ -811,25 +811,25 @@ class APISite(BaseSite):
         # check for invalid argument combinations
         if page is None and revids is None:
             raise ValueError(
-                "getrevisions:  either page or revids argument required")
+                "loadrevisions:  either page or revids argument required")
         if (startid is not None or endid is not None) and \
                 (starttime is not None or endtime is not None):
             raise ValueError(
-                "getrevisions: startid/endid combined with starttime/endtime")
+                "loadrevisions: startid/endid combined with starttime/endtime")
         if starttime is not None and endtime is not None:
             if rvdir and starttime >= endtime:
                 raise ValueError(
-                    "getrevisions: starttime > endtime with rvdir=True")
+                    "loadrevisions: starttime > endtime with rvdir=True")
             if (not rvdir) and endtime >= starttime:
                 raise ValueError(
-                    "getrevisions: endtime > starttime with rvdir=False")
+                    "loadrevisions: endtime > starttime with rvdir=False")
         if startid is not None and endid is not None:
             if rvdir and startid >= endid:
                 raise ValueError(
-                    "getrevisions: startid > endid with rvdir=True")
+                    "loadrevisions: startid > endid with rvdir=True")
             if (not rvdir) and endid >= startid:
                 raise ValueError(
-                    "getrevisions: endid > startid with rvdir=False")
+                    "loadrevisions: endid > startid with rvdir=False")
 
         # assemble API request
         if revids is None:
@@ -866,7 +866,7 @@ class APISite(BaseSite):
             if page is not None:
                 if pagedata['title'] != page.title(withSection=False):
                     raise Error(
-                        u"getrevisions: Query on %s returned data on '%s'"
+                        u"loadrevisions: Query on %s returned data on '%s'"
                         % (page, pagedata['title']))
             else:
                 page = Page(self, pagedata['title'])
@@ -924,6 +924,146 @@ class APISite(BaseSite):
             for linkdata in pageitem['extlinks']:
                 yield linkdata['*']
 
+    def allpages(self, start="!", prefix="", namespace=0,
+                 filterredir=None, filterlanglinks=None,
+                 minsize=None, maxsize=None,
+                 protect_type=None, protect_level=None,
+                 limit=None, reverse=False, includeRedirects=None,
+                 throttle=None):
+        """Iterate pages in a single namespace.
+
+        Note: parameters includeRedirects and throttle are deprecated and
+        included only for backwards compatibility.
+        
+        @param start: Start at this title (page need not exist).
+        @param prefix: Only yield pages starting with this string.
+        @param namespace: Iterate pages from this (single) namespace
+           (default: 0)
+        @param filterredir: if True, only yield redirects; if False (and not
+            None), only yield non-redirects (default: yield both)
+        @param filterlanglinks: if True, only yield pages with language links;
+            if False (and not None), only yield pages without language links
+            (default: yield both)
+        @param minsize: if present, only yield pages at least this many
+            bytes in size
+        @param maxsize: if present, only yield pages at most this many bytes
+            in size
+        @param protect_type: only yield pages that have a protection of the
+            specified type
+        @type protect_type: str
+        @param protect_level: only yield pages that have protection at this
+            level; can only be used if protect_type is specified
+        @param limit: maximum number of pages to iterate (default: iterate
+            all pages in namespace)
+        @param reverse: if True, iterate in reverse Unicode lexigraphic
+            order (default: iterate in forward order)
+
+        """
+        if not isinstance(namespace, int):
+            raise Error("allpages: only one namespace permitted.")
+        if throttle is not None:
+            logging.debug("allpages: the 'throttle' parameter is deprecated.")
+        if includeRedirects is not None:
+            logging.debug(
+                "allpages: the 'includeRedirect' parameter is deprecated.")
+            if includeRedirects:
+                if includeRedirects == "only":
+                    filterredirs = True
+                else:
+                    filterredirs = None
+            else:
+                filterredirs = False
+                    
+        apgen = api.PageGenerator("allpages", gapnamespace=str(namespace),
+                                  gapfrom=start)
+        if prefix:
+            apgen.request["gapprefix"] = prefix
+        if filterredir is not None:
+            apgen.request["gapfilterredir"] = (filterredir
+                                               and "redirects"
+                                               or "nonredirects")
+        if filterlanglinks is not None:
+            apgen.request["gapfilterlanglinks"] = (filterlanglinks
+                                                   and "withlanglinks"
+                                                   or "withoutlanglinks")
+        if isinstance(minsize, int):
+            apgen.request["gapminsize"] = str(minsize)
+        if isinstance(maxsize, int):
+            apgen.request["gapmaxsize"] = str(maxsize)
+        if isinstance(protect_type, basestring):
+            apgen.request["gapprtype"] = protect_type
+            if isinstance(protect_level, basestring):
+                apgen.request["gapprlevel"] = protect_level
+        if isinstance(limit, int):
+            apgen.request["gaplimit"] = str(limit)
+        if reverse:
+            apgen.request["gapdir"] = "descending"
+        return apgen
+
+    def alllinks(self, start="!", prefix="", namespace=0, unique=False,
+                 limit=None, fromids=False):
+        """Iterate all links to pages (which need not exist) in one namespace.
+
+        Note that, in practice, links that were found on pages that have
+        been deleted may not have been removed from the links table, so this
+        method can return false positives.
+
+        @param start: Start at this title (page need not exist).
+        @param prefix: Only yield pages starting with this string.
+        @param namespace: Iterate pages from this (single) namespace
+            (default: 0)
+        @param unique: If True, only iterate each link title once (default:
+            iterate once for each linking page)
+        @param limit: maximum number of pages to iterate (default: iterate
+            all pages in namespace)
+        @param fromids: if True, include the pageid of the page containing
+            each link (default: False) as the 'fromid' attribute of the Page;
+            cannot be combined with unique
+
+        """
+        if unique and fromids:
+            raise Error("alllinks: unique and fromids cannot both be True.")
+        if not isinstance(namespace, int):
+            raise Error("alllinks: only one namespace permitted.")
+        algen = api.ListGenerator("alllinks", alnamespace=str(namespace),
+                                  alfrom=start)
+        if prefix:
+            algen.request["alprefix"] = prefix
+        if isinstance(limit, int):
+            algen.request["allimit"] = str(limit)
+        if unique:
+            algen.request["alunique"] = ""
+        if fromids:
+            algen.request["alprop"] = "title|ids"
+        for link in algen:
+            p = pywikibot.Page(self, link['title'], link['ns'])
+            if fromids:
+                p.fromid = link['fromid']
+            yield p
+
+
+    def allcategories(self, start="!", prefix="", limit=None,
+                      reverse=False):
+        """Iterate categories used (which need not have a Category page).
+
+        Iterator yields Category objects.
+
+        @param start: Start at this category title (category need not exist).
+        @param prefix: Only yield categories starting with this string.
+        @param limit: maximum number of categories to iterate (default:
+            iterate all)
+        @param reverse: if True, iterate in reverse Unicode lexigraphic
+            order (default: iterate in forward order)
+
+        """
+        acgen = api.CategoryGenerator("allcategories", gapfrom=start)
+        if prefix:
+            acgen.request["gacprefix"] = prefix
+        if isinstance(limit, int):
+            acgen.request["gaclimit"] = str(limit)
+        if reverse:
+            acgen.request["gacdir"] = "descending"
+        return acgen
 
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
@@ -1805,92 +1945,6 @@ your connection is down. Retrying in %i minutes..."""
                     yield page
             if not repeat:
                 break
-
-    def allpages(self, start='!', namespace=0, includeredirects=True,
-                 throttle=True):
-        """Yield all Pages from Special:Allpages.
-
-        Parameters:
-        start   Start at this page. By default, it starts at '!', and yields
-                all pages.
-        namespace Yield all pages in this namespace; defaults to 0.
-                MediaWiki software will only return pages in one namespace
-                at a time.
-
-        If includeredirects is False, redirects will not be found.
-        If includeredirects equals the string 'only', only redirects
-        will be found. Note that this has not been tested on older
-        versions of the MediaWiki code.
-
-        It is advised not to use this directly, but to use the
-        AllpagesPageGenerator from pagegenerators.py instead.
-
-        """
-        while True:
-            # encode Non-ASCII characters in hexadecimal format (e.g. %F6)
-            start = start.encode(self.encoding())
-            start = urllib.quote(start)
-            # load a list which contains a series of article names (always 480)
-            path = self.allpages_address(start, namespace)
-            output(u'Retrieving Allpages special page for %s from %s, namespace %i' % (repr(self), start, namespace))
-            returned_html = self.getUrl(path)
-            # Try to find begin and end markers
-            try:
-                # In 1.4, another table was added above the navigational links
-                if self.versionnumber() >= 4:
-                    begin_s = '</table><hr /><table'
-                    end_s = '</table'
-                else:
-                    begin_s = '<table'
-                    end_s = '</table'
-                ibegin = returned_html.index(begin_s)
-                iend = returned_html.index(end_s,ibegin + 3)
-            except ValueError:
-                raise ServerError(
-"Couldn't extract allpages special page. Make sure you're using MonoBook skin.")
-            # remove the irrelevant sections
-            returned_html = returned_html[ibegin:iend]
-            if self.versionnumber()==2:
-                R = re.compile('/wiki/(.*?)\" *class=[\'\"]printable')
-            elif self.versionnumber()<5:
-                # Apparently the special code for redirects was added in 1.5
-                R = re.compile('title ?=\"(.*?)\"')
-            elif not includeredirects:
-                R = re.compile('\<td(?: width="33%")?\>\<a href=\"\S*\" +title ?="(.*?)"')
-            elif includeredirects == 'only':
-                R = re.compile('\<td(?: width="33%")?>\<[^\<\>]*allpagesredirect\"\>\<a href=\"\S*\" +title ?="(.*?)"')
-            else:
-                R = re.compile('title ?=\"(.*?)\"')
-            # Count the number of useful links on this page
-            n = 0
-            for hit in R.findall(returned_html):
-                # count how many articles we found on the current page
-                n = n + 1
-                if self.versionnumber()==2:
-                    yield Page(self, url2link(hit, site = self, insite = self))
-                else:
-                    yield Page(self, hit)
-                # save the last hit, so that we know where to continue when we
-                # finished all articles on the current page. Append a '!' so that
-                # we don't yield a page twice.
-                start = Page(self,hit).titleWithoutNamespace() + '!'
-            # A small shortcut: if there are less than 100 pages listed on this
-            # page, there is certainly no next. Probably 480 would do as well,
-            # but better be safe than sorry.
-            if n < 100:
-                if (not includeredirects) or includeredirects == 'only':
-                    # Maybe there were only so few because the rest is or is not a redirect
-                    R = re.compile('title ?=\"(.*?)\"')
-                    allLinks = R.findall(returned_html)
-                    if len(allLinks) < 100:
-                        break
-                    elif n == 0:
-                        # In this special case, no pages of the requested type
-                        # were found, and "start" will remain and be double-encoded.
-                        # Use the last page as the start of the next page.
-                        start = Page(self, allLinks[-1]).titleWithoutNamespace() + '!'
-                else:
-                    break
 
     def prefixindex(self, prefix, namespace=0, includeredirects=True):
         """Yield all pages with a given prefix.
