@@ -508,7 +508,7 @@ class APISite(BaseSite):
     def loadpageinfo(self, page):
         """Load page info from api and save in page attributes"""
         title = page.title(withSection=False)
-        query = api.PropertyGenerator("info",
+        query = api.PropertyGenerator("info", site=self,
                                       titles=title.encode(self.encoding()))
         for pageitem in query:
             if pageitem['title'] != title:
@@ -603,7 +603,7 @@ class APISite(BaseSite):
                                       if hasattr(p, "_pageid")
                                          and p._pageid > 0]
             cache = dict((p.title(withSection=False), p) for p in sublist)
-            rvgen = api.PropertyGenerator("revisions|info")
+            rvgen = api.PropertyGenerator("revisions|info", site=self)
             if len(pageids) == len(sublist):
                 # only use pageids if all pages have them
                 rvgen.request["pageids"] = "|".join(pageids)
@@ -660,7 +660,7 @@ class APISite(BaseSite):
 
         """
         bltitle = page.title(withSection=False).encode(self.encoding())
-        blgen = api.PageGenerator("backlinks", gbltitle=bltitle)
+        blgen = api.PageGenerator("backlinks", gbltitle=bltitle, site=self)
         if namespaces is not None:
             blgen.request["gblnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
@@ -683,7 +683,7 @@ class APISite(BaseSite):
 
         """
         eititle = page.title(withSection=False).encode(self.encoding())
-        eigen = api.PageGenerator("embeddedin", geititle=eititle)
+        eigen = api.PageGenerator("embeddedin", geititle=eititle, site=self)
         if namespaces is not None:
             eigen.request["geinamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
@@ -707,7 +707,7 @@ class APISite(BaseSite):
 
     def pagelinks(self, page, namespaces=None):
         """Iterate internal wikilinks contained (or transcluded) on page."""
-        plgen = api.PageGenerator("links")
+        plgen = api.PageGenerator("links", site=self)
         if hasattr(page, "_pageid"):
             plgen.request['pageids'] = str(page._pageid)
         else:
@@ -721,7 +721,7 @@ class APISite(BaseSite):
     def pagecategories(self, page, withSortKey=False):
         """Iterate categories to which page belongs."""
         # Sortkey doesn't work with generator; FIXME or deprecate
-        clgen = api.CategoryPageGenerator("categories")
+        clgen = api.CategoryPageGenerator("categories", site=self)
         if hasattr(page, "_pageid"):
             clgen.request['pageids'] = str(page._pageid)
         else:
@@ -732,13 +732,13 @@ class APISite(BaseSite):
     def pageimages(self, page):
         """Iterate images used (not just linked) on the page."""
         imtitle = page.title(withSection=False).encode(self.encoding())
-        imgen = api.ImagePageGenerator("images", titles=imtitle)
+        imgen = api.ImagePageGenerator("images", titles=imtitle, site=self)
         return imgen
 
     def pagetemplates(self, page, namespaces=None):
         """Iterate templates transcluded (not just linked) on the page."""
         tltitle = page.title(withSection=False).encode(self.encoding())
-        tlgen = api.PageGenerator("templates", titles=tltitle)
+        tlgen = api.PageGenerator("templates", titles=tltitle, site=self)
         if namespaces is not None:
             tlgen.request["gtlnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
@@ -762,7 +762,7 @@ class APISite(BaseSite):
                 % category.title())
         cmtitle = category.title(withSection=False).encode(self.encoding())
         cmgen = api.PageGenerator(u"categorymembers", gcmtitle=cmtitle,
-                                  gcmprop="ids|title|sortkey")
+                                  gcmprop="ids|title|sortkey", site=self)
         if namespaces is not None:
             cmgen.request[u"gcmnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
@@ -845,10 +845,12 @@ class APISite(BaseSite):
         # assemble API request
         if revids is None:
             rvtitle = page.title(withSection=False).encode(self.encoding())
-            rvgen = api.PropertyGenerator(u"revisions", titles=rvtitle)
+            rvgen = api.PropertyGenerator(u"revisions", titles=rvtitle,
+                                          site=self)
         else:
             ids = u"|".join(unicode(r) for r in revids)
-            rvgen = api.PropertyGenerator(u"revisions", revids=ids)
+            rvgen = api.PropertyGenerator(u"revisions", revids=ids,
+                                          site=self)
         if getText:
             rvgen.request[u"rvprop"] = \
                     u"ids|flags|timestamp|user|comment|content"
@@ -906,8 +908,8 @@ class APISite(BaseSite):
         """Iterate all interlanguage links on page, yielding Link objects."""
         lltitle = page.title(withSection=False)
         llquery = api.PropertyGenerator("langlinks",
-                                        titles=lltitle.encode(self.encoding())
-                                       )
+                                        titles=lltitle.encode(self.encoding()),
+                                        site=self)
         for pageitem in llquery:
             if pageitem['title'] != lltitle:
                 raise Error(
@@ -923,8 +925,8 @@ class APISite(BaseSite):
         """Iterate all external links on page, yielding URL strings."""
         eltitle = page.title(withSection=False)
         elquery = api.PropertyGenerator("extlinks",
-                                        titles=eltitle.encode(self.encoding())
-                                       )
+                                        titles=eltitle.encode(self.encoding()),
+                                        site=self)
         for pageitem in elquery:
             if pageitem['title'] != eltitle:
                 raise RuntimeError(
@@ -986,7 +988,7 @@ class APISite(BaseSite):
                 filterredirs = False
                     
         apgen = api.PageGenerator("allpages", gapnamespace=str(namespace),
-                                  gapfrom=start)
+                                  gapfrom=start, site=self)
         if prefix:
             apgen.request["gapprefix"] = prefix
         if filterredir is not None:
@@ -1037,7 +1039,7 @@ class APISite(BaseSite):
         if not isinstance(namespace, int):
             raise Error("alllinks: only one namespace permitted.")
         algen = api.ListGenerator("alllinks", alnamespace=str(namespace),
-                                  alfrom=start)
+                                  alfrom=start, site=self)
         if prefix:
             algen.request["alprefix"] = prefix
         if isinstance(limit, int):
@@ -1051,7 +1053,6 @@ class APISite(BaseSite):
             if fromids:
                 p.fromid = link['fromid']
             yield p
-
 
     def allcategories(self, start="!", prefix="", limit=None,
                       reverse=False):
@@ -1067,7 +1068,7 @@ class APISite(BaseSite):
             order (default: iterate in forward order)
 
         """
-        acgen = api.CategoryGenerator("allcategories", gapfrom=start)
+        acgen = api.CategoryGenerator("allcategories", gapfrom=start, site=self)
         if prefix:
             acgen.request["gacprefix"] = prefix
         if isinstance(limit, int):
@@ -1075,6 +1076,113 @@ class APISite(BaseSite):
         if reverse:
             acgen.request["gacdir"] = "descending"
         return acgen
+
+    def allusers(self, start="!", prefix="", limit=None, group=None):
+        """Iterate registered users, ordered by username.
+
+        Iterated values are dicts containing 'name', 'editcount',
+        'registration', and (sometimes) 'groups' keys. 'groups' will be
+        present only if the user is a member of at least 1 group, and will
+        be a list of unicodes; all the other values are unicodes and should
+        always be present.
+        
+        @param start: start at this username (name need not exist)
+        @param prefix: only iterate usernames starting with this substring
+        @param limit: maximum number of users to iterate (default: all)
+        @param group: only iterate users that are members of this group
+        @type group: str
+
+        """
+        augen = api.ListGenerator("allusers", aufrom=start,
+                                  auprop="editcount|groups|registration",
+                                  site=self)
+        if prefix:
+            augen.request["auprefix"] = prefix
+        if group:
+            augen.request["augroup"] = group
+        if isinstance(limit, int):
+            augen.request["aulimit"] = str(limit)
+        return augen
+
+    def allimages(self, start="!", prefix="", minsize=None, maxsize=None,
+                  limit=None, reverse=False, sha1=None, sha1base36=None):
+        """Iterate all images, ordered by image title.
+
+        Yields ImagePages, but these pages need not exist on the wiki.
+
+        @param start: start at this title (name need not exist)
+        @param prefix: only iterate titles starting with this substring
+        @param limit: maximum number of titles to iterate (default: all)
+        @param minsize: only iterate images of at least this many bytes
+        @param maxsize: only iterate images of no more than this many bytes
+        @param reverse: if True, iterate in reverse lexigraphic order
+        @param sha1: only iterate image (it is theoretically possible there
+            could be more than one) with this sha1 hash
+        @param sha1base36: same as sha1 but in base 36
+
+        """        
+        aigen = api.ImagePageGenerator("allimages", gaifrom=start,
+                                       site=self)
+        if prefix:
+            aigen.request["gaiprefix"] = prefix
+        if isinstance(limit, int):
+            aigen.request["gailimit"] = str(limit)
+        if isinstance(minsize, int):
+            aigen.request["gaiminsize"] = str(minsize)
+        if isinstance(maxsize, int):
+            aigen.request["gaimaxsize"] = str(maxsize)
+        if reverse:
+            aigen.request["gaidir"] = "descending"
+        if sha1:
+            aigen.request["gaisha1"] = sha1
+        if sha1base36:
+            aigen.request["gaisha1base36"] = sha1base36
+        return aigen
+
+    def blocks(self, starttime=None, endtime=None, reverse=False,
+               blockids=None, users=None, limit=None):
+        """Iterate all current blocks, in order of creation.
+
+        Note that logevents only logs user blocks, while this method
+        iterates all blocks including IP ranges.  The iterator yields dicts
+        containing keys corresponding to the block properties (see
+        http://www.mediawiki.org/wiki/API:Query_-_Lists for documentation).
+
+        @param starttime: start iterating at this timestamp
+        @param endtime: stop iterating at this timestamp
+        @param reverse: if True, iterate oldest blocks first (default: newest)
+        @param blockids: only iterate blocks with these id numbers
+        @param users: only iterate blocks affecting these usernames or IPs
+        @param limit: maximum number of blocks to iterate (default: all)
+
+        """
+        if starttime and endtime:
+            if reverse:
+                if starttime > endtime:
+                    logging.error(
+                "blocks: starttime must be before endtime with reverse=True")
+                    return
+            else:
+                if endtime < starttime:
+                    logging.error(
+                "blocks: endtime must be before starttime with reverse=False")
+                    return
+        bkgen = api.ListGenerator("blocks", site=self)
+        bkgen.request["bkprop"] = \
+                            "id|user|by|timestamp|expiry|reason|range|flags"
+        if starttime:
+            bkgen.request["bkstart"] = starttime
+        if endtime:
+            bkgen.request["bkend"] = endtime
+        if reverse:
+            bkgen.request["bkdir"] = newer
+        if blockids:
+            bkgen.request["bkids"] = blockids
+        if users:
+            bkgen.request["bkusers"] = users
+        if isinstance(limit, int):
+            bkgen.request["bklimit"] = str(limit)
+        return bkgen
 
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####

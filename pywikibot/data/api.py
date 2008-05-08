@@ -278,6 +278,7 @@ class PageGenerator(object):
               'allpages': 'aplimit',
               'alllinks': 'allimit',
               'allcategories': 'aclimit',
+              'allimages': 'ailimit',
               'backlinks': 'bllimit',
               'categorymembers': 'cmlimit',
               'embeddedin': 'eilimit',
