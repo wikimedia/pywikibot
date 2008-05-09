@@ -744,7 +744,7 @@ class APISite(BaseSite):
                                                       for ns in namespaces)
         return tlgen
 
-    def categorymembers(self, category, namespaces=None):
+    def categorymembers(self, category, namespaces=None, batch=None):
         """Iterate members of specified category.
 
         @param category: The Category to iterate.
@@ -754,6 +754,8 @@ class APISite(BaseSite):
             however, that the iterated values are always Page objects, even
             if in the Category or Image namespace.
         @type namespaces: list of ints
+        @param batch: the number of pages to fetch each time.
+        @type batch: int
 
         """
         if category.namespace() != 14:
@@ -766,6 +768,11 @@ class APISite(BaseSite):
         if namespaces is not None:
             cmgen.request[u"gcmnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        if batch is not None:
+            if batch > 5000:
+                logging.debug("No more than 5000 rows can be fetched at once.")
+                batch=5000
+            cmgen.request[u'cmlimit'] = str(batch)
         return cmgen
 
     def loadrevisions(self, page=None, getText=False, revids=None,
@@ -881,6 +888,8 @@ class APISite(BaseSite):
                     raise Error(
                         u"loadrevisions: Query on %s returned data on '%s'"
                         % (page, pagedata['title']))
+                if pagedata.has_key('missing'):
+                    raise NoPage(u'Page %s does not exist' % page.title(asLink=True)) 
             else:
                 page = Page(self, pagedata['title'])
             api.update_page(page, pagedata)
