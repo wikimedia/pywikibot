@@ -24,6 +24,8 @@ from pywikibot import login
 
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
+_modules = {} # cache for retrieved API parameter information
+
 
 class APIError(pywikibot.Error):
     """The wiki site returned an error message."""
@@ -233,7 +235,136 @@ class Request(DictMixin):
 
 #TODO - refactor all these generator classes into a parent/subclass hierarchy
 
-class PageGenerator(object):
+class QueryGenerator(object):
+    """Base class for iterators that handle responses to API action=query.
+
+    By default, the iterator will iterate each item in the query response,
+    and use the query-continue element, if present, to continue iterating as
+    long as the wiki returns additional values.  However, if the iterator's
+    limit attribute is set to a positive int, the iterator will stop after
+    iterating that many values.
+
+    """
+    def __init__(self, **kwargs):
+        """
+        Constructor: kwargs are used to create a Request object;
+        see that object's documentation for values. 'action'='query' is
+        assumed.
+
+        """
+        global data
+        if "action" in kwargs and "action" != "query":
+            raise Error("%s: 'action' must be 'query', not %s"
+                        % (self.__class__.__name__, kwargs["query"]))
+        else:
+            kwargs["action"] = "query"
+        self.site = kwargs.get("site", pywikibot.Site())
+        # make sure request type is valid, and get limit key if any
+        if "generator" in kwargs:
+            self.module = kwargs["generator"]
+        elif "list" in kwargs:
+            self.module = kwargs["list"]
+        elif "prop" in kwargs:
+            self.module = kwargs["prop"]
+        else:
+            raise Error("%s: No query module name found in arguments."
+                        % self.__class__.__name__)
+        for name in self.module.split("|"):
+            if name not in _modules:
+                self.get_module()
+                break
+        self.set_limit()
+        if self.query_limit is not None and "generator" in kwargs:
+            self.prefix = "g" + self.prefix
+        self.request = Request(**kwargs)
+        self.limit = None
+        self.resultkey = self.module # this is the name of the "query"
+                                     # subelement to look for when iterating
+        
+    def get_module(self):
+        """Query api on self.site for paraminfo on querymodule=self.module"""
+        
+        paramreq = Request(site=self.site, action="paraminfo",
+                           querymodules=self.module)
+        data = paramreq.submit()
+        assert "paraminfo" in data
+        assert "querymodules" in data["paraminfo"]
+        assert len(data["paraminfo"]["querymodules"]) == 1+self.module.count("|")
+        for paraminfo in data["paraminfo"]["querymodules"]:
+            assert paraminfo["name"] in self.module
+            if "missing" in paraminfo:
+                raise Error("Invalid query module name '%s'." % self.module)
+            _modules[paraminfo["name"]] = paraminfo
+
+    def set_limit(self):
+        """Set query_limit for self.module based on api response"""
+
+        self.query_limit = None
+        for mod in self.module.split('|'):
+            for param in _modules[mod].get("parameters", []):
+                if param["name"] == "limit":
+                    if (self.site.logged_in()
+                            and "apihighlimits" in
+                                self.site.getuserinfo()["rights"]):
+                        self.query_limit = int(param["highmax"])
+                    else:
+                        self.query_limit = int(param["max"])
+                    self.prefix = _modules[mod]["prefix"]
+                    logging.debug("%s: Set query_limit to %i."
+                                  % (self.__class__.__name__, self.query_limit))
+                    return
+
+    def __iter__(self):
+        """Submit request and iterate the response based on self.resultkey
+
+        Continues response as needed until limit (if any) is reached.
+
+        """
+        count = 0
+        while True:
+            if self.query_limit is not None and "revisions" not in self.module:
+                if self.limit is not None:
+                    new_limit = min(self.query_limit, self.limit - count)
+                else:
+                    new_limit = self.query_limit
+                self.request[self.prefix+"limit"] = str(new_limit)
+            self.data = self.request.submit()
+            if not self.data or not isinstance(self.data, dict):
+                logging.debug(
+                    "%s: stopped iteration because no dict retrieved from api."
+                    % self.__class__.__name__)
+                return
+            if not ("query" in self.data
+                    and self.resultkey in self.data["query"]):
+                logging.debug(
+                    "%s: stopped iteration because 'query' and result keys not found in api response."
+                    % self.__class__.__name__)
+                logging.debug(self.data)
+                return
+            pagedata = self.data["query"][self.resultkey]
+            if isinstance(pagedata, dict):
+                pagedata = pagedata.values()
+                    # for generators, this yields the pages in order of
+                    # their pageids, not their titles.... FIXME?
+
+            for item in pagedata:
+                yield self.result(item)
+                count += 1
+                if self.limit is not None and count >= self.limit:
+                    return
+            if not "query-continue" in self.data:
+                return
+            if not self.module in self.data["query-continue"]:
+                raise Error("Missing '%s' key in ['query-continue'] value."
+                            % self.module)
+            self.request.update(self.data["query-continue"][self.module])
+
+    def result(self, data):
+        """Process result data as needed for particular subclass."""
+        return data
+
+
+class PageGenerator(QueryGenerator):
     """Iterator for response to a request of type action=query&generator=foo."""
     def __init__(self, generator, **kwargs):
         """
@@ -244,15 +375,8 @@ class PageGenerator(object):
         @type generator: str
 
         """
-        if generator not in self.limits:
-            raise ValueError("Unrecognized generator '%s'" % generator)
-        self.request = Request(action="query", generator=generator, **kwargs)
-        # set limit to max, if applicable
-        # FIXME: need to distinguish between the "limit" per API request and an
-        #        overall limit on the number of pages to be iterated
-        if self.limits[generator]:
-            limitkey = 'g' + self.limits[generator]
-            self.request.setdefault(limitkey, "max")
+        QueryGenerator.__init__(self, generator=generator, **kwargs)
+        # get some basic information about every page generated
         if 'prop' in self.request:
             self.request['prop'] += "|info|imageinfo"
         else:
@@ -266,60 +390,7 @@ class PageGenerator(object):
             self.request["iiprop"] += 'timestamp|user|comment|url|size|sha1|metadata'
         else:
             self.request['iiprop'] = 'timestamp|user|comment|url|size|sha1|metadata'
-        self.generator = generator
-        self.site = self.request.site
         self.resultkey = "pages" # element to look for in result
-
-    # dict mapping generator types to their limit parameter names
-    limits = {'links': None,
-              'images': None,
-              'templates': None,
-              'categories': None,
-              'allpages': 'aplimit',
-              'alllinks': 'allimit',
-              'allcategories': 'aclimit',
-              'allimages': 'ailimit',
-              'backlinks': 'bllimit',
-              'categorymembers': 'cmlimit',
-              'embeddedin': 'eilimit',
-              'imageusage': 'iulimit',
-              'search': 'srlimit',
-              'watchlist': 'wllimit',
-              'exturlusage': 'eulimit',
-              'random': 'rnlimit',
-             }
-
-    def __iter__(self):
-        """Iterate objects for elements found in response."""
-        # FIXME: this won't handle generators with <redirlinks> subelements
-        #        correctly yet
-        while True:
-            self.data = self.request.submit()
-            if not self.data or not isinstance(self.data, dict):
-                raise StopIteration
-            if not "query" in self.data:
-                raise StopIteration
-            query = self.data["query"]
-            if not self.resultkey in query:
-                raise StopIteration
-            if isinstance(query[self.resultkey], dict):
-                for v in query[self.resultkey].itervalues():
-                    yield self.result(v) 
-            elif isinstance(query[self.resultkey], list):
-                for v in query[self.resultkey]:
-                    yield self.result(v)
-            else:
-                raise APIError("Unknown",
-                               "Unknown format in ['query']['%s'] value."
-                                 % self.resultkey,
-                               data=query[self.resultkey])
-            if not "query-continue" in self.data:
-                return
-            if not self.generator in self.data["query-continue"]:
-                raise APIError("Unknown",
-                               "Missing '%s' key in ['query-continue'] value.",
-                               data=self.data["query-continue"])
-            self.request.update(self.data["query-continue"][self.generator])
 
     def result(self, pagedata):
         """Convert page dict entry from api to Page object.
@@ -352,7 +423,7 @@ class ImagePageGenerator(PageGenerator):
         return image
 
 
-class PropertyGenerator(object):
+class PropertyGenerator(QueryGenerator):
     """Generator for queries of type action=query&property=...
 
     Note that this generator yields one or more dict object(s) corresponding
@@ -369,55 +440,11 @@ class PropertyGenerator(object):
         @type prop: str
 
         """
-        if isinstance(prop, basestring):
-            prop = prop.split("|")
-        for p in prop:
-            if p not in self.limits:
-                raise ValueError("Unrecognized property '%s'" % p)
-        self.request = Request(action="query", prop="|".join(prop))
-        # set limit to max, if applicable
-        for p in prop:
-            if self.limits[p] and kwargs.pop("getAll", False):
-                self.request['g'+self.limits[generator]] = "max"
-        self.request.params.update(kwargs)
-        self.site = self.request.site
-        self.resultkey = prop
-
-    # dict mapping property types to their limit parameter names
-    limits = {'revisions': 'rvlimit',
-              'imageinfo': 'iilimit',
-              'info': None,
-              'links': None,
-              'langlinks': None,
-              'images': None,
-              'imageinfo': None,
-              'templates': None,
-              'categories': None,
-              'extlinks': None,
-             }
-
-    def __iter__(self):
-        """Iterate objects for elements found in response."""
-        # this looks for the resultkey ''inside'' a <page> entry
-        while True:
-            self.data = self.request.submit()
-            if not self.data or not isinstance(self.data, dict):
-                raise StopIteration
-            if not ("query" in self.data and "pages" in self.data["query"]):
-                raise StopIteration
-            pagedata = self.data["query"]["pages"].values()
-            for item in pagedata:
-                yield item
-            if not "query-continue" in self.data:
-                return
-            if not self.resultkey in self.data["query-continue"]:
-                raise APIError("Unknown",
-                               "Missing '%s' key in ['query-continue'] value.",
-                               data=self.data["query-continue"])
-            self.request.update(self.data["query-continue"][self.resultkey])
+        QueryGenerator.__init__(self, prop=prop, **kwargs)
+        self.resultkey = "pages"
 
 
-class ListGenerator(object):
+class ListGenerator(QueryGenerator):
     """Iterator for queries with action=query&list=... parameters"""
 
     def __init__(self, listaction, **kwargs):
@@ -429,62 +456,7 @@ class ListGenerator(object):
         @type listaction: str
 
         """
-        if listaction not in self.limits:
-            raise ValueError("Unrecognized list type '%s'" % listaction)
-        self.request = Request(action="query", list=listaction, **kwargs)
-        # set limit to max, if applicable
-        # FIXME: need to distinguish between the "limit" per API request and an
-        #        overall limit on the number of pages to be iterated
-        if self.limits[listaction]:
-            limitkey = self.limits[listaction]
-            self.request.setdefault(limitkey, "max")
-        self.resultkey = listaction
-        self.site = self.request.site
-
-    # dict mapping generator types to their limit parameter names
-    
-    limits = {'allpages': 'aplimit',
-              'alllinks': 'allimit',
-              'allcategories': 'aclimit',
-              'allusers': 'aulimit',
-              'allimages': 'ailimit',
-              'backlinks': 'bllimit',
-              'blocks': 'bklimit',
-              'categorymembers': 'cmlimit',
-              'embeddedin': 'eilimit',
-              'exturlusage': 'eulimit',
-              'imageusage': 'iulimit',
-              'logevents': 'lelimit',
-              'recentchanges': 'rclimit',
-              'search': 'srlimit',
-              'usercontribs': 'uclimit',
-              'watchlist': 'wllimit',
-              'deletedrevs': 'drlimit',
-              'users': None,
-              'random': 'rnlimit',
-             }
-
-    def __iter__(self):
-        """Iterate objects for elements found in response."""
-        # this looks for the resultkey in the 'query' element
-        while True:
-            self.data = self.request.submit()
-            if not self.data or not isinstance(self.data, dict):
-                raise StopIteration
-            if not ("query" in self.data
-                    and self.resultkey in self.data["query"]):
-                raise StopIteration
-            resultdata = self.data["query"][self.resultkey]
-            assert isinstance(resultdata, list)
-            for item in resultdata:
-                yield item
-            if not "query-continue" in self.data:
-                return
-            if not self.resultkey in self.data["query-continue"]:
-                raise APIError("Unknown",
-                               "Missing '%s' key in ['query-continue'] value.",
-                               data=self.data["query-continue"])
-            self.request.update(self.data["query-continue"][self.resultkey])
+        QueryGenerator.__init__(self, list=listaction, **kwargs)
 
 
 class LoginManager(login.LoginManager):

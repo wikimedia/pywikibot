@@ -615,6 +615,7 @@ class APISite(BaseSite):
                            % (len(cache), self)
                         )
             for pagedata in rvgen:
+#                logging.debug("Preloading %s" % pagedata)
                 try:
                     if pagedata['title'] not in cache:
                         raise Error(
@@ -754,25 +755,22 @@ class APISite(BaseSite):
             however, that the iterated values are always Page objects, even
             if in the Category or Image namespace.
         @type namespaces: list of ints
-        @param batch: the number of pages to fetch each time.
-        @type batch: int
+        @param limit: maximum number of pages to iterate (default: all)
+        @type limit: int
 
         """
         if category.namespace() != 14:
-            raise ValueError(
-                u"Cannot get category members of non-Category page '%s'"
+            raise Error(
+                u"categorymembers: non-Category page '%s' specified"
                 % category.title())
         cmtitle = category.title(withSection=False).encode(self.encoding())
-        cmgen = api.PageGenerator(u"categorymembers", gcmtitle=cmtitle,
+        cmgen = api.PageGenerator("categorymembers", gcmtitle=cmtitle,
                                   gcmprop="ids|title|sortkey", site=self)
         if namespaces is not None:
-            cmgen.request[u"gcmnamespace"] = u"|".join(unicode(ns)
+            cmgen.request["gcmnamespace"] = u"|".join(str(ns)
                                                       for ns in namespaces)
-        if batch is not None:
-            if batch > 5000:
-                logging.debug("No more than 5000 rows can be fetched at once.")
-                batch=5000
-            cmgen.request[u'cmlimit'] = str(batch)
+        if isinstance(limit, int):
+            cmgen.limit = limit
         return cmgen
 
     def loadrevisions(self, page=None, getText=False, revids=None,
@@ -863,8 +861,8 @@ class APISite(BaseSite):
                     u"ids|flags|timestamp|user|comment|content"
             if section is not None:
                 rvgen.request[u"rvsection"] = unicode(section)
-        if limit:
-            rvgen.request[u"rvlimit"] = unicode(limit)
+        if isinstance(limit, int):
+            rvgen.limit = limit
         if rvdir:
             rvgen.request[u"rvdir"] = u"newer"
         elif rvdir is not None:
@@ -1017,7 +1015,7 @@ class APISite(BaseSite):
             if isinstance(protect_level, basestring):
                 apgen.request["gapprlevel"] = protect_level
         if isinstance(limit, int):
-            apgen.request["gaplimit"] = str(limit)
+            apgen.limit = limit
         if reverse:
             apgen.request["gapdir"] = "descending"
         return apgen
@@ -1052,7 +1050,7 @@ class APISite(BaseSite):
         if prefix:
             algen.request["alprefix"] = prefix
         if isinstance(limit, int):
-            algen.request["allimit"] = str(limit)
+            algen.limit = limit
         if unique:
             algen.request["alunique"] = ""
         if fromids:
@@ -1081,7 +1079,7 @@ class APISite(BaseSite):
         if prefix:
             acgen.request["gacprefix"] = prefix
         if isinstance(limit, int):
-            acgen.request["gaclimit"] = str(limit)
+            acgen.limit = limit
         if reverse:
             acgen.request["gacdir"] = "descending"
         return acgen
@@ -1110,7 +1108,7 @@ class APISite(BaseSite):
         if group:
             augen.request["augroup"] = group
         if isinstance(limit, int):
-            augen.request["aulimit"] = str(limit)
+            augen.limit = limit
         return augen
 
     def allimages(self, start="!", prefix="", minsize=None, maxsize=None,
@@ -1135,7 +1133,7 @@ class APISite(BaseSite):
         if prefix:
             aigen.request["gaiprefix"] = prefix
         if isinstance(limit, int):
-            aigen.request["gailimit"] = str(limit)
+            aigen.limit = limit
         if isinstance(minsize, int):
             aigen.request["gaiminsize"] = str(minsize)
         if isinstance(maxsize, int):
@@ -1190,7 +1188,7 @@ class APISite(BaseSite):
         if users:
             bkgen.request["bkusers"] = users
         if isinstance(limit, int):
-            bkgen.request["bklimit"] = str(limit)
+            bkgen.limit = limit
         return bkgen
 
 
