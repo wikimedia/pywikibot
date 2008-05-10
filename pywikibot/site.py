@@ -745,7 +745,7 @@ class APISite(BaseSite):
                                                       for ns in namespaces)
         return tlgen
 
-    def categorymembers(self, category, namespaces=None, batch=None):
+    def categorymembers(self, category, namespaces=None, limit=None):
         """Iterate members of specified category.
 
         @param category: The Category to iterate.
