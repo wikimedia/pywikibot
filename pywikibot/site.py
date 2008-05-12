@@ -861,7 +861,9 @@ class APISite(BaseSite):
                     u"ids|flags|timestamp|user|comment|content"
             if section is not None:
                 rvgen.request[u"rvsection"] = unicode(section)
-        if isinstance(limit, int):
+        if latest:
+            rvgen.limit = -1  # suppress use of rvlimit parameter
+        elif isinstance(limit, int):
             rvgen.limit = limit
         if rvdir:
             rvgen.request[u"rvdir"] = u"newer"

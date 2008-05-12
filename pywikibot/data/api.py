@@ -242,7 +242,8 @@ class QueryGenerator(object):
     and use the query-continue element, if present, to continue iterating as
     long as the wiki returns additional values.  However, if the iterator's
     limit attribute is set to a positive int, the iterator will stop after
-    iterating that many values.
+    iterating that many values. If limit is negative, the limit parameter
+    will not be passed to the API at all.
 
     """
     def __init__(self, **kwargs):
@@ -322,12 +323,15 @@ class QueryGenerator(object):
         """
         count = 0
         while True:
-            if self.query_limit is not None and "revisions" not in self.module:
-                if self.limit is not None:
+            if self.query_limit is not None:
+                if self.limit is None:
+                    new_limit = self.query_limit
+                elif self.limit > 0:
                     new_limit = min(self.query_limit, self.limit - count)
                 else:
-                    new_limit = self.query_limit
-                self.request[self.prefix+"limit"] = str(new_limit)
+                    new_limit = None
+                if new_limit is not None:
+                    self.request[self.prefix+"limit"] = str(new_limit)
             self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 logging.debug(
