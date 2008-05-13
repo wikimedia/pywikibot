@@ -522,7 +522,7 @@ class APISite(BaseSite):
         if not hasattr(page, "_pageid"):
             self.loadpageinfo(page)
         return page._pageid > 0
-   
+
     def page_restrictions(self, page):
         """Returns a dictionary reflecting page protections"""
         if not self.page_exists(page):
@@ -957,7 +957,7 @@ class APISite(BaseSite):
 
         Note: parameters includeRedirects and throttle are deprecated and
         included only for backwards compatibility.
-        
+
         @param start: Start at this title (page need not exist).
         @param prefix: Only yield pages starting with this string.
         @param namespace: Iterate pages from this (single) namespace
@@ -996,7 +996,7 @@ class APISite(BaseSite):
                     filterredirs = None
             else:
                 filterredirs = False
-                    
+
         apgen = api.PageGenerator("allpages", gapnamespace=str(namespace),
                                   gapfrom=start, site=self)
         if prefix:
@@ -1068,7 +1068,9 @@ class APISite(BaseSite):
                       reverse=False):
         """Iterate categories used (which need not have a Category page).
 
-        Iterator yields Category objects.
+        Iterator yields Category objects. Note that, in practice, links that
+        were found on pages that have been deleted may not have been removed
+        from the database table, so this method can return false positives.
 
         @param start: Start at this category title (category need not exist).
         @param prefix: Only yield categories starting with this string.
@@ -1078,7 +1080,8 @@ class APISite(BaseSite):
             order (default: iterate in forward order)
 
         """
-        acgen = api.CategoryGenerator("allcategories", gapfrom=start, site=self)
+        acgen = api.CategoryPageGenerator("allcategories",
+                                          gapfrom=start, site=self)
         if prefix:
             acgen.request["gacprefix"] = prefix
         if isinstance(limit, int):
@@ -1095,7 +1098,7 @@ class APISite(BaseSite):
         present only if the user is a member of at least 1 group, and will
         be a list of unicodes; all the other values are unicodes and should
         always be present.
-        
+
         @param start: start at this username (name need not exist)
         @param prefix: only iterate usernames starting with this substring
         @param limit: maximum number of users to iterate (default: all)
@@ -1193,6 +1196,161 @@ class APISite(BaseSite):
         if isinstance(limit, int):
             bkgen.limit = limit
         return bkgen
+
+    def exturlusage(self, url, protocol="http", namespaces=None,
+                    limit=None):
+        """Iterate Pages that contain links to the given URL.
+
+        @param url: The URL to search for (without the protocol prefix);
+            this many include a '*' as a wildcard, only at the start of the
+            hostname
+        @param protocol: The protocol prefix (default: "http")
+        @param namespaces: Only iterate pages in these namespaces (default: all)
+        @type namespaces: list of ints
+        @param limit: Only iterate this many linking pages (default: all)
+
+        """
+        eugen = api.PageGenerator("exturlusage", geuquery=url,
+                                  geuprotocol=protocol, site=self)
+        if namespaces is not None:
+            eugen.request["geunamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        if isinstance(limit, int):
+            eugen.limit = limit
+        return eugen
+
+    def imageusage(self, image, namespaces=None, filterredir=None,
+                   limit=None):
+        """Iterate Pages that contain links to the given ImagePage.
+
+        @param image: the image to search for (ImagePage need not exist on the wiki)
+        @type image: ImagePage
+        @param namespaces: Only iterate pages in these namespaces (default: all)
+        @type namespaces: list of ints
+        @param filterredir: if True, only yield redirects; if False (and not
+            None), only yield non-redirects (default: yield both)
+        @param limit: Only iterate this many linking pages (default: all)
+
+        """
+        iugen = api.PageGenerator("imageusage", site=self,
+                                  giutitle=image.title(withSection=False))
+        if namespaces is not None:
+            iugen.request["giunamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        if isinstance(limit, int):
+            iugen.limit = limit
+        if filterredir is not None:
+            iugen.request["giufilterredir"] = (filterredir and "redirects"
+                                                           or "nonredirects")
+        return iugen
+
+    def logevents(self, logtype=None, user=None, page=None,
+                  start=None, end=None, reverse=False, limit=None):
+        """Iterate all log entries.
+
+        @param logtype: only iterate entries of this type (see wiki
+            documentation for available types, which will include "block",
+            "protect", "rights", "delete", "upload", "move", "import",
+            "patrol", "merge")
+        @param user: only iterate entries that match this user name
+        @param page: only iterate entries affecting this page
+        @param start: only iterate entries from and after this timestamp
+        @param end: only iterate entries up to and through this timestamp
+        @param reverse: if True, iterate oldest entries first (default: newest)
+        @param limit: only iterate up to this many entries
+
+        """
+        if start and end:
+            if reverse:
+                if end < start:
+                    raise Error(
+                  "logevents: end must be later than start with reverse=True")
+            else:
+                if start < end:
+                    raise Error(
+                  "logevents: start must be later than end with reverse=False")
+        legen = api.ListGenerator("logevents", site=self)
+        if logtype is not None:
+            legen.request["letype"] = logtype
+        if user is not None:
+            legen.request["leuser"] = user
+        if page is not None:
+            legen.request["letitle"] = page.title(withSection=False)
+        if start is not None:
+            legen.request["lestart"] = start
+        if end is not None:
+            legen.request["leend"] = end
+        if reverse:
+            legen.request["ledir"] = "newer"
+        if isinstance(limit, int):
+            legen.limit = limit
+        return legen
+
+    def recentchanges(self, start=None, end=None, reverse=False, limit=None,
+                      namespaces=None, pagelist=None, changetype=None,
+                      showMinor=None, showBot=None, showAnon=None,
+                      showRedirects=None, showPatrolled=None):
+        """Iterate recent changes.
+
+        @param start: timestamp to start listing from
+        @param end: timestamp to end listing at
+        @param reverse: if True, start with oldest changes (default: newest)
+        @param limit: iterate no more than this number of entries
+        @param namespaces: iterate changes to pages in these namespaces only
+        @type namespaces: list of ints
+        @param pagelist: iterate changes to pages in this list only
+        @param pagelist: list of Pages
+        @param changetype: only iterate changes of this type ("edit" for
+            edits to existing pages, "new" for new pages, "log" for log
+            entries)
+        @param showMinor: if True, only list minor edits; if False (and not
+            None), only list non-minor edits
+        @param showBot: if True, only list bot edits; if False (and not
+            None), only list non-bot edits
+        @param showAnon: if True, only list anon edits; if False (and not
+            None), only list non-anon edits
+        @param showRedirects: if True, only list edits to redirect pages; if
+            False (and not None), only list edits to non-redirect pages
+        @param showPatrolled: if True, only list patrolled edits; if False
+            (and not None), only list non-patrolled edits
+
+        """
+        if start and end:
+            if reverse:
+                if end < start:
+                    raise Error(
+            "recentchanges: end must be later than start with reverse=True")
+            else:
+                if start < end:
+                    raise Error(
+            "recentchanges: start must be later than end with reverse=False")
+        rcgen = api.ListGenerator("recentchanges", site=self)
+        if start is not None:
+            rcgen.request["start"] = start
+        if end is not None:
+            rcgen.request["end"] = end
+        if reverse:
+            rcgen.request["rcdir"] = "newer"
+        if isinstance(limit, int):
+            rcgen.limit = limit
+        if namespaces is not None:
+            rcgen.request["rcunamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        if pagelist:
+            rcgen.request["rctitles"] = u"|".join(p.title(withSection=False)
+                                                 for p in pagelist)
+        if changetype:
+            rcgen.request["rctype"] = changetype
+        filters = {'minor': showMinor, 'bot':showBot,
+                   'anon': showAnon, 'redirects': showRedirects,
+                   'patrolled': showPatrolled}
+        rcshow = []
+        for item in filters:
+            if filters[item] is not None:
+                rcshow.append(filters[item] and item or ("!"+item))
+        if rcshow:
+            rcgen.request["rcshow"] = "|".join(rcshow)
+        return rcgen
 
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
