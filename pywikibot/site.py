@@ -604,6 +604,7 @@ class APISite(BaseSite):
                                          and p._pageid > 0]
             cache = dict((p.title(withSection=False), p) for p in sublist)
             rvgen = api.PropertyGenerator("revisions|info", site=self)
+            rvgen.limit = -1
             if len(pageids) == len(sublist):
                 # only use pageids if all pages have them
                 rvgen.request["pageids"] = "|".join(pageids)
