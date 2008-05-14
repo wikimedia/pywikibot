@@ -1090,6 +1090,16 @@ class APISite(BaseSite):
             acgen.request["gacdir"] = "descending"
         return acgen
 
+    def categories(self, number=10, repeat=False):
+        """Deprecated; retained for backwards-compatibility"""
+        logging.debug(
+            "Site.categories() method is deprecated; use .allcategories()")
+        if repeat:
+            limit = None
+        else:
+            limit = number
+        return self.allcategories(limit=limit)
+
     def allusers(self, start="!", prefix="", limit=None, group=None):
         """Iterate registered users, ordered by username.
 
@@ -1326,9 +1336,9 @@ class APISite(BaseSite):
             "recentchanges: start must be later than end with reverse=False")
         rcgen = api.ListGenerator("recentchanges", site=self)
         if start is not None:
-            rcgen.request["start"] = start
+            rcgen.request["rcstart"] = start
         if end is not None:
-            rcgen.request["end"] = end
+            rcgen.request["rcend"] = end
         if reverse:
             rcgen.request["rcdir"] = "newer"
         if isinstance(limit, int):
@@ -1341,8 +1351,10 @@ class APISite(BaseSite):
                                                  for p in pagelist)
         if changetype:
             rcgen.request["rctype"] = changetype
-        filters = {'minor': showMinor, 'bot':showBot,
-                   'anon': showAnon, 'redirects': showRedirects,
+        filters = {'minor': showMinor,
+                   'bot': showBot,
+                   'anon': showAnon,
+                   'redirects': showRedirects,
                    'patrolled': showPatrolled}
         rcshow = []
         for item in filters:
@@ -1351,6 +1363,155 @@ class APISite(BaseSite):
         if rcshow:
             rcgen.request["rcshow"] = "|".join(rcshow)
         return rcgen
+
+    def search(self, searchstring, number=None, namespaces=[0], where="text",
+               getredirects=False, limit=None):
+        """Iterate Pages that contain the searchstring.
+
+        Note that this may include non-existing Pages if the wiki's database
+        table contains outdated entries.
+
+        @param searchstring: the text to search for
+        @type searchstring: unicode
+        @param where: Where to search; value must be "text" or "titles" (many
+            wikis do not support title search)
+        @param namespaces: search only in these namespaces (default: 0)
+        @type namespaces: list of ints
+        @param getredirects: if True, include redirects in results
+        @param limit: maximum number of results to iterate
+        @param number: deprecated, synonym for 'limit'
+
+        """
+        if number is not None:
+            logging.debug("search: number parameter is deprecated; use limit")
+            limit = number
+        if not searchstring:
+            raise Error("search: searchstring cannot be empty")
+        if where not in ("text", "titles"):
+            raise Error("search: unrecognized 'where' value: %s" % where)
+        srgen = PageGenerator("search", gsrsearch=searchstring, gsrwhat=where,
+                              site=self)
+        if not namespaces:
+            logging.warning("search: namespaces cannot be empty; using [0].")
+            namespaces = [0]
+        if isinstance(namespaces, basestring):
+            srgen.request["gsrnamespace"] = namespaces
+        else:
+            srgen.request["gsrnamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        if getredirects:
+            srgen.request["gsrredirects"] = ""
+        if isinstance(limit, int):
+            srgen.limit = limit
+        return srgen
+
+    def usercontribs(self, user=None, userprefix=None, start=None, end=None,
+                     reverse=False, limit=None, namespaces=None,
+                     showMinor=None):
+        """Iterate contributions by a particular user.
+
+        Iterated values are in the same format as recentchanges.
+
+        @param user: Iterate contributions by this user (name or IP)
+        @param userprefix: Iterate contributions by all users whose names
+            or IPs start with this substring
+        @param start: Iterate contributions starting at this timestamp
+        @param end: Iterate contributions ending at this timestamp
+        @param reverse: Iterate oldest contributions first (default: newest)
+        @param limit: Maximum number of contributions to iterate
+        @param namespaces: Only iterate contributions in these namespaces
+        @type namespaces: list of ints
+        @param showMinor: if True, iterate only minor edits; if False and
+            not None, iterate only non-minor edits (default: iterate both)
+
+        """
+        if not (user or userprefix):
+            raise Error(
+                "usercontribs: either user or userprefix must be non-empty")
+        if start and end:
+            if reverse:
+                if end < start:
+                    raise Error(
+                "usercontribs: end must be later than start with reverse=True")
+            else:
+                if start < end:
+                    raise Error(
+                "usercontribs: start must be later than end with reverse=False")
+        ucgen = ListGenerator("usercontribs", site=self,
+                              ucprop="ids|title|timestamp|comment|flags")
+        if user:
+            ucgen.request["ucuser"] = user
+        if userprefix:
+            ucgen.request["ucuserprefix"] = userprefix
+        if start is not None:
+            ucgen.request["ucstart"] = start
+        if end is not None:
+            ucgen.request["ucend"] = end
+        if reverse:
+            ucgen.request["ucdir"] = "newer"
+        if isinstance(limit, int):
+            ucgen.limit = limit
+        if namespaces is not None:
+            ucgen.request["ucnamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        if showMinor is not None:
+            ucgen.request["ucshow"] = showMinor and "minor" or "!minor"
+        return ucgen
+
+    def watchlist_revs(self, start=None, end=None, reverse=False,
+                       namespaces=None, showMinor=None, showBot=None,
+                       showAnon=None):
+        """Iterate revisions to pages on the bot user's watchlist.
+
+        Iterated values will be in same format as recentchanges.
+        
+        @param start: Iterate revisions starting at this timestamp
+        @param end: Iterate revisions ending at this timestamp
+        @param reverse: Iterate oldest revisions first (default: newest)
+        @param namespaces: only iterate revisions to pages in these
+            namespaces (default: all)
+        @type namespaces: list of ints
+        @param showMinor: if True, only list minor edits; if False (and not
+            None), only list non-minor edits
+        @param showBot: if True, only list bot edits; if False (and not
+            None), only list non-bot edits
+        @param showAnon: if True, only list anon edits; if False (and not
+            None), only list non-anon edits
+        
+        """
+        if start and end:
+            if reverse:
+                if end < start:
+                    raise Error(
+            "watchlist_revs: end must be later than start with reverse=True")
+            else:
+                if start < end:
+                    raise Error(
+            "watchlist_revs: start must be later than end with reverse=False")
+        wlgen = ListGenerator("watchlist", wlallrev="", site=self,
+                              wlprop="user|comment|timestamp|title|ids|flags")
+        #TODO: allow users to ask for "patrol" as well?
+        if start is not None:
+            wlgen.request["wlstart"] = start
+        if end is not None:
+            wlgen.request["wlend"] = end
+        if reverse:
+            wlgen.request["wldir"] = "newer"
+        if isinstance(limit, int):
+            wlgen.limit = limit
+        if namespaces is not None:
+            wlgen.request["wlnamespace"] = u"|".join(unicode(ns)
+                                                     for ns in namespaces)
+        filters = {'minor': showMinor,
+                   'bot': showBot,
+                   'anon': showAnon}
+        wlshow = []
+        for item in filters:
+            if filters[item] is not None:
+                wlshow.append(filters[item] and item or ("!"+item))
+        if wlshow:
+            wlgen.request["wlshow"] = "|".join(wlshow)
+        return wlgen
 
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
@@ -1863,37 +2024,6 @@ your connection is down. Retrying in %i minutes..."""
         # Parse data
         self._getUserData(text, sysop = sysop)
 
-    def search(self, query, number = 10, namespaces = None):
-        """Yield search results (using Special:Search page) for query."""
-        throttle = True
-        path = self.search_address(urllib.quote_plus(query),
-                                   n=number, ns=namespaces)
-        get_throttle()
-        html = self.getUrl(path)
-
-        entryR = re.compile(ur'<li[^>]*><a href=".+?" title="(?P<title>.+?)">.+?</a>'
-                              '<br />(?P<match>.*?)<span style="color[^>]*>.+?: '
-                              '(?P<relevance>[0-9.]+)% - '
-#                              '(?P<size>[0-9.]*) '
-#                              '(?P<sizeunit>[A-Za-z]) '
-#                              '\((?P<words>.+?) \w+\) - '
-#                              '(?P<date>.+?)</span></li>'
-                              , re.DOTALL)
-
-        for m in entryR.finditer(html):
-            page = Page(self, m.group('title'))
-            match = m.group('match')
-            relevance = m.group('relevance')
-            #size = m.group('size')
-            ## sizeunit appears to always be "KB"
-            #words = m.group('words')
-            #date = m.group('date')
-
-            #print "%s - %s %s (%s words) - %s" % (relevance, size, sizeunit, words, date)
-
-            #yield page, match, relevance, size, words, date
-            yield page, match, relevance, '', '', ''
-
     # TODO: avoid code duplication for the following methods
     def newpages(self, number = 10, get_redirect = False, repeat = False):
         """Yield new articles (as Page objects) from Special:Newpages.
@@ -1984,25 +2114,6 @@ your connection is down. Retrying in %i minutes..."""
                     seen.add(title)
                     page = Page(self, title)
                     yield page, length
-            if not repeat:
-                break
-
-    def categories(self, number=10, repeat=False):
-        """Yield Category objects from Special:Categories"""
-        import catlib
-        seen = set()
-        while True:
-            path = self.categories_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile(
-                '<li><a href=".+?" title="(?P<title>.+?)">.+?</a>.*?</li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-                if title not in seen:
-                    seen.add(title)
-                    page = catlib.Category(self, title)
-                    yield page
             if not repeat:
                 break
 
