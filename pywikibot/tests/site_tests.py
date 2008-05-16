@@ -24,7 +24,7 @@ class TestSiteObject(unittest.TestCase):
         self.assertEqual(mysite.language(), "en")
         self.assert_(isinstance(mysite.user(), (basestring, type(None))))
         self.assertEqual(mysite.sitename(), "wikipedia:en")
-        self.assertEqual(mysite.normalize_namespace("project"), "Wikipedia")
+        self.assertEqual(mysite.ns_normalize("project"), "Wikipedia")
         self.assertEqual(mysite.redirect(), "REDIRECT")
 
 

@@ -167,7 +167,7 @@ class BaseSite(object):
         """Return list of all valid language codes for this site's Family."""
         return self.family().langs.keys()
 
-    def getNamespaceIndex(self, namespace):
+    def ns_index(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
         for ns in self.namespaces():
             if namespace.lower() in [name.lower()
@@ -175,22 +175,23 @@ class BaseSite(object):
                 return ns
         return None
 
+    getNamespaceIndex = ns_index  # for backwards-compatibility
+
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
         return self._namespaces
 
-    def normalize_namespace(self, value):
+    def ns_normalize(self, value):
         """Return canonical local form of namespace name.
 
         @param value: A namespace name
         @type value: unicode
 
         """
-        index = self.getNamespaceIndex(value)
+        index = self.ns_index(value)
         return self.namespace(index)
 
-    # alias for backwards-compatibility
-    normalizeNamespace = normalize_namespace
+    normalizeNamespace = ns_normalize  # for backwards-compatibility
 
     def redirect(self, default=True):
         """Return the localized redirect tag for the site.
@@ -380,9 +381,6 @@ class APISite(BaseSite):
         """Return the current username if logged in, otherwise return None.
 
         DEPRECATED (use .user() method instead)
-        Checks if we're logged in by loading a page and looking for the login
-        link. We assume that we're not being logged out during a bot run, so
-        loading the test page is only required once.
 
         """
         logging.debug("Site.loggedInAs() method is deprecated.")
@@ -695,7 +693,7 @@ class APISite(BaseSite):
         return eigen
 
     def pagereferences(self, page, followRedirects, filterRedirects,
-                      withTemplateInclusion, onlyTemplateInclusion):
+                       withTemplateInclusion, onlyTemplateInclusion):
         """Convenience method combining pagebacklinks and page_embeddedin."""
         if onlyTemplateInclusion:
             return self.page_embeddedin(page)
@@ -1488,8 +1486,8 @@ class APISite(BaseSite):
                 if start < end:
                     raise Error(
             "watchlist_revs: start must be later than end with reverse=False")
-        wlgen = ListGenerator("watchlist", wlallrev="", site=self,
-                              wlprop="user|comment|timestamp|title|ids|flags")
+        wlgen = api.ListGenerator("watchlist", wlallrev="", site=self,
+                           wlprop="user|comment|timestamp|title|ids|flags")
         #TODO: allow users to ask for "patrol" as well?
         if start is not None:
             wlgen.request["wlstart"] = start
@@ -1512,6 +1510,99 @@ class APISite(BaseSite):
         if wlshow:
             wlgen.request["wlshow"] = "|".join(wlshow)
         return wlgen
+
+    def deletedrevs(self, start=None, end=None, reverse=None, limit=None,
+                    get_text=False):
+        """Iterate deleted revisions.
+
+        Each value returned by the iterator will be a dict containing the
+        'title' and 'ns' keys for a particular Page and a 'revisions' key
+        whose value is a list of revisions in the same format as
+        recentchanges (plus a 'content' element if requested). If get_text
+        is true, the toplevel dict will contain a 'token' key as well.
+
+        @param start: Iterate revisions starting at this timestamp
+        @param end: Iterate revisions ending at this timestamp
+        @param reverse: Iterate oldest revisions first (default: newest)
+        @param limit: Iterate no more than this number of revisions.
+        @param get_text: If True, retrieve the content of each revision and
+            an undelete token
+
+        """
+        if start and end:
+            if reverse:
+                if end < start:
+                    raise Error(
+"deletedrevs: end must be later than start with reverse=True")
+            else:
+                if start < end:
+                    raise Error(
+"deletedrevs: start must be later than end with reverse=False")
+        if not self.logged_in():
+            self.login()
+        if "deletedhistory" not in self.getuserinfo()['rights']:
+            try:
+                self.login(True)
+            except NoUsername:
+                pass
+            if "deletedhistory" not in self.getuserinfo()['rights']:
+                raise Error(
+"deletedrevs: User:%s not authorized to access deleted revisions."
+                        % self.user())
+        if get_text:
+            if "undelete" not in self.getuserinfo()['rights']:
+                try:
+                    self.login(True)
+                except NoUsername:
+                    pass
+                if "undelete" not in self.getuserinfo()['rights']:
+                    raise Error(
+"deletedrevs: User:%s not authorized to view deleted content."
+                            % self.user())
+            
+        drgen = api.ListGenerator("deletedrevs", site=self,
+                    drprop="revid|user|comment|minor")
+        if get_text:
+            drgen.request['drprop'] = drgen.request['drprop'] + "|content|token"
+        if start is not None:
+            drgen.request["drstart"] = start
+        if end is not None:
+            drgen.request["drend"] = end
+        if reverse:
+            drgen.request["drdir"] = "newer"
+        if isinstance(limit, int):
+            drgen.limit = limit
+        return drgen
+
+    def users(self, usernames):
+        """Iterate info about a list of users by name or IP.
+
+        @param usernames: a list of user names
+        @type usernames: list, or other iterable, of unicodes
+
+        """
+        if not isinstance(usernames, basestring):
+            usernames = u"|".join(usernames)
+        usgen = api.ListGenerator("users", ususers=usernames, site=self,
+                          usprop="blockinfo|groups|editcount|registration")
+        return usgen
+
+    def randompages(self, limit=1, namespaces=None):
+        """Iterate a number of random pages.
+
+        Pages are listed in a fixed sequence, only the starting point is
+        random.
+        
+        @param limit: the maximum number of pages to iterate (default: 1)
+        @param namespaces: only iterate pages in these namespaces.
+
+        """
+        rngen = api.PageGenerator("random", site=self)
+        rngen.limit = limit
+        if namespaces:
+            rngen.request["wlnamespace"] = u"|".join(unicode(ns)
+                                                     for ns in namespaces)
+        return rngen
 
 
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
@@ -2423,7 +2514,7 @@ your connection is down. Retrying in %i minutes..."""
             interlangTargetFamily = Family(self.family().interwiki_forward)
         else:
             interlangTargetFamily = self.family()
-        if self.getNamespaceIndex(first):
+        if self.ns_index(first):
             return False
         if first in interlangTargetFamily.langs:
             if first == self.language():
