@@ -28,7 +28,7 @@ installed, and users won't need to worry about this...]
 To run pywikibot, you will need the httplib2, simplejson, and setuptools packages--
 * httplib2   : http://code.google.com/p/httplib2/
 * setuptools : http://pypi.python.org/pypi/setuptools/
-* simplejson : http://https://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7.1/docs/index.html
+* simplejson : http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7.1/docs/index.html
 
 or, if you already have setuptools installed, just execute 'easy_install httplib2'
 and 'easy_install simplejson'
