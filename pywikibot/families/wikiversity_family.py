@@ -13,7 +13,7 @@ class Family(family.Family):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fr', 'es', 'de', 'it', 'el',
+            'en', 'fr', 'es', 'de', 'it', 'el', 'cs', 'ja', 'pt',
         ]
 
         self.langs = {
@@ -28,49 +28,60 @@ class Family(family.Family):
         # You only need to enter translations that differ from _default.
         self.namespaces[4] = {
             '_default': [u'Wikiversity', self.namespaces[4]['_default']],
+            'cs': u'Wikiverzita',
             'el': u'Βικιεπιστήμιο',
             'es': u'Wikiversidad',
             'fr': u'Wikiversité',
             'it': u'Wikiversità',
+            'pt': u'Wikiversidade',
         }
         self.namespaces[5] = {
             '_default': [u'Wikiversity talk', self.namespaces[5]['_default']],
+            'cs': u'Wikiverzita diskuse',
             'de': u'Wikiversity Diskussion',
             'el': u'Συζήτηση Βικιεπιστημίου',
             'es': u'Wikiversidad Discusión',
             'fr': u'Discussion Wikiversité',
             'it': u'Discussioni Wikiversità',
+            'ja': u'Wikiversity‐ノート',
+            'pt': u'Wikiversidade Discussão',
         }
 
         self.namespaces[100] = {
             'el': u'Σχολή',
             'en': u'School',
             'it': u'Facoltà',
+            'ja': u'School',
         }
         self.namespaces[101] = {
             'el': u'Συζήτηση Σχολής',
             'en': u'School talk',
             'it': u'Discussioni facoltà',
+            'ja': u'School‐ノート',
         }
         self.namespaces[102] = {
             'el': u'Τμήμα',
             'en': u'Portal',
             'fr': u'Projet',
             'it': u'Corso',
+            'ja': u'Portal',
         }
         self.namespaces[103] = {
             'el': u'Συζήτηση Τμήματος',
             'en': u'Portal talk',
             'fr': u'Discussion Projet',
             'it': u'Discussioni corso',
+            'ja': u'Portal‐ノート',
         }
         self.namespaces[104] = {
             'en': u'Topic',
             'it': u'Materia',
+            'ja': u'Topic',
         }
         self.namespaces[105] = {
             'en': u'Topic talk',
             'it': u'Discussioni materia',
+            'ja': u'Topic‐ノート',
         }
         self.namespaces[106] = {
             'de': u'Kurs',

@@ -37,7 +37,8 @@ class Family(family.Family):
             'cr', 've', 'rw', 'xh', 'ss', 'kl', 'ik', 'dz', 'ts', 'bug',
             'bi', 'kv', 'xal', 'st', 'tn', 'ch', 'ak', 'bxr', 'ny', 'tw',
             'ab', 'fj', 'lbe', 'za', 'ff', 'tum', 'sn', 'ha', 'sg', 'lg',
-            'ki', 'rn', 'chy', 'aa', 'mh', 'ng',
+            'ki', 'rn', 'chy', 'aa', 'ng', 'ext', 'gan', 'hif', 'kaa', 'mdf',
+            'myv', 'sah', 'srn', 'szl',
         ]
 
         for lang in self.languages_by_size:
@@ -76,6 +77,7 @@ class Family(family.Family):
             'el': u'Βικιπαίδεια',
             'eo': u'Vikipedio',
             'et': u'Vikipeedia',
+            'ext': u'Güiquipeya',
             'fa': u'ویکی‌پدیا',
             'fr': [u'Wikipédia', u'Wikipedia'],
             'frp': u'Vouiquipèdia',
@@ -94,15 +96,18 @@ class Family(family.Family):
             'io': u'Wikipedio',
             'ka': u'ვიკიპედია',
             'kk': u'Уикипедия',
+            'km': u'វិគីភីឌា',
             'kn': u'ವಿಕಿಪೀಡಿಯ',
             'ko': u'위키백과',
             'ku': u'Wîkîpediya',
             'la': u'Vicipaedia',
             'lbe': u'Википедия',
             'lo': u'ວິກິພີເດຍ',
+            'mdf': u'Википедиесь',
             'mk': u'Википедија',
             'ml': u'വിക്കിപീഡിയ',
             'mt': u'Wikipedija',
+            'myv': u'Википедиясь',
             'nds-nl': u'Wikipedie',
             'new': u'विकिपिडिया',
             'nv': u'Wikiibíídiiya',
@@ -110,9 +115,11 @@ class Family(family.Family):
             'pa': u'ਵਿਕਿਪੀਡਿਆ',
             'rmy': u'Vikipidiya',
             'ru': u'Википедия',
+            'sah': u'Бикипиидийэ',
             'sk': u'Wikipédia',
             'sl': u'Wikipedija',
             'sr': u'Википедија',
+            'szl': u'Wikipedyjo',
             'ta': [u'Wikipedia', u'விக்கிபீடியா'],
             'te': u'వికీపీడియా',
             'tg': u'Википедиа',
@@ -169,6 +176,7 @@ class Family(family.Family):
             'es': u'Wikipedia Discusión',
             'et': u'Vikipeedia arutelu',
             'eu': u'Wikipedia eztabaida',
+            'ext': u'Güiquipeya talk',
             'fa': u'بحث ویکی‌پدیا',
             'ff': u'Discussion Wikipedia',
             'fi': u'Keskustelu Wikipediasta',
@@ -198,9 +206,11 @@ class Family(family.Family):
             'ja': u'Wikipedia‐ノート',
             'jv': u'Dhiskusi Wikipedia',
             'ka': u'ვიკიპედია განხილვა',
+            'kaa': u'Wikipedia sa\'wbeti',
             'kab': u'Amyannan n Wikipedia',
             'kk': u'Уикипедия талқылауы',
-            'km': u'ការពិភាក្សាអំពីWikipedia',
+            'kl': u'Wikipedia-diskussion',
+            'km': u'ការពិភាក្សាអំពីវិគីភីឌា',
             'kn': u'ವಿಕಿಪೀಡಿಯ ಚರ್ಚೆ',
             'ko': u'위키백과토론',
             'ksh': u'Wikipedia Klaaf',
@@ -216,12 +226,15 @@ class Family(family.Family):
             'lo': u'ສົນທະນາກ່ຽວກັບວິກິພີເດຍ',
             'lt': u'Wikipedia aptarimas',
             'lv': u'Wikipedia diskusija',
+            'map-bms': u'Dhiskusi Wikipedia',
+            'mdf': u'Википедиесь talk',
             'mg': u'Discussion Wikipedia',
             'mk': u'Разговор за Википедија',
             'ml': u'വിക്കിപീഡിയ സംവാദം',
             'mr': u'Wikipedia चर्चा',
             'ms': u'Perbincangan Wikipedia',
             'mt': u'Wikipedija talk',
+            'myv': u'Википедиясь talk',
             'mzn': u'بحث Wikipedia',
             'nah': u'Wikipedia Discusión',
             'nap': u'Discussioni Wikipedia',
@@ -245,6 +258,7 @@ class Family(family.Family):
             'ro': u'Discuţie Wikipedia',
             'ru': u'Обсуждение Википедии',
             'sa': u'Wikipediaसंभाषणं',
+            'sah': u'Бикипиидийэ talk',
             'sc': u'Wikipedia discussioni',
             'scn': u'Discussioni Wikipedia',
             'si': u'Wikipedia සාකච්ඡාව',
@@ -252,9 +266,11 @@ class Family(family.Family):
             'sl': u'Pogovor o Wikipediji',
             'sq': u'Wikipedia diskutim',
             'sr': u'Разговор о Википедији',
+            'srn': u'Overleg Wikipedia',
             'stq': u'Wikipedia Diskussion',
             'su': u'Obrolan Wikipedia',
             'sv': u'Wikipediadiskussion',
+            'szl': u'Dyskusja Wikipedyjo',
             'ta': [u'Wikipedia பேச்சு', u'விக்கிபீடியா பேச்சு'],
             'te': u'వికీపీడియా చర్చ',
             'tet': u'Diskusaun Wikipedia',
@@ -281,6 +297,7 @@ class Family(family.Family):
 
         self.namespaces[100] = {
             'als': u'Portal',
+            'an': u'Portal',
             'ar': u'بوابة',
             'bg': u'Портал',
             'bpy': u'হমিলদুৱার',
@@ -331,6 +348,7 @@ class Family(family.Family):
             'sr': u'Портал',
             'su': u'Portal',
             'sv': u'Portal',
+            'ta': u'வலைவாசல்',
             'te': u'వేదిక',
             'tg': u'Портал',
             'th': u'สถานีย่อย',
@@ -346,6 +364,7 @@ class Family(family.Family):
 
         self.namespaces[101] = {
             'als': u'Portal Diskussion',
+            'an': u'Descusión Portal',
             'ar': u'نقاش البوابة',
             'bg': u'Портал беседа',
             'bpy': u'হমিলদুৱার য়্যারী',
@@ -396,6 +415,7 @@ class Family(family.Family):
             'sr': u'Разговор о порталу',
             'su': u'Obrolan portal',
             'sv': u'Portaldiskussion',
+            'ta': u'வலைவாசல் பேச்ச',
             'te': u'వేదిక చర్చ',
             'tg': u'Баҳси портал',
             'th': u'คุยเรื่องสถานีย่อย',
@@ -455,6 +475,30 @@ class Family(family.Family):
             'es': u'Anexo Discusión',
             'fr': u'Discussion Référence',
             'lt': u'Sąrašo aptarimas',
+        }
+
+        self.namespaces[106] = {
+            'als': u'Text',
+        }
+
+        self.namespaces[107] = {
+            'als': u'Text Diskussion',
+        }
+
+        self.namespaces[108] = {
+            'als': u'Spruch',
+        }
+
+        self.namespaces[109] = {
+            'als': u'Spruch Diskussion',
+        }
+
+        self.namespaces[110] = {
+            'als': u'Nochricht',
+        }
+
+        self.namespaces[111] = {
+            'als': u'Nochricht Diskussion',
         }
 
         self.disambiguationTemplates = {
@@ -579,10 +623,11 @@ class Family(family.Family):
             'uk':  [u'DisambigG', u'Disambig'],
             'vec': [u'Disambigua'],
             'vi':  [u'Trang định hướng', u'Định hướng', u'Disambig', u'Hndis'],
-            'vls': [u'Dp', u'Dpintro'],
+            'vls': [u'Db', u'Dp', u'Dpintro'],
             'vo':  [u'Telplänov'],
             'wa':  [u'Omonimeye', u'Disambig'],
             'yi':  [u'באדייטען'],
+            'zea': [u'db'],
             'zh':  [u'Disambig', u'消歧义', u'消歧义页', u'消歧義'],
             'zh-classical':  [u'Disambig', u'釋義', u'消歧義', u''],
             'zh-min-nan': [u'Khu-pia̍t-ia̍h', 'KhPI', u'Disambig'],
@@ -760,6 +805,7 @@ class Family(family.Family):
             'ii': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yi_Wikipedia
             'kj': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kwanyama_Wikipedia
             'kr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikipedia
+            'mh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wikipedia
             'minnan': 'zh-min-nan',
             'mo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
             'mus': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia

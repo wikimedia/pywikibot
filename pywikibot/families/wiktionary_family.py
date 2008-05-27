@@ -13,24 +13,21 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'fr', 'en', 'vi', 'tr', 'ru', 'io', 'zh', 'el', 'ar', 'pl',
-            'fi', 'it', 'de', 'hu', 'sv', 'pt', 'ku', 'ko', 'id', 'te',
-            'es', 'nl', 'ja', 'lt', 'bg', 'vo', 'gl', 'li', 'et', 'sr',
-            'fa', 'is', 'ro', 'af', 'scn', 'br', 'sl', 'ta', 'hy', 'zh-min-nan',
-            'no', 'he', 'la', 'sq', 'ur', 'simple', 'da', 'ca', 'ast', 'tlh',
-            'fy', 'uk', 'cs', 'hr', 'sw', 'oc', 'ang', 'kk', 'ml', 'hi',
-            'ia', 'co', 'csb', 'st', 'eo', 'sk', 'kl', 'nds', 'ms', 'ky',
-            'ug', 'sd', 'ga', 'az', 'th', 'tt', 'mk', 'ti', 'gu', 'tl',
-            'ts', 'fo', 'qu', 'rw', 'cy', 'bs', 'mr', 'su', 'an', 'ie',
-            'chr', 'am', 'yi', 'wo', 'kn', 'mn', 'nah', 'gd', 'be', 'pa',
-            'lv', 'zu', 'nn', 'km', 'ps', 'mi', 'so', 'dv', 'tg', 'bn',
-            'mg', 'ha', 'ka', 'na', 'sa', 'gv', 'tpi', 'ay', 'ss', 'eu',
-            'ne', 'jbo', 'uz', 'gn', 'tn', 'ch', 'as', 'mt', 'jv', 'pi',
-            'sh', 'lb', 'ks', 'tk', 'iu', 'sg', 'fj', 'als', 'xh', 'ik',
-            'kw', 'ln', 'sm', 'si', 'za', 'roa-rup', 'mh', 'ba', 'or', 'sn',
-            'ak', 'bh', 'lo', 'bm', 'yo', 'bi', 'to', 'aa', 'av', 'rn',
-            'dz', 'tw', 'om', 'ab', 'my', 'wa', 'sc', 'cr', 'bo', 'rm',
-            'hsb',
+            'fr', 'en', 'vi', 'tr', 'ru', 'io', 'zh', 'ta', 'el', 'pl',
+            'fi', 'it', 'de', 'hu', 'sv', 'pt', 'lt', 'ku', 'ko', 'id',
+            'nl', 'te', 'es', 'ja', 'bg', 'vo', 'gl', 'li', 'et', 'sr',
+            'fa', 'ro', 'is', 'af', 'br', 'scn', 'ar', 'lo', 'sl', 'no',
+            'he', 'hy', 'fy', 'zh-min-nan', 'la', 'uk', 'sq', 'oc', 'ca',
+            'simple', 'da', 'ur', 'hsb', 'ast', 'tt', 'cs', 'ml', 'hr', 'kk',
+            'sw', 'ang', 'hi', 'eo', 'ia', 'co', 'csb', 'st', 'sk', 'ms',
+            'kl', 'nds', 'ky', 'sd', 'ug', 'ga', 'th', 'az', 'mk', 'ti',
+            'gu', 'tl', 'an', 'ts', 'km', 'fo', 'qu', 'rw', 'cy', 'bs',
+            'mr', 'kn', 'su', 'am', 'wo', 'chr', 'ie', 'yi', 'mn', 'be',
+            'nah', 'eu', 'gd', 'lv', 'pa', 'zu', 'nn', 'ps', 'mi', 'so',
+            'tg', 'dv', 'bn', 'ka', 'mg', 'ha', 'kw', 'ss', 'na', 'sa',
+            'gv', 'ay', 'tpi', 'ne', 'jbo', 'jv', 'gn', 'uz', 'tn', 'mt',
+            'sh', 'lb', 'ks', 'tk', 'sg', 'fj', 'als', 'ik', 'si', 'ln',
+            'sm', 'za', 'roa-rup', 'sn', 'yo', 'dz', 'my', 'wa', 'sc',
         ]
 
         for lang in self.languages_by_size:
@@ -83,11 +80,13 @@ class Family(family.Family):
             'pt': u'Wikcionário',
             'ro': u'Wikţionar',
             'ru': u'Викисловарь',
+            'scn': u'Wikizziunariu',
             'sk': u'Wikislovník',
             'sl': u'Wikislovar',
             'sr': u'Викиречник',
             'tr': u'Vikisözlük',
             'tt': u'Wiktionary',
+            'uk': u'Вікісловник',
             'ur': u'وکی لغت',
             'uz': u'Vikilug‘at',
             'vo': u'Vükivödabuk',
@@ -147,6 +146,7 @@ class Family(family.Family):
             'jv': u'Dhiskusi Wiktionary',
             'ka': u'ვიქსიკონი განხილვა',
             'kk': u'Уикисөздік талқылауы',
+            'kl': u'Wiktionary-diskussion',
             'km': u'ការពិភាក្សាអំពីWiktionary',
             'kn': u'Wiktionary ಚರ್ಚೆ',
             'ko': u'위키낱말사전토론',
@@ -178,7 +178,7 @@ class Family(family.Family):
             'ru': u'Обсуждение Викисловаря',
             'sa': u'Wiktionaryसंभाषणं',
             'sc': u'Wiktionary discussioni',
-            'scn': u'Discussioni Wiktionary',
+            'scn': u'Discussioni Wikizziunariu',
             'si': u'Wiktionary සාකච්ඡාව',
             'sk': u'Diskusia k Wikislovníku',
             'sl': u'Pogovor o Wikislovarju',
@@ -192,7 +192,7 @@ class Family(family.Family):
             'th': u'คุยเรื่องWiktionary',
             'tr': u'Vikisözlük tartışma',
             'tt': u'Wiktionary bäxäse',
-            'uk': u'Обговорення Wiktionary',
+            'uk': u'Обговорення Вікісловника',
             'ur': u'تبادلۂ خیال وکی لغت',
             'uz': u'Vikilug‘at munozarasi',
             'vi': u'Thảo luận Wiktionary',
@@ -220,6 +220,7 @@ class Family(family.Family):
             'ru': [u'Приложение', u'Appendix'],
             'sr': u'Портал',
             'sv': u'WT',
+            'uk': u'Додаток',
         }
         self.namespaces[101] = {
             'bg': u'Словоформи беседа',
@@ -239,6 +240,7 @@ class Family(family.Family):
             'ru': [u'Обсуждение приложения', u'Appendix talk'],
             'sr': u'Разговор о порталу',
             'sv': u'WT-diskussion',
+            'uk': u'Обговорення додатка',
         }
 
         self.namespaces[102] = {
@@ -252,6 +254,7 @@ class Family(family.Family):
             'ro': u'Apendice',
             'ru': [u'Конкорданс', u'Concordance'],
             'sv': u'Appendix',
+            'uk': u'Індекс',
         }
 
         self.namespaces[103] = {
@@ -265,6 +268,7 @@ class Family(family.Family):
             'ro': u'Discuţie Apendice',
             'ru': [u'Обсуждение конкорданса', u'Concordance talk'],
             'sv': u'Appendixdiskussion',
+            'uk': u'Обговорення індексу',
         }
 
         self.namespaces[104] = {
@@ -342,15 +346,47 @@ class Family(family.Family):
         self.nocapitalize = self.langs.keys()
 
         self.obsolete = {
+            'aa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wiktionary
+            'ab': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Abkhaz_Wiktionary
+            'ak': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Akan_Wiktionary
+            'as': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wiktionary
+            'av': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Avar_Wiktionary
+            'ba': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bashkir_Wiktionary
+            'bh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bihari_Wiktionary
+            'bi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bislama_Wiktionary
+            'bm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wiktionary
+            'bo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tibetan_Wiktionary
+            'ch': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Chamorro_Wiktionary
+            'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wiktionary
             'dk': 'da',
+            'iu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Inuktitut_Wiktionary	
             'jp': 'ja',
+            'mh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wiktionary
             'mo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary
             'minnan':'zh-min-nan',
             'nb': 'no',
+            'om': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oromoo_Wiktionary
+            'or': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oriya_Wiktionary
+            'pi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Pali_Bhasa_Wiktionary
+            'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rhaetian_Wiktionary
+            'rn': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kirundi_Wiktionary
+            'to': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tongan_Wiktionary
+            'tlh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Klingon_Wiktionary
+            'tw': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Twi_Wiktionary
             'tokipona': None,
+            'xh': None,# http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Xhosa_Wiktionary
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }
+
+        # Order for fy: alphabetical by code, but y counts as i
+        # TODO: This code is duplicated from wikipedia_family.py
+        def fycomp(x,y):
+            x = x.replace("y","i")+x.count("y")*"!"
+            y = y.replace("y","i")+y.count("y")*"!"
+            return cmp(x,y)
+        self.fyinterwiki = self.alphabetic[:]
+        self.fyinterwiki.sort(fycomp)
 
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
@@ -364,6 +400,7 @@ class Family(family.Family):
             'et': self.alphabetic,
             'fi': self.alphabetic,
             'fr': self.alphabetic,
+            'fy': self.fyinterwiki,
             'he': ['en'],
             'hu': ['en'],
             'pl': self.alphabetic,

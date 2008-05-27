@@ -17,8 +17,8 @@ class Family(family.Family):
             'ro', 'te', 'hr', 'tr', 'he', 'cs', 'fi', 'nl', 'sr', 'sv',
             'hu', 'ar', 'la', 'ml', 'is', 'ja', 'bs', 'uk', 'el', 'ca',
             'ko', 'sl', 'bn', 'hy', 'no', 'da', 'id', 'ta', 'az', 'mk',
-            'kn', 'bg', 'fa', 'vi', 'sk', 'cy', 'et', 'lt', 'gl',
-            'zh-min-nan','yi', 'ht', 'fo', 'ang',
+            'kn', 'bg', 'fa', 'vi', 'sk', 'cy', 'et', 'lt', 'gl', 'zh-min-nan',
+            'yi', 'ht', 'fo', 'ang', 'li',
         ]
 
         self.langs = {
@@ -57,6 +57,7 @@ class Family(family.Family):
             'hy': u'Վիքիդարան',
             'is': u'Wikiheimild',
             'la': u'Vicifons',
+            'li': u'Wikibrónne',
             'lt': u'Vikišaltiniai',
             'ml': u'വിക്കിഗ്രന്ഥശാല',
             'nb': u'Wikikilden',
@@ -102,6 +103,7 @@ class Family(family.Family):
             'kn': u'Wikisource ಚರ್ಚೆ',
             'ko': u'Wikisource토론',
             'la': u'Disputatio Vicifontis',
+            'li': u'Euverlèk Wikibrónne',
             'lt': u'Vikišaltiniai aptarimas',
             'mk': u'Разговор за Wikisource',
             'ml': u'വിക്കിഗ്രന്ഥശാല സംവാദം',
@@ -136,6 +138,7 @@ class Family(family.Family):
             'nl': u'Hoofdportaal',
             'pt': u'Portal',
             'sl': u'Stran',
+            'tr': u'Kişi',
         }
         self.namespaces[101] = {
             'bg': u'Автор беседа',
@@ -149,6 +152,7 @@ class Family(family.Family):
             'nl': u'Overleg hoofdportaal',
             'pt': u'Portal Discussão',
             'sl': u'Pogovor o strani',
+            'tr': u'Kişi tartışma',
         }
         self.namespaces[102] = {
             'ar': u'مؤلف',
@@ -210,6 +214,7 @@ class Family(family.Family):
         }
 
         self.namespaces[106] = {
+            'en': u'Index',
             'he': u'ביאור',
             'hy': u'Ինդեքս',
             'it': u'Portale',
@@ -218,6 +223,7 @@ class Family(family.Family):
         }
 
         self.namespaces[107] = {
+            'en': u'Index talk',
             'he': u'שיחת ביאור',
             'hy': u'Ինդեքսի քննարկում',
             'it': u'Discussioni portale',
@@ -270,6 +276,7 @@ class Family(family.Family):
 
         self.obsolete = {
             'dk': 'da',
+            'ht': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
             'jp': 'ja',
             'minnan':'zh-min-nan',
             'nb': 'no',
