@@ -646,7 +646,7 @@ class APISite(BaseSite):
     # following group of methods map more-or-less directly to API queries
 
     def pagebacklinks(self, page, followRedirects=False, filterRedirects=None,
-                     namespaces=None):
+                      namespaces=None):
         """Iterate all pages that link to the given page.
 
         @param page: The Page to get links to.

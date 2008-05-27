@@ -427,19 +427,21 @@ class Page(object):
         return _isDisambig
 
     def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
-                      onlyTemplateInclusion=False, redirectsOnly=False):
-        """Yield all pages that link to the page.
+                      onlyTemplateInclusion=False, redirectsOnly=False,
+                      namespaces=None):
+        """Return an iterator all pages that refer to or embed the page.
 
         If you need a full list of referring pages, use 
         C{pages = list(s.getReferences())}
 
-        @param follow_redirects: if True, also return pages that link to a
+        @param follow_redirects: if True, also iterate pages that link to a
             redirect pointing to the page.
-        @param withTemplateInclusion: if True, also return pages where self
+        @param withTemplateInclusion: if True, also iterate pages where self
             is used as a template.
-        @param onlyTemplateInclusion: if True, only return pages where self
+        @param onlyTemplateInclusion: if True, only iterate pages where self
             is used as a template.
-        @param redirectsOnly: if True, only return redirects to self.
+        @param redirectsOnly: if True, only iterate redirects to self.
+        @param namespaces: only iterate pages in these namespaces
 
         """
         # N.B.: this method intentionally overlaps with backlinks() and
@@ -449,22 +451,32 @@ class Page(object):
         # split up the results for the others. 
         return self.site().pagereferences(
                            self, follow_redirects, redirectsOnly,
-                           withTemplateInclusion, onlyTemplateInclusion)
+                           withTemplateInclusion, onlyTemplateInclusion,
+                           namespaces)
 
-    def backlinks(self, followRedirects=True, filterRedirects=None):
-        """Yield all pages that contain ordinary wikilinks to this page.
+    def backlinks(self, followRedirects=True, filterRedirects=None,
+                  namespaces=None):
+        """Return an iterator for pages that link to this page.
 
-        @param followRedirects: if True, also return pages that link to a
+        @param followRedirects: if True, also iterate pages that link to a
             redirect pointing to the page.
-        @param filterRedirects: if True, only return redirects; if False,
+        @param filterRedirects: if True, only iterate redirects; if False,
             omit redirects; if None, do not filter
+        @param namespaces: only iterate pages in these namespaces
 
         """
-        return self.site().pagebacklinks(self, followRedirects, filterRedirects)
+        return self.site().pagebacklinks(self, followRedirects, filterRedirects,
+                                         namespaces)
 
-    def embeddedin(self):
-        """Yield all pages that embed this page as a template."""
-        return self.site().page_embeddedin(self)
+    def embeddedin(self, filter_redirects=None, namespaces=None):
+        """Return an iterator for pages that embed this page as a template.
+
+        @param filterRedirects: if True, only iterate redirects; if False,
+            omit redirects; if None, do not filter
+        @param namespaces: only iterate pages in these namespaces
+
+        """
+        return self.site().page_embeddedin(self, filter_redirects, namespaces)
 
     def canBeEdited(self):
         """Return bool indicating whether this page can be edited.
