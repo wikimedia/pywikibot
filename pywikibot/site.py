@@ -76,18 +76,18 @@ class BaseSite(object):
         """
         self._lang = code.lower()
         if isinstance(fam, basestring) or fam is None:
-            self._family = Family(fam, fatal=False)
+            self.__family = Family(fam, fatal=False)
         else:
-            self._family = fam
+            self.__family = fam
 
         # if we got an outdated language code, use the new one instead.
-        if self._family.obsolete.has_key(self._lang):
-            if self._family.obsolete[self._lang] is not None:
-                self._lang = self._family.obsolete[self._lang]
+        if self.__family.obsolete.has_key(self._lang):
+            if self.__family.obsolete[self._lang] is not None:
+                self._lang = self.__family.obsolete[self._lang]
             else:
                 # no such language anymore
                 raise NoSuchSite("Language %s in family %s is obsolete"
-                                 % (self._lang, self._family.name))
+                                 % (self._lang, self.__family.name))
         if self._lang not in self.languages():
             if self._lang == 'zh-classic' and 'zh-classical' in self.languages():
                 self._lang = 'zh-classical'
@@ -95,7 +95,7 @@ class BaseSite(object):
                 # is cut to zh-classic.
             else:
                 raise NoSuchSite("Language %s does not exist in family %s"
-                                 % (self._lang, self._family.name))
+                                 % (self._lang, self.__family.name))
 
         self._username = user
 
@@ -115,9 +115,10 @@ class BaseSite(object):
                 pass
         return self._throttle
 
+    @property
     def family(self):
         """Return the associated Family object."""
-        return self._family
+        return self.__family
 
     def language(self):
         """Return the site's language code."""
@@ -137,7 +138,7 @@ class BaseSite(object):
         if hasattr(self.__class__, attr):
             return self.__class__.attr
         try:
-            method = getattr(self.family(), attr)
+            method = getattr(self.family, attr)
             f = lambda *args, **kwargs: \
                        method(self.language(), *args, **kwargs)
             if hasattr(method, "__doc__"):
@@ -149,23 +150,23 @@ class BaseSite(object):
 
     def sitename(self):
         """Return string representing this Site's name and language."""
-        return self.family().name+':'+self.language()
+        return self.family.name+':'+self.language()
 
     __str__ = sitename
 
     def __repr__(self):
-        return 'Site("%s", "%s")' % (self.language(), self.family().name)
+        return 'Site("%s", "%s")' % (self.language(), self.family.name)
 
     def __hash__(self):
         return hash(repr(self))
 
     def linktrail(self):
         """Return regex for trailing chars displayed as part of a link."""
-        return self.family().linktrail(self.language())
+        return self.family.linktrail(self.language())
 
     def languages(self):
         """Return list of all valid language codes for this site's Family."""
-        return self.family().langs.keys()
+        return self.family.langs.keys()
 
     def ns_index(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
@@ -204,11 +205,11 @@ class BaseSite(object):
             if self.language() == 'ar':
                 # It won't work with REDIRECT[[]] but it work with the local,
                 # if problems, try to find a work around. FixMe!
-                return self.family().redirect.get(self.language(), [u"تحويل"])[0]
+                return self.family.redirect.get(self.language(), [u"تحويل"])[0]
             else:
-                return self.family().redirect.get(self.language(), [u"REDIRECT"])[0]
+                return self.family.redirect.get(self.language(), [u"REDIRECT"])[0]
         else:
-            return self.family().redirect.get(self.language(), None)
+            return self.family.redirect.get(self.language(), None)
 
     def lock_page(self, page, block=True):
         """Lock page for writing.  Must be called before writing any page.
@@ -349,7 +350,7 @@ class APISite(BaseSite):
 
 # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
         self._mediawiki_messages = {}
-        self.nocapitalize = self._lang in self.family().nocapitalize
+        self.nocapitalize = self._lang in self.family.nocapitalize
         self._userData = [False, False]
         self._userName = [None, None]
         self._isLoggedIn = [None, None]
@@ -1650,21 +1651,21 @@ class NotImplementedYet:
         try:
             if sysop:
                 try:
-                    username = config.sysopnames[self.family().name][self.language()]
+                    username = config.sysopnames[self.family.name][self.language()]
                 except KeyError:
                     raise NoUsername("""\
 You tried to perform an action that requires admin privileges, but you haven't
 entered your sysop name in your user-config.py. Please add
 sysopnames['%s']['%s']='name' to your user-config.py"""
-                                     % (self.family().name, self.language()))
+                                     % (self.family.name, self.language()))
             else:
-                username = config.usernames[self.family().name][self.language()]
+                username = config.usernames[self.family.name][self.language()]
         except KeyError:
             self._cookies[index] = None
             self._isLoggedIn[index] = False
         else:
             tmp = '%s-%s-%s-login.data' % (
-                    self.family().name, self.language(), username)
+                    self.family.name, self.language(), username)
             fn = config.datafilepath('login-data', tmp)
             if not os.path.exists(fn):
                 self._cookies[index] = None
@@ -2510,10 +2511,10 @@ your connection is down. Retrying in %i minutes..."""
         # interwiki codes are case-insensitive
         first = first.lower().strip()
         # commons: forwards interlanguage links to wikipedia:, etc.
-        if self.family().interwiki_forward:
-            interlangTargetFamily = Family(self.family().interwiki_forward)
+        if self.family.interwiki_forward:
+            interlangTargetFamily = Family(self.family.interwiki_forward)
         else:
-            interlangTargetFamily = self.family()
+            interlangTargetFamily = self.family
         if self.ns_index(first):
             return False
         if first in interlangTargetFamily.langs:
@@ -2521,8 +2522,8 @@ your connection is down. Retrying in %i minutes..."""
                 return self.isInterwikiLink(rest)
             else:
                 return True
-        if first in self.family().get_known_families(site = self):
-            if first == self.family().name:
+        if first in self.family.get_known_families(site = self):
+            if first == self.family.name:
                 return self.isInterwikiLink(rest)
             else:
                 return True
@@ -2540,10 +2541,10 @@ your connection is down. Retrying in %i minutes..."""
             red = u"تحويل"
         try:
             if redDefault == red:
-                redirKeywords = [red] + self.family().redirect[self.language()]
+                redirKeywords = [red] + self.family.redirect[self.language()]
                 redirKeywordsR = r'(?:' + '|'.join(redirKeywords) + ')'
             else:
-                redirKeywords = [red] + self.family().redirect[self.language()]
+                redirKeywords = [red] + self.family.redirect[self.language()]
                 redirKeywordsR = r'(?:' + redDefault + '|'.join(redirKeywords) + ')'
         except KeyError:
             # no localized keyword for redirects
@@ -2560,7 +2561,7 @@ your connection is down. Retrying in %i minutes..."""
 
     def version(self):
         """Return MediaWiki version number as a string."""
-        return self.family().version(self.language())
+        return self.family.version(self.language())
 
     def versionnumber(self):
         """Return an int identifying MediaWiki version.
@@ -2569,7 +2570,7 @@ your connection is down. Retrying in %i minutes..."""
         number; i.e., 'X' in version '1.X.Y'
 
         """
-        return self.family().versionnumber(self.language())
+        return self.family.versionnumber(self.language())
 
     def live_version(self):
         """Return the 'real' version number found on [[Special:Version]]
@@ -2589,7 +2590,7 @@ your connection is down. Retrying in %i minutes..."""
                 self._mw_version = (int(m.group(1)), int(m.group(2)),
                                         m.group(3))
             else:
-                self._mw_version = self.family().version(self.language()).split(".")
+                self._mw_version = self.family.version(self.language()).split(".")
         return self._mw_version
 
     def checkCharset(self, charset):
@@ -2606,34 +2607,34 @@ your connection is down. Retrying in %i minutes..."""
 
     def shared_image_repository(self):
         """Return a tuple of image repositories used by this site."""
-        return self.family().shared_image_repository(self.language())
+        return self.family.shared_image_repository(self.language())
 
     def __cmp__(self, other):
         """Perform equality and inequality tests on Site objects."""
         if not isinstance(other, Site):
             return 1
-        if self.family() == other.family:
-            return cmp(self.language() ,other.lang)
-        return cmp(self.family().name, other.family.name)
+        if self.family == other.family:
+            return cmp(self.language(), other.lang)
+        return cmp(self.family.name, other.family.name)
 
     def category_on_one_line(self):
         """Return True if this site wants all category links on one line."""
-        return self.language() in self.family().category_on_one_line
+        return self.language() in self.family.category_on_one_line
 
     def interwiki_putfirst(self):
         """Return list of language codes for ordering of interwiki links."""
-        return self.family().interwiki_putfirst.get(self.language(), None)
+        return self.family.interwiki_putfirst.get(self.language(), None)
 
     def interwiki_putfirst_doubled(self, list_of_links):
         # TODO: is this even needed?  No family in the framework has this
         # dictionary defined!
-        if self.family().interwiki_putfirst_doubled.has_key(self.language()):
-            if len(list_of_links) >= self.family().interwiki_putfirst_doubled[self.language()][0]:
+        if self.family.interwiki_putfirst_doubled.has_key(self.language()):
+            if len(list_of_links) >= self.family.interwiki_putfirst_doubled[self.language()][0]:
                 list_of_links2 = []
                 for lang in list_of_links:
                     list_of_links2.append(lang.language())
                 list = []
-                for lang in self.family().interwiki_putfirst_doubled[self.language()][1]:
+                for lang in self.family.interwiki_putfirst_doubled[self.language()][1]:
                     try:
                         list.append(list_of_links[list_of_links2.index(lang)])
                     except ValueError:
@@ -2646,7 +2647,7 @@ your connection is down. Retrying in %i minutes..."""
 
     def getSite(self, code):
         """Return Site object for language 'code' in this Family."""
-        return getSite(code = code, fam = self.family(), user=self.user)
+        return getSite(code = code, fam = self.family, user=self.user)
 
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""
@@ -2657,7 +2658,7 @@ your connection is down. Retrying in %i minutes..."""
         import catlib
         try:
             return catlib.Category(self,
-                    self.namespace(14)+':'+self.family().disambcatname[self.language()])
+                    self.namespace(14)+':'+self.family.disambcatname[self.language()])
         except KeyError:
             raise NoPage(u'No page %s.' % page)
 

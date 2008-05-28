@@ -20,7 +20,7 @@ class TestSiteObject(unittest.TestCase):
     """Test cases for Site methods."""
     def testBaseMethods(self):
         """Test cases for BaseSite methods"""
-        self.assertEqual(mysite.family(), pywikibot.site.Family("wikipedia"))
+        self.assertEqual(mysite.family, pywikibot.site.Family("wikipedia"))
         self.assertEqual(mysite.language(), "en")
         self.assert_(isinstance(mysite.user(), (basestring, type(None))))
         self.assertEqual(mysite.sitename(), "wikipedia:en")

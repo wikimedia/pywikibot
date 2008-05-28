@@ -154,9 +154,9 @@ class Page(object):
         if asLink:
             if forceInterwiki or (
                     allowInterwiki and self.site() != pywikibot.Site()):
-                if self.site().family() != pywikibot.Site().family() \
-                        and self.site().family().name != self.site().language():
-                    return u'[[%s:%s:%s]]' % (self.site().family().name,
+                if self.site().family != pywikibot.Site().family \
+                        and self.site().family.name != self.site().language():
+                    return u'[[%s:%s:%s]]' % (self.site().family.name,
                                               self.site().language(),
                                               self._title)
                 else:
@@ -1373,7 +1373,7 @@ class Link(object):
                 t = t.lstrip(u":").lstrip(u" ")
                 continue
 
-            fam = self.site.family()
+            fam = self.site.family
             prefix = t[ :t.index(u":")].lower()
             ns = self.site.getNamespaceIndex(prefix)
             if ns:

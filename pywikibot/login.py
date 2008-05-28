@@ -71,22 +71,25 @@ class LoginManager:
         self.site = site or pywikibot.Site()
         if sysop:
             try:
-                self.username = config.sysopnames[self.site.family().name][self.site.language()]
+                self.username = config.sysopnames\
+                                [self.site.family.name][self.site.language()]
             except:
-                raise NoUsername(u'ERROR: Sysop username for %s:%s is undefined.\nIf you have a sysop account for that site, please add such a line to user-config.py:\n\nsysopnames[\'%s\'][\'%s\'] = \'myUsername\'' % (self.site.family().name, self.site.language(), self.site.family().name, self.site.language()))
+                raise NoUsername(
+u'ERROR: Sysop username for %s:%s is undefined.\nIf you have a sysop account for that site, please add such a line to user-config.py:\n\nsysopnames[\'%s\'][\'%s\'] = \'myUsername\''
+                      % (self.site.family.name, self.site.language(),
+                         self.site.family.name, self.site.language()))
         else:
             try:
-                self.username = config.usernames[self.site.family().name][self.site.language()]
+                self.username = config.usernames\
+                                [self.site.family.name][self.site.language()]
             except:
                 raise NoUsername(
 u"""ERROR: Username for %s:%s is undefined.
 If you have an account for that site, please add a line to user-config.py:
 
 usernames['%s']['%s'] = 'myUsername'"""
-                        % (self.site.family().name,
-                           self.site.language(),
-                           self.site.family().name,
-                           self.site.language()))
+                        % (self.site.family.name, self.site.language(),
+                           self.site.family.name, self.site.language()))
         self.password = password
         if getattr(config, 'password_file', ''):
             self.readPassword()
@@ -185,7 +188,7 @@ usernames['%s']['%s'] = 'myUsername'"""
 
         """
         filename = config.datafilepath('%s-%s-%s-login.data'
-                                       % (self.site.family().name,
+                                       % (self.site.family.name,
                                           self.site.language(),
                                           self.username))
         f = open(filename, 'w')
