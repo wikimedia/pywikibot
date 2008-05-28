@@ -72,24 +72,24 @@ class LoginManager:
         if sysop:
             try:
                 self.username = config.sysopnames\
-                                [self.site.family.name][self.site.language()]
+                                [self.site.family.name][self.site.code]
             except:
                 raise NoUsername(
 u'ERROR: Sysop username for %s:%s is undefined.\nIf you have a sysop account for that site, please add such a line to user-config.py:\n\nsysopnames[\'%s\'][\'%s\'] = \'myUsername\''
-                      % (self.site.family.name, self.site.language(),
-                         self.site.family.name, self.site.language()))
+                      % (self.site.family.name, self.site.code,
+                         self.site.family.name, self.site.code))
         else:
             try:
                 self.username = config.usernames\
-                                [self.site.family.name][self.site.language()]
+                                [self.site.family.name][self.site.code]
             except:
                 raise NoUsername(
 u"""ERROR: Username for %s:%s is undefined.
 If you have an account for that site, please add a line to user-config.py:
 
 usernames['%s']['%s'] = 'myUsername'"""
-                        % (self.site.family.name, self.site.language(),
-                           self.site.family.name, self.site.language()))
+                        % (self.site.family.name, self.site.code,
+                           self.site.family.name, self.site.code))
         self.password = password
         if getattr(config, 'password_file', ''):
             self.readPassword()
@@ -100,8 +100,8 @@ usernames['%s']['%s'] = 'myUsername'"""
         the policy on the respective wiki.
         """
         return True # DEBUG
-        if botList.has_key(self.site.family.name) and botList[self.site.family.name].has_key(self.site.language()):
-            botListPageTitle = botList[self.site.family.name][self.site.language()]
+        if botList.has_key(self.site.family.name) and botList[self.site.family.name].has_key(self.site.code):
+            botListPageTitle = botList[self.site.family.name][self.site.code]
             botListPage = pywikibot.Page(self.site, botListPageTitle)
             for linkedPage in botListPage.linkedPages():
                 if linkedPage.titleWithoutNamespace() == self.username:
@@ -189,7 +189,7 @@ usernames['%s']['%s'] = 'myUsername'"""
         """
         filename = config.datafilepath('%s-%s-%s-login.data'
                                        % (self.site.family.name,
-                                          self.site.language(),
+                                          self.site.code,
                                           self.username))
         f = open(filename, 'w')
         f.write(data)
@@ -217,7 +217,7 @@ usernames['%s']['%s'] = 'myUsername'"""
             if len(entry) == 2:
                 if entry[0] == self.username: self.password = entry[1]
             elif len(entry) == 4:
-                if entry[0] == self.site.lang and \
+                if entry[0] == self.site.code and \
                   entry[1] == self.site.family.name and \
                   entry[2] == self.username:
                     self.password = entry[3]
@@ -238,7 +238,7 @@ usernames['%s']['%s'] = 'myUsername'"""
             logging.info(u"Should be logged in now")
             # Show a warning according to the local bot policy
             if not self.botAllowed():
-                logging.error(u'*** Your username is not listed on [[%s]].\n*** Please make sure you are allowed to use the robot before actually using it!' % botList[self.site.family.name][self.site.lang])
+                logging.error(u'*** Your username is not listed on [[%s]].\n*** Please make sure you are allowed to use the robot before actually using it!' % botList[self.site.family.name][self.site.code])
             return True
         else:
             logging.error(u"Login failed. Wrong password or CAPTCHA answer?")

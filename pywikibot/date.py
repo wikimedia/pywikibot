@@ -1500,7 +1500,7 @@ class FormatDate(object):
         self.site = site
 
     def __call__(self, m, d):
-        return formats['Day_' + enMonthNames[m-1]][self.site.lang](d)
+        return formats['Day_' + enMonthNames[m-1]][self.site.code](d)
 
 
 def formatYear(lang, year):

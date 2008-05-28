@@ -155,12 +155,12 @@ class Page(object):
             if forceInterwiki or (
                     allowInterwiki and self.site() != pywikibot.Site()):
                 if self.site().family != pywikibot.Site().family \
-                        and self.site().family.name != self.site().language():
+                        and self.site().family.name != self.site().code:
                     return u'[[%s:%s:%s]]' % (self.site().family.name,
-                                              self.site().language(),
+                                              self.site().code,
                                               self._title)
                 else:
-                    return u'[[%s:%s]]' % (self.site().language(),
+                    return u'[[%s:%s]]' % (self.site().code,
                                            self._title)
             elif textlink and (self.isImage() or self.isCategory()):
                     return u'[[:%s]]' % title
@@ -231,7 +231,7 @@ class Page(object):
         if not hasattr(self, '_autoFormat'):
             from pywikibot import date
             self._autoFormat = date.getAutoFormat(
-                                        self.site().language(),
+                                        self.site().code,
                                         self.title(withNamespace=False)
                                     )
         return self._autoFormat
@@ -416,7 +416,7 @@ class Page(object):
 
         """
         if not hasattr(self, '_isDisambig'):
-            locdis = self.site().family.disambig( self.site().lang )
+            locdis = self.site().family.disambig(self.site().code)
             for template in self.templates():
                 tn = template.title(withNamespace=False)
                 if tn in locdis:
@@ -1393,7 +1393,7 @@ class Link(object):
                 if prefix in fam.langs.keys():
                     newsite = pywikibot.Site(prefix, fam)
                 else:
-                    otherlang = self.site.language()
+                    otherlang = self.site.code
                     familyName = fam.get_known_families(site=self.site)[prefix]
                     if familyName in ['commons', 'meta']:
                         otherlang = familyName
