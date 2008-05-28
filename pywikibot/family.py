@@ -2775,11 +2775,18 @@ class Family:
 
     # Which version of MediaWiki is used?
     def version(self, code):
+        """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
         return "1.12alpha"
 
     def versionnumber(self, code):
+        """Return an int identifying MediaWiki version.
+
+        Currently this is implemented as returning the minor version
+        number; i.e., 'X' in version '1.X.Y'
+
+        """
         R = re.compile(r"(\d+).(\d+)")
         M = R.search(self.version(code))
         if not M:

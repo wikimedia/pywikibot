@@ -108,7 +108,6 @@ class BaseSite(object):
         """Return this Site's throttle.  Initialize a new one if needed."""
         if not hasattr(self, "_throttle"):
             self._throttle = Throttle(self, multiplydelay=True, verbosedelay=True)
-            self.getsiteinfo()
             try:
                 self.login(False)
             except pywikibot.NoUsername:
@@ -387,6 +386,8 @@ class APISite(BaseSite):
 
     def login(self, sysop=False):
         """Log the user in if not already logged in."""
+        if not hasattr(self, "_siteinfo"):
+            self._getsiteinfo()
         if not self.logged_in(sysop):
             loginMan = api.LoginManager(site=self, sysop=sysop)
             if loginMan.login(retry = True):
@@ -436,64 +437,72 @@ class APISite(BaseSite):
         result = r.submit()
         return re.search('\d+', result['parse']['text']['*']).group()
 
-    def getsiteinfo(self):
-        """Retrieve siteinfo from site and store in _siteinfo attribute."""
-        if not hasattr(self, "_siteinfo"):
+    def _getsiteinfo(self):
+        """Retrieve siteinfo and namespaces from site."""
+        sirequest = api.Request(
+                            site=self,
+                            action="query",
+                            meta="siteinfo",
+                            siprop="general|namespaces|namespacealiases"
+                        )
+        try:
+            sidata = sirequest.submit()
+        except api.APIError:
+            # hack for older sites that don't support 1.12 properties
+            # probably should delete if we're not going to support pre-1.12
             sirequest = api.Request(
                                 site=self,
                                 action="query",
                                 meta="siteinfo",
-                                siprop="general|namespaces|namespacealiases"
+                                siprop="general|namespaces"
                             )
-            try:
-                sidata = sirequest.submit()
-            except api.APIError:
-                # hack for older sites that don't support 1.12 properties
-                # probably should delete if we're not going to support pre-1.12
-                sirequest = api.Request(
-                                    site=self,
-                                    action="query",
-                                    meta="siteinfo",
-                                    siprop="general|namespaces"
-                                )
-                sidata = sirequest.submit()
+            sidata = sirequest.submit()
 
-            assert 'query' in sidata, \
-                   "API siteinfo response lacks 'query' key"
-            sidata = sidata['query']
-            assert 'general' in sidata, \
-                   "API siteinfo response lacks 'general' key"
-            assert 'namespaces' in sidata, \
-                   "API siteinfo response lacks 'namespaces' key"
-            self._siteinfo = sidata['general']
-            nsdata = sidata['namespaces']
-            for nskey in nsdata:
-                ns = int(nskey)
-                if ns in self._namespaces:
-                    if nsdata[nskey]["*"] in self._namespaces[ns]:
-                        continue
-                    # this is the preferred form so it goes at front of list
-                    self._namespaces[ns].insert(0, nsdata[nskey]["*"])
-                else:
-                    self._namespaces[ns] = [nsdata[nskey]["*"]]
-            if 'namespacealiases' in sidata:
-                aliasdata = sidata['namespacealiases']
-                for item in aliasdata:
-                    # this is a less preferred form so it goes at the end
-                    self._namespaces[int(item['id'])].append(item["*"])
+        assert 'query' in sidata, \
+               "API siteinfo response lacks 'query' key"
+        sidata = sidata['query']
+        assert 'general' in sidata, \
+               "API siteinfo response lacks 'general' key"
+        assert 'namespaces' in sidata, \
+               "API siteinfo response lacks 'namespaces' key"
+        self._siteinfo = sidata['general']
+        nsdata = sidata['namespaces']
+        for nskey in nsdata:
+            ns = int(nskey)
+            if ns in self._namespaces:
+                if nsdata[nskey]["*"] in self._namespaces[ns]:
+                    continue
+                # this is the preferred form so it goes at front of list
+                self._namespaces[ns].insert(0, nsdata[nskey]["*"])
+            else:
+                self._namespaces[ns] = [nsdata[nskey]["*"]]
+        if 'namespacealiases' in sidata:
+            aliasdata = sidata['namespacealiases']
+            for item in aliasdata:
+                if item["*"] in self._namespaces[int(item['id'])]:
+                    continue
+                # this is a less preferred form so it goes at the end
+                self._namespaces[int(item['id'])].append(item["*"])
+
+    @property
+    def siteinfo(self):
+        """Site information dict."""
+        if not hasattr("_siteinfo"):
+            self._getsiteinfo()
         return self._siteinfo
 
     def case(self):
-        return self.getsiteinfo()['case']
+        return self.siteinfo['case']
 
     def language(self):
         """Return the code for the language of this Site."""
         # N.B. this code may or may not be the same as self.code
-        return self.getsiteinfo()['lang']
+        return self.siteinfo['lang']
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
-        self.getsiteinfo()
+        if not hasattr(self, "_siteinfo"):
+            self._getsiteinfo()
         return self._namespaces
 
     def namespace(self, num, all=False):
@@ -2561,19 +2570,6 @@ your connection is down. Retrying in %i minutes..."""
         return re.compile(r'#' + redirKeywordsR +
                                    '.*?\[\[(.*?)(?:\|.*?)?\]\]',
                           re.IGNORECASE | re.UNICODE | re.DOTALL)
-
-    def version(self):
-        """Return MediaWiki version number as a string."""
-        return self.family.version(self.code)
-
-    def versionnumber(self):
-        """Return an int identifying MediaWiki version.
-
-        Currently this is implemented as returning the minor version
-        number; i.e., 'X' in version '1.X.Y'
-
-        """
-        return self.family.versionnumber(self.code)
 
     def live_version(self):
         """Return the 'real' version number found on [[Special:Version]]
