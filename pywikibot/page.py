@@ -327,6 +327,27 @@ class Page(object):
             self.site().loadrevisions(self)
         return self._revid
 
+    def _textgetter(self):
+        """Return the current (edited) wikitext, loading it if necessary."""
+        if not hasattr(self, '_text'):
+            try:
+                self._text = self.get()
+            except NoPage:  # TODO: what other exceptions might be returned?
+                self._text = u""
+        return self._text
+
+    def _textsetter(self, value):
+        """Update the edited wikitext"""
+        self._text = unicode(value)
+
+    def _cleartext(self):
+        """Delete the edited wikitext"""
+        if hasattr(self, "_text"):
+            del self._text
+
+    text = property(_textgetter, _textsetter, _cleartext,
+                    "The edited wikitext (unicode) of this Page")
+
     def userName(self):
         """Return name or IP address of last user to edit page."""
         return self._revisions[self.latestRevision()].user
