@@ -68,7 +68,10 @@ botList = {
 
 class LoginManager:
     def __init__(self, password = None, sysop = False, site = None):
-        self.site = site or pywikibot.Site()
+        if site is not None:
+            self.site = site
+        else:
+            self.site = pywikibot.Site()
         if sysop:
             try:
                 self.username = config.sysopnames\

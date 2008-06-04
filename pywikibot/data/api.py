@@ -89,7 +89,10 @@ class Request(DictMixin):
     
     """
     def __init__(self, **kwargs):
-        self.site = kwargs.pop("site", pywikibot.Site())
+        try:
+            self.site = kwargs.pop("site")
+        except KeyError:
+            self.site = pywikibot.Site()
         self.max_retries = kwargs.pop("max_retries", 25)
         self.retry_wait = kwargs.pop("retry_wait", 5)
         self.params = {}
@@ -160,7 +163,9 @@ class Request(DictMixin):
             self.site.throttle()  # TODO: add write=True when needed
             uri = self.site.scriptpath() + "/api.php"
             try:
-                if self.params.get("action", "") in ("login",):
+                if self.params.get("action", "") in (
+                        "login", "edit"):
+                    # add other actions that require POST requests above
                     rawdata = http.request(self.site, uri, method="POST",
                                 headers={'Content-Type':
                                          'application/x-www-form-urlencoded'},
@@ -259,7 +264,10 @@ class QueryGenerator(object):
                         % (self.__class__.__name__, kwargs["query"]))
         else:
             kwargs["action"] = "query"
-        self.site = kwargs.get("site", pywikibot.Site())
+        try:
+            self.site = kwargs["site"]
+        except KeyError:
+            self.site = pywikibot.Site()
         # make sure request type is valid, and get limit key if any
         if "generator" in kwargs:
             self.module = kwargs["generator"]

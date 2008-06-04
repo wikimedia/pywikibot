@@ -152,9 +152,10 @@ class Page(object):
             encodedTitle = title.encode(self.site().encoding())
             title = urllib.quote(encodedTitle)
         if asLink:
-            if forceInterwiki or (
-                    allowInterwiki and self.site() != pywikibot.Site()):
-                if self.site().family != pywikibot.Site().family \
+            if forceInterwiki or (allowInterwiki and
+                    (self.site().family != pywikibot.default_family
+                     or self.site().code != pywikibot.default_code)):
+                if self.site().family != pywikibot.default_family \
                         and self.site().family.name != self.site().code:
                     return u'[[%s:%s:%s]]' % (self.site().family.name,
                                               self.site().code,
@@ -332,7 +333,8 @@ class Page(object):
         if not hasattr(self, '_text'):
             try:
                 self._text = self.get()
-            except NoPage:  # TODO: what other exceptions might be returned?
+            except pywikibot.NoPage:
+                # TODO: what other exceptions might be returned?
                 self._text = u""
         return self._text
 
