@@ -16,11 +16,16 @@ from pywikibot.data import api
 from pywikibot.exceptions import *
 import config
 
+try:
+    from hashlib import md5
+except ImportError:
+    from md5 import md5
 import logging
 import os
+import re
 import sys
 import threading
-import re
+import urllib
 
 
 class PageInUse(pywikibot.Error):
@@ -369,11 +374,9 @@ class APISite(BaseSite):
         @param sysop: if True, require sysop privileges.
 
         """
-        if not hasattr(self, '_userinfo'):
+        if self.getuserinfo()['name'] != self._username:
             return False
-        if self._userinfo['name'] != self._username:
-            return False
-        return (not sysop) or 'sysop' in self._userinfo['groups']
+        return (not sysop) or 'sysop' in self.getuserinfo()['groups']
 
     def loggedInAs(self, sysop = False):
         """Return the current username if logged in, otherwise return None.
@@ -487,7 +490,7 @@ class APISite(BaseSite):
     @property
     def siteinfo(self):
         """Site information dict."""
-        if not hasattr("_siteinfo"):
+        if not hasattr(self, "_siteinfo"):
             self._getsiteinfo()
         return self._siteinfo
 
@@ -655,6 +658,26 @@ class APISite(BaseSite):
                         page._revisions[revision.revid] = revision
                         page._revid = revision.revid
                 yield page
+
+    def token(self, page, tokentype):
+        """Return token retrieved from wiki to allow changing page content.
+
+        @param page: the Page for which a token should be retrieved
+        @param tokentype: the type of token (e.g., "edit", "move", "delete");
+            see API documentation for full list of types
+
+        """
+        query = api.PropertyGenerator("info|revisions", site=self,
+                                      titles=page.title(withSection=False),
+                                      intoken=tokentype)
+        for item in query:
+            if item['title'] != page.title(withSection=False):
+                raise Error(
+                    u"token: Query on page %s returned data on page [[%s]]"
+                     % (page.title(withSection=False, asLink=True),
+                        item['title']))
+            api.update_page(page, item)
+            return item[tokentype + "token"]
 
     # following group of methods map more-or-less directly to API queries
 
@@ -1617,7 +1640,175 @@ class APISite(BaseSite):
                                                      for ns in namespaces)
         return rngen
 
+    # catalog of editpage error codes, for use in generating messages
+    _ep_errors = {
+"noapiwrite": "API editing not enabled on %(site)s wiki",
+"writeapidenied":
+    "User %(user)s is not authorized to edit on %(site)s wiki",
+"protectedtitle":
+    "Title %(title)s is protected against creation on %(site)s",
+"cantcreate":
+    "User %(user)s not authorized to create new pages on %(site)s wiki",
+"cantcreate-anon":
+    """\
+Bot is not logged in, and anon users are not authorized to create new pages
+on %(site)s wiki""",
+"articleexists":
+    "Page %(title)s already exists on %(site)s wiki",
+"noimageredirect-anon":
+    """\
+Bot is not logged in, and anon users are not authorized to create image
+redirects on %(site)s wiki""",
+"noimageredirect":
+    "User %(user)s not authorized to create image redirects on %(site)s wiki",
+"spamdetected":
+    "Edit to page %(title)s rejected by spam filter due to content:\n",
+"filtered":
+    "%(info)s",
+"contenttoobig":
+    "%(info)s",
+"noedit-anon":
+    """\
+Bot is not logged in, and anon users are not authorized to edit on
+%(site)s wiki""",
+"noedit":
+    "User %(user)s not authorized to edit pages on %(site)s wiki",
+"pagedeleted":
+    "Page %(title)s has been deleted since last retrieved from %(site)s wiki",
+"editconflict":
+    "Page %(title)s not saved due to edit conflict.",
+    }
+        
+    def editpage(self, page, summary, minor=True, notminor=False,
+                 recreate=True, createonly=False, watch=False, unwatch=False):
+        """Submit an edited Page object to be saved to the wiki.
 
+        @param page: The Page to be saved; its .text property will be used
+            as the new text to be saved to the wiki
+        @param token: the edit token retrieved using Site.token()
+        @param summary: the edit summary (required!)
+        @param minor: if True (default), mark edit as minor
+        @param notminor: if True, override account preferences to mark edit
+            as non-minor
+        @param recreate: if True (default), create new page even if this
+            title has previously been deleted
+        @param createonly: if True, raise an error if this title already
+            exists on the wiki
+        @param watch: if True, add this Page to bot's watchlist
+        @param unwatch: if True, remove this Page from bot's watchlist if
+            possible
+
+        """
+        text = page.text
+        if not text:
+            raise Error("editpage: no text to be saved")
+        try:
+            lastrev = page.latestRevision()
+        except NoPage:
+            lastrev = None
+            if not recreate:
+                raise Error("Page %s does not exist on %s wiki."
+                            % (page.title(withSection=False), self))
+        self.lock_page(page)
+        token = self.token(page, "edit")
+        if lastrev is not None and page.latestRevision() != lastrev:
+            raise Error("editpage: Edit conflict detected; saving aborted.")
+        req = api.Request(site=self, action="edit",
+                          title=page.title(withSection=False),
+                          text=text, token=token, summary=summary)
+##        if lastrev is not None:
+##            req["basetimestamp"] = page._revisions[lastrev].timestamp
+        if minor:
+            req['minor'] = ""
+        elif notminor:
+            req['notminor'] = ""
+        if 'bot' in self.getuserinfo()['groups']:
+            req['bot'] = ""
+        if recreate:
+            req['recreate'] = ""
+        if createonly:
+            req['createonly'] = ""
+        if watch:
+            req['watch'] = ""
+        elif unwatch:
+            req['unwatch'] = ""
+## FIXME: API gives 'badmd5' error
+##        md5hash = md5()
+##        md5hash.update(urllib.quote_plus(text.encode(self.encoding())))
+##        req['md5'] = md5hash.digest()
+        while True:
+            try:
+                result = req.submit()
+                logging.debug("editpage response: %s" % result)
+            except api.APIError, err:
+                self.unlock_page(page)
+                if err.code.endswith("anon") and self.logged_in():
+                    logging.debug(
+"editpage: received '%s' even though bot is logged in" % err.code)
+                errdata = {
+                    'site': self,
+                    'title': page.title(withSection=False),
+                    'user': self.user(),
+                    'info': err.info
+                }
+                if err.code == "spamdetected":
+                    raise SpamfilterError(self._ep_errors[err.code] % errdata
+                            + err.info[ err.info.index("fragment: ") + 9: ])
+                
+                if err.code == "editconflict":
+                    raise EditConflict(self._ep_errors[err.code] % errdata)
+                if err.code in self._ep_errors:
+                    raise Error(self._ep_errors[err.code] % errdata)
+                logging.debug("editpage: Unexpected error code '%s' received."
+                              % err.code)
+                raise
+            assert ("edit" in result and "result" in result["edit"]), result
+            if result["edit"]["result"] == "Success":
+                self.unlock_page(page)
+                if "nochange" in result["edit"]:
+                    # null edit, page not changed
+                    # TODO: do we want to notify the user of this?
+                    return True
+                page._revid = result["edit"]["newrevid"]
+                page._revisions[int(page._revid)] = pywikibot.page.Revision(
+                        revid=int(page._revid), timestamp='',
+                        user=self.user(), anon=not self.logged_in(),
+                        comment=summary, minor=minor or not notminor,
+                        text=text
+                )
+                return True
+            elif result["edit"]["result"] == "Failure":
+                if "captcha" in result["edit"]:
+                    captcha = result["edit"]["captcha"]
+                    req['captchaid'] = captcha['id']
+                    if captcha["type"] == "math":
+                        req['captchaword'] = input(captcha["question"])
+                        continue
+                    elif "url" in captcha:
+                        webbrowser.open(url)
+                        req['captchaword'] = cap_answerwikipedia.input(
+"Please view CAPTCHA in your browser, then type answer here:")
+                        continue
+                    else:
+                        self.unlock_page(page)
+                        logging.error(
+"editpage: unknown CAPTCHA response %s, page not saved"
+                                      % captcha)
+                        return False
+                else:
+                    self.unlock_page(page)
+                    logging.error("editpage: unknown failure reason %s"
+                                  % str(result))
+                    return False
+            else:
+                self.unlock_page(page)
+                logging.error(
+"editpage: Unknown result code '%s' received; page not saved"
+                    % result["edit"]["result"])
+                logging.error(str(result))
+                return False
+        
+        
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
 class NotImplementedYet:
 
