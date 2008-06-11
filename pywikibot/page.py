@@ -38,7 +38,9 @@ class Page(object):
 
           - If the first argument is a Page, create a copy of that object.
             This can be used to convert an existing Page into a subclass
-            object, such as Category or ImagePage.
+            object, such as Category or ImagePage.  (If the title is also
+            given as the second argument, creates a copy with that title;
+            this is used when pages are moved.)
           - If the first argument is a Site, create a Page on that Site
             using the second argument as the title (may include a section),
             and the third as the namespace number. The namespace number is
@@ -93,6 +95,8 @@ class Page(object):
         elif isinstance(source, Page): 
             # copy all of source's attributes to this object
             self.__dict__ = source.__dict__
+            if title:
+                self._title = title  # FIXME: needs to handle namespace, section
         elif isinstance(source, Link):
             self._site = source.site
             self._section = source.section
@@ -1078,6 +1082,7 @@ class ImagePage(Page):
     def usingPages(self):
         """Yield Pages on which the image is displayed."""
         return self.site().getimageusage(self)
+
 
 class Category(Page):
     """A page in the Category: namespace"""

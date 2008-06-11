@@ -1642,41 +1642,33 @@ class APISite(BaseSite):
 
     # catalog of editpage error codes, for use in generating messages
     _ep_errors = {
-"noapiwrite": "API editing not enabled on %(site)s wiki",
-"writeapidenied":
-    "User %(user)s is not authorized to edit on %(site)s wiki",
-"protectedtitle":
-    "Title %(title)s is protected against creation on %(site)s",
-"cantcreate":
-    "User %(user)s not authorized to create new pages on %(site)s wiki",
-"cantcreate-anon":
-    """\
-Bot is not logged in, and anon users are not authorized to create new pages
+        "noapiwrite": "API editing not enabled on %(site)s wiki",
+        "writeapidenied":
+"User %(user)s is not authorized to edit on %(site)s wiki",
+        "protectedtitle":
+"Title %(title)s is protected against creation on %(site)s",
+        "cantcreate":
+"User %(user)s not authorized to create new pages on %(site)s wiki",
+        "cantcreate-anon":
+"""Bot is not logged in, and anon users are not authorized to create new pages
 on %(site)s wiki""",
-"articleexists":
-    "Page %(title)s already exists on %(site)s wiki",
-"noimageredirect-anon":
-    """\
-Bot is not logged in, and anon users are not authorized to create image
+        "articleexists": "Page %(title)s already exists on %(site)s wiki",
+        "noimageredirect-anon":
+"""Bot is not logged in, and anon users are not authorized to create image
 redirects on %(site)s wiki""",
-"noimageredirect":
-    "User %(user)s not authorized to create image redirects on %(site)s wiki",
-"spamdetected":
-    "Edit to page %(title)s rejected by spam filter due to content:\n",
-"filtered":
-    "%(info)s",
-"contenttoobig":
-    "%(info)s",
-"noedit-anon":
-    """\
-Bot is not logged in, and anon users are not authorized to edit on
+        "noimageredirect":
+"User %(user)s not authorized to create image redirects on %(site)s wiki",
+        "spamdetected":
+"Edit to page %(title)s rejected by spam filter due to content:\n",
+        "filtered": "%(info)s",
+        "contenttoobig": "%(info)s",
+        "noedit-anon":
+"""Bot is not logged in, and anon users are not authorized to edit on
 %(site)s wiki""",
-"noedit":
-    "User %(user)s not authorized to edit pages on %(site)s wiki",
-"pagedeleted":
-    "Page %(title)s has been deleted since last retrieved from %(site)s wiki",
-"editconflict":
-    "Page %(title)s not saved due to edit conflict.",
+        "noedit": "User %(user)s not authorized to edit pages on %(site)s wiki",
+        "pagedeleted":
+"Page %(title)s has been deleted since last retrieved from %(site)s wiki",
+        "editconflict": "Page %(title)s not saved due to edit conflict.",
     }
         
     def editpage(self, page, summary, minor=True, notminor=False,
@@ -1697,6 +1689,7 @@ Bot is not logged in, and anon users are not authorized to edit on
         @param watch: if True, add this Page to bot's watchlist
         @param unwatch: if True, remove this Page from bot's watchlist if
             possible
+        @return: True if edit succeeded, False if it failed
 
         """
         text = page.text
@@ -1770,12 +1763,9 @@ Bot is not logged in, and anon users are not authorized to edit on
                     # TODO: do we want to notify the user of this?
                     return True
                 page._revid = result["edit"]["newrevid"]
-                page._revisions[int(page._revid)] = pywikibot.page.Revision(
-                        revid=int(page._revid), timestamp='',
-                        user=self.user(), anon=not self.logged_in(),
-                        comment=summary, minor=minor or not notminor,
-                        text=text
-                )
+                # see http://www.mediawiki.org/wiki/API:Wikimania_2006_API_discussion#Notes
+                # not safe to assume that saved text is the same as sent
+                self.loadrevisions(page, getText=True)
                 return True
             elif result["edit"]["result"] == "Failure":
                 if "captcha" in result["edit"]:
@@ -1807,7 +1797,99 @@ Bot is not logged in, and anon users are not authorized to edit on
                     % result["edit"]["result"])
                 logging.error(str(result))
                 return False
-        
+
+    # catalog of move errors for use in error messages
+    _mv_errors = {
+        "noapiwrite": "API editing not enabled on %(site)s wiki",
+        "writeapidenied":
+"User %(user)s is not authorized to edit on %(site)s wiki",
+        "nosuppress":
+"User %(user)s is not authorized to move pages without creating redirects",
+        "cantmove-anon":
+"""Bot is not logged in, and anon users are not authorized to move pages on
+%(site)s wiki""",
+        "cantmove":
+"User %(user)s is not authorized to move pages on %(site)s wiki",
+        "immobilenamespace":
+"Pages in %(oldnamespace)s namespace cannot be moved on %(site)s wiki",
+        "articleexists":
+"Cannot move because page [[%(newtitle)s]] already exists on %(site)s wiki",
+        "protectedpage":
+"Page [[%(oldtitle)s]] is protected against moving on %(site)s wiki",
+        "protectedtitle":
+"Page [[%(newtitle)s]] is protected against creation on %(site)s wiki",
+        "nonfilenamespace":
+"Cannot move a file to %(newnamespace)s namespace on %(site)s wiki",
+        "filetypemismatch":
+"[[%(newtitle)s]] file extension does not match content of [[%(oldtitle)s]]"
+    }
+
+    def movepage(self, page, newtitle, summary, movetalk=True,
+                 noredirect=False):
+        """Move a Page to a new title.
+
+        @param page: the Page to be moved (must exist)
+        @param newtitle: the new title for the Page
+        @type newtitle: unicode
+        @param summary: edit summary (required!)
+        @param movetalk: if True (default), also move the talk page if possible
+        @param noredirect: if True, suppress creation of a redirect from the
+            old title to the new one
+        @return: Page object with the new title
+
+        """
+        oldtitle = page.title(withSection=False)
+        newlink = pywikibot.Link(newtitle, self)
+        if newlink.namespace:
+            newtitle = self.namespace(newlink.namespace) + ":" + newlink.title
+        else:
+            newtitle = newlink.title
+        if oldtitle == newtitle:
+            raise Error("Cannot move page %s to its own title."
+                        % oldtitle)
+        if not page.exists():
+            raise Error("Cannot move page %s because it does not exist on %s."
+                        % (oldtitle, self))
+        self.lock_page(page)
+        token = self.token(page, "move")
+        req = api.Request(site=self, action="move", to=newtitle,
+                          token=token, reason=summary)
+        req['from'] = oldtitle  # "from" is a python keyword
+        if movetalk:
+            req['movetalk'] = ""
+        if noredirect:
+            req['noredirect'] = ""
+        try:
+            result = req.submit()
+            logging.debug("movepage response: %s" % result)
+        except api.APIError, err:
+            self.unlock_page(page)
+            if err.code.endswith("anon") and self.logged_in():
+                logging.debug(
+"movepage: received '%s' even though bot is logged in" % err.code)
+            errdata = {
+                'site': self,
+                'oldtitle': oldtitle,
+                'oldnamespace': self.namespace(page.namespace()),
+                'newtitle': newtitle,
+                'newnamespace': self.namespace(newlink.namespace),
+                'user': self.user(),
+            }
+            if err.code in self._mv_errors:
+                raise Error(self._mv_errors[err.code] % errdata)
+            logging.debug("movepage: Unexpected error code '%s' received."
+                          % err.code)
+            raise
+        self.unlock_page(page)
+        if "move" not in result:
+            logging.error("movepage: %s" % result)
+            raise Error("movepage: unexpected response")
+        # TODO: Check for talkmove-error messages
+        if "talkmove-error-code" in result["move"]:
+            logging.warning(u"movepage: Talk page %s not moved"
+                            % (page.toggleTalkPage().title(asLink=True)))
+        return pywikibot.Page(page, newtitle)
+
         
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
 class NotImplementedYet:
