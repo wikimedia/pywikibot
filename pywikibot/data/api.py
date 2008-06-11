@@ -358,6 +358,9 @@ class QueryGenerator(object):
                 logging.debug(self.data)
                 return
             pagedata = self.data["query"][self.resultkey]
+            logging.debug("%s received %s; limit=%s"
+                         % (self.__class__.__name__, pagedata.keys(),
+                            self.limit))
             if isinstance(pagedata, dict):
                 pagedata = pagedata.values()
                     # for generators, this yields the pages in order of
@@ -366,7 +369,8 @@ class QueryGenerator(object):
             for item in pagedata:
                 yield self.result(item)
                 count += 1
-                if self.limit is not None and count >= self.limit:
+                if self.limit is not None and self.limit > 0 \
+                                          and count >= self.limit:
                     return
             if not "query-continue" in self.data:
                 return
