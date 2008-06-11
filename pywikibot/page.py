@@ -560,37 +560,22 @@ class Page(object):
         # no restricting template found
         return True
 
-    def put(self, newtext, comment=None, watchArticle=None, minorEdit=True,
-            force=False):
-        """Save the page with the contents of the first argument as the text.
+    def save(self, comment=None, watch=None, minor=True, force=False,
+             async=False, callback=None):
+        """Save the current contents of page's text to the wiki.
 
-        @param newtext: The complete text of the revised page.
-        @type newtext: unicode
-        @param comment: The edit summary for the modification (optional,
-            but most wikis strongly encourage its use)
+        @param comment: The edit summary for the modification (optional, but
+            most wikis strongly encourage its use)
         @type comment: unicode
-        @param watchArticle: if True, add or if False, remove this Page
-            to/from bot user's watchlist; if None, leave watchlist status
-            unchanged
-        @type watchArticle: bool or None
-        @param minorEdit: if True, mark this edit as minor
-        @type minorEdit: bool
+        @param watch: if True, add or if False, remove this Page to/from bot
+            user's watchlist; if None, leave watchlist status unchanged
+        @type watch: bool or None
+        @param minor: if True, mark this edit as minor
+        @type minor: bool
         @param force: if True, ignore botMayEdit() setting
         @type force: bool
-
-        """
-        return self.site().put(self, newtext, comment, watchArticle,
-                               minorEdit, force)
-
-    def put_async(self, newtext,
-                  comment=None, watchArticle=None, minorEdit=True, force=False,
-                  callback=None):
-        """Put page on queue to be saved to wiki asynchronously.
-
-        Asynchronous version of put (takes the same arguments), which places
-        pages on a queue to be saved by a daemon thread. All arguments are
-        the same as for .put(), except:
-
+        @param async: if True, launch a separate thread to save
+            asynchronously
         @param callback: a callable object that will be called after the
             page put operation. This object must take two arguments: (1) a
             Page object, and (2) an exception instance, which will be None
@@ -599,8 +584,65 @@ class Page(object):
             successful.
 
         """
-        return self.site().put(self, newtext, comment, watchArticle,
-                               minorEdit, force, callback, async=True)
+        if not comment:
+            comment = pywikibot.default_comment # needs to be defined
+        if watch is None:
+            unwatch = False
+            watch = False
+        else:
+            unwatch = not watch
+        if not force and not self.botMayEdit:
+            raise pywikibot.PageNotSaved(
+                "Page %s not saved; editing restricted by {{bots}} template"
+                % self.title(asLink=True))
+        if async:
+            import threading
+            threading.Thread(target=self._save,
+                             args=(comment, minor, watch, unwatch, callback)
+                             ).start()
+        else:
+            self._save(comment, minor, watch, unwatch, callback)
+
+    def _save(self, comment, minor, watch, unwatch, callback):
+        err = None
+        try:
+            done = self.site().editpage(self, summary=comment, minor=minor,
+                                        watch=watch, unwatch=unwatch)
+            if not done:
+                logging.warn("Page %s not saved" % self.title(asLink=True))
+        except pywikibot.Error, err:
+            logging.exception("Error saving page %s" % self.title(asLink=True))
+        if callback:
+            callback(self, err)
+
+    def put(self, newtext, comment=u'', watchArticle=None, minorEdit=True,
+            force=False, async=False):
+        """Save the page with the contents of the first argument as the text.
+
+        This method is maintained primarily for backwards-compatibility.
+        For new code, using Page.save() is preferred.  See save() method
+        docs for all parameters not listed here.
+
+        @param newtext: The complete text of the revised page.
+        @type newtext: unicode
+
+        """
+        self.text = newtext
+        return self.save(comment, watchArticle, minorEdit, force,
+                         async, callback)
+
+    def put_async(self, newtext, comment=u'', watchArticle=None,
+                  minorEdit=True, force=False, callback=None):
+        """Put page on queue to be saved to wiki asynchronously.
+
+        Asynchronous version of put (takes the same arguments), which places
+        pages on a queue to be saved by a daemon thread. All arguments are
+        the same as for .put().  This version is maintained solely for
+        backwards-compatibility.
+
+        """
+        return self.put(self, newtext, comment, watchArticle,
+                        minorEdit, force, callback, async=True)
 
     def linkedPages(self):
         """Iterate Pages that this Page links to.
@@ -763,7 +805,7 @@ class Page(object):
         @param sysop: Try to move using sysop account, if available
         @param throttle: DEPRECATED
         @param deleteAndMove: if move succeeds, delete the old page
-            (requires sysop privileges)
+            (usually requires sysop privileges, depending on wiki settings)
         @param safe: If false, attempt to delete existing page at newtitle
             (if there is one) and then move this page to that title
 
@@ -775,9 +817,11 @@ class Page(object):
             logging.info(u'Moving %s to [[%s]].'
                              % (self.title(asLink=True), newtitle))
             reason = pywikibot.input(u'Please enter a reason for the move:')
-        return self.site().move(self, newtitle, reason,
-                                movetalkpage=movetalkpage, sysop=sysop,
-                                deleteAndMove=deleteAndMove, safe=safe)
+        # TODO: implement "safe" parameter
+        # TODO: implement "sysop" parameter
+        return self.site().movepage(self, newtitle, reason,
+                                    movetalk=movetalkpage,
+                                    noredirect=deleteAndMove)
 
     def delete(self, reason=None, prompt=True, throttle=None, mark=False):
         """Deletes the page from the wiki. Requires administrator status.
