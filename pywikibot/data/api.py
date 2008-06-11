@@ -154,9 +154,13 @@ class Request(DictMixin):
             raise TypeError("Query format '%s' cannot be parsed."
                             % self.params['format'])
         for key in self.params:
-            self.params[key] = "|".join(self.params[key])
-            if isinstance(self.params[key], unicode):
-                self.params[key] = self.params[key].encode(self.site.encoding())
+            try:
+                self.params[key] = "|".join(self.params[key])
+                if isinstance(self.params[key], unicode):
+                    self.params[key] = self.params[key].encode(
+                                                self.site.encoding())
+            except Exception:
+                logging.exception("key=%s, params=%s" % (key, self.params[key]))
         params = urllib.urlencode(self.params)
         while True:
             # TODO catch http errors
@@ -164,7 +168,7 @@ class Request(DictMixin):
             uri = self.site.scriptpath() + "/api.php"
             try:
                 if self.params.get("action", "") in (
-                        "login", "edit"):
+                        "login", "edit", "move"):
                     # add other actions that require POST requests above
                     rawdata = http.request(self.site, uri, method="POST",
                                 headers={'Content-Type':
