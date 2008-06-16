@@ -216,7 +216,7 @@ class Throttle(object):
             self.next_multiplicity = math.log(1+requestsize)/math.log(2.0)
             # Announce the delay if it exceeds a preset limit
             if waittime > config.noisysleep:
-                logging.warn(u"Sleeping for %.1f seconds, %s"
+                logging.info(u"Sleeping for %.1f seconds, %s"
                               % (waittime,
                                  time.strftime("%Y-%m-%d %H:%M:%S",
                                                time.localtime()))

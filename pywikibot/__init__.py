@@ -70,13 +70,24 @@ def input(prompt, password=False):
         return getpass.getpass(prompt)
     return raw_input(prompt)
 
+# Throttle and thread handling
+
+threadpool = []
+
 def stopme():
-    """Drop this process from the throttle log.
+    """Drop this process from the throttle log, after pending threads finish.
 
     Can be called manually if desired, but if not, will be called automatically
     at Python exit.
 
     """
+    threadcount = sum(1 for thd in threadpool if thd.isAlive())
+    if threadcount:
+        logging.info("Waiting for approximately %s threads to finish."
+                     % threadcount)
+        for thd in threadpool:
+            if thd.isAlive():
+                thd.join()
     # only need one drop() call because all throttles use the same global pid
     try:
         _sites[_sites.keys()[0]].throttle.drop()

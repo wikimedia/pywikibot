@@ -16,6 +16,7 @@ import htmlentitydefs
 import logging
 import re
 import sys
+import threading
 import unicodedata
 import urllib
 
@@ -81,7 +82,7 @@ class Page(object):
                 title = source.namespace(ns) + u":" + title
             elif not ns and u":" in title:
                 pos = title.index(u':')
-                nsindex = source.getNamespaceIndex(title[ :pos])
+                nsindex = source.ns_index(title[ :pos])
                 if nsindex:
                     self._ns = nsindex
             if u"#" in title:
@@ -96,7 +97,23 @@ class Page(object):
             # copy all of source's attributes to this object
             self.__dict__ = source.__dict__
             if title:
-                self._title = title  # FIXME: needs to handle namespace, section
+                # overwrite title
+                if ":" in title:
+                    prefix = title[ :title.index(":")]
+                    self._ns = site.ns_index(prefix)
+                    if self._ns is None:
+                        self._ns = 0
+                    else:
+                        title = title[title.index(":")+1 : ].strip(" _")
+                        self._title = "%s:%s" % (
+                                         self.site().namespace(self._ns),
+                                         self._title)
+                else:
+                    self._ns = 0
+                if "#" in title:
+                    self._section = title[title.index("#") + 1 : ].strip(" _")
+                    title = title[ : title.index("#")].strip(" _")
+                self._title = title
         elif isinstance(source, Link):
             self._site = source.site
             self._section = source.section
@@ -596,10 +613,12 @@ class Page(object):
                 "Page %s not saved; editing restricted by {{bots}} template"
                 % self.title(asLink=True))
         if async:
-            import threading
-            threading.Thread(target=self._save,
-                             args=(comment, minor, watch, unwatch, callback)
-                             ).start()
+            thd = threading.Thread(
+                      target=self._save,
+                      args=(comment, minor, watch, unwatch, callback)
+                  )
+            pywikibot.threadpool.append(thd)
+            thd.start()
         else:
             self._save(comment, minor, watch, unwatch, callback)
 
@@ -610,13 +629,15 @@ class Page(object):
                                         watch=watch, unwatch=unwatch)
             if not done:
                 logging.warn("Page %s not saved" % self.title(asLink=True))
+            else:
+                logging.info("Page %s saved" % self.title(asLink=True))
         except pywikibot.Error, err:
             logging.exception("Error saving page %s" % self.title(asLink=True))
         if callback:
             callback(self, err)
 
     def put(self, newtext, comment=u'', watchArticle=None, minorEdit=True,
-            force=False, async=False):
+            force=False, async=False, callback=None):
         """Save the page with the contents of the first argument as the text.
 
         This method is maintained primarily for backwards-compatibility.
@@ -1447,7 +1468,7 @@ class Link(object):
 
             fam = self.site.family
             prefix = t[ :t.index(u":")].lower()
-            ns = self.site.getNamespaceIndex(prefix)
+            ns = self.site.ns_index(prefix)
             if ns:
                 # Ordinary namespace
                 t = t[t.index(u":"): ].lstrip(u":").lstrip(u" ")
