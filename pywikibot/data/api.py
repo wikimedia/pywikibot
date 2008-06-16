@@ -164,11 +164,14 @@ class Request(DictMixin):
         params = urllib.urlencode(self.params)
         while True:
             # TODO catch http errors
-            self.site.throttle()  # TODO: add write=True when needed
+            action = self.params.get("action", "")
+            write = action in (
+                        "edit", "move"
+                    )
+            self.site.throttle(write=write)
             uri = self.site.scriptpath() + "/api.php"
             try:
-                if self.params.get("action", "") in (
-                        "login", "edit", "move"):
+                if write or action == "login":
                     # add other actions that require POST requests above
                     rawdata = http.request(self.site, uri, method="POST",
                                 headers={'Content-Type':
