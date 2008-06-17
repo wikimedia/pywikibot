@@ -27,6 +27,8 @@ import sys
 import threading
 import urllib
 
+logger = logging.getLogger("wiki")
+
 
 class PageInUse(pywikibot.Error):
     """Page cannot be reserved for writing due to existing lock."""
@@ -55,7 +57,7 @@ def Family(fam=None, fatal=True):
             exec "import %s_family as myfamily" % fam
         except ImportError:
             if fatal:
-                logging.exception(u"""\
+                logger.exception(u"""\
 Error importing the %s family. This probably means the family
 does not exist. Also check your configuration file."""
                            % fam)
@@ -384,7 +386,7 @@ class APISite(BaseSite):
         DEPRECATED (use .user() method instead)
 
         """
-        logging.debug("Site.loggedInAs() method is deprecated.")
+        logger.debug("Site.loggedInAs() method is deprecated.")
         return self.logged_in(sysop) and self.user()
 
     def login(self, sysop=False):
@@ -626,11 +628,11 @@ class APISite(BaseSite):
                 rvgen.request["titles"] = "|".join(cache.keys())
             rvgen.request[u"rvprop"] = \
                     u"ids|flags|timestamp|user|comment|content"
-            logging.info(u"Retrieving %s pages from %s."
+            logger.info(u"Retrieving %s pages from %s."
                            % (len(cache), self)
                         )
             for pagedata in rvgen:
-#                logging.debug("Preloading %s" % pagedata)
+#                logger.debug("Preloading %s" % pagedata)
                 try:
                     if pagedata['title'] not in cache:
                         raise Error(
@@ -638,9 +640,9 @@ class APISite(BaseSite):
                              % pagedata['title']
                         )
                 except KeyError:
-                    logging.debug("No 'title' in %s" % pagedata)
-                    logging.debug("pageids=%s" % pageids)
-                    logging.debug("titles=%s" % cache.keys())
+                    logger.debug("No 'title' in %s" % pagedata)
+                    logger.debug("pageids=%s" % pageids)
+                    logger.debug("titles=%s" % cache.keys())
                     continue
                 page = cache[pagedata['title']]
                 api.update_page(page, pagedata)
@@ -1019,9 +1021,9 @@ class APISite(BaseSite):
         if not isinstance(namespace, int):
             raise Error("allpages: only one namespace permitted.")
         if throttle is not None:
-            logging.debug("allpages: the 'throttle' parameter is deprecated.")
+            logger.debug("allpages: the 'throttle' parameter is deprecated.")
         if includeRedirects is not None:
-            logging.debug(
+            logger.debug(
                 "allpages: the 'includeRedirect' parameter is deprecated.")
             if includeRedirects:
                 if includeRedirects == "only":
@@ -1126,7 +1128,7 @@ class APISite(BaseSite):
 
     def categories(self, number=10, repeat=False):
         """Deprecated; retained for backwards-compatibility"""
-        logging.debug(
+        logger.debug(
             "Site.categories() method is deprecated; use .allcategories()")
         if repeat:
             limit = None
@@ -1216,12 +1218,12 @@ class APISite(BaseSite):
         if starttime and endtime:
             if reverse:
                 if starttime > endtime:
-                    logging.error(
+                    logger.error(
                 "blocks: starttime must be before endtime with reverse=True")
                     return
             else:
                 if endtime < starttime:
-                    logging.error(
+                    logger.error(
                 "blocks: endtime must be before starttime with reverse=False")
                     return
         bkgen = api.ListGenerator("blocks", site=self)
@@ -1417,7 +1419,7 @@ class APISite(BaseSite):
 
         """
         if number is not None:
-            logging.debug("search: number parameter is deprecated; use limit")
+            logger.debug("search: number parameter is deprecated; use limit")
             limit = number
         if not searchstring:
             raise Error("search: searchstring cannot be empty")
@@ -1426,7 +1428,7 @@ class APISite(BaseSite):
         srgen = PageGenerator("search", gsrsearch=searchstring, gsrwhat=where,
                               site=self)
         if not namespaces:
-            logging.warning("search: namespaces cannot be empty; using [0].")
+            logger.warning("search: namespaces cannot be empty; using [0].")
             namespaces = [0]
         if isinstance(namespaces, basestring):
             srgen.request["gsrnamespace"] = namespaces
@@ -1732,11 +1734,11 @@ redirects on %(site)s wiki""",
         while True:
             try:
                 result = req.submit()
-                logging.debug("editpage response: %s" % result)
+                logger.debug("editpage response: %s" % result)
             except api.APIError, err:
                 self.unlock_page(page)
                 if err.code.endswith("anon") and self.logged_in():
-                    logging.debug(
+                    logger.debug(
 "editpage: received '%s' even though bot is logged in" % err.code)
                 errdata = {
                     'site': self,
@@ -1752,7 +1754,7 @@ redirects on %(site)s wiki""",
                     raise EditConflict(self._ep_errors[err.code] % errdata)
                 if err.code in self._ep_errors:
                     raise Error(self._ep_errors[err.code] % errdata)
-                logging.debug("editpage: Unexpected error code '%s' received."
+                logger.debug("editpage: Unexpected error code '%s' received."
                               % err.code)
                 raise
             assert ("edit" in result and "result" in result["edit"]), result
@@ -1781,21 +1783,21 @@ redirects on %(site)s wiki""",
                         continue
                     else:
                         self.unlock_page(page)
-                        logging.error(
+                        logger.error(
 "editpage: unknown CAPTCHA response %s, page not saved"
                                       % captcha)
                         return False
                 else:
                     self.unlock_page(page)
-                    logging.error("editpage: unknown failure reason %s"
+                    logger.error("editpage: unknown failure reason %s"
                                   % str(result))
                     return False
             else:
                 self.unlock_page(page)
-                logging.error(
+                logger.error(
 "editpage: Unknown result code '%s' received; page not saved"
                     % result["edit"]["result"])
-                logging.error(str(result))
+                logger.error(str(result))
                 return False
 
     # catalog of move errors for use in error messages
@@ -1861,11 +1863,11 @@ redirects on %(site)s wiki""",
             req['noredirect'] = ""
         try:
             result = req.submit()
-            logging.debug("movepage response: %s" % result)
+            logger.debug("movepage response: %s" % result)
         except api.APIError, err:
             self.unlock_page(page)
             if err.code.endswith("anon") and self.logged_in():
-                logging.debug(
+                logger.debug(
 "movepage: received '%s' even though bot is logged in" % err.code)
             errdata = {
                 'site': self,
@@ -1877,16 +1879,16 @@ redirects on %(site)s wiki""",
             }
             if err.code in self._mv_errors:
                 raise Error(self._mv_errors[err.code] % errdata)
-            logging.debug("movepage: Unexpected error code '%s' received."
+            logger.debug("movepage: Unexpected error code '%s' received."
                           % err.code)
             raise
         self.unlock_page(page)
         if "move" not in result:
-            logging.error("movepage: %s" % result)
+            logger.error("movepage: %s" % result)
             raise Error("movepage: unexpected response")
         # TODO: Check for talkmove-error messages
         if "talkmove-error-code" in result["move"]:
-            logging.warning(u"movepage: Talk page %s not moved"
+            logger.warning(u"movepage: Talk page %s not moved"
                             % (page.toggleTalkPage().title(asLink=True)))
         return pywikibot.Page(page, newtitle)
 

@@ -20,6 +20,8 @@ import threading
 import unicodedata
 import urllib
 
+logger = logging.getLogger("wiki")
+
 reNamespace = re.compile("^(.+?) *: *(.*)$")
 
 
@@ -66,10 +68,10 @@ class Page(object):
 
         """
         if insite is not None:
-            logging.debug(
+            logger.debug(
                 "The 'insite' option in Page constructor is deprecated.")
         if defaultNamespace is not None:
-            logging.debug(
+            logger.debug(
             "The 'defaultNamespace' option in Page constructor is deprecated.")
         if isinstance(source, pywikibot.site.BaseSite):
             self._site = source
@@ -167,7 +169,7 @@ class Page(object):
         if underscore or asUrl:
             title = title.replace(u' ', u'_')
         if savetitle:
-            logging.debug(
+            logger.debug(
               u"Page.title(savetitle=...) is deprecated.")
         if savetitle or asUrl:
             encodedTitle = title.encode(self.site().encoding())
@@ -200,7 +202,7 @@ class Page(object):
 
         """
         if underscore:
-            logging.debug(
+            logger.debug(
                 u"Page.section(underscore=...) is deprecated.")
         if self._section:
             return self._section
@@ -287,11 +289,11 @@ class Page(object):
 
         """
         if throttle is not None:
-            logging.debug("Page.get(throttle) option is deprecated.")
+            logger.debug("Page.get(throttle) option is deprecated.")
         if nofollow_redirects is not None:
-            logging.debug("Page.get(nofollow_redirects) option is deprecated.")
+            logger.debug("Page.get(nofollow_redirects) option is deprecated.")
         if change_edit_time is not None:
-            logging.debug("Page.get(change_edit_time) option is deprecated.")
+            logger.debug("Page.get(change_edit_time) option is deprecated.")
         if force:
             # When forcing, we retry the page no matter what. Old exceptions
             # do not apply any more.
@@ -320,13 +322,13 @@ class Page(object):
 
         """
         if throttle is not None:
-            logging.debug(
+            logger.debug(
                 "Page.getOldVersion(throttle) option is deprecated.")
         if nofollow_redirects is not None:
-            logging.debug(
+            logger.debug(
                 "Page.getOldVersion(nofollow_redirects) option is deprecated.")
         if change_edit_time is not None:
-            logging.debug(
+            logger.debug(
                 "Page.getOldVersion(change_edit_time) option is deprecated.")
         if force or not oldid in self._revisions:
             self.site().loadrevisions(self, getText=True, ids=oldid,
@@ -628,11 +630,11 @@ class Page(object):
             done = self.site().editpage(self, summary=comment, minor=minor,
                                         watch=watch, unwatch=unwatch)
             if not done:
-                logging.warn("Page %s not saved" % self.title(asLink=True))
+                logger.warn("Page %s not saved" % self.title(asLink=True))
             else:
-                logging.info("Page %s saved" % self.title(asLink=True))
+                logger.info("Page %s saved" % self.title(asLink=True))
         except pywikibot.Error, err:
-            logging.exception("Error saving page %s" % self.title(asLink=True))
+            logger.exception("Error saving page %s" % self.title(asLink=True))
         if callback:
             callback(self, err)
 
@@ -706,10 +708,10 @@ class Page(object):
 
         """
         if followRedirects is not None:
-            logging.debug(
+            logger.debug(
                 u"Page.imagelinks(followRedirects) option is deprecated.")
         if loose is not None:
-            logging.debug(
+            logger.debug(
                 u"Page.imagelinks(loose) option is deprecated.")
         return self.site().pageimages(self)
 
@@ -744,7 +746,7 @@ class Page(object):
         # follow_redirects makes no sense here because category membership
         # doesn't follow redirects
         if nofollow_redirects is not None:
-            logging.debug(
+            logger.debug(
                 u"Page.categories(nofollow_redirects) option is deprecated.")
         return self.site().pagecategories(self, withSortKey=withSortKey)
 
@@ -832,10 +834,10 @@ class Page(object):
 
         """
         if throttle is not None:
-            logging.debug(
+            logger.debug(
                 u"Page.move: throttle option is deprecated.")
         if reason is None:
-            logging.info(u'Moving %s to [[%s]].'
+            logger.info(u'Moving %s to [[%s]].'
                              % (self.title(asLink=True), newtitle))
             reason = pywikibot.input(u'Please enter a reason for the move:')
         # TODO: implement "safe" parameter
@@ -854,10 +856,10 @@ class Page(object):
 
         """
         if throttle is not None:
-            logging.debug(
+            logger.debug(
                 u"Page.delete: throttle option is deprecated.")
         if reason is None:
-            logging.info(u'Deleting %s.' % (self.title(asLink=True)))
+            logger.info(u'Deleting %s.' % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the deletion:')
         answer = u'y'
         if prompt and not hasattr(self.site(), '_noDeletePrompt'):
@@ -932,10 +934,10 @@ class Page(object):
 
         """
         if throttle is not None:
-            logging.debug(
+            logger.debug(
                 u"Page.undelete: throttle option is deprecated.")
         if comment is None:
-            logging.info(u'Preparing to undelete %s.'
+            logger.info(u'Preparing to undelete %s.'
                              % (self.title(asLink=True)))
             comment = pywikibot.input(
                         u'Please enter a reason for the undeletion:')
@@ -958,14 +960,14 @@ class Page(object):
 
         """
         if throttle is not None:
-            logging.debug(
+            logger.debug(
                 u"Page.protect: throttle option is deprecated.")
         if reason is None:
             if unprotect:
                 un = u'un'
             else:
                 un = u''
-            logging.info(u'Preparing to %sprotect %s.'
+            logger.info(u'Preparing to %sprotect %s.'
                              % (un, self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the action:')
         if unprotect:
@@ -990,7 +992,7 @@ class Page(object):
         DEPRECATED: use Site.encoding() instead
 
         """
-        logging.debug(u"Page.encoding() is deprecated; use Site.encoding().")
+        logger.debug(u"Page.encoding() is deprecated; use Site.encoding().")
         return self.site().encoding()
 
     def titleWithoutNamespace(self, underscore=False):
@@ -999,7 +1001,7 @@ class Page(object):
         DEPRECATED: use self.title(withNamespace=False) instead.
 
         """
-        logging.debug(
+        logger.debug(
             u"Page.titleWithoutNamespace() method is deprecated.")
         return self.title(underscore=underscore, withNamespace=False,
                           withSection=False)
@@ -1010,7 +1012,7 @@ class Page(object):
         DEPRECATED: use self.title(withSection=False) instead.
 
         """
-        logging.debug(
+        logger.debug(
             u"Page.sectionFreeTitle() method is deprecated.")
         return self.title(underscore=underscore, withSection=False)
 
@@ -1020,7 +1022,7 @@ class Page(object):
         DEPRECATED: use self.title(asLink=True) instead.
 
         """
-        logging.debug(u"Page.aslink() method is deprecated.")
+        logger.debug(u"Page.aslink() method is deprecated.")
         return self.title(asLink=True, forceInterwiki=forceInterwiki,
                           allowInterwiki=not noInterwiki, textlink=textlink)
 
@@ -1030,7 +1032,7 @@ class Page(object):
         DEPRECATED: use self.title(asUrl=True) instead.
 
         """
-        logging.debug(u"Page.urlname() method is deprecated.")
+        logger.debug(u"Page.urlname() method is deprecated.")
         return self.title(asUrl=True)
 
 ####### DISABLED METHODS (warnings provided) ######
@@ -1039,12 +1041,12 @@ class Page(object):
 
     def removeImage(self, image, put=False, summary=None, safe=True):
         """Old method to remove all instances of an image from page."""
-        logging.warning(u"Page.removeImage() is no longer supported.")
+        logger.warning(u"Page.removeImage() is no longer supported.")
 
     def replaceImage(self, image, replacement=None, put=False, summary=None,
                      safe=True):
         """Old method to replace all instances of an image with another."""
-        logging.warning(u"Page.replaceImage() is no longer supported.")
+        logger.warning(u"Page.replaceImage() is no longer supported.")
 
 
 class ImagePage(Page):
@@ -1107,7 +1109,7 @@ class ImagePage(Page):
 
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
-        logging.debug(
+        logger.debug(
             "ImagePage.getFileMd5Sum() is deprecated; use getFileSHA1Sum().")
 # FIXME: MD5 might be performed on incomplete file due to server disconnection
 # (see bug #1795683).
@@ -1159,7 +1161,7 @@ class Category(Page):
 
         """
         if sortKey is not None:
-            logging.debug(
+            logger.debug(
                 "The 'sortKey' option in Category constructor is deprecated.")
         Page.__init__(self, source, title, 14)
         if self.namespace() != 14:
@@ -1183,7 +1185,7 @@ class Category(Page):
         """
         if forceInterwiki is not None \
                 or textlink is not None or noInterwiki is not None:
-            logging.debug("All arguments to Category.aslink() are deprecated.")
+            logger.debug("All arguments to Category.aslink() are deprecated.")
         if sortKey:
             titleWithSortKey = '%s|%s' % (self.title(withSection=False),
                                           self.sortKey)
@@ -1261,11 +1263,11 @@ class Category(Page):
         catname = self.site().category_namespace() + ':' + catname
         targetCat = Category(self.site(), catname)
         if targetCat.exists():
-            logging.warn('Target page %s already exists!'
+            logger.warn('Target page %s already exists!'
                              % targetCat.title())
             return False
         else:
-            logging.info('Moving text from %s to %s.'
+            logger.info('Moving text from %s to %s.'
                              % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
             creationSummary = pywikibot.translate(
@@ -1297,11 +1299,11 @@ class Category(Page):
         catname = self.site().category_namespace() + ':' + catname
         targetCat = Category(self.site(), catname)
         if targetCat.exists():
-            logging.warn('Target page %s already exists!'
+            logger.warn('Target page %s already exists!'
                              % targetCat.title())
             return False
         else:
-            logging.info('Moving text from %s to %s.'
+            logger.info('Moving text from %s to %s.'
                              % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
             creationSummary = pywikibot.translate(
@@ -1325,22 +1327,22 @@ class Category(Page):
 #### DEPRECATED METHODS ####
     def subcategoriesList(self, recurse=False):
         """DEPRECATED: Equivalent to list(self.subcategories(...))"""
-        logging.debug("Category.subcategoriesList() method is deprecated.")
+        logger.debug("Category.subcategoriesList() method is deprecated.")
         return sorted(list(set(self.subcategories(recurse))))
 
     def articlesList(self, recurse=False):
         """DEPRECATED: equivalent to list(self.articles(...))"""
-        logging.debug("Category.articlesList() method is deprecated.")
+        logger.debug("Category.articlesList() method is deprecated.")
         return sorted(list(set(self.articles(recurse))))
 
     def supercategories(self):
         """DEPRECATED: equivalent to self.categories()"""
-        logging.debug("Category.supercategories() method is deprecated.")
+        logger.debug("Category.supercategories() method is deprecated.")
         return self.categories()
 
     def supercategoriesList(self):
         """DEPRECATED: equivalent to list(self.categories(...))"""
-        logging.debug("Category.articlesList() method is deprecated.")
+        logger.debug("Category.articlesList() method is deprecated.")
         return sorted(list(set(self.categories())))
 
 

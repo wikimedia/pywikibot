@@ -51,6 +51,9 @@ import config
 import pywikibot
 from pywikibot.exceptions import *
 
+logger = logging.getLogger("wiki")
+
+
 # On some wikis you are only allowed to run a bot if there is a link to
 # the bot's user page in a specific list.
 botList = {
@@ -234,17 +237,17 @@ usernames['%s']['%s'] = 'myUsername'"""
 
 #        self.password = self.password.encode(self.site.encoding())
 
-        logging.info(u"Logging in to %s as %s" % (self.site, self.username))
+        logger.info(u"Logging in to %s as %s" % (self.site, self.username))
         cookiedata = self.getCookie()
         if cookiedata:
             self.storecookiedata(cookiedata)
-            logging.info(u"Should be logged in now")
+            logger.info(u"Should be logged in now")
             # Show a warning according to the local bot policy
             if not self.botAllowed():
-                logging.error(u'*** Your username is not listed on [[%s]].\n*** Please make sure you are allowed to use the robot before actually using it!' % botList[self.site.family.name][self.site.code])
+                logger.error(u'*** Your username is not listed on [[%s]].\n*** Please make sure you are allowed to use the robot before actually using it!' % botList[self.site.family.name][self.site.code])
             return True
         else:
-            logging.error(u"Login failed. Wrong password or CAPTCHA answer?")
+            logger.error(u"Login failed. Wrong password or CAPTCHA answer?")
             if retry:
                 self.password = None
                 return self.login(retry = True)
@@ -283,7 +286,7 @@ def main():
             for lang in namedict[familyName].iterkeys():
                 site = pywikibot.getSite(code=lang, fam=familyName)
                 if not forceLogin and site.loggedInAs(sysop = sysop) != None:
-                    logging.info(u'Already logged in on %s' % site)
+                    logger.info(u'Already logged in on %s' % site)
                 else:
                     loginMan = LoginManager(password, sysop = sysop, site = site)
                     loginMan.login()

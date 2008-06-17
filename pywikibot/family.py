@@ -1,11 +1,13 @@
 # -*- coding: utf-8  -*-
-import config
 
+__version__='$Id$'
+
+import config
 import logging
 import re
 import urllib
 
-__version__='$Id$'
+logger = logging.getLogger("wiki")
 
 # Parent class for all wiki families
 

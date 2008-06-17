@@ -22,6 +22,8 @@ import config
 import pywikibot
 from pywikibot import login
 
+logger = logging.getLogger("data")
+
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
 _modules = {} # cache for retrieved API parameter information
@@ -160,7 +162,7 @@ class Request(DictMixin):
                     self.params[key] = self.params[key].encode(
                                                 self.site.encoding())
             except Exception:
-                logging.exception("key=%s, params=%s" % (key, self.params[key]))
+                logger.exception("key=%s, params=%s" % (key, self.params[key]))
         params = urllib.urlencode(self.params)
         while True:
             # TODO catch http errors
@@ -181,7 +183,7 @@ class Request(DictMixin):
                     uri = uri + "?" + params
                     rawdata = http.request(self.site, uri)
             except Exception, e: #TODO: what exceptions can occur here?
-                logging.warning(traceback.format_exc())
+                logger.warning(traceback.format_exc())
                 print uri, params
                 self.wait()
                 continue
@@ -192,7 +194,7 @@ class Request(DictMixin):
             except ValueError:
                 # if the result isn't valid JSON, there must be a server
                 # problem.  Wait a few seconds and try again
-                logging.warning(
+                logger.warning(
 "Non-JSON response received from server %s; the server may be down."
                               % self.site)
                 print rawdata
@@ -222,7 +224,7 @@ class Request(DictMixin):
             if code == "maxlag":
                 lag = lagpattern.search(info)
                 if lag:
-                    logging.info(
+                    logger.info(
                         "Pausing due to database lag: " + info)
                     self.site.throttle.lag(int(lag.group("lag")))
                     continue
@@ -240,7 +242,7 @@ class Request(DictMixin):
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError("Maximum retries attempted without success.")
-        logging.warn("Waiting %s seconds before retrying." % self.retry_wait)
+        logger.warn("Waiting %s seconds before retrying." % self.retry_wait)
         time.sleep(self.retry_wait)
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
@@ -326,7 +328,7 @@ class QueryGenerator(object):
                     else:
                         self.query_limit = int(param["max"])
                     self.prefix = _modules[mod]["prefix"]
-                    logging.debug("%s: Set query_limit to %i."
+                    logger.debug("%s: Set query_limit to %i."
                                   % (self.__class__.__name__, self.query_limit))
                     return
 
@@ -349,19 +351,19 @@ class QueryGenerator(object):
                     self.request[self.prefix+"limit"] = str(new_limit)
             self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
-                logging.debug(
+                logger.debug(
                     "%s: stopped iteration because no dict retrieved from api."
                     % self.__class__.__name__)
                 return
             if not ("query" in self.data
                     and self.resultkey in self.data["query"]):
-                logging.debug(
+                logger.debug(
                     "%s: stopped iteration because 'query' and result keys not found in api response."
                     % self.__class__.__name__)
-                logging.debug(self.data)
+                logger.debug(self.data)
                 return
             pagedata = self.data["query"][self.resultkey]
-            logging.debug("%s received %s; limit=%s"
+            logger.debug("%s received %s; limit=%s"
                          % (self.__class__.__name__, pagedata.keys(),
                             self.limit))
             if isinstance(pagedata, dict):
@@ -549,7 +551,7 @@ def update_page(page, pagedict):
 
 if __name__ == "__main__":
     from pywikibot import Site
-    logging.getLogger().setLevel(logging.DEBUG)
+    logger.setLevel(logger.DEBUG)
     mysite = Site("en", "wikipedia")
     print "starting test...."
     def _test():

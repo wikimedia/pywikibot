@@ -17,6 +17,8 @@ import math
 import threading
 import time
 
+logger = logging.getLogger("wiki")
+
 pid = False   # global process identifier
               # Don't check for other processes unless this is set
 
@@ -58,7 +60,7 @@ class Throttle(object):
     def checkMultiplicity(self):
         global pid
         self.lock.acquire()
-        logging.debug("Checking multiplicity: pid = %s" % pid)
+        logger.debug("Checking multiplicity: pid = %s" % pid)
         try:
             processes = []
             my_pid = 1
@@ -107,7 +109,7 @@ class Throttle(object):
             f.close()
             self.process_multiplicity = count
             if self.verbosedelay:
-                logging.info(
+                logger.info(
                 u"Found %s processes running, including the current process."
                     % count)
         finally:
@@ -216,7 +218,7 @@ class Throttle(object):
             self.next_multiplicity = math.log(1+requestsize)/math.log(2.0)
             # Announce the delay if it exceeds a preset limit
             if waittime > config.noisysleep:
-                logging.info(u"Sleeping for %.1f seconds, %s"
+                logger.info(u"Sleeping for %.1f seconds, %s"
                               % (waittime,
                                  time.strftime("%Y-%m-%d %H:%M:%S",
                                                time.localtime()))
@@ -246,7 +248,7 @@ class Throttle(object):
             wait = delay - (time.time() - started)
             if wait > 0:
                 if wait > config.noisysleep:
-                    logging.warn(u"Sleeping for %.1f seconds, %s"
+                    logger.warn(u"Sleeping for %.1f seconds, %s"
                                   % (wait,
                                      time.strftime("%Y-%m-%d %H:%M:%S",
                                                    time.localtime()))

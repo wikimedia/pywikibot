@@ -10,10 +10,7 @@ The initialization file for the Pywikibot framework.
 __version__ = '$Id: $'
 
 import logging
-logging.getLogger().setLevel(logging.DEBUG)
-
 from exceptions import *
-
 import config
 
 _sites = {}
@@ -33,6 +30,8 @@ def Site(code=None, fam=None, user=None, interface=None):
     @type user: unicode
 
     """
+    logger = logging.getLogger("wiki")
+    
     if code == None:
         code = default_code
     if fam == None:
@@ -51,7 +50,7 @@ def Site(code=None, fam=None, user=None, interface=None):
     key = '%s:%s:%s' % (fam, code, user)
     if not _sites.has_key(key):
         _sites[key] = __Site(code=code, fam=fam, user=user)
-        logging.debug("Instantiating Site object '%s'"
+        logger.debug("Instantiating Site object '%s'"
                       % _sites[key])
     return _sites[key]
 
@@ -59,7 +58,8 @@ getSite = Site # alias for backwards-compability
 
 from page import Page, ImagePage, Category, Link
 
-# DEBUG
+
+# User interface functions (kept extremely simple for debugging)
 
 def output(text):
     print text
@@ -70,9 +70,36 @@ def input(prompt, password=False):
         return getpass.getpass(prompt)
     return raw_input(prompt)
 
+
+# Logger configuration
+
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
+
+def set_debug(layer):
+    """Set the logger for specified layer to DEBUG level.
+
+    The framework has four layers (by default, others can be added), each
+    designated by a string --
+
+    1.  "comm": the communication layer (http requests, etc.)
+    2.  "data": the raw data layer (API requests, XML dump parsing)
+    3.  "wiki": the wiki content representation layer (Page and Site objects)
+    4.  "bot": the application layer
+
+    This method sets the logger for any specified layer to the DEBUG level,
+    causing it to output extensive debugging information.  If this method is
+    not called for a layer, the default logging setting is the INFO level.
+
+    This method does not check the 'layer' argument for validity.
+
+    """
+    logging.getLogger(layer).setLevel(logging.DEBUG)
+
+
 # Throttle and thread handling
 
-threadpool = []
+threadpool = []   # add page-putting threads to this list as they are created
 
 def stopme():
     """Drop this process from the throttle log, after pending threads finish.
@@ -81,9 +108,12 @@ def stopme():
     at Python exit.
 
     """
+    logger = logging.getLogger("wiki")
+    
+    logger.debug("stopme() called")
     threadcount = sum(1 for thd in threadpool if thd.isAlive())
     if threadcount:
-        logging.info("Waiting for approximately %s threads to finish."
+        logger.info("Waiting for approximately %s threads to finish."
                      % threadcount)
         for thd in threadpool:
             if thd.isAlive():
@@ -91,10 +121,9 @@ def stopme():
     # only need one drop() call because all throttles use the same global pid
     try:
         _sites[_sites.keys()[0]].throttle.drop()
-        logging.info("Dropped throttle(s).")
+        logger.info("Dropped throttle(s).")
     except IndexError:
         pass
 
 import atexit
 atexit.register(stopme)
-

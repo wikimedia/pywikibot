@@ -30,11 +30,14 @@ import urllib
 import cookielib
 import sys
 
+logger = logging.getLogger("comm")
+
+
 # easy_install safeguarded dependencies
 try:
     import pkg_resources
 except ImportError:
-    logging.critical(
+    logger.critical(
         "Error : You need the python module setuptools to use this module")
     sys.exit(1)
 pkg_resources.require("httplib2")
@@ -50,7 +53,7 @@ class ConnectionPool(object):
                        The pool drops excessive connections added.
 
         """
-        logging.debug("Creating connection pool.")
+        logger.debug("Creating connection pool.")
         self.connections = {}
         self.lock = threading.Lock()
         self.maxnum = maxnum
@@ -59,7 +62,7 @@ class ConnectionPool(object):
         """Destructor to close all connections in the pool."""
         self.lock.acquire()
         try:
-            logging.debug("Closing connection pool (%s connections)"
+            logger.debug("Closing connection pool (%s connections)"
                          % len(self.connections))
             for key in self.connections:
                 for connection in self.connections[key]:
@@ -81,7 +84,7 @@ class ConnectionPool(object):
         try:
             if identifier in self.connections:
                 if len(self.connections[identifier]) > 0:
-                    logging.debug("Retrieved connection from '%s' pool."
+                    logger.debug("Retrieved connection from '%s' pool."
                                   % identifier)
                     return self.connections[identifier].pop()
             return None
@@ -101,7 +104,7 @@ class ConnectionPool(object):
                 self.connections[identifier] = []
 
             if len(self.connections[identifier]) == self.maxnum:
-                logging.debug('closing %s connection %r'
+                logger.debug('closing %s connection %r'
                               % (identifier, connection))
                 connection.close()
                 del connection
@@ -194,7 +197,7 @@ class Http(httplib2.Http):
         # Redirect hack: we want to regulate redirects
         follow_redirects = self.follow_redirects
         self.follow_redirects = False
-        logging.debug('%r' % (
+        logger.debug('%r' % (
             (uri.replace("%7C","|"),
              method, body, headers, max_redirects, connection_type),))
         try:
@@ -252,7 +255,7 @@ class Http(httplib2.Http):
                                                                     location)
             if authority == None:
                 response['location'] = httplib2.urlparse.urljoin(uri, location)
-                logging.debug('Relative redirect: changed [%s] to [%s]'
+                logger.debug('Relative redirect: changed [%s] to [%s]'
                               % (location, response['location']))
         if response.status == 301 and method in ["GET", "HEAD"]:
             response['-x-permanent-redirect-url'] = response['location']
@@ -318,11 +321,11 @@ class HttpProcessor(threading.Thread):
     def run(self):
         # The Queue item is expected to either an HttpRequest object
         # or None (to shut down the thread)
-        logging.debug('Thread started, waiting for requests.')
+        logger.debug('Thread started, waiting for requests.')
         while (True):
             item = self.queue.get()
             if item is None:
-                logging.debug('Shutting down thread.')
+                logger.debug('Shutting down thread.')
                 return
             try:
                 item.data = self.http.request(*item.args, **item.kwargs)

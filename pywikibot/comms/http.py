@@ -31,6 +31,8 @@ import config
 import cookielib
 import threadedhttp
 
+logger = logging.getLogger("comm")
+
 
 # global variables
 
@@ -49,13 +51,13 @@ cookie_jar = threadedhttp.LockableCookieJar(
 try:
     cookie_jar.load()
 except (IOError, cookielib.LoadError):
-    logging.debug("Loading cookies failed.")
+    logger.debug("Loading cookies failed.")
 else:
-    logging.debug("Loaded cookies from file.")
+    logger.debug("Loaded cookies from file.")
 
 
 # Build up HttpProcessors
-logging.info('Starting %i threads...' % numthreads)
+logger.info('Starting %i threads...' % numthreads)
 for i in range(numthreads):
     proc = threadedhttp.HttpProcessor(http_queue, cookie_jar, connection_pool)
     proc.setDaemon(True)
@@ -66,10 +68,10 @@ for i in range(numthreads):
 def _flush():
     for i in threads:
         http_queue.put(None)
-    logging.info('Waiting for threads to finish... ')
+    logger.info('Waiting for threads to finish... ')
     for i in threads:
         i.join()
-    logging.debug('All threads finished.')
+    logger.debug('All threads finished.')
 atexit.register(_flush)
 
 # export cookie_jar to global namespace
@@ -99,6 +101,6 @@ def request(site, uri, *args, **kwargs):
         raise request.data
 
     if request.data[0].status != 200:
-        logging.warning("Http response status %s" % request.data[0].status)
+        logger.warning("Http response status %s" % request.data[0].status)
 
     return request.data[1]    
