@@ -9,7 +9,9 @@ The initialization file for the Pywikibot framework.
 #
 __version__ = '$Id: $'
 
+import sys
 import logging
+
 from exceptions import *
 import config
 
@@ -65,6 +67,8 @@ def output(text):
     print text
 
 def input(prompt, password=False):
+    if isinstance(prompt, unicode):
+        prompt = prompt.encode(sys.stdout.encoding, "replace")
     if password:
         import getpass
         return getpass.getpass(prompt)
