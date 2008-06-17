@@ -363,14 +363,17 @@ class QueryGenerator(object):
                 logger.debug(self.data)
                 return
             pagedata = self.data["query"][self.resultkey]
-            logger.debug("%s received %s; limit=%s"
+            if isinstance(pagedata, dict):
+                logger.debug("%s received %s; limit=%s"
                          % (self.__class__.__name__, pagedata.keys(),
                             self.limit))
-            if isinstance(pagedata, dict):
                 pagedata = pagedata.values()
                     # for generators, this yields the pages in order of
                     # their pageids, not their titles.... FIXME?
-
+            else:
+                logger.debug("%s received %s; limit=%s"
+                         % (self.__class__.__name__, pagedata,
+                            self.limit))                
             for item in pagedata:
                 yield self.result(item)
                 count += 1
