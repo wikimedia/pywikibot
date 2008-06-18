@@ -27,7 +27,7 @@ class Family(family.Family):
             'tg', 'dv', 'bn', 'ka', 'mg', 'ha', 'kw', 'ss', 'na', 'sa',
             'gv', 'ay', 'tpi', 'ne', 'jbo', 'jv', 'gn', 'uz', 'tn', 'mt',
             'sh', 'lb', 'ks', 'tk', 'sg', 'fj', 'als', 'ik', 'si', 'ln',
-            'sm', 'za', 'roa-rup', 'sn', 'yo', 'dz', 'my', 'wa', 'sc',
+            'sm', 'za', 'roa-rup', 'yo', 'dz', 'my', 'wa', 'sc',
         ]
 
         for lang in self.languages_by_size:
@@ -274,6 +274,7 @@ class Family(family.Family):
         self.namespaces[104] = {
             'bs': u'Dodatak',
             'cy': u'WiciSawrws',
+            'de': u'WikiSaurus',
             'en': u'Index',
             'fr': u'Portail',
             'pl': u'Portal',
@@ -285,6 +286,7 @@ class Family(family.Family):
         self.namespaces[105] = {
             'bs': u'Razgovor o Dodatku',
             'cy': u'Sgwrs WiciSawrws',
+            'de': u'WikiSaurus Diskussion',
             'en': u'Index talk',
             'fr': u'Discussion Portail',
             'pl': u'Dyskusja portalu',
@@ -370,6 +372,7 @@ class Family(family.Family):
             'pi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Pali_Bhasa_Wiktionary
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rhaetian_Wiktionary
             'rn': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kirundi_Wiktionary
+            'sn': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Shona_Wiktionary
             'to': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tongan_Wiktionary
             'tlh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Klingon_Wiktionary
             'tw': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Twi_Wiktionary

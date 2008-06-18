@@ -21,10 +21,10 @@ class Family(family.Family):
             'la', 'ml', 'cv', 'ie', 'hi', 'fy', 'lv', 'hy', 'eu', 'pa',
             'ky', 'bn', 'tl', 'bs', 'be', 'ms', 'tg', 'te', 'af', 'cy',
             'ast', 'tt', 'sa', 'az', 'mg', 'ku', 'si', 'co', 'sw', 'tk',
-            'ne', 'qu', 'bm', 'ak', 'vo', 'uz', 'ks', 'bo', 'gu', 'su',
+            'ne', 'qu', 'bm', 'ak', 'vo', 'uz', 'bo', 'su',
             'na', 'se', 'ps', 'kn', 'kk', 'zh-min-nan', 'ay', 'lb', 'got', 'nah',
-            'as', 'aa', 'mn', 'ch', 'gn', 'ln', 'ug', 'km', 'yo', 'nds',
-            'xh', 'rm', 'ba', 'za', 'bi', 'my', 'ga', 'wa', 'zu', 'mi',
+            'aa', 'mn', 'ch', 'gn', 'ln', 'km', 'nds',
+            'xh', 'rm', 'ba', 'za', 'bi', 'my', 'wa', 'zu', 'mi',
         ]
 
         for lang in self.languages_by_size:
@@ -70,6 +70,7 @@ class Family(family.Family):
             'sl': u'Wikiknjige',
             'sr': u'Викикњиге',
             'tr': u'Vikikitap',
+            'uk': u'Вікіпідручник',
             'ur': u'وکی کتب',
             'uz': u'Vikikitob',
             'vo': u'Vükibuks',
@@ -159,7 +160,7 @@ class Family(family.Family):
             'th': u'คุยเรื่องWikibooks',
             'tr': u'Vikikitap tartışma',
             'tt': u'Wikibooks bäxäse',
-            'uk': u'Обговорення Wikibooks',
+            'uk': u'Обговорення Вікіпідручника',
             'ur': u'تبادلۂ خیال وکی کتب',
             'uz': u'Vikikitob munozarasi',
             'vi': u'Thảo luận Wikibooks',
@@ -177,6 +178,7 @@ class Family(family.Family):
             'ro': u'Raft',
             'ru': u'Полка',
             'tr': u'Yemek',
+            'uk': u'Полиця',
         }
 
         self.namespaces[101] = {
@@ -189,6 +191,7 @@ class Family(family.Family):
             'ro': u'Discuţie Raft',
             'ru': u'Обсуждение полки',
             'tr': u'Yemek tartışma',
+            'uk': u'Обговорення полиці',
         }
 
         self.namespaces[102] = {
@@ -202,6 +205,7 @@ class Family(family.Family):
             'ro': u'Wikijunior',
             'ru': u'Импортировано',
             'sr': u'Кувар',
+            'uk': u'Рецепт',
         }
 
         self.namespaces[103] = {
@@ -215,6 +219,7 @@ class Family(family.Family):
             'ro': u'Discuţie Wikijunior',
             'ru': u'Обсуждение импортированного',
             'sr': u'Разговор о кувару',
+            'uk': u'Обговорення рецепта',
         }
 
         self.namespaces[104] = {
@@ -274,18 +279,20 @@ class Family(family.Family):
 
         alphabetic = ['af','ar','roa-rup','om','bg','be','bn','bs',
                       'ca','chr','co','cs','cy','da','de','als','et',
-                      'el','en','es','eo','eu','fa','fr','fy','ga','gv',
+                      'el','en','es','eo','eu','fa','fr','fy','gv',
                       'gd','gl','ko','hi','hr','io','id','ia','is','it',
-                      'he','jv','ka','csb','ks','sw','la','lv','lt','hu',
+                      'he','jv','ka','csb','sw','la','lv','lt','hu',
                       'mk','mg','ml','mi','mr','ms','zh-cfr','mn','nah','na',
                       'nl','ja','no','nb','oc','nds','pl','pt','ro','ru',
                       'sa','st','sq','si','simple','sk','sl','sr','su',
                       'fi','sv','ta','tt','th','ur','vi',
-                      'tpi','tr','uk','vo','yi','yo','za','zh','zh-cn',
+                      'tpi','tr','uk','vo','yi','za','zh','zh-cn',
                       'zh-tw']
 
         self.obsolete = {
             'aa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikibooks
+            'ak': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Akan_Wikibooks
+            'as': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wikibooks
             'ay': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Aymar_Wikibooks
             'ba': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bashkir_Wikibooks
             'bi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bislama_Wikibooks
@@ -293,10 +300,14 @@ class Family(family.Family):
             'bo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tibetan_Wikibooks
             'ch': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Chamorro_Wikibooks
             'dk': 'da',
+            'ga':None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikibooks
             'got': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gothic_Wikibooks
             'gn': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Guarani_Wikibooks
+            'gu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gujarati_Wikibooks
             'jp': 'ja',
+            'ks': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikibooks
             'ln': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Lingala_Wikibooks
+            'mi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Maori_Wikibooks
             'minnan':'zh-min-nan',
             'nah': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nahuatl_Wikibooks
             'nb': 'no',
@@ -304,6 +315,8 @@ class Family(family.Family):
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rumantsch_Wikibooks
             'se': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Sami_Wikibooks
             'tokipona': None,
+            'ug': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Uyghur_Wikibooks
+            'yo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wikibooks
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }

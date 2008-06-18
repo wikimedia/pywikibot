@@ -275,6 +275,9 @@ class Family(family.Family):
                       'sv','te','th','tr','uk','vi','yi','zh']
 
         self.obsolete = {
+            'ang': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
+            
+            
             'dk': 'da',
             'ht': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
             'jp': 'ja',

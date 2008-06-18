@@ -80,6 +80,7 @@ class Family(family.Family):
 
         self.namespaces[100] = {
             'ar': u'بوابة',
+            'cs': u'Portál',
             'de': u'Portal',
             'en': u'Portal',
             'es': u'Comentarios',
@@ -96,6 +97,7 @@ class Family(family.Family):
 
         self.namespaces[101] = {
             'ar': u'نقاش البوابة',
+            'cs': u'Portál diskuse',
             'de': u'Portal Diskussion',
             'en': u'Portal talk',
             'es': u'Comentarios Discusión',
