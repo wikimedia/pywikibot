@@ -233,8 +233,6 @@ class Family(family.Family):
             'lv': u'Vikipēdijas diskusija',
             'map-bms': u'Dhiskusi Wikipedia',
             'mdf': u'Википедиесь talk',
-            'map-bms': u'Dhiskusi Wikipedia',
-            'mdf': u'Википедиесь talk',
             'mg': u'Discussion Wikipedia',
             'mk': u'Разговор за Википедија',
             'ml': u'വിക്കിപീഡിയ സംവാദം',

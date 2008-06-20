@@ -13,15 +13,15 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'de', 'it', 'pl', 'sk', 'pt', 'ru', 'bg', 'bs', 'sl',
-            'es', 'tr', 'he', 'zh', 'fr', 'lt', 'cs', 'id', 'el', 'uk',
+            'en', 'de', 'it', 'pl', 'sk', 'pt', 'ru', 'bg', 'bs', 'es',
+            'sl', 'tr', 'he', 'zh', 'fr', 'lt', 'cs', 'id', 'el', 'uk',
             'sv', 'hu', 'ja', 'no', 'nl', 'fa', 'fi', 'ca', 'ku', 'ar',
-            'eo', 'ro', 'hr', 'gl', 'ko', 'is', 'af', 'et', 'nn', 'li',
-            'ka', 'sr', 'ml', 'da', 'th', 'simple', 'vi', 'sq', 'te',
-            'la', 'az', 'br', 'eu', 'hi', 'ast', 'uz', 'be', 'ang',
-            'zh-min-nan', 'lb', 'mr', 'su', 'ur', 'kn', 'ta', 'wo', 'ky', 'gu',
-            'cy', 'hy', 'am', 'tt', 'co', 'qu', 'bm', 'ug', 'kw', 'na',
-            'tk', 'vo', 'ga', 'kr', 'nds', 'cr', 'kk', 'ks', 'za', 'als',
+            'eo', 'ro', 'hr', 'gl', 'ko', 'li', 'is', 'et', 'af', 'nn',
+            'ka', 'sr', 'ml', 'da', 'th', 'simple', 'vi', 'sq', 'te', 'la',
+            'az', 'br', 'eu', 'hi', 'ast', 'uz', 'be', 'ang', 'zh-min-nan', 'lb',
+            'mr', 'su', 'ur', 'kn', 'ta', 'wo', 'ky', 'gu', 'cy', 'hy',
+            'am', 'tt', 'qu', 'co', 'bm', 'ug', 'kw', 'na', 'tk', 'vo',
+            'ga', 'cr', 'nds', 'kk', 'kr', 'als', 'za', 'ks',
         ]
 
         for lang in self.languages_by_size:
