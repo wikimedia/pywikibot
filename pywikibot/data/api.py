@@ -21,6 +21,7 @@ import urllib
 import config
 import pywikibot
 from pywikibot import login
+from pywikibot.exceptions import *
 
 logger = logging.getLogger("data")
 
