@@ -8,6 +8,7 @@ __version__ = '$Id$'
 
 import os, re
 import sys as __sys
+
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
 # a file user-config.py, and overwrite values in there.
@@ -108,10 +109,11 @@ def _get_base_dir():
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file
     if not os.path.isdir(base_dir):
-        raise RuntimeError("Directory '%s' does not exist." % base_dir)
+        raise RuntimeError("Directory '%(base_dir)s' does not exist."
+                           % locals())
     if not os.path.exists(os.path.join(base_dir, "user-config.py")):
-        raise RuntimeError("No user-config.py found in directory '%s'."
-                           % base_dir)
+        raise RuntimeError("No user-config.py found in directory '%(base_dir)s'."
+                           % locals())
     return base_dir
 
 _base_dir = _get_base_dir()
@@ -183,8 +185,7 @@ if __sys.platform=='win32':
         _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, '%s\shell\open\command' % _progID)
         _cmd = _winreg.QueryValueEx(_key2, None)[0]
         editor = _cmd.replace('%1', '')
-        # Notepad is even worse than our Tkinter editor. Nobody has
-        # deserved to use it.
+        # Notepad is even worse than our Tkinter editor.
         if editor.lower().endswith('notepad.exe'):
             editor = None
     except:
@@ -319,7 +320,7 @@ splitLongParagraphs = False
 # That can do very ugly results.
 deIndentTables = True
 # table2wiki.py works quite stable, so you might switch to True
-table2wikiAskOnlyWarnings = True
+table2wikiAskOnlyWarnngs = True
 table2wikiSkipWarnings = False
 
 ############## WEBLINK CHECKER SETTINGS ##############
@@ -462,9 +463,11 @@ for _filename in _fns:
             if __sys.platform=='win32' or _filemode&002==0:
                 execfile(_filename)
             else:
-                print "WARNING: Skipped '%s': writeable by others."%_filename
+                print "WARNING: Skipped '%(fn)s': writeable by others."\
+                      % {'fn' :_filename}
         else:
-            print "WARNING: Skipped '%s': owned by someone else."%_filename
+            print "WARNING: Skipped '%(fn)s': owned by someone else."\
+                  % {'fn' :_filename}
 
 # Test for obsoleted and/or unknown variables.
 for _key in globals().keys():
@@ -484,12 +487,14 @@ for _key in globals().keys():
         elif ot==type(1) and nt==type(True):
             pass
         else:
-            print "WARNING: Type of '%s' changed"%_key
-            print "       Was: ",ot
-            print "       Now: ",nt
+            print "WARNING: Type of '%(_key)s' changed" % locals()
+            print "         %(was)s: %(old)s" % {'was': "Was", 'old': ot}
+            print "         %(was)s: %(new)s" % {'now': "Now", 'new': nt}
         del nt,ot
     else:
-        print "WARNING: Configuration variable %r is defined but unknown. Misspelled?" %_key
+        logger.warn(
+    "Configuration variable %(_key)r is defined but unknown. Misspelled?"
+            % locals())
 
 # Fix up default console_encoding
 if console_encoding == None:
@@ -549,7 +554,7 @@ if __name__=="__main__":
         if _arg=="modified":
             _all=0
         else:
-            print "Unknown arg %s ignored"%_arg
+            print "Unknown arg %(_arg)s ignored" % locals()
     _k=globals().keys()
     _k.sort()
     for _name in _k:

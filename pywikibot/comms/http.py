@@ -57,7 +57,7 @@ else:
 
 
 # Build up HttpProcessors
-logger.info('Starting %i threads...' % numthreads)
+logger.info('Starting %(numthreads)i threads...' % locals())
 for i in range(numthreads):
     proc = threadedhttp.HttpProcessor(http_queue, cookie_jar, connection_pool)
     proc.setDaemon(True)
@@ -94,13 +94,14 @@ def request(site, uri, *args, **kwargs):
     http_queue.put(request)
     request.lock.acquire()
 
-    #do some error correcting stuff
+    #TODO: do some error correcting stuff
 
     #if all else fails
     if isinstance(request.data, Exception):
         raise request.data
 
     if request.data[0].status != 200:
-        logger.warning("Http response status %s" % request.data[0].status)
+        logger.warning("Http response status %(status)s"
+                       % {'status': request.data[0].status})
 
     return request.data[1]    

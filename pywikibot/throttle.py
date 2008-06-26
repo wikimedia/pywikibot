@@ -46,8 +46,8 @@ class Throttle(object):
         self.last_read = 0
         self.last_write = 0
         self.next_multiplicity = 1.0
-        self.checkdelay = 120  # Check logfile again after this many seconds
-        self.dropdelay = 360   # Ignore processes that have not made
+        self.checkdelay = 300  # Check logfile again after this many seconds
+        self.dropdelay = 750   # Ignore processes that have not made
                                # a check in this many seconds
         self.releasepid = 1800 # Free the process id after this many seconds
         self.lastwait = 0.0
@@ -60,7 +60,7 @@ class Throttle(object):
     def checkMultiplicity(self):
         global pid
         self.lock.acquire()
-        logger.debug("Checking multiplicity: pid = %s" % pid)
+        logger.debug("Checking multiplicity: pid = %(pid)s" % globals())
         try:
             processes = []
             my_pid = 1
@@ -110,8 +110,8 @@ class Throttle(object):
             self.process_multiplicity = count
             if self.verbosedelay:
                 logger.info(
-                u"Found %s processes running, including the current process."
-                    % count)
+u"Found %(count)s processes running, including the current process."
+                    % locals())
         finally:
             self.lock.release()
 
@@ -206,10 +206,14 @@ class Throttle(object):
 
         Parameter requestsize is the number of Pages to be read/written;
         multiply delay time by an appropriate factor.
+
+        Because this seizes the throttle lock, it will prevent any other
+        thread from writing to the same site until the wait expires.
+
         """
         self.lock.acquire()
         try:
-            waittime = self.waittime(write=write)
+            wait = self.waittime(write=write)
             # Calculate the multiplicity of the next delay based on how
             # big the request is that is being posted now.
             # We want to add "one delay" for each factor of two in the
@@ -217,13 +221,13 @@ class Throttle(object):
             # the delay time for the server.
             self.next_multiplicity = math.log(1+requestsize)/math.log(2.0)
             # Announce the delay if it exceeds a preset limit
-            if waittime > config.noisysleep:
-                logger.info(u"Sleeping for %.1f seconds, %s"
-                              % (waittime,
-                                 time.strftime("%Y-%m-%d %H:%M:%S",
-                                               time.localtime()))
-                                 )
-            time.sleep(waittime)
+            if wait > config.noisysleep:
+                logger.info(u"Sleeping for %(wait).1f seconds, %(now)s"
+                              % {'wait': wait,
+                                 'now': time.strftime("%Y-%m-%d %H:%M:%S",
+                                                      time.localtime())
+                                } )
+            time.sleep(wait)
             if write:
                 self.last_write = time.time()
             else:
@@ -248,12 +252,12 @@ class Throttle(object):
             wait = delay - (time.time() - started)
             if wait > 0:
                 if wait > config.noisysleep:
-                    logger.warn(u"Sleeping for %.1f seconds, %s"
-                                  % (wait,
-                                     time.strftime("%Y-%m-%d %H:%M:%S",
-                                                   time.localtime()))
-                                     )
+                    logger.info(u"Sleeping for %(wait).1f seconds, %(now)s"
+                                  % {'wait': wait,
+                                     'now': time.strftime("%Y-%m-%d %H:%M:%S",
+                                                          time.localtime())
+                                    } )
                 time.sleep(wait)
         finally:
             self.lock.release()
-        
+

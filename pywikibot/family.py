@@ -2505,11 +2505,17 @@ class Family:
         elif fallback:
             return self.linktrails[fallback]
         else:
-            raise KeyError('ERROR: linktrail in language %s unknown' % code)
+            raise KeyError(
+                "ERROR: linktrail in language %(language_code)s unknown"
+                           % {'language_code': code})
 
-    def namespace(self, code, ns_number, fallback = '_default', all = False):
+    def namespace(self, code, ns_number, fallback='_default', all=False):
         if not self.isDefinedNS(ns_number):
-            raise KeyError('ERROR: Unknown namespace %d for %s:%s' % (ns_number, code, self.name))
+            raise KeyError(
+'ERROR: Unknown namespace %(ns_number)d for %(language_code)s:%(ns_name)s'
+                           % {'ns_number': ns_number,
+                              'language_code': code,
+                              'ns_name': self.name})
         elif self.isNsI18N(ns_number, code):
             v = self.namespaces[ns_number][code]
             if type(v) is not list:
@@ -2525,35 +2531,35 @@ class Family:
             if type(v) is not list:
                 v = [v,]
         else:
-            raise KeyError('ERROR: title for namespace %d in language %s unknown' % (ns_number, code))
-
+            raise KeyError(
+'ERROR: title for namespace %(ns_number)d in language %(language_code)s unknown'
+                           % {'ns_number': ns_number,
+                              'language_code': code})
         if all:
-            namespaces = []
-
-            # Unique list
-            for ns in v:
-                if ns not in namespaces:
-                    namespaces.append(ns)
-
+            namespaces = list(set(v))
             # Lowercase versions of namespaces
             if code not in self.nocapitalize:
-                namespaces.extend([ns[0].lower() + ns[1:] for ns in namespaces if ns and ns[0].lower() != ns[0].upper()])
-
+                namespaces.extend([ns[0].lower() + ns[1:]
+                                   for ns in namespaces
+                                   if ns and ns[0].lower() != ns[0].upper()])
             # Underscore versions of namespaces
-            namespaces.extend([ns.replace(' ', '_') for ns in namespaces if ns and ' ' in ns])
-
+            namespaces.extend([ns.replace(' ', '_')
+                               for ns in namespaces if ns and ' ' in ns])
             return tuple(namespaces)
         else:
             return v[0]
 
     def isDefinedNS(self, ns_number):
-        """Return True if the namespace has been defined in this family.
-        """
+        """Return True if the namespace has been defined in this family."""
+        
         return self.namespaces.has_key(ns_number)
 
     def isNsI18N(self, ns_number, code):
         """Return True if the namespace has been internationalized.
-        (it has a custom entry for a given language)"""
+
+        (it has a custom entry for a given language)
+
+        """
         return self.namespaces[ns_number].has_key(code)
 
     def isDefinedNSLanguage(self, ns_number, code, fallback='_default'):
@@ -2623,8 +2629,8 @@ class Family:
             return self.disambiguationTemplates[fallback]
         else:
             raise KeyError(
-                'ERROR: title for disambig template in language %s unknown'
-                % code)
+"ERROR: title for disambig template in language %(language_code)s unknown"
+                           % {'language_code': code})
 
     # Returns the title of the special namespace in language 'code', taken from
     # dictionary above.

@@ -81,32 +81,36 @@ class LoginManager:
                                 [self.site.family.name][self.site.code]
             except:
                 raise NoUsername(
-u'ERROR: Sysop username for %s:%s is undefined.\nIf you have a sysop account for that site, please add such a line to user-config.py:\n\nsysopnames[\'%s\'][\'%s\'] = \'myUsername\''
-                      % (self.site.family.name, self.site.code,
-                         self.site.family.name, self.site.code))
+u"""ERROR: Sysop username for %(fam_name)s:%(wiki_code)s is undefined.
+If you have a sysop account for that site, please add a line to user-config.py:
+
+sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
+                                  % {'fam_name': self.site.family.name,
+                                     'wiki_code': self.site.code})
         else:
             try:
                 self.username = config.usernames\
                                 [self.site.family.name][self.site.code]
             except:
                 raise NoUsername(
-u"""ERROR: Username for %s:%s is undefined.
+u"""ERROR: Username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have an account for that site, please add a line to user-config.py:
 
-usernames['%s']['%s'] = 'myUsername'"""
-                        % (self.site.family.name, self.site.code,
-                           self.site.family.name, self.site.code))
+usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
+                                  % {'fam_name': self.site.family.name,
+                                     'wiki_code': self.site.code})
         self.password = password
         if getattr(config, 'password_file', ''):
             self.readPassword()
 
     def botAllowed(self):
-        """
-        Checks whether the bot is listed on a specific page to comply with
+        """Check whether the bot is listed on a specific page to comply with
         the policy on the respective wiki.
+        
         """
         return True # DEBUG
-        if botList.has_key(self.site.family.name) and botList[self.site.family.name].has_key(self.site.code):
+        if botList.has_key(self.site.family.name)\
+                and botList[self.site.family.name].has_key(self.site.code):
             botListPageTitle = botList[self.site.family.name][self.site.code]
             botListPage = pywikibot.Page(self.site, botListPageTitle)
             for linkedPage in botListPage.linkedPages():
@@ -117,15 +121,15 @@ usernames['%s']['%s'] = 'myUsername'"""
             # No bot policies on other 
             return True
 
-    def getCookie(self, remember=True, captchaId = None, captchaAnswer = None):
-        """
-        Login to the site.
+    def getCookie(self, remember=True, captchaId=None, captchaAnswer=None):
+        """Login to the site.
 
         remember    Remember login (default: True)
         captchaId   The id number of the captcha, if any
         captcha     The word displayed in the captcha, if any
 
         Returns cookie data if succesful, None otherwise.
+
         """
         predata = {
             "wpName": self.username.encode(self.site.encoding()),
@@ -144,12 +148,16 @@ usernames['%s']['%s'] = 'myUsername'"""
                 "User-agent": wikipedia.useragent
             }
             data = self.site.urlEncode(predata)
-            response = urllib2.urlopen(urllib2.Request(self.site.protocol() + '://' + self.site.hostname() + address, data, headers))
+            response = urllib2.urlopen(
+                           urllib2.Request(self.site.protocol()
+                                           + '://' + self.site.hostname()
+                                           + address, data, headers))
             data = response.read()
             wikipedia.cj.save(wikipedia.COOKIEFILE)
             return "Ok"
         else:
-            response, data = self.site.postForm(address, predata, useCookie=False)
+            response, data = self.site.postForm(address, predata,
+                                                useCookie=False)
             n = 0
             Reat=re.compile(': (.*?);')
             L = []
@@ -182,13 +190,14 @@ usernames['%s']['%s'] = 'myUsername'"""
                         raise CaptchaError(id)
                     url = self.site.protocol() + '://' + self.site.hostname() + self.site.captcha_image_address(id)
                     answer = wikipedia.ui.askForCaptcha(url)
-                    return self.getCookie(remember = remember, captchaId = id, captchaAnswer = answer)
+                    return self.getCookie(remember=remember, captchaId=id,
+                                          captchaAnswer=answer)
             else:
                 return None
 
     def storecookiedata(self, data):
         """
-        Stores cookie data.
+        Store cookie data.
 
         The argument data is the raw data, as returned by getCookie().
 
@@ -202,30 +211,32 @@ usernames['%s']['%s'] = 'myUsername'"""
         f.close()
 
     def readPassword(self):
-        """
-            Reads passwords from a file. DO NOT FORGET TO REMOVE READ 
-            ACCESS FOR OTHER USERS!!! Use chmod 600 password-file.
-            All lines below should be valid Python tuples in the form 
-            (code, family, username, password) or (username, password) 
-            to set a default password for an username. Default usernames
-            should occur above specific usernames.
+        """Read passwords from a file.
 
-            Example:
+        DO NOT FORGET TO REMOVE READ ACCESS FOR OTHER USERS!!! Use chmod 600
+        password-file. All lines below should be valid Python tuples in the
+        form (code, family, username, password) or (username, password) to
+        set a default password for an username. Default usernames should
+        occur above specific usernames.
 
-            ("my_username", "my_default_password")
-            ("my_sysop_user", "my_sysop_password")
-            ("en", "wikipedia", "my_en_user", "my_en_pass")
+        Example:
+
+        ("my_username", "my_default_password")
+        ("my_sysop_user", "my_sysop_password")
+        ("en", "wikipedia", "my_en_user", "my_en_pass")
+
         """
         file = open(config.password_file)
         for line in file:
             if not line.strip(): continue
             entry = eval(line)
             if len(entry) == 2:
-                if entry[0] == self.username: self.password = entry[1]
+                if entry[0] == self.username:
+                    self.password = entry[1]
             elif len(entry) == 4:
                 if entry[0] == self.site.code and \
-                  entry[1] == self.site.family.name and \
-                  entry[2] == self.username:
+                        entry[1] == self.site.family.name and \
+                        entry[2] == self.username:
                     self.password = entry[3]
         file.close()
 
@@ -233,18 +244,28 @@ usernames['%s']['%s'] = 'myUsername'"""
         if not self.password:
             # As we don't want the password to appear on the screen, we set
             # password = True
-            self.password = pywikibot.input(u'Password for user %s on %s:' % (self.username, self.site), password = True)
+            self.password = pywikibot.input(
+                                u'Password for user %(name)s on %(site)s:'
+                                 % {'name': self.username, 'site': self.site},
+                                password = True)
 
 #        self.password = self.password.encode(self.site.encoding())
 
-        logger.info(u"Logging in to %s as %s" % (self.site, self.username))
+        logger.info(u"Logging in to %(site)s as %(name)s"
+                     % {'name': self.username, 'site': self.site})
         cookiedata = self.getCookie()
         if cookiedata:
             self.storecookiedata(cookiedata)
             logger.info(u"Should be logged in now")
             # Show a warning according to the local bot policy
             if not self.botAllowed():
-                logger.error(u'*** Your username is not listed on [[%s]].\n*** Please make sure you are allowed to use the robot before actually using it!' % botList[self.site.family.name][self.site.code])
+                logger.error(
+                    u"Username '%(name)s' is not listed on [[%(page)s]]."
+                     % {'name': self.username,
+                        'page': botList[self.site.family.name][self.site.code]})
+                logger.error(
+"Please make sure you are allowed to use the robot before actually using it!")
+                return False
             return True
         else:
             logger.error(u"Login failed. Wrong password or CAPTCHA answer?")
@@ -265,7 +286,8 @@ def main():
     for arg in wikipedia.handleArgs():
         if arg.startswith("-pass"):
             if len(arg) == 5:
-                password = pywikibot.input(u'Password for all accounts:', password = True)
+                password = pywikibot.input(u'Password for all accounts:',
+                                           password = True)
             else:
                 password = arg[6:]
         elif arg == "-sysop":
@@ -286,12 +308,12 @@ def main():
             for lang in namedict[familyName].iterkeys():
                 site = pywikibot.getSite(code=lang, fam=familyName)
                 if not forceLogin and site.loggedInAs(sysop = sysop) != None:
-                    logger.info(u'Already logged in on %s' % site)
+                    logger.info(u'Already logged in on %(site)s' % locals())
                 else:
-                    loginMan = LoginManager(password, sysop = sysop, site = site)
+                    loginMan = LoginManager(password, sysop=sysop, site=site)
                     loginMan.login()
     else:
-        loginMan = LoginManager(password, sysop = sysop)
+        loginMan = LoginManager(password, sysop=sysop)
         loginMan.login()
 
 if __name__ == "__main__":

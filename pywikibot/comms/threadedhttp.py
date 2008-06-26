@@ -38,7 +38,7 @@ try:
     import pkg_resources
 except ImportError:
     logger.critical(
-        "Error : You need the python module setuptools to use this module")
+        "Error: You need the python module setuptools to use this module")
     sys.exit(1)
 pkg_resources.require("httplib2")
 import httplib2
@@ -67,6 +67,8 @@ class ConnectionPool(object):
             for key in self.connections:
                 for connection in self.connections[key]:
                     connection.close()
+        except AttributeError:
+            pass   # this shows up when logger has been destroyed first
         finally:
             self.lock.release()
 

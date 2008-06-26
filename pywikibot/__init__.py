@@ -48,12 +48,12 @@ def Site(code=None, fam=None, user=None, interface=None):
     try:
         exec "from site import %s as __Site" % interface
     except ImportError:
-        raise ValueError("Invalid interface name '%s'" % interface)
+        raise ValueError("Invalid interface name '%(interface)s'" % locals())
     key = '%s:%s:%s' % (fam, code, user)
     if not _sites.has_key(key):
         _sites[key] = __Site(code=code, fam=fam, user=user)
-        logger.debug("Instantiating Site object '%s'"
-                      % _sites[key])
+        logger.debug("Instantiating Site object '%(site)s'"
+                      % {'site': _sites[key]})
     return _sites[key]
 
 getSite = Site # alias for backwards-compability
@@ -68,7 +68,7 @@ def output(text):
 
 def input(prompt, password=False):
     if isinstance(prompt, unicode):
-        prompt = prompt.encode(sys.stdout.encoding, "replace")
+        prompt = prompt.encode(sys.stdout.encoding, "xmlcharrefreplace")
     if password:
         import getpass
         return getpass.getpass(prompt)
@@ -104,6 +104,7 @@ def set_debug(layer):
 # Throttle and thread handling
 
 threadpool = []   # add page-putting threads to this list as they are created
+stopped = False
 
 def stopme():
     """Drop this process from the throttle log, after pending threads finish.
@@ -112,13 +113,16 @@ def stopme():
     at Python exit.
 
     """
+    global stopped
+    if stopped:
+        return
     logger = logging.getLogger("wiki")
     
     logger.debug("stopme() called")
-    threadcount = sum(1 for thd in threadpool if thd.isAlive())
-    if threadcount:
-        logger.info("Waiting for approximately %s threads to finish."
-                     % threadcount)
+    count = sum(1 for thd in threadpool if thd.isAlive())
+    if count:
+        logger.info("Waiting for about %(count)s pages to be saved."
+                     % locals())
         for thd in threadpool:
             if thd.isAlive():
                 thd.join()
@@ -126,6 +130,7 @@ def stopme():
     try:
         _sites[_sites.keys()[0]].throttle.drop()
         logger.info("Dropped throttle(s).")
+        stopped = True
     except IndexError:
         pass
 
