@@ -47,8 +47,6 @@ class Family(family.Family):
         # Override defaults
         self.namespaces[2]['cs'] = u'Wikipedista'
         self.namespaces[3]['cs'] = u'Wikipedista diskuse'
-        self.namespaces[2]['hu'] = u'Szerkesztő'
-        self.namespaces[3]['hu'] = u'Szerkesztővita'
         self.namespaces[2]['pl'] = u'Wikipedysta'
         self.namespaces[3]['pl'] = u'Dyskusja wikipedysty'
 
@@ -144,6 +142,7 @@ class Family(family.Family):
             'als': u'Wikipedia Diskussion',
             'an': u'Descusión Wikipedia',
             'ar': u'نقاش ويكيبيديا',
+            'as': u'Wikipedia वार्ता',
             'ast': u'Uiquipedia alderique',
             'av': u'Обсуждение Wikipedia',
             'ay': u'Wikipedia Discusión',
@@ -350,6 +349,7 @@ class Family(family.Family):
             'scn': u'Purtali',
             'si': u'Portal',
             'sk': u'Portál',
+            'sl': u'Portal',
             'sq': u'Portal',
             'sr': u'Портал',
             'su': u'Portal',
@@ -418,6 +418,7 @@ class Family(family.Family):
             'scn': u'Discussioni purtali',
             'si': u'Portal talk',
             'sk': u'Diskusia k portálu',
+            'sl': u'Pogovor o portalu',
             'sq': u'Portal diskutim',
             'sr': u'Разговор о порталу',
             'su': u'Obrolan portal',
@@ -513,6 +514,8 @@ class Family(family.Family):
         }
 
         self.disambiguationTemplates = {
+            # set value to None, instead of a list, to retrieve names from
+            # the live wiki ([[MediaWiki:Disambiguationspage]]
             '_default': [u'Disambig'],
             'af':  [u'Dubbelsinnig', u'Disambig'],
             'als': [u'Begriffsklärung', u'Disambig'],
@@ -536,12 +539,7 @@ class Family(family.Family):
             'da':  [u'Flertydig'],
             'de':  [u'Begriffsklärung', u'BKS', u'Disambig'],
             'el':  [u'Disambig', u'Αποσαφ', u'Αποσαφήνιση'],
-            'en':  [u'Disambig', u'Disambiguation', u'2CC', u'2LC',
-                    u'2LCdisambig', u'3CC', u'3LC', u'4CC', u'4LC', u'4LA',
-                    u'5CC', u'TLAdisambig', u'Hndis', u'Numberdis',
-                    u'Roadis', u'Roaddis', u'Geodis', u'TLA', u'Surname',
-                    u'Dab', u'Disambig-cleanup', u'Disamb', u'letter disambig',
-                    u'Schooldis', u'Shipindex', u'Songdis', u'4cc', u'3cc'],
+            'en':  None,
             'eo':  [u'Apartigilo', u'Disambig'],
             'es':  [u'Desambiguacion', u'Desambiguación', u'Desambig', u'Disambig',u'Des'],
             'et':  [u'Täpsustuslehekülg', u'Täpsustus', u'Disambig'],
@@ -569,14 +567,14 @@ class Family(family.Family):
             'hr':  [u'Disambig', u'Razdvojba'],
             'hsb': [u'Wjacezmyslnosć', u'Disambig'],
             'ht':  [u'Menm non', u'Disambig'],
-            'hu':  [u'Egyert', u'Disambig', u'Egyért'],
+            'hu':  [u'Egyert', u'Disambig', u'Egyért', u'Egyért-redir'],
             'hy':  [u'Երկիմաստ', u'Disambig'],
             'ia':  [u'Disambiguation', u'Disambig'],
-            'id':  [u'Disingkat',u'Disambig', u'Disambig nama', u'disambig tempat', u'Disingkat'],
+            'id':  [u'Disingkat',u'Disambig', u'Disambig nama', u'Disambig tempat', u'Disambig-bandara', u'Disambiguasi', u'Disambig suku'],
             'io':  [u'Homonimo', u'Disambig'],
             'is':  [u'Aðgreining', u'Disambig'],
             'it':  [u'Disambigua', u'Sigla2', u'Sigla3', u'Sigla4', u'Cogni'],
-            'ja':  [u'Aimai', u'Disambig'],
+            'ja':  [u'Aimai', u'Dab', u'曖昧さ回避', u'Disambig'],
             'ka':  [u'მრავალმნიშვნელოვანი', u'მრავმნიშ'],
             'kab': [u'Asefham'],
             'kg':  [u'Bisongidila'],
@@ -585,7 +583,7 @@ class Family(family.Family):
             'ku':  [u'Cudakirin'],
             'kw':  [u'Klerheans'],
             'ksh': [u'Disambig',  u'disambig'],
-            'la':  [u'Discretiva'],
+            'la':  [u'Discretiva', u'Disnomen'],
             'lb':  [u'Homonymie', u'Disambig'],
             'li':  [u'Verdudeliking', u'Verdudelikingpazjena', u'Vp'],
             'lmo': [u'Desambiguació'],
@@ -640,7 +638,7 @@ class Family(family.Family):
             'vo':  [u'Telplänov'],
             'wa':  [u'Omonimeye', u'Disambig'],
             'yi':  [u'באדייטען'],
-            'zea': [u'db'],
+            'zea': [u'dp', u'Deurverwiespagina'],
             'zh':  [u'Disambig', u'消歧义', u'消歧义页', u'消歧義'],
             'zh-classical':  [u'Disambig', u'釋義', u'消歧義', u''],
             'zh-min-nan': [u'Khu-pia̍t-ia̍h', 'KhPI', u'Disambig'],
@@ -668,13 +666,14 @@ class Family(family.Family):
             'et':  u'Täpsustusleheküljed',
             'eu':  u'Argipen orriak',
             'fa':  u'صفحات ابهام‌زدایی',
-            'fi':  u'Täsmennyssivu',
+            'fi':  u'Täsmennyssivut',
             'fo':  u'Fleiri týdningar',
             'fr':  u'Homonymie',
             'fy':  u'Trochferwiisside',
             'ga':  u'Idirdhealáin',
             'gl':  u'Homónimos',
             'he':  u'פירושונים',
+            'hu':  u'Egyértelműsítő lapok',
             'ia':  u'Disambiguation',
             'id':  u'Disambiguasi',
             'io':  u'Homonimi',
@@ -716,6 +715,7 @@ class Family(family.Family):
             'vi':  u'Trang định hướng',
             'vo':  u'Telplänovapads',
             'wa':  u'Omonimeye',
+            'zea': u'Wikipedia:Deurverwiespagina',
             'zh':  u'消歧义',
             'zh-min-nan': u'Khu-pia̍t-ia̍h',
             }
@@ -838,6 +838,78 @@ class Family(family.Family):
                     'id', 'lv', 'sw', 'tt', 'uk', 'vo', 'ga', 'na', 'es',
                     'nl', 'da', 'dk', 'sv', 'test']
 
+        self.crossnamespace[0] = {
+            '_default': {
+                'pt': [102], 
+                'als': [104], 
+                'es': [104], 
+                'fr': [104], 
+                'lt': [104]
+            }
+        }
+        self.crossnamespace[1] = {
+            '_default': {
+                'pt': [103],
+                'als': [105], 
+                'es': [105],
+                'fr': [105],
+                'lt': [105]
+            }
+        }
+        self.crossnamespace[102] = {
+            'pt': {
+                '_default': [0],
+                'als': [0, 104], 
+                'es': [0, 104], 
+                'fr': [0, 104], 
+                'lt': [0, 104]
+            }
+        }
+        self.crossnamespace[103] = {
+            'pt': {
+                '_default': [1],
+                'als': [1, 105],
+                'es': [1, 105],
+                'fr': [1, 105],
+                'lt': [1, 105]
+            }
+        }
+        self.crossnamespace[104] = {
+            'als': {
+                '_default': [0],
+                'pt': [0, 102]
+            },
+            'es': { 
+                '_default': [0],
+                'pt': [0, 102]
+            },
+            'fr': {
+                '_default': [0],
+                'pt': [0, 102]
+            },
+            'lt': { 
+                '_default': [0],
+                'pt': [0, 102]
+            }
+        }
+        self.crossnamespace[105] = {
+            'als': {
+                '_default': [1],
+                'pt': [0, 103]
+            },
+            'es': {
+                '_default': [1],
+                'pt': [0, 103]
+            },
+            'fr': {
+                '_default': [1],
+                'pt': [0, 103]
+            },
+            'lt': {
+                '_default': [1],
+                'pt': [0, 103]
+            }
+        }
     def get_known_families(self, site):
         # In Swedish Wikipedia 's:' is part of page title not a family
         # prefix for 'wikisource'.

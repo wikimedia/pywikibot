@@ -94,7 +94,7 @@ class Family(family.Family):
             'he': u'שיחת ויקיטקסט',
             'hr': u'Razgovor o Wikizvoru',
             'ht': u'Diskisyon Wikisòrs',
-            'hu': u'Wikiforrás vita',
+            'hu': u'Wikiforrás-vita',
             'hy': u'Վիքիդարանի քննարկում',
             'id': u'Pembicaraan Wikisource',
             'is': u'Wikiheimildspjall',
@@ -218,6 +218,7 @@ class Family(family.Family):
             'he': u'ביאור',
             'hy': u'Ինդեքս',
             'it': u'Portale',
+            'la': u'Liber',
             'pt': u'Página',
             'sv': u'Författare',
         }
@@ -227,6 +228,7 @@ class Family(family.Family):
             'he': u'שיחת ביאור',
             'hy': u'Ինդեքսի քննարկում',
             'it': u'Discussioni portale',
+            'la': u'Disputatio Libri',
             'pt': u'Página Discussão',
             'sv': u'Författardiskussion',
         }

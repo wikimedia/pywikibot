@@ -26,8 +26,8 @@ class Family(family.Family):
             'nah', 'eu', 'gd', 'lv', 'pa', 'zu', 'nn', 'ps', 'mi', 'so',
             'tg', 'dv', 'bn', 'ka', 'mg', 'ha', 'kw', 'ss', 'na', 'sa',
             'gv', 'ay', 'tpi', 'ne', 'jbo', 'jv', 'gn', 'uz', 'tn', 'mt',
-            'sh', 'lb', 'ks', 'tk', 'sg', 'fj', 'als', 'ik', 'si', 'ln',
-            'sm', 'za', 'roa-rup', 'yo', 'dz', 'my', 'wa', 'sc',
+            'iu', 'sh', 'lb', 'ks', 'tk', 'sg', 'fj', 'als', 'ik', 'si',
+            'ln', 'sm', 'za', 'roa-rup', 'dz', 'my', 'wa',
         ]
 
         for lang in self.languages_by_size:
@@ -50,6 +50,7 @@ class Family(family.Family):
             'ca': u'Viccionari',
             'cs': u'Wikislovník',
             'cy': u'Wiciadur',
+            'el': u'Βικιλεξικό',
             'eo': u'Vikivortaro',
             'es': u'Wikcionario',
             'et': u'Vikisõnaraamat',
@@ -117,7 +118,7 @@ class Family(family.Family):
             'cy': u'Sgwrs Wiciadur',
             'da': u'Wiktionary-diskussion',
             'de': u'Wiktionary Diskussion',
-            'el': u'Wiktionary συζήτηση',
+            'el': u'Συζήτηση βικιλεξικού',
             'eo': u'Vikivortaro diskuto',
             'es': u'Wikcionario Discusión',
             'et': u'Vikisõnaraamat arutelu',
@@ -135,7 +136,7 @@ class Family(family.Family):
             'hi': u'विक्षनरी वार्ता',
             'hr': u'Razgovor Wječnik',
             'hsb': u'Wiktionary diskusija',
-            'hu': u'Wikiszótár vita',
+            'hu': u'Wikiszótár-vita',
             'hy': u'Վիքիբառարանի քննարկում',
             'ia': u'Discussion Wiktionary',
             'id': u'Pembicaraan Wiktionary',
@@ -206,9 +207,11 @@ class Family(family.Family):
             'bg': u'Словоформи',
             'bs': u'Portal',
             'cy': u'Atodiad',
+            'el': u'Παράρτημα',
             'en': u'Appendix',
             'fi': u'Liite',
             'fr': u'Annexe',
+            'ga': u'Aguisín',
             'he': u'נספח',
             'it': u'Appendice',
             'ko': u'부록',
@@ -226,9 +229,11 @@ class Family(family.Family):
             'bg': u'Словоформи беседа',
             'bs': u'Razgovor o Portalu',
             'cy': u'Sgwrs Atodiad',
+            'el': u'Συζήτηση παραρτήματος',
             'en': u'Appendix talk',
             'fi': u'Keskustelu liitteestä',
             'fr': u'Discussion Annexe',
+            'ga': u'Plé aguisín',
             'he': u'שיחת נספח',
             'it': u'Discussioni appendice',
             'ko': u'부록 토론',
@@ -361,7 +366,8 @@ class Family(family.Family):
             'ch': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Chamorro_Wiktionary
             'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wiktionary
             'dk': 'da',
-            'iu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Inuktitut_Wiktionary	
+             # Now *RESTORED*. Don't de-comment these two lines, thanks.
+             #'iu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Inuktitut_Wiktionary	
             'jp': 'ja',
             'mh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wiktionary
             'mo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary
@@ -372,12 +378,14 @@ class Family(family.Family):
             'pi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Pali_Bhasa_Wiktionary
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rhaetian_Wiktionary
             'rn': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kirundi_Wiktionary
+            'sc': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Sardinian_Wiktionary
             'sn': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Shona_Wiktionary
             'to': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tongan_Wiktionary
             'tlh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Klingon_Wiktionary
             'tw': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Twi_Wiktionary
             'tokipona': None,
-            'xh': None,# http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Xhosa_Wiktionary
+            'xh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Xhosa_Wiktionary
+            'yo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wiktionary
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }

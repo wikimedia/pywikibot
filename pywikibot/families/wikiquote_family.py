@@ -51,6 +51,7 @@ class Family(family.Family):
             'is': u'Wikivitnun',
             'ka': [u'ვიკიციტატა', u'Wikiquote'],
             'kk': u'Уикидәйек',
+            'ko': u'위키인용집',
             'la': u'Vicicitatio',
             'ml': u'വിക്കി ചൊല്ലുകള്‍',
             'pl': u'Wikicytaty',
@@ -93,7 +94,7 @@ class Family(family.Family):
             'he': u'שיחת ויקיציטוט',
             'hi': u'Wikiquote वार्ता',
             'hr': u'Razgovor Wikicitat',
-            'hu': u'Wikidézet vita',
+            'hu': u'Wikidézet-vita',
             'hy': u'Վիքիքաղվածքի քննարկում',
             'id': u'Pembicaraan Wikiquote',
             'is': u'Wikivitnunspjall',
@@ -102,7 +103,7 @@ class Family(family.Family):
             'ka': [u'ვიკიციტატა განხილვა', u'Wikiquote განხილვა'],
             'kk': u'Уикидәйек талқылауы',
             'kn': u'Wikiquote ಚರ್ಚೆ',
-            'ko': u'Wikiquote토론',
+            'ko': u'위키인용집토론',
             'ku': u'Wikiquote nîqaş',
             'la': u'Disputatio Vicicitationis',
             'lb': u'Wikiquote Diskussioun',
@@ -231,17 +232,22 @@ class Family(family.Family):
             'bm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikiquote
             'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wikiquote
             'dk': 'da',
+            'ga': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikiquote
             'jp': 'ja',
+            'kr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikiquote
             'ks': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikiquote
             'kw': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kernewek_Wikiquote
             'minnan':'zh-min-nan',
             'na': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nauruan_Wikiquote
             'nb': 'no',
+            'nds': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Low_Saxon_Wikiquote
+            'qu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikiquote
             'tk': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Turkmen_Wikiquote
             'tokipona': None,
             'tt': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tatar_Wikiquote
             'ug': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oyghurque_Wikiquote
             'vo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Volapuk_Wikiquote
+            'za':None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zhuang_Wikiquote
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }

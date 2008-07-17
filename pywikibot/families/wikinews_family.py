@@ -22,8 +22,11 @@ class Family(family.Family):
             self.langs[lang] = '%s.wikinews.org' % lang
 
         # Override defaults
+        self.namespaces[2]['cs'] = u'Redaktor'
         self.namespaces[2]['pl'] = u'Wikireporter'
+        self.namespaces[3]['cs'] = u'Redaktor diskuse'
         self.namespaces[3]['pl'] = u'Dyskusja Wikireportera'
+
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -62,7 +65,7 @@ class Family(family.Family):
             'fi': u'Keskustelu Wikiuutisista',
             'fr': u'Discussion Wikinews',
             'he': u'שיחת ויקיחדשות',
-            'hu': u'Wikihírek vita',
+            'hu': u'Wikihírek-vita',
             'it': u'Discussioni Wikinotizie',
             'ja': u'ウィキニュース‐ノート',
             'nl': u'Overleg Wikinews',

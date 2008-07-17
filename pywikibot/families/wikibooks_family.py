@@ -111,7 +111,7 @@ class Family(family.Family):
             'he': u'שיחת ויקיספר',
             'hi': u'Wikibooks वार्ता',
             'hr': u'Razgovor Wikiknjige',
-            'hu': u'Wikikönyvek vita',
+            'hu': u'Wikikönyvek-vita',
             'hy': u'Վիքիգրքերի քննարկում',
             'ia': u'Discussion Wikibooks',
             'id': u'Pembicaraan Wikibooks',
