@@ -7,7 +7,7 @@
 #
 __version__ = '$Id: $'
 
-
+import sys
 import threading
 import time
 import Queue
@@ -123,7 +123,50 @@ def itergroup(iterable, size):
     if group:
         yield group
 
-            
+
+class ThreadList(list):
+    """A simple threadpool class to limit the number of simultaneous threads.
+
+    Any threading.Thread object can be added to the pool using the append()
+    method.  If the maximum number of simultaneous threads has not been reached,
+    the Thread object will be started immediately; if not, the append() call
+    will block until the thread is able to start.
+
+    >>> pool = ThreadList(limit=10)
+    >>> def work():
+    ...     time.sleep(1)
+    ...
+    >>> for x in xrange(20):
+    ...     pool.append(threading.Thread(target=work))
+    ...
+    
+    """
+    def __init__(self, limit=sys.maxint, *args):
+        self.limit = limit
+        list.__init__(self, *args)
+        for item in list(self):
+            if not isinstance(threading.Thread, item):
+                raise TypeError("Cannot add '%s' to ThreadList" % type(item))
+
+    def active_count(self):
+        """Return the number of alive threads, and delete all non-alive ones."""
+        count = 0
+        for item in list(self):
+            if item.isAlive():
+                count += 1
+            else:
+                self.remove(item)
+        return count
+
+    def append(self, thd):
+        if not isinstance(thd, threading.Thread):
+            raise TypeError("Cannot append '%s' to ThreadList" % type(thd))
+        while self.active_count() >= self.limit:
+            time.sleep(2)
+        list.append(self, thd)
+        thd.start()
+
+
 if __name__ == "__main__":
     def _test():
         import doctest
