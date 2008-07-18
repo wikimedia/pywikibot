@@ -457,20 +457,37 @@ class Page(object):
     def isDisambig(self):
         """Return True if this is a disambiguation page, False otherwise.
 
-        Relies on the presence of specific templates, identified in the Family
-        file, to identify disambiguation pages.
+        Relies on the presence of specific templates, identified in
+        the Family file or on a wiki page, to identify disambiguation
+        pages.
+
+        By default, loads a list of template names from the Family file;
+        if the value in the Family file is None, looks for the list on
+        [[MediaWiki:Disambiguationspage]].
 
         """
-        if not hasattr(self, '_isDisambig'):
-            locdis = self.site().family.disambig(self.site().code)
-            for template in self.templates():
-                tn = template.title(withNamespace=False)
-                if tn in locdis:
-                    _isDisambig = True
+        if not hasattr(self, "_isDisambig"):
+            if not hasattr(self.site(), "_disambigtemplates"):
+                self.site()._disambigtemplates = \
+                                self.site().family.disambig(self.site().code)
+                if self.site()._disambigtemplates is None:
+                    try:
+                        disambigpages = Page(self.site(),
+                                             "MediaWiki:Disambiguationspage")
+                        self.site()._disambigtemplates = [
+                            link.title(withNamespace=False)
+                              for link in disambigpages.linkedPages()
+                              if link.namespace() == 10
+                        ]
+                    except NoPage:
+                        self.site()._disambigtemplates = ['Disambig']
+            for t in self.templates():
+                if t.title(withNamespace=False) in self.site()._disambigtemplates:
+                    self._isDisambig = True
                     break
             else:
-                _isDisambig = False
-        return _isDisambig
+                self._isDisambig = False
+        return self._isDisambig
 
     def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
                       onlyTemplateInclusion=False, redirectsOnly=False,
