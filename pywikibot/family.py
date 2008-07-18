@@ -1992,6 +1992,8 @@ class Family:
             },
         }
 
+        self.crossnamespace = {}
+
         # letters that can follow a wikilink and are regarded as part of this link
         # This depends on the linktrail setting in LanguageXx.php and on
         # [[MediaWiki:Linktrail]].
