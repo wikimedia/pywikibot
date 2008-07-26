@@ -183,12 +183,13 @@ class Request(DictMixin):
                 else:
                     uri = uri + "?" + params
                     rawdata = http.request(self.site, uri)
-            rawdata = rawdata.decode(self.site.encoding())
             except Exception, e: #TODO: what exceptions can occur here?
                 logger.warning(traceback.format_exc())
                 print uri, params
                 self.wait()
                 continue
+            if not isinstance(rawdata, unicode):
+                rawdata = rawdata.decode(self.site.encoding)
             if rawdata.startswith(u"unknown_action"):
                 raise APIError(rawdata[:14], rawdata[16:])
             try:
