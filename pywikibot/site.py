@@ -743,14 +743,23 @@ class APISite(BaseSite):
                                self.page_embeddedin(page, filterRedirects)
                               )
 
-    def pagelinks(self, page, namespaces=None):
-        """Iterate internal wikilinks contained (or transcluded) on page."""
+    def pagelinks(self, page, namespaces=None, follow_redirects=False):
+        """Iterate internal wikilinks contained (or transcluded) on page.
+
+        @param namespaces: Only iterate pages in these namespaces (default: all)
+        @type namespaces: list of ints
+        @param follow_redirects: if True, yields the target of any redirects,
+            rather than the redirect page
+
+        """
         plgen = api.PageGenerator("links", site=self)
         if hasattr(page, "_pageid"):
             plgen.request['pageids'] = str(page._pageid)
         else:
             pltitle = page.title(withSection=False).encode(self.encoding())
             plgen.request['titles'] = pltitle
+        if follow_redirects:
+            plgen.request['redirects'] = ''
         if namespaces is not None:
             plgen.request["gplnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
@@ -758,6 +767,7 @@ class APISite(BaseSite):
 
     def pagecategories(self, page, withSortKey=False):
         """Iterate categories to which page belongs."""
+        
         # Sortkey doesn't work with generator; FIXME or deprecate
         clgen = api.CategoryPageGenerator("categories", site=self)
         if hasattr(page, "_pageid"):
@@ -1704,8 +1714,8 @@ redirects on %(site)s wiki""",
             if not recreate:
                 raise Error("Page %s does not exist on %s wiki."
                             % (page.title(withSection=False), self))
-        self.lock_page(page)
         token = self.token(page, "edit")
+        self.lock_page(page)
         if lastrev is not None and page.latestRevision() != lastrev:
             raise Error("editpage: Edit conflict detected; saving aborted.")
         req = api.Request(site=self, action="edit",
@@ -1852,8 +1862,8 @@ redirects on %(site)s wiki""",
         if not page.exists():
             raise Error("Cannot move page %s because it does not exist on %s."
                         % (oldtitle, self))
-        self.lock_page(page)
         token = self.token(page, "move")
+        self.lock_page(page)
         req = api.Request(site=self, action="move", to=newtitle,
                           token=token, reason=summary)
         req['from'] = oldtitle  # "from" is a python keyword
@@ -1865,7 +1875,6 @@ redirects on %(site)s wiki""",
             result = req.submit()
             logger.debug("movepage response: %s" % result)
         except api.APIError, err:
-            self.unlock_page(page)
             if err.code.endswith("anon") and self.logged_in():
                 logger.debug(
 "movepage: received '%s' even though bot is logged in" % err.code)
@@ -1882,7 +1891,8 @@ redirects on %(site)s wiki""",
             logger.debug("movepage: Unexpected error code '%s' received."
                           % err.code)
             raise
-        self.unlock_page(page)
+        finally:
+            self.unlock_page(page)
         if "move" not in result:
             logger.error("movepage: %s" % result)
             raise Error("movepage: unexpected response")
@@ -1892,11 +1902,122 @@ redirects on %(site)s wiki""",
                             % (page.toggleTalkPage().title(asLink=True)))
         return pywikibot.Page(page, newtitle)
 
-        
+    # catalog of rollback errors for use in error messages
+    _rb_errors = {
+        "noapiwrite":
+            "API editing not enabled on %(site)s wiki",
+        "writeapidenied":
+            "User %(user)s not allowed to edit through the API",
+        "alreadyrolled":
+            "Page [[%(title)s]] already rolled back; action aborted.",
+    } # other errors shouldn't arise because we check for those errors
+
+    def rollbackpage(self, page, summary=u''):
+        """Roll back page to version before last user's edits.
+
+        As a precaution against errors, this method will fail unless
+        the page history contains at least two revisions, and at least
+        one that is not by the same user who made the last edit.
+
+        @param page: the Page to be rolled back (must exist)
+        @param summary: edit summary (defaults to a standardized message)
+
+        """
+        if len(page._revisions) < 2:
+            raise pywikibot.Error(
+                  u"Rollback of %s aborted; load revision history first."
+                    % page.title(asLink=True))
+        last_rev = page._revisions[page.latestRevision()]
+        last_user = last_rev.user
+        for rev in sorted(page._revisions.keys(), reverse=True):
+            # start with most recent revision first
+            if rev.user != last_user:
+                prev_user = rev.user
+                break
+        else:
+            raise pywikibot.Error(
+                  u"Rollback of %s aborted; only one user in revision history."
+                   % page.title(asLink=True))
+        summary = summary or (
+u"Reverted edits by [[Special:Contributions/%(last_user)s|%(last_user)s]] "
+u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
+                  % locals())
+        token = self.token(page, "rollback")
+        self.lock_page(page)
+        req = api.Request(site=self, action="rollback",
+                          title=page.title(withSection=False),
+                          user=last_user,
+                          token=token)
+        try:
+            result = req.submit()
+        except api.APIError, err:
+            errdata = {
+                'site': self,
+                'title': page.title(withSection=False),
+                'user': self.user(),
+            }
+            if err.code in self._rb_errors:
+                raise Error(self._rb_errors[err.code] % errdata)
+            logger.debug("rollback: Unexpected error code '%s' received."
+                          % err.code)
+            raise
+        finally:
+            self.unlock_page(page)
+
+    # catalog of delete errors for use in error messages
+    _dl_errors = {
+        "noapiwrite":
+            "API editing not enabled on %(site)s wiki",
+        "writeapidenied":
+            "User %(user)s not allowed to edit through the API",
+        "permissiondenied":
+            "User %(user)s not authorized to delete pages on %(site)s wiki.",
+        "cantdelete":
+            "Could not delete [[%(title)s]]. Maybe it was deleted already.",
+    } # other errors shouldn't occur because of pre-submission checks
+
+    def deletepage(self, page, summary):
+        """Delete page from the wiki. Requires appropriate privilege level.
+
+        @param page: Page to be deleted.
+        @param summary: Edit summary (required!).
+
+        """
+        try:
+            self.login(sysop=True)
+        except pywikibot.Error, e:
+            raise Error("delete: Unable to login as sysop (%s)"
+                        % e.__class__.__name__)
+        if not self.logged_in(sysop=True):
+            raise Error("delete: Unable to login as sysop")
+        token = self.token("delete")
+        req = api.Request(site=self, action="delete", token=token,
+                          title=page.title(withSection=False),
+                          reason=summary)
+        try:
+            result = req.submit()
+        except api.APIError, err:
+            errdata = {
+                'site': self,
+                'title': page.title(withSection=False),
+                'user': self.user(),
+            }
+            if err.code in self._dl_errors:
+                raise Error(self._dl_errors[err.code] % errdata)
+            logger.debug("delete: Unexpected error code '%s' received."
+                          % err.code)
+            raise
+        finally:
+            self.unlock_page(page)
+
+    # TODO: implement undelete
+
+    
+
 #### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
 class NotImplementedYet:
 
-    def isBlocked(self, sysop = False):
+    def isBlocked(self, sysop=False):
         """Check if the user is blocked."""
         try:
             text = self.getUrl(u'%saction=query&meta=userinfo&uiprop=blockinfo'

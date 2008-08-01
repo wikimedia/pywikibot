@@ -169,7 +169,8 @@ class Request(DictMixin):
             # TODO catch http errors
             action = self.params.get("action", "")
             write = action in (
-                        "edit", "move"
+                        "edit", "move", "rollback", "delete", "undelete",
+                        "protect", "block", "unblock"
                     )
             self.site.throttle(write=write)
             uri = self.site.scriptpath() + "/api.php"
