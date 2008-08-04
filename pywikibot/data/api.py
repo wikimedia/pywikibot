@@ -190,7 +190,7 @@ class Request(DictMixin):
                 self.wait()
                 continue
             if not isinstance(rawdata, unicode):
-                rawdata = rawdata.decode(self.site.encoding)
+                rawdata = rawdata.decode(self.site.encoding())
             if rawdata.startswith(u"unknown_action"):
                 raise APIError(rawdata[:14], rawdata[16:])
             try:
