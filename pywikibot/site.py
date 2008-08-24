@@ -1483,7 +1483,7 @@ class APISite(BaseSite):
                 if start < end:
                     raise Error(
                 "usercontribs: start must be later than end with reverse=False")
-        ucgen = ListGenerator("usercontribs", site=self,
+        ucgen = api.ListGenerator("usercontribs", site=self,
                               ucprop="ids|title|timestamp|comment|flags")
         if user:
             ucgen.request["ucuser"] = user
