@@ -525,7 +525,8 @@ class APISite(BaseSite):
         """Load page info from api and save in page attributes"""
         title = page.title(withSection=False)
         query = api.PropertyGenerator("info", site=self,
-                                      titles=title.encode(self.encoding()))
+                                      titles=title.encode(self.encoding()),
+                                      inprop="protection")
         for pageitem in query:
             if pageitem['title'] != title:
                 raise Error(
@@ -572,7 +573,7 @@ class APISite(BaseSite):
         if not hasattr(page, "_redir"):
             self.loadpageinfo(page)
         if not page._redir:
-            raise pywikibot.IsNotRedirectPage
+            raise pywikibot.IsNotRedirectPage(page.title())
         title = page.title(withSection=False)
         query = api.Request(site=self, action="query", property="info",
                             inprop="protection|talkid|subjectid",
@@ -730,13 +731,14 @@ class APISite(BaseSite):
                                                               or "nonredirects"
         return eigen
 
-    def pagereferences(self, page, followRedirects, filterRedirects,
-                       withTemplateInclusion, onlyTemplateInclusion):
+    def pagereferences(self, page, followRedirects=False, filterRedirects=None,
+                       withTemplateInclusion=True, onlyTemplateInclusion=False):
         """Convenience method combining pagebacklinks and page_embeddedin."""
+        #TODO Warn about deprecated arguments
         if onlyTemplateInclusion:
             return self.page_embeddedin(page)
         if not withTemplateInclusion:
-            return self.pagebacklinks(page, follow_redirects)
+            return self.pagebacklinks(page, followRedirects)
         import itertools
         return itertools.chain(self.pagebacklinks(
                                     page, followRedirects, filterRedirects),
