@@ -382,7 +382,7 @@ class Page(object):
         return self._revisions[self.latestRevision()].anon
 
     def editTime(self):
-        """Return timestamp (in MediaWiki format) of last revision to page."""
+        """Return timestamp (in ISO 8601 format) of last revision to page."""
         return self._revisions[self.latestRevision()].timestamp
 
     def previousRevision(self):
@@ -1374,7 +1374,7 @@ class Revision(object):
         @type revid: int
         @param text: Revision wikitext.
         @type text: unicode, or None if text not yet retrieved
-        @param timestamp: Revision time stamp (in MediaWiki text format)
+        @param timestamp: Revision time stamp (in ISO 8601 format)
         @type timestamp: unicode
         @param user: user who edited this revision
         @type user: unicode
