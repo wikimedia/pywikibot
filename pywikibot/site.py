@@ -544,7 +544,8 @@ class APISite(BaseSite):
         """Returns a dictionary reflecting page protections"""
         if not self.page_exists(page):
             raise NoPage(u'No page %s.' % page)
-        # page_exists called loadpageinfo which set protection levels
+        if not hasattr(page, "_protection"):
+            self.loadpageinfo(page)
         return page._protection
 
     def page_can_be_edited(self, page):
