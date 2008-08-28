@@ -37,7 +37,7 @@ class Family(family.Family):
             'cr', 've', 'ss', 'rw', 'xh', 'kl', 'ik', 'bug', 'dz', 'ts',
             'kv', 'bi', 'xal', 'st', 'tn', 'ch', 'ak', 'bxr', 'ny', 'ab',
             'fj', 'tw', 'lbe', 'za', 'ff', 'tum', 'ha', 'sn', 'sg', 'lg',
-            'ki', 'rn', 'chy', 'aa', 'ng', 'ext', 'gan', 'hif', 'kaa', 'mdf',
+            'ki', 'rn', 'chy', 'ng', 'ext', 'gan', 'hif', 'kaa', 'mdf',
             'myv', 'sah', 'srn', 'szl',
         ]
 
@@ -140,6 +140,7 @@ class Family(family.Family):
             'ab': u'Обсуждение Wikipedia',
             'af': u'Wikipediabespreking',
             'als': u'Wikipedia Diskussion',
+            'am': u'Wikipedia ውይይት',
             'an': u'Descusión Wikipedia',
             'ar': u'نقاش ويكيبيديا',
             'as': u'Wikipedia वार्ता',
@@ -240,7 +241,7 @@ class Family(family.Family):
             'mt': u'Wikipedija talk',
             'myv': u'Википедиясь talk',
             'mzn': u'بحث Wikipedia',
-            'nah': u'Wikipedia Discusión',
+            'nah': [u'Wikipedia tēixnāmiquiliztli', u'Wikipedia Discusión'],
             'nap': u'Discussioni Wikipedia',
             'nds': u'Wikipedia Diskuschoon',
             'nds-nl': u'Overleg Wikipedie',
@@ -303,6 +304,7 @@ class Family(family.Family):
             'als': u'Portal',
             'an': u'Portal',
             'ar': u'بوابة',
+            'be-x-old': u'Партал',
             'bg': u'Портал',
             'bpy': u'হমিলদুৱার',
             'ca': u'Portal',
@@ -340,6 +342,7 @@ class Family(family.Family):
             'nds': u'Portal',
             'new': u'दबू',
             'nl': u'Portaal',
+            'nn': u'Tema',
             'no': u'Portal',
             'oc': u'Portal',
             'pl': u'Portal',
@@ -372,6 +375,7 @@ class Family(family.Family):
             'als': u'Portal Diskussion',
             'an': u'Descusión Portal',
             'ar': u'نقاش البوابة',
+            'be-x-old': u'Абмеркаваньне парталу',
             'bg': u'Портал беседа',
             'bpy': u'হমিলদুৱার য়্যারী',
             'ca': u'Portal Discussió',
@@ -409,6 +413,7 @@ class Family(family.Family):
             'nds': u'Portal Diskuschoon',
             'new': u'दबू खँलाबँला',
             'nl': u'Overleg portaal',
+            'nn': u'Temadiskusjon',
             'no': u'Portaldiskusjon',
             'oc': u'Discussion Portal',
             'pl': u'Dyskusja portalu',
@@ -811,6 +816,7 @@ class Family(family.Family):
         }
 
         self.obsolete = {
+            'aa': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikipedia
             'cho': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Choctaw_Wikipedia
             'dk': 'da',
             'ho': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hiri_Motu_Wikipedia
@@ -842,18 +848,20 @@ class Family(family.Family):
             '_default': {
                 'pt': [102], 
                 'als': [104], 
+                'en': [12],
                 'es': [104], 
                 'fr': [104], 
-                'lt': [104]
+                'lt': [104],
             }
         }
         self.crossnamespace[1] = {
             '_default': {
                 'pt': [103],
                 'als': [105], 
+                'en': [13],
                 'es': [105],
                 'fr': [105],
-                'lt': [105]
+                'lt': [105],
             }
         }
         self.crossnamespace[102] = {
@@ -910,6 +918,16 @@ class Family(family.Family):
                 'pt': [0, 103]
             }
         }
+        self.crossnamespace[12] = {
+            'en': {
+                '_default': [0],
+            }
+        }
+        self.crossnamespace[13] = {
+            'en': {
+                '_default': [0],
+            }
+        }
     def get_known_families(self, site):
         # In Swedish Wikipedia 's:' is part of page title not a family
         # prefix for 'wikisource'.
@@ -921,7 +939,7 @@ class Family(family.Family):
             return self.known_families
 
     def version(self, code):
-        return '1.13alpha'
+        return '1.14alpha'
 
     def dbName(self, code):
         # returns the name of the MySQL database
