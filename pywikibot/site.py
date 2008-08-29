@@ -433,9 +433,11 @@ class APISite(BaseSite):
         return self._userinfo
 
     def getcurrenttimestamp(self):
-        """Returns a (Mediawiki) timestamp, {{CURRENTTIMESTAMP}},
-           the server time.
-           Format is yyyymmddhhmmss"""
+        """Return (Mediawiki) timestamp, {{CURRENTTIMESTAMP}}, the server time.
+
+        Format is yyyymmddhhmmss
+
+        """
         r = api.Request(site=self,
                         action="parse",
                         text="{{CURRENTTIMESTAMP}}")
@@ -1438,8 +1440,8 @@ class APISite(BaseSite):
             raise Error("search: searchstring cannot be empty")
         if where not in ("text", "titles"):
             raise Error("search: unrecognized 'where' value: %s" % where)
-        srgen = PageGenerator("search", gsrsearch=searchstring, gsrwhat=where,
-                              site=self)
+        srgen = api.PageGenerator("search", gsrsearch=searchstring,
+                                  gsrwhat=where, site=self)
         if not namespaces:
             logger.warning("search: namespaces cannot be empty; using [0].")
             namespaces = [0]
@@ -1509,7 +1511,7 @@ class APISite(BaseSite):
 
     def watchlist_revs(self, start=None, end=None, reverse=False,
                        namespaces=None, showMinor=None, showBot=None,
-                       showAnon=None):
+                       showAnon=None, limit=None):
         """Iterate revisions to pages on the bot user's watchlist.
 
         Iterated values will be in same format as recentchanges.
@@ -1526,7 +1528,8 @@ class APISite(BaseSite):
             None), only list non-bot edits
         @param showAnon: if True, only list anon edits; if False (and not
             None), only list non-anon edits
-        
+        @param limit: Maximum number of revisions to iterate
+
         """
         if start and end:
             if reverse:
