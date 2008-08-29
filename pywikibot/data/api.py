@@ -201,7 +201,7 @@ class Request(DictMixin):
                 logger.warning(
 "Non-JSON response received from server %s; the server may be down."
                               % self.site)
-                print rawdata
+                logger.debug(rawdata)
                 self.wait()
                 continue
             if not result:
