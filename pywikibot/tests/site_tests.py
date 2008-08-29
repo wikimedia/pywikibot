@@ -153,6 +153,109 @@ class TestSiteObject(unittest.TestCase):
             self.assertTrue(user.has_key("editcount"))
             self.assertTrue(user.has_key("registration"))
 
+    def testAllImages(self):
+        """Test the site.allimages() method"""
+
+        ai = list(mysite.allimages(limit=10))
+        self.assertTrue(len(ai) <= 10)
+        self.assertTrue(all(isinstance(image, pywikibot.ImagePage)
+                            for image in ai))
+
+    def testBlocks(self):
+        """Test the site.blocks() method"""
+
+        bl = list(mysite.blocks(limit=10))
+        self.assertTrue(len(bl) <= 10)
+        self.assertTrue(all(isinstance(block, dict)
+                            for block in bl))
+
+    def testExturlusage(self):
+        """Test the site.exturlusage() method"""
+
+        url = "www.google.com"
+        eu = list(mysite.exturlusage(url, limit=10))
+        self.assertTrue(len(eu) <= 10)
+        self.assertTrue(all(isinstance(link, pywikibot.Page)
+                            for link in eu))
+
+    def testImageusage(self):
+        """Test the site.imageusage() method"""
+
+        imagepage = pywikibot.ImagePage(pywikibot.Link("Image:Wiki.png", mysite))
+        iu = list(mysite.imageusage(imagepage, limit=10))
+        self.assertTrue(len(iu) <= 10)
+        self.assertTrue(all(isinstance(link, pywikibot.Page)
+                            for link in iu))
+
+    def testLogEvents(self):
+        """Test the site.logevents() method"""
+
+        le = list(mysite.logevents(limit=10))
+        self.assertTrue(len(le) <= 10)
+        self.assertTrue(all(isinstance(entry, dict) and entry.has_key("type")
+                            for entry in le))
+
+    def testRecentchanges(self):
+        """Test the site.recentchanges() method"""
+
+        rc = list(mysite.recentchanges(limit=10))
+        self.assertTrue(len(rc) <= 10)
+        self.assertTrue(all(isinstance(change, dict)
+                            for change in rc))
+
+    def testSearch(self):
+        """Test the site.search() method"""
+
+        se = list(mysite.search("wiki", limit=10))
+        self.assertTrue(len(se) <= 10)
+        self.assertTrue(all(isinstance(hit, pywikibot.Page)
+                            for hit in se))
+
+    def testUsercontribs(self):
+        """Test the site.usercontribs() method"""
+
+        uc = list(mysite.usercontribs(user=mysite.user(), limit=10))
+        self.assertTrue(len(uc) <= 10)
+        self.assertTrue(all(isinstance(contrib, dict)
+                            for contrib in uc))
+
+    def testWatchlistrevs(self):
+        """Test the site.watchlist_revs() method"""
+
+        wl = list(mysite.watchlist_revs(limit=10))
+        self.assertTrue(len(wl) <= 10)
+        self.assertTrue(all(isinstance(rev, dict)
+                            for rev in wl))
+
+    def testDeletedrevs(self):
+        """Test the site.deletedrevs() method"""
+
+        if not mysite.logged_in(True):
+            return
+        dr = list(mysite.deletedrevs(limit=10))
+        self.assertTrue(len(dr) <= 10)
+        self.assertTrue(all(isinstance(rev, dict)
+                            for rev in dr))
+        dr2 = list(mysite.deletedrevs(titles=mainpage.title(withSection=False),
+                                     limit=10))
+        self.assertTrue(len(dr2) <= 10)
+        self.assertTrue(all(isinstance(rev, dict)
+                            for rev in dr2))
+
+    def testUsers(self):
+        """Test the site.users() method"""
+
+        us = list(mysite.users([mysite.user()]))
+        self.assertEqual(len(us), 1)
+        self.assertTrue(isinstance(us[0], dict))
+
+    def testRandompages(self):
+        """Test the site.randompages() method"""
+        rn = list(mysite.randompages(limit=10))
+        self.assertTrue(len(rn) <= 10)
+        self.assertTrue(all(isinstance(a_page, pywikibot.Page)
+                            for a_page in rn))
+
 
 if __name__ == '__main__':
 #    pywikibot.logging.getLogger().setLevel(pywikibot.logging.DEBUG)
