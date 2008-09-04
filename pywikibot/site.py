@@ -351,6 +351,7 @@ class APISite(BaseSite):
             }
         self.sitelock = threading.Lock()
         self._msgcache = {}
+        self._username = ""
         return
 
 # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
@@ -419,7 +420,7 @@ class APISite(BaseSite):
 
         """
         if not hasattr(self, "_userinfo") or "rights" not in self._userinfo \
-                or self._userinfo['name'] != self.user():
+                or self._userinfo['name'] != self._username:
             uirequest = api.Request(
                                 site=self,
                                 action="query",
