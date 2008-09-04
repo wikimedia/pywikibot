@@ -282,12 +282,10 @@ class QueryGenerator(object):
         except KeyError:
             self.site = pywikibot.Site()
         # make sure request type is valid, and get limit key if any
-        if "generator" in kwargs:
-            self.module = kwargs["generator"]
-        elif "list" in kwargs:
-            self.module = kwargs["list"]
-        elif "prop" in kwargs:
-            self.module = kwargs["prop"]
+        for modtype in ("generator", "list", "prop", "meta"):
+            if modtype in kwargs:
+                self.module = kwargs[modtype]
+                break
         else:
             raise Error("%s: No query module name found in arguments."
                         % self.__class__.__name__)
