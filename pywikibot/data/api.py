@@ -55,6 +55,35 @@ class Request(DictMixin):
     the dict interface.  All attributes must be strings (or unicode).  Use
     an empty string for parameters that don't require a value (e.g.,
     "action=query&...&redirects").
+
+    This is the lowest-level interface to the API, and can be used for any
+    request that a particular site's API supports. See the API documentation
+    (http://www.mediawiki.org/wiki/API) and site-specific settings for
+    details on what parameters are accepted for each request type.
+
+    Returns a dict containing the JSON data returned by the wiki. Normally,
+    one of the dict keys will be equal to the value of the 'action'
+    parameter.  Errors are caught and raise an APIError exception.
+    
+    Example:
+
+    >>> r = Request(site=mysite, action="query", meta="userinfo")
+    >>> # This is equivalent to
+    >>> # http://{path}/api.php?action=query&meta=userinfo&format=json
+    >>> # change a parameter
+    >>> r['meta'] = "userinfo|siteinfo"
+    >>> # add a new parameter
+    >>> r['siprop'] = "namespaces"
+    >>> # note that "uiprop" param gets added automatically
+    >>> r.params
+    {'action': 'query', 'meta': 'userinfo|siteinfo', 'siprop': 'namespaces'}
+    >>> data = r.submit()
+    >>> type(data)
+    <type 'dict'>
+    >>> data.keys()
+    [u'query']
+    >>> data[u'query'].keys()
+    [u'userinfo', u'namespaces']
     
     @param site: The Site to which the request will be submitted. If not
            supplied, uses the user's configured default Site.
@@ -65,31 +94,6 @@ class Request(DictMixin):
            reached)
     @param format: (optional) Defaults to "json"
 
-    Example:
-
-    >>> r = Request(site=mysite, action="query", meta="userinfo")
-    >>> # This is equivalent to
-    >>> # http://{path}/api.php?action=query&meta=userinfo&format=json
-    >>> # r.data is undefined until request is submitted
-    >>> print r.data
-    Traceback (most recent call last):
-        ...
-    AttributeError: Request instance has no attribute 'data'
-    >>> # change a parameter
-    >>> r['meta'] = "userinfo|siteinfo"
-    >>> # add a new parameter
-    >>> r['siprop'] = "namespaces"
-    >>> # note that "uiprop" param gets added automatically
-    >>> r.params
-    {'maxlag': '5', 'format': 'json', 'meta': 'userinfo|siteinfo', 'action': 'query', 'siprop': 'namespaces', 'uiprop': 'blockinfo|hasmsg'}
-    >>> data = r.submit()
-    >>> type(data)
-    <type 'dict'>
-    >>> data.keys()
-    [u'query']
-    >>> data[u'query'].keys()
-    [u'userinfo', u'namespaces']
-    
     """
     def __init__(self, **kwargs):
         try:
@@ -251,7 +255,6 @@ class Request(DictMixin):
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
 
-#TODO - refactor all these generator classes into a parent/subclass hierarchy
 
 class QueryGenerator(object):
     """Base class for iterators that handle responses to API action=query.
@@ -262,6 +265,11 @@ class QueryGenerator(object):
     limit attribute is set to a positive int, the iterator will stop after
     iterating that many values. If limit is negative, the limit parameter
     will not be passed to the API at all.
+
+    Most common query types are more efficiently handled by subclasses, but
+    this class can be used directly for custom queries and miscellaneous
+    types (such as "meta=...") that don't return the usual list of pages or
+    links. See the API documentation for specific query options.
 
     """
     def __init__(self, **kwargs):
@@ -370,8 +378,6 @@ class QueryGenerator(object):
                          % (self.__class__.__name__, pagedata.keys(),
                             self.limit))
                 pagedata = pagedata.values()
-                    # for generators, this yields the pages in order of
-                    # their pageids, not their titles.... FIXME?
             else:
                 logger.debug("%s received %s; limit=%s"
                          % (self.__class__.__name__, pagedata,
@@ -395,7 +401,13 @@ class QueryGenerator(object):
 
 
 class PageGenerator(QueryGenerator):
-    """Iterator for response to a request of type action=query&generator=foo."""
+    """Iterator for response to a request of type action=query&generator=foo.
+
+    This class can be used for any of the query types that are listed in the
+    API documentation as being able to be used as a generator.  Instances of
+    this class iterate Page objects.
+    
+    """
     def __init__(self, generator, **kwargs):
         """
         Required and optional parameters are as for C{Request}, except that
@@ -435,7 +447,7 @@ class PageGenerator(QueryGenerator):
 
 
 class CategoryPageGenerator(PageGenerator):
-    """Generator that yields Category objects instead of Pages."""
+    """Like PageGenerator, but yields Category objects instead of Pages."""
 
     def result(self, pagedata):
         p = PageGenerator.result(self, pagedata)
@@ -443,7 +455,7 @@ class CategoryPageGenerator(PageGenerator):
 
 
 class ImagePageGenerator(PageGenerator):
-    """Generator that yields ImagePage objects instead of Pages."""
+    """Like PageGenerator, but yields ImagePage objects instead of Pages."""
 
     def result(self, pagedata):
         p = PageGenerator.result(self, pagedata)
@@ -454,11 +466,16 @@ class ImagePageGenerator(PageGenerator):
 
 
 class PropertyGenerator(QueryGenerator):
-    """Generator for queries of type action=query&property=...
+    """Iterator for queries of type action=query&property=...
 
-    Note that this generator yields one or more dict object(s) corresponding
+    See the API documentation for types of page properties that can be
+    queried.
+
+    This iterator yields one or more dict object(s) corresponding
     to each "page" item(s) from the API response; the calling module has to
-    decide what to do with the contents of the dict.
+    decide what to do with the contents of the dict. There will be one
+    dict for each page queried via a titles= or ids= parameter (which must
+    be supplied when instantiating this class).
 
     """
     def __init__(self, prop, **kwargs):
@@ -475,8 +492,19 @@ class PropertyGenerator(QueryGenerator):
 
 
 class ListGenerator(QueryGenerator):
-    """Iterator for queries with action=query&list=... parameters"""
+    """Iterator for queries of type action=query&list=...
 
+    See the API documentation for types of lists that can be queried.  Lists
+    include both side-wide information (such as 'allpages') and page-specific
+    information (such as 'backlinks').
+
+    This iterator yields a dict object for each member of the list returned
+    by the API, with the format of the dict depending on the particular list
+    command used.  For those lists that contain page information, it may be
+    easier to use the PageGenerator class instead, as that will convert the
+    returned information into a Page object.
+
+    """
     def __init__(self, listaction, **kwargs):
         """
         Required and optional parameters are as for C{Request}, except that
@@ -492,12 +520,12 @@ class ListGenerator(QueryGenerator):
 class LoginManager(login.LoginManager):
     """Supplies getCookie() method to use API interface."""
     def getCookie(self, remember=True, captchaId=None, captchaAnswer=None):
-        """
-        Login to the site.
+        """Login to the site.
 
         Parameters are all ignored.
 
         Returns cookie data if succesful, None otherwise.
+        
         """
         if hasattr(self, '_waituntil'):
             if datetime.now() < self._waituntil:
@@ -528,7 +556,7 @@ class LoginManager(login.LoginManager):
 
 
 def update_page(page, pagedict):
-    """Update attributes of Page object page, based on query data in pagequery
+    """Update attributes of Page object page, based on query data in pagedict
 
     @param page: object to be updated
     @type page: Page
@@ -554,9 +582,10 @@ def update_page(page, pagedict):
         for item in pagedict['protection']:
             page._protection[item['type']] = item['level'], item['expiry']
 
+
 if __name__ == "__main__":
     from pywikibot import Site
-    logger.setLevel(logger.DEBUG)
+    logger.setLevel(pywikibot.logging.DEBUG)
     mysite = Site("en", "wikipedia")
     print "starting test...."
     def _test():
