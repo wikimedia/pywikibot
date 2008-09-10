@@ -71,6 +71,7 @@ class BaseSite(object):
     """Site methods that are independent of the communication interface."""
     # to implement a specific interface, define a Site class that inherits
     # from this
+
     def __init__(self, code, fam=None, user=None):
         """
         @param code: the site's language code
@@ -130,6 +131,14 @@ class BaseSite(object):
     def code(self):
         """The identifying code for this Site."""
         return self.__code
+
+    def __cmp__(self, other):
+        """Perform equality and inequality tests on Site objects."""
+        if not isinstance(other, Site):
+            return 1
+        if self.family == other.family:
+            return cmp(self.code, other.code)
+        return cmp(self.family.name, other.family.name)
 
     def user(self):
         """Return the currently-logged in bot user, or None."""
@@ -206,12 +215,7 @@ class BaseSite(object):
 
         """
         if default:
-            if self.language() == 'ar':
-                # It won't work with REDIRECT[[]] but it work with the local,
-                # if problems, try to find a work around. FixMe!
-                return self.family.redirect.get(self.code, [u"تحويل"])[0]
-            else:
-                return self.family.redirect.get(self.code, [u"REDIRECT"])[0]
+            return self.family.redirect.get(self.code, [u"REDIRECT"])[0]
         else:
             return self.family.redirect.get(self.code, None)
 
@@ -249,6 +253,101 @@ class BaseSite(object):
             self._locked_pages.remove(page.title(withSection=False))
         finally:
             self._pagemutex.release()
+
+    def disambcategory(self):
+        """Return Category in which disambig pages are listed."""
+        
+        try:
+            name = self.namespace(14)+':'+self.family.disambcatname[self.code])        
+        except KeyError:
+            raise Error(u"No disambiguation category name found for %(site)s"
+                         % {'site': self})
+        return pywikibot.Category(pywikibot.Link(name, self))
+
+    def linkto(self, title, othersite = None):
+        """Return unicode string in the form of a wikilink to 'title'
+
+        Use optional Site argument 'othersite' to generate an interwiki link.
+
+        """
+        # TODO convert to Link method, deprecate
+        if othersite and othersite.code != self.code:
+            return u'[[%s:%s]]' % (self.code, title)
+        else:
+            return u'[[%s]]' % title
+
+    def isInterwikiLink(self, s):
+        """Return True if s is in the form of an interwiki link.
+
+        Interwiki links have the form "foo:bar" or ":foo:bar" where foo is a
+        known language code or family. Called recursively if the first part
+        of the link refers to this site's own family and/or language. Do
+        not include brackets around the link!
+
+        """
+        # TODO: convert to Link method
+        s = s.strip().lstrip(":")
+        if not ':' in s:
+            return False
+        first, rest = s.split(':',1)
+        # interwiki codes are case-insensitive
+        first = first.lower().strip()
+        # commons: forwards interlanguage links to wikipedia:, etc.
+        if self.family.interwiki_forward:
+            interlangTargetFamily = pywikibot.Family(self.family.interwiki_forward)
+        else:
+            interlangTargetFamily = self.family
+        if self.ns_index(first):
+            return False
+        if first in interlangTargetFamily.langs:
+            if first == self.code:
+                return self.isInterwikiLink(rest)
+            else:
+                return True
+        if first in self.family.get_known_families(site = self):
+            if first == self.family.name:
+                return self.isInterwikiLink(rest)
+            else:
+                return True
+        return False
+
+    def redirectRegex(self):
+        """Return a compiled regular expression matching on redirect pages.
+
+        Group 1 in the regex match object will be the target title.
+
+        """
+        #TODO: is this needed, since the API identifies redirects?
+        #      (maybe, the API can give false positives)
+        default = 'REDIRECT'
+        try:
+            keywords = set(self.family.redirect[self.code])
+            keywords.add(default)
+            pattern = r'(?:' + '|'.join(keywords) + ')'
+        except KeyError:
+            # no localized keyword for redirects
+            pattern = r'%s' % default
+        # A redirect starts with hash (#), followed by a keyword, then
+        # arbitrary stuff, then a wikilink. The wikilink may contain
+        # a label, although this is not useful.
+        return re.compile(r'\s*#%(pattern)s\s*:?\s*\[\[(.+?)(?:\|.*?)?\]\]'
+                           % locals(),
+                          re.IGNORECASE | re.UNICODE | re.DOTALL)
+
+    # site-specific formatting preferences
+    
+    def category_on_one_line(self):
+        """Return True if this site wants all category links on one line."""
+        return self.code in self.family.category_on_one_line
+
+    def interwiki_putfirst(self):
+        """Return list of language codes for ordering of interwiki links."""
+        return self.family.interwiki_putfirst.get(self.code, None)
+
+    def getSite(self, code):
+        """Return Site object for language 'code' in this Family."""
+
+        return pywikibot.Site(code=code, fam=self.family, user=self.user)
 
 
 class APISite(BaseSite):
@@ -301,9 +400,6 @@ class APISite(BaseSite):
 ##    (note, some methods yield other information in a tuple along with the
 ##    Pages; see method docs for details) --
 ##
-##        search(query): query results from Special:Search
-##        allpages(): Special:Allpages
-##        prefixindex(): Special:Prefixindex
 ##        newpages(): Special:Newpages
 ##        newimages(): Special:Log&type=upload
 ##        longpages(): Special:Longpages
@@ -397,12 +493,16 @@ class APISite(BaseSite):
             self._getsiteinfo()
         # check whether a login cookie already exists for this user
         if hasattr(self, "_userinfo"):
-            if sysop:
-                name = config.sysopnames[self.family.name][self.code]
-            else:
-                name = config.usernames[self.family.name][self.code]
-            if self._userinfo['name'] == name:
-                self._username = name
+            try:
+                if sysop:
+                    name = config.sysopnames[self.family.name][self.code]
+                else:
+                    name = config.usernames[self.family.name][self.code]
+                if self._userinfo['name'] == name:
+                    self._username = name
+            except KeyError:
+                # no username for this site
+                pass
         if not self.logged_in(sysop):
             loginMan = api.LoginManager(site=self, sysop=sysop)
             if loginMan.login(retry = True):
@@ -606,6 +706,20 @@ class APISite(BaseSite):
         if all:
             return self.namespaces()[num]
         return self.namespaces()[num][0]
+
+    def live_version(self):
+        """Return the 'real' version number found on [[Special:Version]]
+
+        Return value is a tuple (int, int, str) of the major and minor
+        version numbers and any other text contained in the version.
+
+        """
+        versionstring = self.siteinfo['generator']
+        m = re.match(r"^MediaWiki ([0-9]+)\.([0-9]+)(.*)$", versionstring)
+        if m:
+            return (int(m.group(1)), int(m.group(2)), m.group(3))
+        else:
+            return None
 
     def loadpageinfo(self, page):
         """Load page info from api and save in page attributes"""
@@ -821,16 +935,16 @@ class APISite(BaseSite):
     def pagereferences(self, page, followRedirects=False, filterRedirects=None,
                        withTemplateInclusion=True, onlyTemplateInclusion=False):
         """Convenience method combining pagebacklinks and page_embeddedin."""
-        #TODO Warn about deprecated arguments
+        
         if onlyTemplateInclusion:
             return self.page_embeddedin(page)
         if not withTemplateInclusion:
             return self.pagebacklinks(page, followRedirects)
         import itertools
-        return itertools.chain(self.pagebacklinks(
-                                    page, followRedirects, filterRedirects),
-                               self.page_embeddedin(page, filterRedirects)
-                              )
+        return itertools.chain(
+                   self.pagebacklinks(page, followRedirects, filterRedirects),
+                   self.page_embeddedin(page, filterRedirects)
+               )
 
     def pagelinks(self, page, namespaces=None, follow_redirects=False):
         """Iterate internal wikilinks contained (or transcluded) on page.
@@ -854,10 +968,13 @@ class APISite(BaseSite):
                                                       for ns in namespaces)
         return plgen
 
-    def pagecategories(self, page, withSortKey=False):
+    def pagecategories(self, page, withSortKey=None):
         """Iterate categories to which page belongs."""
         
-        # Sortkey doesn't work with generator; FIXME or deprecate
+        # Sortkey doesn't work with generator; deprecate
+        if withSortKey is not None:
+            logger.debug(
+                "site.pagecategories(): withSortKey option is deprecated")
         clgen = api.CategoryPageGenerator("categories", site=self)
         if hasattr(page, "_pageid"):
             clgen.request['pageids'] = str(page._pageid)
@@ -868,12 +985,14 @@ class APISite(BaseSite):
 
     def pageimages(self, page):
         """Iterate images used (not just linked) on the page."""
+        
         imtitle = page.title(withSection=False).encode(self.encoding())
         imgen = api.ImagePageGenerator("images", titles=imtitle, site=self)
         return imgen
 
     def pagetemplates(self, page, namespaces=None):
         """Iterate templates transcluded (not just linked) on the page."""
+        
         tltitle = page.title(withSection=False).encode(self.encoding())
         tlgen = api.PageGenerator("templates", titles=tltitle, site=self)
         if namespaces is not None:
@@ -2114,8 +2233,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
     # TODO: implement undelete
 
     
-
-#### METHODS NOT IMPLEMENTED YET (but may be delegated to Family object) ####
+#### METHODS NOT IMPLEMENTED YET ####
 class NotImplementedYet:
 
     # TODO: is this needed any more? can it be obtained from the http module?
@@ -2503,101 +2621,8 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                         cache.append(title)
                         yield Page(self, title)
 
-    def linkto(self, title, othersite = None):
-        """Return unicode string in the form of a wikilink to 'title'
-
-        Use optional Site argument 'othersite' to generate an interwiki link.
-
-        """
-        if othersite and othersite.code != self.code:
-            return u'[[%s:%s]]' % (self.code, title)
-        else:
-            return u'[[%s]]' % title
-
-    def isInterwikiLink(self, s):
-        """Return True if s is in the form of an interwiki link.
-
-        Interwiki links have the form "foo:bar" or ":foo:bar" where foo is a
-        known language code or family. Called recursively if the first part
-        of the link refers to this site's own family and/or language.
-
-        """
-        s = s.strip().lstrip(":")
-        if not ':' in s:
-            return False
-        first, rest = s.split(':',1)
-        # interwiki codes are case-insensitive
-        first = first.lower().strip()
-        # commons: forwards interlanguage links to wikipedia:, etc.
-        if self.family.interwiki_forward:
-            interlangTargetFamily = Family(self.family.interwiki_forward)
-        else:
-            interlangTargetFamily = self.family
-        if self.ns_index(first):
-            return False
-        if first in interlangTargetFamily.langs:
-            if first == self.code:
-                return self.isInterwikiLink(rest)
-            else:
-                return True
-        if first in self.family.get_known_families(site = self):
-            if first == self.family.name:
-                return self.isInterwikiLink(rest)
-            else:
-                return True
-        return False
-
-    def redirectRegex(self):
-        """Return a compiled regular expression matching on redirect pages.
-
-        Group 1 in the regex match object will be the target title.
-
-        """
-        redDefault = 'redirect'
-        red = 'redirect'
-        if self.language() == 'ar':
-            red = u"تحويل"
-        try:
-            if redDefault == red:
-                redirKeywords = [red] + self.family.redirect[self.code]
-                redirKeywordsR = r'(?:' + '|'.join(redirKeywords) + ')'
-            else:
-                redirKeywords = [red] + self.family.redirect[self.code]
-                redirKeywordsR = r'(?:' + redDefault + '|'.join(redirKeywords) + ')'
-        except KeyError:
-            # no localized keyword for redirects
-            if redDefault == red:
-                redirKeywordsR = r'%s' % red
-            else:
-                redirKeywordsR = r'(?:%s|%s)' % (red, redDefault)
-        # A redirect starts with hash (#), followed by a keyword, then
-        # arbitrary stuff, then a wikilink. The wikilink may contain
-        # a label, although this is not useful.
-        return re.compile(r'#' + redirKeywordsR +
-                                   '.*?\[\[(.*?)(?:\|.*?)?\]\]',
-                          re.IGNORECASE | re.UNICODE | re.DOTALL)
-
-    def live_version(self):
-        """Return the 'real' version number found on [[Special:Version]]
-
-        Return value is a tuple (int, int, str) of the major and minor
-        version numbers and any other text contained in the version.
-
-        """
-        global htmldata
-        if not hasattr(self, "_mw_version"):
-            versionpage = self.getUrl(self.get_address("Special:Version"))
-            htmldata = BeautifulSoup(versionpage, convertEntities="html")
-            versionstring = htmldata.findAll(text="MediaWiki"
-                                             )[1].parent.nextSibling
-            m = re.match(r"^: ([0-9]+)\.([0-9]+)(.*)$", str(versionstring))
-            if m:
-                self._mw_version = (int(m.group(1)), int(m.group(2)),
-                                        m.group(3))
-            else:
-                self._mw_version = self.family.version(self.code).split(".")
-        return self._mw_version
-
+    # TODO: why should we rely on the family file to contain the correct
+    #       encoding?
     def checkCharset(self, charset):
         """Warn if charset returned by wiki doesn't match family file."""
         if not hasattr(self,'charset'):
@@ -2609,26 +2634,6 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
             raise ValueError(
 "code2encodings has wrong charset for %s. It should be %s, but is %s"
                              % (repr(self), charset, self.encoding()))
-
-    def shared_image_repository(self):
-        """Return a tuple of image repositories used by this site."""
-        return self.family.shared_image_repository(self.code)
-
-    def __cmp__(self, other):
-        """Perform equality and inequality tests on Site objects."""
-        if not isinstance(other, Site):
-            return 1
-        if self.family == other.family:
-            return cmp(self.code, other.code)
-        return cmp(self.family.name, other.family.name)
-
-    def category_on_one_line(self):
-        """Return True if this site wants all category links on one line."""
-        return self.code in self.family.category_on_one_line
-
-    def interwiki_putfirst(self):
-        """Return list of language codes for ordering of interwiki links."""
-        return self.family.interwiki_putfirst.get(self.code, None)
 
     def interwiki_putfirst_doubled(self, list_of_links):
         # TODO: is this even needed?  No family in the framework has this
@@ -2650,19 +2655,6 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         else:
             return False
 
-    def getSite(self, code):
-        """Return Site object for language 'code' in this Family."""
-        return getSite(code = code, fam = self.family, user=self.user)
-
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""
         return self._validlanguages
-
-    def disambcategory(self):
-        """Return Category in which disambig pages are listed."""
-        import catlib
-        try:
-            return catlib.Category(self,
-                    self.namespace(14)+':'+self.family.disambcatname[self.code])
-        except KeyError:
-            raise NoPage(u'No page %s.' % page)
