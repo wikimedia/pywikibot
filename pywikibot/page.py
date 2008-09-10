@@ -176,14 +176,16 @@ class Page(object):
             title = urllib.quote(encodedTitle)
         if asLink:
             if forceInterwiki or (allowInterwiki and
-                    (self.site().family != pywikibot.default_family
+                    (self.site().family.name != pywikibot.default_family
                      or self.site().code != pywikibot.default_code)):
-                if self.site().family != pywikibot.default_family \
+                if self.site().family.name != pywikibot.default_family \
                         and self.site().family.name != self.site().code:
                     return u'[[%s:%s:%s]]' % (self.site().family.name,
                                               self.site().code,
                                               self._title)
                 else:
+                    # use this form for sites like commons, where the
+                    # code is the same as the family name
                     return u'[[%s:%s]]' % (self.site().code,
                                            self._title)
             elif textlink and (self.isImage() or self.isCategory()):
