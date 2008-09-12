@@ -34,11 +34,11 @@ def Site(code=None, fam=None, user=None, interface=None):
     """
     logger = logging.getLogger("wiki")
     
-    if code == None:
+    if code is None:
         code = default_code
-    if fam == None:
+    if fam is None:
         fam = default_family
-    if user == None:
+    if user is None:
         try:
             user = config.usernames[fam][code]
         except KeyError:

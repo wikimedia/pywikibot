@@ -114,6 +114,7 @@ class BaseSite(object):
     @property
     def throttle(self):
         """Return this Site's throttle.  Initialize a new one if needed."""
+        
         if not hasattr(self, "_throttle"):
             self._throttle = Throttle(self, multiplydelay=True, verbosedelay=True)
             try:
@@ -125,16 +126,28 @@ class BaseSite(object):
     @property
     def family(self):
         """The Family object for this Site's wiki family."""
+        
         return self.__family
 
     @property
     def code(self):
         """The identifying code for this Site."""
+        
+        return self.__code
+
+    @property
+    def lang(self):
+        """The ISO language code for this Site.
+
+        Presumed to be equal to the wiki prefix, but this can be overridden.
+        
+        """
         return self.__code
 
     def __cmp__(self, other):
         """Perform equality and inequality tests on Site objects."""
-        if not isinstance(other, Site):
+        
+        if not isinstance(other, BaseSite):
             return 1
         if self.family == other.family:
             return cmp(self.code, other.code)
@@ -142,12 +155,14 @@ class BaseSite(object):
 
     def user(self):
         """Return the currently-logged in bot user, or None."""
+        
         if self.logged_in():
             return self._username
         return None
 
     def __getattr__(self, attr):
         """Calls to methods not defined in this object are passed to Family."""
+        
         if hasattr(self.__class__, attr):
             return self.__class__.attr
         try:
@@ -163,6 +178,7 @@ class BaseSite(object):
 
     def sitename(self):
         """Return string representing this Site's name and language."""
+        
         return self.family.name+':'+self.code
 
     __str__ = sitename
@@ -174,15 +190,34 @@ class BaseSite(object):
         return hash(repr(self))
 
     def linktrail(self):
-        """Return regex for trailing chars displayed as part of a link."""
+        """Return regex for trailing chars displayed as part of a link.
+
+        Returns a string, not a compiled regular expression object.
+
+        This reads from the family file, and ''not'' from
+        [[MediaWiki:Linktrail]], because the MW software currently uses a
+        built-in linktrail from its message files and ignores the wiki
+        value.
+
+        """
         return self.family.linktrail(self.code)
 
     def languages(self):
         """Return list of all valid language codes for this site's Family."""
+        
         return self.family.langs.keys()
+
+
+    def validLanguageLinks(self):
+        """Return list of language codes that can be used in interwiki links."""
+
+        nsnames = sum(self.namespaces().values(), [])
+        return [l for l in self.languages()
+                  if l[:1].upper() + l[1:] not in self.namespaces()]
 
     def ns_index(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
+        
         for ns in self.namespaces():
             if namespace.lower() in [name.lower()
                                      for name in self.namespaces()[ns]]:
@@ -193,6 +228,7 @@ class BaseSite(object):
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
+        
         return self._namespaces
 
     def ns_normalize(self, value):
@@ -258,7 +294,7 @@ class BaseSite(object):
         """Return Category in which disambig pages are listed."""
         
         try:
-            name = self.namespace(14)+':'+self.family.disambcatname[self.code])        
+            name = self.namespace(14)+':'+self.family.disambcatname[self.code]
         except KeyError:
             raise Error(u"No disambiguation category name found for %(site)s"
                          % {'site': self})
@@ -338,10 +374,12 @@ class BaseSite(object):
     
     def category_on_one_line(self):
         """Return True if this site wants all category links on one line."""
+
         return self.code in self.family.category_on_one_line
 
     def interwiki_putfirst(self):
         """Return list of language codes for ordering of interwiki links."""
+
         return self.family.interwiki_putfirst.get(self.code, None)
 
     def getSite(self, code):
@@ -447,7 +485,6 @@ class APISite(BaseSite):
             }
         self.sitelock = threading.Lock()
         self._msgcache = {}
-        self._username = ""
         return
 
 # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
@@ -493,18 +530,11 @@ class APISite(BaseSite):
             self._getsiteinfo()
         # check whether a login cookie already exists for this user
         if hasattr(self, "_userinfo"):
-            try:
-                if sysop:
-                    name = config.sysopnames[self.family.name][self.code]
-                else:
-                    name = config.usernames[self.family.name][self.code]
-                if self._userinfo['name'] == name:
-                    self._username = name
-            except KeyError:
-                # no username for this site
-                pass
+            if self._userinfo['name'] == self._username:
+                return
         if not self.logged_in(sysop):
-            loginMan = api.LoginManager(site=self, sysop=sysop)
+            loginMan = api.LoginManager(site=self, sysop=sysop,
+                                        user=self._username)
             if loginMan.login(retry = True):
                 self._username = loginMan.username
                 if hasattr(self, "_userinfo"):
@@ -678,20 +708,25 @@ class APISite(BaseSite):
     @property
     def siteinfo(self):
         """Site information dict."""
+
         if not hasattr(self, "_siteinfo"):
             self._getsiteinfo()
         return self._siteinfo
 
     def case(self):
+
         return self.siteinfo['case']
 
     def language(self):
         """Return the code for the language of this Site."""
-        # N.B. this code may or may not be the same as self.code
+
         return self.siteinfo['lang']
 
+    lang = property(fget=language, doc=language.__doc__)
+    
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
+
         if not hasattr(self, "_siteinfo"):
             self._getsiteinfo()
         return self._namespaces
@@ -2654,7 +2689,3 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 return False
         else:
             return False
-
-    def validLanguageLinks(self):
-        """Return list of language codes that can be used in interwiki links."""
-        return self._validlanguages
