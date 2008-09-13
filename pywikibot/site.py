@@ -968,17 +968,21 @@ class APISite(BaseSite):
         return eigen
 
     def pagereferences(self, page, followRedirects=False, filterRedirects=None,
-                       withTemplateInclusion=True, onlyTemplateInclusion=False):
+                       withTemplateInclusion=True, onlyTemplateInclusion=False,
+                       namespaces=None):
         """Convenience method combining pagebacklinks and page_embeddedin."""
         
         if onlyTemplateInclusion:
-            return self.page_embeddedin(page)
+            return self.page_embeddedin(page, namespaces=namespaces)
         if not withTemplateInclusion:
-            return self.pagebacklinks(page, followRedirects)
+            return self.pagebacklinks(page, followRedirects,
+                                      namespaces=namespaces)
         import itertools
         return itertools.chain(
-                   self.pagebacklinks(page, followRedirects, filterRedirects),
-                   self.page_embeddedin(page, filterRedirects)
+                   self.pagebacklinks(page, followRedirects,
+                                      filterRedirects, namespaces=namespaces),
+                   self.page_embeddedin(page, filterRedirects,
+                                        namespaces=namespaces)
                )
 
     def pagelinks(self, page, namespaces=None, follow_redirects=False):

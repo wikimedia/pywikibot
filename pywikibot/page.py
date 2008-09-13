@@ -1425,7 +1425,7 @@ class Link(object):
         )
 
     def __init__(self, text, source=None, defaultNamespace=0):
-        """Parse text into a Link object.
+        """Constructor
 
         @param text: the link text (everything appearing between [[ and ]]
             on a wiki page)
@@ -1438,22 +1438,29 @@ class Link(object):
         @type defaultNamespace: int
 
         """
-        # First remove the anchor, which is stored unchanged, if there is one
-        if u"|" in text:
-            text, self.anchor = text.split(u"|", 1)
-        else:
-            self.anchor = None
+        self._text = text
+        self.source = source
+        self._defaultns = defaultNamespace
 
-        if source is None:
-            source = pywikibot.Site()
-        self.source = self.site = source
+    def parse(self):
+        """Parse text; called internally when accessing attributes"""
+        
+        # First remove the anchor, which is stored unchanged, if there is one
+        if u"|" in self._text:
+            self._text, self._anchor = self._text.split(u"|", 1)
+        else:
+            self._anchor = None
+
+        if self.source is None:
+            self.source = pywikibot.Site()
+        self._site = self.source
 
         # Clean up the name, it can come from anywhere.
         # Convert HTML entities to unicode
-        t = html2unicode(text)
+        t = html2unicode(self._text)
 
         # Convert URL-encoded characters to unicode
-        t = url2unicode(t, site=self.site)
+        t = url2unicode(t, site=self._site)
 
         # Normalize unicode string to a NFC (composed) format to allow proper
         # string comparisons. According to
@@ -1466,7 +1473,7 @@ class Link(object):
         #
         if u'\ufffd' in t:
             raise pywikibot.Error("Title contains illegal char (\\uFFFD)")
-        self.namespace = defaultNamespace
+        self._namespace = self._defaultns
 
         # Replace underscores by spaces
         t = t.replace(u"_", u" ")
@@ -1481,34 +1488,34 @@ class Link(object):
         while u":" in t:
             # Initial colon indicates main namespace rather than default
             if t.startswith(u":"):
-                self.namespace = 0
+                self._namespace = 0
                 # remove the colon but continue processing
                 # remove any subsequent whitespace
                 t = t.lstrip(u":").lstrip(u" ")
                 continue
 
-            fam = self.site.family
+            fam = self._site.family
             prefix = t[ :t.index(u":")].lower()
-            ns = self.site.ns_index(prefix)
+            ns = self._site.ns_index(prefix)
             if ns:
                 # Ordinary namespace
                 t = t[t.index(u":"): ].lstrip(u":").lstrip(u" ")
-                self.namespace = ns
+                self._namespace = ns
                 break
             if prefix in fam.langs.keys()\
-                   or prefix in fam.get_known_families(site=self.site):
+                   or prefix in fam.get_known_families(site=self._site):
                 # looks like an interwiki link
                 if not firstPass:
                     # Can't make a local interwiki link to an interwiki link.
                     raise pywikibot.Error(
                           "Improperly formatted interwiki link '%s'"
-                          % text)
+                          % self._text)
                 t = t[t.index(u":"): ].lstrip(u":").lstrip(u" ")
                 if prefix in fam.langs.keys():
                     newsite = pywikibot.Site(prefix, fam)
                 else:
-                    otherlang = self.site.code
-                    familyName = fam.get_known_families(site=self.site)[prefix]
+                    otherlang = self._site.code
+                    familyName = fam.get_known_families(site=self._site)[prefix]
                     if familyName in ['commons', 'meta']:
                         otherlang = familyName
                     try:
@@ -1517,25 +1524,25 @@ class Link(object):
                         raise pywikibot.Error("""\
 %s is not a local page on %s, and the %s family is
 not supported by PyWikiBot!"""
-                              % (title, self.site(), familyName))
+                              % (title, self._site(), familyName))
 
                 # Redundant interwiki prefix to the local wiki
-                if newsite == self.site:
+                if newsite == self._site:
                     if not t:
                         # Can't have an empty self-link
                         raise pywikibot.Error(
-                              "Invalid link title: '%s'" % text)
+                              "Invalid link title: '%s'" % self._text)
                     firstPass = False
                     continue
-                self.site = newsite
+                self._site = newsite
             else:
                 break   # text before : doesn't match any known prefix
 
         if u"#" in t:
             t, sec = t.split(u'#', 1)
-            t, self.section = t.rstrip(), sec.lstrip()
+            t, self._section = t.rstrip(), sec.lstrip()
         else:
-            self.section = None
+            self._section = None
 
         # Reject illegal characters.
         m = Link.illegal_titles_pattern.search(t)
@@ -1558,25 +1565,58 @@ not supported by PyWikiBot!"""
         ):
             raise pywikibot.Error(
                   "Invalid title (contains . / combinations): '%s'"
-                        % text)
+                        % self._text)
 
         # Magic tilde sequences? Nu-uh!
         if u"~~~" in t:
-            raise pywikibot.Error("Invalid title (contains ~~~): '%s'" % text)
+            raise pywikibot.Error("Invalid title (contains ~~~): '%s'" % self._text)
 
-        if self.namespace != -1 and len(t) > 255:
+        if self._namespace != -1 and len(t) > 255:
             raise pywikibot.Error("Invalid title (over 255 bytes): '%s'" % t)
 
-        if self.site.case() == 'first-letter':
+        if self._site.case() == 'first-letter':
             t = t[:1].upper() + t[1:]
 
         # Can't make a link to a namespace alone...
         # "empty" local links can only be self-links
         # with a fragment identifier.
-        if not t and self.site == self.source and self.namespace != 0:
-            raise ValueError("Invalid link (no page title): '%s'" % text)
+        if not t and self._site == self.source and self._namespace != 0:
+            raise ValueError("Invalid link (no page title): '%s'" % self._text)
 
-        self.title = t
+        self._title = t
+
+    # define attributes, to be evaluated lazily
+
+    @property
+    def site(self):
+        if not hasattr(self, "_site"):
+            self.parse()
+        return self._site
+
+    @property
+    def namespace(self):
+        if not hasattr(self, "_namespace"):
+            self.parse()
+        return self._namespace
+
+    @property
+    def title(self):
+        if not hasattr(self, "_title"):
+            self.parse()
+        return self._title
+
+    @property
+    def section(self):
+        if not hasattr(self, "_section"):
+            self.parse()
+        return self._section
+
+    @property
+    def anchor(self):
+        if not hasattr(self, "_anchor"):
+            self.parse()
+        return self._anchor
+
 
 
 # Utility functions for parsing page titles

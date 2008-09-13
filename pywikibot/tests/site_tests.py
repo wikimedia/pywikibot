@@ -96,34 +96,34 @@ class TestSiteObject(unittest.TestCase):
             self.assertTrue(isinstance(mysite.token(mainpage, ttype),
                                        basestring))
 
-##    def testLinkMethods(self):
-##        """Test site methods for getting links to and from a page"""
-##        
-##        backlinks = set(mysite.pagebacklinks(mainpage))
-##        embedded = set(mysite.page_embeddedin(mainpage))
-##        refs = set(mysite.pagereferences(mainpage))
-##        for bl in backlinks:
-##            self.assertTrue(isinstance(bl, pywikibot.Page))
-##            self.assertTrue(bl in refs)
-##        for ei in embedded:
-##            self.assertTrue(isinstance(ei, pywikibot.Page))
-##            self.assertTrue(ei in refs)
-##        for ref in refs:
-##            self.assertTrue(ref in backlinks or ref in embedded)
-##        for pl in mysite.pagelinks(mainpage):
-##            self.assertTrue(isinstance(pl, pywikibot.Page))
-##        for cat in mysite.pagecategories(mainpage):
-##            self.assertTrue(isinstance(cat, pywikibot.Category))
-##            for cm in mysite.categorymembers(cat):
-##                self.assertTrue(isinstance(cat, pywikibot.Page))
-##        self.assertTrue(all(isinstance(im, pywikibot.ImagePage)
-##                            for im in mysite.pageimages(mainpage)))
-##        self.assertTrue(all(isinstance(te, pywikibot.Page)
-##                            for te in mysite.pagetemplates(mainpage)))
-##        for ll in mysite.pagelanglinks(mainpage):
-##            self.assertTrue(isinstance(ll, pywikibot.Link))
-##        self.assertTrue(all(isinstance(el, basestring)
-##                            for el in mysite.page_extlinks(mainpage)))
+    def testLinkMethods(self):
+        """Test site methods for getting links to and from a page"""
+        
+        backlinks = set(mysite.pagebacklinks(mainpage, namespaces=[0]))
+        embedded = set(mysite.page_embeddedin(mainpage, namespaces=[0]))
+        refs = set(mysite.pagereferences(mainpage, namespaces=[0]))
+        for bl in backlinks:
+            self.assertTrue(isinstance(bl, pywikibot.Page))
+            self.assertTrue(bl in refs)
+        for ei in embedded:
+            self.assertTrue(isinstance(ei, pywikibot.Page))
+            self.assertTrue(ei in refs)
+        for ref in refs:
+            self.assertTrue(ref in backlinks or ref in embedded)
+        for pl in mysite.pagelinks(mainpage):
+            self.assertTrue(isinstance(pl, pywikibot.Page))
+        for cat in mysite.pagecategories(mainpage):
+            self.assertTrue(isinstance(cat, pywikibot.Category))
+            for cm in mysite.categorymembers(cat):
+                self.assertTrue(isinstance(cat, pywikibot.Page))
+        self.assertTrue(all(isinstance(im, pywikibot.ImagePage)
+                            for im in mysite.pageimages(mainpage)))
+        self.assertTrue(all(isinstance(te, pywikibot.Page)
+                            for te in mysite.pagetemplates(mainpage)))
+        for ll in mysite.pagelanglinks(mainpage):
+            self.assertTrue(isinstance(ll, pywikibot.Link))
+        self.assertTrue(all(isinstance(el, basestring)
+                            for el in mysite.page_extlinks(mainpage)))
 
     def testLoadRevisions(self):
         """Test the site.loadrevisions() method"""
