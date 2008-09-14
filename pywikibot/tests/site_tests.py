@@ -19,8 +19,10 @@ mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
 
 class TestSiteObject(unittest.TestCase):
     """Test cases for Site methods."""
+
     def testBaseMethods(self):
         """Test cases for BaseSite methods"""
+
         self.assertEqual(mysite.family.name, pywikibot.config.family)
         self.assertEqual(mysite.code, pywikibot.config.mylang)
         self.assertTrue(isinstance(mysite.language(), basestring))
@@ -70,6 +72,17 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(all(isinstance(item, basestring)
                             for key in mysite.namespaces()
                             for item in mysite.namespace(key, True)))
+        ver = mysite.live_version()
+        self.assertTrue(isinstance(ver, tuple))
+        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
+        self.assertTrue(isinstance(ver[2], basestring))
+        for msg in ("1movedto2", "about", "aboutpage", "aboutsite",
+                    "accesskey-n-portal"):
+            self.assertTrue(mysite.has_mediawiki_message(msg))
+            self.assertTrue(isinstance(mysite.mediawiki_message(msg),
+                                       basestring))
+        self.assertFalse(mysite.has_mediawiki_message("nosuchmessage"))
+        self.assertRaises(KeyError, mysite.mediawiki_message, "nosuchmessage")
 
     def testPageMethods(self):
         """Test ApiSite methods for getting page-specific info"""
