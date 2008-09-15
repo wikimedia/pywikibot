@@ -27,7 +27,7 @@ class Family(family.Family):
             'tg', 'dv', 'bn', 'ka', 'mg', 'ha', 'kw', 'ss', 'na', 'sa',
             'gv', 'ay', 'tpi', 'ne', 'jbo', 'jv', 'gn', 'uz', 'tn', 'mt',
             'iu', 'sh', 'lb', 'ks', 'tk', 'sg', 'fj', 'als', 'ik', 'si',
-            'ln', 'sm', 'za', 'roa-rup', 'dz', 'my', 'wa',
+            'om', 'ln', 'sm', 'za', 'roa-rup', 'dz', 'my', 'wa',
         ]
 
         for lang in self.languages_by_size:
@@ -65,6 +65,7 @@ class Family(family.Family):
             'hr': u'Wječnik',
             'hu': u'Wikiszótár',
             'hy': u'Վիքիբառարան',
+            'ia': u'Wiktionario',
             'io': u'Wikivortaro',
             'is': u'Wikiorðabók',
             'it': u'Wikizionario',
@@ -138,7 +139,7 @@ class Family(family.Family):
             'hsb': u'Wiktionary diskusija',
             'hu': u'Wikiszótár-vita',
             'hy': u'Վիքիբառարանի քննարկում',
-            'ia': u'Discussion Wiktionary',
+            'ia': u'Discussion Wiktionario',
             'id': u'Pembicaraan Wiktionary',
             'io': u'Wikivortaro Debato',
             'is': [u'Wikiorðabókarspjall', u'Wikiorðabókspjall'],
@@ -164,7 +165,7 @@ class Family(family.Family):
             'ml': u'വിക്കിനിഘണ്ടു സംവാദം',
             'mr': u'Wiktionary चर्चा',
             'ms': u'Perbincangan Wiktionary',
-            'nah': u'Wiktionary Discusión',
+            'nah': u'Wiktionary tēixnāmiquiliztli',
             'nds': u'Wiktionary Diskuschoon',
             'nl': u'Overleg WikiWoordenboek',
             'nn': u'Wiktionary-diskusjon',
@@ -373,7 +374,6 @@ class Family(family.Family):
             'mo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary
             'minnan':'zh-min-nan',
             'nb': 'no',
-            'om': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oromoo_Wiktionary
             'or': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oriya_Wiktionary
             'pi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Pali_Bhasa_Wiktionary
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rhaetian_Wiktionary
