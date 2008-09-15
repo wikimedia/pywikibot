@@ -38,6 +38,11 @@ class TestSiteObject(unittest.TestCase):
         langs = mysite.languages()
         self.assertTrue(isinstance(langs, list))
         self.assertTrue(mysite.code in langs)
+        obs = mysite.family.obsolete
+        ipf = mysite.interwiki_putfirst()
+        self.assertTrue(isinstance(ipf, list))
+        for item in ipf:
+            self.assertTrue(item in langs or item in obs)
         self.assertEqual(mysite.ns_index("Talk"), 1)
         ns = mysite.namespaces()
         self.assertTrue(isinstance(ns, dict))
@@ -48,12 +53,20 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(isinstance(mysite.redirect(), basestring))
         self.assertTrue(isinstance(mysite.disambcategory(), pywikibot.Category))
         self.assertTrue(isinstance(mysite.redirectRegex().pattern, basestring))
+        self.assertTrue(isinstance(mysite.category_on_one_line(), bool))
+        for grp in ("user", "autoconfirmed", "bot", "sysop", "nosuchgroup"):
+            self.assertTrue(isinstance(mysite.has_group(grp), bool))
+        for rgt in ("read", "edit", "move", "delete", "rollback", "block",
+                    "nosuchright"):
+            self.assertTrue(isinstance(mysite.has_right(rgt), bool))
 
     def testApiMethods(self):
         """Test generic ApiSite methods"""
         
         self.assertTrue(isinstance(mysite.logged_in(), bool))
         self.assertTrue(isinstance(mysite.getuserinfo(), dict))
+        self.assertTrue(isinstance(mysite.is_blocked(), bool))
+        self.assertTrue(isinstance(mysite.messages(), bool))
         self.assertTrue(isinstance(mysite.getcurrenttimestamp(), basestring))
         self.assertTrue(isinstance(mysite.siteinfo, dict))
         self.assertTrue(isinstance(mysite.case(), basestring))
