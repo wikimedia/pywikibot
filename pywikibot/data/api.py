@@ -306,9 +306,12 @@ class QueryGenerator(object):
             self.prefix = "g" + self.prefix
         self.request = Request(**kwargs)
         self.limit = None
-        self.resultkey = self.module # this is the name of the "query"
-                                     # subelement to look for when iterating
-        
+        if "generator" in kwargs:
+            self.resultkey = "pages"        # name of the "query"
+        else:                               # subelement key
+            self.resultkey = self.module    # to look for when iterating
+
+
     def get_module(self):
         """Query api on self.site for paraminfo on querymodule=self.module"""
         
