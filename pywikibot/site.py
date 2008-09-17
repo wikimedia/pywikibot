@@ -306,46 +306,17 @@ class BaseSite(object):
         Use optional Site argument 'othersite' to generate an interwiki link.
 
         """
-        # TODO convert to Link method, deprecate
-        if othersite and othersite.code != self.code:
-            return u'[[%s:%s]]' % (self.code, title)
-        else:
-            return u'[[%s]]' % title
+        logger.debug("Site.linkto() method is deprecated; use pywikibot.Link")
+        return pywikibot.Link(title, self).astext(othersite)
 
     def isInterwikiLink(self, s):
         """Return True if s is in the form of an interwiki link.
 
-        Interwiki links have the form "foo:bar" or ":foo:bar" where foo is a
-        known language code or family. Called recursively if the first part
-        of the link refers to this site's own family and/or language. Do
-        not include brackets around the link!
+        If a link object constructed using "s" as the link text parses as
+        belonging to a different site, this method returns True.
 
         """
-        # TODO: convert to Link method
-        s = s.strip().lstrip(":")
-        if not ':' in s:
-            return False
-        first, rest = s.split(':',1)
-        # interwiki codes are case-insensitive
-        first = first.lower().strip()
-        # commons: forwards interlanguage links to wikipedia:, etc.
-        if self.family.interwiki_forward:
-            interlangTargetFamily = pywikibot.Family(self.family.interwiki_forward)
-        else:
-            interlangTargetFamily = self.family
-        if self.ns_index(first):
-            return False
-        if first in interlangTargetFamily.langs:
-            if first == self.code:
-                return self.isInterwikiLink(rest)
-            else:
-                return True
-        if first in self.family.get_known_families(site = self):
-            if first == self.family.name:
-                return self.isInterwikiLink(rest)
-            else:
-                return True
-        return False
+        return (pywikibot.Link(s, self).site != self)
 
     def redirectRegex(self):
         """Return a compiled regular expression matching on redirect pages.
@@ -916,6 +887,7 @@ class APISite(BaseSite):
                      % (page.title(withSection=False, asLink=True),
                         item['title']))
             api.update_page(page, item)
+            logging.debug(str(item))
             return item[tokentype + "token"]
 
     # following group of methods map more-or-less directly to API queries

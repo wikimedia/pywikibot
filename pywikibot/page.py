@@ -1439,7 +1439,7 @@ class Link(object):
 
         """
         self._text = text
-        self.source = source
+        self._source = source
         self._defaultns = defaultNamespace
 
     def parse(self):
@@ -1451,9 +1451,9 @@ class Link(object):
         else:
             self._anchor = None
 
-        if self.source is None:
-            self.source = pywikibot.Site()
-        self._site = self.source
+        if self._source is None:
+            self._source = pywikibot.Site()
+        self._site = self._source
 
         # Clean up the name, it can come from anywhere.
         # Convert HTML entities to unicode
@@ -1580,7 +1580,7 @@ not supported by PyWikiBot!"""
         # Can't make a link to a namespace alone...
         # "empty" local links can only be self-links
         # with a fragment identifier.
-        if not t and self._site == self.source and self._namespace != 0:
+        if not t and self._site == self._source and self._namespace != 0:
             raise ValueError("Invalid link (no page title): '%s'" % self._text)
 
         self._title = t
@@ -1617,6 +1617,36 @@ not supported by PyWikiBot!"""
             self.parse()
         return self._anchor
 
+    def astext(self, onsite=None):
+        """Return a text representation of the link.
+
+        @param onsite: if specified, present as a (possibly interwiki) link
+            from the given site; otherwise, present as an internal link on
+            the source site.
+
+        """
+        if onsite is None:
+            onsite = self.site
+        title = self.title
+        if self.namespace:
+            title = onsite.namespace(self.namespace) + ":" + title
+        if self.section:
+            title = title + "#" + self.section
+        if onsite == self.site:
+            return u'[[%s]]' % title
+        if onsite.family == self.site.family:
+            return u'[[%s:%s]]' % (self.site.code, title)
+        if self.site.family.name == self.site.code:
+            # use this form for sites like commons, where the
+            # code is the same as the family name
+            return u'[[%s:%s]]' % (self.site.code,
+                                   title)
+        return u'[[%s:%s:%s]]' % (self.site.family.name,
+                                  self.site.code,
+                                  title)
+
+    def __str__(self):
+        return self.astext()
 
 
 # Utility functions for parsing page titles
