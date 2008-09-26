@@ -207,7 +207,6 @@ class BaseSite(object):
         
         return self.family.langs.keys()
 
-
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""
 
@@ -368,9 +367,6 @@ class APISite(BaseSite):
 ##    Site methods from version 1.0 (as these are implemented in this file,
 ##     or declared deprecated/obsolete, they will be removed from this list)
 ##########
-##    validLanguageLinks: A list of language codes that can be used in interwiki
-##        links.
-##
 ##    messages: return True if there are new messages on the site
 ##    cookies: return user's cookies as a string
 ##
@@ -379,24 +375,8 @@ class APISite(BaseSite):
 ##    postForm: Post form data to an address at this site.
 ##    postData: Post encoded form data to an http address at this site.
 ##
-##    redirect: Return the localized redirect tag for the site.
-##    redirectRegex: Return compiled regular expression matching on redirect
-##                   pages.
-##    mediawiki_message: Retrieve the text of a specified MediaWiki message
-##    has_mediawiki_message: True if this site defines specified MediaWiki
-##                           message
-##
 ##    shared_image_repository: Return tuple of image repositories used by this
 ##        site.
-##    category_on_one_line: Return True if this site wants all category links
-##        on one line.
-##    interwiki_putfirst: Return list of language codes for ordering of
-##        interwiki links.
-##    linkto(title): Return string in the form of a wikilink to 'title'
-##    isInterwikiLink(s): Return True if 's' is in the form of an interwiki
-##                        link.
-##    getSite(lang): Return Site object for wiki in same family, language
-##                   'lang'.
 ##    version: Return MediaWiki version string from Family file.
 ##    versionnumber: Return int identifying the MediaWiki version.
 ##    live_version: Return version number read from Special:Version.
@@ -413,7 +393,6 @@ class APISite(BaseSite):
 ##        newimages(): Special:Log&type=upload
 ##        longpages(): Special:Longpages
 ##        shortpages(): Special:Shortpages
-##        categories(): Special:Categories (yields Category objects)
 ##        deadendpages(): Special:Deadendpages
 ##        ancientpages(): Special:Ancientpages
 ##        lonelypages(): Special:Lonelypages
@@ -459,16 +438,7 @@ class APISite(BaseSite):
         return
 
 # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
-        self._mediawiki_messages = {}
         self.nocapitalize = self.__code in self.family.nocapitalize
-        self._userData = [False, False]
-        self._userName = [None, None]
-        self._isLoggedIn = [None, None]
-        self._isBlocked = [None, None]
-        self._messages = [None, None]
-        self._rights = [None, None]
-        self._token = [None, None]
-        self._cookies = [None, None]
         # Calculating valid languages took quite long, so we calculate it once
         # in initialization instead of each time it is used.
         self._validlanguages = []
@@ -482,9 +452,9 @@ class APISite(BaseSite):
         @param sysop: if True, require sysop privileges.
 
         """
-        if self.getuserinfo()['name'] != self._username:
+        if self.userinfo['name'] != self._username:
             return False
-        return (not sysop) or 'sysop' in self.getuserinfo()['groups']
+        return (not sysop) or 'sysop' in self.userinfo['groups']
 
     def loggedInAs(self, sysop = False):
         """Return the current username if logged in, otherwise return None.
@@ -501,7 +471,7 @@ class APISite(BaseSite):
             self._getsiteinfo()
         # check whether a login cookie already exists for this user
         if hasattr(self, "_userinfo"):
-            if self._userinfo['name'] == self._username:
+            if self.userinfo['name'] == self._username:
                 return
         if not self.logged_in(sysop):
             loginMan = api.LoginManager(site=self, sysop=sysop,
@@ -543,6 +513,8 @@ class APISite(BaseSite):
                    "API userinfo response lacks 'userinfo' key"
             self._userinfo = uidata['query']['userinfo']
         return self._userinfo
+
+    userinfo = property(fget=getuserinfo, doc=getuserinfo.__doc__)
 
     def is_blocked(self, sysop=False):
         """Return true if and only if user is blocked.
@@ -685,6 +657,7 @@ class APISite(BaseSite):
         return self._siteinfo
 
     def case(self):
+        """Return this site's capitalization rule."""
 
         return self.siteinfo['case']
 
@@ -840,7 +813,7 @@ class APISite(BaseSite):
                            % (len(cache), self)
                         )
             for pagedata in rvgen:
-#                logger.debug("Preloading %s" % pagedata)
+                logger.debug("Preloading %s" % pagedata)
                 try:
                     if pagedata['title'] not in cache:
                         raise Error(
@@ -914,7 +887,7 @@ class APISite(BaseSite):
         if filterRedirects is not None:
             blgen.request["gblfilterredir"] = filterRedirects and "redirects"\
                                                               or "nonredirects"
-        if followRedirects:
+        if followRedirects: #FIXME This doesn't work correctly
             blgen.request["gblredirect"] = ""
         return blgen
 
@@ -1819,22 +1792,22 @@ class APISite(BaseSite):
 "deletedrevs: start must be later than end with reverse=False")
         if not self.logged_in():
             self.login()
-        if "deletedhistory" not in self.getuserinfo()['rights']:
+        if "deletedhistory" not in self.userinfo['rights']:
             try:
                 self.login(True)
             except NoUsername:
                 pass
-            if "deletedhistory" not in self.getuserinfo()['rights']:
+            if "deletedhistory" not in self.userinfo['rights']:
                 raise Error(
 "deletedrevs: User:%s not authorized to access deleted revisions."
                         % self.user())
         if get_text:
-            if "undelete" not in self.getuserinfo()['rights']:
+            if "undelete" not in self.userinfo['rights']:
                 try:
                     self.login(True)
                 except NoUsername:
                     pass
-                if "undelete" not in self.getuserinfo()['rights']:
+                if "undelete" not in self.userinfo['rights']:
                     raise Error(
 "deletedrevs: User:%s not authorized to view deleted content."
                             % self.user())
@@ -1958,7 +1931,7 @@ redirects on %(site)s wiki""",
             req['minor'] = ""
         elif notminor:
             req['notminor'] = ""
-        if 'bot' in self.getuserinfo()['groups']:
+        if 'bot' in self.userinfo['groups']:
             req['bot'] = ""
         if recreate:
             req['recreate'] = ""

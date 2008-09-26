@@ -20,93 +20,132 @@ mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
 class TestSiteObject(unittest.TestCase):
     """Test cases for Site methods."""
 
+    def assertType(self, obj, cls):
+        """Assert that obj is an instance of type cls"""
+        return self.assertTrue(isinstance(obj, cls))
+
     def testBaseMethods(self):
         """Test cases for BaseSite methods"""
 
         self.assertEqual(mysite.family.name, pywikibot.config.family)
         self.assertEqual(mysite.code, pywikibot.config.mylang)
-        self.assertTrue(isinstance(mysite.language(), basestring))
-        self.assertTrue(isinstance(mysite == pywikibot.Site("en", "wikipedia"),
-                                   bool))
-        self.assertTrue(isinstance(mysite.user(), (basestring, type(None))))
+        self.assertType(mysite.lang, basestring)
+        self.assertType(mysite == pywikibot.Site("en", "wikipedia"), bool)
+        self.assertType(mysite.user(), (basestring, type(None)))
         self.assertEqual(mysite.sitename(),
-                         "%s:%s" % (pywikibot.config.family, pywikibot.config.mylang))
+                         "%s:%s" % (pywikibot.config.family,
+                                    pywikibot.config.mylang))
         self.assertEqual(repr(mysite),
                          'Site("%s", "%s")'
                          % (pywikibot.config.mylang, pywikibot.config.family))
-        self.assertTrue(isinstance(mysite.linktrail(), basestring))
+        self.assertType(mysite.linktrail(), basestring)
+        self.assertType(mysite.redirect(default=True), basestring)
+        self.assertType(mysite.disambcategory(), pywikibot.Category)
+        self.assertEqual(mysite.linkto("foo"), u"[[Foo]]")
+        self.assertFalse(mysite.isInterwikiLink("foo"))
+        self.assertType(mysite.redirectRegex().pattern, basestring)
+        self.assertType(mysite.category_on_one_line(), bool)
+        for grp in ("user", "autoconfirmed", "bot", "sysop", "nosuchgroup"):
+            self.assertType(mysite.has_group(grp), bool)
+        for rgt in ("read", "edit", "move", "delete", "rollback", "block",
+                    "nosuchright"):
+            self.assertType(mysite.has_right(rgt), bool)
+
+    def testLanguageMethods(self):
+        """Test cases for languages() and related methods"""
+        
         langs = mysite.languages()
-        self.assertTrue(isinstance(langs, list))
+        self.assertType(langs, list)
         self.assertTrue(mysite.code in langs)
         obs = mysite.family.obsolete
         ipf = mysite.interwiki_putfirst()
-        self.assertTrue(isinstance(ipf, list))
-        for item in ipf:
-            self.assertTrue(item in langs or item in obs)
-        self.assertEqual(mysite.ns_index("Talk"), 1)
+        self.assertType(ipf, list)
+        self.assertTrue(all(item in langs or item in obs
+                            for item in ipf))
+        self.assertTrue(all(item in langs
+                            for item in mysite.validLanguageLinks()))
+
+    def testNamespaceMethods(self):
+        """Test cases for methods manipulating namespace names"""
+
+        builtins = {'Talk': 1, # these should work in any MW wiki
+                    'User': 2,
+                    'User talk': 3,
+                    'Project': 4,
+                    'Project talk': 5,
+                    'Image': 6,
+                    'Image talk': 7,
+                    'MediaWiki': 8,
+                    'MediaWiki talk': 9,
+                    'Template': 10,
+                    'Template talk': 11,
+                    'Help': 12,
+                    'Help talk': 13,
+                    'Category': 14,
+                    'Category talk': 15,
+        }
+        self.assertTrue(all(mysite.ns_index(b) == builtins[b]
+                            for b in builtins))
         ns = mysite.namespaces()
-        self.assertTrue(isinstance(ns, dict))
-        for x in xrange(0, 16): # built-in namespaces always present
-            self.assertTrue(x in ns)
-            self.assertTrue(isinstance(ns[x], list))
-        self.assertTrue(isinstance(mysite.ns_normalize("project"), basestring))
-        self.assertTrue(isinstance(mysite.redirect(), basestring))
-        self.assertTrue(isinstance(mysite.disambcategory(), pywikibot.Category))
-        self.assertTrue(isinstance(mysite.redirectRegex().pattern, basestring))
-        self.assertTrue(isinstance(mysite.category_on_one_line(), bool))
-        for grp in ("user", "autoconfirmed", "bot", "sysop", "nosuchgroup"):
-            self.assertTrue(isinstance(mysite.has_group(grp), bool))
-        for rgt in ("read", "edit", "move", "delete", "rollback", "block",
-                    "nosuchright"):
-            self.assertTrue(isinstance(mysite.has_right(rgt), bool))
+        self.assertType(ns, dict)
+        self.assertTrue(all(x in ns for x in xrange(0, 16)))
+            # built-in namespaces always present
+        self.assertType(mysite.ns_normalize("project"), basestring)
+        self.assertTrue(all(isinstance(key, int)
+                            for key in ns))
+        self.assertTrue(all(isinstance(val, list)
+                            for val in ns.values()))
+        self.assertTrue(all(isinstance(name, basestring)
+                            for val in ns.values()
+                            for name in val))
+        self.assertTrue(all(isinstance(mysite.namespace(key), basestring)
+                            for key in ns))
+        self.assertTrue(all(isinstance(mysite.namespace(key, True), list)
+                            for key in ns))
+        self.assertTrue(all(isinstance(item, basestring)
+                            for key in ns
+                            for item in mysite.namespace(key, True)))
 
     def testApiMethods(self):
         """Test generic ApiSite methods"""
         
-        self.assertTrue(isinstance(mysite.logged_in(), bool))
-        self.assertTrue(isinstance(mysite.getuserinfo(), dict))
-        self.assertTrue(isinstance(mysite.is_blocked(), bool))
-        self.assertTrue(isinstance(mysite.messages(), bool))
-        self.assertTrue(isinstance(mysite.getcurrenttimestamp(), basestring))
-        self.assertTrue(isinstance(mysite.siteinfo, dict))
-        self.assertTrue(isinstance(mysite.case(), basestring))
-        self.assertTrue(isinstance(mysite.namespaces(), dict))
-        self.assertTrue(all(isinstance(key, int)
-                            for key in mysite.namespaces()))
-        self.assertTrue(all(isinstance(val, list)
-                            for val in mysite.namespaces().values()))
-        self.assertTrue(all(isinstance(name, basestring)
-                            for val in mysite.namespaces().values()
-                            for name in val))
-        self.assertTrue(all(isinstance(mysite.namespace(key), basestring)
-                            for key in mysite.namespaces()))
-        self.assertTrue(all(isinstance(mysite.namespace(key, True), list)
-                            for key in mysite.namespaces()))
-        self.assertTrue(all(isinstance(item, basestring)
-                            for key in mysite.namespaces()
-                            for item in mysite.namespace(key, True)))
-        ver = mysite.live_version()
-        self.assertTrue(isinstance(ver, tuple))
-        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
-        self.assertTrue(isinstance(ver[2], basestring))
+        self.assertType(mysite.logged_in(), bool)
+        self.assertType(mysite.logged_in(True), bool)
+        self.assertType(mysite.userinfo, dict)
+        self.assertType(mysite.is_blocked(), bool)
+        self.assertType(mysite.is_blocked(True), bool)
+        self.assertType(mysite.messages(), bool)
+        self.assertType(mysite.has_right("edit"), bool)
+        self.assertFalse(mysite.has_right("nonexistent_right"))
+        self.assertType(mysite.has_right("edit", True), bool)
+        self.assertFalse(mysite.has_right("nonexistent_right", True))
+        self.assertType(mysite.has_group("bots"), bool)
+        self.assertFalse(mysite.has_group("nonexistent_group"))
+        self.assertType(mysite.has_group("bots", True), bool)
+        self.assertFalse(mysite.has_group("nonexistent_group", True))
         for msg in ("1movedto2", "about", "aboutpage", "aboutsite",
                     "accesskey-n-portal"):
             self.assertTrue(mysite.has_mediawiki_message(msg))
-            self.assertTrue(isinstance(mysite.mediawiki_message(msg),
-                                       basestring))
+            self.assertType(mysite.mediawiki_message(msg), basestring)
         self.assertFalse(mysite.has_mediawiki_message("nosuchmessage"))
         self.assertRaises(KeyError, mysite.mediawiki_message, "nosuchmessage")
+        self.assertType(mysite.getcurrenttimestamp(), basestring)
+        self.assertType(mysite.siteinfo, dict)
+        self.assertType(mysite.case(), basestring)
+        ver = mysite.live_version()
+        self.assertType(ver, tuple)
+        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
+        self.assertType(ver[2], basestring)
 
     def testPageMethods(self):
         """Test ApiSite methods for getting page-specific info"""
         
-        self.assertTrue(isinstance(mysite.page_exists(mainpage), bool))
-        self.assertTrue(isinstance(mysite.page_restrictions(mainpage), dict))
-        self.assertTrue(isinstance(mysite.page_can_be_edited(mainpage), bool))
-        self.assertTrue(isinstance(mysite.page_isredirect(mainpage), bool))
+        self.assertType(mysite.page_exists(mainpage), bool)
+        self.assertType(mysite.page_restrictions(mainpage), dict)
+        self.assertType(mysite.page_can_be_edited(mainpage), bool)
+        self.assertType(mysite.page_isredirect(mainpage), bool)
         if mysite.page_isredirect(mainpage):
-            self.assertTrue(isinstance(mysite.getredirtarget(mainpage),
-                                       pywikibot.Page))
+            self.assertType(mysite.getredirtarget(mainpage), pywikibot.Page)
         else:
             self.assertRaises(pywikibot.IsNotRedirectPage,
                               mysite.getredirtarget, mainpage)
@@ -119,8 +158,21 @@ class TestSiteObject(unittest.TestCase):
         """Test ability to get page tokens"""
         
         for ttype in ("edit", "move"): # token types for non-sysops
-            self.assertTrue(isinstance(mysite.token(mainpage, ttype),
-                                       basestring))
+            self.assertType(mysite.token(mainpage, ttype), basestring)
+        self.assertRaises(KeyError, mysite.token, mainpage, "invalidtype")
+
+    def testPreload(self):
+        """Test that preloading works"""
+
+        count = 0
+        for page in mysite.preloadpages(mysite.pagelinks(mainpage)):
+            self.assertType(page, pywikibot.Page)
+            self.assertType(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+            count += 1
+            if count >= 5:
+                break
 
     def testLinkMethods(self):
         """Test site methods for getting links to and from a page"""
@@ -129,25 +181,41 @@ class TestSiteObject(unittest.TestCase):
         embedded = set(mysite.page_embeddedin(mainpage, namespaces=[0]))
         refs = set(mysite.pagereferences(mainpage, namespaces=[0]))
         for bl in backlinks:
-            self.assertTrue(isinstance(bl, pywikibot.Page))
+            self.assertType(bl, pywikibot.Page)
             self.assertTrue(bl in refs)
         for ei in embedded:
-            self.assertTrue(isinstance(ei, pywikibot.Page))
+            self.assertType(ei, pywikibot.Page)
             self.assertTrue(ei in refs)
         for ref in refs:
             self.assertTrue(ref in backlinks or ref in embedded)
+        # test backlinks arguments
+        self.assertTrue(backlinks.issubset(
+                    set(mysite.pagebacklinks(mainpage,
+                                             followRedirects=True,
+                                             namespaces=[0]))))
+        self.assertTrue(backlinks.issuperset(
+                    set(mysite.pagebacklinks(mainpage,
+                                             filterRedirects=True,
+                                             namespaces=[0]))))
+        self.assertTrue(backlinks.issuperset(
+                    set(mysite.pagebacklinks(mainpage,
+                                             filterRedirects=False,
+                                             namespaces=[0]))))
+        self.assertTrue(backlinks.issubset(
+                    set(mysite.pagebacklinks(mainpage, namespaces=[0, 2]))))
+        # 
         for pl in mysite.pagelinks(mainpage):
-            self.assertTrue(isinstance(pl, pywikibot.Page))
+            self.assertType(pl, pywikibot.Page)
         for cat in mysite.pagecategories(mainpage):
-            self.assertTrue(isinstance(cat, pywikibot.Category))
+            self.assertType(cat, pywikibot.Category)
             for cm in mysite.categorymembers(cat):
-                self.assertTrue(isinstance(cat, pywikibot.Page))
+                self.assertType(cat, pywikibot.Page)
         self.assertTrue(all(isinstance(im, pywikibot.ImagePage)
                             for im in mysite.pageimages(mainpage)))
         self.assertTrue(all(isinstance(te, pywikibot.Page)
                             for te in mysite.pagetemplates(mainpage)))
         for ll in mysite.pagelanglinks(mainpage):
-            self.assertTrue(isinstance(ll, pywikibot.Link))
+            self.assertType(ll, pywikibot.Link)
         self.assertTrue(all(isinstance(el, basestring)
                             for el in mysite.page_extlinks(mainpage)))
 
@@ -165,7 +233,7 @@ class TestSiteObject(unittest.TestCase):
         ap = list(mysite.allpages(limit=10))
         self.assertTrue(len(ap) <= 10)
         for page in ap:
-            self.assertTrue(isinstance(page, pywikibot.Page))
+            self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
         # TODO: test various optional arguments to allpages
 
@@ -192,7 +260,7 @@ class TestSiteObject(unittest.TestCase):
         au = list(mysite.allusers(limit=10))
         self.assertTrue(len(au) <= 10)
         for user in au:
-            self.assertTrue(isinstance(user, dict))
+            self.assertType(user, dict)
             self.assertTrue(user.has_key("name"))
             self.assertTrue(user.has_key("editcount"))
             self.assertTrue(user.has_key("registration"))
@@ -291,7 +359,7 @@ class TestSiteObject(unittest.TestCase):
 
         us = list(mysite.users([mysite.user()]))
         self.assertEqual(len(us), 1)
-        self.assertTrue(isinstance(us[0], dict))
+        self.assertType(us[0], dict)
 
     def testRandompages(self):
         """Test the site.randompages() method"""
