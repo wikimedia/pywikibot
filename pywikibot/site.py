@@ -827,19 +827,6 @@ class APISite(BaseSite):
                     continue
                 page = cache[pagedata['title']]
                 api.update_page(page, pagedata)
-                if 'revisions' in pagedata: # true if page exists
-                    for rev in pagedata['revisions']:
-                        revision = pywikibot.page.Revision(
-                                            revid=rev['revid'],
-                                            timestamp=rev['timestamp'],
-                                            user=rev['user'],
-                                            anon=rev.has_key('anon'),
-                                            comment=rev.get('comment',  u''),
-                                            minor=rev.has_key('minor'),
-                                            text=rev.get('*', None)
-                                   )
-                        page._revisions[revision.revid] = revision
-                        page._revid = revision.revid
                 yield page
 
     def token(self, page, tokentype):
@@ -1089,11 +1076,11 @@ class APISite(BaseSite):
         # assemble API request
         if revids is None:
             rvtitle = page.title(withSection=False).encode(self.encoding())
-            rvgen = api.PropertyGenerator(u"revisions", titles=rvtitle,
+            rvgen = api.PropertyGenerator(u"info|revisions", titles=rvtitle,
                                           site=self)
         else:
             ids = u"|".join(unicode(r) for r in revids)
-            rvgen = api.PropertyGenerator(u"revisions", revids=ids,
+            rvgen = api.PropertyGenerator(u"info|revisions", revids=ids,
                                           site=self)
         if getText:
             rvgen.request[u"rvprop"] = \
@@ -1132,21 +1119,6 @@ class APISite(BaseSite):
             else:
                 page = Page(self, pagedata['title'])
             api.update_page(page, pagedata)
-            if 'revisions' not in pagedata:
-                continue
-            for rev in pagedata['revisions']:
-                revision = pywikibot.page.Revision(
-                                            revid=rev['revid'],
-                                            timestamp=rev['timestamp'],
-                                            user=rev['user'],
-                                            anon=rev.has_key('anon'),
-                                            comment=rev.get('comment',  u''),
-                                            minor=rev.has_key('minor'),
-                                            text=rev.get('*', None)
-                                          )
-                page._revisions[revision.revid] = revision
-                if latest:
-                    page._revid = revision.revid
 
     def pageinterwiki(self, page):
         # TODO

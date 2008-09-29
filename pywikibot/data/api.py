@@ -583,17 +583,17 @@ def update_page(page, pagedict):
         for item in pagedict['protection']:
             page._protection[item['type']] = item['level'], item['expiry']
     if 'revisions' in pagedict:
-            for rev in pagedict['revisions']:
-                revision = pywikibot.page.Revision(
-                                            revid=rev['revid'],
-                                            timestamp=rev['timestamp'],
-                                            user=rev['user'],
-                                            anon=rev.has_key('anon'),
-                                            comment=rev.get('comment',  u''),
-                                            minor=rev.has_key('minor'),
-                                            text=rev.get('*', None)
-                                          )
-                page._revisions[revision.revid] = revision
+        for rev in pagedict['revisions']:
+            revision = pywikibot.page.Revision(
+                                        revid=rev['revid'],
+                                        timestamp=rev['timestamp'],
+                                        user=rev['user'],
+                                        anon=rev.has_key('anon'),
+                                        comment=rev.get('comment',  u''),
+                                        minor=rev.has_key('minor'),
+                                        text=rev.get('*', None)
+                                      )
+            page._revisions[revision.revid] = revision
     if 'lastrevid' in pagedict:
         page._revid = pagedict['lastrevid']
         if page._revid in page._revisions:
