@@ -30,6 +30,32 @@ import urllib
 logger = logging.getLogger("wiki")
 
 
+def deprecate_arg(old_arg, new_arg):
+    """Decorator to declare old_arg deprecated and replace it with new_arg"""
+    def decorator(method):
+        def wrapper(*__args, **__kw):
+            meth_name = method.__name__
+            if old_arg in __kw:
+                if new_arg:
+                    if new_arg in __kw:
+                        logger.warn(
+"%(new_arg)s argument of %(meth_name)s replaces %(old_arg)s; cannot use both."
+                            % locals())
+                    else:
+                        logger.debug(
+"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
+                            % locals())
+                        __kw[new_arg] = __kw[old_arg]
+                else:
+                    logger.debug(
+                        "%(old_arg)s argument of %(meth_name)s is deprecated."
+                        % locals())
+                del __kw[old_arg]
+            return method(*__args, **__kw)
+        return wrapper
+    return decorator
+
+
 class PageInUse(pywikibot.Error):
     """Page cannot be reserved for writing due to existing lock."""
 
@@ -527,8 +553,9 @@ class APISite(BaseSite):
         return 'blockinfo' in self._userinfo
 
     def isBlocked(self, sysop=False):
-        """Deprecated; retained for backwards-compatibility"""
-        logger.debug("Site.isBlocked() method is deprecated; use is_blocked()")
+        """Deprecated synonym for is_blocked"""
+        logger.debug(
+            "Site method 'isBlocked' should be changed to 'is_blocked'")
         return self.is_blocked(sysop)
 
     def has_right(self, right, sysop=False):
@@ -917,7 +944,8 @@ class APISite(BaseSite):
                                         namespaces=namespaces)
                )
 
-    def pagelinks(self, page, namespaces=None, follow_redirects=False):
+    def pagelinks(self, page, namespaces=None, follow_redirects=False,
+                  limit=None):
         """Iterate internal wikilinks contained (or transcluded) on page.
 
         @param namespaces: Only iterate pages in these namespaces (default: all)
@@ -927,6 +955,8 @@ class APISite(BaseSite):
 
         """
         plgen = api.PageGenerator("links", site=self)
+        if isinstance(limit, int):
+            plgen.limit = limit
         if hasattr(page, "_pageid"):
             plgen.request['pageids'] = str(page._pageid)
         else:
@@ -939,13 +969,10 @@ class APISite(BaseSite):
                                                       for ns in namespaces)
         return plgen
 
+    @deprecate_arg("withSortKey", None) # Sortkey doesn't work with generator
     def pagecategories(self, page, withSortKey=None):
         """Iterate categories to which page belongs."""
         
-        # Sortkey doesn't work with generator; deprecate
-        if withSortKey is not None:
-            logger.debug(
-                "site.pagecategories(): withSortKey option is deprecated")
         clgen = api.CategoryPageGenerator("categories", site=self)
         if hasattr(page, "_pageid"):
             clgen.request['pageids'] = str(page._pageid)
@@ -1157,12 +1184,11 @@ class APISite(BaseSite):
             for linkdata in pageitem['extlinks']:
                 yield linkdata['*']
 
-    def allpages(self, start="!", prefix="", namespace=0,
-                 filterredir=None, filterlanglinks=None,
-                 minsize=None, maxsize=None,
-                 protect_type=None, protect_level=None,
-                 limit=None, reverse=False, includeRedirects=None,
-                 throttle=None):
+    @deprecate_arg("throttle", None)
+    def allpages(self, start="!", prefix="", namespace=0, filterredir=None,
+                 filterlanglinks=None, minsize=None, maxsize=None,
+                 protect_type=None, protect_level=None, limit=None,
+                 reverse=False, includeRedirects=None):
         """Iterate pages in a single namespace.
 
         Note: parameters includeRedirects and throttle are deprecated and
@@ -1194,11 +1220,9 @@ class APISite(BaseSite):
         """
         if not isinstance(namespace, int):
             raise Error("allpages: only one namespace permitted.")
-        if throttle is not None:
-            logger.debug("allpages: the 'throttle' parameter is deprecated.")
         if includeRedirects is not None:
             logger.debug(
-                "allpages: the 'includeRedirects' parameter is deprecated.")
+"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.")
             if includeRedirects:
                 if includeRedirects == "only":
                     filterredirs = True
@@ -1261,7 +1285,7 @@ class APISite(BaseSite):
         @param limit: maximum number of pages to iterate (default: iterate
             all pages in namespace)
         @param fromids: if True, include the pageid of the page containing
-            each link (default: False) as the 'fromid' attribute of the Page;
+            each link (default: False) as the '_fromid' attribute of the Page;
             cannot be combined with unique
 
         """
@@ -1282,7 +1306,7 @@ class APISite(BaseSite):
         for link in algen:
             p = pywikibot.Page(self, link['title'], link['ns'])
             if fromids:
-                p.fromid = link['fromid']
+                p._fromid = link['fromid']
             yield p
 
     def allcategories(self, start="!", prefix="", limit=None,
@@ -1585,7 +1609,8 @@ class APISite(BaseSite):
             rcgen.request["rcshow"] = "|".join(rcshow)
         return rcgen
 
-    def search(self, searchstring, number=None, namespaces=[0], where="text",
+    @deprecate_arg("number", "limit")
+    def search(self, searchstring, namespaces=[0], where="text",
                getredirects=False, limit=None):
         """Iterate Pages that contain the searchstring.
 
@@ -1603,9 +1628,6 @@ class APISite(BaseSite):
         @param number: deprecated, synonym for 'limit'
 
         """
-        if number is not None:
-            logger.debug("search: number parameter is deprecated; use limit")
-            limit = number
         if not searchstring:
             raise Error("search: searchstring cannot be empty")
         if where not in ("text", "titles"):

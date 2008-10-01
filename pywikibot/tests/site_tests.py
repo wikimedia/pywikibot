@@ -165,7 +165,7 @@ class TestSiteObject(unittest.TestCase):
         """Test that preloading works"""
 
         count = 0
-        for page in mysite.preloadpages(mysite.pagelinks(mainpage)):
+        for page in mysite.preloadpages(mysite.pagelinks(mainpage, limit=10)):
             self.assertType(page, pywikibot.Page)
             self.assertType(page.exists(), bool)
             if page.exists():
@@ -219,7 +219,8 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(links.issuperset(
                     set(mysite.pagelinks(mainpage, namespaces=[0, 1]))))
         for target in mysite.preloadpages(
-                            mysite.pagelinks(mainpage, follow_redirects=True)):
+                            mysite.pagelinks(mainpage, follow_redirects=True,
+                                             limit=10)):
             self.assertType(target, pywikibot.Page)
             self.assertFalse(target.isRedirectPage())
         # test pagecategories
@@ -254,71 +255,95 @@ class TestSiteObject(unittest.TestCase):
     def testAllPages(self):
         """Test the site.allpages() method"""
 
-        global ap, ap6, ap7
-        ap = list(mysite.allpages(limit=10))
-        self.assertTrue(len(ap) <= 10)
-        for page in ap:
+        fwd = list(mysite.allpages(limit=10))
+        self.assertTrue(len(fwd) <= 10)
+        for page in fwd:
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
-        # TODO: test various optional arguments to allpages
-        ap1 = mysite.allpages(start="Py", limit=10)
-        for page in ap1:
+        rev = list(mysite.allpages(reverse=True, start="Aa", limit=12))
+        self.assertTrue(len(rev) <= 12)
+        for page in rev:
+            self.assertType(page, pywikibot.Page)
+            self.assertTrue(mysite.page_exists(page))
+            self.assertEqual(page.namespace(), 0)
+            self.assertTrue(page.title() <= "Aa")
+        for page in mysite.allpages(start="Py", limit=10):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.title() >= "Py")
-        ap2 = mysite.allpages(prefix="Pre", limit=10)
-        for page in ap2:
+        for page in mysite.allpages(prefix="Pre", limit=10):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.title().startswith("Pre"))
-        ap3 = mysite.allpages(namespace=1, limit=10)
-        for page in ap3:
+        for page in mysite.allpages(namespace=1, limit=10):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 1)
-        ap4= mysite.allpages(filterredir=True, limit=10)
-        for page in ap4:
+        for page in mysite.allpages(filterredir=True, limit=10):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.isRedirectPage())
-        ap5= mysite.allpages(filterredir=False, limit=10)
-        for page in ap5:
+        for page in mysite.allpages(filterredir=False, limit=10):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertFalse(page.isRedirectPage())
-        ap6= list(mysite.allpages(filterlanglinks=True, limit=10))
-        for page in ap6:
+        for page in mysite.allpages(filterlanglinks=True, limit=10):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
-        ap7= list(mysite.allpages(filterlanglinks=False, limit=10))
-        for page in ap7:
+        for page in mysite.allpages(filterlanglinks=False, limit=10):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
-        ap8 = mysite.allpages(minsize=100, limit=10)
-        for page in ap8:
+        for page in mysite.allpages(minsize=100, limit=10):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertTrue(len(page.text) >= 100)
-        ap9 = mysite.allpages(maxsize=200, limit=10)
-        for page in ap9:
+        for page in mysite.allpages(maxsize=200, limit=10):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertTrue(len(page.text) <= 200)
+        for page in mysite.allpages(protect_type="edit", limit=5):
+            self.assertType(page, pywikibot.Page)
+            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue("edit" in page._protection)
+        for page in mysite.allpages(protect_type="edit",
+                                    protect_level="sysop", limit=5):
+            self.assertType(page, pywikibot.Page)
+            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue("edit" in page._protection)
+            self.assertTrue("sysop" in page._protection["edit"])
 
     def testAllLinks(self):
         """Test the site.alllinks() method"""
         
-        al = list(mysite.alllinks(limit=10))
-        self.assertTrue(len(al) <= 10)
-        self.assertTrue(all(isinstance(link, pywikibot.Page) for link in al))
+        fwd = list(mysite.alllinks(limit=10))
+        self.assertTrue(len(fwd) <= 10)
+        self.assertTrue(all(isinstance(link, pywikibot.Page) for link in fwd))
+        uniq = list(mysite.alllinks(limit=10, unique=True))
+        self.assertTrue(all(link in uniq for link in fwd))
         # TODO: test various optional arguments to alllinks
+        for page in mysite.alllinks(start="Link", limit=10):
+            self.assertType(page, pywikibot.Page)
+            self.assertEqual(page.namespace(), 0)
+            self.assertTrue(page.title() >= "Link")
+        for page in mysite.alllinks(prefix="Fix", limit=10):
+            self.assertType(page, pywikibot.Page)
+            self.assertEqual(page.namespace(), 0)
+            self.assertTrue(page.title().startswith("Fix"))
+        for page in mysite.alllinks(namespace=1, limit=10):
+            self.assertType(page, pywikibot.Page)
+            self.assertEqual(page.namespace(), 1)
+        for page in mysite.alllinks(start="From", namespace=4, fromids=True,
+                                    limit=10):
+            self.assertType(page, pywikibot.Page)
+            self.assertTrue(page.title(withNamespace=False) >= "From")
+            self.assertTrue(hasattr(page, "_fromid"))
 
     def testAllCategories(self):
         """Test the site.allcategories() method"""
