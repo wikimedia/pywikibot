@@ -115,17 +115,19 @@ u"Found %(count)s processes running, including the current process."
         finally:
             self.lock.release()
 
-    def setDelays(self, delay=None, absolute=False):
+    def setDelays(self, delay=None, writedelay=None, absolute=False):
         """Set the nominal delays in seconds. Defaults to config values."""
         self.lock.acquire()
         try:
             if delay is None:
                 delay = self.mindelay
+            if writedelay is None:
+                writedelay = self.writedelay
             if absolute:
                 self.maxdelay = delay
                 self.mindelay = delay
             self.delay = delay
-            self.writedelay = min(max(self.mindelay, self.writedelay),
+            self.writedelay = min(max(self.mindelay, writedelay),
                                   self.maxdelay)
             # Start the delay count now, not at the next check
             self.last_read = self.last_write = time.time()
