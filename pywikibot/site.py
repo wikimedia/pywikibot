@@ -1326,7 +1326,7 @@ class APISite(BaseSite):
 
         """
         acgen = api.CategoryPageGenerator("allcategories",
-                                          gapfrom=start, site=self)
+                                          gacfrom=start, site=self)
         if prefix:
             acgen.request["gacprefix"] = prefix
         if isinstance(limit, int):

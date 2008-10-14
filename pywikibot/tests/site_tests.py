@@ -220,7 +220,7 @@ class TestSiteObject(unittest.TestCase):
                     set(mysite.pagelinks(mainpage, namespaces=[0, 1]))))
         for target in mysite.preloadpages(
                             mysite.pagelinks(mainpage, follow_redirects=True,
-                                             limit=10)):
+                                             limit=5)):
             self.assertType(target, pywikibot.Page)
             self.assertFalse(target.isRedirectPage())
         # test pagecategories
@@ -249,7 +249,7 @@ class TestSiteObject(unittest.TestCase):
         mysite.loadrevisions(mainpage)
         self.assertTrue(hasattr(mainpage, "_revid"))
         self.assertTrue(hasattr(mainpage, "_revisions"))
-        self.assertTrue(mainpage._revisions.has_key(mainpage._revid))
+        self.assertTrue(mainpage._revid in mainpage._revisions)
         # TODO test all the optional arguments
 
     def testAllPages(self):
@@ -268,43 +268,43 @@ class TestSiteObject(unittest.TestCase):
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.title() <= "Aa")
-        for page in mysite.allpages(start="Py", limit=10):
+        for page in mysite.allpages(start="Py", limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.title() >= "Py")
-        for page in mysite.allpages(prefix="Pre", limit=10):
+        for page in mysite.allpages(prefix="Pre", limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.title().startswith("Pre"))
-        for page in mysite.allpages(namespace=1, limit=10):
+        for page in mysite.allpages(namespace=1, limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 1)
-        for page in mysite.allpages(filterredir=True, limit=10):
+        for page in mysite.allpages(filterredir=True, limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.isRedirectPage())
-        for page in mysite.allpages(filterredir=False, limit=10):
+        for page in mysite.allpages(filterredir=False, limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertFalse(page.isRedirectPage())
-        for page in mysite.allpages(filterlanglinks=True, limit=10):
+        for page in mysite.allpages(filterlanglinks=True, limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
-        for page in mysite.allpages(filterlanglinks=False, limit=10):
+        for page in mysite.allpages(filterlanglinks=False, limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
-        for page in mysite.allpages(minsize=100, limit=10):
+        for page in mysite.allpages(minsize=100, limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertTrue(len(page.text) >= 100)
-        for page in mysite.allpages(maxsize=200, limit=10):
+        for page in mysite.allpages(maxsize=200, limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
             self.assertTrue(len(page.text) <= 200)
@@ -327,23 +327,24 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(all(isinstance(link, pywikibot.Page) for link in fwd))
         uniq = list(mysite.alllinks(limit=10, unique=True))
         self.assertTrue(all(link in uniq for link in fwd))
-        # TODO: test various optional arguments to alllinks
-        for page in mysite.alllinks(start="Link", limit=10):
+        for page in mysite.alllinks(start="Link", limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.title() >= "Link")
-        for page in mysite.alllinks(prefix="Fix", limit=10):
+        for page in mysite.alllinks(prefix="Fix", limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.title().startswith("Fix"))
-        for page in mysite.alllinks(namespace=1, limit=10):
+        for page in mysite.alllinks(namespace=1, limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertEqual(page.namespace(), 1)
         for page in mysite.alllinks(start="From", namespace=4, fromids=True,
-                                    limit=10):
+                                    limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(page.title(withNamespace=False) >= "From")
             self.assertTrue(hasattr(page, "_fromid"))
+        errgen = mysite.alllinks(unique=True, fromids=True)
+        self.assertRaises(pywikibot.Error, errgen.next)
 
     def testAllCategories(self):
         """Test the site.allcategories() method"""
@@ -352,7 +353,16 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(len(ac) <= 10)
         self.assertTrue(all(isinstance(cat, pywikibot.Category)
                             for cat in ac))
-        # TODO: test various optional arguments to allcategories
+        for cat in mysite.allcategories(limit=5, start="Abc"):
+            self.assertType(cat, pywikibot.Category)
+            self.assertTrue(cat.title(withNamespace=False) >= "Abc")
+        for cat in mysite.allcategories(limit=5, prefix="Def"):
+            self.assertType(cat, pywikibot.Category)
+            self.assertTrue(cat.title(withNamespace=False).startswith("Def"))
+        # Bug # 15985
+##        for cat in mysite.allcategories(limit=5, start="Hij", reverse=True):
+##            self.assertType(cat, pywikibot.Category)
+##            self.assertTrue(cat.title(withNamespace=False) <= "Hij")
 
     def testAllUsers(self):
         """Test the site.allusers() method"""
@@ -361,9 +371,28 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(len(au) <= 10)
         for user in au:
             self.assertType(user, dict)
-            self.assertTrue(user.has_key("name"))
-            self.assertTrue(user.has_key("editcount"))
-            self.assertTrue(user.has_key("registration"))
+            self.assertTrue("name" in user)
+            self.assertTrue("editcount" in user)
+            self.assertTrue("registration" in user)
+        for user in mysite.allusers(start="B", limit=5):
+            self.assertType(user, dict)
+            self.assertTrue("name" in user)
+            self.assertTrue(user["name"] >= "B")
+            self.assertTrue("editcount" in user)
+            self.assertTrue("registration" in user)
+        for user in mysite.allusers(prefix="C", limit=5):
+            self.assertType(user, dict)
+            self.assertTrue("name" in user)
+            self.assertTrue(user["name"].startswith("C"))
+            self.assertTrue("editcount" in user)
+            self.assertTrue("registration" in user)
+        for user in mysite.allusers(prefix="D", group="sysop", limit=5):
+            self.assertType(user, dict)
+            self.assertTrue("name" in user)
+            self.assertTrue(user["name"].startswith("D"))
+            self.assertTrue("editcount" in user)
+            self.assertTrue("registration" in user)
+            self.assertTrue("groups" in user and "sysop" in user["groups"])
 
     def testAllImages(self):
         """Test the site.allimages() method"""
@@ -404,7 +433,7 @@ class TestSiteObject(unittest.TestCase):
 
         le = list(mysite.logevents(limit=10))
         self.assertTrue(len(le) <= 10)
-        self.assertTrue(all(isinstance(entry, dict) and entry.has_key("type")
+        self.assertTrue(all(isinstance(entry, dict) and "type" in entry
                             for entry in le))
 
     def testRecentchanges(self):
