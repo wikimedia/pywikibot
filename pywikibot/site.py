@@ -1431,7 +1431,7 @@ class APISite(BaseSite):
                 "blocks: starttime must be before endtime with reverse=True")
                     return
             else:
-                if endtime < starttime:
+                if endtime > starttime:
                     logger.error(
                 "blocks: endtime must be before starttime with reverse=False")
                     return
@@ -1443,7 +1443,7 @@ class APISite(BaseSite):
         if endtime:
             bkgen.request["bkend"] = endtime
         if reverse:
-            bkgen.request["bkdir"] = newer
+            bkgen.request["bkdir"] = "newer"
         if blockids:
             bkgen.request["bkids"] = blockids
         if users:

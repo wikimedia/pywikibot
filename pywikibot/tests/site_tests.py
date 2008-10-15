@@ -401,14 +401,76 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(len(ai) <= 10)
         self.assertTrue(all(isinstance(image, pywikibot.ImagePage)
                             for image in ai))
+        for impage in mysite.allimages(start="Ba", limit=5):
+            self.assertType(impage, pywikibot.ImagePage)
+            self.assertTrue(mysite.page_exists(impage))
+            self.assertTrue(impage.title(withNamespace=False) >= "Ba")
+        # Bug # 15985
+##        for impage in mysite.allimages(start="Da", reverse=True, limit=5):
+##            self.assertType(impage, pywikibot.ImagePage)
+##            self.assertTrue(mysite.page_exists(impage))
+##            self.assertTrue(impage.title() <= "Da")
+        for impage in mysite.allimages(prefix="Ch", limit=5):
+            self.assertType(impage, pywikibot.ImagePage)
+            self.assertTrue(mysite.page_exists(impage))
+            self.assertTrue(impage.title(withNamespace=False).startswith("Ch"))
+        for impage in mysite.allimages(minsize=100, limit=5):
+            self.assertType(impage, pywikibot.ImagePage)
+            self.assertTrue(mysite.page_exists(impage))
+            self.assertTrue(len(impage.text) >= 100)
+        for impage in mysite.allimages(maxsize=200, limit=5):
+            self.assertType(impage, pywikibot.ImagePage)
+            self.assertTrue(mysite.page_exists(impage))
+            self.assertTrue(len(impage.text) <= 200)
 
     def testBlocks(self):
         """Test the site.blocks() method"""
 
+        props = ("id", "by", "timestamp", "expiry", "reason")
         bl = list(mysite.blocks(limit=10))
         self.assertTrue(len(bl) <= 10)
-        self.assertTrue(all(isinstance(block, dict)
-                            for block in bl))
+        for block in bl:
+            self.assertType(block, dict)
+            for prop in props:
+                self.assertTrue(prop in block)
+        # timestamps should be in descending order
+        timestamps = [block['timestamp'] for block in bl]
+        for t in xrange(1, len(timestamps)):
+            self.assertTrue(timestamps[t] < timestamps[t-1])
+
+        b2 = list(mysite.blocks(limit=10, reverse=True))
+        self.assertTrue(len(b2) <= 10)
+        for block in b2:
+            self.assertType(block, dict)
+            for prop in props:
+                self.assertTrue(prop in block)
+        # timestamps should be in ascending order
+        timestamps = [block['timestamp'] for block in b2]
+        for t in xrange(1, len(timestamps)):
+            self.assertTrue(timestamps[t] > timestamps[t-1])
+
+        for block in mysite.blocks(starttime="20080101000001", limit=5):
+            self.assertType(block, dict)
+            for prop in props:
+                self.assertTrue(prop in block)
+        for block in mysite.blocks(endtime="20080131235959", limit=5):
+            self.assertType(block, dict)
+            for prop in props:
+                self.assertTrue(prop in block)
+        for block in mysite.blocks(starttime="20080202000001",
+                                   endtime="20080202235959",
+                                   reverse=True, limit=5):
+            self.assertType(block, dict)
+            for prop in props:
+                self.assertTrue(prop in block)
+        for block in mysite.blocks(starttime="20080203235959",
+                                   endtime="20080203000001",
+                                   limit=5):
+            self.assertType(block, dict)
+            for prop in props:
+                self.assertTrue(prop in block)
+
+# TODO
 
     def testExturlusage(self):
         """Test the site.exturlusage() method"""
@@ -418,6 +480,8 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(len(eu) <= 10)
         self.assertTrue(all(isinstance(link, pywikibot.Page)
                             for link in eu))
+        for link in mysite.exturlusage(url, namespaces=[2, 3], limit=5):
+            self.assertType(link, pywikibot.Page)
 
     def testImageusage(self):
         """Test the site.imageusage() method"""
