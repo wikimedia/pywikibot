@@ -1427,14 +1427,12 @@ class APISite(BaseSite):
         if starttime and endtime:
             if reverse:
                 if starttime > endtime:
-                    logger.error(
+                    raise pywikibot.Error(
                 "blocks: starttime must be before endtime with reverse=True")
-                    return
             else:
                 if endtime > starttime:
-                    logger.error(
+                    raise pywikibot.Error(
                 "blocks: endtime must be before starttime with reverse=False")
-                    return
         bkgen = api.ListGenerator("blocks", site=self)
         bkgen.request["bkprop"] = \
                             "id|user|by|timestamp|expiry|reason|range|flags"
