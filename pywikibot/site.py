@@ -52,6 +52,8 @@ def deprecate_arg(old_arg, new_arg):
                         % locals())
                 del __kw[old_arg]
             return method(*__args, **__kw)
+        wrapper.__doc__ = method.__doc__
+        wrapper.__name__ = method.__name__
         return wrapper
     return decorator
 
@@ -895,9 +897,11 @@ class APISite(BaseSite):
         """
         bltitle = page.title(withSection=False).encode(self.encoding())
         blgen = api.PageGenerator("backlinks", gbltitle=bltitle, site=self)
-        if namespaces is not None:
+        if isinstance(namespaces, list):
             blgen.request["gblnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        elif namespaces is not None:
+            blgen.request["gblnamespace"] = str(namespaces)
         if filterRedirects is not None:
             blgen.request["gblfilterredir"] = filterRedirects and "redirects"\
                                                               or "nonredirects"
@@ -918,9 +922,11 @@ class APISite(BaseSite):
         """
         eititle = page.title(withSection=False).encode(self.encoding())
         eigen = api.PageGenerator("embeddedin", geititle=eititle, site=self)
-        if namespaces is not None:
+        if isinstance(namespaces, list):
             eigen.request["geinamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        elif namespaces is not None:
+            eigen.request["geinamespace"] = str(namespaces)
         if filterRedirects is not None:
             eigen.request["geifilterredir"] = filterRedirects and "redirects"\
                                                               or "nonredirects"
@@ -964,9 +970,11 @@ class APISite(BaseSite):
             plgen.request['titles'] = pltitle
         if follow_redirects:
             plgen.request['redirects'] = ''
-        if namespaces is not None:
+        if isinstance(namespaces, list):
             plgen.request["gplnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        elif namespaces is not None:
+            plgen.request["gplnamespace"] = str(namespaces)
         return plgen
 
     @deprecate_arg("withSortKey", None) # Sortkey doesn't work with generator
@@ -993,9 +1001,11 @@ class APISite(BaseSite):
         
         tltitle = page.title(withSection=False).encode(self.encoding())
         tlgen = api.PageGenerator("templates", titles=tltitle, site=self)
-        if namespaces is not None:
+        if isinstance(namespaces, list):
             tlgen.request["gtlnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        elif namespaces is not None:
+            tlgen.request["gtlnamespace"] = str(namespaces)
         return tlgen
 
     def categorymembers(self, category, namespaces=None, limit=None):
@@ -1019,9 +1029,11 @@ class APISite(BaseSite):
         cmtitle = category.title(withSection=False).encode(self.encoding())
         cmgen = api.PageGenerator("categorymembers", gcmtitle=cmtitle,
                                   gcmprop="ids|title|sortkey", site=self)
-        if namespaces is not None:
-            cmgen.request["gcmnamespace"] = u"|".join(str(ns)
+        if isinstance(namespaces, list):
+            cmgen.request["gcmnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        elif namespaces is not None:
+            cmgen.request["gcmnamespace"] = str(namespaces)
         if isinstance(limit, int):
             cmgen.limit = limit
         return cmgen
@@ -1465,9 +1477,11 @@ class APISite(BaseSite):
         """
         eugen = api.PageGenerator("exturlusage", geuquery=url,
                                   geuprotocol=protocol, site=self)
-        if namespaces is not None:
+        if isinstance(namespaces, list):
             eugen.request["geunamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        elif namespaces is not None:
+            eugen.request["geunamespace"] = str(namespaces)
         if isinstance(limit, int):
             eugen.limit = limit
         return eugen
@@ -1487,9 +1501,11 @@ class APISite(BaseSite):
         """
         iugen = api.PageGenerator("imageusage", site=self,
                                   giutitle=image.title(withSection=False))
-        if namespaces is not None:
+        if isinstance(namespaces, list):
             iugen.request["giunamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        elif namespaces is not None:
+            iugen.request["giunamespace"] = str(namespaces)
         if isinstance(limit, int):
             iugen.limit = limit
         if filterredir is not None:
@@ -1577,7 +1593,9 @@ class APISite(BaseSite):
                 if start < end:
                     raise Error(
             "recentchanges: start must be later than end with reverse=False")
-        rcgen = api.ListGenerator("recentchanges", site=self)
+        rcgen = api.ListGenerator("recentchanges", site=self,
+                                  rcprop="user|comment|timestamp|title|ids"
+                                         "|redirect|patrolled|loginfo|flags")
         if start is not None:
             rcgen.request["rcstart"] = start
         if end is not None:
@@ -1586,9 +1604,11 @@ class APISite(BaseSite):
             rcgen.request["rcdir"] = "newer"
         if isinstance(limit, int):
             rcgen.limit = limit
-        if namespaces is not None:
-            rcgen.request["rcunamespace"] = u"|".join(unicode(ns)
+        if isinstance(namespaces, list):
+            rcgen.request["rcnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        elif namespaces is not None:
+            rcgen.request["rcnamespace"] = str(namespaces)
         if pagelist:
             rcgen.request["rctitles"] = u"|".join(p.title(withSection=False)
                                                  for p in pagelist)
@@ -1597,7 +1617,7 @@ class APISite(BaseSite):
         filters = {'minor': showMinor,
                    'bot': showBot,
                    'anon': showAnon,
-                   'redirects': showRedirects,
+                   'redirect': showRedirects,
                    'patrolled': showPatrolled}
         rcshow = []
         for item in filters:
@@ -1608,7 +1628,7 @@ class APISite(BaseSite):
         return rcgen
 
     @deprecate_arg("number", "limit")
-    def search(self, searchstring, namespaces=[0], where="text",
+    def search(self, searchstring, namespaces=None, where="text",
                getredirects=False, limit=None):
         """Iterate Pages that contain the searchstring.
 
@@ -1619,11 +1639,10 @@ class APISite(BaseSite):
         @type searchstring: unicode
         @param where: Where to search; value must be "text" or "titles" (many
             wikis do not support title search)
-        @param namespaces: search only in these namespaces (default: 0)
+        @param namespaces: search only in these namespaces (defaults to 0)
         @type namespaces: list of ints
         @param getredirects: if True, include redirects in results
         @param limit: maximum number of results to iterate
-        @param number: deprecated, synonym for 'limit'
 
         """
         if not searchstring:
@@ -1635,11 +1654,11 @@ class APISite(BaseSite):
         if not namespaces:
             logger.warning("search: namespaces cannot be empty; using [0].")
             namespaces = [0]
-        if isinstance(namespaces, basestring):
-            srgen.request["gsrnamespace"] = namespaces
-        else:
+        if isinstance(namespaces, list):
             srgen.request["gsrnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        else:
+            srgen.request["gsrnamespace"] = str(namespaces)
         if getredirects:
             srgen.request["gsrredirects"] = ""
         if isinstance(limit, int):
@@ -1692,9 +1711,11 @@ class APISite(BaseSite):
             ucgen.request["ucdir"] = "newer"
         if isinstance(limit, int):
             ucgen.limit = limit
-        if namespaces is not None:
+        if isinstance(namespaces, list):
             ucgen.request["ucnamespace"] = u"|".join(unicode(ns)
                                                       for ns in namespaces)
+        elif namespaces is not None:
+            ucgen.request["ucnamespace"] = str(namespaces)
         if showMinor is not None:
             ucgen.request["ucshow"] = showMinor and "minor" or "!minor"
         return ucgen
@@ -1741,9 +1762,11 @@ class APISite(BaseSite):
             wlgen.request["wldir"] = "newer"
         if isinstance(limit, int):
             wlgen.limit = limit
-        if namespaces is not None:
+        if isinstance(namespaces, list):
             wlgen.request["wlnamespace"] = u"|".join(unicode(ns)
-                                                     for ns in namespaces)
+                                                      for ns in namespaces)
+        elif namespaces is not None:
+            wlgen.request["wlnamespace"] = str(namespaces)
         filters = {'minor': showMinor,
                    'bot': showBot,
                    'anon': showAnon}
@@ -1843,9 +1866,11 @@ class APISite(BaseSite):
         """
         rngen = api.PageGenerator("random", site=self)
         rngen.limit = limit
-        if namespaces:
-            rngen.request["wlnamespace"] = u"|".join(unicode(ns)
-                                                     for ns in namespaces)
+        if isinstance(namespaces, list):
+            rngen.request["grnnamespace"] = u"|".join(unicode(ns)
+                                                      for ns in namespaces)
+        elif namespaces is not None:
+            rngen.request["grnnamespace"] = str(namespaces)
         return rngen
 
     # catalog of editpage error codes, for use in generating messages
@@ -2207,6 +2232,8 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             self.unlock_page(page)
 
     # TODO: implement undelete
+
+    # TODO: implement patrol
 
     
 #### METHODS NOT IMPLEMENTED YET ####

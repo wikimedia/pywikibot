@@ -15,6 +15,7 @@ import pywikibot
 
 mysite = pywikibot.Site()
 mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
+imagepage = iter(mainpage.imagelinks()).next() # 1st image on main page
 
 
 class TestSiteObject(unittest.TestCase):
@@ -359,7 +360,7 @@ class TestSiteObject(unittest.TestCase):
         for cat in mysite.allcategories(limit=5, prefix="Def"):
             self.assertType(cat, pywikibot.Category)
             self.assertTrue(cat.title(withNamespace=False).startswith("Def"))
-        # Bug # 15985
+##        # Bug # 15985
 ##        for cat in mysite.allcategories(limit=5, start="Hij", reverse=True):
 ##            self.assertType(cat, pywikibot.Category)
 ##            self.assertTrue(cat.title(withNamespace=False) <= "Hij")
@@ -405,7 +406,7 @@ class TestSiteObject(unittest.TestCase):
             self.assertType(impage, pywikibot.ImagePage)
             self.assertTrue(mysite.page_exists(impage))
             self.assertTrue(impage.title(withNamespace=False) >= "Ba")
-        # Bug # 15985
+##        # Bug # 15985
 ##        for impage in mysite.allimages(start="Da", reverse=True, limit=5):
 ##            self.assertType(impage, pywikibot.ImagePage)
 ##            self.assertTrue(mysite.page_exists(impage))
@@ -449,34 +450,37 @@ class TestSiteObject(unittest.TestCase):
         for t in xrange(1, len(timestamps)):
             self.assertTrue(timestamps[t] >= timestamps[t-1])
 
-        for block in mysite.blocks(starttime="20080101000001", limit=5):
+        for block in mysite.blocks(starttime="2008-01-01T00:00:01", limit=5):
             self.assertType(block, dict)
             for prop in props:
                 self.assertTrue(prop in block)
-        for block in mysite.blocks(endtime="20080131235959", limit=5):
+        for block in mysite.blocks(endtime="2008-01-31T23:59:59", limit=5):
             self.assertType(block, dict)
             for prop in props:
                 self.assertTrue(prop in block)
-        for block in mysite.blocks(starttime="20080202000001",
-                                   endtime="20080202235959",
+        for block in mysite.blocks(starttime="2008-02-02T00:00:01",
+                                   endtime="2008-02-02T23:59:59",
                                    reverse=True, limit=5):
             self.assertType(block, dict)
             for prop in props:
                 self.assertTrue(prop in block)
-        for block in mysite.blocks(starttime="20080203235959",
-                                   endtime="20080203000001",
+        for block in mysite.blocks(starttime="2008-02-03T23:59:59",
+                                   endtime="2008-02-03T00:00:01",
                                    limit=5):
             self.assertType(block, dict)
             for prop in props:
                 self.assertTrue(prop in block)
         # starttime earlier than endtime
         self.assertRaises(pywikibot.Error, mysite.blocks,
-                          starttime="20080203000001",
-                          endtime="20080203235959", limit=5)
+                          starttime="2008-02-03T00:00:01",
+                          endtime="2008-02-03T23:59:59", limit=5)
         # reverse: endtime earlier than starttime
         self.assertRaises(pywikibot.Error, mysite.blocks,
-                          starttime="20080203235959",
-                          endtime="20080203000001", reverse=True, limit=5)
+                          starttime="2008-02-03T23:59:59",
+                          endtime="2008-02-03T00:00:01", reverse=True, limit=5)
+        for block in mysite.blocks(users=mysite.user(), limit=5):
+            self.assertType(block, dict)
+            self.assertEqual(block['user'], mysite.user())
 
     def testExturlusage(self):
         """Test the site.exturlusage() method"""
@@ -493,8 +497,6 @@ class TestSiteObject(unittest.TestCase):
     def testImageusage(self):
         """Test the site.imageusage() method"""
 
-        imagepage = iter(mainpage.imagelinks()).next()
-        # use first image appearing on main page
         iu = list(mysite.imageusage(imagepage, limit=10))
         self.assertTrue(len(iu) <= 10)
         self.assertTrue(all(isinstance(link, pywikibot.Page)
@@ -526,32 +528,32 @@ class TestSiteObject(unittest.TestCase):
         for entry in mysite.logevents(user=mysite.user(), limit=3):
             self.assertTrue("user" in entry
                             and entry["user"] == mysite.user())
-        for entry in mysite.logevents(start="20080101000001", limit=5):
+        for entry in mysite.logevents(start="2008-01-01T00:00:01", limit=5):
             self.assertType(entry, dict)
             self.assertTrue(entry['timestamp'] <= "2008-01-01T00:00:01Z")
-        for entry in mysite.logevents(end="20080131235959", limit=5):
+        for entry in mysite.logevents(end="2008-01-31T23:59:59", limit=5):
             self.assertType(entry, dict)
             self.assertTrue(entry['timestamp'] >= "2008-01-31T23:59:59Z")
-        for entry in mysite.logevents(start="20080202000001",
-                                      end="20080202235959",
+        for entry in mysite.logevents(start="2008-02-02T00:00:01",
+                                      end="2008-02-02T23:59:59",
                                       reverse=True, limit=5):
             self.assertType(entry, dict)
             self.assertTrue("2008-02-02T00:00:01Z" <= entry['timestamp']
                                 <= "2008-02-02T23:59:59Z")
-        for entry in mysite.logevents(start="20080203235959",
-                                      end="20080203000001",
+        for entry in mysite.logevents(start="2008-02-03T23:59:59",
+                                      end="2008-02-03T00:00:01",
                                       limit=5):
             self.assertType(entry, dict)
             self.assertTrue("2008-02-03T00:00:01Z" <= entry['timestamp']
                                 <= "2008-02-03T23:59:59Z")
         # starttime earlier than endtime
         self.assertRaises(pywikibot.Error, mysite.logevents,
-                          start="20080203000001",
-                          end="20080203235959", limit=5)
+                          start="2008-02-03T00:00:01",
+                          end="2008-02-03T23:59:59", limit=5)
         # reverse: endtime earlier than starttime
         self.assertRaises(pywikibot.Error, mysite.logevents,
-                          start="20080203235959",
-                          end="20080203000001", reverse=True, limit=5)
+                          start="2008-02-03T23:59:59",
+                          end="2008-02-03T00:00:01", reverse=True, limit=5)
 
     def testRecentchanges(self):
         """Test the site.recentchanges() method"""
@@ -560,6 +562,89 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(len(rc) <= 10)
         self.assertTrue(all(isinstance(change, dict)
                             for change in rc))
+        for change in mysite.recentchanges(start="2008-10-01T01:02:03Z",
+                                           limit=5):
+            self.assertType(change, dict)
+            self.assertTrue(change['timestamp'] <= "2008-10-01T01:02:03Z")
+        for change in mysite.recentchanges(end="2008-04-01T02:03:04Z",
+                                           limit=5):
+            self.assertType(change, dict)
+            self.assertTrue(change['timestamp'] >= "2008-10-01T02:03:04Z")
+        for change in mysite.recentchanges(start="2008-10-01T03:05:07Z",
+                                           limit=5, reverse=True):
+            self.assertType(change, dict)
+            self.assertTrue(change['timestamp'] >= "2008-10-01T03:05:07Z")
+        for change in mysite.recentchanges(end="2008-10-01T04:06:08Z",
+                                           limit=5, reverse=True):
+            self.assertType(change, dict)
+            self.assertTrue(change['timestamp'] <= "2008-10-01T04:06:08Z")
+        for change in mysite.recentchanges(start="2008-10-03T11:59:59Z",
+                                           end="2008-10-03T00:00:01Z",
+                                           limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("2008-10-03T00:00:01Z" <= change['timestamp']
+                                <= "2008-10-03T11:59:59Z")
+        for change in mysite.recentchanges(start="2008-10-05T06:00:01Z",
+                                           end="2008-10-05T23:59:59Z",
+                                           reverse=True, limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("2008-10-05T06:00:01Z" <= change['timestamp']
+                                <= "2008-10-05T23:59:59Z")
+        # start earlier than end
+        self.assertRaises(pywikibot.Error, mysite.recentchanges,
+                          start="2008-02-03T00:00:01",
+                          end="2008-02-03T23:59:59", limit=5)
+        # reverse: end earlier than start
+        self.assertRaises(pywikibot.Error, mysite.recentchanges,
+                          start="2008-02-03T23:59:59",
+                          end="2008-02-03T00:00:01", reverse=True, limit=5)
+        for change in mysite.recentchanges(namespaces=[6,7], limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("title" in change and "ns" in change)
+            title = change['title']
+            self.assertTrue(":" in title)
+            prefix = title[ : title.index(":")]
+            self.assertTrue(mysite.ns_index(prefix) in [6,7])
+            self.assertTrue(change["ns"] in [6,7])
+        for change in mysite.recentchanges(pagelist=[mainpage, imagepage],
+                                           limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("title" in change)
+            self.assertTrue(change["title"] in (mainpage.title(),
+                                                imagepage.title()))
+        for typ in ("edit", "new", "log"):
+            for change in mysite.recentchanges(changetype=typ, limit=5):
+                self.assertType(change, dict)
+                self.assertTrue("type" in change)
+                self.assertEqual(change["type"], typ)
+        for change in mysite.recentchanges(showMinor=True, limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("minor" in change)
+        for change in mysite.recentchanges(showMinor=False, limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("minor" not in change)
+        for change in mysite.recentchanges(showBot=True, limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("bot" in change)
+        for change in mysite.recentchanges(showBot=False, limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("bot" not in change)
+        for change in mysite.recentchanges(showAnon=True, limit=5):
+            self.assertType(change, dict)
+        for change in mysite.recentchanges(showAnon=False, limit=5):
+            self.assertType(change, dict)
+        for change in mysite.recentchanges(showRedirects=True, limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("redirect" in change)
+        for change in mysite.recentchanges(showRedirects=False, limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("redirect" not in change)
+        for change in mysite.recentchanges(showPatrolled=True, limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("patrolled" in change)
+        for change in mysite.recentchanges(showPatrolled=False, limit=5):
+            self.assertType(change, dict)
+            self.assertTrue("patrolled" not in change)
 
     def testSearch(self):
         """Test the site.search() method"""
@@ -568,6 +653,20 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(len(se) <= 10)
         self.assertTrue(all(isinstance(hit, pywikibot.Page)
                             for hit in se))
+        self.assertTrue(all(hit.namespace() == 0 for hit in se))
+        for hit in mysite.search("common", namespaces=4, limit=5):
+            self.assertType(hit, pywikibot.Page)
+            self.assertEqual(hit.namespace(), 4)
+        for hit in mysite.search("word", namespaces=[5,6,7], limit=5):
+            self.assertType(hit, pywikibot.Page)
+            self.assertTrue(hit.namespace() in [5,6,7])
+        for hit in mysite.search("another", namespaces="8|9|10", limit=5):
+            self.assertType(hit, pywikibot.Page)
+            self.assertTrue(hit.namespace() in [8,9,10])
+        for hit in mysite.search("wiki", namespaces=0, limit=10,
+                                 getredirects=True):
+            self.assertType(hit, pywikibot.Page)
+            self.assertEqual(hit.namespace(), 0)
 
     def testUsercontribs(self):
         """Test the site.usercontribs() method"""
@@ -576,6 +675,71 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(len(uc) <= 10)
         self.assertTrue(all(isinstance(contrib, dict)
                             for contrib in uc))
+        self.assertTrue(all("user" in contrib
+                            and contrib["user"] == mysite.user()
+                            for contrib in uc))
+        for contrib in mysite.usercontribs(userprefix="John", limit=5):
+            self.assertType(contrib, dict)
+            for key in ("user", "title", "ns", "pageid", "revid"):
+                self.assertTrue(key in contrib)
+            self.assertTrue(contrib["user"].startswith("John"))
+        for contrib in mysite.usercontribs(userprefix="Jane",
+                                           start="2008-10-06T01:02:03Z",
+                                           limit=5):
+            self.assertTrue(contrib['timestamp'] <= "2008-10-06T01:02:03Z")
+        for contrib in mysite.usercontribs(userprefix="Jane",
+                                           end="2008-10-07T02:03:04Z",
+                                           limit=5):
+            self.assertTrue(contrib['timestamp'] >= "2008-10-07T02:03:04Z")
+        for contrib in mysite.usercontribs(userprefix="Brion",
+                                           start="2008-10-08T03:05:07Z",
+                                           limit=5, reverse=True):
+            self.assertTrue(contrib['timestamp'] >= "2008-10-08T03:05:07Z")
+        for contrib in mysite.usercontribs(userprefix="Brion",
+                                           end="2008-10-09T04:06:08Z",
+                                           limit=5, reverse=True):
+            self.assertTrue(contrib['timestamp'] <= "2008-10-09T04:06:08Z")
+        for contrib in mysite.usercontribs(userprefix="Tim",
+                                           start="2008-10-10T11:59:59Z",
+                                           end="2008-10-10T00:00:01Z",
+                                           limit=5):
+            self.assertTrue("2008-10-10T00:00:01Z" <= contrib['timestamp']
+                                <= "2008-10-10T11:59:59Z")
+        for contrib in mysite.usercontribs(userprefix="Tim",
+                                           start="2008-10-11T06:00:01Z",
+                                           end="2008-10-11T23:59:59Z",
+                                           reverse=True, limit=5):
+            self.assertTrue("2008-10-11T06:00:01Z" <= contrib['timestamp']
+                                <= "2008-10-11T23:59:59Z")
+        # start earlier than end
+        self.assertRaises(pywikibot.Error, mysite.usercontribs,
+                          userprefix="Jim",
+                          start="2008-10-03T00:00:01",
+                          end="2008-10-03T23:59:59", limit=5)
+        # reverse: end earlier than start
+        self.assertRaises(pywikibot.Error, mysite.usercontribs,
+                          userprefix="Jim",
+                          start="2008-10-03T23:59:59",
+                          end="2008-10-03T00:00:01", reverse=True, limit=5)
+
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           namespaces=14, limit=5):
+            self.assertType(contrib, dict)
+            self.assertTrue("title" in contrib)
+            self.assertTrue(contrib["title"].startswith(mysite.namespace(14)))
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           namespaces=[10,11], limit=5):
+            self.assertType(contrib, dict)
+            self.assertTrue("title" in contrib)
+            self.assertTrue(contrib["ns"] in (10, 11))
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           showMinor=True, limit=5):
+            self.assertType(contrib, dict)
+            self.assertTrue("minor" in contrib)
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           showMinor=False, limit=5):
+            self.assertType(contrib, dict)
+            self.assertTrue("minor" not in contrib)
 
     def testWatchlistrevs(self):
         """Test the site.watchlist_revs() method"""
