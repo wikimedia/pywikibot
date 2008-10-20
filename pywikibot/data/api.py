@@ -396,7 +396,9 @@ class QueryGenerator(object):
             if not self.module in self.data["query-continue"]:
                 raise Error("Missing '%s' key in ['query-continue'] value."
                             % self.module)
-            self.request.update(self.data["query-continue"][self.module])
+            update = self.data["query-continue"][self.module]
+            for key in update:
+                self.request[key] = str(update[key])
 
     def result(self, data):
         """Process result data as needed for particular subclass."""
