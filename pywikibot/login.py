@@ -282,7 +282,7 @@ def main():
     sysop = False
     logall = False
     forceLogin = False
-    for arg in wikipedia.handleArgs():
+    for arg in wikipedia.handleArgs(): #FIXME
         if arg.startswith("-pass"):
             if len(arg) == 5:
                 password = pywikibot.input(u'Password for all accounts:',
@@ -296,7 +296,7 @@ def main():
         elif arg == "-force":
             forceLogin = True
         else:
-            wikipedia.showHelp('login')
+            wikipedia.showHelp('login') #FIXME
             return
     if logall:
         if sysop:
@@ -306,14 +306,16 @@ def main():
         for familyName in namedict.iterkeys():
             for lang in namedict[familyName].iterkeys():
                 try:
-                    site = wikipedia.getSite(code=lang, fam=familyName)
+                    site = pywikibot.getSite(code=lang, fam=familyName)
                     if not forceLogin and site.loggedInAs(sysop = sysop) != None:
-                        wikipedia.output(u'Already logged in on %s' % site)
+                        logger.info(u'Already logged in on %(site)s' % locals())
                     else:
-                        loginMan = LoginManager(password, sysop = sysop, site = site)
+                        loginMan = LoginManager(password, sysop=sysop, site=site)
                         loginMan.login()
-                except wikipedia.NoSuchSite:
-                    wikipedia.output(lang+ u'.' + familyName + u' is not a valid site, please remove it from your config')
+                except pywikibot.NoSuchSite:
+                    pywikibot.output(
+                        lang + u'.' + familyName +
+u' is not a valid site, please remove it from your config')
 
     else:
         loginMan = LoginManager(password, sysop=sysop)
