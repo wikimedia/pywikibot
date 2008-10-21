@@ -81,7 +81,7 @@ class LoginManager:
             try:
                 self.username = config.sysopnames\
                                 [self.site.family.name][self.site.code]
-            except:
+            except KeyError:
                 raise NoUsername(
 u"""ERROR: Sysop username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have a sysop account for that site, please add a line to user-config.py:
@@ -120,33 +120,45 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                     return True
             return False
         else:
-            # No bot policies on other 
+            # No bot policies on other
             return True
 
-    def getCookie(self, remember=True, captchaId=None, captchaAnswer=None):
-        """Login to the site.
+    def getCookie(self, remember=True, captcha = None):
+        """
+        Login to the site.
 
         remember    Remember login (default: True)
-        captchaId   The id number of the captcha, if any
-        captcha     The word displayed in the captcha, if any
+        captchaId   A dictionary containing the captcha id and answer, if any
 
         Returns cookie data if succesful, None otherwise.
 
         """
-        predata = {
-            "wpName": self.username.encode(self.site.encoding()),
-            "wpPassword": self.password,
-            "wpLoginattempt": "Aanmelden & Inschrijven", # dutch button label seems to work for all wikis
-            "wpRemember": str(int(bool(remember)))
-        }
-        if captchaId:
-            predata["wpCaptchaId"] = captchaId
-            predata["wpCaptchaWord"] = captchaAnswer
-        address = self.site.login_address()
+        if config.use_api_login:
+            predata = {
+                'action': 'login',
+                'lgname': self.username.encode(self.site.encoding()),
+                'lgpassword': self.password,
+                'lgdomain': self.site.family.ldapDomain,
+            }
+            address = self.site.api_address()
+        else:
+            predata = {
+                "wpName": self.username.encode(self.site.encoding()),
+                "wpPassword": self.password,
+                "wpDomain": self.site.family.ldapDomain,     # VistaPrint fix
+                "wpLoginattempt": "Aanmelden & Inschrijven", # dutch button label seems to work for all wikis
+                "wpRemember": str(int(bool(remember))),
+                "wpSkipCookieCheck": '1'
+            }
+            if captcha:
+                predata["wpCaptchaId"] = captcha['id']
+                predata["wpCaptchaWord"] = captcha['answer']
+            login_address = self.site.login_address()
+            address = login_address + '&action=submit'
 
         if self.site.hostname() in config.authenticate.keys():
             headers = {
-                "Content-type": "application/x-www-form-urlencoded", 
+                "Content-type": "application/x-www-form-urlencoded",
                 "User-agent": wikipedia.useragent
             }
             data = self.site.urlEncode(predata)
@@ -158,44 +170,29 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             wikipedia.cj.save(wikipedia.COOKIEFILE)
             return "Ok"
         else:
-            response, data = self.site.postForm(address, predata,
-                                                useCookie=False)
-            n = 0
+            response, data = self.site.postData(address, self.site.urlEncode(predata))
             Reat=re.compile(': (.*?);')
             L = []
 
             for eat in response.msg.getallmatchingheaders('set-cookie'):
                 m = Reat.search(eat)
                 if m:
-                    n += 1
                     L.append(m.group(1))
 
-            log_data = []
+            got_token = got_user = False
             for Ldata in L:
-                if (re.match('.*_session=.*', Ldata)):
-                    log_data.append(Ldata)
-                elif (re.match('.*UserID=.*', Ldata)):
-                    log_data.append(Ldata)
-                elif (re.match('.*UserName=.*', Ldata)):
-                    log_data.append(Ldata)
-                elif (re.match('.*Token=.*', Ldata)):
-                    log_data.append(Ldata)
+                if 'Token=' in Ldata:
+                    got_token = True
+                if 'User=' in Ldata or 'UserName=' in Ldata:
+                    got_user = True
 
-            if len(log_data) == 4:
+            if got_token and got_user:
                 return "\n".join(L)
-            elif not captchaAnswer:
-                captchaR = re.compile('<input type="hidden" name="wpCaptchaId" id="wpCaptchaId" value="(?P<id>\d+)" />')
-                match = captchaR.search(data)
-                if match:
-                    id = match.group('id')
-                    if not config.solve_captcha:
-                        raise CaptchaError(id)
-                    url = self.site.protocol() + '://' + self.site.hostname() + self.site.captcha_image_address(id)
-                    answer = wikipedia.ui.askForCaptcha(url)
-                    return self.getCookie(remember=remember, captchaId=id,
-                                          captchaAnswer=answer)
-            else:
-                return None
+            elif not captcha:
+                solve = self.site.solveCaptcha(data)
+                if solve:
+                    return self.getCookie(remember = remember, captcha = solve)
+            return None
 
     def storecookiedata(self, data):
         """
@@ -308,12 +305,16 @@ def main():
             namedict = config.usernames
         for familyName in namedict.iterkeys():
             for lang in namedict[familyName].iterkeys():
-                site = pywikibot.getSite(code=lang, fam=familyName)
-                if not forceLogin and site.loggedInAs(sysop = sysop) != None:
-                    logger.info(u'Already logged in on %(site)s' % locals())
-                else:
-                    loginMan = LoginManager(password, sysop=sysop, site=site)
-                    loginMan.login()
+                try:
+                    site = wikipedia.getSite(code=lang, fam=familyName)
+                    if not forceLogin and site.loggedInAs(sysop = sysop) != None:
+                        wikipedia.output(u'Already logged in on %s' % site)
+                    else:
+                        loginMan = LoginManager(password, sysop = sysop, site = site)
+                        loginMan.login()
+                except wikipedia.NoSuchSite:
+                    wikipedia.output(lang+ u'.' + familyName + u' is not a valid site, please remove it from your config')
+
     else:
         loginMan = LoginManager(password, sysop=sysop)
         loginMan.login()
