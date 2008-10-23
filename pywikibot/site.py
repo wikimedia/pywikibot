@@ -100,7 +100,7 @@ class BaseSite(object):
     # to implement a specific interface, define a Site class that inherits
     # from this
 
-    def __init__(self, code, fam=None, user=None):
+    def __init__(self, code, fam=None, user=None, sysop=None):
         """
         @param code: the site's language code
         @type code: str
@@ -108,6 +108,8 @@ class BaseSite(object):
         @type fam: str or Family
         @param user: bot user name (optional)
         @type user: str
+        @param sysop: sysop account user name (optional)
+        @type sysop: str
 
         """
         self.__code = code.lower()
@@ -133,7 +135,7 @@ class BaseSite(object):
                 raise NoSuchSite("Language %s does not exist in family %s"
                                  % (self.__code, self.__family.name))
 
-        self._username = user
+        self._username = [user, sysop]
 
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Lock()
@@ -184,8 +186,10 @@ class BaseSite(object):
     def user(self):
         """Return the currently-logged in bot user, or None."""
         
-        if self.logged_in():
-            return self._username
+        if self.logged_in(True):
+            return self._username[True]
+        elif self.logged_in(False):
+            return self._username[False]
         return None
 
     def __getattr__(self, attr):
@@ -480,7 +484,7 @@ class APISite(BaseSite):
         @param sysop: if True, require sysop privileges.
 
         """
-        if self.userinfo['name'] != self._username:
+        if self.userinfo['name'] != self._username[sysop]:
             return False
         return (not sysop) or 'sysop' in self.userinfo['groups']
 
@@ -499,13 +503,13 @@ class APISite(BaseSite):
             self._getsiteinfo()
         # check whether a login cookie already exists for this user
         if hasattr(self, "_userinfo"):
-            if self.userinfo['name'] == self._username:
+            if self.userinfo['name'] == self._username[sysop]:
                 return
         if not self.logged_in(sysop):
             loginMan = api.LoginManager(site=self, sysop=sysop,
-                                        user=self._username)
+                                        user=self._username[sysop])
             if loginMan.login(retry = True):
-                self._username = loginMan.username
+                self._username[sysop] = loginMan.username
                 if hasattr(self, "_userinfo"):
                     del self._userinfo
                 self.getuserinfo()
@@ -526,8 +530,10 @@ class APISite(BaseSite):
           - blockinfo: present if user is blocked (dict)
 
         """
-        if not hasattr(self, "_userinfo") or "rights" not in self._userinfo \
-                or self._userinfo['name'] != self._username:
+        if (not hasattr(self, "_userinfo")
+                or "rights" not in self._userinfo
+                or self._userinfo['name']
+                   != self._username["sysop" in self._userinfo["groups"]]):
             uirequest = api.Request(
                                 site=self,
                                 action="query",
@@ -1854,7 +1860,7 @@ class APISite(BaseSite):
                           usprop="blockinfo|groups|editcount|registration")
         return usgen
 
-    def randompages(self, limit=1, namespaces=None):
+    def randompages(self, limit=1, namespaces=None, redirects=False):
         """Iterate a number of random pages.
 
         Pages are listed in a fixed sequence, only the starting point is
@@ -1862,6 +1868,8 @@ class APISite(BaseSite):
         
         @param limit: the maximum number of pages to iterate (default: 1)
         @param namespaces: only iterate pages in these namespaces.
+        @param redirects: if True, include only redirect pages in results
+            (default: include only non-redirects)
 
         """
         rngen = api.PageGenerator("random", site=self)
@@ -1871,6 +1879,8 @@ class APISite(BaseSite):
                                                       for ns in namespaces)
         elif namespaces is not None:
             rngen.request["grnnamespace"] = str(namespaces)
+        if redirects:
+            rngen.request["grnredirect"] = ""
         return rngen
 
     # catalog of editpage error codes, for use in generating messages
