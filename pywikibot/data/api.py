@@ -17,6 +17,7 @@ import re
 import traceback
 import time
 import urllib
+import warnings
 
 import config
 import pywikibot
@@ -41,6 +42,11 @@ class APIError(pywikibot.Error):
         return 'APIError("%(code)s", "%(info)s", %(other)s)' % self.__dict__
     def __str__(self):
         return "%(code)s: %(info)s" % self.__dict__
+
+
+class APIWarning(UserWarning):
+    """The API returned a warning message."""
+    pass
 
 
 class TimeoutError(pywikibot.Error):
@@ -222,6 +228,12 @@ class Request(DictMixin):
                     else:
                         self.site._userinfo = result['query']['userinfo']
 
+            if "warnings" in result:
+                modules = [k for k in result["warning"] if k != "info"]
+                logger.warn(
+                    "API warning (%s): %s"
+                    % (", ".join(modules), result['warnings']['info']))
+                warnings.warn(result['warnings']['info'])
             if "error" not in result:
                 return result
             if "*" in result["error"]:
