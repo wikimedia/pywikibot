@@ -1784,7 +1784,7 @@ class APISite(BaseSite):
             wlgen.request["wlshow"] = "|".join(wlshow)
         return wlgen
 
-    def deletedrevs(self, start=None, end=None, reverse=None, limit=None,
+    def deletedrevs(self, page, start=None, end=None, reverse=None, limit=None,
                     get_text=False):
         """Iterate deleted revisions.
 
@@ -1794,6 +1794,7 @@ class APISite(BaseSite):
         recentchanges (plus a 'content' element if requested). If get_text
         is true, the toplevel dict will contain a 'token' key as well.
 
+        @param page: The page to check for deleted revisions
         @param start: Iterate revisions starting at this timestamp
         @param end: Iterate revisions ending at this timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
@@ -1834,7 +1835,8 @@ class APISite(BaseSite):
                             % self.user())
             
         drgen = api.ListGenerator("deletedrevs", site=self,
-                    drprop="revid|user|comment|minor")
+                                  titles=page.title(withSection=False),
+                                  drprop="revid|user|comment|minor")
         if get_text:
             drgen.request['drprop'] = drgen.request['drprop'] + "|content|token"
         if start is not None:

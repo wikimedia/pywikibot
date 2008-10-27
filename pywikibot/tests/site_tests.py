@@ -824,51 +824,54 @@ class TestSiteObject(unittest.TestCase):
                 warnings.warn(
                  "Cannot test Site.deleted_revs; no sysop account configured.")
                 return
-        dr = list(mysite.deletedrevs(limit=10))
+        dr = list(mysite.deletedrevs(limit=10, page=mainpage))
         self.assertTrue(len(dr) <= 10)
         self.assertTrue(all(isinstance(rev, dict)
                             for rev in dr))
-        dr2 = list(mysite.deletedrevs(titles=mainpage.title(withSection=False),
-                                      limit=10))
+        dr2 = list(mysite.deletedrevs(page=mainpage, limit=10))
         self.assertTrue(len(dr2) <= 10)
         self.assertTrue(all(isinstance(rev, dict)
                             for rev in dr2))
         for rev in mysite.deletedrevs(start="2008-10-11T01:02:03Z",
-                                      limit=5):
+                                      page=mainpage, limit=5):
             self.assertType(rev, dict)
             self.assertTrue(rev['timestamp'] <= "2008-10-11T01:02:03Z")
         for rev in mysite.deletedrevs(end="2008-04-01T02:03:04Z",
-                                      limit=5):
+                                      page=mainpage, limit=5):
             self.assertType(rev, dict)
             self.assertTrue(rev['timestamp'] >= "2008-10-11T02:03:04Z")
         for rev in mysite.deletedrevs(start="2008-10-11T03:05:07Z",
-                                      limit=5, reverse=True):
+                                      page=mainpage, limit=5,
+                                      reverse=True):
             self.assertType(rev, dict)
             self.assertTrue(rev['timestamp'] >= "2008-10-11T03:05:07Z")
         for rev in mysite.deletedrevs(end="2008-10-11T04:06:08Z",
-                                      limit=5, reverse=True):
+                                      page=mainpage, limit=5,
+                                      reverse=True):
             self.assertType(rev, dict)
             self.assertTrue(rev['timestamp'] <= "2008-10-11T04:06:08Z")
         for rev in mysite.deletedrevs(start="2008-10-13T11:59:59Z",
                                       end="2008-10-13T00:00:01Z",
-                                      limit=5):
+                                      page=mainpage, limit=5):
             self.assertType(rev, dict)
             self.assertTrue("2008-10-13T00:00:01Z" <= rev['timestamp']
                                 <= "2008-10-13T11:59:59Z")
         for rev in mysite.deletedrevs(start="2008-10-15T06:00:01Z",
                                       end="2008-10-15T23:59:59Z",
-                                      reverse=True, limit=5):
+                                      page=mainpage, reverse=True,
+                                      limit=5):
             self.assertType(rev, dict)
             self.assertTrue("2008-10-15T06:00:01Z" <= rev['timestamp']
                                 <= "2008-10-15T23:59:59Z")
         # start earlier than end
         self.assertRaises(pywikibot.Error, mysite.deletedrevs,
-                          start="2008-09-03T00:00:01Z",
+                          page=mainpage, start="2008-09-03T00:00:01Z",
                           end="2008-09-03T23:59:59Z", limit=5)
         # reverse: end earlier than start
         self.assertRaises(pywikibot.Error, mysite.deletedrevs,
-                          start="2008-09-03T23:59:59Z",
-                          end="2008-09-03T00:00:01Z", reverse=True, limit=5)
+                          page=mainpage, start="2008-09-03T23:59:59Z",
+                          end="2008-09-03T00:00:01Z", reverse=True,
+                          limit=5)
 
     def testUsers(self):
         """Test the site.users() method"""
