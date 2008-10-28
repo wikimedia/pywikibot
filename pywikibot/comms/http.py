@@ -90,7 +90,9 @@ def request(site, uri, *args, **kwargs):
     baseuri = "%s://%s/" % (site.protocol(), site.hostname())
     uri = urlparse.urljoin(baseuri, uri)
 
-    kwargs.setdefault("headers", {})['user-agent'] = useragent
+    # set default user-agent string
+    kwargs.setdefault("headers", {})
+    kwargs["headers"].setdefault("user-agent", useragent)
     request = threadedhttp.HttpRequest(uri, *args, **kwargs)
     http_queue.put(request)
     request.lock.acquire()
