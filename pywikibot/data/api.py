@@ -409,8 +409,11 @@ class QueryGenerator(object):
                 raise Error("Missing '%s' key in ['query-continue'] value."
                             % self.module)
             update = self.data["query-continue"][self.module]
-            for key in update:
-                self.request[key] = str(update[key])
+            for key, value in update.iteritems():
+                # query-continue can return ints
+                if isinstance(value, int):
+                    value = str(value)
+                self.request[key] = value
 
     def result(self, data):
         """Process result data as needed for particular subclass."""
