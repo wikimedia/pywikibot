@@ -14,19 +14,6 @@ class Family(family.Family):
             'incubator': 'incubator.wikimedia.org',
         }
 
-        self.namespaces[4] = {
-            '_default': [u'Incubator', self.namespaces[4]['_default']],
-        }
-        self.namespaces[5] = {
-            '_default': [u'Incubator talk', self.namespaces[5]['_default']],
-        }
-        self.namespaces[100] = {
-            '_default': u'Lost',
-        }
-        self.namespaces[101] = {
-            '_default': u'Lost talk',
-        }
-
     def version(self, code):
         return '1.13alpha'
 

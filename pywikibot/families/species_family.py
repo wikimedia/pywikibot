@@ -13,14 +13,6 @@ class Family(family.Family):
         self.langs = {
             'species': 'species.wikimedia.org',
         }
-
-        self.namespaces[4] = {
-            '_default': [u'Wikispecies', self.namespaces[4]['_default']],
-        }
-        self.namespaces[5] = {
-            '_default': [u'Wikispecies talk', self.namespaces[5]['_default']],
-        }
-
         self.interwiki_forward = 'wikipedia'
 
     def version(self,code):
