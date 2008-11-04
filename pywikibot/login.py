@@ -4,7 +4,7 @@
 Script to log the robot in to a wiki account.
 
 Suggestion is to make a special account to use for robot use only. Make
-sure this robot account is well known on your home wikipedia before using.
+sure this robot account is well known on your home wiki before using.
 
 Parameters:
 
@@ -133,66 +133,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         Returns cookie data if succesful, None otherwise.
 
         """
-        if config.use_api_login:
-            predata = {
-                'action': 'login',
-                'lgname': self.username.encode(self.site.encoding()),
-                'lgpassword': self.password,
-                'lgdomain': self.site.family.ldapDomain,
-            }
-            address = self.site.api_address()
-        else:
-            predata = {
-                "wpName": self.username.encode(self.site.encoding()),
-                "wpPassword": self.password,
-                "wpDomain": self.site.family.ldapDomain,     # VistaPrint fix
-                "wpLoginattempt": "Aanmelden & Inschrijven", # dutch button label seems to work for all wikis
-                "wpRemember": str(int(bool(remember))),
-                "wpSkipCookieCheck": '1'
-            }
-            if captcha:
-                predata["wpCaptchaId"] = captcha['id']
-                predata["wpCaptchaWord"] = captcha['answer']
-            login_address = self.site.login_address()
-            address = login_address + '&action=submit'
-
-        if self.site.hostname() in config.authenticate.keys():
-            headers = {
-                "Content-type": "application/x-www-form-urlencoded",
-                "User-agent": wikipedia.useragent
-            }
-            data = self.site.urlEncode(predata)
-            response = urllib2.urlopen(
-                           urllib2.Request(self.site.protocol()
-                                           + '://' + self.site.hostname()
-                                           + address, data, headers))
-            data = response.read()
-            wikipedia.cj.save(wikipedia.COOKIEFILE)
-            return "Ok"
-        else:
-            response, data = self.site.postData(address, self.site.urlEncode(predata))
-            Reat=re.compile(': (.*?);')
-            L = []
-
-            for eat in response.msg.getallmatchingheaders('set-cookie'):
-                m = Reat.search(eat)
-                if m:
-                    L.append(m.group(1))
-
-            got_token = got_user = False
-            for Ldata in L:
-                if 'Token=' in Ldata:
-                    got_token = True
-                if 'User=' in Ldata or 'UserName=' in Ldata:
-                    got_user = True
-
-            if got_token and got_user:
-                return "\n".join(L)
-            elif not captcha:
-                solve = self.site.solveCaptcha(data)
-                if solve:
-                    return self.getCookie(remember = remember, captcha = solve)
-            return None
+        # NOT IMPLEMENTED - see data/api.py for implementation
 
     def storecookiedata(self, data):
         """

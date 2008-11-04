@@ -11,6 +11,7 @@ on the same topic in different languages).
 __version__ = '$Id: $'
 
 import pywikibot
+from pywikibot import deprecate_arg
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import *
@@ -28,35 +29,6 @@ import threading
 import urllib
 
 logger = logging.getLogger("wiki")
-
-
-def deprecate_arg(old_arg, new_arg):
-    """Decorator to declare old_arg deprecated and replace it with new_arg"""
-    def decorator(method):
-        def wrapper(*__args, **__kw):
-            meth_name = method.__name__
-            if old_arg in __kw:
-                if new_arg:
-                    if new_arg in __kw:
-                        logger.warn(
-"%(new_arg)s argument of %(meth_name)s replaces %(old_arg)s; cannot use both."
-                            % locals())
-                    else:
-                        logger.debug(
-"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
-                            % locals())
-                        __kw[new_arg] = __kw[old_arg]
-                else:
-                    logger.debug(
-                        "%(old_arg)s argument of %(meth_name)s is deprecated."
-                        % locals())
-                del __kw[old_arg]
-            return method(*__args, **__kw)
-        wrapper.__doc__ = method.__doc__
-        wrapper.__name__ = method.__name__
-        return wrapper
-    return decorator
-
 
 class PageInUse(pywikibot.Error):
     """Page cannot be reserved for writing due to existing lock."""
@@ -146,7 +118,8 @@ class BaseSite(object):
         """Return this Site's throttle.  Initialize a new one if needed."""
         
         if not hasattr(self, "_throttle"):
-            self._throttle = Throttle(self, multiplydelay=True, verbosedelay=True)
+            self._throttle = Throttle(self, multiplydelay=True,
+                                      verbosedelay=True)
             try:
                 self.login(False)
             except pywikibot.NoUsername:
@@ -191,6 +164,9 @@ class BaseSite(object):
         elif self.logged_in(False):
             return self._username[False]
         return None
+
+    def username(self, sysop = False):
+        return self._username[sysop]
 
     def __getattr__(self, attr):
         """Calls to methods not defined in this object are passed to Family."""
@@ -389,6 +365,35 @@ class BaseSite(object):
 
         return pywikibot.Site(code=code, fam=self.family, user=self.user)
 
+    def urlEncode(self, query):
+        """DEPRECATED"""
+        return urllib.urlencode(query)
+
+    def getUrl(self, path, retry=True, sysop=False, data=None,
+               compress=True, no_hostname=False, cookie_only=False):
+        """DEPRECATED.
+
+        Retained for compatibility only. All arguments except path and data
+        are ignored.
+
+        """
+        if data:
+            if not isinstance(data, basestring):
+                data = urllib.urlencode(data)
+            return pywikibot.comms.data.request(self, path, method="PUT",
+                                                body=data)
+        else:
+            return pywikibot.comms.data.request(self, path)
+
+    def postForm(self, address, predata, sysop=False, cookies=None):
+        """DEPRECATED"""
+        return self.getUrl(address, data=predata)
+
+    def postData(self, address, data, contentType=None, sysop=False,
+                 compress=True, cookies=None):
+        """DEPRECATED"""
+        return self.getUrl(address, data=data)
+
 
 class APISite(BaseSite):
     """API interface to MediaWiki site.
@@ -399,10 +404,8 @@ class APISite(BaseSite):
 ##    Site methods from version 1.0 (as these are implemented in this file,
 ##     or declared deprecated/obsolete, they will be removed from this list)
 ##########
-##    messages: return True if there are new messages on the site
 ##    cookies: return user's cookies as a string
 ##
-##    getUrl: retrieve an URL from the site
 ##    urlEncode: Encode a query to be sent using an http POST request.
 ##    postForm: Post form data to an address at this site.
 ##    postData: Post encoded form data to an http address at this site.
@@ -439,8 +442,8 @@ class APISite(BaseSite):
 ##        withoutinterwiki: Special:Withoutinterwiki
 ##        linksearch: Special:Linksearch
 
-    def __init__(self, code, fam=None, user=None):
-        BaseSite.__init__(self, code, fam, user)
+    def __init__(self, code, fam=None, user=None, sysop=None):
+        BaseSite.__init__(self, code, fam, user, sysop)
         self._namespaces = {
             # these are the MediaWiki built-in names, which always work
             # localized names are loaded later upon accessing the wiki
@@ -565,6 +568,12 @@ class APISite(BaseSite):
         logger.debug(
             "Site method 'isBlocked' should be changed to 'is_blocked'")
         return self.is_blocked(sysop)
+
+    def checkBlocks(self, sysop = False):
+        """Check if the user is blocked, and raise an exception if so."""
+        if self.is_blocked(sysop):
+            # User blocked
+            raise UserBlocked('User is blocked in site %s' % self)
 
     def has_right(self, right, sysop=False):
         """Return true if and only if the user has a specific right.
@@ -1203,10 +1212,11 @@ class APISite(BaseSite):
                 yield linkdata['*']
 
     @deprecate_arg("throttle", None)
+    @deprecate_arg("includeredirects", "filterredir")
     def allpages(self, start="!", prefix="", namespace=0, filterredir=None,
                  filterlanglinks=None, minsize=None, maxsize=None,
                  protect_type=None, protect_level=None, limit=None,
-                 reverse=False, includeRedirects=None):
+                 reverse=False, includeredirects=None):
         """Iterate pages in a single namespace.
 
         Note: parameters includeRedirects and throttle are deprecated and
@@ -1234,15 +1244,16 @@ class APISite(BaseSite):
             all pages in namespace)
         @param reverse: if True, iterate in reverse Unicode lexigraphic
             order (default: iterate in forward order)
+        @param includeredirects: DEPRECATED, use filterredirs instead
 
         """
         if not isinstance(namespace, int):
             raise Error("allpages: only one namespace permitted.")
-        if includeRedirects is not None:
+        if includeredirects is not None:
             logger.debug(
 "allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.")
-            if includeRedirects:
-                if includeRedirects == "only":
+            if includeredirects:
+                if includeredirects == "only":
                     filterredirs = True
                 else:
                     filterredirs = None
@@ -1283,7 +1294,7 @@ class APISite(BaseSite):
         """
         logger.debug("Site.prefixindex() is deprecated; use allpages instead.")
         return self.allpages(prefix=prefix, namespace=namespace,
-                             includeRedirects=includeredirects)
+                             includeredirects=includeredirects)
 
 
     def alllinks(self, start="!", prefix="", namespace=0, unique=False,

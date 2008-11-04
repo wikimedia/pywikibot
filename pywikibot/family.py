@@ -7,7 +7,7 @@ import logging
 import re
 import urllib
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 logger = logging.getLogger("wiki")
 
@@ -1144,13 +1144,13 @@ class Family:
         """Return the shared image repository, if any."""
         return (None, None)
 
-    def server_time(self):
-        """Returns a datetime object representing server time"""
-        # TODO : If the local computer time is wrong, result wll be wrong
+    def server_time(self, code):
+        """Return a datetime object representing server time"""
+        # TODO : If the local computer time is wrong, result will be wrong
         return datetime.utcnow() + self.servergmtoffset
 
-    def isPublic(self):
-        """Does the wiki require logging in before viewing it ?"""
+    def isPublic(self, code):
+        """Does the wiki require logging in before viewing it?"""
         return True
 
     def post_get_convert(self, site, getText):
