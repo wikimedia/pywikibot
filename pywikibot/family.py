@@ -7,6 +7,8 @@ import logging
 import re
 import urllib
 
+from datetime import timedelta
+
 logger = logging.getLogger("wiki")
 
 # Parent class for all wiki families
@@ -21,8 +23,8 @@ class Family:
             'zh-min-nan', 'map-bms', 'ba', 'be', 'be-x-old', 'bh', 'bcl', 'bi', 'bar', 'bo',
             'bs', 'br', 'bg', 'bxr', 'ca', 'cv', 'ceb', 'cs', 'ch', 'ny',
             'sn', 'tum', 'cho', 'co', 'za', 'cy', 'da', 'pdc', 'de', 'dv',
-            'nv', 'dsb', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'es', 'eo',
-            'eu', 'ee', 'fa', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga', 'gv',
+            'nv', 'dsb', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo',
+            'ext', 'eu', 'ee', 'fa', 'fo', 'hif', 'fr', 'fy', 'ff', 'fur', 'ga', 'gan', 'gv',
             'gd', 'gl', 'ki', 'glk', 'gu', 'got', 'zh-classical', 'hak', 'xal', 'ko',
             'ha', 'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'io', 'ig', 'ilo',
             'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is',
@@ -30,14 +32,14 @@ class Family:
             'kk', 'kw', 'rw', 'ky', 'rn', 'sw', 'kv', 'kg', 'ht', 'kj',
             'ku', 'lad', 'lbe', 'lo', 'la', 'lv', 'lb', 'lt', 'lij', 'li',
             'ln', 'jbo', 'lg', 'lmo', 'hu', 'mk', 'mg', 'ml', 'mt', 'mi',
-            'mr', 'mzn', 'ms', 'cdo', 'mo', 'mn', 'mus', 'my', 'nah', 'na',
+            'mr', 'mzn', 'ms', 'cdo', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'na',
             'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nap', 'ce', 'pih',
             'no', 'nn', 'nrm', 'nov', 'oc', 'or', 'om', 'ng', 'hz', 'ug',
             'uz', 'pa', 'pi', 'pag', 'pap', 'ps', 'km', 'pms', 'nds', 'pl',
-            'pt', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'se',
-            'sm', 'sa', 'sg', 'sc', 'sco', 'st', 'tn', 'sq', 'scn', 'si',
-            'simple', 'sd', 'ss', 'sk', 'cu', 'sl', 'so', 'sr', 'sh', 'stq',
-            'su', 'fi', 'sv', 'tl', 'ta', 'kab', 'roa-tara', 'tt', 'te', 'tet',
+            'pt', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'sah', 'se',
+            'sm', 'sa', 'sg', 'sc', 'sco', 'stq', 'st', 'tn', 'sq', 'scn', 'si',
+            'simple', 'sd', 'ss', 'sk', 'cu', 'sl', 'szl', 'so', 'sr', 'sh',
+            'srn', 'su', 'fi', 'sv', 'tl', 'ta', 'kab', 'roa-tara', 'tt', 'te', 'tet',
             'th', 'vi', 'ti', 'tg', 'tpi', 'to', 'chr', 'chy', 've', 'tr',
             'tk', 'tw', 'udm', 'bug', 'uk', 'ur', 'vec', 'vo', 'fiu-vro', 'wa',
             'vls', 'war', 'wo', 'wuu', 'ts', 'ii', 'yi', 'yo', 'zh-yue', 'cbk-zam',
@@ -45,7 +47,29 @@ class Family:
         ]
 
         self.langs = {}
-        
+        # The timedelta to GMT of the server.
+        # Exemple for a server running CET :
+        # timedelta(hours=+1)
+        self.servergmtoffset = timedelta()
+
+      # letters that can follow a wikilink and are regarded as part of this link
+        # This depends on the linktrail setting in LanguageXx.php and on
+        # [[MediaWiki:Linktrail]].
+        # Note: this is a regular expression.
+        self.linktrails = {
+           '_default': u'[a-z]*',
+           'de': u'[a-zäöüß]*',
+           'da': u'[a-zæøå]*',
+           'fi': u'[a-zåäö]*',
+           'fr': u'[a-zàâçéèêîôû]*',
+           'he': u'[a-zא-ת]*',
+           'it': u'[a-zàèéìòù]*',
+           'kk': u'[a-zäçéğıïñöşüýа-яёәғіқңөұүһʺʹ]*',
+           'nl': u'[a-zäöüïëéèéàç]*',
+           'pt': u'[a-záâàãéêíóôõúüç]*',
+           'ru': u'[a-zа-я]*',
+        }
+
         # Wikimedia wikis all use "bodyContent" as the id of the <div>
         # element that contains the actual page content; change this for
         # wikis that use something else (e.g., mozilla family)
@@ -53,7 +77,7 @@ class Family:
 
         # A dictionary where keys are family codes that can be used in
         # inter-family interwiki links. Values are not used yet.
-        # Generated from http://tools.wikimedia.de/~daniel/interwiki-en.txt:
+        # Generated from http://toolserver.org/~daniel/interwiki-en.txt:
         # remove interlanguage links from file, then run
         # f = open('interwiki-en.txt')
         # for line in f.readlines():
@@ -510,19 +534,76 @@ class Family:
         # Some languages belong to a group where the possibility is high that
         # equivalent articles have identical titles among the group.
         self.language_groups = {
+            # languages using the arabic script (incomplete)
+        'arab' : [
+                'ar', 'ps', 'sd', 'ur',
+                # languages using multiple scripts, including arabic
+            'kk', 'ku', 'tt', 'ug'
+            ],
             # languages that use chinese symbols
             'chinese': [
-                'ja', 'wuu', 'zh', 'zh-classical', 'zh-yue'
+                'wuu', 'zh', 'zh-classical', 'zh-yue', 'gan', 'ii',
+                # languages using multiple/mixed scripts, including chinese
+        'ja', 'za'
             ],
             # languages that use the cyrillic alphabet
             'cyril': [
-                'ab', 'ba', 'be', 'be-x-old', 'bg', 'ce', 'cv', 'kk', 'kv', 'ky', 'mk',
-                'mn', 'os', 'ru', 'sr', 'tg', 'tk', 'udm', 'uk', 'xal'
+                'ab', 'av', 'ba', 'be', 'be-x-old', 'bg', 'bxr', 'ce', 'cu', 'cv', 'kv',
+        'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo', 'myv', 'os', 'ru', 'sah', 'tg',
+                'tk', 'udm', 'uk', 'xal',
+                # languages using multiple scripts, including cyrillic
+                'ha', 'kk', 'sh', 'sr', 'tt'
             ],
+            # languages that use the latin alphabet
+            'latin': [
+                'aa', 'af', 'ak', 'als', 'an', 'ang', 'ast', 'ay', 'bar', 'bat-smg',
+        'bcl', 'bi', 'bm', 'br', 'bs', 'ca', 'cbk-zam', 'cdo', 'ceb', 'ch',
+        'cho', 'chy', 'co', 'crh', 'cs', 'csb', 'cy', 'da', 'de', 'diq', 'dsb',
+        'ee', 'eml', 'en', 'eo', 'es', 'et', 'eu', 'ext', 'ff', 'fi', 'fiu-vro',
+        'fj', 'fo', 'fr', 'frp', 'fur', 'fy', 'ga', 'gd', 'gl', 'gn', 'gv',
+        'hak', 'haw', 'hif', 'ho', 'hr', 'hsb', 'ht', 'hu', 'hz', 'ia', 'id',
+        'ie', 'ig', 'ik', 'ilo', 'io', 'is', 'it', 'jbo', 'jv', 'kaa', 'kab',
+        'kg', 'ki', 'kj', 'kl', 'kr', 'ksh', 'kw', 'la', 'lad', 'lb', 'lg',
+        'li', 'lij', 'lmo', 'ln', 'lt', 'lv', 'map-bms', 'mg', 'mh', 'mi', 'ms',
+        'mt', 'mus', 'na', 'nah', 'nap', 'nds', 'nds-nl', 'ng', 'nl', 'nn',
+        'no', 'nov', 'nrm', 'nv', 'ny', 'oc', 'om', 'pag', 'pam', 'pap', 'pdc',
+        'pih', 'pl', 'pms', 'pt', 'qu', 'rm', 'rn', 'ro', 'roa-rup', 'roa-tara',
+                'rw', 'sc', 'scn', 'sco', 'se', 'sg', 'simple', 'sk', 'sl', 'sm', 'sn',
+        'so', 'sq', 'srn', 'ss', 'st', 'stq', 'su', 'sv', 'sw', 'szl', 'tet',
+        'tl', 'tn', 'to', 'tpi', 'tr', 'ts', 'tum', 'tw', 'ty', 'uz', 've',
+        'vec', 'vi', 'vls', 'vo', 'wa', 'war', 'wo', 'xh', 'yo', 'zea',
+        'zh-min-nan', 'zu',
+                # languages using multiple scripts, including latin
+                'az', 'chr', 'ha', 'iu', 'kk', 'ku', 'rmy', 'sh', 'sr', 'tt', 'ug', 'za'
+            ],
+            # Scandinavian languages
             'scand': [
                 'da', 'fo', 'is', 'no', 'sv'
             ],
         }
+
+        # LDAP domain if your wiki uses LDAP authentication,
+        # http://www.mediawiki.org/wiki/Extension:LDAP_Authentication
+        self.ldapDomain = ()
+
+        # Allows crossnamespace interwiki linking.
+        # Lists the possible crossnamespaces combinations
+        # keys are originating NS
+        # values are dicts where:
+        #   keys are the originating langcode, or _default
+        #   values are dicts where:
+        #       keys are the languages that can be linked to from the lang+ns, or _default
+        #       values are a list of namespace numbers
+        self.crossnamespace = {}
+        #### Examples :
+        ## Allowing linking to pt' 102 NS from any other lang' 0 NS is
+        # self.crossnamespace[0] = {
+        #     '_default': { 'pt': [102]}
+        # }
+        ## While allowing linking from pt' 102 NS to any other lang' = NS is
+        # self.crossnamespace[102] = {
+        #     'pt': { '_default': [0]}
+        # }
 
     def _addlang(self, code, location, namespaces = {}):
         """Add a new language to the langs and namespaces of the family.
@@ -628,8 +709,11 @@ class Family:
                 if value in v: return v[0]
             else:
                 if value == v: return v
-            if value == self.namespace('_default', ns):
-                return self.namespace(code, ns)
+            try:
+                if value == self.namespace('_default', ns):
+                    return self.namespace(code, ns)
+            except KeyError:
+                pass
         return value
 
     def getNamespaceIndex(self, lang, namespace):
@@ -711,19 +795,23 @@ class Family:
         'cy': [u'ail-cyfeirio'],
         'el': [u'ΑΝΑΚΑΤΕΥΘΥΝΣΗ'],
         'et': [u'suuna'],
-        'eu': [u'bidali'],
         'fa': [u'تغییرمسیر'],
         'fi': [u'ohjaus', u'uudelleenohjaus'],
         'ga': [u'athsheoladh'],
         'he': [u'הפניה'],
+        'hu': [u'átirányítás'],
         'id': [u'alih'],
         'is': [u'tilvísun'],
         'jv': [u'alih'],
         'ka': [u'გადამისამართება'],
         'kk': [u'айдау'],
+        'ko': [u'넘겨주기'],
         'mzn': [u'تغییرمسیر'],
+        'nl': [u'DOORVERWIJZING'],
         'nn': [u'omdiriger'],
-        'ru': [u'перенаправление', u'перенапр'],
+        'ru': [u'REDIRECT', u'перенаправление', u'перенапр'], # localised version is not
+                                                              # so usual, so put the default
+                                                              # one as the most used.
         'sk': [u'presmeruj'],
         'sr': [u'преусмери',u'Преусмери'], # Using lowercase only doesn't work?
         'su': [u'redirected', u'alih'],
@@ -822,7 +910,7 @@ class Family:
         """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return "1.12alpha"
+        return '1.13alpha'
 
     def versionnumber(self, code):
         """Return an int identifying MediaWiki version.
@@ -879,7 +967,7 @@ class Family:
         return "%s?title=%s:Allmessages&ot=html" % (self.path(code), self.special_namespace_url(code))
 
     def login_address(self, code):
-        return '%s?title=%s:Userlogin&action=submit' % (self.path(code), self.special_namespace_url(code))
+        return '%s?title=%s:Userlogin' % (self.path(code), self.special_namespace_url(code))
 
     def captcha_image_address(self, code, id):
         return '%s?title=%s:Captcha/image&wpCaptchaId=%s' % (self.path(code), self.special_namespace_url(code), id)
@@ -991,6 +1079,9 @@ class Family:
     def lonelypages_address(self, code, limit=500):
         return "%s?title=%s:Lonelypages&limit=%d" % (self.path(code), self.special_namespace_url(code), limit)
 
+    def protectedpages_address(self, code, limit=500):
+        return "%s?title=%s:ProtectedPages&limit=%d" % (self.path(code), self.special_namespace_url(code), limit)
+
     def unwatchedpages_address(self, code, limit=500):
         return "%s?title=%s:Unwatchedpages&limit=%d" % (self.path(code), self.special_namespace_url(code), limit)
 
@@ -1052,3 +1143,22 @@ class Family:
     def shared_image_repository(self, code):
         """Return the shared image repository, if any."""
         return (None, None)
+
+    def server_time(self):
+        """Returns a datetime object representing server time"""
+        # TODO : If the local computer time is wrong, result wll be wrong
+        return datetime.utcnow() + self.servergmtoffset
+
+    def isPublic(self):
+        """Does the wiki require logging in before viewing it ?"""
+        return True
+
+    def post_get_convert(self, site, getText):
+        """Does a conversion on the retrieved text from the wiki
+        i.e. Esperanto X-conversion """
+        return getText
+
+    def pre_put_convert(self, site, putText):
+        """Does a conversion on the text to insert on the wiki
+        i.e. Esperanto X-conversion """
+        return putText
