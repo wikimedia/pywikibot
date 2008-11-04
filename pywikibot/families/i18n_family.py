@@ -7,7 +7,7 @@ from pywikibot import family
 # The Wikimedia i18n family (should be called Betawiki, but already exists)
 
 class Family(family.Family):
-    
+
     def __init__(self):
         family.Family.__init__(self)
         self.name = 'i18n'

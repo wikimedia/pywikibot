@@ -54,6 +54,7 @@ class Family(family.Family):
             'ar':  [u'Disambig', u'توضيح'],
             'arc': [u'ܕ'],
             'ast': [u'Dixebra'],
+            'az':  [u'Dəqiqləşdirmə'],
             'bar': [u'Begriffsklärung'],
             'be':  [u'Неадназначнасць', u'Disambig'],
             'be-x-old':  [u'Неадназначнасць', u'Неадназначнасьць', u'Disambig'],
