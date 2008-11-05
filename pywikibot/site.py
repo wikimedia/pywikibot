@@ -15,7 +15,6 @@ from pywikibot import deprecate_arg
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import *
-import config
 
 try:
     from hashlib import md5
@@ -53,7 +52,7 @@ def Family(fam=None, fatal=True):
     except ImportError:
         # next see if user has defined a local family module
         try:
-            sys.path.append(pywikibot.config.datafilepath('families'))
+            sys.path.append(pywikibot.config2.datafilepath('families'))
             exec "import %s_family as myfamily" % fam
         except ImportError:
             if fatal:
@@ -116,7 +115,7 @@ class BaseSite(object):
     @property
     def throttle(self):
         """Return this Site's throttle.  Initialize a new one if needed."""
-        
+
         if not hasattr(self, "_throttle"):
             self._throttle = Throttle(self, multiplydelay=True,
                                       verbosedelay=True)
@@ -129,13 +128,13 @@ class BaseSite(object):
     @property
     def family(self):
         """The Family object for this Site's wiki family."""
-        
+
         return self.__family
 
     @property
     def code(self):
         """The identifying code for this Site."""
-        
+
         return self.__code
 
     @property
@@ -143,13 +142,13 @@ class BaseSite(object):
         """The ISO language code for this Site.
 
         Presumed to be equal to the wiki prefix, but this can be overridden.
-        
+
         """
         return self.__code
 
     def __cmp__(self, other):
         """Perform equality and inequality tests on Site objects."""
-        
+
         if not isinstance(other, BaseSite):
             return 1
         if self.family == other.family:
@@ -158,7 +157,7 @@ class BaseSite(object):
 
     def user(self):
         """Return the currently-logged in bot user, or None."""
-        
+
         if self.logged_in(True):
             return self._username[True]
         elif self.logged_in(False):
@@ -170,7 +169,7 @@ class BaseSite(object):
 
     def __getattr__(self, attr):
         """Calls to methods not defined in this object are passed to Family."""
-        
+
         if hasattr(self.__class__, attr):
             return self.__class__.attr
         try:
@@ -186,7 +185,7 @@ class BaseSite(object):
 
     def sitename(self):
         """Return string representing this Site's name and language."""
-        
+
         return self.family.name+':'+self.code
 
     __str__ = sitename
@@ -212,7 +211,7 @@ class BaseSite(object):
 
     def languages(self):
         """Return list of all valid language codes for this site's Family."""
-        
+
         return self.family.langs.keys()
 
     def validLanguageLinks(self):
@@ -224,7 +223,7 @@ class BaseSite(object):
 
     def ns_index(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
-        
+
         for ns in self.namespaces():
             if namespace.lower() in [name.lower()
                                      for name in self.namespaces()[ns]]:
@@ -235,7 +234,7 @@ class BaseSite(object):
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
-        
+
         return self._namespaces
 
     def ns_normalize(self, value):
@@ -299,7 +298,7 @@ class BaseSite(object):
 
     def disambcategory(self):
         """Return Category in which disambig pages are listed."""
-        
+
         try:
             name = self.namespace(14)+':'+self.family.disambcatname[self.code]
         except KeyError:
@@ -348,8 +347,28 @@ class BaseSite(object):
                            % locals(),
                           re.IGNORECASE | re.UNICODE | re.DOTALL)
 
+    # namespace shortcuts for backwards-compatibility
+
+    def special_namespace(self):
+        return self.namespace(-1)
+
+    def image_namespace(self):
+        return self.namespace(6)
+
+    def mediawiki_namespace(self):
+        return self.namespace(8)
+
+    def template_namespace(self):
+        return self.namespace(10)
+
+    def category_namespace(self):
+        return self.namespace(14)
+
+    def category_namespaces(self):
+        return self.namespace(14, all=True)
+
     # site-specific formatting preferences
-    
+
     def category_on_one_line(self):
         """Return True if this site wants all category links on one line."""
 
@@ -360,10 +379,35 @@ class BaseSite(object):
 
         return self.family.interwiki_putfirst.get(self.code, None)
 
+    def interwiki_putfirst_doubled(self, list_of_links):
+        # TODO: is this even needed?  No family in the framework has this
+        # dictionary defined!
+        if self.lang in self.family.interwiki_putfirst_doubled:
+            if len(list_of_links) >= \
+                        self.family.interwiki_putfirst_doubled[self.lang][0]:
+                links2 = [lang.language() for lang in list_of_links]
+                result = []
+                for lang in self.family.interwiki_putfirst_doubled[self.lang][1]:
+                    try:
+                        result.append(list_of_links[links2.index(lang)])
+                    except ValueError:
+                        pass
+                return result
+            else:
+                return False
+        else:
+            return False
+
     def getSite(self, code):
         """Return Site object for language 'code' in this Family."""
 
         return pywikibot.Site(code=code, fam=self.family, user=self.user)
+
+    # deprecated methods for backwards-compatibility
+
+    def fam(self):
+        """Return Family object for this Site."""
+        return self.family
 
     def urlEncode(self, query):
         """DEPRECATED"""
@@ -393,6 +437,99 @@ class BaseSite(object):
                  compress=True, cookies=None):
         """DEPRECATED"""
         return self.getUrl(address, data=data)
+
+    # unsupported methods from version 1
+
+    def checkCharset(self, charset):
+        raise NotImplementedError
+    def getToken(self, getalways=True, getagain=False, sysop=False):
+        raise NotImplementedError
+    def export_address(self):
+        raise NotImplementedError
+    def move_address(self):
+        raise NotImplementedError
+    def delete_address(self, s):
+        raise NotImplementedError
+    def undelete_view_address(self, s, ts=''):
+        raise NotImplementedError
+    def undelete_address(self):
+        raise NotImplementedError
+    def protect_address(self, s):
+        raise NotImplementedError
+    def unprotect_address(self, s):
+        raise NotImplementedError
+    def put_address(self, s):
+        raise NotImplementedError
+    def get_address(self, s):
+        raise NotImplementedError
+    def nice_get_address(self, s):
+        raise NotImplementedError
+    def edit_address(self, s):
+        raise NotImplementedError
+    def purge_address(self, s):
+        raise NotImplementedError
+    def block_address(self):
+        raise NotImplementedError
+    def unblock_address(self):
+        raise NotImplementedError
+    def blocksearch_address(self, s):
+        raise NotImplementedError
+    def linksearch_address(self, s, limit=500, offset=0):
+        raise NotImplementedError
+    def search_address(self, q, n=50, ns=0):
+        raise NotImplementedError
+    def allpages_address(self, s, ns = 0):
+        raise NotImplementedError
+    def log_address(self, n=50, mode = ''):
+        raise NotImplementedError
+    def newpages_address(self, n=50):
+        raise NotImplementedError
+    def longpages_address(self, n=500):
+        raise NotImplementedError
+    def shortpages_address(self, n=500):
+        raise NotImplementedError
+    def unusedfiles_address(self, n=500):
+        raise NotImplementedError
+    def categories_address(self, n=500):
+        raise NotImplementedError
+    def deadendpages_address(self, n=500):
+        raise NotImplementedError
+    def ancientpages_address(self, n=500):
+        raise NotImplementedError
+    def lonelypages_address(self, n=500):
+        raise NotImplementedError
+    def protectedpages_address(self, n=500):
+        raise NotImplementedError
+    def unwatchedpages_address(self, n=500):
+        raise NotImplementedError
+    def uncategorizedcategories_address(self, n=500):
+        raise NotImplementedError
+    def uncategorizedimages_address(self, n=500):
+        raise NotImplementedError
+    def uncategorizedpages_address(self, n=500):
+        raise NotImplementedError
+    def unusedcategories_address(self, n=500):
+        raise NotImplementedError
+    def withoutinterwiki_address(self, n=500):
+        raise NotImplementedError
+    def references_address(self, s):
+        raise NotImplementedError
+    def allmessages_address(self):
+        raise NotImplementedError
+    def upload_address(self):
+        raise NotImplementedError
+    def double_redirects_address(self, default_limit = True):
+        raise NotImplementedError
+    def broken_redirects_address(self, default_limit = True):
+        raise NotImplementedError
+    def login_address(self):
+        raise NotImplementedError
+    def captcha_image_address(self, id):
+        raise NotImplementedError
+    def watchlist_address(self):
+        raise NotImplementedError
+    def contribs_address(self, target, limit=500, offset=''):
+        raise NotImplementedError
 
 
 class APISite(BaseSite):
@@ -580,15 +717,15 @@ class APISite(BaseSite):
 
         Possible values of 'right' may vary depending on wiki settings,
         but will usually include:
-        
+
         * Actions: edit, move, delete, protect, upload
         * User levels: autoconfirmed, sysop, bot
-        
+
         """
         if not self.logged_in(sysop):
             self.login(sysop)
         return right.lower() in self._userinfo['rights']
-        
+
     def isAllowed(self, right, sysop=False):
         """Deprecated; retained for backwards-compatibility"""
         logger.debug("Site.isAllowed() method is deprecated; use has_right()")
@@ -604,7 +741,7 @@ class APISite(BaseSite):
         if not self.logged_in(sysop):
             self.login(sysop)
         return group.lower() in self._userinfo['groups']
-        
+
     def messages(self, sysop=False):
         """Returns true if the user has new messages, and false otherwise."""
         if not self.logged_in(sysop):
@@ -624,7 +761,7 @@ class APISite(BaseSite):
                 raise KeyError("Site %(self)s has no message '%(key)s'"
                                % locals())
         return self._msgcache[key]
-        
+
     def has_mediawiki_message(self, key):
         """Return True iff this site defines a MediaWiki message for 'key'."""
         try:
@@ -711,7 +848,7 @@ class APISite(BaseSite):
         return self.siteinfo['lang']
 
     lang = property(fget=language, doc=language.__doc__)
-    
+
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
 
@@ -951,7 +1088,7 @@ class APISite(BaseSite):
                        withTemplateInclusion=True, onlyTemplateInclusion=False,
                        namespaces=None):
         """Convenience method combining pagebacklinks and page_embeddedin."""
-        
+
         if onlyTemplateInclusion:
             return self.page_embeddedin(page, namespaces=namespaces)
         if not withTemplateInclusion:
@@ -995,7 +1132,7 @@ class APISite(BaseSite):
     @deprecate_arg("withSortKey", None) # Sortkey doesn't work with generator
     def pagecategories(self, page, withSortKey=None):
         """Iterate categories to which page belongs."""
-        
+
         clgen = api.CategoryPageGenerator("categories", site=self)
         if hasattr(page, "_pageid"):
             clgen.request['pageids'] = str(page._pageid)
@@ -1006,14 +1143,14 @@ class APISite(BaseSite):
 
     def pageimages(self, page):
         """Iterate images used (not just linked) on the page."""
-        
+
         imtitle = page.title(withSection=False).encode(self.encoding())
         imgen = api.ImagePageGenerator("images", titles=imtitle, site=self)
         return imgen
 
     def pagetemplates(self, page, namespaces=None):
         """Iterate templates transcluded (not just linked) on the page."""
-        
+
         tltitle = page.title(withSection=False).encode(self.encoding())
         tlgen = api.PageGenerator("templates", titles=tltitle, site=self)
         if isinstance(namespaces, list):
@@ -1290,7 +1427,7 @@ class APISite(BaseSite):
         """Yield all pages with a given prefix. Deprecated.
 
         Use allpages() with the prefix= parameter instead of this method.
-        
+
         """
         logger.debug("Site.prefixindex() is deprecated; use allpages instead.")
         return self.allpages(prefix=prefix, namespace=namespace,
@@ -1743,7 +1880,7 @@ class APISite(BaseSite):
         """Iterate revisions to pages on the bot user's watchlist.
 
         Iterated values will be in same format as recentchanges.
-        
+
         @param start: Iterate revisions starting at this timestamp
         @param end: Iterate revisions ending at this timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
@@ -1844,7 +1981,7 @@ class APISite(BaseSite):
                     raise Error(
 "deletedrevs: User:%s not authorized to view deleted content."
                             % self.user())
-            
+
         drgen = api.ListGenerator("deletedrevs", site=self,
                                   titles=page.title(withSection=False),
                                   drprop="revid|user|comment|minor")
@@ -1878,7 +2015,7 @@ class APISite(BaseSite):
 
         Pages are listed in a fixed sequence, only the starting point is
         random.
-        
+
         @param limit: the maximum number of pages to iterate (default: 1)
         @param namespaces: only iterate pages in these namespaces.
         @param redirects: if True, include only redirect pages in results
@@ -1926,7 +2063,7 @@ redirects on %(site)s wiki""",
 "Page %(title)s has been deleted since last retrieved from %(site)s wiki",
         "editconflict": "Page %(title)s not saved due to edit conflict.",
     }
-        
+
     def editpage(self, page, summary, minor=True, notminor=False,
                  recreate=True, createonly=False, watch=False, unwatch=False):
         """Submit an edited Page object to be saved to the wiki.
@@ -2003,7 +2140,7 @@ redirects on %(site)s wiki""",
                 if err.code == "spamdetected":
                     raise SpamfilterError(self._ep_errors[err.code] % errdata
                             + err.info[ err.info.index("fragment: ") + 9: ])
-                
+
                 if err.code == "editconflict":
                     raise EditConflict(self._ep_errors[err.code] % errdata)
                 if err.code in self._ep_errors:
@@ -2258,7 +2395,34 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 
     # TODO: implement patrol
 
-    
+    def linksearch(self, siteurl, limit=500):
+        """Backwards-compatible interface to exturlusage()"""
+        return self.exturlusage(siteurl, limit=limit)
+
+    @deprecate_arg("repeat", None)
+    def newimages(self, number=100, lestart=None, leend=None, leuser=None,
+                  letitle=None):
+        """Yield ImagePages from most recent uploads"""
+        return self.logevents(logtype="upload", limit=number, start=lestart,
+                              end=leend, user=leuser, title=letitle)
+
+    def getImagesFromAnHash(self, hash_found=None):
+        """Return all images that have the same hash.
+
+        Useful to find duplicates or nowcommons.
+
+        NOTE: it returns also the image itself, if you don't want it, just
+        filter the list returned.
+
+        NOTE 2: it returns the image title WITHOUT the image namespace.
+        
+        """
+        if hash_found == None: # If the hash is none return None and not continue
+            return None
+        return [image.title(withNamespace=False)
+                for image in self.allimages(sha1=hash_found)]
+
+
 #### METHODS NOT IMPLEMENTED YET ####
 class NotImplementedYet:
 
@@ -2277,7 +2441,8 @@ class NotImplementedYet:
         try:
             if sysop:
                 try:
-                    username = config.sysopnames[self.family.name][self.code]
+                    username = pywikibot.config2.sysopnames[self.family.name
+                                                            ][self.code]
                 except KeyError:
                     raise NoUsername("""\
 You tried to perform an action that requires admin privileges, but you haven't
@@ -2285,14 +2450,15 @@ entered your sysop name in your user-config.py. Please add
 sysopnames['%s']['%s']='name' to your user-config.py"""
                                      % (self.family.name, self.code))
             else:
-                username = config.usernames[self.family.name][self.code]
+                username = pywikiobt.config2.usernames[self.family.name
+                                                       ][self.code]
         except KeyError:
             self._cookies[index] = None
             self._isLoggedIn[index] = False
         else:
             tmp = '%s-%s-%s-login.data' % (
                     self.family.name, self.code, username)
-            fn = config.datafilepath('login-data', tmp)
+            fn = pywikibot.config2.datafilepath('login-data', tmp)
             if not os.path.exists(fn):
                 self._cookies[index] = None
                 self._isLoggedIn[index] = False
@@ -2301,6 +2467,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 self._cookies[index] = '; '.join([x.strip() for x in f.readlines()])
                 f.close()
 
+    # THESE ARE FUNCTIONS NOT YET IMPLEMENTED IN THE API
     # TODO: avoid code duplication for the following methods
     def newpages(self, number = 10, get_redirect = False, repeat = False):
         """Yield new articles (as Page objects) from Special:Newpages.
@@ -2647,36 +2814,3 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                         cache.append(title)
                         yield Page(self, title)
 
-    # TODO: why should we rely on the family file to contain the correct
-    #       encoding?
-    def checkCharset(self, charset):
-        """Warn if charset returned by wiki doesn't match family file."""
-        if not hasattr(self,'charset'):
-            self.charset = charset
-        assert self.charset.lower() == charset.lower(), \
-               "charset for %s changed from %s to %s" \
-                   % (repr(self), self.charset, charset)
-        if self.encoding().lower() != charset.lower():
-            raise ValueError(
-"code2encodings has wrong charset for %s. It should be %s, but is %s"
-                             % (repr(self), charset, self.encoding()))
-
-    def interwiki_putfirst_doubled(self, list_of_links):
-        # TODO: is this even needed?  No family in the framework has this
-        # dictionary defined!
-        if self.family.interwiki_putfirst_doubled.has_key(self.code):
-            if len(list_of_links) >= self.family.interwiki_putfirst_doubled[self.code][0]:
-                list_of_links2 = []
-                for lang in list_of_links:
-                    list_of_links2.append(lang.code)
-                list = []
-                for lang in self.family.interwiki_putfirst_doubled[self.code][1]:
-                    try:
-                        list.append(list_of_links[list_of_links2.index(lang)])
-                    except ValueError:
-                        pass
-                return list
-            else:
-                return False
-        else:
-            return False
