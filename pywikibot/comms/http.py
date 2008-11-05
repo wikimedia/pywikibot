@@ -27,7 +27,7 @@ import urlparse
 import logging
 import atexit
 
-import config2
+from pywikibot import config2
 import cookielib
 import threadedhttp
 
