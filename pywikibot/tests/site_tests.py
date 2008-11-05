@@ -423,11 +423,11 @@ class TestSiteObject(unittest.TestCase):
         for impage in mysite.allimages(minsize=100, limit=5):
             self.assertType(impage, pywikibot.ImagePage)
             self.assertTrue(mysite.page_exists(impage))
-            self.assertTrue(len(impage.text) >= 100)
-        for impage in mysite.allimages(maxsize=200, limit=5):
+            self.assertTrue(impage._imageinfo["size"] >= 100)
+        for impage in mysite.allimages(maxsize=2000, limit=5):
             self.assertType(impage, pywikibot.ImagePage)
             self.assertTrue(mysite.page_exists(impage))
-            self.assertTrue(len(impage.text) <= 200)
+            self.assertTrue(impage._imageinfo["size"] <= 2000)
 
     def testBlocks(self):
         """Test the site.blocks() method"""
