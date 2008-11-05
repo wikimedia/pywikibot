@@ -19,7 +19,6 @@ import time
 import urllib
 import warnings
 
-import config
 import pywikibot
 from pywikibot import login
 from pywikibot.exceptions import *
@@ -160,7 +159,7 @@ class Request(DictMixin):
                     info = set(info + ["protection", "talkid", "subjectid"])
                     self.params["info"] = list(info)
         if "maxlag" not in self.params:
-            self.params["maxlag"] = [str(config.maxlag)]
+            self.params["maxlag"] = [str(pywikibot.config2.maxlag)]
         if "format" not in self.params:
             self.params["format"] = ["json"]
         if self.params['format'] != ["json"]:

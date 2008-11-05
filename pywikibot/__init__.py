@@ -13,7 +13,7 @@ import sys
 import logging
 
 from exceptions import *
-import config
+import config2
 
 
 def deprecate_arg(old_arg, new_arg):
@@ -46,8 +46,8 @@ def deprecate_arg(old_arg, new_arg):
 
 
 _sites = {}
-default_family = config.family
-default_code = config.mylang
+default_family = config2.family
+default_code = config2.mylang
 
 
 @deprecate_arg("persistent_http", None)
@@ -72,16 +72,16 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
         fam = default_family
     if user is None:
         try:
-            user = config.usernames[fam][code]
+            user = config2.usernames[fam][code]
         except KeyError:
             user = None
     if sysop is None:
         try:
-            sysop = config.sysopnames[fam][code]
+            sysop = config2.sysopnames[fam][code]
         except KeyError:
             sysop = None
     if interface is None:
-        interface = config.site_interface
+        interface = config2.site_interface
     try:
         exec "from site import %s as __Site" % interface
     except ImportError:

@@ -29,17 +29,17 @@ class TestSiteObject(unittest.TestCase):
     def testBaseMethods(self):
         """Test cases for BaseSite methods"""
 
-        self.assertEqual(mysite.family.name, pywikibot.config.family)
-        self.assertEqual(mysite.code, pywikibot.config.mylang)
+        self.assertEqual(mysite.family.name, pywikibot.config2.family)
+        self.assertEqual(mysite.code, pywikibot.config2.mylang)
         self.assertType(mysite.lang, basestring)
         self.assertType(mysite == pywikibot.Site("en", "wikipedia"), bool)
         self.assertType(mysite.user(), (basestring, type(None)))
         self.assertEqual(mysite.sitename(),
-                         "%s:%s" % (pywikibot.config.family,
-                                    pywikibot.config.mylang))
+                         "%s:%s" % (pywikibot.config2.family,
+                                    pywikibot.config2.mylang))
         self.assertEqual(repr(mysite),
                          'Site("%s", "%s")'
-                         % (pywikibot.config.mylang, pywikibot.config.family))
+                         % (pywikibot.config2.mylang, pywikibot.config2.family))
         self.assertType(mysite.linktrail(), basestring)
         self.assertType(mysite.redirect(default=True), basestring)
         self.assertType(mysite.disambcategory(), pywikibot.Category)

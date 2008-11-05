@@ -567,7 +567,7 @@ class Page(object):
         user_config.py, or using page.put(force=True).
 
         """ # TODO: move this to Site object?
-        if config.ignore_bot_templates: #Check the "master ignore switch"
+        if pywikibot.config2.ignore_bot_templates: #Check the "master ignore switch"
             return True
         try:
             templates = self.templatesWithParams();

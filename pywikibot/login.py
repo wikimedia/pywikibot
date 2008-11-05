@@ -15,12 +15,11 @@ Parameters:
                 several sites and use the same password for all of them.
                 Asks you for the password, then logs in on all given sites.
 
-   -pass:XXXX   Uses XXXX as password. Be careful if you use this
-                parameter because your password will be shown on your
-                screen, and will probably be saved in your command line
-                history. This is NOT RECOMMENDED for use on computers
-                where others have either physical or remote access.
-                Use -pass instead.
+   -pass:XXXX   Uses XXXX as password. Be careful if you use this parameter
+                because your password will be shown on your screen, and will
+                probably be saved in your command line history. This is NOT
+                RECOMMENDED for use on computers where others have either
+                physical or remote access. Use -pass instead.
 
    -sysop       Log in with your sysop account.
 
@@ -47,7 +46,6 @@ __version__='$Id$'
 import logging
 import re
 import urllib2
-import config
 import pywikibot
 from pywikibot.exceptions import *
 
@@ -79,7 +77,7 @@ class LoginManager:
             self.username = user
         elif sysop:
             try:
-                self.username = config.sysopnames\
+                self.username = pywikibot.config2.sysopnames\
                                 [self.site.family.name][self.site.code]
             except KeyError:
                 raise NoUsername(
@@ -91,7 +89,7 @@ sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                                      'wiki_code': self.site.code})
         else:
             try:
-                self.username = config.usernames\
+                self.username = pywikibot.config2.usernames\
                                 [self.site.family.name][self.site.code]
             except:
                 raise NoUsername(
@@ -102,7 +100,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                                   % {'fam_name': self.site.family.name,
                                      'wiki_code': self.site.code})
         self.password = password
-        if getattr(config, 'password_file', ''):
+        if getattr(pywikibot.config2, 'password_file', ''):
             self.readPassword()
 
     def botAllowed(self):
@@ -142,10 +140,9 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         The argument data is the raw data, as returned by getCookie().
 
         """
-        filename = config.datafilepath('%s-%s-%s-login.data'
-                                       % (self.site.family.name,
-                                          self.site.code,
-                                          self.username))
+        filename = pywikibot.config2.datafilepath('%s-%s-%s-login.data'
+                      % (self.site.family.name, self.site.code,
+                         self.username))
         f = open(filename, 'w')
         f.write(data)
         f.close()
@@ -166,7 +163,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         ("en", "wikipedia", "my_en_user", "my_en_pass")
 
         """
-        file = open(config.password_file)
+        file = open(pywikibot.config2.password_file)
         for line in file:
             if not line.strip(): continue
             entry = eval(line)
@@ -241,9 +238,9 @@ def main():
             return
     if logall:
         if sysop:
-            namedict = config.sysopnames
+            namedict = pywikibot.config2.sysopnames
         else:
-            namedict = config.usernames
+            namedict = pywikibot.config2.usernames
         for familyName in namedict.iterkeys():
             for lang in namedict[familyName].iterkeys():
                 try:

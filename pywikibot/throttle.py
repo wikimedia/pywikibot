@@ -9,8 +9,8 @@ Mechanics to slow down wiki read and/or write rate.
 #
 __version__ = '$Id: $'
 
-import config
 import pywikibot
+from pywikibot import config2 as config
 
 import logging
 import math

@@ -1,7 +1,6 @@
 # -*- coding: utf-8  -*-
 import urllib
 from pywikibot import family
-import config
 
 __version__ = '$Id$'
 
