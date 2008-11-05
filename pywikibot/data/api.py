@@ -480,7 +480,7 @@ class ImagePageGenerator(PageGenerator):
         p = PageGenerator.result(self, pagedata)
         image = pywikibot.ImagePage(p)
         if 'imageinfo' in pagedata:
-            image._imageinfo = pagedata['imageinfo']
+            image._imageinfo = pagedata['imageinfo'][0]
         return image
 
 
