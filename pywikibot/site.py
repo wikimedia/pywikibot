@@ -894,6 +894,29 @@ class APISite(BaseSite):
                     % (page, pageitem['title']))
             api.update_page(page, pageitem)
 
+    def loadimageinfo(self, page, history=False):
+        """Load image info from api and save in page attributes
+
+        @param history: if true, return the image's version history
+
+        """
+        title = page.title(withSection=False)
+        query = api.PropertyGenerator("imageinfo", site=self,
+                                      titles=title.encode(self.encoding()),
+                                      iiprop=["timestamp", "user", "comment",
+                                              "url", "size", "sha1", "mime",
+                                              "metadata", "archivename"])
+        if history:
+            query.request["iilimit"] = "max"
+        for pageitem in query:
+            if pageitem['title'] != title:
+                raise Error(
+                    u"loadpageinfo: Query on %s returned data on '%s'"
+                    % (page, pageitem['title']))
+            api.update_page(page, pageitem)
+            if history:
+                return pageitem['imageinfo']
+
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
         if not hasattr(page, "_pageid"):
