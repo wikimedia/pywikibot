@@ -1322,6 +1322,7 @@ class APISite(BaseSite):
         elif excludeuser:
             rvgen.request[u"rvexcludeuser"] = excludeuser
         # TODO if sysop: something
+        rvgen.continuekey = "revisions"
         for pagedata in rvgen:
             if page is not None:
                 if pagedata['title'] != page.title(withSection=False):
@@ -1329,7 +1330,8 @@ class APISite(BaseSite):
                         u"loadrevisions: Query on %s returned data on '%s'"
                         % (page, pagedata['title']))
                 if pagedata.has_key('missing'):
-                    raise NoPage(u'Page %s does not exist' % page.title(asLink=True)) 
+                    raise NoPage(u'Page %s does not exist'
+                                  % page.title(asLink=True)) 
             else:
                 page = Page(self, pagedata['title'])
             api.update_page(page, pagedata)

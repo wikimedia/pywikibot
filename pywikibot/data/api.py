@@ -290,7 +290,6 @@ class QueryGenerator(object):
         assumed.
 
         """
-        global data
         if "action" in kwargs and "action" != "query":
             raise Error("%s: 'action' must be 'query', not %s"
                         % (self.__class__.__name__, kwargs["query"]))
@@ -321,7 +320,9 @@ class QueryGenerator(object):
             self.resultkey = "pages"        # name of the "query"
         else:                               # subelement key
             self.resultkey = self.module    # to look for when iterating
-
+        self.continuekey = self.resultkey   # usually the query-continue key
+                                            # is the same as the querymodule,
+                                            # but not always
 
     def get_module(self):
         """Query api on self.site for paraminfo on querymodule=self.module"""
@@ -382,8 +383,8 @@ class QueryGenerator(object):
             if not ("query" in self.data
                     and self.resultkey in self.data["query"]):
                 logger.debug(
-                    "%s: stopped iteration because 'query' and result keys not found in api response."
-                    % self.__class__.__name__)
+"%s: stopped iteration because 'query' and '%s' not found in api response.",
+                        self.__class__.__name__, self.resultkey)
                 logger.debug(self.data)
                 return
             pagedata = self.data["query"][self.resultkey]
@@ -404,10 +405,10 @@ class QueryGenerator(object):
                     return
             if not "query-continue" in self.data:
                 return
-            if not self.module in self.data["query-continue"]:
+            if not self.continuekey in self.data["query-continue"]:
                 raise Error("Missing '%s' key in ['query-continue'] value."
-                            % self.module)
-            update = self.data["query-continue"][self.module]
+                            % self.continuekey)
+            update = self.data["query-continue"][self.continuekey]
             for key, value in update.iteritems():
                 # query-continue can return ints
                 if isinstance(value, int):
@@ -604,9 +605,9 @@ def update_page(page, pagedict):
                                         revid=rev['revid'],
                                         timestamp=rev['timestamp'],
                                         user=rev['user'],
-                                        anon=rev.has_key('anon'),
+                                        anon='anon' in rev,
                                         comment=rev.get('comment',  u''),
-                                        minor=rev.has_key('minor'),
+                                        minor='minor' in rev,
                                         text=rev.get('*', None)
                                       )
             page._revisions[revision.revid] = revision

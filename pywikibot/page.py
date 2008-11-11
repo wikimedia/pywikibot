@@ -10,7 +10,7 @@ Objects representing various types of MediaWiki pages.
 __version__ = '$Id: $'
 
 import pywikibot
-import pywikibot.site
+from pywikibot import deprecate_arg
 
 import htmlentitydefs
 import logging
@@ -141,9 +141,11 @@ class Page(object):
         """Return the number of the namespace of the page."""
         return self._ns
 
+    @deprecate_arg("decode", None)
     def title(self, underscore=False, savetitle=False, withNamespace=True,
               withSection=True, asUrl=False, asLink=False,
-              allowInterwiki=True, forceInterwiki=False, textlink=False):
+              allowInterwiki=True, forceInterwiki=False, textlink=False,
+              as_filename=False):
         """Return the title of this Page, as a Unicode string.
 
         @param underscore: if true, replace all ' ' characters with '_'
@@ -159,6 +161,8 @@ class Page(object):
             format the link as an interwiki link
         @param textlink: (only used if asLink is true) if true, place a ':'
             before Category: and Image: links
+        @param as_filename: if true, replace any characters that are unsafe
+            in filenames
 
         """
         title = self._title
@@ -192,20 +196,23 @@ class Page(object):
                     return u'[[:%s]]' % title
             else:
                 return u'[[%s]]' % title
+        if as_filename:
+            # Replace characters that are not possible in file names on some
+            # systems.
+            # Spaces are possible on most systems, but are bad for URLs.
+            for forbidden in ':*?/\\ ':
+                title = title.replace(forbidden, '_')
         return title
 
-    def section(self, underscore = False):
+    @deprecate_arg("decode", None)
+    @deprecate_arg("underscore", None)
+    def section(self):
         """Return the name of the section this Page refers to.
 
         The section is the part of the title following a '#' character, if
         any. If no section is present, return None.
 
-        @param underscore: unused, but maintained for backwards compatibility
-
         """
-        if underscore:
-            logger.debug(
-                u"Page.section(underscore=...) is deprecated.")
         if self._section:
             return self._section
         else:
@@ -213,14 +220,16 @@ class Page(object):
 
     def __str__(self):
         """Return a console representation of the pagelink."""
-        return self.title(asLink=True, forceInterwiki=True).encode(sys.stderr.encoding)
+        return self.title(asLink=True, forceInterwiki=True
+                          ).encode(sys.stderr.encoding)
 
     def __unicode__(self):
         return self.title(asLink=True, forceInterwiki=True)
 
     def __repr__(self):
         """Return a more complete string representation."""
-        return u"%s(%s)" % (self.__class__.__name__, self.title())
+        return u"%s(%s)" % (self.__class__.__name__,
+                            self.title().encode(sys.stderr.encoding))
 
     def __cmp__(self, other):
         """Test for equality and inequality of Page objects.
@@ -228,14 +237,18 @@ class Page(object):
         Page objects are "equal" if and only if they are on the same site
         and have the same normalized title, including section if any.
 
+        Page objects are sortable by namespace first, then by title.
+
         """
         if not isinstance(other, Page):
             # especially, return -1 if other is None
             return -1
         if not self.site() == other.site():
             return cmp(self.site(), other.site())
-        owntitle = self.title()
-        othertitle = other.title()
+        if self.namespace() != other.namespace():
+            return cmp(self.namespace(), other.namespace())
+        owntitle = self.title(withNamespace=False)
+        othertitle = other.title(withNamespace=False)
         return cmp(owntitle, othertitle)
 
     def __hash__(self):
@@ -343,7 +356,7 @@ class Page(object):
         return "%s://%s/%sindex.php?title=%s&oldid=%s" \
                % (self.site().protocol(),
                   self.site().hostname(),
-                  self.site().script_path(),
+                  self.site().scriptpath(),
                   self.title(asUrl=True),
                   self.latestRevision())
 
@@ -390,7 +403,8 @@ class Page(object):
     def previousRevision(self):
         """Return the revision id for the previous revision of this Page."""
         vh = self.getVersionHistory(revCount=2)
-        return vh[1][0]
+        revkey = sorted(self._revisions.keys(), reverse=True)[1]
+        return revkey
 
     def exists(self):
         """Return True if page exists on the wiki, even if it's a redirect.
@@ -790,8 +804,9 @@ class Page(object):
             self.site().getredirtarget(self)
         return self._redir
 
-    def getVersionHistory(self, forceReload=False, reverseOrder=False,
-                          getAll=False, revCount=500):
+    @deprecate_arg("forceReload", None)
+    def getVersionHistory(self, reverseOrder=False, getAll=False,
+                          revCount=500):
         """Load the version history page and return history information.
 
         Return value is a list of tuples, where each tuple represents one
@@ -805,8 +820,16 @@ class Page(object):
             limit = None
         else:
             limit = revCount
-        return self.site().loadrevisions(self, getText=False,
-                                        rvdir=not reverseOrder, limit=limit)
+        self.site().loadrevisions(self, getText=False, rvdir=reverseOrder,
+                                  limit=limit)
+        if getAll:
+            revCount = len(self._revisions)
+        return [(self._revisions[rev].id,
+                 self._revisions[rev].timestamp,
+                 self._revisions[rev].user,
+                 self._revisions[rev].comment)
+                for rev in sorted(self._revisions.keys(),
+                                  reverse=not reverseOrder)[ : revCount]
 
     def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
                                getAll=False, revCount=500):
@@ -1006,41 +1029,31 @@ class Page(object):
 ######## DEPRECATED METHODS ########
 
     def encoding(self):
-        """Return the character encoding used on this Page's wiki Site.
-
-        DEPRECATED: use Site.encoding() instead
-
-        """
+        """DEPRECATED: use Site.encoding() instead"""
         logger.debug(u"Page.encoding() is deprecated; use Site.encoding().")
         return self.site().encoding()
 
     def titleWithoutNamespace(self, underscore=False):
-        """Return title of Page without namespace and without section.
-
-        DEPRECATED: use self.title(withNamespace=False) instead.
-
-        """
+        """DEPRECATED: use self.title(withNamespace=False) instead."""
         logger.debug(
             u"Page.titleWithoutNamespace() method is deprecated.")
         return self.title(underscore=underscore, withNamespace=False,
                           withSection=False)
 
+    def titleForFilename(self):
+        """DEPRECATED: use self.title(as_filename=True) instead."""
+        logger.debug(
+            u"Page.titleForFilename() method is deprecated.")
+        return self.title(as_filename=True)
+
     def sectionFreeTitle(self, underscore=False):
-        """Return the title of this Page, without the section (if any).
-
-        DEPRECATED: use self.title(withSection=False) instead.
-
-        """
+        """DEPRECATED: use self.title(withSection=False) instead."""
         logger.debug(
             u"Page.sectionFreeTitle() method is deprecated.")
         return self.title(underscore=underscore, withSection=False)
 
     def aslink(self, forceInterwiki=False, textlink=False, noInterwiki=False):
-        """Return a string representation in the form of a wikilink.
-
-        DEPRECATED: use self.title(asLink=True) instead.
-
-        """
+        """DEPRECATED: use self.title(asLink=True) instead."""
         logger.debug(u"Page.aslink() method is deprecated.")
         return self.title(asLink=True, forceInterwiki=forceInterwiki,
                           allowInterwiki=not noInterwiki, textlink=textlink)
@@ -1110,7 +1123,7 @@ class ImagePage(Page):
         """Return the URL for the image described on this page."""
         # TODO add scaling option?
         if not hasattr(self, '_imageinfo'):
-            self._imageinfo = self.site().getimageinfo(self)
+            self._imageinfo = self.site().getimageinfo(self) #FIXME
         return self._imageinfo['url']
 
     def fileIsOnCommons(self):
@@ -1142,7 +1155,7 @@ class ImagePage(Page):
     def getFileSHA1Sum(self):
         """Return image file's SHA1 checksum."""
         if not hasattr(self, '_imageinfo'):
-            self._imageinfo = self.site().getimageinfo(self)
+            self._imageinfo = self.site().getimageinfo(self) #FIXME
         return self._imageinfo['sha1']
 
     def getFileVersionHistory(self):
@@ -1153,7 +1166,7 @@ class ImagePage(Page):
 
         """
         #TODO; return value may need to change
-        return self.site().getimageinfo(self, history=True)
+        return self.site().getimageinfo(self, history=True) #FIXME
 
     def getFileVersionHistoryTable(self):
         """Return the version history in the form of a wiki table."""
