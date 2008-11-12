@@ -317,10 +317,10 @@ class QueryGenerator(object):
         self.request = Request(**kwargs)
         self.limit = None
         if "generator" in kwargs:
-            self.resultkey = "pages"        # name of the "query"
-        else:                               # subelement key
-            self.resultkey = self.module    # to look for when iterating
-        self.continuekey = self.resultkey   # usually the query-continue key
+            self.resultkey = "pages"        # name of the "query" subelement key
+        else:                               # to look for when iterating
+            self.resultkey = self.module
+        self.continuekey = self.module      # usually the query-continue key
                                             # is the same as the querymodule,
                                             # but not always
 
