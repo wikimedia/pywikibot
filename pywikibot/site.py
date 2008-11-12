@@ -1293,7 +1293,10 @@ class APISite(BaseSite):
             rvgen = api.PropertyGenerator(u"info|revisions", titles=rvtitle,
                                           site=self)
         else:
-            ids = u"|".join(unicode(r) for r in revids)
+            if isinstance(revids, (int, basestring)):
+                ids = unicode(revids)
+            else:
+                ids = u"|".join(unicode(r) for r in revids)
             rvgen = api.PropertyGenerator(u"info|revisions", revids=ids,
                                           site=self)
         if getText:
@@ -1301,7 +1304,7 @@ class APISite(BaseSite):
                     u"ids|flags|timestamp|user|comment|content"
             if section is not None:
                 rvgen.request[u"rvsection"] = unicode(section)
-        if latest:
+        if latest or "revids" in rvgen.request:
             rvgen.limit = -1  # suppress use of rvlimit parameter
         elif isinstance(limit, int):
             rvgen.limit = limit

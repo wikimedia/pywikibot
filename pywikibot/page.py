@@ -279,8 +279,10 @@ class Page(object):
         """Return True if title of this Page is in the autoFormat dictionary."""
         return self.autoFormat()[0] is not None
 
-    def get(self, force=False, get_redirect=False, throttle=None,
-            sysop=False, nofollow_redirects=None, change_edit_time=None):
+    @deprecate_arg("throttle", None)
+    @deprecate_arg("nofollow_redirects", None)
+    @deprecate_arg("change_edit_time", None)
+    def get(self, force=False, get_redirect=False, sysop=False):
         """Return the wiki-text of the page.
 
         This will retrieve the page from the server if it has not been
@@ -298,17 +300,8 @@ class Page(object):
             redirect, do not raise an exception.
         @param sysop: if the user has a sysop account, use it to retrieve
             this page
-        @param throttle: DEPRECATED and unused
-        @param nofollow_redirects: DEPRECATED and unused
-        @param change_edit_time: DEPRECATED and unused
 
         """
-        if throttle is not None:
-            logger.debug("Page.get(throttle) option is deprecated.")
-        if nofollow_redirects is not None:
-            logger.debug("Page.get(nofollow_redirects) option is deprecated.")
-        if change_edit_time is not None:
-            logger.debug("Page.get(change_edit_time) option is deprecated.")
         if force:
             # When forcing, we retry the page no matter what. Old exceptions
             # do not apply any more.
@@ -322,32 +315,27 @@ class Page(object):
             elif hasattr(self, '_getexception'):
                 raise self._getexception
         if force or not hasattr(self, "_revid") \
-                 or not self._revid in self._revisions:
+                 or not self._revid in self._revisions \
+                 or self._revisions[self._revid].text is None:
             self.site().loadrevisions(self, getText=True, sysop=sysop)
             # TODO: Exception handling for no-page, redirects, etc.
 
         return self._revisions[self._revid].text
 
+    @deprecate_arg("throttle", None)
+    @deprecate_arg("nofollow_redirects", None)
+    @deprecate_arg("change_edit_time", None)
     def getOldVersion(self, oldid, force=False, get_redirect=False,
-                      throttle=None, sysop=False, nofollow_redirects=None,
-                      change_edit_time=None):
+                      sysop=False):
         """Return text of an old revision of this page; same options as get().
 
         @param oldid: The revid of the revision desired.
 
         """
-        if throttle is not None:
-            logger.debug(
-                "Page.getOldVersion(throttle) option is deprecated.")
-        if nofollow_redirects is not None:
-            logger.debug(
-                "Page.getOldVersion(nofollow_redirects) option is deprecated.")
-        if change_edit_time is not None:
-            logger.debug(
-                "Page.getOldVersion(change_edit_time) option is deprecated.")
-        if force or not oldid in self._revisions:
-            self.site().loadrevisions(self, getText=True, ids=oldid,
-                                     sysop=sysop)
+        if force or not oldid in self._revisions \
+                or self._revisions[oldid].text is None:
+            self.site().loadrevisions(self, getText=True, revids=oldid,
+                                      sysop=sysop)
         # TODO: what about redirects, errors?
         return self._revisions[oldid].text
 
@@ -368,7 +356,7 @@ class Page(object):
 
     def _textgetter(self):
         """Return the current (edited) wikitext, loading it if necessary."""
-        if not hasattr(self, '_text'):
+        if not hasattr(self, '_text') or self._text is None:
             try:
                 self._text = self.get()
             except pywikibot.NoPage:
@@ -427,8 +415,8 @@ class Page(object):
 
         """
         txt = self.get()
-        txt = pywikibot.removeLanguageLinks(txt, site = self.site())
-        txt = pywikibot.removeCategoryLinks(txt, site = self.site())
+        txt = pywikibot.textlib.removeLanguageLinks(txt, site = self.site())
+        txt = pywikibot.textlib.removeCategoryLinks(txt, site = self.site())
         if len(txt) < 4:
             return True
         else:
@@ -443,7 +431,9 @@ class Page(object):
         """Return other member of the article-talk page pair for this Page.
 
         If self is a talk page, returns the associated content page;
-        otherwise, returns the associated talk page.
+        otherwise, returns the associated talk page.  The returned page need
+        not actually exist on the wiki.
+        
         Returns None if self is a special page.
 
         """
@@ -824,12 +814,13 @@ class Page(object):
                                   limit=limit)
         if getAll:
             revCount = len(self._revisions)
-        return [(self._revisions[rev].id,
-                 self._revisions[rev].timestamp,
-                 self._revisions[rev].user,
-                 self._revisions[rev].comment)
-                for rev in sorted(self._revisions.keys(),
-                                  reverse=not reverseOrder)[ : revCount]
+        return [ ( self._revisions[rev].revid,
+                   self._revisions[rev].timestamp,
+                   self._revisions[rev].user,
+                   self._revisions[rev].comment
+                 ) for rev in sorted(self._revisions.keys(),
+                                     reverse=not reverseOrder)[ : revCount]
+               ]
 
     def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
                                getAll=False, revCount=500):
