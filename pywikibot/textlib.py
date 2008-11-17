@@ -569,8 +569,11 @@ def extract_templates_and_params(text, get_redirect=False):
 
     Return value is a list of tuples. There is one tuple for each use of a
     template in the page, with the template title as the first entry and a
-    dict of parameters as the second entry.  Positional parameters are
-    indexed by an int, named parameters by a str.
+    dict of parameters as the second entry.  Parameters are indexed by
+    strings; as in MediaWiki, an unnamed parameter is given a parameter name
+    with an integer value corresponding to its position among the unnnamed
+    parameters, and if this results multiple parameters with the same name
+    only the last value provided will be returned.
 
     """
     # remove commented-out stuff etc.
@@ -653,7 +656,7 @@ def extract_templates_and_params(text, get_redirect=False):
                     if "=" in param:
                         param_name, param_val = param.split("=", 1)
                     else:
-                        param_name = numbered_param
+                        param_name = unicode(numbered_param)
                         param_val = param
                         numbered_param += 1
                     for m2 in Rmarker.finditer(param_val):
