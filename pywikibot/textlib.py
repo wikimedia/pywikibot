@@ -564,3 +564,110 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     linkR = re.compile(regex)
     return linkR
 
+def extract_templates_and_params(text, get_redirect=False):
+    """Return list of template calls found in text.
+
+    Return value is a list of tuples. There is one tuple for each use of a
+    template in the page, with the template title as the first entry and a
+    dict of parameters as the second entry.  Positional parameters are
+    indexed by an int, named parameters by a str.
+
+    """
+    # remove commented-out stuff etc.
+    thistxt = removeDisabledParts(text)
+
+    # marker for inside templates or parameters
+    marker = u'@@'
+    while marker in thistxt:
+        marker += u'@'
+
+    # marker for links
+    marker2 = u'##'
+    while marker2 in thistxt:
+        marker2 += u'#'
+
+    # marker for math
+    marker3 = u'%%'
+    while marker2 in thistxt:
+        marker3 += u'%'
+
+    result = []
+    inside = {}
+    count = 0
+    Rtemplate = re.compile(
+                ur'{{(msg:)?(?P<name>[^{\|]+?)(\|(?P<params>[^{]+?))?}}')
+    Rlink = re.compile(ur'\[\[[^\]]+\]\]')
+    Rmath = re.compile(ur'<math>[^<]+</math>')
+    Rmarker = re.compile(ur'%s(\d+)%s' % (marker, marker))
+    Rmarker2 = re.compile(ur'%s(\d+)%s' % (marker2, marker2))
+    Rmarker3 = re.compile(ur'%s(\d+)%s' % (marker3, marker3))
+
+    # Replace math with markers
+    maths = {}
+    count = 0
+    for m in Rmath.finditer(thistxt):
+        count += 1
+        text = m.group()
+        thistxt = thistxt.replace(text, '%s%d%s' % (marker3, count, marker3))
+        maths[count] = text
+
+    while Rtemplate.search(thistxt) is not None:
+        for m in Rtemplate.finditer(thistxt):
+            # Make sure it is not detected again
+            count += 1
+            text = m.group()
+            thistxt = thistxt.replace(text,
+                                      '%s%d%s' % (marker, count, marker))
+            # Make sure stored templates don't contain markers
+            for m2 in Rmarker.finditer(text):
+                text = text.replace(m2.group(), inside[int(m2.group(1))])
+            for m2 in Rmarker3.finditer(text):
+                text = text.replace(m2.group(), maths[int(m2.group(1))])
+            inside[count] = text
+
+            # Name
+            name = m.group('name').strip()
+            m2 = Rmarker.search(name) or Rmath.search(name)
+            if m2 is not None:
+                # Doesn't detect templates whose name changes,
+                # or templates whose name contains math tags
+                continue
+            # Parameters
+            paramString = m.group('params')
+            params = {}
+            numbered_param = 1
+            if paramString:
+                # Replace links to markers
+                links = {}
+                count2 = 0
+                for m2 in Rlink.finditer(paramString):
+                    count2 += 1
+                    text = m2.group()
+                    paramString = paramString.replace(text,
+                                    '%s%d%s' % (marker2, count2, marker2))
+                    links[count2] = text
+                # Parse string
+                markedParams = paramString.split('|')
+                # Replace markers
+                for param in markedParams:
+                    if "=" in param:
+                        param_name, param_val = param.split("=", 1)
+                    else:
+                        param_name = numbered_param
+                        param_val = param
+                        numbered_param += 1
+                    for m2 in Rmarker.finditer(param_val):
+                        param_val = param_val.replace(m2.group(),
+                                                      inside[int(m2.group(1))])
+                    for m2 in Rmarker2.finditer(param_val):
+                        param_val = param_val.replace(m2.group(),
+                                                      links[int(m2.group(1))])
+                    for m2 in Rmarker3.finditer(param_val):
+                        param_val = param_val.replace(m2.group(),
+                                                      maths[int(m2.group(1))])
+                    params[param_name] = param_val
+
+            # Add it to the result
+            result.append((name, params))
+    return result
+
