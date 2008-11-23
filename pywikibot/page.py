@@ -756,7 +756,25 @@ class Page(object):
         parameters as the second entry.
 
         """
-        return self.site().templates_with_params(self)
+        templates = pywikibot.textlib.extract_templates_and_params(self.text)
+        # backwards-compatibility: convert the dict returned as the second
+        # element into a list in the format used by old scripts
+        result = []
+        for template in templates:
+            args = template[1]
+            positional = []
+            named = {}
+            for key in sorted(args.keys()):
+                try:
+                    int(key)
+                except ValueError:
+                    named[key] = args[key]
+                else:
+                    positional.append(args[key])
+            for pos in positional:
+                named.append("%s=%s" % (pos, positional[pos]))
+            result.append(template[0], named)
+        return result
 
     def categories(self, nofollow_redirects=None, withSortKey=False):
         """Iterate categories that the article is in.
