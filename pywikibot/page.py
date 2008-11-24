@@ -771,9 +771,11 @@ class Page(object):
                     named[key] = args[key]
                 else:
                     positional.append(args[key])
-            for pos in positional:
-                named.append("%s=%s" % (pos, positional[pos]))
-            result.append(template[0], named)
+            for name in named:
+                positional.append("%s=%s" % (name, named[name]))
+            result.append((pywikibot.Page(
+                             pywikibot.Link(template[0], self.site())),
+                           positional))
         return result
 
     def categories(self, nofollow_redirects=None, withSortKey=False):
