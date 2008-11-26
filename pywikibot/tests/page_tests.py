@@ -14,11 +14,16 @@ import unittest
 import pywikibot
 import pywikibot.page
 
-site = pywikibot.Site("en", "wikipedia")
-
+site = pywikibot.Site()
+mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
+maintalk = pywikibot.Page(pywikibot.page.Link("Talk:Main Page", site))
+badpage = pywikibot.Page(pywikibot.page.Link("There is no page with this title",
+                                        site))
 
 class TestLinkObject(unittest.TestCase):
     """Test cases for Link objects"""
+
+    enwiki = pywikibot.Site("en", "wikipedia")
     namespaces = {0: [u""],        # en.wikipedia.org namespaces for testing
                   1: [u"Talk:"],   # canonical form first, then others
                   2: [u"User:"],   # must end with :
@@ -62,11 +67,11 @@ class TestLinkObject(unittest.TestCase):
         for num in self.namespaces:
             for prefix in self.namespaces[num]:
                 l = pywikibot.page.Link(prefix+self.titles.keys()[0],
-                                        site)
+                                        self.enwiki)
                 self.assertEqual(l.namespace, num)
                 # namespace prefixes are case-insensitive
                 m = pywikibot.page.Link(prefix.lower()+self.titles.keys()[1],
-                                        site)
+                                        self.enwiki)
                 self.assertEqual(m.namespace, num)
 
     def testTitles(self):
@@ -81,14 +86,21 @@ class TestLinkObject(unittest.TestCase):
 
 
 class TestPageObject(unittest.TestCase):
+    def testGeneral(self):
+        self.assertEqual(str(mainpage), "[[%s:%s]]"
+                                        % (site.lang, mainpage.title()))
+        self.assertTrue(mainpage < maintalk)
+
     def testSite(self):
         """Test site() method"""
-        p1 = pywikibot.Page(site, u"Help:Test page#Testing")
-        self.assertEqual(p1.site(), site)
+        self.assertEqual(mainpage.site(), site)
+        self.assertEqual(mainpage.encoding(), site.encoding())
 
     def testNamespace(self):
         """Test namespace() method"""
-        # TODO
+        self.assertEqual(mainpage.namespace(), 0)
+        self.assertEqual(maintalk.namespace(), 1)
+        self.assertEqual(badpage.namespace(), 0)
 
     def testTitle(self):
         """Test title() method options."""
@@ -131,6 +143,8 @@ class TestPageObject(unittest.TestCase):
                          u"[[en:Image:Jean-Léon Gérôme 003.jpg]]")
         self.assertEqual(p2.title(asLink=True, textlink=True),
                          u"[[:Image:Jean-Léon Gérôme 003.jpg]]")
+        self.assertEqual(p2.title(as_filename=True),
+                         u"Image_Jean-Léon_Gérôme_003.jpg")
 
     def testSection(self):
         """Test section() method."""
@@ -160,46 +174,100 @@ class TestPageObject(unittest.TestCase):
         self.assertEqual(p2.isCategory(), True)
         self.assertEqual(p3.isCategory(), False)
 
-    # testIsImage -- todo
+    def testIsImage(self):
+        p1 = pywikibot.Page(site, u"First page")
+        p2 = pywikibot.Page(site, u"Image:Second page")
+        p3 = pywikibot.Page(site, u"Image talk:Second page")
+        self.assertEqual(p1.isImage(), False)
+        self.assertEqual(p2.isImage(), True)
+        self.assertEqual(p3.isImage(), False)
     
     def testApiMethods(self):
         """Test various methods that rely on API."""
         # since there is no way to predict what data the wiki will return,
         # we only check that the returned objects are of correct type.
-        main = pywikibot.Page(site, u"Main Page")
-        self.assertEqual(type(main.get()), unicode)
-        self.assertEqual(type(main.latestRevision()), int)
-        self.assertEqual(type(main.userName()), unicode)
-        self.assertEqual(type(main.isIpEdit()), bool)
-        self.assertEqual(type(main.exists()), bool)
-        self.assertEqual(type(main.isRedirectPage()), bool)
-        self.assertEqual(type(main.isEmpty()), bool)
-        self.assertEqual(type(main.toggleTalkPage()), type(main))
-        self.assertEqual(type(main.isDisambig()), bool)
-        self.assertEqual(type(main.canBeEdited()), bool)
-        self.assertEqual(type(main.botMayEdit()), bool)
-        for p in main.getReferences():
-            self.assertEqual(type(p), type(main))
-        for p in main.backlinks():
-            self.assertEqual(type(p), type(main))
-        for p in main.embeddedin():
-            self.assertEqual(type(p), type(main))
-        for p in main.linkedPages():
-            self.assertEqual(type(p), type(main))
-        for p in main.interwiki():
-            self.assertEqual(type(p), pywikibot.page.Link)
-        for p in main.langlinks():
-            self.assertEqual(type(p), pywikibot.page.Link)
-        for p in main.imagelinks():
-            self.assertEqual(type(p), pywikibot.page.ImagePage)
-        for p in main.templates():
-            self.assertEqual(type(p), type(main))
-        # todo - templatesWithParameters
-        for p in main.categories():
-            self.assertEqual(type(p), pywikibot.page.Category)
-        for p in main.extlinks():
-            self.assertEqual(type(p), unicode)
-        # more to come
+        self.assertTrue(isinstance(mainpage.get(), unicode))
+        self.assertTrue(isinstance(maintalk.get(), unicode))
+        self.assertRaises(pywikibot.NoPage, badpage.get)
+        self.assertTrue(isinstance(mainpage.latestRevision(), int))
+        self.assertTrue(isinstance(mainpage.userName(), unicode))
+        self.assertTrue(isinstance(mainpage.isIpEdit(), bool))
+        self.assertTrue(isinstance(mainpage.exists(), bool))
+        self.assertTrue(isinstance(mainpage.isRedirectPage(), bool))
+        self.assertTrue(isinstance(mainpage.isEmpty(), bool))
+        self.assertEqual(mainpage.toggleTalkPage(), maintalk)
+        self.assertEqual(maintalk.toggleTalkPage(), mainpage)
+        self.assertTrue(isinstance(mainpage.isDisambig(), bool))
+        self.assertTrue(isinstance(mainpage.canBeEdited(), bool))
+        self.assertTrue(isinstance(mainpage.botMayEdit(), bool))
+        self.assertTrue(isinstance(mainpage.editTime(), unicode))
+        self.assertTrue(isinstance(mainpage.previousRevision(), int))
+        self.assertTrue(isinstance(mainpage.permalink(), basestring))
+
+    def testReferences(self):
+        pywikibot.set_debug("comm")
+        count = 0
+        for p in mainpage.getReferences():
+            count += 1
+            self.assertTrue(isinstance(p, pywikibot.Page))
+            if count >= 10:
+                break
+        count = 0
+        for p in mainpage.backlinks():
+            count += 1
+            self.assertTrue(isinstance(p, pywikibot.Page))
+            if count >= 10:
+                break
+        count = 0
+        for p in mainpage.embeddedin():
+            count += 1
+            self.assertTrue(isinstance(p, pywikibot.Page))
+            if count >= 10:
+                break
+
+    def testLinks(self):
+        for p in mainpage.linkedPages():
+            self.assertTrue(isinstance(p, pywikibot.Page))
+## Not implemented:
+##        for p in mainpage.interwiki():
+##            self.assertTrue(isinstance(p, pywikibot.Link))
+        for p in mainpage.langlinks():
+            self.assertTrue(isinstance(p, pywikibot.Link))
+        for p in mainpage.imagelinks():
+            self.assertTrue(isinstance(p, pywikibot.ImagePage))
+        for p in mainpage.templates():
+            self.assertTrue(isinstance(p, pywikibot.Page))
+        for t, params in mainpage.templatesWithParams():
+            self.assertTrue(isinstance(t, pywikibot.Page))
+            self.assertTrue(isinstance(params, list))
+        for p in mainpage.categories():
+            self.assertTrue(isinstance(p, pywikibot.Category))
+        for p in mainpage.extlinks():
+            self.assertTrue(isinstance(p, unicode))
+
+# methods that still need tests implemented or expanded:
+
+##    def autoFormat(self):
+##    def isAutoTitle(self):
+##    def get(self, force=False, get_redirect=False, sysop=False):
+##    def getOldVersion(self, oldid, force=False, get_redirect=False,
+##                      sysop=False):
+##    text = property(_textgetter, _textsetter, _cleartext,
+##                    "The edited wikitext (unicode) of this Page")
+##    def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
+##                      onlyTemplateInclusion=False, redirectsOnly=False,
+##                      namespaces=None):
+##    def backlinks(self, followRedirects=True, filterRedirects=None,
+##                  namespaces=None):
+##    def embeddedin(self, filter_redirects=None, namespaces=None):
+##    def getRedirectTarget(self):
+##    def getVersionHistory(self, reverseOrder=False, getAll=False,
+##                          revCount=500):
+##    def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
+##                               getAll=False, revCount=500):
+##    def fullVersionHistory(self):
+##    def contributingUsers(self):
+
 
 if __name__ == '__main__':
     try:
