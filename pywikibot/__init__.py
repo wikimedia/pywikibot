@@ -106,7 +106,11 @@ def output(text):
 
 def input(prompt, password=False):
     if isinstance(prompt, unicode):
-        prompt = prompt.encode(sys.stdout.encoding, "xmlcharrefreplace")
+        encoding = sys.stdout.encoding
+        # Fallback to _some_ encoding for virtual consoles (cron, screen !)
+        if not encoding:
+            encoding = "UTF-8"
+        prompt = prompt.encode(encoding, "xmlcharrefreplace")
     if password:
         import getpass
         return getpass.getpass(prompt)
