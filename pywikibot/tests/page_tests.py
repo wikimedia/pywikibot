@@ -205,7 +205,6 @@ class TestPageObject(unittest.TestCase):
         self.assertTrue(isinstance(mainpage.permalink(), basestring))
 
     def testReferences(self):
-        pywikibot.set_debug("comm")
         count = 0
         for p in mainpage.getReferences():
             count += 1
