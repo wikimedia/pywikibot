@@ -1080,8 +1080,24 @@ class APISite(BaseSite):
         if filterRedirects is not None:
             blgen.request["gblfilterredir"] = filterRedirects and "redirects"\
                                                               or "nonredirects"
-        if followRedirects: #FIXME This doesn't work correctly
-            blgen.request["gblredirect"] = ""
+        if followRedirects:
+            # bug: see http://bugzilla.wikimedia.org/show_bug.cgi?id=16218
+            # links identified by MediaWiki as redirects may not really be,
+            # so we have to check each "redirect" page and see if it
+            # really redirects to this page
+            blgen.request["gblfilterredir"] = "nonredirects"
+            redirgen = api.PageGenerator("backlinks", gbltitle=bltitle,
+                                         site=self, gblfilterredir="redirects")
+            if "gblnamespace" in blgen.request:
+                redirgen.request["gblnamespace"] = blgen.request["gblnamespace"]
+            genlist = [blgen]
+            for redir in redirgen:
+                if redir.getRedirectTarget() == page:
+                    genlist.append(
+                        self.pagebacklinks(
+                            redir, True, None, namespaces))
+            import itertools
+            return itertools.chain(*genlist)
         return blgen
 
     def page_embeddedin(self, page, filterRedirects=None, namespaces=None):
