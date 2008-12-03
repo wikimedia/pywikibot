@@ -14,6 +14,8 @@ import unittest
 import pywikibot
 import warnings
 
+logger = pywikibot.logging.getLogger("wiki.site.tests")
+
 mysite = pywikibot.Site()
 mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
 imagepage = iter(mainpage.imagelinks()).next() # 1st image on main page
@@ -127,7 +129,7 @@ class TestSiteObject(unittest.TestCase):
             self.assertType(mysite.has_group("bots", True), bool)
             self.assertFalse(mysite.has_group("nonexistent_group", True))
         except pywikibot.NoUsername:
-            warnings.warn(
+            logger.warn(
              "Cannot test Site methods for sysop; no sysop account configured.")
         for msg in ("1movedto2", "about", "aboutpage", "aboutsite",
                     "accesskey-n-portal"):
@@ -184,8 +186,28 @@ class TestSiteObject(unittest.TestCase):
         """Test site methods for getting links to and from a page"""
         
         backlinks = set(mysite.pagebacklinks(mainpage, namespaces=[0]))
+        # only non-redirects:
+        filtered = set(mysite.pagebacklinks(mainpage, namespaces=0,
+                                            filterRedirects=False))
+        # only redirects:
+        redirs = set(mysite.pagebacklinks(mainpage, namespaces=0,
+                                          filterRedirects=True))
+        # including links to redirect pages (but not the redirects):
+        indirect = set(mysite.pagebacklinks(mainpage, namespaces=[0],
+                                            followRedirects=True))
+        self.assertEqual(filtered & redirs, set([]))
+        self.assertEqual(indirect & redirs, set([]))
+        self.assertTrue(filtered.issubset(indirect))
+        self.assertTrue(filtered.issubset(backlinks))
+        self.assertTrue(redirs.issubset(backlinks))
+        self.assertTrue(backlinks.issubset(
+                        set(mysite.pagebacklinks(mainpage, namespaces=[0, 2]))))
+
+        # pagereferences includes both backlinks and embeddedin
         embedded = set(mysite.page_embeddedin(mainpage, namespaces=[0]))
         refs = set(mysite.pagereferences(mainpage, namespaces=[0]))
+        self.assertTrue(backlinks.issubset(refs))
+        self.assertTrue(embedded.issubset(refs))
         for bl in backlinks:
             self.assertType(bl, pywikibot.Page)
             self.assertTrue(bl in refs)
@@ -194,21 +216,6 @@ class TestSiteObject(unittest.TestCase):
             self.assertTrue(ei in refs)
         for ref in refs:
             self.assertTrue(ref in backlinks or ref in embedded)
-        # test backlinks arguments
-        self.assertTrue(backlinks.issubset(
-                    set(mysite.pagebacklinks(mainpage,
-                                             followRedirects=True,
-                                             namespaces=[0]))))
-        self.assertTrue(backlinks.issuperset(
-                    set(mysite.pagebacklinks(mainpage,
-                                             filterRedirects=True,
-                                             namespaces=[0]))))
-        self.assertTrue(backlinks.issuperset(
-                    set(mysite.pagebacklinks(mainpage,
-                                             filterRedirects=False,
-                                             namespaces=[0]))))
-        self.assertTrue(backlinks.issubset(
-                    set(mysite.pagebacklinks(mainpage, namespaces=[0, 2]))))
         # test embeddedin arguments
         self.assertTrue(embedded.issuperset(
                     set(mysite.page_embeddedin(mainpage, filterRedirects=True,
@@ -298,14 +305,14 @@ class TestSiteObject(unittest.TestCase):
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertFalse(page.isRedirectPage())
-        for page in mysite.allpages(filterlanglinks=True, limit=5):
-            self.assertType(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
-            self.assertEqual(page.namespace(), 0)
-        for page in mysite.allpages(filterlanglinks=False, limit=5):
-            self.assertType(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
-            self.assertEqual(page.namespace(), 0)
+##        for page in mysite.allpages(filterlanglinks=True, limit=5):
+##            self.assertType(page, pywikibot.Page)
+##            self.assertTrue(mysite.page_exists(page))
+##            self.assertEqual(page.namespace(), 0)
+##        for page in mysite.allpages(filterlanglinks=False, limit=5):
+##            self.assertType(page, pywikibot.Page)
+##            self.assertTrue(mysite.page_exists(page))
+##            self.assertEqual(page.namespace(), 0)
         for page in mysite.allpages(minsize=100, limit=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
@@ -821,7 +828,7 @@ class TestSiteObject(unittest.TestCase):
             try:
                 mysite.login(True)
             except pywikibot.NoUsername:
-                warnings.warn(
+                logger.warn(
                  "Cannot test Site.deleted_revs; no sysop account configured.")
                 return
         dr = list(mysite.deletedrevs(limit=10, page=mainpage))
@@ -902,7 +909,7 @@ class TestSiteObject(unittest.TestCase):
 
 
 if __name__ == '__main__':
-#    pywikibot.logging.getLogger().setLevel(pywikibot.logging.DEBUG)
+#    pywikibot.logging.getLogger("").setLevel(pywikibot.logging.DEBUG)
     try:
         try:
             unittest.main()
