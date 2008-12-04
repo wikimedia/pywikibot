@@ -12,6 +12,7 @@ __version__ = '$Id: $'
 
 import pywikibot
 from pywikibot import deprecate_arg
+from pywikibot import config
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import *
@@ -45,14 +46,14 @@ def Family(fam=None, fatal=True):
 
     """
     if fam == None:
-        fam = pywikibot.default_family
+        fam = config.family
     try:
         # first try the built-in families
         exec "import pywikibot.families.%s_family as myfamily" % fam
     except ImportError:
         # next see if user has defined a local family module
         try:
-            sys.path.append(pywikibot.config2.datafilepath('families'))
+            sys.path.append(config.datafilepath('families'))
             exec "import %s_family as myfamily" % fam
         except ImportError:
             if fatal:
@@ -2485,7 +2486,7 @@ class NotImplementedYet:
         try:
             if sysop:
                 try:
-                    username = pywikibot.config2.sysopnames[self.family.name
+                    username = config.sysopnames[self.family.name
                                                             ][self.code]
                 except KeyError:
                     raise NoUsername("""\
@@ -2502,7 +2503,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         else:
             tmp = '%s-%s-%s-login.data' % (
                     self.family.name, self.code, username)
-            fn = pywikibot.config2.datafilepath('login-data', tmp)
+            fn = config.datafilepath('login-data', tmp)
             if not os.path.exists(fn):
                 self._cookies[index] = None
                 self._isLoggedIn[index] = False

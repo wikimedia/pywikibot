@@ -27,7 +27,7 @@ import urlparse
 import logging
 import atexit
 
-from pywikibot import config2
+from pywikibot import config
 import cookielib
 import threadedhttp
 
@@ -44,10 +44,10 @@ connection_pool = threadedhttp.ConnectionPool()
 http_queue = Queue.Queue()
 
 cookie_jar = threadedhttp.LockableCookieJar(
-                 config2.datafilepath("%s-%s-%s.lwp"
-                        % (config2.family,
-                           config2.mylang,
-                           config2.usernames[config2.family][config2.mylang])))
+                 config.datafilepath("%s-%s-%s.lwp"
+                        % (config.family,
+                           config.mylang,
+                           config.usernames[config.family][config.mylang])))
 try:
     cookie_jar.load()
 except (IOError, cookielib.LoadError):

@@ -11,6 +11,7 @@ __version__ = '$Id: $'
 
 import pywikibot
 from pywikibot import deprecate_arg
+from pywikibot import config
 import pywikibot.textlib
 
 import htmlentitydefs
@@ -181,9 +182,9 @@ class Page(object):
             title = urllib.quote(encodedTitle)
         if asLink:
             if forceInterwiki or (allowInterwiki and
-                    (self.site().family.name != pywikibot.default_family
-                     or self.site().code != pywikibot.default_code)):
-                if self.site().family.name != pywikibot.default_family \
+                    (self.site().family.name != config.family
+                     or self.site().code != config.mylang)):
+                if self.site().family.name != config.family \
                         and self.site().family.name != self.site().code:
                     return u'[[%s:%s:%s]]' % (self.site().family.name,
                                               self.site().code,
@@ -572,7 +573,7 @@ class Page(object):
         user_config.py, or using page.put(force=True).
 
         """ # TODO: move this to Site object?
-        if pywikibot.config2.ignore_bot_templates: #Check the "master ignore switch"
+        if config.ignore_bot_templates: #Check the "master ignore switch"
             return True
         try:
             templates = self.templatesWithParams();

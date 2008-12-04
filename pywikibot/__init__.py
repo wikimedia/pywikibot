@@ -13,7 +13,7 @@ import sys
 import logging
 
 from exceptions import *
-import config2
+import config2 as config
 import textlib
 
 
@@ -47,9 +47,6 @@ def deprecate_arg(old_arg, new_arg):
 
 
 _sites = {}
-default_family = config2.family
-default_code = config2.mylang
-
 
 @deprecate_arg("persistent_http", None)
 def Site(code=None, fam=None, user=None, sysop=None, interface=None):
@@ -68,21 +65,21 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     logger = logging.getLogger("wiki")
     
     if code is None:
-        code = default_code
+        code = config.mylang
     if fam is None:
-        fam = default_family
+        fam = config.family
     if user is None:
         try:
-            user = config2.usernames[fam][code]
+            user = config.usernames[fam][code]
         except KeyError:
             user = None
     if sysop is None:
         try:
-            sysop = config2.sysopnames[fam][code]
+            sysop = config.sysopnames[fam][code]
         except KeyError:
             sysop = None
     if interface is None:
-        interface = config2.site_interface
+        interface = config.site_interface
     try:
         exec "from site import %s as __Site" % interface
     except ImportError:
@@ -95,6 +92,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     return _sites[key]
 
 getSite = Site # alias for backwards-compability
+
 
 from page import Page, ImagePage, Category, Link
 

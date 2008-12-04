@@ -47,6 +47,7 @@ import logging
 import re
 import urllib2
 import pywikibot
+from pywikibot import config
 from pywikibot.exceptions import *
 
 logger = logging.getLogger("wiki")
@@ -77,7 +78,7 @@ class LoginManager:
             self.username = user
         elif sysop:
             try:
-                self.username = pywikibot.config2.sysopnames\
+                self.username = config.sysopnames\
                                 [self.site.family.name][self.site.code]
             except KeyError:
                 raise NoUsername(
@@ -89,7 +90,7 @@ sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                                      'wiki_code': self.site.code})
         else:
             try:
-                self.username = pywikibot.config2.usernames\
+                self.username = config.usernames\
                                 [self.site.family.name][self.site.code]
             except:
                 raise NoUsername(
@@ -100,7 +101,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                                   % {'fam_name': self.site.family.name,
                                      'wiki_code': self.site.code})
         self.password = password
-        if getattr(pywikibot.config2, 'password_file', ''):
+        if getattr(config, 'password_file', ''):
             self.readPassword()
 
     def botAllowed(self):
@@ -140,7 +141,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         The argument data is the raw data, as returned by getCookie().
 
         """
-        filename = pywikibot.config2.datafilepath('%s-%s-%s-login.data'
+        filename = config.datafilepath('%s-%s-%s-login.data'
                       % (self.site.family.name, self.site.code,
                          self.username))
         f = open(filename, 'w')
@@ -163,7 +164,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         ("en", "wikipedia", "my_en_user", "my_en_pass")
 
         """
-        file = open(pywikibot.config2.password_file)
+        file = open(config.password_file)
         for line in file:
             if not line.strip(): continue
             entry = eval(line)
@@ -238,9 +239,9 @@ def main():
             return
     if logall:
         if sysop:
-            namedict = pywikibot.config2.sysopnames
+            namedict = config.sysopnames
         else:
-            namedict = pywikibot.config2.usernames
+            namedict = config.usernames
         for familyName in namedict.iterkeys():
             for lang in namedict[familyName].iterkeys():
                 try:
