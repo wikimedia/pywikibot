@@ -13,10 +13,9 @@ function/method instead.
 #
 __version__ = '$Id: $'
 
-import pywikibot
-import pywikibot.textlib
 
 from pywikibot import Category
+
 
 def change_category(article, oldCat, newCat, comment=None, sortKey=None,
                     inPlace=True):

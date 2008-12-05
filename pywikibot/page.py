@@ -35,8 +35,10 @@ class Page(object):
     to the Site object. 
 
     """
-    def __init__(self, source, title=u"", ns=0, insite=None,
-                 defaultNamespace=None):
+
+    @deprecate_arg("insite", None)
+    @deprecate_arg("defaultNamespace", None)
+    def __init__(self, source, title=u"", ns=0):
         """Instantiate a Page object.
 
         Three calling formats are supported:
@@ -65,16 +67,8 @@ class Page(object):
         @param ns: namespace number; required if source is a Site, ignored
             otherwise
         @type ns: int
-        @param insite: DEPRECATED (use Link instead)
-        @param defaultNamespace: DEPRECATED (use Link instead)
 
         """
-        if insite is not None:
-            logger.debug(
-                "The 'insite' option in Page constructor is deprecated.")
-        if defaultNamespace is not None:
-            logger.debug(
-            "The 'defaultNamespace' option in Page constructor is deprecated.")
         if isinstance(source, pywikibot.site.BaseSite):
             self._site = source
             if ns not in source.namespaces():
@@ -144,6 +138,7 @@ class Page(object):
         return self._ns
 
     @deprecate_arg("decode", None)
+    @deprecate_arg("savetitle", "asUrl")
     def title(self, underscore=False, savetitle=False, withNamespace=True,
               withSection=True, asUrl=False, asLink=False,
               allowInterwiki=True, forceInterwiki=False, textlink=False,
@@ -151,8 +146,6 @@ class Page(object):
         """Return the title of this Page, as a Unicode string.
 
         @param underscore: if true, replace all ' ' characters with '_'
-        @param savetitle: if true, try to quote all non-ASCII characters.
-            (DEPRECATED: use asURL instead)
         @param withNamespace: if false, omit the namespace prefix
         @param withSection: if false, omit the section
         @param asUrl: if true, quote title as if in an URL
@@ -174,10 +167,7 @@ class Page(object):
             title = title.split(u'#', 1)[0]
         if underscore or asUrl:
             title = title.replace(u' ', u'_')
-        if savetitle:
-            logger.debug(
-              u"Page.title(savetitle=...) is deprecated.")
-        if savetitle or asUrl:
+        if asUrl:
             encodedTitle = title.encode(self.site().encoding())
             title = urllib.quote(encodedTitle)
         if asLink:
@@ -724,20 +714,14 @@ class Page(object):
         """
         return self.site().pagelanglinks(self)
 
+    @deprecate_arg("followRedirects", None)
+    @deprecate_arg("loose", None)
     def imagelinks(self, followRedirects=None, loose=None):
         """Iterate ImagePage objects for images displayed on this Page.
 
-        @param followRedirects: DEPRECATED and ignored
-        @param loose: DEPRECATED and ignored
         @return: a generator that yields ImagePage objects.
 
         """
-        if followRedirects is not None:
-            logger.debug(
-                u"Page.imagelinks(followRedirects) option is deprecated.")
-        if loose is not None:
-            logger.debug(
-                u"Page.imagelinks(loose) option is deprecated.")
         return self.site().pageimages(self)
 
     def templates(self):
@@ -780,19 +764,14 @@ class Page(object):
                            positional))
         return result
 
-    def categories(self, nofollow_redirects=None, withSortKey=False):
+    @deprecate_arg("nofollow_redirects", None)
+    def categories(self, withSortKey=False):
         """Iterate categories that the article is in.
 
-        @param nofollow_redirects: DEPRECATED and ignored
         @param withSortKey: if True, include the sort key in each Category.
         @return: a generator that yields Category objects.
 
         """
-        # follow_redirects makes no sense here because category membership
-        # doesn't follow redirects
-        if nofollow_redirects is not None:
-            logger.debug(
-                u"Page.categories(nofollow_redirects) option is deprecated.")
         return self.site().pagecategories(self, withSortKey=withSortKey)
 
     def extlinks(self):
@@ -873,24 +852,21 @@ class Page(object):
         users = set([edit[2] for edit in edits])
         return users
 
+    @deprecate_arg("throttle", None)
     def move(self, newtitle, reason=None, movetalkpage=True, sysop=False,
-             throttle=None, deleteAndMove=False, safe=True):
+             deleteAndMove=False, safe=True):
         """Move this page to a new title.
 
         @param newtitle: The new page title.
         @param reason: The edit summary for the move.
         @param movetalkpage: If true, move this page's talk page (if it exists)
         @param sysop: Try to move using sysop account, if available
-        @param throttle: DEPRECATED
         @param deleteAndMove: if move succeeds, delete the old page
             (usually requires sysop privileges, depending on wiki settings)
         @param safe: If false, attempt to delete existing page at newtitle
             (if there is one) and then move this page to that title
 
         """
-        if throttle is not None:
-            logger.debug(
-                u"Page.move: throttle option is deprecated.")
         if reason is None:
             logger.info(u'Moving %s to [[%s]].'
                              % (self.title(asLink=True), newtitle))
@@ -901,6 +877,7 @@ class Page(object):
                                     movetalk=movetalkpage,
                                     noredirect=deleteAndMove)
 
+    @deprecate_arg("throttle", None)
     def delete(self, reason=None, prompt=True, throttle=None, mark=False):
         """Deletes the page from the wiki. Requires administrator status.
 
@@ -910,9 +887,6 @@ class Page(object):
             speedy-deletion request on the page instead.
 
         """
-        if throttle is not None:
-            logger.debug(
-                u"Page.delete: throttle option is deprecated.")
         if reason is None:
             logger.info(u'Deleting %s.' % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the deletion:')
@@ -967,7 +941,8 @@ class Page(object):
         self._deletedRevs[timestamp][4] = undelete
         self._deletedRevsModified = True
 
-    def undelete(self, comment=None, throttle=None):
+    @deprecate_arg("throttle", None)
+    def undelete(self, comment=None):
         """Undelete revisions based on the markers set by previous calls.
 
         If no calls have been made since loadDeletedRevisions(), everything
@@ -985,12 +960,8 @@ class Page(object):
             pg.undelete('This will restore only selected revisions.')
 
         @param comment: The undeletion edit summary.
-        @param throttle: DEPRECATED
 
         """
-        if throttle is not None:
-            logger.debug(
-                u"Page.undelete: throttle option is deprecated.")
         if comment is None:
             logger.info(u'Preparing to undelete %s.'
                              % (self.title(asLink=True)))
@@ -998,8 +969,9 @@ class Page(object):
                         u'Please enter a reason for the undeletion:')
         return self.site().undelete(self, comment)
 
+    @deprecate_arg("throttle", None)
     def protect(self, edit='sysop', move='sysop', unprotect=False,
-                reason=None, prompt=True, throttle=None):
+                reason=None, prompt=True):
         """(Un)protect a wiki page. Requires administrator status.
 
         Valid protection levels (in MediaWiki 1.12) are '' (equivalent to
@@ -1011,12 +983,8 @@ class Page(object):
             all protection levels to '')
         @param reason: Edit summary.
         @param prompt: If true, ask user for confirmation.
-        @param throttle: DEPRECATED
 
         """
-        if throttle is not None:
-            logger.debug(
-                u"Page.protect: throttle option is deprecated.")
         if reason is None:
             if unprotect:
                 un = u'un'
@@ -1294,38 +1262,30 @@ class ImagePage(Page):
 class Category(Page):
     """A page in the Category: namespace"""
 
-    def __init__(self, source, title=u"", insite=None, sortKey=None):
-        """All parameters are the same as for Page() constructor, except:
-
-        @param sortKey: DEPRECATED (use .aslink() method instead)
+    @deprecate_arg("sortKey", None)
+    def __init__(self, source, title=u"", insite=None):
+        """All parameters are the same as for Page() constructor.
 
         """
-        if sortKey is not None:
-            logger.debug(
-                "The 'sortKey' option in Category constructor is deprecated.")
         Page.__init__(self, source, title, 14)
         if self.namespace() != 14:
             raise ValueError(u"'%s' is not in the category namespace!"
                              % title)
 
-    def aslink(self, sortKey=u'', forceInterwiki=None, textlink=None,
-               noInterwiki=None):
+    @deprecate_arg("forceInterwiki", None)
+    @deprecate_arg("textlink", None)
+    @deprecate_arg("noInterwiki", None)
+    def aslink(self, sortKey=u''):
         """Return a link to place a page in this Category.
 
         Use this only to generate a "true" category link, not for interwikis
         or text links to category pages.
-
-        Parameters are deprecated and preserved for backwards-compatibility,
-        except:
 
         @param sortKey: The sort key for the article to be placed in this
             Category; if omitted, default sort key is used.
         @type sortKey: (optional) unicode
 
         """
-        if forceInterwiki is not None \
-                or textlink is not None or noInterwiki is not None:
-            logger.debug("All arguments to Category.aslink() are deprecated.")
         if sortKey:
             titleWithSortKey = '%s|%s' % (self.title(withSection=False),
                                           self.sortKey)
