@@ -184,7 +184,7 @@ class Request(DictMixin):
             self.site.throttle(write=write)
             uri = self.site.scriptpath() + "/api.php"
             try:
-                if write or action == "login":
+                if write or action in ("login", "expandtemplates", "parse"):
                     # add other actions that require POST requests above
                     rawdata = http.request(self.site, uri, method="POST",
                                 headers={'Content-Type':

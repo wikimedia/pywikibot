@@ -227,9 +227,12 @@ class TestPageObject(unittest.TestCase):
     def testLinks(self):
         for p in mainpage.linkedPages():
             self.assertTrue(isinstance(p, pywikibot.Page))
-## Not implemented:
-##        for p in mainpage.interwiki():
-##            self.assertTrue(isinstance(p, pywikibot.Link))
+        iw = list(mainpage.interwiki(expand=True))
+        for p in iw:
+            self.assertTrue(isinstance(p, pywikibot.Link))
+        for p2 in mainpage.interwiki(expand=False):
+            self.assertTrue(isinstance(p2, pywikibot.Link))
+            self.assertTrue(p2 in iw)            
         for p in mainpage.langlinks():
             self.assertTrue(isinstance(p, pywikibot.Link))
         for p in mainpage.imagelinks():

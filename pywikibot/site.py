@@ -1357,7 +1357,7 @@ class APISite(BaseSite):
             api.update_page(page, pagedata)
 
     def pageinterwiki(self, page):
-        # TODO
+        # No such function in the API (this method isn't called anywhere)
         raise NotImplementedError
 
     def pagelanglinks(self, page):

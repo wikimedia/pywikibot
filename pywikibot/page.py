@@ -368,6 +368,15 @@ class Page(object):
     text = property(_textgetter, _textsetter, _cleartext,
                     "The edited wikitext (unicode) of this Page")
 
+    def expand_text(self):
+        """Return the page text with all templates expanded."""
+        req = pywikibot.data.api.Request(action="expandtemplates",
+                                         text=self.text,
+                                         title=self.title(withSection=False),
+                                         site=self.site())
+        result = req.submit()
+        return result["expandtemplates"]["*"]
+
     def userName(self):
         """Return name or IP address of last user to edit page."""
         return self._revisions[self.latestRevision()].user
@@ -686,8 +695,8 @@ class Page(object):
         """Iterate Pages that this Page links to.
 
         Only returns pages from "normal" internal links. Image and category
-        links are omitted unless prefixed with ":"; embedded templates are
-        omitted (but links within them are returned); all interwiki and
+        links are omitted unless prefixed with ":". Embedded templates are
+        omitted (but links within them are returned). All interwiki and
         external links are omitted.
 
         @return: a generator that yields Page objects.
@@ -695,19 +704,42 @@ class Page(object):
         """
         return self.site().pagelinks(self)
 
-    def interwiki(self):
-        """Iterate interwiki links in the page text.
+    def interwiki(self, expand=True):
+        """Iterate interwiki links in the page text, excluding language links.
 
-        @return: a generator that yields Link objects.
+        @param expand: if True (default), include interwiki links found in
+            templates transcluded onto this page; if False, only iterate
+            interwiki links found in this page's own wikitext
+        @return: a generator that yields Link objects
 
         """
-        return self.site().pageinterwiki(self)
+        # This function does not exist in the API, so it has to be
+        # implemented by screen-scraping
+        Rlink = re.compile(r'\[\[(?P<title>[^\]|[#<>{}]*)(\|.*?)?\]\]')
+        if expand:
+            text = self.expand_text()
+        else:
+            text = self.text
+        for linkmatch in Rlink.finditer(
+                            pywikibot.textlib.removeDisabledParts(text)):
+            linktitle = linkmatch.group("title")
+            link = Link(linktitle, self.site())
+            # only yield links that are to a different site and that
+            # are not language links
+            try:
+                if link.site != self.site():
+                    if linktitle.lstrip().startswith(":"):
+                        # initial ":" indicates not a language link
+                        yield link
+                    elif link.site.family != self.site().family:
+                        # link to a different family is not a language link
+                        yield link
+            except pywikibot.Error:
+                # ignore any links with invalid contents
+                continue
 
     def langlinks(self):
         """Iterate all interlanguage links on this page.
-
-        Note that the links yielded by this method will be a subset of
-        the results of self.interwiki().
 
         @return: a generator that yields Link objects.
 
@@ -1729,6 +1761,24 @@ not supported by PyWikiBot!"""
     def __str__(self):
         return self.astext()
 
+    def __cmp__(self, other):
+        """Test for equality and inequality of Link objects.
+
+        Link objects are "equal" if and only if they are on the same site
+        and have the same normalized title, including section if any.
+
+        Link objects are sortable by site, then namespace, then title.
+
+        """
+        if not isinstance(other, Link):
+            # especially, return -1 if other is None
+            return -1
+        if not self.site == other.site:
+            return cmp(self.site, other.site)
+        if self.namespace != other.namespace:
+            return cmp(self.namespace, other.namespace)
+        return cmp(self.title, other.title)
+
 
 # Utility functions for parsing page titles
 
@@ -1794,7 +1844,7 @@ def html2unicode(text, ignore = []):
                 unicodeCodepoint=convertIllegalHtmlEntities[unicodeCodepoint]
             except KeyError:
                 pass
-            if unicodeCodepoint and unicodeCodepoint not in ignore and (WIDEBUILD or unicodeCodepoint < 65534):
+            if unicodeCodepoint and unicodeCodepoint not in ignore:
                 result += unichr(unicodeCodepoint)
             else:
                 # Leave the entity unchanged
