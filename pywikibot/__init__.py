@@ -11,10 +11,12 @@ __version__ = '$Id: $'
 
 import sys
 import logging
+import re
 
 from exceptions import *
 import config2 as config
 import textlib
+from bot import handleArgs, showHelp
 
 
 def deprecate_arg(old_arg, new_arg):
@@ -97,10 +99,13 @@ getSite = Site # alias for backwards-compability
 from page import Page, ImagePage, Category, Link
 
 
+link_regex = re.compile(r'\[\[(?P<title>[^\]|[#<>{}]*)(\|.*?)?\]\]')
+
+
 # User interface functions (kept extremely simple for debugging)
 
-def output(text):
-    print text
+def output(text, toStdout=False):
+    print text.encode(config.console_encoding, "xmlcharrefreplace")
 
 def input(prompt, password=False):
     if isinstance(prompt, unicode):

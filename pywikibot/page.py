@@ -12,6 +12,7 @@ __version__ = '$Id: $'
 import pywikibot
 from pywikibot import deprecate_arg
 from pywikibot import config
+import pywikibot.site
 import pywikibot.textlib
 
 import htmlentitydefs
@@ -1325,6 +1326,8 @@ class Category(Page):
             titleWithSortKey = self.title(withSection=False)
         return '[[%s]]' % titleWithSortKey
 
+    @deprecate_arg("startFrom", None)
+    @deprecate_arg("cacheResults", None)
     def subcategories(self, recurse=False):
         """Iterate all subcategories of the current category.
 
@@ -1353,7 +1356,8 @@ class Category(Page):
                     for item in subcat.subcategories(recurse):
                         yield item
 
-    def articles(self, recurse=False, startFrom=None):
+    @deprecate_arg("startFrom", None)
+    def articles(self, recurse=False):
         """
         Yields all articles in the current category.
 
@@ -1367,7 +1371,7 @@ class Category(Page):
         namespaces = [x for x in self.site().namespaces().keys()
                       if x>=0 and x!=14]
         for member in self.site().categorymembers(self,
-                                                     namespaces=namespaces):
+                                                  namespaces=namespaces):
             yield member
         if recurse:
             if not isinstance(recurse, bool) and recurse:

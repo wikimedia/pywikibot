@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+ # -*- coding: utf-8  -*-
 """
 Objects representing MediaWiki sites (wikis) and families (groups of wikis
 on the same topic in different languages).
