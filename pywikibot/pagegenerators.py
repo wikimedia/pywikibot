@@ -548,7 +548,7 @@ def TextfilePageGenerator(filename=None, site=None):
     if site is None:
         site = pywikibot.Site()
     f = codecs.open(filename, 'r', config.textfile_encoding)
-    for linkmatch in Rlink.finditer(f.read()):
+    for linkmatch in pywikibot.link_regex.finditer(f.read()):
         # If the link is in interwiki format, the Page object may reside
         # on a different Site than the default.
         # This makes it possible to work on different wikis using a single

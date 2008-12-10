@@ -599,7 +599,6 @@ def extract_templates_and_params(text, get_redirect=False):
     count = 0
     Rtemplate = re.compile(
                 ur'{{(msg:)?(?P<name>[^{\|]+?)(\|(?P<params>[^{]+?))?}}')
-    Rlink = re.compile(ur'\[\[[^\]]+\]\]')
     Rmath = re.compile(ur'<math>[^<]+</math>')
     Rmarker = re.compile(ur'%s(\d+)%s' % (marker, marker))
     Rmarker2 = re.compile(ur'%s(\d+)%s' % (marker2, marker2))
@@ -640,12 +639,12 @@ def extract_templates_and_params(text, get_redirect=False):
             params = {}
             numbered_param = 1
             if paramString:
-                # Replace links to markers
+                # Replace wikilinks with markers
                 links = {}
                 count2 = 0
-                for m2 in Rlink.finditer(paramString):
+                for m2 in pywikibot.link_regex.finditer(paramString):
                     count2 += 1
-                    text = m2.group()
+                    text = m2.group(0)
                     paramString = paramString.replace(text,
                                     '%s%d%s' % (marker2, count2, marker2))
                     links[count2] = text

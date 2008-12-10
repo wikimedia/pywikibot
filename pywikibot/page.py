@@ -716,12 +716,11 @@ class Page(object):
         """
         # This function does not exist in the API, so it has to be
         # implemented by screen-scraping
-        Rlink = re.compile(r'\[\[(?P<title>[^\]|[#<>{}]*)(\|.*?)?\]\]')
         if expand:
             text = self.expand_text()
         else:
             text = self.text
-        for linkmatch in Rlink.finditer(
+        for linkmatch in pywikibot.link_regex.finditer(
                             pywikibot.textlib.removeDisabledParts(text)):
             linktitle = linkmatch.group("title")
             link = Link(linktitle, self.site())
