@@ -159,23 +159,22 @@ def stopme():
 
     """
     global stopped
-    if stopped:
-        return
     logger = logging.getLogger("wiki")
-    
-    logger.debug("stopme() called")
-    count = sum(1 for thd in threadpool if thd.isAlive())
-    if count:
-        logger.info("Waiting for about %(count)s pages to be saved."
-                     % locals())
-        for thd in threadpool:
-            if thd.isAlive():
-                thd.join()
+
+    if not stopped:
+        logger.debug("stopme() called")
+        count = sum(1 for thd in threadpool if thd.isAlive())
+        if count:
+            logger.info("Waiting for about %(count)s pages to be saved."
+                         % locals())
+            for thd in threadpool:
+                if thd.isAlive():
+                    thd.join()
+        stopped = True
     # only need one drop() call because all throttles use the same global pid
     try:
         _sites[_sites.keys()[0]].throttle.drop()
         logger.info("Dropped throttle(s).")
-        stopped = True
     except IndexError:
         pass
 

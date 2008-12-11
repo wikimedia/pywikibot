@@ -17,10 +17,12 @@ import math
 import threading
 import time
 
-logger = logging.getLogger("wiki")
+logger = logging.getLogger("wiki.throttle")
 
-pid = False   # global process identifier
-              # Don't check for other processes unless this is set
+pid = False     # global process identifier
+                # when the first Throttle is instantiated, it will set this
+                # variable to a positive integer, which will apply to all
+                # throttle objects created by this process.
 
 
 class Throttle(object):
@@ -33,23 +35,25 @@ class Throttle(object):
     rate of access.
 
     """
-    def __init__(self, site, mindelay=config.minthrottle,
-                       maxdelay=config.maxthrottle,
-                       writedelay=config.put_throttle,
-                       multiplydelay=True, verbosedelay=False):
+    def __init__(self, site, mindelay=None, maxdelay=None, writedelay=None,
+                 multiplydelay=True, verbosedelay=False):
         self.lock = threading.RLock()
         self.mysite = str(site)
         self.logfn = config.datafilepath('throttle.log')
         self.mindelay = mindelay
+        if self.mindelay is None:
+            self.mindelay = config.minthrottle
         self.maxdelay = maxdelay
+        if self.maxdelay is None:
+            self.maxdelay = config.maxthrottle
         self.writedelay = writedelay
         self.last_read = 0
         self.last_write = 0
         self.next_multiplicity = 1.0
         self.checkdelay = 300  # Check logfile again after this many seconds
-        self.dropdelay = 750   # Ignore processes that have not made
+        self.dropdelay = 600   # Ignore processes that have not made
                                # a check in this many seconds
-        self.releasepid = 1800 # Free the process id after this many seconds
+        self.releasepid = 1200 # Free the process id after this many seconds
         self.lastwait = 0.0
         self.delay = 0
         self.verbosedelay = verbosedelay
@@ -58,13 +62,16 @@ class Throttle(object):
         self.setDelays()
 
     def checkMultiplicity(self):
+        """Count running processes for site and set process_multiplicity."""
         global pid
         self.lock.acquire()
+        mysite = self.mysite
         logger.debug("Checking multiplicity: pid = %(pid)s" % globals())
         try:
             processes = []
-            my_pid = 1
+            my_pid = pid or 1  # start at 1 if global pid not yet set
             count = 1
+            # open throttle.log
             try:
                 f = open(self.logfn, 'r')
             except IOError:
@@ -75,6 +82,7 @@ class Throttle(object):
             else:
                 now = time.time()
                 for line in f.readlines():
+                    # parse line; format is "pid timestamp site"
                     try:
                         line = line.split(' ')
                         this_pid = int(line[0])
@@ -86,7 +94,7 @@ class Throttle(object):
                     if now - ptime > self.releasepid:
                         continue    # process has expired, drop from file
                     if now - ptime <= self.dropdelay \
-                            and this_site == self.mysite \
+                            and this_site == mysite \
                             and this_pid != pid:
                         count += 1
                     if this_site != self.mysite or this_pid != pid:
@@ -94,14 +102,14 @@ class Throttle(object):
                                           'time': ptime,
                                           'site': this_site})
                     if not pid and this_pid >= my_pid:
-                        my_pid = this_pid+1
+                        my_pid = this_pid+1 # next unused process id
 
             if not pid:
                 pid = my_pid
             self.checktime = time.time()
-            processes.append({'pid': my_pid,
+            processes.append({'pid': pid,
                               'time': self.checktime,
-                              'site': self.mysite})
+                              'site': mysite})
             f = open(self.logfn, 'w')
             processes.sort(key=lambda p:(p['pid'], p['site']))
             for p in processes:
@@ -110,7 +118,7 @@ class Throttle(object):
             self.process_multiplicity = count
             if self.verbosedelay:
                 logger.info(
-u"Found %(count)s processes running, including the current process."
+u"Found %(count)s %(mysite)s processes running, including this one."
                     % locals())
         finally:
             self.lock.release()
@@ -119,10 +127,11 @@ u"Found %(count)s processes running, including the current process."
         """Set the nominal delays in seconds. Defaults to config values."""
         self.lock.acquire()
         try:
+            maxdelay = self.maxdelay
             if delay is None:
                 delay = self.mindelay
             if writedelay is None:
-                writedelay = self.writedelay
+                writedelay = config.put_throttle
             if absolute:
                 self.maxdelay = delay
                 self.mindelay = delay
@@ -173,7 +182,8 @@ u"Found %(count)s processes running, including the current process."
             return 0.0
 
     def drop(self):
-        """Remove me from the list of running bots processes."""
+        """Remove me from the list of running bot processes."""
+        # drop all throttles with this process's pid, regardless of site
         self.checktime = 0
         processes = []
         try:

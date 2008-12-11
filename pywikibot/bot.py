@@ -14,6 +14,7 @@ __version__ = '$Id: $'
 # scripts, instead of writing each one from scratch.
 
 
+import logging
 import os.path
 import sys
 import pywikibot
@@ -108,8 +109,9 @@ def handleArgs(*args):
     return nonGlobalArgs
 
 
-def showHelp():
-    moduleName = calledModuleName()
+def showHelp(name=""):
+    # argument, if given, is ignored
+    module = calledModuleName()
     globalHelp =u'''\
 Global arguments available for all bots:
 
@@ -144,15 +146,14 @@ Global arguments available for all bots:
 -v                debugging.
 '''
     try:
-        exec('import %s as module' % moduleName)
+        exec('import %s as module' % module)
         helpText = module.__doc__.decode('utf-8')
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.iteritems():
                 helpText = helpText.replace(key, value.strip('\n\r'))
         pywikibot.output(helpText)
     except:
-        pywikibot.output(u'Sorry, no help available for %s' % moduleName)
+        if module:
+            pywikibot.output(u'Sorry, no help available for %s' % module)
         logging.exception('showHelp:')
     pywikibot.output(globalHelp)
-
-

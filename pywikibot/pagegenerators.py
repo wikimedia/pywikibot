@@ -654,7 +654,7 @@ def PageWithTalkPageGenerator(generator):
             yield page.toggleTalkPage()
 
 
-def PreloadingGenerator(self, generator, pageNumber=60, lookahead=10):
+def PreloadingGenerator(generator, pageNumber=60, lookahead=10):
     """Yield preloaded pages taken from another generator."""
 
     # pages may be on more than one site, for example if an interwiki
@@ -663,8 +663,8 @@ def PreloadingGenerator(self, generator, pageNumber=60, lookahead=10):
     # build a list of pages for each site found in the iterator
     for page in generator:
         sites.setdefault(page.site(), []).append(page)
-    return itertools.chain(site.preloadpages(sites[site], pageNumber)
-                           for site in sites)
+    return itertools.chain(*(site.preloadpages(sites[site], pageNumber)
+                             for site in sites))
 
 
 #TODO below
