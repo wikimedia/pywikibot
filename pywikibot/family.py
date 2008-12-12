@@ -18,7 +18,7 @@ class Family:
         self.name = None
             # Updated from http://meta.wikimedia.org/wiki/Interwiki_sorting_order
         self.alphabetic = [
-            'aa', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an', 'arc',
+            'aa', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an', 'arc', 'arz',
             'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm',
             'bn', 'zh-min-nan', 'map-bms', 'ba', 'be', 'be-x-old', 'bh',
             'bcl', 'bi', 'bar', 'bo', 'bs', 'br', 'bg', 'bxr', 'ca', 'cv',
@@ -540,7 +540,7 @@ class Family:
         self.language_groups = {
             # languages using the arabic script (incomplete)
         'arab' : [
-                'ar', 'ps', 'sd', 'ur',
+                'ar', 'arz', 'ps', 'sd', 'ur',
                 # languages using multiple scripts, including arabic
             'kk', 'ku', 'tt', 'ug'
             ],
@@ -766,32 +766,47 @@ class Family:
     redirect = {
         'ar': [u'تحويل'],
         'be-x-old': [u'перанакіраваньне'],
-        'bg': [u'виж'],
+        'bg': [u'виж', u'пренасочване'],
         'bs': [u'preusmjeri'],
-        'cy': [u'ail-cyfeirio'],
+        'cs': [u'PŘESMĚRUJ'],
+        'cy': [u'ail-cyfeirio', u'ailgyfeirio'],
         'el': [u'ΑΝΑΚΑΤΕΥΘΥΝΣΗ'],
+        'eo': [u'ALIDIREKTU'],
         'et': [u'suuna'],
         'fa': [u'تغییرمسیر'],
         'fi': [u'ohjaus', u'uudelleenohjaus'],
+        'fiu-vro': [u'saadaq'],
         'ga': [u'athsheoladh'],
         'he': [u'הפניה'],
+        'hr': [u'PREUSMJERI'],
         'hu': [u'átirányítás'],
+        'hy': [u'ՎԵՐԱՀՂՈՒՄ'],
         'id': [u'alih'],
         'is': [u'tilvísun'],
         'jv': [u'alih'],
         'ka': [u'გადამისამართება'],
         'kk': [u'айдау'],
         'ko': [u'넘겨주기'],
+        'mk': [u'пренасочување', u'види'],
+        'ml': [u'തിരിച്ചുവിടുക', u'തിരിച്ചുവിടല്‍'],
+        'mr': [u'पुनर्निर्देशन'],
         'mzn': [u'تغییرمسیر'],
+        'nds': [u'wiederleiden'],
+        'nds-nl': [u'DEURVERWIEZING'],
         'nl': [u'DOORVERWIJZING'],
         'nn': [u'omdiriger'],
+        'oc': [u'REDIRECCION'],
+        'pl': [u'TAM', u'PRZEKIERUJ'],
         'ru': [u'REDIRECT',             # localised version is not
                u'перенаправление',      # so usual, so put the default
                u'перенапр'],            # one as the most used.
         'sk': [u'presmeruj'],
         'sr': [u'преусмери', u'Преусмери'], # lowercase only doesn't work?
         'su': [u'redirected', u'alih'],
+        'sv': [u'OMDIRIGERING'],
         'tt': [u'yünältü'],
+        'uk': [u'ПЕРЕНАПРАВЛЕННЯ', u'ПЕРЕНАПР'],
+        'vi': [u'đổi'],
         'yi': [u'ווייטערפירן']
     }
 
