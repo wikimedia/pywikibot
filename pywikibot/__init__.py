@@ -7,7 +7,7 @@ The initialization file for the Pywikibot framework.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: $'
+__version__ = '$Id$'
 
 import sys
 import logging
@@ -16,7 +16,7 @@ import re
 from exceptions import *
 import config2 as config
 import textlib
-from bot import handleArgs, showHelp
+from bot import *
 
 
 def deprecate_arg(old_arg, new_arg):
@@ -120,11 +120,6 @@ def input(prompt, password=False):
     return raw_input(prompt)
 
 
-# Logger configuration
-
-logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
-
 def set_debug(layer):
     """Set the logger for specified layer to DEBUG level.
 
@@ -174,7 +169,7 @@ def stopme():
     # only need one drop() call because all throttles use the same global pid
     try:
         _sites[_sites.keys()[0]].throttle.drop()
-        logger.info("Dropped throttle(s).")
+        logger.log("VERBOSE", "Dropped throttle(s).")
     except IndexError:
         pass
 

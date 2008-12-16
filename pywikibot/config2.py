@@ -216,6 +216,9 @@ editor_filename_extension = 'wiki'
 # be used to generate so-called warnfiles.
 # This setting can be overridden by the -log or -nolog command-line arguments.
 log = ['interwiki']
+logfilename = None # defaults to modulename.log
+verbose_output = 0
+debug_log = False
 
 ############## INTERWIKI SETTINGS ##############
 

@@ -7,14 +7,14 @@ User-interface related functions for building bots
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: $'
+__version__ = '$Id$'
 
 # Note: the intention is to develop this module (at some point) into a Bot
 # class definition that can be subclassed to create new, functional bot
 # scripts, instead of writing each one from scratch.
 
 
-import logging
+import logging, logging.handlers
 import os.path
 import sys
 import pywikibot
@@ -64,7 +64,6 @@ def handleArgs(*args):
     args may be passed as an argument, thereby overriding sys.argv
 
     """
-    global verbose
     # get commandline arguments if necessary
     if not args:
         args = sys.argv[1:]
@@ -72,6 +71,8 @@ def handleArgs(*args):
     # required because the -help option loads the module's docstring and because
     # the module name will be used for the filename of the log.
     moduleName = calledModuleName()
+    if not moduleName:
+        moduleName = "terminal-interface"
     nonGlobalArgs = []
     for arg in args:
         arg = _decodeArg(arg)
@@ -87,15 +88,23 @@ def handleArgs(*args):
         elif arg.startswith('-pt:'):
             config.put_throttle = int(arg[4:])
         elif arg == '-log':
-            setLogfileStatus(True) #FIXME
+            if moduleName not in config.log:
+                config.log.append(moduleName)
         elif arg.startswith('-log:'):
-            setLogfileStatus(True, arg[5:]) #FIXME
+            if moduleName not in config.log:
+                config.log.append(moduleName)
+            config.logfilename = arg[5:]
         elif arg == '-nolog':
-            setLogfileStatus(False) #FIXME
+            if moduleName in config.log:
+                config.log.remove(moduleName)
+        elif arg == "-debug":
+            if moduleName not in config.log:
+                config.log.append(moduleName)
+            config.log.debug_log = True
         elif arg == '-verbose' or arg == "-v":
             pywikibot.output(u'Pywikipediabot %s' % (version.getversion()))
             pywikibot.output(u'Python %s' % (sys.version))
-            verbose += 1 # FIXME
+            config.verbose_output += 1
         elif arg == '-daemonize':
             import daemonize
             daemonize.daemonize()
@@ -106,6 +115,35 @@ def handleArgs(*args):
             # the argument is not global. Let the specific bot script care
             # about it.
             nonGlobalArgs.append(arg)
+
+    # initialize logging system for terminal-based bots
+
+    logging.addLevelName(18, "VERBOSE") # for messages to be displayed on 
+                                        # terminal at "verbose" setting
+                                        # use INFO for messages to be displayed
+                                        # even on non-verbose setting
+    logging.addLevelName(24, "STDOUT")  # for messages to be displayed to stdout
+    logging.addLevelName(26, "INPUT")   # for prompts requiring user response
+
+    logging.basicConfig()               # initializes root logger
+    root_logger = logging.getLogger()
+    if config.verbose_output:
+        root_logger.setLevel("VERBOSE")
+    else:
+        root_logger.setLevel(logging.INFO)
+    if moduleName in config.log:
+        if config.logfilename:
+            logfile = config.datafilepath(config.logfilename)
+        else:
+            logfile = config.datafilepath("%s.log" % moduleName)
+        file_handler = logging.handlers.RotatingFileHandler(
+                            filename=logfile, maxBytes=2 << 20, backupCount=5)
+        if config.debug_log:
+            file_handler.setLevel(logging.DEBUG)
+        else:
+            file_handler.setLevel("VERBOSE")
+        logging.addHandler(file_handler)
+
     return nonGlobalArgs
 
 
