@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: $'
+__version__ = '$Id$'
 
 import sys
 import threading

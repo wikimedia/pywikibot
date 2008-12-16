@@ -8,7 +8,7 @@ on the same topic in different languages).
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: $'
+__version__ = '$Id$'
 
 import pywikibot
 from pywikibot import deprecate_arg

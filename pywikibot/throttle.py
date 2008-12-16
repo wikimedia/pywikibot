@@ -7,7 +7,7 @@ Mechanics to slow down wiki read and/or write rate.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: $'
+__version__ = '$Id$'
 
 import pywikibot
 from pywikibot import config2 as config
