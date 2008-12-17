@@ -105,7 +105,13 @@ link_regex = re.compile(r'\[\[(?P<title>[^\]|[#<>{}]*)(\|.*?)?\]\]')
 # User interface functions (kept extremely simple for debugging)
 
 def output(text, toStdout=False):
-    print text.encode(config.console_encoding, "xmlcharrefreplace")
+    if toStdout:
+        level = STDOUT
+    else:
+        level = logging.INFO
+    logging.getLogger().log(level,
+                            text.encode(config.console_encoding,
+                                        "xmlcharrefreplace"))
 
 def input(prompt, password=False):
     if isinstance(prompt, unicode):
@@ -169,7 +175,7 @@ def stopme():
     # only need one drop() call because all throttles use the same global pid
     try:
         _sites[_sites.keys()[0]].throttle.drop()
-        logger.log("VERBOSE", "Dropped throttle(s).")
+        logger.log(pywikibot.VERBOSE, "Dropped throttle(s).")
     except IndexError:
         pass
 

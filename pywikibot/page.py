@@ -37,8 +37,8 @@ class Page(object):
 
     """
 
-    @deprecate_arg("insite", None)
-    @deprecate_arg("defaultNamespace", None)
+#    @deprecate_arg("insite", None)
+#    @deprecate_arg("defaultNamespace", None)
     def __init__(self, source, title=u"", ns=0):
         """Instantiate a Page object.
 

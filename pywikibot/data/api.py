@@ -195,7 +195,7 @@ class Request(DictMixin):
                     rawdata = http.request(self.site, uri)
             except Exception, e: #TODO: what exceptions can occur here?
                 logger.warning(traceback.format_exc())
-                print uri, params
+                logger.warning("%s, %s", uri, params)
                 self.wait()
                 continue
             if not isinstance(rawdata, unicode):
@@ -621,7 +621,7 @@ if __name__ == "__main__":
     from pywikibot import Site
     logger.setLevel(pywikibot.logging.DEBUG)
     mysite = Site("en", "wikipedia")
-    print "starting test...."
+    pywikibot.output("starting test....")
     def _test():
         import doctest
         doctest.testmod()

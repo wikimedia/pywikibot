@@ -39,7 +39,7 @@ class Throttle(object):
                  multiplydelay=True, verbosedelay=False):
         self.lock = threading.RLock()
         self.mysite = str(site)
-        self.logfn = config.datafilepath('throttle.log')
+        self.ctrlfilename = config.datafilepath('throttle.ctrl')
         self.mindelay = mindelay
         if self.mindelay is None:
             self.mindelay = config.minthrottle
@@ -73,7 +73,7 @@ class Throttle(object):
             count = 1
             # open throttle.log
             try:
-                f = open(self.logfn, 'r')
+                f = open(self.ctrlfilename, 'r')
             except IOError:
                 if not pid:
                     pass
@@ -110,7 +110,7 @@ class Throttle(object):
             processes.append({'pid': pid,
                               'time': self.checktime,
                               'site': mysite})
-            f = open(self.logfn, 'w')
+            f = open(self.ctrlfilename, 'w')
             processes.sort(key=lambda p:(p['pid'], p['site']))
             for p in processes:
                 f.write("%(pid)s %(time)s %(site)s\n" % p)
@@ -187,7 +187,7 @@ u"Found %(count)s %(mysite)s processes running, including this one."
         self.checktime = 0
         processes = []
         try:
-            f = open(self.logfn, 'r')
+            f = open(self.ctrlfilename, 'r')
         except IOError:
             return
         else:
@@ -206,15 +206,14 @@ u"Found %(count)s %(mysite)s processes running, including this one."
                     processes.append({'pid': this_pid,
                                       'time': ptime,
                                       'site': this_site})
-        f = open(self.logfn, 'w')
+        f = open(self.ctrlfilename, 'w')
         processes.sort(key=lambda p:p['pid'])
         for p in processes:
             f.write("%(pid)s %(time)s %(site)s\n" % p)
         f.close()
 
     def __call__(self, requestsize=1, write=False):
-        """
-        Block the calling program if the throttle time has not expired.
+        """Block the calling program if the throttle time has not expired.
 
         Parameter requestsize is the number of Pages to be read/written;
         multiply delay time by an appropriate factor.
@@ -248,8 +247,7 @@ u"Found %(count)s %(mysite)s processes running, including this one."
             self.lock.release()
 
     def lag(self, lagtime):
-        """
-        Seize the throttle lock due to server lag.
+        """Seize the throttle lock due to server lag.
 
         This will prevent any thread from accessing this site.
 

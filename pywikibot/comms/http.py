@@ -27,7 +27,7 @@ import urlparse
 import logging
 import atexit
 
-from pywikibot import config
+from pywikibot import config, VERBOSE
 import cookielib
 import threadedhttp
 
@@ -57,7 +57,7 @@ else:
 
 
 # Build up HttpProcessors
-logger.info('Starting %(numthreads)i threads...' % locals())
+logger.log(VERBOSE, 'Starting %(numthreads)i threads...', locals())
 for i in range(numthreads):
     proc = threadedhttp.HttpProcessor(http_queue, cookie_jar, connection_pool)
     proc.setDaemon(True)
@@ -68,7 +68,7 @@ for i in range(numthreads):
 def _flush():
     for i in threads:
         http_queue.put(None)
-    logger.info('Waiting for threads to finish... ')
+    logger.log(VERBOSE, 'Waiting for threads to finish... ')
     for i in threads:
         i.join()
     logger.debug('All threads finished.')
