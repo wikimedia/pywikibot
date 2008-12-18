@@ -310,20 +310,22 @@ def replaceLanguageLinks(oldtext, new, site = None):
     s = interwikiFormat(new, insite = site)
     s2 = removeLanguageLinks(oldtext, site = site, marker = marker)
     if s:
+        separator = site.family.interwiki_text_separator
         if site.language() in site.family.interwiki_attop:
-            newtext = s + site.family.interwiki_text_separator + s2.replace(marker,'').strip()
+            newtext = s + separator + s2.replace(marker,'').strip()
         else:
             # calculate what was after the language links on the page
             firstafter = s2.find(marker) + len(marker)
-            # Is there any text in the 'after' part that means we should keep it after?
+            # Any text in 'after' part that means we should keep it after?
             if "</noinclude>" in s2[firstafter:]:
                 newtext = s2[:firstafter] + s + s2[firstafter:]
             elif site.language() in site.family.categories_last:
                 cats = getCategoryLinks(s2, site = site)
-                s2 = removeCategoryLinks(s2.replace(marker,'').strip(), site) + site.family.interwiki_text_separator + s
+                s2 = removeCategoryLinks(s2.replace(marker,'').strip(),
+                                         site) + separator + s
                 newtext = replaceCategoryLinks(s2, cats, site=site)
             else:
-                newtext = s2.replace(marker,'').strip() + site.family.interwiki_text_separator + s
+                newtext = s2.replace(marker,'').strip() + separator + s
             newtext = newtext.replace(marker,'')
     else:
         newtext = s2.replace(marker,'')
@@ -494,19 +496,21 @@ def replaceCategoryLinks(oldtext, new, site = None, addOnly = False):
         s2 = removeCategoryLinks(oldtext, site = site, marker = marker)
 
     if s:
+        separator = site.family.category_text_separator
         if site.language() in site.family.category_attop:
-            newtext = s + site.family.category_text_separator + s2
+            newtext = s + separator + s2
         else:
             # calculate what was after the categories links on the page
             firstafter = s2.find(marker)
-            # Is there any text in the 'after' part that means we should keep it after?
+            # Any text in 'after' part that means we should keep it after?
             if "</noinclude>" in s2[firstafter:]:
                 newtext = s2[:firstafter] + s + s2[firstafter:]
             elif site.language() in site.family.categories_last:
-                newtext = s2.replace(marker,'').strip() + site.family.category_text_separator + s
+                newtext = s2.replace(marker,'').strip() + separator + s
             else:
                 interwiki = getLanguageLinks(s2)
-                s2 = removeLanguageLinks(s2.replace(marker,''), site) + site.family.category_text_separator + s
+                s2 = removeLanguageLinks(s2.replace(marker,''), site
+                                         ) + separator + s
                 newtext = replaceLanguageLinks(s2, interwiki, site)
         newtext = newtext.replace(marker,'')
     else:
@@ -672,4 +676,148 @@ def extract_templates_and_params(text, get_redirect=False):
             # Add it to the result
             result.append((name, params))
     return result
+
+# I18N functions
+
+# Languages to use for comment text after the actual language but before
+# en:. For example, if for language 'xx', you want the preference of
+# languages to be:
+# xx:, then fr:, then ru:, then en:
+# you let altlang return ['fr','ru'].
+# This code is used by translate() below.
+
+def _altlang(code):
+    """Define fallback languages for particular languages.
+
+    If no translation is available to a specified language, translate() will
+    try each of the specified fallback languages, in order, until it finds
+    one with a translation, or '_default' as a last resort.
+
+    """
+    if code=='aa':
+        return ['am']
+    if code in ['fa','so']:
+        return ['ar']
+    if code=='ku':
+        return ['ar','tr']
+    if code=='sk':
+        return ['cs']
+    if code in ['bar','ksh','stq']:
+        return ['de']
+    if code in ['als','lb']:
+        return ['de','fr']
+    if code=='dsb':
+        return ['hsb','de']
+    if code=='hsb':
+        return ['dsb','de']
+    if code=='io':
+        return ['eo']
+    if code in ['an','ast','ay','ca','gn','nah','qu']:
+        return ['es']
+    if code == ['cbk-zam']:
+        return ['es','tl']
+    if code=='eu':
+        return ['es','fr']
+    if code in ['glk','mzn']:
+        return ['fa','ar']
+    if code=='gl':
+        return ['es','pt']
+    if code=='lad':
+        return ['es','he']
+    if code in ['br','ht','kab','ln','lo','nrm','wa']:
+        return ['fr']
+    if code in ['ie','oc']:
+        return ['ie','oc','fr']
+    if code in ['co','frp']:
+        return ['fr','it']
+    if code=='yi':
+        return ['he','de']
+    if code=='sa':
+        return ['hi']
+    if code in ['eml','lij','lmo','nap','pms','roa-tara','sc','scn','vec']:
+        return ['it']
+    if code=='rm':
+        return ['it','de','fr']
+    if code in ['bat-smg','ltg']:
+        return ['lt']
+    if code=='ia':
+        return ['la','es','fr','it']
+    if code=='nds':
+        return ['nds-nl','de']
+    if code=='nds-nl':
+        return ['nds','nl']
+    if code in ['fy','pap','vls','zea']:
+        return ['nl']
+    if code=='li':
+        return ['nl','de']
+    if code=='csb':
+        return ['pl']
+    if code in ['fab','tet']:
+        return ['pt']
+    if code in ['mo','roa-rup']:
+        return ['ro']
+    if code in ['av','bxr','cv','hy','lbe','tg','udm','uk','xal']:
+        return ['ru']
+    if code in ['be','be-x-old']:
+        return ['be','be-x-old','ru']
+    if code in ['ky','tt','uz']:
+        return ['kk','tr','ru']
+    if code in ['az','diq','tk','ug']:
+        return ['tr']
+    if code in ['ja','minnan','zh','zh-cn']:
+        return ['zh','zh-tw','zh-classical','zh-cn']
+    if code in ['bo','cdo','hak','wuu','za','zh-cdo','zh-classical','zh-tw','zh-yue']:
+        return ['zh','zh-cn','zh-classical','zh-tw']
+    if code=='da':
+        return ['nb','no']
+    if code in ['is','no','nb','nn']:
+        return ['no','nb','nn','da','sv']
+    if code=='sv':
+        return ['da','no','nb']
+    if code=='se':
+        return ['no','nb','sv','nn','fi','da']
+    if code in ['bug','id','jv','map-bms','ms','su']:
+        return ['id','ms','jv']
+    if code in ['bs','hr','sh']:
+        return ['sh','hr','bs','sr']
+    if code in ['mk','sr']:
+        return ['sh','sr','hr','bs']
+    if code in ['ceb','pag','tl','war']:
+        return ['tl','es']
+    if code=='bi':
+        return ['tpi']
+    if code=='tpi':
+        return ['bi']
+    if code == 'new':
+        return ['ne']
+    if code == 'nov':
+        return ['io','eo']
+    return []
+
+def translate(code, xdict):
+    """Return the most appropriate translation from a translation dict.
+
+    Given a language code and a dictionary, returns the dictionary's value for
+    key 'code' if this key exists; otherwise tries to return a value for an
+    alternative language that is most applicable to use on the Wikipedia in
+    language 'code'.
+
+    The language itself is always checked first, then languages that
+    have been defined to be alternatives, and finally English. If none of
+    the options gives result, we just take the first language in the
+    list.
+
+    """
+    # If a site is given instead of a code, use its language
+    if hasattr(code,'lang'):
+        code = code.lang
+
+    if xdict.has_key(code):
+        return xdict[code]
+    for alt in _altlang(code):
+        if xdict.has_key(alt):
+            return xdict[alt]
+    if xdict.has_key('en'):
+        return xdict['en']
+    return xdict.values()[0]
 
