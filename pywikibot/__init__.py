@@ -18,6 +18,8 @@ import config2 as config
 import textlib
 from bot import *
 
+logging.basicConfig(fmt="%(message)s")
+
 
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg"""
@@ -102,30 +104,6 @@ from page import Page, ImagePage, Category, Link
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[#<>{}]*)(\|.*?)?\]\]')
 
 
-# User interface functions (kept extremely simple for debugging)
-
-def output(text, toStdout=False):
-    if toStdout:
-        level = STDOUT
-    else:
-        level = logging.INFO
-    logging.getLogger().log(level,
-                            text.encode(config.console_encoding,
-                                        "xmlcharrefreplace"))
-
-def input(prompt, password=False):
-    if isinstance(prompt, unicode):
-        encoding = sys.stdout.encoding
-        # Fallback to _some_ encoding for virtual consoles (cron, screen !)
-        if not encoding:
-            encoding = "UTF-8"
-        prompt = prompt.encode(encoding, "xmlcharrefreplace")
-    if password:
-        import getpass
-        return getpass.getpass(prompt)
-    return raw_input(prompt)
-
-
 def set_debug(layer):
     """Set the logger for specified layer to DEBUG level.
 
@@ -144,7 +122,7 @@ def set_debug(layer):
     This method does not check the 'layer' argument for validity.
 
     """
-    logging.getLogger(layer).setLevel(logging.DEBUG)
+    logging.getLogger(layer).setLevel(DEBUG)
 
 
 # Throttle and thread handling
@@ -175,7 +153,7 @@ def stopme():
     # only need one drop() call because all throttles use the same global pid
     try:
         _sites[_sites.keys()[0]].throttle.drop()
-        logger.log(pywikibot.VERBOSE, "Dropped throttle(s).")
+        logger.log(VERBOSE, "Dropped throttle(s).")
     except IndexError:
         pass
 

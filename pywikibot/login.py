@@ -50,7 +50,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import *
 
-logger = logging.getLogger("wiki")
+logger = logging.getLogger()
 
 
 # On some wikis you are only allowed to run a bot if there is a link to
@@ -191,27 +191,29 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         logger.info(u"Logging in to %(site)s as %(name)s"
                      % {'name': self.username, 'site': self.site})
-        cookiedata = self.getCookie()
-        if cookiedata:
-            self.storecookiedata(cookiedata)
-            logger.info(u"Should be logged in now")
-            # Show a warning according to the local bot policy
-            if not self.botAllowed():
-                logger.error(
-                    u"Username '%(name)s' is not listed on [[%(page)s]]."
-                     % {'name': self.username,
-                        'page': botList[self.site.family.name][self.site.code]})
-                logger.error(
-"Please make sure you are allowed to use the robot before actually using it!")
-                return False
-            return True
-        else:
-            logger.error(u"Login failed. Wrong password or CAPTCHA answer?")
+        try:
+            cookiedata = self.getCookie()
+        except pywikibot.data.api.APIError, e:
+            logger.error("Login failed (%s).", e.code)
             if retry:
                 self.password = None
                 return self.login(retry = True)
             else:
                 return False
+        self.storecookiedata(cookiedata)
+        logger.info(u"Should be logged in now")
+##        # Show a warning according to the local bot policy
+##   FIXME: disabled due to recursion; need to move this to the Site object after
+##   login
+##        if not self.botAllowed():
+##            logger.error(
+##                u"Username '%(name)s' is not listed on [[%(page)s]]."
+##                 % {'name': self.username,
+##                    'page': botList[self.site.family.name][self.site.code]})
+##            logger.error(
+##"Please make sure you are allowed to use the robot before actually using it!")
+##            return False
+        return True
 
     def showCaptchaWindow(self, url):
         pass
@@ -221,7 +223,7 @@ def main():
     sysop = False
     logall = False
     forceLogin = False
-    for arg in wikipedia.handleArgs(): #FIXME
+    for arg in pywikibot.handleArgs(): 
         if arg.startswith("-pass"):
             if len(arg) == 5:
                 password = pywikibot.input(u'Password for all accounts:',
@@ -235,7 +237,7 @@ def main():
         elif arg == "-force":
             forceLogin = True
         else:
-            wikipedia.showHelp('login') #FIXME
+            pywikibot.showHelp('login')
             return
     if logall:
         if sysop:
@@ -257,7 +259,7 @@ def main():
 u' is not a valid site, please remove it from your config')
 
     else:
-        loginMan = LoginManager(password, sysop=sysop)
+        loginMan = pywikibot.data.api.LoginManager(password, sysop=sysop)
         loginMan.login()
 
 if __name__ == "__main__":

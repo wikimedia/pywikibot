@@ -23,7 +23,7 @@ import pywikibot
 from pywikibot import login
 from pywikibot.exceptions import *
 
-logger = logging.getLogger("data")
+logger = logging.getLogger()
 
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
@@ -198,6 +198,7 @@ class Request(DictMixin):
                 logger.warning("%s, %s", uri, params)
                 self.wait()
                 continue
+            logger.debug("API response received:\n%s", rawdata)
             if not isinstance(rawdata, unicode):
                 rawdata = rawdata.decode(self.site.encoding())
             if rawdata.startswith(u"unknown_action"):
@@ -228,11 +229,11 @@ class Request(DictMixin):
                         self.site._userinfo = result['query']['userinfo']
 
             if "warnings" in result:
-                modules = [k for k in result["warning"] if k != "info"]
-                logger.warn(
-                    "API warning (%s): %s"
-                    % (", ".join(modules), result['warnings']['info']))
-                warnings.warn(result['warnings']['info'])
+                modules = [k for k in result["warnings"] if k != "info"]
+                for mod in modules:
+                    logger.warning(
+                        "API warning (%s): %s"
+                        % (mod, result["warnings"][mod]["*"]))
             if "error" not in result:
                 return result
             if "*" in result["error"]:
@@ -558,18 +559,21 @@ class LoginManager(login.LoginManager):
         login_result = login_request.submit()
         if u"login" not in login_result:
             raise RuntimeError("API login response does not have 'login' key.")
-        if login_result['login']['result'] != u'Success':
-            self._waituntil = datetime.datetime.now() + datetime.timedelta(seconds=60)
-            return None
-
-        prefix = login_result['login']['cookieprefix']
-        cookies = []
-        for key in ('Token', 'UserID', 'UserName'):
-            cookies.append("%s%s=%s"
-                           % (prefix, key,
-                              login_result['login']['lg'+key.lower()]))
-        self.username = login_result['login']['lgusername']
-        return "\n".join(cookies)
+        if login_result['login']['result'] == u'Success':
+            prefix = login_result['login']['cookieprefix']
+            cookies = []
+            for key in ('Token', 'UserID', 'UserName'):
+                cookies.append("%s%s=%s"
+                               % (prefix, key,
+                                  login_result['login']['lg'+key.lower()]))
+            self.username = login_result['login']['lgusername']
+            return "\n".join(cookies)
+        elif login_result['login']['result'] == "Throttled":
+            self._waituntil = datetime.now() \
+                              + timedelta(seconds=int(
+                                            login_result["login"]["wait"])
+                                          )
+        raise APIError(code=login_result["login"]["result"], info="")
 
     def storecookiedata(self, data):
         pywikibot.cookie_jar.save()
