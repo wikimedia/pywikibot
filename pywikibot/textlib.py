@@ -93,7 +93,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         # images.
         'link':        re.compile(r'\[\[[^\]\|]*(\|[^\]]*)?\]\]'),
         'interwiki':   re.compile(r'(?i)\[\[(%s)\s?:[^\]]*\]\][\s]*'
-                               % '|'.join(site.validLanguageLinks() + site.family.obsolete.keys())),
+                                   % '|'.join(site.validLanguageLinks()
+                                              + site.family.obsolete.keys())
+                                  ),
 
     }
 
@@ -132,25 +134,28 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                     excMatch.start() < nextExceptionMatch.start()):
                 nextExceptionMatch = excMatch
 
-        if nextExceptionMatch is not None and nextExceptionMatch.start() <= match.start():
-            # an HTML comment or text in nowiki tags stands before the next valid match. Skip.
+        if nextExceptionMatch is not None \
+                and nextExceptionMatch.start() <= match.start():
+            # an HTML comment or text in nowiki tags stands before the next
+            # valid match. Skip.
             index = nextExceptionMatch.end()
         else:
             # We found a valid match. Replace it.
             if callable(new):
-                # the parameter new can be a function which takes the match as a parameter.
+                # the parameter new can be a function which takes the match
+                # as a parameter.
                 replacement = new(match)
             else:
                 # it is not a function, but a string.
 
-                # it is a little hack to make \n work. It would be better to fix it
-                # previously, but better than nothing.
+                # it is a little hack to make \n work. It would be better
+                # to fix it previously, but better than nothing.
                 new = new.replace('\\n', '\n')
 
                 # We cannot just insert the new string, as it may contain regex
                 # group references such as \2 or \g<name>.
-                # On the other hand, this approach does not work because it can't
-                # handle lookahead or lookbehind (see bug #1731008):
+                # On the other hand, this approach does not work because it
+                # can't handle lookahead or lookbehind (see bug #1731008):
                 #replacement = old.sub(new, text[match.start():match.end()])
                 #text = text[:match.start()] + replacement + text[match.end():]
 
@@ -162,8 +167,11 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                     groupMatch = groupR.search(replacement)
                     if not groupMatch:
                         break
-                    groupID = groupMatch.group('name') or int(groupMatch.group('number'))
-                    replacement = replacement[:groupMatch.start()] + match.group(groupID) + replacement[groupMatch.end():]
+                    groupID = (groupMatch.group('name')
+                               or int(groupMatch.group('number')))
+                    replacement = (replacement[:groupMatch.start()]
+                                   + match.group(groupID)
+                                   + replacement[groupMatch.end():])
             text = text[:match.start()] + replacement + text[match.end():]
 
             # continue the search on the remaining text
@@ -210,12 +218,43 @@ def isDisabled(text, index, tags = ['*']):
     For the tags parameter, see removeDisabledParts() above.
     """
     # Find a marker that is not already in the text.
-    marker = '@@'
-    while marker in text:
-        marker += '@'
+    marker = findmarker(text, '@@', '@')
     text = text[:index] + marker + text[index:]
     text = removeDisabledParts(text, tags)
     return (marker not in text)
+
+
+def findmarker(text, startwith = u'@', append = u'@'):
+    # find a string which is not part of text
+    if len(append) <= 0:
+        append = u'@'
+    mymarker = startwith
+    while mymarker in text:
+        mymarker += append
+    return mymarker
+
+
+def expandmarker(text, marker = '', separator = ''):
+    # set to remove any number of separator occurrences plus arbitrary
+    # whitespace before, after, and between them,
+    # by allowing to include them into marker.
+    if separator:
+        firstinmarker = text.find(marker)
+        firstinseparator = firstinmarker
+        lenseparator = len(separator)
+        striploopcontinue = True
+        while firstinseparator > 0 and striploopcontinue:
+            striploopcontinue = False
+            if ( (firstinseparator >= lenseparator) and
+                 (separator ==
+                    text[firstinseparator-lenseparator:firstinseparator])):
+                firstinseparator -= lenseparator
+                striploopcontinue = True
+            elif text[firstinseparator-1] < ' ':
+                firstinseparator -= 1
+                striploopcontinue = True
+        marker = text[firstinseparator:firstinmarker] + marker
+    return marker
 
 
 # Functions dealing with interwiki language links
@@ -289,11 +328,32 @@ def removeLanguageLinks(text, site = None, marker = ''):
     interwikiR = re.compile(r'\[\[(%s)\s?:[^\]]*\]\][\s]*'
                             % languages, re.IGNORECASE)
     text = replaceExcept(text, interwikiR, '',
-                         ['nowiki', 'comment', 'math', 'pre', 'source'], marker=marker)
+                         ['nowiki', 'comment', 'math', 'pre', 'source'],
+                         marker=marker)
     return text.strip()
 
 
-def replaceLanguageLinks(oldtext, new, site = None):
+def removeLanguageLinksAndSeparator(text, site = None, marker = '', separator = ''):
+    """
+    Return text with all interlanguage links, plus any preceeding whitespace
+    and separateor occurrences removed.
+
+    If a link to an unknown language is encountered, a warning is printed.
+    If a marker is defined, that string is placed at the location of the
+    last occurence of an interwiki link (at the end if there are no
+    interwiki links).
+
+    """
+    if separator:
+        mymarker = findmarker(text, u'@L@')
+        newtext = removeLanguageLinks(text, site, mymarker)
+        mymarker = expandmarker(newtext, mymarker, separator)
+        return newtext.replace(mymarker, marker)
+    else:
+        return removeLanguageLinks(text, site, marker)
+
+
+def replaceLanguageLinks(oldtext, new, site = None, addOnly = False):
     """Replace interlanguage links in the text with a new set of links.
 
     'new' should be a dict with the Site objects as keys, and Page objects
@@ -302,31 +362,45 @@ def replaceLanguageLinks(oldtext, new, site = None):
     
     """
     # Find a marker that is not already in the text.
-    marker = '@@'
-    while marker in oldtext:
-        marker += '@'
+    marker = findmarker( oldtext, u'@@')
     if site == None:
         site = pywikibot.getSite()
+    separator = site.family.interwiki_text_separator
+    cseparator = site.family.category_text_separator
+    separatorstripped = separator.strip()
+    cseparatorstripped = cseparator.strip()
+    if addOnly:
+        s2 = oldtext
+    else:
+        s2 = removeLanguageLinksAndSeparator(oldtext, site=site, marker=marker,
+                                             separator=separatorstripped)
     s = interwikiFormat(new, insite = site)
-    s2 = removeLanguageLinks(oldtext, site = site, marker = marker)
     if s:
         separator = site.family.interwiki_text_separator
         if site.language() in site.family.interwiki_attop:
             newtext = s + separator + s2.replace(marker,'').strip()
         else:
             # calculate what was after the language links on the page
-            firstafter = s2.find(marker) + len(marker)
+            firstafter = s2.find(marker)
+            if firstafter < 0:
+                firstafter = len(s2)
+            else:
+                firstafter += len(marker)
             # Any text in 'after' part that means we should keep it after?
             if "</noinclude>" in s2[firstafter:]:
-                newtext = s2[:firstafter] + s + s2[firstafter:]
+                if separatorstripped:
+                    s = separator + s
+                newtext = s2[:firstafter].replace(marker,'') + s \
+                          + s2[firstafter:]
             elif site.language() in site.family.categories_last:
                 cats = getCategoryLinks(s2, site = site)
-                s2 = removeCategoryLinks(s2.replace(marker,'').strip(),
-                                         site) + separator + s
-                newtext = replaceCategoryLinks(s2, cats, site=site)
+                s2 = removeCategoryLinksAndSeparator(
+                         s2.replace(marker, '', cseparatorstripped).strip(),
+                         site) + separator + s
+                newtext = replaceCategoryLinks(s2, cats, site=site,
+                                               addOnly=True)
             else:
                 newtext = s2.replace(marker,'').strip() + separator + s
-            newtext = newtext.replace(marker,'')
     else:
         newtext = s2.replace(marker,'')
     return newtext
@@ -385,7 +459,8 @@ def interwikiSort(sites, insite = None):
                     del sites[sites.index(site)]
                     firstsites = firstsites + [site]
         sites = firstsites + sites
-    if insite.interwiki_putfirst_doubled(sites): #some implementations return False
+    if insite.interwiki_putfirst_doubled(sites):
+        #some (all?) implementations return False
         sites = insite.interwiki_putfirst_doubled(sites) + sites
     return sites
 
@@ -420,7 +495,7 @@ def removeCategoryLinks(text, site, marker = ''):
     """Return text with all category links removed.
 
     Put the string marker after the last replacement (at the end of the text
-    if  there is no replacement).
+    if there is no replacement).
 
     """
     # This regular expression will find every link that is possibly an
@@ -429,11 +504,32 @@ def removeCategoryLinks(text, site, marker = ''):
     # ASCII letters and hyphens.
     catNamespace = '|'.join(site.category_namespaces())
     categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
-    text = replaceExcept(text, categoryR, '', ['nowiki', 'comment', 'math', 'pre', 'source'], marker = marker)
+    text = replaceExcept(text, categoryR, '',
+                         ['nowiki', 'comment', 'math', 'pre', 'source'],
+                         marker=marker)
     if marker:
         #avoid having multiple linefeeds at the end of the text
-        text = re.sub('\s*%s' % re.escape(marker), '\r\n' + marker, text.strip())
+        text = re.sub('\s*%s' % re.escape(marker), '\r\n' + marker,
+                      text.strip())
     return text.strip()
+
+
+def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
+    """
+    Return text with all category links, plus any preceeding whitespace
+    and separateor occurrences removed.
+
+    Put the string marker after the last replacement (at the end of the text
+    if there is no replacement).
+
+    """
+    if separator:
+        mymarker = findmarker(text, u'@C@')
+        newtext = removeCategoryLinks(text, site, mymarker)
+        mymarker = expandmarker(newtext, mymarker, separator)
+        return newtext.replace(mymarker, marker)
+    else:
+        return removeCategoryLinks(text, site, marker)
 
 
 def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
@@ -453,7 +549,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
     # title might not be capitalized correctly on the wiki
     if title[0].isalpha() and not site.nocapitalize:
         title = "[%s%s]" % (title[0].upper(), title[0].lower()) + title[1:]
-    # spaces and underscores in page titles are interchangeable, and collapsible
+    # spaces and underscores in page titles are interchangeable and collapsible
     title = title.replace(r"\ ", "[ _]+").replace(r"\_", "[ _]+")
     categoryR = re.compile(r'\[\[\s*(%s)\s*:\s*%s\s*((?:\|[^]]+)?\]\])'
                             % (catNamespace, title), re.I)
@@ -470,31 +566,34 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
 
 def replaceCategoryLinks(oldtext, new, site = None, addOnly = False):
     """Replace the category links given in the wikitext given
-       in oldtext by the new links given in new.
+    in oldtext by the new links given in new.
 
-       'new' should be a list of Category objects.
+    'new' should be a list of Category objects.
 
-       If addOnly is True, the old category won't be deleted and
-       the category(s) given will be added
-       (and so they won't replace anything).
+    If addOnly is True, the old category won't be deleted andthe
+    category(s) given will be added (and so they won't replace anything).
+    
     """
-
     # Find a marker that is not already in the text.
-    marker = '@@'
-    while marker in oldtext:
-        marker += '@'
-
+    marker = findmarker( oldtext, u'@@')
     if site is None:
         site = pywikibot.getSite()
     if site.sitename() == 'wikipedia:de' and "{{Personendaten" in oldtext:
-        raise Error('The PyWikipediaBot is no longer allowed to touch categories on the German Wikipedia on pages that contain the person data template because of the non-standard placement of that template. See http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/bis_2006#Position_der_Personendaten_am_.22Artikelende.22')
-
-    s = categoryFormat(new, insite = site)
+        raise Error("""\
+The PyWikipediaBot is no longer allowed to touch categories on the German
+Wikipedia on pages that contain the Personendaten template because of the
+non-standard placement of that template.
+See http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/bis_2006#Position_der_Personendaten_am_.22Artikelende.22""")
+    separator = site.family.category_text_separator
+    iseparator = site.family.interwiki_text_separator
+    separatorstripped = separator.strip()
+    iseparatorstripped = iseparator.strip()
     if addOnly:
         s2 = oldtext
     else:
-        s2 = removeCategoryLinks(oldtext, site = site, marker = marker)
-
+        s2 = removeCategoryLinksAndSeparator(oldtext, site=site, marker=marker,
+                                             separator=separatorstripped)
+    s = categoryFormat(new, insite = site)
     if s:
         separator = site.family.category_text_separator
         if site.language() in site.family.category_attop:
@@ -502,20 +601,28 @@ def replaceCategoryLinks(oldtext, new, site = None, addOnly = False):
         else:
             # calculate what was after the categories links on the page
             firstafter = s2.find(marker)
-            # Any text in 'after' part that means we should keep it after?
+            if firstafter < 0:
+                firstafter = len(s2)
+            else:
+                firstafter += len(marker)
+            # Is there  text in the 'after' part that means we should keep it
+            # after?
             if "</noinclude>" in s2[firstafter:]:
-                newtext = s2[:firstafter] + s + s2[firstafter:]
+                if separatorstripped:
+                    s = separator + s
+                newtext = (s2[:firstafter].replace(marker,'') + s
+                           + s2[firstafter:])
             elif site.language() in site.family.categories_last:
                 newtext = s2.replace(marker,'').strip() + separator + s
             else:
                 interwiki = getLanguageLinks(s2)
-                s2 = removeLanguageLinks(s2.replace(marker,''), site
-                                         ) + separator + s
-                newtext = replaceLanguageLinks(s2, interwiki, site)
-        newtext = newtext.replace(marker,'')
+                s2 = removeLanguageLinksAndSeparator(
+                         s2.replace(marker,''), site, '', iseparatorstripped
+                     ) + separator + s
+                newtext = replaceLanguageLinks(s2, interwiki, site=site,
+                                               addOnly=True)
     else:
-        s2 = s2.replace(marker,'')
-        return s2
+        newtext = s2.replace(marker,'')
     return newtext.strip()
 
 
@@ -559,7 +666,9 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     # not allowed inside links. For example, in this wiki text:
     #       ''Please see http://www.example.org.''
     # .'' shouldn't be considered as part of the link.
-    regex = r'(?P<url>http[s]?://[^' + notInside + ']*?[^' + notAtEnd + '](?=[' + notAtEnd+ ']*\'\')|http[s]?://[^' + notInside + ']*[^' + notAtEnd + '])'
+    regex = r'(?P<url>http[s]?://[^' + notInside + ']*?[^' + notAtEnd \
+            + '](?=[' + notAtEnd+ ']*\'\')|http[s]?://[^' + notInside \
+            + ']*[^' + notAtEnd + '])'
 
     if withoutBracketed:
         regex = r'(?<!\[)' + regex
@@ -567,6 +676,7 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
         regex = r'\[' + regex
     linkR = re.compile(regex)
     return linkR
+
 
 def extract_templates_and_params(text, get_redirect=False):
     """Return list of template calls found in text.
