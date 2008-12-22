@@ -608,10 +608,10 @@ class APISite(BaseSite):
             }
         self.sitelock = threading.Lock()
         self._msgcache = {}
+        self.nocapitalize = self.code in self.family.nocapitalize
         return
 
 # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
-        self.nocapitalize = self.__code in self.family.nocapitalize
         # Calculating valid languages took quite long, so we calculate it once
         # in initialization instead of each time it is used.
         self._validlanguages = []
