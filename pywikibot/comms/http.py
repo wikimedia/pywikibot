@@ -31,7 +31,7 @@ from pywikibot import config, VERBOSE
 import cookielib
 import threadedhttp
 
-logger = logging.getLogger("comm")
+logger = logging.getLogger("comms.http")
 
 
 # global variables

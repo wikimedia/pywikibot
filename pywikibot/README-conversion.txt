@@ -2,14 +2,17 @@ This is a guide to converting bot scripts from version 1 of the
 Pywikipediabot framework to version 2.
 
 Most importantly, note that the version 2 framework *only* supports wikis
-using MediaWiki v.1.12 or higher software.  If you need to access a wiki that
+using MediaWiki v.1.14 or higher software.  If you need to access a wiki that
 uses older software, you should continue using version 1 for this purpose.
 
-The "root" namespace used in the project has changed from "wikipedia"
+The root namespace used in the project has changed from "wikipedia"
 to "pywikibot". References to wikipedia need to be changed globally to
 pywikibot.  Unless noted in this document, other names have not changed; for
 example, wikipedia.Page can be replaced by pywikibot.Page throughout any
-bot.
+bot.  An effort has been made to design the interface to be as backwards-
+compatible as possible, so that in most cases it should be possible to convert
+scripts to the new interface simply by changing import statements and doing
+global search-and-replace on module names, as discussed in this document.
 
 With pywikipedia scripts were importing "wikipedia" or "pagegenerators"
 libraries; pywikibot is now written as a standard package, and other modules
@@ -17,7 +20,16 @@ are contained within it (e.g., pywikibot.site contains Site classes). However,
 most commonly-used names are imported into the pywikibot namespace, so that
 module names don't need to be used unless specified in the documentation.
 
-(To use it, just import "pywikibot", assuming that pywikibot/ is in sys.path)
+Make sure that the directory that contains the "pywikibot" subdirectory (or
+folder) is in sys.path.
+
+The following changes, at a minimum, need to be made to allow scripts to run:
+
+    change "import wikipedia" to "import pywikibot"
+    change "import pagegenerators" to "from pywikibot import pagegenerators"
+    change "import config" to "from pywikibot import config"
+    change "import catlib" to "from pywikibot import catlib"
+    change "wikipedia." to "pywikibot."
 
 == Python librairies ==
 
@@ -25,16 +37,19 @@ module names don't need to be used unless specified in the documentation.
 so that these dependencies will be loaded automatically when the package is
 installed, and users won't need to worry about this...]
 
-To run pywikibot, you will need the httplib2, simplejson, and setuptools packages--
+To run pywikibot, you will need the httplib2, simplejson, and setuptools
+packages--
 * httplib2   : http://code.google.com/p/httplib2/
 * setuptools : http://pypi.python.org/pypi/setuptools/
 * simplejson : http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7.1/docs/index.html
 
-or, if you already have setuptools installed, just execute 'easy_install httplib2'
-and 'easy_install simplejson'
+or, if you already have setuptools installed, just execute
+'easy_install httplib2' and 'easy_install simplejson'
 
-If you run into errors involving httplib2.urlnorm, update httplib2 to
-0.4.0 (Ubuntu package python-httlib2 for example, is outdated)
+If you run into errors involving httplib2.urlnorm, update httplib2 to 0.4.0
+(Ubuntu package python-httlib2, for example, is outdated).  Note that
+httplib2 will run under Python 2.6, but will emit DeprecationWarnings (which
+are annoying but don't affect the ability to use the package).
 
 == Page objects ==
 

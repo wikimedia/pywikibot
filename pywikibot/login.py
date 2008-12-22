@@ -50,7 +50,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import *
 
-logger = logging.getLogger()
+logger = logging.getLogger("wiki.login")
 
 
 # On some wikis you are only allowed to run a bot if there is a link to

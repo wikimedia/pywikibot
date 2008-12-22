@@ -176,8 +176,10 @@ def handleArgs(*args):
     #    ERROR - user error messages
     #    CRITICAL - fatal error messages
     # Accordingly, do ''not'' use print statements in bot code; instead,
-    # send output to the pywikibot.output() function which will route it
-    # to the logging module.
+    # send output to logging.log(level, text) or one of its equivalents.
+    # For backwards-compatibility, pywikibot.output is supported, which
+    # directs output to logging.info() or other levels as appropriate, but
+    # its use in new code is deprecated.
 
     logging.addLevelName(VERBOSE, "VERBOSE")
         # for messages to be displayed on terminal at "verbose" setting
@@ -213,7 +215,7 @@ def handleArgs(*args):
         else:
             file_handler.setLevel(VERBOSE)
         form = logging.Formatter(
-                   fmt="%(asctime)s %(filename)-18s:%(lineno)-4d "
+                   fmt="%(asctime)s %(filename)18s, %(lineno)d: "
                        "%(levelname)-8s %(message)s",
                    datefmt="%Y-%m-%d %H:%M:%S"
                )

@@ -9,7 +9,7 @@ import urllib
 
 from datetime import datetime, timedelta
 
-logger = logging.getLogger("wiki")
+logger = logging.getLogger("wiki.family")
 
 # Parent class for all wiki families
 

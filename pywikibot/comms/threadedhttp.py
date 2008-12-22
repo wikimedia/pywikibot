@@ -30,7 +30,7 @@ import urllib
 import cookielib
 import sys
 
-logger = logging.getLogger("comm")
+logger = logging.getLogger("comms.threadedhttp")
 
 
 # easy_install safeguarded dependencies

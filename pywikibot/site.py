@@ -28,7 +28,7 @@ import sys
 import threading
 import urllib
 
-logger = logging.getLogger("wiki")
+logger = logging.getLogger("wiki.site")
 
 class PageInUse(pywikibot.Error):
     """Page cannot be reserved for writing due to existing lock."""
