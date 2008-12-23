@@ -132,12 +132,12 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
     if decoder:
         text = unicode(text, decoder)
     elif type(text) is not unicode:
-        import traceback
-        pywikibot.output(
-            u"Non-unicode (%s) passed to wikipedia.output without decoder!\n"
-             % type(text),
-            level=VERBOSE
-        )
+##        import traceback
+##        pywikibot.output(
+##            u"Non-unicode (%s) passed to wikipedia.output without decoder!\n"
+##             % type(text),
+##            level=VERBOSE
+##        )
         try:
             text = unicode(text, 'utf-8')
         except UnicodeDecodeError:
