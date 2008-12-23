@@ -689,8 +689,9 @@ class Page(object):
         backwards-compatibility.
 
         """
-        return self.put(self, newtext, comment, watchArticle,
-                        minorEdit, force, callback, async=True)
+        return self.put(newtext, comment=comment, watchArticle=watchArticle,
+                        minorEdit=minorEdit, force=force, async=True,
+                        callback=callback)
 
     def linkedPages(self):
         """Iterate Pages that this Page links to.
