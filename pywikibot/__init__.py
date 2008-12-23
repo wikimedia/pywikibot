@@ -9,14 +9,15 @@ The initialization file for the Pywikibot framework.
 #
 __version__ = '$Id$'
 
-import sys
+import difflib
 import logging
 import re
+import sys
 
-from exceptions import *
 import config2 as config
-import textlib
 from bot import *
+from exceptions import *
+from textlib import *
 
 logging.basicConfig(fmt="%(message)s")
 
@@ -30,18 +31,18 @@ def deprecate_arg(old_arg, new_arg):
             if old_arg in __kw:
                 if new_arg:
                     if new_arg in __kw:
-                        logger.warn(
+                        pywikibot.output(
 "%(new_arg)s argument of %(meth_name)s replaces %(old_arg)s; cannot use both."
-                            % locals())
+                            % locals(), level=WARNING)
                     else:
-                        logger.debug(
+                        pywikibot.output(
 "%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
-                            % locals())
+                            % locals(), level=DEBUG)
                         __kw[new_arg] = __kw[old_arg]
                 else:
-                    logger.debug(
+                    pywikibot.output(
                         "%(old_arg)s argument of %(meth_name)s is deprecated."
-                        % locals())
+                        % locals(), level=DEBUG)
                 del __kw[old_arg]
             return method(*__args, **__kw)
         wrapper.__doc__ = method.__doc__
@@ -91,8 +92,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     key = '%s:%s:%s' % (fam, code, user)
     if not _sites.has_key(key):
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
-        logger.debug("Instantiating Site object '%(site)s'"
-                      % {'site': _sites[key]})
+        pywikibot.output("Instantiating Site object '%(site)s'"
+                         % {'site': _sites[key]}, level=DEBUG)
     return _sites[key]
 
 getSite = Site # alias for backwards-compability
@@ -125,6 +126,69 @@ def set_debug(layer):
     logging.getLogger(layer).setLevel(DEBUG)
 
 
+def showDiff(oldtext, newtext):
+    """
+    Output a string showing the differences between oldtext and newtext.
+    The differences are highlighted (only on compatible systems) to show which
+    changes were made.
+    
+    """
+    # This is probably not portable to non-terminal interfaces....
+    # For information on difflib, see http://pydoc.org/2.3/difflib.html
+    color = {
+        '+': 'lightgreen',
+        '-': 'lightred',
+    }
+    diff = u''
+    colors = []
+    # This will store the last line beginning with + or -.
+    lastline = None
+    # For testing purposes only: show original, uncolored diff
+    #     for line in difflib.ndiff(oldtext.splitlines(), newtext.splitlines()):
+    #         print line
+    for line in difflib.ndiff(oldtext.splitlines(), newtext.splitlines()):
+        if line.startswith('?'):
+            # initialize color vector with None, which means default color
+            lastcolors = [None for c in lastline]
+            # colorize the + or - sign
+            lastcolors[0] = color[lastline[0]]
+            # colorize changed parts in red or green
+            for i in range(min(len(line), len(lastline))):
+                if line[i] != ' ':
+                    lastcolors[i] = color[lastline[0]]
+            diff += lastline + '\n'
+            # append one None (default color) for the newline character
+            colors += lastcolors + [None]
+        elif lastline:
+            diff += lastline + '\n'
+            # colorize the + or - sign only
+            lastcolors = [None for c in lastline]
+            lastcolors[0] = color[lastline[0]]
+            colors += lastcolors + [None]
+        lastline = None
+        if line[0] in ('+', '-'):
+            lastline = line
+    # there might be one + or - line left that wasn't followed by a ? line.
+    if lastline:
+        diff += lastline + '\n'
+        # colorize the + or - sign only
+        lastcolors = [None for c in lastline]
+        lastcolors[0] = color[lastline[0]]
+        colors += lastcolors + [None]
+
+    result = u''
+    lastcolor = None
+    for i in range(len(diff)):
+        if colors[i] != lastcolor:
+            if lastcolor is None:
+                result += '\03{%s}' % colors[i]
+            else:
+                result += '\03{default}'
+        lastcolor = colors[i]
+        result += diff[i]
+    output(result)
+
+
 # Throttle and thread handling
 
 threadpool = []   # add page-putting threads to this list as they are created
@@ -141,11 +205,11 @@ def stopme():
     logger = logging.getLogger("wiki")
 
     if not stopped:
-        logger.debug("stopme() called")
+        pywikibot.output("stopme() called", level=DEBUG)
         count = sum(1 for thd in threadpool if thd.isAlive())
         if count:
-            logger.info("Waiting for about %(count)s pages to be saved."
-                         % locals())
+            pywikibot.output("Waiting for about %(count)s pages to be saved."
+                             % locals())
             for thd in threadpool:
                 if thd.isAlive():
                     thd.join()
@@ -153,7 +217,7 @@ def stopme():
     # only need one drop() call because all throttles use the same global pid
     try:
         _sites[_sites.keys()[0]].throttle.drop()
-        logger.log(VERBOSE, "Dropped throttle(s).")
+        pywikibot.output("Dropped throttle(s).", level=VERBOSE)
     except IndexError:
         pass
 

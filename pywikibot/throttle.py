@@ -10,7 +10,7 @@ Mechanics to slow down wiki read and/or write rate.
 __version__ = '$Id$'
 
 import pywikibot
-from pywikibot import config2 as config
+from pywikibot import config
 
 import logging
 import math
@@ -66,7 +66,8 @@ class Throttle(object):
         global pid
         self.lock.acquire()
         mysite = self.mysite
-        logger.debug("Checking multiplicity: pid = %(pid)s" % globals())
+        pywikibot.output("Checking multiplicity: pid = %(pid)s" % globals(),
+                         level=pywikibot.DEBUG)
         try:
             processes = []
             my_pid = pid or 1  # start at 1 if global pid not yet set
@@ -117,7 +118,7 @@ class Throttle(object):
             f.close()
             self.process_multiplicity = count
             if self.verbosedelay:
-                logger.info(
+                pywikibot.output(
 u"Found %(count)s %(mysite)s processes running, including this one."
                     % locals())
         finally:
@@ -233,11 +234,11 @@ u"Found %(count)s %(mysite)s processes running, including this one."
             self.next_multiplicity = math.log(1+requestsize)/math.log(2.0)
             # Announce the delay if it exceeds a preset limit
             if wait > config.noisysleep:
-                logger.info(u"Sleeping for %(wait).1f seconds, %(now)s"
-                              % {'wait': wait,
-                                 'now': time.strftime("%Y-%m-%d %H:%M:%S",
-                                                      time.localtime())
-                                } )
+                pywikibot.output(u"Sleeping for %(wait).1f seconds, %(now)s"
+                                  % {'wait': wait,
+                                     'now': time.strftime("%Y-%m-%d %H:%M:%S",
+                                                          time.localtime())
+                                    } )
             time.sleep(wait)
             if write:
                 self.last_write = time.time()
@@ -262,11 +263,12 @@ u"Found %(count)s %(mysite)s processes running, including this one."
             wait = delay - (time.time() - started)
             if wait > 0:
                 if wait > config.noisysleep:
-                    logger.info(u"Sleeping for %(wait).1f seconds, %(now)s"
-                                  % {'wait': wait,
-                                     'now': time.strftime("%Y-%m-%d %H:%M:%S",
-                                                          time.localtime())
-                                    } )
+                    pywikibot.output(
+                              u"Sleeping for %(wait).1f seconds, %(now)s"
+                               % {'wait': wait,
+                                  'now': time.strftime("%Y-%m-%d %H:%M:%S",
+                                                       time.localtime())
+                                 } )
                 time.sleep(wait)
         finally:
             self.lock.release()

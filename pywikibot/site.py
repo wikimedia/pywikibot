@@ -1014,7 +1014,7 @@ class APISite(BaseSite):
                 rvgen.request["titles"] = "|".join(cache.keys())
             rvgen.request[u"rvprop"] = \
                     u"ids|flags|timestamp|user|comment|content"
-            logger.info(u"Retrieving %s pages from %s."
+            pywikibot.output(u"Retrieving %s pages from %s."
                            % (len(cache), self)
                         )
             for pagedata in rvgen:
@@ -1052,7 +1052,7 @@ class APISite(BaseSite):
                      % (page.title(withSection=False, asLink=True),
                         item['title']))
             api.update_page(page, item)
-            logging.debug(str(item))
+            pywikibot.output(str(item), level=pywikibot.DEBUG)
             return item[tokentype + "token"]
 
     # following group of methods map more-or-less directly to API queries

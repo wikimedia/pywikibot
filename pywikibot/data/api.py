@@ -244,7 +244,7 @@ class Request(DictMixin):
             if code == "maxlag":
                 lag = lagpattern.search(info)
                 if lag:
-                    logger.info(
+                    pywikibot.output(
                         "Pausing due to database lag: " + info)
                     self.site.throttle.lag(int(lag.group("lag")))
                     continue

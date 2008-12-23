@@ -13,7 +13,6 @@ import pywikibot
 from pywikibot import deprecate_arg
 from pywikibot import config
 import pywikibot.site
-import pywikibot.textlib
 
 import htmlentitydefs
 import logging
@@ -417,8 +416,8 @@ class Page(object):
 
         """
         txt = self.get()
-        txt = pywikibot.textlib.removeLanguageLinks(txt, site = self.site())
-        txt = pywikibot.textlib.removeCategoryLinks(txt, site = self.site())
+        txt = pywikibot.removeLanguageLinks(txt, site = self.site())
+        txt = pywikibot.removeCategoryLinks(txt, site = self.site())
         if len(txt) < 4:
             return True
         else:
@@ -655,9 +654,10 @@ class Page(object):
             done = self.site().editpage(self, summary=comment, minor=minor,
                                         watch=watch, unwatch=unwatch)
             if not done:
-                logger.warn("Page %s not saved" % self.title(asLink=True))
+                pywikibot.output("Page %s not saved" % self.title(asLink=True),
+                                 level=pywikibot.WARNING)
             else:
-                logger.info("Page %s saved" % self.title(asLink=True))
+                pywikibot.output("Page %s saved" % self.title(asLink=True))
         except pywikibot.Error, err:
             logger.exception("Error saving page %s" % self.title(asLink=True))
         if callback:
@@ -721,7 +721,7 @@ class Page(object):
         else:
             text = self.text
         for linkmatch in pywikibot.link_regex.finditer(
-                            pywikibot.textlib.removeDisabledParts(text)):
+                            pywikibot.removeDisabledParts(text)):
             linktitle = linkmatch.group("title")
             link = Link(linktitle, self.site())
             # only yield links that are to a different site and that
@@ -774,7 +774,7 @@ class Page(object):
         parameters as the second entry.
 
         """
-        templates = pywikibot.textlib.extract_templates_and_params(self.text)
+        templates = pywikibot.extract_templates_and_params(self.text)
         # backwards-compatibility: convert the dict returned as the second
         # element into a list in the format used by old scripts
         result = []
@@ -900,7 +900,7 @@ class Page(object):
 
         """
         if reason is None:
-            logger.info(u'Moving %s to [[%s]].'
+            pywikibot.output(u'Moving %s to [[%s]].'
                              % (self.title(asLink=True), newtitle))
             reason = pywikibot.input(u'Please enter a reason for the move:')
         # TODO: implement "safe" parameter
@@ -920,7 +920,7 @@ class Page(object):
 
         """
         if reason is None:
-            logger.info(u'Deleting %s.' % (self.title(asLink=True)))
+            pywikibot.output(u'Deleting %s.' % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the deletion:')
         answer = u'y'
         if prompt and not hasattr(self.site(), '_noDeletePrompt'):
@@ -995,7 +995,7 @@ class Page(object):
 
         """
         if comment is None:
-            logger.info(u'Preparing to undelete %s.'
+            pywikibot.output(u'Preparing to undelete %s.'
                              % (self.title(asLink=True)))
             comment = pywikibot.input(
                         u'Please enter a reason for the undeletion:')
@@ -1022,7 +1022,7 @@ class Page(object):
                 un = u'un'
             else:
                 un = u''
-            logger.info(u'Preparing to %sprotect %s.'
+            pywikibot.output(u'Preparing to %sprotect %s.'
                              % (un, self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the action:')
         if unprotect:
@@ -1056,8 +1056,8 @@ class Page(object):
                               % self.title(asLink=True))
             return False
         if inPlace == True:
-            newtext = pywikibot.textlib.replaceCategoryInPlace(
-                                            self.text, oldCat, newCat)
+            newtext = pywikibot.replaceCategoryInPlace(self.text,
+                                                       oldCat, newCat)
             if newtext == self.text:
                 pywikibot.output(
                     u'No changes in made in page %s.'
@@ -1111,8 +1111,7 @@ class Page(object):
                               % (self.title(asLink=True), oldCat.title()))
         else:
             try:
-                text = pywikibot.textlib.replaceCategoryLinks(self.text,
-                                                              newCatList)
+                text = pywikibot.replaceCategoryLinks(self.text, newCatList)
             except ValueError:
                 # Make sure that the only way replaceCategoryLinks() can return
                 # a ValueError is in the case of interwiki links to self.
@@ -1402,7 +1401,7 @@ class Category(Page):
                              % targetCat.title())
             return False
         else:
-            logger.info('Moving text from %s to %s.'
+            pywikibot.output('Moving text from %s to %s.'
                              % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
             creationSummary = pywikibot.translate(
@@ -1438,7 +1437,7 @@ class Category(Page):
                              % targetCat.title())
             return False
         else:
-            logger.info('Moving text from %s to %s.'
+            pywikibot.output('Moving text from %s to %s.'
                              % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
             creationSummary = pywikibot.translate(

@@ -6,15 +6,20 @@
 #
 __version__ = '$Id$'
 
-import config, transliteration
+
 import traceback, re, sys
-import wikipedia
+import logging
+import pywikibot
+from pywikibot import config
+from pywikibot.userinterfaces import transliteration
+
 
 try:
     import ctypes
     ctypes_found = True
 except ImportError:
     ctypes_found = False
+
 
 def getDefaultTextColorInWindows():
     """
@@ -112,16 +117,15 @@ class UI:
     def __init__(self):
         pass
 
-    def printColorizedInUnix(self, text, targetStream):
+    def printColorizedInUnix(self, text, level):
         lastColor = None
         for key, value in unixColors.iteritems():
             text = text.replace('\03{%s}' % key, value)
         # just to be sure, reset the color
         text += unixColors['default']
+        logging.log(level, text)
 
-        targetStream.write(text.encode(config.console_encoding, 'replace'))
-
-    def printColorizedInWindows(self, text, targetStream):
+    def printColorizedInWindows(self, text, level):
         """
         This only works in Python 2.5 or higher.
         """
@@ -135,7 +139,7 @@ class UI:
                 tagM = colorTagR.search(text)
                 if tagM:
                     # print the text up to the tag.
-                    targetStream.write(text[:tagM.start()].encode(config.console_encoding, 'replace'))
+                    logging.log(level, text[:tagM.start()])
                     newColor = tagM.group('name')
                     if newColor == 'default':
                         if len(colorStack) > 0:
@@ -151,7 +155,7 @@ class UI:
                         ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors[newColor])
                     text = text[tagM.end():]
             # print the rest of the text
-            targetStream.write(text.encode(config.console_encoding, 'replace'))
+            logging.log(level, text)
             # just to be sure, reset the color
             ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors['default'])
         else:
@@ -164,18 +168,18 @@ class UI:
                 if count > 0:
                     line += '***'
                 line += '\n'
-                targetStream.write(line.encode(config.console_encoding, 'replace'))
+                logging.log(level, line)
 
-    def printColorized(self, text, targetStream):
+    def printColorized(self, text, level):
         if config.colorized_output:
             if sys.platform == 'win32':
-                self.printColorizedInWindows(text, targetStream)
+                self.printColorizedInWindows(text, level)
             else:
-                self.printColorizedInUnix(text, targetStream)
+                self.printColorizedInUnix(text, level)
         else:
-            targetStream.write(text.encode(config.console_encoding, 'replace'))
+            logging.log(level, text)
 
-    def output(self, text, toStdout = False):
+    def output(self, text, level=logging.INFO):
         """
         If a character can't be displayed in the encoding used by the user's
         terminal, it will be replaced with a question mark or by a
@@ -212,11 +216,7 @@ class UI:
                     prev = codecedText[i]
             text = transliteratedText
 
-        if toStdout:
-            targetStream = sys.stdout
-        else:
-            targetStream = sys.stderr
-        self.printColorized(text, targetStream)
+        self.printColorized(text, level)
 
     def input(self, question, password = False):
         """
@@ -229,8 +229,7 @@ class UI:
         # sound the terminal bell to notify the user
         if config.ring_bell:
             sys.stdout.write('\07')
-        # TODO: make sure this is logged as well
-        self.output(question + ' ')
+        self.output(question + ' ', level=pywikibot.INPUT)
         if password:
             import getpass
             text = getpass.getpass('')
@@ -239,7 +238,7 @@ class UI:
         text = unicode(text, config.console_encoding)
         return text
 
-    def inputChoice(self, question, options, hotkeys, default = None):
+    def inputChoice(self, question, options, hotkeys, default=None):
         options = options[:] # we don't want to edit the passed parameter
         for i in range(len(options)):
             option = options[i]
@@ -279,7 +278,7 @@ class UI:
             print 'Could not load GUI modules: %s' % e
             return text
         editor = gui.EditBoxWindow()
-        return editor.edit(text, jumpIndex = jumpIndex, highlight = highlight)
+        return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)
 
     def askForCaptcha(self, url):
         try:

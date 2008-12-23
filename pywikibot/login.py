@@ -189,8 +189,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
 #        self.password = self.password.encode(self.site.encoding())
 
-        logger.info(u"Logging in to %(site)s as %(name)s"
-                     % {'name': self.username, 'site': self.site})
+        pywikibot.output(u"Logging in to %(site)s as %(name)s"
+                         % {'name': self.username, 'site': self.site})
         try:
             cookiedata = self.getCookie()
         except pywikibot.data.api.APIError, e:
@@ -201,7 +201,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             else:
                 return False
         self.storecookiedata(cookiedata)
-        logger.info(u"Should be logged in now")
+        pywikibot.output(u"Should be logged in now")
 ##        # Show a warning according to the local bot policy
 ##   FIXME: disabled due to recursion; need to move this to the Site object after
 ##   login
@@ -249,9 +249,11 @@ def main():
                 try:
                     site = pywikibot.getSite(code=lang, fam=familyName)
                     if not forceLogin and site.loggedInAs(sysop = sysop) != None:
-                        logger.info(u'Already logged in on %(site)s' % locals())
+                        pywikibot.output(u'Already logged in on %(site)s'
+                                          % locals())
                     else:
-                        loginMan = LoginManager(password, sysop=sysop, site=site)
+                        loginMan = LoginManager(password, sysop=sysop,
+                                                site=site)
                         loginMan.login()
                 except pywikibot.NoSuchSite:
                     pywikibot.output(

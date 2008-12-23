@@ -31,6 +31,9 @@ The following changes, at a minimum, need to be made to allow scripts to run:
     change "import catlib" to "from pywikibot import catlib"
     change "wikipedia." to "pywikibot."
 
+wikipedia.setAction() no longer works; you must revise the script to pass an
+explicit edit summary message on each put() or put_async() call.
+
 == Python librairies ==
 
 [Note: the goal will be to package pywikibot with setuptools easy_install,
@@ -68,7 +71,7 @@ Category, or vice versa: e.g., Category(pageobj) converts a Page to a
 Category, as long as the page is in the category namespace.
 
 The following methods of the Page object have been deprecated (deprecated
-methods will still work, but print a warning message in debug mode):
+methods still work, but print a warning message in debug mode):
 
 - urlname(): replaced by Page.title(asUrl=True)
 - titleWithoutNamespace(): replaced by Page.title(withNamespace=False)
@@ -94,8 +97,8 @@ stores the SHA1 hash of images.
 === Category objects ===
 
 The Category object has been moved from the catlib module to the pywikibot
-namespace.  Any references to "catlib.Category" need to be replaced by
-"pywikibot.Category".
+namespace.  Any references to "catlib.Category" can be replaced by
+"pywikibot.Category", but the old form is retained for backwards-compatibility.
 
 For Category objects, the following methods are deprecated:
 

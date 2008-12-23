@@ -18,7 +18,7 @@ import logging, logging.handlers
 import os.path
 import sys
 import pywikibot
-from pywikibot import config2 as config
+from pywikibot import config
 
 
 # logging levels
@@ -27,34 +27,6 @@ from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 STDOUT = 16
 VERBOSE = 18
 INPUT = 25
-
-
-def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
-    if toStdout:
-        level = STDOUT
-    logging.getLogger().log(level, text)
-
-
-def input(prompt, password=False):
-    logging.getLogger().log(INPUT, prompt)
-    if password:
-        import getpass
-        return getpass.getpass("")
-    return raw_input()
-
-
-def calledModuleName():
-    """Return the name of the module calling this function.
-
-    This is required because the -help option loads the module's docstring
-    and because the module name will be used for the filename of the log.
-
-    """
-    # get commandline arguments
-    called = sys.argv[0].strip()
-    if ".py" in called:  # could end with .pyc, .pyw, etc. on some platforms
-        called = called[ : called.rindex(".py")]
-    return os.path.basename(called)
 
 
 class MaxLevelFilter(logging.Filter):
@@ -74,6 +46,160 @@ class MaxLevelFilter(logging.Filter):
             return True
 
 
+class TerminalHandler(logging.Handler):
+    """
+    A handler class that writes logging records, appropriately formatted,
+    to a stream. Note that this class does not close the stream, as
+    sys.stdout or sys.stderr may be used.
+
+    Slightly modified version of the StreamHandler class that ships with
+    logging module.
+    
+    """
+    def __init__(self, strm=None):
+        """
+        Initialize the handler.
+
+        If strm is not specified, sys.stderr is used.
+        """
+        logging.Handler.__init__(self)
+        if strm is None:
+            strm = sys.stderr
+        self.stream = strm
+        self.formatter = None
+
+    def flush(self):
+        """
+        Flush the stream.
+        """
+        self.stream.flush()
+
+    def emit(self, record):
+        """
+        Emit a record.
+
+        If a formatter is specified, it is used to format the record. The
+        record is then written to the stream. If exception information is
+        present, it is formatted using traceback.print_exception and
+        appended to the stream.
+        """
+        try:
+            msg = self.format(record)
+            fs = "%s"
+            try:
+                self.stream.write(fs % msg.encode(config.console_encoding,
+                                                  "xmlcharrefreplace"))
+            except UnicodeError:
+                self.stream.write(fs % msg.encode("ascii",
+                                                  "xmlcharrefreplace"))
+            self.flush()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            self.handleError(record)
+
+
+
+# User interface initialization
+# search for user interface module in the 'userinterfaces' subdirectory
+exec ("import pywikibot.userinterfaces.%s_interface as uiModule"
+      % config.userinterface)
+ui = uiModule.UI()
+
+def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
+    """Output a message to the user via the userinterface.
+
+    Works like print, but uses the encoding used by the user's console
+    (console_encoding in the configuration file) instead of ASCII.
+    If decoder is None, text should be a unicode string. Otherwise it
+    should be encoded in the given encoding.
+
+    If newline is True, a linebreak will be added after printing the text.
+
+    If toStdout is True, the text will be sent to standard output,
+    so that it can be piped to another process. All other text will
+    be sent to stderr. See: http://en.wikipedia.org/wiki/Pipeline_%28Unix%29
+
+    text can contain special sequences to create colored output. These
+    consist of the escape character \03 and the color name in curly braces,
+    e. g. \03{lightpurple}. \03{default} resets the color.
+
+    @param level: output level for logging module; use VERBOSE for optional
+        messages, INPUT for prompts requiring user reponse (not yet fully
+        implemented)
+
+    """
+    if decoder:
+        text = unicode(text, decoder)
+    elif type(text) is not unicode:
+        import traceback
+        pywikibot.output(
+            u"Non-unicode (%s) passed to wikipedia.output without decoder!\n"
+             % type(text),
+            level=VERBOSE
+        )
+        try:
+            text = unicode(text, 'utf-8')
+        except UnicodeDecodeError:
+            text = unicode(text, 'iso8859-1')
+    if newline:
+        text += u'\n'
+    if toStdout:
+        level = STDOUT
+    ui.output(text, level=level)
+
+def input(question, password=False):
+    """Ask the user a question, return the user's answer.
+
+    Parameters:
+    * question - a unicode string that will be shown to the user. Don't add a
+                 space after the question mark/colon, this method will do this
+                 for you.
+    * password - if True, hides the user's input (for password entry).
+
+    Returns a unicode string.
+
+    """
+    data = ui.input(question, password)
+    return data
+
+def inputChoice(question, answers, hotkeys, default=None):
+    """Ask the user a question with several options, return the user's choice.
+
+    The user's input will be case-insensitive, so the hotkeys should be
+    distinctive case-insensitively.
+
+    Parameters:
+    * question - a unicode string that will be shown to the user. Don't add a
+                 space after the question mark, this method will do this
+                 for you.
+    * answers  - a list of strings that represent the options.
+    * hotkeys  - a list of one-letter strings, one for each answer.
+    * default  - an element of hotkeys, or None. The default choice that will
+                 be returned when the user just presses Enter.
+
+    Returns a one-letter string in lowercase.
+
+    """
+    data = ui.inputChoice(question, answers, hotkeys, default).lower()
+    return data
+
+
+# Command line parsing and help
+
+def calledModuleName():
+    """Return the name of the module calling this function.
+
+    This is required because the -help option loads the module's docstring
+    and because the module name will be used for the filename of the log.
+
+    """
+    # get commandline arguments
+    called = sys.argv[0].strip()
+    if ".py" in called:  # could end with .pyc, .pyw, etc. on some platforms
+        called = called[ : called.rindex(".py")]
+    return os.path.basename(called)
+
 def _decodeArg(arg):
     if sys.platform=='win32':
         if config.console_encoding == 'cp850':
@@ -90,7 +216,6 @@ def _decodeArg(arg):
         # Linux uses the same encoding for both.
         # I don't know how non-Western Windows versions behave.
         return unicode(arg, config.console_encoding)
-
 
 def handleArgs(*args):
     """Handle standard command line arguments, return the rest as a list.
@@ -176,10 +301,7 @@ def handleArgs(*args):
     #    ERROR - user error messages
     #    CRITICAL - fatal error messages
     # Accordingly, do ''not'' use print statements in bot code; instead,
-    # send output to logging.log(level, text) or one of its equivalents.
-    # For backwards-compatibility, pywikibot.output is supported, which
-    # directs output to logging.info() or other levels as appropriate, but
-    # its use in new code is deprecated.
+    # use pywikibot.output function.
 
     logging.addLevelName(VERBOSE, "VERBOSE")
         # for messages to be displayed on terminal at "verbose" setting
@@ -190,17 +312,18 @@ def handleArgs(*args):
         # for prompts requiring user response
 
     root_logger = logging.getLogger()
-    # default handler for VERBOSE and INFO levels
-    default_handler = root_logger.handlers[0]
+    root_logger.handlers = [] # get rid of default handler
     root_logger.setLevel(DEBUG) # all records go to logger
 
-    # configure default handler for VERBOSE, INFO, and INPUT levels
+    # configure default handler for VERBOSE and INFO levels
+    default_handler = TerminalHandler(strm=sys.stderr)
     if config.verbose_output:
         default_handler.setLevel(VERBOSE)
     else:
         default_handler.setLevel(INFO)
     default_handler.addFilter(MaxLevelFilter(INPUT))
     default_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
+    root_logger.addHandler(default_handler)
 
     # if user has enabled file logging, configure file handler
     if moduleName in config.log or '*' in config.log:
@@ -223,13 +346,13 @@ def handleArgs(*args):
         root_logger.addHandler(file_handler)
 
     # handler for level STDOUT
-    output_handler = logging.StreamHandler(strm=sys.stdout)
+    output_handler = TerminalHandler(strm=sys.stdout)
     output_handler.setLevel(STDOUT)
     output_handler.addFilter(MaxLevelFilter(STDOUT))
     root_logger.addHandler(output_handler)
 
     # handler for levels WARNING and higher
-    warning_handler = logging.StreamHandler() # uses sys.stderr
+    warning_handler = TerminalHandler(strm=sys.stderr)
     warning_handler.setLevel(logging.WARNING)
     warning_handler.setFormatter(
             logging.Formatter(fmt="%(levelname)s: %(message)s"))
@@ -242,7 +365,7 @@ def handleArgs(*args):
         pywikibot.output(u'Pywikipediabot r%s' % m.group(1))
         pywikibot.output(u'Python %s' % sys.version)
 
-    root_logger.debug("handleArgs() completed.")
+    pywikibot.output("handleArgs() completed.", level=DEBUG)
     return nonGlobalArgs
 
 
