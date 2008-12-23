@@ -523,7 +523,7 @@ fixes = {
             (u'Special:Listgrouprights', u'Special:ListGroupRights'),
             (u'Special:Listusers',       u'Special:ListUsers'),
             (u'Special:Newimages',       u'Special:NewImages'),
-            (u'Special:Prefixindex',   u'Special:PrefixIndex'),
+            (u'Special:Prefixindex',     u'Special:PrefixIndex'),
             (u'Special:Protectedpages',  u'Special:ProtectedPages'),
             (u'Special:Recentchanges',   u'Special:RecentChanges'),
             (u'Special:Specialpages',    u'Special:SpecialPages'),
@@ -538,9 +538,9 @@ fixes = {
 #
 # Load the user fixes file.
 
-import config
+from pywikibot import config
 
 try:
-    execfile(config.datafilepath(config.base_dir, "user-fixes.py"))
+    execfile(config.datafilepath("user-fixes.py"))
 except IOError:
     pass
