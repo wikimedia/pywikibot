@@ -261,7 +261,7 @@ class Family(family.Family):
         # On most Wikipedias page names must start with a capital letter, but some
         # languages don't use this.
 
-##        self.nocapitalize = ['jbo',]
+        self.nocapitalize = ['jbo',]
 
 
         # A revised sorting order worked out on http://meta.wikimedia.org/wiki/Interwiki_sorting_order

@@ -386,6 +386,8 @@ fixes = {
         'replacements': [
             # colon
             (r'ISBN: (\d+)', r'ISBN \1'),
+            # superfluous word "number"
+            (r'ISBN( number| no\.?| No\.?|-Nummer|-Nr\.):? (\d+)', r'ISBN \2'),
             # Spaces, dashes, or dots instead of hyphens as separators,
             # or spaces between digits and separators.
             # Note that these regular expressions also match valid ISBNs, but
