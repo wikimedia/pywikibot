@@ -117,7 +117,7 @@ from __future__ import generators
 import sys, re, time
 import pywikibot
 from pywikibot import pagegenerators, catlib, config
-# import editarticle
+from pywikibot.scripts import editarticle
 import webbrowser
 
 # Imports predefined replacements tasks from fixes.py
