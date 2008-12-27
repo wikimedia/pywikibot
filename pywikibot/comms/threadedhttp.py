@@ -246,12 +246,12 @@ class Http(httplib2.Http):
 
         # Pick out the location header and basically start from the beginning
         # remembering first to strip the ETag header and decrement our 'depth'
-        if not response.has_key('location') and response.status != 300:
+        if "location" not in response and response.status != 300:
             raise httplib2.RedirectMissingLocation(
                 "Redirected but the response is missing a Location: header.",
                 response, content)
         # Fix-up relative redirects (which violate an RFC 2616 MUST)
-        if response.has_key('location'):
+        if "location" in response:
             location = response['location']
             (scheme, authority, path, query, fragment) = httplib2.parse_uri(
                                                                     location)
@@ -261,7 +261,7 @@ class Http(httplib2.Http):
                               % (location, response['location']))
         if response.status == 301 and method in ["GET", "HEAD"]:
             response['-x-permanent-redirect-url'] = response['location']
-            if not response.has_key('content-location'):
+            if "content-location" not in response:
                 response['content-location'] = absolute_uri 
             httplib2._updateCache(headers, response, content, self.cache,
                                   cachekey)
@@ -269,7 +269,7 @@ class Http(httplib2.Http):
         headers.pop('if-none-match', None)
         headers.pop('if-modified-since', None)
 
-        if response.has_key('location'):
+        if "location" in response:
             location = response['location']
             redirect_method = ((response.status == 303) and
                                (method not in ["GET", "HEAD"])

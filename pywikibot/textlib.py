@@ -111,7 +111,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         if isinstance(exc, str) or isinstance(exc, unicode):
             # assume it's a reference to the exceptionRegexes dictionary
             # defined above.
-            if not exceptionRegexes.has_key(exc):
+            if exc not in exceptionRegexes:
                 raise ValueError("Unknown tag type: " + exc)
             dontTouchRegexes.append(exceptionRegexes[exc])
         else:
@@ -922,12 +922,12 @@ def translate(code, xdict):
     if hasattr(code,'lang'):
         code = code.lang
 
-    if xdict.has_key(code):
+    if code in xdict:
         return xdict[code]
     for alt in _altlang(code):
-        if xdict.has_key(alt):
+        if alt in xdict:
             return xdict[alt]
-    if xdict.has_key('en'):
+    if "en" in xdict:
         return xdict['en']
     return xdict.values()[0]
 

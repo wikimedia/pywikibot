@@ -94,7 +94,7 @@ def _get_base_dir():
             __sys.argv.remove(arg)
             break
     else:
-        if os.environ.has_key("PYWIKIBOT2_DIR"):
+        if "PYWIKIBOT2_DIR" in os.environ:
             base_dir = os.environ["PYWIKIBOT2_DIR"]
         else:
             is_windows = __sys.platform == 'win32' 

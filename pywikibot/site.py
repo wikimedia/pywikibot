@@ -91,7 +91,7 @@ class BaseSite(object):
             self.__family = fam
 
         # if we got an outdated language code, use the new one instead.
-        if self.__family.obsolete.has_key(self.__code):
+        if self.__code in self.__family.obsolete:
             if self.__family.obsolete[self.__code] is not None:
                 self.__code = self.__family.obsolete[self.__code]
             else:
@@ -940,7 +940,7 @@ class APISite(BaseSite):
 
         """
         rest = self.page_restrictions(page)
-        sysop_protected = rest.has_key('edit') and rest['edit'][0] == 'sysop'
+        sysop_protected = "edit" in rest and rest['edit'][0] == 'sysop'
         try:
             api.LoginManager(site=self, sysop=sysop_protected)
         except NoUsername:
@@ -1349,7 +1349,7 @@ class APISite(BaseSite):
                     raise Error(
                         u"loadrevisions: Query on %s returned data on '%s'"
                         % (page, pagedata['title']))
-                if pagedata.has_key('missing'):
+                if "missing" in pagedata:
                     raise NoPage(u'Page %s does not exist'
                                   % page.title(asLink=True)) 
             else:

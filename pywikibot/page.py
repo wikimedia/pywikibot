@@ -968,7 +968,7 @@ class Page(object):
         """
         if self._deletedRevs == None:
             self.loadDeletedRevisions()
-        if not self._deletedRevs.has_key(timestamp):
+        if timestamp not in self._deletedRevs:
             #TODO: Throw an exception?
             return None
         self._deletedRevs[timestamp][4] = undelete
@@ -1839,7 +1839,7 @@ def html2unicode(text, ignore = []):
                 unicodeCodepoint = int(match.group('hex'), 16)
             elif match.group('name'):
                 name = match.group('name')
-                if htmlentitydefs.name2codepoint.has_key(name):
+                if name in htmlentitydefs.name2codepoint:
                     # We found a known HTML entity.
                     unicodeCodepoint = htmlentitydefs.name2codepoint[name]
             result += text[:match.start()]

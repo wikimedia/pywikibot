@@ -90,7 +90,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     except ImportError:
         raise ValueError("Invalid interface name '%(interface)s'" % locals())
     key = '%s:%s:%s' % (fam, code, user)
-    if not _sites.has_key(key):
+    if not key in _sites:
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
         pywikibot.output("Instantiating Site object '%(site)s'"
                          % {'site': _sites[key]}, level=DEBUG)

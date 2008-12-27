@@ -110,8 +110,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         
         """
         return True # DEBUG
-        if botList.has_key(self.site.family.name)\
-                and botList[self.site.family.name].has_key(self.site.code):
+        if self.site.family.name in botList \
+                and self.site.code in botList[self.site.family.name]:
             botListPageTitle = botList[self.site.family.name][self.site.code]
             botListPage = pywikibot.Page(self.site, botListPageTitle)
             for linkedPage in botListPage.linkedPages():

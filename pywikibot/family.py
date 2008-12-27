@@ -625,7 +625,7 @@ class Family:
         return self.known_families
 
     def linktrail(self, code, fallback = '_default'):
-        if self.linktrails.has_key(code):
+        if code in self.linktrails:
             return self.linktrails[code]
         elif fallback:
             return self.linktrails[fallback]
@@ -751,7 +751,7 @@ class Family:
 ##            return None
 ##
     def disambig(self, code, fallback = '_default'):
-        if self.disambiguationTemplates.has_key(code):
+        if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]
         elif fallback:
             return self.disambiguationTemplates[fallback]
