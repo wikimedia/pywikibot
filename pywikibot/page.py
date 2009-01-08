@@ -628,7 +628,7 @@ class Page(object):
 
         """
         if not comment:
-            comment = pywikibot.default_comment # needs to be defined
+            comment = config.default_edit_summary
         if watch is None:
             unwatch = False
             watch = False
@@ -798,6 +798,7 @@ class Page(object):
         return result
 
     @deprecate_arg("nofollow_redirects", None)
+    @deprecate_arg("get_redirect", None)
     def categories(self, withSortKey=False):
         """Iterate categories that the article is in.
 
@@ -1040,7 +1041,7 @@ class Page(object):
         if answer in ['y', 'Y']:
             return self.site().protect(self, edit, move, reason)
 
-    def change_category(article, oldCat, newCat, comment=None, sortKey=None,
+    def change_category(self, oldCat, newCat, comment=None, sortKey=None,
                         inPlace=True):
         """Remove page from oldCat and add it to newCat.
 
