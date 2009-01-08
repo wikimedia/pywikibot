@@ -72,6 +72,11 @@ authenticate = {}
 # By default you are asked for a password on the terminal.
 password_file = None
 
+# edit summary to use if not supplied by bot script
+# WARNING: this should NEVER be used in practice, ALWAYS supply a more
+#          relevant summary for bot edits
+default_edit_summary = u'Wikipedia python library v.2'
+
 # Get the names of all known families, and initialize
 # with empty dictionaries
 def _get_base_dir():

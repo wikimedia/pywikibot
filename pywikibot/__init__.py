@@ -105,6 +105,11 @@ from page import Page, ImagePage, Category, Link
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[#<>{}]*)(\|.*?)?\]\]')
 
 
+def setAction(s):
+    """Set a summary to use for changed page submissions"""
+    config.default_edit_summary = s
+
+
 def set_debug(layer):
     """Set the logger for specified layer to DEBUG level.
 
