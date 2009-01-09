@@ -187,7 +187,7 @@ def main(*args):
 
 if __name__ == "__main__":
     try:
-        main(*args)
+        main()
     finally:
         pywikibot.stopme()
 
