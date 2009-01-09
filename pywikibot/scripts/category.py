@@ -328,7 +328,7 @@ def add_category(sort_by_last_name = False):
             newcatTitle = newcatTitle[:1].capitalize() + newcatTitle[1:]
 
         # set edit summary message
-        pywikibot.setAction(pywikibot.translate(site, msg_add) % newcatTitle)
+        editSummary = pywikibot.translate(site, msg_add) % newcatTitle
 
         cat_namespace = site.category_namespaces()[0]
 
@@ -383,7 +383,7 @@ Are you sure? [y/n]:""")
                         text = page.get()
                         text = pywikibot.replaceCategoryLinks(text, cats)
                         try:
-                            page.put(text)
+                            page.put(text, comment = editSummary)
                         except pywikibot.EditConflict:
                             pywikibot.output(
                                 u'Skipping %s because of edit conflict'
@@ -505,10 +505,8 @@ class CategoryListifyRobot:
         listOfArticles = self.cat.articlesList(recurse = self.recurse)
         if self.subCats:
             listOfArticles += self.cat.subcategoriesList()
-        if self.editSummary:
-            pywikibot.setAction(self.editSummary)
-        else:
-            pywikibot.setAction(pywikibot.translate(pywikibot.getSite(), self.listify_msg) % (self.cat.title(), len(listOfArticles)))
+        if not self.editSummary:
+            self.editSummary = pywikibot.translate(pywikibot.Site(), self.listify_msg) % (self.cat.title(), len(listOfArticles))
 
         listString = ""
         for article in listOfArticles:
@@ -525,7 +523,7 @@ class CategoryListifyRobot:
         if self.list.exists() and not self.overwrite:
             pywikibot.output(u'Page %s already exists, aborting.' % self.list.title())
         else:
-            self.list.put(listString)
+            self.list.put(listString, comment=self.editSummary)
 
 class CategoryRemoveRobot:
     '''
@@ -591,10 +589,8 @@ class CategoryRemoveRobot:
         self.batchMode = batchMode
         self.titleRegex = titleRegex
         self.inPlace = inPlace
-        if self.editSummary:
-            pywikibot.setAction(self.editSummary)
-        else:
-            pywikibot.setAction(pywikibot.translate(pywikibot.getSite(), self.msg_remove) % self.cat.title())
+        if not self.editSummary:
+            self.editSummary = pywikibot.translate(pywikibot.Site(), self.msg_remove) % self.cat.title()
 
     def run(self):
         articles = self.cat.articlesList(recurse = 0)
@@ -603,14 +599,14 @@ class CategoryRemoveRobot:
         else:
             for article in articles:
                 if not self.titleRegex or re.search(self.titleRegex,article.title()):
-                    catlib.change_category(article, self.cat, None, inPlace = self.inPlace)
+                    catlib.change_category(article, self.cat, None, comment = self.editSummary, inPlace = self.inPlace)
         # Also removes the category tag from subcategories' pages
         subcategories = self.cat.subcategoriesList(recurse = 0)
         if len(subcategories) == 0:
             pywikibot.output(u'There are no subcategories in category %s' % self.cat.title())
         else:
             for subcategory in subcategories:
-                catlib.change_category(subcategory, self.cat, None, inPlace = self.inPlace)
+                catlib.change_category(subcategory, self.cat, None, comment = self.editSummary, inPlace = self.inPlace)
         # Deletes the category page
         if self.cat.exists() and self.cat.isEmpty():
             if self.useSummaryForDeletion and self.editSummary:
@@ -649,6 +645,7 @@ class CategoryTidyRobot:
     def __init__(self, catTitle, catDB):
         self.catTitle = catTitle
         self.catDB = catDB
+        self.editSummary = pywikibot.translate(pywikibot.Site(), msg_change) % cat.title()
 
     def move_to_category(self, article, original_cat, current_cat):
         '''
@@ -715,7 +712,7 @@ class CategoryTidyRobot:
                 if current_cat == original_cat:
                     print 'No changes necessary.'
                 else:
-                    catlib.change_category(article, original_cat, current_cat)
+                    catlib.change_category(article, original_cat, current_cat, comment = self.editSummary)
                 flag = True
             elif choice in ['j', 'J']:
                 newCatTitle = pywikibot.input(u'Please enter the category the article should be moved to:')
@@ -725,7 +722,7 @@ class CategoryTidyRobot:
                 flag = True
             elif choice in ['r', 'R']:
                 # remove the category tag
-                catlib.change_category(article, original_cat, None)
+                catlib.change_category(article, original_cat, None, comment = self.editSummary)
                 flag = True
             elif choice == '?':
                 contextLength += 500
@@ -760,9 +757,6 @@ class CategoryTidyRobot:
 
     def run(self):
         cat = catlib.Category(pywikibot.getSite(), 'Category:' + self.catTitle)
-
-        # get edit summary message
-        pywikibot.setAction(pywikibot.translate(pywikibot.getSite(), msg_change) % cat.title())
 
         articles = cat.articlesList(recurse = False)
         if len(articles) == 0:
