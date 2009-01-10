@@ -152,7 +152,7 @@ class ArticleEditor:
         """Sets page and page title"""
         site = pywikibot.getSite()
         pageTitle = self.options.page or pywikibot.input(u"Page to edit:")
-        self.page = pywikibot.Page(site, pageTitle)
+        self.page = pywikibot.Page(pywikibot.Link(pageTitle, site))
         if not self.options.edit_redirect and self.page.isRedirectPage():
             self.page = self.page.getRedirectTarget()
 
