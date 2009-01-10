@@ -215,7 +215,8 @@ class GeneratorFactory(object):
             title = arg[11:]
             if not title:
                 title = pywikibot.input(u'Which page should be processed?')
-            page = pywikibot.Page(pywikibot.Site(), title)
+            page = pywikibot.Page(pywikibot.Link(title,
+                                                 pywikibot.Site()))
             gen = InterwikiPageGenerator(page)
         elif arg.startswith('-file'):
             textfilename = arg[6:]
@@ -242,14 +243,16 @@ class GeneratorFactory(object):
             if not referredPageTitle:
                 referredPageTitle = pywikibot.input(
                     u'Links to which page should be processed?')
-            referredPage = pywikibot.Page(pywikibot.Site(), referredPageTitle)
+            referredPage = pywikibot.Page(pywikibot.Link(referredPageTitle,
+                                                         pywikibot.Site()))
             gen = ReferringPageGenerator(referredPage)
         elif arg.startswith('-links'):
             linkingPageTitle = arg[7:]
             if not linkingPageTitle:
                 linkingPageTitle = pywikibot.input(
                     u'Links from which page should be processed?')
-            linkingPage = pywikibot.Page(pywikibot.Site(), linkingPageTitle)
+            linkingPage = pywikibot.Page(pywikibot.Link(linkingPageTitle,
+                                                        pywikibot.Site()))
             gen = LinkedPageGenerator(linkingPage)
         elif arg.startswith('-weblink'):
             url = arg[9:]
@@ -262,8 +265,9 @@ class GeneratorFactory(object):
             if not transclusionPageTitle:
                 transclusionPageTitle = pywikibot.input(
                     u'Pages that transclude which page should be processed?')
-            transclusionPage = pywikibot.Page(pywikibot.Site(),
-                                    'Template:%s' % transclusionPageTitle)
+            transclusionPage = pywikibot.Page(pywikibot.Link(
+                                    'Template:%s' % transclusionPageTitle,
+                                    pywikibot.Site()))
             gen = ReferringPageGenerator(transclusionPage,
                                          onlyTemplateInclusion=True)
         elif arg.startswith('-start'):
@@ -274,10 +278,10 @@ class GeneratorFactory(object):
             if not firstPageTitle:
                 firstPageTitle = pywikibot.input(
                     u'At which page do you want to start?')
-            namespace = pywikibot.Page(pywikibot.Site(),
-                                       firstPageTitle).namespace()
-            firstPageTitle = pywikibot.Page(pywikibot.link(firstPageTitle)
-                                           ).titleWithoutNamespace()
+            firstpagelink = pywikibot.Link(firstPageTitle,
+                                           pywikibot.Site())
+            namespace = firstpagelink.namespace
+            firstPageTitle = firstpagelink.title
             gen = AllpagesPageGenerator(firstPageTitle, namespace,
                                         includeredirects=False)
         elif arg.startswith('-prefixindex'):
@@ -301,7 +305,8 @@ class GeneratorFactory(object):
             if not imagelinkstitle:
                 imagelinkstitle = pywikibot.input(
                     u'Images on which page should be processed?')
-            imagelinksPage = pywikibot.Page(pywikibot.Link(imagelinkstitle))
+            imagelinksPage = pywikibot.Page(pywikibot.Link(imagelinkstitle,
+                                                           pywikibot.Site()))
             gen = ImagesPageGenerator(imagelinksPage)
         elif arg.startswith('-search'):
             mediawikiQuery = arg[8:]
@@ -353,10 +358,10 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
                            site=None):
     if site is None:
         site = pywikibot.Site()
-    page = pywikibot.Page(site, prefix)
+    prefixlink = pywikibot.Link(prefix, site)
     if namespace is None:
-        namespace = page.namespace()
-    title = page.titleWithoutNamespace()
+        namespace = prefixlink.namespace
+    title = prefixlink.title
     if includeredirects:
         if includeredirects == 'only':
             filterredir = True
@@ -706,7 +711,7 @@ class YahooSearchPageGenerator:
         for url in self.queryYahoo(localQuery):
             if url[:len(base)] == base:
                 title = url[len(base):]
-                page = pywikibot.Page(self.site, title)
+                page = pywikibot.Page(pywikibot.Link(title, pywikibot.Site()))
                 yield page
 
 class GoogleSearchPageGenerator:
@@ -810,7 +815,7 @@ class GoogleSearchPageGenerator:
         for url in self.queryGoogle(localQuery):
             if url[:len(base)] == base:
                 title = url[len(base):]
-                page = pywikibot.Page(self.site, title)
+                page = pywikibot.Page(pywikibot.Link(title, self.site))
                 # Google contains links in the format http://de.wikipedia.org/wiki/en:Foobar
                 if page.site() == self.site:
                     yield page
@@ -854,7 +859,7 @@ def YearPageGenerator(start = 1, end = 2050, site = None):
         # There is no year 0
         if i != 0:
             current_year = date.formatYear(site.lang, i )
-            yield pywikibot.Page(site, current_year)
+            yield pywikibot.Page(pywikibot.Link(current_year, site))
 
 def DayPageGenerator(startMonth = 1, endMonth = 12, site = None):
     if site is None:
@@ -864,7 +869,7 @@ def DayPageGenerator(startMonth = 1, endMonth = 12, site = None):
     pywikibot.output(u"Starting with %s" % firstPage.aslink())
     for month in xrange(startMonth, endMonth+1):
         for day in xrange(1, date.getNumberOfDaysInMonth(month)+1):
-            yield pywikibot.Page(site, fd(month, day))
+            yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
 
 
 if __name__ == "__main__":
