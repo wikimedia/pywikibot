@@ -23,6 +23,11 @@ Furthermore, the following command line parameters are supported:
 
 -nocase           Use case insensitive regular expressions.
 
+-dotall           Make the dot match any character at all, including a newline.
+                  Without this flag, '.' will match anything except a newline.
+
+-multiline        '^' and '$' will now match begin and end of each line.
+
 -xmlstart         (Only works with -xml) Skip all articles in the XML dump
                   before the one specified (may also be given as
                   -xmlstart:Article).
@@ -136,37 +141,38 @@ __version__='$Id$'
 # NOTE: Predefined replacement tasks might use their own dictionary, see 'fixes'
 # below.`v
 msg = {
-       'ar':u'%s روبوت : استبدال تلقائي للنص',
-       'cs':u'Robot automaticky nahradil text: %s',
-       'de':u'Bot: Automatisierte Textersetzung %s',
-       'el':u'Ρομπότ: Αυτόματη αντικατάσταση κειμένου %s',
-       'en':u'Robot: Automated text replacement %s',
-       'es':u'Robot: Reemplazo automático de texto %s',
-       'fa':u'ربات: تغییر خودکار متن %s',
-       'fr':u'Bot : Remplacement de texte automatisé %s',
-       'he':u'בוט: החלפת טקסט אוטומטית %s',
-       'hu':u'Robot: Automatikus szövegcsere %s',
-       'ia':u'Robot: Reimplaciamento automatic de texto %s',
-       'id':u'Bot: Penggantian teks otomatis %s',
-       'is':u'Vélmenni: breyti texta %s',
-       'it':u'Bot: Sostituzione automatica %s',
-       'ja':u'ロボットによる: 文字置き換え %s',
-       'ka':u'რობოტი: ტექსტის ავტომატური შეცვლა %s',
-       'kk':u'Бот: Мәтінді өздікті алмастырды: %s',
-       'ksh':u'Bot: hät outomatesch Täx jetuusch: %s',
-       'lt':u'robotas: Automatinis teksto keitimas %s',
-       'nds':u'Bot: Text automaatsch utwesselt: %s',
-       'nds-nl':u'Bot: autematisch tekse vervungen %s',
-       'nl':u'Bot: automatisch tekst vervangen %s',
-       'nn':u'robot: automatisk teksterstatning: %s',
-       'no':u'robot: automatisk teksterstatning: %s',
-       'pl':u'Robot automatycznie zamienia tekst %s',
-       'pt':u'Bot: Mudança automática %s',
-       'ru':u'Робот: Автоматизированная замена текста',
-       'sr':u'Бот: Аутоматска замена текста %s',
-       'sv':u'Bot: Automatisk textersättning: %s',
-       'zh': u'機器人:執行文字代換作業 %s',
-       }
+    'ar': u'%s روبوت : استبدال تلقائي للنص',
+    'ca': u'Robot: Reemplaçament automàtic de text %s',
+    'cs': u'Robot automaticky nahradil text: %s',
+    'de': u'Bot: Automatisierte Textersetzung %s',
+    'el': u'Ρομπότ: Αυτόματη αντικατάσταση κειμένου %s',
+    'en': u'Robot: Automated text replacement %s',
+    'es': u'Robot: Reemplazo automático de texto %s',
+    'fa': u'ربات: تغییر خودکار متن %s',
+    'fr': u'Bot : Remplacement de texte automatisé %s',
+    'he': u'בוט: החלפת טקסט אוטומטית %s',
+    'hu': u'Robot: Automatikus szövegcsere %s',
+    'ia': u'Robot: Reimplaciamento automatic de texto %s',
+    'id': u'Bot: Penggantian teks otomatis %s',
+    'is': u'Vélmenni: breyti texta %s',
+    'it': u'Bot: Sostituzione automatica %s',
+    'ja': u'ロボットによる: 文字置き換え %s',
+    'ka': u'რობოტი: ტექსტის ავტომატური შეცვლა %s',
+    'kk': u'Бот: Мәтінді өздікті алмастырды: %s',
+    'ksh': u'Bot: hät outomatesch Täx jetuusch: %s',
+    'lt': u'robotas: Automatinis teksto keitimas %s',
+    'nds': u'Bot: Text automaatsch utwesselt: %s',
+    'nds-nl': u'Bot: autematisch tekse vervungen %s',
+    'nl': u'Bot: automatisch tekst vervangen %s',
+    'nn': u'robot: automatisk teksterstatning: %s',
+    'no': u'robot: automatisk teksterstatning: %s',
+    'pl': u'Robot automatycznie zamienia tekst %s',
+    'pt': u'Bot: Mudança automática %s',
+    'ru': u'Робот: Автоматизированная замена текста %s',
+    'sr': u'Бот: Аутоматска замена текста %s',
+    'sv': u'Bot: Automatisk textersättning: %s',
+    'zh': u'機器人:執行文字代換作業 %s',
+}
 
 
 class XmlDumpReplacePageGenerator:
@@ -487,6 +493,10 @@ def main(*args):
     acceptall = False
     # Will become True if the user inputs the commandline parameter -nocase
     caseInsensitive = False
+    # Will become True if the user inputs the commandline parameter -dotall
+    dotall = False
+    # Will become True if the user inputs the commandline parameter -multiline
+    multiline = False
     # Which namespaces should be processed?
     # default to [] which means all namespaces will be processed
     namespaces = []
@@ -546,8 +556,12 @@ def main(*args):
             recursive = True
         elif arg == '-nocase':
             caseInsensitive = True
+        elif arg == '-dotall':
+            dotall = True
+        elif arg == '-multiline':
+            multiline = True
         elif arg.startswith('-addcat:'):
-            add_cat = arg[8:]
+            add_cat = arg[len('-addcat:'):]
         elif arg.startswith('-namespace:'):
             try:
                 namespaces.append(int(arg[11:]))
@@ -633,15 +647,21 @@ u'Press Enter to use this default message, or enter a description of the\nchange
             exceptions = fix['exceptions']
         replacements = fix['replacements']
 
-    # already compile all regular expressions here to save time later
+    #Set the regular expression flags
+    flags = re.UNICODE
+    if caseInsensitive:
+        flags = flags | re.IGNORECASE
+    if dotall:
+        flags = flags | re.DOTALL
+    if multiline:
+        flags = flags | re.MULTILINE
+
+    # Pre-compile all regular expressions here to save time later
     for i in range(len(replacements)):
         old, new = replacements[i]
         if not regex:
             old = re.escape(old)
-        if caseInsensitive:
-            oldR = re.compile(old, re.UNICODE | re.IGNORECASE)
-        else:
-            oldR = re.compile(old, re.UNICODE)
+        oldR = re.compile(old, flags)
         replacements[i] = oldR, new
 
     for exceptionCategory in ['title', 'require-title', 'text-contains', 'inside']:
@@ -649,12 +669,7 @@ u'Press Enter to use this default message, or enter a description of the\nchange
             patterns = exceptions[exceptionCategory]
             if not regex:
                 patterns = [re.escape(pattern) for pattern in patterns]
-            if caseInsensitive:
-                patterns = [re.compile(pattern, re.UNICODE | re.IGNORECASE)
-                            for pattern in patterns]
-            else:
-                patterns = [re.compile(pattern, re.UNICODE)
-                            for pattern in patterns]
+            patterns = [re.compile(pattern, flags) for pattern in patterns]
             exceptions[exceptionCategory] = patterns
 
     if xmlFilename:
@@ -682,7 +697,6 @@ JOIN text ON (page_id = old_id)
 %s
 LIMIT 200""" % (whereClause, exceptClause)
         gen = pagegenerators.MySQLPageGenerator(query)
-
     elif PageTitles:
         pages = [pywikibot.Page(pywikibot.getSite(), PageTitle)
                  for PageTitle in PageTitles]
