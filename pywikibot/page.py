@@ -1049,7 +1049,6 @@ class Page(object):
         If newCat is None, the category will be removed.
         
         """ # TODO: document remaining arguments
-        cats = self.categories(get_redirect=True)
         site = self.site()
         changesMade = False
 
@@ -1092,6 +1091,7 @@ class Page(object):
         # and remove duplicates.
         newCatList = []
         newCatSet = set()
+        cats = list(self.categories(get_redirect=True))
         for i in range(len(cats)):
             cat = cats[i]
             if cat == oldCat:
@@ -1295,8 +1295,7 @@ class ImagePage(Page):
 class Category(Page):
     """A page in the Category: namespace"""
 
-    @deprecate_arg("sortKey", None)
-    def __init__(self, source, title=u"", insite=None):
+    def __init__(self, source, title=u"", insite=None, sortKey=None):
         """All parameters are the same as for Page() constructor.
 
         """
@@ -1304,6 +1303,7 @@ class Category(Page):
         if self.namespace() != 14:
             raise ValueError(u"'%s' is not in the category namespace!"
                              % title)
+        self.sortKey = sortKey
 
     @deprecate_arg("forceInterwiki", None)
     @deprecate_arg("textlink", None)
@@ -1556,28 +1556,22 @@ class Link(object):
 
         """
         self._text = text
-        self._source = source
+        self._source = source or pywikibot.Site()
         self._defaultns = defaultNamespace
 
-    def parse(self):
-        """Parse text; called internally when accessing attributes"""
-        
-        # First remove the anchor, which is stored unchanged, if there is one
+        # preprocess text (these changes aren't site-dependent)
+        # First remove anchor, which is stored unchanged, if there is one
         if u"|" in self._text:
             self._text, self._anchor = self._text.split(u"|", 1)
         else:
             self._anchor = None
-
-        if self._source is None:
-            self._source = pywikibot.Site()
-        self._site = self._source
 
         # Clean up the name, it can come from anywhere.
         # Convert HTML entities to unicode
         t = html2unicode(self._text)
 
         # Convert URL-encoded characters to unicode
-        t = url2unicode(t, site=self._site)
+        t = url2unicode(t, site=self._source)
 
         # Normalize unicode string to a NFC (composed) format to allow proper
         # string comparisons. According to
@@ -1590,7 +1584,6 @@ class Link(object):
         #
         if u'\ufffd' in t:
             raise pywikibot.Error("Title contains illegal char (\\uFFFD)")
-        self._namespace = self._defaultns
 
         # Replace underscores by spaces
         t = t.replace(u"_", u" ")
@@ -1600,7 +1593,61 @@ class Link(object):
         t = t.strip(" ")
         # Remove left-to-right and right-to-left markers.
         t = t.replace(u"\u200e", u"").replace(u"\u200f", u"")
+        self._text = t
 
+    def parse_site(self):
+        """Parse only enough text to determine the host site."""
+
+        t = self._text
+        self._site = self._source
+        firstPass = True
+        while u":" in t:
+            # Initial colon
+            if t.startswith(u":"):
+                # remove the colon but continue processing
+                # remove any subsequent whitespace
+                t = t.lstrip(u":").lstrip(u" ")
+                continue
+            fam = self._site.family
+            prefix = t[ :t.index(u":")].lower() # part of text before :
+            ns = self._site.ns_index(prefix)
+            if ns:
+                # Ordinary namespace
+                return
+            if prefix in fam.langs.keys()\
+                   or prefix in fam.get_known_families(site=self._site):
+                # looks like an interwiki link
+                if not firstPass:
+                    return
+                t = t[t.index(u":"): ].lstrip(u": ") # part of text after :
+                if prefix in fam.langs.keys():
+                    newsite = pywikibot.Site(prefix, fam)
+                else:
+                    otherlang = self._site.code
+                    familyName = fam.get_known_families(site=self._site)[prefix]
+                    if familyName in ['commons', 'meta']:
+                        otherlang = familyName
+                    try:
+                        newsite = pywikibot.Site(otherlang, familyName)
+                    except ValueError:
+                        return
+                # Redundant interwiki prefix to the local wiki
+                if newsite == self._site:
+                    firstPass = False
+                    continue
+                self._site = newsite
+            else:
+                return   # text before : doesn't match any known prefix
+
+    def parse(self):
+        """Parse text; called internally when accessing attributes"""
+        
+        self._site = self._source
+        self._namespace = self._defaultns
+        t = self._text
+
+        # This code was adapted from Title.php : secureAndSplit()
+        #
         firstPass = True
         while u":" in t:
             # Initial colon indicates main namespace rather than default
@@ -1707,7 +1754,7 @@ not supported by PyWikiBot!"""
     @property
     def site(self):
         if not hasattr(self, "_site"):
-            self.parse()
+            self.parse_site()
         return self._site
 
     @property
@@ -1733,6 +1780,14 @@ not supported by PyWikiBot!"""
         if not hasattr(self, "_anchor"):
             self.parse()
         return self._anchor
+
+    def canonical_title(self):
+        """Return full page title, including localized namespace."""
+        if self.namespace:
+            return "%s:%s" % (self.site.namespace(self.namespace),
+                              self.title)
+        else:
+            return self.title
 
     def astext(self, onsite=None):
         """Return a text representation of the link.
@@ -1763,7 +1818,7 @@ not supported by PyWikiBot!"""
                                   title)
 
     def __str__(self):
-        return self.astext()
+        return self.astext().encode("ascii", "backslashreplace")
 
     def __cmp__(self, other):
         """Test for equality and inequality of Link objects.
