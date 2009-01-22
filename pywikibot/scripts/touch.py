@@ -56,38 +56,29 @@ def main(*args):
     gen = None
     genFactory = pagegenerators.GeneratorFactory()
     redirs = False
-    namespaces = []
     # If the user chooses to work on a single page, this temporary array is
     # used to read the words from the page title. The words will later be
     # joined with spaces to retrieve the full title.
     pageTitle = []
     for arg in pywikibot.handleArgs(*args):
+        if genFactory.handleArg(arg):
+            continue
         if arg == '-redir':
             redirs = True
-        elif arg.startswith('-namespace:'):
-            try:
-                namespaces.append(int(arg[11:]))
-            except ValueError:
-                namespaces.append(arg[11:])
         else:
-            generator = genFactory.handleArg(arg)
-            if generator:
-                gen = generator
-            else:
-                pageTitle.append(arg)
+            pageTitle.append(arg)
 
-    if pageTitle:
-        # work on a single page
-        page = pywikibot.Page(pywikibot.Link(' '.join(pageTitle)))
-        gen = iter([page])
+    gen = genFactory.getCombinedGenerator()
     if not gen:
-        pywikibot.showHelp()
-    else:
-        if namespaces:
-            gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = TouchBot(preloadingGen, redirs)
-        bot.run()
+        if pageTitle:
+            # work on a single page
+            page = pywikibot.Page(pywikibot.Link(' '.join(pageTitle)))
+            gen = iter([page])
+        else:
+            pywikibot.showHelp()
+    preloadingGen = pagegenerators.PreloadingGenerator(gen)
+    bot = TouchBot(preloadingGen, redirs)
+    bot.run()
 
 
 if __name__ == "__main__":

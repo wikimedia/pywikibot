@@ -77,6 +77,10 @@ parameterHelp = """\
                   config.py for instructions.
                   Argument can also be given as "-google:searchstring".
 
+-namespace        Filter the page generator to only yield pages in the
+                  specified namespaces.  Separate multiple namespace
+                  numbers with commas.
+
 -interwiki        Work on the given page and all equivalent pages in other
                   languages. This can, for example, be used to fight
                   multi-site spamming.
@@ -145,21 +149,43 @@ docuReplacements = {'&params;': parameterHelp}
 
 class GeneratorFactory(object):
     """Process command line arguments and return appropriate page generator."""
+    def __init__(self):
+        self.gens = []
+        self.namespaces = []
 
-    def setCategoryGen(self, arg, length, recurse = False):
+    def getCombinedGenerator(self):
+        """Return the combination of all accumulated generators.
+
+        Only call this after all arguments have been parsed.
+        
+        """
+        if len(self.gens) == 0:
+            return None
+        elif len(self.gens) == 1:
+            gensList = self.gens[0]
+        else:
+            gensList = CombinedPageGenerator(self.gens)
+        genToReturn = DuplicateFilterPageGenerator(gensList)
+        if self.namespaces:
+            genToReturn = NamespaceFilterPageGenerator(genToReturn, map(int, self.namespaces))
+        return genToReturn
+
+    def getCategoryGen(self, arg, length, recurse = False):
         if len(arg) == length:
             categoryname = pywikibot.input(u'Please enter the category name:')
         else:
             categoryname = arg[length + 1:]
 
         ind = categoryname.find('|')
+        startfrom = None
         if ind > 0:
             startfrom = categoryname[ind + 1:]
             categoryname = categoryname[:ind]
-        else:
-            startfrom = None
 
-        cat = pywikibot.Category(pywikibot.Link('Category:%s' % categoryname))
+        cat = pywikibot.Category(pywikibot.Link(categoryname,
+                                                defaultNamespace=14))
+        # Link constructor automatically prepends localized namespace
+        # if not included in user's input
         return CategorizedPageGenerator(cat, start=startfrom, recurse=recurse)
 
     def setSubCategoriesGen(self, arg, length, recurse=False):
@@ -175,10 +201,20 @@ class GeneratorFactory(object):
         else:
             startfrom = None
 
-        cat = pywikibot.Category(pywikibot.Link('Category:%s' % categoryname))
+        cat = pywikibot.Category(pywikibot.Link(categoryname,
+                                                defaultNamespace=14))
         return SubCategoriesPageGenerator(cat, start=startfrom, recurse=recurse)
 
     def handleArg(self, arg):
+        """Parse one argument at a time.
+
+        If it is recognized as an argument that specifies a generator, a
+        generator is created and added to the accumulation list, and the
+        function returns true.  Otherwise, it returns false, so that caller
+        can try parsing the argument. Call getCombinedGenerator() after all
+        arguments have been parsed to get the final output generator.
+
+        """
         gen = None
         if arg.startswith('-filelinks'):
             fileLinksPageTitle = arg[11:]
@@ -224,14 +260,35 @@ class GeneratorFactory(object):
                 textfilename = pywikibot.input(
                     u'Please enter the local file name:')
             gen = TextfilePageGenerator(textfilename)
+        elif arg.startswith('-namespace'):
+            if len(arg) == len('-namespace'):
+                self.namespaces.append(
+                    pywikibot.input(u'What namespace are you filtering on?'))
+            else:
+                self.namespaces.extend(arg[len('-namespace:'):].split(","))
+            return True
         elif arg.startswith('-catr'):
-            gen = self.setCategoryGen(arg, 5, recurse = True)
+            gen = self.getCategoryGen(arg, len("-catr"), recurse = True)
+        elif arg.startswith('-category'):
+            gen = self.getCategoryGen(arg, len('-category'))
         elif arg.startswith('-cat'):
-            gen = self.setCategoryGen(arg, 4)
+            gen = self.getCategoryGen(arg, len("-cat"))
         elif arg.startswith('-subcatsr'):
             gen = self.setSubCategoriesGen(arg, 9, recurse = True)
         elif arg.startswith('-subcats'):
             gen = self.setSubCategoriesGen(arg, 8)
+        elif arg.startswith('-page'):
+            if len(arg) == len('-page'):
+                gen = [pywikibot.Page(
+                           pywikibot.Link(
+                               pywikibot.input(
+                                   u'What page do you want to use?'),
+                               pywikibot.getSite())
+                           )]
+            else:
+                gen = [pywikibot.Page(pywikibot.Link(arg[len('-page:'):],
+                                                     pywikibot.getSite())
+                                      )]
         elif arg.startswith('-uncatfiles'):
             gen = UnCategorizedImageGenerator()
         elif arg.startswith('-uncatcat'):
@@ -265,9 +322,10 @@ class GeneratorFactory(object):
             if not transclusionPageTitle:
                 transclusionPageTitle = pywikibot.input(
                     u'Pages that transclude which page should be processed?')
-            transclusionPage = pywikibot.Page(pywikibot.Link(
-                                    'Template:%s' % transclusionPageTitle,
-                                    pywikibot.Site()))
+            transclusionPage = pywikibot.Page(
+                                   pywikibot.Link(transclusionPageTitle,
+                                                  defaultNamespace=10,
+                                                  source=pywikibot.Site()))
             gen = ReferringPageGenerator(transclusionPage,
                                          onlyTemplateInclusion=True)
         elif arg.startswith('-start'):
@@ -327,10 +385,12 @@ class GeneratorFactory(object):
         elif arg.startswith('-yahoo'):
             gen = YahooSearchPageGenerator(arg[7:])
         else:
-            return None
-        # make sure all yielded pages are unique
-        gen = DuplicateFilterPageGenerator(gen)
-        return gen
+            pass
+        if gen:
+            self.gens.append(gen)
+            return True
+        else:
+            return False
 
 
 def AllpagesPageGenerator(start ='!', namespace=None, includeredirects=True,
@@ -490,6 +550,7 @@ def PagesFromTitlesGenerator(iterable, site=None):
 def UserContributionsGenerator(username, number=250, namespaces=None,
                                site=None):
     """Yields number unique pages edited by user:username
+
     namespaces : list of namespace numbers to fetch contribs from
 
     """

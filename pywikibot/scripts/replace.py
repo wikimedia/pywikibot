@@ -71,12 +71,6 @@ Furthermore, the following command line parameters are supported:
                   Currently available predefined fixes are:
 &fixes-help;
 
--namespace:n      Number or name of namespace to process. The parameter can be
-                  used multiple times. It works in combination with all other
-                  parameters, except for the -start parameter. If you e.g.
-                  want to iterate over all categories starting at M, use
-                  -start:Category:M.
-
 -always           Don't prompt you for each replacement
 
 -recursive        Recurse replacement as long as possible. Be careful, this
@@ -497,9 +491,6 @@ def main(*args):
     dotall = False
     # Will become True if the user inputs the commandline parameter -multiline
     multiline = False
-    # Which namespaces should be processed?
-    # default to [] which means all namespaces will be processed
-    namespaces = []
     # Do all hits when they overlap
     allowoverlap = False
     # Do not recurse replacement
@@ -514,6 +505,8 @@ def main(*args):
 
     # Read commandline parameters.
     for arg in pywikibot.handleArgs(*args):
+        if genFactory.handleArg(arg):
+            continue
         if arg == '-regex':
             regex = True
         elif arg.startswith('-xmlstart'):
@@ -562,23 +555,15 @@ def main(*args):
             multiline = True
         elif arg.startswith('-addcat:'):
             add_cat = arg[len('-addcat:'):]
-        elif arg.startswith('-namespace:'):
-            try:
-                namespaces.append(int(arg[11:]))
-            except ValueError:
-                namespaces.append(arg[11:])
         elif arg.startswith('-summary:'):
             edit_summary = arg[9:]
             summary_commandline = True
         elif arg.startswith('-allowoverlap'):
             allowoverlap = True
         else:
-            generator = genFactory.handleArg(arg)
-            if generator:
-                gen = generator
-            else:
-                commandline_replacements.append(arg)
+            commandline_replacements.append(arg)
 
+    gen = genFactory.getCombinedGenerator()
     if (len(commandline_replacements) % 2):
         raise pywikibot.Error, 'require even number of replacements.'
     elif (len(commandline_replacements) == 2 and fix == None):
@@ -706,8 +691,6 @@ LIMIT 200""" % (whereClause, exceptClause)
         # syntax error, show help text from the top of this file
         pywikibot.showHelp('replace')
         return
-    if namespaces != []:
-        gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
     if xmlFilename:
         # XML parsing can be quite slow, so use smaller batches and
         # longer lookahead.
