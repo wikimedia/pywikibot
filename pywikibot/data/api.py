@@ -20,7 +20,7 @@ import urllib
 import warnings
 
 import pywikibot
-from pywikibot import login
+from pywikibot import config, login
 from pywikibot.exceptions import *
 
 logger = logging.getLogger("data.api")
@@ -159,7 +159,7 @@ class Request(DictMixin):
                     info = set(info + ["protection", "talkid", "subjectid"])
                     self.params["info"] = list(info)
         if "maxlag" not in self.params:
-            self.params["maxlag"] = [str(pywikibot.config2.maxlag)]
+            self.params["maxlag"] = [str(config.maxlag)]
         if "format" not in self.params:
             self.params["format"] = ["json"]
         if self.params['format'] != ["json"]:
