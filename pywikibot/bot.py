@@ -245,9 +245,9 @@ def handleArgs(*args):
             showHelp()
             sys.exit(0)
         elif arg.startswith('-family:'):
-            config.family = arg[len("-family:" : ]
+            config.family = arg[len("-family:") : ]
         elif arg.startswith('-lang:'):
-            config.mylang = arg[len("-lang:" : ]
+            config.mylang = arg[len("-lang:") : ]
         elif arg.startswith("-user:"):
             username = arg[len("-user:") : ]
         elif arg.startswith('-putthrottle:'):
@@ -262,7 +262,7 @@ def handleArgs(*args):
         elif arg.startswith('-log:'):
             if moduleName not in config.log:
                 config.log.append(moduleName)
-            config.logfilename = arg[len("-log:" : ]
+            config.logfilename = arg[len("-log:") : ]
         elif arg == '-nolog':
             if moduleName in config.log:
                 config.log.remove(moduleName)

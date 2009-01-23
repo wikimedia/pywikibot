@@ -158,7 +158,7 @@ class Request(DictMixin):
                     inprop = self.params.get("inprop", [])
                     info = set(info + ["protection", "talkid", "subjectid"])
                     self.params["info"] = list(info)
-        if "maxlag" not in self.params:
+        if "maxlag" not in self.params and config.maxlag:
             self.params["maxlag"] = [str(config.maxlag)]
         if "format" not in self.params:
             self.params["format"] = ["json"]
