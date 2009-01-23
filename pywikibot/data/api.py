@@ -407,8 +407,11 @@ class QueryGenerator(object):
             if not "query-continue" in self.data:
                 return
             if not self.continuekey in self.data["query-continue"]:
-                raise Error("Missing '%s' key in ['query-continue'] value."
-                            % self.continuekey)
+                pywikibot.output(
+                    u"Missing '%s' key in ['query-continue'] value."
+                     % self.continuekey,
+                    level=pywikibot.VERBOSE)
+                return
             update = self.data["query-continue"][self.continuekey]
             for key, value in update.iteritems():
                 # query-continue can return ints
