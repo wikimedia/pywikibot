@@ -172,7 +172,7 @@ class Request(DictMixin):
                     self.params[key] = self.params[key].encode(
                                                 self.site.encoding())
             except Exception:
-                logger.exception("key=%s, params=%s" % (key, self.params[key]))
+                logger.exception("key=%s, params=%s\n" % (key, self.params[key]))
         params = urllib.urlencode(self.params)
         while True:
             # TODO catch http errors
@@ -194,11 +194,14 @@ class Request(DictMixin):
                     uri = uri + "?" + params
                     rawdata = http.request(self.site, uri)
             except Exception, e: #TODO: what exceptions can occur here?
-                logger.warning(traceback.format_exc())
-                logger.warning("%s, %s", uri, params)
+                pywikibot.output(traceback.format_exc(),
+                                 level=pywikibot.ERROR)
+                pywikibot.output("%s, %s" % (uri, params),
+                                 level=pywikibot.VERBOSE)
                 self.wait()
                 continue
-            logger.debug("API response received:\n%s", rawdata)
+            pywikibot.output("API response received:\n%s" % rawdata,
+                             level=pywikibot.DEBUG)
             if not isinstance(rawdata, unicode):
                 rawdata = rawdata.decode(self.site.encoding())
             if rawdata.startswith(u"unknown_action"):
@@ -208,10 +211,10 @@ class Request(DictMixin):
             except ValueError:
                 # if the result isn't valid JSON, there must be a server
                 # problem.  Wait a few seconds and try again
-                logger.warning(
+                pywikibot.output(
 "Non-JSON response received from server %s; the server may be down."
-                              % self.site)
-                logger.debug(rawdata)
+                                 % self.site, level=pywikibot.WARNING)
+                pywikibot.output(rawdata, level=pywikibot.DEBUG)
                 self.wait()
                 continue
             if not result:
@@ -231,9 +234,10 @@ class Request(DictMixin):
             if "warnings" in result:
                 modules = [k for k in result["warnings"] if k != "info"]
                 for mod in modules:
-                    logger.warning(
-                        "API warning (%s): %s"
-                        % (mod, result["warnings"][mod]["*"]))
+                    pywikibot.output(
+                        u"API warning (%s): %s"
+                         % (mod, result["warnings"][mod]["*"]),
+                        level=pywikibot.WARNING)
             if "error" not in result:
                 return result
             if "*" in result["error"]:
@@ -262,7 +266,9 @@ class Request(DictMixin):
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError("Maximum retries attempted without success.")
-        logger.warn("Waiting %s seconds before retrying." % self.retry_wait)
+        pywikibot.output(u"Waiting %s seconds before retrying."
+                          % self.retry_wait,
+                         level=pywikibot.WARNING)
         time.sleep(self.retry_wait)
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
@@ -354,8 +360,10 @@ class QueryGenerator(object):
                     else:
                         self.query_limit = int(param["max"])
                     self.prefix = _modules[mod]["prefix"]
-                    logger.debug("%s: Set query_limit to %i."
-                                  % (self.__class__.__name__, self.query_limit))
+                    pywikibot.output(u"%s: Set query_limit to %i."
+                                     % (self.__class__.__name__,
+                                        self.query_limit),
+                                     level=pywikibot.DEBUG)
                     return
 
     def __iter__(self):
@@ -377,27 +385,31 @@ class QueryGenerator(object):
                     self.request[self.prefix+"limit"] = str(new_limit)
             self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
-                logger.debug(
-                    "%s: stopped iteration because no dict retrieved from api."
-                    % self.__class__.__name__)
+                pywikibot.output(
+                    u"%s: stopped iteration because no dict retrieved from api."
+                     % self.__class__.__name__,
+                    level=pywikibot.DEBUG)
                 return
             if not ("query" in self.data
                     and self.resultkey in self.data["query"]):
-                logger.debug(
-"%s: stopped iteration because 'query' and '%s' not found in api response.",
-                        self.__class__.__name__, self.resultkey)
-                logger.debug(self.data)
+                pywikibot.output(
+u"%s: stopped iteration because 'query' and '%s' not found in api response."
+                    % (self.__class__.__name__, self.resultkey),
+                    level=pywikibot.DEBUG)
+                pywikibot.output(unicode(self.data), level=pywikibot.DEBUG)
                 return
             pagedata = self.data["query"][self.resultkey]
             if isinstance(pagedata, dict):
-                logger.debug("%s received %s; limit=%s"
-                         % (self.__class__.__name__, pagedata.keys(),
-                            self.limit))
+                pywikibot.output(u"%s received %s; limit=%s"
+                                  % (self.__class__.__name__, pagedata.keys(),
+                                     self.limit),
+                                 level=pywikibot.DEBUG)
                 pagedata = pagedata.values()
             else:
-                logger.debug("%s received %s; limit=%s"
-                         % (self.__class__.__name__, pagedata,
-                            self.limit))                
+                pywikibot.output(u"%s received %s; limit=%s"
+                                  % (self.__class__.__name__, pagedata,
+                                     self.limit),
+                                 level=pywikibot.DEBUG)
             for item in pagedata:
                 yield self.result(item)
                 count += 1

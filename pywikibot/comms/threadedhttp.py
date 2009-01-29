@@ -30,6 +30,8 @@ import urllib
 import cookielib
 import sys
 
+import pywikibot
+
 logger = logging.getLogger("comms.threadedhttp")
 
 
@@ -37,8 +39,9 @@ logger = logging.getLogger("comms.threadedhttp")
 try:
     import pkg_resources
 except ImportError:
-    logger.critical(
-        "Error: You need the python module setuptools to use this module")
+    pywikibot.output(
+        u"Error: You need the python module setuptools to use this module",
+        level=pywikibot.CRITICAL)
     sys.exit(1)
 pkg_resources.require("httplib2")
 import httplib2

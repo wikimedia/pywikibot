@@ -659,7 +659,7 @@ class Page(object):
             else:
                 pywikibot.output("Page %s saved" % self.title(asLink=True))
         except pywikibot.Error, err:
-            logger.exception("Error saving page %s" % self.title(asLink=True))
+            logger.exception("Error saving page %s\n" % self.title(asLink=True))
         if callback:
             callback(self, err)
 
@@ -1139,31 +1139,33 @@ class Page(object):
 
     def encoding(self):
         """DEPRECATED: use Site.encoding() instead"""
-        logger.debug(u"Page.encoding() is deprecated; use Site.encoding().")
+        pywikibot.output(u"Page.encoding() is deprecated; use Site.encoding().",
+                         level=pywikibot.DEBUG)
         return self.site().encoding()
 
     def titleWithoutNamespace(self, underscore=False):
         """DEPRECATED: use self.title(withNamespace=False) instead."""
-        logger.debug(
-            u"Page.titleWithoutNamespace() method is deprecated.")
+        pywikibot.output(u"Page.titleWithoutNamespace() method is deprecated.",
+                         level=pywikibot.DEBUG)
         return self.title(underscore=underscore, withNamespace=False,
                           withSection=False)
 
     def titleForFilename(self):
         """DEPRECATED: use self.title(as_filename=True) instead."""
-        logger.debug(
-            u"Page.titleForFilename() method is deprecated.")
+        pywikibot.output(u"Page.titleForFilename() method is deprecated.",
+                         level=pywikibot.DEBUG)
         return self.title(as_filename=True)
 
     def sectionFreeTitle(self, underscore=False):
         """DEPRECATED: use self.title(withSection=False) instead."""
-        logger.debug(
-            u"Page.sectionFreeTitle() method is deprecated.")
+        pywikibot.output(u"Page.sectionFreeTitle() method is deprecated.",
+                         level=pywikibot.DEBUG)
         return self.title(underscore=underscore, withSection=False)
 
     def aslink(self, forceInterwiki=False, textlink=False, noInterwiki=False):
         """DEPRECATED: use self.title(asLink=True) instead."""
-        logger.debug(u"Page.aslink() method is deprecated.")
+        pywikibot.output(u"Page.aslink() method is deprecated.",
+                         level=pywikibot.DEBUG)
         return self.title(asLink=True, forceInterwiki=forceInterwiki,
                           allowInterwiki=not noInterwiki, textlink=textlink)
 
@@ -1173,7 +1175,8 @@ class Page(object):
         DEPRECATED: use self.title(asUrl=True) instead.
 
         """
-        logger.debug(u"Page.urlname() method is deprecated.")
+        pywikibot.output(u"Page.urlname() method is deprecated.",
+                         level=pywikibot.DEBUG)
         return self.title(asUrl=True)
 
 ####### DISABLED METHODS (warnings provided) ######
@@ -1182,12 +1185,14 @@ class Page(object):
 
     def removeImage(self, image, put=False, summary=None, safe=True):
         """Old method to remove all instances of an image from page."""
-        logger.warning(u"Page.removeImage() is no longer supported.")
+        pywikibot.output(u"Page.removeImage() is no longer supported.",
+                         level=pywikibot.WARNING)
 
     def replaceImage(self, image, replacement=None, put=False, summary=None,
                      safe=True):
         """Old method to replace all instances of an image with another."""
-        logger.warning(u"Page.replaceImage() is no longer supported.")
+        pywikibot.output(u"Page.replaceImage() is no longer supported.",
+                         level=pywikibot.WARNING)
 
 
 class ImagePage(Page):
@@ -1250,8 +1255,9 @@ class ImagePage(Page):
 
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
-        logger.debug(
-            "ImagePage.getFileMd5Sum() is deprecated; use getFileSHA1Sum().")
+        pywikibot.output(
+            u"ImagePage.getFileMd5Sum() is deprecated; use getFileSHA1Sum().",
+            level=pywikibot.DEBUG)
 # FIXME: MD5 might be performed on incomplete file due to server disconnection
 # (see bug #1795683).
         import md5, urllib
@@ -1399,8 +1405,9 @@ class Category(Page):
         catname = self.site().category_namespace() + ':' + catname
         targetCat = Category(self.site(), catname)
         if targetCat.exists():
-            logger.warn('Target page %s already exists!'
-                             % targetCat.title())
+            pywikibot.output(u'Target page %s already exists!'
+                              % targetCat.title(),
+                             level=pywikibot.WARNING)
             return False
         else:
             pywikibot.output('Moving text from %s to %s.'
@@ -1435,8 +1442,9 @@ class Category(Page):
         catname = self.site().category_namespace() + ':' + catname
         targetCat = Category(self.site(), catname)
         if targetCat.exists():
-            logger.warn('Target page %s already exists!'
-                             % targetCat.title())
+            pywikibot.output(u'Target page %s already exists!'
+                              % targetCat.title(),
+                             level=pywikibot.WARNING)
             return False
         else:
             pywikibot.output('Moving text from %s to %s.'
@@ -1463,22 +1471,26 @@ class Category(Page):
 #### DEPRECATED METHODS ####
     def subcategoriesList(self, recurse=False):
         """DEPRECATED: Equivalent to list(self.subcategories(...))"""
-        logger.debug("Category.subcategoriesList() method is deprecated.")
+        pywikibot.output(u"Category.subcategoriesList() method is deprecated.",
+                         level=pywikibot.DEBUG)
         return sorted(list(set(self.subcategories(recurse))))
 
     def articlesList(self, recurse=False):
         """DEPRECATED: equivalent to list(self.articles(...))"""
-        logger.debug("Category.articlesList() method is deprecated.")
+        pywikibot.output(u"Category.articlesList() method is deprecated.",
+                         level=pywikibot.DEBUG)
         return sorted(list(set(self.articles(recurse))))
 
     def supercategories(self):
         """DEPRECATED: equivalent to self.categories()"""
-        logger.debug("Category.supercategories() method is deprecated.")
+        pywikibot.output(u"Category.supercategories() method is deprecated.",
+                         level=pywikibot.DEBUG)
         return self.categories()
 
     def supercategoriesList(self):
         """DEPRECATED: equivalent to list(self.categories(...))"""
-        logger.debug("Category.articlesList() method is deprecated.")
+        pywikibot.output(u"Category.articlesList() method is deprecated.",
+                         level=pywikibot.DEBUG)
         return sorted(list(set(self.categories())))
 
 

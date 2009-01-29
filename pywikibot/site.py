@@ -1851,7 +1851,8 @@ class APISite(BaseSite):
         srgen = api.PageGenerator("search", gsrsearch=searchstring,
                                   gsrwhat=where, site=self)
         if not namespaces:
-            logger.warning("search: namespaces cannot be empty; using [0].")
+            pywikibot.output(u"search: namespaces cannot be empty; using [0].",
+                             level=pywikibot.WARNING)
             namespaces = [0]
         if isinstance(namespaces, list):
             srgen.request["gsrnamespace"] = u"|".join(unicode(ns)
@@ -2219,21 +2220,24 @@ redirects on %(site)s wiki""",
                         continue
                     else:
                         self.unlock_page(page)
-                        logger.error(
-"editpage: unknown CAPTCHA response %s, page not saved"
-                                      % captcha)
+                        pywikibot.output(
+                    u"editpage: unknown CAPTCHA response %s, page not saved"
+                                         % captcha,
+                                         level=pywikibot.ERROR)
                         return False
                 else:
                     self.unlock_page(page)
-                    logger.error("editpage: unknown failure reason %s"
-                                  % str(result))
+                    pywikibot.output(u"editpage: unknown failure reason %s"
+                                      % str(result),
+                                     level=pywikibot.ERROR)
                     return False
             else:
                 self.unlock_page(page)
-                logger.error(
-"editpage: Unknown result code '%s' received; page not saved"
-                    % result["edit"]["result"])
-                logger.error(str(result))
+                pywikibot.output(
+u"editpage: Unknown result code '%s' received; page not saved"
+                                   % result["edit"]["result"],
+                                 level=pywikibot.ERROR)
+                pywikibot.output(str(result), level=pywikibot.VERBOSE)
                 return False
 
     # catalog of move errors for use in error messages
@@ -2320,12 +2324,13 @@ redirects on %(site)s wiki""",
         finally:
             self.unlock_page(page)
         if "move" not in result:
-            logger.error("movepage: %s" % result)
+            pywikibot.output(u"movepage: %s" % result, level=pywikibot.ERROR)
             raise Error("movepage: unexpected response")
         # TODO: Check for talkmove-error messages
         if "talkmove-error-code" in result["move"]:
-            logger.warning(u"movepage: Talk page %s not moved"
-                            % (page.toggleTalkPage().title(asLink=True)))
+            pywikibot.output(u"movepage: Talk page %s not moved"
+                              % (page.toggleTalkPage().title(asLink=True)),
+                             level=pywikibot.WARNING)
         return pywikibot.Page(page, newtitle)
 
     # catalog of rollback errors for use in error messages

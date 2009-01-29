@@ -167,7 +167,8 @@ class GeneratorFactory(object):
             gensList = CombinedPageGenerator(self.gens)
         genToReturn = DuplicateFilterPageGenerator(gensList)
         if self.namespaces:
-            genToReturn = NamespaceFilterPageGenerator(genToReturn, map(int, self.namespaces))
+            genToReturn = NamespaceFilterPageGenerator(
+                              genToReturn, map(int, self.namespaces))
         return genToReturn
 
     def getCategoryGen(self, arg, length, recurse = False):

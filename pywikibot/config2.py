@@ -504,7 +504,7 @@ for _key in globals().keys():
         del nt,ot
     else:
         logger.warn(
-    "Configuration variable %(_key)r is defined but unknown. Misspelled?"
+    "Configuration variable %(_key)r is defined but unknown. Misspelled?\n"
             % locals())
 
 # Fix up default console_encoding
