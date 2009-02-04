@@ -43,6 +43,82 @@ class Family(family.Family):
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wikipedia.org' % lang
 
+        self.category_redirect_templates = {
+            '_default': (),
+            'ar': (u"تحويل تصنيف",
+                   u"تحويلة تصنيف",
+                   u"Category redirect",
+                   u"تحويلة تصنيف",),
+            'arz': (u'تحويل تصنيف',),
+            'cs': (u'Zastaralá kategorie',),
+            'da': (u'Kategoriomdirigering',),
+            'de': (u'Kategorieweiterleitung',),
+            'en': (u"Category redirect",
+                   u"Category redirect3",
+                   u"Categoryredirect",
+                   u"CR",
+                   u"Catredirect",
+                   u"Cat redirect",
+                   u"Seecat",),
+            'es': (u'Categoría redirigida',),
+            'eu': (u'Kategoria redirect',),
+            'fa': (u'رده بهتر',
+                   u'انتقال رده',
+                   u'فیلم‌های امریکایی',),
+            'fr': (u'Redirection de catégorie',),
+            'hi': (u'श्रेणीअनुप्रेषित',
+                   u'Categoryredirect',),
+            'id': (u'Alih kategori',
+                   u'Alihkategori',),
+            # 'it' has removed its template
+            # 'ja' is discussing to remove this template
+            'ja': (u"Category redirect",),
+            'ko': (u'분류 넘겨주기',),
+            'mk': (u'Премести категорија',),
+            'ms': (u'Pengalihan kategori',
+                   u'Categoryredirect',
+                   u'Category redirect',),
+            'mt': (u'Redirect kategorija',),
+            # 'nl' has removed its template
+            'no': (u"Category redirect",
+                   u"Kategoriomdirigering",
+                   u"Kategori-omdirigering",),
+            'pl': (u'Przekierowanie kategorii',
+                   u'Category redirect',),
+            'pt': (u'Redirecionamento de categoria',
+                   u'Redircat',
+                   u'Redirect-categoria',),
+            'ro': (u'Redirect categorie',),
+            'ru': (u'Переименованная категория',
+                   u'Categoryredirect',
+                   u'CategoryRedirect',
+                   u'Category redirect',
+                   u'Catredirect',),
+            'simple': (u"Category redirect",
+                       u"Catredirect",),
+            'sq': (u'Kategori e zhvendosur',
+                   u'Category redirect',),
+            'tl': (u'Category redirect',),
+            'tr': (u'Kategori yönlendirme',
+                   u'Kat redir',),
+            'uk': (u'Categoryredirect',),
+            'vi': (u'Đổi hướng thể loại',
+                   u'Thể loại đổi hướng',
+                   u'Chuyển hướng thể loại',
+                   u'Categoryredirect',
+                   u'Category redirect',
+                   u'Catredirect',
+                   u'Categoryredirect',),
+            'yi': (u'קאטעגאריע אריבערפירן',),
+            'zh': (u'分类重定向',
+                   u'Cr',
+                   u'CR',
+                   u'Cat-redirect',),
+            'zh-yue': (u'Category redirect',
+                       u'分類彈去',
+                       u'分類跳轉',),
+        }
+        
         self.disambiguationTemplates = {
             # set value to None, instead of a list, to retrieve names from
             # the live wiki ([[MediaWiki:Disambiguationspage]]
@@ -88,7 +164,7 @@ class Family(family.Family):
                     u'Homonymie de comtés', u'Internationalisation',
                     u'Isomérie', u'Homonymie de nom romain',
                     u'Paronymie', u'Patronyme', u'Personnes homonymes',
-                    u'Unités homonymes', u'Villes homonymes'],
+                    u'Unités homonymes', u'Villes homonymes', u'Homonymie bateau'],
             'frp': [u'Homonimos'],
             'fy':  [u'Tfs', u'Neibetsjuttings'],
             'ga':  [u'Idirdhealú', u'Disambig'],
@@ -121,7 +197,7 @@ class Family(family.Family):
             'lmo': [u'Desambiguació'],
             'ln':  [u'Bokokani'],
             'lt':  None,
-            'mk':  [u'Појаснување', u'Disambig'],
+            'mk':  [u'Појаснување', u'Disambig', u'Geodis'],
             'mo':  [u'Дезамбигуйзаре', u'Disambig'],
             'ms':  [u'Nyahkekaburan', u'Disambig'],
             'mt':  [u'Diżambigwazzjoni'],
@@ -165,7 +241,7 @@ class Family(family.Family):
             'ta':  [u'பக்கவழி நெறிப்படுத்தல்'],
             'te':  [u'అయోమయ నివృత్తి', u'వివరమైన అయోమయ నివృత్తి'],
             'tg':  [u'Ибҳомзудоӣ', u'Disambig', u'Рафъи ибҳом', u'Disambiguation'],
-            'th':  [u'แก้กำกวม', u'Disambig'],
+            'th':  [u'แก้กำกวม', u'Disambig', u'คำกำกวม'],
             'tl':  [u'Paglilinaw', u'Disambig'],
             'tr':  [u'Anlam ayrım', u'Disambig', u'Anlam ayrımı'],
             'uk':  [u'Неоднозначність',u'DisambigG', u'Disambig', u'DisambigN',
@@ -383,9 +459,10 @@ class Family(family.Family):
                 'als': [104], 
                 'en': [12],
                 'es': [104], 
-                'fr': [104], 
+                'fr': [104],
+                'hr': [102],
                 'lt': [104],
-            }
+            },
         }
         self.crossnamespace[1] = {
             '_default': {
@@ -394,8 +471,9 @@ class Family(family.Family):
                 'en': [13],
                 'es': [105],
                 'fr': [105],
+                'hr': [103],
                 'lt': [105],
-            }
+            },
         }
         self.crossnamespace[102] = {
             'pt': {
@@ -404,7 +482,14 @@ class Family(family.Family):
                 'es': [0, 104], 
                 'fr': [0, 104], 
                 'lt': [0, 104]
-            }
+            },
+            'hr': {
+                '_default': [0],
+                'als': [0, 104], 
+                'es': [0, 104], 
+                'fr': [0, 104], 
+                'lt': [0, 104]
+            },
         }
         self.crossnamespace[103] = {
             'pt': {
@@ -413,53 +498,68 @@ class Family(family.Family):
                 'es': [1, 105],
                 'fr': [1, 105],
                 'lt': [1, 105]
-            }
+            },
+            'hr': {
+                '_default': [1],
+                'als': [1, 105],
+                'es': [1, 105],
+                'fr': [1, 105],
+                'lt': [1, 105]
+            },
         }
         self.crossnamespace[104] = {
             'als': {
                 '_default': [0],
-                'pt': [0, 102]
+                'pt': [0, 102],
+                'hr': [0, 102],
             },
             'es': { 
                 '_default': [0],
-                'pt': [0, 102]
+                'pt': [0, 102],
+                'hr': [0, 102],
             },
             'fr': {
                 '_default': [0],
-                'pt': [0, 102]
+                'pt': [0, 102],
+                'hr': [0, 102],
             },
             'lt': { 
                 '_default': [0],
-                'pt': [0, 102]
-            }
+                'pt': [0, 102],
+                'hr': [0, 102],
+            },
         }
         self.crossnamespace[105] = {
             'als': {
                 '_default': [1],
-                'pt': [0, 103]
+                'pt': [0, 103],
+                'hr': [0, 103],
             },
             'es': {
                 '_default': [1],
-                'pt': [0, 103]
+                'pt': [0, 103],
+                'hr': [0, 103],
             },
             'fr': {
                 '_default': [1],
-                'pt': [0, 103]
+                'pt': [0, 103],
+                'hr': [0, 103],
             },
             'lt': {
                 '_default': [1],
-                'pt': [0, 103]
-            }
+                'pt': [0, 103],
+                'hr': [0, 103],
+            },
         }
         self.crossnamespace[12] = {
             'en': {
                 '_default': [0],
-            }
+            },
         }
         self.crossnamespace[13] = {
             'en': {
                 '_default': [0],
-            }
+            },
         }
     def get_known_families(self, site):
         # In Swedish Wikipedia 's:' is part of page title not a family
@@ -472,7 +572,7 @@ class Family(family.Family):
             return self.known_families
 
     def version(self, code):
-        return '1.14alpha'
+        return '1.15alpha'
 
     def dbName(self, code):
         # returns the name of the MySQL database

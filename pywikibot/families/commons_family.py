@@ -15,16 +15,31 @@ class Family(family.Family):
         }
 
         self.interwiki_forward = 'wikipedia'
+
+        self.category_redirect_templates = {
+            'commons': (u'Category redirect',
+                        u'Categoryredirect',
+                        u'See cat',
+                        u'Seecat',
+                        u'Catredirect',
+                        u'Cat redirect',
+                        u'CatRed',
+                        u'Cat-red',
+                        u'Catredir',
+                        u'Redirect category'),
+        }
+        
         self.disambiguationTemplates = {
             'commons': [u'Disambig', u'Disambiguation', u'Razločitev',
                         u'Begriffsklärung']
         }
+        
         self.disambcatname = {
             'commons':  u'Disambiguation'
         }
 
     def version(self, code):
-        return '1.14alpha'
+        return '1.15alpha'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

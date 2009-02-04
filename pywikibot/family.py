@@ -55,9 +55,7 @@ class Family:
         self.servergmtoffset = timedelta()
 
         # letters that can follow a wikilink and are regarded as part of
-        # this link
-        # This depends on the linktrail setting in LanguageXx.php and on
-        # [[MediaWiki:Linktrail]].
+        # this link        # This depends on the linktrail setting in LanguageXx.php and on        # [[MediaWiki:Linktrail]].
         # Note: this is a regular expression.
         self.linktrails = {
            '_default': u'[a-z]*',
@@ -470,6 +468,12 @@ class Family:
             'zzz wiki':         'zzz wiki',
         }
 
+        # A list of category redirect template names in different languages
+        # Note: It *is* necessary to list template redirects here
+        self.category_redirect_templates = {
+            '_default': []
+        }
+
         # A list of disambiguation template names in different languages
         self.disambiguationTemplates = {
             '_default': []
@@ -634,122 +638,16 @@ class Family:
                 "ERROR: linktrail in language %(language_code)s unknown"
                            % {'language_code': code})
 
-##    def namespace(self, code, ns_number, fallback='_default', all=False):
-##        if not self.isDefinedNS(ns_number):
-##            raise KeyError(
-##'ERROR: Unknown namespace %(ns_number)d for %(language_code)s:%(ns_name)s'
-##                           % {'ns_number': ns_number,
-##                              'language_code': code,
-##                              'ns_name': self.name})
-##        elif self.isNsI18N(ns_number, code):
-##            v = self.namespaces[ns_number][code]
-##            if type(v) is not list:
-##                v = [v,]
-##            if all and self.isNsI18N(ns_number, fallback):
-##                v2 = self.namespaces[ns_number][fallback]
-##                if type(v2) is list:
-##                    v.extend(v2)
-##                else:
-##                    v.append(v2)
-##        elif fallback and self.isNsI18N(ns_number, fallback):
-##            v = self.namespaces[ns_number][fallback]
-##            if type(v) is not list:
-##                v = [v,]
-##        else:
-##            raise KeyError(
-##'ERROR: title for namespace %(ns_number)d in language %(language_code)s unknown'
-##                           % {'ns_number': ns_number,
-##                              'language_code': code})
-##        if all:
-##            namespaces = list(set(v))
-##            # Lowercase versions of namespaces
-##            if code not in self.nocapitalize:
-##                namespaces.extend([ns[0].lower() + ns[1:]
-##                                   for ns in namespaces
-##                                   if ns and ns[0].lower() != ns[0].upper()])
-##            # Underscore versions of namespaces
-##            namespaces.extend([ns.replace(' ', '_')
-##                               for ns in namespaces if ns and ' ' in ns])
-##            return tuple(namespaces)
-##        else:
-##            return v[0]
-##
-##    def isDefinedNS(self, ns_number):
-##        """Return True if the namespace has been defined in this family."""
-##        
-##        return self.namespaces.has_key(ns_number)
-##
-##    def isNsI18N(self, ns_number, code):
-##        """Return True if the namespace has been internationalized.
-##
-##        (it has a custom entry for a given language)
-##
-##        """
-##        return self.namespaces[ns_number].has_key(code)
-##
-##    def isDefinedNSLanguage(self, ns_number, code, fallback='_default'):
-##        """Return True if the namespace has been defined in this family
-##        for this language or its fallback.
-##        """
-##        if not self.isDefinedNS(ns_number):
-##            return False
-##        elif self.isNsI18N(ns_number, code):
-##            return True
-##        elif fallback and self.isNsI18N(ns_number, fallback):
-##            return True
-##        else:
-##            return False
-##
-##    def normalizeNamespace(self, code, value):
-##        """Given a value, attempt to match it with all available namespaces,
-##        with default and localized versions. Sites may have more than one
-##        way to write the same namespace - choose the first one in the list.
-##        If nothing can be normalized, return the original value.
-##        """
-##        for ns, items in self.namespaces.iteritems():
-##            if items.has_key(code):
-##                v = items[code]
-##            elif items.has_key('_default'):
-##                v = items['_default']
-##            else:
-##                continue
-##            if type(v) is list:
-##                if value in v: return v[0]
-##            else:
-##                if value == v: return v
-##            try:
-##                if value == self.namespace('_default', ns):
-##                    return self.namespace(code, ns)
-##            except KeyError:
-##                pass
-##        return value
-##
-##    def getNamespaceIndex(self, lang, namespace):
-##        """Given a namespace, attempt to match it with all available
-##        namespaces. Sites may have more than one way to write the same
-##        namespace - choose the first one in the list. Returns namespace
-##        index or None.
-##        """
-##        namespace = namespace.lower()
-##        for n in self.namespaces.keys():
-##            try:
-##                nslist = self.namespaces[n][lang]
-##                if type(nslist) != type([]):
-##                    nslist = [nslist]
-##                for ns in nslist:
-##                    if ns.lower() == namespace:
-##                        return n
-##            except (KeyError,AttributeError):
-##                # The namespace has no localized name defined
-##                pass
-##        if lang != '_default':
-##            # This is not a localized namespace. Try if it
-##            # is a default (English) namespace.
-##            return self.getNamespaceIndex('_default', namespace)
-##        else:
-##            # give up
-##            return None
-##
+##    def namespace(self, code, ns_number, fallback='_default', all=False):##        if not self.isDefinedNS(ns_number):##            raise KeyError(##'ERROR: Unknown namespace %(ns_number)d for %(language_code)s:%(ns_name)s'##                           % {'ns_number': ns_number,##                              'language_code': code,##                              'ns_name': self.name})##        elif self.isNsI18N(ns_number, code):##            v = self.namespaces[ns_number][code]##            if type(v) is not list:##                v = [v,]##            if all and self.isNsI18N(ns_number, fallback):##                v2 = self.namespaces[ns_number][fallback]##                if type(v2) is list:##                    v.extend(v2)##                else:##                    v.append(v2)##        elif fallback and self.isNsI18N(ns_number, fallback):##            v = self.namespaces[ns_number][fallback]##            if type(v) is not list:##                v = [v,]##        else:##            raise KeyError(##'ERROR: title for namespace %(ns_number)d in language %(language_code)s unknown'##                           % {'ns_number': ns_number,##                              'language_code': code})##        if all:##            namespaces = list(set(v))##            # Lowercase versions of namespaces##            if code not in self.nocapitalize:##                namespaces.extend([ns[0].lower() + ns[1:]##                                   for ns in namespaces##                                   if ns and ns[0].lower() != ns[0].upper()])##            # Underscore versions of namespaces##            namespaces.extend([ns.replace(' ', '_')##                               for ns in namespaces if ns and ' ' in ns])##            return tuple(namespaces)##        else:##            return v[0]####    def isDefinedNS(self, ns_number):##        """Return True if the namespace has been defined in this family."""##        ##        return self.namespaces.has_key(ns_number)####    def isNsI18N(self, ns_number, code):##        """Return True if the namespace has been internationalized.####        (it has a custom entry for a given language)####        """##        return self.namespaces[ns_number].has_key(code)####    def isDefinedNSLanguage(self, ns_number, code, fallback='_default'):##        """Return True if the namespace has been defined in this family##        for this language or its fallback.##        """##        if not self.isDefinedNS(ns_number):##            return False##        elif self.isNsI18N(ns_number, code):##            return True##        elif fallback and self.isNsI18N(ns_number, fallback):##            return True##        else:##            return False####    def normalizeNamespace(self, code, value):##        """Given a value, attempt to match it with all available namespaces,##        with default and localized versions. Sites may have more than one##        way to write the same namespace - choose the first one in the list.##        If nothing can be normalized, return the original value.##        """##        for ns, items in self.namespaces.iteritems():##            if items.has_key(code):##                v = items[code]##            elif items.has_key('_default'):##                v = items['_default']##            else:##                continue##            if type(v) is list:##                if value in v: return v[0]##            else:##                if value == v: return v##            try:##                if value == self.namespace('_default', ns):##                    return self.namespace(code, ns)##            except KeyError:##                pass##        return value####    def getNamespaceIndex(self, lang, namespace):##        """Given a namespace, attempt to match it with all available##        namespaces. Sites may have more than one way to write the same##        namespace - choose the first one in the list. Returns namespace##        index or None.##        """##        namespace = namespace.lower()##        for n in self.namespaces.keys():##            try:##                nslist = self.namespaces[n][lang]##                if type(nslist) != type([]):##                    nslist = [nslist]##                for ns in nslist:##                    if ns.lower() == namespace:##                        return n##            except (KeyError,AttributeError):##                # The namespace has no localized name defined##                pass##        if lang != '_default':##            # This is not a localized namespace. Try if it##            # is a default (English) namespace.##            return self.getNamespaceIndex('_default', namespace)##        else:##            # give up##            return None##    def category_redirects(self, code, fallback="_default"):
+        if code in self.category_redirect_templates:
+            return self.category_redirect_templates[code]
+        elif fallback:
+            return self.category_redirect_templates[fallback]
+        else:
+            raise KeyError(
+"ERROR: title for category redirect template in language '%s' unknown"
+                % code)
+
     def disambig(self, code, fallback = '_default'):
         if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]
@@ -789,6 +687,7 @@ class Family:
         'ka': [u'გადამისამართება'],
         'kk': [u'айдау'],
         'ko': [u'넘겨주기'],
+        'li': [u'DOORVERWIJZING'],
         'mk': [u'пренасочување', u'види'],
         'ml': [u'തിരിച്ചുവിടുക', u'തിരിച്ചുവിടല്‍'],
         'mr': [u'पुनर्निर्देशन'],
@@ -799,7 +698,7 @@ class Family:
         'nl': [u'DOORVERWIJZING'],
         'nn': [u'omdiriger'],
         'oc': [u'REDIRECCION'],
-        'pl': [u'TAM', u'PRZEKIERUJ'],
+        'pl': [u'REDIRECT', u'TAM', u'PRZEKIERUJ'],
         'ru': [u'REDIRECT',             # localised version is not
                u'перенаправление',      # so usual, so put the default
                u'перенапр'],            # one as the most used.
@@ -809,7 +708,7 @@ class Family:
         'sv': [u'OMDIRIGERING'],
         'tt': [u'yünältü'],
         'uk': [u'ПЕРЕНАПРАВЛЕННЯ', u'ПЕРЕНАПР'],
-        'vi': [u'đổi'],
+        'vi': [u'đổi', u'đổi'],
         'yi': [u'ווייטערפירן']
     }
 
