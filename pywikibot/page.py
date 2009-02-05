@@ -408,6 +408,29 @@ class Page(object):
         """Return True if this is a redirect, False if not or not existing."""
         return self.site().page_isredirect(self)
 
+    def isCategoryRedirect(self):
+        """Return True if this is a category redirect page, False otherwise."""
+
+        if not self.isCategory():
+            return False
+        if not hasattr(self, "_catredirect"):
+            catredirs = self.site().category_redirects()
+            for (template, args) in self.templatesWithParams():
+                if template.title(withNamespace=False) in catredirs:
+                    # Get target (first template argument)
+                    self._catredirect = self.site().namespace(14) \
+                                         + ":" + args[0]
+                    break
+            else:
+                self._catredirect = False
+        return bool(self._catredirect)
+
+    def getCategoryRedirectTarget(self):
+        """If this is a category redirect, return the target category title."""
+        if self.isCategoryRedirect():
+            return Category(self.site(), self._catredirect)
+        raise pywikibot.ErrorIsNotRedirectPage
+
     def isEmpty(self):
         """Return True if the page text has less than 4 characters.
 
@@ -793,7 +816,8 @@ class Page(object):
             for name in named:
                 positional.append("%s=%s" % (name, named[name]))
             result.append((pywikibot.Page(
-                             pywikibot.Link(template[0], self.site())),
+                             pywikibot.Link(template[0], self.site(),
+                                            defaultNamespace=10)),
                            positional))
         return result
 
@@ -1305,7 +1329,7 @@ class Category(Page):
         """All parameters are the same as for Page() constructor.
 
         """
-        Page.__init__(self, source, title, 14)
+        Page.__init__(self, source, title, ns=14)
         if self.namespace() != 14:
             raise ValueError(u"'%s' is not in the category namespace!"
                              % title)
