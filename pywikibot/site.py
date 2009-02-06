@@ -1809,8 +1809,13 @@ class APISite(BaseSite):
         elif namespaces is not None:
             rcgen.request["rcnamespace"] = str(namespaces)
         if pagelist:
-            rcgen.request["rctitles"] = u"|".join(p.title(withSection=False)
-                                                 for p in pagelist)
+            if self.versionnumber() > 14:
+                pywikibot.output(
+                    u"recentchanges: pagelist option is disabled",
+                    level=pywikibot.ERROR)
+            else:
+                rcgen.request["rctitles"] = u"|".join(p.title(withSection=False)
+                                                      for p in pagelist)
         if changetype:
             rcgen.request["rctype"] = changetype
         filters = {'minor': showMinor,
