@@ -1518,6 +1518,26 @@ class Category(Page):
         return sorted(list(set(self.categories())))
 
 
+msg_created_for_renaming = {
+    'ar':u'روبوت: نقل من %s. المؤلفون: %s',
+    'de':u'Bot: Verschoben von %s. Autoren: %s',
+    'en':u'Robot: Moved from %s. Authors: %s',
+    'fi':u'Botti siirsi luokan %s. Muokkaajat: %s',
+    'fr':u'Robot : déplacé depuis %s. Auteurs: %s',
+    'he':u'בוט: הועבר מהשם %s. כותבים: %s',
+    'ia':u'Robot: Transferite de %s. Autores: %s',
+    'id':u'Bot: Memindahkan dari %s. Kontributor: %s',
+    'it':u'Bot: Voce spostata da %s. Autori: %s',
+    'ja': u'ロボットによる: %s から移動しました。原作者は %s',
+    'ksh':u'Bot: hääjeholldt von %s. Schriiver: %s',
+    'nds':u'Kat-Bot: herschaven von %s. Schriever: %s',
+    'nl':u'Bot: hernoemd van %s. Auteurs: %s',
+    'pl':u'Robot przenosi z %s. Autorzy: %s',
+    'pt':u'Bot: Movido de %s. Autor: %s',
+    'zh':u'機器人: 已從 %s 移動。原作者是 %s',
+    }
+
+
 class Revision(object):
     """A structure holding information about a single revision of a Page."""
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
