@@ -429,7 +429,7 @@ class Page(object):
         """If this is a category redirect, return the target category title."""
         if self.isCategoryRedirect():
             return Category(self.site(), self._catredirect)
-        raise pywikibot.IsNotRedirectPage
+        raise pywikibot.IsNotRedirectPage(self.title())
 
     def isEmpty(self):
         """Return True if the page text has less than 4 characters.
@@ -848,7 +848,7 @@ class Page(object):
 
         """
         if not self.isRedirectPage():
-            raise pywikibot.IsNotRedirectPage
+            raise pywikibot.IsNotRedirectPage(self.title())
         if not isinstance(self._redir, Page):
             self.site().getredirtarget(self)
         return self._redir
