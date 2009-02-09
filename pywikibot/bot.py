@@ -239,11 +239,12 @@ def handleArgs(*args):
         moduleName = "terminal-interface"
     nonGlobalArgs = []
     username = None
+    do_help = False
     for arg in args:
         arg = _decodeArg(arg)
         if arg == '-help':
-            showHelp()
-            sys.exit(0)
+            do_help = True
+            break
         elif arg.startswith('-family:'):
             config.family = arg[len("-family:") : ]
         elif arg.startswith('-lang:'):
@@ -367,6 +368,9 @@ def handleArgs(*args):
         pywikibot.output(u'Pywikipediabot r%s' % m.group(1))
         pywikibot.output(u'Python %s' % sys.version)
 
+    if do_help:
+        showHelp()
+        sys.exit(0)
     pywikibot.output("handleArgs() completed.", level=DEBUG)
     return nonGlobalArgs
 
@@ -374,6 +378,12 @@ def handleArgs(*args):
 def showHelp(name=""):
     # argument, if given, is ignored
     modname = calledModuleName()
+    if not modname:
+        try:
+            modname = sys.modules['__main__'].main.__module__
+        except NameError:
+            modname = "no_module"
+
     globalHelp =u'''\
 Global arguments available for all bots:
 
@@ -418,7 +428,7 @@ Global arguments available for all bots:
             for key, value in module.docuReplacements.iteritems():
                 helpText = helpText.replace(key, value.strip('\n\r'))
         pywikibot.output(helpText)
-    except:
+    except Exception:
         if modname:
             pywikibot.output(u'Sorry, no help available for %s' % modname)
         logging.exception('showHelp:')
