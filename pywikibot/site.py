@@ -2194,6 +2194,8 @@ redirects on %(site)s wiki""",
 
                 if err.code == "editconflict":
                     raise EditConflict(self._ep_errors[err.code] % errdata)
+                if err.code == "protectedpage":
+                    raise LockedPage(errdata['title'])
                 if err.code in self._ep_errors:
                     raise Error(self._ep_errors[err.code] % errdata)
                 logger.debug("editpage: Unexpected error code '%s' received."

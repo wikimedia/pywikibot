@@ -673,16 +673,25 @@ class Page(object):
 
     def _save(self, comment, minor, watch, unwatch, callback):
         err = None
+        link = self.title(asLink=True)
         try:
             done = self.site().editpage(self, summary=comment, minor=minor,
                                         watch=watch, unwatch=unwatch)
             if not done:
-                pywikibot.output("Page %s not saved" % self.title(asLink=True),
+                pywikibot.output(u"Page %s not saved" % link,
                                  level=pywikibot.WARNING)
+                raise pywikibot.PageNotSaved(link)
             else:
-                pywikibot.output("Page %s saved" % self.title(asLink=True))
+                pywikibot.output(u"Page %s saved" % link)
+        except pywikibot.LockedPage, err:
+            # re-raise the LockedPage exception so that calling program
+            # can re-try if appropriate
+            if not callback:
+                raise
+        # TODO: other "expected" error types to catch?
         except pywikibot.Error, err:
-            logger.exception("Error saving page %s\n" % self.title(asLink=True))
+            logger.exception(u"Error saving page %s\n" % link)
+            pywikibot.output(u"")
         if callback:
             callback(self, err)
 
