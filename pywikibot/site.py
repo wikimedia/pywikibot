@@ -1052,7 +1052,7 @@ class APISite(BaseSite):
                      % (page.title(withSection=False, asLink=True),
                         item['title']))
             api.update_page(page, item)
-            pywikibot.output(str(item), level=pywikibot.DEBUG)
+            logger.debug(str(item))
             return item[tokentype + "token"]
 
     # following group of methods map more-or-less directly to API queries
