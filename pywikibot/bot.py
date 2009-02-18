@@ -270,7 +270,14 @@ def handleArgs(*args):
         elif arg == "-debug":
             if moduleName not in config.log:
                 config.log.append(moduleName)
-            config.debug_log = True
+            if "" not in config.debug_log:
+                config.debug_log.append("")
+        elif arg.startswith("-debug:"):
+            if moduleName not in config.log:
+                config.log.append(moduleName)
+            component = arg[len("-debug:") : ]
+            if component not in config.debug_log:
+                config.debug_log.append(component)
         elif arg == '-verbose' or arg == "-v":
             config.verbose_output += 1
         elif arg == '-daemonize':
@@ -316,7 +323,7 @@ def handleArgs(*args):
 
     root_logger = logging.getLogger()
     root_logger.handlers = [] # get rid of default handler
-    root_logger.setLevel(DEBUG) # all records go to logger
+    root_logger.setLevel(VERBOSE) # all records except DEBUG go to logger
 
     # configure default handler for VERBOSE and INFO levels
     default_handler = TerminalHandler(strm=sys.stderr)
@@ -336,10 +343,8 @@ def handleArgs(*args):
             logfile = config.datafilepath("%s-bot.log" % moduleName)
         file_handler = logging.handlers.RotatingFileHandler(
                             filename=logfile, maxBytes=2 << 20, backupCount=5)
-        if config.debug_log:
-            file_handler.setLevel(DEBUG)
-        else:
-            file_handler.setLevel(VERBOSE)
+        
+        file_handler.setLevel(DEBUG)
         form = logging.Formatter(
                    fmt="%(asctime)s %(filename)18s, %(lineno)d: "
                        "%(levelname)-8s %(message)s",
@@ -347,6 +352,10 @@ def handleArgs(*args):
                )
         file_handler.setFormatter(form)
         root_logger.addHandler(file_handler)
+        for component in config.debug_log:
+            debuglogger = logging.getLogger(component)
+            debuglogger.setLevel(DEBUG)
+            debuglogger.addHandler(file_handler)
 
     # handler for level STDOUT
     output_handler = TerminalHandler(strm=sys.stdout)
@@ -413,13 +422,16 @@ Global arguments available for all bots:
 
 -nolog            Disable the logfile (if it is enabled by default).
 
--debug            Enable the logfile and include extensive debugging data.
+-debug:item       Enable the logfile and include extensive debugging data
+-debug            for component "item" (or all components if the second form
+                  is used).
 
 -putthrottle:n    Set the minimum time (in seconds) the bot will wait between
 -pt:n             saving pages.
 
--verbose          Have the bot provide additional output that may be useful in
--v                debugging.
+-verbose          Have the bot provide additional console output that may be
+-v                useful in debugging.
+
 ''' % modname
     try:
         exec('import %s as module' % modname)

@@ -226,7 +226,7 @@ logfilename = None
 verbose_output = 0
 # if True, include a lot of debugging info in logfile
 # (overrides log setting above)
-debug_log = False
+debug_log = []
 
 ############## INTERWIKI SETTINGS ##############
 
