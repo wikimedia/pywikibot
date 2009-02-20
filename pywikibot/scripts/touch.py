@@ -79,6 +79,7 @@ def main(*args):
             gen = iter([page])
         else:
             pywikibot.showHelp()
+            return
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
     bot = TouchBot(preloadingGen, redirs)
     bot.run()
