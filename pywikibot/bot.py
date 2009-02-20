@@ -130,6 +130,11 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
         implemented)
 
     """
+    # make sure logging system has been initialized
+    root = pywikibot.logging.getLogger()
+    if root.level == 30: # init_handlers sets this level
+        init_handlers()
+
     if decoder:
         text = unicode(text, decoder)
     elif type(text) is not unicode:
@@ -184,6 +189,89 @@ def inputChoice(question, answers, hotkeys, default=None):
     """
     data = ui.inputChoice(question, answers, hotkeys, default).lower()
     return data
+
+
+def init_handlers():
+    """Initialize logging system for terminal-based bots"""
+
+    # All user output is routed through the logging module.
+    # Each type of output is handled by an appropriate handler object.
+    # This structure is used to permit eventual development of other
+    # user interfaces (GUIs) without modifying the core bot code.
+    # The following output levels are defined:
+    #    DEBUG - only for file logging; debugging messages
+    #    STDOUT - output that must be sent to sys.stdout (for bots that may
+    #             have their output redirected to a file or other destination)
+    #    VERBOSE - optional progress information for display to user
+    #    INFO - normal (non-optional) progress information for display to user
+    #    INPUT - prompts requiring user response
+    #    WARN - user warning messages
+    #    ERROR - user error messages
+    #    CRITICAL - fatal error messages
+    # Accordingly, do ''not'' use print statements in bot code; instead,
+    # use pywikibot.output function.
+
+    moduleName = calledModuleName()
+    if not moduleName:
+        moduleName = "terminal-interface"
+
+    logging.addLevelName(VERBOSE, "VERBOSE")
+        # for messages to be displayed on terminal at "verbose" setting
+        # use INFO for messages to be displayed even on non-verbose setting
+    logging.addLevelName(STDOUT, "STDOUT")
+        # for messages to be displayed to stdout
+    logging.addLevelName(INPUT, "INPUT")
+        # for prompts requiring user response
+
+    root_logger = logging.getLogger()
+    root_logger.handlers = [] # get rid of default handler
+    root_logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
+
+    # configure default handler for VERBOSE and INFO levels
+    default_handler = TerminalHandler(strm=sys.stderr)
+    if config.verbose_output:
+        default_handler.setLevel(VERBOSE)
+    else:
+        default_handler.setLevel(INFO)
+    default_handler.addFilter(MaxLevelFilter(INPUT))
+    default_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
+    root_logger.addHandler(default_handler)
+
+    # if user has enabled file logging, configure file handler
+    if moduleName in config.log or '*' in config.log:
+        if config.logfilename:
+            logfile = config.datafilepath(config.logfilename)
+        else:
+            logfile = config.datafilepath("%s-bot.log" % moduleName)
+        file_handler = logging.handlers.RotatingFileHandler(
+                            filename=logfile, maxBytes=2 << 20, backupCount=5)
+        
+        file_handler.setLevel(DEBUG)
+        form = logging.Formatter(
+                   fmt="%(asctime)s %(filename)18s, %(lineno)d: "
+                       "%(levelname)-8s %(message)s",
+                   datefmt="%Y-%m-%d %H:%M:%S"
+               )
+        file_handler.setFormatter(form)
+        root_logger.addHandler(file_handler)
+        for component in config.debug_log:
+            debuglogger = logging.getLogger(component)
+            debuglogger.setLevel(DEBUG)
+            debuglogger.addHandler(file_handler)
+
+    # handler for level STDOUT
+    output_handler = TerminalHandler(strm=sys.stdout)
+    output_handler.setLevel(STDOUT)
+    output_handler.addFilter(MaxLevelFilter(STDOUT))
+    output_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
+    root_logger.addHandler(output_handler)
+
+    # handler for levels WARNING and higher
+    warning_handler = TerminalHandler(strm=sys.stderr)
+    warning_handler.setLevel(logging.WARNING)
+    warning_handler.setFormatter(
+            logging.Formatter(fmt="%(levelname)s: %(message)s"))
+    root_logger.addHandler(warning_handler)
 
 
 # Command line parsing and help
@@ -294,82 +382,7 @@ def handleArgs(*args):
     if username:
         config.usernames[config.family][config.mylang] = username
 
-    # initialize logging system for terminal-based bots
-
-    # All user output is routed through the logging module.
-    # Each type of output is handled by an appropriate handler object.
-    # This structure is used to permit eventual development of other
-    # user interfaces (GUIs) without modifying the core bot code.
-    # The following output levels are defined:
-    #    DEBUG - only for file logging; debugging messages
-    #    STDOUT - output that must be sent to sys.stdout (for bots that may
-    #             have their output redirected to a file or other destination)
-    #    VERBOSE - optional progress information for display to user
-    #    INFO - normal (non-optional) progress information for display to user
-    #    INPUT - prompts requiring user response
-    #    WARN - user warning messages
-    #    ERROR - user error messages
-    #    CRITICAL - fatal error messages
-    # Accordingly, do ''not'' use print statements in bot code; instead,
-    # use pywikibot.output function.
-
-    logging.addLevelName(VERBOSE, "VERBOSE")
-        # for messages to be displayed on terminal at "verbose" setting
-        # use INFO for messages to be displayed even on non-verbose setting
-    logging.addLevelName(STDOUT, "STDOUT")
-        # for messages to be displayed to stdout
-    logging.addLevelName(INPUT, "INPUT")
-        # for prompts requiring user response
-
-    root_logger = logging.getLogger()
-    root_logger.handlers = [] # get rid of default handler
-    root_logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
-
-    # configure default handler for VERBOSE and INFO levels
-    default_handler = TerminalHandler(strm=sys.stderr)
-    if config.verbose_output:
-        default_handler.setLevel(VERBOSE)
-    else:
-        default_handler.setLevel(INFO)
-    default_handler.addFilter(MaxLevelFilter(INPUT))
-    default_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
-    root_logger.addHandler(default_handler)
-
-    # if user has enabled file logging, configure file handler
-    if moduleName in config.log or '*' in config.log:
-        if config.logfilename:
-            logfile = config.datafilepath(config.logfilename)
-        else:
-            logfile = config.datafilepath("%s-bot.log" % moduleName)
-        file_handler = logging.handlers.RotatingFileHandler(
-                            filename=logfile, maxBytes=2 << 20, backupCount=5)
-        
-        file_handler.setLevel(DEBUG)
-        form = logging.Formatter(
-                   fmt="%(asctime)s %(filename)18s, %(lineno)d: "
-                       "%(levelname)-8s %(message)s",
-                   datefmt="%Y-%m-%d %H:%M:%S"
-               )
-        file_handler.setFormatter(form)
-        root_logger.addHandler(file_handler)
-        for component in config.debug_log:
-            debuglogger = logging.getLogger(component)
-            debuglogger.setLevel(DEBUG)
-            debuglogger.addHandler(file_handler)
-
-    # handler for level STDOUT
-    output_handler = TerminalHandler(strm=sys.stdout)
-    output_handler.setLevel(STDOUT)
-    output_handler.addFilter(MaxLevelFilter(STDOUT))
-    output_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
-    root_logger.addHandler(output_handler)
-
-    # handler for levels WARNING and higher
-    warning_handler = TerminalHandler(strm=sys.stderr)
-    warning_handler.setLevel(logging.WARNING)
-    warning_handler.setFormatter(
-            logging.Formatter(fmt="%(levelname)s: %(message)s"))
-    root_logger.addHandler(warning_handler)
+    init_handlers()
 
     if config.verbose_output:
         import re
