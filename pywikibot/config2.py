@@ -9,6 +9,9 @@ __version__ = '$Id$'
 import os, re
 import sys as __sys
 
+import logging
+logger = logging.getLogger("wiki.config2")
+
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
 # a file user-config.py, and overwrite values in there.
