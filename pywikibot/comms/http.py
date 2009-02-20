@@ -104,8 +104,8 @@ def request(site, uri, *args, **kwargs):
         raise request.data
 
     if request.data[0].status != 200:
-        pywikibot.output("Http response status %(status)s"
-                         % {'status': request.data[0].status},
+        pywikibot.output(u"Http response status %(status)s"
+                          % {'status': request.data[0].status},
                          level=pywikibot.WARNING)
 
     return request.data[1]    

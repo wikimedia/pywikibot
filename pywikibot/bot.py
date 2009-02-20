@@ -22,6 +22,7 @@ from pywikibot import config
 
 
 # logging levels
+logger = logging.getLogger("bot")
 
 from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 STDOUT = 16
@@ -244,7 +245,6 @@ def handleArgs(*args):
         arg = _decodeArg(arg)
         if arg == '-help':
             do_help = True
-            break
         elif arg.startswith('-family:'):
             config.family = arg[len("-family:") : ]
         elif arg.startswith('-lang:'):
@@ -323,7 +323,7 @@ def handleArgs(*args):
 
     root_logger = logging.getLogger()
     root_logger.handlers = [] # get rid of default handler
-    root_logger.setLevel(VERBOSE) # all records except DEBUG go to logger
+    root_logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
 
     # configure default handler for VERBOSE and INFO levels
     default_handler = TerminalHandler(strm=sys.stderr)
@@ -361,6 +361,7 @@ def handleArgs(*args):
     output_handler = TerminalHandler(strm=sys.stdout)
     output_handler.setLevel(STDOUT)
     output_handler.addFilter(MaxLevelFilter(STDOUT))
+    output_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
     root_logger.addHandler(output_handler)
 
     # handler for levels WARNING and higher
@@ -380,7 +381,7 @@ def handleArgs(*args):
     if do_help:
         showHelp()
         sys.exit(0)
-    pywikibot.output("handleArgs() completed.", level=DEBUG)
+    logger.debug(u"handleArgs() completed.")
     return nonGlobalArgs
 
 
@@ -439,9 +440,10 @@ Global arguments available for all bots:
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.iteritems():
                 helpText = helpText.replace(key, value.strip('\n\r'))
-        pywikibot.output(helpText)
+        pywikibot.output(helpText, level=pywikibot.STDOUT) # output to STDOUT
     except Exception:
         if modname:
-            pywikibot.output(u'Sorry, no help available for %s' % modname)
+            pywikibot.output(u'Sorry, no help available for %s' % modname,
+                             level=pywikibot.STDOUT)
         logging.exception('showHelp:')
-    pywikibot.output(globalHelp)
+    pywikibot.output(globalHelp, level=pywikibot.STDOUT)

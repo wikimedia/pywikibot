@@ -109,7 +109,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         the policy on the respective wiki.
         
         """
-        return True # DEBUG
+#        return True # DEBUG
         if self.site.family.name in botList \
                 and self.site.code in botList[self.site.family.name]:
             botListPageTitle = botList[self.site.family.name][self.site.code]
@@ -194,7 +194,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         try:
             cookiedata = self.getCookie()
         except pywikibot.data.api.APIError, e:
-            pywikibot.output("Login failed (%s)." % e.code,
+            pywikibot.output(u"Login failed (%s)." % e.code,
                              level=pywikibot.ERROR)
             if retry:
                 self.password = None
@@ -219,12 +219,12 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
     def showCaptchaWindow(self, url):
         pass
 
-def main():
+def main(*args):
     username = password = None
     sysop = False
     logall = False
     forceLogin = False
-    for arg in pywikibot.handleArgs(): 
+    for arg in pywikibot.handleArgs(*args): 
         if arg.startswith("-pass"):
             if len(arg) == 5:
                 password = pywikibot.input(u'Password for all accounts:',

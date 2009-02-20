@@ -196,7 +196,7 @@ class Request(DictMixin):
             except Exception, e: #TODO: what exceptions can occur here?
                 pywikibot.output(traceback.format_exc(),
                                  level=pywikibot.ERROR)
-                pywikibot.output("%s, %s" % (uri, params),
+                pywikibot.output(u"%s, %s" % (uri, params),
                                  level=pywikibot.VERBOSE)
                 self.wait()
                 continue
@@ -248,7 +248,8 @@ class Request(DictMixin):
                 lag = lagpattern.search(info)
                 if lag:
                     pywikibot.output(
-                        "Pausing due to database lag: " + info)
+                        u"Pausing due to database lag: " + info,
+                        level=pywikibot.VERBOSE)
                     self.site.throttle.lag(int(lag.group("lag")))
                     continue
             if code in (u'internal_api_error_DBConnectionError', ):
@@ -633,7 +634,7 @@ if __name__ == "__main__":
     from pywikibot import Site
     logger.setLevel(pywikibot.logging.DEBUG)
     mysite = Site("en", "wikipedia")
-    pywikibot.output("starting test....")
+    pywikibot.output(u"starting test....")
     def _test():
         import doctest
         doctest.testmod()

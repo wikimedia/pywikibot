@@ -92,8 +92,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     key = '%s:%s:%s' % (fam, code, user)
     if not key in _sites:
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
-        pywikibot.output("Instantiating Site object '%(site)s'"
-                         % {'site': _sites[key]}, level=DEBUG)
+        logging.debug(u"Instantiating Site object '%(site)s'"
+                       % {'site': _sites[key]})
     return _sites[key]
 
 getSite = Site # alias for backwards-compability
@@ -210,11 +210,11 @@ def stopme():
     logger = logging.getLogger("wiki")
 
     if not stopped:
-        pywikibot.output("stopme() called", level=DEBUG)
+        logging.debug("stopme() called")
         count = sum(1 for thd in threadpool if thd.isAlive())
         if count:
-            pywikibot.output("Waiting for about %(count)s pages to be saved."
-                             % locals())
+            pywikibot.output(u"Waiting for about %(count)s pages to be saved."
+                              % locals())
             for thd in threadpool:
                 if thd.isAlive():
                     thd.join()
@@ -222,7 +222,7 @@ def stopme():
     # only need one drop() call because all throttles use the same global pid
     try:
         _sites[_sites.keys()[0]].throttle.drop()
-        pywikibot.output("Dropped throttle(s).", level=VERBOSE)
+        pywikibot.output(u"Dropped throttle(s).", level=VERBOSE)
     except IndexError:
         pass
 
