@@ -2452,7 +2452,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 
     # TODO: implement patrol
 
-    def linksearch(self, siteurl, limit=500):
+    def linksearch(self, siteurl, limit=None):
         """Backwards-compatible interface to exturlusage()"""
         return self.exturlusage(siteurl, limit=limit)
 
