@@ -22,7 +22,7 @@ fixes = {
         'regex': True,
         'msg': {
             'ar':u'روبوت: تحويل/تصليح HTML',
-            'en':u'Robot: converting/fixing HTML',
+            'en':u'Robot: Converting/fixing HTML',
             'de':u'Bot: konvertiere/korrigiere HTML',
             'fr':u'Robot: convertit/fixe HTML',
             'he':u'בוט: ממיר/מתקן HTML',
@@ -388,12 +388,12 @@ fixes = {
             (r'ISBN: (\d+)', r'ISBN \1'),
             # superfluous word "number"
             (r'ISBN( number| no\.?| No\.?|-Nummer|-Nr\.):? (\d+)', r'ISBN \2'),
-            # Spaces, dashes, or dots instead of hyphens as separators,
-            # or spaces between digits and separators.
+            # Space, minus, dot,  hypen, en dash, em dash, etc. instead of
+            # hyphen-minus as separator, or spaces between digits and separators.
             # Note that these regular expressions also match valid ISBNs, but
             # these won't be changed.
-            (r'ISBN (978|979) *[\- –\.] *(\d+) *[\- –\.] *(\d+) *[\- –\.] *(\d+) *[\- –\.] *(\d)(?!\d)', r'ISBN \1-\2-\3-\4-\5'), # ISBN-13
-            (r'ISBN (\d+) *[\- –\.] *(\d+) *[\- –\.] *(\d+) *[\- –\.] *(\d|X|x)(?!\d)', r'ISBN \1-\2-\3-\4'), # ISBN-10
+            (ur'ISBN (978|979) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d)(?!\d)', r'ISBN \1-\2-\3-\4-\5'), # ISBN-13
+            (ur'ISBN (\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d|X|x)(?!\d)', r'ISBN \1-\2-\3-\4'), # ISBN-10
             # missing space before ISBN-10 or before ISBN-13,
             # or non-breaking space.
             (r'ISBN(|&nbsp;| )((\d(-?)){12}\d|(\d(-?)){9}[\dXx])', r'ISBN \2'),
@@ -537,6 +537,62 @@ fixes = {
             (u'Special:Userlogin',       u'Special:UserLogin'),
             (u'Special:Userlogout',      u'Special:UserLogout'),
             (u'Special:Whatlinkshere',   u'Special:WhatLinksHere'),
+        ],
+    },
+    # yu top-level domain will soon be disabled,
+    # see http://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
+    # The following are domains that are often-used.
+    'yu-tld': {
+        'regex': False,
+        'nocase': True,
+        'msg': {
+            'de': u'Bot: Ersetze Links auf .yu-Domains',
+            'en': u'Robot: Replacing links to .yu domains',
+            'fr': u'Robot: Correction des liens pointant vers le domaine .yu, qui expire en 2009',
+         },
+         'replacements': [
+            (u'www.budva.cg.yu',             u'www.budva.rs'),
+            (u'spc.org.yu',                  u'spc.rs'),
+            (u'www.oks.org.yu',              u'www.oks.org.rs'),
+            (u'www.kikinda.org.yu',          u'www.kikinda.rs'),
+            (u'www.ds.org.yu',               u'www.ds.org.rs'),
+            (u'www.nbs.yu',                  u'www.nbs.rs'),
+            (u'www.serbia.sr.gov.yu',        u'www.srbija.gov.rs'),
+            (u'eunet.yu',                    u'eunet.rs'),
+            (u'www.zastava-arms.co.yu',      u'www.zastava-arms.co.rs'),
+            (u'www.airportnis.co.yu',        u'www.airportnis.rs'),
+            # (u'www.danas.co.yu',             u'www.danas.rs'), # Archive links don't seem to work
+            (u'www.belex.co.yu',             u'www.belex.rs'),
+            (u'beograd.org.yu',              u'beograd.rs'),
+            (u'www.vlada.cg.yu',             u'www.vlada.me'),
+            (u'webrzs.statserb.sr.gov.yu',   u'webrzs.stat.gov.rs'),
+            (u'www.statserb.sr.gov.yu',      u'webrzs.stat.gov.rs'),
+            (u'www.rastko.org.yu',           u'www.rastko.org.rs'),
+            (u'www.reprezentacija.co.yu',    u'www.reprezentacija.rs'),
+            (u'www.blic.co.yu',              u'www.blic.co.rs'),
+            (u'www.beograd.org.yu',          u'www.beograd.org.rs'),
+            (u'arhiva.glas-javnosti.co.yu',  u'arhiva.glas-javnosti.rs'),
+            (u'www.srpsko-nasledje.co.yu',   u'www.srpsko-nasledje.co.rs'),
+            (u'www.dnevnik.co.yu',           u'www.dnevnik.rs'),
+            (u'www.srbija.sr.gov.yu',        u'www.srbija.gov.rs'),
+            (u'www.kurir-info.co.yu/Arhiva', u'arhiva.kurir-info.rs/Arhiva'),
+            (u'www.kurir-info.co.yu/arhiva', u'arhiva.kurir-info.rs/arhiva'),
+            (u'www.kurir-info.co.yu',        u'www.kurir-info.rs'),
+            (u'arhiva.kurir-info.co.yu',     u'arhiva.kurir-info.rs'),
+            (u'www.prvaliga.co.yu',          u'www.prvaliga.rs'),
+            (u'www.mitropolija.cg.yu',       u'www.mitropolija.me'),
+            (u'www.spc.yu/sr',               u'www.spc.rs/sr'),
+            (u'www.sk.co.yu',                u'www.sk.co.rs'),
+            (u'www.ekoforum.org.yu',         u'www.ekoforum.org'),
+            (u'www.svevlad.org.yu',          u'www.svevlad.org.rs'),
+            (u'www.posta.co.yu',             u'www.posta.rs'),
+            (u'www.glas-javnosti.co.yu',     u'www.glas-javnosti.rs'),
+            (u'www.fscg.cg.yu',              u'www.fscg.co.me'),
+            (u'ww1.rts.co.yu/euro',          u'ww1.rts.co.rs/euro'),
+            (u'www.rtv.co.yu',               u'www.rtv.rs'),
+            (u'www.politika.co.yu',          u'www.politika.rs'),
+            (u'www.mfa.gov.yu',              u'www.mfa.gov.rs'),
+            (u'www.drzavnauprava.sr.gov.yu', u'www.drzavnauprava.gov.rs'),
         ],
     },
 }
