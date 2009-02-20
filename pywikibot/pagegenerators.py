@@ -939,9 +939,8 @@ if __name__ == "__main__":
         gen = None
         genFactory = GeneratorFactory()
         for arg in pywikibot.handleArgs():
-            generator = genFactory.handleArg(arg)
-            if generator:
-                gen = generator
+            genFactory.handleArg(arg)
+        gen = genFactory.getCombinedGenerator()
         if gen:
             for page in gen:
                 pywikibot.output(page.title(), toStdout = True)
