@@ -8,9 +8,7 @@ __version__ = '$Id$'
 
 import os, re
 import sys as __sys
-
-import logging
-logger = logging.getLogger("wiki.config2")
+import pywikibot
 
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
@@ -506,9 +504,9 @@ for _key in globals().keys():
             print "         %(was)s: %(new)s" % {'now': "Now", 'new': nt}
         del nt,ot
     else:
-        logger.warn(
-    "Configuration variable %(_key)r is defined but unknown. Misspelled?\n"
-            % locals())
+        print \
+            "Configuration variable %(_key)r is defined but unknown."\
+            " Misspelled?" % locals()
 
 # Fix up default console_encoding
 if console_encoding == None:
