@@ -200,9 +200,9 @@ class Request(DictMixin):
                                  level=pywikibot.VERBOSE)
                 self.wait()
                 continue
-            logger.debug(u"API response received:\n%s" % rawdata)
             if not isinstance(rawdata, unicode):
                 rawdata = rawdata.decode(self.site.encoding())
+            logger.debug(u"API response received:\n" + rawdata)
             if rawdata.startswith(u"unknown_action"):
                 raise APIError(rawdata[:14], rawdata[16:])
             try:
