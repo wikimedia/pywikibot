@@ -318,7 +318,7 @@ class QueryGenerator(object):
             if name not in _modules:
                 self.get_module()
                 break
-        self.set_limit()
+        self.update_limit()
         if self.query_limit is not None and "generator" in kwargs:
             self.prefix = "g" + self.prefix
         self.request = Request(**kwargs)
@@ -346,7 +346,29 @@ class QueryGenerator(object):
                 raise Error("Invalid query module name '%s'." % self.module)
             _modules[paraminfo["name"]] = paraminfo
 
-    def set_limit(self):
+    def set_query_increment(self, value):
+        """Set the maximum number of items to be retrieved per API query.
+
+        If not called, the default is to ask for "max" items and let the
+        API decide how many to send.
+
+        """
+        limit = int(value)
+        # don't update if limit is greater than maximum allowed by API
+        self.update_limit()
+        if self.query_limit is None or limit < self.query_limit:
+            self.query_limit = int(limit)
+
+    def set_query_item_limit(self, value):
+        """Set the maximum number of items to be retrieved from the wiki.
+
+        If not called, most queries will continue as long as there is
+        more data to be retrieved from the API.
+
+        """
+        self.limit = int(value)
+        
+    def update_limit(self):
         """Set query_limit for self.module based on api response"""
 
         self.query_limit = None
@@ -363,6 +385,22 @@ class QueryGenerator(object):
                     logger.debug(u"%s: Set query_limit to %i."
                                   % (self.__class__.__name__,
                                      self.query_limit))
+                    return
+
+    def set_namespace(self, namespaces):
+        """Set a namespace filter on this query.
+
+        @param namespaces: Either an int or a list of ints
+
+        """
+        if isinstance(namespaces, list):
+            namespaces = "|".join(str(n) for n in namespaces)
+        else:
+            namespaces = str(namespaces)
+        for mod in self.module.split('|'):
+            for param in _modules[mod].get("parameters", []):
+                if param["name"] == "namespace":
+                    self.request[self.prefix+"namespace"] = namespaces
                     return
 
     def __iter__(self):

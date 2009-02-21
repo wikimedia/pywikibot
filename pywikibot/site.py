@@ -1073,11 +1073,8 @@ class APISite(BaseSite):
         """
         bltitle = page.title(withSection=False).encode(self.encoding())
         blgen = api.PageGenerator("backlinks", gbltitle=bltitle, site=self)
-        if isinstance(namespaces, list):
-            blgen.request["gblnamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            blgen.request["gblnamespace"] = str(namespaces)
+        if namespaces is not None:
+            blgen.set_namespace(namespaces)
         if filterRedirects is not None:
             blgen.request["gblfilterredir"] = filterRedirects and "redirects"\
                                                               or "nonredirects"
@@ -1114,11 +1111,8 @@ class APISite(BaseSite):
         """
         eititle = page.title(withSection=False).encode(self.encoding())
         eigen = api.PageGenerator("embeddedin", geititle=eititle, site=self)
-        if isinstance(namespaces, list):
-            eigen.request["geinamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            eigen.request["geinamespace"] = str(namespaces)
+        if namespaces is not None:
+            eigen.set_namespace(namespaces)
         if filterRedirects is not None:
             eigen.request["geifilterredir"] = filterRedirects and "redirects"\
                                                               or "nonredirects"
@@ -1162,11 +1156,8 @@ class APISite(BaseSite):
             plgen.request['titles'] = pltitle
         if follow_redirects:
             plgen.request['redirects'] = ''
-        if isinstance(namespaces, list):
-            plgen.request["gplnamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            plgen.request["gplnamespace"] = str(namespaces)
+        if namespaces is not None:
+            plgen.set_namespace(namespaces)
         return plgen
 
     @deprecate_arg("withSortKey", None) # Sortkey doesn't work with generator
@@ -1193,11 +1184,8 @@ class APISite(BaseSite):
 
         tltitle = page.title(withSection=False).encode(self.encoding())
         tlgen = api.PageGenerator("templates", titles=tltitle, site=self)
-        if isinstance(namespaces, list):
-            tlgen.request["gtlnamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            tlgen.request["gtlnamespace"] = str(namespaces)
+        if namespaces is not None:
+            tlgen.set_namespace(namespaces)
         return tlgen
 
     def categorymembers(self, category, namespaces=None, limit=None):
@@ -1221,11 +1209,8 @@ class APISite(BaseSite):
         cmtitle = category.title(withSection=False).encode(self.encoding())
         cmgen = api.PageGenerator("categorymembers", gcmtitle=cmtitle,
                                   gcmprop="ids|title|sortkey", site=self)
-        if isinstance(namespaces, list):
-            cmgen.request["gcmnamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            cmgen.request["gcmnamespace"] = str(namespaces)
+        if namespaces is not None:
+            cmgen.set_namespace(namespaces)
         if isinstance(limit, int):
             cmgen.limit = limit
         return cmgen
@@ -1676,11 +1661,8 @@ class APISite(BaseSite):
         """
         eugen = api.PageGenerator("exturlusage", geuquery=url,
                                   geuprotocol=protocol, site=self)
-        if isinstance(namespaces, list):
-            eugen.request["geunamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            eugen.request["geunamespace"] = str(namespaces)
+        if namespaces is not None:
+            eugen.set_namespace(namespaces)
         if isinstance(limit, int):
             eugen.limit = limit
         return eugen
@@ -1700,11 +1682,8 @@ class APISite(BaseSite):
         """
         iugen = api.PageGenerator("imageusage", site=self,
                                   giutitle=image.title(withSection=False))
-        if isinstance(namespaces, list):
-            iugen.request["giunamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            iugen.request["giunamespace"] = str(namespaces)
+        if namespaces is not None:
+            iugen.set_namespace(namespaces)
         if isinstance(limit, int):
             iugen.limit = limit
         if filterredir is not None:
@@ -1803,11 +1782,8 @@ class APISite(BaseSite):
             rcgen.request["rcdir"] = "newer"
         if isinstance(limit, int):
             rcgen.limit = limit
-        if isinstance(namespaces, list):
-            rcgen.request["rcnamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            rcgen.request["rcnamespace"] = str(namespaces)
+        if namespaces is not None:
+            rcgen.set_namespace(namespaces)
         if pagelist:
             if self.versionnumber() > 14:
                 pywikibot.output(
@@ -1859,11 +1835,8 @@ class APISite(BaseSite):
             pywikibot.output(u"search: namespaces cannot be empty; using [0].",
                              level=pywikibot.WARNING)
             namespaces = [0]
-        if isinstance(namespaces, list):
-            srgen.request["gsrnamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        else:
-            srgen.request["gsrnamespace"] = str(namespaces)
+        if namespaces is not None:
+            srgen.set_namespace(namespaces)
         if getredirects:
             srgen.request["gsrredirects"] = ""
         if isinstance(limit, int):
@@ -1916,11 +1889,8 @@ class APISite(BaseSite):
             ucgen.request["ucdir"] = "newer"
         if isinstance(limit, int):
             ucgen.limit = limit
-        if isinstance(namespaces, list):
-            ucgen.request["ucnamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            ucgen.request["ucnamespace"] = str(namespaces)
+        if namespaces is not None:
+            ucgen.set_namespace(namespaces)
         if showMinor is not None:
             ucgen.request["ucshow"] = showMinor and "minor" or "!minor"
         return ucgen
@@ -1967,11 +1937,8 @@ class APISite(BaseSite):
             wlgen.request["wldir"] = "newer"
         if isinstance(limit, int):
             wlgen.limit = limit
-        if isinstance(namespaces, list):
-            wlgen.request["wlnamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            wlgen.request["wlnamespace"] = str(namespaces)
+        if namespaces is not None:
+            wlgen.set_namespace(namespaces)
         filters = {'minor': showMinor,
                    'bot': showBot,
                    'anon': showAnon}
@@ -2075,11 +2042,8 @@ class APISite(BaseSite):
         """
         rngen = api.PageGenerator("random", site=self)
         rngen.limit = limit
-        if isinstance(namespaces, list):
-            rngen.request["grnnamespace"] = u"|".join(unicode(ns)
-                                                      for ns in namespaces)
-        elif namespaces is not None:
-            rngen.request["grnnamespace"] = str(namespaces)
+        if namespaces is not None:
+            rngen.set_namespace(namespaces)
         if redirects:
             rngen.request["grnredirect"] = ""
         return rngen
