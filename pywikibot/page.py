@@ -1418,7 +1418,7 @@ class Category(Page):
             return False
         return True
 
-    def copyTo(self, catname):
+    def copyTo(self, catname, message):
         """
         Copy text of category page to a new page.  Does not move contents.
 
@@ -1428,6 +1428,8 @@ class Category(Page):
 
         """
         # This seems far too specialized to be in the top-level framework
+        # move to category.py? (Although it doesn't seem to be used there,
+        # either)
         catname = self.site().category_namespace() + ':' + catname
         targetCat = Category(self.site(), catname)
         if targetCat.exists():
@@ -1439,13 +1441,11 @@ class Category(Page):
             pywikibot.output('Moving text from %s to %s.'
                              % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
-            creationSummary = pywikibot.translate(
-                                  self.site(), msg_created_for_renaming
-                              ) % (self.title(), authors)
+            creationSummary = message % (self.title(), authors)
             targetCat.put(self.get(), creationSummary)
             return True
 
-    def copyAndKeep(self, catname, cfdTemplates):
+    def copyAndKeep(self, catname, cfdTemplates, message):
         """Copy partial category page text (not contents) to a new title.
 
         Like copyTo above, except this removes a list of templates (like
@@ -1465,6 +1465,7 @@ class Category(Page):
 
         """
         # I don't see why we need this as part of the framework either
+        # move to scripts/category.py?
         catname = self.site().category_namespace() + ':' + catname
         targetCat = Category(self.site(), catname)
         if targetCat.exists():
@@ -1476,9 +1477,7 @@ class Category(Page):
             pywikibot.output('Moving text from %s to %s.'
                              % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
-            creationSummary = pywikibot.translate(
-                                  self.site(), msg_created_for_renaming
-                              ) % (self.title(), authors)
+            creationSummary = message % (self.title(), authors)
             newtext = self.get()
         for regexName in cfdTemplates:
             matchcfd = re.compile(r"{{%s.*?}}" % regexName, re.IGNORECASE)
@@ -1514,26 +1513,6 @@ class Category(Page):
         """DEPRECATED: equivalent to list(self.categories(...))"""
         logger.debug(u"Category.articlesList() method is deprecated.")
         return sorted(list(set(self.categories())))
-
-
-msg_created_for_renaming = {
-    'ar':u'روبوت: نقل من %s. المؤلفون: %s',
-    'de':u'Bot: Verschoben von %s. Autoren: %s',
-    'en':u'Robot: Moved from %s. Authors: %s',
-    'fi':u'Botti siirsi luokan %s. Muokkaajat: %s',
-    'fr':u'Robot : déplacé depuis %s. Auteurs: %s',
-    'he':u'בוט: הועבר מהשם %s. כותבים: %s',
-    'ia':u'Robot: Transferite de %s. Autores: %s',
-    'id':u'Bot: Memindahkan dari %s. Kontributor: %s',
-    'it':u'Bot: Voce spostata da %s. Autori: %s',
-    'ja': u'ロボットによる: %s から移動しました。原作者は %s',
-    'ksh':u'Bot: hääjeholldt von %s. Schriiver: %s',
-    'nds':u'Kat-Bot: herschaven von %s. Schriever: %s',
-    'nl':u'Bot: hernoemd van %s. Auteurs: %s',
-    'pl':u'Robot przenosi z %s. Autorzy: %s',
-    'pt':u'Bot: Movido de %s. Autor: %s',
-    'zh':u'機器人: 已從 %s 移動。原作者是 %s',
-    }
 
 
 class Revision(object):
