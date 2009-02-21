@@ -359,11 +359,16 @@ class QueryGenerator(object):
         if self.query_limit is None or limit < self.query_limit:
             self.query_limit = int(limit)
 
-    def set_query_item_limit(self, value):
+    def set_maximum_items(self, value):
         """Set the maximum number of items to be retrieved from the wiki.
 
         If not called, most queries will continue as long as there is
         more data to be retrieved from the API.
+
+        If set to -1 (or any negative value), the "limit" parameter will be
+        omitted from the request. For some request types (such as
+        prop=revisions), this is necessary to signal that only current
+        revision is to be returned.
 
         """
         self.limit = int(value)

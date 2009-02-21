@@ -1006,7 +1006,7 @@ class APISite(BaseSite):
                                          and p._pageid > 0]
             cache = dict((p.title(withSection=False), p) for p in sublist)
             rvgen = api.PropertyGenerator("revisions|info", site=self)
-            rvgen.limit = -1
+            rvgen.set_maximum_items(-1) # suppress use of "rvlimit" parameter
             if len(pageids) == len(sublist):
                 # only use pageids if all pages have them
                 rvgen.request["pageids"] = "|".join(pageids)
@@ -1148,7 +1148,7 @@ class APISite(BaseSite):
         """
         plgen = api.PageGenerator("links", site=self)
         if isinstance(limit, int):
-            plgen.limit = limit
+            plgen.set_maximum_items(limit)
         if hasattr(page, "_pageid"):
             plgen.request['pageids'] = str(page._pageid)
         else:
@@ -1212,7 +1212,7 @@ class APISite(BaseSite):
         if namespaces is not None:
             cmgen.set_namespace(namespaces)
         if isinstance(limit, int):
-            cmgen.limit = limit
+            cmgen.set_maximum_items(limit)
         return cmgen
 
     def loadrevisions(self, page=None, getText=False, revids=None,
@@ -1307,9 +1307,9 @@ class APISite(BaseSite):
             if section is not None:
                 rvgen.request[u"rvsection"] = unicode(section)
         if latest or "revids" in rvgen.request:
-            rvgen.limit = -1  # suppress use of rvlimit parameter
+            rvgen.set_maximum_items(-1)  # suppress use of rvlimit parameter
         elif isinstance(limit, int):
-            rvgen.limit = limit
+            rvgen.set_maximum_items(limit)
         if rvdir:
             rvgen.request[u"rvdir"] = u"newer"
         elif rvdir is not None:
@@ -1448,7 +1448,7 @@ class APISite(BaseSite):
             if isinstance(protect_level, basestring):
                 apgen.request["gapprlevel"] = protect_level
         if isinstance(limit, int):
-            apgen.limit = limit
+            apgen.set_maximum_items(limit)
         if reverse:
             apgen.request["gapdir"] = "descending"
         return apgen
@@ -1494,7 +1494,7 @@ class APISite(BaseSite):
         if prefix:
             algen.request["alprefix"] = prefix
         if isinstance(limit, int):
-            algen.limit = limit
+            algen.set_maximum_items(limit)
         if unique:
             algen.request["alunique"] = ""
         if fromids:
@@ -1526,7 +1526,7 @@ class APISite(BaseSite):
         if prefix:
             acgen.request["gacprefix"] = prefix
         if isinstance(limit, int):
-            acgen.limit = limit
+            acgen.set_maximum_items(limit)
         if reverse:
             acgen.request["gacdir"] = "descending"
         return acgen
@@ -1565,7 +1565,7 @@ class APISite(BaseSite):
         if group:
             augen.request["augroup"] = group
         if isinstance(limit, int):
-            augen.limit = limit
+            augen.set_maximum_items(limit)
         return augen
 
     def allimages(self, start="!", prefix="", minsize=None, maxsize=None,
@@ -1590,7 +1590,7 @@ class APISite(BaseSite):
         if prefix:
             aigen.request["gaiprefix"] = prefix
         if isinstance(limit, int):
-            aigen.limit = limit
+            aigen.set_maximum_items(limit)
         if isinstance(minsize, int):
             aigen.request["gaiminsize"] = str(minsize)
         if isinstance(maxsize, int):
@@ -1643,7 +1643,7 @@ class APISite(BaseSite):
         if users:
             bkgen.request["bkusers"] = users
         if isinstance(limit, int):
-            bkgen.limit = limit
+            bkgen.set_maximum_items(limit)
         return bkgen
 
     def exturlusage(self, url, protocol="http", namespaces=None,
@@ -1664,7 +1664,7 @@ class APISite(BaseSite):
         if namespaces is not None:
             eugen.set_namespace(namespaces)
         if isinstance(limit, int):
-            eugen.limit = limit
+            eugen.set_maximum_items(limit)
         return eugen
 
     def imageusage(self, image, namespaces=None, filterredir=None,
@@ -1685,7 +1685,7 @@ class APISite(BaseSite):
         if namespaces is not None:
             iugen.set_namespace(namespaces)
         if isinstance(limit, int):
-            iugen.limit = limit
+            iugen.set_maximum_items(limit)
         if filterredir is not None:
             iugen.request["giufilterredir"] = (filterredir and "redirects"
                                                            or "nonredirects")
@@ -1730,7 +1730,7 @@ class APISite(BaseSite):
         if reverse:
             legen.request["ledir"] = "newer"
         if isinstance(limit, int):
-            legen.limit = limit
+            legen.set_maximum_items(limit)
         return legen
 
     def recentchanges(self, start=None, end=None, reverse=False, limit=None,
@@ -1781,7 +1781,7 @@ class APISite(BaseSite):
         if reverse:
             rcgen.request["rcdir"] = "newer"
         if isinstance(limit, int):
-            rcgen.limit = limit
+            rcgen.set_maximum_items(limit)
         if namespaces is not None:
             rcgen.set_namespace(namespaces)
         if pagelist:
@@ -1840,7 +1840,7 @@ class APISite(BaseSite):
         if getredirects:
             srgen.request["gsrredirects"] = ""
         if isinstance(limit, int):
-            srgen.limit = limit
+            srgen.set_maximum_items(limit)
         return srgen
 
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
@@ -1888,7 +1888,7 @@ class APISite(BaseSite):
         if reverse:
             ucgen.request["ucdir"] = "newer"
         if isinstance(limit, int):
-            ucgen.limit = limit
+            ucgen.set_maximum_items(limit)
         if namespaces is not None:
             ucgen.set_namespace(namespaces)
         if showMinor is not None:
@@ -1936,7 +1936,7 @@ class APISite(BaseSite):
         if reverse:
             wlgen.request["wldir"] = "newer"
         if isinstance(limit, int):
-            wlgen.limit = limit
+            wlgen.set_maximum_items(limit)
         if namespaces is not None:
             wlgen.set_namespace(namespaces)
         filters = {'minor': showMinor,
@@ -2012,7 +2012,7 @@ class APISite(BaseSite):
         if reverse:
             drgen.request["drdir"] = "newer"
         if isinstance(limit, int):
-            drgen.limit = limit
+            drgen.set_maximum_items(limit)
         return drgen
 
     def users(self, usernames):
@@ -2041,7 +2041,7 @@ class APISite(BaseSite):
 
         """
         rngen = api.PageGenerator("random", site=self)
-        rngen.limit = limit
+        rngen.set_maximum_items(limit)
         if namespaces is not None:
             rngen.set_namespace(namespaces)
         if redirects:
