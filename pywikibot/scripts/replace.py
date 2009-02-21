@@ -107,7 +107,7 @@ talk about HTTP, where the typo has become part of the standard:
     python replace.py referer referrer -file:typos.txt -excepttext:HTTP
 """
 #
-# (C) Daniel Herding & the Pywikipediabot Team, 2004-2008
+# (C) Daniel Herding & the Pywikipediabot Team, 2004-2009
 #
 # Distributed under the terms of the MIT license.
 #
@@ -133,7 +133,7 @@ __version__='$Id$'
 
 # Summary messages in different languages
 # NOTE: Predefined replacement tasks might use their own dictionary, see 'fixes'
-# below.`v
+# below.
 msg = {
     'ar': u'%s روبوت : استبدال تلقائي للنص',
     'ca': u'Robot: Reemplaçament automàtic de text %s',
@@ -373,9 +373,10 @@ class ReplaceRobot:
                         % page.aslink())
                     break
                 new_text = self.doReplacements(new_text)
-                if new_text == original_text:
-                    pywikibot.output('No changes were necessary in %s'
-                                     % page.aslink())
+                if new_text.strip().replace('\r\n', '\n'
+                        ) == original_text.strip().replace('\r\n', '\n'):
+                    pywikibot.output(u'No changes were necessary in %s'
+                                      % page.aslink())
                     break
                 if self.recursive:
                     newest_text = self.doReplacements(new_text)
@@ -630,6 +631,8 @@ u'Press Enter to use this default message, or enter a description of the\nchange
                 pywikibot.translate(pywikibot.getSite(), fix['msg'])
         if "exceptions" in fix:
             exceptions = fix['exceptions']
+        if "nocase" in fix:
+            caseInsensitive = fix['nocase']
         replacements = fix['replacements']
 
     #Set the regular expression flags
