@@ -77,7 +77,7 @@ parameterHelp = """\
                   config.py for instructions.
                   Argument can also be given as "-google:searchstring".
 
--namespace        Filter the page generator to only yield pages in the
+-namespace -ns    Filter the page generator to only yield pages in the
                   specified namespaces.  Separate multiple namespace
                   numbers with commas.
 
@@ -159,17 +159,21 @@ class GeneratorFactory(object):
         Only call this after all arguments have been parsed.
         
         """
+        if self.namespaces:
+            namespaces = [int(n) for n in self.namespaces]
+            for i in xrange(len(self.gens)):
+                if isinstance(self.gens[i], pywikibot.data.api.QueryGenerator):
+                    self.gens[i].set_namespace(namespaces)
+                else:
+                    self.gens[i] = NamespaceFilterPageGenerator(
+                                       self.gens[i], namespaces)
         if len(self.gens) == 0:
             return None
         elif len(self.gens) == 1:
             gensList = self.gens[0]
         else:
             gensList = CombinedPageGenerator(self.gens)
-        genToReturn = DuplicateFilterPageGenerator(gensList)
-        if self.namespaces:
-            genToReturn = NamespaceFilterPageGenerator(
-                              genToReturn, map(int, self.namespaces))
-        return genToReturn
+        return DuplicateFilterPageGenerator(gensList)
 
     def getCategoryGen(self, arg, length, recurse = False):
         if len(arg) == length:
@@ -267,6 +271,13 @@ class GeneratorFactory(object):
                     pywikibot.input(u'What namespace are you filtering on?'))
             else:
                 self.namespaces.extend(arg[len('-namespace:'):].split(","))
+            return True
+        elif arg.startswith('-ns'):
+            if len(arg) == len('-ns'):
+                self.namespaces.append(
+                    pywikibot.input(u'What namespace are you filtering on?'))
+            else:
+                self.namespaces.extend(arg[len('-ns:'):].split(","))
             return True
         elif arg.startswith('-catr'):
             gen = self.getCategoryGen(arg, len("-catr"), recurse = True)
@@ -394,13 +405,14 @@ class GeneratorFactory(object):
             return False
 
 
-def AllpagesPageGenerator(start ='!', namespace=None, includeredirects=True,
+def AllpagesPageGenerator(start ='!', namespace=0, includeredirects=True,
                           site=None):
     """
-    Using the Allpages special page, retrieve all articles' titles, and yield
-    page objects.
+    Iterate Page objects for all titles in a single namespace.
+
     If includeredirects is False, redirects are not included. If
     includeredirects equals the string 'only', only redirects are added.
+    
     """
     if site is None:
         site = pywikibot.getSite()
