@@ -291,9 +291,9 @@ def calledModuleName():
 
 def _decodeArg(arg):
     if sys.platform=='win32':
-        if config.console_encoding == 'cp850':
+        if config.console_encoding in ("cp437", 'cp850'):
             # Western Windows versions give parameters encoded as windows-1252
-            # even though the console encoding is cp850.
+            # even though the console encoding is cp850 or cp437.
             return unicode(arg, 'windows-1252')
         elif config.console_encoding == 'cp852':
             # Central/Eastern European Windows versions give parameters encoded

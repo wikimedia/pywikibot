@@ -605,10 +605,10 @@ def RedirectFilterPageGenerator(generator):
 
 def DuplicateFilterPageGenerator(generator):
     """Yield all unique pages from another generator, omitting duplicates."""
-    seenPages = {}
+    seenPages = set([])
     for page in generator:
         if page not in seenPages:
-            seenPages[page] = None
+            seenPages.add(page)
             yield page
 
 
@@ -946,11 +946,11 @@ def DayPageGenerator(startMonth = 1, endMonth = 12, site = None):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
 
 
-if __name__ == "__main__":
+def main(*args):
     try:
         gen = None
         genFactory = GeneratorFactory()
-        for arg in pywikibot.handleArgs():
+        for arg in pywikibot.handleArgs(*args):
             genFactory.handleArg(arg)
         gen = genFactory.getCombinedGenerator()
         if gen:
@@ -958,5 +958,11 @@ if __name__ == "__main__":
                 pywikibot.output(page.title(), toStdout = True)
         else:
             pywikibot.showHelp()
+    except Exception:
+        pywikibot.logging.exception("")
     finally:
         pywikibot.stopme()
+
+
+if __name__=="__main__":
+    main()
