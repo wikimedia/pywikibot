@@ -13,6 +13,7 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot import deprecate_arg
 from pywikibot import config
+from pywikibot import deprecated
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import *
@@ -313,7 +314,7 @@ class BaseSite(object):
         Use optional Site argument 'othersite' to generate an interwiki link.
 
         """
-        logger.debug("Site.linkto() method is deprecated; use pywikibot.Link")
+        deprecated("pywikibot.Link")
         return pywikibot.Link(title, self).astext(othersite)
 
     def isInterwikiLink(self, s):
@@ -408,10 +409,12 @@ class BaseSite(object):
 
     def fam(self):
         """Return Family object for this Site."""
+        deprecated("family attribute")
         return self.family
 
     def urlEncode(self, query):
         """DEPRECATED"""
+        deprecated("urllib.urlencode()")
         return urllib.urlencode(query)
 
     def getUrl(self, path, retry=True, sysop=False, data=None,
@@ -422,6 +425,7 @@ class BaseSite(object):
         are ignored.
 
         """
+        deprecated("pywikibot.comms.data.request")
         if data:
             if not isinstance(data, basestring):
                 data = urllib.urlencode(data)
@@ -432,11 +436,13 @@ class BaseSite(object):
 
     def postForm(self, address, predata, sysop=False, cookies=None):
         """DEPRECATED"""
+        deprecated()
         return self.getUrl(address, data=predata)
 
     def postData(self, address, data, contentType=None, sysop=False,
                  compress=True, cookies=None):
         """DEPRECATED"""
+        deprecated()
         return self.getUrl(address, data=data)
 
     # unsupported methods from version 1
@@ -635,7 +641,7 @@ class APISite(BaseSite):
         DEPRECATED (use .user() method instead)
 
         """
-        logger.debug("Site.loggedInAs() method is deprecated.")
+        deprecated("Site.user()")
         return self.logged_in(sysop) and self.user()
 
     def login(self, sysop=False):
@@ -729,7 +735,7 @@ class APISite(BaseSite):
 
     def isAllowed(self, right, sysop=False):
         """Deprecated; retained for backwards-compatibility"""
-        logger.debug("Site.isAllowed() method is deprecated; use has_right()")
+        deprecated("Site.has_right()")
         return self.has_right(right, sysop)
 
     def has_group(self, group, sysop=False):
@@ -1459,7 +1465,7 @@ class APISite(BaseSite):
         Use allpages() with the prefix= parameter instead of this method.
 
         """
-        logger.debug("Site.prefixindex() is deprecated; use allpages instead.")
+        deprecated("Site.allpages()")
         return self.allpages(prefix=prefix, namespace=namespace,
                              includeredirects=includeredirects)
 
@@ -1533,8 +1539,7 @@ class APISite(BaseSite):
 
     def categories(self, number=10, repeat=False):
         """Deprecated; retained for backwards-compatibility"""
-        logger.debug(
-            "Site.categories() method is deprecated; use .allcategories()")
+        deprecated("Site.allcategories()")
         if repeat:
             limit = None
         else:

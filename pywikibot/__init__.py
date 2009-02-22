@@ -22,6 +22,22 @@ from textlib import *
 logging.basicConfig(fmt="%(message)s")
 
 
+def deprecated(instead=None):
+    """Outputs a method deprecation warning.
+    Uses the stack to determine class and name of calling method
+
+    @param instead: if provided, will be used to specify the replacement
+    @type instead: string
+    """
+    f = sys._getframe(1)
+    classname = f.f_locals['self'].__class__.__name__ 
+    funcname = f.f_code.co_name
+    if new:
+        logging.warning("%s.%s is DEPRECATED, use %s instead" % \
+            (classname, funcname, instead))
+    else:
+        logging.warning("%s.%s is DEPRECATED." % (classname, funcname))
+
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg"""
     logger = logging.getLogger()
