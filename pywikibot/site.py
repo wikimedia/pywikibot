@@ -403,7 +403,7 @@ class BaseSite(object):
     def getSite(self, code):
         """Return Site object for language 'code' in this Family."""
 
-        return pywikibot.Site(code=code, fam=self.family, user=self.user)
+        return pywikibot.Site(code=code, fam=self.family, user=self.user())
 
     # deprecated methods for backwards-compatibility
 
