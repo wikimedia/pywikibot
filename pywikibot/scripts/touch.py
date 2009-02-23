@@ -39,14 +39,14 @@ class TouchBot:
                 text = page.get(get_redirect = self.touch_redirects)
                 page.save("Pywikibot touch script")
             except pywikibot.NoPage:
-                pywikibot.output(u"Page %s does not exist?!" % page.aslink(),
+                pywikibot.output(u"Page %s does not exist?!" % page.title(asLink=True),
                                  level=pywikibot.ERROR)
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u"Page %s is a redirect; skipping."
-                                  % page.aslink(),
+                                  % page.title(asLink=True),
                                  level=pywikibot.WARNING)
             except pywikibot.LockedPage:
-                pywikibot.output(u"Page %s is locked?!" % page.aslink(),
+                pywikibot.output(u"Page %s is locked?!" % page.title(asLink=True),
                                  level=pywikibot.ERROR)
 
 

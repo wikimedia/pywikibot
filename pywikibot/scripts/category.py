@@ -357,7 +357,7 @@ def add_category(sort_by_last_name = False):
                 answer = ''
 
             while answer not in ('y','n','a'):
-                answer = pywikibot.input(u'%s [y/n/a(ll)]:' % (page.aslink()))
+                answer = pywikibot.input(u'%s [y/n/a(ll)]:' % (page.title(asLink=True)))
                 if answer == 'a':
                     confirm = ''
                     while confirm not in ('y','n'):
@@ -397,7 +397,7 @@ Are you sure? [y/n]:""")
                         pywikibot.output(u"%s is already in %s."
                                          % (page.title(), catpl.title()))
                     else:
-                        pywikibot.output(u'Adding %s' % catpl.aslink())
+                        pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
                         cats.append(catpl)
                         text = page.get()
                         text = pywikibot.replaceCategoryLinks(text, cats)

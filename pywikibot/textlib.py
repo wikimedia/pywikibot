@@ -418,7 +418,7 @@ def interwikiFormat(links, insite = None):
     s = []
     for site in ar:
         try:
-            link = links[site].aslink(forceInterwiki=True)
+            link = links[site].title(asLink=True, forceInterwiki=True)
             s.append(link)
         except AttributeError:
             s.append(pywikibot.getSite(site).linkto(links[site],
@@ -633,7 +633,7 @@ def categoryFormat(categories, insite = None):
         return ''
     if insite is None:
         insite = pywikibot.getSite()
-    catLinks = [category.aslink(noInterwiki = True) for category in categories]
+    catLinks = [category.title(asLink=True, noInterwiki = True) for category in categories]
     if insite.category_on_one_line():
         sep = ' '
     else:

@@ -940,7 +940,7 @@ def DayPageGenerator(startMonth = 1, endMonth = 12, site = None):
         site = pywikibot.Site()
     fd = date.FormatDate(site)
     firstPage = pywikibot.Page(site, fd(startMonth, 1))
-    pywikibot.output(u"Starting with %s" % firstPage.aslink())
+    pywikibot.output(u"Starting with %s" % firstPage.title(asLink=True))
     for month in xrange(startMonth, endMonth+1):
         for day in xrange(1, date.getNumberOfDaysInMonth(month)+1):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
