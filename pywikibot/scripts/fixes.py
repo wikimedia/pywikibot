@@ -565,6 +565,8 @@ fixes = {
             (u'www.belex.co.yu',             u'www.belex.rs'),
             (u'beograd.org.yu',              u'beograd.rs'),
             (u'www.vlada.cg.yu',             u'www.vlada.me'),
+            (u'www.vlada.me/eng/premijer/vijesti.php', 
+            u'www.gov.me/eng/premijer/index.php'),
             (u'webrzs.statserb.sr.gov.yu',   u'webrzs.stat.gov.rs'),
             (u'www.statserb.sr.gov.yu',      u'webrzs.stat.gov.rs'),
             (u'www.rastko.org.yu',           u'www.rastko.org.rs'),
