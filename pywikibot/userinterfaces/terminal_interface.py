@@ -119,68 +119,6 @@ class UI:
         self.writelock = threading.RLock()
         pass
 
-    def printColorizedInUnix(self, text, level):
-        lastColor = None
-        for key, value in unixColors.iteritems():
-            text = text.replace('\03{%s}' % key, value)
-        # just to be sure, reset the color
-        text += unixColors['default']
-        logging.log(level, text)
-
-    def printColorizedInWindows(self, text, level):
-        """
-        This only works in Python 2.5 or higher.
-        """
-        if ctypes_found:
-            std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11)
-            # Color tags might be cascaded, e.g. because of transliteration.
-            # Therefore we need this stack.
-            colorStack = []
-            tagM = True
-            while tagM:
-                tagM = colorTagR.search(text)
-                if tagM:
-                    # print the text up to the tag.
-                    logging.log(level, text[:tagM.start()])
-                    newColor = tagM.group('name')
-                    if newColor == 'default':
-                        if len(colorStack) > 0:
-                            colorStack.pop()
-                            if len(colorStack) > 0:
-                                lastColor = colorStack[-1]
-                            else:
-                                lastColor = 'default'
-                            ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors[lastColor])
-                    else:
-                        colorStack.append(newColor)
-                        # set the new color
-                        ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors[newColor])
-                    text = text[tagM.end():]
-            # print the rest of the text
-            logging.log(level, text)
-            # just to be sure, reset the color
-            ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors['default'])
-        else:
-            # ctypes is only available since Python 2.5, and we won't
-            # try to colorize without it. Instead we add *** after the text as a whole
-            # if anything needed to be colorized.
-            lines = text.split('\n')
-            for line in lines:
-                line, count = colorTagR.subn('', line)
-                if count > 0:
-                    line += '***'
-                line += '\n'
-                logging.log(level, line)
-
-    def printColorized(self, text, level):
-        if config.colorized_output:
-            if sys.platform == 'win32':
-                self.printColorizedInWindows(text, level)
-            else:
-                self.printColorizedInUnix(text, level)
-        else:
-            logging.log(level, text)
-
     def output(self, text, level=logging.INFO):
         """
         If a character can't be displayed in the encoding used by the user's
@@ -229,10 +167,9 @@ class UI:
                     prev = transliterated[-1:]
                     prevchar = char
             text = u"".join(transliteratedText)
-        
         self.writelock.acquire()
         try:
-            self.printColorized(text, level)
+            logging.log(level, text)
         finally:
             self.writelock.release()
 
@@ -302,8 +239,6 @@ class UI:
         finally:
             self.writelock.release()
         return answer
-            
-        
 
     def editText(self, text, jumpIndex = None, highlight = None):
         """
@@ -327,7 +262,126 @@ class UI:
             import webbrowser
             pywikibot.output(u'Opening CAPTCHA in your web browser...')
             webbrowser.open(url)
-            return pywikibot.input(u'What is the solution of the CAPTCHA that is shown in your web browser?')
+            return pywikibot.input(
+                u'What is the solution of the CAPTCHA that is shown in your web browser?')
         except:
-            pywikibot.output(u'Error in opening web browser: %s' % sys.exc_info()[0])
-            return pywikibot.input(u'What is the solution of the CAPTCHA at %s ?' % url)
+            pywikibot.output(u'Error in opening web browser: %s'
+                              % sys.exc_info()[0])
+            return pywikibot.input(
+                u'What is the solution of the CAPTCHA at %s ?' % url)
+
+
+class TerminalHandler(logging.Handler):
+    """A handler class that writes logging records, appropriately formatted, to
+    a stream connected to a terminal. This class does not close the stream,
+    as sys.stdout or sys.stderr may be (and usually will be) used.
+
+    Slightly modified version of the StreamHandler class that ships with
+    logging module, plus code for colorization of output.
+
+    """
+
+    def __init__(self, strm=None):
+        """Initialize the handler.
+
+        If strm is not specified, sys.stderr is used.
+
+        """
+        logging.Handler.__init__(self)
+        if strm is None:
+            strm = sys.stderr
+        self.stream = strm
+        self.formatter = None
+
+    def flush(self):
+        """Flush the stream. """
+        self.stream.flush()
+
+    def emit_raw(self, record, msg):
+        """Emit a formatted message.
+
+        The message is written to the stream. If exception information is
+        present, it is formatted using traceback.print_exception and
+        appended to the stream.
+
+        """
+        try:
+            fs = "%s"
+            if isinstance(msg, str):
+                self.stream.write(fs % msg)
+            else:
+                try:
+                    self.stream.write(fs % msg.encode(config.console_encoding,
+                                                      "xmlcharrefreplace"))
+                except UnicodeError:
+                    self.stream.write(fs % msg.encode("ascii",
+                                                      "xmlcharrefreplace"))
+                self.flush()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            self.handleError(record)
+
+    def emitColorizedInUnix(self, record, msg):
+        lastColor = None
+        for key, value in unixColors.iteritems():
+            msg = msg.replace('\03{%s}' % key, value)
+        # just to be sure, reset the color
+        msg += unixColors['default']
+        self.emit_raw(record, msg)
+
+    def emitColorizedInWindows(self, record, msg):
+        """This only works in Python 2.5 or higher."""
+        if ctypes_found:
+            std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11)
+            # Color tags might be cascaded, e.g. because of transliteration.
+            # Therefore we need this stack.
+            colorStack = []
+            tagM = True
+            while tagM:
+                tagM = colorTagR.search(msg)
+                if tagM:
+                    # print the text up to the tag.
+                    self.emit_raw(record, msg[:tagM.start()])
+                    newColor = tagM.group('name')
+                    if newColor == 'default':
+                        if len(colorStack) > 0:
+                            colorStack.pop()
+                            if len(colorStack) > 0:
+                                lastColor = colorStack[-1]
+                            else:
+                                lastColor = 'default'
+                            ctypes.windll.kernel32.SetConsoleTextAttribute(
+                                std_out_handle, windowsColors[lastColor])
+                    else:
+                        colorStack.append(newColor)
+                        # set the new color
+                        ctypes.windll.kernel32.SetConsoleTextAttribute(
+                            std_out_handle, windowsColors[newColor])
+                    msg = msg[tagM.end():]
+            # print the rest of the text
+            self.emit_raw(record, msg)
+            # just to be sure, reset the color
+            ctypes.windll.kernel32.SetConsoleTextAttribute(
+                std_out_handle, windowsColors['default'])
+        else:
+            # ctypes is only available since Python 2.5, and we won't
+            # try to colorize without it. Instead we add *** after the text
+            # as a whole if anything needed to be colorized.
+            lines = msg.split('\n')
+            for line in lines:
+                line, count = colorTagR.subn('', line)
+                if count > 0:
+                    line += '***'
+                line += '\n'
+                self.emit_raw(record, line)
+
+    def emit(self, record):
+        msg = self.format(record)
+        if config.colorized_output:
+            if sys.platform == 'win32':
+                self.emitColorizedInWindows(record, msg)
+            else:
+                self.emitColorizedInUnix(record, msg)
+        else:
+            self.emit_raw(record, msg)

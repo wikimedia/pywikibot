@@ -48,68 +48,20 @@ class MaxLevelFilter(logging.Filter):
             return True
 
 
-class TerminalHandler(logging.Handler):
-    """
-    A handler class that writes logging records, appropriately formatted,
-    to a stream. Note that this class does not close the stream, as
-    sys.stdout or sys.stderr may be used.
-
-    Slightly modified version of the StreamHandler class that ships with
-    logging module.
-    
-    """
-    def __init__(self, strm=None):
-        """
-        Initialize the handler.
-
-        If strm is not specified, sys.stderr is used.
-        """
-        logging.Handler.__init__(self)
-        if strm is None:
-            strm = sys.stderr
-        self.stream = strm
-        self.formatter = None
-
-    def flush(self):
-        """
-        Flush the stream.
-        """
-        self.stream.flush()
-
-    def emit(self, record):
-        """
-        Emit a record.
-
-        If a formatter is specified, it is used to format the record. The
-        record is then written to the stream. If exception information is
-        present, it is formatted using traceback.print_exception and
-        appended to the stream.
-        """
-        try:
-            msg = self.format(record)
-            fs = "%s"
-            if isinstance(msg, str):
-                self.stream.write(fs % msg)
-            else:
-                try:
-                    self.stream.write(fs % msg.encode(config.console_encoding,
-                                                      "xmlcharrefreplace"))
-                except UnicodeError:
-                    self.stream.write(fs % msg.encode("ascii",
-                                                      "xmlcharrefreplace"))
-            self.flush()
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except:
-            self.handleError(record)
-
-
-
 # User interface initialization
 # search for user interface module in the 'userinterfaces' subdirectory
 exec ("import pywikibot.userinterfaces.%s_interface as uiModule"
       % config.userinterface)
 ui = uiModule.UI()
+TerminalHandler = uiModule.TerminalHandler
+
+
+class RotatingFileHandler(logging.handlers.RotatingFileHandler):
+    """Strip trailing newlines before outputting text to file"""
+    def emit(self, record):
+        record.msg = record.msg.rstrip("\r\n")
+        logging.handlers.RotatingFileHandler.emit(self, record)
+
 
 def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
     """Output a message to the user via the userinterface.
@@ -263,7 +215,7 @@ def init_handlers():
             logfile = config.datafilepath(config.logfilename)
         else:
             logfile = config.datafilepath("%s-bot.log" % moduleName)
-        file_handler = logging.handlers.RotatingFileHandler(
+        file_handler = RotatingFileHandler(
                             filename=logfile, maxBytes=2 << 20, backupCount=5)
         
         file_handler.setLevel(DEBUG)
