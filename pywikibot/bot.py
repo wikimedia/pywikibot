@@ -15,11 +15,9 @@ __version__ = '$Id$'
 
 
 import logging, logging.handlers
+       # all output goes thru python std library "logging" module
 import os.path
 import sys
-import pywikibot
-from pywikibot import config
-
 
 # logging levels
 logger = logging.getLogger("bot")
@@ -28,6 +26,9 @@ from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 STDOUT = 16
 VERBOSE = 18
 INPUT = 25
+
+import pywikibot
+from pywikibot import config
 
 
 class MaxLevelFilter(logging.Filter):
@@ -134,20 +135,20 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
 
     """
     # make sure logging system has been initialized
-    root = pywikibot.logging.getLogger()
+    root = logging.getLogger()
     if root.level == 30: # init_handlers sets this level
         init_handlers()
 
     if decoder:
         text = unicode(text, decoder)
-    elif type(text) is not unicode:
+    elif not isinstance(text, unicode):
 ##        import traceback
 ##        pywikibot.output(
 ##            u"Non-unicode (%s) passed to wikipedia.output without decoder!\n"
 ##             % type(text),
 ##            level=VERBOSE
 ##        )
-        if type(text) is not str:
+        if not isinstance(text, str):
             # looks like text is a non-text object. 
             # Maybe it has a __unicode__ builtin ?
             # (allows to print Page, Site...)
@@ -175,6 +176,11 @@ def input(question, password=False):
     Returns a unicode string.
 
     """
+    # make sure logging system has been initialized
+    root = logging.getLogger()
+    if root.level == 30: # init_handlers sets this level
+        init_handlers()
+
     data = ui.input(question, password)
     return data
 
@@ -196,6 +202,11 @@ def inputChoice(question, answers, hotkeys, default=None):
     Returns a one-letter string in lowercase.
 
     """
+    # make sure logging system has been initialized
+    root = logging.getLogger()
+    if root.level == 30: # init_handlers sets this level
+        init_handlers()
+
     data = ui.inputChoice(question, answers, hotkeys, default).lower()
     return data
 
