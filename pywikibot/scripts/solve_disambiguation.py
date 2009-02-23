@@ -452,7 +452,7 @@ class PrimaryIgnoreManager(object):
         self.ignorelist = []
         filename = config.datafilepath(
                               'disambiguations',
-                              self.disambPage.titleForFilename() + '.txt')
+                              self.disambPage.title(asFilename=True) + '.txt')
         try:
             # The file is stored in the disambiguation/ subdir.
             # Create if necessary.
@@ -469,18 +469,18 @@ class PrimaryIgnoreManager(object):
             pass
 
     def isIgnored(self, refPage):
-        return self.enabled and refPage.urlname() in self.ignorelist
+        return self.enabled and refPage.title(asUrl=True) in self.ignorelist
 
     def ignore(self, refPage):
         if self.enabled:
             # Skip this occurence next time.
             filename = config.datafilepath(
                                   'disambiguations',
-                                  self.disambPage.urlname() + '.txt')
+                                  self.disambPage.title(asUrl=True) + '.txt')
             try:
                 # Open file for appending. If none exists yet, create a new one.
                 f = codecs.open(filename, 'a', 'utf-8')
-                f.write(refPage.urlname() + '\n')
+                f.write(refPage.title(asUrl=True) + '\n')
                 f.close()
             except IOError:
                 pass

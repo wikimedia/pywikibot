@@ -249,7 +249,7 @@ def main(*args):
             for lang in namedict[familyName].iterkeys():
                 try:
                     site = pywikibot.getSite(code=lang, fam=familyName)
-                    if not forceLogin and site.loggedInAs(sysop = sysop) != None:
+                    if not forceLogin and (site.logged_in(sysop) and site.user()) != None:
                         pywikibot.output(u'Already logged in on %(site)s'
                                           % locals())
                     else:

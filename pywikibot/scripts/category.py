@@ -254,11 +254,11 @@ class CategoryDatabase:
         if self.catContentDB.has_key(supercat):
             return self.catContentDB[supercat][0]
         else:
-            subcatlist = supercat.subcategoriesList()
-            articlelist = supercat.articlesList()
+            subcatset = set(supercat.subcategories())
+            articleset = set(supercat.articles())
             # add to dictionary
-            self.catContentDB[supercat] = (subcatlist, articlelist)
-            return subcatlist
+            self.catContentDB[supercat] = (subcatset, articleset)
+            return subcatset
 
     def getArticles(self, cat):
         '''
@@ -270,21 +270,21 @@ class CategoryDatabase:
         if self.catContentDB.has_key(cat):
             return self.catContentDB[cat][1]
         else:
-            subcatlist = cat.subcategoriesList()
-            articlelist = cat.articlesList()
+            subcatset = set(cat.subcategories())
+            articleset = set(cat.articles())
             # add to dictionary
-            self.catContentDB[cat] = (subcatlist, articlelist)
-            return articlelist
+            self.catContentDB[cat] = (subcatset, articleset)
+            return articleset
 
     def getSupercats(self, subcat):
         # if we already know which subcategories exist here
         if self.superclassDB.has_key(subcat):
             return self.superclassDB[subcat]
         else:
-            supercatlist = subcat.supercategoriesList()
+            supercatset = set(subcat.categories())
             # add to dictionary
-            self.superclassDB[subcat] = supercatlist
-            return supercatlist
+            self.superclassDB[subcat] = supercatset
+            return supercatset
 
     def dump(self, filename = 'category.dump.bz2'):
         '''
@@ -524,14 +524,14 @@ class CategoryListifyRobot:
         self.recurse = recurse
 
     def run(self):
-        listOfArticles = self.cat.articlesList(recurse = self.recurse)
+        setOfArticles = set(self.cat.articles(recurse = self.recurse))
         if self.subCats:
-            listOfArticles += self.cat.subcategoriesList()
+            setOfArticles += set(self.cat.subcategories())
         if not self.editSummary:
-            self.editSummary = pywikibot.translate(self.site, self.listify_msg) % (self.cat.title(), len(listOfArticles))
+            self.editSummary = pywikibot.translate(self.site, self.listify_msg) % (self.cat.title(), len(setOfArticles))
 
         listString = ""
-        for article in listOfArticles:
+        for article in setOfArticles:
             if (not article.isImage() or self.showImages) and not article.isCategory():
                 if self.talkPages and not article.isTalkPage():
                     listString = listString + "*[[%s]] -- [[%s|talk]]\n" % (article.title(), article.toggleTalkPage().title())
@@ -616,7 +616,7 @@ class CategoryRemoveRobot:
             self.editSummary = pywikibot.translate(self.site, self.msg_remove) % self.cat.title()
 
     def run(self):
-        articles = self.cat.articlesList(recurse = 0)
+        articles = set(self.cat.articles())
         if len(articles) == 0:
             pywikibot.output(u'There are no articles in category %s' % self.cat.title())
         else:
@@ -624,7 +624,7 @@ class CategoryRemoveRobot:
                 if not self.titleRegex or re.search(self.titleRegex,article.title()):
                     catlib.change_category(article, self.cat, None, comment = self.editSummary, inPlace = self.inPlace)
         # Also removes the category tag from subcategories' pages
-        subcategories = self.cat.subcategoriesList(recurse = 0)
+        subcategories = set(self.cat.subcategories())
         if len(subcategories) == 0:
             pywikibot.output(u'There are no subcategories in category %s' % self.cat.title())
         else:
@@ -782,7 +782,7 @@ class CategoryTidyRobot:
     def run(self):
         cat = catlib.Category(pywikibot.Link('Category:' + self.catTitle))
 
-        articles = cat.articlesList(recurse = False)
+        articles = set(cat.articles())
         if len(articles) == 0:
             pywikibot.output(u'There are no articles in category ' + catTitle)
         else:
