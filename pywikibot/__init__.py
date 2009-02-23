@@ -32,7 +32,7 @@ def deprecated(instead=None):
     f = sys._getframe(1)
     classname = f.f_locals['self'].__class__.__name__ 
     funcname = f.f_code.co_name
-    if new:
+    if instead:
         logging.warning("%s.%s is DEPRECATED, use %s instead" % \
             (classname, funcname, instead))
     else:
