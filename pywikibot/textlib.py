@@ -299,13 +299,7 @@ def getLanguageLinks(text, insite = None, pageLink = "[[]]"):
                 pagetitle = pagetitle[:pagetitle.index('|')]
             # we want the actual page objects rather than the titles
             site = insite.getSite(code = lang)
-            try:
-                result[site] = pywikibot.Page(site, pagetitle, insite = insite)
-            except InvalidTitle:
-                output(
-        u"[getLanguageLinks] Text contains invalid interwiki link [[%s:%s]]."
-                           % (lang, pagetitle))
-                continue
+            result[site] = pywikibot.Page(pywikibot.Link(pagetitle, site))
     return result
 
 
@@ -483,9 +477,10 @@ def getCategoryLinks(text, site):
                    r'(?:\|(?P<sortKey>.+?))?\s*\]\]'
                    % catNamespace, re.I)
     for match in R.finditer(text):
-        cat = pywikibot.Category(site,
+        cat = pywikibot.Category(pywikibot.Link(
                                  '%s:%s' % (match.group('namespace'),
                                             match.group('catName')),
+                                 site),
                                  sortKey = match.group('sortKey'))
         result.append(cat)
     return result

@@ -1325,7 +1325,8 @@ class ImagePage(Page):
 class Category(Page):
     """A page in the Category: namespace"""
 
-    def __init__(self, source, title=u"", insite=None, sortKey=None):
+    @deprecate_arg("insite", None)
+    def __init__(self, source, title=u"", sortKey=None):
         """All parameters are the same as for Page() constructor.
 
         """
