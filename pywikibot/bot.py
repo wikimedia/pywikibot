@@ -144,10 +144,16 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
 ##             % type(text),
 ##            level=VERBOSE
 ##        )
-        try:
-            text = unicode(text, 'utf-8')
-        except UnicodeDecodeError:
-            text = unicode(text, 'iso8859-1')
+        if type(text) is not str:
+            # looks like text is a non-text object. 
+            # Maybe it has a __unicode__ builtin ?
+            # (allows to print Page, Site...)
+            text = unicode(text)
+        else:
+            try:
+                text = unicode(text, 'utf-8')
+            except UnicodeDecodeError:
+                text = unicode(text, 'iso8859-1')
     if newline:
         text += u'\n'
     if toStdout:
