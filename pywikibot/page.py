@@ -1416,11 +1416,16 @@ class Category(Page):
             return False
         return True
 
-    def copyTo(self, catname, message):
+    def copyTo(self, cat, message):
         """
         Copy text of category page to a new page.  Does not move contents.
 
-        @param catname: New category title (without namespace)
+        @param cat: New category title (without namespace) or Category object
+        @type cat: unicode or Category
+        @param message: message to use for category creation message
+        If two %s are provided in message, will be replaced 
+        by (self.title, authorsList)
+        @type message: unicode
         @return: True if copying was successful, False if target page
             already existed.
 
@@ -1428,8 +1433,11 @@ class Category(Page):
         # This seems far too specialized to be in the top-level framework
         # move to category.py? (Although it doesn't seem to be used there,
         # either)
-        catname = self.site().category_namespace() + ':' + catname
-        targetCat = Category(self.site(), catname)
+        if not isinstance(cat, Category):
+            cat = self.site().category_namespace() + ':' + cat
+            targetCat = Category(self.site(), cat)
+        else:
+            targetCat=cat
         if targetCat.exists():
             pywikibot.output(u'Target page %s already exists!'
                               % targetCat.title(),
@@ -1439,7 +1447,10 @@ class Category(Page):
             pywikibot.output('Moving text from %s to %s.'
                              % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
-            creationSummary = message % (self.title(), authors)
+            try:
+                creationSummary = message % (self.title(), authors)
+            except TypeError:
+                creationSummary=message
             targetCat.put(self.get(), creationSummary)
             return True
 
