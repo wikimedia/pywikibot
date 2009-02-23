@@ -115,7 +115,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             botListPageTitle = botList[self.site.family.name][self.site.code]
             botListPage = pywikibot.Page(self.site, botListPageTitle)
             for linkedPage in botListPage.linkedPages():
-                if linkedPage.titleWithoutNamespace() == self.username:
+                if linkedPage.title(withNamespace=False) == self.username:
                     return True
             return False
         else:

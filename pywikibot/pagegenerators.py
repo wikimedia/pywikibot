@@ -616,7 +616,7 @@ def RegexFilterPageGenerator(generator, regex):
     """Yield pages from another generator whose titles match regex."""
     reg = re.compile(regex, re.I)
     for page in generator:
-        if reg.match(page.titleWithoutNamespace()):
+        if reg.match(page.title(withNamespace=False)):
             yield page
 
 

@@ -541,7 +541,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
         site = pywikibot.getSite()
 
     catNamespace = '|'.join(site.category_namespaces())
-    title = oldcat.titleWithoutNamespace()
+    title = oldcat.title(withNamespace=False)
     if not title:
         return
     # title might contain regex special characters
@@ -559,7 +559,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
     else:
         text = replaceExcept(oldtext, categoryR,
                              '[[%s:%s\\2' % (site.namespace(14),
-                                             newcat.titleWithoutNamespace()),
+                                             newcat.title(withNamespace=False)),
                              ['nowiki', 'comment', 'math', 'pre', 'source'])
     return text
 
