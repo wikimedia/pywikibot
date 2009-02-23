@@ -87,12 +87,15 @@ class TerminalHandler(logging.Handler):
         try:
             msg = self.format(record)
             fs = "%s"
-            try:
-                self.stream.write(fs % msg.encode(config.console_encoding,
-                                                  "xmlcharrefreplace"))
-            except UnicodeError:
-                self.stream.write(fs % msg.encode("ascii",
-                                                  "xmlcharrefreplace"))
+            if isinstance(msg, str):
+                self.stream.write(fs % msg)
+            else:
+                try:
+                    self.stream.write(fs % msg.encode(config.console_encoding,
+                                                      "xmlcharrefreplace"))
+                except UnicodeError:
+                    self.stream.write(fs % msg.encode("ascii",
+                                                      "xmlcharrefreplace"))
             self.flush()
         except (KeyboardInterrupt, SystemExit):
             raise
