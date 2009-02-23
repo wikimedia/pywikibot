@@ -9,6 +9,7 @@ __version__ = '$Id$'
 
 import traceback, re, sys
 import logging
+import threading
 import pywikibot
 from pywikibot import config
 from pywikibot.userinterfaces import transliteration
@@ -115,6 +116,7 @@ colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(windowsColors.keys()))
 
 class UI:
     def __init__(self):
+        self.writelock = threading.RLock()
         pass
 
     def printColorizedInUnix(self, text, level):
@@ -227,7 +229,12 @@ class UI:
                     prev = transliterated[-1:]
                     prevchar = char
             text = u"".join(transliteratedText)
-        self.printColorized(text, level)
+        
+        self.writelock.acquire()
+        try:
+            self.printColorized(text, level)
+        finally:
+            self.writelock.release()
 
     def input(self, question, password = False):
         """
@@ -240,12 +247,21 @@ class UI:
         # sound the terminal bell to notify the user
         if config.ring_bell:
             sys.stdout.write('\07')
+
+        # While we're waiting for user input, 
+        # we don't want terminal writes from other Threads
+        self.writelock.acquire()
         self.output(question + ' ', level=pywikibot.INPUT)
-        if password:
-            import getpass
-            text = getpass.getpass('')
-        else:
-            text = raw_input()
+
+        try:
+            if password:
+                import getpass
+                text = getpass.getpass('')
+            else:
+                text = raw_input()
+        finally:
+            self.writelock.release()
+
         text = unicode(text, config.console_encoding)
         return text
 
@@ -265,14 +281,29 @@ class UI:
                 options[i] = '%s[%s]%s' % (option[:pos], caseHotkey, option[pos+1:])
             else:
                 options[i] = '%s [%s]' % (option, caseHotkey)
-        # loop until the user entered a valid choice
-        while True:
-            prompt = '%s (%s)' % (question, ', '.join(options))
-            answer = self.input(prompt)
-            if answer.lower() in hotkeys or answer.upper() in hotkeys:
-                return answer
-            elif default and answer=='':		# empty string entered
-                return default
+        
+        answer = ''
+
+        # While we're waiting for user input, 
+        # we don't want terminal writes from other Threads
+        self.writelock.acquire()
+        try:
+            # loop until the user entered a valid choice
+            while True:
+                prompt = '%s (%s)' % (question, ', '.join(options))
+                
+                # it's okay to enter input with the lock, RLock is reentrant.
+                answer = self.input(prompt)
+                if answer.lower() in hotkeys or answer.upper() in hotkeys:
+                    break
+                elif default and answer=='':		# empty string entered
+                    answer = default
+                    break
+        finally:
+            self.writelock.release()
+        return answer
+            
+        
 
     def editText(self, text, jumpIndex = None, highlight = None):
         """
@@ -294,9 +325,9 @@ class UI:
     def askForCaptcha(self, url):
         try:
             import webbrowser
-            wikipedia.output(u'Opening CAPTCHA in your web browser...')
+            pywikibot.output(u'Opening CAPTCHA in your web browser...')
             webbrowser.open(url)
-            return wikipedia.input(u'What is the solution of the CAPTCHA that is shown in your web browser?')
+            return pywikibot.input(u'What is the solution of the CAPTCHA that is shown in your web browser?')
         except:
-            wikipedia.output(u'Error in opening web browser: %s' % sys.exc_info()[0])
-            return wikipedia.input(u'What is the solution of the CAPTCHA at %s ?' % url)
+            pywikibot.output(u'Error in opening web browser: %s' % sys.exc_info()[0])
+            return pywikibot.input(u'What is the solution of the CAPTCHA at %s ?' % url)
