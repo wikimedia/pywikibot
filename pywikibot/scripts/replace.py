@@ -373,8 +373,7 @@ class ReplaceRobot:
                         % page.title(asLink=True))
                     break
                 new_text = self.doReplacements(new_text)
-                if new_text.strip().replace('\r\n', '\n'
-                        ) == original_text.strip().replace('\r\n', '\n'):
+                if new_text == original_text:
                     pywikibot.output(u'No changes were necessary in %s'
                                       % page.title(asLink=True))
                     break
