@@ -55,9 +55,7 @@ class Family:
         self.servergmtoffset = timedelta()
 
         # letters that can follow a wikilink and are regarded as part of
-        # this link
-        # This depends on the linktrail setting in LanguageXx.php and on
-        # [[MediaWiki:Linktrail]].
+        # this link        # This depends on the linktrail setting in LanguageXx.php and on        # [[MediaWiki:Linktrail]].
         # Note: this is a regular expression.
         self.linktrails = {
            '_default': u'[a-z]*',
@@ -780,20 +778,30 @@ class Family:
     # Note that redirect codes are case-insensitive, so it is enough
     # to enter the code in lowercase here.
     redirect = {
+        'af': [u'AANSTUUR'],
+        'als': [u'WEITERLEITUNG', u'REDIRECT'],
         'ar': [u'تحويل'],
+        'bar': [u'WEITERLEITUNG', u'REDIRECT'],
+        'be-tarask': [u'перанакіраваньне'],
         'be-x-old': [u'перанакіраваньне'],
         'bg': [u'виж', u'пренасочване'],
+        'br': [u'ADKAS'],
         'bs': [u'preusmjeri'],
         'cs': [u'PŘESMĚRUJ'],
+        'cu': [u'ПРѢНАПРАВЛЄНИѤ'],
         'cy': [u'ail-cyfeirio', u'ailgyfeirio'],
+        'de': [u'WEITERLEITUNG', u'REDIRECT'],
         'el': [u'ΑΝΑΚΑΤΕΥΘΥΝΣΗ'],
         'eo': [u'ALIDIREKTU'],
+        'es': [u'REDIRECCIÓN'],
         'et': [u'suuna'],
+        'eu': [u'BIRZUZENDU'],
         'fa': [u'تغییرمسیر'],
         'fi': [u'ohjaus', u'uudelleenohjaus'],
         'fiu-vro': [u'saadaq'],
         'fr': [u'REDIRECTION', u'REDIRECT'],
         'ga': [u'athsheoladh'],
+        'gl': [u'REDIRECCIÓN'],
         'he': [u'הפניה'],
         'hr': [u'PREUSMJERI'],
         'hu': [u'átirányítás'],
@@ -805,28 +813,43 @@ class Family:
         'ka': [u'გადამისამართება'],
         'kk': [u'айдау'],
         'ko': [u'넘겨주기'],
+        'ksh': [u'ÖMLEIDUNG'],
         'li': [u'DOORVERWIJZING'],
+        'lt': [u'PERADRESAVIMAS'],
         'mk': [u'пренасочување', u'види'],
         'ml': [u'തിരിച്ചുവിടുക', u'തിരിച്ചുവിടല്‍'],
         'mr': [u'पुनर्निर्देशन'],
         'mt': [u'RINDIRIZZA', u'REDIRECT'],
+        'mwl': [u'ANCAMINAR'],
         'mzn': [u'تغییرمسیر'],
         'nds': [u'wiederleiden'],
         'nds-nl': [u'DEURVERWIEZING'],
+        'new': [u'पुनर्निर्देश'],
         'nl': [u'DOORVERWIJZING'],
         'nn': [u'omdiriger'],
         'oc': [u'REDIRECCION'],
+        'pdc': [u'WEITERLEITUNG', u'REDIRECT'],
         'pl': [u'REDIRECT', u'TAM', u'PRZEKIERUJ'],
+        'ro': [u'REDIRECTEAZA'],
         'ru': [u'REDIRECT',             # localised version is not
                u'перенаправление',      # so usual, so put the default
                u'перенапр'],            # one as the most used.
+        'sa': [u'#पुनर्निदेशन'],
+        'si': [u'යළියොමුව'],
         'sk': [u'presmeruj'],
-        'sr': [u'преусмери', u'Преусмери'], # lowercase only doesn't work?
+        'sq': [u'RIDREJTO'],
+        'sr': [u'преусмери', u'Преусмери'], # Using lowercase only doesn't work?
+        'srn': [u'STIR'],
         'su': [u'redirected', u'alih'],
         'sv': [u'OMDIRIGERING'],
+        'ta': [u'வழிமாற்று'],
+        'te': [u'దారిమార్పు'],
+        'th': [u'เปลี่ยนทาง'],
+        'tr': [u'YÖNLENDİRME'],
         'tt': [u'yünältü'],
         'uk': [u'ПЕРЕНАПРАВЛЕННЯ', u'ПЕРЕНАПР'],
         'vi': [u'đổi', u'đổi'],
+        'vro': [u'saadaq'],
         'yi': [u'ווייטערפירן']
     }
 
