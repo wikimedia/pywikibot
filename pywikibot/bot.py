@@ -16,6 +16,7 @@ __version__ = '$Id$'
 
 import logging, logging.handlers
        # all output goes thru python std library "logging" module
+import os
 import os.path
 import sys
 
@@ -111,7 +112,7 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
             except UnicodeDecodeError:
                 text = unicode(text, 'iso8859-1')
     if newline:
-        text += u'\n'
+        text += os.linesep
     if toStdout:
         level = STDOUT
     ui.output(text, level=level)
