@@ -1169,6 +1169,20 @@ class Page(object):
                 pywikibot.output(u"Saving page %s failed: %s"
                                  % (self.title(asLink=True), error.message))
 
+    @property
+    def categoryinfo(self):
+        """If supported, return a dict containing category content values:
+
+        Numbers of pages, subcategories, files, and total contents.
+
+        """
+        if not self.isCategory():
+            return None # should this raise an exception??
+        try:
+            return self.site().categoryinfo(self)
+        except NotImplementedError:
+            return None
+
 ######## DEPRECATED METHODS ########
 
     def encoding(self):

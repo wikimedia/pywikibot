@@ -1384,6 +1384,25 @@ class APISite(BaseSite):
             for linkdata in pageitem['extlinks']:
                 yield linkdata['*']
 
+    # TODO: implement a method to retrieve categoryinfo
+    def getcategoryinfo(self, category):
+        """Retrieve data on contents of category."""
+        cititle = category.title(withSection=False)
+        ciquery = api.PropertyGenerator("categoryinfo",
+                                        titles=cititle.encode(self.encoding()),
+                                        site=self)
+        for pageitem in ciquery:
+            if pageitem['title'] != cititle:
+                raise Error(
+                    u"categoryinfo: Query on %s returned data on '%s'"
+                    % (category, pageitem['title']))
+            api.update_page(category, pageitem)
+
+    def categoryinfo(self, category):
+        if not hasattr(category, "_catinfo"):
+            self.getcategoryinfo(category)
+        return category._catinfo
+
     @deprecate_arg("throttle", None)
     @deprecate_arg("includeredirects", "filterredir")
     def allpages(self, start="!", prefix="", namespace=0, filterredir=None,
@@ -2175,7 +2194,7 @@ redirects on %(site)s wiki""",
                 self.unlock_page(page)
                 if "nochange" in result["edit"]:
                     # null edit, page not changed
-                    # TODO: do we want to notify the user of this?
+                    #TODO: do we want to notify the user of this?
                     return True
                 page._revid = result["edit"]["newrevid"]
                 # see http://www.mediawiki.org/wiki/API:Wikimania_2006_API_discussion#Notes
@@ -2302,7 +2321,7 @@ u"editpage: Unknown result code '%s' received; page not saved"
         if "move" not in result:
             pywikibot.output(u"movepage: %s" % result, level=pywikibot.ERROR)
             raise Error("movepage: unexpected response")
-        # TODO: Check for talkmove-error messages
+        #TODO: Check for talkmove-error messages
         if "talkmove-error-code" in result["move"]:
             pywikibot.output(u"movepage: Talk page %s not moved"
                               % (page.toggleTalkPage().title(asLink=True)),
@@ -2417,9 +2436,9 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
         finally:
             self.unlock_page(page)
 
-    # TODO: implement undelete
+    #TODO: implement undelete
 
-    # TODO: implement patrol
+    #TODO: implement patrol
 
     def linksearch(self, siteurl, limit=None):
         """Backwards-compatible interface to exturlusage()"""
@@ -2452,7 +2471,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 #### METHODS NOT IMPLEMENTED YET ####
 class NotImplementedYet:
 
-    # TODO: is this needed any more? can it be obtained from the http module?
+    #TODO: is this needed any more? can it be obtained from the http module?
     def cookies(self, sysop = False):
         """Return a string containing the user's current cookies."""
         self._loadCookies(sysop = sysop)
@@ -2494,7 +2513,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 f.close()
 
     # THESE ARE FUNCTIONS NOT YET IMPLEMENTED IN THE API
-    # TODO: avoid code duplication for the following methods
+    #TODO: avoid code duplication for the following methods
     def newpages(self, number = 10, get_redirect = False, repeat = False):
         """Yield new articles (as Page objects) from Special:Newpages.
 

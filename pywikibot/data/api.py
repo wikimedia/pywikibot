@@ -493,9 +493,9 @@ class PageGenerator(QueryGenerator):
         QueryGenerator.__init__(self, generator=generator, **kwargs)
         # get some basic information about every page generated
         if 'prop' in self.request:
-            self.request['prop'] += "|info|imageinfo"
+            self.request['prop'] += "|info|imageinfo|categoryinfo"
         else:
-            self.request['prop'] = 'info|imageinfo'
+            self.request['prop'] = 'info|imageinfo|categoryinfo'
         if "inprop" in self.request:
             if "protection" not in self.request["inprop"]:
                 self.request["inprop"] += "|protection"
@@ -671,6 +671,8 @@ def update_page(page, pagedict):
         page._revid = pagedict['lastrevid']
         if page._revid in page._revisions:
             page._text = page._revisions[page._revid].text
+    if "categoryinfo" in pagedict:
+        page._catinfo = pagedict["categoryinfo"]
 
 
 if __name__ == "__main__":
