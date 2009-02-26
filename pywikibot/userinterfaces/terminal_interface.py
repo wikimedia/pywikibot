@@ -125,48 +125,6 @@ class UI:
         terminal, it will be replaced with a question mark or by a
         transliteration.
         """
-        if config.transliterate:
-            # Encode unicode string in the encoding used by the user's console,
-            # and decode it back to unicode. Then we can see which characters
-            # can't be represented in the console encoding.
-            codecedText = text.encode(config.console_encoding, 'replace'
-                                      ).decode(config.console_encoding)
-            transliteratedText = list(codecedText)
-            # Note: A transliteration replacement might be longer than the
-            # original character; e.g., ч is transliterated to ch.
-            # the resulting list will have as many elements as there are
-            # characters in the original text, but some list elements may 
-            # contain multiple characters
-            prev = "-"
-            prevchar = -1
-            cursor = 0
-            while cursor < len(codecedText):
-                char = codecedText.find(u"?", cursor)
-                if char == -1:
-                    break
-                cursor = char + 1
-                # work on characters that couldn't be encoded, but not on
-                # original question marks.
-                if text[char] != u"?":
-                    if char > 0 and prevchar != char - 1:
-                        prev = transliteratedText[char-1]
-                    try:
-                        transliterated = transliteration.trans(
-                                             text[char], default='?',
-                                             prev=prev, next=text[char+1])
-                    except IndexError:
-                        transliterated = transliteration.trans(
-                                             text[char], default='?',
-                                             prev=prev, next=' ')
-                    # transliteration was successful. The replacement
-                    # could consist of multiple letters.
-                    # mark the transliterated letters in yellow.
-                    transliteratedText[char] = u'\03{lightyellow}%s\03{default}' \
-                                                % transliterated
-                    # save the last transliterated character
-                    prev = transliterated[-1:]
-                    prevchar = char
-            text = u"".join(transliteratedText)
         self.writelock.acquire()
         try:
             logging.log(level, text)
@@ -377,11 +335,53 @@ class TerminalHandler(logging.Handler):
                 self.emit_raw(record, line)
 
     def emit(self, record):
-        msg = self.format(record)
+        text = self.format(record)
+        if config.transliterate:
+            # Encode unicode string in the encoding used by the user's console,
+            # and decode it back to unicode. Then we can see which characters
+            # can't be represented in the console encoding.
+            codecedText = text.encode(config.console_encoding, 'replace'
+                                      ).decode(config.console_encoding)
+            transliteratedText = list(codecedText)
+            # Note: A transliteration replacement might be longer than the
+            # original character; e.g., ч is transliterated to ch.
+            # the resulting list will have as many elements as there are
+            # characters in the original text, but some list elements may 
+            # contain multiple characters
+            prev = "-"
+            prevchar = -1
+            cursor = 0
+            while cursor < len(codecedText):
+                char = codecedText.find(u"?", cursor)
+                if char == -1:
+                    break
+                cursor = char + 1
+                # work on characters that couldn't be encoded, but not on
+                # original question marks.
+                if text[char] != u"?":
+                    if char > 0 and prevchar != char - 1:
+                        prev = transliteratedText[char-1]
+                    try:
+                        transliterated = transliteration.trans(
+                                             text[char], default='?',
+                                             prev=prev, next=text[char+1])
+                    except IndexError:
+                        transliterated = transliteration.trans(
+                                             text[char], default='?',
+                                             prev=prev, next=' ')
+                    # transliteration was successful. The replacement
+                    # could consist of multiple letters.
+                    # mark the transliterated letters in yellow.
+                    transliteratedText[char] = u'\03{lightyellow}%s\03{default}' \
+                                                % transliterated
+                    # save the last transliterated character
+                    prev = transliterated[-1:]
+                    prevchar = char
+            text = u"".join(transliteratedText)
         if config.colorized_output:
             if sys.platform == 'win32':
-                self.emitColorizedInWindows(record, msg)
+                self.emitColorizedInWindows(record, text)
             else:
-                self.emitColorizedInUnix(record, msg)
+                self.emitColorizedInUnix(record, text)
         else:
-            self.emit_raw(record, msg)
+            self.emit_raw(record, text)

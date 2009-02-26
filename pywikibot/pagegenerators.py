@@ -955,7 +955,7 @@ def main(*args):
         gen = genFactory.getCombinedGenerator()
         if gen:
             for page in gen:
-                pywikibot.output(page.title(), toStdout = True)
+                pywikibot.output(page.title(), level=pywikibot.STDOUT)
         else:
             pywikibot.showHelp()
     except Exception:

@@ -60,8 +60,12 @@ TerminalHandler = uiModule.TerminalHandler
 class RotatingFileHandler(logging.handlers.RotatingFileHandler):
     """Strip trailing newlines before outputting text to file"""
     def emit(self, record):
-        record.msg = record.msg.rstrip("\r\n")
-        logging.handlers.RotatingFileHandler.emit(self, record)
+        newrecord = logging.LogRecord(record.name, record.levelno,
+                                      record.pathname, record.lineno,
+                                      record.msg, record.args,
+                                      record.exc_info, record.funcName)
+        newrecord.msg = newrecord.msg.rstrip("\r\n")
+        logging.handlers.RotatingFileHandler.emit(self, newrecord)
 
 
 def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
