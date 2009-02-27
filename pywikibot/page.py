@@ -808,11 +808,22 @@ class Page(object):
         parameters as the second entry.
 
         """
+        # WARNING: may not return all templates used in particularly
+        # intricate cases such as template substitution
+        titles = list(t.title() for t in self.templates())
         templates = pywikibot.extract_templates_and_params(self.text)
         # backwards-compatibility: convert the dict returned as the second
         # element into a list in the format used by old scripts
         result = []
         for template in templates:
+            link = pywikibot.Link(template[0], self.site(),
+                                      defaultNamespace=10)
+            try:
+                if link.canonical_title() not in titles:
+                    continue
+            except pywikibot.Error:
+                # this is a parser function or magic word, not template name
+                continue
             args = template[1]
             positional = []
             named = {}
@@ -825,10 +836,7 @@ class Page(object):
                     positional.append(args[key])
             for name in named:
                 positional.append("%s=%s" % (name, named[name]))
-            result.append((pywikibot.Page(
-                             pywikibot.Link(template[0], self.site(),
-                                            defaultNamespace=10)),
-                           positional))
+            result.append((pywikibot.Page(link, self.site()), positional))
         return result
 
     @deprecate_arg("nofollow_redirects", None)
@@ -1425,6 +1433,17 @@ class Category(Page):
                 for article in subcat.articles(recurse):
                     yield article
 
+    def members(self, recurse=False):
+        """Yield all category contents (subcats, pages, and files)."""
+        for member in self.site().categorymembers(self):
+            yield member
+        if recurse:
+            if not isinstance(recurse, bool) and recurse:
+                recurse = recurse - 1
+            for subcat in self.subcategories():
+                for article in subcat.members(recurse):
+                    yield article
+        
     def isEmptyCategory(self):
         """Return True if category has no members (including subcategories)."""
         for member in self.site().categorymembers(self, limit=1):
@@ -1802,7 +1821,8 @@ not supported by PyWikiBot!"""
         # "empty" local links can only be self-links
         # with a fragment identifier.
         if not t and self._site == self._source and self._namespace != 0:
-            raise ValueError("Invalid link (no page title): '%s'" % self._text)
+            raise pywikibot.Error("Invalid link (no page title): '%s'"
+                                  % self._text)
 
         self._title = t
 

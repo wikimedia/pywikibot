@@ -33,10 +33,12 @@ def deprecated(instead=None):
     classname = f.f_locals['self'].__class__.__name__ 
     funcname = f.f_code.co_name
     if instead:
-        logging.warning("%s.%s is DEPRECATED, use %s instead" % \
-            (classname, funcname, instead))
+        output(u"%s.%s is DEPRECATED, use %s instead."
+                % (classname, funcname, instead),
+               level=WARNING)
     else:
-        logging.warning("%s.%s is DEPRECATED." % (classname, funcname))
+        output(u"%s.%s is DEPRECATED." % (classname, funcname),
+               level=WARNING)
 
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg"""

@@ -1,4 +1,4 @@
- # -*- coding: utf-8  -*-
+# -*- coding: utf-8  -*-
 """
 Objects representing MediaWiki sites (wikis) and families (groups of wikis
 on the same topic in different languages).
@@ -994,7 +994,7 @@ class APISite(BaseSite):
             api.update_page(target, pagedata)
             page._redir = target
 
-    def preloadpages(self, pagelist, groupsize=60):
+    def preloadpages(self, pagelist, groupsize=50):
         """Return a generator to a list of preloaded pages.
 
         Note that [at least in current implementation] pages may be iterated
@@ -1401,10 +1401,12 @@ class APISite(BaseSite):
     def categoryinfo(self, category):
         if not hasattr(category, "_catinfo"):
             self.getcategoryinfo(category)
+        if not hasattr(category, "_catinfo"):
+            # a category that exists but has no contents returns no API result
+            return {'size':0, 'pages':0, 'files':0, 'subcats':0}
         return category._catinfo
 
     @deprecate_arg("throttle", None)
-    @deprecate_arg("includeredirects", "filterredir")
     def allpages(self, start="!", prefix="", namespace=0, filterredir=None,
                  filterlanglinks=None, minsize=None, maxsize=None,
                  protect_type=None, protect_level=None, limit=None,
