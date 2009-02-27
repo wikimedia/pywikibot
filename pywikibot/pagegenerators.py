@@ -647,7 +647,7 @@ def PageWithTalkPageGenerator(generator):
             yield page.toggleTalkPage()
 
 
-def PreloadingGenerator(generator, pageNumber=60, lookahead=10):
+def PreloadingGenerator(generator, pageNumber=50, lookahead=10):
     """Yield preloaded pages taken from another generator."""
 
     # pages may be on more than one site, for example if an interwiki
