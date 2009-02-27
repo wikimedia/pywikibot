@@ -1011,7 +1011,8 @@ class APISite(BaseSite):
                                       if hasattr(p, "_pageid")
                                          and p._pageid > 0]
             cache = dict((p.title(withSection=False), p) for p in sublist)
-            rvgen = api.PropertyGenerator("revisions|info", site=self)
+            rvgen = api.PropertyGenerator("revisions|info|categoryinfo",
+                                          site=self)
             rvgen.set_maximum_items(-1) # suppress use of "rvlimit" parameter
             if len(pageids) == len(sublist):
                 # only use pageids if all pages have them

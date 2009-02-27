@@ -420,7 +420,7 @@ class Page(object):
                 if template.title(withNamespace=False) in catredirs:
                     # Get target (first template argument)
                     self._catredirect = self.site().namespace(14) \
-                                         + ":" + args[0]
+                                         + ":" + args[0].strip()
                     break
             else:
                 self._catredirect = False
