@@ -28,6 +28,7 @@ import re
 import sys
 import threading
 import urllib
+from datetime import datetime
 
 logger = logging.getLogger("wiki.site")
 
@@ -788,6 +789,11 @@ class APISite(BaseSite):
                         text="{{CURRENTTIMESTAMP}}")
         result = r.submit()
         return re.search('\d+', result['parse']['text']['*']).group()
+
+    def getcurrenttime(self):
+        """Returns a datetime object representing server time"""
+        ts = self.getcurrenttimestamp()
+        return datetime.strptime(ts, "%Y%m%d%H%M%S")
 
     def _getsiteinfo(self):
         """Retrieve siteinfo and namespaces from site."""

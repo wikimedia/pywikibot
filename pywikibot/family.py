@@ -7,7 +7,7 @@ import logging
 import re
 import urllib
 
-from datetime import datetime, timedelta
+import pywikibot
 
 logger = logging.getLogger("wiki.family")
 
@@ -49,10 +49,10 @@ class Family:
         ]
 
         self.langs = {}
-        # The timedelta to GMT of the server.
-        # Exemple for a server running CET :
-        # timedelta(hours=+1)
-        self.servergmtoffset = timedelta()
+##        # The timedelta to GMT of the server.
+##        # Exemple for a server running CET :
+##        # timedelta(hours=+1)
+##        self.servergmtoffset = timedelta()
 
         # letters that can follow a wikilink and are regarded as part of
         # this link        # This depends on the linktrail setting in LanguageXx.php and on        # [[MediaWiki:Linktrail]].
@@ -1005,9 +1005,11 @@ class Family:
         return (None, None)
 
     def server_time(self, code):
-        """Return a datetime object representing server time"""
-        # TODO : If the local computer time is wrong, result will be wrong
-        return datetime.utcnow() + self.servergmtoffset
+        """
+        DEPRECATED, use Site.getcurrenttime() instead
+        Return a datetime object representing server time"""
+        pywikibot.deprecated("Site.getcurrenttime()")
+        return pywikibot.Site(code, self).getcurrenttime()
 
     def isPublic(self, code):
         """Does the wiki require logging in before viewing it?"""
