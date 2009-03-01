@@ -963,6 +963,7 @@ class Page(object):
             speedy-deletion request on the page instead.
 
         """
+        # TODO: add support for mark
         if reason is None:
             pywikibot.output(u'Deleting %s.' % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the deletion:')
@@ -977,7 +978,13 @@ class Page(object):
                 answer = 'y'
                 self.site()._noDeletePrompt = True
         if answer in ['y', 'Y']:
-            return self.site().delete(self, reason, mark=mark)
+            try:
+                return self.site().deletepage(self, reason)
+            except pywikibot.NoUsername, e:
+                if mark:
+                    raise NotImplementedError("marking pages for deletions is not yet available.")
+                raise e
+                
 
     def loadDeletedRevisions(self):
         """Retrieve all deleted revisions for this Page from Special/Undelete.

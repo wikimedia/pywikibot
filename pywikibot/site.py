@@ -2420,11 +2420,11 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
         """
         try:
             self.login(sysop=True)
-        except pywikibot.Error, e:
-            raise Error("delete: Unable to login as sysop (%s)"
+        except pywikibot.NoUsername, e:
+            raise NoUsername("delete: Unable to login as sysop (%s)"
                         % e.__class__.__name__)
         if not self.logged_in(sysop=True):
-            raise Error("delete: Unable to login as sysop")
+            raise NoUsername("delete: Unable to login as sysop")
         token = self.token("delete")
         req = api.Request(site=self, action="delete", token=token,
                           title=page.title(withSection=False),
