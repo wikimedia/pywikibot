@@ -482,7 +482,7 @@ class CategoryMoveRobot:
 
         # Delete the old category and its moved talk page
         if copied and self.deleteEmptySourceCat == True:
-            if self.oldCat.isEmpty():
+            if self.oldCat.isEmptyCategory():
                 reason = pywikibot.translate(site, deletion_reason_move) \
                          % (self.newCatTitle, self.newCatTitle)
                 confirm = not self.batchMode
