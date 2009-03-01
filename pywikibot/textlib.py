@@ -633,7 +633,7 @@ def categoryFormat(categories, insite = None):
         return ''
     if insite is None:
         insite = pywikibot.getSite()
-    catLinks = [category.title(asLink=True, noInterwiki = True) for category in categories]
+    catLinks = [category.aslink() for category in categories]
     if insite.category_on_one_line():
         sep = ' '
     else:
