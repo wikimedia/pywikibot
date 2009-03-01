@@ -1509,7 +1509,13 @@ def formatYear(lang, year):
     else:
         return formats['YearAD'][lang](year)
 
+mediawikiFormat = "%Y%m%d%H%M%S"
+def timestamp2datetime(ts):
+    from datetime import datetime
+    return datetime.strptime(ts, mediawikiFormat)
 
+def datetime2timestamp(dt):
+    return dt.strftime(mediawikiFormat)
 
 #
 #
