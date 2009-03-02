@@ -425,14 +425,14 @@ class BaseSite(object):
         are ignored.
 
         """
-        deprecated("pywikibot.comms.data.request")
+        deprecated("pywikibot.comms.http.request")
+        from pywikibot.comms import http
         if data:
             if not isinstance(data, basestring):
                 data = urllib.urlencode(data)
-            return pywikibot.comms.data.request(self, path, method="PUT",
-                                                body=data)
+            return http.request(self, path, method="PUT", body=data)
         else:
-            return pywikibot.comms.data.request(self, path)
+            return http.request(self, path)
 
     def postForm(self, address, predata, sysop=False, cookies=None):
         """DEPRECATED"""
