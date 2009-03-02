@@ -18,7 +18,6 @@ import pywikibot.site
 import htmlentitydefs
 import logging
 import re
-import sys
 import threading
 import unicodedata
 import urllib
@@ -214,7 +213,7 @@ class Page(object):
     def __str__(self):
         """Return a console representation of the pagelink."""
         return self.title(asLink=True, forceInterwiki=True
-                          ).encode(sys.stderr.encoding)
+                          ).encode(config.console_encoding)
 
     def __unicode__(self):
         return self.title(asLink=True, forceInterwiki=True)
@@ -222,7 +221,7 @@ class Page(object):
     def __repr__(self):
         """Return a more complete string representation."""
         return u"%s(%s)" % (self.__class__.__name__,
-                            self.title().encode(sys.stderr.encoding))
+                            self.title().encode(config.console_encoding))
 
     def __cmp__(self, other):
         """Test for equality and inequality of Page objects.

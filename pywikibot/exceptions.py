@@ -10,7 +10,7 @@ Exception classes used throughout the framework.
 __version__ = '$Id$'
 
 
-import sys
+from pywikibot import config
 
 # TODO: These are copied from wikipedia.py; not certain that all of them
 # will be needed in the rewrite.
@@ -19,7 +19,7 @@ class Error(Exception):
     """Wikipedia error"""
     def __init__(self, arg):
         try:
-            self.string = arg.encode(sys.stderr.encoding, "xmlcharrefreplace")
+            self.string = arg.encode(config.console_encoding, "xmlcharrefreplace")
         except (AttributeError, TypeError):
             self.string = arg.encode("ascii", "xmlcharrefreplace")
     def __str__(self):
