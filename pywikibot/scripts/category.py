@@ -374,11 +374,9 @@ Are you sure? [y/n]:""")
                     pywikibot.output(u"%s doesn't exist yet. Ignoring."
                                      % (page.title()))
                     pass
-                except pywikibot.IsRedirectPage, arg:
-                    redirTarget = pywikibot.Page(site, arg.args[0])
+                except pywikibot.IsRedirectPage:
                     pywikibot.output(
-                        u"WARNING: %s is redirect to %s. Ignoring."
-                        % (page.title(), redirTarget.title()))
+                        u"WARNING: %s is redirect to. Ignoring." % page)
                 else:
                     cats = page.categories()
                     # Show the title of the page we're working on.
