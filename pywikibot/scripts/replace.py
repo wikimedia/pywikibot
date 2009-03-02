@@ -699,7 +699,7 @@ LIMIT 200""" % (whereClause, exceptClause)
         preloadingGen = pagegenerators.PreloadingGenerator(gen,
                                             pageNumber=20, lookahead=100)
     else:
-        preloadingGen = pagegenerators.PreloadingGenerator(gen, pageNumber=60)
+        preloadingGen = pagegenerators.PreloadingGenerator(gen)
     bot = ReplaceRobot(preloadingGen, replacements, exceptions, acceptall,
                        allowoverlap, recursive, add_cat, sleep, edit_summary)
     bot.run()
