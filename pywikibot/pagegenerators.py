@@ -655,10 +655,17 @@ def PreloadingGenerator(generator, pageNumber=50, lookahead=10):
     sites = {}
     # build a list of pages for each site found in the iterator
     for page in generator:
-        sites.setdefault(page.site(), []).append(page)
-    return itertools.chain(*(site.preloadpages(sites[site], pageNumber)
-                             for site in sites))
-
+        site = page.site()
+        sites.setdefault(site, []).append(page)
+        if len(sites[site]) >= pageNumber:
+            group = sites[site]
+            sites[site] = []
+            for i in site.preloadpages(group, pageNumber):
+                yield i
+    for site in sites:
+        if sites[site]:
+            for i in site.preloadpages(sites[site], pageNumber):
+                yield i
 
 #TODO below
 
