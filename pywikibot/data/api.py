@@ -444,6 +444,8 @@ u"%s: stopped iteration because 'query' and '%s' not found in api response."
                               % (self.__class__.__name__, pagedata.keys(),
                                  self.limit))
                 pagedata = pagedata.values()
+                if self.resultkey == "pages":
+                    pagedata.sort(key=lambda i:int(i["pageid"]))
             else:
                 logger.debug(u"%s received %s; limit=%s"
                               % (self.__class__.__name__, pagedata, self.limit))
