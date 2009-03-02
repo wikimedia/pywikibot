@@ -939,7 +939,7 @@ class APISite(BaseSite):
     def page_restrictions(self, page):
         """Returns a dictionary reflecting page protections"""
         if not self.page_exists(page):
-            raise NoPage(u'No page %s.' % page)
+            raise NoPage(page)
         if not hasattr(page, "_protection"):
             self.loadpageinfo(page)
         return page._protection
@@ -970,7 +970,7 @@ class APISite(BaseSite):
         if not hasattr(page, "_redir"):
             self.loadpageinfo(page)
         if not page._redir:
-            raise pywikibot.IsNotRedirectPage(page.title())
+            raise pywikibot.IsNotRedirectPage(page)
         title = page.title(withSection=False)
         query = api.Request(site=self, action="query", property="info",
                             inprop="protection|talkid|subjectid",
@@ -1348,8 +1348,7 @@ class APISite(BaseSite):
                         u"loadrevisions: Query on %s returned data on '%s'"
                         % (page, pagedata['title']))
                 if "missing" in pagedata:
-                    raise NoPage(u'Page %s does not exist'
-                                  % page.title(asLink=True)) 
+                    raise NoPage(page) 
             else:
                 page = Page(self, pagedata['title'])
             api.update_page(page, pagedata)
@@ -2141,8 +2140,7 @@ redirects on %(site)s wiki""",
         except NoPage:
             lastrev = None
             if not recreate:
-                raise Error("Page %s does not exist on %s wiki."
-                            % (page.title(withSection=False), self))
+                raise 
         token = self.token(page, "edit")
         self.lock_page(page)
         if lastrev is not None and page.latestRevision() != lastrev:

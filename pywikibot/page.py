@@ -283,8 +283,7 @@ class Page(object):
         exceptions that should be caught by the calling code:
 
           - NoPage: The page does not exist
-          - IsRedirectPage: The page is a redirect. The argument of the
-                exception is the title of the page it redirects to.
+          - IsRedirectPage: The page is a redirect. 
           - SectionError: The section does not exist on a page with a #
                 link
 
@@ -304,7 +303,7 @@ class Page(object):
         else:
             # Make sure we re-raise an exception we got on an earlier attempt
             if hasattr(self, '_redirarg') and not get_redirect:
-                raise pywikibot.IsRedirectPage, self._redirarg
+                raise pywikibot.IsRedirectPage(self)
             elif hasattr(self, '_getexception'):
                 raise self._getexception
         if force or not hasattr(self, "_revid") \

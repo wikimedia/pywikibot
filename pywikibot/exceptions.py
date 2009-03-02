@@ -25,24 +25,47 @@ class Error(Exception):
     def __str__(self):
         return self.string
 
+class PageRelatedError(Error):
+    """Abstract Exception, used when the Exception concerns a particular 
+    Page, and when a generic message can be written once for all"""
+    # Preformated UNICODE message where the page title will be inserted
+    # Override this in subclasses.
+    # u"Oh noes! Page %s is too funky, we should not delete it ;("
+    message = None
+    def __init__(self, page):
+        """
+        @param page
+        @type page: Page object
+        """
+        if self.message is None:
+            raise Error("PageRelatedError is abstract. Can't instantiate it!")
+        super(PageRelatedError, self).__init__(self.message % page)
+        self._page = page
+
+    def getPage(self):
+        return self._page
+
 class NoUsername(Error):
     """Username is not in user-config.py"""
 
-class NoPage(Error):
+class NoPage(PageRelatedError):
     """Page does not exist"""
+    message = u"Page %s doesn't exist."
 
 class NoSuchSite(Error):
     """Site does not exist"""
 
-class IsRedirectPage(Error):
+class IsRedirectPage(PageRelatedError):
     """Page is a redirect page"""
+    message = u"Page %s is a redirect page."
 
-class IsNotRedirectPage(Error):
+class IsNotRedirectPage(PageRelatedError):
     """Page is not a redirect page"""
+    message = u"Page %s is not a redirect page."
 
 class CircularRedirect(Error):
     """Page is a circular redirect
-
+ 
     Exception argument is the redirect target; this may be the same title
     as this page or a different title (in which case the target page directly
     or indirectly redirects back to this one)
