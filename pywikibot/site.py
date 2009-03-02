@@ -961,16 +961,16 @@ class APISite(BaseSite):
 
     def page_isredirect(self, page):
         """Return True if and only if page is a redirect."""
-        if not hasattr(page, "_redir"):
+        if not hasattr(page, "_isredir"):
             self.loadpageinfo(page)
-        return bool(page._redir)
+        return page._isredir
 
     def getredirtarget(self, page):
         """Return Page object for the redirect target of page."""
-        if not hasattr(page, "_redir"):
-            self.loadpageinfo(page)
-        if not page._redir:
+        if not self.page_isredirect(page):
             raise pywikibot.IsNotRedirectPage(page)
+        if hasattr(page, '_redirtarget'):
+            return page._redirtarget
         title = page.title(withSection=False)
         query = api.Request(site=self, action="query", property="info",
                             inprop="protection|talkid|subjectid",
@@ -998,7 +998,8 @@ class APISite(BaseSite):
                     % pagedata['title'])
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
             api.update_page(target, pagedata)
-            page._redir = target
+            page._redirtarget = target
+        return page._redirtarget
 
     def preloadpages(self, pagelist, groupsize=50):
         """Return a generator to a list of preloaded pages.

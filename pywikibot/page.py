@@ -295,24 +295,45 @@ class Page(object):
 
         """
         if force:
-            # When forcing, we retry the page no matter what. Old exceptions
-            # do not apply any more.
-            for attr in ['_redirarg', '_getexception']:
+            # When forcing, we retry the page no matter what:
+            # * Old exceptions do not apply any more
+            # * Deleting _revid to force reload
+            # * Deleting _redirtarget, that info is now obsolete.
+            for attr in ['_redirtarget', '_getexception', '_revid']:
                 if hasattr(self, attr):
                     delattr(self,attr)
-        else:
-            # Make sure we re-raise an exception we got on an earlier attempt
-            if hasattr(self, '_redirarg') and not get_redirect:
-                raise pywikibot.IsRedirectPage(self)
-            elif hasattr(self, '_getexception'):
-                raise self._getexception
-        if force or not hasattr(self, "_revid") \
-                 or not self._revid in self._revisions \
-                 or self._revisions[self._revid].text is None:
-            self.site().loadrevisions(self, getText=True, sysop=sysop)
-            # TODO: Exception handling for no-page, redirects, etc.
+        try:
+            self._getInternals(sysop)
+        except pywikibot.IsRedirectPage:
+            if not get_redirect:
+                raise
 
         return self._revisions[self._revid].text
+
+    def _getInternals(self, sysop):
+        """Helper function for get(). 
+        Stores latest revision in self if it doesn't contain it, doesn't think.
+        * Raises exceptions from previous runs.
+        * Stores new exceptions in _getexception and raises them"""
+
+        # Raise exceptions from previous runs
+        if hasattr(self, '_getexception'):
+            raise self._getexception
+
+        # If not already stored, fetch revision
+        if not hasattr(self, "_revid") \
+                 or not self._revid in self._revisions \
+                 or self._revisions[self._revid].text is None:
+            try:
+                self.site().loadrevisions(self, getText=True, sysop=sysop)
+            except (pywikibot.NoPage, pywikibot.SectionError), e:
+                self._getexception = e
+                raise
+
+        # self._isredir is set by loadrevisions
+        if self._isredir:
+            self._getexception = pywikibot.IsRedirectPage(self)
+            raise self._getexception
 
     @deprecate_arg("throttle", None)
     @deprecate_arg("nofollow_redirects", None)
@@ -864,11 +885,7 @@ class Page(object):
         exception. This method also can raise a NoPage exception.
 
         """
-        if not self.isRedirectPage():
-            raise pywikibot.IsNotRedirectPage(self.title())
-        if not isinstance(self._redir, Page):
-            self.site().getredirtarget(self)
-        return self._redir
+        return self.site().getredirtarget(self)
 
     @deprecate_arg("forceReload", None)
     def getVersionHistory(self, reverseOrder=False, getAll=False,
