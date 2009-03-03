@@ -7,7 +7,7 @@ Objects representing Mediawiki log entries
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: $'
+__version__ = '$Id$'
 
 from pywikibot.exceptions import *
 import pywikibot

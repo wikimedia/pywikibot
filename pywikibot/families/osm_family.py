@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: openttd_family.py 5066 2008-02-21 19:42:30Z russblau $'
+__version__ = '$Id$'
 
 import family
 

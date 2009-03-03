@@ -16,7 +16,7 @@ All other parameters will be regarded as a page title; in this case, the bot
 will only touch a single page.
 """
 
-__version__='$Id: touch.py,v 1.13 2006/03/01 14:07:06 russblau Exp $'
+__version__='$Id$'
 
 import pywikibot
 from pywikibot import pagegenerators, catlib, config

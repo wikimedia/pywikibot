@@ -7,7 +7,7 @@ Interface functions to Mediawiki's api.php
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: $'
+__version__ = '$Id$'
 
 from UserDict import DictMixin
 from datetime import datetime, timedelta
