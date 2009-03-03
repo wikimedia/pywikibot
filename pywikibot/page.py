@@ -962,7 +962,7 @@ class Page(object):
             pywikibot.output(u'Moving %s to [[%s]].'
                              % (self.title(asLink=True), newtitle))
             reason = pywikibot.input(u'Please enter a reason for the move:')
-        # TODO: implement "safe" parameter
+        # TODO: implement "safe" parameter (Is this necessary ?) 
         # TODO: implement "sysop" parameter
         return self.site().movepage(self, newtitle, reason,
                                     movetalk=movetalkpage,
@@ -1112,7 +1112,13 @@ class Page(object):
         oldCat and newCat should be Category objects.
         If newCat is None, the category will be removed.
         
-        """ # TODO: document remaining arguments
+        comment: string to use as an edit summary
+
+        sortKey: sortKey to use for the added category. 
+        Unused if newCat is None, or if inPlace=True
+        
+        """
+        #TODO: is inPlace necessary? 
         site = self.site()
         changesMade = False
 

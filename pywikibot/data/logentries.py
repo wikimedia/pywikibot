@@ -14,7 +14,7 @@ import pywikibot
 from pywikibot import date
   
 class LogDict(dict):
-    """Simple custom dictionary that raises an APIError instead of a KeyError"""
+    """Simple custom dictionary that raises a custom Error instead of a KeyError"""
     def __missing__(self, key):
         pywikibot.output(u"API log entry received:\n" + repr(self),
                          level=pywikibot.DEBUG)
@@ -23,6 +23,9 @@ class LogDict(dict):
 class LogEntry(object):
     """Generic log entry"""
 
+    # Log type expected. None for every type, or one of the (letype) str : 
+    # block/patrol/etc...
+    # Overriden in subclasses.
     _expectedType = None
 
     def __init__(self, apidata):
