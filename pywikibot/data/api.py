@@ -591,6 +591,19 @@ class ListGenerator(QueryGenerator):
         """
         QueryGenerator.__init__(self, list=listaction, **kwargs)
 
+class LogEntryListGenerator(ListGenerator):
+    """
+    Like ListGenerator, but specialized for listaction="logevents" :
+    yields LogEntry objects instead of dicts.
+    """
+    def __init__(self, logtype, **kwargs):
+        ListGenerator.__init__(self, "logevents", **kwargs)
+
+        import logentries  
+        self.entryFactory = logentries.LogEntryFactory(logtype)
+
+    def result(self, pagedata):
+        return self.entryFactory.create(pagedata)
 
 class LoginManager(login.LoginManager):
     """Supplies getCookie() method to use API interface."""

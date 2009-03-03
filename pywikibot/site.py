@@ -1749,7 +1749,7 @@ class APISite(BaseSite):
                 if start < end:
                     raise Error(
                   "logevents: start must be later than end with reverse=False")
-        legen = api.ListGenerator("logevents", site=self)
+        legen = api.LogEntryListGenerator(logtype, site=self)
         if logtype is not None:
             legen.request["letype"] = logtype
         if user is not None:
