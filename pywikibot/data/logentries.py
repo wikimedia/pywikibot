@@ -9,7 +9,7 @@ Objects representing Mediawiki log entries
 #
 __version__ = '$Id: $'
 
-from api import APIError
+from pywikibot.exceptions import *
 
 class LogEntry(object):
     """Generic log entry"""
@@ -107,4 +107,4 @@ class LogEntryFactory(object):
             logtype = logdata['type'] 
             return _getEntryClass(logtype)(logdata)
         except KeyError:
-            raise APIError("Log entry has no 'type' key")
+            raise Error("Log entry has no 'type' key")
