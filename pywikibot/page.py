@@ -448,7 +448,7 @@ class Page(object):
     def getCategoryRedirectTarget(self):
         """If this is a category redirect, return the target category title."""
         if self.isCategoryRedirect():
-            return Category(self.site(), self._catredirect)
+            return Category(Link(self._catredirect, self.site()))
         raise pywikibot.IsNotRedirectPage(self.title())
 
     def isEmpty(self):
@@ -712,6 +712,8 @@ class Page(object):
         except pywikibot.Error, err:
             logger.exception(u"Error saving page %s\n" % link)
             pywikibot.output(u"")
+            if not callback:
+                raise pywikibot.PageNotSaved(link)
         if callback:
             callback(self, err)
 
