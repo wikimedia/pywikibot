@@ -2190,7 +2190,7 @@ redirects on %(site)s wiki""",
 
                 if err.code == "editconflict":
                     raise EditConflict(self._ep_errors[err.code] % errdata)
-                if err.code == "protectedpage":
+                if err.code in ("protectedpage", "cascadeprotected"):
                     raise LockedPage(errdata['title'])
                 if err.code in self._ep_errors:
                     raise Error(self._ep_errors[err.code] % errdata)
