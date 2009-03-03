@@ -1509,13 +1509,18 @@ def formatYear(lang, year):
     else:
         return formats['YearAD'][lang](year)
 
-mediawikiFormat = "%Y%m%d%H%M%S"
+mediawikiTSFormat = "%Y%m%d%H%M%S"
+ISO8601Format = "%Y-%m-%dT%H:%M:%SZ"
 def timestamp2datetime(ts):
     from datetime import datetime
-    return datetime.strptime(ts, mediawikiFormat)
+    return datetime.strptime(ts, mediawikiTSFormat)
 
 def datetime2timestamp(dt):
-    return dt.strftime(mediawikiFormat)
+    return dt.strftime(mediawikiTSFormat)
+
+def ISO2datetime(ts):
+    from datetime import datetime
+    return datetime.strptime(ts, ISO8601Format)
 
 #
 #
