@@ -10,12 +10,55 @@ Objects representing Mediawiki log entries
 __version__ = '$Id: $'
 
 from pywikibot.exceptions import *
+import pywikibot
+from pywikibot import date
+  
+class LogDict(dict):
+    """Simple custom dictionary that raises an APIError instead of a KeyError"""
+    def __missing__(self, key):
+        pywikibot.output(u"API log entry received:\n" + repr(self),
+                         level=pywikibot.DEBUG)
+        raise Error("Log entry has no '%s' key" % key)
 
 class LogEntry(object):
     """Generic log entry"""
     def __init__(self, apidata):
         """Initialize object from a logevent dict returned by MW API"""
-        raise NotImplementedError(self.__class__)
+        self.data = LogDict(apidata)
+     
+    def logid(self):
+        return self.data['logid']
+    
+    def pageid(self):
+        return self.data['pageid']
+
+    def ns(self):
+        return self.data['ns']
+
+    def title(self):
+        """Page on which action was performed"""
+        if not hasattr(self, '_title'):
+            self._title = pywikibot.Page(pywikibot.Link(self.data['title']))
+        return self._title
+    
+    def type(self):
+        return self.data['type']
+
+    def action(self):
+        return self.data['action']
+
+    def user(self):
+        #TODO use specific User class ?
+        return self.data['user']
+
+    def timestamp(self):
+        """datetime object corresponding to event timestamp"""
+        if not hasattr(self, '_timestamp'):
+            self._timestamp = date.ISO2datetime(self.data['timestamp'])
+        return self._timestamp
+
+    def comment(self):
+        return self.data['comment']
 
 class BlockEntry(LogEntry):
     pass
@@ -107,4 +150,6 @@ class LogEntryFactory(object):
             logtype = logdata['type'] 
             return _getEntryClass(logtype)(logdata)
         except KeyError:
+            pywikibot.output(u"API log entry received:\n" + logdata,
+                              level=pywikibot.DEBUG)
             raise Error("Log entry has no 'type' key")
