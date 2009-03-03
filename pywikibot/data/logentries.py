@@ -22,9 +22,15 @@ class LogDict(dict):
 
 class LogEntry(object):
     """Generic log entry"""
+
+    _expectedType = None
+
     def __init__(self, apidata):
         """Initialize object from a logevent dict returned by MW API"""
         self.data = LogDict(apidata)
+        if self._expectedType is not None and self._expectedType != self.type():
+            raise Error("Wrong log type! Expecting %s, received %s instead." \
+                        % (self._expectedType, self.type()))
      
     def logid(self):
         return self.data['logid']
@@ -61,31 +67,31 @@ class LogEntry(object):
         return self.data['comment']
 
 class BlockEntry(LogEntry):
-    pass
+    _expectedType = 'block'
 
 class ProtectEntry(LogEntry):
-    pass
+    _expectedType = 'protect'
 
 class RightsEntry(LogEntry):
-    pass
+    _expectedType = 'rights'
 
 class DeleteEntry(LogEntry):
-    pass
+    _expectedType = 'delete'
 
 class UploadEntry(LogEntry):
-    pass
+    _expectedType = 'upload'
 
 class MoveEntry(LogEntry):
-    pass
+    _expectedType = 'move'
 
 class ImportEntry(LogEntry):
-    pass
+    _expectedType = 'import'
 
 class PatrolEntry(LogEntry):
-    pass
+    _expectedType = 'patrol'
 
 class NewUsersEntry(LogEntry):
-    pass
+    _expectedType = 'newusers'
 
 #TODO entries for merge,suppress,makebot,gblblock,renameuser,globalauth,gblrights ?
 
