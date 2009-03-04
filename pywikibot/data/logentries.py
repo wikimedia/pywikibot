@@ -189,34 +189,24 @@ class NewUsersEntry(LogEntry):
 #TODO entries for merge,suppress,makebot,gblblock,renameuser,globalauth,gblrights ?
 
 
-_logtypes = {
-    'block':BlockEntry,
-    'protect':ProtectEntry,
-    'rights':RightsEntry,
-    'delete':DeleteEntry,
-    'upload':UploadEntry,
-    'move':MoveEntry,
-    'import':ImportEntry,
-    'patrol':PatrolEntry,
-    'newusers':NewUsersEntry
-}
-
-def _getEntryClass(logtype):
-    """
-    Returns the class corresponding to the @logtype string parameter.
-    Returns LogEntry if logtype is unknown or not supported
-    """
-    try:
-        return _logtypes[logtype]
-    except KeyError:
-        return LogEntry
-
 class LogEntryFactory(object):
     """
     LogEntry Factory
 
     Only available method is create()
     """
+    _logtypes = {
+        'block':BlockEntry,
+        'protect':ProtectEntry,
+        'rights':RightsEntry,
+        'delete':DeleteEntry,
+        'upload':UploadEntry,
+        'move':MoveEntry,
+        'import':ImportEntry,
+        'patrol':PatrolEntry,
+        'newusers':NewUsersEntry
+    }
+
     def __init__(self, logtype=None):
         """
         @param logtype: The log type of the log entries, if known in advance.
@@ -229,7 +219,7 @@ class LogEntryFactory(object):
         else:
             # Bind a Class object to self._creator:
             # When called, it will initialize a new object of that class
-            self._creator = _getEntryClass(logtype)
+            self._creator = LogEntryFactory._getEntryClass(logtype)
 
     def create(self, logdata):
         """
@@ -241,13 +231,24 @@ class LogEntryFactory(object):
         """
         return self._creator(logdata)
 
+    @staticmethod
+    def _getEntryClass(logtype):
+        """
+        Returns the class corresponding to the @logtype string parameter.
+        Returns LogEntry if logtype is unknown or not supported
+        """
+        try:
+            return LogEntryFactory._logtypes[logtype]
+        except KeyError:
+            return LogEntry
+
     def _createFromData(self, logdata):
         """
         Checks for logtype from data, and creates the correct LogEntry
         """
         try:
             logtype = logdata['type'] 
-            return _getEntryClass(logtype)(logdata)
+            return LogEntryFactory._getEntryClass(logtype)(logdata)
         except KeyError:
             pywikibot.output(u"API log entry received:\n" + logdata,
                               level=pywikibot.DEBUG)
