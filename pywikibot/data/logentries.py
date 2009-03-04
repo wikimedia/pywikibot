@@ -14,11 +14,14 @@ import pywikibot
 from pywikibot import date
   
 class LogDict(dict):
-    """Simple custom dictionary that raises a custom Error instead of a KeyError"""
+    """
+    Simple custom dictionary that raises a custom KeyError and logs
+    debugging information when a key is missing
+    """
     def __missing__(self, key):
         pywikibot.output(u"API log entry received:\n" + repr(self),
                          level=pywikibot.DEBUG)
-        raise Error("Log entry has no '%s' key" % key)
+        raise KeyError("Log entry has no '%s' key" % key, key)
 
 class LogEntry(object):
     """Generic log entry"""
@@ -71,6 +74,74 @@ class LogEntry(object):
 
 class BlockEntry(LogEntry):
     _expectedType = 'block'
+    def __init__(self, apidata):
+        super(BlockEntry, self).__init__(apidata)
+        # see http://en.wikipedia.org/w/api.php?action=query&list=logevents&letype=block&lelimit=1&lestart=2009-03-04T00:35:07Z :
+        # When an autoblock is removed, the "title" field is not a page title
+        # ( https://bugzilla.wikimedia.org/show_bug.cgi?id=17781 )
+        pos = self.data['title'].find('#')
+        self.isAutoblockRemoval = pos > 0
+        if self.isAutoblockRemoval:
+            self._blockid = int(self.data['title'][pos+1:])
+
+    def title(self):
+        """
+        * Returns the Page object of username or IP 
+           if this block action targets a username or IP.
+        * Returns the blockid if this log reflects the removal of an autoblock
+        """
+        #TODO what for IP ranges ?
+        if self.isAutoblockRemoval:
+            return self._blockid
+        else:
+            return super(BlockEntry, self).title()
+
+    def isAutoblockRemoval(self):
+        return self.isAutoblockRemoval
+            
+    def _getBlockDetails(self):
+        try:
+            return self.data['block']
+        except KeyError:
+            # No 'block' key means this is an unblocking log entry
+            if self.action() == 'unblock':
+                raise Error("action='unblock': this log entry has no block details such as flags, duration, or expiry!")
+            raise
+
+    def flags(self):
+        """
+        Returns a list of (str) flags associated with the block entry.
+        Raises an Error if the entry is an unblocking log entry
+        """
+        if hasattr(self, '_flags'):
+            return self._flags
+        self._flags = self._getBlockDetails()['flags'].split(',')
+        return self._flags
+
+    def duration(self):
+        """
+        Returns a datetime.timedelta representing the block duration,
+        or None if block is indefinite
+        Raises an Error if the entry is an unblocking log entry
+        """
+        if hasattr(self, '_duration'):
+            return self._duration
+        if self._getBlockDetails()['duration'] == 'indefinite':
+            self._duration = None
+        else:
+            # Doing the difference is easier than parsing the string
+            self._duration = self.expiry() - self.timestamp()
+        return self._duration
+
+    def expiry(self):
+        """
+        Returns a datetime.datetime representing the block expiry date
+        Raises an Error if the entry is an unblocking log entry
+        """
+        if hasattr(self, '_expiry'):
+            return self._expiry
+        self._expiry = date.ISO2datetime(self._getBlockDetails()['expiry'])
+        return self._expiry
 
 class ProtectEntry(LogEntry):
     _expectedType = 'protect'
