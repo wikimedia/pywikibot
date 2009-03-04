@@ -46,7 +46,12 @@ class TouchBot:
                                   % page.title(asLink=True),
                                  level=pywikibot.WARNING)
             except pywikibot.LockedPage:
-                pywikibot.output(u"Page %s is locked?!" % page.title(asLink=True),
+                pywikibot.output(u"Page %s is locked?!"
+                                  % page.title(asLink=True),
+                                 level=pywikibot.ERROR)
+            except pywikibot.PageNotSaved:
+                pywikibot.output(u"Page %s not saved"
+                                  % page.title(asLink=True),
                                  level=pywikibot.ERROR)
 
 
