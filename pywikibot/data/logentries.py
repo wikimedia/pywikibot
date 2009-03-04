@@ -87,6 +87,25 @@ class UploadEntry(LogEntry):
 class MoveEntry(LogEntry):
     _expectedType = 'move'
 
+    def new_ns(self):
+        return self.data['move']['new_ns']
+
+    def new_title(self):
+        """Page object of the new title"""
+        if not hasattr(self, '_new_title'):
+            self._new_title = pywikibot.Page(pywikibot.Link( \
+                                self.data['move']['new_title']))
+        return self._new_title
+
+    def suppressedredirect(self):
+        """
+        Returns True if no redirect was created from the old title 
+        to the new title during the move
+        """
+        # Introduced in MW r47901, not yet live on WM sites.
+        return self.data['move'].has_key('suppressedredirect')
+    
+
 class ImportEntry(LogEntry):
     _expectedType = 'import'
 
