@@ -322,7 +322,7 @@ category links:
 
         try:
             template_list = self.redir_templates[self.site.family.name
-                                                ][self.site.lang]
+                                                ][self.site.code]
         except KeyError:
             pywikibot.output(u"No redirect templates defined for %s"
                               % self.site.sitename())
@@ -383,7 +383,7 @@ category links:
         redircat = pywikibot.Category(
                        pywikibot.Link(
                            self.cat_redirect_cat[self.site.family.name]
-                                                [self.site.lang],
+                                                [self.site.code],
                            self.site)
                    )
 
