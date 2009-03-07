@@ -1004,11 +1004,11 @@ class Family:
         """Return the shared image repository, if any."""
         return (None, None)
 
+    @pywikibot.deprecated("Site.getcurrenttime()")
     def server_time(self, code):
         """
         DEPRECATED, use Site.getcurrenttime() instead
         Return a datetime object representing server time"""
-        pywikibot.deprecated("Site.getcurrenttime()")
         return pywikibot.Site(code, self).getcurrenttime()
 
     def isPublic(self, code):

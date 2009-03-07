@@ -1223,40 +1223,40 @@ class Page(object):
 
 ######## DEPRECATED METHODS ########
 
+    @deprecated("Site.encoding()")
     def encoding(self):
         """DEPRECATED: use Site.encoding() instead"""
-        deprecated("Site.encoding()")
         return self.site().encoding()
 
+    @deprecated("Page.title(withNamespace=False)")
     def titleWithoutNamespace(self, underscore=False):
         """DEPRECATED: use self.title(withNamespace=False) instead."""
-        deprecated("Page.title(withNamespace=False)")
         return self.title(underscore=underscore, withNamespace=False,
                           withSection=False)
 
+    @deprecated("Page.title(as_filename=True)")
     def titleForFilename(self):
         """DEPRECATED: use self.title(as_filename=True) instead."""
-        deprecated("Page.title(as_filename=True)")
         return self.title(as_filename=True)
 
+    @deprecated("Page.title(withSection=False)")
     def sectionFreeTitle(self, underscore=False):
         """DEPRECATED: use self.title(withSection=False) instead."""
-        deprecated("Page.title(withSection=False)")
         return self.title(underscore=underscore, withSection=False)
 
+    @deprecated("Page.title(asLink=True)")
     def aslink(self, forceInterwiki=False, textlink=False, noInterwiki=False):
         """DEPRECATED: use self.title(asLink=True) instead."""
-        deprecated("Page.title(asLink=True)")
         return self.title(asLink=True, forceInterwiki=forceInterwiki,
                           allowInterwiki=not noInterwiki, textlink=textlink)
 
+    @deprecated("Page.title(asUrl=True)")
     def urlname(self):
         """Return the Page title encoded for use in an URL.
 
         DEPRECATED: use self.title(asUrl=True) instead.
 
         """
-        deprecated("Page.title(asUrl=True)")
         return self.title(asUrl=True)
 
 ####### DISABLED METHODS (warnings provided) ######
@@ -1331,9 +1331,9 @@ class ImagePage(Page):
                 u'http://wikitravel.org/upload/shared/')
         return self.fileIsOnCommons()
 
+    @deprecated("ImagePage.getFileSHA1Sum()")
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
-        deprecated("ImagePage.getFileSHA1Sum()")
 # FIXME: MD5 might be performed on incomplete file due to server disconnection
 # (see bug #1795683).
         import md5, urllib
@@ -1567,24 +1567,24 @@ class Category(Page):
             return True
 
 #### DEPRECATED METHODS ####
+    @deprecated("list(Category.subcategories(...))")
     def subcategoriesList(self, recurse=False):
         """DEPRECATED: Equivalent to list(self.subcategories(...))"""
-        deprecated("list(Category.subcategories(...))")
         return sorted(list(set(self.subcategories(recurse))))
 
+    @deprecated("list(Category.articles(...))")
     def articlesList(self, recurse=False):
         """DEPRECATED: equivalent to list(self.articles(...))"""
-        deprecated("list(Category.articles(...))")
         return sorted(list(set(self.articles(recurse))))
 
+    @deprecated("Category.categories()")
     def supercategories(self):
         """DEPRECATED: equivalent to self.categories()"""
-        deprecated("Category.categories()")
         return self.categories()
 
+    @deprecated("list(Category.categories(...))")
     def supercategoriesList(self):
         """DEPRECATED: equivalent to list(self.categories(...))"""
-        deprecated("list(Category.categories(...))")
         return sorted(list(set(self.categories())))
 
 

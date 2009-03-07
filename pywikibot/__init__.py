@@ -29,16 +29,21 @@ def deprecated(instead=None):
     @param instead: if provided, will be used to specify the replacement
     @type instead: string
     """
-    f = sys._getframe(1)
-    classname = f.f_locals['self'].__class__.__name__ 
-    funcname = f.f_code.co_name
-    if instead:
-        output(u"%s.%s is DEPRECATED, use %s instead."
-                % (classname, funcname, instead),
-               level=WARNING)
-    else:
-        output(u"%s.%s is DEPRECATED." % (classname, funcname),
-               level=WARNING)
+    def decorator(method):
+        def wrapper(*args, **kwargs):
+            funcname = method.func_name
+            classname = args[0].__class__.__name__
+            if instead:
+                output(u"%s.%s is DEPRECATED, use %s instead."
+                        % (classname, funcname, instead),
+                       level=WARNING)
+            else:
+                output(u"%s.%s is DEPRECATED." % (classname, funcname),
+                       level=WARNING)
+            return method(*args, **kwargs)
+        wrapper.func_name = method.func_name
+        return wrapper
+    return decorator
 
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg"""

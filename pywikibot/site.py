@@ -308,13 +308,13 @@ class BaseSite(object):
                          % {'site': self})
         return pywikibot.Category(pywikibot.Link(name, self))
 
+    @deprecated("pywikibot.Link")
     def linkto(self, title, othersite = None):
         """Return unicode string in the form of a wikilink to 'title'
 
         Use optional Site argument 'othersite' to generate an interwiki link.
 
         """
-        deprecated("pywikibot.Link")
         return pywikibot.Link(title, self).astext(othersite)
 
     def isInterwikiLink(self, s):
@@ -407,16 +407,17 @@ class BaseSite(object):
 
     # deprecated methods for backwards-compatibility
 
+    @deprecated("family attribute")
     def fam(self):
         """Return Family object for this Site."""
-        deprecated("family attribute")
         return self.family
 
+    @deprecated("urllib.urlencode()")
     def urlEncode(self, query):
         """DEPRECATED"""
-        deprecated("urllib.urlencode()")
         return urllib.urlencode(query)
 
+    @deprecated("pywikibot.comms.http.request")
     def getUrl(self, path, retry=True, sysop=False, data=None,
                compress=True, no_hostname=False, cookie_only=False):
         """DEPRECATED.
@@ -425,7 +426,6 @@ class BaseSite(object):
         are ignored.
 
         """
-        deprecated("pywikibot.comms.http.request")
         from pywikibot.comms import http
         if data:
             if not isinstance(data, basestring):
@@ -434,15 +434,15 @@ class BaseSite(object):
         else:
             return http.request(self, path)
 
+    @deprecated()
     def postForm(self, address, predata, sysop=False, cookies=None):
         """DEPRECATED"""
-        deprecated()
         return self.getUrl(address, data=predata)
 
+    @deprecated()
     def postData(self, address, data, contentType=None, sysop=False,
                  compress=True, cookies=None):
         """DEPRECATED"""
-        deprecated()
         return self.getUrl(address, data=data)
 
     # unsupported methods from version 1
@@ -635,13 +635,13 @@ class APISite(BaseSite):
             return False
         return (not sysop) or 'sysop' in self.userinfo['groups']
 
+    @deprecated("Site.user()")
     def loggedInAs(self, sysop = False):
         """Return the current username if logged in, otherwise return None.
 
         DEPRECATED (use .user() method instead)
 
         """
-        deprecated("Site.user()")
         return self.logged_in(sysop) and self.user()
 
     def login(self, sysop=False):
@@ -733,9 +733,9 @@ class APISite(BaseSite):
             self.login(sysop)
         return right.lower() in self._userinfo['rights']
 
+    @deprecated("Site.has_right()")
     def isAllowed(self, right, sysop=False):
         """Deprecated; retained for backwards-compatibility"""
-        deprecated("Site.has_right()")
         return self.has_right(right, sysop)
 
     def has_group(self, group, sysop=False):
@@ -1487,13 +1487,13 @@ class APISite(BaseSite):
             apgen.request["gapdir"] = "descending"
         return apgen
 
+    @deprecated("Site.allpages()")
     def prefixindex(self, prefix, namespace=0, includeredirects=True):
         """Yield all pages with a given prefix. Deprecated.
 
         Use allpages() with the prefix= parameter instead of this method.
 
         """
-        deprecated("Site.allpages()")
         return self.allpages(prefix=prefix, namespace=namespace,
                              includeredirects=includeredirects)
 
@@ -1565,9 +1565,9 @@ class APISite(BaseSite):
             acgen.request["gacdir"] = "descending"
         return acgen
 
+    @deprecated("Site.allcategories()")
     def categories(self, number=10, repeat=False):
         """Deprecated; retained for backwards-compatibility"""
-        deprecated("Site.allcategories()")
         if repeat:
             limit = None
         else:
