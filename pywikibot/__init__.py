@@ -23,8 +23,7 @@ logging.basicConfig(fmt="%(message)s")
 
 
 def deprecated(instead=None):
-    """Outputs a method deprecation warning.
-    Uses the stack to determine class and name of calling method
+    """Decorator to output a method deprecation warning.
 
     @param instead: if provided, will be used to specify the replacement
     @type instead: string
