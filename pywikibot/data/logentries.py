@@ -11,7 +11,6 @@ __version__ = '$Id$'
 
 from pywikibot.exceptions import *
 import pywikibot
-from pywikibot import date
   
 class LogDict(dict):
     """
