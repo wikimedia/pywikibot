@@ -38,6 +38,9 @@ class LogEntry(object):
             raise Error("Wrong log type! Expecting %s, received %s instead." \
                         % (self._expectedType, self.type()))
      
+    def __hash__(self):
+        return self.logid()
+
     def logid(self):
         return self.data['logid']
     
