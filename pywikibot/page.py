@@ -220,7 +220,7 @@ class Page(object):
 
     def __repr__(self):
         """Return a more complete string representation."""
-        return u"%s(%s)" % (self.__class__.__name__,
+        return "%s(%s)" % (self.__class__.__name__,
                             self.title().encode(config.console_encoding))
 
     def __cmp__(self, other):
