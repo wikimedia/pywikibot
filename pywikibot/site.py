@@ -790,10 +790,9 @@ class APISite(BaseSite):
         return re.search('\d+', result['parse']['text']['*']).group()
 
     def getcurrenttime(self):
-        """Returns a datetime object representing server time"""
+        """Returns a Timestamp object representing server time"""
         ts = self.getcurrenttimestamp()
-        from date import timestamp2datetime
-        return timestamp2datetime(ts)
+        return pywikibot.Timestamp.fromtimestampformat(ts)
 
     def _getsiteinfo(self):
         """Retrieve siteinfo and namespaces from site."""

@@ -9,6 +9,7 @@ The initialization file for the Pywikibot framework.
 #
 __version__ = '$Id$'
 
+import datetime
 import difflib
 import logging
 import re
@@ -20,6 +21,56 @@ from exceptions import *
 from textlib import *
 
 logging.basicConfig(fmt="%(message)s")
+
+
+class Timestamp(datetime.datetime):
+    """Class for handling Mediawiki timestamps.
+
+    This inherits from datetime.datetime, so it can use all of the methods
+    and operations of a datetime object.  To ensure that the results of any
+    operation are also a Timestamp object, be sure to use only Timestamp
+    objects (and datetime.timedeltas) in any operation.
+
+    Use Timestamp.fromISOformat() and Timestamp.fromtimestampformat() to
+    create Timestamp objects from Mediawiki string formats.
+
+    Use Timestamp.utcnow() [not .now()] for the current time.
+
+    """
+    mediawikiTSFormat = "%Y%m%d%H%M%S"
+    ISO8601Format = "%Y-%m-%dT%H:%M:%SZ"
+
+    @classmethod
+    def fromISOformat(cls, ts):
+        """Convert an ISO 8601 timestamp to a Timestamp object."""
+        return cls.strptime(ts, cls.ISO8601Format)
+
+    @classmethod
+    def fromtimestampformat(cls, ts):
+        """Convert the internal MediaWiki timestamp format to a Timestamp object."""
+        return cls.strptime(ts, cls.mediawikiTSFormat)
+
+    def __str__(self):
+        """Return a string format recognized by the API"""
+        return self.strftime(self.ISO8601Format)
+
+    def __add__(self, other):
+        newdt = datetime.datetime.__add__(self, other)
+        if isinstance(newdt, datetime.datetime):
+            return Timestamp(newdt.year, newdt.month, newdt.day, newdt.hour,
+                             newdt.minute, newdt.second, newdt.microsecond,
+                             newdt.tzinfo)
+        else:
+            return newdt
+
+    def __sub__(self, other):
+        newdt = datetime.datetime.__sub__(self, other)
+        if isinstance(newdt, datetime.datetime):
+            return Timestamp(newdt.year, newdt.month, newdt.day, newdt.hour,
+                             newdt.minute, newdt.second, newdt.microsecond,
+                             newdt.tzinfo)
+        else:
+            return newdt
 
 
 def deprecated(instead=None):

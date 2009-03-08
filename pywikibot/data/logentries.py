@@ -67,9 +67,10 @@ class LogEntry(object):
         return self.data['user']
 
     def timestamp(self):
-        """datetime object corresponding to event timestamp"""
+        """Timestamp object corresponding to event timestamp"""
         if not hasattr(self, '_timestamp'):
-            self._timestamp = date.ISO2datetime(self.data['timestamp'])
+            self._timestamp = pywikibot.Timestamp.fromISOformat(
+                                            self.data['timestamp'])
         return self._timestamp
 
     def comment(self):
@@ -138,12 +139,13 @@ class BlockEntry(LogEntry):
 
     def expiry(self):
         """
-        Returns a datetime.datetime representing the block expiry date
+        Returns a Timestamp representing the block expiry date
         Raises an Error if the entry is an unblocking log entry
         """
         if hasattr(self, '_expiry'):
             return self._expiry
-        self._expiry = date.ISO2datetime(self._getBlockDetails()['expiry'])
+        self._expiry = pywikibot.Timestamp.fromISOformat(
+                                    self._getBlockDetails()['expiry'])
         return self._expiry
 
 class ProtectEntry(LogEntry):
