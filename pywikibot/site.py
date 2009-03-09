@@ -778,9 +778,9 @@ class APISite(BaseSite):
             return False
 
     def getcurrenttimestamp(self):
-        """Return (Mediawiki) timestamp, {{CURRENTTIMESTAMP}}, the server time.
+        """Return server time, {{CURRENTTIMESTAMP}}, as a string.
 
-        Format is yyyymmddhhmmss
+        Format is 'yyyymmddhhmmss'
 
         """
         r = api.Request(site=self,
@@ -790,7 +790,7 @@ class APISite(BaseSite):
         return re.search('\d+', result['parse']['text']['*']).group()
 
     def getcurrenttime(self):
-        """Returns a Timestamp object representing server time"""
+        """Return a Timestamp object representing the current server time."""
         ts = self.getcurrenttimestamp()
         return pywikibot.Timestamp.fromtimestampformat(ts)
 
