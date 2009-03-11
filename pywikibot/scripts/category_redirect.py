@@ -201,7 +201,7 @@ category links:
                    ))
         except pywikibot.PageNotSaved, error:
             pywikibot.output(u"Saving page %s failed: %s"
-                             % (article.title(asLink=True), error.message))
+                             % (article.title(asLink=True), error))
         return False
 
     def move_contents(self, oldCatTitle, newCatTitle, editSummary):
@@ -304,6 +304,7 @@ category links:
         if other_words:
             redirect_magicwords.extend(other_words)
         problems = []
+        newredirs = []
 
         l = time.localtime()
         today = "%04d-%02d-%02d" % l[:3]
@@ -365,10 +366,9 @@ category links:
                                         page.title(asLink=True, textlink=True)))
                 except pywikibot.Error, e:
                     self.log_text.append(
-                        u"* Failed to add {{tl|%s}} to %s (%s)"
+                        u"* Failed to add {{tl|%s}} to %s"
                          % (template_list[0],
-                            page.title(asLink=True, textlink=True),
-                            e))
+                            page.title(asLink=True, textlink=True)))
             else:
                 problems.append(
                     u"# %s is a hard redirect to %s"
@@ -414,14 +414,17 @@ category links:
                 self.log_text.append(u"* Could not load %s; ignoring"
                                       % cat.title(asLink=True, textlink=True))
                 continue
-            if cat_title not in record:
-                # make sure every redirect has a record entry
-                record[cat_title] = {today: None}
             catlist.append(cat)
             target = cat.getCategoryRedirectTarget()
             destination = target.title(withNamespace=False)
             destmap.setdefault(target, []).append(cat)
             catmap[cat] = destination
+            if cat_title not in record:
+                # make sure every redirect has a record entry
+                record[cat_title] = {today: None}
+                newredirs.append("*# %s -> %s"
+                               % (cat.title(asLink=True, textlink=True),
+                                  target.title(asLink=True, textlink=True)))
 ##            if match.group(1):
 ##                # category redirect target starts with "Category:" - fix it
 ##                text = text[ :match.start(1)] + text[match.end(1): ]
@@ -496,7 +499,7 @@ category links:
                                                       self.dbl_redir_comment),
                                   minorEdit=True)
                         except pywikibot.Error, e:
-                            self.log_text.append("** Failed: %s" % str(e))
+                            self.log_text.append("** Failed: %s" % e)
 
         # only scan those pages that have contents (nonemptypages)
         # and that haven't been removed from catlist as broken redirects
@@ -533,11 +536,15 @@ category links:
         pywikibot.setAction(pywikibot.translate(self.site.lang,
                                                 self.maint_comment))
         self.log_text.sort()
+        problems.sort()
+        newredirs.sort()
         self.log_page.put(u"\n==%i-%02i-%02iT%02i:%02i:%02iZ==\n"
                             % time.gmtime()[:6]
                           + u"\n".join(self.log_text)
-                          + "\n" + "\n".join(problems)
-                          + "\n" + self.get_log_text())
+                          + u"\n* New redirects since last report:\n"
+                          + u"\n".join(newredirs)
+                          + u"\n" + u"\n".join(problems)
+                          + u"\n" + self.get_log_text())
         if self.edit_requests:
             edit_request_page.put(self.edit_request_text
                                  % u"\n".join((self.edit_request_item % item)
