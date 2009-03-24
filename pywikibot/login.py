@@ -38,6 +38,7 @@ subdirectory.
 """
 #
 # (C) Rob W.W. Hooft, 2003
+# (C) Pywikipedia bot team, 2003-2008
 #
 # Distributed under the terms of the MIT license.
 #

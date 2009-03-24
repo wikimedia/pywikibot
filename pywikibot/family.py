@@ -1,5 +1,10 @@
 # -*- coding: utf-8  -*-
 
+#
+# (C) Pywikipedia bot team, 2004-2009
+#
+# Distributed under the terms of the MIT license.
+#
 __version__='$Id$'
 
 import config2 as config

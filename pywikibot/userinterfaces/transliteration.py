@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+#
+# (C) Pywikipedia bot team, 2006-2008
+#
+# Distributed under the terms of the MIT license.
+#
 def trans(char, default = '?', prev = '-', next = '-'):
     # Give a transliteration for char, or default if none is known
     # Accented etc. Latin characters
