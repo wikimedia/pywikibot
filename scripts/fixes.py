@@ -1,6 +1,16 @@
 # -*- coding: utf-8  -*-
-""" File containing all standard fixes """
+"""
+File containing all standard fixes
+
+"""
+
+#
+# (C) Pywikipedia team, 2008-2009
+#
 __version__ = '$Id$'
+#
+# Distributed under the terms of the MIT license.
+#
 
 help = """
                        * HTML       -  Convert HTML tags to wiki syntax, and

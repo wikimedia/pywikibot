@@ -107,7 +107,9 @@ talk about HTTP, where the typo has become part of the standard:
     python replace.py referer referrer -file:typos.txt -excepttext:HTTP
 """
 #
-# (C) Daniel Herding & the Pywikipediabot Team, 2004-2009
+# (C) Daniel Herding & the Pywikipedia team, 2004-2009
+#
+__version__='$Id$'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -129,7 +131,6 @@ docuReplacements = {
     '&fixes-help;': fixes.help,
 }
 
-__version__='$Id$'
 
 # Summary messages in different languages
 # NOTE: Predefined replacement tasks might use their own dictionary, see 'fixes'

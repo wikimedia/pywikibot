@@ -1,10 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+"""
+Edit a Wikipedia article with your favourite editor.
+"""
 
-# Edit a Wikipedia article with your favourite editor.
 #
 # (C) Gerrit Holl 2004
+# (C) Pywikipedia team, 2004-2009
+#
+__version__ = "$Id$"
+#
 # Distributed under the terms of the MIT license.
+#
 
 # Version 0.4.
 #
@@ -15,7 +22,6 @@
 #       - ...
 
 __metaclass__ = type
-__version__ = "$Id$"
 import sys
 import os
 import string

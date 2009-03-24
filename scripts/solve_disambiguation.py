@@ -62,18 +62,22 @@ Command line options:
 To complete a move of a page, one can use:
 
     python solve_disambiguation.py -just -pos:New_Name Old_Name
+
 """
+
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikipediabot team, 2003-2009
-#
-# Distributed under the terms of the MIT license.
+# (C) Pywikipedia team, 2003-2009
 #
 __version__='$Id$'
 #
+# Distributed under the terms of the MIT license.
+#
+
+
 # Standard library imports
 import re, sys, codecs
 

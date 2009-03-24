@@ -16,7 +16,13 @@ All other parameters will be regarded as a page title; in this case, the bot
 will only touch a single page.
 """
 
+#
+# (C) Pywikipedia team
+#
 __version__='$Id$'
+#
+# Distributed under the terms of the MIT license.
+#
 
 import pywikibot
 from pywikibot import pagegenerators, catlib, config

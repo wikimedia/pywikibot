@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 """
 Scripts to manage categories.
 
@@ -69,6 +68,7 @@ This will move all pages in the category US to the category United States.
 
 """
 
+#
 # (C) Rob W.W. Hooft, 2004
 # (C) Daniel Herding, 2004
 # (C) Anreas J Schwab, 2007
@@ -78,6 +78,7 @@ __version__ = '$Id$'
 #
 # Distributed under the terms of the MIT license.
 #
+
 import os, re, sys, pickle, bz2
 import pywikibot
 from pywikibot import catlib, config, pagegenerators

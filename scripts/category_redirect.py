@@ -12,7 +12,14 @@ that haven't been edited for a certain cooldown period (currently 7 days)
 are taken into account.
 
 """
+
+#
+# (C) Pywikipedia team, 2008-2009
+#
 __version__ = '$Id$'
+#
+# Distributed under the terms of the MIT license.
+#
 
 import pywikibot
 from pywikibot import pagegenerators
