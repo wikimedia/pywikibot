@@ -12,21 +12,21 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'fr', 'en', 'vi', 'tr', 'ru', 'io', 'zh', 'ta', 'el', 'pl',
-            'fi', 'it', 'de', 'hu', 'sv', 'pt', 'lt', 'ku', 'ko', 'id',
-            'nl', 'te', 'es', 'ja', 'bg', 'vo', 'gl', 'li', 'et', 'sr',
-            'fa', 'ro', 'is', 'af', 'br', 'scn', 'ar', 'lo', 'sl', 'no',
-            'he', 'hy', 'fy', 'zh-min-nan', 'la', 'uk', 'sq', 'oc', 'ca',
-            'simple', 'da', 'ur', 'hsb', 'ast', 'tt', 'cs', 'ml', 'hr', 'kk',
-            'sw', 'ang', 'hi', 'eo', 'ia', 'co', 'csb', 'st', 'sk', 'ms',
-            'kl', 'nds', 'ky', 'sd', 'ug', 'ga', 'th', 'az', 'mk', 'ti',
-            'gu', 'tl', 'an', 'ts', 'km', 'fo', 'qu', 'rw', 'cy', 'bs',
-            'mr', 'kn', 'su', 'am', 'wo', 'chr', 'ie', 'yi', 'mn', 'be',
-            'nah', 'eu', 'gd', 'lv', 'pa', 'zu', 'nn', 'ps', 'mi', 'so',
-            'tg', 'dv', 'bn', 'ka', 'mg', 'ha', 'kw', 'ss', 'na', 'sa',
-            'gv', 'ay', 'tpi', 'ne', 'jbo', 'jv', 'gn', 'uz', 'tn', 'mt',
-            'iu', 'sh', 'lb', 'ks', 'tk', 'sg', 'fj', 'als', 'ik', 'si',
-            'om', 'ln', 'sm', 'za', 'roa-rup', 'dz', 'my', 'wa',
+            'fr', 'en', 'tr', 'vi', 'ru', 'io', 'el', 'pl', 'lt', 'zh',
+            'fi', 'hu', 'ta', 'it', 'sv', 'de', 'ko', 'pt', 'nl', 'ku',
+            'lo', 'es', 'ja', 'id', 'te', 'gl', 'bg', 'ro', 'vo', 'ar',
+            'et', 'no', 'li', 'ca', 'sr', 'is', 'fa', 'af', 'uk', 'scn',
+            'br', 'th', 'fy', 'oc', 'he', 'sl', 'simple', 'hy', 'sq', 'tt',
+            'cs', 'la', 'zh-min-nan', 'da', 'ast', 'sw', 'ur', 'kk', 'hsb', 'ky',
+            'ml', 'hr', 'ang', 'eo', 'hi', 'gn', 'az', 'ia', 'co', 'ga',
+            'sk', 'csb', 'st', 'ms', 'nds', 'kl', 'wo', 'sd', 'ug', 'ti',
+            'mk', 'tl', 'an', 'my', 'gu', 'km', 'ka', 'cy', 'ts', 'qu',
+            'bs', 'fo', 'rw', 'am', 'mr', 'kn', 'eu', 'su', 'tk', 'chr',
+            'lv', 'mn', 'nah', 'ie', 'yi', 'wa', 'be', 'om', 'gd', 'zu',
+            'mg', 'iu', 'pa', 'bn', 'si', 'nn', 'mi', 'tpi', 'dv', 'mt',
+            'ps', 'jv', 'so', 'tg', 'roa-rup', 'ha', 'ik', 'gv', 'sh', 'ss',
+            'kw', 'sa', 'ay', 'uz', 'na', 'ne', 'jbo', 'tn', 'sg', 'lb',
+            'ks', 'fj', 'ln', 'sm', 'za', 'dz', 'als',
         ]
 
         for lang in self.languages_by_size:
