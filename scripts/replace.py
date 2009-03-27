@@ -106,6 +106,7 @@ talk about HTTP, where the typo has become part of the standard:
 
     python replace.py referer referrer -file:typos.txt -excepttext:HTTP
 """
+from __future__ import generators
 #
 # (C) Daniel Herding & the Pywikipedia team, 2004-2009
 #
@@ -114,7 +115,6 @@ __version__='$Id$'
 # Distributed under the terms of the MIT license.
 #
 
-from __future__ import generators
 import sys, re, time
 import pywikibot
 from pywikibot import pagegenerators, catlib, config
