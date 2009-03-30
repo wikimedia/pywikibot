@@ -118,11 +118,11 @@ __version__='$Id$'
 import sys, re, time
 import pywikibot
 from pywikibot import pagegenerators, catlib, config
-from pywikibot.scripts import editarticle
+from scripts import editarticle
 import webbrowser
 
 # Imports predefined replacements tasks from fixes.py
-import pywikibot.scripts.fixes as fixes
+import scripts.fixes as fixes
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
