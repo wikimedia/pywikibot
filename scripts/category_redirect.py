@@ -101,7 +101,8 @@ class CategoryRedirectBot(object):
 
         self.move_comment = {
             'en':
-u"Robot: moving pages out of redirected category",
+u"Robot: change redirected category [[:%(oldCatLink)s|%(oldCatTitle)s]]"
+u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'ar':
 u"روبوت: نقل الصفحات من تصنيف محول",
             'hu':
@@ -110,13 +111,11 @@ u"Bot: Lapok automatikus áthelyezése átirányított kategóriából",
 u"ロボットによる: 移行中のカテゴリからのカテゴリ変更",
             'no':
 u"Robot: Flytter sider ut av omdirigeringskategori",
-            'commons':
-u'Robot: Changing category link (following [[Template:Category redirect|category redirect]])'
         }
 
         self.redir_comment = {
             'en':
-u"Robot: adding category redirect template for maintenance",
+u"Robot: add category redirect template for maintenance",
             'ar':
 u"روبوت: إضافة قالب تحويل تصنيف للصيانة",
             'hu':
@@ -128,7 +127,7 @@ u"Robot: Legger til vedlikeholdsmal for kategoriomdirigering",
         }
 
         self.dbl_redir_comment = {
-            'en': u"Robot: fixing double-redirect",
+            'en': u"Robot: fix double-redirect",
             'ar': u"روبوت: تصليح تحويلة مزدوجة",
             'hu': u"Bot: Kettős átirányítás javítása",
             'ja': u"ロボットによる: 二重リダイレクト修正",
@@ -148,7 +147,6 @@ u"Robot: Legger til vedlikeholdsmal for kategoriomdirigering",
 The following protected pages have been detected as requiring updates to \
 category links:
 %s
-~~~~
 """,
             })
 
@@ -220,12 +218,15 @@ category links:
                 newCat = pywikibot.Category(self.site,
                                             self.catprefix + newCatTitle)
 
+                oldCatLink = oldCat.title()
+                newCatLink = newCat.title()
+                comment = editSummary % locals()
                 # Move articles
                 found, moved = 0, 0
                 for article in oldCat.members():
                     found += 1
                     changed = self.change_category(article, oldCat, newCat,
-                                                   comment=editSummary)
+                                                   comment=comment)
                     if changed: moved += 1
 
                 # pass 2: look for template doc pages
@@ -241,7 +242,7 @@ category links:
                     except pywikibot.Error:
                         continue
                     changed = self.change_category(doc, oldCat, newCat,
-                                                   comment=editSummary)
+                                                   comment=comment)
                     if changed: moved += 1
 
                 if found:
