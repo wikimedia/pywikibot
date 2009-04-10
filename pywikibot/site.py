@@ -1259,8 +1259,8 @@ class APISite(BaseSite):
         @type limit: int
         @param startid: retrieve revisions starting with this revid
         @param endid: stop upon retrieving this revid
-        @param starttime: retrieve revisions starting at this timestamp
-        @param endtime: stop upon reaching this timestamp
+        @param starttime: retrieve revisions starting at this Timestamp
+        @param endtime: stop upon reaching this Timestamp
         @param rvdir: if false, retrieve newest revisions first (default);
             if true, retrieve earliest first
         @param user: retrieve only revisions authored by this user
@@ -1332,9 +1332,9 @@ class APISite(BaseSite):
         if endid:
             rvgen.request[u"rvendid"] = endid
         if starttime:
-            rvgen.request[u"rvstart"] = starttime
+            rvgen.request[u"rvstart"] = str(starttime)
         if endtime:
-            rvgen.request[u"rvend"] = endtime
+            rvgen.request[u"rvend"] = str(endtime)
         if user:
             rvgen.request[u"rvuser"] = user
         elif excludeuser:
@@ -1644,8 +1644,8 @@ class APISite(BaseSite):
         containing keys corresponding to the block properties (see
         http://www.mediawiki.org/wiki/API:Query_-_Lists for documentation).
 
-        @param starttime: start iterating at this timestamp
-        @param endtime: stop iterating at this timestamp
+        @param starttime: start iterating at this Timestamp
+        @param endtime: stop iterating at this Timestamp
         @param reverse: if True, iterate oldest blocks first (default: newest)
         @param blockids: only iterate blocks with these id numbers
         @param users: only iterate blocks affecting these usernames or IPs
@@ -1665,9 +1665,9 @@ class APISite(BaseSite):
         bkgen.request["bkprop"] = \
                             "id|user|by|timestamp|expiry|reason|range|flags"
         if starttime:
-            bkgen.request["bkstart"] = starttime
+            bkgen.request["bkstart"] = str(starttime)
         if endtime:
-            bkgen.request["bkend"] = endtime
+            bkgen.request["bkend"] = str(endtime)
         if reverse:
             bkgen.request["bkdir"] = "newer"
         if blockids:
@@ -1733,8 +1733,8 @@ class APISite(BaseSite):
             "patrol", "merge")
         @param user: only iterate entries that match this user name
         @param page: only iterate entries affecting this page
-        @param start: only iterate entries from and after this timestamp
-        @param end: only iterate entries up to and through this timestamp
+        @param start: only iterate entries from and after this Timestamp
+        @param end: only iterate entries up to and through this Timestamp
         @param reverse: if True, iterate oldest entries first (default: newest)
         @param limit: only iterate up to this many entries
 
@@ -1756,9 +1756,9 @@ class APISite(BaseSite):
         if page is not None:
             legen.request["letitle"] = page.title(withSection=False)
         if start is not None:
-            legen.request["lestart"] = start
+            legen.request["lestart"] = str(start)
         if end is not None:
-            legen.request["leend"] = end
+            legen.request["leend"] = str(end)
         if reverse:
             legen.request["ledir"] = "newer"
         if isinstance(limit, int):
@@ -1771,8 +1771,8 @@ class APISite(BaseSite):
                       showRedirects=None, showPatrolled=None):
         """Iterate recent changes.
 
-        @param start: timestamp to start listing from
-        @param end: timestamp to end listing at
+        @param start: Timestamp to start listing from
+        @param end: Timestamp to end listing at
         @param reverse: if True, start with oldest changes (default: newest)
         @param limit: iterate no more than this number of entries
         @param namespaces: iterate changes to pages in these namespaces only
@@ -1807,9 +1807,9 @@ class APISite(BaseSite):
                                   rcprop="user|comment|timestamp|title|ids"
                                          "|redirect|patrolled|loginfo|flags")
         if start is not None:
-            rcgen.request["rcstart"] = start
+            rcgen.request["rcstart"] = str(start)
         if end is not None:
-            rcgen.request["rcend"] = end
+            rcgen.request["rcend"] = str(end)
         if reverse:
             rcgen.request["rcdir"] = "newer"
         if isinstance(limit, int):
@@ -1885,8 +1885,8 @@ class APISite(BaseSite):
         @param user: Iterate contributions by this user (name or IP)
         @param userprefix: Iterate contributions by all users whose names
             or IPs start with this substring
-        @param start: Iterate contributions starting at this timestamp
-        @param end: Iterate contributions ending at this timestamp
+        @param start: Iterate contributions starting at this Timestamp
+        @param end: Iterate contributions ending at this Timestamp
         @param reverse: Iterate oldest contributions first (default: newest)
         @param limit: Maximum number of contributions to iterate
         @param namespaces: Only iterate contributions in these namespaces
@@ -1914,9 +1914,9 @@ class APISite(BaseSite):
         if userprefix:
             ucgen.request["ucuserprefix"] = userprefix
         if start is not None:
-            ucgen.request["ucstart"] = start
+            ucgen.request["ucstart"] = str(start)
         if end is not None:
-            ucgen.request["ucend"] = end
+            ucgen.request["ucend"] = str(end)
         if reverse:
             ucgen.request["ucdir"] = "newer"
         if isinstance(limit, int):
@@ -1934,8 +1934,8 @@ class APISite(BaseSite):
 
         Iterated values will be in same format as recentchanges.
 
-        @param start: Iterate revisions starting at this timestamp
-        @param end: Iterate revisions ending at this timestamp
+        @param start: Iterate revisions starting at this Timestamp
+        @param end: Iterate revisions ending at this Timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
         @param namespaces: only iterate revisions to pages in these
             namespaces (default: all)
@@ -1962,9 +1962,9 @@ class APISite(BaseSite):
                            wlprop="user|comment|timestamp|title|ids|flags")
         #TODO: allow users to ask for "patrol" as well?
         if start is not None:
-            wlgen.request["wlstart"] = start
+            wlgen.request["wlstart"] = str(start)
         if end is not None:
-            wlgen.request["wlend"] = end
+            wlgen.request["wlend"] = str(end)
         if reverse:
             wlgen.request["wldir"] = "newer"
         if isinstance(limit, int):
@@ -1993,8 +1993,8 @@ class APISite(BaseSite):
         is true, the toplevel dict will contain a 'token' key as well.
 
         @param page: The page to check for deleted revisions
-        @param start: Iterate revisions starting at this timestamp
-        @param end: Iterate revisions ending at this timestamp
+        @param start: Iterate revisions starting at this Timestamp
+        @param end: Iterate revisions ending at this Timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
         @param limit: Iterate no more than this number of revisions.
         @param get_text: If True, retrieve the content of each revision and
@@ -2038,9 +2038,9 @@ class APISite(BaseSite):
         if get_text:
             drgen.request['drprop'] = drgen.request['drprop'] + "|content|token"
         if start is not None:
-            drgen.request["drstart"] = start
+            drgen.request["drstart"] = str(start)
         if end is not None:
-            drgen.request["drend"] = end
+            drgen.request["drend"] = str(end)
         if reverse:
             drgen.request["drdir"] = "newer"
         if isinstance(limit, int):
