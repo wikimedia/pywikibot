@@ -98,7 +98,7 @@ class Page(object):
                 # overwrite title
                 if ":" in title:
                     prefix = title[ :title.index(":")]
-                    self._ns = site.ns_index(prefix)
+                    self._ns = self._site.ns_index(prefix)
                     if self._ns is None:
                         self._ns = 0
                     else:
