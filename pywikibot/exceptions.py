@@ -18,12 +18,15 @@ from pywikibot import config
 class Error(Exception):
     """Wikipedia error"""
     def __init__(self, arg):
+        self.unicode = arg
         try:
             self.string = arg.encode(config.console_encoding, "xmlcharrefreplace")
         except (AttributeError, TypeError):
             self.string = arg.encode("ascii", "xmlcharrefreplace")
     def __str__(self):
         return self.string
+    def __unicode__(self):
+        return self.unicode
 
 class PageRelatedError(Error):
     """Abstract Exception, used when the Exception concerns a particular 
@@ -72,8 +75,9 @@ class CircularRedirect(Error):
 
     """
 
-class LockedPage(Error):
+class LockedPage(PageRelatedError):
     """Page is locked"""
+    message = u"Page %s is locked."
 
 class SectionError(Error):
     """The section specified by # does not exist"""
