@@ -229,7 +229,11 @@ class Request(DictMixin):
                         self.site._userinfo.update(result['query']['userinfo'])
                     else:
                         self.site._userinfo = result['query']['userinfo']
-
+                if self.site._userinfo['name'] != self.site.user():
+                    # user is no longer logged in (session expired?)
+                    self.site.login(self.site._username.index(self.site.user()))
+                    # retry the previous query
+                    continue
             if "warnings" in result:
                 modules = [k for k in result["warnings"] if k != "info"]
                 for mod in modules:
