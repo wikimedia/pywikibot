@@ -229,9 +229,19 @@ class Request(DictMixin):
                         self.site._userinfo.update(result['query']['userinfo'])
                     else:
                         self.site._userinfo = result['query']['userinfo']
-                if self.site._userinfo['name'] != self.site.user():
+                status = self.site._loginstatus # save previous login status
+                if ( ("error" in result
+                            and result["error"]["code"].endswith("limit"))
+                      or (status != -1
+                            and self.site._userinfo['name']
+                                != self.site._username[status])):
                     # user is no longer logged in (session expired?)
-                    self.site.login(self.site._username.index(self.site.user()))
+                    # reset userinfo, then make user log in again
+                    del self.site._userinfo
+                    self.site._loginstatus = -1
+                    if status == -1:
+                        status = 0  # default to non-sysop login
+                    self.site.login(status)
                     # retry the previous query
                     continue
             if "warnings" in result:

@@ -615,6 +615,9 @@ class APISite(BaseSite):
         self.sitelock = threading.Lock()
         self._msgcache = {}
         self.nocapitalize = self.code in self.family.nocapitalize
+        # _loginstatus: -1 means not logged in, 0 means logged in as user,
+        #               1 means logged in as sysop
+        self._loginstatus = -1
         return
 
     # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
@@ -646,20 +649,25 @@ class APISite(BaseSite):
 
     def login(self, sysop=False):
         """Log the user in if not already logged in."""
-        if not hasattr(self, "_siteinfo"):
-            self._getsiteinfo()
         # check whether a login cookie already exists for this user
-        if hasattr(self, "_userinfo"):
-            if self.userinfo['name'] == self._username[sysop]:
-                return
+        if not hasattr(self, "_userinfo"):
+            self.getuserinfo()
+        if self._userinfo['name'] == self._username[sysop]:
+            self._loginstatus = sysop
+            return
         if not self.logged_in(sysop):
             loginMan = api.LoginManager(site=self, sysop=sysop,
                                         user=self._username[sysop])
             if loginMan.login(retry = True):
                 self._username[sysop] = loginMan.username
+                self._loginstatus = sysop
                 if hasattr(self, "_userinfo"):
                     del self._userinfo
                 self.getuserinfo()
+            else:
+                self._loginstatus = -1 # failure
+        if not hasattr(self, "_siteinfo"):
+            self._getsiteinfo()
 
     forceLogin = login  # alias for backward-compatibility
 
