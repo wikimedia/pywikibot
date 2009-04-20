@@ -173,7 +173,7 @@ class BaseSite(object):
         """Calls to methods not defined in this object are passed to Family."""
 
         if hasattr(self.__class__, attr):
-            return self.__class__.attr
+            return getattr(self.__class__, attr)
         try:
             method = getattr(self.family, attr)
             f = lambda *args, **kwargs: \
@@ -617,7 +617,7 @@ class APISite(BaseSite):
         self.nocapitalize = self.code in self.family.nocapitalize
         return
 
-# ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
+    # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
         # Calculating valid languages took quite long, so we calculate it once
         # in initialization instead of each time it is used.
         self._validlanguages = []
