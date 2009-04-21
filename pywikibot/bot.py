@@ -451,3 +451,79 @@ Global arguments available for all bots:
                              level=pywikibot.STDOUT)
         logging.exception('showHelp:')
     pywikibot.output(globalHelp, level=pywikibot.STDOUT)
+
+class Bot(object):
+    """
+    Generic Bot to be subclassed
+    """
+
+    # Bot configuration.
+    # Only the keys of the dict can be passed as init options
+    # The values are the default values
+    # Extend this in subclasses!
+    availableOptions = {
+        'always': False, # ask for confirmation when putting a page?
+    }
+
+    def __init__(self, **kwargs):
+        """
+        Only accepts options defined in availableOptions
+        """
+        self.setOptions(kwargs) 
+
+    def setOptions(self, **kwargs):
+        """
+        Sets the instance options
+        """
+        # contains the options overriden from defaults
+        self.options = {}
+
+        validOptions = set(availableOptions.iterkeys())
+        receivedOptions = set(kwargs.iterkeys()) 
+
+        for opt in receivedOptions & validOptions:
+            self.options[opt] = kwargs[opt]
+
+        for opt in receivedOptions - validOptions:
+            logging.warning(u'%s is not a valid option. It was ignored' % opt)
+        
+    def getOption(self, option):
+        """
+        Get the current value of an option.
+        @param option: key defined in Bot.availableOptions
+        """
+        try:
+            return self.options.get(option, Bot.availableOptions[option])
+        except KeyError:
+            raise pywikibot.Error(u'%s is not a valid bot option.' % option)
+
+    def userPut(self, page, oldtext, newtext):
+        """
+        Print differences, ask user for confirmation,
+        and puts the page if needed.
+
+        Option used:
+            * 'always'
+        """
+        if oldtext == newtext:
+            logging.info(u'No changes were needed on %s' \
+                            % page.title(asLink=True))
+            return
+
+        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
+                         % page.title())
+        pywikibot.showDiff(oldtext, newtext)
+
+        choice = 'a'
+        if not self.getOption('always'):
+            choice = pywikibot.inputChoice(
+                        u'Do you want to accept these changes?',
+                        ['Yes', 'No', 'All'],
+                        ['y', 'N', 'a'], 'N')
+            if choice == 'a':
+                # Remember the choice
+                self.options['always'] = True
+        
+        if choice != 'N':
+            page.put(newtext, async=(choice=='a'))
+
