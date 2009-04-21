@@ -4,7 +4,7 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-# The Wikimedia i18n family (should be called Betawiki, but already exists)
+# The Wikimedia i18n family
 
 class Family(family.Family):
 

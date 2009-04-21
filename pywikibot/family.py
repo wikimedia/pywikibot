@@ -722,7 +722,7 @@ class Family:
         'nn': [u'omdiriger'],
         'oc': [u'redireccion'],
         'pdc': [u'weiterleitung'],
-        'pl': [u'redirect', u'tam', u'przekieruj'],
+        'pl': [u'redirect', u'patrz', u'tam', u'przekieruj'],
         'ro': [u'redirecteaza'],
         'ru': [u'redirect', u'перенаправление', u'перенапр'],
         'sa': [u'#पुनर्निदेशन'],
