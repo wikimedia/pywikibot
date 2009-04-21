@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """This bot will move pages out of redirected categories
 
-Usage: category-redirect.py [options]
+Usage: category_redirect.py [options]
 
 The bot will look for categories that are marked with a category redirect
 template, take the first parameter of the template as the target of the
@@ -48,12 +48,14 @@ class CategoryRedirectBot(object):
         # Category that contains all redirected category pages
         self.cat_redirect_cat = {
             'wikipedia': {
-                'en': "Category:Wikipedia category redirects",
                 'ar': "تصنيف:تحويلات تصنيفات ويكيبيديا",
+                'da': "Kategori:Omdirigeringskategorier",
+                'en': "Category:Wikipedia category redirects",
                 'hu': "Kategória:Kategóriaátirányítások",
                 'ja': "Category:移行中のカテゴリ",
                 'no': "Kategori:Wikipedia omdirigertekategorier",
                 'simple': "Category:Category redirects",
+                'zh': u"Category:已重定向的分类",
             },
             'commons': {
                 'commons': "Category:Category redirects"
@@ -64,6 +66,10 @@ class CategoryRedirectBot(object):
         # (put the most preferred form first)
         self.redir_templates = {
             'wikipedia': {
+                'ar': ("تحويل تصنيف",
+                       "Category redirect",
+                       "تحويلة تصنيف"),
+                'da': ("Kategoriomdirigering",),
                 'en': ("Category redirect",
                        "Category redirect3",
                        "Categoryredirect",
@@ -75,15 +81,18 @@ class CategoryRedirectBot(object):
                        "Emptycategory",
                        "Empty cat",
                        "Seecat",),
-                'ar': ("تحويل تصنيف",
-                       "Category redirect",
-                       "تحويلة تصنيف",),
                 'hu': ("Kat-redir",
                        "Katredir",),
                 'ja': ("Category redirect",),
                 'no': ("Kategoriomdirigering",),
                 'simple': ("Category redirect",
                            "Catredirect"),
+                'zh': (u"分类重定向",
+                       u"Cat-redirect",
+                       u"重定向分类",
+                       u"重定向分类",
+                       u"Cr",
+                       u"CR"),
                 },
             'commons': {
                 'commons': (u'Category redirect',
@@ -100,46 +109,64 @@ class CategoryRedirectBot(object):
             }
 
         self.move_comment = {
+            'ar':
+u"روبوت: نقل الصفحات من تصنيف محول",
+            'da': 
+u"Robot: flytter sider ud af omdirigeringskategorien",
             'en':
 u"Robot: change redirected category [[:%(oldCatLink)s|%(oldCatTitle)s]]"
 u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
-            'ar':
-u"روبوت: نقل الصفحات من تصنيف محول",
             'hu':
 u"Bot: Lapok automatikus áthelyezése átirányított kategóriából",
             'ja':
 u"ロボットによる: 移行中のカテゴリからのカテゴリ変更",
+            'ksh':
+u"Bot: Sigk uß en ömjeleidt Saachjropp eruß jesammdt.",
             'no':
 u"Robot: Flytter sider ut av omdirigeringskategori",
+            'zh':
+u'机器人：改变已重定向分类中的页面的分类',
         }
 
         self.redir_comment = {
-            'en':
-u"Robot: add category redirect template for maintenance",
             'ar':
 u"روبوت: إضافة قالب تحويل تصنيف للصيانة",
+            'da':
+u"Robot: tilføjer omdirigeringsskabelon for vedligeholdelse",
+            'en':
+u"Robot: add category redirect template for maintenance",
             'hu':
 u"Bot: kategóriaátirányítás sablon hozzáadása",
             'ja':
 u"ロボットによる: 移行中のカテゴリとしてタグ付け",
+            'ksh':
+u"Bot: Ömleidungsschalbon dobeijedonn.",
             'no':
 u"Robot: Legger til vedlikeholdsmal for kategoriomdirigering",
+            'zh':
+u"机器人: 增加分类重定向模板，用于维护",
         }
 
         self.dbl_redir_comment = {
-            'en': u"Robot: fix double-redirect",
             'ar': u"روبوت: تصليح تحويلة مزدوجة",
+            'da': u"Robot: retter dobbelt omdirigering",
+            'en': u"Robot: fix double-redirect",
             'hu': u"Bot: Kettős átirányítás javítása",
             'ja': u"ロボットによる: 二重リダイレクト修正",
             'no': u"Robot: Ordner doble omdirigeringer",
+            'ksh': u"Bot: dubbel Ömleidung eruß jemaat.",
+            'zh': u"Bot: 修复双重重定向",
         }
 
         self.maint_comment = {
-            'en': u"Category redirect maintenance bot",
             'ar': u"بوت صيانة تحويل التصنيف",
+            'da': u"Bot til vedligeholdelse af kategoromdirigeringer",
+            'en': u"Category redirect maintenance bot",
             'hu': u"Kategóriaátirányítás-karbantartó bot",
             'ja': u"移行中のカテゴリのメンテナンス・ボット",
             'no': u"Bot for vedlikehold av kategoriomdirigeringer",
+            'ksh': u"Bot för de Saachjroppe ier Ömleidunge.",
+            'zh': u"分类重定向维护机器人",
         }
 
         self.edit_request_text = pywikibot.translate(self.site.lang,
@@ -148,10 +175,24 @@ The following protected pages have been detected as requiring updates to \
 category links:
 %s
 """,
+            'ksh': u"""\
+Hee di Sigge sin jeschötz un möße ier Saachjroppe odder Lingks op Saachjroppe \
+aanjepaß krijje:
+%s
+~~~~
+""",
+            'zh': u"""\
+下列被保护页面被检测出需要更新 \
+分类链接:
+%s
+~~~~
+""",
             })
 
         self.edit_request_item = pywikibot.translate(self.site.lang,
-            {'en': u"* %s is in %s, which is a redirect to %s",
+            {
+                'en': u"* %s is in %s, which is a redirect to %s",
+                'ksh': u"* %s es en %s, un dat es en Ömleidung op %s",
             })
 
     def change_category(self, article, oldCat, newCat, comment=None,
