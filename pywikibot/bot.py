@@ -469,7 +469,7 @@ class Bot(object):
         """
         Only accepts options defined in availableOptions
         """
-        self.setOptions(kwargs) 
+        self.setOptions(**kwargs) 
 
     def setOptions(self, **kwargs):
         """
@@ -478,14 +478,14 @@ class Bot(object):
         # contains the options overriden from defaults
         self.options = {}
 
-        validOptions = set(availableOptions.iterkeys())
+        validOptions = set(Bot.availableOptions.iterkeys())
         receivedOptions = set(kwargs.iterkeys()) 
 
         for opt in receivedOptions & validOptions:
             self.options[opt] = kwargs[opt]
 
         for opt in receivedOptions - validOptions:
-            logging.warning(u'%s is not a valid option. It was ignored' % opt)
+            logging.warning(u'%s is not a valid option. It was ignored\n' % opt)
         
     def getOption(self, option):
         """
@@ -506,7 +506,7 @@ class Bot(object):
             * 'always'
         """
         if oldtext == newtext:
-            logging.info(u'No changes were needed on %s' \
+            pywikibot.output(u'No changes were needed on %s' \
                             % page.title(asLink=True))
             return
 
@@ -524,6 +524,6 @@ class Bot(object):
                 # Remember the choice
                 self.options['always'] = True
         
-        if choice != 'N':
+        if choice != 'n':
             page.put(newtext, async=(choice=='a'))
 
