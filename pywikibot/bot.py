@@ -63,6 +63,24 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         text = logging.handlers.RotatingFileHandler.format(self, record)
         return text.rstrip("\r\n")
 
+class LoggingFormatter(logging.Formatter):
+    def formatException(self, ei):
+        """
+        Make sure that the exception trace is converted to unicode:
+            * our pywikibot.Error traces are encoded in our
+              console encoding, which is needed for plainly printing them.
+            * but when it comes to logging using logging.exception,
+              the Python logging module will try to use these traces, 
+              and it will fail if they are console encoded strings.
+
+        Formatter.formatException also strips the trailing \n, which we need.
+        """
+        strExc = logging.Formatter.formatException(self, ei)
+
+        if isinstance(strExc, str):
+            return strExc.decode(config.console_encoding) + '\n'
+        else:
+            return strExc + '\n'
 
 def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
     """Output a message to the user via the userinterface.
@@ -207,7 +225,7 @@ def init_handlers():
     else:
         default_handler.setLevel(INFO)
     default_handler.addFilter(MaxLevelFilter(INPUT))
-    default_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
+    default_handler.setFormatter(LoggingFormatter(fmt="%(message)s"))
     root_logger.addHandler(default_handler)
 
     # if user has enabled file logging, configure file handler
@@ -220,7 +238,7 @@ def init_handlers():
                             filename=logfile, maxBytes=2 << 20, backupCount=5)
         
         file_handler.setLevel(DEBUG)
-        form = logging.Formatter(
+        form = LoggingFormatter(
                    fmt="%(asctime)s %(filename)18s, %(lineno)d: "
                        "%(levelname)-8s %(message)s",
                    datefmt="%Y-%m-%d %H:%M:%S"
@@ -236,14 +254,14 @@ def init_handlers():
     output_handler = TerminalHandler(strm=sys.stdout)
     output_handler.setLevel(STDOUT)
     output_handler.addFilter(MaxLevelFilter(STDOUT))
-    output_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
+    output_handler.setFormatter(LoggingFormatter(fmt="%(message)s"))
     root_logger.addHandler(output_handler)
 
     # handler for levels WARNING and higher
     warning_handler = TerminalHandler(strm=sys.stderr)
     warning_handler.setLevel(logging.WARNING)
     warning_handler.setFormatter(
-            logging.Formatter(fmt="%(levelname)s: %(message)s"))
+            LoggingFormatter(fmt="%(levelname)s: %(message)s"))
     root_logger.addHandler(warning_handler)
 
 
