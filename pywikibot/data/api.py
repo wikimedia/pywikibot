@@ -184,15 +184,10 @@ class Request(DictMixin):
             self.site.throttle(write=write)
             uri = self.site.scriptpath() + "/api.php"
             try:
-                if write or action in ("login", "expandtemplates", "parse"):
-                    # add other actions that require POST requests above
-                    rawdata = http.request(self.site, uri, method="POST",
-                                headers={'Content-Type':
-                                         'application/x-www-form-urlencoded'},
-                                body=params)
-                else:
-                    uri = uri + "?" + params
-                    rawdata = http.request(self.site, uri)
+                rawdata = http.request(self.site, uri, method="POST",
+                            headers={'Content-Type':
+                                     'application/x-www-form-urlencoded'},
+                            body=params)
             except Exception, e: #TODO: what exceptions can occur here?
                 pywikibot.output(traceback.format_exc(),
                                  level=pywikibot.ERROR)
