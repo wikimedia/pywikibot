@@ -350,8 +350,8 @@ def removeLanguageLinksAndSeparator(text, site = None, marker = '', separator = 
 def replaceLanguageLinks(oldtext, new, site = None, addOnly = False):
     """Replace interlanguage links in the text with a new set of links.
 
-    'new' should be a dict with the Site objects as keys, and Page objects
-    as values (i.e., just like the dict returned by getLanguageLinks
+    'new' should be a dict with the Site objects as keys, and Page or Link 
+    object as values (i.e., just like the dict returned by getLanguageLinks
     function).
     
     """
@@ -404,7 +404,7 @@ def interwikiFormat(links, insite = None):
     """Convert interwiki link dict into a wikitext string.
 
     'links' should be a dict with the Site objects as keys, and Page
-    objects as values.
+    or Link objects as values.
 
     Return a unicode string that is formatted for inclusion in insite
     (defaulting to the current site).
@@ -417,12 +417,13 @@ def interwikiFormat(links, insite = None):
     ar = interwikiSort(links.keys(), insite)
     s = []
     for site in ar:
-        try:
-            link = links[site].title(asLink=True, forceInterwiki=True)
-            s.append(link)
-        except AttributeError:
-            s.append(pywikibot.Link(links[site], \
-                pywikibot.getSite(site)).astext(insite))
+        obj = links[site]
+        if isinstance(obj, pywikibot.Link):
+            link = obj.astext(insite)
+        else:
+            # Page
+            link = obj.title(asLink=True, forceInterwiki=True)
+        s.append(link)
     if insite.lang in insite.family.interwiki_on_one_line:
         sep = u' '
     else:
