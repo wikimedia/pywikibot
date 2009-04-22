@@ -479,8 +479,8 @@ class Bot(object):
         # contains the options overriden from defaults
         self.options = {}
 
-        validOptions = set(Bot.availableOptions.iterkeys())
-        receivedOptions = set(kwargs.iterkeys()) 
+        validOptions = set(Bot.availableOptions)
+        receivedOptions = set(kwargs) 
 
         for opt in receivedOptions & validOptions:
             self.options[opt] = kwargs[opt]

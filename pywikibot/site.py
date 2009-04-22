@@ -221,9 +221,9 @@ class BaseSite(object):
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""
 
-        nsnames = sum(self.namespaces().itervalues(), [])
-        return [l for l in self.languages()
-                  if l[:1].upper() + l[1:] not in self.namespaces()]
+        nsnames = [name for name in self.namespaces().itervalues()]
+        return [lang for lang in self.languages()
+                     if lang[:1].upper() + lang[1:] not in nsnames]
 
     def ns_index(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
@@ -1001,7 +1001,7 @@ class APISite(BaseSite):
             raise pywikibot.CircularRedirect(redirmap[title])
         for pagedata in result['query']['pages'].itervalues():
             # there should be only one value in 'pages', and it is the target
-            if pagedata['title'] not in redirmap.values():
+            if pagedata['title'] not in redirmap.itervalues():
                 raise RuntimeError(
                     "getredirtarget: target page '%s' not found in 'redirects'"
                     % pagedata['title'])

@@ -246,8 +246,8 @@ def main(*args):
             namedict = config.sysopnames
         else:
             namedict = config.usernames
-        for familyName in namedict.iterkeys():
-            for lang in namedict[familyName].iterkeys():
+        for familyName in namedict:
+            for lang in namedict[familyName]:
                 try:
                     site = pywikibot.getSite(code=lang, fam=familyName)
                     if not forceLogin and (site.logged_in(sysop) and site.user()) != None:

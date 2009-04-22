@@ -277,8 +277,8 @@ _digitDecoders = {
     'T' : ( _decimalDigits, lambda v: unicode(v+543), lambda v: int(v)-543 ),
 }
 
-# Allows to search for '(%%)|(%d)|(%R)|...", and allows one digit 1-9  too set the size of zero-padding for numbers
-_reParameters = re.compile(u'|'.join([ u'(%%[1-9]?%s)' % s for s in _digitDecoders.iterkeys() ]))
+# Allows to search for '(%%)|(%d)|(%R)|...", and allows one digit 1-9 to set the size of zero-padding for numbers
+_reParameters = re.compile(u'|'.join( u'(%%[1-9]?%s)' % s for s in _digitDecoders ))
 
 # A map of   sitecode+pattern  to  (re matching object and corresponding decoders)
 _escPtrnCache2 = {}
@@ -1567,7 +1567,7 @@ def test(quick = False, showAll = False):
         >>> date.test()
         
     """
-    for formatName in formats.iterkeys():
+    for formatName in formats:
     
         if quick:
             testMapEntry( formatName, showAll, formatLimits[formatName][1] )     # Only test the first value in the test range
