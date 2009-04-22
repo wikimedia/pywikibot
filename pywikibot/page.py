@@ -1949,6 +1949,21 @@ not supported by PyWikiBot!"""
     def __hash__(self):
         return hash(self.astext())
 
+    @staticmethod
+    def fromPage(page):
+        """Create a Link from a Page object"""
+
+        link = Link.__new__(Link)
+        link._site = page.site()
+        link._section = page.section()
+        link._namespace = page.namespace()
+        link._title = page.title(withNamespace=False, 
+                                allowInterwiki=False,
+                                withSection=False)
+        link._anchor = None
+
+        return link
+
 # Utility functions for parsing page titles
 
 def html2unicode(text, ignore = []):
