@@ -177,8 +177,8 @@ class MoveEntry(LogEntry):
         Returns True if no redirect was created from the old title 
         to the new title during the move
         """
-        # Introduced in MW r47901, not yet live on WM sites.
-        return self.data['move'].has_key('suppressedredirect')
+        # Introduced in MW r47901
+        return 'suppressedredirect' in self.data['move']
     
 
 class ImportEntry(LogEntry):

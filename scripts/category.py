@@ -252,7 +252,7 @@ class CategoryDatabase:
         server next time it's required.
         '''
         # if we already know which subcategories exist here
-        if self.catContentDB.has_key(supercat):
+        if supercat in self.catContentDB:
             return self.catContentDB[supercat][0]
         else:
             subcatset = set(supercat.subcategories())
@@ -268,7 +268,7 @@ class CategoryDatabase:
         server next time it's required.
         '''
         # if we already know which articles exist here
-        if self.catContentDB.has_key(cat):
+        if cat in self.catContentDB:
             return self.catContentDB[cat][1]
         else:
             subcatset = set(cat.subcategories())
@@ -279,7 +279,7 @@ class CategoryDatabase:
 
     def getSupercats(self, subcat):
         # if we already know which subcategories exist here
-        if self.superclassDB.has_key(subcat):
+        if subcat in self.superclassDB:
             return self.superclassDB[subcat]
         else:
             supercatset = set(subcat.categories())
