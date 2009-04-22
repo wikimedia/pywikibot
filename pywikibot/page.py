@@ -781,7 +781,7 @@ class Page(object):
             # are not language links
             try:
                 if link.site != self.site():
-                    if linktitle.lstrip().startswith(":"):
+                    if not linktitle.lstrip().startswith(":"):
                         # initial ":" indicates not a language link
                         yield link
                     elif link.site.family != self.site().family:
