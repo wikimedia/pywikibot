@@ -235,13 +235,11 @@ class Page(object):
         if not isinstance(other, Page):
             # especially, return -1 if other is None
             return -1
-        if not self.site() == other.site():
-            return cmp(self.site(), other.site())
-        if self.namespace() != other.namespace():
-            return cmp(self.namespace(), other.namespace())
-        owntitle = self.title(withNamespace=False)
-        othertitle = other.title(withNamespace=False)
-        return cmp(owntitle, othertitle)
+        if self._site != other._site:
+            return cmp(self._site, other._site)
+        if self._ns != other._ns:
+            return cmp(self._ns, other._ns)
+        return cmp(self._title, other._title)
 
     def __hash__(self):
         # Pseudo method that makes it possible to store Page objects as keys
