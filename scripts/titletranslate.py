@@ -9,13 +9,14 @@ __version__ = '$Id$'
 #
 import re
 
-import wikipedia, date, time
+import pywikibot, time
+import pywikibot.date as date
 
 def translate(page, hints = None, auto = True, removebrackets = False):
     """
     Please comment your source code! --Daniel
 
-    Does some magic stuff. Returns a list of pages.
+    Does some magic stuff. Returns a list of Links.
     """
     result = []
     site = page.site()
@@ -33,7 +34,7 @@ def translate(page, hints = None, auto = True, removebrackets = False):
                 # we're currently working on ...
                 ns = page.namespace()
                 if ns:
-                    newname = u'%s:%s' % (site.family.namespace('_default', ns), page.titleWithoutNamespace())
+                    newname = u'%s:%s' % (site.family.namespace('_default', ns), page.title(withNamespace=False))
                 else:
                     # article in the main namespace
                     newname = page.title()
@@ -52,30 +53,30 @@ def translate(page, hints = None, auto = True, removebrackets = False):
                     codes = codes.split(',')
             for newcode in codes:
                 if newcode in site.languages():
-                    if newcode != site.language():
-                        x = wikipedia.Page(site.getSite(code=newcode), newname)
+                    if newcode != site.code:
+                        x = pywikibot.Link(site.getSite(code=newcode), newname)
                         if x not in result:
                             result.append(x)
                 else:
-                    if wikipedia.verbose:
-                        wikipedia.output(u"Ignoring unknown language code %s"%newcode)
+                    if pywikibot.verbose:
+                        pywikibot.output(u"Ignoring unknown language code %s"%newcode)
 
     # Autotranslate dates into all other languages, the rest will come from existing interwiki links.
     if auto:
         # search inside all dictionaries for this link
-        dictName, value = date.getAutoFormat( page.site().language(), page.title() )
+        dictName, value = date.getAutoFormat( page.site().code, page.title() )
         if dictName:
-            if not (dictName == 'yearsBC' and date.maxyearBC.has_key(page.site().language()) and value > date.maxyearBC[page.site().language()]) or (dictName == 'yearsAD' and date.maxyearAD.has_key(page.site().language()) and value > date.maxyearAD[page.site().language()]):
-                wikipedia.output(u'TitleTranslate: %s was recognized as %s with value %d' % (page.title(),dictName,value))
+            if not (dictName == 'yearsBC' and date.maxyearBC.has_key(page.site().code) and value > date.maxyearBC[page.site().code]) or (dictName == 'yearsAD' and date.maxyearAD.has_key(page.site().code) and value > date.maxyearAD[page.site().code]):
+                pywikibot.output(u'TitleTranslate: %s was recognized as %s with value %d' % (page.title(),dictName,value))
                 for entryLang, entry in date.formats[dictName].iteritems():
-                    if entryLang != page.site().language():
+                    if entryLang != page.site().code:
                         if dictName == 'yearsBC' and date.maxyearBC.has_key(entryLang) and value > date.maxyearBC[entryLang]:
                             pass
                         elif dictName == 'yearsAD' and date.maxyearAD.has_key(entryLang) and value > date.maxyearAD[entryLang]:
                             pass
             else:
                             newname = entry(value)
-                            x = wikipedia.Page( wikipedia.getSite(code=entryLang, fam=site.family), newname )
+                            x = pywikibot.Link( newname, pywikibot.getSite(code=entryLang, fam=site.family) )
                             if x not in result:
                                 result.append(x) # add new page
     return result
@@ -91,11 +92,11 @@ def getPoisonedLinks(pl):
     """
     result = []
 
-    wikipedia.output( u'getting poisoned links for %s' % pl.title() )
+    pywikibot.output( u'getting poisoned links for %s' % pl.title() )
 
-    dictName, value = date.getAutoFormat( pl.site().language(), pl.title() )
+    dictName, value = date.getAutoFormat( pl.site().code, pl.title() )
     if dictName is not None:
-        wikipedia.output( u'date found in %s' % dictName )
+        pywikibot.output( u'date found in %s' % dictName )
 
         # errors in year BC
         if dictName in date.bcFormats:
