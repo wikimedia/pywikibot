@@ -219,7 +219,7 @@ class BaseSite(object):
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""
 
-        nsnames = sum(self.namespaces().values(), [])
+        nsnames = sum(self.namespaces().itervalues(), [])
         return [l for l in self.languages()
                   if l[:1].upper() + l[1:] not in self.namespaces()]
 
@@ -997,7 +997,7 @@ class APISite(BaseSite):
         if "pages" not in result['query']:
             # no "pages" element indicates a circular redirect
             raise pywikibot.CircularRedirect(redirmap[title])
-        for pagedata in result['query']['pages'].values():
+        for pagedata in result['query']['pages'].itervalues():
             # there should be only one value in 'pages', and it is the target
             if pagedata['title'] not in redirmap.values():
                 raise RuntimeError(

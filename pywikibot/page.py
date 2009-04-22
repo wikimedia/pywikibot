@@ -412,7 +412,7 @@ class Page(object):
     def previousRevision(self):
         """Return the revision id for the previous revision of this Page."""
         vh = self.getVersionHistory(revCount=2)
-        revkey = sorted(self._revisions.keys(), reverse=True)[1]
+        revkey = sorted(self._revisions.iterkeys(), reverse=True)[1]
         return revkey
 
     def exists(self):
@@ -848,7 +848,7 @@ class Page(object):
             args = template[1]
             positional = []
             named = {}
-            for key in sorted(args.keys()):
+            for key in sorted(args.iterkeys()):
                 try:
                     int(key)
                 except ValueError:
@@ -912,7 +912,7 @@ class Page(object):
                    self._revisions[rev].timestamp,
                    self._revisions[rev].user,
                    self._revisions[rev].comment
-                 ) for rev in sorted(self._revisions.keys(),
+                 ) for rev in sorted(self._revisions.iterkeys(),
                                      reverse=not reverseOrder)[ : revCount]
                ]
 
@@ -1451,7 +1451,7 @@ class Category(Page):
         @type recurse: int or bool
 
         """
-        namespaces = [x for x in self.site().namespaces().keys()
+        namespaces = [x for x in self.site().namespaces().iterkeys()
                       if x>=0 and x!=14]
         for member in self.site().categorymembers(self,
                                                   namespaces=namespaces):
@@ -1944,7 +1944,6 @@ not supported by PyWikiBot!"""
         if self.namespace != other.namespace:
             return cmp(self.namespace, other.namespace)
         return cmp(self.title, other.title)
-
 
 # Utility functions for parsing page titles
 

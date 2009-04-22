@@ -326,8 +326,8 @@ aanjepaß krijje:
         if len(log_items) < LOG_SIZE:
             return log_text
         # sort by keys and keep the first (LOG_SIZE-1) values
-        keep = [text for (key, text)
-                     in sorted(log_items.items(), reverse=True)[ : LOG_SIZE-1]]
+        keep = [text for (_, text) in
+                    sorted(log_items.iteritems(), reverse=True)[:LOG_SIZE-1]]
         log_text = "\n".join("\n".join(line for line in text) for text in keep)
         # get permalink to older logs
         history = self.log_page.getVersionHistory(revCount=LOG_SIZE)
@@ -489,7 +489,7 @@ aanjepaß krijje:
 ##                         % cat.title(asLink=True, textlink=True))
 
         # delete record entries for non-existent categories
-        for cat_name in list(record.keys()):
+        for cat_name in record.iterkeys():
             if pywikibot.Category(
                     pywikibot.Link(self.catprefix+cat_name, self.site)
                ) not in catmap:
@@ -497,7 +497,7 @@ aanjepaß krijje:
 
         pywikibot.output(u"")
         pywikibot.output(u"Checking %s destination categories" % len(destmap))
-        for dest in pagegenerators.PreloadingGenerator(destmap.keys()):
+        for dest in pagegenerators.PreloadingGenerator(destmap.iterkeys()):
             if not dest.exists():
                 for d in destmap[dest]:
                     problems.append("# %s redirects to %s"

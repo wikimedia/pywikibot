@@ -30,7 +30,7 @@ class TestApiFunctions(unittest.TestCase):
         # req.keys() should contain "foo", "bar", "format", "maxlag", "one"
         self.assertEqual(len(req.keys()), 5)
         self.assert_("test" in req.values())
-        self.assert_(all(len(item) == 2 for item in req.items()))
+        self.assert_(all(len(item) == 2 for item in req.iteritems()))
 
 
 class TestPageGenerator(unittest.TestCase):
