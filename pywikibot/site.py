@@ -50,12 +50,14 @@ def Family(fam=None, fatal=True):
         fam = config.family
     try:
         # first try the built-in families
-        exec "import pywikibot.families.%s_family as myfamily" % fam
+        name = "pywikibot.families.%s_family" % fam
+        __import__(name)
+        myfamily = sys.modules[name]
     except ImportError:
         # next see if user has defined a local family module
         try:
             sys.path.append(config.datafilepath('families'))
-            exec "import %s_family as myfamily" % fam
+            myfamily =  __import__("%s_family" % fam)
         except ImportError:
             if fatal:
                 logger.exception(u"""\

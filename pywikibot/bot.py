@@ -51,8 +51,9 @@ class MaxLevelFilter(logging.Filter):
 
 # User interface initialization
 # search for user interface module in the 'userinterfaces' subdirectory
-exec ("import pywikibot.userinterfaces.%s_interface as uiModule"
-      % config.userinterface)
+uiModule = __import__("pywikibot.userinterfaces.%s_interface"
+                        % config.userinterface, 
+                        fromlist=['UI', 'TerminalHandler'] )
 ui = uiModule.UI()
 TerminalHandler = uiModule.TerminalHandler
 
@@ -439,7 +440,7 @@ Global arguments available for all bots:
 
 ''' % modname
     try:
-        exec('import %s as module' % modname)
+        module = __import__('%s' % modname)
         helpText = module.__doc__.decode('utf-8')
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.iteritems():

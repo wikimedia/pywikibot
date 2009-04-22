@@ -160,7 +160,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     if interface is None:
         interface = config.site_interface
     try:
-        exec "from site import %s as __Site" % interface
+        tmp = __import__('pywikibot.site', fromlist=[interface])
+        __Site = getattr(tmp, interface)
     except ImportError:
         raise ValueError("Invalid interface name '%(interface)s'" % locals())
     key = '%s:%s:%s' % (fam, code, user)
