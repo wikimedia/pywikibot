@@ -482,7 +482,7 @@ for _filename in _fns:
                   % {'fn' :_filename}
 
 # Test for obsoleted and/or unknown variables.
-for _key in globals().iterkeys():
+for _key in globals().keys():
     if _key[0]=='_':
         pass
     elif _key in _gl:
@@ -577,7 +577,7 @@ if __name__=="__main__":
 
 # cleanup all locally-defined variables
 
-for __var in globals().iterkeys():
+for __var in globals().keys():
     if __var.startswith("_") and not __var.startswith("__"):
         del __sys.modules[__name__].__dict__[__var]
 
