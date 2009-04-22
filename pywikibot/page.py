@@ -1945,6 +1945,12 @@ not supported by PyWikiBot!"""
             return cmp(self.namespace, other.namespace)
         return cmp(self.title, other.title)
 
+    def __unicode__(self):
+        return self.astext()
+
+    def __hash__(self):
+        return hash(self.astext())
+
 # Utility functions for parsing page titles
 
 def html2unicode(text, ignore = []):
