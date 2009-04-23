@@ -28,6 +28,7 @@ import logging
 import atexit
 
 from pywikibot import config
+from pywikibot.exceptions import Server504Error
 import pywikibot
 import cookielib
 import threadedhttp
@@ -98,6 +99,8 @@ def request(site, uri, *args, **kwargs):
     request.lock.acquire()
 
     #TODO: do some error correcting stuff
+    if request.data[0].status == 504:
+        raise Server504Error("Server %s timed out" % site.hostname())
 
     #if all else fails
     if isinstance(request.data, Exception):

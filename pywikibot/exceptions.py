@@ -97,6 +97,9 @@ class SpamfilterError(PageNotSaved):
 class ServerError(Error):
     """Got unexpected server response"""
 
+class Server504Error(Error):
+    """Server timed out with http 504 code"""
+
 class BadTitle(Error):
     """Server responded with BadTitle."""
 

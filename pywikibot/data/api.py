@@ -175,7 +175,6 @@ class Request(DictMixin):
                 logger.exception("key=%s, params=%s\n" % (key, self.params[key]))
         params = urllib.urlencode(self.params)
         while True:
-            # TODO catch http errors
             action = self.params.get("action", "")
             write = action in (
                         "edit", "move", "rollback", "delete", "undelete",
@@ -188,7 +187,12 @@ class Request(DictMixin):
                             headers={'Content-Type':
                                      'application/x-www-form-urlencoded'},
                             body=params)
-            except Exception, e: #TODO: what exceptions can occur here?
+            except Server504Error:
+                logger.debug(u"Caught 504 error")
+                raise
+            #TODO: what other exceptions can occur here?
+            except Exception, e:
+                # for any other error on the http request, wait and retry
                 pywikibot.output(traceback.format_exc(),
                                  level=pywikibot.ERROR)
                 pywikibot.output(u"%s, %s" % (uri, params),
@@ -327,7 +331,8 @@ class QueryGenerator(object):
             if name not in _modules:
                 self.get_module()
                 break
-        self.update_limit()
+        self.prefix = None
+        self.update_limit() # sets self.prefix
         if self.query_limit is not None and "generator" in kwargs:
             self.prefix = "g" + self.prefix
         self.request = Request(**kwargs)
@@ -395,7 +400,8 @@ class QueryGenerator(object):
                         self.query_limit = int(param["highmax"])
                     else:
                         self.query_limit = int(param["max"])
-                    self.prefix = _modules[mod]["prefix"]
+                    if self.prefix is None:
+                        self.prefix = _modules[mod]["prefix"]
                     logger.debug(u"%s: Set query_limit to %i."
                                   % (self.__class__.__name__,
                                      self.query_limit))
@@ -434,7 +440,17 @@ class QueryGenerator(object):
                     new_limit = None
                 if new_limit is not None:
                     self.request[self.prefix+"limit"] = str(new_limit)
-            self.data = self.request.submit()
+            try:
+                self.data = self.request.submit()
+            except Server504Error:
+                # server timeout, usually caused by request with high limit
+                old_limit = self.query_limit
+                if old_limit is None or old_limit < 2:
+                    raise
+                pywikibot.output("Setting query limit to %s" % (old_limit // 2),
+                                 level=pywikibot.VERBOSE)
+                self.set_query_increment(old_limit // 2)
+                continue
             if not self.data or not isinstance(self.data, dict):
                 logger.debug(
                     u"%s: stopped iteration because no dict retrieved from api."
