@@ -1950,8 +1950,11 @@ not supported by PyWikiBot!"""
         return hash(self.astext())
 
     @staticmethod
-    def fromPage(page):
-        """Create a Link from a Page object"""
+    def fromPage(page, source=None):
+        """
+        Create a Link to a Page.
+        @param source: Link from site source
+        """
 
         link = Link.__new__(Link)
         link._site = page.site()
@@ -1961,6 +1964,7 @@ not supported by PyWikiBot!"""
                                 allowInterwiki=False,
                                 withSection=False)
         link._anchor = None
+        link._source = source or pywikibot.Site()
 
         return link
 
