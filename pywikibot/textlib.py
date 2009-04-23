@@ -351,7 +351,7 @@ def replaceLanguageLinks(oldtext, new, site = None, addOnly = False):
     """Replace interlanguage links in the text with a new set of links.
 
     'new' should be a dict with the Site objects as keys, and Page or Link 
-    object as values (i.e., just like the dict returned by getLanguageLinks
+    objects as values (i.e., just like the dict returned by getLanguageLinks
     function).
     
     """
