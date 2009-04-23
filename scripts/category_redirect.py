@@ -489,7 +489,7 @@ aanjepaß krijje:
 ##                         % cat.title(asLink=True, textlink=True))
 
         # delete record entries for non-existent categories
-        for cat_name in record.iterkeys():
+        for cat_name in record.keys():
             if pywikibot.Category(
                     pywikibot.Link(self.catprefix+cat_name, self.site)
                ) not in catmap:
@@ -497,7 +497,7 @@ aanjepaß krijje:
 
         pywikibot.output(u"")
         pywikibot.output(u"Checking %s destination categories" % len(destmap))
-        for dest in pagegenerators.PreloadingGenerator(destmap.iterkeys()):
+        for dest in pagegenerators.PreloadingGenerator(destmap):
             if not dest.exists():
                 for d in destmap[dest]:
                     problems.append("# %s redirects to %s"
