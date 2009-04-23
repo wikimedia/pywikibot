@@ -14,7 +14,7 @@ import unittest
 import pywikibot
 import pywikibot.page
 
-site = pywikibot.Site()
+site = pywikibot.Site('en')
 mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
 maintalk = pywikibot.Page(pywikibot.page.Link("Talk:Main Page", site))
 badpage = pywikibot.Page(pywikibot.page.Link("There is no page with this title",
