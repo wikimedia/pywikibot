@@ -1903,7 +1903,7 @@ not supported by PyWikiBot!"""
 
         """
         if onsite is None:
-            onsite = self.site
+            onsite = self._source
         title = self.title
         if self.namespace:
             title = onsite.namespace(self.namespace) + ":" + title
