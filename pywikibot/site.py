@@ -1381,8 +1381,9 @@ class APISite(BaseSite):
             if 'langlinks' not in pageitem:
                 continue
             for linkdata in pageitem['langlinks']:
-                yield pywikibot.Link(linkdata['*'],
-                                     source=pywikibot.Site(linkdata['lang']))
+                yield pywikibot.Link('%s:%s' % (linkdata['lang'], 
+                                                linkdata['*']),
+                                     source=self)
 
     def page_extlinks(self, page):
         """Iterate all external links on page, yielding URL strings."""
