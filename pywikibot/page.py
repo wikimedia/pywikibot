@@ -1947,7 +1947,9 @@ not supported by PyWikiBot!"""
         return self.astext()
 
     def __hash__(self):
-        return hash(self.astext())
+        return hash(u'%s:%s:%s' % (self.site.family.name,
+                                  self.site.code,
+                                  self.title))
 
     @staticmethod
     def fromPage(page, source=None):

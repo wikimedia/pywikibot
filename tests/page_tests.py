@@ -24,6 +24,9 @@ class TestLinkObject(unittest.TestCase):
     """Test cases for Link objects"""
 
     enwiki = pywikibot.Site("en", "wikipedia")
+    frwiki = pywikibot.Site("fr", "wikipedia")
+    itwikt = pywikibot.Site("it", "wiktionary")
+
     namespaces = {0: [u""],        # en.wikipedia.org namespaces for testing
                   1: [u"Talk:"],   # canonical form first, then others
                   2: [u"User:"],   # must end with :
@@ -84,6 +87,24 @@ class TestLinkObject(unittest.TestCase):
                 m = pywikibot.page.Link(":"+self.namespaces[num][0]+title)
                 self.assertEqual(m.title, self.titles[title])
 
+    def testHashCmp(self):
+        # All links point to en:wikipedia:Test
+        l1 = pywikibot.page.Link('Test', source=self.enwiki)
+        l2 = pywikibot.page.Link('en:Test', source=self.frwiki) 
+        l3 = pywikibot.page.Link('wikipedia:en:Test', source=self.itwikt)
+        def assertHashCmp(link1, link2):
+            self.assertEqual(link1, link2)
+            self.assertEqual(hash(link1), hash(link2))
+
+        assertHashCmp(l1, l2)
+        assertHashCmp(l1, l3)
+        assertHashCmp(l2, l3)
+
+        # fr:wikipedia:Test
+        other = pywikibot.page.Link('Test', source=self.frwiki)
+
+        self.assertNotEqual(l1, other)
+        self.assertNotEqual(hash(l1), hash(other))
 
 class TestPageObject(unittest.TestCase):
     def testGeneral(self):
