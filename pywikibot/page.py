@@ -1970,6 +1970,28 @@ not supported by PyWikiBot!"""
 
         return link
 
+    @staticmethod
+    def langlinkUnSafe(lang, title, source):
+        """
+        Create a "lang:title" Link linked from source.
+        Assumes that the lang & title come clean, no checks are made.
+        """
+        link = Link.__new__(Link)
+
+        link._site = pywikibot.Site(lang, source.family.name)
+        link._section = None
+        link._source = source
+
+        if ':' in title:
+            ns, t = title.split(':', 1)
+            link._namespace = link._site.ns_index(ns.lower())
+            link._title = t
+        else:
+            link._title = title
+            link._namespace = 0
+        
+        return link 
+
 # Utility functions for parsing page titles
 
 def html2unicode(text, ignore = []):
