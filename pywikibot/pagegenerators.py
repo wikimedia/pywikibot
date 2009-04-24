@@ -605,10 +605,13 @@ def RedirectFilterPageGenerator(generator):
 
 def DuplicateFilterPageGenerator(generator):
     """Yield all unique pages from another generator, omitting duplicates."""
-    seenPages = set([])
+    seenPages = {}
     for page in generator:
         if page not in seenPages:
-            seenPages.add(page)
+            _page = u"%s:%s:%s" % (page._site.family.name,
+                                   page._site.code,
+                                   page._title)
+            seenPages[_page] = True
             yield page
 
 
