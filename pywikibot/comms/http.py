@@ -99,12 +99,12 @@ def request(site, uri, *args, **kwargs):
     request.lock.acquire()
 
     #TODO: do some error correcting stuff
-    if request.data[0].status == 504:
-        raise Server504Error("Server %s timed out" % site.hostname())
-
     #if all else fails
     if isinstance(request.data, Exception):
         raise request.data
+
+    if request.data[0].status == 504:
+        raise Server504Error("Server %s timed out" % site.hostname())
 
     if request.data[0].status != 200:
         pywikibot.output(u"Http response status %(status)s"
