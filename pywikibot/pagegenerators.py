@@ -700,8 +700,9 @@ def UnCategorizedImageGenerator(number = 100, repeat = False, site = None):
 def NewimagesPageGenerator(number = 100, repeat = False, site = None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.newimages(number, repeat=repeat):
-        yield page[0]
+    for tuple in site.newimages(number, repeat=repeat):
+        # tuple is ImagePage, date, user comment
+        yield tuple[0]
 
 def UnCategorizedPageGenerator(number = 100, repeat = False, site = None):
     if site is None:
@@ -724,8 +725,8 @@ def UnwatchedPagesPageGenerator(number = 100, repeat = False, site = None):
 def AncientPagesPageGenerator(number = 100, repeat = False, site = None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.ancientpages(number=number, repeat=repeat):
-        yield page[0]
+    for page, date in site.ancientpages(number=number, repeat=repeat):
+        yield page
 
 def DeadendPagesPageGenerator(number = 100, repeat = False, site = None):
     if site is None:
@@ -736,14 +737,14 @@ def DeadendPagesPageGenerator(number = 100, repeat = False, site = None):
 def LongPagesPageGenerator(number = 100, repeat = False, site = None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.longpages(number=number, repeat=repeat):
-        yield page[0]
+    for page, length in site.longpages(number=number, repeat=repeat):
+        yield page
 
 def ShortPagesPageGenerator(number = 100, repeat = False, site = None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.shortpages(number=number, repeat=repeat):
-        yield page[0]
+    for page, length in site.shortpages(number=number, repeat=repeat):
+        yield page
 
 def LinksearchPageGenerator(link, limit=None, site=None):
     """Yields all pages that include a specified link, according to
@@ -762,7 +763,7 @@ def SearchPageGenerator(query, number = 100, namespaces = None, site = None):
     if site is None:
         site = pywikibot.Site()
     for page in site.search(query, number=number, namespaces = namespaces):
-        yield page[0]
+        yield page
 
 # following classes just ported from version 1 without revision; not tested
 
