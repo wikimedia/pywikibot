@@ -295,11 +295,11 @@ except NameError:
         """
         seq2 = copy.copy(seq)
         if key:
-            if cmp == None:
+            if cmp is None:
                 cmp = __builtins__.cmp
             seq2.sort(lambda x,y: cmp(key(x), key(y)))
         else:
-            if cmp == None:
+            if cmp is None:
                 seq2.sort()
             else:
                 seq2.sort(cmp)
@@ -502,6 +502,64 @@ class Global(object):
     nobackonly = False
     hintsareright = False
 
+class PageTree(object):
+    """
+    Structure to manipulate a set of pages.
+    Allows filtering efficiently by Site.
+    """
+    def __init__(self):
+        self.tree = {}
+        self.size = 0
+
+    def filter(self, site):
+        """
+        Iterates over pages that are in Site site
+        """ 
+        try:
+            for page in self.tree[site]:
+                yield page
+        except KeyError:
+            pass
+
+    def __len__(self):
+        return self.size
+
+    def add(self, page):
+        site = page.site()
+        if not site in self.tree:
+            self.tree[site] = {}
+        self.tree[site][page] = True
+        self.size += 1
+
+    def remove(self, page):
+        try:
+            del self.tree[page.site()][page]
+            self.size -= 1
+        except KeyError:
+            pass
+
+    def removeSite(self, site):
+        """
+        Removes all pages from Site site
+        """
+        try:
+            self.size -= len(self.tree[site])
+            del self.tree[site]
+        except KeyError:
+            pass
+
+    def siteCounts(self):
+        """
+        Yields (Site, number of pages in site) pairs
+        """
+        for site, d in self.tree.iteritems():
+            yield site, len(d)
+    
+    def __iter__(self):
+        for site, d in self.tree.iteritems():
+            for page in d:
+                yield page
+
 class Subject(object):
     """
     Class to follow the progress of a single 'subject' (i.e. a page with
@@ -515,10 +573,12 @@ class Subject(object):
         self.originPage = originPage
         # todo is a list of all pages that still need to be analyzed.
         # Mark the origin page as todo.
-        self.todo = [originPage]
+        self.todo = PageTree()
+        self.todo.add(originPage)
+
         # done is a list of all pages that have been analyzed and that
         # are known to belong to this subject.
-        self.done = []
+        self.done = PageTree()
         # foundIn is a dictionary where pages are keys and lists of
         # pages are values. It stores where we found each page.
         # As we haven't yet found a page that links to the origin page, we
@@ -526,7 +586,7 @@ class Subject(object):
         self.foundIn = {self.originPage:[]}
         # This is a list of all pages that are currently scheduled for
         # download.
-        self.pending = []
+        self.pending = PageTree()
         if globalvar.hintsareright:
             # This is a set of sites that we got hits to
             self.hintedsites = set()
@@ -544,8 +604,8 @@ class Subject(object):
         first one will be returned.
         Otherwise, None will be returned.
         """
-        for page in self.done + self.pending:
-            if page.site() == site:
+        for tree in [self.done, self.pending]:
+            for page in tree.filter(site):
                 if page.exists() and page.isDisambig():
                     return page
         return None
@@ -557,8 +617,8 @@ class Subject(object):
         first one will be returned.
         Otherwise, None will be returned.
         """
-        for page in self.done + self.pending:
-            if page.site() == site:
+        for tree in [self.done, self.pending]:
+            for page in tree.filter(site):
                 if page.exists() and not page.isDisambig() and not page.isRedirectPage():
                     return page
         return None
@@ -570,8 +630,8 @@ class Subject(object):
         have been found, the first one will be returned.
         Otherwise, None will be returned.
         """
-        for page in self.done + self.pending + self.todo:
-            if page.site() == site:
+        for tree in [self.done, self.pending, self.todo]:
+            for page in tree.filter(site):
                 if page.namespace() == self.originPage.namespace():
                     if page.exists() and not page.isRedirectPage():
                         return page
@@ -590,22 +650,18 @@ class Subject(object):
             pages = titletranslate.translate(self.originPage, hints = hints, auto = globalvar.auto, removebrackets
 = globalvar.hintnobracket)
         for page in pages:
-            self.todo.append(page)
+            self.todo.add(page)
             self.foundIn[page] = [None]
             if keephintedsites:
                 self.hintedsites.add(page.site)
 
-    def openSites(self, allowdoubles = False):
-        """Return a list of sites for all things we still need to do"""
-        distinctSites = {}
-
-        for page in self.todo:
-            site = page.site()
-            if allowdoubles:
-                distinctSites[page] = site
-            else:
-                distinctSites[site] = site
-        return distinctSites.values()
+    def openSites(self):
+        """
+        Iterator. Yields (site, count) pairs:
+        * site is a site where we still have work to do on
+        * count is the number of items in that Site that need work on
+        """
+        return self.todo.siteCounts()
 
     def willWorkOn(self, site):
         """
@@ -615,24 +671,25 @@ class Subject(object):
         """
         # Bug-check: Isn't there any work still in progress? We can't work on
         # different sites at a time!
-        if self.pending != []:
+        if len(self.pending) > 0:
             raise 'BUG: Can\'t start to work on %s; still working on %s' % (site, self.pending)
         # Prepare a list of suitable pages
-        for page in self.todo:
-            if page.site() == site:
-                self.pending.append(page)
-        for page in self.pending:
-            self.todo.remove(page)
+        result = []
+        for page in self.todo.filter(site):
+            self.pending.add(page)
+            result.append(page)
+
+        self.todo.removeSite(site)
         # If there are any, return them. Otherwise, nothing is in progress.
-        return self.pending
+        return result
 
     def makeForcedStop(self,counter):
         """
         Ends work on the page before the normal end.
         """
-        for page in self.todo:
-            counter.minus(page.site())
-        self.todo = []
+        for site, count in self.todo.siteCounts():
+            counter.minus(site, count)
+        self.todo = PageTree()
         self.forcedStop = True
 
     def addIfNew(self, page, counter, linkingPage):
@@ -658,9 +715,14 @@ class Subject(object):
             return False
         else:
             self.foundIn[page] = [linkingPage]
-            self.todo.append(page)
+            self.todo.add(page)
             counter.plus(page.site())
             return True
+
+    def skipPage(self, page, target, counter):
+        return self.isIgnored(target) or \
+            self.namespaceMismatch(page, target, counter) or \
+            self.wiktionaryMismatch(target)
 
     def namespaceMismatch(self, linkingPage, linkedPage, counter):
         """
@@ -745,14 +807,16 @@ class Subject(object):
         else:
             choice = 'y'
             if self.originPage.isDisambig() and not page.isDisambig():
-                if self.getFoundDisambig(page.site()):
-                    wikipedia.output(u"NOTE: Ignoring non-disambiguation page %s for %s because disambiguation page %s has already been found." % (page.aslink(True), self.originPage.aslink(True), self.getFoundDisambig(page.site()).aslink(True)))
+                disambig = self.getFoundDisambig(page.site())
+                if disambig:
+                    wikipedia.output(u"NOTE: Ignoring non-disambiguation page %s for %s because disambiguation page %s has already been found." % (page.aslink(True), self.originPage.aslink(True), disambig.aslink(True)))
                     return (True, None)
                 else:
                     choice = wikipedia.inputChoice('WARNING: %s is a disambiguation page, but %s doesn\'t seem to be one. Follow it anyway?' % (self.originPage.aslink(True), page.aslink(True)), ['Yes', 'No', 'Add an alternative', 'Give up'], ['y', 'n', 'a', 'g'])
             elif not self.originPage.isDisambig() and page.isDisambig():
-                if self.getFoundNonDisambig(page.site()):
-                    wikipedia.output(u"NOTE: Ignoring disambiguation page %s for %s because non-disambiguation page %s has already been found." % (page.aslink(True), self.originPage.aslink(True), self.getFoundNonDisambig(page.site()).aslink(True)))
+                nondisambig = self.getFoundNonDisambig(page.site())
+                if nondisambig:
+                    wikipedia.output(u"NOTE: Ignoring disambiguation page %s for %s because non-disambiguation page %s has already been found." % (page.aslink(True), self.originPage.aslink(True), nondisambig.aslink(True)))
                     return (True, None)
                 else:
                     choice = wikipedia.inputChoice('WARNING: %s doesn\'t seem to be a disambiguation page, but %s is one. Follow it anyway?' % (self.originPage.aslink(True), page.aslink(True)), ['Yes', 'No', 'Add an alternative', 'Give up'], ['y', 'n', 'a', 'g'])
@@ -822,124 +886,143 @@ class Subject(object):
         # Loop over all the pages that should have been taken care of
         for page in self.pending:
             # Mark the page as done
-            self.done.append(page)
+            self.done.add(page)
 
             # make sure that none of the linked items is an auto item
             if globalvar.skipauto:
                 dictName, year = page.autoFormat()
-                if dictName != None:
+                if dictName is not None:
                     wikipedia.output(u'WARNING: %s:%s relates to %s:%s, which is an auto entry %s(%s)' % (self.originPage.site().language(), self.originPage.title(), page.site().language(),page.title(),dictName,year))
 
             # Register this fact at the todo-counter.
             counter.minus(page.site())
             # Now check whether any interwiki links should be added to the
             # todo list.
-            if page.section() and not page.isRedirectPage():
-                # We have been referred to a part of a page, not the whole page. Do not follow references.
-                pass
-            else:
-                try:
-                    iw = page.interwiki()
-                except wikipedia.IsRedirectPage, arg:
-                    redirectTargetPage = wikipedia.Page(page.site(), arg.args[0])
-                    wikipedia.output(u"NOTE: %s is redirect to %s" % (page.aslink(True), redirectTargetPage.aslink(True)))
-                    if page == self.originPage:
-                        if globalvar.initialredirect:
-                            self.originPage = redirectTargetPage
-                            self.pending.append(redirectTargetPage)
-                            counter.plus(redirectTargetPage.site)
-                        else:
-                            # This is a redirect page to the origin. We don't need to
-                            # follow the redirection.
-                            # In this case we can also stop all hints!
-                            for page2 in self.todo:
-                                counter.minus(page2.site())
-                            self.todo = []
-                    elif not globalvar.followredirect:
-                        wikipedia.output(u"NOTE: not following redirects.")
-                    else:
-                        if not (self.isIgnored(redirectTargetPage) or self.namespaceMismatch(page, redirectTargetPage, counter) or self.wiktionaryMismatch(redirectTargetPage) or (page.site().family != redirectTargetPage.site().family)):
-                            if self.addIfNew(redirectTargetPage, counter, page):
-                                if config.interwiki_shownew:
-                                    wikipedia.output(u"%s: %s gives new redirect %s" %  (self.originPage.aslink(), page.aslink(True), redirectTargetPage.aslink(True)))
-                except wikipedia.NoPage:
-                    wikipedia.output(u"NOTE: %s does not exist" % page.aslink(True))
-                    if page == self.originPage:
-                        # The page we are working on is the page that does not exist.
-                        # No use in doing any work on it in that case.
-                        for page2 in self.todo:
-                            counter.minus(page2.site())
-                        self.todo = []
-                        self.done = [] # In some rare cases it might be we already did check some 'automatic' links
-                        pass
-                except wikipedia.NoSuchSite:
-                    wikipedia.output(u"NOTE: site %s does not exist" % page.site())
-                #except wikipedia.SectionError:
-                #    wikipedia.output(u"NOTE: section %s does not exist" % page.aslink())
-                else:
-                    (skip, alternativePage) = self.disambigMismatch(page, counter)
-                    if skip:
-                        wikipedia.output(u"NOTE: ignoring %s and its interwiki links" % page.aslink(True))
-                        if page in self.done: #XXX: Ugly bugfix - the following line has reportedly thrown "ValueError: list.remove(x): x not in list"
-                            self.done.remove(page)
-                        iw = ()
-                        if alternativePage:
-                            # add the page that was entered by the user
-                            self.addIfNew(alternativePage, counter, None)
 
-                    if self.originPage == page:
-                        self.untranslated = (len(iw) == 0)
-                        if globalvar.untranslatedonly:
-                            # Ignore the interwiki links.
-                            iw = ()
-                    elif globalvar.autonomous and page.site() in [p.site() for p in self.done if p != page and p.exists() and not p.isRedirectPage()]:
-                        otherpage = [p for p in self.done if p.site() == page.site() and p != page and p.exists() and not p.isRedirectPage()][0]
-                        wikipedia.output(u"Stopping work on %s because duplicate pages %s and %s are found"%(self.originPage.aslink(),otherpage.aslink(True),page.aslink(True)))
-                        self.makeForcedStop(counter)
-                        try:
-                            f = codecs.open(
-                                    wikipedia.config.datafilepath('autonomous_problems.dat'),
-                                    'a', 'utf-8')
-                            f.write("* %s {Found more than one link for %s}" % (self.originPage.aslink(True), page.site()))
-                            if config.interwiki_graph and config.interwiki_graph_url:
-                                filename = interwiki_graph.getFilename(self.originPage, extension = config.interwiki_graph_formats[0])
-                                f.write(" [%s%s graph]" % (config.interwiki_graph_url, filename))
-                            f.write("\n")
-                            f.close()
-                        except:
-                           #raise
-                           wikipedia.output(u'File autonomous_problem.dat open or corrupted! Try again with -restore.')
-                           sys.exit()
-                        iw = ()
-                    elif page.isEmpty() and not page.isCategory():
-                        wikipedia.output(u"NOTE: %s is empty; ignoring it and its interwiki links" % page.aslink(True))
-                        # Ignore the interwiki links
-                        if page in self.done: #XXX: Ugly bugfix - the following line has reportedly thrown "ValueError: list.remove(x): x not in list"
-                            self.done.remove(page)
-                        iw = ()
-                    for linkedPage in iw:
-                        if globalvar.hintsareright:
-                            if linkedPage.site in self.hintedsites:
-                                wikipedia.output(u"NOTE: %s: %s extra interwiki on hinted site ignored %s" % (self.originPage.aslink(), page.aslink(True), linkedPage.aslink(True)))
-                                break
-                        if not (self.isIgnored(linkedPage) or self.namespaceMismatch(page, linkedPage, counter) or self.wiktionaryMismatch(linkedPage)):
-                            if globalvar.followinterwiki or page == self.originPage:
-                                if self.addIfNew(linkedPage, counter, page):
-                                    # It is new. Also verify whether it is the second on the
-                                    # same site
-                                    lpsite=linkedPage.site()
-                                    for prevPage in self.foundIn.keys():
-                                        if prevPage != linkedPage and prevPage.site() == lpsite:
-                                            # Still, this could be "no problem" as either may be a
-                                            # redirect to the other. No way to find out quickly!
-                                            wikipedia.output(u"NOTE: %s: %s gives duplicate interwiki on same site %s" % (self.originPage.aslink(), page.aslink(True), linkedPage.aslink(True)))
-                                            break
-                                    else:
-                                        if config.interwiki_shownew:
-                                            wikipedia.output(u"%s: %s gives new interwiki %s"% (self.originPage.aslink(), page.aslink(True), linkedPage.aslink(True)))
+
+            if not page.exists():
+                wikipedia.output(u"NOTE: %s does not exist" % page.aslink(True))
+                if page == self.originPage:
+                    # The page we are working on is the page that does not exist.
+                    # No use in doing any work on it in that case.
+                    for site, count in self.todo.siteCounts():
+                        counter.minus(site, count)
+                    self.todo = PageTree()
+                    # In some rare cases it might be we already did check some 'automatic' links 
+                    self.done = PageTree() 
+                continue
+
+            elif page.isRedirectPage():
+                redirectTargetPage = page.getRedirectTarget()
+                wikipedia.output(u"NOTE: %s is redirect to %s" % (page.aslink(True), redirectTargetPage.aslink(True)))
+                if page == self.originPage:
+                    if globalvar.initialredirect:
+                        self.originPage = redirectTargetPage
+                        self.todo.add(redirectTargetPage)
+                        counter.plus(redirectTargetPage.site)
+                    else:
+                        # This is a redirect page to the origin. We don't need to
+                        # follow the redirection.
+                        # In this case we can also stop all hints!
+                        for site, count in self.todo.siteCounts():
+                            counter.minus(site, count)
+                        self.todo = PageTree()
+                elif not globalvar.followredirect:
+                    wikipedia.output(u"NOTE: not following redirects.")
+                elif page.site().family == redirectTargetPage.site().family \
+                    and not self.skipPage(page, redirectTargetPage, counter):
+                    if self.addIfNew(redirectTargetPage, counter, page):
+                        if config.interwiki_shownew:
+                            wikipedia.output(u"%s: %s gives new redirect %s" %  (self.originPage.aslink(), page.aslink(True), redirectTargetPage.aslink(True)))
+
+                continue
+
+            elif page.section():
+                continue
+
+
+            # Page exists, isnt a redirect, and is a plain link (no section)
+
+            try:
+                iw = page.interwiki()
+            except wikipedia.NoSuchSite:
+                wikipedia.output(u"NOTE: site %s does not exist" % page.site())
+                continue
+
+            (skip, alternativePage) = self.disambigMismatch(page, counter)
+            if skip:
+                wikipedia.output(u"NOTE: ignoring %s and its interwiki links" % page.aslink(True))
+                self.done.remove(page)
+                iw = ()
+                if alternativePage:
+                    # add the page that was entered by the user
+                    self.addIfNew(alternativePage, counter, None)
+
+            duplicate = None
+            for p in self.done.filter(page.site()):
+                if p != page and p.exists() and not p.isRedirectPage():
+                    duplicate = p
+                    break
+
+            if self.originPage == page:
+                self.untranslated = (len(iw) == 0)
+                if globalvar.untranslatedonly:
+                    # Ignore the interwiki links.
+                    iw = ()
+
+            elif globalvar.autonomous and duplicate:
+                
+                wikipedia.output(u"Stopping work on %s because duplicate pages"\
+                    " %s and %s are found" % (self.originPage.aslink(), 
+                                              duplicate.aslink(True), 
+                                              page.aslink(True)))
+                self.makeForcedStop(counter)
+                try:
+                    f = codecs.open(
+                            wikipedia.config.datafilepath('autonomous_problems.dat'),
+                            'a', 'utf-8')
+                    f.write("* %s {Found more than one link for %s}" % (self.originPage.aslink(True), page.site()))
+                    if config.interwiki_graph and config.interwiki_graph_url:
+                        filename = interwiki_graph.getFilename(self.originPage, extension = config.interwiki_graph_formats[0])
+                        f.write(" [%s%s graph]" % (config.interwiki_graph_url, filename))
+                    f.write("\n")
+                    f.close()
+                # FIXME: What errors are we catching here? 
+                # except: should be avoided!!
+                except:
+                   #raise
+                   wikipedia.output(u'File autonomous_problem.dat open or corrupted! Try again with -restore.')
+                   sys.exit()
+                iw = ()
+            elif page.isEmpty() and not page.isCategory():
+                wikipedia.output(u"NOTE: %s is empty; ignoring it and its interwiki links" % page.aslink(True))
+                # Ignore the interwiki links
+                self.done.remove(page)
+                iw = ()
+
+            for linkedPage in iw:
+                if globalvar.hintsareright:
+                    if linkedPage.site in self.hintedsites:
+                        wikipedia.output(u"NOTE: %s: %s extra interwiki on hinted site ignored %s" % (self.originPage.aslink(), page.aslink(True), linkedPage.aslink(True)))
+                        break
+                if not self.skipPage(page, linkedPage, counter):
+                    if globalvar.followinterwiki or page == self.originPage:
+                        if self.addIfNew(linkedPage, counter, page):
+                            # It is new. Also verify whether it is the second on the
+                            # same site
+                            lpsite=linkedPage.site()
+                            for prevPage in self.foundIn:
+                                if prevPage != linkedPage and prevPage.site() == lpsite:
+                                    # Still, this could be "no problem" as either may be a
+                                    # redirect to the other. No way to find out quickly!
+                                    wikipedia.output(u"NOTE: %s: %s gives duplicate interwiki on same site %s" % (self.originPage.aslink(), page.aslink(True), linkedPage.aslink(True)))
+                                    break
+                            else:
+                                if config.interwiki_shownew:
+                                    wikipedia.output(u"%s: %s gives new interwiki %s"% (self.originPage.aslink(), page.aslink(True), linkedPage.aslink(True)))
 
         # These pages are no longer 'in progress'
-        self.pending = []
+        self.pending = PageTree()
         # Check whether we need hints and the user offered to give them
         if self.untranslated and not self.hintsAsked:
             self.reportInterwikilessPage(page)
@@ -972,92 +1055,94 @@ class Subject(object):
         # Each value will be a list of pages.
         new = {}
         for page in self.done:
-            site = page.site()
-            if site == self.originPage.site() and page.exists() and not page.isRedirectPage():
-                if page != self.originPage:
-                    self.problem("Found link to %s" % page.aslink(True) )
-                    self.whereReport(page)
-                    errorCount += 1
-            elif page.exists() and not page.isRedirectPage():
-                if site in new:
-                    new[site].append(page)
+            if page.exists() and not page.isRedirectPage():
+                site = page.site()
+                if site == self.originPage.site():
+                    if page != self.originPage:
+                        self.problem("Found link to %s" % page.aslink(True) )
+                        self.whereReport(page)
+                        errorCount += 1
                 else:
-                    new[site] = [page]
+                    if site in new:
+                        new[site].append(page)
+                    else:
+                        new[site] = [page]
         # See if new{} contains any problematic values
         result = {}
         for site, pages in new.iteritems():
             if len(pages) > 1:
                 errorCount += 1
                 self.problem("Found more than one link for %s" % site)
-        # If there are any errors, we need to go through all
-        # items manually.
-        if errorCount > 0 or globalvar.select:
 
-            if config.interwiki_graph:
-                graphDrawer = interwiki_graph.GraphDrawer(self)
-                graphDrawer.createGraph()
-
-            # We don't need to continue with the rest if we're in autonomous
-            # mode.
-            if globalvar.autonomous:
-                return None
-
-            # First loop over the ones that have more solutions
-            for site, pages in new.iteritems():
-                if len(pages) > 1:
-                    wikipedia.output(u"=" * 30)
-                    wikipedia.output(u"Links to %s" % site)
-                    i = 0
-                    for page2 in pages:
-                        i += 1
-                        wikipedia.output(u"  (%d) Found link to %s in:" % (i, page2.aslink(True)))
-                        self.whereReport(page2, indent = 8)
-                    while True:
-                        answer = wikipedia.input(u"Which variant should be used [number, (n)one, (g)ive up] :")
-                        if answer:
-                            if answer == 'g':
-                                return None
-                            elif answer == 'n':
-                                # None acceptable
-                                break
-                            elif answer.isdigit():
-                                answer = int(answer)
-                                try:
-                                    result[site] = pages[answer - 1]
-                                except IndexError:
-                                    # user input is out of range
-                                    pass
-                                else:
-                                    break
-            # Loop over the ones that have one solution, so are in principle
-            # not a problem.
-            acceptall = False
-            for site, pages in new.iteritems():
-                if len(pages) == 1:
-                    if not acceptall:
-                        wikipedia.output(u"=" * 30)
-                        page2 = pages[0]
-                        wikipedia.output(u"Found link to %s in:" % page2.aslink(True))
-                        self.whereReport(page2, indent = 4)
-                    while True:
-                        if acceptall:
-                            answer = 'a'
-                        else:
-                            answer = wikipedia.inputChoice(u'What should be done?', ['accept', 'reject', 'give up', 'accept all'], ['a', 'r', 'g', 'l'], 'a')
-                        if answer == 'l': # accept all
-                            acceptall = True
-                            answer = 'a'
-                        if answer == 'a': # accept this one
-                            result[site] = pages[0]
-                            break
-                        elif answer == 'g': # give up
-                            return None
-                        elif answer == 'r': # reject
-                            # None acceptable
-                            break
-        else: # errorCount <= 0, hence there are no lists longer than one.
+        if not errorCount and not globalvar.select:
+            # no errors, so all lists have only one item
             for site, pages in new.iteritems():
                 result[site] = pages[0]
+            return result
+
+        # There are any errors.
+        if config.interwiki_graph:
+            graphDrawer = interwiki_graph.GraphDrawer(self)
+            graphDrawer.createGraph()
+
+        # We don't need to continue with the rest if we're in autonomous
+        # mode.
+        if globalvar.autonomous:
+            return None
+
+        # First loop over the ones that have more solutions
+        for site, pages in new.iteritems():
+            if len(pages) > 1:
+                wikipedia.output(u"=" * 30)
+                wikipedia.output(u"Links to %s" % site)
+                i = 0
+                for page2 in pages:
+                    i += 1
+                    wikipedia.output(u"  (%d) Found link to %s in:" % (i, page2.aslink(True)))
+                    self.whereReport(page2, indent = 8)
+                while True:
+                    answer = wikipedia.input(u"Which variant should be used [number, (n)one, (g)ive up] :")
+                    if answer:
+                        if answer == 'g':
+                            return None
+                        elif answer == 'n':
+                            # None acceptable
+                            break
+                        elif answer.isdigit():
+                            answer = int(answer)
+                            try:
+                                result[site] = pages[answer - 1]
+                            except IndexError:
+                                # user input is out of range
+                                pass
+                            else:
+                                break
+        # Loop over the ones that have one solution, so are in principle
+        # not a problem.
+        acceptall = False
+        for site, pages in new.iteritems():
+            if len(pages) == 1:
+                if not acceptall:
+                    wikipedia.output(u"=" * 30)
+                    page2 = pages[0]
+                    wikipedia.output(u"Found link to %s in:" % page2.aslink(True))
+                    self.whereReport(page2, indent = 4)
+                while True:
+                    if acceptall:
+                        answer = 'a'
+                    else:
+                        answer = wikipedia.inputChoice(u'What should be done?', ['accept', 'reject', 'give up', 'accept all'], ['a', 'r', 'g', 'l'], 'a')
+                    if answer == 'l': # accept all
+                        acceptall = True
+                        answer = 'a'
+                    if answer == 'a': # accept this one
+                        result[site] = pages[0]
+                        break
+                    elif answer == 'g': # give up
+                        return None
+                    elif answer == 'r': # reject
+                        # None acceptable
+                        break
         return result
 
     def finish(self, bot = None):
@@ -1086,7 +1171,7 @@ class Subject(object):
         wikipedia.output(u"======Post-processing %s======" % self.originPage.aslink(True))
         # Assemble list of accepted interwiki links
         new = self.assemble()
-        if new == None: # User said give up or autonomous with problem
+        if new is None: # User said give up or autonomous with problem
             wikipedia.output(u"======Aborted processing %s======" % self.originPage.aslink(True))
             return
 
@@ -1104,7 +1189,15 @@ class Subject(object):
             lclSite = self.originPage.site()
             lclSiteDone = False
             frgnSiteDone = False
-            for siteCode in lclSite.family.languages_by_size + [s for s in lclSite.family.langs.keys() if (not s in lclSite.family.languages_by_size and not s in lclSite.family.obsolete)]:
+
+            # XXX Do we really need to make an union here?
+            # we should have sorted(languages_by_size) = sorted(langs) ?!
+            langBySize = set(lclSite.family.languages_by_size)
+            allLangs = set(lclSite.family.langs)
+
+            langToCheck = (langBySize | allLangs).difference(lclSite.family.obsolete)
+
+            for siteCode in langToCheck:
                 site = wikipedia.getSite(code = siteCode)
                 if (not lclSiteDone and site == lclSite) or (not frgnSiteDone and site != lclSite and site in new):
                     if site == lclSite:
@@ -1128,7 +1221,7 @@ class Subject(object):
                         wikipedia.output(u"BUG>>> %s no longer exists?" % new[site].aslink(True))
                         continue
                     mods, adding, removing, modifying = compareLanguages(old, new, insite = lclSite)
-                    if (len(removing) > 0 and not globalvar.autonomous) or (len(modifying) > 0 and self.problemfound) or len(old.keys()) == 0 or (globalvar.needlimit and len(adding) + len(modifying) >= globalvar.needlimit +1):
+                    if (len(removing) > 0 and not globalvar.autonomous) or (len(modifying) > 0 and self.problemfound) or len(old) == 0 or (globalvar.needlimit and len(adding) + len(modifying) >= globalvar.needlimit +1):
                         try:
                             if self.replaceLinks(new[site], new, bot):
                                 updatedSites.append(site)
@@ -1186,6 +1279,8 @@ class Subject(object):
         # clone original newPages dictionary, so that we can modify it to the local page's needs
         new = dict(newPages)
 
+        interwikis = page.interwiki()
+
         # remove interwiki links to ignore
         for iw in re.finditer('<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
             try:
@@ -1195,7 +1290,8 @@ class Subject(object):
 
             try:
                 if (new[ignorepage.site()] == ignorepage) and (ignorepage.site() != page.site()):
-                    if (ignorepage not in page.interwiki()):
+                    
+                    if (ignorepage not in interwikis):
                         wikipedia.output(u"Ignoring link to %(to)s for %(from)s" % {'to': ignorepage.aslink(), 'from': page.aslink()})
                         new.pop(ignorepage.site())
                     else:
@@ -1207,7 +1303,7 @@ class Subject(object):
         pltmp = new[page.site()]
         if pltmp != page:
             s = "None"
-            if pltmp != None: s = pltmp.aslink(True)
+            if pltmp is not None: s = pltmp.aslink(True)
             wikipedia.output(u"BUG>>> %s is not in the list of new links! Found %s." % (page.aslink(True), s))
             raise SaveError
 
@@ -1217,7 +1313,7 @@ class Subject(object):
         # Put interwiki links into a map
         old={}
         try:
-            for page2 in page.interwiki():
+            for page2 in interwikis:
                 old[page2.site()] = page2
         except wikipedia.NoPage:
             wikipedia.output(u"BUG>>> %s no longer exists?" % page.aslink(True))
@@ -1228,104 +1324,107 @@ class Subject(object):
 
         # When running in autonomous mode without -force switch, make sure we don't remove any items, but allow addition of the new ones
         if globalvar.autonomous and not globalvar.force and len(removing) > 0:
-            for rmPage in removing:
-                if rmPage.site() != page.site():   # Sometimes sites have an erroneous link to itself as an interwiki
+            for rmsite in removing:
+                if rmsite != page.site():   # Sometimes sites have an erroneous link to itself as an interwiki
+                    rmPage = old[rmsite]
                     ##########
                     # temporary hard-coded special case to get rid of thousands of broken links to the Lombard Wikipedia,
                     # where useless bot-created articles were mass-deleted. See for example:
                     # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Lombard_Wikipedia#Road_Map
-                    if rmPage.site() == wikipedia.getSite('lmo', 'wikipedia'):
+                    if rmsite == wikipedia.getSite('lmo', 'wikipedia'):
                         wikipedia.output('Found bad link to %s. As many lmo pages were deleted, it is assumed that it can be safely removed.' % rmPage.aslink())
                     else:
                     ##########
-                        new[rmPage.site()] = old[rmPage.site()]
+                        new[rmsite] = old[rmsite]
                         wikipedia.output(u"WARNING: %s is either deleted or has a mismatching disambiguation state." % rmPage.aslink(True))
             # Re-Check what needs to get done
             mods, adding, removing, modifying = compareLanguages(old, new, insite = page.site())
 
         if not mods:
             wikipedia.output(u'No changes needed' )
-        else:
-            if mods:
-                wikipedia.output(u"Changes to be made: %s" % mods)
-            oldtext = page.get()
-            newtext = wikipedia.replaceLanguageLinks(oldtext, new, site = page.site())
-            if globalvar.debug:
-                wikipedia.showDiff(oldtext, newtext)
-            if newtext != oldtext:
-                # wikipedia.output(u"NOTE: Replace %s" % page.aslink())
-                # Determine whether we need permission to submit
-                ask = False
-                if removing and removing != [page]:   # Allow for special case of a self-pointing interwiki link
-                    self.problem('Found incorrect link to %s in %s'% (",".join([x.site().lang for x in removing]), page.aslink(True)), createneed = False)
-                    ask = True
-                if globalvar.force:
-                    ask = False
-                if globalvar.confirm:
-                    ask = True
-                # If we need to ask, do so
-                if ask:
-                    if globalvar.autonomous:
-                        # If we cannot ask, deny permission
-                        answer = 'n'
-                    else:
-                        answer = wikipedia.inputChoice(u'Submit?', ['Yes', 'No', 'Give up'], ['y', 'n', 'g'])
-                else:
-                    # If we do not need to ask, allow
-                    answer = 'y'
-                # If we got permission to submit, do so
-                if answer == 'y':
-                    # Check whether we will have to wait for wikipedia. If so, make
-                    # another get-query first.
-                    if bot:
-                        while wikipedia.get_throttle.waittime() + 2.0 < wikipedia.put_throttle.waittime():
-                            wikipedia.output(u"NOTE: Performing a recursive query first to save time....")
-                            qdone = bot.oneQuery()
-                            if not qdone:
-                                # Nothing more to do
-                                break
-                    wikipedia.output(u"NOTE: Updating live wiki...")
-                    timeout=60
-                    while 1:
-                        try:
-                            status, reason, data = page.put(newtext, comment = wikipedia.translate(page.site().lang, msg)[0] + mods)
-                        except wikipedia.LockedPage:
-                            wikipedia.output(u'Page %s is locked. Skipping.' % (page.title(),))
-                            raise SaveError
-                        except wikipedia.EditConflict:
-                            wikipedia.output(u'ERROR putting page: An edit conflict occurred. Giving up.')
-                            raise SaveError
-                        except (wikipedia.SpamfilterError), error:
-                            wikipedia.output(u'ERROR putting page: %s blacklisted by spamfilter. Giving up.' % (error.url,))
-                            raise SaveError
-                        except (wikipedia.PageNotSaved), error:
-                            wikipedia.output(u'ERROR putting page: %s' % (error.args,))
-                            raise SaveError
-                        except (socket.error, IOError), error:
-                            if timeout>3600:
-                                raise
-                            wikipedia.output(u'ERROR putting page: %s' % (error.args,))
-                            wikipedia.output(u'Sleeping %i seconds before trying again.' % (timeout,))
-                            timeout *= 2
-                            time.sleep(timeout)
-                        except wikipedia.ServerError:
-                            if timeout>3600:
-                                raise
-                            wikipedia.output(u'ERROR putting page: ServerError.')
-                            wikipedia.output(u'Sleeping %i seconds before trying again.' % (timeout,))
-                            timeout *= 2
-                            time.sleep(timeout)
-                        else:
-                            break
-                    if str(status) == '302':
-                        return True
-                    else:
-                        wikipedia.output(u'%s %s' % (status, reason))
-                elif answer == 'g':
-                    raise GiveUpOnPage
-                else:
-                    raise LinkMustBeRemoved('Found incorrect link to %s in %s'% (",".join([x.site().lang for x in removing]), page.aslink(True)))
             return False
+
+        wikipedia.output(u"Changes to be made: %s" % mods)
+        oldtext = page.get()
+        newtext = wikipedia.replaceLanguageLinks(oldtext, new, site = page.site())
+        if newtext == oldtext:
+            return False
+        if globalvar.debug:
+            wikipedia.showDiff(oldtext, newtext)
+
+        # wikipedia.output(u"NOTE: Replace %s" % page.aslink())
+        # Determine whether we need permission to submit
+        ask = False
+        if removing and removing != [page.site()]:   # Allow for special case of a self-pointing interwiki link
+            self.problem('Found incorrect link to %s in %s'% (",".join([x.lang for x in removing]), page.aslink(True)), createneed = False)
+            ask = True
+        if globalvar.force:
+            ask = False
+        if globalvar.confirm:
+            ask = True
+        # If we need to ask, do so
+        if ask:
+            if globalvar.autonomous:
+                # If we cannot ask, deny permission
+                answer = 'n'
+            else:
+                answer = wikipedia.inputChoice(u'Submit?', ['Yes', 'No', 'Give up'], ['y', 'n', 'g'])
+        else:
+            # If we do not need to ask, allow
+            answer = 'y'
+        # If we got permission to submit, do so
+        if answer == 'y':
+            # Check whether we will have to wait for wikipedia. If so, make
+            # another get-query first.
+            if bot:
+                while wikipedia.get_throttle.waittime() + 2.0 < wikipedia.put_throttle.waittime():
+                    wikipedia.output(u"NOTE: Performing a recursive query first to save time....")
+                    qdone = bot.oneQuery()
+                    if not qdone:
+                        # Nothing more to do
+                        break
+            wikipedia.output(u"NOTE: Updating live wiki...")
+            timeout=60
+            while 1:
+                try:
+                    status, reason, data = page.put(newtext, comment = wikipedia.translate(page.site().lang, msg)[0] + mods)
+                except wikipedia.LockedPage:
+                    wikipedia.output(u'Page %s is locked. Skipping.' % (page.title(),))
+                    raise SaveError
+                except wikipedia.EditConflict:
+                    wikipedia.output(u'ERROR putting page: An edit conflict occurred. Giving up.')
+                    raise SaveError
+                except (wikipedia.SpamfilterError), error:
+                    wikipedia.output(u'ERROR putting page: %s blacklisted by spamfilter. Giving up.' % (error.url,))
+                    raise SaveError
+                except (wikipedia.PageNotSaved), error:
+                    wikipedia.output(u'ERROR putting page: %s' % (error.args,))
+                    raise SaveError
+                except (socket.error, IOError), error:
+                    if timeout>3600:
+                        raise
+                    wikipedia.output(u'ERROR putting page: %s' % (error.args,))
+                    wikipedia.output(u'Sleeping %i seconds before trying again.' % (timeout,))
+                    timeout *= 2
+                    time.sleep(timeout)
+                except wikipedia.ServerError:
+                    if timeout>3600:
+                        raise
+                    wikipedia.output(u'ERROR putting page: ServerError.')
+                    wikipedia.output(u'Sleeping %i seconds before trying again.' % (timeout,))
+                    timeout *= 2
+                    time.sleep(timeout)
+                else:
+                    break
+            if str(status) == '302':
+                return True
+            else:
+                wikipedia.output(u'%s %s' % (status, reason))
+                return False
+        elif answer == 'g':
+            raise GiveUpOnPage
+        else:
+            raise LinkMustBeRemoved('Found incorrect link to %s in %s'% (",".join([x.lang for x in removing]), page.aslink(True)))
 
     def reportBacklinks(self, new, updatedSites):
         """
@@ -1336,11 +1435,12 @@ class Subject(object):
 
         """
         # use sets because searching an element is faster than in lists
-        expectedPages = set(new.values())
-        expectedSites = set([page.site() for page in expectedPages])
+        expectedPages = set(new.itervalues())
+        expectedSites = set(new)
         try:
-            for site, page in new.iteritems():
-                if site not in updatedSites and not page.section():
+            for site in expectedSites - set(updatedSites):
+                page = new[site]
+                if not page.section():
                     try:
                         linkedPages = set(page.interwiki())
                     except wikipedia.NoPage:
@@ -1351,8 +1451,8 @@ class Subject(object):
                     linkedPagesDict = {}
                     for linkedPage in linkedPages:
                         linkedPagesDict[linkedPage.site()] = linkedPage
-                    for expectedPage in expectedPages:
-                        if expectedPage != page and expectedPage not in linkedPages:
+                    for expectedPage in expectedPages - linkedPages:
+                        if expectedPage != page:
                             try:
                                 linkedPage = linkedPagesDict[expectedPage.site()]
                                 wikipedia.output(u"WARNING: %s: %s does not link to %s but to %s" % (page.site().family.name, page.aslink(True), expectedPage.aslink(True), linkedPage.aslink(True)))
@@ -1388,9 +1488,9 @@ class InterwikiBot(object):
         """Add a single subject to the list"""
         subj = Subject(page, hints = hints)
         self.subjects.append(subj)
-        for site in subj.openSites(allowdoubles = True):
+        for site, count in subj.openSites():
             # Keep correct counters
-            self.plus(site)
+            self.plus(site, count)
 
     def setPageGenerator(self, pageGenerator, number = None, until = None):
         """Add a generator of subjects. Once the list of subjects gets
@@ -1427,7 +1527,7 @@ class InterwikiBot(object):
                         continue
                     if globalvar.skipauto:
                         dictName, year = page.autoFormat()
-                        if dictName != None:
+                        if dictName is not None:
                             wikipedia.output(u'Skipping: %s is an auto entry %s(%s)' % (page.title(),dictName,year))
                             continue
                     if globalvar.bracketonly:
@@ -1461,12 +1561,12 @@ class InterwikiBot(object):
         maxlang = None
         if not self.firstSubject():
             return None
-        oc = self.firstSubject().openSites()
+        oc = dict(self.firstSubject().openSites())
         if not oc:
             # The first subject is done. This might be a recursive call made because we
             # have to wait before submitting another modification to go live. Select
             # any language from counts.
-            oc = self.counts.keys()
+            oc = self.counts
         if wikipedia.getSite() in oc:
             return wikipedia.getSite()
         for lang in oc:
@@ -1516,7 +1616,7 @@ class InterwikiBot(object):
         """
         # First find the best language to work on
         site = self.selectQuerySite()
-        if site == None:
+        if site is None:
             wikipedia.output(u"NOTE: Nothing left to do")
             return False
         # Now assemble a reasonable list of pages to get
@@ -1559,16 +1659,16 @@ class InterwikiBot(object):
         """Check whether there is still more work to do"""
         return len(self) == 0 and self.pageGenerator is None
 
-    def plus(self, site):
+    def plus(self, site, count=1):
         """This is a routine that the Subject class expects in a counter"""
         try:
-            self.counts[site] += 1
+            self.counts[site] += count
         except KeyError:
-            self.counts[site] = 1
+            self.counts[site] = count
 
-    def minus(self, site):
+    def minus(self, site, count=1):
         """This is a routine that the Subject class expects in a counter"""
-        self.counts[site] -= 1
+        self.counts[site] -= count
 
     def run(self):
         """Start the process until finished"""
@@ -1579,37 +1679,32 @@ class InterwikiBot(object):
         return len(self.subjects)
 
 def compareLanguages(old, new, insite):
-    removing = []
-    adding = []
-    modifying = []
-    for site in old.keys():
-        if site not in new:
-            removing.append(old[site])
-        elif old[site] != new[site]:
-            modifying.append(new[site])
 
-    for site2 in new.keys():
-        if site2 not in old:
-            adding.append(new[site2])
-    mods = ""
+    oldiw = set(old)
+    newiw = set(new)
+
     # sort by language code
-    adding.sort()
-    modifying.sort()
-    removing.sort()
+    adding = sorted(newiw - oldiw)
+    removing = sorted(oldiw - newiw)
+    modifying = sorted(site for site in oldiw & newiw if old[site] != new[site])
+
+    mods = ""
 
     if len(adding) + len(removing) + len(modifying) <= 3:
         # Use an extended format for the string linking to all added pages.
-        fmt = lambda page: page.aslink(forceInterwiki=True)
+        fmt = lambda d, site: d[site].aslink(forceInterwiki=True)
     else:
         # Use short format, just the language code
-        fmt = lambda page: page.site().lang
+        fmt = lambda d, site: site.lang
+
+    _, add, rem, mod = wikipedia.translate(insite.lang, msg)
 
     if adding:
-        mods += " %s: %s" % (wikipedia.translate(insite.lang, msg)[1], ", ".join([fmt(x) for x in adding]))
+        mods += " %s: %s" % (add, ", ".join([fmt(new, x) for x in adding]))
     if removing:
-        mods += " %s: %s" % (wikipedia.translate(insite.lang, msg)[2], ", ".join([fmt(x) for x in removing]))
+        mods += " %s: %s" % (rem, ", ".join([fmt(old, x) for x in removing]))
     if modifying:
-        mods += " %s: %s" % (wikipedia.translate(insite.lang, msg)[3], ", ".join([fmt(x) for x in modifying]))
+        mods += " %s: %s" % (mod, ", ".join([fmt(new, x) for x in modifying]))
     return mods, adding, removing, modifying
 
 def readWarnfile(filename, bot):
@@ -1617,11 +1712,10 @@ def readWarnfile(filename, bot):
     reader = warnfile.WarnfileReader(filename)
     # we won't use removeHints
     (hints, removeHints) = reader.getHints()
-    pages = hints.keys()
-    for page in pages:
+    for page, pagelist in hints.iteritems():
         # The WarnfileReader gives us a list of pagelinks, but titletranslate.py expects a list of strings, so we convert it back.
         # TODO: This is a quite ugly hack, in the future we should maybe make titletranslate expect a list of pagelinks.
-        hintStrings = ['%s:%s' % (hintedPage.site().language(), hintedPage.title()) for hintedPage in hints[page]]
+        hintStrings = ['%s:%s' % (hintedPage.site().language(), hintedPage.title()) for hintedPage in pagelist]
         bot.add(page, hints = hintStrings)
 
 #===========
@@ -1800,7 +1894,7 @@ if __name__ == "__main__":
         except:
             wikipedia.output(u'Missing main page name')
 
-        if newPages != None:
+        if newPages is not None:
             if len(namespaces) == 0:
                 ns = 0 
             elif len(namespaces) == 1:
