@@ -675,7 +675,7 @@ class Page(object):
             watch = False
         else:
             unwatch = not watch
-        if not force and not self.botMayEdit:
+        if not force and not self.botMayEdit():
             raise pywikibot.PageNotSaved(
                 "Page %s not saved; editing restricted by {{bots}} template"
                 % self.title(asLink=True))
