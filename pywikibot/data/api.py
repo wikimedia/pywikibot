@@ -52,7 +52,7 @@ class TimeoutError(pywikibot.Error):
     pass
 
 
-class Request(DictMixin):
+class Request(object, DictMixin):
     """A request to a Site's api.php interface.
 
     Attributes of this object (except for the special parameters listed
@@ -133,14 +133,9 @@ class Request(DictMixin):
 
     def iteritems(self):
         return self.params.iteritems()
-    
-    def submit(self):
-        """Submit a query and parse the response.
 
-        @return:  The data retrieved from api.php (a dict)
-        
-        """
-        from pywikibot.comms import http
+    def http_params(self):
+        """Return the parameters formatted for inclusion in an HTTP request."""
 
         for key in self.params:
             if isinstance(self.params[key], basestring):
@@ -173,7 +168,23 @@ class Request(DictMixin):
                                                 self.site.encoding())
             except Exception:
                 logger.exception("key=%s, params=%s\n" % (key, self.params[key]))
-        params = urllib.urlencode(self.params)
+        return urllib.urlencode(self.params)
+
+    def __str__(self):
+        return urllib.unquote(self.site.scriptpath()
+                              + "/api.php?"
+                              + self.http_params()
+                             )
+    
+    def submit(self):
+        """Submit a query and parse the response.
+
+        @return:  The data retrieved from api.php (a dict)
+        
+        """
+        from pywikibot.comms import http
+
+        params = self.http_params()
         while True:
             action = self.params.get("action", "")
             write = action in (
