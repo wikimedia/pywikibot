@@ -19,12 +19,14 @@ These parameters are supported to specify which pages titles to print:
 __version__ = '$Id$'
 
 import pywikibot
+from pywikibot import config2 as config
 
 import itertools
 import Queue
 import re
 import sys
 import threading
+import codecs
 
 
 # ported from version 1 for backwards-compatibility
