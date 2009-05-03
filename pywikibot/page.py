@@ -129,6 +129,9 @@ class Page(object):
             self._title = self._title + "#" + self._section
         self._revisions = {}
 
+        # Always capitalize the first letter
+        self._title = self._title.title()
+
     def site(self):
         """Return the Site object for the wiki on which this Page resides."""
         return self._site
