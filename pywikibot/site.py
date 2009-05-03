@@ -1010,7 +1010,8 @@ class APISite(BaseSite):
             page._redirtarget = target
         return page._redirtarget
 
-    def preloadpages(self, pagelist, groupsize=50):
+    def preloadpages(self, pagelist, groupsize=50, templates=False,
+        langlinks=False):
         """Return a generator to a list of preloaded pages.
 
         Note that [at least in current implementation] pages may be iterated
@@ -1019,6 +1020,8 @@ class APISite(BaseSite):
         @param pagelist: an iterable that returns Page objects
         @param groupsize: how many Pages to query at a time
         @type groupsize: int
+        @param templates: preload list of templates in the pages
+        @param langlinks: preload list of language links found in the pages
 
         """
         from pywikibot.tools import itergroup
@@ -1027,8 +1030,13 @@ class APISite(BaseSite):
                                       if hasattr(p, "_pageid")
                                          and p._pageid > 0]
             cache = dict((p.title(withSection=False), p) for p in sublist)
-            rvgen = api.PropertyGenerator("revisions|info|categoryinfo",
-                                          site=self)
+
+            props = "revisions|info|categoryinfo"
+            if templates:
+                props += '|templates'
+            if langlinks:
+                props += '|langlinks'
+            rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1) # suppress use of "rvlimit" parameter
             if len(pageids) == len(sublist):
                 # only use pageids if all pages have them

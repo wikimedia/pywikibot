@@ -793,12 +793,54 @@ class Page(object):
                 continue
 
     def langlinks(self):
+        """Returns a list of all interlanguage Links on this page.
+
+        """
+        # Data might have been preloaded
+        if not hasattr(self, '_langlinks'):
+            self._langlinks = list(self.iterlanglinks())
+
+        return self._langlinks
+
+    def iterlanglinks(self):
         """Iterate all interlanguage links on this page.
 
         @return: a generator that yields Link objects.
 
         """
+        if hasattr(self, '_langlinks'):
+            return iter(self._langlinks)
+        # XXX We might want to fill _langlinks when the Site
+        # method is called. If we do this, we'll have to think
+        # about what will happen if the generator is not completely
+        # iterated upon.
         return self.site().pagelanglinks(self)
+
+    def templates(self):
+        """Returns a list of Page objects for templates used on this Page.
+
+        Template parameters are ignored.  This method only returns embedded
+        templates, not template pages that happen to be referenced through
+        a normal link.
+
+        """
+        # Data might have been preloaded
+        if not hasattr(self, '_templates'):
+            self._templates = list(self.itertemplates())
+
+        return self._templates
+
+    def itertemplates(self):
+        """Iterate Page objects for templates used on this Page.
+
+        Template parameters are ignored.  This method only returns embedded
+        templates, not template pages that happen to be referenced through
+        a normal link.
+
+        """
+        if hasattr(self, '_templates'):
+            return iter(self._templates)
+        return self.site().pagetemplates(self)
 
     @deprecate_arg("followRedirects", None)
     @deprecate_arg("loose", None)
@@ -809,16 +851,6 @@ class Page(object):
 
         """
         return self.site().pageimages(self)
-
-    def templates(self):
-        """Iterate Page objects for templates used on this Page.
-
-        Template parameters are ignored.  This method only returns embedded
-        templates, not template pages that happen to be referenced through
-        a normal link.
-
-        """
-        return self.site().pagetemplates(self)
 
     def templatesWithParams(self):
         """Iterate templates used on this Page.

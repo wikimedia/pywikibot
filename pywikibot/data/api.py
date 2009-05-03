@@ -716,12 +716,27 @@ def update_page(page, pagedict):
                                         text=rev.get('*', None)
                                       )
             page._revisions[revision.revid] = revision
+
     if 'lastrevid' in pagedict:
         page._revid = pagedict['lastrevid']
         if page._revid in page._revisions:
             page._text = page._revisions[page._revid].text
+
     if "categoryinfo" in pagedict:
         page._catinfo = pagedict["categoryinfo"]
+
+    if "templates" in pagedict:
+        page._templates = [ pywikibot.Page(page.site(), tl['title'])
+                                for tl in pagedict['templates'] ]
+
+    if "langlinks" in pagedict:
+        links = []
+        for ll in pagedict["langlinks"]:
+            link = pywikibot.Link.langlinkUnsafe(ll['lang'],
+                                                 ll['*'],
+                                                 source=page.site())
+            links.append(link)
+        page._langlinks = links
 
 
 if __name__ == "__main__":
