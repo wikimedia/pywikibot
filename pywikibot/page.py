@@ -1972,7 +1972,7 @@ not supported by PyWikiBot!"""
         return link
 
     @staticmethod
-    def langlinkUnSafe(lang, title, source):
+    def langlinkUnsafe(lang, title, source):
         """
         Create a "lang:title" Link linked from source.
         Assumes that the lang & title come clean, no checks are made.
