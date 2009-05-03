@@ -1983,13 +1983,15 @@ not supported by PyWikiBot!"""
         link._section = None
         link._source = source
 
+        link._namespace = 0
+
         if ':' in title:
             ns, t = title.split(':', 1)
-            link._namespace = link._site.ns_index(ns.lower())
-            link._title = t
-        else:
-            link._title = title
-            link._namespace = 0
+            ns = link._site.ns_index(ns.lower())
+            if ns:
+                link._namespace = ns
+                title = t
+        link._title = title
         
         return link 
 
