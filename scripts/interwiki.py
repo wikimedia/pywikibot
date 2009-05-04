@@ -1527,7 +1527,9 @@ class Subject(object):
 
         pywikibot.output(u"Changes to be made: %s" % mods)
         oldtext = page.get()
-        newtext = pywikibot.replaceLanguageLinks(oldtext, new, site = page.site())
+        newtext = pywikibot.replaceLanguageLinks(oldtext, new, 
+                                        site = page.site(), 
+                                        template = (page.namespace() == 10))
         if newtext == oldtext:
             return False
         if globalvar.debug:
