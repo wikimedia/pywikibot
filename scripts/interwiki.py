@@ -1828,7 +1828,7 @@ class InterwikiBot(object):
             pywikibot.output(u"NOTE: Nothing left to do 2")
             return False
         # Get the content of the assembled list in one blow
-        gen = pagegenerators.PreloadingGenerator(iter(pageGroup))
+        gen = site.preloadpages(pageGroup, templates=True, langlinks=True)
         for page in gen:
             # we don't want to do anything with them now. The
             # page contents will be read via the Subject class.
