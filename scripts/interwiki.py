@@ -211,7 +211,7 @@ multiple languages, and specify on which sites the bot should modify pages:
     -localonly     only work on the local wiki, not on other wikis in the family
                    I have a login at. (note: without ending colon)
 
-    -limittwo      only update two pages - one in the local wiki (if loged-in),
+    -limittwo      only update two pages - one in the local wiki (if logged-in)
                    and one in the top available one.
                    For example, if the local page has links to de and fr,
                    this option will make sure that only local and de: (larger)
@@ -270,13 +270,14 @@ next time.
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
+# (C) Pywikipedia bot team, 2007-2009
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
 #
 
-import sys, copy, re
+import sys, copy, re, os
 import time
 import codecs
 import socket
@@ -309,6 +310,7 @@ except NameError:
 
 import wikipedia, config, pagegenerators, catlib
 import titletranslate, interwiki_graph
+import webbrowser
 
 docuReplacements = {
     '&pagegenerators_help;': pagegenerators.parameterHelp
@@ -461,6 +463,7 @@ msg = {
     'uz': (u'Bot', u'Qoʻshdi', u'Tuzatdi', u'Oʻchirdi'),
     'vi': (u'robot ', u'Thêm', u'Dời', u'Thay'),
     'vo': (u'bot ', u'läükon', u'moükon', u'votükon'),
+    'war':(u'robot ', u'Gindugngan', u'Gintanggal', u'Ginliwat'),
     'yi': (u'באט ', u'צוגעלייגט', u'אראפגענומען', u'געענדערט'),
     'yue': (u'機械人 ', u'加', u'減', u'改'),
     'zh': (u'機器人 ', u'新增', u'移除', u'修改'),
@@ -495,12 +498,80 @@ class Global(object):
     strictlimittwo = False
     needlimit = 0
     ignore = []
-    bracketonly = False
+    parenthesesonly = False
     rememberno = False
     followinterwiki = True
     minsubjects = config.interwiki_min_subjects
     nobackonly = False
     hintsareright = False
+    contentsondisk = config.interwiki_contents_on_disk
+
+class StoredPage(wikipedia.Page):
+    """
+    Store the Page contents on disk to avoid sucking too much
+    memory when a big number of Page objects will be loaded
+    at the same time.
+    """
+    
+    # Please prefix the class members names by SP
+    # to avoid possible name clashes with wikipedia.Page
+
+    # path to the shelve
+    SPpath = None
+    # shelve
+    SPstore = None
+
+    # attributes created by wikipedia.Page.__init__
+    SPcopy = [ '_editrestriction', 
+               '_site', 
+               '_namespace',
+               '_section',
+               '_title',
+               'editRestriction',
+               'moveRestriction',
+               '_permalink',
+               '_userName',
+               '_ipedit',
+               '_editTime',
+               '_startTime',
+               '_revisionId',
+               '_deletedRevs' ]
+                 
+    def SPdeleteStore():
+        if StoredPage.SPpath:
+            del StoredPage.SPstore
+            os.unlink(StoredPage.SPpath)
+    SPdeleteStore = staticmethod(SPdeleteStore)
+
+    def __init__(self, page):
+        for attr in StoredPage.SPcopy:
+            setattr(self, attr, getattr(page, attr))
+
+        if not StoredPage.SPpath:
+            import shelve
+            index = 1
+            while True:
+                path = config.datafilepath('cache', 'pagestore' + str(index))       
+                if not os.path.exists(path): break
+                index += 1
+            StoredPage.SPpath = path
+            StoredPage.SPstore = shelve.open(path)
+
+        self.SPkey = self.aslink().encode('utf-8')
+        self.SPcontentSet = False
+
+    def SPgetContents(self):
+        return StoredPage.SPstore[self.SPkey]
+
+    def SPsetContents(self, contents):
+        self.SPcontentSet = True
+        StoredPage.SPstore[self.SPkey] = contents
+
+    def SPdelContents(self):
+        if self.SPcontentSet:
+            del StoredPage.SPstore[self.SPkey]
+
+    _contents = property(SPgetContents, SPsetContents, SPdelContents)
 
 class PageTree(object):
     """
@@ -508,6 +579,26 @@ class PageTree(object):
     Allows filtering efficiently by Site.
     """
     def __init__(self):
+        # self.tree :
+        # Dictionary: 
+        # keys: Site
+        # values: list of pages
+        # All pages found within Site are kept in
+        # self.tree[site]
+
+        # While using dict values would be faster for
+        # the remove() operation,
+        # keeping list values is important, because
+        # the order in which the pages were found matters:
+        # the earlier a page is found, the closer it is to the 
+        # Subject.originPage. Chances are that pages found within
+        # 2 interwiki distance from the originPage are more related
+        # to the original topic than pages found later on, after
+        # 3, 4, 5 or more interwiki hops.
+
+        # Keeping this order is hence important to display ordered
+        # list of pages to the user when he'll be asked to resolve
+        # conflicts.
         self.tree = {}
         self.size = 0
 
@@ -527,15 +618,15 @@ class PageTree(object):
     def add(self, page):
         site = page.site()
         if not site in self.tree:
-            self.tree[site] = {}
-        self.tree[site][page] = True
+            self.tree[site] = []
+        self.tree[site].append(page)
         self.size += 1
 
     def remove(self, page):
         try:
-            del self.tree[page.site()][page]
+            self.tree[page.site()].remove(page)
             self.size -= 1
-        except KeyError:
+        except ValueError:
             pass
 
     def removeSite(self, site):
@@ -556,19 +647,76 @@ class PageTree(object):
             yield site, len(d)
     
     def __iter__(self):
-        for site, d in self.tree.iteritems():
-            for page in d:
+        for site, plist in self.tree.iteritems():
+            for page in plist:
                 yield page
 
 class Subject(object):
     """
     Class to follow the progress of a single 'subject' (i.e. a page with
     all its translations)
+
+
+    Subject is a transitive closure of the binary relation on Page:
+    "has_a_langlink_pointing_to".
+
+    A formal way to compute that closure would be:
+
+    With P a set of pages, NL ('NextLevel') a function on sets defined as:
+        NL(P) = { target | ∃ source ∈ P, target ∈ source.langlinks() }
+    pseudocode:
+        todo <- [originPage]
+        done <- []
+        while todo != []: 
+            pending <- todo
+            todo <-NL(pending) / done
+            done <- NL(pending) U done
+        return done
+
+
+    There is, however, one limitation that is induced by implementation:
+    to compute efficiently NL(P), one has to load the page contents of 
+    pages in P. 
+    (Not only the langlinks have to be parsed from each Page, but we also want
+     to know if the Page is a redirect, a disambiguation, etc...)
+
+    Because of this, the pages in pending have to be preloaded. 
+    However, because the pages in pending are likely to be in several sites
+    we cannot "just" preload them as a batch.
+
+    Instead of doing "pending <- todo" at each iteration, we have to elect a 
+    Site, and we put in pending all the pages from todo that belong to that 
+    Site:
+
+    Code becomes:
+        todo <- {originPage.site():[originPage]}
+        done <- []
+        while todo != {}: 
+            site <- electSite()
+            pending <- todo[site]
+
+            preloadpages(site, pending)
+
+            todo[site] <- NL(pending) / done
+            done <- NL(pending) U done
+        return done
+
+
+    Subject objects only operate on pages that should have been preloaded before.
+    In fact, at any time: 
+      * todo contains new Pages that have not been loaded yet
+      * done contains Pages that have been loaded, and that have been treated.
+      * If batch preloadings are successful, Page._get() is never called from 
+        this Object.
     """
 
     def __init__(self, originPage, hints = None):
         """Constructor. Takes as arguments the Page on the home wiki
            plus optionally a list of hints for translation"""
+
+        if globalvar.contentsondisk:
+            originPage = StoredPage(originPage)
+
         # Remember the "origin page"
         self.originPage = originPage
         # todo is a list of all pages that still need to be analyzed.
@@ -650,6 +798,8 @@ class Subject(object):
             pages = titletranslate.translate(self.originPage, hints = hints, auto = globalvar.auto, removebrackets
 = globalvar.hintnobracket)
         for page in pages:
+            if globalvar.contentsondisk:
+                page = StoredPage(page)
             self.todo.add(page)
             self.foundIn[page] = [None]
             if keephintedsites:
@@ -663,11 +813,12 @@ class Subject(object):
         """
         return self.todo.siteCounts()
 
-    def willWorkOn(self, site):
+    def whatsNextPageBatch(self, site):
         """
         By calling this method, you 'promise' this instance that you will
-        work on any todo items for the wiki indicated by 'site'. This routine
-        will return a list of pages that can be treated.
+        preload all the 'site' Pages that are in the todo list. 
+
+        This routine will return a list of pages that can be treated.
         """
         # Bug-check: Isn't there any work still in progress? We can't work on
         # different sites at a time!
@@ -680,6 +831,7 @@ class Subject(object):
             result.append(page)
 
         self.todo.removeSite(site)
+
         # If there are any, return them. Otherwise, nothing is in progress.
         return result
 
@@ -709,11 +861,15 @@ class Subject(object):
                 wikipedia.output("%s has a backlink from %s."%(page,linkingPage))
                 self.makeForcedStop(counter)
                 return False
+
+
         if page in self.foundIn:
             # not new
             self.foundIn[page].append(linkingPage)
             return False
         else:
+            if globalvar.contentsondisk:
+                page = StoredPage(page)
             self.foundIn[page] = [linkingPage]
             self.todo.add(page)
             counter.plus(page.site())
@@ -876,10 +1032,14 @@ class Subject(object):
                             if globalvar.hintsareright:
                                 self.hintedsites.add(page.site)
 
-    def workDone(self, counter):
+    def batchLoaded(self, counter):
         """
-        This is called by a worker to tell us that the promised work
-        was completed as far as possible. The only argument is an instance
+        This is called by a worker to tell us that the promised batch of
+        pages was loaded. 
+        In other words, all the pages in self.pending have already
+        been preloaded.
+
+        The only argument is an instance
         of a counter class, that has methods minus() and plus() to keep
         counts of the total work todo.
         """
@@ -913,10 +1073,18 @@ class Subject(object):
                 continue
 
             elif page.isRedirectPage():
-                redirectTargetPage = page.getRedirectTarget()
+                try:
+                    redirectTargetPage = page.getRedirectTarget()
+                except wikipedia.InvalidTitle:
+                    # MW considers #redirect [[en:#foo]] as a redirect page,
+                    # but we can't do anything useful with such pages
+                    wikipedia.output(u"NOTE: %s redirects to an invalid title" % page.aslink(True))
+                    continue
                 wikipedia.output(u"NOTE: %s is redirect to %s" % (page.aslink(True), redirectTargetPage.aslink(True)))
                 if page == self.originPage:
                     if globalvar.initialredirect:
+                        if globalvar.contentsondisk:
+                            redirectTargetPage = StoredPage(redirectTargetPage)
                         self.originPage = redirectTargetPage
                         self.todo.add(redirectTargetPage)
                         counter.plus(redirectTargetPage.site)
@@ -973,7 +1141,7 @@ class Subject(object):
             elif globalvar.autonomous and duplicate:
                 
                 wikipedia.output(u"Stopping work on %s because duplicate pages"\
-                    " %s and %s are found" % (self.originPage.aslink(), 
+                    " %s and %s are found" % (self.originPage.aslink(True), 
                                               duplicate.aslink(True), 
                                               page.aslink(True)))
                 self.makeForcedStop(counter)
@@ -1015,7 +1183,7 @@ class Subject(object):
                                 if prevPage != linkedPage and prevPage.site() == lpsite:
                                     # Still, this could be "no problem" as either may be a
                                     # redirect to the other. No way to find out quickly!
-                                    wikipedia.output(u"NOTE: %s: %s gives duplicate interwiki on same site %s" % (self.originPage.aslink(), page.aslink(True), linkedPage.aslink(True)))
+                                    wikipedia.output(u"NOTE: %s: %s gives duplicate interwiki on same site %s" % (self.originPage.aslink(True), page.aslink(True), linkedPage.aslink(True)))
                                     break
                             else:
                                 if config.interwiki_shownew:
@@ -1190,14 +1358,7 @@ class Subject(object):
             lclSiteDone = False
             frgnSiteDone = False
 
-            # XXX Do we really need to make an union here?
-            # we should have sorted(languages_by_size) = sorted(langs) ?!
-            langBySize = set(lclSite.family.languages_by_size)
-            allLangs = set(lclSite.family.langs)
-
-            langToCheck = (langBySize | allLangs).difference(lclSite.family.obsolete)
-
-            for siteCode in langToCheck:
+            for siteCode in lclSite.family.languages_by_size:
                 site = wikipedia.getSite(code = siteCode)
                 if (not lclSiteDone and site == lclSite) or (not frgnSiteDone and site != lclSite and site in new):
                     if site == lclSite:
@@ -1253,6 +1414,27 @@ class Subject(object):
         # don't report backlinks for pages we already changed
         if config.interwiki_backlink:
             self.reportBacklinks(new, updatedSites)
+
+    def clean(self):
+        """
+        Delete the contents that are stored on disk for this Subject.
+
+        We cannot afford to define this in a StoredPage destructor because
+        StoredPage instances can get referenced cyclicly: that would stop the 
+        garbage collector from destroying some of those objects.
+
+        It's also not necessary to set these lines as a Subject destructor:
+        deleting all stored content one entry by one entry when bailing out
+        after a KeyboardInterrupt for example is redundant, because the 
+        whole storage file will be eventually removed.
+        """
+        if globalvar.contentsondisk:
+            for page in self.foundIn:
+                # foundIn can contain either Page or StoredPage objects
+                # calling the destructor on _contents will delete the
+                # disk records if necessary
+                if hasattr(page, '_contents'):
+                    del page._contents
 
     def replaceLinks(self, page, newPages, bot):
         """
@@ -1312,12 +1494,8 @@ class Subject(object):
 
         # Put interwiki links into a map
         old={}
-        try:
-            for page2 in interwikis:
-                old[page2.site()] = page2
-        except wikipedia.NoPage:
-            wikipedia.output(u"BUG>>> %s no longer exists?" % page.aslink(True))
-            raise SaveError
+        for page2 in interwikis:
+            old[page2.site()] = page2
 
         # Check what needs to get done
         mods, adding, removing, modifying = compareLanguages(old, new, insite = page.site())
@@ -1368,7 +1546,16 @@ class Subject(object):
                 # If we cannot ask, deny permission
                 answer = 'n'
             else:
-                answer = wikipedia.inputChoice(u'Submit?', ['Yes', 'No', 'Give up'], ['y', 'n', 'g'])
+                answer = wikipedia.inputChoice(u'Submit?', 
+                            ['Yes', 'No', 'open in Browser', 'Give up'], 
+                            ['y', 'n', 'b', 'g'])
+                if answer == 'b':
+                    webbrowser.open("http://%s%s" % (
+                        page.site().hostname(),
+                        page.site().nice_get_address(page.title())
+                    ))
+                    wikipedia.input("Press Enter when finished in browser.")
+                    return True
         else:
             # If we do not need to ask, allow
             answer = 'y'
@@ -1530,8 +1717,9 @@ class InterwikiBot(object):
                         if dictName is not None:
                             wikipedia.output(u'Skipping: %s is an auto entry %s(%s)' % (page.title(),dictName,year))
                             continue
-                    if globalvar.bracketonly:
-                        if page.title().find("(") == -1:
+                    if globalvar.parenthesesonly:
+                        # Only yield pages that have ( ) in titles
+                        if "(" not in page.title():
                             continue
                     break
 
@@ -1625,7 +1813,7 @@ class InterwikiBot(object):
         for subject in self.subjects:
             # Promise the subject that we will work on the site.
             # We will get a list of pages we can do.
-            pages = subject.willWorkOn(site)
+            pages = subject.whatsNextPageBatch(site)
             if pages:
                 pageGroup.extend(pages)
                 subjectGroup.append(subject)
@@ -1643,7 +1831,7 @@ class InterwikiBot(object):
             pass
         # Tell all of the subjects that the promised work is done
         for subject in subjectGroup:
-            subject.workDone(self)
+            subject.batchLoaded(self)
         return True
 
     def queryStep(self):
@@ -1653,6 +1841,7 @@ class InterwikiBot(object):
             subj = self.subjects[i]
             if subj.isDone():
                 subj.finish(self)
+                subj.clean()
                 del self.subjects[i]
 
     def isDone(self):
@@ -1870,7 +2059,7 @@ if __name__ == "__main__":
                 # override configuration
                 config.interwiki_graph = True
             elif arg == '-bracket':
-                globalvar.bracketonly = True
+                globalvar.parenthesesonly = True
             elif arg == '-localright':
                 globalvar.followinterwiki = False
             elif arg == '-hintsareright':
@@ -1891,7 +2080,7 @@ if __name__ == "__main__":
             site = wikipedia.getSite()
             mainpagename = site.mediawiki_message('mainpage')
             globalvar.skip.add(wikipedia.Page(site, mainpagename))
-        except:
+        except wikipedia.Error:
             wikipedia.output(u'Missing main page name')
 
         if newPages is not None:
@@ -1958,6 +2147,9 @@ if __name__ == "__main__":
         except:
             bot.dump()
             raise
+        finally:
+            if globalvar.contentsondisk:
+                StoredPage.SPdeleteStore()
 
     finally:
         wikipedia.stopme()
