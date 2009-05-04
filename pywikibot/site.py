@@ -1011,7 +1011,7 @@ class APISite(BaseSite):
         return page._redirtarget
 
     def preloadpages(self, pagelist, groupsize=50, templates=False,
-        langlinks=False):
+            langlinks=False):
         """Return a generator to a list of preloaded pages.
 
         Note that [at least in current implementation] pages may be iterated
@@ -1114,17 +1114,16 @@ class APISite(BaseSite):
             # links identified by MediaWiki as redirects may not really be,
             # so we have to check each "redirect" page and see if it
             # really redirects to this page
-            blgen.request["gblfilterredir"] = "nonredirects"
             redirgen = api.PageGenerator("backlinks", gbltitle=bltitle,
                                          site=self, gblfilterredir="redirects")
-            if "gblnamespace" in blgen.request:
-                redirgen.request["gblnamespace"] = blgen.request["gblnamespace"]
             genlist = [blgen]
             for redir in redirgen:
                 if redir.getRedirectTarget() == page:
                     genlist.append(
                         self.pagebacklinks(
-                            redir, True, None, namespaces))
+                            redir, followRedirects=True,
+                            filterRedirects=filterRedirects,
+                            namespaces=namespaces))
             import itertools
             return itertools.chain(*genlist)
         return blgen
