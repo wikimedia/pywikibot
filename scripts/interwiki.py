@@ -1113,7 +1113,7 @@ class Subject(object):
             # Page exists, isnt a redirect, and is a plain link (no section)
 
             try:
-                iw = page.interwiki()
+                iw = page.langlinks()
             except pywikibot.NoSuchSite:
                 pywikibot.output(u"NOTE: site %s does not exist" % page.site())
                 continue
@@ -1169,7 +1169,8 @@ class Subject(object):
                 self.done.remove(page)
                 iw = ()
 
-            for linkedPage in iw:
+            for link in iw:
+                linkedPage = pywikibot.Page(link)
                 if globalvar.hintsareright:
                     if linkedPage.site in self.hintedsites:
                         pywikibot.output(u"NOTE: %s: %s extra interwiki on hinted site ignored %s" % (self.originPage, page, linkedPage))
@@ -1377,7 +1378,8 @@ class Subject(object):
                 elif not globalvar.strictlimittwo and site in new and site != lclSite:
                     old={}
                     try:
-                        for page in new[site].interwiki():
+                        for link in new[site].iterlanglinks():
+                            page = pywikibot.Page(link)
                             old[page.site()] = page
                     except pywikibot.NoPage:
                         pywikibot.output(u"BUG>>> %s no longer exists?" % new[site])
@@ -1462,7 +1464,7 @@ class Subject(object):
         # clone original newPages dictionary, so that we can modify it to the local page's needs
         new = dict(newPages)
 
-        interwikis = page.interwiki()
+        interwikis = [pywikibot.Page(l) for l in page.iterlanglinks()]
 
         # remove interwiki links to ignore
         for iw in re.finditer('<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
@@ -1630,7 +1632,7 @@ class Subject(object):
                 page = new[site]
                 if not page.section():
                     try:
-                        linkedPages = set(page.interwiki())
+                        linkedPages = set(pywikibot.Page(l) for l in page.iterlanglinks())
                     except pywikibot.NoPage:
                         pywikibot.output(u"WARNING: Page %s does no longer exist?!" % page)
                         break
