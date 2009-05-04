@@ -279,7 +279,7 @@ __version__ = '$Id$'
 
 import sys, copy, re, os
 import time
-import codecs
+import codecs, pickle
 import socket
 
 try:
@@ -1692,11 +1692,12 @@ class InterwikiBot(object):
     def dump(self):
         site = pywikibot.getSite()
         dumpfn = pywikibot.config.datafilepath(
+                     'data',
                      'interwiki-dumps',
-                     'interwikidump-%s-%s.txt' % (site.family.name, site.lang))
-        f = codecs.open(dumpfn, 'w', 'utf-8')
-        for subj in self.subjects:
-            f.write(unicode(subj.originPage)+'\n')
+                     '%s-%s.pickle' % (site.family.name, site.lang))
+        f = open(dumpfn, 'w')
+        titles = [s.originPage.title() for s in self.subjects]
+        pickle.dump(titles, f)
         f.close()
         pywikibot.output(u'Dump %s (%s) saved' % (site.lang, site.family.name))
 
@@ -2105,24 +2106,29 @@ if __name__ == "__main__":
         if optRestore or optContinue:
             site = pywikibot.getSite()
             dumpFileName = pywikibot.config.datafilepath(
+                               'data',
                                'interwiki-dumps',
-                               u'interwikidump-%s-%s.txt'
+                               u'%s-%s.pickle'
                                  % (site.family.name, site.lang))
-            hintlessPageGen = pagegenerators.TextfilePageGenerator(dumpFileName)
+            try:
+                f = open(dumpFileName, 'r')
+                dumpedTitles = pickle.load(f)
+                f.close()
+            except (EOFError, IOError):
+                dumpedTitles = []
+            pages = [pywikibot.Page(site, title) for title in dumpedTitles]
+
+            hintlessPageGen = iter(pages)
             if optContinue:
-                # We waste this generator to find out the last page's title
-                # This is an ugly workaround.
-                for page in hintlessPageGen:
-                    pass
-                try:
-                    nextPage = page.titleWithoutNamespace() + '!'
-                    namespace = page.namespace()
-                except NameError:
+                if pages:
+                    last = pages[-1]
+                    nextPage = last.title(withNamespace=False) + '!'
+                    namespace = last.namespace()
+                else:
                     pywikibot.output(u"Dump file is empty?! Starting at the beginning.")
                     nextPage = "!"
                     namespace = 0
-                # old generator is used up, create a new one
-                hintlessPageGen = pagegenerators.CombinedPageGenerator([pagegenerators.TextfilePageGenerator(dumpFileName), pagegenerators.AllpagesPageGenerator(nextPage, namespace, includeredirects = False)])
+                hintlessPageGen = pagegenerators.CombinedPageGenerator([hintlessPageGen, pagegenerators.AllpagesPageGenerator(nextPage, namespace, includeredirects = False)])
 
         bot = InterwikiBot()
 
