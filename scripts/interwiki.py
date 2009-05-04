@@ -1446,17 +1446,17 @@ class Subject(object):
         if globalvar.localonly:
             # In this case only continue on the Page we started with
             if page != self.originPage:
-                raise SaveError
+                raise SaveError(u'-localonly and page != originPage')
 
         if page.section():
             # This is not a page, but a subpage. Do not edit it.
             pywikibot.output(u"Not editing %s: not doing interwiki on subpages" % page)
-            raise SaveError
+            raise SaveError(u'Link has a #section')
         try:
             pagetext = page.get()
         except pywikibot.NoPage:
             pywikibot.output(u"Not editing %s: page does not exist" % page)
-            raise SaveError
+            raise SaveError(u'Page doesn\'t exist')
 
         # Show a message in purple.
         pywikibot.output(u"\03{lightpurple}Updating links on page %s.\03{default}" % page)
@@ -1490,7 +1490,7 @@ class Subject(object):
             s = u"None"
             if pltmp is not None: s = pltmp
             pywikibot.output(u"BUG>>> %s is not in the list of new links! Found %s." % (page, s))
-            raise SaveError
+            raise SaveError(u'BUG: sanity check failed')
 
         # Avoid adding an iw link back to itself
         del new[page.site()]
@@ -1580,16 +1580,16 @@ class Subject(object):
                     status, reason, data = page.put(newtext, comment = pywikibot.translate(page.site().lang, msg)[0] + mods)
                 except pywikibot.LockedPage:
                     pywikibot.output(u'Page %s is locked. Skipping.' % (page,))
-                    raise SaveError
+                    raise SaveError(u'Locked')
                 except pywikibot.EditConflict:
                     pywikibot.output(u'ERROR putting page: An edit conflict occurred. Giving up.')
-                    raise SaveError
+                    raise SaveError(u'Edit conflict')
                 except (pywikibot.SpamfilterError), error:
                     pywikibot.output(u'ERROR putting page: %s blacklisted by spamfilter. Giving up.' % (error.url,))
-                    raise SaveError
+                    raise SaveError(u'Spam filter')
                 except (pywikibot.PageNotSaved), error:
                     pywikibot.output(u'ERROR putting page: %s' % (error.args,))
-                    raise SaveError
+                    raise SaveError(u'PageNotSaved')
                 except (socket.error, IOError), error:
                     if timeout>3600:
                         raise
@@ -1612,7 +1612,7 @@ class Subject(object):
                 pywikibot.output(u'%s %s' % (status, reason))
                 return False
         elif answer == 'g':
-            raise GiveUpOnPage
+            raise GiveUpOnPage(u'User asked us to give up')
         else:
             raise LinkMustBeRemoved(u'Found incorrect link to %s in %s'% (",".join([x.lang for x in removing]), page))
 
