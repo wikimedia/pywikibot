@@ -397,7 +397,7 @@ def replaceLanguageLinks(oldtext, new, site = None, addOnly = False,
             else:
                 if template:
                     # Do we have a noinclude at the end of the template?
-                    parts = '</noinclude>'.split(s2)
+                    parts = s2.split('</noinclude>')
                     lastpart = parts[-1]
                     if re.match('\s*%s' % marker, lastpart):
                         # Put the langlinks back into the noinclude's
