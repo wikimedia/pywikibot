@@ -130,7 +130,7 @@ class Page(object):
         self._revisions = {}
 
         # Always capitalize the first letter
-        self._title = self._title.title()
+        self._title = self._title[:1].upper() + self._title[1:]
 
     def site(self):
         """Return the Site object for the wiki on which this Page resides."""
