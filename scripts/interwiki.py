@@ -1448,7 +1448,7 @@ class Subject(object):
             if page != self.originPage:
                 raise SaveError
 
-        if page.title() != page.sectionFreeTitle():
+        if page.section():
             # This is not a page, but a subpage. Do not edit it.
             pywikibot.output(u"Not editing %s: not doing interwiki on subpages" % page)
             raise SaveError
