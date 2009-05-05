@@ -1116,16 +1116,23 @@ class APISite(BaseSite):
             # really redirects to this page
             redirgen = api.PageGenerator("backlinks", gbltitle=bltitle,
                                          site=self, gblfilterredir="redirects")
-            genlist = [blgen]
+            genlist = {None: blgen}
             for redir in redirgen:
+                if redir == page:
+                    # if a wiki contains pages whose titles contain
+                    # namespace aliases that existed before those aliases
+                    # were defined (example: [[WP:Sandbox]] existed as a
+                    # redirect to [[Wikipedia:Sandbox]] before the WP: alias
+                    # was created) they can be returned as redirects to
+                    # themselves; skip these
+                    continue
                 if redir.getRedirectTarget() == page:
-                    genlist.append(
-                        self.pagebacklinks(
-                            redir, followRedirects=True,
-                            filterRedirects=filterRedirects,
-                            namespaces=namespaces))
+                    genlist[redir.title()] = self.pagebacklinks(
+                                                redir, followRedirects=True,
+                                                filterRedirects=filterRedirects,
+                                                namespaces=namespaces)
             import itertools
-            return itertools.chain(*genlist)
+            return itertools.chain(*genlist.values())
         return blgen
 
     def page_embeddedin(self, page, filterRedirects=None, namespaces=None):

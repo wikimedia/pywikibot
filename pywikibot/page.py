@@ -83,6 +83,8 @@ class Page(object):
                 nsindex = source.ns_index(title[ :pos])
                 if nsindex:
                     self._ns = nsindex
+                    # normalize namespace, in case an alias was used
+                    title = source.namespace(nsindex) + title[pos: ]
             if u"#" in title:
                 title, self._section = title.split(u"#", 1)
             else:
