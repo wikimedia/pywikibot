@@ -374,7 +374,7 @@ class Page(object):
         """Return the current (edited) wikitext, loading it if necessary."""
         if not hasattr(self, '_text') or self._text is None:
             try:
-                self._text = self.get()
+                self._text = self.get(get_redirect=True)
             except pywikibot.NoPage:
                 # TODO: what other exceptions might be returned?
                 self._text = u""
