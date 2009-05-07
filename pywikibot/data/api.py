@@ -474,16 +474,23 @@ u"%s: stopped iteration because 'query' and '%s' not found in api response."
                     % (self.__class__.__name__, self.resultkey))
                 logger.debug(unicode(self.data))
                 return
-            pagedata = self.data["query"][self.resultkey]
-            if isinstance(pagedata, dict):
+            resultdata = self.data["query"][self.resultkey]
+            if isinstance(resultdata, dict):
                 logger.debug(u"%s received %s; limit=%s"
-                              % (self.__class__.__name__, pagedata.keys(),
+                              % (self.__class__.__name__, resultdata.keys(),
                                  self.limit))
-                pagedata = [pagedata[k] for k in sorted(pagedata.keys())]
+                resultdata = [resultdata[k] for k in sorted(resultdata.keys())]
             else:
                 logger.debug(u"%s received %s; limit=%s"
-                              % (self.__class__.__name__, pagedata, self.limit))
-            for item in pagedata:
+                              % (self.__class__.__name__, resultdata,
+                                 self.limit))
+            if "normalized" in self.data["query"]:
+                self.normalized = dict((item['to'], item['from'])
+                                      for item in
+                                      self.data["query"]["normalized"])
+            else:
+                self.normalized = {}
+            for item in resultdata:
                 yield self.result(item)
                 count += 1
                 if self.limit is not None and self.limit > 0 \
@@ -625,6 +632,7 @@ class ListGenerator(QueryGenerator):
         """
         QueryGenerator.__init__(self, list=listaction, **kwargs)
 
+
 class LogEntryListGenerator(ListGenerator):
     """
     Like ListGenerator, but specialized for listaction="logevents" :
@@ -638,6 +646,7 @@ class LogEntryListGenerator(ListGenerator):
 
     def result(self, pagedata):
         return self.entryFactory.create(pagedata)
+
 
 class LoginManager(login.LoginManager):
     """Supplies getCookie() method to use API interface."""
