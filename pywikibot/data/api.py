@@ -194,7 +194,13 @@ class Request(object, DictMixin):
             self.site.throttle(write=write)
             uri = self.site.scriptpath() + "/api.php"
             try:
-                rawdata = http.request(self.site, uri, method="POST",
+                ssl = False
+                if self.site.family.name in config.available_ssl_project:
+                    if action == "login" and config.use_SSL_onlogin:
+                        ssl = True
+                    elif config.use_SSL_always:
+                        ssl = True
+                rawdata = http.request(self.site, uri, ssl, method="POST",
                             headers={'Content-Type':
                                      'application/x-www-form-urlencoded'},
                             body=params)

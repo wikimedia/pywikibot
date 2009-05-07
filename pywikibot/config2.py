@@ -50,7 +50,7 @@ disambiguation_comment = {}
 gdab_namespaces = {}
 
 # Solve captchas in the webbrowser. Setting this to False will result in the 
-# exception CaptchaError be thrown if a captcha is encountered. 
+# exception CaptchaError being thrown if a captcha is encountered. 
 solve_captcha = True
 
 # Some sites will require password identication to access the HTML pages at
@@ -66,6 +66,19 @@ solve_captcha = True
 #    for, for example, wiki usernames
 # 2. You must use the hostname of the site, not its family/language pair
 authenticate = {}
+
+#
+#    Security Connection for Wikimedia Projects
+#
+use_SSL_onlogin = True # if available, use SSL when logging in
+use_SSL_always = False # if available, use SSL for all API queries
+
+# Available security projects
+available_ssl_project = [
+    u'wikipedia', u'wikinews', u'wikisource', u'wiktionary', u'wikibooks',
+    u'wikiquote', u'wikiversity', u'meta', u'mediawiki', u'commons',
+    u'species', u'incubator'
+]
 
 # password_file = ".passwd"
 # A password file with default passwords. For more information, please
@@ -150,7 +163,10 @@ except:
     #we get "StdioOnnaStick instance has no attribute 'encoding'"
     console_encoding = None
 
-# The encoding in which textfiles are stored, which contain lists of page titles.
+# The encoding in which textfiles are stored, which contain lists of page
+# titles. The most used is: 'utf-8'. 'utf-8-sig' recognizes BOM but it is
+# available on Python 2.5 or higher. For a complete list please see:
+# http://docs.python.org/library/codecs.html#standard-encodings
 textfile_encoding = 'utf-8'
 
 # tkinter isn't yet ready
@@ -163,7 +179,7 @@ userinterface = 'terminal'
 # Currently only works if interface 'terminal' is set.
 transliterate = True
 
-# Should the system bell be ringed if the bot expects user input?
+# Should the system bell ring if the bot expects user input?
 ring_bell = False
 
 # Colorization can be used to markup important text parts of the output.
@@ -220,6 +236,7 @@ editor_filename_extension = 'wiki'
 #     log = []
 # Per default, logging of interwiki.py is enabled because its logfiles can
 # be used to generate so-called warnfiles.
+# This setting can be overridden by the -log or -nolog command-line arguments.
 log = ['interwiki']
 # filename defaults to modulename-bot.log
 logfilename = None
@@ -337,7 +354,7 @@ splitLongParagraphs = False
 # That can do very ugly results.
 deIndentTables = True
 # table2wiki.py works quite stable, so you might switch to True
-table2wikiAskOnlyWarnngs = True
+table2wikiAskOnlyWarnings = True
 table2wikiSkipWarnings = False
 
 ############## WEBLINK CHECKER SETTINGS ##############

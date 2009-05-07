@@ -76,25 +76,32 @@ def _flush():
 atexit.register(_flush)
 
 # export cookie_jar to global namespace
-import pywikibot
 pywikibot.cookie_jar = cookie_jar
 
-def request(site, uri, *args, **kwargs):
+def request(site, uri, ssl=False, *args, **kwargs):
     """Queue a request to be submitted to Site.
 
     All parameters not listed below are the same as
     L{httplib2.Http.request}, but the uri is relative
 
     @param site: The Site to connect to
+    @param uri: the URI to retrieve (relative to the site's scriptpath)
+    @param ssl: Use https connection
     @return: The received data (a unicode string).
+    
     """
-    baseuri = "%s://%s/" % (site.protocol(), site.hostname())
-    uri = urlparse.urljoin(baseuri, uri)
+    if ssl:
+        proto = "https"
+        host = site.ssl_hostname()
+    else:
+        proto = "http"
+        host = site.hostname()
+    full_uri = "%(proto)s://%(host)s%(uri)s" % locals()
 
     # set default user-agent string
     kwargs.setdefault("headers", {})
     kwargs["headers"].setdefault("user-agent", useragent)
-    request = threadedhttp.HttpRequest(uri, *args, **kwargs)
+    request = threadedhttp.HttpRequest(full_uri, *args, **kwargs)
     http_queue.put(request)
     request.lock.acquire()
 

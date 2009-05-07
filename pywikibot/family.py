@@ -670,6 +670,7 @@ class Family:
     redirect = {
         'af': [u'aanstuur'],
         'als': [u'weiterleitung'],
+        'an': [u'redirección'],
         'ar': [u'تحويل'],
         'arz': [u'تحويل'],
         'av': [u'перенаправление'],
@@ -677,6 +678,7 @@ class Family:
         'be-tarask': [u'перанакіраваньне'],
         'be-x-old': [u'перанакіраваньне'],
         'bg': [u'виж', u'пренасочване'],
+        'bug': [u'alih'],
         'br': [u'adkas'],
         'bs': [u'preusmjeri'],
         'cs': [u'přesměruj'],
@@ -723,17 +725,20 @@ class Family:
         'oc': [u'redireccion'],
         'pdc': [u'weiterleitung'],
         'pl': [u'redirect', u'patrz', u'tam', u'przekieruj'],
+        'qu': [u'redirección'],
         'ro': [u'redirecteaza'],
         'ru': [u'redirect', u'перенаправление', u'перенапр'],
         'sa': [u'#पुनर्निदेशन'],
+        'sah': [u'перенаправление'],
         'si': [u'යළියොමුව'],
         'sk': [u'presmeruj'],
         'sq': [u'ridrejto'],
         'sr': [u'преусмери', u'преусмери'],
         'srn': [u'stir'],
+        'stq': [u'weiterleitung'],
         'su': [u'redirected', u'alih'],
         'sv': [u'omdirigering'],
-        'szl': [u'redirect', u'tam'],
+        'szl': [u'redirect', u'tam', u'patrz'],
         'ta': [u'வழிமாற்று'],
         'te': [u'దారిమార్పు'],
         'th': [u'เปลี่ยนทาง'],
@@ -767,7 +772,7 @@ class Family:
     def pagenamecodes(self,code):
         pos = ['PAGENAME']
         pos2 = []
-        if code in self.pagename.keys():
+        if code in self.pagename:
             pos = pos + self.pagename[code]
         elif code == 'als':
             return self.pagenamecodes('de')
@@ -780,7 +785,7 @@ class Family:
     def pagename2codes(self,code):
         pos = ['PAGENAME']
         pos2 = []
-        if code in self.pagenamee.keys():
+        if code in self.pagenamee:
             pos = pos + self.pagenamee[code]
         elif code == 'als':
             return self.pagename2codes('de')
@@ -799,7 +804,12 @@ class Family:
         return 'http'
 
     def hostname(self, code):
+        """The hostname to use for standard http connections."""
         return self.langs[code]
+
+    def ssl_hostname(self, code):
+        """The hostname to use for SSL connections."""
+        return "secure.wikimedia.org/%s/%s" % (self.name, code)
 
     def scriptpath(self, code):
         """The prefix used to locate scripts on this wiki.
