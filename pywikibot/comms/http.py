@@ -93,15 +93,16 @@ def request(site, uri, ssl=False, *args, **kwargs):
     if ssl:
         proto = "https"
         host = site.ssl_hostname()
+        uri = site.ssl_pathprefix() + uri
     else:
-        proto = "http"
+        proto = site.protocol()
         host = site.hostname()
-    full_uri = "%(proto)s://%(host)s%(uri)s" % locals()
-
+    baseuri = urlparse.urljoin("%(proto)s://%(host)s" % locals(), uri)
+    
     # set default user-agent string
     kwargs.setdefault("headers", {})
     kwargs["headers"].setdefault("user-agent", useragent)
-    request = threadedhttp.HttpRequest(full_uri, *args, **kwargs)
+    request = threadedhttp.HttpRequest(baseuri, *args, **kwargs)
     http_queue.put(request)
     request.lock.acquire()
 

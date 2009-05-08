@@ -809,7 +809,7 @@ class Family:
 
     def ssl_hostname(self, code):
         """The hostname to use for SSL connections."""
-        return "secure.wikimedia.org/%s/%s" % (self.name, code)
+        return "secure.wikimedia.org"
 
     def scriptpath(self, code):
         """The prefix used to locate scripts on this wiki.
@@ -824,6 +824,10 @@ class Family:
 
         """
         return '/w'
+
+    def ssl_pathprefix(self, code):
+        """The path prefix for secure.wikimedia.org access."""
+        return "/%s/%s" % (self.name, code)
 
     def path(self, code):
         return '%s/index.php' % self.scriptpath(code)

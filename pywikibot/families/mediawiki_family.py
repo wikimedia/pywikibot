@@ -21,3 +21,6 @@ class Family(family.Family):
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
+
+    def ssl_pathprefix(self, code):
+        return "/wikipedia/mediawiki"
