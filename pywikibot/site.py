@@ -617,9 +617,11 @@ class APISite(BaseSite):
         self.sitelock = threading.Lock()
         self._msgcache = {}
         self.nocapitalize = self.code in self.family.nocapitalize
-        # _loginstatus: -1 means not logged in, 0 means logged in as user,
+        # _loginstatus: -2 means login not yet attempted,
+        #               -1 means not logged in (anon user),
+        #               0 means logged in as user,
         #               1 means logged in as sysop
-        self._loginstatus = -1
+        self._loginstatus = -2
         return
 
     # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
@@ -654,20 +656,21 @@ class APISite(BaseSite):
         # check whether a login cookie already exists for this user
         if not hasattr(self, "_userinfo"):
             self.getuserinfo()
-        if self._userinfo['name'] == self._username[sysop]:
-            self._loginstatus = sysop
+##        if self._userinfo['name'] == self._username[sysop]:
+##            self._loginstatus = sysop
+##            return
+        if self.logged_in(sysop):
             return
-        if not self.logged_in(sysop):
-            loginMan = api.LoginManager(site=self, sysop=sysop,
-                                        user=self._username[sysop])
-            if loginMan.login(retry = True):
-                self._username[sysop] = loginMan.username
-                self._loginstatus = sysop
-                if hasattr(self, "_userinfo"):
-                    del self._userinfo
-                self.getuserinfo()
-            else:
-                self._loginstatus = -1 # failure
+        loginMan = api.LoginManager(site=self, sysop=sysop,
+                                    user=self._username[sysop])
+        if loginMan.login(retry = True):
+            self._username[sysop] = loginMan.username
+            self._loginstatus = sysop
+            if hasattr(self, "_userinfo"):
+                del self._userinfo
+            self.getuserinfo()
+        else:
+            self._loginstatus = -1 # failure
         if not hasattr(self, "_siteinfo"):
             self._getsiteinfo()
 
@@ -911,9 +914,15 @@ class APISite(BaseSite):
                                       inprop="protection")
         for pageitem in query:
             if pageitem['title'] != title:
-                raise Error(
-                    u"loadpageinfo: Query on %s returned data on '%s'"
-                    % (page, pageitem['title']))
+                if pageitem['title'] in query.normalized_to \
+                        and query.normalized_to[pageitem['title']] == title:
+                    # page title was normalized by api
+                    # TODO
+                    pass
+                else:
+                    raise Error(
+                        u"loadpageinfo: Query on %s returned data on '%s'"
+                        % (page, pageitem['title']))
             api.update_page(page, pageitem)
 
     def loadimageinfo(self, page, history=False):
