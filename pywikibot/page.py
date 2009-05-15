@@ -1407,7 +1407,7 @@ class ImagePage(Page):
 
     def usingPages(self):
         """Yield Pages on which the image is displayed."""
-        return self.site().getimageusage(self)
+        return self.site().imageusage(self)
 
 
 class Category(Page):
@@ -1499,15 +1499,15 @@ class Category(Page):
                 for article in subcat.articles(recurse):
                     yield article
 
-    def members(self, recurse=False):
+    def members(self, recurse=False, namespaces=None):
         """Yield all category contents (subcats, pages, and files)."""
-        for member in self.site().categorymembers(self):
+        for member in self.site().categorymembers(self, namespaces):
             yield member
         if recurse:
             if not isinstance(recurse, bool) and recurse:
                 recurse = recurse - 1
             for subcat in self.subcategories():
-                for article in subcat.members(recurse):
+                for article in subcat.members(recurse, namespaces):
                     yield article
         
     def isEmptyCategory(self):
