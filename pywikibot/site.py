@@ -651,6 +651,7 @@ class APISite(BaseSite):
     def login(self, sysop=False):
         """Log the user in if not already logged in."""
         # check whether a login cookie already exists for this user
+        self._loginstatus = -2
         if not hasattr(self, "_userinfo"):
             self.getuserinfo()
         if self.logged_in(sysop):
