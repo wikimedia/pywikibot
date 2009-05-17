@@ -185,6 +185,8 @@ class Request(object, DictMixin):
         from pywikibot.comms import http
 
         params = self.http_params()
+        if self.site._loginstatus == -3:
+            self.site.login(False)
         while True:
             action = self.params.get("action", "")
             write = action in (
@@ -248,14 +250,14 @@ class Request(object, DictMixin):
                 status = self.site._loginstatus # save previous login status
                 if ( ("error" in result
                             and result["error"]["code"].endswith("limit"))
-                      or (status != -1
+                      or (status >= 0
                             and self.site._userinfo['name']
                                 != self.site._username[status])):
                     # user is no longer logged in (session expired?)
                     # reset userinfo, then make user log in again
                     del self.site._userinfo
                     self.site._loginstatus = -1
-                    if status == -1:
+                    if status < 0:
                         status = 0  # default to non-sysop login
                     self.site.login(status)
                     # retry the previous query
@@ -672,6 +674,7 @@ class LoginManager(login.LoginManager):
                                 lgname=self.username,
                                 lgpassword=self.password
                                )
+        self.site._loginstatus = -2
         login_result = login_request.submit()
         if u"login" not in login_result:
             raise RuntimeError("API login response does not have 'login' key.")
@@ -692,6 +695,7 @@ class LoginManager(login.LoginManager):
         raise APIError(code=login_result["login"]["result"], info="")
 
     def storecookiedata(self, data):
+        # ignore data; cookies are set by threadedhttp module
         pywikibot.cookie_jar.save()
 
 

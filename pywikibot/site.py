@@ -123,10 +123,6 @@ class BaseSite(object):
         if not hasattr(self, "_throttle"):
             self._throttle = Throttle(self, multiplydelay=True,
                                       verbosedelay=True)
-            try:
-                self.login(False)
-            except pywikibot.NoUsername:
-                pass
         return self._throttle
 
     @property
@@ -617,11 +613,12 @@ class APISite(BaseSite):
         self.sitelock = threading.Lock()
         self._msgcache = {}
         self.nocapitalize = self.code in self.family.nocapitalize
-        # _loginstatus: -2 means login not yet attempted,
+        # _loginstatus: -3 means login not yet attempted,
+        #               -2 means login attempt in progress,
         #               -1 means not logged in (anon user),
         #               0 means logged in as user,
         #               1 means logged in as sysop
-        self._loginstatus = -2
+        self._loginstatus = -3
         return
 
     # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
@@ -656,19 +653,16 @@ class APISite(BaseSite):
         # check whether a login cookie already exists for this user
         if not hasattr(self, "_userinfo"):
             self.getuserinfo()
-##        if self._userinfo['name'] == self._username[sysop]:
-##            self._loginstatus = sysop
-##            return
         if self.logged_in(sysop):
             return
         loginMan = api.LoginManager(site=self, sysop=sysop,
                                     user=self._username[sysop])
         if loginMan.login(retry = True):
             self._username[sysop] = loginMan.username
-            self._loginstatus = sysop
             if hasattr(self, "_userinfo"):
                 del self._userinfo
             self.getuserinfo()
+            self._loginstatus = sysop
         else:
             self._loginstatus = -1 # failure
         if not hasattr(self, "_siteinfo"):

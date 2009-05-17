@@ -71,7 +71,7 @@ authenticate = {}
 #    Security Connection for Wikimedia Projects
 #
 use_SSL_onlogin = True # if available, use SSL when logging in
-use_SSL_always = False # if available, use SSL for all API queries
+use_SSL_always = True  # if available, use SSL for all API queries
 
 # Available security projects
 available_ssl_project = [

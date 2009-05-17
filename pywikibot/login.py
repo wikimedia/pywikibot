@@ -142,9 +142,9 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         The argument data is the raw data, as returned by getCookie().
 
         """
-        filename = config.datafilepath('%s-%s-%s-login.data'
-                      % (self.site.family.name, self.site.code,
-                         self.username))
+		# THIS IS OVERRIDDEN IN data/api.py
+        filename = config.datafilepath('pywikibot.lwp')
+        logger.debug(u"Storing cookies to %s" % filename)
         f = open(filename, 'w')
         f.write(data)
         f.close()
