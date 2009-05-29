@@ -941,7 +941,7 @@ class Page(object):
         else:
             limit = revCount
         self.site().loadrevisions(self, getText=False, rvdir=reverseOrder,
-                                  limit=limit)
+                                  total=limit)
         if getAll:
             revCount = len(self._revisions)
         return [ ( self._revisions[rev].revid,
@@ -1512,7 +1512,7 @@ class Category(Page):
         
     def isEmptyCategory(self):
         """Return True if category has no members (including subcategories)."""
-        for member in self.site().categorymembers(self, limit=1):
+        for member in self.site().categorymembers(self, total=1):
             return False
         return True
 
