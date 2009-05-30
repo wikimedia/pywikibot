@@ -48,7 +48,7 @@ class CategoryRedirectBot(object):
         # Category that contains all redirected category pages
         self.cat_redirect_cat = {
             'wikipedia': {
-                'ar': "تصنيف:تحويلات تصنيفات ويكيبيديا",
+                'ar': u"تصنيف:تحويلات تصنيفات ويكيبيديا",
                 'da': "Kategori:Omdirigeringskategorier",
                 'en': "Category:Wikipedia category redirects",
                 'hu': "Kategória:Kategóriaátirányítások",
@@ -66,9 +66,9 @@ class CategoryRedirectBot(object):
         # (put the most preferred form first)
         self.redir_templates = {
             'wikipedia': {
-                'ar': ("تحويل تصنيف",
-                       "Category redirect",
-                       "تحويلة تصنيف"),
+                'ar': (u"تحويل تصنيف",
+                       u"Category redirect",
+                       u"تحويلة تصنيف"),
                 'da': ("Kategoriomdirigering",),
                 'en': ("Category redirect",
                        "Category redirect3",
@@ -81,8 +81,10 @@ class CategoryRedirectBot(object):
                        "Emptycategory",
                        "Empty cat",
                        "Seecat",),
+                'fr': ("Catégorie redirigée",
+                       "Redirection de catégorie"),
                 'hu': ("Kat-redir",
-                       "Katredir",),
+                       "Katredir"),
                 'ja': ("Category redirect",),
                 'no': ("Kategoriomdirigering",),
                 'simple': ("Category redirect",
@@ -151,6 +153,7 @@ u"机器人: 增加分类重定向模板，用于维护",
             'ar': u"روبوت: تصليح تحويلة مزدوجة",
             'da': u"Robot: retter dobbelt omdirigering",
             'en': u"Robot: fix double-redirect",
+            'fr': u"Robot : Correction des redirections doubles",
             'hu': u"Bot: Kettős átirányítás javítása",
             'ja': u"ロボットによる: 二重リダイレクト修正",
             'no': u"Robot: Ordner doble omdirigeringer",
@@ -162,6 +165,7 @@ u"机器人: 增加分类重定向模板，用于维护",
             'ar': u"بوت صيانة تحويل التصنيف",
             'da': u"Bot til vedligeholdelse af kategoromdirigeringer",
             'en': u"Category redirect maintenance bot",
+            'fr': u"Robot de maintenance des redirection de catégorie",
             'hu': u"Kategóriaátirányítás-karbantartó bot",
             'ja': u"移行中のカテゴリのメンテナンス・ボット",
             'no': u"Bot for vedlikehold av kategoriomdirigeringer",
@@ -192,6 +196,7 @@ aanjepaß krijje:
         self.edit_request_item = pywikibot.translate(self.site.lang,
             {
                 'en': u"* %s is in %s, which is a redirect to %s",
+                'fr': u"* %s est dans %s, qui est une redirection vers %s",
                 'ksh': u"* %s es en %s, un dat es en Ömleidung op %s",
             })
 
