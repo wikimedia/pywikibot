@@ -43,9 +43,10 @@ except ImportError:
         u"Error: You need the python module setuptools to use this module",
         level=pywikibot.CRITICAL)
     sys.exit(1)
-pkg_resources.require("httplib2")
-import httplib2
-
+try:
+    import httplib2
+except ImportError:
+    pkg_resources.require("httplib2")
 
 class ConnectionPool(object):
     """A thread-safe connection pool."""
