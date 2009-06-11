@@ -32,7 +32,7 @@ class Page(object):
 
     This object only implements internally methods that do not require
     reading from or writing to the wiki.  All other methods are delegated
-    to the Site object. 
+    to the Site object.
 
     """
 
@@ -93,7 +93,7 @@ class Page(object):
                 raise pywikibot.Error(
                       "Page object cannot be created from Site without title.")
             self._title = title
-        elif isinstance(source, Page): 
+        elif isinstance(source, Page):
             # copy all of source's attributes to this object
             self.__dict__ = source.__dict__
             if title:
@@ -286,7 +286,7 @@ class Page(object):
         exceptions that should be caught by the calling code:
 
           - NoPage: The page does not exist
-          - IsRedirectPage: The page is a redirect. 
+          - IsRedirectPage: The page is a redirect.
           - SectionError: The section does not exist on a page with a #
                 link
 
@@ -314,11 +314,13 @@ class Page(object):
         return self._revisions[self._revid].text
 
     def _getInternals(self, sysop):
-        """Helper function for get(). 
+        """Helper function for get().
+
         Stores latest revision in self if it doesn't contain it, doesn't think.
         * Raises exceptions from previous runs.
-        * Stores new exceptions in _getexception and raises them"""
+        * Stores new exceptions in _getexception and raises them.
 
+        """
         # Raise exceptions from previous runs
         if hasattr(self, '_getexception'):
             raise self._getexception
@@ -481,7 +483,7 @@ class Page(object):
         If self is a talk page, returns the associated content page;
         otherwise, returns the associated talk page.  The returned page need
         not actually exist on the wiki.
-        
+
         Returns None if self is a special page.
 
         """
@@ -545,10 +547,10 @@ class Page(object):
 
     def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
                       onlyTemplateInclusion=False, redirectsOnly=False,
-                      namespaces=None):
+                      namespaces=None, step=None, total=None):
         """Return an iterator all pages that refer to or embed the page.
 
-        If you need a full list of referring pages, use 
+        If you need a full list of referring pages, use
         C{pages = list(s.getReferences())}
 
         @param follow_redirects: if True, also iterate pages that link to a
@@ -559,20 +561,26 @@ class Page(object):
             is used as a template.
         @param redirectsOnly: if True, only iterate redirects to self.
         @param namespaces: only iterate pages in these namespaces
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
 
         """
         # N.B.: this method intentionally overlaps with backlinks() and
         # embeddedin(). Depending on the interface, it may be more efficient
         # to implement those methods in the site interface and then combine
         # the results for this method, or to implement this method and then
-        # split up the results for the others. 
+        # split up the results for the others.
         return self.site().pagereferences(
-                           self, follow_redirects, redirectsOnly,
-                           withTemplateInclusion, onlyTemplateInclusion,
-                           namespaces)
+                               self,
+                               followRedirects=follow_redirects,
+                               filterRedirects=redirectsOnly,
+                               withTemplateInclusion=withTemplateInclusion,
+                               onlyTemplateInclusion=onlyTemplateInclusion,
+                               namespaces=namespaces, step=step,
+                               total=total)
 
     def backlinks(self, followRedirects=True, filterRedirects=None,
-                  namespaces=None):
+                  namespaces=None, step=None, total=None):
         """Return an iterator for pages that link to this page.
 
         @param followRedirects: if True, also iterate pages that link to a
@@ -580,20 +588,31 @@ class Page(object):
         @param filterRedirects: if True, only iterate redirects; if False,
             omit redirects; if None, do not filter
         @param namespaces: only iterate pages in these namespaces
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
 
         """
-        return self.site().pagebacklinks(self, followRedirects, filterRedirects,
-                                         namespaces)
+        return self.site().pagebacklinks(self,
+                                         followRedirects=followRedirects,
+                                         filterRedirects=filterRedirects,
+                                         namespaces=namespaces, step=step,
+                                         total=total)
 
-    def embeddedin(self, filter_redirects=None, namespaces=None):
+    def embeddedin(self, filter_redirects=None, namespaces=None, step=None,
+                   total=None):
         """Return an iterator for pages that embed this page as a template.
 
         @param filterRedirects: if True, only iterate redirects; if False,
             omit redirects; if None, do not filter
         @param namespaces: only iterate pages in these namespaces
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
 
         """
-        return self.site().page_embeddedin(self, filter_redirects, namespaces)
+        return self.site().page_embeddedin(self,
+                                           filterRedirects=filter_redirects,
+                                           namespaces=namespaces,
+                                           step=step, total=total)
 
     def canBeEdited(self):
         """Return bool indicating whether this page can be edited.
@@ -751,7 +770,7 @@ class Page(object):
                         minorEdit=minorEdit, force=force, async=True,
                         callback=callback)
 
-    def linkedPages(self):
+    def linkedPages(self, namespaces=None, step=None, total=None):
         """Iterate Pages that this Page links to.
 
         Only returns pages from "normal" internal links. Image and category
@@ -759,10 +778,14 @@ class Page(object):
         omitted (but links within them are returned). All interwiki and
         external links are omitted.
 
+        @param namespaces: only iterate links in these namespaces
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
         @return: a generator that yields Page objects.
 
         """
-        return self.site().pagelinks(self)
+        return self.site().pagelinks(self, namespaces=namespaces, step=step,
+                                     total=total)
 
     def interwiki(self, expand=True):
         """Iterate interwiki links in the page text, excluding language links.
@@ -798,7 +821,7 @@ class Page(object):
                 continue
 
     def langlinks(self):
-        """Returns a list of all interlanguage Links on this page.
+        """Return a list of all interlanguage Links on this page.
 
         """
         # Data might have been preloaded
@@ -807,9 +830,11 @@ class Page(object):
 
         return self._langlinks
 
-    def iterlanglinks(self):
+    def iterlanglinks(self, step=None, total=None):
         """Iterate all interlanguage links on this page.
 
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
         @return: a generator that yields Link objects.
 
         """
@@ -819,10 +844,10 @@ class Page(object):
         # method is called. If we do this, we'll have to think
         # about what will happen if the generator is not completely
         # iterated upon.
-        return self.site().pagelanglinks(self)
+        return self.site().pagelanglinks(self, step=step, total=total)
 
     def templates(self):
-        """Returns a list of Page objects for templates used on this Page.
+        """Return a list of Page objects for templates used on this Page.
 
         Template parameters are ignored.  This method only returns embedded
         templates, not template pages that happen to be referenced through
@@ -835,27 +860,32 @@ class Page(object):
 
         return self._templates
 
-    def itertemplates(self):
+    def itertemplates(self, step=None, total=None):
         """Iterate Page objects for templates used on this Page.
 
         Template parameters are ignored.  This method only returns embedded
         templates, not template pages that happen to be referenced through
         a normal link.
 
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
+
         """
         if hasattr(self, '_templates'):
             return iter(self._templates)
-        return self.site().pagetemplates(self)
+        return self.site().pagetemplates(self, step=step, total=total)
 
     @deprecate_arg("followRedirects", None)
     @deprecate_arg("loose", None)
-    def imagelinks(self, followRedirects=None, loose=None):
+    def imagelinks(self, step=None, total=None):
         """Iterate ImagePage objects for images displayed on this Page.
 
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
         @return: a generator that yields ImagePage objects.
 
         """
-        return self.site().pageimages(self)
+        return self.site().pageimages(self, step=step, total=total)
 
     def templatesWithParams(self):
         """Iterate templates used on this Page.
@@ -898,22 +928,27 @@ class Page(object):
 
     @deprecate_arg("nofollow_redirects", None)
     @deprecate_arg("get_redirect", None)
-    def categories(self, withSortKey=False):
+    def categories(self, withSortKey=False, step=None, total=None):
         """Iterate categories that the article is in.
 
         @param withSortKey: if True, include the sort key in each Category.
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
         @return: a generator that yields Category objects.
 
         """
-        return self.site().pagecategories(self, withSortKey=withSortKey)
+        return self.site().pagecategories(self, withSortKey=withSortKey,
+                                          step=step, total=total)
 
-    def extlinks(self):
+    def extlinks(self, step=None, total=None):
         """Iterate all external URLs (not interwiki links) from this page.
 
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
         @return: a generator that yields unicode objects containing URLs.
 
         """
-        return self.site().page_extlinks(self)
+        return self.site().page_extlinks(self, step=step, total=total)
 
     def getRedirectTarget(self):
         """Return a Page object for the target this Page redirects to.
@@ -924,9 +959,14 @@ class Page(object):
         """
         return self.site().getredirtarget(self)
 
+    # BREAKING CHANGE: in old framework, default value for getVersionHistory
+    #                  returned no more than 500 revisions; now, it iterates
+    #                  all revisions unless 'total' argument is used
     @deprecate_arg("forceReload", None)
-    def getVersionHistory(self, reverseOrder=False, getAll=False,
-                          revCount=500):
+    @deprecate_arg("revCount", "total")
+    @deprecate_arg("getAll", None)
+    def getVersionHistory(self, reverseOrder=False, step=None,
+                          total=None):
         """Load the version history page and return history information.
 
         Return value is a list of tuples, where each tuple represents one
@@ -935,49 +975,58 @@ class Page(object):
         reverseOrder is True. Defaults to getting the first revCount edits,
         unless getAll is True.
 
+        @param step: limit each API call to this number of revisions
+        @param total: iterate no more than this number of revisions in total
+
         """
-        if getAll:
-            limit = None
-        else:
-            limit = revCount
         self.site().loadrevisions(self, getText=False, rvdir=reverseOrder,
-                                  total=limit)
-        if getAll:
-            revCount = len(self._revisions)
+                                  step=step, total=total)
         return [ ( self._revisions[rev].revid,
                    self._revisions[rev].timestamp,
                    self._revisions[rev].user,
                    self._revisions[rev].comment
                  ) for rev in sorted(self._revisions,
-                                     reverse=not reverseOrder)[ : revCount]
+                                     reverse=not reverseOrder)
                ]
 
     def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
-                               getAll=False, revCount=500):
+                               step=None, total=None):
         """Return the version history as a wiki table."""
+
         result = '{| border="1"\n'
         result += '! oldid || date/time || username || edit summary\n'
         for oldid, time, username, summary \
                 in self.getVersionHistory(forceReload=forceReload,
                                           reverseOrder=reverseOrder,
-                                          getAll=getAll, revCount=revCount):
+                                          step=step, total=total):
             result += '|----\n'
             result += '| %s || %s || %s || <nowiki>%s</nowiki>\n'\
                       % (oldid, time, username, summary)
         result += '|}\n'
         return result
 
-    def fullVersionHistory(self):
-        """Iterate all previous versions including wikitext.
+    def fullVersionHistory(self, reverseOrder=False, step=None,
+                          total=None):
+        """Iterate previous versions including wikitext.
+
+        Takes same arguments as getVersionHistory.
 
         @return: A generator that yields tuples consisting of revision ID,
             edit date/time, user name and content
-        """
-        return self.site().loadrevisions(self, withText=True)
 
-    def contributingUsers(self):
-        """Return a set of usernames (or IPs) of users who edited this page."""
-        edits = self.getVersionHistory()
+        """
+        return self.site().loadrevisions(self, getText=True,
+                                         rvdir=reverseOrder,
+                                         step=step, total=total)
+
+    def contributingUsers(self, step=None, total=None):
+        """Return a set of usernames (or IPs) of users who edited this page.
+
+        @param step: limit each API call to this number of revisions
+        @param total: iterate no more than this number of revisions in total
+
+        """
+        edits = self.getVersionHistory(step=step, total=total)
         users = set([edit[2] for edit in edits])
         return users
 
@@ -1000,7 +1049,7 @@ class Page(object):
             pywikibot.output(u'Moving %s to [[%s]].'
                              % (self.title(asLink=True), newtitle))
             reason = pywikibot.input(u'Please enter a reason for the move:')
-        # TODO: implement "safe" parameter (Is this necessary ?) 
+        # TODO: implement "safe" parameter (Is this necessary ?)
         # TODO: implement "sysop" parameter
         return self.site().movepage(self, newtitle, reason,
                                     movetalk=movetalkpage,
@@ -1035,21 +1084,28 @@ class Page(object):
                 return self.site().deletepage(self, reason)
             except pywikibot.NoUsername, e:
                 if mark:
-                    raise NotImplementedError("marking pages for deletions is not yet available.")
+                    raise NotImplementedError(
+                        "Marking pages for deletion is not yet available.")
                 raise e
-                
 
-    def loadDeletedRevisions(self):
+    # all these DeletedRevisions methods need to be reviewed and harmonized
+    # with the new framework; they do not appear functional
+    def loadDeletedRevisions(self, step=None, total=None):
         """Retrieve all deleted revisions for this Page from Special/Undelete.
 
         Stores all revisions' timestamps, dates, editors and comments in
         self._deletedRevs attribute.
 
-        @return: list of timestamps (which can be used to retrieve revisions
-            later on).
+        @return: iterator of timestamps (which can be used to retrieve
+            revisions later on).
 
         """
-        return self.site().loadDeletedRevisions(self)
+        if not hasattr(self, "_deletedRevs"):
+            self._deletedRevs = {}
+        for item in self.site().deletedrevs(self, step=step, total=total):
+            for rev in item.get("revisions", []):
+                self._deletedRevs[rev['timestamp']] = rev
+                yield rev['timestamp']
 
     def getDeletedRevision(self, timestamp, retrieveText=False):
         """Return a particular deleted revision by timestamp.
@@ -1060,8 +1116,17 @@ class Page(object):
             None.
 
         """
-        return self.site().getDeletedRevision(self, timestamp,
-                                              getText=retrieveText)
+        if hasattr(self, "_deletedRevs"):
+            if timestamp in self._deletedRevs and (
+                    (not retrieveText)
+                    or "content" in self._deletedRevs["timestamp"]):
+                return self._deletedRevs["timestamp"]
+        for item in self.site().deletedrevs(self, start=timestamp,
+                                            get_text=retrieveText, total=1):
+            # should only be one item with one revision
+            if item['title'] == self.title:
+                if "revisions" in item:
+                    return item["revisions"][0]
 
     def markDeletedRevision(self, timestamp, undelete=True):
         """Mark the revision identified by timestamp for undeletion.
@@ -1069,7 +1134,7 @@ class Page(object):
         @param undelete: if False, mark the revision to remain deleted.
 
         """
-        if self._deletedRevs == None:
+        if not hasattr(self, "_deletedRevs"):
             self.loadDeletedRevisions()
         if timestamp not in self._deletedRevs:
             #TODO: Throw an exception?
@@ -1149,14 +1214,14 @@ class Page(object):
 
         oldCat and newCat should be Category objects.
         If newCat is None, the category will be removed.
-        
+
         comment: string to use as an edit summary
 
-        sortKey: sortKey to use for the added category. 
+        sortKey: sortKey to use for the added category.
         Unused if newCat is None, or if inPlace=True
-        
+
         """
-        #TODO: is inPlace necessary? 
+        #TODO: is inPlace necessary?
         site = self.site()
         changesMade = False
 
@@ -1405,9 +1470,14 @@ class ImagePage(Page):
                          % (datetime, username, resolution, size, comment))
         return u'{| border="1"\n! date/time || username || resolution || size || edit summary\n|----\n' + u'\n|----\n'.join(lines) + '\n|}'
 
-    def usingPages(self):
-        """Yield Pages on which the image is displayed."""
-        return self.site().imageusage(self)
+    def usingPages(self, step=None, total=None):
+        """Yield Pages on which the image is displayed.
+
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in total
+
+        """
+        return self.site().imageusage(self, step=step, total=total)
 
 
 class Category(Page):
@@ -1447,7 +1517,7 @@ class Category(Page):
 
     @deprecate_arg("startFrom", None)
     @deprecate_arg("cacheResults", None)
-    def subcategories(self, recurse=False):
+    def subcategories(self, recurse=False, step=None, total=None):
         """Iterate all subcategories of the current category.
 
         @param recurse: if not False or 0, also iterate subcategories of
@@ -1455,28 +1525,46 @@ class Category(Page):
             levels. (Example: recurse=1 will iterate direct subcats and
             first-level sub-sub-cats, but no deeper.)
         @type recurse: int or bool
+        @param step: limit each API call to this number of categories
+        @param total: iterate no more than this number of
+            subcategories in total (at all levels)
 
         """
         if not isinstance(recurse, bool) and recurse:
             recurse = recurse - 1
         if not hasattr(self, "_subcats"):
             self._subcats = []
-            for member in self.site().categorymembers(self, namespaces=[14]):
+            for member in self.site().categorymembers(self, namespaces=[14],
+                                                      step=step, total=total):
                 subcat = Category(self.site(), member.title())
                 self._subcats.append(subcat)
                 yield subcat
+                total -= 1
+                if not total:
+                    return
                 if recurse:
-                    for item in subcat.subcategories(recurse):
+                    for item in subcat.subcategories(recurse,
+                                                     step=step, total=total):
                         yield item
+                        total -= 1
+                        if not total:
+                            return
         else:
             for subcat in self._subcats:
                 yield subcat
+                total -= 1
+                if not total:
+                    return
                 if recurse:
-                    for item in subcat.subcategories(recurse):
+                    for item in subcat.subcategories(recurse,
+                                                     step=step, total=total):
                         yield item
+                        total -= 1
+                        if not total:
+                            return
 
     @deprecate_arg("startFrom", None)
-    def articles(self, recurse=False):
+    def articles(self, recurse=False, step=None, total=None):
         """
         Yields all articles in the current category.
 
@@ -1485,31 +1573,50 @@ class Category(Page):
             levels. (Example: recurse=1 will iterate articles in first-level
             subcats, but no deeper.)
         @type recurse: int or bool
+        @param step: limit each API call to this number of pages
+        @param total: iterate no more than this number of pages in
+            total (at all levels)
 
         """
         namespaces = [x for x in self.site().namespaces()
                       if x>=0 and x!=14]
         for member in self.site().categorymembers(self,
-                                                  namespaces=namespaces):
+                                                  namespaces=namespaces,
+                                                  step=step, total=total):
             yield member
+            total -= 1
+            if not total:
+                return
         if recurse:
             if not isinstance(recurse, bool) and recurse:
                 recurse = recurse - 1
-            for subcat in self.subcategories():
-                for article in subcat.articles(recurse):
+            for subcat in self.subcategories(step=step):
+                for article in subcat.articles(recurse, step=step, total=total):
                     yield article
+                    total -= 1
+                    if not total:
+                        return
 
-    def members(self, recurse=False, namespaces=None):
+    def members(self, recurse=False, namespaces=None, step=None, total=None):
         """Yield all category contents (subcats, pages, and files)."""
-        for member in self.site().categorymembers(self, namespaces):
+
+        for member in self.site().categorymembers(self, namespaces,
+                                                  step=step, total=total):
             yield member
+            total -= 1
+            if not total:
+                return
         if recurse:
             if not isinstance(recurse, bool) and recurse:
                 recurse = recurse - 1
-            for subcat in self.subcategories():
-                for article in subcat.members(recurse, namespaces):
+            for subcat in self.subcategories(step=step):
+                for article in subcat.members(recurse, namespaces, step=step,
+                                              total=total):
                     yield article
-        
+                    total -= 1
+                    if not total:
+                        return
+
     def isEmptyCategory(self):
         """Return True if category has no members (including subcategories)."""
         for member in self.site().categorymembers(self, total=1):
@@ -1523,7 +1630,7 @@ class Category(Page):
         @param cat: New category title (without namespace) or Category object
         @type cat: unicode or Category
         @param message: message to use for category creation message
-        If two %s are provided in message, will be replaced 
+        If two %s are provided in message, will be replaced
         by (self.title, authorsList)
         @type message: unicode
         @return: True if copying was successful, False if target page
@@ -1676,7 +1783,7 @@ class Link(object):
             u'''[^ %!\"$&'()*,\\-.\\/0-9:;=?@A-Z\\\\^_`a-z~\u0080-\uFFFF+]'''
             # URL percent encoding sequences interfere with the ability
             # to round-trip titles -- you can't link to them consistently.
-            u'|%[0-9A-Fa-f]{2}' 
+            u'|%[0-9A-Fa-f]{2}'
             # XML/HTML character references produce similar issues.
             u'|&[A-Za-z0-9\x80-\xff]+;'
             u'|&#[0-9]+;'
@@ -1783,7 +1890,7 @@ class Link(object):
 
     def parse(self):
         """Parse text; called internally when accessing attributes"""
-        
+
         self._site = self._source
         self._namespace = self._defaultns
         t = self._text
@@ -2000,7 +2107,7 @@ not supported by PyWikiBot!"""
         link._site = page.site()
         link._section = page.section()
         link._namespace = page.namespace()
-        link._title = page.title(withNamespace=False, 
+        link._title = page.title(withNamespace=False,
                                 allowInterwiki=False,
                                 withSection=False)
         link._anchor = None
@@ -2029,8 +2136,8 @@ not supported by PyWikiBot!"""
                 link._namespace = ns
                 title = t
         link._title = title
-        
-        return link 
+
+        return link
 
 # Utility functions for parsing page titles
 
