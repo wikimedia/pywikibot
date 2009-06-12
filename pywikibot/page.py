@@ -1539,29 +1539,33 @@ class Category(Page):
                 subcat = Category(self.site(), member.title())
                 self._subcats.append(subcat)
                 yield subcat
-                total -= 1
-                if not total:
-                    return
+                if total is not None:
+                    total -= 1
+                    if not total:
+                        return
                 if recurse:
                     for item in subcat.subcategories(recurse,
                                                      step=step, total=total):
                         yield item
-                        total -= 1
-                        if not total:
-                            return
+                        if total is not None:
+                            total -= 1
+                            if not total:
+                                return
         else:
             for subcat in self._subcats:
                 yield subcat
-                total -= 1
-                if not total:
-                    return
+                if total is not None:
+                    total -= 1
+                    if not total:
+                        return
                 if recurse:
                     for item in subcat.subcategories(recurse,
                                                      step=step, total=total):
                         yield item
-                        total -= 1
-                        if not total:
-                            return
+                        if total is not None:
+                            total -= 1
+                            if not total:
+                                return
 
     @deprecate_arg("startFrom", None)
     def articles(self, recurse=False, step=None, total=None):
@@ -1584,18 +1588,20 @@ class Category(Page):
                                                   namespaces=namespaces,
                                                   step=step, total=total):
             yield member
-            total -= 1
-            if not total:
-                return
+            if total is not None:
+                total -= 1
+                if not total:
+                    return
         if recurse:
             if not isinstance(recurse, bool) and recurse:
                 recurse = recurse - 1
             for subcat in self.subcategories(step=step):
                 for article in subcat.articles(recurse, step=step, total=total):
                     yield article
-                    total -= 1
-                    if not total:
-                        return
+                    if total is not None:
+                        total -= 1
+                        if not total:
+                            return
 
     def members(self, recurse=False, namespaces=None, step=None, total=None):
         """Yield all category contents (subcats, pages, and files)."""
@@ -1603,9 +1609,10 @@ class Category(Page):
         for member in self.site().categorymembers(self, namespaces,
                                                   step=step, total=total):
             yield member
-            total -= 1
-            if not total:
-                return
+            if total is not None:
+                total -= 1
+                if not total:
+                    return
         if recurse:
             if not isinstance(recurse, bool) and recurse:
                 recurse = recurse - 1
@@ -1613,9 +1620,10 @@ class Category(Page):
                 for article in subcat.members(recurse, namespaces, step=step,
                                               total=total):
                     yield article
-                    total -= 1
-                    if not total:
-                        return
+                    if total is not None:
+                        total -= 1
+                        if not total:
+                            return
 
     def isEmptyCategory(self):
         """Return True if category has no members (including subcategories)."""
