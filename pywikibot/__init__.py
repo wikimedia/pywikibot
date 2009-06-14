@@ -111,7 +111,7 @@ def deprecate_arg(old_arg, new_arg):
                     else:
                         pywikibot.output(
 "%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
-                            % locals(), level=DEBUG)
+                            % locals(), level=WARNING)
                         __kw[new_arg] = __kw[old_arg]
                 else:
                     pywikibot.output(
