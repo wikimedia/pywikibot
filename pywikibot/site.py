@@ -1115,7 +1115,8 @@ class APISite(BaseSite):
         """
         query = api.PropertyGenerator("info|revisions",
                                       titles=page.title(withSection=False),
-                                      intoken=tokentype)
+                                      intoken=tokentype,
+                                      site=self)
         for item in query:
             if item['title'] != page.title(withSection=False):
                 raise Error(
@@ -2452,7 +2453,8 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
                         % e.__class__.__name__)
         if not self.logged_in(sysop=True):
             raise NoUsername("delete: Unable to login as sysop")
-        token = self.token("delete")
+        token = self.token(page, "delete")
+        self.lock_page(page)
         req = api.Request(site=self, action="delete", token=token,
                           title=page.title(withSection=False),
                           reason=summary)
