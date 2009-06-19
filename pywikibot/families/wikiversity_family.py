@@ -12,17 +12,16 @@ class Family(family.Family):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fi', 'fr', 'es', 'de', 'it', 'el', 'cs', 'ja', 'pt'
+            'en', 'fr', 'de', 'cs', 'es', 'it', 'pt', 'el', 'fi',
+            'ja',
         ]
 
-        self.langs = {
-            'beta': 'beta.wikiversity.org',
-        }
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wikiversity.org' % lang
+            self.langs['beta'] = 'beta.wikiversity.org'
 
     def version(self,code):
-        return '1.15alpha'
+        return '1.16alpha'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

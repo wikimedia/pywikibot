@@ -39,7 +39,10 @@ class Family(family.Family):
         }
 
     def version(self, code):
-        return '1.15alpha'
+        return '1.16alpha'
+
+    def dbName(self, code):
+        return 'commonswiki_p'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

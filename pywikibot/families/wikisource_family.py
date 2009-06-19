@@ -12,19 +12,17 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'en', 'pt', 'fr', 'zh', 'es', 'de', 'ru', 'it', 'fa', 'ar',
-            'hu', 'th', 'pl', 'he', 'cs', 'ro', 'hr', 'te', 'fi', 'tr',
-            'nl', 'sv', 'sr', 'la', 'uk', 'ja', 'sl', 'li', 'ml', 'is',
-            'bs', 'el', 'ko', 'id', 'ca', 'bn', 'no', 'hy', 'da', 'az',
-            'vi', 'ta', 'et', 'yi', 'mk', 'bg', 'kn', 'lt', 'cy', 'sk',
-            'gl', 'zh-min-nan', 'fo',
+            'en', 'pt', 'fr', 'zh', 'es', 'de', 'ru', 'he', 'it', 'ar',
+            'fa', 'hu', 'pl', 'th', 'cs', 'ro', 'hr', 'te', 'fi', 'tr',
+            'nl', 'sv', 'sl', 'sr', 'la', 'uk', 'ja', 'li', 'el', 'ml',
+            'ko', 'is', 'bs', 'id', 'ca', 'bn', 'hy', 'yi', 'az', 'mk',
+            'no', 'da', 'vi', 'et', 'ta', 'bg', 'lt', 'kn', 'gl', 'cy',
+            'sk', 'zh-min-nan', 'fo',
         ]
 
-        self.langs = {
-            '-': 'wikisource.org',
-        }
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wikisource.org' % lang
+            self.langs['-'] = 'wikisource.org'
 
         self.alphabetic = ['ang','ar','az','bg','bs','ca','cs','cy',
                       'da','de','el','en','es','et','fa','fi',
@@ -35,8 +33,8 @@ class Family(family.Family):
 
         self.obsolete = {
             'ang': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
-            
-            
+
+
             'dk': 'da',
             'ht': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
             'jp': 'ja',
@@ -56,9 +54,22 @@ class Family(family.Family):
             'pl': self.alphabetic,
             'simple': self.alphabetic
         }
+        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = [
+            'el','fa','it','ko','no','zh'
+        ]
+
+    def scriptpath(self, code):
+        if config.SSL_connection:
+            if code == '-':
+                return '/wikipedia/sources/w'
+            else:
+                return '/%s/%s/w' % (self.name, code)
+        else:
+            return '/w'
 
     def version(self, code):
-        return '1.15alpha'
+        return '1.16alpha'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

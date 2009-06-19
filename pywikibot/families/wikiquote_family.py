@@ -12,13 +12,13 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'it', 'de', 'pl', 'pt', 'sk', 'ru', 'bg', 'bs', 'es',
-            'sl', 'tr', 'he', 'fr', 'cs', 'zh', 'lt', 'id', 'uk', 'fa',
-            'hu', 'sv', 'el', 'nl', 'no', 'ja', 'fi', 'ca', 'nn', 'ka',
-            'et', 'simple', 'ku', 'ar', 'hr', 'eo', 'hy', 'ro', 'gl', 'ko',
-            'ml', 'li', 'is', 'af', 'sr', 'th', 'da', 'sq', 'te', 'vi',
-            'eu', 'la', 'az', 'br', 'hi', 'be', 'ast', 'uz', 'ang', 'zh-min-nan',
-            'lb', 'mr', 'su', 'ur', 'ta', 'wo', 'ky', 'kn', 'gu', 'cy',
+            'en', 'it', 'de', 'pl', 'pt', 'sk', 'ru', 'bg', 'es', 'bs',
+            'sl', 'tr', 'he', 'lt', 'fr', 'cs', 'zh', 'uk', 'hu', 'id',
+            'fa', 'sv', 'el', 'no', 'nl', 'ja', 'fi', 'eo', 'hy', 'et',
+            'ca', 'nn', 'simple', 'ka', 'ar', 'ku', 'hr', 'ko', 'ro', 'gl',
+            'ml', 'li', 'is', 'sr', 'af', 'th', 'te', 'da', 'sq', 'vi',
+            'eu', 'az', 'la', 'br', 'hi', 'be', 'ast', 'uz', 'ang', 'zh-min-nan',
+            'lb', 'mr', 'su', 'ur', 'ta', 'wo', 'kn', 'ky', 'gu', 'cy',
             'am', 'co', 'kk',
         ]
 
@@ -26,9 +26,10 @@ class Family(family.Family):
             self.langs[lang] = '%s.wikiquote.org' % lang
 
         self.disambiguationTemplates = {
-            '_default': [u''],
-            'ka':       [u'მრავალმნიშვნელოვანი', u'მრავმნიშ'],
-            'pt':       [u'Desambiguação'],
+            '_default': [],
+            'fr': ['Homonymie'],
+            'ka': [u'მრავალმნიშვნელოვანი', u'მრავმნიშ'],
+            'pt': [u'Desambiguação'],
             }
 
         # attop is a list of languages that prefer to have the interwiki
@@ -45,6 +46,11 @@ class Family(family.Family):
         # List of languages that want the category on_one_line.
         self.category_on_one_line = []
 
+        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = [
+            'af','am','ang','ar','ast','az','ca','da','fa','it',
+            'ka','ko','la','nn','no','ro','simple','sv','vi','zh'
+        ]
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
         # alphabetical order on language code is used. For languages that are in
@@ -101,7 +107,7 @@ class Family(family.Family):
         }
 
     def version(self, code):
-        return '1.15alpha'
+        return '1.16alpha'
 
     def code2encodings(self, code):
         """

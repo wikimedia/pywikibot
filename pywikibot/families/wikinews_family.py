@@ -13,8 +13,8 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'pl', 'de', 'it', 'sr', 'fr', 'pt', 'es', 'zh', 'sv',
-            'ja', 'ru', 'nl', 'he', 'fi', 'sd', 'cs', 'no', 'uk', 'ca',
-            'ar', 'hu', 'ro', 'bs', 'th', 'bg', 'ta',
+            'ja', 'ru', 'nl', 'he', 'fi', 'sd', 'ar', 'cs', 'no', 'uk',
+            'ca', 'hu', 'ro', 'th', 'bs', 'bg', 'ta',
         ]
 
         for lang in self.languages_by_size:
@@ -41,11 +41,14 @@ class Family(family.Family):
             'pl': self.alphabetic,
         }
 
+        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = ['cs','hu',]
+
     def code2encoding(self, code):
         return 'utf-8'
 
     def version(self, code):
-        return '1.15alpha'
+        return '1.16alpha'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

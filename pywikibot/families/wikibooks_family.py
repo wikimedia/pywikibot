@@ -12,16 +12,16 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'pt', 'hu', 'es', 'nl', 'ja', 'it', 'pl',
-            'sq', 'he', 'fi', 'vi', 'ru', 'hr', 'cs', 'da', 'sv', 'zh',
-            'mk', 'tr', 'sr', 'fa', 'tl', 'is', 'id', 'ta', 'ca', 'ar',
-            'no', 'ko', 'eo', 'ka', 'simple', 'bg', 'th', 'lt', 'gl', 'ro',
-            'sk', 'la', 'ia', 'ang', 'el', 'et', 'mr', 'sl', 'ur', 'oc',
-            'cv', 'ml', 'uk', 'ms', 'eu', 'lv', 'fy', 'hi', 'ie', 'tg',
-            'bn', 'hy', 'af', 'az', 'te', 'bs', 'pa', 'ky', 'be', 'ast',
-            'cy', 'sa', 'tt', 'mg', 'km', 'ku', 'si', 'co', 'zh-min-nan', 'sw',
-            'tk', 'ne', 'als', 'uz', 'vo', 'na', 'su', 'ps', 'mn', 'lb',
-            'kn', 'xh', 'kk', 'za', 'nds', 'wa', 'zu', 'my',
+            'en', 'de', 'fr', 'hu', 'pt', 'es', 'ja', 'nl', 'it', 'pl',
+            'sq', 'he', 'fi', 'vi', 'ru', 'cs', 'hr', 'da', 'zh', 'sv',
+            'mk', 'tr', 'th', 'sr', 'fa', 'tl', 'id', 'is', 'ca', 'ta',
+            'ar', 'no', 'ko', 'eo', 'ka', 'simple', 'bg', 'gl', 'lt', 'ro',
+            'sk', 'la', 'el', 'ia', 'ang', 'sl', 'et', 'mr', 'cv', 'ur',
+            'oc', 'ml', 'ms', 'uk', 'eu', 'fy', 'lv', 'ie', 'hi', 'tg',
+            'bn', 'hy', 'af', 'az', 'te', 'bs', 'ky', 'pa', 'be', 'sa',
+            'zh-min-nan', 'ast', 'cy', 'mg', 'tt', 'km', 'si', 'ku', 'co', 'sw',
+            'tk', 'ne', 'als', 'uz', 'vo', 'su', 'na', 'mn', 'lb', 'kn',
+            'ps', 'xh', 'kk', 'za', 'nds', 'wa', 'zu', 'my',
         ]
 
         for lang in self.languages_by_size:
@@ -87,9 +87,11 @@ class Family(family.Family):
             'pl': alphabetic,
             'simple': alphabetic
         }
+        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = ['fa','fy','it','ru','simple','zh']
 
     def version(self, code):
-        return '1.15alpha'
+        return '1.16alpha'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
