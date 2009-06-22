@@ -1945,7 +1945,7 @@ class Link(object):
                         raise pywikibot.Error("""\
 %s is not a local page on %s, and the %s family is
 not supported by PyWikiBot!"""
-                              % (title, self._site(), familyName))
+                              % (self._text, self._site(), familyName))
 
                 # Redundant interwiki prefix to the local wiki
                 if newsite == self._site:
