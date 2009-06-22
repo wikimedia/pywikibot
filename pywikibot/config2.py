@@ -482,7 +482,7 @@ _glv.update(globals())
 _gl = _glv.keys()
 _tp = {}
 for _key in _gl:
-    if _key[0]! = '_':
+    if _key[0] != '_':
         _tp[_key] = type(globals()[_key])
 
 # Get the user files
