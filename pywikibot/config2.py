@@ -199,7 +199,7 @@ except:
 # The command for the editor you want to use. If set to None, a simple Tkinter
 # editor will be used.
 # On Windows systems, this script tries to determine the default text editor.
-if __sys.platform=='win32':
+if __sys.platform == 'win32':
     try:
         import _winreg
         _key1 = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\OpenWithProgids')
@@ -211,6 +211,7 @@ if __sys.platform=='win32':
         if editor.lower().endswith('notepad.exe'):
             editor = None
     except:
+        # XXX what are we catching here?
         #raise
         editor = None
 else:
@@ -476,25 +477,25 @@ cosmetic_changes_mylang_only = True
 # ============================
 # System-level and User-level changes.
 # Store current variables and their types.
-_glv={}
+_glv = {}
 _glv.update(globals())
-_gl=_glv.keys()
-_tp={}
+_gl = _glv.keys()
+_tp = {}
 for _key in _gl:
-    if _key[0]!='_':
-        _tp[_key]=type(globals()[_key])
+    if _key[0]! = '_':
+        _tp[_key] = type(globals()[_key])
 
 # Get the user files
-_thislevel=0
-_fns=[os.path.join(_base_dir, "user-config.py")]
+_thislevel = 0
+_fns = [os.path.join(_base_dir, "user-config.py")]
 for _filename in _fns:
     _thislevel += 1
     if os.path.exists(_filename):
-        _filestatus=os.stat(_filename)
-        _filemode=_filestatus[0]
-        _fileuid=_filestatus[4]
-        if (__sys.platform=='win32' or _fileuid==os.getuid() or _fileuid==0):
-            if __sys.platform=='win32' or _filemode&002==0:
+        _filestatus = os.stat(_filename)
+        _filemode = _filestatus[0]
+        _fileuid = _filestatus[4]
+        if __sys.platform == 'win32' or _fileuid in [os.getuid(), 0]:
+            if __sys.platform == 'win32' or _filemode & 002 == 0:
                 execfile(_filename)
             else:
                 print "WARNING: Skipped '%(fn)s': writeable by others."\
@@ -520,7 +521,7 @@ for _key, _val in globals().items():
             print "WARNING: Type of '%(_key)s' changed" % locals()
             print "         %(was)s: %(old)s" % {'was': "Was", 'old': ot}
             print "         %(was)s: %(new)s" % {'now': "Now", 'new': nt}
-        del nt,ot
+        del nt, ot
     else:
         print \
             "Configuration variable %(_key)r is defined but unknown."\
@@ -528,7 +529,7 @@ for _key, _val in globals().items():
 
 # Fix up default console_encoding
 if console_encoding == None:
-    if __sys.platform=='win32':
+    if __sys.platform == 'win32':
         console_encoding = 'cp850'
     else:
         console_encoding = 'iso-8859-1'
@@ -549,12 +550,10 @@ def makepath(path):
     from holger@trillke.net 2002/03/18
 
     """
-    from os import makedirs
-    from os.path import normpath, dirname, exists, abspath
-
-    dpath = normpath(dirname(path))
-    if not exists(dpath): makedirs(dpath)
-    return normpath(abspath(path))
+    dpath = os.path.normpath(os.path.dirname(path))
+    if not os.path.exists(dpath): 
+        os.makedirs(dpath)
+    return os.path.normpath(os.path.abspath(path))
 
 def datafilepath(*filename):
     """Return an absolute path to a data file in a standard location.
@@ -564,12 +563,10 @@ def datafilepath(*filename):
     directories in the path that do not already exist are created.
 
     """
-    import os
     return makepath(os.path.join(base_dir, *filename))
 
 def shortpath(path):
     """Return a file path relative to config.base_dir."""
-    import os
     if path.startswith(base_dir):
         return path[len(base_dir) + len(os.path.sep) : ]
     return path
@@ -577,21 +574,21 @@ def shortpath(path):
 #
 # When called as main program, list all configuration variables
 #
-if __name__=="__main__":
+if __name__ == "__main__":
     import types
-    _all=1
+    _all = 1
     for _arg in __sys.argv[1:]:
-        if _arg=="modified":
-            _all=0
+        if _arg == "modified":
+            _all = 0
         else:
             print "Unknown arg %(_arg)s ignored" % locals()
-    _k=globals().keys()
+    _k = globals().keys()
     _k.sort()
     for _name in _k:
-        if _name[0]!='_':
+        if _name[0] != '_':
             if not type(globals()[_name]) in [types.FunctionType, types.ModuleType]:
-                if _all or _glv[_name]!=globals()[_name]:
-                    print _name,"=",repr(globals()[_name])
+                if _all or _glv[_name] != globals()[_name]:
+                    print _name, "=", repr(globals()[_name])
 
 # cleanup all locally-defined variables
 

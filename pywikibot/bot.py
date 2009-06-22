@@ -282,7 +282,7 @@ def calledModuleName():
     return os.path.basename(called)
 
 def _decodeArg(arg):
-    if sys.platform=='win32':
+    if sys.platform == 'win32':
         if config.console_encoding in ("cp437", 'cp850'):
             # Western Windows versions give parameters encoded as windows-1252
             # even though the console encoding is cp850 or cp437.
@@ -399,7 +399,7 @@ def showHelp(name=""):
         except NameError:
             modname = "no_module"
 
-    globalHelp =u'''\
+    globalHelp = u'''\
 Global arguments available for all bots:
 
 -dir:PATH         Read the bot's configuration data from directory given by
