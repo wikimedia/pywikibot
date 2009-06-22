@@ -1437,7 +1437,7 @@ class ImagePage(Page):
         """Return image file's MD5 checksum."""
 # FIXME: MD5 might be performed on incomplete file due to server disconnection
 # (see bug #1795683).
-        import md5, urllib
+        import md5
         f = urllib.urlopen(self.fileUrl())
         # TODO: check whether this needs a User-Agent header added
         md5Checksum = md5.new(f.read()).hexdigest()
@@ -1652,11 +1652,11 @@ class Category(Page):
             cat = self.site().category_namespace() + ':' + cat
             targetCat = Category(self.site(), cat)
         else:
-            targetCat=cat
+            targetCat = cat
         if targetCat.exists():
             pywikibot.output(u'Target page %s already exists!'
                               % targetCat.title(),
-                             level=pywikibot.WARNING)
+                             level = pywikibot.WARNING)
             return False
         else:
             pywikibot.output('Moving text from %s to %s.'
@@ -1665,7 +1665,7 @@ class Category(Page):
             try:
                 creationSummary = message % (self.title(), authors)
             except TypeError:
-                creationSummary=message
+                creationSummary = message
             targetCat.put(self.get(), creationSummary)
             return True
 
@@ -1705,7 +1705,7 @@ class Category(Page):
             newtext = self.get()
         for regexName in cfdTemplates:
             matchcfd = re.compile(r"{{%s.*?}}" % regexName, re.IGNORECASE)
-            newtext = matchcfd.sub('',newtext)
+            newtext = matchcfd.sub('', newtext)
             matchcomment = re.compile(
                         r"<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->",
                                       re.IGNORECASE | re.MULTILINE | re.DOTALL)
@@ -2208,7 +2208,7 @@ def html2unicode(text, ignore = []):
                     unicodeCodepoint = htmlentitydefs.name2codepoint[name]
             result += text[:match.start()]
             try:
-                unicodeCodepoint=convertIllegalHtmlEntities[unicodeCodepoint]
+                unicodeCodepoint = convertIllegalHtmlEntities[unicodeCodepoint]
             except KeyError:
                 pass
             if unicodeCodepoint and unicodeCodepoint not in ignore:
