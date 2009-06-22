@@ -304,7 +304,7 @@ class Page(object):
             # * Deleting _redirtarget, that info is now obsolete.
             for attr in ['_redirtarget', '_getexception', '_revid']:
                 if hasattr(self, attr):
-                    delattr(self,attr)
+                    delattr(self, attr)
         try:
             self._getInternals(sysop)
         except pywikibot.IsRedirectPage:
@@ -535,7 +535,7 @@ class Page(object):
                               for link in disambigpages.linkedPages()
                               if link.namespace() == 10
                         ]
-                    except NoPage:
+                    except pywikibot.NoPage:
                         self.site()._disambigtemplates = ['Disambig']
             for t in self.templates():
                 if t.title(withNamespace=False) in self.site()._disambigtemplates:
@@ -2231,7 +2231,7 @@ def url2unicode(title, site, site2 = None):
     """
     # create a list of all possible encodings for both hint sites
     encList = [site.encoding()] + list(site.encodings())
-    if site2 and site2 <> site:
+    if site2 and site2 != site:
         encList.append(site2.encoding())
         encList += list(site2.encodings())
     firstException = None
