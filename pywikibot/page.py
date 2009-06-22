@@ -1406,7 +1406,7 @@ class ImagePage(Page):
         same ImagePage object, the page will only be downloaded once.
         """
         if not hasattr(self, '_imagePageHtml'):
-            from pywikibot.data import http
+            from pywikibot.comms import http
             path = "%s/index.php?title=%s" \
                    % (self.site().scriptpath(), self.title(asUrl=True))
             self._imagePageHtml = http.request(self.site(), path)
