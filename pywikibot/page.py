@@ -190,7 +190,7 @@ class Page(object):
                     return u'[[%s:%s]]' % (self.site().code,
                                            self._title)
             elif textlink and (self.isImage() or self.isCategory()):
-                    return u'[[:%s]]' % title
+                return u'[[:%s]]' % title
             else:
                 return u'[[%s]]' % title
         if as_filename:
