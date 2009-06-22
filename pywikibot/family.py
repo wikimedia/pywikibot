@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id$'
+__version__ = '$Id$'
 
 import config2 as config
 import logging
@@ -846,7 +846,7 @@ class Family:
         'sr': [u'СТРАНИЦЕ']
     }
 
-    def pagenamecodes(self,code):
+    def pagenamecodes(self, code):
         pos = ['PAGENAME']
         pos2 = []
         if code in self.pagename:
@@ -856,10 +856,10 @@ class Family:
         elif code == 'bm':
             return self.pagenamecodes('fr')
         for p in pos:
-            pos2 += [p,p.lower()]
+            pos2 += [p, p.lower()]
         return pos2
 
-    def pagename2codes(self,code):
+    def pagename2codes(self, code):
         pos = ['PAGENAME']
         pos2 = []
         if code in self.pagenamee:
@@ -869,7 +869,7 @@ class Family:
         elif code == 'bm':
             return self.pagename2codes('fr')
         for p in pos:
-            pos2 += [p,p.lower()]
+            pos2 += [p, p.lower()]
         return pos2
 
     # Methods
@@ -979,7 +979,7 @@ class Family:
         found is an existing page, in case the normal regexp does not work."""
         return None
 
-    def has_query_api(self,code):
+    def has_query_api(self, code):
         """Is query.php installed in the wiki?"""
         return False
 
