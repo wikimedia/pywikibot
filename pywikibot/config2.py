@@ -550,6 +550,7 @@ def makepath(path):
     from holger@trillke.net 2002/03/18
 
     """
+    import os
     dpath = os.path.normpath(os.path.dirname(path))
     if not os.path.exists(dpath): 
         os.makedirs(dpath)
@@ -563,6 +564,7 @@ def datafilepath(*filename):
     directories in the path that do not already exist are created.
 
     """
+    import os.path
     return makepath(os.path.join(base_dir, *filename))
 
 def shortpath(path):
