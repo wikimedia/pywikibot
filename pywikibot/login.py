@@ -42,14 +42,12 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id$'
+__version__ = '$Id$'
 
 import logging
-import re
-import urllib2
 import pywikibot
 from pywikibot import config
-from pywikibot.exceptions import *
+from pywikibot.exceptions import NoSuchSite, NoUsername
 
 logger = logging.getLogger("wiki.login")
 
@@ -221,7 +219,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         pass
 
 def main(*args):
-    username = password = None
+    password = None
     sysop = False
     logall = False
     forceLogin = False
@@ -251,13 +249,12 @@ def main(*args):
                 try:
                     site = pywikibot.getSite(code=lang, fam=familyName)
                     if not forceLogin and (site.logged_in(sysop) and site.user()) != None:
-                        pywikibot.output(u'Already logged in on %(site)s'
-                                          % locals())
+                        pywikibot.output(u'Already logged in on %s' % site)
                     else:
                         loginMan = LoginManager(password, sysop=sysop,
                                                 site=site)
                         loginMan.login()
-                except pywikibot.NoSuchSite:
+                except NoSuchSite:
                     pywikibot.output(
                         lang + u'.' + familyName +
 u' is not a valid site, please remove it from your config')
