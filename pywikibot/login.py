@@ -163,9 +163,10 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         ("en", "wikipedia", "my_en_user", "my_en_pass")
 
         """
-        file = open(config.password_file)
-        for line in file:
-            if not line.strip(): continue
+        password_f = open(config.password_file)
+        for line in password_f:
+            if not line.strip(): 
+                continue
             entry = eval(line)
             if len(entry) == 2:
                 if entry[0] == self.username:
@@ -175,7 +176,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                         entry[1] == self.site.family.name and \
                         entry[2] == self.username:
                     self.password = entry[3]
-        file.close()
+        password_f.close()
 
     def login(self, retry = False):
         if not self.password:
