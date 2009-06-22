@@ -91,6 +91,7 @@ class EditConflict(PageNotSaved):
 class SpamfilterError(PageNotSaved):
     """Saving the page has failed because the MediaWiki spam filter detected a blacklisted URL."""
     def __init__(self, arg):
+        super(SpamfilterError, self).__init__(u'MediaWiki spam filter has been triggered')
         self.url = arg
         self.args = arg,
 
