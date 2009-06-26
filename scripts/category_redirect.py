@@ -406,7 +406,13 @@ aanjepaß krijje:
             if page.isCategoryRedirect():
                 # this is already a soft-redirect, so skip it (for now)
                 continue
-            target = page.getRedirectTarget()
+            try:
+                target = page.getRedirectTarget()
+            except pywikibot.CircularRedirect:
+                target = page
+                problems.append(
+                    u"# %s is a self-linked redirect"
+                     % page.title(asLink=True, textlink=True))
             if target.namespace() == 14:
                 # this is a hard-redirect to a category page
                 newtext = (u"{{%(template)s|%(cat)s}}"
