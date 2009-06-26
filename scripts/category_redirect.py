@@ -23,7 +23,6 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import pagegenerators
-import simplejson
 import cPickle
 import math
 import re

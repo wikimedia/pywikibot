@@ -11,7 +11,10 @@ __version__ = '$Id$'
 
 from UserDict import DictMixin
 from datetime import datetime, timedelta
-import simplejson as json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 import logging
 import re
 import traceback
