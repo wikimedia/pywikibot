@@ -895,6 +895,11 @@ class APISite(BaseSite):
 
         return self.siteinfo['case']
 
+    def dbName(self):
+        """Return this site's internal id."""
+
+        return self.siteinfo['wikiid']
+
     def language(self):
         """Return the code for the language of this Site."""
 
@@ -1153,7 +1158,7 @@ class APISite(BaseSite):
             blgen.request["gblfilterredir"] = filterRedirects and "redirects"\
                                                               or "nonredirects"
         if followRedirects:
-            # bug: see http://bugzilla.wikimedia.org/show_bug.cgi?id=16218
+            # bug: see http://bugzilla.wikimedia.org/show_bug.cgi?id=7304
             # links identified by MediaWiki as redirects may not really be,
             # so we have to check each "redirect" page and see if it
             # really redirects to this page
