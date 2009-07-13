@@ -605,9 +605,13 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
     for i in xrange(len(namespaces)):
         ns = namespaces[i]
         if isinstance(ns, basestring):
-            index = site.getNamespaceIndex(ns)
-            if index is None:
-                raise ValueError(u'Unknown namespace: %s' % ns)
+            try:
+                # namespace might be given as str representation of int
+                index = int(ns)
+            except ValueError:
+                index = site.getNamespaceIndex(ns)
+                if index is None:
+                    raise ValueError(u'Unknown namespace: %s' % ns)
             namespaces[i] = index
     for page in generator:
         if page.namespace() in namespaces:
