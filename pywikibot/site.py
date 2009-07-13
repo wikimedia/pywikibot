@@ -14,6 +14,7 @@ import pywikibot
 from pywikibot import deprecate_arg
 from pywikibot import config
 from pywikibot import deprecated
+from pywikibot import pagegenerators
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import *
