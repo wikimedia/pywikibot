@@ -413,6 +413,10 @@ aanjepaß krijje:
                 problems.append(
                     u"# %s is a self-linked redirect"
                      % page.title(asLink=True, textlink=True))
+            except RuntimeError:
+                # race condition: someone else removed the redirect while we
+                # were checking for it
+                continue
             if target.namespace() == 14:
                 # this is a hard-redirect to a category page
                 newtext = (u"{{%(template)s|%(cat)s}}"
