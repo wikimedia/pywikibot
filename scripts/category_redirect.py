@@ -334,7 +334,7 @@ aanjepaß krijje:
                     sorted(log_items.iteritems(), reverse=True)[:LOG_SIZE-1]]
         log_text = "\n".join("\n".join(line for line in text) for text in keep)
         # get permalink to older logs
-        history = self.log_page.getVersionHistory(revCount=LOG_SIZE)
+        history = self.log_page.getVersionHistory(total=LOG_SIZE)
         # get the id of the newest log being archived
         rotate_revid = history[-1][0]
         # append permalink
@@ -372,7 +372,7 @@ aanjepaß krijje:
         except IOError:
             record = {}
         if record:
-            cPickle.dump(record, open(datafile + ".bak", "wb"))
+            cPickle.dump(record, open(datafile + ".bak", "wb"), -1)
 
         try:
             template_list = self.redir_templates[self.site.family.name
@@ -590,7 +590,7 @@ aanjepaß krijje:
                     % (self.catprefix, cat_title, found, moved))
             counts[cat_title] = found
 
-        cPickle.dump(record, open(datafile, "wb"))
+        cPickle.dump(record, open(datafile, "wb"), -1)
 
         pywikibot.setAction(pywikibot.translate(self.site.lang,
                                                 self.maint_comment))
