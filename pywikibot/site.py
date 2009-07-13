@@ -1302,8 +1302,15 @@ class APISite(BaseSite):
                                 type_arg="categorymembers",
                                 gcmtitle=cmtitle,
                                 gcmprop="ids|title|sortkey",
-                                namespaces=namespaces, step=step,
+#                                namespaces=namespaces,
+                                step=step,
                                 total=total)
+#       workaround for https://bugzilla.wikimedia.org/show_bug.cgi?id=19640:
+        if namespaces:
+            if not isinstance(namespaces, list):
+                namespaces = [namespaces]
+            cmgen = pagegenerators.NamespaceFilterPageGenerator(
+                        cmgen, namespaces, site=self)
         return cmgen
 
     def loadrevisions(self, page=None, getText=False, revids=None,
