@@ -417,7 +417,7 @@ class Page(object):
 
     def previousRevision(self):
         """Return the revision id for the previous revision of this Page."""
-        vh = self.getVersionHistory(revCount=2)
+        vh = self.getVersionHistory(total=2)
         revkey = sorted(self._revisions, reverse=True)[1]
         return revkey
 
