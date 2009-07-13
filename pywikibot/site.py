@@ -102,10 +102,14 @@ class BaseSite(object):
                 raise NoSuchSite("Language %s in family %s is obsolete"
                                  % (self.__code, self.__family.name))
         if self.__code not in self.languages():
-            if self.__code == 'zh-classic' and 'zh-classical' in self.languages():
+            if self.__code == 'zh-classic' \
+                    and 'zh-classical' in self.languages():
                 self.__code = 'zh-classical'
-                # database hack (database is varchar[10] -> zh-classical
-                # is cut to zh-classic.
+                # database hack (database is varchar[10], so zh-classical
+                # is cut to zh-classic)
+            elif self.__family.name in self.__family.langs.keys() \
+                    or len(self.__family.langs) == 1:
+                self.__code = self.__family.name
             else:
                 raise NoSuchSite("Language %s does not exist in family %s"
                                  % (self.__code, self.__family.name))
