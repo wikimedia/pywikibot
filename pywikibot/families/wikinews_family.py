@@ -1,5 +1,4 @@
 # -*- coding: utf-8  -*-
-import urllib
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -12,7 +11,7 @@ class Family(family.Family):
         self.name = 'wikinews'
 
         self.languages_by_size = [
-            'en', 'pl', 'de', 'it', 'sr', 'fr', 'pt', 'es', 'zh', 'sv',
+            'en', 'pl', 'de', 'sr', 'it', 'fr', 'pt', 'es', 'zh', 'sv',
             'ja', 'ru', 'nl', 'he', 'fi', 'sd', 'ar', 'cs', 'no', 'uk',
             'ca', 'hu', 'ro', 'th', 'bs', 'bg', 'ta',
         ]
@@ -42,7 +41,7 @@ class Family(family.Family):
         }
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['cs','hu',]
+        self.cross_allowed = ['cs', 'hu',]
 
     def code2encoding(self, code):
         return 'utf-8'

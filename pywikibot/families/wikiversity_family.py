@@ -1,5 +1,4 @@
 # -*- coding: utf-8  -*-
-import urllib
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -12,13 +11,12 @@ class Family(family.Family):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fr', 'de', 'cs', 'es', 'it', 'pt', 'el', 'fi',
+            'en', 'fr', 'de', 'beta', 'cs', 'es', 'it', 'pt', 'el', 'fi',
             'ja',
         ]
 
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wikiversity.org' % lang
-            self.langs['beta'] = 'beta.wikiversity.org'
 
     def version(self,code):
         return '1.16alpha'

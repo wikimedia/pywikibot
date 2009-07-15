@@ -1,5 +1,4 @@
 # -*- coding: utf-8  -*-
-import urllib
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -12,20 +11,20 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'fr', 'en', 'tr', 'lt', 'vi', 'ru', 'io', 'el', 'pl', 'zh',
+            'fr', 'en', 'tr', 'lt', 'vi', 'ru', 'io', 'zh', 'el', 'pl',
             'fi', 'no', 'hu', 'it', 'ta', 'sv', 'de', 'ko', 'lo', 'pt',
             'nl', 'ku', 'es', 'ja', 'id', 'te', 'et', 'ro', 'gl', 'bg',
             'vo', 'ar', 'uk', 'ca', 'is', 'sr', 'fa', 'af', 'li', 'scn',
-            'sw', 'fy', 'th', 'br', 'oc', 'he', 'simple', 'cs', 'sl', 'hy',
-            'sq', 'tt', 'la', 'zh-min-nan', 'da', 'ast', 'ur', 'kk', 'ml', 'hsb',
-            'ky', 'hr', 'wo', 'ang', 'eo', 'hi', 'tk', 'gn', 'ia', 'ga',
-            'az', 'co', 'sk', 'csb', 'st', 'ms', 'nds', 'kl', 'sd', 'ug',
-            'ti', 'mk', 'tl', 'an', 'my', 'gu', 'kn', 'ka', 'km', 'lv',
-            'ts', 'cy', 'qu', 'wa', 'fo', 'bs', 'am', 'rw', 'mr', 'eu',
-            'su', 'chr', 'mn', 'nah', 'ie', 'yi', 'om', 'be', 'gd', 'mg',
-            'sh', 'zu', 'iu', 'bn', 'nn', 'pa', 'si', 'mt', 'mi', 'tpi',
-            'dv', 'ps', 'jv', 'tg', 'so', 'roa-rup', 'ik', 'ha', 'gv', 'ss',
-            'kw', 'sa', 'ay', 'uz', 'na', 'ne', 'jbo', 'tn', 'sm', 'sg',
+            'sw', 'fy', 'th', 'br', 'oc', 'he', 'cs', 'simple', 'sl', 'hy',
+            'sq', 'tt', 'la', 'zh-min-nan', 'da', 'ast', 'ur', 'hsb', 'kk', 'wa',
+            'ml', 'ky', 'hr', 'wo', 'tk', 'ang', 'eo', 'kn', 'hi', 'gn',
+            'ga', 'ia', 'az', 'co', 'sk', 'csb', 'st', 'ms', 'nds', 'kl',
+            'sd', 'ug', 'ti', 'tl', 'mk', 'an', 'my', 'gu', 'ka', 'km',
+            'lv', 'ts', 'cy', 'qu', 'fo', 'bs', 'am', 'rw', 'eu', 'mr',
+            'su', 'chr', 'mn', 'nah', 'ie', 'yi', 'om', 'be', 'gd', 'sh',
+            'iu', 'mg', 'nn', 'zu', 'bn', 'pa', 'si', 'mt', 'tpi', 'dv',
+            'mi', 'jv', 'ps', 'roa-rup', 'tg', 'so', 'ik', 'ha', 'gv', 'uz',
+            'ss', 'kw', 'sa', 'ay', 'na', 'ne', 'jbo', 'tn', 'sm', 'sg',
             'lb', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
         ]
 
@@ -38,8 +37,8 @@ class Family(family.Family):
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
-            'ang','bg','bn','eo','fa','fy','gd','ia','ie','jv','ka','lt','mk',
-            'nl','no','sk','th','ti','ts','uk','vo','za','zh-min-nan','zh',
+            'ang', 'ast', 'bg', 'bn', 'eo', 'es', 'fa', 'fy', 'ga', 'gd', 'ia', 'ie', 'jv', 'ka', 'lt', 'mk',
+            'nl', 'no', 'sk', 'tg', 'th', 'ti', 'ts', 'ug', 'uk', 'vo', 'za', 'zh-min-nan', 'zh',
         ]
         self.obsolete = {
             'aa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wiktionary

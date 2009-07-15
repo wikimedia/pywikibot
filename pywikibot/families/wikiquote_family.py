@@ -1,5 +1,4 @@
 # -*- coding: utf-8  -*-
-import urllib
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -13,12 +12,12 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'it', 'de', 'pl', 'pt', 'sk', 'ru', 'bg', 'es', 'bs',
-            'sl', 'tr', 'he', 'lt', 'fr', 'cs', 'zh', 'uk', 'hu', 'id',
+            'sl', 'tr', 'he', 'lt', 'fr', 'cs', 'zh', 'hu', 'uk', 'id',
             'fa', 'sv', 'el', 'no', 'nl', 'ja', 'fi', 'eo', 'hy', 'et',
-            'ca', 'nn', 'simple', 'ka', 'ar', 'ku', 'hr', 'ko', 'ro', 'gl',
-            'ml', 'li', 'is', 'sr', 'af', 'th', 'te', 'da', 'sq', 'vi',
+            'nn', 'ca', 'simple', 'ka', 'ar', 'ku', 'hr', 'ko', 'ro', 'gl',
+            'sr', 'ml', 'li', 'is', 'th', 'af', 'te', 'da', 'sq', 'vi',
             'eu', 'az', 'la', 'br', 'hi', 'be', 'ast', 'uz', 'ang', 'zh-min-nan',
-            'lb', 'mr', 'su', 'ur', 'ta', 'wo', 'kn', 'ky', 'gu', 'cy',
+            'lb', 'mr', 'su', 'gu', 'ur', 'ta', 'wo', 'kn', 'ky', 'cy',
             'am', 'co', 'kk',
         ]
 

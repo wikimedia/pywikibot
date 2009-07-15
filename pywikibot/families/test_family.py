@@ -1,6 +1,9 @@
 # -*- coding: utf-8  -*-
 
-from pywikibot import family
+__version__ = '$Id$'
+from pywikibot import family, config
+
+import family, config
 
 # The test wikipedia family
 
@@ -11,6 +14,8 @@ class Family(family.Family):
         self.langs = {
             'test': 'test.wikipedia.org',
         }
+        if config.SSL_connection:
+            self.langs['test'] = None
 
     def version(self, code):
         return '1.13alpha'
