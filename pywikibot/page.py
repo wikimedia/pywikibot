@@ -640,6 +640,7 @@ class Page(object):
         """ # TODO: move this to Site object?
         if config.ignore_bot_templates: #Check the "master ignore switch"
             return True
+        username = self.site().user()
         try:
             templates = self.templatesWithParams();
         except (pywikibot.NoPage,
