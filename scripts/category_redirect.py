@@ -400,7 +400,8 @@ aanjepaß krijje:
         # with an appropriate template
         comment = pywikibot.translate(self.site.lang, self.redir_comment)
         for page in pagegenerators.PreloadingGenerator(
-                        self.site.allpages(namespace=14, filterredir=True)
+                        self.site.allpages(namespace=14, filterredir=True),
+                        step=250
                     ):
             # generator yields all hard redirect pages in namespace 14
             if page.isCategoryRedirect():
@@ -457,7 +458,7 @@ aanjepaß krijje:
         pywikibot.output(u"")
         pywikibot.output(u"Preloading %s category redirect pages"
                          % len(catpages))
-        for cat in pagegenerators.PreloadingGenerator(catpages):
+        for cat in pagegenerators.PreloadingGenerator(catpages, step=250):
             catdata = cat.categoryinfo
             if "size" in catdata and int(catdata['size']):
                 # save those categories that have contents
@@ -511,7 +512,7 @@ aanjepaß krijje:
 
         pywikibot.output(u"")
         pywikibot.output(u"Checking %s destination categories" % len(destmap))
-        for dest in pagegenerators.PreloadingGenerator(destmap):
+        for dest in pagegenerators.PreloadingGenerator(destmap, step=250):
             if not dest.exists():
                 for d in destmap[dest]:
                     problems.append("# %s redirects to %s"
