@@ -731,7 +731,7 @@ def update_page(page, pagedict):
             revision = pywikibot.page.Revision(
                                         revid=rev['revid'],
                                         timestamp=rev['timestamp'],
-                                        user=rev['user'],
+                                        user=rev.get('user', u''),
                                         anon='anon' in rev,
                                         comment=rev.get('comment',  u''),
                                         minor='minor' in rev,
