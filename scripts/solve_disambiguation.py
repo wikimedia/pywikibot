@@ -84,7 +84,7 @@ import re, sys, codecs
 # Application specific imports
 import pywikibot
 from pywikibot import config, pagegenerators
-from pywikibot.scripts import editarticle
+from scripts import editarticle
 
 # Summary message when working on disambiguation pages
 msg = {
@@ -456,7 +456,7 @@ class PrimaryIgnoreManager(object):
         self.ignorelist = []
         filename = config.datafilepath(
                               'disambiguations',
-                              self.disambPage.title(asFilename=True) + '.txt')
+                              self.disambPage.title(as_filename=True) + '.txt')
         try:
             # The file is stored in the disambiguation/ subdir.
             # Create if necessary.
