@@ -91,6 +91,9 @@ parameterHelp = """\
                   pages on several wiki sites, this is not well tested,
                   so check your edits!
 
+-limit:n          When used with any other argument that specifies a set
+                  of pages, work on no more than n pages in total
+
 -links            Work on all pages that are linked from a certain page.
                   Argument can also be given as "-links:linkingpagetitle".
 
@@ -117,6 +120,10 @@ parameterHelp = """\
 -prefixindex      Work on pages commencing with a common prefix.
 
 -regex            Obsolete, use -titleregex
+
+-step:n           When used with any other argument that specifies a set
+                  of pages, only retrieve n pages at a time from the wiki
+                  server
 
 -titleregex       Work on titles that match the given regular expression.
 
@@ -155,6 +162,8 @@ class GeneratorFactory(object):
     def __init__(self):
         self.gens = []
         self.namespaces = []
+        self.step = None
+        self.limit = None
 
     def getCombinedGenerator(self):
         """Return the combination of all accumulated generators.
@@ -162,14 +171,21 @@ class GeneratorFactory(object):
         Only call this after all arguments have been parsed.
         
         """
-        if self.namespaces:
-            namespaces = [int(n) for n in self.namespaces]
-            for i in xrange(len(self.gens)):
-                if isinstance(self.gens[i], pywikibot.data.api.QueryGenerator):
+        namespaces = [int(n) for n in self.namespaces]
+        for i in xrange(len(self.gens)):
+            if isinstance(self.gens[i], pywikibot.data.api.QueryGenerator):
+                if self.namespaces:
                     self.gens[i].set_namespace(namespaces)
-                else:
+                if self.step:
+                    self.gens[i].set_query_increment(self.step)
+                if self.limit:
+                    self.gens[i].set_maximum_items(self.limit)
+            else:
+                if self.namespaces:
                     self.gens[i] = NamespaceFilterPageGenerator(
                                        self.gens[i], namespaces)
+                if self.limit:
+                    self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
             return None
         elif len(self.gens) == 1:
@@ -281,6 +297,18 @@ class GeneratorFactory(object):
                     pywikibot.input(u'What namespace are you filtering on?'))
             else:
                 self.namespaces.extend(arg[len('-ns:'):].split(","))
+            return True
+        elif arg.startswith('-step'):
+            if len(arg) == len('-step'):
+                self.step = int(pywikibot.input("What is the step value?"))
+            else:
+                self.step = int(arg[len('-step:'):])
+            return True
+        elif arg.startswith('-limit'):
+            if len(arg) == len('-limit'):
+                self.limit = int(pywikibot.input("What is the limit value?"))
+            else:
+                self.limit = int(arg[len('-limit:'):])
             return True
         elif arg.startswith('-catr'):
             gen = self.getCategoryGen(arg, len("-catr"), recurse = True)
