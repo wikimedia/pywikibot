@@ -18,7 +18,7 @@ class Family(family.Family):
             self.langs['test'] = None
 
     def version(self, code):
-        return '1.13alpha'
+        return '1.16alpha-wmf'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

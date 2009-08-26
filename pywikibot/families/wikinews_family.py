@@ -11,9 +11,9 @@ class Family(family.Family):
         self.name = 'wikinews'
 
         self.languages_by_size = [
-            'en', 'pl', 'de', 'sr', 'it', 'fr', 'pt', 'es', 'zh', 'sv',
-            'ja', 'ru', 'nl', 'he', 'fi', 'sd', 'ar', 'cs', 'no', 'uk',
-            'ca', 'hu', 'ro', 'th', 'bs', 'bg', 'ta',
+            'en', 'sr', 'pl', 'it', 'de', 'fr', 'pt', 'es', 'zh', 'sv',
+            'ja', 'ru', 'nl', 'he', 'fi', 'ar', 'sd', 'cs', 'no', 'uk',
+            'hu', 'ca', 'ro', 'th', 'bs', 'bg', 'ta', 'tr'
         ]
 
         for lang in self.languages_by_size:
@@ -47,7 +47,7 @@ class Family(family.Family):
         return 'utf-8'
 
     def version(self, code):
-        return '1.16alpha'
+        return '1.16alpha-wmf'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

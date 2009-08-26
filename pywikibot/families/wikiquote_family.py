@@ -11,13 +11,13 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'it', 'de', 'pl', 'pt', 'sk', 'ru', 'bg', 'es', 'bs',
-            'sl', 'tr', 'he', 'lt', 'fr', 'cs', 'zh', 'hu', 'uk', 'id',
-            'fa', 'sv', 'el', 'no', 'nl', 'ja', 'fi', 'eo', 'hy', 'et',
-            'nn', 'ca', 'simple', 'ka', 'ar', 'ku', 'hr', 'ko', 'ro', 'gl',
+            'en', 'it', 'de', 'pl', 'pt', 'sk', 'ru', 'es', 'bg', 'bs',
+            'sl', 'tr', 'he', 'lt', 'fr', 'cs', 'zh', 'fa', 'hu', 'uk',
+            'id', 'sv', 'el', 'no', 'nl', 'ja', 'fi', 'eo', 'hy', 'et',
+            'nn', 'ca', 'simple', 'ka', 'ar', 'ku', 'ko', 'hr', 'ro', 'gl',
             'sr', 'ml', 'li', 'is', 'th', 'af', 'te', 'da', 'sq', 'vi',
             'eu', 'az', 'la', 'br', 'hi', 'be', 'ast', 'uz', 'ang', 'zh-min-nan',
-            'lb', 'mr', 'su', 'gu', 'ur', 'ta', 'wo', 'kn', 'ky', 'cy',
+            'lb', 'mr', 'gu', 'su', 'ur', 'ta', 'wo', 'kn', 'ky', 'cy',
             'am', 'co', 'kk',
         ]
 
@@ -106,7 +106,7 @@ class Family(family.Family):
         }
 
     def version(self, code):
-        return '1.16alpha'
+        return '1.16alpha-wmf'
 
     def code2encodings(self, code):
         """

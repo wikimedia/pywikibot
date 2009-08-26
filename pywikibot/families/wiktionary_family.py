@@ -13,18 +13,18 @@ class Family(family.Family):
         self.languages_by_size = [
             'fr', 'en', 'tr', 'lt', 'vi', 'ru', 'io', 'zh', 'el', 'pl',
             'fi', 'no', 'hu', 'it', 'ta', 'sv', 'de', 'ko', 'lo', 'pt',
-            'nl', 'ku', 'es', 'ja', 'id', 'te', 'et', 'ro', 'gl', 'bg',
-            'vo', 'ar', 'uk', 'ca', 'is', 'sr', 'fa', 'af', 'li', 'scn',
-            'sw', 'fy', 'th', 'br', 'oc', 'he', 'cs', 'simple', 'sl', 'hy',
-            'sq', 'tt', 'la', 'zh-min-nan', 'da', 'ast', 'ur', 'hsb', 'kk', 'wa',
-            'ml', 'ky', 'hr', 'wo', 'tk', 'ang', 'eo', 'kn', 'hi', 'gn',
+            'nl', 'ku', 'ja', 'es', 'id', 'te', 'ro', 'et', 'gl', 'bg',
+            'ca', 'ar', 'vo', 'uk', 'fa', 'is', 'sr', 'af', 'sw', 'scn',
+            'fy', 'th', 'br', 'oc', 'simple', 'li', 'cs', 'he', 'sl', 'hy',
+            'sq', 'tt', 'la', 'zh-min-nan', 'da', 'ast', 'tk', 'ur', 'wa', 'hsb',
+            'kk', 'ml', 'ky', 'hr', 'wo', 'kn', 'ang', 'eo', 'hi', 'gn',
             'ga', 'ia', 'az', 'co', 'sk', 'csb', 'st', 'ms', 'nds', 'kl',
-            'sd', 'ug', 'ti', 'tl', 'mk', 'an', 'my', 'gu', 'ka', 'km',
-            'lv', 'ts', 'cy', 'qu', 'fo', 'bs', 'am', 'rw', 'eu', 'mr',
-            'su', 'chr', 'mn', 'nah', 'ie', 'yi', 'om', 'be', 'gd', 'sh',
-            'iu', 'mg', 'nn', 'zu', 'bn', 'pa', 'si', 'mt', 'tpi', 'dv',
-            'mi', 'jv', 'ps', 'roa-rup', 'tg', 'so', 'ik', 'ha', 'gv', 'uz',
-            'ss', 'kw', 'sa', 'ay', 'na', 'ne', 'jbo', 'tn', 'sm', 'sg',
+            'sd', 'ug', 'ti', 'tl', 'mk', 'ka', 'an', 'my', 'gu', 'km',
+            'lv', 'cy', 'ts', 'qu', 'eu', 'fo', 'bs', 'am', 'rw', 'mr',
+            'su', 'chr', 'mn', 'nah', 'om', 'ie', 'yi', 'be', 'iu', 'mg',
+            'sh', 'gd', 'nn', 'bn', 'zu', 'si', 'pa', 'mt', 'dv', 'tpi',
+            'mi', 'roa-rup', 'jv', 'tg', 'ps', 'ik', 'so', 'uz', 'ha', 'gv',
+            'ss', 'kw', 'sa', 'ay', 'na', 'jbo', 'ne', 'tn', 'sm', 'sg',
             'lb', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
         ]
 
@@ -107,7 +107,7 @@ class Family(family.Family):
         self.interwiki_attop = ['pl']
 
     def version(self, code):
-        return '1.16alpha'
+        return '1.16alpha-wmf'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

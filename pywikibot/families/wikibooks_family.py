@@ -11,16 +11,16 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'hu', 'pt', 'ja', 'es', 'nl', 'it', 'pl',
-            'he', 'sq', 'fi', 'vi', 'ru', 'cs', 'hr', 'th', 'zh', 'da',
-            'sv', 'mk', 'tr', 'sr', 'fa', 'tl', 'id', 'is', 'ca', 'ta',
-            'ar', 'no', 'ko', 'eo', 'ka', 'simple', 'bg', 'gl', 'lt', 'ro',
+            'en', 'de', 'fr', 'zh', 'no', 'hu', 'pt', 'ja', 'es', 'it',
+            'nl', 'pl', 'sq', 'he', 'fi', 'vi', 'ru', 'cs', 'hr', 'da',
+            'sv', 'mk', 'th', 'tr', 'sr', 'fa', 'tl', 'ca', 'id', 'is',
+            'ta', 'ar', 'ko', 'eo', 'ka', 'simple', 'bg', 'gl', 'lt', 'ro',
             'sk', 'la', 'el', 'ia', 'ang', 'sl', 'et', 'mr', 'cv', 'ur',
-            'oc', 'ml', 'uk', 'ms', 'eu', 'fy', 'lv', 'hi', 'ie', 'tg',
-            'bn', 'hy', 'af', 'az', 'te', 'pa', 'bs', 'ky', 'be', 'sa',
-            'zh-min-nan', 'ast', 'cy', 'tt', 'mg', 'km', 'si', 'ku', 'co', 'sw',
-            'tk', 'ne', 'als', 'uz', 'vo', 'su', 'na', 'mn', 'lb', 'kn',
-            'ps', 'xh', 'kk', 'za', 'nds', 'wa', 'zu', 'my',
+            'oc', 'ml', 'ms', 'uk', 'eu', 'fy', 'ie', 'hi', 'tg', 'bn',
+            'hy', 'af', 'az', 'te', 'pa', 'bs', 'ky', 'be', 'sa', 'zh-min-nan',
+            'ast', 'cy', 'tt', 'mg', 'si', 'ku', 'co', 'tk', 'sw', 'ne',
+            'als', 'su', 'uz', 'vo', 'na', 'kn', 'mn', 'kk', 'za', 'nds',
+            'zu', 'my',
         ]
 
         for lang in self.languages_by_size:
@@ -96,7 +96,7 @@ class Family(family.Family):
         self.cross_allowed = ['fa', 'fy', 'it', 'ru', 'simple', 'zh']
 
     def version(self, code):
-        return '1.16alpha'
+        return '1.16alpha-wmf'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
