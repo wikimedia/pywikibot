@@ -1,30 +1,18 @@
-# -*- coding: utf-8  -*-
-#
-# (C) Pywikipedia bot team, 2005-2008
-#
-# Distributed under the terms of the MIT license.
-#
+
 __version__ = '$Id$'
 
 import sys; sys.path.append('..')
 
-import config, re, sys
-from wxPython.wx import *
+import re
+import terminal_interface
+import wx
 
-        
+app = wx.App()
 
-class UI:
+class UI(terminal_interface.UI):
     def __init__(self):
         pass
-
-    def output(self, text, ):
-        """
-        If a character can't be displayed, it will be replaced with a
-        question mark.
-        """
-        # comma at the end means "don't print newline"
-        print text.encode(config.console_encoding, 'replace'),
-
+    
     def input(self, question, password = False):
         """
         Works like raw_input(), but returns a unicode string instead of ASCII.
@@ -33,27 +21,44 @@ class UI:
         question.
         """
         # TODO: hide input if password = True
-        answer = dialog = wxTextEntryDialog ( None, 'question', 'Title Here', '' )
+        
+        self.output(question)
+        if password:
+            answer = wx.PasswordEntryDialog( None, question, '','')
+        else:
+            answer = wx.TextEntryDialog( None, question, '', '' )
+        answer.ShowModal()
+        self.output(answer+'\n')
+        #tkSimpleDialog.askstring('title', question)
+        return answer.GetValue() or ''
 
-#tkSimpleDialog.askstring('title', question)
-        return answer or ''
-
-    def inputChoice(self, question, options, hotkeys):
-        goodAnswer = False
-        while not goodAnswer:
-            for i in range(len(options)):
-                option = options[i]
-                hotkey = hotkeys[i]
-                m = re.search('[%s%s]' % (hotkey.lower(), hotkey.upper()), option)
-                if m:
-                    pos = m.start()
-                    options[i] = '%s[%s]%s' % (option[:pos], option[pos], option[pos+1:])
-                else:
-                    options[i] = '%s [%s]' % (option, hotkey)
-
-            prompt = '%s (%s)' % (question, ', '.join(options))
-            answer = self.input(prompt)
+    def inputChoice(self, question, options, hotkeys, default = None):
+        for i in range(len(options)):
+            option = options[i]
+            hotkey = hotkeys[i]
+            m = re.search('[%s%s]' % (hotkey.lower(), hotkey.upper()), option)
+            if m:
+                pos = m.start()
+                options[i] = '%s[%s]%s' % (option[:pos], option[pos], option[pos+1:])
+            else:
+                options[i] = '%s [%s]' % (option, hotkey)
+        
+        while True:
+            prompt = '%s\n(%s)' % (question, ', '.join(options))
+            self.output('%s (%s)' % (question, ', '.join(options)))
+            answer = wx.TextEntryDialog(None, prompt, question, '')
+            answer.ShowModal()
+            answer = answer.GetValue()
+            self.output(answer+'\n')
+            
             if answer.lower() in hotkeys or answer.upper() in hotkeys:
                 return answer
-ui = UI()
-print ui.input('Test?')
+            elif default and answer=='':# empty string entered
+                return default
+
+if __name__ == '__main__':
+    ui = UI()
+    print ui.input('Test?')
+
+app.MainLoop()
+
