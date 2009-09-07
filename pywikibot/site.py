@@ -2187,16 +2187,23 @@ redirects on %(site)s wiki""",
         except NoPage:
             lastrev = None
             if not recreate:
-                raise 
+                raise
         token = self.token(page, "edit")
+        # getting token also updates the 'lastrevid' value, which allows us to
+        # detect if page has been changed since last time text was retrieved.
+        
+        # note that the server can still return an 'editconflict' error
+        # if the page is updated after the token is retrieved but
+        # before the page is saved.
         self.lock_page(page)
         if lastrev is not None and page.latestRevision() != lastrev:
-            raise Error("editpage: Edit conflict detected; saving aborted.")
+            raise EditConflict(
+                "editpage: Edit conflict detected; saving aborted.")
         req = api.Request(site=self, action="edit",
                           title=page.title(withSection=False),
                           text=text, token=token, summary=summary)
-##        if lastrev is not None:
-##            req["basetimestamp"] = page._revisions[lastrev].timestamp
+        if lastrev is not None:
+            req["basetimestamp"] = page._revisions[lastrev].timestamp
         if minor:
             req['minor'] = ""
         elif notminor:
