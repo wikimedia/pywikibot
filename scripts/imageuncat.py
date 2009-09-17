@@ -1270,37 +1270,11 @@ def recentChanges(site = None, delay=0, block=70):
     Should probably copied to somewhere else
     '''
     
-    result = []
-    dateformat ="%Y-%m-%dT%H:%M:%SZ"
-    rcstart = datetime.utcnow() + timedelta(minutes=-delay-block)
-    rcend = datetime.utcnow() + timedelta(minutes=-delay)
+    rcstart = site.getcurrenttime() + timedelta(minutes=-delay-block)
+    rcend = site.getcurrenttime() + timedelta(minutes=-delay)
 
     return site.recentchanges(start=rcstart, end=rcend, reverse=True, namespaces=6, changetype='edit|log', showBot=False) 
-    '''
-    params = {
-        'action'    :'query',
-        'list'      :'recentchanges',
-        'rcstart'   :rcstart.strftime(dateformat),
-        'rcend'     :rcend.strftime(dateformat),
-        'rcdir'     :'newer',
-        'rcnamespace':'6',
-        'rcprop'    :'title',
-        'rcshow'    :'!bot',
-        'rclimit'   :'5000',
-        'rctype'    :'edit|log',
-        }
 
-    data = query.GetData(params, site, encodeTitle = False)
-    try:
-        for item in data['query']['recentchanges']:
-            result.append(item['title'])
-    except IndexError:
-        raise NoPage(u'API Error, nothing found in the APIs')
-    except KeyError:
-        raise NoPage(u'API Error, nothing found in the APIs')
-
-    return pagegenerators.PagesFromTitlesGenerator(result, site)
-    '''
 def isUncat(page):
     '''
     Do we want to skip this page?
