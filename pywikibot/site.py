@@ -2514,8 +2514,10 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
     def newimages(self, number=100, lestart=None, leend=None, leuser=None,
                   letitle=None):
         """Yield ImagePages from most recent uploads"""
+        if isinstance(letitle, basestring):
+            letitle = pywikbot.Page(pywikibot.Link(letitle))
         return self.logevents(logtype="upload", total=number, start=lestart,
-                              end=leend, user=leuser, title=letitle)
+                              end=leend, user=leuser, page=letitle)
 
     def getImagesFromAnHash(self, hash_found=None):
         """Return all images that have the same hash.

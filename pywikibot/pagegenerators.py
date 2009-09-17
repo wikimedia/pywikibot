@@ -67,22 +67,12 @@ parameterHelp = """\
 -filelinks        Work on all pages that use a certain image/media file.
                   Argument can also be given as "-filelinks:filename".
 
--yahoo            Work on all pages that are found in a Yahoo search.
-                  Depends on python module pYsearch.  See yahoo_appid in
-                  config.py for instructions.
-
 -search           Work on all pages that are found in a MediaWiki search
                   across all namespaces.
 
--google           Work on all pages that are found in a Google search.
-                  You need a Google Web API license key. Note that Google
-                  doesn't give out license keys anymore. See google_key in
-                  config.py for instructions.
-                  Argument can also be given as "-google:searchstring".
-
 -namespace -ns    Filter the page generator to only yield pages in the
                   specified namespaces.  Separate multiple namespace
-                  numbers with commas.
+                  numbers with commas. Example "-ns:0,2,4"
 
 -interwiki        Work on the given page and all equivalent pages in other
                   languages. This can, for example, be used to fight
@@ -97,14 +87,18 @@ parameterHelp = """\
 -links            Work on all pages that are linked from a certain page.
                   Argument can also be given as "-links:linkingpagetitle".
 
--new              Work on the 60 newest pages. If given as -new:x, will work
-                  on the x newest pages.
-
 -imagelinks       Work on all images that are linked from a certain page.
                   Argument can also be given as "-imagelinks:linkingpagetitle".
 
 -newimages        Work on the 100 newest images. If given as -newimages:x,
                   will work on the x newest images.
+
+-newpages         Work on the most recent new pages. If given as -newpages:x,
+                  will work on the x newest pages.
+
+-recentchanges    Work on the pages with the most recent changes. If
+                  given as -recentchanges:x, will work on the x most recently
+                  changed pages.
 
 -ref              Work on all pages that link to a certain page.
                   Argument can also be given as "-ref:referredpagetitle".
@@ -148,6 +142,16 @@ parameterHelp = """\
 -withoutinterwiki Work on all pages that don't have interlanguage links.
                   Argument can be given as "-withoutinterwiki:n" where
                   n is some number (??).
+
+-google           Work on all pages that are found in a Google search.
+                  You need a Google Web API license key. Note that Google
+                  doesn't give out license keys anymore. See google_key in
+                  config.py for instructions.
+                  Argument can also be given as "-google:searchstring".
+
+-yahoo            Work on all pages that are found in a Yahoo search.
+                  Depends on python module pYsearch.  See yahoo_appid in
+                  config.py for instructions.
 """
 
 docuReplacements = {'&params;': parameterHelp}
@@ -395,12 +399,17 @@ class GeneratorFactory(object):
         elif arg.startswith('-newimages'):
             limit = arg[11:] or pywikibot.input(
                 u'How many images do you want to load?')
-            gen = NewimagesPageGenerator(number=int(limit))
-        elif arg.startswith('-new'):
-            if len(arg) >=5:
-              gen = NewpagesPageGenerator(number=int(arg[5:]))
+            gen = NewimagesPageGenerator(total=int(limit))
+        elif arg.startswith('-newpages'):
+            if len(arg) >= 10:
+              gen = NewpagesPageGenerator(total=int(arg[10:]))
             else:
-              gen = NewpagesPageGenerator(number=60)
+              gen = NewpagesPageGenerator(total=60)
+        elif arg.startswith('-recentchanges'):
+            if len(arg) >= 15:
+              gen = RecentChangesPageGenerator(total=int(arg[15:]))
+            else:
+              gen = RecentChangesPageGenerator(total=60)
         elif arg.startswith('-imagelinks'):
             imagelinkstitle = arg[len('-imagelinks:'):]
             if not imagelinkstitle:
@@ -487,8 +496,50 @@ def NewpagesPageGenerator(get_redirect=False, repeat=False, site=None,
     # defaults to namespace 0 because that's how Special:Newpages defaults
     if site is None:
         site = pywikibot.Site()
-    return site.recentchanges(showRedirects=get_redirect, changetype="new",
-                              namespaces=0, step=step, total=total)
+    for item in site.recentchanges(showRedirects=get_redirect,
+                     changetype="new", namespaces=0, step=step, total=total):
+        yield pywikibot.Page(pywikibot.Link(item["title"], site))
+
+
+def RecentChangesPageGenerator(start=None, end=None, reverse=False,
+                               namespaces=None, pagelist=None,
+                               changetype=None, showMinor=None,
+                               showBot=None, showAnon=None,
+                               showRedirects=None, showPatrolled=None,
+                               step=None, total=None, site=None):
+    """Generate pages that are in the recent changes list.
+
+    @param start: Timestamp to start listing from
+    @param end: Timestamp to end listing at
+    @param reverse: if True, start with oldest changes (default: newest)
+    @param limit: iterate no more than this number of entries
+    @param pagelist: iterate changes to pages in this list only
+    @param pagelist: list of Pages
+    @param changetype: only iterate changes of this type ("edit" for
+        edits to existing pages, "new" for new pages, "log" for log
+        entries)
+    @param showMinor: if True, only list minor edits; if False (and not
+        None), only list non-minor edits
+    @param showBot: if True, only list bot edits; if False (and not
+        None), only list non-bot edits
+    @param showAnon: if True, only list anon edits; if False (and not
+        None), only list non-anon edits
+    @param showRedirects: if True, only list edits to redirect pages; if
+        False (and not None), only list edits to non-redirect pages
+    @param showPatrolled: if True, only list patrolled edits; if False
+        (and not None), only list non-patrolled edits
+
+    """
+    if site is None:
+        site = pywikibot.Site()
+    for item in site.recentchanges(start=start, end=end, reverse=reverse,
+                                   namespaces=namespaces, pagelist=pagelist,
+                                   changetype=changetype, showMinor=showMinor,
+                                   showBot=showBot, showAnon=showAnon,
+                                   showRedirects=showRedirects,
+                                   showPatrolled=showPatrolled,
+                                   step=step, total=total):
+        yield pywikibot.Page(pywikibot.Link(item["title"], site))
 
 
 def FileLinksGenerator(referredImagePage, step=None, total=None):
@@ -722,6 +773,16 @@ def PreloadingGenerator(generator, step=50):
             for i in site.preloadpages(sites[site], step):
                 yield i
 
+
+def NewimagesPageGenerator(step=None, total=None, site=None):
+    if site is None:
+        site = pywikibot.Site()
+    for entry in site.logevents(logtype="upload", step=step, total=total):
+        # entry is an UploadEntry object
+        # entry.title() returns a Page object
+        yield entry.title()
+
+
 #TODO below
 
 def UnusedFilesGenerator(number=100, repeat=False, site=None, extension=None):
@@ -748,13 +809,6 @@ def UnCategorizedImageGenerator(number = 100, repeat = False, site = None):
         site = pywikibot.Site()
     for page in site.uncategorizedimages(number=number, repeat=repeat):
         yield page
-
-def NewimagesPageGenerator(number = 100, repeat = False, site = None):
-    if site is None:
-        site = pywikibot.Site()
-    for tuple in site.newimages(number, repeat=repeat):
-        # tuple is ImagePage, date, user comment
-        yield tuple[0]
 
 def UnCategorizedPageGenerator(number = 100, repeat = False, site = None):
     if site is None:
