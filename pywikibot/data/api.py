@@ -671,7 +671,8 @@ class LoginManager(login.LoginManager):
         """
         if hasattr(self, '_waituntil'):
             if datetime.now() < self._waituntil:
-                time.sleep(self._waituntil - datetime.now())
+                diff = self._waituntil - datetime.now()
+                time.sleep(diff.seconds)
         login_request = Request(site=self.site,
                                 action="login",
                                 lgname=self.username,
