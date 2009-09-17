@@ -672,6 +672,9 @@ class LoginManager(login.LoginManager):
         if hasattr(self, '_waituntil'):
             if datetime.now() < self._waituntil:
                 diff = self._waituntil - datetime.now()
+                pywikibot.output(u"Too many tries, waiting %s seconds before retrying."
+                                % diff.seconds,
+                                level=pywikibot.WARNING)
                 time.sleep(diff.seconds)
         login_request = Request(site=self.site,
                                 action="login",
