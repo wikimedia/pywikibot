@@ -1273,7 +1273,11 @@ def recentChanges(site = None, delay=0, block=70):
     rcstart = site.getcurrenttime() + timedelta(minutes=-delay-block)
     rcend = site.getcurrenttime() + timedelta(minutes=-delay)
 
-    return site.recentchanges(start=rcstart, end=rcend, reverse=True, namespaces=6, changetype='edit|log', showBot=False) 
+    gen = site.recentchanges(start=rcstart, end=rcend, reverse=True, namespaces=6, changetype='edit|log', showBot=False) 
+    # remove 'patrolled' from rcprop since we can't get it
+    gen.request['rcprop'] = 'title|user|comment|ids'
+    for p in gen:
+        yield pywikibot.Page(site, p['title'], p['ns'])
 
 def isUncat(page):
     '''
@@ -1342,7 +1346,7 @@ def main(args):
     if not generator:
         pywikibot.output('You have to specify the generator you want to use for the program!')
     else:
-        pregenerator = pagegenerators.PreloadingGenerator(generator)
+        pregenerator = site.preloadpages(generator)
         for page in pregenerator:
             print page.title()
             if page.exists() and (page.namespace() == 6) and (not page.isRedirectPage()) :
