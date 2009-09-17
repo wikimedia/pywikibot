@@ -1298,7 +1298,7 @@ def isUncat(page):
 
     for templateWithTrail in page.templates():
         #Strip of trailing garbage
-        template = templateWithTrail.rstrip('\n').rstrip()
+        template = templateWithTrail.title().rstrip('\n').rstrip()
         if template in skipTemplates:
             # Already tagged with a template, skip it
             pywikibot.output(u'Already tagged, skip it')
@@ -1350,7 +1350,7 @@ def main(*args):
     else:
         pregenerator = site.preloadpages(generator)
         for page in pregenerator:
-            print page.title()
+            pywikibot.output(page.title())
             if page.exists() and (page.namespace() == 6) \
                    and (not page.isRedirectPage()) :
                 if isUncat(page):
