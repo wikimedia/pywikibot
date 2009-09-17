@@ -1267,13 +1267,15 @@ def recentChanges(site = None, delay=0, block=70):
     '''
     Return a pagegenerator containing all the images edited in a certain timespan.
     The delay is the amount of minutes to wait and the block is the timespan to return images in.
-    Should probably copied to somewhere else
-    '''
+    Should probably be copied to somewhere else
     
+    '''
     rcstart = site.getcurrenttime() + timedelta(minutes=-delay-block)
     rcend = site.getcurrenttime() + timedelta(minutes=-delay)
 
-    gen = site.recentchanges(start=rcstart, end=rcend, reverse=True, namespaces=6, changetype='edit|log', showBot=False) 
+    gen = site.recentchanges(start=rcstart, end=rcend, reverse=True,
+                             namespaces=6, changetype='edit|log',
+                             showBot=False)
     # remove 'patrolled' from rcprop since we can't get it
     gen.request['rcprop'] = 'title|user|comment|ids'
     for p in gen:
@@ -1283,7 +1285,8 @@ def isUncat(page):
     '''
     Do we want to skip this page?
 
-    If we found a category which is not in the ignore list it means that the page is categorized so skip the page.
+    If we found a category which is not in the ignore list it means
+    that the page is categorized so skip the page.
     If we found a template which is in the ignore list, skip the page.
     '''
     pywikibot.output(u'Working on '+ page.title())
@@ -1324,37 +1327,37 @@ def addUncat(page):
         pass
     return
 
-def main(args):
+def main(*args):
     '''
     Grab a bunch of images and tag them if they are not categorized.
     '''
-    generator = None;
+    generator = None
     genFactory = pagegenerators.GeneratorFactory()
 
     site = pywikibot.getSite(u'commons', u'commons')
-    #pywikibot.setSite(site)
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handleArgs(*args):
         if arg.startswith('-yesterday'):
             generator = uploadedYesterday(site)
         elif arg.startswith('-recentchanges'):
             generator = recentChanges(site=site, delay=120)
         else:
             genFactory.handleArg(arg)
-    print 'bla'
     if not generator:
         generator = genFactory.getCombinedGenerator()
     if not generator:
-        pywikibot.output('You have to specify the generator you want to use for the program!')
+        pywikibot.output(
+          u'You have to specify the generator you want to use for the program!')
     else:
         pregenerator = site.preloadpages(generator)
         for page in pregenerator:
             print page.title()
-            if page.exists() and (page.namespace() == 6) and (not page.isRedirectPage()) :
+            if page.exists() and (page.namespace() == 6) \
+                   and (not page.isRedirectPage()) :
                 if isUncat(page):
                     addUncat(page)
 
 if __name__ == "__main__":
     try:
-        main(sys.argv[1:])
+        main()
     finally:
         pywikibot.stopme()
