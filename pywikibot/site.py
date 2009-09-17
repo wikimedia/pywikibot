@@ -116,6 +116,7 @@ class BaseSite(object):
                                  % (self.__code, self.__family.name))
 
         self._username = [user, sysop]
+        self.nocapitalize = self.code in self.family.nocapitalize
 
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Lock()
@@ -617,7 +618,6 @@ class APISite(BaseSite):
             }
         self.sitelock = threading.Lock()
         self._msgcache = {}
-        self.nocapitalize = self.code in self.family.nocapitalize
         # _loginstatus: -3 means login not yet attempted,
         #               -2 means login attempt in progress,
         #               -1 means not logged in (anon user),
@@ -1102,10 +1102,12 @@ class APISite(BaseSite):
                 logger.debug("Preloading %s" % pagedata)
                 try:
                     if pagedata['title'] not in cache:
-                        raise Error(
+                        pywikibot.output(
                         u"preloadpages: Query returned unexpected title '%s'"
-                             % pagedata['title']
+                             % pagedata['title'],
+                            level=pywikibot.WARNING
                         )
+                        continue
                 except KeyError:
                     logger.debug("No 'title' in %s" % pagedata)
                     logger.debug("pageids=%s" % pageids)
