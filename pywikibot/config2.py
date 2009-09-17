@@ -346,11 +346,6 @@ maxlag = 5
 # running solve_disambiguation.py with the -primary argument.
 special_page_limit = 500
 
-# Disable lagging, for debugging purposes.
-# If your bot has this variable activated in a production environment, it is
-# likely to be too aggressive and to get blocked by system admins.
-no_lagging = False
-
 ############## TABLE CONVERSION BOT SETTINGS ##############
 
 # will split long paragraphs for better reading the source.

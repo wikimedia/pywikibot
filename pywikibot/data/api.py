@@ -281,7 +281,7 @@ class Request(object, DictMixin):
             info = result["error"].pop("info", None)
             if code == "maxlag":
                 lag = lagpattern.search(info)
-                if lag and not config.no_lagging:
+                if lag:
                     pywikibot.output(
                         u"Pausing due to database lag: " + info,
                         level=pywikibot.VERBOSE)
