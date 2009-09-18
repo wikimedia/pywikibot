@@ -32,8 +32,6 @@ class Family(family.Family):
 
         self.obsolete = {
             'ang': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
-
-
             'dk': 'da',
             'ht': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
             'jp': 'ja',
@@ -58,18 +56,8 @@ class Family(family.Family):
             'el','fa','it','ko','no','zh'
         ]
 
-    def scriptpath(self, code):
-        if config.SSL_connection:
-            if code == '-':
-                return '/wikipedia/sources/w'
-            else:
-                return '/%s/%s/w' % (self.name, code)
-        else:
-            return '/w'
-
     def version(self, code):
         return '1.16alpha-wmf'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
-

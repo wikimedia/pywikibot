@@ -23,33 +23,36 @@ class Family:
         self.name = None
             # Updated from http://meta.wikimedia.org/wiki/Interwiki_sorting_order
         self.alphabetic = [
-            'af', 'ak', 'ace', 'als', 'am', 'ang', 'ab', 'ar', 'an', 'arc', 'roa-rup',
-            'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm', 'bn',
-            'zh-min-nan', 'nan', 'map-bms', 'ba', 'be', 'be-x-old', 'bh', 'bcl',
-            'bi', 'bar', 'bo', 'bs', 'br', 'bg', 'bxr', 'ca', 'cv', 'ceb', 'cs',
-            'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy', 'da', 'dk',
-            'pdc', 'de', 'dv', 'nv', 'dsb', 'dz', 'mh', 'et', 'el', 'eml', 'en',
-            'myv', 'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr', 'fy',
-            'ff', 'fur', 'ga', 'gv', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu',
-            'got', 'hak', 'xal', 'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb',
-            'hr', 'io', 'ig', 'ilo', 'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os',
-            'xh', 'zu', 'is', 'it', 'he', 'jv', 'kl', 'kn', 'kr', 'pam', 'ka',
-            'ks', 'csb', 'kk', 'kw', 'rw', 'ky', 'rn', 'sw', 'kv', 'kg', 'ht',
-            'ku', 'kj', 'lad', 'lbe', 'lo', 'la', 'lv', 'lb', 'lt', 'lij', 'li',
-            'ln', 'jbo', 'lg', 'lmo', 'hu', 'mk', 'mg', 'ml', 'mt', 'mi', 'mr',
-            'arz', 'mzn', 'ms', 'cdo', 'mwl', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah',
-            'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nap', 'ce',
-            'pih', 'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng',
-            'hz', 'uz', 'pa', 'pnb', 'pi', 'pag', 'pap', 'ps', 'km', 'pms', 'tpi',
-            'nds', 'pl', 'tokipona', 'tp', 'pnt', 'pt', 'aa', 'kaa', 'crh',
-            'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'sah', 'se', 'sm', 'sa',
-            'sg', 'sc', 'za', 'sco', 'stq', 'st', 'tn', 'sq', 'scn', 'si',
-            'simple', 'sd', 'ss', 'sk', 'cu', 'sl', 'szl', 'so', 'ckb', 'srn', 'sr',
-            'sh', 'su', 'fi', 'sv', 'tl', 'ta', 'kab', 'roa-tara', 'tt', 'te',
-            'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tr', 'tk',
-            'tw', 'udm', 'bug', 'uk', 'ur', 'ug', 'vec', 'vi', 'vo', 'fiu-vro',
-            'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo',
-            'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn'
+            'af', 'ak', 'ace', 'als', 'am', 'ang', 'ab', 'ar', 'an', 'arc',
+            'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm',
+            'bn', 'zh-min-nan', 'nan', 'map-bms', 'ba', 'be', 'be-x-old',
+            'bh', 'bcl', 'bi', 'bar', 'bo', 'bs', 'br', 'bg', 'bxr', 'ca',
+            'cv', 'ceb', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho',
+            'co', 'cy', 'da', 'dk', 'pdc', 'de', 'dv', 'nv', 'dsb', 'dz',
+            'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu',
+            'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga', 'gv',
+            'gd', 'gl', 'gan', 'ki', 'glk', 'gu', 'got', 'hak', 'xal', 'ko',
+            'ha', 'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'io', 'ig', 'ilo',
+            'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is',
+            'it', 'he', 'jv', 'kl', 'kn', 'kr', 'pam', 'ka', 'ks', 'csb',
+            'kk', 'kw', 'rw', 'ky', 'rn', 'sw', 'kv', 'kg', 'ht', 'ku',
+            'kj', 'lad', 'lbe', 'lo', 'la', 'lv', 'lb', 'lt', 'lij', 'li',
+            'ln', 'jbo', 'lg', 'lmo', 'hu', 'mk', 'mg', 'ml', 'mt', 'mi',
+            'mr', 'arz', 'mzn', 'ms', 'cdo', 'mwl', 'mdf', 'mo', 'mn',
+            'mus', 'my', 'nah', 'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne',
+            'new', 'ja', 'nap', 'ce', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov',
+            'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pnb',
+            'pi', 'pag', 'pap', 'ps', 'km', 'pms', 'tpi', 'nds', 'pl',
+            'tokipona', 'tp', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh',
+            'ro', 'rmy', 'rm', 'qu', 'ru', 'sah', 'se', 'sm', 'sa', 'sg',
+            'sc', 'za', 'sco', 'stq', 'st', 'tn', 'sq', 'scn', 'si',
+            'simple', 'sd', 'ss', 'sk', 'cu', 'sl', 'szl', 'so', 'ckb',
+            'srn', 'sr', 'sh', 'su', 'fi', 'sv', 'tl', 'ta', 'kab',
+            'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'tg', 'to', 'chr',
+            'chy', 've', 'tr', 'tk', 'tw', 'udm', 'bug', 'uk', 'ur', 'ug',
+            'vec', 'vi', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls',
+            'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea',
+            'bat-smg', 'zh', 'zh-tw', 'zh-cn'
         ]
 
         self.langs = {}
@@ -725,7 +728,7 @@ class Family:
         'fi': [u'ohjaus', u'uudelleenohjaus'],
         'fiu-vro': [u'saadaq'],
         'fr': [u'redirection'],
-        'frp': [u'redirection'],
+        'frp': [u'redirèccion', u'redirection'],
         'fur': [u'rinvia', u'rinvio'],
         'ga': [u'athsheoladh'],
         'gag': [u'yönlendirme'],
@@ -753,7 +756,8 @@ class Family:
         'kk-latn': [u'aýdaw', u'айдау'],
         'km': [u'\u1794\u1789\u17d2\u1787\u17bc\u1793\u1794\u1793\u17d2\u178f',
                u'\u1794\u17d2\u178f\u17bc\u179a\u1791\u17b8\u178f\u17b6\u17c6\u1784',
-               u'\u1794\u17d2\u178a\u17bc\u179a\u1785\u17c6\u178e\u1784\u1787\u17be\u1784'],
+               u'\u1794\u17d2\u178a\u17bc\u179a\u1785\u17c6\u178e\u1784\u1787\u17be\u1784',
+               u'ប្តូរទីតាំងទៅ'],
         'ko': [u'넘겨주기'],
         'ksh': [u'ömleidung'],
         'kv': [u'перенаправление', u'перенапр'],
@@ -778,6 +782,7 @@ class Family:
         'myv': [u'перенаправление', u'перенапр'],
         'mzn': [u'تغییرمسیر'],
         'nah': [u'redirección'],
+        'nap': [u'rinvia'],
         'nds': [u'wiederleiden', u'weiterleitung'],
         'nds-nl': [u'deurverwiezing', u'doorverwijzing'],
         'new': [u'पुनर्निर्देश'],
@@ -830,7 +835,7 @@ class Family:
         'vro': [u'saadaq', u'suuna'],
         'wa': [u'redirection'],
         'wo': [u'redirection'],
-        'yi': [u'הפניה', u'ווייטערפירן'],
+        'yi': [u'ווייטערפירן', u'הפניה'],
         'zea': [u'doorverwijzing']
     }
 
@@ -911,6 +916,8 @@ class Family:
 
     def ssl_pathprefix(self, code):
         """The path prefix for secure.wikimedia.org access."""
+        # Override this ONLY if the wiki family uses a different path
+        # pattern than /familyname/languagecode
         return "/%s/%s" % (self.name, code)
 
     def path(self, code):

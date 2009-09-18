@@ -135,6 +135,7 @@ class Family(family.Family):
             'az':  [u'Dəqiqləşdirmə'],
             'ba':  [u'Күп мәғәнәлелек'],
             'bar': [u'Begriffsklärung'],
+            'bcl': [u'Clarip'],
             'be':  [u'Неадназначнасць', u'Disambig'],
             'be-x-old':  [u'Неадназначнасць', u'Неадназначнасьць', u'Disambig'],
             'bg':  [u'Пояснение', u'Disambig'],
@@ -258,6 +259,7 @@ class Family(family.Family):
             'vls': [u'Db', u'Dp', u'Dpintro'],
             'vo':  [u'Telplänov'],
             'wa':  [u'Omonimeye', u'Disambig'],
+            'war': [u'Pansayod'],
             'wo':  [u'Bokktekki'],
             'yi':  [u'באדייטען'],
             'zea': [u'dp', u'Deurverwiespagina'],
@@ -344,19 +346,19 @@ class Family(family.Family):
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
-            'ab', 'ace', 'af', 'ak', 'als', 'am', 'ang', 'arc', 'arz', 'as', 'ast,', 'av', 'ay', 'az',
+            'ab', 'ace', 'af', 'ak', 'als', 'am', 'ang', 'arc', 'arz', 'as', 'ast', 'av', 'ay', 'az',
             'ba', 'bar', 'bcl', 'be-x-old', 'be', 'bg', 'bh', 'bi', 'bm', 'bo', 'bpy', 'bug', 'bxr',
-            'cbk-zam', 'cdo', 'ce', 'ch', 'chr', 'chy', 'ckb', 'co', 'crh', 'cr', 'csb', 'cu', 'cv', 'cy',
-            'diq', 'dsb', 'dz', 'ee', 'el', 'eml', 'eu', 'ext', 'fa', 'ff', 'fj', 'fo', 'frp', 'fur',
-            'ga', 'gan', 'glk', 'gn', 'got', 'gu', 'gv', 'ha', 'hak', 'haw', 'hif', 'hi', 'hsb', 'ht', 'hu', 'hy',
+            'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy', 'ckb', 'co', 'crh', 'cr', 'csb', 'cu', 'cv', 'cy',
+            'diq', 'dsb', 'dz', 'ee', 'el', 'eml', 'eo', 'et', 'eu', 'ext', 'fa', 'ff', 'fj', 'fo', 'frp', 'fur',
+            'ga', 'gan', 'gd', 'glk', 'gn', 'got', 'gu', 'gv', 'ha', 'hak', 'haw', 'hif', 'hi', 'hr', 'hsb', 'ht', 'hu', 'hy',
             'ia', 'id', 'ie', 'ig', 'ik', 'ilo', 'iow', 'is', 'iu', 'ja', 'jbo', 'jv',
-            'kaa', 'kab', 'ka', 'kg', 'ki', 'kl', 'km', 'kn', 'ko', 'ks', 'ku', 'kv', 'kw', 'ky',
+            'kaa', 'kab', 'ka', 'kg', 'ki', 'kk', 'kl', 'km', 'kn', 'ko', 'ks', 'ku', 'kv', 'kw', 'ky',
             'lad', 'lb', 'lbe', 'lg', 'li', 'lij', 'lmo', 'ln', 'lo', 'lv',
-            'map-bms', 'mdf', 'mg', 'mhr', 'mk', 'mn', 'ms', 'mt', 'mwl', 'myv', 'my', 'mzn',
-            'nah', 'na', 'nap', 'nds-nl', 'ne', 'new', 'ng', 'nl', 'nov', 'nrm', 'nv', 'ny', 'om', 'or', 'os',
-            'pam', 'pap', 'pa', 'pdc', 'pnb', 'pnt', 'ps', 'qu', 'rm', 'rmy', 'rn', 'roa-rup', 'roa-tara', 'rw',
-            'sah', 'sa', 'sc', 'sco', 'sd', 'se', 'sg', 'sh', 'simple', 'si', 'sk', 'sm', 'sn', 'so', 'srn', 'stq', 'st', 'su', 'sw', 'szl',
-            'ta', 'te', 'tet', 'tg', 'ti', 'tk', 'tn', 'to', 'tpi', 'ts', 'tt', 'tum', 'tw', 'ty',
+            'map-bms', 'mdf', 'mg', 'mhr', 'mi', 'mk', 'mn', 'ms', 'mt', 'mwl', 'myv', 'my', 'mzn',
+            'nah', 'na', 'nap', 'nds-nl', 'ne', 'new', 'ng', 'nl', 'nov', 'nrm', 'nv', 'ny', 'oc', 'om', 'or', 'os',
+            'pam', 'pap', 'pa', 'pag', 'pdc', 'pi', 'pms', 'pnb', 'pnt', 'ps', 'qu', 'rm', 'rmy', 'rn', 'roa-rup', 'roa-tara', 'rw',
+            'sah', 'sa', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'simple', 'si', 'sk', 'sm', 'sn', 'so', 'srn', 'stq', 'st', 'su', 'sw', 'szl',
+            'ta', 'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl', 'tn', 'to', 'tpi', 'ts', 'tt', 'tum', 'tw', 'ty',
             'udm', 'ug', 'uz', 've', 'vls', 'wa', 'war', 'wo', 'wuu',
             'xal', 'xh', 'yi', 'yo', 'za', 'zea', 'zh', 'zh-classical', 'zh-min-nan', 'zu',
         ]
@@ -403,6 +405,7 @@ class Family(family.Family):
             y = y.replace("y","i")+y.count("y")*"!"
             return cmp(x,y)
         self.fyinterwiki = self.alphabetic[:]
+        self.fyinterwiki.remove('nb')
         self.fyinterwiki.sort(fycomp)
 
         # Which languages have a special order for putting interlanguage links,
@@ -479,6 +482,7 @@ class Family(family.Family):
             '_default': {
                 'pt': [103],
                 'als': [105],
+                'ar': [105],
                 'en': [13],
                 'es': [105],
                 'fi': [5],
@@ -531,6 +535,9 @@ class Family(family.Family):
                 'pt': [0, 102],
                 'hr': [0, 102],
             },
+            'ar': {
+                '_default': [0, 100],
+            },
             'es': {
                 '_default': [0],
                 'pt': [0, 102],
@@ -552,6 +559,9 @@ class Family(family.Family):
                 '_default': [1],
                 'pt': [0, 103],
                 'hr': [0, 103],
+            },
+            'ar': {
+                '_default': [1, 101],
             },
             'es': {
                 '_default': [1],

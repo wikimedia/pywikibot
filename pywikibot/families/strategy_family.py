@@ -4,21 +4,25 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-# The test wikipedia family
+# The Wikimedia Strategy family
 
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)
-        self.name = 'test'
+        self.name = 'strategy'
         self.langs = {
-            'test': 'test.wikipedia.org',
+            'strategy': 'strategy.wikimedia.org',
         }
+        self.interwiki_forward = 'wikipedia'
 
     def version(self, code):
         return '1.16alpha-wmf'
+
+    def dbName(self, code):
+        return 'strategywiki_p'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
 
     def ssl_pathprefix(self, code):
-        return "/wikipedia/test"
+        return "/wikipedia/strategy"
