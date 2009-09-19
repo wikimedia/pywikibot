@@ -27,6 +27,9 @@ logger = logging.getLogger("wiki.page")
 reNamespace = re.compile("^(.+?) *: *(.*)$")
 
 
+# Note: Link objects (defined later on) represent a wiki-page's title, while
+# Page objects (defined here) represent the page itself, including its contents.
+
 class Page(object):
     """Page: A MediaWiki page
 
@@ -70,77 +73,80 @@ class Page(object):
 
         """
         if isinstance(source, pywikibot.site.BaseSite):
-            self._site = source
-            if ns not in source.namespaces():
-                raise pywikibot.Error(
-                      "Invalid namespace '%i' for site %s."
-                      % (ns, source.sitename()))
-            self._ns = ns
-            if ns and not title.startswith(source.namespace(ns)+u":"):
-                title = source.namespace(ns) + u":" + title
-            elif not ns and u":" in title:
-                pos = title.index(u':')
-                nsindex = source.ns_index(title[ :pos])
-                if nsindex:
-                    self._ns = nsindex
-                    # normalize namespace, in case an alias was used
-                    title = source.namespace(nsindex) + title[pos: ]
-            if u"#" in title:
-                title, self._section = title.split(u"#", 1)
-            else:
-                self._section = None
-            if not title:
-                raise pywikibot.Error(
-                      "Page object cannot be created from Site without title.")
-            self._title = title
+            self._link = Link(title, source=source, defaultNamespace=ns)
+##            self._site = source
+##            if ns not in source.namespaces():
+##                raise pywikibot.Error(
+##                      "Invalid namespace '%i' for site %s."
+##                      % (ns, source.sitename()))
+##            self._ns = ns
+##            if ns and not title.startswith(source.namespace(ns)+u":"):
+##                title = source.namespace(ns) + u":" + title
+##            elif not ns and u":" in title:
+##                pos = title.index(u':')
+##                nsindex = source.ns_index(title[ :pos])
+##                if nsindex:
+##                    self._ns = nsindex
+##                    # normalize namespace, in case an alias was used
+##                    title = source.namespace(nsindex) + title[pos: ]
+##            if u"#" in title:
+##                title, self._section = title.split(u"#", 1)
+##            else:
+##                self._section = None
+##            if not title:
+##                raise pywikibot.Error(
+##                      "Page object cannot be created from Site without title.")
+##            self._title = title
         elif isinstance(source, Page):
             # copy all of source's attributes to this object
             self.__dict__ = source.__dict__
             if title:
                 # overwrite title
-                if ":" in title:
-                    prefix = title[ :title.index(":")]
-                    self._ns = self._site.ns_index(prefix)
-                    if self._ns is None:
-                        self._ns = 0
-                    else:
-                        title = title[title.index(":")+1 : ].strip(" _")
-                        self._title = "%s:%s" % (
-                                         self.site().namespace(self._ns),
-                                         self._title)
-                else:
-                    self._ns = 0
-                if "#" in title:
-                    self._section = title[title.index("#") + 1 : ].strip(" _")
-                    title = title[ : title.index("#")].strip(" _")
-                self._title = title
+                self._link = Link(title, source=source, defaultNamespace=ns)
+##                if ":" in title:
+##                    prefix = title[ :title.index(":")]
+##                    self._ns = self._site.ns_index(prefix)
+##                    if self._ns is None:
+##                        self._ns = 0
+##                    else:
+##                        title = title[title.index(":")+1 : ].strip(" _")
+##                        self._title = "%s:%s" % (
+##                                         self.site().namespace(self._ns),
+##                                         self._title)
+##                else:
+##                    self._ns = 0
+##                if "#" in title:
+##                    self._section = title[title.index("#") + 1 : ].strip(" _")
+##                    title = title[ : title.index("#")].strip(" _")
+##                self._title = title
         elif isinstance(source, Link):
-            self._site = source.site
-            self._section = source.section
-            self._ns = source.namespace
-            self._title = source.title
-            # reassemble the canonical title from components
-            if self._ns:
-                self._title = "%s:%s" % (self.site().namespace(self._ns),
-                                         self._title)
+            self._link = source
+##            self._site = source.site
+##            self._section = source.section
+##            self._ns = source.namespace
+##            self._title = source.title
+##            # reassemble the canonical title from components
+##            if self._ns:
+##                self._title = "%s:%s" % (self.site().namespace(self._ns),
+##                                         self._title)
         else:
             raise pywikibot.Error(
                   "Invalid argument type '%s' in Page constructor: %s"
                   % (type(source), source))
-        if self._section is not None:
-            self._title = self._title + "#" + self._section
+##        if self._section is not None:
+##            self._title = self._title + "#" + self._section
         self._revisions = {}
 
-        # Always capitalize the first letter
-        self._title = self._title[:1].upper() + self._title[1:]
+##        # Always capitalize the first letter
+##        self._title = self._title[:1].upper() + self._title[1:]
 
     def site(self):
         """Return the Site object for the wiki on which this Page resides."""
-        return self._site
+        return self._link.site
 
     def namespace(self):
         """Return the number of the namespace of the page."""
-        return self._ns
+        return self._link.namespace
 
     @deprecate_arg("decode", None)
     @deprecate_arg("savetitle", "asUrl")
@@ -165,16 +171,9 @@ class Page(object):
             in filenames
 
         """
-        title = self._title
-        if not withNamespace and self._ns != 0:
-            title = title.split(u':', 1)[1]
-        if not withSection and self._section:
-            title = title.split(u'#', 1)[0]
-        if underscore or asUrl:
-            title = title.replace(u' ', u'_')
-        if asUrl:
-            encodedTitle = title.encode(self.site().encoding())
-            title = urllib.quote(encodedTitle)
+        title = self._link.canonical_title()
+        if withSection and self._link.section:
+            title = title + "#" + self._link.section
         if asLink:
             if forceInterwiki or (allowInterwiki and
                     (self.site().family.name != config.family
@@ -183,16 +182,25 @@ class Page(object):
                         and self.site().family.name != self.site().code:
                     return u'[[%s:%s:%s]]' % (self.site().family.name,
                                               self.site().code,
-                                              self._title)
+                                              title)
                 else:
                     # use this form for sites like commons, where the
                     # code is the same as the family name
                     return u'[[%s:%s]]' % (self.site().code,
-                                           self._title)
+                                           title)
             elif textlink and (self.isImage() or self.isCategory()):
                 return u'[[:%s]]' % title
             else:
                 return u'[[%s]]' % title
+        if not withNamespace and self.namespace() != 0:
+            title = self._link.title
+            if withSection and self._link.section:
+                title = title + "#" + self._link.section
+        if underscore or asUrl:
+            title = title.replace(u' ', u'_')
+        if asUrl:
+            encodedTitle = title.encode(self.site().encoding())
+            title = urllib.quote(encodedTitle)
         if as_filename:
             # Replace characters that are not possible in file names on some
             # systems.
@@ -210,10 +218,7 @@ class Page(object):
         any. If no section is present, return None.
 
         """
-        if self._section:
-            return self._section
-        else:
-            return None
+        return self._link.section
 
     def __str__(self):
         """Return a console representation of the pagelink."""
@@ -241,11 +246,11 @@ class Page(object):
         if not isinstance(other, Page):
             # especially, return -1 if other is None
             return -1
-        if self._site != other._site:
-            return cmp(self._site, other._site)
-        if self._ns != other._ns:
-            return cmp(self._ns, other._ns)
-        return cmp(self._title, other._title)
+        if self.site() != other.site():
+            return cmp(self.site(), other.site())
+        if self.namespace() != other.namespace():
+            return cmp(self.namespace(), other.namespace())
+        return cmp(self._link.title, other._link.title)
 
     def __hash__(self):
         # Pseudo method that makes it possible to store Page objects as keys

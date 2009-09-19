@@ -709,9 +709,9 @@ def DuplicateFilterPageGenerator(generator):
     seenPages = {}
     for page in generator:
         if page not in seenPages:
-            _page = u"%s:%s:%s" % (page._site.family.name,
-                                   page._site.code,
-                                   page._title)
+            _page = u"%s:%s:%s" % (page.site().family.name,
+                                   page.site().code,
+                                   page.title())
             seenPages[_page] = True
             yield page
 
