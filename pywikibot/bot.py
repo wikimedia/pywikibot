@@ -21,7 +21,7 @@ import os.path
 import sys
 
 # logging levels
-logger = logging.getLogger("bot")
+logger = logging.getLogger("pywiki.bot")
 
 from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 STDOUT = 16
@@ -53,9 +53,8 @@ class MaxLevelFilter(logging.Filter):
 # search for user interface module in the 'userinterfaces' subdirectory
 uiModule = __import__("pywikibot.userinterfaces.%s_interface"
                         % config.userinterface, 
-                        fromlist=['UI', 'TerminalHandler'] )
+                        fromlist=['UI'] )
 ui = uiModule.UI()
-TerminalHandler = uiModule.TerminalHandler
 
 
 class RotatingFileHandler(logging.handlers.RotatingFileHandler):
@@ -63,6 +62,7 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
     def format(self, record):
         text = logging.handlers.RotatingFileHandler.format(self, record)
         return text.rstrip("\r\n")
+
 
 class LoggingFormatter(logging.Formatter):
     def formatException(self, ei):
@@ -82,6 +82,7 @@ class LoggingFormatter(logging.Formatter):
             return strExc.decode(config.console_encoding) + '\n'
         else:
             return strExc + '\n'
+
 
 def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
     """Output a message to the user via the userinterface.
@@ -107,19 +108,13 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
 
     """
     # make sure logging system has been initialized
-    root = logging.getLogger()
+    root = logging.getLogger("pywiki")
     if root.level == 30: # init_handlers sets this level
-        init_handlers()
+        init_handlers(strm=ui.output_stream)
 
     if decoder:
         text = unicode(text, decoder)
     elif not isinstance(text, unicode):
-##        import traceback
-##        pywikibot.output(
-##            u"Non-unicode (%s) passed to wikipedia.output without decoder!\n"
-##             % type(text),
-##            level=VERBOSE
-##        )
         if not isinstance(text, str):
             # looks like text is a non-text object. 
             # Maybe it has a __unicode__ builtin ?
@@ -149,9 +144,9 @@ def input(question, password=False):
 
     """
     # make sure logging system has been initialized
-    root = logging.getLogger()
+    root = logging.getLogger("pywiki")
     if root.level == 30: # init_handlers sets this level
-        init_handlers()
+        init_handlers(strm=ui.output_stream)
 
     data = ui.input(question, password)
     return data
@@ -175,16 +170,24 @@ def inputChoice(question, answers, hotkeys, default=None):
 
     """
     # make sure logging system has been initialized
-    root = logging.getLogger()
+    root = logging.getLogger("pywiki")
     if root.level == 30: # init_handlers sets this level
-        init_handlers()
+        init_handlers(strm=ui.output_stream)
 
     data = ui.inputChoice(question, answers, hotkeys, default).lower()
     return data
 
 
-def init_handlers():
-    """Initialize logging system for terminal-based bots"""
+def init_handlers(strm=None):
+    """Initialize logging system for terminal-based bots.
+
+    This function must be called before using pywikibot.output(); and must
+    be called again if the destination stream is changed.
+
+    @param strm: Output stream. If None, re-uses the last stream if one
+        was defined, otherwise uses sys.stderr
+
+    """
 
     # All user output is routed through the logging module.
     # Each type of output is handled by an appropriate handler object.
@@ -203,6 +206,14 @@ def init_handlers():
     # Accordingly, do ''not'' use print statements in bot code; instead,
     # use pywikibot.output function.
 
+    global _stream
+    if strm:
+        _stream = strm
+    else:
+        try:
+            _stream
+        except NameError:
+            _stream = sys.stderr
     moduleName = calledModuleName()
     if not moduleName:
         moduleName = "terminal-interface"
@@ -215,12 +226,12 @@ def init_handlers():
     logging.addLevelName(INPUT, "INPUT")
         # for prompts requiring user response
 
-    root_logger = logging.getLogger()
-    root_logger.handlers = [] # get rid of default handler
+    root_logger = logging.getLogger("pywiki")
     root_logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
+    root_logger.handlers = [] # remove any old handlers
 
     # configure default handler for VERBOSE and INFO levels
-    default_handler = TerminalHandler(strm=sys.stderr)
+    default_handler = ui.OutputHandlerClass(strm=_stream)
     if config.verbose_output:
         default_handler.setLevel(VERBOSE)
     else:
@@ -247,19 +258,19 @@ def init_handlers():
         file_handler.setFormatter(form)
         root_logger.addHandler(file_handler)
         for component in config.debug_log:
-            debuglogger = logging.getLogger(component)
+            debuglogger = logging.getLogger("pywiki."+component)
             debuglogger.setLevel(DEBUG)
             debuglogger.addHandler(file_handler)
 
     # handler for level STDOUT
-    output_handler = TerminalHandler(strm=sys.stdout)
+    output_handler = ui.OutputHandlerClass(strm=sys.stdout)
     output_handler.setLevel(STDOUT)
     output_handler.addFilter(MaxLevelFilter(STDOUT))
     output_handler.setFormatter(LoggingFormatter(fmt="%(message)s"))
     root_logger.addHandler(output_handler)
 
     # handler for levels WARNING and higher
-    warning_handler = TerminalHandler(strm=sys.stderr)
+    warning_handler = ui.OutputHandlerClass(strm=_stream)
     warning_handler.setLevel(logging.WARNING)
     warning_handler.setFormatter(
             LoggingFormatter(fmt="%(levelname)s: %(message)s"))
@@ -374,7 +385,7 @@ def handleArgs(*args):
     if username:
         config.usernames[config.family][config.mylang] = username
 
-    init_handlers()
+    init_handlers(strm=ui.output_stream)
 
     if config.verbose_output:
         import re
@@ -450,7 +461,7 @@ Global arguments available for all bots:
         if modname:
             pywikibot.output(u'Sorry, no help available for %s' % modname,
                              level=pywikibot.STDOUT)
-        logging.exception('showHelp:')
+        logger.exception('showHelp:')
     pywikibot.output(globalHelp, level=pywikibot.STDOUT)
 
 class Bot(object):
@@ -486,7 +497,9 @@ class Bot(object):
             self.options[opt] = kwargs[opt]
 
         for opt in receivedOptions - validOptions:
-            logging.warning(u'%s is not a valid option. It was ignored\n' % opt)
+            pywikibot.output(u'%s is not a valid option. It was ignored\n'
+                              % opt,
+                             level=pywikibot.WARNING)
         
     def getOption(self, option):
         """

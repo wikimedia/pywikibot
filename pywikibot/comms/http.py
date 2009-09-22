@@ -33,7 +33,7 @@ import pywikibot
 import cookielib
 import threadedhttp
 
-logger = logging.getLogger("comms.http")
+logger = logging.getLogger("pywiki.comms.http")
 
 
 # global variables

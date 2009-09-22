@@ -49,7 +49,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import NoSuchSite, NoUsername
 
-logger = logging.getLogger("wiki.login")
+logger = logging.getLogger("pywiki.wiki.login")
 
 
 # On some wikis you are only allowed to run a bot if there is a link to

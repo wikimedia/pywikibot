@@ -26,7 +26,7 @@ import pywikibot
 from pywikibot import config, login
 from pywikibot.exceptions import *
 
-logger = logging.getLogger("data.api")
+logger = logging.getLogger("pywiki.data.api")
 
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 

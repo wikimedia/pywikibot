@@ -117,7 +117,8 @@ colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(windowsColors.keys()))
 class UI:
     def __init__(self):
         self.writelock = threading.RLock()
-        pass
+        self.OutputHandlerClass = TerminalHandler
+        self.output_stream = sys.stderr
 
     def output(self, text, level=logging.INFO):
         """
@@ -127,7 +128,7 @@ class UI:
         """
         self.writelock.acquire()
         try:
-            logging.log(level, text)
+            logging.getLogger("pywiki").log(level, text)
         finally:
             self.writelock.release()
 

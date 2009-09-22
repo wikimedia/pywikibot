@@ -22,7 +22,7 @@ import threading
 import unicodedata
 import urllib
 
-logger = logging.getLogger("wiki.page")
+logger = logging.getLogger("pywiki.wiki.page")
 
 reNamespace = re.compile("^(.+?) *: *(.*)$")
 

@@ -108,7 +108,8 @@ class TextEditor:
         """
         text = self.convertLinebreaks(text)
         if config.editor:
-            tempFilename = '%s.%s' % (tempfile.mktemp(), config.editor_filename_extension)
+            tempFilename = '%s.%s' % (tempfile.mktemp(),
+                                      config.editor_filename_extension)
             tempFile = open(tempFilename, 'w')
             tempFile.write(text.encode(config.editor_encoding))
             tempFile.close()
@@ -120,14 +121,18 @@ class TextEditor:
                 # Nothing changed
                 return None
             else:
-                newcontent = open(tempFilename).read().decode(config.editor_encoding)
+                newcontent = open(tempFilename).read().decode(
+                                            config.editor_encoding)
                 os.unlink(tempFilename)
                 return self.restoreLinebreaks(newcontent)
         else:
-            return self.restoreLinebreaks(pywikibot.ui.editText(text, jumpIndex = jumpIndex, highlight = highlight))
+            return self.restoreLinebreaks(
+                        pywikibot.editText(text, jumpIndex=jumpIndex,
+                                           highlight=highlight))
 
 class ArticleEditor:
-    joinchars = string.letters + '[]' + string.digits # join lines if line starts with this ones
+    joinchars = string.letters + '[]' + string.digits
+    # join lines if line starts with this ones
 
     def __init__(self, *args):
         self.set_options(*args)

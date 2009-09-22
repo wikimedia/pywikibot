@@ -17,7 +17,7 @@ import math
 import threading
 import time
 
-logger = logging.getLogger("wiki.throttle")
+logger = logging.getLogger("pywiki.wiki.throttle")
 
 pid = False     # global process identifier
                 # when the first Throttle is instantiated, it will set this

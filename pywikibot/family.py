@@ -14,7 +14,7 @@ import urllib
 
 import pywikibot
 
-logger = logging.getLogger("wiki.family")
+logger = logging.getLogger("pywiki.wiki.family")
 
 # Parent class for all wiki families
 

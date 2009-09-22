@@ -30,7 +30,7 @@ import sys
 import threading
 import urllib
 
-logger = logging.getLogger("wiki.site")
+logger = logging.getLogger("pywiki.wiki.site")
 
 class PageInUse(pywikibot.Error):
     """Page cannot be reserved for writing due to existing lock."""
@@ -110,7 +110,11 @@ class BaseSite(object):
                 # is cut to zh-classic)
             elif self.__family.name in self.__family.langs.keys() \
                     or len(self.__family.langs) == 1:
+                oldcode = self.__code
                 self.__code = self.__family.name
+                if self.__family == pywikibot.config.family \
+                        and oldcode == pywikibot.config.mylang:
+                    pywikibot.config.mylang = self.__code
             else:
                 raise NoSuchSite("Language %s does not exist in family %s"
                                  % (self.__code, self.__family.name))

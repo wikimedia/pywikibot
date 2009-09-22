@@ -20,8 +20,6 @@ from bot import *
 from exceptions import *
 from textlib import *
 
-logging.basicConfig(fmt="%(message)s")
-
 
 class Timestamp(datetime.datetime):
     """Class for handling Mediawiki timestamps.
@@ -98,7 +96,7 @@ def deprecated(instead=None):
 
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg"""
-    logger = logging.getLogger()
+    logger = logging.getLogger("pywiki")
     def decorator(method):
         def wrapper(*__args, **__kw):
             meth_name = method.__name__
@@ -141,7 +139,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     @type user: unicode
 
     """
-    logger = logging.getLogger("wiki")
+    logger = logging.getLogger("pywiki.wiki")
     
     if code is None:
         code = config.mylang
@@ -167,7 +165,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     key = '%s:%s:%s' % (fam, code, user)
     if not key in _sites:
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
-        logging.debug(u"Instantiating Site object '%(site)s'"
+        logger.debug(u"Instantiating Site object '%(site)s'"
                        % {'site': _sites[key]})
     return _sites[key]
 
@@ -203,7 +201,7 @@ def set_debug(layer):
     This method does not check the 'layer' argument for validity.
 
     """
-    logging.getLogger(layer).setLevel(DEBUG)
+    logging.getLogger("pywiki."+layer).setLevel(DEBUG)
 
 
 def showDiff(oldtext, newtext):
@@ -282,10 +280,10 @@ def stopme():
 
     """
     global stopped
-    logger = logging.getLogger("wiki")
+    logger = logging.getLogger("pywiki.wiki")
 
     if not stopped:
-        logging.debug("stopme() called")
+        logger.debug("stopme() called")
         count = sum(1 for thd in threadpool if thd.isAlive())
         if count:
             pywikibot.output(u"Waiting for about %(count)s pages to be saved."

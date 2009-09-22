@@ -32,7 +32,7 @@ import sys
 
 import pywikibot
 
-logger = logging.getLogger("comms.threadedhttp")
+logger = logging.getLogger("pywiki.comms.threadedhttp")
 
 
 # easy_install safeguarded dependencies
