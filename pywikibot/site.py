@@ -957,15 +957,21 @@ class APISite(BaseSite):
                                 inprop="protection")
         for pageitem in query:
             if pageitem['title'] != title:
-                if pageitem['title'] in query.normalized_to \
-                        and query.normalized_to[pageitem['title']] == title:
+                if pageitem['title'] in query.normalized \
+                        and query.normalized[pageitem['title']] == title:
                     # page title was normalized by api
-                    # TODO
-                    pass
+                    # this should never happen because the Link() constructor
+                    # normalizes the title
+                    pywikibot.output(
+                        u"loadpageinfo: Page title '%s' was normalized to '%s'"
+                         % (title, pageitem['title']),
+                        level=pywikibot.ERROR)
                 else:
-                    raise Error(
+                    pywikibot.output(
                         u"loadpageinfo: Query on %s returned data on '%s'"
-                        % (page, pageitem['title']))
+                         % (page, pageitem['title']),
+                        level=pywikibot.WARNING)
+                continue
             api.update_page(page, pageitem)
 
     def loadimageinfo(self, page, history=False):
