@@ -569,6 +569,7 @@ def datafilepath(*filename):
 
 def shortpath(path):
     """Return a file path relative to config.base_dir."""
+    import os.path
     if path.startswith(base_dir):
         return path[len(base_dir) + len(os.path.sep) : ]
     return path
