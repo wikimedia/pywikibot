@@ -2573,7 +2573,7 @@ entered your sysop name in your user-config.py. Please add
 sysopnames['%s']['%s']='name' to your user-config.py"""
                                      % (self.family.name, self.code))
             else:
-                username = pywikiobt.config2.usernames[self.family.name
+                username = pywikibot.config2.usernames[self.family.name
                                                        ][self.code]
         except KeyError:
             self._cookies[index] = None
