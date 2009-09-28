@@ -257,8 +257,13 @@ def init_handlers(strm=None):
                )
         file_handler.setFormatter(form)
         root_logger.addHandler(file_handler)
+        # Turn on debugging for each component requested by user
+        # or for all components if nothing was specified
         for component in config.debug_log:
-            debuglogger = logging.getLogger("pywiki."+component)
+            if component:
+                debuglogger = logging.getLogger("pywiki."+component)
+            else:
+                debuglogger = logging.getLogger("pywiki")
             debuglogger.setLevel(DEBUG)
             debuglogger.addHandler(file_handler)
 
