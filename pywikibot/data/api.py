@@ -186,6 +186,8 @@ class Request(object, DictMixin):
         
         """
         from pywikibot.comms import http
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.nonmultipart import MIMENonMultipart
 
         params = self.http_params()
         if self.site._loginstatus == -3:
@@ -197,6 +199,7 @@ class Request(object, DictMixin):
                         "protect", "block", "unblock"
                     )
             self.site.throttle(write=write)
+            mime = False # debugging
             uri = self.site.scriptpath() + "/api.php"
             try:
                 ssl = False
@@ -205,10 +208,30 @@ class Request(object, DictMixin):
                         ssl = True
                     elif config.use_SSL_always:
                         ssl = True
-                rawdata = http.request(self.site, uri, ssl, method="POST",
-                            headers={'Content-Type':
-                                     'application/x-www-form-urlencoded'},
-                            body=params)
+                if mime:
+                    global container
+                    # construct a MIME message containing all API key/values
+                    container = MIMEMultipart(_subtype='form-data')
+                    for key in self.params:
+                        submsg = MIMENonMultipart("text", "plain")
+                        submsg.add_header("Content-disposition", "form-data",
+                                          name=key)
+                        submsg.set_payload(self.params[key])
+                        container.attach(submsg)
+                    # strip the headers to get the HTTP message body
+                    body = container.as_string()
+                    marker = "\n\n" # separates headers from body
+                    eoh = body.find(marker)
+                    body = body[ eoh + len(marker): ]
+                    # retrieve the headers from the MIME object
+                    mimehead = dict(container.items())
+                    rawdata = http.request(self.site, uri, ssl, method="POST",
+                                           headers=mimehead, body=body)
+                else:
+                    rawdata = http.request(self.site, uri, ssl, method="POST",
+                                headers={'Content-Type':
+                                         'application/x-www-form-urlencoded'},
+                                body=params)
             except Server504Error:
                 logger.debug(u"Caught 504 error")
                 raise
