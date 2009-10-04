@@ -6,7 +6,8 @@ try:
     import pydot
 except ImportError:
     pydotfound = False
-import wikipedia, config
+import pywikibot
+from pywikibot import config2 as config
 
 # for speedyshare
 import re
