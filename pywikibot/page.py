@@ -449,9 +449,17 @@ class Page(object):
             for (template, args) in self.templatesWithParams():
                 if template.title(withNamespace=False) in catredirs:
                     # Get target (first template argument)
-                    self._catredirect = self.site().namespace(14) \
+                    try:
+                        self._catredirect = self.site().namespace(14) \
                                          + ":" + args[0].strip()
-                    break
+                        break
+                    except IndexError:
+                        pywikibot.output(
+                            u"No target for category redirect on %s"
+                             % self.title(asLink=True),
+                            level=pywikibot.WARNING)
+                        self._catredirect = False
+                        break
             else:
                 self._catredirect = False
         return bool(self._catredirect)
