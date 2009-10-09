@@ -49,7 +49,7 @@ class CategoryRedirectBot(object):
             'wikipedia': {
                 'ar': u"تصنيف:تحويلات تصنيفات ويكيبيديا",
                 'da': "Kategori:Omdirigeringskategorier",
-                'en': "Category:Wikipedia category redirects",
+                'en': "Category:Wikipedia soft redirected categories",
                 'hu': "Kategória:Kategóriaátirányítások",
                 'ja': "Category:移行中のカテゴリ",
                 'no': "Kategori:Wikipedia omdirigertekategorier",
