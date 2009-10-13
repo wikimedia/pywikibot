@@ -147,7 +147,7 @@ These arguments are useful to provide hints to the bot:
 These arguments define how much user confirmation is required:
 
     -autonomous    run automatically, do not ask any questions. If a question
-                   to an operator is needed, write the name of the page
+    -auto          to an operator is needed, write the name of the page
                    to autonomous_problems.dat and continue on the next page.
                    (note: without ending colon)
 
@@ -1727,6 +1727,9 @@ class InterwikiBot(object):
                         # Only yield pages that have ( ) in titles
                         if "(" not in page.title():
                             continue
+                    if page.isTalkPage():
+                        pywikibot.output(u'Skipping: %s is a talk page' % page)
+                        continue
                     break
 
                 if self.generateUntil:
@@ -1773,7 +1776,8 @@ class InterwikiBot(object):
     def selectQuerySite(self):
         """Select the site the next query should go out for."""
         # How many home-language queries we still have?
-        mycount = self.counts.get(pywikibot.getSite(), 0)
+        ### its seems this counts a negative value
+        mycount = max(0, self.counts.get(pywikibot.getSite(), 0))
         # Do we still have enough subjects to work on for which the
         # home language has been retrieved? This is rough, because
         # some subjects may need to retrieve a second home-language page!
@@ -1983,7 +1987,7 @@ if __name__ == "__main__":
                 globalvar.confirm = True
             elif arg == '-select':
                 globalvar.select = True
-            elif arg == '-autonomous':
+            elif arg == '-autonomous' or arg == '-auto':
                 globalvar.autonomous = True
             elif arg == '-noredirect':
                 globalvar.followredirect = False
