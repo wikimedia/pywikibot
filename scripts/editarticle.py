@@ -131,8 +131,8 @@ class TextEditor:
                                            highlight=highlight))
 
 class ArticleEditor:
-    joinchars = string.letters + '[]' + string.digits
     # join lines if line starts with this ones
+    joinchars = string.letters + '[]' + string.digits
 
     def __init__(self, *args):
         self.set_options(*args)
