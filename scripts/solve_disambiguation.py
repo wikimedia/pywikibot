@@ -95,7 +95,7 @@ msg = {
     'da': u'Retter flertydigt link til: %s - Ændrede link(s) til %s',
     'de': u'Bot-unterstützte Begriffsklärung: %s - Link(s) ersetzt durch %s',
     'fi': u'Täsmennystä botin avulla: %s korvattiin link(e)illä %s',
-    'fr': u'Homonymie résolue à l\'aide du robot: %s - Modifications du (des) lien(s) pour %s',
+    'fr': u'Homonymie résolue à l’aide du robot: %s - Modifications du (des) lien(s) pour %s',
     'he': u'תיקון קישור לדף פירושונים באמצעות בוט: %s',
     'hu': u'Bottal végzett egyértelműsítés: %s –> %s',
     'ia': u'Disambiguation assistite per robot: %s - Changed link(s) to %s',
@@ -103,13 +103,14 @@ msg = {
     'lt': u'Nuorodų į nukrepiamąjį straipsnį keitimas: %s - Pakeistos nuorodos į %s',
     'kk': u'Айрықты мағыналарды бот көмегімен шешу: %s - Changed link(s) to %s',
     'ko': u'로봇의 도움을 받아 동음이의 처리 : [[%s]] - %s 문서로 링크 걸음',
-    'nl': u'Robot-geholpen doorverwijzing: [[%s]] - Link(s) veranderd naar %s',
+    'nl': u'Botgeholpen doorverwijzing: [[%s]] - Verwijzing(en) gewijzigd naar %s',
     'no': u'bot: Retter lenke til peker: %s - Endret lenke(r) til %s',
     'pl': u'Wspomagane przez robota ujednoznacznienie: %s - Zmieniono link(i) %s',
     'pt': u'Desambiguação assistida por bot: %s link(s) mudado(s) para %s',
     'ru': u'Разрешение значений с помощью бота: %s - Changed link(s) to %s',
     'sr': u'Решавање вишезначних одредница помоћу бота: %s - Changed link(s) to %s',
     'sv': u'Länkar direkt till rätt artikel för: %s - Bytte länk(ar) till %s',
+    'uk': u'Виправлення посилання на багатозначність за допомогою бота: %s змінено на %s',
     }
 
 # Summary message when working on disambiguation pages and the link is removed
@@ -120,7 +121,7 @@ msg_unlink = {
     'da': u'Retter flertydigt link til: %s - Fjernede link(s)',
     'de': u'Bot-unterstützte Begriffsklärung: %s - Link(s) entfernt',
     'fi': u'Täsmennystä botin avulla: %s - poistettiin linkkejä.',
-    'fr': u'Homonymie résolue à l\'aide du robot: %s - Retrait du (des) lien(s)',
+    'fr': u'Homonymie résolue à l’aide du robot: %s - Retrait du (des) lien(s)',
     'he': u'הסרת קישור לדף פירושונים באמצעות בוט: %s',
     'hu': u'Bottal végzett egyértelműsítés: %s – hivatkozások eltávolítása',
     'ia': u'Disambiguation assistite per robot: %s - Removed link(s).',
@@ -128,13 +129,14 @@ msg_unlink = {
     'lt': u'Nuorodų į nukrepiamąjį straipsnį keitimas: %s - Pašalintos nuorodos',
     'kk': u'Айрықты мағыналарды бот көмегімен шешу: %s - Removed link(s).',
     'ko': u'로봇의 도움을 받아 동음이의 처리: [[%s]] - 링크 제거',
-    'nl': u'Robot-geholpen doorverwijzing: [[%s]] - Link(s) weggehaald.',
+    'nl': u'Botgeholpen doorverwijzing: [[%s]] - Verwijzing(en) verwijderd',
     'no': u'bot: Retter lenke til peker: %s - Fjernet lenke(r)',
     'pl': u'Wspomagane przez robota ujednoznacznienie: %s - Usunięto link(i)',
     'pt': u'Desambiguação assistida por bot: %s link(s) removido(s)',
     'ru': u'Разрешение значений с помощью бота: %s - Removed link(s)',
     'sr': u'Решавање вишезначних одредница помоћу бота: %s - Removed link(s)',
     'sv': u'Länkar direkt till rätt artikel för: %s - Tog bort länk(ar)',
+    'uk': u'Виправлення посилання на багатозначність за допомогою бота: %s вилучено',
     }
 
 # Summary message when working on redirects
@@ -153,13 +155,14 @@ msg_redir = {
     'lt': u'Nuorodų į peradresavimo straipsnį keitimas: %s - Pakeistos nuorodos į %s',
     'kk': u'Айрықты мағыналарды бот көмегімен шешу: %s - Changed link(s) to %s',
     'ko': u'로봇의 도움을 받아 동음이의 처리: [[%s]] - %s 문서로 링크 걸음',
-    'nl': u'Robot-geholpen redirect-oplossing: [[%s]] - Link(s) veranderd naar %s',
+    'nl': u'Botgeholpen oplossing voor doorverwijzing: [[%s]] - Verwijzing(en) gewijzigd naar %s',
     'no': u'bot: Endrer omdirigeringslenke: %s - Endret lenke(r) til %s',
     'pl': u'Wspomagane przez robota ujednoznacznienie: %s - Zmieniono link(i) %s',
     'pt': u'Desambiguação assistida por bot: %s link(s) mudados para %s',
     'ru': u'Разрешение значений с помощью бота: %s - Changed link(s) to %s',
     'sr': u'Решавање вишезначних одредница помоћу бота: %s - Changed link(s) to %s',
     'sv': u'Länkar direkt till rätt artikel för: %s - Bytte länk(ar) till %s',
+    'uk': u'Виправлення посилання на багатозначність за допомогою бота: %s змінено на %s',
     }
 
 # Summary message when working on redirects and the link is removed
@@ -178,13 +181,14 @@ msg_redir_unlink = {
     'lt': u'Nuorodų į peradresavimo straipsnį keitimas: %s - Pašalintos nuorodos',
     'kk': u'Айрықты мағыналарды бот көмегімен шешу: %s - Removed link(s).',
     'ko': u'로봇의 도움을 받아 동음이의 처리: [[%s]] - 링크 제거',
-    'nl': u'Robot-geholpen redirect-oplossing: [[%s]] - Link(s) weggehaald',
+    'nl': u'Botgeholpen oplossing voor doorverwijzing: [[%s]] - Verwijzing(en) verwijderd',
     'no': u'bot: Endrer omdirigeringslenke: %s - Fjernet lenke(r)',
     'pl': u'Wspomagane przez robota ujednoznacznienie: %s - Usunięto link(i)',
     'pt': u'Desambiguação assistida por bot: %s link(s) removidos',
     'ru': u'Разрешение значений с помощью бота: %s - Removed link(s)',
     'sr': u'Решавање вишезначних одредница помоћу бота: %s - Removed link(s)',
     'sv': u'Länkar direkt till rätt artikel för: %s - Tog bort länk(ar)',
+    'uk': u'Виправлення посилання на багатозначність за допомогою бота: %s вилучено',
     }
 
 # Summary message to (unknown)
@@ -218,6 +222,7 @@ primary_topic_format = {
     'ru': u'%s_(значения)',
     'sr': u'%s_(вишезначна одредница)',
     'sv': u'%s_(olika betydelser)',
+    'uk': u'%s_(значення)',
     }
 
 # List pages that will be ignored if they got a link to a disambiguation
@@ -254,13 +259,11 @@ ignore_title = {
             u'Liste griechischer Wortstämme in deutschen Fremdwörtern',
             u'Liste von Gräzismen',
             u'Portal:Abkürzungen/.+',
-            u'Wikipedia:Archiv:.+',
+            u'Wikipedia:Archiv/.+',
             u'Wikipedia:Artikelwünsche/Ding-Liste/[A-Z]',
             u'Wikipedia:Begriffsklärung.*',
             u'Wikipedia:Dreibuchstabenkürzel von [A-Z][A-Z][A-Z] bis [A-Z][A-Z][A-Z]',
             u'Wikipedia:Interwiki-Konflikte',
-            u'Wikipedia:Kurze Artikel',
-            u'Wikipedia:Liste aller 2-Buchstaben-Kombinationen',
             u'Wikipedia:Liste mathematischer Themen/BKS',
             u'Wikipedia:Liste mathematischer Themen/Redirects',
             u'Wikipedia:Löschkandidaten/.+',
@@ -302,12 +305,12 @@ ignore_title = {
             u'Wikipedia:Täsmennyssivu',
         ],
         'fr': [
-            u'Wikipédia:Liens aux pages d\'homonymie',
+            u'Wikipédia:Liens aux pages d’homonymie',
             u'Wikipédia:Homonymie',
             u'Wikipédia:Homonymie/Homonymes dynastiques',
             u'Wikipédia:Prise de décision, noms des membres de dynasties/liste des dynastiens',
             u'Liste de toutes les combinaisons de deux lettres',
-            u'Wikipédia:Log d\'upload/.*',
+            u'Wikipédia:Log d’upload/.*',
             u'Sigles de trois lettres de [A-Z]AA à [A-Z]ZZ',
             u'Wikipédia:Pages sans interwiki,.'
         ],
@@ -363,6 +366,7 @@ ignore_title = {
             u'Wikipedia:Top 1000 van meest bekeken artikelen',
             u'Wikipedia:Wikipedianen met een encyclopedisch artikel',
             u'Wikipedia:Woorden die niet als zoekterm gebruikt kunnen worden',
+            u'Overleg gebruiker:Taka(/.*)?',
          ],
         'pl': [
             u'Wikipedysta:.+',
@@ -398,8 +402,7 @@ def firstcap(string):
     return string[0].upper()+string[1:]
 
 def correctcap(link, text):
-    # If text links to a page with title link uncapitalized,
-    # uncapitalize link, otherwise capitalize it
+    # If text links to a page with title link uncapitalized, uncapitalize link, otherwise capitalize it
     linkupper = link.title()
     linklower = linkupper[0].lower() + linkupper[1:]
     if text.find("[[%s]]"%linklower) > -1 or text.find("[[%s|"%linklower) > -1:
@@ -588,7 +591,7 @@ class DisambiguationRobot(object):
             refPage - A page linking to disambPage
         Returns False if the user pressed q to completely quit the program.
         Otherwise, returns True.
-        
+       
         """
         # TODO: break this function up into subroutines!
 
@@ -640,7 +643,7 @@ class DisambiguationRobot(object):
                 % refPage.title())
             include = False
         if include in (True, "redirect"):
-            # make a backup of the original text so we can show changes later
+            # make a backup of the original text so we can show the changes later
             original_text = text
             n = 0
             curpos = 0
@@ -656,7 +659,7 @@ class DisambiguationRobot(object):
                     else:
                         # stop loop and save page
                         break
-                # Make sure that next time around we will not find same hit.
+                # Make sure that next time around we will not find this same hit.
                 curpos = m.start() + 1
                 try:
                     foundlink = pywikibot.Link(m.group('title'),
@@ -742,7 +745,7 @@ u"        m=more context, d=show disambiguation page, l=list, a=add new):")
                 elif choice in ['n', 'N']:
                     # skip this page
                     if self.primary:
-                        # If run with -primary, skip this occurence next time.
+                        # If run with the -primary argument, skip this occurence next time.
                         self.primaryIgnoreManager.ignore(refPage)
                     return True
                 elif choice in ['q', 'Q']:
