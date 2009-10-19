@@ -23,6 +23,14 @@ help = """
                                        run this in automatic mode.
                        * case-de     - fix upper/lower case errors in German
                        * grammar-de  - fix grammar and typography in German
+                       * vonbis      - Ersetze Binde-/Gedankenstrich durch "bis" in German
+                       * music       - Links auf Begriffsklärungen in German
+                       * datum       - specific date formats in German
+                       * correct-ar  - Corrections for Arabic Wikipedia and any Arabic wiki.
+                       * yu-tld      - the yu top-level domain will soon be disabled, see
+                       * fckeditor   - Try to convert FCKeditor HTML tags to wiki syntax.
+                                       http://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
+
 """
 
 fixes = {
@@ -32,18 +40,24 @@ fixes = {
         'regex': True,
         'msg': {
             'ar':u'روبوت: تحويل/تصليح HTML',
+            'be':u'Бот: карэкцыя HTML',
+            'cs':u'převod/oprava HTML',
             'en':u'Robot: Converting/fixing HTML',
+            'eo':u'Bot: koredtado de HTMLa teksto',
             'de':u'Bot: konvertiere/korrigiere HTML',
             'fr':u'Robot: convertit/fixe HTML',
             'he':u'בוט: ממיר/מתקן HTML',
             'ja':u'ロボットによる: HTML転換',
+            'ksh':u'Bot: vun HTML en Wikikood wandelle',
             'ia':u'Robot: conversion/reparation de HTML',
             'lt':u'robotas: konvertuojamas/taisomas HTML',
             'nl':u'Bot: conversie/reparatie HTML',
             'pl':u'Robot konwertuje/naprawia HTML',
             'pt':u'Bot: Corrigindo HTML',
+            'ru':u'Бот: коррекция HTML',
             'sr':u'Бот: Поправка HTML-а',
-            'sv': u'Bot: Konverterar/korrigerar HTML',
+            'sv':u'Bot: Konverterar/korrigerar HTML',
+            'uk':u'Бот: корекцiя HTML',
             'zh':u'機器人: 轉換HTML',
         },
         'replacements': [
@@ -51,9 +65,9 @@ fixes = {
             # Keep in mind that MediaWiki automatically converts <br> to <br />
             # when rendering pages, so you might comment the next two lines out
             # to save some time/edits.
-            #r'(?i)<br>':                      r'<br />',
+            #(r'(?i)<br>',                      r'<br />'),
             # linebreak with attributes
-            #r'(?i)<br ([^>/]+?)>':            r'<br \1 />',
+            #(r'(?i)<br ([^>/]+?)>',            r'<br \1 />'),
             (r'(?i)<b>(.*?)</b>',              r"'''\1'''"),
             (r'(?i)<strong>(.*?)</strong>',    r"'''\1'''"),
             (r'(?i)<i>(.*?)</i>',              r"''\1''"),
@@ -166,8 +180,11 @@ fixes = {
         'regex': True,
         'msg': {
             'ar':u'بوت: تصليح تهيئة الويكي',
+            'be':u'Бот: Карэкцыя вiкi-сiнтаксiсу',
+            'cs':u'Oprava wikisyntaxe',
             'de':u'Bot: Korrigiere Wiki-Syntax',
             'en':u'Bot: Fixing wiki syntax',
+            'eo':u'Bot: Korektado de vikia sintakso',
             'fr':u'Bot: Corrige wiki-syntaxe',
             'he':u'בוט: מתקן תחביר ויקי',
             'ia':u'Robot: Reparation de syntaxe wiki',
@@ -176,7 +193,9 @@ fixes = {
             'nl':u'Bot: reparatie wikisyntaxis',
             'pl':u'Robot poprawia wiki-składnię',
             'pt':u'Bot: Corrigindo sintaxe wiki',
+            'ru':u'Бот: Коррекция вики синтаксиса',
             'sr':u'Бот: Поправка вики синтаксе',
+            'uk':u'Бот: Корекцiя вiкi-синтаксису',
             'zh':u'機器人: 修正wiki語法',
         },
         'replacements': [
@@ -236,8 +255,11 @@ fixes = {
         'regex': True,
         'msg': {
             'ar':u'بوت: تصليح تهيئة الويكي',
+            'be':u'Бот: Карэкцыя вiкi-сiнтаксiсу',
+            'cs':u'Oprava wikisyntaxe',
             'de':u'Bot: Korrigiere Wiki-Syntax',
             'en':u'Bot: Fixing wiki syntax',
+            'eo':u'Bot: Korektado de vikia sintakso',
             'fr':u'Bot: Corrige wiki-syntaxe',
             'he':u'בוט: מתקן תחביר ויקי',
             'ia':u'Robot: Reparation de syntaxe wiki',
@@ -246,7 +268,9 @@ fixes = {
             'nl':u'Bot: reparatie wikisyntaxis',
             'pl':u'Robot poprawia wiki-składnię',
             'pt':u'Bot: Corrigindo sintaxe wiki',
+            'ru':u'Бот: Коррекция вики синтаксиса',
             'sr':u'Бот: Поправка вики синтаксе',
+            'uk':u'Бот: Корекцiя вiкi-синтаксису',
             'zh':u'機器人: 修正wiki語法',
         },
         'replacements': [
@@ -386,11 +410,16 @@ fixes = {
         'regex': True,
         'msg': {
             'ar': u'روبوت: تصليح صيغة ISBN',
+            'be': u'Бот: Карэкцыя ISBN фармату',
+            'cs': u'Oprava formátu ISBN',
             'de': u'Bot: Korrigiere ISBN-Format',
             'en': u'Robot: Fixing ISBN format',
             'es': u'Arreglando formato ISBN',
+            'eo': u'Bot: Korekto de teksto en ISBN-formato',
             'he': u'בוט: מתקן פורמט ISBN',
             'ja': u'ロボットによる: ISBNフォーマット修正',
+            'ru': u'Бот: Коррекция ISBN формата',
+            'uk': u'Бот: Корекція ISBN формату',
             'zh': u'機器人: 修正ISBN格式',
         },
         'replacements': [
@@ -559,6 +588,7 @@ fixes = {
             'de': u'Bot: Ersetze Links auf .yu-Domains',
             'en': u'Robot: Replacing links to .yu domains',
             'fr': u'Robot: Correction des liens pointant vers le domaine .yu, qui expire en 2009',
+            'ksh': u'Bot: de ahle .yu-Domains loufe us, dröm ußjetuusch',
          },
          'replacements': [
             (u'www.budva.cg.yu',             u'www.budva.rs'),
@@ -575,8 +605,6 @@ fixes = {
             (u'www.belex.co.yu',             u'www.belex.rs'),
             (u'beograd.org.yu',              u'beograd.rs'),
             (u'www.vlada.cg.yu',             u'www.vlada.me'),
-            (u'www.vlada.me/eng/premijer/vijesti.php', 
-            u'www.gov.me/eng/premijer/index.php'),
             (u'webrzs.statserb.sr.gov.yu',   u'webrzs.stat.gov.rs'),
             (u'www.statserb.sr.gov.yu',      u'webrzs.stat.gov.rs'),
             (u'www.rastko.org.yu',           u'www.rastko.org.rs'),
@@ -605,6 +633,20 @@ fixes = {
             (u'www.politika.co.yu',          u'www.politika.rs'),
             (u'www.mfa.gov.yu',              u'www.mfa.gov.rs'),
             (u'www.drzavnauprava.sr.gov.yu', u'www.drzavnauprava.gov.rs'),
+        ],
+    },
+    # These replacements will convert HTML tag from FCK-editor to wiki syntax.
+    #
+	'fckeditor': {
+        'regex': True,
+        'msg': {
+            'en': u'Robot: Fixing rich-editor html',
+         },
+         'replacements': [
+            # replace <br> with a new line
+            (r'(?i)<br>',                      r'\n'),
+			# replace &nbsp; with a space
+			(r'(?i)&nbsp;',                      r' '),
         ],
     },
 }
