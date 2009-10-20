@@ -1882,7 +1882,7 @@ class APISite(BaseSite):
             "recentchanges: start must be later than end with reverse=False")
         rcgen = self._generator(api.ListGenerator, type_arg="recentchanges",
                                 rcprop="user|comment|timestamp|title|ids"
-                                       "|redirect|patrolled|loginfo|flags",
+                                       "|redirect|loginfo|flags",
                                 namespaces=namespaces, step=step,
                                 total=total)
         if start is not None:
@@ -1904,8 +1904,8 @@ class APISite(BaseSite):
         filters = {'minor': showMinor,
                    'bot': showBot,
                    'anon': showAnon,
-                   'redirect': showRedirects,
-                   'patrolled': showPatrolled}
+                   'redirect': showRedirects,}
+                   #'patrolled': showPatrolled}
         rcshow = []
         for item in filters:
             if filters[item] is not None:
