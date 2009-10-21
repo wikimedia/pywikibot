@@ -9,6 +9,7 @@ __version__ = '$Id$'
 
 import os, re
 import sys as __sys
+import platform
 
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
@@ -119,7 +120,11 @@ def _get_base_dir():
             is_windows = __sys.platform == 'win32' 
             home = os.path.expanduser("~") 
             if is_windows: 
-                base_dir = os.path.join(home, "Application Data", NAME) 
+                _win_version = int(platform.version()[0])
+                if _win_version == 5:
+                    base_dir = os.path.join(home, "Application Data", NAME) 
+                elif _win_version == 6:
+                    base_dir = os.path.join(home, "AppData\\Roaming", NAME) 
             else: 
                 base_dir = os.path.join(home, "."+NAME) 
             if not os.path.isdir(base_dir): 
