@@ -383,7 +383,7 @@ msg = {
     'da': (u'robot ', u'Tilføjer', u'Fjerner', u'Ændrer'),
     'de': (u'Bot: ', u'Ergänze', u'Entferne', u'Ändere'),
     'dv': (u'ރޮބޮޓ ', u'އިތުރު ކުރުނ', u'ފޮހެލުނ', u'ބަދަލު ގެނައުނ'),
-    'el': (u'Ρομπότ:', u'Προσθήκη', u'Αφαίρεση', u'Τροποποίηση'),
+    'el': (u'Ρομπότ: ', u'Προσθήκη', u'Αφαίρεση', u'Τροποποίηση'),
     'en': (u'robot ', u'Adding', u'Removing', u'Modifying'),
     'eo': (u'roboto ', u'aldono de', u'forigo de', u'modifo de'),
     'es': (u'robot ', u'Añadido', u'Eliminado', u'Modificado'),
@@ -400,7 +400,7 @@ msg = {
     'gl': (u'bot ', u'Engadido', u'Eliminado', u'Modificado'),
     'gn': (u'bot ', u'ojoapy', u'oñembogue', u'oñemoambue'),
     'he': (u'בוט ', u'מוסיף', u'מסיר', u'משנה'),
-    'hr': (u'robot', u'Dodaje', u'Uklanja', u'Mijenja'),
+    'hr': (u'robot ', u'Dodaje', u'Uklanja', u'Mijenja'),
     'hsb': (u'bot ', u'přidał', u'wotstronił', u'změnił'),
     'ht': (u'wobo ', u'Ajoute', u'Anlve', u'Modifye'),
     'hu': (u'Bot: ', u'következő hozzáadása', u'következő eltávolítása', u'következő módosítása'),
@@ -410,7 +410,7 @@ msg = {
     'io': (u'roboto ', u'adjuntas', u'efacas', u'modifikas'),
     'is': (u'robot ', u'Bæti við', u'Fjarlægi', u'Breyti'),
     'it': (u'Bot: ', u'Aggiungo', u'Tolgo', u'Modifico'),
-    'ja': (u'ロボットによる', u'追加', u'除去', u'変更'),
+    'ja': (u'ロボットによる ', u'追加', u'除去', u'変更'),
     'ka': (u'ბოტის ', u'დამატება', u'წაშლა', u'შეცვლა'),
     'ko': (u'로봇이 ', u'더함', u'지움', u'바꿈'),
     'kk': (u'Боттың ', u'үстегені', u'аластағаны', u'түзеткені'),
@@ -437,7 +437,8 @@ msg = {
     'no': (u'robot ', u'legger til', u'fjerner', u'endrer'),
     'nov': (u'robote ', u'Adid', u'Ekartad', u'Modifikad'),
     'nrm': (u'robot ', u'ajouôte', u'hale', u'amende'),
-    'os': (u'Робот', u'баххæст кодта', u'Баивта', u'Аиуварс'),
+    'os': (u'Робот ', u'баххæст кодта', u'Баивта', u'Аиуварс'),
+    'pdc': (u'Bot: ', u'dezu geduh', u'raus gnumme', u'gennert'),
     'pl': (u'robot ', u'dodaje', u'usuwa', u'poprawia'),
     'pms': (u'ël trigomiro ', u'a gionta', u'a gava', u'a modìfica'),
     'pt': (u'Bot: ', u'Adicionando', u'Removendo',u'Modificando'),
@@ -447,21 +448,23 @@ msg = {
     'sk': (u'robot ', u'Pridal', u'Odobral',u'Zmenil' ),
     'sl': (u'robot ', u'Dodajanje', u'Odstranjevanje', u'Spreminjanje'),
     'sq': (u'roboti ', u'shtoj', u'largoj', u'ndryshoj'),
-    'sr': (u'Бот', u'Додаје', u'Брише', u'Мења'),
+    'sr': (u'Бот ', u'Додаје', u'Брише', u'Мења'),
     'su': (u'bot ', u'Nambih', u'Miceun', u'Ngarobih'),
     'sv': (u'robot ', u'Lägger till', u'Tar bort', u'Ändrar'),
     'sw': (u'roboti ', u'Nyongeza', u'Ondoa', u'Badiliko'),
     'szl': (u'Bot ', u'dodowo', u'wyćepuje', u'zmjyńo'),
     'ta': (u'தானியங்கி',u'இணைப்பு',u'அழிப்பு',u'மாற்றல்'),
-    'te': (u'యంత్రము ', u'కలుపుతున్నది', u'తొలగిస్తున్నది', u'మార్పులు చేస్తున్నది'),
+    'te': (u'యంత్రము  ', u'కలుపుతున్నది', u'తొలగిస్తున్నది', u'మార్పులు చేస్తున్నది'),
     'tet': (u'bot ', u'tau tan', u'hasai', u'filak'),
     'tg': (u'робот ', u'илова карда истодааст', u'дигаргуни карда истодааст', u'ҳaвз карда истодааст'),
+    'tk': (u'robot ', u'goşdy', u'aýyrdy', u'üýtgetdi'),
     'tl': (u'robot ', u'dinagdag', u'tinanggal', u'binago'),
     'to': (u'mīsini', u'ʻoku tānaki', u'ʻoku toʻo', u'ʻoku liliu'),
-    'tr': (u'Bot değişikliği', u'Ekleniyor', u'Kaldırılıyor', u'Değiştiriliyor'),
+    'tr': (u'Bot değişikliği ', u'Ekleniyor', u'Kaldırılıyor', u'Değiştiriliyor'),
     'th': (u'โรบอต ', u'เพิ่ม', u'ลบ', u'แก้ไข'),
-    'uk': (u'робот', u'додав', u'видалив', u'змінив'),
-    'uz': (u'Bot', u'Qoʻshdi', u'Tuzatdi', u'Oʻchirdi'),
+    'uk': (u'робот ', u'додав', u'видалив', u'змінив'),
+    'uz': (u'Bot ', u'Qoʻshdi', u'Tuzatdi', u'Oʻchirdi'),
+    'vec': (u'Bot: ', u'Zonto', u'Cavo', u'Canbio'),
     'vi': (u'robot ', u'Thêm', u'Dời', u'Thay'),
     'vo': (u'bot ', u'läükon', u'moükon', u'votükon'),
     'war':(u'robot ', u'Gindugngan', u'Gintanggal', u'Ginliwat'),
@@ -1160,7 +1163,7 @@ class Subject(object):
                 # except: should be avoided!!
                 except:
                    #raise
-                   pywikibot.output(u'File autonomous_problem.dat open or corrupted! Try again with -restore.')
+                   pywikibot.output(u'File autonomous_problems.dat open or corrupted! Try again with -restore.')
                    sys.exit()
                 iw = ()
             elif page.isEmpty() and not page.isCategory():
@@ -1535,7 +1538,7 @@ class Subject(object):
         if globalvar.debug:
             pywikibot.showDiff(oldtext, newtext)
 
-        # wikipedia.output(u"NOTE: Replace %s" % page.aslink())
+        # pywikibot.output(u"NOTE: Replace %s" % page)
         # Determine whether we need permission to submit
         ask = False
         if removing and removing != [page.site()]:   # Allow for special case of a self-pointing interwiki link
@@ -1566,10 +1569,10 @@ class Subject(object):
             answer = 'y'
         # If we got permission to submit, do so
         if answer == 'y':
-            # Check whether we will have to wait for wikipedia. If so, make
+            # Check whether we will have to wait for pywikibot. If so, make
             # another get-query first.
             if bot:
-                while wikipedia.get_throttle.waittime() + 2.0 < wikipedia.put_throttle.waittime():
+                while pywikibot.get_throttle.waittime() + 2.0 < pywikibot.put_throttle.waittime():
                     pywikibot.output(u"NOTE: Performing a recursive query first to save time....")
                     qdone = bot.oneQuery()
                     if not qdone:
@@ -1776,7 +1779,7 @@ class InterwikiBot(object):
     def selectQuerySite(self):
         """Select the site the next query should go out for."""
         # How many home-language queries we still have?
-        ### its seems this counts a negative value
+        ### it seems this counts a negative value
         mycount = max(0, self.counts.get(pywikibot.getSite(), 0))
         # Do we still have enough subjects to work on for which the
         # home language has been retrieved? This is rough, because
