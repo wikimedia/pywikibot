@@ -116,3 +116,6 @@ class PageNotFound(Error):
 class CaptchaError(Error):
     """Captcha is asked and config.solve_captcha == False."""
 
+class UploadWarning(Error):
+    """Upload failed with a warning message (passed as the argument)."""
+

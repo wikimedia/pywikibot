@@ -2545,7 +2545,107 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
         return [image.title(withNamespace=False)
                 for image in self.allimages(sha1=hash_found)]
 
+    def upload(self, imagepage, source_filename=None, source_url=None,
+               comment=None, watch=False, ignore_warnings=False):
+        """Upload a file to the wiki.
 
+        Either source_filename or source_url, but not both, must be provided.
+
+        @param imagepage: an ImagePage object from which the wiki-name of the
+            file will be obtained.
+        @param source_filename: path to the file to be uploaded
+        @param source_url: URL of the file to be uploaded
+        @param comment: Edit summary; if this is not provided, then
+            imagepage.text will be used. An empty summary is not permitted.
+        @param watch: If true, add imagepage to the bot user's watchlist
+        @param ignore_warnings: if true, ignore API warnings and force
+            upload (for example, to overwrite an existing file); default False
+
+        """
+        upload_warnings = {
+            # map API warning codes to user error messages
+            # %(msg)s will be replaced by message string from API responsse
+            'duplicate-archive':
+                "The file is a duplicate of a deleted file %(msg)s.",
+            'was-deleted':
+                "The file %(msg)s was previously deleted.",
+            'emptyfile':
+                "File %(msg)s is empty.",
+            'exists':
+                "File %(msg)s already exists.",
+            'duplicate':
+                "Uploaded file is a duplicate of %(msg)s.",
+            'badfilename':
+                "Target filename is invalid.",
+             'filetype-unwanted-type':
+                "File %(msg)s type is unwatched type.",
+        }
+
+        # check for required user right
+        if "upload" not in self.userinfo["rights"]:
+            raise pywikibot.Error(
+                "User '%s' does not have upload rights on site %s."
+                % (self.user(), self))
+        # check for required parameters
+        if (source_filename and source_url)\
+                or (source_filename is None and source_url is None):
+            raise ValueError(
+"APISite.upload: must provide either source_filename or source_url, not both."
+            )
+        if comment is None:
+            comment = imagepage.text
+        if not comment:
+            raise ValueError(
+"APISite.upload: cannot upload file without a summary/description."
+            )
+        token = self.token(imagepage, "edit")
+        if source_filename:
+            # upload local file
+            # make sure file actually exists
+            if not os.path.isfile(source_filename):
+                raise ValueError("File '%s' does not exist."
+                                 % source_filename)
+            filesize = os.path.getsize(source_filename)
+            # TODO: if file size exceeds some threshold (to be determined),
+            #       upload by chunks
+            req = api.Request(site=self, action="upload", token=token,
+                              filename=imagepage.title(withNamespace=False),
+                              file=source_filename, comment=comment,
+                              mime=True)
+        else:
+            # upload by URL
+            if "upload_by_url" not in self.userinfo["rights"]:
+                raise pywikibot.Error(
+                    "User '%s' is not authorized to upload by URL on site %s."
+                    % (self.user(), self))
+            req = api.Request(site=self, action="upload", token=token,
+                              filename=imagepage.title(withNamespace=False),
+                              url=source_url, comment=comment)
+        if watch:
+            req["watch"] = ""
+        if ignore_warnings:
+            req["ignorewarnings"] = ""
+        try:
+            result = req.submit()
+        except api.APIError, err:
+            # TODO: catch and process foreseeable errors
+            raise
+        result = result["upload"]
+        pywikibot.output(result, level=pywikibot.DEBUG)
+        if "warnings" in result:
+            warning = result["warnings"].keys()[0]
+            message = result["warnings"][warning]
+            raise pywikibot.UploadWarning(upload_warnings[warning]
+                                          % {'msg': message})
+        else:
+            pywikibot.output(u"Upload: unrecognized response: %s"
+                              % result["result"])
+        if result["result"] == "Success":
+            pywikibot.output(u"Upload successful.")
+            imagepage._imageinfo = result["imageinfo"]
+            return
+
+            
 #### METHODS NOT IMPLEMENTED YET ####
 class NotImplementedYet:
 

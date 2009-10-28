@@ -16,6 +16,7 @@ try:
 except ImportError:
     import simplejson as json
 import logging
+import mimetypes
 import re
 import traceback
 import time
@@ -61,13 +62,19 @@ class Request(object, DictMixin):
     Attributes of this object (except for the special parameters listed
     below) get passed as commands to api.php, and can be get or set using
     the dict interface.  All attributes must be strings (or unicode).  Use
-    an empty string for parameters that don't require a value (e.g.,
-    "action=query&...&redirects").
+    an empty string for parameters that don't require a value. For example,
+    Request(action="query", titles="Foo bar", prop="info", redirects="")
+    corresponds to the API request
+    "api.php?action=query&titles=Foo%20bar&prop=info&redirects"
 
     This is the lowest-level interface to the API, and can be used for any
     request that a particular site's API supports. See the API documentation
     (http://www.mediawiki.org/wiki/API) and site-specific settings for
     details on what parameters are accepted for each request type.
+
+    Uploading files is a special case: to upload, the parameter "mime" must
+    be true, and the parameter "file" must be set equal to a valid
+    filename on the local computer, _not_ to the content of the file.
 
     Returns a dict containing the JSON data returned by the wiki. Normally,
     one of the dict keys will be equal to the value of the 'action'
@@ -95,6 +102,7 @@ class Request(object, DictMixin):
     
     @param site: The Site to which the request will be submitted. If not
            supplied, uses the user's configured default Site.
+    @param mime: If true, send in "multipart/form-data" format (default False)
     @param max_retries: (optional) Maximum number of times to retry after
            errors, defaults to 25
     @param retry_wait: (optional) Minimum time to wait after an error,
@@ -108,6 +116,7 @@ class Request(object, DictMixin):
             self.site = kwargs.pop("site")
         except KeyError:
             self.site = pywikibot.Site()
+        self.mime = kwargs.pop("mime", False)
         self.max_retries = kwargs.pop("max_retries", 25)
         self.retry_wait = kwargs.pop("retry_wait", 5)
         self.params = {}
@@ -199,7 +208,6 @@ class Request(object, DictMixin):
                         "protect", "block", "unblock"
                     )
             self.site.throttle(write=write)
-            mime = False # debugging
             uri = self.site.scriptpath() + "/api.php"
             try:
                 ssl = False
@@ -208,15 +216,32 @@ class Request(object, DictMixin):
                         ssl = True
                     elif config.use_SSL_always:
                         ssl = True
-                if mime:
-                    global container
+                if self.mime:
                     # construct a MIME message containing all API key/values
                     container = MIMEMultipart(_subtype='form-data')
                     for key in self.params:
-                        submsg = MIMENonMultipart("text", "plain")
-                        submsg.add_header("Content-disposition", "form-data",
-                                          name=key)
-                        submsg.set_payload(self.params[key])
+                        # key "file" requires special treatment in a multipart
+                        # message
+                        if key == "file":
+                            local_filename = self.params[key]
+                            filetype = mimetypes.guess_type(local_filename)[0] \
+                                       or 'application/octet-stream'
+                            file_content = file(local_filename, "rb").read()
+                            submsg = MIMENonMultipart(*filetype.split("/"))
+                            submsg.add_header("Content-disposition",
+                                              "form-data", name=key,
+                                              filename=local_filename)
+                            submsg.set_payload(file_content)
+                        else:
+                            try:
+                                self.params[key].encode("ascii")
+                                keytype = ("text", "plain")
+                            except UnicodeError:
+                                keytype = ("application", "octet-stream")
+                            submsg = MIMENonMultipart(*keytype)
+                            submsg.add_header("Content-disposition", "form-data",
+                                              name=key)
+                            submsg.set_payload(self.params[key])
                         container.attach(submsg)
                     # strip the headers to get the HTTP message body
                     body = container.as_string()
