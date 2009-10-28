@@ -297,26 +297,20 @@ class UploadRobot:
         encodedFilename = filename.encode(self.targetSite.encoding())
 
 
-        formdata = {}
-        formdata["wpUploadDescription"] = self.description
-        formdata["wpUploadAffirm"] = "1"
-        formdata["wpUpload"] = "upload bestand"
+        formdata = {
+            'wpUploadDescription': self.description,
+            'wpUploadAffirm': '1',
+            'wpUpload': 'upload bestand',
+            'wpEditToken': self.targetSite.getToken(), # Get an edit token so we can do the upload
+            'wpDestFile': filename, # Set the new filename
+        }
         # This somehow doesn't work.
         if self.ignoreWarning:
             formdata["wpIgnoreWarning"] = "1"
 
-        # Get an edit token so we can do the upload
-        formdata["wpEditToken"]  = self.targetSite.getToken()
-
-        # Set the new filename
-        formdata["wpDestFile"]  = filename
-
         if self.uploadByUrl:
             formdata["wpUploadFileURL"]  = self.url
             formdata["wpSourceType"] = 'Url'
-        #Not needed now. Might be needed in the future
-        #else:
-        #    formdata["wpSourceType"] = 'file'
         
         # try to encode the strings to the encoding used by the target site.
         # if that's not possible (e.g. because there are non-Latin-1 characters and
