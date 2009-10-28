@@ -92,7 +92,9 @@ docuReplacements = {
 msg_add={
     'ar':u'روبوت: إضافة [[تصنيف:%s]]',
     'bat-smg':u'Robots: Pridedama [[Kateguorėjė:%s]]',
+    'be-x-old':u'Робат: дадаваньне [[Катэгорыя:%s]]',
     'ca':u'Robot: Afegint [[Categoria:%s]]',
+    'cs':u'Robot přidal [[Kategorie:%s]]',
     'da':u'Robot: Tilføjer [[Kategori:%s]]',
     'de':u'Bot: Ergänze [[Kategorie:%s]]',
     'en':u'Robot: Adding [[Category:%s]]',
@@ -112,7 +114,7 @@ msg_add={
     'lt':u'robotas: Pridedama [[Kategorija:%s]]',
     'nds':u'Kat-Bot: [[Kategorie:%s]] rin',
     'nds-nl':u'bot: [[kattegerie:%s]] derbie edaon',
-    'nl':u'Bot: [[Categorie:%s]] toegevoegd',
+    'nl':u'Bot: [[categorie:%s]] toegevoegd',
     'no':u'Robot: Legger til [[Kategori:%s]]',
     'nn':u'robot: la til [[Kategori:%s]]',
     'pl':u'Robot dodaje [[Kategoria:%s]]',
@@ -120,12 +122,15 @@ msg_add={
     'ru':u'Робот: добавление [[Категория:%s]]',
     'sr':u'Бот: Додаје [[Категорија:%s]]',
     'sv':u'Robot: Lägger till [[Kategori:%s]]',
+    'szl':u'Bot dodowo: [[Kategoria:%s]]',
     'zh':u'機器人:新增目錄 [[Category:%s]]',
     }
 
 msg_change={
     'ar':u'روبوت: تغيير %s',
+    'be-x-old':u'Робат: зьмена %s',
     'ca':u'Robot: Canviant %s',
+    'cs':u'Robot změnil %s',
     'da':u'Robot: Ændrer %s',
     'de':u'Bot: Ändere %s',
     'en':u'Robot: Changing %s',
@@ -144,7 +149,7 @@ msg_change={
     'ksh':u'Bot: %s ußjewääßelt',
     'nds':u'Kat-Bot: %s utwesselt',
     'nds-nl':u'bot: wieziging %s',
-    'nl':u'Bot: Wijziging %s',
+    'nl':u'Bot: wijziging %s',
     'no':u'Robot: Endrer %s',
     'nn':u'robot: endra %s',
     'pt':u'Bot: Modificando [[%s]]',
@@ -177,7 +182,9 @@ msg_created_for_renaming = {
 deletion_reason_move = {
     'ar':u'روبوت: التصنيف نقل إلى [[:تصنيف:%s|%s]]',
     'bat-smg':u'Robots: Kateguorėjė bova parvadėnta i [[:Kateguorėjė:%s|%s]]',
+    'be-x-old':u'Робат: катэгорыя перайменаваная ў [[:Катэгорыя:%s|%s]]',
     'ca':u'Robot: La categoria s\'ha mogut a [[:Categoria:%s|%s]]',
+    'cs':u'Kategorie přesunuta na [[:Kategorie:%s|%s]]',
     'da':u'Robot: Kategori flyttet til [[:Category:%s|%s]]',
     'de':u'Bot: Kategorie wurde nach [[:Category:%s|%s]] verschoben',
     'en':u'Robot: Category was moved to [[:Category:%s|%s]]',
@@ -554,6 +561,7 @@ class CategoryRemoveRobot:
     '''
     deletion_reason_remove = {
         'ar':u'روبوت: التصنيف تم الاستغناء عنه',
+        'be-x-old':u'Робат: катэгорыя расфармаваная',
         'ca':u'Robot: La categoria s\'ha eliminat',
         'da':u'Robot: Kategorien blev opløst',
         'de':u'Bot: Kategorie wurde aufgelöst',
@@ -578,12 +586,14 @@ class CategoryRemoveRobot:
     msg_remove={
         'ar':u'روبوت: إزالة من %s',
         'bat-smg':u'Robots: Trėnama ėš  %s',
+        'be-x-old':u'Робат: выключэньне з [[Катэгорыя:%s]]',
         'ca':u'Robot: Eliminant de %s',
         'da':u'Robot: Fjerner fra %s',
         'de':u'Bot: Entferne aus %s',
         'en':u'Robot: Removing from %s',
         'es':u'Bot: Eliminada de la %s',
         'fi':u'Botti poisti luokasta %s',
+        'fr':u'Robot : Retiré depuis %s',
         'he':u'בוט: מסיר את הדף מהקטגוריה %s',
         'ia':u'Robot: Eliminate de %s',
         'is':u'Vélmenni: Fjarlægi [[Flokkur:%s]]',
@@ -828,6 +838,7 @@ class CategoryTreeRobot:
         # the one we're coming from
         also_in_cats = {
             'ar': u'(أيضا في %s)',
+            'be-x-old': u'(таксама ў %s)',
             'ca': u'(també a %s)',
             'da': u'(også i %s)',
             'de': u'(auch in %s)',
