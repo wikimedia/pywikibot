@@ -165,6 +165,7 @@ class CosmeticChangesToolkit:
         self.redirect = redirect
         self.namespace = namespace
         self.template = (self.namespace == 10)
+        self.talkpage = self.namespace >= 0 and self.namespace % 2 == 1
 
     def change(self, text):
         """
@@ -206,7 +207,7 @@ class CosmeticChangesToolkit:
         Makes sure that interwiki links are put to the correct position and
         into the right order.
         """
-        if pywikibot.calledModuleName() <> 'interwiki':
+        if not self.talkpage and pywikibot.calledModuleName() <> 'interwiki':
             interwikiLinks = pywikibot.getLanguageLinks(text, insite = self.site)
             text = pywikibot.replaceLanguageLinks(text, interwikiLinks, site = self.site, template = self.template)
         return text
@@ -253,6 +254,7 @@ class CosmeticChangesToolkit:
             titleWithSection = match.group('titleWithSection')
             label = match.group('label')
             trailingChars = match.group('linktrail')
+            newline = match.group('newline')
 
             if not self.site.isInterwikiLink(titleWithSection):
                 # The link looks like this:
@@ -331,7 +333,7 @@ class CosmeticChangesToolkit:
                     #   text[[ title | name ]]text -> text [[title|name]] text
                     #   text[[ title |name]]text   -> text[[title|name]]text
                     #   text[[title| name]]text    -> text [[title|name]]text
-                    if hadLeadingSpaces:
+                    if hadLeadingSpaces and not newline:
                         newLink = ' ' + newLink
                     if hadTrailingSpaces:
                         newLink = newLink + ' '
@@ -346,7 +348,7 @@ class CosmeticChangesToolkit:
         # group label is the alternative link title, that's everything between | and ].
         # group linktrail is the link trail, that's letters after ]] which are part of the word.
         # note that the definition of 'letter' varies from language to language.
-        linkR = re.compile(r'\[\[(?P<titleWithSection>[^\]\|]+)(\|(?P<label>[^\]\|]*))?\]\](?P<linktrail>' + self.site.linktrail() + ')')
+        linkR = re.compile(r'(?P<newline>[\n]*)\[\[(?P<titleWithSection>[^\]\|]+)(\|(?P<label>[^\]\|]*))?\]\](?P<linktrail>' + self.site.linktrail() + ')')
 
         text = pywikibot.replaceExcept(text, linkR, handleOneLink, ['comment', 'math', 'nowiki', 'pre', 'startspace'])
         return text
@@ -416,7 +418,7 @@ class CosmeticChangesToolkit:
         If there are any complaints, please file a bug report.
         """
         if not self.redirect:
-            text = pywikibot.replaceExcept(text, r'(?m)^(?P<bullet>(\*+|#+):*)(?P<char>[^\s\*#:].+?)', '\g<bullet> \g<char>', ['comment', 'math', 'nowiki', 'pre'])
+            text = pywikibot.replaceExcept(text, r'(?m)^(?P<bullet>[:;]*(\*+|#+)[:;\*#]*)(?P<char>[^\s\*#:;].+?)', '\g<bullet> \g<char>', ['comment', 'math', 'nowiki', 'pre'])
         return text
 
     #from fixes.py
