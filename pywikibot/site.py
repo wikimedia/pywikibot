@@ -28,6 +28,7 @@ import os
 import re
 import sys
 import threading
+import time
 import urllib
 
 logger = logging.getLogger("pywiki.wiki.site")
@@ -2618,6 +2619,8 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
                 raise pywikibot.Error(
                     "User '%s' is not authorized to upload by URL on site %s."
                     % (self.user(), self))
+            # doesn't work yet
+            raise NotImplementedError("Upload by URL not yet implemented")
             req = api.Request(site=self, action="upload", token=token,
                               filename=imagepage.title(withNamespace=False),
                               url=source_url, comment=comment)
@@ -2632,6 +2635,26 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             raise
         result = result["upload"]
         pywikibot.output(result, level=pywikibot.DEBUG)
+        if source_url:
+            # get session key from result
+            key = result["upload_session_key"]
+            pywikibot.output(u"Asynchronous upload started.")
+            time.sleep(1)
+            while True:
+                # get upload status
+                statusrequest = api.Request(site=self, action="upload",
+                                            token=token, httpstatus="",
+                                            sessionkey=str(key))
+                status = statusrequest.submit()
+                status = status["upload"]
+                if int(status["loaded"]) != int(status["content_length"]):
+                    pywikibot.output(
+                      u" %(loaded)s out of %(content_length)s bytes loaded..."
+                       % status)
+                    continue                                     
+                # notify the user, since I have no idea what else to do at this point
+                pywikibot.output(str(status))
+                return
         if "warnings" in result:
             warning = result["warnings"].keys()[0]
             message = result["warnings"][warning]
@@ -2639,7 +2662,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
                                           % {'msg': message})
         else:
             pywikibot.output(u"Upload: unrecognized response: %s"
-                              % result["result"])
+                              % result)
         if result["result"] == "Success":
             pywikibot.output(u"Upload successful.")
             imagepage._imageinfo = result["imageinfo"]
