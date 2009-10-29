@@ -1268,7 +1268,6 @@ def recentChanges(site = None, delay=0, block=70):
     Return a pagegenerator containing all the images edited in a certain timespan.
     The delay is the amount of minutes to wait and the block is the timespan to return images in.
     Should probably be copied to somewhere else
-    
     '''
     rcstart = site.getcurrenttime() + timedelta(minutes=-delay-block)
     rcend = site.getcurrenttime() + timedelta(minutes=-delay)

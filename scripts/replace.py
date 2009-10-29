@@ -83,6 +83,8 @@ other:            First argument is the old text, second argument is the new
                   text. If the -regex argument is given, the first argument
                   will be regarded as a regular expression, and the second
                   argument might contain expressions like \\1 or \g<name>.
+                  It is possible to introduce more than one pair of old text
+                  and replacement.
 
 Examples:
 
@@ -96,6 +98,9 @@ If you have a dump called foobar.xml and want to fix typos in articles, e.g.
 Errror -> Error, use this:
 
     python replace.py -xml:foobar.xml "Errror" "Error" -namespace:0
+
+If you want to do more than one replacement at a time, use this:
+    python replace.py -xml:foobar.xml "Errror" "Error" "Faail" "Fail" -namespace:0
 
 If you have a page called 'John Doe' and want to fix the format of ISBNs, use:
 
@@ -144,7 +149,8 @@ msg = {
     'en': u'Robot: Automated text replacement %s',
     'es': u'Robot: Reemplazo automático de texto %s',
     'fa': u'ربات: تغییر خودکار متن %s',
-    'fr': u'Bot : Remplacement de texte automatisé %s',
+    'fi': u'Botti korvasi automaattisesti tekstin %s',
+    'fr': u'Robot : Remplacement de texte automatisé %s',
     'he': u'בוט: החלפת טקסט אוטומטית %s',
     'hu': u'Robot: Automatikus szövegcsere %s',
     'ia': u'Robot: Reimplaciamento automatic de texto %s',
@@ -166,6 +172,7 @@ msg = {
     'ru': u'Робот: Автоматизированная замена текста %s',
     'sr': u'Бот: Аутоматска замена текста %s',
     'sv': u'Bot: Automatisk textersättning: %s',
+    'uk': u'Бот: Автоматизована заміна тексту: %s',
     'zh': u'機器人:執行文字代換作業 %s',
 }
 
@@ -555,7 +562,7 @@ def main(*args):
         elif arg == '-multiline':
             multiline = True
         elif arg.startswith('-addcat:'):
-            add_cat = arg[len('-addcat:'):]
+            add_cat = arg[8:]
         elif arg.startswith('-summary:'):
             edit_summary = arg[9:]
             summary_commandline = True
