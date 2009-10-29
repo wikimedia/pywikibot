@@ -115,7 +115,9 @@ class CategoryRedirectBot(object):
             'ar': u"روبوت: نقل الصفحات من تصنيف محول",
             'cs': u'Robot přesunul stránku ze zastaralé kategorie',
             'da': u"Robot: flytter sider ud af omdirigeringskategorien",
-            'en': u"Robot: moving pages out of redirected category",
+            'en':
+u"Robot: change redirected category [[:%(oldCatLink)s|%(oldCatTitle)s]]"
+u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'hu': u"Bot: Lapok automatikus áthelyezése átirányított kategóriából",
             'ja': u"ロボットによる: 移行中のカテゴリからのカテゴリ変更",
             'ksh': u"Bot: Sigk uß en ömjeleidt Saachjropp eruß jesammdt.",
