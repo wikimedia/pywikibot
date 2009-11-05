@@ -12,7 +12,7 @@ __version__ = '$Id$'
 # Distributed under the terms of the MIT license.
 #
 
-help = """
+help = u"""
                        * HTML       -  Convert HTML tags to wiki syntax, and
                                        fix XHTML.
                        * isbn        - Fix badly formatted ISBNs.
