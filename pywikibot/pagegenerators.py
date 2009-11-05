@@ -34,7 +34,7 @@ import codecs
 # most of these functions just wrap a Site or Page method that returns
 # a generator
 
-parameterHelp = """\
+parameterHelp = u"""\
 -cat              Work on all pages which are in a specific category.
                   Argument can also be given as "-cat:categoryname" or
                   as "-cat:categoryname|fromtitle".
@@ -87,8 +87,8 @@ parameterHelp = """\
 -links            Work on all pages that are linked from a certain page.
                   Argument can also be given as "-links:linkingpagetitle".
 
--imagelinks       Work on all images that are linked from a certain page.
-                  Argument can also be given as "-imagelinks:linkingpagetitle".
+-imagesused       Work on all images that contained on a certain page.
+                  Argument can also be given as "-imagesused:linkingpagetitle".
 
 -newimages        Work on the 100 newest images. If given as -newimages:x,
                   will work on the x newest images.
@@ -173,7 +173,7 @@ class GeneratorFactory(object):
         """Return the combination of all accumulated generators.
 
         Only call this after all arguments have been parsed.
-        
+
         """
         namespaces = [int(n) for n in self.namespaces]
         for i in xrange(len(self.gens)):
@@ -410,8 +410,8 @@ class GeneratorFactory(object):
               gen = RecentChangesPageGenerator(total=int(arg[15:]))
             else:
               gen = RecentChangesPageGenerator(total=60)
-        elif arg.startswith('-imagelinks'):
-            imagelinkstitle = arg[len('-imagelinks:'):]
+        elif arg.startswith('-imagesused'):
+            imagelinkstitle = arg[len('-imagesused:'):]
             if not imagelinkstitle:
                 imagelinkstitle = pywikibot.input(
                     u'Images on which page should be processed?')
