@@ -93,6 +93,7 @@ msg_standalone = {
     'sr': u'Бот козметичке промене',
     'sv': u'Bot: Kosmetiska ändringar',
     'th': u'บอต ปรับแต่งให้อ่านง่าย',
+    'tk': u'Bot: kosmetik üýtgeşme',
     'tl': u'robot Kosmetiko pagbabago',
     'tr': u'Bot Kozmetik değişiklikler',
     'uk': u'робот косметичні зміни',
@@ -149,6 +150,7 @@ msg_append = {
     'sr': u'; козметичке промене',
     'sv': u'; kosmetiska ändringar',
     'th': u'; ปรับแต่งให้อ่านง่าย',
+    'tk': u'; kosmetik üýtgeşme',
     'tl': u'; Kosmetiko pagbabago',
     'tr': u'; Kozmetik değişiklikler',
     'uk': u'; косметичні зміни',
@@ -159,7 +161,7 @@ msg_append = {
 }
 
 class CosmeticChangesToolkit:
-    def __init__(self, site, debug = False, redirect = False, namespace = None):
+    def __init__(self, site, debug=False, redirect=False, namespace=None):
         self.site = site
         self.debug = debug
         self.redirect = redirect
@@ -169,7 +171,7 @@ class CosmeticChangesToolkit:
 
     def change(self, text):
         """
-        Given a wiki source code text, returns the cleaned up version.
+        Given a wiki source code text, return the cleaned up version.
         """
         oldText = text
         text = self.fixSelfInterwiki(text)
@@ -337,6 +339,8 @@ class CosmeticChangesToolkit:
                         newLink = ' ' + newLink
                     if hadTrailingSpaces:
                         newLink = newLink + ' '
+                    if newline:
+                        newLink = newline + newLink
                     return newLink
             # don't change anything
             return match.group()
@@ -370,7 +374,7 @@ class CosmeticChangesToolkit:
         return text
 
     def validXhtml(self, text):
-        text = pywikibot.replaceExcept(text, r'<br>', r'<br />', ['comment', 'math', 'nowiki', 'pre'])
+        text = pywikibot.replaceExcept(text, r'(?i)<br[ /]*>', r'<br />', ['comment', 'math', 'nowiki', 'pre'])
         return text
 
     def removeUselessSpaces(self, text):
