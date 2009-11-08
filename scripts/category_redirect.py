@@ -89,6 +89,7 @@ class CategoryRedirectBot(object):
                 'ja': ("Category redirect",),
                 'no': ("Kategoriomdirigering",),
                 'simple': ("Category redirect",
+                           "Categoryredirect",
                            "Catredirect"),
                 'zh': (u"分类重定向",
                        u"Cat-redirect",
