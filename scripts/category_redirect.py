@@ -62,56 +62,6 @@ class CategoryRedirectBot(object):
             }
         }
 
-        # List of all templates that are used to mark category redirects
-        # (put the most preferred form first)
-        self.redir_templates = {
-            'wikipedia': {
-                'ar': (u"تحويل تصنيف",
-                       u"Category redirect",
-                       u"تحويلة تصنيف"),
-                'cs': (u"Zastaralá kategorie"),
-                'da': ("Kategoriomdirigering",),
-                'en': ("Category redirect",
-                       "Category redirect3",
-                       "Categoryredirect",
-                       "Empty category",
-                       "CR",
-                       "Catredirect",
-                       "Cat redirect",
-                       "Emptycat",
-                       "Emptycategory",
-                       "Empty cat",
-                       "Seecat"),
-                'fr': ("Catégorie redirigée",
-                       "Redirection de catégorie"),
-                'hu': ("Kat-redir",
-                       "Katredir"),
-                'ja': ("Category redirect",),
-                'no': ("Kategoriomdirigering",),
-                'simple': ("Category redirect",
-                           "Categoryredirect",
-                           "Catredirect"),
-                'zh': (u"分类重定向",
-                       u"Cat-redirect",
-                       u"重定向分类",
-                       u"重定向分类",
-                       u"Cr",
-                       u"CR"),
-                },
-            'commons': {
-                'commons': (u'Category redirect',
-                            u'Categoryredirect',
-                            u'See cat',
-                            u'Seecat',
-                            u'Catredirect',
-                            u'Cat redirect',
-                            u'CatRed',
-                            u'Cat-red',
-                            u'Catredir',
-                            u'Redirect category',),
-                }
-            }
-
         self.move_comment = {
             'ar': u"روبوت: نقل الصفحات من تصنيف محول",
             'cs': u'Robot přesunul stránku ze zastaralé kategorie',
@@ -344,7 +294,7 @@ aanjepaß krijje:
     def run(self):
         """Run the bot"""
         global destmap, catlist, catmap
-        
+
         user = self.site.user()
         redirect_magicwords = ["redirect"]
         other_words = self.site.redirect()
@@ -369,8 +319,7 @@ aanjepaß krijje:
             cPickle.dump(record, open(datafile + ".bak", "wb"), -1)
 
         try:
-            template_list = self.redir_templates[self.site.family.name
-                                                ][self.site.code]
+            template_list = self.site.family.category_redirect_templates[self.site.code]
         except KeyError:
             pywikibot.output(u"No redirect templates defined for %s"
                               % self.site.sitename())
