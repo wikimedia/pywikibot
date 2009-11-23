@@ -11,15 +11,15 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'zh', 'no', 'hu', 'pt', 'ja', 'es', 'it',
-            'nl', 'pl', 'sq', 'he', 'fi', 'vi', 'ru', 'cs', 'hr', 'da',
-            'sv', 'mk', 'th', 'tr', 'sr', 'fa', 'tl', 'ca', 'id', 'is',
-            'ta', 'ar', 'ko', 'eo', 'ka', 'simple', 'bg', 'gl', 'lt', 'ro',
-            'sk', 'la', 'el', 'ia', 'ang', 'sl', 'et', 'mr', 'cv', 'ur',
-            'oc', 'ml', 'ms', 'uk', 'eu', 'fy', 'ie', 'hi', 'tg', 'bn',
-            'hy', 'af', 'az', 'te', 'pa', 'bs', 'ky', 'be', 'sa', 'zh-min-nan',
-            'ast', 'cy', 'tt', 'mg', 'si', 'ku', 'co', 'tk', 'sw', 'ne',
-            'als', 'su', 'uz', 'vo', 'na', 'kn', 'mn', 'kk', 'za', 'nds',
+            'en', 'de', 'fr', 'hu', 'pt', 'ja', 'es', 'pl', 'nl', 'it',
+            'he', 'sq', 'fi', 'vi', 'ru', 'cs', 'hr', 'zh', 'sv', 'da',
+            'mk', 'ca', 'tr', 'th', 'tl', 'sr', 'fa', 'id', 'is', 'ar',
+            'ta', 'no', 'ka', 'simple', 'ko', 'eo', 'gl', 'bg', 'lt', 'ro',
+            'sk', 'el', 'la', 'ia', 'ang', 'sl', 'et', 'cv', 'mr', 'ur',
+            'oc', 'ml', 'ms', 'uk', 'eu', 'fy', 'hi', 'ie', 'bn', 'tg',
+            'af', 'hy', 'te', 'pa', 'bs', 'ky', 'az', 'be', 'sa', 'zh-min-nan',
+            'ast', 'tt', 'cy', 'mg', 'si', 'ku', 'co', 'sw', 'tk', 'ne',
+            'als', 'su', 'vo', 'uz', 'na', 'kn', 'kk', 'mn', 'nds', 'za',
             'zu', 'my',
         ]
 
@@ -93,7 +93,12 @@ class Family(family.Family):
             'simple': alphabetic
         }
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['fa', 'fy', 'it', 'ru', 'simple', 'zh']
+        self.cross_allowed = ['fa', 'fy', 'it', 'nl', 'ru', 'simple', 'zh']
+        # CentralAuth cross avaliable projects.
+        self.cross_projects = [
+            'wikipedia', 'wiktionary', 'wikiquote', 'wikiquote', 'wikinews', 'wikiversity', 
+            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
+        ]
 
     def version(self, code):
         return '1.16alpha-wmf'

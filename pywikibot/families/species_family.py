@@ -14,6 +14,10 @@ class Family(family.Family):
             'species': 'species.wikimedia.org',
         }
         self.interwiki_forward = 'wikipedia'
+        self.cross_projects = [
+            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
+            'meta', 'mediawiki', 'test', 'incubator', 'commons',
+        ]
 
     def version(self,code):
         return '1.16alpha-wmf'

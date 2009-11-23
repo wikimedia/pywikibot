@@ -483,8 +483,18 @@ class Family:
         self.disambiguationTemplates = {
             '_default': []
         }
+
+        # A list of projects that share cross-project sessions.
+        self.cross_projects = []
+
+        # A list with the name for cross-project cookies.
+        # default for wikimedia centralAuth extensions.
+        self.cross_projects_cookies = ['centralauth_Session', 'centralauth_Token', 'centralauth_User']
+        self.cross_projects_cookie_username = 'centralauth_User'
+
         # A list with the name in the cross-language flag permissions
         self.cross_allowed = []
+
         # A list with the name of the category containing disambiguation
         # pages for the various languages. Only one category per language,
         # and without the namespace, so add things like:

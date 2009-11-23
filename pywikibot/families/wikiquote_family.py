@@ -11,14 +11,14 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'it', 'de', 'pl', 'pt', 'sk', 'ru', 'es', 'bg', 'bs',
-            'sl', 'tr', 'he', 'lt', 'fr', 'cs', 'zh', 'fa', 'hu', 'uk',
-            'id', 'sv', 'el', 'no', 'nl', 'ja', 'fi', 'eo', 'hy', 'et',
-            'nn', 'ca', 'simple', 'ka', 'ar', 'ku', 'ko', 'hr', 'ro', 'gl',
-            'sr', 'ml', 'li', 'is', 'th', 'af', 'te', 'da', 'sq', 'vi',
-            'eu', 'az', 'la', 'br', 'hi', 'be', 'ast', 'uz', 'ang', 'zh-min-nan',
-            'lb', 'mr', 'gu', 'su', 'ur', 'ta', 'wo', 'kn', 'ky', 'cy',
-            'am', 'co', 'kk',
+            'en', 'it', 'pl', 'de', 'pt', 'ru', 'sk', 'es', 'bg', 'bs',
+            'sl', 'tr', 'fr', 'he', 'lt', 'cs', 'zh', 'el', 'hu', 'fa',
+            'uk', 'id', 'sv', 'nl', 'no', 'ja', 'fi', 'simple', 'hy', 'eo',
+            'et', 'nn', 'ca', 'ka', 'ar', 'ko', 'ku', 'hr', 'gl', 'ro',
+            'sr', 'ml', 'li', 'is', 'th', 'te', 'af', 'da', 'sq', 'eu',
+            'az', 'vi', 'la', 'cy', 'br', 'hi', 'be', 'ast', 'uz', 'ta',
+            'ang', 'zh-min-nan', 'mr', 'gu', 'lb', 'su', 'ur', 'wo', 'ky', 'kn',
+            'am', 'kk', 'co',
         ]
 
         for lang in self.languages_by_size:
@@ -47,8 +47,13 @@ class Family(family.Family):
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
-            'af','am','ang','ar','ast','az','ca','da','fa','it',
-            'ka','ko','la','nn','no','ro','simple','sv','vi','zh'
+            'af','am','ang','ar','ast','az','bg','bs','ca','cs','da','el','es','eu','fa','fr','fi','he','hu','hy','id','it',
+            'ka','ko','la','lt','nl','nn','no','pt','ro','simple','sv','vi','zh'
+        ]
+        # CentralAuth cross avaliable projects.
+        self.cross_projects = [
+            'wikipedia', 'wiktionary', 'wikibooks', 'wikisource', 'wikinews', 'wikiversity', 
+            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,

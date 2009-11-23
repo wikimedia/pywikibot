@@ -28,15 +28,20 @@ class Family(family.Family):
                         u'Catredir',
                         u'Redirect category'),
         }
-        
+
         self.disambiguationTemplates = {
             'commons': [u'Disambig', u'Disambiguation', u'Razločitev',
                         u'Begriffsklärung']
         }
-        
+
         self.disambcatname = {
             'commons':  u'Disambiguation'
         }
+        self.cross_projects = [
+            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
+            'meta', 'mediawiki', 'test', 'incubator', 'species',
+        ]
+
 
     def version(self, code):
         return '1.16alpha-wmf'

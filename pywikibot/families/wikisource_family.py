@@ -11,11 +11,11 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'en', 'pt', 'fr', 'zh', 'es', 'de', 'ru', 'he', 'it', 'ar',
+            'en', 'pt', 'ru', 'zh', 'fr', 'es', 'de', 'he', 'it', 'ar',
             'fa', 'hu', 'pl', 'th', 'cs', 'ro', 'hr', 'te', 'fi', 'tr',
-            'nl', 'sv', 'sl', 'ko', 'sr', 'ja', 'la', 'uk', 'el', 'li',
-            'ml', 'is', 'bs', 'id', 'ca', 'bn', 'az', 'yi', 'hy', 'mk',
-            'no', 'da', 'vi', 'et', 'ta', 'bg', 'lt', 'kn', 'gl', 'cy',
+            'nl', 'sv', 'sl', 'ko', 'sr', 'uk', 'ja', 'el', 'la', 'li',
+            'yi', 'ml', 'az', 'is', 'bn', 'bs', 'ca', 'vi', 'id', 'hy',
+            'mk', 'no', 'da', 'et', 'ta', 'bg', 'lt', 'kn', 'gl', 'cy',
             'sk', 'zh-min-nan', 'fo',
         ]
 
@@ -53,7 +53,12 @@ class Family(family.Family):
         }
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
-            'el','fa','it','ko','no','zh'
+            'el','fa','it','ko','no','vi','zh'
+        ]
+        # CentralAuth cross avaliable projects.
+        self.cross_projects = [
+            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikinews', 'wikiversity', 
+            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
 
     def version(self, code):

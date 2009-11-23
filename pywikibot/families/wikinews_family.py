@@ -11,9 +11,9 @@ class Family(family.Family):
         self.name = 'wikinews'
 
         self.languages_by_size = [
-            'en', 'sr', 'pl', 'it', 'de', 'fr', 'pt', 'es', 'zh', 'sv',
-            'ja', 'ru', 'nl', 'he', 'fi', 'ar', 'sd', 'cs', 'no', 'uk',
-            'hu', 'ca', 'ro', 'th', 'bs', 'bg', 'ta', 'tr'
+            'sr', 'en', 'pl', 'de', 'it', 'fr', 'pt', 'es', 'zh', 'ja',
+            'sv', 'ru', 'nl', 'he', 'fi', 'ar', 'cs', 'sd', 'no', 'hu',
+            'uk', 'ca', 'ro', 'ta', 'tr', 'bg', 'th', 'bs',
         ]
 
         for lang in self.languages_by_size:
@@ -42,6 +42,11 @@ class Family(family.Family):
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = ['cs', 'hu',]
+        # CentralAuth cross avaliable projects.
+        self.cross_projects = [
+            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikiversity', 
+            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
+        ]
 
     def code2encoding(self, code):
         return 'utf-8'
