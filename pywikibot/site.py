@@ -810,7 +810,8 @@ class APISite(BaseSite):
     def mediawiki_message(self, key):
         """Return the MediaWiki message text for key "key" """
         if not key in self._msgcache:
-            msg_query = api.QueryGenerator(meta="allmessages", amfilter=key)
+            msg_query = api.QueryGenerator(site=self, meta="allmessages",
+                                           amfilter=key)
             for msg in msg_query:
                 if msg['name'] == key and not 'missing' in msg:
                     self._msgcache[key] = msg['*']
@@ -1097,7 +1098,7 @@ class APISite(BaseSite):
                 props += '|templates'
             if langlinks:
                 props += '|langlinks'
-            rvgen = api.PropertyGenerator(props)
+            rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1) # suppress use of "rvlimit" parameter
             if len(pageids) == len(sublist):
                 # only use pageids if all pages have them
