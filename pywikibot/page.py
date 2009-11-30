@@ -1753,6 +1753,243 @@ class Category(Page):
         return sorted(list(set(self.categories())))
 
 
+class User(Page):
+    """A class that represents a Wiki user.
+    """
+
+    @deprecate_arg("insite", None)
+    def __init__(self, source, title=u''):
+        """All parameters are the same as for Page() constructor.
+        """
+        if len(title) > 1 and title[0] == u'#':
+            self.is_autoblock = True
+            title = title[1:]
+        else:
+            self.is_autoblock = False
+        Page.__init__(self, source, title, ns=2)
+        if self.namespace() != 2:
+            raise ValueError(u"'%s' is not in the user namespace!"
+                             % title)
+        if self.is_autoblock:
+            # This user is probably being queried for purpose of lifting
+            # an autoblock.
+            pywikibot.output("This is an autoblock ID, "
+                            "you can only use to unblock it.")
+
+    @property
+    def username(self):
+        """ Convenience method that returns the title of the page with
+        namespace prefix omitted, aka the username, as a Unicode string.
+        """
+        if self.is_autoblock:
+            return u'#' + self.title(withNamespace=False)
+        else:
+            return self.title(withNamespace=False)
+
+    def getprops(self, force=False):
+        """ Return a Dictionnary that contains user's properties. Use cached
+        values if already called before, otherwise fetch data from the API.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        """
+        if force:
+            del self._userprops
+        if not hasattr(self, '_userprops'):
+            usrequest = pywikibot.data.api.Request(
+                            site=self.site(),
+                            action='query',
+                            list='users',
+                            usprop='blockinfo|groups|editcount|registration|emailable',
+                            ususers=self.username,
+                            )
+            usdata = usrequest.submit()
+            assert 'query' in usdata, \
+                   "API users response lacks 'query' key"
+            assert 'users' in usdata['query'], \
+                   "API users response lacks 'users' key"
+            if u'missing' in usdata['query']['users'][0] or \
+                                    u'invalid' in usdata['query']['users'][0]:
+                raise pywikibot.Error(u'No such user or invaild username (%s)'\
+                                                            % self.username)
+            self._userprops = usdata['query']['users'][0]
+        return self._userprops
+
+    def registrationTime(self, force=False):
+        """ Return registration time for this user, as a Unicode string in
+        ISO8601 format, or None if the date is unknown.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        """
+        if 'registration' in self.getprops(force):
+            return self.getprops()['registration']
+
+    def editCount(self, force=False):
+        """ Return edit count for this user as int.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        """
+        if 'editcount' in self.getprops(force):
+            return self.getprops()['editcount']
+        else:
+            return 0
+
+    def isBlocked(self, force=False):
+        """ Return True if this user is currently blocked, False otherwise.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        """
+        return 'blockedby' in self.getprops(force)
+
+    def isEmailable(self, force=False):
+        """ Return True if emails can be send to this user through mediawiki,
+        False otherwise.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        """
+        return 'emailable' in self.getprops(force)
+
+    def groups(self, force=False):
+        """ Return a list of groups to wich this user belongs. The return value
+        is guaranteed to be a list object, possibly empty.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        """
+        if 'groups' in self.getprops(force):
+            return self.getprops()['groups']
+        else:
+            return []
+
+    def getUserPage(self, subpage=u''):
+        """ Return a pywikibot.Page object corresponding to this user's main
+        page, or a subpage of it if subpage is set.
+
+        @param subpage: subpage part to be appended to the main
+                            page title (optional)
+        @type subpage: unicode
+        """
+        if self.is_autoblock:
+            #This user is probably being queried for purpose of lifting
+            #an autoblock, so has no user pages per se.
+            raise AutoblockUser("This is an autoblock ID, you can only use to unblock it.")
+        if subpage:
+            subpage = u'/' + subpage
+        return Page(Link(self.title() + subpage, self.site()))
+
+    def getUserTalkPage(self, subpage=u''):
+        """ Return a pywikibot.Page object corresponding to this user's main
+        talk page, or a subpage of it if subpage is set.
+
+        @param subpage: subpage part to be appended to the main
+                            talk page title (optional)
+        @type subpage: unicode
+        """
+        if self.is_autoblock:
+            #This user is probably being queried for purpose of lifting
+            #an autoblock, so has no user talk pages per se.
+            raise AutoblockUser("This is an autoblock ID, you can only use to unblock it.")
+        if subpage:
+            subpage = u'/' + subpage
+        return Page(Link(self.title(withNamespace=False) + subpage,
+                                            self.site(), defaultNamespace=3))
+
+    def sendMail(self, subject, text, ccme = False):
+        """ Send an email to this user via mediawiki's email interface.
+        Return True on success, False otherwise.
+        This method can raise an UserActionRefuse exception in case this user
+        doesn't allow sending email to him or the currently logged in bot
+        doesn't have the right to send emails.
+
+        @param subject: the subject header of the mail
+        @type subject: unicode
+        @param text: mail body
+        @type text: unicode
+        @param ccme: if True, sends a copy of this email to the bot
+        @type ccme: bool
+        """
+        if not self.isEmailable():
+            raise UserActionRefuse('This user is not mailable')
+
+        if not self.site().has_right('sendemail'):
+            raise UserActionRefuse('You don\'t have permission to send mail')
+
+        params = {
+            'action': 'emailuser',
+            'target': self.username,
+            'token': self.site().token(self, 'email'),
+            'subject': subject,
+            'text': text,
+        }
+        if ccme:
+            params['ccme'] = 1
+        mailrequest = pywikibot.data.api.Request(**params)
+        maildata = mailrequest.submit()
+
+        if 'error' in maildata:
+            code = maildata['error']['code']
+            if code == u'usermaildisabled ':
+                pywikibot.output(u'User mail has been disabled')
+        elif 'emailuser' in maildata:
+            if maildata['emailuser']['result'] == u'Success':
+                pywikibot.output(u'Email sent.')
+                return True
+        return False
+
+    @deprecated("contributions")
+    @deprecate_arg("limit", "total") # To be consistent with rest of framework
+    def editedPages(self, total=500):
+        """ Deprecated function that wraps 'contributions' for backwards
+        compatibility. Yields pywikibot.Page objects that this user has
+        edited, with an upper bound of 'total'. Pages returned are not
+        guaranteed to be unique.
+
+        @param total: limit result to this number of pages.
+        @type total: int.
+        """
+        for item in self.contributions(total=total):
+            yield item[0]
+
+    @deprecate_arg("limit", "total") # To be consistent with rest of framework
+    @deprecate_arg("namespace", "namespaces")
+    def contributions(self, total=500, namespaces=[]):
+        """ Yield tuples describing this user edits.
+        Each tuple is composed of a pywikibot.Page object,
+        the revision id (int), the edit timestamp (as int in mediawiki's
+        internal format), and the comment (unicode).
+        Pages returned are not guaranteed to be unique.
+
+        @param total: limit result to this number of pages
+        @type total: int
+        @param namespaces: only iterate links in these namespaces
+        @type namespaces: list
+        """
+        for contrib in self.site().usercontribs(user=self.username,
+                                        namespaces=namespaces, total=total):
+            ts = pywikibot.Timestamp.fromISOformat(contrib['timestamp'])
+            ts = int(ts.strftime("%Y%m%d%H%M%S"))
+            yield Page(Link(contrib['title'], self.site(),
+                            defaultNamespace=contrib['ns'])), \
+                  contrib['revid'], ts, contrib['comment']
+
+    @deprecate_arg("number", "total")
+    def uploadedImages(self, total=10):
+        """ Yield tuples describing files uploaded by this user.
+        Each tuple is composed of a pywikibot.Page, the timestamp (str in
+        ISO8601 format), comment (unicode) and a bool (always False...).
+        Pages returned are not guaranteed to be unique.
+
+        @param total: limit result to this number of pages
+        @type total: int
+        """
+        for item in self.site().logevents(logtype='upload', user=self.username,
+                                                                total=total):
+            yield item.title(), str(item.timestamp()), item.comment(), False
+
 class Revision(object):
     """A structure holding information about a single revision of a Page."""
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
@@ -2261,4 +2498,3 @@ def url2unicode(title, site, site2 = None):
             pass
     # Couldn't convert, raise the original exception
     raise firstException
-

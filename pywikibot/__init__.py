@@ -140,7 +140,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
 
     """
     logger = logging.getLogger("pywiki.wiki")
-    
+
     if code is None:
         code = config.mylang
     if fam is None:
@@ -172,7 +172,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
 getSite = Site # alias for backwards-compability
 
 
-from page import Page, ImagePage, Category, Link
+from page import Page, ImagePage, Category, Link, User
 
 
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[#<>{}]*)(\|.*?)?\]\]')
@@ -209,7 +209,7 @@ def showDiff(oldtext, newtext):
     Output a string showing the differences between oldtext and newtext.
     The differences are highlighted (only on compatible systems) to show which
     changes were made.
-    
+
     """
     # This is probably not portable to non-terminal interfaces....
     # For information on difflib, see http://pydoc.org/2.3/difflib.html

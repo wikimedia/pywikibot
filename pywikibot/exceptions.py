@@ -29,7 +29,7 @@ class Error(Exception):
         return self.unicode
 
 class PageRelatedError(Error):
-    """Abstract Exception, used when the Exception concerns a particular 
+    """Abstract Exception, used when the Exception concerns a particular
     Page, and when a generic message can be written once for all"""
     # Preformated UNICODE message where the page title will be inserted
     # Override this in subclasses.
@@ -68,7 +68,7 @@ class IsNotRedirectPage(PageRelatedError):
 
 class CircularRedirect(Error):
     """Page is a circular redirect
- 
+
     Exception argument is the redirect target; this may be the same title
     as this page or a different title (in which case the target page directly
     or indirectly redirects back to this one)
@@ -119,3 +119,11 @@ class CaptchaError(Error):
 class UploadWarning(Error):
     """Upload failed with a warning message (passed as the argument)."""
 
+class AutoblockUser(Error):
+    """
+    The class AutoblockUserError is an exception that is raised whenever
+    an action is requested on a virtual autoblock user that's not available
+    for him (i.e. roughly everything except unblock).
+    """
+class UserActionRefuse(Error):
+    pass
