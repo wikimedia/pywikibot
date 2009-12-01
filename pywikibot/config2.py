@@ -50,8 +50,8 @@ sysopnames = {}
 disambiguation_comment = {}
 gdab_namespaces = {}
 
-# Solve captchas in the webbrowser. Setting this to False will result in the 
-# exception CaptchaError being thrown if a captcha is encountered. 
+# Solve captchas in the webbrowser. Setting this to False will result in the
+# exception CaptchaError being thrown if a captcha is encountered.
 solve_captcha = True
 
 # Some sites will require password identication to access the HTML pages at
@@ -105,7 +105,7 @@ def _get_base_dir():
     3.  Use (and if necessary create) a 'pywikibot' folder (Windows) or
         '.pywikibot' directory (Unix and similar) under the user's home
         directory.
-    
+
     """
     NAME = "pywikibot"
     for arg in __sys.argv[1:]:
@@ -117,18 +117,18 @@ def _get_base_dir():
         if "PYWIKIBOT2_DIR" in os.environ:
             base_dir = os.environ["PYWIKIBOT2_DIR"]
         else:
-            is_windows = __sys.platform == 'win32' 
-            home = os.path.expanduser("~") 
-            if is_windows: 
+            is_windows = __sys.platform == 'win32'
+            home = os.path.expanduser("~")
+            if is_windows:
                 _win_version = int(platform.version()[0])
                 if _win_version == 5:
-                    base_dir = os.path.join(home, "Application Data", NAME) 
+                    base_dir = os.path.join(home, "Application Data", NAME)
                 elif _win_version == 6:
-                    base_dir = os.path.join(home, "AppData\\Roaming", NAME) 
-            else: 
-                base_dir = os.path.join(home, "."+NAME) 
-            if not os.path.isdir(base_dir): 
-                os.makedirs(base_dir, mode=0700) 
+                    base_dir = os.path.join(home, "AppData\\Roaming", NAME)
+            else:
+                base_dir = os.path.join(home, "."+NAME)
+            if not os.path.isdir(base_dir):
+                os.makedirs(base_dir, mode=0700)
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file
@@ -326,7 +326,7 @@ upload_to_commons = False
 # control the rate of server access.  Set minthrottle to non-zero to use a
 # throttle on read access.
 minthrottle = 0
-maxthrottle = 10
+maxthrottle = 60
 
 # Slow down the robot such that it never makes a second page edit within
 # 'put_throttle' seconds.
@@ -557,7 +557,7 @@ def makepath(path):
     """
     import os
     dpath = os.path.normpath(os.path.dirname(path))
-    if not os.path.exists(dpath): 
+    if not os.path.exists(dpath):
         os.makedirs(dpath)
     return os.path.normpath(os.path.abspath(path))
 
