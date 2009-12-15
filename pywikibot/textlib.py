@@ -347,14 +347,14 @@ def removeLanguageLinksAndSeparator(text, site = None, marker = '', separator = 
         return removeLanguageLinks(text, site, marker)
 
 
-def replaceLanguageLinks(oldtext, new, site = None, addOnly = False, 
+def replaceLanguageLinks(oldtext, new, site = None, addOnly = False,
     template = False):
     """Replace interlanguage links in the text with a new set of links.
 
-    'new' should be a dict with the Site objects as keys, and Page or Link 
+    'new' should be a dict with the Site objects as keys, and Page or Link
     objects as values (i.e., just like the dict returned by getLanguageLinks
     function).
-    
+
     """
     # Find a marker that is not already in the text.
     marker = findmarker( oldtext, u'@@')
@@ -581,7 +581,7 @@ def replaceCategoryLinks(oldtext, new, site = None, addOnly = False):
 
     If addOnly is True, the old category won't be deleted andthe
     category(s) given will be added (and so they won't replace anything).
-    
+
     """
     # Find a marker that is not already in the text.
     marker = findmarker( oldtext, u'@@')
@@ -641,7 +641,7 @@ def categoryFormat(categories, insite = None):
     'categories' should be a list of Category objects.
 
     The string is formatted for inclusion in insite.
-    
+
     """
     if not categories:
         return ''
@@ -790,7 +790,7 @@ def extract_templates_and_params(text, get_redirect=False):
                     for m2 in Rmarker3.finditer(param_val):
                         param_val = param_val.replace(m2.group(),
                                                       maths[int(m2.group(1))])
-                    params[param_name] = param_val
+                    params[param_name.strip()] = param_val.strip()
 
             # Add it to the result
             result.append((name, params))
