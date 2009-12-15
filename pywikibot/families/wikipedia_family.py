@@ -156,7 +156,7 @@ class Family(family.Family):
             'cu':  [u'Мъногосъмыслиѥ', u'Disambig'],
             'cy':  [u'Anamrwysedd', u'Disambig', u'Gwahaniaethu'],
             'da':  [u'Flertydig'],
-            'de':  [u'Begriffsklärung', u'BKS', u'Disambig'],
+            'de':  [u'Begriffsklärung'],
             'dsb': [u'Wěcejwóznamowosć'],
             'el':  [u'Disambig', u'Αποσαφ', u'Αποσαφήνιση'],
             'en':  None,
@@ -220,6 +220,7 @@ class Family(family.Family):
             'no':  [u'Peker', u'Etternavn', u'Disambig', u'Tobokstavsforkortelse',
                     u'Trebokstavsforkortelse', u'Flertydig', u'Pekerside'],
             'nov': [u'Desambig'],
+            'nv':  [u'Dab'],
             'nrm': [u'Page dé frouque'],
             'oc':  [u'Omonimia', u'Disambig'],
             'pl':  [u'Disambig', u'DisambRulers', u'DisambigC', u'Strona ujednoznaczniająca'],
@@ -480,6 +481,7 @@ class Family(family.Family):
                 'pt': [102],
                 'als': [104],
                 'ar': [104],
+                'de': [4],
                 'en': [12],
                 'es': [104],
                 'fi': [4],
@@ -502,10 +504,32 @@ class Family(family.Family):
             },
         }
         self.crossnamespace[4] = {
-            'fi': {'_default': [0]}
+            '_default': {
+                '_default': [12],
+            },
+            'de': {
+                '_default': [0, 12]
+            },
+            'fi': {
+                '_default': [0, 12]
+            },
         }
         self.crossnamespace[5] = {
-            'fi': {'_default': [1]}
+            'fi': {
+                '_default': [1]}
+        }
+        self.crossnamespace[12] = {
+            '_default': {
+                '_default': [4],
+            },
+            'en': {
+                '_default': [0, 4],
+            },
+        }
+        self.crossnamespace[13] = {
+            'en': {
+                '_default': [0],
+            },
         }
         self.crossnamespace[102] = {
             'pt': {
@@ -519,6 +543,7 @@ class Family(family.Family):
             'hr': {
                 '_default': [0],
                 'als': [0, 104],
+                'ar': [0, 104],
                 'es': [0, 104],
                 'fr': [0, 104],
                 'lt': [0, 104]
@@ -548,6 +573,7 @@ class Family(family.Family):
             },
             'ar': {
                 '_default': [0, 100],
+                'hr': [0, 102],
                 'pt': [0, 102],
             },
             'es': {
@@ -591,16 +617,7 @@ class Family(family.Family):
                 'hr': [0, 103],
             },
         }
-        self.crossnamespace[12] = {
-            'en': {
-                '_default': [0],
-            },
-        }
-        self.crossnamespace[13] = {
-            'en': {
-                '_default': [0],
-            },
-        }
+
     def get_known_families(self, site):
         # In Swedish Wikipedia 's:' is part of page title not a family
         # prefix for 'wikisource'.

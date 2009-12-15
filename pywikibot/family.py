@@ -768,7 +768,7 @@ class Family:
                u'\u1794\u17d2\u178a\u17bc\u179a\u1785\u17c6\u178e\u1784\u1787\u17be\u1784',
                u'ប្តូរទីតាំងទៅ'],
         'ko': [u'넘겨주기'],
-        'ksh': [u'ömleidung'],
+        'ksh': [u'ömleide op', u'ömleidung'],
         'kv': [u'перенаправление', u'перенапр'],
         'lad': [u'redirección'],
         'lb': [u'weiterleitung'],
