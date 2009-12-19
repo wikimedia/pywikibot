@@ -11,20 +11,20 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'fr', 'en', 'lt', 'tr', 'vi', 'ru', 'zh', 'io', 'pl', 'el',
+            'fr', 'en', 'lt', 'tr', 'zh', 'ru', 'vi', 'io', 'pl', 'el',
             'fi', 'hu', 'no', 'it', 'ta', 'de', 'sv', 'ko', 'pt', 'nl',
-            'lo', 'ku', 'ja', 'es', 'ro', 'id', 'te', 'et', 'gl', 'bg',
-            'uk', 'ca', 'ar', 'kn', 'vo', 'ml', 'fa', 'is', 'sr', 'af',
-            'li', 'sw', 'cs', 'scn', 'fy', 'th', 'simple', 'br', 'oc', 'he',
-            'sl', 'hy', 'sq', 'tt', 'la', 'zh-min-nan', 'da', 'hr', 'ast', 'tk',
-            'wa', 'ur', 'hsb', 'kk', 'ky', 'wo', 'ang', 'eo', 'hi', 'ga',
+            'lo', 'ku', 'ja', 'es', 'ro', 'et', 'id', 'te', 'kn', 'gl',
+            'bg', 'uk', 'ca', 'ar', 'vo', 'ml', 'fa', 'is', 'sr', 'li',
+            'af', 'cs', 'sw', 'fy', 'scn', 'th', 'simple', 'br', 'oc', 'he',
+            'sl', 'hy', 'sq', 'tt', 'la', 'zh-min-nan', 'hr', 'da', 'ast', 'tk',
+            'wa', 'ur', 'hsb', 'kk', 'ky', 'wo', 'eo', 'ang', 'hi', 'ga',
             'gn', 'az', 'ia', 'co', 'sk', 'csb', 'st', 'ms', 'mr', 'tl',
-            'ka', 'nds', 'kl', 'sd', 'ug', 'ti', 'mk', 'an', 'my', 'gu',
-            'km', 'lv', 'eu', 'cy', 'mg', 'ts', 'qu', 'sh', 'bs', 'fo',
-            'am', 'rw', 'chr', 'su', 'mn', 'om', 'nah', 'bn', 'ie', 'yi',
-            'be', 'iu', 'gd', 'nn', 'zu', 'si', 'tg', 'pa', 'mt', 'dv',
-            'tpi', 'roa-rup', 'mi', 'jv', 'kw', 'ps', 'uz', 'ik', 'so', 'gv',
-            'sg', 'ha', 'ss', 'sa', 'ay', 'na', 'jbo', 'ne', 'tn', 'sm',
+            'ka', 'nds', 'kl', 'sd', 'ug', 'ti', 'mk', 'an', 'my', 'sh',
+            'gu', 'eu', 'mg', 'km', 'lv', 'cy', 'bn', 'ts', 'qu', 'bs',
+            'fo', 'am', 'rw', 'chr', 'su', 'ne', 'mn', 'om', 'nah', 'ie',
+            'yi', 'be', 'iu', 'gd', 'nn', 'tg', 'zu', 'si', 'pa', 'mt',
+            'dv', 'tpi', 'kw', 'gv', 'roa-rup', 'mi', 'jv', 'uz', 'ps', 'ik',
+            'so', 'sg', 'ha', 'ss', 'sa', 'ay', 'na', 'jbo', 'tn', 'sm',
             'lb', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
         ]
 

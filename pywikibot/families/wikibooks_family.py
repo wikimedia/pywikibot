@@ -11,15 +11,15 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'hu', 'pt', 'ja', 'es', 'pl', 'nl', 'it',
-            'he', 'sq', 'fi', 'vi', 'ru', 'cs', 'hr', 'zh', 'sv', 'da',
-            'mk', 'ca', 'tr', 'th', 'tl', 'sr', 'fa', 'id', 'is', 'ar',
-            'ta', 'no', 'ka', 'simple', 'ko', 'eo', 'gl', 'bg', 'lt', 'ro',
+            'en', 'de', 'fr', 'hu', 'pt', 'ja', 'es', 'nl', 'pl', 'it',
+            'he', 'sq', 'fi', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'da',
+            'ca', 'mk', 'tr', 'th', 'tl', 'sr', 'fa', 'id', 'is', 'ar',
+            'ta', 'no', 'simple', 'ka', 'ko', 'eo', 'gl', 'bg', 'lt', 'ro',
             'sk', 'el', 'la', 'ia', 'ang', 'sl', 'et', 'cv', 'mr', 'ur',
-            'oc', 'ml', 'ms', 'uk', 'eu', 'fy', 'hi', 'ie', 'bn', 'tg',
-            'af', 'hy', 'te', 'pa', 'bs', 'ky', 'az', 'be', 'sa', 'zh-min-nan',
-            'ast', 'tt', 'cy', 'mg', 'si', 'ku', 'co', 'sw', 'tk', 'ne',
-            'als', 'su', 'vo', 'uz', 'na', 'kn', 'kk', 'mn', 'nds', 'za',
+            'uk', 'oc', 'ml', 'ms', 'eu', 'fy', 'ie', 'hi', 'tg', 'bn',
+            'af', 'hy', 'bs', 'te', 'pa', 'ky', 'az', 'be', 'sa', 'ast',
+            'zh-min-nan', 'tt', 'cy', 'mg', 'si', 'ku', 'co', 'tk', 'sw', 'ne',
+            'als', 'su', 'uz', 'vo', 'na', 'kn', 'mn', 'kk', 'nds', 'za',
             'zu', 'my',
         ]
 
