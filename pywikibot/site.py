@@ -1058,17 +1058,19 @@ class APISite(BaseSite):
             raise RuntimeError(
                 "getredirtarget: 'redirects' contains no key for page %s."
                 % title)
-        if "pages" not in result['query']:
+        target_title = redirmap[title]
+        if target_title == title or "pages" not in result['query']:
             # no "pages" element indicates a circular redirect
             raise pywikibot.CircularRedirect(redirmap[title])
-        for pagedata in result['query']['pages'].itervalues():
+        pagedata = result['query']['pages'].values()[0]
             # there should be only one value in 'pages', and it is the target
-            if pagedata['title'] not in redirmap.itervalues():
-                raise RuntimeError(
-                    "getredirtarget: target page '%s' not found in 'redirects'"
-                    % pagedata['title'])
+        if pagedata['title'] == target_title:
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
             api.update_page(target, pagedata)
+            page._redirtarget = target
+        else:
+            # double redirect; target is an intermediate redirect
+            target = pywikibot.Page(self, target_title)
             page._redirtarget = target
         return page._redirtarget
 
@@ -1451,7 +1453,7 @@ class APISite(BaseSite):
                         u"loadrevisions: Query on %s returned data on '%s'"
                         % (page, pagedata['title']))
                 if "missing" in pagedata:
-                    raise NoPage(page) 
+                    raise NoPage(page)
             else:
                 page = Page(self, pagedata['title'])
             api.update_page(page, pagedata)
@@ -1475,7 +1477,7 @@ class APISite(BaseSite):
             if 'langlinks' not in pageitem:
                 continue
             for linkdata in pageitem['langlinks']:
-                yield pywikibot.Link.langlinkUnsafe(linkdata['lang'], 
+                yield pywikibot.Link.langlinkUnsafe(linkdata['lang'],
                                                     linkdata['*'],
                                                     source=self)
 
@@ -1710,7 +1712,7 @@ class APISite(BaseSite):
             could be more than one) with this sha1 hash
         @param sha1base36: same as sha1 but in base 36
 
-        """        
+        """
         aigen = self._generator(api.ImagePageGenerator,
                                 type_arg="allimages", gaifrom=start,
                                 step=step, total=total)
@@ -2205,7 +2207,7 @@ redirects on %(site)s wiki""",
         token = self.token(page, "edit")
         # getting token also updates the 'lastrevid' value, which allows us to
         # detect if page has been changed since last time text was retrieved.
-        
+
         # note that the server can still return an 'editconflict' error
         # if the page is updated after the token is retrieved but
         # before the page is saved.
@@ -2540,7 +2542,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
         filter the list returned.
 
         NOTE 2: it returns the image title WITHOUT the image namespace.
-        
+
         """
         if hash_found == None: # If the hash is none return None and not continue
             return None
