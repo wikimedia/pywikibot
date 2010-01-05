@@ -120,7 +120,7 @@ class UI:
         self.OutputHandlerClass = TerminalHandler
         self.output_stream = sys.stderr
 
-    def output(self, text, level=logging.INFO):
+    def output(self, text, level=logging.INFO, context=None):
         """
         If a character can't be displayed in the encoding used by the user's
         terminal, it will be replaced with a question mark or by a
@@ -128,7 +128,7 @@ class UI:
         """
         self.writelock.acquire()
         try:
-            logging.getLogger("pywiki").log(level, text)
+            logging.getLogger("pywiki").log(level, text, extra=context)
         finally:
             self.writelock.release()
 
@@ -144,7 +144,7 @@ class UI:
         if config.ring_bell:
             sys.stdout.write('\07')
 
-        # While we're waiting for user input, 
+        # While we're waiting for user input,
         # we don't want terminal writes from other Threads
         self.writelock.acquire()
         self.output(question + ' ', level=pywikibot.INPUT)
@@ -177,17 +177,17 @@ class UI:
                 options[i] = '%s[%s]%s' % (option[:pos], caseHotkey, option[pos+1:])
             else:
                 options[i] = '%s [%s]' % (option, caseHotkey)
-        
+
         answer = ''
 
-        # While we're waiting for user input, 
+        # While we're waiting for user input,
         # we don't want terminal writes from other Threads
         self.writelock.acquire()
         try:
             # loop until the user entered a valid choice
             while True:
                 prompt = '%s (%s)' % (question, ', '.join(options))
-                
+
                 # it's okay to enter input with the lock, RLock is reentrant.
                 answer = self.input(prompt)
                 if answer.lower() in hotkeys or answer.upper() in hotkeys:
@@ -202,7 +202,7 @@ class UI:
     def editText(self, text, jumpIndex = None, highlight = None):
         """
         Uses a Tkinter edit box because we don't have a console editor
-        
+
         Parameters:
             * text      - a Unicode string
             * jumpIndex - an integer: position at which to put the caret
@@ -347,7 +347,7 @@ class TerminalHandler(logging.Handler):
             # Note: A transliteration replacement might be longer than the
             # original character; e.g., ч is transliterated to ch.
             # the resulting list will have as many elements as there are
-            # characters in the original text, but some list elements may 
+            # characters in the original text, but some list elements may
             # contain multiple characters
             prev = "-"
             prevchar = -1

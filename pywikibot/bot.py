@@ -32,6 +32,31 @@ import pywikibot
 from pywikibot import config
 
 
+# User interface initialization
+# search for user interface module in the 'userinterfaces' subdirectory
+uiModule = __import__("pywikibot.userinterfaces.%s_interface"
+                        % config.userinterface,
+                        fromlist=['UI'] )
+ui = uiModule.UI()
+
+# next bit filched from 1.5.2's inspect.py
+def currentframe():
+    """Return the frame object for the caller's stack frame."""
+    try:
+        raise Exception
+    except:
+        return sys.exc_traceback.tb_frame.f_back
+
+if hasattr(sys, '_getframe'):
+    # less portable but more efficient
+    currentframe = lambda: sys._getframe(2)
+    # frame0 is this lambda, frame1 is output() in this module,
+    # so frame2 is whatever called output()
+
+# done filching
+
+# Logging module configuration
+
 class MaxLevelFilter(logging.Filter):
     """Filter that only passes records at or below a specific level.
 
@@ -49,14 +74,6 @@ class MaxLevelFilter(logging.Filter):
             return True
 
 
-# User interface initialization
-# search for user interface module in the 'userinterfaces' subdirectory
-uiModule = __import__("pywikibot.userinterfaces.%s_interface"
-                        % config.userinterface, 
-                        fromlist=['UI'] )
-ui = uiModule.UI()
-
-
 class RotatingFileHandler(logging.handlers.RotatingFileHandler):
     """Strip trailing newlines before outputting text to file"""
     def format(self, record):
@@ -71,7 +88,7 @@ class LoggingFormatter(logging.Formatter):
             * our pywikibot.Error traces are encoded in our
               console encoding, which is needed for plainly printing them.
             * but when it comes to logging using logging.exception,
-              the Python logging module will try to use these traces, 
+              the Python logging module will try to use these traces,
               and it will fail if they are console encoded strings.
 
         Formatter.formatException also strips the trailing \n, which we need.
@@ -112,11 +129,17 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
     if root.level == 30: # init_handlers sets this level
         init_handlers(strm=ui.output_stream)
 
+    frame = currentframe()
+    module = os.path.basename(frame.f_code.co_filename)
+    context = {'caller_name': frame.f_code.co_name,
+               'caller_file': module,
+               'caller_line': frame.f_lineno}
+
     if decoder:
         text = unicode(text, decoder)
     elif not isinstance(text, unicode):
         if not isinstance(text, str):
-            # looks like text is a non-text object. 
+            # looks like text is a non-text object.
             # Maybe it has a __unicode__ builtin ?
             # (allows to print Page, Site...)
             text = unicode(text)
@@ -129,7 +152,7 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
         text += "\n"
     if toStdout:
         level = STDOUT
-    ui.output(text, level=level)
+    ui.output(text, level=level, context=context)
 
 def input(question, password=False):
     """Ask the user a question, return the user's answer.
@@ -248,11 +271,11 @@ def init_handlers(strm=None):
             logfile = config.datafilepath("%s-bot.log" % moduleName)
         file_handler = RotatingFileHandler(
                             filename=logfile, maxBytes=2 << 20, backupCount=5)
-        
+
         file_handler.setLevel(DEBUG)
         form = LoggingFormatter(
-                   fmt="%(asctime)s %(filename)18s, %(lineno)d: "
-                       "%(levelname)-8s %(message)s",
+                   fmt="%(asctime)s %(caller_file)18s, %(caller_line)4s "
+                       "in %(caller_name)18s: %(levelname)-8s %(message)s",
                    datefmt="%Y-%m-%d %H:%M:%S"
                )
         file_handler.setFormatter(form)
@@ -486,7 +509,7 @@ class Bot(object):
         """
         Only accepts options defined in availableOptions
         """
-        self.setOptions(**kwargs) 
+        self.setOptions(**kwargs)
 
     def setOptions(self, **kwargs):
         """
@@ -496,7 +519,7 @@ class Bot(object):
         self.options = {}
 
         validOptions = set(Bot.availableOptions)
-        receivedOptions = set(kwargs) 
+        receivedOptions = set(kwargs)
 
         for opt in receivedOptions & validOptions:
             self.options[opt] = kwargs[opt]
@@ -505,7 +528,7 @@ class Bot(object):
             pywikibot.output(u'%s is not a valid option. It was ignored\n'
                               % opt,
                              level=pywikibot.WARNING)
-        
+
     def getOption(self, option):
         """
         Get the current value of an option.
@@ -542,7 +565,7 @@ class Bot(object):
             if choice == 'a':
                 # Remember the choice
                 self.options['always'] = True
-        
+
         if choice != 'n':
             page.put(newtext, async=(choice=='a'))
 
