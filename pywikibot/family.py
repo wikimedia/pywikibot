@@ -89,7 +89,7 @@ class Family:
         # for line in f.readlines():
         #     s = line[:line.index('\t')]
         #     print (("            '%s':" % s).ljust(20) + ("'%s'," % s))
-        
+
         # TODO: replace this with API interwikimap call
         self.known_families = {
             'abbenormal':       'abbenormal',
@@ -657,7 +657,7 @@ class Family:
         else:
             raise KeyError(
                 "ERROR: linktrail in language %(language_code)s unknown"
-                           % {'language_code': code})
+                % {'language_code': code})
 
     def category_redirects(self, code, fallback="_default"):
         if code in self.category_redirect_templates:
@@ -676,8 +676,8 @@ class Family:
             return self.disambiguationTemplates[fallback]
         else:
             raise KeyError(
-"ERROR: title for disambig template in language %(language_code)s unknown"
-                           % {'language_code': code})
+                "ERROR: title for disambig template in language %(language_code)s unknown"
+                % {'language_code': code})
 
     # Localised magic words for language code 'xyz' can be found in
     # the MediaWiki source code in the file

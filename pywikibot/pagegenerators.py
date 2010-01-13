@@ -113,8 +113,6 @@ parameterHelp = u"""\
 
 -prefixindex      Work on pages commencing with a common prefix.
 
--regex            Obsolete, use -titleregex
-
 -step:n           When used with any other argument that specifies a set
                   of pages, only retrieve n pages at a time from the wiki
                   server
@@ -576,7 +574,8 @@ def ReferringPageGenerator(referredPage, followRedirects=False,
 
 def CategorizedPageGenerator(category, recurse=False, start=None,
                              step=None, total=None):
-    '''Yield all pages in a specific category.
+    '''
+    Yields all pages in a specific category.
 
     If recurse is True, pages in subcategories are included as well; if
     recurse is an int, only subcategories to that depth will be included
@@ -584,8 +583,8 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
     not go any further).
     If start is a string value, only pages whose sortkey comes after start
     alphabetically are included.
-
-    ''' # TODO: page generator could be modified to use cmstartsortkey ...
+    '''
+    # TODO: page generator could be modified to use cmstartsortkey ...
     for a in category.articles(recurse=recurse, step=step, total=total):
         if start is None or a.title(withNamespace=False) >= start:
             yield a
@@ -593,7 +592,8 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
 
 def SubCategoriesPageGenerator(category, recurse=False, start=None,
                                step=None, total=None):
-    '''Yields all subcategories in a specific category.
+    '''
+    Yields all subcategories in a specific category.
 
     If recurse is True, pages in subcategories are included as well; if
     recurse is an int, only subcategories to that depth will be included
@@ -601,8 +601,8 @@ def SubCategoriesPageGenerator(category, recurse=False, start=None,
     not go any further).
     If start is a string value, only categories whose sortkey comes after
     start alphabetically are included.
-
-    ''' # TODO: page generator could be modified to use cmstartsortkey ...
+    '''
+    # TODO: page generator could be modified to use cmstartsortkey ...
     for s in category.subcategories(recurse=recurse, step=step, total=total):
         if start is None or s.title(withNamespace=False) >= start:
             yield s
@@ -637,7 +637,6 @@ def TextfilePageGenerator(filename=None, site=None):
         # inadvertently change pages on another wiki!
         yield pywikibot.Page(pywikibot.Link(linkmatch.groups("title"), site))
     f.close()
-
 
 def PagesFromTitlesGenerator(iterable, site=None):
     """Generate pages from the titles (unicode strings) yielded by iterable."""
