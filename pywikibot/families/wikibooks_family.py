@@ -14,12 +14,12 @@ class Family(family.Family):
             'en', 'de', 'fr', 'hu', 'pt', 'ja', 'es', 'nl', 'pl', 'it',
             'he', 'sq', 'fi', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'da',
             'ca', 'mk', 'tr', 'th', 'tl', 'sr', 'fa', 'id', 'is', 'ar',
-            'ta', 'no', 'simple', 'ka', 'ko', 'gl', 'eo', 'bg', 'lt', 'ro',
+            'ta', 'no', 'ko', 'simple', 'ka', 'gl', 'eo', 'bg', 'lt', 'ro',
             'sk', 'el', 'la', 'ia', 'ang', 'cv', 'sl', 'et', 'mr', 'ur',
-            'uk', 'oc', 'ml', 'ms', 'eu', 'fy', 'ie', 'hi', 'tg', 'bn',
-            'af', 'hy', 'bs', 'te', 'pa', 'ky', 'az', 'sa', 'be', 'ast',
-            'zh-min-nan', 'tt', 'cy', 'mg', 'si', 'ku', 'co', 'tk', 'sw', 'ne',
-            'als', 'su', 'uz', 'vo', 'na', 'kn', 'mn', 'kk', 'nds', 'za',
+            'uk', 'oc', 'ml', 'ms', 'eu', 'fy', 'ie', 'hi', 'tg', 'az',
+            'bn', 'af', 'hy', 'te', 'bs', 'pa', 'ky', 'sa', 'be', 'ast',
+            'zh-min-nan', 'cy', 'tt', 'mg', 'si', 'ku', 'co', 'tk', 'sw', 'ne',
+            'als', 'su', 'vo', 'uz', 'na', 'mn', 'kn', 'kk', 'nds', 'za',
             'zu', 'my',
         ]
 
