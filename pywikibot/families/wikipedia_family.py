@@ -157,7 +157,7 @@ class Family(family.Family):
             'cu':  [u'Мъногосъмыслиѥ', u'Disambig'],
             'cy':  [u'Anamrwysedd', u'Disambig', u'Gwahaniaethu'],
             'da':  [u'Flertydig'],
-            'de':  [u'Begriffsklärung'],
+            'de':  None,
             'dsb': [u'Wěcejwóznamowosć'],
             'el':  [u'Disambig', u'Αποσαφ', u'Αποσαφήνιση'],
             'en':  None,
