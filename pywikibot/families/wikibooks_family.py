@@ -13,13 +13,13 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'pt', 'ja', 'es', 'nl', 'pl', 'it',
             'he', 'sq', 'fi', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'da',
-            'ca', 'mk', 'tr', 'th', 'tl', 'sr', 'fa', 'id', 'is', 'ar',
-            'ta', 'no', 'ka', 'ko', 'simple', 'gl', 'eo', 'lt', 'bg', 'ro',
+            'ca', 'tr', 'th', 'mk', 'sr', 'tl', 'fa', 'id', 'is', 'ar',
+            'no', 'ta', 'ka', 'ko', 'simple', 'gl', 'eo', 'lt', 'bg', 'ro',
             'sk', 'el', 'la', 'ia', 'ang', 'cv', 'sl', 'et', 'mr', 'ur',
-            'uk', 'oc', 'ml', 'ms', 'eu', 'fy', 'hi', 'ie', 'az', 'tg',
+            'uk', 'oc', 'ml', 'ms', 'az', 'eu', 'fy', 'hi', 'ie', 'tg',
             'hy', 'bn', 'af', 'te', 'bs', 'pa', 'ky', 'sa', 'be', 'ast',
             'zh-min-nan', 'cy', 'tt', 'mg', 'si', 'ku', 'co', 'tk', 'sw', 'ne',
-            'als', 'su', 'vo', 'uz', 'na', 'mn', 'kn', 'kk', 'nds', 'za',
+            'als', 'su', 'uz', 'vo', 'na', 'mn', 'kn', 'kk', 'nds', 'za',
             'zu', 'my',
         ]
 
