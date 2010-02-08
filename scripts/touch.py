@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 
-"""This bot goes over multiple pages of a wiki, and edits them without
+"""
+This bot goes over multiple pages of a wiki, and edits them without
 changing. This is for example used to get category links in templates
 working.
 
@@ -25,7 +26,7 @@ __version__='$Id$'
 #
 
 import pywikibot
-from pywikibot import pagegenerators, catlib, config
+from pywikibot import pagegenerators, config
 import sys
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}
