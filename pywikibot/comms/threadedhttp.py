@@ -31,6 +31,7 @@ import cookielib
 import sys
 
 import pywikibot
+from pywikibot import config
 
 logger = logging.getLogger("pywiki.comms.threadedhttp")
 
@@ -153,6 +154,8 @@ class Http(httplib2.Http):
         except KeyError:
             self.connection_pool = ConnectionPool()
         self.max_redirects = kwargs.pop('max_redirects', 5)
+        if len(args) < 3:
+            kwargs.setdefault('proxy_info', config.proxy)
         httplib2.Http.__init__(self, *args, **kwargs)
 
     def request(self, uri, method="GET", body=None, headers=None,

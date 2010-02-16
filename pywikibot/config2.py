@@ -478,6 +478,18 @@ cosmetic_changes = False
 # foreign wiki, set cosmetic_changes_mylang_only to False, but be careful!
 cosmetic_changes_mylang_only = True
 
+### Proxy configuration ###
+# assign prox = None to connect directly
+# For proxy support first run: apt-get install python-socks.py
+# then change your user-config.py like:
+# import httplib2
+# import socks
+# proxy = httplib2.ProxyInfo(socks.PROXY_TYPE_HTTP, 'localhost', 8000)
+# The following lines will be printed, but it works:
+# Configuration variable 'httplib2' is defined but unknown. Misspelled?
+# Configuration variable 'socks' is defined but unknown. Misspelled?proxy = None
+proxy = None
+
 # End of configuration section
 # ============================
 # System-level and User-level changes.
