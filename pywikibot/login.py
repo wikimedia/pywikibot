@@ -202,7 +202,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             else:
                 return False
         self.storecookiedata(cookiedata)
-        pywikibot.output(u"Should be logged in now")
+        pywikibot.output(u"Should be logged in now", level=pywikibot.VERBOSE)
 ##        # Show a warning according to the local bot policy
 ##   FIXME: disabled due to recursion; need to move this to the Site object after
 ##   login
@@ -224,7 +224,7 @@ def main(*args):
     sysop = False
     logall = False
     forceLogin = False
-    for arg in pywikibot.handleArgs(*args): 
+    for arg in pywikibot.handleArgs(*args):
         if arg.startswith("-pass"):
             if len(arg) == 5:
                 password = pywikibot.input(u'Password for all accounts:',
