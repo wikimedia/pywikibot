@@ -15,10 +15,10 @@ class Family(family.Family):
             'sl', 'tr', 'fr', 'he', 'lt', 'cs', 'zh', 'el', 'hu', 'fa',
             'uk', 'id', 'sv', 'nl', 'no', 'ja', 'eo', 'fi', 'simple', 'hy',
             'nn', 'et', 'ca', 'ka', 'ar', 'ko', 'ku', 'hr', 'gl', 'ro',
-            'sr', 'ml', 'cy', 'li', 'is', 'th', 'te', 'af', 'da', 'az',
+            'sr', 'cy', 'ml', 'li', 'is', 'th', 'te', 'af', 'da', 'az',
             'sq', 'eu', 'vi', 'la', 'br', 'hi', 'be', 'ast', 'uz', 'ta',
-            'ang', 'zh-min-nan', 'mr', 'lb', 'gu', 'su', 'ur', 'wo', 'kn', 'ky',
-            'kk', 'am', 'co',
+            'ang', 'zh-min-nan', 'mr', 'gu', 'lb', 'su', 'ur', 'wo', 'kn', 'ky',
+            'am', 'co',
         ]
 
         for lang in self.languages_by_size:
@@ -92,6 +92,7 @@ class Family(family.Family):
             'dk': 'da',
             'ga': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikiquote
             'jp': 'ja',
+            'kk': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
             'kr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikiquote
             'ks': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikiquote
             'kw': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kernewek_Wikiquote

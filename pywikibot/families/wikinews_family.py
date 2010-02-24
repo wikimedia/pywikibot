@@ -12,8 +12,8 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'sr', 'en', 'pl', 'de', 'fr', 'it', 'pt', 'es', 'zh', 'ja',
-            'sv', 'ru', 'nl', 'he', 'fi', 'ar', 'cs', 'sd', 'hu', 'no',
-            'uk', 'ta', 'ca', 'bg', 'ro', 'tr', 'th', 'bs',
+            'sv', 'ru', 'fi', 'he', 'ar', 'cs', 'sd', 'hu', 'no', 'ta',
+            'bg', 'uk', 'ro', 'ca', 'tr', 'th', 'bs',
         ]
 
         for lang in self.languages_by_size:
@@ -22,6 +22,7 @@ class Family(family.Family):
         self.obsolete = {
             'jp': 'ja',
             'nb': 'no',
+            'nl': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }

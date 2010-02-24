@@ -12,15 +12,14 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'pt', 'ja', 'es', 'nl', 'pl', 'it',
-            'he', 'sq', 'fi', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'da',
+            'he', 'sq', 'fi', 'vi', 'ru', 'cs', 'hr', 'zh', 'sv', 'da',
             'ca', 'tr', 'th', 'mk', 'sr', 'tl', 'fa', 'id', 'is', 'ar',
-            'no', 'ta', 'ka', 'ko', 'simple', 'gl', 'eo', 'lt', 'bg', 'ro',
-            'sk', 'el', 'la', 'ia', 'ang', 'cv', 'sl', 'et', 'mr', 'ur',
-            'uk', 'oc', 'ml', 'ms', 'az', 'eu', 'fy', 'hi', 'ie', 'tg',
-            'hy', 'bn', 'af', 'te', 'bs', 'pa', 'ky', 'sa', 'be', 'ast',
-            'zh-min-nan', 'cy', 'tt', 'mg', 'si', 'ku', 'co', 'tk', 'sw', 'ne',
-            'als', 'su', 'uz', 'vo', 'na', 'mn', 'kn', 'kk', 'nds', 'za',
-            'zu', 'my',
+            'no', 'ta', 'ko', 'ka', 'gl', 'eo', 'lt', 'bg', 'ro', 'sk',
+            'el', 'la', 'ia', 'ang', 'cv', 'sl', 'et', 'mr', 'ur', 'uk',
+            'ml', 'oc', 'az', 'ms', 'eu', 'fy', 'hi', 'ie', 'tg', 'bn',
+            'af', 'hy', 'pa', 'bs', 'te', 'sa', 'ky', 'be', 'ast', 'tt',
+            'zh-min-nan', 'cy', 'mg', 'si', 'ku', 'ne', 'co', 'tk', 'sw', 'su',
+            'als', 'vo', 'uz', 'na', 'mn', 'kk', 'nds', 'zu', 'my',
         ]
 
         for lang in self.languages_by_size:
@@ -62,6 +61,7 @@ class Family(family.Family):
             'gu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gujarati_Wikibooks
             'jp': 'ja',
             'km': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Khmer_Wikibooks
+            'kn': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
             'ks': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikibooks
             'lb': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_L%C3%ABtzebuergesch_Wikibooks
             'ln': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Lingala_Wikibooks
@@ -74,11 +74,13 @@ class Family(family.Family):
             'qu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikibooks
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rumantsch_Wikibooks
             'se': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Sami_Wikibooks
+            'simple' : 'en', # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
             'tokipona': None,
             'ug': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Uyghur_Wikibooks
             'wa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Walon_Wikibooks
             'xh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Xhosa_Wikibooks
             'yo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wikibooks
+            'za': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }

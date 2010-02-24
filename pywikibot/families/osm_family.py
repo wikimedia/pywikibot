@@ -15,8 +15,5 @@ class Family(family.Family):
             'en': 'wiki.openstreetmap.org',
         }
 
-    def scriptpath(self, code):
-        return ''
-
     def version(self, code):
-        return "1.13.3"
+        return "1.15.1"
