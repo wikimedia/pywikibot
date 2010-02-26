@@ -1515,7 +1515,7 @@ class APISite(BaseSite):
             self.getcategoryinfo(category)
         if not hasattr(category, "_catinfo"):
             # a category that exists but has no contents returns no API result
-            return {'size':0, 'pages':0, 'files':0, 'subcats':0}
+            category._catinfo = {'size':0, 'pages':0, 'files':0, 'subcats':0}
         return category._catinfo
 
     @deprecate_arg("throttle", None)
