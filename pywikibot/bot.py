@@ -126,7 +126,8 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
     """
     # make sure logging system has been initialized
     root = logging.getLogger("pywiki")
-    if root.level == 30: # init_handlers sets this level
+    if not root.level:
+        # init_handlers sets this level; if it is 0, it needs to be set
         init_handlers(strm=ui.output_stream)
 
     frame = currentframe()
@@ -425,7 +426,7 @@ def handleArgs(*args):
     if do_help:
         showHelp()
         sys.exit(0)
-    logger.debug(u"handleArgs() completed.")
+    pywikibot.output(u"handleArgs() completed.", level=pywikibot.DEBUG)
     return nonGlobalArgs
 
 
