@@ -419,22 +419,47 @@ liên kết thể loại:
                    )
 
         # get a list of all members of the category-redirect category
-        catpages = list(redircat.subcategories())
+        catpages = dict((c, None) for c in
+                        self.site.categorymembers(redircat, namespaces=[14]))
 
-        # preload the category pages for redirected categories
+        # check the category pages for redirected categories
         pywikibot.output(u"")
-        pywikibot.output(u"Preloading %s category redirect pages"
+        pywikibot.output(u"Checking %s category redirect pages"
                          % len(catpages))
-        for cat in pagegenerators.PreloadingGenerator(catpages, step=250):
-            catdata = cat.categoryinfo
-            if "size" in catdata and int(catdata['size']):
-                # save those categories that have contents
-                nonemptypages.append(cat)
+        for cat in catpages:
             cat_title = cat.title(withNamespace=False)
             if "category redirect" in cat_title:
                 self.log_text.append(u"* Ignoring %s"
                                       % cat.title(asLink=True, textlink=True))
                 continue
+            if hasattr(cat, "_catinfo"):
+                # skip empty categories that don't return a "categoryinfo" key
+                catdata = cat.categoryinfo
+                if "size" in catdata and int(catdata['size']):
+                    # save those categories that have contents
+                    nonemptypages.append(cat)
+            if cat_title not in record:
+                # make sure every redirect has a record entry
+                record[cat_title] = {today: None}
+                try:
+                    newredirs.append("*# %s -> %s"
+                                   % (cat.title(asLink=True, textlink=True),
+                                      cat.getCategoryRedirectTarget().title(
+                                            asLink=True, textlink=True)))
+                except pywikibot.Error:
+                    pass
+
+        # delete record entries for non-existent categories
+        for cat_name in record.keys():
+            if pywikibot.Category(self.site, self.catprefix + cat_name
+                                 ) not in catpages:
+                del record[cat_name]
+
+        pywikibot.output(u"")
+        pywikibot.output(u"Moving pages out of %s redirected categories."
+                         % len(nonemptypages))
+
+        for cat in pagegenerators.PreloadingGenerator(nonemptypages):
             try:
                 if not cat.isCategoryRedirect():
                     self.log_text.append(u"* False positive: %s"
@@ -445,103 +470,6 @@ liên kết thể loại:
                 self.log_text.append(u"* Could not load %s; ignoring"
                                       % cat.title(asLink=True, textlink=True))
                 continue
-            catlist.append(cat)
-            target = cat.getCategoryRedirectTarget()
-            destination = target.title(withNamespace=False)
-            destmap.setdefault(target, []).append(cat)
-            catmap[cat] = destination
-            if cat_title not in record:
-                # make sure every redirect has a record entry
-                record[cat_title] = {today: None}
-                newredirs.append("*# %s -> %s"
-                               % (cat.title(asLink=True, textlink=True),
-                                  target.title(asLink=True, textlink=True)))
-##            if match.group(1):
-##                # category redirect target starts with "Category:" - fix it
-##                text = text[ :match.start(1)] + text[match.end(1): ]
-##                try:
-##                    cat.put(text,
-##                            u"Robot: fixing category redirect parameter format")
-##                    self.log_text.append(
-##                        u"* Removed category prefix from parameter in %s"
-##                         % cat.title(asLink=True, textlink=True))
-##                except pywikibot.Error:
-##                    self.log_text.append(
-##                        u"* Unable to save changes to %s"
-##                         % cat.title(asLink=True, textlink=True))
-
-        # delete record entries for non-existent categories
-        for cat_name in record.keys():
-            if pywikibot.Category(
-                    pywikibot.Link(self.catprefix+cat_name, self.site)
-               ) not in catmap:
-                del record[cat_name]
-
-        pywikibot.output(u"")
-        pywikibot.output(u"Checking %s destination categories" % len(destmap))
-        for dest in pagegenerators.PreloadingGenerator(destmap, step=250):
-            if not dest.exists():
-                for d in destmap[dest]:
-                    problems.append("# %s redirects to %s"
-                                    % (d.title(asLink=True, textlink=True),
-                                       dest.title(asLink=True, textlink=True)))
-                    catlist.remove(d)
-                    # do a null edit on d to make it appear in the
-                    # "needs repair" category (if this wiki has one)
-                    try:
-                        d.put(d.get(get_redirect=True))
-                    except:
-                        pass
-            if dest in catlist:
-                for d in destmap[dest]:
-                    # is catmap[dest] also a redirect?
-                    newcat = pywikibot.Category(
-                                 pywikibot.Link(self.catprefix+catmap[dest],
-                                                self.site)
-                             )
-                    while newcat in catlist:
-                        if newcat == d or newcat == dest:
-                            self.log_text.append(u"* Redirect loop from %s"
-                                             % newcat.title(asLink=True,
-                                                            textlink=True))
-                            break
-                        newcat = pywikibot.Category(
-                                     pywikibot.Link(
-                                         self.catprefix+catmap[newcat],
-                                         self.site)
-                                 )
-                    else:
-                        self.log_text.append(
-                            u"* Fixed double-redirect: %s -> %s -> %s"
-                                % (d.title(asLink=True, textlink=True),
-                                   dest.title(asLink=True, textlink=True),
-                                   newcat.title(asLink=True, textlink=True)))
-                        oldtext = d.get(get_redirect=True)
-                        # remove the old redirect from the old text,
-                        # leaving behind any non-redirect text
-                        oldtext = template_regex.sub("", oldtext)
-                        newtext = (u"{{%(redirtemp)s|%(ncat)s}}"
-                                    % {'redirtemp': template_list[0],
-                                       'ncat': newcat.title(withNamespace=False)})
-                        newtext = newtext + oldtext.strip()
-                        try:
-                            d.put(newtext,
-                                  pywikibot.translate(self.site.lang,
-                                                      self.dbl_redir_comment),
-                                  minorEdit=True)
-                        except pywikibot.Error, e:
-                            self.log_text.append("** Failed: %s" % e)
-
-        # only scan those pages that have contents (nonemptypages)
-        # and that haven't been removed from catlist as broken redirects
-        cats_to_empty = set(catlist) & set(nonemptypages)
-        pywikibot.output(u"")
-        pywikibot.output(u"Moving pages out of %s redirected categories."
-                         % len(cats_to_empty))
-#        thread_limit = int(math.log(len(cats_to_empty), 8) + 1)
-#        threadpool = ThreadList(limit=1)    # disabling multi-threads
-
-        for cat in cats_to_empty:
             cat_title = cat.title(withNamespace=False)
             if not self.readyToEdit(cat):
                 counts[cat_title] = None
@@ -549,7 +477,49 @@ liên kết thể loại:
                     u"* Skipping %s; in cooldown period."
                      % cat.title(asLink=True, textlink=True))
                 continue
-            found, moved = self.move_contents(cat_title, catmap[cat],
+            dest = cat.getCategoryRedirectTarget()
+            if not dest.exists():
+                problems.append("# %s redirects to %s"
+                                % (cat.title(asLink=True, textlink=True),
+                                   dest.title(asLink=True, textlink=True)))
+                # do a null edit on cat to make it appear in the
+                # "needs repair" category (if this wiki has one)
+                try:
+                    cat.put(cat.get(get_redirect=True))
+                except:
+                    pass
+                continue
+            if dest.isCategoryRedirect():
+                double = dest.getCategoryRedirectTarget()
+                if double == dest or double == cat:
+                    self.log_text.append(u"* Redirect loop from %s"
+                                     % dest.title(asLink=True,
+                                                  textlink=True))
+                else:
+                    self.log_text.append(
+                        u"* Fixed double-redirect: %s -> %s -> %s"
+                            % (cat.title(asLink=True, textlink=True),
+                               dest.title(asLink=True, textlink=True),
+                               double.title(asLink=True, textlink=True)))
+                    oldtext = cat.get(get_redirect=True)
+                    # remove the old redirect from the old text,
+                    # leaving behind any non-redirect text
+                    oldtext = template_regex.sub("", oldtext)
+                    newtext = (u"{{%(redirtemp)s|%(ncat)s}}"
+                                % {'redirtemp': template_list[0],
+                                   'ncat': double.title(withNamespace=False)})
+                    newtext = newtext + oldtext.strip()
+                    try:
+                        cat.put(newtext,
+                                pywikibot.translate(self.site.lang,
+                                                    self.dbl_redir_comment),
+                                minorEdit=True)
+                    except pywikibot.Error, e:
+                        self.log_text.append("** Failed: %s" % e)
+                continue
+
+            found, moved = self.move_contents(cat_title,
+                                              dest.title(withNamespace=False),
                                               editSummary=comment)
             if found is None:
                 self.log_text.append(
