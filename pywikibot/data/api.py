@@ -79,7 +79,7 @@ class Request(object, DictMixin):
     Returns a dict containing the JSON data returned by the wiki. Normally,
     one of the dict keys will be equal to the value of the 'action'
     parameter.  Errors are caught and raise an APIError exception.
-    
+
     Example:
 
     >>> r = Request(site=mysite, action="query", meta="userinfo")
@@ -99,7 +99,7 @@ class Request(object, DictMixin):
     [u'query']
     >>> data[u'query'].keys()
     [u'userinfo', u'namespaces']
-    
+
     @param site: The Site to which the request will be submitted. If not
            supplied, uses the user's configured default Site.
     @param mime: If true, send in "multipart/form-data" format (default False)
@@ -123,6 +123,15 @@ class Request(object, DictMixin):
         if "action" not in kwargs:
             raise ValueError("'action' specification missing from Request.")
         self.update(**kwargs)
+        self.write = self.params["action"] in (
+                        "edit", "move", "rollback", "delete", "undelete",
+                        "protect", "block", "unblock", "watch", "patrol",
+                        "import", "userrights", "upload"
+                    )
+        if self.write:
+            pywikibot.output(u"Adding user assertion",
+                             level=pywikibot.DEBUG)
+            self.params["assert"] = "user" # make sure user is logged in
 
     # implement dict interface
     def __getitem__(self, key):
@@ -151,7 +160,13 @@ class Request(object, DictMixin):
 
         for key in self.params:
             if isinstance(self.params[key], basestring):
+                # convert a stringified sequence into a list
                 self.params[key] = self.params[key].split("|")
+            try:
+                iter(self.params[key])
+            except TypeError:
+                # convert any non-iterable value into a single-element list
+                self.params[key] = [str(self.params[key])]
         if self.params["action"] == ['query']:
             meta = self.params.get("meta", [])
             if "userinfo" not in meta:
@@ -187,27 +202,23 @@ class Request(object, DictMixin):
                               + "/api.php?"
                               + self.http_params()
                              )
-    
+
     def submit(self):
         """Submit a query and parse the response.
 
         @return:  The data retrieved from api.php (a dict)
-        
+
         """
         from pywikibot.comms import http
         from email.mime.multipart import MIMEMultipart
         from email.mime.nonmultipart import MIMENonMultipart
 
-        params = self.http_params()
+        paramstring = self.http_params()
         if self.site._loginstatus == -3:
             self.site.login(False)
         while True:
             action = self.params.get("action", "")
-            write = action in (
-                        "edit", "move", "rollback", "delete", "undelete",
-                        "protect", "block", "unblock"
-                    )
-            self.site.throttle(write=write)
+            self.site.throttle(write=self.write)
             uri = self.site.scriptpath() + "/api.php"
             try:
                 ssl = False
@@ -256,22 +267,24 @@ class Request(object, DictMixin):
                     rawdata = http.request(self.site, uri, ssl, method="POST",
                                 headers={'Content-Type':
                                          'application/x-www-form-urlencoded'},
-                                body=params)
+                                body=paramstring)
             except Server504Error:
-                logger.debug(u"Caught 504 error")
+                pywikibot.output(u"Caught 504 error",
+                                 level=pywikibot.DEBUG)
                 raise
             #TODO: what other exceptions can occur here?
             except Exception, e:
                 # for any other error on the http request, wait and retry
                 pywikibot.output(traceback.format_exc(),
                                  level=pywikibot.ERROR)
-                pywikibot.output(u"%s, %s" % (uri, params),
+                pywikibot.output(u"%s, %s" % (uri, paramstring),
                                  level=pywikibot.VERBOSE)
                 self.wait()
                 continue
             if not isinstance(rawdata, unicode):
                 rawdata = rawdata.decode(self.site.encoding())
-            logger.debug(u"API response received:\n" + rawdata)
+            pywikibot.output(u"API response received:\n" + rawdata,
+                             level=pywikibot.DEBUG)
             if rawdata.startswith(u"unknown_action"):
                 raise APIError(rawdata[:14], rawdata[16:])
             try:
@@ -281,8 +294,10 @@ class Request(object, DictMixin):
                 # problem.  Wait a few seconds and try again
                 pywikibot.output(
 "Non-JSON response received from server %s; the server may be down."
-                                 % self.site, level=pywikibot.WARNING)
-                logger.debug(rawdata)
+                                 % self.site,
+                                 level=pywikibot.WARNING)
+                pywikibot.output(rawdata,
+                                 level=pywikibot.DEBUG)
                 self.wait()
                 continue
             if not result:
@@ -389,6 +404,7 @@ class QueryGenerator(object):
             self.site = kwargs["site"]
         except KeyError:
             self.site = pywikibot.Site()
+            kwargs["site"] = self.site
         # make sure request type is valid, and get limit key if any
         for modtype in ("generator", "list", "prop", "meta"):
             if modtype in kwargs:
@@ -417,7 +433,7 @@ class QueryGenerator(object):
 
     def get_module(self):
         """Query api on self.site for paraminfo on querymodule=self.module"""
-        
+
         paramreq = Request(site=self.site, action="paraminfo",
                            querymodules=self.module)
         data = paramreq.submit()
@@ -456,7 +472,7 @@ class QueryGenerator(object):
 
         """
         self.limit = int(value)
-        
+
     def update_limit(self):
         """Set query_limit for self.module based on api response"""
 
@@ -472,9 +488,10 @@ class QueryGenerator(object):
                         self.query_limit = int(param["max"])
                     if self.prefix is None:
                         self.prefix = _modules[mod]["prefix"]
-                    logger.debug(u"%s: Set query_limit to %i."
-                                  % (self.__class__.__name__,
-                                     self.query_limit))
+                    pywikibot.output(u"%s: Set query_limit to %i."
+                                      % (self.__class__.__name__,
+                                         self.query_limit),
+                                     level=pywikibot.DEBUG)
                     return
 
     def set_namespace(self, namespaces):
@@ -522,27 +539,34 @@ class QueryGenerator(object):
                 self.set_query_increment(old_limit // 2)
                 continue
             if not self.data or not isinstance(self.data, dict):
-                logger.debug(
+                pywikibot.output(
                     u"%s: stopped iteration because no dict retrieved from api."
-                     % self.__class__.__name__)
+                        % self.__class__.__name__,
+                    level=pywikibot.DEBUG)
                 return
             if not ("query" in self.data
                     and self.resultkey in self.data["query"]):
-                logger.debug(
+                pywikibot.output(
 u"%s: stopped iteration because 'query' and '%s' not found in api response."
-                    % (self.__class__.__name__, self.resultkey))
-                logger.debug(unicode(self.data))
+                        % (self.__class__.__name__, self.resultkey),
+                    level=pywikibot.DEBUG)
+                pywikibot.output(unicode(self.data),
+                                 level=pywikibot.DEBUG)
                 return
             resultdata = self.data["query"][self.resultkey]
             if isinstance(resultdata, dict):
-                logger.debug(u"%s received %s; limit=%s"
-                              % (self.__class__.__name__, resultdata.keys(),
-                                 self.limit))
+                pywikibot.output(u"%s received %s; limit=%s"
+                                     % (self.__class__.__name__,
+                                        resultdata.keys(),
+                                        self.limit),
+                                 level=pywikibot.DEBUG)
                 resultdata = [resultdata[k] for k in sorted(resultdata.keys())]
             else:
-                logger.debug(u"%s received %s; limit=%s"
-                              % (self.__class__.__name__, resultdata,
-                                 self.limit))
+                pywikibot.output(u"%s received %s; limit=%s"
+                                     % (self.__class__.__name__,
+                                        resultdata,
+                                        self.limit),
+                                 level=pywikibot.DEBUG)
             if "normalized" in self.data["query"]:
                 self.normalized = dict((item['to'], item['from'])
                                       for item in
@@ -581,13 +605,13 @@ class PageGenerator(QueryGenerator):
     This class can be used for any of the query types that are listed in the
     API documentation as being able to be used as a generator.  Instances of
     this class iterate Page objects.
-    
+
     """
     def __init__(self, generator, **kwargs):
         """
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and generator is required.
-        
+
         @param generator: the "generator=" type from api.php
         @type generator: str
 
@@ -614,7 +638,7 @@ class PageGenerator(QueryGenerator):
 
         This can be overridden in subclasses to return a different type
         of object.
-        
+
         """
         p = pywikibot.Page(self.site, pagedata['title'], pagedata['ns'])
         update_page(p, pagedata)
@@ -657,7 +681,7 @@ class PropertyGenerator(QueryGenerator):
         """
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and prop is required.
-        
+
         @param prop: the "property=" type from api.php
         @type prop: str
 
@@ -684,7 +708,7 @@ class ListGenerator(QueryGenerator):
         """
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and listaction is required.
-        
+
         @param listaction: the "list=" type from api.php
         @type listaction: str
 
@@ -700,7 +724,7 @@ class LogEntryListGenerator(ListGenerator):
     def __init__(self, logtype, **kwargs):
         ListGenerator.__init__(self, "logevents", **kwargs)
 
-        import logentries  
+        import logentries
         self.entryFactory = logentries.LogEntryFactory(logtype)
 
     def result(self, pagedata):
@@ -715,7 +739,7 @@ class LoginManager(login.LoginManager):
         Parameters are all ignored.
 
         Returns cookie data if succesful, None otherwise.
-        
+
         """
         if hasattr(self, '_waituntil'):
             if datetime.now() < self._waituntil:
