@@ -165,8 +165,9 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     key = '%s:%s:%s' % (fam, code, user)
     if not key in _sites:
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
-        logger.debug(u"Instantiating Site object '%(site)s'"
-                       % {'site': _sites[key]})
+        pywikibot.output(u"Instantiating Site object '%(site)s'"
+                             % {'site': _sites[key]},
+                         level=pywikibot.DEBUG)
     return _sites[key]
 
 getSite = Site # alias for backwards-compability
@@ -283,7 +284,8 @@ def stopme():
     logger = logging.getLogger("pywiki.wiki")
 
     if not stopped:
-        logger.debug("stopme() called")
+        pywikibot.output(u"stopme() called",
+                         level=pywikibot.DEBUG)
         count = sum(1 for thd in threadpool if thd.isAlive())
         if count:
             pywikibot.output(u"Waiting for about %(count)s pages to be saved."

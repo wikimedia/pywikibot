@@ -143,7 +143,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         # THIS IS OVERRIDDEN IN data/api.py
         filename = config.datafilepath('pywikibot.lwp')
-        logger.debug(u"Storing cookies to %s" % filename)
+        pywikibot.output(u"Storing cookies to %s" % filename,
+                         level=pywikibot.DEBUG)
         f = open(filename, 'w')
         f.write(data)
         f.close()

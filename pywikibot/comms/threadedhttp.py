@@ -58,7 +58,8 @@ class ConnectionPool(object):
                        The pool drops excessive connections added.
 
         """
-        logger.debug("Creating connection pool.")
+        pywikibot.output(u"Creating connection pool.",
+                         level=pywikibot.DEBUG)
         self.connections = {}
         self.lock = threading.Lock()
         self.maxnum = maxnum
@@ -67,8 +68,9 @@ class ConnectionPool(object):
         """Destructor to close all connections in the pool."""
         self.lock.acquire()
         try:
-            logger.debug("Closing connection pool (%s connections)"
-                         % len(self.connections))
+            pywikibot.output(u"Closing connection pool (%s connections)"
+                                 % len(self.connections),
+                             level=pywikibot.DEBUG)
             for key in self.connections:
                 for connection in self.connections[key]:
                     connection.close()
@@ -91,8 +93,9 @@ class ConnectionPool(object):
         try:
             if identifier in self.connections:
                 if len(self.connections[identifier]) > 0:
-                    logger.debug("Retrieved connection from '%s' pool."
-                                  % identifier)
+                    pywikibot.output(u"Retrieved connection from '%s' pool."
+                                         % identifier,
+                                     level=pywikibot.DEBUG)
                     return self.connections[identifier].pop()
             return None
         finally:
@@ -111,8 +114,9 @@ class ConnectionPool(object):
                 self.connections[identifier] = []
 
             if len(self.connections[identifier]) == self.maxnum:
-                logger.debug('closing %s connection %r'
-                              % (identifier, connection))
+                pywikibot.output(u"closing %s connection %r"
+                                     % (identifier, connection),
+                                 level=pywikibot.DEBUG)
                 connection.close()
                 del connection
             else:
@@ -206,9 +210,11 @@ class Http(httplib2.Http):
         # Redirect hack: we want to regulate redirects
         follow_redirects = self.follow_redirects
         self.follow_redirects = False
-        logger.debug('%r' % (
-            (uri.replace("%7C","|"),
-             method, body, headers, max_redirects, connection_type),))
+        pywikibot.output(u"%r" % (
+                            (uri.replace("%7C","|"), method, body,
+                            headers, max_redirects,
+                            connection_type),),
+                         level=pywikibot.DEBUG)
         try:
             (response, content) = httplib2.Http.request(
                                     self, uri, method, body, headers,
@@ -264,8 +270,9 @@ class Http(httplib2.Http):
                                                                     location)
             if authority == None:
                 response['location'] = httplib2.urlparse.urljoin(uri, location)
-                logger.debug('Relative redirect: changed [%s] to [%s]'
-                              % (location, response['location']))
+                pywikibot.output(u"Relative redirect: changed [%s] to [%s]"
+                                     % (location, response['location']),
+                                 level=pywikibot.DEBUG)
         if response.status == 301 and method in ["GET", "HEAD"]:
             response['-x-permanent-redirect-url'] = response['location']
             if "content-location" not in response:
@@ -330,11 +337,13 @@ class HttpProcessor(threading.Thread):
     def run(self):
         # The Queue item is expected to either an HttpRequest object
         # or None (to shut down the thread)
-        logger.debug('Thread started, waiting for requests.')
+        pywikibot.output(u"Thread started, waiting for requests.",
+                         level=pywikibot.DEBUG)
         while (True):
             item = self.queue.get()
             if item is None:
-                logger.debug('Shutting down thread.')
+                pywikibot.output(u"Shutting down thread.",
+                                 level=pywikibot.DEBUG)
                 return
             try:
                 item.data = self.http.request(*item.args, **item.kwargs)

@@ -66,7 +66,8 @@ class Throttle(object):
         global pid
         self.lock.acquire()
         mysite = self.mysite
-        logger.debug("Checking multiplicity: pid = %(pid)s" % globals())
+        pywikibot.output(u"Checking multiplicity: pid = %(pid)s" % globals(),
+                         level=pywikibot.DEBUG)
         try:
             processes = []
             my_pid = pid or 1  # start at 1 if global pid not yet set

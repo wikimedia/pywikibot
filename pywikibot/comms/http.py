@@ -50,9 +50,11 @@ cookie_jar = threadedhttp.LockableCookieJar(
 try:
     cookie_jar.load()
 except (IOError, cookielib.LoadError):
-    logger.debug("Loading cookies failed.")
+    pywikibot.output(u"Loading cookies failed.",
+                     level=pywikibot.DEBUG)
 else:
-    logger.debug("Loaded cookies from file.")
+    pywikibot.output(u"Loaded cookies from file.",
+                     level=pywikibot.DEBUG)
 
 
 # Build up HttpProcessors
@@ -72,7 +74,8 @@ def _flush():
                      level=pywikibot.VERBOSE)
     for i in threads:
         i.join()
-    logger.debug('All threads finished.')
+    pywikibot.output(u"All threads finished.",
+                     level=pywikibot.VERBOSE)
 atexit.register(_flush)
 
 # export cookie_jar to global namespace

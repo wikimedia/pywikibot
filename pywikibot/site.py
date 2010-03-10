@@ -761,8 +761,9 @@ class APISite(BaseSite):
 
     def isBlocked(self, sysop=False):
         """Deprecated synonym for is_blocked"""
-        logger.debug(
-            "Site method 'isBlocked' should be changed to 'is_blocked'")
+        pywikibot.output(
+            u"Site method 'isBlocked' should be changed to 'is_blocked'",
+            level=pywikibot.DEBUG)
         return self.is_blocked(sysop)
 
     def checkBlocks(self, sysop = False):
@@ -1113,7 +1114,8 @@ class APISite(BaseSite):
                            % (len(cache), self)
                         )
             for pagedata in rvgen:
-                logger.debug("Preloading %s" % pagedata)
+                pywikibot.output(u"Preloading %s" % pagedata,
+                                 level=pywikibot.DEBUG)
                 try:
                     if pagedata['title'] not in cache:
                         pywikibot.output(
@@ -1123,9 +1125,12 @@ class APISite(BaseSite):
                         )
                         continue
                 except KeyError:
-                    logger.debug("No 'title' in %s" % pagedata)
-                    logger.debug("pageids=%s" % pageids)
-                    logger.debug("titles=%s" % cache.keys())
+                    pywikibot.output(u"No 'title' in %s" % pagedata,
+                                     level=pywikibot.DEBUG)
+                    pywikibot.output(u"pageids=%s" % pageids,
+                                     level=pywikibot.DEBUG)
+                    pywikibot.output(u"titles=%s" % cache.keys(),
+                                     level=pywikibot.DEBUG)
                     continue
                 page = cache[pagedata['title']]
                 api.update_page(page, pagedata)
@@ -1150,7 +1155,8 @@ class APISite(BaseSite):
                      % (page.title(withSection=False, asLink=True),
                         item['title']))
             api.update_page(page, item)
-            logger.debug(str(item))
+            pywikibot.output(unicode(item),
+                             level=pywikibot.DEBUG)
             return item[tokentype + "token"]
 
     # following group of methods map more-or-less directly to API queries
@@ -1555,8 +1561,9 @@ class APISite(BaseSite):
         if not isinstance(namespace, int):
             raise Error("allpages: only one namespace permitted.")
         if includeredirects is not None:
-            logger.debug(
-"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.")
+            pywikibot.output(
+u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
+                 level=pywikibot.DEBUG)
             if includeredirects:
                 if includeredirects == "only":
                     filterredirs = True
@@ -2241,12 +2248,14 @@ redirects on %(site)s wiki""",
         while True:
             try:
                 result = req.submit()
-                logger.debug("editpage response: %s" % result)
+                pywikibot.output(u"editpage response: %s" % result,
+                                 level=pywikibot.DEBUG)
             except api.APIError, err:
                 self.unlock_page(page)
                 if err.code.endswith("anon") and self.logged_in():
-                    logger.debug(
-"editpage: received '%s' even though bot is logged in" % err.code)
+                    pywikibot.output(
+u"editpage: received '%s' even though bot is logged in" % err.code,
+                                     level=pywikibot.DEBUG)
                 errdata = {
                     'site': self,
                     'title': page.title(withSection=False),
@@ -2263,8 +2272,10 @@ redirects on %(site)s wiki""",
                     raise LockedPage(errdata['title'])
                 if err.code in self._ep_errors:
                     raise Error(self._ep_errors[err.code] % errdata)
-                logger.debug("editpage: Unexpected error code '%s' received."
-                              % err.code)
+                pywikibot.output(
+                    u"editpage: Unexpected error code '%s' received."
+                        % err.code,
+                    level=pywikibot.DEBUG)
                 raise
             assert ("edit" in result and "result" in result["edit"]), result
             if result["edit"]["result"] == "Success":
@@ -2375,11 +2386,13 @@ u"editpage: Unknown result code '%s' received; page not saved"
             req['noredirect'] = ""
         try:
             result = req.submit()
-            logger.debug("movepage response: %s" % result)
+            pywikibot.output(u"movepage response: %s" % result,
+                             level=pywikibot.DEBUG)
         except api.APIError, err:
             if err.code.endswith("anon") and self.logged_in():
-                logger.debug(
-"movepage: received '%s' even though bot is logged in" % err.code)
+                pywikibot.output(
+u"movepage: received '%s' even though bot is logged in" % err.code,
+                                 level=pywikibot.DEBUG)
             errdata = {
                 'site': self,
                 'oldtitle': oldtitle,
@@ -2390,8 +2403,9 @@ u"editpage: Unknown result code '%s' received; page not saved"
             }
             if err.code in self._mv_errors:
                 raise Error(self._mv_errors[err.code] % errdata)
-            logger.debug("movepage: Unexpected error code '%s' received."
-                          % err.code)
+            pywikibot.output(u"movepage: Unexpected error code '%s' received."
+                                 % err.code,
+                             level=pywikibot.DEBUG)
             raise
         finally:
             self.unlock_page(page)
@@ -2461,8 +2475,9 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             }
             if err.code in self._rb_errors:
                 raise Error(self._rb_errors[err.code] % errdata)
-            logger.debug("rollback: Unexpected error code '%s' received."
-                          % err.code)
+            pywikibot.output(u"rollback: Unexpected error code '%s' received."
+                                 % err.code,
+                             level=pywikibot.DEBUG)
             raise
         finally:
             self.unlock_page(page)
@@ -2508,8 +2523,9 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             }
             if err.code in self._dl_errors:
                 raise Error(self._dl_errors[err.code] % errdata)
-            logger.debug("delete: Unexpected error code '%s' received."
-                          % err.code)
+            pywikibot.output(u"delete: Unexpected error code '%s' received."
+                                 % err.code,
+                             level=pywikibot.DEBUG)
             raise
         finally:
             self.unlock_page(page)
