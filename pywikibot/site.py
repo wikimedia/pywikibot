@@ -261,16 +261,21 @@ class BaseSite(object):
     normalizeNamespace = ns_normalize  # for backwards-compatibility
 
     def redirect(self, default=True):
-        """Return the localized redirect tag for the site.
+        """Return list of localized redirect tags for the site.
 
         If default is True, falls back to 'REDIRECT' if the site has no
         special redirect tag.
 
         """
-        if default:
-            return self.family.redirect.get(self.code, [u"REDIRECT"])[0]
-        else:
-            return self.family.redirect.get(self.code, None)
+        return [u"REDIRECT"]
+
+    def pagenamecodes(self, default=True):
+        """Return list of localized PAGENAME tags for the site."""
+        return [u"PAGENAME"]
+
+    def pagename2codes(self, default=True):
+        """Return list of localized PAGENAMEE tags for the site."""
+        return [u"PAGENAMEE"]
 
     def lock_page(self, page, block=True):
         """Lock page for writing.  Must be called before writing any page.
@@ -335,22 +340,14 @@ class BaseSite(object):
         """
         return (pywikibot.Link(s, self).site != self)
 
-    def redirectRegex(self):
+    def redirectRegex(self, pattern=None):
         """Return a compiled regular expression matching on redirect pages.
 
         Group 1 in the regex match object will be the target title.
 
         """
-        #TODO: is this needed, since the API identifies redirects?
-        #      (maybe, the API can give false positives)
-        default = 'REDIRECT'
-        try:
-            keywords = set(self.family.redirect[self.code])
-            keywords.add(default)
-            pattern = r'(?:' + '|'.join(keywords) + ')'
-        except KeyError:
-            # no localized keyword for redirects
-            pattern = r'%s' % default
+        if pattern is None:
+            pattern = "REDIRECT"
         # A redirect starts with hash (#), followed by a keyword, then
         # arbitrary stuff, then a wikilink. The wikilink may contain
         # a label, although this is not useful.
@@ -846,6 +843,70 @@ class APISite(BaseSite):
         """Return a Timestamp object representing the current server time."""
         ts = self.getcurrenttimestamp()
         return pywikibot.Timestamp.fromtimestampformat(ts)
+
+    def getmagicwords(self, word):
+        """Return list of localized "word" magic words for the site."""
+        if not hasattr(self, "_magicwords"):
+            sirequest = api.Request(
+                                site=self,
+                                action="query",
+                                meta="siteinfo",
+                                siprop="magicwords"
+                            )
+            try:
+                sidata = sirequest.submit()
+                assert 'query' in sidata, \
+                       "API siteinfo response lacks 'query' key"
+                sidata = sidata['query']
+                assert 'magicwords' in sidata, \
+                       "API siteinfo response lacks 'magicwords' key"
+                self._magicwords = dict((item["name"], item["aliases"])
+                                        for item in sidata["magicwords"])
+
+            except api.APIError:
+                # hack for older sites that don't support 1.13 properties
+                # probably should delete if we're not going to support pre-1.13
+                self._magicwords = {}
+
+        if word in self._magicwords:
+            return self._magicwords[word]
+        else:
+            return [word]
+
+    def redirect(self, default=True):
+        """Return the preferred localized #REDIRECT keyword.
+
+        Argument is ignored (but maintained for backwards-compatibility.
+
+        """
+        # return the magic word without the preceding '#' character
+        return self.getmagicwords("redirect")[0].lstrip("#")
+
+    def redirectRegex(self):
+        """Return a compiled regular expression matching on redirect pages.
+
+        Group 1 in the regex match object will be the target title.
+
+        """
+        #TODO: is this needed, since the API identifies redirects?
+        #      (maybe, the API can give false positives)
+        try:
+            keywords = set(s.lstrip("#")
+                           for s in self.getmagicwords("redirect"))
+            keywords.add("REDIRECT") # just in case
+            pattern = "(?:" + "|".join(keywords) + ")"
+        except KeyError:
+            # no localized keyword for redirects
+            pattern = None
+        return BaseSite.redirectRegex(self, pattern)
+
+    def pagenamecodes(self, default=True):
+        """Return list of localized PAGENAME tags for the site."""
+        return self.getmagicwords("pagename")
+
+    def pagename2codes(self, default=True):
+        """Return list of localized PAGENAMEE tags for the site."""
+        return self.getmagicwords("pagenamee")
 
     def _getsiteinfo(self):
         """Retrieve siteinfo and namespaces from site."""
