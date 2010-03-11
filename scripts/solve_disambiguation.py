@@ -27,6 +27,9 @@ Command line options:
    -just       only use the alternatives given on the command line, do not
                read the page for other possibilities
 
+   -dnskip     Skip links already marked with a disambiguation-needed
+               template (e.g., {{dn}})
+
    -primary    "primary topic" disambiguation (Begriffsklärung nach Modell 2).
                That's titles where one topic is much more important, the
                disambiguation page is saved somewhere else, and the important
@@ -55,7 +58,7 @@ Command line options:
                wiki that is defined (to the bot) as the category containing
                disambiguation pages, starting at XY. If only '-start' or
                '-start:' is given, it starts at the beginning.
-               
+
    -min:XX     (XX being a number) only work on disambiguation pages for which
                at least XX are to be worked on.
 
@@ -189,6 +192,21 @@ msg_redir_unlink = {
     'sr': u'Решавање вишезначних одредница помоћу бота: %s - Removed link(s)',
     'sv': u'Länkar direkt till rätt artikel för: %s - Tog bort länk(ar)',
     'uk': u'Виправлення посилання на багатозначність за допомогою бота: %s вилучено',
+    }
+
+# Disambiguation Needed template
+dn_template = {
+    'en' : u'{{dn}}',
+    }
+
+# Summary message when adding Disambiguation Needed template
+msg_dn = {
+    'en' : u'Robot-assisted disambiguation: %s - Marked as needing expert attention',
+    }
+
+# Summary message when adding Disambiguation Needed template to a redirect link
+msg_redir_dn = {
+    'en' : u'Robot-assisted disambiguation: %s - Marked as needing expert attention',
     }
 
 # Summary message to (unknown)
@@ -417,7 +435,7 @@ class ReferringPageGeneratorWithIgnore:
         self.primaryIgnoreManager = PrimaryIgnoreManager(disambPage,
                                                          enabled=primary)
         self.minimum = minimum
-        
+
     def __iter__(self):
         # TODO: start yielding before all referring pages have been found
         refs = [page for page in
@@ -510,17 +528,18 @@ class DisambiguationRobot(object):
               u'{{[Pp]rocessing}}',
             ),
     }
-    
+
     primary_redir_template = {
         # Page.templates() format, first letter uppercase
         'hu': u'Egyért-redir',
     }
-    
-    def __init__(self, always, alternatives, getAlternatives, generator,
+
+    def __init__(self, always, alternatives, getAlternatives, dnSkip, generator,
                  primary, main_only, minimum = 0):
         self.always = always
         self.alternatives = alternatives
         self.getAlternatives = getAlternatives
+        self.dnSkip = dnSkip
         self.generator = generator
         self.primary = primary
         self.main_only = main_only
@@ -579,9 +598,12 @@ class DisambiguationRobot(object):
         # group linktrail is the link trail, that's letters after ]] which
         #    are part of the word.
         # note that the definition of 'letter' varies from language to language.
-        self.linkR = re.compile(
-            r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?(\|(?P<label>[^\]]*))?\]\](?P<linktrail>'
-            + linktrail + ')')
+        self.linkR = re.compile(r'''
+            \[\[  (?P<title>     [^\[\]\|#]*)
+                  (?P<section> \#[^\]\|]*)?
+               (\|(?P<label>     [^\]]*))?  \]\]
+            (?P<linktrail>%s)''' % linktrail,
+                                flags=re.X)
 
     def treat(self, refPage, disambPage):
         """
@@ -591,10 +613,11 @@ class DisambiguationRobot(object):
             refPage - A page linking to disambPage
         Returns False if the user pressed q to completely quit the program.
         Otherwise, returns True.
-       
+
         """
         # TODO: break this function up into subroutines!
 
+        dn_template_str = pywikibot.translate(self.mysite, dn_template)
         include = False
         unlink = False
         new_targets = []
@@ -647,6 +670,7 @@ class DisambiguationRobot(object):
             original_text = text
             n = 0
             curpos = 0
+            dn = False
             edited = False
             # This loop will run until we have finished the current page
             while True:
@@ -670,11 +694,23 @@ class DisambiguationRobot(object):
                 if foundlink.site != disambPage.site():
                     continue
                 # check whether the link found is to disambPage
-                if foundlink.canonical_title() != disambPage.title():
+                try:
+                    if foundlink.canonical_title() != disambPage.title():
+                        continue
+                except pywikibot.Error:
+                    # must be a broken link
+                    pywikibot.output("Invalid link [[%s]] in page [[%s]]"
+                                     % (m.group('title'), refPage.title()),
+                                     level=pywikibot.VERBOSE)
                     continue
                 n += 1
                 # how many bytes should be displayed around the current link
                 context = 60
+                #there's a {{dn}} here already
+                already_dn = text[m.end() : m.end() + 8].find(dn_template_str[:4]) > -1
+                if already_dn and self.dnSkip:
+                    continue
+
                 # This loop will run while the user doesn't choose an option
                 # that will actually change the page
                 while True:
@@ -697,10 +733,12 @@ class DisambiguationRobot(object):
                         if edited:
                             choice = pywikibot.input(
 u"Option (#, r#, s=skip link, e=edit page, n=next page, u=unlink, q=quit,\n"
+u"        ?=tag with " + dn_template_str + ",\n"
 u"        m=more context, l=list, a=add new, x=save in this form):")
                         else:
                             choice = pywikibot.input(
 u"Option (#, r#, s=skip link, e=edit page, n=next page, u=unlink, q=quit,\n"
+u"        ?=tag with " + dn_template_str + ",\n"
 u"        m=more context, d=show disambiguation page, l=list, a=add new):")
                     else:
                         choice = self.always
@@ -775,7 +813,21 @@ u"        m=more context, d=show disambiguation page, l=list, a=add new):")
                 if trailing_chars:
                     link_text += trailing_chars
 
-                if choice in ['u', 'U']:
+                if choice in ['?', '/']:
+                    #small chunk of text to search
+                    search_text = text[m.end() : m.end() + context]
+                    #figure out where the link (and sentance) ends, put note there
+                    end_of_word_match = re.search("\s", search_text)
+                    if end_of_word_match:
+                        position_split = end_of_word_match.start(0)
+                    else:
+                        position_split = 0
+                    #insert dab needed template
+                    text = text[:m.end() + position_split] + dn_template_str \
+                           + text[m.end() + position_split:]
+                    dn = True
+                    continue
+                elif choice in ['u', 'U']:
                     # unlink - we remove the section if there's any
                     text = text[:m.start()] + link_text + text[m.end():]
                     unlink = True
@@ -852,7 +904,7 @@ u"Choice out of range. Please select a number between 0 and %i."
                 pywikibot.showDiff(original_text, text)
                 pywikibot.output(u'')
                 # save the page
-                self.setSummaryMessage(disambPage, new_targets, unlink)
+                self.setSummaryMessage(disambPage, new_targets, unlink, dn)
                 try:
                     refPage.put_async(text,comment=self.comment)
                 except pywikibot.LockedPage:
@@ -936,7 +988,8 @@ or press enter to quit:""")
             self.alternatives += links
         return True
 
-    def setSummaryMessage(self, disambPage, new_targets=[], unlink=False):
+    def setSummaryMessage(self, disambPage, new_targets=[], unlink=False,
+                          dn=False):
         # make list of new targets
         targets = ''
         for page_title in new_targets:
@@ -968,23 +1021,25 @@ or press enter to quit:""")
         elif disambPage.isRedirectPage():
             # when working on redirects, there's another summary message
             if unlink and not new_targets:
-                self.comment = pywikibot.translate(
-                                         self.mysite,
-                                         msg_redir_unlink
-                                         ) % disambPage.title()
+                self.comment = pywikibot.translate(self.mysite,
+                                                   msg_redir_unlink) \
+                                % disambPage.title()
+            elif dn and not new_targets:
+                self.comment = pywikibot.translate(self.mysite, msg_redir_dn) \
+                                % disambPage.title()
             else:
-                self.comment = pywikibot.translate(
-                                         self.mysite, msg_redir
-                                         ) % (disambPage.title(), targets)
+                self.comment = pywikibot.translate(self.mysite, msg_redir) \
+                                % (disambPage.title(), targets)
         else:
             if unlink and not new_targets:
-                self.comment = pywikibot.translate(
-                                         self.mysite, msg_unlink
-                                         ) % disambPage.title()
+                self.comment = pywikibot.translate(self.mysite, msg_unlink) \
+                                % disambPage.title()
+            elif dn and not new_targets:
+                self.comment = pywikibot.translate(self.mysite, msg_dn) \
+                                % disambPage.title()
             else:
-                self.comment = pywikibot.translate(
-                                         self.mysite, msg
-                                         ) % (disambPage.title(), targets)
+                self.comment = pywikibot.translate(self.mysite, msg) \
+                                % (disambPage.title(), targets)
 
     def run(self):
         if self.main_only:
@@ -1029,6 +1084,7 @@ def main(*args):
     always = None
     alternatives = []
     getAlternatives = True
+    dnSkip = False
     # if the -file argument is used, page titles are dumped in this array.
     # otherwise it will only contain one page.
     generator = None
@@ -1074,6 +1130,8 @@ def main(*args):
                 alternatives.append(arg[5:])
         elif arg == '-just':
             getAlternatives = False
+        elif arg == '-dnskip':
+            dnSkip = True
         elif arg == '-main':
             main_only = True
         elif arg.startswith('-min:'):
@@ -1106,7 +1164,7 @@ def main(*args):
         page = pywikibot.Page(pywikibot.Link(pageTitle, pywikibot.getSite()))
         generator = iter([page])
 
-    # if no disambiguation pages was given as an argument, and none was
+    # if no disambiguation page was given as an argument, and none was
     # read from a file, query the user
     if not generator:
         pageTitle = pywikibot.input(
@@ -1114,10 +1172,10 @@ def main(*args):
         page = pywikibot.Page(pywikibot.Link(pageTitle, pywikibot.getSite()))
         generator = iter([page])
 
-    bot = DisambiguationRobot(always, alternatives, getAlternatives, generator,
-                              primary, main_only, minimum=minimum)
+    bot = DisambiguationRobot(always, alternatives, getAlternatives, dnSkip,
+                              generator, primary, main_only,
+                              minimum=minimum)
     bot.run()
-
 
 
 if __name__ == "__main__":
