@@ -320,10 +320,6 @@ liên kết thể loại:
         global destmap, catlist, catmap
 
         user = self.site.user()
-        redirect_magicwords = ["redirect"]
-        other_words = self.site.redirect()
-        if other_words:
-            redirect_magicwords.extend(other_words)
         problems = []
         newredirs = []
 
@@ -482,8 +478,8 @@ liên kết thể loại:
                 problems.append("# %s redirects to %s"
                                 % (cat.title(asLink=True, textlink=True),
                                    dest.title(asLink=True, textlink=True)))
-                # do a null edit on cat to make it appear in the
-                # "needs repair" category (if this wiki has one)
+                # do a null edit on cat to update any special redirect
+                # categories this wiki might maintain
                 try:
                     cat.put(cat.get(get_redirect=True))
                 except:
@@ -495,6 +491,11 @@ liên kết thể loại:
                     self.log_text.append(u"* Redirect loop from %s"
                                      % dest.title(asLink=True,
                                                   textlink=True))
+                    # do a null edit on cat
+                    try:
+                        cat.put(cat.get(get_redirect=True))
+                    except:
+                        pass
                 else:
                     self.log_text.append(
                         u"* Fixed double-redirect: %s -> %s -> %s"
@@ -531,6 +532,12 @@ liên kết thể loại:
                     u"* [[:%s%s]]: %d found, %d moved"
                     % (self.catprefix, cat_title, found, moved))
             counts[cat_title] = found
+            # do a null edit on cat
+            try:
+                cat.put(cat.get(get_redirect=True))
+            except:
+                pass
+            continue
 
         cPickle.dump(record, open(datafile, "wb"), -1)
 
