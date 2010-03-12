@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 
 #
-# (C) Pywikipedia bot team, 2004-2009
+# (C) Pywikipedia bot team, 2004-2010
 #
 # Distributed under the terms of the MIT license.
 #

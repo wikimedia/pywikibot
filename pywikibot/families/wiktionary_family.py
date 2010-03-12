@@ -12,19 +12,19 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'fr', 'en', 'lt', 'tr', 'zh', 'ru', 'vi', 'io', 'pl', 'pt',
-            'fi', 'hu', 'no', 'el', 'ta', 'it', 'de', 'sv', 'ko', 'nl',
+            'fi', 'hu', 'el', 'no', 'ta', 'de', 'it', 'sv', 'ko', 'nl',
             'lo', 'kn', 'ja', 'ku', 'ar', 'es', 'ml', 'ro', 'et', 'id',
             'te', 'gl', 'bg', 'uk', 'ca', 'vo', 'li', 'is', 'fa', 'sr',
-            'af', 'cs', 'scn', 'th', 'sw', 'fy', 'simple', 'br', 'oc', 'he',
-            'sl', 'hr', 'hy', 'sq', 'tt', 'la', 'zh-min-nan', 'da', 'tk', 'ast',
-            'wa', 'ur', 'hsb', 'kk', 'ky', 'wo', 'eo', 'ang', 'hi', 'ga',
-            'gn', 'az', 'ia', 'co', 'lv', 'sk', 'ka', 'ne', 'csb', 'st',
-            'ms', 'tl', 'mr', 'nds', 'kl', 'eu', 'sd', 'ug', 'ti', 'cy',
+            'af', 'scn', 'cs', 'th', 'sw', 'fy', 'simple', 'br', 'oc', 'he',
+            'hr', 'sl', 'hy', 'sq', 'tt', 'la', 'zh-min-nan', 'da', 'tk', 'wa',
+            'ast', 'ur', 'hsb', 'kk', 'ky', 'eo', 'wo', 'ang', 'lv', 'hi',
+            'ga', 'gn', 'az', 'ia', 'co', 'ka', 'sk', 'ne', 'csb', 'st',
+            'ms', 'tl', 'mr', 'eu', 'cy', 'nds', 'kl', 'sd', 'ug', 'ti',
             'mk', 'ps', 'an', 'sh', 'my', 'bn', 'gu', 'km', 'mg', 'ts',
             'qu', 'bs', 'fo', 'am', 'rw', 'chr', 'su', 'om', 'mn', 'nah',
             'ie', 'yi', 'iu', 'be', 'ss', 'gd', 'tg', 'si', 'nn', 'zu',
-            'kw', 'dv', 'pa', 'gv', 'mt', 'tpi', 'sg', 'roa-rup', 'mi', 'jv',
-            'uz', 'ik', 'so', 'ha', 'sa', 'ay', 'na', 'jbo', 'tn', 'sm',
+            'kw', 'mt', 'dv', 'pa', 'gv', 'tpi', 'sg', 'roa-rup', 'mi', 'uz',
+            'jv', 'ik', 'so', 'ha', 'ay', 'sa', 'na', 'jbo', 'tn', 'sm',
             'lb', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
         ]
 

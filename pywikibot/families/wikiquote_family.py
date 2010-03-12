@@ -13,12 +13,12 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'it', 'pl', 'de', 'pt', 'ru', 'sk', 'es', 'bg', 'bs',
             'sl', 'tr', 'fr', 'he', 'lt', 'cs', 'zh', 'el', 'hu', 'fa',
-            'uk', 'id', 'sv', 'nl', 'no', 'ja', 'eo', 'fi', 'simple', 'hy',
-            'nn', 'et', 'ca', 'ka', 'ar', 'ko', 'ku', 'hr', 'gl', 'ro',
-            'sr', 'cy', 'ml', 'li', 'is', 'th', 'te', 'af', 'da', 'az',
-            'sq', 'eu', 'vi', 'la', 'br', 'hi', 'be', 'ast', 'uz', 'ta',
-            'ang', 'zh-min-nan', 'mr', 'gu', 'lb', 'su', 'ur', 'wo', 'kn', 'ky',
-            'am', 'co',
+            'uk', 'id', 'sv', 'nl', 'no', 'ja', 'eo', 'fi', 'hy', 'nn',
+            'et', 'ca', 'ka', 'ar', 'ko', 'ku', 'hr', 'gl', 'ro', 'sr',
+            'cy', 'ml', 'li', 'is', 'th', 'te', 'af', 'da', 'az', 'sq',
+            'eu', 'vi', 'la', 'br', 'hi', 'be', 'ast', 'uz', 'ta', 'ang',
+            'zh-min-nan', 'mr', 'gu', 'lb', 'su', 'ur', 'wo', 'kn', 'ky', 'am',
+            'co',
         ]
 
         for lang in self.languages_by_size:
@@ -101,6 +101,7 @@ class Family(family.Family):
             'nb': 'no',
             'nds': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Low_Saxon_Wikiquote
             'qu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikiquote
+            'simple': 'en', #http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Simple_English_(3)_Wikiquote
             'tk': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Turkmen_Wikiquote
             'tokipona': None,
             'tt': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tatar_Wikiquote

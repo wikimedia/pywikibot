@@ -11,12 +11,12 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'hu', 'pt', 'ja', 'es', 'nl', 'pl', 'it',
-            'he', 'sq', 'fi', 'vi', 'ru', 'cs', 'hr', 'zh', 'sv', 'da',
-            'ca', 'tr', 'th', 'mk', 'sr', 'tl', 'fa', 'id', 'is', 'ar',
-            'no', 'ta', 'ko', 'ka', 'gl', 'eo', 'lt', 'bg', 'ro', 'sk',
+            'en', 'de', 'fr', 'pt', 'hu', 'ja', 'es', 'nl', 'pl', 'it',
+            'he', 'sq', 'fi', 'vi', 'ru', 'cs', 'hr', 'zh', 'sv', 'ca',
+            'da', 'tr', 'th', 'mk', 'sr', 'tl', 'fa', 'id', 'ar', 'is',
+            'no', 'ta', 'gl', 'ko', 'ka', 'eo', 'lt', 'bg', 'ro', 'sk',
             'el', 'la', 'ia', 'ang', 'cv', 'sl', 'et', 'mr', 'ur', 'uk',
-            'ml', 'oc', 'az', 'ms', 'eu', 'fy', 'hi', 'ie', 'tg', 'bn',
+            'ml', 'az', 'oc', 'ms', 'eu', 'fy', 'hi', 'ie', 'tg', 'bn',
             'af', 'hy', 'pa', 'bs', 'te', 'sa', 'ky', 'be', 'ast', 'tt',
             'zh-min-nan', 'cy', 'mg', 'si', 'ku', 'ne', 'co', 'tk', 'sw', 'su',
             'als', 'vo', 'uz', 'na', 'mn', 'kk', 'nds', 'zu', 'my',
