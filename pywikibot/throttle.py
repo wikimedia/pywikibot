@@ -47,6 +47,8 @@ class Throttle(object):
         if self.maxdelay is None:
             self.maxdelay = config.maxthrottle
         self.writedelay = writedelay
+        if self.writedelay is None:
+            self.writedelay = config.put_throttle
         self.last_read = 0
         self.last_write = 0
         self.next_multiplicity = 1.0
@@ -56,8 +58,10 @@ class Throttle(object):
         self.releasepid = 1200 # Free the process id after this many seconds
         self.lastwait = 0.0
         self.delay = 0
+        self.checktime = 0
         self.verbosedelay = verbosedelay
-        if multiplydelay:
+        self.multiplydelay = multiplydelay
+        if self.multiplydelay:
             self.checkMultiplicity()
         self.setDelays()
 
@@ -95,8 +99,8 @@ class Throttle(object):
                     if now - ptime > self.releasepid:
                         continue    # process has expired, drop from file
                     if now - ptime <= self.dropdelay \
-                            and this_site == mysite \
-                            and this_pid != pid:
+                       and this_site == mysite \
+                       and this_pid != pid:
                         count += 1
                     if this_site != self.mysite or this_pid != pid:
                         processes.append({'pid': this_pid,
@@ -111,15 +115,18 @@ class Throttle(object):
             processes.append({'pid': pid,
                               'time': self.checktime,
                               'site': mysite})
-            f = open(self.ctrlfilename, 'w')
             processes.sort(key=lambda p:(p['pid'], p['site']))
-            for p in processes:
-                f.write("%(pid)s %(time)s %(site)s\n" % p)
+            try:
+                f = open(self.ctrlfilename, 'w')
+                for p in processes:
+                    f.write("%(pid)s %(time)s %(site)s\n" % p)
+            except IOError:
+                pass
             f.close()
             self.process_multiplicity = count
             if self.verbosedelay:
                 pywikibot.output(
-u"Found %(count)s %(mysite)s processes running, including this one."
+                    u"Found %(count)s %(mysite)s processes running, including this one."
                     % locals())
         finally:
             self.lock.release()
@@ -156,7 +163,7 @@ u"Found %(count)s %(mysite)s processes running, including this one."
             thisdelay = self.writedelay
         else:
             thisdelay = self.delay
-        if pid: # If set, we're checking for multiple processes
+        if pid and self.multiplydelay: # We're checking for multiple processes
             if time.time() > self.checktime + self.checkdelay:
                 self.checkMultiplicity()
             if thisdelay < (self.mindelay * self.next_multiplicity):
@@ -203,14 +210,17 @@ u"Found %(count)s %(mysite)s processes running, including this one."
                     continue    # Sometimes the file gets corrupted
                                 # ignore that line
                 if now - ptime <= self.releasepid \
-                        and this_pid != pid:
+                   and this_pid != pid:
                     processes.append({'pid': this_pid,
                                       'time': ptime,
                                       'site': this_site})
-        f = open(self.ctrlfilename, 'w')
         processes.sort(key=lambda p:p['pid'])
-        for p in processes:
-            f.write("%(pid)s %(time)s %(site)s\n" % p)
+        try:
+            f = open(self.ctrlfilename, 'w')
+            for p in processes:
+                f.write("%(pid)s %(time)s %(site)s\n" % p)
+        except IOError:
+            pass
         f.close()
 
     def __call__(self, requestsize=1, write=False):
@@ -235,10 +245,10 @@ u"Found %(count)s %(mysite)s processes running, including this one."
             # Announce the delay if it exceeds a preset limit
             if wait > config.noisysleep:
                 pywikibot.output(u"Sleeping for %(wait).1f seconds, %(now)s"
-                                  % {'wait': wait,
-                                     'now': time.strftime("%Y-%m-%d %H:%M:%S",
+                                 % {'wait': wait,
+                                    'now' : time.strftime("%Y-%m-%d %H:%M:%S",
                                                           time.localtime())
-                                    } )
+                                } )
             time.sleep(wait)
             if write:
                 self.last_write = time.time()
@@ -264,11 +274,11 @@ u"Found %(count)s %(mysite)s processes running, including this one."
             if wait > 0:
                 if wait > config.noisysleep:
                     pywikibot.output(
-                              u"Sleeping for %(wait).1f seconds, %(now)s"
-                               % {'wait': wait,
-                                  'now': time.strftime("%Y-%m-%d %H:%M:%S",
-                                                       time.localtime())
-                                 } )
+                        u"Sleeping for %(wait).1f seconds, %(now)s"
+                        % {'wait': wait,
+                           'now': time.strftime("%Y-%m-%d %H:%M:%S",
+                                                time.localtime())
+                        } )
                 time.sleep(wait)
         finally:
             self.lock.release()

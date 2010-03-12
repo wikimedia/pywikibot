@@ -4,7 +4,7 @@ Objects representing MediaWiki sites (wikis) and families (groups of wikis
 on the same topic in different languages).
 """
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikipedia bot team, 2008-2010
 #
 # Distributed under the terms of the MIT license.
 #
@@ -876,7 +876,7 @@ class APISite(BaseSite):
     def redirect(self, default=True):
         """Return the preferred localized #REDIRECT keyword.
 
-        Argument is ignored (but maintained for backwards-compatibility.
+        Argument is ignored (but maintained for backwards-compatibility).
 
         """
         # return the magic word without the preceding '#' character
@@ -888,8 +888,7 @@ class APISite(BaseSite):
         Group 1 in the regex match object will be the target title.
 
         """
-        #TODO: is this needed, since the API identifies redirects?
-        #      (maybe, the API can give false positives)
+        #NOTE: this is needed, since the API can give false positives!
         try:
             keywords = set(s.lstrip("#")
                            for s in self.getmagicwords("redirect"))
