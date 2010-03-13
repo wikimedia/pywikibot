@@ -158,12 +158,11 @@ class Throttle(object):
         account of how much time has elapsed since the last access.
 
         """
-        global pid
         if write:
             thisdelay = self.writedelay
         else:
             thisdelay = self.delay
-        if pid and self.multiplydelay: # We're checking for multiple processes
+        if self.multiplydelay: # We're checking for multiple processes
             if time.time() > self.checktime + self.checkdelay:
                 self.checkMultiplicity()
             if thisdelay < (self.mindelay * self.next_multiplicity):
@@ -243,13 +242,15 @@ class Throttle(object):
             # the delay time for the server.
             self.next_multiplicity = math.log(1+requestsize)/math.log(2.0)
             # Announce the delay if it exceeds a preset limit
-            if wait > config.noisysleep:
-                pywikibot.output(u"Sleeping for %(wait).1f seconds, %(now)s"
-                                 % {'wait': wait,
-                                    'now' : time.strftime("%Y-%m-%d %H:%M:%S",
-                                                          time.localtime())
-                                } )
-            time.sleep(wait)
+            if wait > 0:
+                if wait > config.noisysleep or pywikibot.verbose:
+                    pywikibot.output(
+                        u"Sleeping for %(wait).1f seconds, %(now)s"
+                        % {'wait': wait,
+                           'now' : time.strftime("%Y-%m-%d %H:%M:%S",
+                                                 time.localtime())
+                        } )
+                time.sleep(wait)
             if write:
                 self.last_write = time.time()
             else:
