@@ -243,7 +243,7 @@ class Throttle(object):
             self.next_multiplicity = math.log(1+requestsize)/math.log(2.0)
             # Announce the delay if it exceeds a preset limit
             if wait > 0:
-                if wait > config.noisysleep or pywikibot.verbose:
+                if wait > config.noisysleep or self.verbosedelay:
                     pywikibot.output(
                         u"Sleeping for %(wait).1f seconds, %(now)s"
                         % {'wait': wait,
