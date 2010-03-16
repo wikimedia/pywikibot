@@ -133,7 +133,7 @@ class BaseSite(object):
 
         if not hasattr(self, "_throttle"):
             self._throttle = Throttle(self, multiplydelay=True,
-                                      verbosedelay=True)
+                                      verbosedelay=False)
         return self._throttle
 
     @property
