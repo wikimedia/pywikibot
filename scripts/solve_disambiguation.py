@@ -266,30 +266,55 @@ ignore_title = {
             u'Wikipedia:Links til sider med flertydige titler'
         ],
         'de': [
+            u'.+/[aA]rchiv.*',
+            u'.+/Baustelle.*',
+            u'.+/Index',
+            u'.+/Spielwiese',
+            u'.+/[tT]est.*',
+            u'.*Diskussion:.+',
+            u'Benutzer:.+/[Ll]og.*',
+            u'Benutzer:C.Löser/.+',
             u'Benutzer:Katharina/Begriffsklärungen',
             u'Benutzer:Kirschblut/.+buchstabenkürzel',
+            u'Benutzer:Mathias Schindler/.+',
             u'Benutzer:Noisper/Dingliste/[A-Z]',
+            u'Benutzer:Professor Einstein.*',
+            u'Benutzer:Sebbot/.+',
             u'Benutzer:SirJective/.+',
-            u'Benutzer:SrbBot/Index/.+',
-            u'Benutzer Diskussion:.+',
-            u'GISLexikon \([A-Z]\)',
+            u'Benutzer:Srbauer.*',
+            u'Benutzer:SteEis.',
+            u'Benutzer:Steindy.*',
+            u'Benutzer:SrbBot.*',
+            u'Benutzer:PortalBot/.+',
+            u'Benutzer:Xqbot/.+',
             u'Lehnwort',
             u'Liste griechischer Wortstämme in deutschen Fremdwörtern',
             u'Liste von Gräzismen',
             u'Portal:Abkürzungen/.+',
+            u'Portal:Astronomie/Moves',
+            u'Portal:Astronomie/Index/.+',
+            u'Portal:Hund',
+            u'Portal:Hund/Beobachtungsliste',
+            u'Portal:Marxismus',
+            u'Portal:Täuferbewegung/Seitenindex',
+            u'Wikipedia:Administratoren/Anfragen',
             u'Wikipedia:Archiv/.+',
             u'Wikipedia:Artikelwünsche/Ding-Liste/[A-Z]',
             u'Wikipedia:Begriffsklärung.*',
-            u'Wikipedia:Dreibuchstabenkürzel von [A-Z][A-Z][A-Z] bis [A-Z][A-Z][A-Z]',
+            u'Wikipedia:Bots/.+',
             u'Wikipedia:Interwiki-Konflikte',
+            u'Wikipedia:ISBN-Suche',
             u'Wikipedia:Liste mathematischer Themen/BKS',
             u'Wikipedia:Liste mathematischer Themen/Redirects',
+            u'Wikipedia:Meinungsbilder/.+',
             u'Wikipedia:Löschkandidaten/.+',
-            u'Wikipedia:Qualitätsoffensive/UNO', #requested by Benutzer:Addicted
             u'Wikipedia:WikiProjekt Altertumswissenschaft/.+',
             u'Wikipedia:WikiProjekt Verwaiste Seiten/Begriffsklärungen',
+            u'Wikipedia:Qualitätssicherung/.+',
+            u'Vorlage:Infobox Weltraum',
+            u'Vorlage:Navigationsleiste Raumfahrt',
         ],
-         'en': [
+        'en': [
             u'Wikipedia:Links to disambiguating pages',
             u'Wikipedia:Disambiguation pages with links',
             u'Wikipedia:Multiple-place names \([A-Z]\)',
@@ -588,15 +613,15 @@ class DisambiguationRobot(object):
         linktrail = self.mysite.linktrail()
         self.trailR = re.compile(linktrail)
         # The regular expression which finds links. Results consist of four
-        #    groups:
+        # groups:
         # group title is the target page title, that is, everything before
-        #    | or ].
+        # | or ].
         # group section is the page section. It'll include the # to make life
-        #    easier for us.
+        # easier for us.
         # group label is the alternative link title, that's everything
-        #    between | and ].
+        # between | and ].
         # group linktrail is the link trail, that's letters after ]] which
-        #    are part of the word.
+        # are part of the word.
         # note that the definition of 'letter' varies from language to language.
         self.linkR = re.compile(r'''
             \[\[  (?P<title>     [^\[\]\|#]*)
@@ -720,26 +745,25 @@ class DisambiguationRobot(object):
                         u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                          % refPage.title())
 
-                    # at the beginning of the link, start red color.
-                    # at the end of the link, reset the color to default
-                    pywikibot.output(text[max(0, m.start() - context)
-                                          : m.start()]
-                                     + '\03{lightred}'
-                                     + text[m.start() : m.end()]
-                                     + '\03{default}'
-                                     + text[m.end() : m.end() + context])
-
                     if not self.always:
+                        # at the beginning of the link, start red color.
+                        # at the end of the link, reset the color to default
+                        pywikibot.output(text[max(0, m.start() - context)
+                                              : m.start()]
+                                         + '\03{lightred}'
+                                         + text[m.start() : m.end()]
+                                         + '\03{default}'
+                                         + text[m.end() : m.end() + context])
                         if edited:
                             choice = pywikibot.input(
-u"Option (#, r#, s=skip link, e=edit page, n=next page, u=unlink, q=quit,\n"
+u"Option (#, r#, [s]kip link, [e]dit page, [n]ext page, [u]nlink, [q]uit,\n"
 u"        ?=tag with " + dn_template_str + ",\n"
-u"        m=more context, l=list, a=add new, x=save in this form):")
+u"        [m]ore context, [l]ist, [a]dd new, x=save in this form):")
                         else:
                             choice = pywikibot.input(
-u"Option (#, r#, s=skip link, e=edit page, n=next page, u=unlink, q=quit,\n"
+u"Option (#, r#, [s]kip link, [e]dit page, [n]ext page, [u]nlink, [q]uit,\n"
 u"        ?=tag with " + dn_template_str + ",\n"
-u"        m=more context, d=show disambiguation page, l=list, a=add new):")
+u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                     else:
                         choice = self.always
                     if choice in ['a', 'A']:
@@ -933,9 +957,9 @@ u"Choice out of range. Please select a number between 0 and %i."
                     links = [correctcap(l,disambPage2.get()) for l in links]
                 except pywikibot.NoPage:
                     pywikibot.output(u"No page at %s, using redirect target."
-                                      % disambTitle)
+                                     % disambTitle)
                     links = disambPage.linkedPages()[:1]
-                    links = [correctcap(l,disambPage.get(get_redirect = True))
+                    links = [correctcap(l, disambPage.get(get_redirect = True))
                              for l in links]
                 self.alternatives += links
             else:
