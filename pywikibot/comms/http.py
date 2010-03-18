@@ -33,7 +33,7 @@ import pywikibot
 import cookielib
 import threadedhttp
 
-logger = logging.getLogger("pywiki.comms.http")
+_logger = "comm.http"
 
 
 # global variables
@@ -50,16 +50,13 @@ cookie_jar = threadedhttp.LockableCookieJar(
 try:
     cookie_jar.load()
 except (IOError, cookielib.LoadError):
-    pywikibot.output(u"Loading cookies failed.",
-                     level=pywikibot.DEBUG)
+    pywikibot.debug(u"Loading cookies failed.", _logger)
 else:
-    pywikibot.output(u"Loaded cookies from file.",
-                     level=pywikibot.DEBUG)
+    pywikibot.debug(u"Loaded cookies from file.", _logger)
 
 
 # Build up HttpProcessors
-pywikibot.output('Starting %(numthreads)i threads...' % locals(),
-                 level=pywikibot.VERBOSE)
+pywikibot.log('Starting %(numthreads)i threads...' % locals())
 for i in range(numthreads):
     proc = threadedhttp.HttpProcessor(http_queue, cookie_jar, connection_pool)
     proc.setDaemon(True)
@@ -70,12 +67,10 @@ for i in range(numthreads):
 def _flush():
     for i in threads:
         http_queue.put(None)
-    pywikibot.output(u'Waiting for threads to finish... ',
-                     level=pywikibot.VERBOSE)
+    pywikibot.log(u'Waiting for threads to finish... ')
     for i in threads:
         i.join()
-    pywikibot.output(u"All threads finished.",
-                     level=pywikibot.VERBOSE)
+    pywikibot.log(u"All threads finished.")
 atexit.register(_flush)
 
 # export cookie_jar to global namespace
@@ -91,7 +86,7 @@ def request(site, uri, ssl=False, *args, **kwargs):
     @param uri: the URI to retrieve (relative to the site's scriptpath)
     @param ssl: Use https connection
     @return: The received data (a unicode string).
-    
+
     """
     if ssl:
         proto = "https"
@@ -101,7 +96,7 @@ def request(site, uri, ssl=False, *args, **kwargs):
         proto = site.protocol()
         host = site.hostname()
     baseuri = urlparse.urljoin("%(proto)s://%(host)s" % locals(), uri)
-    
+
     # set default user-agent string
     kwargs.setdefault("headers", {})
     kwargs["headers"].setdefault("user-agent", useragent)
@@ -118,8 +113,7 @@ def request(site, uri, ssl=False, *args, **kwargs):
         raise Server504Error("Server %s timed out" % site.hostname())
 
     if request.data[0].status != 200:
-        pywikibot.output(u"Http response status %(status)s"
-                          % {'status': request.data[0].status},
-                         level=pywikibot.WARNING)
+        pywikibot.warning(u"Http response status %(status)s"
+                            % {'status': request.data[0].status})
 
-    return request.data[1]    
+    return request.data[1]

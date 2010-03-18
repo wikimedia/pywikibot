@@ -17,7 +17,7 @@ import math
 import threading
 import time
 
-logger = logging.getLogger("pywiki.wiki.throttle")
+_logger = "wiki.throttle"
 
 pid = False     # global process identifier
                 # when the first Throttle is instantiated, it will set this
@@ -70,8 +70,8 @@ class Throttle(object):
         global pid
         self.lock.acquire()
         mysite = self.mysite
-        pywikibot.output(u"Checking multiplicity: pid = %(pid)s" % globals(),
-                         level=pywikibot.DEBUG)
+        pywikibot.debug(u"Checking multiplicity: pid = %(pid)s" % globals(),
+                        _logger)
         try:
             processes = []
             my_pid = pid or 1  # start at 1 if global pid not yet set
@@ -126,6 +126,10 @@ class Throttle(object):
             self.process_multiplicity = count
             if self.verbosedelay:
                 pywikibot.output(
+                    u"Found %(count)s %(mysite)s processes running, including this one."
+                    % locals())
+            else:
+                pywikibot.log(
                     u"Found %(count)s %(mysite)s processes running, including this one."
                     % locals())
         finally:
@@ -250,6 +254,14 @@ class Throttle(object):
                            'now' : time.strftime("%Y-%m-%d %H:%M:%S",
                                                  time.localtime())
                         } )
+                else:
+                    pywikibot.log(
+                        u"Sleeping for %(wait).1f seconds, %(now)s"
+                        % {'wait': wait,
+                           'now' : time.strftime("%Y-%m-%d %H:%M:%S",
+                                                 time.localtime())
+                        } )
+
                 time.sleep(wait)
             if write:
                 self.last_write = time.time()
@@ -275,6 +287,13 @@ class Throttle(object):
             if wait > 0:
                 if wait > config.noisysleep:
                     pywikibot.output(
+                        u"Sleeping for %(wait).1f seconds, %(now)s"
+                        % {'wait': wait,
+                           'now': time.strftime("%Y-%m-%d %H:%M:%S",
+                                                time.localtime())
+                        } )
+                else:
+                    pywikibot.log(
                         u"Sleeping for %(wait).1f seconds, %(now)s"
                         % {'wait': wait,
                            'now': time.strftime("%Y-%m-%d %H:%M:%S",

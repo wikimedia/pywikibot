@@ -120,15 +120,11 @@ class UI:
         self.OutputHandlerClass = TerminalHandler
         self.output_stream = sys.stderr
 
-    def output(self, text, level=logging.INFO, context=None):
-        """
-        If a character can't be displayed in the encoding used by the user's
-        terminal, it will be replaced with a question mark or by a
-        transliteration.
-        """
+    def output(self, text, logger, level=logging.INFO, context=None):
+        """Send text to the logger for output to terminal."""
         self.writelock.acquire()
         try:
-            logging.getLogger("pywiki").log(level, text, extra=context)
+            logger.log(level, text, extra=context)
         finally:
             self.writelock.release()
 
@@ -147,7 +143,8 @@ class UI:
         # While we're waiting for user input,
         # we don't want terminal writes from other Threads
         self.writelock.acquire()
-        self.output(question + ' ', level=pywikibot.INPUT)
+        pywikibot.bot._fmtoutput(question + ' ', newline=False,
+                                 _level=pywikibot.INPUT)
 
         try:
             if password:

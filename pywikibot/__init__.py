@@ -83,12 +83,10 @@ def deprecated(instead=None):
             funcname = method.func_name
             classname = args[0].__class__.__name__
             if instead:
-                output(u"%s.%s is DEPRECATED, use %s instead."
-                        % (classname, funcname, instead),
-                       level=WARNING)
+                warning(u"%s.%s is DEPRECATED, use %s instead."
+                         % (classname, funcname, instead))
             else:
-                output(u"%s.%s is DEPRECATED." % (classname, funcname),
-                       level=WARNING)
+                warning(u"%s.%s is DEPRECATED." % (classname, funcname))
             return method(*args, **kwargs)
         wrapper.func_name = method.func_name
         return wrapper
@@ -96,25 +94,26 @@ def deprecated(instead=None):
 
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg"""
-    logger = logging.getLogger("pywiki")
+    _logger = ""
     def decorator(method):
         def wrapper(*__args, **__kw):
             meth_name = method.__name__
             if old_arg in __kw:
                 if new_arg:
                     if new_arg in __kw:
-                        pywikibot.output(
-"%(new_arg)s argument of %(meth_name)s replaces %(old_arg)s; cannot use both."
-                            % locals(), level=WARNING)
+                        pywikibot.warning(
+u"%(new_arg)s argument of %(meth_name)s replaces %(old_arg)s; cannot use both."
+                            % locals())
                     else:
-                        pywikibot.output(
-"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
-                            % locals(), level=WARNING)
+                        pywikibot.warning(
+u"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
+                            % locals())
                         __kw[new_arg] = __kw[old_arg]
                 else:
-                    pywikibot.output(
-                        "%(old_arg)s argument of %(meth_name)s is deprecated."
-                        % locals(), level=DEBUG)
+                    pywikibot.debug(
+                        u"%(old_arg)s argument of %(meth_name)s is deprecated."
+                            % locals(),
+                        _logger)
                 del __kw[old_arg]
             return method(*__args, **__kw)
         wrapper.__doc__ = method.__doc__
@@ -139,7 +138,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     @type user: unicode
 
     """
-    logger = logging.getLogger("pywiki.wiki")
+    _logger = "wiki"
 
     if code is None:
         code = config.mylang
@@ -165,9 +164,9 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     key = '%s:%s:%s' % (fam, code, user)
     if not key in _sites:
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
-        pywikibot.output(u"Instantiating Site object '%(site)s'"
+        pywikibot.debug(u"Instantiating Site object '%(site)s'"
                              % {'site': _sites[key]},
-                         level=pywikibot.DEBUG)
+                        _logger)
     return _sites[key]
 
 getSite = Site # alias for backwards-compability
@@ -182,27 +181,6 @@ link_regex = re.compile(r'\[\[(?P<title>[^\]|[#<>{}]*)(\|.*?)?\]\]')
 def setAction(s):
     """Set a summary to use for changed page submissions"""
     config.default_edit_summary = s
-
-
-def set_debug(layer):
-    """Set the logger for specified layer to DEBUG level.
-
-    The framework has four layers (by default, others can be added), each
-    designated by a string --
-
-    1.  "comm": the communication layer (http requests, etc.)
-    2.  "data": the raw data layer (API requests, XML dump parsing)
-    3.  "wiki": the wiki content representation layer (Page and Site objects)
-    4.  "bot": the application layer
-
-    This method sets the logger for any specified layer to the DEBUG level,
-    causing it to output extensive debugging information.  If this method is
-    not called for a layer, the default logging setting is the INFO level.
-
-    This method does not check the 'layer' argument for validity.
-
-    """
-    logging.getLogger("pywiki."+layer).setLevel(DEBUG)
 
 
 def showDiff(oldtext, newtext):
@@ -281,11 +259,10 @@ def stopme():
 
     """
     global stopped
-    logger = logging.getLogger("pywiki.wiki")
+    _logger = "wiki"
 
     if not stopped:
-        pywikibot.output(u"stopme() called",
-                         level=pywikibot.DEBUG)
+        pywikibot.debug(u"stopme() called", _logger)
         count = sum(1 for thd in threadpool if thd.isAlive())
         if count:
             pywikibot.output(u"Waiting for about %(count)s pages to be saved."
@@ -297,7 +274,7 @@ def stopme():
     # only need one drop() call because all throttles use the same global pid
     try:
         _sites[_sites.keys()[0]].throttle.drop()
-        pywikibot.output(u"Dropped throttle(s).", level=VERBOSE)
+        pywikibot.log(u"Dropped throttle(s).")
     except IndexError:
         pass
 

@@ -51,7 +51,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import NoSuchSite, NoUsername
 
-logger = logging.getLogger("pywiki.wiki.login")
+logger = "wiki.login"
 
 
 # On some wikis you are only allowed to run a bot if there is a link to
@@ -143,8 +143,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         # THIS IS OVERRIDDEN IN data/api.py
         filename = config.datafilepath('pywikibot.lwp')
-        pywikibot.output(u"Storing cookies to %s" % filename,
-                         level=pywikibot.DEBUG)
+        pywikibot.debug(u"Storing cookies to %s" % filename,
+                        _logger)
         f = open(filename, 'w')
         f.write(data)
         f.close()
@@ -195,15 +195,14 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         try:
             cookiedata = self.getCookie()
         except pywikibot.data.api.APIError, e:
-            pywikibot.output(u"Login failed (%s)." % e.code,
-                             level=pywikibot.ERROR)
+            pywikibot.error(u"Login failed (%s)." % e.code)
             if retry:
                 self.password = None
                 return self.login(retry = True)
             else:
                 return False
         self.storecookiedata(cookiedata)
-        pywikibot.output(u"Should be logged in now", level=pywikibot.VERBOSE)
+        pywikibot.log(u"Should be logged in now")
 ##        # Show a warning according to the local bot policy
 ##   FIXME: disabled due to recursion; need to move this to the Site object after
 ##   login

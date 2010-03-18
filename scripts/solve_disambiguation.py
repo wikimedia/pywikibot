@@ -475,9 +475,8 @@ class ReferringPageGeneratorWithIgnore:
                                    ][self.disambPage.site().lang]:
                 for i in range(len(refs)-1, -1, -1):
                     if re.match(ig, refs[i].title()):
-                        pywikibot.output(u'Ignoring page %s'
-                                          % refs[i].title(),
-                                         level=pywikibot.VERBOSE)
+                        pywikibot.log(u'Ignoring page %s'
+                                        % refs[i].title())
                         del refs[i]
                     elif self.primaryIgnoreManager.isIgnored(refs[i]):
                         del refs[i]
@@ -724,9 +723,8 @@ class DisambiguationRobot(object):
                         continue
                 except pywikibot.Error:
                     # must be a broken link
-                    pywikibot.output("Invalid link [[%s]] in page [[%s]]"
-                                     % (m.group('title'), refPage.title()),
-                                     level=pywikibot.VERBOSE)
+                    pywikibot.log(u"Invalid link [[%s]] in page [[%s]]"
+                                    % (m.group('title'), refPage.title()))
                     continue
                 n += 1
                 # how many bytes should be displayed around the current link

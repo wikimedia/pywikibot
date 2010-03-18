@@ -12,7 +12,7 @@ This class extends httplib2, adding support for:
 # (C) 2007 Pywikipedia bot team, 2007
 # (C) 2006 Httplib 2 team, 2006
 # (C) 2007 Metaweb Technologies, Inc.
-# 
+#
 # Partially distributed under the MIT license
 # Partially distributed under Metaweb Technologies, Incs license
 #    which is compatible with the MIT license
@@ -33,16 +33,16 @@ import sys
 import pywikibot
 from pywikibot import config
 
-logger = logging.getLogger("pywiki.comms.threadedhttp")
+_logger = "comm.threadedhttp"
 
 
 # easy_install safeguarded dependencies
 try:
     import pkg_resources
 except ImportError:
-    pywikibot.output(
+    pywikibot.error(
         u"Error: You need the python module setuptools to use this module",
-        level=pywikibot.CRITICAL)
+        _level=pywikibot.CRITICAL)
     sys.exit(1)
 try:
     import httplib2
@@ -58,8 +58,7 @@ class ConnectionPool(object):
                        The pool drops excessive connections added.
 
         """
-        pywikibot.output(u"Creating connection pool.",
-                         level=pywikibot.DEBUG)
+        pywikibot.debug(u"Creating connection pool.", _logger)
         self.connections = {}
         self.lock = threading.Lock()
         self.maxnum = maxnum
@@ -68,9 +67,9 @@ class ConnectionPool(object):
         """Destructor to close all connections in the pool."""
         self.lock.acquire()
         try:
-            pywikibot.output(u"Closing connection pool (%s connections)"
+            pywikibot.debug(u"Closing connection pool (%s connections)"
                                  % len(self.connections),
-                             level=pywikibot.DEBUG)
+                            _logger)
             for key in self.connections:
                 for connection in self.connections[key]:
                     connection.close()
@@ -93,9 +92,9 @@ class ConnectionPool(object):
         try:
             if identifier in self.connections:
                 if len(self.connections[identifier]) > 0:
-                    pywikibot.output(u"Retrieved connection from '%s' pool."
+                    pywikibot.debug(u"Retrieved connection from '%s' pool."
                                          % identifier,
-                                     level=pywikibot.DEBUG)
+                                    _logger)
                     return self.connections[identifier].pop()
             return None
         finally:
@@ -114,9 +113,9 @@ class ConnectionPool(object):
                 self.connections[identifier] = []
 
             if len(self.connections[identifier]) == self.maxnum:
-                pywikibot.output(u"closing %s connection %r"
+                pywikibot.debug(u"closing %s connection %r"
                                      % (identifier, connection),
-                                 level=pywikibot.DEBUG)
+                                _logger)
                 connection.close()
                 del connection
             else:
@@ -179,7 +178,7 @@ class Http(httplib2.Http):
 
         @return: (response, content) tuple
 
-        """ 
+        """
         if max_redirects is None:
             max_redirects = self.max_redirects
         if headers is None:
@@ -210,11 +209,11 @@ class Http(httplib2.Http):
         # Redirect hack: we want to regulate redirects
         follow_redirects = self.follow_redirects
         self.follow_redirects = False
-        pywikibot.output(u"%r" % (
+        pywikibot.debug(u"%r" % (
                             (uri.replace("%7C","|"), method, body,
                             headers, max_redirects,
                             connection_type),),
-                         level=pywikibot.DEBUG)
+                        _logger)
         try:
             (response, content) = httplib2.Http.request(
                                     self, uri, method, body, headers,
@@ -229,9 +228,9 @@ class Http(httplib2.Http):
                                              self.connections[conn_key])
         del self.connections[conn_key]
 
-        # First write cookies 
+        # First write cookies
         self.cookiejar.lock.acquire()
-        try:           
+        try:
             self.cookiejar.extract_cookies(DummyResponse(response), req)
         finally:
             self.cookiejar.lock.release()
@@ -270,13 +269,13 @@ class Http(httplib2.Http):
                                                                     location)
             if authority == None:
                 response['location'] = httplib2.urlparse.urljoin(uri, location)
-                pywikibot.output(u"Relative redirect: changed [%s] to [%s]"
+                pywikibot.debug(u"Relative redirect: changed [%s] to [%s]"
                                      % (location, response['location']),
-                                 level=pywikibot.DEBUG)
+                                _logger)
         if response.status == 301 and method in ["GET", "HEAD"]:
             response['-x-permanent-redirect-url'] = response['location']
             if "content-location" not in response:
-                response['content-location'] = absolute_uri 
+                response['content-location'] = absolute_uri
             httplib2._updateCache(headers, response, content, self.cache,
                                   cachekey)
 
@@ -337,13 +336,11 @@ class HttpProcessor(threading.Thread):
     def run(self):
         # The Queue item is expected to either an HttpRequest object
         # or None (to shut down the thread)
-        pywikibot.output(u"Thread started, waiting for requests.",
-                         level=pywikibot.DEBUG)
+        pywikibot.debug(u"Thread started, waiting for requests.", _logger)
         while (True):
             item = self.queue.get()
             if item is None:
-                pywikibot.output(u"Shutting down thread.",
-                                 level=pywikibot.DEBUG)
+                pywikibot.debug(u"Shutting down thread.", _logger)
                 return
             try:
                 item.data = self.http.request(*item.args, **item.kwargs)
@@ -368,7 +365,7 @@ class HttpProcessor(threading.Thread):
  #       copyright notice, this list of conditions and the following
  #       disclaimer in the documentation and/or other materials provided
  #       with the distribution.
- # 
+ #
  # THIS SOFTWARE IS PROVIDED BY METAWEB TECHNOLOGIES AND CONTRIBUTORS
  # ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS

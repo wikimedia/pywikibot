@@ -21,7 +21,7 @@ import os.path
 import sys
 
 # logging levels
-logger = logging.getLogger("pywiki.bot")
+_logger = "bot"
 
 from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 STDOUT = 16
@@ -38,22 +38,6 @@ uiModule = __import__("pywikibot.userinterfaces.%s_interface"
                         % config.userinterface,
                         fromlist=['UI'] )
 ui = uiModule.UI()
-
-# next bit filched from 1.5.2's inspect.py
-def currentframe():
-    """Return the frame object for the caller's stack frame."""
-    try:
-        raise Exception
-    except:
-        return sys.exc_traceback.tb_frame.f_back
-
-if hasattr(sys, '_getframe'):
-    # less portable but more efficient
-    currentframe = lambda: sys._getframe(2)
-    # frame0 is this lambda, frame1 is output() in this module,
-    # so frame2 is whatever called output()
-
-# done filching
 
 # Logging module configuration
 
@@ -101,33 +85,55 @@ class LoggingFormatter(logging.Formatter):
             return strExc + '\n'
 
 
-def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
-    """Output a message to the user via the userinterface.
+# User output/logging functions
 
-    Works like print, but uses the encoding used by the user's console
-    (console_encoding in the configuration file) instead of ASCII.
-    If decoder is None, text should be a unicode string. Otherwise it
-    should be encoded in the given encoding.
+# Five output functions are defined. Each requires a unicode or string
+# argument.  All of these functions generate a message to the log file if
+# logging is enabled ("-log" or "-debug" command line arguments).
 
-    If newline is True, a linebreak will be added after printing the text.
+# The functions output(), warning(), and error() all display a message to the
+# user through the logger object; the only difference is the priority level,
+# which can be used by the application layer to alter the display.
 
-    If toStdout is True, the text will be sent to standard output,
-    so that it can be piped to another process. All other text will
-    be sent to stderr. See: http://en.wikipedia.org/wiki/Pipeline_%28Unix%29
+# The function log() by default does not display a message to the user, but
+# this can be altered by using the "-verbose" command line option.
 
-    text can contain special sequences to create colored output. These
-    consist of the escape character \03 and the color name in curly braces,
-    e. g. \03{lightpurple}. \03{default} resets the color.
+# The function debug() only logs its messages, they are never displayed on
+# the user console. debug() takes a required second argument, which is a
+# string indicating the debugging layer.
 
-    @param level: output level for logging module; use VERBOSE for optional
-        messages, INPUT for prompts requiring user reponse (not yet fully
-        implemented)
+# next bit filched from 1.5.2's inspect.py
+def currentframe():
+    """Return the frame object for the caller's stack frame."""
+    try:
+        raise Exception
+    except:
+        # go back two levels, one for _fmtoutput and one for whatever called it
+        return sys.exc_traceback.tb_frame.f_back.f_back
+
+if hasattr(sys, '_getframe'):
+    # less portable but more efficient
+    currentframe = lambda: sys._getframe(3)
+    # frame0 is this lambda, frame1 is _fmtoutput() in this module,
+    # frame2 is the convenience function (output(), etc.)
+    # so frame3 is whatever called the convenience function
+
+# done filching
+
+def _fmtoutput(text, decoder=None, newline=True, toStdout=False,
+               _level=INFO, _logger=""):
+    """Format output and send to the logging module.
+
+    Backend function used by all the user-output convenience functions.
 
     """
+    if _logger:
+        path = "pywiki." + _logger
+    else:
+        path = "pywiki"
+
     # make sure logging system has been initialized
-    root = logging.getLogger("pywiki")
-    if not root.level:
-        # init_handlers sets this level; if it is 0, it needs to be set
+    if not _handlers_initialized:
         init_handlers(strm=ui.output_stream)
 
     frame = currentframe()
@@ -152,8 +158,45 @@ def output(text, decoder=None, newline=True, toStdout=False, level=INFO):
     if newline:
         text += "\n"
     if toStdout:
-        level = STDOUT
-    ui.output(text, level=level, context=context)
+        _level = STDOUT
+    logger = logging.getLogger(path)
+    ui.output(text, logger, _level, context)
+
+def output(text, decoder=None, newline=True, toStdout=False):
+    """Output a message to the user via the userinterface.
+
+    Works like print, but uses the encoding used by the user's console
+    (console_encoding in the configuration file) instead of ASCII.
+    If decoder is None, text should be a unicode string. Otherwise it
+    should be encoded in the given encoding.
+
+    If newline is True, a linebreak will be added after printing the text.
+
+    If toStdout is True, the text will be sent to standard output,
+    so that it can be piped to another process. All other text will
+    be sent to stderr. See: http://en.wikipedia.org/wiki/Pipeline_%28Unix%29
+
+    text can contain special sequences to create colored output. These
+    consist of the escape character \03 and the color name in curly braces,
+    e. g. \03{lightpurple}. \03{default} resets the color.
+
+    """
+    _fmtoutput(text, decoder, newline, toStdout, INFO)
+
+def warning(text, decoder=None, newline=True, toStdout=False):
+    _fmtoutput(text, decoder, newline, toStdout, WARNING)
+
+def error(text, decoder=None, newline=True, toStdout=False):
+    _fmtoutput(text, decoder, newline, toStdout, ERROR)
+
+def log(text, decoder=None, newline=True, toStdout=False):
+    _fmtoutput(text, decoder, newline, toStdout, VERBOSE)
+
+def debug(text, layer, decoder=None, newline=True, toStdout=False):
+    _fmtoutput(text, decoder, newline, toStdout, DEBUG, layer)
+
+
+# User input functions
 
 def input(question, password=False):
     """Ask the user a question, return the user's answer.
@@ -168,8 +211,7 @@ def input(question, password=False):
 
     """
     # make sure logging system has been initialized
-    root = logging.getLogger("pywiki")
-    if root.level == 30: # init_handlers sets this level
+    if not _handlers_initialized:
         init_handlers(strm=ui.output_stream)
 
     data = ui.input(question, password)
@@ -194,13 +236,14 @@ def inputChoice(question, answers, hotkeys, default=None):
 
     """
     # make sure logging system has been initialized
-    root = logging.getLogger("pywiki")
-    if root.level == 30: # init_handlers sets this level
+    if not _handlers_initialized:
         init_handlers(strm=ui.output_stream)
 
     data = ui.inputChoice(question, answers, hotkeys, default).lower()
     return data
 
+
+_handlers_initialized = False
 
 def init_handlers(strm=None):
     """Initialize logging system for terminal-based bots.
@@ -212,6 +255,8 @@ def init_handlers(strm=None):
         was defined, otherwise uses sys.stderr
 
     """
+    # Note: this function is called by handleArgs(), so it should normally
+    # not need to be called explicitly
 
     # All user output is routed through the logging module.
     # Each type of output is handled by an appropriate handler object.
@@ -229,6 +274,8 @@ def init_handlers(strm=None):
     #    CRITICAL - fatal error messages
     # Accordingly, do ''not'' use print statements in bot code; instead,
     # use pywikibot.output function.
+
+    global _handlers_initialized
 
     global _stream
     if strm:
@@ -254,7 +301,7 @@ def init_handlers(strm=None):
     root_logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
     root_logger.handlers = [] # remove any old handlers
 
-    # configure default handler for VERBOSE and INFO levels
+    # configure default handler for display to user interface
     default_handler = ui.OutputHandlerClass(strm=_stream)
     if config.verbose_output:
         default_handler.setLevel(VERBOSE)
@@ -305,6 +352,7 @@ def init_handlers(strm=None):
             LoggingFormatter(fmt="%(levelname)s: %(message)s"))
     root_logger.addHandler(warning_handler)
 
+    _handlers_initialized = True
 
 # Command line parsing and help
 
@@ -387,6 +435,31 @@ def handleArgs(*args):
         elif arg == '-nolog':
             if moduleName in config.log:
                 config.log.remove(moduleName)
+        #
+        #  DEBUG control:
+        #
+        #    The framework has four layers (by default, others can be added),
+        #    each designated by a string --
+        #
+        #    1.  "comm": the communication layer (http requests, etc.)
+        #    2.  "data": the raw data layer (API requests, XML dump parsing)
+        #    3.  "wiki": the wiki content representation layer (Page and Site
+        #         objects)
+        #    4.  "bot": the application layer (user scripts should always
+        #         send any debug() messages to this layer)
+        #
+        #    The "-debug:layer" flag sets the logger for any specified
+        #    layer to the DEBUG level, causing it to output extensive debugging
+        #    information. Otherwise, the default logging setting is the INFO
+        #    level. "-debug" with no layer specified sets _all_ loggers to
+        #    DEBUG level.
+        #
+        #    This method does not check the 'layer' part of the flag for
+        #    validity.
+        #
+        #    If used, "-debug" turns on file logging, regardless of any
+        #    other settings.
+        #
         elif arg == "-debug":
             if moduleName not in config.log:
                 config.log.append(moduleName)
@@ -426,7 +499,7 @@ def handleArgs(*args):
     if do_help:
         showHelp()
         sys.exit(0)
-    pywikibot.output(u"handleArgs() completed.", level=pywikibot.DEBUG)
+    pywikibot.debug(u"handleArgs() completed.", _logger)
     return nonGlobalArgs
 
 
@@ -485,13 +558,13 @@ Global arguments available for all bots:
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.iteritems():
                 helpText = helpText.replace(key, value.strip('\n\r'))
-        pywikibot.output(helpText, level=pywikibot.STDOUT) # output to STDOUT
+        pywikibot.output(helpText, toStdout=True) # output to STDOUT
     except Exception:
         if modname:
             pywikibot.output(u'Sorry, no help available for %s' % modname,
-                             level=pywikibot.STDOUT)
+                             toStdout=True)
         logger.exception('showHelp:')
-    pywikibot.output(globalHelp, level=pywikibot.STDOUT)
+    pywikibot.output(globalHelp, toStdout=True)
 
 class Bot(object):
     """
@@ -526,9 +599,8 @@ class Bot(object):
             self.options[opt] = kwargs[opt]
 
         for opt in receivedOptions - validOptions:
-            pywikibot.output(u'%s is not a valid option. It was ignored\n'
-                              % opt,
-                             level=pywikibot.WARNING)
+            pywikibot.warning(u'%s is not a valid option. It was ignored.'
+                                % opt)
 
     def getOption(self, option):
         """

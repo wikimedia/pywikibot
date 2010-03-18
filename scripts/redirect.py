@@ -774,8 +774,7 @@ def main(*args):
             pywikibot.output(u'Unknown argument: %s' % arg)
 
     if xmlFilename:
-        pywikibot.output("Sorry, xmlreader is not yet implemented in rewrite",
-                        level=pywikibot.ERROR)
+        pywikibot.error(u"Sorry, xmlreader is not yet implemented in rewrite")
     elif not action: # or (xmlFilename and moved_pages)
                      # or (api and xmlFilename):
         pywikibot.showHelp('redirect')

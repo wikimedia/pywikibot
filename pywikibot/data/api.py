@@ -27,13 +27,15 @@ import pywikibot
 from pywikibot import config, login
 from pywikibot.exceptions import *
 
-logger = logging.getLogger("pywiki.data.api")
+_logger = "data.api"
 
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
 _modules = {} # cache for retrieved API parameter information
 
-
+##logger = logging.getLogger("pywiki.data.api")
+##print "level =", logger.getEffectiveLevel()
+##
 class APIError(pywikibot.Error):
     """The wiki site returned an error message."""
     def __init__(self, code, info, **kwargs):
@@ -129,8 +131,7 @@ class Request(object, DictMixin):
                         "import", "userrights", "upload"
                     )
         if self.write:
-            pywikibot.output(u"Adding user assertion",
-                             level=pywikibot.DEBUG)
+            pywikibot.debug(u"Adding user assertion", _logger)
             self.params["assert"] = "user" # make sure user is logged in
 
     # implement dict interface
@@ -269,22 +270,18 @@ class Request(object, DictMixin):
                                          'application/x-www-form-urlencoded'},
                                 body=paramstring)
             except Server504Error:
-                pywikibot.output(u"Caught 504 error",
-                                 level=pywikibot.DEBUG)
+                pywikibot.debug(u"Caught 504 error", _logger)
                 raise
             #TODO: what other exceptions can occur here?
             except Exception, e:
                 # for any other error on the http request, wait and retry
-                pywikibot.output(traceback.format_exc(),
-                                 level=pywikibot.ERROR)
-                pywikibot.output(u"%s, %s" % (uri, paramstring),
-                                 level=pywikibot.VERBOSE)
+                pywikibot.error(traceback.format_exc())
+                pywikibot.log(u"%s, %s" % (uri, paramstring))
                 self.wait()
                 continue
             if not isinstance(rawdata, unicode):
                 rawdata = rawdata.decode(self.site.encoding())
-            pywikibot.output(u"API response received:\n" + rawdata,
-                             level=pywikibot.DEBUG)
+            pywikibot.debug(u"API response received:\n" + rawdata, _logger)
             if rawdata.startswith(u"unknown_action"):
                 raise APIError(rawdata[:14], rawdata[16:])
             try:
@@ -292,12 +289,10 @@ class Request(object, DictMixin):
             except ValueError:
                 # if the result isn't valid JSON, there must be a server
                 # problem.  Wait a few seconds and try again
-                pywikibot.output(
+                pywikibot.warning(
 "Non-JSON response received from server %s; the server may be down."
-                                 % self.site,
-                                 level=pywikibot.WARNING)
-                pywikibot.output(rawdata,
-                                 level=pywikibot.DEBUG)
+                                 % self.site)
+                pywikibot.debug(rawdata, _logger)
                 self.wait()
                 continue
             if not result:
@@ -331,10 +326,9 @@ class Request(object, DictMixin):
             if "warnings" in result:
                 modules = [k for k in result["warnings"] if k != "info"]
                 for mod in modules:
-                    pywikibot.output(
+                    pywikibot.warning(
                         u"API warning (%s): %s"
-                         % (mod, result["warnings"][mod]["*"]),
-                        level=pywikibot.WARNING)
+                         % (mod, result["warnings"][mod]["*"]))
             if "error" not in result:
                 return result
             if "*" in result["error"]:
@@ -345,9 +339,8 @@ class Request(object, DictMixin):
             if code == "maxlag":
                 lag = lagpattern.search(info)
                 if lag:
-                    pywikibot.output(
-                        u"Pausing due to database lag: " + info,
-                        level=pywikibot.VERBOSE)
+                    pywikibot.log(
+                        u"Pausing due to database lag: " + info)
                     self.site.throttle.lag(int(lag.group("lag")))
                     continue
             if code in (u'internal_api_error_DBConnectionError', ):
@@ -364,9 +357,8 @@ class Request(object, DictMixin):
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError("Maximum retries attempted without success.")
-        pywikibot.output(u"Waiting %s seconds before retrying."
-                          % self.retry_wait,
-                         level=pywikibot.WARNING)
+        pywikibot.warning(u"Waiting %s seconds before retrying."
+                            % self.retry_wait)
         time.sleep(self.retry_wait)
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
@@ -488,10 +480,10 @@ class QueryGenerator(object):
                         self.query_limit = int(param["max"])
                     if self.prefix is None:
                         self.prefix = _modules[mod]["prefix"]
-                    pywikibot.output(u"%s: Set query_limit to %i."
+                    pywikibot.debug(u"%s: Set query_limit to %i."
                                       % (self.__class__.__name__,
                                          self.query_limit),
-                                     level=pywikibot.DEBUG)
+                                    _logger)
                     return
 
     def set_namespace(self, namespaces):
@@ -534,39 +526,37 @@ class QueryGenerator(object):
                 old_limit = self.query_limit
                 if old_limit is None or old_limit < 2:
                     raise
-                pywikibot.output("Setting query limit to %s" % (old_limit // 2),
-                                 level=pywikibot.VERBOSE)
+                pywikibot.log("Setting query limit to %s" % (old_limit // 2))
                 self.set_query_increment(old_limit // 2)
                 continue
             if not self.data or not isinstance(self.data, dict):
-                pywikibot.output(
+                pywikibot.debug(
                     u"%s: stopped iteration because no dict retrieved from api."
                         % self.__class__.__name__,
-                    level=pywikibot.DEBUG)
+                    _logger)
                 return
             if not ("query" in self.data
                     and self.resultkey in self.data["query"]):
-                pywikibot.output(
+                pywikibot.debug(
 u"%s: stopped iteration because 'query' and '%s' not found in api response."
                         % (self.__class__.__name__, self.resultkey),
-                    level=pywikibot.DEBUG)
-                pywikibot.output(unicode(self.data),
-                                 level=pywikibot.DEBUG)
+                    _logger)
+                pywikibot.debug(unicode(self.data), _logger)
                 return
             resultdata = self.data["query"][self.resultkey]
             if isinstance(resultdata, dict):
-                pywikibot.output(u"%s received %s; limit=%s"
-                                     % (self.__class__.__name__,
-                                        resultdata.keys(),
-                                        self.limit),
-                                 level=pywikibot.DEBUG)
+                pywikibot.debug(u"%s received %s; limit=%s"
+                                  % (self.__class__.__name__,
+                                     resultdata.keys(),
+                                     self.limit),
+                                _logger)
                 resultdata = [resultdata[k] for k in sorted(resultdata.keys())]
             else:
-                pywikibot.output(u"%s received %s; limit=%s"
-                                     % (self.__class__.__name__,
-                                        resultdata,
-                                        self.limit),
-                                 level=pywikibot.DEBUG)
+                pywikibot.debug(u"%s received %s; limit=%s"
+                                  % (self.__class__.__name__,
+                                     resultdata,
+                                     self.limit),
+                                _logger)
             if "normalized" in self.data["query"]:
                 self.normalized = dict((item['to'], item['from'])
                                       for item in
@@ -582,10 +572,9 @@ u"%s: stopped iteration because 'query' and '%s' not found in api response."
             if not "query-continue" in self.data:
                 return
             if not self.continuekey in self.data["query-continue"]:
-                pywikibot.output(
+                pywikibot.log(
                     u"Missing '%s' key in ['query-continue'] value."
-                     % self.continuekey,
-                    level=pywikibot.VERBOSE)
+                      % self.continuekey)
                 return
             update = self.data["query-continue"][self.continuekey]
             for key, value in update.iteritems():
@@ -744,9 +733,8 @@ class LoginManager(login.LoginManager):
         if hasattr(self, '_waituntil'):
             if datetime.now() < self._waituntil:
                 diff = self._waituntil - datetime.now()
-                pywikibot.output(u"Too many tries, waiting %s seconds before retrying."
-                                % diff.seconds,
-                                level=pywikibot.WARNING)
+                pywikibot.warning(u"Too many tries, waiting %s seconds before retrying."
+                                    % diff.seconds)
                 time.sleep(diff.seconds)
         login_request = Request(site=self.site,
                                 action="login",
@@ -838,8 +826,8 @@ def update_page(page, pagedict):
 
 
 if __name__ == "__main__":
-    from pywikibot import Site
-    logger.setLevel(pywikibot.logging.DEBUG)
+    from pywikibot import Site, logging
+    logging.getLogger("pywiki.data.api").setLevel(logging.DEBUG)
     mysite = Site("en", "wikipedia")
     pywikibot.output(u"starting test....")
     def _test():

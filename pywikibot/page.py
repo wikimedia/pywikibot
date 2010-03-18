@@ -454,10 +454,9 @@ class Page(object):
                                          + ":" + args[0].strip()
                         break
                     except IndexError:
-                        pywikibot.output(
+                        pywikibot.warning(
                             u"No target for category redirect on %s"
-                             % self.title(asLink=True),
-                            level=pywikibot.WARNING)
+                              % self.title(asLink=True))
                         self._catredirect = False
                         break
             else:
@@ -735,8 +734,7 @@ class Page(object):
             done = self.site().editpage(self, summary=comment, minor=minor,
                                         watch=watch, unwatch=unwatch)
             if not done:
-                pywikibot.output(u"Page %s not saved" % link,
-                                 level=pywikibot.WARNING)
+                pywikibot.warning(u"Page %s not saved" % link)
                 raise pywikibot.PageNotSaved(link)
             else:
                 pywikibot.output(u"Page %s saved" % link)
@@ -1707,9 +1705,8 @@ class Category(Page):
         catname = self.site().category_namespace() + ':' + catname
         targetCat = Category(self.site(), catname)
         if targetCat.exists():
-            pywikibot.output(u'Target page %s already exists!'
-                              % targetCat.title(),
-                             level=pywikibot.WARNING)
+            pywikibot.warning(u'Target page %s already exists!'
+                                % targetCat.title())
             return False
         else:
             pywikibot.output('Moving text from %s to %s.'

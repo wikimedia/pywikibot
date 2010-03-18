@@ -11,21 +11,23 @@ __version__ = '$Id$'
 
 from pywikibot.exceptions import *
 import pywikibot
-  
+
+_logger = "wiki"
+
 class LogDict(dict):
     """
     Simple custom dictionary that raises a custom KeyError and logs
     debugging information when a key is missing
     """
     def __missing__(self, key):
-        pywikibot.output(u"API log entry received:\n" + repr(self),
-                         level=pywikibot.DEBUG)
+        pywikibot.debug(u"API log entry received:\n" + repr(self),
+                        _logger)
         raise KeyError("Log entry has no '%s' key" % key, key)
 
 class LogEntry(object):
     """Generic log entry"""
 
-    # Log type expected. None for every type, or one of the (letype) str : 
+    # Log type expected. None for every type, or one of the (letype) str :
     # block/patrol/etc...
     # Overriden in subclasses.
     _expectedType = None
@@ -36,13 +38,13 @@ class LogEntry(object):
         if self._expectedType is not None and self._expectedType != self.type():
             raise Error("Wrong log type! Expecting %s, received %s instead." \
                         % (self._expectedType, self.type()))
-     
+
     def __hash__(self):
         return self.logid()
 
     def logid(self):
         return self.data['logid']
-    
+
     def pageid(self):
         return self.data['pageid']
 
@@ -54,7 +56,7 @@ class LogEntry(object):
         if not hasattr(self, '_title'):
             self._title = pywikibot.Page(pywikibot.Link(self.data['title']))
         return self._title
-    
+
     def type(self):
         return self.data['type']
 
@@ -89,7 +91,7 @@ class BlockEntry(LogEntry):
 
     def title(self):
         """
-        * Returns the Page object of username or IP 
+        * Returns the Page object of username or IP
            if this block action targets a username or IP.
         * Returns the blockid if this log reflects the removal of an autoblock
         """
@@ -101,7 +103,7 @@ class BlockEntry(LogEntry):
 
     def isAutoblockRemoval(self):
         return self.isAutoblockRemoval
-            
+
     def _getBlockDetails(self):
         try:
             return self.data['block']
@@ -174,12 +176,12 @@ class MoveEntry(LogEntry):
 
     def suppressedredirect(self):
         """
-        Returns True if no redirect was created from the old title 
+        Returns True if no redirect was created from the old title
         to the new title during the move
         """
         # Introduced in MW r47901
         return 'suppressedredirect' in self.data['move']
-    
+
 
 class ImportEntry(LogEntry):
     _expectedType = 'import'
@@ -251,9 +253,9 @@ class LogEntryFactory(object):
         Checks for logtype from data, and creates the correct LogEntry
         """
         try:
-            logtype = logdata['type'] 
+            logtype = logdata['type']
             return LogEntryFactory._getEntryClass(logtype)(logdata)
         except KeyError:
-            pywikibot.output(u"API log entry received:\n" + logdata,
-                              level=pywikibot.DEBUG)
+            pywikibot.debug(u"API log entry received:\n" + logdata,
+                            _logger)
             raise Error("Log entry has no 'type' key")

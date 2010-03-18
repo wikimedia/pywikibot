@@ -110,9 +110,8 @@ class UploadRobot:
                     elif dt < 360:
                         dt += 60
             else:
-                pywikibot.output(
-                    u"WARNING: No check length to retrieved data is possible.",
-                    level=pywikibot.VERBOSE)
+                pywikibot.log(
+                    u"WARNING: No check length to retrieved data is possible.")
         handle, tempname = tempfile.mkstemp()
         t = os.fdopen(handle, "wb")
         t.write(_contents)
@@ -220,7 +219,7 @@ class UploadRobot:
             else:
                 pywikibot.output(u"Upload aborted.")
                 return
-            
+
         except Exception, e:
             pywikibot.logger.exception("Upload error: " + str(e))
 
