@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikipedia bot team, 2008-2010
 #
 # Distributed under the terms of the MIT license.
 #
@@ -92,7 +92,8 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         # this matches internal wikilinks, but also interwiki, categories, and
         # images.
         'link':        re.compile(r'\[\[[^\]\|]*(\|[^\]]*)?\]\]'),
-        'interwiki':   re.compile(r'(?i)\[\[(%s)\s?:[^\]]*\]\][\s]*'
+        # also finds links to foreign sites with preleading ":"
+        'interwiki':   re.compile(r'(?i)\[\[:?(%s)\s?:[^\]]*\]\][\s]*'
                                    % '|'.join(site.validLanguageLinks()
                                               + site.family.obsolete.keys())
                                   ),
@@ -678,7 +679,7 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     # Note: While allowing parenthesis inside URLs, MediaWiki will regard
     # right parenthesis at the end of the URL as not part of that URL.
     # The same applies to dot, comma, colon and some other characters.
-    notAtEnd = '\]\s\)\.:;,<>"'
+    notAtEnd = '\]\s\)\.:;,<>"\|'
     # So characters inside the URL can be anything except whitespace,
     # closing squared brackets, quotation marks, greater than and less
     # than, and the last character also can't be parenthesis or another
