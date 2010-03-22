@@ -20,23 +20,24 @@ class Family(family.Family):
             'lv', 'sq', 'tl', 'bpy', 'pms', 'be-x-old', 'ta', 'bn', 'oc', 'war',
             'an', 'be', 'io', 'sw', 'nds', 'scn', 'fy', 'qu', 'su', 'af',
             'gu', 'zh-yue', 'ast', 'nap', 'ku', 'ur', 'bat-smg', 'ml', 'wa', 'cv',
-            'ksh', 'ga', 'lmo', 'tg', 'roa-tara', 'vec', 'hy', 'kn', 'gd', 'uz',
+            'ksh', 'lmo', 'ga', 'tg', 'roa-tara', 'vec', 'hy', 'kn', 'gd', 'uz',
             'yi', 'pam', 'mi', 'zh-min-nan', 'yo', 'als', 'nah', 'kk', 'sah', 'li',
             'glk', 'hsb', 'co', 'tt', 'roa-rup', 'arz', 'os', 'ia', 'bcl', 'gan',
             'mn', 'fiu-vro', 'nds-nl', 'vls', 'tk', 'fo', 'sa', 'pnb', 'am', 'dv',
             'nrm', 'ne', 'pag', 'rm', 'bar', 'map-bms', 'wuu', 'gv', 'my', 'sco',
             'diq', 'se', 'fur', 'lij', 'si', 'nov', 'ug', 'mt', 'bh', 'mzn',
             'csb', 'ilo', 'zh-classical', 'pi', 'km', 'lad', 'sc', 'mg', 'frp', 'ang',
-            'kw', 'haw', 'pdc', 'szl', 'ckb', 'hif', 'ps', 'bo', 'pa', 'ie',
+            'kw', 'pdc', 'haw', 'hif', 'szl', 'ckb', 'ps', 'bo', 'pa', 'ie',
             'hak', 'kv', 'to', 'crh', 'stq', 'myv', 'gn', 'ln', 'mhr', 'nv',
             'ace', 'ext', 'ky', 'arc', 'jbo', 'wo', 'ty', 'tpi', 'eml', 'cbk-zam',
             'so', 'zea', 'kab', 'srn', 'ay', 'pap', 'ig', 'or', 'ba', 'kg',
             'lo', 'udm', 'dsb', 'rmy', 'cu', 'kaa', 'ce', 'ab', 'sm', 'xal',
             'kl', 'av', 'ks', 'tet', 'got', 'sd', 'mwl', 'mdf', 'na', 'bm',
-            'pnt', 'pcd', 'iu', 'pih', 'as', 'cdo', 'chr', 'om', 'ee', 'zu',
+            'pcd', 'pnt', 'iu', 'pih', 'as', 'cdo', 'chr', 'om', 'ee', 'zu',
             'ti', 'ts', 'za', 'ss', 've', 'bi', 'ha', 'dz', 'ch', 'cr',
             'xh', 'bug', 'bxr', 'tn', 'ki', 'sg', 'ik', 'rw', 'st', 'ny',
             'tw', 'ak', 'sn', 'fj', 'ff', 'lg', 'lbe', 'tum', 'chy', 'rn',
+            'krc',
         ]
 
         for lang in self.languages_by_size:
@@ -198,9 +199,10 @@ class Family(family.Family):
             'kg':  [u'Bisongidila'],
             'kn':  [u'ದ್ವಂದ್ವ ನಿವಾರಣೆ'],
             'ko':  None,
+            'krc': [u'Шаблон:Кёб магъаналы', u'Шаблон:Disambig'],
+            'ksh': None,
             'ku':  None,
             'kw':  None,
-            'ksh': None,
             'la':  None,
             'lb':  [u'Homonymie', u'Disambig', u'Homonymie Ofkierzungen'],
             'li':  [u'Verdudeliking', u'Verdudelikingpazjena', u'Vp'],
@@ -314,6 +316,7 @@ class Family(family.Family):
             'kw':  u'Folennow klerheans',
             'ko':  u'동음이의어 문서',
             'ku':  u'Rûpelên cudakirinê',
+            'krc': u'Кёб магъаналы терминле',
             'ksh': u'Woot met mieh wi ëijnem Senn',
             'la':  u'Discretiva',
             'lb':  u'Homonymie',
@@ -356,7 +359,8 @@ class Family(family.Family):
             'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species',
         ]
-        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # Global bot allowed languages on
+        # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
             'ab', 'ace', 'af', 'ak', 'als', 'am', 'an', 'ang', 'arc', 'arz', 'as', 'ast', 'av', 'ay', 'az',
             'ba', 'bat-smg', 'bar', 'bcl', 'be-x-old', 'be', 'bg', 'bh', 'bi', 'bm', 'bo', 'bpy', 'bug', 'bxr',
@@ -374,12 +378,13 @@ class Family(family.Family):
             'udm', 'ug', 'uz', 've', 'vls', 'wa', 'war', 'wo', 'wuu',
             'xal', 'xh', 'yi', 'yo', 'za', 'zea', 'zh', 'zh-classical', 'zh-min-nan', 'zu',
         ]
-        # On most Wikipedias page names must start with a capital letter, but some
-        # languages don't use this.
 
+        # On most Wikipedias page names must start with a capital letter,
+        # but some languages don't use this.
         self.nocapitalize = ['jbo',]
 
-        # A revised sorting order worked out on http://meta.wikimedia.org/wiki/Interwiki_sorting_order
+        # A revised sorting order worked out on
+        # http://meta.wikimedia.org/wiki/Interwiki_sorting_order
         self.alphabetic_revised = [
             'ace', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an', 'arc',
             'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'id', 'ms',
@@ -395,20 +400,20 @@ class Family(family.Family):
             'kl', 'kn', 'kr', 'pam', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'ky',
             'rn', 'sw', 'kv', 'kg', 'ht', 'ku', 'kj', 'lad', 'lbe', 'lo', 'la',
             'lv', 'to', 'lb', 'lt', 'lij', 'li', 'ln', 'jbo', 'lg', 'lmo', 'hu',
-            'mk', 'mg', 'ml', 'mt', 'mi', 'mr', 'arz', 'mzn', 'cdo', 'mwl',
-            'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'fj', 'nl', 'nds-nl', 'cr',
-            'ne', 'new', 'ja', 'nap', 'ce', 'pih', 'no', 'nb', 'nn', 'nrm',
-            'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi',
-            'pag', 'pnb', 'pap', 'ps', 'km', 'pcd', 'pms', 'nds', 'pl', 'pnt',
-            'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu',
-            'ru', 'sah', 'se', 'sa', 'sg', 'sc', 'sco', 'stq', 'st', 'tn', 'sq',
-            'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
-            'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab', 'roa-tara',
-            'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi', 'tokipona', 'tp',
-            'chr', 'chy', 've', 'tr', 'tk', 'tw', 'udm', 'uk', 'ur', 'ug', 'za',
-            'vec', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo',
-            'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh',
-            'zh-tw', 'zh-cn'
+            'mk', 'mg', 'ml', 'krc', 'mt', 'mi', 'mr', 'arz', 'mzn', 'cdo',
+            'mwl', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'fj', 'nl', 'nds-nl',
+            'cr', 'ne', 'new', 'ja', 'nap', 'ce', 'pih', 'no', 'nb', 'nn',
+            'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa',
+            'pi', 'pag', 'pnb', 'pap', 'ps', 'km', 'pcd', 'pms', 'nds', 'pl',
+            'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm',
+            'qu', 'ru', 'sah', 'se', 'sa', 'sg', 'sc', 'sco', 'stq', 'st', 'tn',
+            'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl',
+            'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab',
+            'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi',
+            'tokipona', 'tp', 'chr', 'chy', 've', 'tr', 'tk', 'tw', 'udm', 'uk',
+            'ur', 'ug', 'za', 'vec', 'vo', 'fiu-vro', 'wa', 'zh-classical',
+            'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea',
+            'bat-smg', 'zh', 'zh-tw', 'zh-cn',
         ]
         
         self.alphabetic_latin = [
@@ -423,23 +428,23 @@ class Family(family.Family):
             'ga', 'gv', 'sm', 'gd', 'gl', 'gan', 'ki', 'glk', 'got', 'gu', 'ha',
             'hak', 'xal', 'haw', 'he', 'hi', 'ho', 'hsb', 'hr', 'hy', 'io',
             'ig', 'ii', 'ilo', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is',
-            'it', 'ja', 'ka', 'kl', 'kr', 'pam', 'csb', 'kk', 'kw', 'rw', 'ky',
-            'rn', 'sw', 'km', 'kn', 'ko', 'kv', 'kg', 'ht', 'ks', 'ku', 'kj',
-            'lad', 'lbe', 'la', 'lv', 'to', 'lb', 'lt', 'lij', 'li', 'ln', 'lo',
-            'jbo', 'lg', 'lmo', 'hu', 'mk', 'mg', 'mt', 'mi', 'cdo', 'mwl',
-            'ml', 'mdf', 'mo', 'mn', 'mr', 'mus', 'my', 'mzn', 'nah', 'fj',
-            'ne', 'nl', 'nds-nl', 'cr', 'new', 'nap', 'ce', 'pih', 'no', 'nb',
-            'nn', 'nrm', 'nov', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa',
-            'pag', 'pap', 'pi', 'pcd', 'pms', 'nds', 'pnb', 'pl', 'pt', 'pnt',
-            'ps', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu',
-            'ru', 'sa', 'sah', 'se', 'sg', 'sc', 'sco', 'sd', 'stq', 'st', 'tn',
-            'sq', 'si', 'scn', 'simple', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
-            'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'ta', 'tl', 'kab', 'roa-tara',
-            'tt', 'te', 'tet', 'th', 'ti', 'vi', 'tg', 'tokipona', 'tp', 'tpi',
-            'chy', 've', 'tr', 'tk', 'tw', 'udm', 'uk', 'ur', 'ug', 'za', 'vec',
-            'vo', 'fiu-vro', 'wa', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo',
-            'diq', 'zea', 'zh', 'zh-tw', 'zh-cn', 'zh-classical', 'zh-yue',
-            'bat-smg',
+            'it', 'ja', 'ka', 'kl', 'kr', 'pam', 'krc', 'csb', 'kk', 'kw', 'rw',
+            'ky', 'rn', 'sw', 'km', 'kn', 'ko', 'kv', 'kg', 'ht', 'ks', 'ku',
+            'kj', 'lad', 'lbe', 'la', 'lv', 'to', 'lb', 'lt', 'lij', 'li', 'ln',
+            'lo', 'jbo', 'lg', 'lmo', 'hu', 'mk', 'mg', 'mt', 'mi', 'cdo',
+            'mwl', 'ml', 'mdf', 'mo', 'mn', 'mr', 'mus', 'my', 'mzn', 'nah',
+            'fj', 'ne', 'nl', 'nds-nl', 'cr', 'new', 'nap', 'ce', 'pih', 'no',
+            'nb', 'nn', 'nrm', 'nov', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz',
+            'pa', 'pag', 'pap', 'pi', 'pcd', 'pms', 'nds', 'pnb', 'pl', 'pt',
+            'pnt', 'ps', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm',
+            'qu', 'ru', 'sa', 'sah', 'se', 'sg', 'sc', 'sco', 'sd', 'stq', 'st',
+            'tn', 'sq', 'si', 'scn', 'simple', 'ss', 'sk', 'sl', 'cu', 'szl',
+            'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'ta', 'tl', 'kab',
+            'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'vi', 'tg', 'tokipona',
+            'tp', 'tpi', 'chy', 've', 'tr', 'tk', 'tw', 'udm', 'uk', 'ur', 'ug',
+            'za', 'vec', 'vo', 'fiu-vro', 'wa', 'vls', 'war', 'wo', 'wuu', 'ts',
+            'yi', 'yo', 'diq', 'zea', 'zh', 'zh-tw', 'zh-cn', 'zh-classical',
+            'zh-yue', 'bat-smg',
         ]
 
         # Order for fy: alphabetical by code, but y counts as i
@@ -456,8 +461,8 @@ class Family(family.Family):
         # and what order is it? If a language is not in interwiki_putfirst,
         # alphabetical order on language code is used. For languages that are in
         # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are put
-        # after those, in code-alphabetical order.
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
 
         self.interwiki_putfirst = {
             'en': self.alphabetic,
