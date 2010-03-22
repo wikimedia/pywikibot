@@ -12,7 +12,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikipedia bot team, 2008-2010
 #
 # Distributed under the terms of the MIT license.
 #
