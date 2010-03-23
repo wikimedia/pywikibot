@@ -199,7 +199,7 @@ class Family(family.Family):
             'kg':  [u'Bisongidila'],
             'kn':  [u'ದ್ವಂದ್ವ ನಿವಾರಣೆ'],
             'ko':  None,
-            'krc': [u'Шаблон:Кёб магъаналы', u'Шаблон:Disambig'],
+            'krc': [u'Кёб магъаналы', u'Disambig'],
             'ksh': None,
             'ku':  None,
             'kw':  None,
