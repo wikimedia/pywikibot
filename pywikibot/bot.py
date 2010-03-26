@@ -558,7 +558,7 @@ Global arguments available for all bots:
     except Exception:
         if modname:
             pywikibot.stdout(u'Sorry, no help available for %s' % modname)
-#        pywikibot.log('showHelp: %%(exception)s')
+        pywikibot.log('showHelp:', exc_info=True)
     pywikibot.stdout(globalHelp)
 
 
