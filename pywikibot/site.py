@@ -61,10 +61,10 @@ def Family(fam=None, fatal=True):
             myfamily =  __import__("%s_family" % fam)
         except ImportError:
             if fatal:
-                logger.exception(u"""\
+                pywikibot.error(u"""\
 Error importing the %s family. This probably means the family
 does not exist. Also check your configuration file."""
-                           % fam)
+                                  % fam, exc_info=True)
                 sys.exit(1)
             else:
                 raise Error("Family %s does not exist" % fam)

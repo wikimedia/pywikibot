@@ -1048,7 +1048,7 @@ if __name__ == "__main__":
     try:
         main()
     except pywikibot.Error:
-        pywikibot.logging.exception("Fatal error:")
+        pywikibot.error("Fatal error:", exc_info=True)
     finally:
         catDB.dump()
         pywikibot.stopme()

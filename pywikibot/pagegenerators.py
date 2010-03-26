@@ -1071,11 +1071,11 @@ def main(*args):
         gen = genFactory.getCombinedGenerator()
         if gen:
             for page in gen:
-                pywikibot.output(page.title(), toStdout=True)
+                pywikibot.stdout(page.title())
         else:
             pywikibot.showHelp()
     except Exception:
-        pywikibot.logging.exception("")
+        pywikibot.error("Fatal error", exc_info=True)
     finally:
         pywikibot.stopme()
 

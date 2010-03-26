@@ -745,8 +745,7 @@ class Page(object):
                 raise
         # TODO: other "expected" error types to catch?
         except pywikibot.Error, err:
-            logger.exception(u"Error saving page %s\n" % link)
-            pywikibot.output(u"")
+            pywikibot.log(u"Error saving page %s\n" % link, exc_info=True)
             if not callback:
                 raise pywikibot.PageNotSaved(link)
         if callback:
@@ -1378,12 +1377,12 @@ class Page(object):
 
     def removeImage(self, image, put=False, summary=None, safe=True):
         """Old method to remove all instances of an image from page."""
-        logger.warning(u"Page.removeImage() is no longer supported.")
+        pywikibot.warning(u"Page.removeImage() is no longer supported.")
 
     def replaceImage(self, image, replacement=None, put=False, summary=None,
                      safe=True):
         """Old method to replace all instances of an image with another."""
-        logger.warning(u"Page.replaceImage() is no longer supported.")
+        pywikibot.warning(u"Page.replaceImage() is no longer supported.")
 
 
 class ImagePage(Page):

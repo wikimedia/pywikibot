@@ -221,7 +221,7 @@ class UploadRobot:
                 return
 
         except Exception, e:
-            pywikibot.logger.exception("Upload error: " + str(e))
+            pywikibot.error("Upload error: ", exc_info=True)
 
         else:
             #No warning, upload complete.

@@ -39,24 +39,8 @@ uiModule = __import__("pywikibot.userinterfaces.%s_interface"
                         fromlist=['UI'] )
 ui = uiModule.UI()
 
+
 # Logging module configuration
-
-class MaxLevelFilter(logging.Filter):
-    """Filter that only passes records at or below a specific level.
-
-    (setting handler level only passes records at or *above* a specified level,
-    so this provides the opposite functionality)
-
-    """
-    def __init__(self, level=None):
-        self.level = level
-
-    def filter(self, record):
-        if self.level:
-            return record.levelno <= self.level
-        else:
-            return True
-
 
 class RotatingFileHandler(logging.handlers.RotatingFileHandler):
     """Strip trailing newlines before outputting text to file"""
@@ -66,6 +50,13 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
 
 class LoggingFormatter(logging.Formatter):
+    """Format LogRecords for output to file.
+
+    This formatter *ignores* the 'newline' key of the LogRecord, because
+    every record written to a file must end with a newline, regardless of
+    whether the output to the user's console does.
+
+    """
     def formatException(self, ei):
         """
         Make sure that the exception trace is converted to unicode:
@@ -85,163 +76,22 @@ class LoggingFormatter(logging.Formatter):
             return strExc + '\n'
 
 
-# User output/logging functions
-
-# Five output functions are defined. Each requires a unicode or string
-# argument.  All of these functions generate a message to the log file if
-# logging is enabled ("-log" or "-debug" command line arguments).
-
-# The functions output(), warning(), and error() all display a message to the
-# user through the logger object; the only difference is the priority level,
-# which can be used by the application layer to alter the display.
-
-# The function log() by default does not display a message to the user, but
-# this can be altered by using the "-verbose" command line option.
-
-# The function debug() only logs its messages, they are never displayed on
-# the user console. debug() takes a required second argument, which is a
-# string indicating the debugging layer.
-
-# next bit filched from 1.5.2's inspect.py
-def currentframe():
-    """Return the frame object for the caller's stack frame."""
-    try:
-        raise Exception
-    except:
-        # go back two levels, one for _fmtoutput and one for whatever called it
-        return sys.exc_traceback.tb_frame.f_back.f_back
-
-if hasattr(sys, '_getframe'):
-    # less portable but more efficient
-    currentframe = lambda: sys._getframe(3)
-    # frame0 is this lambda, frame1 is _fmtoutput() in this module,
-    # frame2 is the convenience function (output(), etc.)
-    # so frame3 is whatever called the convenience function
-
-# done filching
-
-def _fmtoutput(text, decoder=None, newline=True, toStdout=False,
-               _level=INFO, _logger=""):
-    """Format output and send to the logging module.
-
-    Backend function used by all the user-output convenience functions.
-
-    """
-    if _logger:
-        path = "pywiki." + _logger
-    else:
-        path = "pywiki"
-
-    # make sure logging system has been initialized
-    if not _handlers_initialized:
-        init_handlers(strm=ui.output_stream)
-
-    frame = currentframe()
-    module = os.path.basename(frame.f_code.co_filename)
-    context = {'caller_name': frame.f_code.co_name,
-               'caller_file': module,
-               'caller_line': frame.f_lineno}
-
-    if decoder:
-        text = unicode(text, decoder)
-    elif not isinstance(text, unicode):
-        if not isinstance(text, str):
-            # looks like text is a non-text object.
-            # Maybe it has a __unicode__ builtin ?
-            # (allows to print Page, Site...)
-            text = unicode(text)
-        else:
-            try:
-                text = unicode(text, 'utf-8')
-            except UnicodeDecodeError:
-                text = unicode(text, 'iso8859-1')
-    if newline:
-        text += "\n"
-    if toStdout:
-        _level = STDOUT
-    logger = logging.getLogger(path)
-    ui.output(text, logger, _level, context)
-
-def output(text, decoder=None, newline=True, toStdout=False):
-    """Output a message to the user via the userinterface.
-
-    Works like print, but uses the encoding used by the user's console
-    (console_encoding in the configuration file) instead of ASCII.
-    If decoder is None, text should be a unicode string. Otherwise it
-    should be encoded in the given encoding.
-
-    If newline is True, a linebreak will be added after printing the text.
-
-    If toStdout is True, the text will be sent to standard output,
-    so that it can be piped to another process. All other text will
-    be sent to stderr. See: http://en.wikipedia.org/wiki/Pipeline_%28Unix%29
-
-    text can contain special sequences to create colored output. These
-    consist of the escape character \03 and the color name in curly braces,
-    e. g. \03{lightpurple}. \03{default} resets the color.
-
-    """
-    _fmtoutput(text, decoder, newline, toStdout, INFO)
-
-def warning(text, decoder=None, newline=True, toStdout=False):
-    _fmtoutput(text, decoder, newline, toStdout, WARNING)
-
-def error(text, decoder=None, newline=True, toStdout=False):
-    _fmtoutput(text, decoder, newline, toStdout, ERROR)
-
-def log(text, decoder=None, newline=True, toStdout=False):
-    _fmtoutput(text, decoder, newline, toStdout, VERBOSE)
-
-def debug(text, layer, decoder=None, newline=True, toStdout=False):
-    _fmtoutput(text, decoder, newline, toStdout, DEBUG, layer)
-
-
-# User input functions
-
-def input(question, password=False):
-    """Ask the user a question, return the user's answer.
-
-    Parameters:
-    * question - a unicode string that will be shown to the user. Don't add a
-                 space after the question mark/colon, this method will do this
-                 for you.
-    * password - if True, hides the user's input (for password entry).
-
-    Returns a unicode string.
-
-    """
-    # make sure logging system has been initialized
-    if not _handlers_initialized:
-        init_handlers(strm=ui.output_stream)
-
-    data = ui.input(question, password)
-    return data
-
-def inputChoice(question, answers, hotkeys, default=None):
-    """Ask the user a question with several options, return the user's choice.
-
-    The user's input will be case-insensitive, so the hotkeys should be
-    distinctive case-insensitively.
-
-    Parameters:
-    * question - a unicode string that will be shown to the user. Don't add a
-                 space after the question mark, this method will do this
-                 for you.
-    * answers  - a list of strings that represent the options.
-    * hotkeys  - a list of one-letter strings, one for each answer.
-    * default  - an element of hotkeys, or None. The default choice that will
-                 be returned when the user just presses Enter.
-
-    Returns a one-letter string in lowercase.
-
-    """
-    # make sure logging system has been initialized
-    if not _handlers_initialized:
-        init_handlers(strm=ui.output_stream)
-
-    data = ui.inputChoice(question, answers, hotkeys, default).lower()
-    return data
-
+# Initialize the handlers and formatters for the logging system.
+#
+# This relies on the global variable 'ui' which is a UserInterface object
+# defined in the 'userinterface' subpackage.
+#
+# The UserInterface object must define its own init_handlers() method
+# which takes the root logger as its only argument, and which adds to that
+# logger whatever handlers and formatters are needed to process output and
+# display it to the user.  The default (terminal) interface sends level
+# STDOUT to sys.stdout (as all interfaces should) and sends all other
+# levels to sys.stderr; levels WARNING and above are labeled with the
+# level name.
+#
+# UserInterface objects must also define methods input(), inputChoice(),
+# editText(), and askForCaptcha(), all of which are documented in
+# userinterfaces/terminal_interface.py
 
 _handlers_initialized = False
 
@@ -277,14 +127,6 @@ def init_handlers(strm=None):
 
     global _handlers_initialized
 
-    global _stream
-    if strm:
-        _stream = strm
-    else:
-        try:
-            _stream
-        except NameError:
-            _stream = sys.stderr
     moduleName = calledModuleName()
     if not moduleName:
         moduleName = "terminal-interface"
@@ -301,15 +143,8 @@ def init_handlers(strm=None):
     root_logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
     root_logger.handlers = [] # remove any old handlers
 
-    # configure default handler for display to user interface
-    default_handler = ui.OutputHandlerClass(strm=_stream)
-    if config.verbose_output:
-        default_handler.setLevel(VERBOSE)
-    else:
-        default_handler.setLevel(INFO)
-    default_handler.addFilter(MaxLevelFilter(INPUT))
-    default_handler.setFormatter(LoggingFormatter(fmt="%(message)s"))
-    root_logger.addHandler(default_handler)
+    # configure handler(s) for display to user interface
+    ui.init_handlers(root_logger)
 
     # if user has enabled file logging, configure file handler
     if moduleName in config.log or '*' in config.log:
@@ -338,21 +173,182 @@ def init_handlers(strm=None):
             debuglogger.setLevel(DEBUG)
             debuglogger.addHandler(file_handler)
 
-    # handler for level STDOUT
-    output_handler = ui.OutputHandlerClass(strm=sys.stdout)
-    output_handler.setLevel(STDOUT)
-    output_handler.addFilter(MaxLevelFilter(STDOUT))
-    output_handler.setFormatter(LoggingFormatter(fmt="%(message)s"))
-    root_logger.addHandler(output_handler)
-
-    # handler for levels WARNING and higher
-    warning_handler = ui.OutputHandlerClass(strm=_stream)
-    warning_handler.setLevel(logging.WARNING)
-    warning_handler.setFormatter(
-            LoggingFormatter(fmt="%(levelname)s: %(message)s"))
-    root_logger.addHandler(warning_handler)
-
     _handlers_initialized = True
+
+
+# User output/logging functions
+
+# Six output functions are defined. Each requires a unicode or string
+# argument.  All of these functions generate a message to the log file if
+# logging is enabled ("-log" or "-debug" command line arguments).
+
+# The functions output(), stdout(), warning(), and error() all display a
+# message to the user through the logger object; the only difference is the
+# priority level,  which can be used by the application layer to alter the
+# display. The stdout() function should be used only for data that is
+# the "result" of a script, as opposed to information messages to the
+# user.
+
+# The function log() by default does not display a message to the user, but
+# this can be altered by using the "-verbose" command line option.
+
+# The function debug() only logs its messages, they are never displayed on
+# the user console. debug() takes a required second argument, which is a
+# string indicating the debugging layer.
+
+# next bit filched from 1.5.2's inspect.py
+def currentframe():
+    """Return the frame object for the caller's stack frame."""
+    try:
+        raise Exception
+    except:
+        # go back two levels, one for logoutput and one for whatever called it
+        return sys.exc_traceback.tb_frame.f_back.f_back
+
+if hasattr(sys, '_getframe'):
+    # less portable but more efficient
+    currentframe = lambda: sys._getframe(3)
+    # frame0 is this lambda, frame1 is logoutput() in this module,
+    # frame2 is the convenience function (output(), etc.)
+    # so frame3 is whatever called the convenience function
+
+# done filching
+
+def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
+               **kwargs):
+    """Format output and send to the logging module.
+
+    Backend function used by all the user-output convenience functions.
+
+    """
+    if _logger:
+        logger = logging.getLogger("pywiki." + _logger)
+    else:
+        logger = logging.getLogger("pywiki")
+
+    # make sure logging system has been initialized
+    if not _handlers_initialized:
+        init_handlers()
+
+    frame = currentframe()
+    module = os.path.basename(frame.f_code.co_filename)
+    context = {'caller_name': frame.f_code.co_name,
+               'caller_file': module,
+               'caller_line': frame.f_lineno,
+               'newline': ("\n" if newline else "")}
+
+    if decoder:
+        text = unicode(text, decoder)
+    elif not isinstance(text, unicode):
+        if not isinstance(text, str):
+            # looks like text is a non-text object.
+            # Maybe it has a __unicode__ builtin ?
+            # (allows to print Page, Site...)
+            text = unicode(text)
+        else:
+            try:
+                text = unicode(text, 'utf-8')
+            except UnicodeDecodeError:
+                text = unicode(text, 'iso8859-1')
+
+    logger.log(_level, text, extra=context, **kwargs)
+
+def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
+    """Output a message to the user via the userinterface.
+
+    Works like print, but uses the encoding used by the user's console
+    (console_encoding in the configuration file) instead of ASCII.
+
+    If decoder is None, text should be a unicode string. Otherwise it
+    should be encoded in the given encoding.
+
+    If newline is True, a linebreak will be added after printing the text.
+
+    If toStdout is True, the text will be sent to standard output,
+    so that it can be piped to another process. All other text will
+    be sent to stderr. See: http://en.wikipedia.org/wiki/Pipeline_%28Unix%29
+
+    text can contain special sequences to create colored output. These
+    consist of the escape character \03 and the color name in curly braces,
+    e. g. \03{lightpurple}. \03{default} resets the color.
+
+    Other keyword arguments are passed unchanged to the logger; so far, the
+    only argument that is useful is "exc_info=True", which causes the
+    log message to include an exception traceback.
+
+    """
+    if toStdout:  # maintained for backwards-compatibity only
+        logoutput(text, decoder, newline, STDOUT, **kwargs)
+    else:
+        logoutput(text, decoder, newline, INFO, **kwargs)
+
+def stdout(text, decoder=None, newline=True, **kwargs):
+    """Output script results to the user via the userinterface."""
+    logoutput(text, decoder, newline, STDOUT, **kwargs)
+
+def warning(text, decoder=None, newline=True, **kwargs):
+    """Output a warning message to the user via the userinterface."""
+    logoutput(text, decoder, newline, WARNING, **kwargs)
+
+def error(text, decoder=None, newline=True, **kwargs):
+    """Output an error message to the user via the userinterface."""
+    logoutput(text, decoder, newline, ERROR, **kwargs)
+
+def log(text, decoder=None, newline=True, **kwargs):
+    """Output a record to the log file."""
+    logoutput(text, decoder, newline, VERBOSE, **kwargs)
+
+def debug(text, layer, decoder=None, newline=True, **kwargs):
+    """Output a debug record to the log file."""
+    logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
+
+
+# User input functions
+
+def input(question, password=False):
+    """Ask the user a question, return the user's answer.
+
+    Parameters:
+    * question - a unicode string that will be shown to the user. Don't add a
+                 space after the question mark/colon, this method will do this
+                 for you.
+    * password - if True, hides the user's input (for password entry).
+
+    Returns a unicode string.
+
+    """
+    # make sure logging system has been initialized
+    if not _handlers_initialized:
+        init_handlers()
+
+    data = ui.input(question, password)
+    return data
+
+def inputChoice(question, answers, hotkeys, default=None):
+    """Ask the user a question with several options, return the user's choice.
+
+    The user's input will be case-insensitive, so the hotkeys should be
+    distinctive case-insensitively.
+
+    Parameters:
+    * question - a unicode string that will be shown to the user. Don't add a
+                 space after the question mark, this method will do this
+                 for you.
+    * answers  - a list of strings that represent the options.
+    * hotkeys  - a list of one-letter strings, one for each answer.
+    * default  - an element of hotkeys, or None. The default choice that will
+                 be returned when the user just presses Enter.
+
+    Returns a one-letter string in lowercase.
+
+    """
+    # make sure logging system has been initialized
+    if not _handlers_initialized:
+        init_handlers()
+
+    data = ui.inputChoice(question, answers, hotkeys, default).lower()
+    return data
+
 
 # Command line parsing and help
 
@@ -487,7 +483,7 @@ def handleArgs(*args):
     if username:
         config.usernames[config.family][config.mylang] = username
 
-    init_handlers(strm=ui.output_stream)
+    init_handlers()
 
     if config.verbose_output:
         import re
@@ -542,7 +538,7 @@ Global arguments available for all bots:
 -nolog            Disable the logfile (if it is enabled by default).
 
 -debug:item       Enable the logfile and include extensive debugging data
--debug            for component "item" (or all components if the second form
+-debug            for component "item" (for all components if the second form
                   is used).
 
 -putthrottle:n    Set the minimum time (in seconds) the bot will wait between
@@ -558,13 +554,13 @@ Global arguments available for all bots:
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.iteritems():
                 helpText = helpText.replace(key, value.strip('\n\r'))
-        pywikibot.output(helpText, toStdout=True) # output to STDOUT
+        pywikibot.stdout(helpText) # output to STDOUT
     except Exception:
         if modname:
-            pywikibot.output(u'Sorry, no help available for %s' % modname,
-                             toStdout=True)
-        logger.exception('showHelp:')
-    pywikibot.output(globalHelp, toStdout=True)
+            pywikibot.stdout(u'Sorry, no help available for %s' % modname)
+#        pywikibot.log('showHelp: %%(exception)s')
+    pywikibot.stdout(globalHelp)
+
 
 class Bot(object):
     """

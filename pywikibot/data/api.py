@@ -33,9 +33,6 @@ lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
 _modules = {} # cache for retrieved API parameter information
 
-##logger = logging.getLogger("pywiki.data.api")
-##print "level =", logger.getEffectiveLevel()
-##
 class APIError(pywikibot.Error):
     """The wiki site returned an error message."""
     def __init__(self, code, info, **kwargs):
@@ -195,7 +192,9 @@ class Request(object, DictMixin):
                     self.params[key] = self.params[key].encode(
                                                 self.site.encoding())
             except Exception:
-                logger.exception("key=%s, params=%s\n" % (key, self.params[key]))
+                pywikibot.error(
+u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
+                      % (key, self.site.encoding(), self.params[key]))
         return urllib.urlencode(self.params)
 
     def __str__(self):

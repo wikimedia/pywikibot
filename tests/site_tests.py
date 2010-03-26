@@ -14,8 +14,6 @@ import unittest
 import pywikibot
 import warnings
 
-logger = pywikibot.logging.getLogger("wiki.site.tests")
-
 mysite = pywikibot.Site()
 mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
 imagepage = iter(mainpage.imagelinks()).next() # 1st image on main page
@@ -57,7 +55,7 @@ class TestSiteObject(unittest.TestCase):
 
     def testLanguageMethods(self):
         """Test cases for languages() and related methods"""
-        
+
         langs = mysite.languages()
         self.assertType(langs, list)
         self.assertTrue(mysite.code in langs)
@@ -112,7 +110,7 @@ class TestSiteObject(unittest.TestCase):
 
     def testApiMethods(self):
         """Test generic ApiSite methods"""
-        
+
         self.assertType(mysite.logged_in(), bool)
         self.assertType(mysite.logged_in(True), bool)
         self.assertType(mysite.userinfo, dict)
@@ -129,7 +127,7 @@ class TestSiteObject(unittest.TestCase):
             self.assertType(mysite.has_group("bots", True), bool)
             self.assertFalse(mysite.has_group("nonexistent_group", True))
         except pywikibot.NoUsername:
-            logger.warn(
+            pywikibot.warning(
              "Cannot test Site methods for sysop; no sysop account configured.")
         for msg in ("1movedto2", "about", "aboutpage", "aboutsite",
                     "accesskey-n-portal"):
@@ -147,7 +145,7 @@ class TestSiteObject(unittest.TestCase):
 
     def testPageMethods(self):
         """Test ApiSite methods for getting page-specific info"""
-        
+
         self.assertType(mysite.page_exists(mainpage), bool)
         self.assertType(mysite.page_restrictions(mainpage), dict)
         self.assertType(mysite.page_can_be_edited(mainpage), bool)
@@ -164,7 +162,7 @@ class TestSiteObject(unittest.TestCase):
 
     def testTokens(self):
         """Test ability to get page tokens"""
-        
+
         for ttype in ("edit", "move"): # token types for non-sysops
             self.assertType(mysite.token(mainpage, ttype), basestring)
         self.assertRaises(KeyError, mysite.token, mainpage, "invalidtype")
@@ -184,7 +182,7 @@ class TestSiteObject(unittest.TestCase):
 
     def testLinkMethods(self):
         """Test site methods for getting links to and from a page"""
-        
+
         backlinks = set(mysite.pagebacklinks(mainpage, namespaces=[0]))
         # only non-redirects:
         filtered = set(mysite.pagebacklinks(mainpage, namespaces=0,
@@ -258,7 +256,7 @@ class TestSiteObject(unittest.TestCase):
 
     def testLoadRevisions(self):
         """Test the site.loadrevisions() method"""
-        
+
         mysite.loadrevisions(mainpage)
         self.assertTrue(hasattr(mainpage, "_revid"))
         self.assertTrue(hasattr(mainpage, "_revisions"))
@@ -334,7 +332,7 @@ class TestSiteObject(unittest.TestCase):
 
     def testAllLinks(self):
         """Test the site.alllinks() method"""
-        
+
         fwd = list(mysite.alllinks(total=10))
         self.assertTrue(len(fwd) <= 10)
         self.assertTrue(all(isinstance(link, pywikibot.Page) for link in fwd))
@@ -361,7 +359,7 @@ class TestSiteObject(unittest.TestCase):
 
     def testAllCategories(self):
         """Test the site.allcategories() method"""
-        
+
         ac = list(mysite.allcategories(total=10))
         self.assertTrue(len(ac) <= 10)
         self.assertTrue(all(isinstance(cat, pywikibot.Category)
@@ -379,7 +377,7 @@ class TestSiteObject(unittest.TestCase):
 
     def testAllUsers(self):
         """Test the site.allusers() method"""
-        
+
         au = list(mysite.allusers(total=10))
         self.assertTrue(len(au) <= 10)
         for user in au:
@@ -828,7 +826,7 @@ class TestSiteObject(unittest.TestCase):
             try:
                 mysite.login(True)
             except pywikibot.NoUsername:
-                logger.warn(
+                pywikibot.warning(
                  "Cannot test Site.deleted_revs; no sysop account configured.")
                 return
         dr = list(mysite.deletedrevs(total=10, page=mainpage))
@@ -909,7 +907,6 @@ class TestSiteObject(unittest.TestCase):
 
 
 if __name__ == '__main__':
-#    pywikibot.logging.getLogger("").setLevel(pywikibot.logging.DEBUG)
     try:
         try:
             unittest.main()

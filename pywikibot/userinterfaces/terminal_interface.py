@@ -12,6 +12,7 @@ import logging
 import threading
 import pywikibot
 from pywikibot import config
+from pywikibot.bot import DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING
 from pywikibot.userinterfaces import transliteration
 
 
@@ -114,22 +115,47 @@ windowsColors = {
 
 colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(windowsColors.keys()))
 
-class UI:
-    def __init__(self):
-        self.writelock = threading.RLock()
-        self.OutputHandlerClass = TerminalHandler
-        self.output_stream = sys.stderr
+class UI(object):
+    def init_handlers(self, root_logger):
+        """Initialize the handlers for user output.
 
-    def output(self, text, logger, level=logging.INFO, context=None):
-        """Send text to the logger for output to terminal."""
-        self.writelock.acquire()
-        try:
-            logger.log(level, text, extra=context)
-        finally:
-            self.writelock.release()
+        This method initializes handler(s) for output levels VERBOSE (if
+        enabled by config.verbose_output), INFO, STDOUT, WARNING, ERROR,
+        and CRITICAL.  STDOUT writes its output to sys.stdout; all the
+        others write theirs to sys.stderr.
+
+        """
+        # default handler for display to terminal
+        default_handler = TerminalHandler(strm=sys.stderr)
+        if config.verbose_output:
+            default_handler.setLevel(VERBOSE)
+        else:
+            default_handler.setLevel(INFO)
+        # this handler ignores levels above INPUT
+        default_handler.addFilter(MaxLevelFilter(INPUT))
+        default_handler.setFormatter(
+            TerminalFormatter(fmt="%(message)s%(newline)s"))
+        root_logger.addHandler(default_handler)
+
+        # handler for level STDOUT
+        output_handler = TerminalHandler(strm=sys.stdout)
+        output_handler.setLevel(STDOUT)
+        output_handler.addFilter(MaxLevelFilter(STDOUT))
+        output_handler.setFormatter(
+            TerminalFormatter(fmt="%(message)s%(newline)s"))
+        root_logger.addHandler(output_handler)
+
+        # handler for levels WARNING and higher
+        warning_handler = TerminalHandler(strm=sys.stderr)
+        warning_handler.setLevel(logging.WARNING)
+        warning_handler.setFormatter(
+            TerminalFormatter(fmt="%(levelname)s: %(message)s%(newline)s"))
+        root_logger.addHandler(warning_handler)
 
     def input(self, question, password = False):
         """
+        Ask the user a question and return the answer.
+
         Works like raw_input(), but returns a unicode string instead of ASCII.
 
         Unlike raw_input, this function automatically adds a space after the
@@ -142,23 +168,25 @@ class UI:
 
         # While we're waiting for user input,
         # we don't want terminal writes from other Threads
-        self.writelock.acquire()
-        pywikibot.bot._fmtoutput(question + ' ', newline=False,
-                                 _level=pywikibot.INPUT)
-
+        TerminalHandler.sharedlock.acquire()
         try:
+            pywikibot.logoutput(question + ' ', newline=False,
+                                _level=pywikibot.INPUT)
             if password:
                 import getpass
                 text = getpass.getpass('')
             else:
                 text = raw_input()
         finally:
-            self.writelock.release()
+            TerminalHandler.sharedlock.release()
 
         text = unicode(text, config.console_encoding)
         return text
 
     def inputChoice(self, question, options, hotkeys, default=None):
+        """
+        Ask the user a question with a predefined list of acceptable answers.
+        """
         options = options[:] # we don't want to edit the passed parameter
         for i in range(len(options)):
             option = options[i]
@@ -197,13 +225,15 @@ class UI:
         return answer
 
     def editText(self, text, jumpIndex = None, highlight = None):
-        """
+        """Return the text as edited by the user.
+
         Uses a Tkinter edit box because we don't have a console editor
 
         Parameters:
             * text      - a Unicode string
             * jumpIndex - an integer: position at which to put the caret
             * highlight - a substring; each occurence will be highlighted
+
         """
         try:
             import gui
@@ -214,6 +244,7 @@ class UI:
         return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)
 
     def askForCaptcha(self, url):
+        """Show the user a CAPTCHA image and return the answer."""
         try:
             import webbrowser
             pywikibot.output(u'Opening CAPTCHA in your web browser...')
@@ -237,6 +268,10 @@ class TerminalHandler(logging.Handler):
 
     """
 
+    # create a class-level lock that can be shared by all instances
+    import threading
+    sharedlock = threading.RLock()
+
     def __init__(self, strm=None):
         """Initialize the handler.
 
@@ -244,6 +279,10 @@ class TerminalHandler(logging.Handler):
 
         """
         logging.Handler.__init__(self)
+        # replace Handler's instance-specific lock with the shared class lock
+        # to ensure that only one instance of this handler can write to
+        # the console at a time
+        self.lock = TerminalHandler.sharedlock
         if strm is None:
             strm = sys.stderr
         self.stream = strm
@@ -383,3 +422,24 @@ class TerminalHandler(logging.Handler):
                 self.emitColorizedInUnix(record, text)
         else:
             self.emit_raw(record, text)
+
+
+class TerminalFormatter(logging.Formatter):
+    pass
+
+
+class MaxLevelFilter(logging.Filter):
+    """Filter that only passes records at or below a specific level.
+
+    (setting handler level only passes records at or *above* a specified level,
+    so this provides the opposite functionality)
+
+    """
+    def __init__(self, level=None):
+        self.level = level
+
+    def filter(self, record):
+        if self.level:
+            return record.levelno <= self.level
+        else:
+            return True
