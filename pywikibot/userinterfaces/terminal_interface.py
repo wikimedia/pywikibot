@@ -205,23 +205,17 @@ class UI(object):
 
         answer = ''
 
-        # While we're waiting for user input,
-        # we don't want terminal writes from other Threads
-        self.writelock.acquire()
-        try:
-            # loop until the user entered a valid choice
-            while True:
-                prompt = '%s (%s)' % (question, ', '.join(options))
+        # loop until the user entered a valid choice
+        while True:
+            prompt = '%s (%s)' % (question, ', '.join(options))
 
-                # it's okay to enter input with the lock, RLock is reentrant.
-                answer = self.input(prompt)
-                if answer.lower() in hotkeys or answer.upper() in hotkeys:
-                    break
-                elif default and answer=='':		# empty string entered
-                    answer = default
-                    break
-        finally:
-            self.writelock.release()
+            # it's okay to enter input with the lock, RLock is reentrant.
+            answer = self.input(prompt)
+            if answer.lower() in hotkeys or answer.upper() in hotkeys:
+                break
+            elif default and answer=='':		# empty string entered
+                answer = default
+                break
         return answer
 
     def editText(self, text, jumpIndex = None, highlight = None):
