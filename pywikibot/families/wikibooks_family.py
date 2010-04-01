@@ -11,15 +11,15 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'ja', 'pt', 'hu', 'es', 'nl', 'pl', 'it',
-            'he', 'sq', 'fi', 'vi', 'ru', 'cs', 'hr', 'zh', 'sv', 'ca',
-            'da', 'tr', 'th', 'mk', 'sr', 'tl', 'fa', 'ar', 'id', 'is',
-            'no', 'gl', 'ta', 'ko', 'ka', 'eo', 'lt', 'bg', 'ro', 'sk',
-            'el', 'la', 'ia', 'ang', 'cv', 'sl', 'et', 'mr', 'uk', 'ur',
-            'ml', 'az', 'oc', 'ms', 'eu', 'fy', 'hi', 'ie', 'tg', 'bn',
-            'af', 'hy', 'pa', 'bs', 'te', 'sa', 'ky', 'si', 'be', 'ast',
-            'tt', 'zh-min-nan', 'cy', 'mg', 'ku', 'co', 'ne', 'sw', 'tk', 'als',
-            'su', 'vo', 'uz', 'na', 'kk', 'mn', 'nds', 'zu', 'my',
+            'en', 'de', 'fr', 'ja', 'pt', 'hu', 'es', 'nl', 'pl', 'it', 'he',
+            'sq', 'fi', 'vi', 'ru', 'cs', 'hr', 'zh', 'sv', 'ca', 'da', 'tr',
+            'th', 'mk', 'sr', 'tl', 'fa', 'ar', 'id', 'is', 'gl', 'no', 'ta',
+            'ka', 'ko', 'eo', 'lt', 'bg', 'ro', 'sk', 'el', 'la', 'ia', 'ang',
+            'cv', 'sl', 'uk', 'et', 'mr', 'ur', 'ml', 'az', 'oc', 'ms', 'eu',
+            'fy', 'hi', 'ie', 'si', 'tg', 'bn', 'af', 'hy', 'te', 'bs', 'pa',
+            'sa', 'ky', 'be', 'ast', 'tt', 'zh-min-nan', 'cy', 'mg', 'ne', 'ku',
+            'co', 'sw', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'mn', 'kk', 'nds',
+            'zu', 'my',
         ]
 
         for lang in self.languages_by_size:

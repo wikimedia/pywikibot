@@ -11,14 +11,13 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'it', 'pl', 'de', 'pt', 'ru', 'sk', 'es', 'bg', 'bs',
-            'sl', 'tr', 'fr', 'he', 'lt', 'cs', 'zh', 'el', 'hu', 'fa',
-            'uk', 'id', 'sv', 'nl', 'no', 'eo', 'ja', 'fi', 'hy', 'nn',
-            'et', 'ca', 'ka', 'ar', 'ko', 'ku', 'hr', 'gl', 'ro', 'sr',
-            'cy', 'ml', 'li', 'is', 'th', 'te', 'af', 'da', 'az', 'sq',
-            'eu', 'vi', 'la', 'br', 'hi', 'be', 'ast', 'uz', 'ta', 'ang',
-            'zh-min-nan', 'mr', 'gu', 'lb', 'su', 'ur', 'wo', 'kn', 'ky', 'am',
-            'co',
+            'en', 'it', 'pl', 'de', 'pt', 'ru', 'sk', 'es', 'bg', 'bs', 'sl',
+            'tr', 'fr', 'he', 'lt', 'cs', 'zh', 'el', 'hu', 'fa', 'uk', 'id',
+            'sv', 'nl', 'no', 'eo', 'ja', 'fi', 'hy', 'nn', 'et', 'ca', 'ka',
+            'ar', 'ko', 'ku', 'hr', 'gl', 'ro', 'sr', 'cy', 'ml', 'li', 'is',
+            'th', 'te', 'af', 'da', 'az', 'sq', 'eu', 'vi', 'la', 'br', 'hi',
+            'be', 'ast', 'uz', 'ta', 'ang', 'mr', 'zh-min-nan', 'gu', 'lb',
+            'su', 'ur', 'wo', 'ky', 'kn', 'am', 'co',
         ]
 
         for lang in self.languages_by_size:
