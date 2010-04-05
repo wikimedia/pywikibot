@@ -89,10 +89,10 @@ This next example substitutes templates test1, test2, and space test on all page
 #
 __version__='$Id$'
 #
-import wikipedia as pywikibot
-import config
-import replace, pagegenerators
-import re, sys, string, catlib
+import pywikibot
+from pywikibot import config, pagegenerators, catlib
+from scripts import replace
+import re, sys, string
 
 class XmlDumpTemplatePageGenerator:
     """
@@ -107,7 +107,7 @@ class XmlDumpTemplatePageGenerator:
                               templates
             * xmlfilename   - The dump's path, either absolute or relative
         """
-
+        raise NotImplementedError("Sorry, no XML reader in rewrite yet.")
         self.templates = templates
         self.xmlfilename = xmlfilename
 
@@ -285,8 +285,8 @@ class TemplateRobot:
         'zh':u'機器人: 更換模板 %s',
     }
 
-    def __init__(self, generator, templates, subst = False, remove = False, editSummary = '',
-                 acceptAll = False, addedCat = None):
+    def __init__(self, generator, templates, subst = False, remove = False,
+                 editSummary = '', acceptAll = False, addedCat = None):
         """
         Arguments:
             * generator    - A page generator.
@@ -304,28 +304,35 @@ class TemplateRobot:
         self.editSummary = editSummary
         self.acceptAll = acceptAll
         self.addedCat = addedCat
+        s = pywikibot.Site()
         if self.addedCat:
-            self.addedCat = catlib.Category(pywikibot.getSite(), 'Category:' + self.addedCat)
+            self.addedCat = pywikibot.Category(s,
+                              s.namespace(14) + ':' + self.addedCat)
 
         # get edit summary message if it's empty
         if (self.editSummary==''):
             oldTemplateNames = (', ').join(self.templates.keys())
-            mysite = pywikibot.getSite()
             if self.remove:
                 if len(self.templates) > 1:
-                    self.editSummary = pywikibot.translate(mysite, self.msgs_remove) % oldTemplateNames
+                    self.editSummary = pywikibot.translate(s, self.msgs_remove) \
+                                         % oldTemplateNames
                 else:
-                    self.editSummary = pywikibot.translate(mysite, self.msg_remove) % oldTemplateNames
+                    self.editSummary = pywikibot.translate(s, self.msg_remove) \
+                                         % oldTemplateNames
             elif self.subst:
                 if len(self.templates) > 1:
-                    self.editSummary = pywikibot.translate(mysite, self.msgs_subst) % oldTemplateNames
+                    self.editSummary = pywikibot.translate(s, self.msgs_subst) \
+                                         % oldTemplateNames
                 else:
-                    self.editSummary = pywikibot.translate(mysite, self.msg_subst) % oldTemplateNames
+                    self.editSummary = pywikibot.translate(s, self.msg_subst) \
+                                         % oldTemplateNames
             else:
                 if len(self.templates) > 1:
-                    self.editSummary = pywikibot.translate(mysite, self.msgs_change) % oldTemplateNames
+                    self.editSummary = pywikibot.translate(s, self.msgs_change) \
+                                         % oldTemplateNames
                 else:
-                    self.editSummary = pywikibot.translate(mysite, self.msg_change) % oldTemplateNames
+                    self.editSummary = pywikibot.translate(s, self.msg_change) \
+                                         % oldTemplateNames
 
     def run(self):
         """
@@ -339,27 +346,38 @@ class TemplateRobot:
 
         replacements = []
         exceptions = {}
+        s = pywikibot.Site()
 
         for old, new in self.templates.iteritems():
-            if not pywikibot.getSite().nocapitalize:
-                pattern = '[' + re.escape(old[0].upper()) + re.escape(old[0].lower()) + ']' + re.escape(old[1:])
+            if not s.nocapitalize:
+                pattern = '[' + re.escape(old[0].upper()) \
+                              + re.escape(old[0].lower()) + ']' \
+                              + re.escape(old[1:])
             else:
                 pattern = re.escape(old)
             pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-            templateRegex = re.compile(r'\{\{ *([Tt]emplate:|[mM][sS][gG]:)?' + pattern + r'(?P<parameters>\s*\|.+?|) *}}', re.DOTALL)
+            templateRegex = re.compile(r'\{\{ *([Tt]emplate:|[mM][sS][gG]:)?'
+                                         + pattern
+                                         + r'(?P<parameters>\s*\|.+?|) *}}',
+                                       re.DOTALL)
 
             if self.remove:
                 replacements.append((templateRegex, ''))
             elif self.subst:
-                replacements.append((templateRegex, '{{subst:' + old + '\g<parameters>}}'))
+                replacements.append((templateRegex,
+                                     '{{subst:' + old + '\g<parameters>}}'))
                 exceptions['inside-tags']=['ref']
             else:
-                replacements.append((templateRegex, '{{' + new + '\g<parameters>}}'))
+                replacements.append((templateRegex,
+                                     '{{' + new + '\g<parameters>}}'))
 
-        replaceBot = replace.ReplaceRobot(self.generator, replacements, exceptions, acceptall = self.acceptAll, addedCat=self.addedCat, editSummary=self.editSummary)
+        replaceBot = replace.ReplaceRobot(self.generator, replacements,
+                             exceptions, acceptall=self.acceptAll,
+                             addedCat=self.addedCat,
+                             summary=self.editSummary)
         replaceBot.run()
 
-def main():
+def main(*args):
     templateNames = []
     templates = {}
     subst = False
@@ -372,7 +390,7 @@ def main():
     # If xmlfilename is None, references will be loaded from the live wiki.
     xmlfilename = None
     # read command line parameters
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handleArgs(*args):
         if arg == '-remove':
             remove = True
         elif arg == '-subst':
@@ -395,7 +413,9 @@ def main():
             acceptAll = True
         else:
             if not genFactory.handleArg(arg):
-                templateNames.append(pywikibot.Page(pywikibot.getSite(), arg, defaultNamespace=10).titleWithoutNamespace())
+                templateNames.append(
+                    pywikibot.Page(pywikibot.Site(), arg, ns=10
+                                  ).title(withNamespace=False))
 
     if subst or remove:
         for templateName in templateNames:
@@ -405,13 +425,14 @@ def main():
             for i in range(0, len(templateNames), 2):
                 templates[templateNames[i]] = templateNames[i + 1]
         except IndexError:
-            pywikibot.output(u'Unless using -subst or -remove, you must give an even number of template names.')
+            pywikibot.output(
+u'Unless using -subst or -remove, you must give an even number of template names.')
             return
 
     oldTemplates = []
-    ns = pywikibot.getSite().template_namespace()
+    ns = pywikibot.Site().template_namespace()
     for templateName in templates.keys():
-        oldTemplate = pywikibot.Page(pywikibot.getSite(), templateName, defaultNamespace=10)
+        oldTemplate = pywikibot.Page(pywikibot.Site(), templateName, ns=10)
         oldTemplates.append(oldTemplate)
 
     if xmlfilename:
@@ -420,7 +441,8 @@ def main():
         gen = genFactory.getCombinedGenerator()
     if not gen:
         gens = []
-        gens = [pagegenerators.ReferringPageGenerator(t, onlyTemplateInclusion = True) for t in oldTemplates]
+        gens = [pagegenerators.ReferringPageGenerator(t,
+                    onlyTemplateInclusion = True) for t in oldTemplates]
         gen = pagegenerators.CombinedPageGenerator(gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
 
@@ -429,11 +451,14 @@ def main():
 
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
 
-    bot = TemplateRobot(preloadingGen, templates, subst, remove, editSummary, acceptAll, addedCat)
+    bot = TemplateRobot(preloadingGen, templates, subst, remove, editSummary,
+                        acceptAll, addedCat)
     bot.run()
 
 if __name__ == "__main__":
     try:
         main()
+    except Exception:
+        pywikibot.error("Fatal error:", exc_info=True)
     finally:
         pywikibot.stopme()
