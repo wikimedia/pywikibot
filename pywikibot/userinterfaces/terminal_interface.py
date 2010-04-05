@@ -180,7 +180,8 @@ class UI(object):
         finally:
             TerminalHandler.sharedlock.release()
 
-        text = unicode(text, config.console_encoding)
+        if not isinstance(text, unicode):
+            text = unicode(text, config.console_encoding)
         return text
 
     def inputChoice(self, question, options, hotkeys, default=None):
