@@ -741,23 +741,31 @@ class LoginManager(login.LoginManager):
                                 lgpassword=self.password
                                )
         self.site._loginstatus = -2
-        login_result = login_request.submit()
-        if u"login" not in login_result:
-            raise RuntimeError("API login response does not have 'login' key.")
-        if login_result['login']['result'] == u'Success':
-            prefix = login_result['login']['cookieprefix']
-            cookies = []
-            for key in ('Token', 'UserID', 'UserName'):
-                cookies.append("%s%s=%s"
-                               % (prefix, key,
-                                  login_result['login']['lg'+key.lower()]))
-            self.username = login_result['login']['lgusername']
-            return "\n".join(cookies)
-        elif login_result['login']['result'] == "Throttled":
-            self._waituntil = datetime.now() \
-                              + timedelta(seconds=int(
-                                            login_result["login"]["wait"])
-                                          )
+        while True:
+            login_result = login_request.submit()
+            if u"login" not in login_result:
+                raise RuntimeError("API login response does not have 'login' key.")
+            if login_result['login']['result'] == "Success":
+                prefix = login_result['login']['cookieprefix']
+                cookies = []
+                for key in ('Token', 'UserID', 'UserName'):
+                    cookies.append("%s%s=%s"
+                                   % (prefix, key,
+                                      login_result['login']['lg'+key.lower()]))
+                self.username = login_result['login']['lgusername']
+                return "\n".join(cookies)
+            elif login_result['login']['result'] == "NeedToken":
+                token = login_result['login']['token']
+                login_request["lgtoken"] = token
+                continue
+            elif login_result['login']['result'] == "Throttled":
+                self._waituntil = datetime.now() \
+                                  + timedelta(seconds=int(
+                                                login_result["login"]["wait"])
+                                              )
+                break
+            else:
+                break
         raise APIError(code=login_result["login"]["result"], info="")
 
     def storecookiedata(self, data):
