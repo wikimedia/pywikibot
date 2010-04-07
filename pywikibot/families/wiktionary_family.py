@@ -13,17 +13,17 @@ class Family(family.Family):
         self.languages_by_size = [
             'fr', 'en', 'lt', 'tr', 'zh', 'ru', 'vi', 'io', 'pl', 'pt', 'fi',
             'hu', 'el', 'no', 'ta', 'de', 'it', 'sv', 'ko', 'nl', 'lo', 'kn',
-            'ja', 'ku', 'ar', 'es', 'ml', 'ro', 'et', 'id', 'te', 'gl', 'bg',
+            'ja', 'ml', 'ku', 'ar', 'es', 'ro', 'et', 'id', 'te', 'gl', 'bg',
             'uk', 'ca', 'vo', 'li', 'is', 'fa', 'scn', 'sr', 'af', 'cs', 'th',
             'sw', 'simple', 'fy', 'oc', 'br', 'he', 'hr', 'sl', 'hy', 'sq',
-            'tt', 'la', 'zh-min-nan', 'da', 'tk', 'wa', 'ast', 'ur', 'hsb',
+            'tt', 'la', 'zh-min-nan', 'da', 'wa', 'tk', 'ast', 'ur', 'hsb',
             'kk', 'ky', 'eo', 'wo', 'lv', 'ang', 'hi', 'ka', 'ga', 'gn', 'az',
-            'ia', 'co', 'eu', 'sk', 'ne', 'csb', 'st', 'ms', 'tl', 'mr', 'cy',
-            'my', 'nds', 'kl', 'sd', 'ug', 'ti', 'mk', 'ps', 'an', 'sh', 'bn',
+            'ia', 'co', 'eu', 'sk', 'my', 'ne', 'csb', 'st', 'ms', 'tl', 'mr',
+            'cy', 'nds', 'kl', 'sd', 'ug', 'ti', 'mk', 'ps', 'an', 'sh', 'bn',
             'gu', 'mg', 'km', 'ss', 'ts', 'qu', 'bs', 'fo', 'am', 'rw', 'chr',
-            'su', 'om', 'mn', 'nah', 'ie', 'be', 'iu', 'yi', 'gd', 'tg', 'si',
-            'nn', 'gv', 'kw', 'zu', 'mt', 'dv', 'pa', 'tpi', 'sg', 'roa-rup',
-            'mi', 'jv', 'uz', 'ik', 'so', 'ha', 'ay', 'sa', 'na', 'jbo', 'tn',
+            'su', 'be', 'om', 'mn', 'nah', 'ie', 'iu', 'yi', 'gd', 'tg', 'si',
+            'nn', 'gv', 'zu', 'kw', 'mt', 'dv', 'pa', 'tpi', 'sg', 'roa-rup',
+            'mi', 'uz', 'jv', 'ik', 'so', 'ha', 'ay', 'sa', 'na', 'jbo', 'tn',
             'sm', 'lb', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
         ]
 
@@ -112,7 +112,7 @@ class Family(family.Family):
         self.interwiki_attop = ['pl']
 
     def version(self, code):
-        return '1.16alpha-wmf'
+        return '1.16-wmf'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

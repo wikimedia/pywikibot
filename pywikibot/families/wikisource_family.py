@@ -14,8 +14,8 @@ class Family(family.Family):
             'en', 'zh', 'pt', 'ru', 'fr', 'es', 'de', 'it', 'he', 'ar', 'hu',
             'fa', 'pl', 'th', 'cs', 'ro', 'hr', 'te', 'fi', 'tr', 'nl', 'sv',
             'sl', 'uk', 'ko', 'sr', 'vi', 'ja', 'el', 'la', 'li', 'yi', 'bn',
-            'ml', 'az', 'is', 'bs', 'hy', 'ca', 'id', 'no', 'mk', 'da', 'et',
-            'ta', 'bg', 'lt', 'gl', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
+            'ml', 'az', 'is', 'bs', 'hy', 'ca', 'id', 'no', 'mk', 'da', 'ta',
+            'et', 'bg', 'lt', 'gl', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
 
         for lang in self.languages_by_size:
@@ -61,7 +61,7 @@ class Family(family.Family):
         ]
 
     def version(self, code):
-        return '1.16alpha-wmf'
+        return '1.16-wmf'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

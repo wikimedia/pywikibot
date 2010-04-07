@@ -12,7 +12,7 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'sr', 'en', 'pl', 'de', 'fr', 'it', 'pt', 'es', 'zh', 'ja', 'sv',
-            'ru', 'fi', 'he', 'cs', 'ar', 'sd', 'bg', 'hu', 'ro', 'ta', 'no',
+            'ru', 'fi', 'he', 'cs', 'ar', 'sd', 'bg', 'ro', 'hu', 'ta', 'no',
             'uk', 'ca', 'tr', 'bs', 'th',
         ]
 
@@ -53,7 +53,7 @@ class Family(family.Family):
         return 'utf-8'
 
     def version(self, code):
-        return '1.16alpha-wmf'
+        return '1.16-wmf'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

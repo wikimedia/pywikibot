@@ -19,7 +19,7 @@ class Family(family.Family):
             self.langs[lang] = '%s.wikiversity.org' % lang
 
     def version(self,code):
-        return '1.16alpha-wmf'
+        return '1.16-wmf'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

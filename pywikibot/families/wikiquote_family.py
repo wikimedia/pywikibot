@@ -13,8 +13,8 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'it', 'pl', 'de', 'pt', 'ru', 'sk', 'es', 'bg', 'bs', 'sl',
             'tr', 'fr', 'he', 'lt', 'cs', 'zh', 'el', 'hu', 'fa', 'uk', 'id',
-            'sv', 'nl', 'no', 'eo', 'ja', 'fi', 'hy', 'nn', 'et', 'ca', 'ka',
-            'ar', 'ko', 'ku', 'hr', 'gl', 'ro', 'sr', 'cy', 'ml', 'li', 'is',
+            'sv', 'nl', 'eo', 'no', 'ja', 'fi', 'hy', 'nn', 'et', 'ca', 'ka',
+            'ar', 'ko', 'ku', 'hr', 'gl', 'sr', 'ro', 'cy', 'ml', 'li', 'is',
             'th', 'te', 'af', 'da', 'az', 'sq', 'eu', 'vi', 'la', 'br', 'hi',
             'be', 'ast', 'uz', 'ta', 'ang', 'mr', 'zh-min-nan', 'gu', 'lb',
             'su', 'ur', 'wo', 'ky', 'kn', 'am', 'co',
@@ -112,7 +112,7 @@ class Family(family.Family):
         }
 
     def version(self, code):
-        return '1.16alpha-wmf'
+        return '1.16-wmf'
 
     def code2encodings(self, code):
         """
