@@ -56,15 +56,15 @@ logger = "wiki.login"
 
 # On some wikis you are only allowed to run a bot if there is a link to
 # the bot's user page in a specific list.
+# If bots are listed in a template, the templates name must be given as
+# second parameter, otherwise it must be None
 botList = {
     'wikipedia': {
-        'en': u'Wikipedia:Bots/Status',
-        # Disabled because they are now using a template system which
-        # we can't check with our current code.
-        #'simple': u'Wikipedia:Bots',
+        'en': [u'Wikipedia:Bots/Status', 'BotS'],
+        'simple': [u'Wikipedia:Bots', '/links']
     },
     'gentoo': {
-        'en': u'Help:Bots',
+        'en': [u'Help:Bots', None],
     }
 }
 
@@ -112,14 +112,20 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         if self.site.family.name in botList \
                 and self.site.code in botList[self.site.family.name]:
-            botListPageTitle = botList[self.site.family.name][self.site.code]
+            botListPageTitle, botTemplate = botList[self.site.family.name][self.site.code]
             botListPage = pywikibot.Page(self.site, botListPageTitle)
-            for linkedPage in botListPage.linkedPages():
-                if linkedPage.title(withNamespace=False) == self.username:
-                    return True
+            if botTemplate:
+                for template in botListPage.templatesWithParams():
+                    if template[0] == botTemplate \
+                       and template[1][0] == self.username:
+                        return True
+            else:
+                for linkedPage in botListPage.linkedPages():
+                    if linkedPage.title(withNamespace=False) == self.username:
+                        return True
             return False
         else:
-            # No bot policies on other
+            # No bot policies on other sites
             return True
 
     def getCookie(self, remember=True, captcha = None):
