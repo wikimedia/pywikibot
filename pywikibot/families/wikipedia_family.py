@@ -20,20 +20,20 @@ class Family(family.Family):
             'be-x-old', 'war', 'ta', 'bn', 'oc', 'an', 'be', 'io', 'sw', 'nds',
             'scn', 'fy', 'qu', 'af', 'su', 'gu', 'zh-yue', 'ast', 'nap', 'ur',
             'ku', 'bat-smg', 'ml', 'wa', 'cv', 'lmo', 'ksh', 'ga', 'tg',
-            'roa-tara', 'vec', 'hy', 'kn', 'gd', 'uz', 'yi', 'pam', 'yo',
+            'roa-tara', 'hy', 'vec', 'kn', 'gd', 'uz', 'yi', 'pam', 'yo',
             'zh-min-nan', 'mi', 'kk', 'als', 'sah', 'nah', 'li', 'glk', 'tt',
             'hsb', 'co', 'roa-rup', 'arz', 'os', 'gan', 'ia', 'bcl', 'mn',
-            'fiu-vro', 'nds-nl', 'vls', 'fo', 'tk', 'pnb', 'sa', 'am', 'dv',
-            'ne', 'nrm', 'pag', 'rm', 'bar', 'map-bms', 'gv', 'wuu', 'my',
+            'fiu-vro', 'nds-nl', 'vls', 'pnb', 'fo', 'tk', 'sa', 'am', 'dv',
+            'ne', 'nrm', 'pag', 'rm', 'bar', 'gv', 'map-bms', 'wuu', 'my',
             'sco', 'diq', 'se', 'fur', 'lij', 'si', 'ug', 'nov', 'mt', 'bh',
             'mzn', 'csb', 'ilo', 'zh-classical', 'pi', 'lad', 'km', 'sc', 'mg',
             'frp', 'ang', 'kw', 'hif', 'pdc', 'haw', 'ckb', 'szl', 'bo', 'pa',
             'ps', 'ie', 'hak', 'kv', 'to', 'crh', 'stq', 'myv', 'gn', 'ln',
-            'mhr', 'nv', 'ace', 'ky', 'ext', 'arc', 'jbo', 'wo', 'cbk-zam',
+            'ace', 'mhr', 'nv', 'ky', 'ext', 'arc', 'jbo', 'wo', 'cbk-zam',
             'ty', 'tpi', 'eml', 'kab', 'so', 'xal', 'zea', 'srn', 'pap', 'ay',
-            'krc', 'ba', 'ig', 'or', 'kg', 'dsb', 'lo', 'udm', 'rmy', 'kl',
+            'krc', 'ba', 'ig', 'or', 'dsb', 'kg', 'lo', 'udm', 'rmy', 'kl',
             'cu', 'kaa', 'ab', 'mwl', 'ce', 'sm', 'av', 'ks', 'tet', 'got',
-            'sd', 'mdf', 'pcd', 'na', 'bm', 'pnt', 'iu', 'pih', 'as', 'cdo',
+            'sd', 'pcd', 'mdf', 'na', 'bm', 'pnt', 'iu', 'pih', 'as', 'cdo',
             'chr', 'bug', 'ee', 'om', 'zu', 'fj', 'ti', 'ts', 'za', 'ss', 've',
             'bi', 'ha', 'dz', 'ch', 'cr', 'xh', 'ak', 'sg', 'tn', 'ki', 'ik',
             'bxr', 'rw', 'tw', 'st', 'ny', 'sn', 'ff', 'lg', 'lbe', 'tum',
@@ -667,7 +667,7 @@ class Family(family.Family):
             return self.known_families
 
     def version(self, code):
-        return '1.16wmf3'
+        return '1.16wmf4'
 
     def dbName(self, code):
         # returns the name of the MySQL database

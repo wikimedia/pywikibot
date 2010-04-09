@@ -11,7 +11,7 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'en', 'zh', 'pt', 'ru', 'fr', 'es', 'de', 'it', 'he', 'ar', 'hu',
+            'en', 'zh', 'ru', 'pt', 'fr', 'es', 'de', 'it', 'he', 'ar', 'hu',
             'fa', 'pl', 'th', 'cs', 'ro', 'hr', 'te', 'fi', 'tr', 'nl', 'sv',
             'sl', 'uk', 'ko', 'sr', 'vi', 'ja', 'el', 'la', 'li', 'yi', 'bn',
             'ml', 'az', 'is', 'bs', 'hy', 'ca', 'id', 'no', 'mk', 'da', 'ta',
@@ -61,7 +61,7 @@ class Family(family.Family):
         ]
 
     def version(self, code):
-        return '1.16wmf3'
+        return '1.16wmf4'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

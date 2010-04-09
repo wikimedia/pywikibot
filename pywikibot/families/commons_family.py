@@ -44,7 +44,7 @@ class Family(family.Family):
 
 
     def version(self, code):
-        return '1.16wmf3'
+        return '1.16wmf4'
 
     def dbName(self, code):
         return 'commonswiki_p'
