@@ -38,6 +38,7 @@ class BasicBot:
         'ksh': u'Bot: Ännern ...',
         'nds': u'Bot: Änderung ...',
         'nl': u'Bot: wijziging ...',
+        'pl': u'Bot: zmienia ...',
         'pt': u'Bot: alterando...',
         'sv': u'Bot: Ändrar ...',
         'zh': u'機器人：編輯.....',
@@ -55,6 +56,7 @@ class BasicBot:
         """
         self.generator = generator
         self.dry = dry
+        # Set the edit summary message
         self.summary = pywikibot.translate(pywikibot.getSite(), self.msg)
 
     def run(self):
