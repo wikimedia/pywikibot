@@ -490,6 +490,12 @@ cosmetic_changes_mylang_only = True
 # Configuration variable 'socks' is defined but unknown. Misspelled?proxy = None
 proxy = None
 
+# How many pages should be put to a queue in asynchroneous mode.
+# If maxsize is <= 0, the queue size is infinite.
+# Increasing this value will increase memory space but could speed up
+# processing. As higher this value this effect will decrease.
+max_queue_size = 64
+
 # End of configuration section
 # ============================
 # System-level and User-level changes.

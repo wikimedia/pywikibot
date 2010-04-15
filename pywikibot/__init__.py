@@ -14,6 +14,8 @@ import difflib
 import logging
 import re
 import sys
+import threading
+from Queue import Queue
 
 import config2 as config
 from bot import *
@@ -248,7 +250,6 @@ def showDiff(oldtext, newtext):
 
 # Throttle and thread handling
 
-threadpool = []   # add page-putting threads to this list as they are created
 stopped = False
 
 def stopme():
@@ -263,20 +264,70 @@ def stopme():
 
     if not stopped:
         pywikibot.debug(u"stopme() called", _logger)
-        count = sum(1 for thd in threadpool if thd.isAlive())
-        if count:
-            pywikibot.output(u"Waiting for about %(count)s pages to be saved."
-                              % locals())
-            for thd in threadpool:
-                if thd.isAlive():
-                    thd.join()
+        def remaining():
+            import datetime
+            remainingPages = page_put_queue.qsize() - 1
+                # -1 because we added a None element to stop the queue
+            remainingSeconds = datetime.timedelta(
+                    seconds=(remainingPages * config.put_throttle))
+            return (remainingPages, remainingSeconds)
+
+        page_put_queue.put((None, [], {}))
         stopped = True
+
+        if page_put_queue.qsize() > 1:
+            output(u'Waiting for %i pages to be put. Estimated time remaining: %s'
+                   % remaining())
+
+        while(_putthread.isAlive()):
+            try:
+                _putthread.join(1)
+            except KeyboardInterrupt:
+                answer = inputChoice(u"""\
+There are %i pages remaining in the queue. Estimated time remaining: %s
+Really exit?"""
+                                         % remaining(),
+                                     ['yes', 'no'], ['y', 'N'], 'N')
+                if answer == 'y':
+                    return
+
     # only need one drop() call because all throttles use the same global pid
     try:
-        _sites[_sites.keys()[0]].throttle.drop()
+        _sites.values()[0].throttle.drop()
         pywikibot.log(u"Dropped throttle(s).")
     except IndexError:
         pass
 
 import atexit
 atexit.register(stopme)
+
+# Create a separate thread for asynchronous page saves (and other requests)
+
+def async_manager():
+    """Daemon; take requests from the queue and execute them in background."""
+    while True:
+        (request, args, kwargs) = page_put_queue.get()
+        if request is None:
+            break
+        request(*args, **kwargs)
+
+def async_request(request, *args, **kwargs):
+    """Put a request on the queue, and start the daemon if necessary."""
+    if not _putthread.isAlive():
+        try:
+            page_put_queue.mutex.acquire()
+            try:
+                _putthread.start()
+            except (AssertionError, RuntimeError):
+                pass
+        finally:
+            page_put_queue.mutex.release()
+    page_put_queue.put((request, args, kwargs))
+
+# queue to hold pending requests
+page_put_queue = Queue(config.max_queue_size)
+# set up the background thread
+_putthread = threading.Thread(target=async_manager)
+# identification for debugging purposes
+_putthread.setName('Put-Thread')
+_putthread.setDaemon(True)

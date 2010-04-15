@@ -718,16 +718,12 @@ class Page(object):
                 "Page %s not saved; editing restricted by {{bots}} template"
                 % self.title(asLink=True))
         if async:
-            thd = threading.Thread(
-                      target=self._save,
-                      args=(comment, minor, watch, unwatch, callback)
-                  )
-            pywikibot.threadpool.append(thd)
-            thd.start()
+            pywikibot.async_request(self._save, comment, minor, watch, unwatch,
+                                    async, callback)
         else:
-            self._save(comment, minor, watch, unwatch, callback)
+            self._save(comment, minor, watch, unwatch, async, callback)
 
-    def _save(self, comment, minor, watch, unwatch, callback):
+    def _save(self, comment, minor, watch, unwatch, async, callback):
         err = None
         link = self.title(asLink=True)
         try:
@@ -741,13 +737,14 @@ class Page(object):
         except pywikibot.LockedPage, err:
             # re-raise the LockedPage exception so that calling program
             # can re-try if appropriate
-            if not callback:
+            if not callback and not async:
                 raise
         # TODO: other "expected" error types to catch?
         except pywikibot.Error, err:
-            pywikibot.log(u"Error saving page %s\n" % link, exc_info=True)
-            if not callback:
-                raise pywikibot.PageNotSaved(link)
+            pywikibot.log(u"Error saving page %s (%s)\n" % (link, err),
+                          exc_info=True)
+            if not callback and not async:
+                raise pywikibot.PageNotSaved("%s: %s" %(link, err))
         if callback:
             callback(self, err)
 
