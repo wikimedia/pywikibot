@@ -50,17 +50,18 @@ class TextEditor:
     def command(self, tempFilename, text, jumpIndex = None):
         command = config.editor
         if jumpIndex:
-            # Some editors make it possible to mark occurences of substrings, or
-            # to jump to the line of the first occurence.
+            # Some editors make it possible to mark occurences of substrings,
+            # or to jump to the line of the first occurence.
             # TODO: Find a better solution than hardcoding these, e.g. a config
             # option.
             line = text[:jumpIndex].count('\n')
             column = jumpIndex - (text[:jumpIndex].rfind('\n') + 1)
         else:
             line = column = 0
-        # Linux editors. We use startswith() because some users might use parameters.
+        # Linux editors. We use startswith() because some users might use
+        # parameters.
         if config.editor.startswith('kate'):
-            command += " -l %i -c %i" % (line, column)
+            command += " -l %i -c %i" % (line + 1, column + 1)
         elif config.editor.startswith('gedit'):
             command += " +%i" % (line + 1) # seems not to support columns
         elif config.editor.startswith('emacs'):
@@ -172,7 +173,9 @@ class ArticleEditor:
         fp = open(fn, 'w')
         fp.write(new)
         fp.close()
-        pywikibot.output(u"An edit conflict has arisen. Your edit has been saved to %s. Please try again." % fn)
+        pywikibot.output(
+            u"An edit conflict has arisen. Your edit has been saved to %s. Please try again."
+            % fn)
 
     def run(self):
         try:
@@ -186,7 +189,8 @@ class ArticleEditor:
             changes = pywikibot.input(u"What did you change?")
             comment = pywikibot.translate(pywikibot.getSite(), msg) % changes
             try:
-                self.page.put(new, comment = comment, minorEdit = False, watchArticle=self.options.watch)
+                self.page.put(new, comment=comment, minorEdit=False,
+                              watchArticle=self.options.watch)
             except pywikibot.EditConflict:
                 self.handle_edit_conflict(new)
         else:
