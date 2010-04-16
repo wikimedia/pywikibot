@@ -2,9 +2,51 @@
 """ Script to create user files (user-config.py, user-fixes.py) """
 __version__ = '$Id$'
 
-import os, sys, codecs, re
+import codecs, os, platform, re, sys
 
-base_dir = ''
+def get_base_dir():
+    """Return the directory in which user-specific information is stored.
+
+    This is determined in the following order -
+    1.  If the script was called with a -dir: argument, use the directory
+        provided in this argument
+    2.  If the user has a PYWIKIBOT2_DIR environment variable, use the value
+        of it
+    3.  Use (and if necessary create) a 'pywikibot' folder (Windows) or
+        '.pywikibot' directory (Unix and similar) under the user's home
+        directory.
+
+    """
+    # copied from config2.py, without the lines that check whether the
+    # directory already contains a user-config.py file
+    # this code duplication is nasty, should fix
+    NAME = "pywikibot"
+    for arg in sys.argv[1:]:
+        if arg.startswith("-dir:"):
+            base_dir = arg[5:]
+            sys.argv.remove(arg)
+            break
+    else:
+        if "PYWIKIBOT2_DIR" in os.environ:
+            base_dir = os.environ["PYWIKIBOT2_DIR"]
+        else:
+            is_windows = sys.platform == 'win32'
+            home = os.path.expanduser("~")
+            if is_windows:
+                _win_version = int(platform.version()[0])
+                if _win_version == 5:
+                    base_dir = os.path.join(home, "Application Data", NAME)
+                elif _win_version == 6:
+                    base_dir = os.path.join(home, "AppData\\Roaming", NAME)
+            else:
+                base_dir = os.path.join(home, "."+NAME)
+            if not os.path.isdir(base_dir):
+                os.makedirs(base_dir, mode=0700)
+    if not os.path.isabs(base_dir):
+        base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
+    return base_dir
+
+base_dir = get_base_dir()
 console_encoding = sys.stdout.encoding
 
 if console_encoding is None or sys.platform == 'cygwin':
@@ -35,6 +77,47 @@ def listchoice(clist = [], message = None, default = None):
             print("Invalid response")
     return response
 
+def change_base_dir():
+    """Create a new user directory."""
+    global base_dir
+    while True:
+        new_base = raw_input("New user directory? ")
+        new_base = os.path.abspath(new_base)
+        if os.path.exists(new_base):
+            if os.path.isfile(new_base):
+                print("ERROR: there is an existing file with that name.")
+                continue
+            # make sure user can read and write this directory
+            if not os.access(new_base, os.R_OK|os.W_OK):
+                print("ERROR: directory access restricted")
+                continue
+            print("OK: using existing directory")
+            break
+        else:
+            try:
+                os.mkdir(new_base, 0700)
+            except Exception:
+                print("ERROR: directory creation failed")
+                continue
+            print("OK: Created new directory.")
+            break
+
+    from textwrap import wrap
+    msg = wrap("""WARNING: Your user files will be created in the directory
+'%(new_base)s' you have chosen. To access these files, you will either have
+to use the argument "-dir:%(new_base)s" every time you run the bot, or set
+the environment variable "PYWIKIBOT2_DIR" equal to this directory name in
+your operating system. See your operating system documentation for how to
+set environment variables.""" % locals(), width=76)
+    for line in msg:
+        print line
+    ok = raw_input("Is this OK? [y/N] ")
+    if ok in ["Yy"]:
+        base_dir = new_base
+        return True
+    print "Aborting changes."
+    return False
+
 def file_exists(filename):
     if os.path.exists(filename):
         print("'%s' already exists." % filename)
@@ -44,19 +127,32 @@ def file_exists(filename):
 def create_user_config():
     _fnc = os.path.join(base_dir, "user-config.py")
     if not file_exists(_fnc):
-        know_families = re.findall(r'(.+)_family.py\b', '\n'.join(os.listdir(os.path.join(base_dir, "families"))))
-        fam = listchoice(know_families, "Select family of sites we are working on", default = 'wikipedia')
-        mylang = raw_input("The language code of the site we're working on (default: 'en'): ") or 'en'
-        username = raw_input("Username (%s %s): " % (mylang, fam)) or 'UnnamedBot'
+        known_families = re.findall(r'(.+)_family.py\b',
+                     '\n'.join(os.listdir(os.path.join(base_dir, "families"))))
+        fam = listchoice(known_families,
+                         "Select family of sites we are working on",
+                         default='wikipedia')
+        mylang = raw_input(
+"The language code of the site we're working on (default: 'en'): ") or 'en'
+        username = raw_input("Username (%s %s): " % (mylang, fam)
+                            ) or 'UnnamedBot'
         username = unicode(username, console_encoding)
         while True:
-            choice = raw_input("Which variant of user_config.py:\n[S]mall or [E]xtended (with further informations)? ").upper()
-            if choice in ['S','E']:
+            choice = raw_input(
+"Which variant of user_config.py:\n[S]mall or [E]xtended (with further information)? "
+                               ).upper()
+            if choice in "SE":
                 break
 
         #
         # I don't like this solution. Temporary for me.
-        f = codecs.open("config.py", "r", "utf-8") ; cpy = f.read() ; f.close()
+        #
+        # determine what directory this script (generate_user_files.py) lives in
+        install = os.path.dirname(os.path.abspath(sys.argv[0]))
+        # config2.py will be in the pywikibot/ directory
+        f = codecs.open(os.path.join(install, "pywikibot", "config2.py"),
+                        "r", "utf-8")
+        cpy = f.read() ; f.close()
 
         res = re.findall("^(############## (?:LOGFILE|"
                                             "INTERWIKI|"
@@ -67,14 +163,16 @@ def create_user_config():
                                             "DATABASE|"
                                             "SEARCH ENGINE|"
                                             "COPYRIGHT|"
-                                            "FURTHER) SETTINGS .*?)^(?=#####|# =====)", cpy, re.MULTILINE | re.DOTALL)
+                                            "FURTHER) SETTINGS .*?)^(?=#####|# =====)",
+                         cpy, re.MULTILINE | re.DOTALL)
         config_text = '\n'.join(res)
 
         f = codecs.open(_fnc, "w", "utf-8")
         if choice == 'E':
             f.write("""# -*- coding: utf-8  -*-
 
-# This is an automatically generated file. You can find more configuration parameters in 'config.py' file.
+# This is an automatically generated file. You can find more configuration
+# parameters in 'config.py' file.
 
 # The family of sites we are working on. wikipedia.py will import
 # families/xxx_family.py so if you want to change this variable,
@@ -124,16 +222,51 @@ fixes['example'] = {
         print("'%s' written." % _fnf)
 
 if __name__ == "__main__":
-    print("1: Create user_config.py file")
-    print("2: Create user_fixes.py file")
-    print("3: The two files")
-    choice = raw_input("What do you do? ")
-    if choice == "1":
-        create_user_config()
-    if choice == "2":
-        create_user_fixes()
-    if choice == "3":
-        create_user_config()
-        create_user_fixes()
-    if not choice in ["1", "2", "3"]:
-        print("Nothing to do")
+    while True:
+        print("Your default user directory is '%s'" % base_dir)
+        ok = raw_input("[K]eep/Change? ").upper().strip()
+        if (not ok) or "KEEP".startswith(ok):
+            break
+        if "CHANGE".startswith(ok):
+            if change_base_dir():
+                break
+    while True:
+        if os.path.exists(os.path.join(base_dir, "user-config.py")):
+            break
+        do_copy = raw_input(
+    "Do you want to copy user files from an existing pywikipedia installation? "
+                        ).upper().strip()
+        if do_copy and "YES".startswith(do_copy):
+            oldpath = raw_input("Path to existing wikipedia.py? ")
+            if not os.path.exists(oldpath):
+                print("ERROR: Not a valid path")
+                continue
+            if os.path.isfile(oldpath):
+                # User probably typed /wikipedia.py at the end, so strip it
+                oldpath = os.path.dirname(oldpath)
+            if not os.path.isfile(os.path.join(oldpath, "user-config.py")):
+                print("ERROR: no user_config.py found in that directory")
+                continue
+            newf = file(os.path.join(base_dir, "user-config.py"), "wb")
+            oldf = file(os.path.join(oldpath, "user-config.py"), "rb")
+            newf.write(oldf.read())
+            newf.close() ; oldf.close()
+            if os.path.isfile(os.path.join(oldpath, "user-fixes.py")):
+                newfix = file(os.path.join(base_dir, "user-fixes.py"), "wb")
+                oldfix = file(os.path.join(oldpath, "user-fixes.py"), "rb")
+                newfix.write(oldfix.read())
+                newfix.close() ; oldfix.close()
+        elif do_copy and "NO".startswith(do_copy):
+            break
+    if not os.path.isfile(os.path.join(base_dir, "user-config.py")):
+        a = raw_input("Create user-config.py file? [y/N] ")
+        if a[:1] in ["Y", "y"]:
+            create_user_config()
+    else:
+        print("NOTE: user-config.py already exists in the directory")
+    if not os.path.isfile(os.path.join(base_dir, "user-fixes.py")):
+        a = raw_input("Create user-fixes.py file? [y/N] ")
+        if a[:1] in ["Y", "y"]:
+            create_user_fixes()
+    else:
+        print("NOTE: user-fixes.py already exists in the directory")
