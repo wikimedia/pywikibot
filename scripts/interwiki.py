@@ -1645,7 +1645,7 @@ class Subject(object):
                     except pywikibot.NoPage:
                         pywikibot.output(u"BUG>>> %s no longer exists?" % new[site])
                         continue
-                    mods, adding, removing, modifying = compareLanguages(old, new, insite = lclSite)
+                    mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite = lclSite)
                     if (len(removing) > 0 and not globalvar.autonomous) or (len(modifying) > 0 and self.problemfound) or len(old) == 0 or (globalvar.needlimit and len(adding) + len(modifying) >= globalvar.needlimit +1):
                         try:
                             if self.replaceLinks(new[site], new, bot):
@@ -1781,8 +1781,8 @@ class Subject(object):
         pywikibot.output(u"Changes to be made: %s" % mods)
         oldtext = page.get()
         template = (page.namespace() == 10)
-        newtext = pywikibot.replaceLanguageLinks(oldtext, new, 
-                                        site = page.site(), 
+        newtext = pywikibot.replaceLanguageLinks(oldtext, new,
+                                        site = page.site(),
                                         template = template)
         # This is for now. Later there should be different funktions for each kind
         if not botMayEdit(page):
@@ -1845,7 +1845,7 @@ class Subject(object):
             timeout=60
             while 1:
                 try:
-                    status, reason, data = page.put(newtext, comment = pywikibot.translate(page.site().lang, msg)[0] + mods)
+                    status, reason, data = page.put(newtext, comment = mcomment)
                 except pywikibot.LockedPage:
                     pywikibot.output(u'Page %s is locked. Skipping.' % (page,))
                     raise SaveError(u'Locked')
