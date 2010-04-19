@@ -51,6 +51,7 @@ class CategoryRedirectBot(object):
                 'cs': u"Kategorie:Zastaralé kategorie",
                 'da': "Kategori:Omdirigeringskategorier",
                 'en': "Category:Wikipedia soft redirected categories",
+                'es': "Categoría:Wikipedia:Categorías redirigidas",
                 'hu': "Kategória:Kategóriaátirányítások",
                 'ja': "Category:移行中のカテゴリ",
                 'no': "Kategori:Wikipedia omdirigertekategorier",
@@ -71,6 +72,7 @@ class CategoryRedirectBot(object):
             'en':
 u"Robot: change redirected category [[:%(oldCatLink)s|%(oldCatTitle)s]]"
 u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
+            'es': u"Bot: moviendo páginas de categoría redirigida",
             'hu': u"Bot: Lapok automatikus áthelyezése átirányított kategóriából",
             'ja': u"ロボットによる: 移行中のカテゴリからのカテゴリ変更",
             'ksh': u"Bot: Sigk uß en ömjeleidt Saachjropp eruß jesammdt.",
@@ -86,6 +88,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'cs':u'Robot označil kategorii jako zastaralou',
             'da':u"Robot: tilføjer omdirigeringsskabelon for vedligeholdelse",
             'en':u"Robot: adding category redirect template for maintenance",
+            'es':u"Bot: añadiendo plantilla de categoría redirigida para mantenimiento",
             'hu':u"Bot: kategóriaátirányítás sablon hozzáadása",
             'ja':u"ロボットによる: 移行中のカテゴリとしてタグ付け",
             'ksh':u"Bot: Ömleidungsschalbon dobeijedonn.",
@@ -100,6 +103,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'cs': u'Robot opravil dvojité přesměrování',
             'da': u"Robot: retter dobbelt omdirigering",
             'en': u"Robot: fixing double-redirect",
+            'es': u"Bot: reparando redirección doble",
             'fr': u"Robot : Correction des redirections doubles",
             'hu': u"Bot: Kettős átirányítás javítása",
             'ja': u"ロボットによる: 二重リダイレクト修正",
@@ -115,6 +119,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'cs': u'Údržba přesměrované kategorie',
             'da': u"Bot til vedligeholdelse af kategoromdirigeringer",
             'en': u"Category redirect maintenance bot",
+            'es': u"Bot de mantenimento de categorías redirigidas",
             'fr': u"Robot de maintenance des redirection de catégorie",
             'hu': u"Kategóriaátirányítás-karbantartó bot",
             'ja': u"移行中のカテゴリのメンテナンス・ボット",
@@ -132,6 +137,12 @@ category links:
 %s
 ~~~~
 """,
+            'es': u"""\
+Se han detectado las siguientes páginas protegidas y se requieren actualizaciones de \
+enlaces de categorías:
+%s
+~~~~
+""",
             'ksh': u"""\
 Hee di Sigge sin jeschötz un möße ier Saachjroppe odder Lingks op Saachjroppe \
 aanjepaß krijje:
@@ -144,7 +155,7 @@ poprawy kategorii:
 %s
 ~~~~
 """,
-			'vi': u"""\
+            'vi': u"""\
 Các trang đã khóa sau cần phải cập nhật \
 liên kết thể loại:
 %s
@@ -160,7 +171,9 @@ liên kết thể loại:
 
         self.edit_request_item = pywikibot.translate(self.site.lang,
             {
+                'ar': u"* %s موجودة في %s, وهي تحويلة إلى %s",
                 'en': u"* %s is in %s, which is a redirect to %s",
+                'es': u"* %s está en %s, el cual redirecciona a %s",
                 'fr': u"* %s est dans %s, qui est une redirection vers %s",
                 'ksh': u"* %s es en %s, un dat es en Ömleidung op %s",
                 'pl': u"* %s jest w %s, która jest przekierowaniem do %s",
@@ -558,7 +571,6 @@ liên kết thể loại:
                                  % u"\n".join((self.edit_request_item % item)
                                              for item in self.edit_requests))
 
-
 def main(*args):
     global bot
     try:
@@ -572,7 +584,6 @@ def main(*args):
         bot.run()
     finally:
         pywikibot.stopme()
-
 
 if __name__ == "__main__":
     main()
