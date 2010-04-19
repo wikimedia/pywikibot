@@ -13,17 +13,17 @@ class Family(family.Family):
         self.languages_by_size = [
             'fr', 'en', 'lt', 'tr', 'zh', 'ru', 'vi', 'io', 'pl', 'pt', 'fi',
             'hu', 'el', 'no', 'ta', 'de', 'it', 'sv', 'ko', 'nl', 'lo', 'kn',
-            'ja', 'ml', 'ku', 'ar', 'es', 'ro', 'et', 'id', 'te', 'gl', 'bg',
+            'ml', 'ja', 'ku', 'ar', 'es', 'ro', 'et', 'id', 'te', 'gl', 'bg',
             'uk', 'ca', 'vo', 'li', 'fa', 'is', 'scn', 'sr', 'af', 'cs', 'th',
             'sw', 'simple', 'fy', 'oc', 'br', 'he', 'hr', 'sl', 'hy', 'sq',
-            'tt', 'la', 'zh-min-nan', 'da', 'wa', 'tk', 'ast', 'ur', 'hsb',
-            'kk', 'ky', 'eo', 'lv', 'wo', 'ang', 'hi', 'ka', 'ga', 'gn', 'az',
-            'ia', 'co', 'my', 'eu', 'sk', 'ne', 'csb', 'ms', 'st', 'tl', 'mr',
+            'tt', 'la', 'zh-min-nan', 'da', 'ne', 'wa', 'tk', 'ast', 'ur',
+            'hsb', 'kk', 'ky', 'eo', 'lv', 'wo', 'ang', 'hi', 'ka', 'ga', 'gn',
+            'az', 'ia', 'co', 'my', 'eu', 'sk', 'csb', 'ms', 'st', 'tl', 'mr',
             'cy', 'mg', 'nds', 'kl', 'sd', 'ug', 'ti', 'mk', 'ps', 'an', 'sh',
-            'bn', 'gu', 'km', 'ss', 'ts', 'qu', 'bs', 'fo', 'am', 'rw', 'be',
+            'bn', 'gu', 'km', 'ss', 'be', 'ts', 'qu', 'bs', 'fo', 'am', 'rw',
             'chr', 'su', 'om', 'mn', 'nah', 'ie', 'iu', 'yi', 'gd', 'kw', 'tg',
             'si', 'nn', 'gv', 'zu', 'mt', 'dv', 'pa', 'tpi', 'sg', 'roa-rup',
-            'mi', 'uz', 'jv', 'ik', 'so', 'ha', 'ay', 'sa', 'na', 'jbo', 'tn',
+            'uz', 'mi', 'jv', 'ik', 'so', 'ha', 'ay', 'sa', 'na', 'jbo', 'tn',
             'sm', 'lb', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
         ]
 
