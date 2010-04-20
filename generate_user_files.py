@@ -112,7 +112,7 @@ set environment variables.""" % locals(), width=76)
     for line in msg:
         print line
     ok = raw_input("Is this OK? [y/N] ")
-    if ok in ["Yy"]:
+    if ok in ["Y", "y"]:
         base_dir = new_base
         return True
     print "Aborting changes."
