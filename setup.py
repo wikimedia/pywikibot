@@ -1,7 +1,7 @@
 import sys
 
-import ez_setup
-ez_setup.use_setuptools()
+from distribute_setup import use_setuptools
+use_setuptools()
 
 from setuptools import setup, find_packages
 
