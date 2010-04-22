@@ -17,10 +17,14 @@ import sys
 import threading
 from Queue import Queue
 
-import config2 as config
-from bot import *
-from exceptions import *
-from textlib import *
+# Use pywikibot. prefix for all in-package imports; this is to prevent
+# confusion with similarly-named modules in version 1 framework, for users
+# who want to continue using both
+
+from pywikibot import config2 as config
+from pywikibot.bot import *
+from pywikibot.exceptions import *
+from pywikibot.textlib import *
 
 
 class Timestamp(datetime.datetime):
