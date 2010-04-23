@@ -61,17 +61,11 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         'comment':     re.compile(r'(?s)<!--.*?-->'),
         # section headers
         'header':      re.compile(r'\r\n=+.+=+ *\r\n'),
-        'includeonly': re.compile(r'(?is)<includeonly>.*?</includeonly>'),
-        'math':        re.compile(r'(?is)<math>.*?</math>'),
-        'noinclude':   re.compile(r'(?is)<noinclude>.*?</noinclude>'),
-        # wiki tags are ignored inside nowiki tags.
-        'nowiki':      re.compile(r'(?is)<nowiki>.*?</nowiki>'),
         # preformatted text
         'pre':         re.compile(r'(?ism)<pre>.*?</pre>'),
         'source':      re.compile(r'(?is)<source .*?</source>'),
         # inline references
         'ref':         re.compile(r'(?ism)<ref[ >].*?</ref>'),
-        'timeline':    re.compile(r'(?is)<timeline>.*?</timeline>'),
         # lines that start with a space are shown in a monospace font and
         # have whitespace preserved.
         'startspace':  re.compile(r'(?m)^ (.*?)$'),
@@ -83,10 +77,10 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         # improve wiki source code readability.
         # 'template':    re.compile(r'(?s){{.*?}}'),
         # The regex above fails on nested templates. This regex can handle
-        # templates cascaded up to level 3, but no deeper. For arbitrary
+        # templates cascaded up to level 2, but no deeper. For arbitrary
         # depth, we'd need recursion which can't be done in Python's re.
         # After all, the language of correct parenthesis words is not regular.
-        'template':    re.compile(r'(?s){{(({{(({{.*?}})|.)*}})|.)*}}'),
+        'template':    re.compile(r'(?s){{(({{.*?}})?.*?)*}}'),
         'hyperlink':   compileLinkR(),
         'gallery':     re.compile(r'(?is)<gallery.*?>.*?</gallery>'),
         # this matches internal wikilinks, but also interwiki, categories, and
@@ -112,9 +106,11 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         if isinstance(exc, str) or isinstance(exc, unicode):
             # assume it's a reference to the exceptionRegexes dictionary
             # defined above.
-            if exc not in exceptionRegexes:
-                raise ValueError("Unknown tag type: " + exc)
-            dontTouchRegexes.append(exceptionRegexes[exc])
+            if exc in exceptionRegexes:
+                dontTouchRegexes.append(exceptionRegexes[exc])
+            else:
+                # nowiki, noinclude, includeonly, timeline, math ond other extensions
+                dontTouchRegexes.append(re.compile(r'(?is)<%s>.*?</%s>' % (exc, exc)))
             # handle alias
             if exc == 'source':
                 dontTouchRegexes.append(re.compile(r'(?is)<syntaxhighlight .*?</syntaxhighlight>'))
@@ -676,10 +672,10 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     # RFC 2396 says that URLs may only contain certain characters.
     # For this regex we also accept non-allowed characters, so that the bot
     # will later show these links as broken ('Non-ASCII Characters in URL').
-    # Note: While allowing parenthesis inside URLs, MediaWiki will regard
-    # right parenthesis at the end of the URL as not part of that URL.
-    # The same applies to dot, comma, colon and some other characters.
-    notAtEnd = '\]\s\)\.:;,<>"\|'
+    # Note: While allowing dots inside URLs, MediaWiki will regard
+    # dots at the end of the URL as not part of that URL.
+    # The same applies to comma, colon and some other characters.
+    notAtEnd = '\]\s\.:;,<>"\|'
     # So characters inside the URL can be anything except whitespace,
     # closing squared brackets, quotation marks, greater than and less
     # than, and the last character also can't be parenthesis or another
