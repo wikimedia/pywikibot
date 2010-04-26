@@ -110,6 +110,7 @@ msg_double={
 # Reason for deleting broken redirects
 reason_broken={
     'ar': u'روبوت: هدف التحويلة غير موجود',
+    'als': u'Wyterleitig wo kaputt isch', 
     'be-x-old': u'Робат: мэта перанакіраваньня не існуе',
     'cs': u'Přerušené přesměrování',
     'de': u'Bot: Weiterleitungsziel existiert nicht',
@@ -127,7 +128,7 @@ reason_broken={
     'kk': u'Бот: Айдату нысанасы жоқ болды',
     'ksh':u'Bot: Dė [[Special:BrokenRedirects|Ömlëijdong jingk ennet Liiere]]',
     'lt': u'robotas: Peradresavimas į niekur',
-    'nds':u'Bot: Kaputte Wiederleiden rutmakt',
+    'nds':u'Bot: Kaputte Wiederleiden ward nich brukt',
     'nl': u'Bot: doelpagina doorverwijzing bestaat niet',
     'nn': u'robot: målet for omdirigeringa eksisterer ikkje',
     'no': u'robot: målet for omdirigeringen eksisterer ikke',
@@ -161,6 +162,9 @@ sd_tagging_sum = {
 # Insert deletion template into page with a broken redirect
 sd_template = {
     'ar': u'{{شطب|تحويلة مكسورة}}',
+    'als':u'{{delete}}Wyterleitig wo kaputt isch--~~~~', 
+    'bar':u'{{delete}}Kaputte Weiterleitung--~~~~', 
+    'de': u'{{sla|Defekte Weiterleitung --~~~~}}',
     'cs': u'{{smazat|přerušené přesměrování}}',
     'en': u'{{db-r1}}',
     'ga': u'{{scrios|Athsheoladh briste}}',
@@ -168,6 +172,7 @@ sd_template = {
     'ja': u'{{即時削除|壊れたリダイレクト}}',
     'ksh':u'{{Schmieß fott}}Di Ömlëijdong jeiht noh nörjendwoh hen.<br />--~~~~~\n\n',
     'nds':u'{{delete}}Kaputte Wiederleiden, wat nich brukt ward.<br />--~~~~\n\n',
+    'pdc':u'{{lösche|Defekte Weiterleitung --~~~~}}',
     'war':u'{{delete}}Nautod o nagbinalikbalik nga redirek.--~~~~\n\n',
     'zh': u'{{delete|R1}}',
 }
