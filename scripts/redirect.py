@@ -20,7 +20,7 @@ and arguments can be:
                works with action "double".
 
 -namespace:n   Namespace to process. Can be given multiple times, for several
-               namespaces.  If omitted, only the main (article) namespace is
+               namespaces. If omitted, only the main (article) namespace is
                treated.
 
 -offset:n      With -moves, the number of hours ago to start scanning moved
@@ -144,19 +144,11 @@ reason_broken={
     'zh-yue': u'機械人：跳轉目標唔存在',
 }
 
-# Summary message for putting broken redirect to speedy delete
-sd_tagging_sum = {
-    'ar': u'روبوت: وسم للحذف السريع',
-    'cs': u'Robot označil ke smazání',
-    'en': u'Robot: Tagging for speedy deletion',
-    'ga': u'Róbó: Ag maircáil le luas-scrios',
-    'it': u'Bot: +Da cancellare subito',
-    'ja': u'ロボットによる:迷子のリダイレクトを即時削除へ',
-    'ksh':u'Bot: Di Ömlëijdong jeiht noh nörjendwoh.',
-    'nds':u'Bot: Kaputte Wiederleiden ward nich brukt',
-    'nl': u'Bot: gemarkeerd voor snelle verwijdering',
-    'war':u'Robot: Nautod o nagbinalikbalik nga redirek',
-    'zh': u'機器人: 將損壞的重定向提報快速刪除',
+# Reason for deleting redirect loops
+reason_loop={
+    'ar': u'بوت: هدف التحويلة يصنع عقدة تحويل',
+    'de': u'Bot: Weiterleitungsziel auf sich selbst',
+    'en': u'[[WP:CSD#G8|G8]]: [[Wikipedia:Redirect|Redirect]] target forms a redirect loop',
 }
 
 # Insert deletion template into page with a broken redirect
@@ -192,6 +184,8 @@ class RedirectGenerator:
         self.api_start = start
         self.api_until = until
         self.api_number = number
+        if self.api_number is None:
+            self.api_number = 'max'
 
 ##    def get_redirects_from_dump(self, alsoGetPageTitles=False):
 ##        '''
@@ -319,7 +313,7 @@ class RedirectGenerator:
             data = gen.submit()
             if 'error' in data:
                 raise RuntimeError("API query error: %s" % data)
-            if data == [] or "query" not in data:
+            if data == [] or 'query' not in data:
                 raise RuntimeError("No results given.")
             redirects = {}
             pages = {}
@@ -522,7 +516,7 @@ class RedirectRobot:
                             redir_page.delete(reason, prompt = False)
                         except pywikibot.NoUsername:
                             if targetPage.site().lang in sd_template \
-                                    and targetPage.site().lang in sd_tagging_sum:
+                                    and targetPage.site().lang in reason_broken:
                                 pywikibot.output(
             u"No sysop in user-config.py, put page to speedy deletion.")
                                 content = redir_page.get(get_redirect=True)
@@ -531,7 +525,7 @@ class RedirectRobot:
                                     sd_template)+"\n"+content
                                 summary = pywikibot.translate(
                                     targetPage.site().lang,
-                                    sd_tagging_sum)
+                                    reason_broken)
                                 redir_page.put(content, summary)
 
                 except pywikibot.IsRedirectPage:
@@ -609,11 +603,15 @@ class RedirectRobot:
                 else:
                     pywikibot.output(
                         u'   Links to: %s.'
-                          % targetPage.title(asLink=True))
+                        % targetPage.title(asLink=True))
+                    if targetPage.site().sitename() == 'wikipedia:en' \
+                       and targetPage.title() == 'Target page name':
+                        pywikibot.output(u"Skipping: Redirect source is vandalized.")
+                        break
                     if targetPage.site() != self.site:
                         pywikibot.output(
-                u'Warning: redirect target (%s) is on a different site.'
-                             % (targetPage.title(asLink=True)))
+                            u'Warning: redirect target (%s) is on a different site.'
+                            % (targetPage.title(asLink=True)))
                         if self.always:
                             break  # skip if automatic
                     # watch out for redirect loops
@@ -622,8 +620,8 @@ class RedirectRobot:
                                           targetPage.title(withSection=False))
                                       ) > 0:
                         pywikibot.output(
-                           u'Warning: Redirect target %s forms a redirect loop.'
-                              % targetPage.title(asLink=True))
+                            u'Warning: Redirect target %s forms a redirect loop.'
+                            % targetPage.title(asLink=True))
                         break ###xqt doesn't work. edits twice!
                         try:
                             content = targetPage.get(get_redirect=True)
@@ -680,8 +678,8 @@ class RedirectRobot:
                              % redir.title())
                     except pywikibot.Error, error:
                         pywikibot.output(
-                        u"Unexpected error occurred trying to save [[%s]]: %s"
-                             % (redir.title(), error))
+                            u"Unexpected error occurred trying to save [[%s]]: %s"
+                            % (redir.title(), error))
                 break
 
     def fix_double_or_delete_broken_redirects(self):
