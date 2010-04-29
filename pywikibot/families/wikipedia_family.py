@@ -18,7 +18,7 @@ class Family(family.Family):
             'hi', 'ht', 'el', 'te', 'ceb', 'mk', 'war', 'la', 'ka', 'br', 'az',
             'sh', 'lb', 'bs', 'is', 'mr', 'jv', 'cy', 'lv', 'tl', 'sq', 'pms',
             'bpy', 'be-x-old', 'ta', 'bn', 'oc', 'an', 'be', 'io', 'sw', 'nds',
-            'scn', 'fy', 'qu', 'af', 'su', 'gu', 'zh-yue', 'ast', 'ur', 'nap',
+            'fy', 'scn', 'qu', 'af', 'su', 'gu', 'zh-yue', 'ast', 'ur', 'nap',
             'ku', 'lmo', 'bat-smg', 'ml', 'wa', 'cv', 'ksh', 'ga', 'tg', 'hy',
             'roa-tara', 'vec', 'kn', 'gd', 'yo', 'yi', 'uz', 'pam', 'os',
             'zh-min-nan', 'mi', 'kk', 'sah', 'als', 'tt', 'nah', 'li', 'glk',
@@ -35,7 +35,7 @@ class Family(family.Family):
             'mwl', 'kaa', 'ce', 'sm', 'av', 'ks', 'tet', 'got', 'sd', 'pcd',
             'mdf', 'na', 'bm', 'pnt', 'iu', 'pih', 'as', 'cdo', 'ee', 'bug',
             'chr', 'om', 'zu', 'fj', 'ti', 'za', 'ts', 'ss', 've', 'bi', 'ha',
-            'dz', 'ch', 'cr', 'sg', 'xh', 'ak', 'lbe', 'tn', 'ki', 'ik', 'bxr',
+            'dz', 'ch', 'sg', 'cr', 'xh', 'ak', 'lbe', 'tn', 'ki', 'ik', 'bxr',
             'rw', 'st', 'tw', 'ny', 'sn', 'chy', 'ff', 'lg', 'tum', 'rn',
         ]
 

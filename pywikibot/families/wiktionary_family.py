@@ -17,14 +17,14 @@ class Family(family.Family):
             'uk', 'ca', 'vo', 'li', 'fa', 'is', 'scn', 'sr', 'af', 'cs', 'th',
             'simple', 'sw', 'fy', 'oc', 'br', 'he', 'hr', 'sl', 'hy', 'sq',
             'tt', 'la', 'zh-min-nan', 'da', 'wa', 'ne', 'tk', 'ast', 'ur',
-            'hsb', 'kk', 'ky', 'eo', 'lv', 'wo', 'ang', 'hi', 'ka', 'ga', 'my',
-            'gn', 'az', 'co', 'ia', 'mg', 'eu', 'sk', 'csb', 'ms', 'st', 'tl',
-            'mr', 'cy', 'nds', 'kl', 'sd', 'ug', 'ti', 'mk', 'ps', 'sh', 'an',
-            'bn', 'gu', 'be', 'km', 'ss', 'ts', 'qu', 'bs', 'fo', 'am', 'rw',
-            'chr', 'su', 'om', 'mn', 'nah', 'ie', 'yi', 'iu', 'mt', 'gd', 'kw',
-            'tg', 'si', 'nn', 'gv', 'zu', 'dv', 'pa', 'tpi', 'sg', 'roa-rup',
-            'uz', 'mi', 'jv', 'ik', 'so', 'ha', 'ay', 'sa', 'na', 'jbo', 'tn',
-            'sm', 'lb', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
+            'hsb', 'kk', 'ky', 'eo', 'lv', 'wo', 'ang', 'ka', 'hi', 'my', 'co',
+            'ga', 'gn', 'az', 'ia', 'mg', 'eu', 'sk', 'csb', 'ms', 'st', 'tl',
+            'mr', 'cy', 'nds', 'kl', 'sd', 'ug', 'ti', 'mk', 'be', 'ps', 'an',
+            'sh', 'bn', 'gu', 'km', 'ss', 'ts', 'qu', 'bs', 'fo', 'am', 'rw',
+            'chr', 'su', 'om', 'mn', 'nah', 'ie', 'yi', 'iu', 'mt', 'gv', 'gd',
+            'kw', 'tg', 'si', 'nn', 'zu', 'dv', 'pa', 'tpi', 'sg', 'roa-rup',
+            'uz', 'mi', 'jv', 'ik', 'so', 'ha', 'ay', 'sa', 'na', 'lb', 'jbo',
+            'tn', 'sm', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
         ]
 
         for lang in self.languages_by_size:

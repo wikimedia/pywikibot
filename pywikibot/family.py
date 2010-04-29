@@ -21,7 +21,8 @@ logger = logging.getLogger("pywiki.wiki.family")
 class Family:
     def __init__(self):
         self.name = None
-            # Updated from http://meta.wikimedia.org/wiki/Interwiki_sorting_order
+
+        # Updated from http://meta.wikimedia.org/wiki/Interwiki_sorting_order
         self.alphabetic = [
             'ace', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an', 'arc',
             'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm', 'bn',
