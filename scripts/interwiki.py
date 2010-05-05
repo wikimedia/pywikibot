@@ -402,6 +402,7 @@ msg = {
     'ca': (u'Robot ', u'afegeix', u'esborra', u'modifica'),
     'ce': (u'робот ', u'тIетоьхна', u'дIаяьккхина', u'хийцина'),
     'ceb': (u'robot ', u'Gidugang', u'Gitangtang', u'Gimodipikar'),
+    'ckb': (u'بۆت ', u'زیادکردن', u'لابردن', u'چاکسازی'),
     'crh': (u'robot ', u'ekley', u'çetleştire', u'deñiştire'),
     'cs': (u'robot ', u'přidal', u'odebral', u'změnil'),
     'cv': (u'робот ', u'хушрĕ', u'кăларса пăрахрĕ', u'улăштарчĕ'),
