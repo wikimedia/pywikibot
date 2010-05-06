@@ -40,6 +40,7 @@ class APIError(pywikibot.Error):
         self.code = code
         self.info = info
         self.other = kwargs
+        self.unicode = unicode(self.__str__())
     def __repr__(self):
         return 'APIError("%(code)s", "%(info)s", %(other)s)' % self.__dict__
     def __str__(self):
