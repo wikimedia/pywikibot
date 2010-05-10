@@ -48,6 +48,8 @@ def get_base_dir():
 
 base_dir = get_base_dir()
 console_encoding = sys.stdout.encoding
+# the directory in which generate_user_files.py is located
+pywikibot_dir = sys.path[0]
 
 if console_encoding is None or sys.platform == 'cygwin':
     console_encoding = "iso-8859-1"
@@ -128,7 +130,9 @@ def create_user_config():
     _fnc = os.path.join(base_dir, "user-config.py")
     if not file_exists(_fnc):
         known_families = re.findall(r'(.+)_family.py\b',
-                     '\n'.join(os.listdir(os.path.join(base_dir, "families"))))
+                     '\n'.join(os.listdir(
+                                   os.path.join(
+                                       pywikibot_dir, "pywikibot", "families"))))
         fam = listchoice(known_families,
                          "Select family of sites we are working on",
                          default='wikipedia')
