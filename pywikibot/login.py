@@ -48,10 +48,10 @@ __version__ = '$Id$'
 
 import logging
 import pywikibot
-from pywikibot import config
+from pywikibot import config, deprecate_arg
 from pywikibot.exceptions import NoSuchSite, NoUsername
 
-logger = "wiki.login"
+_logger = "wiki.login"
 
 
 # On some wikis you are only allowed to run a bot if there is a link to
@@ -70,6 +70,8 @@ botList = {
 
 
 class LoginManager:
+    @deprecate_arg("username", "user")
+    @deprecate_arg("verbose", None)
     def __init__(self, password=None, sysop=False, site=None, user=None):
         if site is not None:
             self.site = site
@@ -255,20 +257,22 @@ def main(*args):
             for lang in namedict[familyName]:
                 try:
                     site = pywikibot.getSite(code=lang, fam=familyName)
-                    if not forceLogin and (site.logged_in(sysop) and site.user()) != None:
-                        pywikibot.output(u'Already logged in on %s' % site)
+                    if site.logged_in(sysop) \
+                            and site.user() == site.username(sysop):
+                        pywikibot.output(u"Login successful on %(site)s." % locals())
                     else:
-                        loginMan = LoginManager(password, sysop=sysop,
-                                                site=site)
-                        loginMan.login()
+                        pywikibot.output(u"Not logged in on %(site)s." % locals())
                 except NoSuchSite:
                     pywikibot.output(
                         lang + u'.' + familyName +
 u' is not a valid site, please remove it from your config')
 
     else:
-        loginMan = pywikibot.data.api.LoginManager(password, sysop=sysop)
-        loginMan.login()
+        site = pywikibot.Site(sysop=sysop)
+        if site.logged_in(sysop) and site.user() == site.username(sysop):
+            pywikibot.output(u"Login successful on %(site)s." % locals())
+        else:
+            pywikibot.output(u"Not logged in on %(site)s." % locals())
 
 if __name__ == "__main__":
     try:
