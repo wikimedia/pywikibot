@@ -2330,7 +2330,8 @@ u"editpage: received '%s' even though bot is logged in" % err.code,
                 self.unlock_page(page)
                 if "nochange" in result["edit"]:
                     # null edit, page not changed
-                    #TODO: do we want to notify the user of this?
+                    pywikibot.log(u"Page [[%s]] saved without any changes."
+                                    % page.title())
                     return True
                 page._revid = result["edit"]["newrevid"]
                 # see http://www.mediawiki.org/wiki/API:Wikimania_2006_API_discussion#Notes
