@@ -2584,6 +2584,25 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 
     #TODO: implement patrol
 
+    def watchpage(self, page, unwatch=False):
+        """Add or remove page from watchlist.
+
+        @param unwatch: If True, remove page from watchlist; if False (default),
+            add it.
+        @return: True if API returned expected response; False otherwise
+
+        """
+        req = api.Request(action="watch", title=page.title(withSection=False))
+        if unwatch:
+            req["unwatch"] = ""
+        result = req.submit()
+        if "watch" not in result:
+            pywikibot.error(u"watchpage: Unexpected API response:\n%s" % result)
+            return False
+        watched = result["watch"]
+        return ((unwatch and "unwatched" in watched)
+                or (not unwatch and "watched" in result))
+
     @deprecated("Site().exturlusage")
     def linksearch(self, siteurl, limit=None):
         """Backwards-compatible interface to exturlusage()"""
