@@ -780,6 +780,15 @@ class Page(object):
                         minorEdit=minorEdit, force=force, async=True,
                         callback=callback)
 
+    def watch(self, unwatch=False):
+        """Add or remove this page to/from bot account's watchlist.
+
+        @param unwatch: True to unwatch, False (default) to watch.
+        @return: True if successful, False otherwise.
+
+        """
+        return self.site().watchpage(self, unwatch)
+
     def linkedPages(self, namespaces=None, step=None, total=None):
         """Iterate Pages that this Page links to.
 
