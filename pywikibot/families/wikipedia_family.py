@@ -67,9 +67,9 @@ class Family(family.Family):
             'fr': (u'Redirection de catégorie',),
             'hi': (u'श्रेणीअनुप्रेषित',
                    u'Categoryredirect',),
-            'hu': (u'kat-redir',
-                   u'katredir',
-                   u'kat-redirekt',),
+            'hu': (u'Kat-redir',
+                   u'Katredir',
+                   u'Kat-redirekt',),
             'id': (u'Alih kategori',
                    u'Alihkategori',),
             # 'it' has removed its template
