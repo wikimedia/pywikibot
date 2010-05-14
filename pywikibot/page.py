@@ -690,7 +690,8 @@ class Page(object):
             most wikis strongly encourage its use)
         @type comment: unicode
         @param watch: if True, add or if False, remove this Page to/from bot
-            user's watchlist; if None, leave watchlist status unchanged
+            user's watchlist; if None (default), follow bot account's default
+            settings
         @type watch: bool or None
         @param minor: if True, mark this edit as minor
         @type minor: bool
@@ -709,26 +710,27 @@ class Page(object):
         if not comment:
             comment = config.default_edit_summary
         if watch is None:
-            unwatch = False
-            watch = False
+            watchval = None
+        elif watch:
+            watchval = "watch"
         else:
-            unwatch = not watch
+            watchval = "unwatch"
         if not force and not self.botMayEdit():
             raise pywikibot.PageNotSaved(
                 "Page %s not saved; editing restricted by {{bots}} template"
                 % self.title(asLink=True))
         if async:
-            pywikibot.async_request(self._save, comment, minor, watch, unwatch,
+            pywikibot.async_request(self._save, comment, minor, watchval,
                                     async, callback)
         else:
-            self._save(comment, minor, watch, unwatch, async, callback)
+            self._save(comment, minor, watchval, async, callback)
 
-    def _save(self, comment, minor, watch, unwatch, async, callback):
+    def _save(self, comment, minor, watchval, async, callback):
         err = None
         link = self.title(asLink=True)
         try:
             done = self.site().editpage(self, summary=comment, minor=minor,
-                                        watch=watch, unwatch=unwatch)
+                                        watch=watchval)
             if not done:
                 pywikibot.warning(u"Page %s not saved" % link)
                 raise pywikibot.PageNotSaved(link)

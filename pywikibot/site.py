@@ -2230,7 +2230,7 @@ redirects on %(site)s wiki""",
     }
 
     def editpage(self, page, summary, minor=True, notminor=False,
-                 recreate=True, createonly=False, watch=False, unwatch=False):
+                 recreate=True, createonly=False, watch=None):
         """Submit an edited Page object to be saved to the wiki.
 
         @param page: The Page to be saved; its .text property will be used
@@ -2244,9 +2244,12 @@ redirects on %(site)s wiki""",
             title has previously been deleted
         @param createonly: if True, raise an error if this title already
             exists on the wiki
-        @param watch: if True, add this Page to bot's watchlist
-        @param unwatch: if True, remove this Page from bot's watchlist if
-            possible
+        @param watch: Specify how the watchlist is affected by this edit, set
+            to one of "watch", "unwatch", "preferences", "nochange":
+            * watch: add the page to the watchlist
+            * unwatch: remove the page from the watchlist
+            * preferences: use the preference settings (Default)
+            * nochange: don't change the watchlist
         @return: True if edit succeeded, False if it failed
 
         """
@@ -2285,10 +2288,12 @@ redirects on %(site)s wiki""",
             req['recreate'] = ""
         if createonly:
             req['createonly'] = ""
-        if watch:
-            req['watch'] = ""
-        elif unwatch:
-            req['unwatch'] = ""
+        if watch in ["watch", "unwatch", "preferences", "nochange"]:
+            req['watch'] = watch
+        elif watch:
+            pywikibot.warning(
+                u"editpage: Invalid watch value '%(watch)s' ignored."
+                  % locals())
 ## FIXME: API gives 'badmd5' error
 ##        md5hash = md5()
 ##        md5hash.update(urllib.quote_plus(text.encode(self.encoding())))
@@ -2643,7 +2648,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             'badfilename':
                 "Target filename is invalid.",
              'filetype-unwanted-type':
-                "File %(msg)s type is unwatched type.",
+                "File %(msg)s type is unwanted type.",
         }
 
         # check for required user right
