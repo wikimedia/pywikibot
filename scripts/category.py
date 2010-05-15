@@ -79,9 +79,10 @@ __version__ = '$Id$'
 # Distributed under the terms of the MIT license.
 #
 
-import os, re, sys, pickle, bz2
+import os, re, pickle, bz2
 import pywikibot
 from pywikibot import catlib, config, pagegenerators
+import sys
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -100,6 +101,7 @@ msg_add={
     'en':u'Robot: Adding [[Category:%s]]',
     'es':u'Bot: Añadida [[Categoría:%s]]',
     'id':u'Bot: Menambahkan [[Kategori:%s]]',
+    'fa':u'ربات: افزودن [[رده:%s]]',
     'fi':u'Botti lisäsi luokkaan [[Luokka:%s]]',
     'fr':u'Robot : ajoute [[Catégorie:%s]]',
     'he':u'בוט: מוסיף [[קטגוריה:%s]]',
@@ -120,9 +122,11 @@ msg_add={
     'pl':u'Robot dodaje [[Kategoria:%s]]',
     'pt':u'Bot: Adicionando [[Categoria:%s]]',
     'ru':u'Робот: добавление [[Категория:%s]]',
+    'sk':u'Robot pridal [[Kategória:%s]]',
     'sr':u'Бот: Додаје [[Категорија:%s]]',
     'sv':u'Robot: Lägger till [[Kategori:%s]]',
     'szl':u'Bot dodowo: [[Kategoria:%s]]',
+    'uk':u'Робот: додано [[Категорія:%s]]',
     'zh':u'機器人:新增目錄 [[Category:%s]]',
     }
 
@@ -136,6 +140,7 @@ msg_change={
     'en':u'Robot: Changing %s',
     'es':u'Bot: Cambiada %s',
     'id':u'Bot: Mengganti %s',
+    'fa':u'ربات:تغییر %s',
     'fi':u'Botti muutti luokan %s',
     'fr':u'Robot : modifie [[%s]]',
     'he':u'בוט: משנה %s',
@@ -143,7 +148,7 @@ msg_change={
     'is':u'Vélmenni: Breyti flokknum [[%s]]',
     'it':u'Bot: Modifico %s',
     'lt':u'robotas: Keičiama %s',
-    'ja':u'ロボットによる: カテゴリ変更 [[%s]]',
+    'ja':u'ロボットによる: カテゴリ変更 [[%s]]→[[%s]]',
     'kk':u'Бот: %s дегенді түзетті',
     'ko': u'로봇: %s 수정',
     'ksh':u'Bot: %s ußjewääßelt',
@@ -155,9 +160,11 @@ msg_change={
     'pt':u'Bot: Modificando [[%s]]',
     'pl':u'Robot przenosi %s',
     'ru':u'Робот: изменение %s',
+    'sk':u'Robot pridal [[Kategória:%s]]',
     'sr':u'Бот: Измена категорије %s',
     'sv':u'Robot: Ändrar %s',
-    'zh':u'機器人:變更目錄 [[%s]]',
+    'uk':u'Робот: змінено [[Категорія:%s]]',
+    'zh':u'機器人:變更目錄 [[%s]]→[[%s]]',
     }
 
 msg_created_for_renaming = {
@@ -189,6 +196,7 @@ deletion_reason_move = {
     'de':u'Bot: Kategorie wurde nach [[:Category:%s|%s]] verschoben',
     'en':u'Robot: Category was moved to [[:Category:%s|%s]]',
     'es':u'Robot: La categoría ha sido movida a [[:Category:%s|%s]]',
+    'fa':u'ربات:رده به رده  [[:رده:%s|%s]] منتقل شده‌است',
     'fi':u'Botti siirsi luokan nimelle [[:Luokka:%s|%s]]',
     'fr':u'Robot : catégorie déplacée sur [[:Category:%s|%s]]',
     'he':u'בוט: הקטגוריה הועברה לשם [[:קטגוריה:%s|%s]]',
@@ -209,16 +217,24 @@ deletion_reason_move = {
     'pt':u'Bot: Categoria [[:Category:%s|%s]] foi movida',
     'pl':u'Robot przenosi kategorię do [[:Category:%s|%s]]',
     'ru':u'Робот: категория переименована в [[:Категория:%s|%s]]',
+    'sk':u'Kategória bola presunutá na [[:Kategória:%s|%s]]',
     'sr':u'Бот: Категорија премештена у [[:Category:%s|%s]]',
     'sv':u'Robot: Kategori flyttades till [[:Category:%s|%s]]',
+    'uk':u'Робот: категорію перейменовано на [[Категорія:%s|%s]]',
     'zh':u'機器人:移動目錄至 [[:Category:%s|%s]]',
     }
 
 cfd_templates = {
-    'en':['cfd', 'cfr', 'cfru', 'cfr-speedy', 'cfm', 'cfdu'],
-    'fi':['roskaa', 'poistettava', 'korjattava/nimi', u'yhdistettäväLuokka'],
-    'he':[u'הצבעת מחיקה', u'למחוק'],
+    'wikipedia' : {
+        'en':[u'cfd', u'cfr', u'cfru', u'cfr-speedy', u'cfm', u'cfdu'],
+        'fi':[u'roskaa', u'poistettava', u'korjattava/nimi', u'yhdistettäväLuokka'],
+        'he':[u'הצבעת מחיקה', u'למחוק'],
+        'nl':[u'categorieweg', u'catweg', u'wegcat', u'weg2']
+    },
+    'commons' : {
+        'commons':[u'cfd', u'move']
     }
+}
 
 class CategoryDatabase:
     '''
