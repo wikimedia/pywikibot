@@ -17,7 +17,7 @@ class Family(family.Family):
             'uk', 'ca', 'li', 'vo', 'fa', 'is', 'scn', 'sr', 'af', 'cs', 'th',
             'simple', 'fy', 'sw', 'oc', 'br', 'he', 'hr', 'sl', 'hy', 'sq',
             'tt', 'la', 'zh-min-nan', 'da', 'wa', 'ne', 'tk', 'ast', 'ur',
-            'hsb', 'kk', 'ky', 'mg', 'eo', 'lv', 'wo', 'my', 'ang', 'ka', 'co',
+            'hsb', 'kk', 'mg', 'ky', 'eo', 'lv', 'wo', 'my', 'ang', 'ka', 'co',
             'hi', 'ga', 'gn', 'az', 'ia', 'eu', 'sk', 'csb', 'ms', 'st', 'tl',
             'mr', 'cy', 'nds', 'kl', 'be', 'sd', 'ug', 'ti', 'mk', 'sh', 'ps',
             'an', 'bn', 'gu', 'km', 'ss', 'ts', 'qu', 'bs', 'fo', 'am', 'rw',
