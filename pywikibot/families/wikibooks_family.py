@@ -12,11 +12,11 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'ja', 'pt', 'hu', 'nl', 'es', 'pl', 'it', 'he',
-            'sq', 'fi', 'ru', 'vi', 'cs', 'hr', 'ca', 'zh', 'sv', 'da', 'tr',
+            'sq', 'fi', 'ru', 'vi', 'cs', 'hr', 'ca', 'sv', 'zh', 'da', 'tr',
             'th', 'mk', 'sr', 'fa', 'tl', 'ko', 'ar', 'id', 'gl', 'is', 'no',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'la', 'si', 'ia',
-            'ang', 'cv', 'sl', 'et', 'mr', 'uk', 'ur', 'ml', 'az', 'oc', 'ms',
-            'eu', 'hi', 'fy', 'ie', 'tg', 'bn', 'hy', 'af', 'pa', 'te', 'bs',
+            'ang', 'cv', 'sl', 'et', 'uk', 'mr', 'ur', 'ml', 'az', 'oc', 'ms',
+            'eu', 'hi', 'fy', 'ie', 'tg', 'bn', 'af', 'hy', 'pa', 'te', 'bs',
             'sa', 'ky', 'be', 'ast', 'tt', 'zh-min-nan', 'cy', 'mg', 'ne', 'ku',
             'co', 'sw', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'mn', 'kk', 'nds',
             'zu', 'my',
