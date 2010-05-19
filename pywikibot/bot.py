@@ -588,7 +588,7 @@ class Bot(object):
         # contains the options overriden from defaults
         self.options = {}
 
-        validOptions = set(Bot.availableOptions)
+        validOptions = set(self.availableOptions)
         receivedOptions = set(kwargs)
 
         for opt in receivedOptions & validOptions:
@@ -604,7 +604,7 @@ class Bot(object):
         @param option: key defined in Bot.availableOptions
         """
         try:
-            return self.options.get(option, Bot.availableOptions[option])
+            return self.options.get(option, self.availableOptions[option])
         except KeyError:
             raise pywikibot.Error(u'%s is not a valid bot option.' % option)
 
