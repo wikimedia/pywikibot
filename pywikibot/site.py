@@ -410,6 +410,10 @@ class BaseSite(object):
 
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
 
+    def nice_get_address(self, title):
+        """Return shorter URL path to retrieve page titled 'title'."""
+        return self.family.nice_get_address(self.lang, title)
+
     # deprecated methods for backwards-compatibility
 
     @deprecated("family attribute")
@@ -473,8 +477,6 @@ class BaseSite(object):
     def put_address(self, s):
         raise NotImplementedError
     def get_address(self, s):
-        raise NotImplementedError
-    def nice_get_address(self, s):
         raise NotImplementedError
     def edit_address(self, s):
         raise NotImplementedError
@@ -977,6 +979,11 @@ class APISite(BaseSite):
         return self.siteinfo['lang']
 
     lang = property(fget=language, doc=language.__doc__)
+
+    def nice_get_address(self, title):
+        """Return shorter URL path to retrieve page titled 'title'."""
+        # 'title' is expected to be URL-encoded already
+        return self.siteinfo["articlepath"].replace("$1", title)
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""

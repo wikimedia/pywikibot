@@ -730,6 +730,9 @@ class Family:
     def nicepath(self, code):
         return '/wiki/'
 
+    def nice_get_address(self, code, title):
+        return '%s%s' % (self.nicepath(code), title)
+
     def dbName(self, code):
         # returns the name of the MySQL database
         return '%s%s' % (code, self.name)
