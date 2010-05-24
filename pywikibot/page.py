@@ -2126,6 +2126,7 @@ class Link(object):
                 # remove the colon but continue processing
                 # remove any subsequent whitespace
                 t = t.lstrip(u":").lstrip(u" ")
+                continue
             prefix = t[ :t.index(u":")].lower() # part of text before :
             ns = self._source.ns_index(prefix)
             if ns:
