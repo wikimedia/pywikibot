@@ -337,7 +337,8 @@ class BaseSite(object):
         belonging to a different site, this method returns True.
 
         """
-        return (pywikibot.Link(s, self).site != self)
+        linkfam, linkcode = pywikibot.Link(s, self).parse_site()
+        return (linkfam != self.family.name or linkcode != self.code)
 
     def redirectRegex(self, pattern=None):
         """Return a compiled regular expression matching on redirect pages.
@@ -3132,4 +3133,3 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                     else:
                         cache.append(title)
                         yield Page(self, title)
-

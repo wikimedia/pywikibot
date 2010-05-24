@@ -2108,48 +2108,38 @@ class Link(object):
         self._text = t
 
     def parse_site(self):
-        """Parse only enough text to determine the host site."""
+        """Parse only enough text to determine which site the link points to.
 
+        This method does not parse anything after the first ":"; links
+        with multiple interwiki prefixes (such as "wikt:fr:Parlais") need
+        to be re-parsed on the first linked wiki to get the actual site.
+
+        @return: tuple of (familyname, languagecode) for the linked site.
+
+        """
         t = self._text
-        self._site = self._source
-        firstPass = True
+        fam = self._source.family
+        code = self._source.code
         while u":" in t:
             # Initial colon
             if t.startswith(u":"):
                 # remove the colon but continue processing
                 # remove any subsequent whitespace
                 t = t.lstrip(u":").lstrip(u" ")
-                continue
-            fam = self._site.family
             prefix = t[ :t.index(u":")].lower() # part of text before :
-            ns = self._site.ns_index(prefix)
+            ns = self._source.ns_index(prefix)
             if ns:
-                # Ordinary namespace
-                return
-            if prefix in fam.langs.keys()\
-                   or prefix in fam.get_known_families(site=self._site):
-                # looks like an interwiki link
-                if not firstPass:
-                    return
-                t = t[t.index(u":"): ].lstrip(u": ") # part of text after :
-                if prefix in fam.langs.keys():
-                    newsite = pywikibot.Site(prefix, fam)
-                else:
-                    otherlang = self._site.code
-                    familyName = fam.get_known_families(site=self._site)[prefix]
-                    if familyName in ['commons', 'meta']:
-                        otherlang = familyName
-                    try:
-                        newsite = pywikibot.Site(otherlang, familyName)
-                    except ValueError:
-                        return
-                # Redundant interwiki prefix to the local wiki
-                if newsite == self._site:
-                    firstPass = False
-                    continue
-                self._site = newsite
-            else:
-                return   # text before : doesn't match any known prefix
+                # The prefix is a namespace in the source wiki
+                return (fam.name, code)
+            if prefix in fam.langs:
+                # prefix is a language code within the source wiki family
+                return (fam.name, prefix)
+            known = fam.get_known_families(site=self._source)
+            if prefix in known:
+                # prefix is a different wiki family
+                return (known[prefix], code)
+            break
+        return (fam.name, code)  # text before : doesn't match any known prefix
 
     def parse(self):
         """Parse text; called internally when accessing attributes"""
@@ -2267,7 +2257,7 @@ not supported by PyWikiBot!"""
     @property
     def site(self):
         if not hasattr(self, "_site"):
-            self.parse_site()
+            self.parse()
         return self._site
 
     @property
