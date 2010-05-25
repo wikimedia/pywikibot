@@ -27,8 +27,11 @@ This script understands the following command-line arguments:
 __version__ = '$Id$'
 #
 
-import wikipedia
 import time
+import datetime
+import sys
+
+import pywikibot
 
 content = {
     'als':u'{{subst:/Vorlage}}',
@@ -119,92 +122,101 @@ sandboxTitle = {
     'zh': u'Project:沙盒',
     }
 
-class SandboxBot:
-    def __init__(self, hours, no_repeat, delay):
-        self.hours = hours
-        self.no_repeat = no_repeat
-        if delay == None:
-            self.delay = min(15, max(5, int(self.hours *60)))
+class SandboxBot(pywikibot.Bot):
+    availableOptions = {
+        'hours': 1,
+        'no_repeat': True,
+        'delay': None,
+        'delay_td': None,
+    }
+
+    def __init__(self, **kwargs):
+        super(SandboxBot, self).__init__(**kwargs)
+        if self.getOption('delay') is None:
+            d = min(15, max(5, int(self.getOption('hours')*60)))
+            self.availableOptions['delay_td'] = datetime.timedelta(minutes=d)
         else:
-            self.delay = max(5, delay)
+            d = max(5, self.getOption('delay'))
+            self.availableOptions['delay_td'] = datetime.timedelta(minutes=d)
+
+        self.site = pywikibot.Site()
+        if sandboxTitle.get(self.site.lang) is None or \
+                                        content.get(self.site.lang) is None:
+            pywikibot.output(u'This bot is not configured for the given site ' \
+                                u'(%s), exiting.' % self.site)
+            sys.exit(0)
+
 
     def run(self):
-        
-        def minutesDiff(time1, time2):
-            if type(time1) is long:
-                time1 = str(time1)
-            if type(time2) is long:
-                time2 = str(time2)
-            t1 = (((int(time1[0:4])*12+int(time1[4:6]))*30+int(time1[6:8]))*24+int(time1[8:10])*60)+int(time1[10:12])
-            t2 = (((int(time2[0:4])*12+int(time2[4:6]))*30+int(time2[6:8]))*24+int(time2[8:10])*60)+int(time2[10:12])
-            return abs(t2-t1)
-
-        mySite = wikipedia.getSite()
         while True:
             wait = False
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-            localSandboxTitle = wikipedia.translate(mySite, sandboxTitle)
+            localSandboxTitle = pywikibot.translate(self.site, sandboxTitle)
             if type(localSandboxTitle) is list:
                 titles = localSandboxTitle
             else:
                 titles = [localSandboxTitle,]
             for title in titles:
-                sandboxPage = wikipedia.Page(mySite, title)
+                sandboxPage = pywikibot.Page(self.site, title)
                 try:
                     text = sandboxPage.get()
-                    translatedContent = wikipedia.translate(mySite, content)
-                    translatedMsg = wikipedia.translate(mySite, msg)
+                    translatedContent = pywikibot.translate(self.site, content)
+                    translatedMsg = pywikibot.translate(self.site, msg)
                     subst = 'subst:' in translatedContent
                     if text.strip() == translatedContent.strip():
-                        wikipedia.output(u'The sandbox is still clean, no change necessary.')
-                    elif subst and sandboxPage.userName() == mySite.loggedInAs():
-                        wikipedia.output(u'The sandbox might be clean, no change necessary.')
+                        pywikibot.output(u'The sandbox is still clean, no change necessary.')
+                    elif subst and sandboxPage.userName() == self.site.user():
+                        pywikibot.output(u'The sandbox might be clean, no change necessary.')
                     elif text.find(translatedContent.strip()) <> 0 and not subst:
                         sandboxPage.put(translatedContent, translatedMsg)
-                        wikipedia.output(u'Standard content was changed, sandbox cleaned.')
+                        pywikibot.showDiff(text, translatedContent) 
+                        pywikibot.output(u'Standard content was changed, sandbox cleaned.')
                     else:
-                        diff = minutesDiff(sandboxPage.editTime(), time.strftime("%Y%m%d%H%M%S", time.gmtime()))
-                        #Is the last edit more than 5 minutes ago?
-                        if diff >= self.delay:
+                        edit_delta = datetime.datetime.utcnow() - \
+                                    pywikibot.Timestamp.fromISOformat(sandboxPage.editTime())
+                        delta = self.getOption('delay_td') - edit_delta
+                        #Is the last edit more than 'delay' minutes ago?
+                        if delta <= datetime.timedelta(0):
                             sandboxPage.put(translatedContent, translatedMsg)
+                            pywikibot.showDiff(text, translatedContent)
                         else: #wait for the rest
-                            wikipedia.output(u'Sleeping for %d minutes.' % (self.delay-diff))
-                            time.sleep((self.delay-diff)*60)
+                            pywikibot.output(u'Sandbox edited %.1f minutes ago...' % \
+                                                (edit_delta.seconds / 60.0))
+                            pywikibot.output(u'Sleeping for %d minutes.' % (delta.seconds/60))
+                            time.sleep(delta.seconds)
                             wait = True
-                except wikipedia.EditConflict:
-                    wikipedia.output(u'*** Loading again because of edit conflict.\n')
-            if self.no_repeat:
-                wikipedia.output(u'\nDone.')
+                except pywikibot.EditConflict:
+                    pywikibot.output(u'*** Loading again because of edit conflict.\n')
+            if self.getOption('no_repeat'):
+                pywikibot.output(u'\nDone.')
                 return
             elif not wait:
-                if self.hours < 1.0:
-                    wikipedia.output('\nSleeping %s minutes, now %s' % ((self.hours*60), now) )
+                if self.getOption('hours') < 1.0:
+                    pywikibot.output('\nSleeping %s minutes, now %s' % ((self.getOption('hours')*60), now))
                 else:
-                    wikipedia.output('\nSleeping %s hours, now %s' % (self.hours, now) )
-                time.sleep(self.hours * 60 * 60)
+                    pywikibot.output('\nSleeping %s hours, now %s' % (self.getOption('hours'), now))
+                time.sleep(self.getOption('hours') * 60 * 60)
 
 def main():
-    hours = 1
-    delay = None
-    no_repeat = True
-    for arg in wikipedia.handleArgs():
+    opts = {}
+    for arg in pywikibot.handleArgs():
         if arg.startswith('-hours:'):
-            hours = float(arg[7:])
-            no_repeat = False
+            opts['hours'] = float(arg[7:])
+            opts['no_repeat'] = False
         elif arg.startswith('-delay:'):
-            delay = int(arg[7:])
+            opts['delay'] = int(arg[7:])
         else:
-            wikipedia.showHelp('clean_sandbox')
+            pywikibot.showHelp('clean_sandbox')
             return
 
-    bot = SandboxBot(hours, no_repeat, delay)
+    bot = SandboxBot(**opts)
     try:
         bot.run()
     except KeyboardInterrupt:
-        wikipedia.output('\nQuitting program...')
+        pywikibot.output('\nQuitting program...')
 
 if __name__ == "__main__":
     try:
         main()
     finally:
-        wikipedia.stopme()
+        pywikibot.stopme()
