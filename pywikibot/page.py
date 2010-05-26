@@ -2067,6 +2067,9 @@ class Link(object):
         @type defaultNamespace: int
 
         """
+        assert source is None or isinstance(source, pywikibot.site.BaseSite), \
+            "source parameter should be a Site object"
+
         self._text = text
         self._source = source or pywikibot.Site()
         self._defaultns = defaultNamespace
