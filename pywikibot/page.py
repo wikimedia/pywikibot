@@ -102,7 +102,7 @@ class Page(object):
             self.__dict__ = source.__dict__
             if title:
                 # overwrite title
-                self._link = Link(title, source=source, defaultNamespace=ns)
+                self._link = Link(title, source=source.site, defaultNamespace=ns)
 ##                if ":" in title:
 ##                    prefix = title[ :title.index(":")]
 ##                    self._ns = self._site.ns_index(prefix)
