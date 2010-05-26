@@ -41,8 +41,7 @@ try:
     import pkg_resources
 except ImportError:
     pywikibot.error(
-        u"Error: You need the python module setuptools to use this module",
-        _level=pywikibot.CRITICAL)
+        u"Error: You need the python module setuptools to use this module")
     sys.exit(1)
 try:
     import httplib2
