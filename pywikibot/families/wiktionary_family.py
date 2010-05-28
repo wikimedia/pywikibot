@@ -19,10 +19,10 @@ class Family(family.Family):
             'tt', 'la', 'zh-min-nan', 'da', 'wa', 'ne', 'tk', 'ast', 'ur',
             'hsb', 'mg', 'kk', 'ky', 'eo', 'lv', 'my', 'wo', 'ang', 'ka', 'co',
             'hi', 'ga', 'gn', 'az', 'ia', 'eu', 'sk', 'csb', 'ms', 'st', 'tl',
-            'mr', 'cy', 'nds', 'kl', 'be', 'sd', 'ug', 'ti', 'mk', 'sh', 'ps',
+            'cy', 'mr', 'nds', 'kl', 'be', 'sd', 'ug', 'ps', 'ti', 'sh', 'mk',
             'an', 'bn', 'gu', 'km', 'ss', 'ts', 'qu', 'bs', 'fo', 'am', 'rw',
             'chr', 'su', 'om', 'mn', 'nah', 'ie', 'iu', 'yi', 'mt', 'gv', 'kw',
-            'gd', 'tg', 'si', 'nn', 'zu', 'dv', 'tpi', 'pa', 'roa-rup', 'jv',
+            'gd', 'si', 'tg', 'nn', 'zu', 'dv', 'tpi', 'pa', 'roa-rup', 'jv',
             'sg', 'uz', 'mi', 'ik', 'so', 'ha', 'ay', 'lb', 'sa', 'na', 'jbo',
             'tn', 'sm', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
         ]
