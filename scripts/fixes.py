@@ -5,7 +5,7 @@ File containing all standard fixes
 """
 
 #
-# (C) Pywikipedia team, 2008-2009
+# (C) Pywikipedia team, 2008-2010
 #
 __version__ = '$Id$'
 #
@@ -13,23 +13,27 @@ __version__ = '$Id$'
 #
 
 help = u"""
-                       * HTML       -  Convert HTML tags to wiki syntax, and
-                                       fix XHTML.
-                       * isbn        - Fix badly formatted ISBNs.
-                       * syntax     -  Try to fix bad wiki markup. Do not run
-                                       this in automatic mode, as the bot may
-                                       make mistakes.
-                       * syntax-safe - Like syntax, but less risky, so you can
-                                       run this in automatic mode.
-                       * case-de     - fix upper/lower case errors in German
-                       * grammar-de  - fix grammar and typography in German
-                       * vonbis      - Ersetze Binde-/Gedankenstrich durch "bis" in German
-                       * music       - Links auf Begriffsklärungen in German
-                       * datum       - specific date formats in German
-                       * correct-ar  - Corrections for Arabic Wikipedia and any Arabic wiki.
-                       * yu-tld      - the yu top-level domain will soon be disabled, see
-                       * fckeditor   - Try to convert FCKeditor HTML tags to wiki syntax.
-                                       http://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
+                  * HTML        - Convert HTML tags to wiki syntax, and
+                                  fix XHTML.
+                  * isbn        - Fix badly formatted ISBNs.
+                  * syntax      - Try to fix bad wiki markup. Do not run
+                                  this in automatic mode, as the bot may
+                                  make mistakes.
+                  * syntax-safe - Like syntax, but less risky, so you can
+                                  run this in automatic mode.
+                  * case-de     - fix upper/lower case errors in German
+                  * grammar-de  - fix grammar and typography in German
+                  * vonbis      - Ersetze Binde-/Gedankenstrich durch "bis"
+                                  in German
+                  * music       - Links auf Begriffsklärungen in German
+                  * datum       - specific date formats in German
+                  * correct-ar  - Corrections for Arabic Wikipedia and any
+                                  Arabic wiki.
+                  * yu-tld      - the yu top-level domain will soon be
+                                  disabled, see
+                  * fckeditor   - Try to convert FCKeditor HTML tags to wiki
+                                  syntax.
+                                  http://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
 
 """
 
@@ -44,6 +48,7 @@ fixes = {
             'cs':u'převod/oprava HTML',
             'en':u'Robot: Converting/fixing HTML',
             'eo':u'Bot: koredtado de HTMLa teksto',
+            'fa':u'ربات:تصحیح/فیکس کدهای اچ‌تی‌ام‌ال',
             'de':u'Bot: konvertiere/korrigiere HTML',
             'fr':u'Robot: convertit/fixe HTML',
             'he':u'בוט: ממיר/מתקן HTML',
@@ -185,6 +190,7 @@ fixes = {
             'de':u'Bot: Korrigiere Wiki-Syntax',
             'en':u'Bot: Fixing wiki syntax',
             'eo':u'Bot: Korektado de vikia sintakso',
+            'fa':u'ربات:تصحیح قالب ویکی‌نویسی',
             'fr':u'Bot: Corrige wiki-syntaxe',
             'he':u'בוט: מתקן תחביר ויקי',
             'ia':u'Robot: Reparation de syntaxe wiki',
@@ -260,6 +266,7 @@ fixes = {
             'de':u'Bot: Korrigiere Wiki-Syntax',
             'en':u'Bot: Fixing wiki syntax',
             'eo':u'Bot: Korektado de vikia sintakso',
+            'fa':u'ربات:تصحیح قالب ویکی‌نویسی',
             'fr':u'Bot: Corrige wiki-syntaxe',
             'he':u'בוט: מתקן תחביר ויקי',
             'ia':u'Robot: Reparation de syntaxe wiki',
@@ -416,6 +423,7 @@ fixes = {
             'en': u'Robot: Fixing ISBN format',
             'es': u'Arreglando formato ISBN',
             'eo': u'Bot: Korekto de teksto en ISBN-formato',
+            'fa': u'ربات:تصحیح شابک',
             'he': u'בוט: מתקן פורמט ISBN',
             'ja': u'ロボットによる: ISBNフォーマット修正',
             'ru': u'Бот: Коррекция ISBN формата',
@@ -637,7 +645,7 @@ fixes = {
     },
     # These replacements will convert HTML tag from FCK-editor to wiki syntax.
     #
-	'fckeditor': {
+    'fckeditor': {
         'regex': True,
         'msg': {
             'en': u'Robot: Fixing rich-editor html',
@@ -645,8 +653,8 @@ fixes = {
          'replacements': [
             # replace <br> with a new line
             (r'(?i)<br>',                      r'\n'),
-			# replace &nbsp; with a space
-			(r'(?i)&nbsp;',                      r' '),
+            # replace &nbsp; with a space
+            (r'(?i)&nbsp;',                      r' '),
         ],
     },
 }
