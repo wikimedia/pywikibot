@@ -543,7 +543,7 @@ for _key, _val in globals().items():
         else:
             print "WARNING: Type of '%(_key)s' changed" % locals()
             print "         %(was)s: %(old)s" % {'was': "Was", 'old': ot}
-            print "         %(was)s: %(new)s" % {'now': "Now", 'new': nt}
+            print "         %(now)s: %(new)s" % {'now': "Now", 'new': nt}
         del nt, ot
     else:
         print \
