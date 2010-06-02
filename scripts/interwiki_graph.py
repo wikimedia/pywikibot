@@ -53,14 +53,14 @@ class GraphDrawer:
         self.subject = subject
 
     def getLabel(self, page):
-        return (u'"\"%s:%s\""' % (page.site().language(),
+        return (u'"\"%s:%s\""' % (page.site.language(),
                                   page.title())).encode('utf-8')
 
     def addNode(self, page):
         node = pydot.Node(self.getLabel(page), shape = 'rectangle')
         node.set_URL("\"http://%s%s\""
-                     % (page.site().hostname(),
-                        page.site().get_address(page.urlname())))
+                     % (page.site.hostname(),
+                        page.site.get_address(page.urlname())))
         node.set_style('filled')
         node.set_fillcolor('white')
         node.set_fontsize('11')
@@ -74,7 +74,7 @@ class GraphDrawer:
             node.set_color('green')
             node.set_style('filled,bold')
         # if we found more than one valid page for this language:
-        if len(filter(lambda p: p.site() == page.site() and p.exists() \
+        if len(filter(lambda p: p.site == page.site and p.exists() \
                       and not p.isRedirectPage(),
                       self.subject.foundIn.keys())) > 1:
             # mark conflict by octagonal node
@@ -102,7 +102,7 @@ class GraphDrawer:
                 # opposite edge.
             else:
                 # add edge
-                if refPage.site() == page.site():
+                if refPage.site == page.site:
                     edge.set_color('blue')
                 elif not page.exists():
                     # mark dead links
@@ -231,8 +231,8 @@ class SpeedyShareUploader:
 
 
 def getFilename(page, extension = None):
-    filename = '%s-%s-%s' % (page.site().family.name,
-                             page.site().language(),
+    filename = '%s-%s-%s' % (page.site.family.name,
+                             page.site.language(),
                              page.titleForFilename())
     if extension:
         filename += '.%s' % extension

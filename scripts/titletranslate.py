@@ -19,7 +19,7 @@ def translate(page, hints = None, auto = True, removebrackets = False):
     Does some magic stuff. Returns a list of Links.
     """
     result = []
-    site = page.site()
+    site = page.site
     if hints:
         for h in hints:
             if h.find(':') == -1:
@@ -64,12 +64,12 @@ def translate(page, hints = None, auto = True, removebrackets = False):
     # Autotranslate dates into all other languages, the rest will come from existing interwiki links.
     if auto:
         # search inside all dictionaries for this link
-        dictName, value = date.getAutoFormat( page.site().code, page.title() )
+        dictName, value = date.getAutoFormat( page.site.code, page.title() )
         if dictName:
-            if not (dictName == 'yearsBC' and date.maxyearBC.has_key(page.site().code) and value > date.maxyearBC[page.site().code]) or (dictName == 'yearsAD' and date.maxyearAD.has_key(page.site().code) and value > date.maxyearAD[page.site().code]):
+            if not (dictName == 'yearsBC' and date.maxyearBC.has_key(page.site.code) and value > date.maxyearBC[page.site.code]) or (dictName == 'yearsAD' and date.maxyearAD.has_key(page.site.code) and value > date.maxyearAD[page.site.code]):
                 pywikibot.output(u'TitleTranslate: %s was recognized as %s with value %d' % (page.title(),dictName,value))
                 for entryLang, entry in date.formats[dictName].iteritems():
-                    if entryLang != page.site().code:
+                    if entryLang != page.site.code:
                         if dictName == 'yearsBC' and date.maxyearBC.has_key(entryLang) and value > date.maxyearBC[entryLang]:
                             pass
                         elif dictName == 'yearsAD' and date.maxyearAD.has_key(entryLang) and value > date.maxyearAD[entryLang]:
@@ -94,7 +94,7 @@ def getPoisonedLinks(pl):
 
     pywikibot.output( u'getting poisoned links for %s' % pl.title() )
 
-    dictName, value = date.getAutoFormat( pl.site().code, pl.title() )
+    dictName, value = date.getAutoFormat( pl.site.code, pl.title() )
     if dictName is not None:
         pywikibot.output( u'date found in %s' % dictName )
 

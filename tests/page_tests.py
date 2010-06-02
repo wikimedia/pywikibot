@@ -114,7 +114,7 @@ class TestPageObject(unittest.TestCase):
 
     def testSite(self):
         """Test site() method"""
-        self.assertEqual(mainpage.site(), site)
+        self.assertEqual(mainpage.site, site)
         self.assertEqual(mainpage.encoding(), site.encoding())
 
     def testNamespace(self):

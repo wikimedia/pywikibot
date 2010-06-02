@@ -469,7 +469,7 @@ class CosmeticChangesBot:
             # Show the title of the page we're working on.
             # Highlight the title in purple.
             pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<" % page.title())
-            ccToolkit = CosmeticChangesToolkit(page.site(), debug = True, namespace = page.namespace())
+            ccToolkit = CosmeticChangesToolkit(page.site, debug = True, namespace = page.namespace())
             changedText = ccToolkit.change(page.get())
             if changedText != page.get():
                 if not self.acceptall:

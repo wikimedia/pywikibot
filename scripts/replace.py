@@ -416,8 +416,8 @@ class ReplaceRobot:
                     continue
                 if choice == 'b':
                     webbrowser.open("http://%s%s" % (
-                        page.site().hostname(),
-                        page.site().nice_get_address(page.title())
+                        page.site.hostname(),
+                        page.site.nice_get_address(page.title())
                     ))
                     pywikibot.input("Press Enter when finished in browser.")
                     original_text = page.get(get_redirect=True, force=True)

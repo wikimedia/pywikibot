@@ -102,7 +102,7 @@ class Page(object):
             self.__dict__ = source.__dict__
             if title:
                 # overwrite title
-                self._link = Link(title, source=source.site(), defaultNamespace=ns)
+                self._link = Link(title, source=source.site, defaultNamespace=ns)
 ##                if ":" in title:
 ##                    prefix = title[ :title.index(":")]
 ##                    self._ns = self._site.ns_index(prefix)
@@ -111,7 +111,7 @@ class Page(object):
 ##                    else:
 ##                        title = title[title.index(":")+1 : ].strip(" _")
 ##                        self._title = "%s:%s" % (
-##                                         self.site().namespace(self._ns),
+##                                         self.site.namespace(self._ns),
 ##                                         self._title)
 ##                else:
 ##                    self._ns = 0
@@ -127,7 +127,7 @@ class Page(object):
 ##            self._title = source.title
 ##            # reassemble the canonical title from components
 ##            if self._ns:
-##                self._title = "%s:%s" % (self.site().namespace(self._ns),
+##                self._title = "%s:%s" % (self.site.namespace(self._ns),
 ##                                         self._title)
         else:
             raise pywikibot.Error(
@@ -140,6 +140,7 @@ class Page(object):
 ##        # Always capitalize the first letter
 ##        self._title = self._title[:1].upper() + self._title[1:]
 
+    @property
     def site(self):
         """Return the Site object for the wiki on which this Page resides."""
         return self._link.site
@@ -176,17 +177,17 @@ class Page(object):
             title = title + "#" + self._link.section
         if asLink:
             if forceInterwiki or (allowInterwiki and
-                    (self.site().family.name != config.family
-                     or self.site().code != config.mylang)):
-                if self.site().family.name != config.family \
-                        and self.site().family.name != self.site().code:
-                    return u'[[%s:%s:%s]]' % (self.site().family.name,
-                                              self.site().code,
+                    (self.site.family.name != config.family
+                     or self.site.code != config.mylang)):
+                if self.site.family.name != config.family \
+                        and self.site.family.name != self.site.code:
+                    return u'[[%s:%s:%s]]' % (self.site.family.name,
+                                              self.site.code,
                                               title)
                 else:
                     # use this form for sites like commons, where the
                     # code is the same as the family name
-                    return u'[[%s:%s]]' % (self.site().code,
+                    return u'[[%s:%s]]' % (self.site.code,
                                            title)
             elif textlink and (self.isImage() or self.isCategory()):
                 return u'[[:%s]]' % title
@@ -199,7 +200,7 @@ class Page(object):
         if underscore or asUrl:
             title = title.replace(u' ', u'_')
         if asUrl:
-            encodedTitle = title.encode(self.site().encoding())
+            encodedTitle = title.encode(self.site.encoding())
             title = urllib.quote(encodedTitle)
         if as_filename:
             # Replace characters that are not possible in file names on some
@@ -246,8 +247,8 @@ class Page(object):
         if not isinstance(other, Page):
             # especially, return -1 if other is None
             return -1
-        if self.site() != other.site():
-            return cmp(self.site(), other.site())
+        if self.site != other.site:
+            return cmp(self.site, other.site)
         if self.namespace() != other.namespace():
             return cmp(self.namespace(), other.namespace())
         return cmp(self._link.title, other._link.title)
@@ -271,7 +272,7 @@ class Page(object):
         if not hasattr(self, '_autoFormat'):
             from pywikibot import date
             self._autoFormat = date.getAutoFormat(
-                                        self.site().code,
+                                        self.site.code,
                                         self.title(withNamespace=False)
                                     )
         return self._autoFormat
@@ -335,7 +336,7 @@ class Page(object):
                  or not self._revid in self._revisions \
                  or self._revisions[self._revid].text is None:
             try:
-                self.site().loadrevisions(self, getText=True, sysop=sysop)
+                self.site.loadrevisions(self, getText=True, sysop=sysop)
             except (pywikibot.NoPage, pywikibot.SectionError), e:
                 self._getexception = e
                 raise
@@ -357,7 +358,7 @@ class Page(object):
         """
         if force or not oldid in self._revisions \
                 or self._revisions[oldid].text is None:
-            self.site().loadrevisions(self, getText=True, revids=oldid,
+            self.site.loadrevisions(self, getText=True, revids=oldid,
                                       sysop=sysop)
         # TODO: what about redirects, errors?
         return self._revisions[oldid].text
@@ -365,16 +366,16 @@ class Page(object):
     def permalink(self):
         """Return the permalink URL for current revision of this page."""
         return "%s://%s/%sindex.php?title=%s&oldid=%s" \
-               % (self.site().protocol(),
-                  self.site().hostname(),
-                  self.site().scriptpath(),
+               % (self.site.protocol(),
+                  self.site.hostname(),
+                  self.site.scriptpath(),
                   self.title(asUrl=True),
                   self.latestRevision())
 
     def latestRevision(self):
         """Return the current revision id for this page."""
         if not hasattr(self, '_revid'):
-            self.site().loadrevisions(self)
+            self.site.loadrevisions(self)
         return self._revid
 
     def _textgetter(self):
@@ -404,7 +405,7 @@ class Page(object):
         req = pywikibot.data.api.Request(action="expandtemplates",
                                          text=self.text,
                                          title=self.title(withSection=False),
-                                         site=self.site())
+                                         site=self.site)
         result = req.submit()
         return result["expandtemplates"]["*"]
 
@@ -433,11 +434,11 @@ class Page(object):
         found.
 
         """
-        return self.site().page_exists(self)
+        return self.site.page_exists(self)
 
     def isRedirectPage(self):
         """Return True if this is a redirect, False if not or not existing."""
-        return self.site().page_isredirect(self)
+        return self.site.page_isredirect(self)
 
     def isCategoryRedirect(self):
         """Return True if this is a category redirect page, False otherwise."""
@@ -445,12 +446,12 @@ class Page(object):
         if not self.isCategory():
             return False
         if not hasattr(self, "_catredirect"):
-            catredirs = self.site().category_redirects()
+            catredirs = self.site.category_redirects()
             for (template, args) in self.templatesWithParams():
                 if template.title(withNamespace=False) in catredirs:
                     # Get target (first template argument)
                     try:
-                        self._catredirect = self.site().namespace(14) \
+                        self._catredirect = self.site.namespace(14) \
                                          + ":" + args[0].strip()
                         break
                     except IndexError:
@@ -466,7 +467,7 @@ class Page(object):
     def getCategoryRedirectTarget(self):
         """If this is a category redirect, return the target category title."""
         if self.isCategoryRedirect():
-            return Category(Link(self._catredirect, self.site()))
+            return Category(Link(self._catredirect, self.site))
         raise pywikibot.IsNotRedirectPage(self.title())
 
     def isEmpty(self):
@@ -477,8 +478,8 @@ class Page(object):
 
         """
         txt = self.get()
-        txt = pywikibot.removeLanguageLinks(txt, site = self.site())
-        txt = pywikibot.removeCategoryLinks(txt, site = self.site())
+        txt = pywikibot.removeLanguageLinks(txt, site = self.site)
+        txt = pywikibot.removeCategoryLinks(txt, site = self.site)
         if len(txt) < 4:
             return True
         else:
@@ -504,14 +505,14 @@ class Page(object):
             return None
         if self.isTalkPage():
             if self.namespace() == 1:
-                return Page(self.site(), self.title(withNamespace=False))
+                return Page(self.site, self.title(withNamespace=False))
             else:
-                return Page(self.site(),
-                            self.site().namespace(ns - 1) + ':'
+                return Page(self.site,
+                            self.site.namespace(ns - 1) + ':'
                               + self.title(withNamespace=False))
         else:
-            return Page(self.site(),
-                        self.site().namespace(ns + 1) + ':'
+            return Page(self.site,
+                        self.site.namespace(ns + 1) + ':'
                           + self.title(withNamespace=False))
 
     def isCategory(self):
@@ -535,22 +536,22 @@ class Page(object):
 
         """
         if not hasattr(self, "_isDisambig"):
-            if not hasattr(self.site(), "_disambigtemplates"):
-                self.site()._disambigtemplates = \
-                                self.site().family.disambig(self.site().code)
-                if self.site()._disambigtemplates is None:
+            if not hasattr(self.site, "_disambigtemplates"):
+                self.site._disambigtemplates = \
+                                self.site.family.disambig(self.site.code)
+                if self.site._disambigtemplates is None:
                     try:
-                        disambigpages = Page(self.site(),
+                        disambigpages = Page(self.site,
                                              "MediaWiki:Disambiguationspage")
-                        self.site()._disambigtemplates = [
+                        self.site._disambigtemplates = [
                             link.title(withNamespace=False)
                               for link in disambigpages.linkedPages()
                               if link.namespace() == 10
                         ]
                     except pywikibot.NoPage:
-                        self.site()._disambigtemplates = ['Disambig']
+                        self.site._disambigtemplates = ['Disambig']
             for t in self.templates():
-                if t.title(withNamespace=False) in self.site()._disambigtemplates:
+                if t.title(withNamespace=False) in self.site._disambigtemplates:
                     self._isDisambig = True
                     break
             else:
@@ -582,7 +583,7 @@ class Page(object):
         # to implement those methods in the site interface and then combine
         # the results for this method, or to implement this method and then
         # split up the results for the others.
-        return self.site().pagereferences(
+        return self.site.pagereferences(
                                self,
                                followRedirects=follow_redirects,
                                filterRedirects=redirectsOnly,
@@ -604,7 +605,7 @@ class Page(object):
         @param total: iterate no more than this number of pages in total
 
         """
-        return self.site().pagebacklinks(self,
+        return self.site.pagebacklinks(self,
                                          followRedirects=followRedirects,
                                          filterRedirects=filterRedirects,
                                          namespaces=namespaces, step=step,
@@ -621,7 +622,7 @@ class Page(object):
         @param total: iterate no more than this number of pages in total
 
         """
-        return self.site().page_embeddedin(self,
+        return self.site.page_embeddedin(self,
                                            filterRedirects=filter_redirects,
                                            namespaces=namespaces,
                                            step=step, total=total)
@@ -634,7 +635,7 @@ class Page(object):
           - page is protected, and bot has a sysop account for this site.
 
         """
-        return self.site().page_can_be_edited(self)
+        return self.site.page_can_be_edited(self)
 
     def botMayEdit(self):
         """Return True if this page allows bots to edit it.
@@ -652,7 +653,7 @@ class Page(object):
         """ # TODO: move this to Site object?
         if config.ignore_bot_templates: #Check the "master ignore switch"
             return True
-        username = self.site().user()
+        username = self.site.user()
         try:
             templates = self.templatesWithParams();
         except (pywikibot.NoPage,
@@ -729,7 +730,7 @@ class Page(object):
         err = None
         link = self.title(asLink=True)
         try:
-            done = self.site().editpage(self, summary=comment, minor=minor,
+            done = self.site.editpage(self, summary=comment, minor=minor,
                                         watch=watchval)
             if not done:
                 pywikibot.warning(u"Page %s not saved" % link)
@@ -787,7 +788,7 @@ class Page(object):
         @return: True if successful, False otherwise.
 
         """
-        return self.site().watchpage(self, unwatch)
+        return self.site.watchpage(self, unwatch)
 
     def linkedPages(self, namespaces=None, step=None, total=None):
         """Iterate Pages that this Page links to.
@@ -803,7 +804,7 @@ class Page(object):
         @return: a generator that yields Page objects.
 
         """
-        return self.site().pagelinks(self, namespaces=namespaces, step=step,
+        return self.site.pagelinks(self, namespaces=namespaces, step=step,
                                      total=total)
 
     def interwiki(self, expand=True):
@@ -824,15 +825,15 @@ class Page(object):
         for linkmatch in pywikibot.link_regex.finditer(
                             pywikibot.removeDisabledParts(text)):
             linktitle = linkmatch.group("title")
-            link = Link(linktitle, self.site())
+            link = Link(linktitle, self.site)
             # only yield links that are to a different site and that
             # are not language links
             try:
-                if link.site != self.site():
+                if link.site != self.site:
                     if linktitle.lstrip().startswith(":"):
                         # initial ":" indicates not a language link
                         yield link
-                    elif link.site.family != self.site().family:
+                    elif link.site.family != self.site.family:
                         # link to a different family is not a language link
                         yield link
             except pywikibot.Error:
@@ -863,7 +864,7 @@ class Page(object):
         # method is called. If we do this, we'll have to think
         # about what will happen if the generator is not completely
         # iterated upon.
-        return self.site().pagelanglinks(self, step=step, total=total)
+        return self.site.pagelanglinks(self, step=step, total=total)
 
     def templates(self):
         """Return a list of Page objects for templates used on this Page.
@@ -892,7 +893,7 @@ class Page(object):
         """
         if hasattr(self, '_templates'):
             return iter(self._templates)
-        return self.site().pagetemplates(self, step=step, total=total)
+        return self.site.pagetemplates(self, step=step, total=total)
 
     @deprecate_arg("followRedirects", None)
     @deprecate_arg("loose", None)
@@ -904,7 +905,7 @@ class Page(object):
         @return: a generator that yields ImagePage objects.
 
         """
-        return self.site().pageimages(self, step=step, total=total)
+        return self.site.pageimages(self, step=step, total=total)
 
     def templatesWithParams(self):
         """Iterate templates used on this Page.
@@ -922,7 +923,7 @@ class Page(object):
         # element into a list in the format used by old scripts
         result = []
         for template in templates:
-            link = pywikibot.Link(template[0], self.site(),
+            link = pywikibot.Link(template[0], self.site,
                                       defaultNamespace=10)
             try:
                 if link.canonical_title() not in titles:
@@ -942,7 +943,7 @@ class Page(object):
                     positional.append(args[key])
             for name in named:
                 positional.append("%s=%s" % (name, named[name]))
-            result.append((pywikibot.Page(link, self.site()), positional))
+            result.append((pywikibot.Page(link, self.site), positional))
         return result
 
     @deprecate_arg("nofollow_redirects", None)
@@ -956,7 +957,7 @@ class Page(object):
         @return: a generator that yields Category objects.
 
         """
-        return self.site().pagecategories(self, withSortKey=withSortKey,
+        return self.site.pagecategories(self, withSortKey=withSortKey,
                                           step=step, total=total)
 
     def extlinks(self, step=None, total=None):
@@ -967,7 +968,7 @@ class Page(object):
         @return: a generator that yields unicode objects containing URLs.
 
         """
-        return self.site().page_extlinks(self, step=step, total=total)
+        return self.site.page_extlinks(self, step=step, total=total)
 
     def getRedirectTarget(self):
         """Return a Page object for the target this Page redirects to.
@@ -976,7 +977,7 @@ class Page(object):
         exception. This method also can raise a NoPage exception.
 
         """
-        return self.site().getredirtarget(self)
+        return self.site.getredirtarget(self)
 
     # BREAKING CHANGE: in old framework, default value for getVersionHistory
     #                  returned no more than 500 revisions; now, it iterates
@@ -998,7 +999,7 @@ class Page(object):
         @param total: iterate no more than this number of revisions in total
 
         """
-        self.site().loadrevisions(self, getText=False, rvdir=reverseOrder,
+        self.site.loadrevisions(self, getText=False, rvdir=reverseOrder,
                                   step=step, total=total)
         return [ ( self._revisions[rev].revid,
                    self._revisions[rev].timestamp,
@@ -1034,7 +1035,7 @@ class Page(object):
             edit date/time, user name and content
 
         """
-        return self.site().loadrevisions(self, getText=True,
+        return self.site.loadrevisions(self, getText=True,
                                          rvdir=reverseOrder,
                                          step=step, total=total)
 
@@ -1070,7 +1071,7 @@ class Page(object):
             reason = pywikibot.input(u'Please enter a reason for the move:')
         # TODO: implement "safe" parameter (Is this necessary ?)
         # TODO: implement "sysop" parameter
-        return self.site().movepage(self, newtitle, reason,
+        return self.site.movepage(self, newtitle, reason,
                                     movetalk=movetalkpage,
                                     noredirect=deleteAndMove)
 
@@ -1089,7 +1090,7 @@ class Page(object):
             pywikibot.output(u'Deleting %s.' % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the deletion:')
         answer = u'y'
-        if prompt and not hasattr(self.site(), '_noDeletePrompt'):
+        if prompt and not hasattr(self.site, '_noDeletePrompt'):
             answer = pywikibot.inputChoice(u'Do you want to delete %s?'
                         % self.title(asLink = True, forceInterwiki = True),
                                            ['Yes', 'No', 'All'],
@@ -1097,10 +1098,10 @@ class Page(object):
                                            'N')
             if answer in ['a', 'A']:
                 answer = 'y'
-                self.site()._noDeletePrompt = True
+                self.site._noDeletePrompt = True
         if answer in ['y', 'Y']:
             try:
-                return self.site().deletepage(self, reason)
+                return self.site.deletepage(self, reason)
             except pywikibot.NoUsername, e:
                 if mark:
                     raise NotImplementedError(
@@ -1121,7 +1122,7 @@ class Page(object):
         """
         if not hasattr(self, "_deletedRevs"):
             self._deletedRevs = {}
-        for item in self.site().deletedrevs(self, step=step, total=total):
+        for item in self.site.deletedrevs(self, step=step, total=total):
             for rev in item.get("revisions", []):
                 self._deletedRevs[rev['timestamp']] = rev
                 yield rev['timestamp']
@@ -1140,7 +1141,7 @@ class Page(object):
                     (not retrieveText)
                     or "content" in self._deletedRevs["timestamp"]):
                 return self._deletedRevs["timestamp"]
-        for item in self.site().deletedrevs(self, start=timestamp,
+        for item in self.site.deletedrevs(self, start=timestamp,
                                             get_text=retrieveText, total=1):
             # should only be one item with one revision
             if item['title'] == self.title:
@@ -1187,7 +1188,7 @@ class Page(object):
                              % (self.title(asLink=True)))
             comment = pywikibot.input(
                         u'Please enter a reason for the undeletion:')
-        return self.site().undelete(self, comment)
+        return self.site.undelete(self, comment)
 
     @deprecate_arg("throttle", None)
     def protect(self, edit='sysop', move='sysop', unprotect=False,
@@ -1216,16 +1217,16 @@ class Page(object):
         if unprotect:
             edit = move = ""
         answer = 'y'
-        if prompt and not hasattr(self.site(), '_noProtectPrompt'):
+        if prompt and not hasattr(self.site, '_noProtectPrompt'):
             answer = pywikibot.inputChoice(
                         u'Do you want to change the protection level of %s?'
                           % self.title(asLink=True, forceInterwiki = True),
                         ['Yes', 'No', 'All'], ['Y', 'N', 'A'], 'N')
             if answer in ['a', 'A']:
                 answer = 'y'
-                self.site()._noProtectPrompt = True
+                self.site._noProtectPrompt = True
         if answer in ['y', 'Y']:
-            return self.site().protect(self, edit, move, reason)
+            return self.site.protect(self, edit, move, reason)
 
     def change_category(self, oldCat, newCat, comment=None, sortKey=None,
                         inPlace=True):
@@ -1241,7 +1242,7 @@ class Page(object):
 
         """
         #TODO: is inPlace necessary?
-        site = self.site()
+        site = self.site
         changesMade = False
 
         if not self.canBeEdited():
@@ -1337,7 +1338,7 @@ class Page(object):
         if not self.isCategory():
             return None # should this raise an exception??
         try:
-            return self.site().categoryinfo(self)
+            return self.site.categoryinfo(self)
         except NotImplementedError:
             return None
 
@@ -1346,7 +1347,7 @@ class Page(object):
     @deprecated("Site.encoding()")
     def encoding(self):
         """DEPRECATED: use Site.encoding() instead"""
-        return self.site().encoding()
+        return self.site.encoding()
 
     @deprecated("Page.title(withNamespace=False)")
     def titleWithoutNamespace(self, underscore=False):
@@ -1427,15 +1428,15 @@ class ImagePage(Page):
         if not hasattr(self, '_imagePageHtml'):
             from pywikibot.comms import http
             path = "%s/index.php?title=%s" \
-                   % (self.site().scriptpath(), self.title(asUrl=True))
-            self._imagePageHtml = http.request(self.site(), path)
+                   % (self.site.scriptpath(), self.title(asUrl=True))
+            self._imagePageHtml = http.request(self.site, path)
         return self._imagePageHtml
 
     def fileUrl(self):
         """Return the URL for the image described on this page."""
         # TODO add scaling option?
         if not hasattr(self, '_imageinfo'):
-            self._imageinfo = self.site().getimageinfo(self) #FIXME
+            self._imageinfo = self.site.getimageinfo(self) #FIXME
         return self._imageinfo['url']
 
     def fileIsOnCommons(self):
@@ -1446,7 +1447,7 @@ class ImagePage(Page):
     def fileIsShared(self):
         """Return True if image is stored on any known shared repository."""
         # as of now, the only known repositories are commons and wikitravel
-        if 'wikitravel_shared' in self.site().shared_image_repository():
+        if 'wikitravel_shared' in self.site.shared_image_repository():
             return self.fileUrl().startswith(
                 u'http://wikitravel.org/upload/shared/')
         return self.fileIsOnCommons()
@@ -1466,7 +1467,7 @@ class ImagePage(Page):
     def getFileSHA1Sum(self):
         """Return image file's SHA1 checksum."""
         if not hasattr(self, '_imageinfo'):
-            self._imageinfo = self.site().getimageinfo(self) #FIXME
+            self._imageinfo = self.site.getimageinfo(self) #FIXME
         return self._imageinfo['sha1']
 
     def getFileVersionHistory(self):
@@ -1477,7 +1478,7 @@ class ImagePage(Page):
 
         """
         #TODO; return value may need to change
-        return self.site().getimageinfo(self, history=True) #FIXME
+        return self.site.getimageinfo(self, history=True) #FIXME
 
     def getFileVersionHistoryTable(self):
         """Return the version history in the form of a wiki table."""
@@ -1496,7 +1497,7 @@ class ImagePage(Page):
         @param total: iterate no more than this number of pages in total
 
         """
-        return self.site().imageusage(self, step=step, total=total)
+        return self.site.imageusage(self, step=step, total=total)
 
 
 class Category(Page):
@@ -1553,9 +1554,9 @@ class Category(Page):
             recurse = recurse - 1
         if not hasattr(self, "_subcats"):
             self._subcats = []
-            for member in self.site().categorymembers(self, namespaces=[14],
+            for member in self.site.categorymembers(self, namespaces=[14],
                                                       step=step, total=total):
-                subcat = Category(self.site(), member.title())
+                subcat = Category(self.site, member.title())
                 self._subcats.append(subcat)
                 yield subcat
                 if total is not None:
@@ -1601,9 +1602,9 @@ class Category(Page):
             total (at all levels)
 
         """
-        namespaces = [x for x in self.site().namespaces()
+        namespaces = [x for x in self.site.namespaces()
                       if x>=0 and x!=14]
-        for member in self.site().categorymembers(self,
+        for member in self.site.categorymembers(self,
                                                   namespaces=namespaces,
                                                   step=step, total=total):
             yield member
@@ -1625,7 +1626,7 @@ class Category(Page):
     def members(self, recurse=False, namespaces=None, step=None, total=None):
         """Yield all category contents (subcats, pages, and files)."""
 
-        for member in self.site().categorymembers(self, namespaces,
+        for member in self.site.categorymembers(self, namespaces,
                                                   step=step, total=total):
             yield member
             if total is not None:
@@ -1646,7 +1647,7 @@ class Category(Page):
 
     def isEmptyCategory(self):
         """Return True if category has no members (including subcategories)."""
-        for member in self.site().categorymembers(self, total=1):
+        for member in self.site.categorymembers(self, total=1):
             return False
         return True
 
@@ -1668,8 +1669,8 @@ class Category(Page):
         # move to category.py? (Although it doesn't seem to be used there,
         # either)
         if not isinstance(cat, Category):
-            cat = self.site().category_namespace() + ':' + cat
-            targetCat = Category(self.site(), cat)
+            cat = self.site.category_namespace() + ':' + cat
+            targetCat = Category(self.site, cat)
         else:
             targetCat = cat
         if targetCat.exists():
@@ -1709,8 +1710,8 @@ class Category(Page):
         """
         # I don't see why we need this as part of the framework either
         # move to scripts/category.py?
-        catname = self.site().category_namespace() + ':' + catname
-        targetCat = Category(self.site(), catname)
+        catname = self.site.category_namespace() + ':' + catname
+        targetCat = Category(self.site, catname)
         if targetCat.exists():
             pywikibot.warning(u'Target page %s already exists!'
                                 % targetCat.title())
@@ -1801,7 +1802,7 @@ class User(Page):
             del self._userprops
         if not hasattr(self, '_userprops'):
             usrequest = pywikibot.data.api.Request(
-                            site=self.site(),
+                            site=self.site,
                             action='query',
                             list='users',
                             usprop='blockinfo|groups|editcount|registration|emailable',
@@ -1883,7 +1884,7 @@ class User(Page):
             raise AutoblockUser("This is an autoblock ID, you can only use to unblock it.")
         if subpage:
             subpage = u'/' + subpage
-        return Page(Link(self.title() + subpage, self.site()))
+        return Page(Link(self.title() + subpage, self.site))
 
     def getUserTalkPage(self, subpage=u''):
         """ Return a pywikibot.Page object corresponding to this user's main
@@ -1900,7 +1901,7 @@ class User(Page):
         if subpage:
             subpage = u'/' + subpage
         return Page(Link(self.title(withNamespace=False) + subpage,
-                                            self.site(), defaultNamespace=3))
+                                            self.site, defaultNamespace=3))
 
     def sendMail(self, subject, text, ccme = False):
         """ Send an email to this user via mediawiki's email interface.
@@ -1919,13 +1920,13 @@ class User(Page):
         if not self.isEmailable():
             raise UserActionRefuse('This user is not mailable')
 
-        if not self.site().has_right('sendemail'):
+        if not self.site.has_right('sendemail'):
             raise UserActionRefuse('You don\'t have permission to send mail')
 
         params = {
             'action': 'emailuser',
             'target': self.username,
-            'token': self.site().token(self, 'email'),
+            'token': self.site.token(self, 'email'),
             'subject': subject,
             'text': text,
         }
@@ -1972,11 +1973,11 @@ class User(Page):
         @param namespaces: only iterate links in these namespaces
         @type namespaces: list
         """
-        for contrib in self.site().usercontribs(user=self.username,
+        for contrib in self.site.usercontribs(user=self.username,
                                         namespaces=namespaces, total=total):
             ts = pywikibot.Timestamp.fromISOformat(contrib['timestamp'])
             ts = int(ts.strftime("%Y%m%d%H%M%S"))
-            yield Page(Link(contrib['title'], self.site(),
+            yield Page(Link(contrib['title'], self.site,
                             defaultNamespace=contrib['ns'])), \
                   contrib['revid'], ts, contrib['comment']
 
@@ -1990,7 +1991,7 @@ class User(Page):
         @param total: limit result to this number of pages
         @type total: int
         """
-        for item in self.site().logevents(logtype='upload', user=self.username,
+        for item in self.site.logevents(logtype='upload', user=self.username,
                                                                 total=total):
             yield item.title(), str(item.timestamp()), item.comment(), False
 
@@ -2361,7 +2362,7 @@ not supported by PyWikiBot!"""
         """
 
         link = Link.__new__(Link)
-        link._site = page.site()
+        link._site = page.site
         link._section = page.section()
         link._namespace = page.namespace()
         link._title = page.title(withNamespace=False,

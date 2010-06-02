@@ -343,7 +343,7 @@ def sorted_by_last_name(catlink, pagelink):
 
         '''
         page_name = pagelink.title()
-        site = pagelink.site()
+        site = pagelink.site
         # regular expression that matches a name followed by a space and
         # disambiguation brackets. Group 1 is the name without the rest.
         bracketsR = re.compile('(.*) \(.+?\)')

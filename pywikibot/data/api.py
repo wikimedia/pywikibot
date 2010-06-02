@@ -820,7 +820,7 @@ def update_page(page, pagedict):
         page._catinfo = pagedict["categoryinfo"]
 
     if "templates" in pagedict:
-        page._templates = [ pywikibot.Page(page.site(), tl['title'])
+        page._templates = [ pywikibot.Page(page.site, tl['title'])
                                 for tl in pagedict['templates'] ]
 
     if "langlinks" in pagedict:
@@ -828,7 +828,7 @@ def update_page(page, pagedict):
         for ll in pagedict["langlinks"]:
             link = pywikibot.Link.langlinkUnsafe(ll['lang'],
                                                  ll['*'],
-                                                 source=page.site())
+                                                 source=page.site)
             links.append(link)
         page._langlinks = links
 

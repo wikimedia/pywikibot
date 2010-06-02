@@ -708,8 +708,8 @@ def DuplicateFilterPageGenerator(generator):
     seenPages = {}
     for page in generator:
         if page not in seenPages:
-            _page = u"%s:%s:%s" % (page.site().family.name,
-                                   page.site().code,
+            _page = u"%s:%s:%s" % (page.site.family.name,
+                                   page.site.code,
                                    page.title())
             seenPages[_page] = True
             yield page
@@ -760,7 +760,7 @@ def PreloadingGenerator(generator, step=50):
     sites = {}
     # build a list of pages for each site found in the iterator
     for page in generator:
-        site = page.site()
+        site = page.site
         sites.setdefault(site, []).append(page)
         if len(sites[site]) >= step:
             group = sites[site]
@@ -789,7 +789,7 @@ def UnusedFilesGenerator(number=100, repeat=False, site=None, extension=None):
         site = pywikibot.Site()
     for page in site.unusedfiles(number=number, repeat=repeat,
                                  extension=extension):
-        yield pywikibot.ImagePage(page.site(), page.title())
+        yield pywikibot.ImagePage(page.site, page.title())
 
 def WithoutInterwikiPageGenerator(number=100, repeat=False, site=None):
     if site is None:
@@ -1007,7 +1007,7 @@ class GoogleSearchPageGenerator:
                 title = url[len(base):]
                 page = pywikibot.Page(pywikibot.Link(title, self.site))
                 # Google contains links in the format http://de.wikipedia.org/wiki/en:Foobar
-                if page.site() == self.site:
+                if page.site == self.site:
                     yield page
 
 def MySQLPageGenerator(query, site = None):

@@ -515,16 +515,16 @@ class RedirectRobot:
                         try:
                             redir_page.delete(reason, prompt = False)
                         except pywikibot.NoUsername:
-                            if targetPage.site().lang in sd_template \
-                                    and targetPage.site().lang in reason_broken:
+                            if targetPage.site.lang in sd_template \
+                                    and targetPage.site.lang in reason_broken:
                                 pywikibot.output(
             u"No sysop in user-config.py, put page to speedy deletion.")
                                 content = redir_page.get(get_redirect=True)
                                 content = pywikibot.translate(
-                                    targetPage.site().lang,
+                                    targetPage.site.lang,
                                     sd_template)+"\n"+content
                                 summary = pywikibot.translate(
-                                    targetPage.site().lang,
+                                    targetPage.site.lang,
                                     reason_broken)
                                 redir_page.put(content, summary)
 
@@ -555,7 +555,7 @@ class RedirectRobot:
             newRedir = redir
             redirList = []  # bookkeeping to detect loops
             while True:
-                redirList.append(u'%s:%s' % (newRedir.site().lang,
+                redirList.append(u'%s:%s' % (newRedir.site.lang,
                                              newRedir.title(withSection=False)))
                 try:
                     targetPage = newRedir.getRedirectTarget()
@@ -604,11 +604,11 @@ class RedirectRobot:
                     pywikibot.output(
                         u'   Links to: %s.'
                         % targetPage.title(asLink=True))
-                    if targetPage.site().sitename() == 'wikipedia:en' \
+                    if targetPage.site.sitename() == 'wikipedia:en' \
                        and targetPage.title() == 'Target page name':
                         pywikibot.output(u"Skipping: Redirect source is vandalized.")
                         break
-                    if targetPage.site() != self.site:
+                    if targetPage.site != self.site:
                         pywikibot.output(
                             u'Warning: redirect target (%s) is on a different site.'
                             % (targetPage.title(asLink=True)))
@@ -616,7 +616,7 @@ class RedirectRobot:
                             break  # skip if automatic
                     # watch out for redirect loops
                     if redirList.count(u'%s:%s'
-                                       % (targetPage.site().lang,
+                                       % (targetPage.site.lang,
                                           targetPage.title(withSection=False))
                                       ) > 0:
                         pywikibot.output(
@@ -627,17 +627,17 @@ class RedirectRobot:
                             content = targetPage.get(get_redirect=True)
                         except pywikibot.SectionError:
                             content = pywikibot.Page(
-                                          targetPage.site(),
+                                          targetPage.site,
                                           targetPage.title(withSection=False)
                                       ).get(get_redirect=True)
-                        if targetPage.site().lang in sd_template \
-                                and targetPage.site().lang in sd_tagging_sum:
+                        if targetPage.site.lang in sd_template \
+                                and targetPage.site.lang in sd_tagging_sum:
                             pywikibot.output(u"Tagging redirect for deletion")
                             # Delete the two redirects
                             content = pywikibot.translate(
-                                        targetPage.site().lang,
+                                        targetPage.site.lang,
                                         sd_template)+"\n"+content
-                            summ = pywikibot.translate(targetPage.site().lang,
+                            summ = pywikibot.translate(targetPage.site.lang,
                                                        sd_tagging_sum)
                             targetPage.put(content, summ)
                             redir.put(content, summ)

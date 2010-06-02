@@ -445,10 +445,11 @@ def firstcap(string):
     return string[0].upper()+string[1:]
 
 def correctcap(link, text):
-    # If text links to a page with title link uncapitalized, uncapitalize link, otherwise capitalize it
+    # If text links to a page with title link uncapitalized, uncapitalize link,
+    # otherwise capitalize it
     linkupper = link.title()
     linklower = linkupper[0].lower() + linkupper[1:]
-    if text.find("[[%s]]"%linklower) > -1 or text.find("[[%s|"%linklower) > -1:
+    if "[[%s]]"%linklower in text or "[[%s|"%linklower in text:
         return linklower
     else:
         return linkupper
@@ -468,11 +469,11 @@ class ReferringPageGeneratorWithIgnore:
                                               withTemplateInclusion=False)]
         pywikibot.output(u"Found %d references." % len(refs))
         # Remove ignorables
-        if self.disambPage.site().family.name in ignore_title \
-                and self.disambPage.site().lang \
-                    in ignore_title[self.disambPage.site().family.name]:
-            for ig in ignore_title[self.disambPage.site().family.name
-                                   ][self.disambPage.site().lang]:
+        if self.disambPage.site.family.name in ignore_title \
+                and self.disambPage.site.lang \
+                    in ignore_title[self.disambPage.site.family.name]:
+            for ig in ignore_title[self.disambPage.site.family.name
+                                   ][self.disambPage.site.lang]:
                 for i in range(len(refs)-1, -1, -1):
                     if re.match(ig, refs[i].title()):
                         pywikibot.log(u'Ignoring page %s'
@@ -711,11 +712,11 @@ class DisambiguationRobot(object):
                 curpos = m.start() + 1
                 try:
                     foundlink = pywikibot.Link(m.group('title'),
-                                               disambPage.site())
+                                               disambPage.site)
                 except pywikibot.Error:
                     continue
                 # ignore interwiki links
-                if foundlink.site != disambPage.site():
+                if foundlink.site != disambPage.site:
                     continue
                 # check whether the link found is to disambPage
                 try:
@@ -884,7 +885,7 @@ u"Choice out of range. Please select a number between 0 and %i."
                         continue
                     new_page_title = self.alternatives[choice]
                     repPl = pywikibot.Page(pywikibot.Link(new_page_title,
-                                                          disambPage.site()))
+                                                          disambPage.site))
                     if (new_page_title[0].isupper()
                             or link_text[0].isupper()):
                         new_page_title = repPl.title()
@@ -937,14 +938,14 @@ u"Choice out of range. Please select a number between 0 and %i."
 
     def findAlternatives(self, disambPage):
         if disambPage.isRedirectPage() and not self.primary:
-            if (disambPage.site().lang in self.primary_redir_template
-                    and self.primary_redir_template[disambPage.site().lang]
+            if (disambPage.site.lang in self.primary_redir_template
+                    and self.primary_redir_template[disambPage.site.lang]
                         in disambPage.templates(get_redirect = True)):
                 baseTerm = disambPage.title()
                 for template in disambPage.templatesWithParams(
                                                        get_redirect=True):
                     if template[0] == self.primary_redir_template[
-                                           disambPage.site().lang] \
+                                           disambPage.site.lang] \
                             and len(template[1]) > 0:
                         baseTerm = template[1][1]
                 disambTitle = primary_topic_format[self.mylang] % baseTerm

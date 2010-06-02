@@ -68,7 +68,7 @@ class TestPageGenerator(unittest.TestCase):
         self.assertEqual(len(results), 4)
         for page in results:
             self.assertEqual(type(page), pywikibot.Page)
-            self.assertEqual(page.site(), mysite)
+            self.assertEqual(page.site, mysite)
             self.assert_(page.title() in titles)
 
 
