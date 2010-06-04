@@ -15,7 +15,14 @@ The following parameters are supported:
 All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
 """
+#
+# (C) Pywikipedia bot team, 2006-2010
+#
+# Distributed under the terms of the MIT license.
+#
 __version__ = '$Id$'
+#
+
 import pywikibot
 from pywikibot import pagegenerators
 
@@ -71,10 +78,12 @@ class BasicBot:
             # Load the page
             text = page.get()
         except pywikibot.NoPage:
-            pywikibot.output(u"Page %s does not exist; skipping." % page.title(asLink=True))
+            pywikibot.output(u"Page %s does not exist; skipping."
+                             % page.title(asLink=True))
             return
         except pywikibot.IsRedirectPage:
-            pywikibot.output(u"Page %s is a redirect; skipping." % page.title(asLink=True))
+            pywikibot.output(u"Page %s is a redirect; skipping."
+                             % page.title(asLink=True))
             return
 
         ################################################################
@@ -89,7 +98,8 @@ class BasicBot:
         if text != page.get():
             # Show the title of the page we're working on.
             # Highlight the title in purple.
-            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<" % page.title())
+            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
+                             % page.title())
             # show what was changed
             pywikibot.showDiff(page.get(), text)
             if not self.dry:
