@@ -202,11 +202,13 @@ dn_template = {
 
 # Summary message when adding Disambiguation Needed template
 msg_dn = {
+    'ar' : u'توضيح بمساعدة روبوت: %s - التعليم كمحتاجة لانتباه خبير',
     'en' : u'Robot-assisted disambiguation: %s - Marked as needing expert attention',
     }
 
 # Summary message when adding Disambiguation Needed template to a redirect link
 msg_redir_dn = {
+    'ar' : u'توضيح بمساعدة روبوت: %s - التعليم كمحتاجة لانتباه خبير',
     'en' : u'Robot-assisted disambiguation: %s - Marked as needing expert attention',
     }
 
