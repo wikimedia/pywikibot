@@ -2184,7 +2184,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             usernames = u"|".join(usernames)
         usgen = api.ListGenerator(
                         "users", ususers=usernames, site=self,
-                        usprop="blockinfo|groups|editcount|registration")
+                        usprop="blockinfo|groups|editcount|registration|emailable")
         return usgen
 
     def randompages(self, step=None, total=1, namespaces=None,
