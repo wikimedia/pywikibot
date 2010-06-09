@@ -1089,7 +1089,11 @@ class Subject(object):
             return False
         if globalvar.nobackonly:
             if page == self.originPage:
-                pywikibot.output(u"%s has a backlink from %s."%(page,linkingPage))
+                try:
+                    pywikibot.output(u"%s has a backlink from %s."
+                                     % (page, linkingPage))
+                except UnicodeDecodeError:
+                    pywikibot.output(u"Found a backlink for a page.")
                 self.makeForcedStop(counter)
                 return False
 
@@ -1738,9 +1742,6 @@ class Subject(object):
             pywikibot.output(u"Not editing %s: page does not exist" % page)
             raise SaveError(u'Page doesn\'t exist')
 
-        # Show a message in purple.
-        pywikibot.output(u"\03{lightpurple}Updating links on page %s.\03{default}" % page)
-
         # clone original newPages dictionary, so that we can modify it to the local page's needs
         new = dict(newPages)
 
@@ -1755,7 +1756,6 @@ class Subject(object):
 
             try:
                 if (new[ignorepage.site] == ignorepage) and (ignorepage.site != page.site):
-                    
                     if (ignorepage not in interwikis):
                         pywikibot.output(u"Ignoring link to %(to)s for %(from)s" % {'to': ignorepage, 'from': page})
                         new.pop(ignorepage.site)
@@ -1794,8 +1794,14 @@ class Subject(object):
             mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite = page.site)
 
         if not mods:
-            pywikibot.output(u'No changes needed' )
+            if not globalvar.quiet:
+                pywikibot.output(u'No changes needed on page %s'
+                                 % page.title(asLink=True,
+                                              forceInterwiki=True))
             return False
+
+        # Show a message in purple.
+        pywikibot.output(u"\03{lightpurple}Updating links on page %s.\03{default}" % page)
 
         pywikibot.output(u"Changes to be made: %s" % mods)
         oldtext = page.get()
