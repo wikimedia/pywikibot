@@ -1758,38 +1758,60 @@ class Category(Page):
         return sorted(list(set(self.categories())))
 
 
+ip_regexp = re.compile(r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}' \
+                       r'(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+
 class User(Page):
     """A class that represents a Wiki user.
     """
 
     @deprecate_arg("insite", None)
     def __init__(self, source, title=u''):
-        """All parameters are the same as for Page() constructor.
+        """Initializer for a User object.
+        All parameters are the same as for Page() constructor.
         """
         if len(title) > 1 and title[0] == u'#':
-            self.is_autoblock = True
+            self._isAutoblock = True
             title = title[1:]
         else:
-            self.is_autoblock = False
+            self._isAutoblock = False
         Page.__init__(self, source, title, ns=2)
         if self.namespace() != 2:
             raise ValueError(u"'%s' is not in the user namespace!"
                              % title)
-        if self.is_autoblock:
+        if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
             # an autoblock.
-            pywikibot.output("This is an autoblock ID, "
-                            "you can only use to unblock it.")
+            pywikibot.output(
+                "This is an autoblock ID, you can only use to unblock it.")
+
+    def name(self):
+        return self.username
 
     @property
     def username(self):
         """ Convenience method that returns the title of the page with
         namespace prefix omitted, aka the username, as a Unicode string.
         """
-        if self.is_autoblock:
+        if self._isAutoblock:
             return u'#' + self.title(withNamespace=False)
         else:
             return self.title(withNamespace=False)
+
+    def isRegistered(self, force=False):
+        """ Return True if a user with this name is registered on this site,
+        False otherwise.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        """
+        if self.isAnonymous():
+            return False
+        else:
+            return self.getprops(force).get('missing') is None
+
+    def isAnonymous(self):
+        return ip_regexp.match(self.username) is not None
 
     def getprops(self, force=False):
         """ Return a Dictionnary that contains user's properties. Use cached
@@ -1801,37 +1823,41 @@ class User(Page):
         if force:
             del self._userprops
         if not hasattr(self, '_userprops'):
-            usrequest = pywikibot.data.api.Request(
-                            site=self.site,
-                            action='query',
-                            list='users',
-                            usprop='blockinfo|groups|editcount|registration|emailable',
-                            ususers=self.username,
-                            )
-            usdata = usrequest.submit()
-            assert 'query' in usdata, \
-                   "API users response lacks 'query' key"
-            assert 'users' in usdata['query'], \
-                   "API users response lacks 'users' key"
-            if u'missing' in usdata['query']['users'][0] or \
-                                    u'invalid' in usdata['query']['users'][0]:
-                raise pywikibot.Error(u'No such user or invaild username (%s)'\
-                                                            % self.username)
-            self._userprops = usdata['query']['users'][0]
+            self._userprops = list(self.site.users([self.username,]))[0]
+            if self.isAnonymous():
+                r = list(self.site.blocks(users=self.username))
+                if r:
+                    self._userprops['blockedby'] = r[0]['by']
+                    self._userprops['blockreason'] = r[0]['reason']
         return self._userprops
 
+    @deprecated('User.registration()')
     def registrationTime(self, force=False):
-        """ Return registration time for this user, as a Unicode string in
-        ISO8601 format, or None if the date is unknown.
+        """ Return registration date for this user, as a long in
+        Mediawiki's internal timestamp format, or 0 if the date is unknown.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
         """
-        if 'registration' in self.getprops(force):
-            return self.getprops()['registration']
+        if self.registration():
+            return long(self.registration().strftime('%Y%m%d%H%M%S'))
+        else:
+            return 0
+
+    def registration(self, force=False):
+        """ Return registration date for this user as a pywikibot.Timestamp
+        object, or None if the date is unknown.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        """
+        reg = self.getprops(force).get('registration')
+        if reg:
+            return pywikibot.Timestamp.fromISOformat(reg)
 
     def editCount(self, force=False):
-        """ Return edit count for this user as int.
+        """ Return edit count for this user as int. This is always 0 for
+        'anonymous' users.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
@@ -1878,7 +1904,7 @@ class User(Page):
                             page title (optional)
         @type subpage: unicode
         """
-        if self.is_autoblock:
+        if self._isAutoblock:
             #This user is probably being queried for purpose of lifting
             #an autoblock, so has no user pages per se.
             raise AutoblockUser("This is an autoblock ID, you can only use to unblock it.")
@@ -1894,7 +1920,7 @@ class User(Page):
                             talk page title (optional)
         @type subpage: unicode
         """
-        if self.is_autoblock:
+        if self._isAutoblock:
             #This user is probably being queried for purpose of lifting
             #an autoblock, so has no user talk pages per se.
             raise AutoblockUser("This is an autoblock ID, you can only use to unblock it.")
@@ -1962,8 +1988,8 @@ class User(Page):
     @deprecate_arg("limit", "total") # To be consistent with rest of framework
     @deprecate_arg("namespace", "namespaces")
     def contributions(self, total=500, namespaces=[]):
-        """ Yield tuples describing this user edits.
-        Each tuple is composed of a pywikibot.Page object,
+        """ Yield tuples describing this user edits with an upper bound of
+        'limit'. Each tuple is composed of a pywikibot.Page object,
         the revision id (int), the edit timestamp (as int in mediawiki's
         internal format), and the comment (unicode).
         Pages returned are not guaranteed to be unique.
@@ -1977,23 +2003,25 @@ class User(Page):
                                         namespaces=namespaces, total=total):
             ts = pywikibot.Timestamp.fromISOformat(contrib['timestamp'])
             ts = int(ts.strftime("%Y%m%d%H%M%S"))
-            yield Page(Link(contrib['title'], self.site,
-                            defaultNamespace=contrib['ns'])), \
+            yield Page(self.site, contrib['title'], contrib['ns']), \
                   contrib['revid'], ts, contrib['comment']
 
     @deprecate_arg("number", "total")
     def uploadedImages(self, total=10):
         """ Yield tuples describing files uploaded by this user.
         Each tuple is composed of a pywikibot.Page, the timestamp (str in
-        ISO8601 format), comment (unicode) and a bool (always False...).
+        ISO8601 format), comment (unicode) and a bool for pageid > 0.
         Pages returned are not guaranteed to be unique.
 
         @param total: limit result to this number of pages
         @type total: int
         """
+        if not self.isRegistered():
+            raise StopIteration
         for item in self.site.logevents(logtype='upload', user=self.username,
                                                                 total=total):
-            yield item.title(), str(item.timestamp()), item.comment(), False
+            yield ImagePage(self.site, item.title().title()), \
+                  unicode(item.timestamp()), item.comment(), item.pageid() > 0
 
 class Revision(object):
     """A structure holding information about a single revision of a Page."""
