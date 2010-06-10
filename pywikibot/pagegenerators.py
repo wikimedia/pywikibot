@@ -70,8 +70,8 @@ parameterHelp = u"""\
 -search           Work on all pages that are found in a MediaWiki search
                   across all namespaces.
 
--namespace -ns    Filter the page generator to only yield pages in the
-                  specified namespaces.  Separate multiple namespace
+-namespace        Filter the page generator to only yield pages in the
+-ns               specified namespaces.  Separate multiple namespace
                   numbers with commas. Example "-ns:0,2,4"
 
 -interwiki        Work on the given page and all equivalent pages in other
@@ -160,18 +160,21 @@ docuReplacements = {'&params;': parameterHelp}
 
 
 class GeneratorFactory(object):
-    """Process command line arguments and return appropriate page generator."""
+    """Process command line arguments and return appropriate page generator.
+    This factory is responsible for processing command line arguments
+    that are used by many scripts and that determine which pages to work on.
+    """
     def __init__(self):
         self.gens = []
         self.namespaces = []
         self.step = None
         self.limit = None
 
+
     def getCombinedGenerator(self):
         """Return the combination of all accumulated generators.
 
         Only call this after all arguments have been parsed.
-
         """
         namespaces = [int(n) for n in self.namespaces]
         for i in xrange(len(self.gens)):
@@ -443,7 +446,7 @@ class GeneratorFactory(object):
             return False
 
 
-def AllpagesPageGenerator(start ='!', namespace=0, includeredirects=True,
+def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
                           site=None, step=None, total=None):
     """
     Iterate Page objects for all titles in a single namespace.
@@ -487,17 +490,22 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
                          filterredir=filterredir, step=step, total=total)
 
 @deprecate_arg("number", "total")
+@deprecate_arg("namespace", "namespaces")
+@deprecate_arg("repeat", None)
 def NewpagesPageGenerator(get_redirect=False, repeat=False, site=None,
-                          step=None, total=None):
+                          namespaces=[0,], step=None, total=None):
+    """
+    Iterate Page objects for all new titles in a single namespace.
+    """
     # API does not (yet) have a newpages function, so this tries to duplicate
     # it by filtering the recentchanges output
     # defaults to namespace 0 because that's how Special:Newpages defaults
     if site is None:
         site = pywikibot.Site()
     for item in site.recentchanges(showRedirects=get_redirect,
-                     changetype="new", namespaces=0, step=step, total=total):
+                                   changetype="new", namespaces=namespaces,
+                                   step=step, total=total):
         yield pywikibot.Page(pywikibot.Link(item["title"], site))
-
 
 def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                namespaces=None, pagelist=None,
@@ -538,7 +546,6 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                    showPatrolled=showPatrolled,
                                    step=step, total=total):
         yield pywikibot.Page(pywikibot.Link(item["title"], site))
-
 
 def FileLinksGenerator(referredImagePage, step=None, total=None):
     return referredImagePage.usingPages(step=step, total=total)
@@ -589,7 +596,6 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
         if start is None or a.title(withNamespace=False) >= start:
             yield a
 
-
 def SubCategoriesPageGenerator(category, recurse=False, start=None,
                                step=None, total=None):
     '''
@@ -607,7 +613,6 @@ def SubCategoriesPageGenerator(category, recurse=False, start=None,
         if start is None or s.title(withNamespace=False) >= start:
             yield s
 
-
 def LinkedPageGenerator(linkingPage, step=None, total=None):
     """Yields all pages linked from a specific page."""
     return linkingPage.linkedPages(step=step, total=total)
@@ -620,7 +625,7 @@ def TextfilePageGenerator(filename=None, site=None):
     generator will yield each corresponding Page object.
 
     @param filename: the name of the file that should be read. If no name is
-        given, the generator prompts the user.
+                     given, the generator prompts the user.
     @param site: the default Site for which Page objects should be created
 
     """
@@ -797,7 +802,7 @@ def WithoutInterwikiPageGenerator(number=100, repeat=False, site=None):
     for page in site.withoutinterwiki(number=number, repeat=repeat):
         yield page
 
-def UnCategorizedCategoryGenerator(number = 100, repeat = False, site = None):
+def UnCategorizedCategoryGenerator(number=100, repeat=False, site=None):
     if site is None:
         site = pywikibot.Site()
     for page in site.uncategorizedcategories(number=number, repeat=repeat):
@@ -809,7 +814,7 @@ def UnCategorizedImageGenerator(number = 100, repeat = False, site = None):
     for page in site.uncategorizedimages(number=number, repeat=repeat):
         yield page
 
-def UnCategorizedPageGenerator(number = 100, repeat = False, site = None):
+def UnCategorizedPageGenerator(number=100, repeat=False, site=None):
     if site is None:
         site = pywikibot.Site()
     for page in site.uncategorizedpages(number=number, repeat=repeat):
