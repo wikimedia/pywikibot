@@ -16,15 +16,15 @@ class Family(family.Family):
             'ml', 'ja', 'ku', 'ar', 'es', 'ro', 'et', 'id', 'te', 'gl', 'bg',
             'uk', 'ca', 'li', 'vo', 'fa', 'is', 'scn', 'sr', 'af', 'cs', 'th',
             'simple', 'fy', 'sw', 'oc', 'br', 'hr', 'he', 'sl', 'hy', 'sq',
-            'tt', 'la', 'zh-min-nan', 'da', 'wa', 'ne', 'tk', 'mg', 'ast', 'ur',
-            'hsb', 'my', 'kk', 'ky', 'eo', 'lv', 'wo', 'ang', 'ka', 'co', 'hi',
-            'cy', 'ga', 'gn', 'az', 'ia', 'eu', 'sk', 'ms', 'csb', 'st', 'tl',
+            'la', 'tt', 'zh-min-nan', 'da', 'mg', 'wa', 'ne', 'tk', 'ast', 'my',
+            'ur', 'hsb', 'kk', 'ky', 'eo', 'lv', 'wo', 'ang', 'ka', 'co', 'cy',
+            'hi', 'ga', 'gn', 'az', 'ia', 'eu', 'sk', 'ms', 'csb', 'st', 'tl',
             'mr', 'nds', 'kl', 'be', 'sd', 'ug', 'ps', 'ti', 'mk', 'sh', 'an',
-            'bn', 'gu', 'km', 'ss', 'ts', 'qu', 'bs', 'fo', 'am', 'rw', 'chr',
-            'su', 'om', 'mn', 'nah', 'yi', 'ie', 'iu', 'mt', 'kw', 'gv', 'si',
+            'bn', 'gu', 'km', 'ss', 'qu', 'ts', 'bs', 'fo', 'am', 'rw', 'chr',
+            'su', 'om', 'mn', 'nah', 'iu', 'yi', 'ie', 'mt', 'gv', 'kw', 'si',
             'gd', 'tg', 'nn', 'zu', 'dv', 'tpi', 'pa', 'sg', 'roa-rup', 'jv',
-            'uz', 'so', 'mi', 'ik', 'ha', 'ay', 'lb', 'sa', 'na', 'jbo', 'tn',
-            'sm', 'ks', 'fj', 'ln', 'za', 'dz', 'als',
+            'uz', 'ik', 'so', 'mi', 'ha', 'ay', 'lb', 'sa', 'na', 'jbo', 'tn',
+            'ln', 'sm', 'za', 'ks', 'fj', 'dz', 'als',
         ]
 
         for lang in self.languages_by_size:
