@@ -13,14 +13,6 @@ class Family(family.Family):
         self.langs = {
             'en': 'www.locksmithwiki.com',
         }
-        self.namespaces[4] = {
-            '_default': [u'Locksmith Wiki Knowledge Base',
-                self.namespaces[4]['_default']], # REQUIRED
-        }
-        self.namespaces[4] = {
-            '_default': [u'Locksmith Wiki Knowledge Base talk',
-                self.namespaces[5]['_default']], # REQUIRED
-        }
 
     def scriptpath(self, code):
         return '/lockwiki'
