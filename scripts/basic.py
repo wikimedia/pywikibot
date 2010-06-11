@@ -74,16 +74,8 @@ class BasicBot:
         """
         Loads the given page, does some changes, and saves it.
         """
-        try:
-            # Load the page
-            text = page.get()
-        except pywikibot.NoPage:
-            pywikibot.output(u"Page %s does not exist; skipping."
-                             % page.title(asLink=True))
-            return
-        except pywikibot.IsRedirectPage:
-            pywikibot.output(u"Page %s is a redirect; skipping."
-                             % page.title(asLink=True))
+        text = self.load(page)
+        if not text:
             return
 
         ################################################################
@@ -94,6 +86,27 @@ class BasicBot:
         # Example: This puts the text 'Test' at the beginning of the page.
         text = 'Test ' + text
 
+        if not self.save(text, page, self.summary):
+            pywikibot.output(u'Page %s not saved.' % page.aslink())
+
+    def load(self, page):
+        """
+        Loads the given page, does some changes, and saves it.
+        """
+        try:
+            # Load the page
+            text = page.get()
+        except pywikibot.NoPage:
+            pywikibot.output(u"Page %s does not exist; skipping."
+                             %  page.title(asLink=True))
+        except pywikibot.IsRedirectPage:
+            pywikibot.output(u"Page %s is a redirect; skipping."
+                             %  page.title(asLink=True))
+        else:
+            return text
+        return None
+
+    def save(self, text, page, comment):
         # only save if something was changed
         if text != page.get():
             # Show the title of the page we're working on.
@@ -102,20 +115,28 @@ class BasicBot:
                              % page.title())
             # show what was changed
             pywikibot.showDiff(page.get(), text)
+            pywikibot.output(u'Comment: %s' %comment)
             if not self.dry:
-                choice = pywikibot.inputChoice(u'Do you want to accept these changes?', ['Yes', 'No'], ['y', 'N'], 'N')
+                choice = pywikibot.inputChoice(
+                             u'Do you want to accept these changes?',
+                             ['Yes', 'No'], ['y', 'N'], 'N')
                 if choice == 'y':
                     try:
                         page.text = text
                         # Save the page
                         page.save(comment=self.summary)
                     except pywikibot.LockedPage:
-                        pywikibot.output(u"Page %s is locked; skipping." % page.title(asLink=True))
+                        pywikibot.output(u"Page %s is locked; skipping."
+                                         % page.title(asLink=True))
                     except pywikibot.EditConflict:
-                        pywikibot.output(u'Skipping %s because of edit conflict' % (page.title()))
+                        pywikibot.output(u'Skipping %s because of edit conflict'
+                                         % (page.title()))
                     except pywikibot.SpamfilterError, error:
-                        pywikibot.output(u'Cannot change %s because of spam blacklist entry %s' % (page.title(), error.url))
-
+                        pywikibot.output(u'Cannot change %s because of spam blacklist entry %s'
+                                         % (page.title(), error.url))
+                    else:
+                        return True
+        return False
 
 def main():
     # This factory is responsible for processing command line arguments
