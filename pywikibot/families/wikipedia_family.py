@@ -32,10 +32,10 @@ class Family(family.Family):
             'ln', 'cbk-zam', 'krc', 'nv', 'ky', 'mhr', 'ext', 'ty', 'arc',
             'jbo', 'wo', 'so', 'eml', 'kab', 'tpi', 'pap', 'zea', 'srn', 'ay',
             'ba', 'or', 'ig', 'dsb', 'kl', 'ce', 'udm', 'kg', 'lo', 'rmy', 'cu',
-            'ab', 'pcd', 'mwl', 'kaa', 'sm', 'av', 'ks', 'tet', 'mdf', 'got',
+            'ab', 'pcd', 'mwl', 'kaa', 'sm', 'av', 'ks', 'mdf', 'tet', 'got',
             'sd', 'na', 'bm', 'pnt', 'pih', 'iu', 'cdo', 'as', 'bug', 'ee',
-            'chr', 'bi', 'om', 'zu', 'za', 'ti', 'ts', 'ss', 've', 'ha', 'dz',
-            'sg', 'ch', 'bxr', 'cr', 'xh', 'ak', 'ik', 'lbe', 'ki', 'tn', 'rw',
+            'chr', 'bi', 'om', 'zu', 'za', 'ti', 'ts', 'ss', 've', 'ha', 'sg',
+            'dz', 'ch', 'bxr', 'cr', 'xh', 'ak', 'ik', 'lbe', 'ki', 'tn', 'rw',
             'st', 'tw', 'ny', 'sn', 'chy', 'ff', 'lg', 'rn', 'tum',
         ]
 
