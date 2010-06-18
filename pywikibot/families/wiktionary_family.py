@@ -17,14 +17,14 @@ class Family(family.Family):
             'uk', 'ca', 'li', 'vo', 'fa', 'is', 'scn', 'sr', 'af', 'cs', 'th',
             'simple', 'fy', 'sw', 'oc', 'br', 'hr', 'he', 'sl', 'hy', 'sq',
             'la', 'tt', 'zh-min-nan', 'da', 'mg', 'wa', 'ne', 'tk', 'ast', 'my',
-            'ur', 'hsb', 'kk', 'ky', 'eo', 'lv', 'wo', 'ang', 'cy', 'ka', 'co',
+            'ur', 'hsb', 'kk', 'ky', 'eo', 'lv', 'wo', 'cy', 'ang', 'ka', 'co',
             'hi', 'ga', 'gn', 'az', 'ia', 'eu', 'sk', 'csb', 'ms', 'st', 'tl',
             'mr', 'nds', 'kl', 'be', 'sd', 'ug', 'ps', 'ti', 'mk', 'sh', 'an',
             'bn', 'gu', 'km', 'ss', 'qu', 'ts', 'bs', 'fo', 'am', 'rw', 'chr',
             'su', 'om', 'mn', 'iu', 'nah', 'yi', 'ie', 'mt', 'gv', 'kw', 'si',
             'gd', 'tg', 'nn', 'zu', 'dv', 'tpi', 'pa', 'sg', 'roa-rup', 'jv',
-            'so', 'uz', 'ik', 'mi', 'ha', 'ln', 'ay', 'lb', 'sa', 'na', 'jbo',
-            'za', 'tn', 'sm', 'fj', 'ks', 'dz', 'als',
+            'so', 'uz', 'ik', 'mi', 'ha', 'ln', 'ay', 'lb', 'sa', 'na', 'za',
+            'jbo', 'tn', 'sm', 'fj', 'ks', 'dz', 'als',
         ]
 
         for lang in self.languages_by_size:
