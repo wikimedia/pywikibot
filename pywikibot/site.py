@@ -1299,7 +1299,8 @@ class APISite(BaseSite):
         if onlyTemplateInclusion:
             return self.page_embeddedin(page, namespaces=namespaces,
                                         filterRedirects=filterRedirects,
-                                        step=step, total=total)        if not withTemplateInclusion:
+                                        step=step, total=total)
+        if not withTemplateInclusion:
             return self.pagebacklinks(page, followRedirects=followRedirects,
                                       filterRedirects=filterRedirects,                                      namespaces=namespaces,
                                       step=step, total=total)
@@ -1352,7 +1353,6 @@ class APISite(BaseSite):
     def pageimages(self, page, step=None, total=None):
         """Iterate images used (not just linked) on the page."""
 
-        @param content: if True, load the current content of each iterated page            (default False); note that this means the content of the image            description page, not the image itself        """        imtitle = page.title(withSection=False).encode(self.encoding())
         imgen = self._generator(api.ImagePageGenerator, type_arg="images",
                                 titles=imtitle, step=step, total=total)
         return imgen
