@@ -143,8 +143,12 @@ class BaseSite(object):
 
     @property
     def code(self):
-        """The identifying code for this Site."""
+        """The identifying code for this Site.
 
+        By convention, this is usually an ISO language code, but it does
+        not have to be.
+
+        """
         return self.__code
 
     @property
@@ -194,7 +198,7 @@ class BaseSite(object):
                                  % (self.__class__.__name__, attr)  )
 
     def sitename(self):
-        """Return string representing this Site's name and language."""
+        """Return string representing this Site's name and code."""
 
         return self.family.name+':'+self.code
 
@@ -270,10 +274,12 @@ class BaseSite(object):
 
     def pagenamecodes(self, default=True):
         """Return list of localized PAGENAME tags for the site."""
+
         return [u"PAGENAME"]
 
     def pagename2codes(self, default=True):
         """Return list of localized PAGENAMEE tags for the site."""
+
         return [u"PAGENAMEE"]
 
     def lock_page(self, page, block=True):
@@ -330,14 +336,14 @@ class BaseSite(object):
         """
         return pywikibot.Link(title, self).astext(othersite)
 
-    def isInterwikiLink(self, s):
-        """Return True if s is in the form of an interwiki link.
+    def isInterwikiLink(self, text):
+        """Return True if text is in the form of an interwiki link.
 
-        If a link object constructed using "s" as the link text parses as
+        If a link object constructed using "text" as the link text parses as
         belonging to a different site, this method returns True.
 
         """
-        linkfam, linkcode = pywikibot.Link(s, self).parse_site()
+        linkfam, linkcode = pywikibot.Link(text, self).parse_site()
         return (linkfam != self.family.name or linkcode != self.code)
 
     def redirectRegex(self, pattern=None):
@@ -413,6 +419,7 @@ class BaseSite(object):
 
     def nice_get_address(self, title):
         """Return shorter URL path to retrieve page titled 'title'."""
+
         return self.family.nice_get_address(self.lang, title)
 
     # deprecated methods for backwards-compatibility
@@ -420,6 +427,7 @@ class BaseSite(object):
     @deprecated("family attribute")
     def fam(self):
         """Return Family object for this Site."""
+
         return self.family
 
     @deprecated("urllib.urlencode()")
@@ -629,14 +637,6 @@ class APISite(BaseSite):
         #               1 means logged in as sysop
         self._loginstatus = -3
         return
-
-    # ANYTHING BELOW THIS POINT IS NOT YET IMPLEMENTED IN __init__()
-        # Calculating valid languages took quite long, so we calculate it once
-        # in initialization instead of each time it is used.
-        self._validlanguages = []
-        for language in self.languages():
-            if not language[:1].upper() + language[1:] in self.namespaces():
-                self._validlanguages.append(language)
 
     def _generator(self, gen_class, type_arg=None, namespaces=None,
                    step=None, total=None, **args):
@@ -1048,16 +1048,15 @@ class APISite(BaseSite):
         @param history: if true, return the image's version history
 
         """
-        title = page.title(withSection=False)
+        args = {"title": page.title(withSection=False)}
+        if history:
+            args["iilimit"] = "max"
         query = self._generator(api.PropertyGenerator,
                                 type_arg="imageinfo",
-                                titles=title.encode(self.encoding()),
                                 iiprop=["timestamp", "user", "comment",
                                         "url", "size", "sha1", "mime",
-                                        "metadata", "archivename"]
-                               )
-        if history:
-            query.request["iilimit"] = "max"
+                                        "metadata", "archivename"],
+                                **args)
         for pageitem in query:
             if pageitem['title'] != title:
                 raise Error(
@@ -1220,7 +1219,7 @@ class APISite(BaseSite):
     # following group of methods map more-or-less directly to API queries
 
     def pagebacklinks(self, page, followRedirects=False, filterRedirects=None,
-                      namespaces=None, step=None, total=None):
+                      namespaces=None, step=None, total=None, content=False):
         """Iterate all pages that link to the given page.
 
         @param page: The Page to get links to.
@@ -1233,15 +1232,18 @@ class APISite(BaseSite):
             in this list.
         @param step: Limit on number of pages to retrieve per API query.
         @param total: Maximum number of pages to retrieve in total.
+        @param content: if True, load the current content of each iterated page
+            (default False)
 
         """
         bltitle = page.title(withSection=False).encode(self.encoding())
-        blgen = self._generator(api.PageGenerator, type_arg="backlinks",
-                                gbltitle=bltitle, namespaces=namespaces,
-                                step=step, total=total)
+        blargs = {"gbltitle": bltitle}
         if filterRedirects is not None:
-            blgen.request["gblfilterredir"] = filterRedirects and "redirects"\
-                                                              or "nonredirects"
+            blargs["gblfilterredir"] = filterRedirects and "redirects" \
+                                                        or "nonredirects"
+        blgen = self._generator(api.PageGenerator, type_arg="backlinks",
+                                namespaces=namespaces, step=step, total=total,
+                                g_content=content, **blargs)
         if followRedirects:
             # bug: see http://bugzilla.wikimedia.org/show_bug.cgi?id=7304
             # links identified by MediaWiki as redirects may not really be,
@@ -1265,13 +1267,14 @@ class APISite(BaseSite):
                     genlist[redir.title()] = self.pagebacklinks(
                                                 redir, followRedirects=True,
                                                 filterRedirects=filterRedirects,
-                                                namespaces=namespaces)
+                                                namespaces=namespaces,
+                                                content=content)
             import itertools
             return itertools.chain(*genlist.values())
         return blgen
 
     def page_embeddedin(self, page, filterRedirects=None, namespaces=None,
-                        step=None, total=None):
+                        step=None, total=None, content=False):
         """Iterate all pages that embedded the given page as a template.
 
         @param page: The Page to get inclusions for.
@@ -1280,93 +1283,121 @@ class APISite(BaseSite):
             None, return both (no filtering).
         @param namespaces: If present, only return links from the namespaces
             in this list.
+        @param content: if True, load the current content of each iterated page
+            (default False)
 
         """
-        eititle = page.title(withSection=False).encode(self.encoding())
-        eigen = self._generator(api.PageGenerator, type_arg="embeddedin",
-                                geititle=eititle, namespaces=namespaces,
-                                step=step, total=total)
+        eiargs = {"geititle":
+                page.title(withSection=False).encode(self.encoding())}
         if filterRedirects is not None:
-            eigen.request["geifilterredir"] = filterRedirects and "redirects"\
-                                                              or "nonredirects"
+            eiargs["geifilterredir"] = filterRedirects and "redirects"\
+                                                        or "nonredirects"
+        eigen = self._generator(api.PageGenerator, type_arg="embeddedin",
+                                namespaces=namespaces, step=step, total=total,
+                                g_content=content, **eiargs)
         return eigen
 
     def pagereferences(self, page, followRedirects=False, filterRedirects=None,
                        withTemplateInclusion=True, onlyTemplateInclusion=False,
-                       namespaces=None, step=None, total=None):
+                       namespaces=None, step=None, total=None, content=False):
         """Convenience method combining pagebacklinks and page_embeddedin."""
 
         if onlyTemplateInclusion:
             return self.page_embeddedin(page, namespaces=namespaces,
                                         filterRedirects=filterRedirects,
-                                        step=step, total=total)
+                                        step=step, total=total, content=content)
         if not withTemplateInclusion:
             return self.pagebacklinks(page, followRedirects=followRedirects,
-                                      filterRedirects=filterRedirects,                                      namespaces=namespaces,
-                                      step=step, total=total)
+                                      filterRedirects=filterRedirects,
+                                      namespaces=namespaces,
+                                      step=step, total=total, content=content)
         import itertools
         return itertools.islice(
                     itertools.chain(
                         self.pagebacklinks(
                             page, followRedirects, filterRedirects,
-                            namespaces=namespaces, step=step),
+                            namespaces=namespaces, step=step, content=content),
                         self.page_embeddedin(
                             page, filterRedirects, namespaces=namespaces,
-                            step=step)
+                            step=step, content=content)
                         ),
                     total)
 
     def pagelinks(self, page, namespaces=None, follow_redirects=False,
-                  step=None, total=None):
+                  step=None, total=None, content=False):
         """Iterate internal wikilinks contained (or transcluded) on page.
 
         @param namespaces: Only iterate pages in these namespaces (default: all)
         @type namespaces: list of ints
         @param follow_redirects: if True, yields the target of any redirects,
             rather than the redirect page
+        @param content: if True, load the current content of each iterated page
+            (default False)
 
         """
-        plgen = self._generator(api.PageGenerator, type_arg="links",
-                                namespaces=namespaces, step=step, total=total)
+        plargs = {}
         if hasattr(page, "_pageid"):
-            plgen.request['pageids'] = str(page._pageid)
+            plargs['pageids'] = str(page._pageid)
         else:
             pltitle = page.title(withSection=False).encode(self.encoding())
-            plgen.request['titles'] = pltitle
+            plargs['titles'] = pltitle
         if follow_redirects:
-            plgen.request['redirects'] = ''
+            plargs['redirects'] = ''
+        plgen = self._generator(api.PageGenerator, type_arg="links",
+                                namespaces=namespaces, step=step, total=total,
+                                g_content=content, **plargs)
         return plgen
 
     @deprecate_arg("withSortKey", None) # Sortkey doesn't work with generator
-    def pagecategories(self, page, step=None, total=None):
-        """Iterate categories to which page belongs."""
+    def pagecategories(self, page, step=None, total=None, content=False):
+        """Iterate categories to which page belongs.
 
-        clgen = self._generator(api.CategoryPageGenerator,
-                                type_arg="categories", step=step, total=total)
+        @param content: if True, load the current content of each iterated page
+            (default False); note that this means the contents of the
+            category description page, not the pages contained in the category
+
+        """
+        clargs = {}
         if hasattr(page, "_pageid"):
-            clgen.request['pageids'] = str(page._pageid)
+            clargs['pageids'] = str(page._pageid)
         else:
-            cltitle = page.title(withSection=False).encode(self.encoding())
-            clgen.request['titles'] = cltitle
+            clargs['titles'] = page.title(withSection=False
+                                         ).encode(self.encoding())
+        clgen = self._generator(api.CategoryPageGenerator,
+                                type_arg="categories", step=step, total=total,
+                                g_content=content, **clargs)
         return clgen
 
-    def pageimages(self, page, step=None, total=None):
-        """Iterate images used (not just linked) on the page."""
+    def pageimages(self, page, step=None, total=None, content=False):
+        """Iterate images used (not just linked) on the page.
 
+        @param content: if True, load the current content of each iterated page
+            (default False); note that this means the content of the image
+            description page, not the image itself
+
+        """
+        imtitle = page.title(withSection=False).encode(self.encoding())
         imgen = self._generator(api.ImagePageGenerator, type_arg="images",
-                                titles=imtitle, step=step, total=total)
+                                titles=imtitle, step=step, total=total,
+                                g_content=content)
         return imgen
 
-    def pagetemplates(self, page, namespaces=None, step=None, total=None):
-        """Iterate templates transcluded (not just linked) on the page."""
+    def pagetemplates(self, page, namespaces=None, step=None, total=None,
+                      content=False):
+        """Iterate templates transcluded (not just linked) on the page.
 
+        @param content: if True, load the current content of each iterated page
+            (default False)
+
+        """
         tltitle = page.title(withSection=False).encode(self.encoding())
         tlgen = self._generator(api.PageGenerator, type_arg="templates",
                                 titles=tltitle, namespaces=namespaces,
-                                step=step, total=total)
+                                step=step, total=total, g_content=content)
         return tlgen
 
-    def categorymembers(self, category, namespaces=None, step=None, total=None):
+    def categorymembers(self, category, namespaces=None, step=None, total=None,
+                        content=False):
         """Iterate members of specified category.
 
         @param category: The Category to iterate.
@@ -1376,6 +1407,8 @@ class APISite(BaseSite):
             however, that the iterated values are always Page objects, even
             if in the Category or Image namespace.
         @type namespaces: list of ints
+        @param content: if True, load the current content of each iterated page
+            (default False)
 
         """
         if category.namespace() != 14:
@@ -1387,9 +1420,10 @@ class APISite(BaseSite):
                                 type_arg="categorymembers",
                                 gcmtitle=cmtitle,
                                 gcmprop="ids|title|sortkey",
-#                                namespaces=namespaces,
+#                                namespaces=namespaces, # see note below
                                 step=step,
-                                total=total)
+                                total=total,
+                                g_content=content)
 #       workaround for https://bugzilla.wikimedia.org/show_bug.cgi?id=19640:
         if namespaces:
             if not isinstance(namespaces, list):
@@ -1587,7 +1621,7 @@ class APISite(BaseSite):
     def allpages(self, start="!", prefix="", namespace=0, filterredir=None,
                  filterlanglinks=None, minsize=None, maxsize=None,
                  protect_type=None, protect_level=None, reverse=False,
-                 includeredirects=None, step=None, total=None):
+                 includeredirects=None, step=None, total=None, content=False):
         """Iterate pages in a single namespace.
 
         Note: parameters includeRedirects and throttle are deprecated and
@@ -1614,6 +1648,8 @@ class APISite(BaseSite):
         @param reverse: if True, iterate in reverse Unicode lexigraphic
             order (default: iterate in forward order)
         @param includeredirects: DEPRECATED, use filterredirs instead
+        @param content: if True, load the current content of each iterated page
+            (default False)
 
         """
         if not isinstance(namespace, int):
@@ -1632,7 +1668,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
 
         apgen = self._generator(api.PageGenerator, type_arg="allpages",
                                 gapnamespace=str(namespace),
-                                gapfrom=start, step=step, total=total)
+                                gapfrom=start, step=step, total=total,
+                                g_content=content)
         if prefix:
             apgen.request["gapprefix"] = prefix
         if filterredir is not None:
@@ -1705,7 +1742,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             yield p
 
     def allcategories(self, start="!", prefix="", step=None, total=None,
-                      reverse=False):
+                      reverse=False, content=False):
         """Iterate categories used (which need not have a Category page).
 
         Iterator yields Category objects. Note that, in practice, links that
@@ -1716,11 +1753,14 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         @param prefix: Only yield categories starting with this string.
         @param reverse: if True, iterate in reverse Unicode lexigraphic
             order (default: iterate in forward order)
+        @param content: if True, load the current content of each iterated page
+            (default False); note that this means the contents of the category
+            description page, not the pages that are members of the category
 
         """
         acgen = self._generator(api.CategoryPageGenerator,
                                 type_arg="allcategories", gacfrom=start,
-                                step=step, total=total)
+                                step=step, total=total, g_content=content)
         if prefix:
             acgen.request["gacprefix"] = prefix
         if reverse:
@@ -1763,7 +1803,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
 
     def allimages(self, start="!", prefix="", minsize=None, maxsize=None,
                   reverse=False, sha1=None, sha1base36=None, step=None,
-                  total=None):
+                  total=None, content=False):
         """Iterate all images, ordered by image title.
 
         Yields ImagePages, but these pages need not exist on the wiki.
@@ -1776,11 +1816,14 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         @param sha1: only iterate image (it is theoretically possible there
             could be more than one) with this sha1 hash
         @param sha1base36: same as sha1 but in base 36
+        @param content: if True, load the current content of each iterated page
+            (default False); note that this means the content of the image
+            description page, not the image itself
 
         """
         aigen = self._generator(api.ImagePageGenerator,
                                 type_arg="allimages", gaifrom=start,
-                                step=step, total=total)
+                                step=step, total=total, g_content=content)
         if prefix:
             aigen.request["gaiprefix"] = prefix
         if isinstance(minsize, int):
@@ -1837,7 +1880,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         return bkgen
 
     def exturlusage(self, url, protocol="http", namespaces=None,
-                    step=None, total=None):
+                    step=None, total=None, content=False):
         """Iterate Pages that contain links to the given URL.
 
         @param url: The URL to search for (without the protocol prefix);
@@ -1849,11 +1892,11 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         eugen = self._generator(api.PageGenerator, type_arg="exturlusage",
                                 geuquery=url, geuprotocol=protocol,
                                 namespaces=namespaces, step=step,
-                                total=total)
+                                total=total, g_content=content)
         return eugen
 
     def imageusage(self, image, namespaces=None, filterredir=None,
-                   step=None, total=None):
+                   step=None, total=None, content=False):
         """Iterate Pages that contain links to the given ImagePage.
 
         @param image: the image to search for (ImagePage need not exist on
@@ -1861,6 +1904,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         @type image: ImagePage
         @param filterredir: if True, only yield redirects; if False (and not
             None), only yield non-redirects (default: yield both)
+        @param content: if True, load the current content of each iterated page
+            (default False)
 
         """
         iuargs = dict(giutitle=image.title(withSection=False))
@@ -1869,7 +1914,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
                                                      or "nonredirects")
         iugen = self._generator(api.PageGenerator, type_arg="imageusage",
                                 namespaces=namespaces, step=step,
-                                total=total, **iuargs)
+                                total=total, g_content=content, **iuargs)
         return iugen
 
     def logevents(self, logtype=None, user=None, page=None,
@@ -1984,7 +2029,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
 
     @deprecate_arg("number", "limit")
     def search(self, searchstring, namespaces=None, where="text",
-               getredirects=False, step=None, total=None):
+               getredirects=False, step=None, total=None, content=False):
         """Iterate Pages that contain the searchstring.
 
         Note that this may include non-existing Pages if the wiki's database
@@ -1997,6 +2042,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         @param namespaces: search only in these namespaces (defaults to 0)
         @type namespaces: list of ints
         @param getredirects: if True, include redirects in results
+        @param content: if True, load the current content of each iterated page
+            (default False)
 
         """
         if not searchstring:
@@ -2009,7 +2056,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         srgen = self._generator(api.PageGenerator, type_arg="search",
                                 gsrsearch=searchstring, gsrwhat=where,
                                 namespaces=namespaces, step=step,
-                                total=total)
+                                total=total, g_content=content)
         if getredirects:
             srgen.request["gsrredirects"] = ""
         return srgen
@@ -2188,7 +2235,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         return usgen
 
     def randompages(self, step=None, total=1, namespaces=None,
-                    redirects=False):
+                    redirects=False, content=False):
         """Iterate a number of random pages.
 
         Pages are listed in a fixed sequence, only the starting point is
@@ -2198,10 +2245,13 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         @param namespaces: only iterate pages in these namespaces.
         @param redirects: if True, include only redirect pages in results
             (default: include only non-redirects)
+        @param content: if True, load the current content of each iterated page
+            (default False)
 
         """
         rngen = self._generator(api.PageGenerator, type_arg="random",
-                                namespaces=namespaces, step=step, total=total)
+                                namespaces=namespaces, step=step, total=total,
+                                g_content=content)
         if redirects:
             rngen.request["grnredirect"] = ""
         return rngen

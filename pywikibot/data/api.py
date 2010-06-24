@@ -409,12 +409,13 @@ class QueryGenerator(object):
             if name not in _modules:
                 self.get_module()
                 break
+        self.request = Request(**kwargs)
         self.prefix = None
         self.update_limit() # sets self.prefix
-        if self.query_limit is not None and "generator" in kwargs:
+        if self.api_limit is not None and "generator" in kwargs:
             self.prefix = "g" + self.prefix
-        self.request = Request(**kwargs)
         self.limit = None
+        self.query_limit = self.api_limit
         if "generator" in kwargs:
             self.resultkey = "pages"        # name of the "query" subelement key
         else:                               # to look for when iterating
@@ -448,8 +449,10 @@ class QueryGenerator(object):
         limit = int(value)
         # don't update if limit is greater than maximum allowed by API
         self.update_limit()
-        if self.query_limit is None or limit < self.query_limit:
-            self.query_limit = int(limit)
+        if self.api_limit is None:
+            self.query_limit = limit
+        else:
+            self.query_limit = min(self.api_limit, limit)
 
     def set_maximum_items(self, value):
         """Set the maximum number of items to be retrieved from the wiki.
@@ -466,23 +469,23 @@ class QueryGenerator(object):
         self.limit = int(value)
 
     def update_limit(self):
-        """Set query_limit for self.module based on api response"""
+        """Set query limit for self.module based on api response"""
 
-        self.query_limit = None
+        self.api_limit = None
         for mod in self.module.split('|'):
             for param in _modules[mod].get("parameters", []):
                 if param["name"] == "limit":
                     if (self.site.logged_in()
                             and "apihighlimits" in
                                 self.site.getuserinfo()["rights"]):
-                        self.query_limit = int(param["highmax"])
+                        self.api_limit = int(param["highmax"])
                     else:
-                        self.query_limit = int(param["max"])
+                        self.api_limit = int(param["max"])
                     if self.prefix is None:
                         self.prefix = _modules[mod]["prefix"]
                     pywikibot.debug(u"%s: Set query_limit to %i."
                                       % (self.__class__.__name__,
-                                         self.query_limit),
+                                         self.api_limit),
                                     _logger)
                     return
 
@@ -517,6 +520,13 @@ class QueryGenerator(object):
                     new_limit = min(self.query_limit, self.limit - count)
                 else:
                     new_limit = None
+                if "rvprop" in self.request \
+                        and "content" in self.request["rvprop"]:
+                    # queries that retrieve page content have lower limits
+                    # Note: although API allows up to 500 pages for content
+                    #   queries, these sometimes result in server-side errors
+                    #   so use 250 as a safer limit
+                    new_limit = min(new_limit, self.api_limit // 10, 250)
                 if new_limit is not None:
                     self.request[self.prefix+"limit"] = str(new_limit)
             try:
@@ -596,30 +606,39 @@ class PageGenerator(QueryGenerator):
     this class iterate Page objects.
 
     """
-    def __init__(self, generator, **kwargs):
+    def __init__(self, generator, g_content=False, **kwargs):
         """
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and generator is required.
 
         @param generator: the "generator=" type from api.php
         @type generator: str
+        @param g_content: if True, retrieve the contents of the current
+            version of each Page (default False)
 
         """
-        QueryGenerator.__init__(self, generator=generator, **kwargs)
         # get some basic information about every page generated
-        if 'prop' in self.request:
-            self.request['prop'] += "|info|imageinfo|categoryinfo"
+        if 'prop' in kwargs:
+            kwargs['prop'] += "|info|imageinfo|categoryinfo"
         else:
-            self.request['prop'] = 'info|imageinfo|categoryinfo'
-        if "inprop" in self.request:
-            if "protection" not in self.request["inprop"]:
-                self.request["inprop"] += "|protection"
+            kwargs['prop'] = 'info|imageinfo|categoryinfo'
+        if g_content:
+            # retrieve the current revision
+            kwargs['prop'] += "|revisions"
+            if "rvprop" in kwargs:
+                kwargs["rvprop"] += "ids|timestamp|flags|comment|user|content"
+            else:
+                kwargs["rvprop"] = "ids|timestamp|flags|comment|user|content"
+        if "inprop" in kwargs:
+            if "protection" not in kwargs["inprop"]:
+                kwargs["inprop"] += "|protection"
         else:
-            self.request['inprop'] = 'protection'
-        if "iiprop" in self.request:
-            self.request["iiprop"] += 'timestamp|user|comment|url|size|sha1|metadata'
+            kwargs['inprop'] = 'protection'
+        if "iiprop" in kwargs:
+            kwargs["iiprop"] += 'timestamp|user|comment|url|size|sha1|metadata'
         else:
-            self.request['iiprop'] = 'timestamp|user|comment|url|size|sha1|metadata'
+            kwargs['iiprop'] = 'timestamp|user|comment|url|size|sha1|metadata'
+        QueryGenerator.__init__(self, generator=generator, **kwargs)
         self.resultkey = "pages" # element to look for in result
 
     def result(self, pagedata):

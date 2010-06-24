@@ -199,7 +199,7 @@ class GeneratorFactory(object):
             gensList = CombinedPageGenerator(self.gens)
         return DuplicateFilterPageGenerator(gensList)
 
-    def getCategoryGen(self, arg, length, recurse = False):
+    def getCategoryGen(self, arg, length, recurse=False, content=False):
         if len(arg) == length:
             categoryname = pywikibot.input(u'Please enter the category name:')
         else:
@@ -215,9 +215,10 @@ class GeneratorFactory(object):
                                                 defaultNamespace=14))
         # Link constructor automatically prepends localized namespace
         # if not included in user's input
-        return CategorizedPageGenerator(cat, start=startfrom, recurse=recurse)
+        return CategorizedPageGenerator(cat,
+               start=startfrom, recurse=recurse, content=content)
 
-    def setSubCategoriesGen(self, arg, length, recurse=False):
+    def setSubCategoriesGen(self, arg, length, recurse=False, content=False):
         if len(arg) == length:
             categoryname = pywikibot.input(u'Please enter the category name:')
         else:
@@ -232,7 +233,8 @@ class GeneratorFactory(object):
 
         cat = pywikibot.Category(pywikibot.Link(categoryname,
                                                 defaultNamespace=14))
-        return SubCategoriesPageGenerator(cat, start=startfrom, recurse=recurse)
+        return SubCategoriesPageGenerator(cat,
+               start=startfrom, recurse=recurse, content=content)
 
     def handleArg(self, arg):
         """Parse one argument at a time.
@@ -447,7 +449,7 @@ class GeneratorFactory(object):
 
 
 def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
-                          site=None, step=None, total=None):
+                          site=None, step=None, total=None, content=False):
     """
     Iterate Page objects for all titles in a single namespace.
 
@@ -456,6 +458,7 @@ def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
 
     @param step: Maximum number of pages to retrieve per API query
     @param total: Maxmum number of pages to retrieve in total
+    @param content: If True, load current version of each page (default False)
 
     """
     if site is None:
@@ -468,11 +471,12 @@ def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
     else:
         filterredir = False
     return site.allpages(start=start, namespace=namespace,
-                         filterredir=filterredir, step=step, total=total)
+                         filterredir=filterredir, step=step, total=total,
+                         content=content)
 
 
 def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
-                           site=None, step=None, total=None):
+                           site=None, step=None, total=None, content=False):
     if site is None:
         site = pywikibot.Site()
     prefixlink = pywikibot.Link(prefix, site)
@@ -487,7 +491,9 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
     else:
         filterredir = False
     return site.allpages(prefix=title, namespace=namespace,
-                         filterredir=filterredir, step=step, total=total)
+                         filterredir=filterredir, step=step, total=total,
+                         content=content)
+
 
 @deprecate_arg("number", "total")
 @deprecate_arg("namespace", "namespaces")
@@ -506,6 +512,7 @@ def NewpagesPageGenerator(get_redirect=False, repeat=False, site=None,
                                    changetype="new", namespaces=namespaces,
                                    step=step, total=total):
         yield pywikibot.Page(pywikibot.Link(item["title"], site))
+
 
 def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                namespaces=None, pagelist=None,
@@ -547,12 +554,13 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                    step=step, total=total):
         yield pywikibot.Page(pywikibot.Link(item["title"], site))
 
-def FileLinksGenerator(referredImagePage, step=None, total=None):
-    return referredImagePage.usingPages(step=step, total=total)
+
+def FileLinksGenerator(referredImagePage, step=None, total=None, content=False):
+    return referredImagePage.usingPages(step=step, total=total, content=content)
 
 
-def ImagesPageGenerator(pageWithImages, step=None, total=None):
-    return pageWithImages.imagelinks(step=step, total=total)
+def ImagesPageGenerator(pageWithImages, step=None, total=None, content=False):
+    return pageWithImages.imagelinks(step=step, total=total, content=content)
 
 
 def InterwikiPageGenerator(page):
@@ -570,52 +578,64 @@ def LanguageLinksPageGenerator(page, step=None, total=None):
 def ReferringPageGenerator(referredPage, followRedirects=False,
                            withTemplateInclusion=True,
                            onlyTemplateInclusion=False,
-                           step=None, total=None):
+                           step=None, total=None, content=False):
     '''Yields all pages referring to a specific page.'''
     return referredPage.getReferences(
                 follow_redirects=followRedirects,
                 withTemplateInclusion=withTemplateInclusion,
                 onlyTemplateInclusion=onlyTemplateInclusion,
-                step=step, total=total)
+                step=step, total=total, content=content)
 
 
 def CategorizedPageGenerator(category, recurse=False, start=None,
-                             step=None, total=None):
-    '''
-    Yields all pages in a specific category.
+                             step=None, total=None, content=False):
+    """Yield all pages in a specific category.
 
     If recurse is True, pages in subcategories are included as well; if
     recurse is an int, only subcategories to that depth will be included
     (e.g., recurse=2 will get pages in subcats and sub-subcats, but will
     not go any further).
+
     If start is a string value, only pages whose sortkey comes after start
     alphabetically are included.
-    '''
+
+    If content is True (default is False), the current page text of each
+    retrieved page will be downloaded.
+
+    """
     # TODO: page generator could be modified to use cmstartsortkey ...
-    for a in category.articles(recurse=recurse, step=step, total=total):
+    for a in category.articles(
+                      recurse=recurse, step=step, total=total, content=content):
         if start is None or a.title(withNamespace=False) >= start:
             yield a
 
+
 def SubCategoriesPageGenerator(category, recurse=False, start=None,
-                               step=None, total=None):
-    '''
-    Yields all subcategories in a specific category.
+                               step=None, total=None, content=False):
+    """Yield all subcategories in a specific category.
 
     If recurse is True, pages in subcategories are included as well; if
     recurse is an int, only subcategories to that depth will be included
     (e.g., recurse=2 will get pages in subcats and sub-subcats, but will
     not go any further).
+
     If start is a string value, only categories whose sortkey comes after
     start alphabetically are included.
-    '''
+
+    If content is True (default is False), the current page text of each
+    category description page will be downloaded.
+
+    """
     # TODO: page generator could be modified to use cmstartsortkey ...
-    for s in category.subcategories(recurse=recurse, step=step, total=total):
+    for s in category.subcategories(
+                      recurse=recurse, step=step, total=total, content=content):
         if start is None or s.title(withNamespace=False) >= start:
             yield s
 
-def LinkedPageGenerator(linkingPage, step=None, total=None):
-    """Yields all pages linked from a specific page."""
-    return linkingPage.linkedPages(step=step, total=total)
+
+def LinkedPageGenerator(linkingPage, step=None, total=None, content=False):
+    """Yield all pages linked from a specific page."""
+    return linkingPage.linkedPages(step=step, total=total, content=content)
 
 
 def TextfilePageGenerator(filename=None, site=None):
@@ -642,6 +662,7 @@ def TextfilePageGenerator(filename=None, site=None):
         # inadvertently change pages on another wiki!
         yield pywikibot.Page(pywikibot.Link(linkmatch.groups("title"), site))
     f.close()
+
 
 def PagesFromTitlesGenerator(iterable, site=None):
     """Generate pages from the titles (unicode strings) yielded by iterable."""
@@ -744,10 +765,11 @@ def CategoryGenerator(generator):
 
 
 def PageWithTalkPageGenerator(generator):
-    """
-    Wraps around another generator. Yields the same pages, but for non-talk
-    pages, it also includes associated talk pages.
-    This generator does not check if the talk page in fact exists.
+    """Yield pages and associated talk pages from another generator.
+
+    Only yields talk pages if the original generator yields a non-talk page,
+    and does not check if the talk page in fact exists.
+
     """
     for page in generator:
         yield page
