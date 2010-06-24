@@ -56,6 +56,7 @@ class CategoryRedirectBot(object):
                 'ja': "Category:移行中のカテゴリ",
                 'no': "Kategori:Wikipedia omdirigertekategorier",
                 'pl': "Kategoria:Przekierowania kategorii",
+                'pt': "Categoria:!Redirecionamentos de categorias",
                 'simple': "Category:Category redirects",
                 'vi': u"Thể loại:Thể loại đổi hướng",
                 'zh': u"Category:已重定向的分类",
@@ -78,6 +79,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'ksh': u"Bot: Sigk uß en ömjeleidt Saachjropp eruß jesammdt.",
             'no': u"Robot: Flytter sider ut av omdirigeringskategori",
             'pl': u"Robot: Usuwa strony z przekierowanej kategorii",
+            'pt': u"Bot: movendo páginas de redirecionamentos de categorias",
             'commons': u'Robot: Changing category link (following [[Template:Category redirect|category redirect]])',
             'vi': u"Robot: bỏ trang ra khỏi thể loại đổi hướng",
             'zh': u'机器人：改变已重定向分类中的页面的分类',
@@ -94,6 +96,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'ksh':u"Bot: Ömleidungsschalbon dobeijedonn.",
             'no':u"Robot: Legger til vedlikeholdsmal for kategoriomdirigering",
             'pl':u"Robot: Dodaje szablon przekierowanej kategorii",
+            'pt':u"Bot: adicionando a predefinição de redirecionamento de categoria",
             'vi':u"Robot: thêm bản mẫu đổi hướng thể loại để dễ bảo trì",
             'zh':u"机器人: 增加分类重定向模板，用于维护",
         }
@@ -110,6 +113,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'no': u"Robot: Ordner doble omdirigeringer",
             'ksh': u"Bot: dubbel Ömleidung eruß jemaat.",
             'pl': u"Robot: Poprawia podwójne przekierowanie",
+            'pt': u"Bot: Corrigindo redirecionamento duplo",
             'vi': u"Robot: sửa thể loại đổi hướng kép",
             'zh': u"Bot: 修复双重重定向",
         }
@@ -126,6 +130,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'no': u"Bot for vedlikehold av kategoriomdirigeringer",
             'ksh': u"Bot för de Saachjroppe ier Ömleidunge.",
             'pl': u"Robot porządkujący przekierowania kategorii",
+            'pt': u"Bot de manutenção de categorias de redirecionamento",
             'vi': u"Robot theo dõi thể loại đổi hướng",
             'zh': u"分类重定向维护机器人",
         }
@@ -155,6 +160,13 @@ poprawy kategorii:
 %s
 ~~~~
 """,
+            'pt': u"""\
+As seguintes páginas protegidas foram detectadas como carecendo de actualizações de \
+ligações de categorias:
+%s
+~~~~
+""",
+
             'vi': u"""\
 Các trang đã khóa sau cần phải cập nhật \
 liên kết thể loại:
@@ -177,6 +189,7 @@ liên kết thể loại:
                 'fr': u"* %s est dans %s, qui est une redirection vers %s",
                 'ksh': u"* %s es en %s, un dat es en Ömleidung op %s",
                 'pl': u"* %s jest w %s, która jest przekierowaniem do %s",
+                'pt': u"* %s está em %s, que redireciona para %s",
                 'vi': u"* %s đang thuộc %s, là thể loại đổi hướng đến %s",
             })
 
