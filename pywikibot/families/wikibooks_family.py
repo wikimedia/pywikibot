@@ -14,11 +14,11 @@ class Family(family.Family):
             'en', 'de', 'fr', 'ja', 'pt', 'hu', 'nl', 'es', 'pl', 'it', 'he',
             'sq', 'fi', 'ru', 'vi', 'cs', 'hr', 'ca', 'zh', 'sv', 'da', 'ko',
             'tr', 'th', 'mk', 'fa', 'sr', 'tl', 'ar', 'id', 'gl', 'is', 'no',
-            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'si', 'la', 'ia',
-            'ang', 'cv', 'uk', 'sl', 'et', 'mr', 'ur', 'az', 'ml', 'oc', 'ms',
-            'eu', 'hi', 'fy', 'ie', 'af', 'tg', 'bn', 'hy', 'pa', 'bs', 'sa',
-            'te', 'ky', 'be', 'ast', 'tt', 'zh-min-nan', 'cy', 'ne', 'mg', 'ku',
-            'co', 'sw', 'tk', 'als', 'su', 'uz', 'vo', 'na', 'mn', 'kk', 'nds',
+            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'si', 'la', 'ang',
+            'ia', 'cv', 'uk', 'sl', 'mr', 'et', 'ur', 'az', 'ml', 'oc', 'ms',
+            'eu', 'hi', 'fy', 'ie', 'af', 'tg', 'bn', 'hy', 'pa', 'te', 'bs',
+            'sa', 'ky', 'be', 'ast', 'tt', 'zh-min-nan', 'cy', 'mg', 'ne', 'ku',
+            'co', 'sw', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'mn', 'kk', 'nds',
             'zu', 'my',
         ]
 
