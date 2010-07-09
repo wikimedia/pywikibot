@@ -15,10 +15,10 @@ class Family(family.Family):
             'sq', 'fi', 'ru', 'vi', 'cs', 'hr', 'ca', 'zh', 'sv', 'da', 'ko',
             'tr', 'th', 'mk', 'fa', 'sr', 'tl', 'ar', 'id', 'gl', 'is', 'no',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'si', 'la', 'ang',
-            'ia', 'cv', 'uk', 'sl', 'mr', 'et', 'ur', 'az', 'ml', 'oc', 'ms',
-            'eu', 'hi', 'fy', 'ie', 'af', 'tg', 'bn', 'hy', 'pa', 'te', 'bs',
-            'sa', 'ky', 'be', 'ast', 'tt', 'zh-min-nan', 'cy', 'mg', 'ne', 'ku',
-            'co', 'sw', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'mn', 'kk', 'nds',
+            'ia', 'uk', 'cv', 'sl', 'mr', 'et', 'ur', 'az', 'ml', 'oc', 'ms',
+            'eu', 'hi', 'fy', 'ie', 'af', 'tg', 'bn', 'hy', 'pa', 'bs', 'te',
+            'sa', 'ky', 'be', 'ne', 'ast', 'tt', 'zh-min-nan', 'cy', 'mg', 'ku',
+            'co', 'sw', 'tk', 'als', 'su', 'vo', 'uz', 'na', 'mn', 'kk', 'nds',
             'zu', 'my',
         ]
 
