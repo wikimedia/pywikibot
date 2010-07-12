@@ -131,40 +131,41 @@ msg_add={
     }
 
 msg_change={
-    'ar':u'روبوت: تغيير %s',
-    'be-x-old':u'Робат: зьмена %s',
-    'ca':u'Robot: Canviant %s',
-    'cs':u'Robot změnil %s',
-    'da':u'Robot: Ændrer %s',
-    'de':u'Bot: Ändere %s',
-    'en':u'Robot: Changing %s',
-    'es':u'Bot: Cambiada %s',
-    'id':u'Bot: Mengganti %s',
-    'fa':u'ربات:تغییر %s',
-    'fi':u'Botti muutti luokan %s',
-    'fr':u'Robot : modifie [[%s]]',
-    'he':u'בוט: משנה %s',
-    'ia':u'Robot: Modification de %s',
-    'is':u'Vélmenni: Breyti flokknum [[%s]]',
-    'it':u'Bot: Modifico %s',
-    'lt':u'robotas: Keičiama %s',
-    'ja':u'ロボットによる: カテゴリ変更 [[%s]]→[[%s]]',
-    'kk':u'Бот: %s дегенді түзетті',
-    'ko': u'로봇: %s 수정',
-    'ksh':u'Bot: %s ußjewääßelt',
-    'nds':u'Kat-Bot: %s utwesselt',
-    'nds-nl':u'bot: wieziging %s',
-    'nl':u'Bot: wijziging %s',
-    'no':u'Robot: Endrer %s',
-    'nn':u'robot: endra %s',
-    'pt':u'Bot: Modificando [[%s]]',
-    'pl':u'Robot przenosi %s',
-    'ru':u'Робот: изменение %s',
-    'sk':u'Robot pridal [[Kategória:%s]]',
-    'sr':u'Бот: Измена категорије %s',
-    'sv':u'Robot: Ändrar %s',
-    'uk':u'Робот: змінено [[Категорія:%s]]',
-    'zh':u'機器人:變更目錄 [[%s]]→[[%s]]',
+    'ar':u'روبوت: تغيير %(oldcat)s',
+    'be-x-old':u'Робат: зьмена %(oldcat)s',
+    'ca':u'Robot: Canviant %(oldcat)s',
+    'cs':u'Robot změnil %(oldcat)s',
+    'da':u'Robot: Ændrer %(oldcat)s',
+    'de':u'Bot: Ändere %(oldcat)s',
+    'en':u'Robot: Changing %(oldcat)s',
+    'es':u'Bot: Cambiada %(oldcat)s',
+    'id':u'Bot: Mengganti %(oldcat)s',
+    'fa':u'ربات:تغییر %(oldcat)s',
+    'fi':u'Botti muutti luokan %(oldcat)s',
+    'fr':u'Robot : modifie [[%(oldcat)s]]',
+    'he':u'בוט: משנה %(oldcat)s',
+    'ia':u'Robot: Modification de %(oldcat)s',
+    'is':u'Vélmenni: Breyti flokknum [[%(oldcat)s]]',
+    'it':u'Bot: Modifico %(oldcat)s',
+    'lt':u'robotas: Keičiama %(oldcat)s',
+    'ja':u'ロボットによる: カテゴリ変更 [[%(oldcat)s]]→[[%(newcat)s]]',
+    'kk':u'Бот: %(oldcat)s дегенді түзетті',
+    'ko': u'로봇: %(oldcat)s 수정',
+    'ksh':u'Bot: %(oldcat)s ußjewääßelt',
+    'nds':u'Kat-Bot: %(oldcat)s utwesselt',
+    'nds-nl':u'bot: wieziging %(oldcat)s',
+    'nl':u'Bot: wijziging %(oldcat)s',
+    'no':u'Robot: Endrer %(oldcat)s',
+    'nn':u'robot: endra %(oldcat)s',
+    'pdc':u'Waddefresser: Abdeeling von %(oldcat)s nooch %(newcat)s geennert',
+    'pt':u'Bot: Modificando [[%(oldcat)s]]',
+    'pl':u'Robot przenosi %(oldcat)s',
+    'ru':u'Робот: изменение %(oldcat)s',
+    'sk':u'Robot pridal [[Kategória:%(oldcat)s]]',
+    'sr':u'Бот: Измена категорије %(oldcat)s',
+    'sv':u'Robot: Ändrar %(oldcat)s',
+    'uk':u'Робот: змінено [[Категорія:%(oldcat)s]]',
+    'zh':u'機器人:變更目錄 [[%(oldcat)s]]→[[%(newcat)s]]',
     }
 
 msg_created_for_renaming = {
@@ -193,7 +194,7 @@ deletion_reason_move = {
     'ca':u'Robot: La categoria s\'ha mogut a [[:Categoria:%s|%s]]',
     'cs':u'Kategorie přesunuta na [[:Kategorie:%s|%s]]',
     'da':u'Robot: Kategori flyttet til [[:Category:%s|%s]]',
-    'de':u'Bot: Kategorie wurde nach [[:Category:%s|%s]] verschoben',
+    'de':u'Bot: Kategorie wurde nach [[:Kategorie:%s|%s]] verschoben',
     'en':u'Robot: Category was moved to [[:Category:%s|%s]]',
     'es':u'Robot: La categoría ha sido movida a [[:Category:%s|%s]]',
     'fa':u'ربات:رده به رده  [[:رده:%s|%s]] منتقل شده‌است',
@@ -214,6 +215,7 @@ deletion_reason_move = {
     'nl':u'Bot: Categorie is hernoemd naar [[:Category:%s|%s]]',
     'no':u'Robot: Kategorien ble flyttet til [[:Category:%s|%s]]',
     'nn':u'robot: kategorien blei flytta til [[:Kategori:%s|%s]]',
+    'pdc':u'Waddefresser: Abdeeling iss gezoge warre nooch [[:Kategorie:%s|%s]].',
     'pt':u'Bot: Categoria [[:Category:%s|%s]] foi movida',
     'pl':u'Robot przenosi kategorię do [[:Category:%s|%s]]',
     'ru':u'Робот: категория переименована в [[:Категория:%s|%s]]',
@@ -447,7 +449,8 @@ class CategoryMoveRobot:
         # set edit summary message
         if not self.editSummary:
             self.editSummary = pywikibot.translate(site, msg_change) \
-                               % self.oldCat.title()
+                               % {'oldcat':self.oldCat.title(),
+                                  'newcat':newCat.title()}
 
     def run(self):
         site = pywikibot.getSite()
@@ -524,11 +527,13 @@ class CategoryListifyRobot:
         'ar':u'روبوت: عرض من %s (%d مدخلة)',
         'ca':u'Robot: Llistant de %s (%d entrades)',
         'en':u'Robot: Listifying from %s (%d entries)',
+        'fa':u'ربات:لیست کردن اعضای رده %s(%d عضو)',
         'fi':u'Botti listasi luokan %s (%d jäsentä)',
         'he':u'בוט: יוצר רשימה מהקטגוריה %s (%d דפים)',
         'kk':u'Бот: %s дегеннен (%d буын) тізімдеді',
         'nds-nl':u'Bot: lieste van %s (%d pagina\'s)',
         'nl':u'Bot: Lijst van %s (%d pagina\'s)',
+        'pl':u'Robot: listuje kategorię %s (%d stron)',
         'sv':u'Robot: Skapar en lista från %s (%d)',
         'pt':u'Bot: Listando de %s (%d entradas)',
         'zh':u'機器人: 從%s提取列表(%d個項目)',
@@ -593,26 +598,30 @@ class CategoryRemoveRobot:
         'nl':u'Bot: Categorie is opgeheven',
         'no':u'Robot: Kategorien ble oppløst',
         'nn':u'robot: kategorien blei løyst opp',
+        'pl':u'Robot: Kategoria została usunięta',
         'pt':u'Bot: Categoria foi unida',
         'ru':u'Робот: категория расформирована',
         'sv':u'Robot: Kategorin upplöstes',
+        'uk':u'Робот: категорія розформована',
         'zh':u'機器人:本目錄已解散',
     }
 
     msg_remove={
         'ar':u'روبوت: إزالة من %s',
-        'bat-smg':u'Robots: Trėnama ėš  %s',
-        'be-x-old':u'Робат: выключэньне з [[Катэгорыя:%s]]',
+        'bat-smg':u'Robots: Trėnama ėš %s',
+        'be-x-old':u'Робат: выключэньне з [[%s]]',
         'ca':u'Robot: Eliminant de %s',
         'da':u'Robot: Fjerner fra %s',
         'de':u'Bot: Entferne aus %s',
         'en':u'Robot: Removing from %s',
         'es':u'Bot: Eliminada de la %s',
+        'fa':u'ربات:حذف رده %s',
         'fi':u'Botti poisti luokasta %s',
         'fr':u'Robot : Retiré depuis %s',
         'he':u'בוט: מסיר את הדף מהקטגוריה %s',
         'ia':u'Robot: Eliminate de %s',
-        'is':u'Vélmenni: Fjarlægi [[Flokkur:%s]]',
+        'is':u'Vélmenni: Fjarlægi [[%s]]',
+        'ja':u'ロボットによる:[[%s]]を除去',
         'kk':u'Бот: %s дегеннен аластатты',
         'ksh':u'Bot: uß de %s ußjedraare',
         'lb': u'Bot: Ewech huele vun %s',
@@ -621,11 +630,13 @@ class CategoryRemoveRobot:
         'nl':u'Bot: Verwijderd uit %s',
         'no':u'Robot: Fjerner ifra %s',
         'nn':u'robot: fjerna ifrå %s',
-        'pt':u'Bot: Removendo [[Categoria:%s]]',
-        'ru':u'Робот: исключение из [[Категория:%s]]',
-        'sr':u'Бот: Уклањање из категорије [[Категорија:%s|%s]]',
+        'pl':u'Robot: Usuwa z kategorii %s',
+        'pt':u'Bot: Removendo [[%s]]',
+        'ru':u'Робот: исключение из %s',
+        'sr':u'Бот: Уклањање из категорије [[%s]]',
         'sv':u'Robot: Tar bort från %s',
-        'zh':u'機器人:移除目錄%s',
+        'uk':u'Робот: видалення з %s',
+        'zh':u'機器人:移除目錄 [[%s]]',
     }
 
     def __init__(self, catTitle, batchMode = False, editSummary = '', useSummaryForDeletion = True, titleRegex = None, inPlace = False):
@@ -694,7 +705,8 @@ class CategoryTidyRobot:
         self.catTitle = catTitle
         self.catDB = catDB
         self.site = pywikibot.getSite()
-        self.editSummary = pywikibot.translate(self.site, msg_change) % cat.title()
+        self.editSummary = pywikibot.translate(self.site, msg_change)\
+                           % {'oldcat':cat.title(), 'newcat':u''}
 
     def move_to_category(self, article, original_cat, current_cat):
         '''
@@ -860,6 +872,7 @@ class CategoryTreeRobot:
             'de': u'(auch in %s)',
             'en': u'(also in %s)',
             'es': u'(también en %s)',
+            'fa': u'(همچنین در %s)',
             'fi': u'(myös luokassa %s)',
             'fr': u'(également dans %s)',
             'he': u'(גם בקטגוריות %s)',
@@ -870,6 +883,7 @@ class CategoryTreeRobot:
             'nl': u'(ook in %s)',
             'no': u'(også i %s)',
             'nn': u'(òg i %s)',
+            'pl': u'(również w %s)',
             'pt': u'(também em %s)',
             'ru': u'(также в %s)',
             'sv': u'(också i %s)',
