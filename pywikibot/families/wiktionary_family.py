@@ -11,19 +11,19 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'fr', 'en', 'lt', 'tr', 'zh', 'ru', 'vi', 'io', 'pl', 'pt', 'fi',
+            'en', 'fr', 'lt', 'zh', 'tr', 'ru', 'vi', 'io', 'pl', 'pt', 'fi',
             'hu', 'el', 'no', 'ta', 'ko', 'de', 'sv', 'it', 'nl', 'kn', 'lo',
-            'ml', 'ja', 'ku', 'es', 'ar', 'et', 'ro', 'li', 'id', 'te', 'gl',
+            'ml', 'ja', 'es', 'ku', 'ar', 'li', 'et', 'ro', 'id', 'te', 'gl',
             'uk', 'bg', 'ca', 'vo', 'fa', 'is', 'scn', 'sr', 'af', 'cs',
-            'simple', 'th', 'fy', 'hr', 'oc', 'sw', 'br', 'mg', 'he', 'sq',
-            'sl', 'la', 'hy', 'tt', 'zh-min-nan', 'da', 'my', 'wa', 'ne', 'tk',
-            'ast', 'ur', 'hsb', 'kk', 'ky', 'eo', 'cy', 'lv', 'wo', 'ka', 'ang',
-            'co', 'hi', 'ga', 'gn', 'az', 'ia', 'eu', 'sk', 'ms', 'csb', 'st',
+            'simple', 'th', 'hr', 'oc', 'fy', 'sw', 'mg', 'br', 'he', 'la',
+            'sq', 'sl', 'hy', 'tt', 'zh-min-nan', 'da', 'my', 'wa', 'ne', 'tk',
+            'ast', 'ur', 'hsb', 'kk', 'cy', 'ky', 'eo', 'lv', 'ka', 'wo', 'ang',
+            'co', 'hi', 'ga', 'az', 'gn', 'ia', 'eu', 'sk', 'ms', 'csb', 'st',
             'tl', 'mr', 'be', 'nds', 'kl', 'sd', 'ug', 'ps', 'ti', 'mk', 'sh',
-            'an', 'bn', 'gu', 'km', 'ss', 'ts', 'qu', 'bs', 'fo', 'si', 'am',
-            'rw', 'chr', 'su', 'om', 'iu', 'mn', 'nah', 'yi', 'ie', 'gv', 'pa',
-            'kw', 'mt', 'tg', 'gd', 'nn', 'zu', 'dv', 'tpi', 'ik', 'sg',
-            'roa-rup', 'jv', 'uz', 'so', 'mi', 'za', 'lb', 'ha', 'ay', 'ln',
+            'an', 'bn', 'gu', 'nn', 'km', 'ss', 'ts', 'qu', 'si', 'bs', 'fo',
+            'am', 'rw', 'chr', 'su', 'om', 'iu', 'mn', 'nah', 'yi', 'ie', 'gv',
+            'pa', 'kw', 'mt', 'tg', 'gd', 'zu', 'dv', 'tpi', 'ik', 'sg',
+            'roa-rup', 'jv', 'so', 'uz', 'mi', 'za', 'lb', 'ha', 'ay', 'ln',
             'sa', 'na', 'sm', 'jbo', 'fj', 'tn', 'ks', 'dz', 'als',
         ]
 
