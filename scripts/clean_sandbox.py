@@ -71,7 +71,7 @@ msg = {
     'da': u'Bot: Nyt sand (fra[[Skabelon:Sandkasse tekst]])',
     'de': u'Bot: Setze Spielwiese zurück.',
     'en': u'Robot: Automatically cleaned',
-    'fa': u'ربات:صفحه به طور خودکار تميز شد',
+    'fa': u'ربات: صفحه به طور خودکار تميز شد',
     'fi': u'Botti siivosi hiekkalaatikon.',
     'he': u'בוט: דף זה ינוקה אוטומטית.',
     'id': u'Bot: Tata ulang',

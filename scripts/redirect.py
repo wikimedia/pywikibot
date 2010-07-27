@@ -116,7 +116,7 @@ reason_broken={
     'de': u'Bot: Weiterleitungsziel existiert nicht',
     'en': u'[[WP:CSD#G8|G8]]: [[Wikipedia:Redirect|Redirect]] to a deleted or non-existent page',
     'es': u'Robot: La página a la que redirige no existe',
-    'fa': u'ربات:تغییرمسیر مقصد ندارد',
+    'fa': u'ربات: (بن بست) تغییرمسیر به صفحه‌ای که وجود ندارد',
     'fi': u'Botti: Ohjauksen kohdesivua ei ole olemassa',
     'fr': u'Robot : Cible du redirect inexistante',
     'ga': u'Róbó : Targaid athsheoladh ar iarraidh',
@@ -149,6 +149,7 @@ reason_loop={
     'ar': u'بوت: هدف التحويلة يصنع عقدة تحويل',
     'de': u'Bot: Weiterleitungsziel auf sich selbst',
     'en': u'[[WP:CSD#G8|G8]]: [[Wikipedia:Redirect|Redirect]] target forms a redirect loop',
+    'fa': u'ربات: تغییر مسیر حلقه‌ای',
 }
 
 # Insert deletion template into page with a broken redirect
@@ -159,6 +160,7 @@ sd_template = {
     'de': u'{{sla|Defekte Weiterleitung --~~~~}}',
     'cs': u'{{smazat|přerušené přesměrování}}',
     'en': u'{{db-r1}}',
+    'fa': u'{{حذف سریع|بن بست}}',
     'ga': u'{{scrios|Athsheoladh briste}}',
     'it': u'{{Cancella subito|9}}',
     'ja': u'{{即時削除|壊れたリダイレクト}}',

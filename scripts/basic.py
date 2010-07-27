@@ -40,6 +40,7 @@ class BasicBot:
         'cs': u'Robot změnil ...',
         'de': u'Bot: Ändere ...',
         'en': u'Robot: Changing ...',
+        'fa': u'ربات: تغییر ...',
         'fr': u'Robot: Changé ...',
         'ja':u'ロボットによる：編集',
         'ksh': u'Bot: Ännern ...',
