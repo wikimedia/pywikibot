@@ -1011,9 +1011,16 @@ class Page(object):
             edit date/time, user name and content
 
         """
-        return self.site.loadrevisions(self, getText=True,
-                                         rvdir=reverseOrder,
-                                         step=step, total=total)
+        self.site.loadrevisions(self, getText=True,
+                                rvdir=reverseOrder,
+                                step=step, total=total)
+        return [( self._revisions[rev].revid,
+                  self._revisions[rev].timestamp,
+                  self._revisions[rev].user,
+                  self._revisions[rev].text
+                ) for rev in sorted(self._revisions,
+                                    reverse=not reverseOrder)
+               ]
 
     def contributingUsers(self, step=None, total=None):
         """Return a set of usernames (or IPs) of users who edited this page.
