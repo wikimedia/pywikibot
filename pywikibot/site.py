@@ -2288,7 +2288,7 @@ redirects on %(site)s wiki""",
     }
 
     def editpage(self, page, summary, minor=True, notminor=False,
-                 recreate=True, createonly=False, watch=None):
+                 bot=True, recreate=True, createonly=False, watch=None):
         """Submit an edited Page object to be saved to the wiki.
 
         @param page: The Page to be saved; its .text property will be used
@@ -2308,6 +2308,7 @@ redirects on %(site)s wiki""",
             * unwatch: remove the page from the watchlist
             * preferences: use the preference settings (Default)
             * nochange: don't change the watchlist
+        @param botflag: if True, mark edit with bot flag
         @return: True if edit succeeded, False if it failed
 
         """
@@ -2331,23 +2332,23 @@ redirects on %(site)s wiki""",
         if lastrev is not None and page.latestRevision() != lastrev:
             raise EditConflict(
                 "editpage: Edit conflict detected; saving aborted.")
-        req = api.Request(site=self, action="edit",
-                          title=page.title(withSection=False),
-                          text=text, token=token, summary=summary)
+        params = dict(action="edit",
+                      title=page.title(withSection=False),
+                      text=text, token=token, summary=summary)
+        if bot:
+            params["bot"] = ""
         if lastrev is not None:
-            req["basetimestamp"] = page._revisions[lastrev].timestamp
+            params["basetimestamp"] = page._revisions[lastrev].timestamp
         if minor:
-            req['minor'] = ""
+            params['minor'] = ""
         elif notminor:
-            req['notminor'] = ""
-        if 'bot' in self.userinfo['groups']:
-            req['bot'] = ""
+            params['notminor'] = ""
         if recreate:
-            req['recreate'] = ""
+            params['recreate'] = ""
         if createonly:
-            req['createonly'] = ""
+            params['createonly'] = ""
         if watch in ["watch", "unwatch", "preferences", "nochange"]:
-            req['watch'] = watch
+            params['watchlist'] = watch
         elif watch:
             pywikibot.warning(
                 u"editpage: Invalid watch value '%(watch)s' ignored."
@@ -2355,7 +2356,8 @@ redirects on %(site)s wiki""",
 ## FIXME: API gives 'badmd5' error
 ##        md5hash = md5()
 ##        md5hash.update(urllib.quote_plus(text.encode(self.encoding())))
-##        req['md5'] = md5hash.digest()
+##        params['md5'] = md5hash.digest()
+        req = api.Request(site=self, **params)
         while True:
             try:
                 result = req.submit()

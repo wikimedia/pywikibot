@@ -638,8 +638,8 @@ class Page(object):
         # no restricting template found
         return True
 
-    def save(self, comment=None, watch=None, minor=True, force=False,
-             async=False, callback=None):
+    def save(self, comment=None, watch=None, minor=True, botflag=None,
+             force=False, async=False, callback=None):
         """Save the current contents of page's text to the wiki.
 
         @param comment: The edit summary for the modification (optional, but
@@ -651,6 +651,8 @@ class Page(object):
         @type watch: bool or None
         @param minor: if True, mark this edit as minor
         @type minor: bool
+        @param botflag: if True, mark this edit as made by a bot (default:
+            True if user has bot status, False if not)
         @param force: if True, ignore botMayEdit() setting
         @type force: bool
         @param async: if True, launch a separate thread to save
@@ -675,18 +677,22 @@ class Page(object):
             raise pywikibot.PageNotSaved(
                 "Page %s not saved; editing restricted by {{bots}} template"
                 % self.title(asLink=True))
+        if botflag is None:
+            botflag = ("bot" in self.site.userinfo["rights"])
         if async:
-            pywikibot.async_request(self._save, comment, minor, watchval,
-                                    async, callback)
+            pywikibot.async_request(self._save, comment=comment, minor=minor,
+                                    watchval=watchval, botflag=botflag,
+                                    async=async, callback=callback)
         else:
-            self._save(comment, minor, watchval, async, callback)
+            self._save(comment=comment, minor=minor, watchval=watchval,
+                       botflag=botflag, async=async, callback=callback)
 
-    def _save(self, comment, minor, watchval, async, callback):
+    def _save(self, comment, minor, watchval, botflag, async, callback):
         err = None
         link = self.title(asLink=True)
         try:
             done = self.site.editpage(self, summary=comment, minor=minor,
-                                        watch=watchval)
+                                      watch=watchval, bot=botflag)
             if not done:
                 pywikibot.warning(u"Page %s not saved" % link)
                 raise pywikibot.PageNotSaved(link)
@@ -707,7 +713,7 @@ class Page(object):
             callback(self, err)
 
     def put(self, newtext, comment=u'', watchArticle=None, minorEdit=True,
-            force=False, async=False, callback=None):
+            botflag=None, force=False, async=False, callback=None):
         """Save the page with the contents of the first argument as the text.
 
         This method is maintained primarily for backwards-compatibility.
@@ -719,11 +725,12 @@ class Page(object):
 
         """
         self.text = newtext
-        return self.save(comment, watchArticle, minorEdit, force,
-                         async, callback)
+        return self.save(comment=comment, watch=watchArticle,
+                        minor=minorEdit, botflag=botflag, force=force,
+                        async=async, callback=callback)
 
     def put_async(self, newtext, comment=u'', watchArticle=None,
-                  minorEdit=True, force=False, callback=None):
+                  minorEdit=True, botflag=None, force=False, callback=None):
         """Put page on queue to be saved to wiki asynchronously.
 
         Asynchronous version of put (takes the same arguments), which places
@@ -733,8 +740,8 @@ class Page(object):
 
         """
         return self.put(newtext, comment=comment, watchArticle=watchArticle,
-                        minorEdit=minorEdit, force=force, async=True,
-                        callback=callback)
+                        minorEdit=minorEdit, botflag=botflag, force=force,
+                        async=True, callback=callback)
 
     def watch(self, unwatch=False):
         """Add or remove this page to/from bot account's watchlist.
