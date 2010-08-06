@@ -12,19 +12,19 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'lt', 'zh', 'tr', 'ru', 'vi', 'io', 'pl', 'pt', 'fi',
-            'hu', 'el', 'no', 'ko', 'ta', 'de', 'sv', 'it', 'nl', 'kn', 'lo',
+            'hu', 'el', 'ko', 'no', 'ta', 'de', 'sv', 'it', 'nl', 'kn', 'lo',
             'ml', 'li', 'ja', 'es', 'ku', 'ar', 'et', 'ro', 'id', 'te', 'gl',
-            'uk', 'bg', 'ca', 'vo', 'fa', 'is', 'scn', 'sr', 'simple', 'af',
-            'cs', 'hr', 'th', 'oc', 'fy', 'sw', 'mg', 'br', 'he', 'la', 'sq',
+            'uk', 'bg', 'ca', 'vo', 'fa', 'is', 'scn', 'sr', 'simple', 'cs',
+            'af', 'hr', 'th', 'oc', 'fy', 'sw', 'mg', 'br', 'he', 'la', 'sq',
             'sl', 'hy', 'tt', 'my', 'zh-min-nan', 'da', 'wa', 'ne', 'tk', 'ast',
-            'ur', 'hsb', 'cy', 'kk', 'ky', 'eo', 'lv', 'ka', 'wo', 'ang', 'co',
+            'ur', 'hsb', 'cy', 'kk', 'ky', 'eo', 'ka', 'lv', 'wo', 'ang', 'co',
             'hi', 'ga', 'az', 'gn', 'ia', 'eu', 'sk', 'ms', 'csb', 'tl', 'st',
-            'mr', 'be', 'nn', 'nds', 'kl', 'sd', 'ug', 'ps', 'ti', 'mk', 'sh',
+            'mr', 'nn', 'be', 'nds', 'kl', 'sd', 'ug', 'ps', 'ti', 'mk', 'sh',
             'an', 'bn', 'gu', 'km', 'si', 'ss', 'ts', 'qu', 'bs', 'fo', 'am',
             'rw', 'chr', 'su', 'om', 'iu', 'mn', 'nah', 'yi', 'ie', 'gv', 'kw',
-            'pa', 'mt', 'gd', 'tg', 'zu', 'dv', 'tpi', 'ik', 'sg', 'roa-rup',
-            'za', 'jv', 'lb', 'so', 'uz', 'mi', 'ln', 'sm', 'ha', 'ay', 'sa',
-            'na', 'jbo', 'fj', 'tn', 'ks', 'dz', 'als',
+            'pa', 'mt', 'gd', 'tg', 'zu', 'dv', 'tpi', 'ik', 'sg', 'so',
+            'roa-rup', 'za', 'lb', 'jv', 'uz', 'ln', 'mi', 'sm', 'ha', 'ay',
+            'sa', 'na', 'jbo', 'tn', 'fj', 'ks', 'dz', 'als',
         ]
 
         for lang in self.languages_by_size:
