@@ -93,6 +93,7 @@ msg_double={
     'no': u'bot: Retter dobbel omdirigering → %s',
     'pl': u'Robot naprawia podwójne przekierowanie → %s',
     'pt': u'Bot: Corrigido duplo redirecionamento → %s',
+    'ro': u'Robot: Corectarea dublu redirecţionare în %s',
     'ru': u'Робот: исправление двойного перенаправления → %s',
     'sr': u'Бот: Поправка дуплих преусмерења → %s',
     'sv': u'Robot: Rättar dubbel omdirigering → %s',
