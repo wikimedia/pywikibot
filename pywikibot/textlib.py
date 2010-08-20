@@ -853,8 +853,8 @@ def _altlang(code):
         return ['hsb', 'dsb', 'de']
     if code == 'rm':
         return ['de', 'it']
-    if code == 'stq':
-        return ['fy', 'de']
+    if code == ['stq', 'frr',]:
+        return ['frr', 'stq', 'fy', 'nds', 'de']
     #Greek
     if code == 'pnt':
         return ['el']
