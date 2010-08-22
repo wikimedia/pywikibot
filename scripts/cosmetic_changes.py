@@ -66,6 +66,7 @@ msg_standalone = {
     'fa': u'ربات: زیباسازی',
     'fi': u'Botti kosmeettisia muutoksia',
     'fr': u'Robot : Changement de type cosmétique',
+    'frr':u'Bot: Kosmeetisk feranerangen',
     'fy': u'bot tekstwiziging',
     'gl': u'bot Cambios estética',
     'he': u'בוט: שינויים קוסמטיים',
@@ -127,6 +128,7 @@ msg_append = {
     'fa': u'; زیباسازی',
     'fi': u'; kosmeettisia muutoksia',
     'fr': u'; changement de type cosmétique',
+    'frr':u'; kosmeetisk feranerangen',
     'fy': u'; tekstwiziging',
     'gl': u'; cambios estética',
     'he': u'; שינויים קוסמטיים',
@@ -237,6 +239,9 @@ class CosmeticChangesToolkit:
         """
         Makes sure that localized namespace names are used.
         """
+        # arz uses english stylish codes
+        if self.site.sitename() == 'wikipedia:arz':
+            return text
         family = self.site.family
         # wiki links aren't parsed here.
         exceptions = ['nowiki', 'comment', 'math', 'pre']
@@ -368,6 +373,7 @@ class CosmeticChangesToolkit:
     def resolveHtmlEntities(self, text):
         ignore = [
              38,     # Ampersand (&amp;)
+             39,     # Bugzilla 24093
              60,     # Less than (&lt;)
              62,     # Great than (&gt;)
              91,     # Opening bracket - sometimes used intentionally inside links
@@ -376,8 +382,8 @@ class CosmeticChangesToolkit:
             160,     # Non-breaking space (&nbsp;) - not supported by Firefox textareas
         ]
         # ignore ' see http://eo.wikipedia.org/w/index.php?title=Liberec&diff=next&oldid=2320801
-        if self.site.lang == 'eo':
-            ignore += [39]
+        #if self.site.lang == 'eo':
+        #    ignore += [39]
         text = pywikibot.html2unicode(text, ignore = ignore)
         return text
 
@@ -471,6 +477,7 @@ class CosmeticChangesBot:
         self.generator = generator
         self.acceptall = acceptall
         self.comment = comment
+        self.done = False
 
     def treat(self, page):
         try:
@@ -479,11 +486,15 @@ class CosmeticChangesBot:
             pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<" % page.title())
             ccToolkit = CosmeticChangesToolkit(page.site, debug = True, namespace = page.namespace())
             changedText = ccToolkit.change(page.get())
-            if changedText != page.get():
+            if changedText.strip() != page.get().strip():
                 if not self.acceptall:
-                    choice = pywikibot.inputChoice(u'Do you want to accept these changes?',  ['Yes', 'No', 'All'], ['y', 'N', 'a'], 'N')
+                    choice = pywikibot.inputChoice(u'Do you want to accept these changes?',
+                                                   ['Yes', 'No', 'All', 'Quit'], ['y', 'N', 'a', 'q'], 'N')
                     if choice == 'a':
                         self.acceptall = True
+                    elif choice == 'q':
+                        self.done = True
+                        return
                 if self.acceptall or choice == 'y':
                     page.put(changedText, comment=self.comment)
             else:
@@ -494,10 +505,13 @@ class CosmeticChangesBot:
             pywikibot.output("Page %s is a redirect; skipping." % page.aslink())
         except pywikibot.LockedPage:
             pywikibot.output("Page %s is locked?!" % page.aslink())
+        except pywikibot.EditConflict:
+            pywikibot.output("An edit conflict has occured at %s." % page.aslink())
 
     def run(self):
         try:
             for page in self.generator:
+                if self.done: break
                 self.treat(page)
         except KeyboardInterrupt:
             raise

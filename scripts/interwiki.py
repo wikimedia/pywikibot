@@ -431,6 +431,7 @@ msg = {
     'fo': (u'bottur ', u'leggur aftrat', u'strikar', u'broytur'),
     'fr': (u'robot ', u'Ajoute', u'Retire', u'Modifie'),
     'frp': (u'robot ', u'Apond', u'Retire', u'Modifie'),
+    'frr': (u'Bot:', u'Diartudu', u'Wechnem', u'Feranere'),
     'fur': (u'Robot: ', u'o zonti', u'o cambii', u'o gjavi'),
     'fy': (u'Bot ', u'- derby', u'- fuort', u'- oars'),
     'ga': (u'róbat ', u'ag suimiú', u'ag baint', u'ag mionathrú'),

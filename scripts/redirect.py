@@ -73,6 +73,7 @@ msg_double={
     'fa': u'ربات:اصلاح تغییر مسیر دوتایی → %s',
     'fi': u'Botti korjasi kaksinkertaisen ohjauksen → %s',
     'fr': u'Robot: répare double redirection à %s',
+    'frr':u'Bot: Ferbeedre dobelt widjerfeerang tu %s',
     'ga': u'Róbó: Ag socrú athsheolta dúbailte → %s',
     'he': u'בוט: מתקן הפניה כפולה → %s',
     'hr': u'Bot: Popravak dvostrukih preusmjeravanja → %s',
@@ -120,6 +121,7 @@ reason_broken={
     'fa': u'ربات: (بن بست) تغییرمسیر به صفحه‌ای که وجود ندارد',
     'fi': u'Botti: Ohjauksen kohdesivua ei ole olemassa',
     'fr': u'Robot : Cible du redirect inexistante',
+    'frr':u'Bot: Widjerfeerang tu en duad sidj.',
     'ga': u'Róbó : Targaid athsheoladh ar iarraidh',
     'he': u'בוט: יעד ההפניה אינו קיים',
     'it': u'Bot: Il redirect indirizza ad una pagina inesistente',
@@ -151,6 +153,7 @@ reason_loop={
     'de': u'Bot: Weiterleitungsziel auf sich selbst',
     'en': u'[[WP:CSD#G8|G8]]: [[Wikipedia:Redirect|Redirect]] target forms a redirect loop',
     'fa': u'ربات: تغییر مسیر حلقه‌ای',
+    'frr':u'Bot: Widjerfeerang üüb ham salew',
 }
 
 # Insert deletion template into page with a broken redirect
