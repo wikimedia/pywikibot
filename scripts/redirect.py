@@ -165,6 +165,7 @@ sd_template = {
     'cs': u'{{smazat|přerušené přesměrování}}',
     'en': u'{{db-r1}}',
     'fa': u'{{حذف سریع|بن بست}}',
+    'frr':u'{{delete|Widjerfeerang uunstaken --~~~~}}',
     'ga': u'{{scrios|Athsheoladh briste}}',
     'it': u'{{Cancella subito|9}}',
     'ja': u'{{即時削除|壊れたリダイレクト}}',
