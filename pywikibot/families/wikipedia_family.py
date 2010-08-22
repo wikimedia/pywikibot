@@ -169,6 +169,7 @@ class Family(family.Family):
             'fo':  [u'Fleiri týdningar'],
             'fr':  None,
             'frp': [u'Homonimos'],
+            'frr': [u'Muardüüdag artikel'],
             'fur': [u'Disambiguazion', u'Disambig'],
             'fy':  [u'Tfs', u'Neibetsjuttings'],
             'ga':  [u'Idirdhealú', u'Disambig'],
