@@ -1359,7 +1359,7 @@ def _hyphenateIsbnNumber(match):
     return i.code
 
 def hyphenateIsbnNumbers(text):
-    isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
+    isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[\dXx])')
     text = isbnR.sub(_hyphenateIsbnNumber, text)
     return text
 
