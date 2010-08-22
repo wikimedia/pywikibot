@@ -60,6 +60,67 @@ class Family(family.Family):
             'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
 
+        self.authornamespaces = {
+            '_default': [0],
+            'ar': [102],
+            'bg': [100],
+            'cs': [100],
+            'da': [102],
+            'en': [102],
+            'fa': [102],
+            'fr': [102],
+            'hr': [100],
+            'hu': [100],
+            'hy': [100],
+            'it': [102],
+            'ko': [100],
+            'la': [102],
+            'nl': [102],
+            'no': [102],
+            'pl': [104],
+            'pt': [102],
+            'sv': [106],
+            'tr': [100],
+            'vi': [102],
+            'zh': [102],
+            }
+
+        self.crossnamespace[0] = {
+            '_default': self.authornamespaces,
+        }
+        self.crossnamespace[100] = {
+            'bg': self.authornamespaces,
+            'cs': self.authornamespaces,
+            'hr': self.authornamespaces,
+            'hu': self.authornamespaces,
+            'hy': self.authornamespaces,
+            'ko': self.authornamespaces,
+            'tr': self.authornamespaces,
+        }
+
+        self.crossnamespace[102] = {
+            'ar': self.authornamespaces,
+            'da': self.authornamespaces,
+            'en': self.authornamespaces,
+            'fa': self.authornamespaces,
+            'fr': self.authornamespaces,
+            'it': self.authornamespaces,
+            'la': self.authornamespaces,
+            'nl': self.authornamespaces,
+            'no': self.authornamespaces,
+            'pt': self.authornamespaces,
+            'vi': self.authornamespaces,
+            'zh': self.authornamespaces,
+        }
+        
+        self.crossnamespace[104] = {
+            'pl': self.authornamespaces,
+        }
+        
+        self.crossnamespace[106] = {
+            'sv': self.authornamespaces,
+        }
+        
     def version(self, code):
         return '1.16wmf4'
 
