@@ -1135,14 +1135,14 @@ class Subject(object):
             if linkedPage.namespace() in nsmatch:
                 return False
             if globalvar.autonomous:
-                pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i." % (self.originPage, self.originPage.namespace(), linkedPage, linkedPage.namespace()))
+                pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i." % (self.linkingPage, self.linkingPage.namespace(), linkedPage, linkedPage.namespace()))
                 # Fill up foundIn, so that we will not write this notice
                 self.foundIn[linkedPage] = [linkingPage]
                 return True
             else:
                 preferredPage = self.getFoundInCorrectNamespace(linkedPage.site)
                 if preferredPage:
-                    pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i because page %s in the correct namespace has already been found." % (self.originPage, self.originPage.namespace(), linkedPage, linkedPage.namespace(), preferredPage))
+                    pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i because page %s in the correct namespace has already been found." % (self.linkingPage, self.linkingnPage.namespace(), linkedPage, linkedPage.namespace(), preferredPage))
                     return True
                 else:
                     choice = pywikibot.inputChoice(u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?' % (self.originPage, self.originPage.namespace(), linkedPage, linkedPage.namespace()), ['Yes', 'No', 'Add an alternative', 'give up'], ['y', 'n', 'a', 'g'])
