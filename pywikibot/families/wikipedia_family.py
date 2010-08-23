@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8  -*-
+# -*- coding: utf-8  -*-
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -169,7 +169,7 @@ class Family(family.Family):
             'fo':  [u'Fleiri týdningar'],
             'fr':  None,
             'frp': [u'Homonimos'],
-            'frr': [u'Muardüüdag artikel'],
+            'frr': None,
             'fur': [u'Disambiguazion', u'Disambig'],
             'fy':  [u'Tfs', u'Neibetsjuttings'],
             'ga':  [u'Idirdhealú', u'Disambig'],
