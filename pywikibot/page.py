@@ -989,7 +989,7 @@ class Page(object):
                                step=None, total=None):
         """Return the version history as a wiki table."""
 
-        result = '{| border="1"\n'
+        result = '{| class="wikitable"\n'
         result += '! oldid || date/time || username || edit summary\n'
         for oldid, time, username, summary \
                 in self.getVersionHistory(forceReload=forceReload,
