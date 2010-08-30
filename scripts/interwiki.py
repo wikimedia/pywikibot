@@ -477,7 +477,7 @@ msg = {
     'mr': (u'सांगकाम्याने ',  u'वाढविले', u'काढले', u'बदलले'),
     'ms': (u'bot ', u'menambah', u'membuang', u'mengubah'),
     'myv': (u'роботось ', u'путызеть', u'нардызеть', u'полавтызеть'),
-    'mzn': (u'Rebot ', u'Biyeshten', u'Bayten', u'Hekărden'),
+    'mzn': (u'ربوت ', u'بیشتن', u'بیتن', u'هکردن'),
     'nah': (u'Tepozcuayollotl', u'Tlamahxiltilli', u'Tlaquixtilli', u'Tlapatlalli'),
     'nds': (u'IW-Bot: ', u'dorto', u'rut', u'ännert'),
     'nds-nl': (u'bot ', u'derbie', u'derof', u'aanders'),
