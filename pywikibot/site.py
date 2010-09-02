@@ -1396,7 +1396,9 @@ class APISite(BaseSite):
                                 step=step, total=total, g_content=content)
         return tlgen
 
-    def categorymembers(self, category, namespaces=None, step=None, total=None,
+    def categorymembers(self, category, namespaces=None, sortby="",
+                        reverse=False, starttime=None, endtime=None,
+                        startsort=None, endsort=None, step=None, total=None,
                         content=False):
         """Iterate members of specified category.
 
@@ -1407,6 +1409,25 @@ class APISite(BaseSite):
             however, that the iterated values are always Page objects, even
             if in the Category or Image namespace.
         @type namespaces: list of ints
+        @param sortby: determines the order in which results are generated,
+            valid values are "sortkey" (default, results ordered by category
+            sort key) or "timestamp" (results ordered by time page was
+            added to the category)
+        @type sortby: str
+        @param reverse: if True, generate results in reverse order
+            (default False)
+        @param starttime: if provided, only generate pages added after this
+            time; not valid unless sortby="timestamp"
+        @type starttime: pywikibot.Timestamp
+        @param endtime: if provided, only generate pages added before this
+            time; not valid unless sortby="timestamp"
+        @type endtime: pywikibot.Timestamp
+        @param startsort: if provided, only generate pages >= this title
+            lexically; not valid if sortby="timestamp"
+        @type startsort: str
+        @param endsort: if provided, only generate pages <= this title
+            lexically; not valid if sortby="timestamp"
+        @type endsort: str
         @param content: if True, load the current content of each iterated page
             (default False)
 
@@ -1416,20 +1437,51 @@ class APISite(BaseSite):
                 u"categorymembers: non-Category page '%s' specified"
                 % category.title())
         cmtitle = category.title(withSection=False).encode(self.encoding())
-        cmgen = self._generator(api.PageGenerator,
-                                type_arg="categorymembers",
-                                gcmtitle=cmtitle,
-                                gcmprop="ids|title|sortkey",
-#                                namespaces=namespaces, # see note below
-                                step=step,
-                                total=total,
-                                g_content=content)
-#       workaround for https://bugzilla.wikimedia.org/show_bug.cgi?id=19640:
-        if namespaces:
-            if not isinstance(namespaces, list):
-                namespaces = [namespaces]
-            cmgen = pagegenerators.NamespaceFilterPageGenerator(
-                        cmgen, namespaces, site=self)
+        cmargs = dict(type_arg="categorymembers",
+                      gcmtitle=cmtitle,
+                      gcmprop="ids|title|sortkey")
+        if sortby in ["sortkey", "timestamp"]:
+            cmargs["gcmsort"] = sortby
+        elif sortby:
+            raise ValueError(
+                 "categorymembers: invalid sortby value '%(sortby)s'"
+                 % locals())
+        if starttime and endtime and starttime > endtime:
+            raise ValueError(
+                "categorymembers: starttime must be before endtime")
+        if startsort and endsort and startsort > endsort:
+            raise ValueError(
+                "categorymembers: startsort must be less than endsort")
+        if reverse:
+            cmargs["gcmdir"] = "desc"
+            # API wants start/end params in opposite order if using descending
+            # sort; we take care of this reversal for the user
+            (starttime, endtime) = (endtime, starttime)
+            (startsort, endsort) = (endsort, startsort)
+        if starttime and sortby == "timestamp":
+            cmargs["gcmstart"] = str(starttime)
+        elif starttime:
+            raise ValueError(
+            "categorymembers: invalid combination of 'sortby' and 'starttime'")
+        if endtime and sortby == "timestamp":
+            cmargs["gcmend"] = str(endtime)
+        elif endtime:
+            raise ValueError(
+            "categorymembers: invalid combination of 'sortby' and 'endtime'")
+        if startsort and sortby != "timestamp":
+            cmargs["gcmstartsortkey"] = startsort
+        elif startsort:
+            raise ValueError(
+            "categorymembers: invalid combination of 'sortby' and 'startsort'")
+        if endsort and sortby != "timestamp":
+            cmargs["gcmendsortkey"] = endsort
+        elif endsort:
+            raise ValueError(
+            "categorymembers: invalid combination of 'sortby' and 'endsort'")
+
+        cmgen = self._generator(api.PageGenerator, namespaces=namespaces,
+                                step=step, total=total, g_content=content,
+                                **cmargs)
         return cmgen
 
     def loadrevisions(self, page=None, getText=False, revids=None,
