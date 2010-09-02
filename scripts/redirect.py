@@ -197,9 +197,9 @@ class RedirectGenerator:
         self.api_start = start
         self.api_until = until
         self.api_number = number
-        if self.api_number is None:
-            self.api_number = 'max'
 
+# note: rewrite branch does not yet support XML dumps, so this is commented out
+# until that support is added
 ##    def get_redirects_from_dump(self, alsoGetPageTitles=False):
 ##        '''
 ##        Load a local XML dump file, look at all pages which have the
@@ -368,7 +368,7 @@ class RedirectGenerator:
                         count += 1
                         if count >= self.api_number:
                             break
-
+# TODO: add XML dump support
 ##        elif self.xmlFilename == None:
 ##            # retrieve information from the live wiki's maintenance page
 ##            # broken redirect maintenance page's URL
@@ -410,7 +410,7 @@ class RedirectGenerator:
                         count += 1
                         if count >= self.api_number:
                             break
-
+# TODO: API cannot yet deliver contents of "special" pages
 ##        elif self.xmlFilename == None:
 ##            # retrieve information from the live wiki's maintenance page
 ##            # double redirect maintenance page's URL
