@@ -545,40 +545,40 @@ class QueryGenerator(object):
                         % self.__class__.__name__,
                     _logger)
                 return
-            if not ("query" in self.data
-                    and self.resultkey in self.data["query"]):
+            if "query" not in self.data:
                 pywikibot.debug(
-u"%s: stopped iteration because 'query' and '%s' not found in api response."
+u"%s: stopped iteration because 'query' not found in api response."
                         % (self.__class__.__name__, self.resultkey),
                     _logger)
                 pywikibot.debug(unicode(self.data), _logger)
                 return
-            resultdata = self.data["query"][self.resultkey]
-            if isinstance(resultdata, dict):
-                pywikibot.debug(u"%s received %s; limit=%s"
-                                  % (self.__class__.__name__,
-                                     resultdata.keys(),
-                                     self.limit),
-                                _logger)
-                resultdata = [resultdata[k] for k in sorted(resultdata.keys())]
-            else:
-                pywikibot.debug(u"%s received %s; limit=%s"
-                                  % (self.__class__.__name__,
-                                     resultdata,
-                                     self.limit),
-                                _logger)
-            if "normalized" in self.data["query"]:
-                self.normalized = dict((item['to'], item['from'])
-                                      for item in
-                                      self.data["query"]["normalized"])
-            else:
-                self.normalized = {}
-            for item in resultdata:
-                yield self.result(item)
-                count += 1
-                if self.limit is not None and self.limit > 0 \
-                                          and count >= self.limit:
-                    return
+            if self.resultkey in self.data["query"]:
+                resultdata = self.data["query"][self.resultkey]
+                if isinstance(resultdata, dict):
+                    pywikibot.debug(u"%s received %s; limit=%s"
+                                      % (self.__class__.__name__,
+                                         resultdata.keys(),
+                                         self.limit),
+                                    _logger)
+                    resultdata = [resultdata[k] for k in sorted(resultdata.keys())]
+                else:
+                    pywikibot.debug(u"%s received %s; limit=%s"
+                                      % (self.__class__.__name__,
+                                         resultdata,
+                                         self.limit),
+                                    _logger)
+                if "normalized" in self.data["query"]:
+                    self.normalized = dict((item['to'], item['from'])
+                                          for item in
+                                          self.data["query"]["normalized"])
+                else:
+                    self.normalized = {}
+                for item in resultdata:
+                    yield self.result(item)
+                    count += 1
+                    if self.limit is not None and self.limit > 0 \
+                                              and count >= self.limit:
+                        return
             if not "query-continue" in self.data:
                 return
             if not self.continuekey in self.data["query-continue"]:
