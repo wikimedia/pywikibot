@@ -141,7 +141,7 @@ reason_broken={
     'no': u'robot: målet for omdirigeringen eksisterer ikke',
     'pl': u'Robot: cel przekierowania nie istnieje',
     'pt': u'Bot: Redirecionamento não existe',
-    'ru': u'Робот: перенаправление в никуда',
+    'ru': u'[[ВП:КБУ#П1|П1]]: перенаправление в никуда',
     'sr': u'Бот: Преусмерење не постоји',
     'th': u'โรบอต: หน้าเปลี่ยนทางเสีย',
     'tr': u'Bot değişikliği: Var olmayan sayfaya olan yönlendirme',
@@ -178,6 +178,7 @@ sd_template = {
     'ksh':u'{{Schmieß fott}}Di Ömlëijdong jeiht noh nörjendwoh hen.<br />--~~~~~\n\n',
     'nds':u'{{delete}}Kaputte Wiederleiden, wat nich brukt ward.<br />--~~~~\n\n',
     'pdc':u'{{lösche|Defekte Weiterleitung --~~~~}}',
+    'ru': u'{{db-redirnone}}',
     'war':u'{{delete}}Nautod o nagbinalikbalik nga redirek.--~~~~\n\n',
     'zh': u'{{delete|R1}}',
 }
