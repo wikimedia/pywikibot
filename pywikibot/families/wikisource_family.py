@@ -20,7 +20,7 @@ class Family(family.Family):
 
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wikisource.org' % lang
-            self.langs['-'] = 'wikisource.org'
+        self.langs['-'] = 'wikisource.org'
 
         self.alphabetic = ['ang','ar','az','bg','bs','ca','cs','cy',
                       'da','de','el','en','es','et','fa','fi',

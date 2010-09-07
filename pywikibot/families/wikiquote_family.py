@@ -16,7 +16,7 @@ class Family(family.Family):
             'eo', 'sv', 'nl', 'no', 'fi', 'ja', 'nn', 'hy', 'et', 'ca', 'li',
             'ar', 'ka', 'ko', 'hr', 'ku', 'gl', 'ro', 'sr', 'cy', 'ml', 'az',
             'th', 'is', 'te', 'af', 'da', 'eu', 'sq', 'vi', 'la', 'br', 'hi',
-            'mr', 'be', 'ast', 'uz', 'ta', 'ang', 'zh-min-nan', 'ur', 'lb',
+            'mr', 'be', 'ast', 'ta', 'uz', 'ang', 'zh-min-nan', 'ur', 'lb',
             'gu', 'su', 'wo', 'kn', 'ky', 'am', 'co',
         ]
 
