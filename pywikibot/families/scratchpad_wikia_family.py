@@ -14,11 +14,10 @@ class Family(family.Family):
             'zh':'zh.scratchpad.wikia.com',
         }
 
-        # A few selected big languages for things that we do not want
-        # to loop over all languages. This is only needed by the
-        # titletranslate.py module, so if you carefully avoid the
-        # options, you could get away without these for another
-        # wikimedia family.
+        # A few selected big languages for things that we do not want to loop
+        # over all languages. This is only needed by the titletranslate.py
+        # module, so if you carefully avoid the options, you could get away
+        # without these for another wikimedia family.
 
         self.languages_by_size = ['en','de']
 
