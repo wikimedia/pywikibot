@@ -753,7 +753,7 @@ class CategoryRemoveRobot:
             for subcategory in subcategories:
                 catlib.change_category(subcategory, self.cat, None, comment = self.editSummary, inPlace = self.inPlace)
         # Deletes the category page
-        if self.cat.exists() and self.cat.isEmpty():
+        if self.cat.exists() and self.cat.isEmptyCategory():
             if self.useSummaryForDeletion and self.editSummary:
                 reason = self.editSummary
             else:
