@@ -16,10 +16,6 @@ These command line parameters can be used to specify which pages to work on:
                   or pages-meta-current, see http://download.wikimedia.org).
                   Argument can also be given as "-xml:filename".
 
--page             Only edit a specific page.
-                  Argument can also be given as "-page:pagetitle". You can
-                  give this parameter multiple times to edit multiple pages.
-
 -protectedpages:  Check all the blocked pages; useful when you have not
                   categories or when you have problems with them. (add the
                   namespace after ":" where you want to check - default checks
@@ -188,14 +184,17 @@ def understandBlock(text, TTP, TSP, TSMP, TTMP, TU):
             resultCatch = re.findall(catchRegex, text)
             if resultCatch:
                 return ('autoconfirmed-move', catchRegex)
-    return ('editable', r'\A\n') # If editable means that we have no regex, won't change anything with this regex
+    # If editable means that we have no regex, won't change anything with this
+    # regex
+    return ('editable', r'\A\n')
 
 def showQuest(site, page):
     quest = pywikibot.inputChoice(u'Do you want to open the page?',
                                   ['with browser', 'with gui', 'no'],
                                   ['b','g','n'], 'n')
     pathWiki = site.family.nicepath(site.lang)
-    url = 'http://%s%s%s?&redirect=no' % (pywikibot.getSite().hostname(), pathWiki, page.urlname())
+    url = 'http://%s%s%s?&redirect=no' % (pywikibot.getSite().hostname(),
+                                          pathWiki, page.urlname())
     if quest == 'b':
         webbrowser.open(url)
     elif quest == 'g':
@@ -207,9 +206,11 @@ def main():
     """ Main Function """
     # Loading the comments
     global categoryToCheck, comment, project_inserted
-    # always, define a generator to understand if the user sets one, defining what's genFactory
+    # always, define a generator to understand if the user sets one,
+    # defining what's genFactory
     always = False; generator = False; show = False
-    moveBlockCheck = False; genFactory = pagegenerators.GeneratorFactory()
+    moveBlockCheck = False
+    genFactory = pagegenerators.GeneratorFactory()
     # To prevent Infinite loops
     errorCount = 0
     # Loading the default options.
@@ -231,21 +232,13 @@ def main():
             else:
                 generator = site.protectedpages(namespace = int(arg[16:]),
                                                 type = 'move')
-        elif arg.startswith('-page'):
-            if len(arg) == 5:
-                generator = [pywikibot.Page(pywikibot.getSite(), pywikibot.input(u'What page do you want to use?'))]
-            else:
-                generator = [pywikibot.Page(pywikibot.getSite(), arg[6:])]
         else:
             genFactory.handleArg(arg)
 
     if config.mylang not in project_inserted:
         pywikibot.output(u"Your project is not supported by this script.\nYou have to edit the script and add it!")
         return
-
-    # Load the right site
     site = pywikibot.getSite()
-
     # Take the right templates to use, the category and the comment
     TSP = pywikibot.translate(site, templateSemiProtection)
     TTP = pywikibot.translate(site, templateTotalProtection)
@@ -293,7 +286,7 @@ def main():
             pywikibot.output("%s is sysop-protected : this account can't edit it! Skipping..." % pagename)
             continue
         """
-        if restrictions.has_key('edit'):
+        if 'edit' in restrictions.keys():
             editRestr = restrictions['edit']
         else:
             editRestr = None
