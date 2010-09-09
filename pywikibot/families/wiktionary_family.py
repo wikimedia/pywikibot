@@ -22,7 +22,7 @@ class Family(family.Family):
             'st', 'be', 'nn', 'nds', 'kl', 'sd', 'ug', 'ps', 'ti', 'mk', 'sh',
             'bn', 'an', 'si', 'gu', 'zu', 'km', 'ss', 'qu', 'ts', 'bs', 'fo',
             'am', 'rw', 'chr', 'om', 'su', 'kw', 'iu', 'mn', 'nah', 'gv', 'yi',
-            'ie', 'pa', 'mt', 'lb', 'gd', 'tg', 'tpi', 'dv', 'ik', 'za', 'sg',
+            'ie', 'lb', 'pa', 'mt', 'gd', 'tg', 'tpi', 'dv', 'ik', 'za', 'sg',
             'so', 'roa-rup', 'uz', 'jv', 'mi', 'ln', 'sm', 'ha', 'ay', 'sa',
             'na', 'jbo', 'tn', 'fj', 'ks', 'dz', 'als',
         ]
