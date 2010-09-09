@@ -210,6 +210,9 @@ def main():
     # defining what's genFactory
     always = False; generator = False; show = False
     moveBlockCheck = False
+    protectedpages = False
+    protectType = 'edit'
+    namespace = 0
     genFactory = pagegenerators.GeneratorFactory()
     # To prevent Infinite loops
     errorCount = 0
@@ -222,16 +225,14 @@ def main():
         elif arg == '-show':
             show = True
         elif arg.startswith('-protectedpages'):
-            if len(arg) == 15:
-                generator = site.protectedpages(namespace = 0)
-            else:
-                generator = site.protectedpages(namespace = int(arg[16:]))
+            protectedpages = True
+            if len(arg) > 15:
+                namespace = int(arg[16:])
         elif arg.startswith('-moveprotected'):
-            if len(arg) == 14:
-                generator = site.protectedpages(namespace = 0, type = 'move')
-            else:
-                generator = site.protectedpages(namespace = int(arg[16:]),
-                                                type = 'move')
+            protectedpages = True
+            protectType = 'move'
+            if len(arg) > 14:
+                namespace = int(arg[15:])
         else:
             genFactory.handleArg(arg)
 
@@ -239,6 +240,8 @@ def main():
         pywikibot.output(u"Your project is not supported by this script.\nYou have to edit the script and add it!")
         return
     site = pywikibot.getSite()
+    if protectedpages:
+        generator = site.protectedpages(namespace=namespace, type=protectType)
     # Take the right templates to use, the category and the comment
     TSP = pywikibot.translate(site, templateSemiProtection)
     TTP = pywikibot.translate(site, templateTotalProtection)
