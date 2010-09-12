@@ -183,6 +183,9 @@ These arguments define how much user confirmation is required:
                    alternatives actually exists.
                    (note: without ending colon)
 
+    -cleanup       like -force but only removes interwiki links to non-existent
+                   or empty pages.
+
     -select        ask for each link whether it should be included before
                    changing any page. This is useful if you want to remove
                    invalid interwiki links and if you do multiple hints of
@@ -599,6 +602,8 @@ class Global(object):
     followredirect = True
     initialredirect = False
     force = False
+    cleanup = False
+    remove = []
     maxquerysize = 60
     same = False
     skip = set()
@@ -647,6 +652,8 @@ class Global(object):
             f.close()
         elif arg == '-force':
             self.force = True
+        elif arg == '-cleanup':
+            self.cleanup = True
         elif arg == '-same':
             self.same = True
         elif arg == '-wiktionary':
@@ -1098,7 +1105,6 @@ class Subject(object):
                 self.makeForcedStop(counter)
                 return False
 
-
         if page in self.foundIn:
             # not new
             self.foundIn[page].append(linkingPage)
@@ -1306,6 +1312,7 @@ class Subject(object):
             # todo list.
 
             if not page.exists():
+                globalvar.remove.append(page.title(asLink=True, forceInterwiki=True))
                 if not globalvar.quiet:
                     pywikibot.output(u"NOTE: %s does not exist" % page)
                 if page == self.originPage:
@@ -1369,6 +1376,7 @@ class Subject(object):
             # must be behind the page.isRedirectPage() part
             # otherwise a redirect error would be raised
             if page.isEmpty() and not page.isCategory():
+                globalvar.remove.append(page.title(asLink=True, forceInterwiki=True))
                 if not globalvar.quiet:
                     pywikibot.output(u"NOTE: %s is empty. Skipping." % page)
                 if page == self.originPage:
@@ -1443,6 +1451,7 @@ class Subject(object):
                    sys.exit()
                 iw = ()
             elif page.isEmpty() and not page.isCategory():
+                globalvar.remove.append(page.title(asLink=True, forceInterwiki=True))
                 if not globalvar.quiet:
                     pywikibot.output(u"NOTE: %s is empty; ignoring it and its interwiki links" % page)
                 # Ignore the interwiki links
@@ -1787,12 +1796,20 @@ class Subject(object):
         # When running in autonomous mode without -force switch, make sure we don't remove any items, but allow addition of the new ones
         if globalvar.autonomous and not globalvar.force and len(removing) > 0:
             for rmsite in removing:
-                if rmsite != page.site:   # Sometimes sites have an erroneous link to itself as an interwiki
-                    rmPage = old[rmsite]
-                    new[rmsite] = old[rmsite] #put it to new means don't delete it
-                    pywikibot.output(u"WARNING: %s is either deleted or has a mismatching disambiguation state." % rmPage)
+                # Sometimes sites have an erroneous link to itself as an
+                # interwiki
+                if rmsite == page.site:
+                    continue
+                rmPage = old[rmsite]
+                #put it to new means don't delete it
+                if not globalvar.cleanup or \
+                   rmPage.title(asLink=True, forceInterwiki=True) not in globalvar.remove:
+                    new[rmsite] = rmPage
+                    pywikibot.output(
+                        u"WARNING: %s is either deleted or has a mismatching disambiguation state."
+                        % rmPage)
             # Re-Check what needs to get done
-            mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite = page.site)
+            mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite=page.site)
 
         if not mods:
             if not globalvar.quiet:
