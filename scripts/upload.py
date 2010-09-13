@@ -9,21 +9,22 @@ Arguments:
   -noverify     Do not ask for verification of the upload description if one
                 is given
 
-If any other arguments are given, the first is the URL or filename to
-upload, and the rest is a proposed description to go with the upload. If
-none of these are given, the user is asked for the file or URL to upload.
-The bot will then upload the image to the wiki.
+If any other arguments are given, the first is the URL or filename to upload,
+and the rest is a proposed description to go with the upload. If none of these
+are given, the user is asked for the file or URL to upload. The bot will then
+upload the image to the wiki.
 
-The script will ask for the location of an image, if not given as a
-parameter, and for a description.
+The script will ask for the location of an image, if not given as a parameter,
+and for a description.
 """
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
+# (C) Pywikipedia bot team, 2003-2010
 #
 # Distributed under the terms of the MIT license.
 #
 __version__='$Id$'
-
+#
 
 import os, sys, time
 import urllib
@@ -59,7 +60,9 @@ class UploadRobot:
         self.uploadByUrl = uploadByUrl
 
     def urlOK(self):
-        "Return true iff self.url looks like an URL or an existing local file."
+        """Return true if self.url looks like an URL or an existing local file.
+
+        """
         return "://" in self.url or os.path.exists(self.url)
 
     def read_file_content(self):
@@ -133,7 +136,7 @@ class UploadRobot:
         if not self.keepFilename:
             pywikibot.output(
                 u"The filename on the target wiki will default to: %s"
-                 % filename)
+                % filename)
             # FIXME: these 2 belong somewhere else, presumably in family
             forbidden = '/' # to be extended
             allowed_formats = (u'gif', u'jpg', u'jpeg', u'mid', u'midi',
