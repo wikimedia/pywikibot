@@ -358,15 +358,21 @@ class Page(object):
         return result["expandtemplates"]["*"]
 
     def userName(self):
-        """Return name or IP address of last user to edit page."""
+        """Return name or IP address of last user to edit page.
+
+        """
         return self._revisions[self.latestRevision()].user
 
     def isIpEdit(self):
-        """Return True if last editor was unregistered."""
+        """Return True if last editor was unregistered.
+
+        """
         return self._revisions[self.latestRevision()].anon
 
     def editTime(self):
-        """Return timestamp (in ISO 8601 format) of last revision to page."""
+        """Return timestamp (in ISO 8601 format) of last revision to page.
+
+        """
         return self._revisions[self.latestRevision()].timestamp
 
     def previousRevision(self):
@@ -387,6 +393,22 @@ class Page(object):
     def isRedirectPage(self):
         """Return True if this is a redirect, False if not or not existing."""
         return self.site.page_isredirect(self)
+
+    def isStaticRedirect(self, force=False):
+        """Return True if this is a redirect containing the magic word
+        __STATICREDIRECT__, False if not or not existing.
+
+        """
+        found = False
+        if self.isRedirectPage():
+            staticKeys = self.site.getmagicwords('staticredirect')
+            text = self.get(get_redirect=True, force=force)
+            if staticKeys:
+                for key in staticKeys:
+                    if key in text:
+                        found = True
+                        break
+        return found
 
     def isCategoryRedirect(self):
         """Return True if this is a category redirect page, False otherwise."""
@@ -493,8 +515,8 @@ class Page(object):
                                              "MediaWiki:Disambiguationspage")
                         self.site._disambigtemplates = [
                             link.title(withNamespace=False)
-                              for link in disambigpages.linkedPages()
-                              if link.namespace() == 10
+                            for link in disambigpages.linkedPages()
+                            if link.namespace() == 10
                         ]
                     except pywikibot.NoPage:
                         self.site._disambigtemplates = ['Disambig']
