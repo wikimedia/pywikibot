@@ -2191,6 +2191,11 @@ class Link(object):
                 return (fam.name, prefix)
             known = fam.get_known_families(site=self._source)
             if prefix in known:
+                if known[prefix] == fam.name:
+                    # interwiki prefix links back to source family
+                    t = t[t.index(u":")+1: ].lstrip(u" ")
+                    # strip off the prefix and retry
+                    continue
                 # prefix is a different wiki family
                 return (known[prefix], code)
             break
