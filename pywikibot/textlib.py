@@ -369,7 +369,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
 
     """
     # Find a marker that is not already in the text.
-    marker = findmarker( oldtext, u'@@')
+    marker = findmarker(oldtext, u'@@')
     if site is None:
         site = pywikibot.getSite()
     separator = site.family.interwiki_text_separator
@@ -383,8 +383,8 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                                              separator=separatorstripped)
     s = interwikiFormat(new, insite = site)
     if s:
-        separator = site.family.interwiki_text_separator
-        if site.language() in site.family.interwiki_attop:
+        if site.language() in site.family.interwiki_attop or \
+           u'<!-- interwiki at top -->' in oldtext:
             newtext = s + separator + s2.replace(marker,'').strip()
         else:
             # calculate what was after the language links on the page
@@ -627,7 +627,6 @@ See http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/bis_2006#
                                              separator=separatorstripped)
     s = categoryFormat(new, insite = site)
     if s:
-        separator = site.family.category_text_separator
         if site.language() in site.family.category_attop:
             newtext = s + separator + s2
         else:
