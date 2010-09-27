@@ -12,14 +12,14 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'ja', 'pt', 'hu', 'nl', 'es', 'pl', 'it', 'he',
-            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'da', 'tr',
+            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'tr', 'da',
             'th', 'mk', 'id', 'ko', 'sr', 'fa', 'tl', 'ar', 'gl', 'is', 'no',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'si', 'la', 'uk',
             'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'ml', 'oc', 'ms',
             'eu', 'hi', 'fy', 'ie', 'af', 'tt', 'tg', 'bn', 'hy', 'pa', 'te',
             'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'cy', 'mg', 'ku',
-            'co', 'sw', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'kk', 'mn', 'nds',
-            'zu', 'my',
+            'co', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'kk', 'mn', 'nds', 'zu',
+            'my',
         ]
 
         for lang in self.languages_by_size:
@@ -32,15 +32,15 @@ class Family(family.Family):
         # languages are put in the order given there. All other languages are put
         # after those, in code-alphabetical order.
 
-        alphabetic = ['af', 'ar', 'roa-rup', 'om', 'bg', 'be', 'bn', 'bs',
-                      'ca', 'chr', 'co', 'cs', 'cy', 'da', 'de', 'als', 'et',
-                      'el', 'en', 'es', 'eo', 'eu', 'fa', 'fr', 'fy', 'gv',
-                      'gd', 'gl', 'ko', 'hi', 'hr', 'io', 'id', 'ia', 'is', 'it',
+        alphabetic = ['af', 'ar', 'roa-rup', 'om', 'bg', 'be', 'bn', 'bs', 'ca',
+                      'chr', 'co', 'cs', 'cy', 'da', 'de', 'als', 'et', 'el',
+                      'en', 'es', 'eo', 'eu', 'fa', 'fr', 'fy', 'gv', 'gd',
+                      'gl', 'ko', 'hi', 'hr', 'io', 'id', 'ia', 'is', 'it',
                       'he', 'jv', 'ka', 'csb', 'sw', 'la', 'lv', 'lt', 'hu',
-                      'mk', 'mg', 'ml', 'mi', 'mr', 'ms', 'zh-cfr', 'mn', 'nah', 'na',
-                      'nl', 'ja', 'no', 'nb', 'oc', 'nds', 'pl', 'pt', 'ro', 'ru',
-                      'sa', 'st', 'sq', 'si', 'simple', 'sk', 'sl', 'sr', 'su',
-                      'fi', 'sv', 'ta', 'tt', 'th', 'ur', 'vi',
+                      'mk', 'mg', 'ml', 'mi', 'mr', 'ms', 'zh-cfr', 'mn', 'nah',
+                      'na', 'nl', 'ja', 'no', 'nb', 'oc', 'nds', 'pl', 'pt',
+                      'ro', 'ru', 'sa', 'st', 'sq', 'si', 'simple', 'sk', 'sl',
+                      'sr', 'su', 'fi', 'sv', 'ta', 'tt', 'th', 'ur', 'vi',
                       'tpi', 'tr', 'uk', 'vo', 'yi', 'za', 'zh', 'zh-cn',
                       'zh-tw']
 
@@ -75,6 +75,7 @@ class Family(family.Family):
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rumantsch_Wikibooks
             'se': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Sami_Wikibooks
             'simple' : 'en', # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
+            'sw' : None, #https://bugzilla.wikimedia.org/show_bug.cgi?id=25170
             'tokipona': None,
             'ug': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Uyghur_Wikibooks
             'wa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Walon_Wikibooks
