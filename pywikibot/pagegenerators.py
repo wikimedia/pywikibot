@@ -878,14 +878,16 @@ def ShortPagesPageGenerator(number = 100, repeat = False, site = None):
     for page, length in site.shortpages(number=number, repeat=repeat):
         yield page
 
-def LinksearchPageGenerator(link, limit=None, site=None):
+def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
+                            site=None):
     """Yields all pages that include a specified link, according to
     [[Special:Linksearch]].
 
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.linksearch(link, limit=limit):
+    for page in site.exturlusage(link, namespaces=namespaces, step=step,
+                                 total=total, content=False):
         yield page
 
 def SearchPageGenerator(query, number = 100, namespaces = None, site = None):
