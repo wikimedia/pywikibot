@@ -282,7 +282,6 @@ class CosmeticChangesToolkit:
             text = interwikiR.sub(r'[[\1]]', text)
         return text
 
-
     def standardizePageFooter(self, text):
         """
         Makes sure that categories are put to the correct position, but
@@ -617,6 +616,7 @@ class CosmeticChangesToolkit:
             # do not change digits inside html-tags
             pattern = re.compile(u'<[/]*?[^</]+?[/]*?>', re.UNICODE)
             exceptions.append(pattern)
+            exceptions.append('table') #exclude tables for now
             for i in range(0,10):
                 text = pywikibot.replaceExcept(text, str(i), u'٠١٢٣٤٥٦٧٨٩'[i], exceptions)
         return text
