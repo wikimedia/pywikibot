@@ -1656,7 +1656,8 @@ class Subject(object):
 
             for siteCode in lclSite.family.languages_by_size:
                 site = pywikibot.getSite(code = siteCode)
-                if (not lclSiteDone and site == lclSite) or (not frgnSiteDone and site != lclSite and site in new):
+                if (not lclSiteDone and site == lclSite) or \
+                   (not frgnSiteDone and site != lclSite and site in new):
                     if site == lclSite:
                         lclSiteDone = True   # even if we fail the update
                     if site.family.name in config.usernames and site.lang in config.usernames[site.family.name]:
@@ -1669,17 +1670,24 @@ class Subject(object):
                             notUpdatedSites.append(site)
                         except GiveUpOnPage:
                             break
-                elif not globalvar.strictlimittwo and site in new and site != lclSite:
+                elif not globalvar.strictlimittwo and site in new \
+                     and site != lclSite:
                     old={}
                     try:
                         for link in new[site].iterlanglinks():
                             page = pywikibot.Page(link)
                             old[page.site] = page
                     except pywikibot.NoPage:
-                        pywikibot.output(u"BUG>>> %s no longer exists?" % new[site])
+                        pywikibot.output(u"BUG>>> %s no longer exists?"
+                                         % new[site])
                         continue
-                    mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite = lclSite)
-                    if (len(removing) > 0 and not globalvar.autonomous) or (len(modifying) > 0 and self.problemfound) or len(old) == 0 or (globalvar.needlimit and len(adding) + len(modifying) >= globalvar.needlimit +1):
+                    mods, mcomment, adding, removing, modifying \
+                          = compareLanguages(old, new, insite = lclSite)
+                    if (len(removing) > 0 and not globalvar.autonomous) or \
+                       (len(modifying) > 0 and self.problemfound) or \
+                       len(old) == 0 or \
+                       (globalvar.needlimit and \
+                        len(adding) + len(modifying) >= globalvar.needlimit +1):
                         try:
                             if self.replaceLinks(new[site], new, bot):
                                 updatedSites.append(site)
@@ -1692,7 +1700,8 @@ class Subject(object):
         else:
             for (site, page) in new.iteritems():
                 # if we have an account for this site
-                if site.family.name in config.usernames and site.lang in config.usernames[site.family.name]:
+                if site.family.name in config.usernames \
+                   and site.lang in config.usernames[site.family.name]:
                     # Try to do the changes
                     try:
                         if self.replaceLinks(page, new, bot):
@@ -1803,7 +1812,8 @@ class Subject(object):
                 rmPage = old[rmsite]
                 #put it to new means don't delete it
                 if not globalvar.cleanup or \
-                   rmPage.title(asLink=True, forceInterwiki=True) not in globalvar.remove:
+                   rmPage.title(asLink=True, forceInterwiki=True) not in globalvar.remove or \
+                   rmPage.site.sitename() == 'wikipedia:hi': #work-arround for bug #3081100 (do not remove hi-pages)
                     new[rmsite] = rmPage
                     pywikibot.output(
                         u"WARNING: %s is either deleted or has a mismatching disambiguation state."
@@ -1844,7 +1854,7 @@ class Subject(object):
         if removing and removing != [page.site]:   # Allow for special case of a self-pointing interwiki link
             self.problem(u'Found incorrect link to %s in %s'% (",".join([x.lang for x in removing]), page), createneed = False)
             ask = True
-        if globalvar.force:
+        if globalvar.force or globalvar.cleanup:
             ask = False
         if globalvar.confirm and not globalvar.always:
             ask = True
