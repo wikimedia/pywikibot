@@ -493,7 +493,7 @@ class Page(object):
         """Return True if this is an image description page, False otherwise."""
         return self.namespace() == 6
 
-    def isDisambig(self):
+    def isDisambig(self, get_Index=True):
         """Return True if this is a disambiguation page, False otherwise.
 
         Relies on the presence of specific templates, identified in
@@ -501,31 +501,53 @@ class Page(object):
         pages.
 
         By default, loads a list of template names from the Family file;
-        if the value in the Family file is None, looks for the list on
-        [[MediaWiki:Disambiguationspage]].
+        if the value in the Family file is None no entry was made, looks for
+        the list on [[MediaWiki:Disambiguationspage]]. If this page does not
+        exist, take the mediawiki message.
+
+        If get_Index is True then also load the templates for index articles
+        which are given on en-wiki
+
+        Template:Disambig is always assumed to be default, and will be
+        appended regardless of its existence.
 
         """
         if not hasattr(self, "_isDisambig"):
             if not hasattr(self.site, "_disambigtemplates"):
-                self.site._disambigtemplates = \
-                                self.site.family.disambig(self.site.code)
-                if self.site._disambigtemplates is None:
+                default = set(self._site.family.disambig('_default'))
+                try:
+                    distl = self.site.family.disambig(self.site.code,
+                                                      fallback=False)
+                except KeyError:
+                    distl = None
+                if distl is None:
                     try:
                         disambigpages = Page(self.site,
                                              "MediaWiki:Disambiguationspage")
-                        self.site._disambigtemplates = [
-                            link.title(withNamespace=False)
-                            for link in disambigpages.linkedPages()
-                            if link.namespace() == 10
-                        ]
+                        disambigs = set(link.title(withNamespace=False)
+                                        for link in disambigpages.linkedPages()
+                                        if link.namespace() == 10)
+                        # add index article templates
+                        if get_Index and \
+                           self.site.sitename() == 'wikipedia:en':
+                            regex = re.compile('\(\((.+?)\)\)')
+                            content = disambigpages.get()
+                            for index in regex.findall(content):
+                                disambigs.add(index)
                     except pywikibot.NoPage:
-                        self.site._disambigtemplates = ['Disambig']
-            for t in self.templates():
-                if t.title(withNamespace=False) in self.site._disambigtemplates:
-                    self._isDisambig = True
-                    break
-            else:
-                self._isDisambig = False
+                        disambigs = set([self.site.mediawiki_message(
+                            'Disambiguationspage').split(':', 1)[1]])
+                    # add the default template(s)
+                    self.site._disambigtemplates = disambigs | default
+                else:
+                    # Normalize template capitalization
+                    self.site._disambigtemplates = set(
+                        t[:1].upper() + t[1:] for t in distl
+                    )
+            disambigInPage = self.site._disambigtemplates.intersection(
+                self.templates())
+            self._isDisambig = self.namespace() != 10 and \
+                               len(disambigInPage) > 0
         return self._isDisambig
 
     def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
