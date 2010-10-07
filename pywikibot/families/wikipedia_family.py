@@ -497,9 +497,14 @@ class Family(family.Family):
                 '_default': [12],
             },
             'de': {
-                '_default': [0, 12]
+                '_default': [0, 10, 12],
+                'el': [100, 12],
+                'es': [104, 12],
             },
             'fi': {
+                '_default': [0, 12]
+            },
+            'mzn': {
                 '_default': [0, 12]
             },
         }
