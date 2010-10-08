@@ -12,15 +12,15 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'lt', 'zh', 'tr', 'ru', 'vi', 'pl', 'io', 'pt', 'fi',
-            'hu', 'ko', 'el', 'no', 'de', 'ta', 'sv', 'it', 'nl', 'my', 'kn',
-            'li', 'mg', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'et', 'ro', 'id',
+            'hu', 'ko', 'el', 'no', 'de', 'ta', 'sv', 'it', 'nl', 'mg', 'my',
+            'kn', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'et', 'ro', 'id',
             'te', 'gl', 'uk', 'bg', 'ca', 'vo', 'fa', 'is', 'scn', 'cs', 'hr',
             'simple', 'sr', 'af', 'th', 'oc', 'fy', 'sw', 'br', 'he', 'la',
             'sq', 'sl', 'hy', 'tt', 'zh-min-nan', 'da', 'cy', 'wa', 'ne', 'tk',
             'lv', 'ast', 'ur', 'hsb', 'ka', 'kk', 'eo', 'ky', 'wo', 'eu', 'ang',
             'hi', 'co', 'az', 'mr', 'ga', 'gn', 'ia', 'sk', 'be', 'tl', 'ms',
             'csb', 'st', 'nn', 'nds', 'kl', 'sd', 'ug', 'ps', 'ti', 'sh', 'mk',
-            'bn', 'an', 'si', 'zu', 'gu', 'km', 'ss', 'qu', 'ts', 'bs', 'fo',
+            'bn', 'si', 'an', 'zu', 'gu', 'km', 'ss', 'qu', 'ts', 'bs', 'fo',
             'am', 'rw', 'chr', 'om', 'su', 'kw', 'iu', 'mn', 'gv', 'nah', 'lb',
             'yi', 'ie', 'pa', 'mt', 'gd', 'tg', 'tpi', 'dv', 'za', 'ik', 'sg',
             'so', 'mi', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',

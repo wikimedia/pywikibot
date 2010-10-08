@@ -11,15 +11,14 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'ja', 'hu', 'pt', 'nl', 'es', 'pl', 'it', 'he',
+            'en', 'de', 'fr', 'ja', 'pt', 'hu', 'nl', 'es', 'pl', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'tr', 'da',
-            'th', 'id', 'mk', 'ko', 'sr', 'fa', 'tl', 'ar', 'gl', 'is', 'no',
+            'th', 'id', 'mk', 'ko', 'fa', 'sr', 'tl', 'ar', 'gl', 'is', 'no',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'si', 'la', 'uk',
-            'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'ml', 'oc', 'ms',
+            'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'oc', 'ml', 'ms',
             'eu', 'hi', 'fy', 'ie', 'tt', 'af', 'tg', 'bn', 'hy', 'pa', 'te',
             'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'cy', 'mg', 'ku',
-            'co', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'kk', 'mn', 'nds', 'zu',
-            'my',
+            'co', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'kk', 'mn', 'nds', 'my',
         ]
 
         for lang in self.languages_by_size:
@@ -83,7 +82,8 @@ class Family(family.Family):
             'yo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wikibooks
             'za': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
             'zh-tw': 'zh',
-            'zh-cn': 'zh'
+            'zh-cn': 'zh',
+            'zu': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=25425
         }
 
         self.interwiki_putfirst = {
