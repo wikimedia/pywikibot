@@ -80,15 +80,6 @@ class Family(family.Family):
             'zh-cn': 'zh'
         }
 
-        # Order for fy: alphabetical by code, but y counts as i
-        # TODO: This code is duplicated from wikipedia_family.py
-        def fycomp(x,y):
-            x = x.replace("y","i")+x.count("y")*"!"
-            y = y.replace("y","i")+y.count("y")*"!"
-            return cmp(x,y)
-        self.fyinterwiki = self.alphabetic[:]
-        self.fyinterwiki.sort(fycomp)
-
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
         # alphabetical order on language code is used. For languages that are in
@@ -104,6 +95,7 @@ class Family(family.Family):
             'fy': self.fyinterwiki,
             'he': ['en'],
             'hu': ['en'],
+            'ms': self.alphabetic_revised,
             'pl': self.alphabetic,
             'simple': self.alphabetic
         }

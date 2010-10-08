@@ -327,39 +327,6 @@ class Family(family.Family):
         # but some languages don't use this.
         self.nocapitalize = ['jbo',]
 
-        # A revised sorting order worked out on
-        # http://meta.wikimedia.org/wiki/Interwiki_sorting_order
-        self.alphabetic_revised = [
-            'ace', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an', 'arc',
-            'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'id', 'ms',
-            'bm', 'bn', 'zh-min-nan', 'nan', 'map-bms', 'jv', 'su', 'ba', 'be',
-            'be-x-old', 'bh', 'bcl', 'bi', 'bar', 'bo', 'bs', 'br', 'bug', 'bg',
-            'bxr', 'ca', 'ceb', 'cv', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum',
-            'cho', 'co', 'cy', 'da', 'dk', 'pdc', 'de', 'dv', 'nv', 'dsb', 'na',
-            'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu',
-            'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga', 'gv', 'sm',
-            'gd', 'gl', 'gan', 'ki', 'glk', 'gu', 'got', 'hak', 'xal', 'ko',
-            'ha', 'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'io', 'ig', 'ilo',
-            'bpy', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it', 'he',
-            'kl', 'kn', 'kr', 'pam', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'ky',
-            'rn', 'sw', 'kv', 'kg', 'ht', 'ku', 'kj', 'lad', 'lbe', 'lo', 'la',
-            'lv', 'to', 'lb', 'lt', 'lij', 'li', 'ln', 'jbo', 'lg', 'lmo', 'hu',
-            'mk', 'mg', 'ml', 'krc', 'mt', 'mi', 'mr', 'arz', 'mzn', 'cdo',
-            'mwl', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'fj', 'nl', 'nds-nl',
-            'cr', 'ne', 'new', 'ja', 'nap', 'ce', 'frr', 'pih', 'no', 'nb',
-            'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz',
-            'pa', 'pi', 'pag', 'pnb', 'pap', 'ps', 'km', 'pcd', 'pms', 'nds',
-            'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy',
-            'rm', 'qu', 'ru', 'sah', 'se', 'sa', 'sg', 'sc', 'sco', 'stq', 'st',
-            'tn', 'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu',
-            'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta',
-            'kab', 'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi',
-            'tokipona', 'tp', 'chr', 'chy', 've', 'tr', 'tk', 'tw', 'udm', 'uk',
-            'ur', 'ug', 'za', 'vec', 'vo', 'fiu-vro', 'wa', 'zh-classical',
-            'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea',
-            'bat-smg', 'zh', 'zh-tw', 'zh-cn',
-        ]
-        
         self.alphabetic_latin = [
             'ace', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an', 'arc',
             'roa-rup', 'frp', 'arz', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'id',
@@ -390,16 +357,6 @@ class Family(family.Family):
             'wuu', 'ts', 'yi', 'yo', 'diq', 'zea', 'zh', 'zh-tw', 'zh-cn',
             'zh-classical', 'zh-yue', 'bat-smg',
         ]
-
-        # Order for fy: alphabetical by code, but y counts as i
-
-        def fycomp(x,y):
-            x = x.replace("y","i")+x.count("y")*"!"
-            y = y.replace("y","i")+y.count("y")*"!"
-            return cmp(x,y)
-        self.fyinterwiki = self.alphabetic[:]
-        self.fyinterwiki.remove('nb')
-        self.fyinterwiki.sort(fycomp)
 
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
