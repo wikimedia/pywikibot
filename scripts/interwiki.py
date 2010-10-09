@@ -68,6 +68,10 @@ These command-line arguments can be used to specify which pages to work on:
                    NOTE: For post-processing it always assumes that saving the
                    the pages was sucessful.
 
+    -summary:      Set an additional action summary message for the edit. This
+                   could be used for further explainings of the bot action.
+                   This will only be used in non-autonomous mode.
+
 Additionaly, these arguments can be used to restrict the bot to certain pages:
 
     -namespace:n   Number or name of namespace to process. The parameter can be
@@ -634,6 +638,7 @@ class Global(object):
     quiet  = False
     restoreAll = False
     async  = False
+    summary = u''
 
     def readOptions(self, arg):
         """ Read all commandline parameters for the global container """
@@ -732,6 +737,11 @@ class Global(object):
             self.quiet = True
         elif arg == '-async':
             self.async = True
+        elif arg.startswith('-summary'):
+            if len(arg) == 8:
+                self.summary = pywikibot.input(u'What summary do you want to use?')
+            else:
+                self.summary = arg[9:]
         elif arg.startswith('-lack:'):
             remainder = arg[6:].split(':')
             self.lacklanguage = remainder[0]
@@ -1612,6 +1622,21 @@ class Subject(object):
            bot, just before submitting a page change to the live wiki it is
            checked whether we will have to wait. If that is the case, the bot will
            be told to make another get request first."""
+
+        #from clean_sandbox
+        def minutesDiff(time1, time2):
+            if type(time1) is long:
+                time1 = str(time1)
+            if type(time2) is long:
+                time2 = str(time2)
+            t1 = (((int(time1[0:4]) * 12 + int(time1[4:6])) * 30 +
+                   int(time1[6:8])) * 24 + int(time1[8:10])) * 60 + \
+                   int(time1[10:12])
+            t2 = (((int(time2[0:4]) * 12 + int(time2[4:6])) * 30 +
+                   int(time2[6:8])) * 24 + int(time2[8:10])) * 60 + \
+                   int(time2[10:12])
+            return abs(t2-t1)
+
         if not self.isDone():
             raise "Bugcheck: finish called before done"
         if not self.workonme:
@@ -1699,9 +1724,50 @@ class Subject(object):
                             break
         else:
             for (site, page) in new.iteritems():
+                # edit restriction on is-wiki
+                # http://is.wikipedia.org/wiki/Wikipediaspjall:V%C3%A9lmenni
+                # allow edits for the same conditions as -whenneeded
+                # or the last edit wasn't a bot
+                # or the last edit as 1 month ago
+                smallWikiAllowed = True
+                if globalvar.autonomous and page.site.sitename() == 'wikipedia:is':
+                    old={}
+                    try:
+                        for mypage in new[page.site].interwiki():
+                            old[mypage.site] = mypage
+                    except pywikibot.NoPage:
+                        pywikibot.output(u"BUG>>> %s no longer exists?"
+                                         % new[site].aslink(True))
+                        continue
+                    mods, mcomment, adding, removing, modifying \
+                          = compareLanguages(old, new, insite=site)
+                    #cannot create userlib.User with IP
+                    smallWikiAllowed = page.isIpEdit() or \
+                                       len(removing) > 0 or len(old) == 0 or \
+                                       len(adding) + len(modifying) > 2 or \
+                                       len(removing) + len(modifying) == 0 and \
+                                       adding == [page.site]
+                    if not smallWikiAllowed:
+                        import userlib
+                        user = userlib.User(page.site, page.userName())
+                        if not 'bot' in user.groups() \
+                           and not 'bot' in page.userName().lower(): #erstmal auch keine namen mit bot
+                            smallWikiAllowed = True
+                        else:
+                            diff = minutesDiff(page.editTime(),
+                                               time.strftime("%Y%m%d%H%M%S",
+                                                             time.gmtime()))
+                            if diff > 30*24*60:
+                                smallWikiAllowed = True
+                            else:
+                                pywikibot.output(
+u'NOTE: number of edits are restricted at %s'
+                                    % page.site.sitename())
+
                 # if we have an account for this site
                 if site.family.name in config.usernames \
-                   and site.lang in config.usernames[site.family.name]:
+                   and site.lang in config.usernames[site.family.name] \
+                   and smallWikiAllowed:
                     # Try to do the changes
                     try:
                         if self.replaceLinks(page, new, bot):
@@ -2238,7 +2304,8 @@ def compareLanguages(old, new, insite):
 
     mcomment = mods = u''
 
-    if len(adding) + len(removing) + len(modifying) <= 3:
+    if not globalvar.summary and \
+       len(adding) + len(removing) + len(modifying) <= 3:
         # Use an extended format for the string linking to all added pages.
         fmt = lambda d, site: unicode(d[site])
     else:
@@ -2260,7 +2327,7 @@ def compareLanguages(old, new, insite):
     if modifying:
         mods += (sep + mod + colon + comma.join([fmt(new, x) for x in modifying]))
     if mods:
-        mcomment = head + mods
+        mcomment = head + globalvar.summary + mods
     return mods, mcomment, adding, removing, modifying
 
 def botMayEdit (page):
@@ -2371,6 +2438,12 @@ def main():
             if not genFactory.handleArg(arg):
                 singlePageTitle.append(arg)
 
+    # Do not use additional summary with autonomous mode
+    if globalvar.autonomous:
+        globalvar.summary = u''
+    elif globalvar.summary:
+        globalvar.summary += u'; '
+    
     # ensure that we don't try to change main page
     try:
         site = pywikibot.getSite()
