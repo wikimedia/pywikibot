@@ -308,11 +308,7 @@ class CosmeticChangesToolkit:
             if not family.isDefinedNSLanguage(nsNumber, self.site.lang):
                 # Skip undefined namespaces
                 continue
-            if nsNumber == 6 and self.site.family.name == 'wikipedia' and \
-               self.site.lang in ('en', 'fr'):
-                # skip processing file namespace on en-wiki and fr-wiki
-                continue
-            namespaces = list(family.namespace(self.site.lang, nsNumber, all = True))
+            namespaces = list(family.namespace(self.site.lang, nsNumber, all=True))
             thisNs = namespaces.pop(0)
             if nsNumber == 6 and family.name == 'wikipedia' and \
                self.site.lang in ('en', 'fr'):
@@ -755,16 +751,16 @@ def main():
         gen = genFactory.getCombinedGenerator()
     if not gen:
         pywikibot.showHelp()
-    elif not always:
-        answer = pywikibot.inputChoice(
-            warning + '\nDo you really want to continue?',
-            ['yes', 'no'], ['y', 'N'], 'N')
-
-    if answer == 'y':
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = CosmeticChangesBot(preloadingGen, acceptall=always,
-                                 comment=editSummary)
-        bot.run()
+    else:
+        if not always:
+            answer = pywikibot.inputChoice(
+                warning + '\nDo you really want to continue?',
+                ['yes', 'no'], ['y', 'N'], 'N')
+        if answer == 'y':
+            preloadingGen = pagegenerators.PreloadingGenerator(gen)
+            bot = CosmeticChangesBot(preloadingGen, acceptall=always,
+                                     comment=editSummary)
+            bot.run()
 
 if __name__ == "__main__":
     try:
