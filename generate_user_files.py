@@ -2,7 +2,8 @@
 """ Script to create user files (user-config.py, user-fixes.py) """
 __version__ = '$Id$'
 
-import codecs, os, platform, re, sys
+import codecs, os, re, sys
+import platform
 
 def get_base_dir():
     """Return the directory in which user-specific information is stored.
@@ -113,7 +114,7 @@ your operating system. See your operating system documentation for how to
 set environment variables.""" % locals(), width=76)
     for line in msg:
         print line
-    ok = raw_input("Is this OK? [y/N] ")
+    ok = raw_input("Is this OK? ([yes], [N]o) ")
     if ok in ["Y", "y"]:
         base_dir = new_base
         return True
@@ -130,16 +131,17 @@ def create_user_config():
     _fnc = os.path.join(base_dir, "user-config.py")
     if not file_exists(_fnc):
         known_families = re.findall(r'(.+)_family.py\b',
-                     '\n'.join(os.listdir(
-                                   os.path.join(
-                                       pywikibot_dir, "pywikibot", "families"))))
+                                   '\n'.join(os.listdir(
+                                       os.path.join(pywikibot_dir,
+                                                    "pywikibot",
+                                                    "families"))))
         fam = listchoice(known_families,
                          "Select family of sites we are working on",
                          default='wikipedia')
         mylang = raw_input(
 "The language code of the site we're working on (default: 'en'): ") or 'en'
-        username = raw_input("Username (%s %s): " % (mylang, fam)
-                            ) or 'UnnamedBot'
+        username = raw_input("Username (%s %s): "
+                             % (mylang, fam)) or 'UnnamedBot'
         username = unicode(username, console_encoding)
         while True:
             choice = raw_input(
@@ -156,7 +158,8 @@ def create_user_config():
         # config2.py will be in the pywikibot/ directory
         f = codecs.open(os.path.join(install, "pywikibot", "config2.py"),
                         "r", "utf-8")
-        cpy = f.read() ; f.close()
+        cpy = f.read()
+        f.close()
 
         res = re.findall("^(############## (?:LOGFILE|"
                                             "INTERWIKI|"
@@ -227,8 +230,8 @@ fixes['example'] = {
 
 if __name__ == "__main__":
     while True:
-        print("Your default user directory is '%s'" % base_dir)
-        ok = raw_input("[K]eep/Change? ").upper().strip()
+        print('\nYour default user directory is "%s"' % base_dir)
+        ok = raw_input("How to proceed? ([K]eep [c]hange) ").upper().strip()
         if (not ok) or "KEEP".startswith(ok):
             break
         if "CHANGE".startswith(ok):
@@ -238,8 +241,8 @@ if __name__ == "__main__":
         if os.path.exists(os.path.join(base_dir, "user-config.py")):
             break
         do_copy = raw_input(
-    "Do you want to copy user files from an existing pywikipedia installation? "
-                        ).upper().strip()
+"Do you want to copy user files from an existing pywikipedia installation? "
+                            ).upper().strip()
         if do_copy and "YES".startswith(do_copy):
             oldpath = raw_input("Path to existing wikipedia.py? ")
             if not os.path.exists(oldpath):
@@ -254,7 +257,7 @@ if __name__ == "__main__":
             newf = file(os.path.join(base_dir, "user-config.py"), "wb")
             oldf = file(os.path.join(oldpath, "user-config.py"), "rb")
             newf.write(oldf.read())
-            newf.close() ; oldf.close()
+            newf.close(); oldf.close()
             if os.path.isfile(os.path.join(oldpath, "user-fixes.py")):
                 newfix = file(os.path.join(base_dir, "user-fixes.py"), "wb")
                 oldfix = file(os.path.join(oldpath, "user-fixes.py"), "rb")
@@ -263,13 +266,13 @@ if __name__ == "__main__":
         elif do_copy and "NO".startswith(do_copy):
             break
     if not os.path.isfile(os.path.join(base_dir, "user-config.py")):
-        a = raw_input("Create user-config.py file? [y/N] ")
+        a = raw_input("Create user-config.py file? ([y]es, [N]o) ")
         if a[:1] in ["Y", "y"]:
             create_user_config()
     else:
         print("NOTE: user-config.py already exists in the directory")
     if not os.path.isfile(os.path.join(base_dir, "user-fixes.py")):
-        a = raw_input("Create user-fixes.py file? [y/N] ")
+        a = raw_input("Create user-fixes.py file? ([y]es, [N]o) ")
         if a[:1] in ["Y", "y"]:
             create_user_fixes()
     else:
