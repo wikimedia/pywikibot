@@ -514,7 +514,10 @@ class Page(object):
         """
         if not hasattr(self, "_isDisambig"):
             if not hasattr(self.site, "_disambigtemplates"):
-                default = set(self.site.family.disambig('_default'))
+                try:
+                    default = set(self.site.family.disambig('_default'))
+                except KeyError:
+                    default = set(u'Disambig')
                 try:
                     distl = self.site.family.disambig(self.site.code,
                                                       fallback=False)
