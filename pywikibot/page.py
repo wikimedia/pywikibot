@@ -514,7 +514,7 @@ class Page(object):
         """
         if not hasattr(self, "_isDisambig"):
             if not hasattr(self.site, "_disambigtemplates"):
-                default = set(self._site.family.disambig('_default'))
+                default = set(self.site.family.disambig('_default'))
                 try:
                     distl = self.site.family.disambig(self.site.code,
                                                       fallback=False)
@@ -524,7 +524,7 @@ class Page(object):
                     try:
                         disambigpages = Page(self.site,
                                              "MediaWiki:Disambiguationspage")
-                        disambigs = set(link.title(withNamespace=False)
+                        disambigs = set(link
                                         for link in disambigpages.linkedPages()
                                         if link.namespace() == 10)
                         # add index article templates
