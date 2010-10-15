@@ -11,7 +11,7 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'en', 'ru', 'zh', 'pt', 'fr', 'de', 'es', 'it', 'he', 'ar', 'hu',
+            'en', 'ru', 'zh', 'pt', 'fr', 'de', 'it', 'es', 'he', 'ar', 'hu',
             'fa', 'pl', 'th', 'cs', 'ro', 'hr', 'te', 'fi', 'bn', 'sv', 'vi',
             'tr', 'nl', 'sl', 'ko', 'uk', 'sr', 'ja', 'el', 'la', 'li', 'yi',
             'ml', 'az', 'is', 'bs', 'ca', 'hy', 'id', 'mk', 'ta', 'da', 'no',

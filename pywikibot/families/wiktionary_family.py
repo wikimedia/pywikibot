@@ -12,11 +12,11 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'lt', 'zh', 'tr', 'ru', 'vi', 'pl', 'io', 'pt', 'fi',
-            'hu', 'ko', 'el', 'no', 'de', 'ta', 'sv', 'it', 'nl', 'mg', 'my',
+            'ko', 'hu', 'el', 'no', 'de', 'ta', 'sv', 'it', 'mg', 'nl', 'my',
             'kn', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'et', 'ro', 'id',
             'te', 'gl', 'uk', 'bg', 'ca', 'vo', 'fa', 'is', 'scn', 'cs', 'hr',
             'simple', 'sr', 'af', 'th', 'oc', 'fy', 'sw', 'br', 'he', 'la',
-            'sq', 'sl', 'hy', 'tt', 'zh-min-nan', 'da', 'cy', 'wa', 'ne', 'tk',
+            'sq', 'sl', 'hy', 'tt', 'zh-min-nan', 'cy', 'da', 'wa', 'ne', 'tk',
             'lv', 'ast', 'ur', 'hsb', 'ka', 'kk', 'eo', 'ky', 'wo', 'eu', 'ang',
             'hi', 'co', 'az', 'mr', 'ga', 'gn', 'ia', 'sk', 'be', 'tl', 'ms',
             'csb', 'st', 'nn', 'nds', 'kl', 'sd', 'ug', 'ps', 'ti', 'sh', 'mk',
