@@ -904,7 +904,7 @@ def _altlang(code):
     if code in ['ne', 'new']:
         return ['ne', 'new', 'hi']
     #Indonesian and Malay
-    if code in ['ace', 'bug', 'id', 'jv', 'ms', 'su']:
+    if code in ['ace', 'bug', 'bjn', 'id', 'jv', 'ms', 'su']:
         return ['id', 'ms', 'jv']
     if code == 'map-bms':
         return ['jv', 'id', 'ms']
@@ -937,8 +937,9 @@ def _altlang(code):
     if code in ['mo', 'roa-rup']:
         return ['ro']
     #Russian and Belarusian
-    if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'kk', 'ky', 'lbe', 'mdf',
-                'mhr', 'myv', 'os', 'sah', 'tg', 'tt', 'udm', 'uk', 'xal']:
+    if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'kk', 'koi', 'ky', 'lbe',
+                'mdf', 'mhr', 'mrj', 'myv', 'os', 'sah', 'tg', 'tt', 'udm',
+                'uk', 'xal']:
         return ['ru']
     if code in ['be', 'be-x-old']:
         return ['be', 'be-x-old', 'ru']
