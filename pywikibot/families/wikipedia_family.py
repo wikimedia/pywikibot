@@ -340,13 +340,13 @@ class Family(family.Family):
             'got', 'gu', 'ha', 'hak', 'xal', 'haw', 'he', 'hi', 'ho', 'hsb',
             'hr', 'hy', 'io', 'ig', 'ii', 'ilo', 'ia', 'ie', 'iu', 'ik', 'os',
             'xh', 'zu', 'is', 'it', 'ja', 'ka', 'kl', 'kr', 'pam', 'krc', 'csb',
-            'kk', 'kw', 'rw', 'ky', 'rn', 'sw', 'km', 'kn', 'ko', 'koi', 'kv',
+            'kk', 'kw', 'rw', 'ky', 'mrj', 'rn', 'sw', 'km', 'kn', 'ko', 'kv',
             'kg', 'ht', 'ks', 'ku', 'kj', 'lad', 'lbe', 'la', 'lv', 'to', 'lb',
             'lt', 'lij', 'li', 'ln', 'lo', 'jbo', 'lg', 'lmo', 'hu', 'mk', 'mg',
             'mt', 'mi', 'cdo', 'mwl', 'ml', 'mdf', 'mo', 'mn', 'mr', 'mus',
             'my', 'mzn', 'nah', 'fj', 'ne', 'nl', 'nds-nl', 'cr', 'new', 'nap',
-            'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov', 'oc', 'mrj',
-            'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pag', 'pap', 'pi',
+            'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov', 'oc', 'mhr',
+            'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pag', 'pap', 'koi', 'pi',
             'pcd', 'pms', 'nds', 'pnb', 'pl', 'pt', 'pnt', 'ps', 'aa', 'kaa',
             'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'sa', 'sah',
             'se', 'sg', 'sc', 'sco', 'sd', 'stq', 'st', 'tn', 'sq', 'si', 'scn',
@@ -377,7 +377,8 @@ class Family(family.Family):
             'lb': self.alphabetic,
             'mk': self.alphabetic,
             'ms': self.alphabetic_revised,
-            'nds': ['nds-nl', 'pdt'] + self.alphabetic, # Note: as of 2008-02-24, pdt: (Plautdietsch) is still in the Incubator.
+            'nds': ['nds-nl', 'pdt'], # Note: as of 2008-02-24, pdt:
+            'nds-nl': ['nds', 'pdt'], # (Plautdietsch) is still in the Incubator.
             'nn': ['no', 'nb', 'sv', 'da'] + self.alphabetic,
             'no': self.alphabetic,
             'pl': self.alphabetic,
