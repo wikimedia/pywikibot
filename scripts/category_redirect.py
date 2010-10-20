@@ -204,7 +204,10 @@ liên kết thể loại:
 
         """
         oldtext = article.get(get_redirect=True, force=True)
-        newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, newCat)
+        if newcat in article.categories():
+            newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, None)
+        else:
+            newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, newCat)
         try:
             # even if no changes, still save the page, in case it needs
             # an update due to changes in a transcluded template
