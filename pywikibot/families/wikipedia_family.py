@@ -11,7 +11,7 @@ class Family(family.Family):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'it', 'pl', 'ja', 'es', 'nl', 'pt', 'ru', 'sv',
+            'en', 'de', 'fr', 'pl', 'it', 'ja', 'es', 'nl', 'pt', 'ru', 'sv',
             'zh', 'ca', 'no', 'fi', 'uk', 'hu', 'cs', 'ro', 'tr', 'ko', 'da',
             'ar', 'eo', 'sr', 'vi', 'id', 'lt', 'vo', 'sk', 'he', 'bg', 'fa',
             'sl', 'war', 'hr', 'et', 'ms', 'new', 'simple', 'gl', 'th',
@@ -21,7 +21,7 @@ class Family(family.Family):
             'sw', 'io', 'ksh', 'lmo', 'fy', 'gu', 'nds', 'af', 'scn', 'qu',
             'ku', 'ur', 'su', 'ml', 'zh-yue', 'ast', 'nap', 'bat-smg', 'wa',
             'ga', 'cv', 'hy', 'yo', 'kn', 'tg', 'roa-tara', 'vec', 'pnb', 'gd',
-            'yi', 'ne', 'zh-min-nan', 'uz', 'tt', 'pam', 'os', 'sah', 'als',
+            'ne', 'yi', 'zh-min-nan', 'uz', 'tt', 'pam', 'os', 'sah', 'als',
             'mi', 'arz', 'kk', 'nah', 'li', 'hsb', 'glk', 'co', 'gan', 'am',
             'ia', 'mn', 'bcl', 'fiu-vro', 'nds-nl', 'fo', 'tk', 'vls', 'sco',
             'si', 'sa', 'bar', 'my', 'gv', 'dv', 'nrm', 'pag', 'rm', 'map-bms',
@@ -34,10 +34,10 @@ class Family(family.Family):
             'ty', 'tpi', 'pap', 'zea', 'srn', 'kl', 'udm', 'ce', 'ig', 'or',
             'dsb', 'kg', 'lo', 'ab', 'mdf', 'rmy', 'cu', 'mwl', 'kaa', 'sm',
             'tet', 'av', 'sn', 'got', 'ks', 'sd', 'bm', 'na', 'pih', 'pnt',
-            'iu', 'ik', 'chr', 'bi', 'as', 'cdo', 'ee', 'ss', 'om', 'za', 'ti',
-            'ts', 've', 'zu', 'ha', 'dz', 'sg', 'ch', 'cr', 'ak', 'xh', 'st',
-            'rw', 'tn', 'ki', 'bxr', 'bug', 'ny', 'lbe', 'tw', 'rn', 'ff',
-            'chy', 'lg',
+            'iu', 'ik', 'chr', 'bi', 'as', 'cdo', 'ee', 'ss', 'om', 'za', 'bjn',
+            'ti', 'ts', 've', 'zu', 'ha', 'dz', 'sg', 'ch', 'cr', 'ak', 'xh',
+            'st', 'rw', 'tn', 'ki', 'bxr', 'bug', 'ny', 'lbe', 'tw', 'rn', 'ff',
+            'chy', 'lg', 'koi', 'mrj',
         ]
 
         for lang in self.languages_by_size:
