@@ -14,11 +14,11 @@ class Family(family.Family):
             'en', 'de', 'fr', 'ja', 'hu', 'pt', 'nl', 'es', 'pl', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'tr', 'da',
             'th', 'id', 'mk', 'ko', 'fa', 'sr', 'tl', 'ar', 'gl', 'is', 'no',
-            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'si', 'la', 'uk',
-            'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'oc', 'ml', 'ms',
-            'eu', 'hi', 'fy', 'ie', 'tt', 'af', 'tg', 'bn', 'hy', 'pa', 'te',
-            'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'cy', 'mg', 'ku',
-            'co', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'kk', 'mn', 'nds', 'my',
+            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'uk', 'si', 'la',
+            'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'ml', 'oc', 'ms',
+            'eu', 'tt', 'hi', 'fy', 'ie', 'tg', 'af', 'bn', 'hy', 'pa', 'bs',
+            'te', 'sa', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'mg', 'cy', 'ku',
+            'co', 'tk', 'als', 'su', 'vo', 'uz', 'na', 'mn', 'kk', 'nds', 'my',
         ]
 
         for lang in self.languages_by_size:
