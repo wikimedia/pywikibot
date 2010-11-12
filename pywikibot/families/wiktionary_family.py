@@ -11,7 +11,7 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'zh', 'lt', 'tr', 'ru', 'vi', 'pl', 'ta', 'io', 'mg',
+            'en', 'fr', 'zh', 'lt', 'tr', 'ru', 'vi', 'pl', 'ta', 'mg', 'io',
             'ko', 'pt', 'fi', 'hu', 'el', 'no', 'de', 'sv', 'it', 'nl', 'my',
             'kn', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'et', 'ro', 'te',
             'id', 'gl', 'uk', 'bg', 'ca', 'vo', 'fa', 'is', 'cs', 'scn', 'hr',
@@ -20,11 +20,11 @@ class Family(family.Family):
             'tk', 'ast', 'ur', 'hsb', 'ka', 'kk', 'eo', 'ky', 'eu', 'wo', 'az',
             'ang', 'hi', 'co', 'mr', 'ga', 'gn', 'ia', 'be', 'sk', 'tl', 'ms',
             'csb', 'st', 'nn', 'nds', 'kl', 'sd', 'ps', 'ug', 'sh', 'ti', 'mk',
-            'bn', 'si', 'an', 'zu', 'gu', 'km', 'qu', 'ss', 'ts', 'bs', 'fo',
-            'am', 'rw', 'chr', 'om', 'su', 'kw', 'iu', 'gv', 'mn', 'lb', 'nah',
+            'si', 'bn', 'an', 'zu', 'gu', 'km', 'ss', 'qu', 'ts', 'bs', 'fo',
+            'am', 'rw', 'chr', 'lb', 'om', 'su', 'kw', 'iu', 'gv', 'mn', 'nah',
             'yi', 'ie', 'pa', 'za', 'mt', 'gd', 'tg', 'tpi', 'dv', 'ik', 'sg',
             'so', 'mi', 'roa-rup', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
-            'na', 'jbo', 'tn', 'fj', 'ks', 'dz', 'als',
+            'na', 'jbo', 'fj', 'tn', 'ks', 'dz', 'als',
         ]
 
         for lang in self.languages_by_size:
