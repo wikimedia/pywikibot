@@ -13,12 +13,12 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'de', 'fr', 'ja', 'hu', 'pt', 'nl', 'es', 'pl', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'tr', 'da',
-            'id', 'th', 'mk', 'ko', 'fa', 'sr', 'tl', 'ar', 'gl', 'is', 'no',
+            'th', 'id', 'mk', 'ko', 'fa', 'sr', 'tl', 'ar', 'gl', 'is', 'no',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'uk', 'si', 'la',
             'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'ml', 'oc', 'ms',
-            'eu', 'tt', 'hi', 'fy', 'ie', 'tg', 'af', 'bn', 'hy', 'pa', 'te',
+            'tt', 'eu', 'hi', 'fy', 'ie', 'tg', 'af', 'bn', 'hy', 'pa', 'te',
             'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'mg', 'cy', 'ku',
-            'co', 'tk', 'als', 'su', 'vo', 'uz', 'na', 'mn', 'kk', 'nds', 'my',
+            'co', 'tk', 'als', 'su', 'vo', 'uz', 'mn', 'kk', 'my',
         ]
 
         for lang in self.languages_by_size:
@@ -67,8 +67,10 @@ class Family(family.Family):
             'lv': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Latvian_Wikibooks
             'mi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Maori_Wikibooks
             'minnan':'zh-min-nan',
+            'na': None, #http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nauruan_Wikibooks
             'nah': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nahuatl_Wikibooks
             'nb': 'no',
+            'nds': None, #http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Plattd%C3%BC%C3%BCtsch_Wikibooks
             'ps': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Pashto_Wikibooks
             'qu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikibooks
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rumantsch_Wikibooks
