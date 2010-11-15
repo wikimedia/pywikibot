@@ -239,16 +239,18 @@ class Page(object):
         retrieved yet, or if force is True. This can raise the following
         exceptions that should be caught by the calling code:
 
-          - NoPage: The page does not exist
-          - IsRedirectPage: The page is a redirect.
-          - SectionError: The section does not exist on a page with a #
-                link
+        @exception NoPage         The page does not exist
+        @exception IsRedirectPage The page is a redirect. The argument of the
+                                  exception is the title of the page it
+                                  redirects to.
+        @exception SectionError   The section does not exist on a page with
+                                  a # link
 
-        @param force: reload all page attributes, including errors.
-        @param get_redirect: return the redirect text, do not follow the
-            redirect, do not raise an exception.
-        @param sysop: if the user has a sysop account, use it to retrieve
-            this page
+        @param force            reload all page attributes, including errors.
+        @param get_redirect     return the redirect text, do not follow the
+                                redirect, do not raise an exception.
+        @param sysop            if the user has a sysop account, use it to
+                                retrieve this page
 
         """
         if force:
