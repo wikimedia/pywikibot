@@ -59,6 +59,7 @@ class Family(family.Family):
                    u"CR",
                    u"Catredirect",
                    u"Cat redirect",
+                   u"Catredir",
                    u"Seecat",),
             'es': (u'Categoría redirigida',),
             'eu': (u'Kategoria redirect',),
