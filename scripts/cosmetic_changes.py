@@ -229,7 +229,6 @@ deprecatedTemplates = {
             (u'Belege', u'Belege fehlen\g<parameters>'),
             (u'Quelle', u'Belege fehlen\g<parameters>'),
             (u'Quellen', u'Belege fehlen\g<parameters>'),
-            (u'Quellen fehlen', u'Belege fehlen\g<parameters>'),
         ],
     }
 }
@@ -580,7 +579,7 @@ class CosmeticChangesToolkit:
         return text
 
     def fixArabicLetters(self, text):
-        if self.site.lang=='ckb':
+        if self.site.lang=='ckb' or self.site.lang=='fa':
             exceptions = [
                 'gallery',
                 'hyperlink',
@@ -598,17 +597,28 @@ class CosmeticChangesToolkit:
             ]
             # do not change inside file links
             namespaces = list(self.site.namespace(6, all = True))
-            pattern = re.compile(u'\[\[(' + '|'.join(namespaces) + '):.+?\..+?\]\]', re.UNICODE)
+            pattern = re.compile(u'\[\[(' + '|'.join(namespaces) + '):.+?\..+?\]\]',
+                                 re.UNICODE)
             exceptions.append(pattern)
             text = pywikibot.replaceExcept(text, u',', u'،', exceptions)
-            text = pywikibot.replaceExcept(text, ur'ه([.،_<\]\s])', ur'ە\1', exceptions)
-            text = pywikibot.replaceExcept(text, u'ه‌', u'ە', exceptions)
-            text = pywikibot.replaceExcept(text, u'ه', u'ھ', exceptions)
+            if self.site.lang=='ckb':
+                text = pywikibot.replaceExcept(text,
+                                               ur'ه([.،_<\]\s])',
+                                               ur'ە\1', exceptions)
+                text = pywikibot.replaceExcept(text, u'ه‌', u'ە', exceptions)
+                text = pywikibot.replaceExcept(text, u'ه', u'ھ', exceptions)
             text = pywikibot.replaceExcept(text, u'ك', u'ک', exceptions)
             text = pywikibot.replaceExcept(text, ur'[ىي]', u'ی', exceptions)
             # replace persian digits
             for i in range(0,10):
-                text = pywikibot.replaceExcept(text, u'۰۱۲۳۴۵۶۷۸۹'[i], u'٠١٢٣٤٥٦٧٨٩'[i], exceptions)
+                if self.site.lang=='ckb':
+                    text = pywikibot.replaceExcept(text,
+                                                   u'۰۱۲۳۴۵۶۷۸۹'[i],
+                                                   u'٠١٢٣٤٥٦٧٨٩'[i], exceptions)
+                else:
+                    text = pywikibot.replaceExcept(text,
+                                                   u'٠١٢٣٤٥٦٧٨٩'[i],
+                                                   u'۰۱۲۳۴۵۶۷۸۹'[i], exceptions)
             # do not change digits in class, style and table params
             pattern = re.compile(u'=".*?"', re.UNICODE)
             exceptions.append(pattern)
@@ -617,7 +627,12 @@ class CosmeticChangesToolkit:
             exceptions.append(pattern)
             exceptions.append('table') #exclude tables for now
             for i in range(0,10):
-                text = pywikibot.replaceExcept(text, str(i), u'٠١٢٣٤٥٦٧٨٩'[i], exceptions)
+                if self.site.lang=='ckb':
+                    text = pywikibot.replaceExcept(text, str(i),
+                                                   u'٠١٢٣٤٥٦٧٨٩'[i], exceptions)
+                else:
+                    text = pywikibot.replaceExcept(text, str(i),
+                                                   u'۰۱۲۳۴۵۶۷۸۹'[i], exceptions)
         return text
 
     # Retrieved from "http://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup"
