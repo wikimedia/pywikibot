@@ -11,19 +11,19 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'zh', 'lt', 'tr', 'ru', 'vi', 'mg', 'pl', 'ta', 'io',
+            'en', 'fr', 'zh', 'lt', 'mg', 'tr', 'ru', 'vi', 'pl', 'ta', 'io',
             'ko', 'pt', 'fi', 'hu', 'el', 'no', 'de', 'sv', 'it', 'nl', 'my',
             'kn', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'et', 'ro', 'te',
-            'id', 'gl', 'uk', 'ca', 'bg', 'vo', 'fa', 'is', 'cs', 'hr', 'scn',
+            'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'fa', 'is', 'cs', 'hr', 'scn',
             'simple', 'sr', 'oc', 'th', 'af', 'fy', 'sw', 'br', 'he', 'la',
             'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'da', 'wa', 'ne', 'lv',
-            'tk', 'ast', 'ur', 'hsb', 'ka', 'kk', 'eo', 'eu', 'ky', 'wo', 'az',
-            'ang', 'hi', 'co', 'mr', 'ga', 'gn', 'ia', 'be', 'sk', 'tl', 'ms',
+            'tk', 'ast', 'ur', 'ka', 'hsb', 'eu', 'kk', 'eo', 'ky', 'az', 'wo',
+            'ang', 'hi', 'co', 'ga', 'mr', 'gn', 'ia', 'be', 'sk', 'tl', 'ms',
             'csb', 'st', 'nn', 'nds', 'kl', 'sd', 'ps', 'ug', 'sh', 'ti', 'mk',
-            'si', 'bn', 'an', 'zu', 'gu', 'km', 'ss', 'qu', 'ts', 'bs', 'fo',
-            'lb', 'am', 'rw', 'chr', 'om', 'su', 'kw', 'iu', 'gv', 'mn', 'nah',
+            'km', 'si', 'bn', 'an', 'zu', 'gu', 'ss', 'qu', 'ts', 'bs', 'lb',
+            'fo', 'am', 'rw', 'chr', 'om', 'su', 'kw', 'gv', 'iu', 'mn', 'nah',
             'ie', 'yi', 'pa', 'za', 'mt', 'gd', 'tg', 'tpi', 'dv', 'ik', 'mi',
-            'sg', 'so', 'roa-rup', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
+            'sg', 'roa-rup', 'so', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
             'na', 'jbo', 'ks', 'fj', 'tn', 'dz', 'als',
         ]
 
