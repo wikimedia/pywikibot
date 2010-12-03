@@ -52,6 +52,7 @@ class CategoryRedirectBot(object):
                 'da': "Kategori:Omdirigeringskategorier",
                 'en': "Category:Wikipedia soft redirected categories",
                 'es': "Categoría:Wikipedia:Categorías redirigidas",
+                'fa': u"رده:رده‌های منتقل شده",
                 'hu': "Kategória:Kategóriaátirányítások",
                 'ja': "Category:移行中のカテゴリ",
                 'no': "Kategori:Wikipedia omdirigertekategorier",
@@ -74,6 +75,7 @@ class CategoryRedirectBot(object):
 u"Robot: change redirected category [[:%(oldCatLink)s|%(oldCatTitle)s]]"
 u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'es': u"Bot: moviendo páginas de categoría redirigida",
+            'fa': u"ربات:تغییر رده‌هایی که انتقال یافته‌اند",
             'hu': u"Bot: Lapok automatikus áthelyezése átirányított kategóriából",
             'ja': u"ロボットによる: 移行中のカテゴリからのカテゴリ変更",
             'ksh': u"Bot: Sigk uß en ömjeleidt Saachjropp eruß jesammdt.",
@@ -91,6 +93,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'da':u"Robot: tilføjer omdirigeringsskabelon for vedligeholdelse",
             'en':u"Robot: adding category redirect template for maintenance",
             'es':u"Bot: añadiendo plantilla de categoría redirigida para mantenimiento",
+            'fa':u"ربات:افزودن الگوی رده بهتر",
             'hu':u"Bot: kategóriaátirányítás sablon hozzáadása",
             'ja':u"ロボットによる: 移行中のカテゴリとしてタグ付け",
             'ksh':u"Bot: Ömleidungsschalbon dobeijedonn.",
@@ -107,6 +110,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'da': u"Robot: retter dobbelt omdirigering",
             'en': u"Robot: fixing double-redirect",
             'es': u"Bot: reparando redirección doble",
+            'fa': u"ربات:تصحیح تغییرمسیرهای دوتایی",
             'fr': u"Robot : Correction des redirections doubles",
             'hu': u"Bot: Kettős átirányítás javítása",
             'ja': u"ロボットによる: 二重リダイレクト修正",
@@ -124,6 +128,7 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'da': u"Bot til vedligeholdelse af kategoromdirigeringer",
             'en': u"Category redirect maintenance bot",
             'es': u"Bot de mantenimento de categorías redirigidas",
+            'fa': u"ربات:مرتب‌سازی رده‌های منتقل‌شده",
             'fr': u"Robot de maintenance des redirection de catégorie",
             'hu': u"Kategóriaátirányítás-karbantartó bot",
             'ja': u"移行中のカテゴリのメンテナンス・ボット",
@@ -139,6 +144,12 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             {'en': u"""\
 The following protected pages have been detected as requiring updates to \
 category links:
+%s
+~~~~
+""",
+             'fa': u"""\
+صفحات حفاظت‌شده زیر نیاز به بروزرسانی دارند \
+صفحات:
 %s
 ~~~~
 """,
@@ -186,6 +197,7 @@ liên kết thể loại:
                 'ar': u"* %s موجودة في %s, وهي تحويلة إلى %s",
                 'en': u"* %s is in %s, which is a redirect to %s",
                 'es': u"* %s está en %s, el cual redirecciona a %s",
+                'fa': u"%s در %s قرار دارد،که به %s انتقال یافته‌است.",
                 'fr': u"* %s est dans %s, qui est une redirection vers %s",
                 'ksh': u"* %s es en %s, un dat es en Ömleidung op %s",
                 'pl': u"* %s jest w %s, która jest przekierowaniem do %s",
