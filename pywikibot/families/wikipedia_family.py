@@ -361,6 +361,7 @@ class Family(family.Family):
             'pl': self.alphabetic,
             'simple': self.alphabetic,
             'sr': self.alphabetic_latin,
+            'sv': self.alphabetic,
             'te': ['en', 'hi', 'kn', 'ta', 'ml'],
             'ur': ['ar', 'fa', 'en'] + self.alphabetic,
             'vi': self.alphabetic_revised,
