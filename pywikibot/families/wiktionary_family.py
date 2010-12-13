@@ -30,21 +30,66 @@ class Family(family.Family):
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wiktionary.org' % lang
 
-        # Other than most Wikipedias, page names must not start with a capital
-        # letter on ALL Wiktionaries.
-        self.nocapitalize = self.langs.keys()
 
-        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = [
-            'ang', 'ast', 'az', 'bg', 'bn', 'da', 'eo', 'es', 'fa', 'fy', 'ga', 'gd', 'hu', 
-            'ia', 'ie', 'ik', 'jv', 'ka', 'li', 'lt', 'mk', 'nl', 'no', 'oc', 'pt', 'sk', 'tg', 'th', 'ti', 
-            'ts', 'ug', 'uk', 'vo', 'za', 'zh-min-nan', 'zh', 'zu', 
-        ]
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
             'wikipedia', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
+        # Global bot allowed languages on
+        # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = [
+            'ang', 'ast', 'az', 'bg', 'bn', 'da', 'eo', 'es', 'fa', 'fy', 'ga',
+            'gd', 'hu', 'ia', 'ie', 'ik', 'jv', 'ka', 'li', 'lt', 'mk', 'nl',
+            'no', 'oc', 'pt', 'sk', 'tg', 'th', 'ti', 'ts', 'ug', 'uk', 'vo',
+            'za', 'zh-min-nan', 'zh', 'zu', 
+        ]
+
+        # Other than most Wikipedias, page names must not start with a capital
+        # letter on ALL Wiktionaries.
+        self.nocapitalize = self.langs.keys()
+
+        self.alphabetic_roman = [
+            'aa', 'af', 'ak', 'als', 'an', 'roa-rup', 'ast', 'gn', 'ay', 'az',
+            'id', 'ms', 'bm', 'zh-min-nan', 'jv', 'su', 'mt', 'bi', 'bo', 'bs',
+            'br', 'ca', 'cs', 'ch', 'sn', 'co', 'za', 'cy', 'da', 'de', 'na',
+            'mh', 'et', 'ang', 'en', 'es', 'eo', 'eu', 'to', 'fr', 'fy', 'fo',
+            'ga', 'gv', 'sm', 'gd', 'gl', 'hr', 'io', 'ia', 'ie', 'ik', 'xh',
+            'is', 'zu', 'it', 'kl', 'csb', 'kw', 'rw', 'rn', 'sw', 'ky', 'ku',
+            'la', 'lv', 'lb', 'lt', 'li', 'ln', 'jbo', 'hu', 'mg', 'mi', 'mo',
+            'my', 'fj', 'nah', 'nl', 'cr', 'no', 'nn', 'hsb', 'oc', 'om', 'ug',
+            'uz', 'nds', 'pl', 'pt', 'ro', 'rm', 'qu', 'sg', 'sc', 'st', 'tn',
+            'sq', 'scn', 'simple', 'ss', 'sk', 'sl', 'so', 'sh', 'fi', 'sv',
+            'tl', 'tt', 'vi', 'tpi', 'tr', 'tw', 'vo', 'wa', 'wo', 'ts', 'yo',
+            'el', 'av', 'ab', 'ba', 'be', 'bg', 'mk', 'mn', 'ru', 'sr', 'tg',
+            'uk', 'kk', 'hy', 'yi', 'he', 'ur', 'ar', 'tk', 'sd', 'fa', 'ha',
+            'ps', 'dv', 'ks', 'ne', 'pi', 'bh', 'mr', 'sa', 'hi', 'as', 'bn',
+            'pa', 'gu', 'or', 'ta', 'te', 'kn', 'ml', 'si', 'th', 'lo', 'dz',
+            'ka', 'ti', 'am', 'chr', 'iu', 'km', 'zh', 'ja', 'ko',
+           ]
+
+
+        # Which languages have a special order for putting interlanguage links,
+        # and what order is it? If a language is not in interwiki_putfirst,
+        # alphabetical order on language code is used. For languages that are in
+        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # languages are put in the order given there. All other languages are put
+        # after those, in code-alphabetical order.
+
+        self.interwiki_putfirst = {
+            'da': self.alphabetic,
+            'en': self.alphabetic,
+            'et': self.alphabetic,
+            'fi': self.alphabetic,
+            'fy': self.fyinterwiki,
+            'he': ['en'],
+            'hu': ['en'],
+            'ms': self.alphabetic_revised,
+            'pl': self.alphabetic,
+            'sv': self.alphabetic_roman,
+            'simple': self.alphabetic,
+        }
+
         self.obsolete = {
             'aa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wiktionary
             'ab': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Abkhaz_Wiktionary
@@ -78,26 +123,6 @@ class Family(family.Family):
             'yo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wiktionary
             'zh-tw': 'zh',
             'zh-cn': 'zh'
-        }
-
-        # Which languages have a special order for putting interlanguage links,
-        # and what order is it? If a language is not in interwiki_putfirst,
-        # alphabetical order on language code is used. For languages that are in
-        # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are put
-        # after those, in code-alphabetical order.
-
-        self.interwiki_putfirst = {
-            'da': self.alphabetic,
-            'en': self.alphabetic,
-            'et': self.alphabetic,
-            'fi': self.alphabetic,
-            'fy': self.fyinterwiki,
-            'he': ['en'],
-            'hu': ['en'],
-            'ms': self.alphabetic_revised,
-            'pl': self.alphabetic,
-            'simple': self.alphabetic
         }
 
         self.interwiki_on_one_line = ['pl']
