@@ -11,14 +11,14 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'ja', 'hu', 'pt', 'nl', 'es', 'pl', 'it', 'he',
+            'en', 'de', 'fr', 'ja', 'hu', 'pt', 'es', 'nl', 'pl', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'tr', 'da',
-            'id', 'th', 'mk', 'ko', 'sr', 'fa', 'tl', 'gl', 'ar', 'is', 'no',
-            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'uk', 'si', 'la',
-            'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'tt', 'ur', 'oc', 'ms',
-            'ml', 'eu', 'hi', 'fy', 'ie', 'tg', 'af', 'bn', 'hy', 'pa', 'te',
-            'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'mg', 'cy', 'ku',
-            'co', 'tk', 'als', 'su', 'vo', 'uz', 'mn', 'kk', 'my', 'li',
+            'id', 'th', 'mk', 'ko', 'sr', 'fa', 'tl', 'ar', 'gl', 'is', 'no',
+            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'uk', 'si', 'li',
+            'la', 'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'tt', 'oc',
+            'ml', 'ms', 'eu', 'hi', 'fy', 'ie', 'tg', 'af', 'bn', 'hy', 'pa',
+            'te', 'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'mg', 'cy',
+            'ku', 'co', 'tk', 'als', 'su', 'uz', 'vo', 'mn', 'kk', 'my',
         ]
 
         for lang in self.languages_by_size:

@@ -12,18 +12,18 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'zh', 'lt', 'mg', 'tr', 'ru', 'vi', 'pl', 'ta', 'io',
-            'ko', 'pt', 'fi', 'hu', 'el', 'no', 'de', 'sv', 'it', 'nl', 'my',
-            'kn', 'li', 'lo', 'ml', 'ja', 'es', 'et', 'ku', 'ar', 'ro', 'te',
+            'ko', 'pt', 'fi', 'hu', 'el', 'de', 'no', 'sv', 'it', 'nl', 'my',
+            'kn', 'li', 'et', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'fa', 'is', 'cs', 'hr', 'scn',
             'simple', 'sr', 'oc', 'th', 'af', 'fy', 'sw', 'br', 'he', 'la',
-            'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'da', 'eo', 'wa', 'ne',
+            'sq', 'sl', 'hy', 'eo', 'tt', 'cy', 'zh-min-nan', 'da', 'wa', 'ne',
             'lv', 'tk', 'ast', 'ur', 'ka', 'hsb', 'eu', 'kk', 'ky', 'az', 'wo',
             'ang', 'hi', 'co', 'ga', 'mr', 'gn', 'ia', 'be', 'sk', 'tl', 'ms',
             'csb', 'st', 'nn', 'nds', 'kl', 'sd', 'km', 'ps', 'ug', 'sh', 'ti',
-            'mk', 'si', 'bn', 'an', 'zu', 'gu', 'ss', 'qu', 'lb', 'ts', 'bs',
+            'mk', 'si', 'bn', 'an', 'zu', 'gu', 'lb', 'ss', 'qu', 'ts', 'bs',
             'fo', 'am', 'rw', 'chr', 'om', 'su', 'kw', 'gv', 'iu', 'mn', 'nah',
-            'ie', 'yi', 'pa', 'za', 'mt', 'tg', 'gd', 'tpi', 'dv', 'ik', 'mi',
-            'sg', 'roa-rup', 'so', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
+            'ie', 'yi', 'tg', 'pa', 'za', 'mt', 'gd', 'tpi', 'dv', 'ik', 'mi',
+            'sg', 'so', 'roa-rup', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
             'na', 'jbo', 'ks', 'fj', 'tn', 'dz', 'als',
         ]
 
