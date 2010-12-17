@@ -18,7 +18,7 @@ class Family(family.Family):
             'la', 'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'tt', 'oc',
             'ml', 'ms', 'eu', 'hi', 'fy', 'ie', 'tg', 'af', 'bn', 'hy', 'pa',
             'te', 'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'mg', 'cy',
-            'ku', 'co', 'tk', 'als', 'su', 'uz', 'vo', 'mn', 'kk', 'my',
+            'ku', 'co', 'tk', 'su', 'uz', 'vo', 'mn', 'kk', 'my',
         ]
 
         for lang in self.languages_by_size:
@@ -46,6 +46,7 @@ class Family(family.Family):
         self.obsolete = {
             'aa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikibooks
             'ak': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Akan_Wikibooks
+            'als': None, # http://als.wikipedia.org/wiki/Wikipedia:Stammtisch/Archiv_2008-1#Afterwards.2C_closure_and_deletion_of_Wiktionary.2C_Wikibooks_and_Wikiquote_sites
             'as': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wikibooks
             'ay': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Aymar_Wikibooks
             'ba': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bashkir_Wikibooks

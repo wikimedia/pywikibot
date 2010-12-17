@@ -13,18 +13,18 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'fr', 'zh', 'lt', 'mg', 'tr', 'ru', 'vi', 'pl', 'ta', 'io',
             'ko', 'pt', 'fi', 'hu', 'el', 'de', 'no', 'sv', 'it', 'nl', 'my',
-            'kn', 'li', 'et', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'ro', 'te',
+            'kn', 'et', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'fa', 'is', 'cs', 'hr', 'scn',
-            'simple', 'sr', 'oc', 'th', 'af', 'fy', 'sw', 'br', 'he', 'la',
+            'simple', 'oc', 'sr', 'th', 'af', 'fy', 'sw', 'br', 'he', 'la',
             'sq', 'sl', 'hy', 'eo', 'tt', 'cy', 'zh-min-nan', 'da', 'wa', 'ne',
-            'lv', 'tk', 'ast', 'ur', 'ka', 'hsb', 'eu', 'kk', 'ky', 'az', 'wo',
+            'lv', 'tk', 'ast', 'ur', 'ka', 'eu', 'hsb', 'kk', 'ky', 'az', 'wo',
             'ang', 'hi', 'co', 'ga', 'mr', 'gn', 'ia', 'be', 'sk', 'tl', 'ms',
             'csb', 'st', 'nn', 'nds', 'kl', 'sd', 'km', 'ps', 'ug', 'sh', 'ti',
             'mk', 'si', 'bn', 'an', 'zu', 'gu', 'lb', 'ss', 'qu', 'ts', 'bs',
             'fo', 'am', 'rw', 'chr', 'om', 'su', 'kw', 'gv', 'iu', 'mn', 'nah',
-            'ie', 'yi', 'tg', 'pa', 'za', 'mt', 'gd', 'tpi', 'dv', 'ik', 'mi',
+            'ie', 'yi', 'tg', 'pa', 'gd', 'za', 'mt', 'tpi', 'dv', 'ik', 'mi',
             'sg', 'so', 'roa-rup', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
-            'na', 'jbo', 'ks', 'fj', 'tn', 'dz', 'als',
+            'na', 'jbo', 'ks', 'fj', 'tn', 'dz',
         ]
 
         for lang in self.languages_by_size:
@@ -94,6 +94,7 @@ class Family(family.Family):
             'aa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wiktionary
             'ab': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Abkhaz_Wiktionary
             'ak': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Akan_Wiktionary
+            'als': None, # http://als.wikipedia.org/wiki/Wikipedia:Stammtisch/Archiv_2008-1#Afterwards.2C_closure_and_deletion_of_Wiktionary.2C_Wikibooks_and_Wikiquote_sites
             'as': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wiktionary
             'av': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Avar_Wiktionary
             'ba': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bashkir_Wiktionary
