@@ -1,7 +1,10 @@
 # -*- coding: utf-8  -*-
+
+__version__ = '$Id$'
+
 from pywikibot import family
 
-# Wikitech site
+# The Wikitech family
 
 class Family(family.Family):
 
@@ -9,11 +12,11 @@ class Family(family.Family):
         family.Family.__init__(self)
         self.name = 'wikitech'
         self.langs = {
-            'en': 'wikitech.leuksman.com',
+            'en': 'wikitech.wikimedia.org',
         }
 
     def version(self, code):
-        return "1.12alpha"
+        return '1.16wmf4'
 
     def scriptpath(self, code):
         return ''

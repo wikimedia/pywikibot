@@ -11,33 +11,33 @@ class Family(family.Family):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'pl', 'it', 'ja', 'es', 'nl', 'pt', 'ru', 'sv',
-            'zh', 'ca', 'no', 'fi', 'uk', 'hu', 'cs', 'ro', 'tr', 'ko', 'vi',
-            'da', 'ar', 'id', 'eo', 'sr', 'lt', 'sk', 'vo', 'he', 'fa', 'bg',
-            'sl', 'war', 'hr', 'ms', 'et', 'new', 'simple', 'gl', 'th', 'nn',
-            'eu', 'roa-rup', 'hi', 'el', 'ht', 'la', 'tl', 'te', 'az', 'ka',
-            'mk', 'ceb', 'br', 'sh', 'mr', 'lb', 'lv', 'jv', 'pms', 'is', 'bs',
-            'be-x-old', 'cy', 'sq', 'ta', 'be', 'bpy', 'an', 'oc', 'bn', 'sw',
+            'en', 'de', 'fr', 'pl', 'it', 'ja', 'es', 'pt', 'nl', 'ru', 'sv',
+            'zh', 'ca', 'no', 'fi', 'uk', 'cs', 'hu', 'ro', 'tr', 'ko', 'vi',
+            'id', 'da', 'ar', 'eo', 'sr', 'lt', 'sk', 'vo', 'fa', 'he', 'bg',
+            'sl', 'war', 'ms', 'hr', 'et', 'new', 'simple', 'gl', 'th', 'nn',
+            'eu', 'roa-rup', 'hi', 'el', 'ht', 'la', 'az', 'tl', 'te', 'ka',
+            'mk', 'ceb', 'sh', 'br', 'mr', 'lb', 'lv', 'jv', 'pms', 'be-x-old',
+            'is', 'cy', 'bs', 'sq', 'ta', 'be', 'bpy', 'an', 'oc', 'bn', 'sw',
             'io', 'lmo', 'fy', 'gu', 'nds', 'af', 'qu', 'scn', 'ml', 'ku', 'ur',
-            'su', 'zh-yue', 'ast', 'nap', 'bat-smg', 'hy', 'wa', 'cv', 'ga',
-            'ksh', 'ne', 'yo', 'kn', 'pnb', 'tg', 'roa-tara', 'vec', 'yi', 'gd',
+            'su', 'zh-yue', 'ast', 'nap', 'bat-smg', 'hy', 'cv', 'wa', 'ga',
+            'ksh', 'yo', 'ne', 'pnb', 'kn', 'tg', 'roa-tara', 'vec', 'yi', 'gd',
             'tt', 'zh-min-nan', 'uz', 'os', 'pam', 'sah', 'als', 'arz', 'kk',
-            'mi', 'li', 'nah', 'hsb', 'am', 'glk', 'co', 'gan', 'mn', 'ia',
-            'sco', 'bcl', 'fo', 'fiu-vro', 'si', 'my', 'nds-nl', 'tk', 'vls',
-            'sa', 'mg', 'bar', 'gv', 'dv', 'ilo', 'nrm', 'pag', 'map-bms', 'rm',
-            'diq', 'ckb', 'se', 'mzn', 'fur', 'wuu', 'ug', 'lij', 'mt', 'bh',
-            'nov', 'ang', 'csb', 'sc', 'bo', 'zh-classical', 'km', 'lad',
-            'cbk-zam', 'pi', 'hif', 'frp', 'ps', 'hak', 'kw', 'pa', 'szl', 'nv',
-            'xal', 'pdc', 'haw', 'stq', 'ie', 'fj', 'kv', 'crh', 'so', 'to',
-            'ace', 'myv', 'krc', 'mhr', 'pcd', 'ln', 'ext', 'gn', 'ky', 'eml',
-            'arc', 'ay', 'jbo', 'wo', 'frr', 'bjn', 'ba', 'pap', 'kl', 'kab',
-            'tpi', 'ty', 'srn', 'zea', 'udm', 'mrj', 'ce', 'koi', 'ig', 'ab',
-            'dsb', 'or', 'kg', 'lo', 'gag', 'mdf', 'rmy', 'mwl', 'cu', 'av',
-            'kaa', 'sm', 'tet', 'ks', 'got', 'bm', 'sd', 'ik', 'bi', 'na',
-            'pih', 'lbe', 'iu', 'pnt', 'chr', 'as', 'ss', 'cdo', 'ha', 'ee',
-            'ti', 'zu', 'om', 'za', 've', 'ts', 'dz', 'sg', 'cr', 'ch', 'lg',
-            'bug', 'bxr', 'rw', 'ak', 'xh', 'ny', 'st', 'tn', 'ki', 'ff', 'rn',
-            'sn', 'tum', 'tw', 'chy', 'pfl',
+            'mi', 'li', 'nah', 'am', 'hsb', 'glk', 'co', 'gan', 'mn', 'ia',
+            'sco', 'bcl', 'fo', 'my', 'si', 'fiu-vro', 'nds-nl', 'tk', 'vls',
+            'sa', 'mg', 'bar', 'gv', 'ilo', 'dv', 'nrm', 'pag', 'map-bms', 'rm',
+            'ckb', 'diq', 'se', 'mzn', 'fur', 'wuu', 'ug', 'lij', 'mt', 'bh',
+            'nov', 'ang', 'csb', 'sc', 'bo', 'zh-classical', 'km', 'hif', 'lad',
+            'cbk-zam', 'pi', 'frp', 'ps', 'hak', 'kw', 'pa', 'nv', 'szl', 'xal',
+            'pdc', 'haw', 'stq', 'ie', 'fj', 'kv', 'so', 'crh', 'to', 'ace',
+            'myv', 'krc', 'mhr', 'pcd', 'ln', 'ext', 'gn', 'ky', 'eml', 'arc',
+            'ay', 'jbo', 'wo', 'bjn', 'frr', 'pap', 'ba', 'kl', 'kab', 'tpi',
+            'ty', 'srn', 'zea', 'udm', 'mrj', 'ce', 'koi', 'ig', 'ab', 'dsb',
+            'or', 'kg', 'lo', 'gag', 'av', 'mdf', 'rmy', 'mwl', 'cu', 'kaa',
+            'sm', 'tet', 'ks', 'got', 'bm', 'ik', 'sd', 'bi', 'na', 'lbe',
+            'pih', 'iu', 'pnt', 'chr', 'as', 'ss', 'cdo', 'pfl', 'ha', 'ee',
+            'ti', 'om', 'zu', 'za', 've', 'ts', 'dz', 'sg', 'cr', 'ch', 'lg',
+            'bug', 'bxr', 'rw', 'ak', 'xh', 'ny', 'st', 'tn', 'ff', 'ki', 'rn',
+            'sn', 'tum', 'tw', 'chy',
         ]
 
         for lang in self.languages_by_size:
@@ -413,6 +413,11 @@ class Family(family.Family):
             },
             'km': {
                 '_default': [0, 4, 12],
+            },
+            #wrong wikipedia namespace alias
+            'mzn': {
+                '_default': [0, 4],
+
             },
         }
         self.crossnamespace[1] = {
