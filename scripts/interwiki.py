@@ -476,7 +476,7 @@ msg = {
     'la': (u'bot ', u'addit', u'abdit', u'mutat'),
     'lb': (u'Bot ', u'Derbäi setzen', u'Ewech huelen', u'Änneren'),
     'lmo': (u'Robot ', u'jontant', u'trant via', u'modifiant'),
-    'ln': (u'bot ', u'ebakisí', u'elongólí', u'ebongolí'),
+    'ln': (u'bot ', u'ebakísí', u'elongólí', u'ebóngólí'),
     'lo': (u'ໂຣບົດ ', u'ພວມເພີ່ມ', u'ພວມລຶບ', u'ພວມແປງ'),
     'lt': (u'robotas ', u'Pridedama', u'Šalinama', u'Keičiama'),
     'mi': (u'he karetao ', u'e tāpiri ana', u'e tango ana', u'e whakarerekē ana'),
