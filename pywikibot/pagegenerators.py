@@ -150,6 +150,9 @@ parameterHelp = u"""\
 -yahoo            Work on all pages that are found in a Yahoo search.
                   Depends on python module pYsearch.  See yahoo_appid in
                   config.py for instructions.
+
+-page             Work on a single page. Argument can also be given as
+                  "-page:pagetitle".
 """
 
 docuReplacements = {'&params;': parameterHelp}
@@ -318,11 +321,11 @@ class GeneratorFactory(object):
                 self.limit = int(arg[len('-limit:'):])
             return True
         elif arg.startswith('-catr'):
-            gen = self.getCategoryGen(arg, len("-catr"), recurse = True)
+            gen = self.getCategoryGen(arg, len('-catr'), recurse = True)
         elif arg.startswith('-category'):
             gen = self.getCategoryGen(arg, len('-category'))
         elif arg.startswith('-cat'):
-            gen = self.getCategoryGen(arg, len("-cat"))
+            gen = self.getCategoryGen(arg, len('-cat'))
         elif arg.startswith('-subcatsr'):
             gen = self.setSubCategoriesGen(arg, 9, recurse = True)
         elif arg.startswith('-subcats'):
