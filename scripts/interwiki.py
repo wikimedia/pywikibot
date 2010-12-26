@@ -96,13 +96,15 @@ Additionaly, these arguments can be used to restrict the bot to certain pages:
 
 These arguments control miscellanous bot behaviour:
 
-    -quiet:        Use this option to get less output
+    -quiet         Use this option to get less output
+                   (note: without ending colon)
 
-    -async:        Put page on queue to be saved to wiki asynchronously. This
+    -async         Put page on queue to be saved to wiki asynchronously. This
                    enables loading pages during saving throtteling and gives a
                    better performance.
                    NOTE: For post-processing it always assumes that saving the
                    the pages was sucessful.
+                   (note: without ending colon)
 
     -summary:      Set an additional action summary message for the edit. This
                    could be used for further explainings of the bot action.
@@ -120,15 +122,15 @@ These arguments are useful to provide hints to the bot:
 
                    There are some special hints, trying a number of languages
                    at once:
-                       * all:     All languages with at least ca. 100 articles.
-                       * 10:      The 10 largest languages (sites with most
-                                  articles). Analogous for any other natural
-                                  number.
-                       * arab:    All languages using the Arabic alphabet.
-                       * cyril:   All languages that use the Cyrillic alphabet.
-                       * chinese: All Chinese dialects.
-                       * latin:   All languages using the Latin script.
-                       * scand:   All Scandinavian languages.
+                       * all:       All languages with at least ca. 100 articles.
+                       * 10:        The 10 largest languages (sites with most
+                                    articles). Analogous for any other natural
+                                    number.
+                       * arab:      All languages using the Arabic alphabet.
+                       * cyril:     All languages that use the Cyrillic alphabet.
+                       * chinese:   All Chinese dialects.
+                       * latin:     All languages using the Latin script.
+                       * scand:     All Scandinavian languages.
 
     -hintfile:     similar to -hint, except that hints are taken from the given
                    file, enclosed in [[]] each, instead of the command line.
@@ -248,9 +250,10 @@ multiple languages, and specify on which sites the bot should modify pages:
     -limittwo      only update two pages - one in the local wiki (if logged-in)
                    and one in the top available one.
                    For example, if the local page has links to de and fr,
-                   this option will make sure that only local and de: (larger)
-                   site is updated. This option is useful to quickly set two
-                   way links without updating all of wiki's sites.
+                   this option will make sure that only the local site and
+                   the de: (larger) sites are updated. This option is useful
+                   to quickly set two way links without updating all of
+                   wiki families sites.
                    (note: without ending colon)
 
     -whenneeded    works like limittwo, but other languages are changed in the
@@ -298,8 +301,8 @@ If interwiki.py is terminated before it is finished, it will write a dump file
 to the interwiki-dumps subdirectory. The program will read it if invoked with
 the "-restore" or "-continue" option, and finish all the subjects in that list.
 After finishing the dump file will be deleted. To run the interwiki-bot on all
-pages on a language, run it with option "-start:!", and if it takes so long that
-you have to break it off, use "-continue" next time.
+pages on a language, run it with option "-start:!", and if it takes so long
+that you have to break it off, use "-continue" next time.
 
 """
 #
@@ -1307,8 +1310,8 @@ class Subject(object):
                     elif not newhint:
                         break
                     else:
-                        pages = titletranslate.translate(self.originPage, hints = [newhint], auto = globalvar.auto, removebrackets
-= globalvar.hintnobracket)
+                        pages = titletranslate.translate(self.originPage, hints=[newhint],
+                                   auto = globalvar.auto, removebrackets=globalvar.hintnobracket)
                         for page in pages:
                             self.addIfNew(page, counter, None)
                             if globalvar.hintsareright:
@@ -1597,6 +1600,7 @@ class Subject(object):
                     pywikibot.output(u"  (%d) Found link to %s in:" % (i, page2))
                     self.whereReport(page2, indent = 8)
                 while True:
+                    #TODO: allow answer to repeat previous or go back after a mistake
                     answer = pywikibot.input(u"Which variant should be used? (<number>, [n]one, [g]ive up) ").lower()
                     if answer:
                         if answer == 'g':
@@ -1627,6 +1631,7 @@ class Subject(object):
                     if acceptall:
                         answer = 'a'
                     else:
+                        #TODO: allow answer to repeat previous or go back after a mistake
                         answer = pywikibot.inputChoice(u'What should be done?', ['accept', 'reject', 'give up', 'accept all'], ['a', 'r', 'g', 'l'], 'a')
                     if answer == 'l': # accept all
                         acceptall = True

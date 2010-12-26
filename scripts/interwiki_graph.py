@@ -14,10 +14,6 @@ except ImportError:
 import pywikibot
 from pywikibot import config2 as config
 
-# for speedyshare
-import re
-import httplib, urllib2, mimetypes
-
 class GraphImpossible(Exception):
     "Drawing a graph is not possible on your system."
 
@@ -87,8 +83,12 @@ class GraphDrawer:
             sourceLabel = self.getLabel(refPage)
             targetLabel = self.getLabel(page)
             edge = pydot.Edge(sourceLabel, targetLabel)
+
             oppositeEdge = self.graph.get_edge(targetLabel, sourceLabel)
             if oppositeEdge:
+                if isinstance(oppositeEdge, list):
+                    # bugfix for pydot >= 1.0.3
+                    oppositeEdge = oppositeEdge[0]
                 #oppositeEdge.set_arrowtail('normal')
                 oppositeEdge.set_dir('both')
             # workaround for bug [ 1722739 ]: prevent duplicate edges
@@ -140,96 +140,6 @@ class GraphDrawer:
                 self.addDirectedEdge(page, refPage)
         self.saveGraphFile()
 
-class SpeedyShareUploader:
-    def __init__(self):
-        pass
-
-    def getToken(self):
-        formR = re.compile(
-            '<form target=_top method="post" action="upload\.php\?(\d+)"')
-
-        uploadPage = urllib2.urlopen(
-            'http://www.speedyshare.com/index_upload.php')
-        text = uploadPage.read()
-        token = formR.search(text).group(1)
-        return token
-
-    def post_multipart(self, host, selector, fields, files):
-        """
-        Post fields and files to an http host as multipart/form-data.
-        fields is a sequence of (name, value) elements for regular form fields.
-        files is a sequence of (name, filename, value) elements for data to be
-        uploaded as files. Return the server's response page.
-        """
-        content_type, body = self.encode_multipart_formdata(fields, files)
-        h = httplib.HTTP(host)
-        h.putrequest('POST', selector)
-        h.putheader('Content-Type', content_type)
-        h.putheader('Content-Length', str(len(body)))
-        h.putheader('User-Agent',
-                    'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.8) Gecko/20051128 SUSE/1.5-0.1 Firefox/1.5')
-        h.putheader('Referer', 'http://www.speedyshare.com/index_upload.php')
-        h.putheader('Accept',
-                    'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5')
-        h.putheader('Accept-Language', 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3')
-        h.putheader('Accept-Charset', 'ISO-8859-1,utf-8;q=0.7,*;q=0.7')
-        h.putheader('Keep-Alive', '30')
-        h.putheader('Connection', 'keep-alive')
-
-        h.endheaders()
-        h.send(body)
-        errcode, errmsg, headers = h.getreply()
-        return errcode, h.file.read()
-
-    def encode_multipart_formdata(self, fields, files):
-        """
-        fields is a sequence of (name, value) elements for regular form fields.
-        files is a sequence of (name, filename, value) elements for data to be
-        uploaded as files. Return (content_type, body) ready for httplib.HTTP
-        instance
-        """
-        BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
-        CRLF = '\r\n'
-        L = []
-        for (key, value) in fields:
-            L.append('--' + BOUNDARY)
-            L.append('Content-Disposition: form-data; name="%s"' % key)
-            L.append('')
-            L.append(value)
-        for (key, filename, value) in files:
-            L.append('--' + BOUNDARY)
-            L.append(
-                'Content-Disposition: form-data; name="%s"; filename="%s"'
-                % (key, filename))
-            L.append('Content-Type: %s' % self.get_content_type(filename))
-            L.append('')
-            L.append(value)
-        L.append('--' + BOUNDARY + '--')
-        L.append('')
-        body = CRLF.join(L)
-        content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
-        return content_type, body
-
-    def get_content_type(self, filename):
-        return mimetypes.guess_type(filename)[0] \
-               or 'application/octet-stream'
-
-    def upload(self, filename):
-        token = self.getToken()
-
-        file = open(filename)
-        encodedFilename = filename#.encode('utf-8')
-        contents = file.read()
-        formdata = []
-
-        response, returned_html = self.post_multipart('www.speedyshare.com',
-                                  'upload.php?' + token,
-                                  formdata,
-                                  [('fileup0', encodedFilename, contents)])
-        print response
-        print returned_html
-
-
 def getFilename(page, extension = None):
     filename = '%s-%s-%s' % (page.site.family.name,
                              page.site.language(),
@@ -238,7 +148,3 @@ def getFilename(page, extension = None):
         filename += '.%s' % extension
     return filename
 
-if __name__ == "__main__":
-    uploader = SpeedyShareUploader()
-    uploader.upload(
-        '/home/daniel/projekte/pywikipedia/interwiki-graphs/wikipedia-de-CEE.svg')

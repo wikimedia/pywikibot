@@ -43,12 +43,14 @@ class BasicBot:
         'fa': u'ربات: تغییر ...',
         'fr': u'Robot: Changé ...',
         'ja':u'ロボットによる：編集',
-        'ksh': u'Bot: Ännern ...',
-        'nds': u'Bot: Änderung ...',
+        'ksh': u'Bot: Änderung ...',
+        'nds': u'Bot: Ännern ...',
         'nl': u'Bot: wijziging ...',
         'pl': u'Bot: zmienia ...',
         'pt': u'Bot: alterando...',
+        'ru': u'Бот: изменил ...',
         'sv': u'Bot: Ändrar ...',
+        'uk': u'Бот: змінив ...',
         'zh': u'機器人：編輯.....',
     }
 
@@ -56,10 +58,10 @@ class BasicBot:
         """
         Constructor. Parameters:
             @param generator: The page generator that determines on which pages
-                          to work on.
+                              to work on.
             @type generator: generator.
             @param dry: If True, doesn't do any real changes, but only shows
-                          what would have been changed.
+                        what would have been changed.
             @type dry: boolean.
         """
         self.generator = generator
@@ -88,7 +90,7 @@ class BasicBot:
         text = 'Test ' + text
 
         if not self.save(text, page, self.summary):
-            pywikibot.output(u'Page %s not saved.' % page.aslink())
+            pywikibot.output(u'Page %s not saved.' % page.title(asLink=True))
 
     def load(self, page):
         """
@@ -99,10 +101,10 @@ class BasicBot:
             text = page.get()
         except pywikibot.NoPage:
             pywikibot.output(u"Page %s does not exist; skipping."
-                             %  page.title(asLink=True))
+                             % page.title(asLink=True))
         except pywikibot.IsRedirectPage:
             pywikibot.output(u"Page %s is a redirect; skipping."
-                             %  page.title(asLink=True))
+                             % page.title(asLink=True))
         else:
             return text
         return None
@@ -119,8 +121,8 @@ class BasicBot:
             pywikibot.output(u'Comment: %s' %comment)
             if not self.dry:
                 choice = pywikibot.inputChoice(
-                             u'Do you want to accept these changes?',
-                             ['Yes', 'No'], ['y', 'N'], 'N')
+                    u'Do you want to accept these changes?',
+                    ['Yes', 'No'], ['y', 'N'], 'N')
                 if choice == 'y':
                     try:
                         page.text = text
@@ -130,11 +132,13 @@ class BasicBot:
                         pywikibot.output(u"Page %s is locked; skipping."
                                          % page.title(asLink=True))
                     except pywikibot.EditConflict:
-                        pywikibot.output(u'Skipping %s because of edit conflict'
-                                         % (page.title()))
+                        pywikibot.output(
+                            u'Skipping %s because of edit conflict'
+                            % (page.title()))
                     except pywikibot.SpamfilterError, error:
-                        pywikibot.output(u'Cannot change %s because of spam blacklist entry %s'
-                                         % (page.title(), error.url))
+                        pywikibot.output(
+u'Cannot change %s because of spam blacklist entry %s'
+                            % (page.title(), error.url))
                     else:
                         return True
         return False

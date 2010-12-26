@@ -137,7 +137,7 @@ msg_add={
     'sr':u'Бот: Додаје [[Категорија:%s]]',
     'sv':u'Robot: Lägger till [[Kategori:%s]]',
     'szl':u'Bot dodowo: [[Kategoria:%s]]',
-    'uk':u'Робот: додано [[Категорія:%s]]',
+    'uk':u'Робот: додавання [[Категорія:%s]]',
     'zh':u'機器人:新增目錄 [[Category:%s]]',
     }
 
@@ -176,7 +176,7 @@ msg_change={
     'sk':u'Robot zmenil [[%(oldcat)s]]→[[%(newcat)s]]',
     'sr':u'Бот: Измена категорије %(oldcat)s',
     'sv':u'Robot: Ändrar %(oldcat)s',
-    'uk':u'Робот: змінено [[Категорія:%(oldcat)s]]',
+    'uk':u'Робот: зміна %(oldcat)s',
     'zh':u'機器人:變更目錄 [[%(oldcat)s]]→[[%(newcat)s]]',
     }
 
@@ -469,7 +469,7 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
                                  minorEdit=minorEdit, botflag=botflag)
                     except pywikibot.LockedPage:
                         pywikibot.output(u"Page %s is locked; skipping."
-                                         % page.aslink())
+                                         % page.title(asLink=True))
                     except pywikibot.EditConflict:
                         pywikibot.output(
                             u'Skipping %s because of edit conflict'
@@ -502,11 +502,12 @@ u'Cannot change %s because of spam blacklist entry %s'
         else:
             if self.sort:
                 catpl = self.sorted_by_last_name(catpl, page)
-            pywikibot.output(u'Adding %s' % catpl.aslink())
+            pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
             cats.append(catpl)
             text = pywikibot.replaceCategoryLinks(text, cats)
             if not self.save(text, page, self.editSummary):
-                pywikibot.output(u'Page %s not saved.' % page.aslink())
+                pywikibot.output(u'Page %s not saved.'
+                                 % page.title(asLink=True))
 
 
 class CategoryMoveRobot:
@@ -982,6 +983,7 @@ class CategoryTreeRobot:
             'pt': u'(também em %s)',
             'ru': u'(также в %s)',
             'sv': u'(också i %s)',
+            'uk': u'(також у %s)',
             'ср': u'(такође у %s)',
             'zh': u'(也在 %s)',
         }
@@ -1066,8 +1068,6 @@ def main(*args):
     restore = False
     create_pages = False
     for arg in pywikibot.handleArgs(*args):
-        if genFactory.handleArg(arg):
-            continue
         if arg == 'add':
             action = 'add'
         elif arg == 'remove':
@@ -1118,6 +1118,8 @@ def main(*args):
             recurse = True
         elif arg == '-create':
             create_pages = True
+        else:
+            genFactory.handleArg(arg)
 
     gen = genFactory.getCombinedGenerator()
     if action == 'add':

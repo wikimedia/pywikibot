@@ -118,6 +118,8 @@ u" to [[:%(newCatLink)s|%(newCatTitle)s]]",
             'ksh': u"Bot: dubbel Ömleidung eruß jemaat.",
             'pl': u"Robot: Poprawia podwójne przekierowanie",
             'pt': u"Bot: Corrigindo redirecionamento duplo",
+            'ru': u"Бот: исправление двойного перенаправления",
+            'uk': u"Бот: виправлення подвійного перенаправлення",
             'vi': u"Robot: sửa thể loại đổi hướng kép",
             'zh': u"Bot: 修复双重重定向",
         }
@@ -227,21 +229,16 @@ liên kết thể loại:
             # an update due to changes in a transcluded template
             article.put(newtext, comment)
             if newtext == oldtext:
-                pywikibot.output(
-                    u'No changes in made in page %s.'
-                     % article.title(asLink=True)
-                )
+                pywikibot.output(u'No changes in made in page %s.'
+                                 % article.title(asLink=True))
                 return False
             return True
         except pywikibot.EditConflict:
-            pywikibot.output(
-                u'Skipping %s because of edit conflict'
-                % article.title(asLink=True)
-            )
+            pywikibot.output(u'Skipping %s because of edit conflict'
+                             % article.title(asLink=True))
         except pywikibot.LockedPage:
             pywikibot.output(u'Skipping locked page %s'
-                             % article.title(asLink=True)
-            )
+                             % article.title(asLink=True))
             self.edit_requests.append(
                     (article.title(asLink=True, textlink=True),
                      oldCat.title(asLink=True, textlink=True),

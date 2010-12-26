@@ -318,7 +318,10 @@ def main():
             text, changes = re.subn('<noinclude>(%s)</noinclude>' % replaceToPerform, '', text)
             if changes == 0:
                 text, changes = re.subn('(%s)' % replaceToPerform, '', text)
-            pywikibot.output(u'The page is editable for all, deleting the template...')
+            msg = u'The page is editable for all'
+            if not moveBlockCheck:
+                msg += u', deleting the template..'
+            pywikibot.output(u'%s.' % msg)
 
         elif editRestr[0] == 'sysop':
             # total edit protection
@@ -371,23 +374,27 @@ def main():
                 # move-total-protection
                 if (TemplateInThePage[0] == 'sysop-move' and TTMP != None) or (TemplateInThePage[0] == 'unique' and TU != None):
                     pywikibot.output(u'The page is protected from moving to the sysop, skipping...')
+                    if TU != None:
+                        text = oldtext # no changes needed, better to revert the old text.
                 else:
                     pywikibot.output(u'The page is protected from moving to the sysop, but the template seems not correct. Fixing...')
-                if TU != None:
-                    text, changes = re.subn(TemplateInThePage[1], TNR[4], text)
-                else:
-                    text, changes = re.subn(TemplateInThePage[1], TNR[3], text)
+                    if TU != None:
+                        text, changes = re.subn(TemplateInThePage[1], TNR[4], text)
+                    else:
+                        text, changes = re.subn(TemplateInThePage[1], TNR[3], text)
 
             elif TSMP != None or TU != None:
                 # implicitely moveRestr[0] = 'autoconfirmed', move-semi-protection
                 if TemplateInThePage[0] == 'autoconfirmed-move' or TemplateInThePage[0] == 'unique':
                     pywikibot.output(u'The page is movable only for the autoconfirmed users, skipping...')
+                    if TU != None:
+                        text = oldtext # no changes needed, better to revert the old text.
                 else:
                     pywikibot.output(u'The page is movable only for the autoconfirmed users, but the template seems not correct. Fixing...')
-                if TU != None:
-                    text, changes = re.subn(TemplateInThePage[1], TNR[4], text)
-                else:
-                    text, changes = re.subn(TemplateInThePage[1], TNR[2], text)
+                    if TU != None:
+                        text, changes = re.subn(TemplateInThePage[1], TNR[4], text)
+                    else:
+                        text, changes = re.subn(TemplateInThePage[1], TNR[2], text)
 
             if changes == 0:
                 # We tried to fix move-protection templates, but it did not work.

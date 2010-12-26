@@ -122,8 +122,9 @@ __version__='$Id$'
 
 import sys, re, time
 import pywikibot
-from pywikibot import pagegenerators, catlib, config
+from pywikibot import pagegenerators
 from scripts import editarticle
+from pywikibot import catlib, config
 import webbrowser
 
 # Imports predefined replacements tasks from fixes.py
@@ -379,12 +380,12 @@ class ReplaceRobot:
                 if self.isTextExcepted(new_text):
                     pywikibot.output(
     u'Skipping %s because it contains text that is on the exceptions list.'
-                        % page.title(asLink=True))
+                                     % page.title(asLink=True))
                     break
                 new_text = self.doReplacements(new_text)
                 if new_text == original_text:
                     pywikibot.output(u'No changes were necessary in %s'
-                                      % page.title(asLink=True))
+                                     % page.title(asLink=True))
                     break
                 if self.recursive:
                     newest_text = self.doReplacements(new_text)
@@ -406,7 +407,8 @@ class ReplaceRobot:
                     break
                 choice = pywikibot.inputChoice(
                             u'Do you want to accept these changes?',
-                            ['Yes', 'No', 'Edit', 'open in Browser', 'All', "Quit"],
+                            ['Yes', 'No', 'Edit', 'open in Browser', 'All',
+                             'Quit'],
                             ['y', 'N', 'e', 'b', 'a', 'q'], 'N')
                 if choice == 'e':
                     editor = editarticle.TextEditor()
