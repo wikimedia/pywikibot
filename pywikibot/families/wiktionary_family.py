@@ -12,19 +12,19 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'zh', 'lt', 'mg', 'tr', 'ru', 'vi', 'pl', 'ta', 'io',
-            'ko', 'pt', 'fi', 'hu', 'el', 'de', 'no', 'sv', 'it', 'nl', 'my',
-            'kn', 'et', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'ro', 'te',
+            'ko', 'pt', 'fi', 'hu', 'el', 'de', 'no', 'sv', 'it', 'nl', 'et',
+            'kn', 'my', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'fa', 'is', 'cs', 'hr', 'scn',
-            'simple', 'oc', 'sr', 'th', 'af', 'fy', 'sw', 'br', 'he', 'la',
-            'sq', 'sl', 'hy', 'eo', 'tt', 'cy', 'zh-min-nan', 'da', 'wa', 'ne',
-            'lv', 'tk', 'ast', 'ur', 'ka', 'eu', 'hsb', 'kk', 'ky', 'az', 'wo',
-            'ang', 'hi', 'co', 'ga', 'mr', 'gn', 'ia', 'be', 'sk', 'tl', 'ms',
-            'csb', 'st', 'nn', 'nds', 'kl', 'sd', 'km', 'ps', 'ug', 'sh', 'ti',
+            'simple', 'oc', 'sr', 'th', 'af', 'fy', 'sw', 'br', 'he', 'eo',
+            'la', 'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'da', 'wa', 'eu',
+            'ne', 'lv', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky', 'az', 'wo',
+            'ang', 'hi', 'co', 'ga', 'mr', 'gn', 'ia', 'nn', 'be', 'sk', 'tl',
+            'ms', 'csb', 'st', 'ps', 'nds', 'kl', 'sd', 'km', 'ug', 'sh', 'ti',
             'mk', 'si', 'bn', 'an', 'zu', 'gu', 'lb', 'ss', 'qu', 'ts', 'bs',
-            'fo', 'am', 'rw', 'chr', 'om', 'su', 'kw', 'gv', 'iu', 'mn', 'nah',
-            'ie', 'yi', 'tg', 'pa', 'gd', 'za', 'mt', 'tpi', 'dv', 'ik', 'mi',
-            'sg', 'so', 'roa-rup', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
-            'na', 'jbo', 'ks', 'fj', 'tn', 'dz',
+            'fo', 'am', 'rw', 'chr', 'om', 'su', 'kw', 'iu', 'gv', 'mn', 'nah',
+            'ie', 'yi', 'tg', 'pa', 'gd', 'za', 'mt', 'tpi', 'dv', 'ik', 'sg',
+            'mi', 'so', 'roa-rup', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
+            'na', 'fj', 'jbo', 'ks', 'tn', 'dz',
         ]
 
         for lang in self.languages_by_size:
