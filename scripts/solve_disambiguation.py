@@ -93,6 +93,7 @@ from pywikibot import config
 # Summary message when working on disambiguation pages
 msg = {
     'ar': u'توضيح بمساعدة روبوت: %s - غير الوصلة أو الوصلات إلى %s',
+    'ca': u'Bot:Desambiguació assistida: %s - Canviant enllaç(os) per %s',
     'cs': u'Odstranění linku na rozcestník [[%s]] s použitím robota - Změněn(y) odkaz(y) na %s',
     'en': u'Robot-assisted disambiguation: %s - Changed link(s) to %s',
     'es': u'Bot:Desambiguación asistida: %s - Cambiando enlace(s) para %s',
@@ -122,6 +123,7 @@ msg = {
 msg_unlink = {
     'ar': u'توضيح بمساعدة روبوت: %s - أزال الوصلة أو الوصلات.',
     'cs': u'Odstranění linku na rozcestník [[%s]] s použitím robota - Odstraněn(y) odkaz(y)',
+    'ca': u'Desambiguació assistida: %s - Eliminant enllaç(os).',
     'en': u'Robot-assisted disambiguation: %s - Removed link(s).',
     'fa': u'ابهام زدایی به کمک ربات: حذف %s',
     'da': u'Retter flertydigt link til: %s - Fjernede link(s)',
@@ -149,6 +151,7 @@ msg_unlink = {
 msg_redir = {
     'ar': u'توضيح بمساعدة روبوت: %s - غير الوصلة أو الوصلات إلى %s',
     'cs': u'Robot opravil přesměrování na %s - Změněn(y) odkaz(y) na %s',
+    'ca': u'Desambiguació assistida: %s - Canviant enllaç(os) a %s',
     'en': u'Robot-assisted disambiguation: %s - Changed link(s) to %s',
     'da': u'Retter flertydigt link til: %s - Ændrede link(s) til %s',
     'de': u'Bot-unterstützte Redirectauflösung: %s - Link(s) ersetzt durch %s',
@@ -176,6 +179,7 @@ msg_redir = {
 msg_redir_unlink = {
     'ar': u'توضيح بمساعدة روبوت: %s - أزال الوصلة أو الوصلات',
     'cs': u'Robot opravil přesměrování na %s - Odstraněn(y) odkaz(y)',
+    'ca': u'Desambiguació assistida: %s - Eliminant enllaç(os)',
     'en': u'Robot-assisted disambiguation: %s - Removed link(s)',
     'da': u'Retter flertydigt link til: %s - Fjernede link(s)',
     'de': u'Bot-unterstützte Redirectauflösung: %s - Link(s) entfernt',
@@ -219,6 +223,7 @@ msg_redir_dn = {
 # Summary message to (unknown)
 unknown_msg = {
     'ar' : u'(غير معروف)',
+    'ca' : u'(Canvi manual)',
     'en' : u'(unknown)',
     'fa' : u'(نامعلوم)',
     'fi' : u'(tuntematon)',
@@ -230,6 +235,7 @@ unknown_msg = {
 # (Begriffsklärungen nach Modell 2)
 primary_topic_format = {
     'ar': u'%s_(توضيح)',
+    'ca': u'%s_(desambiguació)',
     'cs': u'%s_(rozcestník)',
     'de': u'%s_(Begriffsklärung)',
     'en': u'%s_(disambiguation)',
@@ -261,6 +267,13 @@ ignore_title = {
     'wikipedia': {
         'ar': [
             u'تصنيف:صفحات توضيح',
+        ],
+        'ca': [
+            u'Viquipèdia:Enllaços incorrectes a pàgines de desambiguació',
+            u'Viquipèdia:Registre de pàgines de desambiguació òrfenes',
+            u'.*Discussió:.+',
+            u'.*Usuari:.+',
+            u'.+/[aA]rxiu.*',
         ],
         'cs': [
             u'Wikipedie:Chybějící interwiki/.+',
