@@ -588,6 +588,9 @@ moved_links = {
     'ro' : (u'documentaţie',  u'/doc'),
     'ru' : (u'doc',           u'/doc'),
     'sv' : (u'dokumentation', u'/dok'),
+    'uk' : ([u'документація',
+             u'doc',
+             u'documentation'], u'/Документація'),
     'vi' : (u'documentation', u'/doc'),
     'zh' : ([u'documentation', u'doc'], u'/doc'),
 }
