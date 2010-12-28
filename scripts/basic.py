@@ -58,7 +58,7 @@ class BasicBot:
         """
         Constructor. Parameters:
             @param generator: The page generator that determines on which pages
-                              to work on.
+                              to work.
             @type generator: generator.
             @param dry: If True, doesn't do any real changes, but only shows
                         what would have been changed.

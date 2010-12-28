@@ -252,7 +252,7 @@ multiple languages, and specify on which sites the bot should modify pages:
                    For example, if the local page has links to de and fr,
                    this option will make sure that only the local site and
                    the de: (larger) sites are updated. This option is useful
-                   to quickly set two way links without updating all of
+                   to quickly set two way links without updating all of the
                    wiki families sites.
                    (note: without ending colon)
 

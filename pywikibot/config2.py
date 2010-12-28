@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikipedia bot team, 2003-2009
+# (C) Pywikipedia bot team, 2003-2010
 #
 # Distributed under the terms of the MIT license.
 #
@@ -54,7 +54,7 @@ gdab_namespaces = {}
 # exception CaptchaError being thrown if a captcha is encountered.
 solve_captcha = True
 
-# Some sites will require password identication to access the HTML pages at
+# Some sites will require password authentication to access the HTML pages at
 # the site. If you have any such site, add lines to your user-config.py of
 # the following form:
 #
@@ -339,7 +339,7 @@ noisysleep = 3.0
 # Defer bot edits during periods of database server lag.  For details, see
 # http://www.mediawiki.org/wiki/Maxlag_parameter
 # You can set this variable to a number of seconds, or to None (or 0) to
-# disable this behavior.  Higher values are more aggressive in seeking
+# disable this behavior. Higher values are more aggressive in seeking
 # access to the wiki.
 # Non-Wikimedia wikis may or may not support this feature; for families
 # that do not use it, it is recommended to set minthrottle (above) to
@@ -402,17 +402,16 @@ copyright_yahoo = True
 copyright_msn = False
 
 # Perform a deep check, loading URLs to search if 'Wikipedia' is present.
-# This may be useful to improve number of correct results. If you haven't
-# a fast connection, you might want to keep they disabled.
+# This may be useful to increase the number of correct results. If you haven't
+# a fast connection, you might want to keep them disabled.
 copyright_check_in_source_google = False
 copyright_check_in_source_yahoo = False
 copyright_check_in_source_msn = False
 
-# Web pages may content a Wikipedia text without 'Wikipedia' word but with
-# typical '[edit]' tag result of copy & paste procedure. You can want no
-# report for this kind of URLs, even if they are copyright violation.
-# However, when enabled these URLs are logged in a file.
-
+# Web pages may contain a Wikipedia text without the word 'Wikipedia' but with
+# the typical '[edit]' tag as a result of a copy & paste procedure. You want
+# no report for this kind of URLs, even if they are copyright violations.
+# However, when enabled, these URLs are logged in a file.
 copyright_check_in_source_section_names = False
 
 # Limit number of queries for page.
@@ -432,7 +431,6 @@ copyright_connection_tries = 10
 #    1 = Disable search engine
 #    2 = Sleep (default)
 #    3 = Stop
-
 copyright_exceeded_in_queries = 2
 copyright_exceeded_in_queries_sleep_hours = 6
 
@@ -442,12 +440,11 @@ copyright_show_date = True
 # Append length of URL to script result
 copyright_show_length = True
 
-# By default the script try to identify and skip text that contents a wide
+# By default the script tries to identify and skip text that contains a large
 # comma separated list or only numbers. But sometimes that might be the
 # only part unmodified of a slightly edited and not otherwise reported
-# copyright violation. You can disable this feature to try to increase
+# copyright violation. You can disable this feature to try to increase the
 # number of results.
-
 copyright_economize_query = True
 
 ############## HTTP SETTINGS ##############
@@ -462,7 +459,6 @@ socket_timeout = 120  # set a pretty long timeout just in case...
 
 
 ############## FURTHER SETTINGS ##############
-
 # The bot can make some additional changes to each page it edits, e.g. fix
 # whitespace or positioning of interwiki and category links.
 
@@ -498,6 +494,43 @@ max_queue_size = 64
 
 # End of configuration section
 # ============================
+
+def makepath(path):
+    """Return a normalized absolute version of the path argument.
+
+    - if the given path already exists in the filesystem
+      the filesystem is not modified.
+
+    - otherwise makepath creates directories along the given path
+      using the dirname() of the path. You may append
+      a '/' to the path if you want it to be a directory path.
+
+    from holger@trillke.net 2002/03/18
+
+    """
+    import os
+    dpath = os.path.normpath(os.path.dirname(path))
+    if not os.path.exists(dpath):
+        os.makedirs(dpath)
+    return os.path.normpath(os.path.abspath(path))
+
+def datafilepath(*filename):
+    """Return an absolute path to a data file in a standard location.
+
+    Argument(s) are zero or more directory names, optionally followed by a
+    data file name. The return path is offset to config.base_dir. Any
+    directories in the path that do not already exist are created.
+
+    """
+    import os.path
+    return makepath(os.path.join(base_dir, *filename))
+
+def shortpath(path):
+    """Return a file path relative to config.base_dir."""
+    import os.path
+    if path.startswith(base_dir):
+        return path[len(base_dir) + len(os.path.sep) : ]
+    return path
 # System-level and User-level changes.
 # Store current variables and their types.
 _glv = {}
@@ -560,42 +593,6 @@ if console_encoding == None:
 # Save base_dir for use by other modules
 base_dir = _base_dir
 
-def makepath(path):
-    """Return a normalized absolute version of the path argument.
-
-    - if the given path already exists in the filesystem
-      the filesystem is not modified.
-
-    - otherwise makepath creates directories along the given path
-      using the dirname() of the path. You may append
-      a '/' to the path if you want it to be a directory path.
-
-    from holger@trillke.net 2002/03/18
-
-    """
-    import os
-    dpath = os.path.normpath(os.path.dirname(path))
-    if not os.path.exists(dpath):
-        os.makedirs(dpath)
-    return os.path.normpath(os.path.abspath(path))
-
-def datafilepath(*filename):
-    """Return an absolute path to a data file in a standard location.
-
-    Argument(s) are zero or more directory names, optionally followed by a
-    data file name. The return path is offset to config.base_dir. Any
-    directories in the path that do not already exist are created.
-
-    """
-    import os.path
-    return makepath(os.path.join(base_dir, *filename))
-
-def shortpath(path):
-    """Return a file path relative to config.base_dir."""
-    import os.path
-    if path.startswith(base_dir):
-        return path[len(base_dir) + len(os.path.sep) : ]
-    return path
 
 #
 # When called as main program, list all configuration variables
@@ -617,7 +614,6 @@ if __name__ == "__main__":
                     print _name, "=", repr(globals()[_name])
 
 # cleanup all locally-defined variables
-
 for __var in globals().keys():
     if __var.startswith("_") and not __var.startswith("__"):
         del __sys.modules[__name__].__dict__[__var]
