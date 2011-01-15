@@ -1778,7 +1778,7 @@ class Category(Page):
             return False
         else:
             pywikibot.output('Moving text from %s to %s.'
-                             % (self.title(), targetCat.title()))
+                    % {'oldcat': self.title(), 'authors': targetCat.title()})
             authors = ', '.join(self.contributingUsers())
             creationSummary = message % (self.title(), authors)
             newtext = self.get()

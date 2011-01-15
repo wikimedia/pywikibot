@@ -90,7 +90,7 @@ __version__ = '$Id$'
 
 import os, re, pickle, bz2
 import pywikibot
-from pywikibot import catlib, config, pagegenerators
+from pywikibot import catlib, config, pagegenerators, i18n
 import sys
 
 # This is required for the text that is shown when you run this script
@@ -99,145 +99,6 @@ docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
 # Summary messages
-msg_add={
-    'ar':u'روبوت: إضافة [[تصنيف:%s]]',
-    'bat-smg':u'Robots: Pridedama [[Kateguorėjė:%s]]',
-    'be-x-old':u'Робат: дадаваньне [[Катэгорыя:%s]]',
-    'ca':u'Robot: Afegint [[Categoria:%s]]',
-    'cs':u'Robot přidal [[Kategorie:%s]]',
-    'da':u'Robot: Tilføjer [[Kategori:%s]]',
-    'de':u'Bot: Ergänze [[Kategorie:%s]]',
-    'en':u'Robot: Adding [[Category:%s]]',
-    'es':u'Bot: Añadida [[Categoría:%s]]',
-    'id':u'Bot: Menambahkan [[Kategori:%s]]',
-    'fa':u'ربات: افزودن [[رده:%s]]',
-    'fi':u'Botti lisäsi luokkaan [[Luokka:%s]]',
-    'fr':u'Robot : ajoute [[Catégorie:%s]]',
-    'he':u'בוט: מוסיף [[קטגוריה:%s]]',
-    'hu':u'[[Kategória:%s]] hozzáadása bottal',
-    'ia':u'Robot: Addition de [[Categoria:%s]]',
-    'is':u'Vélmenni: Bæti við [[Flokkur:%s]]',
-    'it':u'Bot: Aggiungo [[Categoria:%s]]',
-    'ja':u'ロボットによる: カテゴリ追加 [[Category:%s]]',
-    'kk':u'Бот: [[Санат:%s]] үстеді',
-    'ko': u'로봇: [[분류:%s]] 추가',
-    'ksh':u'Bot: [[Saachjropp:%s]] erinjedonn',
-    'lb': u'Bot: Derbäi setzen [[Kategorie:%s]]',
-    'lt':u'robotas: Pridedama [[Kategorija:%s]]',
-    'nds':u'Kat-Bot: [[Kategorie:%s]] rin',
-    'nds-nl':u'bot: [[kattegerie:%s]] derbie edaon',
-    'nl':u'Bot: [[categorie:%s]] toegevoegd',
-    'no':u'Robot: Legger til [[Kategori:%s]]',
-    'nn':u'robot: la til [[Kategori:%s]]',
-    'pl':u'Robot dodaje [[Kategoria:%s]]',
-    'pdc':u'Waddefresser: [[Kategorie:%s]] dezu geduh',
-    'pt':u'Bot: Adicionando [[Categoria:%s]]',
-    'ru':u'Робот: добавление [[Категория:%s]]',
-    'sk':u'Robot pridal [[Kategória:%s]]',
-    'sr':u'Бот: Додаје [[Категорија:%s]]',
-    'sv':u'Robot: Lägger till [[Kategori:%s]]',
-    'szl':u'Bot dodowo: [[Kategoria:%s]]',
-    'uk':u'Робот: додавання [[Категорія:%s]]',
-    'zh':u'機器人:新增目錄 [[Category:%s]]',
-    }
-
-msg_change={
-    'ar':u'روبوت: تغيير %(oldcat)s',
-    'be-x-old':u'Робат: зьмена %(oldcat)s',
-    'ca':u'Robot: Canviant %(oldcat)s',
-    'cs':u'Robot změnil [[%(oldcat)s]]→[[%(newcat)s]]',
-    'da':u'Robot: Ændrer %(oldcat)s',
-    'de':u'Bot: Ändere %(oldcat)s zu %(newcat)s',
-    'en':u'Robot: Changing %(oldcat)s',
-    'es':u'Bot: Cambiada %(oldcat)s',
-    'id':u'Bot: Mengganti %(oldcat)s',
-    'fa':u'ربات:تغییر %(oldcat)s',
-    'fi':u'Botti muutti luokan %(oldcat)s',
-    'fr':u'Robot : modifie [[%(oldcat)s]]',
-    'he':u'בוט: משנה %(oldcat)s',
-    'hu':u'Módosítás bottal: [[%(oldcat)s]]→[[%(newcat)s]]',
-    'ia':u'Robot: Modification de %(oldcat)s',
-    'is':u'Vélmenni: Breyti flokknum [[%(oldcat)s]]',
-    'it':u'Bot: Modifico %(oldcat)s',
-    'lt':u'robotas: Keičiama %(oldcat)s',
-    'ja':u'ロボットによる: カテゴリ変更 [[%(oldcat)s]]→[[%(newcat)s]]',
-    'kk':u'Бот: %(oldcat)s дегенді түзетті',
-    'ko': u'로봇: %(oldcat)s 수정',
-    'ksh':u'Bot: %(oldcat)s ußjewääßelt',
-    'nds':u'Kat-Bot: %(oldcat)s utwesselt',
-    'nds-nl':u'bot: wieziging %(oldcat)s',
-    'nl':u'Bot: wijziging %(oldcat)s',
-    'no':u'Robot: Endrer %(oldcat)s',
-    'nn':u'robot: endra %(oldcat)s',
-    'pdc':u'Waddefresser: Abdeeling vun %(oldcat)s nooch %(newcat)s geennert',
-    'pt':u'Bot: Modificando [[%(oldcat)s]]',
-    'pl':u'Robot przenosi %(oldcat)s',
-    'ru':u'Робот: изменение %(oldcat)s',
-    'sk':u'Robot zmenil [[%(oldcat)s]]→[[%(newcat)s]]',
-    'sr':u'Бот: Измена категорије %(oldcat)s',
-    'sv':u'Robot: Ändrar %(oldcat)s',
-    'uk':u'Робот: зміна %(oldcat)s',
-    'zh':u'機器人:變更目錄 [[%(oldcat)s]]→[[%(newcat)s]]',
-    }
-
-msg_created_for_renaming = {
-    'ar':u'روبوت: نقل من %s. المؤلفون: %s',
-    'de':u'Bot: Verschoben von %s. Autoren: %s',
-    'en':u'Robot: Moved from %s. Authors: %s',
-    'fi':u'Botti siirsi luokan %s. Muokkaajat: %s',
-    'fr':u'Robot : déplacé depuis %s. Auteurs: %s',
-    'he':u'בוט: הועבר מהשם %s. כותבים: %s',
-    'ia':u'Robot: Transferite de %s. Autores: %s',
-    'id':u'Bot: Memindahkan dari %s. Kontributor: %s',
-    'it':u'Bot: Voce spostata da %s. Autori: %s',
-    'ja': u'ロボットによる: %s から移動しました。原作者は %s',
-    'ksh':u'Bot: hääjeholldt von %s. Schriiver: %s',
-    'nds':u'Kat-Bot: herschaven von %s. Schriever: %s',
-    'nl':u'Bot: hernoemd van %s. Auteurs: %s',
-    'pl':u'Robot przenosi z %s. Autorzy: %s',
-    'pt':u'Bot: Movido de %s. Autor: %s',
-    'zh':u'機器人: 已從 %s 移動。原作者是 %s',
-    }
-
-deletion_reason_move = {
-    'ar':u'روبوت: التصنيف نقل إلى [[:تصنيف:%s|%s]]',
-    'bat-smg':u'Robots: Kateguorėjė bova parvadėnta i [[:Kateguorėjė:%s|%s]]',
-    'be-x-old':u'Робат: катэгорыя перайменаваная ў [[:Катэгорыя:%s|%s]]',
-    'ca':u'Robot: La categoria s\'ha mogut a [[:Categoria:%s|%s]]',
-    'cs':u'Kategorie přesunuta na [[:Kategorie:%s|%s]]',
-    'da':u'Robot: Kategori flyttet til [[:Category:%s|%s]]',
-    'de':u'Bot: Kategorie wurde nach [[:Kategorie:%s|%s]] verschoben',
-    'en':u'Robot: Category was moved to [[:Category:%s|%s]]',
-    'es':u'Robot: La categoría ha sido movida a [[:Category:%s|%s]]',
-    'fa':u'ربات:رده به رده  [[:رده:%s|%s]] منتقل شده‌است',
-    'fi':u'Botti siirsi luokan nimelle [[:Luokka:%s|%s]]',
-    'fr':u'Robot : catégorie déplacée sur [[:Category:%s|%s]]',
-    'he':u'בוט: הקטגוריה הועברה לשם [[:קטגוריה:%s|%s]]',
-    'hu':u'A bot áthelyezte a kategória tartalmát ide: [[:Kategória:%s|%s]]',
-    'ia':u'Robot: Categoria transferite a [[:Category:%s|%s]]',
-    'id':u'Bot: Kategori dipindahkan ke [[:Category:%s|%s]]',
-    'it':u'Bot: La categoria è stata sostituita da [[:Categoria:%s|%s]]',
-    'ja':u'ロボットによる: カテゴリ [[:Category:%s]]へ移動',
-    'kk':u'Бот: Санат [[:Санат:%s|%s]] дегенге жылжытылды',
-    'ko': u'로봇: 분류가 [[:분류:%s|%s]]로 옮겨짐',
-    'ksh':u'Bot: Saachjropp noh [[:Category:%s|%s]] jeschovve',
-    'lb': u'Bot: Kategorie gouf gréckelt: Nei [[:Kategorie:%s|%s]]',
-    'lt':u'robotas: Kategorija pervadinta į [[:Category:%s|%s]]',
-    'nds':u'Kat-Bot: Kategorie na [[:Category:%s|%s]] schaven',
-    'nds-nl':u'Bot: kattegerie is herneumd naor [[:Kattegerie:%s|%s]]',
-    'nl':u'Bot: Categorie is hernoemd naar [[:Category:%s|%s]]',
-    'no':u'Robot: Kategorien ble flyttet til [[:Category:%s|%s]]',
-    'nn':u'robot: kategorien blei flytta til [[:Kategori:%s|%s]]',
-    'pdc':u'Waddefresser: Abdeeling iss gezoge warre nooch [[:Kategorie:%s|%s]].',
-    'pt':u'Bot: Categoria [[:Category:%s|%s]] foi movida',
-    'pl':u'Robot przenosi kategorię do [[:Category:%s|%s]]',
-    'ru':u'Робот: категория переименована в [[:Категория:%s|%s]]',
-    'sk':u'Kategória bola presunutá na [[:Kategória:%s|%s]]',
-    'sr':u'Бот: Категорија премештена у [[:Category:%s|%s]]',
-    'sv':u'Robot: Kategori flyttades till [[:Category:%s|%s]]',
-    'uk':u'Робот: категорію перейменовано на [[Категорія:%s|%s]]',
-    'zh':u'機器人:移動目錄至 [[:Category:%s|%s]]',
-    }
 
 cfd_templates = {
     'wikipedia' : {
@@ -409,8 +270,8 @@ class AddCategory:
             self.newcatTitle = self.newcatTitle[:1].upper() + \
                                self.newcatTitle[1:]
         if not self.editSummary:
-            self.editSummary = pywikibot.translate(self.site, msg_add) \
-                               % self.newcatTitle
+            self.editSummary = i18n.twtranslate(self.site, 'category-adding', \
+                                {'newcat': self.newcatTitle})
         counter = 0
         for page in self.generator:
             self.treat(page)
@@ -532,9 +393,9 @@ class CategoryMoveRobot:
         newCat = catlib.Category(pywikibot.Link('Category:' + self.newCatTitle))
         # set edit summary message
         if not self.editSummary:
-            self.editSummary = pywikibot.translate(site, msg_change) \
-                               % {'oldcat':self.oldCat.title(),
-                                  'newcat':newCat.title()}
+            self.editSummary = i18n.twtranslate(site, 'category-replacing',\
+                                {'oldcat':self.oldCat.title(),
+                                 'newcat':newCat.title()})
 
         # Copy the category contents to the new category page
         copied = False
@@ -543,12 +404,12 @@ class CategoryMoveRobot:
             copied = self.oldCat.copyAndKeep(
                             self.newCatTitle,
                             pywikibot.translate(site, cfd_templates),
-                            pywikibot.translate(site, msg_created_for_renaming)
+                            i18n.twtranslate(site, 'category-renamed')
                      )
             # Also move the talk page
             if copied:
-                reason = pywikibot.translate(site, deletion_reason_move) \
-                         % (self.newCatTitle, self.newCatTitle)
+                reason = i18n.twtranslate(site, 'category-was-moved', \
+                         {'newcat':self.newCatTitle, 'title':self.newCatTitle})
                 oldTalk = self.oldCat.toggleTalkPage()
                 if oldTalk.exists():
                     newTalkTitle = newCat.toggleTalkPage().title()
@@ -588,8 +449,8 @@ class CategoryMoveRobot:
         # Delete the old category and its moved talk page
         if copied and self.deleteEmptySourceCat == True:
             if self.oldCat.isEmptyCategory():
-                reason = pywikibot.translate(site, deletion_reason_move) \
-                         % (self.newCatTitle, self.newCatTitle)
+                reason = i18n.twtranslate(site, 'category-was-moved', \
+                        {'newcat': self.newCatTitle, 'title': self.newCatTitle})
                 confirm = not self.batchMode
                 self.oldCat.delete(reason, confirm, mark = True)
                 if oldMovedTalk is not None:
@@ -601,24 +462,6 @@ class CategoryMoveRobot:
 
 class CategoryListifyRobot:
     '''Creates a list containing all of the members in a category.'''
-    listify_msg={
-        'ar':u'روبوت: عرض من %s (%d مدخلة)',
-        'ca':u'Robot: Llistant de %s (%d entrades)',
-        'cs':u'Robot: vytvoření soupisu obsahu kategorie %s (%d položek)',
-        'en':u'Bot: Listifying from %s (%d entries)',
-        'fa':u'ربات:فهرست کردن اعضای رده %s(%d عضو)',
-        'fi':u'Botti listasi luokan %s (%d jäsentä)',
-        'he':u'בוט: יוצר רשימה מהקטגוריה %s (%d דפים)',
-        'hu':u'%s listázása bottal (%d lap)',
-        'kk':u'Бот: %s дегеннен (%d буын) тізімдеді',
-        'nds-nl':u'Bot: lieste van %s (%d pagina\'s)',
-        'nl':u'Bot: Lijst van %s (%d pagina\'s)',
-        'pl':u'Robot: listuje kategorię %s (%d stron)',
-        'sv':u'Robot: Skapar en lista från %s (%d)',
-        'pt':u'Bot: Listando de %s (%d entradas)',
-        'zh':u'機器人: 從%s提取列表(%d個項目)',
-    }
-
     def __init__(self, catTitle, listTitle, editSummary, overwrite = False, showImages = False, subCats = False, talkPages = False, recurse = False):
         self.editSummary = editSummary
         self.overwrite = overwrite
@@ -635,8 +478,8 @@ class CategoryListifyRobot:
         if self.subCats:
             setOfArticles += set(self.cat.subcategories())
         if not self.editSummary:
-            self.editSummary = pywikibot.translate(self.site, self.listify_msg) \
-                               % (self.cat.title(), len(setOfArticles))
+            self.editSummary = i18n.twtranslate(self.site, 'category-listifying', \
+                    {'fromcat': self.cat.title(), 'num': len(setOfArticles)})
 
         listString = ""
         for article in setOfArticles:
@@ -736,7 +579,7 @@ class CategoryRemoveRobot:
         self.titleRegex = titleRegex
         self.inPlace = inPlace
         if not self.editSummary:
-            self.editSummary = pywikibot.translate(self.site, self.msg_remove) % self.cat.title()
+            self.editSummary = i18n.twtranslate(self.site, 'category-removing', {'oldcat': self.cat.title()})
 
     def run(self):
         articles = set(self.cat.articles())
@@ -758,7 +601,7 @@ class CategoryRemoveRobot:
             if self.useSummaryForDeletion and self.editSummary:
                 reason = self.editSummary
             else:
-                reason = pywikibot.translate(self.site, self.deletion_reason_remove)
+                reason = i18n.twtranslate(self.site, 'category-was-disbanded')
             talkPage = self.cat.toggleTalkPage()
             try:
                 self.cat.delete(reason, not self.batchMode)
@@ -797,7 +640,7 @@ class CategoryTidyRobot:
         self.catTitle = catTitle
         self.catDB = catDB
         self.site = pywikibot.getSite()
-        self.editSummary = pywikibot.translate(self.site, msg_change)\
+        self.editSummary = i18n.twtranslate(self.site, 'category-changing')\
                            % {'oldcat':self.catTitle, 'newcat':u''}
 
     def move_to_category(self, article, original_cat, current_cat):
@@ -957,37 +800,6 @@ class CategoryTreeRobot:
             * parent - the Category of the category we're coming from
         '''
 
-        # Translations to say that the current category is in more categories than
-        # the one we're coming from
-        also_in_cats = {
-            'ar': u'(أيضا في %s)',
-            'be-x-old': u'(таксама ў %s)',
-            'ca': u'(també a %s)',
-            'cs': u'(také v %s)', 
-            'da': u'(også i %s)',
-            'de': u'(auch in %s)',
-            'en': u'(also in %s)',
-            'es': u'(también en %s)',
-            'fa': u'(همچنین در %s)',
-            'fi': u'(myös luokassa %s)',
-            'fr': u'(également dans %s)',
-            'he': u'(גם בקטגוריות %s)',
-            'ia': u'(equalmente in %s)',
-            'is': u'(einnig í %s)',
-            'kk': u'(тағы да %s дегенде)',
-            'nds-nl': u'(oek in %s)',
-            'nl': u'(ook in %s)',
-            'no': u'(også i %s)',
-            'nn': u'(òg i %s)',
-            'pl': u'(również w %s)',
-            'pt': u'(também em %s)',
-            'ru': u'(также в %s)',
-            'sv': u'(också i %s)',
-            'uk': u'(також у %s)',
-            'ср': u'(такође у %s)',
-            'zh': u'(也在 %s)',
-        }
-
         result = u'#' * currentDepth
         result += '[[:%s|%s]]' % (cat.title(), cat.title().split(':', 1)[1])
         result += ' (%d)' % len(self.catDB.getArticles(cat))
@@ -1005,7 +817,7 @@ class CategoryTreeRobot:
                 # create a list of wiki links to the supercategories
                 supercat_names.append('[[:%s|%s]]' % (supercats[i].title(), supercats[i].title().split(':', 1)[1]))
                 # print this list, separated with commas, using translations given in also_in_cats
-            result += ' ' + pywikibot.translate(self.site, also_in_cats) % ', '.join(supercat_names)
+            result += ' ' + i18n.twtranslate(self.site, 'category-also-in', {'alsocat': ', '.join(supercat_names)})
         result += '\n'
         if currentDepth < self.maxDepth:
             for subcat in self.catDB.getSubcats(cat):
