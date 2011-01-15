@@ -486,7 +486,7 @@ u'Cannot change %s because of spam blacklist entry %s'
         text = self.load(page)
         if text is None:
             return
-        cats = page.categories()
+        cats = [c for c in page.categories()]
         # Show the title of the page we're working on.
         # Highlight the title in purple.
         pywikibot.output(
