@@ -185,3 +185,21 @@ def translate(code, xdict):
         return xdict['en']
     return xdict.values()[0]
 
+def twtranslate(code, twtitle, parameters=None):
+    """ Uses TranslateWiki files to provide translations based on the TW title
+        twtitle, which corresponds to a page on TW.
+
+        @param parameters is for future addition of plural support
+        @param twtitle is the TranslateWiki string title, in <package>-<key> format
+
+        The translations are retrieved from i18n.<package>, based on the callers
+        import table.
+    """
+    package = twtitle.split("-")[0]
+    transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
+    trans = translate(code, transdict)[twtitle]
+
+    if parameters:
+        return trans % parameters
+    else:
+        return trans
