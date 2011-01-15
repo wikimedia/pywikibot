@@ -432,8 +432,8 @@ class AddCategory:
             else:
                 pywikibot.output(u"Page %s does not exist; skipping."
                                  % page.title(asLink=True))
-        except pywikibot.IsRedirectPage:
-            redirTarget = pywikibot.Page(site, arg.args[0])
+        except pywikibot.IsRedirectPage, arg:
+            redirTarget = pywikibot.Page(self.site, arg.args[0])
             pywikibot.output(u"WARNING: Page %s is a redirect to %s; skipping."
                              % (page.title(asLink=True),
                                 redirTarget.title(asLink=True)))
