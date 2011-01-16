@@ -174,10 +174,11 @@ def translate(code, xdict):
     if hasattr(code,'lang'):
         code = code.lang
 
-    if code in xdict:
+    # check if the subkey exists anyway
+    if code in xdict and xdict[code]:
         return xdict[code]
     for alt in _altlang(code):
-        if alt in xdict:
+        if alt in xdict and xdict[alt]:
             return xdict[alt]
     if '_default' in xdict:
         return xdict['_default']
