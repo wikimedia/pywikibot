@@ -2,6 +2,8 @@
 # I18N functions
 #----------------
 
+from pywikibot import Error
+
 # Languages to use for comment text after the actual language but before
 # en:. For example, if for language 'xx', you want the preference of
 # languages to be:
@@ -185,6 +187,10 @@ def translate(code, xdict):
         return xdict['en']
     return xdict.values()[0]
 
+
+class TranslationError(Error):
+    pass
+
 def twtranslate(code, twtitle, parameters=None):
     """ Uses TranslateWiki files to provide translations based on the TW title
         twtitle, which corresponds to a page on TW.
@@ -197,7 +203,23 @@ def twtranslate(code, twtitle, parameters=None):
     """
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
-    trans = translate(code, transdict)[twtitle]
+
+    # There are two possible failure modes: the msg dict might not have the
+    # language altogether, or a specific key could be untranslated.
+    
+    trans = None
+    try:
+        trans = transdict[code][twtitle]
+    except KeyError:
+        # try alternative languages and English
+        for alt in _altlang(code) + ['en']:
+            try:
+                trans = transdict[alt][twtitle]
+                break
+            except KeyError:
+                continue
+        if not trans:
+            raise TranslationError("No English translation has been defined for TranslateWiki key %r" % twtitle)
 
     if parameters:
         return trans % parameters
