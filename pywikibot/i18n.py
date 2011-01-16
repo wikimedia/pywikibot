@@ -174,11 +174,10 @@ def translate(code, xdict):
     if hasattr(code,'lang'):
         code = code.lang
 
-    # check if the subkey exists anyway
-    if code in xdict and xdict[code]:
+    if code in xdict:
         return xdict[code]
     for alt in _altlang(code):
-        if alt in xdict and xdict[alt]:
+        if alt in xdict:
             return xdict[alt]
     if '_default' in xdict:
         return xdict['_default']
@@ -198,11 +197,7 @@ def twtranslate(code, twtitle, parameters=None):
     """
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
-    twmsg = translate(code, transdict)
-    if twtitle in twmsg:
-        trans = twmsg[twtitle]
-    else:
-        trans = transdict['en'][twtitle]
+    trans = translate(code, transdict)[twtitle]
 
     if parameters:
         return trans % parameters
