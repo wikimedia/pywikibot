@@ -39,24 +39,11 @@ Furthermore, the following command line parameters are supported:
 __version__='$Id$'
 
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators, i18n
 import sys, re
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
-}
-
-# Summary messages in different languages
-msg = {
-    'ar': u'روبوت: تهيئة ISBN',
-    'de': 'Bot: Formatiere ISBN',
-    'en': 'Robot: Formatting ISBN',
-    'fa': u'ربات:استانداردسازی شابک',
-    'he': u'בוט: מעצב ISBN',
-    'ja': u'ロボットによる ISBN の書式化',
-    'nl': 'Bot: ISBN opgemaakt',
-    'pt': u'Bot: Formatando ISBN',
-    'zh': u'機器人：ISBN格式化',
 }
 
 # Maps each group number to the list of its publisher number ranges.
@@ -1389,7 +1376,7 @@ class IsbnBot:
         self.format = format
         self.always = always
         self.isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
-        self.comment = pywikibot.translate(pywikibot.getSite(), msg)
+        self.comment = i18n.twtranslate(pywikibot.getSite(), 'isbn-formatting')
 
     def treat(self, page):
         try:
