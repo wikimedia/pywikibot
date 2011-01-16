@@ -1,6 +1,12 @@
-#----------------
-# I18N functions
-#----------------
+# -*- coding: utf-8  -*-
+""" Various i18n functions, both for the internal translation system
+    and for TranslateWiki-based translations
+"""
+#
+# (C) Pywikipedia bot team, 2004-2011
+#
+# Distributed under the terms of the MIT license.
+#
 
 from pywikibot import Error
 
@@ -9,15 +15,17 @@ from pywikibot import Error
 # languages to be:
 # xx:, then fr:, then ru:, then en:
 # you let altlang return ['fr','ru'].
-# This code is used by translate() below.
+# This code is used by translate() and twtranslate() below.
 
 def _altlang(code):
     """Define fallback languages for particular languages.
 
     If no translation is available to a specified language, translate() will
     try each of the specified fallback languages, in order, until it finds
-    one with a translation, or '_default' as a last resort.
-
+    one with a translation, with 'en' and '_default' as a last resort.
+    
+    For example, if for language 'xx', you want the preference of languages
+    to be: xx > fr > ru > en, you let altlang return ['fr', 'ru'].
     """
     #Amharic
     if code in ['aa', 'om']:
@@ -189,14 +197,17 @@ def translate(code, xdict):
 
 
 class TranslationError(Error):
+    """ Raised when no correct translation could be found """
     pass
 
 def twtranslate(code, twtitle, parameters=None):
     """ Uses TranslateWiki files to provide translations based on the TW title
         twtitle, which corresponds to a page on TW.
 
-        @param parameters is for future addition of plural support
-        @param twtitle is the TranslateWiki string title, in <package>-<key> format
+        @param code The language code
+        @param twtitle The TranslateWiki string title, in <package>-<key> format
+        @param parameters For passing parameters. In the future, this will
+                          be used for plural support.
 
         The translations are retrieved from i18n.<package>, based on the callers
         import table.
@@ -204,8 +215,9 @@ def twtranslate(code, twtitle, parameters=None):
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
 
-    # There are two possible failure modes: the msg dict might not have the
-    # language altogether, or a specific key could be untranslated.
+    # There are two possible failure modes: the translation dict might not have
+    # the language altogether, or a specific key could be untranslated. Both
+    # modes are caught with the KeyError.
     
     trans = None
     try:
