@@ -198,7 +198,11 @@ def twtranslate(code, twtitle, parameters=None):
     """
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
-    trans = translate(code, transdict)[twtitle]
+    twmsg = translate(code, transdict)
+    if twtitle in twmsg:
+        trans = twmsg[twtitle]
+    else:
+        trans = transdict['en'][twtitle]
 
     if parameters:
         return trans % parameters
