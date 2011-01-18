@@ -239,3 +239,17 @@ def twtranslate(code, twtitle, parameters=None):
         return trans % parameters
     else:
         return trans
+
+def twhas_key(code, twtitle):
+    """ Uses TranslateWiki files to to check whether specified translation
+        based on the TW title is provided. No code fallback is made.
+
+        @param code The language code
+        @param twtitle The TranslateWiki string title, in <package>-<key> format
+
+        The translations are retrieved from i18n.<package>, based on the callers
+        import table.
+    """
+    package = twtitle.split("-")[0]
+    transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
+    return code in transdict and twtitle in transdict[code]
