@@ -129,8 +129,10 @@ def _altlang(code):
     if code == 'kaa':
         return ['uz', 'ru']
     #Serbocroatian
-    if code in ['bs', 'hr', 'sh', 'sr']:
-        return ['sh', 'hr', 'bs', 'sr']
+    if code in ['bs', 'hr', 'sh',]:
+        return ['sh', 'hr', 'bs', 'sr', 'sr-el']
+    if code == 'sr':
+        return ['sr-el', 'sh', 'hr', 'bs']
     #Turkish and Kurdish
     if code in ['diq', 'ku']:
         return ['ku', 'tr']
