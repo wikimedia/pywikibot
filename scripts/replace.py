@@ -125,6 +125,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from scripts import editarticle
 from pywikibot import catlib, config
+from pywikibot import i18n
 import webbrowser
 
 # Imports predefined replacements tasks from fixes.py
@@ -135,47 +136,6 @@ import scripts.fixes as fixes
 docuReplacements = {
     '&params;':     pagegenerators.parameterHelp,
     '&fixes-help;': fixes.help,
-}
-
-
-# Summary messages in different languages
-# NOTE: Predefined replacement tasks might use their own dictionary, see 'fixes'
-# below.
-msg = {
-    'ar': u'%s روبوت : استبدال تلقائي للنص',
-    'ca': u'Robot: Reemplaçament automàtic de text %s',
-    'cs': u'Robot automaticky nahradil text: %s',
-    'de': u'Bot: Automatisierte Textersetzung %s',
-    'el': u'Ρομπότ: Αυτόματη αντικατάσταση κειμένου %s',
-    'en': u'Bot: Automated text replacement %s',
-    'es': u'Robot: Reemplazo automático de texto %s',
-    'fa': u'ربات: تغییر خودکار متن %s',
-    'fi': u'Botti korvasi automaattisesti tekstin %s',
-    'fr': u'Robot : Remplacement de texte automatisé %s',
-    'frr': u'Bot: Automatisiaret ütjwakselt tekst %s',
-    'he': u'בוט: החלפת טקסט אוטומטית %s',
-    'hu': u'Robot: Automatikus szövegcsere %s',
-    'ia': u'Robot: Reimplaciamento automatic de texto %s',
-    'id': u'Bot: Penggantian teks otomatis %s',
-    'is': u'Vélmenni: breyti texta %s',
-    'it': u'Bot: Sostituzione automatica %s',
-    'ja': u'ロボットによる: 文字置き換え %s',
-    'ka': u'რობოტი: ტექსტის ავტომატური შეცვლა %s',
-    'kk': u'Бот: Мәтінді өздікті алмастырды: %s',
-    'ksh': u'Bot: hät outomatesch Täx jetuusch: %s',
-    'lt': u'robotas: Automatinis teksto keitimas %s',
-    'nds': u'Bot: Text automaatsch utwesselt: %s',
-    'nds-nl': u'Bot: autematisch tekse vervungen %s',
-    'nl': u'Bot: automatisch tekst vervangen %s',
-    'nn': u'robot: automatisk teksterstatning: %s',
-    'no': u'robot: automatisk teksterstatning: %s',
-    'pl': u'Robot automatycznie zamienia tekst %s',
-    'pt': u'Bot: Mudança automática %s',
-    'ru': u'Робот: Автоматизированная замена текста %s',
-    'sr': u'Бот: Аутоматска замена текста %s',
-    'sv': u'Bot: Automatisk textersättning: %s',
-    'uk': u'Бот: Автоматизована заміна тексту: %s',
-    'zh': u'機器人:執行文字代換作業 %s',
 }
 
 
@@ -581,10 +541,11 @@ def main(*args):
         replacements.append((commandline_replacements[0],
                              commandline_replacements[1]))
         if not summary_commandline:
-            edit_summary = pywikibot.translate(pywikibot.getSite(), msg
-                                     ) % (' (-' + commandline_replacements[0]
-                                          + ' +' + commandline_replacements[1]
-                                          + ')')
+            edit_summary = i18n.twtranslate(pywikibot.getSite(),
+                                            'replace-replacing',
+                                            {'description': ' (-%s +%s)'
+                                            % (commandline_replacements[0],
+                                               commandline_replacements[1])})
     elif (len(commandline_replacements) > 1):
         if (fix == None):
             for i in xrange (0, len(commandline_replacements), 2):
@@ -596,8 +557,10 @@ def main(*args):
                          for i in range(0, len(commandline_replacements), 2)]
                 replacementsDescription = '(%s)' % ', '.join(
                     [('-' + pair[0] + ' +' + pair[1]) for pair in pairs])
-                edit_summary = pywikibot.translate(pywikibot.getSite(), msg
-                                         ) % replacementsDescription
+                edit_summary = i18n.twtranslate(pywikibot.getSite(),
+                                                'replace-replacing',
+                                                {'description':
+                                                 replacementsDescription})
         else:
            raise pywikibot.Error(
                'Specifying -fix with replacements is undefined')
@@ -610,14 +573,15 @@ def main(*args):
             old = pywikibot.input(
 u'Please enter another text that should be replaced, or press Enter to start:')
             if old == '':
-                change = change + ')'
+                change += ')'
                 break
             new = pywikibot.input(u'Please enter the new text:')
-            change = change + ' & -' + old + ' +' + new
+            change += ' & -' + old + ' +' + new
             replacements.append((old, new))
         if not summary_commandline:
-            default_summary_message =  pywikibot.translate(
-                                          pywikibot.getSite(), msg) % change
+            default_summary_message = i18n.twtranslate(pywikibot.getSite(),
+                                                       'replace-replacing',
+                                                       {'description': change})
             pywikibot.output(u'The summary message will default to: %s'
                              % default_summary_message)
             summary_message = pywikibot.input(
