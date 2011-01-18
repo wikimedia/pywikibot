@@ -16,7 +16,7 @@ All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
 """
 #
-# (C) Pywikipedia bot team, 2006-2010
+# (C) Pywikipedia bot team, 2006-2011
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,7 +24,7 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators, i18n
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -33,26 +33,9 @@ docuReplacements = {
 }
 
 class BasicBot:
-    # Edit summary message that should be used.
-    # NOTE: Put a good description here, and add translations, if possible!
-    msg = {
-        'ar': u'روبوت: تغيير ...',
-        'cs': u'Robot změnil ...',
-        'de': u'Bot: Ändere ...',
-        'en': u'Robot: Changing ...',
-        'fa': u'ربات: تغییر ...',
-        'fr': u'Robot: Changé ...',
-        'ja':u'ロボットによる：編集',
-        'ksh': u'Bot: Änderung ...',
-        'nds': u'Bot: Ännern ...',
-        'nl': u'Bot: wijziging ...',
-        'pl': u'Bot: zmienia ...',
-        'pt': u'Bot: alterando...',
-        'ru': u'Бот: изменил ...',
-        'sv': u'Bot: Ändrar ...',
-        'uk': u'Бот: змінив ...',
-        'zh': u'機器人：編輯.....',
-    }
+    # Edit summary message that should be used is placed on /i18n subdirectory.
+    # The file containing these messages must have the same name as the caller
+    # script (i.e. basic.py in this case)
 
     def __init__(self, generator, dry):
         """
@@ -67,7 +50,7 @@ class BasicBot:
         self.generator = generator
         self.dry = dry
         # Set the edit summary message
-        self.summary = pywikibot.translate(pywikibot.getSite(), self.msg)
+        self.summary = i18n.twtranslate(pywikibot.getSite(), 'basic-changing')
 
     def run(self):
         for page in self.generator:
