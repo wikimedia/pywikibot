@@ -57,134 +57,9 @@ __version__='$Id: redirect.py 7789 2009-12-17 19:20:12Z xqt $'
 #
 import re, sys, datetime
 import pywikibot
-from pywikibot import config
+from pywikibot import config, i18n
 # import xmlreader
 
-# Summary message for fixing double redirects
-msg_double={
-    'als':u'Bötli: Uflösig vun de doppleti Wyterleitig zue %s',
-    'ar': u'روبوت: تصليح تحويلة مزدوجة → %s',
-    'bat-smg': u'Robots: Taisuoms dvėgobs paradresavėms → %s',
-    'be-x-old': u'Робат: выпраўленьне падвойнага перанакіраваньня → %s',
-    'bjn': u'Robot: Pamasangan paugahan ganda ka %s',
-    'br': u'Kempennet adkas doubl gant robot → %s',
-    'cs': u'Robot opravil dvojité přesměrování → %s',
-    'de': u'Bot: Korrigiere doppelte Weiterleitung zu %s',
-    'en': u'Bot: Fixing double redirect to %s',
-    'es': u'Robot: Arreglando doble redirección → %s',
-    'fa': u'ربات:اصلاح تغییر مسیر دوتایی ← %s',
-    'fi': u'Botti korjasi kaksinkertaisen ohjauksen → %s',
-    'fr': u'Robot: répare double redirection à %s',
-    'frr':u'Bot: Ferbeedre dobelt widjerfeerang tu %s',
-    'ga': u'Róbó: Ag socrú athsheolta dúbailte → %s',
-    'he': u'בוט: מתקן הפניה כפולה → %s',
-    'hr': u'Bot: Popravak dvostrukih preusmjeravanja → %s',
-    'hu': u'Bot: %s lapra mutató dupla átirányítás javítása',
-    'ia': u'Robot: reparation de duple redirection → %s',
-    'is': u'Vélmenni: Lagfæri tvöfalda tilvísun → %s',
-    'it': u'Bot: Sistemo i redirect doppi a %s',
-    'ja': u'ロボットによる: 二重リダイレクト修正 → %s',
-    'ka': u'რობოტი: ორმაგი გადამისამართების გასწორება → %s',
-    'ko': u'로봇: 이중 넘겨주기 수정 → %s',
-    'kk': u'Бот: Шынжырлы айдатуды түзетті → %s',
-    'ksh':u'Bot: [[special:doubleredirects|Dubbel Ömlëijdong]] fottjemaat → %s',
-    'lb': u'Bot: Duebel Viruleedung gefléckt → %s',
-    'lt': u'robotas: Taisomas dvigubas peradresavimas → %s',
-    'mk': u'Бот: Исправка на двојни пренасочувања → %s',
-    'mzn': u'ربوت:عوض هایتن دکشیه‌ئون دِتایی → %s',
-    'nds':u'Bot: Dubbelte Wiederleiden rutmakt → %s',
-    'nl': u'Bot: dubbele doorverwijzing gecorrigeerd aan %s',
-    'nn': u'robot: retta dobbel omdirigering → %s',
-    'no': u'bot: Retter dobbel omdirigering → %s',
-    'pfl': u'Bot: E doppelte Waiterlaitung vabessat zu %s',
-    'pl': u'Robot naprawia podwójne przekierowanie → %s',
-    'pt': u'Bot: Corrigido duplo redirecionamento → %s',
-    'ro': u'Robot: Corectarea dublu redirecţionare în %s',
-    'ru': u'Робот: исправление двойного перенаправления → %s',
-    'sr': u'Бот: Поправка дуплих преусмерења → %s',
-    'sv': u'Robot: Rättar dubbel omdirigering → %s',
-    'szl':u'Robot sprowjo tuplowane przekerowańa → %s',
-    'th': u'โรบอต: แก้หน้าเปลี่ยนทางซ้ำซ้อน → %s',
-    'tr': u'Bot değişikliği: Yönlendirmeye olan yönlendirme → %s',
-    'uk': u'Робот: виправлення подвійного перенаправлення → %s',
-    'war':u'Robot: Gin-ayad in nagduduha nga redirek → %s',
-    'yi': u'באט: פארראכטן פארטאפלטע ווייטערפירונג → %s',
-    'zh': u'機器人:修正雙重重定向 → %s',
-    'zh-yue': u'機械人：拉直連串跳轉 → %s',
-    'zh-classical': u'僕:復修渡口 → %s',
-}
-
-# Reason for deleting broken redirects
-reason_broken={
-    'ar': u'روبوت: هدف التحويلة غير موجود',
-    'als': u'Wyterleitig wo kaputt isch', 
-    'be-x-old': u'Робат: мэта перанакіраваньня не існуе',
-    'cs': u'Přerušené přesměrování',
-    'de': u'Bot: Weiterleitungsziel existiert nicht',
-    'en': u'[[WP:CSD#G8|G8]]: [[Wikipedia:Redirect|Redirect]] to a deleted or non-existent page',
-    'es': u'Robot: La página a la que redirige no existe',
-    'fa': u'ربات: (بن بست) تغییرمسیر به صفحه‌ای که وجود ندارد',
-    'fi': u'Botti: Ohjauksen kohdesivua ei ole olemassa',
-    'fr': u'Robot : Cible du redirect inexistante',
-    'frr':u'Bot: Widjerfeerang tu en duad sidj.',
-    'ga': u'Róbó : Targaid athsheoladh ar iarraidh',
-    'he': u'בוט: יעד ההפניה אינו קיים',
-    'hu': u'Bot: Törölt vagy nemlétező lapra mutató [[WP:REDIR|átirányítás]] törlése',
-    'it': u'Bot: Il redirect indirizza ad una pagina inesistente',
-    'ja': u'ロボットによる:リダイレクトの目標は存在しませんでした',
-    'ka': u'რობოტი: გადამისამართებული გვერდი არ არსებობს',
-    'ko': u'로봇: 끊긴 넘겨주기',
-    'kk': u'Бот: Айдату нысанасы жоқ болды',
-    'ksh':u'Bot: Dė [[Special:BrokenRedirects|Ömlëijdong jingk ennet Liiere]]',
-    'lt': u'robotas: Peradresavimas į niekur',
-    'mzn': u'ربوت:بی‌جاء ِدکشی‌یه‌ئون',
-    'nds':u'Bot: Kaputte Wiederleiden ward nich brukt',
-    'nl': u'Bot: doelpagina doorverwijzing bestaat niet',
-    'nn': u'robot: målet for omdirigeringa eksisterer ikkje',
-    'no': u'robot: målet for omdirigeringen eksisterer ikke',
-    'pl': u'Robot: cel przekierowania nie istnieje',
-    'pt': u'Bot: Redirecionamento não existe',
-    'ru': u'[[ВП:КБУ#П1|П1]]: перенаправление в никуда',
-    'sr': u'Бот: Преусмерење не постоји',
-    'th': u'โรบอต: หน้าเปลี่ยนทางเสีย',
-    'tr': u'Bot değişikliği: Var olmayan sayfaya olan yönlendirme',
-    'war':u'Robot: Waray dida an karadto-an han redirek',
-    'yi': u'באט: ווײַטערפֿירן ציל עקזיסטירט נישט',
-    'zh': u'機器人:該重定向的目標不存在',
-    'zh-yue': u'機械人：跳轉目標唔存在',
-}
-
-# Reason for deleting redirect loops
-reason_loop={
-    'ar': u'بوت: هدف التحويلة يصنع عقدة تحويل',
-    'de': u'Bot: Weiterleitungsziel auf sich selbst',
-    'en': u'[[WP:CSD#G8|G8]]: [[Wikipedia:Redirect|Redirect]] target forms a redirect loop',
-    'fa': u'ربات: تغییر مسیر حلقه‌ای',
-    'frr':u'Bot: Widjerfeerang üüb ham salew',
-    'hu': u'Bot: A cél átirányítási hurkot hoz létre',
-}
-
-# Insert deletion template into page with a broken redirect
-sd_template = {
-    'ar': u'{{شطب|تحويلة مكسورة}}',
-    'als':u'{{delete}}Wyterleitig wo kaputt isch--~~~~', 
-    'bar':u'{{delete}}Kaputte Weiterleitung--~~~~', 
-    'de': u'{{sla|Defekte Weiterleitung --~~~~}}',
-    'cs': u'{{smazat|přerušené přesměrování}}',
-    'en': u'{{db-r1}}',
-    'fa': u'{{حذف سریع|بن بست}}',
-    'frr':u'{{delete|Widjerfeerang uunstaken --~~~~}}',
-    'ga': u'{{scrios|Athsheoladh briste}}',
-    'hu': u'{{azonnali|Hibás átirányítás|~~~~}}',
-    'it': u'{{Cancella subito|9}}',
-##    'ja': u'{{即時削除|壊れたリダイレクト}}', ## tracker no 3072733
-    'ksh':u'{{Schmieß fott}}Di Ömlëijdong jeiht noh nörjendwoh hen.<br />--~~~~~\n\n',
-    'nds':u'{{delete}}Kaputte Wiederleiden, wat nich brukt ward.<br />--~~~~\n\n',
-    'pdc':u'{{lesche|Kaputte Weiderleiding --~~~~}}',
-    'ru': u'{{db-redirnone}}',
-    'war':u'{{delete}}Nautod o nagbinalikbalik nga redirek.--~~~~\n\n',
-    'zh': u'{{delete|R1}}',
-}
 
 class RedirectGenerator:
     def __init__(self, xmlFilename=None, namespaces=[], offset=-1,
@@ -506,9 +381,9 @@ class RedirectRobot:
 
     def delete_broken_redirects(self):
         # get reason for deletion text
-        reason = pywikibot.translate(self.site, reason_broken)
+        reason = i18n.twtranslate(self.site, 'redirect-remove-broken')
         for redir_name in self.generator.retrieve_broken_redirects():
-            self.delete_1_broken_redirect( redir_name, reason)
+            self.delete_1_broken_redirect(redir_name, reason)
             if self.exiting:
                 break
 
@@ -535,17 +410,21 @@ class RedirectRobot:
                     try:
                         redir_page.delete(reason, prompt = False)
                     except pywikibot.NoUsername:
-                        if targetPage.site.lang in sd_template and \
-                           targetPage.site.lang in reason_broken:
+                        if i18n.twhas_key(
+                            targetPage.site.lang,
+                            'redirect-broken-redirect-template') and \
+                            i18n.twhas_key(targetPage.site.lang,
+                                           'redirect-remove-broken'):
                             pywikibot.output(
         u"No sysop in user-config.py, put page to speedy deletion.")
                             content = redir_page.get(get_redirect=True)
-                            content = pywikibot.translate(
+                            ### TODO: Add bot's signature if needed
+                            ###       Not supported via TW yet
+                            content = i18n.twtranslate(
                                 targetPage.site.lang,
-                                sd_template) + "\n" + content
-                            summary = pywikibot.translate(
-                                targetPage.site.lang, reason_broken)
-                            redir_page.put(content, summary)
+                                'redirect-broken-redirect-template'
+                                ) + "\n" + content
+                            redir_page.put(content, reason)
             except pywikibot.IsRedirectPage:
                 pywikibot.output(
         u'Redirect target %s is also a redirect! Won\'t delete anything.'
@@ -645,26 +524,31 @@ class RedirectRobot:
                         pywikibot.output(
                             u'Warning: Redirect target %s forms a redirect loop.'
                             % targetPage.title(asLink=True))
-                        break ###xqt doesn't work. edits twice!
-                        try:
-                            content = targetPage.get(get_redirect=True)
-                        except pywikibot.SectionError:
-                            content = pywikibot.Page(
-                                          targetPage.site,
-                                          targetPage.title(withSection=False)
-                                      ).get(get_redirect=True)
-                        if targetPage.site.lang in sd_template and \
-                           targetPage.site.lang in sd_tagging_sum:
-                            pywikibot.output(u"Tagging redirect for deletion")
-                            # Delete the two redirects
-                            content = pywikibot.translate(
-                                        targetPage.site.lang,
-                                        sd_template)+"\n"+content
-                            summ = pywikibot.translate(targetPage.site.lang,
-                                                       sd_tagging_sum)
-                            targetPage.put(content, summ)
-                            redir.put(content, summ)
-                        break # TODO Better implement loop redirect
+                        break ### doesn't work. edits twice!
+##                        try:
+##                            content = targetPage.get(get_redirect=True)
+##                        except pywikibot.SectionError:
+##                            content = pywikibot.Page(
+##                                          targetPage.site,
+##                                          targetPage.title(withSection=False)
+##                                      ).get(get_redirect=True)
+##                        if i18n.twhas_key(
+##                            targetPage.site.lang,
+##                            'redirect-broken-redirect-template') and \
+##                            i18n.twhas_key(targetPage.site.lang,
+##                                           'redirect-remove-loop'):
+##                            pywikibot.output(u"Tagging redirect for deletion")
+##                            # Delete the two redirects
+##                            content = i18n.twtranslate(
+##                                          targetPage.site.lang,
+##                                          'redirect-remove-loop',
+##                                          ) + "\n" + content
+##                            summ = i18n.twtranslate(
+##                                       targetPage.site.lang,
+##                                       'redirect-broken-redirect-template')
+##                            targetPage.put(content, summ)
+##                            redir.put(content, summ)
+##                        break # TODO Better implement loop redirect
                     else: # redirect target found
                         if targetPage.isStaticRedirect():
                             pywikibot.output(
@@ -685,8 +569,9 @@ class RedirectRobot:
                     pywikibot.output(u"Note: Nothing left to do on %s"
                                      % redir.title(asLink=True))
                     break
-                summary = pywikibot.translate(self.site, msg_double) \
-                          % targetPage.title(asLink=True)
+                summary = i18n.twtranslate(self.site, 'redirect-fix-double',
+                                           {'to': targetPage.title(asLink=True)}
+                                           )
                 pywikibot.showDiff(oldText, text)
                 if self.prompt(u'Do you want to accept the changes?'):
                     try:
@@ -713,7 +598,7 @@ class RedirectRobot:
     def fix_double_or_delete_broken_redirects(self):
         # TODO: part of this should be moved to generator, the rest merged into self.run()
         # get reason for deletion text
-        delete_reason = pywikibot.translate(self.site, reason_broken)
+        delete_reason = i18n.twtranslate(self.site, 'redirect-remove-broken')
         count = 0
         for (redir_name, code, target, final)\
                 in self.generator.get_redirects_via_api(maxlen=2):
