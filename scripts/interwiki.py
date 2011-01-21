@@ -309,7 +309,7 @@ that you have to break it off, use "-continue" next time.
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
-# (C) Pywikipedia bot team, 2007-2010
+# (C) Pywikipedia bot team, 2007-2011
 #
 # Distributed under the terms of the MIT license.
 #
@@ -321,33 +321,6 @@ import time
 import codecs
 import pickle
 import socket
-
-try:
-    set # introduced in Python 2.4: faster and future
-except NameError:
-    from sets import Set as set
-
-try: sorted ## Introduced in 2.4
-except NameError:
-    def sorted(seq, cmp=None, key=None, reverse=False):
-        """Copy seq and sort and return it.
-        >>> sorted([3, 1, 2])
-        [1, 2, 3]
-        """
-        seq2 = copy.copy(seq)
-        if key:
-            if cmp is None:
-                cmp = __builtins__.cmp
-            seq2.sort(lambda x,y: cmp(key(x), key(y)))
-        else:
-            if cmp is None:
-                seq2.sort()
-            else:
-                seq2.sort(cmp)
-        if reverse:
-            seq2.reverse()
-        return seq2
-
 import pywikibot
 import config2 as config
 import catlib
