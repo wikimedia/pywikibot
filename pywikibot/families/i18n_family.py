@@ -16,4 +16,4 @@ class Family(family.Family):
         }
 
     def version(self, code):
-        return "1.17alpha"
+        return "1.18alpha"
