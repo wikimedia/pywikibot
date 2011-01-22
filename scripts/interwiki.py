@@ -2363,8 +2363,10 @@ def compareLanguages(old, new, insite):
         fmt = lambda d, site: site.lang
 
     head, add, rem, mod = pywikibot.translate(insite.lang, msg)
-    if insite.lang=='de' and not globalvar.autonomous:
-        head = u'Halbautomatischer %s' % head #prevents abuse filter blocking for hi-wiki
+    #Version info marks bots without unicode error
+    #This also prevents abuse filter blocking on de-wiki
+    if not pywikibot.unicode_error:
+        head = u'r%s) (%s' % (sys.version.split()[0], head)
 
     colon = u': '
     comma = u', '
