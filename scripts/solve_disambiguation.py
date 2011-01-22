@@ -89,147 +89,12 @@ import pywikibot
 from scripts import editarticle
 from pywikibot import pagegenerators
 from pywikibot import config
-
-# Summary message when working on disambiguation pages
-msg = {
-    'ar': u'توضيح بمساعدة روبوت: %s - غير الوصلة أو الوصلات إلى %s',
-    'ca': u'Bot:Desambiguació assistida: %s - Canviant enllaç(os) per %s',
-    'cs': u'Odstranění linku na rozcestník [[%s]] s použitím robota - Změněn(y) odkaz(y) na %s',
-    'en': u'Robot-assisted disambiguation: %s - Changed link(s) to %s',
-    'es': u'Bot:Desambiguación asistida: %s - Cambiando enlace(s) para %s',
-    'da': u'Retter flertydigt link til: %s - Ændrede link(s) til %s',
-    'de': u'Bot-unterstützte Begriffsklärung: %s - Link(s) ersetzt durch %s',
-    'fa': u'ابهام زدایی به کمک ربات: %s - پیوند به [[%s]]',
-    'fi': u'Täsmennystä botin avulla: %s korvattiin link(e)illä %s',
-    'fr': u'Homonymie résolue à l’aide du robot: %s - Modifications du (des) lien(s) pour %s',
-    'he': u'תיקון קישור לדף פירושונים באמצעות בוט: %s',
-    'hu': u'Bottal végzett egyértelműsítés: %s –> %s',
-    'ia': u'Disambiguation assistite per robot: %s - Changed link(s) to %s',
-    'it': u'Sistemazione automatica della disambigua: %s - Inversione di redirect %s',
-    'lt': u'Nuorodų į nukrepiamąjį straipsnį keitimas: %s - Pakeistos nuorodos į %s',
-    'kk': u'Айрықты мағыналарды бот көмегімен шешу: %s - Changed link(s) to %s',
-    'ko': u'로봇의 도움을 받아 동음이의 처리 : [[%s]] - %s 문서로 링크 걸음',
-    'nl': u'Botgeholpen doorverwijzing: [[%s]] - Verwijzing(en) gewijzigd naar %s',
-    'no': u'bot: Retter lenke til peker: %s - Endret lenke(r) til %s',
-    'pl': u'Wspomagane przez robota ujednoznacznienie: %s - Zmieniono link(i) %s',
-    'pt': u'Desambiguação assistida por bot: %s link(s) mudado(s) para %s',
-    'ru': u'Разрешение значений с помощью бота: %s - Changed link(s) to %s',
-    'sr': u'Решавање вишезначних одредница помоћу бота: %s - Changed link(s) to %s',
-    'sv': u'Länkar direkt till rätt artikel för: %s - Bytte länk(ar) till %s',
-    'uk': u'Виправлення посилання на багатозначність за допомогою бота: %s змінено на %s',
-    }
-
-# Summary message when working on disambiguation pages and the link is removed
-msg_unlink = {
-    'ar': u'توضيح بمساعدة روبوت: %s - أزال الوصلة أو الوصلات.',
-    'cs': u'Odstranění linku na rozcestník [[%s]] s použitím robota - Odstraněn(y) odkaz(y)',
-    'ca': u'Desambiguació assistida: %s - Eliminant enllaç(os).',
-    'en': u'Robot-assisted disambiguation: %s - Removed link(s).',
-    'fa': u'ابهام زدایی به کمک ربات: حذف %s',
-    'da': u'Retter flertydigt link til: %s - Fjernede link(s)',
-    'de': u'Bot-unterstützte Begriffsklärung: %s - Link(s) entfernt',
-    'fi': u'Täsmennystä botin avulla: %s - poistettiin linkkejä.',
-    'fr': u'Homonymie résolue à l’aide du robot: %s - Retrait du (des) lien(s)',
-    'he': u'הסרת קישור לדף פירושונים באמצעות בוט: %s',
-    'hu': u'Bottal végzett egyértelműsítés: %s – hivatkozások eltávolítása',
-    'ia': u'Disambiguation assistite per robot: %s - Removed link(s).',
-    'it': u'Sistemazione automatica della disambigua: %s - Collegamenti rimossi',
-    'lt': u'Nuorodų į nukrepiamąjį straipsnį keitimas: %s - Pašalintos nuorodos',
-    'kk': u'Айрықты мағыналарды бот көмегімен шешу: %s - Removed link(s).',
-    'ko': u'로봇의 도움을 받아 동음이의 처리: [[%s]] - 링크 제거',
-    'nl': u'Botgeholpen doorverwijzing: [[%s]] - Verwijzing(en) verwijderd',
-    'no': u'bot: Retter lenke til peker: %s - Fjernet lenke(r)',
-    'pl': u'Wspomagane przez robota ujednoznacznienie: %s - Usunięto link(i)',
-    'pt': u'Desambiguação assistida por bot: %s link(s) removido(s)',
-    'ru': u'Разрешение значений с помощью бота: %s - Removed link(s)',
-    'sr': u'Решавање вишезначних одредница помоћу бота: %s - Removed link(s)',
-    'sv': u'Länkar direkt till rätt artikel för: %s - Tog bort länk(ar)',
-    'uk': u'Виправлення посилання на багатозначність за допомогою бота: %s вилучено',
-    }
-
-# Summary message when working on redirects
-msg_redir = {
-    'ar': u'توضيح بمساعدة روبوت: %s - غير الوصلة أو الوصلات إلى %s',
-    'cs': u'Robot opravil přesměrování na %s - Změněn(y) odkaz(y) na %s',
-    'ca': u'Desambiguació assistida: %s - Canviant enllaç(os) a %s',
-    'en': u'Robot-assisted disambiguation: %s - Changed link(s) to %s',
-    'da': u'Retter flertydigt link til: %s - Ændrede link(s) til %s',
-    'de': u'Bot-unterstützte Redirectauflösung: %s - Link(s) ersetzt durch %s',
-    'fa': u'ابهام زدایی به کمک ربات: %s - پیوند به [[%s]]',
-    'fi': u'Täsmennystä botin avulla: %s korvattiin link(e)illä %s',
-    'fr': u'Correction de lien vers redirect: %s - Modifications du (des) lien(s) pour %s',
-    'he': u'תיקון קישור לדף פירושונים באמצעות בוט: %s שונה ל%s',
-    'hu': u'Bottal végzett egyértelműsítés: %s –> %s',
-    'ia': u'Resolution de redirectiones assistite per robot: %s - Changed link(s) to %s',
-    'it': u'Sistemazione automatica del redirect: %s - Inversione di redirect %s',
-    'lt': u'Nuorodų į peradresavimo straipsnį keitimas: %s - Pakeistos nuorodos į %s',
-    'kk': u'Айрықты мағыналарды бот көмегімен шешу: %s - Changed link(s) to %s',
-    'ko': u'로봇의 도움을 받아 동음이의 처리: [[%s]] - %s 문서로 링크 걸음',
-    'nl': u'Botgeholpen oplossing voor doorverwijzing: [[%s]] - Verwijzing(en) gewijzigd naar %s',
-    'no': u'bot: Endrer omdirigeringslenke: %s - Endret lenke(r) til %s',
-    'pl': u'Wspomagane przez robota ujednoznacznienie: %s - Zmieniono link(i) %s',
-    'pt': u'Desambiguação assistida por bot: %s link(s) mudados para %s',
-    'ru': u'Разрешение значений с помощью бота: %s - Changed link(s) to %s',
-    'sr': u'Решавање вишезначних одредница помоћу бота: %s - Changed link(s) to %s',
-    'sv': u'Länkar direkt till rätt artikel för: %s - Bytte länk(ar) till %s',
-    'uk': u'Виправлення посилання на багатозначність за допомогою бота: %s змінено на %s',
-    }
-
-# Summary message when working on redirects and the link is removed
-msg_redir_unlink = {
-    'ar': u'توضيح بمساعدة روبوت: %s - أزال الوصلة أو الوصلات',
-    'cs': u'Robot opravil přesměrování na %s - Odstraněn(y) odkaz(y)',
-    'ca': u'Desambiguació assistida: %s - Eliminant enllaç(os)',
-    'en': u'Robot-assisted disambiguation: %s - Removed link(s)',
-    'da': u'Retter flertydigt link til: %s - Fjernede link(s)',
-    'de': u'Bot-unterstützte Redirectauflösung: %s - Link(s) entfernt',
-    'fa': u'ابهام زدایی به کمک ربات: حذف %s',
-    'fr': u'Correction de lien vers redirect: %s - Retrait du (des) lien(s)',
-    'fi': u'Täsmennystä botin avulla: %s - poistettiin linkkejä',
-    'he': u'הסרת קישור לדף פירושונים באמצעות בוט: %s',
-    'hu': u'Bottal támogatott egyértelműsítés: %s – hivatkozások eltávolítása',
-    'ia': u'Resolution de redirectiones assistite per robot: %s - Removed link(s).',
-    'it': u'Sistemazione automatica del redirect: %s - Collegamenti rimossi',
-    'lt': u'Nuorodų į peradresavimo straipsnį keitimas: %s - Pašalintos nuorodos',
-    'kk': u'Айрықты мағыналарды бот көмегімен шешу: %s - Removed link(s).',
-    'ko': u'로봇의 도움을 받아 동음이의 처리: [[%s]] - 링크 제거',
-    'nl': u'Botgeholpen oplossing voor doorverwijzing: [[%s]] - Verwijzing(en) verwijderd',
-    'no': u'bot: Endrer omdirigeringslenke: %s - Fjernet lenke(r)',
-    'pl': u'Wspomagane przez robota ujednoznacznienie: %s - Usunięto link(i)',
-    'pt': u'Desambiguação assistida por bot: %s link(s) removidos',
-    'ru': u'Разрешение значений с помощью бота: %s - Removed link(s)',
-    'sr': u'Решавање вишезначних одредница помоћу бота: %s - Removed link(s)',
-    'sv': u'Länkar direkt till rätt artikel för: %s - Tog bort länk(ar)',
-    'uk': u'Виправлення посилання на багатозначність за допомогою бота: %s вилучено',
-    }
+from pywikibot import i18n
 
 # Disambiguation Needed template
 dn_template = {
     'en' : u'{{dn}}',
-    }
-
-# Summary message when adding Disambiguation Needed template
-msg_dn = {
-    'ar' : u'توضيح بمساعدة روبوت: %s - التعليم كمحتاجة لانتباه خبير',
-    'en' : u'Robot-assisted disambiguation: %s - Marked as needing expert attention',
-    }
-
-# Summary message when adding Disambiguation Needed template to a redirect link
-msg_redir_dn = {
-    'ar' : u'توضيح بمساعدة روبوت: %s - التعليم كمحتاجة لانتباه خبير',
-    'en' : u'Robot-assisted disambiguation: %s - Marked as needing expert attention',
-    }
-
-# Summary message to (unknown)
-unknown_msg = {
-    'ar' : u'(غير معروف)',
-    'ca' : u'(Canvi manual)',
-    'en' : u'(unknown)',
-    'fa' : u'(نامعلوم)',
-    'fi' : u'(tuntematon)',
-    'hu' : u'(ismeretlen)',
-    'pt' : u'(desconhecido)',
-    }
+}
 
 # disambiguation page name format for "primary topic" disambiguations
 # (Begriffsklärungen nach Modell 2)
@@ -1046,7 +911,7 @@ u"Page does not exist, using the first link in page %s."
         targets = targets[:-2]
 
         if not targets:
-            targets = pywikibot.translate(self.mysite, unknown_msg)
+            targets = i18n.twtranslate(self.mysite, 'solve_disambiguation-unknown-page')
 
         # first check whether user has customized the edit comment
         if (self.mysite.family.name in config.disambiguation_comment
@@ -1069,25 +934,22 @@ u"Page does not exist, using the first link in page %s."
         elif disambPage.isRedirectPage():
             # when working on redirects, there's another summary message
             if unlink and not new_targets:
-                self.comment = pywikibot.translate(self.mysite,
-                                                   msg_redir_unlink) \
-                               % disambPage.title()
+                self.comment = i18n.twtranslate(self.mysite, 
+                               'solve_disambiguation-redirect-removed',
+                               {'from': disambPage.title()})
             elif dn and not new_targets:
-                self.comment = pywikibot.translate(self.mysite, msg_redir_dn) \
-                               % disambPage.title()
+                self.comment = i18n.twtranslate(self.mysite,
+                               'solve_disambiguation-redirect-adding-dn-template',
+                               {'from': disambPage.title()})
             else:
-                self.comment = pywikibot.translate(self.mysite, msg_redir) \
-                               % (disambPage.title(), targets)
+                self.comment = i18n.twtranslate(self.mysite, 'solve_disambiguation-redirect-resolved', {'from': disambPage.title(), 'to': targets})
         else:
             if unlink and not new_targets:
-                self.comment = pywikibot.translate(self.mysite, msg_unlink) \
-                               % disambPage.title()
+                self.comment = i18n.twtranslate(self.mysite, 'solve_disambiguation-links-removed', {'from': disambPage.title()})
             elif dn and not new_targets:
-                self.comment = pywikibot.translate(self.mysite, msg_dn) \
-                               % disambPage.title()
+                self.comment = i18n.twtranslate(self.mysite, 'solve_disambiguation-adding-dn-template', {'from': disambPage.title()})
             else:
-                self.comment = pywikibot.translate(self.mysite, msg) \
-                               % (disambPage.title(), targets)
+                self.comment = i18n.twtranslate(self.mysite, 'solve_disambiguation-links-resolved', {'from': disambPage.title(), 'to': targets})
 
     def run(self):
         if self.main_only:
