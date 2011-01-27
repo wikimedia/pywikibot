@@ -624,7 +624,8 @@ class Family:
             'cyril': [
                 'ab', 'av', 'ba', 'be', 'be-x-old', 'bg', 'bxr', 'ce', 'cu',
                 'cv', 'koi', 'kv', 'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo', 'myv',
-                'mhr', 'mrj', 'os', 'ru', 'sah', 'tg', 'tk', 'udm', 'uk', 'xal', 
+                'mhr', 'mrj', 'os', 'ru', 'rue', 'sah', 'tg', 'tk', 'udm', 'uk',
+                'xal', 
                 # languages using multiple scripts, including cyrillic
                 'ha', 'kk', 'sh', 'sr', 'tt'
             ],
