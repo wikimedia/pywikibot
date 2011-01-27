@@ -121,8 +121,8 @@ def _altlang(code):
         return ['ro']
     #Russian and Belarusian
     if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'kk', 'koi', 'ky', 'lbe',
-                'mdf', 'mhr', 'mrj', 'myv', 'os', 'sah', 'tg', 'tt', 'udm',
-                'uk', 'xal']:
+                'mdf', 'mhr', 'mrj', 'myv', 'os', 'rue', 'sah', 'tg', 'tt',
+                'udm', 'uk', 'xal']:
         return ['ru']
     if code in ['be', 'be-x-old']:
         return ['be', 'be-x-old', 'ru']
