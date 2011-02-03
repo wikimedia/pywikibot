@@ -1640,9 +1640,13 @@ class Category(Page):
                                 return
 
     @deprecate_arg("startFrom", None)
-    def articles(self, recurse=False, step=None, total=None, content=False):
+    def articles(self, recurse=False, step=None, total=None,
+                 namespaces=None, content=False):
         """
         Yields all articles in the current category.
+
+        By default, yields all *pages* in the category that are not
+        subcategories!
 
         @param recurse: if not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
@@ -1652,12 +1656,15 @@ class Category(Page):
         @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in
             total (at all levels)
+        @param namespaces: only yield pages in the specified namespaces
+        @type namespace: int or list of ints
         @param content: if True, retrieve the content of the current version
             of each page (default False)
 
         """
-        namespaces = [x for x in self.site.namespaces()
-                      if x>=0 and x!=14]
+        if namespaces is None:
+            namespaces = [x for x in self.site.namespaces()
+                          if x>=0 and x!=14]
         for member in self.site.categorymembers(self,
                                                 namespaces=namespaces,
                                                 step=step, total=total,
