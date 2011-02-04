@@ -1641,7 +1641,7 @@ class Category(Page):
 
     @deprecate_arg("startFrom", None)
     def articles(self, recurse=False, step=None, total=None,
-                 namespaces=None, content=False):
+                 content=False, namespaces=None):
         """
         Yields all articles in the current category.
 
