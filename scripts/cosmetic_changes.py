@@ -34,7 +34,7 @@ all of them, but be careful if you do.
 __version__ = '$Id$'
 import pywikibot
 import isbn
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators, i18n
 import sys
 import re
 
@@ -49,131 +49,11 @@ docuReplacements = {
 }
 
 # Summary message when using this module as a stand-alone script
-msg_standalone = {
-    'commons': u'Bot: [[Commons talk:Tools/pywiki file description cleanup|desc page fmt]]',
-    'als':u'Bötli: chleineri Änderige',
-    'ar': u'روبوت: تغييرات تجميلية',
-    'be-x-old': u'Робат: касмэтычныя зьмены',
-    'bg': u'Робот козметични промени',
-    'br': u'Bot: Kemm dister',
-    'ca': u'Robot: Canvis cosmètics',
-    'ckb':u'بۆت: دەستکاریی جوانکاری',
-    'cs': u'Robotické: kosmetické úpravy',
-    'da': u'Bot: Kosmetiske ændringer',
-    'de': u'Bot: Kosmetische Änderungen',
-    'el': u'Ρομπότ: διακοσμητικές αλλαγές',
-    'en': u'Robot: Cosmetic changes',
-    'es': u'Robot: Cambios triviales',
-    'et': u'robot: kosmeetilised muudatused',
-    'fa': u'ربات: زیباسازی',
-    'fi': u'Botti kosmeettisia muutoksia',
-    'fr': u'Robot : Changement de type cosmétique',
-    'frr':u'Bot: Kosmeetisk feranerangen',
-    'fy': u'bot tekstwiziging',
-    'gl': u'bot Cambios estética',
-    'he': u'בוט: שינויים קוסמטיים',
-    'hi': u'Bot: अंगराग परिवर्तन',
-    'hr': u'robot kozmetičke promjene',
-    'hu': u'Bot: kozmetikai változtatások',
-    'ia': u'Robot: Cambios cosmetic',
-    'id': u'bot kosmetik perubahan',
-    'it': u'Bot: Modifiche estetiche',
-    'ja': u'ロボットによる: 細部の編集',
-    'ko': u'로봇: 예쁘게 바꿈',
-    'la': u'automaton: mutationes minores',
-    'lt': u'robotas: smulkūs taisymai',
-    'lv': u'robots kosmētiskās izmaiņas',
-    'mk': u'Бот: козметички промени',
-    'ms': u'Bot: perubahan kosmetik',
-    'mt': u'Bot: kosmetiċi bidliet',
-    'nl': u'Bot: cosmetische wijzigingen',
-    'no': u'Bot: Kosmetiske endringer',
-    'nn': u'Robot: Kosmetiske endringar',
-    'pdc':u'Waddefresser: gleenere Enneringe',
-    'pfl':u'Bot: Klännere Ännerunge',
-    'pl': u'Robot dokonuje poprawek kosmetycznych',
-    'pt': u'Bot: Mudanças triviais',
-    'ro': u'robot modificări cosmetice',
-    'ru': u'робот косметические изменения',
-    'sk': u'robot kozmetické zmeny',
-    'sl': u'robot kozmetične spremembe',
-    'sr': u'Бот козметичке промене',
-    'sv': u'Bot: Kosmetiska ändringar',
-    'th': u'บอต ปรับแต่งให้อ่านง่าย',
-    'tk': u'Bot: kosmetik üýtgeşme',
-    'tl': u'robot Kosmetiko pagbabago',
-    'tr': u'Bot Kozmetik değişiklikler',
-    'uk': u'робот косметичні зміни',
-    'vec':u'Bot: Modifiche estetiche',
-    'vi': u'robot: Sửa cách trình bày',
-    'war':u'Robot: Kosmetiko nga mga pagbag-o',
-    'yi': u'באט: קאסמעטישע ענדערונגען',
-    'zh': u'機器人: 細部更改',
-}
+msg_standalone = 'cosmetic_changes-standalone'
 
 # Summary message  that will be appended to the normal message when
 # cosmetic changes are made on the fly
-msg_append = {
-    'commons': u'; [[Commons talk:Tools/pywiki file description cleanup|desc page fmt]]',
-    'als':u'; chleineri Änderige',
-    'ar': u'; تغييرات تجميلية',
-    'be-x-old': u'; касмэтычныя зьмены',
-    'bg': u'; козметични промени',
-    'br': u'; Kemm dister',
-    'ca': u'; canvis cosmètics',
-    'ckb':u'; دەستکاریی جوانکاری', 
-    'cs': u'; kosmetické úpravy',
-    'da': u'; kosmetiske ændringer',
-    'de': u'; kosmetische Änderungen',
-    'el': u'; διακοσμητικές αλλαγές',
-    'en': u'; cosmetic changes',
-    'es': u'; cambios triviales',
-    'et': u'; kosmeetilised muudatused',
-    'fa': u'; زیباسازی',
-    'fi': u'; kosmeettisia muutoksia',
-    'fr': u'; changement de type cosmétique',
-    'frr':u'; kosmeetisk feranerangen',
-    'fy': u'; tekstwiziging',
-    'gl': u'; cambios estética',
-    'he': u'; שינויים קוסמטיים',
-    'hi': u'; अंगराग परिवर्तन',
-    'hr': u'; kozmetičke promjene',
-    'hu': u'; kozmetikai változtatások',
-    'ia': u'; cambios cosmetic',
-    'id': u'; kosmetik perubahan',
-    'it': u'; modifiche estetiche',
-    'ja': u'; 細部の編集',
-    'ko': u'; 예쁘게 바꿈',
-    'la': u'; mutationes minores',
-    'lt': u'; smulkūs taisymai',
-    'lv': u'; kosmētiskās izmaiņas',
-    'mt': u'; kosmetiċi bidliet',
-    'mk': u'; козметички промени',
-    'ms': u'; perubahan kosmetik',
-    'nl': u'; cosmetische veranderingen',
-    'no': u'; kosmetiske endringer',
-    'nn': u'; kosmetiske endringar',
-    'pdc':u'; gleenere Enneringe',
-    'pfl':u'; klännere Ännerunge',
-    'pl': u'; zmiany kosmetyczne',
-    'pt': u'; mudanças triviais',
-    'ro': u'; modificări cosmetice',
-    'ru': u'; косметические изменения',
-    'sk': u'; kozmetické zmeny',
-    'sl': u'; kozmetične spremembe',
-    'sr': u'; козметичке промене',
-    'sv': u'; kosmetiska ändringar',
-    'th': u'; ปรับแต่งให้อ่านง่าย',
-    'tk': u'; kosmetik üýtgeşme',
-    'tl': u'; Kosmetiko pagbabago',
-    'tr': u'; Kozmetik değişiklikler',
-    'uk': u'; косметичні зміни',
-    'vec':u'; modifiche estetiche',
-    'vi': u'; sửa cách trình bày',
-    'war':u'; kosmetiko nga mga pagbag-o',
-    'yi': u'; קאסמעטישע ענדערונגען',
-    'zh': u'; 細部更改',
-}
+msg_append = 'cosmetic_changes-append'
 
 nn_iw_msg = u'<!--interwiki (no, sv, da first; then other languages alphabetically by name)-->'
 
@@ -761,7 +641,7 @@ def main():
 
     if editSummary == '':
         # Load default summary message.
-        editSummary = pywikibot.translate(pywikibot.getSite(), msg_standalone)
+        editSummary = i18n.twtranslate(pywikibot.getSite(), msg_standalone)
     if pageTitle:
         site = pywikibot.getSite()
         gen = iter([pywikibot.Page(pywikibot.Link(t, site)) for t in pageTitle])
