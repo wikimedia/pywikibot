@@ -183,7 +183,7 @@ def translate(code, xdict):
 
     """
     # If a site is given instead of a code, use its language
-    if hasattr(code,'lang'):
+    if hasattr(code, 'lang'):
         code = code.lang
 
     if code in xdict:
@@ -216,6 +216,10 @@ def twtranslate(code, twtitle, parameters=None):
     """
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
+
+    # If a site is given instead of a code, use its language
+    if hasattr(code, 'lang'):
+        code = code.lang
 
     # There are two possible failure modes: the translation dict might not have
     # the language altogether, or a specific key could be untranslated. Both
@@ -252,4 +256,7 @@ def twhas_key(code, twtitle):
     """
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
+    # If a site is given instead of a code, use its language
+    if hasattr(code, 'lang'):
+        code = code.lang
     return code in transdict and twtitle in transdict[code]
