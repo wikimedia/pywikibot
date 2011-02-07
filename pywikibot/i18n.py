@@ -44,8 +44,10 @@ def _altlang(code):
     #German
     if code in ['bar', 'frr', 'ksh', 'pdc', 'pfl']:
         return ['de']
-    if code in ['als', 'lb']:
+    if code == 'lb':
         return ['de', 'fr']
+    if code == 'als':
+        return ['gsw', 'de']
     if code == 'nds':
         return ['nds-nl', 'de']
     if code in ['dsb', 'hsb']:
