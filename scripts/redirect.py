@@ -505,7 +505,7 @@ class RedirectRobot:
                         % targetPage.title(asLink=True))
                     if targetPage.site.sitename() == 'wikipedia:en':
                         mw_msg = targetPage.site.mediawiki_message(
-                                     'Wikieditor-toolbar-tool-redirect-example')
+                                     'wikieditor-toolbar-tool-redirect-example')
                         if targetPage.title() == mw_msg:
                             pywikibot.output(
                                 u"Skipping toolbar example: Redirect source is potentially vandalized.")
