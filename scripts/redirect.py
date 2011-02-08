@@ -472,11 +472,16 @@ class RedirectRobot:
                     pywikibot.output(
                         u'Warning: Redirect target section %s doesn\'t exist.'
                           % newRedir.title(asLink=True))
+                except pywikibot.CircularRedirect, e:
+                    pywikibot.warning(u"Skipping circular redirect: [[%s]]"
+                                       % str(e))
+                    break
                 except pywikibot.BadTitle, e:
                     # str(e) is in the format 'BadTitle: [[Foo]]'
                     pywikibot.output(
                         u'Warning: Redirect target %s is not a valid page title.'
                           % str(e)[10:])
+                    break
                 except pywikibot.NoPage:
                     if len(redirList) == 1:
                         pywikibot.output(u'Skipping: Page %s does not exist.'
