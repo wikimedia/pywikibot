@@ -477,10 +477,6 @@ class RedirectRobot:
                     pywikibot.output(
                         u'Warning: Redirect target %s is not a valid page title.'
                           % str(e)[10:])
-                #sometimes this error occures. Invalid Title starting with a '#'
-                except pywikibot.InvalidTitle, err:
-                    pywikibot.output(u'Warning: %s' % err)
-                    break
                 except pywikibot.NoPage:
                     if len(redirList) == 1:
                         pywikibot.output(u'Skipping: Page %s does not exist.'

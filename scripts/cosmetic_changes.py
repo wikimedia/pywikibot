@@ -217,10 +217,7 @@ class CosmeticChangesToolkit:
                 # [[page_title|link_text]]trailing_chars
                 # We only work on namespace 0 because pipes and linktrails work
                 # differently for images and categories.
-                try:
-                    page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
-                except pywikibot.InvalidTitle:
-                    return match.group()
+                page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
                 if page.namespace() == 0:
                     # Replace underlines by spaces, also multiple underlines
                     titleWithSection = re.sub('_+', ' ', titleWithSection)
@@ -532,7 +529,7 @@ class CosmeticChangesToolkit:
             text,
             r"([\r\n])\=\= *(Licensing|License information|{{int:license-header}}) *\=\=",
             r"\1== {{int:license}} ==", exceptions, True)
- 
+
         # frequent field values to {{int:}} versions
         text = pywikibot.replaceExcept(
             text,
@@ -542,10 +539,10 @@ class CosmeticChangesToolkit:
             text,
             r'(\| *Permission *\=) *(?:[Ss]ee below|[Ss]iehe unten) *([\r\n])',
             r'\1\2', exceptions, True)
- 
+
         # added to transwikied pages
         text = pywikibot.replaceExcept(text, r'__NOTOC__', '', exceptions, True)
- 
+
         # tracker element for js upload form
         text = pywikibot.replaceExcept(
             text,
@@ -553,7 +550,7 @@ class CosmeticChangesToolkit:
             '', exceptions[1:], True)
         text = pywikibot.replaceExcept(text, r'{{ImageUpload\|(?:basic|full)}}',
                                        '', exceptions, True)
- 
+
         # duplicated section headers
         text = pywikibot.replaceExcept(
             text,
