@@ -218,7 +218,7 @@ liên kết thể loại:
 
         """
         oldtext = article.get(get_redirect=True, force=True)
-        if newCat in article.categories() or newcat == article:
+        if newCat in article.categories() or newCat == article:
             newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, None,
                                                        site=self.site)
         else:
