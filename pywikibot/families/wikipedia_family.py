@@ -565,7 +565,7 @@ class Family(family.Family):
             return self.known_families
 
     def version(self, code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def dbName(self, code):
         # returns the name of the MySQL database
