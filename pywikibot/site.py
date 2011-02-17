@@ -678,7 +678,9 @@ class APISite(BaseSite):
         @param sysop: if True, require sysop privileges.
 
         """
-        if pywikibot.Page(self, ns=2, title=self.userinfo['name']) != \
+        if self.userinfo['name'] is None or\
+           self._username[sysop] is None or\
+           pywikibot.Page(self, ns=2, title=self.userinfo['name']) != \
            pywikibot.Page(self, ns=2, title=self._username[sysop]):
             return False
         return (not sysop) or 'sysop' in self.userinfo['groups']
