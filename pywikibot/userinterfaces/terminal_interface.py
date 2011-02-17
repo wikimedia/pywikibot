@@ -175,6 +175,11 @@ class UI(object):
             if password:
                 import getpass
                 text = getpass.getpass('')
+                # See PYWP-13 / http://bugs.python.org/issue11236
+                # getpass does not always raise an KeyboardInterrupt when ^C
+                # is pressed.
+                if '\x03' in text:
+                    raise KeyboardInterrupt()
             else:
                 text = raw_input()
         finally:
