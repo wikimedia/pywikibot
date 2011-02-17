@@ -38,16 +38,16 @@ _logger = "comm.threadedhttp"
 
 # easy_install safeguarded dependencies
 try:
-    import pkg_resources
-except ImportError:
-    pywikibot.error(
-        u"Error: You need the python module setuptools to use this module")
-    sys.exit(1)
-try:
     import httplib2
 except ImportError:
-    pkg_resources.require("httplib2")
-
+    try:
+        import pkg_resources
+        pkg_resources.require("httplib2")
+    except ImportError:
+        pywikibot.error(
+            u"Error: You need the python module setuptools to use this module")
+        sys.exit(1)
+   
 class ConnectionPool(object):
     """A thread-safe connection pool."""
 
