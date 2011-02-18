@@ -120,7 +120,7 @@ parameterHelp = u"""\
 -titleregex       Work on titles that match the given regular expression.
 
 -transcludes      Work on all pages that use a certain template.
-                  Argument can also be given as "-transcludes:Template:Title".
+                  Argument can also be given as "-transcludes:Title".
 
 -unusedfiles      Work on all description pages of images/media files that are
                   not used anywhere.
