@@ -12,18 +12,18 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'zh', 'lt', 'mg', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
-            'io', 'hu', 'pt', 'fi', 'el', 'de', 'no', 'sv', 'it', 'nl', 'et',
-            'kn', 'my', 'li', 'ml', 'ja', 'lo', 'es', 'ku', 'ar', 'ro', 'te',
+            'io', 'hu', 'pt', 'fi', 'el', 'de', 'no', 'sv', 'it', 'nl', 'kn',
+            'et', 'my', 'li', 'ja', 'ml', 'lo', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'cs', 'fa', 'is', 'hr', 'scn',
             'simple', 'oc', 'sr', 'th', 'af', 'fy', 'sw', 'br', 'he', 'eo',
             'la', 'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'da', 'eu', 'wa',
-            'lv', 'ne', 'tk', 'ast', 'ka', 'ur', 'hsb', 'az', 'kk', 'ky', 'wo',
-            'nn', 'hi', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'sk', 'tl',
-            'ms', 'csb', 'st', 'ps', 'nds', 'kl', 'km', 'sd', 'si', 'sh', 'ug',
+            'lv', 'ne', 'tk', 'ast', 'az', 'ka', 'ur', 'hsb', 'kk', 'ky', 'wo',
+            'nn', 'hi', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'km', 'sk',
+            'tl', 'ms', 'csb', 'st', 'ps', 'nds', 'kl', 'sd', 'si', 'sh', 'ug',
             'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'ss', 'qu', 'ts', 'bs',
-            'fo', 'am', 'rw', 'chr', 'om', 'tg', 'su', 'nah', 'kw', 'iu', 'gv',
-            'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'dv', 'ik', 'sg',
-            'mi', 'so', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',
+            'fo', 'am', 'rw', 'chr', 'om', 'tg', 'su', 'kw', 'nah', 'iu', 'gv',
+            'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi', 'dv', 'ik',
+            'sg', 'so', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',
             'na', 'fj', 'jbo', 'ks', 'tn', 'dz',
         ]
 
