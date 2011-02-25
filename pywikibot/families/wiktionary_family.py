@@ -16,14 +16,14 @@ class Family(family.Family):
             'et', 'my', 'li', 'ja', 'ml', 'lo', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'cs', 'fa', 'is', 'hr', 'scn',
             'simple', 'oc', 'sr', 'th', 'af', 'fy', 'sw', 'br', 'he', 'eo',
-            'la', 'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'da', 'eu', 'wa',
+            'la', 'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'eu', 'da', 'wa',
             'lv', 'ne', 'tk', 'ast', 'az', 'ka', 'ur', 'hsb', 'kk', 'ky', 'wo',
             'nn', 'hi', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'km', 'sk',
             'tl', 'ms', 'csb', 'st', 'ps', 'nds', 'kl', 'sd', 'si', 'sh', 'ug',
             'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'ss', 'qu', 'ts', 'bs',
             'fo', 'am', 'rw', 'chr', 'om', 'tg', 'su', 'kw', 'nah', 'iu', 'gv',
             'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi', 'dv', 'ik',
-            'sg', 'so', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',
+            'sg', 'so', 'roa-rup', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
             'na', 'fj', 'jbo', 'ks', 'tn', 'dz',
         ]
 
