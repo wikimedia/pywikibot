@@ -123,9 +123,11 @@ def _altlang(code):
         return ['ro']
     #Russian and Belarusian
     if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'kk', 'koi', 'ky', 'lbe',
-                'mdf', 'mhr', 'mrj', 'myv', 'os', 'rue', 'sah', 'tg', 'tt',
-                'udm', 'uk', 'xal']:
+                'mdf', 'mhr', 'mrj', 'myv', 'os', 'rue', 'sah', 'tg', 'udm',
+                'uk', 'xal']:
         return ['ru']
+    if code == 'tt':
+        return ['tt-cyrl', 'ru']
     if code in ['be', 'be-x-old']:
         return ['be', 'be-x-old', 'ru']
     if code == 'kaa':
@@ -137,7 +139,7 @@ def _altlang(code):
         return ['sr-el', 'sh', 'hr', 'bs']
     #Turkish and Kurdish
     if code in ['diq', 'ku']:
-        return ['ku', 'tr']
+        return ['ku', 'ku-latn', 'tr']
     if code == 'gag':
         return ['tr']
     if code == 'ckb':
