@@ -23,7 +23,7 @@ def _altlang(code):
     If no translation is available to a specified language, translate() will
     try each of the specified fallback languages, in order, until it finds
     one with a translation, with 'en' and '_default' as a last resort.
-    
+
     For example, if for language 'xx', you want the preference of languages
     to be: xx > fr > ru > en, you let altlang return ['fr', 'ru'].
     """
@@ -228,7 +228,7 @@ def twtranslate(code, twtitle, parameters=None):
     # There are two possible failure modes: the translation dict might not have
     # the language altogether, or a specific key could be untranslated. Both
     # modes are caught with the KeyError.
-    
+
     trans = None
     try:
         trans = transdict[code][twtitle]
