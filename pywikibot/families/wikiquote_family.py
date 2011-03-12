@@ -11,12 +11,12 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'pl', 'it', 'de', 'ru', 'pt', 'sk', 'es', 'bg', 'bs', 'tr',
-            'cs', 'fr', 'sl', 'he', 'lt', 'el', 'id', 'zh', 'fa', 'hu', 'uk',
-            'eo', 'fi', 'nl', 'sv', 'no', 'nn', 'ja', 'hy', 'et', 'ca', 'ar',
-            'li', 'cy', 'hr', 'ka', 'ko', 'sr', 'ro', 'ku', 'gl', 'ml', 'az',
+            'en', 'pl', 'it', 'de', 'ru', 'pt', 'sk', 'es', 'bg', 'bs', 'cs',
+            'tr', 'fr', 'sl', 'he', 'lt', 'el', 'id', 'zh', 'fa', 'hu', 'nl',
+            'uk', 'eo', 'fi', 'sv', 'no', 'nn', 'ja', 'hy', 'et', 'ca', 'ar',
+            'li', 'cy', 'hr', 'ka', 'ko', 'sr', 'gl', 'ro', 'ku', 'ml', 'az',
             'is', 'th', 'te', 'da', 'eu', 'af', 'sq', 'vi', 'hi', 'la', 'br',
-            'mr', 'be', 'ast', 'ta', 'uz', 'ang', 'zh-min-nan', 'ur', 'gu',
+            'be', 'mr', 'ast', 'ta', 'uz', 'ang', 'zh-min-nan', 'ur', 'gu',
             'su', 'lb', 'kn', 'wo', 'ky', 'am', 'co',
         ]
 
