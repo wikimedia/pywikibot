@@ -22,7 +22,7 @@ class Family(family.Family):
         self.languages_by_size = ['en','de']
 
     def version(self, code):
-        return "1.14.0"
+        return "1.16.2"
 
     def scriptpath(self, code):
         return ''

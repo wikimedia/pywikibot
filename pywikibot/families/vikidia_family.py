@@ -35,7 +35,7 @@ class Family(family.Family):
     # Which version of MediaWiki is used? REQUIRED
     def version(self, code):
         # Replace with the actual version being run on your wiki
-        return '1.15.2'
+        return '1.16.0'
 
     def code2encoding(self, code):
         """Return the encoding for a specific language wiki"""
