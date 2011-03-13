@@ -12,7 +12,7 @@ app = wx.App()
 class UI(terminal_interface.UI):
     def __init__(self):
         pass
-    
+
     def input(self, question, password = False):
         """
         Works like raw_input(), but returns a unicode string instead of ASCII.
@@ -21,7 +21,7 @@ class UI(terminal_interface.UI):
         question.
         """
         # TODO: hide input if password = True
-        
+
         self.output(question)
         if password:
             answer = wx.PasswordEntryDialog( None, question, '','')
@@ -42,7 +42,7 @@ class UI(terminal_interface.UI):
                 options[i] = '%s[%s]%s' % (option[:pos], option[pos], option[pos+1:])
             else:
                 options[i] = '%s [%s]' % (option, hotkey)
-        
+
         while True:
             prompt = '%s\n(%s)' % (question, ', '.join(options))
             self.output('%s (%s)' % (question, ', '.join(options)))
@@ -50,7 +50,7 @@ class UI(terminal_interface.UI):
             answer.ShowModal()
             answer = answer.GetValue()
             self.output(answer+'\n')
-            
+
             if answer.lower() in hotkeys or answer.upper() in hotkeys:
                 return answer
             elif default and answer=='':# empty string entered

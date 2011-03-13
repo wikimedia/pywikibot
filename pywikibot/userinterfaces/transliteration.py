@@ -42,7 +42,7 @@ def trans(char, default = '?', prev = '-', next = '-'):
     if char == u"Ð":
         return u"Dh"
     if char == u"ð":
-        return u"dh"    
+        return u"dh"
     if char in u"ĎḊḌḎḐḒĐƉƊƋ":
         return u"D"
     if char in u"ďḋḍḏḑḓđɖɗƌ":
@@ -175,7 +175,7 @@ def trans(char, default = '?', prev = '-', next = '-'):
         return u"z"
     if char == u"ɀ":
         return u"zv"
-    
+
     # Latin: extended Latin alphabet
     if char == u"ɑ":
         return u"a"
@@ -331,7 +331,7 @@ def trans(char, default = '?', prev = '-', next = '-'):
         return u"?!"
     if char == u"؟":
         return u";-)"
-    
+
 
     # Cyrillic
     if char == u"А":
@@ -706,7 +706,7 @@ def trans(char, default = '?', prev = '-', next = '-'):
         return u"Ü"
     if char == u"ѵ":
         return u"ü"
-    
+
 
     # Hebrew alphabet
     if char in u"אע":
@@ -751,7 +751,7 @@ def trans(char, default = '?', prev = '-', next = '-'):
         return u"sh"
     if char == u"ת":
         return u"th"
-    
+
     # Arab alphabet
     if char in u"اﺍﺎ":
         return u"a"
@@ -1818,7 +1818,7 @@ def trans(char, default = '?', prev = '-', next = '-'):
         return u"8"
     if char == u"৯":
         return u"9"
-    
+
     # Thai (because of complications of the alphabet, transliterations
     #       are very imprecise here)
     if char == u"ก":
@@ -1902,6 +1902,6 @@ def trans(char, default = '?', prev = '-', next = '-'):
     if char in u"ฯ":
         return u"."
     if char in u"ๆ":
-        return u"(2)"    
-    
+        return u"(2)"
+
     return default

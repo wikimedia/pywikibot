@@ -39,7 +39,7 @@ class CustomMessageBox(tkSimpleDialog.Dialog):
         self.hotkeys = hotkeys
         self.default = default
         tkSimpleDialog.Dialog.__init__(self, master)
-        
+
     def body(self, master):
         Label(self, text=self.question).grid(columnspan = len(self.options))
         btns = []
@@ -66,7 +66,7 @@ class CustomMessageBox(tkSimpleDialog.Dialog):
 
     def buttonbox(self):
         return
-    
+
     def select(self, i, event=None):
         self.selection = i
         self.ok()
@@ -115,7 +115,7 @@ class TkController(Frame):
     object.  Do not call this object's methods directly.  Methods of this
     object cannot return values to the main thread; they must store them
     in attributes to be retrieved by the main thread.
-    
+
     """
     # TODO: use Event for inter-thread communication instead of wait loops
     def __init__(self, parent, **kwargs):
@@ -159,7 +159,7 @@ class UI(object):
     This object serves only to dispatch event calls to the TkController
     object, to be run in that object's separate mainloop thread; and,
     when necessary, to wait for the user's response.
-    
+
     """
     def __init__(self, parent = None):
         # create a new window if necessary

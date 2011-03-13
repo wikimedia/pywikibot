@@ -15,6 +15,6 @@ class UI:
         if not toStdout:
             return
         sys.stdout.write(text.encode('UTF-8', 'replace'))
-    
+
     def input(self, question, colors = None):
         self.output(question + ' ', newline = False, showcgi = True)
