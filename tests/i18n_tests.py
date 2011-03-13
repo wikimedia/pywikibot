@@ -44,7 +44,7 @@ class TestTranslate(unittest.TestCase):
                          u'test-non-localized EN')
         self.assertEqual(i18n.translate('ru', self.msg_non_localized),
                          u'test-non-localized EN')
-    
+
     def testNoEnglish(self):
         self.assertEqual(i18n.translate('en', self.msg_no_english),
                          u'test-no-english JA')
@@ -52,7 +52,7 @@ class TestTranslate(unittest.TestCase):
                          u'test-no-english JA')
         self.assertEqual(i18n.translate('nl', self.msg_no_english),
                          u'test-no-english JA')
-    
+
 
 class TestTWTranslate(unittest.TestCase):
     def testLocalized(self):
@@ -80,10 +80,10 @@ class TestTWTranslate(unittest.TestCase):
                          u'test-non-localized EN')
         self.assertEqual(i18n.twtranslate('ru', 'test-non-localized'),
                          u'test-non-localized EN')
-    
+
     def testNoEnglish(self):
         self.assertRaises(i18n.TranslationError, i18n.twtranslate, 'en', 'test-no-english')
-        
+
 
 if __name__ == '__main__':
     try:

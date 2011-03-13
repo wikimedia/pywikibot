@@ -90,7 +90,7 @@ class TestLinkObject(unittest.TestCase):
     def testHashCmp(self):
         # All links point to en:wikipedia:Test
         l1 = pywikibot.page.Link('Test', source=self.enwiki)
-        l2 = pywikibot.page.Link('en:Test', source=self.frwiki) 
+        l2 = pywikibot.page.Link('en:Test', source=self.frwiki)
         l3 = pywikibot.page.Link('wikipedia:en:Test', source=self.itwikt)
         def assertHashCmp(link1, link2):
             self.assertEqual(link1, link2)
@@ -202,7 +202,7 @@ class TestPageObject(unittest.TestCase):
         self.assertEqual(p1.isImage(), False)
         self.assertEqual(p2.isImage(), True)
         self.assertEqual(p3.isImage(), False)
-    
+
     def testApiMethods(self):
         """Test various methods that rely on API."""
         # since there is no way to predict what data the wiki will return,
@@ -253,7 +253,7 @@ class TestPageObject(unittest.TestCase):
             self.assertTrue(isinstance(p, pywikibot.Link))
         for p2 in mainpage.interwiki(expand=False):
             self.assertTrue(isinstance(p2, pywikibot.Link))
-            self.assertTrue(p2 in iw)            
+            self.assertTrue(p2 in iw)
         for p in mainpage.langlinks():
             self.assertTrue(isinstance(p, pywikibot.Link))
         for p in mainpage.imagelinks():
