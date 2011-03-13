@@ -42,7 +42,7 @@ class Family(family.Family):
             'ang', 'ast', 'az', 'bg', 'bn', 'da', 'eo', 'es', 'fa', 'fy', 'ga',
             'gd', 'hu', 'ia', 'ie', 'ik', 'jv', 'ka', 'li', 'lt', 'mk', 'nl',
             'no', 'oc', 'pt', 'sk', 'tg', 'th', 'ti', 'ts', 'ug', 'uk', 'vo',
-            'za', 'zh-min-nan', 'zh', 'zu', 
+            'za', 'zh-min-nan', 'zh', 'zu',
         ]
 
         # Other than most Wikipedias, page names must not start with a capital

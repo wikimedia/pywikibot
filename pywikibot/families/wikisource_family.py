@@ -57,7 +57,7 @@ class Family(family.Family):
         ]
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikinews', 'wikiversity', 
+            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
 
@@ -113,15 +113,15 @@ class Family(family.Family):
             'vi': self.authornamespaces,
             'zh': self.authornamespaces,
         }
-        
+
         self.crossnamespace[104] = {
             'pl': self.authornamespaces,
         }
-        
+
         self.crossnamespace[106] = {
             'sv': self.authornamespaces,
         }
-        
+
     def version(self, code):
         return '1.17wmf1'
 

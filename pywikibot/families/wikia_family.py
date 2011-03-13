@@ -18,7 +18,7 @@ class Family(family.Family):
 
     def hostname(self, code):
         return u'www.wikia.com'
-    
+
     def version(self, code):
         return "1.16.2"
 

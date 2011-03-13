@@ -51,7 +51,7 @@ class Family(family.Family):
         ]
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikisource', 'wikinews', 'wikiversity', 
+            'wikipedia', 'wiktionary', 'wikibooks', 'wikisource', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
         # Which languages have a special order for putting interlanguage links,
