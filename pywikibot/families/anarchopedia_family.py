@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
 __version__ = '$Id$'
+
 import family
 
 # The Anarchopedia family
