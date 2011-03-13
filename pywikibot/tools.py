@@ -33,7 +33,7 @@ class ThreadedGenerator(threading.Thread):
     ... finally:
     ...     gen.stop()
     0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
-    
+
     """
 
     def __init__(self, group=None, target=None, name="GeneratorThread",
@@ -139,7 +139,7 @@ class ThreadList(list):
     >>> for x in xrange(20):
     ...     pool.append(threading.Thread(target=work))
     ...
-    
+
     """
     def __init__(self, limit=sys.maxint, *args):
         self.limit = limit

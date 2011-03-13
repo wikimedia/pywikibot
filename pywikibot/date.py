@@ -979,7 +979,7 @@ formats = {
             (lambda v: dh_centuryAD( v, u'%des kansblydhen' ),  lambda p: p == 5),
             (lambda v: dh_centuryAD( v, u'%dns kansblydhen' ),  lambda p: p >= 20),
             (lambda v: dh_centuryAD( v, u'%dves kansblydhen' ), alwaysTrue)]),
-        'ksh':      lambda v: dh_centuryAD( v, u'%d. Joohunndot'), 
+        'ksh':      lambda v: dh_centuryAD( v, u'%d. Joohunndot'),
         'la' :      lambda v: dh_centuryAD( v, u'Saeculum %d' ),
         'lb' :      lambda v: dh_centuryAD( v, u'%d. Joerhonnert' ),
 

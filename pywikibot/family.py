@@ -88,7 +88,7 @@ class Family:
             'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh',
             'zh-tw', 'zh-cn',
         ]
-        
+
         # Order for fy: alphabetical by code, but y counts as i
         def fycomp(x,y):
             x = x.replace("y","i")+x.count("y")*"!"
@@ -625,7 +625,7 @@ class Family:
                 'ab', 'av', 'ba', 'be', 'be-x-old', 'bg', 'bxr', 'ce', 'cu',
                 'cv', 'koi', 'kv', 'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo', 'myv',
                 'mhr', 'mrj', 'os', 'ru', 'rue', 'sah', 'tg', 'tk', 'udm', 'uk',
-                'xal', 
+                'xal',
                 # languages using multiple scripts, including cyrillic
                 'ha', 'kk', 'sh', 'sr', 'tt'
             ],
