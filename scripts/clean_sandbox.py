@@ -169,7 +169,7 @@ class SandboxBot(pywikibot.Bot):
                         pywikibot.output(u'The sandbox might be clean, no change necessary.')
                     elif text.find(translatedContent.strip()) <> 0 and not subst:
                         sandboxPage.put(translatedContent, translatedMsg)
-                        pywikibot.showDiff(text, translatedContent) 
+                        pywikibot.showDiff(text, translatedContent)
                         pywikibot.output(u'Standard content was changed, sandbox cleaned.')
                     else:
                         edit_delta = datetime.datetime.utcnow() - \

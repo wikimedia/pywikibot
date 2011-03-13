@@ -934,7 +934,7 @@ u"Page does not exist, using the first link in page %s."
         elif disambPage.isRedirectPage():
             # when working on redirects, there's another summary message
             if unlink and not new_targets:
-                self.comment = i18n.twtranslate(self.mysite, 
+                self.comment = i18n.twtranslate(self.mysite,
                                'solve_disambiguation-redirect-removed',
                                {'from': disambPage.title()})
             elif dn and not new_targets:
