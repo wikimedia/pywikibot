@@ -129,13 +129,8 @@ class Family:
         self.content_id = "bodyContent"
 
         # A dictionary where keys are family codes that can be used in
-        # inter-family interwiki links. Values are not used yet.
-        # Generated from http://toolserver.org/~daniel/interwiki-en.txt:
-        # remove interlanguage links from file, then run
-        # f = open('interwiki-en.txt')
-        # for line in f.readlines():
-        #     s = line[:line.index('\t')]
-        #     print (("            '%s':" % s).ljust(20) + ("'%s'," % s))
+        # inter-family interwiki links. Do not use it directly but
+        # get_known_families() instead.
 
         # TODO: replace this with API interwikimap call
         self.known_families = {
@@ -370,6 +365,7 @@ class Family:
             'orthodoxwiki':     'orthodoxwiki',
             'osi reference model':'osi reference model',
             'ourmedia':         'ourmedia',
+            'outreach':         'outreach',
             'paganwiki':        'paganwiki',
             'panawiki':         'panawiki',
             'pangalacticorg':   'pangalacticorg',
