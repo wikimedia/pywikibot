@@ -15,7 +15,7 @@ are taken into account.
 
 #
 # (C) Pywikipedia team, 2008-2009
-#
+#c
 __version__ = '$Id$'
 #
 # Distributed under the terms of the MIT license.
@@ -326,7 +326,8 @@ class CategoryRedirectBot(object):
 
         # get a list of all members of the category-redirect category
         catpages = dict((c, None) for c in
-                        self.site.categorymembers(redircat, namespaces=[14]))
+                        self.site.categorymembers(redircat, namespaces=[14],
+                                                  sortby="timestamp"))
 
         # check the category pages for redirected categories
         pywikibot.output(u"")
