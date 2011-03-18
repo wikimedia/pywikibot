@@ -11,12 +11,12 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'zh', 'mg', 'lt', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
+            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
             'io', 'hu', 'pt', 'fi', 'de', 'el', 'sv', 'no', 'it', 'nl', 'kn',
             'et', 'my', 'li', 'ja', 'ml', 'lo', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'cs', 'fa', 'is', 'hr', 'scn',
-            'simple', 'oc', 'sr', 'th', 'af', 'fy', 'sw', 'br', 'he', 'eo',
-            'la', 'sq', 'sl', 'hy', 'tt', 'cy', 'da', 'eu', 'zh-min-nan', 'wa',
+            'simple', 'oc', 'th', 'sr', 'af', 'fy', 'sw', 'br', 'he', 'eo',
+            'la', 'sq', 'sl', 'hy', 'cy', 'tt', 'da', 'eu', 'zh-min-nan', 'wa',
             'lv', 'ne', 'az', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky', 'wo',
             'nn', 'hi', 'km', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'sk',
             'tl', 'ms', 'csb', 'st', 'ps', 'nds', 'sd', 'kl', 'si', 'sh', 'ug',
