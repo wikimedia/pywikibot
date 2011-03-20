@@ -619,9 +619,9 @@ class Family:
             # languages that use the cyrillic alphabet
             'cyril': [
                 'ab', 'av', 'ba', 'be', 'be-x-old', 'bg', 'bxr', 'ce', 'cu',
-                'cv', 'koi', 'kv', 'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo', 'myv',
-                'mhr', 'mrj', 'os', 'ru', 'rue', 'sah', 'tg', 'tk', 'udm', 'uk',
-                'xal',
+                'cv', 'kbd', 'koi', 'kv', 'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo',
+                'myv', 'mhr', 'mrj', 'os', 'ru', 'rue', 'sah', 'tg', 'tk',
+                'udm', 'uk', 'xal',
                 # languages using multiple scripts, including cyrillic
                 'ha', 'kk', 'sh', 'sr', 'tt'
             ],
@@ -641,7 +641,7 @@ class Family:
                 'hak', 'haw', 'hif', 'ho', 'hr', 'hsb', 'ht', 'hu', 'hz', 'ia',
                 'id', 'ie', 'ig', 'ik', 'ilo', 'io', 'is', 'it', 'jbo', 'jv',
                 'kaa', 'kab', 'kg', 'ki', 'kj', 'kl', 'kr', 'ksh', 'kw', 'la',
-                'lad', 'lb', 'lg', 'li', 'lij', 'lmo', 'ln', 'lt', 'lv',
+                'lad', 'lb', 'lg', 'li', 'lij', 'lmo', 'ln', 'lt', 'ltg', 'lv',
                 'map-bms', 'mg', 'mh', 'mi', 'ms', 'mt', 'mus', 'mwl', 'na',
                 'nah', 'nap', 'nds', 'nds-nl', 'ng', 'nl', 'nn', 'no', 'nov',
                 'nrm', 'nv', 'ny', 'oc', 'om', 'pag', 'pam', 'pap', 'pcd',
