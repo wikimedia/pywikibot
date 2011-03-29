@@ -12,19 +12,19 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
-            'io', 'hu', 'pt', 'fi', 'de', 'el', 'sv', 'no', 'it', 'nl', 'kn',
+            'io', 'hu', 'de', 'pt', 'fi', 'el', 'sv', 'no', 'it', 'nl', 'kn',
             'et', 'my', 'li', 'ja', 'ml', 'lo', 'es', 'ku', 'ar', 'ro', 'te',
-            'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'cs', 'fa', 'is', 'hr', 'scn',
-            'simple', 'oc', 'th', 'sr', 'af', 'fy', 'sw', 'br', 'he', 'eo',
-            'la', 'sq', 'sl', 'hy', 'cy', 'tt', 'da', 'eu', 'zh-min-nan', 'wa',
-            'lv', 'ne', 'az', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky', 'wo',
-            'nn', 'hi', 'km', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'sk',
-            'tl', 'ms', 'csb', 'st', 'ps', 'nds', 'sd', 'kl', 'si', 'sh', 'ug',
-            'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'ss', 'qu', 'ts', 'bs',
-            'fo', 'am', 'rw', 'chr', 'tg', 'om', 'su', 'kw', 'nah', 'gv', 'iu',
-            'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi', 'dv', 'ik',
-            'sg', 'so', 'roa-rup', 'jv', 'uz', 'ln', 'sm', 'ha', 'sa', 'ay',
-            'na', 'fj', 'jbo', 'ks', 'tn', 'dz',
+            'id', 'gl', 'ca', 'uk', 'bg', 'cs', 'vo', 'fa', 'is', 'hr',
+            'simple', 'scn', 'oc', 'th', 'sr', 'af', 'fy', 'sw', 'br', 'he',
+            'eo', 'la', 'sq', 'sl', 'hy', 'cy', 'tt', 'da', 'eu', 'zh-min-nan',
+            'wa', 'lv', 'ne', 'az', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky',
+            'wo', 'nn', 'hi', 'km', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia',
+            'sk', 'tl', 'ms', 'csb', 'st', 'ps', 'nds', 'sd', 'kl', 'si', 'sh',
+            'ug', 'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'ss', 'qu', 'chr',
+            'ts', 'bs', 'fo', 'am', 'rw', 'tg', 'om', 'su', 'kw', 'nah', 'gv',
+            'iu', 'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi', 'dv',
+            'ik', 'sg', 'so', 'roa-rup', 'jv', 'uz', 'ln', 'sm', 'ha', 'sa',
+            'ay', 'na', 'fj', 'jbo', 'ks', 'tn', 'dz',
         ]
 
         for lang in self.languages_by_size:
