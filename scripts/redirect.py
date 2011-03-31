@@ -1,3 +1,4 @@
+#! /usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Script to resolve double redirects, and to delete broken redirects. Requires
@@ -473,8 +474,11 @@ class RedirectRobot:
                         u'Warning: Redirect target section %s doesn\'t exist.'
                           % newRedir.title(asLink=True))
                 except pywikibot.CircularRedirect, e:
-                    pywikibot.warning(u"Skipping circular redirect: [[%s]]"
-                                       % str(e))
+                    try:
+                        pywikibot.warning(u"Skipping circular redirect: [[%s]]"
+                                           % str(e))
+                    except UnicodeDecodeError:
+                        pywikibot.warning(u"Skipping circular redirect")
                     break
                 except pywikibot.BadTitle, e:
                     # str(e) is in the format 'BadTitle: [[Foo]]'
