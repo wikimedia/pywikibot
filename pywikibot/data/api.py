@@ -17,6 +17,7 @@ except ImportError:
     import simplejson as json
 import logging
 import mimetypes
+import pprint
 import re
 import traceback
 import time
@@ -349,6 +350,10 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
                 continue
             # raise error
             try:
+                pywikibot.log(u"API Error: query=\n%s"
+                               % pprint.pformat(self.params))
+                pywikibot.log(u"           response=\n%s"
+                               % result)
                 raise APIError(code, info, **result["error"])
             except TypeError:
                 raise RuntimeError(result)
