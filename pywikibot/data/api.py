@@ -270,8 +270,9 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
                                          'application/x-www-form-urlencoded'},
                                 body=paramstring)
             except Server504Error:
-                pywikibot.debug(u"Caught 504 error", _logger)
-                raise
+                pywikibot.log(u"Caught HTTP 504 error; retrying")
+                self.wait()
+                continue
             #TODO: what other exceptions can occur here?
             except Exception, e:
                 # for any other error on the http request, wait and retry
