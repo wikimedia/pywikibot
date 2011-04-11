@@ -65,7 +65,7 @@ from pywikibot import config, i18n
 class RedirectGenerator:
     def __init__(self, xmlFilename=None, namespaces=[], offset=-1,
                  use_move_log=False, use_api=False, start=None, until=None,
-                 number=None):
+                 number=None, step=None):
         self.site = pywikibot.getSite()
 ##        self.xmlFilename = xmlFilename
         self.namespaces = namespaces
@@ -77,6 +77,7 @@ class RedirectGenerator:
         self.api_start = start
         self.api_until = until
         self.api_number = number
+        self.api_step = step
 
 # note: rewrite branch does not yet support XML dumps, so this is commented out
 # until that support is added
@@ -161,6 +162,8 @@ class RedirectGenerator:
                                      filterredir=True)
             if self.api_number:
                 gen.set_maximum_items(self.api_number)
+            if self.api_step:
+                gen.set_query_increment(self.api_step)
             for p in gen:
                 done = self.api_until \
                            and p.title(withNamespace=False) >= self.api_until
@@ -358,12 +361,13 @@ class RedirectGenerator:
 
 
 class RedirectRobot:
-    def __init__(self, action, generator, always=False, number=None):
+    def __init__(self, action, generator, always=False, number=None, step=None):
         self.site = pywikibot.getSite()
         self.action = action
         self.generator = generator
         self.always = always
         self.number = number
+        self.step = step
         self.exiting = False
 
     def prompt(self, question):
@@ -648,6 +652,7 @@ def main(*args):
     start = ''
     until = ''
     number = None
+    step = None
     always = False
     for arg in pywikibot.handleArgs(*args):
         if arg == 'double' or arg == 'do':
@@ -688,7 +693,9 @@ def main(*args):
         elif arg.startswith('-until:'):
             until = arg[7:]
         elif arg.startswith('-total:'):
-            number = int(arg[8:])
+            number = int(arg[7:])
+        elif arg.startswith('-step:'):
+            step = int(arg[6:])
         elif arg == '-always':
             always = True
         else:
@@ -701,8 +708,8 @@ def main(*args):
         pywikibot.showHelp('redirect')
     else:
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
-                                api, start, until, number)
-        bot = RedirectRobot(action, gen, always, number)
+                                api, start, until, number, step)
+        bot = RedirectRobot(action, gen, always, number, step)
         bot.run()
 
 if __name__ == '__main__':
