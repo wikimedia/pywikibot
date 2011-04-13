@@ -369,13 +369,17 @@ class CosmeticChangesToolkit:
         For better readability of bullet list and enumeration wiki source code,
         puts a space between the * or # and the text.
 
-        NOTE: This space is recommended in the syntax help on the English, German,
-        and French Wikipedia. It might be that it is not wanted on other wikis.
-        If there are any complaints, please file a bug report.
+        NOTE: This space is recommended in the syntax help on the English,
+        German, and French Wikipedia. It might be that it is not wanted on other
+        wikis. If there are any complaints, please file a bug report.
         """
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'source', 'timeline']
-        if not self.redirect and pywikibot.calledModuleName() <> 'capitalize_redirects':
-            text = pywikibot.replaceExcept(text, r'(?m)^(?P<bullet>[:;]*(\*+|#+)[:;\*#]*)(?P<char>[^\s\*#:;].+?)', '\g<bullet> \g<char>', exceptions)
+        if not (self.redirect or self.template) and \
+           pywikibot.calledModuleName() != 'capitalize_redirects':
+            text = pywikibot.replaceExcept(
+                text,
+                r'(?m)^(?P<bullet>[:;]*(\*+|#+)[:;\*#]*)(?P<char>[^\s\*#:;].+?)', '\g<bullet> \g<char>',
+                exceptions)
         return text
 
     def replaceDeprecatedTemplates(self, text):
