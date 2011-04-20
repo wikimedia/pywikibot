@@ -892,9 +892,9 @@ formats = {
         'hu' :      lambda m: multi(m, [
             (lambda v: dh_constVal(v, 0, u'i. e. 0-s évek'),
              lambda p: p == 0),
-            (lambda v: dh_decBC(v, u'i.e. %d-as évek' ),
+            (lambda v: dh_decBC(v, u'i. e. %d-as évek' ),
              lambda p: (p % 100 / 10) in [0,2,3,6,8]),
-            (lambda v: dh_decBC(v, u'i.e. %d-es évek'), alwaysTrue)]),
+            (lambda v: dh_decBC(v, u'i. e. %d-es évek'), alwaysTrue)]),
 
         'it' :      lambda v: dh_decBC( v, u'Anni %d a.C.' ),
 
