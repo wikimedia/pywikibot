@@ -242,10 +242,10 @@ def localDigitsStrToInt( value, digitsToLocalDict, localToDigitsDict ):
 _decimalDigits = '0123456789'
 
 # Helper for roman numerals number representation
-_romanNumbers = ('-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX',
+_romanNumbers = ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX',
                  'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII',
                  'XIX', 'XX', 'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI',
-                 'XXVII', 'XXVIII', 'XXIX', 'XXX')
+                 'XXVII', 'XXVIII', 'XXIX', 'XXX']
 
 def intToRomanNum(i):
     if i >= len(_romanNumbers):
