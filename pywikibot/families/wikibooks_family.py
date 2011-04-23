@@ -12,12 +12,12 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'es', 'pl', 'it', 'he',
-            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'zh', 'hr', 'sv', 'tr', 'da',
-            'id', 'ko', 'th', 'gl', 'fa', 'sr', 'tl', 'no', 'ar', 'mk', 'is',
+            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'zh', 'hr', 'sv', 'tr', 'ko',
+            'da', 'id', 'th', 'gl', 'fa', 'sr', 'tl', 'no', 'mk', 'ar', 'is',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'uk', 'el', 'az', 'si',
             'li', 'la', 'tt', 'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'ur', 'oc',
-            'ml', 'bn', 'ms', 'hi', 'eu', 'fy', 'ie', 'tg', 'af', 'te', 'hy',
-            'pa', 'ne', 'bs', 'sa', 'ky', 'be', 'ast', 'zh-min-nan', 'mg', 'cy',
+            'ml', 'bn', 'ms', 'hi', 'eu', 'fy', 'ie', 'te', 'hy', 'tg', 'af',
+            'ne', 'pa', 'bs', 'sa', 'ky', 'be', 'ast', 'zh-min-nan', 'mg', 'cy',
             'ku', 'co', 'tk', 'su', 'uz', 'vo', 'kk', 'mn', 'my',
         ]
 
