@@ -12,18 +12,18 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
-            'io', 'de', 'pt', 'hu', 'fi', 'el', 'sv', 'no', 'it', 'nl', 'kn',
-            'my', 'et', 'li', 'ml', 'ja', 'lo', 'es', 'ku', 'ar', 'ro', 'te',
+            'io', 'de', 'pt', 'hu', 'fi', 'el', 'sv', 'no', 'it', 'nl', 'my',
+            'kn', 'et', 'li', 'ml', 'ja', 'lo', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'cs', 'eo', 'vo', 'fa', 'is', 'hr',
-            'simple', 'scn', 'oc', 'th', 'sr', 'af', 'fy', 'sw', 'br', 'he',
-            'la', 'sq', 'sl', 'hy', 'eu', 'cy', 'da', 'tt', 'zh-min-nan', 'wa',
-            'az', 'lv', 'ne', 'tk', 'ast', 'hi', 'ka', 'ur', 'hsb', 'kk', 'ky',
+            'oc', 'simple', 'scn', 'th', 'sr', 'af', 'fy', 'sw', 'br', 'he',
+            'eu', 'la', 'sq', 'sl', 'hy', 'da', 'cy', 'tt', 'zh-min-nan', 'wa',
+            'az', 'lv', 'ne', 'hi', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky',
             'nn', 'wo', 'km', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'sk',
             'tl', 'ms', 'ps', 'csb', 'st', 'sd', 'nds', 'kl', 'si', 'sh', 'ug',
             'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'am', 'ss', 'qu', 'chr',
             'ts', 'bs', 'fo', 'rw', 'tg', 'om', 'nah', 'kw', 'su', 'gv', 'iu',
             'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi', 'dv', 'ik',
-            'sg', 'so', 'roa-rup', 'jv', 'uz', 'ln', 'sm', 'ha', 'ay', 'sa',
+            'sg', 'so', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',
             'na', 'fj', 'jbo', 'ks', 'tn', 'dz',
         ]
 
