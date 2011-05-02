@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikipedia bot team, 2008-2010
+# (C) Pywikipedia bot team, 2008-2011
 #
 # Distributed under the terms of the MIT license.
 #
@@ -403,7 +403,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
             elif site.language() in site.family.categories_last:
                 cats = getCategoryLinks(s2, site = site)
                 s2 = removeCategoryLinksAndSeparator(
-                         s2.replace(marker, '', cseparatorstripped).strip(),
+                         s2.replace(marker, cseparatorstripped).strip(),
                          site) + separator + s
                 newtext = replaceCategoryLinks(s2, cats, site=site,
                                                addOnly=True)
