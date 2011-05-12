@@ -90,7 +90,8 @@ __version__ = '$Id$'
 
 import os, re, pickle, bz2
 import pywikibot
-from pywikibot import catlib, config, pagegenerators, i18n
+from pywikibot import catlib, config, pagegenerators
+from pywikibot import i18n
 import sys
 
 # This is required for the text that is shown when you run this script
@@ -98,7 +99,6 @@ import sys
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
-# Summary messages
 
 cfd_templates = {
     'wikipedia' : {
@@ -270,8 +270,8 @@ class AddCategory:
             self.newcatTitle = self.newcatTitle[:1].upper() + \
                                self.newcatTitle[1:]
         if not self.editSummary:
-            self.editSummary = i18n.twtranslate(self.site, 'category-adding', \
-                                {'newcat': self.newcatTitle})
+            self.editSummary = i18n.twtranslate(self.site, 'category-adding',
+                                                {'newcat': self.newcatTitle})
         counter = 0
         for page in self.generator:
             self.treat(page)
@@ -478,8 +478,10 @@ class CategoryListifyRobot:
         if self.subCats:
             setOfArticles += set(self.cat.subcategories())
         if not self.editSummary:
-            self.editSummary = i18n.twtranslate(self.site, 'category-listifying', \
-                    {'fromcat': self.cat.title(), 'num': len(setOfArticles)})
+            self.editSummary = i18n.twtranslate(self.site,
+                                                'category-listifying',
+                                                {'fromcat': self.cat.title(),
+                                                 'num': len(setOfArticles)})
 
         listString = ""
         for article in setOfArticles:
@@ -505,69 +507,6 @@ class CategoryRemoveRobot:
     Does not remove category tags pointing at subcategories.
 
     '''
-    deletion_reason_remove = {
-        'ar':u'روبوت: التصنيف تم الاستغناء عنه',
-        'be-x-old':u'Робат: катэгорыя расфармаваная',
-        'ca':u'Robot: La categoria s\'ha eliminat',
-        'cs':u'Robot: kategorie byla vyprázdněna',
-        'da':u'Robot: Kategorien blev opløst',
-        'de':u'Bot: Kategorie wurde aufgelöst',
-        'en':u'Bot: Category was disbanded',
-        'es':u'Robot: La categoría ha sido eliminada',
-        'fa':u'ربات: رده خالی',
-        'fi':u'Botti tyhjensi luokan',
-        'he':u'בוט: הקטגוריה פורקה',
-        'hu':u'A bot kiürítette a kategóriát',
-        'ia':u'Robot: Categoria esseva dissolvite',
-        'kk':u'Бот: Санат тарқатылды',
-        'ksh':u'Bot: de Saachjropp is nu opjelööß',
-        'nds':u'Kat-Bot: Kategorie is nu oplööst',
-        'nds-nl':u'Bot: kattegerie besteet neet meer',
-        'nl':u'Bot: Categorie is opgeheven',
-        'no':u'Robot: Kategorien ble oppløst',
-        'nn':u'robot: kategorien blei løyst opp',
-        'pl':u'Robot: Kategoria została usunięta',
-        'pt':u'Bot: Categoria foi unida',
-        'ru':u'Робот: категория расформирована',
-        'sv':u'Robot: Kategorin upplöstes',
-        'uk':u'Робот: категорія розформована',
-        'zh':u'機器人:本目錄已解散',
-    }
-
-    msg_remove={
-        'ar':u'روبوت: إزالة من %s',
-        'bat-smg':u'Robots: Trėnama ėš %s',
-        'be-x-old':u'Робат: выключэньне з [[%s]]',
-        'ca':u'Robot: Eliminant de %s',
-        'cs':u'Robot: odstranění kategorie %s',
-        'da':u'Robot: Fjerner fra %s',
-        'de':u'Bot: Entferne aus %s',
-        'en':u'Bot: Removing from %s',
-        'es':u'Bot: Eliminada de la %s',
-        'fa':u'ربات:حذف از %s',
-        'fi':u'Botti poisti luokasta %s',
-        'fr':u'Robot : Retiré depuis %s',
-        'he':u'בוט: מסיר את הדף מהקטגוריה %s',
-        'hu':u'[[%s]] eltávolítása bottal',
-        'ia':u'Robot: Eliminate de %s',
-        'is':u'Vélmenni: Fjarlægi [[%s]]',
-        'ja':u'ロボットによる:[[%s]]を除去',
-        'kk':u'Бот: %s дегеннен аластатты',
-        'ksh':u'Bot: uß de %s ußjedraare',
-        'lb': u'Bot: Ewech huele vun %s',
-        'nds':u'Kat-Bot: rut ut %s',
-        'nds-nl':u'Bot: vort-ehaold uut %s',
-        'nl':u'Bot: Verwijderd uit %s',
-        'no':u'Robot: Fjerner ifra %s',
-        'nn':u'robot: fjerna ifrå %s',
-        'pl':u'Robot: Usuwa z kategorii %s',
-        'pt':u'Bot: Removendo [[%s]]',
-        'ru':u'Робот: исключение из %s',
-        'sr':u'Бот: Уклањање из категорије [[%s]]',
-        'sv':u'Robot: Tar bort från %s',
-        'uk':u'Робот: видалення з %s',
-        'zh':u'機器人:移除目錄 [[%s]]',
-    }
 
     def __init__(self, catTitle, batchMode = False, editSummary = '', useSummaryForDeletion = True, titleRegex = None, inPlace = False):
         self.editSummary = editSummary
@@ -579,7 +518,8 @@ class CategoryRemoveRobot:
         self.titleRegex = titleRegex
         self.inPlace = inPlace
         if not self.editSummary:
-            self.editSummary = i18n.twtranslate(self.site, 'category-removing', {'oldcat': self.cat.title()})
+            self.editSummary = i18n.twtranslate(self.site, 'category-removing',
+                                                {'oldcat': self.cat.title()})
 
     def run(self):
         articles = set(self.cat.articles())
@@ -817,7 +757,8 @@ class CategoryTreeRobot:
                 # create a list of wiki links to the supercategories
                 supercat_names.append('[[:%s|%s]]' % (supercats[i].title(), supercats[i].title().split(':', 1)[1]))
                 # print this list, separated with commas, using translations given in also_in_cats
-            result += ' ' + i18n.twtranslate(self.site, 'category-also-in', {'alsocat': ', '.join(supercat_names)})
+            result += ' ' + i18n.twtranslate(self.site, 'category-also-in',
+                                             {'alsocat': ', '.join(supercat_names)})
         result += '\n'
         if currentDepth < self.maxDepth:
             for subcat in self.catDB.getSubcats(cat):
@@ -936,9 +877,9 @@ def main(*args):
     gen = genFactory.getCombinedGenerator()
     if action == 'add':
         if not gen:
+            # default for backwards compatibility
             genFactory.handleArg('-links')
             gen = genFactory.getCombinedGenerator()
-                  # default for backwards compatibility
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.
         gen = pagegenerators.PreloadingGenerator(gen)
