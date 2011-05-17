@@ -18,7 +18,7 @@ class Family(family.Family):
             'li', 'la', 'tt', 'ang', 'ia', 'cv', 'sl', 'et', 'mr', 'ur', 'oc',
             'bn', 'ml', 'ms', 'hi', 'eu', 'fy', 'ie', 'te', 'tg', 'af', 'hy',
             'ne', 'pa', 'bs', 'sa', 'ky', 'be', 'ast', 'zh-min-nan', 'mg', 'cy',
-            'ku', 'co', 'tk', 'su', 'uz', 'vo', 'kk', 'mn', 'my',
+            'ku', 'tk', 'su', 'uz', 'vo', 'kk', 'mn', 'my',
         ]
 
         for lang in self.languages_by_size:
@@ -54,6 +54,7 @@ class Family(family.Family):
             'bm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikibooks
             'bo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tibetan_Wikibooks
             'ch': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Chamorro_Wikibooks
+            'co': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28644
             'dk': 'da',
             'ga':None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikibooks
             'got': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gothic_Wikibooks
