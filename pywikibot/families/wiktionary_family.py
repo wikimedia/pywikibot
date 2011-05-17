@@ -85,7 +85,7 @@ class Family(family.Family):
             'he': ['en'],
             'hu': ['en'],
             'ms': self.alphabetic_revised,
-            'pl': self.alphabetic,
+            'pl': self.alphabetic_revised,
             'sv': self.alphabetic_roman,
             'simple': self.alphabetic,
         }
