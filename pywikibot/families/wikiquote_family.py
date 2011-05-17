@@ -16,8 +16,8 @@ class Family(family.Family):
             'hu', 'uk', 'fi', 'sv', 'no', 'nn', 'ja', 'hy', 'et', 'ca', 'ar',
             'li', 'cy', 'hr', 'ko', 'ka', 'gl', 'sr', 'ro', 'ku', 'az', 'ml',
             'is', 'th', 'te', 'da', 'eu', 'af', 'sq', 'vi', 'hi', 'la', 'br',
-            'be', 'mr', 'ast', 'ta', 'uz', 'ang', 'ur', 'zh-min-nan', 'gu',
-            'su', 'lb', 'kn', 'wo', 'ky', 'am', 'co',
+            'be', 'mr', 'ta', 'uz', 'ang', 'ur', 'zh-min-nan', 'gu', 'su', 'lb',
+            'kn', 'wo', 'ky', 'am', 'co',
         ]
 
         for lang in self.languages_by_size:
@@ -86,6 +86,7 @@ class Family(family.Family):
 
         self.obsolete = {
             'als': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Alemannic_Wikiquote
+            'ast': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28964
             'bm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikiquote
             'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wikiquote
             'dk': 'da',
