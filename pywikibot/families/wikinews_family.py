@@ -12,17 +12,19 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'sr', 'en', 'pl', 'de', 'fr', 'it', 'es', 'pt', 'zh', 'ja', 'sv',
-            'ru', 'ta', 'fi', 'cs', 'he', 'ro', 'bg', 'ar', 'hu', 'sd', 'fa',
-            'ca', 'tr', 'sq', 'uk', 'no', 'el', 'bs', 'th', 'ko', 'eo',
+            'ru', 'ta', 'fi', 'cs', 'he', 'ro', 'bg', 'ar', 'sd', 'fa', 'ca',
+            'tr', 'sq', 'uk', 'no', 'el', 'bs', 'ko', 'eo',
         ]
 
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wikinews.org' % lang
 
         self.obsolete = {
+            'hu': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28342
             'jp': 'ja',
             'nb': 'no',
             'nl': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
+            'th': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28341
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }
