@@ -30,7 +30,7 @@ class Family(family.Family):
             'lt': 'lt.wow.wikia.com',
             'lv': 'lv.wow.wikia.com',
             'nl': 'nl.wow.wikia.com',
-            'no': 'no.wow.wikia.com',
+            'no': 'no.wowwiki.com',
             'pl': 'pl.wow.wikia.com',
             'pt': 'pt.wow.wikia.com',
             'pt-br': 'pt-br.wow.wikia.com',
@@ -51,8 +51,10 @@ class Family(family.Family):
                                               'disambig/achievement2']
         self.disambcatname['en'] = "Disambiguations"
 
+        # Wikia's default CategorySelect extension always puts categories last
+        self.categories_last = ['cs', 'da', 'de', 'el', 'en', 'es', 'fa', 'fi', 'fr', 'he', 'hr', 'hu', 'is', 'it', 'ja', 'ko', 'lt', 'lv', 'nl', 'no', 'pl', 'pt', 'pt-br', 'ro', 'ru', 'sk', 'sr', 'sv', 'tr', 'zh-tw', 'zh']
     def scriptpath(self, code):
         return ''
 
     def version(self, code):
-        return '1.16.2'
+        return '1.16.4'
