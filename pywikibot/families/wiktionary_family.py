@@ -17,7 +17,7 @@ class Family(family.Family):
             'id', 'gl', 'ca', 'uk', 'bg', 'cs', 'eo', 'vo', 'is', 'fa', 'hr',
             'oc', 'simple', 'scn', 'th', 'sr', 'af', 'fy', 'sw', 'br', 'he',
             'eu', 'la', 'sq', 'sl', 'hy', 'cy', 'da', 'tt', 'zh-min-nan', 'wa',
-            'az', 'lv', 'ne', 'hi', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky',
+            'az', 'hi', 'lv', 'ne', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky',
             'nn', 'wo', 'km', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'sk',
             'tl', 'ms', 'ps', 'csb', 'st', 'nds', 'sd', 'kl', 'si', 'sh', 'ug',
             'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'am', 'ss', 'qu', 'chr',
@@ -107,7 +107,7 @@ class Family(family.Family):
             'dk': 'da',
             'jp': 'ja',
             'mh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wiktionary
-            'mo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary
+            'mo': 'ro', # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary
             'minnan':'zh-min-nan',
             'nb': 'no',
             'or': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oriya_Wiktionary
