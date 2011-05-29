@@ -480,8 +480,8 @@ def interwikiSort(sites, insite = None):
         firstsites = []
         for code in putfirst:
             # The code may not exist in this family?
-            if code in insite.family.obsolete:
-                code = insite.family.obsolete[code]
+##            if code in insite.family.obsolete:
+##                code = insite.family.obsolete[code]
             if code in insite.validLanguageLinks():
                 site = insite.getSite(code = code)
                 if site in sites:
