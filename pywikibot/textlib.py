@@ -592,7 +592,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
         prevents blank lines left over in category lists following a removal.)
         """
 
-        text = replaceExcept(oldtext, categoryRN, ''
+        text = replaceExcept(oldtext, categoryRN, '',
                              ['nowiki', 'comment', 'math', 'pre', 'source'])
         text = replaceExcept(text, categoryR, '',
                              ['nowiki', 'comment', 'math', 'pre', 'source'])
