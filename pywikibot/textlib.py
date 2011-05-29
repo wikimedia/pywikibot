@@ -584,8 +584,17 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
     title = title.replace(r"\ ", "[ _]+").replace(r"\_", "[ _]+")
     categoryR = re.compile(r'\[\[\s*(%s)\s*:\s*%s\s*((?:\|[^]]+)?\]\])'
                             % (catNamespace, title), re.I)
+    categoryRN = re.compile(r'^[^\S\n]*\[\[\s*(%s)\s*:\s*%s\s*((?:\|[^]]+)?\]\])[^\S\n]*\n'
+                            % (catNamespace, title), re.I | re.M)
     if newcat is None:
-        text = replaceExcept(oldtext, categoryR, '',
+        """ First go through and try the more restrictive regex that removes
+        an entire line, if the category is the only thing on that line (this
+        prevents blank lines left over in category lists following a removal.)
+        """
+
+        text = replaceExcept(oldtext, categoryRN, ''
+                             ['nowiki', 'comment', 'math', 'pre', 'source'])
+        text = replaceExcept(text, categoryR, '',
                              ['nowiki', 'comment', 'math', 'pre', 'source'])
     else:
         text = replaceExcept(oldtext, categoryR,
