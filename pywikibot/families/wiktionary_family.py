@@ -19,12 +19,12 @@ class Family(family.Family):
             'eu', 'la', 'sq', 'sl', 'hy', 'cy', 'da', 'tt', 'zh-min-nan', 'wa',
             'az', 'hi', 'lv', 'ne', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky',
             'nn', 'wo', 'km', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'sk',
-            'tl', 'ms', 'ps', 'csb', 'st', 'nds', 'sd', 'kl', 'si', 'sh', 'ug',
+            'tl', 'csb', 'ms', 'ps', 'st', 'nds', 'sd', 'kl', 'si', 'sh', 'ug',
             'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'am', 'ss', 'qu', 'chr',
-            'ts', 'bs', 'fo', 'nah', 'rw', 'tg', 'om', 'kw', 'su', 'gv', 'iu',
+            'ts', 'nah', 'bs', 'fo', 'rw', 'tg', 'om', 'kw', 'su', 'gv', 'iu',
             'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi', 'dv', 'ik',
             'sg', 'so', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'sa', 'ay',
-            'jbo', 'na', 'fj', 'ks', 'tn', 'dz',
+            'jbo', 'ks', 'na', 'fj', 'tn', 'dz',
         ]
 
         for lang in self.languages_by_size:
