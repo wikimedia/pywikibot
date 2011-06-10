@@ -12,14 +12,14 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
-            'io', 'de', 'pt', 'hu', 'fi', 'el', 'sv', 'no', 'nl', 'it', 'my',
+            'io', 'de', 'pt', 'hu', 'fi', 'el', 'sv', 'no', 'nl', 'my', 'it',
             'kn', 'et', 'li', 'ml', 'ja', 'lo', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'cs', 'eo', 'vo', 'is', 'fa', 'hr',
             'oc', 'simple', 'scn', 'th', 'sr', 'af', 'fy', 'sw', 'br', 'he',
             'eu', 'la', 'sq', 'sl', 'hy', 'cy', 'da', 'tt', 'zh-min-nan', 'wa',
-            'az', 'hi', 'lv', 'ne', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky',
-            'nn', 'wo', 'km', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'sk',
-            'tl', 'csb', 'ms', 'ps', 'st', 'nds', 'sd', 'kl', 'si', 'sh', 'ug',
+            'hi', 'az', 'lv', 'ne', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky',
+            'nn', 'wo', 'km', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'tl',
+            'sk', 'csb', 'ps', 'ms', 'st', 'nds', 'sd', 'kl', 'si', 'sh', 'ug',
             'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'am', 'ss', 'qu', 'chr',
             'ts', 'nah', 'bs', 'fo', 'rw', 'tg', 'om', 'kw', 'su', 'gv', 'iu',
             'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi', 'dv', 'ik',
