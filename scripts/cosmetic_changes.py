@@ -318,6 +318,7 @@ class CosmeticChangesToolkit:
              93,     # Closing bracket - sometimes used intentionally inside links
             124,     # Vertical bar (??) - used intentionally in navigation bar templates on de:
             160,     # Non-breaking space (&nbsp;) - not supported by Firefox textareas
+            173,     # Soft-hypen (&shy;) - enable editing
         ]
         # ignore ' see http://eo.wikipedia.org/w/index.php?title=Liberec&diff=next&oldid=2320801
         #if self.site.lang == 'eo':
