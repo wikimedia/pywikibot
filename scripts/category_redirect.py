@@ -354,6 +354,11 @@ class CategoryRedirectBot(object):
                                             asLink=True, textlink=True)))
                 except pywikibot.Error:
                     pass
+                # do a null edit on cat
+                try:
+                    cat.put(cat.get(get_redirect=True))
+                except:
+                    pass
 
         # delete record entries for non-existent categories
         for cat_name in record.keys():
