@@ -573,7 +573,8 @@ class RedirectRobot:
                     break
                 text = self.site.redirectRegex().sub(
                     '#%s %s' % (self.site.redirect(True),
-                                targetPage.title(asLink=True)), oldText)
+                                targetPage.title(asLink=True, textlink=True)),
+                    oldText)
                 if text == oldText:
                     pywikibot.output(u"Note: Nothing left to do on %s"
                                      % redir.title(asLink=True))
