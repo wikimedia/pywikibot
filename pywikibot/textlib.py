@@ -43,7 +43,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
 
     Parameters:
         text            - a unicode string
-        old             - a compiled regular expression
+        old             - a compiled or uncompiled regular expression
         new             - a unicode string (which can contain regular
                           expression references), or a function which takes
                           a match object as parameter. See parameter repl of
