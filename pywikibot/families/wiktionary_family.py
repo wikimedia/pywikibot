@@ -16,15 +16,15 @@ class Family(family.Family):
             'kn', 'et', 'li', 'ml', 'fa', 'ja', 'lo', 'es', 'ku', 'ar', 'ro',
             'te', 'id', 'gl', 'ca', 'uk', 'bg', 'cs', 'eo', 'vo', 'is', 'hr',
             'oc', 'simple', 'scn', 'th', 'sr', 'af', 'fy', 'sw', 'br', 'he',
-            'eu', 'la', 'sq', 'sl', 'hy', 'cy', 'da', 'tt', 'zh-min-nan', 'wa',
-            'hi', 'az', 'ne', 'lv', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky',
-            'nn', 'wo', 'km', 'ang', 'be', 'co', 'ga', 'mr', 'gn', 'ia', 'tl',
-            'sk', 'csb', 'ps', 'ms', 'st', 'nds', 'sd', 'kl', 'si', 'sh', 'ug',
-            'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'am', 'ss', 'qu', 'nah',
+            'eu', 'la', 'sq', 'cy', 'sl', 'hy', 'da', 'tt', 'zh-min-nan', 'wa',
+            'hi', 'az', 'ne', 'lv', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'nn',
+            'ky', 'wo', 'km', 'ang', 'be', 'co', 'ga', 'mr', 'gn', 'ia', 'tl',
+            'sk', 'csb', 'ps', 'ms', 'st', 'nds', 'sd', 'kl', 'sh', 'si', 'ug',
+            'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'nah', 'am', 'ss', 'qu',
             'chr', 'ts', 'bs', 'fo', 'rw', 'tg', 'om', 'kw', 'su', 'gv', 'iu',
             'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi', 'dv', 'ik',
             'sg', 'so', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',
-            'jbo', 'ks', 'na', 'fj', 'tn', 'dz',
+            'ks', 'jbo', 'na', 'fj', 'tn', 'dz',
         ]
 
         for lang in self.languages_by_size:

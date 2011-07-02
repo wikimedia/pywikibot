@@ -12,12 +12,12 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'es', 'pl', 'it', 'he',
-            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'zh', 'hr', 'sv', 'tr', 'da',
-            'id', 'th', 'gl', 'fa', 'ko', 'sr', 'tl', 'no', 'ar', 'mk', 'is',
-            'ta', 'lt', 'ka', 'eo', 'bg', 'ro', 'sk', 'uk', 'el', 'az', 'si',
-            'tt', 'li', 'sl', 'la', 'ang', 'ia', 'cv', 'et', 'mr', 'ur', 'bn',
+            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'zh', 'hr', 'sv', 'tr', 'id',
+            'da', 'th', 'gl', 'fa', 'ko', 'sr', 'no', 'tl', 'ar', 'mk', 'is',
+            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sl', 'sk', 'uk', 'el', 'az',
+            'tt', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'mr', 'ur', 'bn',
             'oc', 'ml', 'ms', 'eu', 'hi', 'fy', 'ie', 'hy', 'te', 'tg', 'af',
-            'pa', 'ne', 'bs', 'sa', 'ky', 'be', 'ast', 'zh-min-nan', 'mg', 'cy',
+            'pa', 'ne', 'sa', 'bs', 'ky', 'be', 'ast', 'zh-min-nan', 'cy', 'mg',
             'ku', 'tk', 'su', 'uz', 'vo', 'kk', 'mn', 'my',
         ]
 
