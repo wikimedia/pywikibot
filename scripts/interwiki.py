@@ -1199,11 +1199,10 @@ class Subject(object):
                     redir = u''
                 else:
                     redir = u'category '
-                try:
-                    if page.isRedirectPage():
-                        redirectTargetPage = page.getRedirectTarget()
-                    else:
-                        redirectTargetPage = page.getCategoryRedirectTarget()
+                if page.isRedirectPage():
+                    redirectTargetPage = page.getRedirectTarget()
+                else:
+                    redirectTargetPage = page.getCategoryRedirectTarget()
                 if not globalvar.quiet:
                     pywikibot.output(u"NOTE: %s is %sredirect to %s"
                                      % (page, redir, redirectTargetPage))
