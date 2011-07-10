@@ -14,21 +14,22 @@ are taken into account.
 """
 
 #
-# (C) Pywikipedia team, 2008-2009
-#c
+# (C) Pywikipedia team, 2008-2011
+#
 __version__ = '$Id$'
 #
 # Distributed under the terms of the MIT license.
 #
 
-import pywikibot
-from pywikibot import pagegenerators, i18n
 import cPickle
 import math
 import re
 import sys, traceback
 import time
 from datetime import datetime, timedelta
+import pywikibot
+from pywikibot import pagegenerators
+from pywikibot import i18n
 
 
 class CategoryRedirectBot(object):
