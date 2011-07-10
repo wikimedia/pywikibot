@@ -24,7 +24,8 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import pagegenerators, i18n
+from pywikibot import pagegenerators
+from pywikibot import i18n
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -34,7 +35,7 @@ docuReplacements = {
 
 class BasicBot:
     # Edit summary message that should be used is placed on /i18n subdirectory.
-    # The file containing these messages must have the same name as the caller
+    # The file containing these messages should have the same name as the caller
     # script (i.e. basic.py in this case)
 
     def __init__(self, generator, dry):
