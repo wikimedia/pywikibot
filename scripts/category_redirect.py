@@ -210,7 +210,7 @@ class CategoryRedirectBot(object):
             return log_text
         # sort by keys and keep the first (LOG_SIZE-1) values
         keep = [text for (key, text) in
-                    sorted(log_items.iteritems(), reverse=True)[:LOG_SIZE-1]]
+                sorted(log_items.iteritems(), reverse=True)[:LOG_SIZE-1]]
         log_text = "\n".join("\n".join(line for line in text) for text in keep)
         # get permalink to older logs
         history = self.log_page.getVersionHistory(total=LOG_SIZE)
@@ -471,8 +471,10 @@ class CategoryRedirectBot(object):
                           + u"\n" + self.get_log_text())
         if self.edit_requests:
             edit_request_page.put(self.edit_request_text
-                                 % u"\n".join((self.edit_request_item % item)
-                                             for item in self.edit_requests))
+                                 % {'itemlist':
+                                    u"\n" + u"\n".join(
+                                        (self.edit_request_item % item)
+                                        for item in self.edit_requests)})
 
 def main(*args):
     global bot
