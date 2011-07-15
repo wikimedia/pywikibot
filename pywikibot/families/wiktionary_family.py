@@ -11,20 +11,20 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'zh', 'mg', 'lt', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
+            'en', 'fr', 'zh', 'lt', 'mg', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
             'io', 'de', 'pt', 'hu', 'fi', 'el', 'sv', 'no', 'nl', 'my', 'it',
             'kn', 'et', 'li', 'ml', 'fa', 'ja', 'lo', 'es', 'ku', 'ar', 'ro',
-            'te', 'id', 'gl', 'ca', 'uk', 'bg', 'cs', 'eo', 'vo', 'hi', 'is',
+            'te', 'id', 'gl', 'ca', 'uk', 'bg', 'cs', 'eo', 'hi', 'vo', 'is',
             'hr', 'oc', 'simple', 'scn', 'th', 'sr', 'af', 'fy', 'br', 'sw',
-            'he', 'eu', 'la', 'cy', 'sq', 'sl', 'hy', 'da', 'tt', 'zh-min-nan',
-            'wa', 'az', 'ne', 'lv', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'nn',
-            'ky', 'wo', 'km', 'ang', 'be', 'co', 'ga', 'mr', 'gn', 'ia', 'tl',
-            'sk', 'csb', 'ps', 'ms', 'st', 'nds', 'sd', 'kl', 'sh', 'si', 'ug',
-            'ti', 'mk', 'bn', 'lb', 'an', 'bs', 'zu', 'gu', 'nah', 'am', 'ss',
-            'qu', 'chr', 'ts', 'fo', 'rw', 'tg', 'om', 'kw', 'su', 'gv', 'iu',
-            'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi', 'dv', 'ik',
-            'sg', 'so', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',
-            'ks', 'jbo', 'na', 'fj', 'tn', 'dz',
+            'he', 'eu', 'la', 'cy', 'sq', 'sl', 'hy', 'da', 'tt', 'wa',
+            'zh-min-nan', 'az', 'ne', 'lv', 'tk', 'ast', 'ka', 'ur', 'hsb',
+            'kk', 'nn', 'ky', 'wo', 'km', 'ang', 'be', 'co', 'ga', 'mr', 'gn',
+            'ia', 'ps', 'tl', 'sk', 'csb', 'ms', 'st', 'nds', 'sd', 'kl', 'sh',
+            'si', 'ug', 'ti', 'mk', 'bn', 'lb', 'bs', 'an', 'zu', 'gu', 'nah',
+            'am', 'ss', 'qu', 'chr', 'ts', 'fo', 'rw', 'tg', 'om', 'kw', 'su',
+            'gv', 'iu', 'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'mi',
+            'dv', 'ik', 'sg', 'so', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha',
+            'ay', 'sa', 'ks', 'jbo', 'na', 'fj', 'tn', 'dz',
         ]
 
         for lang in self.languages_by_size:

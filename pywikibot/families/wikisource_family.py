@@ -15,7 +15,7 @@ class Family(family.Family):
             'hu', 'pl', 'cs', 'th', 'ro', 'ko', 'hr', 'te', 'fi', 'sv', 'sl',
             'bn', 'vi', 'nl', 'tr', 'uk', 'ja', 'sr', 'el', 'ml', 'la', 'az',
             'br', 'li', 'yi', 'sa', 'mk', 'hy', 'is', 'vec', 'ta', 'ca', 'bs',
-            'id', 'eo', 'da', 'no', 'et', 'sah', 'bg', 'lt', 'gl', 'kn', 'cy',
+            'id', 'da', 'eo', 'no', 'et', 'bg', 'sah', 'lt', 'gl', 'kn', 'cy',
             'sk', 'zh-min-nan', 'fo',
         ]
 
