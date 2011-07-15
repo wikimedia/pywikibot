@@ -363,19 +363,28 @@ class Page(object):
         """Return name or IP address of last user to edit page.
 
         """
-        return self._revisions[self.latestRevision()].user
+        rev = self.latestRevision()
+        if rev not in self._revisions:
+            self.site.loadrevisions(self)
+        return self._revisions[rev].user
 
     def isIpEdit(self):
         """Return True if last editor was unregistered.
 
         """
-        return self._revisions[self.latestRevision()].anon
+        rev = self.latestRevision()
+        if rev not in self._revisions:
+            self.site.loadrevisions(self)
+        return self._revisions[rev].anon
 
     def editTime(self):
         """Return timestamp (in ISO 8601 format) of last revision to page.
 
         """
-        return self._revisions[self.latestRevision()].timestamp
+        rev = self.latestRevision()
+        if rev not in self._revisions:
+            self.site.loadrevisions(self)
+        return self._revisions[rev].timestamp
 
     def previousRevision(self):
         """Return the revision id for the previous revision of this Page."""
