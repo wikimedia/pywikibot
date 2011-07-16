@@ -1727,6 +1727,12 @@ class Category(Page):
             return False
         return True
 
+    def isHiddenCategory(self):
+        """Return True if the category is hidden."""
+        text = self.get()
+        hidden = re.search('__HIDDENCAT__', text)
+        return bool(hidden)
+
     def copyTo(self, cat, message):
         """
         Copy text of category page to a new page.  Does not move contents.
