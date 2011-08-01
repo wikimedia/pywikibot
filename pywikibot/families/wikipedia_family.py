@@ -333,8 +333,8 @@ class Family(family.Family):
             'kab', 'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'vi', 'tg',
             'tokipona', 'tp', 'tpi', 'chy', 've', 'tr', 'tk', 'tw', 'udm', 'uk',
             'ur', 'ug', 'za', 'vec', 'vo', 'fiu-vro', 'wa', 'vls', 'war', 'wo',
-            'wuu', 'ts', 'yi', 'yo', 'diq', 'zea', 'zh', 'zh-tw', 'zh-cn',
-            'zh-classical', 'zh-yue', 'bat-smg',
+            'wuu', 'ts', 'xmf', 'yi', 'yo', 'diq', 'zea', 'zh', 'zh-tw',
+            'zh-cn', 'zh-classical', 'zh-yue', 'bat-smg',
         ]
 
         # Which languages have a special order for putting interlanguage links,
