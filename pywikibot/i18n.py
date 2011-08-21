@@ -308,22 +308,28 @@ def twntranslate(code, twtitle, parameters=None):
     The translations are retrieved from i18n.<package>, based on the callers
     import table.
     """
+    PATTERN = '{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
     param = None
-    pattern = '{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
-    trans = twtranslate(code, twtitle, None)
-    selector, variants = re.search(pattern, trans).groups()
     if type(parameters) == dict:
         param = parameters
-        num = param[selector]
-    elif type(parameters) == basestring:
-        num = int(parameters)
+    trans = twtranslate(code, twtitle, None)
+    try:
+        selector, variants = re.search(PATTERN, trans).groups()
+    # No PLURAL tag found: nothing to replace
+    except AttributeError:
+        pass
     else:
-        num = parameters
-    #todo: other functions depending on language code
-    #      which gives more than two variants
-    plural_func = lambda x: x != 1
-    repl = variants.split('|')[plural_func(num)]
-    trans = re.sub(pattern, repl, trans)
+        if type(parameters) == dict:
+            num = param[selector]
+        elif type(parameters) == basestring:
+            num = int(parameters)
+        else:
+            num = parameters
+        #todo: other functions depending on language code
+        #      which gives more than two variants
+        plural_func = lambda x: x != 1
+        repl = variants.split('|')[plural_func(num)]
+        trans = re.sub(PATTERN, repl, trans)
     if param:
         try:
             return trans % param
