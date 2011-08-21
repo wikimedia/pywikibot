@@ -10,6 +10,7 @@
 __version__ = '$Id$'
 
 from pywikibot import Error
+import re
 
 # Languages to use for comment text after the actual language but before
 # en:. For example, if for language 'xx', you want the preference of
@@ -253,6 +254,82 @@ def twtranslate(code, twtitle, parameters=None):
         return trans % parameters
     else:
         return trans
+
+def twntranslate(code, twtitle, parameters=None):
+    """ First implementation of plural support for translations based on the
+    TW title twtitle, which corresponds to a page on TW.
+
+    @param code The language code
+    @param twtitle The TranslateWiki string title, in <package>-<key> format
+    @param parameters For passing parameters.
+
+    Support is implemented like in MediaWiki extension. If the tw message
+    contains a plural tag inside which looks like
+    {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
+    it takes that variant calculated by the plural_func depending on the number
+    value. At the moment, we have only one plural_func = x: x!= 1 yet. Multiple
+    PLURAL tags are not supported (yet).
+
+    Examples:
+    If we had a test dictionary in test.py like
+    msg = {
+        'de': {
+            'test-changing': u'Bot: Ändere %(num)d {{PLURAL:num|Seite|Seiten}}.',
+        },
+        'en': {
+            # number value as format sting is allowed
+            'test-changing': u'Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.',
+        },
+        'nl': {
+            # format sting inside PLURAL tag is allowed
+            'test-changing': u'Bot: Endrer {{PLURAL:num|1 pagina|%(num)d pagina\'s}}.',
+        },
+        'fr': {
+            # additional sting inside or outside PLURAL tag is allowed
+            'test-changing': u'Robot: Changer %(descr)s {{PLURAL:num|une page|un peu pages}}.',
+        },
+    }
+    #use a number
+    >>> i18n.twntranslate('en', 'test-changing', 0) % {'num': 'no'}
+    Bot: Changing no pages.
+    #use a string
+    >>> i18n.twntranslate('en', 'test-changing', '1') % {'num': 'one'}
+    Bot: Changing one page.
+    #use a dictionary
+    >>> i18n.twntranslate('en', 'test-changing', {'num':2})
+    Bot: Changing 2 pages.
+    #use additional format strings
+    >>> i18n.twntranslate('fr', 'test-changing', {'num':1, 'descr':'seulement'})
+    Bot: Changer seulement une pages.
+    #use format strings also outside
+    >>> i18n.twntranslate('fr', 'test-changing', 0) % {'descr':'seulement'}
+    Bot: Changer seulement un peu pages.
+
+    The translations are retrieved from i18n.<package>, based on the callers
+    import table.
+    """
+    param = None
+    pattern = '{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
+    trans = twtranslate(code, twtitle, None)
+    selector, variants = re.search(pattern, trans).groups()
+    if type(parameters) == dict:
+        param = parameters
+        num = param[selector]
+    elif type(parameters) == basestring:
+        num = int(parameters)
+    else:
+        num = parameters
+    #todo: other functions depending on language code
+    #      which gives more than two variants
+    plural_func = lambda x: x != 1
+    repl = variants.split('|')[plural_func(num)]
+    trans = re.sub(pattern, repl, trans)
+    if param:
+        try:
+            return trans % param
+        except KeyError:
+            pass
+    return trans
 
 def twhas_key(code, twtitle):
     """ Uses TranslateWiki files to to check whether specified translation
