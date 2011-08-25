@@ -295,6 +295,16 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
 "Non-JSON response received from server %s; the server may be down."
                                  % self.site)
                 pywikibot.debug(rawdata, _logger)
+                # there might also be an overflow, so try a smaller limit
+                for param in self.params:
+                    if param.endswith("limit"):
+                        value = self.params[param]
+                        try:
+                            self.params[param] = str(int(value) // 2)
+                            pywikibot.output(u"Set %s = %s"
+                                             % (param, self.params[param]))
+                        except:
+                            pass
                 self.wait()
                 continue
             if not result:
@@ -415,6 +425,7 @@ class QueryGenerator(object):
             if name not in _modules:
                 self.get_module()
                 break
+        kwargs["indexpageids"] = ""  # always ask for list of pageids
         self.request = Request(**kwargs)
         self.prefix = None
         self.update_limit() # sets self.prefix
@@ -566,7 +577,14 @@ u"%s: stopped iteration because 'query' not found in api response."
                                          resultdata.keys(),
                                          self.limit),
                                     _logger)
-                    resultdata = [resultdata[k] for k in sorted(resultdata.keys())]
+                    if "pageids" in self.data["query"]:
+                        # this ensures that page data will be iterated
+                        # in the same order as received from server
+                        resultdata = [resultdata[k]
+                                      for k in self.data["query"]["pageids"]]
+                    else:
+                        resultdata = [resultdata[k]
+                                      for k in sorted(resultdata.keys())]
                 else:
                     pywikibot.debug(u"%s received %s; limit=%s"
                                       % (self.__class__.__name__,
