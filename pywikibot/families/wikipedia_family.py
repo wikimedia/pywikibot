@@ -12,12 +12,12 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'it', 'pl', 'es', 'ja', 'ru', 'nl', 'pt', 'sv',
-            'zh', 'ca', 'no', 'uk', 'fi', 'vi', 'cs', 'hu', 'tr', 'ko', 'id',
+            'zh', 'ca', 'no', 'uk', 'fi', 'vi', 'cs', 'hu', 'ko', 'tr', 'id',
             'ro', 'fa', 'ar', 'da', 'eo', 'sr', 'lt', 'sk', 'he', 'ms', 'bg',
-            'sl', 'vo', 'eu', 'war', 'hr', 'hi', 'et', 'az', 'gl', 'kk',
+            'sl', 'vo', 'eu', 'war', 'hr', 'hi', 'et', 'az', 'kk', 'gl',
             'simple', 'nn', 'new', 'th', 'el', 'roa-rup', 'la', 'tl', 'ht',
-            'ka', 'te', 'mk', 'sh', 'ceb', 'pms', 'be-x-old', 'br', 'lv', 'jv',
-            'ta', 'mr', 'cy', 'sq', 'lb', 'is', 'bs', 'be', 'oc', 'yo', 'an',
+            'ka', 'te', 'mk', 'sh', 'ceb', 'pms', 'br', 'be-x-old', 'lv', 'jv',
+            'ta', 'mr', 'cy', 'sq', 'lb', 'is', 'be', 'bs', 'oc', 'yo', 'an',
             'bpy', 'mg', 'bn', 'io', 'sw', 'fy', 'lmo', 'gu', 'pnb', 'ml', 'af',
             'nds', 'scn', 'ur', 'qu', 'ku', 'zh-yue', 'ne', 'ast', 'su', 'hy',
             'nap', 'ga', 'bat-smg', 'cv', 'wa', 'diq', 'tt', 'am', 'kn', 'als',
