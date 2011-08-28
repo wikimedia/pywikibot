@@ -9,8 +9,9 @@
 #
 __version__ = '$Id$'
 
-from pywikibot import Error
 import re
+from pywikibot import Error
+from plural import plural_rules
 
 # Languages to use for comment text after the actual language but before
 # en:. For example, if for language 'xx', you want the preference of
@@ -228,9 +229,14 @@ def twtranslate(code, twtitle, parameters=None):
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
 
+    code_needed = False
     # If a site is given instead of a code, use its language
     if hasattr(code, 'lang'):
-        code = code.lang
+        lang = code.lang
+    # check whether we need the language code back
+    elif type(code) == list:
+        lang = code.pop()
+        code_needed = True
 
     # There are two possible failure modes: the translation dict might not have
     # the language altogether, or a specific key could be untranslated. Both
@@ -238,23 +244,28 @@ def twtranslate(code, twtitle, parameters=None):
 
     trans = None
     try:
-        trans = transdict[code][twtitle]
+        trans = transdict[lang][twtitle]
     except KeyError:
         # try alternative languages and English
-        for alt in _altlang(code) + ['en']:
+        for alt in _altlang(lang) + ['en']:
             try:
                 trans = transdict[alt][twtitle]
+                if code_needed:
+                    lang = alt
                 break
             except KeyError:
                 continue
         if not trans:
             raise TranslationError("No English translation has been defined for TranslateWiki key %r" % twtitle)
-
+    # send the language code back via the given list
+    if code_needed:
+        code.append(lang)
     if parameters:
         return trans % parameters
     else:
         return trans
 
+# Maybe this function should be merged with twtranslate
 def twntranslate(code, twtitle, parameters=None):
     """ First implementation of plural support for translations based on the
     TW title twtitle, which corresponds to a page on TW.
@@ -312,6 +323,8 @@ def twntranslate(code, twtitle, parameters=None):
     param = None
     if type(parameters) == dict:
         param = parameters
+    # we send the code via list and get the alternate code back
+    code = [code]
     trans = twtranslate(code, twtitle, None)
     try:
         selector, variants = re.search(PATTERN, trans).groups()
@@ -325,9 +338,15 @@ def twntranslate(code, twtitle, parameters=None):
             num = int(parameters)
         else:
             num = parameters
-        #todo: other functions depending on language code
-        #      which gives more than two variants
-        plural_func = lambda x: x != 1
+        # get the alternate language code modified by twtranslate
+        lang = code.pop()
+        # we only need the lang or _default, not a _altlang code
+        # maybe we should implement this to i18n.translate()
+        try:
+            plural_func = plural_rules[lang]['plural']
+        except KeyError:
+            plural_func = plural_rules['_default']['plural']
+        # TODO: check against plural_rules[lang]['nplurals']
         repl = variants.split('|')[plural_func(num)]
         trans = re.sub(PATTERN, repl, trans)
     if param:
