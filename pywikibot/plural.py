@@ -9,7 +9,7 @@ __version__ = '$Id$'
 #
 
 plural_rules = {
-    '_default': {'nplurals': 2, 'plural': lambda n: lambda n: (n != 1)},
+    '_default': {'nplurals': 2, 'plural': lambda n: (n != 1)},
     'ach':{'nplurals': 2, 'plural': lambda n: (n > 1)},
     'ak': {'nplurals': 2, 'plural': lambda n: (n > 1)},
     'am': {'nplurals': 2, 'plural': lambda n: (n > 1)},
