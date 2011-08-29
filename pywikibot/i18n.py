@@ -237,6 +237,8 @@ def twtranslate(code, twtitle, parameters=None):
     elif type(code) == list:
         lang = code.pop()
         code_needed = True
+    else:
+        lang = code
 
     # There are two possible failure modes: the translation dict might not have
     # the language altogether, or a specific key could be untranslated. Both
