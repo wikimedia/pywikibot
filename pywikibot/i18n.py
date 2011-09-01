@@ -325,6 +325,9 @@ def twntranslate(code, twtitle, parameters=None):
     param = None
     if type(parameters) == dict:
         param = parameters
+    # If a site is given instead of a code, use its language
+    if hasattr(code, 'lang'):
+        code = code.lang
     # we send the code via list and get the alternate code back
     code = [code]
     trans = twtranslate(code, twtitle, None)
