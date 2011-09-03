@@ -2199,11 +2199,11 @@ class Link(object):
         # Convert URL-encoded characters to unicode
         t = url2unicode(t, site=self._source)
 
-        # Normalize unicode string to a NFC (composed) format to allow proper
-        # string comparisons. According to
+        # Normalize unicode string to a NFC (composed) format to allow
+        # proper string comparisons. According to
         # http://svn.wikimedia.org/viewvc/mediawiki/branches/REL1_6/phase3/includes/normal/UtfNormal.php?view=markup
-        # the mediawiki code normalizes everything to NFC, not NFKC (which
-        # might result in information loss).
+        # the mediawiki code normalizes everything to NFC, not NFKC
+        # (which might result in information loss).
         t = unicodedata.normalize('NFC', t)
 
         # This code was adapted from Title.php : secureAndSplit()
