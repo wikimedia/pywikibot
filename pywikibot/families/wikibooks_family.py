@@ -14,11 +14,11 @@ class Family(family.Family):
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'es', 'pl', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'zh', 'hr', 'id', 'sv', 'tr',
             'da', 'th', 'gl', 'fa', 'ko', 'sr', 'no', 'tl', 'ar', 'mk', 'is',
-            'ta', 'tt', 'lt', 'ka', 'eo', 'ro', 'bg', 'sl', 'sk', 'az', 'uk',
+            'ta', 'tt', 'lt', 'ka', 'eo', 'ro', 'bg', 'sl', 'az', 'sk', 'uk',
             'el', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'mr', 'ur', 'bn',
             'oc', 'ml', 'ms', 'hi', 'eu', 'fy', 'ie', 'hy', 'te', 'tg', 'af',
             'pa', 'sa', 'ne', 'bs', 'ky', 'be', 'mg', 'cy', 'zh-min-nan', 'ast',
-            'ku', 'tk', 'su', 'uz', 'vo', 'kk', 'mn', 'my',
+            'ku', 'tk', 'su', 'kk', 'uz', 'vo', 'mn', 'my',
         ]
 
         for lang in self.languages_by_size:
