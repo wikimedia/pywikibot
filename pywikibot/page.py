@@ -2213,10 +2213,10 @@ class Link(object):
 
         # Replace underscores by spaces
         t = t.replace(u"_", u" ")
-        # replace multiple spaces and underscores with a single space
+        # replace multiple spaces with a single space
         while u"  " in t: t = t.replace(u"  ", u" ")
         # Strip spaces at both ends
-        t = t.strip(" ")
+        t = t.strip()
         # Remove left-to-right and right-to-left markers.
         t = t.replace(u"\u200e", u"").replace(u"\u200f", u"")
         self._text = t
