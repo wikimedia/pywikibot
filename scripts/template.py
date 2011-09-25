@@ -5,9 +5,9 @@ and to convert the old MediaWiki boilerplate format to the new template format.
 
 Syntax: python template.py [-remove] [xml[:filename]] oldTemplate [newTemplate]
 
-Specify the template on the command line. The program will
-pick up the template page, and look for all pages using it. It will
-then automatically loop over them, and replace the template.
+Specify the template on the command line. The program will pick up the template
+page, and look for all pages using it. It will then automatically loop over
+them, and replace the template.
 
 Command line options:
 
@@ -17,13 +17,15 @@ Command line options:
              article. This is done by changing {{...}} or {{msg:...}} into
              {{subst:...}}
 
+-assubst     Replaces the first argument as old template with the second
+             argument as new template but substitutes it like -subst does.
+             Using both options -remove and -subst in the same command line has
+             the same effect.
+
 -xml         retrieve information from a local dump
              (http://download.wikimedia.org). If this argument isn\'t given,
              info will be loaded from the maintenance page of the live wiki.
              argument can also be given as "-xml:filename.xml".
-
--namespace:  Only process templates in the given namespace number (may be used
-             multiple times).
 
 -user:       Only process pages edited by a given user
 
@@ -64,18 +66,16 @@ Move the page [[Template:Cities in Washington]] manually afterwards.
 If you have a template called [[Template:test]] and want to substitute it only
 on pages in the User: and User talk: namespaces, do:
 
-    python template.py test -namespace:2 -namespace:3
+    python template.py test -subst -namespace:2 -namespace:3
 
-Note that, on the English Wikipedia, User: is namespace 2 and User talk: is
-namespace 3. This may differ on other projects so make sure to find out the
-appropriate namespace numbers.
+Note that -namespace: is a global pywikipedia parameter
 
 
 This next example substitutes the template lived with a supplied edit summary.
 It only performs substitutions in main article namespace and doesn't prompt to
 start replacing. Note that -putthrottle: is a global pywikipedia parameter.
 
-    python template.py -putthrottle:30 -namespace:0 lived -always
+    python template.py -putthrottle:30 -namespace:0 lived -subst -always
         -summary:"ROBOT: Substituting {{lived}}, see [[WP:SUBST]]."
 
 
@@ -255,12 +255,16 @@ class TemplateRobot:
                                        r'(?P<parameters>\s*\|.+?|) *}}',
                                        re.DOTALL)
 
-            if self.remove:
-                replacements.append((templateRegex, ''))
+            if self.subst and self.remove:
+                replacements.append((templateRegex,
+                                     '{{subst:%s\g<parameters>}}' % new))
+                exceptions['inside-tags']=['ref', 'gallery']
             elif self.subst:
                 replacements.append((templateRegex,
                                      '{{subst:%s\g<parameters>}}' % old))
                 exceptions['inside-tags']=['ref', 'gallery']
+            elif self.remove:
+                replacements.append((templateRegex, ''))
             else:
                 replacements.append((templateRegex,
                                      '{{%s\g<parameters>}}' % new))
@@ -292,6 +296,8 @@ def main(*args):
             remove = True
         elif arg == '-subst':
             subst = True
+        elif arg == '-assubst':
+            subst = remove = True
         elif arg == ('-always'):
             acceptAll = True
         elif arg.startswith('-xml'):
@@ -300,11 +306,6 @@ def main(*args):
                     u'Please enter the XML dump\'s filename: ')
             else:
                 xmlfilename = arg[5:]
-        elif arg.startswith('-namespace:'):
-            try:
-                namespaces.append(int(arg[len('-namespace:'):]))
-            except ValueError:
-                namespaces.append(arg[len('-namespace:'):])
         elif arg.startswith('-category:'):
             addedCat = arg[len('-category:'):]
         elif arg.startswith('-summary:'):
@@ -322,7 +323,7 @@ def main(*args):
                     pywikibot.Page(pywikibot.Site(), arg,
                                    ns=10).title(withNamespace=False))
 
-    if subst or remove:
+    if subst ^ remove:
         for templateName in templateNames:
             templates[templateName] = None
     else:
@@ -331,7 +332,7 @@ def main(*args):
                 templates[templateNames[i]] = templateNames[i + 1]
         except IndexError:
             pywikibot.output(
-u'Unless using -subst or -remove, you must give an even number of template names.')
+u'Unless using solely -subst or -remove, you must give an even number of template names.')
             return
 
     oldTemplates = []
@@ -351,8 +352,6 @@ u'Unless using -subst or -remove, you must give an even number of template names
         gen = pagegenerators.CombinedPageGenerator(gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
 
-    if namespaces:
-        gen =  pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
     if user:
         gen = UserEditFilterGenerator(gen, user, timestamp, skip)
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
