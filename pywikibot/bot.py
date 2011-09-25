@@ -3,7 +3,7 @@
 User-interface related functions for building bots
 """
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikipedia bot team, 2008-2011
 #
 # Distributed under the terms of the MIT license.
 #
@@ -252,7 +252,6 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
                 text = unicode(text, 'iso8859-1')
 
     logger.log(_level, text, extra=context, **kwargs)
-
 def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     """Output a message to the user via the userinterface.
 
@@ -362,12 +361,13 @@ def calledModuleName():
     # get commandline arguments
     called = sys.argv[0].strip()
     if ".py" in called:  # could end with .pyc, .pyw, etc. on some platforms
-        called = called[ : called.rindex(".py")]
+        # clip off the '.py?' filename extension
+        called = called[:called.rindex('.py')]
     return os.path.basename(called)
 
 def _decodeArg(arg):
     if sys.platform == 'win32':
-        if config.console_encoding in ("cp437", 'cp850'):
+        if config.console_encoding in ('cp437', 'cp850'):
             # Western Windows versions give parameters encoded as windows-1252
             # even though the console encoding is cp850 or cp437.
             return unicode(arg, 'windows-1252')
@@ -498,7 +498,6 @@ def handleArgs(*args):
     pywikibot.debug(u"handleArgs() completed.", _logger)
     return nonGlobalArgs
 
-
 def showHelp(name=""):
     # argument, if given, is ignored
     modname = calledModuleName()
@@ -508,7 +507,7 @@ def showHelp(name=""):
         except NameError:
             modname = "no_module"
 
-    globalHelp = u'''\
+    globalHelp = u'''
 Global arguments available for all bots:
 
 -dir:PATH         Read the bot's configuration data from directory given by
