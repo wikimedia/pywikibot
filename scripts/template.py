@@ -25,6 +25,16 @@ Command line options:
 -namespace:  Only process templates in the given namespace number (may be used
              multiple times).
 
+-user:       Only process pages edited by a given user
+
+-skipuser:   Only process pages not edited by a given user
+
+-timestamp:  (With -user or -skipuser). Only check for a user where his edit is
+             not older than the given timestamp. Timestamp must be writen in
+             MediaWiki timestamp format which is "%Y%m%d%H%M%S"
+             If this parameter is missed, all edits are checked but this is
+             restricted to the last 100 edits.
+
 -summary:    Lets you pick a custom edit summary.  Use quotes if edit summary
              contains spaces.
 
@@ -88,6 +98,8 @@ pages:
 #
 # (C) Daniel Herding, 2004
 # (C) Rob W.W. Hooft, 2003
+# (C) xqt, 2009-2011
+# (C) Pywikipedia team, 2004-2010
 #
 # Distributed under the terms of the MIT license.
 #
@@ -95,8 +107,37 @@ __version__='$Id$'
 #
 import re, sys, string
 import pywikibot
+from pywikibot import i18n
 from pywikibot import config, pagegenerators, catlib
 from scripts import replace
+
+def UserEditFilterGenerator(generator, username, timestamp=None, skip=False):
+    """
+    Generator which will yield Pages depending of user:username is an Author of
+    that page (only looks at the last 100 editors).
+    If timestamp is set in MediaWiki format JJJJMMDDhhmmss, older edits are
+    ignored
+    If skip is set, pages edited by the given user are ignored otherwise only
+    pages edited by this user are given back
+
+    """
+    if timestamp:
+        ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
+    for page in generator:
+        editors = page.getLatestEditors(limit=100)
+        found = False
+        for ed in editors:
+            uts = pywikibot.Timestamp.fromISOformat(ed['timestamp'])
+            if not timestamp or uts>=ts:
+                if username == ed['user']:
+                    found = True
+                    break
+            else:
+                break
+        if found and not skip or not found and skip:
+            yield page
+        else:
+            pywikibot.output(u'Skipping %s' % page.title(asLink=True))
 
 
 class XmlDumpTemplatePageGenerator:
@@ -141,161 +182,13 @@ class XmlDumpTemplatePageGenerator:
                 page = pywikibot.Page(mysite, entry.title)
                 yield page
 
+
 class TemplateRobot:
     """
     This robot will load all pages yielded by a page generator and replace or
     remove all occurences of the old template, or substitute them with the
     template's text.
     """
-    # Summary messages for replacing templates
-    msg_change={
-        'ar':u'روبوت: تغيير القالب: %s',
-        'da':u'Bot: Erstatter skabelon: %s',
-        'de':u'Bot: Ändere Vorlage: %s',
-        'en':u'Robot: Changing template: %s',
-        'es':u'Robot: Cambiada la plantilla: %s',
-        'fa':u'ربات:تغییر الگو: %s',
-        'fi':u'Botti korvasi mallineen: %s',
-        'fr':u'Robot : Change modèle: %s',
-        'he':u'בוט: משנה תבנית: %s',
-        'hu':u'Robot: Sablon csere: %s',
-        'ia':u'Robot: Modification del template: %s',
-        'kk':u'Бот: Мына үлгі өзгертілді: %s',
-        'lt':u'robotas: Keičiamas šablonas: %s',
-        'nds':u'Bot: Vörlaag utwesselt: %s',
-        'ja':u'ロボットによるテンプレートの張り替え : %s',
-        'nl':u'Bot: vervangen sjabloon: %s',
-        'no':u'bot: Endrer mal: %s',
-        'pl':u'Robot zmienia szablon: %s',
-        'pt':u'Bot: Alterando predefinição: %s',
-        'ru':u'Робот: замена шаблона: %s',
-        'sr':u'Бот: Измена шаблона: %s',
-        'uk':u'Робот: заміна шаблону: %s',
-        'zh':u'機器人: 更改模板 %s',
-    }
-
-    #Needs more translations!
-    msgs_change={
-        'ar':u'روبوت: تغيير القوالب: %s',
-        'da':u'Bot: Erstatter skabeloner: %s',
-        'de':u'Bot: Ändere Vorlagen: %s',
-        'en':u'Robot: Changing templates: %s',
-        'es':u'Robot: Cambiando las plantillas: %s',
-        'fa':u'ربات:تغییر الگوها: %s',
-        'fi':u'Botti korvasi mallineet: %s',
-        'fr':u'Robot : Modifie modèles %s',
-        'he':u'בוט: משנה תבניות: %s',
-        'kk':u'Бот: Мына үлгілер өзгертілді: %s',
-        'lt':u'robotas: Keičiami šablonai: %s',
-        'nds':u'Bot: Vörlagen utwesselt: %s',
-        'ja':u'ロボットによるテンプレートの張り替え : %s',
-        'nl':u'Bot: vervangen sjablonen: %s',
-        'no':u'bot: Endrer maler: %s',
-        'pl':u'Robot zmienia szablony: %s',
-        'pt':u'Bot: Alterando predefinição: %s',
-        'ru':u'Робот: замена шаблонов: %s',
-        'uk':u'Робот: заміна шаблонів: %s',
-        'zh':u'機器人: 更改模板 %s',
-    }
-
-    # Summary messages for removing templates
-    msg_remove={
-        'ar':u'روبوت: إزالة القالب: %s',
-        'da':u'Bot: Fjerner skabelon: %s',
-        'de':u'Bot: Entferne Vorlage: %s',
-        'en':u'Robot: Removing template: %s',
-        'es':u'Robot: Retirando la plantilla: %s',
-        'fa':u'ربات:حذف الگو: %s',
-        'fi':u'Botti poisti mallineen: %s',
-        'fr':u'Robot : Enlève le modèle: %s',
-        'he':u'בוט: מסיר תבנית: %s',
-        'hu':u'Robot: Sablon eltávolítása: %s',
-        'kk':u'Бот: Мына үлгі аластатылды: %s',
-        'ia':u'Robot: Elimination del template: %s',
-        'lt':u'robotas: Šalinamas šablonas: %s',
-        'nds':u'Bot: Vörlaag rut: %s',
-        'ja':u'ロボットによるテンプレートの除去 : %s',
-        'nl':u'Bot: verwijderen sjabloon: %s',
-        'no':u'bot: Fjerner mal: %s',
-        'pl':u'Robot usuwa szablon: %s',
-        'pt':u'Bot: Removendo predefinição: %s',
-        'ru':u'Робот: удаление шаблона: %s',
-        'sr':u'Бот: Уклањање шаблона: %s',
-        'uk':u'Робот: видалення шаблону: %s',
-        'zh':u'機器人: 移除模板 %s',
-    }
-
-    #Needs more translations!
-    msgs_remove={
-        'ar':u'روبوت: إزالة القوالب: %s',
-        'da':u'Bot: Fjerner skabeloner: %s',
-        'de':u'Bot: Entferne Vorlagen: %s',
-        'en':u'Robot: Removing templates: %s',
-        'es':u'Robot: Retirando las plantillas: %s',
-        'fa':u'ربات:حذف الگوها: %s',
-        'fi':u'Botti poisti mallineet: %s',
-        'he':u'בוט: מסיר תבניות: %s',
-        'fr':u'Robot : Enlève modèles : %s',
-        'kk':u'Бот: Мына үлгілер аластатылды: %s',
-        'lt':u'robotas: Šalinami šablonai: %s',
-        'nds':u'Bot: Vörlagen rut: %s',
-        'ja':u'ロボットによるテンプレートの除去 : %s',
-        'nl':u'Bot: verwijderen sjablonen: %s',
-        'no':u'bot: Fjerner maler: %s',
-        'pl':u'Robot usuwa szablony: %s',
-        'ru':u'Робот: удаление шаблонов: %s',
-        'pt':u'Bot: Removendo predefinição: %s',
-        'uk':u'Робот: видалення шаблонів: %s',
-        'zh':u'機器人: 移除模板 %s',
-    }
-
-    # Summary messages for substituting templates
-    #Needs more translations!
-    msg_subst={
-        'ar':u'روبوت: نسخ القالب: %s',
-        'da':u'Bot: Substituerer skabelon: %s',
-        'de':u'Bot: Umgehe Vorlage: %s',
-        'en':u'Robot: Substituting template: %s',
-        'es':u'Robot: Sustituyendo la plantilla: %s',
-        'fa':u'ربات: جایگزینی الگو: %s',
-        'fi':u'Botti substasi mallineen: %s',
-        'fr':u'Robot : Remplace modèle : %s',
-        'he':u'בוט: מכליל תבנית בקוד הדף: %s',
-        'kk':u'Бот: Мына үлгі бәделдірленді: %s',
-        'nds':u'Bot: Vörlaag in Text övernahmen: %s',
-        'ja':u'ロボットによるテンプレートの置換 : %s',
-        'nl':u'Bot: substitueren sjabloon: %s',
-        'no':u'bot: Erstatter mal: %s',
-        'pl':u'Robot podmienia szablon: %s',
-        'pt':u'Bot: Substituindo predefinição: %s',
-        'ru':u'Робот: подстановка шаблона: %s',
-        'uk':u'Робот: підстановка шаблону: %s',
-        'zh':u'機器人: 更換模板 %s',
-    }
-
-    #Needs more translations!
-    msgs_subst={
-        'ar':u'روبوت: نسخ القوالب: %s',
-        'da':u'Bot: Substituerer skabeloner: %s',
-        'de':u'Bot: Umgehe Vorlagen: %s',
-        'en':u'Robot: Substituting templates: %s',
-        'es':u'Robot: Sustituyendo las plantillas: %s',
-        'fa':u'ربات: جایگزینی الگوها: %s',
-        'fi':u'Botti substasi mallineet: %s',
-        'fr':u'Robot : Remplace modèles : %s',
-        'he':u'בוט: מכליל תבניות בקוד הדף: %s',
-        'kk':u'Бот: Мына үлгілер бәделдірленді: %s',
-        'nds':u'Bot: Vörlagen in Text övernahmen: %s',
-        'ja':u'ロボットによるテンプレートの置換 : %s',
-        'nl':u'Bot: substitueren sjablonen: %s',
-        'no':u'bot: Erstatter maler: %s',
-        'pl':u'Robot podmienia szablony: %s',
-        'pt':u'Bot: Substituindo predefinição: %s',
-        'ru':u'Робот: подстановка шаблонов: %s',
-        'uk':u'Робот: підстановка шаблонів: %s',
-        'zh':u'機器人: 更換模板 %s',
-    }
-
     def __init__(self, generator, templates, subst = False, remove = False,
                  editSummary = '', acceptAll = False, addedCat = None):
         """
@@ -315,35 +208,24 @@ class TemplateRobot:
         self.editSummary = editSummary
         self.acceptAll = acceptAll
         self.addedCat = addedCat
-        s = pywikibot.Site()
+        site = pywikibot.Site()
         if self.addedCat:
-            self.addedCat = pywikibot.Category(s,
-                              s.namespace(14) + ':' + self.addedCat)
+            self.addedCat = pywikibot.Category(
+                site, u'%s:%s' % (site.namespace(14), self.addedCat))
 
         # get edit summary message if it's empty
         if (self.editSummary==''):
-            oldTemplateNames = (', ').join(self.templates.keys())
+            Param = {'list': (', ').join(self.templates.keys()),
+                     'num' : len(self.templates)}
             if self.remove:
-                if len(self.templates) > 1:
-                    self.editSummary = pywikibot.translate(s, self.msgs_remove) \
-                                         % oldTemplateNames
-                else:
-                    self.editSummary = pywikibot.translate(s, self.msg_remove) \
-                                         % oldTemplateNames
+                self.editSummary = i18n.twntranslate(
+                    site, 'template-removing', Param)
             elif self.subst:
-                if len(self.templates) > 1:
-                    self.editSummary = pywikibot.translate(s, self.msgs_subst) \
-                                         % oldTemplateNames
-                else:
-                    self.editSummary = pywikibot.translate(s, self.msg_subst) \
-                                         % oldTemplateNames
+                self.editSummary = i18n.twntranslate(
+                    site, 'template-substituting', Param)
             else:
-                if len(self.templates) > 1:
-                    self.editSummary = pywikibot.translate(s, self.msgs_change) \
-                                         % oldTemplateNames
-                else:
-                    self.editSummary = pywikibot.translate(s, self.msg_change) \
-                                         % oldTemplateNames
+                self.editSummary = i18n.twntranslate(
+                    site, 'template-changing', Param)
 
     def run(self):
         """
@@ -357,35 +239,36 @@ class TemplateRobot:
 
         replacements = []
         exceptions = {}
-        s = pywikibot.Site()
-
+        site = pywikibot.getSite()
         for old, new in self.templates.iteritems():
-            if not s.nocapitalize:
-                pattern = '[' + re.escape(old[0].upper()) \
-                              + re.escape(old[0].lower()) + ']' \
-                              + re.escape(old[1:])
+            namespaces = list(site.namespace(10, all=True))
+            if not site.nocapitalize:
+                pattern = '[' + \
+                          re.escape(old[0].upper()) + \
+                          re.escape(old[0].lower()) + \
+                          ']' + re.escape(old[1:])
             else:
                 pattern = re.escape(old)
             pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-            templateRegex = re.compile(r'\{\{ *([Tt]emplate:|[mM][sS][gG]:)?'
-                                         + pattern
-                                         + r'(?P<parameters>\s*\|.+?|) *}}',
+            templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces) + \
+                                       r':|[mM][sS][gG]:)?' + pattern + \
+                                       r'(?P<parameters>\s*\|.+?|) *}}',
                                        re.DOTALL)
 
             if self.remove:
                 replacements.append((templateRegex, ''))
             elif self.subst:
                 replacements.append((templateRegex,
-                                     '{{subst:' + old + '\g<parameters>}}'))
-                exceptions['inside-tags']=['ref']
+                                     '{{subst:%s\g<parameters>}}' % old))
+                exceptions['inside-tags']=['ref', 'gallery']
             else:
                 replacements.append((templateRegex,
-                                     '{{' + new + '\g<parameters>}}'))
+                                     '{{%s\g<parameters>}}' % new))
 
         replaceBot = replace.ReplaceRobot(self.generator, replacements,
-                             exceptions, acceptall=self.acceptAll,
-                             addedCat=self.addedCat,
-                             summary=self.editSummary)
+                                          exceptions, acceptall=self.acceptAll,
+                                          addedCat=self.addedCat,
+                                          editSummary=self.editSummary)
         replaceBot.run()
 
 def main(*args):
@@ -400,6 +283,9 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
     # If xmlfilename is None, references will be loaded from the live wiki.
     xmlfilename = None
+    user = None
+    skip = False
+    timestamp = None
     # read command line parameters
     for arg in pywikibot.handleArgs(*args):
         if arg == '-remove':
@@ -410,7 +296,8 @@ def main(*args):
             acceptAll = True
         elif arg.startswith('-xml'):
             if len(arg) == 4:
-                xmlfilename = pywikibot.input(u'Please enter the XML dump\'s filename: ')
+                xmlfilename = pywikibot.input(
+                    u'Please enter the XML dump\'s filename: ')
             else:
                 xmlfilename = arg[5:]
         elif arg.startswith('-namespace:'):
@@ -422,11 +309,18 @@ def main(*args):
             addedCat = arg[len('-category:'):]
         elif arg.startswith('-summary:'):
             editSummary = arg[len('-summary:'):]
+        elif arg.startswith('-user:'):
+            user = arg[len('-user:'):]
+        elif arg.startswith('-skipuser:'):
+            user = arg[len('-skipuser:'):]
+            skip = True
+        elif arg.startswith('-timestamp:'):
+            timestamp = arg[len('-timestamp:'):]
         else:
             if not genFactory.handleArg(arg):
                 templateNames.append(
-                    pywikibot.Page(pywikibot.Site(), arg, ns=10
-                                  ).title(withNamespace=False))
+                    pywikibot.Page(pywikibot.Site(), arg,
+                                   ns=10).title(withNamespace=False))
 
     if subst or remove:
         for templateName in templateNames:
@@ -452,14 +346,15 @@ u'Unless using -subst or -remove, you must give an even number of template names
         gen = genFactory.getCombinedGenerator()
     if not gen:
         gens = []
-        gens = [pagegenerators.ReferringPageGenerator(t,
-                    onlyTemplateInclusion = True) for t in oldTemplates]
+        gens = [pagegenerators.ReferringPageGenerator(
+                    t, onlyTemplateInclusion=True) for t in oldTemplates]
         gen = pagegenerators.CombinedPageGenerator(gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
 
     if namespaces:
         gen =  pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
-
+    if user:
+        gen = UserEditFilterGenerator(gen, user, timestamp, skip)
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
 
     bot = TemplateRobot(preloadingGen, templates, subst, remove, editSummary,
