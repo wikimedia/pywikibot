@@ -131,7 +131,7 @@ class Family(family.Family):
         self.interwiki_attop = ['pl']
 
     def version(self, code):
-        return '1.17wmf1'
+        return '1.18wmf1' if code == 'simple' else '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

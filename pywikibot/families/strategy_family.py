@@ -15,9 +15,6 @@ class Family(family.Family):
         }
         self.interwiki_forward = 'wikipedia'
 
-    def version(self, code):
-        return '1.17wmf1'
-
     def dbName(self, code):
         return 'strategywiki_p'
 
