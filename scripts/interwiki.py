@@ -878,14 +878,14 @@ class Subject(object):
         """Add the given translation hints to the todo list"""
         if globalvar.same:
             if hints:
-                pages = titletranslate.translate(self.originPage, hints = hints + ['all:'], auto = globalvar.auto, removebrackets
-= globalvar.hintnobracket)
+                pages = titletranslate.translate(self.originPage, hints = hints + ['all:'],
+                           auto = globalvar.auto, removebrackets = globalvar.hintnobracket)
             else:
-                pages = titletranslate.translate(self.originPage, hints = ['all:'], auto = globalvar.auto, removebrackets
-= globalvar.hintnobracket)
+                pages = titletranslate.translate(self.originPage, hints = ['all:'],
+                           auto = globalvar.auto, removebrackets = globalvar.hintnobracket)
         else:
-            pages = titletranslate.translate(self.originPage, hints = hints, auto = globalvar.auto, removebrackets
-= globalvar.hintnobracket)
+            pages = titletranslate.translate(self.originPage, hints = hints,
+                           auto = globalvar.auto, removebrackets = globalvar.hintnobracket)
         for page in pages:
             if globalvar.contentsondisk:
                 page = StoredPage(page)
@@ -1685,6 +1685,10 @@ u'NOTE: number of edits are restricted at %s'
             pywikibot.output(u"Not editing %s: page does not exist"
                              % page)
             raise SaveError(u'Page doesn\'t exist')
+        if page.isEmpty() and not page.isCategory():
+            pywikibot.output(u"Not editing %s: page is empty"
+                             % page.aslink(True))
+            raise SaveError
 
         # clone original newPages dictionary, so that we can modify it to the
         # local page's needs
@@ -2227,9 +2231,9 @@ def compareLanguages(old, new, insite):
 
         mcomment += globalvar.summary
 
-        changes = {'adding':    ','.join([fmt(new, x) for x in adding]),
-                   'removing':  ','.join([fmt(old, x) for x in removing]),
-                   'modifying': ','.join([fmt(new, x) for x in modifying])}
+        changes = {'adding':    ', '.join([fmt(new, x) for x in adding]),
+                   'removing':  ', '.join([fmt(old, x) for x in removing]),
+                   'modifying': ', '.join([fmt(new, x) for x in modifying])}
 
         mcomment += i18n.twtranslate(insite.lang, commentname) % changes
         mods = i18n.twtranslate('en', commentname) % changes
