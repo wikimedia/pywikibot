@@ -230,7 +230,6 @@ class Page(object):
         return self.autoFormat()[0] is not None
 
     @deprecate_arg("throttle", None)
-    @deprecate_arg("nofollow_redirects", None)
     @deprecate_arg("change_edit_time", None)
     def get(self, force=False, get_redirect=False, sysop=False):
         """Return the wiki-text of the page.
@@ -297,7 +296,6 @@ class Page(object):
             raise self._getexception
 
     @deprecate_arg("throttle", None)
-    @deprecate_arg("nofollow_redirects", None)
     @deprecate_arg("change_edit_time", None)
     def getOldVersion(self, oldid, force=False, get_redirect=False,
                       sysop=False):
@@ -528,7 +526,7 @@ class Page(object):
                 try:
                     default = set(self.site.family.disambig('_default'))
                 except KeyError:
-                    default = set(u'Disambig')
+                    default = set([u'Disambig'])
                 try:
                     distl = self.site.family.disambig(self.site.code,
                                                       fallback=False)
@@ -1131,7 +1129,7 @@ class Page(object):
     def delete(self, reason=None, prompt=True, throttle=None, mark=False):
         """Deletes the page from the wiki. Requires administrator status.
 
-        @param reason: The edit summary for the deletion.
+        @param reason: The edit summary for the deletion. If None, ask for it.
         @param prompt: If true, prompt user for confirmation before deleting.
         @param mark: if true, and user does not have sysop rights, place a
             speedy-deletion request on the page instead.
@@ -1221,10 +1219,10 @@ class Page(object):
         If no calls have been made since loadDeletedRevisions(), everything
         will be restored.
 
-        Simplest case::
+        Simplest case:
             Page(...).undelete('This will restore all revisions')
 
-        More complex::
+        More complex:
             pg = Page(...)
             revs = pg.loadDeletedRevsions()
             for rev in revs:
