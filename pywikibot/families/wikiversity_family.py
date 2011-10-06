@@ -18,8 +18,5 @@ class Family(family.Family):
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wikiversity.org' % lang
 
-    def version(self,code):
-        return '1.18wmf1' if code == 'beta' else '1.17wmf1'
-
     def shared_image_repository(self, code):
         return ('commons', 'commons')

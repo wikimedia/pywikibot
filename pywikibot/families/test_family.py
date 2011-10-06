@@ -14,9 +14,6 @@ class Family(family.Family):
             'test': 'test.wikipedia.org',
         }
 
-    def version(self, code):
-        return '1.17wmf1'
-
     def shared_image_repository(self, code):
         return ('commons', 'commons')
 

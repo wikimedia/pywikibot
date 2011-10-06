@@ -566,10 +566,6 @@ class Family(family.Family):
         else:
             return self.known_families
 
-    def version(self, code):
-        return '1.18wmf1' if code in (
-            'en', 'eo', 'fr', 'nl', 'pl', 'simple') else '1.17wmf1'
-
     def dbName(self, code):
         # returns the name of the MySQL database
         # for historic reasons, the databases are called xxwiki instead of

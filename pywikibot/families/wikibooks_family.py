@@ -107,8 +107,5 @@ class Family(family.Family):
             'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
 
-    def version(self, code):
-        return '1.18wmf1' if code == 'en' else '1.17wmf1'
-
     def shared_image_repository(self, code):
         return ('commons', 'commons')

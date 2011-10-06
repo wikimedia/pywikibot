@@ -112,9 +112,6 @@ class Family(family.Family):
             'zh-cn': 'zh'
         }
 
-    def version(self, code):
-        return '1.18wmf1' if code == 'en' else '1.17wmf1'
-
     def code2encodings(self, code):
         """
         Return a list of historical encodings for a specific language wikipedia
