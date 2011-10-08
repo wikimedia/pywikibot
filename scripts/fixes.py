@@ -444,12 +444,12 @@ fixes = {
     },
 
     #Corrections for Arabic Wikipedia and any Arabic wiki.
-    #python replace.py -always -start:! -fix:correct-ar
+    #python replace.py -fix:correct-ar -start:! -always
 
     'correct-ar': {
         'regex': True,
         'msg': {
-            'ar':u'تدقيق إملائي. 528 كلمة مستهدفة حاليًا.',
+            'ar':u'تدقيق إملائي',
         },
         'replacements': [
             #(u' ,', u' ،'), #FIXME: Do not replace comma in non-Arabic text, interwiki, image links or <math> syntax.
@@ -479,7 +479,6 @@ fixes = {
             (ur'\bأحدى\b', u'إحدى'),
             (ur'\bلاكن\b', u'لكن'),
             (ur'\bإثنان\b', u'اثنان'),
-            (ur'\bشيئ\b', u'شيء'),
             (ur'\bإحتياط\b', u'احتياط'),
             (ur'\bإقتباس\b', u'اقتباس'),
             (ur'\bادارة\b', u'إدارة'),
@@ -501,7 +500,7 @@ fixes = {
             (ur'\bاخي\b', u'أخي'),
             (ur'\bاحد\b', u'أحد'),
             (ur'\bاربعاء\b', u'أربعاء'),
-            #(ur'\bاول\b', u'أول'), #FIXME: Do not replace this (and all others) in interwiki links. This is an Arabic typo, but it is correct in Farsi.
+            (ur'\bاول\b', u'أول'),
             (ur'\b(ال|)اهم\b', ur'\1أهم'),
             (ur'\b(ال|)اثقل\b', ur'\1أثقل'),
             (ur'\b(ال|)امجد\b', ur'\1أمجد'),
@@ -544,7 +543,14 @@ fixes = {
             (ur'\b(ال|)(ا|أ)(رثوذكس|رثوذوكس)(ي|ية|يتان|يان|يين|يي|يون|يو|يات|)\b', ur'\1أرثوذكس\4'),
             (ur'\bإست(عمل|خدم|مر|مد|مال|عاض|قام|حال|جاب|قال|زاد|عان|طال)(ت|ا|وا|)\b', ur'است\1\2'),
             (ur'\bإست(حال|قال|طال|زاد|عان|قام|راح|جاب|عاض|مال)ة\b', ur'است\1ة'),
-        ]
+        ],
+        'exceptions': {
+            'inside-tags': [
+                'interwiki',
+                'math',
+                'ref',
+            ],
+        }
     },
     'specialpages': {
         'regex': False,
