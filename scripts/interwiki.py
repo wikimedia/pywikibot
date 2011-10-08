@@ -322,8 +322,8 @@ import codecs
 import pickle
 import socket
 import pywikibot
-import config2 as config
-import catlib
+from pywikibot import config
+from pywikibot import catlib
 from pywikibot import pagegenerators
 from pywikibot import i18n
 import titletranslate, interwiki_graph
