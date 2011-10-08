@@ -497,7 +497,7 @@ def main(*args):
         elif arg.startswith('-page'):
             if len(arg) == 5:
                 PageTitles.append(pywikibot.input(
-                                    u'Which page do you want to change?'))
+                    u'Which page do you want to change?'))
             else:
                 PageTitles.append(arg[6:])
         elif arg.startswith('-excepttitle:'):
@@ -601,8 +601,12 @@ u'Press Enter to use this default message, or enter a description of the\nchange
         if "regex" in fix:
             regex = fix['regex']
         if "msg" in fix:
-            edit_summary = \
-                pywikibot.translate(pywikibot.getSite(), fix['msg'])
+            if isinstance(fix['msg'], basestring):
+                edit_summary = i18n.twtranslate(pywikibot.getSite(),
+                                                str(fix['msg']))
+            else:
+                edit_summary = pywikibot.translate(pywikibot.getSite(),
+                                                   fix['msg'])
         if "exceptions" in fix:
             exceptions = fix['exceptions']
         if "nocase" in fix:
