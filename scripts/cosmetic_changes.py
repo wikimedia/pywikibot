@@ -31,10 +31,18 @@ There is another config variable: You can set
 if you're running a bot on multiple sites and want to do cosmetic changes on
 all of them, but be careful if you do.
 """
+#
+# (C) xqt, 2009-2011
+# (C) Pywikipedia bot team, 2006-2010
+#
+# Distributed under the terms of the MIT license.
+#
 __version__ = '$Id$'
+#
 import pywikibot
 import isbn
-from pywikibot import pagegenerators, i18n
+from pywikibot import pagegenerators
+from pywikibot import i18n
 import sys
 import re
 
@@ -47,13 +55,6 @@ docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
     '&warning;': warning,
 }
-
-# Summary message when using this module as a stand-alone script
-msg_standalone = 'cosmetic_changes-standalone'
-
-# Summary message  that will be appended to the normal message when
-# cosmetic changes are made on the fly
-msg_append = 'cosmetic_changes-append'
 
 nn_iw_msg = u'<!--interwiki (no, sv, da first; then other languages alphabetically by name)-->'
 
@@ -323,6 +324,8 @@ class CosmeticChangesToolkit:
         # ignore ' see http://eo.wikipedia.org/w/index.php?title=Liberec&diff=next&oldid=2320801
         #if self.site.lang == 'eo':
         #    ignore += [39]
+        if self.template:
+            ignore += [58]
         text = pywikibot.html2unicode(text, ignore = ignore)
         return text
 
@@ -374,12 +377,14 @@ class CosmeticChangesToolkit:
         German, and French Wikipedia. It might be that it is not wanted on other
         wikis. If there are any complaints, please file a bug report.
         """
-        exceptions = ['comment', 'math', 'nowiki', 'pre', 'source', 'timeline']
+        exceptions = ['comment', 'math', 'nowiki', 'pre', 'source', 'template',
+                      'timeline']
         if not (self.redirect or self.template) and \
            pywikibot.calledModuleName() != 'capitalize_redirects':
             text = pywikibot.replaceExcept(
                 text,
-                r'(?m)^(?P<bullet>[:;]*(\*+|#+)[:;\*#]*)(?P<char>[^\s\*#:;].+?)', '\g<bullet> \g<char>',
+                r'(?m)^(?P<bullet>[:;]*(\*+|#+)[:;\*#]*)(?P<char>[^\s\*#:;].+?)',
+                '\g<bullet> \g<char>',
                 exceptions)
         return text
 
@@ -643,7 +648,8 @@ def main():
 
     if editSummary == '':
         # Load default summary message.
-        editSummary = i18n.twtranslate(pywikibot.getSite(), msg_standalone)
+        editSummary = i18n.twtranslate(pywikibot.getSite(),
+                                       'cosmetic_changes-standalone')
     if pageTitle:
         site = pywikibot.getSite()
         gen = iter([pywikibot.Page(pywikibot.Link(t, site)) for t in pageTitle])
