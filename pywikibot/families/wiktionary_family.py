@@ -11,9 +11,9 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'zh', 'mg', 'lt', 'ru', 'tr', 'pl', 'ta', 'vi', 'ko',
-            'de', 'io', 'el', 'fi', 'hu', 'pt', 'sv', 'kn', 'nl', 'no', 'my',
-            'it', 'hi', 'et', 'li', 'ml', 'fa', 'ja', 'lo', 'es', 'ku', 'ar',
+            'en', 'fr', 'zh', 'mg', 'lt', 'ru', 'tr', 'pl', 'ko', 'ta', 'vi',
+            'de', 'io', 'el', 'fi', 'pt', 'hu', 'sv', 'kn', 'nl', 'no', 'my',
+            'it', 'hi', 'et', 'li', 'ml', 'ja', 'fa', 'lo', 'es', 'ku', 'ar',
             'ro', 'te', 'id', 'gl', 'ca', 'cs', 'uk', 'bg', 'eo', 'vo', 'oc',
             'is', 'hr', 'br', 'eu', 'simple', 'scn', 'th', 'sr', 'af', 'fy',
             'sw', 'he', 'cy', 'la', 'sq', 'sl', 'hy', 'da', 'tt', 'wa',
@@ -21,7 +21,7 @@ class Family(family.Family):
             'hsb', 'kk', 'nn', 'ky', 'wo', 'km', 'bs', 'ang', 'be', 'ga', 'co',
             'mr', 'gn', 'ia', 'tl', 'sk', 'csb', 'ms', 'st', 'lb', 'nds', 'sd',
             'kl', 'sh', 'si', 'tg', 'ug', 'ti', 'mk', 'bn', 'nah', 'an', 'gu',
-            'zu', 'ss', 'qu', 'chr', 'am', 'ts', 'fo', 'rw', 'om', 'kw', 'gv',
+            'zu', 'am', 'ss', 'qu', 'chr', 'ts', 'fo', 'rw', 'kw', 'om', 'gv',
             'iu', 'su', 'mn', 'so', 'yi', 'ie', 'gd', 'za', 'pa', 'mt', 'tpi',
             'mi', 'dv', 'ik', 'jv', 'sg', 'roa-rup', 'uz', 'ln', 'sm', 'ha',
             'ay', 'sa', 'ks', 'jbo', 'na', 'fj', 'tn', 'dz',
