@@ -11,7 +11,7 @@ __version__ = '$Id$'
 import os
 import time
 import sys
-import config
+from pywikibot import config2 as config
 
 cache = None
 
@@ -31,8 +31,8 @@ def getversiondict():
         try:
             (tag, rev, date) = getversion_nightly()
         except Exception, e:
-            import wikipedia
-            version = wikipedia.__version__
+            import pywikibot
+            version = pywikibot.__version__
             if len(version) == 4:
                 # the value is most likely '$Id' + '$', it means that
                 # wikipedia.py got imported without using svn at all
@@ -42,7 +42,7 @@ def getversiondict():
             id, file, rev, date, ts, author, dollar = version.split(' ')
             tag = ''
             date = time.strptime('%sT%s' % (date, ts), '%Y-%m-%dT%H:%M:%SZ')
-            rev += ' (wikipedia.py)'
+            rev += ' (pywikibot.py)'
     datestring = time.strftime('%Y/%m/%d, %H:%M:%S', date)
     cache = dict(tag=tag, rev=rev, date=datestring)
     return cache
@@ -76,11 +76,8 @@ def getversion_nightly():
     return (tag, rev, date)
 
 if __name__ == '__main__':
-    print 'Pywikipedia %s' % getversion()
+    print 'Pywikibot %s' % getversion()
     print 'Python %s' % sys.version
-    print 'config-settings:'
-    print 'use_api =', config.use_api
-    print 'use_api_login =', config.use_api_login
     if not __import__('unicodedata').normalize('NFC', u'\u092e\u093e\u0930\u094d\u0915 \u091c\u093c\u0941\u0915\u0947\u0930\u092c\u0930\u094d\u0917') == u'\u092e\u093e\u0930\u094d\u0915 \u091c\u093c\u0941\u0915\u0947\u0930\u092c\u0930\u094d\u0917':
         print u'unicode test: triggers problem #3081100'
     else:
