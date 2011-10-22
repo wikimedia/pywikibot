@@ -2084,7 +2084,7 @@ class User(Page):
             ts = pywikibot.Timestamp.fromISOformat(contrib['timestamp'])
             ts = int(ts.strftime("%Y%m%d%H%M%S"))
             yield Page(self.site, contrib['title'], contrib['ns']), \
-                  contrib['revid'], ts, contrib['comment']
+                  contrib['revid'], ts, contrib.get('comment', None)
 
     @deprecate_arg("number", "total")
     def uploadedImages(self, total=10):
