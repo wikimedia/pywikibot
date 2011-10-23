@@ -2,6 +2,7 @@
 """ Module to determine the pywikipedia version (tag, revision and date) """
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2008
+# (C) xqt, 2010-2011
 # (C) Pywikipedia bot team, 2007-2011
 #
 # Distributed under the terms of the MIT license.
@@ -52,16 +53,31 @@ def getversion_svn():
 #   if not os.path.isabs(_program_dir):
 #      _program_dir = os.path.normpath(os.path.join(os.getcwd(), _program_dir))
     entries = open(os.path.join(_program_dir, '.svn/entries'))
-    for i in range(4):
-        entries.readline()
-    tag = entries.readline().strip()
-    t = tag.split('://')
-    t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/', '')
-    tag = '[%s] %s' % (t[0], t[1])
-    for i in range(4):
-        entries.readline()
-    date = time.strptime(entries.readline()[:19],'%Y-%m-%dT%H:%M:%S')
-    rev = entries.readline()[:-1]
+    version = entries.readline().strip()
+    #use sqlite table for new entries format
+    if version == "12":
+        entries.close()
+        from sqlite3 import dbapi2 as sqlite
+        from datetime import datetime
+        con = sqlite.connect(os.path.join(_program_dir, ".svn/wc.db"))
+        cur = con.cursor()
+        cur.execute( '''select local_relpath, repos_path, revision, changed_date from nodes order by revision desc''')
+        name, tag, rev, date = cur.fetchone()
+        con.close()
+        tag = tag.rstrip(name)
+        date = time.gmtime(date/1000000)
+    else:
+        for i in range(3):
+            entries.readline()
+        tag = entries.readline().strip()
+        t = tag.split('://')
+        t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/', '')
+        tag = '[%s] %s' % (t[0], t[1])
+        for i in range(4):
+            entries.readline()
+        date = time.strptime(entries.readline()[:19],'%Y-%m-%dT%H:%M:%S')
+        rev = entries.readline()[:-1]
+        entries.close()
     if not date or not tag or not rev:
         raise ParseError
     return (tag, rev, date)
