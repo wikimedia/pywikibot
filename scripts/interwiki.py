@@ -393,7 +393,8 @@ moved_links = {
              u'template documentation',
              u'template doc',
              u'doc',
-             u'توضیحات'], u'/doc'),
+             u'توضیحات',
+             u'زیرصفحه توضیحات'], u'/doc'),
     # fi: no idea how to handle this type of subpage at :Metasivu:
     'fi' : (u'mallineohje', None),
     'fr' : ([u'/documentation', u'documentation', u'doc_modèle',
