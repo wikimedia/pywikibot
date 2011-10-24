@@ -26,7 +26,6 @@ import itertools
 import Queue
 import re
 import sys
-import threading
 import codecs
 
 

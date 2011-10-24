@@ -113,7 +113,7 @@ talk about HTTP, where the typo has become part of the standard:
 """
 from __future__ import generators
 #
-# (C) Daniel Herding & the Pywikipedia team, 2004-2009
+# (C) Daniel Herding & the Pywikipedia team, 2004-2011
 #
 __version__='$Id$'
 #
@@ -672,13 +672,8 @@ LIMIT 200""" % (whereClause, exceptClause)
         # syntax error, show help text from the top of this file
         pywikibot.showHelp('replace')
         return
-    if xmlFilename:
-        # XML parsing can be quite slow, so use smaller batches and
-        # longer lookahead.
-        preloadingGen = pagegenerators.PreloadingGenerator(gen,
-                                            pageNumber=20, lookahead=100)
-    else:
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
+
+    preloadingGen = pagegenerators.PreloadingGenerator(gen)
     bot = ReplaceRobot(preloadingGen, replacements, exceptions, acceptall,
                        allowoverlap, recursive, add_cat, sleep, edit_summary)
     bot.run()
