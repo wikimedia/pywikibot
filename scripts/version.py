@@ -50,6 +50,7 @@ def getversiondict():
 
 def getversion_svn():
     _program_dir = os.path.normpath(os.path.dirname(sys.argv[0]))
+    _program_dir = _program_dir.rstrip(os.path.basename(_program_dir))
 #   if not os.path.isabs(_program_dir):
 #      _program_dir = os.path.normpath(os.path.join(os.getcwd(), _program_dir))
     entries = open(os.path.join(_program_dir, '.svn/entries'))
