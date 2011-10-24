@@ -18,5 +18,8 @@ class Family(family.Family):
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wikiversity.org' % lang
 
+        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = ['ja',]
+
     def shared_image_repository(self, code):
         return ('commons', 'commons')
