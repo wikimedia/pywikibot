@@ -288,6 +288,12 @@ class GeneratorFactory(object):
             page = pywikibot.Page(pywikibot.Link(title,
                                                  pywikibot.Site()))
             gen = InterwikiPageGenerator(page)
+        elif arg.startswith('-recentchanges'):
+            if len(arg) >= 15:
+                gen = RecentChangesPageGenerator(total=int(arg[15:]))
+            else:
+                gen = RecentChangesPageGenerator(total=60)
+            gen = DuplicateFilterPageGenerator(gen)
         elif arg.startswith('-file'):
             textfilename = arg[6:]
             if not textfilename:
@@ -411,11 +417,6 @@ class GeneratorFactory(object):
               gen = NewpagesPageGenerator(total=int(arg[10:]))
             else:
               gen = NewpagesPageGenerator(total=60)
-        elif arg.startswith('-recentchanges'):
-            if len(arg) >= 15:
-              gen = RecentChangesPageGenerator(total=int(arg[15:]))
-            else:
-              gen = RecentChangesPageGenerator(total=60)
         elif arg.startswith('-imagesused'):
             imagelinkstitle = arg[len('-imagesused:'):]
             if not imagelinkstitle:
