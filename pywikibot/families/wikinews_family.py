@@ -45,7 +45,7 @@ class Family(family.Family):
         }
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['cs', 'hu',]
+        self.cross_allowed = ['ca', 'cs', 'fa',]
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
             'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikiversity',

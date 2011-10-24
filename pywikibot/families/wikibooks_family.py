@@ -100,7 +100,7 @@ class Family(family.Family):
             'simple': alphabetic
         }
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['fa', 'fy', 'it', 'nl', 'ru', 'simple', 'zh']
+        self.cross_allowed = ['af', 'ang', 'ca', 'fa', 'it', 'nl', 'ru', 'th', 'zh']
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
             'wikipedia', 'wiktionary', 'wikiquote', 'wikiquote', 'wikinews', 'wikiversity',
