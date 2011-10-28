@@ -11,7 +11,7 @@ class Family(family.Family):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fr', 'ru', 'de', 'beta', 'cs', 'it', 'pt', 'es', 'ar', 'el',
+            'en', 'fr', 'de', 'ru', 'beta', 'cs', 'it', 'pt', 'es', 'ar', 'el',
             'sv', 'fi', 'ja',
         ]
 
