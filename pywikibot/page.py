@@ -3,7 +3,7 @@
 Objects representing various types of MediaWiki pages.
 """
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikipedia bot team, 2008-2011
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,6 +24,7 @@ import urllib
 
 logger = logging.getLogger("pywiki.wiki.page")
 
+# Pre-compile re expressions
 reNamespace = re.compile("^(.+?) *: *(.*)$")
 
 
@@ -94,7 +95,9 @@ class Page(object):
         return self._link.site
 
     def namespace(self):
-        """Return the number of the namespace of the page."""
+        """Return the number of the namespace of the page.
+
+        """
         return self._link.namespace
 
     @deprecate_arg("decode", None)
@@ -181,7 +184,7 @@ class Page(object):
     def __repr__(self):
         """Return a more complete string representation."""
         return "%s(%s)" % (self.__class__.__name__,
-                            self.title().encode(config.console_encoding))
+                           self.title().encode(config.console_encoding))
 
     def __cmp__(self, other):
         """Test for equality and inequality of Page objects.
