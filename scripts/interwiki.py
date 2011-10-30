@@ -2248,8 +2248,8 @@ def compareLanguages(old, new, insite):
     if adding or removing or modifying:
         #Version info marks bots without unicode error
         #This also prevents abuse filter blocking on de-wiki
-        if not pywikibot.unicode_error:
-            mcomment += u'r%s) (' % sys.version.split()[0]
+##        if not pywikibot.unicode_error:
+##            mcomment += u'r%s) (' % sys.version.split()[0]
 
         mcomment += globalvar.summary
 
