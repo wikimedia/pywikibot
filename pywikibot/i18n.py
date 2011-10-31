@@ -177,6 +177,8 @@ def _altlang(code):
         return ['ia', 'la', 'it', 'fr', 'es']
     if code == 'xmf':
         return ['ka']
+    if code in ['nso', 'st']:
+        return ['st', 'nso']
     #Default value
     return []
 
