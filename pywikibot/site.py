@@ -2015,14 +2015,13 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
     def recentchanges(self, start=None, end=None, reverse=False,
                       namespaces=None, pagelist=None, changetype=None,
                       showMinor=None, showBot=None, showAnon=None,
-                      showRedirects=None, showPatrolled=None, step=None,
-                      total=None):
+                      showRedirects=None, showPatrolled=None, topOnly=False,
+                      step=None, total=None):
         """Iterate recent changes.
 
         @param start: Timestamp to start listing from
         @param end: Timestamp to end listing at
         @param reverse: if True, start with oldest changes (default: newest)
-        @param limit: iterate no more than this number of entries
         @param pagelist: iterate changes to pages in this list only
         @param pagelist: list of Pages
         @param changetype: only iterate changes of this type ("edit" for
@@ -2038,6 +2037,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             False (and not None), only list edits to non-redirect pages
         @param showPatrolled: if True, only list patrolled edits; if False
             (and not None), only list non-patrolled edits
+        @param topOnly: if True, only list changes that are the latest revision
+            (default False)
 
         """
         if start and end:
@@ -2069,6 +2070,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
                                                       for p in pagelist)
         if changetype:
             rcgen.request["rctype"] = changetype
+        if topOnly:
+            rcgen.request["rctoponly"] = ""
         filters = {'minor': showMinor,
                    'bot': showBot,
                    'anon': showAnon,
