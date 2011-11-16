@@ -324,7 +324,6 @@ class Family:
             'metawiki':         'metawiki',
             'metawikipedia':    'metawikipedia',
             'mineralienatlas':  'mineralienatlas',
-            'minnan':           'minnan',
             'moinmoin':         'moinmoin',
             'monstropedia':     'monstropedia',
             'mosapedia':        'mosapedia',
