@@ -93,8 +93,8 @@ class BasicBot:
             return text
         return None
 
-    def save(self, text, page, comment=self.summary, minor=True,
-             botflag=None):
+    def save(self, text, page, comment=None, minorEdit=True,
+             botflag=True):
         # only save if something was changed
         if text != page.get():
             # Show the title of the page we're working on.
@@ -112,8 +112,8 @@ class BasicBot:
                     try:
                         page.text = text
                         # Save the page
-                        page.save(comment=comment, minor=minor,
-                                  botflag=botflag)
+                        page.save(comment=comment or self.comment,
+                                  minor=minor, botflag=botflag)
                     except pywikibot.LockedPage:
                         pywikibot.output(u"Page %s is locked; skipping."
                                          % page.title(asLink=True))
