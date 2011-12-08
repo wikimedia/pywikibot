@@ -13,10 +13,10 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'pl', 'it', 'es', 'he',
             'sq', 'fi', 'ca', 'vi', 'ru', 'cs', 'zh', 'id', 'hr', 'sv', 'tr',
-            'da', 'fa', 'th', 'gl', 'ko', 'ta', 'no', 'sr', 'ar', 'tl', 'mk',
-            'is', 'tt', 'lt', 'ka', 'eo', 'az', 'ro', 'bg', 'sl', 'sk', 'uk',
-            'el', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'mr', 'ur', 'bn',
-            'oc', 'ml', 'ms', 'hi', 'eu', 'fy', 'hy', 'ie', 'ne', 'te', 'af',
+            'da', 'fa', 'th', 'gl', 'ko', 'no', 'ta', 'sr', 'tl', 'ar', 'mk',
+            'is', 'tt', 'lt', 'ka', 'eo', 'az', 'ro', 'bg', 'uk', 'sl', 'sk',
+            'el', 'si', 'li', 'la', 'hy', 'ang', 'ia', 'cv', 'et', 'mr', 'ur',
+            'bn', 'oc', 'ml', 'hi', 'ms', 'eu', 'fy', 'ie', 'ne', 'te', 'af',
             'tg', 'sa', 'pa', 'bs', 'ky', 'be', 'cy', 'mg', 'zh-min-nan', 'ast',
             'ku', 'tk', 'su', 'uz', 'vo', 'kk', 'mn', 'my',
         ]
