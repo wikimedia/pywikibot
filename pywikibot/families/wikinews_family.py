@@ -12,7 +12,7 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'sr', 'en', 'pl', 'de', 'fr', 'it', 'es', 'pt', 'zh', 'ja', 'sv',
-            'ru', 'ta', 'cs', 'fi', 'el', 'fa', 'ro', 'ar', 'he', 'bg', 'tr',
+            'ru', 'ta', 'cs', 'el', 'fi', 'fa', 'ro', 'ar', 'he', 'bg', 'tr',
             'ca', 'sd', 'sq', 'uk', 'no', 'bs', 'ko', 'eo',
         ]
 

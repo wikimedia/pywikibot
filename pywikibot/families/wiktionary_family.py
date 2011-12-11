@@ -14,17 +14,17 @@ class Family(family.Family):
             'en', 'fr', 'zh', 'mg', 'lt', 'ko', 'ru', 'tr', 'pl', 'ta', 'vi',
             'de', 'io', 'el', 'fi', 'pt', 'hu', 'kn', 'sv', 'nl', 'no', 'my',
             'it', 'hi', 'et', 'li', 'ja', 'ml', 'fa', 'es', 'lo', 'ku', 'ar',
-            'ro', 'te', 'id', 'gl', 'ca', 'cs', 'uk', 'bg', 'eo', 'vo', 'oc',
+            'ro', 'id', 'te', 'gl', 'ca', 'cs', 'uk', 'bg', 'eo', 'vo', 'oc',
             'eu', 'is', 'hr', 'br', 'simple', 'scn', 'th', 'sr', 'af', 'fy',
             'sw', 'tl', 'he', 'fj', 'cy', 'la', 'ast', 'sq', 'hy', 'da', 'sl',
-            'tt', 'wa', 'zh-min-nan', 'ka', 'az', 'lv', 'ne', 'ur', 'tk', 'ps',
+            'tt', 'wa', 'zh-min-nan', 'ur', 'ka', 'az', 'lv', 'ne', 'tk', 'ps',
             'hsb', 'kk', 'nn', 'ky', 'wo', 'km', 'bs', 'ang', 'be', 'lb', 'ga',
             'co', 'mr', 'gn', 'ia', 'sk', 'csb', 'ms', 'st', 'nds', 'sd', 'kl',
             'sh', 'si', 'tg', 'ug', 'ti', 'mk', 'bn', 'nah', 'zu', 'an', 'gu',
             'chr', 'am', 'ss', 'qu', 'ts', 'fo', 'rw', 'kw', 'om', 'gv', 'iu',
             'su', 'mn', 'so', 'yi', 'ie', 'gd', 'za', 'pa', 'mt', 'mi', 'tpi',
-            'dv', 'ik', 'jv', 'sg', 'roa-rup', 'uz', 'ln', 'na', 'sm', 'tn',
-            'sa', 'ha', 'ay', 'ks', 'jbo', 'dz',
+            'dv', 'ik', 'jv', 'sg', 'roa-rup', 'uz', 'ln', 'sa', 'na', 'sm',
+            'tn', 'ha', 'ay', 'ks', 'jbo', 'dz',
         ]
 
         for lang in self.languages_by_size:
