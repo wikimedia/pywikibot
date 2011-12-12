@@ -701,7 +701,7 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     # Note: While allowing dots inside URLs, MediaWiki will regard
     # dots at the end of the URL as not part of that URL.
     # The same applies to comma, colon and some other characters.
-    notAtEnd = '\]\s\.:;,<>"\|'
+    notAtEnd = '\]\s\.:;,<>"\|\)'
     # So characters inside the URL can be anything except whitespace,
     # closing squared brackets, quotation marks, greater than and less
     # than, and the last character also can't be parenthesis or another
@@ -834,5 +834,3 @@ def extract_templates_and_params(text):
             # Add it to the result
             result.append((name, params))
     return result
-
-
