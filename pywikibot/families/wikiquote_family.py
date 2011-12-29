@@ -16,7 +16,7 @@ class Family(family.Family):
             'fa', 'hu', 'fi', 'sv', 'no', 'nn', 'ja', 'az', 'hy', 'li', 'et',
             'ar', 'ca', 'hr', 'cy', 'ko', 'ka', 'gl', 'sr', 'ro', 'ml', 'ku',
             'is', 'th', 'te', 'da', 'eu', 'af', 'sq', 'vi', 'hi', 'la', 'br',
-            'be', 'ta', 'mr', 'uz', 'ang', 'ur', 'zh-min-nan', 'gu', 'su', 'lb',
+            'ta', 'be', 'mr', 'uz', 'ang', 'ur', 'zh-min-nan', 'gu', 'su', 'lb',
             'kn', 'wo', 'ky', 'am', 'co',
         ]
 
