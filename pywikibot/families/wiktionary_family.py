@@ -12,18 +12,18 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'zh', 'mg', 'lt', 'ko', 'ru', 'tr', 'pl', 'ta', 'vi',
-            'de', 'io', 'el', 'fi', 'pt', 'hu', 'kn', 'sv', 'nl', 'no', 'my',
-            'it', 'hi', 'et', 'li', 'ja', 'ml', 'fa', 'es', 'lo', 'ku', 'ar',
-            'ro', 'id', 'te', 'gl', 'ca', 'cs', 'uk', 'bg', 'eo', 'vo', 'oc',
-            'eu', 'is', 'hr', 'br', 'simple', 'scn', 'th', 'sr', 'af', 'fy',
-            'sw', 'tl', 'he', 'fj', 'cy', 'la', 'ast', 'sq', 'hy', 'da', 'sl',
-            'tt', 'wa', 'zh-min-nan', 'ur', 'ka', 'az', 'lv', 'ne', 'tk', 'ps',
-            'hsb', 'kk', 'nn', 'ky', 'wo', 'km', 'bs', 'ang', 'be', 'lb', 'ga',
+            'de', 'io', 'el', 'fi', 'pt', 'hu', 'kn', 'sv', 'nl', 'no', 'it',
+            'my', 'id', 'hi', 'et', 'li', 'ja', 'ml', 'fa', 'es', 'lo', 'ku',
+            'ar', 'ro', 'te', 'gl', 'ca', 'cs', 'uk', 'bg', 'eo', 'vo', 'eu',
+            'oc', 'is', 'hr', 'br', 'simple', 'scn', 'th', 'sr', 'af', 'fy',
+            'sw', 'tl', 'he', 'cy', 'fj', 'ur', 'ast', 'la', 'sq', 'hy', 'da',
+            'sl', 'tt', 'wa', 'zh-min-nan', 'az', 'ka', 'lv', 'ne', 'tk', 'ps',
+            'hsb', 'kk', 'nn', 'ky', 'wo', 'km', 'lb', 'bs', 'be', 'ang', 'ga',
             'co', 'mr', 'gn', 'ia', 'sk', 'csb', 'ms', 'st', 'nds', 'sd', 'kl',
-            'sh', 'si', 'tg', 'ug', 'ti', 'mk', 'bn', 'nah', 'zu', 'an', 'gu',
-            'chr', 'am', 'ss', 'qu', 'ts', 'fo', 'rw', 'kw', 'om', 'gv', 'iu',
+            'sh', 'si', 'nah', 'tg', 'ug', 'ti', 'mk', 'bn', 'zu', 'an', 'gu',
+            'ss', 'chr', 'qu', 'am', 'ts', 'fo', 'rw', 'kw', 'om', 'gv', 'iu',
             'su', 'mn', 'so', 'yi', 'ie', 'gd', 'za', 'pa', 'mt', 'mi', 'tpi',
-            'dv', 'ik', 'jv', 'sg', 'roa-rup', 'uz', 'ln', 'sa', 'na', 'sm',
+            'dv', 'ik', 'roa-rup', 'sg', 'na', 'uz', 'ln', 'jv', 'sa', 'sm',
             'tn', 'ha', 'ay', 'ks', 'jbo', 'dz',
         ]
 
