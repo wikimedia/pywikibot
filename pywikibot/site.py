@@ -2052,7 +2052,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             "recentchanges: start must be later than end with reverse=False")
         rcgen = self._generator(api.ListGenerator, type_arg="recentchanges",
                                 rcprop="user|comment|timestamp|title|ids"
-                                       "|redirect|loginfo|flags",
+                                       "|sizes|redirect|patrolled|loginfo"
+                                       "|flags",
                                 namespaces=namespaces, step=step,
                                 total=total)
         if start is not None:
@@ -2852,6 +2853,218 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             imagepage._imageinfo = result["imageinfo"]
             return
 
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    @deprecate_arg("namespace", "namespaces")
+    @deprecate_arg("rc_show", None)
+    def newpages(self, get_redirect=False, user=None, returndict=False,
+                 start=None, end=None, reverse=False, showBot=False,
+                 showRedirects=False, excludeuser=None,
+                 showPatrolled=None, namespaces=None, step=None, total=None):
+        """Yield new articles (as Page objects) from recent changes.
+
+        Starts with the newest article and fetches the number of articles
+        specified in the first argument. If repeat is True, it fetches
+        Newpages again. If there is no new page, it blocks until there is
+        one, sleeping between subsequent fetches of Newpages.
+
+        The objects yielded are dependent on paramater returndict.
+        When true, it yields a tuple composed of a Page object and a dict of
+        attributes.
+        When false, it yields a tuple composed of the Page object,
+        timestamp (unicode), length (int), an empty unicode string, username
+        or IP address (str), comment (unicode).
+
+        """
+        # TODO: update docstring
+        
+        # N.B. API still provides no way to access Special:Newpages content
+        # directly, so we get new pages indirectly through 'recentchanges'
+
+        namespaces = namespaces if namespaces is not None else namespace
+        gen = self.recentchanges(start=start, end=end, reverse=reverse,
+                namespaces=namespaces, changetype="new", user=user,
+                excludeuser=excludeuser, showBot=showBot,
+                showRedirects=showRedirects, showPatrolled=showPatrolled,
+                step=step, total=total)
+        for pageitem in gen:
+            newpage = pywikibot.Page(self, pageitem['title'])
+            if returndict:
+                yield (newpage, pageitem)
+            else:
+                yield (newpage, pageitem['newlen'], u'', pageitem['user'],
+                       pageitem['comment'])
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def newimages(self, user=None, start=None, end=None, reverse=False,
+                  step=None, total=None):
+        """Yield information about newly uploaded images.
+
+        Yields a tuple of ImagePage, Timestamp, user(unicode), comment(unicode).
+
+        N.B. the API does not provide direct access to Special:Newimages, so
+        this is derived from the "upload" log events instead.
+        
+        """
+        #TODO: update docstring
+        for event in logevents(self, logtype="upload", user=user,
+                               start=start, end=end, reverse=reverse,
+                               step=step, total=total):
+            image = pywikibot.ImagePage(self, event['title'])
+            date = pywikibot.Timestamp.fromISOformat(event['timestamp'])
+            user = event['user']
+            comment = event['comment'] or u''
+            yield (image, date, user, comment)
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def longpages(self, step=None, total=None):
+        """Yield Pages and lengths from Special:Longpages.
+
+        Yields a tuple of Page object, length(int).
+
+        """
+        lpgen = self._generator(api.ListGenerator,
+                                type_arg="querypage", qppage="Longpages",
+                                step=step, total=total)
+        for pageitem in lpgen:
+            yield (pywikibot.Page(self, pageitem['title']),
+                   int(pageitem['value']))
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def shortpages(self, step=None, total=None):
+        """Yield Pages and lengths from Special:Shortpages.
+
+        Yields a tuple of Page object, length(int).
+
+        """
+        spgen = self._generator(api.ListGenerator,
+                                type_arg="querypage", qppage="Shortpages",
+                                step=step, total=total)
+        for pageitem in spgen:
+            yield (pywikibot.Page(self, pageitem['title']),
+                   int(pageitem['value']))
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def deadendpages(self, step=None, total=None):
+        """Yield Page objects retrieved from Special:Deadendpages."""
+        degen = self._generator(api.PageGenerator,
+                                type_arg="querypage", gqppage="Deadendpages",
+                                step=step, total=total)
+        return degen
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def ancientpages(self, step=None, total=None):
+        """Yield Pages, datestamps from Special:Ancientpages."""
+        apgen = self._generator(api.ListGenerator,
+                                type_arg="querypage", qppage="Ancientpages",
+                                step=step, total=total)
+        for pageitem in apgen:
+            yield (pywikibot.Page(self, pageitem['title']),
+                   pywikibot.Timestamp.fromISOformat(pageitem['timestamp']))
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def lonelypages(self, step=None, total=None):
+        """Yield Pages retrieved from Special:Lonelypages."""
+        lpgen = self._generator(api.PageGenerator,
+                                type_arg="querypage", gqppage="Lonelypages",
+                                step=step, total=total)
+        return lpgen
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def unwatchedpages(self, step=None, total=None):
+        """Yield Pages from Special:Unwatchedpages (requires Admin privileges)."""
+        uwgen = self._generator(api.PageGenerator,
+                                type_arg="querypage", gqppage="Unwatchedpages",
+                                step=step, total=total)
+        return uwgen
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def uncategorizedcategories(self, number=None, repeat=True,
+                                step=None, total=None):
+        """Yield Categories from Special:Uncategorizedcategories."""
+        ucgen = self._generator(api.CategoryPageGenerator,
+                                type_arg="querypage",
+                                gqppage="Uncategorizedcategories",
+                                step=step, total=total)
+        return ucgen
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def uncategorizedimages(self, number=None, repeat=True,
+                            step=None, total=None):
+        """Yield ImagePages from Special:Uncategorizedimages."""
+        uigen = self._generator(api.ImagePageGenerator,
+                                type_arg="querypage",
+                                gqppage="Uncategorizedimages",
+                                step=step, total=total)
+        return uigen
+
+    #synonym
+    uncategorizedfiles = uncategorizedimages
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def uncategorizedpages(self, number=None, repeat=True,
+                           step=None, total=None):
+        """Yield Pages from Special:Uncategorizedpages."""
+        upgen = self._generator(api.PageGenerator,
+                                type_arg="querypage",
+                                gqppage="Uncategorizedpages",
+                                step=step, total=total)
+        return upgen
+    
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def uncategorizedtemplates(self, number=None, repeat=True,
+                           step=None, total=None):
+        """Yield Pages from Special:Uncategorizedtemplates."""
+        utgen = self._generator(api.PageGenerator,
+                                type_arg="querypage",
+                                gqppage="Uncategorizedtemplates",
+                                step=step, total=total)
+        return utgen
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def unusedcategories(self, step=None, total=None):
+        """Yield Category objects from Special:Unusedcategories."""
+        ucgen = self._generator(api.CategoryPageGenerator,
+                                type_arg="querypage",
+                                gqppage="Unusedcategories",
+                                step=step, total=total)
+        return ucgen
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def unusedfiles(self, step=None, total=None):
+        """Yield ImagePage objects from Special:Unusedimages."""
+        uigen = self._generator(api.ImagePageGenerator,
+                                type_arg="querypage",
+                                gqppage="Unusedimages",
+                                step=step, total=total)
+        return uigen
+
+    #synonym
+    unusedimages = unusedfiles
+
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def withoutinterwiki(self, step=None, total=None):
+        """Yield Pages without language links from Special:Withoutinterwiki."""
+        wigen = self._generator(api.PageGenerator,
+                                type_arg="querypage",
+                                gqppage="Withoutinterwiki",
+                                step=step, total=total)
+        return wigen
+
 
 #### METHODS NOT IMPLEMENTED YET ####
 class NotImplementedYet:
@@ -2898,326 +3111,6 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 f.close()
 
     # THESE ARE FUNCTIONS NOT YET IMPLEMENTED IN THE API
-    #TODO: avoid code duplication for the following methods
-    def newpages(self, number = 10, get_redirect = False, repeat = False):
-        """Yield new articles (as Page objects) from Special:Newpages.
-
-        Starts with the newest article and fetches the number of articles
-        specified in the first argument. If repeat is True, it fetches
-        Newpages again. If there is no new page, it blocks until there is
-        one, sleeping between subsequent fetches of Newpages.
-
-        The objects yielded are tuples composed of the Page object,
-        timestamp (unicode), length (int), an empty unicode string, username
-        or IP address (str), comment (unicode).
-
-        """
-        # TODO: in recent MW versions Special:Newpages takes a namespace parameter,
-        #       and defaults to 0 if not specified.
-        # TODO: Detection of unregistered users is broken
-        # TODO: Repeat mechanism doesn't make much sense as implemented;
-        #       should use both offset and limit parameters, and have an
-        #       option to fetch older rather than newer pages
-        seen = set()
-        while True:
-            path = self.newpages_address(n=number)
-            # The throttling is important here, so always enabled.
-            get_throttle()
-            html = self.getUrl(path)
-
-            entryR = re.compile(
-'<li[^>]*>(?P<date>.+?) \S*?<a href=".+?"'
-' title="(?P<title>.+?)">.+?</a>.+?[\(\[](?P<length>[\d,.]+)[^\)\]]*[\)\]]'
-' .?<a href=".+?" title=".+?:(?P<username>.+?)">'
-                                )
-            for m in entryR.finditer(html):
-                date = m.group('date')
-                title = m.group('title')
-                title = title.replace('&quot;', '"')
-                length = int(re.sub("[,.]", "", m.group('length')))
-                loggedIn = u''
-                username = m.group('username')
-                comment = u''
-
-                if title not in seen:
-                    seen.add(title)
-                    page = Page(self, title)
-                    yield page, date, length, loggedIn, username, comment
-            if not repeat:
-                break
-
-    def longpages(self, number = 10, repeat = False):
-        """Yield Pages from Special:Longpages.
-
-        Return values are a tuple of Page object, length(int).
-
-        """
-        #TODO: should use offset and limit parameters; 'repeat' as now
-        #      implemented is fairly useless
-        # this comment applies to all the XXXXpages methods following, as well
-        seen = set()
-        while True:
-            path = self.longpages_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile(ur'<li>\(<a href=".+?" title=".+?">hist</a>\) ‎<a href=".+?" title="(?P<title>.+?)">.+?</a> ‎\[(?P<length>\d+)(.+?)\]</li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-                length = int(m.group('length'))
-                if title not in seen:
-                    seen.add(title)
-                    page = Page(self, title)
-                    yield page, length
-            if not repeat:
-                break
-
-    def shortpages(self, number = 10, repeat = False):
-        """Yield Pages and lengths from Special:Shortpages."""
-        throttle = True
-        seen = set()
-        while True:
-            path = self.shortpages_address(n = number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile(ur'<li>\(<a href=".+?" title=".+?">hist</a>\) ‎<a href=".+?" title="(?P<title>.+?)">.+?</a> ‎\[(?P<length>\d+)(.+?)\]</li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-                length = int(m.group('length'))
-
-                if title not in seen:
-                    seen.add(title)
-                    page = Page(self, title)
-                    yield page, length
-            if not repeat:
-                break
-
-    def deadendpages(self, number = 10, repeat = False):
-        """Yield Page objects retrieved from Special:Deadendpages."""
-        seen = set()
-        while True:
-            path = self.deadendpages_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile(
-                '<li><a href=".+?" title="(?P<title>.+?)">.+?</a></li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-
-                if title not in seen:
-                    seen.add(title)
-                    page = Page(self, title)
-                    yield page
-            if not repeat:
-                break
-
-    def ancientpages(self, number = 10, repeat = False):
-        """Yield Pages, datestamps from Special:Ancientpages."""
-        seen = set()
-        while True:
-            path = self.ancientpages_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile(
-'<li><a href=".+?" title="(?P<title>.+?)">.+?</a> (?P<date>.+?)</li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-                date = m.group('date')
-                if title not in seen:
-                    seen.add(title)
-                    page = Page(self, title)
-                    yield page, date
-            if not repeat:
-                break
-
-    def lonelypages(self, number = 10, repeat = False):
-        """Yield Pages retrieved from Special:Lonelypages."""
-        throttle = True
-        seen = set()
-        while True:
-            path = self.lonelypages_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile(
-                '<li><a href=".+?" title="(?P<title>.+?)">.+?</a></li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-
-                if title not in seen:
-                    seen.add(title)
-                    page = Page(self, title)
-                    yield page
-            if not repeat:
-                break
-
-    def unwatchedpages(self, number = 10, repeat = False):
-        """Yield Pages from Special:Unwatchedpages (requires Admin privileges)."""
-        seen = set()
-        while True:
-            path = self.unwatchedpages_address(n=number)
-            get_throttle()
-            html = self.getUrl(path, sysop = True)
-            entryR = re.compile(
-                '<li><a href=".+?" title="(?P<title>.+?)">.+?</a>.+?</li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-                if title not in seen:
-                    seen.add(title)
-                    page = Page(self, title)
-                    yield page
-            if not repeat:
-                break
-
-    def uncategorizedcategories(self, number = 10, repeat = False):
-        """Yield Categories from Special:Uncategorizedcategories."""
-        import catlib
-        seen = set()
-        while True:
-            path = self.uncategorizedcategories_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile(
-                '<li><a href=".+?" title="(?P<title>.+?)">.+?</a></li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-                if title not in seen:
-                    seen.add(title)
-                    page = catlib.Category(self, title)
-                    yield page
-            if not repeat:
-                break
-
-    def newimages(self, number = 10, repeat = False):
-        """Yield ImagePages from Special:Log&type=upload"""
-
-        seen = set()
-        regexp = re.compile('<li[^>]*>(?P<date>.+?)\s+<a href=.*?>(?P<user>.+?)</a>\s+\(.+?</a>\).*?<a href=".*?"(?P<new> class="new")? title="(?P<image>.+?)"\s*>(?:.*?<span class="comment">(?P<comment>.*?)</span>)?', re.UNICODE)
-
-        while True:
-            path = self.log_address(number, mode = 'upload')
-            get_throttle()
-            html = self.getUrl(path)
-
-            for m in regexp.finditer(html):
-                image = m.group('image')
-
-                if image not in seen:
-                    seen.add(image)
-
-                    if m.group('new'):
-                        output(u"Image \'%s\' has been deleted." % image)
-                        continue
-
-                    date = m.group('date')
-                    user = m.group('user')
-                    comment = m.group('comment') or ''
-
-                    yield ImagePage(self, image), date, user, comment
-            if not repeat:
-                break
-
-    def uncategorizedimages(self, number = 10, repeat = False):
-        """Yield ImagePages from Special:Uncategorizedimages."""
-        seen = set()
-        ns = self.image_namespace()
-        entryR = re.compile(
-            '<a href=".+?" title="(?P<title>%s:.+?)">.+?</a>' % ns)
-        while True:
-            path = self.uncategorizedimages_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            for m in entryR.finditer(html):
-                title = m.group('title')
-                if title not in seen:
-                    seen.add(title)
-                    page = ImagePage(self, title)
-                    yield page
-            if not repeat:
-                break
-
-    def uncategorizedpages(self, number = 10, repeat = False):
-        """Yield Pages from Special:Uncategorizedpages."""
-        seen = set()
-        while True:
-            path = self.uncategorizedpages_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile(
-                '<li><a href=".+?" title="(?P<title>.+?)">.+?</a></li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-
-                if title not in seen:
-                    seen.add(title)
-                    page = Page(self, title)
-                    yield page
-            if not repeat:
-                break
-
-    def unusedcategories(self, number = 10, repeat = False):
-        """Yield Category objects from Special:Unusedcategories."""
-        import catlib
-        seen = set()
-        while True:
-            path = self.unusedcategories_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile('<li><a href=".+?" title="(?P<title>.+?)">.+?</a></li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-
-                if title not in seen:
-                    seen.add(title)
-                    page = catlib.Category(self, title)
-                    yield page
-            if not repeat:
-                break
-
-    def unusedfiles(self, number = 10, repeat = False, extension = None):
-        """Yield ImagePage objects from Special:Unusedimages."""
-        seen = set()
-        ns = self.image_namespace()
-        entryR = re.compile(
-            '<a href=".+?" title="(?P<title>%s:.+?)">.+?</a>' % ns)
-        while True:
-            path = self.unusedfiles_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            for m in entryR.finditer(html):
-                fileext = None
-                title = m.group('title')
-                if extension:
-                    fileext = title[len(title)-3:]
-                if title not in seen and fileext == extension:
-                    ## Check whether the media is used in a Proofread page
-                    # code disabled because it slows this method down, and
-                    # because it is unclear what it's supposed to do.
-                    #basename = title[6:]
-                    #page = Page(self, 'Page:' + basename)
-
-                    #if not page.exists():
-                    seen.add(title)
-                    image = ImagePage(self, title)
-                    yield image
-            if not repeat:
-                break
-
-    def withoutinterwiki(self, number=10, repeat=False):
-        """Yield Pages without language links from Special:Withoutinterwiki."""
-        seen = set()
-        while True:
-            path = self.withoutinterwiki_address(n=number)
-            get_throttle()
-            html = self.getUrl(path)
-            entryR = re.compile('<li><a href=".+?" title="(?P<title>.+?)">.+?</a></li>')
-            for m in entryR.finditer(html):
-                title = m.group('title')
-                if title not in seen:
-                    seen.add(title)
-                    page = Page(self, title)
-                    yield page
-            if not repeat:
-                break
-
     def linksearch(self, siteurl):
         """Yield Pages from results of Special:Linksearch for 'siteurl'."""
         if siteurl.startswith('*.'):

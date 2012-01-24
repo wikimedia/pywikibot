@@ -577,7 +577,9 @@ u"%s: stopped iteration because 'query' not found in api response."
                                          resultdata.keys(),
                                          self.limit),
                                     _logger)
-                    if "pageids" in self.data["query"]:
+                    if "results" in resultdata:
+                        resultdata = resultdata["results"]
+                    elif "pageids" in self.data["query"]:
                         # this ensures that page data will be iterated
                         # in the same order as received from server
                         resultdata = [resultdata[k]
