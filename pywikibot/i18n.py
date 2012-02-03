@@ -130,7 +130,7 @@ def _altlang(code):
     #Russian and Belarusian
     if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'kbd', 'kk', 'koi', 'ky',
                 'lbe', 'mdf', 'mhr', 'mrj', 'myv', 'os', 'rue', 'sah', 'tg',
-                'udm', 'uk', 'xal']:
+                'vep', 'udm', 'uk', 'xal']:
         return ['ru']
     if code == 'tt':
         return ['tt-cyrl', 'ru']
