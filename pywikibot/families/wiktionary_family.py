@@ -12,19 +12,19 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ko', 'ru', 'tr', 'pl', 'ta', 'vi',
-            'de', 'io', 'el', 'fi', 'pt', 'kn', 'hu', 'nl', 'sv', 'no', 'it',
+            'de', 'io', 'el', 'fi', 'kn', 'pt', 'hu', 'nl', 'sv', 'no', 'it',
             'my', 'id', 'hi', 'et', 'li', 'ja', 'ml', 'fa', 'es', 'lo', 'ku',
             'ar', 'ro', 'te', 'gl', 'cs', 'ca', 'uk', 'bg', 'eu', 'eo', 'vo',
             'oc', 'is', 'hr', 'br', 'simple', 'scn', 'th', 'sr', 'af', 'fy',
-            'sw', 'tl', 'cy', 'ur', 'he', 'fj', 'ast', 'la', 'sq', 'hy', 'da',
+            'sw', 'tl', 'ur', 'cy', 'he', 'fj', 'ast', 'la', 'sq', 'hy', 'da',
             'sl', 'tt', 'wa', 'zh-min-nan', 'az', 'ka', 'lv', 'ne', 'tk', 'ps',
-            'hsb', 'kk', 'nn', 'ky', 'lb', 'wo', 'bs', 'km', 'be', 'ang', 'ga',
-            'co', 'mr', 'gn', 'ia', 'sk', 'csb', 'ms', 'st', 'nds', 'nah', 'sd',
-            'kl', 'sh', 'si', 'tg', 'ug', 'ti', 'mk', 'bn', 'zu', 'an', 'gu',
-            'ss', 'chr', 'qu', 'am', 'ts', 'fo', 'rw', 'kw', 'om', 'gv', 'iu',
-            'su', 'sa', 'mn', 'so', 'yi', 'ie', 'gd', 'za', 'pa', 'mt', 'mi',
-            'tpi', 'roa-rup', 'dv', 'ik', 'sg', 'na', 'uz', 'ln', 'jv', 'sm',
-            'tn', 'ha', 'ay', 'ks', 'jbo', 'dz',
+            'hsb', 'kk', 'nn', 'lb', 'ky', 'pnb', 'wo', 'bs', 'km', 'be', 'ang',
+            'ga', 'co', 'mr', 'gn', 'ia', 'sk', 'csb', 'ms', 'st', 'nah', 'nds',
+            'sd', 'kl', 'sh', 'si', 'tg', 'ug', 'ti', 'mk', 'bn', 'zu', 'an',
+            'gu', 'ss', 'chr', 'qu', 'am', 'ts', 'fo', 'rw', 'kw', 'om', 'gv',
+            'iu', 'su', 'sa', 'mn', 'so', 'yi', 'ie', 'gd', 'za', 'pa',
+            'roa-rup', 'mt', 'mi', 'tpi', 'dv', 'ik', 'sg', 'na', 'uz', 'ln',
+            'jv', 'sm', 'tn', 'ha', 'ay', 'ks', 'jbo', 'dz',
         ]
 
         for lang in self.languages_by_size:
