@@ -81,7 +81,7 @@ This will move all pages in the category US to the category United States.
 # (C) leogregianin, 2004-2008
 # (C) Cyde, 2006-2010
 # (C) Anreas J Schwab, 2007
-# (C) Pywikipedia team, 2008-2009
+# (C) Pywikipedia team, 2008-2012
 #
 __version__ = '$Id$'
 #
@@ -92,7 +92,6 @@ import os, re, pickle, bz2
 import pywikibot
 from pywikibot import catlib, config, pagegenerators
 from pywikibot import i18n
-import sys
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -373,6 +372,7 @@ u'Cannot change %s because of spam blacklist entry %s'
 
 class CategoryMoveRobot:
     """Robot to move pages from one category to another."""
+
     def __init__(self, oldCatTitle, newCatTitle, batchMode=False,
                  editSummary='', inPlace=False, moveCatPage=True,
                  deleteEmptySourceCat=True, titleRegex=None,
@@ -847,10 +847,6 @@ def main(*args):
             batchMode = True
         elif arg == '-inplace':
             inPlace = True
-        elif arg == '-delsum':
-            # This parameter is kept for historical reasons,
-            # as it was previously not the default option.
-            pass
         elif arg == '-nodelsum':
             useSummaryForDeletion = False
         elif arg == '-overwrite':
