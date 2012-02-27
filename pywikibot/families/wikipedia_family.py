@@ -360,6 +360,7 @@ class Family(family.Family):
             'nds-nl': ['nds', 'pdt'], # (Plautdietsch) is still in the Incubator.
             'nn': ['no', 'nb', 'sv', 'da'] + self.alphabetic,
             'no': self.alphabetic,
+            'nv': ['en', 'es'] + self.alphabetic,
             'pdc': ['de', 'en'],
             'pl': self.alphabetic,
             'simple': self.alphabetic,
