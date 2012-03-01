@@ -30,11 +30,14 @@ def _altlang(code):
     For example, if for language 'xx', you want the preference of languages
     to be: xx > fr > ru > en, you let altlang return ['fr', 'ru'].
     """
+    #Akan
+    if code in ['ak', 'tw']:
+        return ['ak', 'tw']
     #Amharic
-    if code in ['aa', 'om']:
+    if code in ['aa', 'ti']:
         return ['am']
     #Arab
-    if code in ['arc', 'arz']:
+    if code in ['arc', 'arz', 'fa', 'so']:
         return ['ar']
     if code == 'kab':
         return ['ar', 'fr']
@@ -55,42 +58,52 @@ def _altlang(code):
         return ['nds-nl', 'de']
     if code in ['dsb', 'hsb']:
         return ['hsb', 'dsb', 'de']
+    if code == 'sli':
+        return ['de', 'pl']
     if code == 'rm':
         return ['de', 'it']
     if code =='stq':
         return ['nds', 'de']
     #Greek
-    if code == 'pnt':
+    if code in ['grc', 'pnt']:
         return ['el']
     #Esperanto
     if code in ['io', 'nov']:
         return ['eo']
     #Spanish
-    if code in ['an', 'ast', 'ay', 'ca', 'ext', 'lad', 'nah', 'nv', 'qu']:
+    if code in ['an', 'arn', 'ast', 'ay', 'ca', 'ext', 'lad', 'nah', 'nv', 'qu', 'yua']:
         return ['es']
     if code in ['gl', 'gn']:
         return ['es', 'pt']
-    if code == ['eu']:
+    if code == 'eu':
         return ['es', 'fr']
-    if code in ['bcl', 'cbk-zam', 'ceb', 'ilo', 'pag', 'pam', 'tl', 'war']:
+    if code == 'cbk-zam':
         return ['es', 'tl']
     #Estonian
     if code == 'fiu-vro':
         return ['et']
-    #Latvian
-    if code == 'ltg':
-        return ['lv']
+    if code == 'liv':
+        return ['et', 'lv']
     #Persian (Farsi)
+    if code == 'ps':
+        return ['fa']
     if code in ['glk', 'mzn']:
-        return ['ar']
+        return ['glk', 'mzn', 'fa', 'ar']
+    #Finnish
+    if code == 'vep':
+        return ['fi', 'ru']
+    if code == 'fit':
+        return ['fi', 'sv']
     #French
-    if code in ['bm', 'br', 'ht', 'kab', 'kg', 'ln', 'mg', 'nrm', 'oc',
-                'pcd', 'rw', 'sg', 'ty', 'wa']:
+    if code in ['bm', 'br', 'ht', 'kg', 'ln', 'mg', 'nrm', 'pcd',
+                'rw', 'sg', 'ty', 'wa']:
         return ['fr']
-    if code == 'co':
+    if code == 'oc':
+        return ['fr', 'ca', 'es']
+    if code in ['co', 'frp']:
         return ['fr', 'it']
     #Hindi
-    if code in ['bh', 'pi', 'sa']:
+    if code in ['sa']:
         return ['hi']
     if code in ['ne', 'new']:
         return ['ne', 'new', 'hi']
@@ -103,16 +116,17 @@ def _altlang(code):
     if code in ['ik', 'iu']:
         return ['iu', 'kl']
     if code == 'kl':
-        return ['iu', 'da', 'no']
+        return ['da', 'iu', 'no']
     #Italian
     if code in ['eml', 'fur', 'lij', 'lmo', 'nap', 'pms', 'roa-tara', 'sc',
                 'scn', 'vec']:
         return ['it']
-    if code == 'frp':
-        return ['it', 'fr']
     #Lithuanian
-    if code in ['bat-smg', 'ltg']:
+    if code in ['bat-smg']:
         return ['lt']
+    #Latvian
+    if code == 'ltg':
+        return ['lv']
     #Dutch
     if code in ['fy', 'li', 'pap', 'srn', 'vls', 'zea']:
         return ['nl']
@@ -128,10 +142,12 @@ def _altlang(code):
     if code in ['mo', 'roa-rup']:
         return ['ro']
     #Russian and Belarusian
-    if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'kbd', 'kk', 'koi', 'ky',
-                'lbe', 'mdf', 'mhr', 'mrj', 'myv', 'os', 'rue', 'sah', 'tg',
-                'vep', 'udm', 'uk', 'xal']:
+    if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'inh', 'kk', 'koi', 'krc', 'kv',
+                'ky', 'lbe', 'lez', 'mdf', 'mhr', 'mn', 'mrj', 'myv', 'os', 'sah',
+                'tg', 'udm', 'uk', 'xal']:
         return ['ru']
+    if code in ['kbd', 'ady']:
+        return ['kbd', 'ady', 'ru']
     if code == 'tt':
         return ['tt-cyrl', 'ru']
     if code in ['be', 'be-x-old']:
@@ -143,13 +159,19 @@ def _altlang(code):
         return ['sh', 'hr', 'bs', 'sr', 'sr-el']
     if code == 'sr':
         return ['sr-el', 'sh', 'hr', 'bs']
+    #Tagalog
+    if code in ['bcl', 'ceb', 'ilo', 'pag', 'pam', 'war']:
+        return ['tl']
     #Turkish and Kurdish
     if code in ['diq', 'ku']:
         return ['ku', 'ku-latn', 'tr']
     if code == 'gag':
         return ['tr']
     if code == 'ckb':
-        return ['ku', 'ar']
+        return ['ku', 'fa']
+    #Ukrainian
+    if code in ['crh', 'rue']:
+        return ['uk', 'ru']
     #Chinese
     if code in ['minnan', 'zh', 'zh-classical', 'zh-min-nan', 'zh-tw',
                 'zh-hans', 'zh-hant']:
@@ -179,16 +201,20 @@ def _altlang(code):
         return ['ka']
     if code in ['nso', 'st']:
         return ['st', 'nso']
+    if code in ['kj', 'ng']:
+        return ['kj', 'ng']
+    if code in ['meu', 'hmo']:
+        return ['meu', 'hmo']
     #Default value
     return []
 
-def translate(code, xdict):
+def translate(code, xdict, fallback=True):
     """Return the most appropriate translation from a translation dict.
 
     Given a language code and a dictionary, returns the dictionary's value for
     key 'code' if this key exists; otherwise tries to return a value for an
     alternative language that is most applicable to use on the Wikipedia in
-    language 'code'.
+    language 'code' except fallback is False.
 
     The language itself is always checked first, then languages that
     have been defined to be alternatives, and finally English. If none of
@@ -202,12 +228,14 @@ def translate(code, xdict):
 
     if code in xdict:
         return xdict[code]
+    if not fallback:
+        return None
     for alt in _altlang(code):
         if alt in xdict:
             return xdict[alt]
     if '_default' in xdict:
         return xdict['_default']
-    elif 'en' in xdict:
+    if 'en' in xdict:
         return xdict['en']
     return xdict.values()[0]
 
