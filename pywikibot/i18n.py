@@ -282,8 +282,7 @@ def twntranslate(code, twtitle, parameters=None):
     contains a plural tag inside which looks like
     {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
     it takes that variant calculated by the plural_func depending on the number
-    value. At the moment, we have only one plural_func = x: x!= 1 yet. Multiple
-    PLURAL tags are not supported (yet).
+    value.
 
     Examples:
     If we had a test dictionary in test.py like
