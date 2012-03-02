@@ -12,13 +12,13 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'pl', 'it', 'es', 'he',
-            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'id', 'zh', 'hr', 'sv', 'tr',
-            'da', 'fa', 'th', 'gl', 'ta', 'ko', 'no', 'sr', 'ar', 'tl', 'mk',
+            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'id', 'zh', 'hr', 'sv', 'fa',
+            'tr', 'da', 'th', 'gl', 'ta', 'ko', 'no', 'sr', 'ar', 'tl', 'mk',
             'is', 'tt', 'lt', 'ka', 'az', 'eo', 'ro', 'bg', 'uk', 'sl', 'sk',
             'el', 'si', 'hy', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'mr', 'ur',
-            'bn', 'ms', 'oc', 'hi', 'ml', 'eu', 'fy', 'ie', 'ne', 'te', 'af',
-            'tg', 'sa', 'pa', 'bs', 'ky', 'mg', 'be', 'cy', 'zh-min-nan', 'ast',
-            'kk', 'ku', 'tk', 'su', 'uz', 'vo', 'mn', 'my',
+            'bn', 'ms', 'oc', 'hi', 'ml', 'eu', 'fy', 'ie', 'kk', 'ne', 'te',
+            'af', 'tg', 'sa', 'pa', 'bs', 'ky', 'mg', 'be', 'cy', 'zh-min-nan',
+            'ast', 'ku', 'tk', 'su', 'uz', 'vo', 'mn', 'my',
         ]
 
         for lang in self.languages_by_size:
