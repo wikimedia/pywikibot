@@ -33,16 +33,22 @@ class Family(family.Family):
 
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
-            'wikipedia', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
-            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
+            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
+            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
+            'species',
         ]
+
         # Global bot allowed languages on
         # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
-            'ang', 'ast', 'az', 'bg', 'bn', 'da', 'eo', 'es', 'fa', 'fy', 'ga',
-            'gd', 'hu', 'ia', 'ie', 'ik', 'jv', 'ka', 'li', 'lt', 'mk', 'nl',
-            'no', 'oc', 'pt', 'sk', 'tg', 'th', 'ti', 'ts', 'ug', 'uk', 'vo',
-            'za', 'zh-min-nan', 'zh', 'zu',
+            'am', 'an', 'ang', 'ast', 'ay', 'az', 'be', 'bg', 'bn', 'br', 'bs',
+            'ca', 'chr', 'co', 'cy', 'da', 'dv', 'eo', 'es', 'et', 'eu', 'fa',
+            'fi', 'fj', 'fo', 'fy', 'ga', 'gd', 'gl', 'gv', 'hu', 'ia', 'id',
+            'ie', 'ik', 'io', 'jv', 'ka', 'kn', 'ky', 'lb', 'lo', 'lt', 'lv',
+            'mg', 'mk', 'ml', 'my', 'ne', 'nl', 'no', 'oc', 'pt', 'sh',
+            'simple', 'sk', 'sl', 'sm', 'su', 'tg', 'th', 'ti', 'tk', 'tn',
+            'tpi', 'ts', 'ug', 'uk', 'vo', 'wa', 'wo', 'za', 'zh', 'zh-min-nan',
+            'zu',
         ]
 
         # Other than most Wikipedias, page names must not start with a capital
