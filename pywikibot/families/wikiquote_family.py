@@ -46,13 +46,18 @@ class Family(family.Family):
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
-            'af','am','ang','ar','ast','az','bg','bs','ca','cs','da','el','es','eu','fa','fr','fi','he','hu','hy','id','it',
-            'ka','ko','la','lt','nl','nn','no','pt','ro','simple','sv','vi','zh'
+            'af', 'am', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs', 'da',
+            'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'gl', 'he', 'hi',
+            'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kn', 'ku', 'la', 'li',
+            'lt', 'ml', 'nl', 'nn', 'no', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq',
+            'sr', 'su', 'sv', 'te', 'tr', 'uk', 'uz', 'vi', 'zh', 'zh-min-nan',
         ]
+
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikisource', 'wikinews', 'wikiversity',
-            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
+            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
+            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
+            'species',
         ]
 
         # Which languages have a special order for putting interlanguage links,
@@ -74,6 +79,7 @@ class Family(family.Family):
 
         self.obsolete = {
             'als': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Alemannic_Wikiquote
+            'ang': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=29150
             'ast': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28964
             'bm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikiquote
             'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wikiquote
