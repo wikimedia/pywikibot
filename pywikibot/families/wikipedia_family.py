@@ -305,6 +305,13 @@ class Family(family.Family):
         # but some languages don't use this.
         self.nocapitalize = ['jbo',]
 
+        # Which languages have a special order for putting interlanguage links,
+        # and what order is it? If a language is not in interwiki_putfirst,
+        # alphabetical order on language code is used. For languages that are in
+        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
+
         self.alphabetic_sr = [
             'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
             'arc', 'roa-rup', 'frp', 'arz', 'as', 'ast', 'gn', 'av', 'ay', 'az',
@@ -337,13 +344,6 @@ class Family(family.Family):
             'zh-tw', 'zh-cn', 'zh-classical', 'zh-yue', 'bat-smg',
         ]
 
-        # Which languages have a special order for putting interlanguage links,
-        # and what order is it? If a language is not in interwiki_putfirst,
-        # alphabetical order on language code is used. For languages that are in
-        # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are
-        # put after those, in code-alphabetical order.
-
         self.interwiki_putfirst = {
             'be-x-old': self.alphabetic,
             'en': self.alphabetic,
@@ -356,8 +356,8 @@ class Family(family.Family):
             'lb': self.alphabetic,
             'mk': self.alphabetic,
             'ms': self.alphabetic_revised,
-            'nds': ['nds-nl', 'pdt'], # Note: as of 2008-02-24, pdt:
-            'nds-nl': ['nds', 'pdt'], # (Plautdietsch) is still in the Incubator.
+            'nds': ['nds-nl'],
+            'nds-nl': ['nds'],
             'nn': ['no', 'sv', 'da'] + self.alphabetic,
             'no': self.alphabetic,
             'nv': ['en', 'es'] + self.alphabetic,
