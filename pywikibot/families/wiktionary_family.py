@@ -49,7 +49,14 @@ class Family(family.Family):
         # letter on ALL Wiktionaries.
         self.nocapitalize = self.langs.keys()
 
-        self.alphabetic_roman = [
+        # Which languages have a special order for putting interlanguage links,
+        # and what order is it? If a language is not in interwiki_putfirst,
+        # alphabetical order on language code is used. For languages that are in
+        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
+
+        self.alphabetic_sv = [
             'aa', 'af', 'ak', 'als', 'an', 'roa-rup', 'ast', 'gn', 'ay', 'az',
             'id', 'ms', 'bm', 'zh-min-nan', 'jv', 'su', 'mt', 'bi', 'bo', 'bs',
             'br', 'ca', 'cs', 'ch', 'sn', 'co', 'za', 'cy', 'da', 'de', 'na',
@@ -68,14 +75,6 @@ class Family(family.Family):
             'dz', 'ka', 'ti', 'am', 'chr', 'iu', 'km', 'zh', 'ja', 'ko',
            ]
 
-
-        # Which languages have a special order for putting interlanguage links,
-        # and what order is it? If a language is not in interwiki_putfirst,
-        # alphabetical order on language code is used. For languages that are in
-        # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are put
-        # after those, in code-alphabetical order.
-
         self.interwiki_putfirst = {
             'da': self.alphabetic,
             'en': self.alphabetic,
@@ -86,7 +85,7 @@ class Family(family.Family):
             'hu': ['en'],
             'ms': self.alphabetic_revised,
             'pl': self.alphabetic_revised,
-            'sv': self.alphabetic_roman,
+            'sv': self.alphabetic_sv,
             'simple': self.alphabetic,
         }
 
