@@ -33,8 +33,8 @@ class Family(family.Family):
         # and what order is it? If a language is not in interwiki_putfirst,
         # alphabetical order on language code is used. For languages that are in
         # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are put
-        # after those, in code-alphabetical order.
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
         self.interwiki_putfirst = {
             'en': self.alphabetic,
             'fi': self.alphabetic,
@@ -46,6 +46,7 @@ class Family(family.Family):
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = ['ca', 'cs', 'fa',]
+
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
             'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikiversity',
