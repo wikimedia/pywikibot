@@ -28,20 +28,17 @@ class Family(family.Family):
         # and what order is it? If a language is not in interwiki_putfirst,
         # alphabetical order on language code is used. For languages that are in
         # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are put
-        # after those, in code-alphabetical order.
-
-        alphabetic = ['af', 'ar', 'roa-rup', 'om', 'bg', 'be', 'bn', 'bs', 'ca',
-                      'chr', 'co', 'cs', 'cy', 'da', 'de', 'als', 'et', 'el',
-                      'en', 'es', 'eo', 'eu', 'fa', 'fr', 'fy', 'gv', 'gd',
-                      'gl', 'ko', 'hi', 'hr', 'io', 'id', 'ia', 'is', 'it',
-                      'he', 'jv', 'ka', 'csb', 'sw', 'la', 'lv', 'lt', 'hu',
-                      'mk', 'mg', 'ml', 'mi', 'mr', 'ms', 'zh-cfr', 'mn', 'nah',
-                      'na', 'nl', 'ja', 'no', 'nb', 'oc', 'nds', 'pl', 'pt',
-                      'ro', 'ru', 'sa', 'st', 'sq', 'si', 'simple', 'sk', 'sl',
-                      'sr', 'su', 'fi', 'sv', 'ta', 'tt', 'th', 'ur', 'vi',
-                      'tpi', 'tr', 'uk', 'vo', 'yi', 'za', 'zh', 'zh-cn',
-                      'zh-tw']
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
+        self.interwiki_putfirst = {
+            'en': self.alphabetic,
+            'fi': self.alphabetic,
+            'fr': self.alphabetic,
+            'he': ['en'],
+            'hu': ['en'],
+            'pl': self.alphabetic,
+            'simple': self.alphabetic
+        }
 
         self.obsolete = {
             'aa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikibooks
@@ -90,15 +87,6 @@ class Family(family.Family):
             'zu': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=25425
         }
 
-        self.interwiki_putfirst = {
-            'en': alphabetic,
-            'fi': alphabetic,
-            'fr': alphabetic,
-            'he': ['en'],
-            'hu': ['en'],
-            'pl': alphabetic,
-            'simple': alphabetic
-        }
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = ['af', 'ang', 'ca', 'fa', 'it', 'nl', 'ru', 'th', 'zh']
         # CentralAuth cross avaliable projects.

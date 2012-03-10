@@ -54,34 +54,22 @@ class Family(family.Family):
             'wikipedia', 'wiktionary', 'wikibooks', 'wikisource', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
+
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
         # alphabetical order on language code is used. For languages that are in
         # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are put
-        # after those, in code-alphabetical order.
-
-        alphabetic = ['af','am','ang','ar','roa-rup','ast','az','bn',
-                    'zh-min-nan','bg','be','bs','br','ca','chr','co','cs','cy',
-                    'da','de','als','et','el','en','es','eo','eu','fa','fr',
-                    'fy','ga','gv','gu','gd','gl','ko','hy','hi','hr','io',
-                    'id','ia','is','it','he','jv','kn','ka','ks','csb','kk',
-                    'ky','sw','ku','la','lb','lt','li','hu','mk','mg','ml',
-                    'mi','mr','zh-cfr','mn','nah','na','nl','ja','no','nb',
-                    'nn','oc','om','nds','uz','pl','pt','ro','ru','sa','st',
-                    'sq','si','simple','sk','sl','sr','su','fi','sv','ta','tt',
-                    'te','th','ur','vi','tpi','tr','uk','vo','yi','yo','wo',
-                    'za','zh','zh-cn','zh-tw']
-
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
         self.interwiki_putfirst = {
-            'en': alphabetic,
-            'fi': alphabetic,
-            'fr': alphabetic,
+            'en': self.alphabetic,
+            'fi': self.alphabetic,
+            'fr': self.alphabetic,
             'he': ['en'],
             'hu': ['en'],
-            'pl': alphabetic,
-            'simple': alphabetic,
-            'pt': alphabetic,
+            'pl': self.alphabetic,
+            'simple': self.alphabetic,
+            'pt': self.alphabetic,
         }
 
         self.obsolete = {

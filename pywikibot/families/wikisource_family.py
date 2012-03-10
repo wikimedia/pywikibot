@@ -42,6 +42,12 @@ class Family(family.Family):
             'zh-cn': 'zh'
         }
 
+        # Which languages have a special order for putting interlanguage links,
+        # and what order is it? If a language is not in interwiki_putfirst,
+        # alphabetical order on language code is used. For languages that are in
+        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
         self.interwiki_putfirst = {
             'en': self.alphabetic,
             'fi': self.alphabetic,
@@ -51,10 +57,24 @@ class Family(family.Family):
             'pl': self.alphabetic,
             'simple': self.alphabetic
         }
+
+        self.obsolete = {
+            'ang': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
+            'dk': 'da',
+            'ht': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
+            'jp': 'ja',
+            'minnan':'zh-min-nan',
+            'nb': 'no',
+            'tokipona': None,
+            'zh-tw': 'zh',
+            'zh-cn': 'zh'
+        }
+
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
             'el','fa','it','ko','no','vi','zh'
         ]
+
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
             'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikinews', 'wikiversity',
