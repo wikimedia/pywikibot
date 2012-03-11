@@ -19,12 +19,12 @@ class Family(family.Family):
             'sw', 'tl', 'ur', 'cy', 'he', 'fj', 'ast', 'la', 'sq', 'da', 'hy',
             'sl', 'wa', 'tt', 'zh-min-nan', 'az', 'ka', 'lv', 'ne', 'lb', 'tk',
             'ps', 'hsb', 'nn', 'kk', 'ky', 'wo', 'bs', 'km', 'be', 'ang', 'ga',
-            'co', 'nah', 'mr', 'mk', 'gn', 'ia', 'sk', 'pnb', 'csb', 'ms', 'st',
+            'nah', 'co', 'mr', 'mk', 'gn', 'ia', 'sk', 'pnb', 'csb', 'ms', 'st',
             'nds', 'sd', 'sh', 'kl', 'si', 'tg', 'ug', 'ti', 'bn', 'zu', 'an',
             'gu', 'ss', 'qu', 'chr', 'am', 'ts', 'fo', 'rw', 'kw', 'om', 'gv',
-            'iu', 'su', 'roa-rup', 'sa', 'mn', 'so', 'yi', 'ie', 'gd', 'za',
-            'pa', 'mt', 'mi', 'tpi', 'dv', 'ik', 'sg', 'na', 'uz', 'ln', 'jv',
-            'sm', 'tn', 'ha', 'ay', 'ks', 'jbo', 'dz',
+            'iu', 'su', 'roa-rup', 'sa', 'mn', 'so', 'yi', 'ie', 'gd', 'pa',
+            'za', 'mt', 'mi', 'tpi', 'dv', 'ik', 'sg', 'na', 'uz', 'ln', 'jv',
+            'sm', 'tn', 'or', 'ha', 'ay', 'ks', 'jbo', 'dz',
         ]
 
         for lang in self.languages_by_size:
@@ -115,7 +115,6 @@ class Family(family.Family):
             'mo': 'ro', # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary
             'minnan':'zh-min-nan',
             'nb': 'no',
-            'or': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oriya_Wiktionary
             'pi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Pali_Bhasa_Wiktionary
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rhaetian_Wiktionary
             'rn': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kirundi_Wiktionary
