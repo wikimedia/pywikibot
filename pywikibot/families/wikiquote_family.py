@@ -16,8 +16,8 @@ class Family(family.Family):
             'fa', 'hu', 'fi', 'sv', 'no', 'nn', 'ja', 'az', 'li', 'hy', 'et',
             'ca', 'ar', 'hr', 'cy', 'ml', 'ko', 'ka', 'gl', 'sr', 'ro', 'ku',
             'te', 'th', 'is', 'eu', 'da', 'af', 'sq', 'vi', 'ta', 'hi', 'la',
-            'br', 'be', 'mr', 'uz', 'ang', 'ur', 'zh-min-nan', 'gu', 'su', 'lb',
-            'kn', 'wo', 'ky', 'co', 'am',
+            'br', 'be', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'lb', 'kn',
+            'wo', 'ky', 'co', 'am',
         ]
 
         for lang in self.languages_by_size:
