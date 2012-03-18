@@ -1,0 +1,174 @@
+<!-- This is not the place to practice editing pages, to do so, please use the [[Wikipedia:Sandbox]] -->
+{{redirect|Wikipedia:Editing|the editing policy|Wikipedia:Editing policy}}
+<noinclude>{{semiprotected|small=yes}}</noinclude>
+{{Wikipedia how to|WP:H2EAP|WP:HEP|WP:HOW}}
+{{See also|Wikipedia:Introduction|Wikipedia:Tutorial|Wikipedia:Starting an article|Wikipedia:Manual of Style}}
+[[File:Wikipedia video tutorial-1-Editing-en.ogv|thumb|250px|Editing tutorial for Wikipedia]]
+[[Wikipedia]] is a [[wiki]], meaning that anyone can edit any [[Wikipedia:Protection policy|unprotected page]] and improve articles immediately for all readers. You do not need to register to do this. Anyone who has edited is known as a "[[Wikipedia: Wikipedian|Wikipedian]]" and, no matter how trivial the edit may seem, can be proud that he or she has helped make Wikipedia what it is. All of these edits add up! <!-- Comment - Good luck with your first edit. -->
+
+However, some pages are [[WP:Protection policy|protected from editing]]. These pages have a <tt>View source</tt> tab instead of an <tt>Edit</tt> tab. You can still edit these pages indirectly, by submitting an "[[Wikipedia:Edit requests|edit request]]" - an editor with the ability to edit the protected page will respond to your request. You can submit a request by clicking on the <tt>View source</tt> tab on that page and using the "Submit an edit request" link at the bottom right.
+
+<div class="messagebox" style="float: right; width: 150px; margin-left: 10px;">Note: You can use the [[Wikipedia:Sandbox|sandbox]] to experiment with page editing.</div>
+
+==Editing==
+Editing most Wikipedia pages is simple. Simply click on the "'''edit'''" tab at the top of a Wikipedia page (or on a [[Wikipedia: Section|section-edit link]]). This will bring you to a new page with a [[text box]] containing the editable text of the current page.
+
+[[File:How to edit a page Edit box.png|thumb|600px|center|alt=Text in a large rectangle below two toolbars and next to a scrollbar.|Edit box showing the [[Help:wiki markup|wiki markup]] for the [[February 2011 Christchurch earthquake]] article.]]
+<br clear=all>
+
+In this box, you can type in the text that you want to add, using [[Help:wiki markup|wiki markup]] to format the text and add other elements like images and tables. The [[Help:Edit toolbar|toolbar]] above the text box can help with formatting. A [[Wikipedia:Cheatsheet|quick reference]] to wiki markup can be opened in a new window by clicking 'Editing help', found near the 'save page' button.
+
+Never start a line with a leading space unless you want the special formatting it causes. Paragraphs can be separated with a blank line. The Wikipedia community has developed [[Wikipedia:Manual of Style|style guidelines]] to make articles and facts appear in a standardized form, and Wikipedia easier to use as a whole.
+
+If you add information to a page, [[Wikipedia:Citing sources|please provide references]], as [[Wikipedia:Verifiability|unreferenced statements are subject to removal]].
+
+When you have finished editing, you should write a short [[Help:Edit summary|edit summary]] in the small field below the edit-box. You may use shorthand to describe your changes, as described in the [[Wikipedia:Edit summary legend|legend]]. To see how the page looks with your edits, press the "'''Show preview'''" button. To see the differences between the page with your edits and the previous version of the page, press the "'''Show changes'''" button. If you're satisfied with what you see, '''[[Wikipedia:Be bold|be bold]]''' and press the "'''Save page'''" button. Your changes will immediately be visible to all Wikipedia users.
+
+{{EditOptions|align=right|width=50em|font-size=80%}}
+
+Note: Do not sign the Edit Summary line with your <nowiki>~~~~</nowiki> signature as it does not work there.
+
+===Talk (discussion) pages===
+{{Further2|[[Help:Using talk pages]]|[[Wikipedia:Talk page guidelines]]}}
+Talk pages are similar to articles in that they also have a "new section" tab to start a new section or edit the whole page.
+
+===Minor edits===
+{{Further2|[[Help:Minor edit]]}}
+A check to the "minor edit" box signifies that only superficial differences exist between the version with your edit and the previous version: typo corrections, formatting and presentational changes, rearranging of text without modifying content, etc. A ''minor edit'' is a version that the editor believes requires no review and could never be the subject of a dispute. The "minor edit" option is one of several [[Wikipedia:Why create an account?#New editing options|options]] available only to [[Help:Logging in|registered users]].
+
+===Major edits===
+{{see|Wikipedia:Editing policy#Talking and editing}}
+
+All editors are encouraged to [[Wikipedia:Be bold|be bold]], but there are several things that a user can do to ensure that major edits are performed smoothly. Before engaging in a major edit, a user should consider discussing proposed changes on the article discussion/talk page. During the edit, if doing so over an extended period, the {{tlx|In use}} tag can reduce the likelihood of an edit conflict. Once the edit has been completed, the inclusion of an [[Help:Edit summary|edit summary]] will assist in documenting the changes. These steps will help all to ensure that major edits are well received by the Wikipedia community.
+
+A major edit should be reviewed to confirm that it is consensual to all concerned editors. Therefore, any change that affects the ''meaning'' of an article is major (not minor), even if the edit is a single word.
+
+There are no necessary terms to which you have to agree when doing major edits, but the recommendations above have become best practice. If you do it your own way, the likelihood of your edits being reedited may be higher.
+
+<!-- Place below here or in intro? -->
+When performing a large edit, it is suggested you periodically, and before pressing 'save page', copy your edits into an external text editor (preferably one without formatting, such as [[Notepad (Windows)|Notepad]]). This ensures that in the case of a browser crash you will not lose your work. If you are adding substantial amounts of work, it is also a good idea to save changes in stages.
+
+==="View source" – protected pages===
+Some pages are [[WP:PROT|protected from editing]]. These pages have a <tt>View source</tt> tab instead of an <tt>Edit</tt> tab. You can still edit these pages indirectly, by submitting an "[[Wikipedia:Edit requests|edit request]]" - an editor with the ability to edit the protected page will respond to your request. You can submit a request by clicking on the <tt>View source</tt> tab on that page and using the "Submit an edit request" link at the bottom right.
+
+===Adding references===
+There is a [[Wikipedia:refToolbar 2.0|tool]] built into the top of the edit box that makes it easier to add and properly format references. The tool can use a single piece of data, such as the [[PMID]] or [[ISBN]], to fill in the rest of the details.
+
+==Wiki markup==
+{{main|Help:Wiki markup}}
+Wiki markup is the extra information (apart from the text which will be displayed) you enter in the edit window which tells the [[MediaWiki]] software how to display, categorize and process the article.
+
+==More information on editing wiki pages==
+===Getting started===
+* [[Wikipedia:Starting an article|Starting an article]]
+
+===Policies and conventions===
+Make sure that you submit information which is relevant to Wikipedia's specific purpose, or your content might be deleted. You can always use the [[Help:Talk page|talk pages]] to ask questions or check to see if your idea will be accepted. Please make note of the license your contributions will be covered by.
+* [[Wikipedia:Policies and guidelines|Policies and guidelines]]
+
+===Helpful tips===
+* [[Wikipedia:Contributing to Wikipedia|Contributing to Wikipedia]]
+* [[Wikipedia:FAQ/Editing|FAQ/Editing]]
+* [[Wikipedia:Cheatsheet|Cheatsheet]]
+* [[Wikipedia:Page size#If you have problems editing a long article|If you have problems editing a long article]]
+* [[Help:Protection|If the article is protected from editing]]
+* [[Help:Page history|About page history]]
+
+===Naming and moving===
+* [[Wikipedia:Moving a page|Moving a page to a new name]]
+* [[Wikipedia:Article titles|Article titles]]
+* [[Wikipedia:Namespace|Namespace]]
+
+===Style and layout===
+* [[Wikipedia:Layout|Layout]]
+* [[Wikipedia:Manual of Style|Manual of Style]]
+* [[Wikipedia:Annotated article|Annotated article]]
+
+===Tools===
+* [[Wikipedia:Text editor support|Text editor support]]
+
+===See also===
+{{Meta}}
+* [[WP:WikiProject|WikiProjects]], if you are writing an article about something that belongs to a group of topics, check here first!
+* [[outreach:Bookshelf|Wikimedia Bookshelf]], learning materials, videos, and handouts
+{{clear}}
+{{Leave feedback|format=table}}
+
+<noinclude>
+[[Category:Wikipedia how-to|How to edit a page]]
+[[Category:Wikipedia basic information|How to edit a page]]
+[[Category:Wikipedia editing| ]]
+
+<!-- Interlanguage links -->
+</noinclude>
+
+[[af:Wikipedia:Redigeringsinstruksies]]
+[[als:Hilfe:Seite bearbeiten]]
+[[am:እርዳታ:የማዘጋጀት እርዳታ]]
+[[ang:Wikipedia:How to edit a page]]
+[[ar:ويكيبيديا:كيف تعدل صفحة]]
+[[as:সহায়:সম্পাদনা]]
+[[az:Vikipediya:Məqalələrin redaktə qaydaları]]
+[[bn:উইকিপিডিয়া:কীভাবে একটি পৃষ্ঠা সম্পাদনা করবেন]]
+[[zh-min-nan:Help:Pian-chi̍p]]
+[[be-x-old:Вікіпэдыя:Як рэдагаваць існуючы артыкул]]
+[[bg:Уикипедия:Редактиране на страници]]
+[[bs:Wikipedia:Kako izmijeniti stranicu]]
+[[br:Skoazell:Penaos kemmañ ur bajenn]]
+[[ca:Ajuda:Com es modifica una pàgina]]
+[[cv:Broken/Статьясене тӳрлетесси çинчен]]
+[[cs:Nápověda:Jak editovat stránku]]
+[[ny:Wikipedia:Chithandizo cha Kulemba pa Wikipedia]]
+[[cy:Wicipedia:Sut i olygu tudalen]]
+[[de:Hilfe:Seite bearbeiten]]
+[[dv:ވިކިޕީޑިޔާ: ޞަފްހާ އަކަށް ނުވަތަ ލިޔެވިފައިވާ މަޒްމޫނަކަށް ބަދަލު ގެނައުމަށް އެހީ އެއް]]
+[[el:Βοήθεια:Πώς να επεξεργαστείτε μια σελίδα]]
+[[es:Ayuda:Cómo se edita una página]]
+[[eo:Helpo:Kiel redakti paĝon]]
+[[eu:Laguntza:Artikuluak nola aldatzen diren]]
+[[fa:ویکی‌پدیا:راهنمای ویرایش صفحه‌ها]]
+[[fr:Aide:Comment modifier une page]]
+[[ga:Vicipéid:Conas alt a chur in eagar]]
+[[gv:Wikipedia:Kanys duillag dy reaghey]]
+[[gl:Wikipedia:Como editar unha páxina]]
+[[hy:Վիքիփեդիա:Ինչպես խմբագրել էջը]]
+[[hr:Wikipedija:Kako uređivati stranicu]]
+[[id:Wikipedia:Menyunting sebuah halaman]]
+[[ia:Wikipedia:Como formatar texto]]
+[[it:Aiuto:Modifica]]
+[[he:עזרה:עריכת דף]]
+[[ku:Wîkîpediya:How does one edit a page]]
+[[la:Vicipaedia:De recensendo]]
+[[lv:Vikipēdija:Kā rediģēt lapu]]
+[[lb:Hëllef/Textgestaltung]]
+[[lt:Pagalba:Kaip redaguoti puslapį]]
+[[hu:Wikipédia:Szerkesztés]]
+[[mk:Помош:Како да уредам страница]]
+[[ms:Wikipedia:Menyunting]]
+[[mn:Тусламж:Арай өндөр төвшинд текст засварлах талаар]]
+[[nl:Help:Uitleg]]
+[[ja:Help:ページの編集]]
+[[no:Hjelp:Hvordan man redigerer en side]]
+[[nn:Hjelp:Endra ei side]]
+[[or:ଉଇକିପିଡ଼ିଆ:କିପରି ଗୋଟିଏ ଫରଦରେ ଅଦଳ ବଦଳ କରିବେ]]
+[[pl:Pomoc:Formatowanie tekstu]]
+[[pt:Ajuda:Guia de edição/Formatação]]
+[[ro:Ajutor:Cum modific o pagină]]
+[[ru:Википедия:Как править статьи]]
+[[si:උදවු:සංස්කරණය]]
+[[simple:Help:How to change pages]]
+[[sk:Pomoc:Prehľad editácie stránok]]
+[[sl:Wikipedija:Urejanje strani]]
+[[sr:Помоћ:Уређивање]]
+[[su:Wikipedia:Cara ngédit kaca]]
+[[fi:Ohje:Kuinka sivuja muokataan]]
+[[sv:Wikipedia:Redigering]]
+[[th:วิธีใช้:การแก้ไขหน้า]]
+[[tg:Википедиа:Вироиши мақолаҳо]]
+[[tr:Yardım:Sayfa nasıl yazılır?]]
+[[ur:صفحہ کس طرح ترمیم کریں]]
+[[vi:Wikipedia:Sửa đổi]]
+[[yi:װיקיפּעדיע:וויאזוי צו רעדאקטירן א בלאט]]
+[[yo:Ìrànwọ́:Báwo lẹṣe le ṣe àtúnṣe ojúewé]]
+[[zh-yue:Wikipedia:點改嘢]]
+[[zh:Help:编辑页面]]
