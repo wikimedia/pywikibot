@@ -934,3 +934,14 @@ def glue_template_and_params(template_and_params):
         text +=  u'|%s=%s\n' % (item, params[item])
 
     return u'{{%s\n%s}}' % (template, text)
+
+#----------------------------------
+# Page parsing functionality
+#----------------------------------
+
+def does_text_contain_section(pagetext, section):
+    """ Determines whether the page text contains the given
+        section title.
+    """
+    m = re.search("=+[ ']*%s[ ']*=+" % re.escape(section), pagetext)
+    return bool(m)
