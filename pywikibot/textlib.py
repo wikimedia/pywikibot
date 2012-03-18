@@ -18,6 +18,7 @@ import pywikibot
 import re
 
 from pywikibot.i18n import translate
+from HTMLParser import HTMLParser
 
 def unescape(s):
     """Replace escaped HTML-special characters by their originals"""
@@ -221,6 +222,40 @@ def removeDisabledParts(text, tags = ['*']):
     return toRemoveR.sub('', text)
 
 
+def removeHTMLParts(text, keeptags = ['tt', 'nowiki', 'small', 'sup']):
+    """
+    Return text without portions where HTML markup is disabled
+
+    Parts that can/will be removed are --
+    * HTML and all wiki tags
+
+    The exact set of parts which should NOT be removed can be passed as the
+    'keeptags' parameter, which defaults to ['tt', 'nowiki', 'small', 'sup'].
+    """
+    # try to merge with 'removeDisabledParts()' above into one generic function
+
+    # thanks to http://www.hellboundhackers.org/articles/841-using-python-39;s-htmlparser-class.html
+    parser = _GetDataHTML()
+    parser.keeptags = keeptags
+    parser.feed(text)
+    parser.close()
+    return parser.textdata
+
+# thanks to http://docs.python.org/library/htmlparser.html
+class _GetDataHTML(HTMLParser):
+    textdata = u''
+    keeptags = []
+
+    def handle_data(self, data):
+        self.textdata += data
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self.keeptags: self.textdata += u"<%s>" % tag
+
+    def handle_endtag(self, tag):
+        if tag in self.keeptags: self.textdata += u"</%s>" % tag
+
+
 def isDisabled(text, index, tags = ['*']):
     """
     Return True if text[index] is disabled, e.g. by a comment or by nowiki tags.
@@ -269,12 +304,24 @@ def expandmarker(text, marker = '', separator = ''):
 #-------------------------------------------------
 # Functions dealing with interwiki language links
 #-------------------------------------------------
-# Note - MediaWiki supports two kinds of interwiki links; interlanguage and
-#        interproject.  These functions only deal with links to a
-#        corresponding page in another language on the same project (e.g.,
-#        Wikipedia, Wiktionary, etc.) in another language. They do not find
-#        or change links to a different project, or any that are formatted
-#        as in-line interwiki links (e.g., "[[:es:Articulo]]".  (CONFIRM)
+# Note - MediaWiki supports several kinds of interwiki links; two kinds are
+#        interlanguage links. We deal here with those kinds only.
+#        A family has by definition only one kind of interlanguage links:
+#        1 - interlanguage links inside the own family.
+#            They go to a corresponding page in another language in the same
+#            family, such as from 'en.wikipedia' to 'pt.wikipedia', or from
+#            'es.wiktionary' to 'arz.wiktionary'.
+#            Families with this kind have several language-specific sites.
+#            They have their interwiki_forward attribute set to None
+#        2 - language links forwarding to another family.
+#            They go to a corresponding page in another family, such as from
+#            'commons' to 'zh.wikipedia, or from 'incubator' to 'en.wikipedia'.
+#            Families having those have one member only, and do not have
+#            language-specific sites. The name of the target family of their
+#            interlanguage links is kept in their interwiki_forward attribute.
+#        These functions only deal with links of these two kinds only.  They
+#        do not find or change links of other kinds, nor any that are formatted
+#        as in-line interwiki links (e.g., "[[:es:Articulo]]".
 
 def getLanguageLinks(text, insite=None, pageLink="[[]]", template_subpage=False):
     """
@@ -287,6 +334,10 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]", template_subpage=False)
     """
     if insite is None:
         insite = pywikibot.getSite()
+    fam = insite.family
+    # when interwiki links forward to another family, retrieve pages & other infos there
+    if fam.interwiki_forward:
+        fam = pywikibot.Family(fam.interwiki_forward)
     result = {}
     # Ignore interwiki links within nowiki tags, includeonly tags, pre tags,
     # and HTML comments
@@ -299,20 +350,28 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]", template_subpage=False)
     # interwiki link.
     # NOTE: language codes are case-insensitive and only consist of basic latin
     # letters and hyphens.
+    #TODO: currently, we do not have any, but BCP 47 allows digits, and underscores.
+    #TODO: There is no semantic difference between hyphens and underscores -> fold them.
     interwikiR = re.compile(r'\[\[([a-zA-Z\-]+)\s?:([^\[\]\n]*)\]\]')
     for lang, pagetitle in interwikiR.findall(text):
         lang = lang.lower()
         # Check if it really is in fact an interwiki link to a known
         # language, or if it's e.g. a category tag or an internal link
-        if lang in insite.family.obsolete:
-            lang = insite.family.obsolete[lang]
-        if lang in insite.validLanguageLinks():
+        if lang in fam.obsolete:
+            lang = fam.obsolete[lang]
+        if lang in fam.langs.keys():
             if '|' in pagetitle:
                 # ignore text after the pipe
                 pagetitle = pagetitle[:pagetitle.index('|')]
             # we want the actual page objects rather than the titles
-            site = insite.getSite(code = lang)
-            result[site] = pywikibot.Page(pywikibot.Link(pagetitle, site))
+            site = pywikibot.getSite(code=lang, fam=fam)
+            try:
+                result[site] = pywikibot.Page(site, pagetitle, insite=insite)
+            except pywikibot.InvalidTitle:
+                pywikibot.output(
+        u"[getLanguageLinks] Text contains invalid interwiki link [[%s:%s]]."
+                           % (lang, pagetitle))
+                continue
     return result
 
 
@@ -386,7 +445,11 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
     if s:
         if site.language() in site.family.interwiki_attop or \
            u'<!-- interwiki at top -->' in oldtext:
-            newtext = s + separator + s2.replace(marker,'').strip()
+            #do not add separator if interiki links are on one line
+            newtext = s + \
+                      [separator, u''][site.language() in
+                                       site.family.interwiki_on_one_line] + \
+                      s2.replace(marker, '').strip()
         else:
             # calculate what was after the language links on the page
             firstafter = s2.find(marker)
@@ -407,6 +470,12 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                          site) + separator + s
                 newtext = replaceCategoryLinks(s2, cats, site=site,
                                                addOnly=True)
+            # for Wikitravel's language links position.
+            # (not supported by rewrite - no API)
+            elif site.family.name == 'wikitravel':
+                s = separator + s + separator
+                newtext = s2[:firstafter].replace(marker,'') + s + \
+                          s2[firstafter:]
             else:
                 if template or template_subpage:
                     if template_subpage:
@@ -451,13 +520,11 @@ def interwikiFormat(links, insite = None):
     ar = interwikiSort(links.keys(), insite)
     s = []
     for site in ar:
-        obj = links[site]
-        if isinstance(obj, pywikibot.Link):
-            link = obj.astext(insite)
-        else:
-            # Page
-            link = obj.title(asLink=True, forceInterwiki=True)
-        s.append(link)
+        try:
+            link = unicode(links[site]).replace('[[:', '[[')
+            s.append(link)
+        except AttributeError:
+            s.append(getSite(site).linkto(links[site], othersite=insite))
     if insite.lang in insite.family.interwiki_on_one_line:
         sep = u' '
     else:
@@ -497,7 +564,8 @@ def interwikiSort(sites, insite = None):
 # Functions dealing with category links
 #---------------------------------------
 
-def getCategoryLinks(text, site):
+def getCategoryLinks(text, site=None):
+    import catlib
     """Return a list of category links found in text.
 
     List contains Category objects.
@@ -505,6 +573,8 @@ def getCategoryLinks(text, site):
 
     """
     result = []
+    if site is None:
+        site = pywikibot.getSite()
     # Ignore category links within nowiki tags, pre tags, includeonly tags,
     # and HTML comments
     text = removeDisabledParts(text)
@@ -522,7 +592,7 @@ def getCategoryLinks(text, site):
     return result
 
 
-def removeCategoryLinks(text, site, marker=''):
+def removeCategoryLinks(text, site=None, marker=''):
     """Return text with all category links removed.
 
     Put the string marker after the last replacement (at the end of the text
@@ -533,6 +603,8 @@ def removeCategoryLinks(text, site, marker=''):
     # interwiki link, plus trailing whitespace. The language code is grouped.
     # NOTE: This assumes that language codes only consist of non-capital
     # ASCII letters and hyphens.
+    if site is None:
+        site = pywikibot.getSite()
     catNamespace = '|'.join(site.category_namespaces())
     categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
     text = replaceExcept(text, categoryR, '',
@@ -554,6 +626,8 @@ def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
     if there is no replacement).
 
     """
+    if site is None:
+        site = pywikibot.getSite()
     if separator:
         mymarker = findmarker(text, u'@C@')
         newtext = removeCategoryLinks(text, site, mymarker)
@@ -609,7 +683,8 @@ def replaceCategoryLinks(oldtext, new, site = None, addOnly = False):
     Replace the category links given in the wikitext given
     in oldtext by the new links given in new.
 
-    'new' should be a list of Category objects.
+    'new' should be a list of Category objects or strings
+          which can be either the raw name or [[Category:..]].
 
     If addOnly is True, the old category won't be deleted and the
     category(s) given will be added (and so they won't replace anything).
@@ -671,7 +746,8 @@ See http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/bis_2006#
 def categoryFormat(categories, insite = None):
     """Return a string containing links to all categories in a list.
 
-    'categories' should be a list of Category objects.
+    'categories' should be a list of Category objects or strings
+        which can be either the raw name or [[Category:..]].
 
     The string is formatted for inclusion in insite.
 
@@ -680,7 +756,15 @@ def categoryFormat(categories, insite = None):
         return ''
     if insite is None:
         insite = pywikibot.getSite()
-    catLinks = [category.aslink() for category in categories]
+
+    if isinstance(categories[0],basestring):
+        if categories[0][0] == '[':
+            catLinks = categories
+        else:
+            catLinks = ['[[Category:'+category+']]' for category in categories]
+    else:
+        catLinks = [category.aslink(noInterwiki=True) for category in categories]
+
     if insite.category_on_one_line():
         sep = ' '
     else:
@@ -834,3 +918,19 @@ def extract_templates_and_params(text):
             # Add it to the result
             result.append((name, params))
     return result
+
+
+def glue_template_and_params(template_and_params):
+    """Return wiki text of template glued from params.
+
+    You can use items from extract_templates_and_params here to get
+    an equivalent template wiki text (it may happen that the order
+    of the params changes).
+    """
+    (template, params) = template_and_params
+
+    text = u''
+    for item in params:
+        text +=  u'|%s=%s\n' % (item, params[item])
+
+    return u'{{%s\n%s}}' % (template, text)
