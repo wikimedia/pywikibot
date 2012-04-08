@@ -16,29 +16,29 @@ class Family(family.Family):
             'fa', 'ro', 'ar', 'sk', 'da', 'eo', 'sr', 'lt', 'sl', 'ms', 'he',
             'bg', 'kk', 'eu', 'vo', 'war', 'hr', 'hi', 'et', 'az', 'gl', 'nn',
             'simple', 'th', 'la', 'el', 'new', 'roa-rup', 'oc', 'sh', 'ka',
-            'mk', 'tl', 'ht', 'pms', 'te', 'ta', 'ceb', 'be-x-old', 'br', 'sq',
+            'mk', 'tl', 'ht', 'pms', 'te', 'ta', 'be-x-old', 'ceb', 'br', 'sq',
             'lv', 'be', 'jv', 'mg', 'lb', 'cy', 'mr', 'is', 'bs', 'yo', 'an',
             'hy', 'bpy', 'lmo', 'fy', 'sw', 'ml', 'io', 'bn', 'gu', 'af', 'pnb',
             'ne', 'nds', 'ku', 'scn', 'ur', 'zh-yue', 'su', 'qu', 'diq', 'ba',
             'ast', 'tt', 'ga', 'cv', 'ia', 'nap', 'bat-smg', 'map-bms', 'wa',
             'am', 'kn', 'als', 'bug', 'my', 'zh-min-nan', 'gd', 'tg', 'yi',
             'vec', 'roa-tara', 'hif', 'sco', 'os', 'arz', 'nah', 'sah', 'uz',
-            'pam', 'sa', 'mn', 'hsb', 'mi', 'li', 'si', 'co', 'gan', 'glk',
-            'ky', 'bo', 'ckb', 'bcl', 'fo', 'bar', 'mrj', 'ilo', 'fiu-vro',
-            'nds-nl', 'tk', 'vls', 'se', 'gv', 'dv', 'rue', 'nrm', 'pag', 'pa',
-            'mzn', 'ps', 'rm', 'km', 'koi', 'udm', 'kv', 'csb', 'fur', 'mt',
-            'wuu', 'ug', 'lij', 'mhr', 'ang', 'lad', 'pi', 'sc', 'bh', 'zea',
-            'zh-classical', 'nov', 'ksh', 'cbk-zam', 'or', 'so', 'nv', 'hak',
-            'kw', 'frp', 'stq', 'xmf', 'szl', 'ext', 'ay', 'pcd', 'frr', 'ie',
-            'haw', 'xal', 'ln', 'rw', 'pdc', 'pfl', 'krc', 'crh', 'ace', 'to',
-            'eml', 'ce', 'gn', 'kl', 'myv', 'gag', 'arc', 'dsb', 'pap', 'bjn',
-            'as', 'tpi', 'lbe', 'wo', 'jbo', 'kab', 'mdf', 'av', 'sn', 'ty',
+            'pam', 'sa', 'mn', 'hsb', 'mi', 'li', 'si', 'co', 'gan', 'ky',
+            'glk', 'bo', 'ckb', 'bcl', 'fo', 'bar', 'mrj', 'ilo', 'fiu-vro',
+            'nds-nl', 'tk', 'vls', 'se', 'gv', 'dv', 'rue', 'nrm', 'pag', 'mzn',
+            'pa', 'ps', 'rm', 'km', 'koi', 'udm', 'kv', 'csb', 'mhr', 'fur',
+            'mt', 'wuu', 'ug', 'lij', 'ang', 'lad', 'pi', 'sc', 'bh', 'zea',
+            'zh-classical', 'nov', 'ksh', 'cbk-zam', 'or', 'so', 'nv', 'kw',
+            'hak', 'frp', 'stq', 'xmf', 'ay', 'szl', 'ext', 'pcd', 'frr', 'ie',
+            'haw', 'xal', 'ln', 'rw', 'pdc', 'pfl', 'krc', 'crh', 'gag', 'ace',
+            'to', 'eml', 'gn', 'ce', 'kl', 'myv', 'arc', 'dsb', 'pap', 'bjn',
+            'as', 'tpi', 'lbe', 'wo', 'jbo', 'mdf', 'kab', 'av', 'sn', 'ty',
             'srn', 'lo', 'ab', 'ltg', 'mwl', 'ig', 'na', 'kg', 'tet', 'kbd',
-            'kaa', 'nso', 'rmy', 'cu', 'tn', 'zu', 'chr', 'lez', 'sm', 'bi',
+            'kaa', 'nso', 'rmy', 'cu', 'tn', 'zu', 'lez', 'chr', 'sm', 'bi',
             'sd', 'bm', 'ik', 'iu', 'pih', 'ss', 'za', 'pnt', 'got', 'cdo',
-            'ee', 'ha', 'ti', 'om', 'ks', 'bxr', 've', 'ts', 'sg', 'rn', 'dz',
-            'cr', 'vep', 'lg', 'ak', 'chy', 'fj', 'tum', 'st', 'ch', 'ff', 'xh',
-            'tw', 'ny', 'ki',
+            'ee', 'ha', 'ti', 'om', 'ks', 'bxr', 've', 'ts', 'sg', 'rn', 'chy',
+            'vep', 'dz', 'cr', 'lg', 'ak', 'fj', 'tum', 'ki', 'st', 'ch', 'ff',
+            'xh', 'ny', 'tw',
         ]
 
         for lang in self.languages_by_size:
@@ -268,6 +268,16 @@ class Family(family.Family):
             'zh':  u'消歧义',
             'zh-min-nan': u'Khu-pia̍t-ia̍h',
             }
+
+        # families that redirect their interlanguage links here.
+        self.interwiki_forwarded_from = [
+            'commons',
+            'incubator',
+            'meta',
+            'species',
+            'strategy',
+            'test',
+        ]
 
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
