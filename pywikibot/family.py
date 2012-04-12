@@ -21,8 +21,11 @@ logger = logging.getLogger("pywiki.wiki.family")
 class Family:
     def __init__(self):
         self.name = None
+        # For interwiki sorting order see
+        # http://meta.wikimedia.org/wiki/Interwiki_sorting_order
 
-        # Updated from http://meta.wikimedia.org/wiki/Interwiki_sorting_order
+        # The sorting order by language name from meta
+        # MediaWiki:Interwiki_config-sorting_order-native-languagename 
         self.alphabetic = [
             'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
             'arc', 'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm',
@@ -36,27 +39,28 @@ class Family:
             'hi', 'ho', 'hsb', 'hr', 'io', 'ig', 'ilo', 'bpy', 'id', 'ia', 'ie',
             'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it', 'he', 'jv', 'kl', 'kn',
             'kr', 'pam', 'krc', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'rn', 'sw',
-            'kv', 'kg', 'ht', 'ku', 'kj', 'ky', 'mrj', 'lad', 'lbe', 'lo', 'ltg',
-            'la', 'lv', 'lb', 'lt', 'lij', 'li', 'ln', 'jbo', 'lg', 'lmo', 'hu',
-            'mk', 'mg', 'ml', 'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn', 'ms',
-            'cdo', 'mwl', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'na', 'fj',
-            'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nap', 'ce', 'frr', 'pih',
-            'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng',
-            'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps', 'koi',
-            'km', 'pcd', 'pms', 'tpi', 'nds', 'pl', 'tokipona', 'tp', 'pnt',
-            'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu',
-            'rue', 'ru', 'sah', 'se', 'sm', 'sa', 'sg', 'sc', 'sco', 'stq',
-            'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk',
-            'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'su', 'fi', 'sv',
-            'tl', 'ta', 'kab', 'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'tg',
-            'to', 'chr', 'chy', 've', 'tr', 'tk', 'tw', 'udm', 'bug', 'uk',
-            'ur', 'ug', 'za', 'vec', 'vi', 'vo', 'fiu-vro', 'wa',
-            'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo',
-            'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
+            'kv', 'kg', 'ht', 'ku', 'kj', 'ky', 'mrj', 'lad', 'lbe', 'lez',
+            'lo', 'ltg', 'la', 'lv', 'lb', 'lt', 'lij', 'li', 'ln', 'jbo', 'lg',
+            'lmo', 'hu', 'mk', 'mg', 'ml', 'mt', 'mi', 'mr', 'xmf', 'arz',
+            'mzn', 'ms', 'cdo', 'mwl', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah',
+            'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nap', 'ce',
+            'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr',
+            'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'pnb',
+            'pap', 'ps', 'koi', 'km', 'pcd', 'pms', 'tpi', 'nds', 'pl',
+            'tokipona', 'tp', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh',
+            'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'se', 'sm', 'sa', 'sg',
+            'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple',
+            'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh',
+            'su', 'fi', 'sv', 'tl', 'ta', 'shi', 'kab', 'roa-tara', 'tt', 'te',
+            'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tr', 'tk', 'tw',
+            'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vi', 'vo',
+            'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts',
+            'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw',
+            'zh-cn',
         ]
 
-        # A revised sorting order worked out on
-        # http://meta.wikimedia.org/wiki/Interwiki_sorting_order
+        # The revised sorting order by first word from meta
+        # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword 
         self.alphabetic_revised = [
             'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
             'arc', 'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bjn',
@@ -71,21 +75,21 @@ class Family:
             'io', 'ig', 'ilo', 'bpy', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu',
             'is', 'it', 'he', 'kl', 'kn', 'kr', 'pam', 'ka', 'ks', 'csb', 'kk',
             'kw', 'rw', 'ky', 'rn', 'mrj', 'sw', 'kv', 'kg', 'ht', 'ku', 'kj',
-            'lad', 'lbe', 'lo', 'la', 'ltg', 'lv', 'to', 'lb', 'lt', 'lij',
-            'li', 'ln', 'jbo', 'lg', 'lmo', 'hu', 'mk', 'mg', 'ml', 'krc', 'mt',
-            'mi', 'mr', 'xmf', 'arz', 'mzn', 'cdo', 'mwl', 'koi', 'mdf', 'mo',
-            'mn', 'mus', 'my', 'nah', 'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new',
-            'ja', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov',
-            'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi', 'pfl',
-            'pag', 'pnb', 'pap', 'ps', 'km', 'pcd', 'pms', 'nds', 'pl', 'pnt',
-            'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu',
-            'ru', 'rue', 'sah', 'se', 'sa', 'sg', 'sc', 'sco', 'stq', 'st',
-            'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl',
-            'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta',
-            'kab',  'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg',
-            'tpi', 'tokipona', 'tp', 'chr', 'chy', 've', 'tr', 'tk', 'tw',
-            'udm', 'uk', 'ur', 'ug', 'za', 'vec', 'vo', 'fiu-vro', 'wa',
-            'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo',
+            'lad', 'lbe', 'lez', 'lo', 'la', 'ltg', 'lv', 'to', 'lb', 'lt',
+            'lij', 'li', 'ln', 'jbo', 'lg', 'lmo', 'hu', 'mk', 'mg', 'ml',
+            'krc', 'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn', 'cdo', 'mwl', 'koi',
+            'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'fj', 'nl', 'nds-nl', 'cr',
+            'ne', 'new', 'ja', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn',
+            'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa',
+            'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps', 'km', 'pcd', 'pms', 'nds',
+            'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy',
+            'rm', 'qu', 'ru', 'rue', 'sah', 'se', 'sa', 'sg', 'sc', 'sco',
+            'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd', 'ss',
+            'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv',
+            'tl', 'ta', 'shi', 'kab', 'roa-tara', 'tt', 'te', 'tet', 'th', 'vi',
+            'ti', 'tg', 'tpi', 'tokipona', 'tp', 'chr', 'chy', 've', 'tr', 'tk',
+            'tw', 'udm', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro',
+            'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo',
             'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
         ]
 
@@ -98,7 +102,6 @@ class Family:
         self.fyinterwiki.remove('nb')
         self.fyinterwiki.sort(fycomp)
 
-
         self.langs = {}
 
         # letters that can follow a wikilink and are regarded as part of
@@ -108,19 +111,29 @@ class Family:
         # Note: this is a regular expression.
         self.linktrails = {
            '_default': u'[a-z]*',
+           'ca': u'[a-zàèéíòóúç·ïü]*',
+           'cs': u'[a-záčďéěíňóřšťúůýž]*',
            'de': u'[a-zäöüß]*',
            'da': u'[a-zæøå]*',
-           'fi': u'[a-zåäö]*',
-           'fr': u'[a-zàâçéèêîôû]*',
+           'es': u'[a-záéíóúñ]*',
+           'fa': u'[a-zابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
+           'fi': u'[a-zäö]*',
+           'fr': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
            'frr': u'[a-zäöüßåāđē]*',
            'he': u'[a-zא-ת]*',
            'hu': u'[a-záéíóúöüőűÁÉÍÓÚÖÜŐŰ]*',
-           'it': u'[a-zàèéìòù]*',
-           'kk': u'[a-zäçéğıïñöşüýа-яёәғіқңөұүһʺʹ]*',
-           'ksh': u'[äöüėëĳßəğåůæœça-z]*',
-           'nl': u'[a-zäöüïëéèéàç]*',
+           'it': u'[a-zàéèíîìóòúù]*',
+           'ka': u'[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
+           'kk': u'[a-zäçéğıïñöşüýʺʹа-яёәғіқңөұүһٴابپتجحدرزسشعفقكلمنڭەوۇۋۆىيچھ“»]*',
+           'ksh': u'[a-zäöüėëĳßəğåůæœç]*',
+           'mk': u'[a-zабвгдѓежзѕијклљмнњопрстќуфхцчџш]*',
+           'nl': u'[a-zäöüïëéèà]*',
+           'nl': u'[a-zæøå]*',
+           'pl': u'[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
            'pt': u'[a-záâàãéêíóôõúüç]*',
+           'ro': u'[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
            'ru': u'[a-zа-я]*',
+           'sk': u'[a-záäčďéíľĺňóôŕšťúýž]*',
         }
 
         # Wikimedia wikis all use "bodyContent" as the id of the <div>
@@ -603,6 +616,12 @@ class Family:
         # family.
         self.interwiki_forward = None
 
+        # Some families, e. g. wikipedia, receive forwarded interlanguage
+        # links from other families, e. g. incubator, commons, or meta.
+        # These families can set this variable to the names of their source
+        # families.
+        self.interwiki_forwarded_from = {}
+
         # Which language codes no longer exist and by which language code
         # should they be replaced. If for example the language with code xx:
         # now should get code yy:, add {'xx':'yy'} to obsolete. If all
@@ -696,6 +715,12 @@ class Family:
         # self.crossnamespace[102] = {
         #     'pt': { '_default': [0]}
         # }
+
+    @property
+    def iwkeys(self):
+        if self.interwiki_forward:
+            return pywikibot.Family(self.interwiki_forward).langs.keys()
+        return self.langs.keys()
 
     def _addlang(self, code, location, namespaces = {}):
         """Add a new language to the langs and namespaces of the family.
