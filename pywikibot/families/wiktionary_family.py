@@ -14,17 +14,17 @@ class Family(family.Family):
             'en', 'fr', 'mg', 'zh', 'lt', 'ko', 'ru', 'tr', 'pl', 'ta', 'vi',
             'kn', 'de', 'io', 'fi', 'el', 'hu', 'pt', 'sv', 'nl', 'no', 'it',
             'my', 'id', 'hi', 'ml', 'et', 'li', 'fa', 'ja', 'es', 'lo', 'ku',
-            'ar', 'te', 'ro', 'cs', 'gl', 'ca', 'uk', 'eu', 'bg', 'eo', 'vo',
+            'te', 'ar', 'ro', 'cs', 'gl', 'ca', 'uk', 'eu', 'bg', 'eo', 'vo',
             'oc', 'is', 'hr', 'th', 'br', 'simple', 'scn', 'sr', 'af', 'fy',
-            'sw', 'tl', 'ur', 'cy', 'he', 'ast', 'fj', 'la', 'sq', 'da', 'hy',
-            'wa', 'sl', 'tt', 'zh-min-nan', 'az', 'ka', 'lv', 'lb', 'ne', 'tk',
+            'sw', 'tl', 'ur', 'cy', 'he', 'ast', 'fj', 'la', 'sq', 'da', 'wa',
+            'hy', 'sl', 'tt', 'zh-min-nan', 'az', 'ka', 'lv', 'lb', 'ne', 'tk',
             'nn', 'ps', 'hsb', 'kk', 'ky', 'wo', 'bs', 'km', 'nah', 'be', 'ang',
             'mk', 'ga', 'co', 'pnb', 'mr', 'gn', 'ia', 'sk', 'csb', 'ms', 'st',
             'nds', 'sd', 'kl', 'sh', 'si', 'tg', 'ug', 'ti', 'zu', 'bn', 'an',
             'gu', 'ss', 'qu', 'chr', 'am', 'ts', 'fo', 'rw', 'kw', 'gv', 'om',
             'iu', 'su', 'roa-rup', 'sa', 'mn', 'so', 'yi', 'ie', 'pa', 'za',
-            'gd', 'mt', 'mi', 'tpi', 'dv', 'ik', 'sg', 'na', 'ln', 'uz', 'jv',
-            'sm', 'tn', 'or', 'jbo', 'ha', 'ay', 'ks', 'dz',
+            'gd', 'mt', 'mi', 'tpi', 'dv', 'ik', 'sg', 'ln', 'uz', 'jv', 'na',
+            'sm', 'tn', 'jbo', 'or', 'ha', 'ay', 'ks', 'dz',
         ]
 
         for lang in self.languages_by_size:
