@@ -49,8 +49,8 @@ and arguments can be:
 #
 # (C) Daniel Herding, 2004.
 # (C) Purodha Blissenbach, 2009.
-# (C) xqt, 2009-2010
-# (C) Pywikipedia bot team, 2004-2010
+# (C) xqt, 2009-2012
+# (C) Pywikipedia bot team, 2004-2011
 #
 # Distributed under the terms of the MIT license.
 #
@@ -58,7 +58,8 @@ __version__='$Id: redirect.py 7789 2009-12-17 19:20:12Z xqt $'
 #
 import re, sys, datetime
 import pywikibot
-from pywikibot import config, i18n
+from pywikibot import i18n
+from pywikibot import config
 # import xmlreader
 
 
@@ -336,7 +337,8 @@ class RedirectGenerator:
                 - datetime.timedelta(0, self.offset*3600)
         # self.offset hours ago
         offset_time = start.strftime("%Y%m%d%H%M%S")
-
+        pywikibot.output(u'Retrieving %s moved pages via API...'
+                         % str(self.api_number))
         move_gen = self.site.logevents(logtype="move", start=offset_time)
         if self.api_number:
             move_gen.set_maximum_items(self.api_number)
@@ -575,7 +577,7 @@ class RedirectRobot:
                 '#%s %s' % (self.site.redirect(True),
                             targetPage.title(asLink=True, textlink=True)),
                 oldText)
-            if text == oldText:
+            if redir.title() == targetPage.title() or text == oldText:
                 pywikibot.output(u"Note: Nothing left to do on %s"
                                  % redir.title(asLink=True))
                 break
@@ -632,6 +634,7 @@ class RedirectRobot:
             self.delete_broken_redirects()
         elif self.action == 'both':
             self.fix_double_or_delete_broken_redirects()
+
 
 def main(*args):
     # read command line parameters
@@ -712,7 +715,6 @@ def main(*args):
                                 api, start, until, number, step)
         bot = RedirectRobot(action, gen, always, number, step)
         bot.run()
-
 
 if __name__ == '__main__':
     try:
