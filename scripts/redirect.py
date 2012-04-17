@@ -552,11 +552,11 @@ class RedirectRobot:
 ##                        # Delete the two redirects
 ##                        content = i18n.twtranslate(
 ##                                      targetPage.site.lang,
-##                                      'redirect-remove-loop',
+##                                      'redirect-broken-redirect-template'
 ##                                      ) + "\n" + content
 ##                        summ = i18n.twtranslate(
 ##                                   targetPage.site.lang,
-##                                   'redirect-broken-redirect-template')
+##                                   'redirect-remove-loop')
 ##                        targetPage.put(content, summ)
 ##                        redir.put(content, summ)
 ##                    break # TODO Better implement loop redirect
