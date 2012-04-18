@@ -42,6 +42,10 @@ class Family(family.Family):
             'meta', 'mediawiki', 'test', 'incubator', 'species',
         ]
 
+
+    def version(self, code):
+        return '1.20wmf1'
+
     def dbName(self, code):
         return 'commonswiki_p'
 
