@@ -4,8 +4,8 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-# The test wikipedia family
 
+# The test wikipedia family
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)
@@ -13,9 +13,6 @@ class Family(family.Family):
         self.langs = {
             'test': 'test.wikipedia.org',
         }
-
-    def version(self, code):
-        return '1.20wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

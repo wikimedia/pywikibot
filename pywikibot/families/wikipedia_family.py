@@ -587,6 +587,12 @@ class Family(family.Family):
         # xxwikipedia for Wikipedias.
         return '%swiki_p' % code
 
+    def version(self, code):
+        """Return MediaWiki version number as a string."""
+        # Don't use this, use versionnumber() instead. This only exists
+        # to not break family files.
+        return '1.19wmf1'
+
     def code2encodings(self, code):
         """Return a list of historical encodings for a specific language
            wikipedia"""
