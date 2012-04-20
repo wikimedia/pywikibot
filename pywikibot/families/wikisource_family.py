@@ -14,8 +14,8 @@ class Family(family.Family):
             'en', 'fr', 'ru', 'zh', 'pt', 'de', 'it', 'es', 'pl', 'he', 'fa',
             'ar', 'hu', 'sv', 'cs', 'th', 'ko', 'ro', 'hr', 'te', 'fi', 'vi',
             'sl', 'sa', 'el', 'ca', 'nl', 'bn', 'tr', 'uk', 'sr', 'ja', 'br',
-            'ml', 'la', 'mk', 'hy', 'az', 'li', 'yi', 'vec', 'ta', 'is', 'bs',
-            'no', 'id', 'da', 'eo', 'et', 'bg', 'sah', 'be', 'lt', 'gl', 'kn',
+            'ml', 'la', 'mk', 'hy', 'az', 'li', 'yi', 'vec', 'ta', 'is', 'no',
+            'bs', 'id', 'da', 'eo', 'et', 'bg', 'sah', 'be', 'lt', 'gl', 'kn',
             'mr', 'cy', 'sk', 'gu', 'fo', 'zh-min-nan',
         ]
 
