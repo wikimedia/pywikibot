@@ -2,7 +2,7 @@
 """ Module to determine the pywikipedia version (tag, revision and date) """
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2008
-# (C) xqt, 2010-2011
+# (C) xqt, 2010-2012
 # (C) Pywikipedia bot team, 2007-2011
 #
 # Distributed under the terms of the MIT license.
@@ -62,10 +62,10 @@ def getversion_svn():
         from datetime import datetime
         con = sqlite.connect(os.path.join(_program_dir, ".svn/wc.db"))
         cur = con.cursor()
-        cur.execute( '''select local_relpath, repos_path, revision, changed_date from nodes order by revision desc''')
+        cur.execute( '''select local_relpath, repos_path, revision, changed_date from nodes order by revision desc, changed_date desc''')
         name, tag, rev, date = cur.fetchone()
         con.close()
-        tag = tag.rstrip(name)
+        tag = tag[:len(tag) - len(name)]
         date = time.gmtime(date/1000000)
     else:
         for i in range(3):
