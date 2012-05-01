@@ -3,7 +3,7 @@
     and for TranslateWiki-based translations
 """
 #
-# (C) Pywikipedia bot team, 2004-2011
+# (C) Pywikipedia bot team, 2004-2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,6 +12,8 @@ __version__ = '$Id$'
 import re
 from pywikibot import Error
 from plural import plural_rules
+import pywikibot
+import config2 as config
 
 # Languages to use for comment text after the actual language but before
 # en:. For example, if for language 'xx', you want the preference of
@@ -128,7 +130,7 @@ def _altlang(code):
     if code == 'ltg':
         return ['lv']
     #Dutch
-    if code in ['fy', 'li', 'pap', 'srn', 'vls', 'zea']:
+    if code in ['af', 'fy', 'li', 'pap', 'srn', 'vls', 'zea']:
         return ['nl']
     if code == ['nds-nl']:
         return ['nds', 'nl']
@@ -205,6 +207,8 @@ def _altlang(code):
         return ['kj', 'ng']
     if code in ['meu', 'hmo']:
         return ['meu', 'hmo']
+    if code == ['as']:
+        return ['bn']
     #Default value
     return []
 
@@ -222,9 +226,19 @@ def translate(code, xdict, fallback=True):
     list.
 
     """
+    family = pywikibot.default_family
     # If a site is given instead of a code, use its language
     if hasattr(code, 'lang'):
+        family = code.family.name
         code = code.lang
+
+    # Check whether xdict has multiple projects
+    if family in xdict:
+        xdict = xdict[family]
+    elif 'wikipedia' in xdict:
+        xdict = xdict['wikipedia']
+    if type(xdict) != dict:
+        return xdict
 
     if code in xdict:
         return xdict[code]
@@ -250,8 +264,7 @@ def twtranslate(code, twtitle, parameters=None):
 
         @param code The language code
         @param twtitle The TranslateWiki string title, in <package>-<key> format
-        @param parameters For passing parameters. In the future, this will
-                          be used for plural support.
+        @param parameters For passing parameters.
 
         The translations are retrieved from i18n.<package>, based on the callers
         import table.
@@ -304,7 +317,7 @@ def twntranslate(code, twtitle, parameters=None):
 
     @param code The language code
     @param twtitle The TranslateWiki string title, in <package>-<key> format
-    @param parameters For passing parameters.
+    @param parameters For passing (plural) parameters.
 
     Support is implemented like in MediaWiki extension. If the tw message
     contains a plural tag inside which looks like
@@ -406,3 +419,22 @@ def twhas_key(code, twtitle):
     if hasattr(code, 'lang'):
         code = code.lang
     return code in transdict and twtitle in transdict[code]
+
+def input(twtitle, parameters=None, password=False):
+    """ Ask the user a question, return the user's answer.
+        @param twtitle The TranslateWiki string title, in <package>-<key> format
+        @param parameters For passing parameters. In the future, this will
+                          be used for plural support.
+        @param password Hides the user's input (for password entry)
+        Returns a unicode string
+
+        The translations are retrieved from i18n.<package>, based on the callers
+        import table.
+        Translation code should be set by in the user_config.py like
+        userinterface_lang = 'de'
+        default is mylang setting
+
+    """
+    code = config.userinterface_lang or config.mylang
+    trans = twtranslate(code, twtitle, parameters)
+    return pywikibot.input(trans, password)
