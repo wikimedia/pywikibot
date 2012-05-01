@@ -177,6 +177,10 @@ textfile_encoding = 'utf-8'
 # tkinter isn't yet ready
 userinterface = 'terminal'
 
+# i18n setting for user interface language
+# default is config.mylang or 'en'
+userinterface_lang = None
+
 # Should we transliterate characters that do not exist in the console
 # character set?
 # True: whenever possible
