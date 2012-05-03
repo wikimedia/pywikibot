@@ -64,8 +64,8 @@ Furthermore, the following command line parameters are supported:
                   in order not to waste too much CPU.
 
 -fix:XYZ          Perform one of the predefined replacements tasks, which are
-                  given in the dictionary 'fixes' defined inside the file
-                  fixes.py.
+                  given in the dictionary 'fixes' defined inside the files
+                  fixes.py and user-fixes.py.
                   The -regex and -nocase argument and given replacements will
                   be ignored if you use -fix.
                   Currently available predefined fixes are:
@@ -110,10 +110,12 @@ This command will change 'referer' to 'referrer', but not in pages which
 talk about HTTP, where the typo has become part of the standard:
 
     python replace.py referer referrer -file:typos.txt -excepttext:HTTP
+
+Please type "replace.py -help | more" if you can't read the top of the help.
 """
 from __future__ import generators
 #
-# (C) Daniel Herding & the Pywikipedia team, 2004-2011
+# (C) Daniel Herding & the Pywikipedia team, 2004-2012
 #
 __version__='$Id$'
 #
@@ -183,7 +185,8 @@ class XmlDumpReplacePageGenerator:
                         and not self.isTextExcepted(entry.text):
                     new_text = entry.text
                     for old, new in self.replacements:
-                        new_text = pywikibot.replaceExcept(new_text, old, new, self.excsInside, self.site)
+                        new_text = pywikibot.replaceExcept(
+                            new_text, old, new, self.excsInside, self.site)
                     if new_text != entry.text:
                         yield pywikibot.Page(self.site, entry.title)
         except KeyboardInterrupt:
@@ -613,7 +616,7 @@ u'Press Enter to use this default message, or enter a description of the\nchange
             caseInsensitive = fix['nocase']
         replacements = fix['replacements']
 
-    #Set the regular expression flags
+    # Set the regular expression flags
     flags = re.UNICODE
     if caseInsensitive:
         flags = flags | re.IGNORECASE
@@ -630,7 +633,8 @@ u'Press Enter to use this default message, or enter a description of the\nchange
         oldR = re.compile(old, flags)
         replacements[i] = oldR, new
 
-    for exceptionCategory in ['title', 'require-title', 'text-contains', 'inside']:
+    for exceptionCategory in [
+                        'title', 'require-title', 'text-contains', 'inside']:
         if exceptionCategory in exceptions:
             patterns = exceptions[exceptionCategory]
             if not regex:
