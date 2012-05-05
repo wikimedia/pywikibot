@@ -15,7 +15,7 @@ class Family(family.Family):
             'ar', 'hu', 'sv', 'cs', 'th', 'ko', 'ro', 'hr', 'te', 'fi', 'vi',
             'sl', 'el', 'sa', 'ca', 'nl', 'bn', 'tr', 'uk', 'sr', 'ja', 'ml',
             'br', 'la', 'mk', 'hy', 'az', 'li', 'yi', 'vec', 'ta', 'is', 'no',
-            'bs', 'id', 'eo', 'da', 'et', 'bg', 'sah', 'be', 'lt', 'gl', 'kn',
+            'bs', 'eo', 'id', 'da', 'et', 'bg', 'sah', 'be', 'lt', 'gl', 'kn',
             'mr', 'cy', 'sk', 'gu', 'fo', 'zh-min-nan',
         ]
 
