@@ -11,34 +11,34 @@ class Family(family.Family):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'pl', 'es', 'ru', 'ja', 'pt', 'sv',
-            'zh', 'vi', 'uk', 'ca', 'no', 'fi', 'cs', 'hu', 'ko', 'id', 'fa',
+            'en', 'de', 'fr', 'nl', 'it', 'pl', 'es', 'ru', 'ja', 'pt', 'zh',
+            'sv', 'vi', 'uk', 'ca', 'no', 'fi', 'cs', 'hu', 'ko', 'id', 'fa',
             'tr', 'ro', 'ar', 'sk', 'eo', 'da', 'sr', 'lt', 'sl', 'he', 'ms',
             'bg', 'kk', 'eu', 'vo', 'war', 'hr', 'hi', 'et', 'az', 'gl', 'nn',
             'simple', 'la', 'th', 'el', 'new', 'roa-rup', 'oc', 'sh', 'ka',
             'mk', 'tl', 'ht', 'pms', 'te', 'ta', 'be-x-old', 'ceb', 'br', 'lv',
-            'be', 'sq', 'jv', 'mg', 'lb', 'cy', 'mr', 'is', 'bs', 'yo', 'an',
-            'hy', 'bpy', 'fy', 'lmo', 'sw', 'ml', 'io', 'bn', 'pnb', 'af', 'gu',
+            'be', 'sq', 'jv', 'mg', 'cy', 'lb', 'mr', 'is', 'bs', 'yo', 'an',
+            'hy', 'bpy', 'fy', 'lmo', 'sw', 'ml', 'bn', 'io', 'pnb', 'af', 'gu',
             'ne', 'nds', 'ku', 'zh-yue', 'scn', 'ur', 'su', 'qu', 'diq', 'ba',
-            'ast', 'my', 'tt', 'ga', 'cv', 'ia', 'nap', 'bat-smg', 'map-bms',
-            'wa', 'am', 'kn', 'als', 'bug', 'tg', 'gd', 'zh-min-nan', 'hif',
-            'yi', 'vec', 'roa-tara', 'sco', 'os', 'arz', 'nah', 'sah', 'uz',
-            'sa', 'pam', 'mn', 'hsb', 'mi', 'li', 'si', 'ky', 'co', 'gan',
+            'ast', 'tt', 'my', 'ga', 'cv', 'ia', 'nap', 'bat-smg', 'map-bms',
+            'wa', 'am', 'kn', 'als', 'bug', 'tg', 'gd', 'zh-min-nan', 'yi',
+            'vec', 'hif', 'roa-tara', 'sco', 'os', 'arz', 'nah', 'sah', 'uz',
+            'sa', 'mn', 'pam', 'hsb', 'mi', 'li', 'si', 'ky', 'co', 'gan',
             'glk', 'ckb', 'bo', 'bar', 'bcl', 'fo', 'ilo', 'mrj', 'fiu-vro',
-            'nds-nl', 'tk', 'vls', 'se', 'gv', 'dv', 'rue', 'nrm', 'mzn', 'pag',
-            'ps', 'pa', 'koi', 'rm', 'km', 'kv', 'udm', 'csb', 'mhr', 'fur',
-            'mt', 'wuu', 'ug', 'lij', 'ang', 'lad', 'pi', 'zea', 'sc', 'bh',
-            'zh-classical', 'nov', 'ksh', 'or', 'so', 'nv', 'kw', 'hak', 'frp',
-            'ay', 'stq', 'xmf', 'ext', 'szl', 'pcd', 'frr', 'ie', 'gag', 'haw',
-            'xal', 'ln', 'rw', 'pdc', 'pfl', 'krc', 'crh', 'ace', 'eml', 'to',
-            'gn', 'ce', 'cbk-zam', 'kl', 'myv', 'arc', 'dsb', 'pap', 'bjn',
-            'tpi', 'lbe', 'as', 'mdf', 'wo', 'jbo', 'kab', 'av', 'sn', 'ty',
-            'srn', 'lo', 'ab', 'ltg', 'mwl', 'ig', 'na', 'kg', 'kbd', 'tet',
-            'lez', 'kaa', 'nso', 'rmy', 'zu', 'cu', 'tn', 'chr', 'sm', 'bi',
-            'bm', 'iu', 'ik', 'za', 'pih', 'ss', 'sd', 'pnt', 'got', 'cdo',
-            'ee', 'chy', 'ha', 'vep', 'ti', 'ks', 'om', 'bxr', 'ts', 've', 'sg',
-            'rn', 'dz', 'cr', 'lg', 'ak', 'tum', 'fj', 'ki', 'st', 'ch', 'ff',
-            'xh', 'ny', 'tw',
+            'nds-nl', 'tk', 'vls', 'se', 'gv', 'dv', 'rue', 'nrm', 'mzn', 'ps',
+            'pag', 'koi', 'pa', 'rm', 'km', 'kv', 'udm', 'csb', 'mhr', 'fur',
+            'mt', 'wuu', 'ug', 'lij', 'lad', 'pi', 'zea', 'sc', 'bh',
+            'zh-classical', 'nov', 'ksh', 'ang', 'or', 'so', 'nv', 'kw', 'hak',
+            'frp', 'ay', 'xmf', 'stq', 'ext', 'szl', 'pcd', 'frr', 'ie', 'gag',
+            'haw', 'xal', 'ln', 'rw', 'pdc', 'pfl', 'krc', 'crh', 'ace', 'eml',
+            'to', 'gn', 'ce', 'kl', 'myv', 'arc', 'dsb', 'bjn', 'pap', 'as',
+            'lbe', 'tpi', 'mdf', 'wo', 'jbo', 'kab', 'av', 'cbk-zam', 'sn',
+            'ty', 'srn', 'lo', 'ab', 'ltg', 'mwl', 'kbd', 'ig', 'na', 'kg',
+            'tet', 'lez', 'kaa', 'nso', 'za', 'rmy', 'zu', 'cu', 'tn', 'chr',
+            'sm', 'bi', 'bm', 'iu', 'ik', 'pih', 'ss', 'sd', 'pnt', 'got',
+            'vep', 'cdo', 'chy', 'ee', 'ha', 'ti', 'bxr', 'ks', 'om', 'ts',
+            've', 'sg', 'rn', 'dz', 'cr', 'lg', 'ak', 'tum', 'fj', 'ki', 'st',
+            'ch', 'ff', 'xh', 'ny', 'tw',
         ]
 
         for lang in self.languages_by_size:
@@ -586,12 +586,6 @@ class Family(family.Family):
         # for historic reasons, the databases are called xxwiki instead of
         # xxwikipedia for Wikipedias.
         return '%swiki_p' % code
-
-    def version(self, code):
-        """Return MediaWiki version number as a string."""
-        # Don't use this, use versionnumber() instead. This only exists
-        # to not break family files.
-        return '1.19wmf1'
 
     def code2encodings(self, code):
         """Return a list of historical encodings for a specific language
