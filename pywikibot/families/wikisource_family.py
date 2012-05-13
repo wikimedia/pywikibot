@@ -11,12 +11,12 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'en', 'fr', 'ru', 'zh', 'pt', 'de', 'it', 'es', 'pl', 'he', 'fa',
-            'ar', 'hu', 'sv', 'cs', 'th', 'ko', 'ro', 'hr', 'te', 'fi', 'vi',
-            'sl', 'el', 'sa', 'ca', 'nl', 'bn', 'tr', 'uk', 'sr', 'ja', 'ml',
-            'br', 'la', 'mk', 'hy', 'az', 'li', 'yi', 'vec', 'ta', 'is', 'no',
-            'bs', 'eo', 'id', 'da', 'et', 'bg', 'sah', 'be', 'lt', 'gl', 'kn',
-            'mr', 'cy', 'sk', 'gu', 'fo', 'zh-min-nan',
+            'fr', 'en', 'de', 'ru', 'it', 'zh', 'pt', 'he', 'pl', 'es', 'sv',
+            'fa', 'hu', 'ar', 'ca', 'cs', 'sl', 'ko', 'ro', 'fi', 'vi', 'te',
+            'sa', 'el', 'bn', 'th', 'hr', 'hy', 'nl', 'no', 'la', 'sr', 'vec',
+            'ml', 'tr', 'ja', 'yi', 'uk', 'br', 'mk', 'id', 'is', 'ta', 'da',
+            'eo', 'li', 'be', 'bg', 'sah', 'gu', 'bs', 'et', 'gl', 'az', 'lt',
+            'kn', 'mr', 'cy', 'zh-min-nan', 'sk', 'fo',
         ]
 
         for lang in self.languages_by_size:
