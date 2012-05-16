@@ -387,9 +387,6 @@ class GeneratorFactory(object):
             gen = ReferringPageGenerator(transclusionPage,
                                          onlyTemplateInclusion=True)
         elif arg.startswith('-start'):
-            if arg.startswith('-startxml'):
-                pywikibot.output(u'-startxml : wrong parameter')
-                raise ValueError
             firstPageTitle = arg[7:]
             if not firstPageTitle:
                 firstPageTitle = pywikibot.input(
