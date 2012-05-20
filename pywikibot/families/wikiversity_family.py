@@ -15,8 +15,8 @@ class Family(family.Family):
             'fi', 'sv', 'sl', 'ja',
         ]
 
-        for lang in self.languages_by_size:
-            self.langs[lang] = '%s.wikiversity.org' % lang
+        self.langs = dict([(lang, '%s.wikiversity.org' % lang) for lang in self.languages_by_size])
+
 
         # CentralAuth cross avaliable projects.
         self.cross_projects = [

@@ -27,8 +27,7 @@ class Family(family.Family):
             'jbo', 'dv', 'ne', 'ha', 'ks', 'ay', 'ts', 'dz',
         ]
 
-        for lang in self.languages_by_size:
-            self.langs[lang] = '%s.wiktionary.org' % lang
+        self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])
 
 
         # CentralAuth cross avaliable projects.

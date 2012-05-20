@@ -20,8 +20,8 @@ class Family(family.Family):
             'wo', 'ky', 'co', 'am',
         ]
 
-        for lang in self.languages_by_size:
-            self.langs[lang] = '%s.wikiquote.org' % lang
+        self.langs = dict([(lang, '%s.wikiquote.org' % lang) for lang in self.languages_by_size])
+
 
         self.disambiguationTemplates = {
             '_default': [],

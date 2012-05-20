@@ -21,8 +21,8 @@ class Family(family.Family):
             'ast', 'ku', 'tk', 'uz', 'su', 'vo', 'mn', 'my',
         ]
 
-        for lang in self.languages_by_size:
-            self.langs[lang] = '%s.wikibooks.org' % lang
+        self.langs = dict([(lang, '%s.wikibooks.org' % lang) for lang in self.languages_by_size])
+
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
             'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
