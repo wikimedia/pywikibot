@@ -52,7 +52,7 @@ class Family(family.Family):
             'arz': (u'تحويل تصنيف',),
             'cs': (u'Zastaralá kategorie',),
             'da': (u'Kategoriomdirigering',),
-            'de': (u'Kategorieweiterleitung',),
+            # 'de' has removed its template
             'en': (u'Category redirect',
                    u'Category redirect3',
                    u"Categoryredirect",
