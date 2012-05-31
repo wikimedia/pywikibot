@@ -534,6 +534,10 @@ Global arguments available for all bots:
 
 -log:xyz          Enable the logfile, using 'xyz' as the filename.
 
+-maxlag           Sets a new maxlag parameter to a number of seconds. Defer bot
+                  edits during periods of database server lag. Default is set by
+                  config.py
+
 -nolog            Disable the logfile (if it is enabled by default).
 
 -debug:item       Enable the logfile and include extensive debugging data
