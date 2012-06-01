@@ -11,7 +11,7 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'pl', 'it', 'fr', 'ru', 'de', 'pt', 'es', 'sk', 'bg', 'cs',
+            'en', 'pl', 'it', 'ru', 'fr', 'de', 'pt', 'es', 'sk', 'bg', 'cs',
             'bs', 'tr', 'sl', 'he', 'eo', 'lt', 'el', 'uk', 'id', 'zh', 'fa',
             'hu', 'fi', 'nl', 'sv', 'li', 'no', 'nn', 'ja', 'az', 'hy', 'ca',
             'et', 'ar', 'hr', 'cy', 'ka', 'ko', 'ml', 'gl', 'sr', 'ro', 'ku',
