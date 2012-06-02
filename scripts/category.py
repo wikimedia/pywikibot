@@ -53,6 +53,8 @@ Options for several actions:
  * -inplace     - Use this flag to change categories in place rather than
                   rearranging them.
  * -recurse     - Recurse through all subcategories of categories.
+ * -pagesonly   - While removing pages from a category, keep the subpage links
+                  and do not remove them
  * -match       - Only work on pages whose titles match the given regex (for
                   move and remove actions).
 
@@ -505,12 +507,16 @@ class CategoryListifyRobot:
 
 class CategoryRemoveRobot:
     '''Removes the category tag from all pages in a given category
-    and from the category pages of all subcategories, without prompting.
-    Does not remove category tags pointing at subcategories.
+    and if pagesonly parameter is False also from the category pages of all
+    subcategories, without prompting. If the category is empty, it will be
+    tagged for deleting. Does not remove category tags pointing at
+    subcategories.
 
     '''
 
-    def __init__(self, catTitle, batchMode = False, editSummary = '', useSummaryForDeletion = True, titleRegex = None, inPlace = False):
+    def __init__(self, catTitle, batchMode=False, editSummary='',
+                 useSummaryForDeletion=True, titleRegex=None, inPlace=False,
+                 pagesonly=False):
         self.editSummary = editSummary
         self.site = pywikibot.getSite()
         self.cat = catlib.Category(pywikibot.Link('Category:' + catTitle))
@@ -519,6 +525,7 @@ class CategoryRemoveRobot:
         self.batchMode = batchMode
         self.titleRegex = titleRegex
         self.inPlace = inPlace
+        self.pagesonly = pagesonly
         if not self.editSummary:
             self.editSummary = i18n.twtranslate(self.site, 'category-removing',
                                                 {'oldcat': self.cat.title()})
@@ -531,6 +538,9 @@ class CategoryRemoveRobot:
             for article in articles:
                 if not self.titleRegex or re.search(self.titleRegex,article.title()):
                     catlib.change_category(article, self.cat, None, comment = self.editSummary, inPlace = self.inPlace)
+        if self.pagesonly:
+            return
+
         # Also removes the category tag from subcategories' pages
         subcategories = set(self.cat.subcategories())
         if len(subcategories) == 0:
@@ -806,6 +816,7 @@ def main(*args):
     talkPages = False
     recurse = False
     titleRegex = None
+    pagesonly = False
 
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
@@ -867,6 +878,8 @@ def main(*args):
             talkPages = True
         elif arg == '-recurse':
             recurse = True
+        elif arg == '-pagesonly':
+            pagesonly = True
         elif arg == '-create':
             create_pages = True
         else:
@@ -888,7 +901,8 @@ def main(*args):
             oldCatTitle = pywikibot.input(
 u'Please enter the name of the category that should be removed:')
         bot = CategoryRemoveRobot(oldCatTitle, batchMode, editSummary,
-                                  useSummaryForDeletion, inPlace=inPlace)
+                                  useSummaryForDeletion, inPlace=inPlace,
+                                  pagesonly=pagesonly)
         bot.run()
     elif action == 'move':
         if (fromGiven == False):
