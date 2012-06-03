@@ -678,12 +678,16 @@ class APISite(BaseSite):
         @param sysop: if True, require sysop privileges.
 
         """
-        if self.userinfo['name'] is None or\
-           self._username[sysop] is None or\
-           pywikibot.Page(self, ns=2, title=self.userinfo['name']) != \
-           pywikibot.Page(self, ns=2, title=self._username[sysop]):
+        if sysop and 'sysop' not in self.userinfo['groups']:
             return False
-        return (not sysop) or 'sysop' in self.userinfo['groups']
+        
+        if not self.userinfo['name']:
+            return False
+            
+        if self.userinfo['name'] != self._username[sysop]:
+            pywikibot.warning("Logged in as %s instead of %s" % (self.userinfo['name'], self._username[sysop]))
+            
+        return True
 
     @deprecated("Site.user()")
     def loggedInAs(self, sysop = False):
