@@ -135,15 +135,15 @@ class CosmeticChangesToolkit:
         if self.site.sitename()== u'commons:commons' and self.namespace == 6:
             text = self.commonsfiledesc(text)
         text = self.fixSelfInterwiki(text)
-        text = self.standardizePageFooter(text)
+##        text = self.standardizePageFooter(text) # removes pipe links on categories
         text = self.fixSyntaxSave(text)
-        text = self.cleanUpLinks(text)
+##        text = self.cleanUpLinks(text) #module object has no attribute url2unicode
         text = self.cleanUpSectionHeaders(text)
         text = self.putSpacesInLists(text)
 ##        text = self.translateAndCapitalizeNamespaces(text) ##excluded since family.namespaces does not exist anymore
 ##        text = self.translateMagicWords(text)
         text = self.replaceDeprecatedTemplates(text)
-        text = self.resolveHtmlEntities(text)
+##        text = self.resolveHtmlEntities(text)
         text = self.validXhtml(text)
         text = self.removeUselessSpaces(text)
         text = self.removeNonBreakingSpaceBeforePercent(text)
