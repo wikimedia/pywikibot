@@ -266,9 +266,9 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
                                 headers={'Content-Type':
                                          'application/x-www-form-urlencoded'},
                                 body=paramstring)
-                import traceback
-                traceback.print_stack()
-                print rawdata
+##                import traceback
+##                traceback.print_stack()
+##                print rawdata
             except Server504Error:
                 pywikibot.log(u"Caught HTTP 504 error; retrying")
                 self.wait()
@@ -605,7 +605,7 @@ class QueryGenerator(object):
                     new_limit = min(new_limit, self.api_limit // 10, 250)
                 if new_limit is not None:
                     self.request[self.prefix+"limit"] = str(new_limit)
-            if not self.data:
+            if not hasattr(self, "data"):
                 try:
                     self.data = self.request.submit()
                 except Server504Error:
