@@ -93,10 +93,8 @@ def main(*args):
                 else:
                     pywikibot.output(u"Not logged in on %(site)s." % locals())
             except NoSuchSite:
-                pywikibot.output(
-                    lang + u'.' + familyName +
-u' is not a valid site, please remove it from your config')
-
+                pywikibot.output(u'%s.%s is not a valid site, please remove it'
+                                 u' from your config' % (lang, familyName))
 if __name__ == "__main__":
     try:
         main()
