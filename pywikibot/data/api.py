@@ -32,8 +32,6 @@ _logger = "data.api"
 
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
-_modules = {} # cache for retrieved API parameter information
-
 class APIError(pywikibot.Error):
     """The wiki site returned an error message."""
     def __init__(self, code, info, **kwargs):
@@ -268,6 +266,9 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
                                 headers={'Content-Type':
                                          'application/x-www-form-urlencoded'},
                                 body=paramstring)
+                import traceback
+                traceback.print_stack()
+                print rawdata
             except Server504Error:
                 pywikibot.log(u"Caught HTTP 504 error; retrying")
                 self.wait()
@@ -405,7 +406,7 @@ class CachedRequest(Request):
             pass
     
     def _create_file_name(self):
-        return hashlib.sha256(self.http_params()).hexdigest()
+        return hashlib.sha256(str(self.site) + str(self)).hexdigest()
         
     def _cachefile_path(self):
         return os.path.join(self._get_cache_dir(), self._create_file_name())
@@ -416,7 +417,9 @@ class CachedRequest(Request):
     def _load_cache(self):
         """ Returns whether the cache can be used """
         try:
-            self._data, self._cachetime = pickle.load(open(self._cachefile_path()))
+            sitestr, selfstr, self._data, self._cachetime = pickle.load(open(self._cachefile_path()))
+            assert(sitestr == str(self.site))
+            assert(selfstr == str(self))
             if self._expired(self._cachetime):
                 self._data = None
                 return False
@@ -426,7 +429,7 @@ class CachedRequest(Request):
     
     def _write_cache(self, data):
         """ writes data to self._cachefile_path() """
-        data = [data, datetime.datetime.now()]
+        data = [str(self.site), str(self), data, datetime.datetime.now()]
         pickle.dump(data, open(self._cachefile_path(), 'w'))
         
     def submit(self):
@@ -477,10 +480,7 @@ class QueryGenerator(object):
         else:
             raise Error("%s: No query module name found in arguments."
                         % self.__class__.__name__)
-        for name in self.module.split("|"):
-            if name not in _modules:
-                self.get_module()
-                break
+
         kwargs["indexpageids"] = ""  # always ask for list of pageids
         self.request = Request(**kwargs)
         self.prefix = None
@@ -497,11 +497,13 @@ class QueryGenerator(object):
                                             # is the same as the querymodule,
                                             # but not always
 
-    def get_module(self):
+    @property
+    def _modules(self):
         """Query api on self.site for paraminfo on querymodule=self.module"""
-
-        paramreq = Request(site=self.site, action="paraminfo",
-                           querymodules=self.module)
+        _modules = {}
+        paramreq = CachedRequest(expiry=config.API_config_expiry,
+                                 site=self.site, action="paraminfo",
+                                 querymodules=self.module)
         data = paramreq.submit()
         assert "paraminfo" in data
         assert "querymodules" in data["paraminfo"]
@@ -511,6 +513,7 @@ class QueryGenerator(object):
             if "missing" in paraminfo:
                 raise Error("Invalid query module name '%s'." % self.module)
             _modules[paraminfo["name"]] = paraminfo
+        return _modules
 
     def set_query_increment(self, value):
         """Set the maximum number of items to be retrieved per API query.
@@ -546,7 +549,7 @@ class QueryGenerator(object):
 
         self.api_limit = None
         for mod in self.module.split('|'):
-            for param in _modules[mod].get("parameters", []):
+            for param in self._modules[mod].get("parameters", []):
                 if param["name"] == "limit":
                     if (self.site.logged_in()
                             and "apihighlimits" in
@@ -555,7 +558,7 @@ class QueryGenerator(object):
                     else:
                         self.api_limit = int(param["max"])
                     if self.prefix is None:
-                        self.prefix = _modules[mod]["prefix"]
+                        self.prefix = self._modules[mod]["prefix"]
                     pywikibot.debug(u"%s: Set query_limit to %i."
                                       % (self.__class__.__name__,
                                          self.api_limit),
@@ -573,7 +576,7 @@ class QueryGenerator(object):
         else:
             namespaces = str(namespaces)
         for mod in self.module.split('|'):
-            for param in _modules[mod].get("parameters", []):
+            for param in self._modules[mod].get("parameters", []):
                 if param["name"] == "namespace":
                     self.request[self.prefix+"namespace"] = namespaces
                     return
@@ -602,16 +605,17 @@ class QueryGenerator(object):
                     new_limit = min(new_limit, self.api_limit // 10, 250)
                 if new_limit is not None:
                     self.request[self.prefix+"limit"] = str(new_limit)
-            try:
-                self.data = self.request.submit()
-            except Server504Error:
-                # server timeout, usually caused by request with high limit
-                old_limit = self.query_limit
-                if old_limit is None or old_limit < 2:
-                    raise
-                pywikibot.log("Setting query limit to %s" % (old_limit // 2))
-                self.set_query_increment(old_limit // 2)
-                continue
+            if not self.data:
+                try:
+                    self.data = self.request.submit()
+                except Server504Error:
+                    # server timeout, usually caused by request with high limit
+                    old_limit = self.query_limit
+                    if old_limit is None or old_limit < 2:
+                        raise
+                    pywikibot.log("Setting query limit to %s" % (old_limit // 2))
+                    self.set_query_increment(old_limit // 2)
+                    continue
             if not self.data or not isinstance(self.data, dict):
                 pywikibot.debug(
                     u"%s: stopped iteration because no dict retrieved from api."

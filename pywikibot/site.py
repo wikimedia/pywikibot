@@ -678,6 +678,9 @@ class APISite(BaseSite):
         @param sysop: if True, require sysop privileges.
 
         """
+        if not hasattr(self, "_userinfo"):
+            return False
+            
         if sysop and 'sysop' not in self.userinfo['groups']:
             return False
         
@@ -918,7 +921,8 @@ class APISite(BaseSite):
 
     def _getsiteinfo(self):
         """Retrieve siteinfo and namespaces from site."""
-        sirequest = api.Request(
+        sirequest = api.CachedRequest(
+                            expiry=config.API_config_expiry,
                             site=self,
                             action="query",
                             meta="siteinfo",

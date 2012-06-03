@@ -17,18 +17,17 @@ class TestApiFunctions(unittest.TestCase):
 
     def testObjectCreation(self):
         """Test that api.Request() creates an object with desired attributes"""
-        req = api.Request(site=mysite, foo="", bar="test")
+        req = api.Request(site=mysite, action="test", foo="", bar="test")
         self.assert_(req)
         self.assertEqual(req.site, mysite)
         self.assert_("foo" in req.params)
-        self.assertEqual(req["format"], "json")
         self.assertEqual(req["bar"], "test")
         # test item assignment
         req["one"] = "1"
         self.assertEqual(req.params['one'], "1")
         # test compliance with dict interface
-        # req.keys() should contain "foo", "bar", "format", "maxlag", "one"
-        self.assertEqual(len(req.keys()), 5)
+        # req.keys() should contain "action", "foo", "bar", "one"
+        self.assertEqual(len(req.keys()), 4)
         self.assert_("test" in req.values())
         self.assert_(all(len(item) == 2 for item in req.iteritems()))
 

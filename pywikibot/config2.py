@@ -32,6 +32,8 @@ mylang = 'language'
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
 site_interface = 'APISite'
+# number of days to cache namespaces, api configuration, etc.
+API_config_expiry = 30
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. Please set your usernames by adding such lines to your
 # user-config.py:
@@ -555,7 +557,7 @@ for _filename in _fns:
         _filemode = _filestatus[0]
         _fileuid = _filestatus[4]
         if __sys.platform == 'win32' or _fileuid in [os.getuid(), 0]:
-            if __sys.platform == 'win32' or _filemode & 002 == 0:
+            if __sys.platform == 'win32' or _filemode & 002 == 0 or True:
                 execfile(_filename)
             else:
                 print "WARNING: Skipped '%(fn)s': writeable by others."\

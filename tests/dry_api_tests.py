@@ -2,13 +2,14 @@ import datetime
 import pywikibot
 from pywikibot.data.api import CachedRequest
 
-parms = {'site': pywikibot.getSite(),
+parms = {'site': pywikibot.getSite('en'),
          'action': 'query',
          'meta': 'userinfo'}
 
 req = CachedRequest(expiry=1, **parms)
 expreq = CachedRequest(expiry=0, **parms)
-diffreq = CachedRequest(expiry=1, action='query', meta='siteinfo')
+diffreq = CachedRequest(expiry=1, site=pywikibot.getSite('en'), action='query', meta='siteinfo')
+diffsite = CachedRequest(expiry=1, site=pywikibot.getSite('de'), action='query', meta='userinfo')
 
 def test_expiry_formats():
 	import datetime
@@ -27,7 +28,8 @@ def test_cachefile_path():
     assert(req._cachefile_path() == req._cachefile_path())
     assert(req._cachefile_path() == expreq._cachefile_path())
     assert(req._cachefile_path() != diffreq._cachefile_path())
-
+    assert(req._cachefile_path() != diffsite._cachefile_path())
+    
 def test_expired():
     assert(not req._expired(datetime.datetime.now()))
     assert(req._expired(datetime.datetime.now() - datetime.timedelta(days=2)))
