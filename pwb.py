@@ -1,6 +1,6 @@
 import sys,os
 sys.path.append('.')
-sys.path.append('externals')
+sys.path.append('externals/httplib2')
 sys.path.append('pywikibot/compat')
 
 if "PYWIKIBOT2_DIR" not in os.environ:
