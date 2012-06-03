@@ -379,6 +379,64 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
 
+import datetime
+import hashlib
+import pickle
+import os
+
+class CachedRequest(Request):
+    def __init__(self, expiry, *args, **kwargs):
+        """ expiry should be either a number of days or a datetime.timedelta object """
+        super(CachedRequest, self).__init__(*args, **kwargs)
+        if not isinstance(expiry, datetime.timedelta):
+            expiry = datetime.timedelta(expiry)
+        self.expiry = expiry
+        self._data = None
+        self._cachetime = None
+    
+    def _get_cache_dir(self):
+        path = os.path.join(pywikibot.config2.base_dir, 'apicache')
+        self._make_dir(path)
+        return path
+        
+    def _make_dir(self, dir):
+        try:
+            os.makedirs(dir)
+        except OSError:
+            # directory already exists
+            pass
+    
+    def _create_file_name(self):
+        return hashlib.sha256(self.http_params()).hexdigest()
+        
+    def _cachefile_path(self):
+        return os.path.join(self._get_cache_dir(), self._create_file_name())
+        
+    def _expired(self, dt):
+        return dt + self.expiry < datetime.datetime.now()
+        
+    def _load_cache(self):
+        """ Returns whether the cache can be used """
+        try:
+            self._data, self._cachetime = pickle.load(open(self._cachefile_path()))
+            if self._expired(self._cachetime):
+                self._data = None
+                return False
+            return True
+        except Exception:
+            return False
+    
+    def _write_cache(self, data):
+        """ writes data to self._cachefile_path() """
+        data = [data, datetime.datetime.now()]
+        pickle.dump(data, open(self._cachefile_path(), 'w'))
+        
+    def submit(self):
+        cached_available = self._load_cache()
+        if not cached_available:
+            self._data = super(CachedRequest, self).submit()
+            self._write_cache(self._data)
+        return self._data
 
 class QueryGenerator(object):
     """Base class for iterators that handle responses to API action=query.
