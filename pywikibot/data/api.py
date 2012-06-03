@@ -216,8 +216,6 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
         from email.mime.nonmultipart import MIMENonMultipart
 
         paramstring = self.http_params()
-        if self.site._loginstatus == -3:
-            self.site.login(False)
         while True:
             action = self.params.get("action", "")
             self.site.throttle(write=self.write)
