@@ -680,16 +680,16 @@ class APISite(BaseSite):
         """
         if not hasattr(self, "_userinfo"):
             return False
-            
+
         if sysop and 'sysop' not in self.userinfo['groups']:
             return False
-        
+
         if not self.userinfo['name']:
             return False
-            
+
         if self.userinfo['name'] != self._username[sysop]:
             pywikibot.warning("Logged in as %s instead of %s" % (self.userinfo['name'], self._username[sysop]))
-            
+
         return True
 
     @deprecated("Site.user()")
@@ -2885,7 +2885,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 
         """
         # TODO: update docstring
-        
+
         # N.B. API still provides no way to access Special:Newpages content
         # directly, so we get new pages indirectly through 'recentchanges'
 
@@ -2913,7 +2913,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 
         N.B. the API does not provide direct access to Special:Newimages, so
         this is derived from the "upload" log events instead.
-        
+
         """
         #TODO: update docstring
         for event in logevents(self, logtype="upload", user=user,
@@ -3028,7 +3028,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
                                 gqppage="Uncategorizedpages",
                                 step=step, total=total)
         return upgen
-    
+
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
     def uncategorizedtemplates(self, number=None, repeat=True,

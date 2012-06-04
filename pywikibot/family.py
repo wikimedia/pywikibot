@@ -25,7 +25,7 @@ class Family:
         # http://meta.wikimedia.org/wiki/Interwiki_sorting_order
 
         # The sorting order by language name from meta
-        # MediaWiki:Interwiki_config-sorting_order-native-languagename 
+        # MediaWiki:Interwiki_config-sorting_order-native-languagename
         self.alphabetic = [
             'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
             'arc', 'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm',
@@ -60,7 +60,7 @@ class Family:
         ]
 
         # The revised sorting order by first word from meta
-        # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword 
+        # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword
         self.alphabetic_revised = [
             'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
             'arc', 'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bjn',
