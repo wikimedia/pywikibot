@@ -131,7 +131,7 @@ from pywikibot import i18n
 import webbrowser
 
 # Imports predefined replacements tasks from fixes.py
-import scripts.fixes as fixes
+from pywikibot import fixes
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
