@@ -39,12 +39,12 @@ all of them, but be careful if you do.
 #
 __version__ = '$Id$'
 #
+import sys, re
 import pywikibot
 import isbn
 from pywikibot import pagegenerators
 from pywikibot import i18n
-import sys
-import re
+from pywikibot import config2 as config
 
 warning = """
 ATTENTION: You can run this script as a stand-alone for testing purposes.
@@ -57,7 +57,13 @@ docuReplacements = {
     '&warning;': warning,
 }
 
-nn_iw_msg = u'<!--interwiki (no, sv, da first; then other languages alphabetically by name)-->'
+# Interwiki message on top of iw links
+# 2nd line is a regex if needed
+msg_interwiki = {
+    'fr' : u'<!-- Autres langues -->',
+    'nn' : (u'<!--interwiki (no, sv, da first; then other languages alphabetically by name)-->',
+            u'(<!-- ?interwiki \(no(?:/nb)?, ?sv, ?da first; then other languages alphabetically by name\) ?-->)')
+}    
 
 # This is from interwiki.py;
 # move it to family file and implement global instances
@@ -157,6 +163,8 @@ class CosmeticChangesToolkit:
         try:
             text = isbn.hyphenateIsbnNumbers(text)
         except isbn.InvalidIsbnException, error:
+            if config.verbose_output:
+                pywikibot.output(u"ISBN error: %s" % error)
             pass
         if self.debug:
             pywikibot.showDiff(oldText, text)
@@ -168,7 +176,8 @@ class CosmeticChangesToolkit:
         Remove their language code prefix.
         """
         if not self.talkpage and pywikibot.calledModuleName() <> 'interwiki':
-            interwikiR = re.compile(r'\[\[%s\s?:([^\[\]\n]*)\]\]' % self.site.lang)
+            interwikiR = re.compile(r'\[\[%s\s?:([^\[\]\n]*)\]\]'
+                                    % self.site.lang)
             text = interwikiR.sub(r'[[\1]]', text)
         return text
 

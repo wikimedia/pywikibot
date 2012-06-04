@@ -346,13 +346,14 @@ import time
 import codecs
 import pickle
 import socket
+import webbrowser
 import pywikibot
 from pywikibot import config
 from pywikibot import catlib
 from pywikibot import pagegenerators
 from pywikibot import i18n
-import titletranslate, interwiki_graph
-import webbrowser
+from pywikibot import interwiki_graph
+from pywikibot import titletranslate
 
 docuReplacements = {
     '&pagegenerators_help;': pagegenerators.parameterHelp
