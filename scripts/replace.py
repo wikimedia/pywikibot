@@ -125,7 +125,7 @@ __version__='$Id$'
 import sys, re, time
 import pywikibot
 from pywikibot import pagegenerators
-from scripts import editarticle
+from pywikibot import editor as editarticle
 from pywikibot import catlib, config
 from pywikibot import i18n
 import webbrowser

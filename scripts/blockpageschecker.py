@@ -198,7 +198,7 @@ def showQuest(site, page):
     if quest == 'b':
         webbrowser.open(url)
     elif quest == 'g':
-        import editarticle
+        from pywikibot import editor as editarticle
         editor = editarticle.TextEditor()
         text = editor.edit(page.get())
 

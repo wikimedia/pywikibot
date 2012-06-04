@@ -86,7 +86,7 @@ import re, sys, codecs
 
 # Application specific imports
 import pywikibot
-from scripts import editarticle
+from pywikibot import editor as editarticle
 from pywikibot import pagegenerators
 from pywikibot import config
 from pywikibot import i18n

@@ -174,7 +174,7 @@ class UploadRobot:
                 u'Do you want to change this description?',
                 ['Yes', 'No'], ['y', 'N'], 'n')
             if choice == 'y':
-                import editarticle
+                from pywikibot import editor as editarticle
                 editor = editarticle.TextEditor()
                 newDescription = editor.edit(self.description)
             # if user saved / didn't press Cancel
