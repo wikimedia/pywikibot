@@ -1573,7 +1573,7 @@ class Category(Page):
     @deprecate_arg("forceInterwiki", None)
     @deprecate_arg("textlink", None)
     @deprecate_arg("noInterwiki", None)
-    def aslink(self, sortKey=u''):
+    def aslink(self, sortKey=None):
         """Return a link to place a page in this Category.
 
         Use this only to generate a "true" category link, not for interwikis
@@ -1584,9 +1584,10 @@ class Category(Page):
         @type sortKey: (optional) unicode
 
         """
-        if sortKey:
+        key = sortKey or self.sortKey
+        if key:
             titleWithSortKey = '%s|%s' % (self.title(withSection=False),
-                                          self.sortKey)
+                                          key)
         else:
             titleWithSortKey = self.title(withSection=False)
         return '[[%s]]' % titleWithSortKey
