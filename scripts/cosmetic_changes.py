@@ -32,7 +32,7 @@ if you're running a bot on multiple sites and want to do cosmetic changes on
 all of them, but be careful if you do.
 """
 #
-# (C) xqt, 2009-2011
+# (C) xqt, 2009-2012
 # (C) Pywikipedia bot team, 2006-2012
 #
 # Distributed under the terms of the MIT license.
@@ -141,7 +141,7 @@ class CosmeticChangesToolkit:
         if self.site.sitename()== u'commons:commons' and self.namespace == 6:
             text = self.commonsfiledesc(text)
         text = self.fixSelfInterwiki(text)
-##        text = self.standardizePageFooter(text) # removes pipe links on categories
+        text = self.standardizePageFooter(text)
         text = self.fixSyntaxSave(text)
 ##        text = self.cleanUpLinks(text) #module object has no attribute url2unicode
         text = self.cleanUpSectionHeaders(text)
