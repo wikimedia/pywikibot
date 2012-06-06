@@ -16,9 +16,9 @@ class Family(family.Family):
             'da', 'th', 'gl', 'ta', 'no', 'ko', 'fa', 'sr', 'ar', 'tl', 'mk',
             'is', 'tt', 'lt', 'ka', 'az', 'eo', 'ro', 'bg', 'uk', 'hy', 'sl',
             'sk', 'el', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'mr',
-            'bn', 'ms', 'hi', 'oc', 'ml', 'kk', 'eu', 'fy', 'ie', 'ne', 'te',
-            'af', 'tg', 'sa', 'pa', 'bs', 'ky', 'mg', 'cy', 'be', 'zh-min-nan',
-            'ast', 'ku', 'tk', 'uz', 'su', 'vo', 'mn', 'my',
+            'bn', 'ms', 'hi', 'oc', 'ml', 'kk', 'eu', 'fy', 'ie', 'ne', 'km',
+            'te', 'af', 'tg', 'sa', 'pa', 'bs', 'ky', 'mg', 'cy', 'be',
+            'zh-min-nan', 'ast', 'ku', 'tk', 'uz', 'su', 'vo', 'mn', 'my',
         ]
 
         self.langs = dict([(lang, '%s.wikibooks.org' % lang) for lang in self.languages_by_size])
