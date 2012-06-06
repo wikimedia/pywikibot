@@ -11,6 +11,8 @@ The following parameters are supported:
 -always           Don't prompt you for each replacement. Warning (see below)
                   has not to be confirmed. ATTENTION: Use this with care!
 
+-async            Put page on queue to be saved to wiki asynchronously.
+
 -summary:XYZ      Set the summary message text for the edit to XYZ, bypassing
                   the predefined message texts with original and replacements
                   inserted.
@@ -655,12 +657,13 @@ class CosmeticChangesToolkit:
         return text
 
 class CosmeticChangesBot:
-    def __init__(self, generator, acceptall = False,
-                 comment=u'Robot: Cosmetic changes'):
+    def __init__(self, generator, acceptall=False,
+                 comment=u'Robot: Cosmetic changes', async=False):
         self.generator = generator
         self.acceptall = acceptall
         self.comment = comment
         self.done = False
+        self.async = async
 
     def treat(self, page):
         try:
@@ -683,7 +686,8 @@ class CosmeticChangesBot:
                         self.done = True
                         return
                 if self.acceptall or choice == 'y':
-                    page.put(changedText, comment=self.comment)
+                    page.text = changedText
+                    page.save(comment=self.comment, async=self.async)
             else:
                 pywikibot.output('No changes were necessary in %s'
                                  % page.title())
@@ -715,6 +719,7 @@ def main():
     editSummary = ''
     answer = 'y'
     always = False
+    async = False
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
@@ -725,6 +730,8 @@ def main():
             editSummary = arg[len('-summary:'):]
         elif arg == '-always':
             always = True
+        elif arg == '-async':
+            async = True
         elif not genFactory.handleArg(arg):
             pageTitle.append(arg)
 
@@ -747,7 +754,7 @@ def main():
         if answer == 'y':
             preloadingGen = pagegenerators.PreloadingGenerator(gen)
             bot = CosmeticChangesBot(preloadingGen, acceptall=always,
-                                     comment=editSummary)
+                                     comment=editSummary, async=async)
             bot.run()
 
 if __name__ == "__main__":
