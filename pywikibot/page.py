@@ -3,7 +3,7 @@
 Objects representing various types of MediaWiki pages.
 """
 #
-# (C) Pywikipedia bot team, 2008-2011
+# (C) Pywikipedia bot team, 2008-2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -329,7 +329,8 @@ class Page(object):
             self.site.loadrevisions(self)
         return self._revid
 
-    def _textgetter(self):
+    @property
+    def text(self):
         """Return the current (edited) wikitext, loading it if necessary."""
         if not hasattr(self, '_text') or self._text is None:
             try:
@@ -339,17 +340,16 @@ class Page(object):
                 self._text = u""
         return self._text
 
-    def _textsetter(self, value):
+    @text.setter
+    def text(self, value):
         """Update the edited wikitext"""
-        self._text = unicode(value)
+        self._text = None if value is None else unicode(value)
 
-    def _cleartext(self):
+    @text.deleter
+    def text(self):
         """Delete the edited wikitext"""
         if hasattr(self, "_text"):
             del self._text
-
-    text = property(_textgetter, _textsetter, _cleartext,
-                    "The edited wikitext (unicode) of this Page")
 
     def expand_text(self):
         """Return the page text with all templates expanded."""
