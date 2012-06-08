@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikipedia bot team, 2003-2010
+# (C) Pywikipedia bot team, 2003-2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,8 +49,6 @@ API_config_expiry = 30
 # sysopnames['wiktionary']['en'] = 'myEnglishUsername'
 usernames = {}
 sysopnames = {}
-disambiguation_comment = {}
-gdab_namespaces = {}
 
 # Solve captchas in the webbrowser. Setting this to False will result in the
 # exception CaptchaError being thrown if a captcha is encountered.
@@ -315,6 +313,7 @@ interwiki_contents_on_disk = False
 # disambiguation_comment['wikipedia']['en'] = \
 #    "Robot-assisted disambiguation ([[WP:DPL|you can help!]]): %s"
 
+disambiguation_comment = {}
 sort_ignore_case = False
 
 ############## IMAGE RELATED SETTINGS ##############
@@ -464,7 +463,7 @@ persistent_http = False
 socket_timeout = 120  # set a pretty long timeout just in case...
 
 
-############## FURTHER SETTINGS ##############
+############## COSMETIC CHANGES SETTINGS ##############
 # The bot can make some additional changes to each page it edits, e.g. fix
 # whitespace or positioning of interwiki and category links.
 
@@ -479,6 +478,8 @@ cosmetic_changes = False
 # If you want the bot to also do cosmetic changes when editing a page on a
 # foreign wiki, set cosmetic_changes_mylang_only to False, but be careful!
 cosmetic_changes_mylang_only = True
+
+############## FURTHER SETTINGS ##############
 
 ### Proxy configuration ###
 # assign prox = None to connect directly
