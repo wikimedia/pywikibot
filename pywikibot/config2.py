@@ -499,6 +499,12 @@ proxy = None
 # processing. As higher this value this effect will decrease.
 max_queue_size = 64
 
+# Define the line separator. Pages retrieved via API have "\n" whereas
+# pages fetched from screen (mostly) have "\r\n". Interwiki and category
+# separator settings in family files should use multiplied of this.
+# LS is a shortcut alias.
+line_separatur = LS = u'\n'
+
 # End of configuration section
 # ============================
 

@@ -582,7 +582,7 @@ class Family:
         # one-after-another on a single line
         self.interwiki_on_one_line = []
         # String used as separator between interwiki links and the text
-        self.interwiki_text_separator = '\r\n\r\n'
+        self.interwiki_text_separator = config.line_separator * 2
 
         # Similar for category
         self.category_attop = []
@@ -590,7 +590,7 @@ class Family:
         # one-after-another on a single line
         self.category_on_one_line = []
         # String used as separator between category links and the text
-        self.category_text_separator = '\r\n\r\n'
+        self.category_text_separator = config.line_separator * 2
         # When both at the bottom should categories come after interwikilinks?
         self.categories_last = []
 
