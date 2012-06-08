@@ -19,6 +19,7 @@ import re
 
 from pywikibot.i18n import translate
 from HTMLParser import HTMLParser
+import config2 as config
 
 def unescape(s):
     """Replace escaped HTML-special characters by their originals"""
