@@ -749,6 +749,8 @@ class Page(object):
     def _save(self, comment, minor, watchval, botflag, async, callback):
         err = None
         link = self.title(asLink=True)
+        if config.cosmetic_changes:
+            comment = self._cosmetic_changes_hook(comment) or comment
         try:
             done = self.site.editpage(self, summary=comment, minor=minor,
                                       watch=watchval, bot=botflag)
@@ -770,6 +772,39 @@ class Page(object):
                 raise pywikibot.PageNotSaved("%s: %s" %(link, err))
         if callback:
             callback(self, err)
+
+    def _cosmetic_changes_hook(self, comment):
+        if self.isTalkPage() or \
+           pywikibot.calledModuleName() in config.cosmetic_changes_deny_script:
+            return
+        family = self.site.family.name
+        if config.cosmetic_changes_mylang_only:
+            cc = (family == config.family and \
+                  self.site.lang == config.mylang) or \
+                  family in config.cosmetic_changes_enable.keys() and \
+                  self.site.lang in config.cosmetic_changes_enable[family]
+        else:
+            cc = True
+        cc = cc and not \
+             (family in config.cosmetic_changes_disable.keys() and \
+             self.site.lang in config.cosmetic_changes_disable[family])
+        if not cc:
+            return
+        old = self.text
+        if config.verbose_output:
+            pywikibot.output(u'Cosmetic changes for %s-%s enabled.'
+                             % (family, self.site.lang))
+        from scripts.cosmetic_changes import CosmeticChangesToolkit
+        from pywikibot import i18n
+        ccToolkit = CosmeticChangesToolkit(self.site,
+                                           redirect=self.isRedirectPage(),
+                                           namespace=self.namespace(),
+                                           pageTitle=self.title())
+        self.text = ccToolkit.change(old)
+        if comment and \
+           old.strip().replace('\r\n', '\n') != self.text.strip().replace('\r\n', '\n'):
+            comment += i18n.twtranslate(self.site, 'cosmetic_changes-append')
+            return comment
 
     def put(self, newtext, comment=u'', watchArticle=None, minorEdit=True,
             botflag=None, force=False, async=False, callback=None):
