@@ -478,6 +478,19 @@ cosmetic_changes = False
 # If you want the bot to also do cosmetic changes when editing a page on a
 # foreign wiki, set cosmetic_changes_mylang_only to False, but be careful!
 cosmetic_changes_mylang_only = True
+# The dictionary cosmetic_changes_enable should contain a tuple of languages
+# for each site where you wish to enable in addition to your own langlanguage
+# (if cosmetic_changes_mylang_only is set)
+# Please set your dictionary by adding such lines to your user-config.py:
+# cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
+cosmetic_changes_enable = {}
+# The dictionary cosmetic_changes_disable should contain a tuple of languages
+# for each site where you wish to disable cosmetic changes. You may use it with
+# cosmetic_changes_mylang_only is False, but you can also disable your own
+# language. This also overrides the settings in the cosmetic_changes_enable
+# dictionary. Please set your dict by adding such lines to your user-config.py:
+# cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
+cosmetic_changes_disable = {}
 
 ############## FURTHER SETTINGS ##############
 
