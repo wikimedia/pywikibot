@@ -503,7 +503,7 @@ max_queue_size = 64
 # pages fetched from screen (mostly) have "\r\n". Interwiki and category
 # separator settings in family files should use multiplied of this.
 # LS is a shortcut alias.
-line_separatur = LS = u'\n'
+line_separator = LS = u'\n'
 
 # End of configuration section
 # ============================
