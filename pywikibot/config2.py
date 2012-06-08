@@ -49,6 +49,7 @@ API_config_expiry = 30
 # sysopnames['wiktionary']['en'] = 'myEnglishUsername'
 usernames = {}
 sysopnames = {}
+disambiguation_comment = {}
 
 # Solve captchas in the webbrowser. Setting this to False will result in the
 # exception CaptchaError being thrown if a captcha is encountered.
@@ -313,7 +314,6 @@ interwiki_contents_on_disk = False
 # disambiguation_comment['wikipedia']['en'] = \
 #    "Robot-assisted disambiguation ([[WP:DPL|you can help!]]): %s"
 
-disambiguation_comment = {}
 sort_ignore_case = False
 
 ############## IMAGE RELATED SETTINGS ##############
