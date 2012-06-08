@@ -16,8 +16,6 @@ import sys,os
 
 if sys.version_info[0] != 2:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2")
-if sys.version_info[0] == 3:
-    raise RuntimeError("ERROR: Pywikipediabot does not run under Python 3")
 if sys.version_info[1] < 6:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 or higher")
 
