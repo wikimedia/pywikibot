@@ -124,6 +124,7 @@ deprecatedTemplates = {
     }
 }
 
+
 class CosmeticChangesToolkit:
     def __init__(self, site, debug=False, redirect=False, namespace=None,
                  pageTitle=None):
@@ -145,13 +146,13 @@ class CosmeticChangesToolkit:
         text = self.fixSelfInterwiki(text)
         text = self.standardizePageFooter(text)
         text = self.fixSyntaxSave(text)
-##        text = self.cleanUpLinks(text) #module object has no attribute url2unicode
+        text = self.cleanUpLinks(text)
         text = self.cleanUpSectionHeaders(text)
         text = self.putSpacesInLists(text)
 ##        text = self.translateAndCapitalizeNamespaces(text) ##excluded since family.namespaces does not exist anymore
 ##        text = self.translateMagicWords(text)
         text = self.replaceDeprecatedTemplates(text)
-##        text = self.resolveHtmlEntities(text)
+        text = self.resolveHtmlEntities(text)
         text = self.validXhtml(text)
         text = self.removeUselessSpaces(text)
         text = self.removeNonBreakingSpaceBeforePercent(text)
@@ -656,6 +657,7 @@ class CosmeticChangesToolkit:
             r'\1== {{int:license}} ==', exceptions, True)
         return text
 
+
 class CosmeticChangesBot:
     def __init__(self, generator, acceptall=False,
                  comment=u'Robot: Cosmetic changes', async=False):
@@ -711,6 +713,7 @@ class CosmeticChangesBot:
         except KeyboardInterrupt:
             raise
             #pywikibot.output('\nQuitting program...')
+
 
 def main():
     #page generator
