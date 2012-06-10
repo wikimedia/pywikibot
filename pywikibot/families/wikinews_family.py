@@ -49,6 +49,7 @@ class Family(family.Family):
             'jp': 'ja',
             'nb': 'no',
             'nl': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
+            'sd': None,
             'th': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28341
             'zh-tw': 'zh',
             'zh-cn': 'zh'
