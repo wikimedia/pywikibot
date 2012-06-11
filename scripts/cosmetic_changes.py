@@ -221,6 +221,11 @@ class CosmeticChangesToolkit:
                     for image in [u'Image', u'image']:
                         if image in namespaces:
                             namespaces.remove(image)
+                if self.site.lang == 'hu':
+                    # do not change "Kép" on hu-wiki
+                    for image in [u'Kép', u'kép']:
+                        if image in namespaces:
+                            namespaces.remove(image)
                 elif self.site.lang == 'pt':
                     # bug #3346901 should be implemented
                     continue
