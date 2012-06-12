@@ -180,7 +180,7 @@ class CosmeticChangesToolkit:
         text = self.cleanUpSectionHeaders(text)
         text = self.putSpacesInLists(text)
 ##        text = self.translateAndCapitalizeNamespaces(text) ##excluded since family.namespaces does not exist anymore
-##        text = self.translateMagicWords(text)
+##        text = self.translateMagicWords(text) # siteinfo is a dict, not a function
         text = self.replaceDeprecatedTemplates(text)
         text = self.resolveHtmlEntities(text)
         text = self.validXhtml(text)
@@ -216,13 +216,137 @@ class CosmeticChangesToolkit:
 
     def standardizePageFooter(self, text):
         """
-        Makes sure that categories are put to the correct position, but
-        does not sort them.
+        Makes sure that interwiki links, categories and star templates are
+        put to the correct position and into the right order. This combines the
+        old instances standardizeInterwiki and standardizeCategories
+        The page footer has the following section in that sequence:
+        1. categories
+        2. ## TODO: template beyond categories ##
+        3. additional information depending on local site policy
+        4. stars templates for featured and good articles
+        5. interwiki links
         """
-        # The PyWikipediaBot is no longer allowed to touch categories on the German Wikipedia. See http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/bis_2006#Position_der_Personendaten_am_.22Artikelende.22
-        if self.site != pywikibot.getSite('de', 'wikipedia') and not self.template:
+        starsList = [
+            u'bueno',
+            u'bom interwiki',
+            u'cyswllt[ _]erthygl[ _]ddethol', u'dolen[ _]ed',
+            u'destacado', u'destaca[tu]',
+            u'enllaç[ _]ad',
+            u'enllaz[ _]ad',
+            u'leam[ _]vdc',
+            u'legătură[ _]a[bcf]',
+            u'liamm[ _]pub',
+            u'lien[ _]adq',
+            u'lien[ _]ba',
+            u'liên[ _]kết[ _]bài[ _]chất[ _]lượng[ _]tốt',
+            u'liên[ _]kết[ _]chọn[ _]lọc',
+            u'ligam[ _]adq',
+            u'ligoelstara',
+            u'ligoleginda',
+            u'link[ _][afgu]a', u'link[ _]adq', u'link[ _]f[lm]', u'link[ _]km',
+            u'link[ _]sm', u'linkfa',
+            u'na[ _]lotura',
+            u'nasc[ _]ar',
+            u'tengill[ _][úg]g',
+            u'ua',
+            u'yüm yg',
+            u'רא',
+            u'وصلة مقالة جيدة',
+            u'وصلة مقالة مختارة',
+        ]
+
+        categories = None
+        interwikiLinks = None
+        allstars = []
+        hasCommentLine = False
+
+        # The PyWikipediaBot is no longer allowed to touch categories on the
+        # German Wikipedia. See
+        # http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Position_der_Personendaten_am_.22Artikelende.22
+        # ignoring nn-wiki of cause of the comment line above iw section
+        if not self.template and not '{{Personendaten' in text and \
+           not '{{SORTIERUNG' in text and not '{{DEFAULTSORT' in text and \
+           not self.site.lang in ('et', 'it', 'bg', 'ru'):
             categories = pywikibot.getCategoryLinks(text, site = self.site)
-            text = pywikibot.replaceCategoryLinks(text, categories, site = self.site)
+
+        if not self.talkpage:# and pywikibot.calledModuleName() <> 'interwiki':
+            subpage = False
+            if self.template:
+                loc = None
+                try:
+                    tmpl, loc = moved_links[self.site.lang]
+                    del tmpl
+                except KeyError:
+                    pass
+                if loc != None and loc in self.title:
+                    subpage = True
+            interwikiLinks = pywikibot.getLanguageLinks(
+                text, insite=self.site, template_subpage=subpage)
+
+            # Removing the interwiki
+            text = pywikibot.removeLanguageLinks(text, site = self.site)
+            # Removing the stars' issue
+            starstext = pywikibot.removeDisabledParts(text)
+            for star in starsList:
+                regex = re.compile('(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
+                                   % star, re.I)
+                found = regex.findall(starstext)
+                if found != []:
+                    if config.verbose_output:
+                        print found
+                    text = regex.sub('', text)
+                    allstars += found
+
+        # nn got a message between the categories and the iw's
+        # and they want to keep it there, first remove it
+        if self.site.lang in msg_interwiki:
+            iw_msg = msg_interwiki[self.site.lang]
+            if isinstance(iw_msg, tuple):
+                iw_reg = iw_msg[1]
+                iw_msg = iw_msg[0]
+            else:
+                iw_reg = u'(%s)' % iw_msg
+            regex = re.compile(iw_reg)
+            found = regex.findall(text)
+            if found:
+                if config.verbose_output:
+                    print found
+                hasCommentLine = True
+                text = regex.sub('', text)
+
+        # Adding categories
+        if categories:
+            ##Sorting categories in alphabetic order. beta test only on Persian Wikipedia, TODO fix bug for sorting
+            #if self.site.language() == 'fa':
+            #   categories.sort()
+            ##Taking main cats to top
+            #   for name in categories:
+            #       if re.search(u"(.+?)\|(.{,1}?)",name.title()) or name.title()==name.title().split(":")[0]+title:
+            #            categories.remove(name)
+            #            categories.insert(0, name)
+            text = pywikibot.replaceCategoryLinks(text, categories,
+                                                  site=self.site)
+        # Put the iw message back
+        if not self.talkpage and \
+           ((interwikiLinks or hasCommentLine) and
+            self.site.language() == 'nn' or
+            (interwikiLinks and hasCommentLine) and
+            self.site.language() == 'fr'):
+            text += config.line_separator * 2 + iw_msg
+        # Adding stars templates
+        if allstars:
+            text = text.strip()+self.site.family.interwiki_text_separator
+            allstars.sort()
+            for element in allstars:
+                text += '%s%s' % (element.strip(),config.line_separator)
+                if config.verbose_output:
+                    pywikibot.output(u'%s' %element.strip())
+        # Adding the interwiki
+        if interwikiLinks:
+            text = pywikibot.replaceLanguageLinks(text, interwikiLinks,
+                                                  site=self.site,
+                                                  template=self.template,
+                                                  template_subpage=subpage)
         return text
 
     def translateAndCapitalizeNamespaces(self, text):
@@ -463,9 +587,13 @@ class CosmeticChangesToolkit:
         German Wikipedia. It might be that it is not wanted on other wikis.
         If there are any complaints, please file a bug report.
         """
-        for level in range(1, 7):
-            equals = '=' * level
-            text = pywikibot.replaceExcept(text, r'\n' + equals + ' *(?P<title>[^=]+?) *' + equals + ' *\r\n', '\n' + equals + ' \g<title> ' + equals + '\r\n', ['comment', 'math', 'nowiki', 'pre'])
+        for level in xrange(1, 7):
+            param = {'equals': '=' * level, 'LS' : config.LS}
+            text = pywikibot.replaceExcept(
+                text,
+                r'\n%(equals)s *(?P<title>[^=]+?) *%(equals)s *\r?\n' % param,
+                '%(LS)s%(equals)s \g<title> %(equals)s%(LS)s' % param,
+                ['comment', 'math', 'nowiki', 'pre'])
         return text
 
     def putSpacesInLists(self, text):
