@@ -50,6 +50,18 @@ cosmetic_changes_enable. Please set this dictionary by adding such lines to
 your user-config.py:
 
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
+
+You may disable cosmetic changes for a given script by appending the all
+unwanted scripts to the list cosmetic_changes_deny_script in your
+user-config.py. By default it contains cosmetic_changes.py itself and touch.py.
+This overrides all other enabling settings for cosmetic changes. Please modify
+the given list by adding such lines to your user-config.py:
+
+    cosmetic_changes_deny_script.append('your_script_name_1')
+
+or by adding a list to the given one:
+
+    cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
 """
 #
 # (C) xqt, 2009-2012
