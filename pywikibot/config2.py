@@ -498,6 +498,8 @@ cosmetic_changes_disable = {}
 # are disabled. You may add additional scripts by appending script names in
 # your user_config.py ("+=" operator is strictly recommended):
 # cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
+# Appending the script name also works:
+# cosmetic_changes_deny_script.append('your_script_name')
 cosmetic_changes_deny_script = ['cosmetic_changes', 'touch']
 
 ############## FURTHER SETTINGS ##############
