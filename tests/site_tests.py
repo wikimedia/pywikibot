@@ -13,14 +13,27 @@ __version__ = '$Id$'
 import unittest
 import pywikibot
 import warnings
+from tests import patch_request, unpatch_request
 
-mysite = pywikibot.Site()
-mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
-imagepage = iter(mainpage.imagelinks()).next() # 1st image on main page
-
+mysite = None
+mainpage = None
+imagepage = None
 
 class TestSiteObject(unittest.TestCase):
     """Test cases for Site methods."""
+    family = "wikipedia"
+    code = "en"
+    @classmethod
+    def setUpClass(cls):
+        patch_request()
+        global mysite, mainpage, imagepage
+        mysite = pywikibot.Site(cls.code, cls.family)
+        mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
+        imagepage = iter(mainpage.imagelinks()).next() # 1st image on main page
+        
+    @classmethod
+    def tearDownClass(cls):
+        unpatch_request
 
     def assertType(self, obj, cls):
         """Assert that obj is an instance of type cls"""
@@ -29,17 +42,17 @@ class TestSiteObject(unittest.TestCase):
     def testBaseMethods(self):
         """Test cases for BaseSite methods"""
 
-        self.assertEqual(mysite.family.name, pywikibot.config2.family)
-        self.assertEqual(mysite.code, pywikibot.config2.mylang)
+        self.assertEqual(mysite.family.name, self.family)
+        self.assertEqual(mysite.code, self.code)
         self.assertType(mysite.lang, basestring)
         self.assertType(mysite == pywikibot.Site("en", "wikipedia"), bool)
         self.assertType(mysite.user(), (basestring, type(None)))
         self.assertEqual(mysite.sitename(),
-                         "%s:%s" % (pywikibot.config2.family,
-                                    pywikibot.config2.mylang))
+                         "%s:%s" % (self.family,
+                                    self.code))
         self.assertEqual(repr(mysite),
                          'Site("%s", "%s")'
-                         % (pywikibot.config2.mylang, pywikibot.config2.family))
+                         % (self.code, self.family))
         self.assertType(mysite.linktrail(), basestring)
         self.assertType(mysite.redirect(default=True), basestring)
         self.assertType(mysite.disambcategory(), pywikibot.Category)
@@ -62,10 +75,9 @@ class TestSiteObject(unittest.TestCase):
         obs = mysite.family.obsolete
         ipf = mysite.interwiki_putfirst()
         self.assertType(ipf, list)
-        self.assertTrue(all(item in langs or item in obs
-                            for item in ipf))
-        self.assertTrue(all(item in langs
-                            for item in mysite.validLanguageLinks()))
+        
+        for item in mysite.validLanguageLinks():
+            self.assertTrue(item in langs, item)
 
     def testNamespaceMethods(self):
         """Test cases for methods manipulating namespace names"""
@@ -192,7 +204,8 @@ class TestSiteObject(unittest.TestCase):
                                           filterRedirects=True))
         # including links to redirect pages (but not the redirects):
         indirect = set(mysite.pagebacklinks(mainpage, namespaces=[0],
-                                            followRedirects=True))
+                                            followRedirects=True,
+                                            filterRedirects=False))
         self.assertEqual(filtered & redirs, set([]))
         self.assertEqual(indirect & redirs, set([]))
         self.assertTrue(filtered.issubset(indirect))
