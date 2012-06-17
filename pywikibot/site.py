@@ -35,6 +35,30 @@ _logger = "wiki.site"
 class PageInUse(pywikibot.Error):
     """Page cannot be reserved for writing due to existing lock."""
 
+class LoginStatus(object):
+    """ Enum for Login statuses.
+    
+    >>> LoginStatus.NOT_ATTEMPTED
+    -3
+    >>> LoginStatus.AS_USER
+    0
+    >>> LoginStatus.name(-3)
+    'NOT_ATTEMPTED'
+    >>> LoginStatus.name(0)
+    'AS_USER'
+    """
+    NOT_ATTEMPTED = -3
+    IN_PROGRESS = -2
+    NOT_LOGGED_IN = -1
+    AS_USER = 0
+    AS_SYSOP = 1
+    
+    @classmethod
+    def name(cls, search_value):
+        for key, value in cls.__dict__.iteritems():
+            if key==key.upper() and value==search_value:
+                return key
+        raise KeyError("Value %r could not be found in this enum" % search_value)
 
 def Family(fam=None, fatal=True):
     """Import the named family.
@@ -630,12 +654,7 @@ class APISite(BaseSite):
             }
         self.sitelock = threading.Lock()
         self._msgcache = {}
-        # _loginstatus: -3 means login not yet attempted,
-        #               -2 means login attempt in progress,
-        #               -1 means not logged in (anon user),
-        #               0 means logged in as user,
-        #               1 means logged in as sysop
-        self._loginstatus = -3
+        self._loginstatus = LoginStatus.NOT_ATTEMPTED
         return
 
     def _generator(self, gen_class, type_arg=None, namespaces=None,
@@ -704,7 +723,7 @@ class APISite(BaseSite):
     def login(self, sysop=False):
         """Log the user in if not already logged in."""
         # check whether a login cookie already exists for this user
-        self._loginstatus = -2
+        self._loginstatus = LoginStatus.IN_PROGRESS
         if not hasattr(self, "_userinfo"):
             self.getuserinfo()
         if self.logged_in(sysop):
@@ -716,9 +735,9 @@ class APISite(BaseSite):
             if hasattr(self, "_userinfo"):
                 del self._userinfo
             self.getuserinfo()
-            self._loginstatus = sysop
+            self._loginstatus = LoginStatus.AS_SYSOP if sysop else LoginStatus.AS_USER
         else:
-            self._loginstatus = -1 # failure
+            self._loginstatus = LoginStatus.NOT_LOGGED_IN # failure
         if not hasattr(self, "_siteinfo"):
             self._getsiteinfo()
 
