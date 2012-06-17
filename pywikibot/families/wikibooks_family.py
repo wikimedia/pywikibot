@@ -18,7 +18,7 @@ class Family(family.Family):
             'el', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'mr',
             'bn', 'ms', 'hi', 'oc', 'kk', 'ml', 'eu', 'fy', 'ie', 'ne', 'te',
             'af', 'tg', 'sa', 'pa', 'bs', 'ky', 'mg', 'cy', 'be', 'zh-min-nan',
-            'ku', 'uz', 'su', 'vo',
+            'ku', 'uz', 'su',
         ]
 
         self.langs = dict([(lang, '%s.wikibooks.org' % lang) for lang in self.languages_by_size])
@@ -93,6 +93,7 @@ class Family(family.Family):
             'tk': None,
             'tokipona': None,
             'ug': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Uyghur_Wikibooks
+            'vo': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=37413
             'wa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Walon_Wikibooks
             'xh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Xhosa_Wikibooks
             'yo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wikibooks
