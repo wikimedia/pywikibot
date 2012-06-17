@@ -13,7 +13,7 @@ class Family(family.Family):
         self.languages_by_size = [
             'sr', 'en', 'pl', 'fr', 'de', 'it', 'es', 'pt', 'zh', 'ru', 'ja',
             'sv', 'ta', 'ca', 'el', 'cs', 'fa', 'ar', 'fi', 'ro', 'he', 'bg',
-            'tr', 'sd', 'sq', 'uk', 'no', 'bs', 'eo', 'ko',
+            'tr', 'sq', 'uk', 'no', 'bs', 'eo', 'ko',
         ]
 
         self.langs = dict([(lang, '%s.wikinews.org' % lang) for lang in self.languages_by_size])

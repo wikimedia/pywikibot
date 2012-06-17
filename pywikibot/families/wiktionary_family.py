@@ -11,20 +11,20 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'ko', 'tr', 'el', 'pl', 'ta',
-            'vi', 'de', 'kn', 'sv', 'io', 'fi', 'nl', 'hu', 'pt', 'no', 'my',
+            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'ko', 'el', 'tr', 'pl', 'ta',
+            'sv', 'vi', 'de', 'kn', 'io', 'fi', 'nl', 'hu', 'pt', 'no', 'my',
             'id', 'it', 'li', 'ml', 'et', 'ja', 'es', 'fa', 'ku', 'ar', 'ro',
-            'lo', 'gl', 'ca', 'cs', 'uk', 'eu', 'bg', 'eo', 'te', 'vo', 'br',
+            'lo', 'gl', 'cs', 'ca', 'uk', 'eu', 'bg', 'eo', 'te', 'vo', 'br',
             'oc', 'is', 'hr', 'th', 'simple', 'scn', 'sr', 'af', 'cy', 'fy',
-            'sw', 'tl', 'ast', 'fj', 'ur', 'he', 'la', 'sq', 'da', 'hy', 'wa',
-            'sl', 'zh-min-nan', 'tt', 'hi', 'az', 'lv', 'ka', 'lb', 'pnb', 'nn',
+            'sw', 'tl', 'ast', 'fj', 'ur', 'he', 'la', 'sq', 'wa', 'da', 'hy',
+            'sl', 'zh-min-nan', 'tt', 'hi', 'az', 'lv', 'ka', 'pnb', 'lb', 'nn',
             'tk', 'hsb', 'kk', 'bs', 'nah', 'km', 'mk', 'be', 'wo', 'ga', 'ang',
             'co', 'ms', 'gn', 'mr', 'csb', 'sk', 'st', 'nds', 'ia', 'si', 'sh',
-            'sd', 'tg', 'ug', 'ky', 'kl', 'an', 'zu', 'gu', 'mn', 'fo', 'kw',
-            'rw', 'ss', 'ie', 'qu', 'gv', 'om', 'ps', 'roa-rup', 'iu', 'bn',
-            'so', 'sa', 'chr', 'su', 'za', 'gd', 'am', 'mt', 'tpi', 'mi', 'ik',
-            'yi', 'ln', 'uz', 'ti', 'sg', 'jv', 'na', 'pa', 'sm', 'or', 'tn',
-            'jbo', 'dv', 'ne', 'ha', 'ks', 'ay', 'ts', 'dz',
+            'sd', 'tg', 'ug', 'ky', 'kl', 'an', 'zu', 'mn', 'gu', 'fo', 'ps',
+            'kw', 'rw', 'ss', 'ie', 'qu', 'gv', 'om', 'roa-rup', 'iu', 'bn',
+            'sa', 'so', 'chr', 'su', 'za', 'gd', 'am', 'mt', 'tpi', 'mi', 'ik',
+            'yi', 'ln', 'uz', 'sm', 'ti', 'sg', 'jv', 'na', 'or', 'pa', 'tn',
+            'jbo', 'dv', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])

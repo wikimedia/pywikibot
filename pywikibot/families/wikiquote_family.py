@@ -14,10 +14,10 @@ class Family(family.Family):
             'en', 'pl', 'it', 'ru', 'fr', 'de', 'pt', 'es', 'sk', 'bg', 'cs',
             'bs', 'tr', 'sl', 'he', 'eo', 'lt', 'el', 'uk', 'id', 'zh', 'fa',
             'hu', 'fi', 'nl', 'sv', 'li', 'no', 'nn', 'ja', 'az', 'hy', 'ca',
-            'et', 'ar', 'hr', 'cy', 'ka', 'ko', 'ml', 'gl', 'sr', 'ro', 'ku',
+            'et', 'ar', 'hr', 'cy', 'ka', 'ko', 'gl', 'ml', 'sr', 'ro', 'ku',
             'te', 'th', 'is', 'eu', 'da', 'af', 'sq', 'vi', 'ta', 'hi', 'la',
-            'br', 'be', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'lb', 'kn',
-            'wo', 'ky', 'co', 'am',
+            'br', 'be', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'kn', 'wo',
+            'ky', 'am',
         ]
 
         self.langs = dict([(lang, '%s.wikiquote.org' % lang) for lang in self.languages_by_size])

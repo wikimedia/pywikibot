@@ -11,14 +11,14 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'pl', 'it', 'es', 'he',
-            'vi', 'sq', 'fi', 'ca', 'id', 'ru', 'cs', 'zh', 'hr', 'sv', 'tr',
+            'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'pl', 'it', 'es', 'vi',
+            'he', 'sq', 'fi', 'ca', 'id', 'ru', 'cs', 'zh', 'hr', 'sv', 'tr',
             'da', 'th', 'gl', 'no', 'ko', 'ta', 'fa', 'sr', 'ar', 'tl', 'mk',
             'is', 'tt', 'lt', 'ka', 'az', 'eo', 'ro', 'bg', 'uk', 'hy', 'sl',
-            'sk', 'el', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'mr',
+            'el', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'mr',
             'bn', 'ms', 'hi', 'oc', 'kk', 'ml', 'eu', 'fy', 'ie', 'ne', 'te',
             'af', 'tg', 'sa', 'pa', 'bs', 'ky', 'mg', 'cy', 'be', 'zh-min-nan',
-            'ast', 'ku', 'tk', 'uz', 'su', 'vo', 'mn', 'my',
+            'ku', 'uz', 'su', 'vo',
         ]
 
         self.langs = dict([(lang, '%s.wikibooks.org' % lang) for lang in self.languages_by_size])
