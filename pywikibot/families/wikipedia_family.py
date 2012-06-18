@@ -400,6 +400,7 @@ class Family(family.Family):
             'minnan': 'zh-min-nan',
             'mo': 'ro', # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
             'mus': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia
+            'nan': 'zh-min-nan',
             'nb': 'no',
             'ng': None, #(not reachable) http://meta.wikimedia.org/wiki/Inactive_wikis
             'jp': 'ja',
