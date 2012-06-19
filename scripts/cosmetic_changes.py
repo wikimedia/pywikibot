@@ -179,7 +179,7 @@ class CosmeticChangesToolkit:
         text = self.cleanUpLinks(text)
         text = self.cleanUpSectionHeaders(text)
         text = self.putSpacesInLists(text)
-##        text = self.translateAndCapitalizeNamespaces(text) ##excluded since family.namespaces does not exist anymore
+        text = self.translateAndCapitalizeNamespaces(text)
         text = self.translateMagicWords(text)
         text = self.replaceDeprecatedTemplates(text)
         text = self.resolveHtmlEntities(text)
@@ -360,36 +360,40 @@ class CosmeticChangesToolkit:
         # wiki links aren't parsed here.
         exceptions = ['nowiki', 'comment', 'math', 'pre']
 
-        for nsNumber in family.namespaces:
-            if not family.isDefinedNSLanguage(nsNumber, self.site.lang):
-                # Skip undefined namespaces
+        for nsNumber in self.site.namespaces():
+            if nsNumber in (0, 2, 3):
+                # skip main (article) namespace
+                # skip user namespace, maybe gender is used
                 continue
-            if nsNumber in (2, 3):
-                # Skip user namespace, maybe gender is used
-                continue
+            # a clone is needed. Won't change the namespace dict
             namespaces = list(self.site.namespace(nsNumber, all=True))
             thisNs = namespaces.pop(0)
             if nsNumber == 6 and family.name == 'wikipedia':
-                if self.site.lang in ('en', 'fr'):
+                if self.site.lang in ('en', 'fr') and \
+                   family.versionnumber(self.site.lang) >= 14:
                     # do not change "Image" on en-wiki and fr-wiki
-                    for image in [u'Image', u'image']:
-                        if image in namespaces:
-                            namespaces.remove(image)
+                    assert u'Image' in namespaces
+                    namespaces.remove(u'Image')
                 if self.site.lang == 'hu':
                     # do not change "Kép" on hu-wiki
-                    for image in [u'Kép', u'kép']:
-                        if image in namespaces:
-                            namespaces.remove(image)
+                    assert u'Kép' in namespaces
+                    namespaces.remove(u'Kép')
                 elif self.site.lang == 'pt':
                     # bug #3346901 should be implemented
                     continue
-            # skip main (article) namespace
+            # lowerspaced and underscored namespaces
+            for i in xrange(len(namespaces)):
+                item = namespaces[i].replace(' ', '[ _]')
+                item = u'[%s%s]' % (item[0], item[0].lower()) + item[1:]
+                namespaces[i] = item
+            namespaces.append(thisNs[0].lower() + thisNs[1:])
             if thisNs and namespaces:
                 text = pywikibot.replaceExcept(
                     text,
-                    r'\[\[\s*(' + '|'.join(namespaces) + \
-                    ') *:(?P<nameAndLabel>.*?)\]\]', r'[[' + thisNs + \
-                    ':\g<nameAndLabel>]]', exceptions)
+                    r'\[\[\s*(%s) *:(?P<nameAndLabel>.*?)\]\]'
+                    % '|'.join(namespaces),
+                    r'[[%s:\g<nameAndLabel>]]' % thisNs,
+                    exceptions)
         return text
 
     def translateMagicWords(self, text):
@@ -587,14 +591,11 @@ class CosmeticChangesToolkit:
         German Wikipedia. It might be that it is not wanted on other wikis.
         If there are any complaints, please file a bug report.
         """
-        for level in xrange(1, 7):
-            param = {'equals': '=' * level, 'LS' : config.LS}
-            text = pywikibot.replaceExcept(
-                text,
-                r'\n%(equals)s *(?P<title>[^=]+?) *%(equals)s *\r?\n' % param,
-                '%(LS)s%(equals)s \g<title> %(equals)s%(LS)s' % param,
-                ['comment', 'math', 'nowiki', 'pre'])
-        return text
+        return pywikibot.replaceExcept(
+            text,
+            r'(?m)^(={1,7}) *(?P<title>[^=]+?) *\1 *\r?\n',
+            r'\1 \g<title> \1%s' % config.LS,
+            ['comment', 'math', 'nowiki', 'pre'])
 
     def putSpacesInLists(self, text):
         """
