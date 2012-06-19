@@ -180,7 +180,7 @@ class CosmeticChangesToolkit:
         text = self.cleanUpSectionHeaders(text)
         text = self.putSpacesInLists(text)
 ##        text = self.translateAndCapitalizeNamespaces(text) ##excluded since family.namespaces does not exist anymore
-##        text = self.translateMagicWords(text) # siteinfo is a dict, not a function
+        text = self.translateMagicWords(text)
         text = self.replaceDeprecatedTemplates(text)
         text = self.resolveHtmlEntities(text)
         text = self.validXhtml(text)
@@ -402,7 +402,7 @@ class CosmeticChangesToolkit:
             exceptions = ['nowiki', 'comment', 'math', 'pre']
             for magicWord in ['img_thumbnail', 'img_left', 'img_center', 'img_right', 'img_none',
                               'img_framed', 'img_frameless', 'img_border', 'img_upright',]:
-                aliases = self.site.siteinfo('magicwords').get(magicWord)
+                aliases = self.site.getmagicwords(magicWord)
                 if not aliases: continue
                 text = pywikibot.replaceExcept(text, r'\[\[(?P<left>.+?:.+?\..+?\|) *(' + '|'.join(aliases) +') *(?P<right>(\|.*?)?\]\])',
                                                r'[[\g<left>' + aliases[0] + '\g<right>',
