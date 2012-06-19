@@ -428,7 +428,11 @@ class CosmeticChangesToolkit:
                 # We only work on namespace 0 because pipes and linktrails work
                 # differently for images and categories.
                 page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
-                if page.namespace() == 0:
+                try:
+                    namespace = page.namespace()
+                except pywikibot.InvalidTitle:
+                    return match.group()
+                if namespace == 0:
                     # Replace underlines by spaces, also multiple underlines
                     titleWithSection = re.sub('_+', ' ', titleWithSection)
                     # Remove double spaces
