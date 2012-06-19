@@ -75,6 +75,9 @@ class CircularRedirect(Error):
 
     """
 
+class InvalidTitle(Error):
+    """Invalid page title"""
+
 class LockedPage(PageRelatedError):
     """Page is locked"""
     message = u"Page %s is locked."

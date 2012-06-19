@@ -2376,8 +2376,8 @@ not supported by PyWikiBot!"""
         # Reject illegal characters.
         m = Link.illegal_titles_pattern.search(t)
         if m:
-            raise pywikibot.Error(
-                  u"Invalid title: contains illegal char(s) '%s'" % m.group(0))
+            raise pywikibot.InvalidTitle(
+                  u"contains illegal char(s) '%s'" % m.group(0))
 
         # Pages with "/./" or "/../" appearing in the URLs will
         # often be unreachable due to the way web browsers deal
@@ -2392,16 +2392,16 @@ not supported by PyWikiBot!"""
                 or t.endswith(u"/.")
                 or t.endswith(u"/..")
         ):
-            raise pywikibot.Error(
-                  "Invalid title (contains . / combinations): '%s'"
+            raise pywikibot.InvalidTitle(
+                  "(contains . / combinations): '%s'"
                         % self._text)
 
         # Magic tilde sequences? Nu-uh!
         if u"~~~" in t:
-            raise pywikibot.Error("Invalid title (contains ~~~): '%s'" % self._text)
+            raise pywikibot.InvalidTitle("(contains ~~~): '%s'" % self._text)
 
         if self._namespace != -1 and len(t) > 255:
-            raise pywikibot.Error("Invalid title (over 255 bytes): '%s'" % t)
+            raise pywikibot.InvalidTitle("(over 255 bytes): '%s'" % t)
 
         if self._site.case() == 'first-letter':
             t = t[:1].upper() + t[1:]
