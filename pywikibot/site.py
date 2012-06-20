@@ -713,7 +713,7 @@ class APISite(BaseSite):
         self._loginstatus = LoginStatus.IN_PROGRESS
         if not hasattr(self, "_userinfo"):
             self.getuserinfo()
-        if self.logged_in(sysop):
+        if self.userinfo['name'] == self._username[sysop] and self.logged_in(sysop):
             return
         loginMan = api.LoginManager(site=self, sysop=sysop,
                                     user=self._username[sysop])
