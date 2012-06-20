@@ -13,14 +13,25 @@ import re
 import pywikibot
 import pywikibot.date as date
 
-def translate(page, hints = None, auto = True, removebrackets = False):
+def translate(page, hints=None, auto=True, removebrackets=False, site=None, family=None):
     """
-    Please comment your source code! --Daniel
+    Goes through all entries in 'hints'. Returns a list of pages.
 
-    Does some magic stuff. Returns a list of Links.
+    Entries for single page titles list those pages. Page titles for entries
+    such as "all:" or "xyz:" or "20:" are first built from the page title of
+    'page' and then listed. When 'removebrackets' is True, a trailing pair of
+    brackets and the text between them is removed from the page title.
+    If 'auto' is true, known year and date page titles are autotranslated
+    to all known target languages and inserted into the list.
+
     """
     result = []
-    site = page.site
+    if site is None and page:
+        site = page.site
+    if family is None and site:
+        family = site.family
+    if site:
+        sitelang = site.language()
     if hints:
         for h in hints:
             if ':' not in h:
@@ -33,9 +44,11 @@ def translate(page, hints = None, auto = True, removebrackets = False):
                 # if given as -hint:xy or -hint:xy:, assume that there should
                 # be a page in language xy with the same title as the page
                 # we're currently working on ...
+                if page is None:
+                   continue
                 ns = page.namespace()
                 if ns:
-                    newname = u'%s:%s' % (site.family.namespace('_default', ns),
+                    newname = u'%s:%s' % (family.namespace('_default', ns),
                                           page.title(withNamespace=False))
                 else:
                     # article in the main namespace
@@ -66,7 +79,7 @@ def translate(page, hints = None, auto = True, removebrackets = False):
 
     # Autotranslate dates into all other languages, the rest will come from
     # existing interwiki links.
-    if auto:
+    if auto and page:
         # search inside all dictionaries for this link
         dictName, value = date.getAutoFormat(page.site.code,
                                              page.title())
