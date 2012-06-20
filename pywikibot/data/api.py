@@ -3,7 +3,7 @@
 Interface functions to Mediawiki's api.php
 """
 #
-# (C) Pywikipedia bot team, 2007-08
+# (C) Pywikipedia bot team, 2007-12
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,10 +11,7 @@ __version__ = '$Id$'
 
 from UserDict import DictMixin
 from datetime import datetime, timedelta
-try:
-    import json
-except ImportError:
-    import simplejson as json
+import json
 import logging
 import mimetypes
 import pprint
@@ -392,28 +389,28 @@ class CachedRequest(Request):
         self.expiry = expiry
         self._data = None
         self._cachetime = None
-    
+
     def _get_cache_dir(self):
         path = os.path.join(pywikibot.config2.base_dir, 'apicache')
         self._make_dir(path)
         return path
-        
+
     def _make_dir(self, dir):
         try:
             os.makedirs(dir)
         except OSError:
             # directory already exists
             pass
-    
+
     def _create_file_name(self):
         return hashlib.sha256(str(self.site) + str(self)).hexdigest()
-        
+
     def _cachefile_path(self):
         return os.path.join(self._get_cache_dir(), self._create_file_name())
-        
+
     def _expired(self, dt):
         return dt + self.expiry < datetime.datetime.now()
-        
+
     def _load_cache(self):
         """ Returns whether the cache can be used """
         try:
@@ -426,12 +423,12 @@ class CachedRequest(Request):
             return True
         except Exception:
             return False
-    
+
     def _write_cache(self, data):
         """ writes data to self._cachefile_path() """
         data = [str(self.site), str(self), data, datetime.datetime.now()]
         pickle.dump(data, open(self._cachefile_path(), 'w'))
-        
+
     def submit(self):
         cached_available = self._load_cache()
         if not cached_available:
