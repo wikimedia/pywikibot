@@ -50,9 +50,6 @@ import logging
 import pywikibot
 from pywikibot import config, deprecate_arg
 from pywikibot.exceptions import NoSuchSite, NoUsername
-from pywikibot.login import LoginManager
-
-_logger = "wiki.login"
 
 def main(*args):
     password = None
@@ -87,6 +84,8 @@ def main(*args):
         for lang in namedict[familyName]:
             try:
                 site = pywikibot.getSite(code=lang, fam=familyName)
+                if forceLogin:
+                    site.login()
                 if site.logged_in(sysop) \
                         and site.user() == site.username(sysop):
                     pywikibot.output(u"Login successful on %(site)s." % locals())
