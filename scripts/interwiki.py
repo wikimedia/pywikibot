@@ -359,32 +359,6 @@ docuReplacements = {
     '&pagegenerators_help;': pagegenerators.parameterHelp
 }
 
-class XmlDumpLmoLinkPageGenerator:
-    """
-    Generator which will yield Pages that might contain selflinks.
-    These pages will be retrieved from a local XML dump file
-    (cur table).
-    """
-    def __init__(self, xmlFilename):
-        """
-        Arguments:
-            * xmlFilename  - The dump's path, either absolute or relative
-        """
-
-        self.xmlFilename = xmlFilename
-
-    def __iter__(self):
-        import xmlreader
-        mysite = pywikibot.getSite()
-        dump = xmlreader.XmlDump(self.xmlFilename)
-        r = re.compile(r'\d')
-        for entry in dump.parse():
-            if not r.search(entry.title):
-                selflinkR = re.compile(r'\[\[lmo:')
-                if selflinkR.search(entry.text):
-                    yield pywikibot.Page(mysite, entry.title)
-
-
 class SaveError(pywikibot.Error):
     """
     An attempt to save a page with changed interwiki has failed.
@@ -2386,12 +2360,6 @@ def main():
     for arg in pywikibot.handleArgs():
         if globalvar.readOptions(arg):
             continue
-        if arg.startswith('-xml'):
-            if len(arg) == 4:
-                xmlFilename = pywikibot.input(u'Please enter the XML dump\'s filename:')
-            else:
-                xmlFilename = arg[5:]
-            hintlessPageGen = XmlDumpLmoLinkPageGenerator(xmlFilename)
         elif arg.startswith('-warnfile:'):
             warnfile = arg[10:]
         elif arg.startswith('-years'):
