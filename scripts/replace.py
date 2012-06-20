@@ -169,7 +169,7 @@ class XmlDumpReplacePageGenerator:
             self.excsInside += self.exceptions['inside-tags']
         if "inside" in self.exceptions:
             self.excsInside += self.exceptions['inside']
-        import xmlreader
+        from pywikibot import xmlreader
         self.site = pywikibot.getSite()
         dump = xmlreader.XmlDump(self.xmlFilename)
         self.parser = dump.parse()

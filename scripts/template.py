@@ -158,10 +158,8 @@ class XmlDumpTemplatePageGenerator:
         self.xmlfilename = xmlfilename
 
     def __iter__(self):
-        """
-        Yield page objects until the entire XML dump has been read.
-        """
-        import xmlreader
+        """Yield page objects until the entire XML dump has been read."""
+        from pywikibot import xmlreader
         mysite = pywikibot.getSite()
         dump = xmlreader.XmlDump(self.xmlfilename)
         # regular expression to find the original template.
@@ -172,11 +170,14 @@ class XmlDumpTemplatePageGenerator:
         for template in self.templates:
             templatePattern = template.titleWithoutNamespace()
             if not pywikibot.getSite().nocapitalize:
-                templatePattern = '[' + templatePattern[0].upper() + templatePattern[0].lower() + ']' + templatePattern[1:]
+                templatePattern = '[%s%s]%s' % (templatePattern[0].upper(),
+                                                templatePattern[0].lower(),
+                                                templatePattern[1:])
             templatePattern = re.sub(' ', '[_ ]', templatePattern)
             templatePatterns.append(templatePattern)
-        templateRegex = re.compile(r'\{\{ *([mM][sS][gG]:)?(?:%s) *(?P<parameters>\|[^}]+|) *}}' % '|'.join(templatePatterns))
-
+        templateRegex = re.compile(
+            r'\{\{ *([mM][sS][gG]:)?(?:%s) *(?P<parameters>\|[^}]+|) *}}'
+                                   % '|'.join(templatePatterns))
         for entry in dump.parse():
             if templateRegex.search(entry.text):
                 page = pywikibot.Page(mysite, entry.title)
