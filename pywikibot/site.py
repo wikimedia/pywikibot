@@ -586,7 +586,7 @@ class APISite(BaseSite):
 
     """
 ##    Site methods from version 1.0 (as these are implemented in this file,
-##     or declared deprecated/obsolete, they will be removed from this list)
+##    or declared deprecated/obsolete, they will be removed from this list)
 ##########
 ##    cookies: return user's cookies as a string
 ##
@@ -608,22 +608,6 @@ class APISite(BaseSite):
 ##    (note, some methods yield other information in a tuple along with the
 ##    Pages; see method docs for details) --
 ##
-##        newpages(): Special:Newpages
-##        newimages(): Special:Log&type=upload
-##        longpages(): Special:Longpages
-##        shortpages(): Special:Shortpages
-##        deadendpages(): Special:Deadendpages
-##        ancientpages(): Special:Ancientpages
-##        lonelypages(): Special:Lonelypages
-##        unwatchedpages(): Special:Unwatchedpages (sysop accounts only)
-##        uncategorizedcategories(): Special:Uncategorizedcategories (yields
-##            Category objects)
-##        uncategorizedpages(): Special:Uncategorizedpages
-##        uncategorizedimages(): Special:Uncategorizedimages (yields
-##            ImagePage objects)
-##        unusedcategories(): Special:Unusuedcategories (yields Category)
-##        unusedfiles(): Special:Unusedimages (yields ImagePage)
-##        withoutinterwiki: Special:Withoutinterwiki
 ##        linksearch: Special:Linksearch
 
     def __init__(self, code, fam=None, user=None, sysop=None):
@@ -3092,6 +3076,33 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
         wigen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Withoutinterwiki",
+                                step=step, total=total)
+        return wigen
+
+    def brocken_redirects(self, step=None, total=None):
+        """Yield Pages without language links from Special:BrokenRedirects."""
+        assert self.versionnumber >= 18
+        wigen = self._generator(api.PageGenerator,
+                                type_arg="querypage",
+                                gqppage="BrokenRedirects",
+                                step=step, total=total)
+        return wigen
+
+    def double_redirects(self, step=None, total=None):
+        """Yield Pages without language links from Special:BrokenRedirects."""
+        assert self.versionnumber >= 18
+        wigen = self._generator(api.PageGenerator,
+                                type_arg="querypage",
+                                gqppage="DoubleRedirects",
+                                step=step, total=total)
+        return wigen
+
+    def redirectpages(self, step=None, total=None):
+        """Yield redirect pages from Special:ListRedirects."""
+        assert self.versionnumber >= 18
+        wigen = self._generator(api.PageGenerator,
+                                type_arg="querypage",
+                                gqppage="Listredirects",
                                 step=step, total=total)
         return wigen
 
