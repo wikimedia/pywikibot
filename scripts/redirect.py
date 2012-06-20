@@ -17,17 +17,25 @@ both           Both of the above. Permitted only with -api. Implies -api.
 
 and arguments can be:
 
+-xml           Retrieve information from a local XML dump
+               (http://download.wikimedia.org). Argument can also be given as
+               "-xml:filename.xml". Cannot be used with -fullscan or -moves.
+
 -fullscan      Retrieve redirect pages from live wiki, not from a special page
 
 -moves         Use the page move log to find double-redirect candidates. Only
-               works with action "double".
+               works with action "double", does not work with -xml.
+
+               NOTE: If neither of -xml -fullscan -moves is given, info will be
+               loaded from a special page of the live wiki.
 
 -namespace:n   Namespace to process. Can be given multiple times, for several
                namespaces. If omitted, only the main (article) namespace is
                treated.
 
 -offset:n      With -moves, the number of hours ago to start scanning moved
-               pages. Otherwise, ignored.
+               pages. With -xml, the number of the redirect to restart with
+               (see progress). Otherwise, ignored.
 
 -start:title   The starting page title in each namespace. Page need not exist.
 
@@ -40,14 +48,6 @@ and arguments can be:
 -always        Don't prompt you for each replacement.
 
 """
-
-# XML not yet implemented: deleted help text follows
-##-xml           Retrieve information from a local XML dump
-##               (http://download.wikimedia.org). Argument can also be given as
-##               "-xml:filename.xml". Cannot be used with -api or -moves.
-##               If neither of -xml -api -moves is given, info will be loaded
-##               from a special page of the live wiki.
-
 #
 # (C) Daniel Herding, 2004.
 # (C) Purodha Blissenbach, 2009.
@@ -62,7 +62,7 @@ import re, sys, datetime
 import pywikibot
 from pywikibot import i18n
 from pywikibot import config
-# import xmlreader
+from pywikibot import xmlreader
 
 
 class RedirectGenerator:
@@ -82,77 +82,75 @@ class RedirectGenerator:
         self.api_number = number
         self.api_step = step
 
-# note: rewrite branch does not yet support XML dumps, so this is commented out
-# until that support is added
-##    def get_redirects_from_dump(self, alsoGetPageTitles=False):
-##        '''
-##        Load a local XML dump file, look at all pages which have the
-##        redirect flag set, and find out where they're pointing at. Return
-##        a dictionary where the redirect names are the keys and the redirect
-##        targets are the values.
-##        '''
-##        xmlFilename = self.xmlFilename
-##        redict = {}
-##        # open xml dump and read page titles out of it
-##        dump = xmlreader.XmlDump(xmlFilename)
-##        redirR = self.site.redirectRegex()
-##        readPagesCount = 0
-##        if alsoGetPageTitles:
-##            pageTitles = set()
-##        for entry in dump.parse():
-##            readPagesCount += 1
-##            # always print status message after 10000 pages
-##            if readPagesCount % 10000 == 0:
-##                pywikibot.output(u'%i pages read...' % readPagesCount)
-##            if len(self.namespaces) > 0:
-##                if pywikibot.Page(self.site, entry.title).namespace() \
-##                        not in self.namespaces:
-##                    continue
-##            if alsoGetPageTitles:
-##                pageTitles.add(entry.title.replace(' ', '_'))
-##
-##            m = redirR.match(entry.text)
-##            if m:
-##                target = m.group(1)
-##                # There might be redirects to another wiki. Ignore these.
-##                for code in self.site.family.langs.keys():
-##                    if target.startswith('%s:' % code) \
-##                            or target.startswith(':%s:' % code):
-##                        if code == self.site.language():
-##                        # link to our wiki, but with the lang prefix
-##                            target = target[(len(code)+1):]
-##                            if target.startswith(':'):
-##                                target = target[1:]
-##                        else:
-##                            pywikibot.output(
-##                                u'NOTE: Ignoring %s which is a redirect to %s:'
-##                                % (entry.title, code))
-##                            target = None
-##                            break
-##                # if the redirect does not link to another wiki
-##                if target:
-##                    source = entry.title.replace(' ', '_')
-##                    target = target.replace(' ', '_')
-##                    # remove leading and trailing whitespace
-##                    target = target.strip('_')
-##                    # capitalize the first letter
-##                    if not pywikibot.getSite().nocapitalize:
-##                        source = source[:1].upper() + source[1:]
-##                        target = target[:1].upper() + target[1:]
-##                    if '#' in target:
-##                        target = target[:target.index('#')].rstrip("_")
-##                    if '|' in target:
-##                        pywikibot.output(
-##                            u'HINT: %s is a redirect with a pipelink.'
-##                            % entry.title)
-##                        target = target[:target.index('|')].rstrip("_")
-##                    if target: # in case preceding steps left nothing
-##                        redict[source] = target
-##        if alsoGetPageTitles:
-##            return redict, pageTitles
-##        else:
-##            return redict
-##
+    def get_redirects_from_dump(self, alsoGetPageTitles=False):
+        '''
+        Load a local XML dump file, look at all pages which have the
+        redirect flag set, and find out where they're pointing at. Return
+        a dictionary where the redirect names are the keys and the redirect
+        targets are the values.
+        '''
+        xmlFilename = self.xmlFilename
+        redict = {}
+        # open xml dump and read page titles out of it
+        dump = xmlreader.XmlDump(xmlFilename)
+        redirR = self.site.redirectRegex()
+        readPagesCount = 0
+        if alsoGetPageTitles:
+            pageTitles = set()
+        for entry in dump.parse():
+            readPagesCount += 1
+            # always print status message after 10000 pages
+            if readPagesCount % 10000 == 0:
+                pywikibot.output(u'%i pages read...' % readPagesCount)
+            if len(self.namespaces) > 0:
+                if pywikibot.Page(self.site, entry.title).namespace() \
+                        not in self.namespaces:
+                    continue
+            if alsoGetPageTitles:
+                pageTitles.add(entry.title.replace(' ', '_'))
+
+            m = redirR.match(entry.text)
+            if m:
+                target = m.group(1)
+                # There might be redirects to another wiki. Ignore these.
+                for code in self.site.family.langs.keys():
+                    if target.startswith('%s:' % code) \
+                            or target.startswith(':%s:' % code):
+                        if code == self.site.language():
+                        # link to our wiki, but with the lang prefix
+                            target = target[(len(code)+1):]
+                            if target.startswith(':'):
+                                target = target[1:]
+                        else:
+                            pywikibot.output(
+                                u'NOTE: Ignoring %s which is a redirect to %s:'
+                                % (entry.title, code))
+                            target = None
+                            break
+                # if the redirect does not link to another wiki
+                if target:
+                    source = entry.title.replace(' ', '_')
+                    target = target.replace(' ', '_')
+                    # remove leading and trailing whitespace
+                    target = target.strip('_')
+                    # capitalize the first letter
+                    if not pywikibot.getSite().nocapitalize:
+                        source = source[:1].upper() + source[1:]
+                        target = target[:1].upper() + target[1:]
+                    if '#' in target:
+                        target = target[:target.index('#')].rstrip("_")
+                    if '|' in target:
+                        pywikibot.output(
+                            u'HINT: %s is a redirect with a pipelink.'
+                            % entry.title)
+                        target = target[:target.index('|')].rstrip("_")
+                    if target: # in case preceding steps left nothing
+                        redict[source] = target
+        if alsoGetPageTitles:
+            return redict, pageTitles
+        else:
+            return redict
+
     def get_redirect_pages_via_api(self):
         """Return generator that yields
         Pages that are redirects.
@@ -299,23 +297,22 @@ class RedirectGenerator:
                         count += 1
                         if count >= self.api_number:
                             break
-
+        elif self.xmlFilename:
+            redict = self.get_redirects_from_dump()
+            num = 0
+            for (key, value) in redict.iteritems():
+                num += 1
+                # check if the value - that is, the redirect target - is a
+                # redirect as well
+                if num > self.offset and value in redict:
+                    yield key
+                    pywikibot.output(u'\nChecking redirect %i of %i...'
+                                     % (num + 1, len(redict)))
         else:
             # retrieve information from double redirect special page
             pywikibot.output(u'Retrieving special page...')
             for redir_name in self.site.double_redirects():
                 yield redir_name.title()
-##        else:
-##            redict = self.get_redirects_from_dump()
-##            num = 0
-##            for (key, value) in redict.iteritems():
-##                num += 1
-##                # check if the value - that is, the redirect target - is a
-##                # redirect as well
-##                if num > self.offset and value in redict:
-##                    yield key
-##                    pywikibot.output(u'\nChecking redirect %i of %i...'
-##                                     % (num + 1, len(redict)))
 
     def get_moved_pages_redirects(self):
         '''generate redirects to recently-moved pages'''
@@ -693,10 +690,8 @@ def main(*args):
         else:
             pywikibot.output(u'Unknown argument: %s' % arg)
 
-    if xmlFilename:
-        pywikibot.error(u"Sorry, xmlreader is not yet implemented in rewrite")
-    elif not action: # or (xmlFilename and moved_pages)
-                     # or (api and xmlFilename):
+    if not action or (xmlFilename and moved_pages) \
+                  or (fullscan and xmlFilename):
         pywikibot.showHelp('redirect')
     else:
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
