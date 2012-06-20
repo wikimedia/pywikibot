@@ -17,6 +17,8 @@ both           Both of the above. Permitted only with -api. Implies -api.
 
 and arguments can be:
 
+-fullscan      Retrieve redirect pages from live wiki, not from a special page
+
 -moves         Use the page move log to find double-redirect candidates. Only
                works with action "double".
 
@@ -68,7 +70,7 @@ class RedirectGenerator:
                  use_move_log=False, use_api=False, start=None, until=None,
                  number=None, step=None):
         self.site = pywikibot.getSite()
-##        self.xmlFilename = xmlFilename
+        self.xmlFilename = xmlFilename
         self.namespaces = namespaces
         if use_api and self.namespaces == []:
             self.namespaces = [ 0 ]
@@ -284,10 +286,10 @@ class RedirectGenerator:
 
     def retrieve_double_redirects(self):
         if self.use_move_log:
-            for redir_page in self.get_moved_pages_redirects():
+            gen = self.get_moved_pages_redirects()
+            for redir_page in gen:
                 yield redir_page.title()
-            return
-        else:
+        elif self.use_api and not self.use_move_log:
             count = 0
             for (pagetitle, type, target, final) \
                     in self.get_redirects_via_api(maxlen=2):
@@ -298,23 +300,11 @@ class RedirectGenerator:
                         if count >= self.api_number:
                             break
 
-# TODO: API cannot yet deliver contents of "special" pages
-##        elif self.xmlFilename == None:
-##            # retrieve information from the live wiki's maintenance page
-##            # double redirect maintenance page's URL
-###            pywikibot.config.special_page_limit = 1000
-##            path = self.site.double_redirects_address(default_limit = False)
-##            pywikibot.output(u'Retrieving special page...')
-##            maintenance_txt = self.site.getUrl(path)
-##
-##            # regular expression which finds redirects which point to
-##            # another redirect inside the HTML
-##            Rredir = re.compile('\<li\>\<a href=".+?" title="(.*?)">')
-##            redir_names = Rredir.findall(maintenance_txt)
-##            pywikibot.output(u'Retrieved %i redirects from special page.\n'
-##                             % len(redir_names))
-##            for redir_name in redir_names:
-##                yield redir_name
+        else:
+            # retrieve information from double redirect special page
+            pywikibot.output(u'Retrieving special page...')
+            for redir_name in self.site.double_redirects():
+                yield redir_name.title()
 ##        else:
 ##            redict = self.get_redirects_from_dump()
 ##            num = 0
@@ -363,13 +353,12 @@ class RedirectGenerator:
 
 
 class RedirectRobot:
-    def __init__(self, action, generator, always=False, number=None, step=None):
+    def __init__(self, action, generator, always=False, number=None):
         self.site = pywikibot.getSite()
         self.action = action
         self.generator = generator
         self.always = always
         self.number = number
-        self.step = step
         self.exiting = False
 
     def prompt(self, question):
@@ -652,7 +641,7 @@ def main(*args):
     # (only with dump); default to -1 which means all redirects are checked
     offset = -1
     moved_pages = False
-    api = True  # rewrite always uses api, probably should get rid of this
+    fullscan = False
     start = ''
     until = ''
     number = None
@@ -665,6 +654,8 @@ def main(*args):
             action = 'broken'
         elif arg == 'both':
             action = 'both'
+        elif arg == '-fullscan':
+            fullscan = True
         elif arg.startswith('-xml'):
             if len(arg) == 4:
                 xmlFilename = i18n.input('pywikibot-enter-xml-filename')
@@ -709,8 +700,8 @@ def main(*args):
         pywikibot.showHelp('redirect')
     else:
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
-                                api, start, until, number, step)
-        bot = RedirectRobot(action, gen, always, number, step)
+                                fullscan, start, until, number, step)
+        bot = RedirectRobot(action, gen, always, number)
         bot.run()
 
 if __name__ == '__main__':
