@@ -865,7 +865,8 @@ class APISite(BaseSite):
     def getmagicwords(self, word):
         """Return list of localized "word" magic words for the site."""
         if not hasattr(self, "_magicwords"):
-            sirequest = api.Request(
+            sirequest = api.CachedRequest(
+                                expiry=config.API_config_expiry,
                                 site=self,
                                 action="query",
                                 meta="siteinfo",
