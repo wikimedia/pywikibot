@@ -3079,7 +3079,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
                                 step=step, total=total)
         return wigen
 
-    def brocken_redirects(self, step=None, total=None):
+    def broken_redirects(self, step=None, total=None):
         """Yield Pages without language links from Special:BrokenRedirects."""
         assert self.versionnumber >= 18
         wigen = self._generator(api.PageGenerator,
