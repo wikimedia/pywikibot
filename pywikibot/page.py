@@ -791,9 +791,8 @@ class Page(object):
         if not cc:
             return
         old = self.text
-        if config.verbose_output:
-            pywikibot.output(u'Cosmetic changes for %s-%s enabled.'
-                             % (family, self.site.lang))
+        pywikibot.log(u'Cosmetic changes for %s-%s enabled.'
+                      % (family, self.site.lang))
         from scripts.cosmetic_changes import CosmeticChangesToolkit
         from pywikibot import i18n
         ccToolkit = CosmeticChangesToolkit(self.site,
