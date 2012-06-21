@@ -1067,12 +1067,14 @@ def main(*args):
             pywikibot.showHelp()
         else:
             pageTitle.append(arg)
-
+    site = pywikibot.Site()
+    site.login()
+    
     # if the disambiguation page is given as a command line argument,
     # connect the title's parts with spaces
     if pageTitle != []:
         pageTitle = ' '.join(pageTitle)
-        page = pywikibot.Page(pywikibot.Link(pageTitle, pywikibot.getSite()))
+        page = pywikibot.Page(pywikibot.Link(pageTitle, site))
         generator = iter([page])
 
     # if no disambiguation page was given as an argument, and none was
@@ -1080,7 +1082,7 @@ def main(*args):
     if not generator:
         pageTitle = pywikibot.input(
             u'On which disambiguation page do you want to work?')
-        page = pywikibot.Page(pywikibot.Link(pageTitle, pywikibot.getSite()))
+        page = pywikibot.Page(pywikibot.Link(pageTitle, site))
         generator = iter([page])
 
     bot = DisambiguationRobot(always, alternatives, getAlternatives, dnSkip,

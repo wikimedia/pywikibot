@@ -170,7 +170,7 @@ class XmlDumpReplacePageGenerator:
         if "inside" in self.exceptions:
             self.excsInside += self.exceptions['inside']
         from pywikibot import xmlreader
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         dump = xmlreader.XmlDump(self.xmlFilename)
         self.parser = dump.parse()
 
@@ -536,7 +536,7 @@ def main(*args):
             allowoverlap = True
         else:
             commandline_replacements.append(arg)
-
+    pywikibot.Site().login()
     gen = genFactory.getCombinedGenerator()
     if (len(commandline_replacements) % 2):
         raise pywikibot.Error, 'require even number of replacements.'

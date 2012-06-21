@@ -1337,6 +1337,7 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     site = pywikibot.getSite(u'commons', u'commons')
+    site.login()
     for arg in pywikibot.handleArgs(*args):
         if arg.startswith('-yesterday'):
             generator = uploadedYesterday(site)

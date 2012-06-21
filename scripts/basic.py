@@ -51,7 +51,7 @@ class BasicBot:
         self.generator = generator
         self.dry = dry
         # Set the edit summary message
-        self.summary = i18n.twtranslate(pywikibot.getSite(), 'basic-changing')
+        self.summary = i18n.twtranslate(site, 'basic-changing')
 
     def run(self):
         for page in self.generator:
@@ -130,6 +130,7 @@ u'Cannot change %s because of spam blacklist entry %s'
         return False
 
 def main():
+    global site
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
@@ -152,11 +153,12 @@ def main():
             # -start:XYZ or -ref:Asdf was given.
             if not genFactory.handleArg(arg):
                 pageTitleParts.append(arg)
-
+    site = pywikibot.Site()
+    site.login()
     if pageTitleParts != []:
         # We will only work on a single page.
         pageTitle = ' '.join(pageTitleParts)
-        page = pywikibot.Page(pywikibot.Link(pageTitle, pywikibot.getSite()))
+        page = pywikibot.Page(pywikibot.Link(pageTitle, site))
         gen = iter([page])
 
     if not gen:

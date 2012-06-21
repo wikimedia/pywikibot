@@ -2414,8 +2414,9 @@ def main():
         globalvar.summary += u'; '
 
     # ensure that we don't try to change main page
+    site = pywikibot.getSite()
+    site.login()
     try:
-        site = pywikibot.getSite()
         mainpagename = site.mediawiki_message('mainpage')
         globalvar.skip.add(pywikibot.Page(site, mainpagename))
     except pywikibot.Error:
@@ -2438,7 +2439,6 @@ def main():
         hintlessPageGen = pagegenerators.NewpagesPageGenerator(newPages, namespace=ns)
 
     elif optRestore or optContinue or globalvar.restoreAll:
-        site = pywikibot.getSite()
         dumpFileName = pywikibot.config.datafilepath(
                            'data',
                            'interwiki-dumps',

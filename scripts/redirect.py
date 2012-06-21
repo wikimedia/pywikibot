@@ -70,6 +70,7 @@ class RedirectGenerator:
                  use_move_log=False, use_api=False, start=None, until=None,
                  number=None, step=None):
         self.site = pywikibot.getSite()
+        self.site.login()
         self.xmlFilename = xmlFilename
         self.namespaces = namespaces
         if use_api and self.namespaces == []:

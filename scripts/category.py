@@ -884,7 +884,7 @@ def main(*args):
             create_pages = True
         else:
             genFactory.handleArg(arg)
-
+    pywikibot.Site().login()
     gen = genFactory.getCombinedGenerator()
     if action == 'add':
         if not gen:

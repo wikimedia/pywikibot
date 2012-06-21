@@ -1469,6 +1469,7 @@ def main():
                 pageTitle.append(arg)
 
     site = pywikibot.getSite()
+    site.login()
     if pageTitle:
         gen = iter([pywikibot.Page(pywikibot.Link(t, site)) for t in pageTitle])
     if not gen:

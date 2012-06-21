@@ -36,6 +36,7 @@ class CategoryRedirectBot(object):
     def __init__(self):
         self.cooldown = 7 # days
         self.site = pywikibot.getSite()
+        self.site.login()
         self.catprefix = self.site.namespace(14)+":"
         self.log_text = []
         self.edit_requests = []

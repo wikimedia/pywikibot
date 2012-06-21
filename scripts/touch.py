@@ -79,7 +79,7 @@ def main(*args):
             redirs = True
         else:
             pageTitle.append(arg)
-
+    pywikibot.Site().login()
     gen = genFactory.getCombinedGenerator()
     if not gen:
         if pageTitle:

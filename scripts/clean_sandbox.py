@@ -120,6 +120,7 @@ class SandboxBot(pywikibot.Bot):
             self.availableOptions['delay_td'] = datetime.timedelta(minutes=d)
 
         self.site = pywikibot.Site()
+        self.site.login()
         if sandboxTitle.get(self.site.code) is None or \
                                         content.get(self.site.code) is None:
             pywikibot.output(u'This bot is not configured for the given site ' \

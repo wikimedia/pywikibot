@@ -40,6 +40,7 @@ class ArticleEditor:
         self.set_options(*args)
         self.setpage()
         self.site = pywikibot.getSite()
+        self.site.login()
 
     def set_options(self, *args):
         """Parse commandline and set options attribute"""
