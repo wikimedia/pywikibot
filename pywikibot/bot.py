@@ -252,6 +252,7 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
                 text = unicode(text, 'iso8859-1')
 
     logger.log(_level, text, extra=context, **kwargs)
+
 def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     """Output a message to the user via the userinterface.
 
@@ -431,6 +432,8 @@ def handleArgs(*args):
         elif arg == '-nolog':
             if moduleName in config.log:
                 config.log.remove(moduleName)
+        elif arg == '-simulate':
+            config.simulate = True
         #
         #  DEBUG control:
         #

@@ -200,6 +200,13 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
                               + self.http_params()
                              )
 
+    def _simulate(self, action):
+        if action and config.simulate and action in config.actions_to_block:
+            pywikibot.output(
+                u'\03{lightyellow}SIMULATION: %s action blocked.\03{default}'
+                % action)
+            return {action: {'result': 'Success', 'nochange': ''}}
+
     def submit(self):
         """Submit a query and parse the response.
 
@@ -213,6 +220,9 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
         paramstring = self.http_params()
         while True:
             action = self.params.get("action", "")
+            simulate = self._simulate(action)
+            if simulate:
+                return simulate
             self.site.throttle(write=self.write)
             uri = self.site.scriptpath() + "/api.php"
             try:

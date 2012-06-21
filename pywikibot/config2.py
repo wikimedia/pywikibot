@@ -516,6 +516,16 @@ cosmetic_changes_deny_script = ['cosmetic_changes', 'touch']
 # Configuration variable 'socks' is defined but unknown. Misspelled?proxy = None
 proxy = None
 
+### Simulate settings ###
+# Defines what actions the bots are NOT allowed to do (e.g. 'edit') on wikipedia
+# servers. Allows simulation runs of bots to be carried out without changing any
+# page on the server side. This setting may be overridden in user_config.py.
+actions_to_block = ['edit', 'watch', 'move', 'delete', 'undelete', 'protect',
+                    'emailuser']
+
+# Set simulate to True or use -simulate option to block all actions given above.
+simulate = False
+
 # How many pages should be put to a queue in asynchroneous mode.
 # If maxsize is <= 0, the queue size is infinite.
 # Increasing this value will increase memory space but could speed up
