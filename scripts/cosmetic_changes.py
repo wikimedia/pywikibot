@@ -196,9 +196,7 @@ class CosmeticChangesToolkit:
         try:
             text = isbn.hyphenateIsbnNumbers(text)
         except isbn.InvalidIsbnException, error:
-            if config.verbose_output:
-                pywikibot.output(u"ISBN error: %s" % error)
-            pass
+            pywikibot.log(u"ISBN error: %s" % error)
         if self.debug:
             pywikibot.showDiff(oldText, text)
         return text
@@ -292,8 +290,6 @@ class CosmeticChangesToolkit:
                                    % star, re.I)
                 found = regex.findall(starstext)
                 if found != []:
-                    if config.verbose_output:
-                        print found
                     text = regex.sub('', text)
                     allstars += found
 
@@ -309,8 +305,6 @@ class CosmeticChangesToolkit:
             regex = re.compile(iw_reg)
             found = regex.findall(text)
             if found:
-                if config.verbose_output:
-                    print found
                 hasCommentLine = True
                 text = regex.sub('', text)
 
@@ -339,8 +333,7 @@ class CosmeticChangesToolkit:
             allstars.sort()
             for element in allstars:
                 text += '%s%s' % (element.strip(),config.line_separator)
-                if config.verbose_output:
-                    pywikibot.output(u'%s' %element.strip())
+                pywikibot.log(u'%s' %element.strip())
         # Adding the interwiki
         if interwikiLinks:
             text = pywikibot.replaceLanguageLinks(text, interwikiLinks,
