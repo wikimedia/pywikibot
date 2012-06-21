@@ -685,6 +685,7 @@ u"%s: stopped iteration because 'query' not found in api response."
                 if isinstance(value, int):
                     value = str(value)
                 self.request[key] = value
+            del self.data # a new request with query-continue is needed
 
     def result(self, data):
         """Process result data as needed for particular subclass."""
