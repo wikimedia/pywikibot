@@ -679,9 +679,11 @@ class APISite(BaseSite):
         return gen
 
     def logged_in(self, sysop=False):
-        """Return True if logged in with specified privileges, otherwise False.
+        """Return True if logged in with the user specified in user-config.py
+       (or the sysop user specified if the sysop parameter is True).
 
-        @param sysop: if True, require sysop privileges.
+        @param sysop: if True, test if user is logged in as the sysop user
+                     instead of the normal user.
 
         """
         if not hasattr(self, "_userinfo"):
@@ -694,7 +696,7 @@ class APISite(BaseSite):
             return False
 
         if self.userinfo['name'] != self._username[sysop]:
-            pywikibot.warning("Logged in as %s instead of %s" % (self.userinfo['name'], self._username[sysop]))
+            return False
 
         return True
 

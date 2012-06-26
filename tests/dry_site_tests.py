@@ -21,4 +21,4 @@ def test_logged_in():
     x._userinfo['name'] = 'sysop_user'
     x._userinfo['groups'] = ['sysop']
     assert x.logged_in(True)
-    assert x.logged_in(False)
+    assert not x.logged_in(False)
