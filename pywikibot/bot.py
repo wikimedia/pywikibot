@@ -144,7 +144,7 @@ def init_handlers(strm=None):
     root_logger.handlers = [] # remove any old handlers
 
     # configure handler(s) for display to user interface
-    ui.init_handlers(root_logger)
+    ui.init_handlers(root_logger, **config.userinterface_init_kwargs)
 
     # if user has enabled file logging, configure file handler
     if moduleName in config.log or '*' in config.log:

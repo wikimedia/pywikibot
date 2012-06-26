@@ -116,7 +116,7 @@ windowsColors = {
 colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(windowsColors.keys()))
 
 class UI(object):
-    def init_handlers(self, root_logger):
+    def init_handlers(self, root_logger, default_stream=sys.stderr):
         """Initialize the handlers for user output.
 
         This method initializes handler(s) for output levels VERBOSE (if
@@ -125,8 +125,14 @@ class UI(object):
         others write theirs to sys.stderr.
 
         """
+
+        if default_stream == 'stdout':
+            default_stream = sys.stdout
+        elif default_stream == 'stderr':
+            default_stream = sys.stderr
+
         # default handler for display to terminal
-        default_handler = TerminalHandler(strm=sys.stderr)
+        default_handler = TerminalHandler(strm=default_stream)
         if config.verbose_output:
             default_handler.setLevel(VERBOSE)
         else:
@@ -172,7 +178,7 @@ class UI(object):
         try:
             pywikibot.logoutput(question + ' ', newline=False,
                                 _level=pywikibot.INPUT)
-            if password:
+            if password and sys.stdin.isatty():
                 import getpass
                 text = getpass.getpass('')
                 # See PYWP-13 / http://bugs.python.org/issue11236

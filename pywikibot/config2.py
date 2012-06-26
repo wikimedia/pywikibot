@@ -178,6 +178,11 @@ textfile_encoding = 'utf-8'
 # tkinter isn't yet ready
 userinterface = 'terminal'
 
+# this can be used to pass variables to the UI init function
+# useful for e.g.
+# userinterface_init_kwargs = {'default_stream': 'stdout'}
+userinterface_init_kwargs = {}
+
 # i18n setting for user interface language
 # default is config.mylang or 'en'
 userinterface_lang = None
