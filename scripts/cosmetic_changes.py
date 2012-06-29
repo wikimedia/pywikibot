@@ -197,6 +197,7 @@ class CosmeticChangesToolkit:
             text = isbn.hyphenateIsbnNumbers(text)
         except isbn.InvalidIsbnException, error:
             pywikibot.log(u"ISBN error: %s" % error)
+            pass
         if self.debug:
             pywikibot.showDiff(oldText, text)
         return text
@@ -742,7 +743,7 @@ class CosmeticChangesToolkit:
         old = digits[digits.keys()[0]]
         # do not change inside file links
         namespaces = list(self.site.namespace(6, all=True))
-        pattern = re.compile(u'\[\[(' + '|'.join(namespaces) + '):.+?\.\w+? *(\|[^\[]*?(\[\[[^\[]*?\]\][^\[]*?)?)?\]\]',
+        pattern = re.compile(u'\[\[(' + '|'.join(namespaces) + '):.+?\.\w+? *(\|((\[\[.*?\]\])|.)*)?\]\]',
                              re.UNICODE)
         exceptions.append(pattern)
         text = pywikibot.replaceExcept(text, u',', u'،', exceptions)
@@ -755,7 +756,7 @@ class CosmeticChangesToolkit:
         text = pywikibot.replaceExcept(text, u'ك', u'ک', exceptions)
         text = pywikibot.replaceExcept(text, ur'[ىي]', u'ی', exceptions)
         # replace persian/arabic digits
-        for i in xrange(0,10):
+        for i in xrange(0, 10):
             text = pywikibot.replaceExcept(text, old[i], new[i], exceptions)
         # do not change digits in class, style and table params
         pattern = re.compile(u'\w+=(".+?"|\d+)', re.UNICODE)
