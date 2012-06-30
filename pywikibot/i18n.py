@@ -389,12 +389,15 @@ def twntranslate(code, twtitle, parameters=None):
         lang = code.pop()
         # we only need the lang or _default, not a _altlang code
         # maybe we should implement this to i18n.translate()
-        try:
-            plural_func = plural_rules[lang]['plural']
-        except KeyError:
-            plural_func = plural_rules['_default']['plural']
         # TODO: check against plural_rules[lang]['nplurals']
-        repl = variants.split('|')[plural_func(num)]
+        try:
+            index = plural_rules[lang]['plural'](num)
+        except KeyError:
+            index = plural_rules['_default']['plural'](num)
+        except TypeError:
+            # we got an int
+            index = plural_rules[lang]['plural']
+        repl = variants.split('|')[index]
         trans = re.sub(PATTERN, repl, trans)
     if param:
         try:
