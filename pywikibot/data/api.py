@@ -446,6 +446,7 @@ class CachedRequest(Request):
             self._write_cache(self._data)
         return self._data
 
+
 class QueryGenerator(object):
     """Base class for iterators that handle responses to API action=query.
 
@@ -505,21 +506,41 @@ class QueryGenerator(object):
                                             # but not always
 
     @property
+    def __modules(self):
+        """
+        Instance cache: hold the query data for paraminfo on
+        querymodule=self.module at self.site
+
+        """
+        if not hasattr(self.site, "_modules"):
+            setattr(self.site, "_modules", dict())
+        return self.site._modules
+
+    @__modules.deleter
+    def __modules(self):
+        """Delete the instance cache - maybe we don't need it"""
+        if hasattr(self.site, "_modules"):
+            del self.site._modules
+
+    @property
     def _modules(self):
         """Query api on self.site for paraminfo on querymodule=self.module"""
+        if not set(self.module.split('|')) <= set(self.__modules.keys()):
+            paramreq = CachedRequest(expiry=config.API_config_expiry,
+                                     site=self.site, action="paraminfo",
+                                     querymodules=self.module)
+            data = paramreq.submit()
+            assert "paraminfo" in data
+            assert "querymodules" in data["paraminfo"]
+            assert len(data["paraminfo"]["querymodules"]) == 1 + self.module.count("|")
+            for paraminfo in data["paraminfo"]["querymodules"]:
+                assert paraminfo["name"] in self.module
+                if "missing" in paraminfo:
+                    raise Error("Invalid query module name '%s'." % self.module)
+                self.__modules[paraminfo["name"]] = paraminfo
         _modules = {}
-        paramreq = CachedRequest(expiry=config.API_config_expiry,
-                                 site=self.site, action="paraminfo",
-                                 querymodules=self.module)
-        data = paramreq.submit()
-        assert "paraminfo" in data
-        assert "querymodules" in data["paraminfo"]
-        assert len(data["paraminfo"]["querymodules"]) == 1+self.module.count("|")
-        for paraminfo in data["paraminfo"]["querymodules"]:
-            assert paraminfo["name"] in self.module
-            if "missing" in paraminfo:
-                raise Error("Invalid query module name '%s'." % self.module)
-            _modules[paraminfo["name"]] = paraminfo
+        for m in self.module.split('|'):
+            _modules[m] = self.__modules[m]
         return _modules
 
     def set_query_increment(self, value):
