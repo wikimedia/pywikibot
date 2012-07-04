@@ -182,7 +182,7 @@ class CosmeticChangesToolkit:
         text = self.translateAndCapitalizeNamespaces(text)
         text = self.translateMagicWords(text)
         text = self.replaceDeprecatedTemplates(text)
-        text = self.resolveHtmlEntities(text)
+##        text = self.resolveHtmlEntities(text)
         text = self.validXhtml(text)
         text = self.removeUselessSpaces(text)
         text = self.removeNonBreakingSpaceBeforePercent(text)
