@@ -887,7 +887,7 @@ def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
                                  total=total, content=False):
         yield page
 
-def SearchPageGenerator(query, ste=None, total=None, namespaces=None, site=None):
+def SearchPageGenerator(query, step=None, total=None, namespaces=None, site=None):
     """
     Provides a list of results using the internal MediaWiki search engine
     """
