@@ -887,13 +887,13 @@ def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
                                  total=total, content=False):
         yield page
 
-def SearchPageGenerator(query, number = 100, namespaces = None, site = None):
+def SearchPageGenerator(query, ste=None, total=None, namespaces=None, site=None):
     """
     Provides a list of results using the internal MediaWiki search engine
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.search(query, number=number, namespaces = namespaces):
+    for page in site.search(query, step=step, total=total, namespaces=namespaces):
         yield page
 
 # following classes just ported from version 1 without revision; not tested
