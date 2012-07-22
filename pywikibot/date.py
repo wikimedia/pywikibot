@@ -10,7 +10,7 @@ lists which are required by some other programs.
 # © Andre Engels, 2004-2005
 # © Yuri Astrakhan, 2005-2006  FirstnameLastname@gmail.com
 #       (years/decades/centuries/millenniums  str <=> int  conversions)
-# © Pywikipedia bot team, 2004-2011
+# © Pywikipedia bot team, 2004-2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -203,28 +203,28 @@ def monthName(lang, ind):
 
 # Helper for KN: digits representation
 _knDigits = u'೦೧೨೩೪೫೬೭೮೯'
-_knDigitsToLocal = dict([(ord(unicode(i)), _knDigits[i]) for i in range(10)])
-_knLocalToDigits = dict([(ord(_knDigits[i]), unicode(i)) for i in range(10)])
+_knDigitsToLocal = dict([(ord(unicode(i)), _knDigits[i]) for i in xrange(10)])
+_knLocalToDigits = dict([(ord(_knDigits[i]), unicode(i)) for i in xrange(10)])
 
 # Helper for Urdu/Persian languages
 _faDigits = u'۰۱۲۳۴۵۶۷۸۹'
-_faDigitsToLocal = dict([(ord(unicode(i)), _faDigits[i]) for i in range(10)])
-_faLocalToDigits = dict([(ord(_faDigits[i]), unicode(i)) for i in range(10)])
+_faDigitsToLocal = dict([(ord(unicode(i)), _faDigits[i]) for i in xrange(10)])
+_faLocalToDigits = dict([(ord(_faDigits[i]), unicode(i)) for i in xrange(10)])
 
 # Helper for HI:, MR:
 _hiDigits = u'०१२३४५६७८९'
-_hiDigitsToLocal = dict([(ord(unicode(i)), _hiDigits[i]) for i in range(10)])
-_hiLocalToDigits = dict([(ord(_hiDigits[i]), unicode(i)) for i in range(10)])
+_hiDigitsToLocal = dict([(ord(unicode(i)), _hiDigits[i]) for i in xrange(10)])
+_hiLocalToDigits = dict([(ord(_hiDigits[i]), unicode(i)) for i in xrange(10)])
 
 # Helper for BN:
 _bnDigits = u'০১২৩৪৫৬৭৮৯'
-_bnDigitsToLocal = dict([(ord(unicode(i)), _bnDigits[i]) for i in range(10)])
-_bnLocalToDigits = dict([(ord(_bnDigits[i]), unicode(i)) for i in range(10)])
+_bnDigitsToLocal = dict([(ord(unicode(i)), _bnDigits[i]) for i in xrange(10)])
+_bnLocalToDigits = dict([(ord(_bnDigits[i]), unicode(i)) for i in xrange(10)])
 
 # Helper for GU:
 _guDigits = u'૦૧૨૩૪૫૬૭૮૯'
-_guDigitsToLocal = dict([(ord(unicode(i)), _guDigits[i]) for i in range(10)])
-_guLocalToDigits = dict([(ord(_guDigits[i]), unicode(i)) for i in range(10)])
+_guDigitsToLocal = dict([(ord(unicode(i)), _guDigits[i]) for i in xrange(10)])
+_guLocalToDigits = dict([(ord(_guDigits[i]), unicode(i)) for i in xrange(10)])
 
 def intToLocalDigitsStr( value, digitsToLocalDict ):
     # Encode an integer value into a textual form.
@@ -367,7 +367,7 @@ def dh( value, pattern, encf, decf, filter = None ):
         m = compPattern.match(value)
         if m:
             # decode each found value using provided decoder
-            values = [ decoders[i][2](m.group(i+1)) for i in range(len(decoders))]
+            values = [ decoders[i][2](m.group(i+1)) for i in xrange(len(decoders))]
             decValue = decf( values )
 
             if decValue in _stringTypes:
@@ -390,7 +390,7 @@ def dh( value, pattern, encf, decf, filter = None ):
             if len(params) != len(decoders):
                 raise AssertionError("parameter count (%d) does not match decoder count (%d)" % (len(params), len(decoders)))
             # convert integer parameters into their textual representation
-            params = [ MakeParameter(decoders[i], params[i]) for i in range(len(params)) ]
+            params = [ MakeParameter(decoders[i], params[i]) for i in xrange(len(params)) ]
             return strPattern % tuple(params)
         else:
             if 1 != len(decoders):
@@ -700,7 +700,7 @@ formats = {
         'fa' :      lambda v: dh_yearBC( v, u'%d (پیش از میلاد)' ),
         'fi' :      lambda v: dh_yearBC( v, u'%d eaa.' ),
         'fo' :      lambda v: dh_yearBC( v, u'%d f. Kr.' ),
-        'fr' :      lambda v: dh_yearBC( v, u'-%d' ),
+        'fr' :      lambda v: dh_yearBC( v, u'%d av. J.-C.'),
         'gl' :      lambda v: dh_yearBC( v, u'-%d' ),
         'he' :      lambda v: dh_yearBC( v, u'%d לפני הספירה' ),
         'hr' :      lambda v: dh_yearBC( v, u'%d. pr. Kr.' ),
@@ -711,7 +711,7 @@ formats = {
         'it' :      lambda v: dh_yearBC( v, u'%d a.C.' ),
         'ka' :      lambda v: dh_yearBC( v, u'ძვ. წ. %d' ),
         'ko' :      lambda v: dh_yearBC( v, u'기원전 %d년' ),
-        'ksh':      lambda v: dh_yearBC( v,u'Joohr %d füür Krėßtůß'),
+        'ksh':      lambda v: dh_yearBC( v, u'Joohr %d füür Krėßtůß'),
         'la' :      lambda v: dh_yearBC( v, u'%d a.C.n.' ),
         'lb' :      lambda v: dh_yearBC( v, u'-%d' ),
         'lt' :      lambda v: dh_yearBC( v, u'%d m. pr. m. e.'),
@@ -1118,14 +1118,12 @@ formats = {
         'cs' :      lambda v: dh_centuryAD( v, u'%d. století' ),
         'da' :      lambda v: dh_centuryAD( v, u'%d. århundrede' ),
         'no' :      lambda v: dh( v, u'%d-tallet', lambda i: (i-1)*100, lambda ii: ii[0]/100+1 ),
-        'ksh':      lambda v: dh_constVal( v, 1, u'Joohunndot' ),
     },
 
     'CenturyBC_Cat':{
         'cs' :      lambda v: dh_centuryBC( v, u'%d. století př. n. l.' ),
         'de' :      lambda v: dh_centuryBC( v, u'Jahr (%d. Jh. v. Chr.)' ),
         'no' :      lambda v: dh( v, u'%d-tallet f.Kr.', lambda i: (i-1)*100, lambda ii: ii[0]/100+1 ),
-        'ksh':      lambda v: dh_constVal( v, 1, u'Joohunndot' ),
     },
 
     'MillenniumAD': {
@@ -1504,7 +1502,7 @@ def addFmt( lang, isMnthOfYear, patterns ):
     if len(patterns) != 12:
         raise AssertionError(u'pattern %s does not have 12 elements' % lang )
 
-    for i in range(12):
+    for i in xrange(12):
         if patterns[i] is not None:
             if isMnthOfYear:
                 formats[yrMnthFmts[i]][lang] = eval(u'lambda v: dh_mnthOfYear( v, u"%s" )' % patterns[i])
@@ -1512,7 +1510,7 @@ def addFmt( lang, isMnthOfYear, patterns ):
                 formats[dayMnthFmts[i]][lang] = eval(u'lambda v: dh_dayOfMnth( v, u"%s" )' % patterns[i])
 
 def makeMonthList(pattern):
-    return [pattern % m for m in range(1,13)]
+    return [pattern % m for m in xrange(1,13)]
 
 def makeMonthNamedList(lang, pattern, makeUpperCase=None):
     """Creates a list of 12 elements based on the name of the month.
@@ -1527,7 +1525,7 @@ def makeMonthNamedList(lang, pattern, makeUpperCase=None):
     elif makeUpperCase == False:
         f = lambda s: s[0].lower() + s[1:]
 
-    return [ pattern % f(monthName(lang, m)) for m in range(1,13) ]
+    return [ pattern % f(monthName(lang, m)) for m in xrange(1,13) ]
 
 def addFmt2( lang, isMnthOfYear, pattern, makeUpperCase = None ):
     addFmt( lang, isMnthOfYear, makeMonthNamedList( lang, pattern, makeUpperCase ))
@@ -1647,7 +1645,7 @@ for i in [3,7,9]:
 
 # Brazil uses "1añ" for the 1st of every month, and number without suffix for all other days
 brMonthNames = makeMonthNamedList( 'br', u"%s", True )
-for i in range(0,12):
+for i in xrange(0,12):
     formats[dayMnthFmts[i]]['br'] = eval(
         (u'lambda m: multi( m, [' +
             u'(lambda v: dh_dayOfMnth( v, u"%%dañ %s" ), lambda p: p == 1),' +
@@ -1670,7 +1668,7 @@ addFmt2('fi', True, u"%s %%d", True )
 addFmt ('fr', True,     [ u"Janvier %d", u"Février %d", u"Mars %d", u"Avril %d", u"Mai %d", u"Juin %d", u"Juillet %d", u"Août %d", u"Septembre %d", u"Octobre %d", u"Novembre %d", u"Décembre %d" ])
 addFmt2('he', True, u"%s %%d", True )
 addFmt2('it', True, u"Attualità/Anno %%d - %s", True )
-addFmt ('ja', True,     [ u"「最近の出来事」%%d年%d月" % mm for mm in range(1,13)])
+addFmt ('ja', True,     [ u"「最近の出来事」%%d年%d月" % mm for mm in xrange(1,13)])
 addFmt2('ka', True, u"%s, %%d" )
 addFmt ('ko', True,     [ u"%d년 1월", u"%d년 2월", u"%d년 3월", u"%d년 4월", u"%d년 5월", u"%d년 6월", u"%d년 7월", u"%d년 8월", u"%d년 9월", u"%d년 10월", u"%d년 11월", u"%d년 12월" ])
 addFmt ('li', True,     [ u"januari %d", u"februari %d", u"miert %d", u"april %d", u"mei %d", u"juni %d", u"juli %d", u"augustus %d", u"september %d", u"oktober %d", u"november %d", u"december %d" ])
@@ -1726,7 +1724,7 @@ for month in yrMnthFmts:
 _formatLimit_DayOfMonth31 = (lambda v: 1 <= v and v < 32,           1, 32)
 _formatLimit_DayOfMonth30 = (lambda v: 1 <= v and v < 31,           1, 31)
 _formatLimit_DayOfMonth29 = (lambda v: 1 <= v and v < 30,           1, 30)
-for monthId in range(12):
+for monthId in xrange(12):
     if (monthId + 1) in [1, 3, 5, 7, 8, 10, 12]:
         formatLimits[dayMnthFmts[monthId]] = _formatLimit_DayOfMonth31      # 31 days a month
     elif (monthId+1) == 2: # February
@@ -1805,7 +1803,7 @@ def testMapEntry( formatName, showAll = True, value = None ):
     for code, convFunc in formats[formatName].iteritems():
 #        import time
 #        startClock = time.clock()
-        for value in range(start, stop, step):
+        for value in xrange(start, stop, step):
             try:
                 if not predicate(value):
                     raise AssertionError("     Not a valid value for this format.")
@@ -1830,7 +1828,6 @@ def test(quick=False, showAll=False):
 
     """
     for formatName in formats:
-
         if quick:
             testMapEntry( formatName, showAll, formatLimits[formatName][1] )     # Only test the first value in the test range
         else:
