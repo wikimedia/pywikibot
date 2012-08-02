@@ -2336,6 +2336,7 @@ def readWarnfile(filename, bot):
 
 def main():
     singlePageTitle = []
+    opthintsonly = False
     start = None
     # Which namespaces should be processed?
     # default to [] which means all namespaces will be processed
