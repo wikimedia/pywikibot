@@ -89,6 +89,7 @@ class Family(family.Family):
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rumantsch_Wikibooks
             'se': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Sami_Wikibooks
             'simple' : 'en', # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
+            'su': None, #http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Basa_Sunda_Wikibooks_(2)
             'sw': None, #https://bugzilla.wikimedia.org/show_bug.cgi?id=25170
             'tk': None,
             'tokipona': None,
