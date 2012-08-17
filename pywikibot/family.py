@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 
 #
-# (C) Pywikipedia bot team, 2004-2011
+# (C) Pywikipedia bot team, 2004-2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -822,7 +822,7 @@ class Family:
         """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.20wmf8'
+        return '1.20wmf9'
 
     def versionnumber(self, code):
         """Return an int identifying MediaWiki version.
