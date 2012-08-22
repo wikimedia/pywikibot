@@ -2901,11 +2901,12 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             imagepage._imageinfo = result["imageinfo"]
             return
 
-    @deprecate_arg("number", None)
+    @deprecate_arg("number", step)
     @deprecate_arg("repeat", None)
     @deprecate_arg("namespace", "namespaces")
     @deprecate_arg("rc_show", None)
-    def newpages(self, get_redirect=False, user=None, returndict=False,
+    @deprecate_arg("get_redirect", None) #20120822
+    def newpages(self, user=None, returndict=False,
                  start=None, end=None, reverse=False, showBot=False,
                  showRedirects=False, excludeuser=None,
                  showPatrolled=None, namespaces=None, step=None, total=None):
@@ -2940,8 +2941,8 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             if returndict:
                 yield (newpage, pageitem)
             else:
-                yield (newpage, pageitem['newlen'], u'', pageitem['user'],
-                       pageitem['comment'])
+                yield (newpage, pageitem['timestamp'], pageitem['newlen'],
+                       u'', pageitem['user'], pageitem['comment'])
 
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
