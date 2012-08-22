@@ -12,7 +12,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikipedia bot team, 2008-2010
+# (C) Pywikipedia bot team, 2008-2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -737,7 +737,6 @@ def DuplicateFilterPageGenerator(generator):
             seenPages[page] = True
             yield page
 
-
 def RegexFilterPageGenerator(generator, regex):
     """Yield pages from another generator whose titles match regex."""
     reg = re.compile(regex, re.I)
@@ -1087,7 +1086,6 @@ def DayPageGenerator(startMonth = 1, endMonth = 12, site = None):
         for day in xrange(1, date.getNumberOfDaysInMonth(month)+1):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
 
-
 def main(*args):
     try:
         gen = None
@@ -1096,8 +1094,10 @@ def main(*args):
             genFactory.handleArg(arg)
         gen = genFactory.getCombinedGenerator()
         if gen:
+            i = 0
             for page in gen:
-                pywikibot.stdout(page.title())
+                i += 1
+                pywikibot.stdout("%4d: %s" % (i, page.title()))
         else:
             pywikibot.showHelp()
     except Exception:
