@@ -4,7 +4,7 @@ Objects representing MediaWiki sites (wikis) and families (groups of wikis
 on the same topic in different languages).
 """
 #
-# (C) Pywikipedia bot team, 2008-2010
+# (C) Pywikipedia bot team, 2008-2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -2099,6 +2099,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             "recentchanges: start must be later than end with reverse=False")
         rcgen = self._generator(api.ListGenerator, type_arg="recentchanges",
                                 rcprop="user|comment|timestamp|title|ids"
+                                       #"|sizes|redirect|loginfo" - patrol rights needed
                                        "|sizes|redirect|patrolled|loginfo"
                                        "|flags",
                                 namespaces=namespaces, step=step,
