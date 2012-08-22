@@ -2901,7 +2901,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             imagepage._imageinfo = result["imageinfo"]
             return
 
-    @deprecate_arg("number", step)
+    @deprecate_arg("number", "step")
     @deprecate_arg("repeat", None)
     @deprecate_arg("namespace", "namespaces")
     @deprecate_arg("rc_show", None)
