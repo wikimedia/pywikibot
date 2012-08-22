@@ -2099,8 +2099,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             "recentchanges: start must be later than end with reverse=False")
         rcgen = self._generator(api.ListGenerator, type_arg="recentchanges",
                                 rcprop="user|comment|timestamp|title|ids"
-                                       #"|sizes|redirect|loginfo" - patrol rights needed
-                                       "|sizes|redirect|patrolled|loginfo"
+                                       "|sizes|redirect|loginfo"
+                                       #"|sizes|redirect|patrolled|loginfo" - patrol rights needed
                                        "|flags",
                                 namespaces=namespaces, step=step,
                                 total=total)
