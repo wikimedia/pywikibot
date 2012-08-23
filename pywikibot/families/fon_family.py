@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 __version__ = '$Id$'
 
-import family
+from pywikibot import family
 
 # The official Beta Wiki.
 class Family(family.Family):

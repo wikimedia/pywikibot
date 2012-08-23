@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 __version__ = '$Id$'
 
-import family
+from pywikibot import family
 
 class Family(family.Family):
     def __init__(self):

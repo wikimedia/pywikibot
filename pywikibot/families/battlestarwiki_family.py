@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 __version__ = '$Id$'
 
-import family
+from pywikibot import family
 
 # The Battlestar Wiki family, a set of Battlestar wikis.
 # http://battlestarwiki.org/

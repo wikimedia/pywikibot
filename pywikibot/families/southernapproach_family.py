@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 __version__ = '$Id$'
 
-import family, config
+from pywikibot import family
 
 # ZRHwiki, formerly known as SouthernApproachWiki, a wiki about Zürich Airport.
 

@@ -4,7 +4,6 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-
 # The test wikipedia family
 class Family(family.Family):
     def __init__(self):
