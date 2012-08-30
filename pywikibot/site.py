@@ -2760,7 +2760,8 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
         @return: True if API returned expected response; False otherwise
 
         """
-        req = api.Request(action="watch", title=page.title(withSection=False))
+        token = self.token(page, "watch")
+        req = api.Request(action="watch", token=token, title=page.title(withSection=False))
         if unwatch:
             req["unwatch"] = ""
         result = req.submit()
