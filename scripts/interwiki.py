@@ -409,6 +409,7 @@ moved_links = {
     'hsb': ([u'dokumentacija', u'doc'], u'/Dokumentacija'),
     'hu' : (u'sablondokumentáció', u'/doc'),
     'id' : (u'template doc',  u'/doc'),
+    'ilo': (u'documentation', u'/doc'),
     'ja' : (u'documentation', u'/doc'),
     'ka' : (u'თარგის ინფო',   u'/ინფო'),
     'ko' : (u'documentation', u'/설명문서'),
