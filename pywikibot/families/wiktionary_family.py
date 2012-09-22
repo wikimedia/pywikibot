@@ -11,20 +11,20 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'tr', 'pl', 'ta',
-            'sv', 'vi', 'nl', 'de', 'kn', 'io', 'fi', 'hu', 'pt', 'no', 'my',
-            'id', 'it', 'li', 'ml', 'et', 'ja', 'es', 'fa', 'ku', 'ar', 'ro',
-            'cs', 'lo', 'gl', 'ca', 'eu', 'uk', 'bg', 'eo', 'br', 'te', 'hr',
-            'vo', 'oc', 'is', 'th', 'simple', 'scn', 'sr', 'af', 'sw', 'cy',
+            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'tr', 'pl',
+            'ta', 'nl', 'vi', 'de', 'kn', 'io', 'fi', 'hu', 'pt', 'no', 'my',
+            'id', 'it', 'li', 'ku', 'ml', 'et', 'ja', 'es', 'fa', 'ar', 'ro',
+            'cs', 'lo', 'gl', 'ca', 'eu', 'uk', 'te', 'bg', 'br', 'eo', 'hr',
+            'vo', 'oc', 'is', 'th', 'simple', 'scn', 'sr', 'af', 'cy', 'sw',
             'fy', 'tl', 'ast', 'nn', 'fj', 'ur', 'he', 'zh-min-nan', 'la', 'wa',
             'da', 'sq', 'hy', 'sl', 'hi', 'tt', 'az', 'lv', 'ka', 'pnb', 'lb',
-            'tk', 'hsb', 'bs', 'kk', 'nah', 'km', 'mk', 'be', 'wo', 'ga', 'ang',
-            'ms', 'co', 'sm', 'gn', 'mr', 'csb', 'sk', 'st', 'nds', 'ia', 'si',
-            'sh', 'sd', 'tg', 'ug', 'ky', 'kl', 'an', 'jbo', 'zu', 'mn', 'sa',
-            'gu', 'ps', 'rw', 'fo', 'kw', 'gv', 'ss', 'ie', 'qu', 'om',
-            'roa-rup', 'iu', 'bn', 'am', 'chr', 'so', 'su', 'za', 'gd', 'mt',
-            'jv', 'mi', 'tpi', 'ik', 'yi', 'ln', 'or', 'uz', 'ti', 'sg', 'na',
-            'pa', 'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
+            'tk', 'bs', 'hsb', 'nah', 'kk', 'km', 'sk', 'be', 'mk', 'ga', 'wo',
+            'ang', 'co', 'ms', 'sm', 'gn', 'mr', 'csb', 'st', 'nds', 'ia', 'si',
+            'sh', 'sd', 'tg', 'ky', 'ug', 'kl', 'jbo', 'an', 'mn', 'zu', 'sa',
+            'ps', 'gu', 'rw', 'fo', 'kw', 'gv', 'ss', 'ie', 'qu', 'mt', 'om',
+            'roa-rup', 'iu', 'bn', 'am', 'chr', 'so', 'su', 'za', 'gd', 'jv',
+            'mi', 'tpi', 'ik', 'yi', 'ln', 'or', 'uz', 'ti', 'sg', 'na', 'dv',
+            'tn', 'pa', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])

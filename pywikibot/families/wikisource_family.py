@@ -11,11 +11,11 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'fr', 'en', 'de', 'ru', 'it', 'zh', 'pt', 'pl', 'he', 'es', 'sv',
+            'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
             'fa', 'hu', 'ar', 'cs', 'ca', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
-            'sa', 'el', 'bn', 'sr', 'th', 'hr', 'hy', 'no', 'nl', 'ml', 'la',
+            'sa', 'el', 'bn', 'sr', 'hr', 'th', 'hy', 'no', 'nl', 'ml', 'la',
             'vec', 'tr', 'ja', 'yi', 'br', 'uk', 'id', 'mk', 'ta', 'is', 'eo',
-            'da', 'be', 'li', 'et', 'gu', 'bs', 'bg', 'sah', 'mr', 'az', 'gl',
+            'da', 'be', 'li', 'gu', 'et', 'mr', 'bs', 'bg', 'sah', 'az', 'gl',
             'lt', 'kn', 'cy', 'zh-min-nan', 'sk', 'fo',
         ]
 
