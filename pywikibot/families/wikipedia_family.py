@@ -150,7 +150,8 @@ class Family(family.Family):
             'kg':  [u'Bisongidila'],
             'krc': [u'Кёб магъаналы', u'Disambig'],
             'la':  [u'Discretiva', u'Disnomen'], #{{Disambig}} is not a disambig
-            'lb':  [u'Homonymie', u'Disambig', u'Homonymie Ofkierzungen'],
+            'lb':  [u'Homonymie', u'Disambig', u'Homonymie Ofkierzungen',
+                    u'Homonymie Persounen'],
             'li':  [u'Verdudeliking', u'Verdudelikingpazjena', u'Vp'],
             'lmo': [u'Desambiguació', u'Dezambiguasiú', u'Desambiguazion',
                     u'Desambiguassiú', u'Desambiguació'],
