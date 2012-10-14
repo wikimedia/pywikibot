@@ -22,14 +22,6 @@ class Family(family.Family):
 
         self.langs = dict([(lang, '%s.wikiquote.org' % lang) for lang in self.languages_by_size])
 
-
-        self.disambiguationTemplates = {
-            '_default': [],
-            'fr': ['Homonymie'],
-            'ka': [u'მრავალმნიშვნელოვანი', u'მრავმნიშ'],
-            'pt': [u'Desambiguação'],
-            }
-
         # attop is a list of languages that prefer to have the interwiki
         # links at the top of the page.
         self.interwiki_attop = []

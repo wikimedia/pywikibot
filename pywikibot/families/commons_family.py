@@ -29,11 +29,6 @@ class Family(family.Family):
                         u'Redirect category'),
         }
 
-        self.disambiguationTemplates = {
-            'commons': [u'Disambig', u'Disambiguation', u'Razločitev',
-                        u'Begriffsklärung']
-        }
-
         self.disambcatname = {
             'commons':  u'Disambiguation'
         }
