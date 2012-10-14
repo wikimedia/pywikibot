@@ -1654,7 +1654,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 # or the last edit wasn't a bot
                 # or the last edit was 1 month ago
                 smallWikiAllowed = True
-                if globalvar.autonomous and page.site.sitename() == 'wikipedia:is':
+                if globalvar.autonomous and (page.site.sitename() == 'wikipedia:is' or
+                                             page.site.sitename() == 'wikipedia:zh'):
                     old={}
                     try:
                         for mypage in new[page.site].interwiki():
