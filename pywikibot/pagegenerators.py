@@ -18,15 +18,15 @@ These parameters are supported to specify which pages titles to print:
 #
 __version__ = '$Id$'
 
-import pywikibot
-from pywikibot import config
-from pywikibot import deprecate_arg
-
-import itertools
-import Queue
 import re
 import sys
 import codecs
+import itertools
+import Queue
+import pywikibot
+from pywikibot import config
+from pywikibot import deprecate_arg, i18n
+
 
 
 # ported from version 1 for backwards-compatibility
@@ -36,7 +36,8 @@ import codecs
 parameterHelp = u"""\
 -cat              Work on all pages which are in a specific category.
                   Argument can also be given as "-cat:categoryname" or
-                  as "-cat:categoryname|fromtitle".
+                  as "-cat:categoryname|fromtitle" (using # instead of |
+                  is also allowed in this one and the following)
 
 -catr             Like -cat, but also recursively includes pages in
                   subcategories, sub-subcategories etc. of the
@@ -203,10 +204,10 @@ class GeneratorFactory(object):
 
     def getCategoryGen(self, arg, length, recurse=False, content=False):
         if len(arg) == length:
-            categoryname = pywikibot.input(u'Please enter the category name:')
+            categoryname = i18n.input('pywikibot-enter-category-name')
         else:
             categoryname = arg[length + 1:]
-
+        categoryname = categoryname.replace('#', '|')
         ind = categoryname.find('|')
         startfrom = None
         if ind > 0:
@@ -222,7 +223,7 @@ class GeneratorFactory(object):
 
     def setSubCategoriesGen(self, arg, length, recurse=False, content=False):
         if len(arg) == length:
-            categoryname = pywikibot.input(u'Please enter the category name:')
+            categoryname = i18n.input('pywikibot-enter-category-name')
         else:
             categoryname = arg[length + 1:]
 
@@ -248,18 +249,19 @@ class GeneratorFactory(object):
         arguments have been parsed to get the final output generator.
 
         """
+        site = pywikibot.getSite()
         gen = None
         if arg.startswith('-filelinks'):
             fileLinksPageTitle = arg[11:]
             if not fileLinksPageTitle:
-                fileLinksPageTitle = pywikibot.input(
-                    u'Links to which image page should be processed?')
-            if fileLinksPageTitle.startswith(pywikibot.Site().namespace(6)
+                fileLinksPageTitle = i18n.input(
+                    'pywikibot-enter-file-links-processing')
+            if fileLinksPageTitle.startswith(site.namespace(6)
                                              + ":"):
-                fileLinksPage = pywikibot.ImagePage(pywikibot.Site(),
+                fileLinksPage = pywikibot.ImagePage(site,
                                                     fileLinksPageTitle)
             else:
-                fileLinksPage = pywikibot.ImagePage(pywikibot.Site(),
+                fileLinksPage = pywikibot.ImagePage(site,
                                                     'Image:' +
                                                     fileLinksPageTitle)
             gen = FileLinksGenerator(fileLinksPage)
@@ -283,7 +285,7 @@ class GeneratorFactory(object):
         elif arg.startswith('-interwiki'):
             title = arg[11:]
             if not title:
-                title = pywikibot.input(u'Which page should be processed?')
+                title = i18n.input('pywikibot-enter-page-processing')
             page = pywikibot.Page(pywikibot.Link(title,
                                                  pywikibot.Site()))
             gen = InterwikiPageGenerator(page)
