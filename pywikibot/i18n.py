@@ -10,6 +10,7 @@
 __version__ = '$Id$'
 
 import re
+import locale
 from pywikibot import Error
 from plural import plural_rules
 import pywikibot
@@ -435,9 +436,10 @@ def input(twtitle, parameters=None, password=False):
         import table.
         Translation code should be set by in the user_config.py like
         userinterface_lang = 'de'
-        default is mylang setting
+        default is os locale setting
 
     """
-    code = config.userinterface_lang or config.mylang
+    code = config.userinterface_lang or \
+           locale.getdefaultlocale()[0].split('_')[0]
     trans = twtranslate(code, twtitle, parameters)
     return pywikibot.input(trans, password)
