@@ -536,10 +536,10 @@ class Page(object):
                 except KeyError:
                     distl = None
                 if distl is None:
-                    try:
-                        disambigpages = Page(self.site,
-                                             "MediaWiki:Disambiguationspage")
-                        disambigs = set(link
+                    disambigpages = Page(self.site,
+                                         "MediaWiki:Disambiguationspage")
+                    if disambigpages.exists():
+                        disambigs = set(link.title(withNamespace=False)
                                         for link in disambigpages.linkedPages()
                                         if link.namespace() == 10)
                         # add index article templates
@@ -548,19 +548,24 @@ class Page(object):
                             regex = re.compile('\(\((.+?)\)\)')
                             content = disambigpages.get()
                             for index in regex.findall(content):
-                                disambigs.add(index)
-                    except pywikibot.NoPage:
-                        disambigs = set([self.site.mediawiki_message(
-                            'Disambiguationspage').split(':', 1)[1]])
-                    # add the default template(s)
-                    self.site._disambigtemplates = disambigs | default
+                                disambigs.add(index[:1].upper() + index[1:])
+                    else:
+                        message = self.site.mediawiki_message(
+                            'disambiguationspage').split(':', 1)[1]
+                        # add the default template(s) for default mw message
+                        # only
+                        disambigs = set([message[:1].upper() +
+                                         message[1:]]) | default
+                    self.site._disambigtemplates = disambigs
                 else:
                     # Normalize template capitalization
                     self.site._disambigtemplates = set(
                         t[:1].upper() + t[1:] for t in distl
                     )
+            templates = set(tl.title(withNamespace=False)
+                            for tl in self.templates())
             disambigInPage = self.site._disambigtemplates.intersection(
-                self.templates())
+                templates)
             self._isDisambig = self.namespace() != 10 and \
                                len(disambigInPage) > 0
         return self._isDisambig
