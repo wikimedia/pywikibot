@@ -385,8 +385,13 @@ class ReplaceRobot:
                         page.site.hostname(),
                         page.site.nice_get_address(page.title())
                     ))
-                    pywikibot.input("Press Enter when finished in browser.")
-                    original_text = page.get(get_redirect=True, force=True)
+                    i18n.input('pywikibot-enter-finished-browser')
+                    try:
+                        original_text = page.get(get_redirect=True, force=True)
+                    except pywikibot.NoPage:
+                        pywikibot.output(u'Page %s has been deleted.'
+                                         % page.title())
+                        break
                     new_text = original_text
                     continue
                 if choice == 'q':
@@ -491,8 +496,7 @@ def main(*args):
                 xmlStart = arg[10:]
         elif arg.startswith('-xml'):
             if len(arg) == 4:
-                xmlFilename = pywikibot.input(
-                    u'Please enter the XML dump\'s filename:')
+                xmlFilename = i18n.input('pywikibot-enter-xml-filename')
             else:
                 xmlFilename = arg[5:]
         elif arg =='-sql':
@@ -574,11 +578,12 @@ def main(*args):
         replacements.append((old, new))
         while True:
             old = pywikibot.input(
-u'Please enter another text that should be replaced, or press Enter to start:')
+                    u'Please enter another text that should be replaced,' +
+                    u'\nor press Enter to start:')
             if old == '':
                 change += ')'
                 break
-            new = pywikibot.input(u'Please enter the new text:')
+            new = i18n.input('pywikibot-enter-new-text')
             change += ' & -' + old + ' +' + new
             replacements.append((old, new))
         if not summary_commandline:
@@ -588,7 +593,8 @@ u'Please enter another text that should be replaced, or press Enter to start:')
             pywikibot.output(u'The summary message will default to: %s'
                              % default_summary_message)
             summary_message = pywikibot.input(
-u'Press Enter to use this default message, or enter a description of the\nchanges your bot will make:')
+                u'Press Enter to use this default message, or enter a ' +
+                u'description of the\nchanges your bot will make:')
             if summary_message == '':
                 summary_message = default_summary_message
             edit_summary = summary_message
