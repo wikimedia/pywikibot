@@ -859,7 +859,7 @@ class APISite(BaseSite):
         """Return the MediaWiki message text for key "key" """
         if not key in self._msgcache:
             msg_query = api.QueryGenerator(site=self, meta="allmessages",
-                                           amfilter=key)
+                                           ammessages=key)
             for msg in msg_query:
                 if msg['name'] == key and not 'missing' in msg:
                     self._msgcache[key] = msg['*']
