@@ -227,7 +227,7 @@ def translate(code, xdict, fallback=True):
     list.
 
     """
-    family = pywikibot.default_family
+    family = pywikibot.config.family
     # If a site is given instead of a code, use its language
     if hasattr(code, 'lang'):
         family = code.family.name
