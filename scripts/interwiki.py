@@ -424,6 +424,7 @@ moved_links = {
     'pt' : ([u'documentação', u'/doc'],  u'/doc'),
     'ro' : (u'documentaţie',  u'/doc'),
     'ru' : (u'doc',           u'/doc'),
+    'simple': ('documentation', u'/doc'),
     'sv' : (u'dokumentation', u'/dok'),
     'uk' : ([u'документація',
              u'doc',
