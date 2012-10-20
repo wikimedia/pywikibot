@@ -1894,7 +1894,8 @@ class User(Page):
     """A class that represents a Wiki user.
     """
 
-    @deprecate_arg("insite", None)
+    @deprecate_arg("site", "source")
+    @deprecate_arg("name", "title")
     def __init__(self, source, title=u''):
         """Initializer for a User object.
         All parameters are the same as for Page() constructor.
