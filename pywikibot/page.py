@@ -783,6 +783,7 @@ class Page(object):
            pywikibot.calledModuleName() in config.cosmetic_changes_deny_script:
             return
         family = self.site.family.name
+        config.cosmetic_changes_disable.update({'wikidata': ('repo', )})
         if config.cosmetic_changes_mylang_only:
             cc = (family == config.family and \
                   self.site.lang == config.mylang) or \
