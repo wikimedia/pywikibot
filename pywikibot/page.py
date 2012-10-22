@@ -524,51 +524,55 @@ class Page(object):
         appended regardless of its existence.
 
         """
-        if not hasattr(self, "_isDisambig"):
-            if not hasattr(self.site, "_disambigtemplates"):
-                try:
-                    default = set(self.site.family.disambig('_default'))
-                except KeyError:
-                    default = set([u'Disambig'])
-                try:
-                    distl = self.site.family.disambig(self.site.code,
-                                                      fallback=False)
-                except KeyError:
-                    distl = None
-                if distl is None:
-                    disambigpages = Page(self.site,
-                                         "MediaWiki:Disambiguationspage")
-                    if disambigpages.exists():
-                        disambigs = set(link.title(withNamespace=False)
-                                        for link in disambigpages.linkedPages()
-                                        if link.namespace() == 10)
-                        # add index article templates
-                        if get_Index and \
-                           self.site.sitename() == 'wikipedia:en':
-                            regex = re.compile('\(\((.+?)\)\)')
-                            content = disambigpages.get()
-                            for index in regex.findall(content):
-                                disambigs.add(index[:1].upper() + index[1:])
-                    else:
-                        message = self.site.mediawiki_message(
-                            'disambiguationspage').split(':', 1)[1]
-                        # add the default template(s) for default mw message
-                        # only
-                        disambigs = set([message[:1].upper() +
-                                         message[1:]]) | default
-                    self.site._disambigtemplates = disambigs
+        if not hasattr(self.site, "_disambigtemplates"):
+            try:
+                default = set(self.site.family.disambig('_default'))
+            except KeyError:
+                default = set([u'Disambig'])
+            try:
+                distl = self.site.family.disambig(self.site.code,
+                                                  fallback=False)
+            except KeyError:
+                distl = None
+            if distl is None:
+                disambigpages = Page(self.site,
+                                     "MediaWiki:Disambiguationspage")
+                indexes = set()
+                if disambigpages.exists():
+                    disambigs = set(link.title(withNamespace=False)
+                                    for link in disambigpages.linkedPages()
+                                    if link.namespace() == 10)
+                    # cache index article templates separately
+                    if self.site.sitename() == 'wikipedia:en':
+                        regex = re.compile('\(\((.+?)\)\)')
+                        content = disambigpages.get()
+                        for index in regex.findall(content):
+                            indexes.add(index[:1].upper() + index[1:])
+                        self.site._indextemplates = indexes
                 else:
-                    # Normalize template capitalization
-                    self.site._disambigtemplates = set(
-                        t[:1].upper() + t[1:] for t in distl
-                    )
-            templates = set(tl.title(withNamespace=False)
-                            for tl in self.templates())
-            disambigInPage = self.site._disambigtemplates.intersection(
-                templates)
-            self._isDisambig = self.namespace() != 10 and \
-                               len(disambigInPage) > 0
-        return self._isDisambig
+                    message = self.site.mediawiki_message(
+                        'disambiguationspage').split(':', 1)[1]
+                    # add the default template(s) for default mw message
+                    # only
+                    disambigs = set([message[:1].upper() +
+                                     message[1:]]) | default
+                self.site._disambigtemplates = disambigs
+            else:
+                # Normalize template capitalization
+                self.site._disambigtemplates = set(
+                    t[:1].upper() + t[1:] for t in distl
+                )
+        templates = set(tl.title(withNamespace=False)
+                        for tl in self.templates())
+        disambigs = set()
+        # always use cached disambig templates
+        disambigs.update(self.site._disambigtemplates)
+        # if get_Index is True, also use cached index templates
+        if get_Index and hasattr(self.site, '_indextemplates'):
+            disambigs.update(self.site._indextemplates)
+        # see if any template on this page is in the set of disambigs
+        disambigInPage = disambigs.intersection(templates)
+        return self.namespace() != 10 and len(disambigInPage) > 0
 
     def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
                       onlyTemplateInclusion=False, redirectsOnly=False,
