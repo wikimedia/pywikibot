@@ -1158,7 +1158,7 @@ class APISite(BaseSite):
         if hasattr(page, '_redirtarget'):
             return page._redirtarget
         title = page.title(withSection=False)
-        query = api.Request(site=self, action="query", property="info",
+        query = api.Request(site=self, action="query", prop="info",
                             inprop="protection|talkid|subjectid",
                             titles=title.encode(self.encoding()),
                             redirects="")
