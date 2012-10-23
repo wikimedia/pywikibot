@@ -124,7 +124,7 @@ class Request(object, DictMixin):
                         "protect", "block", "unblock", "watch", "patrol",
                         "import", "userrights", "upload"
                     )
-        if self.write:
+        if self.action == "edit":
             pywikibot.debug(u"Adding user assertion", _logger)
             self.params["assert"] = "user" # make sure user is logged in
 
