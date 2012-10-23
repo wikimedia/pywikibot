@@ -2170,7 +2170,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
 
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
                      reverse=False, namespaces=None, showMinor=None,
-                     step=None, total=None):
+                     step=None, total=None, top_only=False):
         """Iterate contributions by a particular user.
 
         Iterated values are in the same format as recentchanges.
@@ -2183,6 +2183,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         @param reverse: Iterate oldest contributions first (default: newest)
         @param showMinor: if True, iterate only minor edits; if False and
             not None, iterate only non-minor edits (default: iterate both)
+        @param top_only: if True, iterate only edits which are the latest revision
 
         """
         if not (user or userprefix):
@@ -2213,6 +2214,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             ucgen.request["ucdir"] = "newer"
         if showMinor is not None:
             ucgen.request["ucshow"] = showMinor and "minor" or "!minor"
+        if top_only:
+            ucgen.request["uctoponly"] = ""
         return ucgen
 
     def watchlist_revs(self, start=None, end=None, reverse=False,
