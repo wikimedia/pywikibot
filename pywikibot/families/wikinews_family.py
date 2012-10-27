@@ -11,7 +11,7 @@ class Family(family.Family):
         self.name = 'wikinews'
 
         self.languages_by_size = [
-            'sr', 'en', 'pl', 'fr', 'de', 'it', 'es', 'pt', 'zh', 'ru', 'ja',
+            'sr', 'en', 'pl', 'fr', 'de', 'it', 'es', 'pt', 'ru', 'zh', 'ja',
             'sv', 'ca', 'ta', 'el', 'cs', 'fa', 'ar', 'fi', 'ro', 'he', 'bg',
             'tr', 'sq', 'uk', 'no', 'bs', 'ko', 'eo',
         ]
