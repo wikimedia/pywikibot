@@ -882,6 +882,10 @@ class Family:
         """Return the shared image repository, if any."""
         return (None, None)
 
+    def shared_data_repository(self, code):
+        """Return the shared wikidata repository, if any."""
+        return (None, None)
+
     @pywikibot.deprecated("Site.getcurrenttime()")
     def server_time(self, code):
         """
