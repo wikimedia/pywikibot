@@ -15,7 +15,7 @@ class Family(family.Family):
             'client': 'wikidata-test-client.wikimedia.de',
         }
 
-    def shared_image_repository(self, code):
+    def shared_data_repository(self, code):
         # for here an now we just use the test repo
         # for wikimedia families the method can return wikidata itself
         return ('repo', 'wikidata')
