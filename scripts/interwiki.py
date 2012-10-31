@@ -2292,6 +2292,11 @@ def compareLanguages(old, new, insite):
         commentname += '-removing'
     if modifying:
         commentname += '-modifying'
+    if commentname == 'interwiki-modifying' and len(modifying) == 1:
+        useFrom = True
+        commentname += '-from'
+    else:
+        useFrom = False
 
     if adding or removing or modifying:
         #Version info marks bots without unicode error
@@ -2303,7 +2308,8 @@ def compareLanguages(old, new, insite):
 
         changes = {'adding':    ', '.join([fmt(new, x) for x in adding]),
                    'removing':  ', '.join([fmt(old, x) for x in removing]),
-                   'modifying': ', '.join([fmt(new, x) for x in modifying])}
+                   'modifying': ', '.join([fmt(new, x) for x in modifying]),
+                   'from': u'' if not useFrom else old[modifying[0]]}
 
         mcomment += i18n.twtranslate(insite.lang, commentname) % changes
         mods = i18n.twtranslate('en', commentname) % changes
