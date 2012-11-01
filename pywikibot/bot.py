@@ -149,9 +149,9 @@ def init_handlers(strm=None):
     # if user has enabled file logging, configure file handler
     if moduleName in config.log or '*' in config.log:
         if config.logfilename:
-            logfile = config.datafilepath(config.logfilename)
+            logfile = config.datafilepath("logs", config.logfilename)
         else:
-            logfile = config.datafilepath("%s-bot.log" % moduleName)
+            logfile = config.datafilepath("logs", "%s-bot.log" % moduleName)
         file_handler = RotatingFileHandler(
                             filename=logfile, maxBytes=2 << 20, backupCount=5)
 
