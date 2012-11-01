@@ -674,7 +674,6 @@ def main():
         except:
             pass
         else:
-            import catlib
             if not namespaces:
                 namespaces = [0]
             cat = catlib.Category(site, "%s:%s" % (site.category_namespace(),
