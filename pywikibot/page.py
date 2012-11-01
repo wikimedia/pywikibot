@@ -1499,10 +1499,8 @@ class ImagePage(Page):
     getImagePageHtml          : Download image page and return raw HTML text.
     fileURL                   : Return the URL for the image described on this
                                 page.
-    fileIsOnCommons           : Return True if image stored on Wikimedia
-                                Commons.
-    fileIsShared              : Return True if image stored on Wikitravel
-                                shared repository.
+    fileIsShared              : Return True if image stored on a shared
+                                repository like Wikimedia Commons or Wikitravel.
     getFileMd5Sum             : Return image file's MD5 checksum.
     getFileVersionHistory     : Return the image file's version history.
     getFileVersionHistoryTable: Return the version history in the form of a
@@ -1536,18 +1534,23 @@ class ImagePage(Page):
             self._imageinfo = self.site.getimageinfo(self) #FIXME
         return self._imageinfo['url']
 
+    @deprecated("fileIsShared")
     def fileIsOnCommons(self):
         """Return True if the image is stored on Wikimedia Commons"""
-        return self.fileUrl().startswith(
-            'http://upload.wikimedia.org/wikipedia/commons/')
+        return fileIsShared
 
     def fileIsShared(self):
         """Return True if image is stored on any known shared repository."""
         # as of now, the only known repositories are commons and wikitravel
-        if 'wikitravel_shared' in self.site.shared_image_repository():
+        # TODO: put the URLs to family file
+        if not self.site.has_image_repository:
+            return False
+        elif 'wikitravel_shared' in self.site.shared_image_repository():
             return self.fileUrl().startswith(
                 u'http://wikitravel.org/upload/shared/')
-        return self.fileIsOnCommons()
+        else:
+            return self.fileUrl().startswith(
+                'http://upload.wikimedia.org/wikipedia/commons/')
 
     @deprecated("ImagePage.getFileSHA1Sum()")
     def getFileMd5Sum(self):
