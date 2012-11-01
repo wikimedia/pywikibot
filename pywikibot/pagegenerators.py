@@ -22,7 +22,6 @@ import re
 import sys
 import codecs
 import itertools
-import Queue
 import pywikibot
 from pywikibot import config
 from pywikibot import deprecate_arg, i18n
