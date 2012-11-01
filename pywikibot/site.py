@@ -37,7 +37,7 @@ class PageInUse(pywikibot.Error):
 
 class LoginStatus(object):
     """ Enum for Login statuses.
-    
+
     >>> LoginStatus.NOT_ATTEMPTED
     -3
     >>> LoginStatus.AS_USER
@@ -1030,6 +1030,36 @@ class APISite(BaseSite):
         return self.siteinfo['lang']
 
     lang = property(fget=language, doc=language.__doc__)
+
+    @property
+    def has_image_repository(self):
+        """Return True if site has a shared image repository like commons"""
+        code, fam = self.family.shared_image_repository(self.code)
+        return bool(code or fam)
+
+    @property
+    def has_data_repository(self):
+        """Return True if site has a shared image repository like wikidata"""
+        code, fam = self.family.shared_data_repository(self.code)
+        return bool(code or fam)
+
+    def image_repository(self):
+        """Return Site object for image repository e.g. commons."""
+
+        code, fam = self.family.shared_image_repository(self.code)
+        if bool(code or fam):
+            return pywikibot.Site(code, fam, self.user())
+        else:
+            return None
+
+    def data_repository(self):
+        """Return Site object for data repository e.g. wikidata."""
+
+        code, fam = self.family.shared_data_repository(self.code)
+        if bool(code or fam):
+            return pywikibot.Site(code, fam, self.user())
+        else:
+            return None
 
     def nice_get_address(self, title):
         """Return shorter URL path to retrieve page titled 'title'."""
