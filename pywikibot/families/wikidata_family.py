@@ -18,4 +18,4 @@ class Family(family.Family):
     def shared_data_repository(self, code):
         # for here an now we just use the test repo
         # for wikimedia families the method can return wikidata itself
-        return ('repo', 'wikidata')
+        return ('repo', 'wikidata') if code == 'client' else (None, None)
