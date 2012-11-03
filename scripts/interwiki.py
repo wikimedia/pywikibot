@@ -2330,9 +2330,9 @@ def botMayEdit (page):
         pass
     tmpl += ignoreTemplates['_default']
     if tmpl != []:
-        templates = page.templatesWithParams(get_redirect=True);
+        templates = page.templatesWithParams();
         for template in templates:
-            if template[0].lower() in tmpl:
+            if template[0].title(withNamespace=False).lower() in tmpl:
                 return False
     return True
 
