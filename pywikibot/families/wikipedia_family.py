@@ -132,10 +132,6 @@ class Family(family.Family):
             # ([[MediaWiki:Disambiguationspage]])
             # first char must be in uppercase
             '_default': [u'Disambig'], # for default MediaWiki message only
-            'arc': [u'ܬ.ܐ.', u'ܕ', u'Disambig'],
-            'az':  [u'Dəqiqləşdirmə'],
-            'ba':  [u'Күп мәғәнәлелек'],
-            'bn':  [u'দ্ব্যর্থতা নিরসন', u'Disambig'],
             'cdo': [u'Gì-ngiê', u'Disambig'],
             'fo':  [u'Fleiri týdningar'],
             'frp': [u'Homonimos', u'Disambig'],
