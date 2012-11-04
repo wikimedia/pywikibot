@@ -447,6 +447,7 @@ ignoreTemplates = {
     'en' : [u'inuse', u'softredirect'],
     'fa' : [u'در دست ویرایش ۲', u'حذف سریع'],
     'pdc': [u'lösche'],
+    'zh' : [u'inuse'],
 }
 
 class Global(object):
