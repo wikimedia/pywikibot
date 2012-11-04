@@ -534,6 +534,7 @@ Global arguments available for all bots:
 
 -log              Enable the logfile, using the default filename
                   '%s-bot.log'
+                  Logs will be stored in the logs subdirectory.
 
 -log:xyz          Enable the logfile, using 'xyz' as the filename.
 
