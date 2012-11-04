@@ -1532,14 +1532,11 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         break
         return result
 
-    def finish(self, bot = None):
+    def finish(self):
         """Round up the subject, making any necessary changes. This method
            should be called exactly once after the todo list has gone empty.
 
-           This contains a shortcut: if a subject list is given in the argument
-           bot, just before submitting a page change to the live wiki it is
-           checked whether we will have to wait. If that is the case, the bot will
-           be told to make another get request first."""
+        """
 
         #from clean_sandbox
         def minutesDiff(time1, time2):
@@ -1594,7 +1591,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             if not self.originPage.site.family.interwiki_forward:
                 new[self.originPage.site] = self.originPage
 
-        #self.replaceLinks(self.originPage, new, True, bot)
+        #self.replaceLinks(self.originPage, new, True)
 
         updatedSites = []
         notUpdatedSites = []
@@ -1613,7 +1610,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         lclSiteDone = True   # even if we fail the update
                     if site.family.name in config.usernames and site.lang in config.usernames[site.family.name]:
                         try:
-                            if self.replaceLinks(new[site], new, bot):
+                            if self.replaceLinks(new[site], new):
                                 updatedSites.append(site)
                             if site != lclSite:
                                  frgnSiteDone = True
@@ -1640,7 +1637,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                        (globalvar.needlimit and \
                         len(adding) + len(modifying) >= globalvar.needlimit +1):
                         try:
-                            if self.replaceLinks(new[site], new, bot):
+                            if self.replaceLinks(new[site], new):
                                 updatedSites.append(site)
                         except SaveError:
                             notUpdatedSites.append(site)
@@ -1697,7 +1694,7 @@ u'NOTE: number of edits are restricted at %s'
                    and smallWikiAllowed:
                     # Try to do the changes
                     try:
-                        if self.replaceLinks(page, new, bot):
+                        if self.replaceLinks(page, new):
                             # Page was changed
                             updatedSites.append(site)
                     except SaveError:
@@ -1735,7 +1732,7 @@ u'NOTE: number of edits are restricted at %s'
                 if hasattr(page, '_contents'):
                     del page._contents
 
-    def replaceLinks(self, page, newPages, bot):
+    def replaceLinks(self, page, newPages):
         """
         Returns True if saving was successful.
         """
@@ -1906,17 +1903,6 @@ u'NOTE: number of edits are restricted at %s'
             answer = 'y'
         # If we got permission to submit, do so
         if answer == 'y':
-            # Check whether we will have to wait for pywikibot. If so, make
-            # another get-query first.
-            if bot:
-                while pywikibot.get_throttle.waittime() + 2.0 < pywikibot.put_throttle.waittime():
-                    if not globalvar.quiet:
-                        pywikibot.output(
-                            u"NOTE: Performing a recursive query first to save time....")
-                    qdone = bot.oneQuery()
-                    if not qdone:
-                        # Nothing more to do
-                        break
             if not globalvar.quiet:
                 pywikibot.output(u"NOTE: Updating live wiki...")
             timeout=60
@@ -2149,9 +2135,9 @@ class InterwikiBot(object):
             return None
         oc = dict(self.firstSubject().openSites())
         if not oc:
-            # The first subject is done. This might be a recursive call made because we
-            # have to wait before submitting another modification to go live. Select
-            # any language from counts.
+            # The first subject is done. This might be a recursive call made
+            # because we have to wait before submitting another modification to
+            # go live. Select any language from counts.
             oc = self.counts
         if pywikibot.getSite() in oc:
             return pywikibot.getSite()
@@ -2239,7 +2225,7 @@ class InterwikiBot(object):
         for i in xrange(len(self.subjects)-1, -1, -1):
             subj = self.subjects[i]
             if subj.isDone():
-                subj.finish(self)
+                subj.finish()
                 subj.clean()
                 del self.subjects[i]
 
