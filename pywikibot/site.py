@@ -1046,20 +1046,28 @@ class APISite(BaseSite):
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
 
-        code, fam = self.family.shared_image_repository(self.code)
+        code, fam = self.shared_image_repository()
         if bool(code or fam):
-            return pywikibot.Site(code, fam, self.user())
+            return pywikibot.Site(code, fam, self.username())
         else:
             return None
 
     def data_repository(self):
         """Return Site object for data repository e.g. wikidata."""
 
-        code, fam = self.family.shared_data_repository(self.code)
+        code, fam = self.shared_data_repository(write)
         if bool(code or fam):
-            return pywikibot.Site(code, fam, self.user())
+            return pywikibot.Site(code, fam, self.username())
         else:
             return None
+
+    def is_image_repository(self):
+        """Return True if Site object is the image repository."""
+        return self is self.image_repository()
+
+    def is_data_repository(self):
+        """Return True if Site object is the data repository."""
+        return self is self.data_repository()
 
     def nice_get_address(self, title):
         """Return shorter URL path to retrieve page titled 'title'."""
