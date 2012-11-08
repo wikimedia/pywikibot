@@ -479,9 +479,19 @@ def handleArgs(*args):
             import daemonize
             daemonize.daemonize(redirect_std = arg[11:])
         else:
+            # the argument depends numerical config settings
+            cmd = []
+            if ':' in arg:
+                cmd = arg[1:].split(':')
+            if len(cmd) == 2 and len(cmd[1]) > 0 and \
+               hasattr(config, cmd[0]) and \
+               type(config.__dict__[cmd[0]]) == int:
+                print 'global', arg, cmd[0], cmd[1]
+                config.__dict__[cmd[0]] = int(cmd[1])
             # the argument is not global. Let the specific bot script care
             # about it.
-            nonGlobalArgs.append(arg)
+            else:
+                nonGlobalArgs.append(arg)
 
     if username:
         config.usernames[config.family][config.mylang] = username
