@@ -43,6 +43,9 @@ class Family(family.Family):
     def dbName(self, code):
         return 'commonswiki_p'
 
+    def shared_image_repository(self, code):
+        return ('commons', 'commons')
+
     def ssl_pathprefix(self, code):
         return "/wikipedia/commons"
 
