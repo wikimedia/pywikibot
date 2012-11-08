@@ -483,7 +483,7 @@ def handleArgs(*args):
                 cmd = arg[1:].split(':')
             if len(cmd) == 2 and len(cmd[1]) > 0 and \
                hasattr(config, cmd[0]) and \
-               type(getattr(config, cmd[0]) == int:
+               type(getattr(config, cmd[0])) == int:
                 setattr(config, cmd[0], cmd[1])
             # the argument is not global. Let the specific bot script care
             # about it.
