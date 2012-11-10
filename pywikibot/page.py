@@ -1723,7 +1723,7 @@ class Category(Page):
         """
         if namespaces is None:
             namespaces = [x for x in self.site.namespaces()
-                          if x>=0 and x!=14]
+                          if x >= 0 and x <> 14]
         for member in self.site.categorymembers(self,
                                                 namespaces=namespaces,
                                                 step=step, total=total,
@@ -1737,9 +1737,9 @@ class Category(Page):
             if not isinstance(recurse, bool) and recurse:
                 recurse = recurse - 1
             for subcat in self.subcategories(step=step):
-                for article in subcat.articles(
-                                      recurse, step=step, total=total,
-                                      content=content):
+                for article in subcat.articles(recurse, step=step, total=total,
+                                               content=content,
+                                               namespaces=namespaces):
                     yield article
                     if total is not None:
                         total -= 1
