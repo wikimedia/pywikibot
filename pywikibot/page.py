@@ -1532,7 +1532,7 @@ class ImagePage(Page):
         """Return the URL for the image described on this page."""
         # TODO add scaling option?
         if not hasattr(self, '_imageinfo'):
-            self._imageinfo = self.site.getimageinfo(self) #FIXME
+            self._imageinfo = self.site.loadimageinfo(self)
         return self._imageinfo['url']
 
     @deprecated("fileIsShared")
@@ -1568,7 +1568,7 @@ class ImagePage(Page):
     def getFileSHA1Sum(self):
         """Return image file's SHA1 checksum."""
         if not hasattr(self, '_imageinfo'):
-            self._imageinfo = self.site.getimageinfo(self) #FIXME
+            self._imageinfo = self.site.loadimageinfo(self)
         return self._imageinfo['sha1']
 
     def getFileVersionHistory(self):
@@ -1579,7 +1579,7 @@ class ImagePage(Page):
 
         """
         #TODO; return value may need to change
-        return self.site.getimageinfo(self, history=True) #FIXME
+        return self.site.loadimageinfo(self, history=True)
 
     def getFileVersionHistoryTable(self):
         """Return the version history in the form of a wiki table."""
