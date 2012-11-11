@@ -1138,8 +1138,8 @@ class APISite(BaseSite):
         """
         title = page.title(withSection=False)
         args = {"titles": title}
-        if history:
-            args["iilimit"] = "max"
+        if not history:
+            args["total"] = 1
         query = self._generator(api.PropertyGenerator,
                                 type_arg="imageinfo",
                                 iiprop=["timestamp", "user", "comment",
