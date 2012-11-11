@@ -17,7 +17,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot import pagegenerators
 from pywikibot import config
-#import  query
+import query
 from datetime import datetime
 from datetime import timedelta
 
@@ -1255,7 +1255,7 @@ def uploadedYesterday(site = None):
         'leend'     :today.strftime(dateformat)
         }
 
-    data = query.GetData(params, site, encodeTitle = False)
+    data = query.GetData(params, site)
     try:
         for item in data['query']['logevents']:
             result.append(item['title'])
