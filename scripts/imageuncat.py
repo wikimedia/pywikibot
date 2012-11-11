@@ -13,13 +13,13 @@ __version__ = '$Id$'
 #
 
 import os, sys, re, codecs
+from datetime import datetime
+from datetime import timedelta
 import pywikibot
 from pywikibot import config
 from pywikibot import pagegenerators
 from pywikibot import config
 import query
-from datetime import datetime
-from datetime import timedelta
 
 #Probably unneeded because these are hidden categories. Have to figure it out.
 ignoreCategories = [u'[[Category:CC-BY-SA-3.0]]',
