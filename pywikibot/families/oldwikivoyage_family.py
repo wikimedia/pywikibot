@@ -47,5 +47,5 @@ class Family(family.Family):
             'wts': u'1.19.1',
         }[code]
 
-    def apipath(self, code):
-        return family.Family.apipath(self, code)
+    def shared_image_repository(self, code):
+        return ('shared', 'oldwikivoyage')
