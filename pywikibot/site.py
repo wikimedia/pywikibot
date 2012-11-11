@@ -52,7 +52,7 @@ class LoginStatus(object):
     NOT_LOGGED_IN = -1
     AS_USER = 0
     AS_SYSOP = 1
-    
+
     @classmethod
     def name(cls, search_value):
         for key, value in cls.__dict__.iteritems():
@@ -1136,7 +1136,8 @@ class APISite(BaseSite):
         @param history: if true, return the image's version history
 
         """
-        args = {"title": page.title(withSection=False)}
+        title = page.title(withSection=False)
+        args = {"titles": title}
         if history:
             args["iilimit"] = "max"
         query = self._generator(api.PropertyGenerator,
@@ -1148,11 +1149,11 @@ class APISite(BaseSite):
         for pageitem in query:
             if pageitem['title'] != title:
                 raise Error(
-                    u"loadpageinfo: Query on %s returned data on '%s'"
+                    u"loadimageinfo: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
             api.update_page(page, pageitem)
-            if history:
-                return pageitem['imageinfo']
+            return pageitem['imageinfo'] \
+                   if history else pageitem['imageinfo'][0]
 
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""

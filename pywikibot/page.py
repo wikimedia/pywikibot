@@ -1538,7 +1538,7 @@ class ImagePage(Page):
     @deprecated("fileIsShared")
     def fileIsOnCommons(self):
         """Return True if the image is stored on Wikimedia Commons"""
-        return self.fileIsShared
+        return self.fileIsShared()
 
     def fileIsShared(self):
         """Return True if image is stored on any known shared repository."""
