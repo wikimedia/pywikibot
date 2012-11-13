@@ -624,8 +624,6 @@ class APISite(BaseSite):
 ##    postForm: Post form data to an address at this site.
 ##    postData: Post encoded form data to an http address at this site.
 ##
-##    shared_image_repository: Return tuple of image repositories used by this
-##        site.
 ##    version: Return MediaWiki version string from Family file.
 ##    versionnumber: Return int identifying the MediaWiki version.
 ##    live_version: Return version number read from Special:Version.
@@ -1034,13 +1032,13 @@ class APISite(BaseSite):
     @property
     def has_image_repository(self):
         """Return True if site has a shared image repository like commons"""
-        code, fam = self.family.shared_image_repository(self.code)
+        code, fam = self.shared_image_repository()
         return bool(code or fam)
 
     @property
     def has_data_repository(self):
         """Return True if site has a shared image repository like wikidata"""
-        code, fam = self.family.shared_data_repository(self.code)
+        code, fam = self.shared_data_repository()
         return bool(code or fam)
 
     def image_repository(self):
@@ -1049,8 +1047,6 @@ class APISite(BaseSite):
         code, fam = self.shared_image_repository()
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username())
-        else:
-            return None
 
     def data_repository(self):
         """Return Site object for data repository e.g. wikidata."""
@@ -1058,8 +1054,6 @@ class APISite(BaseSite):
         code, fam = self.shared_data_repository(write)
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username())
-        else:
-            return None
 
     def is_image_repository(self):
         """Return True if Site object is the image repository."""
