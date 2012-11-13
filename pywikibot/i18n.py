@@ -271,7 +271,7 @@ def twtranslate(code, twtitle, parameters=None):
         import table.
     """
     package = twtitle.split("-")[0]
-    transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
+    transdict = getattr(__import__("scripts.i18n", fromlist=[package]), package).msg
 
     code_needed = False
     # If a site is given instead of a code, use its language
