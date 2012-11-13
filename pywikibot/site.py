@@ -2830,7 +2830,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
         return self.logevents(logtype="upload", total=number, start=lestart,
                               end=leend, user=leuser, page=letitle)
 
-    def getImagesFromAnHash(self, hash_found=None):
+    def getFilesFromAnHash(self, hash_found=None):
         """Return all images that have the same hash.
 
         Useful to find duplicates or nowcommons.
@@ -2845,6 +2845,11 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             return None
         return [image.title(withNamespace=False)
                 for image in self.allimages(sha1=hash_found)]
+
+    @deprecated('Site().getFilesFromAnHash')
+    def getImagesFromAnHash(self, hash_found=None):
+        return self.getFilesFromAnHash(self, hash_found)
+
 
     def upload(self, imagepage, source_filename=None, source_url=None,
                comment=None, watch=False, ignore_warnings=False):
