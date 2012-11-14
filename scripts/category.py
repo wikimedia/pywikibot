@@ -395,6 +395,7 @@ class CategoryMoveRobot:
     def run(self):
         site = pywikibot.getSite()
         newCat = catlib.Category(pywikibot.Link('Category:' + self.newCatTitle))
+        newcat_contents = set(newCat.members())
         # set edit summary message
         if not self.editSummary:
             self.editSummary = i18n.twtranslate(site, 'category-replacing',\
@@ -435,7 +436,12 @@ class CategoryMoveRobot:
         for article in preloadingGen:
             if not self.titleRegex or re.search(self.titleRegex,
                                                 article.title()):
-                catlib.change_category(article, self.oldCat, newCat,
+                if article in newcat_contents:
+                    catlib.change_category(article, self.oldCat, None,
+                                       comment=self.editSummary,
+                                       inPlace=self.inPlace)
+                else:
+                    catlib.change_category(article, self.oldCat, newCat,
                                        comment=self.editSummary,
                                        inPlace=self.inPlace)
 
@@ -446,7 +452,12 @@ class CategoryMoveRobot:
         for subcategory in preloadingGen:
             if not self.titleRegex or re.search(self.titleRegex,
                                                 subcategory.title()):
-                catlib.change_category(subcategory, self.oldCat, newCat,
+                if subcategory in newcat_contents:
+                    catlib.change_category(subcategory, self.oldCat, None,
+                                       comment=self.editSummary,
+                                       inPlace=self.inPlace)
+                else:
+                    catlib.change_category(subcategory, self.oldCat, newCat,
                                        comment=self.editSummary,
                                        inPlace=self.inPlace)
 
