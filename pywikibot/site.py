@@ -636,7 +636,6 @@ class APISite(BaseSite):
 ##    (note, some methods yield other information in a tuple along with the
 ##    Pages; see method docs for details) --
 ##
-##        linksearch: Special:Linksearch
 
     def __init__(self, code, fam=None, user=None, sysop=None):
         BaseSite.__init__(self, code, fam, user, sysop)
@@ -3313,30 +3312,3 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 f = open(fn)
                 self._cookies[index] = '; '.join([x.strip() for x in f.readlines()])
                 f.close()
-
-    # THESE ARE FUNCTIONS NOT YET IMPLEMENTED IN THE API
-    def linksearch(self, siteurl):
-        """Yield Pages from results of Special:Linksearch for 'siteurl'."""
-        if siteurl.startswith('*.'):
-            siteurl = siteurl[2:]
-        output(u'Querying [[Special:Linksearch]]...')
-        cache = []
-        for url in [siteurl, '*.' + siteurl]:
-            path = self.linksearch_address(url)
-            get_throttle()
-            html = self.getUrl(path)
-            loc = html.find('<div class="mw-spcontent">')
-            if loc > -1:
-                html = html[loc:]
-            loc = html.find('<div class="printfooter">')
-            if loc > -1:
-                html = html[:loc]
-            R = re.compile('title ?=\"(.*?)\"')
-            for title in R.findall(html):
-                if not siteurl in title:
-                    # the links themselves have similar form
-                    if title in cache:
-                        continue
-                    else:
-                        cache.append(title)
-                        yield Page(self, title)
