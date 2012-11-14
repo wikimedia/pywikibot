@@ -3162,52 +3162,47 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
     def broken_redirects(self, step=None, total=None):
         """Yield Pages without language links from Special:BrokenRedirects."""
         assert self.versionnumber >= 18
-        wigen = self._generator(api.PageGenerator,
+        brgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="BrokenRedirects",
                                 step=step, total=total)
-        return wigen
+        return brgen
 
     def double_redirects(self, step=None, total=None):
         """Yield Pages without language links from Special:BrokenRedirects."""
         assert self.versionnumber >= 18
-        wigen = self._generator(api.PageGenerator,
+        drgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="DoubleRedirects",
                                 step=step, total=total)
-        return wigen
+        return drgen
 
     def redirectpages(self, step=None, total=None):
         """Yield redirect pages from Special:ListRedirects."""
         assert self.versionnumber >= 18
-        wigen = self._generator(api.PageGenerator,
+        lrgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Listredirects",
                                 step=step, total=total)
-        return wigen
+        return lrgen
 
 
 class DataSite (APISite):
-    def __init__(self, code, fam=None, user=None, sysop=None):
-        APISite.__init__(self, code, fam, user, sysop)
-        self._namespaces[4] = [u"Wikidata", "Projekt"]
-        self._namespaces[5] = [u"Wikidata talk", "Projekt talk"]
-        self._namespaces[6] = [u"File", "Image"]
-        self._namespaces[7] = [u"File talk", "Image talk"]
-        self._namespaces[120] = [u"Property"]
-        self._namespaces[120] = [u"Property talk"]
-        self._namespaces[120] = [u"Query"]
-        self._namespaces[120] = [u"Query talk"]
-        return
 
     def __getattr__(self, attr):
-        """Calls to methods get_labels, get_descriptions, get_sitelinks"""
+        """Calls to methods get_info, get_sitelinks, get_aliases, get_labels,
+        get_descriptions, get_urls
+
+        """
 
         if hasattr(self.__class__, attr):
             return getattr(self.__class__, attr)
         if attr.startswith("get_"):
             props = attr.replace("get_", "")
-            if props in ['labels', 'descriptions', 'sitelinks']:
+            if props in ['info', 'sitelinks', 'aliases', 'labels',
+                         'descriptions', 'urls']:
+                if props == 'urls':
+                    props = 'sitelinks/urls'
                 method = self._get_propertyitem
                 f = lambda *args, **params: \
                     method(props, *args, **params)
