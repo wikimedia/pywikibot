@@ -1051,9 +1051,10 @@ class APISite(BaseSite):
     def data_repository(self):
         """Return Site object for data repository e.g. wikidata."""
 
-        code, fam = self.shared_data_repository(write)
+        code, fam = self.shared_data_repository()
         if bool(code or fam):
-            return pywikibot.Site(code, fam, self.username())
+            return pywikibot.Site(code, fam, self.username(),
+                                  interface="DataSite")
 
     def is_image_repository(self):
         """Return True if Site object is the image repository."""
@@ -3184,6 +3185,95 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
                                 gqppage="Listredirects",
                                 step=step, total=total)
         return wigen
+
+
+class DataSite (APISite):
+    def __init__(self, code, fam=None, user=None, sysop=None):
+        APISite.__init__(self, code, fam, user, sysop)
+        self._namespaces[4] = [u"Wikidata", "Projekt"]
+        self._namespaces[5] = [u"Wikidata talk", "Projekt talk"]
+        self._namespaces[6] = [u"File", "Image"]
+        self._namespaces[7] = [u"File talk", "Image talk"]
+        self._namespaces[120] = [u"Property"]
+        self._namespaces[120] = [u"Property talk"]
+        self._namespaces[120] = [u"Query"]
+        self._namespaces[120] = [u"Query talk"]
+        return
+
+    def __getattr__(self, attr):
+        """Calls to methods get_labels, get_descriptions, get_sitelinks"""
+
+        if hasattr(self.__class__, attr):
+            return getattr(self.__class__, attr)
+        if attr.startswith("get_"):
+            props = attr.replace("get_", "")
+            if props in ['labels', 'descriptions', 'sitelinks']:
+                method = self._get_propertyitem
+                f = lambda *args, **params: \
+                    method(props, *args, **params)
+                if hasattr(method, "__doc__"):
+                    f.__doc__ = method.__doc__
+                return f
+        return super(APISite, self).__getattr__(attr)
+
+    def _get_propertyitem(self, props, source, **params):
+        """generic method to get the data for multiple Wikibase items"""
+        wbdata = self.get_item(source, props=props, **params)
+        assert props in wbdata, \
+               "API wbgetitems response lacks %s key" % props
+        return wbdata[props]
+
+    def get_item(self, source, **params):
+        """get the data for multiple Wikibase items"""
+        if type(source) == int or \
+           isinstance(source, basestring) and source.isdigit():
+            ids = str(source)
+            wbrequest = api.Request(site=self, action="wbgetitems", ids=ids,
+                                    **params)
+            wbdata = wbrequest.submit()
+            print wbdata.keys()
+            assert 'success' in wbdata,  \
+                   "API wbgetitems response lacks 'success' key"
+            assert wbdata['success'] == 1, \
+                   "API 'success' key ist not 1"
+            assert 'items' in wbdata,  \
+                   "API wbgetitems response lacks 'items' key"
+            assert ids in wbdata['items'], \
+                   "API  wbgetitems response lacks %s key" % ids
+            return wbdata['items'][ids]
+        else:
+            # not implemented yet
+            raise NotImplementedError
+
+    # deprecated BaseSite methods
+    def fam(self):
+        raise NotImplementedError
+    def urlEncode(self, *args, **kwargs):
+        raise NotImplementedError
+    def getUrl(self, *args, **kwargs):
+        raise NotImplementedError
+    def linkto(self, *args, **kwargs):
+        raise NotImplementedError
+    def loggedInAs(self, *args, **kwargs):
+        raise NotImplementedError
+    def postData(self, *args, **kwargs):
+        raise NotImplementedError
+    def postForm(self, *args, **kwargs):
+        raise NotImplementedError
+
+    # deprecated APISite methods
+    def isBlocked(self, *args, **kwargs):
+        raise NotImplementedError
+    def isAllowed(self, *args, **kwargs):
+        raise NotImplementedError
+    def prefixindex(self, *args, **kwargs):
+        raise NotImplementedError
+    def categories(self, *args, **kwargs):
+        raise NotImplementedError
+    def linksearch(self, *args, **kwargs):
+        raise NotImplementedError
+    def newimages(self, *args, **kwargs):
+        raise NotImplementedError
 
 
 #### METHODS NOT IMPLEMENTED YET ####
