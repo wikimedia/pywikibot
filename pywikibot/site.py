@@ -3231,7 +3231,6 @@ class DataSite (APISite):
             wbrequest = api.Request(site=self, action="wbgetitems", ids=ids,
                                     **params)
             wbdata = wbrequest.submit()
-            print wbdata.keys()
             assert 'success' in wbdata,  \
                    "API wbgetitems response lacks 'success' key"
             assert wbdata['success'] == 1, \
