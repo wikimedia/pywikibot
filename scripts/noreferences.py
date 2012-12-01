@@ -324,6 +324,7 @@ referencesTemplates = {
     'wikipedia': {
         'ar': [u'Reflist', u'ثبت المراجع', u'قائمة المراجع'],
         'be': [u'Зноскі', u'Примечания', u'Reflist', u'Спіс заўваг', u'Заўвагі'],
+        'be-x-old': [u'Зноскі'],
         'da': [u'Reflist'],
         'dsb':[u'Referency'],
         'en': [u'Reflist', u'Refs', u'FootnotesSmall', u'Reference',
