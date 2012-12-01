@@ -759,8 +759,9 @@ class Family:
             return self.disambiguationTemplates[fallback]
         else:
             raise KeyError(
-"ERROR: title for disambig template in language %(language_code)s unknown"
-                % {'language_code': code})
+                "ERROR: title for disambig template in language %s unknown"
+                % code)
+
 
     # Methods
     def protocol(self, code):
@@ -822,7 +823,7 @@ class Family:
         """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.21wmf3'
+        return '1.21wmf4'
 
     def versionnumber(self, code):
         """Return an int identifying MediaWiki version.
