@@ -823,7 +823,7 @@ class Family:
         """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.21wmf4'
+        return '1.21wmf5'
 
     def versionnumber(self, code):
         """Return an int identifying MediaWiki version.
