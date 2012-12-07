@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This bot cleans a sandbox by replacing the current contents with
+This bot cleans a (user) sandbox by replacing the current contents with
 predefined text.
 
 This script understands the following command-line arguments:
@@ -14,6 +14,17 @@ This script understands the following command-line arguments:
                    hours and limits it between 5 and 15 minutes.
                    The minimum delay time is 5 minutes.
 
+    -user          Use this parameter to run the script in the user name-
+                   space.
+                   > ATTENTION: on most wiki THIS IS FORBIDEN FOR BOTS ! <
+                   > (please talk with your admin first)                 <
+                   Since it is considered bad style to edit user page with-
+                   out permission, the 'user_sandboxTemplate' for given
+                   language has to be set-up (no fall-back will be used).
+                   All pages containing that template will get cleaned.
+                   Please be also aware that the rules when to clean the
+                   user sandbox differ from those for project sandbox.
+
 """
 #
 # (C) Leonardo Gregianin, 2006
@@ -21,6 +32,7 @@ This script understands the following command-line arguments:
 # (C) Andre Engels, 2007
 # (C) Siebrand Mazeland, 2007
 # (C) xqt, 2009-2012
+# (C) Dr. Trigon, 2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -103,6 +115,13 @@ sandboxTitle = {
     'zh': u'Project:沙盒',
     }
 
+user_content = {
+    'de': u'{{Benutzer:DrTrigonBot/Spielwiese}}',
+    }
+
+user_sandboxTemplate = {
+    'de': u'User:DrTrigonBot/Spielwiese',
+    }
 
 class SandboxBot(pywikibot.Bot):
     availableOptions = {
@@ -110,6 +129,7 @@ class SandboxBot(pywikibot.Bot):
         'no_repeat': True,
         'delay': None,
         'delay_td': None,
+        'user': False,
     }
 
     def __init__(self, **kwargs):
@@ -123,6 +143,15 @@ class SandboxBot(pywikibot.Bot):
 
         self.site = pywikibot.Site()
         self.site.login()
+        if self.getOption('user'):
+            localSandboxTitle = pywikibot.translate(self.site, user_sandboxTemplate)
+            localSandbox      = pywikibot.Page(self.site, localSandboxTitle)
+            content.update(user_content)
+            sandboxTitle[self.site.lang] = [item.title() \
+              for item in localSandbox.getReferences(onlyTemplateInclusion=True)]
+            if self.site.lang not in user_sandboxTemplate:
+                content[self.site.code] = None
+                pywikibot.output(u'Not properly set-up to run in user namespace!')
         if sandboxTitle.get(self.site.code) is None or \
                                         content.get(self.site.code) is None:
             pywikibot.output(u'This bot is not configured for the given site ' \
@@ -155,9 +184,18 @@ class SandboxBot(pywikibot.Bot):
                     elif subst and sandboxPage.userName() == mySite.user():
                         pywikibot.output(u'The sandbox might be clean, no change necessary.')
                     elif pos <> 0 and not subst:
-                        sandboxPage.put(translatedContent, translatedMsg)
-                        pywikibot.showDiff(text, translatedContent)
-                        pywikibot.output(u'Standard content was changed, sandbox cleaned.')
+                        if self.getOption('user'):
+                            endpos = pos + len(translatedContent.strip())
+                            if (pos < 0) or (endpos == len(text)):
+                                pywikibot.output(u'The user sandbox is still clean, no change necessary.')
+                            else:
+                                sandboxPage.put(text[:endpos], translatedMsg)
+                                pywikibot.showDiff(text, text[:endpos])
+                                pywikibot.output(u'Standard content was changed, user sandbox cleaned.')
+                        else:
+                            sandboxPage.put(translatedContent, translatedMsg)
+                            pywikibot.showDiff(text, translatedContent)
+                            pywikibot.output(u'Standard content was changed, sandbox cleaned.')
                     else:
                         edit_delta = datetime.datetime.utcnow() - \
                                     pywikibot.Timestamp.fromISOformat(sandboxPage.editTime())
@@ -193,6 +231,8 @@ def main():
             opts['no_repeat'] = False
         elif arg.startswith('-delay:'):
             opts['delay'] = int(arg[7:])
+        elif arg == '-user':
+            opts['user'] = True
         else:
             pywikibot.showHelp('clean_sandbox')
             return
