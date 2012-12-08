@@ -11,8 +11,8 @@ class Family(family.Family):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fr', 'de', 'beta', 'cs', 'ru', 'it', 'es', 'pt', 'ar', 'el',
-            'fi', 'sv', 'sl', 'ja',
+            'en', 'fr', 'de', 'beta', 'cs', 'ru', 'it', 'es', 'pt', 'ar', 'fi',
+            'el', 'sv', 'sl', 'ja',
         ]
 
         self.langs = dict([(lang, '%s.wikiversity.org' % lang) for lang in self.languages_by_size])

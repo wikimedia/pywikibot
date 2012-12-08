@@ -12,19 +12,19 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'tr', 'pl',
-            'ta', 'nl', 'de', 'vi', 'kn', 'fi', 'io', 'hu', 'pt', 'no', 'my',
-            'id', 'it', 'li', 'ku', 'ml', 'et', 'ja', 'es', 'fa', 'ar', 'ro',
+            'ta', 'nl', 'de', 'vi', 'kn', 'fi', 'io', 'ku', 'hu', 'pt', 'no',
+            'my', 'id', 'it', 'li', 'ml', 'es', 'et', 'ja', 'fa', 'ro', 'ar',
             'cs', 'te', 'lo', 'eu', 'gl', 'ca', 'uk', 'fj', 'br', 'bg', 'eo',
-            'hr', 'oc', 'vo', 'is', 'th', 'simple', 'scn', 'sr', 'af', 'cy',
-            'sw', 'zh-min-nan', 'fy', 'tl', 'ast', 'nn', 'he', 'ur', 'la', 'wa',
-            'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'tt', 'az', 'lv', 'ka', 'ps',
-            'pnb', 'nah', 'lb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km', 'mk', 'be',
-            'ga', 'wo', 'ang', 'co', 'ms', 'gn', 'mr', 'csb', 'st', 'nds', 'ia',
-            'si', 'sh', 'sd', 'tg', 'ky', 'ug', 'kl', 'jbo', 'mn', 'an', 'zu',
+            'hr', 'oc', 'vo', 'is', 'th', 'simple', 'scn', 'zh-min-nan', 'sr',
+            'af', 'cy', 'sw', 'fy', 'tl', 'ast', 'nn', 'he', 'ur', 'wa', 'la',
+            'ps', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'az', 'tt', 'lv', 'ka',
+            'lb', 'nah', 'pnb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km', 'mk', 'be',
+            'ga', 'wo', 'ang', 'ms', 'co', 'gn', 'mr', 'csb', 'ky', 'st', 'nds',
+            'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'jbo', 'mn', 'an', 'zu',
             'sa', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie', 'mt', 'om',
-            'chr', 'roa-rup', 'iu', 'bn', 'am', 'so', 'su', 'za', 'gd', 'jv',
-            'mi', 'tpi', 'ik', 'or', 'yi', 'ln', 'uz', 'ti', 'sg', 'na', 'dv',
-            'tn', 'pa', 'ne', 'ha', 'ks', 'ay', 'ts',
+            'chr', 'roa-rup', 'iu', 'bn', 'am', 'so', 'pa', 'su', 'za', 'gd',
+            'mi', 'jv', 'tpi', 'ik', 'or', 'yi', 'ln', 'uz', 'ti', 'sg', 'na',
+            'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])

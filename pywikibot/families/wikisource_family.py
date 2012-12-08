@@ -13,9 +13,9 @@ class Family(family.Family):
         self.languages_by_size = [
             'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
             'fa', 'hu', 'ar', 'cs', 'ca', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
-            'sa', 'el', 'bn', 'sr', 'hr', 'th', 'hy', 'no', 'nl', 'ml', 'la',
-            'vec', 'tr', 'ja', 'yi', 'eo', 'br', 'uk', 'id', 'ta', 'mk', 'is',
-            'da', 'gu', 'be', 'li', 'et', 'mr', 'bg', 'bs', 'sah', 'az', 'gl',
+            'sa', 'el', 'sr', 'bn', 'hr', 'th', 'hy', 'no', 'nl', 'ml', 'la',
+            'vec', 'tr', 'ja', 'eo', 'br', 'yi', 'mk', 'uk', 'id', 'ta', 'is',
+            'gu', 'da', 'be', 'li', 'et', 'mr', 'bg', 'bs', 'sah', 'az', 'gl',
             'lt', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
 
