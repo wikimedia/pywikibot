@@ -671,22 +671,32 @@ class Page(object):
 
         The framework enforces this restriction by default. It is possible
         to override this by setting ignore_bot_templates=True in
-        user_config.py, or using page.put(force=True).
+        user-config.py, or using page.put(force=True).
 
-        """ # TODO: move this to Site object?
+        """
+        # TODO: move this to Site object?
         if config.ignore_bot_templates: #Check the "master ignore switch"
             return True
         username = self.site.user()
         try:
-            templates = self.templatesWithParams();
+            templates = self.templatesWithParams()
         except (pywikibot.NoPage,
                 pywikibot.IsRedirectPage,
                 pywikibot.SectionError):
             return True
+
+        # go through all templates and look for any restriction
+        # multiple bots/nobots templates are allowed
         for template in templates:
             title = template[0].title(withNamespace=False)
             if title == 'Nobots':
-                return False
+                if len(template[1]) == 0:
+                    return False
+                else:
+                    bots = template[1][0].split(',')
+                    if 'all' in bots or calledModuleName() in bots \
+                       or username in bots:
+                        return False
             elif title == 'Bots':
                 if len(template[1]) == 0:
                     return True
@@ -694,15 +704,13 @@ class Page(object):
                     (ttype, bots) = template[1][0].split('=', 1)
                     bots = bots.split(',')
                     if ttype == 'allow':
-                        if 'all' in bots or username in bots:
-                            return True
-                        else:
-                            return False
+                        return 'all' in bots or username in bots
                     if ttype == 'deny':
-                        if 'all' in bots or username in bots:
-                            return False
-                        else:
-                            return True
+                        return not ('all' in bots or username in bots)
+                    if ttype == 'allowscript':
+                        return 'all' in bots or calledModuleName() in bots
+                    if ttype == 'denyscript':
+                        return not ('all' in bots or calledModuleName() in bots)
         # no restricting template found
         return True
 
