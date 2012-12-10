@@ -3,7 +3,7 @@
 User-interface related functions for building bots
 """
 #
-# (C) Pywikipedia bot team, 2008-2011
+# (C) Pywikipedia bot team, 2008-2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -35,16 +35,65 @@ from pywikibot import config
 # User interface initialization
 # search for user interface module in the 'userinterfaces' subdirectory
 uiModule = __import__("pywikibot.userinterfaces.%s_interface"
-                        % config.userinterface,
-                        fromlist=['UI'] )
+                      % config.userinterface,
+                      fromlist=['UI'] )
 ui = uiModule.UI()
 
 
 # Logging module configuration
 
 class RotatingFileHandler(logging.handlers.RotatingFileHandler):
-    """Strip trailing newlines before outputting text to file"""
+
+    def doRollover(self):
+        """
+        Overwrites the default Rollover renaming by inserting the count number
+        between file name root and extension. If backupCount is >= 1, the system
+        will successively create new files with the same pathname as the base
+        file, but with inserting ".1", ".2" etc. in front of the filename
+        suffix. For example, with a backupCount of 5 and a base file name of
+        "app.log", you would get "app.log", "app.1.log", "app.2.log", ...
+        through to "app.5.log". The file being written to is always "app.log" -
+        when it gets filled up, it is closed and renamed to "app.1.log", and if
+        files "app.2.log", "app.2.log" etc. exist, then they are renamed to
+        "app.2.log", "app.3.log" etc. respectively.
+        If backupCount is >= 1 do not rotate but create new numbered filenames.
+        The newest file has the highest number except some older numbered files
+        where deleted and the bot was restarted. In this case the ordering
+        starts from the lowest availlable (unused) number.
+
+        """
+        if self.stream:
+            self.stream.close()
+            self.stream = None
+        root, ext = os.path.splitext(self.baseFilename)
+        if self.backupCount > 0:
+            for i in range(self.backupCount - 1, 0, -1):
+                sfn = "%s.%d%s" % (root, i, ext)
+                dfn = "%s.%d%s" % (root, i + 1, ext)
+                if os.path.exists(sfn):
+                    #print "%s -> %s" % (sfn, dfn)
+                    if os.path.exists(dfn):
+                        os.remove(dfn)
+                    os.rename(sfn, dfn)
+            dfn = "%s.1%s" % (root, ext)
+            if os.path.exists(dfn):
+                os.remove(dfn)
+            os.rename(self.baseFilename, dfn)
+            #print "%s -> %s" % (self.baseFilename, dfn)
+        elif self.backupCount == -1:
+            if not hasattr(self, lastNo):
+                self._lastNo = 1
+            while True:
+                fn = "%s.%d%s" % (root, self._lastNo, ext)
+                self._lastNo += 1
+                if not os.path.exists(fn):
+                    break
+            os.rename(self.baseFilename, fn)
+        self.mode = 'w'
+        self.stream = self._open()
+
     def format(self, record):
+        """Strip trailing newlines before outputting text to file"""
         text = logging.handlers.RotatingFileHandler.format(self, record)
         return text.rstrip("\r\n")
 
@@ -152,8 +201,9 @@ def init_handlers(strm=None):
             logfile = config.datafilepath("logs", config.logfilename)
         else:
             logfile = config.datafilepath("logs", "%s-bot.log" % moduleName)
-        file_handler = RotatingFileHandler(
-                            filename=logfile, maxBytes=2 << 20, backupCount=5)
+        file_handler = RotatingFileHandler(filename=logfile,
+                                           maxBytes=1024 * config.logfilesize,
+                                           backupCount=config.logfilecount)
 
         file_handler.setLevel(DEBUG)
         form = LoggingFormatter(
@@ -167,7 +217,7 @@ def init_handlers(strm=None):
         # or for all components if nothing was specified
         for component in config.debug_log:
             if component:
-                debuglogger = logging.getLogger("pywiki."+component)
+                debuglogger = logging.getLogger("pywiki." + component)
             else:
                 debuglogger = logging.getLogger("pywiki")
             debuglogger.setLevel(DEBUG)
@@ -215,7 +265,7 @@ if hasattr(sys, '_getframe'):
 # done filching
 
 def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
-               **kwargs):
+              **kwargs):
     """Format output and send to the logging module.
 
     Backend function used by all the user-output convenience functions.
