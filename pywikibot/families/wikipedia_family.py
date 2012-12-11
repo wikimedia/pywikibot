@@ -584,3 +584,6 @@ class Family(family.Family):
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
+
+    def shared_data_repository(self, code):
+        return ('wikidata', 'wikidata')
