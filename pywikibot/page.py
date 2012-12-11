@@ -94,6 +94,16 @@ class Page(object):
         """Return the Site object for the wiki on which this Page resides."""
         return self._link.site
 
+    @property
+    def image_repository(self):
+        """Return the Site object for the image repository."""
+        return self.site.image_repository()
+
+    @property
+    def data_repository(self):
+       """Return the Site object for the data repository."""
+        return self.site.data_repository()
+
     def namespace(self):
         """Return the number of the namespace of the page.
 
@@ -460,8 +470,8 @@ class Page(object):
 
         """
         txt = self.get()
-        txt = pywikibot.removeLanguageLinks(txt, site = self.site)
-        txt = pywikibot.removeCategoryLinks(txt, site = self.site)
+        txt = pywikibot.removeLanguageLinks(txt, site=self.site)
+        txt = pywikibot.removeCategoryLinks(txt, site=self.site)
         if len(txt) < 4:
             return True
         else:
@@ -837,8 +847,8 @@ class Page(object):
         """
         self.text = newtext
         return self.save(comment=comment, watch=watchArticle,
-                        minor=minorEdit, botflag=botflag, force=force,
-                        async=async, callback=callback)
+                         minor=minorEdit, botflag=botflag, force=force,
+                         async=async, callback=callback)
 
     def put_async(self, newtext, comment=u'', watchArticle=None,
                   minorEdit=True, botflag=None, force=False, callback=None):
@@ -2560,7 +2570,6 @@ not supported by PyWikiBot!"""
         Assumes that the lang & title come clean, no checks are made.
         """
         link = Link.__new__(Link)
-
         link._site = pywikibot.Site(lang, source.family.name)
         link._section = None
         link._source = source
@@ -2584,7 +2593,7 @@ def html2unicode(text, ignore = []):
     # This regular expression will match any decimal and hexadecimal entity and
     # also entities that might be named entities.
     entityR = re.compile(
-        r'&(#(?P<decimal>\d+)|#x(?P<hex>[0-9a-fA-F]+)|(?P<name>[A-Za-z]+));')
+        r'&(?:amp;)?(#(?P<decimal>\d+)|#x(?P<hex>[0-9a-fA-F]+)|(?P<name>[A-Za-z]+));')
     # These characters are Html-illegal, but sadly you *can* find some of
     # these and converting them to unichr(decimal) is unsuitable
     convertIllegalHtmlEntities = {
