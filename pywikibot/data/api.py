@@ -844,7 +844,7 @@ class LogEntryListGenerator(ListGenerator):
     Like ListGenerator, but specialized for listaction="logevents" :
     yields LogEntry objects instead of dicts.
     """
-    def __init__(self, logtype, **kwargs):
+    def __init__(self, logtype=None, **kwargs):
         ListGenerator.__init__(self, "logevents", **kwargs)
 
         import logentries
