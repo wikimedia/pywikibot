@@ -527,9 +527,9 @@ class BaseSite(object):
         raise NotImplementedError
     def allpages_address(self, s, ns = 0):
         raise NotImplementedError
-    def log_address(self, n=50, mode = ''):
+    def log_address(self, n=50, mode='', user=''):
         raise NotImplementedError
-    def newpages_address(self, n=50):
+    def newpages_address(self, n=50, namespace=0):
         raise NotImplementedError
     def longpages_address(self, n=500):
         raise NotImplementedError
@@ -555,7 +555,11 @@ class BaseSite(object):
         raise NotImplementedError
     def uncategorizedpages_address(self, n=500):
         raise NotImplementedError
+    def uncategorizedtemplates_address(self, n=500):
+        raise NotImplementedError
     def unusedcategories_address(self, n=500):
+        raise NotImplementedError
+    def wantedcategories_address(self, n=500):
         raise NotImplementedError
     def withoutinterwiki_address(self, n=500):
         raise NotImplementedError
@@ -569,6 +573,10 @@ class BaseSite(object):
         raise NotImplementedError
     def broken_redirects_address(self, default_limit = True):
         raise NotImplementedError
+    def random_address(self):
+        raise NotImplementedError
+    def randomredirect_address(self):
+        raise NotImplementedError
     def login_address(self):
         raise NotImplementedError
     def captcha_image_address(self, id):
@@ -577,7 +585,8 @@ class BaseSite(object):
         raise NotImplementedError
     def contribs_address(self, target, limit=500, offset=''):
         raise NotImplementedError
-
+    def globalusers_address(self, target='', limit=500, offset='', group=''):
+        raise NotImplementedError
 
 def must_be(group=None,right=None):
     """ Decorator to require a certain user status. For now, only the values
