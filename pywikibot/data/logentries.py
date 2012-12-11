@@ -3,7 +3,7 @@
 Objects representing Mediawiki log entries
 """
 #
-# (C) Pywikipedia bot team, 2007-08
+# (C) Pywikipedia bot team, 2007-12
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,6 +14,7 @@ import pywikibot
 
 _logger = "wiki"
 
+
 class LogDict(dict):
     """
     Simple custom dictionary that raises a custom KeyError and logs
@@ -23,6 +24,7 @@ class LogDict(dict):
         pywikibot.debug(u"API log entry received:\n" + repr(self),
                         _logger)
         raise KeyError("Log entry has no '%s' key" % key, key)
+
 
 class LogEntry(object):
     """Generic log entry"""
@@ -36,7 +38,7 @@ class LogEntry(object):
         """Initialize object from a logevent dict returned by MW API"""
         self.data = LogDict(apidata)
         if self._expectedType is not None and self._expectedType != self.type():
-            raise Error("Wrong log type! Expecting %s, received %s instead." \
+            raise Error("Wrong log type! Expecting %s, received %s instead."
                         % (self._expectedType, self.type()))
 
     def __hash__(self):
@@ -76,6 +78,7 @@ class LogEntry(object):
 
     def comment(self):
         return self.data['comment']
+
 
 class BlockEntry(LogEntry):
     _expectedType = 'block'
@@ -149,6 +152,7 @@ class BlockEntry(LogEntry):
                                     self._getBlockDetails()['expiry'])
         return self._expiry
 
+
 class ProtectEntry(LogEntry):
     _expectedType = 'protect'
 
@@ -161,6 +165,7 @@ class DeleteEntry(LogEntry):
 class UploadEntry(LogEntry):
     _expectedType = 'upload'
 
+
 class MoveEntry(LogEntry):
     _expectedType = 'move'
 
@@ -170,7 +175,7 @@ class MoveEntry(LogEntry):
     def new_title(self):
         """Page object of the new title"""
         if not hasattr(self, '_new_title'):
-            self._new_title = pywikibot.Page(pywikibot.Link( \
+            self._new_title = pywikibot.Page(pywikibot.Link(
                                 self.data['move']['new_title']))
         return self._new_title
 
