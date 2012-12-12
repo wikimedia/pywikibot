@@ -101,7 +101,7 @@ class Page(object):
 
     @property
     def data_repository(self):
-       """Return the Site object for the data repository."""
+        """Return the Site object for the data repository."""
         return self.site.data_repository()
 
     def namespace(self):
