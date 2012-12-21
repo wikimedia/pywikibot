@@ -9,7 +9,7 @@ from pywikibot import family
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)
-        self.name = 'Wikivoyage'
+        self.name = 'wikivoyage'
         self.langs = {
             'de': u'de.wikivoyage.org',
             'en': u'en.wikivoyage.org',
