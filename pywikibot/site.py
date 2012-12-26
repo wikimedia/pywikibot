@@ -143,8 +143,11 @@ class BaseSite(object):
                 raise NoSuchSite("Language %s does not exist in family %s"
                                  % (self.__code, self.__family.name))
 
-        self._username = [user, sysop]
         self.nocapitalize = self.code in self.family.nocapitalize
+        if not self.nocapitalize:
+            user = None if user is None else user[0].upper() + user[1:]
+            sysop = None if sysop is None else sysop[0].upper() + sysop[1:]
+        self._username = [user, sysop]
 
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Lock()
