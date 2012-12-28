@@ -148,6 +148,8 @@ class BaseSite(object):
             user = None if user is None else user[0].upper() + user[1:]
             sysop = None if sysop is None else sysop[0].upper() + sysop[1:]
         self._username = [user, sysop]
+        self.use_hard_category_redirects = \
+                self.code in self.family.use_hard_category_redirects
 
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Lock()
