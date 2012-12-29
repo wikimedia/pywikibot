@@ -97,7 +97,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
                 return
         except pywikibot.IsRedirectPage:
                 return
-        print entry[0], name
+        pywikibot.output(str(( entry[0], name )))
 
     def on_dccmsg(self, c, e):
         pass
