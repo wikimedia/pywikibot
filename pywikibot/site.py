@@ -145,8 +145,10 @@ class BaseSite(object):
 
         self.nocapitalize = self.code in self.family.nocapitalize
         if not self.nocapitalize:
-            user = None if user is None else user[0].upper() + user[1:]
-            sysop = None if sysop is None else sysop[0].upper() + sysop[1:]
+            if user:
+                user = user[0].upper() + user[1:]
+            if sysop:
+                sysop = sysop[0].upper() + sysop[1:]
         self._username = [user, sysop]
         self.use_hard_category_redirects = \
                 self.code in self.family.use_hard_category_redirects
