@@ -11,10 +11,11 @@ class Family(family.Family):
         family.Family.__init__(self)
         self.name = 'wikivoyage'
         self.languages_by_size = [
-            'de', 'en', 'fr', 'it', 'nl', 'ru','sv',
+            'de', 'en', 'fr', 'it', 'nl', 'ru', 'sv', 'pt', 'es',
         ]
 
-        self.langs = dict([(lang, '%s.wikivoyage.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikivoyage.org' % lang)
+                           for lang in self.languages_by_size])
 
         }
 
