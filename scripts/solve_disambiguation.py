@@ -250,6 +250,14 @@ ignore_title = {
         'fy': [
             u'Wikipedy:Fangnet',
         ],
+        'hu': [
+            #hu:Wikipédia:Kocsmafal (egyéb)#Hol nem kell egyértelműsíteni?
+            #2012-02-08
+            u'Wikipédia:(?!Sportműhely/Eddigi cikkeink).*',
+            u'.*\(egyértelműsítő lap\)$',
+            u'.*[Vv]ita:.*',
+            u'Szerkesztő:[^/]+$',
+        ],
         'ia': [
             u'Categoria:Disambiguation',
             u'Wikipedia:.+',

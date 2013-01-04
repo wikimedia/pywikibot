@@ -334,7 +334,7 @@ that you have to break it off, use "-continue" next time.
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
 # (C) xqt, 2009-2012
-# (C) Pywikipedia bot team, 2007-2012
+# (C) Pywikipedia bot team, 2007-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -424,7 +424,11 @@ moved_links = {
     'pt' : ([u'documentação', u'/doc'],  u'/doc'),
     'ro' : (u'documentaţie',  u'/doc'),
     'ru' : (u'doc',           u'/doc'),
-    'simple': ('documentation', u'/doc'),
+    'simple': ([u'documentation',
+                u'template documentation',
+                u'template doc',
+                u'doc',
+                u'documentation, template'], u'/doc'),
     'sv' : (u'dokumentation', u'/dok'),
     'uk' : ([u'документація',
              u'doc',

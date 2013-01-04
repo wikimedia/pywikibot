@@ -140,7 +140,8 @@ class UploadRobot:
             # FIXME: these 2 belong somewhere else, presumably in family
             forbidden = '/' # to be extended
             allowed_formats = (u'gif', u'jpg', u'jpeg', u'mid', u'midi',
-                               u'ogg', u'png', u'svg', u'xcf', u'djvu')
+                               u'ogg', u'png', u'svg', u'xcf', u'djvu',
+                               u'ogv', u'oga', u'tif', u'tiff')
             # ask until it's valid
             while True:
                 newfn = pywikibot.input(

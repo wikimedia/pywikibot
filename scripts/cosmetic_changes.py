@@ -95,7 +95,7 @@ msg_interwiki = {
     'fr' : u'<!-- Autres langues -->',
     'nn' : (u'<!--interwiki (no, sv, da first; then other languages alphabetically by name)-->',
             u'(<!-- ?interwiki \(no(?:/nb)?, ?sv, ?da first; then other languages alphabetically by name\) ?-->)')
-}    
+}
 
 # This is from interwiki.py;
 # move it to family file and implement global instances
@@ -180,7 +180,7 @@ class CosmeticChangesToolkit:
         text = self.cleanUpSectionHeaders(text)
         text = self.putSpacesInLists(text)
         text = self.translateAndCapitalizeNamespaces(text)
-        text = self.translateMagicWords(text)
+##        text = self.translateMagicWords(text)
         text = self.replaceDeprecatedTemplates(text)
 ##        text = self.resolveHtmlEntities(text)
         text = self.validXhtml(text)
@@ -333,7 +333,7 @@ class CosmeticChangesToolkit:
             text = text.strip()+self.site.family.interwiki_text_separator
             allstars.sort()
             for element in allstars:
-                text += '%s%s' % (element.strip(),config.line_separator)
+                text += '%s%s' % (element.strip(), config.line_separator)
                 pywikibot.log(u'%s' %element.strip())
         # Adding the interwiki
         if interwikiLinks:
@@ -755,7 +755,9 @@ class CosmeticChangesToolkit:
             text = pywikibot.replaceExcept(text, u'ه', u'ھ', exceptions)
         text = pywikibot.replaceExcept(text, u'ك', u'ک', exceptions)
         text = pywikibot.replaceExcept(text, ur'[ىي]', u'ی', exceptions)
+        return text
         # replace persian/arabic digits
+        ## deactivated due to bug #3539407
         for i in xrange(0, 10):
             text = pywikibot.replaceExcept(text, old[i], new[i], exceptions)
         # do not change digits in class, style and table params

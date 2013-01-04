@@ -191,7 +191,7 @@ def understandBlock(text, TTP, TSP, TSMP, TTMP, TU):
 def showQuest(site, page):
     quest = pywikibot.inputChoice(u'Do you want to open the page?',
                                   ['with browser', 'with gui', 'no'],
-                                  ['b','g','n'], 'n')
+                                  ['b', 'g', 'n'], 'n')
     pathWiki = site.family.nicepath(site.lang)
     url = 'http://%s%s%s?&redirect=no' % (pywikibot.getSite().hostname(),
                                           pathWiki, page.urlname())

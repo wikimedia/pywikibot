@@ -6,7 +6,7 @@ See imagerecat.py (still working on that one) to add these images to categories.
 """
 __version__ = '$Id$'
 #
-#  (C) Multichill 2008
+# (C) Multichill 2008
 #
 # Distributed under the terms of the MIT license.
 #

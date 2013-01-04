@@ -26,7 +26,7 @@ All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
 
 If neither a page title nor a page generator is given, it takes all pages from
-the default maintenance category. 
+the default maintenance category.
 
 It is strongly recommended not to run this script over the entire article
 namespace (using the -start) parameter, as that would consume too much
