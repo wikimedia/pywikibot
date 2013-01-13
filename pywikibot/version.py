@@ -120,8 +120,10 @@ cmp_ver = lambda a, b, tol=1: {-1: '<', 0: '~', 1: '>'}[cmp((a-b)//tol, 0)]
 #  without importing it (thus can be done for any file)
 #
 def getfileversion(filename):
+    _program_dir = os.path.normpath(os.path.dirname(sys.argv[0]))
+    _program_dir = _program_dir.rstrip(os.path.basename(_program_dir))
     __version__ = None
-    fn = os.path.abspath(os.path.join(os.curdir, filename))
+    fn = os.path.join(_program_dir, filename)
     if os.path.exists(fn):
         for line in open(fn, 'r').readlines():
             if line.find('__version__') == 0:
