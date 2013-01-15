@@ -581,7 +581,7 @@ class Family(family.Family):
         return ('commons', 'commons')
 
     def shared_data_repository(self, code, transcluded=False):
-        if not transcluded or code in ['hu']):
+        if not transcluded or code in ['hu']:
             return ('wikidata', 'wikidata')            
         else:
             return (None, None)
