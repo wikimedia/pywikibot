@@ -1109,7 +1109,10 @@ class APISite(BaseSite):
         version numbers and any other text contained in the version.
 
         """
+        exp = config.API_config_expiry      # expire immediately to get
+        config.API_config_expiry = 0        # 'live' (!) version data
         versionstring = self.siteinfo['generator']
+        config.API_config_expiry = exp
         m = re.match(r"^MediaWiki ([0-9]+)\.([0-9]+)(.*)$", versionstring)
         if m:
             return (int(m.group(1)), int(m.group(2)), m.group(3))
