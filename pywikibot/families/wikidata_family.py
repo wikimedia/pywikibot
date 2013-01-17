@@ -16,7 +16,10 @@ class Family(family.Family):
             'client': 'wikidata-test-client.wikimedia.de',
         }
 
-    def shared_data_repository(self, code):
-        # for here an now we just use the test repo
-        # for wikimedia families the method can return wikidata itself
-        return ('repo', 'wikidata') if code == 'client' else (None, None)
+    def shared_data_repository(self, code, transcluded=False):
+        """Always return a repository tupe. This enables testing whether
+        the site opject is the repository itself, see Site.is_data_repository()
+
+        """
+        return ('wikidata',
+                'wikidata') if code == 'wikidata' else ('repo', 'wikidata')
