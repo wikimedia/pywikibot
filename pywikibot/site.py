@@ -971,10 +971,10 @@ class APISite(BaseSite):
         """Return list of localized PAGENAMEE tags for the site."""
         return self.getmagicwords("pagenamee")
 
-    def _getsiteinfo(self):
+    def _getsiteinfo(self, force=False):
         """Retrieve siteinfo and namespaces from site."""
         sirequest = api.CachedRequest(
-                            expiry=config.API_config_expiry,
+                            expiry=(0 if force else config.API_config_expiry),
                             site=self,
                             action="query",
                             meta="siteinfo",
@@ -1102,17 +1102,16 @@ class APISite(BaseSite):
             return self.namespaces()[num]
         return self.namespaces()[num][0]
 
-    def live_version(self):
+    def live_version(self, force=False):
         """Return the 'real' version number found on [[Special:Version]]
 
         Return value is a tuple (int, int, str) of the major and minor
         version numbers and any other text contained in the version.
 
         """
-        exp = config.API_config_expiry      # expire immediately to get
-        config.API_config_expiry = 0        # 'live' (!) version data
+        if force:
+            self._getsiteinfo(force=True)    # drop/expire cache and reload
         versionstring = self.siteinfo['generator']
-        config.API_config_expiry = exp
         m = re.match(r"^MediaWiki ([0-9]+)\.([0-9]+)(.*)$", versionstring)
         if m:
             return (int(m.group(1)), int(m.group(2)), m.group(3))
