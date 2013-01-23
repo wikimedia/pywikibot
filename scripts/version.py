@@ -9,9 +9,9 @@
 #
 __version__ = '$Id$'
 
+import sys
 from pywikibot.version import *
 from pywikibot import config2 as config
-import sys
 
 if __name__ == '__main__':
     print 'Pywikibot %s' % getversion()
