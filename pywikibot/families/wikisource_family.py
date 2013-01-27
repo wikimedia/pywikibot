@@ -14,7 +14,7 @@ class Family(family.WikimediaFamily):
             'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
             'fa', 'hu', 'ar', 'cs', 'ca', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
             'sa', 'el', 'sr', 'bn', 'hr', 'th', 'no', 'hy', 'nl', 'ml', 'la',
-            'vec', 'ja', 'tr', 'eo', 'br', 'yi', 'mk', 'uk', 'ta', 'gu', 'id',
+            'vec', 'ja', 'tr', 'eo', 'br', 'yi', 'mk', 'uk', 'gu', 'ta', 'id',
             'is', 'da', 'be', 'li', 'et', 'mr', 'bg', 'bs', 'sah', 'az', 'gl',
             'lt', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
@@ -22,7 +22,6 @@ class Family(family.WikimediaFamily):
         for lang in self.languages_by_size:
             self.langs[lang] = '%s.wikisource.org' % lang
         self.langs['-'] = 'wikisource.org'
-
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
