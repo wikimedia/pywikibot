@@ -8,7 +8,7 @@ from pywikibot import family
 
 class Family(family.WikimediaFamily):
     def __init__(self):
-        super(WikimediaFamily, self).__init__()
+        super(Family, self).__init__()
         self.name = 'incubator'
         self.langs = {
             'incubator': 'incubator.wikimedia.org',
