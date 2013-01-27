@@ -5,9 +5,9 @@ __version__ = '$Id$'
 
 # The Wikimedia family that is known as Wiktionary
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wiktionary'
 
         self.languages_by_size = [
@@ -30,12 +30,7 @@ class Family(family.Family):
         self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])
 
 
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
-            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
-            'species',
-        ]
+
 
         # Global bot allowed languages on
         # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
@@ -133,6 +128,3 @@ class Family(family.Family):
         self.interwiki_on_one_line = ['pl']
 
         self.interwiki_attop = ['pl']
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')

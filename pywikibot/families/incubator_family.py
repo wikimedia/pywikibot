@@ -6,17 +6,13 @@ from pywikibot import family
 
 # The Wikimedia Incubator family
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(WikimediaFamily, self).__init__()
         self.name = 'incubator'
         self.langs = {
             'incubator': 'incubator.wikimedia.org',
         }
 
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
-
     def ssl_pathprefix(self, code):
         return "/wikipedia/incubator"
-

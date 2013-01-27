@@ -6,9 +6,9 @@ from pywikibot import family
 
 # The wikidata family
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikidata'
         self.langs = {
             'wikidata': 'wikidata.org',

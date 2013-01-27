@@ -6,9 +6,9 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikivoyage'
         self.languages_by_size = [
             'de', 'en', 'fr', 'it', 'nl', 'ru', 'sv', 'pt', 'es',
@@ -17,10 +17,5 @@ class Family(family.Family):
         self.langs = dict([(lang, '%s.wikivoyage.org' % lang)
                            for lang in self.languages_by_size])
 
-        }
-
     def scriptpath(self, code):
         return u'/w'
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')

@@ -5,9 +5,9 @@ __version__ = '$Id$'
 
 # The Wikimedia family that is known as Wikibooks
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikibooks'
 
         self.languages_by_size = [
@@ -103,6 +103,3 @@ class Family(family.Family):
             'zh-cn': 'zh',
             'zu': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=25425
         }
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')

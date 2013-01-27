@@ -6,9 +6,9 @@ from pywikibot import family
 
 # The Wikimedia Commons family
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'commons'
         self.langs = {
             'commons': 'commons.wikimedia.org',
@@ -35,16 +35,9 @@ class Family(family.Family):
         self.disambcatname = {
             'commons':  u'Disambiguation'
         }
-        self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
-            'meta', 'mediawiki', 'test', 'incubator', 'species',
-        ]
 
     def dbName(self, code):
         return 'commonswiki_p'
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
 
     def ssl_pathprefix(self, code):
         return "/wikipedia/commons"
