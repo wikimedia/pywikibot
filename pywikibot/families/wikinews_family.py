@@ -16,7 +16,9 @@ class Family(family.WikimediaFamily):
             'bg', 'sq', 'uk', 'no', 'ko', 'bs', 'eo',
         ]
 
-        self.langs = dict([(lang, '%s.wikinews.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikinews.org' % lang)
+                           for lang in self.languages_by_size])
+
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = ['ca', 'cs', 'en', 'fa',]
@@ -46,6 +48,3 @@ class Family(family.WikimediaFamily):
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }
-
-    def code2encoding(self, code):
-        return 'utf-8'

@@ -27,7 +27,8 @@ class Family(family.WikimediaFamily):
             'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 
-        self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wiktionary.org' % lang)
+                           for lang in self.languages_by_size])
 
         # Global bot allowed languages on
         # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

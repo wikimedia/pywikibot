@@ -41,7 +41,9 @@ class Family(family.WikimediaFamily):
             'ff', 'st', 'tw', 'xh',
         ]
 
-        self.langs = dict([(lang, '%s.wikipedia.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikipedia.org' % lang)
+                           for lang in self.languages_by_size])
+
 
         self.category_redirect_templates = {
             '_default': (),

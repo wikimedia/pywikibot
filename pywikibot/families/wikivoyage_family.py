@@ -16,6 +16,3 @@ class Family(family.WikimediaFamily):
 
         self.langs = dict([(lang, '%s.wikivoyage.org' % lang)
                            for lang in self.languages_by_size])
-
-    def scriptpath(self, code):
-        return u'/w'

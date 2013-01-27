@@ -20,7 +20,9 @@ class Family(family.WikimediaFamily):
             'ky', 'am',
         ]
 
-        self.langs = dict([(lang, '%s.wikiquote.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikiquote.org' % lang)
+                           for lang in self.languages_by_size])
+
 
         # attop is a list of languages that prefer to have the interwiki
         # links at the top of the page.
