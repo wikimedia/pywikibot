@@ -1056,6 +1056,12 @@ class APISite(BaseSite):
         code, fam = self.shared_data_repository()
         return bool(code or fam)
 
+    @property
+    def has_transcluded_data(self):
+        """Return True if site has a shared image repository like wikidata"""
+        code, fam = self.shared_data_repository(True)
+        return bool(code or fam)
+
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
 
