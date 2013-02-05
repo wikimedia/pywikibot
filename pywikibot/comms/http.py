@@ -32,13 +32,22 @@ from pywikibot.exceptions import Server504Error
 import pywikibot
 import cookielib
 import threadedhttp
+import pywikibot.version
 
 _logger = "comm.http"
 
 
 # global variables
 
-useragent = 'Pywikipediabot/2.0' # This should include some global version string
+# the User-agent: header. The default is 
+# '<script>/<revision> Pywikipediabot/2.0', where '<script>' is the tail
+# path component and file name of the currently executing script and
+# revision is the SVN revision of Pywikipediabot.
+USER_AGENT_FORMAT = '{script}/r{version[rev]} Pywikipediabot/2.0'
+useragent = (USER_AGENT_FORMAT.format(
+    script=('-'.join(pywikibot.version.get_executing_script())),
+    version=pywikibot.version.getversiondict()
+))
 numthreads = 1
 threads = []
 

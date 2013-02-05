@@ -12,6 +12,7 @@ __version__ = '$Id$'
 import os
 import time
 import urllib
+import sys
 
 cache = None
 
@@ -134,3 +135,16 @@ def getfileversion(filename):
                 exec(line)
                 break
     return __version__
+
+## Get the tail path component and file name of the currently executing
+# script. Returns a tuple.
+#
+def get_executing_script():
+    """Get the last path component and filename of the currently
+    executing script."""
+    try:
+        script = os.path.abspath(sys.modules['__main__'].__file__)
+    except (KeyError, AttributeError):
+        script = sys.executable
+    path, file = os.path.split(script)
+    return (os.path.basename(path), file)
