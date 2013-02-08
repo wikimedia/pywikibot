@@ -11,25 +11,18 @@ class Family(family.WikimediaFamily):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'hu', 'ja', 'pt', 'it', 'nl', 'pl', 'es', 'vi',
-            'he', 'sq', 'ca', 'fi', 'id', 'ru', 'cs', 'zh', 'hr', 'sv', 'tr',
+            'en', 'de', 'fr', 'hu', 'ja', 'pt', 'it', 'nl', 'vi', 'pl', 'es',
+            'he', 'sq', 'ca', 'id', 'fi', 'ru', 'cs', 'zh', 'hr', 'sv', 'tr',
             'da', 'th', 'no', 'gl', 'fa', 'ko', 'sr', 'ta', 'ar', 'tl', 'mk',
             'ro', 'is', 'tt', 'lt', 'ka', 'az', 'uk', 'eo', 'bg', 'el', 'hy',
-            'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'mr',
-            'ms', 'bn', 'hi', 'ml', 'oc', 'kk', 'eu', 'fy', 'ie', 'ne', 'te',
+            'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'ms',
+            'mr', 'bn', 'hi', 'ml', 'oc', 'kk', 'eu', 'fy', 'ie', 'ne', 'te',
             'sa', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'zh-min-nan', 'cy',
             'ku', 'uz',
         ]
 
         self.langs = dict([(lang, '%s.wikibooks.org' % lang)
                            for lang in self.languages_by_size])
-
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
-            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
-            'species',
-        ]
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
