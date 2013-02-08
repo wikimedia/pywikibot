@@ -12,12 +12,11 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'fr', 'de', 'beta', 'cs', 'ru', 'it', 'es', 'pt', 'ar', 'sv',
-            'fi', 'el', 'sl', 'ja',
+            'fi', 'el', 'ko', 'sl', 'ja',
         ]
 
         self.langs = dict([(lang, '%s.wikiversity.org' % lang)
                            for lang in self.languages_by_size])
-
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = ['ja',]
