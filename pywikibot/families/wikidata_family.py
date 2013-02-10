@@ -21,5 +21,8 @@ class Family(family.WikimediaFamily):
         the site opject is the repository itself, see Site.is_data_repository()
 
         """
-        return ('wikidata',
-                'wikidata') if code == 'wikidata' else ('repo', 'wikidata')
+        if transcluded:
+            return(None, None)
+        else:
+            return ('wikidata',
+                    'wikidata') if code == 'wikidata' else ('repo', 'wikidata')
