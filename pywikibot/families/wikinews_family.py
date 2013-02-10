@@ -21,7 +21,7 @@ class Family(family.WikimediaFamily):
 
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['ca', 'cs', 'en', 'fa',]
+        self.cross_allowed = ['ca', 'cs', 'en', 'fa', 'ko', ]
 
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
