@@ -16,9 +16,9 @@ class Family(family.WikimediaFamily):
             'da', 'th', 'no', 'gl', 'fa', 'ko', 'sr', 'ta', 'ar', 'tl', 'mk',
             'ro', 'is', 'tt', 'lt', 'ka', 'az', 'eo', 'uk', 'bg', 'el', 'hy',
             'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ms', 'ur',
-            'mr', 'bn', 'hi', 'ml', 'oc', 'kk', 'eu', 'fy', 'ie', 'ne', 'te',
-            'sa', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'zh-min-nan', 'cy',
-            'ku', 'uz',
+            'mr', 'bn', 'hi', 'ml', 'oc', 'km', 'kk', 'eu', 'fy', 'ie', 'ne',
+            'te', 'sa', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'zh-min-nan',
+            'cy', 'ku', 'uz',
         ]
 
         self.langs = dict([(lang, '%s.wikibooks.org' % lang)
@@ -64,7 +64,6 @@ class Family(family.WikimediaFamily):
             'gn': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Guarani_Wikibooks
             'gu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gujarati_Wikibooks
             'jp': 'ja',
-            'km': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Khmer_Wikibooks
             'kn': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
             'ks': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikibooks
             'lb': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_L%C3%ABtzebuergesch_Wikibooks
