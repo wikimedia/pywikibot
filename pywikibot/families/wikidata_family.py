@@ -11,7 +11,7 @@ class Family(family.WikimediaFamily):
         super(Family, self).__init__()
         self.name = 'wikidata'
         self.langs = {
-            'wikidata': 'wikidata.org',
+            'wikidata': 'www.wikidata.org',
             'repo': 'wikidata-test-repo.wikimedia.de',
             'client': 'wikidata-test-client.wikimedia.de',
         }
