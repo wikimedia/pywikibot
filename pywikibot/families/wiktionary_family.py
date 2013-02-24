@@ -23,8 +23,8 @@ class Family(family.WikimediaFamily):
             'st', 'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'sa', 'mn',
             'jbo', 'an', 'zu', 'or', 'gu', 'rw', 'kw', 'fo', 'gv', 'qu', 'ss',
             'ie', 'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa', 'so', 'am',
-            'su', 'za', 'gd', 'mi', 'tpi', 'ik', 'yi', 'ln', 'ti', 'sg', 'na',
-            'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
+            'su', 'za', 'gd', 'mi', 'tpi', 'yi', 'ln', 'ti', 'sg', 'na', 'dv',
+            'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang)
@@ -103,6 +103,7 @@ class Family(family.WikimediaFamily):
             'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wiktionary
             'dk': 'da',
             'dz': None,
+            'ik': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Inupiak_Wiktionary
             'jp': 'ja',
             'mh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wiktionary
             'mo': 'ro', # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary
