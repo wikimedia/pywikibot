@@ -491,7 +491,7 @@ class CategoryListifyRobot:
     def run(self):
         setOfArticles = set(self.cat.articles(recurse = self.recurse))
         if self.subCats:
-            setOfArticles += set(self.cat.subcategories())
+            setOfArticles = setOfArticles.union(set(self.cat.subcategories()))
         if not self.editSummary:
             self.editSummary = i18n.twtranslate(self.site,
                                                 'category-listifying',
