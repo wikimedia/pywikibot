@@ -1706,9 +1706,20 @@ class APISite(BaseSite):
         for pagedata in rvgen:
             if page is not None:
                 if pagedata['title'] != page.title(withSection=False):
-                    raise Error(
-                        u"loadrevisions: Query on %s returned data on '%s'"
-                        % (page, pagedata['title']))
+                    ok = False
+                    namespace = page.namespace()
+                    # gender settings ?
+                    if namespace in [2, 3]:
+                        ns, title = pagedata['title'].split(':', 1)
+                        if ns in page.site.namespace(namespace, all=True) and \
+                           title == page.title(withSection=False,
+                                               withNamespace=False):
+                       
+                            ok = True
+                    if not ok:
+                        raise Error(
+                            u"loadrevisions: Query on %s returned data on '%s'"
+                            % (page, pagedata['title']))
                 if "missing" in pagedata:
                     raise NoPage(page)
             else:
