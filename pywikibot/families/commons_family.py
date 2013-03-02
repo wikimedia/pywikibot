@@ -36,9 +36,6 @@ class Family(family.WikimediaFamily):
             'commons':  u'Disambiguation'
         }
 
-    def dbName(self, code):
-        return 'commonswiki_p'
-
     def ssl_pathprefix(self, code):
         return "/wikipedia/commons"
 
