@@ -33,6 +33,7 @@ docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
 
+
 class BasicBot:
     # Edit summary message that should be used is placed on /i18n subdirectory.
     # The file containing these messages should have the same name as the caller
@@ -103,7 +104,7 @@ class BasicBot:
                              % page.title())
             # show what was changed
             pywikibot.showDiff(page.get(), text)
-            pywikibot.output(u'Comment: %s' %comment)
+            pywikibot.output(u'Comment: %s' % comment)
             if not self.dry:
                 choice = pywikibot.inputChoice(
                     u'Do you want to accept these changes?',
