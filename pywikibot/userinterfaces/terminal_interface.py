@@ -166,6 +166,7 @@ class UI(object):
 
         Unlike raw_input, this function automatically adds a space after the
         question.
+
         """
 
         # sound the terminal bell to notify the user
@@ -211,12 +212,10 @@ class UI(object):
                 caseHotkey = hotkey
             if m:
                 pos = m.start()
-                options[i] = '%s[%s]%s' % (option[:pos], caseHotkey, option[pos+1:])
+                options[i] = '%s[%s]%s' % (option[:pos], caseHotkey,
+                                           option[pos+1:])
             else:
                 options[i] = '%s [%s]' % (option, caseHotkey)
-
-        answer = ''
-
         # loop until the user entered a valid choice
         while True:
             prompt = '%s (%s)' % (question, ', '.join(options))
@@ -224,13 +223,11 @@ class UI(object):
             # it's okay to enter input with the lock, RLock is reentrant.
             answer = self.input(prompt)
             if answer.lower() in hotkeys or answer.upper() in hotkeys:
-                break
-            elif default and answer=='':		# empty string entered
-                answer = default
-                break
-        return answer
+                return answer
+            elif default and answer=='':  # empty string entered
+                return default
 
-    def editText(self, text, jumpIndex = None, highlight = None):
+    def editText(self, text, jumpIndex=None, highlight=None):
         """Return the text as edited by the user.
 
         Uses a Tkinter edit box because we don't have a console editor
