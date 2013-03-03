@@ -163,6 +163,8 @@ These arguments are useful to provide hints to the bot:
                    for the format, one can for example give "en:something" or
                    "20:" as hint.
 
+    -repository    Include data repository
+
     -same          looks over all 'serious' languages for the same title.
                    -same is equivalent to -hint:all:
                    (note: without ending colon)
@@ -497,6 +499,7 @@ class Global(object):
     restoreAll = False
     async = False
     summary = u''
+    repository = False
 
     def readOptions(self, arg):
         """ Read all commandline parameters for the global container """
@@ -524,6 +527,8 @@ class Global(object):
             self.same = True
         elif arg == '-wiktionary':
             self.same = 'wiktionary'
+        elif arg == '-repository':
+            self.repository = True
         elif arg == '-untranslated':
             self.untranslated = True
         elif arg == '-untranslatedonly':
@@ -831,6 +836,7 @@ class Subject(object):
 
         # Remember the "origin page"
         self.originPage = originPage
+        self.repoPage = None
         # todo is a list of all pages that still need to be analyzed.
         # Mark the origin page as todo.
         self.todo = PageTree()
@@ -1578,15 +1584,15 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     else:
                         #TODO: allow answer to repeat previous or go back after a mistake
                         answer = pywikibot.inputChoice(u'What should be done?', ['accept', 'reject', 'give up', 'accept all'], ['a', 'r', 'g', 'l'], 'a')
-                    if answer == 'l': # accept all
+                    if answer == 'l':  # accept all
                         acceptall = True
                         answer = 'a'
-                    if answer == 'a': # accept this one
+                    if answer == 'a':  # accept this one
                         result[site] = pages[0]
                         break
-                    elif answer == 'g': # give up
+                    elif answer == 'g':  # give up
                         return None
-                    elif answer == 'r': # reject
+                    elif answer == 'r':  # reject
                         # None acceptable
                         break
         return result
@@ -1609,7 +1615,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             t2 = (((int(time2[0:4]) * 12 + int(time2[4:6])) * 30 +
                    int(time2[6:8])) * 24 + int(time2[8:10])) * 60 + \
                    int(time2[10:12])
-            return abs(t2-t1)
+            return abs(t2 - t1)
 
         if not self.isDone():
             raise "Bugcheck: finish called before done"
@@ -1637,7 +1643,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         pywikibot.output(u"======Post-processing %s======" % self.originPage)
         # Assemble list of accepted interwiki links
         new = self.assemble()
-        if new is None: # User said give up
+        if new is None:  # User said give up
             pywikibot.output(u"======Aborted processing %s======"
                              % self.originPage)
             return
@@ -1662,7 +1668,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             frgnSiteDone = False
 
             for siteCode in lclSite.family.languages_by_size:
-                site = pywikibot.getSite(code = siteCode)
+                site = pywikibot.getSite(siteCode)
                 if (not lclSiteDone and site == lclSite) or \
                    (not frgnSiteDone and site != lclSite and site in new):
                     if site == lclSite:
@@ -1672,14 +1678,14 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                             if self.replaceLinks(new[site], new):
                                 updatedSites.append(site)
                             if site != lclSite:
-                                 frgnSiteDone = True
+                                frgnSiteDone = True
                         except SaveError:
                             notUpdatedSites.append(site)
                         except GiveUpOnPage:
                             break
                 elif not globalvar.strictlimittwo and site in new \
                      and site != lclSite:
-                    old={}
+                    old = {}
                     try:
                         for link in new[site].iterlanglinks():
                             page = pywikibot.Page(link)
@@ -1689,12 +1695,12 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                                          % new[site])
                         continue
                     mods, mcomment, adding, removing, modifying \
-                          = compareLanguages(old, new, insite = lclSite)
+                          = compareLanguages(old, new, insite=lclSite)
                     if (len(removing) > 0 and not globalvar.autonomous) or \
                        (len(modifying) > 0 and self.problemfound) or \
                        len(old) == 0 or \
-                       (globalvar.needlimit and \
-                        len(adding) + len(modifying) >= globalvar.needlimit +1):
+                       (globalvar.needlimit and
+                        len(adding) + len(modifying) >= globalvar.needlimit + 1):
                         try:
                             if self.replaceLinks(new[site], new):
                                 updatedSites.append(site)
@@ -1721,7 +1727,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                    (page.site.sitename() == 'wikipedia:is' or
                     page.site.sitename() == 'wikipedia:zh' and
                     page.namespace() == 10):
-                    old={}
+                    old = {}
                     try:
                         for mypage in new[page.site].interwiki():
                             old[mypage.site] = mypage
@@ -1747,7 +1753,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                             diff = minutesDiff(page.editTime(),
                                                time.strftime("%Y%m%d%H%M%S",
                                                              time.gmtime()))
-                            if diff > 30*24*60:
+                            if diff > 30 * 24 * 60:
                                 smallWikiAllowed = True
                             else:
                                 pywikibot.output(
@@ -1869,7 +1875,7 @@ u'NOTE: number of edits are restricted at %s'
                     del new[stmp]
 
         # Put interwiki links into a map
-        old={}
+        old = {}
         for page2 in interwikis:
             old[page2.site] = page2
 
@@ -2079,6 +2085,7 @@ u'NOTE: number of edits are restricted at %s'
         except (socket.error, IOError):
             pywikibot.output(u'ERROR: could not report backlinks')
 
+
 class InterwikiBot(object):
     """A class keeping track of a list of subjects, controlling which pages
        are queried from which languages when."""
@@ -2095,29 +2102,31 @@ class InterwikiBot(object):
         self.pageGenerator = None
         self.generated = 0
 
-    def add(self, page, hints = None):
+    def add(self, page, hints=None):
         """Add a single subject to the list"""
-        subj = Subject(page, hints = hints)
+        subj = Subject(page, hints=hints)
         self.subjects.append(subj)
         for site, count in subj.openSites():
             # Keep correct counters
             self.plus(site, count)
 
-    def setPageGenerator(self, pageGenerator, number = None, until = None):
+    def setPageGenerator(self, pageGenerator, number=None, until=None):
         """Add a generator of subjects. Once the list of subjects gets
            too small, this generator is called to produce more Pages"""
         self.pageGenerator = pageGenerator
         self.generateNumber = number
         self.generateUntil = until
 
-    def dump(self, append = True):
+    def dump(self, append=True):
         site = pywikibot.getSite()
         dumpfn = pywikibot.config.datafilepath(
                      'data',
                      'interwiki-dumps',
                      '%s-%s.pickle' % (site.family.name, site.lang))
-        if append: mode = 'appended'
-        else: mode = 'written'
+        if append:
+            mode = 'appended'
+        else:
+            mode = 'written'
         f = open(dumpfn, mode[0])
         titles = [s.originPage.title() for s in self.subjects]
         pickle.dump(titles, f)
@@ -2177,10 +2186,10 @@ class InterwikiBot(object):
                 if self.generateUntil:
                     until = self.generateUntil
                     if page.site.lang not in page.site.family.nocapitalize:
-                        until = until[0].upper()+until[1:]
+                        until = until[0].upper() + until[1:]
                     if page.title(withNamespace=False) > until:
                         raise StopIteration
-                self.add(page, hints = globalvar.hints)
+                self.add(page, hints=globalvar.hints)
                 self.generated += 1
                 if self.generateNumber:
                     if self.generated >= self.generateNumber:
@@ -2229,12 +2238,14 @@ class InterwikiBot(object):
             # Can we make more home-language queries by adding subjects?
             if self.pageGenerator and mycount < globalvar.maxquerysize:
                 timeout = 60
-                while timeout<3600:
+                while timeout < 3600:
                     try:
                         self.generateMore(globalvar.maxquerysize - mycount)
                     except pywikibot.ServerError:
                         # Could not extract allpages special page?
-                        pywikibot.output(u'ERROR: could not retrieve more pages. Will try again in %d seconds'%timeout)
+                        pywikibot.output(
+                            u'ERROR: could not retrieve more pages. Will try again in %d seconds'
+                            % timeout)
                         time.sleep(timeout)
                         timeout *= 2
                     else:
@@ -2292,7 +2303,7 @@ class InterwikiBot(object):
     def queryStep(self):
         self.oneQuery()
         # Delete the ones that are done now.
-        for i in xrange(len(self.subjects)-1, -1, -1):
+        for i in xrange(len(self.subjects) - 1, -1, -1):
             subj = self.subjects[i]
             if subj.isDone():
                 subj.finish()
@@ -2321,6 +2332,7 @@ class InterwikiBot(object):
 
     def __len__(self):
         return len(self.subjects)
+
 
 def compareLanguages(old, new, insite):
 
@@ -2393,16 +2405,20 @@ def botMayEdit (page):
                 return False
     return True
 
+
 def readWarnfile(filename, bot):
     import warnfile
     reader = warnfile.WarnfileReader(filename)
     # we won't use removeHints
     (hints, removeHints) = reader.getHints()
     for page, pagelist in hints.iteritems():
-        # The WarnfileReader gives us a list of pagelinks, but titletranslate.py expects a list of strings, so we convert it back.
-        # TODO: This is a quite ugly hack, in the future we should maybe make titletranslate expect a list of pagelinks.
-        hintStrings = ['%s:%s' % (hintedPage.site.language(), hintedPage.title()) for hintedPage in pagelist]
-        bot.add(page, hints = hintStrings)
+        # The WarnfileReader gives us a list of pagelinks, but titletranslate.py
+        # expects a list of strings, so we convert it back.
+        # TODO: This is a quite ugly hack, in the future we should maybe make
+        # titletranslate expect a list of pagelinks.
+        hintStrings = ['%s:%s' % (hintedPage.site.language(),
+                                  hintedPage.title()) for hintedPage in pagelist]
+        bot.add(page, hints=hintStrings)
 
 def main():
     singlePageTitle = []
@@ -2419,7 +2435,7 @@ def main():
     optContinue = False
     optRestore = False
     restoredFiles = []
-    File2Restore  = []
+    File2Restore = []
     dumpFileName = ''
     append = True
     newPages = None
@@ -2507,7 +2523,8 @@ def main():
             namespaces = []
         else:
             ns = 'all'
-        hintlessPageGen = pagegenerators.NewpagesPageGenerator(newPages, namespace=ns)
+        hintlessPageGen = pagegenerators.NewpagesPageGenerator(newPages,
+                                                               namespace=ns)
 
     elif optRestore or optContinue or globalvar.restoreAll:
         dumpFileName = pywikibot.config.datafilepath(
@@ -2543,7 +2560,7 @@ def main():
         if len(namespaces) > 0:
             hintlessPageGen = pagegenerators.NamespaceFilterPageGenerator(hintlessPageGen, namespaces)
         # we'll use iter() to create make a next() function available.
-        bot.setPageGenerator(iter(hintlessPageGen), number = number, until=until)
+        bot.setPageGenerator(iter(hintlessPageGen), number=number, until=until)
     elif warnfile:
         # TODO: filter namespaces if -namespace parameter was used
         readWarnfile(warnfile, bot)
@@ -2555,7 +2572,7 @@ def main():
             singlePage = pywikibot.Page(pywikibot.getSite(), singlePageTitle)
         else:
             singlePage = None
-        bot.add(singlePage, hints = globalvar.hints)
+        bot.add(singlePage, hints=globalvar.hints)
 
     try:
         append = not (optRestore or optContinue or globalvar.restoreAll)
@@ -2581,7 +2598,7 @@ def main():
                 pass
 
 #===========
-globalvar=Global()
+globalvar = Global()
 
 if __name__ == "__main__":
     try:
