@@ -14,9 +14,9 @@ class Family(family.WikimediaFamily):
             'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
             'fa', 'hu', 'ar', 'ca', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
             'sa', 'el', 'sr', 'hr', 'bn', 'th', 'no', 'hy', 'nl', 'ml', 'la',
-            'vec', 'tr', 'eo', 'ja', 'br', 'yi', 'mk', 'uk', 'gu', 'ta', 'id',
-            'is', 'da', 'be', 'li', 'et', 'mr', 'bg', 'bs', 'as', 'sah', 'az',
-            'gl', 'lt', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
+            'vec', 'tr', 'eo', 'ja', 'br', 'yi', 'mk', 'gu', 'uk', 'ta', 'id',
+            'is', 'be', 'da', 'li', 'et', 'mr', 'bg', 'bs', 'as', 'sah', 'az',
+            'gl', 'kn', 'lt', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
 
         self.langs = dict([(lang, '%s.wikisource.org' % lang)
