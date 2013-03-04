@@ -3245,6 +3245,9 @@ class DataSite (APISite):
                 return f
         return super(APISite, self).__getattr__(attr)
 
+    def __repr__(self):
+        return 'DataSite("%s", "%s")' % (self.code, self.family.name)
+
     def _get_propertyitem(self, props, source, **params):
         """generic method to get the data for multiple Wikibase items"""
         wbdata = self.get_item(source, props=props, **params)
