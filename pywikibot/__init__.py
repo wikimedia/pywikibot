@@ -178,7 +178,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
 getSite = Site # alias for backwards-compability
 
 
-from page import Page, ImagePage, Category, Link, User
+from page import Page, ImagePage, Category, Link, User, ItemPage, PropertyPage, Claim
 from page import html2unicode, url2unicode
 
 

@@ -2184,6 +2184,271 @@ class User(Page):
             yield ImagePage(self.site, item.title().title()), \
                   unicode(item.timestamp()), item.comment(), item.pageid() > 0
 
+class WikibasePage(Page):
+    """
+    The base page for the Wikibase extension.
+    There really should be no need to call this directly
+    """
+    def __init__(self, site, title=u""):
+        Page.__init__(self, site, title)
+        if isinstance(self.site, pywikibot.site.DataSite):
+            self.repo = self.site
+        else:
+            self.repo = self.site.data_repository()
+
+    def __defined_by(self):
+        """
+        returns the parameters needed by the API
+        to identify an item.
+        Once an item's "p/q##" is looked up, that
+        will be used for all future requests.
+        """
+        params = {}
+        #id overrides all
+        if hasattr(self, 'id'):
+            params['ids'] = self.id
+            return params
+
+        #the rest only applies to ItemPages, but is still needed here.
+
+        if isinstance(self.site, pywikibot.site.DataSite):
+            params['ids'] = self.title(withNamespace=False)
+        elif isinstance(self.site, pywikibot.site.BaseSite):
+            params['sites'] = self.site.dbName()
+            params['titles'] = self.title()
+        else:
+            raise pywikibot.exceptions.BadTitle
+        return params
+
+    def get(self, force=False, *args):
+        """
+        Fetches all page data, and caches it
+        force will override caching
+        args can be used to specify custom props.
+        """
+        if force or not hasattr(self, '_content'):
+            params = dict(**self.__defined_by())
+            params['action'] = 'wbgetentities'
+            if args:
+                params['props'] = '|'.join(args)
+                #print params
+            req = pywikibot.data.api.Request(site=self.repo, **params)
+            data = req.submit()
+            if not 'success' in data:
+                raise pywikibot.data.api.APIError, data['errors']
+            self.id = data['entities'].keys()[0]
+            self._content = data['entities'][self.id]
+            #aliases
+        self.aliases = {}
+        if 'aliases' in self._content:
+            for lang in self._content['aliases']:
+                self.aliases[lang] = list()
+                for value in self._content['aliases'][lang]:
+                    self.aliases[lang].append(value['value'])
+
+        #labels
+        self.labels = {}
+        if 'labels' in self._content:
+            for lang in self._content['labels']:
+                self.labels[lang] = self._content['labels'][lang]['value']
+
+        #descriptions
+        self.descriptions = {}
+        if 'descriptions' in self._content:
+            for lang in self._content['descriptions']:
+                self.descriptions[lang] = self._content['descriptions'][lang]['value']
+
+        return {'aliases':self.aliases,
+                'labels':self.labels,
+                'descriptions':self.descriptions,
+                }
+
+
+
+    def save(self, summary, **kwargs):
+        """
+        Save whatever we added/removed/etc.
+        """
+        raise NotImplementedError
+
+
+class ItemPage(WikibasePage):
+    def __init__(self, site, title=None):
+        """
+        defined by qid XOR site AND title
+        options:
+        site=pywikibot.DataSite & title=Q42
+        site=pywikibot.Site & title=Main Page
+        """
+        WikibasePage.__init__(self, site, title)
+
+    @staticmethod
+    def fromPage(page):
+        """
+        Get the ItemPage based on a Page that links to it
+        """
+        return ItemPage(page.site, page.title())
+
+    def __make_site(self, dbname):
+        """
+        Converts a Site.dbName() into a Site object.
+        Rather hackish method that only works for WMF sites
+        """
+        lang = dbname.replace('wiki','')
+        lang = lang.replace('_','-')
+        return pywikibot.Site(lang, 'wikipedia')
+
+    def get(self, force=False, *args):
+        """
+        Fetches all page data, and caches it
+        force will override caching
+        args are the values of props
+        """
+        if force or not hasattr(self, '_content'):
+            WikibasePage.get(self, force=force, *args)
+
+        #claims
+        self.claims = {}
+        if 'claims' in self._content:
+            for pid in self._content['claims']:
+                self.claims[pid] = list()
+                for claim in self._content['claims'][pid]:
+                    self.claims[pid].append(Claim.fromJSON(self.repo, claim))
+
+        #sitelinks
+        self.sitelinks = {}
+        if 'sitelinks' in self._content:
+            for dbname in self._content['sitelinks']:
+                #Due to issues with locked/obsolete sites
+                #this part is commented out
+                #site = self.__make_site(dbname)
+                #self.sitelinks[site] = pywikibot.Page(site, self._content['sitelinks'][dbname]['title'])
+                self.sitelinks[dbname] = self._content['sitelinks'][dbname]['title']
+
+        return {'aliases': self.aliases,
+                'labels': self.labels,
+                'descriptions': self.descriptions,
+                'sitelinks': self.sitelinks,
+                'claims': self.claims
+        }
+
+    def get_sitelink(self, site, force=False):
+        """
+        Returns a page object for the specific site
+        site is a pywikibot.Site
+        force will override caching
+        If the item doesn't have that language, raise NoPage
+        """
+        if force or not hasattr(self, '_content'):
+            self.get(force=force)
+        dbname = site.dbName()
+        if not dbname in self.sitelinks:
+            raise pywikibot.NoPage
+        else:
+            return self.sitelinks[dbname]
+
+
+class PropertyPage(WikibasePage):
+    """
+    Any page in the property namespace
+    Should be created as:
+        PropertyPage(DataSite, 'Property:P21')
+    """
+    def __init__(self, source, title=u""):
+        WikibasePage.__init__(self, source, title)
+        self.id = self.title(withNamespace=False).lower()
+        if not self.id.startswith(u'p'):
+            raise ValueError(u"'%s' is not a property page!" % self.title())
+
+    def get_type(self):
+        """
+        Returns the type that this item uses
+        Examples: item, commons media file, StringValue, NumericalValue
+        """
+        raise NotImplementedError
+
+class QueryPage(WikibasePage):
+    """
+    For future usage, not implemented yet
+    """
+    def __init__(self, site, title):
+        WikibasePage.__init__(self, site, title)
+        raise NotImplementedError
+
+
+class Claim(PropertyPage):
+    """
+    Claims are standard claims as well as references.
+    """
+    def __init__(self, site, pid, snak=None, isReference=False):
+        """
+        Defined by the "snak" value, supplemented by site + pid
+        """
+        PropertyPage.__init__(self, site, 'Property:'+pid)
+        self.snak = snak
+        self.isReference = isReference
+        self.sources = []
+        self.target = None
+
+    @staticmethod
+    def fromJSON(site, data):
+        """
+        Creates the claim object from JSON returned
+        in the API call.
+        """
+        claim = Claim(site, data['mainsnak']['property'])
+        if 'id' in data:
+            claim.snak = data['id']
+        else:
+            claim.isReference = True
+        if data['mainsnak']['datavalue']['type'] == 'wikibase-entityid':
+            claim.target = ItemPage(site, 'Q' +
+                                          str(data['mainsnak']['datavalue']['value']['numeric-id']))
+        else:
+            claim.target = data['mainsnak']['datavalue']['value']
+        if 'references' in data:
+            for source in data['references']:
+                claim.sources.append(Claim.referenceFromJSON(site, source['snaks'].values()[0][0]))
+        return claim
+
+    @staticmethod
+    def referenceFromJSON(site, data):
+        """
+        This is a simple hack since reference objects
+        aren't wrapped in a mainsnak object.
+        """
+        wrap = {'mainsnak': data}
+        return Claim.fromJSON(site, wrap)
+
+    def set_target(self, value):
+        """
+        Sets the target to the passed value.
+        There should be checks to ensure type compliance
+        """
+        self.target = value
+
+    def get_target(self):
+        """
+        Returns object that the property is associated with.
+        None is returned if no target is set
+        """
+        return self.target
+
+    def get_sources(self):
+        """
+        Returns a list of Claims
+        """
+        return self.sources
+
+    def add_source(self, source):
+        """
+        source is a Claim.
+        adds it as a reference.
+        """
+        raise NotImplementedError
+
+
+
 class Revision(object):
     """A structure holding information about a single revision of a Page."""
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
