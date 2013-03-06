@@ -805,6 +805,14 @@ def NewimagesPageGenerator(step=None, total=None, site=None):
         # entry.title() returns a Page object
         yield entry.title()
 
+def WikidataItemGenerator(gen):
+    """
+    A wrapper generator used to take another generator
+    and yield their relevant Wikidata items
+    """
+    for page in gen:
+        yield pywikibot.ItemPage.fromPage(page)
+
 
 #TODO below
 
