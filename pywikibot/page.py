@@ -2373,7 +2373,9 @@ class QueryPage(WikibasePage):
     """
     def __init__(self, site, title):
         WikibasePage.__init__(self, site, title)
-        raise NotImplementedError
+        self.id = self.title(withNamespace=False).lower()
+        if not self.id.startswith(u'u'):
+            raise ValueError(u"'%s' is not a property page!" % self.title())
 
 
 class Claim(PropertyPage):
