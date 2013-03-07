@@ -565,7 +565,4 @@ class Family(family.WikimediaFamily):
         return self.code2encoding(code),
 
     def shared_data_repository(self, code, transcluded=False):
-        if not transcluded or code in ['en', 'he', 'hu', 'it']:
-            return ('wikidata', 'wikidata')
-        else:
-            return (None, None)
+        return ('wikidata', 'wikidata')
