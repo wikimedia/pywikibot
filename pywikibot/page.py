@@ -2238,7 +2238,8 @@ class WikibasePage(Page):
                 raise pywikibot.data.api.APIError, data['errors']
             self.id = data['entities'].keys()[0]
             self._content = data['entities'][self.id]
-            #aliases
+            self.lastrevid = self._content['lastrevid']
+        #aliases
         self.aliases = {}
         if 'aliases' in self._content:
             for lang in self._content['aliases']:
@@ -2263,7 +2264,10 @@ class WikibasePage(Page):
                 'descriptions':self.descriptions,
                 }
 
-
+    def latestRevision(self):
+        if not hasattr(self, 'lastrevid'):
+            self.get()
+        return self.lastrevid
 
     def save(self, summary, **kwargs):
         """
@@ -2366,6 +2370,7 @@ class PropertyPage(WikibasePage):
         Examples: item, commons media file, StringValue, NumericalValue
         """
         raise NotImplementedError
+
 
 class QueryPage(WikibasePage):
     """
