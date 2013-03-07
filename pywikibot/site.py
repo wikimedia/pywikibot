@@ -3223,6 +3223,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 
 class DataSite (APISite):
 
+    @deprecated("pywikibot.ItemPage")
     def __getattr__(self, attr):
         """Calls to methods get_info, get_sitelinks, get_aliases, get_labels,
         get_descriptions, get_urls
@@ -3248,6 +3249,7 @@ class DataSite (APISite):
     def __repr__(self):
         return 'DataSite("%s", "%s")' % (self.code, self.family.name)
 
+    @deprecated("pywikibot.PropertyPage")
     def _get_propertyitem(self, props, source, **params):
         """generic method to get the data for multiple Wikibase items"""
         wbdata = self.get_item(source, props=props, **params)
@@ -3255,6 +3257,7 @@ class DataSite (APISite):
                "API wbgetentities response lacks %s key" % props
         return wbdata[props]
 
+    @deprecated("pywikibot.WikibasePage")
     def get_item(self, source, **params):
         """get the data for multiple Wikibase items"""
         if type(source) == int or \
