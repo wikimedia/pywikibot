@@ -392,6 +392,48 @@ class BaseSite(object):
                            % locals(),
                           re.IGNORECASE | re.UNICODE | re.DOTALL)
 
+    def sametitle(self, title1, title2):
+        """Return True iff title1 and title2 identify the same wiki page."""
+        # title1 and title2 may be unequal but still identify the same page,
+        # if they use different aliases for the same namespace
+        def valid_namespace(text, number):
+            """Return True iff text is a valid alias for namespace with given number."""
+            for alias in self.namespace(number, all=True):
+                if text.lower() == alias.lower():
+                    return True
+            return False
+        if title1 == title2:
+            return True
+        # determine whether titles contain namespace prefixes
+        if ":" in title1:
+            ns1, name1 = title1.split(":", 1)
+        else:
+            ns1, name1 = 0, title1
+        if ":" in title2:
+            ns2, name2 = title2.split(":", 1)
+        else:
+            ns2, name2 = 0, title2
+        for space in self.namespaces(): # iterate over all valid namespaces
+            if type(ns1) is not int and valid_namespace(ns1, space):
+                ns1 = space
+            if type(ns2) is not int and valid_namespace(ns2, space):
+                ns2 = space
+        if type(ns1) is not int:
+            # no valid namespace prefix found, so the string followed by ":"
+            # must be part of the title
+            name1 = ns1 + ":" + name1
+            ns1 = 0
+        if type(ns2) is not int:
+            name2 = ns2 + ":" + name2
+            ns2 = 0
+        if ns1 != ns2:
+            # pages in different namespaces
+            return False
+        if self.case() == "first-letter":
+            name1 = name1[:1].upper() + name1[1:]
+            name2 = name2[:1].upper() + name2[1:]
+        return name1 == name2
+
     # namespace shortcuts for backwards-compatibility
 
     def special_namespace(self):
@@ -1132,19 +1174,10 @@ class APISite(BaseSite):
                                 titles=title.encode(self.encoding()),
                                 inprop="protection")
         for pageitem in query:
-            if pageitem['title'] != title:
-                if pageitem['title'] in query.normalized \
-                        and query.normalized[pageitem['title']] == title:
-                    # page title was normalized by api
-                    # this should never happen because the Link() constructor
-                    # normalizes the title
-                    pywikibot.log(
-                        u"loadpageinfo: Page title '%s' was normalized to '%s'"
-                          % (title, pageitem['title']))
-                else:
-                    pywikibot.warning(
-                        u"loadpageinfo: Query on %s returned data on '%s'"
-                          % (page, pageitem['title']))
+            if not self.sametitle(pageitem['title'], title):
+                pywikibot.warning(
+                    u"loadpageinfo: Query on %s returned data on '%s'"
+                      % (page, pageitem['title']))
                 continue
             api.update_page(page, pageitem)
 
@@ -1165,7 +1198,7 @@ class APISite(BaseSite):
                                         "metadata", "archivename"],
                                 **args)
         for pageitem in query:
-            if pageitem['title'] != title:
+            if not self.sametitle(pageitem['title'], title):
                 raise Error(
                     u"loadimageinfo: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
@@ -1236,7 +1269,7 @@ class APISite(BaseSite):
             raise pywikibot.CircularRedirect(redirmap[title])
         pagedata = result['query']['pages'].values()[0]
             # there should be only one value in 'pages', and it is the target
-        if pagedata['title'] == target_title:
+        if self.sametitle(pagedata['title'], target_title):
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
             api.update_page(target, pagedata)
             page._redirtarget = target
@@ -1288,10 +1321,21 @@ class APISite(BaseSite):
                 pywikibot.debug(u"Preloading %s" % pagedata, _logger)
                 try:
                     if pagedata['title'] not in cache:
-                        pywikibot.warning(
-                        u"preloadpages: Query returned unexpected title '%s'"
-                             % pagedata['title'])
-                        continue
+#                       API always returns a "normalized" title which is
+#                       usually the same as the canonical form returned by
+#                       page.title(), but sometimes not (e.g.,
+#                       gender-specific localizations of "User" namespace).
+#                       This checks to see if there is a normalized title in
+#                       the response that corresponds to the canonical form
+#                       used in the query.
+                        if pagedata['title'] in rvgen.normalized \
+                                and rvgen.normalized[pagedata['title']] in cache:
+                            cache[pagedata['title']] = cache[rvgen.normalized[pagedata['title']]]
+                        else:
+                            pywikibot.warning(
+                                u"preloadpages: Query returned unexpected title '%s'"
+                                     % pagedata['title'])
+                            continue
                 except KeyError:
                     pywikibot.debug(u"No 'title' in %s" % pagedata, _logger)
                     pywikibot.debug(u"pageids=%s" % pageids, _logger)
@@ -1314,7 +1358,7 @@ class APISite(BaseSite):
                                       intoken=tokentype,
                                       site=self)
         for item in query:
-            if item['title'] != page.title(withSection=False):
+            if not self.sametitle(item['title'], page.title(withSection=False)):
                 raise Error(
                     u"token: Query on page %s returned data on page [[%s]]"
                      % (page.title(withSection=False, asLink=True),
@@ -1705,21 +1749,11 @@ class APISite(BaseSite):
         rvgen.continuekey = "revisions"
         for pagedata in rvgen:
             if page is not None:
-                if pagedata['title'] != page.title(withSection=False):
-                    ok = False
-                    namespace = page.namespace()
-                    # gender settings ?
-                    if namespace in [2, 3]:
-                        ns, title = pagedata['title'].split(':', 1)
-                        if ns in page.site.namespace(namespace, all=True) and \
-                           title == page.title(withSection=False,
-                                               withNamespace=False):
-                       
-                            ok = True
-                    if not ok:
-                        raise Error(
-                            u"loadrevisions: Query on %s returned data on '%s'"
-                            % (page, pagedata['title']))
+                if not self.sametitle(pagedata['title'],
+                                      page.title(withSection=False)):
+                    raise Error(
+                        u"loadrevisions: Query on %s returned data on '%s'"
+                        % (page, pagedata['title']))
                 if "missing" in pagedata:
                     raise NoPage(page)
             else:
@@ -1739,7 +1773,7 @@ class APISite(BaseSite):
                                   titles=lltitle.encode(self.encoding()),
                                   step=step, total=total)
         for pageitem in llquery:
-            if pageitem['title'] != lltitle:
+            if not self.sametitle(pageitem['title'], lltitle):
                 raise Error(
                     u"getlanglinks: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
@@ -1757,7 +1791,7 @@ class APISite(BaseSite):
                                   titles=eltitle.encode(self.encoding()),
                                   step=step, total=total)
         for pageitem in elquery:
-            if pageitem['title'] != eltitle:
+            if not self.sametitle(pageitem['title'], eltitle):
                 raise RuntimeError(
                     "getlanglinks: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
@@ -1773,7 +1807,7 @@ class APISite(BaseSite):
                                   type_arg="categoryinfo",
                                   titles=cititle.encode(self.encoding()))
         for pageitem in ciquery:
-            if pageitem['title'] != cititle:
+            if not self.sametitle(pageitem['title'], cititle):
                 raise Error(
                     u"categoryinfo: Query on %s returned data on '%s'"
                     % (category, pageitem['title']))
@@ -2591,7 +2625,7 @@ u"editpage: received '%s' even though bot is logged in" % err.code,
                         req['captchaword'] = input(captcha["question"])
                         continue
                     elif "url" in captcha:
-                        webbrowser.open(url)
+                        webbrowser.open(captcha["url"])
                         req['captchaword'] = cap_answerwikipedia.input(
 "Please view CAPTCHA in your browser, then type answer here:")
                         continue
@@ -3352,3 +3386,5 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 f = open(fn)
                 self._cookies[index] = '; '.join([x.strip() for x in f.readlines()])
                 f.close()
+
+    
