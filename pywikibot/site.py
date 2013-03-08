@@ -3223,7 +3223,6 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 
 class DataSite (APISite):
 
-    @deprecated("pywikibot.ItemPage")
     def __getattr__(self, attr):
         """Calls to methods get_info, get_sitelinks, get_aliases, get_labels,
         get_descriptions, get_urls
