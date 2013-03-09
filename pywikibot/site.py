@@ -3312,6 +3312,27 @@ class DataSite (APISite):
             # not implemented yet
             raise NotImplementedError
 
+    def loadcontent(self, identification, *props):
+        """
+        This is called loadcontent since
+        wbgetentities does not support fetching old
+        revisions. Eventually this will get replaced by
+        an actual loadrevisions.
+        @param identification Parameters used to identify the page(s)
+        @type identification dict
+        @param props the optional properties to fetch.
+        """
+        params = dict(**identification)
+        params['action'] = 'wbgetentities'
+        if props:
+            params['props'] = '|'.join(props)
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        if not 'success' in data:
+            raise pywikibot.data.api.APIError, data['errors']
+        return data['entities']
+
+
     # deprecated BaseSite methods
     def fam(self):
         raise NotImplementedError

@@ -2227,17 +2227,9 @@ class WikibasePage(Page):
         args can be used to specify custom props.
         """
         if force or not hasattr(self, '_content'):
-            params = dict(**self.__defined_by())
-            params['action'] = 'wbgetentities'
-            if args:
-                params['props'] = '|'.join(args)
-                #print params
-            req = pywikibot.data.api.Request(site=self.repo, **params)
-            data = req.submit()
-            if not 'success' in data:
-                raise pywikibot.data.api.APIError, data['errors']
-            self.id = data['entities'].keys()[0]
-            self._content = data['entities'][self.id]
+            data = self.repo.loadcontent(self.__defined_by(), *args)
+            self.id = data.keys()[0]
+            self._content = data[self.id]
             self.lastrevid = self._content['lastrevid']
         #aliases
         self.aliases = {}
