@@ -2230,7 +2230,10 @@ class WikibasePage(Page):
             data = self.repo.loadcontent(self.__defined_by(), *args)
             self.id = data.keys()[0]
             self._content = data[self.id]
-            self.lastrevid = self._content['lastrevid']
+            if 'lastrevid' in self._content:
+                self.lastrevid = self._content['lastrevid']
+            else:
+                raise pywikibot.NoPage
         #aliases
         self.aliases = {}
         if 'aliases' in self._content:
