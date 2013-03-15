@@ -2382,12 +2382,13 @@ class Claim(PropertyPage):
     """
     Claims are standard claims as well as references.
     """
-    def __init__(self, site, pid, snak=None, isReference=False):
+    def __init__(self, site, pid, snak=None, hash=None, isReference=False):
         """
         Defined by the "snak" value, supplemented by site + pid
         """
-        PropertyPage.__init__(self, site, 'Property:'+pid)
+        PropertyPage.__init__(self, site, 'Property:' + pid)
         self.snak = snak
+        self.hash = hash
         self.isReference = isReference
         self.sources = []
         self.target = None
@@ -2410,17 +2411,21 @@ class Claim(PropertyPage):
             claim.target = data['mainsnak']['datavalue']['value']
         if 'references' in data:
             for source in data['references']:
-                claim.sources.append(Claim.referenceFromJSON(site, source['snaks'].values()[0][0]))
+                claim.sources.append(Claim.referenceFromJSON(site, source))
         return claim
 
     @staticmethod
     def referenceFromJSON(site, data):
         """
-        This is a simple hack since reference objects
-        aren't wrapped in a mainsnak object.
+        Reference objects are represented a
+        bit differently, and require some
+        more handling.
         """
-        wrap = {'mainsnak': data}
-        return Claim.fromJSON(site, wrap)
+        mainsnak = data['snaks'].values()[0][0]
+        wrap = {'mainsnak': mainsnak}
+        c = Claim.fromJSON(site, wrap)
+        c.hash = data['hash']
+        return c
 
     def set_target(self, value):
         """
