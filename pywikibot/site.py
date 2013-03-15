@@ -1328,9 +1328,10 @@ class APISite(BaseSite):
 #                       This checks to see if there is a normalized title in
 #                       the response that corresponds to the canonical form
 #                       used in the query.
-                        if pagedata['title'] in rvgen.normalized \
-                                and rvgen.normalized[pagedata['title']] in cache:
-                            cache[pagedata['title']] = cache[rvgen.normalized[pagedata['title']]]
+                        for key in cache:
+                            if self.sametitle(key, pagedata['title']):
+                                cache[pagedata['title']] = cache[key]
+                                break
                         else:
                             pywikibot.warning(
                                 u"preloadpages: Query returned unexpected title '%s'"
