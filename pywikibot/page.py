@@ -2193,6 +2193,7 @@ class WikibasePage(Page):
         Page.__init__(self, site, title)
         if isinstance(self.site, pywikibot.site.DataSite):
             self.repo = self.site
+            self.id = title.lower()
         else:
             self.repo = self.site.data_repository()
 
@@ -2258,6 +2259,19 @@ class WikibasePage(Page):
                 'labels':self.labels,
                 'descriptions':self.descriptions,
                 }
+
+    def getID(self, numeric=False, force=False):
+        """
+        @param numeric Strip the first letter and return an int
+        @type numeric bool
+        @param force Force an update of new data
+        @type force bool
+        """
+        if not hasattr(self, 'id') or force:
+            self.get(force=force)
+        if numeric:
+            return int(self.id[1:])
+        return self.id
 
     def latestRevision(self):
         if not hasattr(self, 'lastrevid'):
@@ -2331,7 +2345,7 @@ class ItemPage(WikibasePage):
                 'claims': self.claims
         }
 
-    def get_sitelink(self, site, force=False):
+    def getSitelink(self, site, force=False):
         """
         Returns a page object for the specific site
         site is a pywikibot.Site
@@ -2346,6 +2360,16 @@ class ItemPage(WikibasePage):
         else:
             return self.sitelinks[dbname]
 
+    def addClaim(self, claim, bot=True):
+        """
+        Adds the claim to the item
+        @param claim The claim to add
+        @type claim Claim
+        @param bot Whether to flag as bot (if possible)
+        @type bot bool
+        """
+        self.repo.addClaim(self, claim, bot=bot)
+
 
 class PropertyPage(WikibasePage):
     """
@@ -2359,12 +2383,21 @@ class PropertyPage(WikibasePage):
         if not self.id.startswith(u'p'):
             raise ValueError(u"'%s' is not a property page!" % self.title())
 
-    def get_type(self):
+    def get(self, force=False, *args):
+        if force or not hasattr(self, '_content'):
+            WikibasePage.get(self, force=force, *args)
+        self.type = self._content['datatype']
+
+    def getType(self):
         """
         Returns the type that this item uses
         Examples: item, commons media file, StringValue, NumericalValue
         """
-        raise NotImplementedError
+        if not hasattr(self, 'type'):
+            self.get()
+        if self.type == 'wikibase-entityid':
+            self.type = 'wikibase-item'
+        return self.type
 
 
 class QueryPage(WikibasePage):
@@ -2404,7 +2437,8 @@ class Claim(PropertyPage):
             claim.snak = data['id']
         else:
             claim.isReference = True
-        if data['mainsnak']['datavalue']['type'] == 'wikibase-entityid':
+        claim.type = data['mainsnak']['datavalue']['type']
+        if claim.type == 'wikibase-entityid':
             claim.target = ItemPage(site, 'Q' +
                                           str(data['mainsnak']['datavalue']['value']['numeric-id']))
         else:
@@ -2427,27 +2461,27 @@ class Claim(PropertyPage):
         c.hash = data['hash']
         return c
 
-    def set_target(self, value):
+    def setTarget(self, value):
         """
         Sets the target to the passed value.
         There should be checks to ensure type compliance
         """
         self.target = value
 
-    def get_target(self):
+    def getTarget(self):
         """
         Returns object that the property is associated with.
         None is returned if no target is set
         """
         return self.target
 
-    def get_sources(self):
+    def getSources(self):
         """
         Returns a list of Claims
         """
         return self.sources
 
-    def add_source(self, source):
+    def addSource(self, source):
         """
         source is a Claim.
         adds it as a reference.

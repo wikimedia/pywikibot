@@ -29,6 +29,7 @@ import sys
 import threading
 import time
 import urllib
+import json
 
 _logger = "wiki.site"
 
@@ -3332,6 +3333,35 @@ class DataSite (APISite):
         if not 'success' in data:
             raise pywikibot.data.api.APIError, data['errors']
         return data['entities']
+
+    def addClaim(self, item, claim, bot=True):
+
+        params = dict(action='wbcreateclaim',
+                      entity=item.getID(),
+                      baserevid=item.latestRevision(),
+                      snaktype='value',
+                      property=claim.getID()
+        )
+        if bot:
+            params['bot'] = 1
+        if claim.getType() == 'wikibase-item':
+            params['value'] = json.dumps({'entity-type': 'item',
+                                          'numeric-id': claim.getTarget().getID(numeric=True)})
+        elif claim.getType() == 'string':
+            params['value'] = '"' + claim.getTarget() + '"'
+        else:
+            raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
+        params['token'] = self.token(item, 'edit')
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        claim.snak = data['claim']['id']
+        #Update the item
+        if claim.getID() in item.claims:
+            item.claims[claim.getID()].append(claim)
+        else:
+            item.claims[claim.getID()] = [claim]
+        item.lastrevid = data['pageinfo']['lastrevid']
+
 
 
     # deprecated BaseSite methods
