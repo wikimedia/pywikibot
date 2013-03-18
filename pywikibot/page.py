@@ -2352,7 +2352,6 @@ class WikibasePage(Page):
         self.editEntity(data, **kwargs)
 
 
-
 class ItemPage(WikibasePage):
     def __init__(self, site, title=None):
         """
@@ -2520,7 +2519,7 @@ class QueryPage(WikibasePage):
         WikibasePage.__init__(self, site, title)
         self.id = self.title(withNamespace=False).lower()
         if not self.id.startswith(u'u'):
-            raise ValueError(u"'%s' is not a property page!" % self.title())
+            raise ValueError(u"'%s' is not a query page!" % self.title())
 
 
 class Claim(PropertyPage):
