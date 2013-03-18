@@ -3334,6 +3334,20 @@ class DataSite (APISite):
             raise pywikibot.data.api.APIError, data['errors']
         return data['entities']
 
+    def editEntity(self, identification, data, **kwargs):
+        params = dict(**identification)
+        params['action'] = 'wbeditentity'
+        if 'baserevid' in kwargs and kwargs['baserevid']:
+            params['baserevid'] = kwargs['baserevid']
+        params['token'] = self.token(pywikibot.Page(self, u'Main Page'), 'edit')  # Use a dummy page
+        for arg in kwargs:
+            if arg in ['bot', 'clear', 'data', 'exclude', 'summary']:
+                params[arg] = kwargs[arg]
+        params['data'] = json.dumps(data)
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        return data
+
     def addClaim(self, item, claim, bot=True):
 
         params = dict(action='wbcreateclaim',
