@@ -414,7 +414,6 @@ class Family(object):
             'seattlewiki':      'seattlewiki',
             'seattlewireless':  'seattlewireless',
             'senseislibrary':   'senseislibrary',
-            'shakti':           'shakti',
             'silcode':          'silcode',
             'slashdot':         'slashdot',
             'slwiki':           'slwiki',
@@ -935,7 +934,7 @@ class WikimediaFamily(Family):
         """Return Wikimedia projects version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.21wmf10'
+        return '1.21wmf11'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
