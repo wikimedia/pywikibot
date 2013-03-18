@@ -122,7 +122,11 @@ class Request(object, DictMixin):
         self.write = self.params["action"] in (
                         "edit", "move", "rollback", "delete", "undelete",
                         "protect", "block", "unblock", "watch", "patrol",
-                        "import", "userrights", "upload"
+                        "import", "userrights", "upload", "wbeditentity",
+                        "wbsetlabel", "wbsetdescription", "wbsetaliases",
+                        "wblinktitles", "wbsetsitelink", "wbcreateclaim",
+                        "wbremoveclaims", "wbsetclaimvalue", "wbsetreference",
+                        "wbremovereferences"
                     )
         if self.params["action"] == "edit":
             pywikibot.debug(u"Adding user assertion", _logger)
