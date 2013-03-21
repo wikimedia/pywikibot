@@ -2194,7 +2194,7 @@ class WikibasePage(Page):
         Page.__init__(self, site, title)
         if isinstance(self.site, pywikibot.site.DataSite):
             self.repo = self.site
-            self.id = title.lower()
+            self.id = self.title(withNamespace=False).lower()
         else:
             self.repo = self.site.data_repository()
 
@@ -2222,6 +2222,16 @@ class WikibasePage(Page):
             raise pywikibot.exceptions.BadTitle
         return params
 
+    def exists(self):
+        if not hasattr(self, '_content'):
+            try:
+                self.get()
+                return True
+            except pywikibot.NoPage:
+                return False
+        return 'lastrevid' in self._content
+
+
     def get(self, force=False, *args):
         """
         Fetches all page data, and caches it
@@ -2232,10 +2242,10 @@ class WikibasePage(Page):
             data = self.repo.loadcontent(self.__defined_by(), *args)
             self.id = data.keys()[0]
             self._content = data[self.id]
-            if 'lastrevid' in self._content:
-                self.lastrevid = self._content['lastrevid']
-            else:
-                raise pywikibot.NoPage
+        if 'lastrevid' in self._content:
+            self.lastrevid = self._content['lastrevid']
+        else:
+            raise pywikibot.NoPage(self)
         #aliases
         self.aliases = {}
         if 'aliases' in self._content:
@@ -2424,7 +2434,7 @@ class ItemPage(WikibasePage):
             self.get(force=force)
         dbname = self.__getdbName(site)
         if not dbname in self.sitelinks:
-            raise pywikibot.NoPage
+            raise pywikibot.NoPage(self)
         else:
             return self.sitelinks[dbname]
 
