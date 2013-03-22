@@ -2231,7 +2231,6 @@ class WikibasePage(Page):
                 return False
         return 'lastrevid' in self._content
 
-
     def get(self, force=False, *args):
         """
         Fetches all page data, and caches it
@@ -2422,7 +2421,6 @@ class ItemPage(WikibasePage):
                 'claims': self.claims
         }
 
-
     def getSitelink(self, site, force=False):
         """
         Returns a page object for the specific site
@@ -2451,6 +2449,7 @@ class ItemPage(WikibasePage):
         or it can be a dbName.
         """
         self.removeSitelinks([site], **kwargs)
+
     def removeSitelinks(self, sites, **kwargs):
         """
         Sites should be a list, with values either
@@ -2589,6 +2588,18 @@ class Claim(PropertyPage):
         """
         self.target = value
 
+    def changeTarget(self, value=None, snaktype='value', **kwargs):
+        """
+        This actually saves the new target.
+        """
+        if value:
+            self.target = value
+
+        data = self.repo.changeClaimTarget(self, snaktype=snaktype,
+                                           **kwargs)
+        #TODO: Re-create the entire item from JSON, not just id
+        self.snak = data['claim']['id']
+
     def getTarget(self):
         """
         Returns object that the property is associated with.
@@ -2608,7 +2619,6 @@ class Claim(PropertyPage):
         adds it as a reference.
         """
         raise NotImplementedError
-
 
 
 class Revision(object):
