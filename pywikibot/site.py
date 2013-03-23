@@ -3409,6 +3409,52 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
+    def editSource(self, claim, source, new=False, **kwargs):
+        """
+        Create/Edit a source.
+        @param claim A Claim object to add the source to
+        @type claim pywikibot.Claim
+        @param source A Claim object to be used as a source
+        @type source pywikibot.Claim
+        @param new Whether to create a new one if the "source" already exists
+        @type new bool
+        """
+        if claim.isReference:
+            raise ValueError("The claim cannot be a reference.")
+        params = dict(action='wbsetreference',
+                      statement=claim.snak,
+                      )
+        params['token'] = self.token(claim, 'edit')
+        if not new and hasattr(source, 'hash'):
+            params['reference'] = source.hash
+        #build up the snak
+        if source.getType() == 'wikibase-item':
+            datavalue = {'type': 'wikibase-entityid',
+                         'value': {'entity-type': 'item',
+                                   'numeric-id': source.getTarget().getID(numeric=True),
+                                   },
+                         }
+        elif source.getType() == 'string':
+            datavalue = {'type': 'string',
+                         'value': source.getTarget(),
+                         }
+        else:
+            raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
+        snak = {source.getID(): [{'snaktype': 'value',
+                                  'property': source.getID(),
+                                  'datavalue': datavalue,
+                                  },
+                                 ],
+                }
+        params['snak'] = json.dumps(snak)
+        for arg in kwargs:
+            if arg in ['bot', 'lastrevid']:
+                params[arg] = kwargs[arg]
+
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        return data
+
 
 
 

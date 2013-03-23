@@ -2613,12 +2613,14 @@ class Claim(PropertyPage):
         """
         return self.sources
 
-    def addSource(self, source):
+    def addSource(self, source, **kwargs):
         """
         source is a Claim.
         adds it as a reference.
         """
-        raise NotImplementedError
+        data = self.repo.editSource(self, source, new=True, **kwargs)
+        source.hash = data['reference']['hash']
+        self.sources.append(source)
 
 
 class Revision(object):
