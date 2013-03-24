@@ -130,7 +130,7 @@ u"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
 
 _sites = {}
 
-@deprecate_arg("persistent_http", None)
+
 def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     """Return the specified Site object.
 
@@ -171,11 +171,11 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     if not key in _sites:
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
         pywikibot.debug(u"Instantiating Site object '%(site)s'"
-                             % {'site': _sites[key]},
-                        _logger)
+                        % {'site': _sites[key]}, _logger)
     return _sites[key]
 
-getSite = Site # alias for backwards-compability
+
+getSite = Site  # alias for backwards-compability
 
 
 from page import Page, ImagePage, Category, Link, User, ItemPage, PropertyPage, Claim
