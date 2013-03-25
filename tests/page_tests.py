@@ -115,7 +115,6 @@ class TestPageObject(unittest.TestCase):
     def testSite(self):
         """Test site() method"""
         self.assertEqual(mainpage.site, site)
-        self.assertEqual(mainpage.encoding(), site.encoding())
 
     def testNamespace(self):
         """Test namespace() method"""
@@ -227,13 +226,14 @@ class TestPageObject(unittest.TestCase):
 
     def testReferences(self):
         count = 0
-        for p in mainpage.getReferences():
+        #Ignore redirects for time considerations
+        for p in mainpage.getReferences(follow_redirects=False):
             count += 1
             self.assertTrue(isinstance(p, pywikibot.Page))
             if count >= 10:
                 break
         count = 0
-        for p in mainpage.backlinks():
+        for p in mainpage.backlinks(followRedirects=False):
             count += 1
             self.assertTrue(isinstance(p, pywikibot.Page))
             if count >= 10:
