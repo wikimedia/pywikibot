@@ -10,13 +10,16 @@ Interface functions to Mediawiki's api.php
 __version__ = '$Id$'
 
 from UserDict import DictMixin
-from datetime import datetime, timedelta
 from pywikibot.comms import http
 from email.mime.multipart import MIMEMultipart
 from email.mime.nonmultipart import MIMENonMultipart
+import datetime
+import hashlib
 import json
 import logging
 import mimetypes
+import os
+import pickle
 import pprint
 import re
 import traceback
@@ -331,7 +334,7 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
                         self.site._userinfo.update(result['query']['userinfo'])
                     else:
                         self.site._userinfo = result['query']['userinfo']
-                status = self.site._loginstatus # save previous login status
+                status = self.site._loginstatus  # save previous login status
                 if ( ("error" in result
                             and result["error"]["code"].endswith("limit"))
                       or (status >= 0
@@ -385,15 +388,11 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
         if self.max_retries < 0:
             raise TimeoutError("Maximum retries attempted without success.")
         pywikibot.warning(u"Waiting %s seconds before retrying."
-                            % self.retry_wait)
+                          % self.retry_wait)
         time.sleep(self.retry_wait)
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
 
-import datetime
-import hashlib
-import pickle
-import os
 
 class CachedRequest(Request):
     def __init__(self, expiry, *args, **kwargs):
@@ -868,8 +867,8 @@ class LoginManager(login.LoginManager):
 
         """
         if hasattr(self, '_waituntil'):
-            if datetime.now() < self._waituntil:
-                diff = self._waituntil - datetime.now()
+            if datetime.datetime.now() < self._waituntil:
+                diff = self._waituntil - datetime.datetime.now()
                 pywikibot.warning(u"Too many tries, waiting %s seconds before retrying."
                                     % diff.seconds)
                 time.sleep(diff.seconds)
@@ -897,8 +896,8 @@ class LoginManager(login.LoginManager):
                 login_request["lgtoken"] = token
                 continue
             elif login_result['login']['result'] == "Throttled":
-                self._waituntil = datetime.now() \
-                                  + timedelta(seconds=int(
+                self._waituntil = datetime.datetime.now() \
+                                  + datetime.timedelta(seconds=int(
                                                 login_result["login"]["wait"])
                                               )
                 break
