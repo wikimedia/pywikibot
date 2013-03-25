@@ -693,8 +693,7 @@ u"%s: stopped iteration because 'query' not found in api response."
                 for item in resultdata:
                     yield self.result(item)
                     count += 1
-                    if self.limit is not None and self.limit > 0 \
-                                              and count >= self.limit:
+                    if self.limit > 0 and count >= self.limit:
                         return
             if not "query-continue" in self.data:
                 return
