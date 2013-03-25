@@ -584,8 +584,7 @@ class QueryGenerator(object):
             for param in self._modules[mod].get("parameters", []):
                 if param["name"] == "limit":
                     if (self.site.logged_in()
-                            and "apihighlimits" in
-                                self.site.getuserinfo()["rights"]):
+                        and self.site.has_right('apihighlimits')):
                         self.api_limit = int(param["highmax"])
                     else:
                         self.api_limit = int(param["max"])
