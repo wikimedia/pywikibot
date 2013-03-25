@@ -127,20 +127,7 @@ class Family(family.WikimediaFamily):
             # ([[MediaWiki:Disambiguationspage]])
             # first char must be in uppercase
             '_default': [u'Disambig'],  # for default MediaWiki message only
-            'frp': [u'Homonimos', u'Disambig'],
-            'fur': [u'Disambiguazion', u'Disambig'],
-            'gd':  [u'Soilleireachadh'],
             'haw': [u'Huaʻōlelo puana like'],
-            'hr':  [u'Preusmjerenje u razdvojbu', u'Razdvojba', u'Razdvojba1',
-                    u'Nova razdvojba'],
-            'hy':  [u'Երկիմաստ', u'Բազմիմաստություն', u'Բազմանշանակ',
-                    u'Disambig'],
-            'kg':  [u'Bisongidila'],
-            'krc': [u'Кёб магъаналы', u'Disambig'],
-            'li':  [u'Verdudeliking', u'Verdudelikingpazjena', u'Vp'],
-            'lmo': [u'Desambiguació', u'Dezambiguasiú', u'Desambiguazion',
-                    u'Desambiguassiú', u'Desambiguació'],
-            'mn':  [u'Салаа утгатай', u'Disambig'],
             'no':  [u'Peker', u'Etternavn', u'Disambig',
                     u'Tobokstavsforkortelse', u'Trebokstavsforkortelse',
                     u'Flertydig', u'Pekerside'],
