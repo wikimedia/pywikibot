@@ -126,8 +126,7 @@ class Family(family.WikimediaFamily):
             # If no templates are given, retrieve names from  the live wiki
             # ([[MediaWiki:Disambiguationspage]])
             # first char must be in uppercase
-            '_default': [u'Disambig'], # for default MediaWiki message only
-            'cdo': [u'Gì-ngiê', u'Disambig'],
+            '_default': [u'Disambig'],  # for default MediaWiki message only
             'frp': [u'Homonimos', u'Disambig'],
             'fur': [u'Disambiguazion', u'Disambig'],
             'gd':  [u'Soilleireachadh'],
@@ -142,8 +141,6 @@ class Family(family.WikimediaFamily):
             'lmo': [u'Desambiguació', u'Dezambiguasiú', u'Desambiguazion',
                     u'Desambiguassiú', u'Desambiguació'],
             'mn':  [u'Салаа утгатай', u'Disambig'],
-            'nn':  [u'Fleirtyding', u'Tobokstavforkorting', u'Pekerside',
-                    u'Peikar', u'Disambig'],
             'no':  [u'Peker', u'Etternavn', u'Disambig',
                     u'Tobokstavsforkortelse', u'Trebokstavsforkortelse',
                     u'Flertydig', u'Pekerside'],
@@ -162,8 +159,7 @@ class Family(family.WikimediaFamily):
             'wo':  [u'Bokktekki'],
             'yi':  [u'באדייטען'],
             'zea': [u'Dp', u'Deurverwiespagina'],
-            'zh-classical':  [u'Disambig', u'釋義', u'消歧義'],
-            'zh-yue': [u'搞清楚', u'Disambig'],
+            'zh-classical':  [u'釋義', u'消歧義', u'Disambig'],
         }
 
         self.disambcatname = {
@@ -242,7 +238,7 @@ class Family(family.WikimediaFamily):
             'zea': u'Wikipedia:Deurverwiespagina',
             'zh':  u'消歧义',
             'zh-min-nan': u'Khu-pia̍t-ia̍h',
-            }
+        }
 
         # families that redirect their interlanguage links here.
         self.interwiki_forwarded_from = [
@@ -286,7 +282,7 @@ class Family(family.WikimediaFamily):
 
         # On most Wikipedias page names must start with a capital letter,
         # but some languages don't use this.
-        self.nocapitalize = ['jbo',]
+        self.nocapitalize = ['jbo']
 
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
@@ -356,36 +352,36 @@ class Family(family.WikimediaFamily):
         }
 
         self.obsolete = {
-            'aa': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikipedia
-            'cho': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Choctaw_Wikipedia
+            'aa': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikipedia
+            'cho': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Choctaw_Wikipedia
             'dk': 'da',
-            'ho': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hiri_Motu_Wikipedia
-            'hz': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Herero_Wikipedia
-            'ii': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yi_Wikipedia
-            'kj': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kwanyama_Wikipedia
-            'kr': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikipedia
-            'mh': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wikipedia
+            'ho': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hiri_Motu_Wikipedia
+            'hz': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Herero_Wikipedia
+            'ii': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yi_Wikipedia
+            'kj': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kwanyama_Wikipedia
+            'kr': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikipedia
+            'mh': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wikipedia
             'minnan': 'zh-min-nan',
-            'mo': 'ro', # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
-            'mus': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia
+            'mo': 'ro',  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
+            'mus': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia
             'nan': 'zh-min-nan',
-            'nl_nds': 'nl-nds', # miss-spelling
+            'nl_nds': 'nl-nds',  # miss-spelling
             'nb': 'no',
-            'ng': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Ndonga_Wikipedia
+            'ng': None,  # (not reachable) http://meta.wikimedia.org/wiki/Inactive_wikis
             'jp': 'ja',
-            'ru-sib': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Siberian_Wikipedia
-            'tlh': None, # https://meta.wikimedia.org/wiki/History_of_the_Klingon_Wikipedia
-            'tokipona': None, # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tokipona_Wikipedia
+            'ru-sib': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Siberian_Wikipedia
+            'tlh': None,
+            'tokipona': None,
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }
 
         # Languages that used to be coded in iso-8859-1
-        self.latin1old = ['de', 'en', 'et', 'es', 'ia', 'la', 'af', 'cs',
-                    'fr', 'pt', 'sl', 'bs', 'fy', 'vi', 'lt', 'fi', 'it',
-                    'no', 'simple', 'gl', 'eu', 'nds', 'co', 'mi', 'mr',
-                    'id', 'lv', 'sw', 'tt', 'uk', 'vo', 'ga', 'na', 'es',
-                    'nl', 'da', 'dk', 'sv', 'test']
+        self.latin1old = [
+            'de', 'en', 'et', 'es', 'ia', 'la', 'af', 'cs', 'fr', 'pt', 'sl',
+            'bs', 'fy', 'vi', 'lt', 'fi', 'it', 'no', 'simple', 'gl', 'eu',
+            'nds', 'co', 'mi', 'mr', 'id', 'lv', 'sw', 'tt', 'uk', 'vo', 'ga',
+            'na', 'es', 'nl', 'da', 'dk', 'sv', 'test']
 
         self.crossnamespace[0] = {
             '_default': {
@@ -547,7 +543,8 @@ class Family(family.WikimediaFamily):
         # prefix for 'wikisource'.
         if site.language() == 'sv':
             d = self.known_families.copy()
-            d.pop('s') ; d['src'] = 'wikisource'
+            d.pop('s')
+            d['src'] = 'wikisource'
             return d
         else:
             return self.known_families
