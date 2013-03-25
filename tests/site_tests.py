@@ -45,7 +45,7 @@ class TestSiteObject(unittest.TestCase):
         self.assertEqual(mysite.family.name, self.family)
         self.assertEqual(mysite.code, self.code)
         self.assertType(mysite.lang, basestring)
-        self.assertType(mysite == pywikibot.Site("en", "wikipedia"), bool)
+        self.assertEqual(mysite, pywikibot.Site("en", "wikipedia"))
         self.assertType(mysite.user(), (basestring, type(None)))
         self.assertEqual(mysite.sitename(),
                          "%s:%s" % (self.family,
@@ -74,7 +74,7 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(mysite.code in langs)
         obs = mysite.family.obsolete
         ipf = mysite.interwiki_putfirst()
-        if ipf: #Not all languages use this
+        if ipf:  # Not all languages use this
             self.assertType(ipf, list)
         
         for item in mysite.validLanguageLinks():

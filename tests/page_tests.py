@@ -14,7 +14,7 @@ import unittest
 import pywikibot
 import pywikibot.page
 
-site = pywikibot.Site('en')
+site = pywikibot.Site('en', 'wikipedia')
 mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
 maintalk = pywikibot.Page(pywikibot.page.Link("Talk:Main Page", site))
 badpage = pywikibot.Page(pywikibot.page.Link("There is no page with this title",
@@ -267,6 +267,21 @@ class TestPageObject(unittest.TestCase):
             self.assertTrue(isinstance(p, pywikibot.Category))
         for p in mainpage.extlinks():
             self.assertTrue(isinstance(p, unicode))
+
+    def testWikibase(self):
+        if not site.has_transcluded_data:
+            return
+        repo = site.data_repository()
+        item = pywikibot.ItemPage.fromPage(mainpage)
+        self.assertTrue(item.getID(), 'q5296')
+        self.assertTrue('en' in item.labels)
+        self.assertEqual(item.labels['en'], 'Main Page')
+        self.assertTrue('en' in item.aliases)
+        self.assertTrue('HomePage' in item.aliases['en'])
+        prop = pywikibot.PropertyPage(repo, 'Property:P21')
+        self.assertEqual(prop.getType(), 'wikibase-item')
+
+
 
 # methods that still need tests implemented or expanded:
 
