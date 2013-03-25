@@ -3441,7 +3441,7 @@ class DataSite (APISite):
                                   },
                                  ],
                 }
-        params['snak'] = json.dumps(snak)
+        params['snaks'] = json.dumps(snak)
         for arg in kwargs:
             if arg in ['bot', 'lastrevid']:
                 params[arg] = kwargs[arg]
