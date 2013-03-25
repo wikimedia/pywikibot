@@ -74,7 +74,8 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(mysite.code in langs)
         obs = mysite.family.obsolete
         ipf = mysite.interwiki_putfirst()
-        self.assertType(ipf, list)
+        if ipf: #Not all languages use this
+            self.assertType(ipf, list)
         
         for item in mysite.validLanguageLinks():
             self.assertTrue(item in langs, item)
@@ -663,10 +664,12 @@ class TestSiteObject(unittest.TestCase):
             self.assertTrue("redirect" not in change)
         for change in mysite.recentchanges(showPatrolled=True, total=5):
             self.assertType(change, dict)
-            self.assertTrue("patrolled" in change)
+            if mysite.has_right('patrol'):
+                self.assertTrue("patrolled" in change)
         for change in mysite.recentchanges(showPatrolled=False, total=5):
             self.assertType(change, dict)
-            self.assertTrue("patrolled" not in change)
+            if mysite.has_right('patrol'):
+                self.assertTrue("patrolled" not in change)
 
     def testSearch(self):
         """Test the site.search() method"""
