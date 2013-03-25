@@ -11,6 +11,9 @@ __version__ = '$Id$'
 
 from UserDict import DictMixin
 from datetime import datetime, timedelta
+from pywikibot.comms import http
+from email.mime.multipart import MIMEMultipart
+from email.mime.nonmultipart import MIMENonMultipart
 import json
 import logging
 import mimetypes
@@ -37,8 +40,10 @@ class APIError(pywikibot.Error):
         self.info = info
         self.other = kwargs
         self.unicode = unicode(self.__str__())
+
     def __repr__(self):
         return 'APIError("%(code)s", "%(info)s", %(other)s)' % self.__dict__
+
     def __str__(self):
         return "%(code)s: %(info)s" % self.__dict__
 
@@ -130,7 +135,7 @@ class Request(object, DictMixin):
                     )
         if self.params["action"] == "edit":
             pywikibot.debug(u"Adding user assertion", _logger)
-            self.params["assert"] = "user" # make sure user is logged in
+            self.params["assert"] = "user"  # make sure user is logged in
 
     # implement dict interface
     def __getitem__(self, key):
@@ -177,7 +182,7 @@ class Request(object, DictMixin):
             if "properties" in self.params:
                 if "info" in self.params["properties"]:
                     inprop = self.params.get("inprop", [])
-                    info = set(info + ["protection", "talkid", "subjectid"])
+                    info = set(inprop + ["protection", "talkid", "subjectid"])
                     self.params["info"] = list(info)
         if "maxlag" not in self.params and config.maxlag:
             self.params["maxlag"] = [str(config.maxlag)]
@@ -217,10 +222,6 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
         @return:  The data retrieved from api.php (a dict)
 
         """
-        from pywikibot.comms import http
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.nonmultipart import MIMENonMultipart
-
         paramstring = self.http_params()
         while True:
             action = self.params.get("action", "")
@@ -229,13 +230,13 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
                 return simulate
             self.site.throttle(write=self.write)
             uri = self.site.scriptpath() + "/api.php"
+            ssl = False
+            if self.site.family.name in config.available_ssl_project:
+                if action == "login" and config.use_SSL_onlogin:
+                    ssl = True
+                elif config.use_SSL_always:
+                    ssl = True
             try:
-                ssl = False
-                if self.site.family.name in config.available_ssl_project:
-                    if action == "login" and config.use_SSL_onlogin:
-                        ssl = True
-                    elif config.use_SSL_always:
-                        ssl = True
                 if self.mime:
                     # construct a MIME message containing all API key/values
                     container = MIMEMultipart(_subtype='form-data')
