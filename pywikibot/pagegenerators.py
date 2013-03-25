@@ -604,11 +604,16 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
     retrieved page will be downloaded.
 
     """
-    # TODO: page generator could be modified to use cmstartsortkey ...
-    for a in category.articles(
-                      recurse=recurse, step=step, total=total, content=content):
-        if start is None or a.title(withNamespace=False) >= start:
-            yield a
+    kwargs = dict(recurse=recurse,
+                  step=step,
+                  total=total,
+                  content=content,
+                  )
+    if start:
+        kwargs['sortby'] = 'sortkey'
+        kwargs['startsort'] = start
+    for a in category.site.categorymembers(category, **kwargs):
+        yield a
 
 
 def SubCategoriesPageGenerator(category, recurse=False, start=None,
