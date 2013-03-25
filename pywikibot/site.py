@@ -10,6 +10,19 @@ on the same topic in different languages).
 #
 __version__ = '$Id$'
 
+try:
+    from hashlib import md5
+except ImportError:
+    from md5 import md5
+import itertools
+import os
+import re
+import sys
+import threading
+import time
+import urllib
+import json
+
 import pywikibot
 from pywikibot import deprecate_arg
 from pywikibot import config
@@ -19,22 +32,12 @@ from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import *
 
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
-import os
-import re
-import sys
-import threading
-import time
-import urllib
-import json
-
 _logger = "wiki.site"
+
 
 class PageInUse(pywikibot.Error):
     """Page cannot be reserved for writing due to existing lock."""
+
 
 class LoginStatus(object):
     """ Enum for Login statuses.
@@ -1417,7 +1420,6 @@ class APISite(BaseSite):
                                                 filterRedirects=filterRedirects,
                                                 namespaces=namespaces,
                                                 content=content)
-            import itertools
             return itertools.chain(*genlist.values())
         return blgen
 
@@ -1459,7 +1461,6 @@ class APISite(BaseSite):
                                       filterRedirects=filterRedirects,
                                       namespaces=namespaces,
                                       step=step, total=total, content=content)
-        import itertools
         return itertools.islice(
                     itertools.chain(
                         self.pagebacklinks(
@@ -2199,9 +2200,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             "recentchanges: start must be later than end with reverse=False")
         rcgen = self._generator(api.ListGenerator, type_arg="recentchanges",
                                 rcprop="user|comment|timestamp|title|ids"
-                                       "|sizes|redirect|loginfo"
-                                       #"|sizes|redirect|patrolled|loginfo" - patrol rights needed
-                                       "|flags",
+                                       "|sizes|redirect|loginfo|flags",
                                 namespaces=namespaces, step=step,
                                 total=total)
         if start is not None:
@@ -2224,8 +2223,11 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         filters = {'minor': showMinor,
                    'bot': showBot,
                    'anon': showAnon,
-                   'redirect': showRedirects,}
-                   #'patrolled': showPatrolled}
+                   'redirect': showRedirects,
+                   }
+        if self.has_right('patrol'):
+            rcgen.request['rcprop'] += '|patrolled'
+            filters['patrolled'] = showPatrolled
         rcshow = []
         for item in filters:
             if filters[item] is not None:
