@@ -1755,7 +1755,7 @@ class APISite(BaseSite):
                 if "missing" in pagedata:
                     raise NoPage(page)
             else:
-                page = Page(self, pagedata['title'])
+                page = pywikibot.Page(self, pagedata['title'])
             api.update_page(page, pagedata)
             break
 
@@ -2888,7 +2888,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
                   letitle=None):
         """Yield ImagePages from most recent uploads"""
         if isinstance(letitle, basestring):
-            letitle = pywikbot.Page(pywikibot.Link(letitle))
+            letitle = pywikibot.Page(pywikibot.Link(letitle))
         return self.logevents(logtype="upload", total=number, start=lestart,
                               end=leend, user=leuser, page=letitle)
 
