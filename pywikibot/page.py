@@ -2197,6 +2197,7 @@ class WikibasePage(Page):
             self.id = self.title(withNamespace=False).lower()
         else:
             self.repo = self.site.data_repository()
+        self._isredir = False  # Wikibase pages cannot be a redirect
 
     def __defined_by(self):
         """
@@ -2586,6 +2587,14 @@ class Claim(PropertyPage):
         Sets the target to the passed value.
         There should be checks to ensure type compliance
         """
+        types = {'wikibase-item': ItemPage,
+                 'string': basestring,
+                 'commonsMedia': ImagePage,
+                 }
+        if self.getType() in types:
+            if not isinstance(value, types[self.getType()]):
+                raise ValueError("%s is not type %s."
+                                 % (value, str(types[self.getType()])))
         self.target = value
 
     def changeTarget(self, value=None, snaktype='value', **kwargs):
@@ -2593,7 +2602,7 @@ class Claim(PropertyPage):
         This actually saves the new target.
         """
         if value:
-            self.target = value
+            self.setTarget(value)
 
         data = self.repo.changeClaimTarget(self, snaktype=snaktype,
                                            **kwargs)
