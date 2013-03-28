@@ -22,12 +22,13 @@ else:
     depend = ['httplib2>=0.6.0']
 
 setup(name='Pywikipediabot',
-      version ='2.0alpha',
-      description ='Python Wikipedia Bot Framework',
-      license = 'MIT',
-      packages = find_packages(),
-      install_requires = depend
-     )
+      version='2.0alpha',
+      description='Python Wikipedia Bot Framework',
+      license='MIT',
+      packages=find_packages(),
+      install_requires=depend,
+      test_suite="tests",
+      )
 
 # automatically launch generate_user_files.py
 
