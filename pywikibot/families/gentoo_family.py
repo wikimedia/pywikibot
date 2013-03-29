@@ -15,7 +15,9 @@ class Family(family.Family):
         family.Family.__init__(self)
         self.name = 'gentoo'
 
-        self.languages_by_size = ['en', 'de', 'es', 'fr', 'cs', 'nl', 'tr', 'ru', 'fi']
+        self.languages_by_size = [
+            'en', 'ru', 'de', 'fr', 'tr', 'es', 'scratch', 'cs', 'nl', 'fi',
+        ]
         for l in self.languages_by_size:
             self.langs[l] = '%s.gentoo-wiki.com' % l
 
