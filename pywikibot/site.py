@@ -3350,18 +3350,19 @@ class DataSite (APISite):
         params = dict(action='wbcreateclaim',
                       entity=item.getID(),
                       baserevid=item.latestRevision(),
-                      snaktype='value',
-                      property=claim.getID()
-        )
+                      snaktype=claim.getSnakType(),
+                      property=claim.getID(),
+                      )
         if bot:
             params['bot'] = 1
-        if claim.getType() == 'wikibase-item':
-            params['value'] = json.dumps({'entity-type': 'item',
-                                          'numeric-id': claim.getTarget().getID(numeric=True)})
-        elif claim.getType() == 'string':
-            params['value'] = '"' + claim.getTarget() + '"'
-        else:
-            raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
+        if claim.getSnakType() == 'value':
+            if claim.getType() == 'wikibase-item':
+                params['value'] = json.dumps({'entity-type': 'item',
+                                              'numeric-id': claim.getTarget().getID(numeric=True)})
+            elif claim.getType() == 'string':
+                params['value'] = '"' + claim.getTarget() + '"'
+            else:
+                raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
         params['token'] = self.token(item, 'edit')
         req = api.Request(site=self, **params)
         data = req.submit()

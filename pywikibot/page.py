@@ -2546,6 +2546,7 @@ class Claim(PropertyPage):
         self.isReference = isReference
         self.sources = []
         self.target = None
+        self.snaktype = 'value'
 
     @staticmethod
     def fromJSON(site, data):
@@ -2558,12 +2559,14 @@ class Claim(PropertyPage):
             claim.snak = data['id']
         else:
             claim.isReference = True
-        claim.type = data['mainsnak']['datavalue']['type']
-        if claim.type == 'wikibase-entityid':
-            claim.target = ItemPage(site, 'Q' +
-                                          str(data['mainsnak']['datavalue']['value']['numeric-id']))
-        else:
-            claim.target = data['mainsnak']['datavalue']['value']
+        claim.snaktype = data['mainsnak']['snaktype']
+        if claim.getSnakType() == 'value':
+            claim.type = data['mainsnak']['datavalue']['type']
+            if claim.type == 'wikibase-entityid':
+                claim.target = ItemPage(site, 'Q' +
+                                              str(data['mainsnak']['datavalue']['value']['numeric-id']))
+            else:
+                claim.target = data['mainsnak']['datavalue']['value']
         if 'references' in data:
             for source in data['references']:
                 claim.sources.append(Claim.referenceFromJSON(site, source))
@@ -2615,6 +2618,28 @@ class Claim(PropertyPage):
         None is returned if no target is set
         """
         return self.target
+
+    def getSnakType(self):
+        """
+        Returns the "snaktype"
+        Can be "value", "somevalue" or "novalue"
+        """
+        return self.snaktype
+
+    def setSnakType(self, value):
+        if value in ['value', 'somevalue', 'novalue']:
+            self.snaktype = value
+        else:
+            raise ValueError("snaktype must be 'value', 'somevalue', or 'novalue'.")
+
+    def changeSnakType(self, value=None, **kwargs):
+        """
+        This actually saves the new snakvalue.
+        TODO: Is this function really needed?
+        """
+        if value:
+            self.setSnakType(value)
+        self.changeTarget(snaktype=self.getSnakType(), **kwargs)
 
     def getSources(self):
         """
