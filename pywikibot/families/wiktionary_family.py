@@ -20,7 +20,7 @@ class Family(family.WikimediaFamily):
             'uz', 'da', 'wa', 'la', 'hy', 'sq', 'sm', 'sl', 'hi', 'nah', 'az',
             'tt', 'pnb', 'ka', 'lv', 'bs', 'lb', 'tk', 'hsb', 'kk', 'sk', 'km',
             'mk', 'be', 'ga', 'wo', 'ms', 'ang', 'ky', 'co', 'nds', 'gn', 'mr',
-            'csb', 'st', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'mn', 'sa',
+            'csb', 'st', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'mn', 'kl', 'sa',
             'jbo', 'an', 'ln', 'zu', 'or', 'gu', 'kw', 'rw', 'gv', 'fo', 'qu',
             'ss', 'ie', 'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa', 'so',
             'am', 'su', 'za', 'gd', 'mi', 'tpi', 'yi', 'ti', 'sg', 'na', 'dv',
