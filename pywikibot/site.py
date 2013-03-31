@@ -3376,9 +3376,9 @@ class DataSite (APISite):
                 params['value'] = json.dumps({'entity-type': 'item',
                                               'numeric-id': claim.getTarget().getID(numeric=True)})
             elif claim.getType() == 'string':
-                params['value'] = '"' + claim.getTarget() + '"'
+                params['value'] = json.dumps(claim.getTarget())
             elif claim.getType() == 'commonsMedia':
-                params['value'] = '"' + claim.getTarget().title(withNamespace=False) + '"'
+                params['value'] = json.dumps(claim.getTarget().title(withNamespace=False))
             else:
                 raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
         params['token'] = self.token(item, 'edit')
@@ -3413,9 +3413,9 @@ class DataSite (APISite):
                 params['value'] = json.dumps({'entity-type': 'item',
                                               'numeric-id': claim.getTarget().getID(numeric=True)})
             elif claim.getType() == 'string':
-                params['value'] = '"' + claim.getTarget() + '"'
+                params['value'] = json.dumps(claim.getTarget())
             elif claim.getType() == 'commonsMedia':
-                params['value'] = '"' + claim.getTarget().title(withNamespace=False) + '"'
+                params['value'] = json.dumps(claim.getTarget().title(withNamespace=False))
             else:
                 raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
 
