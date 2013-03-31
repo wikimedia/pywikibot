@@ -2562,7 +2562,11 @@ class Claim(PropertyPage):
             if claim.getType() == 'wikibase-item':
                 claim.target = ItemPage(site, 'Q' +
                                               str(data['mainsnak']['datavalue']['value']['numeric-id']))
+            elif claim.getType() == 'commonsMedia':
+                claim.target = ImagePage(site.image_repository(), 'File:' +
+                                                                  data['mainsnak']['datavalue']['value'])
             else:
+                #This covers string type
                 claim.target = data['mainsnak']['datavalue']['value']
         if 'references' in data:
             for source in data['references']:

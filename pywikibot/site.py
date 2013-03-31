@@ -3377,6 +3377,8 @@ class DataSite (APISite):
                                               'numeric-id': claim.getTarget().getID(numeric=True)})
             elif claim.getType() == 'string':
                 params['value'] = '"' + claim.getTarget() + '"'
+            elif claim.getType() == 'commonsMedia':
+                params['value'] = '"' + claim.getTarget().title(withNamespace=False) + '"'
             else:
                 raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
         params['token'] = self.token(item, 'edit')
@@ -3412,6 +3414,8 @@ class DataSite (APISite):
                                               'numeric-id': claim.getTarget().getID(numeric=True)})
             elif claim.getType() == 'string':
                 params['value'] = '"' + claim.getTarget() + '"'
+            elif claim.getType() == 'commonsMedia':
+                params['value'] = '"' + claim.getTarget().title(withNamespace=False) + '"'
             else:
                 raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
 
