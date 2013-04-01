@@ -277,9 +277,11 @@ def translate(code, xdict, parameters=None, fallback=True):
         for alt in _altlang(code) + ['_default', 'en']:
             if alt in xdict:
                 trans = xdict[alt]
+                code = alt
                 break
         else:
             trans = xdict.values()[0]
+            code = xdict.keys()[0]
     if not trans:
         return  # return None if we have no translation found
     if parameters is None:
@@ -297,7 +299,6 @@ def translate(code, xdict, parameters=None, fallback=True):
             num = int(parameters)
         else:
             num = parameters
-        # we only need the lang or _default, not a _altlang code
         # TODO: check against plural_rules[lang]['nplurals']
         try:
             index = plural_rules[code]['plural'](num)
