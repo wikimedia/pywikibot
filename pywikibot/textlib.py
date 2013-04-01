@@ -857,18 +857,23 @@ def extract_templates_and_params(text):
 
     # marker for math
     marker3 = u'%%'
-    while marker2 in thistxt:
+    while marker3 in thistxt:
         marker3 += u'%'
 
+    # marker for value parameter
+    marker4 = u'§§'
+    while marker4 in thistxt:
+        marker4 += u'§'
+
     result = []
-    inside = {}
-    count = 0
     Rtemplate = re.compile(
         ur'{{(msg:)?(?P<name>[^{\|]+?)(\|(?P<params>[^{]+?))?}}')
     Rmath = re.compile(ur'<math>[^<]+</math>')
+    Rvalue = re.compile(r'{{{.+?}}}')
     Rmarker = re.compile(ur'%s(\d+)%s' % (marker, marker))
     Rmarker2 = re.compile(ur'%s(\d+)%s' % (marker2, marker2))
     Rmarker3 = re.compile(ur'%s(\d+)%s' % (marker3, marker3))
+    Rmarker4 = re.compile(ur'%s(\d+)%s' % (marker4, marker4))
 
     # Replace math with markers
     maths = {}
@@ -879,6 +884,16 @@ def extract_templates_and_params(text):
         thistxt = thistxt.replace(text, '%s%d%s' % (marker3, count, marker3))
         maths[count] = text
 
+    values = {}
+    count = 0
+    for m in Rvalue.finditer(thistxt):
+        count += 1
+        text = m.group()
+        thistxt = thistxt.replace(text, '%s%d%s' % (marker4, count, marker4))
+        values[count] = text
+
+    inside = {}
+    count = 0
     while Rtemplate.search(thistxt) is not None:
         for m in Rtemplate.finditer(thistxt):
             # Make sure it is not detected again
@@ -891,6 +906,8 @@ def extract_templates_and_params(text):
                 text = text.replace(m2.group(), inside[int(m2.group(1))])
             for m2 in Rmarker3.finditer(text):
                 text = text.replace(m2.group(), maths[int(m2.group(1))])
+            for m2 in Rmarker4.finditer(text):
+                text = text.replace(m2.group(), values[int(m2.group(1))])
             inside[count] = text
 
             # Name
@@ -933,6 +950,9 @@ def extract_templates_and_params(text):
                     for m2 in Rmarker3.finditer(param_val):
                         param_val = param_val.replace(m2.group(),
                                                       maths[int(m2.group(1))])
+                    for m2 in Rmarker4.finditer(param_val):
+                        param_val = param_val.replace(m2.group(),
+                                                      values[int(m2.group(1))])
                     params[param_name.strip()] = param_val.strip()
 
             # Add it to the result
