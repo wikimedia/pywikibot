@@ -108,7 +108,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
 
     dontTouchRegexes = []
     for exc in exceptions:
-        if isinstance(exc, str) or isinstance(exc, unicode):
+        if isinstance(exc, basestring):
             # assume it's a reference to the exceptionRegexes dictionary
             # defined above.
             if exc in exceptionRegexes:
@@ -274,13 +274,13 @@ def isDisabled(text, index, tags=['*']):
 
     """
     # Find a marker that is not already in the text.
-    marker = findmarker(text, '@@', '@')
+    marker = findmarker(text)
     text = text[:index] + marker + text[index:]
     text = removeDisabledParts(text, tags)
     return (marker not in text)
 
 
-def findmarker(text, startwith=u'@', append=None):
+def findmarker(text, startwith=u'@@', append=None):
     # find a string which is not part of text
     if not append:
         append = u'@'
@@ -446,7 +446,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
 
     """
     # Find a marker that is not already in the text.
-    marker = findmarker(oldtext, u'@@')
+    marker = findmarker(oldtext)
     if site is None:
         site = pywikibot.getSite()
     separator = site.family.interwiki_text_separator
@@ -708,7 +708,7 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
 
     """
     # Find a marker that is not already in the text.
-    marker = findmarker(oldtext, u'@@')
+    marker = findmarker(oldtext)
     if site is None:
         site = pywikibot.getSite()
     if site.sitename() == 'wikipedia:de' and "{{Personendaten" in oldtext:
@@ -846,24 +846,16 @@ def extract_templates_and_params(text):
     thistxt = removeDisabledParts(text)
 
     # marker for inside templates or parameters
-    marker = u'@@'
-    while marker in thistxt:
-        marker += u'@'
+    marker = findmarker(thistxt)
 
     # marker for links
-    marker2 = u'##'
-    while marker2 in thistxt:
-        marker2 += u'#'
+    marker2 = findmarker(thistxt, u'##', u'#')
 
     # marker for math
-    marker3 = u'%%'
-    while marker3 in thistxt:
-        marker3 += u'%'
+    marker3 = findmarker(thistxt, u'%%', u'%')
 
     # marker for value parameter
-    marker4 = u'§§'
-    while marker4 in thistxt:
-        marker4 += u'§'
+    marker4 = findmarker(thistxt, u'§§', u'§')
 
     result = []
     Rtemplate = re.compile(
