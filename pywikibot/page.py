@@ -2199,26 +2199,36 @@ class WikibasePage(Page):
             self.repo = self.site.data_repository()
         self._isredir = False  # Wikibase pages cannot be a redirect
 
-    def __defined_by(self):
+    def __defined_by(self, singular=False):
         """
-        returns the parameters needed by the API
-        to identify an item.
-        Once an item's "p/q##" is looked up, that
-        will be used for all future requests.
+        returns the parameters needed by the API to identify an item.
+        Once an item's "p/q##" is looked up, that will be used for all future
+        requests.
+        @param singular: Whether the parameter names should use the singular
+                         form
+        @type singular: bool
         """
         params = {}
+        if singular:
+            id = 'id'
+            site = 'site'
+            title = 'title'
+        else:
+            id = 'ids'
+            site = 'sites'
+            title = 'titles'
         #id overrides all
         if hasattr(self, 'id'):
-            params['ids'] = self.id
+            params[id] = self.id
             return params
 
         #the rest only applies to ItemPages, but is still needed here.
 
         if isinstance(self.site, pywikibot.site.DataSite):
-            params['ids'] = self.title(withNamespace=False)
+            params[id] = self.title(withNamespace=False)
         elif isinstance(self.site, pywikibot.site.BaseSite):
-            params['sites'] = self.site.dbName()
-            params['titles'] = self.title()
+            params[site] = self.site.dbName()
+            params[title] = self.title()
         else:
             raise pywikibot.exceptions.BadTitle
         return params
@@ -2326,7 +2336,8 @@ class WikibasePage(Page):
             baserevid = self.lastrevid
         else:
             baserevid = None
-        updates = self.repo.editEntity(self.__defined_by(), data, baserevid=baserevid, **kwargs)
+        updates = self.repo.editEntity(self.__defined_by(singular=True), data,
+                                       baserevid=baserevid, **kwargs)
         self.lastrevid = updates['entity']['lastrevid']
 
     def editLabels(self, labels, **kwargs):
