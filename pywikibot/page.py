@@ -2348,6 +2348,8 @@ class WikibasePage(Page):
         You can set it to '' to remove the label.
         """
         labels = self.__normalizeLanguages(labels)
+        for key in labels:
+            labels[key] = {'language': key, 'value': labels[key]}
         data = {'labels': labels}
         self.editEntity(data, **kwargs)
 
@@ -2359,6 +2361,8 @@ class WikibasePage(Page):
         You can set it to '' to remove the description.
         """
         descriptions = self.__normalizeLanguages(descriptions)
+        for key in descriptions:
+            descriptions[key] = {'language': key, 'value': descriptions[key]}
         data = {'descriptions': descriptions}
         self.editEntity(data, **kwargs)
 
