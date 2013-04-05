@@ -55,7 +55,6 @@ def main(*args):
     password = None
     sysop = False
     logall = False
-    forceLogin = False
     for arg in pywikibot.handleArgs(*args):
         if arg.startswith("-pass"):
             if len(arg) == 5:
@@ -68,7 +67,8 @@ def main(*args):
         elif arg == "-all":
             logall = True
         elif arg == "-force":
-            forceLogin = True
+            pywikibot.output(u"To force a re-login, please delete the revelant lines from '%s' (or the entire file) and try again." %
+                             os.path.join(config.base_dir, 'pywikibot.lwp'))
         else:
             pywikibot.showHelp('login')
             return
@@ -84,11 +84,11 @@ def main(*args):
         for lang in namedict[familyName]:
             try:
                 site = pywikibot.getSite(code=lang, fam=familyName)
-                if forceLogin:
-                    site.login()
-                if site.logged_in(sysop) \
-                        and site.user() == site.username(sysop):
-                    pywikibot.output(u"Login successful on %(site)s." % locals())
+                site.login()
+
+                user = site.user()
+                if user:
+                    pywikibot.output(u"Logged in on %(site)s as %(user)s." % locals())
                 else:
                     pywikibot.output(u"Not logged in on %(site)s." % locals())
             except NoSuchSite:
