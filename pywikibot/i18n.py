@@ -262,10 +262,11 @@ def translate(code, xdict, parameters=None, fallback=True):
         code = code.lang
 
     # Check whether xdict has multiple projects
-    if family in xdict:
-        xdict = xdict[family]
-    elif 'wikipedia' in xdict:
-        xdict = xdict['wikipedia']
+    if type(xdict) == dict:
+        if family in xdict:
+            xdict = xdict[family]
+        elif 'wikipedia' in xdict:
+            xdict = xdict['wikipedia']
 
     # Get the translated string
     trans = None
