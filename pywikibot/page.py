@@ -2506,6 +2506,13 @@ class ItemPage(WikibasePage):
         """
         self.repo.addClaim(self, claim, bot=bot)
 
+    def removeClaims(self, claims, **kwargs):
+        """
+        Removes the claims from the item
+        @type claims: list
+        """
+        self.repo.removeClaims(claims, **kwargs)
+
 
 class PropertyPage(WikibasePage):
     """
