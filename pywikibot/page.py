@@ -2312,7 +2312,7 @@ class WikibasePage(Page):
                 del data[key]
         return data
 
-    def __getdbName(self, site):
+    def getdbName(self, site):
         """
         Helper function to normalize site
         objects into dbnames
@@ -2446,7 +2446,7 @@ class ItemPage(WikibasePage):
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
-        dbname = self.__getdbName(site)
+        dbname = self.getdbName(site)
         if not dbname in self.sitelinks:
             raise pywikibot.NoPage(self)
         else:
@@ -2471,10 +2471,10 @@ class ItemPage(WikibasePage):
         Sites should be a list, with values either
         being Site objects, or dbNames.
         """
-        data = {}
+        data = list()
         for site in sites:
-            site = self.__getdbName(site)
-            data[site] = {'site': site, 'title': ''}
+            site = self.getdbName(site)
+            data.append({'site': site, 'title': ''})
         self.setSitelinks(data, **kwargs)
 
     def setSitelinks(self, sitelinks, **kwargs):
@@ -2487,7 +2487,7 @@ class ItemPage(WikibasePage):
         data = {}
         for obj in sitelinks:
             if isinstance(obj, Page):
-                dbName = self.__getdbName(obj.site)
+                dbName = self.getdbName(obj.site)
                 data[dbName] = {'site': dbName, 'title': obj.title()}
             else:
                 #TODO: Do some verification here
