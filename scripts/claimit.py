@@ -51,4 +51,5 @@ def main():
             #TODO FIXME: We should add a source for each claim that is added
             #TODO FIXME: We need to check that we aren't adding a duplicate
 
-
+if __name__ == "__main__":
+    main()
