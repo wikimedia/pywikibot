@@ -1354,7 +1354,7 @@ class APISite(BaseSite):
             see API documentation for full list of types
 
         """
-        query = api.PropertyGenerator("info|revisions",
+        query = api.PropertyGenerator("info",
                                       titles=page.title(withSection=False),
                                       intoken=tokentype,
                                       site=self)
