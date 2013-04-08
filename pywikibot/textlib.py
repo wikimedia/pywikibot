@@ -147,6 +147,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                 item = m.group()
                 text = text.replace(item, '%s%d%s' % (marker1, count, marker1))
 
+                # Make sure stored templates don't contain markers
                 for m2 in Rmarker1.finditer(item):
                     item = item.replace(m2.group(), inside[int(m2.group(1))])
                 for m2 in Rmarker2.finditer(item):
@@ -944,7 +945,7 @@ def extract_templates_and_params(text):
                 continue
 
             # {{#if: }}
-            if name.startswith('#'):
+            if not name or name.startswith('#'):
                 continue
 
 ## TODO: merged from wikipedia.py - implement the following
