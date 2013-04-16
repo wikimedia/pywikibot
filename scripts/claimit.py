@@ -30,10 +30,14 @@ def addClaims(page, claims):
         return False
 
     for claim in claims:
-        pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget().getID()))
-        item.addClaim(claim)
-        #TODO FIXME: We should add a source for each claim that is added
-        #TODO FIXME: We need to check that we aren't adding a duplicate
+        if claim.getID() in item.get().get('claims'):
+            pywikibot.output(u'A claim for %s already exists. Skipping' % (claim.getID(),))
+            #TODO FIXME: This is a very crude way of dupe checking
+        else:
+            pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget().getID()))
+            item.addClaim(claim)
+            #TODO FIXME: We should add a source for each claim that is added
+            #TODO FIXME: We need to check that we aren't adding a duplicate
 
 
 def main():
@@ -51,7 +55,6 @@ def main():
         claim = pywikibot.Claim(repo, commandline_claims[i])
         claim.setTarget(pywikibot.ItemPage(repo, commandline_claims[i+1]))
         claims.append(claim)
-
 
     generator = gen.getCombinedGenerator()
 
