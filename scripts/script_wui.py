@@ -57,7 +57,7 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__       = '$Id$'
-__framework_rev__ = '11097' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '11384' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.5'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -79,13 +79,6 @@ import pywikibot
 import pywikibot.botirc
 from pywikibot import version
 
-
-# logging of framework info (may be this should be done without importing, just opening)
-infolist = [ 'pywikibot/__init__.py', 'pywikibot/config2.py',   # framework
-             'pywikibot/data/api.py',                           #
-             'pywikibot/bot.py', 'pywikibot/botirc.py',         #
-             __version__,                                       #
-             'scripts/clean_sandbox.py', ]                      #
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
 
@@ -117,6 +110,12 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         pywikibot.output(u'\03{lightgreen}* Initialization of bot\03{default}')
 
         pywikibot.botirc.IRCBot.__init__(self, *arg)
+
+        ## modification of timezone to be in sync with wiki
+        #os.environ['TZ'] = 'Europe/Amsterdam'
+        #time.tzset()
+        #pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
+        #pywikibot.output(u'')
 
         # init environment with minimal changes (try to do as less as possible)
         # - Lua -
@@ -299,61 +298,9 @@ def main():
         raise
 
 def output_verinfo():
-    global __release_rev__
-
     # script call
     pywikibot.output(u'SCRIPT CALL:')
     pywikibot.output(u'  ' + u' '.join(sys.argv))
-    pywikibot.output(u'')
-
-    # logging of release/framework info
-    pywikibot.output(u'RELEASE/FRAMEWORK VERSION:')
-    for item in infolist:
-        ver = version.getfileversion(item)
-        pywikibot.output(u'  %s' % (item if ver is None else ver))
-    pywikibot.output(u'')
-
-    # new release/framework revision? (JIRA: DRTRIGON-131)
-    pywikibot.output(u'LATEST RELEASE/FRAMEWORK REVISION:')
-    # local release revision?
-    __release_rev__ %= int(version.getversion_svn(pywikibot.config.datafilepath('.'))[1])
-    match = version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/')
-    if match:
-        release_rev = int(match)
-        info = version.cmp_ver(release_rev, int(__release_rev__))
-        pywikibot.output(u'  Directory revision - release:   %s (%s %s)' % (release_rev, info, __release_rev__))
-    else:
-        pywikibot.output(u'  WARNING: could not retrieve release information!')
-    # framework revision?
-    __framework_rev = int(__framework_rev__)
-    match = version.getversion_onlinerepo()
-    if match:
-        framework_rev = int(match)
-        info = version.cmp_ver(framework_rev, __framework_rev, 100)
-        pywikibot.output(u'  Directory revision - framework: %s (%s %s)' % (framework_rev, info, __framework_rev__))
-    else:
-        pywikibot.output(u'  WARNING: could not retrieve framework information!')
-    pywikibot.output(u'')
-
-    # mediawiki software version?
-    pywikibot.output(u'MEDIAWIKI VERSION:')
-    pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version(force=True)))
-    pywikibot.output(u'')
-
-#    # processing of messages on bot discussion page
-#    if pywikibot.getSite().messages():
-#        pywikibot.output(u'====== new messages on bot discussion page (last few lines) ======')
-#        messages_page  = pywikibot.Page(pywikibot.getSite(), u'User:DrTrigonBot').toggleTalkPage()
-#        messagesforbot = messages_page.get(get_redirect=True)
-#        pywikibot.output( u'\n'.join(messagesforbot.splitlines()[-10:]) )
-#        pywikibot.output(u'==================================================================')
-#        # purge/reset messages (remove this message from queue) by "viewing" it
-#        pywikibot.getSite().getUrl( os.path.join('/wiki', messages_page.urlname()) )
-
-    # modification of timezone to be in sync with wiki
-    os.environ['TZ'] = 'Europe/Amsterdam'
-    time.tzset()
-    pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
     pywikibot.output(u'')
 
 if __name__ == "__main__":

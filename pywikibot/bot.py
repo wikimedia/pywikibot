@@ -30,6 +30,7 @@ INPUT = 25
 
 import pywikibot
 from pywikibot import config
+from pywikibot import version
 
 
 # User interface initialization
@@ -223,7 +224,42 @@ def init_handlers(strm=None):
             debuglogger.setLevel(DEBUG)
             debuglogger.addHandler(file_handler)
 
+        writelogheader(root_logger)
+
     _handlers_initialized = True
+
+
+def writelogheader(logger):
+    """
+    Save additional version, system and status info to the logfile in use,
+    so that the user can look it up later to track errors or report bugs.
+    """
+    logoutput(u'=== Pywikipediabot framework v2.0 -- Logging header ===')
+
+    # script call
+    logoutput(u'COMMAND: %s' % unicode(sys.argv))
+
+    # new framework release/revision?
+    site = pywikibot.getSite()
+    logoutput(u'VERSION: %s' % unicode((version.getversion().strip(' ()'),
+                                          version.getversion_onlinerepo(),
+                                          site.live_version())))
+
+    # system
+    if hasattr(os, 'uname'):
+        logoutput(u'SYSTEM: %s' % unicode(os.uname()))
+
+    # imported modules
+    #logoutput(u'MODULES:')
+    #for item in sys.modules.keys():
+    #    ver = version.getfileversion('%s.py' % item)
+    #    if ver and (ver[0] == u'$'):
+    #        logoutput(u'  %s' % ver)
+
+    # messages on bot discussion page?
+    logoutput(u'MESSAGES: %s' % ('unanswered' if site.messages() else 'none'))
+
+    logoutput(u'=== ' * 14)
 
 
 # User output/logging functions
