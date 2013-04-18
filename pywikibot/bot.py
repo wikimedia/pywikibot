@@ -224,12 +224,12 @@ def init_handlers(strm=None):
             debuglogger.setLevel(DEBUG)
             debuglogger.addHandler(file_handler)
 
-        writelogheader(root_logger)
+        writelogheader()
 
     _handlers_initialized = True
 
 
-def writelogheader(logger):
+def writelogheader():
     """
     Save additional version, system and status info to the logfile in use,
     so that the user can look it up later to track errors or report bugs.
