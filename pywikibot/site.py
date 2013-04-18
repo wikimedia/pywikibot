@@ -2250,7 +2250,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         @param where: Where to search; value must be "text" or "titles" (many
             wikis do not support title search)
         @param namespaces: search only in these namespaces (defaults to 0)
-        @type namespaces: list of ints
+        @type namespaces: list of ints, or an empty list to signal all namespaces
         @param getredirects: if True, include redirects in results
         @param content: if True, load the current content of each iterated page
             (default False)
@@ -2260,6 +2260,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             raise Error("search: searchstring cannot be empty")
         if where not in ("text", "titles"):
             raise Error("search: unrecognized 'where' value: %s" % where)
+        if namespaces == []:
+            namespaces = [ns for ns in self.namespaces().keys() if ns >= 0]
         if not namespaces:
             pywikibot.warning(u"search: namespaces cannot be empty; using [0].")
             namespaces = [0]
