@@ -1549,8 +1549,10 @@ class APISite(BaseSite):
     def categorymembers(self, category, namespaces=None, sortby="",
                         reverse=False, starttime=None, endtime=None,
                         startsort=None, endsort=None, step=None, total=None,
-                        content=False):
+                        content=False, recurse=False):
         """Iterate members of specified category.
+        FIXME: Properly implement recursion, see:
+        https://sourceforge.net/tracker/?func=detail&atid=603138&aid=3611098&group_id=93107
 
         @param category: The Category to iterate.
         @param namespaces: If present, only return category members from
