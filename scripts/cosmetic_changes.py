@@ -172,13 +172,13 @@ class CosmeticChangesToolkit:
         text = self.fixSyntaxSave(text)
         text = self.cleanUpLinks(text)
         text = self.cleanUpSectionHeaders(text)
-        text = self.putSpacesInLists(text)
+##        text = self.putSpacesInLists(text)
         text = self.translateAndCapitalizeNamespaces(text)
 ##        text = self.translateMagicWords(text)
         text = self.replaceDeprecatedTemplates(text)
 ##        text = self.resolveHtmlEntities(text)
         text = self.validXhtml(text)
-        text = self.removeUselessSpaces(text)
+##        text = self.removeUselessSpaces(text)
         text = self.removeNonBreakingSpaceBeforePercent(text)
 
         text = self.fixHtml(text)
@@ -605,7 +605,7 @@ class CosmeticChangesToolkit:
                     old = '[' + old[0].upper() + old[0].lower() + ']' + old[1:]
                 text = pywikibot.replaceExcept(
                     text,
-                    r'\{\{([mM][sS][gG]:)?' + old + '(?P<parameters>\|[^}]+|)}}',
+                    r'\{\{([mM][sS][gG]:)?%s(?P<parameters>\|[^}]+|)}}' % old,
                     new, exceptions)
         return text
 
