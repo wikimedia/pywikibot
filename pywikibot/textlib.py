@@ -19,7 +19,8 @@ import re
 from HTMLParser import HTMLParser
 import config2 as config
 
-TEMP_REGEX = re.compile('{{(msg:)?(?P<name>[^{\|]+?)(\|(?P<params>[^{]+?))?}}')
+TEMP_REGEX = re.compile(
+    '{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')
 
 def unescape(s):
     """Replace escaped HTML-special characters by their originals"""
