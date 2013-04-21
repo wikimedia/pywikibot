@@ -26,8 +26,8 @@ class Family(family.WikimediaFamily):
             'nah', 'sa', 'os', 'sah', 'pam', 'hsb', 'si', 'se', 'li', 'bar',
             'mi', 'co', 'ilo', 'gan', 'bo', 'fo', 'glk', 'rue', 'pa', 'bcl',
             'fiu-vro', 'mrj', 'nds-nl', 'tk', 'ps', 'vls', 'xmf', 'gv', 'diq',
-            'pag', 'kv', 'or', 'zea', 'dv', 'km', 'nrm', 'rm', 'koi', 'udm',
-            'mhr', 'frr', 'csb', 'lad', 'vep', 'lij', 'wuu', 'fur',
+            'min', 'pag', 'kv', 'or', 'zea', 'dv', 'km', 'nrm', 'rm', 'koi',
+            'udm', 'mhr', 'frr', 'csb', 'lad', 'vep', 'lij', 'wuu', 'fur',
             'zh-classical', 'ug', 'stq', 'sc', 'pi', 'ay', 'so', 'mt', 'bh',
             'nov', 'ksh', 'ang', 'kw', 'nv', 'pcd', 'hak', 'gn', 'ext', 'frp',
             'as', 'szl', 'gag', 'ie', 'eml', 'ln', 'ce', 'krc', 'pfl', 'xal',
@@ -38,7 +38,7 @@ class Family(family.WikimediaFamily):
             'rmy', 'roa-rup', 'cu', 'tn', 'chr', 'bi', 'cdo', 'got', 'sm', 'bm',
             'iu', 'pih', 'pnt', 'sd', 'ss', 'ki', 'ee', 'ha', 'om', 'fj', 'ti',
             'ts', 'ks', 've', 'sg', 'rn', 'st', 'dz', 'ak', 'cr', 'tum', 'lg',
-            'ny', 'ff', 'ch', 'ik', 'tw', 'xh', 'min',
+            'ny', 'ff', 'ch', 'ik', 'tw', 'xh',
         ]
 
         self.langs = dict([(lang, '%s.wikipedia.org' % lang)

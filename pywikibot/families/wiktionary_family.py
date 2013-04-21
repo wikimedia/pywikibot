@@ -18,7 +18,7 @@ class Family(family.WikimediaFamily):
             'eo', 'hr', 'oc', 'is', 'vo', 'th', 'simple', 'zh-min-nan', 'cy',
             'scn', 'sr', 'af', 'ps', 'ast', 'sw', 'fy', 'tl', 'nn', 'he', 'ur',
             'da', 'uz', 'wa', 'la', 'hy', 'sq', 'sm', 'sl', 'hi', 'nah', 'ka',
-            'az', 'pnb', 'tt', 'bs', 'lv', 'lb', 'tk', 'hsb', 'kk', 'sk', 'km',
+            'pnb', 'az', 'tt', 'bs', 'lv', 'lb', 'tk', 'hsb', 'kk', 'sk', 'km',
             'mk', 'be', 'ga', 'wo', 'ms', 'nds', 'ang', 'ky', 'co', 'gn', 'mr',
             'csb', 'st', 'ia', 'sd', 'si', 'sh', 'tg', 'ug', 'sa', 'mn', 'kl',
             'jbo', 'an', 'ln', 'zu', 'or', 'gu', 'kw', 'rw', 'gv', 'fo', 'qu',
