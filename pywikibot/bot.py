@@ -191,6 +191,8 @@ def init_handlers(strm=None):
 
     root_logger = logging.getLogger("pywiki")
     root_logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
+    if hasattr(root_logger, 'captureWarnings'):
+        root_logger.captureWarnings(True) # introduced in Python >= 2.7
     root_logger.handlers = [] # remove any old handlers
 
     # configure handler(s) for display to user interface
@@ -391,6 +393,29 @@ def critical(text, decoder=None, newline=True, **kwargs):
 def debug(text, layer, decoder=None, newline=True, **kwargs):
     """Output a debug record to the log file."""
     logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
+
+def exception(msg=None, decoder=None, newline=True, full=False, **kwargs):
+    """Output an error traceback to the user via the userinterface.
+
+       Use directly after an 'except' statement:
+           ...
+           except:
+               pywikibot.exception()
+           ...
+       or alternatively:
+           ...
+           except Exception, e:
+               pywikibot.exception(e)
+           ...
+    """
+    if isinstance(msg, BaseException):
+        exc_info = 1
+    else:
+        exc_info = sys.exc_info()
+        msg = unicode(exc_info[1]).strip()
+    if full:
+        kwargs['exc_info'] = exc_info
+    logoutput(msg, decoder, newline, ERROR, **kwargs)
 
 
 # User input functions
