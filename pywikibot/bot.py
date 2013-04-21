@@ -154,26 +154,26 @@ def init_handlers(strm=None):
     @param strm: Output stream. If None, re-uses the last stream if one
         was defined, otherwise uses sys.stderr
 
-    """
-    # Note: this function is called by handleArgs(), so it should normally
-    # not need to be called explicitly
+    Note: this function is called by handleArgs(), so it should normally
+    not need to be called explicitly
 
-    # All user output is routed through the logging module.
-    # Each type of output is handled by an appropriate handler object.
-    # This structure is used to permit eventual development of other
-    # user interfaces (GUIs) without modifying the core bot code.
-    # The following output levels are defined:
-    #    DEBUG - only for file logging; debugging messages
-    #    STDOUT - output that must be sent to sys.stdout (for bots that may
-    #             have their output redirected to a file or other destination)
-    #    VERBOSE - optional progress information for display to user
-    #    INFO - normal (non-optional) progress information for display to user
-    #    INPUT - prompts requiring user response
-    #    WARN - user warning messages
-    #    ERROR - user error messages
-    #    CRITICAL - fatal error messages
-    # Accordingly, do ''not'' use print statements in bot code; instead,
-    # use pywikibot.output function.
+    All user output is routed through the logging module.
+    Each type of output is handled by an appropriate handler object.
+    This structure is used to permit eventual development of other
+    user interfaces (GUIs) without modifying the core bot code.
+    The following output levels are defined:
+       DEBUG - only for file logging; debugging messages
+       STDOUT - output that must be sent to sys.stdout (for bots that may
+                have their output redirected to a file or other destination)
+       VERBOSE - optional progress information for display to user
+       INFO - normal (non-optional) progress information for display to user
+       INPUT - prompts requiring user response
+       WARN - user warning messages
+       ERROR - user error messages
+       CRITICAL - fatal error messages
+    Accordingly, do ''not'' use print statements in bot code; instead,
+    use pywikibot.output function.
+    """
 
     global _handlers_initialized
 
