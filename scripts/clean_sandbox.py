@@ -158,30 +158,28 @@ class SandboxBot(pywikibot.Bot):
                                 u'(%s), exiting.' % self.site)
             sys.exit(0)
 
-
     def run(self):
-        mySite = self.site
         while True:
             wait = False
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-            localSandboxTitle = pywikibot.translate(mySite, sandboxTitle)
+            localSandboxTitle = pywikibot.translate(self.site, sandboxTitle)
             if type(localSandboxTitle) is list:
                 titles = localSandboxTitle
             else:
                 titles = [localSandboxTitle,]
             for title in titles:
-                sandboxPage = pywikibot.Page(mySite, title)
+                sandboxPage = pywikibot.Page(self.site, title)
                 pywikibot.output(u'Preparing to process sandbox page %s' % sandboxPage.title(asLink=True))
                 try:
                     text = sandboxPage.get()
-                    translatedContent = pywikibot.translate(mySite, content)
-                    translatedMsg = i18n.twtranslate(mySite,
+                    translatedContent = pywikibot.translate(self.site, content)
+                    translatedMsg = i18n.twtranslate(self.site,
                                                      'clean_sandbox-cleaned')
                     subst = 'subst:' in translatedContent
                     pos = text.find(translatedContent.strip())
                     if text.strip() == translatedContent.strip():
                         pywikibot.output(u'The sandbox is still clean, no change necessary.')
-                    elif subst and sandboxPage.userName() == mySite.user():
+                    elif subst and sandboxPage.userName() == self.site.user():
                         pywikibot.output(u'The sandbox might be clean, no change necessary.')
                     elif pos <> 0 and not subst:
                         if self.getOption('user'):
