@@ -604,17 +604,13 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
     retrieved page will be downloaded.
 
     """
-    kwargs = dict(recurse=recurse,
-                  step=step,
-                  total=total,
-                  content=content,
-                  )
+    kwargs = dict(recurse=recurse, step=step, total=total,
+                  content=content)
     if start:
         kwargs['sortby'] = 'sortkey'
         kwargs['startsort'] = start
-    for a in category.site.categorymembers(category, **kwargs):
+    for a in category.articles(**kwargs):
         yield a
-
 
 def SubCategoriesPageGenerator(category, recurse=False, start=None,
                                step=None, total=None, content=False):

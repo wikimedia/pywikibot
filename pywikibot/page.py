@@ -1722,7 +1722,9 @@ class Category(Page):
 
     @deprecate_arg("startFrom", None)
     def articles(self, recurse=False, step=None, total=None,
-                 content=False, namespaces=None):
+                 content=False, namespaces=None, sortby="",
+                 starttime=None, endtime=None,startsort=None,
+                 endsort=None):
         """
         Yields all articles in the current category.
 
@@ -1741,6 +1743,23 @@ class Category(Page):
         @type namespace: int or list of ints
         @param content: if True, retrieve the content of the current version
             of each page (default False)
+        @param sortby: determines the order in which results are generated,
+            valid values are "sortkey" (default, results ordered by category
+            sort key) or "timestamp" (results ordered by time page was
+            added to the category). This applies recursively.
+        @type sortby: str
+        @param starttime: if provided, only generate pages added after this
+            time; not valid unless sortby="timestamp"
+        @type starttime: pywikibot.Timestamp
+        @param endtime: if provided, only generate pages added before this
+            time; not valid unless sortby="timestamp"
+        @type endtime: pywikibot.Timestamp
+        @param startsort: if provided, only generate pages >= this title
+            lexically; not valid if sortby="timestamp"
+        @type startsort: str
+        @param endsort: if provided, only generate pages <= this title
+            lexically; not valid if sortby="timestamp"
+        @type endsort: str
 
         """
         if namespaces is None:
@@ -1749,7 +1768,10 @@ class Category(Page):
         for member in self.site.categorymembers(self,
                                                 namespaces=namespaces,
                                                 step=step, total=total,
-                                                content=content):
+                                                content=content, sortby=sortby,
+                                                starttime=starttime, endtime=endtime,
+                                                startsort=startsort, endsort=endsort,
+                                                ):
             yield member
             if total is not None:
                 total -= 1
@@ -1761,7 +1783,10 @@ class Category(Page):
             for subcat in self.subcategories(step=step):
                 for article in subcat.articles(recurse, step=step, total=total,
                                                content=content,
-                                               namespaces=namespaces):
+                                               namespaces=namespaces, sortby=sortby,
+                                               starttime=starttime, endtime=endtime,
+                                               startsort=startsort, endsort=endsort,
+                                               ):
                     yield article
                     if total is not None:
                         total -= 1
