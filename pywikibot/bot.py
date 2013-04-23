@@ -241,11 +241,11 @@ def writelogheader():
     # script call
     output(u'COMMAND: %s' % unicode(sys.argv))
 
-    # new framework release/revision?
+    # new framework release/revision? (handleArgs needs to be called first)
     site = pywikibot.getSite()
-    output(u'VERSION: %s' % unicode((version.getversion().strip(' ()'),
-                                          version.getversion_onlinerepo(),
-                                          site.live_version())))
+    output(u'VERSION: %s' % unicode((version.getversion().strip(),
+                                     version.getversion_onlinerepo(),
+                                     site.live_version())))
 
     # system
     if hasattr(os, 'uname'):
