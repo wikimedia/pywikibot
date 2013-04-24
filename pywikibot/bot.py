@@ -394,26 +394,29 @@ def debug(text, layer, decoder=None, newline=True, **kwargs):
     """Output a debug record to the log file."""
     logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
 
-def exception(msg=None, decoder=None, newline=True, full=False, **kwargs):
+def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
     """Output an error traceback to the user via the userinterface.
 
-       Use directly after an 'except' statement:
-           ...
-           except:
-               pywikibot.exception()
-           ...
-       or alternatively:
-           ...
-           except Exception, e:
-               pywikibot.exception(e)
-           ...
+    @param tb: Set to True in order to output traceback also.
+
+    Use directly after an 'except' statement:
+      ...
+      except:
+          pywikibot.exception()
+      ...
+    or alternatively:
+      ...
+      except Exception, e:
+          pywikibot.exception(e)
+      ...
     """
     if isinstance(msg, BaseException):
         exc_info = 1
     else:
         exc_info = sys.exc_info()
-        msg = unicode(exc_info[1]).strip()
-    if full:
+        msg = u'%s: %s' % (repr(exc_info[1]).split('(')[0], 
+                           unicode(exc_info[1]).strip())
+    if tb:
         kwargs['exc_info'] = exc_info
     logoutput(msg, decoder, newline, ERROR, **kwargs)
 
