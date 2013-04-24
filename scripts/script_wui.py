@@ -76,7 +76,6 @@ import dtbext.crontab
 
 import pywikibot
 import pywikibot.botirc
-from pywikibot import version
 
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
@@ -190,16 +189,12 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         try:
             thread.start_new_thread( main_script, (self.refs[page_title], rev, params) )
         except:
-            #pywikibot.output(u"WARNING: unable to start thread")
+            # (done according to subster in trunk and submit in rewrite/.../data/api.py)
+            # TODO: is this error handling here needed at all??!?
+            pywikibot.exception(tb=True) # secure traceback print (from api.py submit)
             pywikibot.warning(u"Unable to start thread")
 
-            # (done according to subster in trunk and submit in rewrite/.../data/api.py)
-            #exc_info = sys.exc_info()
-            #tb = traceback.format_exception(exc_info[0], exc_info[1], exc_info[2])
-            tb = traceback.format_exc()
-            pywikibot.error(tb)    # secure traceback print (from api.py submit)
-            wiki_logger(tb, self.refs[page_title], rev)
-            # TODO: is this error handling here needed at all??!?
+            wiki_logger(traceback.format_exc(), self.refs[page_title], rev)
 
 # Define a function for the thread
 def main_script(page, rev=None, params=None):
@@ -284,7 +279,7 @@ def main():
     __sys_argv = sys.argv
 
     # verbosely output version info of all involved scripts
-    output_verinfo()
+    # PROBLEM: correct place -> improve logging!!
 
     site = pywikibot.getSite()
     site.login()
@@ -296,16 +291,6 @@ def main():
         bot.t.cancel()
         raise
 
-def output_verinfo():
-    # script call
-    pywikibot.output(u'SCRIPT CALL:')
-    pywikibot.output(u'  ' + u' '.join(sys.argv))
-    pywikibot.output(u'')
-
 if __name__ == "__main__":
-#    # verbosely output version info of all involved scripts
-#    # PROBLEM: correct place, but output not logged here, thus moved to 'main()' -> improve logging!! (look e.g. at botirc.py)
-#    output_verinfo()
-
     # run bot
     main()
