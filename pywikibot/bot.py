@@ -252,11 +252,11 @@ def writelogheader():
         output(u'SYSTEM: %s' % unicode(os.uname()))
 
     # imported modules
-    #output(u'MODULES:')
-    #for item in sys.modules.keys():
-    #    ver = version.getfileversion('%s.py' % item)
-    #    if ver and (ver[0] == u'$'):
-    #        output(u'  %s' % ver)
+    output(u'MODULES:')
+    for item in sys.modules.keys():
+        ver = version.getfileversion('%s.py' % item.replace('.', '/'))
+        if ver and (ver[0] == u'$'):
+            output(u'  %s' % ver)
 
     # messages on bot discussion page?
     output(u'MESSAGES: %s' % ('unanswered' if site.messages() else 'none'))

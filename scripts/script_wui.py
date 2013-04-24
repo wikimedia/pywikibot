@@ -57,8 +57,8 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__       = '$Id$'
-__release_ver__   = '1.5'   # increase minor (1.x) at re-merges with framework
-__release_rev__   = '%i'
+__framework_rev__ = '11445'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__release_ver__   = '1.5.%i' # increase minor (1.x) at re-merges with framework
 #
 
 
@@ -76,6 +76,7 @@ import dtbext.crontab
 
 import pywikibot
 import pywikibot.botirc
+from pywikibot import version
 
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
@@ -269,7 +270,7 @@ def wiki_logger(buffer, page, rev=None):
 #                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
 
 def main():
-    global __simulate, __sys_argv
+    global __simulate, __sys_argv, __release_ver__
 
     for arg in pywikibot.handleArgs():
         pywikibot.showHelp('script_wui')
@@ -278,8 +279,14 @@ def main():
     __simulate = pywikibot.config.simulate
     __sys_argv = sys.argv
 
-    # verbosely output version info of all involved scripts
-    # PROBLEM: correct place -> improve logging!!
+    # output version info
+    __release_ver__ %= version.getversion_svn(pywikibot.config.datafilepath('..'))[1]
+    pywikibot.output({'release_ver':          __release_ver__,
+                      'framework_ver':        __framework_rev__,
+                      'release_online_ver':   version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/'),
+                      'framework_online_ver': version.getversion_onlinerepo(),
+                       })
+    pywikibot.output(u'=== ' * 14)
 
     site = pywikibot.getSite()
     site.login()
