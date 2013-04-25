@@ -18,6 +18,9 @@ repos and zip archives like:
     (from http://labix.org/lunatic-python)
     Download the zip archive and unpack the 'lunatic-python-1.0' dir into the
     path 'externals/_lua' afterwards.
+    $ wget http://labix.org/download/lunatic-python/lunatic-python-1.0.tar.bz2
+    $ tar -xvf lunatic-python-1.0.tar.bz2 
+    $ mv lunatic-python-1.0 _lua
     Patch package dir in order to work with newer lua (>= 5.1) versions
     $ patch -p1 -d [path-to-install-dir]/_lua < [path-to-externals]/patch-lua
     and you are done.

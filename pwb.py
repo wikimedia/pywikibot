@@ -19,9 +19,14 @@ if sys.version_info[0] != 2:
 if sys.version_info[1] < 6:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 or higher")
 
-sys.path.append('.')
-sys.path.append('externals/httplib2')
-sys.path.append('pywikibot/compat')
+rewrite_path = os.path.dirname(sys.argv[0])
+if not os.path.isabs(rewrite_path):
+    rewrite_path = os.path.abspath(os.path.join(os.curdir, rewrite_path))
+
+sys.path.append(rewrite_path)
+sys.path.append(os.path.join(rewrite_path, 'externals/httplib2'))
+sys.path.append(os.path.join(rewrite_path, 'pywikibot/compat'))
+sys.path.append(os.path.join(rewrite_path, 'externals'))
 
 if "PYWIKIBOT2_DIR" not in os.environ:
     os.environ["PYWIKIBOT2_DIR"] = os.path.split(__file__)[0]

@@ -57,8 +57,6 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__       = '$Id$'
-__framework_rev__ = '11448'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
-__release_ver__   = '1.5.%s' # increase minor (1.x) at re-merges with framework
 #
 
 
@@ -77,7 +75,6 @@ import crontab
 
 import pywikibot
 import pywikibot.botirc
-from pywikibot import version
 
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
@@ -230,10 +227,7 @@ def main_script(page, rev=None, params=None):
         exec( code )
     except:
         # (done according to subster in trunk and submit in rewrite/.../data/api.py)
-        #exc_info = sys.exc_info()
-        #tb = traceback.format_exception(exc_info[0], exc_info[1], exc_info[2])
-        tb = traceback.format_exc()
-        pywikibot.error(tb)    # secure traceback print (from api.py submit)
+        pywikibot.exception(tb=True) # secure traceback print (from api.py submit)
 
     sys.stdout = sys.__stdout__
     sys.stderr = sys.__stderr__
@@ -271,7 +265,7 @@ def wiki_logger(buffer, page, rev=None):
 #                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
 
 def main():
-    global __simulate, __sys_argv, __release_ver__
+    global __simulate, __sys_argv
 
     for arg in pywikibot.handleArgs():
         pywikibot.showHelp('script_wui')
@@ -279,15 +273,6 @@ def main():
 
     __simulate = pywikibot.config.simulate
     __sys_argv = sys.argv
-
-    # output version info
-    __release_ver__ %= version.getversion_svn(pywikibot.config.datafilepath('..'))[1]
-    pywikibot.output({'release_ver':          __release_ver__,
-                      'framework_ver':        __framework_rev__,
-                      'release_online_ver':   version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/'),
-                      'framework_online_ver': version.getversion_onlinerepo(),
-                       })
-    pywikibot.output(u'=== ' * 14)
 
     site = pywikibot.getSite()
     site.login()
