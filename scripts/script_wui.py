@@ -57,8 +57,8 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__       = '$Id$'
-__framework_rev__ = '11445'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
-__release_ver__   = '1.5.%i' # increase minor (1.x) at re-merges with framework
+__framework_rev__ = '11448'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__release_ver__   = '1.5.%s' # increase minor (1.x) at re-merges with framework
 #
 
 
@@ -69,10 +69,11 @@ import re
 
 # http://labix.org/lunatic-python
 try:
-    import lua                  # install f15 packages: 'lua', 'lunatic-python'
+    import lua          # installed packages (on f15: 'lua', 'lunatic-python')
 except ImportError:
-    import dtbext._lua as lua   # TS/labs (debian/ubuntu)
-import dtbext.crontab
+    import _lua as lua  # compiled in externals with patch (ubuntu on TS/labs)
+# https://github.com/josiahcarlson/parse-crontab
+import crontab
 
 import pywikibot
 import pywikibot.botirc
@@ -167,15 +168,15 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 
     def do_check_CronJobs(self):
         # check cron/date (changes of self.refs are tracked (and reload) in on_pubmsg)
-        page    = self.refs[self.templ]
-        crontab = self.refs[self.cron].get()
+        page = self.refs[self.templ]
+        ctab = self.refs[self.cron].get()
         # extract 'rev' and 'timestmp' from 'crontab' page text ...
-        for line in crontab.splitlines():   # hacky/ugly/cheap; already better done in trunk dtbext
+        for line in ctab.splitlines():   # hacky/ugly/cheap; already better done in trunk dtbext
             (rev, timestmp) = [item.strip() for item in line[1:].split(',')]
 
             # [min] [hour] [day of month] [month] [day of week]
             # (date supported only, thus [min] and [hour] dropped)
-            entry = dtbext.crontab.CronTab(timestmp)
+            entry = crontab.CronTab(timestmp)
             # find the delay from current minute (does not return 0.0 - but next)
             delay = entry.next(datetime.datetime.now().replace(second=0,microsecond=0)-datetime.timedelta(microseconds=1))
             #pywikibot.output(u'CRON delay for execution: %.3f (<= %i)' % (delay, bot_config['CRONMaxDelay']))

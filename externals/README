@@ -1,3 +1,25 @@
 External dependencies for the rewrite branch. This package is only necessary to
 run pywikibot from a fully self-sufficient (no other dependencies other than
-python 2.6+) directory. This is especially useful on Windows. 
+python 2.6+) directory. This is especially useful on Windows.
+
+Usually - under normal circumstances - these packages should be installed 
+separately elsewhere in the OS by the standard package managing system.
+
+If you want to run the rewrite as a stand-alone package, please also download
+the contents of the externals/ subdirectory. Furthermore this includes git
+repos and zip archives like:
+
+* parse-crontab: Parse and use crontab schedules in Python - Version .14
+    (from https://github.com/josiahcarlson/parse-crontab)
+    Checkout the gip repository and copy the 'crontab' dir into the path
+    'externals/crontab' afterwards.
+
+* lunatic-python: Two-way bridge between Python and Lua - Version 1.0
+    (from http://labix.org/lunatic-python)
+    Download the zip archive and unpack the 'lunatic-python-1.0' dir into the
+    path 'externals/_lua' afterwards.
+    Patch package dir in order to work with newer lua (>= 5.1) versions
+    $ patch -p1 -d [path-to-install-dir]/_lua < [path-to-externals]/patch-lua
+    and you are done.
+    For the sake of completeness, the command invoked to create the patch was:
+    $ diff -Naur lunatic-python-1.0 _lua > patch-lua

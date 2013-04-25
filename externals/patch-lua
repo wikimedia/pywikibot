@@ -1,0 +1,127 @@
+diff -Naur lunatic-python-1.0/__init__.py _lua/__init__.py
+--- lunatic-python-1.0/__init__.py	1970-01-01 01:00:00.000000000 +0100
++++ _lua/__init__.py	2013-04-25 10:10:06.007753009 +0200
+@@ -0,0 +1,38 @@
++# patches applied for compatibility with lua5.1:
++# https://github.com/bastibe/lunatic-python/issues/1
++# http://lua-users.org/wiki/LunaticPython
++
++import sys, os
++
++scriptdir = os.path.dirname(sys.argv[0])
++if not os.path.isabs(scriptdir):
++    scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
++
++libdir = os.path.join(scriptdir, '../externals/_lua/build/lib.linux-x86_64-%s.%s' % sys.version_info[:2])
++if not os.path.exists(libdir):
++    os.makedirs(libdir)
++# path has to exist BEFORE appending, otherwise the re-import fails
++sys.path.append(libdir)
++
++try:
++    # try to import
++    from lua import *
++except ImportError, e:
++    print "(re-)compilation triggered because of: '%s'" % e
++
++    cur = os.path.abspath(os.curdir)
++    os.chdir( os.path.join(scriptdir, '../externals/_lua') )
++
++    # remove/reset if existing already
++    if os.path.exists(os.path.join(libdir, 'lua.so')):
++        os.remove( os.path.join(libdir, 'lua.so') )
++
++    # compile python module (may be use 'distutil' instead of 'make' here)
++    if os.system("python setup.py build"):
++    #if os.system("make"):
++        raise ImportError("'lua.so' could not be compiled!")
++
++    os.chdir( cur )
++
++    # re-try to import
++    from lua import *
+diff -Naur lunatic-python-1.0/python.lua _lua/python.lua
+--- lunatic-python-1.0/python.lua	2003-12-13 05:37:57.000000000 +0100
++++ _lua/python.lua	2012-12-28 22:09:07.000000000 +0100
+@@ -1,6 +1,6 @@
+ local path = os.getenv("LUA_SOPATH")
+ if path then
+-	func = loadlib(path.."/lua-python.so", "luaopen_python")
++	func = package.loadlib(path.."/lua-python.so", "luaopen_python")
+ 	if func then
+ 		func()
+ 		return
+@@ -10,7 +10,7 @@
+ local loaded = false
+ for i = 10, 2, -1 do
+ 	for j = 10, 2, -1 do
+-		func = loadlib(string.format(modmask, i, j), "luaopen_python")
++		func = package.loadlib(string.format(modmask, i, j), "luaopen_python")
+ 		if func then
+ 			loaded = true
+ 			func()
+diff -Naur lunatic-python-1.0/setup.py _lua/setup.py
+--- lunatic-python-1.0/setup.py	2005-10-19 01:10:07.000000000 +0200
++++ _lua/setup.py	2013-04-25 00:05:34.776479704 +0200
+@@ -1,7 +1,7 @@
+ #!/usr/bin/python
+ from distutils.core import setup, Extension
+ from distutils.sysconfig import get_python_lib, get_python_version
+-import os
++import os, platform
+ 
+ if os.path.isfile("MANIFEST"):
+     os.unlink("MANIFEST")
+@@ -9,7 +9,13 @@
+ # You may have to change these
+ PYLIBS = ["python"+get_python_version(), "pthread", "util"]
+ PYLIBDIR = [get_python_lib(standard_lib=True)+"/config"]
+-LUALIBS = ["lua", "lualib"]
++pltfrm = platform.platform().lower()
++if 'ubuntu' in pltfrm:
++      LUALIBS = ["lua5.1"]
++elif 'fedora' in pltfrm:
++      LUALIBS = ["lua"]
++else:
++      LUALIBS = ["lua5.1"]
+ LUALIBDIR = []
+ 
+ setup(name="lunatic-python",
+@@ -31,13 +37,13 @@
+                                ["src/pythoninlua.c", "src/luainpython.c"],
+                                library_dirs=PYLIBDIR,
+                                libraries=PYLIBS,
+-                               extra_compile_args=["-rdynamic"],
++                               extra_compile_args=["-rdynamic", "-I/usr/include/lua5.1"],
+                                extra_link_args=["-rdynamic"]),
+                      Extension("lua",
+                                ["src/pythoninlua.c", "src/luainpython.c"],
+                                library_dirs=LUALIBDIR,
+                                libraries=LUALIBS,
+-                               extra_compile_args=["-rdynamic"],
++                               extra_compile_args=["-rdynamic", "-I/usr/include/lua5.1"],
+                                extra_link_args=["-rdynamic"]),
+                     ],
+       )
+diff -Naur lunatic-python-1.0/src/luainpython.c _lua/src/luainpython.c
+--- lunatic-python-1.0/src/luainpython.c	2005-10-19 01:07:02.000000000 +0200
++++ _lua/src/luainpython.c	2012-12-28 22:09:07.000000000 +0100
+@@ -488,12 +488,12 @@
+ 
+ 	if (!L) {
+ 		L = lua_open();
+-		luaopen_base(L);
+-		luaopen_table(L);
+-		luaopen_io(L);
+-		luaopen_string(L);
+-		luaopen_debug(L);
+-		luaopen_loadlib(L);
++
++		/* loading each lib separately has some deep conflict
++		 * with python's readline module so we obey the holy
++		 * docs by lua people and use the magic loader.
++		 */
++		luaL_openlibs(L);
+ 		luaopen_python(L);
+ 		lua_settop(L, 0);
+ 	}
