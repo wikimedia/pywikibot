@@ -88,6 +88,10 @@ If you call them, they will print a warning and do nothing else:
 - removeImage()
 - replaceImage()
 
+The following methods have had their outputs changed:
+
+- getVersionHistory(): Returns a pywikibot.Timestamp object instead of a MediaWiki one
+
 === ImagePage objects ===
 
 For ImagePage objects, the getFileMd5Sum() method is deprecated; it is
@@ -106,5 +110,15 @@ For Category objects, the following methods are deprecated:
 - articlesList: use, for example, list(self.articles()) instead
 - supercategories: use self.categories() instead
 - supercategoriesList: use, for example, list(self.categories()) instead
+
+=== User objects ===
+
+The User object has been moved from the userlib module to the pywikibot
+namespace. Any references to "userlib.User" can be replaced by
+"pywikibot.User", but the old for mis retained for backwards-compatibility.
+
+The following changes have occured in the User object:
+
+- contributions(): returns a pywikibot.Timestamp object instead of a Mediawiki one
 
 # MORE TO COME #
