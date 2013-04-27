@@ -55,9 +55,17 @@ class Timestamp(datetime.datetime):
         """Convert the internal MediaWiki timestamp format to a Timestamp object."""
         return cls.strptime(ts, cls.mediawikiTSFormat)
 
+    def toISOformat(self):
+        """Converts the Timestamp object to an ISO 8601 timestamp"""
+        return self.strftime(self.ISO8601Format)
+
+    def totimestampformat(self):
+        """Converts the Timestamp object to the internal MediaWiki timestamp format."""
+        return self.strftime(self.mediawikiTSFormat)
+
     def __str__(self):
         """Return a string format recognized by the API"""
-        return self.strftime(self.ISO8601Format)
+        return self.toISOformat()
 
     def __add__(self, other):
         newdt = datetime.datetime.__add__(self, other)
