@@ -25,6 +25,7 @@ from pywikibot import config2 as config
 from pywikibot.bot import *
 from pywikibot.exceptions import *
 from pywikibot.textlib import *
+from pywikibot.i18n import translate
 
 
 class Timestamp(datetime.datetime):
