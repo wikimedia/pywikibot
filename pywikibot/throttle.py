@@ -122,7 +122,8 @@ class Throttle(object):
                     f.write("%(pid)s %(time)s %(site)s\n" % p)
             except IOError:
                 pass
-            f.close()
+            else:
+                f.close()
             self.process_multiplicity = count
             if self.verbosedelay:
                 pywikibot.output(
@@ -223,7 +224,7 @@ class Throttle(object):
             for p in processes:
                 f.write("%(pid)s %(time)s %(site)s\n" % p)
         except IOError:
-            pass
+            return
         f.close()
 
     def __call__(self, requestsize=1, write=False):
