@@ -226,7 +226,7 @@ def init_handlers(strm=None):
             debuglogger.setLevel(DEBUG)
             debuglogger.addHandler(file_handler)
 
-        writelogheader()
+##        writelogheader()
 
     _handlers_initialized = True
 
