@@ -133,30 +133,35 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         Rmarker2 = re.compile('%(mark)s(\d+)%(mark)s' % {'mark': marker2})
         # hide the flat template marker
         dontTouchRegexes.append(Rmarker1)
+        origin = text
         values = {}
         count = 0
         for m in Rvalue.finditer(text):
             count += 1
+            # If we have digits between brackets, restoring from dict may fail.
+            # So we need to change the index. We have to search in the origin.
+            while u'}}}%d{{{' % count in origin:
+                count += 1
             item = m.group()
             text = text.replace(item, '%s%d%s' % (marker2, count, marker2))
             values[count] = item
         inside = {}
         seen = set()
+        count = 0
         while TEMP_REGEX.search(text) is not None:
             for m in TEMP_REGEX.finditer(text):
                 item = m.group()
                 if item in seen:
                     continue  # speed up
                 seen.add(item)
-                count = len(seen)
+                count += 1
+                while u'}}%d{{' % count in origin:
+                    count += 1
                 text = text.replace(item, '%s%d%s' % (marker1, count, marker1))
 
                 # Make sure stored templates don't contain markers
-                # We replace the last item first, otherwise inside templates
-                # like {{A{{B}}{{C}}1{{D}}}} could fail
-                for i in range(count - 1, 0, -1):
-                    item = item.replace('%s%d%s' % (marker1, i, marker1),
-                                        inside[i])
+                for m2 in Rmarker1.finditer(item):
+                    item = item.replace(m2.group(), inside[int(m2.group(1))])
                 for m2 in Rmarker2.finditer(item):
                     item = item.replace(m2.group(), values[int(m2.group(1))])
                 inside[count] = item
@@ -889,7 +894,7 @@ def extract_templates_and_params(text):
     thistxt = removeDisabledParts(text)
 
     # marker for inside templates or parameters
-    marker = findmarker(thistxt)
+    marker1 = findmarker(thistxt)
 
     # marker for links
     marker2 = findmarker(thistxt, u'##', u'#')
@@ -903,7 +908,7 @@ def extract_templates_and_params(text):
     result = []
     Rmath = re.compile(ur'<math>[^<]+</math>')
     Rvalue = re.compile(r'{{{.+?}}}')
-    Rmarker = re.compile(ur'%s(\d+)%s' % (marker, marker))
+    Rmarker1 = re.compile(ur'%s(\d+)%s' % (marker1, marker1))
     Rmarker2 = re.compile(ur'%s(\d+)%s' % (marker2, marker2))
     Rmarker3 = re.compile(ur'%s(\d+)%s' % (marker3, marker3))
     Rmarker4 = re.compile(ur'%s(\d+)%s' % (marker4, marker4))
@@ -921,12 +926,17 @@ def extract_templates_and_params(text):
     count = 0
     for m in Rvalue.finditer(thistxt):
         count += 1
+        # If we have digits between brackets, restoring from dict may fail.
+        # So we need to change the index. We have to search in the origin text.
+        while u'}}}%d{{{' % count in text:
+            count += 1
         item = m.group()
         thistxt = thistxt.replace(item, '%s%d%s' % (marker4, count, marker4))
         values[count] = item
 
     inside = {}
     seen = set()
+    count = 0
     while TEMP_REGEX.search(thistxt) is not None:
         for m in TEMP_REGEX.finditer(thistxt):
             # Make sure it is not detected again
@@ -934,14 +944,15 @@ def extract_templates_and_params(text):
             if item in seen:
                 continue  # speed up
             seen.add(item)
-            count = len(seen)
-            thistxt = thistxt.replace(item, '%s%d%s' % (marker, count, marker))
+            count += 1
+            while u'}}%d{{' % count in text:
+                count += 1
+            thistxt = thistxt.replace(item,
+                                      '%s%d%s' % (marker1, count, marker1))
+
             # Make sure stored templates don't contain markers
-            # We replace the last item first, otherwise inside templates
-            # like {{A|{{B}}{{C}}1{{D}}}} could fail
-            for i in range(count - 1, 0, -1):
-                item = item.replace('%s%d%s' % (marker, count, marker),
-                                    inside[i])
+            for m2 in Rmarker1.finditer(item):
+                item = item.replace(m2.group(), inside[int(m2.group(1))])
             for m2 in Rmarker3.finditer(item):
                 item = item.replace(m2.group(), maths[int(m2.group(1))])
             for m2 in Rmarker4.finditer(item):
@@ -950,7 +961,7 @@ def extract_templates_and_params(text):
 
             # Name
             name = m.group('name').strip()
-            m2 = Rmarker.search(name) or Rmath.search(name)
+            m2 = Rmarker1.search(name) or Rmath.search(name)
             if m2 is not None:
                 # Doesn't detect templates whose name changes,
                 # or templates whose name contains math tags
@@ -1009,10 +1020,9 @@ def extract_templates_and_params(text):
                         param_val = param
                         numbered_param += 1
                     count = len(inside)
-                    for i in range(count - 1, 0, -1):
-                        param_val = param_val.replace('%s%d%s'
-                                                      % (marker, i, marker),
-                                                      inside[i])
+                    for m2 in Rmarker1.finditer(param_val):
+                        param_val = param_val.replace(m2.group(),
+                                                      inside[int(m2.group(1))])
                     for m2 in Rmarker2.finditer(param_val):
                         param_val = param_val.replace(m2.group(),
                                                       links[int(m2.group(1))])
