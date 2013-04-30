@@ -1115,7 +1115,7 @@ class Page(object):
         self.site.loadrevisions(self, getText=False, rvdir=reverseOrder,
                                   step=step, total=total)
         return [ ( self._revisions[rev].revid,
-                   pywikibot.Timestamp.fromtimestampformat(self._revisions[rev].timestamp),
+                   pywikibot.Timestamp.fromISOformat(self._revisions[rev].timestamp),
                    self._revisions[rev].user,
                    self._revisions[rev].comment
                  ) for rev in sorted(self._revisions,
