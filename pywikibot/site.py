@@ -3351,9 +3351,11 @@ class DataSite (APISite):
         data = req.submit()
         return data['entities'][prop.getID()]['datatype']
 
-    def editEntity(self, identification, data, **kwargs):
+    def editEntity(self, identification, data, bot=True, **kwargs):
         params = dict(**identification)
         params['action'] = 'wbeditentity'
+        if bot:
+            params['bot'] = 1
         if 'baserevid' in kwargs and kwargs['baserevid']:
             params['baserevid'] = kwargs['baserevid']
         params['token'] = self.token(pywikibot.Page(self, u'Main Page'), 'edit')  # Use a dummy page
@@ -3396,7 +3398,7 @@ class DataSite (APISite):
             item.claims[claim.getID()] = [claim]
         item.lastrevid = data['pageinfo']['lastrevid']
 
-    def changeClaimTarget(self, claim, snaktype='value', **kwargs):
+    def changeClaimTarget(self, claim, snaktype='value', bot=True, **kwargs):
         """
         Sets the claim target to whatever claim.target is
         An optional snaktype lets you set a novalue or somevalue.
@@ -3410,6 +3412,8 @@ class DataSite (APISite):
                       claim=claim.snak,
                       snaktype=snaktype,
                       )
+        if bot:
+            params['bot'] = 1
         params['token'] = self.token(claim, 'edit')
         if snaktype == 'value':
             #This code is repeated from above, maybe it should be it's own function?
@@ -3431,7 +3435,7 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
-    def editSource(self, claim, source, new=False, **kwargs):
+    def editSource(self, claim, source, new=False, bot=True, **kwargs):
         """
         Create/Edit a source.
         @param claim A Claim object to add the source to
@@ -3446,6 +3450,8 @@ class DataSite (APISite):
         params = dict(action='wbsetreference',
                       statement=claim.snak,
                       )
+        if bot:
+           params['bot'] = 1
         params['token'] = self.token(claim, 'edit')
         if not new and hasattr(source, 'hash'):
             params['reference'] = source.hash
@@ -3477,8 +3483,10 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
-    def removeClaims(self, claims, **kwargs):
+    def removeClaims(self, claims, bot=True, **kwargs):
         params = dict(action='wbremoveclaims')
+        if bot:
+            params['bot'] = 1
         params['claim'] = '|'.join(claim.snak for claim in claims)
         params['token'] = self.token(pywikibot.Page(self, u'Main Page'), 'edit')  # Use a dummy page
         for kwarg in kwargs:
