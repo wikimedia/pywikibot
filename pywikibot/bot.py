@@ -226,9 +226,9 @@ def init_handlers(strm=None):
             debuglogger.setLevel(DEBUG)
             debuglogger.addHandler(file_handler)
 
-##        writelogheader()
-
     _handlers_initialized = True
+
+    writelogheader()
 
 
 def writelogheader():
@@ -236,13 +236,18 @@ def writelogheader():
     Save additional version, system and status info to the logfile in use,
     so that the user can look it up later to track errors or report bugs.
     """
+    # if site not available it's too early to print a header (work-a-round)
+    try:
+        site = pywikibot.getSite()
+    except:
+        return
+
     output(u'=== Pywikipediabot framework v2.0 -- Logging header ===')
 
     # script call
     output(u'COMMAND: %s' % unicode(sys.argv))
 
     # new framework release/revision? (handleArgs needs to be called first)
-    site = pywikibot.getSite()
     output(u'VERSION: %s' % unicode((version.getversion().strip(),
                                      version.getversion_onlinerepo(),
                                      site.live_version())))
