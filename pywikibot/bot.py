@@ -239,7 +239,7 @@ def writelogheader():
     # if site not available it's too early to print a header (work-a-round)
     try:
         site = pywikibot.getSite()
-    except:
+    except AttributeError:
         return
 
     output(u'=== Pywikipediabot framework v2.0 -- Logging header ===')
