@@ -15,53 +15,72 @@ Then list the property-->target pairs to add.
 """
 import pywikibot
 from pywikibot import pagegenerators
-repo = pywikibot.Site().data_repository()
 
-source_values = {'en': pywikibot.ItemPage(repo, 'Q328'),
-                 'sv': pywikibot.ItemPage(repo, 'Q169514'),
-                 'de': pywikibot.ItemPage(repo, 'Q48183'),
-                 'it': pywikibot.ItemPage(repo, 'Q11920'),
-                 'no': pywikibot.ItemPage(repo, 'Q191769'),
-                 'ar': pywikibot.ItemPage(repo, 'Q199700'),
-                 'es': pywikibot.ItemPage(repo, 'Q8449'),
-                 'pl': pywikibot.ItemPage(repo, 'Q1551807'),
-                 'ca': pywikibot.ItemPage(repo, 'Q199693'),
-                 'fr': pywikibot.ItemPage(repo, 'Q8447'),
-                 'nl': pywikibot.ItemPage(repo, 'Q10000'),
-                 'pt': pywikibot.ItemPage(repo, 'Q11921'),
-                 'ru': pywikibot.ItemPage(repo, 'Q206855'),
-                 'vi': pywikibot.ItemPage(repo, 'Q200180'),
-                 'be': pywikibot.ItemPage(repo, 'Q877583'),
-                 'uk': pywikibot.ItemPage(repo, 'Q199698'),
-                 'tr': pywikibot.ItemPage(repo, 'Q58255'),
+class ClaimRobot:
+    """
+    A bot to add Wikidata claims
+    """
+    def __init__(self, generator, claims):
+        """
+        Arguments:
+            * generator    - A generator that yields Page objects.
+            * claims       - A list of wikidata claims
+
+        """
+        self.generator = generator
+        self.claims = claims
+        self.repo = pywikibot.Site().data_repository()
+        self.source = None
+        self.setSource(pywikibot.Site().language())
+    
+    def setSource(self, lang):
+        '''
+        Get the source
+        '''
+        source_values = {'en': pywikibot.ItemPage(self.repo, 'Q328'),
+                         'sv': pywikibot.ItemPage(self.repo, 'Q169514'),
+                         'de': pywikibot.ItemPage(self.repo, 'Q48183'),
+                         'it': pywikibot.ItemPage(self.repo, 'Q11920'),
+                         'no': pywikibot.ItemPage(self.repo, 'Q191769'),
+                         'ar': pywikibot.ItemPage(self.repo, 'Q199700'),
+                         'es': pywikibot.ItemPage(self.repo, 'Q8449'),
+                         'pl': pywikibot.ItemPage(self.repo, 'Q1551807'),
+                         'ca': pywikibot.ItemPage(self.repo, 'Q199693'),
+                         'fr': pywikibot.ItemPage(self.repo, 'Q8447'),
+                         'nl': pywikibot.ItemPage(self.repo, 'Q10000'),
+                         'pt': pywikibot.ItemPage(self.repo, 'Q11921'),
+                         'ru': pywikibot.ItemPage(self.repo, 'Q206855'),
+                         'vi': pywikibot.ItemPage(self.repo, 'Q200180'),
+                         'be': pywikibot.ItemPage(self.repo, 'Q877583'),
+                         'uk': pywikibot.ItemPage(self.repo, 'Q199698'),
+                         'tr': pywikibot.ItemPage(self.repo, 'Q58255'),
                  }  # TODO: This should include all projects
+        
+        if lang in source_values:
+            self.source = pywikibot.Claim(self.repo, 'p143')
+            self.source.setTarget(source_values.get(lang))
 
-imported_from = pywikibot.Claim(repo, 'p143')
-source = source_values.get(pywikibot.Site().language(), None)
-if source:
-    imported_from.setTarget(source)
-
-def addClaims(page, claims):
-    '''
-    The function will add the claims to the wikibase page
-    '''
-    item = pywikibot.ItemPage.fromPage(page)
-    pywikibot.output('Processing %s' % page)
-    if not item.exists():
-        pywikibot.output('%s doesn\'t have a wikidata item :(' % page)
-        #TODO FIXME: We should provide an option to create the page
-        return False
-
-    for claim in claims:
-        if claim.getID() in item.get().get('claims'):
-            pywikibot.output(u'A claim for %s already exists. Skipping' % (claim.getID(),))
-            #TODO FIXME: This is a very crude way of dupe checking
-        else:
-            pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget().getID()))
-            item.addClaim(claim)
-            if source:
-                claim.addSource(imported_from, bot=True)
-            #TODO FIXME: We need to check that we aren't adding a duplicate
+    def run(self):
+        """
+        Starts the robot.
+        """
+        for page in self.generator:
+            item = pywikibot.ItemPage.fromPage(page)
+            pywikibot.output('Processing %s' % page)
+            if not item.exists():
+                pywikibot.output('%s doesn\'t have a wikidata item :(' % page)
+                #TODO FIXME: We should provide an option to create the page
+            else:
+                for claim in self.claims:
+                    if claim.getID() in item.get().get('claims'):
+                        pywikibot.output(u'A claim for %s already exists. Skipping' % (claim.getID(),))
+                        #TODO FIXME: This is a very crude way of dupe checking
+                    else:
+                        pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget().getID()))
+                        item.addClaim(claim)
+                        if self.source:
+                            claim.addSource(self.source, bot=True)
+                        #TODO FIXME: We need to check that we aren't adding a duplicate           
 
 
 def main():
@@ -75,16 +94,20 @@ def main():
         raise ValueError  # or something.
     claims = list()
 
+    repo = pywikibot.Site().data_repository()
+
     for i in xrange (0, len(commandline_claims), 2):
         claim = pywikibot.Claim(repo, commandline_claims[i])
         claim.setTarget(pywikibot.ItemPage(repo, commandline_claims[i+1]))
         claims.append(claim)
 
     generator = gen.getCombinedGenerator()
-
-    if generator:
-        for page in generator:
-            addClaims(page, claims)
+    if not generator:
+        # FIXME: Should throw some help
+        return
+    
+    bot = ClaimRobot(generator, claims)
+    bot.run()
 
 if __name__ == "__main__":
     main()
