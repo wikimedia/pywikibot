@@ -75,6 +75,7 @@ class Page(object):
         """
         if isinstance(source, pywikibot.site.BaseSite):
             self._link = Link(title, source=source, defaultNamespace=ns)
+            self._revisions = {}
         elif isinstance(source, Page):
             # copy all of source's attributes to this object
             self.__dict__ = source.__dict__
@@ -83,11 +84,11 @@ class Page(object):
                 self._link = Link(title, source=source.site, defaultNamespace=ns)
         elif isinstance(source, Link):
             self._link = source
+            self._revisions = {}
         else:
             raise pywikibot.Error(
                   "Invalid argument type '%s' in Page constructor: %s"
                   % (type(source), source))
-        self._revisions = {}
 
     @property
     def site(self):
