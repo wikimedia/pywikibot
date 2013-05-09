@@ -191,7 +191,7 @@ from page import Page, ImagePage, Category, Link, User, ItemPage, PropertyPage, 
 from page import html2unicode, url2unicode
 
 
-link_regex = re.compile(r'\[\[(?P<title>[^\]|[#<>{}]*)(\|.*?)?\]\]')
+link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 
 def setAction(s):
