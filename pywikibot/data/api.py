@@ -121,8 +121,8 @@ class Request(object, DictMixin):
         except KeyError:
             self.site = pywikibot.Site()
         self.mime = kwargs.pop("mime", False)
-        self.max_retries = kwargs.pop("max_retries", 25)
-        self.retry_wait = kwargs.pop("retry_wait", 5)
+        self.max_retries = kwargs.pop("max_retries", pywikibot.config.max_retries)
+        self.retry_wait = kwargs.pop("retry_wait", pywikibot.config.retry_wait)
         self.params = {}
         if "action" not in kwargs:
             raise ValueError("'action' specification missing from Request.")
