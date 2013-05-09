@@ -104,6 +104,8 @@ class HarvestRobot:
                                     try:
                                         link = pywikibot.Link(match.group(1))
                                         linkedPage = pywikibot.Page(link)
+                                        if linkedPage.isRedirectPage():
+                                            linkedPage = linkedPage.getRedirectTarget()
                                         linkedItem = pywikibot.ItemPage.fromPage(linkedPage)
                                         claim.setTarget(linkedItem)
                                         pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget().getID()))
