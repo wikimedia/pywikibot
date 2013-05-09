@@ -372,6 +372,11 @@ maxlag = 5
 # running solve_disambiguation.py with the -primary argument.
 special_page_limit = 500
 
+# Maximum number of times to retry an API request before quitting.
+max_retries = 25
+# Minimum time to wait before resubmitting a failed API request.
+retry_wait = 5
+
 ############## TABLE CONVERSION BOT SETTINGS ##############
 
 # will split long paragraphs for better reading the source.
