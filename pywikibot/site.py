@@ -798,8 +798,9 @@ class APISite(BaseSite):
         """Log the user in if not already logged in."""
         # check whether a login cookie already exists for this user
         self._loginstatus = LoginStatus.IN_PROGRESS
-        if not hasattr(self, "_userinfo"):
-            self.getuserinfo()
+        if hasattr(self, "_userinfo"):
+            del self._userinfo
+        self.getuserinfo()
         if self.userinfo['name'] == self._username[sysop] and self.logged_in(sysop):
             return
         loginMan = api.LoginManager(site=self, sysop=sysop,
