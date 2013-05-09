@@ -937,7 +937,7 @@ class WikimediaFamily(Family):
         """Return Wikimedia projects version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.22wmf1'
+        return '1.22wmf3'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
