@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
 This is a script originally written by Wikihermit and then rewritten by Filnik,

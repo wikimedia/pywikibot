@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 This bot cleans a (user) sandbox by replacing the current contents with

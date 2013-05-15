@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8  -*-
 """ Script to determine the pywikipedia version (tag, revision and date) """
 #

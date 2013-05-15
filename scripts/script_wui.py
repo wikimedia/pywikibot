@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
 Robot which runs python framework scripts as (sub-)bot and provides a
