@@ -605,7 +605,7 @@ class CosmeticChangesToolkit:
                     old = '[' + old[0].upper() + old[0].lower() + ']' + old[1:]
                 text = pywikibot.replaceExcept(
                     text,
-                    r'\{\{([mM][sS][gG]:)?' + old + '(?P<parameters>\|[^}]+|)}}',
+                    r'\{\{([mM][sS][gG]:)?%s(?P<parameters>\|[^}]+|)}}' % old,
                     new, exceptions)
         return text
 
@@ -789,11 +789,11 @@ class CosmeticChangesToolkit:
         text = pywikibot.replaceExcept(
             text,
             r"([\r\n])\=\= *\[\[Commons:Copyright tags\|Licensing\]\]: *\=\=",
-            r"\1== {{int:license}} ==", exceptions, True)
+            r"\1== {{int:license-header}} ==", exceptions, True)
         text = pywikibot.replaceExcept(
             text,
-            r"([\r\n])\=\= *(Licensing|License information|{{int:license-header}}) *\=\=",
-            r"\1== {{int:license}} ==", exceptions, True)
+            r"([\r\n])\=\= *(Licensing|License information|{{int:license}}) *\=\=",
+            r"\1== {{int:license-header}} ==", exceptions, True)
 
         # frequent field values to {{int:}} versions
         text = pywikibot.replaceExcept(
@@ -823,8 +823,8 @@ class CosmeticChangesToolkit:
             r'\1== {{int:filedesc}} ==', exceptions, True)
         text = pywikibot.replaceExcept(
             text,
-            r'([\r\n]|^)\=\= *{{int:license}} *\=\=(?:[\r\n ]*)\=\= *{{int:license}} *\=\=',
-            r'\1== {{int:license}} ==', exceptions, True)
+            r'([\r\n]|^)\=\= *{{int:license-header}} *\=\=(?:[\r\n ]*)\=\= *{{int:license-header}} *\=\=',
+            r'\1== {{int:license-header}} ==', exceptions, True)
         return text
 
 
