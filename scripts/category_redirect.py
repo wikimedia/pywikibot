@@ -218,7 +218,7 @@ class CategoryRedirectBot(object):
         # get permalink to older logs
         history = self.log_page.getVersionHistory(total=LOG_SIZE)
         # get the id of the newest log being archived
-        rotate_revid = history[-1][0]
+        rotate_revid = history[LOG_SIZE-1][0]
         # append permalink
         log_text = log_text + (
             "\n\n'''[%s Older logs]'''"
