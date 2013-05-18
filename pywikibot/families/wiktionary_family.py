@@ -22,9 +22,9 @@ class Family(family.WikimediaFamily):
             'mk', 'be', 'ga', 'nds', 'wo', 'ms', 'ang', 'ky', 'co', 'gn', 'mr',
             'csb', 'st', 'ia', 'sd', 'si', 'sh', 'tg', 'sa', 'ug', 'mn', 'kl',
             'jbo', 'an', 'ln', 'zu', 'or', 'gu', 'kw', 'rw', 'gv', 'fo', 'qu',
-            'ss', 'ie', 'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa', 'so',
-            'am', 'su', 'za', 'gd', 'mi', 'tpi', 'ne', 'yi', 'ti', 'sg', 'na',
-            'dv', 'tn', 'ha', 'ks', 'ay', 'ts',
+            'ss', 'vec', 'ie', 'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa',
+            'so', 'am', 'su', 'za', 'gd', 'mi', 'tpi', 'ne', 'yi', 'ti', 'sg',
+            'na', 'dv', 'tn', 'ha', 'ks', 'ay', 'ts',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang)
