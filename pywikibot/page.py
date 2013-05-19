@@ -331,9 +331,8 @@ class Page(object):
         @param oldid: The revid of the revision desired.
 
         """
-        return "%s://%s/%sindex.php?title=%s&oldid=%s" \
-               % (self.site.protocol(),
-                  self.site.hostname(),
+        return "//%s%s/index.php?title=%s&oldid=%s" \
+               % (self.site.hostname(),
                   self.site.scriptpath(),
                   self.title(asUrl=True),
                   (oldid if oldid is not None else self.latestRevision()))
