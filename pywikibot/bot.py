@@ -242,14 +242,14 @@ def writelogheader():
     except AttributeError:
         return
 
-    output(u'=== Pywikipediabot framework v2.0 -- Logging header ===')
+    log(u'=== Pywikipediabot framework v2.0 -- Logging header ===')
 
     # script call
-    output(u'COMMAND: %s' % unicode(sys.argv))
+    log(u'COMMAND: %s' % unicode(sys.argv))
 
     # new framework release/revision? (handleArgs needs to be called first)
     try:
-        output(u'VERSION: %s' % unicode((version.getversion().strip(),
+        log(u'VERSION: %s' % unicode((version.getversion().strip(),
                                          version.getversion_onlinerepo(),
                                          site.live_version())))
     except version.ParseError:
@@ -257,19 +257,19 @@ def writelogheader():
 
     # system
     if hasattr(os, 'uname'):
-        output(u'SYSTEM: %s' % unicode(os.uname()))
+        log(u'SYSTEM: %s' % unicode(os.uname()))
 
     # imported modules
-    output(u'MODULES:')
+    log(u'MODULES:')
     for item in sys.modules.keys():
         ver = version.getfileversion('%s.py' % item.replace('.', '/'))
         if ver and (ver[0] == u'$'):
-            output(u'  %s' % ver)
+            log(u'  %s' % ver)
 
     # messages on bot discussion page?
-    output(u'MESSAGES: %s' % ('unanswered' if site.messages() else 'none'))
+    log(u'MESSAGES: %s' % ('unanswered' if site.messages() else 'none'))
 
-    output(u'=== ' * 14)
+    log(u'=== ' * 14)
 
 
 # User output/logging functions
