@@ -217,7 +217,7 @@ usernames['%s']['%s'] = u'%s'
         while(raw_input("Do you want to add any other projects? (y/N)").upper() == "Y"):
              fam, mylang, username = get_site_and_lang()
              username = username or mainusername
-             f.write("usernames['%(fam)s']['%(mylang)s'] = u'%(username)s'\n")
+             f.write("usernames['%(fam)s']['%(mylang)s'] = u'%(username)s'\n" % locals())
 
         f.close()
         print("'%s' written." % _fnc)
