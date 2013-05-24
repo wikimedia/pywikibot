@@ -133,22 +133,29 @@ def file_exists(filename):
         return True
     return False
 
-def create_user_config():
-    _fnc = os.path.join(base_dir, "user-config.py")
-    if not file_exists(_fnc):
+def get_site_and_lang():
         known_families = re.findall(r'(.+)_family.py\b',
                                    '\n'.join(os.listdir(
                                        os.path.join(pywikibot_dir,
                                                     "pywikibot",
                                                     "families"))))
+        known_families = sorted(known_families)
         fam = listchoice(known_families,
                          "Select family of sites we are working on",
                          default='wikipedia')
         mylang = raw_input(
 "The language code of the site we're working on (default: 'en'): ") or 'en'
         username = raw_input("Username (%s %s): "
-                             % (mylang, fam)) or 'UnnamedBot'
+                             % (mylang, fam))
         username = unicode(username, console_encoding)
+        return fam, mylang, username
+
+def create_user_config():
+    _fnc = os.path.join(base_dir, "user-config.py")
+    if not file_exists(_fnc):
+        fam, mylang, mainusername = get_site_and_lang()
+        mainusername = mainusername or "UnnamedBot"
+
         while True:
             choice = raw_input(
 "Which variant of user_config.py:\n[S]mall or [E]xtended (with further information)? "
@@ -200,13 +207,18 @@ mylang = '%s'
 usernames['%s']['%s'] = u'%s'
 
 
-%s""" % (fam, mylang, fam, mylang, username, config_text))
+%s""" % (fam, mylang, fam, mylang, mainusername, config_text))
         else:
             f.write("""# -*- coding: utf-8  -*-
 family = '%s'
 mylang = '%s'
 usernames['%s']['%s'] = u'%s'
-""" % (fam, mylang, fam, mylang, username))
+""" % (fam, mylang, fam, mylang, mainusername))
+        while(raw_input("Do you want to add any other projects? (y/N)").upper() == "Y"):
+             fam, mylang, username = get_site_and_lang()
+             username = username or mainusername
+             f.write("usernames['%(fam)s']['%(mylang)s'] = u'%(username)s'\n")
+
         f.close()
         print("'%s' written." % _fnc)
 
