@@ -31,6 +31,9 @@ sys.path.append(os.path.join(rewrite_path, 'externals'))
 if "PYWIKIBOT2_DIR" not in os.environ:
     os.environ["PYWIKIBOT2_DIR"] = os.path.split(__file__)[0]
 
+if not os.path.exists(os.path.join(os.environ["PYWIKIBOT2_DIR"], "user-config.py")):
+    execfile('generate_user_files.py')
+
 sys.argv.pop(0)
 if len(sys.argv) > 0:
     if not os.path.exists(sys.argv[0]):
