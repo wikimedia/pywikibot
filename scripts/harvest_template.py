@@ -50,6 +50,7 @@ class HarvestRobot:
                          'de': pywikibot.ItemPage(self.repo, 'Q48183'),
                          'it': pywikibot.ItemPage(self.repo, 'Q11920'),
                          'no': pywikibot.ItemPage(self.repo, 'Q191769'),
+                         'fa': pywikibot.ItemPage(self.repo, 'Q48952'),
                          'ar': pywikibot.ItemPage(self.repo, 'Q199700'),
                          'es': pywikibot.ItemPage(self.repo, 'Q8449'),
                          'pl': pywikibot.ItemPage(self.repo, 'Q1551807'),
