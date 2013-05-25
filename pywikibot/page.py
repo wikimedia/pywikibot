@@ -2824,6 +2824,9 @@ class Link(object):
         t = t.replace(u"\u200e", u"").replace(u"\u200f", u"")
         self._text = t
 
+    def __repr__(self):
+        return "pywikibot.page.Link(%r, %r)" % (self.title, self.site)
+
     def parse_site(self):
         """Parse only enough text to determine which site the link points to.
 
