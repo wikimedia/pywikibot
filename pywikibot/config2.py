@@ -523,6 +523,17 @@ cosmetic_changes_disable = {}
 # cosmetic_changes_deny_script.append('your_script_name')
 cosmetic_changes_deny_script = ['cosmetic_changes', 'touch']
 
+############## REPLICATION BOT ################
+# You can add replicate_replace to your user_config.py, which has the following format:
+#
+# replicate_replace = {
+#            'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
+# }
+#
+# to replace all occurences of 'Hoofdpagina' with 'Veurblaad' when writing to liwiki. Note that this does
+# not take the origin wiki into account.
+replicate_replace = {}
+
 ############## FURTHER SETTINGS ##############
 
 ### Proxy configuration ###
