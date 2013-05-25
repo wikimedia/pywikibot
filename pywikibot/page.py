@@ -365,14 +365,16 @@ class Page(object):
         if hasattr(self, "_text"):
             del self._text
 
-    def expand_text(self):
+    def expand_text(self, refresh=False):
         """Return the page text with all templates expanded."""
-        req = pywikibot.data.api.Request(action="expandtemplates",
-                                         text=self.text,
-                                         title=self.title(withSection=False),
-                                         site=self.site)
-        result = req.submit()
-        return result["expandtemplates"]["*"]
+        if not hasattr(self, "_expanded_text") or (self._expanded_text is None) or refresh:
+            req = pywikibot.data.api.Request(action="expandtemplates", 
+                                             text=self.text,
+                                             title=self.title(withSection=False),
+                                             site=self.site)
+            self._expanded_text = req.submit()["expandtemplates"]["*"]
+            
+        return self._expanded_text
 
     def userName(self):
         """Return name or IP address of last user to edit page.
