@@ -3352,6 +3352,7 @@ class DataSite (APISite):
         data = req.submit()
         return data['entities'][prop.getID()]['datatype']
 
+    @must_be(group='user')
     def editEntity(self, identification, data, bot=True, **kwargs):
         params = dict(**identification)
         params['action'] = 'wbeditentity'
@@ -3368,6 +3369,7 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
+    @must_be(group='user')
     def addClaim(self, item, claim, bot=True):
 
         params = dict(action='wbcreateclaim',
@@ -3399,6 +3401,7 @@ class DataSite (APISite):
             item.claims[claim.getID()] = [claim]
         item.lastrevid = data['pageinfo']['lastrevid']
 
+    @must_be(group='user')
     def changeClaimTarget(self, claim, snaktype='value', bot=True, **kwargs):
         """
         Sets the claim target to whatever claim.target is
@@ -3436,6 +3439,7 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
+    @must_be(group='user')
     def editSource(self, claim, source, new=False, bot=True, **kwargs):
         """
         Create/Edit a source.
@@ -3484,6 +3488,7 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
+    @must_be(group='user')
     def removeClaims(self, claims, bot=True, **kwargs):
         params = dict(action='wbremoveclaims')
         if bot:
