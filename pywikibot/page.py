@@ -395,7 +395,7 @@ class Page(object):
         return self._revisions[rev].anon
 
     def editTime(self):
-        """Return timestamp (in ISO 8601 format) of last revision to page.
+        """Return timestamp of last revision to page.
 
         """
         rev = self.latestRevision()
@@ -2180,8 +2180,8 @@ class User(Page):
     def contributions(self, total=500, namespaces=[]):
         """ Yield tuples describing this user edits with an upper bound of
         'limit'. Each tuple is composed of a pywikibot.Page object,
-        the revision id (int), the edit timestamp (as int in mediawiki's
-        internal format), and the comment (unicode).
+        the revision id (int), the edit timestamp (as a pywikibot.Timestamp
+        object), and the comment (unicode).
         Pages returned are not guaranteed to be unique.
 
         @param total: limit result to this number of pages
@@ -2719,8 +2719,8 @@ class Revision(object):
         @type revid: int
         @param text: Revision wikitext.
         @type text: unicode, or None if text not yet retrieved
-        @param timestamp: Revision time stamp (in ISO 8601 format)
-        @type timestamp: unicode
+        @param timestamp: Revision time stamp
+        @type timestamp: pywikibot.Timestamp
         @param user: user who edited this revision
         @type user: unicode
         @param anon: user is unregistered

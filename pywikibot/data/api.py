@@ -937,14 +937,14 @@ def update_page(page, pagedict):
     if 'revisions' in pagedict:
         for rev in pagedict['revisions']:
             revision = pywikibot.page.Revision(
-                                        revid=rev['revid'],
-                                        timestamp=rev['timestamp'],
-                                        user=rev.get('user', u''),
-                                        anon='anon' in rev,
-                                        comment=rev.get('comment',  u''),
-                                        minor='minor' in rev,
-                                        text=rev.get('*', None)
-                                      )
+                revid=rev['revid'],
+                timestamp=pywikibot.Timestamp.fromISOformat(rev['timestamp']),
+                user=rev.get('user', u''),
+                anon='anon' in rev,
+                comment=rev.get('comment',  u''),
+                minor='minor' in rev,
+                text=rev.get('*', None)
+              )
             page._revisions[revision.revid] = revision
 
     if 'lastrevid' in pagedict:
