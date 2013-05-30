@@ -286,8 +286,10 @@ class TestPageObject(unittest.TestCase):
         self.assertEqual(item.labels['en'], 'Main Page')
         self.assertTrue('en' in item.aliases)
         self.assertTrue('HomePage' in item.aliases['en'])
+        self.assertEqual(item.namespace(), 0)
         prop = pywikibot.PropertyPage(repo, 'Property:P21')
         self.assertEqual(prop.getType(), 'wikibase-item')
+        self.assertEqual(prop.namespace(), 120)
 
 
 

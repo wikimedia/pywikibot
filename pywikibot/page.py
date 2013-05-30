@@ -2218,8 +2218,8 @@ class WikibasePage(Page):
     The base page for the Wikibase extension.
     There really should be no need to call this directly
     """
-    def __init__(self, site, title=u""):
-        Page.__init__(self, site, title)
+    def __init__(self, site, title=u"", **kwargs):
+        Page.__init__(self, site, title, **kwargs)
         if isinstance(self.site, pywikibot.site.DataSite):
             self.repo = self.site
             self.id = self.title(withNamespace=False).lower()
@@ -2413,7 +2413,7 @@ class ItemPage(WikibasePage):
         site=pywikibot.DataSite & title=Q42
         site=pywikibot.Site & title=Main Page
         """
-        WikibasePage.__init__(self, site, title)
+        WikibasePage.__init__(self, site, title, ns=0)
 
     @staticmethod
     def fromPage(page):
@@ -2549,7 +2549,7 @@ class PropertyPage(WikibasePage):
         PropertyPage(DataSite, 'Property:P21')
     """
     def __init__(self, source, title=u""):
-        WikibasePage.__init__(self, source, title)
+        WikibasePage.__init__(self, source, title, ns=120)
         self.id = self.title(withNamespace=False).lower()
         if not self.id.startswith(u'p'):
             raise ValueError(u"'%s' is not a property page!" % self.title())
@@ -2574,7 +2574,7 @@ class QueryPage(WikibasePage):
     For future usage, not implemented yet
     """
     def __init__(self, site, title):
-        WikibasePage.__init__(self, site, title)
+        WikibasePage.__init__(self, site, title, ns=122)
         self.id = self.title(withNamespace=False).lower()
         if not self.id.startswith(u'u'):
             raise ValueError(u"'%s' is not a query page!" % self.title())
