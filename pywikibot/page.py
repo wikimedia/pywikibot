@@ -2220,12 +2220,15 @@ class WikibasePage(Page):
     """
     def __init__(self, site, title=u"", **kwargs):
         Page.__init__(self, site, title, **kwargs)
-        if isinstance(self.site, pywikibot.site.DataSite):
-            self.repo = self.site
-            self.id = self.title(withNamespace=False).lower()
-        else:
-            self.repo = self.site.data_repository()
+        self.repo = self.site
         self._isredir = False  # Wikibase pages cannot be a redirect
+
+    def title(self, **kwargs):
+        if self.namespace() == 0:
+            self._link._text = self.getID()
+            del self._link._title
+        return Page(self).title(**kwargs)
+
 
     def __defined_by(self, singular=False):
         """
@@ -2251,14 +2254,13 @@ class WikibasePage(Page):
             return params
 
         #the rest only applies to ItemPages, but is still needed here.
-
-        if isinstance(self.site, pywikibot.site.DataSite):
-            params[id] = self.title(withNamespace=False)
-        elif isinstance(self.site, pywikibot.site.BaseSite):
-            params[site] = self.site.dbName()
-            params[title] = self.title()
+        if hasattr(self, '_site') and hasattr(self, '_title'):
+            params[site] = self._site.dbName()
+            params[title] = self._title
         else:
-            raise pywikibot.exceptions.BadTitle
+            quit()
+            params[id] = self.getID()
+
         return params
 
     def exists(self):
@@ -2414,13 +2416,20 @@ class ItemPage(WikibasePage):
         site=pywikibot.Site & title=Main Page
         """
         WikibasePage.__init__(self, site, title, ns=0)
+        self.id = title
 
     @staticmethod
     def fromPage(page):
         """
         Get the ItemPage based on a Page that links to it
         """
-        return ItemPage(page.site, page.title())
+        repo = page.site.data_repository()
+        i = ItemPage(repo, 'null')
+        del i.id
+        i._site = page.site
+        i._title = page.title()
+        return i
+        #return ItemPage(page.site, page.title())
 
     def __make_site(self, dbname):
         """
