@@ -227,7 +227,7 @@ class TestPageObject(unittest.TestCase):
         self.assertType(mainpage.isDisambig(), bool)
         self.assertType(mainpage.canBeEdited(), bool)
         self.assertType(mainpage.botMayEdit(), bool)
-        self.assertType(mainpage.editTime(), unicode)
+        self.assertType(mainpage.editTime(), pywikibot.Timestamp)
         self.assertType(mainpage.previousRevision(), int)
         self.assertType(mainpage.permalink(), basestring)
 
