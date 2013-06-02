@@ -19,7 +19,10 @@ import json
 import logging
 import mimetypes
 import os
-import pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 import pprint
 import re
 import traceback
