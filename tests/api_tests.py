@@ -6,6 +6,7 @@
 #
 __version__ = '$Id$'
 
+import datetime
 import unittest
 import pywikibot
 import pywikibot.data.api as api
@@ -70,6 +71,22 @@ class TestPageGenerator(unittest.TestCase):
             self.assertEqual(page.site, mysite)
             self.assert_(page.title() in titles)
 
+
+class TestCachedRequest(unittest.TestCase):
+    def testResults(self):
+        # Run the cached query twice to ensure the
+        # data returned is equal
+        params = {'action': 'query',
+                  'prop': 'info',
+                  'titles': 'Main Page',
+                  }
+        req = api.CachedRequest(datetime.timedelta(minutes=10),
+                                site=mysite, **params)
+        data = req.submit()
+        req2 = api.CachedRequest(datetime.timedelta(minutes=10),
+                                 site=mysite, **params)
+        data2 = req2.submit()
+        self.assertEqual(data, data2)
 
 if __name__ == '__main__':
     try:
