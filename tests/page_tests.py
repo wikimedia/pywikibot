@@ -209,6 +209,12 @@ class TestPageObject(unittest.TestCase):
         self.assertEqual(p2.isImage(), True)
         self.assertEqual(p3.isImage(), False)
 
+    def testIsRedirect(self):
+        p1 = pywikibot.Page(site, u'User:Legoktm/R1')
+        p2 = pywikibot.Page(site, u'User:Legoktm/R2')
+        self.assertTrue(p1.isRedirectPage())
+        self.assertEqual(p1.getRedirectTarget(), p2)
+
     def testApiMethods(self):
         """Test various methods that rely on API."""
         # since there is no way to predict what data the wiki will return,
@@ -312,7 +318,6 @@ class TestPageObject(unittest.TestCase):
 ##    def backlinks(self, followRedirects=True, filterRedirects=None,
 ##                  namespaces=None):
 ##    def embeddedin(self, filter_redirects=None, namespaces=None):
-##    def getRedirectTarget(self):
 ##    def getVersionHistory(self, reverseOrder=False, getAll=False,
 ##                          revCount=500):
 ##    def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
