@@ -215,6 +215,16 @@ class TestPageObject(unittest.TestCase):
         self.assertTrue(p1.isRedirectPage())
         self.assertEqual(p1.getRedirectTarget(), p2)
 
+    def testPageGet(self):
+        p1 = pywikibot.Page(site, u'User:Legoktm/R2')
+        p2 = pywikibot.Page(site, u'User:Legoktm/R1')
+        p3 = pywikibot.Page(site, u'User:Legoktm/R3')
+
+        text = u'This page is used in the [[mw:Manual:Pywikipediabot]] testing suite.'
+        self.assertEqual(p1.get(), text)
+        self.assertRaises(pywikibot.exceptions.IsRedirectPage, p2.get)
+        self.assertRaises(pywikibot.exceptions.NoPage, p3.get)
+
     def testApiMethods(self):
         """Test various methods that rely on API."""
         # since there is no way to predict what data the wiki will return,
@@ -307,7 +317,6 @@ class TestPageObject(unittest.TestCase):
 
 ##    def autoFormat(self):
 ##    def isAutoTitle(self):
-##    def get(self, force=False, get_redirect=False, sysop=False):
 ##    def getOldVersion(self, oldid, force=False, get_redirect=False,
 ##                      sysop=False):
 ##    text = property(_textgetter, _textsetter, _cleartext,
