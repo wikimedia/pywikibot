@@ -2229,7 +2229,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
                    'anon': showAnon,
                    'redirect': showRedirects,
                    }
-        if self.has_right('patrol'):
+        if showPatrolled is not None and (self.has_right('patrol') or self.has_right('patrolmarks')):
             rcgen.request['rcprop'] += '|patrolled'
             filters['patrolled'] = showPatrolled
         rcshow = []
