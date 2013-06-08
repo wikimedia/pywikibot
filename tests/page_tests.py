@@ -311,7 +311,10 @@ class TestPageObject(unittest.TestCase):
         self.assertEqual(prop.getType(), 'wikibase-item')
         self.assertEqual(prop.namespace(), 120)
 
-
+    def testItemPageExtensionability(self):
+        class MyItemPage(pywikibot.ItemPage):
+            pass
+        self.assertIsInstance(MyItemPage.fromPage(mainpage), MyItemPage)
 
 # methods that still need tests implemented or expanded:
 

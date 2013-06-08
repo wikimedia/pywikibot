@@ -2415,21 +2415,20 @@ class ItemPage(WikibasePage):
         site=pywikibot.DataSite & title=Q42
         site=pywikibot.Site & title=Main Page
         """
-        WikibasePage.__init__(self, site, title, ns=0)
+        super(ItemPage, self).__init__(site, title, ns=0)
         self.id = title
 
-    @staticmethod
-    def fromPage(page):
+    @classmethod
+    def fromPage(cls, page):
         """
         Get the ItemPage based on a Page that links to it
         """
         repo = page.site.data_repository()
-        i = ItemPage(repo, 'null')
+        i = cls(repo, 'null')
         del i.id
         i._site = page.site
         i._title = page.title()
         return i
-        #return ItemPage(page.site, page.title())
 
     def __make_site(self, dbname):
         """
@@ -2447,7 +2446,7 @@ class ItemPage(WikibasePage):
         args are the values of props
         """
         if force or not hasattr(self, '_content'):
-            WikibasePage.get(self, force=force, *args)
+            super(ItemPage, self).get(force=force, *args)
 
         #claims
         self.claims = {}
