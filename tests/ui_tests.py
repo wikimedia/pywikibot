@@ -100,7 +100,68 @@ if __name__ == "__main__":
             self.assertEqual(newstdout.getvalue(), "")
             self.assertEqual(newstderr.getvalue(), "CRITICAL: CRITICAL\n")
 
-    
+        def test_output(self):
+            pywikibot.output("output", toStdout=False)
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "output\n")
+
+        def test_output(self):
+            pywikibot.output("output", toStdout=True)
+            self.assertEqual(newstdout.getvalue(), "output\n")
+            self.assertEqual(newstderr.getvalue(), "")
+
+        def test_warning(self):
+            pywikibot.warning("warning")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "WARNING: warning\n")
+
+        def test_error(self):
+            pywikibot.error("error")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "ERROR: error\n")
+
+        def test_log(self):
+            pywikibot.log("log")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "")
+
+        def test_critical(self):
+            pywikibot.critical("critical")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "CRITICAL: critical\n")
+
+        def test_debug(self):
+            pywikibot.debug("debug", "test")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "")
+
+        def test_exception(self):
+            class TestException(Exception):
+                pass
+            try:
+                raise TestException("Testing Exception")
+            except TestException:
+                pywikibot.exception("exception")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "ERROR: TestException: Testing Exception\n")
+
+        def test_exception(self):
+            class TestException(Exception):
+                pass
+            try:
+                raise TestException("Testing Exception")
+            except TestException:
+                pywikibot.exception("exception", tb=True)
+            self.assertEqual(newstdout.getvalue(), "")
+            stderrlines = newstderr.getvalue().split("\n")
+            self.assertEqual(stderrlines[0], "ERROR: TestException: Testing Exception")
+            self.assertEqual(stderrlines[1], "Traceback (most recent call last):")
+            self.assertEqual(stderrlines[3], """    raise TestException("Testing Exception")""")
+            self.assertEqual(stderrlines[4], "TestException: Testing Exception")
+
+            self.assertNotEqual(stderrlines[-1], "\n")
+
+
     try:
         try:
             unittest.main()
