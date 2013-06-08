@@ -232,6 +232,38 @@ if __name__ == "__main__":
             self.assertIsInstance(returned, unicode)
             self.assertEqual(returned, "n")
 
+    class TestTerminalOutputColorUnix(unittest.TestCase):
+        def setUp(self):
+            patch()
+            newstdout.truncate(0)
+            newstderr.truncate(0)
+            newstdin.truncate(0)
+
+        def tearDown(self):
+            unpatch()
+
+        def testOutputColorizedText(self):
+            pywikibot.config.colorized_output = True
+            pywikibot.output(u"normal text \03{lightpurple}light purple text\03{default} normal text")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "normal text \x1b[35;1mlight purple text\x1b[0m normal text\n\x1b[0m")
+
+        @unittest.expectedFailure
+        def testOutputNoncolorizedText(self):
+            pywikibot.config.colorized_output = False
+            pywikibot.output(u"normal text \03{lightpurple}light purple text\03{default} normal text")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "normal text light purple text normal text ***")
+
+        @unittest.expectedFailure
+        def testOutputColorCascade(self):
+            pywikibot.config.colorized_output = True
+            pywikibot.output(u"normal text \03{lightpurple} light purple \03{lightblue} light blue \03{default} light purple \03{default} normal text")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "normal text \x1b[35;1m light purple \x1b[94;1m light blue \x1b[35;1m light purple \x1b[0m normal text\n\x1b[0m")
+
+
+
 
 
     try:
