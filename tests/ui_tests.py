@@ -50,7 +50,7 @@ if __name__ == "__main__":
                       'caller_line': 0,
                       'newline': "\n"}
 
-    class TestTerminalUI(unittest.TestCase):
+    class TestTerminalOutput(unittest.TestCase):
         def setUp(self):
             patch()
             newstdout.truncate(0)
@@ -160,6 +160,78 @@ if __name__ == "__main__":
             self.assertEqual(stderrlines[4], "TestException: Testing Exception")
 
             self.assertNotEqual(stderrlines[-1], "\n")
+
+    class TestTerminalInput(unittest.TestCase):
+        def setUp(self):
+            patch()
+            newstdout.truncate(0)
+            newstderr.truncate(0)
+            newstdin.truncate(0)
+
+        def tearDown(self):
+            unpatch()
+
+        def testInput(self):
+            newstdin.write("input to read\n")
+            newstdin.seek(0)
+
+            returned = pywikibot.input("question")
+
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "question ")
+
+            self.assertIsInstance(returned, unicode)
+            self.assertEqual(returned, u"input to read")
+
+        @unittest.expectedFailure
+        def testInputChoiceDefault(self):
+            newstdin.write("\n")
+            newstdin.seek(0)
+
+            returned = pywikibot.inputChoice("question", ["answer 1", "answer 2", "answer 3"], ["A", "N", "S"], "A")
+
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "question ([A]nswer 1, a[N]swer 2, an[S]wer 3) ")
+
+            self.assertIsInstance(returned, unicode)
+            self.assertEqual(returned, "a")
+
+        def testInputChoiceCapital(self):
+            newstdin.write("N\n")
+            newstdin.seek(0)
+
+            returned = pywikibot.inputChoice("question", ["answer 1", "answer 2", "answer 3"], ["A", "N", "S"], "A")
+
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "question ([A]nswer 1, a[N]swer 2, an[S]wer 3) ")
+
+            self.assertIsInstance(returned, unicode)
+            self.assertEqual(returned, "n")
+
+        def testInputChoiceNonCapital(self):
+            newstdin.write("n\n")
+            newstdin.seek(0)
+
+            returned = pywikibot.inputChoice("question", ["answer 1", "answer 2", "answer 3"], ["A", "N", "S"], "A")
+
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "question ([A]nswer 1, a[N]swer 2, an[S]wer 3) ")
+
+            self.assertIsInstance(returned, unicode)
+            self.assertEqual(returned, "n")
+
+        def testInputChoiceIncorrectAnswer(self):
+            newstdin.write("X\nN\n")
+            newstdin.seek(0)
+
+            returned = pywikibot.inputChoice("question", ["answer 1", "answer 2", "answer 3"], ["A", "N", "S"], "A")
+
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "question ([A]nswer 1, a[N]swer 2, an[S]wer 3) "*2)
+
+            self.assertIsInstance(returned, unicode)
+            self.assertEqual(returned, "n")
+
 
 
     try:
