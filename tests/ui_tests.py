@@ -255,6 +255,13 @@ if __name__ == "__main__":
             self.assertEqual(newstdout.getvalue(), "")
             self.assertEqual(newstderr.getvalue(), "normal text light purple text normal text ***")
 
+        def testOutputNoncolorizedText_incorrect(self):
+            ''' This test documents current (incorrect) behavior '''
+            pywikibot.config.colorized_output = False
+            pywikibot.output(u"normal text \03{lightpurple}light purple text\03{default} normal text")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "normal text \x03{lightpurple}light purple text\x03{default} normal text\n")
+
         @unittest.expectedFailure
         def testOutputColorCascade(self):
             pywikibot.config.colorized_output = True
@@ -262,9 +269,42 @@ if __name__ == "__main__":
             self.assertEqual(newstdout.getvalue(), "")
             self.assertEqual(newstderr.getvalue(), "normal text \x1b[35;1m light purple \x1b[94;1m light blue \x1b[35;1m light purple \x1b[0m normal text\n\x1b[0m")
 
+        def testOutputColorCascade_incorrect(self):
+            ''' This test documents current (incorrect) behavior '''
+            pywikibot.config.colorized_output = True
+            pywikibot.output(u"normal text \03{lightpurple} light purple \03{lightblue} light blue \03{default} light purple \03{default} normal text")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "normal text \x1b[35;1m light purple \x1b[94;1m light blue \x1b[0m light purple \x1b[0m normal text\n\x1b[0m")
+    
+    class TestTerminalUnicodeUnix(unittest.TestCase):
+        def setUp(self):
+            patch()
+            newstdout.truncate(0)
+            newstderr.truncate(0)
+            newstdin.truncate(0)
 
+        def tearDown(self):
+            unpatch()
 
+        def testOutputUnicodeText(self):
+            pywikibot.config.console_encoding = 'utf-8'
+            pywikibot.output(u"Заглавная_страница")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), u"Заглавная_страница\n".encode('utf-8'))
 
+            
+        def testInputUnicodeText(self):
+            pywikibot.config.console_encoding = 'utf-8'
+            newstdin.write(u"Заглавная_страница\n".encode('utf-8'))
+            newstdin.seek(0)
+            
+            returned = pywikibot.input(u"Википедию? ")
+            
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), u"Википедию?  ".encode('utf-8'))
+            
+            self.assertIsInstance(returned, unicode)
+            self.assertEqual(returned, u"Заглавная_страница")
 
     try:
         try:
