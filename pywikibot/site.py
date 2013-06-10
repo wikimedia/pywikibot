@@ -76,7 +76,7 @@ def Family(fam=None, fatal=True):
     @return: a Family instance configured for the named family.
 
     """
-    if fam == None:
+    if fam is None:
         fam = config.family
     try:
         # first try the built-in families
@@ -87,13 +87,13 @@ def Family(fam=None, fatal=True):
         # next see if user has defined a local family module
         try:
             sys.path.append(config.datafilepath('families'))
-            myfamily =  __import__("%s_family" % fam)
+            myfamily = __import__("%s_family" % fam)
         except ImportError:
             if fatal:
                 pywikibot.error(u"""\
 Error importing the %s family. This probably means the family
 does not exist. Also check your configuration file."""
-                                  % fam, exc_info=True)
+                                % fam, exc_info=True)
                 sys.exit(1)
             else:
                 raise Error("Family %s does not exist" % fam)
@@ -3464,7 +3464,7 @@ class DataSite (APISite):
                       statement=claim.snak,
                       )
         if bot:
-           params['bot'] = 1
+            params['bot'] = 1
         params['token'] = self.token(claim, 'edit')
         if not new and hasattr(source, 'hash'):
             params['reference'] = source.hash
