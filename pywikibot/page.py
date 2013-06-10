@@ -2623,6 +2623,8 @@ class Claim(PropertyPage):
             elif claim.getType() == 'commonsMedia':
                 claim.target = ImagePage(site.image_repository(), 'File:' +
                                                                   data['mainsnak']['datavalue']['value'])
+            elif claim.getType() == 'globecoordinate':
+                claim.target = pywikibot.Coordinate.fromWikibase(data['mainsnak']['datavalue']['value'])
             else:
                 #This covers string type
                 claim.target = data['mainsnak']['datavalue']['value']
@@ -2652,6 +2654,7 @@ class Claim(PropertyPage):
         types = {'wikibase-item': ItemPage,
                  'string': basestring,
                  'commonsMedia': ImagePage,
+                 'globecoordinate': pywikibot.Coordinate,
                  }
         if self.getType() in types:
             if not isinstance(value, types[self.getType()]):

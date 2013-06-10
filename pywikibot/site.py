@@ -3350,7 +3350,11 @@ class DataSite (APISite):
         #Store it for 100 years
         req = api.CachedRequest(expiry, site=self, **params)
         data = req.submit()
-        return data['entities'][prop.getID()]['datatype']
+        dtype =  data['entities'][prop.getID()]['datatype']
+        if dtype == 'globe-coordinate':
+            dtype = 'globecoordinate'
+            #TODO Fix this
+        return dtype
 
     @must_be(group='user')
     def editEntity(self, identification, data, bot=True, **kwargs):
@@ -3388,6 +3392,8 @@ class DataSite (APISite):
                 params['value'] = json.dumps(claim.getTarget())
             elif claim.getType() == 'commonsMedia':
                 params['value'] = json.dumps(claim.getTarget().title(withNamespace=False))
+            elif claim.getType() == 'globecoordinate':
+                params['value'] = json.dumps(claim.getTarget().toWikibase())
             else:
                 raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
         params['token'] = self.token(item, 'edit')
@@ -3428,6 +3434,8 @@ class DataSite (APISite):
                 params['value'] = json.dumps(claim.getTarget())
             elif claim.getType() == 'commonsMedia':
                 params['value'] = json.dumps(claim.getTarget().title(withNamespace=False))
+            elif claim.getType() == 'globecoordinate':
+                params['value'] = json.dumps(claim.getTarget().toWikibase())
             else:
                 raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
 

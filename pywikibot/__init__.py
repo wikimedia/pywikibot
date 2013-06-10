@@ -87,6 +87,66 @@ class Timestamp(datetime.datetime):
             return newdt
 
 
+class Coordinate(object):
+    """
+    Class for handling and storing Coordinates.
+    For now its just being used for DataSite, but
+    in the future we can use it for the GeoData extension.
+    """
+    def __init__(self, lat, lon, alt=None, precision=0.1, globe='earth'):
+        """
+        @param lat: Latitude
+        @type lat: float
+        @param lon: Longitute
+        @param lon: float
+        @param alt: Altitute? TODO FIXME
+        @param precision: precision
+        @type precision: float
+        @param globe: Which Wikidata globe to use
+        @type globe: str
+        """
+        self.lat = lat
+        self.lon = lon
+        self.alt = alt
+        self.precision = precision
+        self.globe = globe
+        #Copied from [[mw:Extension:GeoData]]
+        if not globe in ['earth', 'mercury', 'venus', 'moon',
+                         'mars', 'phobos', 'deimos', 'ganymede',
+                         'callisto', 'io', 'europa', 'mimas',
+                         'enceladus', 'tethys', 'dione',
+                         'rhea', 'titan', 'hyperion', 'iapetus',
+                         'phoebe', 'miranda', 'ariel', 'umbriel',
+                         'titania', 'oberon', 'triton', 'pluto']:
+            raise ValueError(u"%s is not a supported globe." % globe)
+
+    def toWikibase(self):
+        """
+        Function which converts the data to a JSON object
+        for the Wikibase API.
+        FIXME Should this be in the DataSite object?
+        """
+        globes = {'earth': 'http://www.wikidata.org/entity/Q2'}
+        if not self.globe in globes:
+            raise NotImplementedError(u"%s is not supported in Wikibase yet." % self.globe)
+        return {'latitude': self.lat,
+                'longitude': self.lon,
+                'altitude': self.alt,
+                'globe': globes[self.globe],
+                'precision': self.precision,
+                }
+
+    @staticmethod
+    def fromWikibase(data):
+        """Constructor to create an object from Wikibase's JSON output"""
+        globes = {'http://www.wikidata.org/entity/Q2': 'earth'}
+        # TODO FIXME ^
+        return Coordinate(data['latitude'], data['longitude'],
+                       data['altitude'], data['precision'],
+                       globes[data['globe']])
+
+
+
 def deprecated(instead=None):
     """Decorator to output a method deprecation warning.
 
