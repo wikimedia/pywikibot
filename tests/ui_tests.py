@@ -337,6 +337,7 @@ if __name__ == "__main__":
             self.assertIsInstance(returned, unicode)
             self.assertEqual(returned, u"Заглавная_страница")
 
+    @unittest.skipUnless(os.name == "posix", "requires Unix console")
     class TestTransliterationUnix(unittest.TestCase):
         def setUp(self):
             patch()
