@@ -305,6 +305,23 @@ if __name__ == "__main__":
             
             self.assertIsInstance(returned, unicode)
             self.assertEqual(returned, u"Заглавная_страница")
+            
+    class TestTransliterationUnix(unittest.TestCase):
+        def setUp(self):
+            patch()
+            newstdout.truncate(0)
+            newstderr.truncate(0)
+            newstdin.truncate(0)
+
+        def tearDown(self):
+            unpatch()
+
+        def testOutputUnicodeText(self):
+            pywikibot.config.console_encoding = 'latin-1'
+            pywikibot.config.colorized_output = True
+            pywikibot.output(u"abcd АБГД αβγδ あいうえお")
+            self.assertEqual(newstdout.getvalue(), "")
+            self.assertEqual(newstderr.getvalue(), "abcd \x1b[33;1mA\x1b[0m\x1b[33;1mB\x1b[0m\x1b[33;1mG\x1b[0m\x1b[33;1mD\x1b[0m \x1b[33;1ma\x1b[0m\x1b[33;1mb\x1b[0m\x1b[33;1mg\x1b[0m\x1b[33;1md\x1b[0m \x1b[33;1ma\x1b[0m\x1b[33;1mi\x1b[0m\x1b[33;1mu\x1b[0m\x1b[33;1me\x1b[0m\x1b[33;1mo\x1b[0m\n\x1b[0m")
 
     try:
         try:
