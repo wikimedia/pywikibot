@@ -192,7 +192,7 @@ class CategoryRedirectBot(object):
         deadline = today + timedelta(days=-self.cooldown)
         if cat.editTime() is None:
             raise RuntimeError
-        return (deadline.strftime(dateformat) > cat.editTime())
+        return (deadline > cat.editTime())
 
     def get_log_text(self):
         """Rotate log text and return the most recent text."""
