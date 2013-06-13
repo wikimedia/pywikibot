@@ -169,6 +169,19 @@ except:
     #we get "StdioOnnaStick instance has no attribute 'encoding'"
     console_encoding = None
 
+# The encoding the user would like to see text transliterated to. This can be
+# set to a charset (e.g. 'ascii', 'iso-8859-1' or 'cp850'), and we will output
+# only characters that exist in that charset. However, the characters will be
+# output using console_encoding.
+# If this is not defined on Windows, we emit a Warning explaining the user
+# to either switch to a Unicode-able font and use
+#    transliteration_target = None
+# or to keep using raster fonts and set
+#    transliteration_target = console_encoding
+# After emitting the warning, this last option will be set.
+
+transliteration_target = 'not set'    
+    
 # The encoding in which textfiles are stored, which contain lists of page
 # titles. The most used is: 'utf-8'. 'utf-8-sig' recognizes BOM but it is
 # available on Python 2.5 or higher. For a complete list please see:
@@ -662,12 +675,23 @@ for _key, _val in globals().items():
             " Misspelled?" % locals()
 
 # Fix up default console_encoding
-if console_encoding == None:
+if console_encoding is None:
     if __sys.platform == 'win32':
         console_encoding = 'cp850'
     else:
         console_encoding = 'iso-8859-1'
 
+# Fix up transliteration_target
+if transliteration_target == 'not set':
+    if __sys.platform == 'win32':
+        transliteration_target = console_encoding
+        print "WARNING: Running on Windows and transliteration_target is not set."
+        print "Please see http://www.mediawiki.org/wiki/Manual:Pywikipediabot/Windows"
+    else:
+        transliteration_target = None
+elif transliteration_target in ('None', 'none'):
+    transliteration_target = None        
+        
 # Save base_dir for use by other modules
 base_dir = _base_dir
 
