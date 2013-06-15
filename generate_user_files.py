@@ -11,6 +11,8 @@ __version__ = '$Id$'
 import codecs, os, re, sys
 import platform
 
+single_wiki_families = ['commons', 'wikidata']
+
 def get_base_dir():
     """Return the directory in which user-specific information is stored.
 
@@ -143,8 +145,11 @@ def get_site_and_lang():
         fam = listchoice(known_families,
                          "Select family of sites we are working on",
                          default='wikipedia')
-        mylang = raw_input(
+        if fam not in single_wiki_families:
+            mylang = raw_input(
 "The language code of the site we're working on (default: 'en'): ") or 'en'
+        else:
+            mylang = fam
         username = raw_input("Username (%s %s): "
                              % (mylang, fam))
         username = unicode(username, console_encoding)
