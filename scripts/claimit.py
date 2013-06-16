@@ -87,7 +87,13 @@ def main():
 
     for i in xrange (0, len(commandline_claims), 2):
         claim = pywikibot.Claim(repo, commandline_claims[i])
-        claim.setTarget(pywikibot.ItemPage(repo, commandline_claims[i+1]))
+        if claim.getType() == 'wikibase-item':
+            target = pywikibot.ItemPage(repo, commandline_claims[i+1])
+        elif claim.getType() == 'string':
+            target = commandline_claims[i+1]
+        else:
+            raise NotImplementedError("%s datatype is not yet supported by claimit.py" % claim.getType())
+        claim.setTarget(target)
         claims.append(claim)
 
     generator = gen.getCombinedGenerator()
