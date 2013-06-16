@@ -93,32 +93,53 @@ class Coordinate(object):
     For now its just being used for DataSite, but
     in the future we can use it for the GeoData extension.
     """
-    def __init__(self, lat, lon, alt=None, precision=0.1, globe='earth'):
+    def __init__(self, lat, lon, alt=None, precision=None, globe='earth',
+                 typ="", name="", dim=None, site=None):
         """
         @param lat: Latitude
         @type lat: float
         @param lon: Longitute
-        @param lon: float
+        @type lon: float
         @param alt: Altitute? TODO FIXME
         @param precision: precision
         @type precision: float
-        @param globe: Which Wikidata globe to use
+        @param globe: Which globe the point is on
         @type globe: str
+        @param typ: The type of coordinate point
+        @type typ: str
+        @param name: The name
+        @type name: str
+        @param dim: Dimension (in meters)
+        @type dim: int
         """
         self.lat = lat
         self.lon = lon
         self.alt = alt
         self.precision = precision
-        self.globe = globe
+        self.globe = globe.lower()
+        self.type = typ
+        self.name = name
+        self.dim = dim
+        if not site:
+            self.site = Site().data_repository()
+        else:
+            self.site = site
         #Copied from [[mw:Extension:GeoData]]
-        if not globe in ['earth', 'mercury', 'venus', 'moon',
-                         'mars', 'phobos', 'deimos', 'ganymede',
-                         'callisto', 'io', 'europa', 'mimas',
-                         'enceladus', 'tethys', 'dione',
-                         'rhea', 'titan', 'hyperion', 'iapetus',
-                         'phoebe', 'miranda', 'ariel', 'umbriel',
-                         'titania', 'oberon', 'triton', 'pluto']:
-            raise ValueError(u"%s is not a supported globe." % globe)
+        if not self.globe in ['earth', 'mercury', 'venus', 'moon',
+                              'mars', 'phobos', 'deimos', 'ganymede',
+                              'callisto', 'io', 'europa', 'mimas',
+                              'enceladus', 'tethys', 'dione',
+                              'rhea', 'titan', 'hyperion', 'iapetus',
+                              'phoebe', 'miranda', 'ariel', 'umbriel',
+                              'titania', 'oberon', 'triton', 'pluto']:
+            raise ValueError(u"%s is not a supported globe." % self.globe)
+
+    def __repr__(self):
+        string = 'Coordinate(%s, %s' % (self.lat, self.lon)
+        if self.globe != 'earth':
+            string += ', globe="%s"' % self.globe
+        string += ')'
+        return string
 
     def toWikibase(self):
         """
@@ -126,24 +147,33 @@ class Coordinate(object):
         for the Wikibase API.
         FIXME Should this be in the DataSite object?
         """
-        globes = {'earth': 'http://www.wikidata.org/entity/Q2'}
-        if not self.globe in globes:
+        if not self.globe in self.site.globes():
             raise NotImplementedError(u"%s is not supported in Wikibase yet." % self.globe)
         return {'latitude': self.lat,
                 'longitude': self.lon,
                 'altitude': self.alt,
-                'globe': globes[self.globe],
+                'globe': self.site.globes()[self.globe],
                 'precision': self.precision,
                 }
 
     @staticmethod
-    def fromWikibase(data):
+    def fromWikibase(data, site):
         """Constructor to create an object from Wikibase's JSON output"""
-        globes = {'http://www.wikidata.org/entity/Q2': 'earth'}
-        # TODO FIXME ^
+        globes = {}
+        for k in site.globes():
+            globes[site.globes()[k]] = k
+
         return Coordinate(data['latitude'], data['longitude'],
-                       data['altitude'], data['precision'],
-                       globes[data['globe']])
+                          data['altitude'], data['precision'],
+                          globes[data['globe']], site=site)
+
+    def dimToPrecision(self):
+        """Convert dim from GeoData to Wikibase's Precision"""
+        raise NotImplementedError
+
+    def precisionToDim(self):
+        """Convert precision from Wikibase to GeoData's dim"""
+        raise NotImplementedError
 
 
 

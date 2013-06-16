@@ -1182,6 +1182,24 @@ class APISite(BaseSite):
                 continue
             api.update_page(page, pageitem)
 
+    def loadcoordinfo(self, page):
+        """Load [[mw:Extension:GeoData]] info"""
+        #prop=coordinates&titles=Wikimedia Foundation&format=jsonfm&coprop=type|name|dim|country|region&coprimary=all
+        title = page.title(withSection=False)
+        query = self._generator(api.PropertyGenerator,
+                                type_arg="coordinates",
+                                titles=title.encode(self.encoding()),
+                                coprop=['type', 'name', 'dim',
+                                        'country', 'region'],
+                                coprimary='all')
+        for pageitem in query:
+            if not self.sametitle(pageitem['title'], title):
+                pywikibot.warning(
+                    u"loadcoordinfo: Query on %s returned data on '%s'"
+                    % (page, pageitem['title']))
+                continue
+            api.update_page(page, pageitem)
+
     def loadimageinfo(self, page, history=False):
         """Load image info from api and save in page attributes
 

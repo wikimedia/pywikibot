@@ -26,3 +26,7 @@ class Family(family.WikimediaFamily):
         else:
             return ('wikidata',
                     'wikidata') if code == 'wikidata' else ('repo', 'wikidata')
+
+    def globes(self, code):
+        """Supported globes for Coordinate datatype"""
+        return {'earth': 'http://www.wikidata.org/entity/Q2'}

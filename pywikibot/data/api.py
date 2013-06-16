@@ -971,6 +971,19 @@ def update_page(page, pagedict):
             links.append(link)
         page._langlinks = links
 
+    if "coordinates" in pagedict:
+        coords = []
+        for co in pagedict['coordinates']:
+            coord = pywikibot.Coordinate(lat=co['lat'],
+                                         lon=co['lon'],
+                                         typ=co['type'],
+                                         name=co['name'],
+                                         dim=co['dim'],
+                                         globe=co.get('globe', 'earth'),  # See [[gerrit:67886]]
+                                         )
+            coords.append(coord)
+        page._coords = coords
+
 
 if __name__ == "__main__":
     from pywikibot import Site, logging

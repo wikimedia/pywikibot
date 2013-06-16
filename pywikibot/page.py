@@ -1088,6 +1088,20 @@ class Page(object):
         """
         return self.site.page_extlinks(self, step=step, total=total)
 
+    def coordinates(self, primary_only=False):
+        """Return a list of Coordinate objects for points
+        on the page using [[mw:Extension:GeoData]]
+
+        @param primary_only: Only return the coordinate indicated to be primary
+        @return: A list of Coordinate objects
+        """
+        if not hasattr(self, '_coords'):
+            self.site.loadcoordinfo(self)
+        if primary_only:
+            return self._coords[0]
+        else:
+            return self._coords
+
     def getRedirectTarget(self):
         """Return a Page object for the target this Page redirects to.
 
@@ -2624,7 +2638,7 @@ class Claim(PropertyPage):
                 claim.target = ImagePage(site.image_repository(), 'File:' +
                                                                   data['mainsnak']['datavalue']['value'])
             elif claim.getType() == 'globecoordinate':
-                claim.target = pywikibot.Coordinate.fromWikibase(data['mainsnak']['datavalue']['value'])
+                claim.target = pywikibot.Coordinate.fromWikibase(data['mainsnak']['datavalue']['value'], site)
             else:
                 #This covers string type
                 claim.target = data['mainsnak']['datavalue']['value']
