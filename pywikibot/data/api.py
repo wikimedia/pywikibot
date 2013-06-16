@@ -976,7 +976,7 @@ def update_page(page, pagedict):
         for co in pagedict['coordinates']:
             coord = pywikibot.Coordinate(lat=co['lat'],
                                          lon=co['lon'],
-                                         typ=co['type'],
+                                         typ=co.get('type', ''),
                                          name=co['name'],
                                          dim=co['dim'],
                                          globe=co.get('globe', 'earth'),  # See [[gerrit:67886]]
