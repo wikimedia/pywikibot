@@ -2430,7 +2430,7 @@ class ItemPage(WikibasePage):
         site=pywikibot.Site & title=Main Page
         """
         super(ItemPage, self).__init__(site, title, ns=0)
-        self.id = title
+        self.id = title.lower()
 
     @classmethod
     def fromPage(cls, page):
