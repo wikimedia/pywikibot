@@ -3403,17 +3403,7 @@ class DataSite (APISite):
         if bot:
             params['bot'] = 1
         if claim.getSnakType() == 'value':
-            if claim.getType() == 'wikibase-item':
-                params['value'] = json.dumps({'entity-type': 'item',
-                                              'numeric-id': claim.getTarget().getID(numeric=True)})
-            elif claim.getType() == 'string':
-                params['value'] = json.dumps(claim.getTarget())
-            elif claim.getType() == 'commonsMedia':
-                params['value'] = json.dumps(claim.getTarget().title(withNamespace=False))
-            elif claim.getType() == 'globecoordinate':
-                params['value'] = json.dumps(claim.getTarget().toWikibase())
-            else:
-                raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
+            params['value'] = json.dumps(claim._formatDataValue())
         params['token'] = self.token(item, 'edit')
         req = api.Request(site=self, **params)
         data = req.submit()
@@ -3444,18 +3434,7 @@ class DataSite (APISite):
             params['bot'] = 1
         params['token'] = self.token(claim, 'edit')
         if snaktype == 'value':
-            #This code is repeated from above, maybe it should be it's own function?
-            if claim.getType() == 'wikibase-item':
-                params['value'] = json.dumps({'entity-type': 'item',
-                                              'numeric-id': claim.getTarget().getID(numeric=True)})
-            elif claim.getType() == 'string':
-                params['value'] = json.dumps(claim.getTarget())
-            elif claim.getType() == 'commonsMedia':
-                params['value'] = json.dumps(claim.getTarget().title(withNamespace=False))
-            elif claim.getType() == 'globecoordinate':
-                params['value'] = json.dumps(claim.getTarget().toWikibase())
-            else:
-                raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
+            params['value'] = json.dumps(claim._formatDataValue())
 
         for arg in kwargs:
             #TODO: Get the lastrevid from the item
@@ -3491,13 +3470,11 @@ class DataSite (APISite):
         #build up the snak
         if source.getType() == 'wikibase-item':
             datavalue = {'type': 'wikibase-entityid',
-                         'value': {'entity-type': 'item',
-                                   'numeric-id': source.getTarget().getID(numeric=True),
-                                   },
+                         'value': source._formatDataValue(),
                          }
         elif source.getType() == 'string':
             datavalue = {'type': 'string',
-                         'value': source.getTarget(),
+                         'value': source._formatDataValue(),
                          }
         else:
             raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())

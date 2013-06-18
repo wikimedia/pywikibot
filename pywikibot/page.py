@@ -2737,6 +2737,25 @@ class Claim(PropertyPage):
         self.on_item.lastrevid = data['pageinfo']['lastrevid']
         self.sources.append(source)
 
+    def _formatDataValue(self):
+        """
+        Format the target into the proper JSON datavalue that Wikibase wants
+        """
+        if self.getType() == 'wikibase-item':
+            value = {'entity-type': 'item',
+                     'numeric-id': self.getTarget().getID(numeric=True)}
+        elif self.getType() == 'string':
+            value = self.getTarget()
+        elif self.getType() == 'commonsMedia':
+            value = self.getTarget().title(withNamespace=False)
+        elif self.getType() == 'globecoordinate':
+            value = self.getTarget().toWikibase()
+        else:
+            raise NotImplementedError('%s datatype is not supported yet.' % self.getType())
+        return value
+
+
+
 
 class Revision(object):
     """A structure holding information about a single revision of a Page."""
