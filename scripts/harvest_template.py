@@ -18,6 +18,7 @@ python harvest_template.py -lang:nl -cat:Sisoridae -template:"Taxobox straalvinn
 
 """
 import re
+import simplejson
 import pywikibot
 from pywikibot import pagegenerators
 
@@ -45,25 +46,11 @@ class HarvestRobot:
         '''
         Get the source
         '''
-        source_values = {'en': pywikibot.ItemPage(self.repo, 'Q328'),
-                         'sv': pywikibot.ItemPage(self.repo, 'Q169514'),
-                         'de': pywikibot.ItemPage(self.repo, 'Q48183'),
-                         'it': pywikibot.ItemPage(self.repo, 'Q11920'),
-                         'no': pywikibot.ItemPage(self.repo, 'Q191769'),
-                         'fa': pywikibot.ItemPage(self.repo, 'Q48952'),
-                         'ar': pywikibot.ItemPage(self.repo, 'Q199700'),
-                         'es': pywikibot.ItemPage(self.repo, 'Q8449'),
-                         'pl': pywikibot.ItemPage(self.repo, 'Q1551807'),
-                         'ca': pywikibot.ItemPage(self.repo, 'Q199693'),
-                         'fr': pywikibot.ItemPage(self.repo, 'Q8447'),
-                         'nl': pywikibot.ItemPage(self.repo, 'Q10000'),
-                         'pt': pywikibot.ItemPage(self.repo, 'Q11921'),
-                         'ru': pywikibot.ItemPage(self.repo, 'Q206855'),
-                         'vi': pywikibot.ItemPage(self.repo, 'Q200180'),
-                         'be': pywikibot.ItemPage(self.repo, 'Q877583'),
-                         'uk': pywikibot.ItemPage(self.repo, 'Q199698'),
-                         'tr': pywikibot.ItemPage(self.repo, 'Q58255'),
-                 }  # TODO: Should be moved to a central wikidata library
+        page = pywikibot.Page(self.repo, 'Wikidata:List of wikis/python')
+        source_values = simplejson.loads(page.get())
+        source_values = source_values['wikipedia']
+        for lang in source_values:
+            source_values[lang] = pywikibot.ItemPage(self.repo, source_values[lang])
         
         if lang in source_values:
             self.source = pywikibot.Claim(self.repo, 'p143')
