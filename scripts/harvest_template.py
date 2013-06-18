@@ -100,23 +100,31 @@ class HarvestRobot:
                                 pywikibot.output(u'A claim for %s already exists. Skipping' % (claim.getID(),))
                                 #TODO FIXME: This is a very crude way of dupe checking
                             else:
-                                # Try to extract a valid page
-                                match = re.search(pywikibot.link_regex, value)
-                                if match:
-                                    try:
-                                        link = pywikibot.Link(match.group(1))
-                                        linkedPage = pywikibot.Page(link)
-                                        if linkedPage.isRedirectPage():
-                                            linkedPage = linkedPage.getRedirectTarget()
-                                        linkedItem = pywikibot.ItemPage.fromPage(linkedPage)
-                                        claim.setTarget(linkedItem)
-                                        pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget().getID()))
-                                        item.addClaim(claim)
-                                        if self.source:
-                                            claim.addSource(self.source, bot=True)
-                                    except pywikibot.exceptions.NoPage:
-                                        pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it' % (linkedItem.title(),))
-                                        
+                                if claim.getType() == 'wikibase-item':
+                                    # Try to extract a valid page
+                                    match = re.search(pywikibot.link_regex, value)
+                                    if match:
+                                        try:
+                                            link = pywikibot.Link(match.group(1))
+                                            linkedPage = pywikibot.Page(link)
+                                            if linkedPage.isRedirectPage():
+                                                linkedPage = linkedPage.getRedirectTarget()
+                                            linkedItem = pywikibot.ItemPage.fromPage(linkedPage)
+                                            claim.setTarget(linkedItem)
+                                        except pywikibot.exceptions.NoPage:
+                                            pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it' % (linkedItem.title(),))
+                                            continue
+                                elif claim.getType() == 'string':
+                                    claim.setTarget(value.strip())
+                                else:
+                                    print "%s is not a supported datatype." % claim.getType()
+                                    continue
+
+                                pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget()))
+                                item.addClaim(claim)
+                                if self.source:
+                                    claim.addSource(self.source, bot=True)
+
 
 def main():
     gen = pagegenerators.GeneratorFactory()
