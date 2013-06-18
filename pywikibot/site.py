@@ -3481,6 +3481,8 @@ class DataSite (APISite):
         params = dict(action='wbsetreference',
                       statement=claim.snak,
                       )
+        if claim.on_item:  # I can't think of when this would be false, but lets be safe
+            params['baserevid'] = claim.on_item.lastrevid
         if bot:
             params['bot'] = 1
         params['token'] = self.token(claim, 'edit')

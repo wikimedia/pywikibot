@@ -2468,7 +2468,9 @@ class ItemPage(WikibasePage):
             for pid in self._content['claims']:
                 self.claims[pid] = list()
                 for claim in self._content['claims'][pid]:
-                    self.claims[pid].append(Claim.fromJSON(self.repo, claim))
+                    c = Claim.fromJSON(self.repo, claim)
+                    c.on_item = self
+                    self.claims[pid].append(c)
 
         #sitelinks
         self.sitelinks = {}
@@ -2555,6 +2557,7 @@ class ItemPage(WikibasePage):
         @type bot bool
         """
         self.repo.addClaim(self, claim, bot=bot)
+        claim.on_item = self
 
     def removeClaims(self, claims, **kwargs):
         """
@@ -2617,6 +2620,7 @@ class Claim(PropertyPage):
         self.sources = []
         self.target = None
         self.snaktype = 'value'
+        self.on_item = None  # The item it's on
 
     @staticmethod
     def fromJSON(site, data):
@@ -2730,6 +2734,7 @@ class Claim(PropertyPage):
         """
         data = self.repo.editSource(self, source, new=True, **kwargs)
         source.hash = data['reference']['hash']
+        self.on_item.lastrevid = data['pageinfo']['lastrevid']
         self.sources.append(source)
 
 
