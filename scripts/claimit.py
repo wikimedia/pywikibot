@@ -14,7 +14,7 @@ You can use any typical pagegenerator to provide with a list of pages
 
 Then list the property-->target pairs to add.
 """
-import simplejson
+import json
 import pywikibot
 from pywikibot import pagegenerators
 
@@ -40,7 +40,7 @@ class ClaimRobot:
         Get the source
         '''
         page = pywikibot.Page(self.repo, 'Wikidata:List of wikis/python')
-        source_values = simplejson.loads(page.get())
+        source_values = json.loads(page.get())
         source_values = source_values['wikipedia']
         for lang in source_values:
             source_values[lang] = pywikibot.ItemPage(self.repo, source_values[lang])

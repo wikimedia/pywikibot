@@ -18,7 +18,7 @@ python harvest_template.py -lang:nl -cat:Sisoridae -template:"Taxobox straalvinn
 
 """
 import re
-import simplejson
+import json
 import pywikibot
 from pywikibot import pagegenerators
 
@@ -47,7 +47,7 @@ class HarvestRobot:
         Get the source
         '''
         page = pywikibot.Page(self.repo, 'Wikidata:List of wikis/python')
-        source_values = simplejson.loads(page.get())
+        source_values = json.loads(page.get())
         source_values = source_values['wikipedia']
         for lang in source_values:
             source_values[lang] = pywikibot.ItemPage(self.repo, source_values[lang])
