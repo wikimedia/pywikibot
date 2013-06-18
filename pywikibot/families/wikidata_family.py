@@ -6,6 +6,7 @@ from pywikibot import family
 
 # The wikidata family
 
+
 class Family(family.WikimediaFamily):
     def __init__(self):
         super(Family, self).__init__()
@@ -14,6 +15,7 @@ class Family(family.WikimediaFamily):
             'wikidata': 'www.wikidata.org',
             'repo': 'wikidata-test-repo.wikimedia.de',
             'client': 'wikidata-test-client.wikimedia.de',
+            'test': 'test.wikidata.org',
         }
 
     def shared_data_repository(self, code, transcluded=False):
@@ -22,10 +24,14 @@ class Family(family.WikimediaFamily):
 
         """
         if transcluded:
-            return(None, None)
+            return (None, None)
         else:
-            return ('wikidata',
-                    'wikidata') if code == 'wikidata' else ('repo', 'wikidata')
+            if code == 'wikidata':
+                return ('wikidata', 'wikidata')
+            elif code == 'test':
+                return ('test', 'wikidata')
+            else:
+                return ('repo', 'wikidata')
 
     def globes(self, code):
         """Supported globes for Coordinate datatype"""
