@@ -19,7 +19,7 @@ if sys.version_info[0] != 2:
 if sys.version_info[1] < 6:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 or higher")
 else:
-    depend = ['httplib2>=0.6.0']
+    depend = ['httplib2>=0.6.0', 'simplejson']
 
 setup(name='Pywikipediabot',
       version='2.0alpha',
