@@ -978,7 +978,7 @@ def update_page(page, pagedict):
                                          lon=co['lon'],
                                          typ=co.get('type', ''),
                                          name=co['name'],
-                                         dim=co['dim'],
+                                         dim=int(co['dim']),
                                          globe=co.get('globe', 'earth'),  # See [[gerrit:67886]]
                                          )
             coords.append(coord)
