@@ -65,7 +65,7 @@ class ClaimRobot:
                         pywikibot.output(u'A claim for %s already exists. Skipping' % (claim.getID(),))
                         #TODO FIXME: This is a very crude way of dupe checking
                     else:
-                        pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget().getID()))
+                        pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget()))
                         item.addClaim(claim)
                         if self.source:
                             claim.addSource(self.source, bot=True)
