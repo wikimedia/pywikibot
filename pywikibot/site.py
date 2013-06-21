@@ -3377,6 +3377,8 @@ class DataSite (APISite):
     @must_be(group='user')
     def editEntity(self, identification, data, bot=True, **kwargs):
         params = dict(**identification)
+        if not params:  # If no identification was provided
+            params['new'] = 'item'  # TODO create properties+queries
         params['action'] = 'wbeditentity'
         if bot:
             params['bot'] = 1
