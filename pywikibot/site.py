@@ -1190,7 +1190,8 @@ class APISite(BaseSite):
                                 type_arg="coordinates",
                                 titles=title.encode(self.encoding()),
                                 coprop=['type', 'name', 'dim',
-                                        'country', 'region'],
+                                        'country', 'region',
+                                        'globe'],
                                 coprimary='all')
         for pageitem in query:
             if not self.sametitle(pageitem['title'], title):
