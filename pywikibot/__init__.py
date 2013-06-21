@@ -12,6 +12,7 @@ __version__ = '$Id$'
 import datetime
 import difflib
 import logging
+import math
 import re
 import sys
 import threading
@@ -168,8 +169,27 @@ class Coordinate(object):
                           globes[data['globe']], site=site)
 
     def dimToPrecision(self):
-        """Convert dim from GeoData to Wikibase's Precision"""
-        raise NotImplementedError
+        """Convert dim from GeoData to Wikibase's Precision
+
+        Formula from http://williams.best.vwh.net/avform.htm#LL and
+        http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+
+        THIS FUNCTION IS EXPERIMENTAL DO NOT USE IT!
+        """
+        lat_r = math.radians(self.lat)
+        lon_r = math.radians(self.lon)
+        radius = 6378137  # TODO: Support other globes
+        offset = self.dim
+        d_lat_r = offset / radius
+        d_lon_r = offset / (radius * math.cos(math.pi * lat_r / 180))
+
+        # Now convert to degrees
+        lat_offset = math.degrees(d_lat_r)
+        lon_offset = math.degrees(d_lon_r)
+
+        # Take the average
+        avg_offset = (lat_offset + lon_offset) / 2.0
+        self.precision = avg_offset
 
     def precisionToDim(self):
         """Convert precision from Wikibase to GeoData's dim"""
