@@ -355,9 +355,18 @@ u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
             if "warnings" in result:
                 modules = [k for k in result["warnings"] if k != "info"]
                 for mod in modules:
+                    if '*' in result["warnings"][mod]:
+                        text = result["warnings"][mod]['*']
+                    elif 'html' in result["warnings"][mod]:
+                        # Bugzilla 49978
+                        text = result["warnings"][mod]['html']['*']
+                    else:
+                        # This is just a warning, we shouldn't raise an
+                        # exception because of it
+                        continue
                     pywikibot.warning(
                         u"API warning (%s): %s"
-                         % (mod, result["warnings"][mod]["*"]))
+                        % (mod, text))
             if "error" not in result:
                 return result
             if "*" in result["error"]:
