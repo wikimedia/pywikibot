@@ -116,11 +116,11 @@ class Coordinate(object):
         self.lat = lat
         self.lon = lon
         self.alt = alt
-        self.precision = precision
+        self._precision = precision
         self.globe = globe.lower()
         self.type = typ
         self.name = name
-        self.dim = dim
+        self._dim = dim
         if not site:
             self.site = Site().data_repository()
         else:
@@ -168,28 +168,26 @@ class Coordinate(object):
                           data['altitude'], data['precision'],
                           globes[data['globe']], site=site)
 
-    def dimToPrecision(self):
-        """Convert dim from GeoData to Wikibase's Precision
-
-        Formula from http://williams.best.vwh.net/avform.htm#LL and
-        http://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
-
-        THIS FUNCTION IS EXPERIMENTAL DO NOT USE IT!
+    @property
+    def precision(self):
         """
-        lat_r = math.radians(self.lat)
-        lon_r = math.radians(self.lon)
-        radius = 6378137  # TODO: Support other globes
-        offset = self.dim
-        d_lat_r = offset / radius
-        d_lon_r = offset / (radius * math.cos(math.pi * lat_r / 180))
+        The biggest error (in degrees) will be given by the longitudinal error - the same error in meters becomes larger
+        (in degrees) further up north. We can thus ignore the latitudinal error.
 
-        # Now convert to degrees
-        lat_offset = math.degrees(d_lat_r)
-        lon_offset = math.degrees(d_lon_r)
+        The longitudinal can be derived as follows:
 
-        # Take the average
-        avg_offset = (lat_offset + lon_offset) / 2.0
-        self.precision = avg_offset
+        In small angle approximation (and thus in radians):
+
+        Δλ ≈ Δpos / r_φ, where r_φ is the radius of earth at the given latitude. Δλ is the error in longitude.
+
+           r_φ = r cos φ, where r is the radius of earth, φ the latitude
+
+        Therefore: precision = math.degrees( self._dim / ( radius * math.cos( math.radians( self.lat ) ) ) )
+        """
+        if not self._precision:
+            radius = 6378137  # TODO: Support other globes
+            self._precision = math.degrees(self._dim / (radius * math.cos(math.radians(self.lat))))
+        return self._precision
 
     def precisionToDim(self):
         """Convert precision from Wikibase to GeoData's dim"""
