@@ -16,7 +16,7 @@ class Family(family.WikimediaFamily):
             'no', 'th', 'sr', 'gl', 'ko', 'fa', 'vi', 'ta', 'ar', 'mk', 'tl',
             'ro', 'is', 'tt', 'lt', 'ka', 'az', 'eo', 'uk', 'sk', 'bg', 'el',
             'hy', 'sl', 'si', 'ms', 'li', 'la', 'ang', 'ia', 'cv', 'ur', 'et',
-            'ml', 'mr', 'bn', 'hi', 'oc', 'kk', 'km', 'eu', 'fy', 'ie', 'ne',
+            'mr', 'bn', 'ml', 'hi', 'oc', 'kk', 'km', 'eu', 'fy', 'ie', 'ne',
             'sa', 'te', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'cy',
             'zh-min-nan', 'ku', 'uz',
         ]
