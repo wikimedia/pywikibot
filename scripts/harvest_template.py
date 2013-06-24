@@ -8,7 +8,7 @@ Distributed under the MIT License
 
 Usage:
 
-python harvest_template.py -lang:nl -template:"Taxobox straalvinnige" orde P70 familie P71 geslacht P74 
+python harvest_template.py -lang:nl -template:"Taxobox straalvinnige" orde P70 familie P71 geslacht P74
 
 This will work on all pages that transclude the template in the article namespace
 
@@ -41,7 +41,7 @@ class HarvestRobot:
         self.repo = pywikibot.Site().data_repository()
         self.source = None
         self.setSource(pywikibot.Site().language())
-    
+
     def setSource(self, lang):
         '''
         Get the source
@@ -51,7 +51,7 @@ class HarvestRobot:
         source_values = source_values['wikipedia']
         for lang in source_values:
             source_values[lang] = pywikibot.ItemPage(self.repo, source_values[lang])
-        
+
         if lang in source_values:
             self.source = pywikibot.Claim(self.repo, 'p143')
             self.source.setTarget(source_values.get(lang))
@@ -128,7 +128,7 @@ def main():
             continue
         else:
             commandline_arguments.append(arg)
-            
+
     if len(commandline_arguments) % 2 or not templateTitle:
         raise ValueError  # or something.
     fields = dict()
@@ -140,7 +140,7 @@ def main():
     if not generator:
         # TODO: Build a transcluding generator based on templateTitle
         return
-    
+
     bot = HarvestRobot(generator, templateTitle, fields)
     bot.run()
 
