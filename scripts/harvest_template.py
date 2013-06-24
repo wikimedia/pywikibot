@@ -1,26 +1,32 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Copyright (C) 2013 Multichill
-Copyright (C) 2013 Pywikipediabot team
-
-Distributed under the MIT License
-
 Usage:
 
 python harvest_template.py -lang:nl -template:"Taxobox straalvinnige" orde P70 familie P71 geslacht P74
 
-This will work on all pages that transclude the template in the article namespace
+This will work on all pages that transclude the template in the article
+namespace
 
-You can use any typical pagegenerator to provide with a list of pages
+You can use any typical pagegenerator to provide with a list of pages:
 
 python harvest_template.py -lang:nl -cat:Sisoridae -template:"Taxobox straalvinnige" -namespace:0 orde P70 familie P71 geslacht P74
 
 """
+#
+# (C) 2013 Multichill, Amir
+# (C) 2013 Pywikipediabot team
+#
+# Distributed under the terms of MIT License.
+#
+__version__ = '$Id: harvest_template.py 11692 2013-06-24 16:55:46Z xqt $'
+#
+
 import re
 import json
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators as pg
+
 
 class HarvestRobot:
     """
@@ -77,15 +83,18 @@ class HarvestRobot:
             templates = pywikibot.extract_templates_and_params(pagetext)
             for (template, fielddict) in templates:
                 # We found the template we were looking for
-                if template.replace(u'_', u' ')==self.templateTitle:
+                if template.replace(u'_', u' ') == self.templateTitle:
                     for field, value in fielddict.items():
                         # This field contains something useful for us
                         if field in self.fields:
                             # Check if the property isn't already set
                             claim = pywikibot.Claim(self.repo, self.fields[field])
                             if claim.getID() in item.get().get('claims'):
-                                pywikibot.output(u'A claim for %s already exists. Skipping' % (claim.getID(),))
-                                #TODO FIXME: This is a very crude way of dupe checking
+                                pywikibot.output(
+                                    u'A claim for %s already exists. Skipping'
+                                    % claim.getID())
+                                # TODO FIXME: This is a very crude way of dupe
+                                # checking
                             else:
                                 if claim.getType() == 'wikibase-item':
                                     # Try to extract a valid page
@@ -114,7 +123,7 @@ class HarvestRobot:
 
 
 def main():
-    gen = pagegenerators.GeneratorFactory()
+    gen = pg.GeneratorFactory()
     commandline_arguments = list()
     templateTitle = u''
     for arg in pywikibot.handleArgs():
@@ -133,8 +142,8 @@ def main():
         raise ValueError  # or something.
     fields = dict()
 
-    for i in xrange (0, len(commandline_arguments), 2):
-        fields[commandline_arguments[i]] = commandline_arguments[i+1]
+    for i in xrange(0, len(commandline_arguments), 2):
+        fields[commandline_arguments[i]] = commandline_arguments[i + 1]
 
     generator = gen.getCombinedGenerator()
     if not generator:
