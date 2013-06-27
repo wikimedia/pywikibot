@@ -13,30 +13,39 @@ import unittest
 import cStringIO
 import StringIO
 import logging
-import os, sys
+import os
+import sys
 
 if os.name == "nt":
     from multiprocessing.managers import BaseManager
-    import threading, win32clipboard
+    import threading
+    import win32clipboard
+
     class pywikibotWrapper(object):
         def init(self):
             import pywikibot
+
         def output(self, *args, **kwargs):
             import pywikibot
             return pywikibot.output(*args, **kwargs)
+
         def request_input(self, *args, **kwargs):
             import pywikibot
             self.input = None
+
             def threadedinput():
                 self.input = pywikibot.input(*args, **kwargs)
             self.inputthread = threading.Thread(target=threadedinput)
             self.inputthread.start()
+
         def get_input(self):
             self.inputthread.join()
             return self.input
+
         def set_config(self, key, value):
             import pywikibot
             setattr(pywikibot.config, key, value)
+
         def set_ui(self, key, value):
             import pywikibot
             setattr(pywikibot.ui, key, value)
@@ -322,39 +331,41 @@ if __name__ == "__main__":
     class TestWindowsTerminalUnicode(UITestCase):
         @classmethod
         def setUpClass(cls):
-            import subprocess, inspect, pywinauto
+            import inspect
+            import pywinauto
+            import subprocess
             si = subprocess.STARTUPINFO()
             si.dwFlags = subprocess.STARTF_USESTDHANDLES
             fn = inspect.getfile(inspect.currentframe())
             cls._process = subprocess.Popen(["python", "pwb.py", fn, "--run-as-slave-interpreter"],
-                   creationflags = subprocess.CREATE_NEW_CONSOLE)
+                                            creationflags=subprocess.CREATE_NEW_CONSOLE)
             _manager.connect()
             cls.pywikibot = _manager.pywikibot()
             
             cls._app = pywinauto.application.Application()
-            cls._app.connect_(process = cls._process.pid)
+            cls._app.connect_(process=cls._process.pid)
 
             # set truetype font (Lucida Console, hopefully)
             cls._app.window_().TypeKeys("% {UP}{ENTER}^L{HOME}L{ENTER}", with_spaces=True)
 
         @classmethod
         def tearDownClass(cls):
-           del cls.pywikibot
-           cls._process.kill()
+            del cls.pywikibot
+            cls._process.kill()
 
         def getstdouterr(self):
-           # select all and copy to clipboard
-           self._app.window_().SetFocus()
-           self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{DOWN}{ENTER}{ENTER}', with_spaces=True)
-           return self.getclip()
+            # select all and copy to clipboard
+            self._app.window_().SetFocus()
+            self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{DOWN}{ENTER}{ENTER}', with_spaces=True)
+            return self.getclip()
 
-        def setclip(self,text):
-            win32clipboard.OpenClipboard();
-            win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT, unicode(text));
+        def setclip(self, text):
+            win32clipboard.OpenClipboard()
+            win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT, unicode(text))
             win32clipboard.CloseClipboard()
 
         def getclip(self):
-            win32clipboard.OpenClipboard();
+            win32clipboard.OpenClipboard()
             data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
             win32clipboard.CloseClipboard()
             data = data.split(u"\x00")[0]
@@ -362,10 +373,10 @@ if __name__ == "__main__":
             return data
 
         def sendstdin(self, text):
-           self.setclip(text.replace(u"\n", u"\r\n"))
-           self._app.window_().SetFocus()
-           self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{ENTER}', with_spaces=True)
-           self.setclip(u'')
+            self.setclip(text.replace(u"\n", u"\r\n"))
+            self._app.window_().SetFocus()
+            self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{ENTER}', with_spaces=True)
+            self.setclip(u'')
 
         def setUp(self):
             super(TestWindowsTerminalUnicode, self).setUp()
