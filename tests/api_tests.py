@@ -44,21 +44,21 @@ class TestPageGenerator(unittest.TestCase):
                                            "ns": 0,
                                            "title": "Broadcaster.com"
                                            },
-                              "13918157": {"pageid": 13918157,
-                                           "ns": 0,
-                                           "title": "Broadcaster (definition)"
-                                           },
+                                "13918157": {"pageid": 13918157,
+                                             "ns": 0,
+                                             "title": "Broadcaster (definition)"
+                                             },
                                 "156658": {"pageid": 156658,
                                            "ns": 0,
                                            "title": "Wiktionary"
                                            },
-                                 "47757": {"pageid": 47757,
-                                           "ns": 4,
-                                           "title": "Wikipedia:Disambiguation"
-                                           }
+                                "47757": {"pageid": 47757,
+                                          "ns": 4,
+                                          "title": "Wikipedia:Disambiguation"
+                                          }
                                 }
                       }
-            }
+        }
 
     def testGeneratorResults(self):
         """Test that PageGenerator yields pages with expected attributes."""
