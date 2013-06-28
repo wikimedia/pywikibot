@@ -7,7 +7,10 @@
 __version__ = '$Id$'
 
 import unittest
+import os
 from pywikibot import i18n
+import shutil
+
 
 class TestTranslate(unittest.TestCase):
     def setUp(self):
@@ -17,7 +20,7 @@ class TestTranslate(unittest.TestCase):
         self.msg_semi_localized = {'en': u'test-semi-localized EN',
                                    'nl': u'test-semi-localized NL'}
         self.msg_non_localized = {'en': u'test-non-localized EN'}
-        self.msg_no_english    = {'ja': u'test-no-english JA'}
+        self.msg_no_english = {'ja': u'test-no-english JA'}
 
     def testLocalized(self):
         self.assertEqual(i18n.translate('en', self.msg_localized),
@@ -55,6 +58,13 @@ class TestTranslate(unittest.TestCase):
 
 
 class TestTWTranslate(unittest.TestCase):
+    def setUp(self):
+        self.path = os.path.realpath(__file__)[:-13]
+        shutil.copyfile(self.path + 'i18n/test.py', self.path + '../scripts/i18n/test.py')
+
+    def tearDown(self):
+        os.remove(self.path + '../scripts/i18n/test.py')
+
     def testLocalized(self):
         self.assertEqual(i18n.twtranslate('en', 'test-localized'),
                          u'test-localized EN')
