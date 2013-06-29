@@ -729,6 +729,24 @@ class APISite(BaseSite):
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
         return
 
+    @staticmethod
+    def fromDBName(dbname):
+        # TODO this only works for some WMF sites
+        req = api.CachedRequest(datetime.timedelta(days=10),
+                                site=pywikibot.Site('meta', 'meta'),
+                                action='sitematrix')
+        data = req.submit()
+        for num in data['sitematrix']:
+            if num in ['specials', 'count']:
+                continue
+            lang = data['sitematrix'][num]['code']
+            for site in data['sitematrix'][num]['site']:
+                if site['dbname'] == dbname:
+                    if site['code'] == 'wiki':
+                        site['code'] = 'wikipedia'
+                    return APISite(lang, site['code'])
+        raise ValueError("Cannot parse a site out of %s." % dbname)
+
     def _generator(self, gen_class, type_arg=None, namespaces=None,
                    step=None, total=None, **args):
         """Convenience method that returns an API generator.

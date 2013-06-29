@@ -66,6 +66,15 @@ class TestSiteObject(unittest.TestCase):
                     "nosuchright"):
             self.assertType(mysite.has_right(rgt), bool)
 
+    def testConstructors(self):
+        """Test cases for site constructors"""
+        self.assertEqual(pywikibot.site.APISite.fromDBName('enwiki'), pywikibot.Site('en', 'wikipedia'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('eswikisource'), pywikibot.Site('es', 'wikisource'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('dewikinews'), pywikibot.Site('de', 'wikinews'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('ukwikivoyage'), pywikibot.Site('uk', 'wikivoyage'))
+
+        self.assertRaises(ValueError, pywikibot.site.APISite.fromDBName, 'metawiki')
+
     def testLanguageMethods(self):
         """Test cases for languages() and related methods"""
 
