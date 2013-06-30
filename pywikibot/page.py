@@ -2510,7 +2510,7 @@ class ItemPage(WikibasePage):
 
     def getSitelink(self, site, force=False):
         """
-        Returns a page object for the specific site
+        Returns the title (unicode string) for the specific site
         site is a pywikibot.Site or database name
         force will override caching
         If the item doesn't have that language, raise NoPage
