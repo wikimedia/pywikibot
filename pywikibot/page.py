@@ -2237,6 +2237,25 @@ class WikibasePage(Page):
         self.repo = self.site
         self._isredir = False  # Wikibase pages cannot be a redirect
 
+    def __cmp__(self, other):
+        """Test for equality and inequality of WikibasePage objects.
+
+        Page objects are "equal" if and only if they are on the same site
+        and have the same normalized title, including section if any.
+
+        Page objects are sortable by namespace first, then by title.
+
+        This is basically the same as Page.__cmp__ but slightly different.
+        """
+        if not isinstance(other, Page):
+            # especially, return -1 if other is None
+            return -1
+        if self.site != other.site:
+            return cmp(self.site, other.site)
+        if self.namespace() != other.namespace():
+            return cmp(self.namespace(), other.namespace())
+        return cmp(self.title(), other.title())
+
     def title(self, **kwargs):
         if self.namespace() == 0:
             self._link._text = self.getID()

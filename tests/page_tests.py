@@ -315,6 +315,9 @@ class TestPageObject(unittest.TestCase):
         claim.setTarget(pywikibot.ItemPage(repo, 'q1'))
         self.assertEqual(claim._formatDataValue(), {'entity-type': 'item', 'numeric-id': 1})
 
+        # test WikibasePage.__cmp__
+        self.assertEqual(pywikibot.ItemPage.fromPage(mainpage), pywikibot.ItemPage(repo, 'q5296'))
+
     def testItemPageExtensionability(self):
         class MyItemPage(pywikibot.ItemPage):
             pass
