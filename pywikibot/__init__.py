@@ -164,9 +164,17 @@ class Coordinate(object):
         for k in site.globes():
             globes[site.globes()[k]] = k
 
+        globekey = data['globe']
+        if globekey:
+            # FIXME: Should probably use get() with some error handling when it's an unknown globe
+            globe = globes[data['globe']]
+        else:
+            # Default to earth or should we use None here?
+            globe = 'earth'
+
         return Coordinate(data['latitude'], data['longitude'],
                           data['altitude'], data['precision'],
-                          globes[data['globe']], site=site)
+                          globe, site=site)
 
     @property
     def precision(self):
