@@ -2628,7 +2628,8 @@ class Claim(PropertyPage):
     """
     Claims are standard claims as well as references.
     """
-    def __init__(self, site, pid, snak=None, hash=None, isReference=False):
+    def __init__(self, site, pid, snak=None, hash=None, isReference=False,
+                 isQualifier=False):
         """
         Defined by the "snak" value, supplemented by site + pid
         """
@@ -2636,7 +2637,11 @@ class Claim(PropertyPage):
         self.snak = snak
         self.hash = hash
         self.isReference = isReference
+        self.isQualifier = isQualifier
+        if self.isQualifier and self.isReference:
+            raise ValueError(u'Claim cannot be both a qualifier and reference.')
         self.sources = []
+        self.qualifiers = []
         self.target = None
         self.snaktype = 'value'
         self.on_item = None  # The item it's on
@@ -2650,8 +2655,11 @@ class Claim(PropertyPage):
         claim = Claim(site, data['mainsnak']['property'])
         if 'id' in data:
             claim.snak = data['id']
-        else:
+        elif 'hash' in data:
             claim.isReference = True
+            claim.hash = data['hash']
+        else:
+            claim.isQualifier = True
         claim.snaktype = data['mainsnak']['snaktype']
         if claim.getSnakType() == 'value':
             if claim.getType() == 'wikibase-item':
@@ -2668,6 +2676,10 @@ class Claim(PropertyPage):
         if 'references' in data:
             for source in data['references']:
                 claim.sources.append(Claim.referenceFromJSON(site, source))
+        if 'qualifiers' in data:
+            for prop in data['qualifiers']:
+                for qualifier in data['qualifiers'][prop]:
+                    claim.qualifiers.append(Claim.qualifierFromJSON(site, qualifier))
         return claim
 
     @staticmethod
@@ -2678,10 +2690,19 @@ class Claim(PropertyPage):
         more handling.
         """
         mainsnak = data['snaks'].values()[0][0]
-        wrap = {'mainsnak': mainsnak}
-        c = Claim.fromJSON(site, wrap)
-        c.hash = data['hash']
-        return c
+        wrap = {'mainsnak': mainsnak, 'hash': data['hash']}
+        return Claim.fromJSON(site, wrap)
+
+    @staticmethod
+    def qualifierFromJSON(site, data):
+        """
+        Qualifier objects are represented a bit
+        differently like references, but I'm not
+        sure if this even requires it's own function.
+        """
+        wrap = {'mainsnak': data}
+        return Claim.fromJSON(site, wrap)
+
 
     def setTarget(self, value):
         """
