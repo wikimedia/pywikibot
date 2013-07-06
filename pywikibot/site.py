@@ -1862,6 +1862,7 @@ class APISite(BaseSite):
 
     @deprecate_arg("throttle", None)
     @deprecate_arg("limit", "total")
+    @deprecate_arg("includeredirects", "filterredir")
     def allpages(self, start="!", prefix="", namespace=0, filterredir=None,
                  filterlanglinks=None, minsize=None, maxsize=None,
                  protect_type=None, protect_level=None, reverse=False,
