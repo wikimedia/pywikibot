@@ -71,7 +71,7 @@ def CAT(site, name, hide):
 
 
 def BACK(site, name, hide):
-    p = pywikibot.Page(site, name, defaultNamespace=10)
+    p = pywikibot.Page(site, name, ns=10)
     return [page for page in p.getReferences(follow_redirects=False,
                                              onlyTemplateInclusion=True)]
 
@@ -346,7 +346,7 @@ def featuredArticles(site, pType):
             articles.append(p)
         # Article talk (like in English)
         elif p.namespace() == 1 and site.lang != 'el':
-            articles.append(pywikibot.Page(p.site(),
+            articles.append(pywikibot.Page(p.site,
                             p.title(withNamespace=False)))
     pywikibot.output(
         '\03{lightred}** wikipedia:%s has %i %s articles\03{default}'
@@ -663,7 +663,6 @@ def main(*args):
         pywikibot.output('\nQuitting program...')
     finally:
         if not nocache:
-            return
             pickle.dump(cache, file(filename, "wb"))
 
 
