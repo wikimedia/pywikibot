@@ -360,17 +360,13 @@ def findTranslated(page, oursite=None, quiet=False):
         oursite = pywikibot.getSite()
     if page.isRedirectPage():
         page = page.getRedirectTarget()
-    try:
-        iw = page.interwiki()
-    except:
-        pywikibot.output(u"%s -> no interwiki, giving up" % page.title())
-        return
 
     ourpage = None
-    for p in iw:
-        if p.site() == oursite:
-            ourpage = p
+    for link in page.iterlanglinks():
+        if link.site == oursite:
+            ourpage = pywikibot.Page(link)
             break
+
     if not ourpage:
         if not quiet:
             pywikibot.output(u"%s -> no corresponding page in %s"
@@ -400,16 +396,12 @@ def findTranslated(page, oursite=None, quiet=False):
                          % ourpage.title())
         return
 
-    try:
-        iw = ourpage.interwiki()
-    except:
-        return
-
-    backpage is None
-    for p in iw:
-        if p.site() == page.site():
-            backpage = p
+    backpage = None
+    for link in ourpage.iterlanglinks():
+        if link.site == page.site:
+            backpage = pywikibot.Page(link)
             break
+
     if not backpage:
         pywikibot.output(u"%s -> no back interwiki ref" % page.title())
         return
