@@ -2641,7 +2641,7 @@ class Claim(PropertyPage):
         if self.isQualifier and self.isReference:
             raise ValueError(u'Claim cannot be both a qualifier and reference.')
         self.sources = []
-        self.qualifiers = []
+        self.qualifiers = {}
         self.target = None
         self.snaktype = 'value'
         self.on_item = None  # The item it's on
@@ -2679,7 +2679,11 @@ class Claim(PropertyPage):
         if 'qualifiers' in data:
             for prop in data['qualifiers']:
                 for qualifier in data['qualifiers'][prop]:
-                    claim.qualifiers.append(Claim.qualifierFromJSON(site, qualifier))
+                    qual = Claim.qualifierFromJSON(site, qualifier)
+                    if prop in claim.qualifiers:
+                        claim.qualifiers[prop].append(qual)
+                    else:
+                        claim.qualifiers[prop] = [qual]
         return claim
 
     @staticmethod
