@@ -75,6 +75,15 @@ def BACK(site, name, hide):
     return [page for page in p.getReferences(follow_redirects=False,
                                              onlyTemplateInclusion=True)]
 
+def DATA(site, name, hide):
+    dp = pywikibot.ItemPage(site.data_repository(), name)
+    cat = pywikibot.Category(site, dp.getSitelink(site))
+    for article in cat.articles(endsort=hide):
+        yield article
+    if hide:
+        for article in cat.articles(startFrom=unichr(ord(hide) + 1)):
+            yield article
+
 # ALL wikis use 'Link FA', and sometimes other localized templates.
 # We use _default AND the localized ones
 template = {
@@ -130,115 +139,7 @@ template_lists = {
 }
 
 featured_name = {
-    'af': (BACK, u"Voorbladster"),
-    'als': (CAT, u"Wikipedia:Bsunders glungener Artikel"),
-    'am': (CAT, u"Wikipedia:Featured article"),
-    'an': (CAT, u"Articlos destacatos"),
-    'ang': (CAT, u"Fulgōd ȝeƿritu"),
-    'ar': (CAT, u"مقالات مختارة"),
-    'ast': (CAT, u"Uiquipedia:Artículos destacaos"),
-    'az': (BACK, u"Seçilmiş məqalə"),
-    'bar': (CAT, u"Berig"),
-    'bat-smg': (CAT, u"Vikipedėjės pavīzdėnē straipsnē"),
-    'be-x-old': (CAT, u"Вікіпэдыя:Абраныя артыкулы"),
-    'bg': (CAT, u"Избрани статии"),
-    'bn': (BACK, u"নির্বাচিত নিবন্ধ"),
-    'br': (CAT, u"Pennadoù eus an dibab"),
-    'bs': (CAT, u"Odabrani članci"),
-    'ca': (CAT, u"Llista d'articles de qualitat"),
-    'ceb': (CAT, u"Mga napiling artikulo"),
-    'cs': (CAT, u"Wikipedie:Nejlepší články"),
-    'cy': (BACK, u"Erthygl ddethol"),
-    'da': (CAT, u"Fremragende artikler"),
-    'de': (CAT, u"Wikipedia:Exzellent"),
-    'dv': (BACK, u"Featured article"),
-    'el': (BACK, u"Αξιόλογο άρθρο"),
-    'en': (CAT, u"Featured articles"),
-    'eo': (CAT, u"Elstaraj artikoloj"),
-    'es': (BACK, u"Artículo destacado"),
-    'et': (CAT, u"Eeskujulikud artiklid"),
-    'eu': (CAT, u"Nabarmendutako artikuluak"),
-    'ext': (BACK, u"Destacau"),
-    'fa': (BACK, u"مقاله برگزیده"),
-    'fi': (CAT, u"Suositellut sivut"),
-    'fo': (CAT, u"Mánaðargrein"),
-    'fr': (CAT, u"Article de qualité"),
-    'frr': (BACK, u"Exzellent"),
-    'gl': (CAT, u"Wikipedia:Artigos de calidade"),
-    'gv': (CAT, u"Artyn reiht"),
-    'he': (CAT, u"ערכים מומלצים"),
-    'hi': (BACK, u"निर्वाचित लेख"),
-    'hr': (CAT, u"Izabrani članci"),
-    'hsb': (CAT, u"Ekscelentny"),
-    'hu': (CAT, u"Kiemelt cikkek"),
-    'hy': (BACK, u"Ընտրված հոդված"),
-    'ia': (CAT, u"Wikipedia:Articulos eminente"),
-    'id': (BACK, u"Featured article"),
-    'is': (CAT, u"Wikipedia:Úrvalsgreinar"),
-    'it': (CAT, u"Voci in vetrina"),
-    'ja': (BACK, u"Featured article"),
-    'ka': (CAT, u"რჩეული სტატიები"),
-    'kk': (CAT, u"Уикипедия:Таңдаулы мақалалар"),
-    'kl': (CAT, u"Anbefalet"),
-    'km': (BACK, u"អត្ថបទពិសេស"),
-    'kn': (BACK, u"ವಿಶೇಷ ಲೇಖನ"),
-    'ko': (CAT, u"알찬 글"),
-    'krc': (CAT, u"Википедия:Сайланнган статьяла"),
-    'kv': (CAT, u"Википедия:Бур гижӧдъяс"),
-    'la': (CAT, u"Paginae mensis"),
-    'lad': (CAT, u"Artikolos valutosos"),
-    'li': (CAT, u"Wikipedia:Sjterartikele"),
-    'lmo': (CAT, u"Articol ben faa"),
-    'lo': (CAT, u"ບົດຄວາມດີເດັ່ນ"),
-    'lt': (CAT, u"Vikipedijos pavyzdiniai straipsniai"),
-    'lv': (CAT, u"Vērtīgi raksti"),
-    'mk': (BACK, u"Избрана"),
-    'ml': (BACK, u"Featured"),
-    'mt': (CAT, u"Artikli fil-vetrina"),
-    'mr': (CAT, u"मुखपृष्ठ सदर लेख"),
-    'ms': (BACK, u"Rencana pilihan"),
-    'nah': (BACK, u"Featured article"),
-    'nds-nl': (BACK, u"Etelazie"),
-    'nl': (CAT, u"Wikipedia:Etalage-artikelen"),
-    'nn': (BACK, u"God artikkel"),
-    'no': (CAT, u"Utmerkede artikler"),
-    'nv': (CAT, u"Naaltsoos nizhónígo ályaaígíí"),
-    'oc': (CAT, u"Article de qualitat"),
-    'pl': (CAT, u"Artykuły na medal"),
-    'pt': (CAT, u"!Artigos destacados"),
-    'qu': (CAT, u"Wikipidiya:Kusa qillqa"),
-    'ro': (CAT, u"Articole de calitate"),
-    'ru': (BACK, u"Избранная статья"),
-    'sco': (CAT, u"Featurt"),
-    'sh': (CAT, u"Izabrani članci"),
-    'simple': (CAT, u"Very good articles"),
-    'sk': (BACK, u"Perfektný článok"),
-    'sl': (CAT, u"Vsi izbrani članki"),
-    'sq': (BACK, u"Artikulli perfekt"),
-    'sr': (CAT, u"Изабрани"),
-    'sv': (CAT, u"Wikipedia:Utmärkta artiklar"),
-    'sw': (BACK, u"Makala_nzuri_sana"),
-    'szl': (CAT, u"Wyrůżńůne artikle"),
-    'ta': (CAT, u"சிறப்புக் கட்டுரைகள்"),
-    'te': (CAT, u"విశేషవ్యాసాలు"),
-    'th': (BACK, u"บทความคัดสรร"),
-    'tl': (BACK, u"Napiling artikulo"),
-    'tn': (CAT, u"Featured articles"),
-    'tr': (BACK, u"Seçkin madde"),
-    'tt': (CAT, u"Сайланган мәкаләләр"),
-    'udm': (CAT, u"Википедия:Быръем статьяос"),
-    'uk': (CAT, u"Вибрані статті"),
-    'ur': (CAT, u"منتخب مقالے"),
-    'uz': (CAT, u"Vikipediya:Tanlangan maqolalar"),
-    'vec': (BACK, u"Vetrina"),
-    'vi': (CAT, u"Bài viết chọn lọc"),
-    'vo': (CAT, u"Yegeds gudik"),
-    'wa': (CAT, u"Raspepyî årtike"),
-    'yi': (CAT, u"רעקאמענדירטע ארטיקלען"),
-    'yo': (BACK, u"Àyọkà pàtàkì"),
-    'zh': (CAT, u"特色条目"),
-    'zh-classical': (CAT, u"卓著"),
-    'zh-yue': (BACK, u"正文"),
+    'wikidata': (DATA, u'Q4387444'),
 }
 
 good_name = {
@@ -318,6 +219,7 @@ former_name = {
 
 
 def featuredArticles(site, pType):
+    code = site.lang
     articles = []
     if pType == 'good':
         info = good_name
@@ -327,17 +229,18 @@ def featuredArticles(site, pType):
         info = lists_name
     else:
         info = featured_name
+        code = 'wikidata'
     try:
-        method = info[site.lang][0]
+        method = info[code][0]
     except KeyError:
         pywikibot.error(
             u'language %s doesn\'t has %s category source.'
-            % (site.lang, pType))
+            % (code, pType))
         return
-    name = info[site.lang][1]
+    name = info[code][1]
     # hide #-sorted items on en-wiki
     try:
-        hide = info[site.lang][2]
+        hide = info[code][2]
     except IndexError:
         hide = None
     raw = method(site, name, hide)
@@ -661,9 +564,9 @@ def main(*args):
                                       config.simulate)
     except KeyboardInterrupt:
         pywikibot.output('\nQuitting program...')
-    finally:
-        if not nocache:
-            pickle.dump(cache, file(filename, "wb"))
+##    finally:
+##        if not nocache:
+##            pickle.dump(cache, file(filename, "wb"))
 
 
 if __name__ == "__main__":
