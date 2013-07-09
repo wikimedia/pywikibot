@@ -3206,8 +3206,12 @@ not supported by PyWikiBot!"""
             if ns:
                 link._namespace = ns
                 title = t
+        if u"#" in title:
+            t, sec = title.split(u'#', 1)
+            title, link._section = t.rstrip(), sec.lstrip()
+        else:
+            link._section = None
         link._title = title
-
         return link
 
 # Utility functions for parsing page titles
