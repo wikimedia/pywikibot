@@ -3,21 +3,44 @@
 """
 This script understands various command-line arguments:
 
+ Task commands:
+
+-featured         use this script for featured articles. Default task if no task
+                  command is specified
+
+-good             use this script for good articles.
+
+-lists            use this script for featured lists.
+
+-former           use this script for removing {{Link FA|xx}} from former
+                  fearured articles
+
+                  NOTE: you may have all of these commands in one run
+
+ Option commands:
+
 -interactive:     ask before changing each page
 
--nocache          doesn't include /cache/featured /cache/lists or /cache/good
-                  file to remember if the article already was verified.
+-nocache          doesn't include cache files file to remember if the article
+                  already was verified.
+                  
+-nocache:xx,yy    you may ignore language codes xx,yy,... from cache file
 
 -fromlang:xx,yy   xx,yy,zz,.. are the languages to be verified.
 -fromlang:ar--fi  Another possible with range the languages
+                  (sorry, not implemented yet)
 
 -fromall          to verify all languages.
 
+-tolang:xx,yy     xx,yy,zz,.. are the languages to be updated
+
 -after:zzzz       process pages after and including page zzzz
+                  (sorry, not implemented yet)
 
 -side             use -side if you want to move all {{Link FA|lang}} next to the
                   corresponding interwiki links. Default is placing
                   {{Link FA|lang}} on top of the interwiki links.
+                  (This option is deprecated with wikidata)
 
 -count            Only counts how many featured/good articles exist
                   on all wikis (given with the "-fromlang" argument) or
@@ -25,17 +48,9 @@ This script understands various command-line arguments:
                   Example: featured.py -fromlang:en,he -count
                   counts how many featured articles exist in the en and he
                   wikipedias.
-
--lists            use this script for featured lists.
-
--good             use this script for good articles.
-
--former           use this script for removing {{Link FA|xx}} from former
-                  fearured articles
+                  (sorry, not implemented yet)
 
 -quiet            no corresponding pages are displayed.
-
-usage: featured.py [-interactive] [-nocache] [-top] [-after:zzzz] [-fromlang:xx,yy--zz|-fromall]
 
 """
 __version__ = '$Id$'
@@ -208,7 +223,7 @@ class FeaturedBot(pywikibot.Bot):
         'fromlang': None,
         'good': False,
         'list': False,
-        'nocache': False,
+        'nocache': None,
         'side': False,    # not template_on_top
         'quiet': False,
     }
@@ -230,18 +245,19 @@ class FeaturedBot(pywikibot.Bot):
         return True
 
     def readcache(self, task):
-        self.filename = pywikibot.config.datafilepath("cache", task)
-        try:
-            f = open(self.filename, "rb")
-            self.cache = pickle.load(f)
-            f.close()
-            pywikibot.output(u'Cache file %s found with %d items.'
-                             % (self.filename, len(self.cache)))
-        except IOError:
-            pywikibot.output(u'Cache file %s not found.' % self.filename)
+        if not self.getOption('nocache') is True:
+            self.filename = pywikibot.config.datafilepath("cache", task)
+            try:
+                f = open(self.filename, "rb")
+                self.cache = pickle.load(f)
+                f.close()
+                pywikibot.output(u'Cache file %s found with %d items.'
+                                 % (self.filename, len(self.cache)))
+            except IOError:
+                pywikibot.output(u'Cache file %s not found.' % self.filename)
 
     def writecache(self):
-        if not self.getOption('nocache'):
+        if not self.getOption('nocache') is True:
             pywikibot.output(u'Writing %d items to cache file %s.'
                              % (len(self.cache), self.filename))
             f = open(self.filename,"wb")
@@ -282,16 +298,14 @@ class FeaturedBot(pywikibot.Bot):
         else:
             return  ### 2DO
         self.fromlang.sort()
-        if not self.getOption('nocache'):
-            self.readcache(task)
+        self.readcache(task)
         for code in self.fromlang:
             try:
                 self.treat(code, task)
             except KeyboardInterrupt:
                 pywikibot.output('\nQuitting featured treat...')
                 break
-        if not self.getOption('nocache'):
-            self.writecache()
+        self.writecache()
 
     # not implemented yet
     def run_list(self):
@@ -319,16 +333,14 @@ class FeaturedBot(pywikibot.Bot):
         else:
             return  ### 2DO
         self.fromlang.sort()
-        if not self.getOption('nocache'):
-            self.readcache(task)
+        self.readcache(task)
         for code in self.fromlang:
             try:
                 self.treat(code, task)
             except KeyboardInterrupt:
                 pywikibot.output('\nQuitting featured treat...')
                 break
-        if not self.getOption('nocache'):
-            self.writecache()            
+        self.writecache()            
 
     def treat(self, code, process):
         fromsite = pywikibot.Site(code)
@@ -554,7 +566,8 @@ class FeaturedBot(pywikibot.Bot):
         if not tosite.lang in self.cache[fromsite.lang]:
             self.cache[fromsite.lang][tosite.lang] = {}
         cc = self.cache[fromsite.lang][tosite.lang]
-        if self.getOption('nocache'):
+        if self.getOption('nocache') is True or \
+           fromsite.code in self.getOption('nocache'):
             cc = {}
         templatelist = self.getTemplateList(tosite.code, task)
         findtemplate = '(' + '|'.join(templatelist) + ')'
@@ -666,6 +679,8 @@ def main(*args):
             part = True
         elif arg.startswith('-after:'):
             afterpage = arg[7:]
+        elif arg.startswith('-nocache:'):
+            options[arg[1:8]] = arg[9:].split(",")
         else:
             options[arg[1:].lower()] = True
 
