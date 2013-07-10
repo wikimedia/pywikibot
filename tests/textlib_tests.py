@@ -44,12 +44,14 @@ class TestSectionFunctions(unittest.TestCase):
         self.assertEqual(func('{{a}}'), [('a', {})])
         self.assertEqual(func('{{a|b=c}}'), [('a', {'b': 'c'})])
         self.assertEqual(func('{{a|b|c=d}}'), [('a', {u'1': 'b', 'c': 'd'})])
+        self.assertEqual(func('{{a|b={{c}}}}'), [(u'a', {u'b': u'{{c}}'}), ('c', {})])
 
     def testExtractTemplatesRegex(self):
         func = textlib.extract_templates_and_params_regex  # It's really long.
         self.assertEqual(func('{{a}}'), [('a', {})])
         self.assertEqual(func('{{a|b=c}}'), [('a', {'b': 'c'})])
         self.assertEqual(func('{{a|b|c=d}}'), [('a', {u'1': 'b', 'c': 'd'})])
+        self.assertEqual(func('{{a|b={{c}}}}'), [('c', {}), (u'a', {u'b': u'{{c}}'})])
 
     @unittest.expectedFailure
     def testSpacesInSection(self):
