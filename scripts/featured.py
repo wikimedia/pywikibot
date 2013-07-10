@@ -223,7 +223,7 @@ class FeaturedBot(pywikibot.Bot):
         'fromlang': None,
         'good': False,
         'list': False,
-        'nocache': None,
+        'nocache': list(),
         'side': False,    # not template_on_top
         'quiet': False,
     }
