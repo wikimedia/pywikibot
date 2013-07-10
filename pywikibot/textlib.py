@@ -13,7 +13,10 @@ and return a unicode string.
 #
 __version__ = '$Id$'
 
-
+try:
+    import mwparserfromhell
+except ImportError:
+    mwparserfromhell = False
 import pywikibot
 import re
 from HTMLParser import HTMLParser
@@ -886,10 +889,36 @@ def extract_templates_and_params(text):
     with an integer value corresponding to its position among the unnnamed
     parameters, and if this results multiple parameters with the same name
     only the last value provided will be returned.
+
+    This uses a third party library (mwparserfromhell) if it is installed
+    and enabled in the user-config.py. Otherwise it falls back on a
+    regex based function defined below.
+
     @param text: The wikitext from which templates are extracted
     @type text: unicode or string
 
     """
+
+    if not (config.use_mwparserfromhell and mwparserfromhell):
+        return extract_templates_and_params_regex(text)
+    code = mwparserfromhell.parse(text)
+    result = []
+    for template in code.filter_templates():
+        params = {}
+        for param in template.params:
+            params[unicode(param.name)] = unicode(param.value)
+        result.append((unicode(template.name.strip()), params))
+    return result
+
+
+def extract_templates_and_params_regex(text):
+    """
+    See the documentation for extract_templates_and_params
+    This does basically the same thing, but uses regex.
+    @param text:
+    @return:
+    """
+
     # remove commented-out stuff etc.
     thistxt = removeDisabledParts(text)
 

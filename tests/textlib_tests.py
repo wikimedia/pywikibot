@@ -6,6 +6,10 @@
 #
 __version__ = '$Id: api_tests.py 8238 2010-06-02 13:50:48Z xqt $'
 
+try:
+    import mwparserfromhell
+except ImportError:
+    mwparserfromhell = False
 import unittest
 import codecs
 import os
@@ -34,11 +38,18 @@ class TestSectionFunctions(unittest.TestCase):
         self.assertContains("enwiki_help_editing", u"Editing")
 
     def testExtractTemplates(self):
+        if not (pywikibot.config.use_mwparserfromhell and mwparserfromhell):
+            return  # We'll test the regex function in the test below
         func = textlib.extract_templates_and_params  # It's really long.
         self.assertEqual(func('{{a}}'), [('a', {})])
         self.assertEqual(func('{{a|b=c}}'), [('a', {'b': 'c'})])
         self.assertEqual(func('{{a|b|c=d}}'), [('a', {u'1': 'b', 'c': 'd'})])
 
+    def testExtractTemplatesRegex(self):
+        func = textlib.extract_templates_and_params_regex  # It's really long.
+        self.assertEqual(func('{{a}}'), [('a', {})])
+        self.assertEqual(func('{{a|b=c}}'), [('a', {'b': 'c'})])
+        self.assertEqual(func('{{a|b|c=d}}'), [('a', {u'1': 'b', 'c': 'd'})])
 
     @unittest.expectedFailure
     def testSpacesInSection(self):
