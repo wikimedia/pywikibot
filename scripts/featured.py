@@ -404,16 +404,16 @@ class FeaturedBot(pywikibot.Bot):
 ##                return True
 ##        return False
 
-    def featuredArticles(self, site, pType):
+    def featuredArticles(self, site, task, cache):
         wikidata = False
         code = site.lang
         articles = []
-        if pType == 'good':
+        if task == 'good':
             info = good_name
             code = 'wikidata'
-        elif pType == 'former':
+        elif task == 'former':
             info = former_name
-        elif pType == 'list':
+        elif task == 'list':
             info = lists_name
         else:
             info = featured_name
@@ -423,7 +423,7 @@ class FeaturedBot(pywikibot.Bot):
         except KeyError:
             pywikibot.error(
                 u'language %s doesn\'t has %s category source.'
-                % (code, pType))
+                % (code, task))
             return
         name = info[code][1]
         # hide #-sorted items on en-wiki
@@ -440,8 +440,19 @@ class FeaturedBot(pywikibot.Bot):
                                 p.title(withNamespace=False)))
         pywikibot.output(
             '\03{lightred}** %s has %i %s articles\03{default}'
-            % (site, len(articles), pType))
+            % (site, len(articles), task))
         for p in articles:
+            if p.title() < afterpage:
+                continue
+
+            if u"/" in p.title() and p.namespace() != 0:
+                pywikibot.output(u"%s is a subpage" % p.title())
+                continue
+
+            if p.title() in cache:
+                pywikibot.output(u"(cached) %s -> %s" % (p.title(),
+                                                         cache[p.title()]))
+                continue
             yield copy(p)
 
 
@@ -513,20 +524,20 @@ class FeaturedBot(pywikibot.Bot):
                          % (page.title(), backpage.title()))
 
 
-    def getTemplateList(self, lang, pType):
-        if pType == 'good':
+    def getTemplateList(self, lang, task):
+        if task == 'good':
             try:
                 templates = template_good[lang]
                 templates += template_good['_default']
             except KeyError:
                 templates = template_good['_default']
-        elif pType == 'list':
+        elif task == 'list':
             try:
                 templates = template_lists[lang]
                 templates += template_lists['_default']
             except KeyError:
                 templates = template_lists['_default']
-        else:  # pType in ['former', 'featured']
+        else:  # task in ['former', 'featured']
             try:
                 templates = template[lang]
                 templates += template['_default']
@@ -535,7 +546,7 @@ class FeaturedBot(pywikibot.Bot):
         return templates
 
 
-    def featuredWithInterwiki(self, fromsite, template_on_top, pType,
+    def featuredWithInterwiki(self, fromsite, template_on_top, task,
                               quiet, dry=False):
         tosite = self.site
         if not fromsite.lang in self.cache:
@@ -545,102 +556,96 @@ class FeaturedBot(pywikibot.Bot):
         cc = self.cache[fromsite.lang][tosite.lang]
         if self.getOption('nocache'):
             cc = {}
-        templatelist = self.getTemplateList(tosite.code, pType)
+        templatelist = self.getTemplateList(tosite.code, task)
         findtemplate = '(' + '|'.join(templatelist) + ')'
         re_Link_FA = re.compile(ur"\{\{%s\|%s\}\}"
                                 % (findtemplate.replace(u' ', u'[ _]'),
                                    fromsite.code), re.IGNORECASE)
-        gen = self.featuredArticles(fromsite, pType)
+        gen = self.featuredArticles(fromsite, task, cc)
         gen = PreloadingGenerator(gen)
         pairs = []
         for a in gen:
-            if a.title() < afterpage:
-                continue
-
-            if u"/" in a.title() and a.namespace() != 0:
-                pywikibot.output(u"%s is a subpage" % a.title())
-                continue
-
-            if a.title() in cc:
-                pywikibot.output(u"(cached) %s -> %s" % (a.title(), cc[a.title()]))
-                continue
-
             if a.isRedirectPage():
                 a = a.getRedirectTarget()
-            try:
-                if not a.exists():
-                    pywikibot.output(u"source page doesn't exist: %s" % a.title())
-                    continue
 
-                atrans = self.findTranslated(a, tosite, quiet)
-                if pType != 'former':
-                    if atrans:
-                        text = atrans.get()
-                        m = re_Link_FA.search(text)
-                        if m:
-                            pywikibot.output(u"(already done)")
-                        else:
-                            # insert just before interwiki
-                            if (not interactive or
-                                pywikibot.input(
-                                    u'Connecting %s -> %s. Proceed? [Y/N]'
-                                    % (a.title(), atrans.title())) in ['Y', 'y']):
-                                site = pywikibot.getSite()
-                                comment = pywikibot.setAction(
-                                    i18n.twtranslate(site, 'featured-' + pType,
-                                                     {'page': unicode(a)}))
-                                ### Moving {{Link FA|xx}} to top of interwikis ###
-                                if template_on_top:
-                                    # Getting the interwiki
-                                    iw = pywikibot.getLanguageLinks(text, site)
-                                    # Removing the interwiki
-                                    text = pywikibot.removeLanguageLinks(text, site)
-                                    text += u"\r\n{{%s|%s}}\r\n" % (templatelist[0],
-                                                                    fromsite.lang)
-                                    # Adding the interwiki
-                                    text = pywikibot.replaceLanguageLinks(text,
-                                                                          iw, site)
+            if not a.exists():
+                pywikibot.output(u"source page doesn't exist: %s"
+                                 % a.title())
+                continue
 
-                                # Placing {{Link FA|xx}} right next to
-                                # corresponding interwiki
-                                else:
-                                    text = (text[:m.end()] +
-                                            (u" {{%s|%s}}" % (templatelist[0],
-                                                              fromsite.lang)) +
-                                            text[m.end():])
-                                if not dry:
-                                    try:
-                                        atrans.put(text, comment)
-                                    except pywikibot.LockedPage:
-                                        pywikibot.output(u'Page %s is locked!'
-                                                         % atrans.title())
-                        cc[a.title()] = atrans.title()
+            atrans = self.findTranslated(a, tosite, quiet)
+            if not atrans:
+                continue
+            
+            if task != 'former':
+                text = atrans.get()
+                m = re_Link_FA.search(text)
+                if m:
+                    pywikibot.output(u"(already done)")
                 else:
-                    if atrans:
-                        text = atrans.get()
-                        m = re_Link_FA.search(text)
-                        if m:
-                            # insert just before interwiki
-                            if (not interactive or
-                                pywikibot.input(
-                                    u'Connecting %s -> %s. Proceed? [Y/N]'
-                                    % (a.title(), atrans.title())) in ['Y', 'y']):
-                                site = pywikibot.getSite()
-                                comment = pywikibot.setAction(
-                                    i18n.twtranslate(site, 'featured-former',
-                                                     {'page': unicode(a)}))
-                                text = re.sub(re_Link_FA, '', text)
-                                if not dry:
-                                    try:
-                                        atrans.put(text, comment)
-                                    except pywikibot.LockedPage:
-                                        pywikibot.output(u'Page %s is locked!'
-                                                         % atrans.title())
+                    # insert just before interwiki
+                    if (not interactive or
+                        pywikibot.input(
+                            u'Connecting %s -> %s. Proceed? [Y/N]'
+                            % (a.title(), atrans.title())) in ['Y', 'y']):
+                        site = pywikibot.getSite()
+                        comment = pywikibot.setAction(
+                            i18n.twtranslate(site, 'featured-' + task,
+                                             {'page': unicode(a)}))
+                        
+                        # Moving {{Link FA|xx}} to top of interwikis
+                        if template_on_top:
+                            # Getting the interwiki
+                            iw = pywikibot.getLanguageLinks(text, site)
+                            # Removing the interwiki
+                            text = pywikibot.removeLanguageLinks(text, site)
+                            text += u"\r\n{{%s|%s}}\r\n" % (templatelist[0],
+                                                            fromsite.code)
+                            # Adding the interwiki
+                            text = pywikibot.replaceLanguageLinks(text,
+                                                                  iw, site)
+
+                        # Placing {{Link FA|xx}} right next to
+                        # corresponding interwiki
                         else:
-                            pywikibot.output(u"(already done)")
-                        cc[a.title()] = atrans.title()
-            except pywikibot.PageNotSaved, e:
-                pywikibot.output(u"Page not saved")
+                            text = (text[:m.end()] +
+                                    (u" {{%s|%s}}" % (templatelist[0],
+                                                      fromsite.code)) +
+                                    text[m.end():])
+                        if not dry:
+                            try:
+                                atrans.put(text, comment)
+                            except pywikibot.LockedPage:
+                                pywikibot.output(u'Page %s is locked!'
+                                                 % atrans.title())
+                            except pywikibot.PageNotSaved, e:
+                                pywikibot.output(u"Page not saved")
+                cc[a.title()] = atrans.title()
+            else:
+                text = atrans.get()
+                m = re_Link_FA.search(text)
+                if m:
+                    # insert just before interwiki
+                    if (not interactive or
+                        pywikibot.input(
+                            u'Connecting %s -> %s. Proceed? [Y/N]'
+                            % (a.title(), atrans.title())) in ['Y', 'y']):
+                        site = pywikibot.getSite()
+                        comment = pywikibot.setAction(
+                            i18n.twtranslate(site, 'featured-former',
+                                             {'page': unicode(a)}))
+                        text = re.sub(re_Link_FA, '', text)
+                        if not dry:
+                            try:
+                                atrans.put(text, comment)
+                            except pywikibot.LockedPage:
+                                pywikibot.output(u'Page %s is locked!'
+                                                 % atrans.title())
+                            except pywikibot.PageNotSaved, e:
+                                pywikibot.output(u"Page not saved")
+                else:
+                    pywikibot.output(u"(already done)")
+                cc[a.title()] = atrans.title()
 
 
 def main(*args):
