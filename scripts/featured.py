@@ -23,7 +23,7 @@ This script understands various command-line arguments:
 
 -nocache          doesn't include cache files file to remember if the article
                   already was verified.
-                  
+
 -nocache:xx,yy    you may ignore language codes xx,yy,... from cache file
 
 -fromlang:xx,yy   xx,yy,zz,.. are the languages to be verified.
@@ -340,7 +340,7 @@ class FeaturedBot(pywikibot.Bot):
             except KeyboardInterrupt:
                 pywikibot.output('\nQuitting featured treat...')
                 break
-        self.writecache()            
+        self.writecache()
 
     def treat(self, code, process):
         fromsite = pywikibot.Site(code)
@@ -589,7 +589,7 @@ class FeaturedBot(pywikibot.Bot):
             atrans = self.findTranslated(a, tosite, quiet)
             if not atrans:
                 continue
-            
+
             if task != 'former':
                 text = atrans.get()
                 m = re_Link_FA.search(text)
@@ -605,7 +605,7 @@ class FeaturedBot(pywikibot.Bot):
                         comment = pywikibot.setAction(
                             i18n.twtranslate(site, 'featured-' + task,
                                              {'page': unicode(a)}))
-                        
+
                         # Moving {{Link FA|xx}} to top of interwikis
                         if template_on_top:
                             # Getting the interwiki
