@@ -88,6 +88,12 @@ def DATA(site, name, hide):
         for article in cat.articles(startFrom=unichr(ord(hide) + 1)):
             yield article
 
+
+# not implemented yet
+def TMPL(site, name, hide):
+    return
+
+
 # ALL wikis use 'Link FA', and sometimes other localized templates.
 # We use _default AND the localized ones
 template = {
@@ -151,6 +157,7 @@ good_name = {
 }
 
 lists_name = {
+    'wikidata': (TMPL, 'Q5857568'),
     'ar': (BACK, u'قائمة مختارة'),
     'da': (BACK, u'FremragendeListe'),
     'de': (BACK, u'Informativ'),
@@ -201,25 +208,46 @@ class FeaturedBot(pywikibot.Bot):
         'fromlang': None,
         'good': False,
         'list': False,
+        'nocache': False,
         'side': False,    # not template_on_top
         'quiet': False,
     }
 
     def __init__(self, **kwargs):
-        """
-        Only accepts options defined in availableOptions
-        """
+        """ Only accepts options defined in availableOptions """
         super(FeaturedBot, self).__init__(**kwargs)
         self.editcounter = 0
         self.fromlang = None
+        self.cache = dict()
+        self.filename = None
+        self.site = pywikibot.Site()
 
-    def hastemplate(self, process):
-        site = pywikibot.getSite()
-        for tl in self.getTemplateList(site.lang, process):
-            tp = pywikibot.Page(site, tl, ns=10)
+    def hastemplate(self, task):
+        for tl in self.getTemplateList(self.site.lang, task):
+            tp = pywikibot.Page(self.site, tl, ns=10)
             if not tp.exists():
                 return
         return True
+
+    def readcache(self, task):
+        self.filename = pywikibot.config.datafilepath("cache", task)
+        try:
+            f = open(self.filename, "rb")
+            self.cache = pickle.load(f)
+            f.close()
+            pywikibot.output(u'Cache file %s found with %d items.'
+                             % (self.filename, len(self.cache)))
+        except IOError:
+            pywikibot.output(u'Cache file %s not found.' % self.filename)
+
+    def writecache(self):
+        if not self.getOption('nocache'):
+            pywikibot.output(u'Writing %d items to cache file %s.'
+                             % (len(self.cache), self.filename))
+            f = open(self.filename,"wb")
+            pickle.dump(self.cache, f)
+            f.close()
+        self.cache = dict()
 
     def run(self):
         done = False
@@ -237,10 +265,10 @@ class FeaturedBot(pywikibot.Bot):
         pywikibot.output(u'%d pages written.' % self.editcounter)
 
     def run_good(self):
-        process = 'good'
-        if not self.hastemplate(process):
+        task = 'good'
+        if not self.hastemplate(task):
             pywikibot.output(u'\nNOTE: % arcticles are not implemented at %.'
-                             % (process, site))
+                             % (task, site))
             return
 
         if self.getOption('fromall'):
@@ -249,23 +277,35 @@ class FeaturedBot(pywikibot.Bot):
             dp.get()
 
             ### Quick and dirty hack - any ideas?
-            self.fromlang =  [key.replace('wiki', '')
+            self.fromlang =  [key.replace('wiki', '').replace('_', '-')
                               for key in dp.sitelinks.keys()]
         else:
             return  ### 2DO
         self.fromlang.sort()
+        if not self.getOption('nocache'):
+            self.readcache(task)
         for code in self.fromlang:
             try:
-                self.treat(code, process)
+                self.treat(code, task)
             except KeyboardInterrupt:
                 pywikibot.output('\nQuitting featured treat...')
                 break
+        if not self.getOption('nocache'):
+            self.writecache()
+
+    # not implemented yet
+    def run_list(self):
+        return
+
+    # not implemented yet
+    def run_former(self):
+        return
 
     def run_featured(self):
-        process = 'featured'
-        if not self.hastemplate(process):
+        task = 'featured'
+        if not self.hastemplate(task):
             pywikibot.output(u'\nNOTE: % arcticles are not implemented at %.'
-                             % (process, site))
+                             % (task, site))
             return
 
         if self.getOption('fromall'):
@@ -279,18 +319,21 @@ class FeaturedBot(pywikibot.Bot):
         else:
             return  ### 2DO
         self.fromlang.sort()
+        if not self.getOption('nocache'):
+            self.readcache(task)
         for code in self.fromlang:
             try:
-                self.treat(code, process)
+                self.treat(code, task)
             except KeyboardInterrupt:
                 pywikibot.output('\nQuitting featured treat...')
                 break
+        if not self.getOption('nocache'):
+            self.writecache()            
 
     def treat(self, code, process):
         fromsite = pywikibot.Site(code)
-        site = pywikibot.Site()
-        if fromsite != site:
-            self.featuredWithInterwiki(fromsite, site,
+        if fromsite != self.site:
+            self.featuredWithInterwiki(fromsite,
                                        not self.getOption('side'),
                                        process,
                                        self.getOption('quiet'),
@@ -388,8 +431,7 @@ class FeaturedBot(pywikibot.Bot):
             hide = info[code][2]
         except IndexError:
             hide = None
-        raw = method(site, name, hide)
-        for p in raw:
+        for p in method(site, name, hide):
             if p.namespace() == 0:  # Article
                 articles.append(p)
             # Article talk (like in English)
@@ -405,7 +447,7 @@ class FeaturedBot(pywikibot.Bot):
 
     def findTranslated(self, page, oursite=None, quiet=False):
         if not oursite:
-            oursite = pywikibot.getSite()
+            oursite = self.site
         if page.isRedirectPage():
             page = page.getRedirectTarget()
 
@@ -493,14 +535,15 @@ class FeaturedBot(pywikibot.Bot):
         return templates
 
 
-    def featuredWithInterwiki(self, fromsite, tosite, template_on_top, pType,
+    def featuredWithInterwiki(self, fromsite, template_on_top, pType,
                               quiet, dry=False):
-        if not fromsite.lang in cache:
-            cache[fromsite.lang] = {}
-        if not tosite.lang in cache[fromsite.lang]:
-            cache[fromsite.lang][tosite.lang] = {}
-        cc = cache[fromsite.lang][tosite.lang]
-        if nocache:
+        tosite = self.site
+        if not fromsite.lang in self.cache:
+            self.cache[fromsite.lang] = {}
+        if not tosite.lang in self.cache[fromsite.lang]:
+            self.cache[fromsite.lang][tosite.lang] = {}
+        cc = self.cache[fromsite.lang][tosite.lang]
+        if self.getOption('nocache'):
             cc = {}
         templatelist = self.getTemplateList(tosite.code, pType)
         findtemplate = '(' + '|'.join(templatelist) + ')'
@@ -601,30 +644,21 @@ class FeaturedBot(pywikibot.Bot):
 
 
 def main(*args):
-    global nocache, interactive, afterpage, cache
-    nocache = 0
+    global interactive, afterpage
     interactive = 0
     afterpage = u"!"
-    cache = {}
 
-    template_on_top = True
     featuredcount = False
     fromlang = []
     processType = 'featured'
-    doAll = False
     part = False
-    quiet = False
     options = {}
     for arg in pywikibot.handleArgs():
         if arg == '-interactive':
             interactive = 1
-        elif arg == '-nocache':
-            nocache = 1
         elif arg.startswith('-fromlang:'):
             fromlang = arg[10:].split(",")
             part = True
-        elif arg == '-fromall':
-            doAll = True
         elif arg.startswith('-after:'):
             afterpage = arg[7:]
         else:
@@ -654,39 +688,6 @@ def main(*args):
         except:
             pass
 
-##    if doAll:
-##        if processType == 'good':
-##            fromlang = good_name.keys()
-##        elif processType == 'list':
-##            fromlang = lists_name.keys()
-##        elif processType == 'former':
-##            fromlang = former_name.keys()
-##        else:
-##            fromlang = featured_name.keys()
-##            fromlang.remove('wikidata')
-##
-    filename = pywikibot.config.datafilepath("cache", processType)
-    try:
-        cache = pickle.load(file(filename, "rb"))
-    except:
-        cache = {}
-
-##    if not fromlang:
-##        pywikibot.showHelp('featured')
-##        sys.exit(1)
-##
-##    fromlang.sort()
-##
-##    #test whether this site has template enabled
-##    hasTemplate = False
-##    if not featuredcount:
-##        for tl in getTemplateList(pywikibot.getSite().lang, processType):
-##            t = pywikibot.Page(pywikibot.getSite(), u'Template:'+tl)
-##            if t.exists():
-##                hasTemplate = True
-##                break
-##
-    try:
 ##        for ll in fromlang:
 ##            fromsite = pywikibot.getSite(ll)
 ##            if featuredcount:
@@ -704,19 +705,11 @@ def main(*args):
 ##                featuredWithInterwiki(fromsite, pywikibot.getSite(),
 ##                                      template_on_top, processType, quiet,
 ##                                      config.simulate)
-        if options:
-            bot = FeaturedBot(**options)
-            bot.run()
-        else:
-            pywikibot.showHelp()
-
-##    except KeyboardInterrupt:
-##        pywikibot.output('\nQuitting program...')
-    finally:
-        if not nocache:
-            f = open(filename,"wb")
-            pickle.dump(cache, f)
-            f.close()
+    if options:
+        bot = FeaturedBot(**options)
+        bot.run()
+    else:
+        pywikibot.showHelp()
 
 
 if __name__ == "__main__":
