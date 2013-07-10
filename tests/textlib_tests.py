@@ -33,6 +33,13 @@ class TestSectionFunctions(unittest.TestCase):
     def testCurrentBehaviour(self):
         self.assertContains("enwiki_help_editing", u"Editing")
 
+    def testExtractTemplates(self):
+        func = textlib.extract_templates_and_params  # It's really long.
+        self.assertEqual(func('{{a}}'), [('a', {})])
+        self.assertEqual(func('{{a|b=c}}'), [('a', {'b': 'c'})])
+        self.assertEqual(func('{{a|b|c=d}}'), [('a', {u'1': 'b', 'c': 'd'})])
+
+
     @unittest.expectedFailure
     def testSpacesInSection(self):
         self.assertContains("enwiki_help_editing", u"Minor_edits")
