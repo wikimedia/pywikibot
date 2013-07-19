@@ -48,6 +48,7 @@ __version__ = '$Id$'
 
 import logging
 import pywikibot
+from os.path import join
 from pywikibot import config, deprecate_arg
 from pywikibot.exceptions import NoSuchSite, NoUsername
 
@@ -68,7 +69,7 @@ def main(*args):
             logall = True
         elif arg == "-force":
             pywikibot.output(u"To force a re-login, please delete the revelant lines from '%s' (or the entire file) and try again." %
-                             os.path.join(config.base_dir, 'pywikibot.lwp'))
+                             join(config.base_dir, 'pywikibot.lwp'))
         else:
             pywikibot.showHelp('login')
             return
