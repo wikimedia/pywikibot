@@ -12,19 +12,19 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'mg', 'fr', 'zh', 'lt', 'ru', 'el', 'pl', 'ko', 'sv', 'tr',
-            'de', 'ta', 'nl', 'ku', 'kn', 'vi', 'fi', 'io', 'hu', 'pt', 'ml',
+            'de', 'ta', 'nl', 'ku', 'kn', 'fi', 'vi', 'io', 'hu', 'pt', 'ml',
             'no', 'es', 'my', 'id', 'it', 'li', 'et', 'ja', 'te', 'fa', 'ro',
             'cs', 'ar', 'ca', 'eu', 'jv', 'gl', 'lo', 'uk', 'fj', 'br', 'bg',
-            'eo', 'hr', 'oc', 'is', 'vo', 'th', 'zh-min-nan', 'simple', 'cy',
-            'ps', 'scn', 'sr', 'af', 'ast', 'sw', 'fy', 'tl', 'uz', 'he', 'da',
-            'nn', 'ur', 'wa', 'la', 'hy', 'sq', 'sm', 'nah', 'sl', 'hi', 'ka',
-            'pnb', 'az', 'tt', 'bs', 'lv', 'lb', 'tk', 'hsb', 'kk', 'sk', 'mk',
-            'km', 'ky', 'nds', 'be', 'ga', 'wo', 'ms', 'ang', 'co', 'gn', 'mr',
+            'eo', 'hr', 'oc', 'is', 'vo', 'th', 'zh-min-nan', 'simple', 'ps',
+            'cy', 'scn', 'sr', 'af', 'ast', 'sw', 'fy', 'tl', 'uz', 'da', 'he',
+            'nn', 'ur', 'wa', 'la', 'hy', 'sq', 'sm', 'nah', 'sl', 'hi', 'az',
+            'pnb', 'ka', 'tt', 'bs', 'lb', 'lv', 'tk', 'hsb', 'sk', 'kk', 'ky',
+            'mk', 'km', 'nds', 'be', 'ga', 'wo', 'ms', 'ang', 'co', 'gn', 'mr',
             'csb', 'sa', 'st', 'ia', 'sd', 'si', 'sh', 'tg', 'ug', 'mn', 'kl',
             'or', 'jbo', 'an', 'ln', 'zu', 'fo', 'gu', 'kw', 'gv', 'rw', 'qu',
             'ss', 'vec', 'ie', 'mt', 'om', 'chr', 'bn', 'roa-rup', 'iu', 'pa',
             'so', 'am', 'su', 'za', 'gd', 'mi', 'tpi', 'ne', 'yi', 'ti', 'sg',
-            'na', 'dv', 'tn', 'ha', 'ks', 'ay', 'ts',
+            'na', 'dv', 'tn', 'ha', 'ks', 'ts', 'ay',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang)
