@@ -3443,7 +3443,7 @@ class DataSite (APISite):
         Sets the claim target to whatever claim.target is
         An optional snaktype lets you set a novalue or somevalue.
         """
-        if claim.isReference:
+        if claim.isReference or claim.isQualifier:
             raise NotImplementedError
         if not claim.snak:
             #We need to already have the snak value
@@ -3458,10 +3458,7 @@ class DataSite (APISite):
         if snaktype == 'value':
             params['value'] = json.dumps(claim._formatDataValue())
 
-        for arg in kwargs:
-            #TODO: Get the lastrevid from the item
-            if arg in ['bot','lastrevid']:
-                params[arg] = kwargs[arg]
+        params['lastrevid'] = claim.on_item.lastrevid
         req = api.Request(site=self, **params)
         data = req.submit()
         return data
