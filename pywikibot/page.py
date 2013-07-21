@@ -2262,7 +2262,6 @@ class WikibasePage(Page):
             del self._link._title
         return Page(self).title(**kwargs)
 
-
     def __defined_by(self, singular=False):
         """
         returns the parameters needed by the API to identify an item.
@@ -2436,6 +2435,8 @@ class WikibasePage(Page):
         value should be a list of strings.
         """
         aliases = self.__normalizeLanguages(aliases)
+        for (key, strings) in aliases.items():
+            aliases[key] = [{'language': key, 'value': i} for i in strings]
         data = {'aliases': aliases}
         self.editEntity(data, **kwargs)
 
