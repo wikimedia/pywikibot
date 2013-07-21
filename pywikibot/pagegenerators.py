@@ -888,10 +888,11 @@ def LongPagesPageGenerator(number = 100, repeat = False, site = None):
     for page, length in site.longpages(number=number, repeat=repeat):
         yield page
 
-def ShortPagesPageGenerator(number = 100, repeat = False, site = None):
+
+def ShortPagesPageGenerator(number=100, repeat=False, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page, length in site.shortpages(number=number, repeat=repeat):
+    for page, length in site.shortpages(total=number, repeat=repeat):
         yield page
 
 def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,

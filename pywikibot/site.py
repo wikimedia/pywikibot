@@ -3137,7 +3137,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             yield (pywikibot.Page(self, pageitem['title']),
                    int(pageitem['value']))
 
-    @deprecate_arg("number", None)
+    @deprecate_arg("number", "total")
     @deprecate_arg("repeat", None)
     def shortpages(self, step=None, total=None):
         """Yield Pages and lengths from Special:Shortpages.
