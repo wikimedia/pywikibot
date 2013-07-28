@@ -640,7 +640,8 @@ def handleArgs(*args):
     if config.verbose_output:
         import re
         ver = pywikibot.__version__  # probably can be improved on
-        m = re.search(r"\$Id$", ver)
+        m = re.search(r"\$Id: (\w+) "
+                      r"\$", ver)
         pywikibot.output(u'Pywikipediabot r%s' % m.group(1))
         pywikibot.output(u'Python %s' % sys.version)
 
