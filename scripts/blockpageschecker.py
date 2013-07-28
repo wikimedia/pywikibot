@@ -61,7 +61,7 @@ python blockpageschecker.py -show -protectedpages:4
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: blockpageschecker.py,v 1.5 2008/04/24 19.40.00 filnik Exp$'
+__version__ = '$Id$'
 #
 
 import re, webbrowser

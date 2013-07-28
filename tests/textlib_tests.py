@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: api_tests.py 8238 2010-06-02 13:50:48Z xqt $'
+__version__ = '$Id$'
 
 try:
     import mwparserfromhell

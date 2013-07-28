@@ -56,7 +56,7 @@ and arguments can be:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: redirect.py 7789 2009-12-17 19:20:12Z xqt $'
+__version__='$Id$'
 #
 import re
 import datetime
