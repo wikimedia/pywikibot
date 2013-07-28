@@ -1844,9 +1844,12 @@ class Category(Page):
 
     def isHiddenCategory(self):
         """Return True if the category is hidden."""
-        text = self.get()
-        hidden = re.search('__HIDDENCAT__', text)
-        return bool(hidden)
+        # FIXME
+        # This should use action=query&list=allcategories
+        # setting acfrom and acto to the category title and adding
+        # acprop=hidden but currently fails  in some cases
+        # (see bug 48824)
+        return '__HIDDENCAT__' in self.expand_text()
 
     def copyTo(self, cat, message):
         """
