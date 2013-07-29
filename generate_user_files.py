@@ -8,10 +8,14 @@ __version__ = '$Id$'
 # Distributed under the terms of the MIT license.
 #
 
-import codecs, os, re, sys
+import os
+import sys
+import re
+import codecs
 import platform
 
 single_wiki_families = ['commons', 'wikidata']
+
 
 def get_base_dir():
     """Return the directory in which user-specific information is stored.
@@ -63,8 +67,8 @@ pywikibot_dir = sys.path[0]
 if console_encoding is None or sys.platform == 'cygwin':
     console_encoding = "iso-8859-1"
 
-def listchoice(clist = [], message = None, default = None):
 
+def listchoice(clist=[], message=None, default=None):
     if not message:
         message = "Select"
 
@@ -88,6 +92,7 @@ def listchoice(clist = [], message = None, default = None):
             print("Invalid response")
     return response
 
+
 def change_base_dir():
     """Create a new user directory."""
     global base_dir
@@ -99,7 +104,7 @@ def change_base_dir():
                 print("ERROR: there is an existing file with that name.")
                 continue
             # make sure user can read and write this directory
-            if not os.access(new_base, os.R_OK|os.W_OK):
+            if not os.access(new_base, os.R_OK | os.W_OK):
                 print("ERROR: directory access restricted")
                 continue
             print("OK: using existing directory")
@@ -129,31 +134,36 @@ set environment variables.""" % locals(), width=76)
     print "Aborting changes."
     return False
 
+
 def file_exists(filename):
     if os.path.exists(filename):
         print("'%s' already exists." % filename)
         return True
     return False
 
+
 def get_site_and_lang():
-        known_families = re.findall(r'(.+)_family.py\b',
-                                   '\n'.join(os.listdir(
-                                       os.path.join(pywikibot_dir,
-                                                    "pywikibot",
-                                                    "families"))))
+        known_families = re.findall(
+            r'(.+)_family.py\b',
+            '\n'.join(os.listdir(os.path.join(
+                pywikibot_dir,
+                "pywikibot",
+                "families")))
+        )
         known_families = sorted(known_families)
         fam = listchoice(known_families,
                          "Select family of sites we are working on",
                          default='wikipedia')
         if fam not in single_wiki_families:
-            mylang = raw_input(
-"The language code of the site we're working on (default: 'en'): ") or 'en'
+            mylang = raw_input("The language code of the site we're working on (default: 'en'): ") or 'en'
         else:
             mylang = fam
+
         username = raw_input("Username (%s %s): "
                              % (mylang, fam))
         username = unicode(username, console_encoding)
         return fam, mylang, username
+
 
 def create_user_config():
     _fnc = os.path.join(base_dir, "user-config.py")
@@ -162,9 +172,7 @@ def create_user_config():
         mainusername = mainusername or "UnnamedBot"
 
         while True:
-            choice = raw_input(
-"Which variant of user_config.py:\n[S]mall or [E]xtended (with further information)? "
-                               ).upper()
+            choice = raw_input("Which variant of user_config.py:\n[S]mall or [E]xtended (with further information)? ").upper()
             if choice in "SE":
                 break
 
@@ -179,16 +187,18 @@ def create_user_config():
         cpy = f.read()
         f.close()
 
-        res = re.findall("^(############## (?:LOGFILE|"
-                                            "INTERWIKI|"
-                                            "SOLVE_DISAMBIGUATION|"
-                                            "IMAGE RELATED|"
-                                            "TABLE CONVERSION BOT|"
-                                            "WEBLINK CHECKER|"
-                                            "DATABASE|"
-                                            "SEARCH ENGINE|"
-                                            "COPYRIGHT|"
-                                            "FURTHER) SETTINGS .*?)^(?=#####|# =====)",
+        res = re.findall("^(############## (?:"
+                         "LOGFILE|"
+                         "INTERWIKI|"
+                         "SOLVE_DISAMBIGUATION|"
+                         "IMAGE RELATED|"
+                         "TABLE CONVERSION BOT|"
+                         "WEBLINK CHECKER|"
+                         "DATABASE|"
+                         "SEARCH ENGINE|"
+                         "COPYRIGHT|"
+                         "FURTHER"
+                         ") SETTINGS .*?)^(?=#####|# =====)",
                          cpy, re.MULTILINE | re.DOTALL)
         config_text = '\n'.join(res)
 
@@ -220,12 +230,13 @@ mylang = '%s'
 usernames['%s']['%s'] = u'%s'
 """ % (fam, mylang, fam, mylang, mainusername))
         while(raw_input("Do you want to add any other projects? (y/N)").upper() == "Y"):
-             fam, mylang, username = get_site_and_lang()
-             username = username or mainusername
-             f.write("usernames['%(fam)s']['%(mylang)s'] = u'%(username)s'\n" % locals())
+            fam, mylang, username = get_site_and_lang()
+            username = username or mainusername
+            f.write("usernames['%(fam)s']['%(mylang)s'] = u'%(username)s'\n" % locals())
 
         f.close()
         print("'%s' written." % _fnc)
+
 
 def create_user_fixes():
     _fnf = os.path.join(base_dir, "user-fixes.py")
@@ -263,9 +274,7 @@ if __name__ == "__main__":
     while True:
         if os.path.exists(os.path.join(base_dir, "user-config.py")):
             break
-        do_copy = raw_input(
-"Do you want to copy user files from an existing pywikipedia installation? "
-                            ).upper().strip()
+        do_copy = raw_input("Do you want to copy user files from an existing pywikipedia installation? ").upper().strip()
         if do_copy and "YES".startswith(do_copy):
             oldpath = raw_input("Path to existing wikipedia.py? ")
             if not os.path.exists(oldpath):
@@ -280,12 +289,16 @@ if __name__ == "__main__":
             newf = file(os.path.join(base_dir, "user-config.py"), "wb")
             oldf = file(os.path.join(oldpath, "user-config.py"), "rb")
             newf.write(oldf.read())
-            newf.close(); oldf.close()
+            newf.close()
+            oldf.close()
+
             if os.path.isfile(os.path.join(oldpath, "user-fixes.py")):
                 newfix = file(os.path.join(base_dir, "user-fixes.py"), "wb")
                 oldfix = file(os.path.join(oldpath, "user-fixes.py"), "rb")
                 newfix.write(oldfix.read())
-                newfix.close() ; oldfix.close()
+                newfix.close()
+                oldfix.close()
+
         elif do_copy and "NO".startswith(do_copy):
             break
     if not os.path.isfile(os.path.join(base_dir, "user-config.py")):
