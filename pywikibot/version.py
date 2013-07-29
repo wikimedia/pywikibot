@@ -15,8 +15,10 @@ import urllib
 
 cache = None
 
+
 class ParseError(Exception):
     """ Parsing went wrong """
+
 
 def _get_program_dir():
     _program_dir = os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
@@ -24,6 +26,7 @@ def _get_program_dir():
 ##   if not os.path.isabs(_program_dir):
 ##      _program_dir = os.path.normpath(os.path.join(os.getcwd(), _program_dir))
     return _program_dir
+
 
 def getversion():
     data = getversiondict()
@@ -35,10 +38,11 @@ def getversion():
         data['cmp_ver'] = 'n/a'
     return '%(tag)s (r%(rev)s, %(date)s, %(cmp_ver)s)' % data
 
+
 def getversiondict():
     global cache
     if cache:
-      return cache
+        return cache
     try:
         (tag, rev, date) = getversion_svn()
     except Exception:
@@ -55,7 +59,8 @@ def getversiondict():
                 id, file, rev, date, ts, author, dollar = version.split(' ')
                 tag = 'pywikibot/__init__.py'
                 date = time.strptime('%sT%s' % (date, ts), '%Y-%m-%dT%H:%M:%SZ')
-            except: # nothing worked; version unknown (but suppress exceptions)
+            except:
+                # nothing worked; version unknown (but suppress exceptions)
                 # the value is most likely '$Id' + '$', it means that
                 # wikipedia.py got imported without using svn at all
                 return dict(tag='', rev='-1 (unknown)', date='0 (unknown)')
@@ -63,6 +68,7 @@ def getversiondict():
     datestring = time.strftime('%Y/%m/%d, %H:%M:%S', date)
     cache = dict(tag=tag, rev=rev, date=datestring)
     return cache
+
 
 def getversion_svn(path=None):
     _program_dir = path or _get_program_dir()
@@ -74,7 +80,7 @@ def getversion_svn(path=None):
         from sqlite3 import dbapi2 as sqlite
         con = sqlite.connect(os.path.join(_program_dir, ".svn/wc.db"))
         cur = con.cursor()
-        cur.execute( '''select local_relpath, repos_path, revision, changed_date from nodes order by revision desc, changed_date desc''')
+        cur.execute('''select local_relpath, repos_path, revision, changed_date from nodes order by revision desc, changed_date desc''')
         name, tag, rev, date = cur.fetchone()
         con.close()
         tag = tag[:-len(name)]
@@ -88,25 +94,26 @@ def getversion_svn(path=None):
         tag = '[%s] %s' % (t[0], t[1])
         for i in xrange(4):
             entries.readline()
-        date = time.strptime(entries.readline()[:19],'%Y-%m-%dT%H:%M:%S')
+        date = time.strptime(entries.readline()[:19], '%Y-%m-%dT%H:%M:%S')
         rev = entries.readline()[:-1]
         entries.close()
     if (not date or not tag or not rev) and not path:
         raise ParseError
     return (tag, rev, date)
 
+
 def getversion_nightly():
     data = open(os.path.join(wikipediatools.get_base_dir(), 'version'))
     tag = data.readline().strip()
-    date = time.strptime(data.readline()[:19],'%Y-%m-%dT%H:%M:%S')
+    date = time.strptime(data.readline()[:19], '%Y-%m-%dT%H:%M:%S')
     rev = data.readline().strip()
     if not date or not tag or not rev:
         raise ParseError
     return (tag, rev, date)
 
-## Retrieve revision number of framework online repository's svnroot
-#
+
 def getversion_onlinerepo(repo=None):
+    """ Retrieve revision number of framework online repository's svnroot """
     url = repo or 'http://svn.wikimedia.org/svnroot/pywikipedia/trunk/pywikipedia/'
     rev = None
     try:
@@ -120,10 +127,11 @@ def getversion_onlinerepo(repo=None):
 #
 cmp_ver = lambda a, b, tol=1: {-1: '<', 0: '~', 1: '>'}[cmp((a-b)//tol, 0)]
 
-## Retrieve revision number of file (__version__ variable containing Id tag)
-#  without importing it (thus can be done for any file)
-#
+
 def getfileversion(filename):
+    """ Retrieve revision number of file (__version__ variable containing Id tag)
+        without importing it (thus can be done for any file)
+    """
     _program_dir = _get_program_dir()
     __version__ = None
     fn = os.path.join(_program_dir, filename)
