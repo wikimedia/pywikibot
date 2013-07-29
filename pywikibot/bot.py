@@ -55,8 +55,8 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         "app.log", you would get "app.log", "app.1.log", "app.2.log", ...
         through to "app.5.log". The file being written to is always "app.log" -
         when it gets filled up, it is closed and renamed to "app.1.log", and if
-        files "app.2.log", "app.2.log" etc. exist, then they are renamed to
-        "app.2.log", "app.3.log" etc. respectively.
+        files "app.1.log", "app.2.log" etc. already exist, then they are
+        renamed to "app.2.log", "app.3.log" etc. respectively.
         If backupCount is >= 1 do not rotate but create new numbered filenames.
         The newest file has the highest number except some older numbered files
         where deleted and the bot was restarted. In this case the ordering
