@@ -34,5 +34,5 @@ setup(name='Pywikipediabot',
 
 import subprocess
 python = sys.executable
-python = python.replace("pythonw.exe", "python.exe") # for Windows
+python = python.replace("pythonw.exe", "python.exe")  # for Windows
 ignore = subprocess.call([python, "generate_user_files.py"])
