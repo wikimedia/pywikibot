@@ -12,7 +12,8 @@ __version__ = '$Id$'
 # Distributed under the terms of the MIT license.
 #
 
-import sys,os
+import sys
+import os
 
 if sys.version_info[0] != 2:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2")
@@ -45,7 +46,7 @@ if len(sys.argv) > 0:
             if os.path.exists(testpath):
                 sys.argv[0] = testpath
             else:
-                raise Exception("%s not found!" % sys.argv[0]) 
+                raise Exception("%s not found!" % sys.argv[0])
     sys.path.append(os.path.split(sys.argv[0])[0])
     execfile(sys.argv[0])
 else:
