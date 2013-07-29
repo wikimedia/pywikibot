@@ -124,11 +124,12 @@ class BasicBot:
                             % (page.title()))
                     except pywikibot.SpamfilterError, error:
                         pywikibot.output(
-u'Cannot change %s because of spam blacklist entry %s'
+                            u'Cannot change %s because of spam blacklist entry %s'
                             % (page.title(), error.url))
                     else:
                         return True
         return False
+
 
 def main():
     global site
