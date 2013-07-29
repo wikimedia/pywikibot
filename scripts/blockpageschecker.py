@@ -85,7 +85,6 @@ templateSemiProtection = {
                   r'\{\{(?:[Tt]emplate:|)[Aa]bp(?:|[ _]scad\|(?:.*?))\}\}'],
             'fr': [ur'\{\{(?:[Tt]emplate:|[Mm]odèle:|)[Ss]emi[- ]?protection(|[^\}]*)\}\}'],
             'ja':[ur'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)半保護(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
-            #'zh':[ur'\{\{(?:[Tt]emplate:|)Protected|(?:[Ss]|[Ss]emi|半)(?:\|.+|)\}\}(\n+?|)',ur'\{\{(?:[Tt]emplate:|)Mini-protected|(?:[Ss]|[Ss]emi|半)(?:\|.+|)\}\}(\n+?|)',ur'\{\{(?:[Tt]emplate:|)Protected-logo|(?:[Ss]|[Ss]emi|半)(?:\|.+|)\}\}(\n+?|)'],
             }
 # Regex to get the total-protection template
 templateTotalProtection = {
@@ -95,21 +94,18 @@ templateTotalProtection = {
             'fr':[ur'\{\{(?:[Tt]emplate:|[Mm]odèle:|)[Pp]rotection(|[^\}]*)\}\}',
                  ur'\{\{(?:[Tt]emplate:|[Mm]odèle:|)(?:[Pp]age|[Aa]rchive|[Mm]odèle) protégée?(|[^\}]*)\}\}'],
             'ja':[ur'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)保護(?:性急|)(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
-            #'zh':[r'\{\{(?:[Tt]emplate:|)Protected|(?:[Nn]|[Nn]ormal)(?:\|.+|)\}\}(\n+?|)',r'\{\{(?:[Tt]emplate:|)Mini-protected|(?:[Nn]|[Nn]ormal)(?:\|.+|)\}\}(\n+?|)',r'\{\{(?:[Tt]emplate:|)Protected-logo|(?:[Nn]|[Nn]ormal)(?:\|.+|)\}\}(\n+?|)'],
             }
 # Regex to get the semi-protection move template
 templateSemiMoveProtection = {
             'en': None,
             'it':[r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
             'ja':[ur'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)移動半保護(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
-            #'zh':[r'\{\{(?:[Tt]emplate:|)Protected|(?:MS|ms)(?:\|.+|)\}\}(\n+?|)',r'\{\{(?:[Tt]emplate:|)Mini-protected|(?:MS|ms)(?:\|.+|)\}\}(\n+?|)',r'\{\{(?:[Tt]emplate:|)Protected-logo|(?:MS|ms)(?:\|.+|)\}\}(\n+?|)'],
             }
 # Regex to get the total-protection move template
 templateTotalMoveProtection = {
             'en': None,
             'it':[r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
             'ja':[ur'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)移動保護(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
-            #'zh':[ur'\{\{(?:[Tt]emplate:|)Protected|(?:[Mm]|[Mm]ove|移[動动])(?:\|.+|)\}\}(\n+?|)',ur'\{\{(?:[Tt]emplate:|)Mini-protected|(?:[Mm]|[Mm]ove|移[動动])(?:\|.+|)\}\}(\n+?|)',ur'\{\{(?:[Tt]emplate:|)Protected-logo|(?:[Mm]|[Mm]ove|移[動动])(?:\|.+|)\}\}(\n+?|)'],
             }
 
 # If you use only one template for all the type of protection, put it here.
@@ -125,7 +121,6 @@ templateNoRegex = {
             'it':['{{Avvisobloccoparziale}}', '{{Avvisoblocco}}', None, None, '{{Protetta}}'],
             'fr':['{{Semi-protection}}', '{{Protection}}', None, None, None],
             'ja':[u'{{半保護}}', u'{{保護}}', u'{{移動半保護}}', u'{{移動保護}}', None],
-            #'zh':[u'{{Protected/semi}}',u'{{Protected}}',u'{{Protected/ms}}',u'{{Protected/move}}', None],
             }
 
 # Category where the bot will check
