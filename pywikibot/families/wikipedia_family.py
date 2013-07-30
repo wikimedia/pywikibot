@@ -41,8 +41,10 @@ class Family(family.WikimediaFamily):
             'ny', 'tw', 'ch', 'xh',
         ]
 
+        langs = self.languages_by_size + ['test', 'test2']  # Sites we want to edit but not count as real languages
+
         self.langs = dict([(lang, '%s.wikipedia.org' % lang)
-                           for lang in self.languages_by_size])
+                           for lang in langs])
 
 
         self.category_redirect_templates = {
