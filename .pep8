@@ -1,3 +1,4 @@
 [pep8]
+ignore = E122
 exclude = distribute_setup.py,externals,user-config.py,./scripts/i18n/*,./pywikibot/date.py
 max_line_length = 256
