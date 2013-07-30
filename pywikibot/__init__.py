@@ -202,7 +202,6 @@ class Coordinate(object):
         raise NotImplementedError
 
 
-
 def deprecated(instead=None):
     """Decorator to output a method deprecation warning.
 
@@ -215,7 +214,7 @@ def deprecated(instead=None):
             classname = args[0].__class__.__name__
             if instead:
                 warning(u"%s.%s is DEPRECATED, use %s instead."
-                         % (classname, funcname, instead))
+                        % (classname, funcname, instead))
             else:
                 warning(u"%s.%s is DEPRECATED." % (classname, funcname))
             return method(*args, **kwargs)
@@ -223,9 +222,11 @@ def deprecated(instead=None):
         return wrapper
     return decorator
 
+
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg"""
     _logger = ""
+
     def decorator(method):
         def wrapper(*__args, **__kw):
             meth_name = method.__name__
@@ -242,9 +243,8 @@ u"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
                         __kw[new_arg] = __kw[old_arg]
                 else:
                     pywikibot.debug(
-                        u"%(old_arg)s argument of %(meth_name)s is deprecated."
-                            % locals(),
-                        _logger)
+u"%(old_arg)s argument of %(meth_name)s is deprecated."
+                        % locals(), _logger)
                 del __kw[old_arg]
             return method(*__args, **__kw)
         wrapper.__doc__ = method.__doc__
@@ -382,6 +382,7 @@ def showDiff(oldtext, newtext):
 
 stopped = False
 
+
 def stopme():
     """Drop this process from the throttle log, after pending threads finish.
 
@@ -394,12 +395,13 @@ def stopme():
 
     if not stopped:
         pywikibot.debug(u"stopme() called", _logger)
+
         def remaining():
             import datetime
             remainingPages = page_put_queue.qsize() - 1
                 # -1 because we added a None element to stop the queue
             remainingSeconds = datetime.timedelta(
-                    seconds=(remainingPages * config.put_throttle))
+                seconds=(remainingPages * config.put_throttle))
             return (remainingPages, remainingSeconds)
 
         page_put_queue.put((None, [], {}))
@@ -415,9 +417,8 @@ def stopme():
             except KeyboardInterrupt:
                 answer = inputChoice(u"""\
 There are %i pages remaining in the queue. Estimated time remaining: %s
-Really exit?"""
-                                         % remaining(),
-                                     ['yes', 'no'], ['y', 'N'], 'N')
+Really exit?""" % remaining(),
+                    ['yes', 'no'], ['y', 'N'], 'N')
                 if answer == 'y':
                     return
 
@@ -431,8 +432,8 @@ Really exit?"""
 import atexit
 atexit.register(stopme)
 
-# Create a separate thread for asynchronous page saves (and other requests)
 
+# Create a separate thread for asynchronous page saves (and other requests)
 def async_manager():
     """Daemon; take requests from the queue and execute them in background."""
     while True:
@@ -440,6 +441,7 @@ def async_manager():
         if request is None:
             break
         request(*args, **kwargs)
+
 
 def async_request(request, *args, **kwargs):
     """Put a request on the queue, and start the daemon if necessary."""
