@@ -14,7 +14,8 @@ __version__ = '$Id$'
 # scripts, instead of writing each one from scratch.
 
 
-import logging, logging.handlers
+import logging
+import logging.handlers
        # all output goes thru python std library "logging" module
 import os
 import os.path
@@ -37,7 +38,7 @@ from pywikibot import version
 # search for user interface module in the 'userinterfaces' subdirectory
 uiModule = __import__("pywikibot.userinterfaces.%s_interface"
                       % config.userinterface,
-                      fromlist=['UI'] )
+                      fromlist=['UI'])
 ui = uiModule.UI()
 
 
@@ -145,6 +146,7 @@ class LoggingFormatter(logging.Formatter):
 
 _handlers_initialized = False
 
+
 def init_handlers(strm=None):
     """Initialize logging system for terminal-based bots.
 
@@ -190,10 +192,10 @@ def init_handlers(strm=None):
         # for prompts requiring user response
 
     root_logger = logging.getLogger("pywiki")
-    root_logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
+    root_logger.setLevel(DEBUG + 1)  # all records except DEBUG go to logger
     if hasattr(root_logger, 'captureWarnings'):
-        root_logger.captureWarnings(True) # introduced in Python >= 2.7
-    root_logger.handlers = [] # remove any old handlers
+        root_logger.captureWarnings(True)  # introduced in Python >= 2.7
+    root_logger.handlers = []  # remove any old handlers
 
     # configure handler(s) for display to user interface
     ui.init_handlers(root_logger, **config.userinterface_init_kwargs)
@@ -210,10 +212,10 @@ def init_handlers(strm=None):
 
         file_handler.setLevel(DEBUG)
         form = LoggingFormatter(
-                   fmt="%(asctime)s %(caller_file)18s, %(caller_line)4s "
-                       "in %(caller_name)18s: %(levelname)-8s %(message)s",
-                   datefmt="%Y-%m-%d %H:%M:%S"
-               )
+            fmt="%(asctime)s %(caller_file)18s, %(caller_line)4s "
+                "in %(caller_name)18s: %(levelname)-8s %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )
         file_handler.setFormatter(form)
         root_logger.addHandler(file_handler)
         # Turn on debugging for each component requested by user
@@ -250,8 +252,8 @@ def writelogheader():
     # new framework release/revision? (handleArgs needs to be called first)
     try:
         log(u'VERSION: %s' % unicode((version.getversion().strip(),
-                                         version.getversion_onlinerepo(),
-                                         site.live_version())))
+                                      version.getversion_onlinerepo(),
+                                      site.live_version())))
     except version.ParseError:
         exception()
 
@@ -310,6 +312,7 @@ if hasattr(sys, '_getframe'):
 
 # done filching
 
+
 def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
               **kwargs):
     """Format output and send to the logging module.
@@ -349,6 +352,7 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
 
     logger.log(_level, text, extra=context, **kwargs)
 
+
 def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     """Output a message to the user via the userinterface.
 
@@ -378,29 +382,36 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     else:
         logoutput(text, decoder, newline, INFO, **kwargs)
 
+
 def stdout(text, decoder=None, newline=True, **kwargs):
     """Output script results to the user via the userinterface."""
     logoutput(text, decoder, newline, STDOUT, **kwargs)
+
 
 def warning(text, decoder=None, newline=True, **kwargs):
     """Output a warning message to the user via the userinterface."""
     logoutput(text, decoder, newline, WARNING, **kwargs)
 
+
 def error(text, decoder=None, newline=True, **kwargs):
     """Output an error message to the user via the userinterface."""
     logoutput(text, decoder, newline, ERROR, **kwargs)
+
 
 def log(text, decoder=None, newline=True, **kwargs):
     """Output a record to the log file."""
     logoutput(text, decoder, newline, VERBOSE, **kwargs)
 
+
 def critical(text, decoder=None, newline=True, **kwargs):
     """Output a debug record to the log file."""
     logoutput(text, decoder, newline, CRITICAL, **kwargs)
 
+
 def debug(text, layer, decoder=None, newline=True, **kwargs):
     """Output a debug record to the log file."""
     logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
+
 
 def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
     """Output an error traceback to the user via the userinterface.
@@ -422,7 +433,7 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
         exc_info = 1
     else:
         exc_info = sys.exc_info()
-        msg = u'%s: %s' % (repr(exc_info[1]).split('(')[0], 
+        msg = u'%s: %s' % (repr(exc_info[1]).split('(')[0],
                            unicode(exc_info[1]).strip())
     if tb:
         kwargs['exc_info'] = exc_info
@@ -430,6 +441,7 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
 
 
 # User input functions
+
 
 def input(question, password=False):
     """Ask the user a question, return the user's answer.
@@ -449,6 +461,7 @@ def input(question, password=False):
 
     data = ui.input(question, password)
     return data
+
 
 def inputChoice(question, answers, hotkeys, default=None):
     """Ask the user a question with several options, return the user's choice.
@@ -478,6 +491,7 @@ def inputChoice(question, answers, hotkeys, default=None):
 
 # Command line parsing and help
 
+
 def calledModuleName():
     """Return the name of the module calling this function.
 
@@ -491,6 +505,7 @@ def calledModuleName():
         # clip off the '.py?' filename extension
         called = called[:called.rindex('.py')]
     return os.path.basename(called)
+
 
 def _decodeArg(arg):
     if sys.platform == 'win32':
@@ -508,6 +523,7 @@ def _decodeArg(arg):
         # Linux uses the same encoding for both.
         # I don't know how non-Western Windows versions behave.
         return unicode(arg, config.console_encoding)
+
 
 def handleArgs(*args):
     """Handle standard command line arguments, return the rest as a list.
@@ -537,22 +553,22 @@ def handleArgs(*args):
         if arg == '-help':
             do_help = True
         elif arg.startswith('-family:'):
-            config.family = arg[len("-family:") : ]
+            config.family = arg[len("-family:"):]
         elif arg.startswith('-lang:'):
-            config.mylang = arg[len("-lang:") : ]
+            config.mylang = arg[len("-lang:"):]
         elif arg.startswith("-user:"):
-            username = arg[len("-user:") : ]
+            username = arg[len("-user:"):]
         elif arg.startswith('-putthrottle:'):
-            config.put_throttle = int(arg[len("-putthrottle:") : ])
+            config.put_throttle = int(arg[len("-putthrottle:"):])
         elif arg.startswith('-pt:'):
-            config.put_throttle = int(arg[len("-pt:") : ])
+            config.put_throttle = int(arg[len("-pt:"):])
         elif arg == '-log':
             if moduleName not in config.log:
                 config.log.append(moduleName)
         elif arg.startswith('-log:'):
             if moduleName not in config.log:
                 config.log.append(moduleName)
-            config.logfilename = arg[len("-log:") : ]
+            config.logfilename = arg[len("-log:"):]
         elif arg == '-nolog':
             if moduleName in config.log:
                 config.log.remove(moduleName)
@@ -591,7 +607,7 @@ def handleArgs(*args):
         elif arg.startswith("-debug:"):
             if moduleName not in config.log:
                 config.log.append(moduleName)
-            component = arg[len("-debug:") : ]
+            component = arg[len("-debug:"):]
             if component not in config.debug_log:
                 config.debug_log.append(component)
         elif arg == '-verbose' or arg == "-v":
@@ -601,7 +617,7 @@ def handleArgs(*args):
             daemonize.daemonize()
         elif arg.startswith('-daemonize:'):
             import daemonize
-            daemonize.daemonize(redirect_std = arg[11:])
+            daemonize.daemonize(redirect_std=arg[11:])
         else:
             # the argument depends numerical config settings
             cmd = []
@@ -623,7 +639,7 @@ def handleArgs(*args):
 
     if config.verbose_output:
         import re
-        ver = pywikibot.__version__ # probably can be improved on
+        ver = pywikibot.__version__  # probably can be improved on
         m = re.search(r"\$Id$", ver)
         pywikibot.output(u'Pywikipediabot r%s' % m.group(1))
         pywikibot.output(u'Python %s' % sys.version)
@@ -633,6 +649,7 @@ def handleArgs(*args):
         sys.exit(0)
     pywikibot.debug(u"handleArgs() completed.", _logger)
     return nonGlobalArgs
+
 
 def showHelp(name=""):
     # argument, if given, is ignored
@@ -698,7 +715,7 @@ Global arguments available for all bots:
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.iteritems():
                 helpText = helpText.replace(key, value.strip('\n\r'))
-        pywikibot.stdout(helpText) # output to STDOUT
+        pywikibot.stdout(helpText)  # output to STDOUT
     except Exception:
         if modname:
             pywikibot.stdout(u'Sorry, no help available for %s' % modname)
@@ -716,7 +733,7 @@ class Bot(object):
     # The values are the default values
     # Extend this in subclasses!
     availableOptions = {
-        'always': False, # ask for confirmation when putting a page?
+        'always': False,  # ask for confirmation when putting a page?
     }
 
     def __init__(self, **kwargs):
@@ -740,7 +757,7 @@ class Bot(object):
 
         for opt in receivedOptions - validOptions:
             pywikibot.warning(u'%s is not a valid option. It was ignored.'
-                                % opt)
+                              % opt)
 
     def getOption(self, option):
         """
@@ -761,8 +778,8 @@ class Bot(object):
             * 'always'
         """
         if oldtext == newtext:
-            pywikibot.output(u'No changes were needed on %s' \
-                            % page.title(asLink=True))
+            pywikibot.output(u'No changes were needed on %s'
+                             % page.title(asLink=True))
             return
 
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
@@ -772,13 +789,14 @@ class Bot(object):
         choice = 'a'
         if not self.getOption('always'):
             choice = pywikibot.inputChoice(
-                        u'Do you want to accept these changes?',
-                        ['Yes', 'No', 'All'],
-                        ['y', 'N', 'a'], 'N')
+                u'Do you want to accept these changes?',
+                ['Yes', 'No', 'All'],
+                ['y', 'N', 'a'],
+                'N'
+            )
             if choice == 'a':
                 # Remember the choice
                 self.options['always'] = True
 
         if choice != 'n':
-            page.put(newtext, async=(choice=='a'))
-
+            page.put(newtext, async=(choice == 'a'))
