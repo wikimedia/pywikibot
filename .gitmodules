@@ -1,3 +1,6 @@
 [submodule "i18n"]
     path = scripts/i18n
     url = https://gerrit.wikimedia.org/r/p/pywikibot/i18n.git
+[submodule "externals/httplib2"]
+	path = externals/httplib2
+	url = https://github.com/iserko/httplib2.git
