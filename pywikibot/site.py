@@ -3600,5 +3600,3 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 f = open(fn)
                 self._cookies[index] = '; '.join([x.strip() for x in f.readlines()])
                 f.close()
-
-    

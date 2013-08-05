@@ -230,4 +230,3 @@ if __name__ == '__main__':
     sync.check_sysops()
     sync.check_namespaces()
     sync.generate_overviews()
-    

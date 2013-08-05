@@ -424,4 +424,3 @@ else:
         @unittest.skip("Terminal UI tests can only be run by directly running tests/ui_tests.py")
         def testCannotBeRun(self):
             pass
-

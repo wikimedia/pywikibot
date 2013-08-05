@@ -303,4 +303,3 @@ class Throttle(object):
                 time.sleep(wait)
         finally:
             self.lock.release()
-

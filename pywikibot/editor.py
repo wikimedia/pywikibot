@@ -108,4 +108,3 @@ class TextEditor(object):
             return self.restoreLinebreaks(
                         pywikibot.editText(text, jumpIndex=jumpIndex,
                                            highlight=highlight))
-

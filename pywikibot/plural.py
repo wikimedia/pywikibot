@@ -152,4 +152,3 @@ plural_rules = {
     'zh-hant': {'nplurals': 1, 'plural': 0},
     'zh-tw': {'nplurals': 1, 'plural': 0},
 }
-
