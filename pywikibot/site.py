@@ -2947,14 +2947,14 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
         NOTE 2: it returns the image title WITHOUT the image namespace.
 
         """
-        if hash_found == None: # If the hash is none return None and not continue
+        if hash_found is None: # If the hash is none return None and not continue
             return None
         return [image.title(withNamespace=False)
                 for image in self.allimages(sha1=hash_found)]
 
     @deprecated('Site().getFilesFromAnHash')
     def getImagesFromAnHash(self, hash_found=None):
-        return self.getFilesFromAnHash(self, hash_found)
+        return self.getFilesFromAnHash(hash_found)
 
 
     def upload(self, imagepage, source_filename=None, source_url=None,
