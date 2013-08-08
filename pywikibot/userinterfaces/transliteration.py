@@ -1683,4 +1683,3 @@ class transliterator(object):
             else:
                 return "h"
         return default
-

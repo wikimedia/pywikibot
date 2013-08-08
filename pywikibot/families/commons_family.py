@@ -38,4 +38,3 @@ class Family(family.WikimediaFamily):
 
     def ssl_pathprefix(self, code):
         return "/wikipedia/commons"
-

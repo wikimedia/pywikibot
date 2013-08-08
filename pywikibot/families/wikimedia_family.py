@@ -25,4 +25,3 @@ class Family(family.Family):
 
         self.langs = dict([(country, '%s.wikimedia.org' % country)
                            for country in self.countries])
-

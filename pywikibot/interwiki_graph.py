@@ -147,4 +147,3 @@ def getFilename(page, extension = None):
     if extension:
         filename += '.%s' % extension
     return filename
-
