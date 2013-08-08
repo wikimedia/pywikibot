@@ -2021,7 +2021,7 @@ class User(Page):
         return ip_regexp.match(self.username) is not None
 
     def getprops(self, force=False):
-        """ Return a Dictionnary that contains user's properties. Use cached
+        """ Return a Dictionary that contains user's properties. Use cached
         values if already called before, otherwise fetch data from the API.
 
         @param force: if True, forces reloading the data from API
