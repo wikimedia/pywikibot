@@ -1,2 +1,4 @@
 *.pyc
 *apicache*
+.idea
+Pywikipediabot.egg-info/
