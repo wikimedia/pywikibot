@@ -24,13 +24,6 @@ class TestRequest(CachedRequest):
     def _expired(self, dt):
         return False
 
-    def submit(self):
-        cached_available = self._load_cache()
-        if not cached_available:
-            print str(self)
-        return super(TestRequest, self).submit()
-
-
 def patch_request():
     pywikibot.data.api.Request = TestRequest
 
