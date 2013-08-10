@@ -2853,8 +2853,8 @@ class Link(object):
 
     """
     illegal_titles_pattern = re.compile(
-        # Matching titles will be held as illegal.
-            u'''[^ %!\"$&'()*,\\-.\\/0-9:;=?@A-Z\\\\^_`a-z~\u0080-\uFFFF+]'''
+            # Matching titles will be held as illegal.
+            ur'''[\x00-\x1f\x23\x3c\x3e\x5b\x5d\x7b\x7c\x7d\x7f]'''
             # URL percent encoding sequences interfere with the ability
             # to round-trip titles -- you can't link to them consistently.
             u'|%[0-9A-Fa-f]{2}'
