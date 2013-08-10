@@ -1,3 +1,7 @@
+# Python Wikipedia Robot Framework
+
+[![Build Status](https://secure.travis-ci.org/wikimedia/pywikibot-core.png?branch=master)](http://travis-ci.org/wikimedia/pywikibot-core)
+
 This is the rewrite of the Python Wikipedia Robot Framework. It features several
 improvements, such as full API usage and a pythonic package layout.
 
