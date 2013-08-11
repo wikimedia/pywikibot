@@ -95,7 +95,7 @@ class Coordinate(object):
     in the future we can use it for the GeoData extension.
     """
     def __init__(self, lat, lon, alt=None, precision=None, globe='earth',
-                 typ="", name="", dim=None, site=None):
+                 typ="", name="", dim=None, site=None, entity=''):
         """
         @param lat: Latitude
         @type lat: float
@@ -112,12 +112,15 @@ class Coordinate(object):
         @type name: str
         @param dim: Dimension (in meters)
         @type dim: int
+        @param entity: The url entity of a Wikibase item
+        @type entity: str
         """
         self.lat = lat
         self.lon = lon
         self.alt = alt
         self._precision = precision
         self.globe = globe.lower()
+        self._entity = entity
         self.type = typ
         self.name = name
         self._dim = dim
@@ -125,15 +128,6 @@ class Coordinate(object):
             self.site = Site().data_repository()
         else:
             self.site = site
-        #Copied from [[mw:Extension:GeoData]]
-        if not self.globe in ['earth', 'mercury', 'venus', 'moon',
-                              'mars', 'phobos', 'deimos', 'ganymede',
-                              'callisto', 'io', 'europa', 'mimas',
-                              'enceladus', 'tethys', 'dione',
-                              'rhea', 'titan', 'hyperion', 'iapetus',
-                              'phoebe', 'miranda', 'ariel', 'umbriel',
-                              'titania', 'oberon', 'triton', 'pluto']:
-            raise ValueError(u"%s is not a supported globe." % self.globe)
 
     def __repr__(self):
         string = 'Coordinate(%s, %s' % (self.lat, self.lon)
@@ -141,6 +135,12 @@ class Coordinate(object):
             string += ', globe="%s"' % self.globe
         string += ')'
         return string
+
+    @property
+    def entity(self):
+        if self._entity:
+            return self._entity
+        return self.site.globes()[self.globe]
 
     def toWikibase(self):
         """
@@ -153,7 +153,7 @@ class Coordinate(object):
         return {'latitude': self.lat,
                 'longitude': self.lon,
                 'altitude': self.alt,
-                'globe': self.site.globes()[self.globe],
+                'globe': self.entity,
                 'precision': self.precision,
                 }
 
@@ -166,15 +166,14 @@ class Coordinate(object):
 
         globekey = data['globe']
         if globekey:
-            # FIXME: Should probably use get() with some error handling when it's an unknown globe
-            globe = globes[data['globe']]
+            globe = globes.get(data['globe'])
         else:
             # Default to earth or should we use None here?
             globe = 'earth'
 
         return Coordinate(data['latitude'], data['longitude'],
                           data['altitude'], data['precision'],
-                          globe, site=site)
+                          globe, site=site, entity=data['globe'])
 
     @property
     def precision(self):
