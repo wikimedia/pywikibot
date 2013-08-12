@@ -6,13 +6,14 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
+
 class Family(family.WikimediaFamily):
     def __init__(self):
         super(Family, self).__init__()
         self.name = 'wikivoyage'
         self.languages_by_size = [
             'en', 'de', 'pt', 'nl', 'fr', 'it', 'pl', 'ru', 'es', 'sv', 'ro',
-            'uk', 'he', 'el',
+            'uk', 'he', 'el', 'vi',
         ]
 
         self.langs = dict([(lang, '%s.wikivoyage.org' % lang)
