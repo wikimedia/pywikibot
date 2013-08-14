@@ -2178,6 +2178,34 @@ class User(Page):
                 return True
         return False
 
+    def block(self, expiry, reason, anononly=True, nocreate=True, autoblock=True,
+              noemail=False, reblock=False):
+        """
+        Blocks a user
+        @param expiry: When the block should expire
+        @type expiry: pywikibot.Timestamp|str
+        @param reason: Block reason
+        @type reason: basestring
+        @param anononly: Whether block should only affect anonymous users
+        @type anononly: bool
+        @param nocreate: Whether to block account creation
+        @type nocreate: bool
+        @param autoblock: Whether to enable autoblock
+        @type autoblock: bool
+        @param noemail: Whether to disable email access
+        @type noemail: bool
+        @param reblock: Whether to reblock if a block already is set
+        @type reblock: bool
+        @return: None
+        """
+        try:
+            self.site.blockuser(self, expiry, reason, anononly, nocreate, autoblock, noemail, reblock)
+        except pywikibot.data.api.APIError, err:
+            if err.code == 'invalidrange':
+                raise ValueError("%s is not a valid IP range." % self.username)
+            else:
+                raise err
+
     @deprecated("contributions")
     @deprecate_arg("limit", "total") # To be consistent with rest of framework
     def editedPages(self, total=500):

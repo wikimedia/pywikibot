@@ -2901,6 +2901,29 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 
     #TODO: implement patrol
 
+    @must_be(group='sysop')
+    def blockuser(self, user, expiry, reason, anononly=True, nocreate=True, autoblock=True,
+                  noemail=False, reblock=False):
+
+        token = self.token(user, 'block')
+        if isinstance(expiry, pywikibot.Timestamp):
+            expiry = expiry.toISOformat()
+        req = api.Request(site=self, action='block', user=user.username, expiry=expiry,
+                          reason=reason, token=token)
+        if anononly:
+            req['anononly'] = ''
+        if nocreate:
+            req['nocreate'] = ''
+        if autoblock:
+            req['autoblock'] = ''
+        if noemail:
+            req['noemail'] = ''
+        if reblock:
+            req['reblock'] = ''
+
+        data = req.submit()
+        return data
+
     def watchpage(self, page, unwatch=False):
         """Add or remove page from watchlist.
 
