@@ -5,7 +5,7 @@ python pwb.py <name_of_script> <options>
 and it will use the package directory to store all user files, will fix up
 search paths so the package does not need to be installed, etc.
 """
-# (C) Pywikipedia team, 2012
+# (C) Pywikipedia team, 2013
 #
 __version__ = '$Id$'
 #

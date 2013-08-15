@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """ Script to create user files (user-config.py, user-fixes.py) """
 #
-# (C) Pywikipedia team, 2010-2012
+# (C) Pywikipedia team, 2010-2013
 #
 __version__ = '$Id$'
 #
