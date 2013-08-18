@@ -18,7 +18,8 @@ __version__ = '$Id$'
 # scripts, instead of writing each one from scratch.
 
 
-import logging, logging.handlers
+import logging
+import logging.handlers
        # all output goes thru python std library "logging" module
 import re
 
@@ -82,12 +83,12 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         if not ('N' in match.group('flags')):
                 return
         try:
-            msg = unicode(e.arguments()[0],'utf-8')
+            msg = unicode(e.arguments()[0], 'utf-8')
         except UnicodeDecodeError:
             return
         if self.other_ns.match(msg):
             return
-        name = msg[8:msg.find(u'14',9)]
+        name = msg[8:msg.find(u'14', 9)]
         text = pywikibot.comms.http.request(self.site, self.api_url)
         entry = self.api_found.findall(text)
         page = pywikibot.Page(self.site, name)
@@ -97,7 +98,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
                 return
         except pywikibot.IsRedirectPage:
                 return
-        pywikibot.output(str(( entry[0], name )))
+        pywikibot.output(str((entry[0], name)))
 
     def on_dccmsg(self, c, e):
         pass
