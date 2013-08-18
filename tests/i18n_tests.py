@@ -59,11 +59,12 @@ class TestTranslate(unittest.TestCase):
 
 class TestTWTranslate(unittest.TestCase):
     def setUp(self):
-        self.path = os.path.realpath(__file__)[:-13]
-        shutil.copyfile(self.path + 'i18n/test.py', self.path + '../scripts/i18n/test.py')
+        self.path = os.path.split(os.path.realpath(__file__))[0]
+        shutil.copyfile(os.path.join(self.path, 'i18n', 'test.py'),
+                        os.path.join(self.path, '..', 'scripts', 'i18n', 'test.py'))
 
     def tearDown(self):
-        os.remove(self.path + '../scripts/i18n/test.py')
+        os.remove(os.path.join(self.path, '..', 'scripts', 'i18n', 'test.py'))
 
     def testLocalized(self):
         self.assertEqual(i18n.twtranslate('en', 'test-localized'),
