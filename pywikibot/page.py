@@ -2510,8 +2510,7 @@ class ItemPage(WikibasePage):
         force will override caching
         args are the values of props
         """
-        if force or not hasattr(self, '_content'):
-            super(ItemPage, self).get(force=force, *args)
+        super(ItemPage, self).get(force=force, *args)
 
         #claims
         self.claims = {}
