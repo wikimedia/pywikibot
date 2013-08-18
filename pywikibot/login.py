@@ -46,28 +46,26 @@ class LoginManager:
             self.username = user
         elif sysop:
             try:
-                self.username = config.sysopnames\
-                                [self.site.family.name][self.site.code]
+                self.username = config.sysopnames[self.site.family.name][self.site.code]
             except KeyError:
                 raise NoUsername(
 u"""ERROR: Sysop username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have a sysop account for that site, please add a line to user-config.py:
 
 sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
-                                  % {'fam_name': self.site.family.name,
-                                     'wiki_code': self.site.code})
+                    % {'fam_name': self.site.family.name,
+                       'wiki_code': self.site.code})
         else:
             try:
-                self.username = config.usernames\
-                                [self.site.family.name][self.site.code]
+                self.username = config.usernames[self.site.family.name][self.site.code]
             except:
                 raise NoUsername(
 u"""ERROR: Username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have an account for that site, please add a line to user-config.py:
 
 usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
-                                  % {'fam_name': self.site.family.name,
-                                     'wiki_code': self.site.code})
+                    % {'fam_name': self.site.family.name,
+                       'wiki_code': self.site.code})
         self.password = password
         if getattr(config, 'password_file', ''):
             self.readPassword()
@@ -95,7 +93,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             # No bot policies on other sites
             return True
 
-    def getCookie(self, remember=True, captcha = None):
+    def getCookie(self, remember=True, captcha=None):
         """
         Login to the site.
 
@@ -141,25 +139,27 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         password_f = open(config.password_file)
         for line in password_f:
-            if not line.strip(): continue
+            if not line.strip():
+                continue
             entry = eval(line)
-            if len(entry) == 2:   #for default userinfo
-                if entry[0] == self.username: self.password = entry[1]
-            elif len(entry) == 4: #for userinfo included code and family
+            if len(entry) == 2:    # for default userinfo
+                if entry[0] == self.username:
+                    self.password = entry[1]
+            elif len(entry) == 4:  # for userinfo included code and family
                 if entry[0] == self.site.code and \
-                  entry[1] == self.site.family.name and \
-                  entry[2] == self.username:
+                   entry[1] == self.site.family.name and \
+                   entry[2] == self.username:
                     self.password = entry[3]
         password_f.close()
 
-    def login(self, retry = False):
+    def login(self, retry=False):
         if not self.password:
             # As we don't want the password to appear on the screen, we set
             # password = True
             self.password = pywikibot.input(
-                                u'Password for user %(name)s on %(site)s:'
-                                % {'name': self.username, 'site': self.site},
-                                password = True)
+                u'Password for user %(name)s on %(site)s:'
+                % {'name': self.username, 'site': self.site},
+                password=True)
 
 #        self.password = self.password.encode(self.site.encoding())
 
@@ -171,7 +171,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             pywikibot.error(u"Login failed (%s)." % e.code)
             if retry:
                 self.password = None
-                return self.login(retry = True)
+                return self.login(retry=True)
             else:
                 return False
         self.storecookiedata(cookiedata)
