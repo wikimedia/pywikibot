@@ -7,8 +7,9 @@
 #
 __version__ = '$Id$'
 
-import os, re
+import os
 import sys as __sys
+import re
 import platform
 
 # IMPORTANT:
@@ -72,8 +73,8 @@ authenticate = {}
 #
 #    Security Connection for Wikimedia Projects
 #
-use_SSL_onlogin = False # if available, use SSL when logging in
-use_SSL_always = False  # if available, use SSL for all API queries
+use_SSL_onlogin = False  # if available, use SSL when logging in
+use_SSL_always = False   # if available, use SSL for all API queries
 
 # Available security projects
 available_ssl_project = [
@@ -92,6 +93,7 @@ password_file = None
 # WARNING: this should NEVER be used in practice, ALWAYS supply a more
 #          relevant summary for bot edits
 default_edit_summary = u'Wikipedia python library v.2'
+
 
 # Get the names of all known families, and initialize
 # with empty dictionaries
@@ -127,7 +129,7 @@ def _get_base_dir():
                 elif _win_version == 6:
                     base_dir = os.path.join(home, "AppData\\Roaming", NAME)
             else:
-                base_dir = os.path.join(home, "."+NAME)
+                base_dir = os.path.join(home, "." + NAME)
             if not os.path.isdir(base_dir):
                 os.makedirs(base_dir, mode=0700)
     if not os.path.isabs(base_dir):
@@ -144,9 +146,9 @@ def _get_base_dir():
 _base_dir = _get_base_dir()
 # families/ is a subdirectory of the directory in which config.py is found
 for _filename in os.listdir(
-                    os.path.join(os.path.dirname(__file__), 'families')):
+        os.path.join(os.path.dirname(__file__), 'families')):
     if _filename.endswith("_family.py"):
-        familyName = _filename[ : -len("_family.py")]
+        familyName = _filename[:-len("_family.py")]
         usernames[familyName] = {}
         sysopnames[familyName] = {}
         disambiguation_comment[familyName] = {}
@@ -180,8 +182,8 @@ except:
 #    transliteration_target = console_encoding
 # After emitting the warning, this last option will be set.
 
-transliteration_target = 'not set'    
-    
+transliteration_target = 'not set'
+
 # The encoding in which textfiles are stored, which contain lists of page
 # titles. The most used is: 'utf-8'. 'utf-8-sig' recognizes BOM but it is
 # available on Python 2.5 or higher. For a complete list please see:
@@ -591,6 +593,7 @@ use_mwparserfromhell = False
 # End of configuration section
 # ============================
 
+
 def makepath(path):
     """Return a normalized absolute version of the path argument.
 
@@ -610,6 +613,7 @@ def makepath(path):
         os.makedirs(dpath)
     return os.path.normpath(os.path.abspath(path))
 
+
 def datafilepath(*filename):
     """Return an absolute path to a data file in a standard location.
 
@@ -621,11 +625,12 @@ def datafilepath(*filename):
     import os.path
     return makepath(os.path.join(base_dir, *filename))
 
+
 def shortpath(path):
     """Return a file path relative to config.base_dir."""
     import os.path
     if path.startswith(base_dir):
-        return path[len(base_dir) + len(os.path.sep) : ]
+        return path[len(base_dir) + len(os.path.sep):]
     return path
 # System-level and User-level changes.
 # Store current variables and their types.
@@ -651,10 +656,10 @@ for _filename in _fns:
                 execfile(_filename)
             else:
                 print "WARNING: Skipped '%(fn)s': writeable by others."\
-                      % {'fn' :_filename}
+                      % {'fn': _filename}
         else:
             print "WARNING: Skipped '%(fn)s': owned by someone else."\
-                  % {'fn' :_filename}
+                  % {'fn': _filename}
 
 # Test for obsoleted and/or unknown variables.
 for _key, _val in globals().items():
@@ -663,7 +668,9 @@ for _key, _val in globals().items():
     elif _key in _gl:
         nt = type(_val)
         ot = _tp[_key]
-        if nt == ot or _val is None or ot == type(None):
+        ov = _glv[_key]
+
+        if nt == ot or _val is None or ov is None:  # nopep8
             pass
         elif nt is int and (ot is float or ot is bool):
             pass
@@ -695,8 +702,8 @@ if transliteration_target == 'not set':
     else:
         transliteration_target = None
 elif transliteration_target in ('None', 'none'):
-    transliteration_target = None        
-        
+    transliteration_target = None
+
 # Save base_dir for use by other modules
 base_dir = _base_dir
 
