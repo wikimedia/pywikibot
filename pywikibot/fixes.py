@@ -43,27 +43,27 @@ fixes = {
     'HTML': {
         'regex': True,
         'msg': {
-            'ar':u'روبوت: تحويل/تصليح HTML',
-            'be':u'Бот: карэкцыя HTML',
-            'cs':u'převod/oprava HTML',
-            'en':u'Robot: Converting/fixing HTML',
-            'eo':u'Bot: koredtado de HTMLa teksto',
-            'fa':u'ربات:تبدیل/تصحیح کدهای اچ‌تی‌ام‌ال',
-            'de':u'Bot: konvertiere/korrigiere HTML',
-            'fr':u'Robot: convertit/fixe HTML',
-            'he':u'בוט: ממיר/מתקן HTML',
-            'ja':u'ロボットによる: HTML転換',
-            'ksh':u'Bot: vun HTML en Wikikood wandelle',
-            'ia':u'Robot: conversion/reparation de HTML',
-            'lt':u'robotas: konvertuojamas/taisomas HTML',
-            'nl':u'Bot: conversie/reparatie HTML',
-            'pl':u'Robot konwertuje/naprawia HTML',
-            'pt':u'Bot: Corrigindo HTML',
-            'ru':u'Бот: коррекция HTML',
-            'sr':u'Бот: Поправка HTML-а',
-            'sv':u'Bot: Konverterar/korrigerar HTML',
-            'uk':u'Бот: корекцiя HTML',
-            'zh':u'機器人: 轉換HTML',
+            'ar':  u'روبوت: تحويل/تصليح HTML',
+            'be':  u'Бот: карэкцыя HTML',
+            'cs':  u'převod/oprava HTML',
+            'en':  u'Robot: Converting/fixing HTML',
+            'eo':  u'Bot: koredtado de HTMLa teksto',
+            'fa':  u'ربات:تبدیل/تصحیح کدهای اچ‌تی‌ام‌ال',
+            'de':  u'Bot: konvertiere/korrigiere HTML',
+            'fr':  u'Robot: convertit/fixe HTML',
+            'he':  u'בוט: ממיר/מתקן HTML',
+            'ja':  u'ロボットによる: HTML転換',
+            'ksh': u'Bot: vun HTML en Wikikood wandelle',
+            'ia':  u'Robot: conversion/reparation de HTML',
+            'lt':  u'robotas: konvertuojamas/taisomas HTML',
+            'nl':  u'Bot: conversie/reparatie HTML',
+            'pl':  u'Robot konwertuje/naprawia HTML',
+            'pt':  u'Bot: Corrigindo HTML',
+            'ru':  u'Бот: коррекция HTML',
+            'sr':  u'Бот: Поправка HTML-а',
+            'sv':  u'Bot: Konverterar/korrigerar HTML',
+            'uk':  u'Бот: корекцiя HTML',
+            'zh':  u'機器人: 轉換HTML',
         },
         'replacements': [
             # Everything case-insensitive (?i)
@@ -108,7 +108,7 @@ fixes = {
     'grammar-de': {
         'regex': True,
         'msg': {
-            'de':u'Bot: korrigiere Grammatik',
+            'de': u'Bot: korrigiere Grammatik',
         },
         'replacements': [
             #(u'([Ss]owohl) ([^,\.]+?), als auch',                                                            r'\1 \2 als auch'),
@@ -150,26 +150,26 @@ fixes = {
                 r'20min.ch',     # Schweizer News-Seite
             ],
             'inside': [
-                r'<code>.*</code>', # because of code examples
+                r'<code>.*</code>',  # because of code examples
                 r'{{[Zz]itat\|.*?}}',
-                ur'{{§\|.*?}}',  # Gesetzesparagraph
+                ur'{{§\|.*?}}',   # Gesetzesparagraph
                 ur'§ ?\d+[a-z]',  # Gesetzesparagraph
-                r'Ju 52/1m', # Flugzeugbezeichnung
-                r'Ju 52/3m', # Flugzeugbezeichnung
-                r'AH-1W',    # Hubschrauberbezeichnung
-                r'ZPG-3W',   # Luftschiffbezeichnung
-                r'8mm',      # Filmtitel
-                r'802.11g',  # WLAN-Standard
-                r'DOS/4GW',  # Software
-                r'ntfs-3g',  # Dateisystem-Treiber
-                r'/\w(,\w)*/',     # Laut-Aufzählung in der Linguistik
-                r'[xyz](,[xyz])+', # Variablen in der Mathematik (unklar, ob Leerzeichen hier Pflicht sind)
-                r'(?m)^;(.*?)$', # Definitionslisten, dort gibt es oft absichtlich Leerzeichen vor Doppelpunkten
-                r'\d+h( |&nbsp;)\d+m', # Schreibweise für Zeiten, vor allem in Film-Infoboxen. Nicht korrekt, aber dafür schön kurz.
-                r'(?i)\[\[(Bild|Image|Media):.+?\|', # Dateinamen auslassen
+                r'Ju 52/1m',  # Flugzeugbezeichnung
+                r'Ju 52/3m',  # Flugzeugbezeichnung
+                r'AH-1W',     # Hubschrauberbezeichnung
+                r'ZPG-3W',    # Luftschiffbezeichnung
+                r'8mm',       # Filmtitel
+                r'802.11g',   # WLAN-Standard
+                r'DOS/4GW',   # Software
+                r'ntfs-3g',   # Dateisystem-Treiber
+                r'/\w(,\w)*/',      # Laut-Aufzählung in der Linguistik
+                r'[xyz](,[xyz])+',  # Variablen in der Mathematik (unklar, ob Leerzeichen hier Pflicht sind)
+                r'(?m)^;(.*?)$',    # Definitionslisten, dort gibt es oft absichtlich Leerzeichen vor Doppelpunkten
+                r'\d+h( |&nbsp;)\d+m',  # Schreibweise für Zeiten, vor allem in Film-Infoboxen. Nicht korrekt, aber dafür schön kurz.
+                r'(?i)\[\[(Bild|Image|Media):.+?\|',  # Dateinamen auslassen
                 r'{{bgc\|.*?}}',  # Hintergrundfarbe
                 r'<sup>\d+m</sup>',                   # bei chemischen Formeln
-                r'\([A-Z][A-Za-z]*(,[A-Z][A-Za-z]*(<sup>.*?</sup>|<sub>.*?</sub>|))+\)' # chemische Formel, z. B. AuPb(Pb,Sb,Bi)Te. Hier sollen keine Leerzeichen hinter die Kommata.
+                r'\([A-Z][A-Za-z]*(,[A-Z][A-Za-z]*(<sup>.*?</sup>|<sub>.*?</sub>|))+\)'  # chemische Formel, z. B. AuPb(Pb,Sb,Bi)Te. Hier sollen keine Leerzeichen hinter die Kommata.
             ],
             'title': [
                 r'Arsen',  # chemische Formel
@@ -184,25 +184,25 @@ fixes = {
     'syntax': {
         'regex': True,
         'msg': {
-            'ar':u'بوت: تصليح تهيئة الويكي',
-            'be':u'Бот: Карэкцыя вiкi-сiнтаксiсу',
-            'cs':u'Oprava wikisyntaxe',
-            'de':u'Bot: Korrigiere Wiki-Syntax',
-            'en':u'Robot: Fixing wiki syntax',
-            'eo':u'Bot: Korektado de vikia sintakso',
-            'fa':u'ربات:تصحیح قالب ویکی‌نویسی',
-            'fr':u'Bot: Corrige wiki-syntaxe',
-            'he':u'בוט: מתקן תחביר ויקי',
-            'ia':u'Robot: Reparation de syntaxe wiki',
-            'ja':u'ロボットによる: wiki構文修正',
-            'lt':u'robotas: Taisoma wiki sintaksė',
-            'nl':u'Bot: reparatie wikisyntaxis',
-            'pl':u'Robot poprawia wiki-składnię',
-            'pt':u'Bot: Corrigindo sintaxe wiki',
-            'ru':u'Бот: Коррекция вики синтаксиса',
-            'sr':u'Бот: Поправка вики синтаксе',
-            'uk':u'Бот: Корекцiя вiкi-синтаксису',
-            'zh':u'機器人: 修正wiki語法',
+            'ar':  u'بوت: تصليح تهيئة الويكي',
+            'be':  u'Бот: Карэкцыя вiкi-сiнтаксiсу',
+            'cs':  u'Oprava wikisyntaxe',
+            'de':  u'Bot: Korrigiere Wiki-Syntax',
+            'en':  u'Robot: Fixing wiki syntax',
+            'eo':  u'Bot: Korektado de vikia sintakso',
+            'fa':  u'ربات:تصحیح قالب ویکی‌نویسی',
+            'fr':  u'Bot: Corrige wiki-syntaxe',
+            'he':  u'בוט: מתקן תחביר ויקי',
+            'ia':  u'Robot: Reparation de syntaxe wiki',
+            'ja':  u'ロボットによる: wiki構文修正',
+            'lt':  u'robotas: Taisoma wiki sintaksė',
+            'nl':  u'Bot: reparatie wikisyntaxis',
+            'pl':  u'Robot poprawia wiki-składnię',
+            'pt':  u'Bot: Corrigindo sintaxe wiki',
+            'ru':  u'Бот: Коррекция вики синтаксиса',
+            'sr':  u'Бот: Поправка вики синтаксе',
+            'uk':  u'Бот: Корекцiя вiкi-синтаксису',
+            'zh':  u'機器人: 修正wiki語法',
         },
         'replacements': [
             # external link in double brackets
@@ -243,14 +243,14 @@ fixes = {
                 'startspace',    # because of code examples
             ],
             'text-contains': [
-                r'http://.*?object=tx\|',               # regular dash in URL
-                r'http://.*?allmusic\.com',             # regular dash in URL
-                r'http://.*?allmovie\.com',             # regular dash in URL
-                r'http://physics.nist.gov/',            # regular dash in URL
-                r'http://www.forum-seniorenarbeit.de/', # regular dash in URL
-                r'http://kuenstlerdatenbank.ifa.de/',   # regular dash in URL
-                r'&object=med',                         # regular dash in URL
-                r'\[CDATA\['                            # lots of brackets
+                r'http://.*?object=tx\|',                # regular dash in URL
+                r'http://.*?allmusic\.com',              # regular dash in URL
+                r'http://.*?allmovie\.com',              # regular dash in URL
+                r'http://physics.nist.gov/',             # regular dash in URL
+                r'http://www.forum-seniorenarbeit.de/',  # regular dash in URL
+                r'http://kuenstlerdatenbank.ifa.de/',    # regular dash in URL
+                r'&object=med',                          # regular dash in URL
+                r'\[CDATA\['                             # lots of brackets
             ],
         }
     },
@@ -260,25 +260,25 @@ fixes = {
     'syntax-safe': {
         'regex': True,
         'msg': {
-            'ar':u'بوت: تصليح تهيئة الويكي',
-            'be':u'Бот: Карэкцыя вiкi-сiнтаксiсу',
-            'cs':u'Oprava wikisyntaxe',
-            'de':u'Bot: Korrigiere Wiki-Syntax',
-            'en':u'Robot: Fixing wiki syntax',
-            'eo':u'Bot: Korektado de vikia sintakso',
-            'fa':u'ربات:تصحیح قالب ویکی‌نویسی',
-            'fr':u'Bot: Corrige wiki-syntaxe',
-            'he':u'בוט: מתקן תחביר ויקי',
-            'ia':u'Robot: Reparation de syntaxe wiki',
-            'ja':u'ロボットによる: wiki構文修正',
-            'lt':u'robotas: Taisoma wiki sintaksė',
-            'nl':u'Bot: reparatie wikisyntaxis',
-            'pl':u'Robot poprawia wiki-składnię',
-            'pt':u'Bot: Corrigindo sintaxe wiki',
-            'ru':u'Бот: Коррекция вики синтаксиса',
-            'sr':u'Бот: Поправка вики синтаксе',
-            'uk':u'Бот: Корекцiя вiкi-синтаксису',
-            'zh':u'機器人: 修正wiki語法',
+            'ar':  u'بوت: تصليح تهيئة الويكي',
+            'be':  u'Бот: Карэкцыя вiкi-сiнтаксiсу',
+            'cs':  u'Oprava wikisyntaxe',
+            'de':  u'Bot: Korrigiere Wiki-Syntax',
+            'en':  u'Robot: Fixing wiki syntax',
+            'eo':  u'Bot: Korektado de vikia sintakso',
+            'fa':  u'ربات:تصحیح قالب ویکی‌نویسی',
+            'fr':  u'Bot: Corrige wiki-syntaxe',
+            'he':  u'בוט: מתקן תחביר ויקי',
+            'ia':  u'Robot: Reparation de syntaxe wiki',
+            'ja':  u'ロボットによる: wiki構文修正',
+            'lt':  u'robotas: Taisoma wiki sintaksė',
+            'nl':  u'Bot: reparatie wikisyntaxis',
+            'pl':  u'Robot poprawia wiki-składnię',
+            'pt':  u'Bot: Corrigindo sintaxe wiki',
+            'ru':  u'Бот: Коррекция вики синтаксиса',
+            'sr':  u'Бот: Поправка вики синтаксе',
+            'uk':  u'Бот: Корекцiя вiкi-синтаксису',
+            'zh':  u'機器人: 修正wiki語法',
         },
         'replacements': [
             # external link in double brackets
@@ -308,17 +308,17 @@ fixes = {
         }
     },
 
-    'case-de': { # German upper / lower case issues
+    'case-de': {  # German upper / lower case issues
         'regex': True,
         'msg': {
-            'de':u'Bot: Korrigiere Groß-/Kleinschreibung',
+            'de': u'Bot: Korrigiere Groß-/Kleinschreibung',
         },
         'replacements': [
             (r'\batlantische(r|n|) Ozean', r'Atlantische\1 Ozean'),
             (r'\bdeutsche(r|n|) Bundestag\b', r'Deutsche\1 Bundestag'),
-            (r'\bdeutschen Bundestags\b', r'Deutschen Bundestags'), # Aufpassen, z. B. 'deutsche Bundestagswahl'
+            (r'\bdeutschen Bundestags\b', r'Deutschen Bundestags'),  # Aufpassen, z. B. 'deutsche Bundestagswahl'
             (r'\bdeutsche(r|n|) Reich\b', r'Deutsche\1 Reich'),
-            (r'\bdeutschen Reichs\b', r'Deutschen Reichs'), # Aufpassen, z. B. 'deutsche Reichsgrenzen'
+            (r'\bdeutschen Reichs\b', r'Deutschen Reichs'),  # Aufpassen, z. B. 'deutsche Reichsgrenzen'
             (r'\bdritte(n|) Welt(?!krieg)', r'Dritte\1 Welt'),
             (r'\bdreißigjährige(r|n|) Krieg', r'Dreißigjährige\1 Krieg'),
             (r'\beuropäische(n|) Gemeinschaft', r'Europäische\1 Gemeinschaft'),
@@ -347,7 +347,7 @@ fixes = {
     'vonbis': {
         'regex': True,
         'msg': {
-            'de':u'Bot: Ersetze Binde-/Gedankenstrich durch "bis"',
+            'de': u'Bot: Ersetze Binde-/Gedankenstrich durch "bis"',
         },
         'replacements': [
             # Bindestrich, Gedankenstrich, Geviertstrich
@@ -360,7 +360,7 @@ fixes = {
     'music': {
         'regex': False,
         'msg': {
-            'de':u'Bot: korrigiere Links auf Begriffsklärungen',
+            'de': u'Bot: korrigiere Links auf Begriffsklärungen',
         },
         'replacements': [
             (u'[[CD]]', u'[[Audio-CD|CD]]'),
@@ -404,18 +404,18 @@ fixes = {
         ],
         'exceptions': {
             'inside': [
-                r'\[\[20. Juli 1944\]\]', # Hitler-Attentat
-                r'\[\[17. Juni 1953\]\]', # Ost-Berliner Volksaufstand
-                r'\[\[1. April 2000\]\]', # Film
-                r'\[\[11. September 2001\]\]', # Anschläge in den USA
-                r'\[\[7. Juli 2005\]\]',  # Terroranschläge in Spanien
+                r'\[\[20. Juli 1944\]\]',  # Hitler-Attentat
+                r'\[\[17. Juni 1953\]\]',  # Ost-Berliner Volksaufstand
+                r'\[\[1. April 2000\]\]',  # Film
+                r'\[\[11. September 2001\]\]',  # Anschläge in den USA
+                r'\[\[7. Juli 2005\]\]',   # Terroranschläge in Spanien
             ],
         }
     },
 
     'isbn': {
         'regex': True,
-        'msg': 'isbn-formatting', # use i18n translations
+        'msg': 'isbn-formatting',  # use i18n translations
         'replacements': [
             # colon
             (r'ISBN: (\d+)', r'ISBN \1'),
@@ -425,8 +425,8 @@ fixes = {
             # hyphen-minus as separator, or spaces between digits and separators.
             # Note that these regular expressions also match valid ISBNs, but
             # these won't be changed.
-            (ur'ISBN (978|979) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d)(?!\d)', r'ISBN \1-\2-\3-\4-\5'), # ISBN-13
-            (ur'ISBN (\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d|X|x)(?!\d)', r'ISBN \1-\2-\3-\4'), # ISBN-10
+            (ur'ISBN (978|979) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d)(?!\d)', r'ISBN \1-\2-\3-\4-\5'),  # ISBN-13
+            (ur'ISBN (\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d|X|x)(?!\d)', r'ISBN \1-\2-\3-\4'),  # ISBN-10
             # missing space before ISBN-10 or before ISBN-13,
             # or non-breaking space.
             (r'ISBN(|&nbsp;| )((\d(-?)){12}\d|(\d(-?)){9}[\dXx])', r'ISBN \2'),
@@ -437,8 +437,8 @@ fixes = {
                 'hyperlink',
             ],
             'inside': [
-                r'ISBN (\d(-?)){12}\d',    # matches valid ISBN-13s
-                r'ISBN (\d(-?)){9}[\dXx]', # matches valid ISBN-10s
+                r'ISBN (\d(-?)){12}\d',     # matches valid ISBN-13s
+                r'ISBN (\d(-?)){9}[\dXx]',  # matches valid ISBN-10s
             ],
         }
     },
@@ -449,7 +449,7 @@ fixes = {
     'correct-ar': {
         'regex': True,
         'msg': {
-            'ar':u'تدقيق إملائي',
+            'ar': u'تدقيق إملائي',
         },
         'replacements': [
             #(u' ,', u' ،'), #FIXME: Do not replace comma in non-Arabic text, interwiki, image links or <math> syntax.
@@ -556,7 +556,7 @@ fixes = {
         'regex': False,
         'msg': {
             'en': u'Robot: Fixing special page capitalisation',
-            'fa':u'ربات: تصحیح بزرگی و کوچکی حروف صفحه‌های ویژه',
+            'fa': u'ربات: تصحیح بزرگی و کوچکی حروف صفحه‌های ویژه',
         },
         'replacements': [
             (u'Special:Allpages',        u'Special:AllPages'),
@@ -586,13 +586,13 @@ fixes = {
         'regex': False,
         'nocase': True,
         'msg': {
-            'de': u'Bot: Ersetze Links auf .yu-Domains',
-            'en': u'Robot: Replacing links to .yu domains',
-            'fa': u'ربات: جایگزینی پیوندها به دامنه‌ها با پسوند yu',
-            'fr': u'Robot: Correction des liens pointant vers le domaine .yu, qui expire en 2009',
+            'de':  u'Bot: Ersetze Links auf .yu-Domains',
+            'en':  u'Robot: Replacing links to .yu domains',
+            'fa':  u'ربات: جایگزینی پیوندها به دامنه‌ها با پسوند yu',
+            'fr':  u'Robot: Correction des liens pointant vers le domaine .yu, qui expire en 2009',
             'ksh': u'Bot: de ahle .yu-Domains loufe us, dröm ußjetuusch',
-         },
-         'replacements': [
+        },
+        'replacements': [
             (u'www.budva.cg.yu',             u'www.budva.rs'),
             (u'spc.org.yu',                  u'spc.rs'),
             (u'www.oks.org.yu',              u'www.oks.org.rs'),
@@ -644,8 +644,8 @@ fixes = {
         'msg': {
             'en': u'Robot: Fixing rich-editor html',
             'fa': u'ربات: تصحیح اچ‌تی‌ام‌ال ویرایشگر پیشرفته',
-         },
-         'replacements': [
+        },
+        'replacements': [
             # replace <br> with a new line
             (r'(?i)<br>',                      r'\n'),
             # replace &nbsp; with a space
