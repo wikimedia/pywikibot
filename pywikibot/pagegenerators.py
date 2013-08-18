@@ -1056,13 +1056,38 @@ class GoogleSearchPageGenerator:
                 if page.site == self.site:
                     yield page
 
-def MySQLPageGenerator(query, site = None):
-    import MySQLdb as mysqldb
+
+def MySQLPageGenerator(query, site=None):
+    """
+    Requires oursql <http://pythonhosted.org/oursql/> or
+    MySQLdb <https://sourceforge.net/projects/mysql-python/>
+    Yields a list of pages based on a MySQL query. Each query
+    should provide the page namespace and page title. An example
+    query that yields all ns0 pages might look like:
+        SELECT
+         page_namespace,
+         page_title,
+        FROM page
+        WHERE page_namespace = 0;
+    @param query: MySQL query to execute
+    @param site: Site object or raw database name
+    @type site: pywikibot.Site|str
+    @return: iterator of pywikibot.Page
+    """
+    try:
+        import oursql as mysqldb
+    except ImportError:
+        import MySQLdb as mysqldb
     if site is None:
         site = pywikibot.Site()
-    conn = mysqldb.connect(config.db_hostname, db = site.dbName(),
-                           user = config.db_username,
-                           passwd = config.db_password)
+    if isinstance(site, pywikibot.site.Site):
+        # We want to let people to set a custom dbname
+        # since the master dbname might not be exactly
+        # equal to the name on the replicated site
+        site = site.dbName()
+    conn = mysqldb.connect(config.db_hostname, db=site,
+                           user=config.db_username,
+                           passwd=config.db_password)
     cursor = conn.cursor()
     pywikibot.output(u'Executing query:\n%s' % query)
     query = query.encode(site.encoding())
@@ -1084,6 +1109,7 @@ def MySQLPageGenerator(query, site = None):
                 pageTitle = pageName
             page = pywikibot.Page(site, pageTitle)
             yield page
+
 
 def YearPageGenerator(start = 1, end = 2050, site = None):
     if site is None:
