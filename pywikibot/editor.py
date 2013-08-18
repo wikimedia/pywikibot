@@ -25,7 +25,7 @@ class TextEditor(object):
     def __init__(self):
         pass
 
-    def command(self, tempFilename, text, jumpIndex = None):
+    def command(self, tempFilename, text, jumpIndex=None):
         command = config.editor
         if jumpIndex:
             # Some editors make it possible to mark occurences of substrings,
@@ -41,25 +41,25 @@ class TextEditor(object):
         if config.editor.startswith('kate'):
             command += " -l %i -c %i" % (line + 1, column + 1)
         elif config.editor.startswith('gedit'):
-            command += " +%i" % (line + 1) # seems not to support columns
+            command += " +%i" % (line + 1)  # seems not to support columns
         elif config.editor.startswith('emacs'):
-            command += " +%i" % (line + 1) # seems not to support columns
+            command += " +%i" % (line + 1)  # seems not to support columns
         elif config.editor.startswith('jedit'):
-            command += " +line:%i" % (line + 1) # seems not to support columns
+            command += " +line:%i" % (line + 1)  # seems not to support columns
         elif config.editor.startswith('vim'):
-            command += " +%i" % (line + 1) # seems not to support columns
+            command += " +%i" % (line + 1)  # seems not to support columns
         elif config.editor.startswith('nano'):
             command += " +%i,%i" % (line + 1, column + 1)
         # Windows editors
         elif config.editor.lower().endswith('notepad++.exe'):
-            command += " -n%i" % (line + 1) # seems not to support columns
+            command += " -n%i" % (line + 1)  # seems not to support columns
 
         command += ' %s' % tempFilename
         #print command
         return command
 
     def convertLinebreaks(self, text):
-        if sys.platform=='win32':
+        if sys.platform == 'win32':
             return text.replace('\r\n', '\n')
         # TODO: Mac OS handling
         return text
@@ -67,12 +67,12 @@ class TextEditor(object):
     def restoreLinebreaks(self, text):
         if text is None:
             return None
-        if sys.platform=='win32':
+        if sys.platform == 'win32':
             return text.replace('\n', '\r\n')
         # TODO: Mac OS handling
         return text
 
-    def edit(self, text, jumpIndex = None, highlight = None):
+    def edit(self, text, jumpIndex=None, highlight=None):
         """
         Calls the editor and thus allows the user to change the text.
         Returns the modified text. Halts the thread's operation until the editor
@@ -100,11 +100,12 @@ class TextEditor(object):
                 # Nothing changed
                 return None
             else:
-                newcontent = open(tempFilename).read().decode(
-                                            config.editor_encoding)
+                newcontent = open(tempFilename).read().decode(config.editor_encoding)
                 os.unlink(tempFilename)
                 return self.restoreLinebreaks(newcontent)
         else:
             return self.restoreLinebreaks(
-                        pywikibot.editText(text, jumpIndex=jumpIndex,
-                                           highlight=highlight))
+                pywikibot.editText(
+                    text,
+                    jumpIndex=jumpIndex,
+                    highlight=highlight))
