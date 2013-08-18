@@ -25,7 +25,7 @@ def _altlang(code):
     @param code The language code
     @type code string
     @return a list of strings as language codes
-    
+
     If no translation is available to a specified language, translate() will
     try each of the specified fallback languages, in order, until it finds
     one with a translation, with 'en' and '_default' as a last resort.
@@ -502,7 +502,6 @@ def input(twtitle, parameters=None, password=False):
         default is os locale setting
 
     """
-    code = config.userinterface_lang or \
-           locale.getdefaultlocale()[0].split('_')[0]
+    code = config.userinterface_lang or locale.getdefaultlocale()[0].split('_')[0]
     trans = twtranslate(code, twtitle, parameters)
     return pywikibot.input(trans, password)
