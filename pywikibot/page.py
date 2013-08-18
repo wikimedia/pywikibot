@@ -2540,6 +2540,23 @@ class ItemPage(WikibasePage):
                 'claims': self.claims
         }
 
+    def iterlinks(self, family=None):
+        """
+        Iterates through all the sitelinks
+        @param family: string/Family object which represents what family of
+                       links to iterate
+        @type family: str|pywikibot.family.Family
+        @return: iterator of pywikibot.Page objects
+        """
+        if not hasattr(self, 'sitelinks'):
+            self.get()
+        if not isinstance(family, pywikibot.family.Family):
+            family = pywikibot.site.Family(family)
+        for dbname in self.sitelinks:
+            pg = Page(pywikibot.site.APISite.fromDBName(dbname), self.sitelinks[dbname])
+            if not family or family == pg.site.family:
+                yield pg
+
     def getSitelink(self, site, force=False):
         """
         Returns the title (unicode string) for the specific site
