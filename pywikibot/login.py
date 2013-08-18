@@ -161,10 +161,9 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             # As we don't want the password to appear on the screen, we set
             # password = True
             self.password = pywikibot.input(
-                u'Password for user %(name)s on %(site)s:'
+                u'Password for user %(name)s on %(site)s (no characters will be shown):'
                 % {'name': self.username, 'site': self.site},
                 password=True)
-
 #        self.password = self.password.encode(self.site.encoding())
 
         pywikibot.output(u"Logging in to %(site)s as %(name)s"

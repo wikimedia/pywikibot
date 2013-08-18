@@ -8,9 +8,17 @@ sure this robot account is well known on your home wiki before using.
 
 Parameters:
 
+   -family:FF
+   -lang:LL     Log in to the LL language of the FF family.
+                Example: -family:wiktionary -lang:fr will log you in at
+                fr.wiktionary.org.
+
    -all         Try to log in on all sites where a username is defined in
                 user-config.py.
 
+   -logout      Log out of the curren site. Combine with -all to log out of
+                all sites, or with -family and -lang to log out of a specific
+                site.
 
    -force       Ignores if the user is already logged in, and tries to log in.
 
@@ -57,10 +65,11 @@ def main(*args):
     password = None
     sysop = False
     logall = False
+    logout = False
     for arg in pywikibot.handleArgs(*args):
         if arg.startswith("-pass"):
             if len(arg) == 5:
-                password = pywikibot.input(u'Password for all accounts:',
+                password = pywikibot.input(u'Password for all accounts (no characters will be shown):',
                                            password=True)
             else:
                 password = arg[6:]
@@ -71,6 +80,8 @@ def main(*args):
         elif arg == "-force":
             pywikibot.output(u"To force a re-login, please delete the revelant lines from '%s' (or the entire file) and try again." %
                              join(config.base_dir, 'pywikibot.lwp'))
+        elif arg == "-logout":
+            logout = True
         else:
             pywikibot.showHelp('login')
             return
@@ -86,13 +97,18 @@ def main(*args):
         for lang in namedict[familyName]:
             try:
                 site = pywikibot.getSite(code=lang, fam=familyName)
-                site.login()
-
+                if logout:
+                    site.logout()
+                else:
+                    site.login()
                 user = site.user()
                 if user:
                     pywikibot.output(u"Logged in on %(site)s as %(user)s." % locals())
                 else:
-                    pywikibot.output(u"Not logged in on %(site)s." % locals())
+                    if logout:
+                        pywikibot.output(u"Logged out of %(site)s." % locals())
+                    else:
+                        pywikibot.output(u"Not logged in on %(site)s." % locals())
             except NoSuchSite:
                 pywikibot.output(u'%s.%s is not a valid site, please remove it'
                                  u' from your config' % (lang, familyName))
