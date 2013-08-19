@@ -34,6 +34,7 @@ class SiteMock(object):
 
     def login(self, as_sysop):
         self.last_login = 'sysop' if as_sysop else 'user'
+        return True
 
     def inner_fn(self, *args, **kwargs):
         self.last_fn_called = (args, kwargs)
