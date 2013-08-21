@@ -769,7 +769,6 @@ class Family(object):
                 "ERROR: title for disambig template in language %s unknown"
                 % code)
 
-
     # Methods
     def protocol(self, code):
         """
