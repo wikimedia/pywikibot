@@ -549,7 +549,7 @@ class TestSiteObject(unittest.TestCase):
 
         le = list(mysite.logevents(total=10))
         self.assertTrue(len(le) <= 10)
-        self.assertTrue(all(isinstance(entry, pywikibot.data.logentries.LogEntry)
+        self.assertTrue(all(isinstance(entry, pywikibot.logentries.LogEntry)
                             for entry in le))
         for typ in ("block", "protect", "rights", "delete", "upload",
                 "move", "import", "patrol", "merge"):
@@ -560,21 +560,21 @@ class TestSiteObject(unittest.TestCase):
         for entry in mysite.logevents(user=mysite.user(), total=3):
             self.assertTrue(entry.user() == mysite.user())
         for entry in mysite.logevents(start="2008-09-01T00:00:01Z", total=5):
-            self.assertType(entry, pywikibot.data.logentries.LogEntry)
+            self.assertType(entry, pywikibot.logentries.LogEntry)
             self.assertTrue(str(entry.timestamp()) <= "2008-09-01T00:00:01Z")
         for entry in mysite.logevents(end="2008-09-02T23:59:59Z", total=5):
-            self.assertType(entry, pywikibot.data.logentries.LogEntry)
+            self.assertType(entry, pywikibot.logentries.LogEntry)
             self.assertTrue(str(entry.timestamp()) >= "2008-09-02T23:59:59Z")
         for entry in mysite.logevents(start="2008-02-02T00:00:01Z",
                                       end="2008-02-02T23:59:59Z",
                                       reverse=True, total=5):
-            self.assertType(entry, pywikibot.data.logentries.LogEntry)
+            self.assertType(entry, pywikibot.logentries.LogEntry)
             self.assertTrue("2008-02-02T00:00:01Z" <= str(entry.timestamp())
                                 <= "2008-02-02T23:59:59Z")
         for entry in mysite.logevents(start="2008-02-03T23:59:59Z",
                                       end="2008-02-03T00:00:01Z",
                                       total=5):
-            self.assertType(entry, pywikibot.data.logentries.LogEntry)
+            self.assertType(entry, pywikibot.logentries.LogEntry)
             self.assertTrue("2008-02-03T00:00:01Z" <= str(entry.timestamp())
                                 <= "2008-02-03T23:59:59Z")
         # starttime earlier than endtime
