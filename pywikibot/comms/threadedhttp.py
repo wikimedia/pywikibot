@@ -48,6 +48,7 @@ except ImportError:
             u"Error: You need the python module httplib2 to use this module")
         sys.exit(1)
 
+
 class ConnectionPool(object):
     """A thread-safe connection pool."""
 
@@ -67,7 +68,7 @@ class ConnectionPool(object):
         self.lock.acquire()
         try:
             pywikibot.debug(u"Closing connection pool (%s connections)"
-                                 % len(self.connections),
+                            % len(self.connections),
                             _logger)
             for key in self.connections:
                 for connection in self.connections[key]:
@@ -92,7 +93,7 @@ class ConnectionPool(object):
             if identifier in self.connections:
                 if len(self.connections[identifier]) > 0:
                     pywikibot.debug(u"Retrieved connection from '%s' pool."
-                                         % identifier,
+                                    % identifier,
                                     _logger)
                     return self.connections[identifier].pop()
             return None
@@ -113,7 +114,7 @@ class ConnectionPool(object):
 
             if len(self.connections[identifier]) == self.maxnum:
                 pywikibot.debug(u"closing %s connection %r"
-                                     % (identifier, connection),
+                                % (identifier, connection),
                                 _logger)
                 connection.close()
                 del connection
@@ -197,9 +198,8 @@ class Http(httplib2.Http):
         headers['connection'] = headers.pop('connection', 'keep-alive')
 
         # determine connection pool key and fetch connection
-        (scheme, authority, request_uri, defrag_uri) = httplib2.urlnorm(
-                                                        httplib2.iri2uri(uri))
-        conn_key = scheme+":"+authority
+        (scheme, authority, request_uri, defrag_uri) = httplib2.urlnorm(httplib2.iri2uri(uri))
+        conn_key = scheme + ":" + authority
 
         connection = self.connection_pool.pop_connection(conn_key)
         if connection is not None:
@@ -209,15 +209,16 @@ class Http(httplib2.Http):
         follow_redirects = self.follow_redirects
         self.follow_redirects = False
         pywikibot.debug(u"%r" % (
-                            (uri.replace("%7C","|"), method, body,
-                            headers, max_redirects,
-                            connection_type),),
-                        _logger)
+            (uri.replace("%7C", "|"), method, body,
+             headers, max_redirects,
+             connection_type),
+        ), _logger)
         try:
             (response, content) = httplib2.Http.request(
-                                    self, uri, method, body, headers,
-                                    max_redirects, connection_type)
-        except Exception, e: # what types?
+                self, uri, method, body, headers,
+                max_redirects, connection_type
+            )
+        except Exception, e:  # what types?
             # return exception instance to be retrieved by the calling thread
             return e
         self.follow_redirects = follow_redirects
@@ -237,19 +238,17 @@ class Http(httplib2.Http):
         # Check for possible redirects
         redirectable_response = ((response.status == 303) or
                                  (response.status in [300, 301, 302, 307] and
-                                    method in ["GET", "HEAD"]))
-        if self.follow_redirects and (max_redirects > 0) \
-                                 and redirectable_response:
+                                  method in ["GET", "HEAD"]))
+        if self.follow_redirects and (max_redirects > 0) and redirectable_response:
             (response, content) = self._follow_redirect(
                 uri, method, body, headers, response, content, max_redirects)
 
-        return (response, content)
+        return response, content
 
     def _follow_redirect(self, uri, method, body, headers, response,
                          content, max_redirects):
         """Internal function to follow a redirect recieved by L{request}"""
-        (scheme, authority, absolute_uri, defrag_uri) = httplib2.urlnorm(
-                                                          httplib2.iri2uri(uri))
+        (scheme, authority, absolute_uri, defrag_uri) = httplib2.urlnorm(httplib2.iri2uri(uri))
         if self.cache:
             cachekey = defrag_uri
         else:
@@ -264,12 +263,11 @@ class Http(httplib2.Http):
         # Fix-up relative redirects (which violate an RFC 2616 MUST)
         if "location" in response:
             location = response['location']
-            (scheme, authority, path, query, fragment) = httplib2.parse_uri(
-                                                                    location)
-            if authority == None:
+            (scheme, authority, path, query, fragment) = httplib2.parse_uri(location)
+            if authority is None:
                 response['location'] = httplib2.urlparse.urljoin(uri, location)
                 pywikibot.debug(u"Relative redirect: changed [%s] to [%s]"
-                                     % (location, response['location']),
+                                % (location, response['location']),
                                 _logger)
         if response.status == 301 and method in ["GET", "HEAD"]:
             response['-x-permanent-redirect-url'] = response['location']
@@ -336,7 +334,7 @@ class HttpProcessor(threading.Thread):
         # The Queue item is expected to either an HttpRequest object
         # or None (to shut down the thread)
         pywikibot.debug(u"Thread started, waiting for requests.", _logger)
-        while (True):
+        while True:
             item = self.queue.get()
             if item is None:
                 pywikibot.debug(u"Shutting down thread.", _logger)
@@ -420,6 +418,7 @@ class DummyRequest(object):
         #  request is the result of a redirect
         return False
 
+
 class DummyResponse(object):
     """Simulated urllib2.Request object for httplib2
        implements only what's necessary for cookielib.CookieJar to work
@@ -429,6 +428,7 @@ class DummyResponse(object):
 
     def info(self):
         return DummyMessage(self.response)
+
 
 class DummyMessage(object):
     """Simulated mimetools.Message object for httplib2
@@ -448,5 +448,5 @@ class DummyMessage(object):
         #  using ','.  but the netscape cookie format uses ','
         #  as part of the expires= date format.  so we have
         #  to split carefully here - header.split(',') won't do it.
-        HEADERVAL= re.compile(r'\s*(([^,]|(,\s*\d))+)')
+        HEADERVAL = re.compile(r'\s*(([^,]|(,\s*\d))+)')
         return [h[0] for h in HEADERVAL.findall(self.response[k])]
