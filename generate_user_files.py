@@ -176,11 +176,8 @@ def create_user_config():
             if choice in "SE":
                 break
 
-        #
-        # I don't like this solution. Temporary for me.
-        #
         # determine what directory this script (generate_user_files.py) lives in
-        install = os.path.dirname(os.path.abspath(sys.argv[0]))
+        install = os.path.dirname(os.path.abspath(__file__))
         # config2.py will be in the pywikibot/ directory
         f = codecs.open(os.path.join(install, "pywikibot", "config2.py"),
                         "r", "utf-8")
