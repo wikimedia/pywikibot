@@ -72,8 +72,7 @@ class LogEntry(object):
     def timestamp(self):
         """Timestamp object corresponding to event timestamp"""
         if not hasattr(self, '_timestamp'):
-            self._timestamp = pywikibot.Timestamp.fromISOformat(
-                                            self.data['timestamp'])
+            self._timestamp = pywikibot.Timestamp.fromISOformat(self.data['timestamp'])
         return self._timestamp
 
     def comment(self):
@@ -82,15 +81,16 @@ class LogEntry(object):
 
 class BlockEntry(LogEntry):
     _expectedType = 'block'
+
     def __init__(self, apidata):
         super(BlockEntry, self).__init__(apidata)
-        # see http://en.wikipedia.org/w/api.php?action=query&list=logevents&letype=block&lelimit=1&lestart=2009-03-04T00:35:07Z :
+        # see en.wikipedia.org/w/api.php?action=query&list=logevents&letype=block&lelimit=1&lestart=2009-03-04T00:35:07Z
         # When an autoblock is removed, the "title" field is not a page title
         # ( https://bugzilla.wikimedia.org/show_bug.cgi?id=17781 )
         pos = self.data['title'].find('#')
         self.isAutoblockRemoval = pos > 0
         if self.isAutoblockRemoval:
-            self._blockid = int(self.data['title'][pos+1:])
+            self._blockid = int(self.data['title'][pos + 1:])
 
     def title(self):
         """
@@ -148,19 +148,21 @@ class BlockEntry(LogEntry):
         """
         if hasattr(self, '_expiry'):
             return self._expiry
-        self._expiry = pywikibot.Timestamp.fromISOformat(
-                                    self._getBlockDetails()['expiry'])
+        self._expiry = pywikibot.Timestamp.fromISOformat(self._getBlockDetails()['expiry'])
         return self._expiry
 
 
 class ProtectEntry(LogEntry):
     _expectedType = 'protect'
 
+
 class RightsEntry(LogEntry):
     _expectedType = 'rights'
 
+
 class DeleteEntry(LogEntry):
     _expectedType = 'delete'
+
 
 class UploadEntry(LogEntry):
     _expectedType = 'upload'
@@ -175,8 +177,7 @@ class MoveEntry(LogEntry):
     def new_title(self):
         """Page object of the new title"""
         if not hasattr(self, '_new_title'):
-            self._new_title = pywikibot.Page(pywikibot.Link(
-                                self.data['move']['new_title']))
+            self._new_title = pywikibot.Page(pywikibot.Link(self.data['move']['new_title']))
         return self._new_title
 
     def suppressedredirect(self):
@@ -191,8 +192,10 @@ class MoveEntry(LogEntry):
 class ImportEntry(LogEntry):
     _expectedType = 'import'
 
+
 class PatrolEntry(LogEntry):
     _expectedType = 'patrol'
+
 
 class NewUsersEntry(LogEntry):
     _expectedType = 'newusers'
@@ -207,15 +210,15 @@ class LogEntryFactory(object):
     Only available method is create()
     """
     _logtypes = {
-        'block':BlockEntry,
-        'protect':ProtectEntry,
-        'rights':RightsEntry,
-        'delete':DeleteEntry,
-        'upload':UploadEntry,
-        'move':MoveEntry,
-        'import':ImportEntry,
-        'patrol':PatrolEntry,
-        'newusers':NewUsersEntry
+        'block': BlockEntry,
+        'protect': ProtectEntry,
+        'rights': RightsEntry,
+        'delete': DeleteEntry,
+        'upload': UploadEntry,
+        'move': MoveEntry,
+        'import': ImportEntry,
+        'patrol': PatrolEntry,
+        'newusers': NewUsersEntry
     }
 
     def __init__(self, logtype=None):
