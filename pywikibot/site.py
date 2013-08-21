@@ -637,43 +637,28 @@ class BaseSite(object):
     def globalusers_address(self, target='', limit=500, offset='', group=''):
         raise NotImplementedError
 
-
 def must_be(group=None,right=None):
+    """ Decorator to require a certain user status. For now, only the values
+        group = 'user' and group = 'sysop' are supported. The right property
+        will be ignored for now.
+
+        @param group: the group the logged in user should belong to
+                      legal values: 'user' and 'sysop'
+        @param right: the rights the logged in user hsould have
+                      not supported yet and thus ignored.
+        @returns: a decorator to make sure the requirement is statisfied when
+                  the decorated function is called.
     """
-    Decorator to require a certain user status.
-    You can use the group and right independently or together.
-    Example:
-        @must_be(group='user', right='edit)
-        def edit_page(...):
-
-    @param group: any arbitrary group the user should belong to
-    @param right: the rights the logged in user should have.
-    @return: a decorator to make sure the requirement is statisfied when
-             the decorated function is called.
-    """
-
-    if group:
-        if group == 'user':
-            grp = lambda self: self.login(False)
-        elif group == 'sysop':
-            grp = lambda self: self.login(True)
-        else:
-            grp = lambda self: self.has_group(group)
+    if group == 'user':
+        run = lambda self: self.login(False)
+    elif group == 'sysop':
+        run = lambda self: self.login(True)
     else:
-        grp = lambda self: True  # No group provided
-
-    if right:
-        rht = lambda self: self.has_right(group)
-    else:
-        rht = lambda self: True  # No right provided
-
-    run = lambda self: grp(self) and rht(self)
+        raise Exception("Not implemented")
 
     def decorator(fn):
         def callee(self, *args, **kwargs):
-            ok = run(self)
-            if not ok:
-                raise NoUsername('')  # FIXME: Pick a better error
+            run(self)
             return fn(self, *args, **kwargs)
         callee.__name__ = fn.__name__
         callee.__doc__ = fn.__doc__
@@ -848,11 +833,6 @@ class APISite(BaseSite):
             self._loginstatus = LoginStatus.NOT_LOGGED_IN # failure
         if not hasattr(self, "_siteinfo"):
             self._getsiteinfo()
-
-        if sysop:
-            return self._loginstatus == LoginStatus.AS_SYSOP
-        else:
-            return self._loginstatus == LoginStatus.AS_USER
 
     forceLogin = login  # alias for backward-compatibility
 
@@ -2563,7 +2543,7 @@ redirects on %(site)s wiki""",
         "editconflict": "Page %(title)s not saved due to edit conflict.",
     }
 
-    @must_be(group='user', right='edit')
+    @must_be(group='user')
     def editpage(self, page, summary, minor=True, notminor=False,
                  bot=True, recreate=True, createonly=False, watch=None):
         """Submit an edited Page object to be saved to the wiki.
@@ -2921,7 +2901,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
 
     #TODO: implement patrol
 
-    @must_be(right='block')
+    @must_be(group='sysop')
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True, autoblock=True,
                   noemail=False, reblock=False):
 
