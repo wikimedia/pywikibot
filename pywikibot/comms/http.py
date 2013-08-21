@@ -39,7 +39,7 @@ _logger = "comm.http"
 
 # global variables
 
-# the User-agent: header. The default is 
+# the User-agent: header. The default is
 # '<script>/<revision> Pywikipediabot/2.0', where '<script>' is the currently
 # executing script and version is the SVN revision of Pywikipediabot.
 USER_AGENT_FORMAT = '{script}/r{version[rev]} Pywikipediabot/2.0'
@@ -51,8 +51,7 @@ threads = []
 connection_pool = threadedhttp.ConnectionPool()
 http_queue = Queue.Queue()
 
-cookie_jar = threadedhttp.LockableCookieJar(
-                 config.datafilepath("pywikibot.lwp"))
+cookie_jar = threadedhttp.LockableCookieJar(config.datafilepath("pywikibot.lwp"))
 try:
     cookie_jar.load()
 except (IOError, cookielib.LoadError):
@@ -69,6 +68,7 @@ for i in range(numthreads):
     threads.append(proc)
     proc.start()
 
+
 # Prepare flush on quit
 def _flush():
     for i in threads:
@@ -81,6 +81,7 @@ atexit.register(_flush)
 
 # export cookie_jar to global namespace
 pywikibot.cookie_jar = cookie_jar
+
 
 def request(site, uri, ssl=False, *args, **kwargs):
     """Queue a request to be submitted to Site.
@@ -120,6 +121,6 @@ def request(site, uri, ssl=False, *args, **kwargs):
 
     if request.data[0].status != 200:
         pywikibot.warning(u"Http response status %(status)s"
-                            % {'status': request.data[0].status})
+                          % {'status': request.data[0].status})
 
     return request.data[1]
