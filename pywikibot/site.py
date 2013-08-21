@@ -61,9 +61,10 @@ class LoginStatus(object):
     @classmethod
     def name(cls, search_value):
         for key, value in cls.__dict__.iteritems():
-            if key==key.upper() and value==search_value:
+            if key == key.upper() and value == search_value:
                 return key
         raise KeyError("Value %r could not be found in this enum" % search_value)
+
 
 def Family(fam=None, fatal=True):
     """Import the named family.
@@ -150,8 +151,7 @@ class BaseSite(object):
             if sysop:
                 sysop = sysop[0].upper() + sysop[1:]
         self._username = [user, sysop]
-        self.use_hard_category_redirects = \
-                self.code in self.family.use_hard_category_redirects
+        self.use_hard_category_redirects = self.code in self.family.use_hard_category_redirects
 
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Lock()
@@ -209,7 +209,7 @@ class BaseSite(object):
             return self._username[False]
         return None
 
-    def username(self, sysop = False):
+    def username(self, sysop=False):
         return self._username[sysop]
 
     def __getattr__(self, attr):
@@ -219,19 +219,18 @@ class BaseSite(object):
             return getattr(self.__class__, attr)
         try:
             method = getattr(self.family, attr)
-            f = lambda *args, **kwargs: \
-                       method(self.code, *args, **kwargs)
+            f = lambda *args, **kwargs: method(self.code, *args, **kwargs)
             if hasattr(method, "__doc__"):
                 f.__doc__ = method.__doc__
             return f
         except AttributeError:
             raise AttributeError("%s instance has no attribute '%s'"
-                                 % (self.__class__.__name__, attr)  )
+                                 % (self.__class__.__name__, attr))
 
     def sitename(self):
         """Return string representing this Site's name and code."""
 
-        return self.family.name+':'+self.code
+        return self.family.name + ':' + self.code
 
     __str__ = sitename
 
@@ -264,7 +263,7 @@ class BaseSite(object):
 
         nsnames = [name for name in self.namespaces().itervalues()]
         return [lang for lang in self.languages()
-                     if lang[:1].upper() + lang[1:] not in nsnames]
+                if lang[:1].upper() + lang[1:] not in nsnames]
 
     def ns_index(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
@@ -352,14 +351,14 @@ class BaseSite(object):
         """Return Category in which disambig pages are listed."""
 
         try:
-            name = self.namespace(14)+':'+self.family.disambcatname[self.code]
+            name = self.namespace(14) + ':' + self.family.disambcatname[self.code]
         except KeyError:
             raise Error(u"No disambiguation category name found for %(site)s"
-                         % {'site': self})
+                        % {'site': self})
         return pywikibot.Category(pywikibot.Link(name, self))
 
     @deprecated("pywikibot.Link")
-    def linkto(self, title, othersite = None):
+    def linkto(self, title, othersite=None):
         """Return unicode string in the form of a wikilink to 'title'
 
         Use optional Site argument 'othersite' to generate an interwiki link.
@@ -375,7 +374,7 @@ class BaseSite(object):
 
         """
         linkfam, linkcode = pywikibot.Link(text, self).parse_site()
-        return (linkfam != self.family.name or linkcode != self.code)
+        return linkfam != self.family.name or linkcode != self.code
 
     def redirectRegex(self, pattern=None):
         """Return a compiled regular expression matching on redirect pages.
@@ -389,7 +388,7 @@ class BaseSite(object):
         # arbitrary stuff, then a wikilink. The wikilink may contain
         # a label, although this is not useful.
         return re.compile(r'\s*#%(pattern)s\s*:?\s*\[\[(.+?)(?:\|.*?)?\]\]'
-                           % locals(),
+                          % locals(),
                           re.IGNORECASE | re.UNICODE | re.DOTALL)
 
     def sametitle(self, title1, title2):
@@ -413,7 +412,7 @@ class BaseSite(object):
             ns2, name2 = title2.split(":", 1)
         else:
             ns2, name2 = 0, title2
-        for space in self.namespaces(): # iterate over all valid namespaces
+        for space in self.namespaces():  # iterate over all valid namespaces
             if type(ns1) is not int and valid_namespace(ns1, space):
                 ns1 = space
             if type(ns2) is not int and valid_namespace(ns2, space):
@@ -470,8 +469,7 @@ class BaseSite(object):
         # TODO: is this even needed?  No family in the framework has this
         # dictionary defined!
         if self.lang in self.family.interwiki_putfirst_doubled:
-            if len(list_of_links) >= \
-                        self.family.interwiki_putfirst_doubled[self.lang][0]:
+            if len(list_of_links) >= self.family.interwiki_putfirst_doubled[self.lang][0]:
                 links2 = [lang.language() for lang in list_of_links]
                 result = []
                 for lang in self.family.interwiki_putfirst_doubled[self.lang][1]:
@@ -540,104 +538,153 @@ class BaseSite(object):
 
     def checkCharset(self, charset):
         raise NotImplementedError
+
     def getToken(self, getalways=True, getagain=False, sysop=False):
         raise NotImplementedError
+
     def export_address(self):
         raise NotImplementedError
+
     def move_address(self):
         raise NotImplementedError
+
     def delete_address(self, s):
         raise NotImplementedError
+
     def undelete_view_address(self, s, ts=''):
         raise NotImplementedError
+
     def undelete_address(self):
         raise NotImplementedError
+
     def protect_address(self, s):
         raise NotImplementedError
+
     def unprotect_address(self, s):
         raise NotImplementedError
+
     def put_address(self, s):
         raise NotImplementedError
+
     def get_address(self, s):
         raise NotImplementedError
+
     def edit_address(self, s):
         raise NotImplementedError
+
     def purge_address(self, s):
         raise NotImplementedError
+
     def block_address(self):
         raise NotImplementedError
+
     def unblock_address(self):
         raise NotImplementedError
+
     def blocksearch_address(self, s):
         raise NotImplementedError
+
     def linksearch_address(self, s, limit=500, offset=0):
         raise NotImplementedError
+
     def search_address(self, q, n=50, ns=0):
         raise NotImplementedError
-    def allpages_address(self, s, ns = 0):
+
+    def allpages_address(self, s, ns=0):
         raise NotImplementedError
+
     def log_address(self, n=50, mode='', user=''):
         raise NotImplementedError
+
     def newpages_address(self, n=50, namespace=0):
         raise NotImplementedError
+
     def longpages_address(self, n=500):
         raise NotImplementedError
+
     def shortpages_address(self, n=500):
         raise NotImplementedError
+
     def unusedfiles_address(self, n=500):
         raise NotImplementedError
+
     def categories_address(self, n=500):
         raise NotImplementedError
+
     def deadendpages_address(self, n=500):
         raise NotImplementedError
+
     def ancientpages_address(self, n=500):
         raise NotImplementedError
+
     def lonelypages_address(self, n=500):
         raise NotImplementedError
+
     def protectedpages_address(self, n=500):
         raise NotImplementedError
+
     def unwatchedpages_address(self, n=500):
         raise NotImplementedError
+
     def uncategorizedcategories_address(self, n=500):
         raise NotImplementedError
+
     def uncategorizedimages_address(self, n=500):
         raise NotImplementedError
+
     def uncategorizedpages_address(self, n=500):
         raise NotImplementedError
+
     def uncategorizedtemplates_address(self, n=500):
         raise NotImplementedError
+
     def unusedcategories_address(self, n=500):
         raise NotImplementedError
+
     def wantedcategories_address(self, n=500):
         raise NotImplementedError
+
     def withoutinterwiki_address(self, n=500):
         raise NotImplementedError
+
     def references_address(self, s):
         raise NotImplementedError
+
     def allmessages_address(self):
         raise NotImplementedError
+
     def upload_address(self):
         raise NotImplementedError
-    def double_redirects_address(self, default_limit = True):
+
+    def double_redirects_address(self, default_limit=True):
         raise NotImplementedError
-    def broken_redirects_address(self, default_limit = True):
+
+    def broken_redirects_address(self, default_limit=True):
         raise NotImplementedError
+
     def random_address(self):
         raise NotImplementedError
+
     def randomredirect_address(self):
         raise NotImplementedError
+
     def login_address(self):
         raise NotImplementedError
+
     def captcha_image_address(self, id):
         raise NotImplementedError
+
     def watchlist_address(self):
         raise NotImplementedError
+
     def contribs_address(self, target, limit=500, offset=''):
         raise NotImplementedError
+
     def globalusers_address(self, target='', limit=500, offset='', group=''):
         raise NotImplementedError
 
-def must_be(group=None,right=None):
+
+def must_be(group=None, right=None):
     """ Decorator to require a certain user status. For now, only the values
         group = 'user' and group = 'sysop' are supported. The right property
         will be ignored for now.
@@ -704,23 +751,23 @@ class APISite(BaseSite):
             # canonical forms are capitalized
             -2: [u"Media"],
             -1: [u"Special"],
-             0: [u""],
-             1: [u"Talk"],
-             2: [u"User"],
-             3: [u"User talk"],
-             4: [u"Project"],
-             5: [u"Project talk"],
-             6: [u"Image"],
-             7: [u"Image talk"],
-             8: [u"MediaWiki"],
-             9: [u"MediaWiki talk"],
+            0: [u""],
+            1: [u"Talk"],
+            2: [u"User"],
+            3: [u"User talk"],
+            4: [u"Project"],
+            5: [u"Project talk"],
+            6: [u"Image"],
+            7: [u"Image talk"],
+            8: [u"MediaWiki"],
+            9: [u"MediaWiki talk"],
             10: [u"Template"],
             11: [u"Template talk"],
             12: [u"Help"],
             13: [u"Help talk"],
             14: [u"Category"],
             15: [u"Category talk"],
-            }
+        }
         if self.family.versionnumber(self.code) >= 14:
             self._namespaces[6] = [u"File"]
             self._namespaces[7] = [u"File talk"]
@@ -804,7 +851,7 @@ class APISite(BaseSite):
         return True
 
     @deprecated("Site.user()")
-    def loggedInAs(self, sysop = False):
+    def loggedInAs(self, sysop=False):
         """Return the current username if logged in, otherwise return None.
 
         DEPRECATED (use .user() method instead)
@@ -823,14 +870,14 @@ class APISite(BaseSite):
             return
         loginMan = api.LoginManager(site=self, sysop=sysop,
                                     user=self._username[sysop])
-        if loginMan.login(retry = True):
+        if loginMan.login(retry=True):
             self._username[sysop] = loginMan.username
             if hasattr(self, "_userinfo"):
                 del self._userinfo
             self.getuserinfo()
             self._loginstatus = LoginStatus.AS_SYSOP if sysop else LoginStatus.AS_USER
         else:
-            self._loginstatus = LoginStatus.NOT_LOGGED_IN # failure
+            self._loginstatus = LoginStatus.NOT_LOGGED_IN  # failure
         if not hasattr(self, "_siteinfo"):
             self._getsiteinfo()
 
@@ -855,11 +902,11 @@ class APISite(BaseSite):
                 or self._userinfo['name']
                    != self._username["sysop" in self._userinfo["groups"]]):
             uirequest = api.Request(
-                                site=self,
-                                action="query",
-                                meta="userinfo",
-                                uiprop="blockinfo|hasmsg|groups|rights"
-                            )
+                site=self,
+                action="query",
+                meta="userinfo",
+                uiprop="blockinfo|hasmsg|groups|rights"
+            )
             uidata = uirequest.submit()
             assert 'query' in uidata, \
                    "API userinfo response lacks 'query' key"
@@ -887,7 +934,7 @@ class APISite(BaseSite):
             _logger)
         return self.is_blocked(sysop)
 
-    def checkBlocks(self, sysop = False):
+    def checkBlocks(self, sysop=False):
         """Check if the user is blocked, and raise an exception if so."""
         if self.is_blocked(sysop):
             # User blocked
@@ -972,12 +1019,12 @@ class APISite(BaseSite):
         """Return list of localized "word" magic words for the site."""
         if not hasattr(self, "_magicwords"):
             sirequest = api.CachedRequest(
-                                expiry=config.API_config_expiry,
-                                site=self,
-                                action="query",
-                                meta="siteinfo",
-                                siprop="magicwords"
-                            )
+                expiry=config.API_config_expiry,
+                site=self,
+                action="query",
+                meta="siteinfo",
+                siprop="magicwords"
+            )
             try:
                 sidata = sirequest.submit()
                 assert 'query' in sidata, \
@@ -1017,7 +1064,7 @@ class APISite(BaseSite):
         try:
             keywords = set(s.lstrip("#")
                            for s in self.getmagicwords("redirect"))
-            keywords.add("REDIRECT") # just in case
+            keywords.add("REDIRECT")  # just in case
             pattern = "(?:" + "|".join(keywords) + ")"
         except KeyError:
             # no localized keyword for redirects
@@ -1035,23 +1082,23 @@ class APISite(BaseSite):
     def _getsiteinfo(self, force=False):
         """Retrieve siteinfo and namespaces from site."""
         sirequest = api.CachedRequest(
-                            expiry=(0 if force else config.API_config_expiry),
-                            site=self,
-                            action="query",
-                            meta="siteinfo",
-                            siprop="general|namespaces|namespacealiases"
-                        )
+            expiry=(0 if force else config.API_config_expiry),
+            site=self,
+            action="query",
+            meta="siteinfo",
+            siprop="general|namespaces|namespacealiases"
+        )
         try:
             sidata = sirequest.submit()
         except api.APIError:
             # hack for older sites that don't support 1.12 properties
             # probably should delete if we're not going to support pre-1.12
             sirequest = api.Request(
-                                site=self,
-                                action="query",
-                                meta="siteinfo",
-                                siprop="general|namespaces"
-                            )
+                site=self,
+                action="query",
+                meta="siteinfo",
+                siprop="general|namespaces"
+            )
             sidata = sirequest.submit()
 
         assert 'query' in sidata, \
@@ -1196,7 +1243,7 @@ class APISite(BaseSite):
             if not self.sametitle(pageitem['title'], title):
                 pywikibot.warning(
                     u"loadpageinfo: Query on %s returned data on '%s'"
-                      % (page, pageitem['title']))
+                    % (page, pageitem['title']))
                 continue
             api.update_page(page, pageitem)
 
@@ -1241,8 +1288,7 @@ class APISite(BaseSite):
                     u"loadimageinfo: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
             api.update_page(page, pageitem)
-            return pageitem['imageinfo'] \
-                   if history else pageitem['imageinfo'][0]
+            return pageitem['imageinfo'] if history else pageitem['imageinfo'][0]
 
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
@@ -1296,7 +1342,7 @@ class APISite(BaseSite):
                 "getredirtarget: No 'redirects' found for page %s."
                 % title)
         redirmap = dict((item['from'], item['to'])
-                            for item in result['query']['redirects'])
+                        for item in result['query']['redirects'])
         if title not in redirmap:
             raise RuntimeError(
                 "getredirtarget: 'redirects' contains no key for page %s."
@@ -1318,7 +1364,7 @@ class APISite(BaseSite):
         return page._redirtarget
 
     def preloadpages(self, pagelist, groupsize=50, templates=False,
-            langlinks=False):
+                     langlinks=False):
         """Return a generator to a list of preloaded pages.
 
         Note that [at least in current implementation] pages may be iterated
@@ -1334,8 +1380,7 @@ class APISite(BaseSite):
         from pywikibot.tools import itergroup
         for sublist in itergroup(pagelist, groupsize):
             pageids = [str(p._pageid) for p in sublist
-                                      if hasattr(p, "_pageid")
-                                         and p._pageid > 0]
+                       if hasattr(p, "_pageid") and p._pageid > 0]
             cache = dict((p.title(withSection=False), p) for p in sublist)
 
             props = "revisions|info|categoryinfo"
@@ -1344,17 +1389,15 @@ class APISite(BaseSite):
             if langlinks:
                 props += '|langlinks'
             rvgen = api.PropertyGenerator(props, site=self)
-            rvgen.set_maximum_items(-1) # suppress use of "rvlimit" parameter
+            rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
             if len(pageids) == len(sublist):
                 # only use pageids if all pages have them
                 rvgen.request["pageids"] = "|".join(pageids)
             else:
                 rvgen.request["titles"] = "|".join(cache.keys())
-            rvgen.request[u"rvprop"] = \
-                    u"ids|flags|timestamp|user|comment|content"
+            rvgen.request[u"rvprop"] = u"ids|flags|timestamp|user|comment|content"
             pywikibot.output(u"Retrieving %s pages from %s."
-                           % (len(cache), self)
-                        )
+                             % (len(cache), self))
             for pagedata in rvgen:
                 pywikibot.debug(u"Preloading %s" % pagedata, _logger)
                 try:
@@ -1373,7 +1416,7 @@ class APISite(BaseSite):
                         else:
                             pywikibot.warning(
                                 u"preloadpages: Query returned unexpected title '%s'"
-                                     % pagedata['title'])
+                                % pagedata['title'])
                             continue
                 except KeyError:
                     pywikibot.debug(u"No 'title' in %s" % pagedata, _logger)
@@ -1400,7 +1443,7 @@ class APISite(BaseSite):
             if not self.sametitle(item['title'], page.title(withSection=False)):
                 raise Error(
                     u"token: Query on page %s returned data on page [[%s]]"
-                     % (page.title(withSection=False, asLink=True),
+                    % (page.title(withSection=False, asLink=True),
                         item['title']))
             api.update_page(page, item)
             pywikibot.debug(unicode(item), _logger)
@@ -1429,8 +1472,7 @@ class APISite(BaseSite):
         bltitle = page.title(withSection=False).encode(self.encoding())
         blargs = {"gbltitle": bltitle}
         if filterRedirects is not None:
-            blargs["gblfilterredir"] = filterRedirects and "redirects" \
-                                                        or "nonredirects"
+            blargs["gblfilterredir"] = filterRedirects and "redirects" or "nonredirects"
         blgen = self._generator(api.PageGenerator, type_arg="backlinks",
                                 namespaces=namespaces, step=step, total=total,
                                 g_content=content, **blargs)
@@ -1455,10 +1497,11 @@ class APISite(BaseSite):
                     continue
                 if redir.getRedirectTarget() == page:
                     genlist[redir.title()] = self.pagebacklinks(
-                                                redir, followRedirects=True,
-                                                filterRedirects=filterRedirects,
-                                                namespaces=namespaces,
-                                                content=content)
+                        redir, followRedirects=True,
+                        filterRedirects=filterRedirects,
+                        namespaces=namespaces,
+                        content=content
+                    )
             return itertools.chain(*genlist.values())
         return blgen
 
@@ -1476,11 +1519,9 @@ class APISite(BaseSite):
             (default False)
 
         """
-        eiargs = {"geititle":
-                page.title(withSection=False).encode(self.encoding())}
+        eiargs = {"geititle": page.title(withSection=False).encode(self.encoding())}
         if filterRedirects is not None:
-            eiargs["geifilterredir"] = filterRedirects and "redirects"\
-                                                        or "nonredirects"
+            eiargs["geifilterredir"] = filterRedirects and "redirects" or "nonredirects"
         eigen = self._generator(api.PageGenerator, type_arg="embeddedin",
                                 namespaces=namespaces, step=step, total=total,
                                 g_content=content, **eiargs)
@@ -1501,15 +1542,14 @@ class APISite(BaseSite):
                                       namespaces=namespaces,
                                       step=step, total=total, content=content)
         return itertools.islice(
-                    itertools.chain(
-                        self.pagebacklinks(
-                            page, followRedirects, filterRedirects,
-                            namespaces=namespaces, step=step, content=content),
-                        self.page_embeddedin(
-                            page, filterRedirects, namespaces=namespaces,
-                            step=step, content=content)
-                        ),
-                    total)
+            itertools.chain(
+                self.pagebacklinks(
+                    page, followRedirects, filterRedirects,
+                    namespaces=namespaces, step=step, content=content),
+                self.page_embeddedin(
+                    page, filterRedirects, namespaces=namespaces,
+                    step=step, content=content)
+            ), total)
 
     def pagelinks(self, page, namespaces=None, follow_redirects=False,
                   step=None, total=None, content=False):
@@ -1536,7 +1576,7 @@ class APISite(BaseSite):
                                 g_content=content, **plargs)
         return plgen
 
-    @deprecate_arg("withSortKey", None) # Sortkey doesn't work with generator
+    @deprecate_arg("withSortKey", None)  # Sortkey doesn't work with generator
     def pagecategories(self, page, step=None, total=None, content=False):
         """Iterate categories to which page belongs.
 
@@ -1549,8 +1589,7 @@ class APISite(BaseSite):
         if hasattr(page, "_pageid"):
             clargs['pageids'] = str(page._pageid)
         else:
-            clargs['titles'] = page.title(withSection=False
-                                         ).encode(self.encoding())
+            clargs['titles'] = page.title(withSection=False).encode(self.encoding())
         clgen = self._generator(api.CategoryPageGenerator,
                                 type_arg="categories", step=step, total=total,
                                 g_content=content, **clargs)
@@ -1634,8 +1673,8 @@ class APISite(BaseSite):
             cmargs["gcmsort"] = sortby
         elif sortby:
             raise ValueError(
-                 "categorymembers: invalid sortby value '%(sortby)s'"
-                 % locals())
+                "categorymembers: invalid sortby value '%(sortby)s'"
+                % locals())
         if starttime and endtime and starttime > endtime:
             raise ValueError(
                 "categorymembers: starttime must be before endtime")
@@ -1762,8 +1801,7 @@ class APISite(BaseSite):
                                     type_arg=u"info|revisions", revids=ids,
                                     step=step, total=total)
         if getText:
-            rvgen.request[u"rvprop"] = \
-                    u"ids|flags|timestamp|user|comment|content"
+            rvgen.request[u"rvprop"] = u"ids|flags|timestamp|user|comment|content"
             if section is not None:
                 rvgen.request[u"rvsection"] = unicode(section)
         if latest or "revids" in rvgen.request:
@@ -1857,7 +1895,7 @@ class APISite(BaseSite):
             self.getcategoryinfo(category)
         if not hasattr(category, "_catinfo"):
             # a category that exists but has no contents returns no API result
-            category._catinfo = {'size':0, 'pages':0, 'files':0, 'subcats':0}
+            category._catinfo = {'size': 0, 'pages': 0, 'files': 0, 'subcats': 0}
         return category._catinfo
 
     @deprecate_arg("throttle", None)
@@ -1901,8 +1939,8 @@ class APISite(BaseSite):
             raise Error("allpages: only one namespace permitted.")
         if includeredirects is not None:
             pywikibot.debug(
-u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
-                 _logger)
+                u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
+                _logger)
             if includeredirects:
                 if includeredirects == "only":
                     filterredirs = True
@@ -1946,7 +1984,6 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         """
         return self.allpages(prefix=prefix, namespace=namespace,
                              includeredirects=includeredirects)
-
 
     def alllinks(self, start="!", prefix="", namespace=0, unique=False,
                  fromids=False, step=None, total=None):
@@ -2103,15 +2140,14 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             if reverse:
                 if starttime > endtime:
                     raise pywikibot.Error(
-                "blocks: starttime must be before endtime with reverse=True")
+                        "blocks: starttime must be before endtime with reverse=True")
             else:
                 if endtime > starttime:
                     raise pywikibot.Error(
-                "blocks: endtime must be before starttime with reverse=False")
+                        "blocks: endtime must be before starttime with reverse=False")
         bkgen = self._generator(api.ListGenerator, type_arg="blocks",
                                 step=step, total=total)
-        bkgen.request["bkprop"] = \
-                            "id|user|by|timestamp|expiry|reason|range|flags"
+        bkgen.request["bkprop"] = "id|user|by|timestamp|expiry|reason|range|flags"
         if starttime:
             bkgen.request["bkstart"] = str(starttime)
         if endtime:
@@ -2156,7 +2192,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         iuargs = dict(giutitle=image.title(withSection=False))
         if filterredir is not None:
             iuargs["giufilterredir"] = (filterredir and "redirects"
-                                                     or "nonredirects")
+                                        or "nonredirects")
         iugen = self._generator(api.PageGenerator, type_arg="imageusage",
                                 namespaces=namespaces, step=step,
                                 total=total, g_content=content, **iuargs)
@@ -2181,11 +2217,11 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             if reverse:
                 if end < start:
                     raise Error(
-                  "logevents: end must be later than start with reverse=True")
+                        "logevents: end must be later than start with reverse=True")
             else:
                 if start < end:
                     raise Error(
-                  "logevents: start must be later than end with reverse=False")
+                        "logevents: start must be later than end with reverse=False")
         legen = self._generator(api.LogEntryListGenerator, type_arg=logtype,
                                 step=step, total=total)
         if logtype is not None:
@@ -2235,11 +2271,11 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             if reverse:
                 if end < start:
                     raise Error(
-            "recentchanges: end must be later than start with reverse=True")
+                        "recentchanges: end must be later than start with reverse=True")
             else:
                 if start < end:
                     raise Error(
-            "recentchanges: start must be later than end with reverse=False")
+                        "recentchanges: start must be later than end with reverse=False")
         rcgen = self._generator(api.ListGenerator, type_arg="recentchanges",
                                 rcprop="user|comment|timestamp|title|ids"
                                        "|sizes|redirect|loginfo|flags",
@@ -2273,7 +2309,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         rcshow = []
         for item in filters:
             if filters[item] is not None:
-                rcshow.append(filters[item] and item or ("!"+item))
+                rcshow.append(filters[item] and item or ("!" + item))
         if rcshow:
             rcgen.request["rcshow"] = "|".join(rcshow)
         return rcgen
@@ -2408,7 +2444,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         wlshow = []
         for item in filters:
             if filters[item] is not None:
-                wlshow.append(filters[item] and item or ("!"+item))
+                wlshow.append(filters[item] and item or ("!" + item))
         if wlshow:
             wlgen.request["wlshow"] = "|".join(wlshow)
         return wlgen
@@ -2439,7 +2475,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             else:
                 if start < end:
                     raise Error(
-"deletedrevs: start must be later than end with reverse=False")
+                        "deletedrevs: start must be later than end with reverse=False")
         if not self.logged_in():
             self.login()
         if "deletedhistory" not in self.userinfo['rights']:
@@ -2449,8 +2485,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
                 pass
             if "deletedhistory" not in self.userinfo['rights']:
                 raise Error(
-"deletedrevs: User:%s not authorized to access deleted revisions."
-                        % self.user())
+                    "deletedrevs: User:%s not authorized to access deleted revisions."
+                    % self.user())
         if get_text:
             if "undelete" not in self.userinfo['rights']:
                 try:
@@ -2459,8 +2495,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
                     pass
                 if "undelete" not in self.userinfo['rights']:
                     raise Error(
-"deletedrevs: User:%s not authorized to view deleted content."
-                            % self.user())
+                        "deletedrevs: User:%s not authorized to view deleted content."
+                        % self.user())
 
         drgen = self._generator(api.ListGenerator, type_arg="deletedrevs",
                                 titles=page.title(withSection=False),
@@ -2486,8 +2522,9 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         if not isinstance(usernames, basestring):
             usernames = u"|".join(usernames)
         usgen = api.ListGenerator(
-                        "users", ususers=usernames, site=self,
-                        usprop="blockinfo|groups|editcount|registration|emailable")
+            "users", ususers=usernames, site=self,
+            usprop="blockinfo|groups|editcount|registration|emailable"
+        )
         return usgen
 
     def randompages(self, step=None, total=1, namespaces=None,
@@ -2515,31 +2552,19 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
     # catalog of editpage error codes, for use in generating messages
     _ep_errors = {
         "noapiwrite": "API editing not enabled on %(site)s wiki",
-        "writeapidenied":
-"User %(user)s is not authorized to edit on %(site)s wiki",
-        "protectedtitle":
-"Title %(title)s is protected against creation on %(site)s",
-        "cantcreate":
-"User %(user)s not authorized to create new pages on %(site)s wiki",
-        "cantcreate-anon":
-"""Bot is not logged in, and anon users are not authorized to create new pages
-on %(site)s wiki""",
+        "writeapidenied": "User %(user)s is not authorized to edit on %(site)s wiki",
+        "protectedtitle": "Title %(title)s is protected against creation on %(site)s",
+        "cantcreate": "User %(user)s not authorized to create new pages on %(site)s wiki",
+        "cantcreate-anon": """Bot is not logged in, and anon users are not authorized to create new pages on %(site)s wiki""",
         "articleexists": "Page %(title)s already exists on %(site)s wiki",
-        "noimageredirect-anon":
-"""Bot is not logged in, and anon users are not authorized to create image
-redirects on %(site)s wiki""",
-        "noimageredirect":
-"User %(user)s not authorized to create image redirects on %(site)s wiki",
-        "spamdetected":
-"Edit to page %(title)s rejected by spam filter due to content:\n",
+        "noimageredirect-anon": """Bot is not logged in, and anon users are not authorized to create image redirects on %(site)s wiki""",
+        "noimageredirect": "User %(user)s not authorized to create image redirects on %(site)s wiki",
+        "spamdetected": "Edit to page %(title)s rejected by spam filter due to content:\n",
         "filtered": "%(info)s",
         "contenttoobig": "%(info)s",
-        "noedit-anon":
-"""Bot is not logged in, and anon users are not authorized to edit on
-%(site)s wiki""",
+        "noedit-anon": """Bot is not logged in, and anon users are not authorized to edit on %(site)s wiki""",
         "noedit": "User %(user)s not authorized to edit pages on %(site)s wiki",
-        "pagedeleted":
-"Page %(title)s has been deleted since last retrieved from %(site)s wiki",
+        "pagedeleted": "Page %(title)s has been deleted since last retrieved from %(site)s wiki",
         "editconflict": "Page %(title)s not saved due to edit conflict.",
     }
 
@@ -2609,7 +2634,7 @@ redirects on %(site)s wiki""",
         elif watch:
             pywikibot.warning(
                 u"editpage: Invalid watch value '%(watch)s' ignored."
-                  % locals())
+                % locals())
 ## FIXME: API gives 'badmd5' error
 ##        md5hash = md5()
 ##        md5hash.update(urllib.quote_plus(text.encode(self.encoding())))
@@ -2623,8 +2648,7 @@ redirects on %(site)s wiki""",
             except api.APIError, err:
                 self.unlock_page(page)
                 if err.code.endswith("anon") and self.logged_in():
-                    pywikibot.debug(
-u"editpage: received '%s' even though bot is logged in" % err.code,
+                    pywikibot.debug(u"editpage: received '%s' even though bot is logged in" % err.code,
                                     _logger)
                 errdata = {
                     'site': self,
@@ -2634,7 +2658,7 @@ u"editpage: received '%s' even though bot is logged in" % err.code,
                 }
                 if err.code == "spamdetected":
                     raise SpamfilterError(self._ep_errors[err.code] % errdata
-                            + err.info[ err.info.index("fragment: ") + 9: ])
+                                          + err.info[err.info.index("fragment: ") + 9:])
 
                 if err.code == "editconflict":
                     raise EditConflict(self._ep_errors[err.code] % errdata)
@@ -2644,7 +2668,7 @@ u"editpage: received '%s' even though bot is logged in" % err.code,
                     raise Error(self._ep_errors[err.code] % errdata)
                 pywikibot.debug(
                     u"editpage: Unexpected error code '%s' received."
-                        % err.code,
+                    % err.code,
                     _logger)
                 raise
             assert ("edit" in result and "result" in result["edit"]), result
@@ -2653,7 +2677,7 @@ u"editpage: received '%s' even though bot is logged in" % err.code,
                 if "nochange" in result["edit"]:
                     # null edit, page not changed
                     pywikibot.log(u"Page [[%s]] saved without any changes."
-                                    % page.title())
+                                  % page.title())
                     return True
                 page._revid = result["edit"]["newrevid"]
                 # see http://www.mediawiki.org/wiki/API:Wikimania_2006_API_discussion#Notes
@@ -2675,8 +2699,8 @@ u"editpage: received '%s' even though bot is logged in" % err.code,
                     else:
                         self.unlock_page(page)
                         pywikibot.error(
-                    u"editpage: unknown CAPTCHA response %s, page not saved"
-                                          % captcha)
+                            u"editpage: unknown CAPTCHA response %s, page not saved"
+                            % captcha)
                         return False
                 else:
                     self.unlock_page(page)
@@ -2686,8 +2710,8 @@ u"editpage: received '%s' even though bot is logged in" % err.code,
             else:
                 self.unlock_page(page)
                 pywikibot.error(
-u"editpage: Unknown result code '%s' received; page not saved"
-                                   % result["edit"]["result"])
+                    u"editpage: Unknown result code '%s' received; page not saved"
+                    % result["edit"]["result"])
                 pywikibot.log(str(result))
                 return False
 
@@ -2759,8 +2783,8 @@ u"editpage: Unknown result code '%s' received; page not saved"
         except api.APIError, err:
             if err.code.endswith("anon") and self.logged_in():
                 pywikibot.debug(
-u"movepage: received '%s' even though bot is logged in" % err.code,
-                                _logger)
+                    u"movepage: received '%s' even though bot is logged in" % err.code,
+                    _logger)
             errdata = {
                 'site': self,
                 'oldtitle': oldtitle,
@@ -2772,7 +2796,7 @@ u"movepage: received '%s' even though bot is logged in" % err.code,
             if err.code in self._mv_errors:
                 raise Error(self._mv_errors[err.code] % errdata)
             pywikibot.debug(u"movepage: Unexpected error code '%s' received."
-                                 % err.code,
+                            % err.code,
                             _logger)
             raise
         finally:
@@ -2823,9 +2847,9 @@ u"movepage: received '%s' even though bot is logged in" % err.code,
                   u"Rollback of %s aborted; only one user in revision history."
                    % page.title(asLink=True))
         summary = summary or (
-u"Reverted edits by [[Special:Contributions/%(last_user)s|%(last_user)s]] "
-u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
-                  % locals())
+            u"Reverted edits by [[Special:Contributions/%(last_user)s|%(last_user)s]] ""
+            u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
+            % locals())
         token = self.token(page, "rollback")
         self.lock_page(page)
         req = api.Request(site=self, action="rollback",
@@ -2843,7 +2867,7 @@ u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             if err.code in self._rb_errors:
                 raise Error(self._rb_errors[err.code] % errdata)
             pywikibot.debug(u"rollback: Unexpected error code '%s' received."
-                              % err.code,
+                            % err.code,
                             _logger)
             raise
         finally:
