@@ -940,6 +940,3 @@ class WikimediaFamily(Family):
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
-
-    def protocol(self, code):
-        return 'https'
