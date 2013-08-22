@@ -289,6 +289,10 @@ class Request(object, DictMixin):
                 pywikibot.log(u"Caught HTTP 504 error; retrying")
                 self.wait()
                 continue
+            except FatalServerError:
+                # This error is not going to be fixed by just waiting
+                pywikibot.error(traceback.format_exc())
+                raise
             #TODO: what other exceptions can occur here?
             except Exception, e:
                 # for any other error on the http request, wait and retry
