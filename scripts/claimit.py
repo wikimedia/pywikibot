@@ -18,6 +18,7 @@ import json
 import pywikibot
 from pywikibot import pagegenerators
 
+
 class ClaimRobot:
     """
     A bot to add Wikidata claims
@@ -43,7 +44,8 @@ class ClaimRobot:
         source_values = json.loads(page.get())
         source_values = source_values['wikipedia']
         for lang in source_values:
-            source_values[lang] = pywikibot.ItemPage(self.repo, source_values[lang])
+            source_values[lang] = pywikibot.ItemPage(self.repo,
+                                                     source_values[lang])
 
         if lang in source_values:
             self.source = pywikibot.Claim(self.repo, 'p143')
@@ -58,18 +60,22 @@ class ClaimRobot:
             pywikibot.output('Processing %s' % page)
             if not item.exists():
                 pywikibot.output('%s doesn\'t have a wikidata item :(' % page)
-                #TODO FIXME: We should provide an option to create the page
+                # TODO FIXME: We should provide an option to create the page
             else:
                 for claim in self.claims:
                     if claim.getID() in item.get().get('claims'):
-                        pywikibot.output(u'A claim for %s already exists. Skipping' % (claim.getID(),))
+                        pywikibot.output(
+                            u'A claim for %s already exists. Skipping'
+                            % (claim.getID(),))
                         #TODO FIXME: This is a very crude way of dupe checking
                     else:
-                        pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget()))
+                        pywikibot.output('Adding %s --> %s'
+                                         % (claim.getID(), claim.getTarget()))
                         item.addClaim(claim)
                         if self.source:
                             claim.addSource(self.source, bot=True)
-                        #TODO FIXME: We need to check that we aren't adding a duplicate           
+                        # TODO FIXME: We need to check that we aren't adding a
+                        # duplicate
 
 
 def main():
@@ -85,14 +91,16 @@ def main():
 
     repo = pywikibot.Site().data_repository()
 
-    for i in xrange (0, len(commandline_claims), 2):
+    for i in xrange(0, len(commandline_claims), 2):
         claim = pywikibot.Claim(repo, commandline_claims[i])
         if claim.getType() == 'wikibase-item':
-            target = pywikibot.ItemPage(repo, commandline_claims[i+1])
+            target = pywikibot.ItemPage(repo, commandline_claims[i + 1])
         elif claim.getType() == 'string':
-            target = commandline_claims[i+1]
+            target = commandline_claims[i + 1]
         else:
-            raise NotImplementedError("%s datatype is not yet supported by claimit.py" % claim.getType())
+            raise NotImplementedError(
+                "%s datatype is not yet supported by claimit.py"
+                % claim.getType())
         claim.setTarget(target)
         claims.append(claim)
 
@@ -100,7 +108,7 @@ def main():
     if not generator:
         # FIXME: Should throw some help
         return
-    
+
     bot = ClaimRobot(generator, claims)
     bot.run()
 
