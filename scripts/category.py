@@ -639,7 +639,7 @@ class CategoryTidyRobot:
             contextLength = 500
         if full_text.startswith(u'[['):  # probably an image
             # Add extra paragraph.
-            contextLength = full_text.find('\n\n', contextLength+2)
+            contextLength = full_text.find('\n\n', contextLength + 2)
         if contextLength > 1000 or contextLength < 0:
             contextLength = 500
         print
