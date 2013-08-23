@@ -11,16 +11,16 @@ class Family(family.WikimediaFamily):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'mg', 'fr', 'zh', 'lt', 'ru', 'el', 'pl', 'ko', 'sv', 'tr',
-            'de', 'nl', 'ku', 'ta', 'kn', 'io', 'fi', 'vi', 'hu', 'pt', 'es',
-            'ml', 'no', 'my', 'id', 'it', 'li', 'et', 'ja', 'te', 'fa', 'ro',
-            'cs', 'ca', 'ar', 'eu', 'jv', 'gl', 'lo', 'uk', 'chr', 'fj', 'br',
+            'en', 'mg', 'fr', 'zh', 'lt', 'ru', 'el', 'pl', 'ko', 'sv', 'de',
+            'tr', 'nl', 'ku', 'ta', 'es', 'kn', 'io', 'fi', 'vi', 'hu', 'pt',
+            'no', 'ml', 'my', 'id', 'it', 'chr', 'li', 'et', 'ja', 'te', 'fa',
+            'ro', 'cs', 'ca', 'ar', 'eu', 'jv', 'gl', 'lo', 'uk', 'fj', 'br',
             'bg', 'eo', 'hr', 'oc', 'is', 'vo', 'th', 'ps', 'zh-min-nan',
-            'simple', 'cy', 'scn', 'sr', 'af', 'ast', 'sw', 'fy', 'tl', 'uz',
+            'simple', 'cy', 'scn', 'sr', 'af', 'ast', 'sw', 'fy', 'uz', 'tl',
             'da', 'he', 'nn', 'ur', 'wa', 'la', 'az', 'hy', 'sq', 'sm', 'sl',
             'nah', 'pnb', 'hi', 'ka', 'bs', 'tt', 'lb', 'lv', 'tk', 'sk', 'hsb',
-            'kk', 'ky', 'mk', 'km', 'nds', 'be', 'ga', 'wo', 'ms', 'ang', 'co',
-            'gn', 'mr', 'sa', 'csb', 'st', 'ia', 'sd', 'sh', 'si', 'tg', 'ug',
+            'kk', 'ky', 'mk', 'km', 'be', 'nds', 'ga', 'wo', 'ms', 'ang', 'co',
+            'gn', 'mr', 'sa', 'csb', 'st', 'ia', 'sd', 'sh', 'si', 'ug', 'tg',
             'mn', 'kl', 'or', 'jbo', 'an', 'ln', 'fo', 'zu', 'gu', 'kw', 'gv',
             'rw', 'qu', 'vec', 'ss', 'ie', 'mt', 'om', 'bn', 'roa-rup', 'iu',
             'pa', 'so', 'am', 'su', 'za', 'gd', 'mi', 'tpi', 'ne', 'yi', 'ti',
