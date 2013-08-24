@@ -27,8 +27,9 @@ import urlparse
 import logging
 import atexit
 
+from httplib2 import SSLHandshakeError
 from pywikibot import config
-from pywikibot.exceptions import Server504Error
+from pywikibot.exceptions import FatalServerError, Server504Error
 import pywikibot
 import cookielib
 import threadedhttp
@@ -38,6 +39,11 @@ _logger = "comm.http"
 
 
 # global variables
+
+# The OpenSSL error code for
+#   certificate verify failed
+# cf. `openssl errstr 14090086`
+SSL_CERT_VERIFY_FAILED = ":14090086:"
 
 # the User-agent: header. The default is
 # '<script>/<revision> Pywikipediabot/2.0', where '<script>' is the currently
@@ -112,6 +118,10 @@ def request(site, uri, ssl=False, *args, **kwargs):
     request.lock.acquire()
 
     #TODO: do some error correcting stuff
+    if isinstance(request.data, SSLHandshakeError):
+        if SSL_CERT_VERIFY_FAILED in str(request.data):
+            raise FatalServerError(str(request.data))
+
     #if all else fails
     if isinstance(request.data, Exception):
         raise request.data
