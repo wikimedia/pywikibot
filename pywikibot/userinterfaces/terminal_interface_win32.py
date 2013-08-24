@@ -37,6 +37,7 @@ windowsColors = {
 
 colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(windowsColors.keys()))
 
+
 # Compat for python <= 2.5
 class Win32BaseUI(terminal_interface_base.UI):
     def __init__(self):
