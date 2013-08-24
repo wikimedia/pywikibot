@@ -307,7 +307,7 @@ class CosmeticChangesToolkit:
             allstars.sort()
             for element in allstars:
                 text += '%s%s' % (element.strip(), config.line_separator)
-                pywikibot.log(u'%s' %element.strip())
+                pywikibot.log(u'%s' % element.strip())
         # Adding the interwiki
         if interwikiLinks:
             text = pywikibot.replaceLanguageLinks(text, interwikiLinks,
@@ -461,9 +461,9 @@ class CosmeticChangesToolkit:
                     # Check if we can create a link with trailing characters
                     # instead of a pipelink
                     elif len(titleWithSection) <= len(label) and \
-                         label[:len(titleWithSection)] == titleWithSection and \
-                         re.sub(trailR, '',
-                                label[len(titleWithSection):]) == '':
+                             label[:len(titleWithSection)] == titleWithSection \
+                             and re.sub(trailR, '',
+                                        label[len(titleWithSection):]) == '':
                         newLink = "[[%s]]%s" % (label[:len(titleWithSection)],
                                                 label[len(titleWithSection):])
                     else:
