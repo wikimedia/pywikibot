@@ -291,26 +291,27 @@ def translate(code, xdict, parameters=None, fallback=True):
         return trans
 
     # else we check for PLURAL variants
-    try:
-        selector, variants = re.search(PLURAL_PATTERN, trans).groups()
-    except AttributeError:
-        pass
-    else:  # we found PLURAL patterns, process it
-        if type(parameters) == dict:
-            num = param[selector]
-        elif isinstance(parameters, basestring):
-            num = int(parameters)
-        else:
-            num = parameters
-        # TODO: check against plural_rules[lang]['nplurals']
+    while re.search(PLURAL_PATTERN, trans):
         try:
-            index = plural_rules[code]['plural'](num)
-        except KeyError:
-            index = plural_rules['_default']['plural'](num)
-        except TypeError:
-            # we got an int, not a function
-            index = plural_rules[code]['plural']
-        trans = re.sub(PLURAL_PATTERN, variants.split('|')[index], trans)
+            selector, variants = re.search(PLURAL_PATTERN, trans).groups()
+        except AttributeError:
+            pass
+        else:  # we found PLURAL patterns, process it
+            if type(parameters) == dict:
+                num = param[selector]
+            elif isinstance(parameters, basestring):
+                num = int(parameters)
+            else:
+                num = parameters
+            # TODO: check against plural_rules[lang]['nplurals']
+            try:
+                index = plural_rules[code]['plural'](num)
+            except KeyError:
+                index = plural_rules['_default']['plural'](num)
+            except TypeError:
+                # we got an int, not a function
+                index = plural_rules[code]['plural']
+            trans = re.sub(PLURAL_PATTERN, variants.split('|')[index], trans, count=1)
     if param:
         try:
             return trans % param
