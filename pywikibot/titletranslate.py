@@ -13,6 +13,7 @@ import re
 import pywikibot
 import pywikibot.date as date
 
+
 def translate(page, hints=None, auto=True, removebrackets=False, site=None, family=None):
     """
     Goes through all entries in 'hints'. Returns a list of pages.
@@ -45,7 +46,7 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None, fami
                 # be a page in language xy with the same title as the page
                 # we're currently working on ...
                 if page is None:
-                   continue
+                    continue
                 ns = page.namespace()
                 if ns:
                     newname = u'%s:%s' % (family.namespace('_default', ns),
@@ -95,13 +96,13 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None, fami
                     % (page.title(), dictName, value))
                 for entryLang, entry in date.formats[dictName].iteritems():
                     if entryLang != page.site.code:
-                        if dictName == 'yearsBC' and \
-                           entryLang in date.maxyearBC and \
-                           value > date.maxyearBC[entryLang]:
+                        if (dictName == 'yearsBC' and
+                                entryLang in date.maxyearBC and
+                                value > date.maxyearBC[entryLang]):
                             pass
-                        elif dictName == 'yearsAD' and \
-                             entryLang in date.maxyearAD and \
-                             value > date.maxyearAD[entryLang]:
+                        elif (dictName == 'yearsAD' and
+                              entryLang in date.maxyearAD and
+                              value > date.maxyearAD[entryLang]):
                             pass
             else:
                             newname = entry(value)
@@ -110,14 +111,16 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None, fami
                                 pywikibot.getSite(code=entryLang,
                                                   fam=site.family))
                             if x not in result:
-                                result.append(x) # add new page
+                                result.append(x)  # add new page
     return result
 
 bcDateErrors = [u'[[ko:%d년]]']
 
-def appendFormatedDates( result, dictName, value ):
+
+def appendFormatedDates(result, dictName, value):
     for code, func in date.formats[dictName].iteritems():
-        result.append( u'[[%s:%s]]' % (code,func(value)) )
+        result.append(u'[[%s:%s]]' % (code, func(value)))
+
 
 def getPoisonedLinks(pl):
     """Returns a list of known corrupted links that should be removed if seen
@@ -127,11 +130,11 @@ def getPoisonedLinks(pl):
     pywikibot.output(u'getting poisoned links for %s' % pl.title())
     dictName, value = date.getAutoFormat(pl.site.code, pl.title())
     if dictName is not None:
-        pywikibot.output( u'date found in %s' % dictName )
+        pywikibot.output(u'date found in %s' % dictName)
         # errors in year BC
         if dictName in date.bcFormats:
             for fmt in bcDateErrors:
-                result.append( fmt % value )
+                result.append(fmt % value)
         # i guess this is like friday the 13th for the years
         if value == 398 and dictName == 'yearsBC':
             appendFormatedDates(result, dictName, 399)
