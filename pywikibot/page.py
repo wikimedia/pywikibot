@@ -2693,7 +2693,6 @@ class Claim(PropertyPage):
         self.qualifiers = {}
         self.target = None
         self.snaktype = 'value'
-        self.rank = 'normal'
         self.on_item = None  # The item it's on
 
     @staticmethod
@@ -2723,7 +2722,6 @@ class Claim(PropertyPage):
             else:
                 #This covers string type
                 claim.target = data['mainsnak']['datavalue']['value']
-        claim.rank = data['rank']
         if 'references' in data:
             for source in data['references']:
                 claim.sources.append(Claim.referenceFromJSON(site, source))
@@ -2757,6 +2755,7 @@ class Claim(PropertyPage):
         """
         wrap = {'mainsnak': data}
         return Claim.fromJSON(site, wrap)
+
 
     def setTarget(self, value):
         """
@@ -2793,12 +2792,6 @@ class Claim(PropertyPage):
         """
         return self.target
 
-    def getRank(self):
-        return self.rank
-
-    def setRank(self):
-        raise NotImplementedError
-
     def getSnakType(self):
         """
         Returns the "snaktype"
@@ -2829,9 +2822,8 @@ class Claim(PropertyPage):
 
     def addSource(self, source, **kwargs):
         """
-        Adds a reference to the current claim
-        @param source: reference to add
-        @type source: pywikibot.Claim
+        source is a Claim.
+        adds it as a reference.
         """
         data = self.repo.editSource(self, source, new=True, **kwargs)
         source.hash = data['reference']['hash']
@@ -2841,7 +2833,6 @@ class Claim(PropertyPage):
     def _formatDataValue(self):
         """
         Format the target into the proper JSON datavalue that Wikibase wants
-        @return: dict|basestring
         """
         if self.getType() == 'wikibase-item':
             value = {'entity-type': 'item',
@@ -2855,32 +2846,6 @@ class Claim(PropertyPage):
         else:
             raise NotImplementedError('%s datatype is not supported yet.' % self.getType())
         return value
-
-    def _buildMainSnak(self):
-        """
-        Builds the full mainsnak that Wikibase wants
-        @return: dict
-        """
-        if self.getType() == 'wikibase-item':
-            datavalue = {
-                'type': 'wikibase-entityid',
-                'value': self._formatDataValue()
-            }
-        elif self.getType() in ['string', 'commonsMedia']:
-            datavalue = {
-                'type': 'string',
-                'value': self._formatDataValue()
-            }
-        elif self.getType() == 'globecoordinate':
-            datavalue = {
-                'type': 'globecoordinate',
-                'value': self._formatDataValue()
-            }
-        else:
-            raise NotImplementedError('%s datatype is not supported yet.' % self.getType())
-        return datavalue
-
-
 
 
 

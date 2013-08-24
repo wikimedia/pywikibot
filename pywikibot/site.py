@@ -17,7 +17,6 @@ except ImportError:
 import datetime
 import itertools
 import os
-from random import randint
 import re
 import sys
 import threading
@@ -3461,85 +3460,6 @@ class DataSite (APISite):
             item.claims[claim.getID()] = [claim]
         item.lastrevid = data['pageinfo']['lastrevid']
 
-    def setClaim(self, item, claim, bot=True, **kwargs):
-        """
-        Implementation of wbsetclaim
-        The advantage of using this is that we can create
-        the reference in the same edit as adding the claim
-        @param item: Item to add a claim on
-        @type item: pywikibot.ItemPage
-        @param claim: Claim to add. This claim can have references
-        @type claim: pywikibot.Claim
-        @param bot: Mark edit as bot
-        @type bot: bool
-        @return: dict
-        """
-        if claim.getSnakType() != 'value':
-            raise NotImplementedError
-        # Assemble the claim thingy
-        data = {
-            'id': self.generateGUID(item),
-            'mainsnak': {
-                'snaktype': claim.getSnakType(),
-                'property': claim.getID(),
-                'datavalue': claim._buildMainSnak(),
-            },
-            'type': 'statement',
-            'rank': claim.getRank(),
-            'references': [],
-        }
-        if claim.sources:
-            # FIXME: Only the first ref will be added
-            ref = claim.sources[0]
-            data['references'].append({
-                'snaks': {
-                    ref.getID(): [{
-                        'snaktype': 'value',  # FIXME: Support multiple snaktypes
-                        'property': ref.getID(),
-                        'datavalue': ref._buildMainSnak(),
-                    }]
-                }
-            })
-
-        params = {
-            'action': 'wbsetclaim',
-            'claim': json.dumps(data),
-            'token': self.token(item, 'edit'),
-            'baserevid': item.lastrevid,
-        }
-        if bot:
-            params['bot'] = 1
-
-        req = api.Request(site=self, **params)
-        data = req.submit()
-        if claim.getID() in item.claims:
-            item.claims[claim.getID()].append(claim)
-        else:
-            item.claims[claim.getID()] = [claim]
-        item.lastrevid = data['pageinfo']['lastrevid']
-        claim.on_item = item
-
-    def generateGUID(self, item):
-        """
-        Function to generate a random GUID, converted from the
-        one in Wikibase in PHP
-        @param item: item the guid is for
-        @type item: pywikibot.ItemPage
-        @return: str
-        """
-        fmt = '{0:04X}{0:04X}-{0:04X}-{0:04X}-{0:04X}-{0:04X}{0:04X}{0:04X}'
-        string = fmt.format(
-            randint(0, 65535),
-            randint(0, 65535),
-            randint(0, 65535),
-            randint(16384, 20479),
-            randint(32768, 49151),
-            randint(0, 65535),
-            randint(0, 65535),
-            randint(0, 65535),
-        )
-        return item.getID() + '$' + string
-
     @must_be(group='user')
     def changeClaimTarget(self, claim, snaktype='value', bot=True, **kwargs):
         """
@@ -3590,7 +3510,16 @@ class DataSite (APISite):
         if not new and hasattr(source, 'hash'):
             params['reference'] = source.hash
         #build up the snak
-        datavalue = source._buildMainSnak()
+        if source.getType() == 'wikibase-item':
+            datavalue = {'type': 'wikibase-entityid',
+                         'value': source._formatDataValue(),
+                         }
+        elif source.getType() == 'string':
+            datavalue = {'type': 'string',
+                         'value': source._formatDataValue(),
+                         }
+        else:
+            raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
         snak = {source.getID(): [{'snaktype': 'value',
                                   'property': source.getID(),
                                   'datavalue': datavalue,
