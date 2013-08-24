@@ -119,9 +119,11 @@ class SpamfilterError(PageNotSaved):
 class ServerError(Error):
     """Got unexpected server response"""
 
+
 class FatalServerError(ServerError):
     """A fatal server error that's not going to be corrected by just sending
     the request again."""
+
 
 class Server504Error(Error):
     """Server timed out with http 504 code"""
