@@ -90,6 +90,7 @@ def BACK(site, name, hide):
     return [page for page in p.getReferences(follow_redirects=False,
                                              onlyTemplateInclusion=True)]
 
+
 def DATA(site, name, hide):
     dp = pywikibot.ItemPage(site.data_repository(), name)
     try:
@@ -266,7 +267,7 @@ class FeaturedBot(pywikibot.Bot):
         if not self.getOption('nocache') is True:
             pywikibot.output(u'Writing %d items to cache file %s.'
                              % (len(self.cache), self.filename))
-            f = open(self.filename,"wb")
+            f = open(self.filename, "wb")
             pickle.dump(self.cache, f)
             f.close()
         self.cache = dict()
@@ -299,10 +300,10 @@ class FeaturedBot(pywikibot.Bot):
             dp.get()
 
             ### Quick and dirty hack - any ideas?
-            self.fromlang =  [key.replace('wiki', '').replace('_', '-')
-                              for key in dp.sitelinks.keys()]
+            self.fromlang = [key.replace('wiki', '').replace('_', '-')
+                             for key in dp.sitelinks.keys()]
         else:
-            return  ### 2DO
+            return  # 2DO
         self.fromlang.sort()
         self.readcache(task)
         for code in self.fromlang:
@@ -334,10 +335,10 @@ class FeaturedBot(pywikibot.Bot):
             dp.get()
 
             ### Quick and dirty hack - any ideas?
-            self.fromlang =  [key.replace('wiki', '').replace('_', '-')
-                              for key in dp.sitelinks.keys()]
+            self.fromlang = [key.replace('wiki', '').replace('_', '-')
+                             for key in dp.sitelinks.keys()]
         else:
-            return  ### 2DO
+            return  # 2DO
         self.fromlang.sort()
         self.readcache(task)
         for code in self.fromlang:
@@ -403,7 +404,6 @@ class FeaturedBot(pywikibot.Bot):
                                                          cache[p.title()]))
                 continue
             yield copy(p)
-
 
     def findTranslated(self, page, oursite=None):
         quiet = self.getOption('quiet')
@@ -473,7 +473,6 @@ class FeaturedBot(pywikibot.Bot):
         pywikibot.output(u"%s -> back interwiki ref target is %s"
                          % (page.title(), backpage.title()))
 
-
     def getTemplateList(self, lang, task):
         add_templates = []
         remove_templates = []
@@ -522,7 +521,7 @@ class FeaturedBot(pywikibot.Bot):
             return re.compile(ur"\{\{%s\|%s\}\}"
                               % (findtemplate.replace(u' ', u'[ _]'),
                                  site.code), re.IGNORECASE)
-            
+
         quiet = self.getOption('quiet')
         tosite = self.site
         if not fromsite.lang in self.cache:
@@ -601,7 +600,6 @@ class FeaturedBot(pywikibot.Bot):
                                      % atrans.title())
                 except pywikibot.PageNotSaved, e:
                     pywikibot.output(u"Page not saved")
-
 
 
 def main(*args):
