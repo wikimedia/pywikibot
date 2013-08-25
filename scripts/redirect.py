@@ -56,7 +56,7 @@ and arguments can be:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id$'
+__version__ = '$Id$'
 #
 import re
 import datetime
@@ -120,7 +120,7 @@ class RedirectGenerator:
                             or target.startswith(':%s:' % code):
                         if code == self.site.language():
                         # link to our wiki, but with the lang prefix
-                            target = target[(len(code)+1):]
+                            target = target[(len(code) + 1):]
                             if target.startswith(':'):
                                 target = target[1:]
                         else:
@@ -168,8 +168,8 @@ class RedirectGenerator:
             if self.api_step:
                 gen.set_query_increment(self.api_step)
             for p in gen:
-                done = self.api_until \
-                           and p.title(withNamespace=False) >= self.api_until
+                done = (self.api_until and
+                        p.title(withNamespace=False) >= self.api_until)
                 if done:
                     return
                 yield p
@@ -323,8 +323,8 @@ class RedirectGenerator:
 
         if self.offset <= 0:
             self.offset = 1
-        start = datetime.datetime.utcnow() - \
-                datetime.timedelta(0, self.offset * 3600)
+        start = (datetime.datetime.utcnow() -
+                 datetime.timedelta(0, self.offset * 3600))
         # self.offset hours ago
         offset_time = start.strftime("%Y%m%d%H%M%S")
         pywikibot.output(u'Retrieving %s moved pages via API...'
@@ -406,12 +406,9 @@ class RedirectRobot:
                     try:
                         redir_page.delete(reason, prompt=False)
                     except pywikibot.NoUsername:
-                        if (i18n.twhas_key(
-                            targetPage.site.lang,
-                            'redirect-broken-redirect-template') and
-                            i18n.twhas_key(targetPage.site.lang,
-                                           'redirect-remove-broken')) or \
-                                           targetPage.site.lang == '-':
+                        if ((i18n.twhas_key(targetPage.site.lang, 'redirect-broken-redirect-template') and
+                             i18n.twhas_key(targetPage.site.lang, 'redirect-remove-broken')
+                             ) or targetPage.site.lang == '-'):
                             pywikibot.output(u"No sysop in user-config.py, "
                                              u"put page to speedy deletion.")
                             content = redir_page.get(get_redirect=True)
@@ -420,7 +417,7 @@ class RedirectRobot:
                             content = i18n.twtranslate(
                                 targetPage.site.lang,
                                 'redirect-broken-redirect-template'
-                                ) + "\n" + content
+                            ) + "\n" + content
                             redir_page.put(content, reason)
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u"Redirect target %s is also a redirect! "
@@ -472,7 +469,7 @@ class RedirectRobot:
             except pywikibot.CircularRedirect, e:
                 try:
                     pywikibot.warning(u"Skipping circular redirect: [[%s]]"
-                                       % str(e))
+                                      % str(e))
                 except UnicodeDecodeError:
                     pywikibot.warning(u"Skipping circular redirect")
                 break
@@ -526,7 +523,7 @@ class RedirectRobot:
                     pywikibot.warning(
                         u'Redirect target %s forms a redirect loop.'
                         % targetPage.title(asLink=True))
-                    break  ### doesn't work. edits twice!
+                    break  # doesn't work. edits twice!
 ##                    try:
 ##                        content = targetPage.get(get_redirect=True)
 ##                    except pywikibot.SectionError:
@@ -696,8 +693,11 @@ def main(*args):
         else:
             pywikibot.output(u'Unknown argument: %s' % arg)
 
-    if not action or (xmlFilename and moved_pages) \
-                  or (fullscan and xmlFilename):
+    if (
+        (not action) or
+        (xmlFilename and moved_pages) or
+        (fullscan and xmlFilename)
+    ):
         pywikibot.showHelp('redirect')
     else:
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
