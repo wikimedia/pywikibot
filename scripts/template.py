@@ -104,13 +104,16 @@ pages:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id$'
+__version__ = '$Id$'
 #
-import re, sys, string
+import re
+import sys
+import string
 import pywikibot
 from pywikibot import i18n
 from pywikibot import config, pagegenerators, catlib
 from scripts import replace
+
 
 def UserEditFilterGenerator(generator, username, timestamp=None, skip=False):
     """
@@ -129,7 +132,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False):
         found = False
         for ed in editors:
             uts = pywikibot.Timestamp.fromISOformat(ed['timestamp'])
-            if not timestamp or uts>=ts:
+            if not timestamp or uts >= ts:
                 if username == ed['user']:
                     found = True
                     break
@@ -178,7 +181,7 @@ class XmlDumpTemplatePageGenerator:
             templatePatterns.append(templatePattern)
         templateRegex = re.compile(
             r'\{\{ *([mM][sS][gG]:)?(?:%s) *(?P<parameters>\|[^}]+|) *}}'
-                                   % '|'.join(templatePatterns))
+            % '|'.join(templatePatterns))
         for entry in dump.parse():
             if templateRegex.search(entry.text):
                 page = pywikibot.Page(mysite, entry.title)
@@ -191,8 +194,8 @@ class TemplateRobot:
     remove all occurences of the old template, or substitute them with the
     template's text.
     """
-    def __init__(self, generator, templates, subst = False, remove = False,
-                 editSummary = '', acceptAll = False, addedCat = None):
+    def __init__(self, generator, templates, subst=False, remove=False,
+                 editSummary='', acceptAll=False, addedCat=None):
         """
         Arguments:
             * generator    - A page generator.
@@ -216,9 +219,9 @@ class TemplateRobot:
                 site, u'%s:%s' % (site.namespace(14), self.addedCat))
 
         # get edit summary message if it's empty
-        if (self.editSummary==''):
+        if (self.editSummary == ''):
             Param = {'list': (', ').join(self.templates.keys()),
-                     'num' : len(self.templates)}
+                     'num': len(self.templates)}
             if self.remove:
                 self.editSummary = i18n.twntranslate(
                     site, 'template-removing', Param)
@@ -260,11 +263,11 @@ class TemplateRobot:
             if self.subst and self.remove:
                 replacements.append((templateRegex,
                                      '{{subst:%s\g<parameters>}}' % new))
-                exceptions['inside-tags']=['ref', 'gallery']
+                exceptions['inside-tags'] = ['ref', 'gallery']
             elif self.subst:
                 replacements.append((templateRegex,
                                      '{{subst:%s\g<parameters>}}' % old))
-                exceptions['inside-tags']=['ref', 'gallery']
+                exceptions['inside-tags'] = ['ref', 'gallery']
             elif self.remove:
                 replacements.append((templateRegex, ''))
             else:
@@ -276,6 +279,7 @@ class TemplateRobot:
                                           addedCat=self.addedCat,
                                           editSummary=self.editSummary)
         replaceBot.run()
+
 
 def main(*args):
     templateNames = []
@@ -349,8 +353,10 @@ u'Unless using solely -subst or -remove, you must give an even number of templat
         gen = genFactory.getCombinedGenerator()
     if not gen:
         gens = []
-        gens = [pagegenerators.ReferringPageGenerator(
-                    t, onlyTemplateInclusion=True) for t in oldTemplates]
+        gens = [
+            pagegenerators.ReferringPageGenerator(t, onlyTemplateInclusion=True)
+            for t in oldTemplates
+        ]
         gen = pagegenerators.CombinedPageGenerator(gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
 
