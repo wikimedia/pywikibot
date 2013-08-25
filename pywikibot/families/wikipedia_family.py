@@ -3,8 +3,8 @@ from pywikibot import family
 
 __version__ = '$Id$'
 
-# The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
+# The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 class Family(family.WikimediaFamily):
     def __init__(self):
         super(Family, self).__init__()
@@ -45,7 +45,6 @@ class Family(family.WikimediaFamily):
 
         self.langs = dict([(lang, '%s.wikipedia.org' % lang)
                            for lang in langs])
-
 
         self.category_redirect_templates = {
             '_default': (),

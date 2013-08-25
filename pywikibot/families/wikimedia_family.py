@@ -2,10 +2,10 @@
 
 __version__ = '$Id$'
 
-# The wikis of Chapters of the Wikimedia Foundation living at a xy.wikimedia.org url
-
 from pywikibot import family
 
+
+# The wikis of Chapters of the Wikimedia Foundation living at a xy.wikimedia.org url
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)

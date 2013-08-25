@@ -3,8 +3,8 @@ from pywikibot import family
 
 __version__ = '$Id$'
 
-# The Wikimedia family that is known as Wiktionary
 
+# The Wikimedia family that is known as Wiktionary
 class Family(family.WikimediaFamily):
     def __init__(self):
         super(Family, self).__init__()
@@ -71,7 +71,7 @@ class Family(family.WikimediaFamily):
             'ps', 'dv', 'ks', 'ne', 'pi', 'bh', 'mr', 'sa', 'hi', 'as', 'bn',
             'pa', 'pnb', 'gu', 'or', 'ta', 'te', 'kn', 'ml', 'si', 'th', 'lo',
             'dz', 'ka', 'ti', 'am', 'chr', 'iu', 'km', 'zh', 'ja', 'ko',
-           ]
+        ]
 
         self.interwiki_putfirst = {
             'da': self.alphabetic,

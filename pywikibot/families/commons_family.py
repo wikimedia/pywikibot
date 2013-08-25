@@ -4,8 +4,8 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-# The Wikimedia Commons family
 
+# The Wikimedia Commons family
 class Family(family.WikimediaFamily):
     def __init__(self):
         super(Family, self).__init__()

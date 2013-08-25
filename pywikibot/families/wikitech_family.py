@@ -4,8 +4,8 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-# The Wikitech family
 
+# The Wikitech family
 class Family(family.Family):
 
     def __init__(self):

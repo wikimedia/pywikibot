@@ -3,8 +3,8 @@ from pywikibot import family
 
 __version__ = '$Id$'
 
-# The Wikimedia family that is known as Wikisource
 
+# The Wikimedia family that is known as Wikisource
 class Family(family.WikimediaFamily):
     def __init__(self):
         super(Family, self).__init__()
@@ -45,11 +45,11 @@ class Family(family.WikimediaFamily):
         }
 
         self.obsolete = {
-            'ang': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
+            'ang': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
             'dk': 'da',
-            'ht': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
+            'ht': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
             'jp': 'ja',
-            'minnan':'zh-min-nan',
+            'minnan': 'zh-min-nan',
             'nb': 'no',
             'tokipona': None,
             'zh-tw': 'zh',
@@ -79,7 +79,7 @@ class Family(family.WikimediaFamily):
             'tr': [100],
             'vi': [102],
             'zh': [102],
-            }
+        }
 
         self.crossnamespace[0] = {
             '_default': self.authornamespaces,

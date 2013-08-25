@@ -3,6 +3,7 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
+
 # The official Beta Wiki.
 class Family(family.Family):
 

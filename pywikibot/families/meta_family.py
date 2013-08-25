@@ -4,8 +4,8 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-# The meta wikimedia family
 
+# The meta wikimedia family
 class Family(family.WikimediaFamily):
     def __init__(self):
         super(Family, self).__init__()
@@ -14,7 +14,7 @@ class Family(family.WikimediaFamily):
             'meta': 'meta.wikimedia.org',
         }
         self.interwiki_forward = 'wikipedia'
-        self.cross_allowed = ['meta',]
+        self.cross_allowed = ['meta', ]
 
     def ssl_pathprefix(self, code):
         return "/wikipedia/meta"

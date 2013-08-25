@@ -3,9 +3,9 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
+
 # The Battlestar Wiki family, a set of Battlestar wikis.
 # http://battlestarwiki.org/
-
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)
@@ -23,7 +23,7 @@ class Family(family.Family):
 
         alphabetic = ['de', 'en', 'es', 'fr', 'tr', 'zh']
 
-    def hostname(self,code):
+    def hostname(self, code):
         return '%s.battlestarwiki.org' % code
 
     def version(self, code):

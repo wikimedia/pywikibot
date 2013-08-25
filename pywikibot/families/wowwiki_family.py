@@ -53,6 +53,7 @@ class Family(family.Family):
 
         # Wikia's default CategorySelect extension always puts categories last
         self.categories_last = ['cs', 'da', 'de', 'el', 'en', 'es', 'fa', 'fi', 'fr', 'he', 'hr', 'hu', 'is', 'it', 'ja', 'ko', 'lt', 'lv', 'nl', 'no', 'pl', 'pt', 'pt-br', 'ro', 'ru', 'sk', 'sr', 'sv', 'tr', 'zh-tw', 'zh']
+
     def scriptpath(self, code):
         return ''
 

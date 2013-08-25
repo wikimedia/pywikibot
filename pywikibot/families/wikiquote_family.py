@@ -3,8 +3,8 @@ from pywikibot import family
 
 __version__ = '$Id$'
 
-# The Wikimedia family that is known as Wikiquote
 
+# The Wikimedia family that is known as Wikiquote
 class Family(family.WikimediaFamily):
     def __init__(self):
         super(Family, self).__init__()
@@ -22,7 +22,6 @@ class Family(family.WikimediaFamily):
 
         self.langs = dict([(lang, '%s.wikiquote.org' % lang)
                            for lang in self.languages_by_size])
-
 
         # attop is a list of languages that prefer to have the interwiki
         # links at the top of the page.
@@ -66,32 +65,32 @@ class Family(family.WikimediaFamily):
         }
 
         self.obsolete = {
-            'als': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Alemannic_Wikiquote
-            'ang': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=29150
-            'ast': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28964
-            'bm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikiquote
+            'als': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Alemannic_Wikiquote
+            'ang': None,  # https://bugzilla.wikimedia.org/show_bug.cgi?id=29150
+            'ast': None,  # https://bugzilla.wikimedia.org/show_bug.cgi?id=28964
+            'bm': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikiquote
             'co': None,
-            'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wikiquote
+            'cr': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wikiquote
             'dk': 'da',
-            'ga': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikiquote
+            'ga': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikiquote
             'jp': 'ja',
-            'kk': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
-            'kr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikiquote
-            'ks': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikiquote
-            'kw': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kernewek_Wikiquote
+            'kk': None,   # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
+            'kr': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikiquote
+            'ks': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikiquote
+            'kw': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kernewek_Wikiquote
             'lb': None,
-            'minnan':'zh-min-nan',
-            'na': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nauruan_Wikiquote
+            'minnan': 'zh-min-nan',
+            'na': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nauruan_Wikiquote
             'nb': 'no',
-            'nds': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Low_Saxon_Wikiquote
-            'qu': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikiquote
-            'simple': 'en', #http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Simple_English_(3)_Wikiquote
-            'tk': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Turkmen_Wikiquote
+            'nds': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Low_Saxon_Wikiquote
+            'qu': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikiquote
+            'simple': 'en',  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Simple_English_(3)_Wikiquote
+            'tk': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Turkmen_Wikiquote
             'tokipona': None,
-            'tt': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tatar_Wikiquote
-            'ug': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oyghurque_Wikiquote
-            'vo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Volapuk_Wikiquote
-            'za':None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zhuang_Wikiquote
+            'tt': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tatar_Wikiquote
+            'ug': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oyghurque_Wikiquote
+            'vo': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Volapuk_Wikiquote
+            'za': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zhuang_Wikiquote
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }
