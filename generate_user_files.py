@@ -52,7 +52,7 @@ def get_base_dir():
                 elif _win_version == 6:
                     base_dir = os.path.join(home, "AppData\\Roaming", NAME)
             else:
-                base_dir = os.path.join(home, "."+NAME)
+                base_dir = os.path.join(home, "." + NAME)
             if not os.path.isdir(base_dir):
                 os.makedirs(base_dir, mode=0700)
     if not os.path.isabs(base_dir):
