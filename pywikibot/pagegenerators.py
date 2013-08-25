@@ -797,13 +797,41 @@ def PreloadingGenerator(generator, step=50):
         site = page.site
         sites.setdefault(site, []).append(page)
         if len(sites[site]) >= step:
+            # if this site is at the step, process it
             group = sites[site]
             sites[site] = []
             for i in site.preloadpages(group, step):
                 yield i
     for site in sites:
         if sites[site]:
+            # process any leftover sites that never reached the step
             for i in site.preloadpages(sites[site], step):
+                yield i
+
+
+def PreloadingItemGenerator(generator, step=50):
+    """
+    Yield preloaded pages taken from another generator.
+
+    Function basically is copied from above, but for ItemPage's
+
+    @param generator: pages to iterate over
+    @param step: how many pages to preload at once
+    """
+    sites = {}
+    for page in generator:
+        site = page.site
+        sites.setdefault(site, []).append(page)
+        if len(sites[site]) >= step:
+            # if this site is at the step, process it
+            group = sites[site]
+            sites[site] = []
+            for i in site.preloaditempages(group, step):
+                yield i
+    for site in sites:
+        if sites[site]:
+            # process any leftover sites that never reached the step
+            for i in site.preloaditempages(sites[site], step):
                 yield i
 
 

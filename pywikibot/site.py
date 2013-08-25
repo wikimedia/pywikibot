@@ -3398,6 +3398,32 @@ class DataSite (APISite):
             raise pywikibot.data.api.APIError, data['errors']
         return data['entities']
 
+    def preloaditempages(self, pagelist, groupsize=50):
+        """Yields ItemPages with content prefilled.
+
+        Note that pages will be iterated in a different order
+        than in the underlying pagelist.
+
+        @param pagelist: an iterable that yields ItemPage objects
+        @param groupsize: how many pages to query at a time
+        @type groupsize: int
+        """
+        from pywikibot.tools import itergroup
+        for sublist in itergroup(pagelist, groupsize):
+            req = {'ids': [], 'titles': [], 'sites': []}
+            for p in sublist:
+                ident = p._defined_by()
+                for key in ident:
+                    req[key].append(ident[key])
+
+            req = api.Request(site=self, action='wbgetentities', **req)
+            data = req.submit()
+            for qid in data['entities']:
+                item = pywikibot.ItemPage(self, qid)
+                item._content = data['entities'][qid]
+                item.get()  # This parses the json and preloads the various properties
+                yield item
+
     def getPropertyType(self, prop):
         """
         This is used sepecifically because we can cache
