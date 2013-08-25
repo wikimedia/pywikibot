@@ -375,7 +375,8 @@ class CosmeticChangesToolkit:
                               'img_right', 'img_none', 'img_framed',
                               'img_frameless', 'img_border', 'img_upright', ]:
                 aliases = self.site.getmagicwords(magicWord)
-                if not aliases: continue
+                if not aliases:
+                    continue
                 text = pywikibot.replaceExcept(
                     text,
                     r'\[\[(?P<left>.+?:.+?\..+?\|) *(' + '|'.join(aliases) + \
@@ -460,10 +461,10 @@ class CosmeticChangesToolkit:
                         newLink = "[[%s]]" % label
                     # Check if we can create a link with trailing characters
                     # instead of a pipelink
-                    elif len(titleWithSection) <= len(label) and \
-                             label[:len(titleWithSection)] == titleWithSection \
-                             and re.sub(trailR, '',
-                                        label[len(titleWithSection):]) == '':
+                    elif (len(titleWithSection) <= len(label) and
+                          label[:len(titleWithSection)] == titleWithSection and
+                          re.sub(trailR, '', label[len(titleWithSection):]) == ''
+                          ):
                         newLink = "[[%s]]%s" % (label[:len(titleWithSection)],
                                                 label[len(titleWithSection):])
                     else:
@@ -472,8 +473,7 @@ class CosmeticChangesToolkit:
                         # don't capitalize nouns...
                         #if not self.site.nocapitalize:
                         if self.site.sitename() == 'wikipedia:de':
-                            titleWithSection = titleWithSection[0].upper() + \
-                                               titleWithSection[1:]
+                            titleWithSection = titleWithSection[0].upper() + titleWithSection[1:]
                         newLink = "[[%s|%s]]" % (titleWithSection, label)
                     # re-add spaces that were pulled out of the link.
                     # Examples:
@@ -879,7 +879,8 @@ class CosmeticChangesBot:
     def run(self):
         try:
             for page in self.generator:
-                if self.done: break
+                if self.done:
+                    break
                 self.treat(page)
         except KeyboardInterrupt:
             pywikibot.output('\nQuitting program...')
