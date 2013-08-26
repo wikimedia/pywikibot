@@ -52,6 +52,7 @@ from os.path import join
 from pywikibot import config, deprecate_arg
 from pywikibot.exceptions import NoSuchSite, NoUsername
 
+
 def main(*args):
     password = None
     sysop = False
@@ -60,7 +61,7 @@ def main(*args):
         if arg.startswith("-pass"):
             if len(arg) == 5:
                 password = pywikibot.input(u'Password for all accounts:',
-                                           password = True)
+                                           password=True)
             else:
                 password = arg[6:]
         elif arg == "-sysop":
