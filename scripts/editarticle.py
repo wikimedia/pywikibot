@@ -81,7 +81,7 @@ class ArticleEditor:
 
     def run(self):
         try:
-            old = self.page.get(get_redirect = self.options.edit_redirect)
+            old = self.page.get(get_redirect=self.options.edit_redirect)
         except pywikibot.NoPage:
             old = ""
         textEditor = TextEditor()
@@ -98,6 +98,7 @@ class ArticleEditor:
                 self.handle_edit_conflict(new)
         else:
             pywikibot.output(u"Nothing changed")
+
 
 def main(*args):
     app = ArticleEditor(*args)
