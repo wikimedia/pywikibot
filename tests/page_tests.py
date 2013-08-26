@@ -14,6 +14,8 @@ import unittest
 import pywikibot
 import pywikibot.page
 
+from utils import PywikibotTestCase
+
 site = pywikibot.Site('en', 'wikipedia')
 mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
 maintalk = pywikibot.Page(pywikibot.page.Link("Talk:Main Page", site))
@@ -109,11 +111,7 @@ class TestLinkObject(unittest.TestCase):
         self.assertNotEqual(hash(l1), hash(other))
 
 
-class TestPageObject(unittest.TestCase):
-    def assertType(self, obj, cls):
-        """Assert that obj is an instance of type cls"""
-        return self.assertTrue(isinstance(obj, cls))
-
+class TestPageObject(PywikibotTestCase):
     def testGeneral(self):
         self.assertEqual(str(mainpage), "[[%s:%s]]"
                                         % (site.lang, mainpage.title()))
@@ -290,38 +288,6 @@ class TestPageObject(unittest.TestCase):
             self.assertType(p, pywikibot.Category)
         for p in mainpage.extlinks():
             self.assertType(p, unicode)
-
-    def testWikibase(self):
-        if not site.has_transcluded_data:
-            return
-        repo = site.data_repository()
-        item = pywikibot.ItemPage.fromPage(mainpage)
-        self.assertType(item, pywikibot.ItemPage)
-        self.assertEqual(item.getID(), 'q5296')
-        self.assertEqual(item.title(), 'Q5296')
-        self.assertTrue('en' in item.labels)
-        self.assertEqual(item.labels['en'], 'Main Page')
-        self.assertTrue('en' in item.aliases)
-        self.assertTrue('HomePage' in item.aliases['en'])
-        self.assertEqual(item.namespace(), 0)
-        item2 = pywikibot.ItemPage(repo, 'q5296')
-        self.assertEqual(item2.getID(), 'q5296')
-        self.assertEqual(item.labels['en'], 'Main Page')
-        prop = pywikibot.PropertyPage(repo, 'Property:P21')
-        self.assertEqual(prop.getType(), 'wikibase-item')
-        self.assertEqual(prop.namespace(), 120)
-        claim = pywikibot.Claim(repo, 'p21')
-        self.assertRaises(ValueError, claim.setTarget, value="test")
-        claim.setTarget(pywikibot.ItemPage(repo, 'q1'))
-        self.assertEqual(claim._formatDataValue(), {'entity-type': 'item', 'numeric-id': 1})
-
-        # test WikibasePage.__cmp__
-        self.assertEqual(pywikibot.ItemPage.fromPage(mainpage), pywikibot.ItemPage(repo, 'q5296'))
-
-    def testItemPageExtensionability(self):
-        class MyItemPage(pywikibot.ItemPage):
-            pass
-        self.assertIsInstance(MyItemPage.fromPage(mainpage), MyItemPage)
 
 # methods that still need tests implemented or expanded:
 
