@@ -118,12 +118,14 @@ from __future__ import generators
 #
 # (C) Daniel Herding & the Pywikipedia team, 2004-2012
 #
-__version__='$Id$'
+__version__ = '$Id$'
 #
 # Distributed under the terms of the MIT license.
 #
 
-import sys, re, time
+import sys
+import re
+import time
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot import editor as editarticle
@@ -206,7 +208,7 @@ class XmlDumpReplacePageGenerator:
                     return True
         if "require-title" in self.exceptions:
             for req in self.exceptions['require-title']:
-                if not req.search(title): # if not all requirements are met:
+                if not req.search(title):  # if not all requirements are met:
                     return True
 
         return False
@@ -311,7 +313,7 @@ class ReplaceRobot:
         if "inside" in self.exceptions:
             exceptions += self.exceptions['inside']
         for old, new in self.replacements:
-            if self.sleep != None:
+            if self.sleep is not None:
                 time.sleep(self.sleep)
             new_text = pywikibot.replaceExcept(new_text, old, new, exceptions,
                                                allowoverlap=self.allowoverlap)
@@ -344,7 +346,7 @@ class ReplaceRobot:
                 if self.isTextExcepted(new_text):
                     pywikibot.output(
     u'Skipping %s because it contains text that is on the exceptions list.'
-                                     % page.title(asLink=True))
+    % page.title(asLink=True))
                     break
                 new_text = self.doReplacements(new_text)
                 if new_text == original_text:
@@ -353,7 +355,7 @@ class ReplaceRobot:
                     break
                 if self.recursive:
                     newest_text = self.doReplacements(new_text)
-                    while (newest_text!=new_text):
+                    while (newest_text != new_text):
                         new_text = newest_text
                         newest_text = self.doReplacements(new_text)
                 if hasattr(self, "addedCat"):
@@ -370,10 +372,9 @@ class ReplaceRobot:
                 if self.acceptall:
                     break
                 choice = pywikibot.inputChoice(
-                            u'Do you want to accept these changes?',
-                            ['Yes', 'No', 'Edit', 'open in Browser', 'All',
-                             'Quit'],
-                            ['y', 'N', 'e', 'b', 'a', 'q'], 'N')
+                    u'Do you want to accept these changes?',
+                    ['Yes', 'No', 'Edit', 'open in Browser', 'All', 'Quit'],
+                    ['y', 'N', 'e', 'b', 'a', 'q'], 'N')
                 if choice == 'e':
                     editor = editarticle.TextEditor()
                     as_edited = editor.edit(original_text)
@@ -420,6 +421,7 @@ class ReplaceRobot:
                     pywikibot.output(u'Skipping %s (locked page)'
                                      % (page.title(),))
 
+
 def prepareRegexForMySQL(pattern):
     pattern = pattern.replace('\s', '[:space:]')
     pattern = pattern.replace('\d', '[:digit:]')
@@ -449,7 +451,7 @@ def main(*args):
         'text-contains': [],
         'inside':        [],
         'inside-tags':   [],
-        'require-title': [], # using a seperate requirements dict needs some
+        'require-title': [],  # using a seperate requirements dict needs some
     }                        # major refactoring of code.
 
     # Should the elements of 'replacements' and 'exceptions' be interpreted
@@ -500,7 +502,7 @@ def main(*args):
                 xmlFilename = i18n.input('pywikibot-enter-xml-filename')
             else:
                 xmlFilename = arg[5:]
-        elif arg =='-sql':
+        elif arg == '-sql':
             useSql = True
         elif arg.startswith('-page'):
             if len(arg) == 5:
@@ -545,23 +547,23 @@ def main(*args):
     gen = genFactory.getCombinedGenerator()
     if (len(commandline_replacements) % 2):
         raise pywikibot.Error, 'require even number of replacements.'
-    elif (len(commandline_replacements) == 2 and fix == None):
+    elif (len(commandline_replacements) == 2 and fix is None):
         replacements.append((commandline_replacements[0],
                              commandline_replacements[1]))
         if not summary_commandline:
-            edit_summary = i18n.twtranslate(pywikibot.getSite(),
-                                            'replace-replacing',
-                                            {'description': ' (-%s +%s)'
-                                            % (commandline_replacements[0],
-                                               commandline_replacements[1])})
+            edit_summary = i18n.twtranslate(
+                pywikibot.getSite(), 'replace-replacing',
+                {'description': ' (-%s +%s)' % (commandline_replacements[0],
+                                                commandline_replacements[1])}
+            )
     elif (len(commandline_replacements) > 1):
-        if (fix == None):
-            for i in xrange (0, len(commandline_replacements), 2):
+        if (fix is None):
+            for i in xrange(0, len(commandline_replacements), 2):
                 replacements.append((commandline_replacements[i],
                                      commandline_replacements[i + 1]))
             if not summary_commandline:
-                pairs = [( commandline_replacements[i],
-                           commandline_replacements[i + 1] )
+                pairs = [(commandline_replacements[i],
+                          commandline_replacements[i + 1])
                          for i in range(0, len(commandline_replacements), 2)]
                 replacementsDescription = '(%s)' % ', '.join(
                     [('-' + pair[0] + ' +' + pair[1]) for pair in pairs])
@@ -570,17 +572,16 @@ def main(*args):
                                                 {'description':
                                                  replacementsDescription})
         else:
-           raise pywikibot.Error(
-               'Specifying -fix with replacements is undefined')
-    elif fix == None:
+            raise pywikibot.Error('Specifying -fix with replacements is undefined')
+    elif fix is None:
         old = pywikibot.input(u'Please enter the text that should be replaced:')
         new = pywikibot.input(u'Please enter the new text:')
         change = '(-' + old + ' +' + new
         replacements.append((old, new))
         while True:
             old = pywikibot.input(
-                    u'Please enter another text that should be replaced,' +
-                    u'\nor press Enter to start:')
+                u'Please enter another text that should be replaced,' +
+                u'\nor press Enter to start:')
             if old == '':
                 change += ')'
                 break
@@ -641,7 +642,7 @@ def main(*args):
         replacements[i] = oldR, new
 
     for exceptionCategory in [
-                        'title', 'require-title', 'text-contains', 'inside']:
+            'title', 'require-title', 'text-contains', 'inside']:
         if exceptionCategory in exceptions:
             patterns = exceptions[exceptionCategory]
             if not regex:
