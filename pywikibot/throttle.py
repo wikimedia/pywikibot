@@ -52,10 +52,10 @@ class Throttle(object):
         self.last_read = 0
         self.last_write = 0
         self.next_multiplicity = 1.0
-        self.checkdelay = 300  # Check logfile again after this many seconds
-        self.dropdelay = 600   # Ignore processes that have not made
-                               # a check in this many seconds
-        self.releasepid = 1200 # Free the process id after this many seconds
+        self.checkdelay = 300   # Check logfile again after this many seconds
+        self.dropdelay = 600    # Ignore processes that have not made
+                                # a check in this many seconds
+        self.releasepid = 1200  # Free the process id after this many seconds
         self.lastwait = 0.0
         self.delay = 0
         self.checktime = 0
@@ -107,7 +107,7 @@ class Throttle(object):
                                           'time': ptime,
                                           'site': this_site})
                     if not pid and this_pid >= my_pid:
-                        my_pid = this_pid+1 # next unused process id
+                        my_pid = this_pid + 1  # next unused process id
 
             if not pid:
                 pid = my_pid
@@ -115,7 +115,7 @@ class Throttle(object):
             processes.append({'pid': pid,
                               'time': self.checktime,
                               'site': mysite})
-            processes.sort(key=lambda p:(p['pid'], p['site']))
+            processes.sort(key=lambda p: (p['pid'], p['site']))
             try:
                 f = open(self.ctrlfilename, 'w')
                 for p in processes:
@@ -167,7 +167,7 @@ class Throttle(object):
             thisdelay = self.writedelay
         else:
             thisdelay = self.delay
-        if self.multiplydelay: # We're checking for multiple processes
+        if self.multiplydelay:  # We're checking for multiple processes
             if time.time() > self.checktime + self.checkdelay:
                 self.checkMultiplicity()
             if thisdelay < (self.mindelay * self.next_multiplicity):
@@ -210,7 +210,7 @@ class Throttle(object):
                     this_pid = int(line[0])
                     ptime = int(line[1].split('.')[0])
                     this_site = line[2].rstrip()
-                except (IndexError,ValueError):
+                except (IndexError, ValueError):
                     continue    # Sometimes the file gets corrupted
                                 # ignore that line
                 if now - ptime <= self.releasepid \
@@ -218,7 +218,7 @@ class Throttle(object):
                     processes.append({'pid': this_pid,
                                       'time': ptime,
                                       'site': this_site})
-        processes.sort(key=lambda p:p['pid'])
+        processes.sort(key=lambda p: p['pid'])
         try:
             f = open(self.ctrlfilename, 'w')
             for p in processes:
@@ -245,23 +245,23 @@ class Throttle(object):
             # We want to add "one delay" for each factor of two in the
             # size of the request. Getting 64 pages at once allows 6 times
             # the delay time for the server.
-            self.next_multiplicity = math.log(1+requestsize)/math.log(2.0)
+            self.next_multiplicity = math.log(1 + requestsize) / math.log(2.0)
             # Announce the delay if it exceeds a preset limit
             if wait > 0:
                 if wait > config.noisysleep or self.verbosedelay:
                     pywikibot.output(
                         u"Sleeping for %(wait).1f seconds, %(now)s"
                         % {'wait': wait,
-                           'now' : time.strftime("%Y-%m-%d %H:%M:%S",
+                           'now':  time.strftime("%Y-%m-%d %H:%M:%S",
                                                  time.localtime())
-                        } )
+                           })
                 else:
                     pywikibot.log(
                         u"Sleeping for %(wait).1f seconds, %(now)s"
                         % {'wait': wait,
-                           'now' : time.strftime("%Y-%m-%d %H:%M:%S",
+                           'now':  time.strftime("%Y-%m-%d %H:%M:%S",
                                                  time.localtime())
-                        } )
+                           })
 
                 time.sleep(wait)
             if write:
@@ -282,7 +282,7 @@ class Throttle(object):
         try:
             # start at 1/2 the current server lag time
             # wait at least 5 seconds but not more than 120 seconds
-            delay = min(max(5, lagtime//2), 120)
+            delay = min(max(5, lagtime // 2), 120)
             # account for any time we waited while acquiring the lock
             wait = delay - (time.time() - started)
             if wait > 0:
@@ -292,14 +292,14 @@ class Throttle(object):
                         % {'wait': wait,
                            'now': time.strftime("%Y-%m-%d %H:%M:%S",
                                                 time.localtime())
-                        } )
+                           })
                 else:
                     pywikibot.log(
                         u"Sleeping for %(wait).1f seconds, %(now)s"
                         % {'wait': wait,
                            'now': time.strftime("%Y-%m-%d %H:%M:%S",
                                                 time.localtime())
-                        } )
+                           })
                 time.sleep(wait)
         finally:
             self.lock.release()
