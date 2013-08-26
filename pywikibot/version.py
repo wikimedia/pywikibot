@@ -173,7 +173,7 @@ def getfileversion(filename):
     fn = os.path.join(_program_dir, filename)
     if os.path.exists(fn):
         for line in open(fn, 'r').readlines():
-            if line.find('__version__') == 0:
+            if line.find('__initversion__') == 0:
                 exec(line)
                 break
         stat = os.stat(fn)

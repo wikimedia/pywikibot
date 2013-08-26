@@ -3,11 +3,12 @@
 The initialization file for the Pywikibot framework.
 """
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikipedia bot team, 2008-213
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '2.0b1'
+__initversion__ = '$Id$'
 
 import datetime
 import difflib

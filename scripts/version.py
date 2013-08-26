@@ -11,12 +11,14 @@
 __version__ = '$Id$'
 
 import sys
+import pywikibot
 from pywikibot.version import *
 from pywikibot import config2 as config
 
 if __name__ == '__main__':
-    print 'Pywikibot %s' % getversion()
-    print 'Python %s' % sys.version
+    print 'Pywikibot: %s' % getversion()
+    print 'Release version: %s' % pywikibot.__version__
+    print 'Python: %s' % sys.version
     #print 'config-settings:'
     #print 'site_interface =', config.site_interface
     #print 'API_config_expiry =', config.API_config_expiry
