@@ -10,7 +10,8 @@
 __version__ = '$Id$'
 
 import os
-import time, datetime
+import time
+import datetime
 import urllib
 import subprocess
 
@@ -39,6 +40,7 @@ def getversion():
         data['cmp_ver'] = 'n/a'
     data['hsh'] = data['hsh'][:7]   # make short hash from full hash
     return '%(tag)s (r%(rev)s, %(hsh)s, %(date)s, %(cmp_ver)s)' % data
+
 
 def getversiondict():
     global cache
@@ -89,7 +91,7 @@ def getversion_svn(path=None):
         name, tag, rev, date = cur.fetchone()
         con.close()
         tag = tag[:-len(name)]
-        date = time.gmtime(date/1000000)
+        date = time.gmtime(date / 1000000)
     else:
         for i in xrange(3):
             entries.readline()
@@ -106,6 +108,7 @@ def getversion_svn(path=None):
         raise ParseError
     return (tag, rev, date)
 
+
 def getversion_git(path=None):
     _program_dir = path or _get_program_dir()
     #(try to use .git directory for new entries format)
@@ -115,23 +118,24 @@ def getversion_git(path=None):
     tag = open(os.path.join(_program_dir, '.git/config'), 'r').read()
     s = tag.find('url = ', tag.find('[remote "origin"]'))
     e = tag.find('\n', s)
-    tag = tag[(s+6):e]
+    tag = tag[(s + 6):e]
     t = tag.strip().split('/')
-    tag  = '[%s] %s' % (t[0][:-1], '/'.join(t[3:])[:-4])
+    tag = '[%s] %s' % (t[0][:-1], '/'.join(t[3:])[:-4])
     info = subprocess.Popen("git log --pretty=format:'%ad|%an|%h|%H|%d' --abbrev-commit --date=iso -1 | cat -",
                             shell=True,
                             stdout=subprocess.PIPE).stdout.read()
     info = info.split('|')
     date = info[0][:-6]
     date = time.strptime(date, '%Y-%m-%d %H:%M:%S')
-    rev  = subprocess.Popen('git rev-list HEAD | wc -l',
-                            shell=True,
-                            stdout=subprocess.PIPE).stdout.read()
-    rev  = int(rev.strip())
-    hsh  = info[3]      # also stored in '.git/refs/heads/master'
+    rev = subprocess.Popen('git rev-list HEAD | wc -l',
+                           shell=True,
+                           stdout=subprocess.PIPE).stdout.read()
+    rev = int(rev.strip())
+    hsh = info[3]      # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
         raise ParseError
     return (tag, rev, date, hsh)
+
 
 def getversion_nightly():
     data = open(os.path.join(wikipediatools.get_base_dir(), 'version'))
@@ -141,6 +145,7 @@ def getversion_nightly():
     if not date or not tag or not rev:
         raise ParseError
     return (tag, rev, date, '(unknown)')
+
 
 def getversion_onlinerepo(repo=None):
     """ Retrieve revision number of framework online repository's svnroot """
@@ -155,7 +160,7 @@ def getversion_onlinerepo(repo=None):
 
 ## Simple version comparison
 #
-cmp_ver = lambda a, b, tol=1: {-1: '<', 0: '~', 1: '>'}[cmp((a-b)//tol, 0)]
+cmp_ver = lambda a, b, tol=1: {-1: '<', 0: '~', 1: '>'}[cmp((a - b) // tol, 0)]
 
 
 def getfileversion(filename):
@@ -171,7 +176,7 @@ def getfileversion(filename):
             if line.find('__version__') == 0:
                 exec(line)
                 break
-        stat  = os.stat(fn)
+        stat = os.stat(fn)
         mtime = datetime.datetime.fromtimestamp(stat.st_mtime).isoformat(' ')
     if mtime and __version__:
         return u'%s %s %s' % (filename, __version__[5:-1][:7], mtime)
