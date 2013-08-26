@@ -4,8 +4,8 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-# Omegawiki, the Ultimate online dictionary
 
+# Omegawiki, the Ultimate online dictionary
 class Family(family.Family):
 
     def __init__(self):
@@ -18,7 +18,7 @@ class Family(family.Family):
 
         self.nocapitalize = self.langs.keys()
 
-    def hostname(self,code):
+    def hostname(self, code):
         return 'www.omegawiki.org'
 
     def version(self, code):

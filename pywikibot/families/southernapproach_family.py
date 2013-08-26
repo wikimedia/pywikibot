@@ -3,14 +3,14 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-# ZRHwiki, formerly known as SouthernApproachWiki, a wiki about Zürich Airport.
 
+# ZRHwiki, formerly known as SouthernApproachWiki, a wiki about Zürich Airport.
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)
         self.name = 'southernapproach'
         self.langs = {
-            'de':'www.zrhwiki.ch',
+            'de': 'www.zrhwiki.ch',
         }
 
     def version(self, code):

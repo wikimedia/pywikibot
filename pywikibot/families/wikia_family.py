@@ -4,9 +4,9 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
+
 # The Wikia Search family
 # user-config.py: usernames['wikia']['wikia'] = 'User name'
-
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)

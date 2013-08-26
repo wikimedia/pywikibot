@@ -3,8 +3,8 @@ from pywikibot import family
 
 __version__ = '$Id$'
 
-#Family file for the original wikivoyage
 
+#Family file for the original wikivoyage
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)
