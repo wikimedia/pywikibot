@@ -24,10 +24,12 @@ and for a description.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id$'
+__version__ = '$Id$'
 #
 
-import os, sys, time
+import os
+import sys
+import time
 import urllib
 import urlparse
 import tempfile
@@ -104,7 +106,7 @@ class UploadRobot:
                     retrieved = False
                     pywikibot.output(
                         u"Connection closed at byte %s (%s left)"
-                         % (rlen, content_len))
+                        % (rlen, content_len))
                     if accept_ranges and rlen > 0:
                         resume = True
                     pywikibot.output(u"Sleeping for %d seconds..." % dt)
@@ -139,14 +141,14 @@ class UploadRobot:
                 u"The filename on the target wiki will default to: %s"
                 % filename)
             # FIXME: these 2 belong somewhere else, presumably in family
-            forbidden = '/' # to be extended
+            forbidden = '/'  # to be extended
             allowed_formats = (u'gif', u'jpg', u'jpeg', u'mid', u'midi',
                                u'ogg', u'png', u'svg', u'xcf', u'djvu',
                                u'ogv', u'oga', u'tif', u'tiff')
             # ask until it's valid
             while True:
                 newfn = pywikibot.input(
-                            u'Enter a better name, or press enter to accept:')
+                    u'Enter a better name, or press enter to accept:')
                 if newfn == "":
                     newfn = filename
                     break
@@ -160,8 +162,8 @@ class UploadRobot:
                 if ext not in allowed_formats:
                     choice = pywikibot.inputChoice(
                         u"File format is not one of [%s], but %s. Continue?"
-                         % (u' '.join(allowed_formats), ext),
-                            ['yes', 'no'], ['y', 'N'], 'N')
+                        % (u' '.join(allowed_formats), ext),
+                        ['yes', 'no'], ['y', 'N'], 'N')
                     if choice == 'n':
                         continue
                 break
@@ -195,7 +197,7 @@ class UploadRobot:
         filename = self.process_filename()
 
         site = self.targetSite
-        imagepage = pywikibot.ImagePage(site, filename) # normalizes filename
+        imagepage = pywikibot.ImagePage(site, filename)  # normalizes filename
         imagepage.text = self.description
 
         pywikibot.output(u'Uploading file to %s via API....' % site)
@@ -231,7 +233,7 @@ class UploadRobot:
         else:
             #No warning, upload complete.
             pywikibot.output(u"Upload successful.")
-            return filename #data['filename']
+            return filename  # data['filename']
 
     def run(self):
         while not self.urlOK():
