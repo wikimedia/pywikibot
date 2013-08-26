@@ -2954,7 +2954,7 @@ class Link(object):
         # This code was adapted from Title.php : secureAndSplit()
         #
         if u'\ufffd' in t:
-            raise pywikibot.Error("Title contains illegal char (\\uFFFD)")
+            raise pywikibot.Error("Title contains illegal char (\\uFFFD 'REPLACEMENT CHARACTER')")
 
         # Replace underscores by spaces
         t = t.replace(u"_", u" ")
