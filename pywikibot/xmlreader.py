@@ -12,13 +12,15 @@ XmlEntry objects which can be used by other bots.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id$'
+__version__ = '$Id$'
 #
 
 import threading
-import codecs, re
+import codecs
+import re
 from xml.etree.cElementTree import iterparse
 import pywikibot
+
 
 def parseRestrictions(restrictions):
     """
@@ -52,7 +54,7 @@ class XmlEntry:
         # TODO: there are more tags we can read.
         self.title = title
         self.ns = ns
-        self.id =id
+        self.id = id
         self.text = text
         self.username = username.strip()
         self.ipedit = ipedit
@@ -152,9 +154,7 @@ class XmlDump(object):
         self.pageid = elem.findtext("{%s}id" % self.uri)
         self.restrictions = elem.findtext("{%s}restrictions" % self.uri)
         self.isredirect = elem.findtext("{%s}redirect" % self.uri) is not None
-        self.editRestriction, self.moveRestriction \
-                              = parseRestrictions(self.restrictions)
-
+        self.editRestriction, self.moveRestriction = parseRestrictions(self.restrictions)
 
     def _create_revision(self, revision):
         """Creates a Single revision"""
@@ -170,7 +170,7 @@ class XmlDump(object):
                         ns=self.ns,
                         id=self.pageid,
                         text=text or u'',
-                        username=username or u'', #username might be deleted
+                        username=username or u'',  # username might be deleted
                         ipedit=bool(ipeditor),
                         timestamp=timestamp,
                         editRestriction=self.editRestriction,
@@ -178,4 +178,4 @@ class XmlDump(object):
                         revisionid=revisionid,
                         comment=comment,
                         redirect=self.isredirect
-                       )
+                        )
