@@ -255,47 +255,47 @@ class transliterator(object):
         self.trans[u"³"] = u"3"
 
         # Cyrillic
-        self.trans.update({u"А" : u"A", u"а" : u"a", u"Б" : u"B", u"б" : u"b",
-                      u"В" : u"V", u"в" : u"v", u"Г" : u"G", u"г" : u"g",
-                      u"Д" : u"D", u"д" : u"d", u"Е" : u"E", u"е" : u"e",
-                      u"Ж" : u"Zh", u"ж" : u"zh", u"З" : u"Z", u"з" : u"z",
-                      u"И" : u"I", u"и" : u"i", u"Й" : u"J", u"й" : u"j",
-                      u"К" : u"K", u"к" : u"k", u"Л" : u"L", u"л" : u"l",
-                      u"М" : u"M", u"м" : u"m", u"Н" : u"N", u"н" : u"n",
-                      u"О" : u"O", u"о" : u"o", u"П" : u"P", u"п" : u"p",
-                      u"Р" : u"R", u"р" : u"r", u"С" : u"S", u"с" : u"s",
-                      u"Т" : u"T", u"т" : u"t", u"У" : u"U", u"у" : u"u",
-                      u"Ф" : u"F", u"ф" : u"f", u"х" : u"kh", u"Ц" : u"C",
-                      u"ц" : u"c", u"Ч" : u"Ch", u"ч" : u"ch", u"Ш" : u"Sh",
-                      u"ш" : u"sh", u"Щ" : u"Shch", u"щ" : u"shch", u"Ь" : u"'",
-                      u"ь" : "'", u"Ъ" : u'"', u"ъ" : '"', u"Ю" : u"Yu",
-                      u"ю" : u"yu", u"Я" : u"Ya", u"я" : u"ya", u"Х" : u"Kh",
-                      u"Χ" : u"Kh"})
+        self.trans.update({u"А": u"A", u"а": u"a", u"Б": u"B", u"б": u"b",
+                           u"В": u"V", u"в": u"v", u"Г": u"G", u"г": u"g",
+                           u"Д": u"D", u"д": u"d", u"Е": u"E", u"е": u"e",
+                           u"Ж": u"Zh", u"ж": u"zh", u"З": u"Z", u"з": u"z",
+                           u"И": u"I", u"и": u"i", u"Й": u"J", u"й": u"j",
+                           u"К": u"K", u"к": u"k", u"Л": u"L", u"л": u"l",
+                           u"М": u"M", u"м": u"m", u"Н": u"N", u"н": u"n",
+                           u"О": u"O", u"о": u"o", u"П": u"P", u"п": u"p",
+                           u"Р": u"R", u"р": u"r", u"С": u"S", u"с": u"s",
+                           u"Т": u"T", u"т": u"t", u"У": u"U", u"у": u"u",
+                           u"Ф": u"F", u"ф": u"f", u"х": u"kh", u"Ц": u"C",
+                           u"ц": u"c", u"Ч": u"Ch", u"ч": u"ch", u"Ш": u"Sh",
+                           u"ш": u"sh", u"Щ": u"Shch", u"щ": u"shch", u"Ь": u"'",
+                           u"ь": "'", u"Ъ": u'"', u"ъ": '"', u"Ю": u"Yu",
+                           u"ю": u"yu", u"Я": u"Ya", u"я": u"ya", u"Х": u"Kh",
+                           u"Χ": u"Kh"})
 
         # Additional Cyrillic letters, most occuring in only one or a few languages
-        self.trans.update({u"Ы" : u"Y", u"ы" : u"y", u"Ё" : u"Ë", u"ё" : u"ë",
-                      u"Э" : u"È", u"Ѐ" : u"È", u"э" : u"è", u"ѐ" : u"è",
-                      u"І" : u"I", u"і" : u"i", u"Ї" : u"Ji", u"ї" : u"ji",
-                      u"Є" : u"Je", u"є" : u"je", u"Ґ" : u"G", u"Ҝ" : u"G",
-                      u"ґ" : u"g", u"ҝ" : u"g", u"Ђ" : u"Dj", u"ђ" : u"dj",
-                      u"Ӣ" : u"Y", u"ӣ" : u"y", u"Љ" : u"Lj", u"љ" : u"lj",
-                      u"Њ" : u"Nj", u"њ" : u"nj", u"Ћ" : u"Cj", u"ћ" : u"cj",
-                      u"Җ" : u"Zhj", u"җ" : u"zhj", u"Ѓ" : u"Gj", u"ѓ" : u"gj",
-                      u"Ќ" : u"Kj", u"ќ" : u"kj", u"Ӣ" : u"Ii", u"ӣ" : u"ii",
-                      u"Ӯ" : u"U", u"ӯ" : u"u", u"Ҳ" : u"H", u"ҳ" : u"h",
-                      u"Ҷ" : u"Dz",u"ҷ" : u"dz", u"Ө" :u"Ô", u"Ӫ" : u"Ô",
-                      u"ө" : u"ô", u"ӫ" : u"ô", u"Ү": u"Y", u"ү": u"y", u"Һ": u"H",
-                      u"һ": u"h", u"Ә": u"AE", u"Ӕ": u"AE", u"ә": u"ae",
-                      u"Ӛ": u"Ë", u"Ӭ": u"Ë", u"ӛ": u"ë", u"ӭ": u"ë", u"Җ": u"Zhj",
-                      u"җ": u"zhj", u"Ұ": u"U", u"ұ": u"u", u"ў": u"ù", u"Ў": u"Ù",
-                      u"ѝ": u"ì", u"Ѝ": u"Ì", u"Ӑ": u"A", u"ă": u"a", u"Ӓ": u"Ä",
-                      u"ҿ": u"ä", u"Ҽ" : u"Ts", u"Ҿ": u"Ts", u"ҽ": u"ts", u"ҿ": u"ts",
-                      u"Ҙ": u"Dh", u"ҙ": u"dh", u"Ӏ": u"", u"ӏ": u"", u"Ӆ": u"L",
-                      u"ӆ": u"l", u"Ӎ": u"M", u"ӎ": u"m", u"Ӧ": u"Ö", u"ӧ": u"ö",
-                      u"Ҩ": u"u", u"ҩ": u"u", u"Ҧ": u"Ph", u"ҧ": u"ph", u"Ҏ": u"R",
-                      u"ҏ": u"r", u"Ҫ": u"Th", u"ҫ": u"th", u"Ҭ": u"T", u"ҭ": u"t",
-                      u"Ӯ": u"Û", u"ӯ": u"û", u"Ұ": u"U", u"Ӹ": u"U", u"ұ": u"u",
-                      u"ӹ": u"u", u"Ҵ": u"Tts", u"ҵ": u"tts", u"Ӵ": u"Ch", u"ӵ": u"ch"})
+        self.trans.update({u"Ы": u"Y", u"ы": u"y", u"Ё": u"Ë", u"ё": u"ë",
+                           u"Э": u"È", u"Ѐ": u"È", u"э": u"è", u"ѐ": u"è",
+                           u"І": u"I", u"і": u"i", u"Ї": u"Ji", u"ї": u"ji",
+                           u"Є": u"Je", u"є": u"je", u"Ґ": u"G", u"Ҝ": u"G",
+                           u"ґ": u"g", u"ҝ": u"g", u"Ђ": u"Dj", u"ђ": u"dj",
+                           u"Ӣ": u"Y", u"ӣ": u"y", u"Љ": u"Lj", u"љ": u"lj",
+                           u"Њ": u"Nj", u"њ": u"nj", u"Ћ": u"Cj", u"ћ": u"cj",
+                           u"Җ": u"Zhj", u"җ": u"zhj", u"Ѓ": u"Gj", u"ѓ": u"gj",
+                           u"Ќ": u"Kj", u"ќ": u"kj", u"Ӣ": u"Ii", u"ӣ": u"ii",
+                           u"Ӯ": u"U", u"ӯ": u"u", u"Ҳ": u"H", u"ҳ": u"h",
+                           u"Ҷ": u"Dz", u"ҷ": u"dz", u"Ө": u"Ô", u"Ӫ": u"Ô",
+                           u"ө": u"ô", u"ӫ": u"ô", u"Ү": u"Y", u"ү": u"y", u"Һ": u"H",
+                           u"һ": u"h", u"Ә": u"AE", u"Ӕ": u"AE", u"ә": u"ae",
+                           u"Ӛ": u"Ë", u"Ӭ": u"Ë", u"ӛ": u"ë", u"ӭ": u"ë", u"Җ": u"Zhj",
+                           u"җ": u"zhj", u"Ұ": u"U", u"ұ": u"u", u"ў": u"ù", u"Ў": u"Ù",
+                           u"ѝ": u"ì", u"Ѝ": u"Ì", u"Ӑ": u"A", u"ă": u"a", u"Ӓ": u"Ä",
+                           u"ҿ": u"ä", u"Ҽ": u"Ts", u"Ҿ": u"Ts", u"ҽ": u"ts", u"ҿ": u"ts",
+                           u"Ҙ": u"Dh", u"ҙ": u"dh", u"Ӏ": u"", u"ӏ": u"", u"Ӆ": u"L",
+                           u"ӆ": u"l", u"Ӎ": u"M", u"ӎ": u"m", u"Ӧ": u"Ö", u"ӧ": u"ö",
+                           u"Ҩ": u"u", u"ҩ": u"u", u"Ҧ": u"Ph", u"ҧ": u"ph", u"Ҏ": u"R",
+                           u"ҏ": u"r", u"Ҫ": u"Th", u"ҫ": u"th", u"Ҭ": u"T", u"ҭ": u"t",
+                           u"Ӯ": u"Û", u"ӯ": u"û", u"Ұ": u"U", u"Ӹ": u"U", u"ұ": u"u",
+                           u"ӹ": u"u", u"Ҵ": u"Tts", u"ҵ": u"tts", u"Ӵ": u"Ch", u"ӵ": u"ch"})
 
         for char in u"ЈӤҊ":
             self.trans[char] = u"J"
@@ -332,10 +332,10 @@ class transliterator(object):
 
         # Archaic Cyrillic letters
         self.trans.update({u"Ѹ": u"Ou", u"ѹ": u"ou", u"Ѡ": u"O", u"Ѻ": u"O", u"ѡ": u"o",
-                      u"ѻ": u"o", u"Ѿ": u"Ot", u"ѿ": u"ot", u"Ѣ": u"E", u"ѣ": u"e",
-                      u"Ѥ": u"Ei", u"Ѧ": u"Ei", u"ѥ": u"ei", u"ѧ": u"ei", u"Ѫ": u"Ai",
-                      u"ѫ": u"ai", u"Ѯ": u"X", u"ѯ": u"x", u"Ѱ": u"Ps", u"ѱ": u"ps",
-                      u"Ѳ": u"Th", u"ѳ": u"th", u"Ѵ": u"Ü", u"Ѷ": u"Ü", u"ѵ": u"ü"})
+                           u"ѻ": u"o", u"Ѿ": u"Ot", u"ѿ": u"ot", u"Ѣ": u"E", u"ѣ": u"e",
+                           u"Ѥ": u"Ei", u"Ѧ": u"Ei", u"ѥ": u"ei", u"ѧ": u"ei", u"Ѫ": u"Ai",
+                           u"ѫ": u"ai", u"Ѯ": u"X", u"ѯ": u"x", u"Ѱ": u"Ps", u"ѱ": u"ps",
+                           u"Ѳ": u"Th", u"ѳ": u"th", u"Ѵ": u"Ü", u"Ѷ": u"Ü", u"ѵ": u"ü"})
 
         # Hebrew alphabet
         for char in u"אע":
@@ -443,7 +443,7 @@ class transliterator(object):
         self.trans[u"ؤ"] = u"w'"
         self.trans[u"ئ"] = u"y'"
         for char in u"◌◌":
-            self.trans[char] = u"" # indicates absence of vowels
+            self.trans[char] = u""  # indicates absence of vowels
         # Arabic vowels
         self.trans[u"◌"] = u"a"
         self.trans[u"◌"] = u"u"
@@ -486,22 +486,22 @@ class transliterator(object):
 
         # Greek
         self.trans.update({u"Α": u"A", u"α": u"a", u"Β": u"B", u"β": u"b", u"Γ": u"G",
-                      u"γ": u"g", u"Δ": u"D", u"δ": u"d", u"Ε": u"E", u"ε": u"e",
-                      u"Ζ": u"Z", u"ζ": u"z", u"Η": u"I", u"η": u"i", u"θ": u"th",
-                      u"Θ": u"Th", u"Ι": u"I", u"ι": u"i", u"Κ": u"K", u"κ": u"k",
-                      u"Λ": u"L", u"λ": u"l", u"Μ": u"M", u"μ": u"m", u"Ν": u"N",
-                      u"ν": u"n", u"Ξ": u"X", u"ξ": u"x", u"Ο": u"O", u"ο": u"o",
-                      u"Π": u"P", u"π": u"p", u"Ρ": u"R", u"ρ": u"r", u"Σ": u"S",
-                      u"σ": u"s", u"ς": u"s", u"Τ": u"T", u"τ": u"t", u"Υ": u"Y",
-                      u"υ": u"y", u"Φ": u"F", u"φ": u"f", u"Ψ": u"Ps", u"ψ": u"ps",
-                      u"Ω": u"O", u"ω": u"o", u"ϗ": u"&", u"Ϛ": u"St", u"ϛ": u"st",
-                      u"Ϙ": u"Q", u"Ϟ": u"Q", u"ϙ": u"q", u"ϟ": u"q", u"Ϻ": u"S",
-                      u"ϻ": u"s", u"Ϡ": u"Ss", u"ϡ": u"ss", u"Ϸ": u"Sh", u"ϸ": u"sh",
-                      u"·": u":", u"Ά": u"Á", u"ά": u"á", u"Έ": u"É", u"Ή": u"É",
-                      u"έ": u"é", u"ή": u"é", u"Ί": u"Í", u"ί": u"í", u"Ϊ": u"Ï",
-                      u"ϊ": u"ï", u"ΐ": u"ï", u"Ό": u"Ó", u"ό": u"ó", u"Ύ": u"Ý",
-                      u"ύ": u"ý", u"Ϋ": u"Y", u"ϋ": u"ÿ", u"ΰ": u"ÿ", u"Ώ": u"Ó",
-                      u"ώ": u"ó"})
+                           u"γ": u"g", u"Δ": u"D", u"δ": u"d", u"Ε": u"E", u"ε": u"e",
+                           u"Ζ": u"Z", u"ζ": u"z", u"Η": u"I", u"η": u"i", u"θ": u"th",
+                           u"Θ": u"Th", u"Ι": u"I", u"ι": u"i", u"Κ": u"K", u"κ": u"k",
+                           u"Λ": u"L", u"λ": u"l", u"Μ": u"M", u"μ": u"m", u"Ν": u"N",
+                           u"ν": u"n", u"Ξ": u"X", u"ξ": u"x", u"Ο": u"O", u"ο": u"o",
+                           u"Π": u"P", u"π": u"p", u"Ρ": u"R", u"ρ": u"r", u"Σ": u"S",
+                           u"σ": u"s", u"ς": u"s", u"Τ": u"T", u"τ": u"t", u"Υ": u"Y",
+                           u"υ": u"y", u"Φ": u"F", u"φ": u"f", u"Ψ": u"Ps", u"ψ": u"ps",
+                           u"Ω": u"O", u"ω": u"o", u"ϗ": u"&", u"Ϛ": u"St", u"ϛ": u"st",
+                           u"Ϙ": u"Q", u"Ϟ": u"Q", u"ϙ": u"q", u"ϟ": u"q", u"Ϻ": u"S",
+                           u"ϻ": u"s", u"Ϡ": u"Ss", u"ϡ": u"ss", u"Ϸ": u"Sh", u"ϸ": u"sh",
+                           u"·": u":", u"Ά": u"Á", u"ά": u"á", u"Έ": u"É", u"Ή": u"É",
+                           u"έ": u"é", u"ή": u"é", u"Ί": u"Í", u"ί": u"í", u"Ϊ": u"Ï",
+                           u"ϊ": u"ï", u"ΐ": u"ï", u"Ό": u"Ó", u"ό": u"ó", u"Ύ": u"Ý",
+                           u"ύ": u"ý", u"Ϋ": u"Y", u"ϋ": u"ÿ", u"ΰ": u"ÿ", u"Ώ": u"Ó",
+                           u"ώ": u"ó"})
 
         # Japanese (katakana and hiragana)
         for char in u"アァあ":
@@ -736,11 +736,11 @@ class transliterator(object):
             self.trans[char] = u"v"
         for char in u"ზ":
             self.trans[char] = u"z"
-        for char in u"თ":#
+        for char in u"თ":
             self.trans[char] = u"th"
         for char in u"ი":
             self.trans[char] = u"i"
-        for char in u"კ":#
+        for char in u"კ":
             self.trans[char] = u"k"
         for char in u"ლ":
             self.trans[char] = u"l"
@@ -750,25 +750,25 @@ class transliterator(object):
             self.trans[char] = u"n"
         for char in u"ო":
             self.trans[char] = u"o"
-        for char in u"პ":#
+        for char in u"პ":
             self.trans[char] = u"p"
-        for char in u"ჟ":#
+        for char in u"ჟ":
             self.trans[char] = u"zh"
         for char in u"რ":
             self.trans[char] = u"r"
         for char in u"ს":
             self.trans[char] = u"s"
-        for char in u"ტ":#
+        for char in u"ტ":
             self.trans[char] = u"t"
         for char in u"უ":
             self.trans[char] = u"u"
-        for char in u"ფ":#
+        for char in u"ფ":
             self.trans[char] = u"ph"
-        for char in u"ქ":#
+        for char in u"ქ":
             self.trans[char] = u"q"
-        for char in u"ღ":#
+        for char in u"ღ":
             self.trans[char] = u"gh"
-        for char in u"ყ":#
+        for char in u"ყ":
             self.trans[char] = u"q'"
         for char in u"შ":
             self.trans[char] = u"sh"
@@ -778,13 +778,13 @@ class transliterator(object):
             self.trans[char] = u"ts"
         for char in u"ძ":
             self.trans[char] = u"dz"
-        for char in u"წ":#
+        for char in u"წ":
             self.trans[char] = u"ts'"
-        for char in u"ჭ":#
+        for char in u"ჭ":
             self.trans[char] = u"ch'"
         for char in u"ხ":
             self.trans[char] = u"kh"
-        for char in u"ჯ":#
+        for char in u"ჯ":
             self.trans[char] = u"j"
         for char in u"ჰ":
             self.trans[char] = u"h"
@@ -1659,12 +1659,13 @@ class transliterator(object):
         self.trans[u"໙"] = "9"
         for char in self.trans:
             value = self.trans[char]
-            if value == "?": continue
+            if value == "?":
+                continue
             while value.encode(encoding, 'replace').decode(encoding) == "?" and value in self.trans:
                 assert value != self.trans[value], "%r == self.trans[%r]!" % (value, value)
                 value = self.trans[value]
             self.trans[char] = value
-        
+
     def transliterate(self, char, default="?", prev="-", next="-"):
         if char in self.trans:
             return self.trans[char]

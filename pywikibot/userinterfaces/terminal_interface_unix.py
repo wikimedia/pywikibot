@@ -36,6 +36,7 @@ unixColors = {
     'lightyellow': chr(27) + '[33;1m',  # Light Yellow start tag
 }
 
+
 class UnixUI(terminal_interface_base.UI):
     def printColorized(self, text, targetStream):
         lastColor = None

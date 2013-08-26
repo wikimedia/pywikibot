@@ -7,7 +7,9 @@
 __version__ = '$Id$'
 
 import transliteration
-import traceback, re, sys
+import traceback
+import re
+import sys
 import pywikibot as wikipedia
 from pywikibot import config
 from pywikibot.bot import DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING
@@ -40,15 +42,15 @@ colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(colors))
 
 class UI:
     def __init__(self):
-        self.stdin  = sys.stdin
+        self.stdin = sys.stdin
         self.stdout = sys.stdout
         self.stderr = sys.stderr
         self.encoding = config.console_encoding
         self.transliteration_target = config.transliteration_target
-        
+
         self.stderr = sys.stderr
         self.stdout = sys.stdout
-        
+
     def init_handlers(self, root_logger, default_stream='stderr'):
         """Initialize the handlers for user output.
 
@@ -94,7 +96,7 @@ class UI:
     def printNonColorized(self, text, targetStream):
         # We add *** after the text as a whole if anything needed to be colorized.
         lines = text.split('\n')
-        for i,line in enumerate(lines):
+        for i, line in enumerate(lines):
             if i > 0:
                 line = "\n" + line
             line, count = colorTagR.subn('', line)
@@ -103,19 +105,18 @@ class UI:
             targetStream.write(line.encode(self.encoding, 'replace'))
 
     printColorized = printNonColorized
-        
+
     def _print(self, text, targetStream):
         if config.colorized_output:
             self.printColorized(text, targetStream)
         else:
-            self.printNonColorized(text, targetStream)    
+            self.printNonColorized(text, targetStream)
 
     def output(self, text, toStdout=False, targetStream=None):
         """
         If a character can't be displayed in the encoding used by the user's
         terminal, it will be replaced with a question mark or by a
         transliteration.
-        
         """
         if config.transliterate:
             # Encode our unicode string in the encoding used by the user's
@@ -139,10 +140,10 @@ class UI:
                 if codecedText[i] == '?' and text[i] != u'?':
                     try:
                         transliterated = transliterator.transliterate(
-                            text[i], default='?', prev=prev, next=text[i+1])
+                            text[i], default='?', prev=prev, next=text[i + 1])
                     except IndexError:
                         transliterated = transliterator.transliterate(
-                            text[i], default = '?', prev=prev, next=' ')
+                            text[i], default='?', prev=prev, next=' ')
                     # transliteration was successful. The replacement
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.
@@ -158,19 +159,19 @@ class UI:
                     transliteratedText += codecedText[i]
                     prev = codecedText[i]
             text = transliteratedText
-        
+
         if not targetStream:
             if toStdout:
                 targetStream = self.stdout
             else:
                 targetStream = self.stderr
-            
+
         self._print(text, targetStream)
 
     def _raw_input(self):
         return raw_input()
-        
-    def input(self, question, password = False):
+
+    def input(self, question, password=False):
         """
         Ask the user a question and return the answer.
 
@@ -178,7 +179,6 @@ class UI:
 
         Unlike raw_input, this function automatically adds a space after the
         question.
-
         """
 
         # sound the terminal bell to notify the user
@@ -198,7 +198,7 @@ class UI:
         """
         Ask the user a question with a predefined list of acceptable answers.
         """
-        options = options[:] # we don't want to edit the passed parameter
+        options = options[:]  # we don't want to edit the passed parameter
         for i in range(len(options)):
             option = options[i]
             hotkey = hotkeys[i]
@@ -211,7 +211,7 @@ class UI:
             if m:
                 pos = m.start()
                 options[i] = '%s[%s]%s' % (option[:pos], caseHotkey,
-                                           option[pos+1:])
+                                           option[pos + 1:])
             else:
                 options[i] = '%s [%s]' % (option, caseHotkey)
         # loop until the user entered a valid choice
@@ -220,7 +220,7 @@ class UI:
             answer = self.input(prompt)
             if answer.lower() in hotkeys or answer.upper() in hotkeys:
                 return answer
-            elif default and answer=='':  # empty string entered
+            elif default and answer == '':  # empty string entered
                 return default
 
     def editText(self, text, jumpIndex=None, highlight=None):
@@ -262,6 +262,7 @@ class UI:
             return wikipedia.input(
                 u'What is the solution of the CAPTCHA at this url ?')
 
+
 class TerminalHandler(logging.Handler):
     """A handler class that writes logging records, appropriately formatted, to
     a stream connected to a terminal. This class does not close the stream,
@@ -299,7 +300,7 @@ class TerminalHandler(logging.Handler):
 
     def emit(self, record):
         text = self.format(record)
-        return self.UI.output(text, targetStream = self.stream)
+        return self.UI.output(text, targetStream=self.stream)
 
 
 class TerminalFormatter(logging.Formatter):
