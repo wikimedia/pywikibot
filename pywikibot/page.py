@@ -2615,7 +2615,7 @@ class ItemPage(WikibasePage):
         data = {'sitelinks': data}
         self.editEntity(data, **kwargs)
 
-    def addClaim(self, claim, bot=True):
+    def addClaim(self, claim, bot=True, **kwargs):
         """
         Adds the claim to the item
         @param claim The claim to add
@@ -2623,7 +2623,7 @@ class ItemPage(WikibasePage):
         @param bot Whether to flag as bot (if possible)
         @type bot bool
         """
-        self.repo.addClaim(self, claim, bot=bot)
+        self.repo.addClaim(self, claim, bot=bot, **kwargs)
         claim.on_item = self
 
     def removeClaims(self, claims, **kwargs):
