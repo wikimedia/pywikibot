@@ -55,8 +55,8 @@ class HarvestRobot:
         page = pywikibot.Page(self.repo, 'Wikidata:List of wikis/python')
         source_values = json.loads(page.get())
         source_values = source_values['wikipedia']
-        for lang in source_values:
-            source_values[lang] = pywikibot.ItemPage(self.repo, source_values[lang])
+        for source_lang in source_values:
+            source_values[source_lang] = pywikibot.ItemPage(self.repo, source_values[source_lang])
 
         if lang in source_values:
             self.source = pywikibot.Claim(self.repo, 'p143')
