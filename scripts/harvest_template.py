@@ -40,7 +40,7 @@ class HarvestRobot:
             * fields        - A dictionary of fields that are of use to us
 
         """
-        self.generator = generator
+        self.generator = pg.PreloadingGenerator(generator)
         self.templateTitle = templateTitle.replace(u'_', u' ')
         # TODO: Make it a list which also includes the redirects to the template
         self.fields = fields
