@@ -49,9 +49,9 @@ class HarvestRobot:
         self.setSource(pywikibot.Site().language())
 
     def setSource(self, lang):
-        '''
+        """
         Get the source
-        '''
+        """
         page = pywikibot.Page(self.repo, 'Wikidata:List of wikis/python')
         source_values = json.loads(page.get())
         source_values = source_values['wikipedia']
@@ -66,8 +66,23 @@ class HarvestRobot:
         """
         Starts the robot.
         """
+        self.templateTitles = self.getTemplateSynonyms(self.templateTitle)
         for page in self.generator:
             self.procesPage(page)
+
+    def getTemplateSynonyms(self, title):
+        """
+        Fetches redirects of the title, so we can check against them
+        """
+        pywikibot.output('Finding redirects...')  # Put some output here since it can take a while
+        temp = pywikibot.Page(pywikibot.Site(), title, ns=10)
+        if temp.isRedirectPage():
+            temp = temp.getRedirectTarget()
+        titles = [page.title(withNamespace=False)
+                  for page
+                  in temp.getReferences(redirectsOnly=True, namespaces=[10], follow_redirects=False)]
+        titles.append(temp.title(withNamespace=False))
+        return titles
 
     def procesPage(self, page):
         """
@@ -83,8 +98,10 @@ class HarvestRobot:
             templates = pywikibot.extract_templates_and_params(pagetext)
             for (template, fielddict) in templates:
                 # We found the template we were looking for
-                if template.replace(u'_', u' ') == self.templateTitle:
+                if template.replace(u'_', u' ') in self.templateTitles:
                     for field, value in fielddict.items():
+                        field = field.strip()
+                        value = value.strip()
                         # This field contains something useful for us
                         if field in self.fields:
                             # Check if the property isn't already set
