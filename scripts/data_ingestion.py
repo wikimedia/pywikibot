@@ -5,10 +5,13 @@ A generic bot to do data ingestion (batch uploading) to Commons
 
 '''
 import pywikibot
-import posixpath, urlparse
+import posixpath
+import urlparse
 import urllib
-import hashlib, base64
+import hashlib
+import base64
 import StringIO
+
 
 class Photo(object):
     '''
@@ -36,11 +39,11 @@ class Photo(object):
         TODO: Add exception handling
         '''
         if not self.contents:
-            imageFile=urllib.urlopen(self.URL).read()
+            imageFile = urllib.urlopen(self.URL).read()
             self.contents = StringIO.StringIO(imageFile)
         return self.contents
 
-    def findDuplicateImages(self, site = pywikibot.getSite(u'commons', u'commons')):
+    def findDuplicateImages(self, site=pywikibot.getSite(u'commons', u'commons')):
         '''
         Takes the photo, calculates the SHA1 hash and asks the mediawiki api for a list of duplicates.
 
@@ -76,12 +79,14 @@ class Photo(object):
     def _safeTemplateValue(self, value):
         return value.replace("|", "{{!}}")
 
+
 def CSVReader(fileobj, urlcolumn, *args, **kwargs):
     import csv
     reader = csv.DictReader(fileobj, *args, **kwargs)
 
     for line in reader:
         yield Photo(line[urlcolumn], line)
+
 
 class DataIngestionBot:
     def __init__(self, reader, titlefmt, pagefmt, site=pywikibot.getSite(u'commons', u'commons')):
@@ -99,12 +104,12 @@ class DataIngestionBot:
         title = photo.getTitle(self.titlefmt)
         description = photo.getDescription(self.pagefmt)
 
-        bot = upload.UploadRobot(url = photo.URL,
-                                 description = description,
-                                 useFilename = title,
-                                 keepFilename = True,
-                                 verifyDescription = False,
-                                 targetSite = self.site)
+        bot = upload.UploadRobot(url=photo.URL,
+                                 description=description,
+                                 useFilename=title,
+                                 keepFilename=True,
+                                 verifyDescription=False,
+                                 targetSite=self.site)
         bot._contents = photo.downloadPhoto().getvalue()
         bot._retrieved = True
         bot.run()
@@ -118,7 +123,7 @@ class DataIngestionBot:
         for photo in self.reader:
             self._doUpload(photo)
 
-if __name__=="__main__":
+if __name__ == "__main__":
     reader = CSVReader(open('tests/data/csv_ingestion.csv'), 'url')
     bot = DataIngestionBot(reader, "%(name)s - %(set)s.%(_ext)s", ":user:valhallasw/test_template", pywikibot.getSite('test', 'test'))
     bot.run()
