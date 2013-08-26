@@ -31,9 +31,10 @@ import re
 from pywikibot import *
 from itertools import imap
 
+
 def namespaces(site):
     '''dict from namespace number to prefix'''
-    ns = dict(map(lambda n: (site.getNamespaceIndex(n), n), 
+    ns = dict(map(lambda n: (site.getNamespaceIndex(n), n),
                   site.namespaces()))
     ns[0] = ''
     return ns
@@ -50,7 +51,7 @@ class SyncSites:
     '''Work is done in here.'''
 
     def __init__(self, options):
-	self.options = options
+        self.options = options
 
         if options.original_wiki:
             original_wiki = options.original_wiki
@@ -64,7 +65,7 @@ class SyncSites:
         sites = options.destination_wiki
 
         self.original = getSite(original_wiki, family)
-        
+
         if options.namespace and 'help' in options.namespace:
             nsd = namespaces(self.original)
             for k in nsd:
@@ -75,7 +76,7 @@ class SyncSites:
 
         self.differences = {}
         self.user_diff = {}
-        print 'Syncing to', 
+        print 'Syncing to',
         for s in self.sites:
             self.differences[s] = []
             self.user_diff[s] = []
@@ -103,16 +104,16 @@ class SyncSites:
     def check_namespaces(self):
         '''Check all namespaces, to be ditched for clarity'''
         namespaces = [
-            0,   # Main
-            8,   # MediaWiki
-            152, # DPL
-            102, # Eigenschap
-            104, # Type
-            106, # Formulier
-            108, # Concept
-            10,  # Sjabloon
-            ]
-        
+            0,    # Main
+            8,    # MediaWiki
+            152,  # DPL
+            102,  # Eigenschap
+            104,  # Type
+            106,  # Formulier
+            108,  # Concept
+            10,   # Sjabloon
+        ]
+
         if self.options.namespace:
             print options.namespace
             namespaces = [int(options.namespace)]
@@ -126,9 +127,9 @@ class SyncSites:
 
         print "\nCHECKING NAMESPACE", namespace
         pages = imap(lambda p: p.title(),
-                    self.original.allpages('!', namespace=namespace))
+                     self.original.allpages('!', namespace=namespace))
         for p in pages:
-            if not p in ['MediaWiki:Sidebar', 'MediaWiki:Mainpage', 
+            if not p in ['MediaWiki:Sidebar', 'MediaWiki:Mainpage',
                          'MediaWiki:Sitenotice', 'MediaWiki:MenuSidebar']:
                 try:
                     self.check_page(p)
@@ -137,7 +138,6 @@ class SyncSites:
                 except pywikibot.exceptions.IsRedirectPage:
                     print 'error: Redirectpage - todo: handle gracefully'
         print
-
 
     def generate_overviews(self):
         '''Create page on wikis with overview of bot results'''
@@ -148,7 +148,7 @@ class SyncSites:
                 output += "".join(map(lambda l: '* [[:' + l + "]]\n", self.differences[site]))
             else:
                 output += "All important pages are the same"
-            
+
             output += "\n\n== Admins from original that are missing here ==\n\n"
             if self.user_diff[site]:
                 output += "".join(map(lambda l: '* ' + l.replace('_', ' ') + "\n", self.user_diff[site]))
@@ -157,7 +157,6 @@ class SyncSites:
 
             print output
             sync_overview_page.put(output, self.put_message(site))
-
 
     def put_message(self, site):
         return site.loggedInAs() + ' sync.py synchronization from ' + str(self.original)
@@ -179,15 +178,15 @@ class SyncSites:
                 print "\nCross namespace, new title: ", new_pagename
             else:
                 new_pagename = pagename
-            
+
             page2 = Page(site, new_pagename)
             if page2.exists():
                 txt2 = page2.get()
-                
+
             else:
                 txt2 = ''
-                
-            if config.replicate_replace.has_key(str(site)):
+
+            if str(site) in config.replicate_replace:
                 txt_new = multiple_replace(txt1, config.replicate_replace[str(site)])
                 if txt1 != txt_new:
                     print 'NOTE: text replaced using config.sync_replace'
@@ -198,11 +197,11 @@ class SyncSites:
                 print "\n", site, 'DIFFERS'
                 self.differences[site].append(pagename)
 
-		if self.options.replace:
-		  page2.put(txt1, self.put_message(site))
-            else:
-                sys.stdout.write('.')
-                sys.stdout.flush()
+        if self.options.replace:
+            page2.put(txt1, self.put_message(site))
+        else:
+            sys.stdout.write('.')
+            sys.stdout.flush()
 
 
 if __name__ == '__main__':
@@ -222,7 +221,7 @@ if __name__ == '__main__':
                         help="specify namespace")
     parser.add_argument("-dns", "--dest-namespace", dest="dest_namespace",
                         help="destination namespace (if different)")
-    
+
     (options, args) = parser.parse_known_args()
 
     # sync is global for convenient IPython debugging
