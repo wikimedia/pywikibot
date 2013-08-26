@@ -57,13 +57,19 @@ Syntax example:
 #  ...
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
-__version__       = '$Id$'
+__version__ = '$Id$'
 #
 
 
-import datetime, time
-import thread, threading
-import sys, os, traceback, gc, resource
+import datetime
+import time
+import thread
+import threading
+import sys
+import os
+import traceback
+import gc
+import resource
 import re
 
 # http://labix.org/lunatic-python
@@ -78,25 +84,25 @@ import pywikibot
 import pywikibot.botirc
 
 
-bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
+bot_config = {
+    'BotName': pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
 
-            # protected !!! ('CSS' or other semi-protected page is essential here)
-            'ConfCSSshell':     u'User:DrTrigon/DrTrigonBot/script_wui-shell.css',    # u'User:DrTrigonBot/Simon sagt' ?
-            'ConfCSScrontab':   u'User:DrTrigon/DrTrigonBot/script_wui-crontab.css',
+    # protected !!! ('CSS' or other semi-protected page is essential here)
+    'ConfCSSshell': u'User:DrTrigon/DrTrigonBot/script_wui-shell.css',    # u'User:DrTrigonBot/Simon sagt' ?
+    'ConfCSScrontab': u'User:DrTrigon/DrTrigonBot/script_wui-crontab.css',
 
-            # (may be protected but not that important... 'CSS' is not needed here !!!)
-            'ConfCSSoutput':    u'User:DrTrigonBot/Simulation',
+    # (may be protected but not that important... 'CSS' is not needed here !!!)
+    'ConfCSSoutput': u'User:DrTrigonBot/Simulation',
 
-            'CRONMaxDelay':     5*60.0,       # check all ~5 minutes
+    'CRONMaxDelay': 5 * 60.0,       # check all ~5 minutes
+#    'queue_security':       ([u'DrTrigon', u'DrTrigonBot'], u'Bot: exec'),
+#    'queue_security':       ([u'DrTrigon'], u'Bot: exec'),
 
-#        'queue_security':       ([u'DrTrigon', u'DrTrigonBot'], u'Bot: exec'),
-#        'queue_security':       ([u'DrTrigon'], u'Bot: exec'),
+    # supported and allowed bot scripts
+    # (at the moment all)
 
-        # supported and allowed bot scripts
-        # (at the moment all)
-
-        # forbidden parameters
-        # (at the moment none, but consider e.g. '-always' or allow it with '-simulate' only!)
+    # forbidden parameters
+    # (at the moment none, but consider e.g. '-always' or allow it with '-simulate' only!)
 }
 
 __simulate = True
@@ -124,12 +130,12 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 
         # init constants
         templ = pywikibot.Page(self.site, bot_config['ConfCSSshell'])
-        cron  = pywikibot.Page(self.site, bot_config['ConfCSScrontab'])
+        cron = pywikibot.Page(self.site, bot_config['ConfCSScrontab'])
 
         self.templ = templ.title()
-        self.cron  = cron.title()
-        self.refs  = { self.templ: templ,
-                       self.cron:  cron, }
+        self.cron = cron.title()
+        self.refs = {self.templ: templ,
+                     self.cron:  cron, }
         pywikibot.output(u'** Pre-loading all relevant page contents')
         for item in self.refs:
             # security; first check if page is protected, reject any data if not
@@ -176,9 +182,9 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
             # (date supported only, thus [min] and [hour] dropped)
             entry = crontab.CronTab(timestmp)
             # find the delay from current minute (does not return 0.0 - but next)
-            delay = entry.next(datetime.datetime.now().replace(second=0,microsecond=0)-datetime.timedelta(microseconds=1))
+            delay = entry.next(datetime.datetime.now().replace(second=0, microsecond=0) - datetime.timedelta(microseconds=1))
             #pywikibot.output(u'CRON delay for execution: %.3f (<= %i)' % (delay, bot_config['CRONMaxDelay']))
-    
+
             if (delay <= bot_config['CRONMaxDelay']):
                 pywikibot.output(u"CRONTAB: %s / %s / %s" % (page, rev, timestmp))
                 self.do_check(page.title(), int(rev))
@@ -187,14 +193,15 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         # Create two threads as follows
         # (simple 'thread' for more sophisticated code use 'threading')
         try:
-            thread.start_new_thread( main_script, (self.refs[page_title], rev, params) )
+            thread.start_new_thread(main_script, (self.refs[page_title], rev, params))
         except:
             # (done according to subster in trunk and submit in rewrite/.../data/api.py)
             # TODO: is this error handling here needed at all??!?
-            pywikibot.exception(tb=True) # secure traceback print (from api.py submit)
+            pywikibot.exception(tb=True)  # secure traceback print (from api.py submit)
             pywikibot.warning(u"Unable to start thread")
 
             wiki_logger(traceback.format_exc(), self.refs[page_title], rev)
+
 
 # Define a function for the thread
 def main_script(page, rev=None, params=None):
@@ -225,10 +232,10 @@ def main_script(page, rev=None, params=None):
     else:
         code = page.getOldVersion(rev)  # crontab; scheduled
     try:
-        exec( code )
+        exec(code)
     except:
         # (done according to subster in trunk and submit in rewrite/.../data/api.py)
-        pywikibot.exception(tb=True) # secure traceback print (from api.py submit)
+        pywikibot.exception(tb=True)  # secure traceback print (from api.py submit)
 
     sys.stdout = sys.__stdout__
     sys.stderr = sys.__stderr__
@@ -245,25 +252,27 @@ def main_script(page, rev=None, params=None):
     pywikibot.config.simulate = __simulate
     sys.argv = __sys_argv
 
-    pywikibot.output(u'environment: garbage; %s / memory; %s / members; %s' % (gc.collect(), resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*resource.getpagesize(), len(dir())))
+    pywikibot.output(u'environment: garbage; %s / memory; %s / members; %s' % (gc.collect(), resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * resource.getpagesize(), len(dir())))
     # 'len(dir())' is equivalent to 'len(inspect.getmembers(__main__))'
 
     # append result to output page
     if rev is None:
         wiki_logger(buffer.getvalue(), page, rev)
 
+
 def wiki_logger(buffer, page, rev=None):
     # (might be a problem here for TS and SGE, output string has another encoding)
     #buffer  = buffer.decode(config.console_encoding)
     buffer = re.sub("\03\{(.*?)\}(.*?)\03\{default\}", "\g<2>", buffer)
     if rev is None:
-        rev  = page.latestRevision()
+        rev = page.latestRevision()
         link = page.permalink(oldid=rev)
     # append to page
     outpage = pywikibot.Page(pywikibot.getSite(), bot_config['ConfCSSoutput'])
     text = outpage.get()
     outpage.put(text + u"\n== Simulation vom %s mit [%s code:%s] ==\n<pre>\n%s</pre>\n\n" % (pywikibot.Timestamp.now().isoformat(' '), link, rev, buffer))
 #                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
+
 
 def main():
     global __simulate, __sys_argv
