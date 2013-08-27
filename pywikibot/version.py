@@ -10,8 +10,7 @@
 __version__ = '$Id$'
 
 import os
-import time
-import datetime
+import time, datetime
 import urllib
 import subprocess
 
@@ -122,12 +121,14 @@ def getversion_git(path=None):
     t = tag.strip().split('/')
     tag = '[%s] %s' % (t[0][:-1], '/'.join(t[3:])[:-4])
     info = subprocess.Popen("git log --pretty=format:'%ad|%an|%h|%H|%d' --abbrev-commit --date=iso -1 | cat -",
+                            cwd=_program_dir,
                             shell=True,
                             stdout=subprocess.PIPE).stdout.read()
     info = info.split('|')
     date = info[0][:-6]
     date = time.strptime(date, '%Y-%m-%d %H:%M:%S')
     rev = subprocess.Popen('git rev-list HEAD | wc -l',
+                           cwd=_program_dir,
                            shell=True,
                            stdout=subprocess.PIPE).stdout.read()
     rev = int(rev.strip())
@@ -173,7 +174,7 @@ def getfileversion(filename):
     fn = os.path.join(_program_dir, filename)
     if os.path.exists(fn):
         for line in open(fn, 'r').readlines():
-            if line.find('__initversion__') == 0:
+            if line.find('__version__') == 0:
                 exec(line)
                 break
         stat = os.stat(fn)

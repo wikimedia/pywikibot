@@ -7,8 +7,8 @@ The initialization file for the Pywikibot framework.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '2.0b1'
-__initversion__ = '$Id$'
+__release__ = '2.0b1'
+__version__ = '$Id$'
 
 import datetime
 import difflib
