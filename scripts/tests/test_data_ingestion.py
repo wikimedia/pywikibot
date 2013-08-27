@@ -12,9 +12,10 @@ import pywikibot
 
 import data_ingestion
 
+
 class TestPhoto(unittest.TestCase):
     def setUp(self):
-        self.obj = data_ingestion.Photo(URL='http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png', 
+        self.obj = data_ingestion.Photo(URL='http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png',
                                         metadata={'description.en': '"Sounds" icon',
                                                   'source': 'http://commons.wikimedia.org/wiki/File:Sound-icon.svg',
                                                   'author': 'KDE artists | Silstor',

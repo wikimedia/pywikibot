@@ -49,7 +49,7 @@ if os.name == "nt":
         def set_ui(self, key, value):
             import pywikibot
             setattr(pywikibot.ui, key, value)
-            
+
         def cls(self):
             os.system('cls')
 
@@ -101,15 +101,15 @@ if __name__ == "__main__":
             newstdout.truncate(0)
             newstderr.truncate(0)
             newstdin.truncate(0)
-            
+
             pywikibot.config.colorized_output = True
             pywikibot.config.transliterate = False
             pywikibot.ui.transliteration_target = None
             pywikibot.ui.encoding = 'utf-8'
 
         def tearDown(self):
-            unpatch()    
-                      
+            unpatch()
+
     class TestTerminalOutput(UITestCase):
         def testOutputLevels_logging_debug(self):
             logger.log(DEBUG, 'debug', extra=loggingcontext)
@@ -269,7 +269,7 @@ if __name__ == "__main__":
             returned = pywikibot.inputChoice("question", ["answer 1", "answer 2", "answer 3"], ["A", "N", "S"], "A")
 
             self.assertEqual(newstdout.getvalue(), "")
-            self.assertEqual(newstderr.getvalue(), "question ([A]nswer 1, a[N]swer 2, an[S]wer 3) "*2)
+            self.assertEqual(newstderr.getvalue(), "question ([A]nswer 1, a[N]swer 2, an[S]wer 3) " * 2)
 
             self.assertIsInstance(returned, unicode)
             self.assertEqual(returned, "n")
@@ -325,7 +325,7 @@ if __name__ == "__main__":
             pywikibot.config.transliterate = True
             pywikibot.output(u"abcd АБГД αβγδ あいうえお")
             self.assertEqual(newstdout.getvalue(), "")
-            self.assertEqual(newstderr.getvalue(), "abcd \x1b[33;1mA\x1b[0m\x1b[33;1mB\x1b[0m\x1b[33;1mG\x1b[0m\x1b[33;1mD\x1b[0m \x1b[33;1ma\x1b[0m\x1b[33;1mb\x1b[0m\x1b[33;1mg\x1b[0m\x1b[33;1md\x1b[0m \x1b[33;1ma\x1b[0m\x1b[33;1mi\x1b[0m\x1b[33;1mu\x1b[0m\x1b[33;1me\x1b[0m\x1b[33;1mo\x1b[0m\n\x1b[0m") # noqa
+            self.assertEqual(newstderr.getvalue(), "abcd \x1b[33;1mA\x1b[0m\x1b[33;1mB\x1b[0m\x1b[33;1mG\x1b[0m\x1b[33;1mD\x1b[0m \x1b[33;1ma\x1b[0m\x1b[33;1mb\x1b[0m\x1b[33;1mg\x1b[0m\x1b[33;1md\x1b[0m \x1b[33;1ma\x1b[0m\x1b[33;1mi\x1b[0m\x1b[33;1mu\x1b[0m\x1b[33;1me\x1b[0m\x1b[33;1mo\x1b[0m\n\x1b[0m")  # noqa
 
     @unittest.skipUnless(os.name == "nt", "requires Windows console")
     class TestWindowsTerminalUnicode(UITestCase):
@@ -341,7 +341,7 @@ if __name__ == "__main__":
                                             creationflags=subprocess.CREATE_NEW_CONSOLE)
             _manager.connect()
             cls.pywikibot = _manager.pywikibot()
-            
+
             cls._app = pywinauto.application.Application()
             cls._app.connect_(process=cls._process.pid)
 
@@ -380,13 +380,13 @@ if __name__ == "__main__":
 
         def setUp(self):
             super(TestWindowsTerminalUnicode, self).setUp()
-            
+
             self.pywikibot.set_config('colorized_output', True)
             self.pywikibot.set_config('transliterate', False)
             self.pywikibot.set_config('console_encoding', 'utf-8')
             self.pywikibot.set_ui('transliteration_target', None)
             self.pywikibot.set_ui('encoding', 'utf-8')
-            
+
             self.pywikibot.cls()
             self.setclip(u'')
 

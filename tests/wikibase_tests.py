@@ -20,6 +20,7 @@ site = pywikibot.Site('en', 'wikipedia')
 mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
 wikidata = site.data_repository()
 
+
 class TestGeneral(PywikibotTestCase):
     def testWikibase(self):
         if not site.has_transcluded_data:

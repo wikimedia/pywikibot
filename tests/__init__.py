@@ -24,6 +24,7 @@ class TestRequest(CachedRequest):
     def _expired(self, dt):
         return False
 
+
 def patch_request():
     pywikibot.data.api.Request = TestRequest
 

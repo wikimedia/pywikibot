@@ -32,7 +32,7 @@ sys.path.append(os.path.join(rewrite_path, 'externals'))
 if "PYWIKIBOT2_DIR" not in os.environ:
     os.environ["PYWIKIBOT2_DIR"] = os.path.split(__file__)[0]
 
-for i,x in enumerate(sys.argv):
+for i, x in enumerate(sys.argv):
     if x.startswith("-dir:"):
         os.environ["PYWIKIBOT2_DIR"] = x[5:]
         sys.argv.pop(i)

@@ -23,10 +23,11 @@ dirname = os.path.join(os.path.dirname(__file__), "pages")
 for f in ["enwiki_help_editing"]:
     files[f] = codecs.open(os.path.join(dirname, f + ".page"), 'r', 'utf-8').read()
 
+
 class TestSectionFunctions(unittest.TestCase):
     def contains(self, fn, sn):
         return textlib.does_text_contain_section(
-                files[fn], sn)
+            files[fn], sn)
 
     def assertContains(self, fn, sn, *args, **kwargs):
         self.assertEqual(self.contains(fn, sn), True, *args, **kwargs)
