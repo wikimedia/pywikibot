@@ -3709,6 +3709,10 @@ class DataSite (APISite):
                 datavalue = {'type': 'string',
                              'value': sourceclaim._formatDataValue(),
                              }
+            elif sourceclaim.getType() == 'time':
+                datavalue = {'type': 'time',
+                             'value': sourceclaim._formatDataValue(),
+                             }
             else:
                 raise NotImplementedError('%s datatype is not supported yet.'
                                           % sourceclaim.getType())
@@ -3726,7 +3730,6 @@ class DataSite (APISite):
             # if present, all claims of one source have the same hash
             if not new and hasattr(sourceclaim, 'hash'):
                 params['reference'] = sourceclaim.hash
-
         params['snaks'] = json.dumps(snak)
         for arg in kwargs:
             if arg in ['baserevid', 'summary']:
