@@ -3505,6 +3505,8 @@ class DataSite (APISite):
                       )
         if bot:
             params['bot'] = 1
+        if 'summary' in kwargs:
+            params['summary'] = kwargs['summary']
         params['token'] = self.token(claim, 'edit')
         if snaktype == 'value':
             params['value'] = json.dumps(claim._formatDataValue())
@@ -3556,7 +3558,7 @@ class DataSite (APISite):
                 }
         params['snaks'] = json.dumps(snak)
         for arg in kwargs:
-            if arg in ['bot', 'lastrevid']:
+            if arg in ['bot', 'lastrevid', 'summary']:
                 params[arg] = kwargs[arg]
 
         req = api.Request(site=self, **params)
