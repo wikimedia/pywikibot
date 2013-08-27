@@ -3439,7 +3439,7 @@ class DataSite (APISite):
         return data
 
     @must_be(group='user')
-    def addClaim(self, item, claim, bot=True):
+    def addClaim(self, item, claim, bot=True, **kwargs):
 
         params = dict(action='wbcreateclaim',
                       entity=item.getID(),
@@ -3451,6 +3451,8 @@ class DataSite (APISite):
             params['bot'] = 1
         if claim.getSnakType() == 'value':
             params['value'] = json.dumps(claim._formatDataValue())
+        if 'summary' in kwargs:
+            params['summary'] = kwargs['summary']
         params['token'] = self.token(item, 'edit')
         req = api.Request(site=self, **params)
         data = req.submit()
@@ -3545,7 +3547,7 @@ class DataSite (APISite):
         params['claim'] = '|'.join(claim.snak for claim in claims)
         params['token'] = self.token(pywikibot.Page(self, u'Main Page'), 'edit')  # Use a dummy page
         for kwarg in kwargs:
-            if kwarg in ['bot', 'baserevid']:
+            if kwarg in ['bot', 'baserevid', 'summary']:
                 params[kwarg] = kwargs[kwarg]
         req = api.Request(site=self, **params)
         data = req.submit()
