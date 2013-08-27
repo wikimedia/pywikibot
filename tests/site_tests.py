@@ -29,8 +29,8 @@ class TestSiteObject(unittest.TestCase):
         global mysite, mainpage, imagepage
         mysite = pywikibot.Site(cls.code, cls.family)
         mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
-        imagepage = iter(mainpage.imagelinks()).next() # 1st image on main page
-        
+        imagepage = iter(mainpage.imagelinks()).next()  # 1st image on main page
+
     @classmethod
     def tearDownClass(cls):
         unpatch_request
@@ -56,7 +56,7 @@ class TestSiteObject(unittest.TestCase):
         self.assertType(mysite.linktrail(), basestring)
         self.assertType(mysite.redirect(default=True), basestring)
         self.assertType(mysite.disambcategory(), pywikibot.Category)
-        self.assertEqual(mysite.linkto("foo"), u"[[Foo]]") # deprecated
+        self.assertEqual(mysite.linkto("foo"), u"[[Foo]]")  # deprecated
         self.assertFalse(mysite.isInterwikiLink("foo"))
         self.assertType(mysite.redirectRegex().pattern, basestring)
         self.assertType(mysite.category_on_one_line(), bool)
@@ -85,14 +85,14 @@ class TestSiteObject(unittest.TestCase):
         ipf = mysite.interwiki_putfirst()
         if ipf:  # Not all languages use this
             self.assertType(ipf, list)
-        
+
         for item in mysite.validLanguageLinks():
             self.assertTrue(item in langs, item)
 
     def testNamespaceMethods(self):
         """Test cases for methods manipulating namespace names"""
 
-        builtins = {'Talk': 1, # these should work in any MW wiki
+        builtins = {'Talk': 1,  # these should work in any MW wiki
                     'User': 2,
                     'User talk': 3,
                     'Project': 4,
@@ -185,7 +185,7 @@ class TestSiteObject(unittest.TestCase):
     def testTokens(self):
         """Test ability to get page tokens"""
 
-        for ttype in ("edit", "move"): # token types for non-sysops
+        for ttype in ("edit", "move"):  # token types for non-sysops
             self.assertType(mysite.token(mainpage, ttype), basestring)
         self.assertRaises(KeyError, mysite.token, mainpage, "invalidtype")
 

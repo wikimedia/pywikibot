@@ -368,12 +368,12 @@ class Page(object):
     def expand_text(self, refresh=False):
         """Return the page text with all templates expanded."""
         if not hasattr(self, "_expanded_text") or (self._expanded_text is None) or refresh:
-            req = pywikibot.data.api.Request(action="expandtemplates", 
+            req = pywikibot.data.api.Request(action="expandtemplates",
                                              text=self.text,
                                              title=self.title(withSection=False),
                                              site=self.site)
             self._expanded_text = req.submit()["expandtemplates"]["*"]
-            
+
         return self._expanded_text
 
     def userName(self):
@@ -499,7 +499,7 @@ class Page(object):
 
         """
         ns = self.namespace()
-        if ns < 0: # Special page
+        if ns < 0:  # Special page
             return None
         if self.isTalkPage():
             if self.namespace() == 1:
@@ -691,7 +691,7 @@ class Page(object):
 
         """
         # TODO: move this to Site object?
-        if config.ignore_bot_templates: #Check the "master ignore switch"
+        if config.ignore_bot_templates:  # Check the "master ignore switch"
             return True
         username = self.site.user()
         try:
@@ -803,7 +803,7 @@ class Page(object):
             pywikibot.log(u"Error saving page %s (%s)\n" % (link, err),
                           exc_info=True)
             if not callback and not async:
-                raise pywikibot.PageNotSaved("%s: %s" %(link, err))
+                raise pywikibot.PageNotSaved("%s: %s" % (link, err))
         if callback:
             callback(self, err)
 
@@ -1474,7 +1474,7 @@ class Page(object):
 
         """
         if not self.isCategory():
-            return None # should this raise an exception??
+            return None  # should this raise an exception??
         try:
             return self.site.categoryinfo(self)
         except NotImplementedError:
@@ -2207,7 +2207,7 @@ class User(Page):
                 raise err
 
     @deprecated("contributions")
-    @deprecate_arg("limit", "total") # To be consistent with rest of framework
+    @deprecate_arg("limit", "total")  # To be consistent with rest of framework
     def editedPages(self, total=500):
         """ Deprecated function that wraps 'contributions' for backwards
         compatibility. Yields pywikibot.Page objects that this user has
@@ -2220,7 +2220,7 @@ class User(Page):
         for item in self.contributions(total=total):
             yield item[0]
 
-    @deprecate_arg("limit", "total") # To be consistent with rest of framework
+    @deprecate_arg("limit", "total")  # To be consistent with rest of framework
     @deprecate_arg("namespace", "namespaces")
     def contributions(self, total=500, namespaces=[]):
         """ Yield tuples describing this user edits with an upper bound of
@@ -2755,7 +2755,6 @@ class Claim(PropertyPage):
         wrap = {'mainsnak': data}
         return Claim.fromJSON(site, wrap)
 
-
     def setTarget(self, value):
         """
         Sets the target to the passed value.
@@ -2845,8 +2844,6 @@ class Claim(PropertyPage):
         else:
             raise NotImplementedError('%s datatype is not supported yet.' % self.getType())
         return value
-
-
 
 
 class Revision(object):
@@ -2988,7 +2985,7 @@ class Link(object):
                 # remove any subsequent whitespace
                 t = t.lstrip(u":").lstrip(u" ")
                 continue
-            prefix = t[ :t.index(u":")].lower() # part of text before :
+            prefix = t[ :t.index(u":")].lower()  # part of text before :
             ns = self._source.ns_index(prefix)
             if ns:
                 # The prefix is a namespace in the source wiki
@@ -3264,6 +3261,7 @@ not supported by PyWikiBot!"""
 
 # Utility functions for parsing page titles
 
+
 def html2unicode(text, ignore = None):
     """Return text, replacing HTML entities by equivalent unicode characters."""
     if ignore is None:
@@ -3275,33 +3273,33 @@ def html2unicode(text, ignore = None):
     # These characters are Html-illegal, but sadly you *can* find some of
     # these and converting them to unichr(decimal) is unsuitable
     convertIllegalHtmlEntities = {
-        128 : 8364, # €
-        130 : 8218, # ‚
-        131 : 402,  # ƒ
-        132 : 8222, # „
-        133 : 8230, # …
-        134 : 8224, # †
-        135 : 8225, # ‡
-        136 : 710,  # ˆ
-        137 : 8240, # ‰
-        138 : 352,  # Š
-        139 : 8249, # ‹
-        140 : 338,  # Œ
-        142 : 381,  # Ž
-        145 : 8216, # ‘
-        146 : 8217, # ’
-        147 : 8220, # “
-        148 : 8221, # ”
-        149 : 8226, # •
-        150 : 8211, # –
-        151 : 8212, # —
-        152 : 732,  # ˜
-        153 : 8482, # ™
-        154 : 353,  # š
-        155 : 8250, # ›
-        156 : 339,  # œ
-        158 : 382,  # ž
-        159 : 376   # Ÿ
+        128 : 8364,  # €
+        130 : 8218,  # ‚
+        131 : 402,   # ƒ
+        132 : 8222,  # „
+        133 : 8230,  # …
+        134 : 8224,  # †
+        135 : 8225,  # ‡
+        136 : 710,   # ˆ
+        137 : 8240,  # ‰
+        138 : 352,   # Š
+        139 : 8249,  # ‹
+        140 : 338,   # Œ
+        142 : 381,   # Ž
+        145 : 8216,  # ‘
+        146 : 8217,  # ’
+        147 : 8220,  # “
+        148 : 8221,  # ”
+        149 : 8226,  # •
+        150 : 8211,  # –
+        151 : 8212,  # —
+        152 : 732,   # ˜
+        153 : 8482,  # ™
+        154 : 353,   # š
+        155 : 8250,  # ›
+        156 : 339,   # œ
+        158 : 382,   # ž
+        159 : 376    # Ÿ
     }
     #ensuring that illegal &#129; &#141; and &#157, which have no known values,
     #don't get converted to unichr(129), unichr(141) or unichr(157)
@@ -3338,6 +3336,7 @@ def html2unicode(text, ignore = None):
             result += text
             found = False
     return result
+
 
 def url2unicode(title, site, site2 = None):
     """Convert url-encoded text to unicode using site's encoding.

@@ -2818,7 +2818,7 @@ class APISite(BaseSite):
             "User %(user)s not allowed to edit through the API",
         "alreadyrolled":
             "Page [[%(title)s]] already rolled back; action aborted.",
-    } # other errors shouldn't arise because we check for those errors
+    }  # other errors shouldn't arise because we check for those errors
 
     def rollbackpage(self, page, summary=u''):
         """Roll back page to version before last user's edits.
@@ -2883,7 +2883,7 @@ class APISite(BaseSite):
             "User %(user)s not authorized to delete pages on %(site)s wiki.",
         "cantdelete":
             "Could not delete [[%(title)s]]. Maybe it was deleted already.",
-    } # other errors shouldn't occur because of pre-submission checks
+    }  # other errors shouldn't occur because of pre-submission checks
 
     def deletepage(self, page, summary):
         """Delete page from the wiki. Requires appropriate privilege level.
@@ -2994,7 +2994,7 @@ class APISite(BaseSite):
         NOTE 2: it returns the image title WITHOUT the image namespace.
 
         """
-        if hash_found is None: # If the hash is none return None and not continue
+        if hash_found is None:  # If the hash is none return None and not continue
             return None
         return [image.title(withNamespace=False)
                 for image in self.allimages(sha1=hash_found)]
@@ -3002,7 +3002,6 @@ class APISite(BaseSite):
     @deprecated('Site().getFilesFromAnHash')
     def getImagesFromAnHash(self, hash_found=None):
         return self.getFilesFromAnHash(hash_found)
-
 
     def upload(self, imagepage, source_filename=None, source_url=None,
                comment=None, watch=False, ignore_warnings=False):
@@ -3108,7 +3107,7 @@ class APISite(BaseSite):
     @deprecate_arg("repeat", None)
     @deprecate_arg("namespace", "namespaces")
     @deprecate_arg("rc_show", None)
-    @deprecate_arg("get_redirect", None) #20120822
+    @deprecate_arg("get_redirect", None)  # 20120822
     def newpages(self, user=None, returndict=False,
                  start=None, end=None, reverse=False, showBot=False,
                  showRedirects=False, excludeuser=None,
@@ -3435,7 +3434,7 @@ class DataSite (APISite):
         #Store it for 100 years
         req = api.CachedRequest(expiry, site=self, **params)
         data = req.submit()
-        dtype =  data['entities'][prop.getID()]['datatype']
+        dtype = data['entities'][prop.getID()]['datatype']
         if dtype == 'globe-coordinate':
             dtype = 'globecoordinate'
             #TODO Fix this
