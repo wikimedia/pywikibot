@@ -87,8 +87,8 @@ class Page(object):
             self._revisions = {}
         else:
             raise pywikibot.Error(
-                  "Invalid argument type '%s' in Page constructor: %s"
-                  % (type(source), source))
+                "Invalid argument type '%s' in Page constructor: %s"
+                % (type(source), source))
 
     @property
     def site(self):
@@ -2741,9 +2741,15 @@ class Claim(PropertyPage):
         bit differently, and require some
         more handling.
         """
-        mainsnak = data['snaks'].values()[0][0]
-        wrap = {'mainsnak': mainsnak, 'hash': data['hash']}
-        return Claim.fromJSON(site, wrap)
+        source = {}
+        for prop in data['snaks'].values():
+            for claimsnak in prop:
+                claim = Claim.fromJSON(site, {'mainsnak': claimsnak, 'hash': data['hash']})
+                if claim.getID() in source:
+                    source[claim.getID()].append(claim)
+                else:
+                    source[claim.getID()] = [claim]
+        return source
 
     @staticmethod
     def qualifierFromJSON(site, data):
@@ -2754,7 +2760,6 @@ class Claim(PropertyPage):
         """
         wrap = {'mainsnak': data}
         return Claim.fromJSON(site, wrap)
-
 
     def setTarget(self, value):
         """
@@ -2815,18 +2820,33 @@ class Claim(PropertyPage):
 
     def getSources(self):
         """
-        Returns a list of Claims
+        Returns a list of sources. Each source is a list of Claims.
         """
         return self.sources
 
-    def addSource(self, source, **kwargs):
+    def addSource(self, claim, **kwargs):
         """
-        source is a Claim.
-        adds it as a reference.
+        Adds the claim as a source.
+        @param claim: the claim to add
+        @type claim: pywikibot.Claim
         """
-        data = self.repo.editSource(self, source, new=True, **kwargs)
-        source.hash = data['reference']['hash']
-        self.on_item.lastrevid = data['pageinfo']['lastrevid']
+        self.addSources([claim], **kwargs)
+
+    def addSources(self, claims, **kwargs):
+        """
+        Adds the claims as one source.
+        @param claims: the claims to add
+        @type claims: list of pywikibot.Claim
+        """
+        data = self.repo.editSource(self, claims, new=True, **kwargs)
+        source = {}
+        for claim in claims:
+            claim.hash = data['reference']['hash']
+            self.on_item.lastrevid = data['pageinfo']['lastrevid']
+            if claim.getID() in source:
+                source[claim.getID()].append(claim)
+            else:
+                source[claim.getID()] = [claim]
         self.sources.append(source)
 
     def _formatDataValue(self):
@@ -2845,8 +2865,6 @@ class Claim(PropertyPage):
         else:
             raise NotImplementedError('%s datatype is not supported yet.' % self.getType())
         return value
-
-
 
 
 class Revision(object):

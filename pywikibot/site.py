@@ -3385,7 +3385,7 @@ class DataSite (APISite):
         """get the data for multiple Wikibase items"""
         if type(source) == int or \
            isinstance(source, basestring) and source.isdigit():
-            ids = 'q'+str(source)
+            ids = 'q' + str(source)
             wbrequest = api.Request(site=self, action="wbgetentities", ids=ids,
                                     **params)
             wbdata = wbrequest.submit()
@@ -3435,7 +3435,7 @@ class DataSite (APISite):
         #Store it for 100 years
         req = api.CachedRequest(expiry, site=self, **params)
         data = req.submit()
-        dtype =  data['entities'][prop.getID()]['datatype']
+        dtype = data['entities'][prop.getID()]['datatype']
         if dtype == 'globe-coordinate':
             dtype = 'globecoordinate'
             #TODO Fix this
@@ -3535,25 +3535,38 @@ class DataSite (APISite):
         if bot:
             params['bot'] = 1
         params['token'] = self.token(claim, 'edit')
-        if not new and hasattr(source, 'hash'):
-            params['reference'] = source.hash
         #build up the snak
-        if source.getType() == 'wikibase-item':
-            datavalue = {'type': 'wikibase-entityid',
-                         'value': source._formatDataValue(),
-                         }
-        elif source.getType() == 'string':
-            datavalue = {'type': 'string',
-                         'value': source._formatDataValue(),
-                         }
+        if isinstance(source, list):
+            sources = source
         else:
-            raise NotImplementedError('%s datatype is not supported yet.' % claim.getType())
-        snak = {source.getID(): [{'snaktype': 'value',
-                                  'property': source.getID(),
-                                  'datavalue': datavalue,
-                                  },
-                                 ],
-                }
+            sources = [source]
+
+        snak = {}
+        for sourceclaim in sources:
+            if sourceclaim.getType() == 'wikibase-item':
+                datavalue = {'type': 'wikibase-entityid',
+                             'value': sourceclaim._formatDataValue(),
+                             }
+            elif sourceclaim.getType() == 'string':
+                datavalue = {'type': 'string',
+                             'value': sourceclaim._formatDataValue(),
+                             }
+            else:
+                raise NotImplementedError('%s datatype is not supported yet.' % sourceclaim.getType())
+            valuesnaks = []
+            if sourceclaim.getID() in snak:
+                valuesnaks = snak[sourceclaim.getID()]
+            valuesnaks.append({'snaktype': 'value',
+                               'property': sourceclaim.getID(),
+                               'datavalue': datavalue,
+                               },
+                              )
+
+            snak[sourceclaim.getID()] = valuesnaks
+            # set the hash if the source should be changed. if present, all claims of one source have the same hash
+            if not new and hasattr(sourceclaim, 'hash'):
+                params['reference'] = sourceclaim.hash
+
         params['snaks'] = json.dumps(snak)
         for arg in kwargs:
             if arg in ['bot', 'lastrevid']:
