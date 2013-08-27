@@ -2847,7 +2847,7 @@ class APISite(BaseSite):
                   u"Rollback of %s aborted; only one user in revision history."
                    % page.title(asLink=True))
         summary = summary or (
-            u"Reverted edits by [[Special:Contributions/%(last_user)s|%(last_user)s]] ""
+            u"Reverted edits by [[Special:Contributions/%(last_user)s|%(last_user)s]] "
             u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
             % locals())
         token = self.token(page, "rollback")
