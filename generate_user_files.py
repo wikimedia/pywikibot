@@ -85,11 +85,20 @@ def listchoice(clist=[], message=None, default=None):
 
         if choice == '' and default:
             return default
-
+        try:
+            choice=int(choice)
+        except ValueError:
+            pass
+        if isinstance(choice, basestring):
+            if not choice in clist:
+                print("Invalid response")
+            else:
+                return choice
         try:
             return clist[int(choice) - 1]
         except:
-            print("Invalid response")
+            if not isinstance(choice, basestring):
+                print("Invalid response")
     return response
 
 
@@ -127,7 +136,7 @@ your operating system. See your operating system documentation for how to
 set environment variables.""" % locals(), width=76)
     for line in msg:
         print line
-    ok = raw_input("Is this OK? ([yes], [N]o) ")
+    ok = raw_input("Is this OK? ([y]es, [N]o) ")
     if ok in ["Y", "y"]:
         base_dir = new_base
         return True
@@ -152,9 +161,22 @@ def get_site_and_lang():
         )
         known_families = sorted(known_families)
         fam = listchoice(known_families,
-                         "Select family of sites we are working on",
+                         "Select family of sites we are working on, " \
+                         "just enter the number not name",
                          default='wikipedia')
         if fam not in single_wiki_families:
+            codesds=codecs.open("pywikibot/families/%s_family.py" % fam, "r","utf-8").read()
+            rre=re.compile("self\.languages\_by\_size *\= *(.+?)\]",re.DOTALL)
+            known_langs=[]
+            if not rre.findall(codesds):
+                rre=re.compile("self\.langs *\= *(.+?)\}",re.DOTALL)
+                if rre.findall(codesds):
+                    import ast
+                    known_langs=ast.literal_eval(rre.findall(codesds)[0]+u"}").keys()
+            else:
+                known_langs=eval(rre.findall(codesds)[0]+u"]")
+            print "This is the list of known language(s):"
+            print " ".join(sorted(known_langs))
             mylang = raw_input("The language code of the site we're working on (default: 'en'): ") or 'en'
         else:
             mylang = fam
@@ -301,13 +323,13 @@ if __name__ == "__main__":
         elif do_copy and "NO".startswith(do_copy):
             break
     if not os.path.isfile(os.path.join(base_dir, "user-config.py")):
-        a = raw_input("Create user-config.py file? ([y]es, [N]o) ")
+        a = raw_input("Create user-config.py file? Required for running bots ([y]es, [N]o) ")
         if a[:1] in ["Y", "y"]:
             create_user_config()
     else:
         print("NOTE: user-config.py already exists in the directory")
     if not os.path.isfile(os.path.join(base_dir, "user-fixes.py")):
-        a = raw_input("Create user-fixes.py file? ([y]es, [N]o) ")
+        a = raw_input("Create user-fixes.py file? Optional and for advanced users ([y]es, [N]o) ")
         if a[:1] in ["Y", "y"]:
             create_user_fixes()
     else:
