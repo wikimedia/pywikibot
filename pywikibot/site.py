@@ -2527,7 +2527,19 @@ class APISite(BaseSite):
         )
         return usgen
 
-    def randompages(self, step=None, total=1, namespaces=None,
+    @deprecated("Site.randompages()")
+    def randompage(self, redirect=False):
+        """
+        @param redirect: Return a random redirect page
+        @return: pywikibot.Page
+        """
+        return self.randompages(total=1, redirects=redirect)
+
+    @deprecated("Site.randompages()")
+    def randomredirectpage(self):
+        return self.randompages(total=1, redirects=True)
+
+    def randompages(self, step=None, total=10, namespaces=None,
                     redirects=False, content=False):
         """Iterate a number of random pages.
 

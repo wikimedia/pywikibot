@@ -94,6 +94,14 @@ parameterHelp = u"""\
 -newpages         Work on the most recent new pages. If given as -newpages:x,
                   will work on the x newest pages.
 
+-random           Work on random pages returned by [[Special:Random]]
+                  Can also be given as "-random:n" where n is the number
+                  of pages to be returned, otherwise the default is 10 pages.
+
+-randomredirect   Work on random redirect pages returned by [[Special:RandomRedirect]].
+                  Can also be given as "-randomredirect:n" where n is the number
+                  of pages to be returned, else 10 pages are returned.
+
 -recentchanges    Work on the pages with the most recent changes. If
                   given as -recentchanges:x, will work on the x most recently
                   changed pages.
@@ -285,6 +293,16 @@ class GeneratorFactory(object):
             page = pywikibot.Page(pywikibot.Link(title,
                                                  pywikibot.Site()))
             gen = InterwikiPageGenerator(page)
+        elif arg.startswith('-random'):
+            if len(arg) == 7:
+                gen = RandomPageGenerator()
+            else:
+                gen = RandomPageGenerator(number=int(arg[8:]))
+        elif arg.startswith('-randomredirect'):
+            if len(arg) == 15:
+                gen = RandomRedirectPageGenerator()
+            else:
+                gen = RandomRedirectPageGenerator(number=int(arg[16:]))
         elif arg.startswith('-recentchanges'):
             if len(arg) >= 15:
                 gen = RecentChangesPageGenerator(total=int(arg[15:]))
@@ -909,6 +927,19 @@ def ShortPagesPageGenerator(number=100, repeat=False, site=None):
     if site is None:
         site = pywikibot.Site()
     for page, length in site.shortpages(total=number, repeat=repeat):
+        yield page
+
+
+def RandomPageGenerator(number=10, site=None):
+    if site is None:
+        site = pywikibot.Site()
+    for page in site.randompages(total=number):
+        yield page
+
+def RandomRedirectPageGenerator(number=10, site=None):
+    if site is None:
+        site = pywikibot.Site()
+    for page in site.randompages(total=number, redirects=True):
         yield page
 
 
