@@ -126,22 +126,26 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         DO NOT FORGET TO REMOVE READ ACCESS FOR OTHER USERS!!!
         Use chmod 600 password-file.
+
         All lines below should be valid Python tuples in the form
         (code, family, username, password) or (username, password)
         to set a default password for an username. Default usernames
         should occur above specific usernames.
 
+        If the username or password contain non-ascii characters, they
+        should be stored using the utf-8 encoding.
+
         Example:
 
-        ("my_username", "my_default_password")
-        ("my_sysop_user", "my_sysop_password")
-        ("en", "wikipedia", "my_en_user", "my_en_pass")
+        (u"my_username", u"my_default_password")
+        (u"my_sysop_user", u"my_sysop_password")
+        (u"en", u"wikipedia", u"my_en_user", u"my_en_pass")
         """
         password_f = open(config.password_file)
         for line in password_f:
             if not line.strip():
                 continue
-            entry = eval(line)
+            entry = eval(line.decode('utf-8'))
             if len(entry) == 2:    # for default userinfo
                 if entry[0] == self.username:
                     self.password = entry[1]
