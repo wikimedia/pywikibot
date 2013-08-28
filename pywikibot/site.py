@@ -3510,7 +3510,7 @@ class DataSite (APISite):
         if snaktype == 'value':
             params['value'] = json.dumps(claim._formatDataValue())
 
-        params['lastrevid'] = claim.on_item.lastrevid
+        params['baserevid'] = claim.on_item.lastrevid
         req = api.Request(site=self, **params)
         data = req.submit()
         return data
@@ -3557,7 +3557,7 @@ class DataSite (APISite):
                 }
         params['snaks'] = json.dumps(snak)
         for arg in kwargs:
-            if arg in ['bot', 'lastrevid', 'summary']:
+            if arg in ['bot', 'baserevid', 'summary']:
                 params[arg] = kwargs[arg]
 
         req = api.Request(site=self, **params)
