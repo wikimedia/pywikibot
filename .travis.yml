@@ -16,6 +16,10 @@ install:
   - touch ~/.pywikibot/passwordfile
   - echo "('Pywikibot-test', '"$USER_PASSWORD"')" > ~/.pywikibot/passwordfile
 
+  - cd externals/httplib2
+  - python setup.py install
+  - cd ../..
+
 script:
   - python setup.py test
 
