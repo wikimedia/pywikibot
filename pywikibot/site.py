@@ -3466,7 +3466,7 @@ class DataSite (APISite):
             params['baserevid'] = kwargs['baserevid']
         params['token'] = self.token(pywikibot.Page(self, u'Main Page'), 'edit')  # Use a dummy page
         for arg in kwargs:
-            if arg in ['bot', 'clear', 'data', 'exclude', 'summary']:
+            if arg in ['clear', 'data', 'exclude', 'summary']:
                 params[arg] = kwargs[arg]
         params['data'] = json.dumps(data)
         req = api.Request(site=self, **params)
@@ -3569,7 +3569,7 @@ class DataSite (APISite):
                 }
         params['snaks'] = json.dumps(snak)
         for arg in kwargs:
-            if arg in ['bot', 'baserevid', 'summary']:
+            if arg in ['baserevid', 'summary']:
                 params[arg] = kwargs[arg]
 
         req = api.Request(site=self, **params)
@@ -3584,7 +3584,7 @@ class DataSite (APISite):
         params['claim'] = '|'.join(claim.snak for claim in claims)
         params['token'] = self.token(pywikibot.Page(self, u'Main Page'), 'edit')  # Use a dummy page
         for kwarg in kwargs:
-            if kwarg in ['bot', 'baserevid', 'summary']:
+            if kwarg in ['baserevid', 'summary']:
                 params[kwarg] = kwargs[kwarg]
         req = api.Request(site=self, **params)
         data = req.submit()
