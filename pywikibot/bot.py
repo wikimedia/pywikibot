@@ -643,8 +643,13 @@ def handleArgs(*args):
     if config.verbose_output:
         import re
         ver = pywikibot.__version__  # probably can be improved on
-        m = re.search(r"\$Id: (\w+) "
-                      r"\$", ver)
+        # Please don't change the regular expression here unless you really
+        # have to - some git versions (like 1.7.0.4) seem to treat lines
+        # containing just `$Id:` as if they were ident lines (see
+        # gitattributes(5)) leading to unwanted behaviour like automatic
+        # replacement with `$Id$` or `$Id$`.
+        m = re.search(r"\$Id"
+                      r": (\w+) \$", ver)
         pywikibot.output(u'Pywikipediabot r%s' % m.group(1))
         pywikibot.output(u'Python %s' % sys.version)
 
