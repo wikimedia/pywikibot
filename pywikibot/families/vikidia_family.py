@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+
 __version__ = '$Id$'
 
 from pywikibot import family
@@ -31,7 +32,7 @@ class Family(family.Family):
         uses a different value.
 
         """
-        return '/wiki'
+        return '/w'
 
     # Which version of MediaWiki is used? REQUIRED
     def version(self, code):
