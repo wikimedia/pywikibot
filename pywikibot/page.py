@@ -2283,6 +2283,8 @@ class WikibasePage(Page):
     There really should be no need to call this directly
     """
     def __init__(self, site, title=u"", **kwargs):
+        if not isinstance(site, pywikibot.site.DataSite):
+            raise TypeError("site must be a pywikibot.site.DataSite object")
         Page.__init__(self, site, title, **kwargs)
         self.repo = self.site
         self._isredir = False  # Wikibase pages cannot be a redirect
@@ -2495,9 +2497,9 @@ class ItemPage(WikibasePage):
     def __init__(self, site, title=None):
         """
         defined by qid XOR site AND title
-        options:
-        site=pywikibot.DataSite & title=Q42
-        site=pywikibot.Site & title=Main Page
+        @param site: data repository
+        @type site: pywikibot.site.DataSite
+        @param title: id number of item, "Q###"
         """
         super(ItemPage, self).__init__(site, title, ns=0)
         self.id = title.lower()
@@ -2660,6 +2662,11 @@ class PropertyPage(WikibasePage):
         PropertyPage(DataSite, 'Property:P21')
     """
     def __init__(self, source, title=u""):
+        """
+        @param source: data repository property is on
+        @type source: pywikibot.site.DataSite
+        @param title: page name of property, like "Property:P##"
+        """
         WikibasePage.__init__(self, source, title, ns=120)
         self.id = self.title(withNamespace=False).lower()
         if not self.id.startswith(u'p'):
@@ -2699,6 +2706,14 @@ class Claim(PropertyPage):
                  isQualifier=False):
         """
         Defined by the "snak" value, supplemented by site + pid
+
+        @param site: repository the claim is on
+        @type site: pywikibot.site.DataSite
+        @param pid: property id, with "P" prefix
+        @param snak: snak identifier for claim
+        @param hash: hash identifer for references
+        @param isReference: whether specified claim is a reference
+        @param isQualifier: whether specified claim is a qualifier
         """
         PropertyPage.__init__(self, site, 'Property:' + pid)
         self.snak = snak
