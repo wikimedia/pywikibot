@@ -80,8 +80,10 @@ for i, x in enumerate(sys.argv):
         sys.argv.pop(i)
         break
 
-
-if not os.path.exists(os.path.join(os.environ["PYWIKIBOT2_DIR"], "user-config.py")):
+user_config_path = os.path.join(os.environ["PYWIKIBOT2_DIR"], "user-config.py")
+if not os.path.exists(user_config_path):
+    print "NOTE:", user_config_path, "was not found!"
+    print "Please follow the prompts to create it:"
     run_python_file('generate_user_files.py', ['generate_user_files.py'])
 
 if len(sys.argv) > 1:
