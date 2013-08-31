@@ -120,18 +120,18 @@ def getversion_git(path=None):
     tag = tag[(s + 6):e]
     t = tag.strip().split('/')
     tag = '[%s] %s' % (t[0][:-1], '/'.join(t[3:])[:-4])
-    info = subprocess.Popen("git log --pretty=format:'%ad|%an|%h|%H|%d' --abbrev-commit --date=iso -1 | cat -",
+    info = subprocess.Popen('git --no-pager log --pretty=format:"%ad|%an|%h|%H|%d" --abbrev-commit --date=iso -1',
                             cwd=_program_dir,
                             shell=True,
                             stdout=subprocess.PIPE).stdout.read()
     info = info.split('|')
     date = info[0][:-6]
     date = time.strptime(date, '%Y-%m-%d %H:%M:%S')
-    rev = subprocess.Popen('git rev-list HEAD | wc -l',
+    rev = subprocess.Popen('git rev-list HEAD',
                            cwd=_program_dir,
                            shell=True,
                            stdout=subprocess.PIPE).stdout.read()
-    rev = int(rev.strip())
+    rev = len(rev.splitlines())
     hsh = info[3]      # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
         raise ParseError
