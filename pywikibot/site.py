@@ -2242,29 +2242,43 @@ class APISite(BaseSite):
                       namespaces=None, pagelist=None, changetype=None,
                       showMinor=None, showBot=None, showAnon=None,
                       showRedirects=None, showPatrolled=None, topOnly=False,
-                      step=None, total=None):
+                      step=None, total=None, user=None, excludeuser=None):
         """Iterate recent changes.
 
         @param start: Timestamp to start listing from
+        @type start: pywikibot.Timestamp
         @param end: Timestamp to end listing at
+        @type end: pywikibot.Timestamp
         @param reverse: if True, start with oldest changes (default: newest)
+        @type reverse: bool
         @param pagelist: iterate changes to pages in this list only
         @param pagelist: list of Pages
         @param changetype: only iterate changes of this type ("edit" for
             edits to existing pages, "new" for new pages, "log" for log
             entries)
+        @type changetype: basestring
         @param showMinor: if True, only list minor edits; if False (and not
             None), only list non-minor edits
+        @type showMinor: bool
         @param showBot: if True, only list bot edits; if False (and not
             None), only list non-bot edits
+        @type showBot: bool
         @param showAnon: if True, only list anon edits; if False (and not
             None), only list non-anon edits
+        @type showAnon: bool
         @param showRedirects: if True, only list edits to redirect pages; if
             False (and not None), only list edits to non-redirect pages
+        @type showRedirects: bool
         @param showPatrolled: if True, only list patrolled edits; if False
             (and not None), only list non-patrolled edits
+        @type showPatrolled: bool
         @param topOnly: if True, only list changes that are the latest revision
             (default False)
+        @type topOnly: bool
+        @param user: if not None, only list edits by this user or users
+        @type user: basestring|list
+        @param excludeuser: if not None, exclude edits by this user or users
+        @type excludeuser: basestring|list
 
         """
         if start and end:
@@ -2312,6 +2326,13 @@ class APISite(BaseSite):
                 rcshow.append(filters[item] and item or ("!" + item))
         if rcshow:
             rcgen.request["rcshow"] = "|".join(rcshow)
+
+        if user:
+            rcgen.request['rcuser'] = user
+
+        if excludeuser:
+            rcgen.request['rcexcludeuser'] = excludeuser
+
         return rcgen
 
     @deprecate_arg("number", "limit")
