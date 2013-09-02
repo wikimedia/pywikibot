@@ -33,23 +33,29 @@ class ClaimRobot:
         self.generator = generator
         self.claims = claims
         self.repo = pywikibot.Site().data_repository()
-        self.source = None
-        self.setSource(pywikibot.Site().language())
+        self.cacheSources()
 
-    def setSource(self, lang):
+    def getSource(self, lang):
         """
-        Get the source
+        Get the source for the specified language,
+        if possible
         """
-        page = pywikibot.Page(self.repo, 'Wikidata:List of wikis/python')
-        source_values = json.loads(page.get())
-        source_values = source_values['wikipedia']
-        for source_lang in source_values:
-            source_values[source_lang] = pywikibot.ItemPage(self.repo,
-                                                            source_values[source_lang])
+        if lang in self.source_values:
+            source = pywikibot.Claim(self.repo, 'p143')
+            source.setTarget(self.source_values.get(lang))
+            return source
 
-        if lang in source_values:
-            self.source = pywikibot.Claim(self.repo, 'p143')
-            self.source.setTarget(source_values.get(lang))
+    def cacheSources(self):
+        """
+        Fetches the sources from the onwiki list
+        and stores it internally
+        """
+        page = pywikibot.Page(self.repo, u'Wikidata:List of wikis/python')
+        self.source_values = json.loads(page.get())
+        self.source_values = self.source_values['wikipedia']
+        for source_lang in self.source_values:
+            self.source_values[source_lang] = pywikibot.ItemPage(self.repo,
+                                                                 self.source_values[source_lang])
 
     def run(self):
         """
@@ -72,8 +78,10 @@ class ClaimRobot:
                         pywikibot.output('Adding %s --> %s'
                                          % (claim.getID(), claim.getTarget()))
                         item.addClaim(claim)
-                        if self.source:
-                            claim.addSource(self.source, bot=True)
+                        # A generator might yield pages from multiple languages
+                        source = self.getSource(page.site.language())
+                        if source:
+                            claim.addSource(source, bot=True)
                         # TODO FIXME: We need to check that we aren't adding a
                         # duplicate
 
