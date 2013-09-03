@@ -12,17 +12,23 @@ import subprocess
 
 import unittest
 
+import pywikibot
+
 pypath = sys.executable
 basepath = os.path.split(os.path.split(__file__)[0])[0]
 pwbpath  = os.path.join(basepath, 'pwb.py')
 testbasepath = os.path.join(basepath, 'tests', 'pwb')
 
 class TestPwb(unittest.TestCase):
-    @unittest.skip("""Skipping test due to broken Travis run.
+    def setUp(self):
+        self.oldenviron = os.environ.copy()
+        os.environ['PYWIKIBOT2_DIR'] = pywikibot.config.base_dir
 
-Probably the shelling out causes an issue, but we have to investigate this.
-See https://gerrit.wikimedia.org/r/#/c/76486/ and
-    https://gerrit.wikimedia.org/r/#/c/82370/ for details. """)
+    def tearDown(self):
+        del os.environ['PYWIKIBOT2_DIR']
+        if 'PYWIKIBOT2_DIR' in self.oldenviron:
+            os.environ['PYWIKIBOT2_DIR'] = self.oldenviron['PYWIKIBOT2_DIR']
+
     def testScriptEnvironment(self):
         """Make sure the environment is not contaminated, and is the same as
            the environment we get when directly running a script."""
