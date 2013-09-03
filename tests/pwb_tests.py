@@ -22,7 +22,7 @@ class TestPwb(unittest.TestCase):
 
 Probably the shelling out causes an issue, but we have to investigate this.
 See https://gerrit.wikimedia.org/r/#/c/76486/ and
-    https://gerrit.wikimedia.org/r/#/c/82370/ for details. """
+    https://gerrit.wikimedia.org/r/#/c/82370/ for details. """)
     def testScriptEnvironment(self):
         """Make sure the environment is not contaminated, and is the same as
            the environment we get when directly running a script."""
