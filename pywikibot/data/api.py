@@ -989,6 +989,9 @@ def update_page(page, pagedict):
             coords.append(coord)
         page._coords = coords
 
+    if "pageprops" in pagedict:
+        page._pageprops = pagedict['pageprops']
+
 
 if __name__ == "__main__":
     from pywikibot import Site, logging

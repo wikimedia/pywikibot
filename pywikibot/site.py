@@ -1266,6 +1266,20 @@ class APISite(BaseSite):
                 continue
             api.update_page(page, pageitem)
 
+    def loadpageprops(self, page):
+        title = page.title(withSection=False)
+        query = self._generator(api.PropertyGenerator,
+                                type_arg="pageprops",
+                                titles=title.encode(self.encoding()),
+                                )
+        for pageitem in query:
+            if not self.sametitle(pageitem['title'], title):
+                pywikibot.warning(
+                    u"loadpageprops: Query on %s returned data on '%s'"
+                    % (page, pageitem['title']))
+                continue
+            api.update_page(page, pageitem)
+
     def loadimageinfo(self, page, history=False):
         """Load image info from api and save in page attributes
 

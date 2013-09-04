@@ -368,6 +368,24 @@ class Page(object):
         if hasattr(self, "_text"):
             del self._text
 
+    def properties(self, force=False):
+        """
+        Returns the various page properties stored for a page
+        @param force: force updating from the live site
+        @return: dict
+        """
+        if not hasattr(self, '_pageprops') or force:
+            self.site.loadpageprops(self)
+        return self._pageprops
+
+    def defaultsort(self, force=False):
+        """
+        Returns the value of {{DEFAULTSORT:}} magic word
+        @param force: force updating from the live site
+        @return: unicode
+        """
+        return self.properties(force=force).get('defaultsort')
+
     def expand_text(self, refresh=False):
         """Return the page text with all templates expanded."""
         if not hasattr(self, "_expanded_text") or (self._expanded_text is None) or refresh:
