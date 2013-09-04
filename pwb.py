@@ -66,10 +66,10 @@ rewrite_path = os.path.dirname(sys.argv[0])
 if not os.path.isabs(rewrite_path):
     rewrite_path = os.path.abspath(os.path.join(os.curdir, rewrite_path))
 
-sys.path.append(rewrite_path)
-sys.path.append(os.path.join(rewrite_path, 'externals/httplib2'))
-sys.path.append(os.path.join(rewrite_path, 'pywikibot/compat'))
-sys.path.append(os.path.join(rewrite_path, 'externals'))
+sys.path = [sys.path[0], rewrite_path,
+            os.path.join(rewrite_path, 'pywikibot', 'compat'),
+            os.path.join(rewrite_path, 'externals')
+            ] + sys.path[1:]
 
 if "PYWIKIBOT2_DIR" not in os.environ:
     os.environ["PYWIKIBOT2_DIR"] = os.path.split(__file__)[0]
