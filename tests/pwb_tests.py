@@ -16,8 +16,9 @@ import pywikibot
 
 pypath = sys.executable
 basepath = os.path.split(os.path.split(__file__)[0])[0]
-pwbpath  = os.path.join(basepath, 'pwb.py')
+pwbpath = os.path.join(basepath, 'pwb.py')
 testbasepath = os.path.join(basepath, 'tests', 'pwb')
+
 
 class TestPwb(unittest.TestCase):
     def setUp(self):
@@ -35,8 +36,8 @@ class TestPwb(unittest.TestCase):
         test = os.path.join(testbasepath, 'print_locals.py')
 
         direct = subprocess.check_output([pypath, test])
-        vpwb   = subprocess.check_output([pypath, pwbpath, test])
+        vpwb = subprocess.check_output([pypath, pwbpath, test])
         self.assertEqual(direct, vpwb)
 
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main(verbosity=10)

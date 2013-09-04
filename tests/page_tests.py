@@ -72,11 +72,11 @@ class TestLinkObject(unittest.TestCase):
         """Test that Link() normalizes namespace names"""
         for num in self.namespaces:
             for prefix in self.namespaces[num]:
-                l = pywikibot.page.Link(prefix+self.titles.keys()[0],
+                l = pywikibot.page.Link(prefix + self.titles.keys()[0],
                                         self.enwiki)
                 self.assertEqual(l.namespace, num)
                 # namespace prefixes are case-insensitive
-                m = pywikibot.page.Link(prefix.lower()+self.titles.keys()[1],
+                m = pywikibot.page.Link(prefix.lower() + self.titles.keys()[1],
                                         self.enwiki)
                 self.assertEqual(m.namespace, num)
 
@@ -84,7 +84,7 @@ class TestLinkObject(unittest.TestCase):
         """Test that Link() normalizes titles"""
         for title in self.titles:
             for num in (0, 1):
-                l = pywikibot.page.Link(self.namespaces[num][0]+title)
+                l = pywikibot.page.Link(self.namespaces[num][0] + title)
                 self.assertEqual(l.title, self.titles[title])
                 # prefixing name with ":" shouldn't change result
                 m = pywikibot.page.Link(":" + self.namespaces[num][0] + title)

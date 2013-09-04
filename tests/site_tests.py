@@ -19,10 +19,12 @@ mysite = None
 mainpage = None
 imagepage = None
 
+
 class TestSiteObject(unittest.TestCase):
     """Test cases for Site methods."""
     family = "wikipedia"
     code = "en"
+
     @classmethod
     def setUpClass(cls):
         patch_request()
@@ -92,21 +94,22 @@ class TestSiteObject(unittest.TestCase):
     def testNamespaceMethods(self):
         """Test cases for methods manipulating namespace names"""
 
-        builtins = {'Talk': 1,  # these should work in any MW wiki
-                    'User': 2,
-                    'User talk': 3,
-                    'Project': 4,
-                    'Project talk': 5,
-                    'Image': 6,
-                    'Image talk': 7,
-                    'MediaWiki': 8,
-                    'MediaWiki talk': 9,
-                    'Template': 10,
-                    'Template talk': 11,
-                    'Help': 12,
-                    'Help talk': 13,
-                    'Category': 14,
-                    'Category talk': 15,
+        builtins = {
+            'Talk': 1,  # these should work in any MW wiki
+            'User': 2,
+            'User talk': 3,
+            'Project': 4,
+            'Project talk': 5,
+            'Image': 6,
+            'Image talk': 7,
+            'MediaWiki': 8,
+            'MediaWiki talk': 9,
+            'Template': 10,
+            'Template talk': 11,
+            'Help': 12,
+            'Help talk': 13,
+            'Category': 14,
+            'Category talk': 15,
         }
         self.assertTrue(all(mysite.ns_index(b) == builtins[b]
                             for b in builtins))
@@ -150,7 +153,7 @@ class TestSiteObject(unittest.TestCase):
             self.assertFalse(mysite.has_group("nonexistent_group", True))
         except pywikibot.NoUsername:
             pywikibot.warning(
-             "Cannot test Site methods for sysop; no sysop account configured.")
+                "Cannot test Site methods for sysop; no sysop account configured.")
         for msg in ("1movedto2", "about", "aboutpage", "aboutsite",
                     "accesskey-n-portal"):
             self.assertTrue(mysite.has_mediawiki_message(msg))
@@ -239,19 +242,19 @@ class TestSiteObject(unittest.TestCase):
             self.assertTrue(ref in backlinks or ref in embedded)
         # test embeddedin arguments
         self.assertTrue(embedded.issuperset(
-                    set(mysite.page_embeddedin(mainpage, filterRedirects=True,
-                                               namespaces=[0]))))
+            set(mysite.page_embeddedin(mainpage, filterRedirects=True,
+                                       namespaces=[0]))))
         self.assertTrue(embedded.issuperset(
-                    set(mysite.page_embeddedin(mainpage, filterRedirects=False,
-                                               namespaces=[0]))))
+            set(mysite.page_embeddedin(mainpage, filterRedirects=False,
+                                       namespaces=[0]))))
         self.assertTrue(embedded.issubset(
-                    set(mysite.page_embeddedin(mainpage, namespaces=[0, 2]))))
+            set(mysite.page_embeddedin(mainpage, namespaces=[0, 2]))))
         links = set(mysite.pagelinks(mainpage))
         for pl in links:
             self.assertType(pl, pywikibot.Page)
         # test links arguments
         self.assertTrue(links.issuperset(
-                    set(mysite.pagelinks(mainpage, namespaces=[0, 1]))))
+            set(mysite.pagelinks(mainpage, namespaces=[0, 1]))))
         for target in mysite.preloadpages(
                             mysite.pagelinks(mainpage, follow_redirects=True,
                                              total=5)):
@@ -470,7 +473,7 @@ class TestSiteObject(unittest.TestCase):
         # timestamps should be in descending order
         timestamps = [block['timestamp'] for block in bl]
         for t in xrange(1, len(timestamps)):
-            self.assertTrue(timestamps[t] <= timestamps[t-1])
+            self.assertTrue(timestamps[t] <= timestamps[t - 1])
 
         b2 = list(mysite.blocks(total=10, reverse=True))
         self.assertTrue(len(b2) <= 10)
@@ -481,7 +484,7 @@ class TestSiteObject(unittest.TestCase):
         # timestamps should be in ascending order
         timestamps = [block['timestamp'] for block in b2]
         for t in xrange(1, len(timestamps)):
-            self.assertTrue(timestamps[t] >= timestamps[t-1])
+            self.assertTrue(timestamps[t] >= timestamps[t - 1])
 
         for block in mysite.blocks(starttime="2008-07-01T00:00:01Z", total=5):
             self.assertType(block, dict)
@@ -534,7 +537,7 @@ class TestSiteObject(unittest.TestCase):
         self.assertTrue(len(iu) <= 10)
         self.assertTrue(all(isinstance(link, pywikibot.Page)
                             for link in iu))
-        for using in mysite.imageusage(imagepage, namespaces=[3,4], total=5):
+        for using in mysite.imageusage(imagepage, namespaces=[3, 4], total=5):
             self.assertType(using, pywikibot.Page)
             self.assertTrue(imagepage in list(using.imagelinks()))
         for using in mysite.imageusage(imagepage, filterredir=True, total=5):
@@ -629,14 +632,14 @@ class TestSiteObject(unittest.TestCase):
         self.assertRaises(pywikibot.Error, mysite.recentchanges,
                           start="2008-02-03T23:59:59Z",
                           end="2008-02-03T00:00:01Z", reverse=True, total=5)
-        for change in mysite.recentchanges(namespaces=[6,7], total=5):
+        for change in mysite.recentchanges(namespaces=[6, 7], total=5):
             self.assertType(change, dict)
             self.assertTrue("title" in change and "ns" in change)
             title = change['title']
             self.assertTrue(":" in title)
             prefix = title[ : title.index(":")]
-            self.assertTrue(mysite.ns_index(prefix) in [6,7])
-            self.assertTrue(change["ns"] in [6,7])
+            self.assertTrue(mysite.ns_index(prefix) in [6, 7])
+            self.assertTrue(change["ns"] in [6, 7])
         if mysite.versionnumber() <= 14:
             for change in mysite.recentchanges(pagelist=[mainpage, imagepage],
                                                total=5):
@@ -691,12 +694,12 @@ class TestSiteObject(unittest.TestCase):
         for hit in mysite.search("common", namespaces=4, total=5):
             self.assertType(hit, pywikibot.Page)
             self.assertEqual(hit.namespace(), 4)
-        for hit in mysite.search("word", namespaces=[5,6,7], total=5):
+        for hit in mysite.search("word", namespaces=[5, 6, 7], total=5):
             self.assertType(hit, pywikibot.Page)
-            self.assertTrue(hit.namespace() in [5,6,7])
+            self.assertTrue(hit.namespace() in [5, 6, 7])
         for hit in mysite.search("another", namespaces="8|9|10", total=5):
             self.assertType(hit, pywikibot.Page)
-            self.assertTrue(hit.namespace() in [8,9,10])
+            self.assertTrue(hit.namespace() in [8, 9, 10])
         for hit in mysite.search("wiki", namespaces=0, total=10,
                                  getredirects=True):
             self.assertType(hit, pywikibot.Page)
@@ -762,7 +765,7 @@ class TestSiteObject(unittest.TestCase):
             self.assertTrue("title" in contrib)
             self.assertTrue(contrib["title"].startswith(mysite.namespace(14)))
         for contrib in mysite.usercontribs(user=mysite.user(),
-                                           namespaces=[10,11], total=5):
+                                           namespaces=[10, 11], total=5):
             self.assertType(contrib, dict)
             self.assertTrue("title" in contrib)
             self.assertTrue(contrib["ns"] in (10, 11))
@@ -818,14 +821,14 @@ class TestSiteObject(unittest.TestCase):
         self.assertRaises(pywikibot.Error, mysite.watchlist_revs,
                           start="2008-09-03T23:59:59Z",
                           end="2008-09-03T00:00:01Z", reverse=True, total=5)
-        for rev in mysite.watchlist_revs(namespaces=[6,7], total=5):
+        for rev in mysite.watchlist_revs(namespaces=[6, 7], total=5):
             self.assertType(rev, dict)
             self.assertTrue("title" in rev and "ns" in rev)
             title = rev['title']
             self.assertTrue(":" in title)
             prefix = title[ : title.index(":")]
-            self.assertTrue(mysite.ns_index(prefix) in [6,7])
-            self.assertTrue(rev["ns"] in [6,7])
+            self.assertTrue(mysite.ns_index(prefix) in [6, 7])
+            self.assertTrue(rev["ns"] in [6, 7])
         for rev in mysite.watchlist_revs(showMinor=True, total=5):
             self.assertType(rev, dict)
             self.assertTrue("minor" in rev)
@@ -851,7 +854,7 @@ class TestSiteObject(unittest.TestCase):
                 mysite.login(True)
             except pywikibot.NoUsername:
                 pywikibot.warning(
-                 "Cannot test Site.deleted_revs; no sysop account configured.")
+                    "Cannot test Site.deleted_revs; no sysop account configured.")
                 return
         dr = list(mysite.deletedrevs(total=10, page=mainpage))
         self.assertTrue(len(dr) <= 10)
