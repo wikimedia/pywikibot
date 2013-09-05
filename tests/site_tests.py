@@ -202,7 +202,7 @@ class TestSiteObject(PywikibotTestCase):
 
         datasite = mysite.data_repository()
 
-        items = [pywikibot.ItemPage(datasite, 'q' + str(num)) for num in range(1, 11)]
+        items = [pywikibot.ItemPage(datasite, 'q' + str(num)) for num in range(1, 6)]
         for page in datasite.preloaditempages(items):
             self.assertTrue(hasattr(page, '_content'))
 
