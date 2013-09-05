@@ -2526,8 +2526,14 @@ class ItemPage(WikibasePage):
     def fromPage(cls, page):
         """
         Get the ItemPage based on a Page that links to it
+        @param page: Page
+        @return: ItemPage
         """
         repo = page.site.data_repository()
+        if hasattr(page, '_pageprops') and page.properties().get('wikibase_item'):
+            # If we have already fetched the pageprops for something else,
+            # we already have the id, so use it
+            return cls(repo, page.properties().get('wikibase_item'))
         i = cls(repo, 'null')
         del i.id
         i._site = page.site
