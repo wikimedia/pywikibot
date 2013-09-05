@@ -197,6 +197,15 @@ class TestSiteObject(PywikibotTestCase):
             if count >= 5:
                 break
 
+    def testItemPreload(self):
+        """Test that ItemPage preloading works"""
+
+        datasite = mysite.data_repository()
+
+        items = [pywikibot.ItemPage(datasite, 'q' + str(num)) for num in range(1, 11)]
+        for page in datasite.preloaditempages(items):
+            self.assertTrue(hasattr(page, '_content'))
+
     def testLinkMethods(self):
         """Test site methods for getting links to and from a page"""
 

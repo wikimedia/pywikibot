@@ -2314,7 +2314,11 @@ class WikibasePage(Page):
             del self._link._title
         return Page(self).title(**kwargs)
 
+    @deprecated("_defined_by")
     def __defined_by(self, singular=False):
+        return self._defined_by(singular=singular)
+
+    def _defined_by(self, singular=False):
         """
         returns the parameters needed by the API to identify an item.
         Once an item's "p/q##" is looked up, that will be used for all future
@@ -2363,7 +2367,7 @@ class WikibasePage(Page):
         args can be used to specify custom props.
         """
         if force or not hasattr(self, '_content'):
-            data = self.repo.loadcontent(self.__defined_by(), *args)
+            data = self.repo.loadcontent(self._defined_by(), *args)
             self.id = data.keys()[0]
             self._content = data[self.id]
         if 'lastrevid' in self._content:
@@ -2450,7 +2454,7 @@ class WikibasePage(Page):
             baserevid = self.lastrevid
         else:
             baserevid = None
-        updates = self.repo.editEntity(self.__defined_by(singular=True), data,
+        updates = self.repo.editEntity(self._defined_by(singular=True), data,
                                        baserevid=baserevid, **kwargs)
         self.lastrevid = updates['entity']['lastrevid']
 
