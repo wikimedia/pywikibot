@@ -1086,7 +1086,7 @@ class APISite(BaseSite):
             site=self,
             action="query",
             meta="siteinfo",
-            siprop="general|namespaces|namespacealiases"
+            siprop="general|namespaces|namespacealiases|extensions"
         )
         try:
             sidata = sirequest.submit()
@@ -1126,6 +1126,14 @@ class APISite(BaseSite):
                     continue
                 # this is a less preferred form so it goes at the end
                 self._namespaces[int(item['id'])].append(item["*"])
+
+    def hasExtension(self, name):
+        if not 'extensions' in self.siteinfo:
+            return NotImplementedError("Feature 'hasExtension' only available in MW 1.14+")
+        for ext in self.siteinfo['extensions']:
+            if ext['name'] == name:
+                return True
+        return False
 
     @property
     def siteinfo(self):
