@@ -58,6 +58,7 @@ class TestGeneral(PywikibotTestCase):
 class TestLinks(PywikibotTestCase):
     """Test cases to test links stored in wikidata"""
     def setUp(self):
+        super(TestLinks, self).setUp()
         self.wdp = pywikibot.ItemPage(wikidata, 'Q60')
         self.wdp.id = 'q60'
         self.wdp._content = json.load(open(os.path.join(os.path.split(__file__)[0], 'pages', 'Q60_only_sitelinks.wd')))

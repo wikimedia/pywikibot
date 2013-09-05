@@ -7,9 +7,10 @@
 __version__ = '$Id$'
 
 import datetime
-import unittest
 import pywikibot
 import pywikibot.data.api as api
+import unittest
+from utils import PywikibotTestCase
 
 mysite = pywikibot.Site('en', 'wikipedia')
 
@@ -33,8 +34,9 @@ class TestApiFunctions(unittest.TestCase):
         self.assert_(all(len(item) == 2 for item in req.iteritems()))
 
 
-class TestPageGenerator(unittest.TestCase):
+class TestPageGenerator(PywikibotTestCase):
     def setUp(self):
+        super(TestPageGenerator, self).setUp()
         self.gen = api.PageGenerator(site=mysite,
                                      generator="links",
                                      titles="User:R'n'B")

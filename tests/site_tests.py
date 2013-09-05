@@ -14,32 +14,24 @@ import unittest
 import pywikibot
 import warnings
 from tests import patch_request, unpatch_request
+from utils import PywikibotTestCase
 
 mysite = None
 mainpage = None
 imagepage = None
 
 
-class TestSiteObject(unittest.TestCase):
+class TestSiteObject(PywikibotTestCase):
     """Test cases for Site methods."""
     family = "wikipedia"
     code = "en"
 
     @classmethod
     def setUpClass(cls):
-        patch_request()
         global mysite, mainpage, imagepage
         mysite = pywikibot.Site(cls.code, cls.family)
         mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
         imagepage = iter(mainpage.imagelinks()).next()  # 1st image on main page
-
-    @classmethod
-    def tearDownClass(cls):
-        unpatch_request
-
-    def assertType(self, obj, cls):
-        """Assert that obj is an instance of type cls"""
-        return self.assertTrue(isinstance(obj, cls))
 
     def testBaseMethods(self):
         """Test cases for BaseSite methods"""
