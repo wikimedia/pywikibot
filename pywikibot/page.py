@@ -380,9 +380,10 @@ class Page(object):
 
     def defaultsort(self, force=False):
         """
-        Returns the value of {{DEFAULTSORT:}} magic word
+        Returns the value of {{DEFAULTSORT:}} magic word or None if no
+        defaultsort has been defined.
         @param force: force updating from the live site
-        @return: unicode
+        @return: unicode or None
         """
         return self.properties(force=force).get('defaultsort')
 
