@@ -368,6 +368,24 @@ class Page(object):
         if hasattr(self, "_text"):
             del self._text
 
+    def properties(self, force=False):
+        """
+        Returns the various page properties stored for a page
+        @param force: force updating from the live site
+        @return: dict
+        """
+        if not hasattr(self, '_pageprops') or force:
+            self.site.loadpageprops(self)
+        return self._pageprops
+
+    def defaultsort(self, force=False):
+        """
+        Returns the value of {{DEFAULTSORT:}} magic word
+        @param force: force updating from the live site
+        @return: unicode
+        """
+        return self.properties(force=force).get('defaultsort')
+
     def expand_text(self, refresh=False):
         """Return the page text with all templates expanded."""
         if not hasattr(self, "_expanded_text") or (self._expanded_text is None) or refresh:
@@ -2512,8 +2530,14 @@ class ItemPage(WikibasePage):
     def fromPage(cls, page):
         """
         Get the ItemPage based on a Page that links to it
+        @param page: Page
+        @return: ItemPage
         """
         repo = page.site.data_repository()
+        if hasattr(page, '_pageprops') and page.properties().get('wikibase_item'):
+            # If we have already fetched the pageprops for something else,
+            # we already have the id, so use it
+            return cls(repo, page.properties().get('wikibase_item'))
         i = cls(repo, 'null')
         del i.id
         i._site = page.site
