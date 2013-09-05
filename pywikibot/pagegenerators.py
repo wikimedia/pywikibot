@@ -750,10 +750,12 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
             yield page
 
 
-def RedirectFilterPageGenerator(generator):
-    """Yields pages from another generator that are not redirects."""
+def RedirectFilterPageGenerator(generator, no_redirects=True):
+    """Yields pages from another generator that are redirects or not."""
     for page in generator:
-        if not page.isRedirectPage():
+        if not page.isRedirectPage() and no_redirects:
+            yield page
+        elif page.isRedirectPage() and not no_redirects:
             yield page
 
 
