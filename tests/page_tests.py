@@ -245,6 +245,19 @@ class TestPageObject(PywikibotTestCase):
         self.assertType(mainpage.previousRevision(), int)
         self.assertType(mainpage.permalink(), basestring)
 
+    def testIsDisambig(self):
+        """
+        Test the integration with
+        Extension:Disambiguator
+        """
+        if not site.hasExtension('Disambiguator', False):
+            raise unittest.SkipTest('Disambiguator extension not loaded on test site')
+        pg = pywikibot.Page(site, 'Random')
+        pg._pageprops = {'disambiguation', ''}
+        self.assertTrue(pg.isDisambig())
+        pg._pageprops = {}
+        self.assertFalse(pg.isDisambig())
+
     def testReferences(self):
         count = 0
         #Ignore redirects for time considerations

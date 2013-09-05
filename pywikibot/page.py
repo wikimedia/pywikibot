@@ -563,6 +563,11 @@ class Page(object):
         appended regardless of its existence.
 
         """
+
+        if self.site.hasExtension('Disambiguator', False):
+            # If the Disambiguator extension is loaded, use it
+            return 'disambiguation' in self.properties()
+
         if not hasattr(self.site, "_disambigtemplates"):
             try:
                 default = set(self.site.family.disambig('_default'))
