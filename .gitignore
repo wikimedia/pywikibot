@@ -1,4 +1,10 @@
+throttle.ctrl
+pywikibot.lwp
+user-*.py
+*.bak
 *.pyc
-*apicache*
+data*
+logs*
+*cache*
 .idea
 Pywikipediabot.egg-info/
