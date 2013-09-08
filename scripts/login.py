@@ -81,7 +81,7 @@ def main(*args):
             namedict = config.usernames
     else:
         site = pywikibot.getSite()
-        namedict = {site.family.name: {site.lang: None}}
+        namedict = {site.family.name: {site.code: None}}
     for familyName in namedict:
         for lang in namedict[familyName]:
             try:
