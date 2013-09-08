@@ -30,6 +30,9 @@ setup(
     install_requires=[
         'httplib2>=0.6.0'
     ],
+    dependency_links=[
+        'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1'
+    ],
     test_suite="tests",
     classifiers=[
         'License :: OSI Approved :: MIT License',
