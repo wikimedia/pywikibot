@@ -3515,7 +3515,16 @@ class DataSite (APISite):
         #Store it for 100 years
         req = api.CachedRequest(expiry, site=self, **params)
         data = req.submit()
-        dtype = data['entities'][prop.getID()]['datatype']
+
+        # the IDs returned from the API can be upper or lowercase, depending
+        # on the version. See for more information:
+        # https://bugzilla.wikimedia.org/show_bug.cgi?id=53894
+        # http://lists.wikimedia.org/pipermail/wikidata-tech/2013-September/000296.html
+        try:
+            dtype = data['entities'][prop.getID()]['datatype']
+        except KeyError:
+            dtype = data['entities'][prop.getID().lower()]['datatype']
+
         if dtype == 'globe-coordinate':
             dtype = 'globecoordinate'
             #TODO Fix this
