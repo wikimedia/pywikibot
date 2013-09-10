@@ -2525,7 +2525,7 @@ class ItemPage(WikibasePage):
         @param title: id number of item, "Q###"
         """
         super(ItemPage, self).__init__(site, title, ns=0)
-        self.id = title.lower()
+        self.id = title.upper()  # This might cause issues if not ns0?
 
     @classmethod
     def fromPage(cls, page):
@@ -2697,7 +2697,7 @@ class PropertyPage(WikibasePage):
         @param title: page name of property, like "Property:P##"
         """
         WikibasePage.__init__(self, source, title, ns=120)
-        self.id = self.title(withNamespace=False).lower()
+        self.id = self.title(withNamespace=False).upper()
         if not self.id.startswith(u'p'):
             raise ValueError(u"'%s' is not a property page!" % self.title())
 
@@ -2722,7 +2722,7 @@ class QueryPage(WikibasePage):
     """
     def __init__(self, site, title):
         WikibasePage.__init__(self, site, title, ns=122)
-        self.id = self.title(withNamespace=False).lower()
+        self.id = self.title(withNamespace=False).upper()
         if not self.id.startswith(u'u'):
             raise ValueError(u"'%s' is not a query page!" % self.title())
 
