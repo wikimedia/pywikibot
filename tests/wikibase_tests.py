@@ -28,7 +28,7 @@ class TestGeneral(PywikibotTestCase):
         repo = site.data_repository()
         item = pywikibot.ItemPage.fromPage(mainpage)
         self.assertType(item, pywikibot.ItemPage)
-        self.assertEqual(item.getID(), 'q5296')
+        self.assertEqual(item.getID(), 'Q5296')
         self.assertEqual(item.title(), 'Q5296')
         self.assertTrue('en' in item.labels)
         self.assertEqual(item.labels['en'], 'Main Page')
