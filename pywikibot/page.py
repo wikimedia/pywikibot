@@ -2698,7 +2698,7 @@ class PropertyPage(WikibasePage):
         """
         WikibasePage.__init__(self, source, title, ns=120)
         self.id = self.title(withNamespace=False).upper()
-        if not self.id.startswith(u'p'):
+        if not self.id.startswith(u'P'):
             raise ValueError(u"'%s' is not a property page!" % self.title())
 
     def get(self, force=False, *args):
@@ -2723,7 +2723,7 @@ class QueryPage(WikibasePage):
     def __init__(self, site, title):
         WikibasePage.__init__(self, site, title, ns=122)
         self.id = self.title(withNamespace=False).upper()
-        if not self.id.startswith(u'u'):
+        if not self.id.startswith(u'U'):
             raise ValueError(u"'%s' is not a query page!" % self.title())
 
 
