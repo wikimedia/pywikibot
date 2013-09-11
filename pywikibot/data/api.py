@@ -861,7 +861,7 @@ class LogEntryListGenerator(ListGenerator):
     def __init__(self, logtype=None, **kwargs):
         ListGenerator.__init__(self, "logevents", **kwargs)
 
-        import logentries
+        from pywikibot import logentries
         self.entryFactory = logentries.LogEntryFactory(logtype)
 
     def result(self, pagedata):
