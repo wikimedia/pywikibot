@@ -1126,12 +1126,28 @@ class APISite(BaseSite):
                     continue
                 # this is a less preferred form so it goes at the end
                 self._namespaces[int(item['id'])].append(item["*"])
+        if 'extensions' in sidata:
+            self._extensions = sidata['extensions']
+        else:
+            self._extensions = None
 
-    def hasExtension(self, name):
-        if not 'extensions' in self.siteinfo:
-            return NotImplementedError("Feature 'hasExtension' only available in MW 1.14+")
-        for ext in self.siteinfo['extensions']:
-            if ext['name'] == name:
+    def hasExtension(self, name, unknown=NotImplementedError):
+        """ Determine whether extension `name` is loaded.
+
+            @param name The extension to check for
+            @param unknown The value to return if the site does not list loaded
+                           extensions. Valid values are an exception to raise,
+                           True or False. Default: NotImplementedError
+        """
+        if not hasattr(self, '_extensions'):
+            self._getsiteinfo()
+        if self._extensions is None:
+            if isinstance(unknown, type) and issubclass(unknown, Exception):
+                raise unknown("Feature 'hasExtension' only available in MW 1.14+")
+            else:
+                return unknown
+        for ext in self._extensions:
+            if ext['name'].lower() == name.lower():
                 return True
         return False
 

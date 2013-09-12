@@ -933,6 +933,27 @@ class TestSiteObject(PywikibotTestCase):
             self.assertType(rndpage, pywikibot.Page)
             self.assertTrue(rndpage.namespace() in [6, 7])
 
+    def testExtensions(self):
+        # test automatically getting _extensions
+        del mysite._extensions
+        self.assertTrue(mysite.hasExtension('Disambiguator'))
+
+        # test case-sensitivity
+        self.assertTrue(mysite.hasExtension('disambiguator'))
+
+        self.assertFalse(mysite.hasExtension('ThisExtensionDoesNotExist'))
+
+        # test behavior for sites that do not report extensions
+        mysite._extensions = None
+        self.assertRaises(NotImplementedError, mysite.hasExtension, ('anything'))
+
+        class MyException(Exception):
+            pass
+        self.assertRaises(MyException, mysite.hasExtension, 'anything', MyException)
+
+        self.assertTrue(mysite.hasExtension('anything', True))
+        self.assertFalse(mysite.hasExtension('anything', False))
+        del mysite._extensions
 
 if __name__ == '__main__':
     try:
