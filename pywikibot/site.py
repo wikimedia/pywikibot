@@ -3059,7 +3059,7 @@ class APISite(BaseSite):
         return self.getFilesFromAnHash(hash_found)
 
     def upload(self, imagepage, source_filename=None, source_url=None,
-               comment=None, watch=False, ignore_warnings=False):
+               comment=None, text=None, watch=False, ignore_warnings=False):
         """Upload a file to the wiki.
 
         Either source_filename or source_url, but not both, must be provided.
@@ -3070,6 +3070,9 @@ class APISite(BaseSite):
         @param source_url: URL of the file to be uploaded
         @param comment: Edit summary; if this is not provided, then
             imagepage.text will be used. An empty summary is not permitted.
+            This may also serve as the initial page text (see below).
+        @param text: Initial page text; if this is not set, then
+            imagepage.text will be used, or comment.
         @param watch: If true, add imagepage to the bot user's watchlist
         @param ignore_warnings: if true, ignore API warnings and force
             upload (for example, to overwrite an existing file); default False
@@ -3111,6 +3114,10 @@ class APISite(BaseSite):
             raise ValueError(
 "APISite.upload: cannot upload file without a summary/description."
             )
+        if text is None:
+            text = imagepage.text
+        if not text:
+            text = comment
         token = self.token(imagepage, "edit")
         if source_filename:
             # upload local file
@@ -3124,7 +3131,7 @@ class APISite(BaseSite):
             req = api.Request(site=self, action="upload", token=token,
                               filename=imagepage.title(withNamespace=False),
                               file=source_filename, comment=comment,
-                              mime=True)
+                              text=text, mime=True)
         else:
             # upload by URL
             if "upload_by_url" not in self.userinfo["rights"]:
@@ -3133,7 +3140,7 @@ class APISite(BaseSite):
                     % (self.user(), self))
             req = api.Request(site=self, action="upload", token=token,
                               filename=imagepage.title(withNamespace=False),
-                              url=source_url, comment=comment)
+                              url=source_url, comment=comment, text=text)
         if watch:
             req["watch"] = ""
         if ignore_warnings:
