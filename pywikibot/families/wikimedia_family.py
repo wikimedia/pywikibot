@@ -12,15 +12,15 @@ class Family(family.Family):
         self.name = 'wikimediachapter'
 
         self.countries = [
-            'ar', 'bd', 'co', 'dk', 'fi', 'mk', 'mx', 'nl', 'no', 'nyc', 'pl',
-            'rs', 'ru', 'se', 'ua', 'uk', 've',
+            'ar', 'br', 'bd', 'co', 'dk', 'fi', 'mk', 'mx', 'nl', 'no',
+            'nyc', 'pl', 'rs', 'ru', 'se', 'ua', 'uk', 've',
         ]
 
         self.countrylangs = {
-            'ar': 'es', 'bd': 'bn', 'co': 'es', 'dk': 'da', 'fi': 'fi',
-            'mk': 'mk', 'mx': 'es', 'nl': 'nl', 'no': 'no', 'nyc': 'en',
-            'pl': 'pl', 'rs': 'sr', 'ru': 'ru', 'se': 'sv', 'ua': 'uk',
-            'uk': 'en-gb', 've': 'en',
+            'ar': 'es', 'br': 'pt-br', 'bd': 'bn', 'co': 'es', 'dk': 'da',
+            'fi': 'fi', 'mk': 'mk', 'mx': 'es', 'nl': 'nl', 'no': 'no',
+            'nyc': 'en', 'pl': 'pl', 'rs': 'sr', 'ru': 'ru', 'se': 'sv',
+            'ua': 'uk', 'uk': 'en-gb', 've': 'en',
         }
 
         self.langs = dict([(country, '%s.wikimedia.org' % country)
