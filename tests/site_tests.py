@@ -686,25 +686,29 @@ class TestSiteObject(PywikibotTestCase):
 
     def testSearch(self):
         """Test the site.search() method"""
-
-        se = list(mysite.search("wiki", total=10))
-        self.assertTrue(len(se) <= 10)
-        self.assertTrue(all(isinstance(hit, pywikibot.Page)
-                            for hit in se))
-        self.assertTrue(all(hit.namespace() == 0 for hit in se))
-        for hit in mysite.search("common", namespaces=4, total=5):
-            self.assertType(hit, pywikibot.Page)
-            self.assertEqual(hit.namespace(), 4)
-        for hit in mysite.search("word", namespaces=[5, 6, 7], total=5):
-            self.assertType(hit, pywikibot.Page)
-            self.assertTrue(hit.namespace() in [5, 6, 7])
-        for hit in mysite.search("another", namespaces="8|9|10", total=5):
-            self.assertType(hit, pywikibot.Page)
-            self.assertTrue(hit.namespace() in [8, 9, 10])
-        for hit in mysite.search("wiki", namespaces=0, total=10,
-                                 getredirects=True):
-            self.assertType(hit, pywikibot.Page)
-            self.assertEqual(hit.namespace(), 0)
+        try:
+            se = list(mysite.search("wiki", total=10))
+            self.assertTrue(len(se) <= 10)
+            self.assertTrue(all(isinstance(hit, pywikibot.Page)
+                                for hit in se))
+            self.assertTrue(all(hit.namespace() == 0 for hit in se))
+            for hit in mysite.search("common", namespaces=4, total=5):
+                self.assertType(hit, pywikibot.Page)
+                self.assertEqual(hit.namespace(), 4)
+            for hit in mysite.search("word", namespaces=[5, 6, 7], total=5):
+                self.assertType(hit, pywikibot.Page)
+                self.assertTrue(hit.namespace() in [5, 6, 7])
+            for hit in mysite.search("another", namespaces="8|9|10", total=5):
+                self.assertType(hit, pywikibot.Page)
+                self.assertTrue(hit.namespace() in [8, 9, 10])
+            for hit in mysite.search("wiki", namespaces=0, total=10,
+                                     getredirects=True):
+                self.assertType(hit, pywikibot.Page)
+                self.assertEqual(hit.namespace(), 0)
+        except pywikibot.data.api.APIError as e:
+            if e.code == "gsrsearch-error" and "timed out" in e.info:
+                raise unittest.SkipTest("gsrsearch returned timeout on site: %r" % e)
+            raise
 
     def testUsercontribs(self):
         """Test the site.usercontribs() method"""
