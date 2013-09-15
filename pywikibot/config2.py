@@ -139,8 +139,13 @@ def _get_base_dir():
         raise RuntimeError("Directory '%(base_dir)s' does not exist."
                            % locals())
     if not os.path.exists(os.path.join(base_dir, "user-config.py")):
-        raise RuntimeError("No user-config.py found in directory '%(base_dir)s'."
-                           % locals())
+        exc_text = "No user-config.py found in directory '%(base_dir)s'.\n" % locals()
+        exc_text += "  Please check that user-config.py is stored in the correct location.\n"
+        exc_text += "  Directory where user-config.py is searched is determined as follows:\n\n"
+        exc_text += "    " + _get_base_dir.__doc__
+                        
+        raise RuntimeError(exc_text)
+
     return base_dir
 
 _base_dir = _get_base_dir()
