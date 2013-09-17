@@ -41,4 +41,5 @@ class Family(family.WikimediaFamily):
     def globes(self, code):
         """Supported globes for Coordinate datatype"""
         return {'earth': 'http://www.wikidata.org/entity/Q2',
+                'mars': 'http://www.wikidata.org/entity/Q111',
                 'moon': 'http://www.wikidata.org/entity/Q405'}
