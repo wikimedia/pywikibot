@@ -10,7 +10,8 @@
 __version__ = '$Id$'
 
 import os
-import time, datetime
+import time
+import datetime
 import urllib
 import subprocess
 
