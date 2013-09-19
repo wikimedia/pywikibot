@@ -964,6 +964,7 @@ def RandomPageGenerator(number=10, site=None):
     for page in site.randompages(total=number):
         yield page
 
+
 def RandomRedirectPageGenerator(number=10, site=None):
     if site is None:
         site = pywikibot.Site()
