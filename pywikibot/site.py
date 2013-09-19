@@ -2759,8 +2759,7 @@ class APISite(BaseSite):
                         return False
                 else:
                     self.unlock_page(page)
-                    pywikibot.error(u"editpage: unknown failure reason %s"
-                                      % str(result))
+                    pywikibot.error(u"editpage: unknown failure reason %s" % str(result))
                     return False
             else:
                 self.unlock_page(page)
@@ -2861,18 +2860,15 @@ class APISite(BaseSite):
             raise Error("movepage: unexpected response")
         #TODO: Check for talkmove-error messages
         if "talkmove-error-code" in result["move"]:
-            pywikibot.warning(u"movepage: Talk page %s not moved"
-                                % (page.toggleTalkPage().title(asLink=True)))
+            pywikibot.warning(
+                u"movepage: Talk page %s not moved" % (page.toggleTalkPage().title(asLink=True)))
         return pywikibot.Page(page, newtitle)
 
     # catalog of rollback errors for use in error messages
     _rb_errors = {
-        "noapiwrite":
-            "API editing not enabled on %(site)s wiki",
-        "writeapidenied":
-            "User %(user)s not allowed to edit through the API",
-        "alreadyrolled":
-            "Page [[%(title)s]] already rolled back; action aborted.",
+        "noapiwrite": "API editing not enabled on %(site)s wiki",
+        "writeapidenied": "User %(user)s not allowed to edit through the API",
+        "alreadyrolled": "Page [[%(title)s]] already rolled back; action aborted.",
     }  # other errors shouldn't arise because we check for those errors
 
     def rollbackpage(self, page, summary=u''):
@@ -2888,8 +2884,7 @@ class APISite(BaseSite):
         """
         if len(page._revisions) < 2:
             raise pywikibot.Error(
-                  u"Rollback of %s aborted; load revision history first."
-                    % page.title(asLink=True))
+                u"Rollback of %s aborted; load revision history first." % page.title(asLink=True))
         last_rev = page._revisions[page.latestRevision()]
         last_user = last_rev.user
         for rev in sorted(page._revisions.keys(), reverse=True):
@@ -2899,8 +2894,7 @@ class APISite(BaseSite):
                 break
         else:
             raise pywikibot.Error(
-                  u"Rollback of %s aborted; only one user in revision history."
-                   % page.title(asLink=True))
+                u"Rollback of %s aborted; only one user in revision history." % page.title(asLink=True))
         summary = summary or (
             u"Reverted edits by [[Special:Contributions/%(last_user)s|%(last_user)s]] "
             u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
@@ -2930,14 +2924,10 @@ class APISite(BaseSite):
 
     # catalog of delete errors for use in error messages
     _dl_errors = {
-        "noapiwrite":
-            "API editing not enabled on %(site)s wiki",
-        "writeapidenied":
-            "User %(user)s not allowed to edit through the API",
-        "permissiondenied":
-            "User %(user)s not authorized to delete pages on %(site)s wiki.",
-        "cantdelete":
-            "Could not delete [[%(title)s]]. Maybe it was deleted already.",
+        "noapiwrite": "API editing not enabled on %(site)s wiki",
+        "writeapidenied": "User %(user)s not allowed to edit through the API",
+        "permissiondenied": "User %(user)s not authorized to delete pages on %(site)s wiki.",
+        "cantdelete": "Could not delete [[%(title)s]]. Maybe it was deleted already.",
     }  # other errors shouldn't occur because of pre-submission checks
 
     def deletepage(self, page, summary):
@@ -2950,8 +2940,7 @@ class APISite(BaseSite):
         try:
             self.login(sysop=True)
         except pywikibot.NoUsername, e:
-            raise NoUsername("delete: Unable to login as sysop (%s)"
-                        % e.__class__.__name__)
+            raise NoUsername("delete: Unable to login as sysop (%s)" % e.__class__.__name__)
         if not self.logged_in(sysop=True):
             raise NoUsername("delete: Unable to login as sysop")
         token = self.token(page, "delete")
@@ -2969,8 +2958,7 @@ class APISite(BaseSite):
             }
             if err.code in self._dl_errors:
                 raise Error(self._dl_errors[err.code] % errdata)
-            pywikibot.debug(u"delete: Unexpected error code '%s' received."
-                              % err.code,
+            pywikibot.debug(u"delete: Unexpected error code '%s' received." % err.code,
                             _logger)
             raise
         finally:
@@ -3081,27 +3069,20 @@ class APISite(BaseSite):
         upload_warnings = {
             # map API warning codes to user error messages
             # %(msg)s will be replaced by message string from API responsse
-            'duplicate-archive':
-                "The file is a duplicate of a deleted file %(msg)s.",
-            'was-deleted':
-                "The file %(msg)s was previously deleted.",
-            'emptyfile':
-                "File %(msg)s is empty.",
-            'exists':
-                "File %(msg)s already exists.",
-            'duplicate':
-                "Uploaded file is a duplicate of %(msg)s.",
-            'badfilename':
-                "Target filename is invalid.",
-             'filetype-unwanted-type':
-                "File %(msg)s type is unwanted type.",
+            'duplicate-archive': "The file is a duplicate of a deleted file %(msg)s.",
+            'was-deleted': "The file %(msg)s was previously deleted.",
+            'emptyfile': "File %(msg)s is empty.",
+            'exists': "File %(msg)s already exists.",
+            'duplicate': "Uploaded file is a duplicate of %(msg)s.",
+            'badfilename': "Target filename is invalid.",
+            'filetype-unwanted-type': "File %(msg)s type is unwanted type.",
         }
 
         # check for required user right
         if "upload" not in self.userinfo["rights"]:
             raise pywikibot.Error(
-                "User '%s' does not have upload rights on site %s."
-                % (self.user(), self))
+                "User '%s' does not have upload rights on site %s." % (self.user(), self)
+            )
         # check for required parameters
         if (source_filename and source_url)\
                 or (source_filename is None and source_url is None):
@@ -3158,8 +3139,7 @@ class APISite(BaseSite):
             raise pywikibot.UploadWarning(upload_warnings[warning]
                                           % {'msg': message})
         elif "result" not in result:
-            pywikibot.output(u"Upload: unrecognized response: %s"
-                              % result)
+            pywikibot.output(u"Upload: unrecognized response: %s" % result)
         if result["result"] == "Success":
             pywikibot.output(u"Upload successful.")
             imagepage._imageinfo = result["imageinfo"]
@@ -3195,11 +3175,13 @@ class APISite(BaseSite):
         # directly, so we get new pages indirectly through 'recentchanges'
 
         namespaces = namespaces if namespaces is not None else namespace
-        gen = self.recentchanges(start=start, end=end, reverse=reverse,
-                namespaces=namespaces, changetype="new", user=user,
-                excludeuser=excludeuser, showBot=showBot,
-                showRedirects=showRedirects, showPatrolled=showPatrolled,
-                step=step, total=total)
+        gen = self.recentchanges(
+            start=start, end=end, reverse=reverse,
+            namespaces=namespaces, changetype="new", user=user,
+            excludeuser=excludeuser, showBot=showBot,
+            showRedirects=showRedirects, showPatrolled=showPatrolled,
+            step=step, total=total
+        )
         for pageitem in gen:
             newpage = pywikibot.Page(self, pageitem['title'])
             if returndict:
@@ -3336,8 +3318,7 @@ class APISite(BaseSite):
 
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
-    def uncategorizedtemplates(self, number=None, repeat=True,
-                           step=None, total=None):
+    def uncategorizedtemplates(self, number=None, repeat=True, step=None, total=None):
         """Yield Pages from Special:Uncategorizedtemplates."""
         utgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
@@ -3437,8 +3418,7 @@ class DataSite (APISite):
     def _get_propertyitem(self, props, source, **params):
         """generic method to get the data for multiple Wikibase items"""
         wbdata = self.get_item(source, props=props, **params)
-        assert props in wbdata, \
-               "API wbgetentities response lacks %s key" % props
+        assert props in wbdata, "API wbgetentities response lacks %s key" % props
         return wbdata[props]
 
     @deprecated("pywikibot.WikibasePage")
@@ -3450,14 +3430,10 @@ class DataSite (APISite):
             wbrequest = api.Request(site=self, action="wbgetentities", ids=ids,
                                     **params)
             wbdata = wbrequest.submit()
-            assert 'success' in wbdata,  \
-                   "API wbgetentities response lacks 'success' key"
-            assert wbdata['success'] == 1, \
-                   "API 'success' key ist not 1"
-            assert 'entities' in wbdata,  \
-                   "API wbgetentities response lacks 'entities' key"
-            assert ids in wbdata['entities'], \
-                   "API  wbgetentities response lacks %s key" % ids
+            assert 'success' in wbdata, "API wbgetentities response lacks 'success' key"
+            assert wbdata['success'] == 1, "API 'success' key ist not 1"
+            assert 'entities' in wbdata, "API wbgetentities response lacks 'entities' key"
+            assert ids in wbdata['entities'], "API  wbgetentities response lacks %s key" % ids
             return wbdata['entities'][ids]
         else:
             # not implemented yet
@@ -3514,11 +3490,12 @@ class DataSite (APISite):
         This is used sepecifically because we can cache
         the value for a much longer time (near infinite).
         """
-        params = dict(action='wbgetentities',
-                      ids=prop.getID(),
-                      props='datatype',
-                      )
-        expiry = datetime.timedelta(days=365*100)
+        params = dict(
+            action='wbgetentities',
+            ids=prop.getID(),
+            props='datatype',
+        )
+        expiry = datetime.timedelta(days=365 * 100)
         #Store it for 100 years
         req = api.CachedRequest(expiry, site=self, **params)
         data = req.submit()
@@ -3691,30 +3668,41 @@ class DataSite (APISite):
     # deprecated BaseSite methods
     def fam(self):
         raise NotImplementedError
+
     def urlEncode(self, *args, **kwargs):
         raise NotImplementedError
+
     def getUrl(self, *args, **kwargs):
         raise NotImplementedError
+
     def linkto(self, *args, **kwargs):
         raise NotImplementedError
+
     def loggedInAs(self, *args, **kwargs):
         raise NotImplementedError
+
     def postData(self, *args, **kwargs):
         raise NotImplementedError
+
     def postForm(self, *args, **kwargs):
         raise NotImplementedError
 
     # deprecated APISite methods
     def isBlocked(self, *args, **kwargs):
         raise NotImplementedError
+
     def isAllowed(self, *args, **kwargs):
         raise NotImplementedError
+
     def prefixindex(self, *args, **kwargs):
         raise NotImplementedError
+
     def categories(self, *args, **kwargs):
         raise NotImplementedError
+
     def linksearch(self, *args, **kwargs):
         raise NotImplementedError
+
     def newimages(self, *args, **kwargs):
         raise NotImplementedError
 
@@ -3723,13 +3711,13 @@ class DataSite (APISite):
 class NotImplementedYet:
 
     #TODO: is this needed any more? can it be obtained from the http module?
-    def cookies(self, sysop = False):
+    def cookies(self, sysop=False):
         """Return a string containing the user's current cookies."""
-        self._loadCookies(sysop = sysop)
+        self._loadCookies(sysop=sysop)
         index = self._userIndex(sysop)
         return self._cookies[index]
 
-    def _loadCookies(self, sysop = False):
+    def _loadCookies(self, sysop=False):
         """Retrieve session cookies for login"""
         index = self._userIndex(sysop)
         if self._cookies[index] is not None:
@@ -3737,8 +3725,7 @@ class NotImplementedYet:
         try:
             if sysop:
                 try:
-                    username = config.sysopnames[self.family.name
-                                                            ][self.code]
+                    username = config.sysopnames[self.family.name][self.code]
                 except KeyError:
                     raise NoUsername("""\
 You tried to perform an action that requires admin privileges, but you haven't
@@ -3752,8 +3739,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
             self._cookies[index] = None
             self._isLoggedIn[index] = False
         else:
-            tmp = '%s-%s-%s-login.data' % (
-                    self.family.name, self.code, username)
+            tmp = '%s-%s-%s-login.data' % (self.family.name, self.code, username)
             fn = config.datafilepath('login-data', tmp)
             if not os.path.exists(fn):
                 self._cookies[index] = None
