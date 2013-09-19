@@ -75,7 +75,10 @@ class HarvestRobot:
         """
         self.templateTitles = self.getTemplateSynonyms(self.templateTitle)
         for page in self.generator:
-            self.procesPage(page)
+            try:
+                self.procesPage(page)
+            except Exception, e:
+                pywikibot.exception(tb=True)
 
     def getTemplateSynonyms(self, title):
         """
