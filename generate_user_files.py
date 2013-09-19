@@ -86,7 +86,7 @@ def listchoice(clist=[], message=None, default=None):
         if choice == '' and default:
             return default
         try:
-            choice=int(choice)
+            choice = int(choice)
         except ValueError:
             pass
         if isinstance(choice, basestring):
@@ -165,16 +165,16 @@ def get_site_and_lang():
                          "just enter the number not name",
                          default='wikipedia')
         if fam not in single_wiki_families:
-            codesds=codecs.open("pywikibot/families/%s_family.py" % fam, "r","utf-8").read()
-            rre=re.compile("self\.languages\_by\_size *\= *(.+?)\]",re.DOTALL)
-            known_langs=[]
+            codesds = codecs.open("pywikibot/families/%s_family.py" % fam, "r", "utf-8").read()
+            rre = re.compile("self\.languages\_by\_size *\= *(.+?)\]", re.DOTALL)
+            known_langs = []
             if not rre.findall(codesds):
-                rre=re.compile("self\.langs *\= *(.+?)\}",re.DOTALL)
+                rre = re.compile("self\.langs *\= *(.+?)\}", re.DOTALL)
                 if rre.findall(codesds):
                     import ast
-                    known_langs=ast.literal_eval(rre.findall(codesds)[0]+u"}").keys()
+                    known_langs = ast.literal_eval(rre.findall(codesds)[0] + u"}").keys()
             else:
-                known_langs=eval(rre.findall(codesds)[0]+u"]")
+                known_langs = eval(rre.findall(codesds)[0] + u"]")
             print "This is the list of known language(s):"
             print " ".join(sorted(known_langs))
             mylang = raw_input("The language code of the site we're working on (default: 'en'): ") or 'en'
