@@ -3348,7 +3348,7 @@ not supported by PyWikiBot!"""
 # Utility functions for parsing page titles
 
 
-def html2unicode(text, ignore = None):
+def html2unicode(text, ignore=None):
     """Return text, replacing HTML entities by equivalent unicode characters."""
     if ignore is None:
         ignore = []
@@ -3359,33 +3359,33 @@ def html2unicode(text, ignore = None):
     # These characters are Html-illegal, but sadly you *can* find some of
     # these and converting them to unichr(decimal) is unsuitable
     convertIllegalHtmlEntities = {
-        128 : 8364,  # €
-        130 : 8218,  # ‚
-        131 : 402,   # ƒ
-        132 : 8222,  # „
-        133 : 8230,  # …
-        134 : 8224,  # †
-        135 : 8225,  # ‡
-        136 : 710,   # ˆ
-        137 : 8240,  # ‰
-        138 : 352,   # Š
-        139 : 8249,  # ‹
-        140 : 338,   # Œ
-        142 : 381,   # Ž
-        145 : 8216,  # ‘
-        146 : 8217,  # ’
-        147 : 8220,  # “
-        148 : 8221,  # ”
-        149 : 8226,  # •
-        150 : 8211,  # –
-        151 : 8212,  # —
-        152 : 732,   # ˜
-        153 : 8482,  # ™
-        154 : 353,   # š
-        155 : 8250,  # ›
-        156 : 339,   # œ
-        158 : 382,   # ž
-        159 : 376    # Ÿ
+        128: 8364,  # €
+        130: 8218,  # ‚
+        131: 402,   # ƒ
+        132: 8222,  # „
+        133: 8230,  # …
+        134: 8224,  # †
+        135: 8225,  # ‡
+        136: 710,   # ˆ
+        137: 8240,  # ‰
+        138: 352,   # Š
+        139: 8249,  # ‹
+        140: 338,   # Œ
+        142: 381,   # Ž
+        145: 8216,  # ‘
+        146: 8217,  # ’
+        147: 8220,  # “
+        148: 8221,  # ”
+        149: 8226,  # •
+        150: 8211,  # –
+        151: 8212,  # —
+        152: 732,   # ˜
+        153: 8482,  # ™
+        154: 353,   # š
+        155: 8250,  # ›
+        156: 339,   # œ
+        158: 382,   # ž
+        159: 376    # Ÿ
     }
     #ensuring that illegal &#129; &#141; and &#157, which have no known values,
     #don't get converted to unichr(129), unichr(141) or unichr(157)
