@@ -2599,11 +2599,11 @@ class ItemPage(WikibasePage):
         """
         if not hasattr(self, 'sitelinks'):
             self.get()
-        if not isinstance(family, pywikibot.family.Family):
+        if family is not None and not isinstance(family, pywikibot.family.Family):
             family = pywikibot.site.Family(family)
         for dbname in self.sitelinks:
             pg = Page(pywikibot.site.APISite.fromDBName(dbname), self.sitelinks[dbname])
-            if not family or family == pg.site.family:
+            if family is None or family == pg.site.family:
                 yield pg
 
     def getSitelink(self, site, force=False):
