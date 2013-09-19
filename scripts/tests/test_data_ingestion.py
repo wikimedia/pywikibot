@@ -44,7 +44,7 @@ class TestPhoto(unittest.TestCase):
 |name=Sound icon
 |set=Crystal SVG icon set
 |source=http://commons.wikimedia.org/wiki/File:Sound-icon.svg
-}}""")
+}}""")  # noqa
 
 
 class TestCSVReader(unittest.TestCase):
@@ -69,7 +69,7 @@ class TestCSVReader(unittest.TestCase):
 |set=Crystal SVG icon set
 |source=http://commons.wikimedia.org/wiki/File:Sound-icon.svg
 |url=http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png
-}}""")
+}}""")  # noqa
 
 
 if __name__ == "__main__":
