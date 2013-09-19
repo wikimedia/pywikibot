@@ -256,9 +256,9 @@ class TestSiteObject(PywikibotTestCase):
         # test links arguments
         self.assertTrue(links.issuperset(
             set(mysite.pagelinks(mainpage, namespaces=[0, 1]))))
-        for target in mysite.preloadpages(
-                            mysite.pagelinks(mainpage, follow_redirects=True,
-                                             total=5)):
+        for target in mysite.preloadpages(mysite.pagelinks(mainpage,
+                                                           follow_redirects=True,
+                                                           total=5)):
             self.assertType(target, pywikibot.Page)
             self.assertFalse(target.isRedirectPage())
         # test pagecategories
@@ -556,7 +556,7 @@ class TestSiteObject(PywikibotTestCase):
         self.assertTrue(all(isinstance(entry, pywikibot.logentries.LogEntry)
                             for entry in le))
         for typ in ("block", "protect", "rights", "delete", "upload",
-                "move", "import", "patrol", "merge"):
+                    "move", "import", "patrol", "merge"):
             for entry in mysite.logevents(logtype=typ, total=3):
                 self.assertEqual(entry.type(), typ)
         for entry in mysite.logevents(page=mainpage, total=3):
@@ -573,14 +573,14 @@ class TestSiteObject(PywikibotTestCase):
                                       end="2008-02-02T23:59:59Z",
                                       reverse=True, total=5):
             self.assertType(entry, pywikibot.logentries.LogEntry)
-            self.assertTrue("2008-02-02T00:00:01Z" <= str(entry.timestamp())
-                                <= "2008-02-02T23:59:59Z")
+            self.assertTrue(
+                "2008-02-02T00:00:01Z" <= str(entry.timestamp()) <= "2008-02-02T23:59:59Z")
         for entry in mysite.logevents(start="2008-02-03T23:59:59Z",
                                       end="2008-02-03T00:00:01Z",
                                       total=5):
             self.assertType(entry, pywikibot.logentries.LogEntry)
-            self.assertTrue("2008-02-03T00:00:01Z" <= str(entry.timestamp())
-                                <= "2008-02-03T23:59:59Z")
+            self.assertTrue(
+                "2008-02-03T00:00:01Z" <= str(entry.timestamp()) <= "2008-02-03T23:59:59Z")
         # starttime earlier than endtime
         self.assertRaises(pywikibot.Error, mysite.logevents,
                           start="2008-02-03T00:00:01Z",
@@ -617,14 +617,14 @@ class TestSiteObject(PywikibotTestCase):
                                            end="2008-10-03T00:00:01Z",
                                            total=5):
             self.assertType(change, dict)
-            self.assertTrue("2008-10-03T00:00:01Z" <= change['timestamp']
-                                <= "2008-10-03T11:59:59Z")
+            self.assertTrue(
+                "2008-10-03T00:00:01Z" <= change['timestamp'] <= "2008-10-03T11:59:59Z")
         for change in mysite.recentchanges(start="2008-10-05T06:00:01Z",
                                            end="2008-10-05T23:59:59Z",
                                            reverse=True, total=5):
             self.assertType(change, dict)
-            self.assertTrue("2008-10-05T06:00:01Z" <= change['timestamp']
-                                <= "2008-10-05T23:59:59Z")
+            self.assertTrue(
+                "2008-10-05T06:00:01Z" <= change['timestamp'] <= "2008-10-05T23:59:59Z")
         # start earlier than end
         self.assertRaises(pywikibot.Error, mysite.recentchanges,
                           start="2008-02-03T00:00:01Z",
@@ -638,7 +638,7 @@ class TestSiteObject(PywikibotTestCase):
             self.assertTrue("title" in change and "ns" in change)
             title = change['title']
             self.assertTrue(":" in title)
-            prefix = title[ : title.index(":")]
+            prefix = title[:title.index(":")]
             self.assertTrue(mysite.ns_index(prefix) in [6, 7])
             self.assertTrue(change["ns"] in [6, 7])
         if mysite.versionnumber() <= 14:
@@ -741,14 +741,14 @@ class TestSiteObject(PywikibotTestCase):
                                            start="2008-10-10T11:59:59Z",
                                            end="2008-10-10T00:00:01Z",
                                            total=5):
-            self.assertTrue("2008-10-10T00:00:01Z" <= contrib['timestamp']
-                                <= "2008-10-10T11:59:59Z")
+            self.assertTrue(
+                "2008-10-10T00:00:01Z" <= contrib['timestamp'] <= "2008-10-10T11:59:59Z")
         for contrib in mysite.usercontribs(userprefix="Tim",
                                            start="2008-10-11T06:00:01Z",
                                            end="2008-10-11T23:59:59Z",
                                            reverse=True, total=5):
-            self.assertTrue("2008-10-11T06:00:01Z" <= contrib['timestamp']
-                                <= "2008-10-11T23:59:59Z")
+            self.assertTrue(
+                "2008-10-11T06:00:01Z" <= contrib['timestamp'] <= "2008-10-11T23:59:59Z")
         # start earlier than end
         self.assertRaises(pywikibot.Error, mysite.usercontribs,
                           userprefix="Jim",
@@ -806,14 +806,14 @@ class TestSiteObject(PywikibotTestCase):
                                          end="2008-10-13T00:00:01Z",
                                          total=5):
             self.assertType(rev, dict)
-            self.assertTrue("2008-10-13T00:00:01Z" <= rev['timestamp']
-                                <= "2008-10-13T11:59:59Z")
+            self.assertTrue(
+                "2008-10-13T00:00:01Z" <= rev['timestamp'] <= "2008-10-13T11:59:59Z")
         for rev in mysite.watchlist_revs(start="2008-10-15T06:00:01Z",
                                          end="2008-10-15T23:59:59Z",
                                          reverse=True, total=5):
             self.assertType(rev, dict)
-            self.assertTrue("2008-10-15T06:00:01Z" <= rev['timestamp']
-                                <= "2008-10-15T23:59:59Z")
+            self.assertTrue(
+                "2008-10-15T06:00:01Z" <= rev['timestamp'] <= "2008-10-15T23:59:59Z")
         # start earlier than end
         self.assertRaises(pywikibot.Error, mysite.watchlist_revs,
                           start="2008-09-03T00:00:01Z",
@@ -827,7 +827,7 @@ class TestSiteObject(PywikibotTestCase):
             self.assertTrue("title" in rev and "ns" in rev)
             title = rev['title']
             self.assertTrue(":" in title)
-            prefix = title[ : title.index(":")]
+            prefix = title[:title.index(":")]
             self.assertTrue(mysite.ns_index(prefix) in [6, 7])
             self.assertTrue(rev["ns"] in [6, 7])
         for rev in mysite.watchlist_revs(showMinor=True, total=5):
@@ -887,15 +887,15 @@ class TestSiteObject(PywikibotTestCase):
                                       end="2008-10-13T00:00:01Z",
                                       page=mainpage, total=5):
             self.assertType(rev, dict)
-            self.assertTrue("2008-10-13T00:00:01Z" <= rev['timestamp']
-                                <= "2008-10-13T11:59:59Z")
+            self.assertTrue(
+                "2008-10-13T00:00:01Z" <= rev['timestamp'] <= "2008-10-13T11:59:59Z")
         for rev in mysite.deletedrevs(start="2008-10-15T06:00:01Z",
                                       end="2008-10-15T23:59:59Z",
                                       page=mainpage, reverse=True,
                                       total=5):
             self.assertType(rev, dict)
-            self.assertTrue("2008-10-15T06:00:01Z" <= rev['timestamp']
-                                <= "2008-10-15T23:59:59Z")
+            self.assertTrue(
+                "2008-10-15T06:00:01Z" <= rev['timestamp'] <= "2008-10-15T23:59:59Z")
         # start earlier than end
         self.assertRaises(pywikibot.Error, mysite.deletedrevs,
                           page=mainpage, start="2008-09-03T00:00:01Z",
