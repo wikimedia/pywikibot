@@ -2731,6 +2731,14 @@ class PropertyPage(WikibasePage):
             self.type = self.repo.getPropertyType(self)
         return self.type
 
+    def newClaim(self, *args, **kwargs):
+        """
+        Convenicence function to create a new claim object
+        for a specific property
+        @return: Claim
+        """
+        return Claim(self.site, self.getID(), *args, **kwargs)
+
 
 class QueryPage(WikibasePage):
     """
