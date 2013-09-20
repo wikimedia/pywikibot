@@ -653,7 +653,6 @@ class Family(object):
         }
 
         # A list of category redirect template names in different languages
-        # Note: It *is* necessary to list template redirects here
         self.category_redirect_templates = {
             '_default': []
         }
@@ -858,14 +857,33 @@ class Family(object):
                 % {'language_code': code})
 
     def category_redirects(self, code, fallback="_default"):
-        if code in self.category_redirect_templates:
-            return self.category_redirect_templates[code]
-        elif fallback:
-            return self.category_redirect_templates[fallback]
+        if not hasattr(self, "_catredirtemplates") or code not in self._catredirtemplates:
+            self.get_cr_templates(code, fallback)
+        if code in self._catredirtemplates:
+            return self._catredirtemplates[code]
         else:
             raise KeyError(
 "ERROR: title for category redirect template in language '%s' unknown"
                 % code)
+
+    def get_cr_templates(self, code, fallback):
+        if not hasattr(self, "_catredirtemplates"):
+            self._catredirtemplates = {}
+        if code in self.category_redirect_templates:
+            cr_template = self.category_redirect_templates[code][0]
+        else:
+            cr_template = self.category_redirect_templates[fallback][0]
+        # start with list of category redirect templates from family file
+        cr_page = pywikibot.Page(pywikibot.Site(code, self),
+                                 "Template:" + cr_template)
+        cr_list = list(self.category_redirect_templates[code])
+        # retrieve all redirects to primary template from API,
+        # add any that are not already on the list
+        for t in cr_page.backlinks(filterRedirects=True, namespaces=10):
+            newtitle = t.title(withNamespace=False)
+            if newtitle not in cr_list:
+                cr_list.append(newtitle)
+        self._catredirtemplates[code] = cr_list
 
     def disambig(self, code, fallback='_default'):
         if code in self.disambiguationTemplates:
