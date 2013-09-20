@@ -11,13 +11,13 @@ class Family(family.WikimediaFamily):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'mg', 'fr', 'zh', 'lt', 'ru', 'el', 'pl', 'sv', 'ko', 'de',
+            'en', 'mg', 'fr', 'zh', 'lt', 'ru', 'el', 'sv', 'pl', 'ko', 'de',
             'tr', 'es', 'nl', 'ku', 'ta', 'kn', 'io', 'fi', 'vi', 'hu', 'pt',
             'no', 'ml', 'my', 'id', 'it', 'chr', 'li', 'et', 'ja', 'te', 'fa',
             'ca', 'cs', 'ro', 'ar', 'eu', 'jv', 'gl', 'lo', 'uk', 'fj', 'br',
-            'bg', 'eo', 'hr', 'oc', 'th', 'is', 'vo', 'ps', 'zh-min-nan',
+            'eo', 'bg', 'hr', 'oc', 'th', 'is', 'vo', 'ps', 'zh-min-nan',
             'simple', 'cy', 'scn', 'sr', 'af', 'ast', 'uz', 'sw', 'fy', 'tl',
-            'da', 'he', 'nn', 'ur', 'wa', 'az', 'la', 'hy', 'sq', 'sm', 'sl',
+            'da', 'he', 'nn', 'ur', 'wa', 'az', 'la', 'sq', 'hy', 'sm', 'sl',
             'nah', 'pnb', 'hi', 'ka', 'bs', 'tt', 'lb', 'lv', 'tk', 'sk', 'hsb',
             'kk', 'ky', 'nds', 'be', 'mk', 'km', 'ga', 'wo', 'ms', 'ang', 'co',
             'gn', 'mr', 'sa', 'csb', 'st', 'ia', 'sd', 'ug', 'sh', 'si', 'tg',
