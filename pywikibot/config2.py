@@ -143,7 +143,7 @@ def _get_base_dir():
         exc_text += "  Please check that user-config.py is stored in the correct location.\n"
         exc_text += "  Directory where user-config.py is searched is determined as follows:\n\n"
         exc_text += "    " + _get_base_dir.__doc__
-                        
+
         raise RuntimeError(exc_text)
 
     return base_dir

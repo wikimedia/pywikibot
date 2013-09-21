@@ -32,10 +32,11 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot import i18n, config, catlib, pagegenerators
 
+
 class DeletionRobot:
     """ This robot allows deletion of pages en masse. """
 
-    def __init__(self, generator, summary, always = False, undelete=True):
+    def __init__(self, generator, summary, always=False, undelete=True):
         """ Arguments:
         * generator - A page generator.
         * always - Delete without prompting?
@@ -52,9 +53,10 @@ class DeletionRobot:
         for page in self.generator:
             pywikibot.output(u'Processing page %s' % page.title())
             if self.undelete:
-                page.undelete(self.summary, throttle = True)
+                page.undelete(self.summary, throttle=True)
             else:
-                page.delete(self.summary, not self.always, throttle = True)
+                page.delete(self.summary, not self.always, throttle=True)
+
 
 def main():
     genFactory = pagegenerators.GeneratorFactory()
@@ -96,7 +98,7 @@ def main():
             genFactory.handleArg(arg)
         if not summary:
             if arg.startswith('-category'):
-                summary = i18n.twtranslate(mysite, 'delete-from-category',{'page': pageName})
+                summary = i18n.twtranslate(mysite, 'delete-from-category', {'page': pageName})
             elif arg.startswith('-links'):
                 summary = i18n.twtranslate(mysite, 'delete-linked-pages', {'page': pageName})
             elif arg.startswith('-ref'):
@@ -112,7 +114,7 @@ def main():
         generator = pagegenerators.ImagesPageGenerator(page)
     if not summary:
         summary = pywikibot.input(u'Enter a reason for the %sdeletion:'
-                                    % ['', 'un'][undelete])
+                                  % ['', 'un'][undelete])
     if not generator:
         generator = genFactory.getCombinedGenerator()
     if not generator:
