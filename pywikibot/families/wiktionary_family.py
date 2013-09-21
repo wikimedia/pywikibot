@@ -14,17 +14,17 @@ class Family(family.WikimediaFamily):
             'en', 'mg', 'fr', 'zh', 'lt', 'ru', 'el', 'sv', 'pl', 'ko', 'de',
             'tr', 'es', 'nl', 'ku', 'ta', 'kn', 'io', 'fi', 'vi', 'hu', 'pt',
             'no', 'ml', 'my', 'id', 'it', 'chr', 'li', 'et', 'ja', 'te', 'fa',
-            'ca', 'cs', 'ro', 'ar', 'eu', 'jv', 'gl', 'lo', 'uk', 'fj', 'br',
+            'ca', 'cs', 'ro', 'ar', 'eu', 'jv', 'gl', 'lo', 'uk', 'br', 'fj',
             'eo', 'bg', 'hr', 'oc', 'th', 'is', 'vo', 'ps', 'zh-min-nan',
             'simple', 'cy', 'scn', 'sr', 'af', 'ast', 'uz', 'sw', 'fy', 'tl',
-            'da', 'he', 'nn', 'ur', 'wa', 'az', 'la', 'sq', 'hy', 'sm', 'sl',
+            'da', 'he', 'nn', 'wa', 'ur', 'az', 'la', 'sq', 'hy', 'sm', 'sl',
             'nah', 'pnb', 'hi', 'ka', 'bs', 'tt', 'lb', 'lv', 'tk', 'sk', 'hsb',
-            'kk', 'ky', 'nds', 'be', 'mk', 'km', 'ga', 'wo', 'ms', 'ang', 'co',
+            'kk', 'nds', 'ky', 'be', 'mk', 'km', 'ga', 'wo', 'ms', 'ang', 'co',
             'gn', 'mr', 'sa', 'csb', 'st', 'ia', 'sd', 'ug', 'sh', 'si', 'tg',
             'mn', 'kl', 'or', 'jbo', 'an', 'ln', 'fo', 'zu', 'gu', 'kw', 'gv',
             'rw', 'qu', 'vec', 'ss', 'ie', 'mt', 'om', 'bn', 'roa-rup', 'iu',
             'pa', 'so', 'am', 'su', 'za', 'gd', 'mi', 'ne', 'tpi', 'yi', 'ti',
-            'sg', 'na', 'dv', 'tn', 'ha', 'ks', 'ts', 'ay',
+            'sg', 'na', 'dv', 'tn', 'ts', 'ha', 'ks', 'ay',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang)
