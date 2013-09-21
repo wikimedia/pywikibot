@@ -13,7 +13,6 @@ class Family(family.WikimediaFamily):
         self.name = 'wikidata'
         self.langs = {
             'wikidata': 'www.wikidata.org',
-            'repo': 'wikidata-test-repo.wikimedia.de',
             'client': 'wikidata-test-client.wikimedia.de',
             'test': 'test.wikidata.org',
         }
@@ -36,7 +35,7 @@ class Family(family.WikimediaFamily):
             elif code == 'test':
                 return ('test', 'wikidata')
             else:
-                return ('repo', 'wikidata')
+                return (None, None)
 
     def globes(self, code):
         """Supported globes for Coordinate datatype"""
