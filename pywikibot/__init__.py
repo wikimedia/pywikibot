@@ -120,7 +120,9 @@ class Coordinate(object):
         self.lon = lon
         self.alt = alt
         self._precision = precision
-        self.globe = globe.lower()
+        if globe:
+            globe = globe.lower()
+        self.globe = globe
         self._entity = entity
         self.type = typ
         self.name = name
