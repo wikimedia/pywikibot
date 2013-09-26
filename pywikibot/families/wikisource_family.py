@@ -102,8 +102,10 @@ class Family(family.WikimediaFamily):
 
         self.crossnamespace[102] = {
             'ar': self.authornamespaces,
+            'be': self.authornamespaces,
             'da': self.authornamespaces,
             'en': self.authornamespaces,
+            'eo': self.authornamespaces,
             'fa': self.authornamespaces,
             'fr': self.authornamespaces,
             'it': self.authornamespaces,
@@ -111,6 +113,7 @@ class Family(family.WikimediaFamily):
             'nl': self.authornamespaces,
             'no': self.authornamespaces,
             'pt': self.authornamespaces,
+            'ro': self.authornamespaces,
             'vi': self.authornamespaces,
             'zh': self.authornamespaces,
         }
@@ -120,5 +123,12 @@ class Family(family.WikimediaFamily):
         }
 
         self.crossnamespace[106] = {
+            'ca': self.authornamespaces,
+            'et': self.authornamespaces,
             'sv': self.authornamespaces,
         }
+
+        self.crossnamespace[108] = {
+            'he': self.authornamespaces,
+        }
+
