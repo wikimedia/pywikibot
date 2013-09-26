@@ -10,8 +10,9 @@ __version__ = '$Id$'
 import logging
 import re
 import urllib
-import config2 as config
+import collections
 
+import config2 as config
 import pywikibot
 
 logger = logging.getLogger("pywiki.wiki.family")
@@ -709,7 +710,7 @@ class Family(object):
         #   values are dicts where:
         #     keys are the languages that can be linked to from the lang+ns, or
         #     '_default'; values are a list of namespace numbers
-        self.crossnamespace = {}
+        self.crossnamespace = collections.defaultdict(dict)
         ##
         ## Examples :
         ## Allowing linking to pt' 102 NS from any other lang' 0 NS is
