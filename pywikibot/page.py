@@ -21,6 +21,7 @@ import re
 import threading
 import unicodedata
 import urllib
+import collections
 
 logger = logging.getLogger("pywiki.wiki.page")
 
@@ -2809,14 +2810,11 @@ class Claim(PropertyPage):
         bit differently, and require some
         more handling.
         """
-        source = {}
+        source = collections.defaultdict(list)
         for prop in data['snaks'].values():
             for claimsnak in prop:
                 claim = Claim.fromJSON(site, {'mainsnak': claimsnak, 'hash': data['hash']})
-                if claim.getID() in source:
-                    source[claim.getID()].append(claim)
-                else:
-                    source[claim.getID()] = [claim]
+                source[claim.getID()].append(claim)
         return source
 
     @staticmethod
@@ -2908,14 +2906,11 @@ class Claim(PropertyPage):
         @type claims: list of pywikibot.Claim
         """
         data = self.repo.editSource(self, claims, new=True, **kwargs)
-        source = {}
+        source = collections.defaultdict(list)
         for claim in claims:
             claim.hash = data['reference']['hash']
             self.on_item.lastrevid = data['pageinfo']['lastrevid']
-            if claim.getID() in source:
-                source[claim.getID()].append(claim)
-            else:
-                source[claim.getID()] = [claim]
+            source[claim.getID()].append(claim)
         self.sources.append(source)
 
     def _formatDataValue(self):
