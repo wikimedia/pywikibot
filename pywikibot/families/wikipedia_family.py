@@ -159,7 +159,7 @@ class Family(family.WikimediaFamily):
             'be':  u'Disambig',
             'be-x-old':  u'Вікіпэдыя:Неадназначнасьці',
             'bg':  u'Пояснителни страници',
-            'ca':  u'Viquipèdia:Registre de pàgines de desambiguació',
+            'ca':  u'Pàgines de desambiguació',
             'cbk-zam': u'Desambiguo',
             'cs':  u'Rozcestníky',
             'cy':  u'Gwahaniaethu',
