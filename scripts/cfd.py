@@ -18,7 +18,7 @@ import re
 import category
 
 # The location of the CFD working page.
-cfdPage = 'Wikipedia:Categories for discussion/Working'
+cfdPage = u'Wikipedia:Categories for discussion/Working'
 
 # A list of templates that are used on category pages as part of the CFD
 # process that contain information such as the link to the per-day discussion page.
@@ -29,17 +29,17 @@ cfdTemplates = ['Cfd full', 'Cfr full']
 # to see how these work in context.  To get this bot working on other wikis you will
 # need to adjust these regular expressions at the very least.
 nobots = re.compile(r"NO\s*BOTS", re.IGNORECASE)
-example = re.compile(r"\[\[\:Category\:(.)\1\1\1\1\]\]", re.IGNORECASE)
+example = re.compile(r"\[\[:Category:(.)\1\1\1\1\]\]", re.IGNORECASE)
 speedymode = re.compile(r"^===*\s*Speedy Moves\s*===*\s*$", re.IGNORECASE)
-movemode = re.compile(r"^===*\s*Move\/Merge then delete\s*===*\s*$", re.IGNORECASE)
+movemode = re.compile(r"^===*\s*Move/Merge then delete\s*===*\s*$", re.IGNORECASE)
 emptymode = re.compile(r"^===*\s*Empty then delete\s*===*\s*$", re.IGNORECASE)
 deletemode = re.compile(r"^===*\s*Ready for deletion\s*===*\s*$", re.IGNORECASE)
 maintenance = re.compile(r"^===*\s*Old by month categories with entries\s*===*\s*$", re.IGNORECASE)
-dateheader = re.compile(r"(\[\[Wikipedia\:Categories[_ ]for[_ ](?:discussion|deletion)\/Log\/([^\]]*?)\]\])",
+dateheader = re.compile(r"(\[\[Wikipedia:Categories[_ ]for[_ ](?:discussion|deletion)/Log/([^\]]*?)\]\])",
                         re.IGNORECASE)
-movecat = re.compile(r"\[\[\:Category\:([^\]]*?)\]\][^\]]*?\[\[\:Category\:([^\]]*?)\]\]", re.IGNORECASE)
-deletecat = re.compile(r"\[\[\:Category\:([^\]]*?)\]\]", re.IGNORECASE)
-findday = re.compile(r"\[\[(Wikipedia\:Categories for (?:discussion|deletion)\/Log\/\d{4} \w+ \d+)#", re.IGNORECASE)
+movecat = re.compile(r"\[\[:Category:([^\]]*?)\]\][^\]]*?\[\[:Category:([^\]]*?)\]\]", re.IGNORECASE)
+deletecat = re.compile(r"\[\[:Category:([^\]]*?)\]\]", re.IGNORECASE)
+findday = re.compile(r"\[\[(Wikipedia:Categories for (?:discussion|deletion)/Log/\d{4} \w+ \d+)#", re.IGNORECASE)
 
 
 class ReCheck:
@@ -59,9 +59,6 @@ def main():
     # Variable declarations
     day = "None"
     mode = "None"
-    src = "None"
-    dest = "None"
-    line = ""
     summary = ""
     robot = None
 
@@ -97,9 +94,11 @@ def main():
             dest = m.result.group(2)
             thisDay = findDay(src, day)
             if mode == "Move" and thisDay != "None":
-                summary = "Robot - Moving category " + src + " to [[:Category:" + dest + "]] per [[WP:CFD|CFD]] at " + thisDay + "."
+                summary = "Robot - Moving category " + src + " to [[:Category:" + dest + "]] per [[WP:CFD|CFD]] at " + \
+                          thisDay + "."
             elif mode == "Speedy":
-                summary = "Robot - Speedily moving category " + src + " to [[:Category:" + dest + "]] per [[WP:CFDS|CFDS]]."
+                summary = "Robot - Speedily moving category " + src + " to [[:Category:" + dest + \
+                          "]] per [[WP:CFDS|CFDS]]."
             else:
                 continue
             # If the category is redirect, we do NOT want to move articles to
@@ -144,7 +143,7 @@ def main():
 # parameter, which is essentially a fallback that is extracted from the
 # per-day subheadings on the working page.
 def findDay(pageTitle, oldDay):
-    page = pywikibot.Page(pywikibot.Site(), "Category:" + pageTitle)
+    page = pywikibot.Page(pywikibot.Site(), u"Category:" + pageTitle)
     try:
         pageSrc = page.get()
         m = findday.search(pageSrc)
