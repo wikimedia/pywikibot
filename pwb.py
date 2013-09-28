@@ -60,7 +60,8 @@ def run_python_file(filename, args):
 if sys.version_info[0] != 2:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2")
 if sys.version_info[1] < 6:
-    raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 or higher")
+    raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 "
+                       "or higher")
 
 rewrite_path = os.path.dirname(sys.argv[0])
 if not os.path.isabs(rewrite_path):
