@@ -291,7 +291,7 @@ class FeaturedBot(pywikibot.Bot):
         task = 'good'
         if not self.hastemplate(task):
             pywikibot.output(u'\nNOTE: % arcticles are not implemented at %.'
-                             % (task, site))
+                             % (task, self.site))
             return
 
         if self.getOption('fromall'):
@@ -300,8 +300,10 @@ class FeaturedBot(pywikibot.Bot):
             dp.get()
 
             ### Quick and dirty hack - any ideas?
-            self.fromlang = [key.replace('wiki', '').replace('_', '-')
-                             for key in dp.sitelinks.keys()]
+            # use wikipedia sites only
+            self.fromlang = [lang.replace('_', '-') for (lang, fam) in
+                             [key.split('wiki') for key in dp.sitelinks.keys()]
+                             if not fam]
         else:
             return  # 2DO
         self.fromlang.sort()
@@ -326,7 +328,7 @@ class FeaturedBot(pywikibot.Bot):
         task = 'featured'
         if not self.hastemplate(task):
             pywikibot.output(u'\nNOTE: % arcticles are not implemented at %.'
-                             % (task, site))
+                             % (task, self.site))
             return
 
         if self.getOption('fromall'):
@@ -335,8 +337,10 @@ class FeaturedBot(pywikibot.Bot):
             dp.get()
 
             ### Quick and dirty hack - any ideas?
-            self.fromlang = [key.replace('wiki', '').replace('_', '-')
-                             for key in dp.sitelinks.keys()]
+            # use wikipedia sites only
+            self.fromlang = [lang.replace('_', '-') for (lang, fam) in
+                             [key.split('wiki') for key in dp.sitelinks.keys()]
+                             if not fam]
         else:
             return  # 2DO
         self.fromlang.sort()
