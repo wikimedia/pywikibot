@@ -87,48 +87,6 @@ class Family(family.WikimediaFamily):
             'zh': [102],
         }
 
-        self.crossnamespace[0] = {
-            '_default': self.authornamespaces,
-        }
-        self.crossnamespace[100] = {
-            'bg': self.authornamespaces,
-            'cs': self.authornamespaces,
-            'hr': self.authornamespaces,
-            'hu': self.authornamespaces,
-            'hy': self.authornamespaces,
-            'ko': self.authornamespaces,
-            'tr': self.authornamespaces,
-        }
-
-        self.crossnamespace[102] = {
-            'ar': self.authornamespaces,
-            'be': self.authornamespaces,
-            'da': self.authornamespaces,
-            'en': self.authornamespaces,
-            'eo': self.authornamespaces,
-            'fa': self.authornamespaces,
-            'fr': self.authornamespaces,
-            'it': self.authornamespaces,
-            'la': self.authornamespaces,
-            'nl': self.authornamespaces,
-            'no': self.authornamespaces,
-            'pt': self.authornamespaces,
-            'ro': self.authornamespaces,
-            'vi': self.authornamespaces,
-            'zh': self.authornamespaces,
-        }
-
-        self.crossnamespace[104] = {
-            'pl': self.authornamespaces,
-        }
-
-        self.crossnamespace[106] = {
-            'ca': self.authornamespaces,
-            'et': self.authornamespaces,
-            'sv': self.authornamespaces,
-        }
-
-        self.crossnamespace[108] = {
-            'he': self.authornamespaces,
-        }
-
+        for key, values in self.authornamespaces.iteritems():
+            for item in values:
+                self.crossnamespace[item].update({key: self.authornamespaces})
