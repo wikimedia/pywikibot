@@ -1,8 +1,8 @@
 # -*- coding: utf-8  -*-
 """ Module to determine the pywikipedia version (tag, revision and date) """
 #
-# (C) Merlijn 'valhallasw' van Deen, 2007-2008
-# (C) xqt, 2010-2012
+# (C) Merlijn 'valhallasw' van Deen, 2007-2014
+# (C) xqt, 2010-2014
 # (C) Pywikibot team, 2007-2013
 #
 # Distributed under the terms of the MIT license.
@@ -25,22 +25,19 @@ class ParseError(Exception):
 
 def _get_program_dir():
     _program_dir = os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
-#    _program_dir = _program_dir.rstrip(os.path.basename(_program_dir))
-##   if not os.path.isabs(_program_dir):
-##      _program_dir = os.path.normpath(os.path.join(os.getcwd(), _program_dir))
     return _program_dir
 
 
 def getversion():
-    data = dict(getversiondict())   # copy dict to prevent changes in 'chache'
+    data = dict(getversiondict())  # copy dict to prevent changes in 'chache'
     try:
         hsh2 = getversion_onlinerepo()
         hsh1 = data['hsh']
         data['cmp_ver'] = 'OUTDATED' if hsh1 != hsh2 else 'ok'
     except Exception:
         data['cmp_ver'] = 'n/a'
-    data['hsh'] = data['hsh'][:7]   # make short hash from full hash
-    return '%(tag)s (r%(rev)s, %(hsh)s, %(date)s, %(cmp_ver)s)' % data
+    data['hsh'] = data['hsh'][:7]  # make short hash from full hash
+    return '%(tag)s (%(hsh)s, %(rev)s, %(date)s, %(cmp_ver)s)' % data
 
 
 def getversiondict():
@@ -48,11 +45,15 @@ def getversiondict():
     if cache:
         return cache
     try:
-        (tag, rev, date, hsh) = getversion_git()
-    except Exception:
+        _program_dir = _get_program_dir()
+        if os.path.isdir(os.path.join(_program_dir, '.svn')):
+            (tag, rev, date, hsh) = getversion_svn(_program_dir)
+        else:
+            (tag, rev, date, hsh) = getversion_git(_program_dir)
+    except ParseError:
         try:
             (tag, rev, date, hsh) = getversion_nightly()
-        except Exception:
+        except ParseError:
             try:
                 version = getfileversion('pywikibot/__init__.py')
                 if not version:
@@ -79,6 +80,8 @@ def getversiondict():
 
 
 def getversion_svn(path=None):
+    import httplib
+    import xml.dom.minidom
     _program_dir = path or _get_program_dir()
     entries = open(os.path.join(_program_dir, '.svn/entries'))
     version = entries.readline().strip()
@@ -88,10 +91,14 @@ def getversion_svn(path=None):
         from sqlite3 import dbapi2 as sqlite
         con = sqlite.connect(os.path.join(_program_dir, ".svn/wc.db"))
         cur = con.cursor()
-        cur.execute('''select local_relpath, repos_path, revision, changed_date from nodes order by revision desc, changed_date desc''')
-        name, tag, rev, date = cur.fetchone()
+        cur.execute("""select
+local_relpath, repos_path, revision, changed_date, checksum from nodes
+order by revision desc, changed_date desc""")
+        name, tag, rev, date, checksum = cur.fetchone()
+        cur.execute("select root from repository")
+        tag, = cur.fetchone()
         con.close()
-        tag = tag[:-len(name)]
+        tag = os.path.split(tag)[1]
         date = time.gmtime(date / 1000000)
     else:
         for i in range(3):
@@ -105,9 +112,18 @@ def getversion_svn(path=None):
         date = time.strptime(entries.readline()[:19], '%Y-%m-%dT%H:%M:%S')
         rev = entries.readline()[:-1]
         entries.close()
+    conn = httplib.HTTPSConnection('github.com')
+    conn.request('PROPFIND', '/wikimedia/%s/!svn/vcc/default' % tag,
+                 "<?xml version='1.0' encoding='utf-8'?>"
+                 "<propfind xmlns=\"DAV:\"><allprop/></propfind>",
+                 {'Label': rev, 'User-Agent': 'SVN/1.7.5-pywikibot1'})
+    resp = conn.getresponse()
+    dom = xml.dom.minidom.parse(resp)
+    hsh = dom.getElementsByTagName("C:git-commit")[0].firstChild.nodeValue
+    rev = 's%s' % rev
     if (not date or not tag or not rev) and not path:
         raise ParseError
-    return (tag, rev, date)
+    return (tag, rev, date, hsh)
 
 
 def getversion_git(path=None):
@@ -119,16 +135,12 @@ def getversion_git(path=None):
         # some windows git versions provide git.cmd instead of git.exe
         cmd = 'git.cmd'
 
-    #(try to use .git directory for new entries format)
-    #tag  = subprocess.Popen('git config --get remote.origin.url',
-    #                        shell=True,
-    #                        stdout=subprocess.PIPE).stdout.read()
     tag = open(os.path.join(_program_dir, '.git/config'), 'r').read()
     s = tag.find('url = ', tag.find('[remote "origin"]'))
     e = tag.find('\n', s)
     tag = tag[(s + 6):e]
     t = tag.strip().split('/')
-    tag = '[%s] %s' % (t[0][:-1], '/'.join(t[3:])[:-4])
+    tag = '[%s] %s' % (t[0][:-1], '-'.join(t[3:]))
     info = subprocess.Popen([cmd, '--no-pager',
                              'log', '-1',
                              '--pretty=format:"%ad|%an|%h|%H|%d"'
@@ -142,8 +154,8 @@ def getversion_git(path=None):
     rev = subprocess.Popen([cmd, 'rev-list', 'HEAD'],
                            cwd=_program_dir,
                            stdout=subprocess.PIPE).stdout.read()
-    rev = len(rev.splitlines())
-    hsh = info[3]      # also stored in '.git/refs/heads/master'
+    rev = 'g%s' % len(rev.splitlines())
+    hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
         raise ParseError
     return (tag, rev, date, hsh)
@@ -169,10 +181,6 @@ def getversion_onlinerepo(repo=None):
     except:
         raise ParseError
     return hsh
-
-## Simple version comparison
-#
-cmp_ver = lambda a, b, tol=1: {-1: '<', 0: '~', 1: '>'}[cmp((a - b) // tol, 0)]
 
 
 def getfileversion(filename):
