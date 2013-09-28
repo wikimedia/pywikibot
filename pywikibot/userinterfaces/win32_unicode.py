@@ -256,3 +256,6 @@ if sys.platform == "win32":
             if arg == u'-c':
                 argv[0] = u'-c'
                 break
+
+    if argv == []:
+        argv = [u'']
