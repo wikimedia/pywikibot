@@ -7,6 +7,26 @@ Tests for the page module.
 #
 # Distributed under the terms of the MIT license.
 #
+
+# NOTE FOR RUNNING WINDOWS UI TESTS
+#
+# Windows UI tests have to be run using the tests\ui_tests.bat helper script.
+# This will set PYTHONPATH and PYWIKIBOT2_DIR, and then run the tests. Do not
+# touch mouse or keyboard while the tests are running, as this might disturb the
+# interaction tests.
+#
+# The Windows tests were developed on a Dutch Windows 7 OS. You might need to adapt the
+# helper functions in TestWindowsTerminalUnicode for other versions.
+#
+# For the Windows-based tests, you need the following packages installed:
+#   - pywin32, for clipboard access, which can be downloaded here:
+#     http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/
+#     make sure to download the package for the correct python version!
+#
+#   - pywinauto, to send keys to the terminal, which can be installed using:
+#     easy_install --upgrade https://pywinauto.googlecode.com/files/pywinauto-0.4.2.zip
+#
+#
 __version__ = '$Id$'
 
 import unittest
@@ -15,6 +35,7 @@ import StringIO
 import logging
 import os
 import sys
+import time
 
 if os.name == "nt":
     from multiprocessing.managers import BaseManager
@@ -328,19 +349,15 @@ if __name__ == "__main__":
             self.assertEqual(newstderr.getvalue(), "abcd \x1b[33;1mA\x1b[0m\x1b[33;1mB\x1b[0m\x1b[33;1mG\x1b[0m\x1b[33;1mD\x1b[0m \x1b[33;1ma\x1b[0m\x1b[33;1mb\x1b[0m\x1b[33;1mg\x1b[0m\x1b[33;1md\x1b[0m \x1b[33;1ma\x1b[0m\x1b[33;1mi\x1b[0m\x1b[33;1mu\x1b[0m\x1b[33;1me\x1b[0m\x1b[33;1mo\x1b[0m\n\x1b[0m")  # noqa
 
     @unittest.skipUnless(os.name == "nt", "requires Windows console")
-    class TestWindowsTerminalUnicode(UITestCase):
+    class WindowsTerminalTestCase(UITestCase):
         @classmethod
-        def setUpClass(cls):
-            import inspect
+        def setUpProcess(cls, command):
             import pywinauto
             import subprocess
             si = subprocess.STARTUPINFO()
             si.dwFlags = subprocess.STARTF_USESTDHANDLES
-            fn = inspect.getfile(inspect.currentframe())
-            cls._process = subprocess.Popen(["python", "pwb.py", fn, "--run-as-slave-interpreter"],
+            cls._process = subprocess.Popen(command,
                                             creationflags=subprocess.CREATE_NEW_CONSOLE)
-            _manager.connect()
-            cls.pywikibot = _manager.pywikibot()
 
             cls._app = pywinauto.application.Application()
             cls._app.connect_(process=cls._process.pid)
@@ -349,15 +366,29 @@ if __name__ == "__main__":
             cls._app.window_().TypeKeys("% {UP}{ENTER}^L{HOME}L{ENTER}", with_spaces=True)
 
         @classmethod
-        def tearDownClass(cls):
-            del cls.pywikibot
+        def tearDownProcess(cls):
             cls._process.kill()
 
+        def setUp(self):
+            super(WindowsTerminalTestCase, self).setUp()
+            self.setclip(u'')
+
+        def waitForWindow(self):
+            while not self._app.window_().IsEnabled():
+                time.sleep(0.01)
+
         def getstdouterr(self):
+            sentinel = u'~~~~SENTINEL~~~~cedcfc9f-7eed-44e2-a176-d8c73136c185'
             # select all and copy to clipboard
             self._app.window_().SetFocus()
+            self.waitForWindow()
             self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{DOWN}{ENTER}{ENTER}', with_spaces=True)
-            return self.getclip()
+
+            while True:
+                data = self.getclip()
+                if data != sentinel:
+                    return data
+                time.sleep(0.01)
 
         def setclip(self, text):
             win32clipboard.OpenClipboard()
@@ -375,8 +406,23 @@ if __name__ == "__main__":
         def sendstdin(self, text):
             self.setclip(text.replace(u"\n", u"\r\n"))
             self._app.window_().SetFocus()
+            self.waitForWindow()
             self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{ENTER}', with_spaces=True)
-            self.setclip(u'')
+
+    class TestWindowsTerminalUnicode(WindowsTerminalTestCase):
+        @classmethod
+        def setUpClass(cls):
+            import inspect
+            fn = inspect.getfile(inspect.currentframe())
+            cls.setUpProcess(["python", "pwb.py", fn, "--run-as-slave-interpreter"])
+
+            _manager.connect()
+            cls.pywikibot = _manager.pywikibot()
+
+        @classmethod
+        def tearDownClass(cls):
+            del cls.pywikibot
+            cls.tearDownProcess()
 
         def setUp(self):
             super(TestWindowsTerminalUnicode, self).setUp()
@@ -388,7 +434,6 @@ if __name__ == "__main__":
             self.pywikibot.set_ui('encoding', 'utf-8')
 
             self.pywikibot.cls()
-            self.setclip(u'')
 
         def testOutputUnicodeText_no_transliterate(self):
             self.pywikibot.output(u"Заглавная_страница")
