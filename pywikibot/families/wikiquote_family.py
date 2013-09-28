@@ -23,20 +23,6 @@ class Family(family.WikimediaFamily):
         self.langs = dict([(lang, '%s.wikiquote.org' % lang)
                            for lang in self.languages_by_size])
 
-        # attop is a list of languages that prefer to have the interwiki
-        # links at the top of the page.
-        self.interwiki_attop = []
-
-        # on_one_line is a list of languages that want the interwiki links
-        # one-after-another on a single line
-        self.interwiki_on_one_line = []
-
-        # Similar for category
-        self.category_attop = []
-
-        # List of languages that want the category on_one_line.
-        self.category_on_one_line = []
-
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
             'af', 'am', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs', 'da',
