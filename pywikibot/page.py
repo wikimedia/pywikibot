@@ -2768,6 +2768,7 @@ class Claim(PropertyPage):
         self.qualifiers = {}
         self.target = None
         self.snaktype = 'value'
+        self.rank = 'normal'
         self.on_item = None  # The item it's on
 
     @staticmethod
@@ -2797,6 +2798,8 @@ class Claim(PropertyPage):
             else:
                 #This covers string, url types
                 claim.target = data['mainsnak']['datavalue']['value']
+        if 'rank' in data:  # References/Qualifiers don't have ranks
+            claim.rank = data['rank']
         if 'references' in data:
             for source in data['references']:
                 claim.sources.append(Claim.referenceFromJSON(site, source))
@@ -2882,6 +2885,15 @@ class Claim(PropertyPage):
             self.snaktype = value
         else:
             raise ValueError("snaktype must be 'value', 'somevalue', or 'novalue'.")
+
+    def getRank(self):
+        return self.rank
+
+    def setRank(self):
+        """
+        Has not been implemented in the Wikibase API yet
+        """
+        raise NotImplementedError
 
     def changeSnakType(self, value=None, **kwargs):
         """
