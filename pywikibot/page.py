@@ -999,6 +999,13 @@ class Page(object):
         # iterated upon.
         return self.site.pagelanglinks(self, step=step, total=total)
 
+    def data_item(self):
+        """
+        Convinience function to get the Wikibase item of a page
+        @return: ItemPage
+        """
+        return ItemPage.fromPage(self)
+
     def templates(self, content=False):
         """Return a list of Page objects for templates used on this Page.
 
