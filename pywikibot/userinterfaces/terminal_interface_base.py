@@ -45,6 +45,7 @@ class UI:
         self.stdin = sys.stdin
         self.stdout = sys.stdout
         self.stderr = sys.stderr
+        self.argv = sys.argv
         self.encoding = config.console_encoding
         self.transliteration_target = config.transliteration_target
 
@@ -261,6 +262,9 @@ class UI:
                 % url)
             return wikipedia.input(
                 u'What is the solution of the CAPTCHA at this url ?')
+
+    def argvu(self):
+        return [s.decode(self.encoding) for s in self.argv]
 
 
 class TerminalHandler(logging.Handler):
