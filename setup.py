@@ -15,11 +15,25 @@ from ez_setup import use_setuptools
 use_setuptools()
 
 from setuptools import setup, find_packages
+from setuptools.command import install
 
 if sys.version_info[0] != 2:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2")
 elif sys.version_info[1] < 6:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 or higher")
+
+
+class pwb_install(install.install):
+    """
+    Setuptools' install command subclassed to automatically call
+    `generate_user_files.py` after installing the package.
+    """
+    def run(self):
+        install.install.run(self)
+        import subprocess
+        python = sys.executable
+        python = python.replace("pythonw.exe", "python.exe")  # for Windows
+        subprocess.call([python, "generate_user_files.py"])
 
 setup(
     name='Pywikipediabot',
@@ -42,12 +56,8 @@ setup(
         'Environment :: Console',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7'
-    ]
+    ],
+    cmdclass={
+        'install': pwb_install
+    }
 )
-
-# automatically launch generate_user_files.py
-
-import subprocess
-python = sys.executable
-python = python.replace("pythonw.exe", "python.exe")  # for Windows
-ignore = subprocess.call([python, "generate_user_files.py"])
