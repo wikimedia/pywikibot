@@ -186,15 +186,15 @@ def getOpenStreetMapCats(latitude, longitude):
     result = []
     locationList = getOpenStreetMap(latitude, longitude)
     for i in range(0, len(locationList)):
-	#print 'Working on ' + locationList[i]
-	if i <= len(locationList)-3:
-	    category = getCategoryByName(name=locationList[i], parent=locationList[i+1], grandparent=locationList[i+2])
-	elif i == len(locationList)-2:
+        #print 'Working on ' + locationList[i]
+        if i <= len(locationList)-3:
+            category = getCategoryByName(name=locationList[i], parent=locationList[i+1], grandparent=locationList[i+2])
+        elif i == len(locationList)-2:
             category = getCategoryByName(name=locationList[i], parent=locationList[i+1])
-	else:
+        else:
             category = getCategoryByName(name=locationList[i])
-	if category and not category==u'':
-	    result.append(category)
+        if category and not category==u'':
+            result.append(category)
     #print result
     return result
 
@@ -208,39 +208,39 @@ def getOpenStreetMap(latitude, longitude):
     gotInfo = False
     parameters = urllib.urlencode({'lat' : latitude, 'lon' : longitude, 'accept-language' : 'en'})
     while(not gotInfo):
-	try:
-	    page = urllib.urlopen("http://nominatim.openstreetmap.org/reverse?format=xml&%s" % parameters)
-	    et = xml.etree.ElementTree.parse(page)
-	    gotInfo=True
-	except IOError:
-	    pywikibot.output(u'Got an IOError, let\'s try again')
-	    time.sleep(30)
-	except socket.timeout:
-	    pywikibot.output(u'Got a timeout, let\'s try again')
-	    time.sleep(30)
+        try:
+            page = urllib.urlopen("http://nominatim.openstreetmap.org/reverse?format=xml&%s" % parameters)
+            et = xml.etree.ElementTree.parse(page)
+            gotInfo=True
+        except IOError:
+            pywikibot.output(u'Got an IOError, let\'s try again')
+            time.sleep(30)
+        except socket.timeout:
+            pywikibot.output(u'Got a timeout, let\'s try again')
+            time.sleep(30)
     validParts = [u'hamlet', u'village', u'city', u'county', u'country']
     invalidParts = [u'path', u'road', u'suburb', u'state', u'country_code']
     addressparts = et.find('addressparts')
     #xml.etree.ElementTree.dump(et)
 
     for addresspart in addressparts.getchildren():
-	if addresspart.tag in validParts:
-	    result.append(addresspart.text)
-	elif addresspart.tag in invalidParts:
-	    pywikibot.output(u'Dropping %s, %s' % (addresspart.tag, addresspart.text))
-	else:
-	    pywikibot.warning(u'%s, %s is not in addressparts lists' % (addresspart.tag, addresspart.text))
+        if addresspart.tag in validParts:
+            result.append(addresspart.text)
+        elif addresspart.tag in invalidParts:
+            pywikibot.output(u'Dropping %s, %s' % (addresspart.tag, addresspart.text))
+        else:
+            pywikibot.warning(u'%s, %s is not in addressparts lists' % (addresspart.tag, addresspart.text))
     #print result
     return result
 
 def getCategoryByName(name, parent=u'', grandparent=u''):
 
     if not parent==u'':
-	workname = name.strip() + u',_' + parent.strip()
-	workcat = pywikibot.Category(
-                pywikibot.Site(u'commons', u'commons'), workname)
-	if workcat.exists():
-	    return workname
+        workname = name.strip() + u',_' + parent.strip()
+        workcat = pywikibot.Category(
+                    pywikibot.Site(u'commons', u'commons'), workname)
+        if workcat.exists():
+            return workname
     if not grandparent==u'':
         workname = name.strip() + u',_' + grandparent.strip()
         workcat = pywikibot.Category(
