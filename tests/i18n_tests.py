@@ -6,10 +6,11 @@
 #
 __version__ = '$Id$'
 
-import unittest
 import os
 from pywikibot import i18n
 import shutil
+
+from utils import unittest
 
 
 class TestTranslate(unittest.TestCase):

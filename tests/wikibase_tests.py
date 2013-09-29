@@ -10,11 +10,10 @@ Tests for the Wikidata parts of the page module.
 __version__ = '$Id$'
 
 import os
-import unittest
 import pywikibot
 import json
 
-from utils import PywikibotTestCase
+from utils import PywikibotTestCase, unittest
 
 site = pywikibot.Site('en', 'wikipedia')
 mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))

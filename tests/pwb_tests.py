@@ -9,15 +9,18 @@ __version__ = '$Id$'
 import os
 import sys
 import subprocess
-
-import unittest
-
 import pywikibot
+
+from utils import unittest
 
 pypath = sys.executable
 basepath = os.path.split(os.path.split(__file__)[0])[0]
 pwbpath = os.path.join(basepath, 'pwb.py')
 testbasepath = os.path.join(basepath, 'tests', 'pwb')
+
+
+def check_output(command):
+    return subprocess.Popen(command, stdout=subprocess.PIPE).communicate()[0]
 
 
 class TestPwb(unittest.TestCase):
@@ -35,8 +38,8 @@ class TestPwb(unittest.TestCase):
            the environment we get when directly running a script."""
         test = os.path.join(testbasepath, 'print_locals.py')
 
-        direct = subprocess.check_output([pypath, test])
-        vpwb = subprocess.check_output([pypath, pwbpath, test])
+        direct = check_output([pypath, test])
+        vpwb = check_output([pypath, pwbpath, test])
         self.assertEqual(direct, vpwb)
 
 if __name__ == "__main__":

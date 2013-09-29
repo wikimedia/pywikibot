@@ -10,11 +10,10 @@ Tests for the page module.
 __version__ = '$Id$'
 
 
-import unittest
 import pywikibot
 import pywikibot.page
 
-from utils import PywikibotTestCase
+from utils import PywikibotTestCase, unittest
 
 site = pywikibot.Site('en', 'wikipedia')
 mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))

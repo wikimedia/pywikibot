@@ -17,10 +17,17 @@ use_setuptools()
 from setuptools import setup, find_packages
 from setuptools.command import install
 
+test_deps = []
+
 if sys.version_info[0] != 2:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2")
 elif sys.version_info[1] < 6:
     raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 or higher")
+elif sys.version_info[1] == 6:
+    test_deps = ['unittest2']
+    testcollector = "tests.utils.collector"
+else:
+    testcollector = "tests"
 
 
 class pwb_install(install.install):
@@ -47,7 +54,8 @@ setup(
     dependency_links=[
         'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1'
     ],
-    test_suite="tests",
+    test_suite=testcollector,
+    tests_require=test_deps,
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Development Status :: 4 - Beta'

@@ -10,11 +10,10 @@ Tests for the site module.
 __version__ = '$Id$'
 
 
-import unittest
 import pywikibot
 import warnings
 from tests import patch_request, unpatch_request
-from utils import PywikibotTestCase
+from utils import PywikibotTestCase, unittest
 
 mysite = None
 mainpage = None
@@ -35,7 +34,6 @@ class TestSiteObject(PywikibotTestCase):
 
     def testBaseMethods(self):
         """Test cases for BaseSite methods"""
-
         self.assertEqual(mysite.family.name, self.family)
         self.assertEqual(mysite.code, self.code)
         self.assertType(mysite.lang, basestring)
