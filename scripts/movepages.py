@@ -37,9 +37,10 @@ Furthermore, the following command line parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 
-__version__='$Id$'
+__version__ = '$Id$'
 
-import sys, re
+import sys
+import re
 import pywikibot
 from pywikibot import i18n
 from pywikibot import pagegenerators
@@ -146,7 +147,7 @@ class MovePagesBot:
                     u'Change the page title to "%s"?'
                     % newPageTitle, ['yes', 'no', 'all', 'quit'],
                     ['y', 'n', 'a', 'q'])
-                if choice2  == 'y':
+                if choice2 == 'y':
                     self.moveOne(page, newPageTitle)
                 elif choice2 == 'a':
                     self.appendAll = True
@@ -161,7 +162,7 @@ class MovePagesBot:
                 searchPattern = pywikibot.input(u'Enter the search pattern:')
                 self.replacePattern = pywikibot.input(
                     u'Enter the replace pattern:')
-                self.regex=re.compile(searchPattern)
+                self.regex = re.compile(searchPattern)
                 if page.title() == page.title(withNamespace=False):
                     newPageTitle = self.regex.sub(self.replacePattern,
                                                   page.title())
