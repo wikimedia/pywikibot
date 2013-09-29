@@ -32,15 +32,15 @@ __version__ = '$Id$'
 #   Distributed under the terms of the MIT license.
 #
 #
-import os, sys, re, codecs
-import urllib, httplib, urllib2
+import sys
+import re
+import urllib
 import time
 import socket
-import StringIO
-import pywikibot
-from pywikibot import config
-from pywikibot import pagegenerators
 import xml.etree.ElementTree
+
+import pywikibot
+from pywikibot import pagegenerators
 
 category_blacklist = []
 countries = []
