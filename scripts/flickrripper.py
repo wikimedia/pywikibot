@@ -392,10 +392,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
     """ Loop over a set of Flickr photos. """
     result = []
     retry = False
-    if not start_id:
-        found_start_id = True
-    else:
-        found_start_id = False
+    found_start_id = not start_id
 
     # http://www.flickr.com/services/api/flickr.groups.pools.getPhotos.html
     # Get the photos in a group
