@@ -45,13 +45,14 @@ from pywikibot import pagegenerators
 category_blacklist = []
 countries = []
 
-search_wikis=u'_20'
-hint_wiki=u''
+search_wikis = u'_20'
+hint_wiki = u''
+
 
 def initLists():
-    '''
+    """
     Get the list of countries & the blacklist from Commons.
-    '''
+    """
     global category_blacklist
     global countries
 
@@ -66,18 +67,19 @@ def initLists():
         countries.append(country.title(withNamespace=False))
     return
 
+
 def categorizeImages(generator, onlyFilter, onlyUncat):
-    ''' Loop over all images in generator and try to categorize them. Get
+    """ Loop over all images in generator and try to categorize them. Get
     category suggestions from CommonSense.
 
-    '''
+    """
     for page in generator:
         if page.exists() and (page.namespace() == 6) and \
            (not page.isRedirectPage()):
             imagepage = pywikibot.ImagePage(page.site(), page.title())
             pywikibot.output(u'Working on ' + imagepage.title())
 
-            if (onlyUncat and not(u'Uncategorized' in imagepage.templates())):
+            if onlyUncat and not(u'Uncategorized' in imagepage.templates()):
                 pywikibot.output(u'No Uncategorized template found')
             else:
                 currentCats = getCurrentCats(imagepage)
@@ -87,26 +89,28 @@ def categorizeImages(generator, onlyFilter, onlyUncat):
                     galleries = []
                 else:
                     (commonshelperCats, usage, galleries) = getCommonshelperCats(imagepage)
-                newcats = applyAllFilters(commonshelperCats+currentCats)
+                newcats = applyAllFilters(commonshelperCats + currentCats)
 
-                if (len(newcats) > 0 and not(set(currentCats)==set(newcats))):
+                if len(newcats) > 0 and not(set(currentCats) == set(newcats)):
                     for cat in newcats:
-                        pywikibot.output(u' Found new cat: ' + cat);
+                        pywikibot.output(u' Found new cat: ' + cat)
                     saveImagePage(imagepage, newcats, usage, galleries,
                                   onlyFilter)
 
+
 def getCurrentCats(imagepage):
-    ''' Get the categories currently on the image '''
+    """ Get the categories currently on the image """
     result = []
     for cat in imagepage.categories():
         result.append(cat.title(withNamespace=False))
     return list(set(result))
 
+
 def getCommonshelperCats(imagepage):
-    ''' Get category suggestions from CommonSense. Parse them and return a list
+    """ Get category suggestions from CommonSense. Parse them and return a list
     of suggestions.
 
-    '''
+    """
     commonshelperCats = []
     usage = []
     galleries = []
@@ -116,35 +120,35 @@ def getCommonshelperCats(imagepage):
     site = imagepage.site
     lang = site.language()
     family = site.family.name
-    if lang==u'commons' and family==u'commons':
+    if lang == u'commons' and family == u'commons':
         parameters = urllib.urlencode(
-            {'i' : imagepage.title(withNamespace=False).encode('utf-8'),
-             'r' : 'on',
-             'go-clean' : 'Find+Categories',
-             'p' : search_wikis,
-             'cl' : hint_wiki})
-    elif family==u'wikipedia':
+            {'i': imagepage.title(withNamespace=False).encode('utf-8'),
+             'r': 'on',
+             'go-clean': 'Find+Categories',
+             'p': search_wikis,
+             'cl': hint_wiki})
+    elif family == u'wikipedia':
         parameters = urllib.urlencode(
-            {'i' : imagepage.title(withNamespace=False).encode('utf-8'),
-             'r' : 'on',
-             'go-move' : 'Find+Categories',
-             'p' : search_wikis,
-             'cl' : hint_wiki,
-             'w' : lang})
+            {'i': imagepage.title(withNamespace=False).encode('utf-8'),
+             'r': 'on',
+             'go-move': 'Find+Categories',
+             'p': search_wikis,
+             'cl': hint_wiki,
+             'w': lang})
     else:
         #Cant handle other sites atm
-        return ([], [], [])
+        return [], [], []
 
-    commonsenseRe = re.compile('^#COMMONSENSE(.*)#USAGE(\s)+\((?P<usagenum>(\d)+)\)\s(?P<usage>(.*))\s#KEYWORDS(\s)+\((?P<keywords>(\d)+)\)(.*)#CATEGORIES(\s)+\((?P<catnum>(\d)+)\)\s(?P<cats>(.*))\s#GALLERIES(\s)+\((?P<galnum>(\d)+)\)\s(?P<gals>(.*))\s(.*)#EOF$', re.MULTILINE + re.DOTALL)
+    commonsenseRe = re.compile('^#COMMONSENSE(.*)#USAGE(\s)+\((?P<usagenum>(\d)+)\)\s(?P<usage>(.*))\s#KEYWORDS(\s)+\((?P<keywords>(\d)+)\)(.*)#CATEGORIES(\s)+\((?P<catnum>(\d)+)\)\s(?P<cats>(.*))\s#GALLERIES(\s)+\((?P<galnum>(\d)+)\)\s(?P<gals>(.*))\s(.*)#EOF$', re.MULTILINE + re.DOTALL)  # noqa
 
     gotInfo = False
     matches = None
     maxtries = 10
     tries = 0
-    while(not gotInfo):
+    while not gotInfo:
         try:
-            if ( tries < maxtries ):
-                tries = tries + 1
+            if tries < maxtries:
+                tries += 1
                 commonsHelperPage = urllib.urlopen(
                     "http://toolserver.org/~daniel/WikiSense/CommonSense.php?%s" % parameters)
                 matches = commonsenseRe.search(
@@ -157,18 +161,18 @@ def getCommonshelperCats(imagepage):
         except socket.timeout:
             pywikibot.output(u'Got a timeout, let\'s try again')
 
-    if (matches and gotInfo):
-        if (matches.group('usagenum') > 0):
+    if matches and gotInfo:
+        if matches.group('usagenum') > 0:
             used = matches.group('usage').splitlines()
             for use in used:
-                usage= usage + getUsage(use)
+                usage = usage + getUsage(use)
                 #pywikibot.output(use)
-        if (matches.group('catnum') > 0):
+        if matches.group('catnum') > 0:
             cats = matches.group('cats').splitlines()
             for cat in cats:
                 commonshelperCats.append(cat.replace('_', ' '))
                 pywikibot.output(u'category : ' + cat)
-        if (matches.group('galnum') > 0):
+        if matches.group('galnum') > 0:
             gals = matches.group('gals').splitlines()
             for gal in gals:
                 galleries.append(gal.replace('_', ' '))
@@ -177,41 +181,45 @@ def getCommonshelperCats(imagepage):
     galleries = list(set(galleries))
     for (lang, project, article) in usage:
         pywikibot.output(lang + project + article)
-    return (commonshelperCats, usage, galleries)
+    return commonshelperCats, usage, galleries
+
 
 def getOpenStreetMapCats(latitude, longitude):
-    '''
+    """
     Get a list of location categories based on the OSM nomatim tool
-    '''
+    """
     result = []
     locationList = getOpenStreetMap(latitude, longitude)
     for i in range(0, len(locationList)):
         #print 'Working on ' + locationList[i]
-        if i <= len(locationList)-3:
-            category = getCategoryByName(name=locationList[i], parent=locationList[i+1], grandparent=locationList[i+2])
-        elif i == len(locationList)-2:
-            category = getCategoryByName(name=locationList[i], parent=locationList[i+1])
+        if i <= len(locationList) - 3:
+            category = getCategoryByName(name=locationList[i],
+                                         parent=locationList[i + 1],
+                                         grandparent=locationList[i + 2])
+        elif i == len(locationList) - 2:
+            category = getCategoryByName(name=locationList[i],
+                                         parent=locationList[i + 1])
         else:
             category = getCategoryByName(name=locationList[i])
-        if category and not category==u'':
+        if category and not category == u'':
             result.append(category)
     #print result
     return result
 
 
 def getOpenStreetMap(latitude, longitude):
-    '''
+    """
     Get the result from http://nominatim.openstreetmap.org/reverse
     and put it in a list of tuples to play around with
-    '''
+    """
     result = []
     gotInfo = False
-    parameters = urllib.urlencode({'lat' : latitude, 'lon' : longitude, 'accept-language' : 'en'})
-    while(not gotInfo):
+    parameters = urllib.urlencode({'lat': latitude, 'lon': longitude, 'accept-language': 'en'})
+    while not gotInfo:
         try:
             page = urllib.urlopen("http://nominatim.openstreetmap.org/reverse?format=xml&%s" % parameters)
             et = xml.etree.ElementTree.parse(page)
-            gotInfo=True
+            gotInfo = True
         except IOError:
             pywikibot.output(u'Got an IOError, let\'s try again')
             time.sleep(30)
@@ -233,30 +241,28 @@ def getOpenStreetMap(latitude, longitude):
     #print result
     return result
 
+
 def getCategoryByName(name, parent=u'', grandparent=u''):
 
-    if not parent==u'':
+    if not parent == u'':
         workname = name.strip() + u',_' + parent.strip()
-        workcat = pywikibot.Category(
-                    pywikibot.Site(u'commons', u'commons'), workname)
+        workcat = pywikibot.Category(pywikibot.Site(u'commons', u'commons'), workname)
         if workcat.exists():
             return workname
-    if not grandparent==u'':
+    if not grandparent == u'':
         workname = name.strip() + u',_' + grandparent.strip()
-        workcat = pywikibot.Category(
-                pywikibot.Site(u'commons', u'commons'), workname)
+        workcat = pywikibot.Category(pywikibot.Site(u'commons', u'commons'), workname)
         if workcat.exists():
             return workname
     workname = name.strip()
-    workcat = pywikibot.Category(
-                pywikibot.Site(u'commons', u'commons'), workname)
+    workcat = pywikibot.Category(pywikibot.Site(u'commons', u'commons'), workname)
     if workcat.exists():
         return workname
     return u''
 
 
 def getUsage(use):
-    ''' Parse the Commonsense output to get the usage '''
+    """ Parse the Commonsense output to get the usage """
     result = []
     lang = ''
     project = ''
@@ -265,21 +271,22 @@ def getUsage(use):
         '^(?P<lang>([\w-]+))\.(?P<project>([\w]+))\.org:(?P<articles>\s(.*))')
     matches = usageRe.search(use)
     if matches:
-        if (matches.group('lang')):
+        if matches.group('lang'):
             lang = matches.group('lang')
             #pywikibot.output(lang)
-        if (matches.group('project')):
+        if matches.group('project'):
             project = matches.group('project')
             #pywikibot.output(project)
-        if (matches.group('articles')):
+        if matches.group('articles'):
             articles = matches.group('articles')
             #pywikibot.output(articles)
     for article in articles.split():
         result.append((lang, project, article))
     return result
 
+
 def applyAllFilters(categories):
-    ''' Apply all filters on categories. '''
+    """ Apply all filters on categories. """
     result = []
     result = filterDisambiguation(categories)
     result = followRedirects(result)
@@ -288,17 +295,19 @@ def applyAllFilters(categories):
     result = filterParents(result)
     return result
 
+
 def filterBlacklist(categories):
-    ''' Filter out categories which are on the blacklist. '''
+    """ Filter out categories which are on the blacklist. """
     result = []
     for cat in categories:
         cat = cat.replace('_', ' ')
-        if (cat not in category_blacklist):
+        if not (cat in category_blacklist):
             result.append(cat)
     return list(set(result))
 
+
 def filterDisambiguation(categories):
-    ''' Filter out disambiguation categories. '''
+    """ Filter out disambiguation categories. """
     result = []
     for cat in categories:
         if (not pywikibot.Page(pywikibot.Site(u'commons', u'commons'),
@@ -306,8 +315,9 @@ def filterDisambiguation(categories):
             result.append(cat)
     return result
 
+
 def followRedirects(categories):
-    ''' If a category is a redirect, replace the category with the target. '''
+    """ If a category is a redirect, replace the category with the target. """
     result = []
     for cat in categories:
         categoryPage = pywikibot.Page(pywikibot.getSite(u'commons', u'commons'),
@@ -320,19 +330,20 @@ def followRedirects(categories):
             result.append(cat)
     return result
 
+
 def filterCountries(categories):
-    ''' Try to filter out ...by country categories.
+    """ Try to filter out ...by country categories.
     First make a list of any ...by country categories and try to find some
     countries. If a by country category has a subcategoy containing one of the
     countries found, add it. The ...by country categories remain in the set and
     should be filtered out by filterParents.
 
-    '''
+    """
     result = categories
     listByCountry = []
     listCountries = []
     for cat in categories:
-        if (cat.endswith(u'by country')):
+        if cat.endswith(u'by country'):
             listByCountry.append(cat)
 
         #If cat contains 'by country' add it to the list
@@ -341,27 +352,26 @@ def filterCountries(categories):
             for country in countries:
                 if country in cat:
                     listCountries.append(country)
-    if(len(listByCountry) > 0):
+    if len(listByCountry) > 0:
         for bc in listByCountry:
             category = pywikibot.Category(
                 pywikibot.Site(u'commons', u'commons'), u'Category:' + bc)
             for subcategory in category.subcategories():
                 for country in listCountries:
-                    if (subcategory.title(withNamespace=False).endswith(country)):
+                    if subcategory.title(withNamespace=False).endswith(country):
                         result.append(subcategory.title(withNamespace=False))
     return list(set(result))
 
-def filterParents(categories):
-    ''' Remove all parent categories from the set to prevent overcategorization.
 
-    '''
+def filterParents(categories):
+    """ Remove all parent categories from the set to prevent overcategorization. """
     result = []
     toFilter = u''
     for cat in categories:
         cat = cat.replace('_', ' ')
         toFilter = toFilter + "[[Category:" + cat + "]]\n"
-    parameters = urllib.urlencode({'source' : toFilter.encode('utf-8'),
-                                   'bot' : '1'})
+    parameters = urllib.urlencode({'source': toFilter.encode('utf-8'),
+                                   'bot': '1'})
     filterCategoriesRe = re.compile('\[\[Category:([^\]]*)\]\]')
     try:
         filterCategoriesPage = urllib.urlopen(
@@ -377,17 +387,18 @@ def filterParents(categories):
         return categories
     return result
 
+
 def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
-    ''' Remove the old categories and add the new categories to the image. '''
+    """ Remove the old categories and add the new categories to the image. """
     newtext = pywikibot.removeCategoryLinks(imagepage.get(), imagepage.site())
-    if not(onlyFilter):
+    if not onlyFilter:
         newtext = removeTemplates(newtext)
         newtext = newtext + getCheckCategoriesTemplate(usage, galleries,
                                                        len(newcats))
-    newtext = newtext + u'\n'
+    newtext += u'\n'
     for category in newcats:
         newtext = newtext + u'[[Category:' + category + u']]\n'
-    if(onlyFilter):
+    if onlyFilter:
         comment = u'Filtering categories'
     else:
         comment = u'Image is categorized by a bot using data from [[Commons:Tools#CommonSense|CommonSense]]'
@@ -395,11 +406,11 @@ def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
     imagepage.put(newtext, comment)
     return
 
-def removeTemplates(oldtext = u''):
-    '''
+
+def removeTemplates(oldtext=u''):
+    """
     Remove {{Uncategorized}} and {{Check categories}} templates
-    '''
-    result = u''
+    """
     result = re.sub(
         u'\{\{\s*([Uu]ncat(egori[sz]ed( image)?)?|[Nn]ocat|[Nn]eedscategory)[^}]*\}\}', u'', oldtext)
     result = re.sub(u'<!-- Remove this line once you have added categories -->',
@@ -407,10 +418,11 @@ def removeTemplates(oldtext = u''):
     result = re.sub(u'\{\{\s*[Cc]heck categories[^}]*\}\}', u'', result)
     return result
 
+
 def getCheckCategoriesTemplate(usage, galleries, ncats):
-    '''
+    """
     Build the check categories template with all parameters
-    '''
+    """
     result = u'{{Check categories|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}\n'
     usageCounter = 1
     for (lang, project, article) in usage:
@@ -418,19 +430,20 @@ def getCheckCategoriesTemplate(usage, galleries, ncats):
         result += u'|wiki%d=%s' % (usageCounter, project)
         result += u'|article%d=%s' % (usageCounter, article)
         result += u'\n'
-        usageCounter = usageCounter + 1
+        usageCounter += 1
     galleryCounter = 1
     for gallery in galleries:
         result += u'|gallery%d=%s' % (galleryCounter, gallery.replace('_', ' ')) + u'\n'
-        galleryCounter = galleryCounter + 1
+        galleryCounter += 1
     result += u'|ncats=%d\n' % ncats
     result += u'}}\n'
     return result
 
+
 def main(args):
-    '''
+    """
     Main loop. Get a generator and options. Work on all images in the generator.
-    '''
+    """
     generator = None
     onlyFilter = False
     onlyUncat = False
@@ -446,9 +459,9 @@ def main(args):
         elif arg == '-onlyuncat':
             onlyUncat = True
         elif arg.startswith('-hint:'):
-            hint_wiki = arg [len('-hint:'):]
+            hint_wiki = arg[len('-hint:'):]
         elif arg.startswith('-onlyhint'):
-            search_wikis = arg [len('-onlyhint:'):]
+            search_wikis = arg[len('-onlyhint:'):]
         else:
             genFactory.handleArg(arg)
 
