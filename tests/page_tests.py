@@ -253,9 +253,9 @@ class TestPageObject(PywikibotTestCase):
         if not site.hasExtension('Disambiguator', False):
             raise unittest.SkipTest('Disambiguator extension not loaded on test site')
         pg = pywikibot.Page(site, 'Random')
-        pg._pageprops = {'disambiguation', ''}
+        pg._pageprops = set(['disambiguation', ''])
         self.assertTrue(pg.isDisambig())
-        pg._pageprops = {}
+        pg._pageprops = set()
         self.assertFalse(pg.isDisambig())
 
     def testReferences(self):
