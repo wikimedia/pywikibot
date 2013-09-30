@@ -15,6 +15,7 @@ from pywikibot import deprecated
 from pywikibot import config
 import pywikibot.site
 
+import hashlib
 import htmlentitydefs
 import logging
 import re
@@ -1645,10 +1646,11 @@ class ImagePage(Page):
         """Return image file's MD5 checksum."""
 # FIXME: MD5 might be performed on incomplete file due to server disconnection
 # (see bug #1795683).
-        import md5
         f = urllib.urlopen(self.fileUrl())
         # TODO: check whether this needs a User-Agent header added
-        md5Checksum = md5.new(f.read()).hexdigest()
+        h = hashlib.md5()
+        h.update(f.read())
+        md5Checksum = h.hexdigest()
         f.close()
         return md5Checksum
 
