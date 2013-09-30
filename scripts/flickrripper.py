@@ -32,14 +32,17 @@ Todo:
 #
 __version__ = '$Id$'
 
-import sys, urllib, re,  StringIO, hashlib, base64, time
+import urllib
+import re
+import StringIO
+import hashlib
+import base64
+import time
 import pywikibot
 from pywikibot import config
-from pywikibot.data import api
-import imagerecat, upload
+import upload
 
 import flickrapi                  # see: http://stuvel.eu/projects/flickrapi
-import xml.etree.ElementTree
 from Tkinter import *
 from PIL import Image, ImageTk    # see: http://www.pythonware.com/products/pil/
 
