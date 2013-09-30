@@ -2420,7 +2420,8 @@ class WikibasePage(Page):
         self.labels = {}
         if 'labels' in self._content:
             for lang in self._content['labels']:
-                self.labels[lang] = self._content['labels'][lang]['value']
+                if not 'removed' in self._content['labels'][lang]:  # Bug 54767
+                    self.labels[lang] = self._content['labels'][lang]['value']
 
         #descriptions
         self.descriptions = {}
