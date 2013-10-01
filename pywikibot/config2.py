@@ -105,7 +105,8 @@ def _get_base_dir():
         provided in this argument
     2.  If the user has a PYWIKIBOT2_DIR environment variable, use the value
         of it
-    3.  Use (and if necessary create) a 'pywikibot' folder (Windows) or
+    3.  Use (and if necessary create) a 'pywikibot' folder under
+        'Application Data' or 'AppData\Roaming' (Windows) or
         '.pywikibot' directory (Unix and similar) under the user's home
         directory.
 
