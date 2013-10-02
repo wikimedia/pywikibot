@@ -1,7 +1,7 @@
 import datetime
 import pywikibot
 from pywikibot.data.api import CachedRequest
-import unittest
+from utils import unittest
 
 
 class DryAPITests(unittest.TestCase):

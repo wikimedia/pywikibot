@@ -9,12 +9,13 @@ Tests for the page module.
 #
 __version__ = '$Id$'
 
-import unittest
 import cStringIO
 import StringIO
 import logging
 import os
 import sys
+
+from utils import unittest
 
 if os.name == "nt":
     from multiprocessing.managers import BaseManager

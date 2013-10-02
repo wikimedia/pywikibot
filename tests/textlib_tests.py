@@ -10,12 +10,13 @@ try:
     import mwparserfromhell
 except ImportError:
     mwparserfromhell = False
-import unittest
 import codecs
 import os
 
 import pywikibot
 import pywikibot.textlib as textlib
+
+from utils import unittest
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")

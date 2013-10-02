@@ -9,8 +9,7 @@ __version__ = '$Id$'
 import datetime
 import pywikibot
 import pywikibot.data.api as api
-import unittest
-from utils import PywikibotTestCase
+from utils import PywikibotTestCase, unittest
 
 mysite = pywikibot.Site('en', 'wikipedia')
 
