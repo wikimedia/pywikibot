@@ -377,6 +377,7 @@ class Page(object):
         @return: dict
         """
         if not hasattr(self, '_pageprops') or force:
+            self._pageprops = {}  # page may not have pageprops (see bug 54868)
             self.site.loadpageprops(self)
         return self._pageprops
 
@@ -1143,9 +1144,10 @@ class Page(object):
         @return: A list of Coordinate objects
         """
         if not hasattr(self, '_coords'):
+            self._coords = []
             self.site.loadcoordinfo(self)
         if primary_only:
-            return self._coords[0]
+            return self._coords[0] if len(self._coords) > 0 else None
         else:
             return self._coords
 
