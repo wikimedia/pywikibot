@@ -2691,6 +2691,8 @@ class APISite(BaseSite):
         if bot:
             params["bot"] = ""
         if lastrev is not None:
+            if lastrev not in page._revisions:
+                self.loadrevisions(page)
             params["basetimestamp"] = page._revisions[lastrev].timestamp
         if minor:
             params['minor'] = ""
