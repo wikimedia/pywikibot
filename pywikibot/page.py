@@ -2768,7 +2768,7 @@ class Claim(PropertyPage):
         if self.isQualifier and self.isReference:
             raise ValueError(u'Claim cannot be both a qualifier and reference.')
         self.sources = []
-        self.qualifiers = {}
+        self.qualifiers = collections.defaultdict(list)
         self.target = None
         self.snaktype = 'value'
         self.rank = 'normal'
@@ -2810,10 +2810,8 @@ class Claim(PropertyPage):
             for prop in data['qualifiers']:
                 for qualifier in data['qualifiers'][prop]:
                     qual = Claim.qualifierFromJSON(site, qualifier)
-                    if prop in claim.qualifiers:
-                        claim.qualifiers[prop].append(qual)
-                    else:
-                        claim.qualifiers[prop] = [qual]
+                    claim.qualifiers[prop].append(qual)
+
         return claim
 
     @staticmethod
@@ -2934,6 +2932,17 @@ class Claim(PropertyPage):
             self.on_item.lastrevid = data['pageinfo']['lastrevid']
             source[claim.getID()].append(claim)
         self.sources.append(source)
+
+    def addQualifier(self, qualifier, **kwargs):
+        """Adds the given qualifier
+
+        @param qualifier: the qualifier to add
+        @type qualifier: Claim
+        """
+        data = self.repo.editQualifier(self, qualifier, **kwargs)
+        qualifier.isQualifier = True
+        self.on_item.lastrevid = data['pageinfo']['lastrevid']
+        self.qualifiers[qualifier.getID()].append(qualifier)
 
     def _formatDataValue(self):
         """

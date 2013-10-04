@@ -3616,8 +3616,8 @@ class DataSite (APISite):
         @param new Whether to create a new one if the "source" already exists
         @type new bool
         """
-        if claim.isReference:
-            raise ValueError("The claim cannot be a reference.")
+        if claim.isReference or claim.isQualifier:
+            raise ValueError("The claim cannot have a source.")
         params = dict(action='wbsetreference',
                       statement=claim.snak,
                       )
@@ -3659,6 +3659,42 @@ class DataSite (APISite):
                 params['reference'] = sourceclaim.hash
 
         params['snaks'] = json.dumps(snak)
+        for arg in kwargs:
+            if arg in ['baserevid', 'summary']:
+                params[arg] = kwargs[arg]
+
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        return data
+
+    @must_be(group='user')
+    def editQualifier(self, claim, qualifier, new=False, bot=True, **kwargs):
+        """
+        Create/Edit a qualifier
+
+        @param claim: A Claim object to add the qualifier to
+        @type claim: pywikibot.Claim
+        @param qualifier: A Claim object to be used as a qualifier
+        @type qualifier: pywikibot.Claim
+        """
+        if claim.isReference or claim.isQualifier:
+            raise ValueError("The claim cannot have a qualifier.")
+        params = dict(action='wbsetqualifier',
+                      claim=claim.snak,
+                      )
+        if claim.on_item:  # I can't think of when this would be false, but lets be safe
+            params['baserevid'] = claim.on_item.lastrevid
+        if bot:
+            params['bot'] = 1
+        if not new and hasattr(qualifier, 'hash'):
+            params['snakhash'] = qualifier.hash
+        params['token'] = self.token(claim, 'edit')
+        #build up the snak
+        if qualifier.getSnakType() == 'value':
+            params['value'] = json.dumps(qualifier._formatDataValue())
+        params['snaktype'] = qualifier.getSnakType()
+        params['property'] = qualifier.getID()
+
         for arg in kwargs:
             if arg in ['baserevid', 'summary']:
                 params[arg] = kwargs[arg]
