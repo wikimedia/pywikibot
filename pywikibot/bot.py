@@ -280,6 +280,9 @@ def writelogheader():
     if hasattr(os, 'uname'):
         log(u'SYSTEM: %s' % unicode(os.uname()))
 
+    # config file dir
+    log(u'CONFIG FILE DIR: %s' % pywikibot.config2.base_dir)
+
     all_modules = sys.modules.keys()
 
     # These are the main dependencies of pywikibot.

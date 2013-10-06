@@ -163,12 +163,16 @@ def get_base_dir(test_directory=None):
 
     if test_directory is not None:
         test_directory = os.path.abspath(test_directory)
-    NAME = "pywikibot"
+
+    DIRNAME_WIN = u"Pywikibot"
+    DIRNAME_WIN_FBCK = u"pywikibot"
+    DIRNAME_UNIX = u".pywikibot"
+
     base_dir = ""
     for arg in sys.argv[1:]:
         if arg.startswith("-dir:"):
             base_dir = arg[5:]
-            sys.argv.remove(arg)
+            base_dir = os.path.expanduser(base_dir)
             break
     else:
         if 'PYWIKIBOT2_DIR' in os.environ:
@@ -176,20 +180,29 @@ def get_base_dir(test_directory=None):
         elif exists('.'):
             return os.path.abspath('.')
         else:
+            base_dir_cand = []
             home = os.path.expanduser("~")
             if sys.platform == 'win32':
                 import platform
                 win_version = int(platform.version()[0])
                 if win_version == 5:
-                    base_dir = os.path.join(home, "Application Data", NAME)
+                    sub_dir = ["Application Data"]
                 elif win_version == 6:
-                    base_dir = os.path.join(home, "AppData\\Roaming", NAME)
+                    sub_dir = ["AppData", "Roaming"]
+                base_dir_cand.extend([[home] + sub_dir + [DIRNAME_WIN],
+                                     [home] + sub_dir + [DIRNAME_WIN_FBCK]])
                 #TODO: Throw exception otherwise to notify the user that the
                 #      version of Windows is not (yet) supported
             else:
-                base_dir = os.path.join(home, "." + NAME)
-            if not os.path.isdir(base_dir):
-                os.makedirs(base_dir, mode=0o700)
+                base_dir_cand.append([home, DIRNAME_UNIX])
+
+            for dir in base_dir_cand:
+                dir = os.path.join(*dir)
+                if not os.path.isdir(dir):
+                    os.makedirs(dir, mode=0o700)
+                if exists(dir):
+                    base_dir = dir
+
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file

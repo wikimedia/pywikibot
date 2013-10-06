@@ -1,11 +1,14 @@
 # -*- coding: utf-8  -*-
-"""wrapper script to use rewrite in 'directory' mode - run scripts using
-python pwb.py <name_of_script> <options>
+"""Wrapper script to use Pywikibot in 'directory' mode.
+
+Run scripts using:
+
+    python pwb.py <name_of_script> <options>
 
 and it will use the package directory to store all user files, will fix up
 search paths so the package does not need to be installed, etc.
 """
-# (C) Pywikibot team, 2013
+# (C) Pywikibot team, 2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,12 +27,15 @@ pwb = None
 
 
 def tryimport_pwb():
-    # See if we can import pywikibot. If so, we need to patch pwb.argvu, too.
-    # If pywikibot is not available, we create a mock object to remove the
-    # need for if statements further on.
+    """Try to import pywikibot.
+
+    If so, we need to patch pwb.argvu, too.
+    If pywikibot is not available, we create a mock object to remove the
+    need for if statements further on.
+    """
     global pwb
     try:
-        import pywikibot
+        import pywikibot  # noqa
         pwb = pywikibot
     except RuntimeError:
         pwb = lambda: None
@@ -143,21 +149,18 @@ if sys.version_info[0] == 2 and sys.version_info[1] == 6:
         print("Upgrade to Python 2.7, or run 'pip install ordereddict'")
         sys.exit(1)
 
-if "PYWIKIBOT2_DIR" not in os.environ:
-    os.environ["PYWIKIBOT2_DIR"] = os.path.split(__file__)[0]
-
-for i, x in enumerate(sys.argv):
-    if x.startswith("-dir:"):
-        os.environ["PYWIKIBOT2_DIR"] = x[5:]
-        sys.argv.pop(i)
-        break
-
-user_config_path = os.path.join(os.environ["PYWIKIBOT2_DIR"], "user-config.py")
-if not os.path.exists(user_config_path):
-    print("NOTE: %s was not found" % user_config_path)
+# Search for user-config.py before creating one.
+try:
+    # user-config.py already exists
+    import pywikibot  # noqa
+except RuntimeError as err:
+    # user-config.py to be created
+    print("NOTE: 'user-config.py' was not found!")
     print("Please follow the prompts to create it:")
-    path = 'generate_user_files.py'
-    run_python_file(path, [path], [path.decode('ascii')])
+    run_python_file('generate_user_files.py',
+                    ['generate_user_files.py'] + sys.argv[1:],
+                    [])
+    sys.exit(1)
 
 if len(sys.argv) > 1:
     tryimport_pwb()
