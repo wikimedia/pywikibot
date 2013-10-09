@@ -883,6 +883,14 @@ class APISite(BaseSite):
 
     forceLogin = login  # alias for backward-compatibility
 
+    def logout(self):
+        uirequest = api.Request(site=self, action="logout")
+        uidata = uirequest.submit()
+        self._loginstatus = LoginStatus.NOT_LOGGED_IN
+        if hasattr(self, "_userinfo"):
+            del self._userinfo
+        self.getuserinfo()
+
     def getuserinfo(self):
         """Retrieve userinfo from site and store in _userinfo attribute.
 
