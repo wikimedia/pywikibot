@@ -622,17 +622,15 @@ def handleArgs(*args):
             import daemonize
             daemonize.daemonize(redirect_std=arg[11:])
         else:
-            # the argument depends numerical config settings
-            cmd = []
-            if ':' in arg:
-                cmd = arg[1:].split(':')
-            if len(cmd) == 2 and len(cmd[1]) > 0 and \
-               hasattr(config, cmd[0]) and \
-               type(getattr(config, cmd[0])) == int:
-                setattr(config, cmd[0], cmd[1])
-            # the argument is not global. Let the specific bot script care
-            # about it.
-            else:
+            # the argument depends on numerical config settings
+            try:
+                _arg, _val = arg[1:].split(':')
+                # explicitly check for int (so bool doesn't match)
+                if type(getattr(config, _arg)) is not int:
+                    raise TypeError
+                setattr(config, _arg, int(_val))
+            except (ValueError, TypeError) as exc:
+            # argument not global -> specific bot script will take care
                 nonGlobalArgs.append(arg)
 
     if username:
@@ -647,7 +645,8 @@ def handleArgs(*args):
         # have to - some git versions (like 1.7.0.4) seem to treat lines
         # containing just `$Id:` as if they were ident lines (see
         # gitattributes(5)) leading to unwanted behaviour like automatic
-        # replacement with `$Id$` or `$Id$`.
+        # replacement with `$Id$`
+        # or `$Id$`.
         m = re.search(r"\$Id"
                       r": (\w+) \$", ver)
         pywikibot.output(u'Pywikipediabot r%s' % m.group(1))
