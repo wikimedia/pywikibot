@@ -3727,6 +3727,30 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
+    def linkTitles(self, page1, page2, bot=True):
+        """
+        Link two pages together
+        @param page1: First page to link
+        @type page1: pywikibot.Page
+        @param page2: Second page to link
+        @type page2: pywikibot.Page
+        @param bot: whether to mark edit as bot
+        @return: dict API output
+        """
+        params = {
+            'action': 'wblinktitles',
+            'tosite': page1.site.dbName(),
+            'totitle': page1.title(),
+            'fromsite': page2.site.dbName(),
+            'fromtitle': page2.title(),
+            'token': self.token(page1, 'edit')
+        }
+        if bot:
+            params['bot'] = 1
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        return data
+
     # deprecated BaseSite methods
     def fam(self):
         raise NotImplementedError
