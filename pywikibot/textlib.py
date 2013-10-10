@@ -733,7 +733,7 @@ def removeCategoryLinks(text, site=None, marker=''):
     catNamespace = '|'.join(site.category_namespaces())
     categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
     text = replaceExcept(text, categoryR, '',
-                         ['nowiki', 'comment', 'math', 'pre', 'source'],
+                         ['nowiki', 'comment', 'math', 'pre', 'source', 'includeonly'],
                          marker=marker,
                          site=site)
     if marker:
