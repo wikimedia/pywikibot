@@ -107,8 +107,11 @@ class HarvestRobot:
             pagetext = page.get()
             templates = pywikibot.extract_templates_and_params(pagetext)
             for (template, fielddict) in templates:
+                # Clean up template
+                template = pywikibot.Page(page.site, template,
+                                          ns=10).title(withNamespace=False)
                 # We found the template we were looking for
-                if template.replace(u'_', u' ') in self.templateTitles:
+                if template in self.templateTitles:
                     for field, value in fielddict.items():
                         field = field.strip()
                         value = value.strip()
