@@ -1,16 +1,17 @@
 diff -Naur lunatic-python-1.0/__init__.py _lua/__init__.py
 --- lunatic-python-1.0/__init__.py	1970-01-01 01:00:00.000000000 +0100
-+++ _lua/__init__.py	2013-04-25 10:10:06.007753009 +0200
-@@ -0,0 +1,38 @@
++++ _lua/__init__.py	2013-10-12 17:32:58.954669463 +0200
+@@ -0,0 +1,39 @@
 +# patches applied for compatibility with lua5.1:
 +# https://github.com/bastibe/lunatic-python/issues/1
 +# http://lua-users.org/wiki/LunaticPython
 +
 +import sys, os
 +
-+scriptdir = os.path.dirname(sys.argv[0])
-+if not os.path.isabs(scriptdir):
-+    scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
++#scriptdir = os.path.dirname(sys.argv[0])
++#if not os.path.isabs(scriptdir):
++#    scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
++scriptdir = os.path.abspath(os.path.join(os.path.split(__file__)[0], '..', '..', 'scripts'))
 +
 +libdir = os.path.join(scriptdir, '../externals/_lua/build/lib.linux-x86_64-%s.%s' % sys.version_info[:2])
 +if not os.path.exists(libdir):
@@ -42,7 +43,7 @@ diff -Naur lunatic-python-1.0/__init__.py _lua/__init__.py
 +    from lua import *
 diff -Naur lunatic-python-1.0/python.lua _lua/python.lua
 --- lunatic-python-1.0/python.lua	2003-12-13 05:37:57.000000000 +0100
-+++ _lua/python.lua	2012-12-28 22:09:07.000000000 +0100
++++ _lua/python.lua	2013-10-12 17:31:55.467702300 +0200
 @@ -1,6 +1,6 @@
  local path = os.getenv("LUA_SOPATH")
  if path then
@@ -62,7 +63,7 @@ diff -Naur lunatic-python-1.0/python.lua _lua/python.lua
  			func()
 diff -Naur lunatic-python-1.0/setup.py _lua/setup.py
 --- lunatic-python-1.0/setup.py	2005-10-19 01:10:07.000000000 +0200
-+++ _lua/setup.py	2013-04-25 00:05:34.776479704 +0200
++++ _lua/setup.py	2013-10-12 17:31:55.481702073 +0200
 @@ -1,7 +1,7 @@
  #!/usr/bin/python
  from distutils.core import setup, Extension
@@ -105,7 +106,7 @@ diff -Naur lunatic-python-1.0/setup.py _lua/setup.py
        )
 diff -Naur lunatic-python-1.0/src/luainpython.c _lua/src/luainpython.c
 --- lunatic-python-1.0/src/luainpython.c	2005-10-19 01:07:02.000000000 +0200
-+++ _lua/src/luainpython.c	2012-12-28 22:09:07.000000000 +0100
++++ _lua/src/luainpython.c	2013-10-12 17:31:55.482702057 +0200
 @@ -488,12 +488,12 @@
  
  	if (!L) {
