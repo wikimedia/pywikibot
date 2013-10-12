@@ -447,11 +447,10 @@ class GeneratorFactory(object):
         elif arg.startswith('-google'):
             gen = GoogleSearchPageGenerator(arg[8:])
         elif arg.startswith('-titleregex'):
-            if len(arg) == 6:
-                regex = pywikibot.input(
-                    u'What page names are you looking for?')
+            if len(arg) == 11:
+                regex = pywikibot.input(u'What page names are you looking for?')
             else:
-                regex = arg[7:]
+                regex = arg[12:]
             gen = RegexFilterPageGenerator(pywikibot.Site().allpages(), regex)
         elif arg.startswith('-yahoo'):
             gen = YahooSearchPageGenerator(arg[7:])
