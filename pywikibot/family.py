@@ -161,6 +161,7 @@ class Family(object):
             'gl': u'[áâãàéêẽçíòóôõq̃úüűũa-z]*',
             'glk': u'[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
             'gn': u'[a-záéíóúñ]*',
+            'gu': u'[઀-૿]*',
             'he': u'[a-zא-ת]*',
             'hr': u'[čšžćđßa-z]*',
             'hsb': u'[äöüßa-z]*',
@@ -187,6 +188,7 @@ class Family(object):
             'mg': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
             'mhr': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'mk': u'[a-zабвгдѓежзѕијклљмнњопрстќуфхцчџш]*',
+            'ml': u'[a-zം-ൿ]*',
             'mn': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя“»]*',
             'mr': u'[ऀ-ॣॱ-ॿ﻿‍]*',
             'mrj': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
@@ -201,6 +203,7 @@ class Family(object):
             'nn': u'[æøåa-z]*',
             'no': u'[æøåa-z]*',
             'oc': u'[a-zàâçéèêîôû]*',
+            'or': u'[a-z଀-୿]*',
             'pa': u'[ਁਂਃਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮਯਰਲਲ਼ਵਸ਼ਸਹ਼ਾਿੀੁੂੇੈੋੌ੍ਖ਼ਗ਼ਜ਼ੜਫ਼ੰੱੲੳa-z]*',
             'pcd': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
             'pdc': u'[äöüßa-z]*',
@@ -1062,7 +1065,7 @@ class WikimediaFamily(Family):
         """Return Wikimedia projects version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.22wmf18'
+        return '1.22wmf20'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
