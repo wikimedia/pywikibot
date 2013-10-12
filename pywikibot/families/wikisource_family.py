@@ -14,7 +14,7 @@ class Family(family.WikimediaFamily):
             'fr', 'en', 'de', 'ru', 'it', 'pl', 'zh', 'he', 'pt', 'es', 'sv',
             'ca', 'fa', 'cs', 'hu', 'ar', 'ko', 'sl', 'te', 'fi', 'ro', 'vi',
             'sa', 'el', 'sr', 'hr', 'bn', 'no', 'th', 'hy', 'is', 'nl', 'ml',
-            'la', 'ja', 'vec', 'gu', 'tr', 'eo', 'br', 'uk', 'mk', 'yi', 'ta',
+            'la', 'ja', 'vec', 'gu', 'tr', 'eo', 'uk', 'br', 'mk', 'yi', 'ta',
             'be', 'id', 'da', 'li', 'et', 'bg', 'as', 'mr', 'bs', 'sah', 'az',
             'gl', 'kn', 'lt', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
