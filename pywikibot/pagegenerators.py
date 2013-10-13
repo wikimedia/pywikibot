@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
-"""This module offers a wide variety of page generators. A page generator is an
+"""
+This module offers a wide variety of page generators. A page generator is an
 object that is iterable (see http://www.python.org/dev/peps/pep-0255/ ) and
 that yields page objects on which other scripts can then work.
 
@@ -12,7 +13,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikipedia bot team, 2008-2012
+# (C) Pywikipedia bot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -94,14 +95,6 @@ parameterHelp = u"""\
 -newpages         Work on the most recent new pages. If given as -newpages:x,
                   will work on the x newest pages.
 
--random           Work on random pages returned by [[Special:Random]]
-                  Can also be given as "-random:n" where n is the number
-                  of pages to be returned, otherwise the default is 10 pages.
-
--randomredirect   Work on random redirect pages returned by [[Special:RandomRedirect]].
-                  Can also be given as "-randomredirect:n" where n is the number
-                  of pages to be returned, else 10 pages are returned.
-
 -recentchanges    Work on the pages with the most recent changes. If
                   given as -recentchanges:x, will work on the x most recently
                   changed pages.
@@ -140,12 +133,22 @@ parameterHelp = u"""\
 -usercontribs     Work on all articles that were edited by a certain user :
                   Example : -usercontribs:DumZiBoT
 
+
 -weblink          Work on all articles that contain an external link to
                   a given URL; may be given as "-weblink:url"
 
 -withoutinterwiki Work on all pages that don't have interlanguage links.
                   Argument can be given as "-withoutinterwiki:n" where
                   n is some number (??).
+
+-random           Work on random pages returned by [[Special:Random]].
+                  Can also be given as "-random:n" where n is the number
+                  of pages to be returned, otherwise the default is 10 pages.
+
+-randomredirect   Work on random redirect pages returned by
+                  [[Special:RandomRedirect]]. Can also be given as
+                  "-randomredirect:n" where n is the number of pages to be
+                  returned, else 10 pages are returned.
 
 -google           Work on all pages that are found in a Google search.
                   You need a Google Web API license key. Note that Google
@@ -999,10 +1002,10 @@ def SearchPageGenerator(query, step=None, total=None, namespaces=None, site=None
 
 
 class YahooSearchPageGenerator:
-    '''
-    To use this generator, install pYsearch
-    '''
-    def __init__(self, query=None, count=100, site=None):  # values larger than 100 fail
+    """ To use this generator, install pYsearch """
+
+    # values larger than 100 fail
+    def __init__(self, query=None, count=100, site=None):
         self.query = query or pywikibot.input(u'Please enter the search query:')
         self.count = count
         if site is None:
@@ -1012,7 +1015,6 @@ class YahooSearchPageGenerator:
     def queryYahoo(self, query):
         from yahoo.search.web import WebSearch
         srch = WebSearch(config.yahoo_appid, query=query, results=self.count)
-
         dom = srch.get_results()
         results = srch.parse_results(dom)
         for res in results:
@@ -1032,12 +1034,14 @@ class YahooSearchPageGenerator:
 
 
 class GoogleSearchPageGenerator:
-    '''
+    """
     To use this generator, you must install the pyGoogle module from
     http://pygoogle.sf.net/ and get a Google Web API license key from
     http://www.google.com/apis/index.html . The google_key must be set to your
     license key in your configuration.
-    '''
+
+    """
+
     def __init__(self, query=None, site=None):
         self.query = query or pywikibot.input(u'Please enter the search query:')
         if site is None:
@@ -1045,8 +1049,9 @@ class GoogleSearchPageGenerator:
         self.site = site
 
     #########
-    # partially commented out because it is probably not in compliance with Google's "Terms of
-    # service" (see 5.3, http://www.google.com/accounts/TOS?loc=US)
+    # partially commented out because it is probably not in compliance with
+    # Google's "Terms of service"
+    # (see 5.3, http://www.google.com/accounts/TOS?loc=US)
     def queryGoogle(self, query):
         #if config.google_key:
         if True:
@@ -1065,22 +1070,24 @@ class GoogleSearchPageGenerator:
         google.LICENSE_KEY = config.google_key
         offset = 0
         estimatedTotalResultsCount = None
-        while not estimatedTotalResultsCount \
-                or offset < estimatedTotalResultsCount:
-            while (True):
+        while not estimatedTotalResultsCount or \
+                offset < estimatedTotalResultsCount:
+            while True:
                 # Google often yields 502 errors.
                 try:
                     pywikibot.output(u'Querying Google, offset %i' % offset)
-                    data = google.doGoogleSearch(query, start=offset, filter=False)
+                    data = google.doGoogleSearch(query, start=offset,
+                                                 filter=False)
                     break
                 except KeyboardInterrupt:
                     raise
                 except:
-                    # SOAPpy.Errors.HTTPError or SOAP.HTTPError (502 Bad Gateway)
-                    # can happen here, depending on the module used. It's not easy
-                    # to catch this properly because pygoogle decides which one of
-                    # the soap modules to use.
-                    pywikibot.output(u"An error occured. Retrying in 10 seconds...")
+                    # SOAPpy.Errors.HTTPError or SOAP.HTTPError
+                    # (502 Bad Gateway) can happen here, depending on the module
+                    # used. It's not easy to catch this properly because
+                    # pygoogle decides which one of the soap modules to use.
+                    pywikibot.output(u"An error occured. "
+                                     u"Retrying in 10 seconds...")
                     time.sleep(10)
                     continue
 
@@ -1089,40 +1096,48 @@ class GoogleSearchPageGenerator:
                 yield result.URL
             # give an estimate of pages to work on, but only once.
             if not estimatedTotalResultsCount:
-                pywikibot.output(u'Estimated total result count: %i pages.' % data.meta.estimatedTotalResultsCount)
+                pywikibot.output(u'Estimated total result count: %i pages.'
+                                 % data.meta.estimatedTotalResultsCount)
             estimatedTotalResultsCount = data.meta.estimatedTotalResultsCount
             #print 'estimatedTotalResultsCount: ', estimatedTotalResultsCount
             offset += 10
 
-    #########
-    # commented out because it is probably not in compliance with Google's "Terms of
-    # service" (see 5.3, http://www.google.com/accounts/TOS?loc=US)
-
-    #def queryViaWeb(self, query):
-        #"""
-        #Google has stopped giving out API license keys, and sooner or later
-        #they will probably shut down the service.
-        #This is a quick and ugly solution: we just grab the search results from
-        #the normal web interface.
-        #"""
-        #linkR = re.compile(r'<a href="([^>"]+?)" class=l>', re.IGNORECASE)
-        #offset = 0
-
-        #while True:
-            #pywikibot.output("Google: Querying page %d" % (offset / 100 + 1))
-            #address = "http://www.google.com/search?q=%s&num=100&hl=en&start=%d" % (urllib.quote_plus(query), offset)
-            ## we fake being Firefox because Google blocks unknown browsers
-            #request = urllib2.Request(address, None, {'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.8) Gecko/20051128 SUSE/1.5-0.1 Firefox/1.5'})
-            #urlfile = urllib2.urlopen(request)
-            #page = urlfile.read()
-            #urlfile.close()
-            #for url in linkR.findall(page):
-                #yield url
-            #if "<div id=nn>" in page: # Is there a "Next" link for next page of results?
-                #offset += 100  # Yes, go to next page of results.
-            #else:
-                #return
-    #########
+#############
+##    commented out because it is probably not in compliance with Google's
+##    "Terms of service" (see 5.3, http://www.google.com/accounts/TOS?loc=US)
+##
+##    def queryViaWeb(self, query):
+##        """
+##        Google has stopped giving out API license keys, and sooner or later
+##        they will probably shut down the service.
+##        This is a quick and ugly solution: we just grab the search results from
+##        the normal web interface.
+##        """
+##        linkR = re.compile(r'<a href="([^>"]+?)" class=l>', re.IGNORECASE)
+##        offset = 0
+##
+##        while True:
+##            pywikibot.output("Google: Querying page %d" % (offset / 100 + 1))
+##            address = "http://www.google.com/search?q=%s&num=100&hl=en&start=%d" \
+##                      % (urllib.quote_plus(query), offset)
+##            # we fake being Firefox because Google blocks unknown browsers
+##            request = urllib2.Request(
+##                address, None,
+##                {'User-Agent':
+##                 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.8) Gecko/20051128 '
+##                 'SUSE/1.5-0.1 Firefox/1.5'})
+##            urlfile = urllib2.urlopen(request)
+##            page = urlfile.read()
+##            urlfile.close()
+##            for url in linkR.findall(page):
+##                yield url
+##
+##            # Is there a "Next" link for next page of results?
+##            if "<div id=nn>" in page:
+##                offset += 100  # Yes, go to next page of results.
+##            else:
+##                return
+#############
 
     def __iter__(self):
         # restrict query to local site
@@ -1133,7 +1148,8 @@ class GoogleSearchPageGenerator:
             if url[:len(base)] == base:
                 title = url[len(base):]
                 page = pywikibot.Page(pywikibot.Link(title, self.site))
-                # Google contains links in the format http://de.wikipedia.org/wiki/en:Foobar
+                # Google contains links in the format
+                # http://de.wikipedia.org/wiki/en:Foobar
                 if page.site == self.site:
                     yield page
 
