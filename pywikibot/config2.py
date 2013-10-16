@@ -38,14 +38,16 @@ API_config_expiry = 30
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. Please set your usernames by adding such lines to your
 # user-config.py:
-#
 # usernames['wikipedia']['de'] = 'myGermanUsername'
 # usernames['wiktionary']['en'] = 'myEnglishUsername'
+#
+# If you have a unique username for all languages of a family,
+# you can use '*'
+# usernames['wikibooks']['*'] = 'mySingleUsername'
 #
 # If you have a sysop account on some wikis, this will be used to delete pages
 # or to edit locked pages if you add such lines to your
 # user-config.py:
-#
 # sysopnames['wikipedia']['de'] = 'myGermanUsername'
 # sysopnames['wiktionary']['en'] = 'myEnglishUsername'
 usernames = {}
