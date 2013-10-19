@@ -134,7 +134,7 @@ placeBeforeSections = {
         u'参考文献',
         u'外部リンク',
     ],
-    'ko': [               # no explicit policy on where to put the references
+    'ko': [              # no explicit policy on where to put the references
         u'외부 링크',
         u'외부링크',
         u'바깥 고리',
@@ -324,7 +324,8 @@ referencesSections = {
 referencesTemplates = {
     'wikipedia': {
         'ar': [u'Reflist', u'ثبت المراجع', u'قائمة المراجع'],
-        'be': [u'Зноскі', u'Примечания', u'Reflist', u'Спіс заўваг', u'Заўвагі'],
+        'be': [u'Зноскі', u'Примечания', u'Reflist', u'Спіс заўваг',
+               u'Заўвагі'],
         'be-x-old': [u'Зноскі'],
         'da': [u'Reflist'],
         'dsb': [u'Referency'],
@@ -334,7 +335,8 @@ referencesTemplates = {
         'eo': [u'Referencoj'],
         'es': ['Listaref', 'Reflist', 'muchasref'],
         'fa': [u'Reflist', u'Refs', u'FootnotesSmall', u'Reference',
-               u'پانویس', u'پانویس‌ها ', u'پانویس ۲', u'پانویس۲', u'فهرست منابع'],
+               u'پانویس', u'پانویس‌ها ', u'پانویس ۲', u'پانویس۲',
+               u'فهرست منابع'],
         'fi': [u'Viitteet', u'Reflist'],
         'fr': [u'Références', u'Notes', u'References', u'Reflist'],
         'hsb': [u'Referency'],
@@ -494,7 +496,11 @@ class NoReferencesBot:
                         pywikibot.output(
                             u'Adding references tag to existing %s section...\n'
                             % section)
-                        newText = oldText[:match.end()] + u'\n' + self.referencesText + u'\n' + oldText[match.end():]
+                        newText = (
+                            oldText[:match.end()] + u'\n' +
+                            self.referencesText + u'\n' +
+                            oldText[match.end():]
+                        )
                         return newText
                 else:
                     break
@@ -510,8 +516,8 @@ class NoReferencesBot:
                 if match:
                     if pywikibot.isDisabled(oldText, match.start()):
                         pywikibot.output(
-                            'Existing  %s section is commented out, won\'t add the references in front of it.'
-                            % section)
+                            'Existing  %s section is commented out, won\'t add '
+                            'the references in front of it.' % section)
                         index = match.end()
                     else:
                         pywikibot.output(
@@ -519,7 +525,8 @@ class NoReferencesBot:
                             % section)
                         index = match.start()
                         ident = match.group('ident')
-                        return self.createReferenceSection(oldText, index, ident)
+                        return self.createReferenceSection(oldText, index,
+                                                           ident)
                 else:
                     break
         # This gets complicated: we want to place the new references
@@ -554,7 +561,9 @@ class NoReferencesBot:
             else:
                 break
         pywikibot.output(
-            u'Found no section that can be preceeded by a new references section.\nPlacing it before interwiki links, categories, and bottom templates.')
+            u'Found no section that can be preceeded by a new references '
+            u'section.\nPlacing it before interwiki links, categories, and '
+            u'bottom templates.')
         index = len(tmpText)
         return self.createReferenceSection(oldText, index)
 
@@ -623,9 +632,11 @@ class NoReferencesBot:
                 pywikibot.output(u"Page %s is locked?!"
                                  % page.title(asLink=True))
                 continue
-            if pywikibot.getSite().sitename() == 'wikipedia:en' and page.isIpEdit():
+            if pywikibot.getSite().sitename() == 'wikipedia:en' and \
+               page.isIpEdit():
                 pywikibot.output(
-                    u"Page %s is edited by IP. Possible vandalized" % page.title(asLink=True))
+                    u"Page %s is edited by IP. Possible vandalized"
+                    % page.title(asLink=True))
                 continue
             if self.lacksReferences(text):
                 newText = self.addReferences(text)
