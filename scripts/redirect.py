@@ -13,7 +13,7 @@ where action can be one of these:
 
 double         Fix redirects which point to other redirects
 broken         Delete redirects where targets don\'t exist. Requires adminship.
-both           Both of the above. Permitted only with -api. Implies -api.
+both           Both of the above.
 
 and arguments can be:
 
