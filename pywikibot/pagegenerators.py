@@ -169,6 +169,11 @@ docuReplacements = {'&params;': parameterHelp}
 # if a bot uses GeneratorFactory, the module should include the line
 #   docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
 # and include the marker &params; in the module's docstring
+#
+# We manually include it so the parameters show up in the auto-generated
+# module documentation:
+
+__doc__ = __doc__.replace("&params;", parameterHelp)
 
 
 class GeneratorFactory(object):
