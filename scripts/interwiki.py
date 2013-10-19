@@ -1753,8 +1753,9 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                                 smallWikiAllowed = True
                             else:
                                 pywikibot.output(
-                                        u'NOTE: number of edits are restricted at %s'
-                                        % page.site.sitename())
+                                    u'NOTE: number of edits are restricted at %s'
+                                    % page.site.sitename()
+                                )
 
                 # if we have an account for this site
                 if site.family.name in config.usernames and \
