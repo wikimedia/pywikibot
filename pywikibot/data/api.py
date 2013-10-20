@@ -9,7 +9,7 @@ Interface functions to Mediawiki's api.php
 #
 __version__ = '$Id$'
 
-from UserDict import DictMixin
+from collections import MutableMapping
 from pywikibot.comms import http
 from email.mime.multipart import MIMEMultipart
 from email.mime.nonmultipart import MIMENonMultipart
@@ -64,7 +64,7 @@ class TimeoutError(pywikibot.Error):
     pass
 
 
-class Request(object, DictMixin):
+class Request(MutableMapping):
     """A request to a Site's api.php interface.
 
     Attributes of this object (except for the special parameters listed
@@ -162,6 +162,9 @@ class Request(object, DictMixin):
 
     def __iter__(self):
         return self.params.__iter__()
+
+    def __len__(self):
+        return len(self.params)
 
     def iteritems(self):
         return self.params.iteritems()
