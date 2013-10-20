@@ -18,16 +18,14 @@ from setuptools import setup, find_packages
 from setuptools.command import install
 
 test_deps = []
+testcollector = "tests"
 
-if sys.version_info[0] != 2:
-    raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2")
-elif sys.version_info[1] < 6:
-    raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 or higher")
-elif sys.version_info[1] == 6:
-    test_deps = ['unittest2']
-    testcollector = "tests.utils.collector"
-else:
-    testcollector = "tests"
+if sys.version_info[0] == 2:
+    if sys.version_info[1] < 6:
+        raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 or higher")
+    elif sys.version_info[1] == 6:
+        test_deps = ['unittest2']
+        testcollector = "tests.utils.collector"
 
 
 class pwb_install(install.install):
@@ -67,5 +65,6 @@ setup(
     ],
     cmdclass={
         'install': pwb_install
-    }
+    },
+    use_2to3=True
 )
