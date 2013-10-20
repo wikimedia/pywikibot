@@ -2,5 +2,5 @@
 host=gerrit.wikimedia.org
 port=29418
 project=pywikibot/core.git
-defaultbranch=master
+defaultbranch=python3
 defaultrebase=0
