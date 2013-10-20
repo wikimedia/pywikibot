@@ -1416,102 +1416,76 @@ class Page(object):
 
     def change_category(self, oldCat, newCat, comment=None, sortKey=None,
                         inPlace=True):
-        """Remove page from oldCat and add it to newCat.
+        """
+        Remove page from oldCat and add it to newCat.
 
-        oldCat and newCat should be Category objects.
-        If newCat is None, the category will be removed.
+        @param oldCat and newCat: should be Category objects.
+            If newCat is None, the category will be removed.
 
-        comment: string to use as an edit summary
+        @param comment: string to use as an edit summary
 
-        sortKey: sortKey to use for the added category.
-        Unused if newCat is None, or if inPlace=True
+        @param sortKey: sortKey to use for the added category.
+            Unused if newCat is None, or if inPlace=True
+
+        @param inPlace: if True, change categories in place rather than
+                      rearranging them.
 
         """
-        #TODO: is inPlace necessary?
+        #get list of Category objects the article is in and remove possible duplicates
+        cats = []
+        for cat in self.categories(get_redirect=True):
+            if cat not in cats:
+                cats.append(cat)
+
         site = self.site
-        changesMade = False
+
+        if not sortKey:
+            sortKey = oldCat.sortKey
 
         if not self.canBeEdited():
             pywikibot.output(u"Can't edit %s, skipping it..."
                              % self.title(asLink=True))
-            return False
-        if inPlace:
-            newtext = pywikibot.replaceCategoryInPlace(self.text,
-                                                       oldCat, newCat)
-            if newtext == self.text:
-                pywikibot.output(
-                    u'No changes in made in page %s.'
-                    % self.title(asLink=True))
-                return False
-            try:
-                self.put(newtext, comment)
-                return True
-            except pywikibot.EditConflict:
-                pywikibot.output(
-                    u'Skipping %s because of edit conflict'
-                    % self.title(asLink=True))
-            except pywikibot.LockedPage:
-                pywikibot.output(u'Skipping locked page %s'
-                                 % self.title(asLink=True))
-            except pywikibot.SpamfilterError, error:
-                pywikibot.output(
-                    u'Changing page %s blocked by spam filter (URL=%s)'
-                    % (self.title(asLink=True), error.url))
-            except pywikibot.NoUsername:
-                pywikibot.output(
-                    u"Page %s not saved; sysop privileges required."
-                    % self.title(asLink=True))
-            except pywikibot.PageNotSaved, error:
-                pywikibot.output(u"Saving page %s failed: %s"
-                                 % (self.title(asLink=True), error.message))
-            return False
+            return
 
-        # This loop will replace all occurrences of the category to be changed,
-        # and remove duplicates.
-        newCatList = []
-        newCatSet = set()
-        cats = list(self.categories(get_redirect=True))
-        for i in range(len(cats)):
-            cat = cats[i]
-            if cat == oldCat:
-                changesMade = True
-                if not sortKey:
-                    sortKey = cat.sortKey
-                if newCat:
-                    if newCat.title() not in newCatSet:
-                        newCategory = Category(site, newCat.title(),
-                                               sortKey=sortKey)
-                        newCatSet.add(newCat.title())
-                        newCatList.append(newCategory)
-            elif cat.title() not in newCatSet:
-                newCatSet.add(cat.title())
-                newCatList.append(cat)
+        if oldCat not in cats:
+            pywikibot.error(u'%s is not in category %s!'
+                            % (self.title(asLink=True), oldCat.title()))
+            return
 
-        if not changesMade:
-            pywikibot.output(u'ERROR: %s is not in category %s!'
-                             % (self.title(asLink=True), oldCat.title()))
+        if inPlace or self.namespace() == 10:
+            oldtext = self.get(get_redirect=True)
+            newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, newCat)
         else:
+            if newCat:
+                cats[cats.index(oldCat)] = Category(site, newCat.title(), sortKey=sortKey)
+            else:
+                cats.pop(cats.index(oldCat))
+            oldtext = self.get(get_redirect=True)
             try:
-                text = pywikibot.replaceCategoryLinks(self.text, newCatList)
+                newtext = pywikibot.replaceCategoryLinks(oldtext, cats)
             except ValueError:
                 # Make sure that the only way replaceCategoryLinks() can return
                 # a ValueError is in the case of interwiki links to self.
-                pywikibot.output(
-                    u'Skipping %s because of interwiki link to self' % self)
+                pywikibot.output(u'Skipping %s because of interwiki link to self'
+                                 % self.title())
+
+        if oldtext != newtext:
             try:
-                self.put(text, comment)
+                self.put(newtext, comment)
             except pywikibot.EditConflict:
-                pywikibot.output(
-                    u'Skipping %s because of edit conflict' % self.title())
+                pywikibot.output(u'Skipping %s because of edit conflict'
+                                 % self.title())
             except pywikibot.SpamfilterError, e:
-                pywikibot.output(
-                    u'Skipping %s because of blacklist entry %s'
-                    % (self.title(), e.url))
+                pywikibot.output(u'Skipping %s because of blacklist entry %s'
+                                 % (self.title(), e.url))
             except pywikibot.LockedPage:
-                pywikibot.output(
-                    u'Skipping %s because page is locked' % self.title())
+                pywikibot.output(u'Skipping %s because page is locked'
+                                 % self.title())
+            except pywikibot.NoUsername:
+                pywikibot.output(u'Page %s not saved; sysop privileges required.'
+                                 % self.title(asLink=True))
             except pywikibot.PageNotSaved, error:
-                pywikibot.output(u"Saving page %s failed: %s"
+                pywikibot.output(u'Saving page %s failed: %s'
                                  % (self.title(asLink=True), error.message))
 
     @property
