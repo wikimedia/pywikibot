@@ -23,12 +23,11 @@ import os
 import sys
 
 
-def run_python_file(filename, args):
+def run_python_file(filename, argv, argvu):
     """Run a python file as if it were the main program on the command line.
 
     `filename` is the path to the file to execute, it need not be a .py file.
-    `args` is the argument array to present as sys.argv, including the first
-    element representing the file being executed.
+    `args` is the argument array to present as sys.argv, as unicode strings.
 
     """
     # Create a module to serve as __main__
@@ -40,8 +39,11 @@ def run_python_file(filename, args):
 
     # Set sys.argv and the first path element properly.
     old_argv = sys.argv
+    old_argvu = pwb.argvu
     old_path0 = sys.path[0]
-    sys.argv = args
+
+    sys.argv = argv
+    pwb.argvu = argvu
     sys.path[0] = os.path.dirname(filename)
 
     try:
@@ -54,6 +56,7 @@ def run_python_file(filename, args):
         # Restore the old argv and path
         sys.argv = old_argv
         sys.path[0] = old_path0
+        pwb.argvu = old_argvu
 
 #### end of snippet
 
@@ -87,9 +90,11 @@ if not os.path.exists(user_config_path):
     print "Please follow the prompts to create it:"
     run_python_file('generate_user_files.py', ['generate_user_files.py'])
 
+import pywikibot as pwb
 if len(sys.argv) > 1:
     fn = sys.argv[1]
-    args = sys.argv[1:]
+    argv = sys.argv[1:]
+    argvu = pwb.argvu[1:]
 
     if not os.path.exists(fn):
         testpath = os.path.join(os.path.split(__file__)[0], 'scripts', fn)
@@ -101,4 +106,4 @@ if len(sys.argv) > 1:
                 fn = testpath
             else:
                 raise Exception("%s not found!" % fn)
-    run_python_file(fn, args)
+    run_python_file(fn, argv, argvu)

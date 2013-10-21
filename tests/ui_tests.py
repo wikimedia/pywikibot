@@ -456,6 +456,28 @@ if __name__ == "__main__":
 
             self.assertEqual(returned, u"Заглавная_страница")
 
+    class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
+        @classmethod
+        def setUpClass(cls):
+            import inspect
+            cls.setUpProcess(["cmd", "/k", "echo off"])
+
+        @classmethod
+        def tearDownClass(cls):
+            cls.tearDownProcess()
+            pass
+
+        def testOutputUnicodeText_no_transliterate(self):
+            self.sendstdin(u"""python -c "import os, pywikibot; os.system('cls'); pywikibot.output(u'\\n'.join(pywikibot.handleArgs()))" Alpha Bετα Гамма دلتا\n""")
+            while(True):
+                lines = self.getstdouterr().split("\n")
+                if len(lines) >= 4 and lines[0] == "Alpha":
+                    break
+                time.sleep(1)
+
+            # empty line is the new command line
+            self.assertEqual(lines, [u"Alpha", u"Bετα", u"Гамма", u"دلتا", u""])
+
     try:
         try:
             unittest.main()

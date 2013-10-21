@@ -48,10 +48,11 @@ class Win32BaseUI(terminal_interface_base.UI):
 class Win32CtypesUI(Win32BaseUI):
     def __init__(self):
         Win32BaseUI.__init__(self)
-        from win32_unicode import stdin, stdout, stderr
+        from win32_unicode import stdin, stdout, stderr, argv
         self.stdin = stdin
         self.stdout = stdout
         self.stderr = stderr
+        self.argv = argv
         self.encoding = 'utf-8'
 
     def printColorized(self, text, targetStream):

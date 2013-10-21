@@ -40,10 +40,10 @@ uiModule = __import__("pywikibot.userinterfaces.%s_interface"
                       % config.userinterface,
                       fromlist=['UI'])
 ui = uiModule.UI()
+argvu = ui.argvu()
 
 
 # Logging module configuration
-
 class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
     def doRollover(self):
@@ -493,8 +493,6 @@ def inputChoice(question, answers, hotkeys, default=None):
 
 
 # Command line parsing and help
-
-
 def calledModuleName():
     """Return the name of the module calling this function.
 
@@ -503,35 +501,17 @@ def calledModuleName():
 
     """
     # get commandline arguments
-    called = sys.argv[0].strip()
+    called = argvu[0].strip()
     if ".py" in called:  # could end with .pyc, .pyw, etc. on some platforms
         # clip off the '.py?' filename extension
         called = called[:called.rindex('.py')]
     return os.path.basename(called)
 
 
-def _decodeArg(arg):
-    if sys.platform == 'win32':
-        if config.console_encoding in ('cp437', 'cp850'):
-            # Western Windows versions give parameters encoded as windows-1252
-            # even though the console encoding is cp850 or cp437.
-            return unicode(arg, 'windows-1252')
-        elif config.console_encoding == 'cp852':
-            # Central/Eastern European Windows versions give parameters encoded
-            # as windows-1250 even though the console encoding is cp852.
-            return unicode(arg, 'windows-1250')
-        else:
-            return unicode(arg, config.console_encoding)
-    else:
-        # Linux uses the same encoding for both.
-        # I don't know how non-Western Windows versions behave.
-        return unicode(arg, config.console_encoding)
-
-
 def handleArgs(*args):
     """Handle standard command line arguments, return the rest as a list.
 
-    Takes the commandline arguments, converts them to Unicode, processes all
+    Takes the commandline arguments as Unicode strings, processes all
     global parameters such as -lang or -log. Returns a list of all arguments
     that are not global. This makes sure that global arguments are applied
     first, regardless of the order in which the arguments were given.
@@ -541,7 +521,10 @@ def handleArgs(*args):
     """
     # get commandline arguments if necessary
     if not args:
-        args = sys.argv[1:]
+        # it's the version in pywikibot.__init__ that is changed by scripts,
+        # not the one in pywikibot.bot.
+        from pywikibot import argvu
+        args = argvu[1:]
     # get the name of the module calling this function. This is
     # required because the -help option loads the module's docstring and because
     # the module name will be used for the filename of the log.
@@ -552,7 +535,6 @@ def handleArgs(*args):
     username = None
     do_help = False
     for arg in args:
-        arg = _decodeArg(arg)
         if arg == '-help':
             do_help = True
         elif arg.startswith('-family:'):
