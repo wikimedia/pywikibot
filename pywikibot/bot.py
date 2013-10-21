@@ -575,6 +575,10 @@ def handleArgs(*args):
         elif arg == '-nolog':
             if moduleName in config.log:
                 config.log.remove(moduleName)
+        elif arg in ('-cosmeticchanges', '-cc'):
+            config.cosmetic_changes = not config.cosmetic_changes
+            output(u'NOTE: option cosmetic_changes is %s\n'
+                   % config.cosmetic_changes)
         elif arg == '-simulate':
             config.simulate = True
         #
@@ -602,7 +606,7 @@ def handleArgs(*args):
         #    If used, "-debug" turns on file logging, regardless of any
         #    other settings.
         #
-        elif arg == "-debug":
+        elif arg == '-debug':
             if moduleName not in config.log:
                 config.log.append(moduleName)
             if "" not in config.debug_log:
@@ -613,16 +617,17 @@ def handleArgs(*args):
             component = arg[len("-debug:"):]
             if component not in config.debug_log:
                 config.debug_log.append(component)
-        elif arg == '-verbose' or arg == "-v":
+        elif arg in ('-verbose', '-v'):
             config.verbose_output += 1
         elif arg == '-daemonize':
             import daemonize
             daemonize.daemonize()
         elif arg.startswith('-daemonize:'):
             import daemonize
-            daemonize.daemonize(redirect_std=arg[11:])
+            daemonize.daemonize(redirect_std=arg[len('-daemonize:'):])
         else:
             # the argument depends on numerical config settings
+            # e.g. -maxlag:
             try:
                 _arg, _val = arg[1:].split(':')
                 # explicitly check for int (so bool doesn't match)
@@ -630,7 +635,7 @@ def handleArgs(*args):
                     raise TypeError
                 setattr(config, _arg, int(_val))
             except (ValueError, TypeError, AttributeError) as exc:
-            # argument not global -> specific bot script will take care
+                # argument not global -> specific bot script will take care
                 nonGlobalArgs.append(arg)
 
     if username:
@@ -702,19 +707,27 @@ Global arguments available for all bots:
                   edits during periods of database server lag. Default is set by
                   config.py
 
+-putthrottle:n    Set the minimum time (in seconds) the bot will wait between
+-pt:n             saving pages.
+-put_throttle:n
+
 -debug:item       Enable the logfile and include extensive debugging data
 -debug            for component "item" (for all components if the second form
                   is used).
 
--putthrottle:n    Set the minimum time (in seconds) the bot will wait between
--pt:n             saving pages.
-
 -verbose          Have the bot provide additional console output that may be
 -v                useful in debugging.
+
+-cosmeticchanges  Toggles the cosmetic_changes setting made in config.py or
+-cc               user_config.py to its inverse and overrules it. All other
+                  settings and restrictions are untouched.
 
 -simulate         Disables writing to the server. Useful for testing and
                   debugging of new code (if given, doesn't do any real
                   changes, but only shows what would have been changed).
+
+-<config var>:n   You may use all given numeric config variables as option and
+                  modify it with command line.
 
 ''' % modname
     try:
