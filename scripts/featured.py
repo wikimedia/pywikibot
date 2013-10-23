@@ -64,14 +64,11 @@ __version__ = '$Id$'
 # Distributed under the terms of the MIT license.
 #
 
-import os.path
 import pickle
 import re
-import sys
 from copy import copy
 import pywikibot
 from pywikibot import i18n
-from pywikibot import config
 from pywikibot.pagegenerators import PreloadingGenerator
 
 
@@ -360,7 +357,6 @@ class FeaturedBot(pywikibot.Bot):
             self.featuredWithInterwiki(fromsite, process)
 
     def featuredArticles(self, site, task, cache):
-        wikidata = False
         code = site.lang
         articles = []
         if task == 'good':
@@ -527,7 +523,6 @@ class FeaturedBot(pywikibot.Bot):
                               % (findtemplate.replace(u' ', u'[ _]'),
                                  site.code), re.IGNORECASE)
 
-        quiet = self.getOption('quiet')
         tosite = self.site
         if not fromsite.lang in self.cache:
             self.cache[fromsite.lang] = {}
@@ -542,7 +537,6 @@ class FeaturedBot(pywikibot.Bot):
         re_Link_remove = compile_link(fromsite, remove_tl)
         gen = self.featuredArticles(fromsite, task, cc)
         gen = PreloadingGenerator(gen)
-        pairs = []
         for a in gen:
             if a.isRedirectPage():
                 a = a.getRedirectTarget()
