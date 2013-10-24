@@ -2670,7 +2670,12 @@ class ItemPage(WikibasePage):
         """
         Removes the claims from the item
         @type claims: list
+
         """
+        # this check allows single claims to be remove by pushing them into a
+        # list of length one.
+        if isinstance(claims, pywikibot.Claim):
+            claims = [claims]
         self.repo.removeClaims(claims, **kwargs)
 
 
