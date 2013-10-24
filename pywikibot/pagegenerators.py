@@ -162,6 +162,9 @@ parameterHelp = u"""\
 
 -page             Work on a single page. Argument can also be given as
                   "-page:pagetitle".
+
+-grep             A regular expression that needs to match the article
+                  otherwise the page won't be returned.
 """
 
 docuReplacements = {'&params;': parameterHelp}
@@ -186,6 +189,7 @@ class GeneratorFactory(object):
         self.namespaces = []
         self.step = None
         self.limit = None
+        self.articlefilter = None
 
     def getCombinedGenerator(self):
         """Return the combination of all accumulated generators.
@@ -212,7 +216,14 @@ class GeneratorFactory(object):
             gensList = self.gens[0]
         else:
             gensList = CombinedPageGenerator(self.gens)
-        return DuplicateFilterPageGenerator(gensList)
+
+        dupfiltergen = DuplicateFilterPageGenerator(gensList)
+
+        if self.articlefilter:
+            return RegexBodyFilterPageGenerator(PreloadingGenerator(dupfiltergen),
+                                                self.articlefilter)
+        else:
+            return dupfiltergen
 
     def getCategoryGen(self, arg, length, recurse=False, content=False):
         if len(arg) == length:
@@ -460,6 +471,11 @@ class GeneratorFactory(object):
             else:
                 regex = arg[12:]
             gen = RegexFilterPageGenerator(pywikibot.Site().allpages(), regex)
+        elif arg.startswith('-grep'):
+            if len(arg) == 5:
+                self.articlefilter = pywikibot.input(u'Which pattern do you want to grep?')
+            else:
+                self.articlefilter = arg[6:]
         elif arg.startswith('-yahoo'):
             gen = YahooSearchPageGenerator(arg[7:])
         else:
@@ -780,6 +796,14 @@ def RegexFilterPageGenerator(generator, regex):
     reg = re.compile(regex, re.I)
     for page in generator:
         if reg.match(page.title(withNamespace=False)):
+            yield page
+
+
+def RegexBodyFilterPageGenerator(generator, regex):
+    """Yield pages from another generator whose body matches regex with options re.IGNORECASE|re.DOTALL."""
+    reg = re.compile(regex, re.IGNORECASE | re.DOTALL)
+    for page in generator:
+        if reg.search(page.text):
             yield page
 
 
