@@ -2773,6 +2773,7 @@ class APISite(BaseSite):
                         req['captchaword'] = input(captcha["question"])
                         continue
                     elif "url" in captcha:
+                        import webbrowser
                         webbrowser.open(captcha["url"])
                         req['captchaword'] = cap_answerwikipedia.input(
 "Please view CAPTCHA in your browser, then type answer here:")
