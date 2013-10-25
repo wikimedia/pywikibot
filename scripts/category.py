@@ -37,6 +37,9 @@ Options for "remove" action:
                   for the language, which is "Category was disbanded" in
                   English.
 
+Options for "move" action:
+ * -nodelete    - Don't delete the old category after move
+
 Options for several actions:
  * -rebuild     - reset the database
  * -from:       - The category to move from (for the move option)
@@ -84,7 +87,7 @@ This will move all pages in the category US to the category United States.
 # (C) leogregianin, 2004-2008
 # (C) Cyde, 2006-2010
 # (C) Anreas J Schwab, 2007
-# (C) xqt, 2009-2012
+# (C) xqt, 2009-2013
 # (C) Pywikibot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
@@ -391,7 +394,8 @@ class CategoryMoveRobot:
                  useSummaryForDeletion=True):
         site = pywikibot.getSite()
         self.editSummary = editSummary
-        self.oldCat = catlib.Category(pywikibot.Link('Category:' + oldCatTitle))
+        self.oldCat = pywikibot.Category(
+            pywikibot.Link('Category:' + oldCatTitle))
         self.newCatTitle = newCatTitle
         self.inPlace = inPlace
         self.moveCatPage = moveCatPage
@@ -402,15 +406,14 @@ class CategoryMoveRobot:
 
     def run(self):
         site = pywikibot.getSite()
-        newCat = catlib.Category(pywikibot.Link('Category:' + self.newCatTitle))
+        newCat = pywikibot.Category(
+            pywikibot.Link('Category:' + self.newCatTitle))
         newcat_contents = set(newCat.members())
         # set edit summary message
         if not self.editSummary:
-            self.editSummary = i18n.twtranslate(
-                site, 'category-replacing',
-                {'oldcat': self.oldCat.title(),
-                 'newcat': newCat.title()}
-            )
+            self.editSummary = i18n.twtranslate(site, 'category-replacing',
+                                                {'oldcat': self.oldCat.title(),
+                                                 'newcat': newCat.title()})
 
         # Copy the category contents to the new category page
         copied = False
@@ -685,10 +688,12 @@ class CategoryTidyRobot:
         # show subcategories as possible choices (with numbers)
         for i in range(len(supercatlist)):
             # layout: we don't expect a cat to have more than 10 supercats
-            pywikibot.output(u'u%d - Move up to %s' % (i, supercatlist[i].title()))
+            pywikibot.output(u'u%d - Move up to %s'
+                             % (i, supercatlist[i].title()))
         for i in range(len(subcatlist)):
             # layout: we don't expect a cat to have more than 100 subcats
-            pywikibot.output(u'%2d - Move down to %s' % (i, subcatlist[i].title()))
+            pywikibot.output(u'%2d - Move down to %s'
+                             % (i, subcatlist[i].title()))
         print ' j - Jump to another category'
         print ' s - Skip this article'
         print ' r - Remove this category tag'
@@ -706,7 +711,8 @@ class CategoryTidyRobot:
                 if current_cat == original_cat:
                     print 'No changes necessary.'
                 else:
-                    catlib.change_category(article, original_cat, current_cat, comment=self.editSummary)
+                    catlib.change_category(article, original_cat, current_cat,
+                                           comment=self.editSummary)
                 flag = True
             elif choice in ['j', 'J']:
                 newCatTitle = pywikibot.input(u'Please enter the category the '
@@ -887,6 +893,7 @@ def main(*args):
     restore = False
     create_pages = False
     follow_redirects = False
+    deleteEmptySourceCat = True
     for arg in pywikibot.handleArgs(*args):
         if arg == 'add':
             action = 'add'
@@ -900,6 +907,8 @@ def main(*args):
             action = 'tree'
         elif arg == 'listify':
             action = 'listify'
+        elif arg == '-nodelete':
+            deleteEmptySourceCat = False
         elif arg == '-person':
             sort_by_last_name = True
         elif arg == '-rebuild':
@@ -950,7 +959,8 @@ def main(*args):
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.
         gen = pagegenerators.PreloadingGenerator(gen)
-        bot = AddCategory(gen, sort_by_last_name, create_pages, editSummary, follow_redirects)
+        bot = AddCategory(gen, sort_by_last_name, create_pages, editSummary,
+                          follow_redirects)
         bot.run()
     elif action == 'remove':
         if not fromGiven:
@@ -969,6 +979,7 @@ def main(*args):
                 u'Please enter the new name of the category:')
         bot = CategoryMoveRobot(oldCatTitle, newCatTitle, batchMode,
                                 editSummary, inPlace,
+                                deleteEmptySourceCat=deleteEmptySourceCat,
                                 titleRegex=titleRegex)
         bot.run()
     elif action == 'tidy':
