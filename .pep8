@@ -1,4 +1,4 @@
 [pep8]
-ignore = E122,E241,E502
+ignore = E122,E127,E241,E502
 exclude = .git,ez_setup.py,externals,user-config.py,./scripts/i18n/*,./pywikibot/date.py
 max_line_length = 256
