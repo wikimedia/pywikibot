@@ -1324,8 +1324,8 @@ class Page(object):
         if hasattr(self, "_deletedRevs"):
             if timestamp in self._deletedRevs and (
                     (not retrieveText)
-                    or "content" in self._deletedRevs["timestamp"]):
-                return self._deletedRevs["timestamp"]
+                    or "content" in self._deletedRevs[timestamp]):
+                return self._deletedRevs[timestamp]
         for item in self.site.deletedrevs(self, start=timestamp,
                                           get_text=retrieveText, total=1):
             # should only be one item with one revision
