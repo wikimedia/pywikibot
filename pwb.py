@@ -23,6 +23,19 @@ import os
 import sys
 
 
+def tryimport_pwb():
+    # See if we can import pywikibot. If so, we need to patch pwb.argvu, too.
+    # If pywikibot is not available, we create a mock object to remove the
+    # need for if statements further on.
+    global pwb
+    try:
+        import pywikibot
+        pwb = pywikibot
+    except RuntimeError:
+        pwb = lambda: None
+        pwb.argvu = []
+
+
 def run_python_file(filename, argv, argvu):
     """Run a python file as if it were the main program on the command line.
 
@@ -30,6 +43,8 @@ def run_python_file(filename, argv, argvu):
     `args` is the argument array to present as sys.argv, as unicode strings.
 
     """
+    tryimport_pwb()
+
     # Create a module to serve as __main__
     old_main_mod = sys.modules['__main__']
     main_mod = imp.new_module('__main__')
@@ -88,13 +103,15 @@ user_config_path = os.path.join(os.environ["PYWIKIBOT2_DIR"], "user-config.py")
 if not os.path.exists(user_config_path):
     print "NOTE:", user_config_path, "was not found!"
     print "Please follow the prompts to create it:"
-    run_python_file('generate_user_files.py', ['generate_user_files.py'])
+    path = 'generate_user_files.py'
+    run_python_file(path, [path], [path.decode('ascii')])
 
-import pywikibot as pwb
 if len(sys.argv) > 1:
+    tryimport_pwb()
     fn = sys.argv[1]
     argv = sys.argv[1:]
     argvu = pwb.argvu[1:]
+    print argvu
 
     if not os.path.exists(fn):
         testpath = os.path.join(os.path.split(__file__)[0], 'scripts', fn)
