@@ -36,7 +36,7 @@ class pwb_install(install.install):
     `generate_user_files.py` after installing the package.
     """
     def run(self):
-        install.install.run(self)
+        install.install.do_egg_install(self)
         import subprocess
         python = sys.executable
         python = python.replace("pythonw.exe", "python.exe")  # for Windows
