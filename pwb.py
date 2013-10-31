@@ -111,7 +111,6 @@ if len(sys.argv) > 1:
     fn = sys.argv[1]
     argv = sys.argv[1:]
     argvu = pwb.argvu[1:]
-    print argvu
 
     if not os.path.exists(fn):
         testpath = os.path.join(os.path.split(__file__)[0], 'scripts', fn)
