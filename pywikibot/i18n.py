@@ -43,7 +43,7 @@ def _altlang(code):
     if code in ['aa', 'ti']:
         return ['am']
     #Arab
-    if code in ['arc', 'arz', 'fa', 'so']:
+    if code in ['arc', 'arz', 'so']:
         return ['ar']
     if code == 'kab':
         return ['ar', 'fr']
