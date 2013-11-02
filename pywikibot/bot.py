@@ -40,7 +40,7 @@ uiModule = __import__("pywikibot.userinterfaces.%s_interface"
                       % config.userinterface,
                       fromlist=['UI'])
 ui = uiModule.UI()
-argvu = ui.argvu()
+pywikibot.argvu = ui.argvu()
 
 
 # Logging module configuration
@@ -501,7 +501,7 @@ def calledModuleName():
 
     """
     # get commandline arguments
-    called = argvu[0].strip()
+    called = pywikibot.argvu[0].strip()
     if ".py" in called:  # could end with .pyc, .pyw, etc. on some platforms
         # clip off the '.py?' filename extension
         called = called[:called.rindex('.py')]
@@ -523,8 +523,7 @@ def handleArgs(*args):
     if not args:
         # it's the version in pywikibot.__init__ that is changed by scripts,
         # not the one in pywikibot.bot.
-        from pywikibot import argvu
-        args = argvu[1:]
+        args = pywikibot.argvu[1:]
     # get the name of the module calling this function. This is
     # required because the -help option loads the module's docstring and because
     # the module name will be used for the filename of the log.
