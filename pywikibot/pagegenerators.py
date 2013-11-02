@@ -1260,26 +1260,5 @@ def DayPageGenerator(startMonth=1, endMonth=12, site=None):
         for day in xrange(1, date.getNumberOfDaysInMonth(month) + 1):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
 
-
-def main(*args):
-    try:
-        gen = None
-        genFactory = GeneratorFactory()
-        for arg in pywikibot.handleArgs(*args):
-            genFactory.handleArg(arg)
-        gen = genFactory.getCombinedGenerator()
-        if gen:
-            i = 0
-            for page in gen:
-                i += 1
-                pywikibot.stdout("%4d: %s" % (i, page.title()))
-        else:
-            pywikibot.showHelp()
-    except Exception:
-        pywikibot.error("Fatal error", exc_info=True)
-    finally:
-        pywikibot.stopme()
-
-
 if __name__ == "__main__":
-    main()
+    pywikibot.output('Pagegenerators cannot be run as script - are you looking for listpages.py?')
