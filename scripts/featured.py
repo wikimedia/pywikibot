@@ -145,7 +145,7 @@ template = {
 template_good = {
     '_default': ['Link GA'],
     'ar': [u'وصلة مقالة جيدة'],
-    'ca': [u'Enllaç AB', 'Lien BA', 'Abo', 'Link GA']
+    'ca': [u'Enllaç AB', 'Lien BA', 'Abo', 'Link GA'],
     'da': ['Link GA', 'Link AA'],
     'eo': ['LigoLeginda'],
     'es': ['Bueno'],
