@@ -12,12 +12,12 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'mg', 'fr', 'zh', 'lt', 'ru', 'el', 'pl', 'sv', 'ko', 'de',
-            'tr', 'es', 'nl', 'ku', 'ta', 'io', 'kn', 'fi', 'vi', 'hu', 'pt',
+            'es', 'tr', 'nl', 'ku', 'ta', 'io', 'kn', 'fi', 'vi', 'hu', 'pt',
             'chr', 'no', 'ml', 'my', 'id', 'it', 'li', 'et', 'ja', 'ro', 'te',
             'fa', 'cs', 'ca', 'ar', 'eu', 'jv', 'gl', 'lo', 'uk', 'br', 'fj',
-            'eo', 'bg', 'hr', 'oc', 'th', 'is', 'vo', 'ps', 'zh-min-nan',
-            'simple', 'cy', 'scn', 'sr', 'af', 'uz', 'ast', 'sw', 'fy', 'da',
-            'tl', 'he', 'nn', 'az', 'wa', 'ur', 'la', 'sq', 'hy', 'sm', 'sl',
+            'eo', 'bg', 'hr', 'th', 'oc', 'is', 'vo', 'ps', 'zh-min-nan',
+            'simple', 'cy', 'scn', 'sr', 'uz', 'af', 'ast', 'sw', 'fy', 'da',
+            'tl', 'he', 'az', 'nn', 'wa', 'ur', 'la', 'sq', 'hy', 'sm', 'sl',
             'nah', 'pnb', 'ka', 'hi', 'tt', 'bs', 'lb', 'lv', 'tk', 'sk', 'hsb',
             'nds', 'kk', 'ky', 'be', 'mk', 'km', 'ga', 'wo', 'ms', 'ang', 'co',
             'sa', 'gn', 'mr', 'csb', 'st', 'ia', 'sd', 'ug', 'sh', 'si', 'tg',

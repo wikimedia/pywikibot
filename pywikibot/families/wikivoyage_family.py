@@ -12,7 +12,7 @@ class Family(family.WikimediaFamily):
         super(Family, self).__init__()
         self.name = 'wikivoyage'
         self.languages_by_size = [
-            'en', 'de', 'pt', 'it', 'nl', 'fr', 'pl', 'ru', 'es', 'vi', 'sv',
+            'en', 'de', 'pt', 'it', 'fr', 'nl', 'pl', 'ru', 'es', 'vi', 'sv',
             'he', 'ro', 'uk', 'el',
         ]
 
