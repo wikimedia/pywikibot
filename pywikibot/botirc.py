@@ -7,7 +7,7 @@ http://python-irclib.sourceforge.net/
 """
 #
 # (C) Balasyum
-# (C) Pywikipedia bot team, 2008-2012
+# (C) Pywikipedia bot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,18 +18,16 @@ __version__ = '$Id$'
 # scripts, instead of writing each one from scratch.
 
 
-import logging
 import logging.handlers
        # all output goes thru python std library "logging" module
 import re
 
 from ircbot import SingleServerIRCBot
-from irclib import nm_to_n, nm_to_h, irc_lower, ip_numstr_to_quad
-from irclib import ip_quad_to_numstr
+from irclib import nm_to_n
 
-# logging levels
 _logger = "botirc"
 
+# logging levels
 from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 STDOUT = 16
 VERBOSE = 18
@@ -60,7 +58,8 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         self.channel = channel
         self.site = site
         self.other_ns = re.compile(
-            u'14\[\[07(' + u'|'.join([item[0] for item in site.namespaces().values() if item[0]]) + u')')
+            u'14\[\[07(' + u'|'.join([item[0] for item in
+                                        site.namespaces().values() if item[0]]) + u')')
         self.api_url = self.site.family.apipath(self.site.lang)
         self.api_url += '?action=query&meta=siteinfo&siprop=statistics&format=xml'
         self.api_found = re.compile(r'articles="(.*?)"')
@@ -79,9 +78,9 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
     def on_pubmsg(self, c, e):
         match = self.re_edit.match(e.arguments()[0])
         if not match:
-                return
+            return
         if not ('N' in match.group('flags')):
-                return
+            return
         try:
             msg = unicode(e.arguments()[0], 'utf-8')
         except UnicodeDecodeError:
@@ -93,11 +92,11 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         entry = self.api_found.findall(text)
         page = pywikibot.Page(self.site, name)
         try:
-                text = page.get()
+            text = page.get()
         except pywikibot.NoPage:
-                return
+            return
         except pywikibot.IsRedirectPage:
-                return
+            return
         pywikibot.output(str((entry[0], name)))
 
     def on_dccmsg(self, c, e):

@@ -20,10 +20,11 @@ These parameters are supported to specify which pages titles to print:
 __version__ = '$Id$'
 
 import re
-import sys
 import codecs
 import itertools
 import pywikibot
+import time
+import date
 from pywikibot import config
 from pywikibot import deprecate_arg, i18n
 
