@@ -384,7 +384,7 @@ def twntranslate(code, twtitle, parameters=None):
     Support is implemented like in MediaWiki extension. If the tw message
     contains a plural tag inside which looks like
     {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
-    it takes that variant calculated by the plural_func depending on the number
+    it takes that variant calculated by the plural_rules depending on the number
     value.
 
     Examples:
@@ -502,6 +502,7 @@ def input(twtitle, parameters=None, password=False):
         default is os locale setting
 
     """
-    code = config.userinterface_lang or locale.getdefaultlocale()[0].split('_')[0]
+    code = config.userinterface_lang or \
+           locale.getdefaultlocale()[0].split('_')[0]
     trans = twtranslate(code, twtitle, parameters)
     return pywikibot.input(trans, password)
