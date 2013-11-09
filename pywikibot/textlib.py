@@ -94,6 +94,10 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         'property':     re.compile(r'(?i)\{\{\s*#property:\s*p\d+\s*\}\}'),
         # Module invocations (currently only Lua)
         'invoke':       re.compile(r'(?i)\{\{\s*#invoke:.*?}\}'),
+        # categories
+        'category':     re.compile(ur'\[\[ *(?:%s)\s*:.*?\]\]' % ur'|'.join(site.namespace(14, all=True))),
+        #files
+        'file':         re.compile(ur'\[\[ *(?:%s)\s*:.*?\]\]' % ur'|'.join(site.namespace(6, all=True))),
 
     }
 
@@ -219,10 +223,10 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                     groupMatch = groupR.search(replacement)
                     if not groupMatch:
                         break
-                    groupID = (groupMatch.group('name') or \
+                    groupID = (groupMatch.group('name') or
                                int(groupMatch.group('number')))
                     try:
-                        replacement = (replacement[:groupMatch.start()] + \
+                        replacement = (replacement[:groupMatch.start()] +
                                        match.group(groupID) + \
                                        replacement[groupMatch.end():])
                     except IndexError:
