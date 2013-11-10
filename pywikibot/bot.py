@@ -21,9 +21,9 @@ import os
 import os.path
 import sys
 
-# logging levels
 _logger = "bot"
 
+# logging levels
 from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 STDOUT = 16
 VERBOSE = 18
@@ -83,7 +83,7 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
             os.rename(self.baseFilename, dfn)
             #print "%s -> %s" % (self.baseFilename, dfn)
         elif self.backupCount == -1:
-            if not hasattr(self, lastNo):
+            if not hasattr(self, '_lastNo'):
                 self._lastNo = 1
             while True:
                 fn = "%s.%d%s" % (root, self._lastNo, ext)
