@@ -3,7 +3,7 @@
 User-interface related functions for building bots
 """
 #
-# (C) Pywikipedia bot team, 2008-2012
+# (C) Pywikibot team, 2008-2012
 #
 # Distributed under the terms of the MIT license.
 #

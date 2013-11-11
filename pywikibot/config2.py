@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikipedia bot team, 2003-2012
+# (C) Pywikibot team, 2003-2012
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
 
 import os
 import sys as __sys

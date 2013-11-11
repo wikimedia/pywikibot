@@ -1,13 +1,15 @@
 # -*- coding: utf-8  -*-
-""" Various i18n functions, both for the internal translation system
-    and for TranslateWiki-based translations
+"""
+Various i18n functions, both for the internal translation system
+and for TranslateWiki-based translations
 """
 #
-# (C) Pywikipedia bot team, 2004-2013
+# (C) Pywikibot team, 2004-2013
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
 
 import re
 import locale

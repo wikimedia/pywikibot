@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 #
 # (C) xqt, 2011
-# (C) Pywikipedia bot team, 2011
+# (C) Pywikibot team, 2011
 #
 # Distributed under the terms of the MIT license.
 #

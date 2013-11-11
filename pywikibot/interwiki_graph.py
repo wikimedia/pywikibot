@@ -1,11 +1,14 @@
 """ Module with the graphviz drawing calls """
 #
-# (C) Pywikipedia bot team, 2006-2010
+# (C) Pywikibot team, 2006-2010
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
+
 import threading
+
 pydotfound = True
 try:
     import pydot

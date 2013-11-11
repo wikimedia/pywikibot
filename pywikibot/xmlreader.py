@@ -8,7 +8,7 @@ http://download.wikimedia.org/wikipedia/de/) and offers a generator over
 XmlEntry objects which can be used by other bots.
 """
 #
-# (C) Pywikipedia bot team, 2005-2012
+# (C) Pywikibot team, 2005-2012
 #
 # Distributed under the terms of the MIT license.
 #

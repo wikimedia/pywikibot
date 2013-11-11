@@ -3,7 +3,7 @@
 Exception classes used throughout the framework.
 """
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikibot team, 2008
 #
 # Distributed under the terms of the MIT license.
 #

@@ -3,11 +3,12 @@
 Objects representing various types of MediaWiki pages.
 """
 #
-# (C) Pywikipedia bot team, 2008-2013
+# (C) Pywikibot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
 
 import pywikibot
 from pywikibot import deprecate_arg

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Miscellaneous helper functions (not wiki-dependent)"""
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikibot team, 2008
 #
 # Distributed under the terms of the MIT license.
 #

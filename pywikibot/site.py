@@ -4,11 +4,12 @@ Objects representing MediaWiki sites (wikis) and families (groups of wikis
 on the same topic in different languages).
 """
 #
-# (C) Pywikipedia bot team, 2008-2012
+# (C) Pywikibot team, 2008-2012
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
 
 try:
     from hashlib import md5
