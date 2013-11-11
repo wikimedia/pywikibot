@@ -3,19 +3,20 @@
 Mechanics to slow down wiki read and/or write rate.
 """
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikibot team, 2008
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
-
-import pywikibot
-from pywikibot import config
+#
 
 import logging
 import math
 import threading
 import time
+
+import pywikibot
+from pywikibot import config
 
 _logger = "wiki.throttle"
 

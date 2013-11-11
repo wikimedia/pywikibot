@@ -3,11 +3,12 @@
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2008
 # (C) xqt, 2010-2012
-# (C) Pywikipedia bot team, 2007-2013
+# (C) Pywikibot team, 2007-2013
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
 
 import os
 import time

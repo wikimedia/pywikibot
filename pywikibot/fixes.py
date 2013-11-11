@@ -5,11 +5,11 @@ File containing all standard fixes
 """
 
 #
-# (C) Pywikipedia team, 2008-2010
-#
-__version__ = '$Id$'
+# (C) Pywikibot team, 2008-2010
 #
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
 #
 
 help = u"""

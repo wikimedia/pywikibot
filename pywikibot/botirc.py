@@ -7,7 +7,7 @@ http://python-irclib.sourceforge.net/
 """
 #
 # (C) Balasyum
-# (C) Pywikipedia bot team, 2008-2013
+# (C) Pywikibot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #

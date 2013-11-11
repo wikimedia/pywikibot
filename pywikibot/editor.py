@@ -6,14 +6,13 @@ Text editor class for your favourite editor.
 
 #
 # (C) Gerrit Holl 2004
-# (C) Pywikipedia team, 2004-2012
-#
-__version__ = "$Id$"
+# (C) Pywikibot team, 2004-2013
 #
 # Distributed under the terms of the MIT license.
 #
+__version__ = "$Id$"
+#
 
-__metaclass__ = type
 import sys
 import os
 import tempfile

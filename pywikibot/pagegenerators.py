@@ -13,11 +13,12 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikipedia bot team, 2008-2013
+# (C) Pywikibot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
 
 import re
 import codecs

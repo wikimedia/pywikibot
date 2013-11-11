@@ -4,20 +4,19 @@ This file is not runnable, but it only consists of various
 lists which are required by some other programs.
 """
 #
-# © Rob W.W. Hooft, 2003
-# © Daniel Herding, 2004
-# © Ævar Arnfjörð Bjarmason, 2004
-# © Andre Engels, 2004-2005
-# © Yuri Astrakhan, 2005-2006  FirstnameLastname@gmail.com
+# (C) Rob W.W. Hooft, 2003
+# (C) Daniel Herding, 2004
+# (C) Ævar Arnfjörð Bjarmason, 2004
+# (C) Andre Engels, 2004-2005
+# (C) Yuri Astrakhan, 2005-2006  FirstnameLastname@gmail.com
 #       (years/decades/centuries/millenniums  str <=> int  conversions)
-# © Pywikipedia bot team, 2004-2012
+# (C) Pywikibot team, 2004-2013
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
 
-# used for date recognition
-import types
 import re
 
 #

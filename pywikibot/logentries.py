@@ -3,11 +3,12 @@
 Objects representing Mediawiki log entries
 """
 #
-# (C) Pywikipedia bot team, 2007-12
+# (C) Pywikibot team, 2007-2013
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
 
 from pywikibot.exceptions import *
 import pywikibot
