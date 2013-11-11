@@ -1,11 +1,11 @@
 # -*- coding: utf-8  -*-
 """ Script to create user files (user-config.py, user-fixes.py) """
 #
-# (C) Pywikipedia team, 2010-2013
-#
-__version__ = '$Id$'
+# (C) Pywikibot team, 2010-2013
 #
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
 #
 
 import os

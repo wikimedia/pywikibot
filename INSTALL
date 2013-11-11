@@ -1,4 +1,4 @@
-To install the Pywikipediabot framework:
+To install the Pywikibot framework:
 
 1)  Extract/unzip this package to a directory on your computer.
 2)  Open a command prompt in that directory, and run the command:
@@ -12,7 +12,7 @@ install the package to a different location by running:
 
         python setup.py install --home=/path/to/location
 
-where "/path/to/location" is the directory that you want the Pywikipediabot
+where "/path/to/location" is the directory that you want the Pywikibot
 files installed to.
 
 Note: You will need to have an active Internet connection when you run the
