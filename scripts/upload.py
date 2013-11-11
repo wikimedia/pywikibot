@@ -20,7 +20,7 @@ and for a description.
 """
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikipedia bot team, 2003-2010
+# (C) Pywikibot team, 2003-2010
 #
 # Distributed under the terms of the MIT license.
 #

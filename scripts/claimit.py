@@ -1,10 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Copyright (C) 2013 Legoktm
-Copyright (C) 2013 Pywikipediabot team
-
-Distributed under the MIT License
+This script adds claims to Wikidata items based on categories.
 
 Usage:
 
@@ -14,6 +11,15 @@ You can use any typical pagegenerator to provide with a list of pages
 
 Then list the property-->target pairs to add.
 """
+#
+# (C) Legoktm, 2013
+# (C) Pywikibot team, 2013
+#
+# Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
+#
+
 import json
 import pywikibot
 from pywikibot import pagegenerators

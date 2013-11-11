@@ -52,12 +52,13 @@ and arguments can be:
 # (C) Daniel Herding, 2004.
 # (C) Purodha Blissenbach, 2009.
 # (C) xqt, 2009-2012
-# (C) Pywikipedia bot team, 2004-2013
+# (C) Pywikibot team, 2004-2013
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
 #
+
 import re
 import datetime
 import pywikibot

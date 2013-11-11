@@ -2,26 +2,22 @@
 # -*- coding: utf-8 -*-
 """
 Edit a Wikipedia article with your favourite editor.
-"""
 
+ TODO: - non existing pages
+       - edit conflicts
+       - minor edits
+       - watch/unwatch
+       - ...
+"""
 #
 # (C) Gerrit Holl 2004
-# (C) Pywikipedia team, 2004-2012
-#
-__version__ = "$Id$"
+# (C) Pywikibot team, 2004-2012
 #
 # Distributed under the terms of the MIT license.
 #
-
-# Version 0.4.
+__version__ = "$Id$"
 #
-# TODO: - non existing pages
-#       - edit conflicts
-#       - minor edits
-#       - watch/unwatch
-#       - ...
 
-__metaclass__ = type
 import os
 import string
 import optparse
@@ -32,7 +28,7 @@ from pywikibot import i18n
 from pywikibot.editor import TextEditor
 
 
-class ArticleEditor:
+class ArticleEditor(object):
     # join lines if line starts with this ones
     joinchars = string.letters + '[]' + string.digits
 

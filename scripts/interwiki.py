@@ -336,7 +336,7 @@ that you have to break it off, use "-continue" next time.
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
 # (C) xqt, 2009-2013
-# (C) Pywikipedia bot team, 2007-2013
+# (C) Pywikibot team, 2007-2013
 #
 # Distributed under the terms of the MIT license.
 #

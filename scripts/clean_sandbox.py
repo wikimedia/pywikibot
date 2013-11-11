@@ -34,6 +34,7 @@ This script understands the following command-line arguments:
 # (C) Siebrand Mazeland, 2007
 # (C) xqt, 2009-2013
 # (C) Dr. Trigon, 2012
+# (C) Pywikibot team, 2013
 #
 # Distributed under the terms of the MIT license.
 #

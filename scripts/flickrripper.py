@@ -25,11 +25,12 @@ Todo:
 """
 #
 # (C) Multichill, 2009
-# (C) Pywikipedia team, 2009-2013
+# (C) Pywikibot team, 2009-2013
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
+#
 
 import urllib
 import re

@@ -9,9 +9,12 @@ Syntax: python cfd.py
 """
 #
 # (C) Ben McIlwain, 2008
-# (C) Pywikipedia bot team, 2009-2013
+# (C) Pywikibot team, 2009-2013
 #
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
+#
 
 import pywikibot
 import re

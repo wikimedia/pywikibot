@@ -33,14 +33,19 @@ namespace (using the -start) parameter, as that would consume too much
 bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
-
+#
+# (C) Pywikibot team, 2013
+#
+# Distributed under the terms of the MIT license.
+#
 __version__ = '$Id$'
+#
 
 import re
 import sys
 import pywikibot
 from pywikibot import i18n
-from pywikibot import pagegenerators, catlib
+from pywikibot import pagegenerators
 import editarticle
 
 # This is required for the text that is shown when you run this script
@@ -691,8 +696,8 @@ def main():
         else:
             if not namespaces:
                 namespaces = [0]
-            cat = catlib.Category(site, "%s:%s" % (site.category_namespace(),
-                                                   cat))
+            cat = pywikibot.Category(site, "%s:%s" % (
+                site.category_namespace(), cat))
             gen = pagegenerators.CategorizedPageGenerator(cat)
     if not gen:
         pywikibot.showHelp('noreferences')

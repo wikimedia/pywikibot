@@ -15,8 +15,8 @@ python harvest_template.py -lang:nl -cat:Sisoridae -template:"Taxobox straalvinn
 &params;
 """
 #
-# (C) 2013 Multichill, Amir
-# (C) 2013 Pywikipediabot team
+# (C) Multichill, Amir, 2013
+# (C) Pywikibot team, 2013
 #
 # Distributed under the terms of MIT License.
 #

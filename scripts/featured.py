@@ -53,15 +53,15 @@ This script understands various command-line arguments:
 -quiet            no corresponding pages are displayed.
 
 """
-__version__ = '$Id$'
-
 #
 # (C) Maxim Razin, 2005
 # (C) Leonardo Gregianin, 2005-2008
 # (C) xqt, 2009-2013
-# (C) Pywikipedia bot team, 2005-2012
+# (C) Pywikibot team, 2005-2012
 #
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
 #
 
 import pickle

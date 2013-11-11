@@ -24,14 +24,15 @@ The following command line parameters are supported:
                 wps : Work on all wikipedia's
 
 """
-__version__ = '$Id$'
 #
-#  (C) Multichill 2008-2011
-#  (C) Pywikipedia bot team, 2008-2013
+# (C) Multichill 2008-2011
+# (C) Pywikibot team, 2008-2013
 #
 #   Distributed under the terms of the MIT license.
 #
+__version__ = '$Id$'
 #
+
 import sys
 import re
 import urllib

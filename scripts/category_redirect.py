@@ -13,13 +13,12 @@ that haven't been edited for a certain cooldown period (currently 7 days)
 are taken into account.
 
 """
-
 #
-# (C) Pywikipedia team, 2008-2011
-#
-__version__ = '$Id$'
+# (C) Pywikibot team, 2008-2011
 #
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
 #
 
 import cPickle

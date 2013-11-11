@@ -32,12 +32,12 @@ Furthermore, the following command line parameters are supported:
 #
 # (C) Leonardo Gregianin, 2006
 # (C) Andreas J. Schwab, 2007
-# (C) Pywikipedia bot team, 2006-2013
+# (C) Pywikibot team, 2006-2013
 #
 # Distributed under the terms of the MIT license.
 #
-
 __version__ = '$Id$'
+#
 
 import sys
 import re

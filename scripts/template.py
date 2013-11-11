@@ -100,15 +100,14 @@ pages:
 # (C) Daniel Herding, 2004
 # (C) Rob W.W. Hooft, 2003
 # (C) xqt, 2009-2011
-# (C) Pywikipedia team, 2004-2010
+# (C) Pywikibot team, 2004-2010
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
 #
+
 import re
-import sys
-import string
 import pywikibot
 from pywikibot import i18n
 from pywikibot import config, pagegenerators, catlib

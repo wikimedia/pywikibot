@@ -25,10 +25,14 @@ Delete everything in the category "To delete" without prompting.
 
     python delete.py -cat:"To delete" -always
 """
-__version__ = '$Id$'
+#
+# (C) Pywikibot team, 2013
 #
 # Distributed under the terms of the MIT license.
 #
+__version__ = '$Id$'
+#
+
 import pywikibot
 from pywikibot import i18n, config, catlib, pagegenerators
 

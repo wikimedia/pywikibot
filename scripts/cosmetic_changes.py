@@ -66,12 +66,13 @@ or by adding a list to the given one:
 """
 #
 # (C) xqt, 2009-2013
-# (C) Pywikipedia bot team, 2006-2013
+# (C) Pywikibot team, 2006-2013
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
 #
+
 import sys
 import re
 import pywikibot

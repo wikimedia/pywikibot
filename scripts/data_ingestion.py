@@ -1,9 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-'''
+"""
 A generic bot to do data ingestion (batch uploading) to Commons
+"""
+#
+# (C) Pywikibot team, 2013
+#
+# Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
+#
 
-'''
 import pywikibot
 import posixpath
 import urlparse

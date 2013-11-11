@@ -77,7 +77,6 @@ Or to do it all from the command-line, use the following syntax:
 This will move all pages in the category US to the category United States.
 
 """
-
 #
 # (C) Rob W.W. Hooft, 2004
 # (C) Daniel Herding, 2004
@@ -86,11 +85,11 @@ This will move all pages in the category US to the category United States.
 # (C) Cyde, 2006-2010
 # (C) Anreas J Schwab, 2007
 # (C) xqt, 2009-2012
-# (C) Pywikipedia team, 2008-2013
-#
-__version__ = '$Id$'
+# (C) Pywikibot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
 #
 
 import os

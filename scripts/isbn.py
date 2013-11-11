@@ -35,8 +35,13 @@ Furthermore, the following command line parameters are supported:
 -always           Don't prompt you for each replacement.
 
 """
-
+#
+# (C) Pywikibot team, 2013
+#
+# Distributed under the terms of the MIT license.
+#
 __version__ = '$Id$'
+#
 
 import sys
 import re

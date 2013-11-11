@@ -67,26 +67,22 @@ To complete a move of a page, one can use:
     python solve_disambiguation.py -just -pos:New_Name Old_Name
 
 """
-
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikipedia team, 2003-2009
-#
-__version__ = '$Id$'
+# (C) Pywikibot team, 2003-2013
 #
 # Distributed under the terms of the MIT license.
 #
+__version__ = '$Id$'
+#
 
-
-# Standard library imports
 import re
 import sys
 import codecs
 
-# Application specific imports
 import pywikibot
 from pywikibot import editor as editarticle
 from pywikibot import pagegenerators
