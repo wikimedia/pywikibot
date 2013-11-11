@@ -1,4 +1,4 @@
-Copyright (c) 2004-2013 Pywikipedia bot team
+Copyright (c) 2004-2013 Pywikibot team
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -22,6 +22,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 Everything in the 'externals' directory is general released under seperate
-licenses. Some parts may come from Pywikipedia bot team and share the same
+licenses. Some parts may come from Pywikibot team and share the same
 permissions, but in general they have to be checked for any external package
 seperately.

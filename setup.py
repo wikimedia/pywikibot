@@ -1,13 +1,14 @@
 # -*- coding: utf-8  -*-
 """
 Installer script for Pywikibot 2.0 framework
-
-(C) Pywikipedia team, 2009-2013
-
-Distributed under the terms of the MIT license.
-
 """
+#
+# (C) Pywikibot team, 2009-2013
+#
+# Distributed under the terms of the MIT license.
+#
 __version__ = '$Id$'
+#
 
 import sys
 
