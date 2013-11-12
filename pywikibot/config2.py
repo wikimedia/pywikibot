@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2012
+# (C) Pywikibot team, 2003-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,14 +31,11 @@ import platform
 family = 'wikipedia'
 # The language code of the site we're working on.
 mylang = 'language'
-# The default interface for communicating with the site
-# currently the only defined interface is 'APISite', so don't change this!
-site_interface = 'APISite'
-# number of days to cache namespaces, api configuration, etc.
-API_config_expiry = 30
+
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. Please set your usernames by adding such lines to your
 # user-config.py:
+#
 # usernames['wikipedia']['de'] = 'myGermanUsername'
 # usernames['wiktionary']['en'] = 'myEnglishUsername'
 #
@@ -49,11 +46,18 @@ API_config_expiry = 30
 # If you have a sysop account on some wikis, this will be used to delete pages
 # or to edit locked pages if you add such lines to your
 # user-config.py:
+#
 # sysopnames['wikipedia']['de'] = 'myGermanUsername'
 # sysopnames['wiktionary']['en'] = 'myEnglishUsername'
 usernames = {}
 sysopnames = {}
 disambiguation_comment = {}
+
+# The default interface for communicating with the site
+# currently the only defined interface is 'APISite', so don't change this!
+site_interface = 'APISite'
+# number of days to cache namespaces, api configuration, etc.
+API_config_expiry = 30
 
 # Solve captchas in the webbrowser. Setting this to False will result in the
 # exception CaptchaError being thrown if a captcha is encountered.
@@ -143,7 +147,8 @@ def _get_base_dir():
         raise RuntimeError("Directory '%(base_dir)s' does not exist."
                            % locals())
     if not os.path.exists(os.path.join(base_dir, "user-config.py")):
-        exc_text = "No user-config.py found in directory '%(base_dir)s'.\n" % locals()
+        exc_text = ("No user-config.py found in directory '%(base_dir)s'.\n"
+                    % locals())
         exc_text += "  Please check that user-config.py is stored in the correct location.\n"
         exc_text += "  Directory where user-config.py is searched is determined as follows:\n\n"
         exc_text += "    " + _get_base_dir.__doc__
@@ -241,9 +246,11 @@ except:
 if __sys.platform == 'win32':
     try:
         import _winreg
-        _key1 = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, 'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\OpenWithProgids')
+        _key1 = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
+                                'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\OpenWithProgids')
         _progID = _winreg.EnumValue(_key1, 1)[0]
-        _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, '%s\shell\open\command' % _progID)
+        _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT,
+                                '%s\shell\open\command' % _progID)
         _cmd = _winreg.QueryValueEx(_key2, None)[0]
         editor = _cmd.replace('%1', '')
         # Notepad is even worse than our Tkinter editor.
@@ -429,10 +436,10 @@ db_password = ''
 
 ############## SEARCH ENGINE SETTINGS ##############
 
-# Some scripts allow querying Google via the Google Web API. To use this feature,
-# you must install the pyGoogle module from http://pygoogle.sf.net/ and have a
-# Google Web API license key. Note that Google doesn't give out license keys
-# anymore.
+# Some scripts allow querying Google via the Google Web API. To use this
+# feature, you must install the pyGoogle module from http://pygoogle.sf.net/
+# and have a Google Web API license key. Note that Google doesn't give out
+# license keys anymore.
 google_key = ''
 
 # Some scripts allow using the Yahoo! Search Web Services. To use this feature,
@@ -545,17 +552,19 @@ cosmetic_changes_disable = {}
 # cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
 # Appending the script name also works:
 # cosmetic_changes_deny_script.append('your_script_name')
-cosmetic_changes_deny_script = ['cosmetic_changes', 'touch']
+cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
+                                'touch']
 
 ############## REPLICATION BOT ################
-# You can add replicate_replace to your user_config.py, which has the following format:
+# You can add replicate_replace to your user_config.py, which has the following
+# format:
 #
 # replicate_replace = {
 #            'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
 # }
 #
-# to replace all occurences of 'Hoofdpagina' with 'Veurblaad' when writing to liwiki. Note that this does
-# not take the origin wiki into account.
+# to replace all occurences of 'Hoofdpagina' with 'Veurblaad' when writing to
+# liwiki. Note that this does not take the origin wiki into account.
 replicate_replace = {}
 
 ############## FURTHER SETTINGS ##############
@@ -594,7 +603,8 @@ max_queue_size = 64
 # LS is a shortcut alias.
 line_separator = LS = u'\n'
 
-# Settings to enable mwparserfromhell <http://mwparserfromhell.readthedocs.org/en/latest/>
+# Settings to enable mwparserfromhell
+# <http://mwparserfromhell.readthedocs.org/en/latest/>
 # Currently used in textlib.extract_templates_and_params
 # This should be more accurate than our current regex, but is currently opt-in.
 use_mwparserfromhell = False
@@ -664,10 +674,10 @@ for _filename in _fns:
             if __sys.platform == 'win32' or _filemode & 002 == 0 or True:
                 execfile(_filename)
             else:
-                print "WARNING: Skipped '%(fn)s': writeable by others."\
+                print "WARNING: Skipped '%(fn)s': writeable by others." \
                       % {'fn': _filename}
         else:
-            print "WARNING: Skipped '%(fn)s': owned by someone else."\
+            print "WARNING: Skipped '%(fn)s': owned by someone else." \
                   % {'fn': _filename}
 
 # Test for obsoleted and/or unknown variables.
@@ -691,9 +701,9 @@ for _key, _val in globals().items():
             print "         %(now)s: %(new)s" % {'now': "Now", 'new': nt}
         del nt, ot
     else:
-        print \
-            "Configuration variable %(_key)r is defined but unknown."\
-            " Misspelled?" % locals()
+        print("WARNING: "
+              "Configuration variable %(_key)r is defined but unknown.\n"
+              "Misspelled?" % locals())
 
 # Fix up default console_encoding
 if console_encoding is None:
@@ -706,8 +716,10 @@ if console_encoding is None:
 if transliteration_target == 'not set':
     if __sys.platform == 'win32':
         transliteration_target = console_encoding
-        print "WARNING: Running on Windows and transliteration_target is not set."
-        print "Please see http://www.mediawiki.org/wiki/Manual:Pywikipediabot/Windows"
+        print("WARNING: Running on Windows and transliteration_target is not "
+              "set.")
+        print("Please see "
+              "http://www.mediawiki.org/wiki/Manual:Pywikipediabot/Windows")
     else:
         transliteration_target = None
 elif transliteration_target in ('None', 'none'):
@@ -732,7 +744,8 @@ if __name__ == "__main__":
     _k.sort()
     for _name in _k:
         if _name[0] != '_':
-            if not type(globals()[_name]) in [types.FunctionType, types.ModuleType]:
+            if not type(globals()[_name]) in [types.FunctionType,
+                                              types.ModuleType]:
                 if _all or _glv[_name] != globals()[_name]:
                     print _name, "=", repr(globals()[_name])
 
