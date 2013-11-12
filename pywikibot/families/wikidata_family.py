@@ -13,14 +13,8 @@ class Family(family.WikimediaFamily):
         self.name = 'wikidata'
         self.langs = {
             'wikidata': 'www.wikidata.org',
-            'client': 'wikidata-test-client.wikimedia.de',
             'test': 'test.wikidata.org',
         }
-
-    def scriptpath(self, code):
-        if code == 'client':
-            return ''
-        return super(Family, self).scriptpath(code)
 
     def shared_data_repository(self, code, transcluded=False):
         """Always return a repository tupe. This enables testing whether
@@ -30,12 +24,7 @@ class Family(family.WikimediaFamily):
         if transcluded:
             return (None, None)
         else:
-            if code == 'wikidata':
-                return ('wikidata', 'wikidata')
-            elif code == 'test':
-                return ('test', 'wikidata')
-            else:
-                return (None, None)
+            return (code, self.name)
 
     def globes(self, code):
         """Supported globes for Coordinate datatype"""
