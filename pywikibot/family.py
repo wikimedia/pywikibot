@@ -874,19 +874,22 @@ class Family(object):
         if not hasattr(self, "_catredirtemplates"):
             self._catredirtemplates = {}
         if code in self.category_redirect_templates:
-            cr_template = self.category_redirect_templates[code][0]
+            cr_template_list = self.category_redirect_templates[code]
+            cr_list = list(self.category_redirect_templates[code])
         else:
-            cr_template = self.category_redirect_templates[fallback][0]
-        # start with list of category redirect templates from family file
-        cr_page = pywikibot.Page(pywikibot.Site(code, self),
-                                 "Template:" + cr_template)
-        cr_list = list(self.category_redirect_templates[code])
-        # retrieve all redirects to primary template from API,
-        # add any that are not already on the list
-        for t in cr_page.backlinks(filterRedirects=True, namespaces=10):
-            newtitle = t.title(withNamespace=False)
-            if newtitle not in cr_list:
-                cr_list.append(newtitle)
+            cr_template_list = self.category_redirect_templates[fallback]
+            cr_list = []
+        if cr_template_list:
+            cr_template = cr_template_list[0]
+            # start with list of category redirect templates from family file
+            cr_page = pywikibot.Page(pywikibot.Site(code, self),
+                                     "Template:" + cr_template)
+            # retrieve all redirects to primary template from API,
+            # add any that are not already on the list
+            for t in cr_page.backlinks(filterRedirects=True, namespaces=10):
+                newtitle = t.title(withNamespace=False)
+                if newtitle not in cr_list:
+                    cr_list.append(newtitle)
         self._catredirtemplates[code] = cr_list
 
     def disambig(self, code, fallback='_default'):
