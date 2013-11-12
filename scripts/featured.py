@@ -288,7 +288,7 @@ class FeaturedBot(pywikibot.Bot):
     def run_good(self):
         task = 'good'
         if not self.hastemplate(task):
-            pywikibot.output(u'\nNOTE: % arcticles are not implemented at %.'
+            pywikibot.output(u'\nNOTE: %s arcticles are not implemented at %s.'
                              % (task, self.site))
             return
 
@@ -325,7 +325,7 @@ class FeaturedBot(pywikibot.Bot):
     def run_featured(self):
         task = 'featured'
         if not self.hastemplate(task):
-            pywikibot.output(u'\nNOTE: % arcticles are not implemented at %.'
+            pywikibot.output(u'\nNOTE: %s arcticles are not implemented at %s.'
                              % (task, self.site))
             return
 
