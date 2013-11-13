@@ -2400,6 +2400,6 @@ def test(quick=False, showAll=False):
     else:
         print(u'Date module has been fully tested')
 
-# Do a quick test upon module loading!
-# Make sure the date file is correct
-test(quick=True)
+if __name__=="__main__":
+    # Test the date file
+    test(quick=False)
