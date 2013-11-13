@@ -29,7 +29,8 @@ Furthermore, the following command line parameters are supported:
 
 -newimages        Add text in the new images
 
-(Not yet supported: -untagged         Add text in the images that don't have any license template)
+-untagged         Add text in the images that don't have any license template
+                  (Not yet supported)
 
 -always           If used, the bot won't ask if it should add the text
                   specified
@@ -86,9 +87,6 @@ docuReplacements = {
 }
 
 
-class NoEnoughData(pywikibot.Error):
-    """ Error class for when the user doesn't specified all the data needed """
-
 starsList = [
     u'bueno',
     u'bom interwiki',
@@ -117,6 +115,10 @@ starsList = [
     u'وصلة مقالة جيدة',
     u'وصلة مقالة مختارة',
 ]
+
+
+class NoEnoughData(pywikibot.Error):
+    """ Error class for when the user doesn't specified all the data needed """
 
 
 def add_text(page=None, addText=None, summary=None, regexSkip=None,
@@ -175,7 +177,7 @@ Match was: %s''' % result)
     if not up:
         newtext = text
         # Translating the \\n into binary \n
-        addText = addText.replace('\\n', '\n')
+        addText = addText.replace('\\n', config.line_separator)
         if (reorderEnabled):
             # Getting the categories
             categoriesInside = pywikibot.getCategoryLinks(newtext, site)
@@ -187,7 +189,7 @@ Match was: %s''' % result)
             newtext = pywikibot.removeLanguageLinks(newtext, site)
 
             # Adding the text
-            newtext += u"\n%s" % addText
+            newtext += u"%s%s" % (config.line_separator, addText)
             # Reputting the categories
             newtext = pywikibot.replaceCategoryLinks(newtext,
                                                      categoriesInside, site,
@@ -203,17 +205,17 @@ Match was: %s''' % result)
                     newtext = regex.sub('', newtext)
                     allstars += found
             if allstars != []:
-                newtext = newtext.strip() + '\r\n\r\n'
+                newtext = newtext.strip() + config.line_separator * 2
                 allstars.sort()
                 for element in allstars:
-                    newtext += '%s\r\n' % element.strip()
+                    newtext += '%s%s' % (element.strip(), config.LS)
             # Adding the interwiki
             newtext = pywikibot.replaceLanguageLinks(newtext, interwikiInside,
                                                      site)
         else:
-            newtext += u"\n%s" % addText
+            newtext += u"%s%s" % (config.line_separator, addText)
     else:
-        newtext = addText + '\n' + text
+        newtext = addText + config.line_separator + text
     if putText and text != newtext:
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                          % page.title())
@@ -251,9 +253,9 @@ Match was: %s''' % result)
                     return (False, False, always)
                 except pywikibot.ServerError:
                     errorCount += 1
-                    if errorCount < 5:
+                    if errorCount < config.max_retries:
                         pywikibot.output(u'Server Error! Wait..')
-                        time.sleep(5)
+                        time.sleep(config.retry_wait)
                         continue
                     else:
                         raise pywikibot.ServerError(u'Fifth Server Error!')
