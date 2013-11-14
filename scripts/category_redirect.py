@@ -56,7 +56,7 @@ class CategoryRedirectBot(object):
                 'da': "Kategori:Omdirigeringskategorier",
                 'en': "Category:Wikipedia soft redirected categories",
                 'es': "Categoría:Wikipedia:Categorías redirigidas",
-                'fa': u"رده:رده‌های منتقل شده",
+                'fa': u"رده:رده‌های منتقل‌شده",
                 'hu': "Kategória:Kategóriaátirányítások",
                 'ja': "Category:移行中のカテゴリ",
                 'no': "Kategori:Wikipedia omdirigertekategorier",
