@@ -99,13 +99,9 @@ class Family(object):
         ]
 
         # Order for fy: alphabetical by code, but y counts as i
-        def fycomp(x, y):
-            x = x.replace("y", "i") + x.count("y") * "!"
-            y = y.replace("y", "i") + y.count("y") * "!"
-            return cmp(x, y)
         self.fyinterwiki = self.alphabetic[:]
         self.fyinterwiki.remove('nb')
-        self.fyinterwiki.sort(fycomp)
+        self.fyinterwiki.sort(key=lambda x: x.replace("y", "i") + x.count("y") * "!")
 
         self.langs = {}
 
