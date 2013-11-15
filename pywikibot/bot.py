@@ -3,7 +3,7 @@
 User-interface related functions for building bots
 """
 #
-# (C) Pywikibot team, 2008-2012
+# (C) Pywikibot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,6 +20,7 @@ import logging.handlers
 import os
 import os.path
 import sys
+import re
 
 _logger = "bot"
 
@@ -244,7 +245,7 @@ def writelogheader():
     except AttributeError:
         return
 
-    log(u'=== Pywikipediabot framework v2.0 -- Logging header ===')
+    log(u'=== Pywikibot framework v2.0 -- Logging header ===')
 
     # script call
     log(u'COMMAND: %s' % unicode(sys.argv))
@@ -625,8 +626,6 @@ def handleArgs(*args):
     init_handlers()
 
     if config.verbose_output:
-        import re
-        ver = pywikibot.__version__  # probably can be improved on
         # Please don't change the regular expression here unless you really
         # have to - some git versions (like 1.7.0.4) seem to treat lines
         # containing just `$Id:` as if they were ident lines (see
@@ -634,8 +633,13 @@ def handleArgs(*args):
         # replacement with `$Id$`
         # or `$Id$`.
         m = re.search(r"\$Id"
-                      r": (\w+) \$", ver)
-        pywikibot.output(u'Pywikipediabot r%s' % m.group(1))
+                      r": (\w+) \$", pywikibot.__version__)
+        if m:
+            pywikibot.output(u'Pywikibot r%s' % m.group(1))
+        else:
+            # Version ID not availlable on SVN repository.
+            # Maybe these informations should be imported from version.py
+            pywikibot.output(u'Pywikibot SVN repository')
         pywikibot.output(u'Python %s' % sys.version)
 
     if do_help:
