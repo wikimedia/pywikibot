@@ -121,3 +121,5 @@ if len(sys.argv) > 1:
             else:
                 raise Exception("%s not found!" % fn)
     run_python_file(fn, argv, argvu)
+elif __name__ == "__main__":
+    print __doc__
