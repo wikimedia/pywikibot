@@ -13,8 +13,9 @@ that haven't been edited for a certain cooldown period (currently 7 days)
 are taken into account.
 
 """
+
 #
-# (C) Pywikibot team, 2008-2011
+# (C) Pywikibot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -103,7 +104,7 @@ class CategoryRedirectBot(object):
             # an update due to changes in a transcluded template
             article.put(newtext, comment)
             if newtext == oldtext:
-                pywikibot.output(u'No changes in made in page %s.'
+                pywikibot.output(u'No changes made in page %s.'
                                  % article.title(asLink=True))
                 return False
             return True
@@ -186,7 +187,6 @@ class CategoryRedirectBot(object):
 
     def readyToEdit(self, cat):
         """Return True if cat not edited during cooldown period, else False."""
-        dateformat = "%Y-%m-%dT%H:%M:%SZ"
         today = datetime.now()
         deadline = today + timedelta(days=-self.cooldown)
         if cat.editTime() is None:
@@ -247,7 +247,8 @@ class CategoryRedirectBot(object):
             cPickle.dump(record, open(datafile + ".bak", "wb"), -1)
 
         try:
-            template_list = self.site.family.category_redirect_templates[self.site.code]
+            template_list = self.site.family.category_redirect_templates[
+                self.site.code]
         except KeyError:
             pywikibot.output(u"No redirect templates defined for %s"
                              % self.site.sitename())
@@ -453,7 +454,7 @@ class CategoryRedirectBot(object):
         self.log_text.sort()
         problems.sort()
         newredirs.sort()
-        self.log_page.put(u"\n==%i-%02i-%02iT%02i:%02i:%02iZ==\n"
+        self.log_page.put(u"\n== %i-%02i-%02iT%02i:%02i:%02iZ ==\n"
                           % time.gmtime()[:6]
                           + u"\n".join(self.log_text)
                           + u"\n* New redirects since last report:\n"
