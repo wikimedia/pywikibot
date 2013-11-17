@@ -34,7 +34,7 @@ This script understands the following command-line arguments:
 # (C) Siebrand Mazeland, 2007
 # (C) xqt, 2009-2013
 # (C) Dr. Trigon, 2012
-# (C) Pywikibot team, 2013
+# (C) Pywikibot team, 2012-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -190,25 +190,27 @@ class SandboxBot(pywikibot.Bot):
                     if text.strip() == translatedContent.strip():
                         pywikibot.output(
                             u'The sandbox is still clean, no change necessary.')
-                    elif subst and sandboxPage.userName() == self.site.user():
+                    elif subst and \
+                         sandboxPage.userName() == self.site.user():
                         pywikibot.output(
                             u'The sandbox might be clean, no change necessary.')
                     elif pos != 0 and not subst:
                         if self.getOption('user'):
                             endpos = pos + len(translatedContent.strip())
                             if (pos < 0) or (endpos == len(text)):
-                                pywikibot.output(
-                                    u'The user sandbox is still clean, no change necessary.')
+                                pywikibot.output(u'The user sandbox is still '
+                                                 u'clean, no change necessary.')
                             else:
                                 sandboxPage.put(text[:endpos], translatedMsg)
                                 pywikibot.showDiff(text, text[:endpos])
                                 pywikibot.output(
-                                    u'Standard content was changed, user sandbox cleaned.')
+                                    u'Standard content was changed, user '
+                                    u'sandbox cleaned.')
                         else:
                             sandboxPage.put(translatedContent, translatedMsg)
                             pywikibot.showDiff(text, translatedContent)
-                            pywikibot.output(
-                                u'Standard content was changed, sandbox cleaned.')
+                            pywikibot.output(u'Standard content was changed, '
+                                             u'sandbox cleaned.')
                     else:
                         edit_delta = datetime.datetime.utcnow() - \
                             pywikibot.Timestamp.fromISOformat(sandboxPage.editTime())
@@ -217,8 +219,8 @@ class SandboxBot(pywikibot.Bot):
                         if delta <= datetime.timedelta(0):
                             sandboxPage.put(translatedContent, translatedMsg)
                             pywikibot.showDiff(text, translatedContent)
-                            pywikibot.output(
-                                u'Standard content was changed, sandbox cleaned.')
+                            pywikibot.output(u'Standard content was changed, '
+                                             u'sandbox cleaned.')
                         else:  # wait for the rest
                             pywikibot.output(
                                 u'Sandbox edited %.1f minutes ago...'
@@ -230,6 +232,10 @@ class SandboxBot(pywikibot.Bot):
                 except pywikibot.EditConflict:
                     pywikibot.output(
                         u'*** Loading again because of edit conflict.\n')
+                except pywikibot.NoPage:
+                    pywikibot.output(
+                        u'*** The sandbox is not existent, skipping.')
+                    continue
             if self.getOption('no_repeat'):
                 pywikibot.output(u'\nDone.')
                 return
