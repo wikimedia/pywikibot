@@ -234,8 +234,8 @@ Match was: %s''' % result)
                     return (False, False, always)
                 elif choice == 'b':
                     webbrowser.open("http://%s%s" % (
-                        page.site().hostname(),
-                        page.site().nice_get_address(page.title())
+                        page.site.hostname(),
+                        page.site.nice_get_address(page.title())
                     ))
                     pywikibot.input("Press Enter when finished in browser.")
             if always or choice == 'y':
