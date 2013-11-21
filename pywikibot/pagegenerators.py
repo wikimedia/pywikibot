@@ -914,12 +914,11 @@ def WikidataItemGenerator(gen):
 
 
 #TODO below
-
+@deprecate_arg("extension", None)
 def UnusedFilesGenerator(number=100, repeat=False, site=None, extension=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.unusedfiles(number=number, repeat=repeat,
-                                 extension=extension):
+    for page in site.unusedfiles(number=number, repeat=repeat):
         yield pywikibot.ImagePage(page.site, page.title())
 
 
