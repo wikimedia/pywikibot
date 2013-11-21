@@ -1948,7 +1948,7 @@ class Category(Page):
         else:
             pywikibot.output(
                 'Moving text from %s to %s.'
-                % {'oldcat': self.title(), 'authors': targetCat.title()})
+                % (self.title(), targetCat.title()))
             authors = ', '.join(self.contributingUsers())
             creationSummary = message % (self.title(), authors)
             newtext = self.get()
