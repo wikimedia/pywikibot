@@ -2941,6 +2941,26 @@ class Claim(PropertyPage):
             source[claim.getID()].append(claim)
         self.sources.append(source)
 
+    def removeSource(self, source, **kwargs):
+        """
+        Removes the source.
+        @param source: the source to remove
+        @type source: pywikibot.Claim
+        """
+        self.removeSources([source], **kwargs)
+
+    def removeSources(self, sources, **kwargs):
+        """
+        Removes the individual sources.
+        @param sources: the sources to remove
+        @type sources: list of pywikibot.Claim
+        """
+        data = self.repo.removeSources(self, sources, **kwargs)
+        for source in sources:
+            source_dict = collections.defaultdict(list)
+            source_dict[source.getID()].append(source)
+            self.sources.remove(source_dict)
+
     def addQualifier(self, qualifier, **kwargs):
         """Adds the given qualifier
 

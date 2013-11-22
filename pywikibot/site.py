@@ -3787,6 +3787,29 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
+    @must_be(group='user')
+    def removeSources(self, claim, sources, bot=True, **kwargs):
+        """
+        Removes sources.
+        @param claim A Claim object to remove the sources from
+        @type claim pywikibot.Claim
+        @param sources A list of Claim objects that are sources
+        @type sources pywikibot.Claim
+        """
+        params = dict(action='wbremovereferences')
+        if bot:
+            params['bot'] = 1
+        params['statement'] = claim.snak
+        params['references'] = '|'.join(source.hash for source in sources)
+        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
+                                     'edit')  # Use a dummy page
+        for kwarg in kwargs:
+            if kwarg in ['baserevid', 'summary']:
+                params[kwarg] = kwargs[kwarg]
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        return data
+
     def linkTitles(self, page1, page2, bot=True):
         """
         Link two pages together
