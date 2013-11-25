@@ -562,9 +562,19 @@ class RedirectRobot:
             except pywikibot.BadTitle:
                 pywikibot.output(u"Bad Title Error")
                 break
+            oldlink = self.site.redirectRegex().search(oldText).group(1)
+            if "#" in oldlink and targetPage.section() is None:
+                sectionlink = oldlink[oldlink.index("#"):]
+                targetlink = pywikibot.Page(
+                    self.site,
+                    targetPage.title() + sectionlink
+                ).title(asLink=True, textlink=True)
+            else:
+                targetlink = targetPage.title(asLink=True, textlink=True)
+
             text = self.site.redirectRegex().sub(
                 '#%s %s' % (self.site.redirect(True),
-                            targetPage.title(asLink=True, textlink=True)),
+                            targetlink),
                 oldText)
             if redir.title() == targetPage.title() or text == oldText:
                 pywikibot.output(u"Note: Nothing left to do on %s"
