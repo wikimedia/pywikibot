@@ -311,7 +311,7 @@ getSite = Site  # alias for backwards-compability
 
 
 from page import Page, ImagePage, Category, Link, User, ItemPage, PropertyPage, Claim
-from page import html2unicode, url2unicode
+from page import html2unicode, url2unicode, unicode2html
 
 
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')

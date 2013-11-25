@@ -3486,6 +3486,22 @@ def html2unicode(text, ignore=None):
     return result
 
 
+def unicode2html(x, encoding):
+    """
+Ensure unicode string is encodable, or else convert to ASCII for HTML.
+
+Arguments are a unicode string and an encoding. Attempt to encode the
+string into the desired format; if that doesn't work, encode the unicode
+into html &#; entities. If it does work, return it unchanged.
+
+"""
+    try:
+        x.encode(encoding)
+    except UnicodeError:
+        x = UnicodeToAsciiHtml(x)
+    return x
+
+
 def url2unicode(title, site, site2=None):
     """Convert url-encoded text to unicode using site's encoding.
 
