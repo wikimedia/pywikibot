@@ -7,9 +7,20 @@ Usage:
 
 python claimit.py [pagegenerators] P1 Q2 P123 Q456
 
-You can use any typical pagegenerator to provide with a list of pages
-
+You can use any typical pagegenerator to provide with a list of pages.
 Then list the property-->target pairs to add.
+
+For geographic coordinates:
+
+python claimit.py [pagegenerators] P625 [lat-dec],[long-dec],[prec]
+
+[lat-dec] and [long-dec] represent the latitude and longitude respectively,
+and [prec] represents the precision. All values are in decimal degrees,
+not DMS. If [prec] is omitted, the default precision is 0.0001 degrees.
+
+Example:
+
+python claimit.py [pagegenerators] P625 -23.3991,-52.0910,0.0001
 """
 #
 # (C) Legoktm, 2013
@@ -111,6 +122,13 @@ def main():
             target = pywikibot.ItemPage(repo, commandline_claims[i + 1])
         elif claim.getType() == 'string':
             target = commandline_claims[i + 1]
+        elif claim.getType() == 'globecoordinate':
+            coord_args = map(float, commandline_claims[i + 1].split(','))
+            if len(coord_args) >= 3:
+                precision = coord_args[2]
+            else:
+                precision = 0.0001  # Default value (~10 m at equator)
+            target = pywikibot.Coordinate(coord_args[0], coord_args[1], precision=precision)
         else:
             raise NotImplementedError(
                 "%s datatype is not yet supported by claimit.py"
