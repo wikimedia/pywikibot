@@ -3040,6 +3040,60 @@ class APISite(BaseSite):
         finally:
             self.unlock_page(page)
 
+    _protect_errors = {
+        "noapiwrite": "API editing not enabled on %(site)s wiki",
+        "writeapidenied": "User %(user)s not allowed to edit through the API",
+        "permissiondenied": "User %(user)s not authorized to protect pages on %(site)s wiki.",
+        "cantedit": "User %(user) can't protect this page because user %(user) can't edit it.",
+        "protect-invalidlevel": "Invalid protection level"
+    }
+
+    def protect(self, page, edit, move, summary):
+        """(Un)protect a wiki page. Requires administrator status.
+
+        Valid protection levels (in MediaWiki 1.12) are '' (equivalent to
+        'none'), 'autoconfirmed', and 'sysop'.
+
+        @param edit: Level of edit protection
+        @param move: Level of move protection
+        @param unprotect: If true, unprotect the page (equivalent to setting
+            all protection levels to '')
+        @param reason: Edit summary.
+        @param prompt: If true, ask user for confirmation.
+
+        """
+        try:
+            self.login(sysop=True)
+        except pywikibot.NoUsername, e:
+            raise NoUsername("protect: Unable to login as sysop (%s)"
+                             % e.__class__.__name__)
+        if not self.logged_in(sysop=True):
+            raise NoUsername("protect: Unable to login as sysop")
+        token = self.token(page, "protect")
+        self.lock_page(page)
+        req = api.Request(site=self, action="protect", token=token,
+                          title=page.title(withSection=False),
+                          protections="edit=" + edit + "|" + "move=" + move,
+                          reason=summary)
+        try:
+            result = req.submit()
+        except api.APIError, err:
+            errdata = {
+                'site': self,
+                'title': page.title(withSection=False),
+                'user': self.user(),
+                'level-edit': edit,
+                'level-move': move
+            }
+            if err.code in self._protect_errors:
+                raise Error(self._protect_errors[err.code] % errdata)
+            pywikibot.debug(u"protect: Unexpected error code '%s' received."
+                            % err.code,
+                            _logger)
+            raise
+        finally:
+            self.unlock_page(page)
+
     #TODO: implement undelete
 
     #TODO: implement patrol
