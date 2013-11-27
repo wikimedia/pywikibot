@@ -173,7 +173,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                          % {'name': self.username, 'site': self.site})
         try:
             cookiedata = self.getCookie()
-        except pywikibot.data.api.APIError, e:
+        except pywikibot.data.api.APIError as e:
             pywikibot.error(u"Login failed (%s)." % e.code)
             if retry:
                 self.password = None

@@ -2760,7 +2760,7 @@ class APISite(BaseSite):
                 result = req.submit()
                 pywikibot.debug(u"editpage response: %s" % result,
                                 _logger)
-            except api.APIError, err:
+            except api.APIError as err:
                 self.unlock_page(page)
                 if err.code.endswith("anon") and self.logged_in():
                     pywikibot.debug(
@@ -2904,7 +2904,7 @@ class APISite(BaseSite):
             result = req.submit()
             pywikibot.debug(u"movepage response: %s" % result,
                             _logger)
-        except api.APIError, err:
+        except api.APIError as err:
             if err.code.endswith("anon") and self.logged_in():
                 pywikibot.debug(
                     u"movepage: received '%s' even though bot is logged in"
@@ -2981,7 +2981,7 @@ class APISite(BaseSite):
                           token=token)
         try:
             result = req.submit()
-        except api.APIError, err:
+        except api.APIError as err:
             errdata = {
                 'site': self,
                 'title': page.title(withSection=False),
@@ -3013,7 +3013,7 @@ class APISite(BaseSite):
         """
         try:
             self.login(sysop=True)
-        except pywikibot.NoUsername, e:
+        except pywikibot.NoUsername as e:
             raise NoUsername("delete: Unable to login as sysop (%s)"
                              % e.__class__.__name__)
         if not self.logged_in(sysop=True):
@@ -3025,7 +3025,7 @@ class APISite(BaseSite):
                           reason=summary)
         try:
             result = req.submit()
-        except api.APIError, err:
+        except api.APIError as err:
             errdata = {
                 'site': self,
                 'title': page.title(withSection=False),
@@ -3064,7 +3064,7 @@ class APISite(BaseSite):
         """
         try:
             self.login(sysop=True)
-        except pywikibot.NoUsername, e:
+        except pywikibot.NoUsername as e:
             raise NoUsername("protect: Unable to login as sysop (%s)"
                              % e.__class__.__name__)
         if not self.logged_in(sysop=True):
@@ -3077,7 +3077,7 @@ class APISite(BaseSite):
                           reason=summary)
         try:
             result = req.submit()
-        except api.APIError, err:
+        except api.APIError as err:
             errdata = {
                 'site': self,
                 'title': page.title(withSection=False),
@@ -3257,7 +3257,7 @@ class APISite(BaseSite):
             req["ignorewarnings"] = ""
         try:
             result = req.submit()
-        except api.APIError, err:
+        except api.APIError as err:
             # TODO: catch and process foreseeable errors
             raise
         result = result["upload"]

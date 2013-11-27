@@ -237,7 +237,7 @@ class UI:
         """
         try:
             import gui
-        except ImportError, e:
+        except ImportError as e:
             print 'Could not load GUI modules: %s' % e
             return text
         editor = gui.EditBoxWindow()

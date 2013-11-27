@@ -297,7 +297,7 @@ class Request(MutableMapping):
                 pywikibot.error(traceback.format_exc())
                 raise
             #TODO: what other exceptions can occur here?
-            except Exception, e:
+            except Exception as e:
                 # for any other error on the http request, wait and retry
                 pywikibot.error(traceback.format_exc())
                 pywikibot.log(u"%s, %s" % (uri, paramstring))

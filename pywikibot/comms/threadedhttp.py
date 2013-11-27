@@ -218,7 +218,7 @@ class Http(httplib2.Http):
                 self, uri, method, body, headers,
                 max_redirects, connection_type
             )
-        except Exception, e:  # what types?
+        except Exception as e:  # what types?
             # return exception instance to be retrieved by the calling thread
             return e
         self.follow_redirects = follow_redirects
