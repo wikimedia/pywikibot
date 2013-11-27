@@ -94,7 +94,7 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None, fami
                 pywikibot.output(
                     u'TitleTranslate: %s was recognized as %s with value %d'
                     % (page.title(), dictName, value))
-                for entryLang, entry in date.formats[dictName].iteritems():
+                for entryLang, entry in date.formats[dictName].items():
                     if entryLang != page.site.code:
                         if (dictName == 'yearsBC' and
                                 entryLang in date.maxyearBC and
@@ -118,7 +118,7 @@ bcDateErrors = [u'[[ko:%d년]]']
 
 
 def appendFormatedDates(result, dictName, value):
-    for code, func in date.formats[dictName].iteritems():
+    for code, func in date.formats[dictName].items():
         result.append(u'[[%s:%s]]' % (code, func(value)))
 
 

@@ -35,7 +35,7 @@ windowsColors = {
     'white':       15,
 }
 
-colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(windowsColors.keys()))
+colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(list(windowsColors.keys())))
 
 
 # Compat for python <= 2.5

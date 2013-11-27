@@ -521,7 +521,7 @@ Really exit?""" % remaining(),
 
     # only need one drop() call because all throttles use the same global pid
     try:
-        _sites.values()[0].throttle.drop()
+        list(_sites.values())[0].throttle.drop()
         pywikibot.log(u"Dropped throttle(s).")
     except IndexError:
         pass

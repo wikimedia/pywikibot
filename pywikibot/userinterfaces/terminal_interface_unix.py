@@ -41,7 +41,7 @@ class UnixUI(terminal_interface_base.UI):
     def printColorized(self, text, targetStream):
         lastColor = None
         totalcount = 0
-        for key, value in unixColors.iteritems():
+        for key, value in unixColors.items():
             ckey = '\03{%s}' % key
             totalcount += text.count(ckey)
             text = text.replace(ckey, value)

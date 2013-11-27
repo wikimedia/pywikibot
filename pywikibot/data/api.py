@@ -155,7 +155,7 @@ class Request(MutableMapping):
         del self.params[key]
 
     def keys(self):
-        return self.params.keys()
+        return list(self.params.keys())
 
     def __contains__(self, key):
         return self.params.__contains__(key)
@@ -167,7 +167,7 @@ class Request(MutableMapping):
         return len(self.params)
 
     def iteritems(self):
-        return self.params.iteritems()
+        return iter(self.params.items())
 
     def http_params(self):
         """Return the parameters formatted for inclusion in an HTTP request."""
@@ -278,7 +278,7 @@ class Request(MutableMapping):
                     eoh = body.find(marker)
                     body = body[eoh + len(marker):]
                     # retrieve the headers from the MIME object
-                    mimehead = dict(container.items())
+                    mimehead = dict(list(container.items()))
                     rawdata = http.request(self.site, uri, ssl, method="POST",
                                            headers=mimehead, body=body)
                 else:
@@ -680,7 +680,7 @@ class QueryGenerator(object):
                 if isinstance(resultdata, dict):
                     pywikibot.debug(u"%s received %s; limit=%s"
                                     % (self.__class__.__name__,
-                                       resultdata.keys(),
+                                       list(resultdata.keys()),
                                        self.limit),
                                     _logger)
                     if "results" in resultdata:
@@ -722,7 +722,7 @@ class QueryGenerator(object):
                     % self.continuekey)
                 return
             update = self.data["query-continue"][self.continuekey]
-            for key, value in update.iteritems():
+            for key, value in update.items():
                 # query-continue can return ints
                 if isinstance(value, int):
                     value = str(value)

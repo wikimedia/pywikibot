@@ -59,7 +59,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         self.site = site
         self.other_ns = re.compile(
             u'14\[\[07(' + u'|'.join([item[0] for item in
-                                        site.namespaces().values() if item[0]]) + u')')
+                                        list(site.namespaces().values()) if item[0]]) + u')')
         self.api_url = self.site.family.apipath(self.site.lang)
         self.api_url += '?action=query&meta=siteinfo&siprop=statistics&format=xml'
         self.api_found = re.compile(r'articles="(.*?)"')

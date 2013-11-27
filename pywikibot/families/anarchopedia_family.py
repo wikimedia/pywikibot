@@ -19,7 +19,7 @@ class Family(family.Family):
         for l in self.languages_by_size:
             self.langs[l] = '%s.anarchopedia.org' % l
 
-        self.nocapitalize = self.langs.keys()
+        self.nocapitalize = list(self.langs.keys())
 
         self.obsolete = {
             'ara': 'ar',

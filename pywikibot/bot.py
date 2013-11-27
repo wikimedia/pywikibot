@@ -264,7 +264,7 @@ def writelogheader():
 
     # imported modules
     log(u'MODULES:')
-    for item in sys.modules.keys():
+    for item in list(sys.modules.keys()):
         ver = version.getfileversion('%s.py' % item.replace('.', '/'))
         if ver:
             log(u'  %s' % ver)
@@ -719,7 +719,7 @@ Global arguments available for all bots:
         module = __import__('%s' % modname)
         helpText = module.__doc__.decode('utf-8')
         if hasattr(module, 'docuReplacements'):
-            for key, value in module.docuReplacements.iteritems():
+            for key, value in module.docuReplacements.items():
                 helpText = helpText.replace(key, value.strip('\n\r'))
         pywikibot.stdout(helpText)  # output to STDOUT
     except Exception:

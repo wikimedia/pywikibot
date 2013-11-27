@@ -655,7 +655,7 @@ def shortpath(path):
 # Store current variables and their types.
 _glv = {}
 _glv.update(globals())
-_gl = _glv.keys()
+_gl = list(_glv.keys())
 _tp = {}
 for _key in _gl:
     if _key[0] != '_':
@@ -681,7 +681,7 @@ for _filename in _fns:
                   % {'fn': _filename})
 
 # Test for obsoleted and/or unknown variables.
-for _key, _val in globals().items():
+for _key, _val in list(globals().items()):
     if _key.startswith('_'):
         pass
     elif _key in _gl:
@@ -740,7 +740,7 @@ if __name__ == "__main__":
             _all = 0
         else:
             print("Unknown arg %(_arg)s ignored" % locals())
-    _k = globals().keys()
+    _k = list(globals().keys())
     _k.sort()
     for _name in _k:
         if _name[0] != '_':
@@ -750,7 +750,7 @@ if __name__ == "__main__":
                     print(_name, "=", repr(globals()[_name]))
 
 # cleanup all locally-defined variables
-for __var in globals().keys():
+for __var in list(globals().keys()):
     if __var.startswith("_") and not __var.startswith("__"):
         del __sys.modules[__name__].__dict__[__var]
 

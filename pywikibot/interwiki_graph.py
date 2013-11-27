@@ -78,7 +78,7 @@ class GraphDrawer:
         # if we found more than one valid page for this language:
         if len(filter(lambda p: p.site == page.site and p.exists()
                                 and not p.isRedirectPage(),          # noqa
-                      self.subject.foundIn.keys())) > 1:
+                      list(self.subject.foundIn.keys()))) > 1:
             # mark conflict by octagonal node
             node.set_shape('octagon')
         self.graph.add_node(node)
@@ -134,14 +134,14 @@ class GraphDrawer:
         # create empty graph
         self.graph = pydot.Dot()
         # self.graph.set('concentrate', 'true')
-        for page in self.subject.foundIn.iterkeys():
+        for page in self.subject.foundIn.keys():
             # a node for each found page
             self.addNode(page)
         # mark start node by pointing there from a black dot.
         firstLabel = self.getLabel(self.subject.originPage)
         self.graph.add_node(pydot.Node('start', shape='point'))
         self.graph.add_edge(pydot.Edge('start', firstLabel))
-        for page, referrers in self.subject.foundIn.iteritems():
+        for page, referrers in self.subject.foundIn.items():
             for refPage in referrers:
                 self.addDirectedEdge(page, refPage)
         self.saveGraphFile()

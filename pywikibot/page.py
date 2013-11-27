@@ -854,12 +854,12 @@ class Page(object):
         if config.cosmetic_changes_mylang_only:
             cc = ((family == config.family and
                    self.site.lang == config.mylang) or
-                  family in config.cosmetic_changes_enable.keys() and
+                  family in list(config.cosmetic_changes_enable.keys()) and
                   self.site.lang in config.cosmetic_changes_enable[family])
         else:
             cc = True
         cc = (cc and not
-              (family in config.cosmetic_changes_disable.keys() and
+              (family in list(config.cosmetic_changes_disable.keys()) and
                self.site.lang in config.cosmetic_changes_disable[family]))
         if not cc:
             return
@@ -2389,7 +2389,7 @@ class WikibasePage(Page):
         """
         if force or not hasattr(self, '_content'):
             data = self.repo.loadcontent(self._defined_by(), *args)
-            self.id = data.keys()[0]
+            self.id = list(data.keys())[0]
             self._content = data[self.id]
         if 'lastrevid' in self._content:
             self.lastrevid = self._content['lastrevid']
@@ -2514,7 +2514,7 @@ class WikibasePage(Page):
         value should be a list of strings.
         """
         aliases = self.__normalizeLanguages(aliases)
-        for (key, strings) in aliases.items():
+        for (key, strings) in list(aliases.items()):
             aliases[key] = [{'language': key, 'value': i} for i in strings]
         data = {'aliases': aliases}
         self.editEntity(data, **kwargs)
@@ -2832,7 +2832,7 @@ class Claim(PropertyPage):
         more handling.
         """
         source = collections.defaultdict(list)
-        for prop in data['snaks'].values():
+        for prop in list(data['snaks'].values()):
             for claimsnak in prop:
                 claim = Claim.fromJSON(site, {'mainsnak': claimsnak,
                                               'hash': data['hash']})
@@ -3186,7 +3186,7 @@ class Link(object):
                 t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
                 self._namespace = ns
                 break
-            if prefix in fam.langs.keys()\
+            if prefix in list(fam.langs.keys())\
                     or prefix in fam.get_known_families(site=self._site):
                 # looks like an interwiki link
                 if not firstPass:
@@ -3195,7 +3195,7 @@ class Link(object):
                         "Improperly formatted interwiki link '%s'"
                         % self._text)
                 t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
-                if prefix in fam.langs.keys():
+                if prefix in list(fam.langs.keys()):
                     newsite = pywikibot.Site(prefix, fam)
                 else:
                     otherlang = self._site.code

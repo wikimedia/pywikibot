@@ -283,8 +283,8 @@ def translate(code, xdict, parameters=None, fallback=True):
                 code = alt
                 break
         else:
-            trans = xdict.values()[0]
-            code = xdict.keys()[0]
+            trans = list(xdict.values())[0]
+            code = list(xdict.keys())[0]
     if not trans:
         return  # return None if we have no translation found
     if parameters is None:

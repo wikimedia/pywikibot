@@ -831,8 +831,8 @@ class Family(object):
     @property
     def iwkeys(self):
         if self.interwiki_forward:
-            return pywikibot.Family(self.interwiki_forward).langs.keys()
-        return self.langs.keys()
+            return list(pywikibot.Family(self.interwiki_forward).langs.keys())
+        return list(self.langs.keys())
 
     def _addlang(self, code, location, namespaces={}):
         """Add a new language to the langs and namespaces of the family.

@@ -45,7 +45,7 @@ class Family(family.WikimediaFamily):
 
         # Other than most Wikipedias, page names must not start with a capital
         # letter on ALL Wiktionaries.
-        self.nocapitalize = self.langs.keys()
+        self.nocapitalize = list(self.langs.keys())
 
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,

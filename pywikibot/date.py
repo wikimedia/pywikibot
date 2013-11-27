@@ -2282,7 +2282,7 @@ def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
     dictName is 'YearBC', 'December', etc.
 
     """
-    for dictName, dict in formats.iteritems():
+    for dictName, dict in formats.items():
         try:
             year = dict[lang](title)
             return dictName, year
@@ -2352,7 +2352,7 @@ def testMapEntry(formatName, showAll=True, value=None):
         pywikibot.output((u"Processing %s with limits from %d to %d and step %d"
                          % (formatName, start, stop - 1, step)))
 
-    for code, convFunc in formats[formatName].iteritems():
+    for code, convFunc in formats[formatName].items():
 ##        import time
 ##        startClock = time.clock()
         for value in xrange(start, stop, step):

@@ -61,7 +61,7 @@ class LoginStatus(object):
 
     @classmethod
     def name(cls, search_value):
-        for key, value in cls.__dict__.iteritems():
+        for key, value in cls.__dict__.items():
             if key == key.upper() and value == search_value:
                 return key
         raise KeyError("Value %r could not be found in this enum"
@@ -135,7 +135,7 @@ class BaseSite(object):
                 raise NoSuchSite("Language %s in family %s is obsolete"
                                  % (self.__code, self.__family.name))
         if self.__code not in self.languages():
-            if self.__family.name in self.__family.langs.keys() and \
+            if self.__family.name in list(self.__family.langs.keys()) and \
                len(self.__family.langs) == 1:
                 oldcode = self.__code
                 self.__code = self.__family.name
@@ -258,12 +258,12 @@ class BaseSite(object):
     def languages(self):
         """Return list of all valid language codes for this site's Family."""
 
-        return self.family.langs.keys()
+        return list(self.family.langs.keys())
 
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""
 
-        nsnames = [name for name in self.namespaces().itervalues()]
+        nsnames = [name for name in self.namespaces().values()]
         return [lang for lang in self.languages()
                 if lang[:1].upper() + lang[1:] not in nsnames]
 
@@ -1407,7 +1407,7 @@ class APISite(BaseSite):
         if target_title == title or "pages" not in result['query']:
             # no "pages" element indicates a circular redirect
             raise pywikibot.CircularRedirect(redirmap[title])
-        pagedata = result['query']['pages'].values()[0]
+        pagedata = list(result['query']['pages'].values())[0]
             # there should be only one value in 'pages', and it is the target
         if self.sametitle(pagedata['title'], target_title):
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
@@ -1450,7 +1450,7 @@ class APISite(BaseSite):
                 # only use pageids if all pages have them
                 rvgen.request["pageids"] = "|".join(pageids)
             else:
-                rvgen.request["titles"] = "|".join(cache.keys())
+                rvgen.request["titles"] = "|".join(list(cache.keys()))
             rvgen.request[u"rvprop"] = u"ids|flags|timestamp|user|comment|content"
             pywikibot.output(u"Retrieving %s pages from %s."
                              % (len(cache), self))
@@ -1477,7 +1477,7 @@ class APISite(BaseSite):
                 except KeyError:
                     pywikibot.debug(u"No 'title' in %s" % pagedata, _logger)
                     pywikibot.debug(u"pageids=%s" % pageids, _logger)
-                    pywikibot.debug(u"titles=%s" % cache.keys(), _logger)
+                    pywikibot.debug(u"titles=%s" % list(cache.keys()), _logger)
                     continue
                 page = cache[pagedata['title']]
                 api.update_page(page, pagedata)
@@ -1559,7 +1559,7 @@ class APISite(BaseSite):
                         namespaces=namespaces,
                         content=content
                     )
-            return itertools.chain(*genlist.values())
+            return itertools.chain(*list(genlist.values()))
         return blgen
 
     def page_embeddedin(self, page, filterRedirects=None, namespaces=None,
@@ -2429,7 +2429,7 @@ class APISite(BaseSite):
         if where not in ("text", "titles"):
             raise Error("search: unrecognized 'where' value: %s" % where)
         if namespaces == []:
-            namespaces = [ns for ns in self.namespaces().keys() if ns >= 0]
+            namespaces = [ns for ns in list(self.namespaces().keys()) if ns >= 0]
         if not namespaces:
             pywikibot.warning(u"search: namespaces cannot be empty; using [0].")
             namespaces = [0]
@@ -2960,7 +2960,7 @@ class APISite(BaseSite):
                 % page.title(asLink=True))
         last_rev = page._revisions[page.latestRevision()]
         last_user = last_rev.user
-        for rev in sorted(page._revisions.keys(), reverse=True):
+        for rev in sorted(list(page._revisions.keys()), reverse=True):
             # start with most recent revision first
             if rev.user != last_user:
                 prev_user = rev.user
@@ -3263,7 +3263,7 @@ class APISite(BaseSite):
         result = result["upload"]
         pywikibot.debug(result, _logger)
         if "warnings" in result:
-            warning = result["warnings"].keys()[0]
+            warning = list(result["warnings"].keys())[0]
             message = result["warnings"][warning]
             raise pywikibot.UploadWarning(upload_warnings[warning]
                                           % {'msg': message})

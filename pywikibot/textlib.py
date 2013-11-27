@@ -90,7 +90,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         # also finds links to foreign sites with preleading ":"
         'interwiki':    re.compile(r'(?i)\[\[:?(%s)\s?:[^\]]*\]\][\s]*'
                                    % '|'.join(site.validLanguageLinks() +
-                                              site.family.obsolete.keys())),
+                                              list(site.family.obsolete.keys()))),
         # Wikidata property inclusions
         'property':     re.compile(r'(?i)\{\{\s*#property:\s*p\d+\s*\}\}'),
         # Module invocations (currently only Lua)
@@ -275,7 +275,7 @@ def removeDisabledParts(text, tags=['*']):
         'syntaxhighlight': r'<syntaxhighlight .*?</syntaxhighlight>',
     }
     if '*' in tags:
-        tags = regexes.keys()
+        tags = list(regexes.keys())
     # add alias
     tags = set(tags)
     if 'source' in tags:
@@ -430,7 +430,7 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]",
         # language, or if it's e.g. a category tag or an internal link
         if lang in fam.obsolete:
             lang = fam.obsolete[lang]
-        if lang in fam.langs.keys():
+        if lang in list(fam.langs.keys()):
             if '|' in pagetitle:
                 # ignore text after the pipe
                 pagetitle = pagetitle[:pagetitle.index('|')]
@@ -462,7 +462,7 @@ def removeLanguageLinks(text, site=None, marker=''):
     # This regular expression will find every interwiki link, plus trailing
     # whitespace.
     languages = '|'.join(site.validLanguageLinks() +
-                         site.family.obsolete.keys())
+                         list(site.family.obsolete.keys()))
     interwikiR = re.compile(r'\[\[(%s)\s?:[^\[\]\n]*\]\][\s]*'
                             % languages, re.IGNORECASE)
     text = replaceExcept(text, interwikiR, '',
@@ -595,7 +595,7 @@ def interwikiFormat(links, insite=None):
     if not links:
         return ''
 
-    ar = interwikiSort(links.keys(), insite)
+    ar = interwikiSort(list(links.keys()), insite)
     s = []
     for site in ar:
         try:

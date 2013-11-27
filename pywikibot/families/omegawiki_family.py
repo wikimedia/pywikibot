@@ -16,7 +16,7 @@ class Family(family.Family):
         # On most Wikipedias page names must start with a capital letter, but some
         # languages don't use this.
 
-        self.nocapitalize = self.langs.keys()
+        self.nocapitalize = list(self.langs.keys())
 
     def hostname(self, code):
         return 'www.omegawiki.org'
