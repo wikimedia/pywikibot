@@ -6,7 +6,7 @@
 #
 __version__ = '$Id$'
 
-import terminal_interface_base
+from . import terminal_interface_base
 
 # TODO: other colors:
          #0 = Black

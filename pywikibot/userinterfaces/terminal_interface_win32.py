@@ -7,7 +7,7 @@
 __version__ = '$Id$'
 
 import re
-import terminal_interface_base
+from . import terminal_interface_base
 
 try:
     import ctypes
@@ -48,7 +48,7 @@ class Win32BaseUI(terminal_interface_base.UI):
 class Win32CtypesUI(Win32BaseUI):
     def __init__(self):
         Win32BaseUI.__init__(self)
-        from win32_unicode import stdin, stdout, stderr, argv
+        from .win32_unicode import stdin, stdout, stderr, argv
         self.stdin = stdin
         self.stdout = stdout
         self.stderr = stderr

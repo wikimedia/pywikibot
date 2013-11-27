@@ -25,8 +25,8 @@ import date
 import itertools
 import re
 import time
-
 import pywikibot
+from . import date
 from pywikibot import config
 from pywikibot import deprecate_arg, i18n
 from pywikibot.comms import http

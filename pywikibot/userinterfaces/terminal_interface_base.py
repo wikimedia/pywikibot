@@ -6,7 +6,7 @@
 #
 __version__ = '$Id$'
 
-import transliteration
+from . import transliteration
 import traceback
 import re
 import sys

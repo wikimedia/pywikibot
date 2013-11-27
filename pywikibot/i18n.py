@@ -14,9 +14,9 @@ __version__ = '$Id$'
 import re
 import locale
 from pywikibot import Error
-from plural import plural_rules
+from .plural import plural_rules
 import pywikibot
-import config2 as config
+from . import config2 as config
 
 PLURAL_PATTERN = '{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 

@@ -13,7 +13,7 @@ import re
 import urllib
 import collections
 
-import config2 as config
+from . import config2 as config
 import pywikibot
 
 logger = logging.getLogger("pywiki.wiki.family")

@@ -21,7 +21,7 @@ except ImportError:
 import pywikibot
 import re
 from HTMLParser import HTMLParser
-import config2 as config
+from . import config2 as config
 
 TEMP_REGEX = re.compile(
     '{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')
@@ -641,7 +641,7 @@ def interwikiSort(sites, insite=None):
 #---------------------------------------
 
 def getCategoryLinks(text, site=None):
-    import catlib
+    from . import catlib
     """Return a list of category links found in text.
 
     List contains Category objects.

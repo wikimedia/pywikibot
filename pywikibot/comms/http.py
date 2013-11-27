@@ -32,7 +32,7 @@ from pywikibot import config
 from pywikibot.exceptions import FatalServerError, Server504Error
 import pywikibot
 import cookielib
-import threadedhttp
+from . import threadedhttp
 import pywikibot.version
 
 _logger = "comm.http"
