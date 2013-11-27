@@ -95,20 +95,27 @@ def request(site, uri, ssl=False, *args, **kwargs):
     All parameters not listed below are the same as
     L{httplib2.Http.request}, but the uri is relative
 
+    If the site argument is None the uri has to be absolute and is
+    taken. In this case ssl is ignored. Used for requests to non wiki
+    pages.
+
     @param site: The Site to connect to
     @param uri: the URI to retrieve (relative to the site's scriptpath)
     @param ssl: Use https connection
     @return: The received data (a unicode string).
 
     """
-    if ssl:
-        proto = "https"
-        host = site.ssl_hostname()
-        uri = site.ssl_pathprefix() + uri
+    if site:
+        if ssl:
+            proto = "https"
+            host = site.ssl_hostname()
+            uri = site.ssl_pathprefix() + uri
+        else:
+            proto = site.protocol()
+            host = site.hostname()
+        baseuri = urlparse.urljoin("%(proto)s://%(host)s" % locals(), uri)
     else:
-        proto = site.protocol()
-        host = site.hostname()
-    baseuri = urlparse.urljoin("%(proto)s://%(host)s" % locals(), uri)
+        baseuri = uri
 
     # set default user-agent string
     kwargs.setdefault("headers", {})
