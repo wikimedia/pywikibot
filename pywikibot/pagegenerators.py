@@ -1256,7 +1256,6 @@ def MySQLPageGenerator(query, site=None):
     while True:
         try:
             namespaceNumber, pageName = cursor.fetchone()
-            print namespaceNumber, pageName
         except TypeError:
             # Limit reached or no more results
             break

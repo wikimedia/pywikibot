@@ -42,7 +42,7 @@ if sys.platform == "win32":
     # So be paranoid about catching errors and reporting them to original_stderr,
     # so that we can at least see them.
     def _complain(message):
-        print >>original_stderr, isinstance(message, str) and message or repr(message)
+        print(isinstance(message, str) and message or repr(message), file=original_stderr)
 
     # Work around <http://bugs.python.org/issue6058>.
     codecs.register(lambda name: name == 'cp65001' and codecs.lookup('utf-8') or None)
