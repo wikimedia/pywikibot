@@ -29,9 +29,6 @@ Furthermore, the following command line parameters are supported:
 
 -newimages        Add text in the new images
 
--untagged         Add text in the images that don't have any license template
-                  (Not yet supported)
-
 -always           If used, the bot won't ask if it should add the text
                   specified
 
@@ -67,7 +64,7 @@ or you need some help regarding this script, you can find us here:
 
 #
 # (C) Filnik, 2007-2010
-# (C) Pywikipedia bot team, 2007-2013
+# (C) Pywikibot team, 2007-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -77,6 +74,7 @@ __version__ = '$Id$'
 import re
 import webbrowser
 import codecs
+
 import pywikibot
 from pywikibot import config
 from pywikibot import i18n
@@ -330,14 +328,6 @@ def main():
                 regexSkip = pywikibot.input(u'What text should I skip?')
             else:
                 regexSkip = arg[8:]
-## *** NOT YET SUPPORTED ***
-##        elif arg.startswith('-untagged'):
-##            if len(arg) == 9:
-##                untaggedProject = pywikibot.input(
-##                    u'What project do you want to use?')
-##            else:
-##                untaggedProject = arg[10:]
-##            generator = untaggedGenerator(untaggedProject)
         elif arg == '-up':
             up = True
         elif arg == '-noreorder':
