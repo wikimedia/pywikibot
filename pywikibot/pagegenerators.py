@@ -20,14 +20,16 @@ These parameters are supported to specify which pages titles to print:
 __version__ = '$Id$'
 #
 
-import re
 import codecs
-import itertools
-import pywikibot
-import time
 import date
+import itertools
+import re
+import time
+
+import pywikibot
 from pywikibot import config
 from pywikibot import deprecate_arg, i18n
+from pywikibot.comms import http
 
 
 # ported from version 1 for backwards-compatibility
@@ -151,6 +153,11 @@ parameterHelp = u"""\
                   [[Special:RandomRedirect]]. Can also be given as
                   "-randomredirect:n" where n is the number of pages to be
                   returned, else 10 pages are returned.
+
+-untagged         Work on image pages that don't have any license template on a
+                  site given in the format "<language>.<project>.org, e.g.
+                  "ja.wikipedia.org" or "commons.wikimedia.org".
+                  Using an external Toolserver tool.
 
 -google           Work on all pages that are found in a Google search.
                   You need a Google Web API license key. Note that Google
@@ -480,6 +487,8 @@ class GeneratorFactory(object):
                 self.articlefilter = arg[6:]
         elif arg.startswith('-yahoo'):
             gen = YahooSearchPageGenerator(arg[7:])
+        elif arg.startswith('-untagged'):
+            gen = UntaggedPageGenerator(arg[10:])
         else:
             pass
         if gen:
@@ -1027,6 +1036,31 @@ def SearchPageGenerator(query, step=None, total=None, namespaces=None, site=None
         site = pywikibot.Site()
     for page in site.search(query, step=step, total=total, namespaces=namespaces):
         yield page
+
+
+def UntaggedPageGenerator(untaggedProject, limit=500):
+    """ Function to get the pages returned by this tool:
+    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
+    """
+    URL = "http://toolserver.org/~daniel/WikiSense/UntaggedImages.php?"
+    REGEXP = r"<td valign='top' title='Name'><a href='http://.*?" \
+              "\.org/w/index\.php\?title=(.*?)'>.*?</a></td>"
+    lang, project = untaggedProject.split('.', 1)
+    if lang == 'commons':
+        wiki = 'wikifam=commons.wikimedia.org'
+    else:
+        wiki = 'wikilang=%s&wikifam=.%s' % (lang, project)
+    link = '%s&%s&max=%d&order=img_timestamp' % (URL, wiki, limit)
+    results = re.findall(REGEXP, http.request(site=None, uri=link))
+    if not results:
+        print link
+        raise pywikibot.Error(
+            'Nothing found! Try to use the tool by yourself to be sure that it '
+            'works!')
+    else:
+        for result in results:
+            yield pywikibot.Page(pywikibot.getSite(), result)
+
 
 # following classes just ported from version 1 without revision; not tested
 
