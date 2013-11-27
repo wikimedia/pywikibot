@@ -3592,7 +3592,7 @@ class DataSite (APISite):
         req = api.Request(site=self, **params)
         data = req.submit()
         if not 'success' in data:
-            raise pywikibot.data.api.APIError, data['errors']
+            raise pywikibot.data.api.APIError(data['errors'])
         return data['entities']
 
     def preloaditempages(self, pagelist, groupsize=50):
