@@ -660,6 +660,6 @@ fixes = {
 from pywikibot import config
 
 try:
-    execfile(config.datafilepath("user-fixes.py"))
+    exec(compile(open(config.datafilepath("user-fixes.py")).read(), config.datafilepath("user-fixes.py"), 'exec'))
 except IOError:
     pass
