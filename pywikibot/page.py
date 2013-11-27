@@ -2805,6 +2805,9 @@ class Claim(PropertyPage):
             elif claim.getType() == 'globecoordinate':
                 claim.target = pywikibot.Coordinate.fromWikibase(
                     data['mainsnak']['datavalue']['value'], site)
+            elif claim.getType() == 'time':
+                claim.target = pywikibot.WbTime.fromWikibase(
+                    data['mainsnak']['datavalue']['value'])
             else:
                 # This covers string, url types
                 claim.target = data['mainsnak']['datavalue']['value']
@@ -2855,6 +2858,7 @@ class Claim(PropertyPage):
                  'commonsMedia': ImagePage,
                  'globecoordinate': pywikibot.Coordinate,
                  'url': basestring,
+                 'time': pywikibot.WbTime,
                  }
         if self.getType() in types:
             if not isinstance(value, types[self.getType()]):
@@ -2984,6 +2988,8 @@ class Claim(PropertyPage):
         elif self.getType() == 'commonsMedia':
             value = self.getTarget().title(withNamespace=False)
         elif self.getType() == 'globecoordinate':
+            value = self.getTarget().toWikibase()
+        elif self.getType() == 'time':
             value = self.getTarget().toWikibase()
         else:
             raise NotImplementedError('%s datatype is not supported yet.'
@@ -3406,6 +3412,7 @@ not supported by PyWikiBot!"""
             link._section = None
         link._title = title
         return link
+
 
 # Utility functions for parsing page titles
 
