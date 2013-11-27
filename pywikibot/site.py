@@ -3759,7 +3759,7 @@ class DataSite (APISite):
                 datavalue = {'type': 'wikibase-entityid',
                              'value': sourceclaim._formatDataValue(),
                              }
-            elif sourceclaim.getType() == 'string':
+            elif sourceclaim.getType() in ['string', 'url']:
                 datavalue = {'type': 'string',
                              'value': sourceclaim._formatDataValue(),
                              }
