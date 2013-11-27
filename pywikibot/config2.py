@@ -139,7 +139,7 @@ def _get_base_dir():
             else:
                 base_dir = os.path.join(home, "." + NAME)
             if not os.path.isdir(base_dir):
-                os.makedirs(base_dir, mode=0700)
+                os.makedirs(base_dir, mode=0o700)
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file
@@ -671,7 +671,7 @@ for _filename in _fns:
         _filemode = _filestatus[0]
         _fileuid = _filestatus[4]
         if __sys.platform == 'win32' or _fileuid in [os.getuid(), 0]:
-            if __sys.platform == 'win32' or _filemode & 002 == 0 or True:
+            if __sys.platform == 'win32' or _filemode & 0o02 == 0 or True:
                 execfile(_filename)
             else:
                 print "WARNING: Skipped '%(fn)s': writeable by others." \
