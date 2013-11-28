@@ -3,12 +3,16 @@
 """
 This script adds claims to Wikidata items based on categories.
 
+------------------------------------------------------------------------------
+
 Usage:
 
 python claimit.py [pagegenerators] P1 Q2 P123 Q456
 
 You can use any typical pagegenerator to provide with a list of pages.
 Then list the property-->target pairs to add.
+
+------------------------------------------------------------------------------
 
 For geographic coordinates:
 
@@ -21,6 +25,28 @@ not DMS. If [prec] is omitted, the default precision is 0.0001 degrees.
 Example:
 
 python claimit.py [pagegenerators] P625 -23.3991,-52.0910,0.0001
+
+------------------------------------------------------------------------------
+
+By default, claimit.py does not add a claim if one with the same property
+already exists on the page. To override this behavior, use the 'exists' option:
+
+python claimit.py [pagegenerators] P246 "string example" -exists:p
+
+Suppose the claim you want to add has the same property as an existing claim
+and the "-exists:p" argument is used. Now, claimit.py will not add the claim
+if it has the same target, sources, and/or qualifiers as the existing claim.
+To override this behavior, add 't' (target), 's' (sources), or 'q' (qualifiers)
+to the 'exists' argument.
+
+For instance, to add the claim to each page even if one with the same
+property, target, and qualifiers already exists:
+
+python claimit.py [pagegenerators] P246 "string example" -exists:ptq
+
+Note that the ordering of the letters in the 'exists' argument does not matter,
+but 'p' must be included.
+
 """
 #
 # (C) Legoktm, 2013
@@ -40,15 +66,17 @@ class ClaimRobot:
     """
     A bot to add Wikidata claims
     """
-    def __init__(self, generator, claims):
+    def __init__(self, generator, claims, exists_arg=''):
         """
         Arguments:
             * generator    - A generator that yields Page objects.
             * claims       - A list of wikidata claims
+            * exists_arg   - String specifying how to handle duplicate claims
 
         """
         self.generator = generator
         self.claims = claims
+        self.exists_arg = exists_arg
         self.repo = pywikibot.Site().data_repository()
         self.cacheSources()
 
@@ -78,44 +106,87 @@ class ClaimRobot:
         """
         Starts the robot.
         """
+        if self.exists_arg:
+            pywikibot.output('\'exists\' argument set to \'%s\'' % self.exists_arg)
         for page in self.generator:
-            item = pywikibot.ItemPage.fromPage(page)
             pywikibot.output('Processing %s' % page)
+            item = pywikibot.ItemPage.fromPage(page)
             if not item.exists():
-                pywikibot.output('%s doesn\'t have a wikidata item :(' % page)
                 # TODO FIXME: We should provide an option to create the page
-            else:
-                for claim in self.claims:
-                    if claim.getID() in item.get().get('claims'):
-                        pywikibot.output(
-                            u'A claim for %s already exists. Skipping'
-                            % (claim.getID(),))
-                        #TODO FIXME: This is a very crude way of dupe checking
+                pywikibot.output('%s doesn\'t have a wikidata item :(' % page)
+                continue
+            for claim in self.claims:
+                skip = False
+                # If claim with same property already exists...
+                if claim.getID() in item.claims:
+                    if self.exists_arg is None or 'p' not in self.exists_arg:
+                        pywikibot.log('Skipping %s because claim with same property already exists' % (claim.getID(),))
+                        pywikibot.log('Use the -exists:p option to override this behavior')
+                        skip = True
                     else:
-                        pywikibot.output('Adding %s --> %s'
-                                         % (claim.getID(), claim.getTarget()))
-                        item.addClaim(claim)
-                        # A generator might yield pages from multiple languages
-                        source = self.getSource(page.site.language())
-                        if source:
-                            claim.addSource(source, bot=True)
-                        # TODO FIXME: We need to check that we aren't adding a
-                        # duplicate
+                        existing_claims = item.claims[claim.getID()]  # Existing claims on page of same property
+                        for existing in existing_claims:
+                            skip = True  # Default value
+                            # If some attribute of the claim being added matches some attribute in an existing claim
+                            # of the same property, skip the claim, unless the 'exists' argument overrides it.
+                            if claim.getTarget() == existing.getTarget() and 't' not in self.exists_arg:
+                                pywikibot.log('Skipping %s because claim with same target already exists' % (claim.getID(),))
+                                pywikibot.log('Append \'t\' to the -exists argument to override this behavior')
+                                break
+                            if listsEqual(claim.getSources(), existing.getSources()) and 's' not in self.exists_arg:
+                                pywikibot.log('Skipping %s because claim with same sources already exists' % (claim.getID(),))
+                                pywikibot.log('Append \'s\' to the -exists argument to override this behavior')
+                                break
+                            if listsEqual(claim.qualifiers, existing.qualifiers) and 'q' not in self.exists_arg:
+                                pywikibot.log('Skipping %s because claim with same qualifiers already exists' % (claim.getID(),))
+                                pywikibot.log('Append \'q\' to the -exists argument to override this behavior')
+                                break
+                            skip = False
+                if not skip:
+                    pywikibot.output('Adding %s --> %s'
+                                     % (claim.getID(), claim.getTarget()))
+                    item.addClaim(claim)
+                    # A generator might yield pages from multiple languages
+                    source = self.getSource(page.site.language())
+                    if source:
+                        claim.addSource(source, bot=True)
+                    # TODO FIXME: We need to check that we aren't adding a
+                    # duplicate
+
+
+def listsEqual(list1, list2):
+    """
+    Returns true if the lists are probably equal, ignoring order.
+    Works for lists of unhashable items (like dictionaries).
+    """
+    if len(list1) != len(list2):
+        return False
+    if sorted(list1) != sorted(list2):
+        return False
+    for item in list1:
+        if not item in list2:
+            return False
+    return True
 
 
 def main():
+    exists_arg = ''
     gen = pagegenerators.GeneratorFactory()
     commandline_claims = list()
     for arg in pywikibot.handleArgs():
+        # Handle args specifying how to handle duplicate claims
+        if arg.startswith('-exists:'):
+            exists_arg = arg.split(':')[1].strip('"')
+            continue
+        # Handle page generator args
         if gen.handleArg(arg):
             continue
         commandline_claims.append(arg)
     if len(commandline_claims) % 2:
         raise ValueError  # or something.
+
     claims = list()
-
     repo = pywikibot.Site().data_repository()
-
     for i in xrange(0, len(commandline_claims), 2):
         claim = pywikibot.Claim(repo, commandline_claims[i])
         if claim.getType() == 'wikibase-item':
@@ -141,7 +212,7 @@ def main():
         # FIXME: Should throw some help
         return
 
-    bot = ClaimRobot(generator, claims)
+    bot = ClaimRobot(generator, claims, exists_arg)
     bot.run()
 
 if __name__ == "__main__":
