@@ -1656,7 +1656,8 @@ class ImagePage(Page):
                 in self.getFileVersionHistory():
             lines.append(u'| %s || %s || %s || %s || <nowiki>%s</nowiki>'
                          % (datetime, username, resolution, size, comment))
-        return u'{| border="1"\n! date/time || username || resolution || size || edit summary\n|----\n' + u'\n|----\n'.join(lines) + '\n|}'
+        return u'{| border="1"\n! date/time || username || resolution || size || edit summary\n|----\n' + \
+               u'\n|----\n'.join(lines) + '\n|}'
 
     def usingPages(self, step=None, total=None, content=False):
         """Yield Pages on which the image is displayed.
@@ -3208,7 +3209,7 @@ class Link(object):
                             """\
 %s is not a local page on %s, and the %s family is
 not supported by PyWikiBot!"""
-                            % (self._text, self._site(), familyName))
+                            % (self._text, self._site, familyName))
 
                 # Redundant interwiki prefix to the local wiki
                 if newsite == self._site:
