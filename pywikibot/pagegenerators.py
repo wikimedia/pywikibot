@@ -21,7 +21,6 @@ __version__ = '$Id$'
 #
 
 import codecs
-import date
 import itertools
 import re
 import time
