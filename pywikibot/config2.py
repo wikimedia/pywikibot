@@ -674,11 +674,11 @@ for _filename in _fns:
             if __sys.platform == 'win32' or _filemode & 0o02 == 0 or True:
                 exec(compile(open(_filename).read(), _filename, 'exec'))
             else:
-                print "WARNING: Skipped '%(fn)s': writeable by others." \
-                      % {'fn': _filename}
+                print("WARNING: Skipped '%(fn)s': writeable by others." \
+                      % {'fn': _filename})
         else:
-            print "WARNING: Skipped '%(fn)s': owned by someone else." \
-                  % {'fn': _filename}
+            print("WARNING: Skipped '%(fn)s': owned by someone else." \
+                  % {'fn': _filename})
 
 # Test for obsoleted and/or unknown variables.
 for _key, _val in globals().items():
@@ -696,14 +696,14 @@ for _key, _val in globals().items():
         elif ot is int and (nt is float or nt is bool):
             pass
         else:
-            print "WARNING: Type of '%(_key)s' changed" % locals()
-            print "         %(was)s: %(old)s" % {'was': "Was", 'old': ot}
-            print "         %(now)s: %(new)s" % {'now': "Now", 'new': nt}
+            print("WARNING: Type of '%(_key)s' changed" % locals())
+            print("         %(was)s: %(old)s" % {'was': "Was", 'old': ot})
+            print("         %(now)s: %(new)s" % {'now': "Now", 'new': nt})
         del nt, ot
     else:
-        print("WARNING: "
+        print(("WARNING: "
               "Configuration variable %(_key)r is defined but unknown.\n"
-              "Misspelled?" % locals())
+              "Misspelled?" % locals()))
 
 # Fix up default console_encoding
 if console_encoding is None:
@@ -739,7 +739,7 @@ if __name__ == "__main__":
         if _arg == "modified":
             _all = 0
         else:
-            print "Unknown arg %(_arg)s ignored" % locals()
+            print("Unknown arg %(_arg)s ignored" % locals())
     _k = globals().keys()
     _k.sort()
     for _name in _k:
@@ -747,7 +747,7 @@ if __name__ == "__main__":
             if not type(globals()[_name]) in [types.FunctionType,
                                               types.ModuleType]:
                 if _all or _glv[_name] != globals()[_name]:
-                    print _name, "=", repr(globals()[_name])
+                    print(_name, "=", repr(globals()[_name]))
 
 # cleanup all locally-defined variables
 for __var in globals().keys():

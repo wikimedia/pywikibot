@@ -2349,8 +2349,8 @@ def testMapEntry(formatName, showAll=True, value=None):
     if value is not None:
         start, stop = value, value + 1
     if showAll:
-        print(u"Processing %s with limits from %d to %d and step %d"
-              % (formatName, start, stop - 1, step))
+        pywikibot.output((u"Processing %s with limits from %d to %d and step %d"
+                         % (formatName, start, stop - 1, step)))
 
     for code, convFunc in formats[formatName].iteritems():
 ##        import time
@@ -2366,12 +2366,12 @@ def testMapEntry(formatName, showAll=True, value=None):
                         "     %s != %s: assert failed, values didn't match"
                         % (newValue, value))
                 if showAll:
-                    print(u"date.formats['%s']['%s'](%d): '%s' -> %d"
-                          % (formatName, code, value, convFunc(value),
-                             newValue))
+                    pywikibot.output((u"date.formats['%s']['%s'](%d): '%s' -> %d"
+                                     % (formatName, code, value, convFunc(value),
+                                        newValue)))
             except:
-                print(u"********** Error in date.formats['%s']['%s'](%d)"
-                      % (formatName, code, value))
+                pywikibot.output((u"********** Error in date.formats['%s']['%s'](%d)"
+                                 % (formatName, code, value)))
                 raise
 ##        print(u"%s\t%s\t%f" % (formatName, code, time.clock() - startClock))
 
@@ -2393,7 +2393,7 @@ def test(quick=False, showAll=False):
         else:
             # Extensive test! Test decade rounding
             testMapEntry(formatName, showAll)
-            print(u"'%s' complete." % formatName)
+            pywikibot.output((u"'%s' complete." % formatName))
     if quick:
 ##        print(u'Date module quick consistency test passed')
         pass

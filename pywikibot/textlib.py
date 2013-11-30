@@ -231,8 +231,8 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                                        match.group(groupID) + \
                                        replacement[groupMatch.end():])
                     except IndexError:
-                        print '\nInvalid group reference:', groupID
-                        print 'Groups found:\n', match.groups()
+                        pywikibot.output('\nInvalid group reference: %s' % groupID)
+                        pywikibot.output('Groups found:\n%s' % match.groups())
                         raise IndexError
             text = text[:match.start()] + replacement + text[match.end():]
 
