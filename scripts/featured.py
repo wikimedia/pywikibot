@@ -312,6 +312,9 @@ class FeaturedBot(pywikibot.Bot):
             except KeyboardInterrupt:
                 pywikibot.output('\nQuitting featured treat...')
                 break
+            except pywikibot.NoSuchSite:
+                pywikibot.output('"%s" is not a valid site. Skipping...' % code)
+                continue
         self.writecache()
 
     # not implemented yet
@@ -349,6 +352,9 @@ class FeaturedBot(pywikibot.Bot):
             except KeyboardInterrupt:
                 pywikibot.output('\nQuitting featured treat...')
                 break
+            except pywikibot.NoSuchSite:
+                pywikibot.output('"%s" is not a valid site. Skipping...' % code)
+                continue
         self.writecache()
 
     def treat(self, code, process):
