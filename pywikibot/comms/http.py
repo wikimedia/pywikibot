@@ -27,7 +27,10 @@ import urlparse
 import logging
 import atexit
 
-from httplib2 import SSLHandshakeError
+try:
+    from httplib2 import SSLHandshakeError
+except ImportError:
+    from ssl import SSLError as SSLHandshakeError
 from pywikibot import config
 from pywikibot.exceptions import FatalServerError, Server504Error
 import pywikibot
