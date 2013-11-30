@@ -1071,10 +1071,10 @@ def main(*args):
                 generator = pagegenerators.NamespaceFilterPageGenerator(
                     generator, [0])
             except pywikibot.NoPage:
-                print "Disambiguation category for your wiki is not known."
+                pywikibot.output("Disambiguation category for your wiki is not known.")
                 raise
         elif arg.startswith("-"):
-            print "Unrecognized command line argument: %s" % arg
+            pywikibot.output("Unrecognized command line argument: %s" % arg)
             # show help text and exit
             pywikibot.showHelp()
         else:

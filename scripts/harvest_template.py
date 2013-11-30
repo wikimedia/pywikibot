@@ -146,7 +146,7 @@ class HarvestRobot:
                                 elif claim.getType() == 'string':
                                     claim.setTarget(value.strip())
                                 else:
-                                    print "%s is not a supported datatype." % claim.getType()
+                                    pywikibot.output("%s is not a supported datatype." % claim.getType())
                                     continue
 
                                 pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget()))

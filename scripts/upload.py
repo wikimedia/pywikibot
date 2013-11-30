@@ -84,8 +84,7 @@ class UploadRobot:
             infile = uo.open(self.url)
 
             if 'text/html' in infile.info().getheader('Content-Type'):
-                print \
-"Couldn't download the image: the requested URL was not found on server."
+                pywikibot.output(u"Couldn't download the image: the requested URL was not found on server.")
                 return
 
             content_len = infile.info().getheader('Content-Length')
@@ -157,7 +156,7 @@ class UploadRobot:
                 invalid = set(forbidden) & set(newfn)
                 if invalid:
                     c = "".join(invalid)
-                    print "Invalid character(s): %s. Please try again" % c
+                    pywikibot.output("Invalid character(s): %s. Please try again" % c)
                     continue
                 if ext not in allowed_formats:
                     choice = pywikibot.inputChoice(

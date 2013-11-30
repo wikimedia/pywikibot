@@ -259,7 +259,7 @@ class PageFromFileReader:
             f = codecs.open(self.filename, 'r',
                             encoding=config.textfile_encoding)
         except IOError as err:
-            print err
+            pywikibot.output(str(err))
             return
 
         text = f.read()

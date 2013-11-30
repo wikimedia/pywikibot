@@ -336,7 +336,7 @@ class DuplicateReferences:
                     if not name in foundRefNames:
                         # first time ever we meet this name
                         if name == 'population':
-                            print "in"
+                            pywikibot.output("in")
                         v[2] = quoted
                         v[0] = name
                     else:

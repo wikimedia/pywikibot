@@ -58,7 +58,7 @@ class SyncSites:
         else:
             original_wiki = config.mylang
 
-        print "Syncing from " + original_wiki
+        pywikibot.output("Syncing from " + original_wiki)
 
         family = options.family or config.family
 
@@ -69,19 +69,19 @@ class SyncSites:
         if options.namespace and 'help' in options.namespace:
             nsd = namespaces(self.original)
             for k in nsd:
-                print k, nsd[k]
+                pywikibot.output('%s %s' % (k, nsd[k]))
             sys.exit()
 
         self.sites = map(lambda s: getSite(s, family), sites)
 
         self.differences = {}
         self.user_diff = {}
-        print 'Syncing to',
+        pywikibot.output('Syncing to', newline=False)
         for s in self.sites:
             self.differences[s] = []
             self.user_diff[s] = []
-            print s,
-        print
+            pywikibot.output(str(s), newline=False)
+        pywikibot.output('')
 
     def check_sysops(self):
         '''Check if sysops are the same
@@ -115,9 +115,9 @@ class SyncSites:
         ]
 
         if self.options.namespace:
-            print options.namespace
+            pywikibot.output(str(options.namespace))
             namespaces = [int(options.namespace)]
-        print "Checking these namespaces", namespaces, "\n"
+        pywikibot.output("Checking these namespaces: %s\n" % (namespaces,))
 
         for ns in namespaces:
             self.check_namespace(ns)
@@ -125,7 +125,7 @@ class SyncSites:
     def check_namespace(self, namespace):
         '''Check an entire namespace'''
 
-        print "\nCHECKING NAMESPACE", namespace
+        pywikibot.output("\nCHECKING NAMESPACE %s" % namespace)
         pages = imap(lambda p: p.title(),
                      self.original.allpages('!', namespace=namespace))
         for p in pages:
@@ -134,10 +134,10 @@ class SyncSites:
                 try:
                     self.check_page(p)
                 except pywikibot.exceptions.NoPage:
-                    print 'Bizarre NoPage exception that we are just going to ignore'
+                    pywikibot.output('Bizarre NoPage exception that we are just going to ignore')
                 except pywikibot.exceptions.IsRedirectPage:
-                    print 'error: Redirectpage - todo: handle gracefully'
-        print
+                    pywikibot.output('error: Redirectpage - todo: handle gracefully')
+        pywikibot.output('')
 
     def generate_overviews(self):
         '''Create page on wikis with overview of bot results'''
@@ -155,7 +155,7 @@ class SyncSites:
             else:
                 output += "All users from original are also present on this wiki"
 
-            print output
+            pywikibot.output(output)
             sync_overview_page.put(output, self.put_message(site))
 
     def put_message(self, site):
@@ -164,7 +164,7 @@ class SyncSites:
     def check_page(self, pagename):
         '''Check one page'''
 
-        print "\nChecking", pagename,
+        pywikibot.output("\nChecking %s" % pagename)
         sys.stdout.flush()
         page1 = Page(self.original, pagename)
         txt1 = page1.get()
@@ -175,7 +175,7 @@ class SyncSites:
                 if prefix:
                     prefix += ':'
                 new_pagename = prefix + page1.titleWithoutNamespace()
-                print "\nCross namespace, new title: ", new_pagename
+                pywikibot.output("\nCross namespace, new title: %s", new_pagename)
             else:
                 new_pagename = pagename
 
@@ -189,12 +189,12 @@ class SyncSites:
             if str(site) in config.replicate_replace:
                 txt_new = multiple_replace(txt1, config.replicate_replace[str(site)])
                 if txt1 != txt_new:
-                    print 'NOTE: text replaced using config.sync_replace'
-                    print txt1, txt_new, txt2
+                    pywikibot.output('NOTE: text replaced using config.sync_replace')
+                    pywikibot.output('%s %s %s' % (txt1, txt_new, txt2))
                     txt1 = txt_new
 
             if txt1 != txt2:
-                print "\n", site, 'DIFFERS'
+                pywikibot.output("\n %s DIFFERS" % site)
                 self.differences[site].append(pagename)
 
         if self.options.replace:

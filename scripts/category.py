@@ -672,19 +672,16 @@ class CategoryTidyRobot:
             contextLength = full_text.find('\n\n', contextLength + 2)
         if contextLength > 1000 or contextLength < 0:
             contextLength = 500
-        print
-        pywikibot.output(full_text[:contextLength])
-        print
+
+        pywikibot.output('\n' + full_text[:contextLength] + '\n')
 
         subcatlist = self.catDB.getSubcats(current_cat)
         supercatlist = self.catDB.getSupercats(current_cat)
-        print
+
         if len(subcatlist) == 0:
-            print 'This category has no subcategories.'
-            print
+            pywikibot.output('This category has no subcategories.\n')
         if len(supercatlist) == 0:
-            print 'This category has no supercategories.'
-            print
+            pywikibot.output('This category has no supercategories.\n')
         # show subcategories as possible choices (with numbers)
         for i in range(len(supercatlist)):
             # layout: we don't expect a cat to have more than 10 supercats
@@ -694,22 +691,22 @@ class CategoryTidyRobot:
             # layout: we don't expect a cat to have more than 100 subcats
             pywikibot.output(u'%2d - Move down to %s'
                              % (i, subcatlist[i].title()))
-        print ' j - Jump to another category'
-        print ' s - Skip this article'
-        print ' r - Remove this category tag'
-        print ' ? - Print first part of the page (longer and longer)'
+        pywikibot.output(' j - Jump to another category')
+        pywikibot.output(' s - Skip this article')
+        pywikibot.output(' r - Remove this category tag')
+        pywikibot.output(' ? - Print first part of the page (longer and longer)')
         pywikibot.output(u'Enter - Save category as %s' % current_cat.title())
 
         flag = False
         while not flag:
-            print ''
+            pywikibot.output('')
             choice = pywikibot.input(u'Choice:')
             if choice in ['s', 'S']:
                 flag = True
             elif choice == '':
                 pywikibot.output(u'Saving category as %s' % current_cat.title())
                 if current_cat == original_cat:
-                    print 'No changes necessary.'
+                    pywikibot.output('No changes necessary.')
                 else:
                     catlib.change_category(article, original_cat, current_cat,
                                            comment=self.editSummary)
@@ -728,15 +725,13 @@ class CategoryTidyRobot:
                 flag = True
             elif choice == '?':
                 contextLength += 500
-                print
-                pywikibot.output(full_text[:contextLength])
-                print
+                pywikibot.output('\n' + full_text[:contextLength] + '\n')
 
                 # if categories possibly weren't visible, show them additionally
                 # (maybe this should always be shown?)
                 if len(full_text) > contextLength:
-                    print ''
-                    print 'Original categories: '
+                    pywikibot.output('')
+                    pywikibot.output('Original categories: ')
                     for cat in article.categories():
                         pywikibot.output(u'* %s' % cat.title())
             elif choice[0] == 'u':
