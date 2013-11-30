@@ -2147,7 +2147,7 @@ class InterwikiBot(object):
                              % fs.originPage)
         pywikibot.output(u"NOTE: Number of pages queued is %d, trying to add %d more."
                          % (len(self.subjects), number))
-        for i in xrange(number):
+        for i in range(number):
             try:
                 while True:
                     try:
@@ -2306,7 +2306,7 @@ class InterwikiBot(object):
     def queryStep(self):
         self.oneQuery()
         # Delete the ones that are done now.
-        for i in xrange(len(self.subjects) - 1, -1, -1):
+        for i in range(len(self.subjects) - 1, -1, -1):
             subj = self.subjects[i]
             if subj.isDone():
                 subj.finish()

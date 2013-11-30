@@ -235,7 +235,7 @@ if sys.platform == "win32":
     argc = c_int(0)
     argv_unicode = CommandLineToArgvW(GetCommandLineW(), byref(argc))
 
-    argv = [argv_unicode[i].encode('utf-8') for i in xrange(0, argc.value)]
+    argv = [argv_unicode[i].encode('utf-8') for i in range(0, argc.value)]
 
     if not hasattr(sys, 'frozen'):
         # If this is an executable produced by py2exe or bbfreeze, then it will

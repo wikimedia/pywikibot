@@ -105,7 +105,7 @@ class TestSiteObject(PywikibotTestCase):
                             for b in builtins))
         ns = mysite.namespaces()
         self.assertType(ns, dict)
-        self.assertTrue(all(x in ns for x in xrange(0, 16)))
+        self.assertTrue(all(x in ns for x in range(0, 16)))
             # built-in namespaces always present
         self.assertType(mysite.ns_normalize("project"), basestring)
         self.assertTrue(all(isinstance(key, int)
@@ -471,7 +471,7 @@ class TestSiteObject(PywikibotTestCase):
                 self.assertTrue(prop in block)
         # timestamps should be in descending order
         timestamps = [block['timestamp'] for block in bl]
-        for t in xrange(1, len(timestamps)):
+        for t in range(1, len(timestamps)):
             self.assertTrue(timestamps[t] <= timestamps[t - 1])
 
         b2 = list(mysite.blocks(total=10, reverse=True))
@@ -482,7 +482,7 @@ class TestSiteObject(PywikibotTestCase):
                 self.assertTrue(prop in block)
         # timestamps should be in ascending order
         timestamps = [block['timestamp'] for block in b2]
-        for t in xrange(1, len(timestamps)):
+        for t in range(1, len(timestamps)):
             self.assertTrue(timestamps[t] >= timestamps[t - 1])
 
         for block in mysite.blocks(starttime="2008-07-01T00:00:01Z", total=5):

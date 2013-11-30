@@ -556,7 +556,7 @@ def main(*args):
             )
     elif (len(commandline_replacements) > 1):
         if (fix is None):
-            for i in xrange(0, len(commandline_replacements), 2):
+            for i in range(0, len(commandline_replacements), 2):
                 replacements.append((commandline_replacements[i],
                                      commandline_replacements[i + 1]))
             if not summary_commandline:

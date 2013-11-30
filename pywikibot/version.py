@@ -94,13 +94,13 @@ def getversion_svn(path=None):
         tag = tag[:-len(name)]
         date = time.gmtime(date / 1000000)
     else:
-        for i in xrange(3):
+        for i in range(3):
             entries.readline()
         tag = entries.readline().strip()
         t = tag.split('://')
         t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/', '')
         tag = '[%s] %s' % (t[0], t[1])
-        for i in xrange(4):
+        for i in range(4):
             entries.readline()
         date = time.strptime(entries.readline()[:19], '%Y-%m-%dT%H:%M:%S')
         rev = entries.readline()[:-1]
