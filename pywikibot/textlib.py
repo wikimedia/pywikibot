@@ -20,7 +20,11 @@ except ImportError:
     mwparserfromhell = False
 import pywikibot
 import re
-from HTMLParser import HTMLParser
+try:
+    from HTMLParser import HTMLParser
+except ImportError:
+    from html.parser import HTMLParser
+
 from . import config2 as config
 
 TEMP_REGEX = re.compile(
