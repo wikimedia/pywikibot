@@ -544,7 +544,7 @@ def main(*args):
     pywikibot.Site().login()
     gen = genFactory.getCombinedGenerator()
     if (len(commandline_replacements) % 2):
-        raise pywikibot.Error, 'require even number of replacements.'
+        raise pywikibot.Error('require even number of replacements.')
     elif (len(commandline_replacements) == 2 and fix is None):
         replacements.append((commandline_replacements[0],
                              commandline_replacements[1]))
