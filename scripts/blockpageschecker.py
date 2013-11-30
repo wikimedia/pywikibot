@@ -462,12 +462,12 @@ def main():
                         else:
                             # Prevent Infinite Loops
                             raise pywikibot.ServerError(u'Fifth Server Error!')
-                    except pywikibot.SpamfilterError, e:
+                    except pywikibot.SpamfilterError as e:
                         pywikibot.output(u'Cannot change %s because of '
                                          u'blacklist entry %s'
                                          % (page.title(), e.url))
                         break
-                    except pywikibot.PageNotSaved, error:
+                    except pywikibot.PageNotSaved as error:
                         pywikibot.output(u'Error putting page: %s'
                                          % (error.args,))
                         break

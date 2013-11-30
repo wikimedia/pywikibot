@@ -77,7 +77,7 @@ class MovePagesBot:
             pywikibot.output(u'Page %s is a redirect; skipping.' % page.title())
         except pywikibot.LockedPage:
             pywikibot.output(u'Page %s is locked!' % page.title())
-        except pywikibot.PageNotSaved, e:
+        except pywikibot.PageNotSaved as e:
             #target newPageTitle already exists
             pywikibot.output(e.message)
 

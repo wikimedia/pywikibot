@@ -453,7 +453,7 @@ class NowCommonsDeleteBot:
                     else:
                         pywikibot.output(
                             u'The image is not identical to the one on Commons.')
-            except (pywikibot.NoPage, pywikibot.IsRedirectPage), e:
+            except (pywikibot.NoPage, pywikibot.IsRedirectPage) as e:
                 pywikibot.output(u'%s' % e[0])
                 continue
 

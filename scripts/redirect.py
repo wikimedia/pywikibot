@@ -467,14 +467,14 @@ class RedirectRobot:
                 pywikibot.warning(
                     u"Redirect target section %s doesn't exist."
                     % newRedir.title(asLink=True))
-            except pywikibot.CircularRedirect, e:
+            except pywikibot.CircularRedirect as e:
                 try:
                     pywikibot.warning(u"Skipping circular redirect: [[%s]]"
                                       % str(e))
                 except UnicodeDecodeError:
                     pywikibot.warning(u"Skipping circular redirect")
                 break
-            except pywikibot.BadTitle, e:
+            except pywikibot.BadTitle as e:
                 # str(e) is in the format 'BadTitle: [[Foo]]'
                 pywikibot.warning(
                     u'Redirect target %s is not a valid page title.'
@@ -589,18 +589,18 @@ class RedirectRobot:
                     redir.put(text, summary)
                 except pywikibot.LockedPage:
                     pywikibot.output(u'%s is locked.' % redir.title())
-                except pywikibot.SpamfilterError, error:
+                except pywikibot.SpamfilterError as error:
                     pywikibot.output(
                         u"Saving page [[%s]] prevented by spam filter: %s"
                         % (redir.title(), error.url))
-                except pywikibot.PageNotSaved, error:
+                except pywikibot.PageNotSaved as error:
                     pywikibot.output(u"Saving page [[%s]] failed: %s"
                                      % (redir.title(), error))
                 except pywikibot.NoUsername:
                     pywikibot.output(
                         u"Page [[%s]] not saved; sysop privileges required."
                         % redir.title())
-                except pywikibot.Error, error:
+                except pywikibot.Error as error:
                     pywikibot.output(
                         u"Unexpected error occurred trying to save [[%s]]: %s"
                         % (redir.title(), error))

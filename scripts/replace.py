@@ -408,11 +408,11 @@ class ReplaceRobot:
                 except pywikibot.EditConflict:
                     pywikibot.output(u'Skipping %s because of edit conflict'
                                      % (page.title(),))
-                except pywikibot.SpamfilterError, e:
+                except pywikibot.SpamfilterError as e:
                     pywikibot.output(
                         u'Cannot change %s because of blacklist entry %s'
                         % (page.title(), e.url))
-                except pywikibot.PageNotSaved, error:
+                except pywikibot.PageNotSaved as error:
                     pywikibot.output(u'Error putting page: %s'
                                      % (error.args,))
                 except pywikibot.LockedPage:

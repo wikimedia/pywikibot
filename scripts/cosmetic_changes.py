@@ -191,7 +191,7 @@ class CosmeticChangesToolkit:
             text = self.fixArabicLetters(text)
         try:
             text = isbn.hyphenateIsbnNumbers(text)
-        except isbn.InvalidIsbnException, error:
+        except isbn.InvalidIsbnException as error:
             pywikibot.log(u"ISBN error: %s" % error)
             pass
         if self.debug:

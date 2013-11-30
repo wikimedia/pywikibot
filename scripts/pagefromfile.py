@@ -231,7 +231,7 @@ class PageFromFileRobot:
             pywikibot.output(u"Page %s is locked; skipping." % title)
         except pywikibot.EditConflict:
             pywikibot.output(u'Skipping %s because of edit conflict' % title)
-        except pywikibot.SpamfilterError, error:
+        except pywikibot.SpamfilterError as error:
             pywikibot.output(
                 u'Cannot change %s because of spam blacklist entry %s'
                 % (title, error.url))
@@ -258,7 +258,7 @@ class PageFromFileReader:
         try:
             f = codecs.open(self.filename, 'r',
                             encoding=config.textfile_encoding)
-        except IOError, err:
+        except IOError as err:
             print err
             return
 
@@ -274,7 +274,7 @@ class PageFromFileReader:
                 else:
                     pywikibot.output(u'End of file.')
                 break
-            except NoTitle, err:
+            except NoTitle as err:
                 pywikibot.output(u'\nNo title found - skipping a page.')
                 position += err.offset
                 continue

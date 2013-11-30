@@ -257,12 +257,12 @@ Match was: %s''' % result)
                         continue
                     else:
                         raise pywikibot.ServerError(u'Fifth Server Error!')
-                except pywikibot.SpamfilterError, e:
+                except pywikibot.SpamfilterError as e:
                     pywikibot.output(
                         u'Cannot change %s because of blacklist entry %s'
                         % (page.title(), e.url))
                     return (False, False, always)
-                except pywikibot.PageNotSaved, error:
+                except pywikibot.PageNotSaved as error:
                     pywikibot.output(u'Error putting page: %s' % error.args)
                     return (False, False, always)
                 except pywikibot.LockedPage:

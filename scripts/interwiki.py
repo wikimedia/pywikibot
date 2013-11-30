@@ -1995,15 +1995,15 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     pywikibot.output(
                         u'ERROR putting page: An edit conflict occurred. Giving up.')
                     raise SaveError(u'Edit conflict')
-                except (pywikibot.SpamfilterError), error:
+                except (pywikibot.SpamfilterError) as error:
                     pywikibot.output(
                         u'ERROR putting page: %s blacklisted by spamfilter. Giving up.'
                         % (error.url,))
                     raise SaveError(u'Spam filter')
-                except (pywikibot.PageNotSaved), error:
+                except (pywikibot.PageNotSaved) as error:
                     pywikibot.output(u'ERROR putting page: %s' % (error.args,))
                     raise SaveError(u'PageNotSaved')
-                except (socket.error, IOError), error:
+                except (socket.error, IOError) as error:
                     if timeout > 3600:
                         raise
                     pywikibot.output(u'ERROR putting page: %s' % (error.args,))

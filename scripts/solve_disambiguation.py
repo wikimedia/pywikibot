@@ -567,7 +567,7 @@ class DisambiguationRobot(object):
                                  % (self.mysite.redirect(default=True), target)
                     try:
                         refPage.put_async(redir_text, comment=self.comment)
-                    except pywikibot.PageNotSaved, error:
+                    except pywikibot.PageNotSaved as error:
                         pywikibot.output(u'Page not saved: %s' % error.args)
             else:
                 choice = pywikibot.inputChoice(
@@ -832,7 +832,7 @@ u"Choice out of range. Please select a number between 0 and %i."
                     refPage.put_async(text, comment=self.comment)
                 except pywikibot.LockedPage:
                     pywikibot.output(u'Page not saved: page is locked')
-                except pywikibot.PageNotSaved, error:
+                except pywikibot.PageNotSaved as error:
                     pywikibot.output(u'Page not saved: %s' % error.args)
         return True
 

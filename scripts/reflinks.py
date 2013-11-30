@@ -471,16 +471,16 @@ class ReferencesRobot:
             except pywikibot.EditConflict:
                 pywikibot.output(u'Skipping %s because of edit conflict'
                                   % (page.title(),))
-            except pywikibot.SpamfilterError, e:
+            except pywikibot.SpamfilterError as e:
                 pywikibot.output(
                     u'Cannot change %s because of blacklist entry %s'
                     % (page.title(), e.url))
-            except pywikibot.PageNotSaved, error:
+            except pywikibot.PageNotSaved as error:
                 pywikibot.error(u'putting page: %s' % (error.args,))
             except pywikibot.LockedPage:
                 pywikibot.output(u'Skipping %s (locked page)'
                                   % (page.title(),))
-            except pywikibot.ServerError, e:
+            except pywikibot.ServerError as e:
                 pywikibot.output(u'Server Error : %s' % e)
 
     def httpError(self, err_num, link, pagetitleaslink):
@@ -632,7 +632,7 @@ class ReferencesRobot:
                         u'\03{lightred}Bad link\03{default} : %s in %s'
                         % (ref.url, page.title(asLink=True)))
                     continue
-                except urllib2.HTTPError, e:
+                except urllib2.HTTPError as e:
                     pywikibot.output(u'HTTP error (%s) for %s on %s'
                                      % (e.code, ref.url,
                                         page.title(asLink=True)),
@@ -647,7 +647,7 @@ class ReferencesRobot:
                 except (urllib2.URLError,
                         socket.error,
                         IOError,
-                        httplib.error), e:
+                        httplib.error) as e:
                     pywikibot.output(u'Can\'t retrieve page %s : %s'
                                      % (ref.url, e))
                     continue

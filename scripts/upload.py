@@ -214,7 +214,7 @@ class UploadRobot:
                 site.upload(imagepage, source_filename=temp,
                             ignore_warnings=self.ignoreWarning)
 
-        except pywikibot.UploadWarning, warn:
+        except pywikibot.UploadWarning as warn:
             pywikibot.output(u"We got a warning message: ", newline=False)
             pywikibot.output(str(warn))
             answer = pywikibot.inputChoice(u"Do you want to ignore?",
@@ -227,7 +227,7 @@ class UploadRobot:
                 pywikibot.output(u"Upload aborted.")
                 return
 
-        except Exception, e:
+        except Exception as e:
             pywikibot.error("Upload error: ", exc_info=True)
 
         else:

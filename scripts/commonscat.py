@@ -309,7 +309,7 @@ class CommonscatBot:
                     pywikibot.output(
                         u'Skipping %s because of edit conflict'
                         % (page.title()))
-                except pywikibot.SpamfilterError, error:
+                except pywikibot.SpamfilterError as error:
                     pywikibot.output(
                         u'Cannot change %s because of spam blacklist entry %s'
                         % (page.title(), error.url))

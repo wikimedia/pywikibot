@@ -1349,10 +1349,10 @@ class ISBN10(ISBN):
 def getIsbn(code):
     try:
         i = ISBN13(code)
-    except InvalidIsbnException, e13:
+    except InvalidIsbnException as e13:
         try:
             i = ISBN10(code)
-        except InvalidIsbnException, e10:
+        except InvalidIsbnException as e10:
             raise InvalidIsbnException(u'ISBN-13: %s / ISBN-10: %s'
                                        % (e13, e10))
     return i
@@ -1415,7 +1415,7 @@ class IsbnBot:
                 code = match.group('code')
                 try:
                     getIsbn(code)
-                except InvalidIsbnException, e:
+                except InvalidIsbnException as e:
                     pywikibot.output(e)
 
             newText = oldText
@@ -1456,7 +1456,7 @@ class IsbnBot:
                 except pywikibot.EditConflict:
                     pywikibot.output(u'Skipping %s because of edit conflict'
                                      % (page.title(),))
-                except pywikibot.SpamfilterError, e:
+                except pywikibot.SpamfilterError as e:
                     pywikibot.output(
                         u'Cannot change %s because of blacklist entry %s'
                         % (page.title(), e.url))

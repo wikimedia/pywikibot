@@ -304,7 +304,7 @@ class AddCategory:
             else:
                 pywikibot.output(u"Page %s does not exist; skipping."
                                  % page.title(asLink=True))
-        except pywikibot.IsRedirectPage, arg:
+        except pywikibot.IsRedirectPage as arg:
             redirTarget = pywikibot.Page(self.site, arg.args[0])
             if self.follow_redirects:
                 text = redirTarget.get()
@@ -349,7 +349,7 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
                         pywikibot.output(
                             u'Skipping %s because of edit conflict'
                             % (page.title()))
-                    except pywikibot.SpamfilterError, error:
+                    except pywikibot.SpamfilterError as error:
                         pywikibot.output(
                             u'Cannot change %s because of spam blacklist entry '
                             u'%s' % (page.title(), error.url))
@@ -435,7 +435,7 @@ class CategoryMoveRobot:
                     newTalkTitle = newCat.toggleTalkPage().title()
                     try:
                         talkMoved = oldTalk.move(newTalkTitle, reason)
-                    except (pywikibot.NoPage, pywikibot.PageNotSaved), e:
+                    except (pywikibot.NoPage, pywikibot.PageNotSaved) as e:
                         #in order :
                         #Source talk does not exist, or
                         #Target talk already exists

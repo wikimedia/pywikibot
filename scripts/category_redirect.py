@@ -118,7 +118,7 @@ class CategoryRedirectBot(object):
                 'title': article.title(asLink=True, textlink=True),
                 'oldcat': oldCat.title(asLink=True, textlink=True),
                 'newcat': newCat.title(asLink=True, textlink=True)})
-        except pywikibot.SpamfilterError, error:
+        except pywikibot.SpamfilterError as error:
             pywikibot.output(
                 u'Changing page %s blocked by spam filter (URL=%s)'
                 % (article.title(asLink=True), error.url))
@@ -130,7 +130,7 @@ class CategoryRedirectBot(object):
                 'title': article.title(asLink=True, textlink=True),
                 'oldcat': oldCat.title(asLink=True, textlink=True),
                 'newcat': newCat.title(asLink=True, textlink=True)})
-        except pywikibot.PageNotSaved, error:
+        except pywikibot.PageNotSaved as error:
             pywikibot.output(u"Saving page %s failed: %s"
                              % (article.title(asLink=True), error))
         return False
@@ -298,7 +298,7 @@ class CategoryRedirectBot(object):
                                          % (template_list[0],
                                             page.title(asLink=True,
                                                        textlink=True)))
-                except pywikibot.Error, e:
+                except pywikibot.Error as e:
                     self.log_text.append(u"* Failed to add {{tl|%s}} to %s"
                                          % (template_list[0],
                                             page.title(asLink=True,
@@ -423,7 +423,7 @@ class CategoryRedirectBot(object):
                                 i18n.twtranslate(self.site.lang,
                                                  self.dbl_redir_comment),
                                 minorEdit=True)
-                    except pywikibot.Error, e:
+                    except pywikibot.Error as e:
                         self.log_text.append("** Failed: %s" % e)
                 continue
 
