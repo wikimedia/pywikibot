@@ -1053,10 +1053,9 @@ def UntaggedPageGenerator(untaggedProject, limit=500):
     link = '%s&%s&max=%d&order=img_timestamp' % (URL, wiki, limit)
     results = re.findall(REGEXP, http.request(site=None, uri=link))
     if not results:
-        print link
         raise pywikibot.Error(
-            'Nothing found! Try to use the tool by yourself to be sure that it '
-            'works!')
+            'Nothing found at %s! Try to use the tool by yourself to be sure that it '
+            'works!' % link)
     else:
         for result in results:
             yield pywikibot.Page(pywikibot.getSite(), result)
