@@ -96,9 +96,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         # Module invocations (currently only Lua)
         'invoke':       re.compile(r'(?i)\{\{\s*#invoke:.*?}\}'),
         # categories
-        'category':     re.compile(ur'\[\[ *(?:%s)\s*:.*?\]\]' % ur'|'.join(site.namespace(14, all=True))),
+        'category':     re.compile(u'\[\[ *(?:%s)\s*:.*?\]\]' % u'|'.join(site.namespace(14, all=True))),
         #files
-        'file':         re.compile(ur'\[\[ *(?:%s)\s*:.*?\]\]' % ur'|'.join(site.namespace(6, all=True))),
+        'file':         re.compile(u'\[\[ *(?:%s)\s*:.*?\]\]' % u'|'.join(site.namespace(6, all=True))),
 
     }
 
@@ -947,12 +947,12 @@ def extract_templates_and_params_regex(text):
     marker4 = findmarker(thistxt, u'§§', u'§')
 
     result = []
-    Rmath = re.compile(ur'<math>[^<]+</math>')
+    Rmath = re.compile(r'<math>[^<]+</math>')
     Rvalue = re.compile(r'{{{.+?}}}')
-    Rmarker1 = re.compile(ur'%s(\d+)%s' % (marker1, marker1))
-    Rmarker2 = re.compile(ur'%s(\d+)%s' % (marker2, marker2))
-    Rmarker3 = re.compile(ur'%s(\d+)%s' % (marker3, marker3))
-    Rmarker4 = re.compile(ur'%s(\d+)%s' % (marker4, marker4))
+    Rmarker1 = re.compile(r'%s(\d+)%s' % (marker1, marker1))
+    Rmarker2 = re.compile(r'%s(\d+)%s' % (marker2, marker2))
+    Rmarker3 = re.compile(r'%s(\d+)%s' % (marker3, marker3))
+    Rmarker4 = re.compile(r'%s(\d+)%s' % (marker4, marker4))
 
     # Replace math with markers
     maths = {}

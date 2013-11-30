@@ -519,7 +519,7 @@ class FeaturedBot(pywikibot.Bot):
         def compile_link(site, templates):
             """compile one link template list"""
             findtemplate = '(%s)' % '|'.join(templates)
-            return re.compile(ur"\{\{%s\|%s\}\}"
+            return re.compile(r"\{\{%s\|%s\}\}"
                               % (findtemplate.replace(u' ', u'[ _]'),
                                  site.code), re.IGNORECASE)
 

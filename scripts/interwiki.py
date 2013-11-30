@@ -516,7 +516,7 @@ class Global(object):
             f = codecs.open(hintfilename, 'r', config.textfile_encoding)
 
             # hint or title ends either before | or before ]]
-            R = re.compile(ur'\[\[(.+?)(?:\]\]|\|)')
+            R = re.compile(r'\[\[(.+?)(?:\]\]|\|)')
             for pageTitle in R.findall(f.read()):
                 self.hints.append(pageTitle)
             f.close()

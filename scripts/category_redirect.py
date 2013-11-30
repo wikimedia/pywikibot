@@ -257,15 +257,15 @@ class CategoryRedirectBot(object):
         #  note that any templates containing optional "category:" are
         #  incorrect and will be fixed by the bot
         template_regex = re.compile(
-            ur"""{{\s*(?:%(prefix)s\s*:\s*)?  # optional "template:"
-                      (?:%(template)s)\s*\|   # catredir template name
-                      (\s*%(catns)s\s*:\s*)?  # optional "category:"
-                      ([^|}]+)                # redirect target cat
-                      (?:\|[^|}]*)*}}         # optional arguments 2+, ignored
-              """ % {'prefix': self.site.namespace(10).lower(),
-                     'template': "|".join(item.replace(" ", "[ _]+")
-                                          for item in template_list),
-                     'catns': self.site.namespace(14)},
+            r"""{{\s*(?:%(prefix)s\s*:\s*)?  # optional "template:"
+                     (?:%(template)s)\s*\|   # catredir template name
+                     (\s*%(catns)s\s*:\s*)?  # optional "category:"
+                     ([^|}]+)                # redirect target cat
+                     (?:\|[^|}]*)*}}         # optional arguments 2+, ignored
+             """ % {'prefix': self.site.namespace(10).lower(),
+                    'template': "|".join(item.replace(" ", "[ _]+")
+                                         for item in template_list),
+                    'catns': self.site.namespace(14)},
             re.I | re.X)
 
         # check for hard-redirected categories that are not already marked

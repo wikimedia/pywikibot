@@ -697,27 +697,27 @@ class CosmeticChangesToolkit:
         # convert prettytable to wikitable class
         if self.site.language in ('de', 'en'):
             text = pywikibot.replaceExcept(text,
-                                           ur'(class="[^"]*)prettytable([^"]*")',
-                                           ur'\1wikitable\2', exceptions)
+                                           r'(class="[^"]*)prettytable([^"]*")',
+                                           r'\1wikitable\2', exceptions)
         return text
 
     def fixTypo(self, text):
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace', 'gallery', 'hyperlink', 'interwiki', 'link']
         # change <number> ccm -> <number> cm³
-        text = pywikibot.replaceExcept(text, ur'(\d)\s*&nbsp;ccm',
-                                       ur'\1&nbsp;cm³', exceptions)
-        text = pywikibot.replaceExcept(text, ur'(\d)\s*ccm', ur'\1&nbsp;cm³',
+        text = pywikibot.replaceExcept(text, r'(\d)\s*&nbsp;ccm',
+                                       r'\1&nbsp;' + u'cm³', exceptions)
+        text = pywikibot.replaceExcept(text, r'(\d)\s*ccm', r'\1&nbsp;' + u'cm³',
                                        exceptions)
         # Solve wrong Nº sign with °C or °F
         # additional exception requested on fr-wiki for this stuff
         pattern = re.compile(u'«.*?»', re.UNICODE)
         exceptions.append(pattern)
-        text = pywikibot.replaceExcept(text, ur'(\d)\s*&nbsp;[º°]([CF])',
-                                       ur'\1&nbsp;°\2', exceptions)
-        text = pywikibot.replaceExcept(text, ur'(\d)\s*[º°]([CF])',
-                                       ur'\1&nbsp;°\2', exceptions)
-        text = pywikibot.replaceExcept(text, ur'º([CF])', ur'°\1', exceptions)
+        text = pywikibot.replaceExcept(text, r'(\d)\s*&nbsp;' + u'[º°]([CF])',
+                                       r'\1&nbsp;' + u'°' + r'\2', exceptions)
+        text = pywikibot.replaceExcept(text, r'(\d)\s*' + u'[º°]([CF])',
+                                       r'\1&nbsp;' + u'°' + r'\2', exceptions)
+        text = pywikibot.replaceExcept(text, u'º([CF])', u'°' + r'\1', exceptions)
         return text
 
     def fixArabicLetters(self, text):
@@ -756,12 +756,12 @@ class CosmeticChangesToolkit:
         text = pywikibot.replaceExcept(text, u',', u'،', exceptions)
         if self.site.lang == 'ckb':
             text = pywikibot.replaceExcept(text,
-                                           ur'ه([.،_<\]\s])',
-                                           ur'ە\1', exceptions)
+                                           u'\u0647([.\u060c_<\\]\\s])',
+                                           u'\u06d5\\1', exceptions)
             text = pywikibot.replaceExcept(text, u'ه‌', u'ە', exceptions)
             text = pywikibot.replaceExcept(text, u'ه', u'ھ', exceptions)
         text = pywikibot.replaceExcept(text, u'ك', u'ک', exceptions)
-        text = pywikibot.replaceExcept(text, ur'[ىي]', u'ی', exceptions)
+        text = pywikibot.replaceExcept(text, u'[ىي]', u'ی', exceptions)
         return text
         # replace persian/arabic digits
         ## deactivated due to bug #3539407

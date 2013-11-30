@@ -103,14 +103,14 @@ deadLinkTag = {
 
 
 soft404 = re.compile(
-    ur'\D404(\D|\Z)|error|errdoc|Not.{0,3}Found|sitedown|eventlog',
+    r'\D404(\D|\Z)|error|errdoc|Not.{0,3}Found|sitedown|eventlog',
     re.IGNORECASE)
 # matches an URL at the index of a website
 dirIndex = re.compile(
-    ur'^\w+://[^/]+/((default|index)\.(asp|aspx|cgi|htm|html|phtml|mpx|mspx|php|shtml|var))?$',
+    r'^\w+://[^/]+/((default|index)\.(asp|aspx|cgi|htm|html|phtml|mpx|mspx|php|shtml|var))?$',
     re.IGNORECASE)
 # Extracts the domain name
-domain = re.compile(ur'^(\w+)://(?:www.|)([^/]+)')
+domain = re.compile(r'^(\w+)://(?:www.|)([^/]+)')
 
 globalbadtitles = """
 # is
@@ -162,11 +162,11 @@ badtitles = {
 # Regex that match bare references
 linksInRef = re.compile(
     # bracketed URLs
-    ur'(?i)<ref(?P<name>[^>]*)>\s*\[?(?P<url>(?:http|https|ftp)://(?:' +
+    r'(?i)<ref(?P<name>[^>]*)>\s*\[?(?P<url>(?:http|https|ftp)://(?:' +
     # unbracketed with()
-    ur'^\[\]\s<>"]+\([^\[\]\s<>"]+[^\[\]\s\.:;\\,<>\?"]+|' +
+    r'^\[\]\s<>"]+\([^\[\]\s<>"]+[^\[\]\s\.:;\\,<>\?"]+|' +
     # unbracketed without ()
-    ur'[^\[\]\s<>"]+[^\[\]\s\)\.:;\\,<>\?"]+|[^\[\]\s<>"]+))[!?,\s]*\]?\s*</ref>')
+    r'[^\[\]\s<>"]+[^\[\]\s\)\.:;\\,<>\?"]+|[^\[\]\s<>"]+))[!?,\s]*\]?\s*</ref>')
 
 # Download this file :
 # http://www.twoevils.org/files/wikipedia/404-links.txt.gz
@@ -436,18 +436,18 @@ class ReferencesRobot:
             raise
 
         # Regex to grasp content-type meta HTML tag in HTML source
-        self.META_CONTENT = re.compile(ur'(?i)<meta[^>]*content\-type[^>]*>')
+        self.META_CONTENT = re.compile(r'(?i)<meta[^>]*content\-type[^>]*>')
         # Extract the encoding from a charset property (from content-type !)
-        self.CHARSET = re.compile(ur'(?i)charset\s*=\s*(?P<enc>[^\'";>/]*)')
+        self.CHARSET = re.compile(r'(?i)charset\s*=\s*(?P<enc>[^\'";>/]*)')
         # Extract html title from page
-        self.TITLE = re.compile(ur'(?is)(?<=<title>).*?(?=</title>)')
+        self.TITLE = re.compile(r'(?is)(?<=<title>).*?(?=</title>)')
         # Matches content inside <script>/<style>/HTML comments
         self.NON_HTML = re.compile(
-            ur'(?is)<script[^>]*>.*?</script>|<style[^>]*>.*?</style>|<!--.*?-->|<!\[CDATA\[.*?\]\]>')
+            r'(?is)<script[^>]*>.*?</script>|<style[^>]*>.*?</style>|<!--.*?-->|<!\[CDATA\[.*?\]\]>')
 
         # Authorized mime types for HTML pages
         self.MIME = re.compile(
-            ur'application/(?:xhtml\+xml|xml)|text/(?:ht|x)ml')
+            r'application/(?:xhtml\+xml|xml)|text/(?:ht|x)ml')
 
     def put_page(self, page, new):
         """ Prints diffs between orginal and new (text), puts new text for page
