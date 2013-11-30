@@ -205,7 +205,7 @@ class GeneratorFactory(object):
         Only call this after all arguments have been parsed.
         """
         namespaces = [int(n) for n in self.namespaces]
-        for i in xrange(len(self.gens)):
+        for i in range(len(self.gens)):
             if isinstance(self.gens[i], pywikibot.data.api.QueryGenerator):
                 if self.namespaces:
                     self.gens[i].set_namespace(namespaces)
@@ -767,7 +767,7 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
     if site is None:
         site = pywikibot.Site()
     # convert namespace names to namespace numbers
-    for i in xrange(len(namespaces)):
+    for i in range(len(namespaces)):
         ns = namespaces[i]
         if isinstance(ns, basestring):
             try:
@@ -1273,7 +1273,7 @@ def YearPageGenerator(start=1, end=2050, site=None):
     if site is None:
         site = pywikibot.Site()
     pywikibot.output(u"Starting with year %i" % start)
-    for i in xrange(start, end + 1):
+    for i in range(start, end + 1):
         if i % 100 == 0:
             pywikibot.output(u'Preparing %i...' % i)
         # There is no year 0
@@ -1288,8 +1288,8 @@ def DayPageGenerator(startMonth=1, endMonth=12, site=None):
     fd = date.FormatDate(site)
     firstPage = pywikibot.Page(site, fd(startMonth, 1))
     pywikibot.output(u"Starting with %s" % firstPage.title(asLink=True))
-    for month in xrange(startMonth, endMonth + 1):
-        for day in xrange(1, date.getNumberOfDaysInMonth(month) + 1):
+    for month in range(startMonth, endMonth + 1):
+        for day in range(1, date.getNumberOfDaysInMonth(month) + 1):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
 
 if __name__ == "__main__":

@@ -350,7 +350,7 @@ class CosmeticChangesToolkit:
                     # bug #3346901 should be implemented
                     continue
             # lowerspaced and underscored namespaces
-            for i in xrange(len(namespaces)):
+            for i in range(len(namespaces)):
                 item = namespaces[i].replace(' ', '[ _]')
                 item = u'[%s%s]' % (item[0], item[0].lower()) + item[1:]
                 namespaces[i] = item
@@ -765,7 +765,7 @@ class CosmeticChangesToolkit:
         return text
         # replace persian/arabic digits
         ## deactivated due to bug #3539407
-        for i in xrange(0, 10):
+        for i in range(0, 10):
             text = pywikibot.replaceExcept(text, old[i], new[i], exceptions)
         # do not change digits in class, style and table params
         pattern = re.compile(u'\w+=(".+?"|\d+)', re.UNICODE)
@@ -775,7 +775,7 @@ class CosmeticChangesToolkit:
         exceptions.append(pattern)
         exceptions.append('table')  # exclude tables for now
         # replace digits
-        for i in xrange(0, 10):
+        for i in range(0, 10):
             text = pywikibot.replaceExcept(text, str(i), new[i], exceptions)
         return text
 

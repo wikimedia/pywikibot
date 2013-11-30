@@ -135,7 +135,7 @@ class UI:
             # Note: A transliteration replacement might be longer than the
             # original character, e.g. ч is transliterated to ch.
             prev = "-"
-            for i in xrange(len(codecedText)):
+            for i in range(len(codecedText)):
                 # work on characters that couldn't be encoded, but not on
                 # original question marks.
                 if codecedText[i] == '?' and text[i] != u'?':

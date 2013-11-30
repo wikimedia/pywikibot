@@ -1090,7 +1090,7 @@ class Page(object):
                     intkeys[int(key)] = args[key]
                 except ValueError:
                     named[key] = args[key]
-            for i in xrange(1, len(intkeys) + 1):
+            for i in range(1, len(intkeys) + 1):
                 # only those args with consecutive integer keys can be
                 # treated as positional; an integer could also be used
                 # (out of order) as the key for a named argument

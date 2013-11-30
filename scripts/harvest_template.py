@@ -177,7 +177,7 @@ def main():
         raise ValueError  # or something.
     fields = dict()
 
-    for i in xrange(0, len(commandline_arguments), 2):
+    for i in range(0, len(commandline_arguments), 2):
         fields[commandline_arguments[i]] = commandline_arguments[i + 1]
 
     generator = gen.getCombinedGenerator()

@@ -187,7 +187,7 @@ def main():
 
     claims = list()
     repo = pywikibot.Site().data_repository()
-    for i in xrange(0, len(commandline_claims), 2):
+    for i in range(0, len(commandline_claims), 2):
         claim = pywikibot.Claim(repo, commandline_claims[i])
         if claim.getType() == 'wikibase-item':
             target = pywikibot.ItemPage(repo, commandline_claims[i + 1])
