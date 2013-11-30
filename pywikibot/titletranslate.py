@@ -56,7 +56,7 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None, fami
                     newname = page.title()
                 # ... unless we do want brackets
                 if removebrackets:
-                    newname = re.sub(re.compile(ur"\W*?\(.*?\)\W*?", re.UNICODE), u" ", newname)
+                    newname = re.sub(re.compile(r"\W*?\(.*?\)\W*?", re.UNICODE), u" ", newname)
             try:
                 number = int(codes)
                 codes = site.family.languages_by_size[:number]
