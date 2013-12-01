@@ -6,9 +6,14 @@
 #
 __version__ = '$Id$'
 
-from urlparse import urlparse
+import sys
+if sys.version_info[0] == 2:
+    from urlparse import urlparse
+else:
+    from urllib.parse import urlparse
+
 import pywikibot.weblib as weblib
-from utils import unittest
+from tests.utils import unittest
 
 
 class TestArchiveSites(unittest.TestCase):

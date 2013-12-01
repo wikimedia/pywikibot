@@ -39,7 +39,7 @@ import os
 import sys
 import time
 
-from utils import unittest
+from tests.utils import unittest
 
 if os.name == "nt":
     from multiprocessing.managers import BaseManager

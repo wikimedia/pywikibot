@@ -16,7 +16,7 @@ import os
 import pywikibot
 import pywikibot.textlib as textlib
 
-from utils import unittest
+from tests.utils import unittest
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")

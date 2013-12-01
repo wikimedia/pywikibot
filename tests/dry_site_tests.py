@@ -10,7 +10,7 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot.site import must_be
 
-from utils import PywikibotTestCase, unittest
+from tests.utils import PywikibotTestCase, unittest
 
 
 class DrySite(pywikibot.site.APISite):

@@ -13,7 +13,7 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot.site import must_be
 from tests import patch_request, unpatch_request
-from utils import PywikibotTestCase, unittest
+from tests.utils import PywikibotTestCase, unittest
 
 mysite = None
 mainpage = None

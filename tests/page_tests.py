@@ -13,7 +13,7 @@ __version__ = '$Id$'
 import pywikibot
 import pywikibot.page
 
-from utils import PywikibotTestCase, unittest
+from tests.utils import PywikibotTestCase, unittest
 
 site = pywikibot.Site('en', 'wikipedia')
 mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
