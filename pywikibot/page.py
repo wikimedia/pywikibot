@@ -21,8 +21,13 @@ import htmlentitydefs
 import logging
 import re
 import unicodedata
-import urllib
 import collections
+
+import urllib
+try:
+    from urllib.parse import quote_from_bytes, unquote_to_bytes
+except ImportError:
+    from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 
 logger = logging.getLogger("pywiki.wiki.page")
 
@@ -167,7 +172,7 @@ class Page(object):
             title = title.replace(u' ', u'_')
         if asUrl:
             encodedTitle = title.encode(self.site.encoding())
-            title = urllib.quote(encodedTitle)
+            title = quote_from_bytes(encodedTitle)
         if as_filename:
             # Replace characters that are not possible in file names on some
             # systems.
@@ -3527,7 +3532,7 @@ def url2unicode(title, site, site2=None):
     for enc in encList:
         try:
             t = title.encode(enc)
-            t = urllib.unquote(t)
+            t = unquote_to_bytes(t)
             return unicode(t, enc)
         except UnicodeError as ex:
             if not firstException:
