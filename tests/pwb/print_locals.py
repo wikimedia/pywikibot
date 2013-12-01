@@ -1,4 +1,4 @@
 """docstring"""
 
-for k, v in locals().copy().iteritems():
-    print repr(k), ":", repr(v)
+for k, v in locals().copy().items():
+    print("%r: %r" % (k, v))
