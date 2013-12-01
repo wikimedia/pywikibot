@@ -61,7 +61,7 @@ def run_python_file(filename, argv, argvu):
 
     try:
         source = open(filename).read()
-        exec compile(source, filename, "exec") in main_mod.__dict__
+        exec(compile(source, filename, "exec"), main_mod.__dict__)
     finally:
         # Restore the old __main__
         sys.modules['__main__'] = old_main_mod
@@ -99,8 +99,8 @@ for i, x in enumerate(sys.argv):
 
 user_config_path = os.path.join(os.environ["PYWIKIBOT2_DIR"], "user-config.py")
 if not os.path.exists(user_config_path):
-    print "NOTE:", user_config_path, "was not found!"
-    print "Please follow the prompts to create it:"
+    print("NOTE: %s was not found" % user_config_path)
+    print("Please follow the prompts to create it:")
     path = 'generate_user_files.py'
     run_python_file(path, [path], [path.decode('ascii')])
 
@@ -122,4 +122,4 @@ if len(sys.argv) > 1:
                 raise Exception("%s not found!" % fn)
     run_python_file(fn, argv, argvu)
 elif __name__ == "__main__":
-    print __doc__
+    print(__doc__)
