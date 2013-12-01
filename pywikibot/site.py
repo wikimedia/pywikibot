@@ -34,6 +34,9 @@ from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import *
 
+if sys.version_info[0] > 2:
+    basestring = (str,)
+
 _logger = "wiki.site"
 
 

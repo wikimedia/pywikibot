@@ -17,17 +17,21 @@ from pywikibot import config
 import pywikibot.site
 
 import hashlib
-import htmlentitydefs
+
+try:
+    import htmlentitydefs
+    from urllib.parse import quote_from_bytes, unquote_to_bytes
+except ImportError:
+    unicode = str
+    from html import entities as htmlentitydefs
+    from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
+
 import logging
 import re
 import unicodedata
 import collections
 
 import urllib
-try:
-    from urllib.parse import quote_from_bytes, unquote_to_bytes
-except ImportError:
-    from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 
 logger = logging.getLogger("pywiki.wiki.page")
 
