@@ -29,8 +29,11 @@ Tests for the page module.
 #
 __version__ = '$Id$'
 
-import cStringIO
-import StringIO
+try:
+    import cStringIO
+except ImportError:
+    from io import StringIO as cStringIO
+
 import logging
 import os
 import sys
@@ -91,7 +94,7 @@ if __name__ == "__main__":
 
     newstdout = cStringIO.StringIO()
     newstderr = cStringIO.StringIO()
-    newstdin = StringIO.StringIO()
+    newstdin = cStringIO.StringIO()
 
     def patch():
         sys.stdout = newstdout
