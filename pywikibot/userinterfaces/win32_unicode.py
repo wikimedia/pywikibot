@@ -19,7 +19,7 @@
 # Licensed under both CC-BY-SA as the MIT license.
 #
 ################################################
-
+from __future__ import print_function
 import sys
 stdin = sys.stdin
 stdout = sys.stdout
