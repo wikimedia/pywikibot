@@ -109,17 +109,14 @@ if len(sys.argv) > 1:
     fn = sys.argv[1]
     argv = sys.argv[1:]
     argvu = pwb.argvu[1:]
-
+    if not fn.endswith('.py'):
+        fn += '.py'
     if not os.path.exists(fn):
         testpath = os.path.join(os.path.split(__file__)[0], 'scripts', fn)
         if os.path.exists(testpath):
             fn = testpath
         else:
-            testpath = testpath + '.py'
-            if os.path.exists(testpath):
-                fn = testpath
-            else:
-                raise Exception("%s not found!" % fn)
+            raise OSError("%s not found!" % fn)
     run_python_file(fn, argv, argvu)
 elif __name__ == "__main__":
     print(__doc__)
