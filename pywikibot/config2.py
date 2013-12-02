@@ -674,10 +674,10 @@ for _filename in _fns:
             if __sys.platform == 'win32' or _filemode & 0o02 == 0 or True:
                 exec(compile(open(_filename).read(), _filename, 'exec'))
             else:
-                print("WARNING: Skipped '%(fn)s': writeable by others." \
+                print("WARNING: Skipped '%(fn)s': writeable by others."
                       % {'fn': _filename})
         else:
-            print("WARNING: Skipped '%(fn)s': owned by someone else." \
+            print("WARNING: Skipped '%(fn)s': owned by someone else."
                   % {'fn': _filename})
 
 # Test for obsoleted and/or unknown variables.
@@ -747,7 +747,7 @@ if __name__ == "__main__":
             if not type(globals()[_name]) in [types.FunctionType,
                                               types.ModuleType]:
                 if _all or _glv[_name] != globals()[_name]:
-                    print(_name, "=", repr(globals()[_name]))
+                    print("%s=%s" % (_name, repr(globals()[_name])))
 
 # cleanup all locally-defined variables
 for __var in list(globals().keys()):
