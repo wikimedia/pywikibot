@@ -523,9 +523,9 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
            u'<!-- interwiki at top -->' in oldtext:
             #do not add separator if interwiki links are on one line
             newtext = (s +
-                       [u''
-                        if site.language() in site.family.interwiki_on_one_line
-                        else separator] +
+                       u''
+                       if site.language() in site.family.interwiki_on_one_line
+                       else separator +
                        s2.replace(marker, '').strip())
         else:
             # calculate what was after the language links on the page
