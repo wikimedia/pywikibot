@@ -225,7 +225,7 @@ class ReplaceRobot:
     """
     def __init__(self, generator, replacements, exceptions={},
                  acceptall=False, allowoverlap=False, recursive=False,
-                 addedCat=None, sleep=None, summary=''):
+                 addedCat=None, sleep=None, summary='', site=None):
         """
         Arguments:
             * generator    - A generator that yields Page objects.
@@ -266,10 +266,12 @@ class ReplaceRobot:
         self.acceptall = acceptall
         self.allowoverlap = allowoverlap
         self.recursive = recursive
+        self.site = site
+        if self.site is None:
+            self.site = pywikibot.getSite()
         if addedCat:
-            site = pywikibot.getSite()
             cat_ns = site.category_namespaces()[0]
-            self.addedCat = pywikibot.Page(site,
+            self.addedCat = pywikibot.Page(self.site,
                                            cat_ns + ':' + addedCat)
         self.sleep = sleep
         self.summary = summary
@@ -314,7 +316,8 @@ class ReplaceRobot:
             if self.sleep is not None:
                 time.sleep(self.sleep)
             new_text = pywikibot.replaceExcept(new_text, old, new, exceptions,
-                                               allowoverlap=self.allowoverlap)
+                                               allowoverlap=self.allowoverlap,
+                                               site=self.site)
         return new_text
 
     def run(self):
@@ -342,9 +345,9 @@ class ReplaceRobot:
             new_text = original_text
             while True:
                 if self.isTextExcepted(new_text):
-                    pywikibot.output(
-    u'Skipping %s because it contains text that is on the exceptions list.'
-    % page.title(asLink=True))
+                    pywikibot.output(u'Skipping %s because it contains text '
+                                     u'that is on the exceptions list.'
+                                     % page.title(asLink=True))
                     break
                 new_text = self.doReplacements(new_text)
                 if new_text == original_text:
@@ -570,7 +573,8 @@ def main(*args):
                                                 {'description':
                                                  replacementsDescription})
         else:
-            raise pywikibot.Error('Specifying -fix with replacements is undefined')
+            raise pywikibot.Error(
+                'Specifying -fix with replacements is undefined')
     elif fix is None:
         old = pywikibot.input(u'Please enter the text that should be replaced:')
         new = pywikibot.input(u'Please enter the new text:')
