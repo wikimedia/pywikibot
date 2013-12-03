@@ -1918,7 +1918,7 @@ for monthOfYear in yrMnthFmts:
     formats[monthOfYear] = {}
 
 
-def addFmt(lang, isMnthOfYear, patterns):
+def addFmt1(lang, isMnthOfYear, patterns):
     """Add 12 month formats for a specific type ('January','Feb..), for a given
     language. The function must accept one parameter for the ->int or ->string
     conversions, just like everywhere else in the formats map.
@@ -1939,7 +1939,8 @@ def addFmt(lang, isMnthOfYear, patterns):
 
 
 def addFmt2(lang, isMnthOfYear, pattern, makeUpperCase=None):
-    addFmt(lang, isMnthOfYear, makeMonthNamedList(lang, pattern, makeUpperCase))
+    addFmt1(lang, isMnthOfYear,
+            makeMonthNamedList(lang, pattern, makeUpperCase))
 
 
 def makeMonthList(pattern):
@@ -1967,23 +1968,23 @@ def makeMonthNamedList(lang, pattern, makeUpperCase=None):
 #
 addFmt2('af', False, u"%%d %s", True)
 addFmt2('als', False, u"%%d. %s", True)
-addFmt ('an', False, [u"%d de chinero", u"%d de frebero", u"%d de marzo",
+addFmt1('an', False, [u"%d de chinero", u"%d de frebero", u"%d de marzo",
                       u"%d d'abril", u"%d de mayo", u"%d de chunio",
                       u"%d de chulio", u"%d d'agosto", u"%d de setiembre",
                       u"%d d'otubre", u"%d de nobiembre", u"%d d'abiento"])
-##addFmt ('ang',False, [u"%d Æfterra Gēola", u"%d Solmōnaþ", u"%d Hréþmónaþ",
+##addFmt1('ang',False, [u"%d Æfterra Gēola", u"%d Solmōnaþ", u"%d Hréþmónaþ",
 ##                      u"%d Éastermónaþ", u"%d Þrimilcemónaþ", u"%d Séremónaþ",
 ##                      u"%d Mǽdmónaþ", u"%d Wéodmónaþ", u"%d Háligmónaþ",
 ##                      u"%d Winterfylleþ", u"%d Blótmónaþ", u"%d Gēolmōnaþ"])
 addFmt2('ang', False, u"%%d %s", True)
-addFmt ('ar', False, [u"%d يناير", u"%d فبراير", u"%d مارس", u"%d أبريل",
+addFmt1('ar', False, [u"%d يناير", u"%d فبراير", u"%d مارس", u"%d أبريل",
                       u"%d مايو", u"%d يونيو", u"%d يوليو", u"%d أغسطس",
                       u"%d سبتمبر", u"%d أكتوبر", u"%d نوفمبر", u"%d ديسمبر"])
-addFmt ('ast', False, [u"%d de xineru", u"%d de febreru", u"%d de marzu",
+addFmt1('ast', False, [u"%d de xineru", u"%d de febreru", u"%d de marzu",
                        u"%d d'abril", u"%d de mayu", u"%d de xunu",
                        u"%d de xunetu", u"%d d'agostu", u"%d de setiembre",
                        u"%d d'ochobre", u"%d de payares", u"%d d'avientu"])
-addFmt ('be', False, [u"%d студзеня", u"%d лютага", u"%d сакавіка",
+addFmt1('be', False, [u"%d студзеня", u"%d лютага", u"%d сакавіка",
                       u"%d красавіка", u"%d траўня", u"%d чэрвеня",
                       u"%d ліпеня", u"%d жніўня", u"%d верасьня",
                       u"%d кастрычніка", u"%d лістапада", u"%d сьнежня"])
@@ -1991,12 +1992,12 @@ addFmt2('bg', False, u"%%d %s", False)
 ##addFmt2('br', False, u"%%d %s", True) # See bellow for br initialization
 addFmt2('bn', False, u"%s %%B")
 addFmt2('bs', False, u"%%d. %s", False)
-addFmt ('ca', False, [u"%d de gener", u"%d de febrer", u"%d de març",
+addFmt1('ca', False, [u"%d de gener", u"%d de febrer", u"%d de març",
                       u"%d d'abril", u"%d de maig", u"%d de juny",
                       u"%d de juliol", u"%d d'agost", u"%d de setembre",
                       u"%d d'octubre", u"%d de novembre", u"%d de desembre"])
 addFmt2('ceb', False, u"%s %%d", True)
-addFmt ('co', False, [u"%d di ghjennaghju", u"%d di frivaghju", u"%d di marzu",
+addFmt1('co', False, [u"%d di ghjennaghju", u"%d di frivaghju", u"%d di marzu",
                       u"%d d'aprile", u"%d di maghju", u"%d di ghjugnu",
                       u"%d di lugliu", u"%d d'aostu", u"%d di settembre",
                       u"%d d'uttrovi", u"%d di nuvembri", u"%d di decembre"])
@@ -2006,7 +2007,7 @@ addFmt2('cv', False, u"%s, %%d", True)
 addFmt2('cy', False, u"%%d %s", True)
 addFmt2('da', False, u"%%d. %s", False)
 addFmt2('de', False, u"%%d. %s", True)
-addFmt ('el', False, [u"%d Ιανουαρίου", u"%d Φεβρουαρίου", u"%d Μαρτίου",
+addFmt1('el', False, [u"%d Ιανουαρίου", u"%d Φεβρουαρίου", u"%d Μαρτίου",
                       u"%d Απριλίου", u"%d Μαΐου", u"%d Ιουνίου",
                       u"%d Ιουλίου", u"%d Αυγούστου", u"%d Σεπτεμβρίου",
                       u"%d Οκτωβρίου", u"%d Νοεμβρίου", u"%d Δεκεμβρίου"])
@@ -2015,24 +2016,24 @@ addFmt2('eo', False, u"%%d-a de %s", False)
 addFmt2('es', False, u"%%d de %s", False)
 addFmt2('et', False, u"%%d. %s", False)
 addFmt2('eu', False, u"%saren %%d", True)
-addFmt ('fa', False, [u"%d ژانویه", u"%d فوریه", u"%d مارس", u"%d آوریل",
+addFmt1('fa', False, [u"%d ژانویه", u"%d فوریه", u"%d مارس", u"%d آوریل",
                       u"%d مه", u"%d ژوئن", u"%d ژوئیه", u"%d اوت",
                       u"%d سپتامبر", u"%d اکتبر", u"%d نوامبر", u"%d دسامبر"])
 addFmt2('fi', False, u"%%d. %sta", False)
 addFmt2('fo', False, u"%%d. %s", False)
-addFmt ('fr', False, [u"%d janvier", u"%d février", u"%d mars", u"%d avril",
+addFmt1('fr', False, [u"%d janvier", u"%d février", u"%d mars", u"%d avril",
                       u"%d mai", u"%d juin", u"%d juillet", u"%d août",
                       u"%d septembre", u"%d octobre", u"%d novembre",
                       u"%d décembre"])
 addFmt2('fur', False, u"%%d di %s", True)
 addFmt2('fy', False, u"%%d %s", False)
-addFmt ('ga', False, [u"%d Eanáir", u"%d Feabhra", u"%d Márta", u"%d Aibreán",
+addFmt1('ga', False, [u"%d Eanáir", u"%d Feabhra", u"%d Márta", u"%d Aibreán",
                       u"%d Bealtaine", u"%d Meitheamh", u"%d Iúil",
                       u"%d Lúnasa", u"%d Meán Fómhair", u"%d Deireadh Fómhair",
                       u"%d Samhain", u"%d Mí na Nollag"])
 addFmt2('gl', False, u"%%d de %s", False)
 addFmt2('he', False, u"%%d ב%s")  # [u"%d בינואר", u"%d בפברואר", u"%d במרץ", u"%d באפריל", u"%d במאי", u"%d ביוני", u"%d ביולי", u"%d באוגוסט", u"%d בספטמבר", u"%d באוקטובר", u"%d בנובמבר", u"%d בדצמבר"])
-addFmt ('hr', False, [u"%d. siječnja", u"%d. veljače", u"%d. ožujka",
+addFmt1('hr', False, [u"%d. siječnja", u"%d. veljače", u"%d. ožujka",
                       u"%d. travnja", u"%d. svibnja", u"%d. lipnja",
                       u"%d. srpnja", u"%d. kolovoza", u"%d. rujna",
                       u"%d. listopada", u"%d. studenog", u"%d. prosinca"])
@@ -2041,35 +2042,35 @@ addFmt2('ia', False, u"%%d de %s", False)
 addFmt2('id', False, u"%%d %s", True)
 addFmt2('ie', False, u"%%d %s", False)
 addFmt2('io', False, u"%%d di %s", False)
-addFmt ('is', False, [u"%d. janúar", u"%d. febrúar", u"%d. mars", u"%d. apríl",
+addFmt1('is', False, [u"%d. janúar", u"%d. febrúar", u"%d. mars", u"%d. apríl",
                       u"%d. maí", u"%d. júní", u"%d. júlí", u"%d. ágúst",
                       u"%d. september", u"%d. október", u"%d. nóvember",
                       u"%d. desember"])
 addFmt2('it', False, u"%%d %s", False)
-addFmt ('ja', False, makeMonthList(u"%d月%%d日"))
+addFmt1('ja', False, makeMonthList(u"%d月%%d日"))
 addFmt2('jv', False, u"%%d %s", True)
 addFmt2('ka', False, u"%%d %s")
-addFmt ('ko', False, makeMonthList(u"%d월 %%d일"))
-addFmt ('ku', False, [u"%d'ê rêbendanê", u"%d'ê reşemiyê", u"%d'ê adarê",
+addFmt1('ko', False, makeMonthList(u"%d월 %%d일"))
+addFmt1('ku', False, [u"%d'ê rêbendanê", u"%d'ê reşemiyê", u"%d'ê adarê",
                       u"%d'ê avrêlê", u"%d'ê gulanê", u"%d'ê pûşperê",
                       u"%d'ê tîrmehê", u"%d'ê gelawêjê", u"%d'ê rezberê",
                       u"%d'ê kewçêrê", u"%d'ê sermawezê", u"%d'ê berfanbarê"])
-addFmt ('la', False, [u"%d Ianuarii", u"%d Februarii", u"%d Martii",
+addFmt1('la', False, [u"%d Ianuarii", u"%d Februarii", u"%d Martii",
                       u"%d Aprilis", u"%d Maii", u"%d Iunii", u"%d Iulii",
                       u"%d Augusti", u"%d Septembris", u"%d Octobris",
                       u"%d Novembris", u"%d Decembris"])
 addFmt2('lb', False, u"%%d. %s", True)
-addFmt ('li', False, [u"%d januari", u"%d februari", u"%d miert", u"%d april",
+addFmt1('li', False, [u"%d januari", u"%d februari", u"%d miert", u"%d april",
                       u"%d mei", u"%d juni", u"%d juli", u"%d augustus",
                       u"%d september", u"%d oktober", u"%d november",
                       u"%d december"])
-addFmt ('lt', False, [u"Sausio %d", u"Vasario %d", u"Kovo %d", u"Balandžio %d",
+addFmt1('lt', False, [u"Sausio %d", u"Vasario %d", u"Kovo %d", u"Balandžio %d",
                       u"Gegužės %d", u"Birželio %d", u"Liepos %d",
                       u"Rugpjūčio %d", u"Rugsėjo %d", u"Spalio %d",
                       u"Lapkričio %d", u"Gruodžio %d"])
 addFmt2('lv', False, u"%%d. %s", False)
 addFmt2('mhr', False, u"%%d %s", False)
-addFmt ('mk', False, [u"%d јануари", u"%d февруари", u"%d март", u"%d април",
+addFmt1('mk', False, [u"%d јануари", u"%d февруари", u"%d март", u"%d април",
                       u"%d мај", u"%d јуни", u"%d јули", u"%d август",
                       u"%d септември", u"%d октомври", u"%d ноември",
                       u"%d декември"])
@@ -2077,45 +2078,45 @@ addFmt2('ml', False, u"%s %%d")
 addFmt2('ms', False, u"%%d %s", True)
 addFmt2('nap', False, u"%%d 'e %s", False)
 addFmt2('nds', False, u"%%d. %s", True)
-addFmt ('nl', False, [u"%%d %s" % v
+addFmt1('nl', False, [u"%%d %s" % v
                       for v in [u"januari", u"februari", u"maart", u"april",
                                 u"mei", u"juni", u"juli", u"augustus",
                                 u"september", u"oktober", u"november",
                                 u"december"]])
-addFmt ('nn', False, [u"%%d. %s" % v
+addFmt1('nn', False, [u"%%d. %s" % v
                       for v in [u"januar", u"februar", u"mars", u"april",
                                 u"mai", u"juni", u"juli", u"august",
                                 u"september", u"oktober", u"november",
                                 u"desember"]])
 addFmt2('no', False, u"%%d. %s", False)
-addFmt ('oc', False, [u"%d de genièr", u"%d de febrièr", u"%d de març",
+addFmt1('oc', False, [u"%d de genièr", u"%d de febrièr", u"%d de març",
                       u"%d d'abril", u"%d de mai", u"%d de junh",
                       u"%d de julhet", u"%d d'agost", u"%d de setembre",
                       u"%d d'octobre", u"%d de novembre", u"%d de decembre"])
-addFmt ('os', False, [u"%d январы", u"%d февралы", u"%d мартъийы",
+addFmt1('os', False, [u"%d январы", u"%d февралы", u"%d мартъийы",
                       u"%d апрелы", u"%d майы", None, u"%d июлы", None,
                       u"%d сентябры", None, u"%d ноябры", u"%d декабры"])
-addFmt ('pl', False, [u"%d stycznia", u"%d lutego", u"%d marca",
+addFmt1('pl', False, [u"%d stycznia", u"%d lutego", u"%d marca",
                       u"%d kwietnia", u"%d maja", u"%d czerwca", u"%d lipca",
                       u"%d sierpnia", u"%d września", u"%d października",
                       u"%d listopada", u"%d grudnia"])
 addFmt2('pt', False, u"%%d de %s", True)
 addFmt2('ro', False, u"%%d %s", False)
-addFmt ('ru', False, [u"%d января", u"%d февраля", u"%d марта",
+addFmt1('ru', False, [u"%d января", u"%d февраля", u"%d марта",
                       u"%d апреля", u"%d мая", u"%d июня", u"%d июля",
                       u"%d августа", u"%d сентября", u"%d октября",
                       u"%d ноября", u"%d декабря"])
 addFmt2('sco', False, u"%%d %s", True)
 addFmt2('scn', False, u"%%d di %s", False)
-addFmt ('se', False, [u"ođđajagimánu %d.", u"guovvamánu %d.", u"njukčamánu %d.",
+addFmt1('se', False, [u"ođđajagimánu %d.", u"guovvamánu %d.", u"njukčamánu %d.",
                       u"cuoŋománu %d.", u"miessemánu %d.", u"geassemánu %d.",
                       u"suoidnemánu %d.", u"borgemánu %d.", u"čakčamánu %d.",
                       u"golggotmánu %d.", u"skábmamánu %d.", u"juovlamánu %d."])
-addFmt ('sh', False, makeMonthList(u"%%d.%d."))
+addFmt1('sh', False, makeMonthList(u"%%d.%d."))
 addFmt2('simple', False, u"%s %%d", True)
 addFmt2('sk', False, u"%%d. %s", False)
 addFmt2('sl', False, u"%%d. %s", False)
-addFmt ('sq', False, [u"%d Janar", u"%d Shkurt", u"%d Mars", u"%d Prill",
+addFmt1('sq', False, [u"%d Janar", u"%d Shkurt", u"%d Mars", u"%d Prill",
                       u"%d Maj", u"%d Qershor", u"%d Korrik", u"%d Gusht",
                       u"%d Shtator", u"%d Tetor", u"%d Nëntor", u"%d Dhjetor"])
 addFmt2('sr', False, u"%%d. %s", False)
@@ -2127,17 +2128,17 @@ addFmt2('th', False, u"%%d %s")  # %%T
 addFmt2('tl', False, u"%s %%d")
 addFmt2('tr', False, u"%%d %s", True)
 addFmt2('tt', False, u"%%d. %s", True)
-addFmt ('uk', False, [u"%d січня", u"%d лютого", u"%d березня", u"%d квітня",
+addFmt1('uk', False, [u"%d січня", u"%d лютого", u"%d березня", u"%d квітня",
                       u"%d травня", u"%d червня", u"%d липня", u"%d серпня",
                       u"%d вересня", u"%d жовтня", u"%d листопада",
                       u"%d грудня"])
-addFmt ('ur', False, [u"%d جنوری", u"%d فروری", u"%d مارچ", u"%d اپریل",
+addFmt1('ur', False, [u"%d جنوری", u"%d فروری", u"%d مارچ", u"%d اپریل",
                       u"%d مئ", u"%d جون", u"%d جلائ", u"%d اگست", u"%d ستمب",
                       u"%d اکتوبر", u"%d نومب", u"%d دسمب"])
 addFmt2('vec', False, u"%%d de %s", False)
-addFmt ('vi', False, makeMonthList(u"%%d tháng %d"))
+addFmt1('vi', False, makeMonthList(u"%%d tháng %d"))
 addFmt2('vo', False, u"%s %%d", False)
-addFmt ('zh', False, makeMonthList(u"%d月%%d日"))
+addFmt1('zh', False, makeMonthList(u"%d月%%d日"))
 
 # Walloon names depend on the day number, thus we must generate various
 # different patterns
@@ -2180,7 +2181,7 @@ addFmt2('ar', True, u"%s %%d")
 addFmt2('ang', True, u"%s %%d", True)
 addFmt2('cs', True, u"%s %%d")
 addFmt2('de', True, u"%s %%d", True)
-addFmt ('el', True, [u"Ιανουάριος %d", u"Φεβρουάριος %d", u"Μάρτιος %d",
+addFmt1('el', True, [u"Ιανουάριος %d", u"Φεβρουάριος %d", u"Μάρτιος %d",
                      u"Απρίλιος %d", u"Μάιος %d", u"Ιούνιος %d", u"Ιούλιος %d",
                      u"Άυγουστος %d", u"Σεπτέμβριος %d", u"Οκτώβριος %d",
                      u"Νοέμβριος %d", u"Δεκέμβριος %d"])
@@ -2189,27 +2190,27 @@ addFmt2('eo', True, u"%s de %%d")
 addFmt2('es', True, u"%s de %%d", True)
 addFmt2('et', True, u"%s %%d", True)
 addFmt2('fi', True, u"%s %%d", True)
-addFmt ('fr', True, [u"Janvier %d", u"Février %d", u"Mars %d", u"Avril %d",
+addFmt1('fr', True, [u"Janvier %d", u"Février %d", u"Mars %d", u"Avril %d",
                      u"Mai %d", u"Juin %d", u"Juillet %d", u"Août %d",
                      u"Septembre %d", u"Octobre %d", u"Novembre %d",
                      u"Décembre %d"])
 addFmt2('he', True, u"%s %%d", True)
 addFmt2('it', True, u"Attualità/Anno %%d - %s", True)
-addFmt ('ja', True, [u"「最近の出来事」%%d年%d月" % mm for mm in range(1, 13)])
+addFmt1('ja', True, [u"「最近の出来事」%%d年%d月" % mm for mm in range(1, 13)])
 addFmt2('ka', True, u"%s, %%d")
-addFmt ('ko', True, [u"%d년 1월", u"%d년 2월", u"%d년 3월", u"%d년 4월",
+addFmt1('ko', True, [u"%d년 1월", u"%d년 2월", u"%d년 3월", u"%d년 4월",
                      u"%d년 5월", u"%d년 6월", u"%d년 7월", u"%d년 8월",
                      u"%d년 9월", u"%d년 10월", u"%d년 11월", u"%d년 12월"])
-addFmt ('li', True, [u"januari %d", u"februari %d", u"miert %d", u"april %d",
+addFmt1('li', True, [u"januari %d", u"februari %d", u"miert %d", u"april %d",
                      u"mei %d", u"juni %d", u"juli %d", u"augustus %d",
                      u"september %d", u"oktober %d", u"november %d",
                      u"december %d"])
-addFmt ('nl', True, [u"Januari %d", u"Februari %d", u"Maart %d", u"April %d",
+addFmt1('nl', True, [u"Januari %d", u"Februari %d", u"Maart %d", u"April %d",
                      u"Mei %d", u"Juni %d", u"Juli %d", u"Augustus %d",
                      u"September %d", u"Oktober %d", u"November %d",
                      u"December %d"])
 addFmt2('pl', True, u"%s %%d", True)
-addFmt ('scn', True, [None, None, u"Marzu %d", None, None, None, None, None,
+addFmt1('scn', True, [None, None, u"Marzu %d", None, None, None, None, None,
                       None, None, None, None])
 addFmt2('simple', True, u"%s %%d", True)
 addFmt2('sk', True, u"%s %%d")
@@ -2217,13 +2218,13 @@ addFmt2('sv', True, u"%s %%d", True)
 addFmt2('th', True, u"%s พ.ศ. %%T")
 addFmt2('tl', True, u"%s %%d")
 addFmt2('tt', True, u"%s, %%d", True)
-addFmt ('ur', True, [u"%d01مبم", u"%d02مبم", u"%d03مبم", u"%d04مبم",
+addFmt1('ur', True, [u"%d01مبم", u"%d02مبم", u"%d03مبم", u"%d04مبم",
                      u"%d05مبم", u"%d06مبم", u"%d07مبم", u"%d08مبم", u"%d09مبم",
                      u"%d10مبم", u"%d11مبم", u"%d12مبم"])
 addFmt2('uk', True, u"%s %%d", True)
-addFmt ('vi', True, makeMonthList(u"Tháng %d năm %%d"))
-addFmt ('zh', True, makeMonthList(u"%%d年%d月"))
-addFmt ('zh-min-nan', True, makeMonthList(u"%%d nî %d goe̍h"))
+addFmt1('vi', True, makeMonthList(u"Tháng %d năm %%d"))
+addFmt1('zh', True, makeMonthList(u"%%d年%d月"))
+addFmt1('zh-min-nan', True, makeMonthList(u"%%d nî %d goe̍h"))
 
 
 # This table defines the limits for each type of format data.
@@ -2349,8 +2350,8 @@ def testMapEntry(formatName, showAll=True, value=None):
     if value is not None:
         start, stop = value, value + 1
     if showAll:
-        pywikibot.output((u"Processing %s with limits from %d to %d and step %d"
-                         % (formatName, start, stop - 1, step)))
+        pywikibot.output(u"Processing %s with limits from %d to %d and step %d"
+                         % (formatName, start, stop - 1, step))
 
     for code, convFunc in formats[formatName].items():
 ##        import time
@@ -2366,12 +2367,12 @@ def testMapEntry(formatName, showAll=True, value=None):
                         "     %s != %s: assert failed, values didn't match"
                         % (newValue, value))
                 if showAll:
-                    pywikibot.output((u"date.formats['%s']['%s'](%d): '%s' -> %d"
+                    pywikibot.output(u"date.formats['%s']['%s'](%d): '%s' -> %d"
                                      % (formatName, code, value, convFunc(value),
-                                        newValue)))
+                                        newValue))
             except:
-                pywikibot.output((u"********** Error in date.formats['%s']['%s'](%d)"
-                                 % (formatName, code, value)))
+                pywikibot.output(u"********** Error in date.formats['%s']['%s'](%d)"
+                                 % (formatName, code, value))
                 raise
 ##        print(u"%s\t%s\t%f" % (formatName, code, time.clock() - startClock))
 
@@ -2393,13 +2394,14 @@ def test(quick=False, showAll=False):
         else:
             # Extensive test! Test decade rounding
             testMapEntry(formatName, showAll)
-            pywikibot.output((u"'%s' complete." % formatName))
+            pywikibot.output(u"'%s' complete." % formatName)
     if quick:
 ##        print(u'Date module quick consistency test passed')
         pass
     else:
         print(u'Date module has been fully tested')
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     # Test the date file
     test(quick=False)
