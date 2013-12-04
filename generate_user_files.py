@@ -100,7 +100,6 @@ def listchoice(clist=[], message=None, default=None):
         except:
             if not isinstance(choice, basestring):
                 print("Invalid response")
-    return response
 
 
 def change_base_dir():
@@ -162,23 +161,27 @@ def get_site_and_lang():
         )
         known_families = sorted(known_families)
         fam = listchoice(known_families,
-                         "Select family of sites we are working on, " \
+                         "Select family of sites we are working on, "
                          "just enter the number not name",
                          default='wikipedia')
         if fam not in single_wiki_families:
-            codesds = codecs.open("pywikibot/families/%s_family.py" % fam, "r", "utf-8").read()
-            rre = re.compile("self\.languages\_by\_size *\= *(.+?)\]", re.DOTALL)
+            codesds = codecs.open("pywikibot/families/%s_family.py" % fam,
+                                  "r", "utf-8").read()
+            rre = re.compile("self\.languages\_by\_size *\= *(.+?)\]",
+                             re.DOTALL)
             known_langs = []
             if not rre.findall(codesds):
                 rre = re.compile("self\.langs *\= *(.+?)\}", re.DOTALL)
                 if rre.findall(codesds):
                     import ast
-                    known_langs = ast.literal_eval(rre.findall(codesds)[0] + u"}").keys()
+                    known_langs = ast.literal_eval(
+                        rre.findall(codesds)[0] + u"}").keys()
             else:
                 known_langs = eval(rre.findall(codesds)[0] + u"]")
             print "This is the list of known language(s):"
             print " ".join(sorted(known_langs))
-            mylang = raw_input("The language code of the site we're working on (default: 'en'): ") or 'en'
+            mylang = raw_input("The language code of the site we're working on "
+                               "(default: 'en'): ") or 'en'
         else:
             mylang = fam
 
@@ -195,7 +198,9 @@ def create_user_config():
         mainusername = mainusername or "UnnamedBot"
 
         while True:
-            choice = raw_input("Which variant of user_config.py:\n[S]mall or [E]xtended (with further information)? ").upper()
+            choice = raw_input(
+                "Which variant of user_config.py:\n"
+                "[S]mall or [E]xtended (with further information)? ").upper()
             if choice in "SE":
                 break
 
@@ -250,12 +255,14 @@ family = '%s'
 mylang = '%s'
 usernames['%s']['%s'] = u'%s'
 """ % (fam, mylang, fam, mylang, mainusername))
-        while(raw_input("Do you want to add any other projects? (y/N)").upper() == "Y"):
+        while(raw_input(
+                "Do you want to add any other projects? (y/N)").upper() == "Y"):
             fam, mylang, username = get_site_and_lang()
             username = username or mainusername
             # Escape ''s
             username = username.replace("'", "\\'")
-            f.write("usernames['%(fam)s']['%(mylang)s'] = u'%(username)s'\n" % locals())
+            f.write("usernames['%(fam)s']['%(mylang)s'] = u'%(username)s'\n"
+                    % locals())
 
         f.close()
         print("'%s' written." % _fnc)
@@ -297,7 +304,8 @@ if __name__ == "__main__":
     while True:
         if os.path.exists(os.path.join(base_dir, "user-config.py")):
             break
-        do_copy = raw_input("Do you want to copy user files from an existing pywikipedia installation? ").upper().strip()
+        do_copy = raw_input("Do you want to copy user files from an existing "
+                            "pywikipedia installation? ").upper().strip()
         if do_copy and "YES".startswith(do_copy):
             oldpath = raw_input("Path to existing wikipedia.py? ")
             if not os.path.exists(oldpath):
@@ -325,13 +333,15 @@ if __name__ == "__main__":
         elif do_copy and "NO".startswith(do_copy):
             break
     if not os.path.isfile(os.path.join(base_dir, "user-config.py")):
-        a = raw_input("Create user-config.py file? Required for running bots ([y]es, [N]o) ")
+        a = raw_input("Create user-config.py file? Required for running bots "
+                      "([y]es, [N]o) ")
         if a[:1] in ["Y", "y"]:
             create_user_config()
     else:
         print("NOTE: user-config.py already exists in the directory")
     if not os.path.isfile(os.path.join(base_dir, "user-fixes.py")):
-        a = raw_input("Create user-fixes.py file? Optional and for advanced users ([y]es, [N]o) ")
+        a = raw_input("Create user-fixes.py file? Optional and for advanced "
+                      "users ([y]es, [N]o) ")
         if a[:1] in ["Y", "y"]:
             create_user_fixes()
     else:
