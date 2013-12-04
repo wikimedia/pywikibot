@@ -310,7 +310,7 @@ def deprecated(instead=None):
             else:
                 warning(u"%s.%s is DEPRECATED." % (classname, funcname))
             return method(*args, **kwargs)
-        wrapper.func_name = method.func_name
+        wrapper.__name__ = method.__name__
         return wrapper
     return decorator
 
