@@ -11,7 +11,7 @@ Edit a Wikipedia article with your favourite editor.
 """
 #
 # (C) Gerrit Holl 2004
-# (C) Pywikibot team, 2004-2012
+# (C) Pywikibot team, 2004-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -66,7 +66,7 @@ class ArticleEditor(object):
         if not self.options.edit_redirect and self.page.isRedirectPage():
             self.page = self.page.getRedirectTarget()
 
-    def handle_edit_conflict(self):
+    def handle_edit_conflict(self, new):
         fn = os.path.join(tempfile.gettempdir(), self.page.title())
         fp = open(fn, 'w')
         fp.write(new)
@@ -99,6 +99,7 @@ class ArticleEditor(object):
 def main(*args):
     app = ArticleEditor(*args)
     app.run()
+
 
 if __name__ == "__main__":
     try:
