@@ -73,7 +73,6 @@ or by adding a list to the given one:
 __version__ = '$Id$'
 #
 
-import sys
 import re
 import pywikibot
 import isbn
@@ -380,7 +379,7 @@ class CosmeticChangesToolkit:
                     continue
                 text = pywikibot.replaceExcept(
                     text,
-                    r'\[\[(?P<left>.+?:.+?\..+?\|) *(' + '|'.join(aliases) + \
+                    r'\[\[(?P<left>.+?:.+?\..+?\|) *(' + '|'.join(aliases) +
                     ') *(?P<right>(\|.*?)?\]\])',
                     r'[[\g<left>' + aliases[0] + '\g<right>', exceptions)
         return text
@@ -399,7 +398,8 @@ class CosmeticChangesToolkit:
                 # [[page_title|link_text]]trailing_chars
                 # We only work on namespace 0 because pipes and linktrails work
                 # differently for images and categories.
-                page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
+                page = pywikibot.Page(pywikibot.Link(titleWithSection,
+                                                     self.site))
                 try:
                     namespace = page.namespace()
                 except pywikibot.InvalidTitle:
@@ -464,8 +464,8 @@ class CosmeticChangesToolkit:
                     # instead of a pipelink
                     elif (len(titleWithSection) <= len(label) and
                           label[:len(titleWithSection)] == titleWithSection and
-                          re.sub(trailR, '', label[len(titleWithSection):]) == ''
-                          ):
+                          re.sub(trailR, '',
+                                 label[len(titleWithSection):]) == ''):
                         newLink = "[[%s]]%s" % (label[:len(titleWithSection)],
                                                 label[len(titleWithSection):])
                     else:
@@ -474,7 +474,8 @@ class CosmeticChangesToolkit:
                         # don't capitalize nouns...
                         #if not self.site.nocapitalize:
                         if self.site.sitename() == 'wikipedia:de':
-                            titleWithSection = titleWithSection[0].upper() + titleWithSection[1:]
+                            titleWithSection = (titleWithSection[0].upper() +
+                                                titleWithSection[1:])
                         newLink = "[[%s|%s]]" % (titleWithSection, label)
                     # re-add spaces that were pulled out of the link.
                     # Examples:
@@ -537,23 +538,23 @@ class CosmeticChangesToolkit:
         return text
 
     def removeUselessSpaces(self, text):
-        result = []
         multipleSpacesR = re.compile('  +')
         spaceAtLineEndR = re.compile(' $')
-
-        exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table', 'template']
+        exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table',
+                      'template']
         text = pywikibot.replaceExcept(text, multipleSpacesR, ' ', exceptions)
         text = pywikibot.replaceExcept(text, spaceAtLineEndR, '', exceptions)
-
         return text
 
     def removeNonBreakingSpaceBeforePercent(self, text):
-        '''
+        """
         Newer MediaWiki versions automatically place a non-breaking space in
         front of a percent sign, so it is no longer required to place it
         manually.
-        '''
-        text = pywikibot.replaceExcept(text, r'(\d)&nbsp;%', r'\1 %', ['timeline'])
+
+        """
+        text = pywikibot.replaceExcept(text, r'(\d)&nbsp;%', r'\1 %',
+                                       ['timeline'])
         return text
 
     def cleanUpSectionHeaders(self, text):
@@ -596,7 +597,8 @@ class CosmeticChangesToolkit:
         exceptions = ['comment', 'math', 'nowiki', 'pre']
         if self.site.family.name in deprecatedTemplates and \
            self.site.lang in deprecatedTemplates[self.site.family.name]:
-            for template in deprecatedTemplates[self.site.family.name][self.site.lang]:
+            for template in deprecatedTemplates[
+                    self.site.family.name][self.site.lang]:
                 old = template[0]
                 new = template[1]
                 if new is None:
@@ -623,9 +625,10 @@ class CosmeticChangesToolkit:
 ##                                       % (self.site.lang, self.site.family.name),
 ##                                       r'[[\g<link>|\g<title>]]', exceptions)
         # external link in double brackets
-        text = pywikibot.replaceExcept(text,
-                                       r'\[\[(?P<url>https?://[^\]]+?)\]\]',
-                                       r'[\g<url>]', exceptions)
+        text = pywikibot.replaceExcept(
+            text,
+            r'\[\[(?P<url>https?://[^\]]+?)\]\]',
+            r'[\g<url>]', exceptions)
         # external link starting with double bracket
         text = pywikibot.replaceExcept(text,
                                        r'\[\[(?P<url>https?://.+?)\]',
@@ -633,15 +636,17 @@ class CosmeticChangesToolkit:
         # external link and description separated by a dash, with
         # whitespace in front of the dash, so that it is clear that
         # the dash is not a legitimate part of the URL.
-        text = pywikibot.replaceExcept(text,
-                                       r'\[(?P<url>https?://[^\|\] \r\n]+?) +\| *(?P<label>[^\|\]]+?)\]',
-                                       r'[\g<url> \g<label>]', exceptions)
+        text = pywikibot.replaceExcept(
+            text,
+            r'\[(?P<url>https?://[^\|\] \r\n]+?) +\| *(?P<label>[^\|\]]+?)\]',
+            r'[\g<url> \g<label>]', exceptions)
         # dash in external link, where the correct end of the URL can
         # be detected from the file extension. It is very unlikely that
         # this will cause mistakes.
-        text = pywikibot.replaceExcept(text,
-                                       r'\[(?P<url>https?://[^\|\] ]+?(\.pdf|\.html|\.htm|\.php|\.asp|\.aspx|\.jsp)) *\| *(?P<label>[^\|\]]+?)\]',
-                                       r'[\g<url> \g<label>]', exceptions)
+        text = pywikibot.replaceExcept(
+            text,
+            r'\[(?P<url>https?://[^\|\] ]+?(\.pdf|\.html|\.htm|\.php|\.asp|\.aspx|\.jsp)) *\| *(?P<label>[^\|\]]+?)\]',
+            r'[\g<url> \g<label>]', exceptions)
         return text
 
     def fixHtml(self, text):
@@ -685,9 +690,11 @@ class CosmeticChangesToolkit:
         # it should be name = " or name=" NOT name   ="
         text = re.sub(r'(?i)<ref +name(= *| *=)"', r'<ref name="', text)
         #remove empty <ref/>-tag
-        text = pywikibot.replaceExcept(text, r'(?i)(<ref\s*/>|<ref *>\s*</ref>)',
+        text = pywikibot.replaceExcept(text,
+                                       r'(?i)(<ref\s*/>|<ref *>\s*</ref>)',
                                        r'', exceptions)
-        text = pywikibot.replaceExcept(text, r'(?i)<ref\s+([^>]+?)\s*>\s*</ref>',
+        text = pywikibot.replaceExcept(text,
+                                       r'(?i)<ref\s+([^>]+?)\s*>\s*</ref>',
                                        r'<ref \1/>', exceptions)
         return text
 
@@ -707,7 +714,8 @@ class CosmeticChangesToolkit:
         # change <number> ccm -> <number> cm³
         text = pywikibot.replaceExcept(text, r'(\d)\s*&nbsp;ccm',
                                        r'\1&nbsp;' + u'cm³', exceptions)
-        text = pywikibot.replaceExcept(text, r'(\d)\s*ccm', r'\1&nbsp;' + u'cm³',
+        text = pywikibot.replaceExcept(text,
+                                       r'(\d)\s*ccm', r'\1&nbsp;' + u'cm³',
                                        exceptions)
         # Solve wrong Nº sign with °C or °F
         # additional exception requested on fr-wiki for this stuff
@@ -717,7 +725,8 @@ class CosmeticChangesToolkit:
                                        r'\1&nbsp;' + u'°' + r'\2', exceptions)
         text = pywikibot.replaceExcept(text, r'(\d)\s*' + u'[º°]([CF])',
                                        r'\1&nbsp;' + u'°' + r'\2', exceptions)
-        text = pywikibot.replaceExcept(text, u'º([CF])', u'°' + r'\1', exceptions)
+        text = pywikibot.replaceExcept(text, u'º([CF])', u'°' + r'\1',
+                                       exceptions)
         return text
 
     def fixArabicLetters(self, text):
@@ -747,8 +756,10 @@ class CosmeticChangesToolkit:
         old = digits[digits.keys()[0]]
         # do not change inside file links
         namespaces = list(self.site.namespace(6, all=True))
-        pattern = re.compile(u'\[\[(' + '|'.join(namespaces) + '):.+?\.\w+? *(\|((\[\[.*?\]\])|.)*)?\]\]',
-                             re.UNICODE)
+        pattern = re.compile(
+            u'\[\[(' + '|'.join(namespaces) +
+            '):.+?\.\w+? *(\|((\[\[.*?\]\])|.)*)?\]\]',
+            re.UNICODE)
         #not to let bot edits in latin content
         exceptions.append(re.compile(u"[^%(fa)s] *?\"*? *?, *?[^%(fa)s]"
                                      % {'fa': faChrs}))
