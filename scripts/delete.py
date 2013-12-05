@@ -9,7 +9,6 @@ Command line options:
 
 -page:       Delete specified page
 -cat:        Delete all pages in the given category.
--nosubcats:  Don't delete pages in the subcategories.
 -links:      Delete all pages linked from a given page.
 -file:       Delete all pages listed in a text file.
 -ref:        Delete all pages referring from a given page.
@@ -34,7 +33,8 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import i18n, config, catlib, pagegenerators
+from pywikibot import i18n
+from pywikibot import pagegenerators
 
 
 class DeletionRobot:
@@ -65,21 +65,17 @@ class DeletionRobot:
 def main():
     genFactory = pagegenerators.GeneratorFactory()
     pageName = ''
-    singlePage = ''
     summary = ''
     always = False
-    doSinglePage = False
-    doCategory = False
-    deleteSubcategories = True
-    doRef = False
-    doLinks = False
     doImages = False
     undelete = False
-    fileName = ''
     generator = None
 
     # read command line parameters
-    for arg in pywikibot.handleArgs():
+    localargs = pywikibot.handleArgs()
+    mysite = pywikibot.getSite()
+
+    for arg in localargs:
         if arg == '-always':
             always = True
         elif arg.startswith('-summary'):
@@ -87,8 +83,6 @@ def main():
                 summary = pywikibot.input(u'Enter a reason for the deletion:')
             else:
                 summary = arg[len('-summary:'):]
-        elif arg.startswith('-nosubcats'):
-            deleteSubcategories = False
         elif arg.startswith('-images'):
             doImages = True
             if len(arg) == len('-images'):
@@ -102,14 +96,17 @@ def main():
             genFactory.handleArg(arg)
         if not summary:
             if arg.startswith('-category'):
-                summary = i18n.twtranslate(mysite, 'delete-from-category', {'page': pageName})
+                summary = i18n.twtranslate(mysite, 'delete-from-category',
+                                           {'page': pageName})
             elif arg.startswith('-links'):
-                summary = i18n.twtranslate(mysite, 'delete-linked-pages', {'page': pageName})
+                summary = i18n.twtranslate(mysite, 'delete-linked-pages',
+                                           {'page': pageName})
             elif arg.startswith('-ref'):
-                summary = i18n.twtranslate(mysite, 'delete-referring-pages', {'page': pageName})
+                summary = i18n.twtranslate(mysite, 'delete-referring-pages',
+                                           {'page': pageName})
             elif arg.startswith('-file'):
                 summary = i18n.twtranslate(mysite, 'delete-from-file')
-    mysite = pywikibot.getSite()
+
     if doImages:
         if not summary:
             summary = i18n.twtranslate(mysite, 'delete-images',
@@ -131,6 +128,8 @@ def main():
         # page generator to actually get the text of those pages.
         bot = DeletionRobot(generator, summary, always, undelete)
         bot.run()
+
+
 if __name__ == "__main__":
     try:
         main()
