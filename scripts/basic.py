@@ -49,6 +49,7 @@ class BasicBot:
                         what would have been changed.
             @type dry: boolean.
         """
+        site = pywikibot.getSite()
         self.generator = generator
         self.dry = dry
         # Set the edit summary message
