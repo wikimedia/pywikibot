@@ -165,7 +165,10 @@ def get_site_and_lang():
                          "just enter the number not name",
                          default='wikipedia')
         if fam not in single_wiki_families:
-            codesds = codecs.open("pywikibot/families/%s_family.py" % fam,
+            codesds = codecs.open(os.path.join(pywikibot_dir,
+                                               "pywikibot",
+                                               "families",
+                                               "%s_family.py" % fam),
                                   "r", "utf-8").read()
             rre = re.compile("self\.languages\_by\_size *\= *(.+?)\]",
                              re.DOTALL)
