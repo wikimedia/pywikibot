@@ -64,6 +64,7 @@ python blockpageschecker.py -show -protectedpages:4
 __version__ = '$Id$'
 #
 
+import time
 import re
 import webbrowser
 import pywikibot
@@ -85,8 +86,10 @@ templateSemiProtection = {
     'en': None,
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccoparziale(?:|[ _]scad\|.*?|\|.*?)\}\}',
            r'\{\{(?:[Tt]emplate:|)[Aa]bp(?:|[ _]scad\|(?:.*?))\}\}'],
-    'fr': [r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' + r'|)[Ss]emi[- ]?protection(|[^\}]*)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'半保護' + r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'fr': [r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' +
+           r'|)[Ss]emi[- ]?protection(|[^\}]*)\}\}'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' +
+           u'半保護' + r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
 }
 # Regex to get the total-protection template
 templateTotalProtection = {
@@ -94,23 +97,28 @@ templateTotalProtection = {
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisoblocco(?:|[ _]scad\|(?:.*?)|minaccia|cancellata)\}\}',
            r'\{\{(?:[Tt]emplate:|)(?:[Cc][Tt]|[Cc]anc fatte|[Cc][Ee])\}\}',
            r'<div class="toccolours[ _]itwiki[ _]template[ _]avviso">(?:\s|\n)*?[Qq]uesta pagina'],
-    'fr': [r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' + r'|)[Pp]rotection(|[^\}]*)\}\}',
-           r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' + r'|)(?:[Pp]age|[Aa]rchive|' + u'[Mm]odèle) protégée' + r'?(|[^\}]*)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'保護(?:性急|)' + r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'fr': [r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' +
+           r'|)[Pp]rotection(|[^\}]*)\}\}',
+           r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' + r'|)(?:[Pp]age|[Aa]rchive|' +
+           u'[Mm]odèle) protégée' + r'?(|[^\}]*)\}\}'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'保護(?:性急|)' +
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
 }
 
 # Regex to get the semi-protection move template
 templateSemiMoveProtection = {
     'en': None,
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動半保護' + r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動半保護' +
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
 }
 
 # Regex to get the total-protection move template
 templateTotalMoveProtection = {
     'en': None,
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動保護' + r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動保護' +
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
 }
 
 # If you use only one template for all the type of protection, put it here.
@@ -199,7 +207,7 @@ def showQuest(site, page):
     elif quest == 'g':
         from pywikibot import editor as editarticle
         editor = editarticle.TextEditor()
-        text = editor.edit(page.get())
+        editor.edit(page.get())
 
 
 def main():
@@ -290,7 +298,8 @@ def main():
         # PreloadingGenerator cannot set correctly page.editRestriction
         # (see bug #1949476 )
         if not page.canBeEdited():
-            pywikibot.output("%s is sysop-protected : this account can't edit it! Skipping..." % pagename)
+            pywikibot.output("%s is sysop-protected : this account can't edit "
+                             "it! Skipping..." % pagename)
             continue
         """
         if 'edit' in restrictions.keys():
