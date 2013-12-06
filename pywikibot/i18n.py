@@ -177,7 +177,7 @@ def _altlang(code):
     if code == 'gag':
         return ['tr']
     if code == 'ckb':
-        return ['ku', 'fa']
+        return ['ku']
     #Ukrainian
     if code in ['crh', 'rue']:
         return ['uk', 'ru']
