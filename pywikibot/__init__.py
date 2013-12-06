@@ -214,8 +214,14 @@ class WbTime(object):
     PRECISION = {'1000000000': 0, '100000000': 1, '10000000': 2, '1000000': 3, '100000': 4, '10000': 5, 'millenia': 6, 'century': 7, 'decade': 8, 'year': 9, 'month': 10, 'day': 11, 'hour': 12, 'minute': 13, 'second': 14}
     FORMATSTR = '{0:+012d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
-    def __init__(self, year=None, month=None, day=None, hour=None, minute=None, second=None, precision=None, before=0, after=0, timezone=0, calendarmodel='http://www.wikidata.org/entity/Q1985727'):
-        """ Creates a new WbTime object. The precision can be set by the Wikibase int value (0-14) or by a human readable string, e.g., 'hour'. If no precision is given, it is set according to the given time units."""
+    def __init__(self, year=None, month=None, day=None, hour=None, minute=None, second=None, precision=None, before=0,
+                 after=0, timezone=0, calendarmodel='http://www.wikidata.org/entity/Q1985727'):
+        """
+        Creates a new WbTime object. The precision can be set
+        by the Wikibase int value (0-14) or by a human readable
+        string, e.g., 'hour'. If no precision is given, it is set
+        according to the given time units.
+        """
         if year is None:
             raise ValueError('no year given')
         self.precision = WbTime.PRECISION['second']
@@ -255,12 +261,14 @@ class WbTime(object):
                 raise ValueError('Invalid precision: "%s"' % precision)
 
     @staticmethod
-    def fromTimestr(datetimestr, precision=14, before=0, after=0, timezone=0, calendarmodel='http://www.wikidata.org/entity/Q1985727'):
+    def fromTimestr(datetimestr, precision=14, before=0, after=0, timezone=0,
+                    calendarmodel='http://www.wikidata.org/entity/Q1985727'):
         match = re.match('([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z', datetimestr)
         if not match:
             raise ValueError(u"Invalid format: '%s'" % datetimestr)
         t = match.groups()
-        return WbTime(long(t[0]), int(t[1]), int(t[2]), int(t[3]), int(t[4]), int(t[5]), precision, before, after, timezone, calendarmodel)
+        return WbTime(long(t[0]), int(t[1]), int(t[2]), int(t[3]), int(t[4]), int(t[5]),
+                      precision, before, after, timezone, calendarmodel)
 
     def toWikibase(self):
         """
@@ -279,7 +287,8 @@ class WbTime(object):
 
     @staticmethod
     def fromWikibase(ts):
-        return WbTime.fromTimestr(ts[u'time'], ts[u'precision'], ts[u'before'], ts[u'after'], ts[u'timezone'], ts[u'calendarmodel'])
+        return WbTime.fromTimestr(ts[u'time'], ts[u'precision'], ts[u'before'], ts[u'after'], ts[u'timezone'],
+                                  ts[u'calendarmodel'])
 
     def __str__(self):
         return str(self.toWikibase())
