@@ -55,7 +55,7 @@ def get_base_dir():
             else:
                 base_dir = os.path.join(home, "." + NAME)
             if not os.path.isdir(base_dir):
-                os.makedirs(base_dir, mode=0700)
+                os.makedirs(base_dir, mode=0o700)
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     return base_dir
@@ -120,7 +120,7 @@ def change_base_dir():
             break
         else:
             try:
-                os.mkdir(new_base, 0700)
+                os.mkdir(new_base, 0o700)
             except Exception:
                 print("ERROR: directory creation failed")
                 continue
@@ -181,8 +181,8 @@ def get_site_and_lang():
                         rre.findall(codesds)[0] + u"}").keys()
             else:
                 known_langs = eval(rre.findall(codesds)[0] + u"]")
-            print "This is the list of known language(s):"
-            print " ".join(sorted(known_langs))
+            print("This is the list of known language(s):")
+            print(" ".join(sorted(known_langs)))
             mylang = raw_input("The language code of the site we're working on "
                                "(default: 'en'): ") or 'en'
         else:
