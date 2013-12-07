@@ -11,7 +11,6 @@ A generic bot to do data ingestion (batch uploading) to Commons
 __version__ = '$Id$'
 #
 
-import pywikibot
 import posixpath
 import urlparse
 import urllib
@@ -19,57 +18,66 @@ import hashlib
 import base64
 import StringIO
 
+import pywikibot
+import upload
+
 
 class Photo(object):
-    '''
+    """
     Represents a Photo (or other file), with metadata, to upload to Commons.
 
-    The constructor takes two parameters: URL (string) and metadata (dict with str:str key:value pairs)
-    that can be referred to from the title & template generation.
+    The constructor takes two parameters: URL (string) and metadata (dict with
+    str:str key:value pairs) that can be referred to from the title & template
+    generation.
 
 
-    '''
+    """
+
     def __init__(self, URL, metadata):
         self.URL = URL
         self.metadata = metadata
         self.metadata["_url"] = URL
-        self.metadata["_filename"] = filename = posixpath.split(urlparse.urlparse(URL)[2])[1]
+        self.metadata["_filename"] = filename = posixpath.split(
+            urlparse.urlparse(URL)[2])[1]
         self.metadata["_ext"] = ext = filename.split(".")[-1]
         if ext == filename:
             self.metadata["_ext"] = ext = None
         self.contents = None
 
     def downloadPhoto(self):
-        '''
+        """
         Download the photo and store it in a StringIO.StringIO object.
 
         TODO: Add exception handling
-        '''
+        """
         if not self.contents:
             imageFile = urllib.urlopen(self.URL).read()
             self.contents = StringIO.StringIO(imageFile)
         return self.contents
 
-    def findDuplicateImages(self, site=pywikibot.getSite(u'commons', u'commons')):
-        '''
-        Takes the photo, calculates the SHA1 hash and asks the mediawiki api for a list of duplicates.
+    def findDuplicateImages(self,
+                            site=pywikibot.getSite(u'commons', u'commons')):
+        """
+        Takes the photo, calculates the SHA1 hash and asks the mediawiki api
+        for a list of duplicates.
 
         TODO: Add exception handling, fix site thing
-        '''
+        """
         hashObject = hashlib.sha1()
         hashObject.update(self.downloadPhoto().getvalue())
         return site.getFilesFromAnHash(base64.b16encode(hashObject.digest()))
 
     def getTitle(self, fmt):
         """
-        Given a format string with %(name)s entries, returns the string formatted with metadata
+        Given a format string with %(name)s entries, returns the string
+        formatted with metadata
         """
         return fmt % self.metadata
 
     def getDescription(self, template, extraparams={}):
-        '''
+        """
         Generate a description for a file
-        '''
+        """
 
         params = {}
         params.update(self.metadata)
@@ -78,7 +86,8 @@ class Photo(object):
         for key in sorted(params.keys()):
             value = params[key]
             if not key.startswith("_"):
-                description = description + (u'|%s=%s' % (key, self._safeTemplateValue(value))) + "\n"
+                description = description + (
+                    u'|%s=%s' % (key, self._safeTemplateValue(value))) + "\n"
         description = description + u'}}'
 
         return description
@@ -96,7 +105,8 @@ def CSVReader(fileobj, urlcolumn, *args, **kwargs):
 
 
 class DataIngestionBot:
-    def __init__(self, reader, titlefmt, pagefmt, site=pywikibot.getSite(u'commons', u'commons')):
+    def __init__(self, reader, titlefmt, pagefmt,
+                 site=pywikibot.getSite(u'commons', u'commons')):
         self.reader = reader
         self.titlefmt = titlefmt
         self.pagefmt = pagefmt
@@ -105,7 +115,7 @@ class DataIngestionBot:
     def _doUpload(self, photo):
         duplicates = photo.findDuplicateImages(self.site)
         if duplicates:
-            pywikibot.output(u"Skipping duplicate of %r" % (duplicates, ))
+            pywikibot.output(u"Skipping duplicate of %r" % duplicates)
             return duplicates[0]
 
         title = photo.getTitle(self.titlefmt)
@@ -132,22 +142,25 @@ class DataIngestionBot:
 
 if __name__ == "__main__":
     reader = CSVReader(open('tests/data/csv_ingestion.csv'), 'url')
-    bot = DataIngestionBot(reader, "%(name)s - %(set)s.%(_ext)s", ":user:valhallasw/test_template", pywikibot.getSite('test', 'test'))
+    bot = DataIngestionBot(
+        reader,
+        "%(name)s - %(set)s.%(_ext)s", ":user:valhallasw/test_template",
+        pywikibot.getSite('test', 'test'))
     bot.run()
 
-"""
+'''
 class DataIngestionBot:
     def __init__(self, configurationPage):
-        '''
+        """
 
-        '''
+        """
         self.site = configurationPage.site()
         self.configuration = self.parseConfigurationPage(configurationPage)
 
     def parseConfigurationPage(self, configurationPage):
-        '''
+        """
         Expects a pywikibot.page object "configurationPage" which contains the configuration
-        '''
+        """
         configuration  = {}
         # Set a bunch of defaults
         configuration['csvDialect']=u'excel'
@@ -169,30 +182,30 @@ class DataIngestionBot:
 
 
     def downloadPhoto(self, photoUrl = ''):
-        '''
+        """
         Download the photo and store it in a StrinIO.StringIO object.
 
         TODO: Add exception handling
-        '''
+        """
         imageFile=urllib.urlopen(photoUrl).read()
         return StringIO.StringIO(imageFile)
 
     def findDuplicateImages(self, photo = None, site = pywikibot.getSite(u'commons', u'commons')):
-        '''
+        """
         Takes the photo, calculates the SHA1 hash and asks the mediawiki api for a list of duplicates.
 
         TODO: Add exception handling, fix site thing
-        '''
+        """
         hashObject = hashlib.sha1()
         hashObject.update(photo.getvalue())
         return site.getFilesFromAnHash(base64.b16encode(hashObject.digest()))
 
     def getTitle(self, metadata):
-        '''
+        """
         Build a title.
         Have titleFormat to indicate how the title would look.
         We need to be able to strip off stuff if it's too long. configuration.get('maxTitleLength')
-        '''
+        """
 
         #FIXME: Make this configurable.
         title = self.configuration.get('titleFormat') % metadata
@@ -208,9 +221,9 @@ class DataIngestionBot:
         return flickrripper.cleanUpTitle(title)
 
     def cleanDate(self, field):
-        '''
+        """
         A function to do date clean up.
-        '''
+        """
         # Empty, make it really empty
         if field==u'-':
             return u''
@@ -259,9 +272,9 @@ class DataIngestionBot:
             self.processFile(metadata)
 
     def run(self):
-        '''
+        """
         Do crap
-        '''
+        """
         if not self.configuration.get('sourceFormat'):
             pywikibot.output(u'The field "sourceFormat" is not set')
             return False
@@ -292,4 +305,4 @@ if __name__ == "__main__":
         main(sys.argv[1:])
     finally:
         print "All done!"
-"""
+'''

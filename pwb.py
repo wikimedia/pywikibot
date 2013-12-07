@@ -48,7 +48,10 @@ def run_python_file(filename, argv, argvu):
     main_mod = imp.new_module('__main__')
     sys.modules['__main__'] = main_mod
     main_mod.__file__ = filename
-    main_mod.__builtins__ = sys.modules['__builtin__']
+    if sys.version_info[0] == 2:
+        main_mod.__builtins__ = sys.modules['__builtin__']
+    else:
+        main_mod.builtins = sys.modules['builtins']
 
     # Set sys.argv and the first path element properly.
     old_argv = sys.argv
@@ -73,11 +76,23 @@ def run_python_file(filename, argv, argvu):
 
 #### end of snippet
 
-if sys.version_info[0] != 2:
-    raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2")
-if sys.version_info[1] < 6:
-    raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 "
-                       "or higher")
+if not os.environ.get("PY3", False):
+    if sys.version_info[0] != 2:
+        raise RuntimeError("ERROR: Pywikibot only runs under Python 2")
+    if sys.version_info[1] < 6:
+        raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6 "
+                           "or higher")
+else:
+    if sys.version_info[0] not in (2, 3):
+        raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2 "
+                           "or Python 3")
+    version = tuple(sys.version_info)[:3]
+    if version < (2, 6):
+        raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6 "
+                           "or higher")
+    if version >= (3, ) and version < (3, 3):
+        raise RuntimeError("ERROR: Pywikibot only runs under Python 3.3 "
+                           "or higher")
 
 rewrite_path = os.path.dirname(sys.argv[0])
 if not os.path.isabs(rewrite_path):
