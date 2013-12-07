@@ -23,10 +23,7 @@ __version__ = '$Id$'
 #
 
 import cPickle
-import math
 import re
-import sys
-import traceback
 import time
 from datetime import datetime, timedelta
 import pywikibot
