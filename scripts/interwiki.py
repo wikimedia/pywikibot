@@ -1606,7 +1606,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         """
 
         if not self.isDone():
-            raise "Bugcheck: finish called before done"
+            raise Exception("Bugcheck: finish called before done")
         if not self.workonme:
             return
         if self.originPage:
