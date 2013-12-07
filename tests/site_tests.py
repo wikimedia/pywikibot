@@ -30,7 +30,7 @@ class TestSiteObject(PywikibotTestCase):
         global mysite, mainpage, imagepage
         mysite = pywikibot.Site(cls.code, cls.family)
         mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
-        imagepage = iter(mainpage.imagelinks()).next()  # 1st image on main page
+        imagepage = next(iter(mainpage.imagelinks()))  # 1st image on main page
 
     def testBaseMethods(self):
         """Test cases for BaseSite methods"""

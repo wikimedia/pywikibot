@@ -51,7 +51,7 @@ class TestCSVReader(unittest.TestCase):
     def setUp(self):
         fileobj = open(os.path.join(os.path.split(__file__)[0], 'data', 'csv_ingestion.csv'))
         self.iterator = data_ingestion.CSVReader(fileobj, 'url')
-        self.obj = self.iterator.next()
+        self.obj = next(self.iterator)
 
     def test_PhotoURL(self):
         self.assertEqual(self.obj.URL, 'http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png')

@@ -2151,7 +2151,7 @@ class InterwikiBot(object):
             try:
                 while True:
                     try:
-                        page = self.pageGenerator.next()
+                        page = next(self.pageGenerator)
                     except IOError:
                         pywikibot.output(u'IOError occured; skipping')
                         continue
