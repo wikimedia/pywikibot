@@ -8,7 +8,7 @@ http://download.wikimedia.org/wikipedia/de/) and offers a generator over
 XmlEntry objects which can be used by other bots.
 """
 #
-# (C) Pywikibot team, 2005-2012
+# (C) Pywikibot team, 2005-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,10 +16,9 @@ __version__ = '$Id$'
 #
 
 import threading
-import codecs
 import re
 from xml.etree.cElementTree import iterparse
-import pywikibot
+import xml.sax
 
 
 def parseRestrictions(restrictions):
@@ -154,7 +153,8 @@ class XmlDump(object):
         self.pageid = elem.findtext("{%s}id" % self.uri)
         self.restrictions = elem.findtext("{%s}restrictions" % self.uri)
         self.isredirect = elem.findtext("{%s}redirect" % self.uri) is not None
-        self.editRestriction, self.moveRestriction = parseRestrictions(self.restrictions)
+        self.editRestriction, self.moveRestriction = parseRestrictions(
+            self.restrictions)
 
     def _create_revision(self, revision):
         """Creates a Single revision"""
