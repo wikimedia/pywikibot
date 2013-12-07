@@ -1208,7 +1208,7 @@ class ISBN:
                 break
 
         # Determine the group
-        for groupNumber in ranges.iterkeys():
+        for groupNumber in ranges.keys():
             if rest.startswith(groupNumber):
                 result += groupNumber + '-'
                 rest = rest[len(groupNumber):]

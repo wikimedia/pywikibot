@@ -209,7 +209,7 @@ class CategoryRedirectBot(object):
             return log_text
         # sort by keys and keep the first (LOG_SIZE-1) values
         keep = [text for (key, text) in
-                sorted(log_items.iteritems(), reverse=True)[:LOG_SIZE - 1]]
+                sorted(log_items.items(), reverse=True)[:LOG_SIZE - 1]]
         log_text = "\n".join("\n".join(line for line in text) for text in keep)
         # get permalink to older logs
         history = self.log_page.getVersionHistory(total=LOG_SIZE)

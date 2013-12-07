@@ -349,13 +349,13 @@ class DuplicateReferences:
         id = 1
         while self.autogen + str(id) in foundRefNames:
             id += 1
-        for (g, d) in foundRefs.iteritems():
+        for (g, d) in foundRefs.items():
             if g:
                 group = u"group=\"%s\" " % group
             else:
                 group = u""
 
-            for (k, v) in d.iteritems():
+            for (k, v) in d.items():
                 if len(v[1]) == 1 and not v[3]:
                     continue
                 name = v[0]
@@ -378,7 +378,7 @@ class DuplicateReferences:
                     end = end.replace(ref, unnamed)
                 text = header + end
 
-        for (k, v) in namedRepl.iteritems():
+        for (k, v) in namedRepl.items():
             # TODO : Support ref groups
             name = v[0]
             if v[1]:
