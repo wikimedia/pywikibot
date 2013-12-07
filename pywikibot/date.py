@@ -18,6 +18,11 @@ __version__ = '$Id$'
 #
 
 import re
+import sys
+
+if sys.version_info[0] > 2:
+    unicode = str
+    basestring = (str,)
 
 #
 # Different collections of well known formats

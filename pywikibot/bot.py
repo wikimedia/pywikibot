@@ -34,6 +34,8 @@ import pywikibot
 from pywikibot import config
 from pywikibot import version
 
+if sys.version_info[0] > 2:
+    unicode = str
 
 # User interface initialization
 # search for user interface module in the 'userinterfaces' subdirectory

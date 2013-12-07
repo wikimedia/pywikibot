@@ -21,20 +21,24 @@ This module is responsible for
 __version__ = '$Id$'
 __docformat__ = 'epytext'
 
-import Queue
 import urllib
-import urlparse
 import logging
 import atexit
 
 try:
     from httplib2 import SSLHandshakeError
+    import Queue
+    import urlparse
+    import cookielib
 except ImportError:
     from ssl import SSLError as SSLHandshakeError
+    import queue as Queue
+    import urllib as urlparse
+    from http import cookiejar as cookielib
+
 from pywikibot import config
 from pywikibot.exceptions import FatalServerError, Server504Error
 import pywikibot
-import cookielib
 from . import threadedhttp
 import pywikibot.version
 

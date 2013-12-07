@@ -21,14 +21,18 @@ __version__ = '$Id$'
 __docformat__ = 'epytext'
 
 # standard python libraries
+import sys
 import re
 import threading
 import time
 import logging
 
 import urllib
-import cookielib
-import sys
+
+try:
+    import cookielib
+except ImportError:
+    from http import cookiejar as cookielib
 
 import pywikibot
 from pywikibot import config
