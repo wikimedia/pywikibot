@@ -9,7 +9,7 @@ This class extends httplib2, adding support for:
 
 """
 
-# (C) 2007 Pywikipedia bot team, 2007
+# (C) 2007 Pywikibot team, 2007-2013
 # (C) 2006 Httplib 2 team, 2006
 # (C) 2007 Metaweb Technologies, Inc.
 #
@@ -77,7 +77,7 @@ class ConnectionPool(object):
             for key in self.connections:
                 for connection in self.connections[key]:
                     connection.close()
-        except AttributeError:
+        except (AttributeError, TypeError):
             pass   # this shows up when logger has been destroyed first
         finally:
             self.lock.release()
