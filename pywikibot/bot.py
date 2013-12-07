@@ -618,7 +618,7 @@ def handleArgs(*args):
                 if type(getattr(config, _arg)) is not int:
                     raise TypeError
                 setattr(config, _arg, int(_val))
-            except (ValueError, TypeError, AttributeError) as exc:
+            except (ValueError, TypeError, AttributeError):
                 # argument not global -> specific bot script will take care
                 nonGlobalArgs.append(arg)
 
