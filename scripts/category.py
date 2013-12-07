@@ -392,7 +392,6 @@ class CategoryMoveRobot:
                  editSummary='', inPlace=False, moveCatPage=True,
                  deleteEmptySourceCat=True, titleRegex=None,
                  useSummaryForDeletion=True):
-        site = pywikibot.getSite()
         self.editSummary = editSummary
         self.oldCat = pywikibot.Category(
             pywikibot.Link('Category:' + oldCatTitle))
@@ -694,7 +693,8 @@ class CategoryTidyRobot:
         pywikibot.output(' j - Jump to another category')
         pywikibot.output(' s - Skip this article')
         pywikibot.output(' r - Remove this category tag')
-        pywikibot.output(' ? - Print first part of the page (longer and longer)')
+        pywikibot.output(
+            ' ? - Print first part of the page (longer and longer)')
         pywikibot.output(u'Enter - Save category as %s' % current_cat.title())
 
         flag = False
@@ -714,7 +714,8 @@ class CategoryTidyRobot:
             elif choice in ['j', 'J']:
                 newCatTitle = pywikibot.input(u'Please enter the category the '
                                               u'article should be moved to:')
-                newCat = catlib.Category(pywikibot.Link('Category:' + newCatTitle))
+                newCat = catlib.Category(pywikibot.Link('Category:' +
+                                                        newCatTitle))
                 # recurse into chosen category
                 self.move_to_category(article, original_cat, newCat)
                 flag = True
@@ -758,7 +759,8 @@ class CategoryTidyRobot:
 
         articles = set(cat.articles())
         if len(articles) == 0:
-            pywikibot.output(u'There are no articles in category ' + catTitle)
+            pywikibot.output(u'There are no articles in category ' +
+                             self.catTitle)
         else:
             preloadingGen = pagegenerators.PreloadingGenerator(iter(articles))
             for article in preloadingGen:
@@ -885,7 +887,6 @@ def main(*args):
     catDB = CategoryDatabase()
     action = None
     sort_by_last_name = False
-    restore = False
     create_pages = False
     follow_redirects = False
     deleteEmptySourceCat = True
