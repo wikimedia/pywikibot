@@ -20,11 +20,11 @@ import hashlib
 
 try:
     import htmlentitydefs
-    from urllib.parse import quote_from_bytes, unquote_to_bytes
+    from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 except ImportError:
     unicode = str
     from html import entities as htmlentitydefs
-    from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
+    from urllib.parse import quote_from_bytes, unquote_to_bytes
 
 import logging
 import re
