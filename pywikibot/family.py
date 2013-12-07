@@ -10,7 +10,6 @@ __version__ = '$Id$'
 
 import logging
 import re
-import urllib
 import collections
 
 from . import config2 as config
@@ -101,7 +100,8 @@ class Family(object):
         # Order for fy: alphabetical by code, but y counts as i
         self.fyinterwiki = self.alphabetic[:]
         self.fyinterwiki.remove('nb')
-        self.fyinterwiki.sort(key=lambda x: x.replace("y", "i") + x.count("y") * "!")
+        self.fyinterwiki.sort(key=lambda x:
+                              x.replace("y", "i") + x.count("y") * "!")
 
         self.langs = {}
 
@@ -857,14 +857,14 @@ class Family(object):
                 % {'language_code': code})
 
     def category_redirects(self, code, fallback="_default"):
-        if not hasattr(self, "_catredirtemplates") or code not in self._catredirtemplates:
+        if not hasattr(self, "_catredirtemplates") or \
+           code not in self._catredirtemplates:
             self.get_cr_templates(code, fallback)
         if code in self._catredirtemplates:
             return self._catredirtemplates[code]
         else:
-            raise KeyError(
-"ERROR: title for category redirect template in language '%s' unknown"
-                % code)
+            raise KeyError("ERROR: title for category redirect template in "
+                           "language '%s' unknown" % code)
 
     def get_cr_templates(self, code, fallback):
         if not hasattr(self, "_catredirtemplates"):
