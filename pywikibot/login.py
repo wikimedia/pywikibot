@@ -14,7 +14,7 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import config, deprecate_arg
-from pywikibot.exceptions import NoSuchSite, NoUsername
+from pywikibot.exceptions import NoUsername
 
 _logger = "wiki.login"
 
@@ -49,25 +49,25 @@ class LoginManager:
                 self.username = config.sysopnames[
                     self.site.family.name][self.site.code]
             except KeyError:
-                raise NoUsername(
-u"""ERROR: Sysop username for %(fam_name)s:%(wiki_code)s is undefined.
+                raise NoUsername(u"""\
+ERROR: Sysop username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have a sysop account for that site, please add a line to user-config.py:
 
 sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
-                    % {'fam_name': self.site.family.name,
-                       'wiki_code': self.site.code})
+                                 % {'fam_name': self.site.family.name,
+                                    'wiki_code': self.site.code})
         else:
             try:
                 self.username = config.usernames[
                     self.site.family.name][self.site.code]
             except:
-                raise NoUsername(
-u"""ERROR: Username for %(fam_name)s:%(wiki_code)s is undefined.
+                raise NoUsername(u"""\
+ERROR: Username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have an account for that site, please add a line to user-config.py:
 
 usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
-                    % {'fam_name': self.site.family.name,
-                       'wiki_code': self.site.code})
+                                 % {'fam_name': self.site.family.name,
+                                    'wiki_code': self.site.code})
         self.password = password
         if getattr(config, 'password_file', ''):
             self.readPassword()
@@ -164,8 +164,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             # As we don't want the password to appear on the screen, we set
             # password = True
             self.password = pywikibot.input(
-                u'Password for user %(name)s on %(site)s (no characters will be shown):'
-                % {'name': self.username, 'site': self.site},
+                u'Password for user %(name)s on %(site)s (no characters will '
+                u'be shown):' % {'name': self.username, 'site': self.site},
                 password=True)
 #        self.password = self.password.encode(self.site.encoding())
 
