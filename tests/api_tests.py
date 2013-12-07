@@ -30,7 +30,7 @@ class TestApiFunctions(unittest.TestCase):
         # req.keys() should contain "action", "foo", "bar", "one"
         self.assertEqual(len(req.keys()), 4)
         self.assert_("test" in req.values())
-        self.assert_(all(len(item) == 2 for item in req.iteritems()))
+        self.assert_(all(len(item) == 2 for item in req.items()))
 
 
 class TestPageGenerator(PywikibotTestCase):

@@ -304,7 +304,7 @@ class RedirectGenerator:
         elif self.xmlFilename:
             redict = self.get_redirects_from_dump()
             num = 0
-            for (key, value) in redict.iteritems():
+            for (key, value) in redict.items():
                 num += 1
                 # check if the value - that is, the redirect target - is a
                 # redirect as well

@@ -761,11 +761,11 @@ class PageTree(object):
         """
         Yields (Site, number of pages in site) pairs
         """
-        for site, d in self.tree.iteritems():
+        for site, d in self.tree.items():
             yield site, len(d)
 
     def __iter__(self):
-        for site, plist in self.tree.iteritems():
+        for site, plist in self.tree.items():
             for page in plist:
                 yield page
 
@@ -1520,14 +1520,14 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         new[site] = [page]
         # See if new{} contains any problematic values
         result = {}
-        for site, pages in new.iteritems():
+        for site, pages in new.items():
             if len(pages) > 1:
                 errorCount += 1
                 self.problem(u"Found more than one link for %s" % site)
 
         if not errorCount and not globalvar.select:
             # no errors, so all lists have only one item
-            for site, pages in new.iteritems():
+            for site, pages in new.items():
                 result[site] = pages[0]
             return result
 
@@ -1542,7 +1542,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             return None
 
         # First loop over the ones that have more solutions
-        for site, pages in new.iteritems():
+        for site, pages in new.items():
             if len(pages) > 1:
                 pywikibot.output(u"=" * 30)
                 pywikibot.output(u"Links to %s" % site)
@@ -1573,7 +1573,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         # Loop over the ones that have one solution, so are in principle
         # not a problem.
         acceptall = False
-        for site, pages in new.iteritems():
+        for site, pages in new.items():
             if len(pages) == 1:
                 if not acceptall:
                     pywikibot.output(u"=" * 30)
@@ -1700,7 +1700,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         except GiveUpOnPage:
                             break
         else:
-            for (site, page) in new.iteritems():
+            for (site, page) in new.items():
                 # edit restriction for some templates on zh-wiki where
                 # interlanguage keys are included by /doc subpage
                 smallWikiAllowed = not (page.site.sitename() == 'wikipedia:zh'
@@ -2042,7 +2042,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
 
         """
         # use sets because searching an element is faster than in lists
-        expectedPages = set(new.itervalues())
+        expectedPages = set(new.values())
         expectedSites = set(new)
         try:
             for site in expectedSites - set(updatedSites):
@@ -2415,7 +2415,7 @@ def readWarnfile(filename, bot):
     reader = warnfile.WarnfileReader(filename)
     # we won't use removeHints
     (hints, removeHints) = reader.getHints()
-    for page, pagelist in hints.iteritems():
+    for page, pagelist in hints.items():
         # The WarnfileReader gives us a list of pagelinks, but titletranslate.py
         # expects a list of strings, so we convert it back.
         # TODO: This is a quite ugly hack, in the future we should maybe make

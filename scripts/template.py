@@ -244,7 +244,7 @@ class TemplateRobot:
         replacements = []
         exceptions = {}
         site = pywikibot.getSite()
-        for old, new in self.templates.iteritems():
+        for old, new in self.templates.items():
             namespaces = list(site.namespace(10, all=True))
             if not site.nocapitalize:
                 pattern = '[' + \
