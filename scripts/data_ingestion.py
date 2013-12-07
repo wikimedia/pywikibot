@@ -134,7 +134,7 @@ class DataIngestionBot:
         return title
 
     def doSingle(self):
-        return self._doUpload(self.reader.next())
+        return self._doUpload(next(self.reader))
 
     def run(self):
         for photo in self.reader:

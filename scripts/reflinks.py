@@ -193,7 +193,7 @@ class XmlDumpPageGenerator:
     def next(self):
         while True:
             try:
-                entry = self.parser.next()
+                entry = next(self.parser)
             except StopIteration:
                 raise
             if self.skipping:

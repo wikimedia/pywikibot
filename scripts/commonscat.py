@@ -509,7 +509,7 @@ class CommonscatBot:
                 pywikibot.output(u'Commons category does not exist. Examining deletion log...')
                 logpages = commonsSite.logevents(logtype='delete', page=commonsPage)
                 for logitem in logpages:
-                    logitem = logpages.next()
+                    logitem = next(logpages)
                     (logpage, loguser, logtimestamp, logcomment) = logitem
                     # Some logic to extract the target page.
                     regex = u'moved to \[\[\:?Category:(?P<newcat1>[^\|\}]+)(\|[^\}]+)?\]\]|Robot: Changing Category:(.+) to Category:(?P<newcat2>.+)'
