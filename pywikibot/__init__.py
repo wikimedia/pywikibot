@@ -311,7 +311,7 @@ def deprecated(instead=None):
     """
     def decorator(method):
         def wrapper(*args, **kwargs):
-            funcname = method.func_name
+            funcname = method.__name__
             classname = args[0].__class__.__name__
             if instead:
                 warning(u"%s.%s is DEPRECATED, use %s instead."
