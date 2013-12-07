@@ -127,13 +127,11 @@ class Throttle(object):
                 f.close()
             self.process_multiplicity = count
             if self.verbosedelay:
-                pywikibot.output(
-                    u"Found %(count)s %(mysite)s processes running, including this one."
-                    % locals())
+                pywikibot.output(u"Found %(count)s %(mysite)s processes "
+                                 u"running, including this one." % locals())
             else:
-                pywikibot.log(
-                    u"Found %(count)s %(mysite)s processes running, including this one."
-                    % locals())
+                pywikibot.log(u"Found %(count)s %(mysite)s processes "
+                              u"running, including this one." % locals())
         finally:
             self.lock.release()
 
@@ -141,7 +139,6 @@ class Throttle(object):
         """Set the nominal delays in seconds. Defaults to config values."""
         self.lock.acquire()
         try:
-            maxdelay = self.maxdelay
             if delay is None:
                 delay = self.mindelay
             if writedelay is None:
