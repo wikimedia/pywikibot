@@ -503,7 +503,6 @@ def stopme():
         pywikibot.debug(u"stopme() called", _logger)
 
         def remaining():
-            import datetime
             remainingPages = page_put_queue.qsize() - 1
                 # -1 because we added a None element to stop the queue
             remainingSeconds = datetime.timedelta(
@@ -514,8 +513,12 @@ def stopme():
         stopped = True
 
         if page_put_queue.qsize() > 1:
-            output(u'Waiting for %i pages to be put. Estimated time remaining: %s'
-                   % remaining())
+            num, sec = remaining()
+            format_values = dict(num=num, sec=sec)
+            output(u'\03{lightblue}'
+                   u'Waiting for %(num)i pages to be put. '
+                   u'Estimated time remaining: %(sec)s'
+                   u'\03{default}' % format_values)
 
         while(_putthread.isAlive()):
             try:
