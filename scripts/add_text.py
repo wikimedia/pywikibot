@@ -74,6 +74,7 @@ __version__ = '$Id$'
 import re
 import webbrowser
 import codecs
+import time
 
 import pywikibot
 from pywikibot import config
