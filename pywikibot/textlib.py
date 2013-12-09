@@ -232,7 +232,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                                int(groupMatch.group('number')))
                     try:
                         replacement = (replacement[:groupMatch.start()] +
-                                       match.group(groupID) + \
+                                       ('' if match.group(groupID) is None else match.group(groupID)) + \
                                        replacement[groupMatch.end():])
                     except IndexError:
                         pywikibot.output('\nInvalid group reference: %s' % groupID)
