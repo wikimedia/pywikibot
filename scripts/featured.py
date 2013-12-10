@@ -586,11 +586,12 @@ class FeaturedBot(pywikibot.Bot):
                         changed = True
             if remove_tl:
                 if m2:
-                    if (not interactive or
+                    if (changed or  # Don't force the user to say "Y" twice
+                        not interactive or
                         pywikibot.input(
                             u'Connecting %s -> %s. Proceed? [Y/N]'
                             % (a.title(), atrans.title())) in ['Y', 'y']):
-                        text = re.sub(re_Link_add, '', text)
+                        text = re.sub(re_Link_remove, '', text)
                         changed = True
                 elif task == 'former':
                     pywikibot.output(u"(already removed)")
