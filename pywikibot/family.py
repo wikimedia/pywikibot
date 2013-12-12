@@ -912,7 +912,7 @@ class Family(object):
 
     def ssl_hostname(self, code):
         """The hostname to use for SSL connections."""
-        return "secure.wikimedia.org"
+        return self.hostname(code)
 
     def scriptpath(self, code):
         """The prefix used to locate scripts on this wiki.
@@ -929,10 +929,9 @@ class Family(object):
         return '/w'
 
     def ssl_pathprefix(self, code):
-        """The path prefix for secure.wikimedia.org access."""
-        # Override this ONLY if the wiki family uses a different path
-        # pattern than /familyname/languagecode
-        return "/%s/%s" % (self.name, code)
+        """The path prefix for secure HTTP access."""
+        # Override this ONLY if the wiki family requires a path prefix
+        return ''
 
     def path(self, code):
         return '%s/index.php' % self.scriptpath(code)
