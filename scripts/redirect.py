@@ -22,11 +22,13 @@ and arguments can be:
                "-xml:filename.xml". Cannot be used with -fullscan or -moves.
 
 -fullscan      Retrieve redirect pages from live wiki, not from a special page
+               Cannot be used with -xml.
 
 -moves         Use the page move log to find double-redirect candidates. Only
                works with action "double", does not work with -xml.
 
-               NOTE: If neither of -xml -fullscan -moves is given, info will be
+               NOTE: You may use only one of these options above.
+               If neither of -xml -fullscan -moves is given, info will be
                loaded from a special page of the live wiki.
 
 -namespace:n   Namespace to process. Can be given multiple times, for several
@@ -291,7 +293,7 @@ class RedirectGenerator:
             gen = self.get_moved_pages_redirects()
             for redir_page in gen:
                 yield redir_page.title()
-        elif self.use_api and not self.use_move_log:
+        elif self.use_api:
             count = 0
             for (pagetitle, type, target, final) \
                     in self.get_redirects_via_api(maxlen=2):
@@ -407,9 +409,12 @@ class RedirectRobot:
                     try:
                         redir_page.delete(reason, prompt=False)
                     except pywikibot.NoUsername:
-                        if ((i18n.twhas_key(targetPage.site.lang, 'redirect-broken-redirect-template') and
-                             i18n.twhas_key(targetPage.site.lang, 'redirect-remove-broken')
-                             ) or targetPage.site.lang == '-'):
+                        if ((i18n.twhas_key(
+                             targetPage.site.lang,
+                             'redirect-broken-redirect-template') and
+                             i18n.twhas_key(targetPage.site.lang,
+                                            'redirect-remove-broken')) or \
+                                            targetPage.site.lang == '-'):
                             pywikibot.output(u"No sysop in user-config.py, "
                                              u"put page to speedy deletion.")
                             content = redir_page.get(get_redirect=True)
@@ -705,11 +710,11 @@ def main(*args):
             pywikibot.output(u'Unknown argument: %s' % arg)
 
     if (
-        (not action) or
-        (xmlFilename and moved_pages) or
-        (fullscan and xmlFilename)
+        not action or
+        xmlFilename and moved_pages or
+        fullscan and xmlFilename
     ):
-        pywikibot.showHelp('redirect')
+        pywikibot.showHelp()
     else:
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
                                 fullscan, start, until, number, step)
