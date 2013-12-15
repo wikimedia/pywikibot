@@ -362,7 +362,7 @@ def twtranslate(code, twtitle, parameters=None):
                 break
             except KeyError:
                 continue
-        if not trans:
+        if trans is None:
             raise TranslationError("No English translation has been defined "
                                    "for TranslateWiki key %r" % twtitle)
     # send the language code back via the given list
