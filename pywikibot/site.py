@@ -1381,6 +1381,7 @@ class APISite(BaseSite):
     def page_isredirect(self, page):
         """Return True if and only if page is a redirect."""
         if not hasattr(page, "_isredir"):
+            page._isredir = False  # bug 54684
             self.loadpageinfo(page)
         return page._isredir
 
