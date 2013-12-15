@@ -46,10 +46,12 @@ class pwb_install(install.install):
     """
     def run(self):
         install.install.do_egg_install(self)
-        import subprocess
-        python = sys.executable
-        python = python.replace("pythonw.exe", "python.exe")  # for Windows
-        subprocess.call([python, "generate_user_files.py"])
+
+        if sys.stdin.isatty():
+            import subprocess
+            python = sys.executable
+            python = python.replace("pythonw.exe", "python.exe")  # for Windows
+            subprocess.call([python, "generate_user_files.py"])
 
 setup(
     name='Pywikipediabot',
