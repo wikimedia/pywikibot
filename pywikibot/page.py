@@ -1273,35 +1273,50 @@ class Page(object):
     def delete(self, reason=None, prompt=True, throttle=None, mark=False):
         """Deletes the page from the wiki. Requires administrator status.
 
-        @param reason: The edit summary for the deletion. If None, ask for it.
+        @param reason: The edit summary for the deletion, or rationale
+            for deletion if requesting. If None, ask for it.
         @param prompt: If true, prompt user for confirmation before deleting.
-        @param mark: if true, and user does not have sysop rights, place a
-            speedy-deletion request on the page instead.
+        @param mark: If true, and user does not have sysop rights, place a
+            speedy-deletion request on the page instead. If false, non-sysops
+            will be asked before marking pages for deletion.
 
         """
-        # TODO: add support for mark
         if reason is None:
             pywikibot.output(u'Deleting %s.' % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the deletion:')
-        answer = u'y'
-        if prompt and not hasattr(self.site, '_noDeletePrompt'):
-            answer = pywikibot.inputChoice(
-                u'Do you want to delete %s?' % self.title(asLink=True,
-                                                          forceInterwiki=True),
-                ['Yes', 'No', 'All'],
-                ['Y', 'N', 'A'],
-                'N')
-            if answer in ['a', 'A']:
-                answer = 'y'
-                self.site._noDeletePrompt = True
-        if answer in ['y', 'Y']:
-            try:
+
+        if self.site.logged_in(sysop=True):  # If user is a sysop, delete the page
+            answer = u'y'
+            if prompt and not hasattr(self.site, '_noDeletePrompt'):
+                answer = pywikibot.inputChoice(
+                    u'Do you want to delete %s?' % self.title(asLink=True,
+                                                              forceInterwiki=True),
+                    ['Yes', 'No', 'All'],
+                    ['Y', 'N', 'A'],
+                    'N')
+                if answer in ['a', 'A']:
+                    answer = 'y'
+                    self.site._noDeletePrompt = True
+            if answer in ['y', 'Y']:
                 return self.site.deletepage(self, reason)
-            except pywikibot.NoUsername as e:
-                if mark:
-                    raise NotImplementedError(
-                        "Marking pages for deletion is not yet available.")
-                raise e
+        else:  # Otherwise mark it for deletion
+            if mark or hasattr(self.site, '_noMarkDeletePrompt'):
+                answer = 'y'
+            else:
+                answer = pywikibot.inputChoice(
+                    u"Can't delete %s; do you want to mark it "
+                    "for deletion instead?" % self.title(asLink=True,
+                                                         forceInterwiki=True),
+                    ['Yes', 'No', 'All'],
+                    ['Y', 'N', 'A'],
+                    'N')
+                if answer in ['a', 'A']:
+                    answer = 'y'
+                    self.site._noMarkDeletePrompt = True
+            if answer in ['y', 'Y']:
+                template = '{{delete|1=%s}}\n' % reason
+                self.text = template + self.text
+                return self.save(comment=reason)
 
     # all these DeletedRevisions methods need to be reviewed and harmonized
     # with the new framework; they do not appear functional
