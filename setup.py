@@ -58,7 +58,9 @@ setup(
     version='2.0b1',
     description='Python Wikipedia Bot Framework',
     license='MIT License',
-    packages=find_packages(),
+    packages=[package
+              for package in find_packages()
+              if package.startswith('pywikibot.')],
     install_requires=[
         'httplib2>=0.6.0'
     ],
