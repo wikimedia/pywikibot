@@ -128,7 +128,7 @@ template = {
     'ga': ['Nasc AR'],
     'hi': ['Link FA', 'Lien AdQ'],
     'is': [u'Tengill ÚG'],
-    'it': ['Link AdQ'],
+    'it': ['Link V', 'Link AdQ'],
     'no': ['Link UA'],
     'oc': ['Ligam AdQ', 'Lien AdQ'],
     'ro': [u'Legătură AC', u'Legătură AF'],
