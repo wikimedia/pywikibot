@@ -64,10 +64,7 @@ import pywikibot
 from pywikibot import i18n
 from pywikibot import pagegenerators as pg
 import image
-# only for nowCommonsMessage
-# from imagetransfer import nowCommonsMessage
-# nowCommonsMessage defined on line #163
-# taken from imagetransfer.py (compat)
+from imagetransfer import nowCommonsMessage
 
 nowCommons = {
     '_default': [
@@ -163,27 +160,6 @@ nowCommons = {
         u'Nowcommons',
         u'NCT',
     ],
-}
-
-nowCommonsMessage = {
-    'ar': u'Ø§Ù„Ù…Ù„Ù Ø§Ù„Ø¢Ù† Ù…ØªÙˆÙØ± ÙÙŠ ÙˆÙŠÙƒÙŠÙ…ÙŠØ¯ÙŠØ§ ÙƒÙˆÙ…Ù†Ø².',
-    'de': u'Datei ist jetzt auf Wikimedia Commons verfÃ¼gbar.',
-    'en': u'File is now available on Wikimedia Commons.',
-    'eo': u'Dosiero nun estas havebla en la Wikimedia-Komunejo.',
-    'fa': u'Ù¾Ø±ÙˆÙ†Ø¯Ù‡ Ø§Ú©Ù†ÙˆÙ† Ø¯Ø± Ø§Ù†Ø¨Ø§Ø± Ø§Ø³Øª',
-    'he': u'×”×§×•×‘×¥ ×–×ž×™×Ÿ ×›×¢×ª ×‘×•×•×™×§×™×©×™×ª×•×£.',
-    'hu': u'A fÃ¡jl most mÃ¡r elÃ©rhetÅ‘ a Wikimedia Commonson',
-    'ia': u'Le file es ora disponibile in Wikimedia Commons.',
-    'ja': u'ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã‚¦ã‚£ã‚­ãƒ¡ãƒ‡ã‚£ã‚¢ãƒ»ã‚³ãƒ¢ãƒ³ã‚ºã«ã‚ã‚Šã¾ã™',
-    'it': u'L\'immagine Ã¨ adesso disponibile su Wikimedia Commons.',
-    'kk': u'Ð¤Ð°Ð¹Ð»Ð´Ñ‹ ÐµÐ½Ð´Ñ– Wikimedia ÐžÑ€Ñ‚Ð°Ò›Ò›Ð¾Ñ€Ñ‹Ð½Ð°Ð½ Ò›Ð°Ñ‚Ñ‹Ð½Ð°ÑƒÒ“Ð° Ð±Ð¾Ð»Ð°Ð´Ñ‹.',
-    'lt': u'Failas Ä¯keltas Ä¯ Wikimedia Commons projektÄ….',
-    'nl': u'Dit bestand staat nu op [[w:nl:Wikimedia Commons|Wikimedia Commons]].',
-    'pl': u'Plik jest teraz dostÄ™pny na Wikimedia Commons.',
-    'pt': u'Arquivo estÃ¡ agora na Wikimedia Commons.',
-    'ru': u'[[Ð’ÐŸ:ÐšÐ‘Ð£#Ð¤8|Ð¤.8]]: Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¾ Ð½Ð° [[Ð’Ð¸ÐºÐ¸ÑÐºÐ»Ð°Ð´]]Ðµ',
-    'sr': u'Ð¡Ð»Ð¸ÐºÐ° Ñ˜Ðµ ÑÐ°Ð´Ð° Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð° Ð¸ Ð½Ð° Ð’Ð¸ÐºÐ¸Ð¼ÐµÐ´Ð¸Ñ˜Ð° ÐžÑÑ‚Ð°Ð²Ð¸.',
-    'zh': u'æª”æ¡ˆå·²å­˜åœ¨æ–¼ç¶­åŸºå…±äº«è³‡æºã€‚',
 }
 
 namespaceInTemplate = [
