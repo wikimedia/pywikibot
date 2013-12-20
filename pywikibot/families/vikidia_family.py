@@ -11,9 +11,9 @@ class Family(family.Family):
         self.name = 'vikidia'
 
         self.langs = {
-            'fr': 'fr.vikidia.org',
             'en': 'en.vikidia.org',
             'es': 'es.vikidia.org',
+            'fr': 'fr.vikidia.org',
             'it': 'it.vikidia.org',
             'ru': 'ru.vikidia.org',
         }
