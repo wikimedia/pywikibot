@@ -36,7 +36,7 @@ archive              Name of the page to which archived threads will be put.
 algo                 specifies the maximum age of a thread. Must be in the form
                      old(<delay>) where <delay> specifies the age in hours or
                      days like 24h or 5d.
-                     Default ist old(24h)
+                     Default is old(24h)
 counter              The current value of a counter which could be assigned as
                      variable. Will be actualized by bot. Initial value is 1.
 maxarchivesize       The maximum archive size before incrementing the counter.
@@ -72,14 +72,20 @@ Options (may be omitted):
 #
 __version__ = '$Id$'
 #
+import pywikibot
+from pywikibot import i18n, pagegenerators
+import datetime
+import time
 import os
 import re
-import time
 import locale
 import traceback
-import string
-import urllib
-import unicodedata
+
+
+ZERO = datetime.timedelta(0)
+
+Site = pywikibot.getSite()
+
 try:  # Get a constructor for the MD5 hash object
     import hashlib
     new_hash = hashlib.md5
@@ -87,11 +93,6 @@ except ImportError:  # Old python?
     import md5
     new_hash = md5.md5
 
-import pywikibot
-from pywikibot import i18n, pagegenerators
-
-
-Site = pywikibot.getSite()
 language = Site.language()
 
 
@@ -105,9 +106,7 @@ class MalformedConfigError(pywikibot.Error):
 
 class MissingConfigError(pywikibot.Error):
     """The config is missing in the header (either it's in one of the threads
-    or transcluded from another page).
-
-    """
+    or transcluded from another page)."""
 
 
 class AlgorithmError(MalformedConfigError):
@@ -116,24 +115,20 @@ class AlgorithmError(MalformedConfigError):
 
 class ArchiveSecurityError(pywikibot.Error):
     """Archive is not a subpage of page being archived and key not specified
-    (or incorrect).
-
-    """
+    (or incorrect)."""
 
 
 def str2time(str):
     """Accepts a string defining a time period:
     7d - 7 days
     36h - 36 hours
-    Returns the corresponding time, measured in seconds.
-
-    """
+    Returns the corresponding timedelta object."""
     if str[-1] == 'd':
-        return int(str[:-1]) * 24 * 3600
+        return datetime.timedelta(days=int(str[:-1]))
     elif str[-1] == 'h':
-        return int(str[:-1]) * 3600
+        return datetime.timedelta(hours=int(str[:-1]))
     else:
-        return int(str)
+        return datetime.timedelta(seconds=int(str))
 
 
 def str2size(str):
@@ -142,10 +137,8 @@ def str2size(str):
     150K - 150 kilobytes
     2M - 2 megabytes
     Returns a tuple (size,unit), where size is an integer and unit is
-    'B' (bytes) or 'T' (threads).
-
-    """
-    if str[-1] in string.digits:  # TODO: de-uglify
+    'B' (bytes) or 'T' (threads)."""
+    if str[-1].isdigit():  # TODO: de-uglify
         return (int(str), 'B')
     elif str[-1] in ['K', 'k']:
         return (int(str[:-1]) * 1024, 'B')
@@ -155,43 +148,6 @@ def str2size(str):
         return (int(str[:-1]), 'T')
     else:
         return (int(str[:-1]) * 1024, 'B')
-
-
-def int2month(num):
-    """Returns the locale's full name of month 'num' (1-12)."""
-    if hasattr(locale, 'nl_langinfo'):
-        return locale.nl_langinfo(locale.MON_1 + num - 1).decode('utf-8')
-    Months = ['january', 'february', 'march', 'april', 'may_long', 'june',
-              'july', 'august', 'september', 'october', 'november', 'december']
-    return Site.mediawiki_message(Months[num - 1])
-
-
-def int2month_short(num):
-    """Returns the locale's abbreviated name of month 'num' (1-12)."""
-    if hasattr(locale, 'nl_langinfo'):
-        #filter out non-alpha characters
-        return ''.join([c for c in
-                        locale.nl_langinfo(
-                            locale.ABMON_1 + num - 1).decode('utf-8')
-                        if c.isalpha()])
-    Months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
-              'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-    return Site.mediawiki_message(Months[num - 1])
-
-
-def txt2timestamp(txt, format):
-    """Attempts to convert the timestamp 'txt' according to given 'format'.
-    On success, returns the time tuple; on failure, returns None.
-
-    """
-##    print txt, format
-    try:
-        return time.strptime(txt, format)
-    except ValueError:
-        try:
-            return time.strptime(txt.encode('utf8'), format)
-        except:
-            pass
 
 
 def generateTransclusions(Site, template, namespaces=[]):
@@ -205,20 +161,213 @@ def generateTransclusions(Site, template, namespaces=[]):
         yield page
 
 
+class Months(object):
+    """
+    Generation of look-up dictionaries for months, used by Timestripper() and PageArchiver
+    """
+
+    def __init__(self, site=None):
+        if site is None:
+            self.site = pywikibot.getSite()
+        else:
+            self.site = site
+
+    @classmethod
+    def queryMonths(self):
+        months_long = ['january', 'february', 'march', 'april', 'may_long', 'june',
+                       'july', 'august', 'september', 'october', 'november', 'december']
+        months_short = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
+                        'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+
+        #d[1:12] = {'short': 'orig_short', 'long': 'orig_long}
+        monthNum2origNames = dict((i, {'short': '', 'long': ''}) for i in range(1, 13))
+        origNames2monthNum = dict()
+
+        # site.mediawiki_message() does not support preloading multiple messages in one go
+        qg = pywikibot.data.api.QueryGenerator(
+            site=self.site,
+            meta="allmessages",
+            ammessages='|'.join(months_long + months_short)
+        )
+
+        for el in qg:
+            orig = el["*"]
+            eng = el["name"]
+            try:
+                month_num = months_long.index(eng) + 1
+                monthNum2origNames[month_num]['long'] = orig
+            except ValueError:
+                month_num = months_short.index(eng) + 1
+                monthNum2origNames[month_num]['short'] = orig
+
+            origNames2monthNum[orig] = month_num
+
+        return monthNum2origNames, origNames2monthNum
+
+    @classmethod
+    def updateMonths(self, site=None):
+        if site is None:
+            self.site = pywikibot.getSite()
+        else:
+            self.site = site
+        self.monthsDicts = self.queryMonths()
+
+
+class tzoneUTC(datetime.tzinfo):
+    """
+    Class building a UTC tzinfo object
+    """
+
+    def utcoffset(self, dt):
+        return ZERO
+
+    def tzname(self, dt):
+        return 'UTC'
+
+    def dst(self, dt):
+        return ZERO
+
+    def __repr__(self):
+        return "%s()" % self.__class__.__name__
+
+
+class tzoneFixedOffset(datetime.tzinfo):
+    """
+    Class building tzinfo objects for fixed-offset time zones
+
+    @offset: a number indicating fixed offset in minutes east from UTC
+    @name: a string with name of the timezone"""
+
+    def __init__(self, offset, name):
+        self.__offset = datetime.timedelta(minutes=offset)
+        self.__name = name
+
+    def utcoffset(self, dt):
+        return self.__offset
+
+    def tzname(self, dt):
+        return self.__name
+
+    def dst(self, dt):
+        return ZERO
+
+    def __repr__(self):
+        return "%s(%s, %s)" % (
+            self.__class__.__name__,
+            self.__offset.days * 86400 + self.__offset.seconds,
+            self.__name
+        )
+
+
+class TimeStripper(object):
+    """
+    Find timetstamp in page text and returns it as timezone aware datetime object
+    """
+
+    def __init__(self):
+        self.monthNum2origNames, self.origNames2monthNum = Months.monthsDicts
+        self.site = Months.site
+
+        self.groups = [u'year', u'month',  u'hour',  u'time', u'day', u'minute', u'tzinfo']
+
+        timeR = r'(?P<time>(?P<hour>[0-2]\d)[:\.h](?P<minute>[0-5]\d))'
+        timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
+        yearR = r'(?P<year>(19|20)\d\d)'
+        monthR = ur'(?P<month>(%s))' % (u'|'.join(self.origNames2monthNum))
+        dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))'
+
+        self.ptimeR = re.compile(timeR)
+        self.timeznR = re.compile(timeznR)
+        self.yearR = re.compile(yearR)
+        self.pmonthR = re.compile(monthR, re.U)
+        self.pdayR = re.compile(dayR)
+
+        #order is important to avoid mismatch when searching
+        self.patterns = [
+            self.ptimeR,
+            self.timeznR,
+            self.yearR,
+            self.pmonthR,
+            self.pdayR,
+        ]
+
+    def findmarker(self, text, base=u'@@', delta='@'):
+        # find a string which is not part of text
+        while base in text:
+            base += delta
+        return base
+
+    def last_match_and_replace(self, txt, pat):
+        """
+        Take the rightmost match, to prevent spurious earlier matches, and replace with marker
+        """
+        m = None
+        for m in pat.finditer(txt):
+            pass
+
+        if m:
+            marker = self.findmarker(txt)
+            txt = pat.sub(marker, txt)
+            return (txt, m.groupdict())
+        else:
+            return (txt, None)
+
+    def timestripper(self, line):
+        """
+        Find timestamp in line and convert it to time zone aware datetime
+        """
+        _line = line
+        #match date fields
+        dateDict = dict()
+        for pat in self.patterns:
+            line, matchDict = self.last_match_and_replace(line, pat)
+            if matchDict:
+                dateDict.update(matchDict)
+
+        #all fields matched -> date valid
+        if all(g in dateDict for g in self.groups):
+            #remove 'time' key, now splitted in hour/minute and not needed by datetime
+            del dateDict['time']
+
+            #replace month name in original language with month number
+            try:
+                dateDict['month'] = self.origNames2monthNum[dateDict['month']]
+            except KeyError:
+                pywikibot.output(u'incorrect month name in page')
+
+            #convert to integers
+            for k, v in dateDict.items():
+                try:
+                    dateDict[k] = int(v)
+                except ValueError:
+                    pass
+
+            #find timezone
+            dateDict['tzinfo'] = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
+                                                  self.site.siteinfo['timezone'])
+
+            timestamp = datetime.datetime(**dateDict)
+
+        else:
+            timestamp = None
+
+        return timestamp
+
+
 class DiscussionThread(object):
-    """An object representing a discussion thread on a page, that is something
-    of the form:
+    """An object representing a discussion thread on a page, that is something of the form:
 
     == Title of thread ==
 
     Thread content here. ~~~~
     :Reply, etc. ~~~~
-
     """
 
-    def __init__(self, title):
+    def __init__(self, title, now):
         self.title = title
+        self.now = now
         self.content = ""
+        self.ts = TimeStripper()
         self.timestamp = None
 
     def __repr__(self):
@@ -228,86 +377,16 @@ class DiscussionThread(object):
     def feedLine(self, line):
         if not self.content and not line:
             return
-        self.content += line + '\n'
-        #Update timestamp
-# nnwiki:
-# 19:42, 25 mars 2008 (CET)
-# enwiki
-# 16:36, 30 March 2008 (UTC)
-# huwiki
-# 2007. december 8., 13:42 (CET)
-        TM = re.search(r'(\d\d):(\d\d), (\d\d?) (\S+) (\d\d\d\d) \(.*?\)', line)
-        if not TM:
-            TM = re.search(r'(\d\d):(\d\d), (\S+) (\d\d?), (\d\d\d\d) \(.*?\)',
-                           line)
-        if not TM:
-            TM = re.search(r'(\d{4})\. (\S+) (\d\d?)\., (\d\d:\d\d) \(.*?\)',
-                           line)
-# 18. apr 2006 kl.18:39 (UTC)
-# 4. nov 2006 kl. 20:46 (CET)
-        if not TM:
-            TM = re.search(r'(\d\d?)\. (\S+) (\d\d\d\d) kl\.\W*(\d\d):(\d\d) \(.*?\)',
-                           line)
-#3. joulukuuta 2008 kello 16.26 (EET)
-        if not TM:
-            TM = re.search(r'(\d\d?)\. (\S+) (\d\d\d\d) kello \W*(\d\d).(\d\d) \(.*?\)',
-                           line)
-        if not TM:
-# 14:23, 12. Jan. 2009 (UTC)
-            pat = re.compile(r'(\d\d):(\d\d), (\d\d?)\. (\S+)\.? (\d\d\d\d) \((?:UTC|CES?T)\)')
-            TM = pat.search(line)
-# ro.wiki: 4 august 2012 13:01 (EEST)
-        if not TM:
-            TM = re.search(r'(\d\d?) (\S+) (\d\d\d\d) (\d\d):(\d\d) \(.*?\)',
-                           line)
-# Japanese: 2012年8月4日 (日) 13:01 (UTC)
-        if not TM:
-            TM = re.search(re.compile(u'(\d\d\d\d)年(\d\d?)月(\d\d?)日 \(.\) (\d\d):(\d\d) \(.*?\)'),
-                           line)
-        if TM:
-            # Strip away all diacritics in the Mn ('Mark, non-spacing') category
-            # NFD decomposition splits combined characters (e.g. 'ä",
-            # LATIN SMALL LETTER A WITH DIAERESIS) into two entities:
-            # LATIN SMALL LETTER A and COMBINING DIAERESIS. The latter falls
-            # in the Mn category and is filtered out, resuling in 'a'.
-            _TM = ''.join(c for c in unicodedata.normalize('NFD', TM.group(0))
-                          if unicodedata.category(c) != 'Mn')
 
-            TIME = txt2timestamp(_TM, "%d. %b %Y kl. %H:%M (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%Y. %B %d., %H:%M (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%d. %b %Y kl.%H:%M (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(re.sub(' *\([^ ]+\) *', '', _TM),
-                                     "%H:%M, %d %B %Y")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%H:%M, %d %b %Y (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(re.sub(' *\([^ ]+\) *', '', _TM),
-                                     "%H:%M, %d %b %Y")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%H:%M, %b %d %Y (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%H:%M, %B %d %Y (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%H:%M, %b %d, %Y (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%H:%M, %B %d, %Y (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%d. %Bta %Y kello %H.%M (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%d %B %Y %H:%M (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(_TM, "%Y年%B%d日 (%a) %H:%M (%Z)")
-            if not TIME:
-                TIME = txt2timestamp(re.sub(' *\([^ ]+\) *', '', _TM),
-                                     "%H:%M, %d. %b. %Y")
-            if TIME:
-                self.timestamp = max(self.timestamp, time.mktime(TIME))
-##                pywikibot.output(u'Time to be parsed: %s' % TM.group(0))
-##                pywikibot.output(u'Parsed time: %s' % TIME)
-##                pywikibot.output(u'Newest timestamp in thread: %s' % TIME)
+        self.content += line + '\n'
+
+        timestamp = self.ts.timestripper(line)
+
+        if not self.timestamp:  # first time
+            self.timestamp = timestamp
+
+        if timestamp:
+            self.timestamp = max(self.timestamp, timestamp)
 
     def size(self):
         return len(self.title) + len(self.content) + 12
@@ -324,16 +403,14 @@ class DiscussionThread(object):
             #TODO: handle this:
                 #return 'unsigned'
             maxage = str2time(reT.group(1))
-            if self.timestamp + maxage < time.time():
+            if self.now - self.timestamp > maxage:
                 return message('archivebot-older-than') + ' ' + reT.group(1)
         return ''
 
 
 class DiscussionPage(pywikibot.Page):
     """A class that represents a single discussion page as well as an archive
-    page. Feed threads to it and run an update() afterwards.
-
-    """
+    page. Feed threads to it and run an update() afterwards."""
 
     def __init__(self, title, archiver, vars=None):
         pywikibot.Page.__init__(self, Site, title)
@@ -341,6 +418,8 @@ class DiscussionPage(pywikibot.Page):
         self.full = False
         self.archiver = archiver
         self.vars = vars
+        self.now = datetime.datetime.utcnow().replace(tzinfo=tzoneUTC())
+
         try:
             self.loadPage()
         except pywikibot.NoPage:
@@ -364,7 +443,7 @@ class DiscussionPage(pywikibot.Page):
                 found = True  # Reading threads now
                 if curThread:
                     self.threads.append(curThread)
-                curThread = DiscussionThread(threadHeader.group(1))
+                curThread = DiscussionThread(threadHeader.group(1), self.now)
             else:
                 if found:
                     curThread.feedLine(line)
@@ -425,6 +504,7 @@ class PageArchiver(object):
         }
         self.archives = {}
         self.archivedThreads = 0
+        self.monthNum2origNames, self.origNames2monthNum = Months.monthsDicts
 
     def get(self, attr, default=''):
         return self.attributes.get(attr, [default])[0]
@@ -439,10 +519,10 @@ class PageArchiver(object):
                 and a != 'maxage']
 
     def attr2text(self):
-        return '{{%s\n%s\n}}' % (self.tpl,
-                                 '\n'.join(['|%s = %s '
-                                            % (a, self.get(a))
-                                            for a in self.saveables()]))
+        return '{{%s\n%s\n}}' \
+               % (self.tpl,
+                  '\n'.join(['|%s = %s' % (a, self.get(a))
+                             for a in self.saveables()]))
 
     def key_ok(self):
         s = new_hash()
@@ -474,10 +554,9 @@ class PageArchiver(object):
         if not archive:
             return
         if not self.force \
-           and not self.Page.title() + '/' == archive[
-               :len(self.Page.title()) + 1] \
+           and not self.Page.title() + '/' == archive[:len(self.Page.title()) + 1] \
            and not self.key_ok():
-            raise ArchiveSecurityError
+            raise ArchiveSecurityError("Archive page %r does not start with page title (%s)!" % (archive, self.Page.title()))
         if not archive in self.archives:
             self.archives[archive] = DiscussionPage(archive, self, vars)
         return self.archives[archive].feedThread(thread, maxArchiveSize)
@@ -487,7 +566,6 @@ class PageArchiver(object):
         archCounter = int(self.get('counter', '1'))
         oldthreads = self.Page.threads
         self.Page.threads = []
-        T = time.mktime(time.gmtime())
         whys = []
         pywikibot.output(u'Processing %d threads' % len(oldthreads))
         for t in oldthreads:
@@ -500,14 +578,13 @@ class PageArchiver(object):
             why = t.shouldBeArchived(self)
             if why:
                 archive = self.get('archive')
-                TStuple = time.gmtime(t.timestamp)
                 vars = {
                     'counter': archCounter,
-                    'year': TStuple[0],
-                    'month': TStuple[1],
-                    'monthname': int2month(TStuple[1]),
-                    'monthnameshort': int2month_short(TStuple[1]),
-                    'week': int(time.strftime('%W', TStuple)),
+                    'year': t.timestamp.year,
+                    'month': t.timestamp.month,
+                    'monthname': self.monthNum2origNames[t.timestamp.month]['long'],
+                    'monthnameshort': self.monthNum2origNames[t.timestamp.month]['short'],
+                    'week': int(time.strftime('%W', t.timestamp.timetuple())),
                 }
                 archive = pywikibot.Page(Site, archive % vars).title()
                 if self.feedArchive(archive, t, maxArchSize, vars):
@@ -539,12 +616,12 @@ class PageArchiver(object):
                                             self.commentParams)
                 self.archives[a].update(comment)
 
-            #Save the page itself
-            rx = re.compile('{{%s\n.*?\n}}' % self.tpl, re.DOTALL)
+            # Save the page itself
+            rx = re.compile('{{' + self.tpl + '\n.*?\n}}', re.DOTALL)
             self.Page.header = rx.sub(self.attr2text(), self.Page.header)
             self.commentParams['count'] = self.archivedThreads
-            self.commentParams['archives'] = ', '.join(
-                ['[[%s]]' % a.title() for a in self.archives.values()])
+            self.commentParams['archives'] \
+                = ', '.join(['[[' + a.title() + ']]' for a in self.archives.values()])
             if not self.commentParams['archives']:
                 self.commentParams['archives'] = '/dev/null'
             self.commentParams['why'] = ', '.join(whys)
@@ -617,6 +694,9 @@ def main():
         pywikibot.showHelp('archivebot')
         return
 
+    #query site for original months name and create convenience look-up dictionaries
+    Months.updateMonths(site=Site)
+
     for a in args[1:]:
         pagelist = []
         a = a.decode('utf8')
@@ -645,7 +725,6 @@ def main():
             except:
                 pywikibot.output(u'Error occured while processing page %s' % pg)
                 traceback.print_exc()
-
 
 if __name__ == '__main__':
     try:
