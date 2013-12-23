@@ -15,6 +15,3 @@ class Family(family.WikimediaFamily):
         self.langs = {
             'mediawiki': 'www.mediawiki.org',
         }
-
-    def ssl_pathprefix(self, code):
-        return "/wikipedia/mediawiki"
