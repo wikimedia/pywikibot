@@ -667,7 +667,7 @@ def main():
             force = True
         for v in if_arg_value(arg, '-filename'):
             filename = v
-        for v in if_arg_value(arg, '-pagename'):
+        for v in if_arg_value(arg, '-page'):
             pagename = v
         for v in if_arg_value(arg, '-namespace'):
             namespace = v
