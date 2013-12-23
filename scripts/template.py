@@ -98,9 +98,9 @@ pages:
 """
 #
 # (C) Daniel Herding, 2004
-# (C) Rob W.W. Hooft, 2003
-# (C) xqt, 2009-2011
-# (C) Pywikibot team, 2004-2010
+# (C) Rob W.W. Hooft, 2003-2005
+# (C) xqt, 2009-2013
+# (C) Pywikibot team, 2004-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -110,7 +110,8 @@ __version__ = '$Id$'
 import re
 import pywikibot
 from pywikibot import i18n
-from pywikibot import config, pagegenerators, catlib
+from pywikibot import pagegenerators
+from pywikibot import xmlreader
 from scripts import replace
 
 
@@ -155,14 +156,13 @@ class XmlDumpTemplatePageGenerator:
             * templateNames - A list of Page object representing the searched
                               templates
             * xmlfilename   - The dump's path, either absolute or relative
+
         """
-        raise NotImplementedError("Sorry, no XML reader in rewrite yet.")
         self.templates = templates
         self.xmlfilename = xmlfilename
 
     def __iter__(self):
         """Yield page objects until the entire XML dump has been read."""
-        from pywikibot import xmlreader
         mysite = pywikibot.getSite()
         dump = xmlreader.XmlDump(self.xmlfilename)
         # regular expression to find the original template.
@@ -171,7 +171,7 @@ class XmlDumpTemplatePageGenerator:
         # TODO: check site.nocapitalize()
         templatePatterns = []
         for template in self.templates:
-            templatePattern = template.titleWithoutNamespace()
+            templatePattern = template.title(withNamespace=False)
             if not pywikibot.getSite().nocapitalize:
                 templatePattern = '[%s%s]%s' % (templatePattern[0].upper(),
                                                 templatePattern[0].lower(),
@@ -192,6 +192,7 @@ class TemplateRobot:
     This robot will load all pages yielded by a page generator and replace or
     remove all occurences of the old template, or substitute them with the
     template's text.
+
     """
     def __init__(self, generator, templates, subst=False, remove=False,
                  editSummary='', acceptAll=False, addedCat=None):
@@ -204,6 +205,7 @@ class TemplateRobot:
                              removed/resolved to None.
             * remove       - True if the template should be removed.
             * subst        - True if the template should be resolved.
+
         """
         self.generator = generator
         self.templates = templates
@@ -217,9 +219,11 @@ class TemplateRobot:
             self.addedCat = pywikibot.Category(
                 site, u'%s:%s' % (site.namespace(14), self.addedCat))
 
+        comma = site.mediawiki_message('comma-separator')
+
         # get edit summary message if it's empty
-        if (self.editSummary == ''):
-            Param = {'list': (', ').join(self.templates.keys()),
+        if not self.editSummary:
+            Param = {'list': comma.join(self.templates.keys()),
                      'num': len(self.templates)}
             if self.remove:
                 self.editSummary = i18n.twntranslate(
@@ -232,9 +236,7 @@ class TemplateRobot:
                     site, 'template-changing', Param)
 
     def run(self):
-        """
-        Starts the robot's action.
-        """
+        """Starts the robot's action."""
         # regular expression to find the original template.
         # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
         # The old syntax, {{msg:vfd}}, will also be found.
@@ -285,7 +287,6 @@ def main(*args):
     templates = {}
     subst = False
     remove = False
-    namespaces = []
     editSummary = ''
     addedCat = ''
     acceptAll = False
@@ -326,7 +327,8 @@ def main(*args):
             if not genFactory.handleArg(arg):
                 templateNames.append(
                     pywikibot.Page(pywikibot.Site(), arg,
-                                   ns=10).title(withNamespace=False))
+                                   ns=10
+                                   ).title(withNamespace=False))
 
     if subst ^ remove:
         for templateName in templateNames:
@@ -341,9 +343,9 @@ u'Unless using solely -subst or -remove, you must give an even number of templat
             return
 
     oldTemplates = []
-    ns = pywikibot.Site().template_namespace()
     for templateName in templates.keys():
-        oldTemplate = pywikibot.Page(pywikibot.Site(), templateName, ns=10)
+        oldTemplate = pywikibot.Page(pywikibot.Site(), templateName,
+                                     ns=10)
         oldTemplates.append(oldTemplate)
 
     if xmlfilename:
@@ -351,14 +353,12 @@ u'Unless using solely -subst or -remove, you must give an even number of templat
     else:
         gen = genFactory.getCombinedGenerator()
     if not gen:
-        gens = []
         gens = [
             pagegenerators.ReferringPageGenerator(t, onlyTemplateInclusion=True)
             for t in oldTemplates
         ]
         gen = pagegenerators.CombinedPageGenerator(gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
-
     if user:
         gen = UserEditFilterGenerator(gen, user, timestamp, skip)
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
