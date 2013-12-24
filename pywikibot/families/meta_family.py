@@ -15,6 +15,3 @@ class Family(family.WikimediaFamily):
         }
         self.interwiki_forward = 'wikipedia'
         self.cross_allowed = ['meta', ]
-
-    def ssl_pathprefix(self, code):
-        return "/wikipedia/meta"

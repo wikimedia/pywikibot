@@ -14,6 +14,3 @@ class Family(family.WikimediaFamily):
             'species': 'species.wikimedia.org',
         }
         self.interwiki_forward = 'wikipedia'
-
-    def ssl_pathprefix(self, code):
-        return "/wikipedia/species"

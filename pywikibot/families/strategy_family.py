@@ -17,6 +17,3 @@ class Family(family.WikimediaFamily):
 
     def dbName(self, code):
         return 'strategywiki_p'
-
-    def ssl_pathprefix(self, code):
-        return "/wikipedia/strategy"
