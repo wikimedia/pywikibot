@@ -2692,7 +2692,6 @@ class APISite(BaseSite):
 
         @param page: The Page to be saved; its .text property will be used
             as the new text to be saved to the wiki
-        @param token: the edit token retrieved using Site.token()
         @param summary: the edit summary (required!)
         @param minor: if True (default), mark edit as minor
         @param notminor: if True, override account preferences to mark edit
