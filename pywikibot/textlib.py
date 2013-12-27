@@ -643,7 +643,6 @@ def interwikiSort(sites, insite=None):
 #---------------------------------------
 
 def getCategoryLinks(text, site=None):
-    from . import catlib
     """Return a list of category links found in text.
 
     List contains Category objects.
