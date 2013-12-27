@@ -36,6 +36,11 @@ These command line parameters can be used to specify which pages to work on:
 -namespace   Only process templates in the namespace with the given number or
              name. This parameter may be used multiple times.
 
+-xml         Should be used instead of a simple page fetching method from
+             pagegenerators.py for performance and load issues
+
+-xmlstart    Page to start with when using an XML dump
+
 -ignore      HTTP return codes to ignore. Can be provided several times :
                 -ignore:401 -ignore:500
 
@@ -112,6 +117,8 @@ import pywikibot
 from pywikibot import i18n
 from pywikibot import config
 from pywikibot import pagegenerators
+from pywikibot import xmlreader
+from pywikibot import weblib
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -177,29 +184,45 @@ def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
             yield m.group('urlb')
 
 
-class InternetArchiveConsulter:
-    def __init__(self, url):
-        self.url = url
+class XmlDumpPageGenerator:
+    """Xml generator that yiels pages containing a web link"""
 
-    def getArchiveURL(self):
-        pywikibot.output(u'Consulting the Internet Archive for %s' % self.url)
-        archiveURL = 'http://web.archive.org/web/*/%s' % self.url
+    def __init__(self, xmlFilename, xmlStart, namespaces):
+        self.xmlStart = xmlStart
+        self.namespaces = namespaces
+        self.skipping = bool(xmlStart)
+        self.site = pywikibot.getSite()
+
+        dump = xmlreader.XmlDump(xmlFilename)
+        self.parser = dump.parse()
+
+    def __iter__(self):
+        return self
+
+    def next(self):
         try:
-            f = urllib2.urlopen(archiveURL)
-        except urllib2.HTTPError:
-            # The Internet Archive yields a 403 error when the site was not
-            # archived due to robots.txt restrictions.
-            return
-        except UnicodeEncodeError:
-            return
-        data = f.read()
-        if f.headers.get('content-encoding', None) == 'gzip':
-            # Since 2008, the Internet Archive returns pages in GZIPed
-            # compression format. Unfortunatelly urllib2 doesn't handle
-            # the decompression for us, so we have to do it ourselves.
-            data = gzip.GzipFile(fileobj=StringIO.StringIO(data)).read()
-        if "Search Results for " in data:
-            return archiveURL
+            for entry in self.parser:
+                if self.skipping:
+                    if entry.title != self.xmlStart:
+                        continue
+                    self.skipping = False
+                page = pywikibot.Page(self.site, entry.title)
+                if not self.namespaces == []:
+                    if page.namespace() not in self.namespaces:
+                        continue
+                found = False
+                for url in weblinksIn(entry.text):
+                    found = True
+                if found:
+                    return page
+        except KeyboardInterrupt:
+            try:
+                if not self.skipping:
+                    pywikibot.output(
+                        u'To resume, use "-xmlstart:%s" on the command line.'
+                        % entry.title)
+            except NameError:
+                pass
 
 
 class LinkChecker(object):
@@ -509,10 +532,10 @@ class History:
 
     def __init__(self, reportThread):
         self.reportThread = reportThread
-        site = pywikibot.getSite()
+        self.site = pywikibot.getSite()
         self.semaphore = threading.Semaphore()
         self.datfilename = pywikibot.config.datafilepath(
-            'deadlinks', 'deadlinks-%s-%s.dat' % (site.family.name, site.code))
+            'deadlinks', 'deadlinks-%s-%s.dat' % (self.site.family.name, self.site.code))
         # Count the number of logged links, so that we can insert captions
         # from time to time
         self.logCount = 0
@@ -528,7 +551,6 @@ class History:
         """
         Logs an error report to a text file in the deadlinks subdirectory.
         """
-        site = pywikibot.getSite()
         if archiveURL:
             errorReport = u'* %s ([%s archive])\n' % (url, archiveURL)
         else:
@@ -541,8 +563,8 @@ class History:
         pywikibot.output(u"** Logging link for deletion.")
         txtfilename = pywikibot.config.datafilepath('deadlinks',
                                                     'results-%s-%s.txt'
-                                                    % (site.family.name,
-                                                       site.lang))
+                                                    % (self.site.family.name,
+                                                       self.site.lang))
         txtfile = codecs.open(txtfilename, 'a', 'utf-8')
         self.logCount += 1
         if self.logCount % 30 == 0:
@@ -573,8 +595,9 @@ class History:
             # We'll list it in a file so that it can be removed manually.
             if timeSinceFirstFound > 60 * 60 * 24 * day:
                 # search for archived page
-                iac = InternetArchiveConsulter(url)
-                archiveURL = iac.getArchiveURL()
+                archiveURL = pywikibot.weblib.getInternetArchiveURL(url)
+                if archiveURL is None:
+                    archiveURL = pywikibot.weblib.getWebCitationURL(url)
                 self.log(url, error, page, archiveURL)
         else:
             self.historyDict[url] = [(page.title(), now, error)]
@@ -781,6 +804,7 @@ def check(url):
 def main():
     gen = None
     singlePageTitle = []
+    xmlFilename = None
     # Which namespaces should be processed?
     # default to [] which means all namespaces will be processed
     namespaces = []
@@ -807,6 +831,17 @@ def main():
             HTTPignore.append(int(arg[8:]))
         elif arg.startswith('-day:'):
             day = int(arg[5:])
+        elif arg.startswith('-xmlstart'):
+            if len(arg) == 9:
+                xmlStart = pywikibot.input(
+                    u'Please enter the dumped article to start with:')
+            else:
+                xmlStart = arg[10:]
+        elif arg.startswith('-xml'):
+            if len(arg) == 4:
+                xmlFilename = i18n.input('pywikibot-enter-xml-filename')
+            else:
+                xmlFilename = arg[5:]
         else:
             if not genFactory.handleArg(arg):
                 singlePageTitle.append(arg)
@@ -816,6 +851,13 @@ def main():
         page = pywikibot.Page(pywikibot.getSite(), singlePageTitle)
         gen = iter([page])
 
+    if xmlFilename:
+        try:
+            xmlStart
+        except NameError:
+            xmlStart = None
+        gen = XmlDumpPageGenerator(xmlFilename, xmlStart, namespaces)
+
     if not gen:
         gen = genFactory.getCombinedGenerator()
     if gen:
@@ -824,7 +866,7 @@ def main():
         # fetch at least 240 pages simultaneously from the wiki, but more if
         # a high thread number is set.
         pageNumber = max(240, config.max_external_links * 2)
-        gen = pagegenerators.PreloadingGenerator(gen, pageNumber=pageNumber)
+        gen = pagegenerators.PreloadingGenerator(gen, step=pageNumber)
         gen = pagegenerators.RedirectFilterPageGenerator(gen)
         bot = WeblinkCheckerRobot(gen, HTTPignore)
         try:
