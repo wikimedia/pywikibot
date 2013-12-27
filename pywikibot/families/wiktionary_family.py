@@ -12,13 +12,13 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'mg', 'fr', 'zh', 'lt', 'ru', 'es', 'el', 'pl', 'sv', 'ko',
-            'de', 'tr', 'ku', 'nl', 'ta', 'io', 'kn', 'fi', 'vi', 'hu', 'pt',
+            'nl', 'de', 'tr', 'ku', 'ta', 'io', 'kn', 'fi', 'vi', 'hu', 'pt',
             'chr', 'no', 'ml', 'my', 'id', 'it', 'li', 'ro', 'et', 'ja', 'te',
-            'fa', 'jv', 'cs', 'ca', 'ar', 'eu', 'gl', 'lo', 'uk', 'br', 'fj',
+            'jv', 'fa', 'cs', 'ca', 'ar', 'eu', 'gl', 'lo', 'uk', 'br', 'fj',
             'eo', 'bg', 'hr', 'th', 'oc', 'is', 'vo', 'ps', 'zh-min-nan',
-            'simple', 'cy', 'uz', 'scn', 'sr', 'af', 'ast', 'da', 'sw', 'az',
+            'simple', 'cy', 'uz', 'scn', 'sr', 'af', 'ast', 'da', 'az', 'sw',
             'fy', 'tl', 'he', 'nn', 'wa', 'ur', 'la', 'sq', 'hy', 'sm', 'sl',
-            'nah', 'pnb', 'ka', 'hi', 'tt', 'bs', 'lb', 'lv', 'tk', 'sk', 'hsb',
+            'ka', 'pnb', 'nah', 'hi', 'tt', 'bs', 'lb', 'lv', 'tk', 'sk', 'hsb',
             'nds', 'kk', 'ky', 'be', 'km', 'mk', 'ga', 'wo', 'ms', 'ang', 'co',
             'sa', 'gn', 'mr', 'csb', 'st', 'ug', 'ia', 'sd', 'sh', 'si', 'mn',
             'tg', 'or', 'kl', 'vec', 'jbo', 'an', 'ln', 'fo', 'zu', 'gu', 'kw',
