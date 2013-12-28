@@ -41,7 +41,6 @@ __version__ = '$Id$'
 import re
 import pywikibot
 from pywikibot import pagegenerators, i18n
-from pywikibot import catlib
 
 
 class CommonsLinkBot:
@@ -108,8 +107,8 @@ class CommonsLinkBot:
             try:
                 pywikibot.output(u'\n>>>> %s <<<<' % page.title())
                 commons = pywikibot.getSite().image_repository()
-                commonsCategory = catlib.Category(commons,
-                                                  'Category:%s' % page.title())
+                commonsCategory = pywikibot.Category(commons,
+                                                     'Category:%s' % page.title())
                 try:
                     getcommonscat = commonsCategory.get(get_redirect=True)
                     commonsCategoryTitle = commonsCategory.title()
@@ -178,8 +177,8 @@ if __name__ == "__main__":
                     namespace=start.namespace(),
                     includeredirects=False)
             elif arg.startswith('-cat:'):
-                cat = catlib.Category(pywikibot.getSite(),
-                                      'Category:%s' % arg[5:])
+                cat = pywikibot.Category(pywikibot.getSite(),
+                                         'Category:%s' % arg[5:])
                 gen = pagegenerators.CategorizedPageGenerator(cat)
             elif arg.startswith('-ref:'):
                 ref = pywikibot.Page(pywikibot.getSite(), arg[5:])
