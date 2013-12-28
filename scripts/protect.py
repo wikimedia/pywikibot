@@ -40,7 +40,7 @@ Unprotect all pages listed in text file "unprotect.txt" without prompting.
 # Written by http://it.wikisource.org/wiki/Utente:Qualc1
 # Created by modifying delete.py
 #
-# (C) Pywikipedia bot team, 2008-2012
+# (C) Pywiki bot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,6 +65,7 @@ class ProtectionRobot:
             * always - Protect without prompting?
             * edit, move, create - protection level for these operations
             * unprotect - unprotect pages (and ignore edit, move, create params)
+
         """
         self.generator = generator
         self.summary = summary
@@ -124,18 +125,21 @@ def main():
             always = True
         elif arg.startswith('-file'):
             if len(arg) == len('-file'):
-                fileName = pywikibot.input(u'Enter name of file to protect pages from:')
+                fileName = pywikibot.input(
+                    u'Enter name of file to protect pages from:')
             else:
                 fileName = arg[len('-file:'):]
         elif arg.startswith('-summary'):
             if len(arg) == len('-summary'):
-                summary = pywikibot.input(u'Enter a reason for the protection:')
+                summary = pywikibot.input(
+                    u'Enter a reason for the protection:')
             else:
                 summary = arg[len('-summary:'):]
         elif arg.startswith('-cat'):
             doCategory = True
             if len(arg) == len('-cat'):
-                pageName = pywikibot.input(u'Enter the category to protect from:')
+                pageName = pywikibot.input(
+                    u'Enter the category to protect from:')
             else:
                 pageName = arg[len('-cat:'):]
         elif arg.startswith('-nosubcats'):
@@ -188,18 +192,22 @@ def main():
         gen = iter([page])
     elif doCategory:
         if not summary:
-            summary = i18n.twtranslate(mysite, 'protect-category', {'cat': pageName})
+            summary = i18n.twtranslate(mysite, 'protect-category',
+                                       {'cat': pageName})
         ns = mysite.category_namespace()
-        categoryPage = catlib.Category(mysite, ns + ':' + pageName)
-        gen = pagegenerators.CategorizedPageGenerator(categoryPage, recurse=protectSubcategories)
+        categoryPage = pywikibot.Category(mysite, ns + ':' + pageName)
+        gen = pagegenerators.CategorizedPageGenerator(
+            categoryPage, recurse=protectSubcategories)
     elif doLinks:
         if not summary:
-            summary = i18n.twtranslate(mysite, 'protect-links', {'page': pageName})
+            summary = i18n.twtranslate(mysite, 'protect-links',
+                                       {'page': pageName})
         linksPage = pywikibot.Page(mysite, pageName)
         gen = pagegenerators.LinkedPageGenerator(linksPage)
     elif doRef:
         if not summary:
-            summary = i18n.twtranslate(mysite, 'protect-ref', {'page': pageName})
+            summary = i18n.twtranslate(mysite, 'protect-ref',
+                                       {'page': pageName})
         refPage = pywikibot.Page(mysite, pageName)
         gen = pagegenerators.ReferringPageGenerator(refPage)
     elif fileName:
@@ -208,8 +216,10 @@ def main():
         gen = pagegenerators.TextfilePageGenerator(fileName)
     elif doImages:
         if not summary:
-            summary = i18n.twtranslate(mysite, 'protect-images', {'page': pageName})
-        gen = pagegenerators.ImagesPageGenerator(pywikibot.Page(mysite, pageName))
+            summary = i18n.twtranslate(mysite, 'protect-images',
+                                       {'page': pageName})
+        gen = pagegenerators.ImagesPageGenerator(pywikibot.Page(mysite,
+                                                                pageName))
 
     if gen:
         pywikibot.setAction(summary)
@@ -224,6 +234,7 @@ def main():
         bot.run()
     else:
         pywikibot.showHelp(u'protect')
+
 
 if __name__ == "__main__":
     try:
