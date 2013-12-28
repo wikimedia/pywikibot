@@ -997,24 +997,42 @@ class APISite(BaseSite):
             self.login(sysop)
         return 'hasmsg' in self._userinfo
 
+    def mediawiki_messages(self, keys):
+        """Return the MediaWiki message text for each 'key' in keys
+           in a dict:
+           -. dict['key'] = text message
+
+        """
+
+        if not all(_key in self._msgcache for _key in keys):
+            msg_query = api.QueryGenerator(
+                site=self,
+                meta="allmessages",
+                ammessages='|'.join(keys),
+            )
+            for _key in keys:
+                for msg in msg_query:
+                    if msg['name'] == _key and not 'missing' in msg:
+                        self._msgcache[_key] = msg['*']
+                        break
+                else:
+                    raise KeyError("Site %(self)s has no message '%(_key)s'"
+                                   % locals())
+
+        return dict((_key, self._msgcache[_key]) for _key in keys)
+
     def mediawiki_message(self, key):
-        """Return the MediaWiki message text for key "key" """
-        if not key in self._msgcache:
-            msg_query = api.QueryGenerator(site=self, meta="allmessages",
-                                           ammessages=key)
-            for msg in msg_query:
-                if msg['name'] == key and not 'missing' in msg:
-                    self._msgcache[key] = msg['*']
-                    break
-            else:
-                raise KeyError("Site %(self)s has no message '%(key)s'"
-                               % locals())
-        return self._msgcache[key]
+        """Return the MediaWiki message text for key 'key' """
+        return self.mediawiki_messages([key])[key]
 
     def has_mediawiki_message(self, key):
-        """Return True iff this site defines a MediaWiki message for 'key'."""
+        """Return True if this site defines a MediaWiki message for 'key' """
+        return self.has_all_mediawiki_messages([key])
+
+    def has_all_mediawiki_messages(self, keys):
+        """Return True if this site defines MediaWiki messages for all 'keys'; False otherwise."""
         try:
-            v = self.mediawiki_message(key)
+            v = self.mediawiki_messages(keys)
             return True
         except KeyError:
             return False

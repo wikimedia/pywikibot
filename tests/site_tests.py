@@ -144,12 +144,22 @@ class TestSiteObject(PywikibotTestCase):
         except pywikibot.NoUsername:
             pywikibot.warning(
                 "Cannot test Site methods for sysop; no sysop account configured.")
+
         for msg in ("1movedto2", "about", "aboutpage", "aboutsite",
                     "accesskey-n-portal"):
             self.assertTrue(mysite.has_mediawiki_message(msg))
             self.assertType(mysite.mediawiki_message(msg), basestring)
         self.assertFalse(mysite.has_mediawiki_message("nosuchmessage"))
         self.assertRaises(KeyError, mysite.mediawiki_message, "nosuchmessage")
+
+        msg = ("1movedto2", "about", "aboutpage")
+        self.assertType(mysite.mediawiki_messages(msg), dict)
+        self.assertTrue(mysite.mediawiki_messages(msg))
+
+        msg = ("1movedto2", "about", "aboutpage", "nosuchmessage")
+        self.assertFalse(mysite.has_all_mediawiki_messages(msg))
+        self.assertRaises(KeyError, mysite.mediawiki_messages, msg)
+
         self.assertType(mysite.getcurrenttimestamp(), basestring)
         self.assertType(mysite.siteinfo, dict)
         self.assertType(mysite.case(), basestring)
