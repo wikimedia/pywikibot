@@ -774,11 +774,11 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
     if site is None:
         site = pywikibot.getSite()
     if site.sitename() == 'wikipedia:de' and "{{Personendaten" in oldtext:
-        raise Error("""\
-The PyWikipediaBot is no longer allowed to touch categories on the German
+        raise pywikibot.Error("""\
+The Pywikibot is no longer allowed to touch categories on the German
 Wikipedia on pages that contain the Personendaten template because of the
 non-standard placement of that template.
-See http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/bis_2006#Position_der_Personendaten_am_.22Artikelende.22
+See http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Position_der_Personendaten_am_.22Artikelende.22
 """)
     separator = site.family.category_text_separator
     iseparator = site.family.interwiki_text_separator
