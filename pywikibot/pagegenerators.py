@@ -488,8 +488,7 @@ class GeneratorFactory(object):
             gen = YahooSearchPageGenerator(arg[7:])
         elif arg.startswith('-untagged'):
             gen = UntaggedPageGenerator(arg[10:])
-        else:
-            pass
+
         if gen:
             self.gens.append(gen)
             return True
@@ -1043,7 +1042,7 @@ def UntaggedPageGenerator(untaggedProject, limit=500):
     """
     URL = "http://toolserver.org/~daniel/WikiSense/UntaggedImages.php?"
     REGEXP = r"<td valign='top' title='Name'><a href='http://.*?" \
-              "\.org/w/index\.php\?title=(.*?)'>.*?</a></td>"
+             "\.org/w/index\.php\?title=(.*?)'>.*?</a></td>"
     lang, project = untaggedProject.split('.', 1)
     if lang == 'commons':
         wiki = 'wikifam=commons.wikimedia.org'
