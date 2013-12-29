@@ -41,7 +41,7 @@ __version__ = '$Id$'
 
 import codecs
 import pywikibot
-from pywikibot import date, catlib, pagegenerators, i18n
+from pywikibot import date, pagegenerators, i18n
 
 
 def rawtoclean(c):
@@ -72,8 +72,8 @@ def needcheck(pl):
 def include(pl, checklinks=True, realinclude=True, linkterm=None):
     cl = checklinks
     if linkterm:
-        actualworkingcat = catlib.Category(mysite, workingcat.title(),
-                                           sortKey=linkterm)
+        actualworkingcat = pywikibot.Category(mysite, workingcat.title(),
+                                              sortKey=linkterm)
     else:
         actualworkingcat = workingcat
     if realinclude:
@@ -91,7 +91,7 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None):
                 for c in cats:
                     if c in parentcats:
                         if removeparent:
-                            catlib.change_category(pl, c, actualworkingcat)
+                            pl.change_category(actualworkingcat)
                             break
                 else:
                     pl.put(pywikibot.replaceCategoryLinks(
@@ -223,10 +223,10 @@ try:
     mysite = pywikibot.getSite()
     workingcatname = unicode(workingcatname, 'utf-8')
     pywikibot.setAction(i18n.twtranslate(mysite, 'makecat-create') + u' ' + workingcatname)
-    workingcat = catlib.Category(mysite,
-                                 u'%s:%s'
-                                 % (mysite.category_namespace(),
-                                    workingcatname))
+    workingcat = pywikibot.Category(mysite,
+                                    u'%s:%s'
+                                    % (mysite.category_namespace(),
+                                       workingcatname))
     filename = pywikibot.config.datafilepath('category',
                                              workingcatname.encode('ascii', 'xmlcharrefreplace') + '_exclude.txt')
     try:
