@@ -127,7 +127,6 @@ import time
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot import editor as editarticle
-from pywikibot import catlib, config
 from pywikibot import i18n
 import webbrowser
 
