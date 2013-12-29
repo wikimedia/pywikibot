@@ -278,7 +278,7 @@ class TemplateRobot:
         replaceBot = replace.ReplaceRobot(self.generator, replacements,
                                           exceptions, acceptall=self.acceptAll,
                                           addedCat=self.addedCat,
-                                          editSummary=self.editSummary)
+                                          summary=self.editSummary)
         replaceBot.run()
 
 
