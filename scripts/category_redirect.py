@@ -79,6 +79,59 @@ class CategoryRedirectBot(object):
         self.edit_request_item = i18n.twtranslate(
             self.site.lang, 'category_redirect-edit-request-item')
 
+    def change_category(self, article, oldCat, newCat, comment=None,
+                        sortKey=None):
+        """Given an article in category oldCat, moves it to category newCat.
+        Moves subcategories of oldCat as well. oldCat and newCat should be
+        Category objects. If newCat is None, the category will be removed.
+
+        This is a copy of portions of [old] catlib.change_category(), with
+        some changes.
+
+        """
+        oldtext = article.get(get_redirect=True, force=True)
+        if newCat in article.categories() or newCat == article:
+            newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, None,
+                                                       site=self.site)
+        else:
+            newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, newCat,
+                                                       site=self.site)
+        try:
+            # even if no changes, still save the page, in case it needs
+            # an update due to changes in a transcluded template
+            article.put(newtext, comment)
+            if newtext == oldtext:
+                pywikibot.output(u'No changes made in page %s.'
+                                 % article.title(asLink=True))
+                return False
+            return True
+        except pywikibot.EditConflict:
+            pywikibot.output(u'Skipping %s because of edit conflict'
+                             % article.title(asLink=True))
+        except pywikibot.LockedPage:
+            pywikibot.output(u'Skipping locked page %s'
+                             % article.title(asLink=True))
+            self.edit_requests.append({
+                'title': article.title(asLink=True, textlink=True),
+                'oldcat': oldCat.title(asLink=True, textlink=True),
+                'newcat': newCat.title(asLink=True, textlink=True)})
+        except pywikibot.SpamfilterError as error:
+            pywikibot.output(
+                u'Changing page %s blocked by spam filter (URL=%s)'
+                % (article.title(asLink=True), error.url))
+        except pywikibot.NoUsername:
+            pywikibot.output(
+                u"Page %s not saved; sysop privileges required."
+                % article.title(asLink=True))
+            self.edit_requests.append({
+                'title': article.title(asLink=True, textlink=True),
+                'oldcat': oldCat.title(asLink=True, textlink=True),
+                'newcat': newCat.title(asLink=True, textlink=True)})
+        except pywikibot.PageNotSaved as error:
+            pywikibot.output(u"Saving page %s failed: %s"
+                             % (article.title(asLink=True), error))
+        return False
+
     def move_contents(self, oldCatTitle, newCatTitle, editSummary):
         """The worker function that moves pages out of oldCat into newCat"""
         while True:
@@ -95,8 +148,8 @@ class CategoryRedirectBot(object):
                 found, moved = 0, 0
                 for article in oldCat.members():
                     found += 1
-                    changed = article.change_category(oldCat, newCat,
-                                                      comment=comment)
+                    changed = self.change_category(article, oldCat, newCat,
+                                                   comment=comment)
                     if changed:
                         moved += 1
 
@@ -111,8 +164,8 @@ class CategoryRedirectBot(object):
                         old_text = doc.get()
                     except pywikibot.Error:
                         continue
-                    changed = doc.change_category(oldCat, newCat,
-                                                  comment=comment)
+                    changed = self.change_category(doc, oldCat, newCat,
+                                                   comment=comment)
                     if changed:
                         moved += 1
 
