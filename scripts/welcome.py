@@ -267,11 +267,13 @@ netext = {
         'zh': u'{{subst:welcome}} %s',
     },
     'wiktionary': {
-        'bn': u'{{subst:User:Wikitanvir/welcome|firma=%s}}',
+        'ar': u'{{subst:ترحيب}} %s',
+        'bn': u'{{subst:স্বাগতম|%s}}',
         'fa': u'{{جا:خوشامد|%s}}',
         'it': u'{{subst:Utente:Filnik/Benve|firma=%s}}',
     },
     'wikiversity': {
+        'ar': u'{{subst:ترحيب}} %s',
         'de': u'{{subst:Willkommen|%s}}',
         'el': u'{{subst:καλωσόρισμα}} %s',
         'en': u'{{subst:Welcome}}\n\n{{subst:Talktome}} %s',
