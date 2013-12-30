@@ -1581,7 +1581,7 @@ formats = {
              lambda p: p == 4),
             (lambda v: dh_constVal(v, 5, u'Föfte Johdousend'),
              lambda p: p == 5),
-            (lambda v: dh_milleniumAD(v, u'%d. Johdousend'), alwaysTrue)]),
+            (lambda v: dh_millenniumAD(v, u'%d. Johdousend'), alwaysTrue)]),
         'lb': lambda v: dh_millenniumAD(v, u'%d. Joerdausend'),
         'mhr': lambda v: dh_millenniumAD(v, u'%R. курым — '),
         'lt': lambda v: dh_millenniumAD(v, u'%d tūkstantmetis'),
@@ -2246,8 +2246,8 @@ formatLimits = {
     'DecadeBC':      (lambda v: 0 <= v and v < 4001,    0, 501),   # zh: has decades as old as 前1700年代
     'CenturyAD':     (lambda v: 1 <= v and v < 41,      1, 23),    # Some centuries use Roman numerals or a given list - do not exceed them in testing
     'CenturyBC':     (lambda v: 1 <= v and v < 91,      1, 23),    # Some centuries use Roman numerals or a given list - do not exceed them in testing
-    'MillenniumAD':  (lambda v: 1 <= v and v < 6,       1, 4),     # For milleniums, only test first 3 AD Milleniums,
-    'MillenniumBC':  (lambda v: 1 <= v and v < 20,      1, 2),     # And only 1 BC Millenium
+    'MillenniumAD':  (lambda v: 1 <= v and v < 6,       1, 4),     # For millenniums, only test first 3 AD Millenniums,
+    'MillenniumBC':  (lambda v: 1 <= v and v < 20,      1, 2),     # And only 1 BC Millennium
     'CenturyAD_Cat': (lambda v: 1 <= v and v < 41,      1, 23),    # Some centuries use Roman numerals or a given list - do not exceed them in testing
     'CenturyBC_Cat': (lambda v: 1 <= v and v < 41,      1, 23),    # Some centuries use Roman numerals or a given list - do not exceed them in testing
     'Cat_Year_MusicAlbums': (lambda v: 1950 <= v and v < 2021, 1950, 2021),
