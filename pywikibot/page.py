@@ -1479,6 +1479,10 @@ class Page(object):
                             % (self.title(asLink=True), oldCat.title()))
             return
 
+        # This prevents the bot from adding newCat if it is already present.
+        if newCat in cats:
+            newCat = None
+
         if inPlace or self.namespace() == 10:
             oldtext = self.get(get_redirect=True)
             newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, newCat)
