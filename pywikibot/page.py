@@ -1455,6 +1455,7 @@ class Page(object):
 
         @param inPlace: if True, change categories in place rather than
                       rearranging them.
+        @return: True if page was saved changed, otherwise False.
 
         """
         # get list of Category objects the article is in and remove possible
@@ -1472,12 +1473,12 @@ class Page(object):
         if not self.canBeEdited():
             pywikibot.output(u"Can't edit %s, skipping it..."
                              % self.title(asLink=True))
-            return
+            return False
 
         if oldCat not in cats:
             pywikibot.error(u'%s is not in category %s!'
                             % (self.title(asLink=True), oldCat.title()))
-            return
+            return False
 
         if inPlace or self.namespace() == 10:
             oldtext = self.get(get_redirect=True)
@@ -1496,10 +1497,12 @@ class Page(object):
                 # a ValueError is in the case of interwiki links to self.
                 pywikibot.output(u'Skipping %s because of interwiki link to '
                                  u'self' % self.title())
+                return False
 
         if oldtext != newtext:
             try:
                 self.put(newtext, comment)
+                return True
             except pywikibot.EditConflict:
                 pywikibot.output(u'Skipping %s because of edit conflict'
                                  % self.title())
@@ -1515,6 +1518,7 @@ class Page(object):
             except pywikibot.PageNotSaved as error:
                 pywikibot.output(u'Saving page %s failed: %s'
                                  % (self.title(asLink=True), error.message))
+        return False
 
     @property
     def categoryinfo(self):
