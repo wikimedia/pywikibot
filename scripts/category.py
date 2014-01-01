@@ -500,7 +500,7 @@ class CategoryListifyRobot:
         self.overwrite = overwrite
         self.showImages = showImages
         self.site = pywikibot.getSite()
-        self.cat = catlib.Category(pywikibot.Link('Category:' + catTitle))
+        self.cat = pywikibot.Category(self.site, catTitle)
         self.list = pywikibot.Page(self.site, listTitle)
         self.subCats = subCats
         self.talkPages = talkPages
@@ -554,7 +554,7 @@ class CategoryRemoveRobot:
                  pagesonly=False):
         self.editSummary = editSummary
         self.site = pywikibot.getSite()
-        self.cat = catlib.Category(pywikibot.Link('Category:' + catTitle))
+        self.cat = pywikibot.Category(self.site, catTitle)
         # get edit summary message
         self.useSummaryForDeletion = useSummaryForDeletion
         self.batchMode = batchMode
@@ -574,9 +574,9 @@ class CategoryRemoveRobot:
             for article in articles:
                 if not self.titleRegex or re.search(self.titleRegex,
                                                     article.title()):
-                    catlib.change_category(article, self.cat, None,
-                                           comment=self.editSummary,
-                                           inPlace=self.inPlace)
+                    article.change_category(self.cat, None,
+                                            comment=self.editSummary,
+                                            inPlace=self.inPlace)
         if self.pagesonly:
             return
 
@@ -587,9 +587,9 @@ class CategoryRemoveRobot:
                              % self.cat.title())
         else:
             for subcategory in subcategories:
-                catlib.change_category(subcategory, self.cat, None,
-                                       comment=self.editSummary,
-                                       inPlace=self.inPlace)
+                subcategory.change_category(self.cat, None,
+                                            comment=self.editSummary,
+                                            inPlace=self.inPlace)
         # Deletes the category page
         if self.cat.exists() and self.cat.isEmptyCategory():
             if self.useSummaryForDeletion and self.editSummary:
@@ -708,8 +708,8 @@ class CategoryTidyRobot:
                 if current_cat == original_cat:
                     pywikibot.output('No changes necessary.')
                 else:
-                    catlib.change_category(article, original_cat, current_cat,
-                                           comment=self.editSummary)
+                    article.change_category(original_cat, current_cat,
+                                            comment=self.editSummary)
                 flag = True
             elif choice in ['j', 'J']:
                 newCatTitle = pywikibot.input(u'Please enter the category the '
@@ -721,8 +721,8 @@ class CategoryTidyRobot:
                 flag = True
             elif choice in ['r', 'R']:
                 # remove the category tag
-                catlib.change_category(article, original_cat, None,
-                                       comment=self.editSummary)
+                article.change_category(original_cat, None,
+                                        comment=self.editSummary)
                 flag = True
             elif choice == '?':
                 contextLength += 500
@@ -755,7 +755,7 @@ class CategoryTidyRobot:
                 flag = True
 
     def run(self):
-        cat = catlib.Category(pywikibot.Link('Category:' + self.catTitle))
+        cat = pywikibot.Category(self.site, self.catTitle)
 
         articles = set(cat.articles())
         if len(articles) == 0:
@@ -847,7 +847,7 @@ class CategoryTreeRobot:
             * maxDepth - the limit beyond which no subcategories will be listed
 
         """
-        cat = catlib.Category(pywikibot.Link('Category:' + self.catTitle))
+        cat = pywikibot.Category(self.site, catTitle)
         tree = self.treeview(cat)
         if self.filename:
             pywikibot.output(u'Saving results in %s' % self.filename)
