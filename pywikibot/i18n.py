@@ -259,9 +259,9 @@ def translate(code, xdict, parameters=None, fallback=True):
 
     family = pywikibot.config.family
     # If a site is given instead of a code, use its language
-    if hasattr(code, 'lang'):
+    if hasattr(code, 'code'):
         family = code.family.name
-        code = code.lang
+        code = code.code
 
     # Check whether xdict has multiple projects
     if type(xdict) == dict:
@@ -336,8 +336,8 @@ def twtranslate(code, twtitle, parameters=None):
 
     code_needed = False
     # If a site is given instead of a code, use its language
-    if hasattr(code, 'lang'):
-        lang = code.lang
+    if hasattr(code, 'code'):
+        lang = code.code
     # check whether we need the language code back
     elif type(code) == list:
         lang = code.pop()
@@ -432,8 +432,8 @@ def twntranslate(code, twtitle, parameters=None):
     if type(parameters) == dict:
         param = parameters
     # If a site is given instead of a code, use its language
-    if hasattr(code, 'lang'):
-        code = code.lang
+    if hasattr(code, 'code'):
+        code = code.code
     # we send the code via list and get the alternate code back
     code = [code]
     trans = twtranslate(code, twtitle, None)
@@ -484,8 +484,8 @@ def twhas_key(code, twtitle):
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
     # If a site is given instead of a code, use its language
-    if hasattr(code, 'lang'):
-        code = code.lang
+    if hasattr(code, 'code'):
+        code = code.code
     return code in transdict and twtitle in transdict[code]
 
 
