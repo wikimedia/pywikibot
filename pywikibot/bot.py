@@ -272,7 +272,14 @@ def writelogheader():
             log(u'  %s' % ver)
 
     # messages on bot discussion page?
-    log(u'MESSAGES: %s' % ('unanswered' if site.messages() else 'none'))
+    if site.logged_in():
+        if site.messages():
+            messagestate = 'unanswered'
+        else:
+            messagestate = 'none'
+    else:
+        messagestate = 'unknown (not logged in)'
+    log(u'MESSAGES: %s' % messagestate)
 
     log(u'=== ' * 14)
 
