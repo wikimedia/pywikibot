@@ -17,14 +17,14 @@ class TestArchiveSites(unittest.TestCase):
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, [u'http', u'https'])
         self.assertEqual(parsed.netloc, u'web.archive.org')
-        self.assertTrue(parsed.path.endswith('www.google.com/'))
+        self.assertTrue(parsed.path.strip('/').endswith('www.google.com'), parsed.path)
 
     def testInternetArchiveOlder(self):
         archivedversion = weblib.getInternetArchiveURL('http://google.com', '200606')
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, [u'http', u'https'])
         self.assertEqual(parsed.netloc, u'web.archive.org')
-        self.assertTrue(parsed.path.endswith('www.google.com/'))
+        self.assertTrue(parsed.path.strip('/').endswith('www.google.com'), parsed.path)
         self.assertIn('200606', parsed.path)
 
     def testWebCiteOlder(self):
