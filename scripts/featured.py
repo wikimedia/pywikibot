@@ -398,7 +398,8 @@ class FeaturedBot(pywikibot.Bot):
         pywikibot.output(
             '\03{lightred}** %s has %i %s articles\03{default}'
             % (site, len(articles), task))
-        for p in articles:
+        while articles:
+            p = articles.pop(0)
             if p.title() < afterpage:
                 continue
 
@@ -410,7 +411,7 @@ class FeaturedBot(pywikibot.Bot):
                 pywikibot.output(u"(cached) %s -> %s" % (p.title(),
                                                          cache[p.title()]))
                 continue
-            yield copy(p)
+            yield p
 
     def findTranslated(self, page, oursite=None):
         quiet = self.getOption('quiet')
