@@ -17,3 +17,6 @@ class Family(family.Family):
 
     def version(self, code):
         return '1.21wmf8'
+
+    def protocol(self, code):
+        return 'https'
