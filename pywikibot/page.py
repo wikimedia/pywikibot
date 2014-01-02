@@ -1270,7 +1270,7 @@ class Page(object):
                                   noredirect=deleteAndMove)
 
     @deprecate_arg("throttle", None)
-    def delete(self, reason=None, prompt=True, throttle=None, mark=False):
+    def delete(self, reason=None, prompt=True, mark=False):
         """Deletes the page from the wiki. Requires administrator status.
 
         @param reason: The edit summary for the deletion, or rationale
