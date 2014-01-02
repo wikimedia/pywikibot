@@ -38,6 +38,8 @@ Options for "remove" action:
                   English.
 
 Options for "move" action:
+ * -hist        - Creates a nice wikitable on the talk page of target category
+                  that contains detailed page history of the source category.
  * -nodelete    - Don't delete the old category after move
 
 Options for several actions:
@@ -391,7 +393,7 @@ class CategoryMoveRobot:
     def __init__(self, oldCatTitle, newCatTitle, batchMode=False,
                  editSummary='', inPlace=False, moveCatPage=True,
                  deleteEmptySourceCat=True, titleRegex=None,
-                 useSummaryForDeletion=True):
+                 useSummaryForDeletion=True, withHistory=True):
         self.editSummary = editSummary
         self.oldCat = pywikibot.Category(
             pywikibot.Link('Category:' + oldCatTitle))
@@ -402,8 +404,11 @@ class CategoryMoveRobot:
         self.deleteEmptySourceCat = deleteEmptySourceCat
         self.titleRegex = titleRegex
         self.useSummaryForDeletion = useSummaryForDeletion
+        self.withHistory = withHistory
 
     def run(self):
+        if self.withHistory:
+            raise NotImplementedError("History printing is not yet enabled.")
         site = pywikibot.getSite()
         newCat = pywikibot.Category(
             pywikibot.Link('Category:' + self.newCatTitle))
@@ -873,6 +878,7 @@ def main(*args):
     recurse = False
     titleRegex = None
     pagesonly = False
+    withHistory = True
 
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
@@ -943,6 +949,8 @@ def main(*args):
             create_pages = True
         elif arg == '-redirect':
             follow_redirects = True
+        elif arg == '-hist':
+            withHistory = True
         else:
             genFactory.handleArg(arg)
     pywikibot.Site().login()
@@ -976,7 +984,8 @@ def main(*args):
         bot = CategoryMoveRobot(oldCatTitle, newCatTitle, batchMode,
                                 editSummary, inPlace,
                                 deleteEmptySourceCat=deleteEmptySourceCat,
-                                titleRegex=titleRegex)
+                                titleRegex=titleRegex,
+                                withHistory=withHistory)
         bot.run()
     elif action == 'tidy':
         catTitle = pywikibot.input(u'Which category do you want to tidy up?')
