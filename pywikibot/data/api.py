@@ -389,9 +389,7 @@ class Request(MutableMapping):
                         u"Pausing due to database lag: " + info)
                     self.site.throttle.lag(int(lag.group("lag")))
                     continue
-            if code in (u'internal_api_error_DBConnectionError',
-                        u'internal_api_error_DBQueryError',
-                        u'internal_api_error_ReadOnlyError'):
+            if code.startswith(u'internal_api_error_'):
                 self.wait()
                 continue
             # raise error
