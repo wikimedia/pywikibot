@@ -125,7 +125,7 @@ class Page(object):
 
     @deprecate_arg("decode", None)
     @deprecate_arg("savetitle", "asUrl")
-    def title(self, underscore=False, savetitle=False, withNamespace=True,
+    def title(self, underscore=False, withNamespace=True,
               withSection=True, asUrl=False, asLink=False,
               allowInterwiki=True, forceInterwiki=False, textlink=False,
               as_filename=False):
@@ -1607,7 +1607,8 @@ class ImagePage(Page):
     usingPages                : Iterate Pages on which the image is displayed.
 
     """
-    def __init__(self, source, title=u"", insite=None):
+    @deprecate_arg("insite", None)
+    def __init__(self, source, title=u""):
         Page.__init__(self, source, title, 6)
         if self.namespace() != 6:
             raise ValueError(u"'%s' is not in the image namespace!" % title)
