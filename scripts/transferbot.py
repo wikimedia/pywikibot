@@ -5,15 +5,19 @@
 This script transfers pages from a source wiki to a target wiki. It also
 copies edit history to a subpage.
 
-Target site can be specified with -tofamily and -tolang
-Source site can be specified with -fromfamily and -fromlang
-Page prefix on the new site can be specified with -prefix
+-tolang:          The target site code.
 
-Existing pages are skipped by default. Pass -overwrite to overwrite pages.
+-tosite:          The target site family.
+
+-prefix:          Page prefix on the new site.
+
+-overwrite:       Existing pages are skipped by default. Use his option to
+                  overwrite pages.
 
 Internal links are *not* repaired!
 
 Pages to work on can be specified using any of:
+
 &params;
 
 Example commands:
@@ -29,6 +33,7 @@ transferbot.py -v -family:toolserver -tofamily:wikitech -page:"Template:Query se
 
 #
 # (C) Merlijn van Deen, 2014
+# (C) pywikibot team, 2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -46,15 +51,17 @@ def main():
 
     fromsite = pywikibot.getSite()
     tolang = fromsite.code
-    tofamily = None
+    tofamily = fromsite.family.name
     prefix = ''
     template = None
     overwrite = False
+    gen_args = []
 
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in tohandle:
         if genFactory.handleArg(arg):
+            gen_args.append(arg)
             continue
         if arg.startswith('-tofamily'):
             tofamily = arg[len('-tofamily:'):]
@@ -67,33 +74,22 @@ def main():
         elif arg == "-overwrite":
             overwrite = True
 
+    tosite = pywikibot.Site(tolang, tofamily)
+    if fromsite == tosite:
+        raise Exception('Target site not different from source site')
+
     gen = genFactory.getCombinedGenerator()
-
-    if not tofamily:
-        raise Exception('Target family not specified')
-
-    from pywikibot import config
-
-    # we change the config family to make sure we get sensible backlinks
-    # i.e. [[wikipedia:en:pagename]] instead of [[pagename]]
-    # this should really be fixed in Page.title() (bug #59223)
-    # we can't do this before, as the pagegenerator would work on the
-    # incorrect site...
-    config.mylang = tolang
-    config.family = tofamily
-
-    tosite = pywikibot.Site()
-
     if not gen:
         raise Exception('Target pages not specified')
 
+    gen_args = ' '.join(gen_args)
     pywikibot.output(u"""
     Page transfer configuration
     ---------------------------
     Source: %(fromsite)r
     Target: %(tosite)r
 
-    Pages to transfer: %(gen)r
+    Pages to transfer: %(gen_args)s
 
     Prefix for transferred pages: %(prefix)s
     """ % locals())
@@ -101,7 +97,8 @@ def main():
     for page in gen:
         summary = "Moved page from %s" % page.title(asLink=True)
         targetpage = pywikibot.Page(tosite, prefix + page.title())
-        edithistpage = pywikibot.Page(tosite, prefix + page.title() + "/edithistory")
+        edithistpage = pywikibot.Page(tosite, prefix + page.title()
+                                      + "/edithistory")
 
         if targetpage.exists() and not overwrite:
             pywikibot.output(
@@ -112,12 +109,15 @@ def main():
             )
             continue
 
-        pywikibot.output(u"Moving %s to %s..." % (page.title(asLink=True), targetpage.title(asLink=True)))
+        pywikibot.output(u"Moving %s to %s..."
+                         % (page.title(asLink=True),
+                            targetpage.title(asLink=True)))
 
         pywikibot.log("Getting page text.")
         text = page.get(get_redirect=True)
         text += "<noinclude>\n\n<small>This page was moved from %s. It's edit history can be viewed at %s</small></noinclude>" % (
-                page.title(asLink=True), edithistpage.title(asLink=True))
+                page.title(asLink=True, insite=targetpage.site),
+                edithistpage.title(asLink=True, insite=targetpage.site))
 
         pywikibot.log("Getting edit history.")
         historytable = page.getVersionHistoryTable()
@@ -127,6 +127,7 @@ def main():
 
         pywikibot.log("Putting edit history.")
         edithistpage.put(historytable, comment=summary)
+
 
 if __name__ == "__main__":
     try:
