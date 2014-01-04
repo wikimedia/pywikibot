@@ -3,7 +3,7 @@
 Objects representing various types of MediaWiki pages.
 """
 #
-# (C) Pywikibot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -128,7 +128,7 @@ class Page(object):
     def title(self, underscore=False, withNamespace=True,
               withSection=True, asUrl=False, asLink=False,
               allowInterwiki=True, forceInterwiki=False, textlink=False,
-              as_filename=False):
+              as_filename=False, insite=None):
         """Return the title of this Page, as a Unicode string.
 
         @param underscore: if true, replace all ' ' characters with '_'
@@ -144,17 +144,26 @@ class Page(object):
             before Category: and Image: links
         @param as_filename: if true, replace any characters that are unsafe
             in filenames
+        @param insite: (only used if asLink is true) a site object where the
+            title is to be shown. default is the current family/lang given by
+            -family and -lang option i.e. config.family and config.mylang
 
         """
         title = self._link.canonical_title()
         if withSection and self._link.section:
             title = title + "#" + self._link.section
         if asLink:
+            if insite:
+                target_code = insite.code
+                target_family = insite.family.name
+            else:
+                target_code = config.mylang
+                target_family = config.family
             if forceInterwiki or \
                (allowInterwiki and
-                (self.site.family.name != config.family
-                 or self.site.code != config.mylang)):
-                if self.site.family.name != config.family \
+                (self.site.family.name != target_family
+                 or self.site.code != target_code)):
+                if self.site.family.name != target_family \
                    and self.site.family.name != self.site.code:
                     return u'[[%s:%s:%s]]' % (self.site.family.name,
                                               self.site.code,
