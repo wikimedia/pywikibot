@@ -964,6 +964,26 @@ class TestSiteObject(PywikibotTestCase):
         self.assertFalse(mysite.hasExtension('anything', False))
         del mysite._extensions
 
+    def test_API_limits_with_site_methods(self):
+        # test step/total parameters for different sitemethods
+        mypage = pywikibot.Page(mysite, 'Albert Einstein')
+        mycat = pywikibot.Page(mysite, 'Category:1879 births')
+
+        cats = [c for c in mysite.pagecategories(mypage, step=5, total=12)]
+        self.assertEqual(len(cats), 12)
+
+        cat_members = [cm for cm in mysite.categorymembers(mycat, step=5, total=12)]
+        self.assertEqual(len(cat_members), 12)
+
+        images = [im for im in mysite.pageimages(mypage, step=3, total=5)]
+        self.assertEqual(len(images), 5)
+
+        templates = [tl for tl in mysite.pagetemplates(mypage, step=3, total=5)]
+        self.assertEqual(len(templates), 5)
+
+        mysite.loadrevisions(mypage, step=5, total=12)
+        self.assertEqual(len(mypage._revisions), 12)
+
 
 class TestSiteLoadRevisions(PywikibotTestCase):
     """Test cases for Site.loadrevision() method."""
@@ -983,6 +1003,12 @@ class TestSiteLoadRevisions(PywikibotTestCase):
         self.assertTrue(hasattr(self.mainpage, "_revisions"))
         self.assertTrue(self.mainpage._revid in self.mainpage._revisions)
         self.assertEqual(len(self.mainpage._revisions), 15)
+
+    def testLoadRevisions_querycontinue(self):
+        """Test the site.loadrevisions() method with query-continue"""
+
+        self.mysite.loadrevisions(self.mainpage, step=5, total=12)
+        self.assertEqual(len(self.mainpage._revisions), 12)
 
     def testLoadRevisions_revdir(self):
         """Test the site.loadrevisions() method with rvdir=True"""

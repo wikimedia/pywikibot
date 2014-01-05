@@ -718,7 +718,16 @@ class QueryGenerator(object):
                     self.normalized = {}
                 for item in resultdata:
                     yield self.result(item)
-                    count += 1
+                    if isinstance(item, dict) and set(self.continuekey) & set(item.keys()):
+                        # if we need to count elements contained in items in
+                        # self.data["query"]["pages"], we want to count
+                        # item[self.continuekey] (e.g. 'revisions') and not
+                        # self.resultkey (i.e. 'pages')
+                        for key in set(self.continuekey) & set(item.keys()):
+                            count += len(item[key])
+                    # otherwise we proceed as usual
+                    else:
+                        count += 1
                     if self.limit > 0 and count >= self.limit:
                         return
             if self.module == "random" and self.limit:

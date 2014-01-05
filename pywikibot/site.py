@@ -1943,7 +1943,6 @@ class APISite(BaseSite):
         elif excludeuser:
             rvgen.request[u"rvexcludeuser"] = excludeuser
         # TODO if sysop: something
-        rvgen.continuekey = "revisions"
         for pagedata in rvgen:
             if page is not None:
                 if not self.sametitle(pagedata['title'],
@@ -1956,7 +1955,6 @@ class APISite(BaseSite):
             else:
                 page = pywikibot.Page(self, pagedata['title'])
             api.update_page(page, pagedata)
-            break
 
     def pageinterwiki(self, page):
         # No such function in the API (this method isn't called anywhere)
