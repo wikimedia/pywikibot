@@ -379,6 +379,7 @@ class RedirectRobot:
         self.number = number
         self.delete = delete
         self.exiting = False
+        self._valid_template = None
 
     def prompt(self, question):
         if not self.always:
@@ -393,6 +394,24 @@ class RedirectRobot:
             elif choice == 'a':
                 self.always = True
         return True
+
+    def has_valid_template(self, twtitle):
+        """"Check whether a template from translatewiki.net does exist on real
+        wiki. We assume we are always working on self.site
+
+        @param twtitle - a sting which is the i18n key
+
+        """
+        if self._valid_template is None:
+            self._valid_template = False
+            if i18n.twhas_key(self.site, twtitle):
+                template_msg = i18n.twtranslate(self.site, twtitle)
+                template = re.findall(u'.*?{{(.*?)[|}]', template_msg)
+                if template:
+                    title = template[0]
+                    page = pywikibot.Page(self.site, title, ns=10)
+                    self._valid_template = page.exists()
+        return self._valid_template
 
     def delete_broken_redirects(self):
         # get reason for deletion text
@@ -476,22 +495,23 @@ class RedirectRobot:
                            redir_page.title(asLink=True))):
                     reason = i18n.twtranslate(self.site,
                                               'redirect-remove-broken')
-                    try:
+                    if self.site.logged_in(sysop=True):
                         redir_page.delete(reason, prompt=False)
-                    except pywikibot.NoUsername:
-                        if ((i18n.twhas_key(
-                             targetPage.site.lang,
-                             'redirect-broken-redirect-template') and
-                             i18n.twhas_key(targetPage.site.lang,
-                                            'redirect-remove-broken')) or
-                                            targetPage.site.lang == '-'):
+                    else:
+                        assert targetPage.site == self.site, (
+                            u'target page is on different site %s'
+                            % targetPage.site)
+                        if (self.has_valid_template(
+                            'redirect-broken-redirect-template') and
+                            i18n.twhas_key(targetPage.site,
+                                           'redirect-remove-broken')):
                             pywikibot.output(u"No sysop in user-config.py, "
                                              u"put page to speedy deletion.")
                             content = redir_page.get(get_redirect=True)
                             ### TODO: Add bot's signature if needed
                             ###       Not supported via TW yet
                             content = i18n.twtranslate(
-                                targetPage.site.lang,
+                                targetPage.site,
                                 'redirect-broken-redirect-template'
                             ) + "\n" + content
                             redir_page.put(content, reason)
