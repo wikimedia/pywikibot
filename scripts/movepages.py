@@ -90,7 +90,7 @@ class MovePagesBot:
             pywikibot.output(u'Page %s is a redirect; skipping.' % page.title())
             return
         pagetitle = page.title(withNamespace=False)
-        namesp = page.site().namespace(page.namespace())
+        namesp = page.site.namespace(page.namespace())
         if self.appendAll:
             newPageTitle = (u'%s%s%s'
                             % (self.pagestart, pagetitle, self.pageend))
