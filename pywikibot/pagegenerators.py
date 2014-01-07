@@ -567,30 +567,49 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                changetype=None, showMinor=None,
                                showBot=None, showAnon=None,
                                showRedirects=None, showPatrolled=None,
-                               step=None, total=None, site=None):
-    """Generate pages that are in the recent changes list.
+                               topOnly=False, step=None, total=None,
+                               user=None, excludeuser=None, site=None):
+
+    """
+    Generate pages that are in the recent changes list.
 
     @param start: Timestamp to start listing from
+    @type start: pywikibot.Timestamp
     @param end: Timestamp to end listing at
+    @type end: pywikibot.Timestamp
     @param reverse: if True, start with oldest changes (default: newest)
-    @param limit: iterate no more than this number of entries
+    @type reverse: bool
     @param pagelist: iterate changes to pages in this list only
     @param pagelist: list of Pages
     @param changetype: only iterate changes of this type ("edit" for
         edits to existing pages, "new" for new pages, "log" for log
         entries)
-    @param showMinor: if True, only list minor edits; if False (and not
-        None), only list non-minor edits
-    @param showBot: if True, only list bot edits; if False (and not
-        None), only list non-bot edits
-    @param showAnon: if True, only list anon edits; if False (and not
-        None), only list non-anon edits
+    @type changetype: basestring
+    @param showMinor: if True, only list minor edits; if False, only list
+        non-minor edits; if None, list all
+    @type showMinor: bool or None
+    @param showBot: if True, only list bot edits; if False, only list
+        non-bot edits; if None, list all
+    @type showBot: bool or None
+    @param showAnon: if True, only list anon edits; if False, only list
+        non-anon edits; if None, list all
+    @type showAnon: bool or None
     @param showRedirects: if True, only list edits to redirect pages; if
-        False (and not None), only list edits to non-redirect pages
-    @param showPatrolled: if True, only list patrolled edits; if False
-        (and not None), only list non-patrolled edits
+        False, only list edits to non-redirect pages; if None, list all
+    @type showRedirects: bool or None
+    @param showPatrolled: if True, only list patrolled edits; if False,
+        only list non-patrolled edits; if None, list all
+    @type showPatrolled: bool or None
+    @param topOnly: if True, only list changes that are the latest revision
+        (default False)
+    @type topOnly: bool
+    @param user: if not None, only list edits by this user or users
+    @type user: basestring|list
+    @param excludeuser: if not None, exclude edits by this user or users
+    @type excludeuser: basestring|list
 
     """
+
     if site is None:
         site = pywikibot.Site()
     for item in site.recentchanges(start=start, end=end, reverse=reverse,
@@ -599,7 +618,8 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                    showBot=showBot, showAnon=showAnon,
                                    showRedirects=showRedirects,
                                    showPatrolled=showPatrolled,
-                                   step=step, total=total):
+                                   topOnly=topOnly, step=step, total=total,
+                                   user=user, excludeuser=excludeuser):
         yield pywikibot.Page(pywikibot.Link(item["title"], site))
 
 
