@@ -112,6 +112,13 @@ def getversion_svn(path=None):
 
 def getversion_git(path=None):
     _program_dir = path or _get_program_dir()
+    cmd = 'git'
+    try:
+        subprocess.Popen([cmd], stdout=subprocess.PIPE).communicate()
+    except WindowsError:
+        # some windows git versions provide git.cmd instead of git.exe
+        cmd = 'git.cmd'
+
     #(try to use .git directory for new entries format)
     #tag  = subprocess.Popen('git config --get remote.origin.url',
     #                        shell=True,
@@ -122,16 +129,18 @@ def getversion_git(path=None):
     tag = tag[(s + 6):e]
     t = tag.strip().split('/')
     tag = '[%s] %s' % (t[0][:-1], '/'.join(t[3:])[:-4])
-    info = subprocess.Popen('git --no-pager log --pretty=format:"%ad|%an|%h|%H|%d" --abbrev-commit --date=iso -1',
+    info = subprocess.Popen([cmd, '--no-pager',
+                             'log', '-1',
+                             '--pretty=format:"%ad|%an|%h|%H|%d"'
+                             '--abbrev-commit',
+                             '--date=iso'],
                             cwd=_program_dir,
-                            shell=True,
                             stdout=subprocess.PIPE).stdout.read()
     info = info.split('|')
     date = info[0][:-6]
-    date = time.strptime(date, '%Y-%m-%d %H:%M:%S')
-    rev = subprocess.Popen('git rev-list HEAD',
+    date = time.strptime(date.strip('"'), '%Y-%m-%d %H:%M:%S')
+    rev = subprocess.Popen([cmd, 'rev-list', 'HEAD'],
                            cwd=_program_dir,
-                           shell=True,
                            stdout=subprocess.PIPE).stdout.read()
     rev = len(rev.splitlines())
     hsh = info[3]      # also stored in '.git/refs/heads/master'
