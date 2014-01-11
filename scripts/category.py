@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
+("""
 Scripts to manage categories.
 
 Syntax: python category.py action [-option]
@@ -37,9 +37,10 @@ Options for "remove" action:
                   for the language, which is "Category was disbanded" in
                   English.
 
-Options for "move" action:
- * -hist        - Creates a nice wikitable on the talk page of target category
-                  that contains detailed page history of the source category.
+Options for "move" action:"""
+ # * -hist        - Creates a nice wikitable on the talk page of target category
+ #                  that contains detailed page history of the source category.
+ """
  * -nodelete    - Don't delete the old category after move
 
 Options for several actions:
@@ -81,7 +82,7 @@ Or to do it all from the command-line, use the following syntax:
 
 This will move all pages in the category US to the category United States.
 
-"""
+""")
 #
 # (C) Rob W.W. Hooft, 2004
 # (C) Daniel Herding, 2004
@@ -393,7 +394,7 @@ class CategoryMoveRobot:
     def __init__(self, oldCatTitle, newCatTitle, batchMode=False,
                  editSummary='', inPlace=False, moveCatPage=True,
                  deleteEmptySourceCat=True, titleRegex=None,
-                 useSummaryForDeletion=True, withHistory=True):
+                 useSummaryForDeletion=True, withHistory=False):
         self.editSummary = editSummary
         self.oldCat = pywikibot.Category(
             pywikibot.Link('Category:' + oldCatTitle))
@@ -878,7 +879,7 @@ def main(*args):
     recurse = False
     titleRegex = None
     pagesonly = False
-    withHistory = True
+    withHistory = False
 
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
@@ -950,7 +951,7 @@ def main(*args):
         elif arg == '-redirect':
             follow_redirects = True
         elif arg == '-hist':
-            withHistory = True
+            withHistory = False
         else:
             genFactory.handleArg(arg)
     pywikibot.Site().login()
