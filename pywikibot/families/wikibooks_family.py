@@ -11,7 +11,7 @@ class Family(family.WikimediaFamily):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'hu', 'ja', 'it', 'pt', 'nl', 'es', 'pl', 'he',
+            'en', 'de', 'fr', 'hu', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'he',
             'vi', 'id', 'sq', 'ca', 'fi', 'ru', 'cs', 'zh', 'sv', 'da', 'hr',
             'tr', 'no', 'th', 'sr', 'gl', 'ko', 'ta', 'ar', 'mk', 'tl', 'fa',
             'ro', 'is', 'tt', 'lt', 'az', 'ka', 'eo', 'uk', 'bg', 'sk', 'el',
