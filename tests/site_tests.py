@@ -289,15 +289,6 @@ class TestSiteObject(PywikibotTestCase):
         self.assertTrue(all(isinstance(el, basestring)
                             for el in mysite.page_extlinks(mainpage)))
 
-    def testLoadRevisions(self):
-        """Test the site.loadrevisions() method"""
-
-        mysite.loadrevisions(mainpage)
-        self.assertTrue(hasattr(mainpage, "_revid"))
-        self.assertTrue(hasattr(mainpage, "_revisions"))
-        self.assertTrue(mainpage._revid in mainpage._revisions)
-        # TODO test all the optional arguments
-
     def testAllPages(self):
         """Test the site.allpages() method"""
 
@@ -966,6 +957,96 @@ class TestSiteObject(PywikibotTestCase):
         self.assertTrue(mysite.hasExtension('anything', True))
         self.assertFalse(mysite.hasExtension('anything', False))
         del mysite._extensions
+
+
+class TestSiteLoadRevisions(PywikibotTestCase):
+    """Test cases for Site.loadrevision() method."""
+
+    # Implemented without setUpClass(cls) and global variables as objects
+    # were not completely disposed and recreated but retained 'memory'
+    def setUp(self):
+        code, family = "en", "wikipedia"
+        self.mysite = pywikibot.Site(code, family)
+        self.mainpage = pywikibot.Page(pywikibot.Link("Main Page", self.mysite))
+
+    def testLoadRevisions_basic(self):
+        """Test the site.loadrevisions() method"""
+
+        self.mysite.loadrevisions(self.mainpage, total=15)
+        self.assertTrue(hasattr(self.mainpage, "_revid"))
+        self.assertTrue(hasattr(self.mainpage, "_revisions"))
+        self.assertTrue(self.mainpage._revid in self.mainpage._revisions)
+        self.assertEqual(len(self.mainpage._revisions), 15)
+
+    def testLoadRevisions_revdir(self):
+        """Test the site.loadrevisions() method with rvdir=True"""
+
+        self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
+        self.assertEqual(len(self.mainpage._revisions), 15)
+
+    def testLoadRevisions_timestamp(self):
+        """Test the site.loadrevisions() method, listing based con timestamp."""
+
+        self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
+        self.assertEqual(len(self.mainpage._revisions), 15)
+        revs = self.mainpage._revisions
+        timestamps = [str(revs[rev].timestamp) for rev in revs]
+        self.assertTrue(all(ts < "2002-01-31T00:00:00Z" for ts in timestamps))
+
+        # Retrieve oldest revisions; listing based on timestamp.
+        # Raises "loadrevisions: starttime > endtime with rvdir=True"
+        self.assertRaises(ValueError, self.mysite.loadrevisions,
+                          self.mainpage, rvdir=True,
+                          starttime="2002-02-01T00:00:00Z", endtime="2002-01-01T00:00:00Z")
+
+        # Retrieve newest revisions; listing based on timestamp.
+        # Raises "loadrevisions: endtime > starttime with rvdir=False"
+        self.assertRaises(ValueError, self.mysite.loadrevisions,
+                          self.mainpage, rvdir=False,
+                          starttime="2002-01-01T00:00:00Z", endtime="2002-02-01T000:00:00Z")
+
+    def testLoadRevisions_revid(self):
+        """Test the site.loadrevisions() method, listing based con revid."""
+
+        self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
+        self.assertEqual(len(self.mainpage._revisions), 15)
+        revs = self.mainpage._revisions
+        self.assertTrue(all(139900 <= rev <= 140100 for rev in revs))
+
+        # Retrieve oldest revisions; listing based on revid.
+        # Raises "loadrevisions: startid > endid with rvdir=True"
+        self.assertRaises(ValueError, self.mysite.loadrevisions,
+                          self.mainpage, rvdir=True,
+                          startid="200000", endid="100000")
+
+        # Retrieve newest revisions; listing based on revid.
+        # Raises "loadrevisions: endid > startid with rvdir=False
+        self.assertRaises(ValueError, self.mysite.loadrevisions,
+                          self.mainpage, rvdir=False,
+                          startid="100000", endid="200000")
+
+    def testLoadRevisions_user(self):
+        """Test the site.loadrevisions() method, filtering by user."""
+
+        # Only list revisions made by this user.
+        self.mainpage._revisions = {}
+        self.mysite.loadrevisions(self.mainpage, rvdir=True,
+                                  user="Magnus Manske")
+        revs = self.mainpage._revisions
+        self.assertTrue(all(revs[rev].user == "Magnus Manske" for rev in revs))
+
+    def testLoadRevisions_excludeuser(self):
+        """Test the site.loadrevisions() method, excluding user."""
+
+        # Do not list revisions made by this user.
+        self.mainpage._revisions = {}
+        self.mysite.loadrevisions(self.mainpage, rvdir=True,
+                                  excludeuser="Magnus Manske")
+        revs = self.mainpage._revisions
+        self.assertFalse(any(revs[rev].user == "Magnus Manske" for rev in revs))
+
+        # TODO test other optional arguments
+
 
 if __name__ == '__main__':
     try:
