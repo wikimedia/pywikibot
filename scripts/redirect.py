@@ -715,7 +715,7 @@ class RedirectRobot:
             if code == 1:
                 continue
             elif code == 0:
-                self.delete_1_broken_redirect(redir_name, delete_reason)
+                self.delete_1_broken_redirect(redir_name)
                 count += 1
             else:
                 self.fix_1_double_redirect(redir_name)
