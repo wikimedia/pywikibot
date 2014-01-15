@@ -998,9 +998,10 @@ class APISite(BaseSite):
         return 'hasmsg' in self._userinfo
 
     def mediawiki_messages(self, keys):
-        """Return the MediaWiki message text for each 'key' in keys
-           in a dict:
+        """Return the MediaWiki message text for each 'key' in keys in a dict:
            -. dict['key'] = text message
+
+           keys='*' or ['*'] will return all messages
 
         """
 
@@ -1010,14 +1011,23 @@ class APISite(BaseSite):
                 meta="allmessages",
                 ammessages='|'.join(keys),
             )
-            for _key in keys:
+
+            # Return all messages
+            if keys == u'*' or keys == [u'*']:
                 for msg in msg_query:
-                    if msg['name'] == _key and not 'missing' in msg:
-                        self._msgcache[_key] = msg['*']
-                        break
-                else:
-                    raise KeyError("Site %(self)s has no message '%(_key)s'"
-                                   % locals())
+                    if not 'missing' in msg:
+                        self._msgcache[msg['name']] = msg['*']
+                return self._msgcache
+            # Return only given keys
+            else:
+                for _key in keys:
+                    for msg in msg_query:
+                        if msg['name'] == _key and not 'missing' in msg:
+                            self._msgcache[_key] = msg['*']
+                            break
+                    else:
+                        raise KeyError("Site %(self)s has no message '%(_key)s'"
+                                       % locals())
 
         return dict((_key, self._msgcache[_key]) for _key in keys)
 
@@ -1030,7 +1040,10 @@ class APISite(BaseSite):
         return self.has_all_mediawiki_messages([key])
 
     def has_all_mediawiki_messages(self, keys):
-        """Return True if this site defines MediaWiki messages for all 'keys'; False otherwise."""
+        """Return True if this site defines MediaWiki messages for all 'keys';
+           False otherwise.
+
+        """
         try:
             v = self.mediawiki_messages(keys)
             return True
