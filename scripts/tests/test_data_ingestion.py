@@ -7,9 +7,6 @@ __version__ = '$Id$'
 import os
 import unittest
 import test_utils
-
-import pywikibot
-
 import data_ingestion
 
 
