@@ -26,7 +26,6 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import pagegenerators, config
-import sys
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}
 

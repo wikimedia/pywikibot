@@ -183,7 +183,6 @@ __version__ = '$Id$'
 
 import time
 import re
-import urllib
 import locale
 import codecs
 from datetime import timedelta

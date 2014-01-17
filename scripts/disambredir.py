@@ -14,7 +14,6 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot import pagegenerators
 import re
-import sys
 from pywikibot import catlib
 
 msg = {

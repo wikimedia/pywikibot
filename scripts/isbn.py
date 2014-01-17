@@ -43,7 +43,6 @@ Furthermore, the following command line parameters are supported:
 __version__ = '$Id$'
 #
 
-import sys
 import re
 
 import pywikibot

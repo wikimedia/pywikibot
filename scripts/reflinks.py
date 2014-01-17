@@ -39,7 +39,6 @@ See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
 __version__ = '$Id$'
 #
 
-import sys
 import re
 import urllib2
 import httplib

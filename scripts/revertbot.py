@@ -17,7 +17,6 @@ __version__ = '$Id$'
 import re
 import pywikibot
 from pywikibot import i18n
-import query
 
 
 class BaseRevertBot(object):
