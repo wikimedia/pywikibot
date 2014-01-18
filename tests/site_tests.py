@@ -11,7 +11,6 @@ __version__ = '$Id$'
 
 
 import pywikibot
-import warnings
 from tests import patch_request, unpatch_request
 from utils import PywikibotTestCase, unittest
 
