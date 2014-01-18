@@ -3142,6 +3142,16 @@ class APISite(BaseSite):
         data = req.submit()
         return data
 
+    @must_be(group='sysop')
+    def unblockuser(self, user, reason):
+
+        token = self.token(user, 'block')
+        req = api.Request(site=self, action='unblock', user=user.username,
+                          reason=reason, token=token)
+
+        data = req.submit()
+        return data
+
     def watchpage(self, page, unwatch=False):
         """Add or remove page from watchlist.
 
