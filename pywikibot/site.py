@@ -1045,7 +1045,8 @@ class APISite(BaseSite):
         """
         r = api.Request(site=self,
                         action="parse",
-                        text="{{CURRENTTIMESTAMP}}")
+                        text="{{CURRENTTIMESTAMP}}",
+                        contentmodel="wikitext")
         result = r.submit()
         return re.search('\d+', result['parse']['text']['*']).group()
 
