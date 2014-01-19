@@ -44,7 +44,6 @@ import urllib2
 import httplib
 import socket
 import codecs
-import ftplib
 import subprocess
 import tempfile
 import os

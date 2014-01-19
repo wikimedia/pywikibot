@@ -45,7 +45,6 @@ import re
 import pywikibot
 from pywikibot import i18n
 from pywikibot import pagegenerators
-import editarticle
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
