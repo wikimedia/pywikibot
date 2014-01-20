@@ -10,7 +10,7 @@ lists which are required by some other programs.
 # (C) Andre Engels, 2004-2005
 # (C) Yuri Astrakhan, 2005-2006  FirstnameLastname@gmail.com
 #       (years/decades/centuries/millenniums  str <=> int  conversions)
-# (C) Pywikibot team, 2004-2013
+# (C) Pywikibot team, 2004-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -2324,89 +2324,6 @@ def formatYear(lang, year):
     else:
         return formats['YearAD'][lang](year)
 
-#
-#  Map testing methods
-#
-
-
-def printMonthArray(lang, pattern, capitalize):
-    """
-    """
-    for s in makeMonthNamedList(lang, pattern, capitalize):
-        pywikibot.output(s)
-
-
-def testMapEntry(formatName, showAll=True, value=None):
-    """This is a test function, to be used interactivelly to test the validity
-    of the above maps. To test, run this function with the map name, value to
-    be tested, and the final value expected.
-    Usage example:
-        run python interpreter
-        >>> import date
-        >>> date.testMapEntry('DecadeAD', 1992, 1990)
-        >>> date.testMapEntry('CenturyAD', 20, 20)
-
-    """
-
-    step = 1
-    if formatName in decadeFormats:
-        step = 10
-    predicate, start, stop = formatLimits[formatName]
-    if value is not None:
-        start, stop = value, value + 1
-    if showAll:
-        pywikibot.output(u"Processing %s with limits from %d to %d and step %d"
-                         % (formatName, start, stop - 1, step))
-
-    for code, convFunc in formats[formatName].items():
-##        import time
-##        startClock = time.clock()
-        for value in range(start, stop, step):
-            try:
-                if not predicate(value):
-                    raise AssertionError(
-                        "     Not a valid value for this format.")
-                newValue = convFunc(convFunc(value))
-                if newValue != value:
-                    raise AssertionError(
-                        "     %s != %s: assert failed, values didn't match"
-                        % (newValue, value))
-                if showAll:
-                    pywikibot.output(u"date.formats['%s']['%s'](%d): '%s' -> %d"
-                                     % (formatName, code, value, convFunc(value),
-                                        newValue))
-            except:
-                pywikibot.output(u"********** Error in date.formats['%s']['%s'](%d)"
-                                 % (formatName, code, value))
-                raise
-##        print(u"%s\t%s\t%f" % (formatName, code, time.clock() - startClock))
-
-
-def test(quick=False, showAll=False):
-    """This is a test function, to be used interactively to test entire
-    format conversion map at once
-
-    Usage example:
-        run python interpreter
-        >>> import date
-        >>> date.test()
-
-    """
-    for formatName in formats:
-        if quick:
-            # Only test the first value in the test range
-            testMapEntry(formatName, showAll, formatLimits[formatName][1])
-        else:
-            # Extensive test! Test decade rounding
-            testMapEntry(formatName, showAll)
-            pywikibot.output(u"'%s' complete." % formatName)
-    if quick:
-##        print(u'Date module quick consistency test passed')
-        pass
-    else:
-        print(u'Date module has been fully tested')
-
 
 if __name__ == "__main__":
-    # Test the date file
-    test(quick=False)
+    print(__doc__)
