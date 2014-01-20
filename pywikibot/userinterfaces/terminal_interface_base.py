@@ -7,7 +7,6 @@
 __version__ = '$Id$'
 
 from . import transliteration
-import traceback
 import re
 import sys
 import pywikibot as wikipedia
@@ -89,7 +88,7 @@ class UI:
 
         # handler for levels WARNING and higher
         warning_handler = TerminalHandler(self, strm=self.stderr)
-        warning_handler.setLevel(logging.WARNING)
+        warning_handler.setLevel(WARNING)
         warning_handler.setFormatter(
             TerminalFormatter(fmt="%(levelname)s: %(message)s%(newline)s"))
         root_logger.addHandler(warning_handler)
@@ -150,7 +149,6 @@ class UI:
                     # mark the transliterated letters in yellow.
                     transliteratedText += '\03{lightyellow}%s\03{default}' \
                                           % transliterated
-                    transLength = len(transliterated)
                     # memorize if we replaced a single letter by multiple
                     # letters.
                     if len(transliterated) > 0:
