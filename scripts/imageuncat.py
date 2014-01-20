@@ -13,16 +13,10 @@ See imagerecat.py (still working on that one) to add these images to categories.
 __version__ = '$Id$'
 #
 
-import os
-import sys
-import re
-import codecs
 from datetime import datetime
 from datetime import timedelta
 import pywikibot
-from pywikibot import config
 from pywikibot import pagegenerators
-from pywikibot import config
 import query
 
 #Probably unneeded because these are hidden categories. Have to figure it out.

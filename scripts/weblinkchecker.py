@@ -109,7 +109,6 @@ import urlparse
 import urllib
 import threading
 import time
-import gzip
 
 import pywikibot
 from pywikibot import i18n
