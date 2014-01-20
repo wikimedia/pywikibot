@@ -10,7 +10,6 @@ Mechanics to slow down wiki read and/or write rate.
 __version__ = '$Id$'
 #
 
-import logging
 import math
 import threading
 import time
