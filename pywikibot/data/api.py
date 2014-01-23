@@ -525,9 +525,16 @@ class QueryGenerator(object):
             self.resultkey = "pages"        # name of the "query" subelement key
         else:                               # to look for when iterating
             self.resultkey = self.module
-        self.continuekey = self.module      # usually the query-continue key
-                                            # is the same as the querymodule,
-                                            # but not always
+
+        # usually the query-continue key is the same as the querymodule,
+        # but not always
+        # API can return more than one query-continue key, if multiple properties
+        # are requested by the query, e.g.
+        # "query-continue":{
+        #     "langlinks":{"llcontinue":"12188973|pt"},
+        #     "templates":{"tlcontinue":"310820|828|Namespace_detect"}}
+        # self.continuekey is a list
+        self.continuekey = self.module.split('|')
 
     @property
     def __modules(self):
@@ -720,17 +727,19 @@ class QueryGenerator(object):
                 continue
             if not "query-continue" in self.data:
                 return
-            if not self.continuekey in self.data["query-continue"]:
+            if all(key not in self.data["query-continue"] for key in self.continuekey):
                 pywikibot.log(
-                    u"Missing '%s' key in ['query-continue'] value."
+                    u"Missing '%s' key(s) in ['query-continue'] value."
                     % self.continuekey)
                 return
-            update = self.data["query-continue"][self.continuekey]
-            for key, value in update.items():
-                # query-continue can return ints
-                if isinstance(value, int):
-                    value = str(value)
-                self.request[key] = value
+            query_continue_pairs = self.data["query-continue"].values()
+            for query_continue_pair in query_continue_pairs:
+                for key, value in query_continue_pair.items():
+                    # query-continue can return ints
+                    if isinstance(value, int):
+                        value = str(value)
+                    self.request[key] = value
+
             del self.data  # a new request with query-continue is needed
 
     def result(self, data):
