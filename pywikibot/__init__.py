@@ -270,13 +270,19 @@ class WbTime(object):
         return WbTime(long(t[0]), int(t[1]), int(t[2]), int(t[3]), int(t[4]), int(t[5]),
                       precision, before, after, timezone, calendarmodel)
 
+    def toTimestr(self):
+        """
+        Function which converts the the data to a UTC date/time string
+        """
+        return WbTime.FORMATSTR.format(self.year, self.month, self.day,
+                                        self.hour, self.minute, self.second)
+
     def toWikibase(self):
         """
         Function which converts the data to a JSON object
         for the Wikibase API.
         """
-        json = {'time': WbTime.FORMATSTR.format(self.year, self.month, self.day,
-                self.hour, self.minute, self.second),
+        json = {'time': self.toTimestr(),
                 'precision': self.precision,
                 'after': self.after,
                 'before': self.before,

@@ -45,6 +45,10 @@ class TestGeneral(PywikibotTestCase):
         claim.setTarget(pywikibot.ItemPage(repo, 'q1'))
         self.assertEqual(claim._formatDataValue(), {'entity-type': 'item', 'numeric-id': 1})
 
+        # test WbTime
+        t = pywikibot.WbTime(year=2010, hour=12, minute=43)
+        self.assertEqual(t.toTimestr(), '+00000002010-01-01T12:43:00Z')
+
         # test WikibasePage.__cmp__
         self.assertEqual(pywikibot.ItemPage.fromPage(mainpage), pywikibot.ItemPage(repo, 'q5296'))
 
