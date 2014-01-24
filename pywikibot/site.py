@@ -3026,6 +3026,7 @@ class APISite(BaseSite):
         "cantdelete": "Could not delete [[%(title)s]]. Maybe it was deleted already.",
     }  # other errors shouldn't occur because of pre-submission checks
 
+    @must_be(group='sysop')
     def deletepage(self, page, summary):
         """Delete page from the wiki. Requires appropriate privilege level.
 
@@ -3033,13 +3034,6 @@ class APISite(BaseSite):
         @param summary: Edit summary (required!).
 
         """
-        try:
-            self.login(sysop=True)
-        except pywikibot.NoUsername as e:
-            raise NoUsername("delete: Unable to login as sysop (%s)"
-                             % e.__class__.__name__)
-        if not self.logged_in(sysop=True):
-            raise NoUsername("delete: Unable to login as sysop")
         token = self.token(page, "delete")
         self.lock_page(page)
         req = api.Request(site=self, action="delete", token=token,
@@ -3070,6 +3064,7 @@ class APISite(BaseSite):
         "protect-invalidlevel": "Invalid protection level"
     }
 
+    @must_be(group='sysop')
     def protect(self, page, edit, move, summary):
         """(Un)protect a wiki page. Requires administrator status.
 
@@ -3084,13 +3079,6 @@ class APISite(BaseSite):
         @param prompt: If true, ask user for confirmation.
 
         """
-        try:
-            self.login(sysop=True)
-        except pywikibot.NoUsername as e:
-            raise NoUsername("protect: Unable to login as sysop (%s)"
-                             % e.__class__.__name__)
-        if not self.logged_in(sysop=True):
-            raise NoUsername("protect: Unable to login as sysop")
         token = self.token(page, "protect")
         self.lock_page(page)
         req = api.Request(site=self, action="protect", token=token,
