@@ -1037,6 +1037,30 @@ class APISite(BaseSite):
         except KeyError:
             return False
 
+    @property
+    def months_names(self):
+        """Return a zero-indexed list of (month name, abbreviation) tuples,
+           ordered by month in calendar, in original site language.
+
+        """
+        if hasattr(self, "_months_names"):
+            return self._months_names
+
+        months_long = ['january', 'february', 'march',
+                       'april', 'may_long', 'june',
+                       'july', 'august', 'september',
+                       'october', 'november', 'december']
+        months_short = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
+                        'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+
+        months = self.mediawiki_messages(months_long + months_short)
+
+        self._months_names = []
+        for m_l, m_s in zip(months_long, months_short):
+            self._months_names.append((months[m_l], months[m_s]))
+
+        return self._months_names
+
     def getcurrenttimestamp(self):
         """Return server time, {{CURRENTTIMESTAMP}}, as a string.
 
