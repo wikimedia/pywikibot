@@ -161,58 +161,6 @@ def generateTransclusions(Site, template, namespaces=[]):
         yield page
 
 
-class Months(object):
-    """
-    Generation of look-up dictionaries for months, used by Timestripper() and PageArchiver
-    """
-
-    def __init__(self, site=None):
-        if site is None:
-            self.site = pywikibot.getSite()
-        else:
-            self.site = site
-
-    @classmethod
-    def queryMonths(self):
-        months_long = ['january', 'february', 'march', 'april', 'may_long', 'june',
-                       'july', 'august', 'september', 'october', 'november', 'december']
-        months_short = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
-                        'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-
-        #d[1:12] = {'short': 'orig_short', 'long': 'orig_long}
-        monthNum2origNames = dict((i, {'short': '', 'long': ''}) for i in range(1, 13))
-        origNames2monthNum = dict()
-
-        # site.mediawiki_message() does not support preloading multiple messages in one go
-        qg = pywikibot.data.api.QueryGenerator(
-            site=self.site,
-            meta="allmessages",
-            ammessages='|'.join(months_long + months_short)
-        )
-
-        for el in qg:
-            orig = el["*"]
-            eng = el["name"]
-            try:
-                month_num = months_long.index(eng) + 1
-                monthNum2origNames[month_num]['long'] = orig
-            except ValueError:
-                month_num = months_short.index(eng) + 1
-                monthNum2origNames[month_num]['short'] = orig
-
-            origNames2monthNum[orig] = month_num
-
-        return monthNum2origNames, origNames2monthNum
-
-    @classmethod
-    def updateMonths(self, site=None):
-        if site is None:
-            self.site = pywikibot.getSite()
-        else:
-            self.site = site
-        self.monthsDicts = self.queryMonths()
-
-
 class tzoneUTC(datetime.tzinfo):
     """
     Class building a UTC tzinfo object
@@ -264,9 +212,16 @@ class TimeStripper(object):
     Find timetstamp in page text and returns it as timezone aware datetime object
     """
 
-    def __init__(self):
-        self.monthNum2origNames, self.origNames2monthNum = Months.monthsDicts
-        self.site = Months.site
+    def __init__(self, site=None):
+        if site is None:
+            self.site = pywikibot.getSite()
+        else:
+            self.site = site
+
+        self.origNames2monthNum = {}
+        for n, (_long, _short) in enumerate(self.site.months_names):
+            self.origNames2monthNum[_long] = n + 1
+            self.origNames2monthNum[_short] = n + 1
 
         self.groups = [u'year', u'month',  u'hour',  u'time', u'day', u'minute', u'tzinfo']
 
@@ -314,7 +269,10 @@ class TimeStripper(object):
 
     def timestripper(self, line):
         """
-        Find timestamp in line and convert it to time zone aware datetime
+        Find timestamp in line and convert it to time zone aware datetime.
+        All the following items must be matched, otherwise None is returned:
+        -. year, month, hour, time, day, minute, tzinfo
+
         """
         _line = line
         #match date fields
@@ -367,7 +325,7 @@ class DiscussionThread(object):
         self.title = title
         self.now = now
         self.content = ""
-        self.ts = TimeStripper()
+        self.ts = TimeStripper(site=Site)
         self.timestamp = None
 
     def __repr__(self):
@@ -504,7 +462,9 @@ class PageArchiver(object):
         }
         self.archives = {}
         self.archivedThreads = 0
-        self.monthNum2origNames, self.origNames2monthNum = Months.monthsDicts
+        self.monthNum2origNames = {}
+        for n, (_long, _short) in enumerate(Site.months_names):
+            self.monthNum2origNames[n + 1] = {"long": _long, "short": _short}
 
     def get(self, attr, default=''):
         return self.attributes.get(attr, [default])[0]
@@ -693,9 +653,6 @@ def main():
         pywikibot.output(u'NOTE: you must specify a template to run the bot')
         pywikibot.showHelp('archivebot')
         return
-
-    #query site for original months name and create convenience look-up dictionaries
-    Months.updateMonths(site=Site)
 
     for a in args[1:]:
         pagelist = []
