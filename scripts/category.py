@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-("""
+"""
 Scripts to manage categories.
 
 Syntax: python category.py action [-option]
@@ -37,10 +37,9 @@ Options for "remove" action:
                   for the language, which is "Category was disbanded" in
                   English.
 
-Options for "move" action:"""
- # * -hist        - Creates a nice wikitable on the talk page of target category
- #                  that contains detailed page history of the source category.
- """
+Options for "move" action:
+ * -hist        - Creates a nice wikitable on the talk page of target category
+                  that contains detailed page history of the source category.
  * -nodelete    - Don't delete the old category after move
 
 Options for several actions:
@@ -82,7 +81,7 @@ Or to do it all from the command-line, use the following syntax:
 
 This will move all pages in the category US to the category United States.
 
-""")
+"""
 #
 # (C) Rob W.W. Hooft, 2004
 # (C) Daniel Herding, 2004
@@ -105,6 +104,7 @@ import bz2
 import pywikibot
 from pywikibot import catlib, config, pagegenerators
 from pywikibot import i18n
+from pywikibot import deprecate_arg
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -388,113 +388,158 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
                                  % page.title(asLink=True))
 
 
-class CategoryMoveRobot:
-    """Robot to move pages from one category to another."""
+class CategoryMoveRobot(object):
+    """Bot to move pages from one category to another. The bot
+    moves pages and subcategories.
+    """
+    @deprecate_arg("oldCatTitle", "oldcat")
+    @deprecate_arg("newCatTitle", "newcat")
+    @deprecate_arg("batchMode", "batch")
+    @deprecate_arg("editSummary", "comment")
+    @deprecate_arg("inPlace", "inplace")
+    @deprecate_arg("moveCatPage", "move_oldcat")
+    @deprecate_arg("deleteEmptySourceCat", "delete_oldcat")
+    @deprecate_arg("titleRegex", "title_regex")
+    @deprecate_arg("withHistory", "history")
+    def __init__(self, oldcat, newcat, batch=False, comment='', inplace=False,
+                 move_oldcat=True, delete_oldcat=True, title_regex=None,
+                 history=False):
+        """Stores all given parameters in the objects attributes.
 
-    def __init__(self, oldCatTitle, newCatTitle, batchMode=False,
-                 editSummary='', inPlace=False, moveCatPage=True,
-                 deleteEmptySourceCat=True, titleRegex=None,
-                 useSummaryForDeletion=True, withHistory=False):
-        self.editSummary = editSummary
-        self.oldCat = pywikibot.Category(
-            pywikibot.Link('Category:' + oldCatTitle))
-        self.newCatTitle = newCatTitle
-        self.inPlace = inPlace
-        self.moveCatPage = moveCatPage
-        self.batchMode = batchMode
-        self.deleteEmptySourceCat = deleteEmptySourceCat
-        self.titleRegex = titleRegex
-        self.useSummaryForDeletion = useSummaryForDeletion
-        self.withHistory = withHistory
+        @param oldcat: The move source.
+        @param newcat: The move target.
+        @param batch: If True the user has not to confirm the deletion.
+        @param comment: The edit summary for all pages where the
+            category is changed.
+        @param inplace: If True the categories are not reordered.
+        @param move_oldcat: If True the category page (and talkpage) is
+            copied to the new category.
+        @param delete_oldcat: If True the oldcat page and talkpage are
+            deleted (or nominated for deletion) if it is empty.
+        @param title_regex: Only pages (and subcats) with a title that
+            matches the regex are moved.
+        @param history: If True the history of the oldcat is posted on
+            the talkpage of newcat.
+        """
+        self.site = pywikibot.Site()
+        # Create attributes for the categories and their talk pages.
+        self.oldcat = self._makecat(oldcat)
+        self.oldtalk = self.oldcat.toggleTalkPage()
+        self.newcat = self._makecat(newcat)
+        self.newtalk = self.newcat.toggleTalkPage()
+        # Set boolean settings.
+        self.inplace = inplace
+        self.move_oldcat = move_oldcat
+        self.delete_oldcat = delete_oldcat
+        self.batch = batch
+        self.title_regex = title_regex
+        self.history = history
+        # Set edit summary for changed pages.
+        self.comment = comment
+        if not self.comment:
+            template_vars = {'oldcat': self.oldcat.title(withNamespace=False),
+                             'newcat': self.newcat.title(withNamespace=False)}
+            self.comment = i18n.twtranslate(self.site,
+                                            'category-replacing',
+                                            template_vars)
 
     def run(self):
-        if self.withHistory:
-            raise NotImplementedError("History printing is not yet enabled.")
-        site = pywikibot.getSite()
-        newCat = pywikibot.Category(
-            pywikibot.Link('Category:' + self.newCatTitle))
-        newcat_contents = set(newCat.members())
-        # set edit summary message
-        if not self.editSummary:
-            self.editSummary = i18n.twtranslate(site, 'category-replacing',
-                                                {'oldcat': self.oldCat.title(),
-                                                 'newcat': newCat.title()})
+        """The main bot function that does all the work.
+        For readability it is splitted into several helper functions.
+        """
+        if self.move_oldcat and not self.newcat.exists():
+            self._movecat()
+            self._movetalk()
+            if self.history:
+                self._hist()
+        self._change(pagegenerators.CategorizedPageGenerator(self.oldcat))
+        self._change(pagegenerators.SubCategoriesPageGenerator(self.oldcat))
+        self._delete()
 
-        # Copy the category contents to the new category page
-        copied = False
-        oldMovedTalk = None
-        if self.oldCat.exists() and self.moveCatPage:
-            copied = self.oldCat.copyAndKeep(
-                self.newCatTitle,
-                pywikibot.translate(site, cfd_templates),
-                i18n.twtranslate(site, 'category-renamed')
-            )
-            # Also move the talk page
-            if copied:
-                reason = i18n.twtranslate(
-                    site, 'category-was-moved',
-                    {'newcat': self.newCatTitle, 'title': self.newCatTitle}
-                )
-                oldTalk = self.oldCat.toggleTalkPage()
-                if oldTalk.exists():
-                    newTalkTitle = newCat.toggleTalkPage().title()
-                    try:
-                        talkMoved = oldTalk.move(newTalkTitle, reason)
-                    except (pywikibot.NoPage, pywikibot.PageNotSaved) as e:
-                        #in order :
-                        #Source talk does not exist, or
-                        #Target talk already exists
-                        pywikibot.output(e.message)
-                    else:
-                        if talkMoved:
-                            oldMovedTalk = oldTalk
+    def _delete(self):
+        """Private function to delete the category page and its talk page.
+        Do not use this function from outside the class.
+        """
+        if self.move_oldcat and self.oldcat.isEmptyCategory() and \
+                self.delete_oldcat:
+            template_vars = {'newcat': self.newcat.title(withNamespace=False),
+                             'title': self.newcat.title(withNamespace=False)}
+            comment = i18n.twtranslate(self.site,
+                                       'category-was-moved',
+                                       template_vars)
+            self.oldcat.delete(comment, not self.batch, mark=True)
+            if self.oldtalk.exists():
+                self.oldtalk.delete(comment, not self.batch, mark=True)
 
-        # Move articles
-        gen = pagegenerators.CategorizedPageGenerator(self.oldCat,
-                                                      recurse=False)
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        for article in preloadingGen:
-            if not self.titleRegex or re.search(self.titleRegex,
-                                                article.title()):
-                if article in newcat_contents:
-                    catlib.change_category(article, self.oldCat, None,
-                                           comment=self.editSummary,
-                                           inPlace=self.inPlace)
-                else:
-                    catlib.change_category(article, self.oldCat, newCat,
-                                           comment=self.editSummary,
-                                           inPlace=self.inPlace)
+    def _change(self, gen):
+        """Private function to move category contents.
+        Do not use this function from outside the class.
 
-        # Move subcategories
-        gen = pagegenerators.SubCategoriesPageGenerator(self.oldCat,
-                                                        recurse=False)
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        for subcategory in preloadingGen:
-            if not self.titleRegex or re.search(self.titleRegex,
-                                                subcategory.title()):
-                if subcategory in newcat_contents:
-                    catlib.change_category(subcategory, self.oldCat, None,
-                                           comment=self.editSummary,
-                                           inPlace=self.inPlace)
-                else:
-                    catlib.change_category(subcategory, self.oldCat, newCat,
-                                           comment=self.editSummary,
-                                           inPlace=self.inPlace)
+        @param gen: Generator containing pages or categories.
+        """
+        for page in pagegenerators.PreloadingGenerator(gen):
+            if not self.title_regex or re.search(self.title_regex,
+                                                 page.title()):
+                page.change_category(self.oldcat, self.newcat,
+                                     comment=self.comment,
+                                     inPlace=self.inplace)
 
-        # Delete the old category and its moved talk page
-        if copied and self.deleteEmptySourceCat:
-            if self.oldCat.isEmptyCategory():
-                reason = i18n.twtranslate(
-                    site, 'category-was-moved',
-                    {'newcat': self.newCatTitle, 'title': self.newCatTitle}
-                )
-                confirm = not self.batchMode
-                self.oldCat.delete(reason, confirm, mark=True)
-                if oldMovedTalk is not None:
-                    oldMovedTalk.delete(reason, confirm, mark=True)
-            else:
-                pywikibot.output('Couldn\'t delete %s - not empty.'
-                                 % self.oldCat.title())
+    def _movecat(self):
+        """Private function to move the category page.
+        Do not use this function from outside the class.
+        """
+        # Some preparing
+        pywikibot.output('Moving text from %s to %s.' % (self.oldcat.title(),
+                                                         self.newcat.title()))
+        authors = ', '.join(self.oldcat.contributingUsers())
+        template_vars = (self.oldcat.title(), authors)
+        comment = i18n.twtranslate(self.site,
+                                   'category-renamed') % template_vars
+        self.newcat.text = self.oldcat.text
+        # Replace stuff
+        REGEX = r"<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->"
+        match = re.compile(REGEX,
+                           re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        self.newcat.text = match.sub('', self.newcat.text)
+        for template_name in cfd_templates:
+            match = re.compile(r"{{%s.*?}}" % template_name, re.IGNORECASE)
+            self.newcat.text = match.sub('', self.newcat.text)
+        # Remove leading whitespace
+        self.newcat.text = self.newcat.text.lstrip()
+        self.newcat.save(comment)
+
+    def _movetalk(self):
+        """Private function to move the category talk page.
+        Do not use this function from outside the class.
+        """
+        if self.oldtalk.exists():
+            comment = i18n.twtranslate(self.site, 'category-was-moved',
+                                       {'newcat': self.newcat.title(),
+                                        'title': self.newcat.title()})
+            self.oldtalk.move(self.newtalk.title(), comment)
+
+    def _hist(self):
+        """Private function to create a history table with the history
+        of the old category on the new talk page.
+        Do not use this function from outside the class.
+        """
+        history = self.oldcat.getVersionHistoryTable()
+        title = i18n.twtranslate(self.site, 'category-section-title',
+                                 {'oldcat': self.oldcat.title()})
+        self.newtalk.text = "%s\n== %s ==\n%s" % (self.newtalk.text,
+                                                  title, history)
+        comment = i18n.twtranslate(self.site, 'category-version-history',
+                                   {'oldcat': self.oldcat.title()})
+        self.newtalk.save(comment)
+
+    def _makecat(self, var):
+        """Private helper function to get a Category object either from
+        a string or use just use the given one (for backwards
+        compatibility).
+        """
+        if not isinstance(var, pywikibot.Category):
+            var = pywikibot.Category(self.site, var)
+        return var
 
 
 class CategoryListifyRobot:
@@ -951,7 +996,7 @@ def main(*args):
         elif arg == '-redirect':
             follow_redirects = True
         elif arg == '-hist':
-            withHistory = False
+            withHistory = True
         else:
             genFactory.handleArg(arg)
     pywikibot.Site().login()
