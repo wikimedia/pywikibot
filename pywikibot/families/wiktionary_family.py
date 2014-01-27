@@ -23,7 +23,7 @@ class Family(family.WikimediaFamily):
             'sa', 'gn', 'mr', 'csb', 'ug', 'st', 'ia', 'sd', 'sh', 'si', 'mn',
             'tg', 'or', 'kl', 'vec', 'jbo', 'an', 'ln', 'fo', 'zu', 'gu', 'kw',
             'gv', 'rw', 'qu', 'ss', 'ie', 'mt', 'om', 'bn', 'pa', 'roa-rup',
-            'iu', 'so', 'am', 'su', 'za', 'gd', 'mi', 'tpi', 'ne', 'yi', 'na',
+            'iu', 'so', 'su', 'am', 'za', 'gd', 'mi', 'tpi', 'ne', 'yi', 'na',
             'ti', 'sg', 'dv', 'tn', 'ts', 'ha', 'ks', 'ay',
         ]
 
