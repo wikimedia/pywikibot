@@ -155,9 +155,14 @@ class TestSiteObject(PywikibotTestCase):
         self.assertType(mysite.mediawiki_messages(msg), dict)
         self.assertTrue(mysite.mediawiki_messages(msg))
 
-        msg = ("1movedto2", "about", "aboutpage", "nosuchmessage")
+        msg = ("nosuchmessage1", "about", "aboutpage", "nosuchmessage")
         self.assertFalse(mysite.has_all_mediawiki_messages(msg))
         self.assertRaises(KeyError, mysite.mediawiki_messages, msg)
+
+        # Load all messages and check that '*' is not a valid key.
+        self.assertType(mysite.mediawiki_messages('*'), dict)
+        self.assertTrue(len(mysite.mediawiki_messages(['*'])) > 10)
+        self.assertFalse('*' in mysite.mediawiki_messages(['*']))
 
         self.assertType(mysite.getcurrenttimestamp(), basestring)
         self.assertType(mysite.siteinfo, dict)
