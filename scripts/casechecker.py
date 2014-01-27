@@ -4,7 +4,7 @@
 with mixed latin and cyrilic alphabets.
 """
 #
-# (C) Pywikibot team, 2006-2013
+# (C) Pywikibot team, 2006-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -284,8 +284,8 @@ class CaseChecker(object):
                              % len(self.knownWords))
             if len(self.knownWords) > 0:
                 pywikibot.log(u'Whitelist: %s'
-                                 % u', '.join([self.MakeLink(i, False)
-                                               for i in self.knownWords]))
+                              % u', '.join([self.MakeLink(i, False)
+                                            for i in self.knownWords]))
         else:
             pywikibot.output(u'Whitelist is not known for language %s'
                              % self.site.lang)
@@ -380,8 +380,8 @@ class CaseChecker(object):
 ##                                                           % (title, newTitle),
 ##                                                           ['Yes', 'No'],
 ##                                                           ['y', 'n'])
-                            editSummary = i18n.twtranslate(self.site,
-                                                              "casechecker-rename")
+                            editSummary = i18n.twtranslate(
+                                self.site, "casechecker-rename")
                             dst = self.Page(newTitle)
 
                             if 'redirect' in page:
@@ -549,7 +549,7 @@ class CaseChecker(object):
                 if badWord in self.alwaysInLocal:
                     mightBeLat = False
                 elif badWord in self.alwaysInLatin:
-                    mightBeLoc = False
+                    mightBeLcl = False
 
             if mightBeLcl:
                 mapLcl[badWord] = badWord.translate(self.latToLclDict)
@@ -770,7 +770,7 @@ class CaseChecker(object):
                     % (i18n.twtranslate(
                         self.site,
                         "casechecker-replacement-summary"),
-                        self.site.mediawiki_message(u"Comma-separator").join(msg)))
+                        self.site.mediawiki_message(u"comma-separator").join(msg)))
                 return True
             except KeyboardInterrupt:
                 raise
@@ -780,7 +780,8 @@ class CaseChecker(object):
         return False
 
     def MakeMoveSummary(self, fromTitle, toTitle):
-        return i18n.twtranslate(self.site, "casechecker-replacement-linklist") % {'source': fromTitle, 'target': toTitle}
+        return i18n.twtranslate(self.site, "casechecker-replacement-linklist",
+                                {'source': fromTitle, 'target': toTitle})
 
     def MakeLink(self, title, colorcode=True):
         prf = u'' if self.Page(title).namespace() == 0 else u':'
@@ -803,7 +804,7 @@ class CaseChecker(object):
     def ReplaceLink(self, text, oldtxt, newtxt):
 
         frmParts = [s.strip(self.stripChars)
-                    for d in self.wordBreaker.split(oldtxt)]
+                    for s in self.wordBreaker.split(oldtxt)]
         toParts = [s.strip(self.stripChars)
                    for s in self.wordBreaker.split(newtxt)]
 
@@ -817,7 +818,6 @@ class CaseChecker(object):
                                     toParts[i][0].lower() + toParts[i][1:])
                 text = text.replace(frmParts[i][0].upper() + frmParts[i][1:],
                                     toParts[i][0].upper() + toParts[i][1:])
-
         return text
 
 
