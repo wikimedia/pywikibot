@@ -1833,14 +1833,14 @@ class APISite(BaseSite):
                                 **cmargs)
         return cmgen
 
-    def loadrevisions(self, page=None, getText=False, revids=None,
+    def loadrevisions(self, page, getText=False, revids=None,
                       startid=None, endid=None, starttime=None,
                       endtime=None, rvdir=None, user=None, excludeuser=None,
                       section=None, sysop=False, step=None, total=None):
         """Retrieve and store revision information.
 
         By default, retrieves the last (current) revision of the page,
-        I{unless} any of the optional parameters revids, startid, endid,
+        unless any of the optional parameters revids, startid, endid,
         starttime, endtime, rvdir, user, excludeuser, or limit are
         specified. Unless noted below, all parameters not specified
         default to False.
@@ -1857,9 +1857,9 @@ class APISite(BaseSite):
             (getText must be True); section must be given by number (top of
             the article is section 0), not name
         @type section: int
-        @param revids: retrieve only the specified revision ids (required
-            unless page is specified)
-        @type revids: list of ints
+        @param revids: retrieve only the specified revision ids (raise
+            Exception if any of revids does not correspond to page
+        @type revids: an int, a str or a list of ints or strings
         @param startid: retrieve revisions starting with this revid
         @param endid: stop upon retrieving this revid
         @param starttime: retrieve revisions starting at this Timestamp
@@ -1884,9 +1884,6 @@ class APISite(BaseSite):
                   total is None)  # if True, retrieving current revision
 
         # check for invalid argument combinations
-        if page is None and revids is None:
-            raise ValueError(
-                "loadrevisions:  either page or revids argument required")
         if (startid is not None or endid is not None) and \
                 (starttime is not None or endtime is not None):
             raise ValueError(
@@ -1906,54 +1903,56 @@ class APISite(BaseSite):
                 raise ValueError(
                     "loadrevisions: endid > startid with rvdir=False")
 
-        # assemble API request
+        rvargs = dict(type_arg=u"info|revisions")
+
+        if getText:
+            rvargs[u"rvprop"] = u"ids|flags|timestamp|user|comment|content"
+            if section is not None:
+                rvargs[u"rvsection"] = unicode(section)
+
         if revids is None:
             rvtitle = page.title(withSection=False).encode(self.encoding())
-            rvgen = self._generator(api.PropertyGenerator,
-                                    type_arg=u"info|revisions",
-                                    titles=rvtitle, step=step, total=total)
+            rvargs[u"titles"] = rvtitle
         else:
             if isinstance(revids, (int, basestring)):
                 ids = unicode(revids)
             else:
                 ids = u"|".join(unicode(r) for r in revids)
-            rvgen = self._generator(api.PropertyGenerator,
-                                    type_arg=u"info|revisions", revids=ids,
-                                    step=step, total=total)
-        if getText:
-            rvgen.request[u"rvprop"] = u"ids|flags|timestamp|user|comment|content"
-            if section is not None:
-                rvgen.request[u"rvsection"] = unicode(section)
+            rvargs[u"revids"] = ids
+
+        if rvdir:
+            rvargs[u"rvdir"] = u"newer"
+        elif rvdir is not None:
+            rvargs[u"rvdir"] = u"older"
+        if startid:
+            rvargs[u"rvstartid"] = startid
+        if endid:
+            rvargs[u"rvendid"] = endid
+        if starttime:
+            rvargs[u"rvstart"] = str(starttime)
+        if endtime:
+            rvargs[u"rvend"] = str(endtime)
+        if user:
+            rvargs[u"rvuser"] = user
+        elif excludeuser:
+            rvargs[u"rvexcludeuser"] = excludeuser
+        # TODO if sysop: something
+
+        # assemble API request
+        rvgen = self._generator(api.PropertyGenerator,
+                                step=step, total=total, **rvargs)
+
         if latest or "revids" in rvgen.request:
             rvgen.set_maximum_items(-1)  # suppress use of rvlimit parameter
-        if rvdir:
-            rvgen.request[u"rvdir"] = u"newer"
-        elif rvdir is not None:
-            rvgen.request[u"rvdir"] = u"older"
-        if startid:
-            rvgen.request[u"rvstartid"] = startid
-        if endid:
-            rvgen.request[u"rvendid"] = endid
-        if starttime:
-            rvgen.request[u"rvstart"] = str(starttime)
-        if endtime:
-            rvgen.request[u"rvend"] = str(endtime)
-        if user:
-            rvgen.request[u"rvuser"] = user
-        elif excludeuser:
-            rvgen.request[u"rvexcludeuser"] = excludeuser
-        # TODO if sysop: something
+
         for pagedata in rvgen:
-            if page is not None:
-                if not self.sametitle(pagedata['title'],
-                                      page.title(withSection=False)):
-                    raise Error(
-                        u"loadrevisions: Query on %s returned data on '%s'"
-                        % (page, pagedata['title']))
-                if "missing" in pagedata:
-                    raise NoPage(page)
-            else:
-                page = pywikibot.Page(self, pagedata['title'])
+            if not self.sametitle(pagedata['title'],
+                                  page.title(withSection=False)):
+                raise Error(
+                    u"loadrevisions: Query on %s returned data on '%s'"
+                    % (page, pagedata['title']))
+            if "missing" in pagedata:
+                raise NoPage(page)
             api.update_page(page, pagedata)
 
     def pageinterwiki(self, page):

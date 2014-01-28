@@ -1003,6 +1003,32 @@ class TestSiteLoadRevisions(PywikibotTestCase):
         self.assertTrue(hasattr(self.mainpage, "_revisions"))
         self.assertTrue(self.mainpage._revid in self.mainpage._revisions)
         self.assertEqual(len(self.mainpage._revisions), 15)
+        self.assertEqual(self.mainpage._text, None)
+
+    def testLoadRevisions_getText(self):
+        """Test the site.loadrevisions() method with getText=True"""
+
+        self.mysite.loadrevisions(self.mainpage, getText=True, total=5)
+        self.assertTrue(len(self.mainpage._text) > 0)
+
+    def testLoadRevisions_revids(self):
+        """Test the site.loadrevisions() method, listing based on revid."""
+
+        #revids as list of int
+        self.mysite.loadrevisions(self.mainpage, revids=[139992, 139993])
+        self.assertTrue(all(rev in self.mainpage._revisions for rev in [139992, 139993]))
+        #revids as list of str
+        self.mysite.loadrevisions(self.mainpage, revids=['139994', '139995'])
+        self.assertTrue(all(rev in self.mainpage._revisions for rev in [139994, 139995]))
+        #revids as int
+        self.mysite.loadrevisions(self.mainpage, revids=140000)
+        self.assertTrue(140000 in self.mainpage._revisions)
+        #revids as str
+        self.mysite.loadrevisions(self.mainpage, revids='140001')
+        self.assertTrue(140001 in self.mainpage._revisions)
+        #revids belonging to a different page raises Exception
+        self.assertRaises(pywikibot.Error, self.mysite.loadrevisions,
+                          self.mainpage, revids=130000)
 
     def testLoadRevisions_querycontinue(self):
         """Test the site.loadrevisions() method with query-continue"""
@@ -1017,7 +1043,7 @@ class TestSiteLoadRevisions(PywikibotTestCase):
         self.assertEqual(len(self.mainpage._revisions), 15)
 
     def testLoadRevisions_timestamp(self):
-        """Test the site.loadrevisions() method, listing based con timestamp."""
+        """Test the site.loadrevisions() method, listing based on timestamp."""
 
         self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
         self.assertEqual(len(self.mainpage._revisions), 15)
@@ -1037,8 +1063,8 @@ class TestSiteLoadRevisions(PywikibotTestCase):
                           self.mainpage, rvdir=False,
                           starttime="2002-01-01T00:00:00Z", endtime="2002-02-01T000:00:00Z")
 
-    def testLoadRevisions_revid(self):
-        """Test the site.loadrevisions() method, listing based con revid."""
+    def testLoadRevisions_rev_id(self):
+        """Test the site.loadrevisions() method, listing based on rev_id."""
 
         self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
         self.assertEqual(len(self.mainpage._revisions), 15)
