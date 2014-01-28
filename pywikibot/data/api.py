@@ -984,8 +984,12 @@ def update_page(page, pagedict):
         page._catinfo = pagedict["categoryinfo"]
 
     if "templates" in pagedict:
-        page._templates = [pywikibot.Page(page.site, tl['title'])
-                           for tl in pagedict['templates']]
+        templates = [pywikibot.Page(page.site, tl['title'])
+                     for tl in pagedict['templates']]
+        if hasattr(page, "_templates"):
+            page._templates.extend(templates)
+        else:
+            page._templates = templates
 
     if "langlinks" in pagedict:
         links = []
@@ -994,7 +998,11 @@ def update_page(page, pagedict):
                                                  ll['*'],
                                                  source=page.site)
             links.append(link)
-        page._langlinks = links
+
+        if hasattr(page, "_langlinks"):
+            page._langlinks.extend(links)
+        else:
+            page._langlinks = links
 
     if "coordinates" in pagedict:
         coords = []
