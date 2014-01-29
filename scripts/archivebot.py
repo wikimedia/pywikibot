@@ -532,15 +532,13 @@ class PageArchiver(object):
 
     def loadConfig(self):
         pywikibot.output(u'Looking for: {{%s}} in %s' % (self.tpl, self.Page))
-        found = False
         for tpl in self.Page.templatesWithParams():
-            if tpl[0].title() == self.tpl:
+            if tpl[0] == pywikibot.Page(Site, self.tpl, ns=10):
                 for param in tpl[1]:
                     item, value = param.split('=', 1)
                     self.set(item.strip(), value.strip())
-                found = True
                 break
-        if not found:
+        else:
             raise MissingConfigError(u'Missing or malformed template')
         if not self.get('algo', ''):
             raise MissingConfigError(u'Missing algo')
