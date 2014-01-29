@@ -9,7 +9,7 @@ Options:
 """
 #
 # (C) Rob W.W. Hooft, Andre Engels, 2004
-# (C) Pywikibot team, 2004-2013
+# (C) Pywikibot team, 2004-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -42,7 +42,7 @@ q: quit.""")
         elif choice == "?":
             from pywikibot import editor as editarticle
             editor = editarticle.TextEditor()
-            newtext = editor.edit(pagetext)
+            editor.edit(pagetext)
         elif choice == "??":
             pywikibot.output(pagetext[0:length])
             length = length + 500
