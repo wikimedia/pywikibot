@@ -853,7 +853,7 @@ class CategoryTreeRobot:
             * maxDepth - the limit beyond which no subcategories will be listed
 
         """
-        cat = pywikibot.Category(self.site, catTitle)
+        cat = pywikibot.Category(self.site, self.catTitle)
         tree = self.treeview(cat)
         if self.filename:
             pywikibot.output(u'Saving results in %s' % self.filename)
