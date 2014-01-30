@@ -108,7 +108,7 @@ class CategoryRedirectBot(object):
                     doc = pywikibot.Page(pywikibot.Link(item['title'] +
                                                         "/doc", self.site))
                     try:
-                        old_text = doc.get()
+                        doc.get()
                     except pywikibot.Error:
                         continue
                     changed = doc.change_category(oldCat, newCat,
