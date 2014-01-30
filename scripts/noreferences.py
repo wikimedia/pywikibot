@@ -65,7 +65,7 @@ placeBeforeSections = {
         u'ملاحظات'
     ],
     'cs': [
-        u'Reference',
+        u'Externí odkazy',
         u'Poznámky',
     ],
     'da': [              # no explicit policy on where to put the references
@@ -200,6 +200,10 @@ referencesSections = {
     'ar': [             # not sure about which ones are preferred.
         u'مراجع',
         u'ملاحظات',
+    ],
+    'cs': [
+        u'Reference',
+        u'Poznámky',
     ],
     'da': [
         u'Noter',
@@ -392,6 +396,7 @@ noTitleRequired = [u'pl', u'be', u'szl']
 maintenance_category = {
     'wikipedia': {
         'be-x-old': u'Вікіпэдыя:Старонкі з адсутным сьпісам зносак',
+        'cs': u'Údržba:Články s chybějící značkou REFERENCES',
         'de': u'Wikipedia:Seite mit fehlendem References-Tag',
         'en': u'Pages with missing references list',
         'fa': u'صفحه‌های با یادکرد خراب (فقدان پانویس)',
