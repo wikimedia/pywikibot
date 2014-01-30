@@ -5,16 +5,16 @@ Goes through the disambiguation pages, checks their links, and asks for
 each link that goes to a redirect page whether it should be replaced.
 """
 #
-# (C) André Engels and others, 2006-2009
+# (c) André Engels and others, 2006-2009
+# (c) pywikibot team, 2006-2014
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
 #
+import re
 import pywikibot
 from pywikibot import pagegenerators
-import re
-from pywikibot import catlib
 
 msg = {
     'ar': u'تغيير التحويلات في صفحة توضيح',
@@ -37,11 +37,13 @@ def firstcap(string):
 
 
 def treat(text, linkedPage, targetPage):
-    """
-    Based on the method of the same name in solve_disambiguation.py.
-    """
+    """ Based on the method of the same name in solve_disambiguation.py. """
     # make a backup of the original text so we can show the changes later
-    linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?(\|(?P<label>[^\]]*))?\]\](?P<linktrail>' + linktrail + ')')
+    mysite = pywikibot.Site()
+    linktrail = mysite.linktrail()
+    linkR = re.compile(
+        r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?(\|(?P<label>[^\]]*))?\]\](?P<linktrail>%s)'
+        % linktrail)
     curpos = 0
     # This loop will run until we have finished the current page
     while True:
@@ -68,7 +70,8 @@ def treat(text, linkedPage, targetPage):
                          '\03{default}' + text[m.end(): m.end() + context])
         while True:
             choice = pywikibot.input(
-                u"Option (N=do not change, y=change link to \03{lightpurple}%s\03{default}, r=change and replace text, u=unlink)" % targetPage.title())
+                u"Option (N=do not change, y=change link to \03{lightpurple}%s\03{default}, r=change and replace text, u=unlink)"
+                % targetPage.title())
             try:
                 choice = choice[0]
             except:
@@ -102,8 +105,8 @@ def treat(text, linkedPage, targetPage):
         if link_text[0].isupper():
             new_page_title = targetPage.title()
         else:
-            new_page_title = targetPage.title()[0].lower() + \
-            targetPage.title()[1:]
+            new_page_title = (targetPage.title()[0].lower() +
+                              targetPage.title()[1:])
         if replaceit and trailing_chars:
             newlink = "[[%s%s]]%s" % (new_page_title, section, trailing_chars)
         elif replaceit or (new_page_title == link_text and not section):
@@ -175,6 +178,7 @@ def main():
                 workon(page, links)
             pagestoload = []
             pagestodo = []
+
 
 if __name__ == "__main__":
     try:
