@@ -663,16 +663,7 @@ class QueryGenerator(object):
                 if new_limit is not None:
                     self.request[self.prefix + "limit"] = str(new_limit)
             if not hasattr(self, "data"):
-                try:
-                    self.data = self.request.submit()
-                except Server504Error:
-                    # server timeout, usually caused by request with high limit
-                    old_limit = self.query_limit
-                    if old_limit is None or old_limit < 2:
-                        raise
-                    pywikibot.log("Setting query limit to %s" % (old_limit // 2))
-                    self.set_query_increment(old_limit // 2)
-                    continue
+                self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 pywikibot.debug(
                     u"%s: stopped iteration because no dict retrieved from api."
