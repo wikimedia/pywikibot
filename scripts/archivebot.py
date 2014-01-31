@@ -74,6 +74,7 @@ __version__ = '$Id$'
 #
 import pywikibot
 from pywikibot import i18n, pagegenerators
+from pywikibot.textlib import tzoneFixedOffset, TimeStripper
 import datetime
 import time
 import os
@@ -177,139 +178,6 @@ class tzoneUTC(datetime.tzinfo):
 
     def __repr__(self):
         return "%s()" % self.__class__.__name__
-
-
-class tzoneFixedOffset(datetime.tzinfo):
-    """
-    Class building tzinfo objects for fixed-offset time zones
-
-    @offset: a number indicating fixed offset in minutes east from UTC
-    @name: a string with name of the timezone"""
-
-    def __init__(self, offset, name):
-        self.__offset = datetime.timedelta(minutes=offset)
-        self.__name = name
-
-    def utcoffset(self, dt):
-        return self.__offset
-
-    def tzname(self, dt):
-        return self.__name
-
-    def dst(self, dt):
-        return ZERO
-
-    def __repr__(self):
-        return "%s(%s, %s)" % (
-            self.__class__.__name__,
-            self.__offset.days * 86400 + self.__offset.seconds,
-            self.__name
-        )
-
-
-class TimeStripper(object):
-    """
-    Find timetstamp in page text and returns it as timezone aware datetime object
-    """
-
-    def __init__(self, site=None):
-        if site is None:
-            self.site = pywikibot.getSite()
-        else:
-            self.site = site
-
-        self.origNames2monthNum = {}
-        for n, (_long, _short) in enumerate(self.site.months_names):
-            self.origNames2monthNum[_long] = n + 1
-            self.origNames2monthNum[_short] = n + 1
-
-        self.groups = [u'year', u'month',  u'hour',  u'time', u'day', u'minute', u'tzinfo']
-
-        timeR = r'(?P<time>(?P<hour>[0-2]\d)[:\.h](?P<minute>[0-5]\d))'
-        timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
-        yearR = r'(?P<year>(19|20)\d\d)'
-        monthR = ur'(?P<month>(%s))' % (u'|'.join(self.origNames2monthNum))
-        dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))'
-
-        self.ptimeR = re.compile(timeR)
-        self.timeznR = re.compile(timeznR)
-        self.yearR = re.compile(yearR)
-        self.pmonthR = re.compile(monthR, re.U)
-        self.pdayR = re.compile(dayR)
-
-        #order is important to avoid mismatch when searching
-        self.patterns = [
-            self.ptimeR,
-            self.timeznR,
-            self.yearR,
-            self.pmonthR,
-            self.pdayR,
-        ]
-
-    def findmarker(self, text, base=u'@@', delta='@'):
-        # find a string which is not part of text
-        while base in text:
-            base += delta
-        return base
-
-    def last_match_and_replace(self, txt, pat):
-        """
-        Take the rightmost match, to prevent spurious earlier matches, and replace with marker
-        """
-        m = None
-        for m in pat.finditer(txt):
-            pass
-
-        if m:
-            marker = self.findmarker(txt)
-            txt = pat.sub(marker, txt)
-            return (txt, m.groupdict())
-        else:
-            return (txt, None)
-
-    def timestripper(self, line):
-        """
-        Find timestamp in line and convert it to time zone aware datetime.
-        All the following items must be matched, otherwise None is returned:
-        -. year, month, hour, time, day, minute, tzinfo
-
-        """
-        _line = line
-        #match date fields
-        dateDict = dict()
-        for pat in self.patterns:
-            line, matchDict = self.last_match_and_replace(line, pat)
-            if matchDict:
-                dateDict.update(matchDict)
-
-        #all fields matched -> date valid
-        if all(g in dateDict for g in self.groups):
-            #remove 'time' key, now splitted in hour/minute and not needed by datetime
-            del dateDict['time']
-
-            #replace month name in original language with month number
-            try:
-                dateDict['month'] = self.origNames2monthNum[dateDict['month']]
-            except KeyError:
-                pywikibot.output(u'incorrect month name in page')
-
-            #convert to integers
-            for k, v in dateDict.items():
-                try:
-                    dateDict[k] = int(v)
-                except ValueError:
-                    pass
-
-            #find timezone
-            dateDict['tzinfo'] = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
-                                                  self.site.siteinfo['timezone'])
-
-            timestamp = datetime.datetime(**dateDict)
-
-        else:
-            timestamp = None
-
-        return timestamp
 
 
 class DiscussionThread(object):

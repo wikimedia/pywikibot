@@ -16,7 +16,7 @@ import pywikibot
 
 from utils import PywikibotTestCase, unittest
 
-from scripts.archivebot import TimeStripper, tzoneFixedOffset
+from pywikibot.textlib import TimeStripper, tzoneFixedOffset
 
 
 class TestTimeStripper(unittest.TestCase):
