@@ -2,10 +2,10 @@
 	path = scripts/i18n
 	url = https://gerrit.wikimedia.org/r/p/pywikibot/i18n.git
 	branch = .
-	ignore = dirty
+	ignore = all
 
 [submodule "externals/httplib2"]
 	path = externals/httplib2
 	url = https://gerrit.wikimedia.org/r/p/pywikibot/externals/httplib2.git
 	branch = .
-	ignore = dirty
+	ignore = all
