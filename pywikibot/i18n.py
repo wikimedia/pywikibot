@@ -4,7 +4,7 @@ Various i18n functions, both for the internal translation system
 and for TranslateWiki-based translations
 """
 #
-# (C) Pywikibot team, 2004-2013
+# (C) Pywikibot team, 2004-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -418,11 +418,11 @@ def twntranslate(code, twtitle, parameters=None):
     >>> i18n.twntranslate('en', 'test-changing', {'num':2})
     Bot: Changing 2 pages.
     #use additional format strings
-    >>> i18n.twntranslate('fr', 'test-changing', {'num':1, 'descr':'seulement'})
-    Bot: Changer seulement une pages.
+    >>> i18n.twntranslate('fr', 'test-changing', {'num': 1, 'descr': 'seulement'})
+    Robot: Changer seulement une pages.
     #use format strings also outside
-    >>> i18n.twntranslate('fr', 'test-changing', 0) % {'descr':'seulement'}
-    Bot: Changer seulement un peu pages.
+    >>> i18n.twntranslate('fr', 'test-changing', 10) % {'descr': 'seulement'}
+    Robot: Changer seulement un peu pages.
 
     The translations are retrieved from i18n.<package>, based on the callers
     import table.
@@ -459,7 +459,7 @@ def twntranslate(code, twtitle, parameters=None):
         except KeyError:
             index = plural_rules['_default']['plural'](num)
         except TypeError:
-            # we got an int
+            # we got an int not a function
             index = plural_rules[lang]['plural']
         repl = variants.split('|')[index]
         trans = re.sub(PLURAL_PATTERN, repl, trans)
