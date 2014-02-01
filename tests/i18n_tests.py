@@ -58,7 +58,7 @@ class TestTranslate(unittest.TestCase):
                          u'test-no-english JA')
 
 
-class TestTWTranslate(unittest.TestCase):
+class TestTWN(unittest.TestCase):
     def setUp(self):
         self.path = os.path.split(os.path.realpath(__file__))[0]
         shutil.copyfile(os.path.join(self.path, 'i18n', 'test.py'),
@@ -66,6 +66,9 @@ class TestTWTranslate(unittest.TestCase):
 
     def tearDown(self):
         os.remove(os.path.join(self.path, '..', 'scripts', 'i18n', 'test.py'))
+
+
+class TestTWTranslate(TestTWN):
 
     def testLocalized(self):
         self.assertEqual(i18n.twtranslate('en', 'test-localized'),
@@ -95,6 +98,61 @@ class TestTWTranslate(unittest.TestCase):
 
     def testNoEnglish(self):
         self.assertRaises(i18n.TranslationError, i18n.twtranslate, 'en', 'test-no-english')
+
+
+class TestTWNTranslate(TestTWN):
+    " Test {{PLURAL:}} support "
+
+    def testNumber(self):
+        """ use a number """
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-plural', 0) % {'num': 0},
+            u'Bot: Ändere 0 Seiten.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-plural', 1) % {'num': 1},
+            u'Bot: Ändere 1 Seite.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-plural', 2) % {'num': 2},
+            u'Bot: Ändere 2 Seiten.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-plural', 3) % {'num': 3},
+            u'Bot: Ändere 3 Seiten.')
+        self.assertEqual(
+            i18n.twntranslate('en', 'test-plural', 0) % {'num': 'no'},
+            u'Bot: Changing no pages.')
+        self.assertEqual(
+            i18n.twntranslate('en', 'test-plural', 1) % {'num': 'one'},
+            u'Bot: Changing one page.')
+        self.assertEqual(
+            i18n.twntranslate('en', 'test-plural', 2) % {'num': 'two'},
+            u'Bot: Changing two pages.')
+        self.assertEqual(
+            i18n.twntranslate('en', 'test-plural', 3) % {'num': 'three'},
+            u'Bot: Changing three pages.')
+
+    def testString(self):
+        """ use a string """
+        self.assertEqual(
+            i18n.twntranslate('en', 'test-plural', '1') % {'num': 'one'},
+            u'Bot: Changing one page.')
+
+    def testDict(self):
+        """ use a dictionary """
+        self.assertEqual(
+            i18n.twntranslate('en', 'test-plural', {'num': 2}),
+            u'Bot: Changing 2 pages.')
+
+    def testExtended(self):
+        """ use additional format strings """
+        self.assertEqual(
+            i18n.twntranslate('fr', 'test-plural', {'num': 1, 'descr': 'seulement'}),
+            u'Robot: Changer seulement une page.')
+
+    def testExtendedOutside(self):
+        """ use additional format strings also outside """
+        self.assertEqual(
+            i18n.twntranslate('fr', 'test-plural', 1) % {'descr': 'seulement'},
+            u'Robot: Changer seulement une page.')
 
 
 if __name__ == '__main__':
