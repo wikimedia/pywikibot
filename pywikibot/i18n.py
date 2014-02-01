@@ -401,11 +401,11 @@ def twntranslate(code, twtitle, parameters=None):
         },
         'nl': {
             # format sting inside PLURAL tag is allowed
-            'test-changing': u'Bot: Endrer {{PLURAL:num|1 pagina|%(num)d pagina\'s}}.',
+            'test-changing': u'Bot: Pas {{PLURAL:num|1 pagina|%(num)d pagina\'s}} aan.',
         },
         'fr': {
             # additional sting inside or outside PLURAL tag is allowed
-            'test-changing': u'Robot: Changer %(descr)s {{PLURAL:num|une page|un peu pages}}.',
+            'test-changing': u'Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.',
         },
     }
     #use a number
@@ -422,7 +422,7 @@ def twntranslate(code, twtitle, parameters=None):
     Robot: Changer seulement une pages.
     #use format strings also outside
     >>> i18n.twntranslate('fr', 'test-changing', 10) % {'descr': 'seulement'}
-    Robot: Changer seulement un peu pages.
+    Robot: Changer seulement quelques pages.
 
     The translations are retrieved from i18n.<package>, based on the callers
     import table.
