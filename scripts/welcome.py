@@ -185,13 +185,11 @@ import time
 import re
 import locale
 import codecs
-from datetime import timedelta
 from random import choice
 from string import capitalize
 import pywikibot
 from pywikibot import i18n
 from pywikibot import config
-import query
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -829,21 +827,7 @@ class WelcomeBot(object):
                 else:
                     raise KeyboardInterrupt
             except KeyboardInterrupt:
-                #if globalvar.makeWelcomeLog and len(self.welcomed_users) > 0:
-                #    pywikibot.output("Update log before qutting script.")
-                #    self.makelogpage(self.welcomed_users)
-                #if hasattr(self, '_BAQueue') and len(self._BAQueue) > 0 and globalvar.filtBadName:
-                #    self.reportBadAccount(None, final = True)
                 break
-    #if __name__ != '__main__':
-    #    globalvar.offset = int(time.strftime("%Y%m%d%H%M%S", time.gmtime()))
-    #
-    #    def putName(nm):
-    #
-    #        self._checkQueue.append(name)
-    #        if len(self._checkQueue) >= globalvar.dumpToLog:
-    #            self.run()
-    #            self._checkQueue = []
 
 
 def showStatus(n=0):
