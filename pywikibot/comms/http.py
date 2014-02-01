@@ -13,7 +13,7 @@ This module is responsible for
 """
 
 #
-# (C) Pywikipedia bot team, 2007
+# (C) Pywikipedia bot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,6 +24,7 @@ __docformat__ = 'epytext'
 import urllib
 import logging
 import atexit
+import re
 
 try:
     from httplib2 import SSLHandshakeError
@@ -146,5 +147,11 @@ def request(site, uri, ssl=False, *args, **kwargs):
     if request.data[0].status != 200:
         pywikibot.warning(u"Http response status %(status)s"
                           % {'status': request.data[0].status})
-
-    return request.data[1]
+    text = request.data[1]
+    # Convert text to Unicode
+    try:
+        charset = re.findall('charset=([^\'\";]+)', text)[0]
+    except IndexError:
+        charset = 'utf-8'  # default
+    text = unicode(text, charset, errors='strict')
+    return text
