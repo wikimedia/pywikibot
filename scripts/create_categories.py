@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Program to batch create categories.
 
@@ -32,9 +32,9 @@ __version__ = '$Id$'
 #   Distributed under the terms of the MIT license.
 #
 #
-import pywikibot
-from pywikibot import catlib, config, pagegenerators
 import sys
+import pywikibot
+from pywikibot import pagegenerators
 
 
 def createCategory(page, parent, basename):
