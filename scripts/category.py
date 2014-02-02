@@ -389,8 +389,9 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
 
 
 class CategoryMoveRobot(object):
-    """Bot to move pages from one category to another. The bot
-    moves pages and subcategories.
+    """Bot to move pages from one category to another or to remove
+    pages from categories. The bot moves per default pages and
+    subcategories.
     """
     @deprecate_arg("oldCatTitle", "oldcat")
     @deprecate_arg("newCatTitle", "newcat")
@@ -401,9 +402,9 @@ class CategoryMoveRobot(object):
     @deprecate_arg("deleteEmptySourceCat", "delete_oldcat")
     @deprecate_arg("titleRegex", "title_regex")
     @deprecate_arg("withHistory", "history")
-    def __init__(self, oldcat, newcat, batch=False, comment='', inplace=False,
-                 move_oldcat=True, delete_oldcat=True, title_regex=None,
-                 history=False):
+    def __init__(self, oldcat, newcat=None, batch=False, comment='',
+                 inplace=False, move_oldcat=True, delete_oldcat=True,
+                 title_regex=None, history=False, pagesonly=False):
         """Stores all given parameters in the objects attributes.
 
         @param oldcat: The move source.
@@ -420,13 +421,18 @@ class CategoryMoveRobot(object):
             matches the regex are moved.
         @param history: If True the history of the oldcat is posted on
             the talkpage of newcat.
+        @param pagesonly: If True only move pages, not subcategories.
         """
         self.site = pywikibot.Site()
         # Create attributes for the categories and their talk pages.
         self.oldcat = self._makecat(oldcat)
         self.oldtalk = self.oldcat.toggleTalkPage()
-        self.newcat = self._makecat(newcat)
-        self.newtalk = self.newcat.toggleTalkPage()
+        if newcat:
+            self.newcat = self._makecat(newcat)
+            self.newtalk = self.newcat.toggleTalkPage()
+        else:
+            self.newcat = None
+            self.newtalk = None
         # Set boolean settings.
         self.inplace = inplace
         self.move_oldcat = move_oldcat
@@ -434,42 +440,55 @@ class CategoryMoveRobot(object):
         self.batch = batch
         self.title_regex = title_regex
         self.history = history
+        self.pagesonly = pagesonly
         # Set edit summary for changed pages.
         self.comment = comment
         if not self.comment:
-            template_vars = {'oldcat': self.oldcat.title(withNamespace=False),
-                             'newcat': self.newcat.title(withNamespace=False)}
-            self.comment = i18n.twtranslate(self.site,
-                                            'category-replacing',
-                                            template_vars)
+            if self.newcat:
+                template_vars = { \
+                    'oldcat': self.oldcat.title(
+                    withNamespace=False),
+                    'newcat': self.newcat.title(
+                    withNamespace=False)}
+                self.comment = i18n.twtranslate(self.site,
+                                                'category-replacing',
+                                                template_vars)
+            else:
+                template_vars = {'oldcat': self.oldcat.title( \
+                    withNamespace=False)}
+                self.comment = i18n.twtranslate(self.site,
+                                                'category-removing',
+                                                template_vars)
 
     def run(self):
         """The main bot function that does all the work.
         For readability it is splitted into several helper functions.
         """
-        if self.move_oldcat and not self.newcat.exists():
+        if self.newcat and self.move_oldcat and not self.newcat.exists():
             self._movecat()
             self._movetalk()
             if self.history:
                 self._hist()
         self._change(pagegenerators.CategorizedPageGenerator(self.oldcat))
-        self._change(pagegenerators.SubCategoriesPageGenerator(self.oldcat))
-        self._delete()
+        if not pagesonly:
+            self._change(pagegenerators.SubCategoriesPageGenerator( \
+                self.oldcat))
+        if self.oldcat.isEmptyCategory() and self.delete_oldcat and \
+                ((self.newcat and self.move_oldcat) or not self.newcat):
+            self._delete()
 
     def _delete(self):
         """Private function to delete the category page and its talk page.
         Do not use this function from outside the class.
         """
-        if self.move_oldcat and self.oldcat.isEmptyCategory() and \
-                self.delete_oldcat:
-            template_vars = {'newcat': self.newcat.title(withNamespace=False),
-                             'title': self.newcat.title(withNamespace=False)}
-            comment = i18n.twtranslate(self.site,
-                                       'category-was-moved',
-                                       template_vars)
-            self.oldcat.delete(comment, not self.batch, mark=True)
-            if self.oldtalk.exists():
-                self.oldtalk.delete(comment, not self.batch, mark=True)
+        template_vars = {'newcat': self.newcat.title(withNamespace=False),
+                         'title': self.newcat.title(withNamespace=False)}
+        comment = i18n.twtranslate(self.site,
+                                   'category-was-moved',
+                                   template_vars)
+        self.oldcat.delete(comment, not self.batch, mark=True)
+        if self.oldtalk.exists():
+            self.oldtalk.delete(comment, not self.batch, mark=True)
 
     def _change(self, gen):
         """Private function to move category contents.
