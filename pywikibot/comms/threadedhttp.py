@@ -150,6 +150,8 @@ class Http(httplib2.Http):
                will be used when not supplied.
         @param max_redirects: (optional) The maximum number of redirects to
                follow. 5 is default.
+        @param timeout: (optional) Socket timeout in seconds. Default is
+               config.socket_timeout. Disable with None.
 
         """
         try:
@@ -163,6 +165,7 @@ class Http(httplib2.Http):
         self.max_redirects = kwargs.pop('max_redirects', 5)
         if len(args) < 3:
             kwargs.setdefault('proxy_info', config.proxy)
+        kwargs.setdefault('timeout', config.socket_timeout)
         httplib2.Http.__init__(self, *args, **kwargs)
 
     def request(self, uri, method="GET", body=None, headers=None,
