@@ -21,9 +21,11 @@ This module is responsible for
 __version__ = '$Id$'
 __docformat__ = 'epytext'
 
+import sys
 import urllib
 import logging
 import atexit
+import time
 
 try:
     from httplib2 import SSLHandshakeError
@@ -86,9 +88,18 @@ for i in range(numthreads):
 def _flush():
     for i in threads:
         http_queue.put(None)
-    pywikibot.log(u'Waiting for threads to finish... ')
-    for i in threads:
-        i.join()
+
+    message = u'Waiting for %i network thread(s) to finish. Press ctrl-c to abort' % len(threads)
+    if hasattr(sys, 'last_type'):
+        # we quit because of an exception
+        print sys.last_type
+        pywikibot.critical(message)
+    else:
+        pywikibot.log(message)
+
+    while any(t for t in threads if t.isAlive()):
+        time.sleep(.1)
+
     pywikibot.log(u"All threads finished.")
 atexit.register(_flush)
 
