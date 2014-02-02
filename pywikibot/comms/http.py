@@ -140,7 +140,8 @@ def request(site, uri, ssl=False, *args, **kwargs):
     kwargs["headers"].setdefault("user-agent", useragent)
     request = threadedhttp.HttpRequest(baseuri, *args, **kwargs)
     http_queue.put(request)
-    request.lock.acquire()
+    while not request.lock.acquire(False):
+        time.sleep(0.1)
 
     #TODO: do some error correcting stuff
     if isinstance(request.data, SSLHandshakeError):
