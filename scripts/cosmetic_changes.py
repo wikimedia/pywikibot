@@ -236,6 +236,7 @@ class CosmeticChangesToolkit:
             u'liên[ _]kết[ _]bài[ _]chất[ _]lượng[ _]tốt',
             u'liên[ _]kết[ _]chọn[ _]lọc',
             u'ligam[ _]adq',
+            u'ligazón[ _]a[bd]',
             u'ligoelstara',
             u'ligoleginda',
             u'link[ _][afgu]a', u'link[ _]adq', u'link[ _]f[lm]', u'link[ _]km',
