@@ -411,7 +411,7 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]",
     # when interwiki links forward to another family, retrieve pages & other
     # infos there
     if fam.interwiki_forward:
-        fam = pywikibot.Family(fam.interwiki_forward)
+        fam = pywikibot.site.Family(fam.interwiki_forward)
     result = {}
     # Ignore interwiki links within nowiki tags, includeonly tags, pre tags,
     # and HTML comments
