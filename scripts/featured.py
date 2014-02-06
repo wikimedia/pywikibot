@@ -28,7 +28,6 @@ This script understands various command-line arguments:
 
 -fromlang:xx,yy   xx,yy,zz,.. are the languages to be verified.
 -fromlang:ar--fi  Another possible with range the languages
-                  (sorry, not implemented yet)
 
 -fromall          to verify all languages.
 
@@ -230,14 +229,51 @@ class FeaturedBot(pywikibot.Bot):
             'nocache': list(),
             'side': False,    # not template_on_top
             'quiet': False,
+            'interactive': False,
         })
 
         super(FeaturedBot, self).__init__(**kwargs)
         self.editcounter = 0
-        self.fromlang = None
         self.cache = dict()
         self.filename = None
         self.site = pywikibot.Site()
+        if self.getOption('fromlang') is True:  # must be a list
+            self.options['fromlang'] = False
+
+    def itercode(self, task):
+        """ generator for site codes to be processed """
+        if task == 'good':
+            item_no = good_name['wikidata'][1]
+        elif task == 'featured':
+            item_no = featured_name['wikidata'][1]
+        dp = pywikibot.ItemPage(pywikibot.Site().data_repository(), item_no)
+        dp.get()
+        ### Quick and dirty hack - any ideas?
+        # use wikipedia sites only
+        generator = (lang.replace('_', '-') for (lang, fam) in
+                     sorted([key.split('wiki')
+                             for key in dp.sitelinks.keys()])
+                     if not fam)
+
+        if self.getOption('fromall'):
+            return generator
+        elif self.getOption('fromlang'):
+            fromlang = self.getOption('fromlang')
+            if len(fromlang) == 1 and fromlang[0].find("--") >= 0:
+                start, end = fromlang[0].split("--", 1)
+                if not start:
+                    start = ""
+                if not end:
+                    end = "zzzzzzz"
+                return (code for code in generator
+                        if code >= start and code <= end)
+            else:
+                return (code for code in generator if code in fromlang)
+        else:
+            pywikibot.warning(u'No sites given to verify %s articles.\n'
+                              u'Please use -fromlang: or fromall option\n'
+                              % task)
+            return ()
 
     def hastemplate(self, task):
         add_tl, remove_tl = self.getTemplateList(self.site.lang, task)
@@ -294,21 +330,8 @@ class FeaturedBot(pywikibot.Bot):
                              % (task, self.site))
             return
 
-        if self.getOption('fromall'):
-            item_no = good_name['wikidata'][1]
-            dp = pywikibot.ItemPage(pywikibot.Site().data_repository(), item_no)
-            dp.get()
-
-            ### Quick and dirty hack - any ideas?
-            # use wikipedia sites only
-            self.fromlang = [lang.replace('_', '-') for (lang, fam) in
-                             [key.split('wiki') for key in dp.sitelinks.keys()]
-                             if not fam]
-        else:
-            return  # 2DO
-        self.fromlang.sort()
         self.readcache(task)
-        for code in self.fromlang:
+        for code in self.itercode(task):
             try:
                 self.treat(code, task)
             except KeyboardInterrupt:
@@ -334,21 +357,8 @@ class FeaturedBot(pywikibot.Bot):
                              % (task, self.site))
             return
 
-        if self.getOption('fromall'):
-            item_no = featured_name['wikidata'][1]
-            dp = pywikibot.ItemPage(pywikibot.Site().data_repository(), item_no)
-            dp.get()
-
-            ### Quick and dirty hack - any ideas?
-            # use wikipedia sites only
-            self.fromlang = [lang.replace('_', '-') for (lang, fam) in
-                             [key.split('wiki') for key in dp.sitelinks.keys()]
-                             if not fam]
-        else:
-            return  # 2DO
-        self.fromlang.sort()
         self.readcache(task)
-        for code in self.fromlang:
+        for code in self.itercode(task):
             try:
                 self.treat(code, task)
             except KeyboardInterrupt:
@@ -532,6 +542,7 @@ class FeaturedBot(pywikibot.Bot):
                               % (findtemplate.replace(u' ', u'[ _]'),
                                  site.code), re.IGNORECASE)
 
+        interactive = self.getOption('interactive')
         tosite = self.site
         if not fromsite.lang in self.cache:
             self.cache[fromsite.lang] = {}
@@ -616,17 +627,12 @@ def main(*args):
     interactive = 0
     afterpage = u"!"
 
-##    featuredcount = False
-    fromlang = []
-    processType = 'featured'
-    part = False
     options = {}
     for arg in pywikibot.handleArgs():
         if arg == '-interactive':
             interactive = 1
         elif arg.startswith('-fromlang:'):
-            fromlang = arg[10:].split(",")
-            part = True
+            options[arg[1:9]] = arg[10:].split(",")
         elif arg.startswith('-after:'):
             afterpage = arg[7:]
         elif arg.startswith('-nocache:'):
@@ -634,37 +640,6 @@ def main(*args):
         else:
             options[arg[1:].lower()] = True
 
-    if part:
-        try:
-            # BUG: range with zh-min-nan (3 "-")
-            if len(fromlang) == 1 and fromlang[0].index("-") >= 0:
-                start, end = fromlang[0].split("--", 1)
-                if not start:
-                    start = ""
-                if not end:
-                    end = "zzzzzzz"
-                if processType == 'good':
-                    fromlang = [lang for lang in good_name.keys()
-                                if lang >= start and lang <= end]
-                elif processType == 'list':
-                    fromlang = [lang for lang in lists_name.keys()
-                                if lang >= start and lang <= end]
-                elif processType == 'former':
-                    fromlang = [lang for lang in former_name.keys()
-                                if lang >= start and lang <= end]
-                else:
-                    fromlang = [lang for lang in featured_name.keys()
-                                if lang >= start and lang <= end]
-        except:
-            pass
-
-##        for ll in fromlang:
-##            fromsite = pywikibot.getSite(ll)
-##            if featuredcount:
-##                try:
-##                    featuredArticles(fromsite, processType).next()
-##                except StopIteration:
-##                    continue
     if options:
         bot = FeaturedBot(**options)
         bot.run()
