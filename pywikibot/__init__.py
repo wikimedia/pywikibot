@@ -3,7 +3,7 @@
 The initialization file for the Pywikibot framework.
 """
 #
-# (C) Pywikibot team, 2008-213
+# (C) Pywikibot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
