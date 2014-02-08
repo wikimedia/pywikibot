@@ -785,6 +785,7 @@ class Page(object):
         # no restricting template found
         return True
 
+    @deprecate_arg('sysop', None)
     def save(self, comment=None, watch=None, minor=True, botflag=None,
              force=False, async=False, callback=None, **kwargs):
         """Save the current contents of page's text to the wiki.
