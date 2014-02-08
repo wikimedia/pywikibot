@@ -516,6 +516,7 @@ class QueryGenerator(object):
         kwargs["indexpageids"] = ""  # always ask for list of pageids
         self.request = Request(**kwargs)
         self.prefix = None
+        self.api_limit = None
         self.update_limit()  # sets self.prefix
         if self.api_limit is not None and "generator" in kwargs:
             self.prefix = "g" + self.prefix
@@ -582,12 +583,15 @@ class QueryGenerator(object):
 
         """
         limit = int(value)
+
         # don't update if limit is greater than maximum allowed by API
-        self.update_limit()
         if self.api_limit is None:
             self.query_limit = limit
         else:
             self.query_limit = min(self.api_limit, limit)
+        pywikibot.debug(u"%s: Set query_limit to %i."
+                        % (self.__class__.__name__, self.query_limit),
+                        _logger)
 
     def set_maximum_items(self, value):
         """Set the maximum number of items to be retrieved from the wiki.
@@ -606,7 +610,6 @@ class QueryGenerator(object):
     def update_limit(self):
         """Set query limit for self.module based on api response"""
 
-        self.api_limit = None
         for mod in self.module.split('|'):
             for param in self._modules[mod].get("parameters", []):
                 if param["name"] == "limit":
