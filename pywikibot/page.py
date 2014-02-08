@@ -1806,7 +1806,7 @@ class Category(Page):
                             if not total:
                                 return
 
-    @deprecate_arg("startFrom", None)
+    @deprecate_arg("startFrom", "startsort")
     def articles(self, recurse=False, step=None, total=None,
                  content=False, namespaces=None, sortby="",
                  starttime=None, endtime=None, startsort=None,
