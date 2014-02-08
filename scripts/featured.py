@@ -94,10 +94,12 @@ def DATA(site, name, hide):
     except pywikibot.PageNotFound:
         return
     cat = pywikibot.Category(site, title)
+    if type(hide) == dict:
+        hide = hide.get(site.code)
     for article in cat.articles(endsort=hide):
         yield article
     if hide:
-        for article in cat.articles(startFrom=unichr(ord(hide) + 1)):
+        for article in cat.articles(startsort=unichr(ord(hide) + 1)):
             yield article
 
 
@@ -195,17 +197,7 @@ lists_name = {
 # Third parameter is the sort key indicating articles to hide from the given
 # list
 former_name = {
-    'ca': (CAT, u"Arxiu de propostes de la retirada de la distinció"),
-    'en': (CAT, u"Wikipedia former featured articles", "#"),
-    'es': (CAT, u"Wikipedia:Artículos anteriormente destacados"),
-    'fa': (CAT, u"مقاله‌های برگزیده پیشین"),
-    'hu': (CAT, u"Korábbi kiemelt cikkek"),
-    'pl': (CAT, u"Byłe artykuły na medal"),
-    'pt': (CAT, u"!Ex-Artigos_destacados"),
-    'ru': (CAT, u"Википедия:Устаревшие избранные статьи"),
-    'th': (CAT, u"บทความคัดสรรในอดีต"),
-    'tr': (CAT, u"Vikipedi eski seçkin maddeler"),
-    'zh': (CAT, u"已撤销的特色条目"),
+    'wikidata': (DATA, 'Q7045853', {'en': '#'})
 }
 
 
@@ -240,20 +232,29 @@ class FeaturedBot(pywikibot.Bot):
         if self.getOption('fromlang') is True:  # must be a list
             self.options['fromlang'] = False
 
+        # setup tasks running
+        self.tasks = []
+        for task in ('featured', 'good', 'lists', 'former'):
+            if self.getOption(task):
+                self.tasks.append(task)
+        if not self.tasks:
+            self.tasks = ['featured']
+
     def itercode(self, task):
         """ generator for site codes to be processed """
         if task == 'good':
             item_no = good_name['wikidata'][1]
         elif task == 'featured':
             item_no = featured_name['wikidata'][1]
-        dp = pywikibot.ItemPage(pywikibot.Site().data_repository(), item_no)
+        elif task == 'former':
+            item_no = former_name['wikidata'][1]
+        dp = pywikibot.ItemPage(self.site.data_repository(), item_no)
         dp.get()
-        ### Quick and dirty hack - any ideas?
-        # use wikipedia sites only
-        generator = (lang.replace('_', '-') for (lang, fam) in
-                     sorted([key.split('wiki')
+
+        generator = (site.code for site in
+                     sorted([self.site.fromDBName(key)
                              for key in dp.sitelinks.keys()])
-                     if not fam)
+                     if site.family == self.site.family)  # wikipedia sites only
 
         if self.getOption('fromall'):
             return generator
@@ -309,22 +310,11 @@ class FeaturedBot(pywikibot.Bot):
         self.cache = dict()
 
     def run(self):
-        done = False
-        if self.getOption('good'):
-            self.run_good()
-            done = True
-        if self.getOption('lists'):
-            self.run_list()
-            done = True
-        if self.getOption('former'):
-            self.run_former()
-            done = True
-        if self.getOption('featured') or not done:
-            self.run_featured()
+        for task in self.tasks:
+            self.run_task(task)
         pywikibot.output(u'%d pages written.' % self.editcounter)
 
-    def run_good(self):
-        task = 'good'
+    def run_task(self, task):
         if not self.hastemplate(task):
             pywikibot.output(u'\nNOTE: %s arcticles are not implemented at %s.'
                              % (task, self.site))
@@ -335,34 +325,7 @@ class FeaturedBot(pywikibot.Bot):
             try:
                 self.treat(code, task)
             except KeyboardInterrupt:
-                pywikibot.output('\nQuitting featured treat...')
-                break
-            except pywikibot.NoSuchSite:
-                pywikibot.output('"%s" is not a valid site. Skipping...' % code)
-                continue
-        self.writecache()
-
-    # not implemented yet
-    def run_list(self):
-        return
-
-    # not implemented yet
-    def run_former(self):
-        return
-
-    def run_featured(self):
-        task = 'featured'
-        if not self.hastemplate(task):
-            pywikibot.output(u'\nNOTE: %s arcticles are not implemented at %s.'
-                             % (task, self.site))
-            return
-
-        self.readcache(task)
-        for code in self.itercode(task):
-            try:
-                self.treat(code, task)
-            except KeyboardInterrupt:
-                pywikibot.output('\nQuitting featured treat...')
+                pywikibot.output('\nQuitting %s treat...' % task)
                 break
             except pywikibot.NoSuchSite:
                 pywikibot.output('"%s" is not a valid site. Skipping...' % code)
@@ -382,6 +345,7 @@ class FeaturedBot(pywikibot.Bot):
             code = 'wikidata'
         elif task == 'former':
             info = former_name
+            code = 'wikidata'
         elif task == 'list':
             info = lists_name
         else:
