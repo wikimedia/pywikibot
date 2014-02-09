@@ -47,7 +47,6 @@ This script understands various command-line arguments:
                   Example: featured.py -fromlang:en,he -count
                   counts how many featured articles exist in the en and he
                   wikipedias.
-                  (sorry, not implemented yet)
 
 -quiet            no corresponding pages are displayed.
 
@@ -55,7 +54,7 @@ This script understands various command-line arguments:
 #
 # (C) Maxim Razin, 2005
 # (C) Leonardo Gregianin, 2005-2008
-# (C) xqt, 2009-2013
+# (C) xqt, 2009-2014
 # (C) Pywikibot team, 2005-2012
 #
 # Distributed under the terms of the MIT license.
@@ -240,7 +239,7 @@ class FeaturedBot(pywikibot.Bot):
         if not self.tasks:
             self.tasks = ['featured']
 
-    def itercode(self, task):
+    def itersites(self, task):
         """ generator for site codes to be processed """
 
         def _generator():
@@ -252,7 +251,7 @@ class FeaturedBot(pywikibot.Bot):
                 item_no = former_name['wikidata'][1]
             dp = pywikibot.ItemPage(self.site.data_repository(), item_no)
             dp.get()
-            for key in dp.sitelinks.keys():
+            for key in sorted(dp.sitelinks.keys()):
                 try:
                     site = self.site.fromDBName(key)
                 except pywikibot.NoSuchSite:
@@ -260,7 +259,7 @@ class FeaturedBot(pywikibot.Bot):
                                      % key)
                 else:
                     if site.family == self.site.family:
-                        yield site.code
+                        yield site
 
         generator = _generator()
 
@@ -274,10 +273,10 @@ class FeaturedBot(pywikibot.Bot):
                     start = ""
                 if not end:
                     end = "zzzzzzz"
-                return (code for code in generator
-                        if code >= start and code <= end)
+                return (site for site in generator
+                        if site.code >= start and site.code <= end)
             else:
-                return (code for code in generator if code in fromlang)
+                return (site for site in generator if site.code in fromlang)
         else:
             pywikibot.warning(u'No sites given to verify %s articles.\n'
                               u'Please use -fromlang: or fromall option\n'
@@ -297,18 +296,21 @@ class FeaturedBot(pywikibot.Bot):
         return True
 
     def readcache(self, task):
-        if not self.getOption('nocache') is True:
-            self.filename = pywikibot.config.datafilepath("cache", task)
-            try:
-                f = open(self.filename, "rb")
-                self.cache = pickle.load(f)
-                f.close()
-                pywikibot.output(u'Cache file %s found with %d items.'
-                                 % (self.filename, len(self.cache)))
-            except IOError:
-                pywikibot.output(u'Cache file %s not found.' % self.filename)
+        if self.getOption('count') or self.getOption('nocache') is True:
+            return
+        self.filename = pywikibot.config.datafilepath("cache", task)
+        try:
+            f = open(self.filename, "rb")
+            self.cache = pickle.load(f)
+            f.close()
+            pywikibot.output(u'Cache file %s found with %d items.'
+                             % (self.filename, len(self.cache)))
+        except IOError:
+            pywikibot.output(u'Cache file %s not found.' % self.filename)
 
     def writecache(self):
+        if self.getOption('count'):
+            return
         if not self.getOption('nocache') is True:
             pywikibot.output(u'Writing %d items to cache file %s.'
                              % (len(self.cache), self.filename))
@@ -329,18 +331,17 @@ class FeaturedBot(pywikibot.Bot):
             return
 
         self.readcache(task)
-        for code in self.itercode(task):
+        for site in self.itersites(task):
             try:
-                self.treat(code, task)
+                self.treat(site, task)
             except KeyboardInterrupt:
                 pywikibot.output('\nQuitting %s treat...' % task)
                 break
         self.writecache()
 
-    def treat(self, code, process):
-        fromsite = pywikibot.Site(code)
+    def treat(self, fromsite, task):
         if fromsite != self.site:
-            self.featuredWithInterwiki(fromsite, process)
+            self.featuredWithInterwiki(fromsite, task)
 
     def featuredArticles(self, site, task, cache):
         code = site.lang
@@ -511,7 +512,6 @@ class FeaturedBot(pywikibot.Bot):
                               % (findtemplate.replace(u' ', u'[ _]'),
                                  site.code), re.IGNORECASE)
 
-        interactive = self.getOption('interactive')
         tosite = self.site
         if not fromsite.lang in self.cache:
             self.cache[fromsite.lang] = {}
@@ -521,11 +521,17 @@ class FeaturedBot(pywikibot.Bot):
         if self.getOption('nocache') is True or \
            fromsite.code in self.getOption('nocache'):
             cc = {}
+
+        gen = self.featuredArticles(fromsite, task, cc)
+        if self.getOption('count'):
+            next(gen, None)
+            return  # count only, we are ready here
+        gen = PreloadingGenerator(gen)
+
         add_tl, remove_tl = self.getTemplateList(tosite.code, task)
         re_Link_add = compile_link(fromsite, add_tl)
         re_Link_remove = compile_link(fromsite, remove_tl)
-        gen = self.featuredArticles(fromsite, task, cc)
-        gen = PreloadingGenerator(gen)
+        interactive = self.getOption('interactive')
         for a in gen:
             if a.isRedirectPage():
                 a = a.getRedirectTarget()
