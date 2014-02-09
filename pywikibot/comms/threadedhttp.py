@@ -29,9 +29,9 @@ import logging
 
 import urllib
 
-try:
+if sys.version_info[0] == 2:
     import cookielib
-except ImportError:
+else:
     from http import cookiejar as cookielib
 
 import pywikibot

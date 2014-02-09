@@ -21,9 +21,10 @@ except ImportError:
 import pywikibot
 import datetime
 import re
-try:
+import sys
+if sys.version_info[0] == 2:
     from HTMLParser import HTMLParser
-except ImportError:
+else:
     from html.parser import HTMLParser
 
 from . import config2 as config

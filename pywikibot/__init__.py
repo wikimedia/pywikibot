@@ -18,10 +18,10 @@ import re
 import sys
 import threading
 
-try:
-    from queue import Queue
-except ImportError:
+if sys.version_info[0] == 2:
     from Queue import Queue
+else:
+    from queue import Queue
 
 # Use pywikibot. prefix for all in-package imports; this is to prevent
 # confusion with similarly-named modules in version 1 framework, for users

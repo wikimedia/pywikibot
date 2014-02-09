@@ -27,12 +27,12 @@ import logging
 import atexit
 import time
 
-try:
+if sys.version_info[0] == 2:
     from httplib2 import SSLHandshakeError
     import Queue
     import urlparse
     import cookielib
-except ImportError:
+else:
     from ssl import SSLError as SSLHandshakeError
     import queue as Queue
     import urllib as urlparse
