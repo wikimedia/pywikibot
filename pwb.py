@@ -103,6 +103,14 @@ sys.path = [sys.path[0], rewrite_path,
             os.path.join(rewrite_path, 'externals')
             ] + sys.path[1:]
 
+# try importing the known externals, and raise an error if they are not found
+try:
+    import httplib2
+except ImportError as e:
+    print("ImportError: %s" % e)
+    print("Did you clone without --recursive? Try running 'git submodule update --init'.")
+    sys.exit(1)
+
 if "PYWIKIBOT2_DIR" not in os.environ:
     os.environ["PYWIKIBOT2_DIR"] = os.path.split(__file__)[0]
 
