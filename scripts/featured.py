@@ -242,19 +242,27 @@ class FeaturedBot(pywikibot.Bot):
 
     def itercode(self, task):
         """ generator for site codes to be processed """
-        if task == 'good':
-            item_no = good_name['wikidata'][1]
-        elif task == 'featured':
-            item_no = featured_name['wikidata'][1]
-        elif task == 'former':
-            item_no = former_name['wikidata'][1]
-        dp = pywikibot.ItemPage(self.site.data_repository(), item_no)
-        dp.get()
 
-        generator = (site.code for site in
-                     sorted([self.site.fromDBName(key)
-                             for key in dp.sitelinks.keys()])
-                     if site.family == self.site.family)  # wikipedia sites only
+        def _generator():
+            if task == 'good':
+                item_no = good_name['wikidata'][1]
+            elif task == 'featured':
+                item_no = featured_name['wikidata'][1]
+            elif task == 'former':
+                item_no = former_name['wikidata'][1]
+            dp = pywikibot.ItemPage(self.site.data_repository(), item_no)
+            dp.get()
+            for key in dp.sitelinks.keys():
+                try:
+                    site = self.site.fromDBName(key)
+                except pywikibot.NoSuchSite:
+                    pywikibot.output('"%s" is not a valid site. Skipping...'
+                                     % key)
+                else:
+                    if site.family == self.site.family:
+                        yield site.code
+
+        generator = _generator()
 
         if self.getOption('fromall'):
             return generator
@@ -327,9 +335,6 @@ class FeaturedBot(pywikibot.Bot):
             except KeyboardInterrupt:
                 pywikibot.output('\nQuitting %s treat...' % task)
                 break
-            except pywikibot.NoSuchSite:
-                pywikibot.output('"%s" is not a valid site. Skipping...' % code)
-                continue
         self.writecache()
 
     def treat(self, code, process):
