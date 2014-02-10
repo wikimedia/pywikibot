@@ -192,12 +192,15 @@ class GeneratorFactory(object):
     This factory is responsible for processing command line arguments
     that are used by many scripts and that determine which pages to work on.
     """
-    def __init__(self):
+    def __init__(self, site=None):
         self.gens = []
         self.namespaces = []
         self.step = None
         self.limit = None
         self.articlefilter = None
+        self.site = site
+        if self.site is None:
+            self.site = pywikibot.Site()
 
     def getCombinedGenerator(self):
         """Return the combination of all accumulated generators.
@@ -280,19 +283,18 @@ class GeneratorFactory(object):
         arguments have been parsed to get the final output generator.
 
         """
-        site = pywikibot.getSite()
         gen = None
         if arg.startswith('-filelinks'):
             fileLinksPageTitle = arg[11:]
             if not fileLinksPageTitle:
                 fileLinksPageTitle = i18n.input(
                     'pywikibot-enter-file-links-processing')
-            if fileLinksPageTitle.startswith(site.namespace(6)
+            if fileLinksPageTitle.startswith(self.site.namespace(6)
                                              + ":"):
-                fileLinksPage = pywikibot.ImagePage(site,
+                fileLinksPage = pywikibot.ImagePage(self.site,
                                                     fileLinksPageTitle)
             else:
-                fileLinksPage = pywikibot.ImagePage(site,
+                fileLinksPage = pywikibot.ImagePage(self.site,
                                                     'Image:' +
                                                     fileLinksPageTitle)
             gen = FileLinksGenerator(fileLinksPage)
@@ -318,7 +320,7 @@ class GeneratorFactory(object):
             if not title:
                 title = i18n.input('pywikibot-enter-page-processing')
             page = pywikibot.Page(pywikibot.Link(title,
-                                                 pywikibot.Site()))
+                                                 self.site))
             gen = InterwikiPageGenerator(page)
         elif arg.startswith('-randomredirect'):
             if len(arg) == 15:
@@ -384,11 +386,11 @@ class GeneratorFactory(object):
                     pywikibot.Link(
                         pywikibot.input(
                             u'What page do you want to use?'),
-                        pywikibot.getSite())
+                        self.site)
                 )]
             else:
                 gen = [pywikibot.Page(pywikibot.Link(arg[len('-page:'):],
-                                                     pywikibot.getSite())
+                                                     self.site)
                                       )]
         elif arg.startswith('-uncatfiles'):
             gen = UnCategorizedImageGenerator()
@@ -402,7 +404,7 @@ class GeneratorFactory(object):
                 referredPageTitle = pywikibot.input(
                     u'Links to which page should be processed?')
             referredPage = pywikibot.Page(pywikibot.Link(referredPageTitle,
-                                                         pywikibot.Site()))
+                                                         self.site))
             gen = ReferringPageGenerator(referredPage)
         elif arg.startswith('-links'):
             linkingPageTitle = arg[7:]
@@ -410,7 +412,7 @@ class GeneratorFactory(object):
                 linkingPageTitle = pywikibot.input(
                     u'Links from which page should be processed?')
             linkingPage = pywikibot.Page(pywikibot.Link(linkingPageTitle,
-                                                        pywikibot.Site()))
+                                                        self.site))
             gen = LinkedPageGenerator(linkingPage)
         elif arg.startswith('-weblink'):
             url = arg[9:]
@@ -426,7 +428,7 @@ class GeneratorFactory(object):
             transclusionPage = pywikibot.Page(
                 pywikibot.Link(transclusionPageTitle,
                                defaultNamespace=10,
-                               source=pywikibot.Site()))
+                               source=self.site))
             gen = ReferringPageGenerator(transclusionPage,
                                          onlyTemplateInclusion=True)
         elif arg.startswith('-start'):
@@ -435,7 +437,7 @@ class GeneratorFactory(object):
                 firstPageTitle = pywikibot.input(
                     u'At which page do you want to start?')
             firstpagelink = pywikibot.Link(firstPageTitle,
-                                           pywikibot.Site())
+                                           self.site)
             namespace = firstpagelink.namespace
             firstPageTitle = firstpagelink.title
             gen = AllpagesPageGenerator(firstPageTitle, namespace,
@@ -462,7 +464,7 @@ class GeneratorFactory(object):
                 imagelinkstitle = pywikibot.input(
                     u'Images on which page should be processed?')
             imagelinksPage = pywikibot.Page(pywikibot.Link(imagelinkstitle,
-                                                           pywikibot.Site()))
+                                                           self.site))
             gen = ImagesPageGenerator(imagelinksPage)
         elif arg.startswith('-search'):
             mediawikiQuery = arg[8:]
@@ -478,7 +480,7 @@ class GeneratorFactory(object):
                 regex = pywikibot.input(u'What page names are you looking for?')
             else:
                 regex = arg[12:]
-            gen = RegexFilterPageGenerator(pywikibot.Site().allpages(), regex)
+            gen = RegexFilterPageGenerator(self.site.allpages(), regex)
         elif arg.startswith('-grep'):
             if len(arg) == 5:
                 self.articlefilter = pywikibot.input(u'Which pattern do you want to grep?')
