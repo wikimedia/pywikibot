@@ -1011,6 +1011,7 @@ class APISite(BaseSite):
                 site=self,
                 meta="allmessages",
                 ammessages='|'.join(keys),
+                amlang=self.lang,
             )
 
             # Return all messages
