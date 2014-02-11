@@ -94,8 +94,8 @@ def main():
                 summary = arg[len('-summary:'):]
         elif arg.startswith('-images'):
             pywikibot.output('\n\03{lightred}-image option is deprecated. '
-                             'Please use -imagelinks instead.\03{default}\n')
-            localargs.append('-imagelinks' + arg[7:])
+                             'Please use -imageused instead.\03{default}\n')
+            localargs.append('-imageused' + arg[7:])
         elif arg.startswith('-undelete'):
             undelete = True
         else:
@@ -104,28 +104,29 @@ def main():
             if found:
                 pageName = arg[found:]
 
-        if pageName and not summary:
-            if arg.startswith('-category'):
-                summary = i18n.twtranslate(mysite, 'delete-from-category',
-                                           {'page': pageName})
-            elif arg.startswith('-links'):
-                summary = i18n.twtranslate(mysite, 'delete-linked-pages',
-                                           {'page': pageName})
-            elif arg.startswith('-ref'):
-                summary = i18n.twtranslate(mysite, 'delete-referring-pages',
-                                           {'page': pageName})
-            elif arg.startswith('-imagelinks'):
-                summary = i18n.twtranslate(mysite, 'delete-images',
-                                           {'page': pageName})
+        if not summary:
+            if pageName:
+                if arg.startswith('-cat') or arg.startswith('-subcats'):
+                    summary = i18n.twtranslate(mysite, 'delete-from-category',
+                                               {'page': pageName})
+                elif arg.startswith('-links'):
+                    summary = i18n.twtranslate(mysite, 'delete-linked-pages',
+                                               {'page': pageName})
+                elif arg.startswith('-ref'):
+                    summary = i18n.twtranslate(mysite, 'delete-referring-pages',
+                                               {'page': pageName})
+                elif arg.startswith('-imageused'):
+                    summary = i18n.twtranslate(mysite, 'delete-images',
+                                               {'page': pageName})
             elif arg.startswith('-file'):
                 summary = i18n.twtranslate(mysite, 'delete-from-file')
-    if summary is None:
-        summary = pywikibot.input(u'Enter a reason for the %sdeletion:'
-                                  % ['', 'un'][undelete])
     generator = genFactory.getCombinedGenerator()
+    # We are just deleting pages, so we have no need of using a preloading
+    # page generator to actually get the text of those pages.
     if generator:
-        # We are just deleting pages, so we have no need of using a preloading
-        # page generator to actually get the text of those pages.
+        if summary is None:
+            summary = pywikibot.input(u'Enter a reason for the %sdeletion:'
+                                      % ['', 'un'][undelete])
         bot = DeletionRobot(generator, summary, always, undelete)
         bot.run()
     else:
