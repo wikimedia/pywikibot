@@ -991,31 +991,40 @@ class Page(object):
                 # ignore any links with invalid contents
                 continue
 
-    def langlinks(self):
+    def langlinks(self, include_obsolete=False):
         """Return a list of all interlanguage Links on this page.
+
+        @param include_obsolete: if true, return even Link objects whose site
+                                 is obsolete
 
         """
         # Data might have been preloaded
         if not hasattr(self, '_langlinks'):
-            self._langlinks = list(self.iterlanglinks())
+            self._langlinks = list(self.iterlanglinks(include_obsolete=True))
 
-        return self._langlinks
+        if include_obsolete:
+            return self._langlinks
+        else:
+            return filter(lambda i: not i.site.obsolete, self._langlinks)
 
-    def iterlanglinks(self, step=None, total=None):
+    def iterlanglinks(self, step=None, total=None, include_obsolete=False):
         """Iterate all interlanguage links on this page.
 
         @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
+        @param include_obsolete: if true, yield even Link object whose site
+                                 is obsolete
         @return: a generator that yields Link objects.
 
         """
         if hasattr(self, '_langlinks'):
-            return iter(self._langlinks)
+            return iter(self.langlinks(include_obsolete=include_obsolete))
         # XXX We might want to fill _langlinks when the Site
         # method is called. If we do this, we'll have to think
         # about what will happen if the generator is not completely
         # iterated upon.
-        return self.site.pagelanglinks(self, step=step, total=total)
+        return self.site.pagelanglinks(self, step=step, total=total,
+                                       include_obsolete=include_obsolete)
 
     def data_item(self):
         """
