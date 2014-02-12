@@ -129,15 +129,15 @@ class BaseSite(object):
         else:
             self.__family = fam
 
+        self.obsolete = False
         # if we got an outdated language code, use the new one instead.
         if self.__code in self.__family.obsolete:
             if self.__family.obsolete[self.__code] is not None:
                 self.__code = self.__family.obsolete[self.__code]
             else:
                 # no such language anymore
-                raise NoSuchSite("Language %s in family %s is obsolete"
-                                 % (self.__code, self.__family.name))
-        if self.__code not in self.languages():
+                self.obsolete = True
+        elif self.__code not in self.languages():
             if self.__family.name in list(self.__family.langs.keys()) and \
                len(self.__family.langs) == 1:
                 oldcode = self.__code
@@ -707,10 +707,15 @@ def must_be(group=None, right=None):
         @param right: the rights the logged in user should have
                       not supported yet and thus ignored.
         @returns: a decorator to make sure the requirement is statisfied when
-                  the decorated function is called.
+                  the decorated function is called. The function can be called
+                  with as_group='sysop' to override the group set in the
+                  decorator.
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):
+            if self.obsolete:
+                raise NoSuchSite("Language %s in family %s is obsolete"
+                                 % (self.code, self.family.name))
             grp = kwargs.pop('as_group', group)
             if grp == 'user':
                 self.login(False)
@@ -1959,8 +1964,14 @@ class APISite(BaseSite):
         # No such function in the API (this method isn't called anywhere)
         raise NotImplementedError
 
-    def pagelanglinks(self, page, step=None, total=None):
-        """Iterate all interlanguage links on page, yielding Link objects."""
+    def pagelanglinks(self, page, step=None, total=None,
+                      include_obsolete=False):
+        """Iterate all interlanguage links on page, yielding Link objects.
+
+        @param include_obsolete: if true, yield even Link objects whose
+                                 site is obsolete
+
+        """
         lltitle = page.title(withSection=False)
         llquery = self._generator(api.PropertyGenerator,
                                   type_arg="langlinks",
@@ -1974,9 +1985,13 @@ class APISite(BaseSite):
             if 'langlinks' not in pageitem:
                 continue
             for linkdata in pageitem['langlinks']:
-                yield pywikibot.Link.langlinkUnsafe(linkdata['lang'],
-                                                    linkdata['*'],
-                                                    source=self)
+                link = pywikibot.Link.langlinkUnsafe(linkdata['lang'],
+                                                     linkdata['*'],
+                                                     source=self)
+                if link.site.obsolete and not include_obsolete:
+                    continue
+                else:
+                    yield link
 
     def page_extlinks(self, page, step=None, total=None):
         """Iterate all external links on page, yielding URL strings."""
