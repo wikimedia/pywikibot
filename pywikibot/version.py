@@ -50,10 +50,10 @@ def getversiondict():
             (tag, rev, date, hsh) = getversion_svn(_program_dir)
         else:
             (tag, rev, date, hsh) = getversion_git(_program_dir)
-    except ParseError:
+    except Exception:
         try:
             (tag, rev, date, hsh) = getversion_nightly()
-        except ParseError:
+        except Exception:
             try:
                 version = getfileversion('pywikibot/__init__.py')
                 if not version:
@@ -162,13 +162,15 @@ def getversion_git(path=None):
 
 
 def getversion_nightly():
-    data = open(os.path.join(wikipediatools.get_base_dir(), 'version'))
+    data = open(os.path.join(os.path.split(__file__)[0], 'version'))
     tag = data.readline().strip()
-    date = time.strptime(data.readline()[:19], '%Y-%m-%dT%H:%M:%S')
     rev = data.readline().strip()
+    date = time.strptime(data.readline()[:19], '%Y-%m-%dT%H:%M:%S')
+    hsh = data.readline().strip()
+
     if not date or not tag or not rev:
         raise ParseError
-    return (tag, rev, date, '(unknown)')
+    return (tag, rev, date, hsh)
 
 
 def getversion_onlinerepo(repo=None):
