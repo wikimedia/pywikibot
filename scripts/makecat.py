@@ -32,7 +32,7 @@ L(ist) - show current list of pages to include or to check
 """
 
 # (C) Andre Engels, 2004
-# (C) Pywikipedia bot team 2005-2010
+# (C) Pywikibot team 2005-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -51,8 +51,7 @@ def rawtoclean(c):
 
 
 def isdate(s):
-    """returns true iff s is a date or year
-    """
+    """returns true if s is a date or year """
     dict, val = date.getAutoFormat(pywikibot.getSite().language(), s)
     return dict is not None
 
@@ -126,7 +125,7 @@ def asktoadd(pl):
     ctoshow = 500
     pywikibot.output(u'')
     pywikibot.output(u"==%s==" % pl.title())
-    while 1:
+    while True:
         answer = raw_input("y(es)/n(o)/i(gnore)/(o)ther options? ")
         if answer == 'y':
             include(pl)
@@ -222,7 +221,7 @@ try:
         workingcatname = ' '.join(workingcatname)
     mysite = pywikibot.getSite()
     workingcatname = unicode(workingcatname, 'utf-8')
-    pywikibot.setAction(i18n.twtranslate(mysite, 'makecat-create') + u' ' + workingcatname)
+    pywikibot.setAction(i18n.twtranslate(mysite, 'makecat-create', {'cat': workingcatname)})
     workingcat = pywikibot.Category(mysite,
                                     u'%s:%s'
                                     % (mysite.category_namespace(),
