@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 
 #
-# (C) Pywikibot team, 2004-2013
+# (C) Pywikibot team, 2004-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1065,7 +1065,7 @@ class WikimediaFamily(Family):
         """Return Wikimedia projects version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.23wmf12'
+        return '1.23wmf13'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
