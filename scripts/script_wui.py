@@ -6,7 +6,7 @@ WikiUserInterface (WUI) with Lua support for bot operators.
 
 This script needs external libraries (see imports and comments there)
 in order to run properly. Most of them can be checked-out at:
-    http://svn.toolserver.org/svnroot/drtrigon/
+    https://gerrit.wikimedia.org/r/#/admin/projects/?filter=pywikibot
 (some code might get compiled on-the-fly, so a GNU compiler along
 with library header files is needed too)
 
