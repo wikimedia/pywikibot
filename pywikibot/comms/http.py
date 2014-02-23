@@ -22,8 +22,6 @@ __version__ = '$Id$'
 __docformat__ = 'epytext'
 
 import sys
-import urllib
-import logging
 import atexit
 import time
 

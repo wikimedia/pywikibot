@@ -9,9 +9,9 @@ This class extends httplib2, adding support for:
 
 """
 
-# (C) 2007 Pywikibot team, 2007-2014
-# (C) 2006 Httplib 2 team, 2006
-# (C) 2007 Metaweb Technologies, Inc.
+# (C) Pywikibot team, 2007-2014
+# (C) Httplib 2 team, 2006
+# (C) Metaweb Technologies, Inc., 2007
 #
 # Partially distributed under the MIT license
 # Partially distributed under Metaweb Technologies, Incs license
@@ -24,10 +24,6 @@ __docformat__ = 'epytext'
 import sys
 import re
 import threading
-import time
-import logging
-
-import urllib
 
 if sys.version_info[0] == 2:
     import cookielib
@@ -118,14 +114,14 @@ class ConnectionPool(object):
             if identifier not in self.connections:
                 self.connections[identifier] = []
 
-            if len(self.connections[identifier]) == self.maxnum:
+            if len(self.connections[identifier]) != self.maxnum:
+                self.connections[identifier].append(connection)
+            else:
                 pywikibot.debug(u"closing %s connection %r"
                                 % (identifier, connection),
                                 _logger)
                 connection.close()
                 del connection
-            else:
-                self.connections[identifier].append(connection)
         finally:
             self.lock.release()
 
@@ -311,6 +307,8 @@ class HttpRequest(object):
 
     Usage:
 
+    >>> import Queue
+    >>> queue = Queue.Queue()
     >>> request = HttpRequest('http://www.google.com')
     >>> queue.put(request)
     >>> request.lock.acquire()
@@ -455,7 +453,7 @@ class DummyMessage(object):
 
     def getheaders(self, k):
         k = k.lower()
-        v = self.response.get(k.lower(), None)
+        self.response.get(k.lower(), None)
         if k not in self.response:
             return []
         #return self.response[k].split(re.compile(',\\s*'))
