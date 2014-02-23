@@ -147,14 +147,13 @@ class PageFromFileRobot:
     }
 
     def __init__(self, reader, force, append, summary, minor, autosummary,
-                 dry, nocontent):
+                 nocontent):
         self.reader = reader
         self.force = force
         self.append = append
         self.summary = summary
         self.minor = minor
         self.autosummary = autosummary
-        self.dry = dry
         self.nocontent = nocontent
 
     def run(self):
@@ -212,14 +211,6 @@ class PageFromFileRobot:
             if self.autosummary:
                 comment = ''
                 pywikibot.setAction('')
-
-        if self.dry:
-            pywikibot.output("*** Dry mode ***\n" + \
-                             "\03{lightpurple}title\03{default}: " + title + "\n" + \
-                             "\03{lightpurple}contents\03{default}:\n" + contents + "\n" \
-                             "\03{lightpurple}comment\03{default}: " + comment + "\n")
-            return
-
         try:
             page.put(contents, comment=comment, minorEdit=self.minor)
         except pywikibot.LockedPage:
@@ -278,8 +269,10 @@ class PageFromFileReader:
             yield title, contents
 
     def findpage(self, text):
-        pageR = re.compile(re.escape(self.pageStartMarker) + "(.*?)" + re.escape(self.pageEndMarker), re.DOTALL)
-        titleR = re.compile(re.escape(self.titleStartMarker) + "(.*?)" + re.escape(self.titleEndMarker))
+        pageR = re.compile(re.escape(self.pageStartMarker) + "(.*?)" +
+                           re.escape(self.pageEndMarker), re.DOTALL)
+        titleR = re.compile(re.escape(self.titleStartMarker) + "(.*?)" +
+                            re.escape(self.titleEndMarker))
 
         location = pageR.search(text)
         if self.include:
@@ -356,7 +349,7 @@ def main():
                                 titleStartMarker, titleEndMarker, include,
                                 notitle)
     bot = PageFromFileRobot(reader, force, append, summary, minor, autosummary,
-                            config.simulate, nocontent)
+                            nocontent)
     bot.run()
 
 if __name__ == "__main__":
