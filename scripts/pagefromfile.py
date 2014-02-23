@@ -283,8 +283,8 @@ class PageFromFileReader:
             yield title, contents
 
     def findpage(self, text):
-        pageR = re.compile(self.pageStartMarker + "(.*?)" + self.pageEndMarker, re.DOTALL)
-        titleR = re.compile(self.titleStartMarker + "(.*?)" + self.titleEndMarker)
+        pageR = re.compile(re.escape(self.pageStartMarker) + "(.*?)" + re.escape(self.pageEndMarker), re.DOTALL)
+        titleR = re.compile(re.escape(self.titleStartMarker) + "(.*?)" + re.escape(self.titleEndMarker))
 
         location = pageR.search(text)
         if self.include:
