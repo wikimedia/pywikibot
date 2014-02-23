@@ -26,7 +26,7 @@ Specific arguments:
 -notitle        do not include the title, including titlestart, and
                 titleend, in the page
 -nocontent      If page has this statment it dosen't append
-                (example: -nocontents:"{{infobox")
+                (example: -nocontent:"{{infobox")
 -summary:xxx    Use xxx as the edit summary for the upload - if
                 a page exists, standard messages are appended
                 after xxx for appending, prepending, or replacement
@@ -147,7 +147,7 @@ class PageFromFileRobot:
     }
 
     def __init__(self, reader, force, append, summary, minor, autosummary,
-                 dry, nocontents):
+                 dry, nocontent):
         self.reader = reader
         self.force = force
         self.append = append
@@ -155,7 +155,7 @@ class PageFromFileRobot:
         self.minor = minor
         self.autosummary = autosummary
         self.dry = dry
-        self.nocontents = nocontents
+        self.nocontent = nocontent
 
     def run(self):
         for title, contents in self.reader.run():
@@ -186,24 +186,19 @@ class PageFromFileRobot:
         contents = re.sub('^[\r\n]*', '', contents)
 
         if page.exists():
-            if self.append == "Top":
-                if appendtops.find(self.nocontents) == -1 and appendtops.find(self.nocontents.lower()) == -1:
-                    contents = contents + appendtops
-                    pywikibot.output(u"Page %s already exists, appending on top!"
-                                     % title)
-                else:
-                    pywikibot.output(u'Page had %s so it is skipped' % (self.nocontents))
+            if self.nocontent != u'':
+                pagecontents = page.get()
+                if pagecontents.find(self.nocontent) != -1 or pagecontents.find(self.nocontent.lower()) != -1:
+                    pywikibot.output(u'Page has %s so it is skipped' % (self.nocontent))
                     return
+            if self.append == "Top":
+                pywikibot.output(u"Page %s already exists, appending on top!"
+                                     % title)
                 contents = contents + page.get()
                 comment = comment_top
             elif self.append == "Bottom":
-                if appendtops.find(self.nocontents) == -1 and appendtops.find(self.nocontents.lower()) == -1:
-                    contents = contents + appendtops
-                    pywikibot.output(u"Page %s already exists, appending on bottom!"
+                pywikibot.output(u"Page %s already exists, appending on bottom!"
                                      % title)
-                else:
-                    pywikibot.output(u'Page had %s so it is skipped' % (self.nocontents))
-                    return
                 contents = page.get() + contents
                 comment = comment_bottom
             elif self.force:
@@ -313,7 +308,7 @@ def main():
     pageEndMarker = "{{-stop-}}"
     titleStartMarker = u"'''"
     titleEndMarker = u"'''"
-    nocontents = u""
+    nocontent = u""
     include = False
     force = False
     append = None
@@ -345,7 +340,7 @@ def main():
         elif arg == '-minor':
             minor = True
         elif arg.startswith('-nocontent:'):
-            nocontents = arg[11:]
+            nocontent = arg[11:]
         elif arg.startswith("-titlestart:"):
             titleStartMarker = arg[12:]
         elif arg.startswith("-titleend:"):
@@ -361,7 +356,7 @@ def main():
                                 titleStartMarker, titleEndMarker, include,
                                 notitle)
     bot = PageFromFileRobot(reader, force, append, summary, minor, autosummary,
-                            config.simulate, nocontents)
+                            config.simulate, nocontent)
     bot.run()
 
 if __name__ == "__main__":
