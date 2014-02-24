@@ -769,27 +769,20 @@ class PageGenerator(QueryGenerator):
             version of each Page (default False)
 
         """
+        def appendParams(params, key, value):
+            if key in params:
+                params[key] += '|' + value
+            else:
+                params[key] = value
         # get some basic information about every page generated
-        if 'prop' in kwargs:
-            kwargs['prop'] += "|info|imageinfo|categoryinfo"
-        else:
-            kwargs['prop'] = 'info|imageinfo|categoryinfo'
+        appendParams(kwargs, 'prop', 'info|imageinfo|categoryinfo')
         if g_content:
             # retrieve the current revision
-            kwargs['prop'] += "|revisions"
-            if "rvprop" in kwargs:
-                kwargs["rvprop"] += "ids|timestamp|flags|comment|user|content"
-            else:
-                kwargs["rvprop"] = "ids|timestamp|flags|comment|user|content"
-        if "inprop" in kwargs:
-            if "protection" not in kwargs["inprop"]:
-                kwargs["inprop"] += "|protection"
-        else:
-            kwargs['inprop'] = 'protection'
-        if "iiprop" in kwargs:
-            kwargs["iiprop"] += 'timestamp|user|comment|url|size|sha1|metadata'
-        else:
-            kwargs['iiprop'] = 'timestamp|user|comment|url|size|sha1|metadata'
+            appendParams(kwargs, 'prop', 'revisions')
+            appendParams(kwargs, 'rvprop', 'ids|timestamp|flags|comment|user|content')
+        if not ('inprop' in kwargs and 'protection' in kwargs['inprop']):
+            appendParams(kwargs, 'inprop', 'protection')
+        appendParams(kwargs, 'iiprop', 'timestamp|user|comment|url|size|sha1|metadata')
         QueryGenerator.__init__(self, generator=generator, **kwargs)
         self.resultkey = "pages"  # element to look for in result
 
