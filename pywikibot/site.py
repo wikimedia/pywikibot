@@ -3099,7 +3099,7 @@ class APISite(BaseSite):
     }
 
     @must_be(group='sysop')
-    def protect(self, page, edit, move, summary):
+    def protect(self, page, edit, move, summary, expiry=None):
         """(Un)protect a wiki page. Requires administrator status.
 
         Valid protection levels (in MediaWiki 1.12) are '' (equivalent to
@@ -3111,6 +3111,7 @@ class APISite(BaseSite):
             all protection levels to '')
         @param reason: Edit summary.
         @param prompt: If true, ask user for confirmation.
+        @param expiry: When the block should expire
 
         """
         token = self.token(page, "protect")
@@ -3119,6 +3120,10 @@ class APISite(BaseSite):
                           title=page.title(withSection=False),
                           protections="edit=" + edit + "|" + "move=" + move,
                           reason=summary)
+        if isinstance(expiry, pywikibot.Timestamp):
+            expiry = expiry.toISOformat()
+        if expiry:
+            req['expiry'] = expiry
         try:
             result = req.submit()
         except api.APIError as err:
