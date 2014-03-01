@@ -11,20 +11,20 @@ class Family(family.WikimediaFamily):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'mg', 'fr', 'zh', 'lt', 'ru', 'es', 'el', 'nl', 'pl', 'sv',
-            'ko', 'de', 'tr', 'ku', 'ta', 'io', 'kn', 'fi', 'vi', 'hu', 'chr',
-            'pt', 'no', 'ml', 'my', 'id', 'it', 'li', 'ro', 'ja', 'et', 'te',
-            'jv', 'fa', 'sh', 'cs', 'ca', 'ar', 'eu', 'gl', 'lo', 'uk', 'br',
-            'hy', 'fj', 'eo', 'bg', 'hr', 'th', 'oc', 'is', 'vo', 'ps',
-            'simple', 'zh-min-nan', 'uz', 'cy', 'scn', 'sr', 'az', 'ast', 'af',
-            'da', 'sw', 'fy', 'he', 'tl', 'nn', 'wa', 'ur', 'la', 'sq', 'sm',
-            'sl', 'pnb', 'ka', 'nah', 'hi', 'tt', 'lb', 'bs', 'lv', 'tk', 'sk',
-            'hsb', 'nds', 'kk', 'ky', 'be', 'km', 'mk', 'ga', 'wo', 'ms', 'ang',
-            'co', 'sa', 'gn', 'mr', 'csb', 'ug', 'st', 'ia', 'sd', 'si', 'mn',
-            'tg', 'or', 'kl', 'vec', 'jbo', 'an', 'ln', 'fo', 'zu', 'gu', 'gv',
-            'kw', 'rw', 'bn', 'qu', 'ss', 'ie', 'mt', 'om', 'pa', 'roa-rup',
-            'iu', 'so', 'su', 'am', 'za', 'gd', 'na', 'mi', 'tpi', 'ne', 'yi',
-            'ti', 'sg', 'dv', 'tn', 'ts', 'ha', 'ks', 'ay',
+            'en', 'mg', 'fr', 'zh', 'lt', 'es', 'ru', 'el', 'pl', 'nl', 'sv',
+            'ko', 'de', 'tr', 'ku', 'ta', 'io', 'fi', 'kn', 'vi', 'hu', 'chr',
+            'pt', 'no', 'ml', 'it', 'my', 'id', 'li', 'ro', 'ja', 'et', 'sh',
+            'te', 'jv', 'fa', 'cs', 'ca', 'ar', 'eu', 'gl', 'lo', 'uk', 'hy',
+            'br', 'fj', 'eo', 'bg', 'hr', 'th', 'oc', 'is', 'vo', 'ps', 'uz',
+            'simple', 'zh-min-nan', 'cy', 'scn', 'az', 'sr', 'ast', 'af', 'da',
+            'sw', 'fy', 'he', 'tl', 'nn', 'wa', 'ur', 'la', 'sq', 'sm', 'ka',
+            'pnb', 'sl', 'nah', 'hi', 'tt', 'lb', 'bs', 'lv', 'tk', 'sk', 'hsb',
+            'nds', 'kk', 'ky', 'be', 'km', 'mk', 'ga', 'ms', 'wo', 'ang', 'co',
+            'sa', 'gn', 'mr', 'csb', 'ug', 'st', 'ia', 'sd', 'mn', 'si', 'tg',
+            'or', 'kl', 'vec', 'jbo', 'an', 'ln', 'fo', 'zu', 'gu', 'gv', 'kw',
+            'rw', 'bn', 'qu', 'ss', 'ie', 'mt', 'om', 'pa', 'so', 'roa-rup',
+            'iu', 'na', 'su', 'am', 'za', 'gd', 'mi', 'tpi', 'ne', 'yi', 'ti',
+            'sg', 'dv', 'tn', 'ts', 'ha', 'ks', 'ay',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang)
