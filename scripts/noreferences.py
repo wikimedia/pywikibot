@@ -199,7 +199,13 @@ placeBeforeSections = {
 referencesSections = {
     'ar': [             # not sure about which ones are preferred.
         u'مراجع',
-        u'ملاحظات',
+        u'المراجع',
+        u'مصادر',
+        u'المصادر',
+        u'مراجع ومصادر',
+        u'مصادر ومراجع',
+        u'المراجع والمصادر',
+        u'المصادر والمراجع',
     ],
     'cs': [
         u'Reference',
@@ -330,7 +336,7 @@ referencesSections = {
 # on your wiki, you don't have to enter anything here.
 referencesTemplates = {
     'wikipedia': {
-        'ar': [u'Reflist', u'ثبت المراجع', u'قائمة المراجع'],
+        'ar': [u'Reflist', u'مراجع', u'ثبت المراجع', u'ثبت_المراجع', u'بداية المراجع', u'نهاية المراجع'],
         'be': [u'Зноскі', u'Примечания', u'Reflist', u'Спіс заўваг',
                u'Заўвагі'],
         'be-x-old': [u'Зноскі'],
@@ -372,6 +378,7 @@ referencesTemplates = {
 # Define this only if required by your wiki.
 referencesSubstitute = {
     'wikipedia': {
+        'ar': u'{{مراجع}}',
         'be': u'{{зноскі}}',
         'da': u'{{reflist}}',
         'dsb': u'{{referency}}',
