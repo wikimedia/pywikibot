@@ -1006,7 +1006,7 @@ def update_page(page, pagedict):
             coord = pywikibot.Coordinate(lat=co['lat'],
                                          lon=co['lon'],
                                          typ=co.get('type', ''),
-                                         name=co['name'],
+                                         name=co.get('name', ''),
                                          dim=int(co['dim']),
                                          globe=co['globe'],  # See [[gerrit:67886]]
                                          )
