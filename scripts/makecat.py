@@ -221,7 +221,7 @@ try:
         workingcatname = ' '.join(workingcatname)
     mysite = pywikibot.getSite()
     workingcatname = unicode(workingcatname, 'utf-8')
-    pywikibot.setAction(i18n.twtranslate(mysite, 'makecat-create', {'cat': workingcatname)})
+    pywikibot.setAction(i18n.twtranslate(mysite, 'makecat-create', {'cat': workingcatname}))
     workingcat = pywikibot.Category(mysite,
                                     u'%s:%s'
                                     % (mysite.category_namespace(),
