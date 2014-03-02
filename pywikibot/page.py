@@ -2739,6 +2739,14 @@ class ItemPage(WikibasePage):
             claims = [claims]
         self.repo.removeClaims(claims, **kwargs)
 
+    def mergeInto(self, item, **kwargs):
+        """
+        Merges the item into another item
+        @param item: The item to merge into
+        @type item: pywikibot.ItemPage
+        """
+        self.repo.mergeItems(fromItem=self, toItem=item, **kwargs)
+
 
 class PropertyPage(WikibasePage):
     """
