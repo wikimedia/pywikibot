@@ -444,7 +444,7 @@ class RedirectRobot:
         else:
             try:
                 targetPage.get()
-            except pywikibot.BadTitle:
+            except pywikibot.BadTitle as e:
                 pywikibot.warning(
                     u'Redirect target %s is not a valid page title.'
                     % str(e)[10:])
