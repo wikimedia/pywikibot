@@ -12,7 +12,6 @@ against the language lists
 __version__ = '$Id$'
 #
 
-import sys
 import re
 import codecs
 import urllib
