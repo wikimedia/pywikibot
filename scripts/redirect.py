@@ -601,20 +601,19 @@ class RedirectRobot:
                 pywikibot.output(
                     u'   Links to: %s.'
                     % targetPage.title(asLink=True))
-                if targetPage.site.sitename() == 'wikipedia:en':
-                    mw_msg = targetPage.site.mediawiki_message(
-                        'wikieditor-toolbar-tool-redirect-example')
-                    if targetPage.title() == mw_msg:
-                        pywikibot.output(
-                            u"Skipping toolbar example: Redirect source is "
-                            u"potentially vandalized.")
-                        break
                 if targetPage.site != self.site:
                     pywikibot.warning(
                         u'redirect target (%s) is on a different site.'
                         % targetPage.title(asLink=True))
                     if self.always:
                         break  # skip if automatic
+                mw_msg = targetPage.site.mediawiki_message(
+                    'wikieditor-toolbar-tool-redirect-example')
+                if targetPage.title() == mw_msg:
+                    pywikibot.output(
+                        u"Skipping toolbar example: Redirect source is "
+                        u"potentially vandalized.")
+                    break
                 # watch out for redirect loops
                 if redirList.count(u'%s:%s'
                                    % (targetPage.site.lang,
