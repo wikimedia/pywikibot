@@ -64,7 +64,6 @@ __version__ = '$Id$'
 
 import pickle
 import re
-from copy import copy
 import pywikibot
 from pywikibot import i18n
 from pywikibot.pagegenerators import PreloadingGenerator
@@ -598,15 +597,12 @@ class FeaturedBot(pywikibot.Bot):
 
 
 def main(*args):
-    global interactive, afterpage
-    interactive = 0
+    global afterpage
     afterpage = u"!"
 
     options = {}
     for arg in pywikibot.handleArgs():
-        if arg == '-interactive':
-            interactive = 1
-        elif arg.startswith('-fromlang:'):
+        if arg.startswith('-fromlang:'):
             options[arg[1:9]] = arg[10:].split(",")
         elif arg.startswith('-after:'):
             afterpage = arg[7:]
