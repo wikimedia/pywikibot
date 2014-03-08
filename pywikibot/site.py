@@ -3944,6 +3944,28 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
+    def mergeItems(self, fromItem, toItem, **kwargs):
+        """
+        Merge two items together
+        @param fromItem: Item to merge from
+        @type fromItem: pywikibot.ItemPage
+        @param toItem: Item to merge into
+        @type toItem: pywikibot.ItemPage
+        @return: dict API output
+        """
+        params = {
+            'action': 'wbmergeitems',
+            'fromid': fromItem.getID(),
+            'toid': toItem.getID(),
+            'token': self.token(toItem, 'edit')
+        }
+        for kwarg in kwargs:
+            if kwarg in ['ignoreconflicts', 'summary']:
+                params[kwarg] = kwargs[kwarg]
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        return data
+
     # deprecated BaseSite methods
     def fam(self):
         raise NotImplementedError
