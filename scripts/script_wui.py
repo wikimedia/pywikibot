@@ -62,7 +62,6 @@ __version__ = '$Id$'
 
 
 import datetime
-import time
 import thread
 import threading
 import sys
@@ -114,12 +113,6 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         pywikibot.output(u'\03{lightgreen}* Initialization of bot\03{default}')
 
         pywikibot.botirc.IRCBot.__init__(self, *arg)
-
-        ## modification of timezone to be in sync with wiki
-        #os.environ['TZ'] = 'Europe/Amsterdam'
-        #time.tzset()
-        #pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
-        #pywikibot.output(u'')
 
         # init environment with minimal changes (try to do as less as possible)
         # - Lua -
