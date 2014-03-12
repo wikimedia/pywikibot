@@ -76,7 +76,6 @@ def main():
     pageName = ''
     summary = None
     always = False
-    doImages = False
     undelete = False
     generator = None
 
