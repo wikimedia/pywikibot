@@ -25,11 +25,11 @@ import itertools
 import re
 import time
 import pywikibot
-from . import date
+from pywikibot import date
 from pywikibot import config
 from pywikibot import deprecate_arg, i18n
 from pywikibot.comms import http
-
+import pywikibot.data.wikidataquery as wdquery
 
 # ported from version 1 for backwards-compatibility
 # most of these functions just wrap a Site or Page method that returns
@@ -144,6 +144,9 @@ parameterHelp = u"""\
                   Argument can be given as "-withoutinterwiki:n" where
                   n is some number (??).
 
+-wikidataquery    Takes a WikidataQuery query string like claim[31:12280]
+                  and works on the resulting pages.
+
 -random           Work on random pages returned by [[Special:Random]].
                   Can also be given as "-random:n" where n is the number
                   of pages to be returned, otherwise the default is 10 pages.
@@ -218,7 +221,8 @@ class GeneratorFactory(object):
                     self.gens[i].set_maximum_items(self.limit)
             else:
                 if self.namespaces:
-                    self.gens[i] = NamespaceFilterPageGenerator(self.gens[i], namespaces)
+                    self.gens[i] = NamespaceFilterPageGenerator(self.gens[i],
+                                                                namespaces)
                 if self.limit:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
@@ -490,6 +494,12 @@ class GeneratorFactory(object):
             gen = YahooSearchPageGenerator(arg[7:])
         elif arg.startswith('-untagged'):
             gen = UntaggedPageGenerator(arg[10:])
+        elif arg.startswith('-wikidataquery'):
+            query = arg[len('-wikidataquery:'):]
+            if not query:
+                query = pywikibot.input(
+                    u'WikidataQuery string:')
+            gen = WikidataQueryPageGenerator(query)
 
         if gen:
             self.gens.append(gen)
@@ -1299,6 +1309,32 @@ def DayPageGenerator(startMonth=1, endMonth=12, site=None):
     for month in range(startMonth, endMonth + 1):
         for day in range(1, date.getNumberOfDaysInMonth(month) + 1):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
+
+
+def WikidataQueryPageGenerator(query, site=None):
+    """Generate pages that result from the given WikidataQuery.
+
+    @param query: the WikidataQuery query string.
+
+    """
+    if site is None:
+        site = pywikibot.Site()
+    repo = site.data_repository()
+
+    wd_queryset = wdquery.QuerySet(query)
+
+    wd_query = wdquery.WikidataQuery(cacheMaxAge=0)
+    data = wd_query.query(wd_queryset)
+
+    pywikibot.output(u'retrieved %d items' % data[u'status'][u'items'])
+    for item in data[u'items']:
+        page = pywikibot.ItemPage(repo, u'Q' + unicode(item))
+        try:
+            link = page.getSitelink(site)
+        except pywikibot.NoPage:
+            continue
+        yield pywikibot.Page(pywikibot.Link(link, site))
+
 
 if __name__ == "__main__":
     pywikibot.output('Pagegenerators cannot be run as script - are you looking for listpages.py?')
