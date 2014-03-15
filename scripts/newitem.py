@@ -16,10 +16,8 @@ This script creates new items on Wikidata based on certain criteria.
 __version__ = '$Id$'
 #
 
-import json
 import pywikibot
 from pywikibot import pagegenerators
-from datetime import datetime
 from datetime import timedelta
 
 
