@@ -973,6 +973,13 @@ def UnwatchedPagesPageGenerator(number=100, repeat=False, site=None):
         yield page
 
 
+def WantedPagesPageGenerator(total=100, site=None):
+    if site is None:
+        site = pywikibot.Site()
+    for page in site.wantedpages(total=total):
+        yield page
+
+
 def AncientPagesPageGenerator(number=100, repeat=False, site=None):
     if site is None:
         site = pywikibot.Site()
