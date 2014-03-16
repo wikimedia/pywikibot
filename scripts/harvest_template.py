@@ -50,14 +50,14 @@ class HarvestRobot:
         self.repo = pywikibot.Site().data_repository()
         self.cacheSources()
 
-    def getSource(self, lang):
+    def getSource(self, site):
         """
-        Get the source for the specified language,
+        Get the source for the specified site,
         if possible
         """
-        if lang in self.source_values:
-            source = pywikibot.Claim(self.repo, 'p143')
-            source.setTarget(self.source_values.get(lang))
+        if site.family.name in self.source_values and site.code in self.source_values[site.family.name]:
+            source = pywikibot.Claim(self.repo, 'P143')
+            source.setTarget(self.source_values.get(site.family.name).get(site.code))
             return source
 
     def cacheSources(self):
@@ -65,12 +65,12 @@ class HarvestRobot:
         Fetches the sources from the onwiki list
         and stores it internally
         """
-        page = pywikibot.Page(self.repo, u'Wikidata:List of wikis/python')
+        page = pywikibot.Page(self.repo, u'List of wikis/python', ns=4)
         self.source_values = json.loads(page.get())
-        self.source_values = self.source_values['wikipedia']
-        for source_lang in self.source_values:
-            self.source_values[source_lang] = pywikibot.ItemPage(self.repo,
-                                                                 self.source_values[source_lang])
+        for family_code, family in self.source_values.iteritems():
+            for source_lang in family:
+                self.source_values[family_code][source_lang] = pywikibot.ItemPage(self.repo,
+                                                                                  family[source_lang])
 
     def run(self):
         """
@@ -152,7 +152,7 @@ class HarvestRobot:
                                 pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget()))
                                 item.addClaim(claim)
                                 # A generator might yield pages from multiple sites
-                                source = self.getSource(page.site.language())
+                                source = self.getSource(page.site)
                                 if source:
                                     claim.addSource(source, bot=True)
 
