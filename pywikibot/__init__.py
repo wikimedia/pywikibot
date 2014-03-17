@@ -397,6 +397,11 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
             sysop = config.sysopnames[fam][code]
         except KeyError:
             sysop = None
+    if sysop is None:
+        try:
+            user = config.sysopnames[fam]['*']
+        except KeyError:
+            sysop = None
     if interface is None:
         interface = config.site_interface
     try:
