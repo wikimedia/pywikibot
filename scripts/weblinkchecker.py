@@ -99,7 +99,6 @@ Syntax examples:
 #
 __version__ = '$Id$'
 
-import sys
 import re
 import codecs
 import pickle
@@ -273,8 +272,7 @@ class LinkChecker(object):
                 conn = self.getConnection()
                 conn.request('HEAD', '/', None, self.header)
                 self.response = conn.getresponse()
-
-                self.readEncodingFromResponse(response)
+                self.readEncodingFromResponse(self.response)
             except:
                 pass
             if not self.serverEncoding:
@@ -592,9 +590,9 @@ class History:
             # We'll list it in a file so that it can be removed manually.
             if timeSinceFirstFound > 60 * 60 * 24 * day:
                 # search for archived page
-                archiveURL = pywikibot.weblib.getInternetArchiveURL(url)
+                archiveURL = weblib.getInternetArchiveURL(url)
                 if archiveURL is None:
-                    archiveURL = pywikibot.weblib.getWebCitationURL(url)
+                    archiveURL = weblib.getWebCitationURL(url)
                 self.log(url, error, page, archiveURL)
         else:
             self.historyDict[url] = [(page.title(), now, error)]
