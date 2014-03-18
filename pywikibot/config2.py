@@ -49,6 +49,10 @@ mylang = 'language'
 #
 # sysopnames['wikipedia']['de'] = 'myGermanUsername'
 # sysopnames['wiktionary']['en'] = 'myEnglishUsername'
+#
+# If you have a unique syop account for all languages of a family,
+# you can use '*'
+# sysopnames['myownwiki']['*'] = 'mySingleUsername'
 usernames = {}
 sysopnames = {}
 disambiguation_comment = {}
