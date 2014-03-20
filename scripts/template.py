@@ -272,6 +272,14 @@ class TemplateRobot:
             elif self.remove:
                 replacements.append((templateRegex, ''))
             else:
+                template = pywikibot.Page(site, new)
+                if not template.exists():
+                    pywikibot.warning(u'Template "%s" does not exist.' % new)
+                    choice = pywikibot.inputChoice(
+                        u'Do you want to proceed anyway?',
+                        ['Yes', 'No'], ['y', 'N'], 'N')
+                    if choice == 'n':
+                        continue
                 replacements.append((templateRegex,
                                      '{{%s\g<parameters>}}' % new))
 
