@@ -944,6 +944,12 @@ class Page(object):
         """
         return self.site.watchpage(self, unwatch)
 
+    def purge(self, **kwargs):
+        """Purge the server's cache for this page.
+
+        """
+        return self.site.purgepages([self], **kwargs)
+
     def linkedPages(self, namespaces=None, step=None, total=None,
                     content=False):
         """Iterate Pages that this Page links to.
