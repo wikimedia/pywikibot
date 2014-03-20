@@ -15,8 +15,12 @@ The script takes a single parameter:
 
 #
 # (C) Denny Vrandecic, 2013
-# (C) Pywikibot team, 2013
+# (C) Pywikibot team, 2013-2014
+#
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
+#
 
 import gzip
 import os
@@ -31,7 +35,8 @@ class FreebaseMapperRobot:
         self.repo = pywikibot.Site('wikidata', 'wikidata').data_repository()
         self.filename = filename
         if not os.path.exists(self.filename):
-            pywikibot.output('Cannot find %s. Try providing the absolute path.' % self.filename)
+            pywikibot.output('Cannot find %s. Try providing the absolute path.'
+                             % self.filename)
             sys.exit(1)
 
     def run(self):
