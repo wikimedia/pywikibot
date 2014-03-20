@@ -37,6 +37,8 @@ transferbot.py -v -family:toolserver -tofamily:wikitech -page:"Template:Query se
 #
 # Distributed under the terms of the MIT license.
 #
+__version__ = '$Id$'
+#
 
 import pywikibot
 from pywikibot import pagegenerators
@@ -53,7 +55,6 @@ def main():
     tolang = fromsite.code
     tofamily = fromsite.family.name
     prefix = ''
-    template = None
     overwrite = False
     gen_args = []
 
@@ -69,8 +70,6 @@ def main():
             tolang = arg[len('-tolang:'):]
         elif arg.startswith('-prefix'):
             prefix = arg[len('-prefix:'):]
-        elif arg.startswith('-template'):
-            prefix = arg[len('-template:'):]
         elif arg == "-overwrite":
             overwrite = True
 
