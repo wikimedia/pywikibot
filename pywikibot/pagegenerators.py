@@ -13,7 +13,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1155,14 +1155,12 @@ class GoogleSearchPageGenerator:
                     continue
 
             for result in data.results:
-                #print 'DBG: ', result.URL
                 yield result.URL
             # give an estimate of pages to work on, but only once.
             if not estimatedTotalResultsCount:
                 pywikibot.output(u'Estimated total result count: %i pages.'
                                  % data.meta.estimatedTotalResultsCount)
             estimatedTotalResultsCount = data.meta.estimatedTotalResultsCount
-            #print 'estimatedTotalResultsCount: ', estimatedTotalResultsCount
             offset += 10
 
 #############
@@ -1258,7 +1256,6 @@ def MySQLPageGenerator(query, site=None):
         except TypeError:
             # Limit reached or no more results
             break
-        #print pageName
         if pageName:
             namespace = site.namespace(namespaceNumber)
             pageName = unicode(pageName, site.encoding())
