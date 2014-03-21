@@ -27,7 +27,7 @@ and option can be one of these:
 """
 #
 # (C) Leonardo Gregianin, 2006
-# (C) Pywikibot team, 2007-2013
+# (C) Pywikibot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -159,48 +159,50 @@ class CommonsLinkBot:
             except pywikibot.LockedPage:
                 pywikibot.output(u'Page %s is locked?!' % page.title())
 
-if __name__ == "__main__":
+
+def main():
     singlepage = []
     gen = None
     start = None
-    try:
-        action = None
-        for arg in pywikibot.handleArgs():
-            if arg == ('pages'):
-                action = 'pages'
-            elif arg == ('categories'):
-                action = 'categories'
-            elif arg.startswith('-start:'):
-                start = pywikibot.Page(pywikibot.getSite(), arg[7:])
-                gen = pagegenerators.AllpagesPageGenerator(
-                    start.title(withNamespace=False),
-                    namespace=start.namespace(),
-                    includeredirects=False)
-            elif arg.startswith('-cat:'):
-                cat = pywikibot.Category(pywikibot.getSite(),
-                                         'Category:%s' % arg[5:])
-                gen = pagegenerators.CategorizedPageGenerator(cat)
-            elif arg.startswith('-ref:'):
-                ref = pywikibot.Page(pywikibot.getSite(), arg[5:])
-                gen = pagegenerators.ReferringPageGenerator(ref)
-            elif arg.startswith('-link:'):
-                link = pywikibot.Page(pywikibot.getSite(), arg[6:])
-                gen = pagegenerators.LinkedPageGenerator(link)
-            elif arg.startswith('-page:'):
-                singlepage = pywikibot.Page(pywikibot.getSite(), arg[6:])
-                gen = iter([singlepage])
-            #else:
-                #bug
+    action = None
+    for arg in pywikibot.handleArgs():
+        if arg == ('pages'):
+            action = 'pages'
+        elif arg == ('categories'):
+            action = 'categories'
+        elif arg.startswith('-start:'):
+            start = pywikibot.Page(pywikibot.getSite(), arg[7:])
+            gen = pagegenerators.AllpagesPageGenerator(
+                start.title(withNamespace=False),
+                namespace=start.namespace(),
+                includeredirects=False)
+        elif arg.startswith('-cat:'):
+            cat = pywikibot.Category(pywikibot.getSite(),
+                                     'Category:%s' % arg[5:])
+            gen = pagegenerators.CategorizedPageGenerator(cat)
+        elif arg.startswith('-ref:'):
+            ref = pywikibot.Page(pywikibot.getSite(), arg[5:])
+            gen = pagegenerators.ReferringPageGenerator(ref)
+        elif arg.startswith('-link:'):
+            link = pywikibot.Page(pywikibot.getSite(), arg[6:])
+            gen = pagegenerators.LinkedPageGenerator(link)
+        elif arg.startswith('-page:'):
+            singlepage = pywikibot.Page(pywikibot.getSite(), arg[6:])
+            gen = iter([singlepage])
+        #else:
+            #bug
 
-        if action == 'pages':
-            preloadingGen = pagegenerators.PreloadingGenerator(gen)
-            bot = CommonsLinkBot(preloadingGen, acceptall=False)
-            bot.pages()
-        elif action == 'categories':
-            preloadingGen = pagegenerators.PreloadingGenerator(gen)
-            bot = CommonsLinkBot(preloadingGen, acceptall=False)
-            bot.categories()
-        else:
-            pywikibot.showHelp(u'commons_link')
-    finally:
-        pywikibot.stopme()
+    if action == 'pages':
+        preloadingGen = pagegenerators.PreloadingGenerator(gen)
+        bot = CommonsLinkBot(preloadingGen, acceptall=False)
+        bot.pages()
+    elif action == 'categories':
+        preloadingGen = pagegenerators.PreloadingGenerator(gen)
+        bot = CommonsLinkBot(preloadingGen, acceptall=False)
+        bot.categories()
+    else:
+        pywikibot.showHelp(u'commons_link')
+
+
+if __name__ == "__main__":
+    main()
