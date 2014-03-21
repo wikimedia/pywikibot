@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1104,8 +1104,25 @@ def glue_template_and_params(template_and_params):
 #----------------------------------
 
 def does_text_contain_section(pagetext, section):
-    section = re.sub(r'\\[ _]', '[ _]', re.escape(section))
-    """Determines whether the page text contains the given section title."""
+    """
+    Determines whether the page text contains the given section title.
+
+    @param pagetext: The wikitext of a page
+    @type text: unicode or string
+    @param section: a section of a page including wikitext markups
+    @type section: unicode or string
+
+    Note: It does not care whether a section string may contain spaces or
+          underlines. Both will match.
+          If a section parameter contains a internal link, it will match the
+          section with or without a preleading colon which is required for a
+          text link e.g. for categories and files.
+
+    """
+    # match preleading colon for text links
+    section = re.sub(r'\\\[\\\[(\\\:)?', '\[\[\:?', re.escape(section))
+    # match underscores and white spaces
+    section = re.sub(r'\\[ _]', '[ _]', section)
     m = re.search("=+[ ']*%s[ ']*=+" % section, pagetext)
     return bool(m)
 
