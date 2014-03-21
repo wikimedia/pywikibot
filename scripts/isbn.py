@@ -36,7 +36,7 @@ Furthermore, the following command line parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2009-2013
+# (C) Pywikibot team, 2009-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,10 +44,8 @@ __version__ = '$Id$'
 #
 
 import re
-
 import pywikibot
 from pywikibot import pagegenerators, i18n
-
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -1364,10 +1362,10 @@ def _hyphenateIsbnNumber(match):
     code = match.group('code')
     try:
         i = getIsbn(code)
+        i.format()
     except InvalidIsbnException:
         # don't change
         return code
-    i.format()
     return i.code
 
 
