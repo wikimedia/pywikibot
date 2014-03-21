@@ -114,6 +114,7 @@ primary_topic_format = {
     'no': u'%s_(peker)',
     'pl': u'%s_(ujednoznacznienie)',
     'pt': u'%s_(desambiguação)',
+    'pfl': u'%s_BKL',
     'he': u'%s_(פירושונים)',
     'ru': u'%s_(значения)',
     'sr': u'%s_(вишезначна одредница)',
