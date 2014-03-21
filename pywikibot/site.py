@@ -3865,7 +3865,9 @@ class DataSite (APISite):
             params['baserevid'] = claim.on_item.lastrevid
         if bot:
             params['bot'] = 1
-        if not new and hasattr(qualifier, 'hash'):
+        if (not new and
+                hasattr(qualifier, 'hash') and
+                qualifier.hash is not None):
             params['snakhash'] = qualifier.hash
         params['token'] = self.token(claim, 'edit')
         #build up the snak
