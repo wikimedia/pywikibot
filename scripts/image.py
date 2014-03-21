@@ -34,9 +34,12 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obselete:
     python image.py Flag.jpg Flag.svg
 
 """
-__version__ = '$Id$'
+#
+# (C) Pywikibot team, 2013-2014
 #
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
 #
 import pywikibot
 import replace
@@ -197,7 +200,4 @@ def main():
         bot.run()
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

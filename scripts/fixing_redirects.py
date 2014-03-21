@@ -16,7 +16,7 @@ options -file, -ref, -links, ...
 #
 # This script based on disambredir.py and solve_disambiguation.py
 #
-# (C) Pywikipedia team, 2004-2012
+# (C) Pywikipedia team, 2004-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -224,7 +224,4 @@ def main():
         pywikibot.showHelp('fixing_redirects')
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()
