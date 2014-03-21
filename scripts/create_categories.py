@@ -27,7 +27,7 @@ create_categories.py
 __version__ = '$Id$'
 #
 # (C) Multichill, 2011
-# (C) xqt, 2011
+# (C) xqt, 2011-2014
 #
 #   Distributed under the terms of the MIT license.
 #
@@ -96,7 +96,4 @@ def main(args):
     pywikibot.output(u'All done')
 
 if __name__ == "__main__":
-    try:
-        main(sys.argv[1:])
-    finally:
-        pywikibot.stopme()
+    main(sys.argv[1:])
