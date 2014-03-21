@@ -240,7 +240,6 @@ class AddCategory:
         self.sort = sort_by_last_name
         self.create = create
         self.follow_redirects = follow_redirects
-        self.site = pywikibot.getSite()
         self.always = False
         self.dry = dry
         self.newcatTitle = None
@@ -280,12 +279,6 @@ class AddCategory:
     def run(self):
         self.newcatTitle = pywikibot.input(
             u'Category to add (do not give namespace):')
-        if not self.site.nocapitalize:
-            self.newcatTitle = (self.newcatTitle[:1].upper() +
-                                self.newcatTitle[1:])
-        if not self.editSummary:
-            self.editSummary = i18n.twtranslate(self.site, 'category-adding',
-                                                {'newcat': self.newcatTitle})
         counter = 0
         for page in self.generator:
             self.treat(page)
@@ -308,7 +301,7 @@ class AddCategory:
                 pywikibot.output(u"Page %s does not exist; skipping."
                                  % page.title(asLink=True))
         except pywikibot.IsRedirectPage as arg:
-            redirTarget = pywikibot.Page(self.site, arg.args[0])
+            redirTarget = pywikibot.Page(page.site, arg.args[0])
             if self.follow_redirects:
                 text = redirTarget.get()
             else:
@@ -318,11 +311,15 @@ class AddCategory:
         else:
             return text
 
-    def save(self, text, page, comment, minorEdit=True, botflag=True):
+    def save(self, text, page, newcatTitle, minorEdit=True, botflag=True):
         # only save if something was changed
         if text != page.get():
             # show what was changed
             pywikibot.showDiff(page.get(), text)
+            comment = self.editSummary
+            if not comment:
+                comment = i18n.twtranslate(page.site, 'category-adding',
+                                                {'newcat': newcatTitle})
             pywikibot.output(u'Comment: %s' % comment)
             if not self.dry:
                 if not self.always:
@@ -373,7 +370,10 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
         pywikibot.output(u"Current categories:")
         for cat in cats:
             pywikibot.output(u"* %s" % cat.title())
-        catpl = pywikibot.Page(self.site, self.newcatTitle, defaultNamespace=14)
+        newcatTitle = self.newcatTitle
+        if not page.site.nocapitalize:
+            newcatTitle = newcatTitle[:1].upper() + newcatTitle[1:]
+        catpl = pywikibot.Page(page.site, newcatTitle, ns=14)
         if catpl in cats:
             pywikibot.output(u"%s is already in %s."
                              % (page.title(), catpl.title()))
@@ -383,7 +383,7 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
             pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
             cats.append(catpl)
             text = pywikibot.replaceCategoryLinks(text, cats)
-            if not self.save(text, page, self.editSummary):
+            if not self.save(text, page, newcatTitle):
                 pywikibot.output(u'Page %s not saved.'
                                  % page.title(asLink=True))
 
