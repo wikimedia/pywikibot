@@ -62,6 +62,7 @@ class CategoryRedirectBot(object):
                 'pt': "Categoria:!Redirecionamentos de categorias",
                 'ru': "Категория:Википедия:Категории-дубликаты",
                 'simple': "Category:Category redirects",
+                'sh': u"Kategorija:Preusmjerene kategorije Wikipedije",
                 'vi': u"Thể loại:Thể loại đổi hướng",
                 'zh': u"Category:已重定向的分类",
             },
