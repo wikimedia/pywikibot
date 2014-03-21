@@ -789,7 +789,6 @@ class ReferencesRobot:
 def main():
     genFactory = pagegenerators.GeneratorFactory()
 
-    PageTitles = []
     xmlFilename = None
     always = False
     ignorepdf = False
