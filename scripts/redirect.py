@@ -73,7 +73,6 @@ import re
 import datetime
 import pywikibot
 from pywikibot import i18n
-from pywikibot import config
 from pywikibot import xmlreader
 
 
