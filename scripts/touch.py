@@ -17,11 +17,11 @@ All other parameters will be regarded as a page title; in this case, the bot
 will only touch a single page.
 """
 #
-# (C) Pywikibot team, 2013
-#
-__version__ = '$Id$'
+# (C) Pywikibot team, 2009-2014
 #
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
 #
 
 import pywikibot
@@ -41,7 +41,7 @@ class TouchBot:
                 # get the page, and save it using the unmodified text.
                 # whether or not getting a redirect throws an exception
                 # depends on the variable self.touch_redirects.
-                text = page.get(get_redirect=self.touch_redirects)
+                page.get(get_redirect=self.touch_redirects)
                 page.save("Pywikibot touch script")
             except pywikibot.NoPage:
                 pywikibot.error(u"Page %s does not exist."
@@ -58,11 +58,6 @@ class TouchBot:
 
 
 def main(*args):
-    global bot
-    # Disable cosmetic changes because we don't want to modify any page
-    # content, so that we don't flood the histories with minor changes.
-    config.cosmetic_changes = False
-    #page generator
     gen = None
     genFactory = pagegenerators.GeneratorFactory()
     redirs = False
