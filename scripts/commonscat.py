@@ -55,8 +55,8 @@ November 2013
 
 #
 # (C) Multichill, 2008-2009
-# (C) Xqt, 2009-2013
-# (C) Pywikipedia bot team, 2008-2012
+# (C) Xqt, 2009-2014
+# (C) Pywikibot team, 2008-2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -595,7 +595,4 @@ def main():
     bot.run()
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

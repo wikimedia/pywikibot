@@ -822,8 +822,5 @@ class CaseChecker(object):
 
 
 if __name__ == "__main__":
-    try:
-        bot = CaseChecker()
-        bot.Run()
-    finally:
-        pywikibot.stopme()
+    bot = CaseChecker()
+    bot.Run()

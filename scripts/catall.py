@@ -110,7 +110,4 @@ def main():
             pywikibot.output(u'%s is a redirect' % p.title())
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()
