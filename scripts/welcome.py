@@ -860,102 +860,109 @@ def load_word_function(raw):
     return list_loaded
 
 globalvar = Global()
+global bot
+global filename
+
+
+def main():
+    number_user = 0
+    for arg in pywikibot.handleArgs():
+        if arg.startswith('-edit'):
+            if len(arg) == 5:
+                globalvar.attachEditCount = int(pywikibot.input(
+                    u'After how many edits would you like to welcome new users? (0 is allowed)'))
+            else:
+                globalvar.attachEditCount = int(arg[6:])
+        elif arg.startswith('-timeoffset'):
+            if len(arg) == 11:
+                globalvar.timeoffset = int(pywikibot.input(
+                    u'Which time offset (in minutest) for new users would you like to use?'))
+            else:
+                globalvar.timeoffset = int(arg[12:])
+        elif arg.startswith('-time'):
+            if len(arg) == 5:
+                globalvar.timeRecur = int(pywikibot.input(
+                    u'For how many seconds would you like to bot to sleep before checking again?'))
+            else:
+                globalvar.timeRecur = int(arg[6:])
+        elif arg.startswith('-offset'):
+            if len(arg) == 7:
+                globalvar.offset = int(pywikibot.input(
+                    u'Which time offset for new users would you like to use? (yyyymmddhhmmss)'))
+            else:
+                globalvar.offset = int(arg[8:])
+            if len(str(globalvar.offset)) != 14:
+                # upon request, we might want to check for software version here
+                raise ValueError(
+                    "Mediawiki has changed, -offset:# is not supported anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP is yyyymmddhhmmss. -timeoffset is now also supported. Please read this script source header for documentation.")
+        elif arg.startswith('-file:'):
+            globalvar.randomSign = True
+            if len(arg) == 6:
+                globalvar.signFileName = pywikibot.input(
+                    u'Where have you saved your signatures?')
+            else:
+                globalvar.signFileName = arg[6:]
+        elif arg.startswith('-sign:'):
+            if len(arg) == 6:
+                globalvar.defaultSign = pywikibot.input(
+                    u'Which signature to use?')
+            else:
+                globalvar.defaultSign = arg[6:]
+            globalvar.defaultSign += timeselected
+        elif arg == '-break':
+            globalvar.recursive = False
+        elif arg == '-nlog':
+            globalvar.makeWelcomeLog = False
+        elif arg == '-ask':
+            globalvar.confirm = True
+        elif arg == '-filter':
+            globalvar.filtBadName = True
+        #elif arg == '-savedata':
+        #    globalvar.saveSignIndex = True
+        elif arg == '-random':
+            globalvar.randomSign = True
+        elif arg == '-sul':
+            globalvar.welcomeAuto = True
+        elif arg.startswith('-limit'):
+            if len(arg) == 6:
+                globalvar.queryLimit = int(pywikibot.input(
+                    u'How many of the latest new users would you like to load?'))
+            else:
+                globalvar.queryLimit = int(arg[7:])
+        elif arg.startswith('-numberlog'):
+            if len(arg) == 10:
+                globalvar.dumpToLog = int(pywikibot.input(
+                    u'After how many welcomed users would you like to update the welcome log?'))
+            else:
+                globalvar.dumpToLog = int(arg[11:])
+        elif arg == '-quiet':
+            globalvar.quiet = True
+        elif arg == '-quick':
+            globalvar.quick = True
+
+    # Filename and pywikipedia path
+    # file where is stored the random signature index
+    filename = pywikibot.config.datafilepath('welcome-%s-%s.data'
+                                             % (pywikibot.Site().family.name,
+                                                pywikibot.Site().code))
+    if globalvar.offset and globalvar.timeoffset:
+        pywikibot.warning(
+            'both -offset and -timeoffset were provided, ignoring -offset')
+        globalvar.offset = 0
+    bot = WelcomeBot()
+    try:
+        bot.run()
+    except KeyboardInterrupt:
+        if bot.welcomed_users:
+            showStatus()
+            pywikibot.output("Put welcomed users before quit...")
+            bot.makelogpage(bot.welcomed_users)
+        pywikibot.output("\nQuitting...")
+
 
 if __name__ == "__main__":
     try:
-        number_user = 0
-        for arg in pywikibot.handleArgs():
-            if arg.startswith('-edit'):
-                if len(arg) == 5:
-                    globalvar.attachEditCount = int(pywikibot.input(
-                        u'After how many edits would you like to welcome new users? (0 is allowed)'))
-                else:
-                    globalvar.attachEditCount = int(arg[6:])
-            elif arg.startswith('-timeoffset'):
-                if len(arg) == 11:
-                    globalvar.timeoffset = int(pywikibot.input(
-                        u'Which time offset (in minutest) for new users would you like to use?'))
-                else:
-                    globalvar.timeoffset = int(arg[12:])
-            elif arg.startswith('-time'):
-                if len(arg) == 5:
-                    globalvar.timeRecur = int(pywikibot.input(
-                        u'For how many seconds would you like to bot to sleep before checking again?'))
-                else:
-                    globalvar.timeRecur = int(arg[6:])
-            elif arg.startswith('-offset'):
-                if len(arg) == 7:
-                    globalvar.offset = int(pywikibot.input(
-                        u'Which time offset for new users would you like to use? (yyyymmddhhmmss)'))
-                else:
-                    globalvar.offset = int(arg[8:])
-                if len(str(globalvar.offset)) != 14:
-                    # upon request, we might want to check for software version here
-                    raise ValueError(
-                        "Mediawiki has changed, -offset:# is not supported anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP is yyyymmddhhmmss. -timeoffset is now also supported. Please read this script source header for documentation.")
-            elif arg.startswith('-file:'):
-                globalvar.randomSign = True
-                if len(arg) == 6:
-                    globalvar.signFileName = pywikibot.input(
-                        u'Where have you saved your signatures?')
-                else:
-                    globalvar.signFileName = arg[6:]
-            elif arg.startswith('-sign:'):
-                if len(arg) == 6:
-                    globalvar.defaultSign = pywikibot.input(
-                        u'Which signature to use?')
-                else:
-                    globalvar.defaultSign = arg[6:]
-                globalvar.defaultSign += timeselected
-            elif arg == '-break':
-                globalvar.recursive = False
-            elif arg == '-nlog':
-                globalvar.makeWelcomeLog = False
-            elif arg == '-ask':
-                globalvar.confirm = True
-            elif arg == '-filter':
-                globalvar.filtBadName = True
-            #elif arg == '-savedata':
-            #    globalvar.saveSignIndex = True
-            elif arg == '-random':
-                globalvar.randomSign = True
-            elif arg == '-sul':
-                globalvar.welcomeAuto = True
-            elif arg.startswith('-limit'):
-                if len(arg) == 6:
-                    globalvar.queryLimit = int(pywikibot.input(
-                        u'How many of the latest new users would you like to load?'))
-                else:
-                    globalvar.queryLimit = int(arg[7:])
-            elif arg.startswith('-numberlog'):
-                if len(arg) == 10:
-                    globalvar.dumpToLog = int(pywikibot.input(
-                        u'After how many welcomed users would you like to update the welcome log?'))
-                else:
-                    globalvar.dumpToLog = int(arg[11:])
-            elif arg == '-quiet':
-                globalvar.quiet = True
-            elif arg == '-quick':
-                globalvar.quick = True
-
-        # Filename and pywikipedia path
-        # file where is stored the random signature index
-        filename = pywikibot.config.datafilepath('welcome-%s-%s.data'
-                                                 % (pywikibot.Site().family.name,
-                                                    pywikibot.Site().code))
-        if globalvar.offset and globalvar.timeoffset:
-            pywikibot.warning(
-                'both -offset and -timeoffset were provided, ignoring -offset')
-            globalvar.offset = 0
-        bot = WelcomeBot()
-        try:
-            bot.run()
-        except KeyboardInterrupt:
-            if bot.welcomed_users:
-                showStatus()
-                pywikibot.output("Put welcomed users before quit...")
-                bot.makelogpage(bot.welcomed_users)
-            pywikibot.output("\nQuitting...")
+        main()
     finally:
         # If there is the savedata, the script must save the number_user.
         if globalvar.randomSign and globalvar.saveSignIndex and \
@@ -964,4 +971,3 @@ if __name__ == "__main__":
             f = file(filename, 'w')
             cPickle.dump(bot.welcomed_users, f)
             f.close()
-        pywikibot.stopme()
