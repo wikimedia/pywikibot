@@ -89,7 +89,7 @@ This will move all pages in the category US to the category United States.
 # (C) leogregianin, 2004-2008
 # (C) Cyde, 2006-2010
 # (C) Anreas J Schwab, 2007
-# (C) xqt, 2009-2013
+# (C) xqt, 2009-2014
 # (C) Pywikibot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
@@ -1086,4 +1086,3 @@ if __name__ == "__main__":
         pywikibot.error("Fatal error:", exc_info=True)
     finally:
         catDB.dump()
-        pywikibot.stopme()

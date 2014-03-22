@@ -65,7 +65,7 @@ Options (may be omitted):
 """
 #
 # (C) Misza13, 2006-2010
-# (C) xqt, 2009-2012
+# (C) xqt, 2009-2014
 # (C) Pywikibot team, 2007-2013
 #
 # Distributed under the terms of the MIT license.
@@ -550,7 +550,4 @@ def main():
                 traceback.print_exc()
 
 if __name__ == '__main__':
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()
