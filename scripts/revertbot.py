@@ -4,7 +4,7 @@
 """
 #
 # (C) Bryan Tong Minh, 2008
-# (C) Pywikipedia bot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Ported by Geoffrey "GEOFBOT" Mon - User:Sn1per
 # for Google Code-In 2013
@@ -111,7 +111,4 @@ def main():
     bot.revert_contribs()
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

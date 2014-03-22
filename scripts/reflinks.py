@@ -32,7 +32,7 @@ See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
                   get pdfinfo)
 """
 # (C) 2008 - Nicolas Dumazet ( en:User:NicDumZ )
-# (C) Pywikipedia bot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the GPL
 #
@@ -842,7 +842,4 @@ def main():
     bot.run()
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

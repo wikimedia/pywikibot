@@ -72,7 +72,7 @@ To complete a move of a page, one can use:
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikibot team, 2003-2013
+# (C) Pywikibot team, 2003-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1105,7 +1105,4 @@ def main(*args):
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()
