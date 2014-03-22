@@ -3,7 +3,7 @@
 Tests for archivebot.py/Timestripper.
 """
 #
-# (C) Pywikipedia bot team, 2014
+# (C) Pywikibot team, 2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,9 +64,6 @@ class TestTimeStripper(unittest.TestCase):
 
 if __name__ == '__main__':
     try:
-        try:
-            unittest.main()
-        except SystemExit:
-            pass
-    finally:
-        pywikibot.stopme()
+        unittest.main()
+    except SystemExit:
+        pass

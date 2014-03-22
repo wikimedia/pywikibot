@@ -3,7 +3,7 @@
 Tests for the page module.
 """
 #
-# (C) Pywikipedia bot team, 2008
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -488,7 +488,6 @@ if __name__ == "__main__":
             pass
     finally:
         unpatch()
-        pywikibot.stopme()
 
 else:
     class TestTerminalUI(unittest.TestCase):
