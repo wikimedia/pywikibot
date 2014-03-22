@@ -348,8 +348,10 @@ class RedirectGenerator:
         move_gen = self.site.logevents(logtype="move", start=offset_time)
         if self.api_number:
             move_gen.set_maximum_items(self.api_number)
+        pywikibot.output('.', newline=False)
         for logentry in move_gen:
             moved_page = logentry.title()
+            pywikibot.output('.', newline=False)
             try:
                 if not moved_page.isRedirectPage():
                     continue
