@@ -296,7 +296,6 @@ try:
         loaded -= 1
 
 finally:
-    pywikibot.stopme()
     try:
         excludefile.close()
     except:
