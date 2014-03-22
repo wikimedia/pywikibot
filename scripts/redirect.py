@@ -344,7 +344,8 @@ class RedirectGenerator:
         # self.offset hours ago
         offset_time = start.strftime("%Y%m%d%H%M%S")
         pywikibot.output(u'Retrieving %s moved pages via API...'
-                         % str(self.api_number))
+                         % (str(self.api_number)
+                            if self.api_number is not None else "all"))
         move_gen = self.site.logevents(logtype="move", start=offset_time)
         if self.api_number:
             move_gen.set_maximum_items(self.api_number)
