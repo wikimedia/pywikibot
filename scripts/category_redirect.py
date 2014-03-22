@@ -15,7 +15,7 @@ are taken into account.
 """
 
 #
-# (C) Pywikibot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -414,18 +414,14 @@ class CategoryRedirectBot(object):
 
 
 def main(*args):
-    global bot
-    try:
-        a = pywikibot.handleArgs(*args)
-        if len(a) == 1:
-            raise RuntimeError('Unrecognized argument "%s"' % a[0])
-        elif a:
-            raise RuntimeError('Unrecognized arguments: ' +
-                               " ".join(('"%s"' % arg) for arg in a))
-        bot = CategoryRedirectBot()
-        bot.run()
-    finally:
-        pywikibot.stopme()
+    a = pywikibot.handleArgs(*args)
+    if len(a) == 1:
+        raise RuntimeError('Unrecognized argument "%s"' % a[0])
+    elif a:
+        raise RuntimeError('Unrecognized arguments: ' +
+                           " ".join(('"%s"' % arg) for arg in a))
+    bot = CategoryRedirectBot()
+    bot.run()
 
 if __name__ == "__main__":
     main()
