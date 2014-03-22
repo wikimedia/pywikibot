@@ -13,7 +13,7 @@ Parameters:
 #
 # (C) Leonardo Gregianin, 2007
 # (C) Filnik, 2008
-# (c) xqt, 2011
+# (c) xqt, 2011-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -125,7 +125,4 @@ def main():
            # msg2uploader = msg2uploader.encode("utf-8")
             appendtext(usertalkpage, msg2uploader)
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

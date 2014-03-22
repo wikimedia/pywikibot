@@ -7,6 +7,7 @@ See imagerecat.py (still working on that one) to add these images to categories.
 """
 #
 # (C) Multichill 2008
+# (C) Pywikibot team, 2009-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1365,7 +1366,4 @@ def main(*args):
                     addUncat(page)
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

@@ -116,6 +116,7 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 """
 #
 # (C) Daniel Herding & the Pywikipedia team, 2004-2012
+# (C) Pywikibot team, 2009-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -693,7 +694,4 @@ LIMIT 200""" % (whereClause, exceptClause)
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

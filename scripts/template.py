@@ -99,7 +99,7 @@ pages:
 #
 # (C) Daniel Herding, 2004
 # (C) Rob W.W. Hooft, 2003-2005
-# (C) xqt, 2009-2013
+# (C) xqt, 2009-2014
 # (C) Pywikibot team, 2004-2013
 #
 # Distributed under the terms of the MIT license.
@@ -380,5 +380,3 @@ if __name__ == "__main__":
         main()
     except Exception:
         pywikibot.error("Fatal error:", exc_info=True)
-    finally:
-        pywikibot.stopme()

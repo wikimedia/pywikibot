@@ -48,8 +48,8 @@ Please fix these if you are capable and motivated:
 #
 # (C) Wikipedian, 2006-2007
 # (C) Siebrand Mazeland, 2007-2008
-# (C) xqt, 2010-2012
-# (C) Pywikipedia bot team, 2006-2013
+# (C) xqt, 2010-2014
+# (C) Pywikibot team, 2006-2013
 #
 # Distributed under the terms of the MIT license.
 #
@@ -463,7 +463,4 @@ def main():
     bot.run()
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

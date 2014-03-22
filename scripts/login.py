@@ -48,7 +48,7 @@ subdirectory.
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2012
+# (C) Pywikibot team, 2003-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -113,7 +113,4 @@ def main(*args):
                 pywikibot.output(u'%s.%s is not a valid site, please remove it'
                                  u' from your config' % (lang, familyName))
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

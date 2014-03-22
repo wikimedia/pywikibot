@@ -42,7 +42,7 @@ python lonelypages.py -enable:User:Bot/CheckBot -always
 #
 # (C) Pietrodn, it.wiki 2006-2007
 # (C) Filnik, it.wiki 2007
-# (C) Pywikipedia bot team, 2008-2012
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -257,7 +257,4 @@ def main():
                         continue
 
 if __name__ == '__main__':
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()
