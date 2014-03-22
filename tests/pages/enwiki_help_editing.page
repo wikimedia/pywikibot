@@ -54,7 +54,7 @@ Some pages are [[WP:PROT|protected from editing]]. These pages have a <tt>View s
 ===Adding references===
 There is a [[Wikipedia:refToolbar 2.0|tool]] built into the top of the edit box that makes it easier to add and properly format references. The tool can use a single piece of data, such as the [[PMID]] or [[ISBN]], to fill in the rest of the details.
 
-==Wiki markup==
+==[[Wiki markup]]==
 {{main|Help:Wiki markup}}
 Wiki markup is the extra information (apart from the text which will be displayed) you enter in the edit window which tells the [[MediaWiki]] software how to display, categorize and process the article.
 
@@ -66,7 +66,7 @@ Wiki markup is the extra information (apart from the text which will be displaye
 Make sure that you submit information which is relevant to Wikipedia's specific purpose, or your content might be deleted. You can always use the [[Help:Talk page|talk pages]] to ask questions or check to see if your idea will be accepted. Please make note of the license your contributions will be covered by.
 * [[Wikipedia:Policies and guidelines|Policies and guidelines]]
 
-===Helpful tips===
+===[[:Help]]ful tips===
 * [[Wikipedia:Contributing to Wikipedia|Contributing to Wikipedia]]
 * [[Wikipedia:FAQ/Editing|FAQ/Editing]]
 * [[Wikipedia:Cheatsheet|Cheatsheet]]
@@ -74,7 +74,7 @@ Make sure that you submit information which is relevant to Wikipedia's specific 
 * [[Help:Protection|If the article is protected from editing]]
 * [[Help:Page history|About page history]]
 
-===Naming and moving===
+=== Naming and moving ===
 * [[Wikipedia:Moving a page|Moving a page to a new name]]
 * [[Wikipedia:Article titles|Article titles]]
 * [[Wikipedia:Namespace|Namespace]]

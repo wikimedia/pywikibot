@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 #
-# (C) Pywikipedia bot team, 2007
+# (C) Pywikibot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,10 +55,9 @@ class TestSectionFunctions(unittest.TestCase):
         self.assertEqual(func('{{a|b|c=d}}'), [('a', {u'1': 'b', 'c': 'd'})])
         self.assertEqual(func('{{a|b={{c}}}}'), [('c', {}), (u'a', {u'b': u'{{c}}'})])
 
-    @unittest.expectedFailure
     def testSpacesInSection(self):
         self.assertContains("enwiki_help_editing", u"Minor_edits")
-        self.assertNotContains("enwiki_help_editing", u"Minor edits", "Incorrect, '#Minor edits' does not work")
+        self.assertNotContains("enwiki_help_editing", u"#Minor edits", "Incorrect, '#Minor edits' does not work")
         self.assertNotContains("enwiki_help_editing", u"Minor Edits", "section hashes are case-sensitive")
         self.assertNotContains("enwiki_help_editing", u"Minor_Edits", "section hashes are case-sensitive")
 
@@ -66,6 +65,22 @@ class TestSectionFunctions(unittest.TestCase):
     def testNonAlphabeticalCharactersInSection(self):
         self.assertContains("enwiki_help_editing", u"Talk_.28discussion.29_pages", "As used in the TOC")
         self.assertContains("enwiki_help_editing", u"Talk_(discussion)_pages", "Understood by mediawiki")
+
+    def test_spaces_outside_section(self):
+        self.assertContains("enwiki_help_editing", u"Naming and_moving")
+        self.assertContains("enwiki_help_editing", u" Naming and_moving ")
+        self.assertContains("enwiki_help_editing", u" Naming and_moving_")
+
+    def test_link_in_section(self):
+        # section is ==[[Wiki markup]]==
+        self.assertContains("enwiki_help_editing", u"[[Wiki markup]]", "Link as section header")
+        self.assertContains("enwiki_help_editing", u"[[:Wiki markup]]", "section header link with preleading colon")
+        self.assertNotContains("enwiki_help_editing", u"Wiki markup", "section header must be a link")
+        # section is ===[[:Help]]ful tips===
+        self.assertContains("enwiki_help_editing", u"[[Help]]ful tips", "Containing link")
+        self.assertContains("enwiki_help_editing", u"[[:Help]]ful tips", "Containing link with preleading colon")
+        self.assertNotContains("enwiki_help_editing", u"Helpful tips", "section header must contain a link")
+
 
 if __name__ == '__main__':
     try:
