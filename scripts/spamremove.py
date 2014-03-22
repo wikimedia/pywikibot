@@ -15,16 +15,16 @@ all the lines where that url occurs. You can choose to:
 * not change the page in question
 
 Command line options:
--automatic: Do not ask, but remove the lines automatically. Be very careful
-              in using this option!
+-always           Do not ask, but remove the lines automatically. Be very
+                  careful in using this option!
 
--namespace: Filters the search to a given namespace.  If this is specified
-              multiple times it will search all given namespaces
+-namespace:       Filters the search to a given namespace. If this is specified
+                  multiple times it will search all given namespaces
 
 """
 
 #
-# (C) Pywikipedia bot team, 2007-2010
+# (C) Pywikipedia bot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -33,35 +33,17 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import config
-from pywikibot import pagegenerators
-import editarticle
-import sys
+from pywikibot import pagegenerators, i18n
+from pywikibot.editor import TextEditor
 
 
 def main():
-    automatic = False
+    always = False
     namespaces = []
-    msg = {
-        'ar': u'إزالة الوصلات إلى موقع سبام %s',
-        'de': u'Entferne in Spam-Blacklist eingetragenen Weblink auf %s',
-        'en': u'Removing links to spamming site %s',
-        'es': u'Removiendo enlaces a sitio publicitario %s',
-        'fa': u'حذف پیوند به وبگاه هرزنگاری %s',
-        'he': u'מסיר קישורים לאתר ספאם %s',
-        'fr': u'Suppression du lien blacklisté %s',
-        'it': u'Rimuovo link contenuto nella Spam-Blacklist %s',
-        'ja': u'ロボットによる: 迷惑リンク削除 %s',
-        'nl': u'Links naar gespamde site: %s verwijderd',
-        'pt': u'Removendo links de spam do site %s',
-        'ta': u'எரிதமாக இணைக்கப்பட்ட %s இணையத்தளம் நீக்கப்பட்டது',
-        'vi': u'xóa các liên kết đến website spam %s',
-        'zh': u'機器人: 移除廣告黑名單連結 %s',
-    }
     spamSite = ''
     for arg in pywikibot.handleArgs():
-        if arg.startswith("-automatic"):
-            automatic = True
+        if arg == "-always":
+            always = True
         elif arg.startswith('-namespace:'):
             try:
                 namespaces.append(int(arg[len('-namespace:'):]))
@@ -69,62 +51,68 @@ def main():
                 namespaces.append(arg[len('-namespace:'):])
         else:
             spamSite = arg
-    if not automatic:
-        config.put_throttle = 1
-    if not spamSite:
-        pywikibot.showHelp('spamremove')
-        pywikibot.output(u"No spam site specified.")
-        sys.exit()
-    mysite = pywikibot.getSite()
-    pages = list(set(mysite.exturlusage(spamSite)))
-    if namespaces:
-        pages = list(set(pagegenerators.NamespaceFilterPageGenerator(pages,
-                                                                     namespaces)))
-    if len(pages) == 0:
-        pywikibot.output('No page found.')
-    else:
-        pywikibot.output('%d pages found.' % len(pages))
-        for p in pages:
-            text = p.get()
-            if not spamSite in text:
-                continue
-            # Show the title of the page we're working on.
-            # Highlight the title in purple.
-            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                             % p.title())
-            lines = text.split('\n')
-            newpage = []
-            lastok = ""
-            for line in lines:
-                if spamSite in line:
-                    if lastok:
-                        pywikibot.output(lastok)
-                    pywikibot.output('\03{lightred}%s\03{default}' % line)
-                    lastok = None
-                else:
-                    newpage.append(line)
-                    if line.strip():
-                        if lastok is None:
-                            pywikibot.output(line)
-                        lastok = line
-            if automatic:
-                answer = "y"
-            else:
-                answer = pywikibot.inputChoice(u'\nDelete the red lines?',
-                                               ['yes', 'no', 'edit'],
-                                               ['y', 'N', 'e'], 'n')
-            if answer == "n":
-                continue
-            elif answer == "e":
-                editor = editarticle.TextEditor()
-                newtext = editor.edit(text, highlight=spamSite,
-                                      jumpIndex=text.find(spamSite))
-            else:
-                newtext = "\n".join(newpage)
-            if newtext != text:
-                p.put(newtext, pywikibot.translate(mysite, msg) % spamSite)
 
-try:
+    if not spamSite:
+        pywikibot.showHelp()
+        pywikibot.output(u"No spam site specified.")
+        return
+
+    mysite = pywikibot.getSite()
+    pages = mysite.exturlusage(spamSite)
+    if namespaces:
+        pages = pagegenerators.NamespaceFilterPageGenerator(pages, namespaces)
+    pages = pagegenerators.PreloadingGenerator(pages)
+
+    summary = i18n.twtranslate(mysite, 'spamremove-remove',
+                               {'url': spamSite})
+    for i, p in enumerate(pages, 1):
+        text = p.text
+        if not spamSite in text:
+            continue
+        # Show the title of the page we're working on.
+        # Highlight the title in purple.
+        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
+                         % p.title())
+        lines = text.split('\n')
+        newpage = []
+        lastok = ""
+        for line in lines:
+            if spamSite in line:
+                if lastok:
+                    pywikibot.output(lastok)
+                pywikibot.output('\03{lightred}%s\03{default}' % line)
+                lastok = None
+            else:
+                newpage.append(line)
+                if line.strip():
+                    if lastok is None:
+                        pywikibot.output(line)
+                    lastok = line
+        if always:
+            answer = "y"
+        else:
+            answer = pywikibot.inputChoice(u'\nDelete the red lines?',
+                                           ['yes', 'no', 'edit'],
+                                           ['y', 'N', 'e'], 'n')
+        if answer == "n":
+            continue
+        elif answer == "e":
+            editor = TextEditor()
+            newtext = editor.edit(text, highlight=spamSite,
+                                  jumpIndex=text.find(spamSite))
+        else:
+            newtext = "\n".join(newpage)
+        if newtext != text:
+            p.text = newtext
+            p.save(summary)
+    else:
+        if "i" not in locals():
+            pywikibot.output('No page found.')
+        elif i == 1:
+            pywikibot.output('1 pages done.')
+        else:
+            pywikibot.output('%d pages done.' % i)
+
+
+if __name__ == '__main__':
     main()
-finally:
-    pywikibot.stopme()
