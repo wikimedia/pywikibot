@@ -5,7 +5,7 @@ against the language lists
 """
 #
 # (C) xqt, 2009-2014
-# (C) Pywikipedia bot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -99,11 +99,8 @@ def update_family(families):
 
 
 if __name__ == '__main__':
-    try:
-        fam = []
-        for arg in pywikibot.handleArgs():
-            if arg in familiesDict.keys() and arg not in fam:
-                fam.append(arg)
-        update_family(fam)
-    finally:
-        pywikibot.stopme()
+    fam = []
+    for arg in pywikibot.handleArgs():
+        if arg in familiesDict.keys() and arg not in fam:
+            fam.append(arg)
+    update_family(fam)
