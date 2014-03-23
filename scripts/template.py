@@ -272,7 +272,7 @@ class TemplateRobot:
             elif self.remove:
                 replacements.append((templateRegex, ''))
             else:
-                template = pywikibot.Page(site, new)
+                template = pywikibot.Page(site, new, ns=10)
                 if not template.exists():
                     pywikibot.warning(u'Template "%s" does not exist.' % new)
                     choice = pywikibot.inputChoice(
