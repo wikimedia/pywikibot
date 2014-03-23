@@ -1,6 +1,7 @@
 import pywikibot
+from pywikibot.site import must_be
 
-from utils import unittest
+from utils import PywikibotTestCase, unittest
 
 
 class DrySite(pywikibot.site.APISite):
@@ -9,7 +10,7 @@ class DrySite(pywikibot.site.APISite):
         return self._userinfo
 
 
-class TestDrySite(unittest.TestCase):
+class TestDrySite(PywikibotTestCase):
     def test_logged_in(self):
         x = DrySite('en')
 
@@ -29,45 +30,66 @@ class TestDrySite(unittest.TestCase):
         self.assertFalse(x.logged_in(False))
 
 
-class SiteMock(object):
-    last_login = None
-    last_fn_called = False
+class TestMustBe(PywikibotTestCase):
+    """Test cases for the must_be decorator."""
 
-    def login(self, as_sysop):
-        self.last_login = 'sysop' if as_sysop else 'user'
-        return True
+    # Implemented without setUpClass(cls) and global variables as objects
+    # were not completely disposed and recreated but retained 'memory'
+    def setUp(self):
+        self.code = 'test'
+        self.family = lambda: None
+        self.family.name = 'test'
+        self._logged_in_as = None
+        self.obsolete = False
 
-    def inner_fn(self, *args, **kwargs):
-        self.last_fn_called = (args, kwargs)
+    def login(self, sysop):
+        # mock call
+        self._logged_in_as = 'sysop' if sysop else 'user'
+
+    def testMockInTest(self):
+        self.assertEqual(self._logged_in_as, None)
+        self.login(True)
+        self.assertEqual(self._logged_in_as, 'sysop')
+
+    testMockInTestReset = testMockInTest
+
+    @must_be('sysop')
+    def call_this_sysop_req_function(self, *args, **kwargs):
         return args, kwargs
 
+    @must_be('user')
+    def call_this_user_req_function(self, *args, **kwargs):
+        return args, kwargs
 
-class TestSiteMock(unittest.TestCase):
-    def test_must_be_user(self):
-        x = SiteMock()
-        wrapped_inner = pywikibot.site.must_be(group='user')(x.inner_fn)
-        self.assertEqual(
-            wrapped_inner(x, 1, 2, 3, a='a', b='b'),
-            (
-                (x, 1, 2, 3),
-                {'a': 'a', 'b': 'b'}
-            )
-        )
-        self.assertEqual(x.last_fn_called, ((x, 1, 2, 3), {'a': 'a', 'b': 'b'}))
-        self.assertEqual(x.last_login, 'user')
+    def testMustBeSysop(self):
+        args = (1, 2, 'a', 'b')
+        kwargs = {'i': 'j', 'k': 'l'}
+        retval = self.call_this_sysop_req_function(*args, **kwargs)
+        self.assertEqual(retval[0], args)
+        self.assertEqual(retval[1], kwargs)
+        self.assertEqual(self._logged_in_as, 'sysop')
 
-    def test_must_be_sysop(self):
-        x = SiteMock()
-        wrapped_inner = pywikibot.site.must_be(group='sysop')(x.inner_fn)
-        self.assertEqual(
-            wrapped_inner(x, 1, 2, 3, a='a', b='b'),
-            (
-                (x, 1, 2, 3),
-                {'a': 'a', 'b': 'b'}
-            )
-        )
-        self.assertEqual(x.last_fn_called, ((x, 1, 2, 3), {'a': 'a', 'b': 'b'}))
-        self.assertEqual(x.last_login, 'sysop')
+    def testMustBeUser(self):
+        args = (1, 2, 'a', 'b')
+        kwargs = {'i': 'j', 'k': 'l'}
+        retval = self.call_this_user_req_function(*args, **kwargs)
+        self.assertEqual(retval[0], args)
+        self.assertEqual(retval[1], kwargs)
+        self.assertEqual(self._logged_in_as, 'user')
+
+    def testOverrideUserType(self):
+        args = (1, 2, 'a', 'b')
+        kwargs = {'i': 'j', 'k': 'l'}
+        retval = self.call_this_user_req_function(*args, as_group='sysop', **kwargs)
+        self.assertEqual(retval[0], args)
+        self.assertEqual(retval[1], kwargs)
+        self.assertEqual(self._logged_in_as, 'sysop')
+
+    def testObsoleteSite(self):
+        self.obsolete = True
+        args = (1, 2, 'a', 'b')
+        kwargs = {'i': 'j', 'k': 'l'}
+        self.assertRaises(pywikibot.NoSuchSite, self.call_this_user_req_function, args, kwargs)
 
 if __name__ == '__main__':
     unittest.main()
