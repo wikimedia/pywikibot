@@ -10,12 +10,9 @@ Tests for archivebot.py/Timestripper.
 __version__ = '$Id$'
 
 import datetime
-import re
 
 import pywikibot
-
 from utils import PywikibotTestCase, unittest
-
 from pywikibot.textlib import TimeStripper, tzoneFixedOffset
 
 
