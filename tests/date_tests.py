@@ -7,9 +7,7 @@
 __version__ = '$Id$'
 
 from utils import unittest
-
-import pywikibot
-import pywikibot.date as date
+from pywikibot import date
 
 
 class TestDate(unittest.TestCase):
