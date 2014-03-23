@@ -1113,11 +1113,7 @@ class TestMustBe(PywikibotTestCase):
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
     def setUp(self):
-        self.code = 'test'
-        self.family = lambda: None
-        self.family.name = 'test'
         self._logged_in_as = None
-        self.obsolete = False
 
     def login(self, sysop):
         # mock call
@@ -1161,12 +1157,6 @@ class TestMustBe(PywikibotTestCase):
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
         self.assertEqual(self._logged_in_as, 'sysop')
-
-    def testObsoleteSite(self):
-        self.obsolete = True
-        args = (1, 2, 'a', 'b')
-        kwargs = {'i': 'j', 'k': 'l'}
-        self.assertRaises(pywikibot.NoSuchSite, self.call_this_user_req_function, args, kwargs)
 
 if __name__ == '__main__':
     try:
