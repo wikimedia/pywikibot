@@ -3211,6 +3211,32 @@ class APISite(BaseSite):
         return ((unwatch and "unwatched" in watched)
                 or (not unwatch and "watched" in result))
 
+    def purgepages(self, pages, **kwargs):
+        """Purge the server's cache for one or multiple pages.
+
+        @param pages: list of Page objects
+        @return: True if API returned expected response; False otherwise
+
+        """
+        req = api.Request(site=self, action='purge')
+        req['titles'] = [page.title(withSection=False) for page in set(pages)]
+        linkupdate = False
+        linkupdate_args = ['forcelinkupdate', 'forcerecursivelinkupdate']
+        for arg in kwargs:
+            if arg in linkupdate_args + ['redirects', 'converttitles']:
+                req[arg] = kwargs[arg]
+            if arg in linkupdate_args:
+                linkupdate = True
+        result = req.submit()
+        if 'purge' not in result:
+            pywikibot.error(u'purgepages: Unexpected API response:\n%s' % result)
+            return False
+        result = result['purge']
+        purged = ['purged' in page for page in result]
+        if linkupdate:
+            purged += ['linkupdate' in page for page in result]
+        return all(purged)
+
     @deprecated("Site().exturlusage")
     def linksearch(self, siteurl, limit=None):
         """Backwards-compatible interface to exturlusage()"""

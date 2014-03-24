@@ -243,6 +243,7 @@ class TestPageObject(PywikibotTestCase):
         self.assertType(mainpage.editTime(), pywikibot.Timestamp)
         self.assertType(mainpage.previousRevision(), int)
         self.assertType(mainpage.permalink(), basestring)
+        self.assertType(mainpage.purge(), bool)
 
     def testIsDisambig(self):
         """
