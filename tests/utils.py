@@ -1,3 +1,11 @@
+# -*- coding: utf-8  -*-
+#
+# (C) Pywikibot team, 2013-2014
+#
+# Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
+#
 try:
     # Unittest2 is a backport of python 2.7s unittest module to python 2.6
     # Trying to import unittest2 has to happen first because 2.6 does have a

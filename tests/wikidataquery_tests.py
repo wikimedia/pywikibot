@@ -6,6 +6,9 @@ Test cases for the WikidataQuery query syntax and API
 # (C) Pywikipedia bot team, 2013
 #
 # Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
+#
 
 
 import pywikibot.data.wikidataquery as query

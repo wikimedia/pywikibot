@@ -1,3 +1,12 @@
+# -*- coding: utf-8  -*-
+#
+# (C) Pywikibot team, 2012-2014
+#
+# Distributed under the terms of the MIT license.
+#
+__version__ = '$Id$'
+#
+
 import pywikibot
 from pywikibot.site import must_be
 
