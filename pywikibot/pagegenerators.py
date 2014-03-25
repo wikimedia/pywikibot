@@ -767,6 +767,8 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
     """
     if site is None:
         site = pywikibot.Site()
+    if isinstance(namespaces, (int, basestring)):
+        namespaces = [namespaces]
     # convert namespace names to namespace numbers
     for i in range(len(namespaces)):
         ns = namespaces[i]
@@ -897,6 +899,7 @@ def PreloadingItemGenerator(generator, step=50):
                 yield i
 
 
+@deprecate_arg("number", "total")
 def NewimagesPageGenerator(step=None, total=None, site=None):
     if site is None:
         site = pywikibot.Site()
