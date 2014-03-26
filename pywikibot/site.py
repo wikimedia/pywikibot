@@ -3506,6 +3506,15 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return uwgen
 
+    def wantedpages(self, step=None, total=None):
+        """Yield Pages from Special:Wantedpages.
+
+        """
+        wpgen = self._generator(api.PageGenerator,
+                                type_arg="querypage", gqppage="Wantedpages",
+                                step=step, total=total)
+        return wpgen
+
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
     def uncategorizedcategories(self, number=None, repeat=True,
