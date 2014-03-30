@@ -17,7 +17,7 @@ import pywikibot.date as date
 def translate(page, hints=None, auto=True, removebrackets=False, site=None,
               family=None):
     """
-    Goes through all entries in 'hints'. Returns a list of pages.
+    Goes through all entries in 'hints'. Returns a list of links to pages.
 
     Entries for single page titles list those pages. Page titles for entries
     such as "all:" or "xyz:" or "20:" are first built from the page title of

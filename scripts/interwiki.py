@@ -914,25 +914,26 @@ class Subject(object):
         """Add the given translation hints to the todo list"""
         if globalvar.same and self.originPage:
             if hints:
-                pages = titletranslate.translate(
+                links = titletranslate.translate(
                     self.originPage,
                     hints=hints + ['all:'],
                     auto=globalvar.auto,
                     removebrackets=globalvar.hintnobracket)
             else:
-                pages = titletranslate.translate(
+                links = titletranslate.translate(
                     self.originPage,
                     hints=['all:'],
                     auto=globalvar.auto,
                     removebrackets=globalvar.hintnobracket)
         else:
-            pages = titletranslate.translate(
+            links = titletranslate.translate(
                 self.originPage,
                 hints=hints,
                 auto=globalvar.auto,
                 removebrackets=globalvar.hintnobracket,
                 site=pywikibot.Site())
-        for page in pages:
+        for link in links:
+            page = pywikibot.Page(link)
             if globalvar.contentsondisk:
                 page = StoredPage(page)
             self.todo.add(page)
@@ -1233,12 +1234,13 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     elif not newhint:
                         break
                     else:
-                        pages = titletranslate.translate(
+                        links = titletranslate.translate(
                             self.originPage,
                             hints=[newhint],
                             auto=globalvar.auto,
                             removebrackets=globalvar.hintnobracket)
-                        for page in pages:
+                        for link in links:
+                            page = pywikibot.Page(link)
                             self.addIfNew(page, counter, None)
                             if globalvar.hintsareright:
                                 self.hintedsites.add(page.site)
