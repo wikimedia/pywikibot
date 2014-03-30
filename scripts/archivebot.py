@@ -426,11 +426,12 @@ class PageArchiver(object):
         if not self.Page.botMayEdit():
             return
         whys = self.analyzePage()
-        if self.archivedThreads < int(self.get('minthreadstoarchive', 2)):
+        mintoarchive = int(self.get('minthreadstoarchive', 2))
+        if self.archivedThreads < mintoarchive:
             # We might not want to archive a measly few threads
             # (lowers edit frequency)
-            pywikibot.output(u'There are only %d Threads. Skipping'
-                             % self.archivedThreads)
+            pywikibot.output(u'Only %d (< %d) threads are old enough. Skipping'
+                             % (self.archivedThreads, mintoarchive))
             return
         if whys:
             pywikibot.output(u'Archiving %d thread(s).' % self.archivedThreads)
