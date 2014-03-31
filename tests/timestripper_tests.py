@@ -46,15 +46,16 @@ class TestTimeStripper(unittest.TestCase):
                           None)
                          )
 
-    @unittest.expectedFailure
     def test_timestripper(self):
         """Test that correct date is matched"""
 
         txtMatch = u'3 février 2010 à 19:48 (CET) 7 février 2010 à 19:48 (CET)'
         txtNoMatch = u'3 March 2010 19:48 (CET) 7 March 2010 19:48 (CET)'
 
-        res = datetime.datetime(2010, 2, 7, 19, 48,
-                                tzinfo=tzoneFixedOffset(60, 'Europe/Paris'))
+        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
+                                 self.ts.site.siteinfo['timezone'])
+
+        res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
 
         self.assertEqual(self.ts.timestripper(txtMatch), res)
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)
