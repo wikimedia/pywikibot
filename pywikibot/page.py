@@ -1494,7 +1494,7 @@ class Page(object):
         # get list of Category objects the article is in and remove possible
         # duplicates
         cats = []
-        for cat in self.categories(get_redirect=True):
+        for cat in pywikibot.textlib.getCategoryLinks(self.text):
             if cat not in cats:
                 cats.append(cat)
 
