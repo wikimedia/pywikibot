@@ -70,7 +70,7 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
             for newcode in codes:
                 if newcode in site.languages():
                     if newcode != site.code:
-                        x = pywikibot.Link(site.getSite(code=newcode), newname)
+                        x = pywikibot.Link(newname, site.getSite(code=newcode))
                         if x not in result:
                             result.append(x)
                 else:
