@@ -91,3 +91,6 @@ class Family(family.WikimediaFamily):
         if code == 'ru':
             return 'utf-8', 'iso8859-5'
         return self.code2encoding(code),
+
+    def shared_data_repository(self, code, transcluded=False):
+        return ('wikidata', 'wikidata')
