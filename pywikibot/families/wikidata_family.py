@@ -18,7 +18,7 @@ class Family(family.WikimediaFamily):
 
     def shared_data_repository(self, code, transcluded=False):
         """Always return a repository tupe. This enables testing whether
-        the site opject is the repository itself, see Site.is_data_repository()
+        the site object is the repository itself, see Site.is_data_repository()
 
         """
         if transcluded:
