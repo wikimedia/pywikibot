@@ -225,6 +225,45 @@ class TranslationError(Error):
     pass
 
 
+def _extract_plural(code, message, parameters):
+    """Check for the plural variants in message and replace them depending on
+    parameter settings.
+    @param message: the message to be replaced
+    @type message: unicode string
+    @param parameters: plural parameters passed from other methods
+    @type parameters: int, basestring, tuple, list, dict
+
+    """
+    plural_items = re.findall(PLURAL_PATTERN, message)
+    if plural_items:  # we found PLURAL patterns, process it
+        if len(plural_items) > 1 and isinstance(parameters, (tuple, list)) and \
+           len(plural_items) != len(parameters):
+            raise ValueError("Length of parameter does not match PLURAL "
+                             "occurences.")
+        i = 0
+        for selector, variants in plural_items:
+            if type(parameters) == dict:
+                num = int(parameters[selector])
+            elif isinstance(parameters, basestring):
+                num = int(parameters)
+            elif isinstance(parameters, (tuple, list)):
+                num = int(parameters[i])
+                i += 1
+            else:
+                num = parameters
+            # TODO: check against plural_rules[code]['nplurals']
+            try:
+                index = plural_rules[code]['plural'](num)
+            except KeyError:
+                index = plural_rules['_default']['plural'](num)
+            except TypeError:
+                # we got an int, not a function
+                index = plural_rules[code]['plural']
+            repl = variants.split('|')[index]
+            message = re.sub(PLURAL_PATTERN, repl, message, count=1)
+    return message
+
+
 def translate(code, xdict, parameters=None, fallback=True):
     """Return the most appropriate translation from a translation dict.
 
@@ -253,10 +292,6 @@ def translate(code, xdict, parameters=None, fallback=True):
     For PLURAL support have a look at the twntranslate method
 
     """
-    param = None
-    if type(parameters) == dict:
-        param = parameters
-
     family = pywikibot.config.family
     # If a site is given instead of a code, use its language
     if hasattr(code, 'code'):
@@ -291,31 +326,11 @@ def translate(code, xdict, parameters=None, fallback=True):
         return trans
 
     # else we check for PLURAL variants
-    while re.search(PLURAL_PATTERN, trans):
+    trans = _extract_plural(code, trans, parameters)
+    if parameters:
         try:
-            selector, variants = re.search(PLURAL_PATTERN, trans).groups()
-        except AttributeError:
-            pass
-        else:  # we found PLURAL patterns, process it
-            if type(parameters) == dict:
-                num = param[selector]
-            elif isinstance(parameters, basestring):
-                num = int(parameters)
-            else:
-                num = parameters
-            # TODO: check against plural_rules[lang]['nplurals']
-            try:
-                index = plural_rules[code]['plural'](num)
-            except KeyError:
-                index = plural_rules['_default']['plural'](num)
-            except TypeError:
-                # we got an int, not a function
-                index = plural_rules[code]['plural']
-            trans = re.sub(PLURAL_PATTERN, variants.split('|')[index], trans, count=1)
-    if param:
-        try:
-            return trans % param
-        except KeyError:
+            return trans % parameters
+        except (KeyError, TypeError):
             # parameter is for PLURAL variants only, don't change the string
             pass
     return trans
@@ -388,7 +403,7 @@ def twntranslate(code, twtitle, parameters=None):
     contains a plural tag inside which looks like
     {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
     it takes that variant calculated by the plural_rules depending on the number
-    value.
+    value. Multiple plurals are allowed.
 
     Examples:
     If we had a test dictionary in test.py like
@@ -429,45 +444,22 @@ def twntranslate(code, twtitle, parameters=None):
     import table.
 
     """
-    param = None
-    if type(parameters) == dict:
-        param = parameters
     # If a site is given instead of a code, use its language
     if hasattr(code, 'code'):
         code = code.code
     # we send the code via list and get the alternate code back
     code = [code]
-    trans = twtranslate(code, twtitle, None)
-    try:
-        selector, variants = re.search(PLURAL_PATTERN, trans).groups()
-    # No PLURAL tag found: nothing to replace
-    except AttributeError:
-        pass
-    else:
-        if type(parameters) == dict:
-            num = param[selector]
-        elif isinstance(parameters, basestring):
-            num = int(parameters)
-        else:
-            num = parameters
-        # get the alternate language code modified by twtranslate
-        lang = code.pop()
-        # we only need the lang or _default, not a _altlang code
-        # maybe we should implement this to i18n.translate()
-        # TODO: check against plural_rules[lang]['nplurals']
+    trans = twtranslate(code, twtitle)
+    # get the alternate language code modified by twtranslate
+    lang = code.pop()
+    # check for PLURAL variants
+    trans = _extract_plural(lang, trans, parameters)
+    # we always have a dict for replacement of translatewiki messages
+    if parameters and type(parameters) == dict:
         try:
-            index = plural_rules[lang]['plural'](num)
+            return trans % parameters
         except KeyError:
-            index = plural_rules['_default']['plural'](num)
-        except TypeError:
-            # we got an int not a function
-            index = plural_rules[lang]['plural']
-        repl = variants.split('|')[index]
-        trans = re.sub(PLURAL_PATTERN, repl, trans)
-    if param:
-        try:
-            return trans % param
-        except KeyError:
+            # parameter is for PLURAL variants only, don't change the string
             pass
     return trans
 

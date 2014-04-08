@@ -2,6 +2,7 @@
 msg = {
     'de': {
         'test-plural': u'Bot: Ändere %(num)d {{PLURAL:num|Seite|Seiten}}.',
+        'test-multiple-plurals': u'Bot: %(action)s %(line)s {{PLURAL:line|Zeile|Zeilen}} von {{PLURAL:%(page)d|einer|mehreren}} {{PLURAL:page|Seite|Seiten}}.',
     },
     'en': {
         'test-localized': u'test-localized EN',

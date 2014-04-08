@@ -154,6 +154,84 @@ class TestTWNTranslate(TestTWN):
             i18n.twntranslate('fr', 'test-plural', 1) % {'descr': 'seulement'},
             u'Robot: Changer seulement une page.')
 
+    def testMultiple(self):
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals', 1)
+            % {'action': u'Ändere', 'line': u'eine'},
+            u'Bot: Ändere eine Zeile von einer Seite.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals', 2)
+            % {'action': u'Ändere', 'line': u'zwei'},
+            u'Bot: Ändere zwei Zeilen von mehreren Seiten.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals', 3)
+            % {'action': u'Ändere', 'line': u'drei'},
+            u'Bot: Ändere drei Zeilen von mehreren Seiten.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals', (1, 2, 2))
+            % {'action': u'Ändere', 'line': u'eine'},
+            u'Bot: Ändere eine Zeile von mehreren Seiten.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals', [3, 1, 1])
+            % {'action': u'Ändere', 'line': u'drei'},
+            u'Bot: Ändere drei Zeilen von einer Seite.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals', ["3", 1, 1])
+            % {'action': u'Ändere', 'line': u'drei'},
+            u'Bot: Ändere drei Zeilen von einer Seite.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals', "321")
+            % {'action': u'Ändere', 'line': u'dreihunderteinundzwanzig'},
+            u'Bot: Ändere dreihunderteinundzwanzig Zeilen von mehreren Seiten.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals',
+                              {'action': u'Ändere', 'line': 1, 'page': 1}),
+            u'Bot: Ändere 1 Zeile von einer Seite.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals',
+                              {'action': u'Ändere', 'line': 1, 'page': 2}),
+            u'Bot: Ändere 1 Zeile von mehreren Seiten.')
+        self.assertEqual(
+            i18n.twntranslate('de', 'test-multiple-plurals',
+                              {'action': u'Ändere', 'line': "11", 'page': 2}),
+            u'Bot: Ändere 11 Zeilen von mehreren Seiten.')
+
+    def testMultipleWrongParameterLength(self):
+        """ Test wrong parameter lenght"""
+        with self.assertRaisesRegexp(ValueError, "Length of parameter does not match PLURAL occurences"):
+            self.assertEqual(
+                i18n.twntranslate('de', 'test-multiple-plurals', (1, 2))
+                % {'action': u'Ändere', 'line': u'drei'},
+                u'Bot: Ändere drei Zeilen von mehreren Seiten.')
+
+        with self.assertRaisesRegexp(ValueError, "Length of parameter does not match PLURAL occurences"):
+            self.assertEqual(
+                i18n.twntranslate('de', 'test-multiple-plurals', ["321"])
+                % {'action': u'Ändere', 'line': u'dreihunderteinundzwanzig'},
+                u'Bot: Ändere dreihunderteinundzwanzig Zeilen von mehreren Seiten.')
+
+    def testMultipleNonNumbers(self):
+        """ Numbers or string numbers are required for tuple or list items """
+        with self.assertRaisesRegexp(ValueError, "invalid literal for int\(\) with base 10: 'drei'"):
+            self.assertEqual(
+                i18n.twntranslate('de', 'test-multiple-plurals', ["drei", "1", 1])
+                % {'action': u'Ändere', 'line': u'drei'},
+                u'Bot: Ändere drei Zeilen von einer Seite.')
+        with self.assertRaisesRegexp(ValueError, "invalid literal for int\(\) with base 10: 'elf'"):
+            self.assertEqual(
+                i18n.twntranslate('de', 'test-multiple-plurals',
+                                  {'action': u'Ändere', 'line': "elf", 'page': 2}),
+                u'Bot: Ändere elf Zeilen von mehreren Seiten.')
+
+    def testAllParametersExist(self):
+        with self.assertRaisesRegexp(KeyError, "u'line'"):
+            # all parameters must be inside twntranslate
+            self.assertEqual(
+                i18n.twntranslate('de', 'test-multiple-plurals',
+                                  {'line': 1, 'page': 1})
+                % {'action': u'Ändere'},
+                u'Bot: Ändere 1 Zeile von einer Seite.')
+
 
 if __name__ == '__main__':
     try:
