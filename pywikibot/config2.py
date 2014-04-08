@@ -106,8 +106,6 @@ password_file = None
 default_edit_summary = u'Wikipedia python library v.2'
 
 
-# Get the names of all known families, and initialize
-# with empty dictionaries
 def _get_base_dir():
     """Return the directory in which user-specific information is stored.
 
@@ -162,14 +160,27 @@ def _get_base_dir():
     return base_dir
 
 _base_dir = _get_base_dir()
-# families/ is a subdirectory of the directory in which config.py is found
-for _filename in os.listdir(
-        os.path.join(os.path.dirname(__file__), 'families')):
-    if _filename.endswith("_family.py"):
-        familyName = _filename[:-len("_family.py")]
-        usernames[familyName] = {}
-        sysopnames[familyName] = {}
-        disambiguation_comment[familyName] = {}
+
+
+family_files = {}
+
+
+def register_family_file(family_name, file_path):
+    usernames[family_name] = {}
+    sysopnames[family_name] = {}
+    disambiguation_comment[family_name] = {}
+    family_files[family_name] = file_path
+
+
+def register_families_folder(folder_path):
+    for file_name in os.listdir(folder_path):
+        if file_name.endswith("_family.py"):
+            family_name = file_name[:-len("_family.py")]
+            register_family_file(family_name, os.path.join(folder_path, file_name))
+
+# Get the names of all known families, and initialize with empty dictionaries.
+# ‘families/’ is a subdirectory of the directory in which config2.py is found.
+register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
 
 # Set to True to override the {{bots}} exclusion protocol (at your own risk!)
 ignore_bot_templates = False
