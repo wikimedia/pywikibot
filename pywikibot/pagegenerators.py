@@ -306,19 +306,19 @@ class GeneratorFactory(object):
             if len(arg) == 12:
                 gen = UnusedFilesGenerator()
             else:
-                gen = UnusedFilesGenerator(number=int(arg[13:]))
+                gen = UnusedFilesGenerator(total=int(arg[13:]))
         elif arg.startswith('-unwatched'):
             if len(arg) == 10:
                 gen = UnwatchedPagesPageGenerator()
             else:
-                gen = UnwatchedPagesPageGenerator(number=int(arg[11:]))
+                gen = UnwatchedPagesPageGenerator(total=int(arg[11:]))
         elif arg.startswith('-usercontribs'):
             gen = UserContributionsGenerator(arg[14:])
         elif arg.startswith('-withoutinterwiki'):
             if len(arg) == 17:
                 gen = WithoutInterwikiPageGenerator()
             else:
-                gen = WithoutInterwikiPageGenerator(number=int(arg[18:]))
+                gen = WithoutInterwikiPageGenerator(total=int(arg[18:]))
         elif arg.startswith('-interwiki'):
             title = arg[11:]
             if not title:
@@ -330,12 +330,12 @@ class GeneratorFactory(object):
             if len(arg) == 15:
                 gen = RandomRedirectPageGenerator()
             else:
-                gen = RandomRedirectPageGenerator(number=int(arg[16:]))
+                gen = RandomRedirectPageGenerator(total=int(arg[16:]))
         elif arg.startswith('-random'):
             if len(arg) == 7:
                 gen = RandomPageGenerator()
             else:
-                gen = RandomPageGenerator(number=int(arg[8:]))
+                gen = RandomPageGenerator(total=int(arg[8:]))
         elif arg.startswith('-recentchanges'):
             if len(arg) >= 15:
                 gen = RecentChangesPageGenerator(total=int(arg[15:]))
@@ -558,7 +558,7 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
 @deprecate_arg("number", "total")
 @deprecate_arg("namespace", "namespaces")
 @deprecate_arg("repeat", None)
-def NewpagesPageGenerator(get_redirect=False, repeat=False, site=None,
+def NewpagesPageGenerator(get_redirect=False, site=None,
                           namespaces=[0, ], step=None, total=None):
     """
     Iterate Page objects for all new titles in a single namespace.
@@ -937,52 +937,66 @@ def WikidataItemGenerator(gen):
 
 #TODO below
 @deprecate_arg("extension", None)
-def UnusedFilesGenerator(number=100, repeat=False, site=None, extension=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def UnusedFilesGenerator(total=100, site=None, extension=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.unusedfiles(number=number, repeat=repeat):
+    for page in site.unusedfiles(total=total):
         yield pywikibot.ImagePage(page.site, page.title())
 
 
-def WithoutInterwikiPageGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def WithoutInterwikiPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.withoutinterwiki(number=number, repeat=repeat):
+    for page in site.withoutinterwiki(total=total):
         yield page
 
 
-def UnCategorizedCategoryGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def UnCategorizedCategoryGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.uncategorizedcategories(number=number, repeat=repeat):
+    for page in site.uncategorizedcategories(total=total):
         yield page
 
 
-def UnCategorizedImageGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def UnCategorizedImageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.uncategorizedimages(number=number, repeat=repeat):
+    for page in site.uncategorizedimages(total=total):
         yield page
 
 
-def UnCategorizedPageGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def UnCategorizedPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.uncategorizedpages(number=number, repeat=repeat):
+    for page in site.uncategorizedpages(total=total):
         yield page
 
 
-def LonelyPagesPageGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def LonelyPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.lonelypages(number=number, repeat=repeat):
+    for page in site.lonelypages(total=total):
         yield page
 
 
-def UnwatchedPagesPageGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def UnwatchedPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.unwatchedpages(number=number, repeat=repeat):
+    for page in site.unwatchedpages(total=total):
         yield page
 
 
@@ -993,45 +1007,55 @@ def WantedPagesPageGenerator(total=100, site=None):
         yield page
 
 
-def AncientPagesPageGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def AncientPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page, date in site.ancientpages(number=number, repeat=repeat):
+    for page, date in site.ancientpages(total=total):
         yield page
 
 
-def DeadendPagesPageGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def DeadendPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.deadendpages(number=number, repeat=repeat):
+    for page in site.deadendpages(total=total):
         yield page
 
 
-def LongPagesPageGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def LongPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page, length in site.longpages(number=number, repeat=repeat):
+    for page, length in site.longpages(total=total):
         yield page
 
 
-def ShortPagesPageGenerator(number=100, repeat=False, site=None):
+@deprecate_arg("number", "total")
+@deprecate_arg("repeat", None)
+def ShortPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page, length in site.shortpages(total=number, repeat=repeat):
+    for page, length in site.shortpages(total=total):
         yield page
 
 
-def RandomPageGenerator(number=10, site=None):
+@deprecate_arg("number", "total")
+def RandomPageGenerator(total=10, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.randompages(total=number):
+    for page in site.randompages(total=total):
         yield page
 
 
-def RandomRedirectPageGenerator(number=10, site=None):
+@deprecate_arg("number", "total")
+def RandomRedirectPageGenerator(total=10, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page in site.randompages(total=number, redirects=True):
+    for page in site.randompages(total=total, redirects=True):
         yield page
 
 
