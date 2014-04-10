@@ -490,6 +490,7 @@ class GeneratorFactory(object):
                 self.articlefilter = pywikibot.input(u'Which pattern do you want to grep?')
             else:
                 self.articlefilter = arg[6:]
+            return True
         elif arg.startswith('-yahoo'):
             gen = YahooSearchPageGenerator(arg[7:])
         elif arg.startswith('-untagged'):
