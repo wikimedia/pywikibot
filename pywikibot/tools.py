@@ -13,7 +13,7 @@ import threading
 import time
 import inspect
 import re
-from collections import Mapping, deque
+import collections
 from distutils.version import Version
 
 if sys.version_info[0] > 2:
@@ -256,17 +256,20 @@ class ThreadList(list):
 
     """
 
+    _logger = "threadlist"
+
     def __init__(self, limit=128, *args):
+        """Constructor."""
         self.limit = limit
-        list.__init__(self, *args)
-        for item in list(self):
+        super(ThreadList, self).__init__(*args)
+        for item in self:
             if not isinstance(threading.Thread, item):
                 raise TypeError("Cannot add '%s' to ThreadList" % type(item))
 
     def active_count(self):
         """Return the number of alive threads, and delete all non-alive ones."""
         count = 0
-        for item in list(self):
+        for item in self[:]:
             if item.isAlive():
                 count += 1
             else:
@@ -274,12 +277,92 @@ class ThreadList(list):
         return count
 
     def append(self, thd):
+        """Add a thread to the pool and start it."""
         if not isinstance(thd, threading.Thread):
             raise TypeError("Cannot append '%s' to ThreadList" % type(thd))
         while self.active_count() >= self.limit:
             time.sleep(2)
-        list.append(self, thd)
+        super(ThreadList, self).append(thd)
         thd.start()
+
+    def stop_all(self):
+        """Stop all threads the pool."""
+        if self:
+            debug(u'EARLY QUIT: Threads: %d' % len(self), ThreadList._logger)
+        for thd in self:
+            thd.stop()
+            debug(u'EARLY QUIT: Queue size left in %s: %s'
+                  % (thd, thd.queue.qsize()), ThreadList._logger)
+
+
+def intersect_generators(genlist):
+    """
+    Intersect generators listed in genlist.
+
+    Yield items only if they are yielded by all generators in genlist.
+    Threads (via ThreadedGenerator) are used in order to run generators
+    in parallel, so that items can be yielded before generators are
+    exhausted.
+
+    Threads are stopped when they are either exhausted or Ctrl-C is pressed.
+    Quitting before all generators are finished is attempted if
+    there is no more chance of finding an item in all queues.
+
+    @param genlist: list of page generators
+    @type genlist: list
+    """
+    _logger = ""
+
+    # Item is cached to check that it is found n_gen
+    # times before being yielded.
+    cache = collections.defaultdict(set)
+    n_gen = len(genlist)
+
+    # Class to keep track of alive threads.
+    # Start new threads and remove completed threads.
+    thrlist = ThreadList()
+
+    for source in genlist:
+        threaded_gen = ThreadedGenerator(name=repr(source), target=source)
+        thrlist.append(threaded_gen)
+        debug("INTERSECT: thread started: %r" % threaded_gen, _logger)
+
+    while True:
+        # Get items from queues in a round-robin way.
+        for t in thrlist:
+            try:
+                # TODO: evaluate if True and timeout is necessary.
+                item = t.queue.get(True, 0.1)
+
+                # Cache entry is a set of tuples (item, thread).
+                # Duplicates from same thread are not counted twice.
+                cache[item].add((item, t))
+                if len(cache[item]) == n_gen:
+                    yield item
+                    # Remove item from cache.
+                    # No chance of seeing it again (see later: early stop).
+                    cache.pop(item)
+
+                active = thrlist.active_count()
+                max_cache = n_gen
+                if cache.values():
+                    max_cache = max(len(v) for v in cache.values())
+                # No. of active threads is not enough to reach n_gen.
+                # We can quit even if some thread is still active.
+                # There could be an item in all generators which has not yet
+                # appeared from any generator. Only when we have lost one
+                # generator, then we can bail out early based on seen items.
+                if active < n_gen and n_gen - max_cache > active:
+                    thrlist.stop_all()
+                    return
+            except Queue.Empty:
+                pass
+            except KeyboardInterrupt:
+                thrlist.stop_all()
+            finally:
+                # All threads are done.
+                if thrlist.active_count() == 0:
+                    return
 
 
 class CombinedError(KeyError, IndexError):
@@ -287,7 +370,7 @@ class CombinedError(KeyError, IndexError):
     """An error that gets caught by both KeyError and IndexError."""
 
 
-class EmptyDefault(str, Mapping):
+class EmptyDefault(str, collections.Mapping):
 
     """
     A default for a not existing siteinfo property.
@@ -336,7 +419,7 @@ class SelfCallString(SelfCallMixin, str):
     """Unicode string with SelfCallMixin."""
 
 
-class DequeGenerator(deque):
+class DequeGenerator(collections.deque):
 
     """A generator that allows items to be added during generating."""
 

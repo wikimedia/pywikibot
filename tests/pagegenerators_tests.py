@@ -17,6 +17,7 @@ from tests.aspects import (
     WikidataTestCase,
     DefaultSiteTestCase,
 )
+from tests.thread_tests import GeneratorIntersectTestCase
 
 
 class TestPageGenerators(TestCase):
@@ -250,6 +251,41 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-recentchanges:10')
         gen = gf.getCombinedGenerator()
         self.assertPagesInNamespaces(gen, set([1, 3]))
+
+
+class PageGeneratorIntersectTestCase(DefaultSiteTestCase,
+                                     GeneratorIntersectTestCase):
+
+    """Page intersect_generators test cases."""
+
+    def test_intersect_newpages_twice(self):
+        site = self.get_site()
+        self.assertEqualItertools(
+            [pagegenerators.NewpagesPageGenerator(site=site, total=10),
+             pagegenerators.NewpagesPageGenerator(site=site, total=10)])
+
+    def test_intersect_newpages_and_recentchanges(self):
+        site = self.get_site()
+        self.assertEqualItertools(
+            [pagegenerators.NewpagesPageGenerator(site=site, total=50),
+             pagegenerators.RecentChangesPageGenerator(site=site, total=200)])
+
+
+class EnglishWikipediaPageGeneratorIntersectTestCase(GeneratorIntersectTestCase):
+
+    """Page intersect_generators test cases."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_intersect_newpages_csd(self):
+        site = self.get_site()
+        self.assertEqualItertools(
+            [pagegenerators.NewpagesPageGenerator(site=site, total=10),
+             pagegenerators.CategorizedPageGenerator(
+                pywikibot.Category(site,
+                                   'Category:Candidates_for_speedy_deletion'))
+             ])
 
 
 if __name__ == "__main__":

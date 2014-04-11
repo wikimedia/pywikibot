@@ -7,9 +7,14 @@
 #
 __version__ = '$Id$'
 
+import itertools
+import sys
 
-from tests.aspects import TestCase
-from pywikibot.tools import ThreadedGenerator
+if sys.version_info[0] == 2:
+    from future_builtins import filter
+
+from tests.aspects import unittest, TestCase
+from pywikibot.tools import ThreadedGenerator, intersect_generators
 
 
 class BasicThreadedGeneratorTestCase(TestCase):
@@ -34,3 +39,45 @@ class BasicThreadedGeneratorTestCase(TestCase):
         thd_gen = ThreadedGenerator(target=self.gen_func)
         thd_gen.start()
         self.assertEqual(list(thd_gen), list(iterable))
+
+
+class GeneratorIntersectTestCase(TestCase):
+
+    """Base class for intersect_generators test cases."""
+
+    def assertEqualItertools(self, gens):
+        # If they are a generator, we need to convert to a list
+        # first otherwise the generator is empty the second time.
+        datasets = [list(gen) for gen in gens]
+
+        itertools_result = set(
+            [item[0] for item in filter(
+                lambda lst: all([x == lst[0] for x in lst]),
+                itertools.product(*datasets))
+             ])
+
+        result = list(intersect_generators(datasets))
+
+        self.assertEqual(len(set(result)), len(result))
+
+        self.assertCountEqual(result, itertools_result)
+
+
+class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
+
+    """Disconnected intersect_generators test cases."""
+
+    net = False
+
+    def test_intersect_basic(self):
+        self.assertEqualItertools(['abc', 'db', 'ba'])
+
+    def test_intersect_with_dups(self):
+        self.assertEqualItertools(['aabc', 'dddb', 'baa'])
+
+
+if __name__ == '__main__':
+    try:
+        unittest.main()
+    except SystemExit:
+        pass
