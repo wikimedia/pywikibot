@@ -1149,7 +1149,7 @@ class tzoneFixedOffset(datetime.tzinfo):
         return self.__name
 
     def dst(self, dt):
-        return ZERO
+        return datetime.timedelta(0)
 
     def __repr__(self):
         return "%s(%s, %s)" % (
