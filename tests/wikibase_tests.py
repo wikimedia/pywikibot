@@ -823,6 +823,51 @@ class TestUnconnectedClient(TestCase):
                                 self.wdp.data_item)
 
 
+class TestJSON(WikidataTestCase):
+
+    """Test cases to test toJSON() functions."""
+
+    def setUp(self):
+        super(TestJSON, self).setUp()
+        wikidata = self.get_repo()
+        self.wdp = pywikibot.ItemPage(wikidata, 'Q60')
+        self.wdp.id = 'Q60'
+        self.wdp._content = json.load(
+            open(os.path.join(os.path.split(__file__)[0], 'pages', 'Q60.wd')))
+        self.wdp.get()
+        del self.wdp._content['id']
+        del self.wdp._content['type']
+        del self.wdp._content['lastrevid']
+
+    def test_itempage_json(self):
+        old = json.dumps(self.wdp._content, indent=2, sort_keys=True)
+        new = json.dumps(self.wdp.toJSON(), indent=2, sort_keys=True)
+
+        self.assertEquals(old, new)
+
+    def test_json_diff(self):
+        del self.wdp.labels['en']
+        del self.wdp.claims['P213']
+        expected = {
+            'labels': {
+                'en': {
+                    'language': 'en',
+                    'value': ''
+                }
+            },
+            'claims': {
+                'P213': [
+                    {
+                        'id': 'Q60$0427a236-4120-7d00-fa3e-e23548d4c02d',
+                        'remove': ''
+                    }
+                ]
+            }
+        }
+        diff = self.wdp.toJSON(diffto=self.wdp._content)
+        self.assertEquals(diff, expected)
+
+
 if __name__ == '__main__':
     try:
         unittest.main()

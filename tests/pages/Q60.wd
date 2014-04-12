@@ -1,0 +1,4798 @@
+{
+    "id": "Q60",
+    "type": "item",
+    "lastrevid": 122836617,
+    "aliases": {
+        "en": [
+            {
+                "language": "en",
+                "value": "NYC"
+            },
+            {
+                "language": "en",
+                "value": "New York"
+            },
+            {
+                "language": "en",
+                "value": "City of New York"
+            },
+            {
+                "language": "en",
+                "value": "New York, New York"
+            },
+            {
+                "language": "en",
+                "value": "The Big Apple"
+            },
+            {
+                "language": "en",
+                "value": "Gotham"
+            },
+            {
+                "language": "en",
+                "value": "New Amsterdam"
+            }
+        ],
+        "fr": [
+            {
+                "language": "fr",
+                "value": "New York City"
+            },
+            {
+                "language": "fr",
+                "value": "NYC"
+            },
+            {
+                "language": "fr",
+                "value": "The City"
+            },
+            {
+                "language": "fr",
+                "value": "City of New York"
+            },
+            {
+                "language": "fr",
+                "value": "The Big Apple"
+            }
+        ],
+        "it": [
+            {
+                "language": "it",
+                "value": "New York City"
+            },
+            {
+                "language": "it",
+                "value": "The City of New York"
+            },
+            {
+                "language": "it",
+                "value": "La grande mela"
+            },
+            {
+                "language": "it",
+                "value": "NYC"
+            },
+            {
+                "language": "it",
+                "value": "NY"
+            }
+        ],
+        "de": [
+            {
+                "language": "de",
+                "value": "City of New York"
+            },
+            {
+                "language": "de",
+                "value": "The Big Apple"
+            },
+            {
+                "language": "de",
+                "value": "NYC"
+            },
+            {
+                "language": "de",
+                "value": "New York"
+            }
+        ],
+        "nl": [
+            {
+                "language": "nl",
+                "value": "New York"
+            }
+        ],
+        "be-tarask": [
+            {
+                "language": "be-tarask",
+                "value": "\u041d\u044c\u044e \u0401\u0440\u043a"
+            }
+        ],
+        "nan": [
+            {
+                "language": "nan",
+                "value": "New York City"
+            }
+        ],
+        "ko": [
+            {
+                "language": "ko",
+                "value": "\ub274\uc695 \uc2dc"
+            }
+        ],
+        "nb": [
+            {
+                "language": "nb",
+                "value": "New York by"
+            },
+            {
+                "language": "nb",
+                "value": "New York City"
+            }
+        ],
+        "zh-hans": [
+            {
+                "language": "zh-hans",
+                "value": "\u7ebd\u7ea6\u5e02"
+            }
+        ],
+        "zh-hant": [
+            {
+                "language": "zh-hant",
+                "value": "\u7d10\u7d04\u5e02"
+            }
+        ],
+        "zh-cn": [
+            {
+                "language": "zh-cn",
+                "value": "\u7ebd\u7ea6\u5e02"
+            }
+        ],
+        "zh-sg": [
+            {
+                "language": "zh-sg",
+                "value": "\u7ebd\u7ea6\u5e02"
+            }
+        ],
+        "zh-my": [
+            {
+                "language": "zh-my",
+                "value": "\u7ebd\u7ea6\u5e02"
+            }
+        ],
+        "zh": [
+            {
+                "language": "zh",
+                "value": "\u7ebd\u7ea6\u5e02"
+            }
+        ],
+        "zh-hk": [
+            {
+                "language": "zh-hk",
+                "value": "\u7d10\u7d04\u5e02"
+            }
+        ],
+        "zh-tw": [
+            {
+                "language": "zh-tw",
+                "value": "\u7d10\u7d04\u5e02"
+            }
+        ],
+        "zh-mo": [
+            {
+                "language": "zh-mo",
+                "value": "\u7d10\u7d04\u5e02"
+            }
+        ],
+        "ca": [
+            {
+                "language": "ca",
+                "value": "Ciutat de Nova York"
+            },
+            {
+                "language": "ca",
+                "value": "New York City"
+            },
+            {
+                "language": "ca",
+                "value": "New York City (New York)"
+            },
+            {
+                "language": "ca",
+                "value": "NYC"
+            },
+            {
+                "language": "ca",
+                "value": "N. Y."
+            },
+            {
+                "language": "ca",
+                "value": "N Y"
+            }
+        ],
+        "oc": [
+            {
+                "language": "oc",
+                "value": "Nava York"
+            },
+            {
+                "language": "oc",
+                "value": "Nu\u00f2va York"
+            },
+            {
+                "language": "oc",
+                "value": "Poma granda"
+            }
+        ],
+        "fi": [
+            {
+                "language": "fi",
+                "value": "Iso omena"
+            }
+        ],
+        "fa": [
+            {
+                "language": "fa",
+                "value": "\u0633\u06cc\u0628 \u0628\u0632\u0631\u06af"
+            },
+            {
+                "language": "fa",
+                "value": "\u06af\u0648\u062a\u0627\u0645"
+            },
+            {
+                "language": "fa",
+                "value": "\u0634\u0647\u0631\u06cc \u06a9\u0647 \u0647\u0631\u06af\u0632 \u0646\u0645\u06cc \u062e\u0648\u0627\u0628\u062f"
+            }
+        ],
+        "be": [
+            {
+                "language": "be",
+                "value": "\u0413\u043e\u0440\u0430\u0434 \u041d\u044c\u044e-\u0401\u0440\u043a"
+            }
+        ],
+        "eo": [
+            {
+                "language": "eo",
+                "value": "Nov-Jorko"
+            },
+            {
+                "language": "eo",
+                "value": "La Granda Pomo"
+            },
+            {
+                "language": "eo",
+                "value": "La urbo, kiu neniam dormas"
+            },
+            {
+                "language": "eo",
+                "value": "Gotham"
+            }
+        ],
+        "th": [
+            {
+                "language": "th",
+                "value": "\u0e40\u0e21\u0e37\u0e2d\u0e07\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e01"
+            },
+            {
+                "language": "th",
+                "value": "\u0e19\u0e04\u0e23\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e04"
+            },
+            {
+                "language": "th",
+                "value": "\u0e21\u0e2b\u0e32\u0e19\u0e04\u0e23\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e01"
+            },
+            {
+                "language": "th",
+                "value": "\u0e40\u0e21\u0e37\u0e2d\u0e07\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e04"
+            },
+            {
+                "language": "th",
+                "value": "\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e01\u0e0b\u0e34\u0e15\u0e35"
+            },
+            {
+                "language": "th",
+                "value": "\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e01\u0e0b\u0e34\u0e15\u0e35\u0e49"
+            },
+            {
+                "language": "th",
+                "value": "\u0e01\u0e23\u0e38\u0e07\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e04"
+            },
+            {
+                "language": "th",
+                "value": "New York City"
+            },
+            {
+                "language": "th",
+                "value": "\u0e01\u0e23\u0e38\u0e07\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e01"
+            },
+            {
+                "language": "th",
+                "value": "NYC"
+            },
+            {
+                "language": "th",
+                "value": "\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e04\u0e0b\u0e34\u0e15\u0e35"
+            }
+        ],
+        "pt-br": [
+            {
+                "language": "pt-br",
+                "value": "Nova York"
+            },
+            {
+                "language": "pt-br",
+                "value": "Cidade de Nova York"
+            }
+        ],
+        "pt": [
+            {
+                "language": "pt",
+                "value": "Nova York"
+            }
+        ],
+        "ta": [
+            {
+                "language": "ta",
+                "value": "\u0ba8\u0bbf\u0baf\u0bc1 \u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd"
+            },
+            {
+                "language": "ta",
+                "value": "\u0ba8\u0bbf\u0baf\u0bc2 \u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd"
+            },
+            {
+                "language": "ta",
+                "value": "\u0ba8\u0bbf\u0baf\u0bc2\u0baf\u0bcb\u0bb0\u0bcd\u0b95\u0bcd"
+            },
+            {
+                "language": "ta",
+                "value": "\u0ba8\u0bbf\u0baf\u0bc2\u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd"
+            },
+            {
+                "language": "ta",
+                "value": "\u0ba8\u0bbf\u0baf\u0bc2 \u0baf\u0bcb\u0bb0\u0bcd\u0b95\u0bcd"
+            },
+            {
+                "language": "ta",
+                "value": "\u0ba8\u0bbf\u0baf\u0bc2\u0baf\u0bcb\u0bb0\u0bcd\u0b95\u0bcd \u0ba8\u0b95\u0bb0\u0bae\u0bcd"
+            },
+            {
+                "language": "ta",
+                "value": "\u0ba8\u0bbf\u0baf\u0bc2 \u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd \u0ba8\u0b95\u0bb0\u0bae\u0bcd"
+            },
+            {
+                "language": "ta",
+                "value": "\u0ba8\u0bbf\u0baf\u0bc2 \u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd\u0b95\u0bc1"
+            },
+            {
+                "language": "ta",
+                "value": "\u0ba4 \u0baa\u0bbf\u0b95\u0bcd \u0b86\u0baa\u0bcd\u0baa\u0bbf\u0bb3\u0bcd"
+            }
+        ],
+        "es": [
+            {
+                "language": "es",
+                "value": "New York City"
+            },
+            {
+                "language": "es",
+                "value": "ciudad de Nueva York"
+            },
+            {
+                "language": "es",
+                "value": "NYC"
+            },
+            {
+                "language": "es",
+                "value": "New York"
+            }
+        ],
+        "hu": [
+            {
+                "language": "hu",
+                "value": "New York City"
+            }
+        ],
+        "da": [
+            {
+                "language": "da",
+                "value": "New York City"
+            }
+        ]
+    },
+    "labels": {
+        "en": {
+            "language": "en",
+            "value": "New York City"
+        },
+        "ar": {
+            "language": "ar",
+            "value": "\u0645\u062f\u064a\u0646\u0629 \u0646\u064a\u0648 \u064a\u0648\u0631\u0643"
+        },
+        "fr": {
+            "language": "fr",
+            "value": "New York"
+        },
+        "it": {
+            "language": "it",
+            "value": "New York"
+        },
+        "pl": {
+            "language": "pl",
+            "value": "Nowy Jork"
+        },
+        "de": {
+            "language": "de",
+            "value": "New York City"
+        },
+        "nl": {
+            "language": "nl",
+            "value": "New York City"
+        },
+        "be-tarask": {
+            "language": "be-tarask",
+            "value": "\u041d\u044c\u044e-\u0401\u0440\u043a"
+        },
+        "nan": {
+            "language": "nan",
+            "value": "New York Chh\u012b"
+        },
+        "hr": {
+            "language": "hr",
+            "value": "New York City"
+        },
+        "ja": {
+            "language": "ja",
+            "value": "\u30cb\u30e5\u30fc\u30e8\u30fc\u30af"
+        },
+        "es": {
+            "language": "es",
+            "value": "Nueva York"
+        },
+        "eo": {
+            "language": "eo",
+            "value": "Novjorko"
+        },
+        "af": {
+            "language": "af",
+            "value": "New York Stad"
+        },
+        "am": {
+            "language": "am",
+            "value": "\u1292\u12cd \u12ee\u122d\u12ad \u12a8\u1270\u121b"
+        },
+        "an": {
+            "language": "an",
+            "value": "Nueva York"
+        },
+        "ang": {
+            "language": "ang",
+            "value": "N\u012b\u01bfeofor\u01bf\u012bcburg"
+        },
+        "arc": {
+            "language": "arc",
+            "value": "\u0722\u071d\u0718 \u071d\u0718\u072a\u0729"
+        },
+        "arz": {
+            "language": "arz",
+            "value": "\u0646\u064a\u0648\u064a\u0648\u0631\u0643"
+        },
+        "ast": {
+            "language": "ast",
+            "value": "Nueva York"
+        },
+        "ay": {
+            "language": "ay",
+            "value": "New York"
+        },
+        "az": {
+            "language": "az",
+            "value": "Nyu York"
+        },
+        "ba": {
+            "language": "ba",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "bar": {
+            "language": "bar",
+            "value": "New York City"
+        },
+        "bcl": {
+            "language": "bcl",
+            "value": "Nueva York"
+        },
+        "be": {
+            "language": "be",
+            "value": "\u041d\u044c\u044e-\u0401\u0440\u043a"
+        },
+        "bg": {
+            "language": "bg",
+            "value": "\u041d\u044e \u0419\u043e\u0440\u043a"
+        },
+        "bn": {
+            "language": "bn",
+            "value": "\u09a8\u09bf\u0989 \u0987\u09af\u09bc\u09b0\u09cd\u0995 \u09b8\u09bf\u099f\u09bf"
+        },
+        "bo": {
+            "language": "bo",
+            "value": "\u0f53\u0f7a\u0f60\u0f74\u0f0b\u0f61\u0f7c\u0f62\u0f0b\u0f40\u0f0d"
+        },
+        "br": {
+            "language": "br",
+            "value": "New York"
+        },
+        "bs": {
+            "language": "bs",
+            "value": "New York City"
+        },
+        "bug": {
+            "language": "bug",
+            "value": "Kuta New York"
+        },
+        "ca": {
+            "language": "ca",
+            "value": "Nova York"
+        },
+        "ce": {
+            "language": "ce",
+            "value": "\u041a\u0435\u0440\u043b\u0430-\u0419\u043e\u0440\u043a"
+        },
+        "ceb": {
+            "language": "ceb",
+            "value": "Dakbayan sa New York"
+        },
+        "ckb": {
+            "language": "ckb",
+            "value": "\u0646\u06cc\u0648\u06cc\u06c6\u0631\u06a9"
+        },
+        "co": {
+            "language": "co",
+            "value": "New York"
+        },
+        "cs": {
+            "language": "cs",
+            "value": "New York"
+        },
+        "cv": {
+            "language": "cv",
+            "value": "\u00c7\u0115\u043d\u0115 \u0419\u043e\u0440\u043a"
+        },
+        "cy": {
+            "language": "cy",
+            "value": "Dinas Efrog Newydd"
+        },
+        "da": {
+            "language": "da",
+            "value": "New York"
+        },
+        "diq": {
+            "language": "diq",
+            "value": "New York City"
+        },
+        "dsb": {
+            "language": "dsb",
+            "value": "New York City"
+        },
+        "el": {
+            "language": "el",
+            "value": "\u039d\u03ad\u03b1 \u03a5\u03cc\u03c1\u03ba\u03b7"
+        },
+        "et": {
+            "language": "et",
+            "value": "New York"
+        },
+        "eu": {
+            "language": "eu",
+            "value": "New York"
+        },
+        "ext": {
+            "language": "ext",
+            "value": "Nueva York"
+        },
+        "fa": {
+            "language": "fa",
+            "value": "\u0646\u06cc\u0648\u06cc\u0648\u0631\u06a9"
+        },
+        "fi": {
+            "language": "fi",
+            "value": "New York"
+        },
+        "fo": {
+            "language": "fo",
+            "value": "New York City"
+        },
+        "frp": {
+            "language": "frp",
+            "value": "New York"
+        },
+        "frr": {
+            "language": "frr",
+            "value": "New York City"
+        },
+        "fy": {
+            "language": "fy",
+            "value": "New York City"
+        },
+        "ga": {
+            "language": "ga",
+            "value": "Nua-Eabhrac"
+        },
+        "gan": {
+            "language": "gan",
+            "value": "\u7d10\u7d04"
+        },
+        "gd": {
+            "language": "gd",
+            "value": "Eabhraig Nuadh"
+        },
+        "gl": {
+            "language": "gl",
+            "value": "Nova York - New York"
+        },
+        "gn": {
+            "language": "gn",
+            "value": "T\u00e1va Nueva York"
+        },
+        "gv": {
+            "language": "gv",
+            "value": "Caayr York Noa"
+        },
+        "he": {
+            "language": "he",
+            "value": "\u05e0\u05d9\u05d5 \u05d9\u05d5\u05e8\u05e7 (\u05e2\u05d9\u05e8)"
+        },
+        "hi": {
+            "language": "hi",
+            "value": "\u0928\u094d\u092f\u0942\u092f\u0949\u0930\u094d\u0915 \u0928\u0917\u0930"
+        },
+        "hif": {
+            "language": "hif",
+            "value": "New York City"
+        },
+        "hsb": {
+            "language": "hsb",
+            "value": "New York City"
+        },
+        "ht": {
+            "language": "ht",
+            "value": "Nouy\u00f2k"
+        },
+        "hu": {
+            "language": "hu",
+            "value": "New York"
+        },
+        "hy": {
+            "language": "hy",
+            "value": "\u0546\u0575\u0578\u0582 \u0545\u0578\u0580\u0584"
+        },
+        "ia": {
+            "language": "ia",
+            "value": "New York"
+        },
+        "id": {
+            "language": "id",
+            "value": "New York City"
+        },
+        "ig": {
+            "language": "ig",
+            "value": "New York City"
+        },
+        "ik": {
+            "language": "ik",
+            "value": "Tchiaq York Iniqpak"
+        },
+        "ilo": {
+            "language": "ilo",
+            "value": "Siudad ti New York"
+        },
+        "io": {
+            "language": "io",
+            "value": "New York"
+        },
+        "is": {
+            "language": "is",
+            "value": "New York-borg"
+        },
+        "jbo": {
+            "language": "jbo",
+            "value": "niu,IORK. zei tcadu"
+        },
+        "jv": {
+            "language": "jv",
+            "value": "New York"
+        },
+        "ka": {
+            "language": "ka",
+            "value": "\u10dc\u10d8\u10e3-\u10d8\u10dd\u10e0\u10d9\u10d8"
+        },
+        "kk": {
+            "language": "kk",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "km": {
+            "language": "km",
+            "value": "\u1791\u17b8\u1780\u17d2\u179a\u17bb\u1784\u1789\u17bc\u179c\u1799\u17c9\u1780"
+        },
+        "kn": {
+            "language": "kn",
+            "value": "\u0ca8\u0ccd\u0caf\u0cc2 \u0caf\u0cbe\u0cb0\u0ccd\u0c95\u0ccd \u0ca8\u0c97\u0cb0"
+        },
+        "ko": {
+            "language": "ko",
+            "value": "\ub274\uc695"
+        },
+        "krc": {
+            "language": "krc",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ku": {
+            "language": "ku",
+            "value": "New York City"
+        },
+        "kw": {
+            "language": "kw",
+            "value": "Evrek Nowydh"
+        },
+        "ky": {
+            "language": "ky",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "la": {
+            "language": "la",
+            "value": "Novum Eboracum"
+        },
+        "lad": {
+            "language": "lad",
+            "value": "Mueva York"
+        },
+        "lb": {
+            "language": "lb",
+            "value": "New York City"
+        },
+        "lez": {
+            "language": "lez",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "li": {
+            "language": "li",
+            "value": "New York City"
+        },
+        "lij": {
+            "language": "lij",
+            "value": "Niorche"
+        },
+        "lmo": {
+            "language": "lmo",
+            "value": "New York"
+        },
+        "ln": {
+            "language": "ln",
+            "value": "New York"
+        },
+        "lt": {
+            "language": "lt",
+            "value": "Niujorkas"
+        },
+        "lv": {
+            "language": "lv",
+            "value": "\u0145ujorka"
+        },
+        "mg": {
+            "language": "mg",
+            "value": "New York"
+        },
+        "mhr": {
+            "language": "mhr",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "mi": {
+            "language": "mi",
+            "value": "New York City"
+        },
+        "mk": {
+            "language": "mk",
+            "value": "\u040a\u0443\u0458\u043e\u0440\u043a"
+        },
+        "ml": {
+            "language": "ml",
+            "value": "\u0d28\u0d4d\u0d2f\u0d42\u0d2f\u0d4b\u0d7c\u0d15\u0d4d\u0d15\u0d4d \u0d28\u0d17\u0d30\u0d02"
+        },
+        "mn": {
+            "language": "mn",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a \u0445\u043e\u0442"
+        },
+        "mr": {
+            "language": "mr",
+            "value": "\u0928\u094d\u092f\u0942 \u092f\u0949\u0930\u094d\u0915 \u0936\u0939\u0930"
+        },
+        "mrj": {
+            "language": "mrj",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ms": {
+            "language": "ms",
+            "value": "Bandar Raya New York"
+        },
+        "mwl": {
+            "language": "mwl",
+            "value": "Nuoba Iorque"
+        },
+        "mzn": {
+            "language": "mzn",
+            "value": "\u0646\u06cc\u0648\u06cc\u0648\u0631\u06a9"
+        },
+        "na": {
+            "language": "na",
+            "value": "New York"
+        },
+        "nah": {
+            "language": "nah",
+            "value": "\u0100ltep\u0113tl Yancu\u012bc York"
+        },
+        "nap": {
+            "language": "nap",
+            "value": "Nova York"
+        },
+        "nds": {
+            "language": "nds",
+            "value": "New York"
+        },
+        "nds-nl": {
+            "language": "nds-nl",
+            "value": "Niej-York"
+        },
+        "ne": {
+            "language": "ne",
+            "value": "\u0928\u094d\u092f\u0942\u092f\u094b\u0930\u094d\u0915 \u0936\u0939\u0930"
+        },
+        "nn": {
+            "language": "nn",
+            "value": "New York by"
+        },
+        "nov": {
+            "language": "nov",
+            "value": "Novi York"
+        },
+        "nrm": {
+            "language": "nrm",
+            "value": "Nouvieau York"
+        },
+        "oc": {
+            "language": "oc",
+            "value": "N\u00f2va York"
+        },
+        "os": {
+            "language": "os",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "pa": {
+            "language": "pa",
+            "value": "\u0a28\u0a3f\u0a0a\u0a2f\u0a3e\u0a30\u0a15 \u0a38\u0a3c\u0a39\u0a3f\u0a30"
+        },
+        "pam": {
+            "language": "pam",
+            "value": "New York Lakanbalen"
+        },
+        "pap": {
+            "language": "pap",
+            "value": "New York City"
+        },
+        "pdc": {
+            "language": "pdc",
+            "value": "Nei Yarrick Schtadt"
+        },
+        "pfl": {
+            "language": "pfl",
+            "value": "Nju Yoorg Siddi"
+        },
+        "pms": {
+            "language": "pms",
+            "value": "New York"
+        },
+        "pnb": {
+            "language": "pnb",
+            "value": "\u0646\u06cc\u0648 \u06cc\u0627\u0631\u06a9 \u0634\u06c1\u0631"
+        },
+        "pt": {
+            "language": "pt",
+            "value": "Nova Iorque"
+        },
+        "qu": {
+            "language": "qu",
+            "value": "New York"
+        },
+        "rm": {
+            "language": "rm",
+            "value": "New York"
+        },
+        "rmy": {
+            "language": "rmy",
+            "value": "New York City"
+        },
+        "ro": {
+            "language": "ro",
+            "value": "New York"
+        },
+        "roa-tara": {
+            "language": "roa-tara",
+            "value": "Nu\u00e8ve York"
+        },
+        "ru": {
+            "language": "ru",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "rue": {
+            "language": "rue",
+            "value": "\u041d\u044e \u0419\u043e\u0440\u043a"
+        },
+        "sa": {
+            "language": "sa",
+            "value": "\u0928\u094d\u200d\u092f\u0942 \u092f\u093e\u0930\u094d\u0915"
+        },
+        "sah": {
+            "language": "sah",
+            "value": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a"
+        },
+        "sc": {
+            "language": "sc",
+            "value": "New York"
+        },
+        "scn": {
+            "language": "scn",
+            "value": "Nova York"
+        },
+        "sco": {
+            "language": "sco",
+            "value": "New York Ceety"
+        },
+        "sh": {
+            "language": "sh",
+            "value": "New York"
+        },
+        "simple": {
+            "language": "simple",
+            "value": "New York City"
+        },
+        "sk": {
+            "language": "sk",
+            "value": "New York"
+        },
+        "sl": {
+            "language": "sl",
+            "value": "New York"
+        },
+        "so": {
+            "language": "so",
+            "value": "New York"
+        },
+        "sq": {
+            "language": "sq",
+            "value": "New York City"
+        },
+        "sr": {
+            "language": "sr",
+            "value": "\u040a\u0443\u0458\u043e\u0440\u043a"
+        },
+        "srn": {
+            "language": "srn",
+            "value": "New York City"
+        },
+        "stq": {
+            "language": "stq",
+            "value": "New York City"
+        },
+        "sv": {
+            "language": "sv",
+            "value": "New York"
+        },
+        "sw": {
+            "language": "sw",
+            "value": "New York"
+        },
+        "szl": {
+            "language": "szl",
+            "value": "Nowy Jork"
+        },
+        "ta": {
+            "language": "ta",
+            "value": "\u0ba8\u0bbf\u0baf\u0bc2\u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd \u0ba8\u0b95\u0bb0\u0bae\u0bcd"
+        },
+        "te": {
+            "language": "te",
+            "value": "\u0c28\u0c4d\u0c2f\u0c42\u0c2f\u0c3e\u0c30\u0c4d\u0c15\u0c4d"
+        },
+        "tg": {
+            "language": "tg",
+            "value": "\u041d\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "th": {
+            "language": "th",
+            "value": "\u0e19\u0e04\u0e23\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e01"
+        },
+        "tk": {
+            "language": "tk",
+            "value": "N\u00fdu-\u00ddork"
+        },
+        "tl": {
+            "language": "tl",
+            "value": "Lungsod ng New York"
+        },
+        "tpi": {
+            "language": "tpi",
+            "value": "Niu Yok Siti"
+        },
+        "tr": {
+            "language": "tr",
+            "value": "New York"
+        },
+        "tt": {
+            "language": "tt",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ty": {
+            "language": "ty",
+            "value": "New York"
+        },
+        "udm": {
+            "language": "udm",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ug": {
+            "language": "ug",
+            "value": "Nyu York Shehiri"
+        },
+        "uk": {
+            "language": "uk",
+            "value": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ur": {
+            "language": "ur",
+            "value": "\u0646\u06cc\u0648\u06cc\u0627\u0631\u06a9 \u0634\u06c1\u0631"
+        },
+        "uz": {
+            "language": "uz",
+            "value": "New York shahri"
+        },
+        "vec": {
+            "language": "vec",
+            "value": "New York"
+        },
+        "vep": {
+            "language": "vep",
+            "value": "Nju Jork"
+        },
+        "vi": {
+            "language": "vi",
+            "value": "Th\u00e0nh ph\u1ed1 New York"
+        },
+        "vo": {
+            "language": "vo",
+            "value": "New York"
+        },
+        "war": {
+            "language": "war",
+            "value": "Syudad han New York"
+        },
+        "wuu": {
+            "language": "wuu",
+            "value": "\u7ebd\u7ea6\u5e02"
+        },
+        "xal": {
+            "language": "xal",
+            "value": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a \u0431\u0430\u043b\u04bb\u0441\u043d"
+        },
+        "xmf": {
+            "language": "xmf",
+            "value": "\u10dc\u10d8\u10e3-\u10d8\u10dd\u10e0\u10e5\u10d8"
+        },
+        "yi": {
+            "language": "yi",
+            "value": "\u05e0\u05d9\u05d5 \u05d9\u05d0\u05e8\u05e7"
+        },
+        "yo": {
+            "language": "yo",
+            "value": "New York"
+        },
+        "za": {
+            "language": "za",
+            "value": "Niujyoz"
+        },
+        "zea": {
+            "language": "zea",
+            "value": "New York"
+        },
+        "zh": {
+            "language": "zh",
+            "value": "\u7ebd\u7ea6"
+        },
+        "zu": {
+            "language": "zu",
+            "value": "New York"
+        },
+        "en-ca": {
+            "language": "en-ca",
+            "value": "New York City"
+        },
+        "en-gb": {
+            "language": "en-gb",
+            "value": "New York City"
+        },
+        "zh-cn": {
+            "language": "zh-cn",
+            "value": "\u7ebd\u7ea6"
+        },
+        "zh-hans": {
+            "language": "zh-hans",
+            "value": "\u7ebd\u7ea6"
+        },
+        "zh-hant": {
+            "language": "zh-hant",
+            "value": "\u7d10\u7d04"
+        },
+        "de-ch": {
+            "language": "de-ch",
+            "value": "New York City"
+        },
+        "pt-br": {
+            "language": "pt-br",
+            "value": "Nova Iorque"
+        },
+        "yue": {
+            "language": "yue",
+            "value": "\u7d10\u7d04\u5e02"
+        },
+        "nb": {
+            "language": "nb",
+            "value": "New York"
+        },
+        "zh-sg": {
+            "language": "zh-sg",
+            "value": "\u7ebd\u7ea6"
+        },
+        "zh-my": {
+            "language": "zh-my",
+            "value": "\u7ebd\u7ea6"
+        },
+        "zh-hk": {
+            "language": "zh-hk",
+            "value": "\u7d10\u7d04"
+        },
+        "zh-tw": {
+            "language": "zh-tw",
+            "value": "\u7d10\u7d04"
+        },
+        "zh-mo": {
+            "language": "zh-mo",
+            "value": "\u7d10\u7d04"
+        },
+        "kab": {
+            "language": "kab",
+            "value": "New York"
+        },
+        "new": {
+            "language": "new",
+            "value": "\u0928\u094d\u092f\u0941 \u092f\u0930\u094d\u0915 \u0928\u0917\u0930"
+        },
+        "cdo": {
+            "language": "cdo",
+            "value": "Ni\u016b-i\u00f3k-ch\u00ea"
+        },
+        "sr-ec": {
+            "language": "sr-ec",
+            "value": "\u040a\u0443\u0458\u043e\u0440\u043a"
+        },
+        "sr-el": {
+            "language": "sr-el",
+            "value": "Njujork"
+        },
+        "crh-latn": {
+            "language": "crh-latn",
+            "value": "Nyu York"
+        },
+        "gsw": {
+            "language": "gsw",
+            "value": "New York City"
+        },
+        "sgs": {
+            "language": "sgs",
+            "value": "Niojuorks"
+        },
+        "lzh": {
+            "language": "lzh",
+            "value": "\u7d10\u7d04\u5e02"
+        },
+        "rup": {
+            "language": "rup",
+            "value": "New York City"
+        },
+        "vro": {
+            "language": "vro",
+            "value": "New York"
+        },
+        "hak": {
+            "language": "hak",
+            "value": "N\u00e9u-yok-s\u1e73"
+        },
+        "be-x-old": {
+            "language": "be-x-old",
+            "value": "\u041d\u044c\u044e-\u0401\u0440\u043a"
+        },
+        "no": {
+            "language": "no",
+            "value": "New York"
+        },
+        "zh-yue": {
+            "language": "zh-yue",
+            "value": "\u7d10\u7d04\u5e02"
+        },
+        "tw": {
+            "language": "tw",
+            "value": "New York"
+        },
+        "bxr": {
+            "language": "bxr",
+            "value": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a \u0445\u043e\u0442\u043e"
+        },
+        "fiu-vro": {
+            "language": "fiu-vro",
+            "value": "New York"
+        },
+        "bat-smg": {
+            "language": "bat-smg",
+            "value": "Niojuorks"
+        },
+        "crh": {
+            "language": "crh",
+            "value": "Nyu York"
+        },
+        "zh-min-nan": {
+            "language": "zh-min-nan",
+            "value": "New York Chh\u012b"
+        },
+        "ie": {
+            "language": "ie",
+            "value": "New York"
+        },
+        "als": {
+            "language": "als",
+            "value": "New York City"
+        },
+        "zh-classical": {
+            "language": "zh-classical",
+            "value": "\u7d10\u7d04\u5e02"
+        }
+    },
+    "descriptions": {
+        "en": {
+            "language": "en",
+            "value": "largest city in New York & United States of America"
+        },
+        "it": {
+            "language": "it",
+            "value": "citt\u00e0 degli Stati Uniti d'America"
+        },
+        "pl": {
+            "language": "pl",
+            "value": "miasto w Stanach Zjednoczonych"
+        },
+        "fr": {
+            "language": "fr",
+            "value": "ville des \u00c9tats-Unis"
+        },
+        "de": {
+            "language": "de",
+            "value": "Metropole an der Ostk\u00fcste der Vereinigten Staaten"
+        },
+        "nl": {
+            "language": "nl",
+            "value": "stad aan de oostkust van de Verenigde Staten"
+        },
+        "es": {
+            "language": "es",
+            "value": "ciudad de Estados Unidos"
+        },
+        "ko": {
+            "language": "ko",
+            "value": "\ubbf8\uad6d \ub274\uc695 \uc8fc\uc758 \ub3c4\uc2dc"
+        },
+        "nb": {
+            "language": "nb",
+            "value": "by i USA"
+        },
+        "zh-hans": {
+            "language": "zh-hans",
+            "value": "\u7f8e\u56fd\u7ebd\u7ea6\u5dde\u7684\u57ce\u5e02"
+        },
+        "zh-hant": {
+            "language": "zh-hant",
+            "value": "\u7f8e\u570b\u7d10\u7d04\u5dde\u7684\u57ce\u5e02"
+        },
+        "zh-cn": {
+            "language": "zh-cn",
+            "value": "\u7f8e\u56fd\u7ebd\u7ea6\u5dde\u7684\u57ce\u5e02"
+        },
+        "zh-sg": {
+            "language": "zh-sg",
+            "value": "\u7f8e\u56fd\u7ebd\u7ea6\u5dde\u7684\u57ce\u5e02"
+        },
+        "zh-my": {
+            "language": "zh-my",
+            "value": "\u7f8e\u56fd\u7ebd\u7ea6\u5dde\u7684\u57ce\u5e02"
+        },
+        "zh": {
+            "language": "zh",
+            "value": "\u7f8e\u56fd\u7ebd\u7ea6\u5dde\u7684\u57ce\u5e02"
+        },
+        "zh-hk": {
+            "language": "zh-hk",
+            "value": "\u7f8e\u570b\u7d10\u7d04\u5dde\u7684\u57ce\u5e02"
+        },
+        "zh-tw": {
+            "language": "zh-tw",
+            "value": "\u7f8e\u570b\u7d10\u7d04\u5dde\u7684\u57ce\u5e02"
+        },
+        "zh-mo": {
+            "language": "zh-mo",
+            "value": "\u7f8e\u570b\u7d10\u7d04\u5dde\u7684\u57ce\u5e02"
+        },
+        "ru": {
+            "language": "ru",
+            "value": "\u0433\u043e\u0440\u043e\u0434 \u0432 \u0448\u0442\u0430\u0442\u0435 \u041d\u044c\u044e-\u0419\u043e\u0440\u043a, \u0421\u0428\u0410"
+        },
+        "ca": {
+            "language": "ca",
+            "value": "ciutat m\u00e9s poblada de l'estat de Nova York, als Estats Units d'Am\u00e8rica"
+        },
+        "oc": {
+            "language": "oc",
+            "value": "Vila dels Estats Units d'America"
+        },
+        "fi": {
+            "language": "fi",
+            "value": "kaupunki New Yorkin osavaltiossa Yhdysvalloissa"
+        },
+        "fa": {
+            "language": "fa",
+            "value": "\u0634\u0647\u0631 \u0646\u06cc\u0648\u06cc\u0648\u0631\u06a9 \u062f\u0631 \u0627\u06cc\u0627\u0644\u0627\u062a \u0645\u062a\u062d\u062f\u0647"
+        },
+        "he": {
+            "language": "he",
+            "value": "\u05e2\u05d9\u05e8 \u05d1\u05de\u05d3\u05d9\u05e0\u05ea \u05e0\u05d9\u05d5 \u05d9\u05d5\u05e8\u05e7"
+        },
+        "cs": {
+            "language": "cs",
+            "value": "m\u011bsto v USA"
+        },
+        "ilo": {
+            "language": "ilo",
+            "value": "siudad idiay estado ti New York, Estados Unidos"
+        },
+        "pt-br": {
+            "language": "pt-br",
+            "value": "cidade no estado de Nova Iorque, Estados Unidos"
+        },
+        "pt": {
+            "language": "pt",
+            "value": "cidade nos Estados Unidos"
+        },
+        "yi": {
+            "language": "yi",
+            "value": "\u05e9\u05d8\u05d0\u05d8"
+        },
+        "ta": {
+            "language": "ta",
+            "value": "\u0b85\u0bae\u0bc6\u0bb0\u0bbf\u0b95\u0bcd\u0b95 \u0ba8\u0bbf\u0baf\u0bc2\u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd \u0bae\u0bbe\u0ba8\u0bbf\u0bb2\u0ba4\u0bcd\u0ba4\u0bbf\u0bb2\u0bc1\u0bb3\u0bcd\u0bb3 \u0bae\u0bbe\u0ba8\u0b95\u0bb0\u0bae\u0bcd"
+        },
+        "en-gb": {
+            "language": "en-gb",
+            "value": "city in New York state, USA"
+        },
+        "lv": {
+            "language": "lv",
+            "value": "pils\u0113ta ASV"
+        },
+        "sv": {
+            "language": "sv",
+            "value": "staden New York"
+        },
+        "eu": {
+            "language": "eu",
+            "value": "Estatu Batuetako hiria"
+        },
+        "nds": {
+            "language": "nds",
+            "value": "Stadt in'e USA"
+        },
+        "hu": {
+            "language": "hu",
+            "value": "az Amerikai Egyes\u00fclt \u00c1llamok legn\u00e9pesebb v\u00e1rosa"
+        },
+        "be-tarask": {
+            "language": "be-tarask",
+            "value": "\u0433\u043e\u0440\u0430\u0434 \u0443 \u0448\u0442\u0430\u0446\u0435 \u041d\u044c\u044e-\u0401\u0440\u043a, \u0417\u0428\u0410"
+        },
+        "da": {
+            "language": "da",
+            "value": "den amerikanske storby"
+        },
+        "bar": {
+            "language": "bar",
+            "value": "stoad in da USA"
+        },
+        "be": {
+            "language": "be",
+            "value": "\u0413\u043e\u0440\u0430\u0434"
+        },
+        "ja": {
+            "language": "ja",
+            "value": "\u30cb\u30e5\u30fc\u30e8\u30fc\u30af\u5dde\u306e\u90fd\u5e02"
+        },
+        "th": {
+            "language": "th",
+            "value": "\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e04\u0e0b\u0e34\u0e15\u0e35"
+        },
+        "hr": {
+            "language": "hr",
+            "value": "grad u SAD-u"
+        },
+        "pms": {
+            "language": "pms",
+            "value": "sit\u00e0 dj\u00eb Stat Un\u00ec d'Am\u00e9rica"
+        },
+        "sr": {
+            "language": "sr",
+            "value": "\u0433\u0440\u0430\u0434 \u0443 \u0441\u0430\u0432\u0435\u0437\u043d\u043e\u0458 \u0434\u0440\u0436\u0430\u0432\u0438 \u040a\u0443\u0458\u043e\u0440\u043a, \u0421\u0458\u0435\u0434\u0438\u045a\u0435\u043d\u0435 \u0410\u043c\u0435\u0440\u0438\u0447\u043a\u0435 \u0414\u0440\u0436\u0430\u0432\u0435"
+        },
+        "sr-ec": {
+            "language": "sr-ec",
+            "value": "\u0433\u0440\u0430\u0434 \u0443 \u0441\u0430\u0432\u0435\u0437\u043d\u043e\u0458 \u0434\u0440\u0436\u0430\u0432\u0438 \u040a\u0443\u0458\u043e\u0440\u043a, \u0421\u0458\u0435\u0434\u0438\u045a\u0435\u043d\u0435 \u0410\u043c\u0435\u0440\u0438\u0447\u043a\u0435 \u0414\u0440\u0436\u0430\u0432\u0435"
+        },
+        "sr-el": {
+            "language": "sr-el",
+            "value": "grad u saveznoj dr\u017eavi Njujork, Sjedinjene Ameri\u010dke Dr\u017eave"
+        },
+        "el": {
+            "language": "el",
+            "value": "\u03c0\u03cc\u03bb\u03b7 \u03c3\u03c4\u03b7\u03bd \u039d\u03ad\u03b1 \u03a5\u03cc\u03c1\u03ba\u03b7, \u0397\u03a0\u0391"
+        }
+    },
+    "claims": {
+        "P1151": [
+            {
+                "id": "Q60$6f832804-4c3f-6185-38bd-ca00b8517765",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P1151",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 6342720
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P213": [
+            {
+                "id": "Q60$0427a236-4120-7d00-fa3e-e23548d4c02d",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P213",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "0000 0001 2196 6726",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P898": [
+            {
+                "id": "Q60$d4187e7c-404b-4809-8bbb-62f305bfe8bd",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P898",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "nu\u02d0\u02c8j\u0254\u02d0\u0279k",
+                        "type": "string"
+                    }
+                },
+                "qualifiers": {
+                    "P407": [
+                        {
+                            "hash": "17da29e56d69809fde8793aaa4864de2e6bb5780",
+                            "snaktype": "value",
+                            "property": "P407",
+                            "datatype": "wikibase-item",
+                            "datavalue": {
+                                "value": {
+                                    "entity-type": "item",
+                                    "numeric-id": 1860
+                                },
+                                "type": "wikibase-entityid"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P407"
+                ],
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "004ec6fbee857649acdbdbad4f97b2c8571df97b",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 48183
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P17": [
+            {
+                "id": "q60$5083E43C-228B-4E3E-B82A-4CB20A22A3FB",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P17",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 30
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "d6e3ab4045fb3f3feea77895bc6b27e663fc878a",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 206855
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P41": [
+            {
+                "id": "q60$6DBAB4EB-3BF7-4E0C-B818-3A651649EB71",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P41",
+                    "datatype": "commonsMedia",
+                    "datavalue": {
+                        "value": "Flag of New York City.svg",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P138": [
+            {
+                "id": "q60$2D67F5C1-3BA4-4D85-9BAE-B1E756733065",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P138",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 42462
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P30": [
+            {
+                "id": "q60$ABDAC0CD-5DB0-42B0-A277-C7215F14CBE6",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P30",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 49
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P194": [
+            {
+                "id": "q60$91ADDE01-4F2C-4150-89A1-0CE91FEDCA2C",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P194",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 645195
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P163": [
+            {
+                "id": "q60$6327A266-904C-473B-9FBA-D19A5F619FEE",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P163",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 1414813
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P373": [
+            {
+                "id": "q60$21783585-8DA3-4E63-BA62-4E53FC749D68",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P373",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "New York City",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P402": [
+            {
+                "id": "q60$096f5758-4788-7dc5-e4e0-77aa3c09541c",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P402",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "175905",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P31": [
+            {
+                "id": "q60$7DB6F3AE-819C-46E2-B689-2D0FB42D7D69",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P31",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 1637706
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "Q60$a6df8e3e-4de0-19ec-9c5a-97a431aa21b2",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P31",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 200250
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "Q60$a5dd20d4-4233-196b-a5eb-dfaf4d82947f",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P31",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 208511
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "Q60$9a8e0aaf-4cd0-0a3e-b152-022a8caefccf",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P31",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 15063611
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P158": [
+            {
+                "id": "q60$9BC88209-BBAD-4CF0-86A4-E05D57639FC0",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P158",
+                    "datatype": "commonsMedia",
+                    "datavalue": {
+                        "value": "Seal of New York City.svg",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "7eb64cf9621d34c54fd4bd040ed4b61a88c4a1a0",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 328
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P131": [
+            {
+                "id": "q60$D856B9DC-396A-4329-A196-0053F3803B90",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P131",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 1384
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P94": [
+            {
+                "id": "q60$15FB3D88-1B52-411A-B524-8F896B964F25",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P94",
+                    "datatype": "commonsMedia",
+                    "datavalue": {
+                        "value": "Seal of New York City.svg",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "dbe2189e7b0d3953de6f69cc1cc88109a79605a4",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 8449
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P6": [
+            {
+                "id": "q60$a465c511-47bf-a90a-b527-aac32e185260",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 212648
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "0feeebfab17e02a82eca8f2f16765a2d988ac12e",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001994-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "e68a0d9728a6c6478d35dfe3be4409dfcc6e6327",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000002001-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$b6d61f0b-408c-68e4-2dd4-b7f31c938f3d",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 467133
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "d195a8d9bec614903d176a6158112c708d5474c3",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001990-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "4a9a9cb544b9d5c1dea610c632120900ee9d80a3",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001993-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$1366e65c-40dd-20a0-5468-a67d7767f7fd",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 467122
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "cb25c5eb18e71eb9710b569158f81a5dfe377b1d",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001978-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "297365fe17e3fa7a088ef6e975c9f0fd7f99e37e",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001989-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$2fad2c45-4646-1e49-89b0-b8e958ffd7cf",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 329910
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "59df82db3e824bbf79591d2213d540ce49453b95",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001974-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "f41f0b75ced859931adf752c47c74baf3cdc62d3",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001977-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$889d6628-4322-dbb6-70eb-fb07dec3fc22",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 666931
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "4c380a6765a210be972200e84ddcd3cee5fac689",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001966-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "a14fec0f7e6f6b2fab6f7d1f97b604ad3dc5d849",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001973-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$c7fccd1d-494d-2893-377a-48b2af8a7f82",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 439156
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "c4031107efbcc94cbfbfda9d7798309693a6a550",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001954-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "bd677842e6f7c98cddbd5370f809d383dfe1c549",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001965-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$897cf930-4d2f-174c-5a97-d2cd4d6a41e7",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 939458
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "41d59bd8e0fd9626109463398e81486bc5c2f1c3",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001950-11-14T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "f1bf9521f2eecb3df4df248ebf1ee6065b68612a",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001953-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$aa5b92a1-43a7-2324-59fc-14642f47114f",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 441554
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "b0ec13fb2768e89035d02fdcb27b36e6b5f2abd9",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001946-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "db703e9e1dea89105da93d69df81f98a6b00e28c",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001950-08-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$2c5f31a8-4ae7-3e87-cd3f-c86a9b8f0a46",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 312502
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "8c38a31e5517a8d71a045077c9f72bff034f9d56",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001934-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "00e17da1476e8357fd7c6471cf39d19c421298c8",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001945-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$1ecade3d-4f46-23a0-64c8-f67a5159178c",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 1701296
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "5c2e5e4c4cd5162f3460f2a095cdb12d5761b765",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001933-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "60dbb7c9de506fcb05506fa04aefe273df1c478c",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001933-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$0c23f6b3-4ed3-52f7-e8a7-e980fd227b22",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 204135
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "904c0a0207c145491e0220b9969d3904fab3b336",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001926-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "d290e0c40594e98174065a04dc82936477568c4c",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001932-09-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$1c00b3d1-4431-00d9-c21c-d98e9a95fd68",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 6233903
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "8aec4d55f3fcc3300cb7dc1e5416aa5529620e2d",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001918-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "a67441cd7a7664755a8aa171c662cb653cce5822",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001925-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$4b10ca3f-4e67-6258-c624-38e47b401c87",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 3182321
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "3a7892a91297144fd3dc441f35f7fe2d8ab61e21",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001914-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "ff18beeafc9a4aaaa242591822c326675cc762ac",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001917-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$5d619ff9-4051-da8d-c07f-ca33e9c374d7",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 2544704
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "398db2b5fc37598b46bf0ca45f6049c11c0e0656",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001910-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "6a0ffcc305c3a4c735994c10dbfa1da83a9bd0c8",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001913-09-10T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$ce47f343-4cac-17d3-6cfe-d0b8dc02947f",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 5536568
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "5340551cbd31aad91133c5cb1e9602c7948b9fc3",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001904-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "6231d9e7d095f43cae628de7441c609ebe775721",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001909-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$c5b05d42-4c12-068b-6794-dec9a23580a7",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 2274772
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "8638f1feb34593667ef85a0cf9ba02d51e37d5fd",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001902-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "d370a3be3a1ebec1084bc2545fb0dd1cf8fc34ff",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001903-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$cbe86dcb-416b-cc90-2b4b-38f989eef6df",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 2156376
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "7bd4837069076f3108cc08648199c508edb47dca",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001898-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "c7172270845b44741aa37a23d45f9ae75b1137f1",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001901-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$cc640d52-4edb-51ff-982d-176fafd35376",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 939458
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "73a56f30d2685e822ef754143960fe0e3a9fbe4f",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001950-08-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "d610a317612bc3eb7fbfeda3229d8221919f7f1c",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001950-11-14T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P39": [
+                        {
+                            "hash": "f0e6bffef60c14b0eeadc89b69953aeac93922ce",
+                            "snaktype": "value",
+                            "property": "P39",
+                            "datatype": "wikibase-item",
+                            "datavalue": {
+                                "value": {
+                                    "entity-type": "item",
+                                    "numeric-id": 13436054
+                                },
+                                "type": "wikibase-entityid"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582",
+                    "P39"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$95329690-4f75-935b-877d-a8a618abda3b",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 4121154
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "dfd467fe1dc17390da32a000f6177a0470c8df21",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001913-09-10T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "19a9d7eee952000bb47234c5ab6dcc4490ac7743",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001913-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P39": [
+                        {
+                            "hash": "f0e6bffef60c14b0eeadc89b69953aeac93922ce",
+                            "snaktype": "value",
+                            "property": "P39",
+                            "datatype": "wikibase-item",
+                            "datavalue": {
+                                "value": {
+                                    "entity-type": "item",
+                                    "numeric-id": 13436054
+                                },
+                                "type": "wikibase-entityid"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582",
+                    "P39"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$70033c87-4fb1-93d1-d71b-394212435296",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 6287566
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "e4d07fc0063cc79e02fa186cd2a5aafa7d8a8144",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001932-09-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "54deab0c0392891e5bf0067f124d5946f1b8b650",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001932-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P39": [
+                        {
+                            "hash": "f0e6bffef60c14b0eeadc89b69953aeac93922ce",
+                            "snaktype": "value",
+                            "property": "P39",
+                            "datatype": "wikibase-item",
+                            "datavalue": {
+                                "value": {
+                                    "entity-type": "item",
+                                    "numeric-id": 13436054
+                                },
+                                "type": "wikibase-entityid"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582",
+                    "P39"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$cad4e313-4b5e-e089-08b9-3b1c7998e762",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 607
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "47c515b79f80e24e03375b327f2ac85184765d5b",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000002002-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ],
+                    "P582": [
+                        {
+                            "hash": "1f463f78538c49ef6adf3a9b18e211af7195240a",
+                            "snaktype": "value",
+                            "property": "P582",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000002013-12-31T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580",
+                    "P582"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "Q60$5cc8fc79-4807-9800-dbea-fe9c20ab273b",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P6",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 4911497
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "c53f3ca845b789e543ed45e3e1ecd1dd950e30dc",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000002014-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 11,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580"
+                ],
+                "type": "statement",
+                "rank": "preferred"
+            }
+        ],
+        "P625": [
+            {
+                "id": "q60$f00c56de-4bac-e259-b146-254897432868",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P625",
+                    "datatype": "globe-coordinate",
+                    "datavalue": {
+                        "value": {
+                            "latitude": 40.67,
+                            "longitude": -73.94,
+                            "altitude": null,
+                            "precision": 0.00027777777777778,
+                            "globe": "http://www.wikidata.org/entity/Q2"
+                        },
+                        "type": "globecoordinate"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "7eb64cf9621d34c54fd4bd040ed4b61a88c4a1a0",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 328
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P190": [
+            {
+                "id": "q60$10a558d0-4572-08c6-5b81-dc1c9c249ba1",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 1781
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$38b5cf4e-46c8-a1fb-e8ed-81fd6887d2e1",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 1218
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$87b6002a-4295-4899-bc7e-aa9b20c0c67a",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 34647
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$1dd4d3c1-40b7-e7de-0fb4-0e04bd760dcc",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 85
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$50af0907-49d0-a020-739e-eceb8e004edd",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 84
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$08aae3cd-426b-1d1a-ee6c-8131f3d2e0e8",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 2807
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$85244561-41c0-07e3-0bad-7b9bd1b3ff5f",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 956
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$72c838b1-4b21-d119-1e37-4d8c4c052a34",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 220
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$6d100014-4233-80d9-0e23-b7484d9e1c22",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 34820
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            },
+            {
+                "id": "q60$683cc6e2-48a6-42c1-bee6-dba08ff27df6",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P190",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 1490
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "qualifiers": {
+                    "P580": [
+                        {
+                            "hash": "f6c5fb85738213971c676d1d317f342e1d64f7b0",
+                            "snaktype": "value",
+                            "property": "P580",
+                            "datatype": "time",
+                            "datavalue": {
+                                "value": {
+                                    "time": "+00000001960-01-01T00:00:00Z",
+                                    "timezone": 0,
+                                    "before": 0,
+                                    "after": 0,
+                                    "precision": 9,
+                                    "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                },
+                                "type": "time"
+                            }
+                        }
+                    ]
+                },
+                "qualifiers-order": [
+                    "P580"
+                ],
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P910": [
+            {
+                "id": "Q60$4F6BB51E-C816-4A4C-86AA-9D425B517FB3",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P910",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 7038507
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P948": [
+            {
+                "id": "Q60$4F0D6DAF-CDE7-4059-A4B9-EC5E2F293CD0",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P948",
+                    "datatype": "commonsMedia",
+                    "datavalue": {
+                        "value": "Loews Cineplex Times Square Banner.jpg",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P998": [
+            {
+                "id": "Q60$DC157063-9448-43A7-AF53-D89C71E9CD59",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P998",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "Regional/North_America/United_States/New_York/Localities/N/New_York_City/",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P935": [
+            {
+                "id": "Q60$8A10022A-08C2-4DD3-B1A4-35A8BD3CBC8E",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P935",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "New York City",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "2f183743080f8e1970847d13a04fde9a796f1476",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 191168
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P982": [
+            {
+                "id": "Q60$BD75EE44-762D-4EB2-B401-DDDEA5A4A4E0",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P982",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "74e50e58-5deb-4b99-93a2-decbb365c07f",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "73057782312f850e2ed69c4c28ad162f57f6d390",
+                        "snaks": {
+                            "P248": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P248",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 14005
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P248"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P349": [
+            {
+                "id": "Q60$A0C8B7FE-0FAF-4F5F-8204-CC30AA9F8CAD",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P349",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "00628906",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P421": [
+            {
+                "id": "Q60$33b6030e-4782-cbc1-c368-85169d375443",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P421",
+                    "datatype": "wikibase-item",
+                    "datavalue": {
+                        "value": {
+                            "entity-type": "item",
+                            "numeric-id": 5390
+                        },
+                        "type": "wikibase-entityid"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P571": [
+            {
+                "id": "Q60$1a8b1219-4d1e-a38c-f7d1-62d0a8ff15ce",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P571",
+                    "datatype": "time",
+                    "datavalue": {
+                        "value": {
+                            "time": "+00000001624-01-01T00:00:00Z",
+                            "timezone": 0,
+                            "before": 0,
+                            "after": 0,
+                            "precision": 9,
+                            "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                        },
+                        "type": "time"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P646": [
+            {
+                "id": "Q60$BC6CE9BD-7444-4B57-890F-6F5D965032E9",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P646",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "/m/02_286",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "b923b0d68beb300866b87ead39f61e63ec30d8af",
+                        "snaks": {
+                            "P248": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P248",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 15241312
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ],
+                            "P577": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P577",
+                                    "datatype": "time",
+                                    "datavalue": {
+                                        "value": {
+                                            "time": "+00000002013-10-28T00:00:00Z",
+                                            "timezone": 0,
+                                            "before": 0,
+                                            "after": 0,
+                                            "precision": 11,
+                                            "calendarmodel": "http://www.wikidata.org/entity/Q1985727"
+                                        },
+                                        "type": "time"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P248",
+                            "P577"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P227": [
+            {
+                "id": "Q60$BB26EA14-9F23-4F95-9A46-484D5A17E26E",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P227",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "4042011-5",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "3e9859118d01bc62b5dbe8939be812333eb7c594",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 1551807
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P244": [
+            {
+                "id": "Q60$53B76048-BA37-4177-9EEB-D60B3794C759",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P244",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "n79007751",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "3e9859118d01bc62b5dbe8939be812333eb7c594",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 1551807
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P214": [
+            {
+                "id": "Q60$E30B0FE2-3378-4D70-828A-448EE276DF3E",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P214",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "266415900",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "3e9859118d01bc62b5dbe8939be812333eb7c594",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 1551807
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P18": [
+            {
+                "id": "Q60$4FF32849-8C1B-49ED-B59B-E71582D54BF4",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P18",
+                    "datatype": "commonsMedia",
+                    "datavalue": {
+                        "value": "NYC Montage 2011.jpg",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ],
+        "P269": [
+            {
+                "id": "Q60$C40A35B1-0A21-4AA8-B047-FE62BB3864A9",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P269",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "026581019",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal",
+                "references": [
+                    {
+                        "hash": "a51d6594fee36c7452eaed2db35a4833613a7078",
+                        "snaks": {
+                            "P143": [
+                                {
+                                    "snaktype": "value",
+                                    "property": "P143",
+                                    "datatype": "wikibase-item",
+                                    "datavalue": {
+                                        "value": {
+                                            "entity-type": "item",
+                                            "numeric-id": 54919
+                                        },
+                                        "type": "wikibase-entityid"
+                                    }
+                                }
+                            ]
+                        },
+                        "snaks-order": [
+                            "P143"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "P268": [
+            {
+                "id": "Q60$efebe507-4e9f-4254-dc47-be273723fb6a",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P268",
+                    "datatype": "string",
+                    "datavalue": {
+                        "value": "11880105b",
+                        "type": "string"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ]
+    },
+    "sitelinks": {
+        "afwiki": {
+            "site": "afwiki",
+            "title": "New York Stad"
+        },
+        "alswiki": {
+            "site": "alswiki",
+            "title": "New York City"
+        },
+        "amwiki": {
+            "site": "amwiki",
+            "title": "\u1292\u12cd \u12ee\u122d\u12ad \u12a8\u1270\u121b"
+        },
+        "angwiki": {
+            "site": "angwiki",
+            "title": "N\u012bweoforw\u012bcburg"
+        },
+        "anwiki": {
+            "site": "anwiki",
+            "title": "Nueva York"
+        },
+        "arcwiki": {
+            "site": "arcwiki",
+            "title": "\u0722\u071d\u0718 \u071d\u0718\u072a\u0729 (\u0721\u0715\u071d\u0722\u072c\u0710)"
+        },
+        "arwiki": {
+            "site": "arwiki",
+            "title": "\u0646\u064a\u0648\u064a\u0648\u0631\u0643 (\u0645\u062f\u064a\u0646\u0629)"
+        },
+        "arzwiki": {
+            "site": "arzwiki",
+            "title": "\u0646\u064a\u0648\u064a\u0648\u0631\u0643"
+        },
+        "astwiki": {
+            "site": "astwiki",
+            "title": "Nueva York"
+        },
+        "aswiki": {
+            "site": "aswiki",
+            "title": "\u09a8\u09bf\u0989\u09af\u09bc\u09f0\u09cd\u0995 \u09ae\u09b9\u09be\u09a8\u0997\u09f0"
+        },
+        "aywiki": {
+            "site": "aywiki",
+            "title": "New York"
+        },
+        "azwiki": {
+            "site": "azwiki",
+            "title": "Nyu York"
+        },
+        "barwiki": {
+            "site": "barwiki",
+            "title": "New York City"
+        },
+        "bat_smgwiki": {
+            "site": "bat_smgwiki",
+            "title": "Niojuorks"
+        },
+        "bawiki": {
+            "site": "bawiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "bclwiki": {
+            "site": "bclwiki",
+            "title": "Nueva York"
+        },
+        "be_x_oldwiki": {
+            "site": "be_x_oldwiki",
+            "title": "\u041d\u044c\u044e-\u0401\u0440\u043a"
+        },
+        "bewiki": {
+            "site": "bewiki",
+            "title": "\u0413\u043e\u0440\u0430\u0434 \u041d\u044c\u044e-\u0401\u0440\u043a"
+        },
+        "bgwiki": {
+            "site": "bgwiki",
+            "title": "\u041d\u044e \u0419\u043e\u0440\u043a"
+        },
+        "bnwiki": {
+            "site": "bnwiki",
+            "title": "\u09a8\u09bf\u0989 \u0987\u09af\u09bc\u09b0\u09cd\u0995 \u09b8\u09bf\u099f\u09bf"
+        },
+        "bowiki": {
+            "site": "bowiki",
+            "title": "\u0f53\u0f7a\u0f60\u0f74\u0f0b\u0f61\u0f7c\u0f62\u0f0b\u0f40\u0f0d"
+        },
+        "brwiki": {
+            "site": "brwiki",
+            "title": "New York"
+        },
+        "bswiki": {
+            "site": "bswiki",
+            "title": "New York City"
+        },
+        "bugwiki": {
+            "site": "bugwiki",
+            "title": "Kuta New York"
+        },
+        "bxrwiki": {
+            "site": "bxrwiki",
+            "title": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a \u0445\u043e\u0442\u043e"
+        },
+        "cawiki": {
+            "site": "cawiki",
+            "title": "Nova York"
+        },
+        "cdowiki": {
+            "site": "cdowiki",
+            "title": "Ni\u016b-i\u00f3k-ch\u00ea"
+        },
+        "cebwiki": {
+            "site": "cebwiki",
+            "title": "Dakbayan sa New York"
+        },
+        "cewiki": {
+            "site": "cewiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ckbwiki": {
+            "site": "ckbwiki",
+            "title": "\u0646\u06cc\u0648\u06cc\u06c6\u0631\u06a9 (\u0634\u0627\u0631)"
+        },
+        "commonswiki": {
+            "site": "commonswiki",
+            "title": "New York City"
+        },
+        "cowiki": {
+            "site": "cowiki",
+            "title": "New York"
+        },
+        "crhwiki": {
+            "site": "crhwiki",
+            "title": "Nyu York"
+        },
+        "cswiki": {
+            "site": "cswiki",
+            "title": "New York"
+        },
+        "cvwiki": {
+            "site": "cvwiki",
+            "title": "\u00c7\u0115\u043d\u0115 \u0419\u043e\u0440\u043a"
+        },
+        "cywiki": {
+            "site": "cywiki",
+            "title": "Dinas Efrog Newydd"
+        },
+        "dawiki": {
+            "site": "dawiki",
+            "title": "New York City"
+        },
+        "dewiki": {
+            "site": "dewiki",
+            "title": "New York City"
+        },
+        "dewikiquote": {
+            "site": "dewikiquote",
+            "title": "New York City"
+        },
+        "dewikisource": {
+            "site": "dewikisource",
+            "title": "New York"
+        },
+        "dewikivoyage": {
+            "site": "dewikivoyage",
+            "title": "New York City"
+        },
+        "diqwiki": {
+            "site": "diqwiki",
+            "title": "New York City"
+        },
+        "dsbwiki": {
+            "site": "dsbwiki",
+            "title": "New York City"
+        },
+        "elwiki": {
+            "site": "elwiki",
+            "title": "\u039d\u03ad\u03b1 \u03a5\u03cc\u03c1\u03ba\u03b7"
+        },
+        "enwiki": {
+            "site": "enwiki",
+            "title": "New York City"
+        },
+        "enwikiquote": {
+            "site": "enwikiquote",
+            "title": "New York City"
+        },
+        "enwikivoyage": {
+            "site": "enwikivoyage",
+            "title": "New York City"
+        },
+        "eowiki": {
+            "site": "eowiki",
+            "title": "Novjorko"
+        },
+        "eswiki": {
+            "site": "eswiki",
+            "title": "Nueva York"
+        },
+        "eswikivoyage": {
+            "site": "eswikivoyage",
+            "title": "Ciudad de Nueva York"
+        },
+        "etwiki": {
+            "site": "etwiki",
+            "title": "New York"
+        },
+        "euwiki": {
+            "site": "euwiki",
+            "title": "New York"
+        },
+        "extwiki": {
+            "site": "extwiki",
+            "title": "Nueva York"
+        },
+        "fawiki": {
+            "site": "fawiki",
+            "title": "\u0646\u06cc\u0648\u06cc\u0648\u0631\u06a9"
+        },
+        "fiu_vrowiki": {
+            "site": "fiu_vrowiki",
+            "title": "New York"
+        },
+        "fiwiki": {
+            "site": "fiwiki",
+            "title": "New York"
+        },
+        "fowiki": {
+            "site": "fowiki",
+            "title": "New York City"
+        },
+        "frpwiki": {
+            "site": "frpwiki",
+            "title": "New York City"
+        },
+        "frrwiki": {
+            "site": "frrwiki",
+            "title": "New York City"
+        },
+        "frwiki": {
+            "site": "frwiki",
+            "title": "New York"
+        },
+        "frwikivoyage": {
+            "site": "frwikivoyage",
+            "title": "New York"
+        },
+        "fywiki": {
+            "site": "fywiki",
+            "title": "New York (st\u00ead)"
+        },
+        "ganwiki": {
+            "site": "ganwiki",
+            "title": "\u7d10\u7d04\u5e02"
+        },
+        "gawiki": {
+            "site": "gawiki",
+            "title": "Nua-Eabhrac (cathair)"
+        },
+        "gdwiki": {
+            "site": "gdwiki",
+            "title": "Eabhraig Nuadh (baile)"
+        },
+        "glwiki": {
+            "site": "glwiki",
+            "title": "Nova York"
+        },
+        "gnwiki": {
+            "site": "gnwiki",
+            "title": "T\u00e1va Nueva York"
+        },
+        "gvwiki": {
+            "site": "gvwiki",
+            "title": "Caayr York Noa"
+        },
+        "hakwiki": {
+            "site": "hakwiki",
+            "title": "N\u00e9u-yok-s\u1e73"
+        },
+        "hewiki": {
+            "site": "hewiki",
+            "title": "\u05e0\u05d9\u05d5 \u05d9\u05d5\u05e8\u05e7"
+        },
+        "hewikivoyage": {
+            "site": "hewikivoyage",
+            "title": "\u05e0\u05d9\u05d5 \u05d9\u05d5\u05e8\u05e7"
+        },
+        "hifwiki": {
+            "site": "hifwiki",
+            "title": "New York City"
+        },
+        "hiwiki": {
+            "site": "hiwiki",
+            "title": "\u0928\u094d\u092f\u0942\u092f\u0949\u0930\u094d\u0915 \u0928\u0917\u0930"
+        },
+        "hrwiki": {
+            "site": "hrwiki",
+            "title": "New York City, New York"
+        },
+        "hsbwiki": {
+            "site": "hsbwiki",
+            "title": "New York City"
+        },
+        "htwiki": {
+            "site": "htwiki",
+            "title": "Nouy\u00f2k"
+        },
+        "huwiki": {
+            "site": "huwiki",
+            "title": "New York"
+        },
+        "hywiki": {
+            "site": "hywiki",
+            "title": "\u0546\u0575\u0578\u0582 \u0545\u0578\u0580\u0584"
+        },
+        "iawiki": {
+            "site": "iawiki",
+            "title": "New York (citate)"
+        },
+        "idwiki": {
+            "site": "idwiki",
+            "title": "Kota New York"
+        },
+        "iewiki": {
+            "site": "iewiki",
+            "title": "New York"
+        },
+        "igwiki": {
+            "site": "igwiki",
+            "title": "New York City"
+        },
+        "ikwiki": {
+            "site": "ikwiki",
+            "title": "Tchiaq York Iniqpak"
+        },
+        "ilowiki": {
+            "site": "ilowiki",
+            "title": "Siudad ti New York"
+        },
+        "iowiki": {
+            "site": "iowiki",
+            "title": "New York"
+        },
+        "iswiki": {
+            "site": "iswiki",
+            "title": "New York-borg"
+        },
+        "itwiki": {
+            "site": "itwiki",
+            "title": "New York"
+        },
+        "itwikiquote": {
+            "site": "itwikiquote",
+            "title": "New York"
+        },
+        "itwikivoyage": {
+            "site": "itwikivoyage",
+            "title": "New York"
+        },
+        "jawiki": {
+            "site": "jawiki",
+            "title": "\u30cb\u30e5\u30fc\u30e8\u30fc\u30af"
+        },
+        "jbowiki": {
+            "site": "jbowiki",
+            "title": "niu,IORK. zei tcadu"
+        },
+        "jvwiki": {
+            "site": "jvwiki",
+            "title": "New York"
+        },
+        "kabwiki": {
+            "site": "kabwiki",
+            "title": "New York"
+        },
+        "kawiki": {
+            "site": "kawiki",
+            "title": "\u10dc\u10d8\u10e3-\u10d8\u10dd\u10e0\u10d9\u10d8"
+        },
+        "kkwiki": {
+            "site": "kkwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "kmwiki": {
+            "site": "kmwiki",
+            "title": "\u1791\u17b8\u1780\u17d2\u179a\u17bb\u1784\u1789\u17bc\u179c\u1799\u17c9\u1780"
+        },
+        "knwiki": {
+            "site": "knwiki",
+            "title": "\u0ca8\u0ccd\u0caf\u0cc2 \u0caf\u0cbe\u0cb0\u0ccd\u0c95\u0ccd \u0ca8\u0c97\u0cb0"
+        },
+        "kowiki": {
+            "site": "kowiki",
+            "title": "\ub274\uc695"
+        },
+        "krcwiki": {
+            "site": "krcwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "kuwiki": {
+            "site": "kuwiki",
+            "title": "New York City"
+        },
+        "kwwiki": {
+            "site": "kwwiki",
+            "title": "Evrek Nowydh"
+        },
+        "kywiki": {
+            "site": "kywiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ladwiki": {
+            "site": "ladwiki",
+            "title": "Mueva York (sivdad)"
+        },
+        "lawiki": {
+            "site": "lawiki",
+            "title": "Novum Eboracum (urbs)"
+        },
+        "lbwiki": {
+            "site": "lbwiki",
+            "title": "New York City"
+        },
+        "lezwiki": {
+            "site": "lezwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "lijwiki": {
+            "site": "lijwiki",
+            "title": "Niorche"
+        },
+        "liwiki": {
+            "site": "liwiki",
+            "title": "New York City"
+        },
+        "lmowiki": {
+            "site": "lmowiki",
+            "title": "New York"
+        },
+        "lnwiki": {
+            "site": "lnwiki",
+            "title": "New York"
+        },
+        "ltwiki": {
+            "site": "ltwiki",
+            "title": "Niujorkas"
+        },
+        "lvwiki": {
+            "site": "lvwiki",
+            "title": "\u0145ujorka"
+        },
+        "mgwiki": {
+            "site": "mgwiki",
+            "title": "New York"
+        },
+        "mhrwiki": {
+            "site": "mhrwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "miwiki": {
+            "site": "miwiki",
+            "title": "New York City"
+        },
+        "mkwiki": {
+            "site": "mkwiki",
+            "title": "\u040a\u0443\u0458\u043e\u0440\u043a (\u0433\u0440\u0430\u0434)"
+        },
+        "mlwiki": {
+            "site": "mlwiki",
+            "title": "\u0d28\u0d4d\u0d2f\u0d42\u0d2f\u0d4b\u0d7c\u0d15\u0d4d\u0d15\u0d4d \u0d28\u0d17\u0d30\u0d02"
+        },
+        "mnwiki": {
+            "site": "mnwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a \u0445\u043e\u0442"
+        },
+        "mrjwiki": {
+            "site": "mrjwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "mrwiki": {
+            "site": "mrwiki",
+            "title": "\u0928\u094d\u092f\u0942 \u092f\u0949\u0930\u094d\u0915 \u0936\u0939\u0930"
+        },
+        "mswiki": {
+            "site": "mswiki",
+            "title": "Bandar Raya New York"
+        },
+        "mwlwiki": {
+            "site": "mwlwiki",
+            "title": "Nuoba Iorque"
+        },
+        "mznwiki": {
+            "site": "mznwiki",
+            "title": "\u0646\u06cc\u0648\u06cc\u0648\u0631\u06a9"
+        },
+        "nahwiki": {
+            "site": "nahwiki",
+            "title": "\u0100ltep\u0113tl Yancu\u012bc York"
+        },
+        "napwiki": {
+            "site": "napwiki",
+            "title": "Nova York"
+        },
+        "nawiki": {
+            "site": "nawiki",
+            "title": "New York"
+        },
+        "nds_nlwiki": {
+            "site": "nds_nlwiki",
+            "title": "Niej-York"
+        },
+        "ndswiki": {
+            "site": "ndswiki",
+            "title": "New York"
+        },
+        "newiki": {
+            "site": "newiki",
+            "title": "\u0928\u094d\u092f\u0942\u092f\u094b\u0930\u094d\u0915 \u0936\u0939\u0930"
+        },
+        "newwiki": {
+            "site": "newwiki",
+            "title": "\u0928\u094d\u092f\u0941 \u092f\u0930\u094d\u0915 \u0928\u0917\u0930"
+        },
+        "nlwiki": {
+            "site": "nlwiki",
+            "title": "New York City"
+        },
+        "nlwikivoyage": {
+            "site": "nlwikivoyage",
+            "title": "New York City"
+        },
+        "nnwiki": {
+            "site": "nnwiki",
+            "title": "New York by"
+        },
+        "novwiki": {
+            "site": "novwiki",
+            "title": "Novi York"
+        },
+        "nowiki": {
+            "site": "nowiki",
+            "title": "New York"
+        },
+        "nrmwiki": {
+            "site": "nrmwiki",
+            "title": "Nouvieau York"
+        },
+        "ocwiki": {
+            "site": "ocwiki",
+            "title": "N\u00f2va York"
+        },
+        "oswiki": {
+            "site": "oswiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "pamwiki": {
+            "site": "pamwiki",
+            "title": "New York Lakanbalen"
+        },
+        "papwiki": {
+            "site": "papwiki",
+            "title": "New York City"
+        },
+        "pawiki": {
+            "site": "pawiki",
+            "title": "\u0a28\u0a3f\u0a0a\u0a2f\u0a3e\u0a30\u0a15 \u0a38\u0a3c\u0a39\u0a3f\u0a30"
+        },
+        "pdcwiki": {
+            "site": "pdcwiki",
+            "title": "Nei Yarrick Schtadt"
+        },
+        "pflwiki": {
+            "site": "pflwiki",
+            "title": "New York City"
+        },
+        "plwiki": {
+            "site": "plwiki",
+            "title": "Nowy Jork"
+        },
+        "plwikivoyage": {
+            "site": "plwikivoyage",
+            "title": "Nowy Jork"
+        },
+        "pmswiki": {
+            "site": "pmswiki",
+            "title": "New York"
+        },
+        "pnbwiki": {
+            "site": "pnbwiki",
+            "title": "\u0646\u06cc\u0648 \u06cc\u0627\u0631\u06a9 \u0634\u06c1\u0631"
+        },
+        "ptwiki": {
+            "site": "ptwiki",
+            "title": "Nova Iorque"
+        },
+        "ptwikivoyage": {
+            "site": "ptwikivoyage",
+            "title": "Nova York"
+        },
+        "quwiki": {
+            "site": "quwiki",
+            "title": "New York"
+        },
+        "rmwiki": {
+            "site": "rmwiki",
+            "title": "New York"
+        },
+        "rmywiki": {
+            "site": "rmywiki",
+            "title": "New York City"
+        },
+        "roa_tarawiki": {
+            "site": "roa_tarawiki",
+            "title": "Nu\u00e8ve York"
+        },
+        "rowiki": {
+            "site": "rowiki",
+            "title": "New York (ora\u0219)"
+        },
+        "rowikivoyage": {
+            "site": "rowikivoyage",
+            "title": "New York (ora\u0219)"
+        },
+        "ruewiki": {
+            "site": "ruewiki",
+            "title": "\u041d\u044e \u0419\u043e\u0440\u043a (\u043c\u0456\u0441\u0442\u043e)"
+        },
+        "ruwiki": {
+            "site": "ruwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ruwikisource": {
+            "site": "ruwikisource",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ruwikivoyage": {
+            "site": "ruwikivoyage",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "sahwiki": {
+            "site": "sahwiki",
+            "title": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a"
+        },
+        "sawiki": {
+            "site": "sawiki",
+            "title": "\u0928\u094d\u200d\u092f\u0942 \u092f\u093e\u0930\u094d\u0915"
+        },
+        "scnwiki": {
+            "site": "scnwiki",
+            "title": "Nova York"
+        },
+        "scowiki": {
+            "site": "scowiki",
+            "title": "New York Ceety"
+        },
+        "scwiki": {
+            "site": "scwiki",
+            "title": "New York City"
+        },
+        "shwiki": {
+            "site": "shwiki",
+            "title": "New York"
+        },
+        "simplewiki": {
+            "site": "simplewiki",
+            "title": "New York City"
+        },
+        "skwiki": {
+            "site": "skwiki",
+            "title": "New York (mesto)"
+        },
+        "slwiki": {
+            "site": "slwiki",
+            "title": "New York"
+        },
+        "sowiki": {
+            "site": "sowiki",
+            "title": "New York"
+        },
+        "sqwiki": {
+            "site": "sqwiki",
+            "title": "New York City"
+        },
+        "srnwiki": {
+            "site": "srnwiki",
+            "title": "New York City"
+        },
+        "srwiki": {
+            "site": "srwiki",
+            "title": "\u040a\u0443\u0458\u043e\u0440\u043a"
+        },
+        "stqwiki": {
+            "site": "stqwiki",
+            "title": "New York"
+        },
+        "svwiki": {
+            "site": "svwiki",
+            "title": "New York"
+        },
+        "svwikivoyage": {
+            "site": "svwikivoyage",
+            "title": "New York"
+        },
+        "swwiki": {
+            "site": "swwiki",
+            "title": "New York"
+        },
+        "szlwiki": {
+            "site": "szlwiki",
+            "title": "Nowy Jork"
+        },
+        "tawiki": {
+            "site": "tawiki",
+            "title": "\u0ba8\u0bbf\u0baf\u0bc2\u0baf\u0bbe\u0bb0\u0bcd\u0b95\u0bcd \u0ba8\u0b95\u0bb0\u0bae\u0bcd"
+        },
+        "tewiki": {
+            "site": "tewiki",
+            "title": "\u0c28\u0c4d\u0c2f\u0c42\u0c2f\u0c3e\u0c30\u0c4d\u0c15\u0c4d"
+        },
+        "tgwiki": {
+            "site": "tgwiki",
+            "title": "\u041d\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "thwiki": {
+            "site": "thwiki",
+            "title": "\u0e19\u0e04\u0e23\u0e19\u0e34\u0e27\u0e22\u0e2d\u0e23\u0e4c\u0e01"
+        },
+        "tkwiki": {
+            "site": "tkwiki",
+            "title": "N\u00fdu-\u00ddork \u015f\u00e4heri"
+        },
+        "tlwiki": {
+            "site": "tlwiki",
+            "title": "Lungsod ng New York"
+        },
+        "tpiwiki": {
+            "site": "tpiwiki",
+            "title": "Niu Yok Siti"
+        },
+        "trwiki": {
+            "site": "trwiki",
+            "title": "New York"
+        },
+        "ttwiki": {
+            "site": "ttwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "twwiki": {
+            "site": "twwiki",
+            "title": "New York"
+        },
+        "tywiki": {
+            "site": "tywiki",
+            "title": "New York"
+        },
+        "udmwiki": {
+            "site": "udmwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ugwiki": {
+            "site": "ugwiki",
+            "title": "Nyu York Shehiri"
+        },
+        "ukwiki": {
+            "site": "ukwiki",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "ukwikivoyage": {
+            "site": "ukwikivoyage",
+            "title": "\u041d\u044c\u044e-\u0419\u043e\u0440\u043a"
+        },
+        "urwiki": {
+            "site": "urwiki",
+            "title": "\u0646\u06cc\u0648\u06cc\u0627\u0631\u06a9 \u0634\u06c1\u0631"
+        },
+        "uzwiki": {
+            "site": "uzwiki",
+            "title": "Nyu York shahri"
+        },
+        "vecwiki": {
+            "site": "vecwiki",
+            "title": "New York"
+        },
+        "vepwiki": {
+            "site": "vepwiki",
+            "title": "Nju Jork"
+        },
+        "viwiki": {
+            "site": "viwiki",
+            "title": "Th\u00e0nh ph\u1ed1 New York"
+        },
+        "viwikivoyage": {
+            "site": "viwikivoyage",
+            "title": "Th\u00e0nh ph\u1ed1 New York"
+        },
+        "vowiki": {
+            "site": "vowiki",
+            "title": "New York (zif)"
+        },
+        "warwiki": {
+            "site": "warwiki",
+            "title": "Syudad han New York"
+        },
+        "wuuwiki": {
+            "site": "wuuwiki",
+            "title": "\u7ebd\u7ea6\u5e02"
+        },
+        "xalwiki": {
+            "site": "xalwiki",
+            "title": "\u041d\u044c\u044e \u0419\u043e\u0440\u043a \u0431\u0430\u043b\u04bb\u0441\u043d"
+        },
+        "xmfwiki": {
+            "site": "xmfwiki",
+            "title": "\u10dc\u10d8\u10e3-\u10d8\u10dd\u10e0\u10d9\u10d8"
+        },
+        "yiwiki": {
+            "site": "yiwiki",
+            "title": "\u05e0\u05d9\u05d5 \u05d9\u05d0\u05e8\u05e7 (\u05e9\u05d8\u05d0\u05d8)"
+        },
+        "yowiki": {
+            "site": "yowiki",
+            "title": "New York"
+        },
+        "zawiki": {
+            "site": "zawiki",
+            "title": "Niujyoz"
+        },
+        "zeawiki": {
+            "site": "zeawiki",
+            "title": "New York City"
+        },
+        "zh_classicalwiki": {
+            "site": "zh_classicalwiki",
+            "title": "\u7d10\u7d04\u5e02"
+        },
+        "zh_min_nanwiki": {
+            "site": "zh_min_nanwiki",
+            "title": "New York Chh\u012b"
+        },
+        "zh_yuewiki": {
+            "site": "zh_yuewiki",
+            "title": "\u7d10\u7d04\u5e02"
+        },
+        "zhwiki": {
+            "site": "zhwiki",
+            "title": "\u7ebd\u7ea6"
+        },
+        "zhwikivoyage": {
+            "site": "zhwikivoyage",
+            "title": "\u7d10\u7d04"
+        },
+        "zuwiki": {
+            "site": "zuwiki",
+            "title": "New York (idolobha)"
+        }
+    }
+}

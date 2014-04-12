@@ -41,6 +41,10 @@ import re
 import sys
 import unicodedata
 import collections
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 
 logger = logging.getLogger("pywiki.wiki.page")
 
@@ -2830,6 +2834,52 @@ class WikibasePage(Page):
                 'descriptions': self.descriptions,
                 }
 
+    def toJSON(self, diffto=None):
+        labels = self._normalizeLanguages(self.labels).copy()
+        if diffto and 'labels' in diffto:
+            old = set(diffto['labels'].keys())
+            new = set(labels.keys())
+            for lang in old - new:
+                labels[lang] = ''
+            for lang in old.intersection(new):
+                if labels[lang] == diffto['labels'][lang]['value']:
+                    del labels[lang]
+        for lang in labels:
+            labels[lang] = {'language': lang, 'value': labels[lang]}
+
+        descriptions = self._normalizeLanguages(self.descriptions).copy()
+        if diffto and 'descriptions' in diffto:
+            old = set(diffto['descriptions'].keys())
+            new = set(descriptions.keys())
+            for lang in old - new:
+                descriptions[lang] = ''
+            for lang in old.intersection(new):
+                if descriptions[lang] == diffto['descriptions'][lang]['value']:
+                    del descriptions[lang]
+        for lang in descriptions:
+            descriptions[lang] = {'language': lang, 'value': descriptions[lang]}
+
+        aliases = self._normalizeLanguages(self.aliases).copy()
+        if diffto and 'aliases' in diffto:
+            for lang in set(diffto['aliases'].keys()) - set(aliases.keys()):
+                aliases[lang] = []
+        for lang, strings in aliases.items():
+            if diffto and 'aliases' in diffto and lang in diffto['aliases']:
+                empty = len(diffto['aliases'][lang]) - len(strings)
+                if empty > 0:
+                    strings += [''] * empty
+                elif collections.Counter(val['value'] for val in diffto['aliases'][lang]
+                                         ) == collections.Counter(strings):
+                    del aliases[lang]
+            if lang in aliases:
+                aliases[lang] = [{'language': lang, 'value': i} for i in strings]
+
+        data = {}
+        for key in ('labels', 'descriptions', 'aliases'):
+            if len(locals()[key]) > 0:
+                data[key] = locals()[key]
+        return data
+
     def getID(self, numeric=False, force=False):
         """
         Get the entity identifier.
@@ -2912,7 +2962,7 @@ class WikibasePage(Page):
             return site.dbName()
         return site
 
-    def editEntity(self, data, **kwargs):
+    def editEntity(self, data=None, **kwargs):
         """
         Edit an entity using Wikibase wbeditentity API.
 
@@ -2930,7 +2980,10 @@ class WikibasePage(Page):
         else:
             baserevid = None
 
-        data = WikibasePage._normalizeData(data)
+        if data is None:
+            data = self.toJSON(diffto=(self._content if hasattr(self, '_content') else None))
+        else:
+            data = WikibasePage._normalizeData(data)
 
         updates = self.repo.editEntity(self._defined_by(singular=True), data,
                                        baserevid=baserevid, **kwargs)
@@ -3119,6 +3172,58 @@ class ItemPage(WikibasePage):
                 'sitelinks': self.sitelinks,
                 'claims': self.claims
                 }
+
+    def toJSON(self, diffto=None):
+        data = super(ItemPage, self).toJSON(diffto=diffto)
+
+        sitelinks = self.sitelinks.copy()
+        if diffto and 'sitelinks' in diffto:
+            old = set(diffto['sitelinks'].keys())
+            new = set(sitelinks.keys())
+            for dbName in old - new:
+                sitelinks[dbName] = ''
+            for dbName in old.intersection(new):
+                if sitelinks[dbName] == diffto['sitelinks'][dbName]['title']:
+                    del sitelinks[dbName]
+        for dbName in sitelinks:
+            sitelinks[dbName] = {'site': dbName, 'title': sitelinks[dbName]}
+
+        claims = self.claims.copy()
+        for prop in claims.keys():
+            if len(claims[prop]) > 0:
+                claims[prop] = [claim.toJSON() for claim in claims[prop]]
+            else:
+                del claims[prop]
+
+        if diffto and 'claims' in diffto:
+            temp = {}
+            for prop in claims:
+                for claim1 in claims[prop]:
+                    seen = False
+                    if prop in diffto['claims']:
+                        for claim2 in diffto['claims'][prop]:
+                            if claim2 == claim1:
+                                seen = True
+                                break
+                    if not seen:
+                        if prop not in temp:
+                            temp[prop] = []
+                        temp[prop].append(claim1)
+            for prop in diffto['claims']:
+                if prop not in claims:
+                    claims[prop] = []
+                for claim1 in diffto['claims'][prop]:
+                    if 'id' in claim1 and claim1['id'] not in \
+                    [claim2['id'] for claim2 in claims[prop] if 'id' in claim2]:
+                        if prop not in temp:
+                            temp[prop] = []
+                        temp[prop].append({'id': claim1['id'], 'remove': ''})
+            claims = temp
+
+        for key in ('sitelinks', 'claims'):
+            if len(locals()[key]) > 0:
+                data[key] = locals()[key]
+        return data
 
     def iterlinks(self, family=None):
         """
@@ -3405,7 +3510,7 @@ class Claim(Property):
         if self.isQualifier and self.isReference:
             raise ValueError(u'Claim cannot be both a qualifier and reference.')
         self.sources = []
-        self.qualifiers = collections.defaultdict(list)
+        self.qualifiers = OrderedDict()
         self.target = None
         self.snaktype = 'value'
         self.rank = 'normal'
@@ -3452,10 +3557,9 @@ class Claim(Property):
             for source in data['references']:
                 claim.sources.append(Claim.referenceFromJSON(site, source))
         if 'qualifiers' in data:
-            for prop in data['qualifiers']:
-                for qualifier in data['qualifiers'][prop]:
-                    qual = Claim.qualifierFromJSON(site, qualifier)
-                    claim.qualifiers[prop].append(qual)
+            for prop in data['qualifiers-order']:
+                claim.qualifiers[prop] = [Claim.qualifierFromJSON(site, qualifier)
+                                          for qualifier in data['qualifiers'][prop]]
         return claim
 
     @staticmethod
@@ -3469,11 +3573,13 @@ class Claim(Property):
 
         @return: dict
         """
-        source = collections.defaultdict(list)
-        for prop in list(data['snaks'].values()):
-            for claimsnak in prop:
+        source = OrderedDict()
+        for prop in data['snaks-order']:
+            for claimsnak in data['snaks'][prop]:
                 claim = Claim.fromJSON(site, {'mainsnak': claimsnak,
                                               'hash': data['hash']})
+                if claim.getID() not in source:
+                    source[claim.getID()] = []
                 source[claim.getID()].append(claim)
         return source
 
@@ -3488,8 +3594,52 @@ class Claim(Property):
 
         @return: Claim
         """
-        wrap = {'mainsnak': data}
-        return Claim.fromJSON(site, wrap)
+        return Claim.fromJSON(site, {'mainsnak': data,
+                                     'hash': data['hash']})
+
+    def toJSON(self):
+        data = {
+            'mainsnak': {
+                'snaktype': self.snaktype,
+                'property': self.getID()
+            },
+            'type': 'statement'
+        }
+        if hasattr(self, 'snak') and self.snak is not None:
+            data['id'] = self.snak
+        if hasattr(self, 'rank') and self.rank is not None:
+            data['rank'] = self.rank
+        if self.getSnakType() == 'value':
+            data['mainsnak']['datatype'] = self.type
+            data['mainsnak']['datavalue'] = self._formatDataValue()
+        if self.isQualifier or self.isReference:
+            data = data['mainsnak']
+            if hasattr(self, 'hash') and self.hash is not None:
+                data['hash'] = self.hash
+        else:
+            if len(self.qualifiers) > 0:
+                data['qualifiers'] = {}
+                data['qualifiers-order'] = list(self.qualifiers.keys())
+                for prop, qualifiers in self.qualifiers.iteritems():
+                    for qualifier in qualifiers:
+                        qualifier.isQualifier = True
+                    data['qualifiers'][prop] = [qualifier.toJSON() for qualifier in qualifiers]
+            if len(self.sources) > 0:
+                data['references'] = []
+                for collection in self.sources:
+                    reference = {'snaks': {}, 'snaks-order': list(collection.keys())}
+                    for prop, val in collection.iteritems():
+                        reference['snaks'][prop] = []
+                        for source in val:
+                            source.isReference = True
+                            src_data = source.toJSON()
+                            if 'hash' in src_data:
+                                if 'hash' not in reference:
+                                    reference['hash'] = src_data['hash']
+                                del src_data['hash']
+                            reference['snaks'][prop].append(src_data)
+                    data['references'].append(reference)
+        return data
 
     def setTarget(self, value):
         """
@@ -3639,7 +3789,10 @@ class Claim(Property):
         data = self.repo.editQualifier(self, qualifier, **kwargs)
         qualifier.isQualifier = True
         self.on_item.lastrevid = data['pageinfo']['lastrevid']
-        self.qualifiers[qualifier.getID()].append(qualifier)
+        if qualifier.getID() in self.qualifiers:
+            self.qualifiers[qualifier.getID()].append(qualifier)
+        else:
+            self.qualifiers[qualifier.getID()] = [qualifier]
 
     def _formatValue(self):
         """
