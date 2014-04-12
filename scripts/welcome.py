@@ -433,7 +433,7 @@ class WelcomeBot(object):
 
     def __init__(self):
         #Initial
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.bname = dict()
 
         self._totallyCount = 0

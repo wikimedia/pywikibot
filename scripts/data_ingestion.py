@@ -56,7 +56,7 @@ class Photo(object):
         return self.contents
 
     def findDuplicateImages(self,
-                            site=pywikibot.getSite(u'commons', u'commons')):
+                            site=pywikibot.Site(u'commons', u'commons')):
         """
         Takes the photo, calculates the SHA1 hash and asks the mediawiki api
         for a list of duplicates.
@@ -106,7 +106,7 @@ def CSVReader(fileobj, urlcolumn, *args, **kwargs):
 
 class DataIngestionBot:
     def __init__(self, reader, titlefmt, pagefmt,
-                 site=pywikibot.getSite(u'commons', u'commons')):
+                 site=pywikibot.Site(u'commons', u'commons')):
         self.reader = reader
         self.titlefmt = titlefmt
         self.pagefmt = pagefmt
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     bot = DataIngestionBot(
         reader,
         "%(name)s - %(set)s.%(_ext)s", ":user:valhallasw/test_template",
-        pywikibot.getSite('test', 'test'))
+        pywikibot.Site('test', 'test'))
     bot.run()
 
 '''
@@ -169,7 +169,7 @@ class DataIngestionBot:
 
         templates = configurationPage.templatesWithParams()
         for (template, params) in templates:
-            if template==u'Data ingestion':
+            if template == u'Data ingestion':
                 for param in params:
                     (field, sep, value) = param.partition(u'=')
 
@@ -181,16 +181,16 @@ class DataIngestionBot:
         return configuration
 
 
-    def downloadPhoto(self, photoUrl = ''):
+    def downloadPhoto(self, photoUrl=''):
         """
         Download the photo and store it in a StrinIO.StringIO object.
 
         TODO: Add exception handling
         """
-        imageFile=urllib.urlopen(photoUrl).read()
+        imageFile = urllib.urlopen(photoUrl).read()
         return StringIO.StringIO(imageFile)
 
-    def findDuplicateImages(self, photo = None, site = pywikibot.getSite(u'commons', u'commons')):
+    def findDuplicateImages(self, photo=None, site=pywikibot.Site(u'commons', u'commons')):
         """
         Takes the photo, calculates the SHA1 hash and asks the mediawiki api for a list of duplicates.
 
@@ -213,7 +213,7 @@ class DataIngestionBot:
         description = metadata.get(u'dc:title')
         identifier = metadata.get(u'dc:identifier')
 
-        if len(description)>120:
+        if len(description) > 120:
             description = description[0 : 120]
 
         title = u'%s - %s.jpg' % (description, identifier)
@@ -225,7 +225,7 @@ class DataIngestionBot:
         A function to do date clean up.
         """
         # Empty, make it really empty
-        if field==u'-':
+        if field == u'-':
             return u''
         # TODO: Circa
         # TODO: Period
@@ -279,7 +279,7 @@ class DataIngestionBot:
             pywikibot.output(u'The field "sourceFormat" is not set')
             return False
 
-        if self.configuration.get('sourceFormat')==u'csv':
+        if self.configuration.get('sourceFormat') == u'csv':
             self.processCSV()
         else:
             pywikibot.output(u'%s is not a supported source format')

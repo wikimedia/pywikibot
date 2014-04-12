@@ -185,7 +185,7 @@ word_to_skip = {
 
 class NowCommonsDeleteBot:
     def __init__(self):
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         if repr(self.site) == 'commons:commons':
             sys.exit('Do not run this bot on Commons!')
 
@@ -308,7 +308,7 @@ class NowCommonsDeleteBot:
         return urllib.quote(encodedTitle)
 
     def run(self):
-        commons = pywikibot.getSite('commons', 'commons')
+        commons = pywikibot.Site('commons', 'commons')
         comment = i18n.translate(self.site, nowCommonsMessage)
 
         for page in self.getPageGenerator():

@@ -70,7 +70,7 @@ class TestLinks(PywikibotTestCase):
 
     def test_iterlinks_page_object(self):
         page = [pg for pg in self.wdp.iterlinks() if pg.site.language() == 'af'][0]
-        self.assertEquals(page, pywikibot.Page(pywikibot.getSite('af', 'wikipedia'), u'New York Stad'))
+        self.assertEquals(page, pywikibot.Page(pywikibot.Site('af', 'wikipedia'), u'New York Stad'))
 
     def test_iterlinks_filtering(self):
         wikilinks = list(self.wdp.iterlinks('wikipedia'))

@@ -198,7 +198,7 @@ class CaseChecker(object):
 
         self.queryParams['prop'] = propParam
 
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
 
         if len(self.localSuspects) != len(self.latinSuspects):
             raise ValueError(u'Suspects must be the same size')

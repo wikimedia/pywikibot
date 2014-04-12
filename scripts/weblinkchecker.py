@@ -187,7 +187,7 @@ class XmlDumpPageGenerator:
         self.xmlStart = xmlStart
         self.namespaces = namespaces
         self.skipping = bool(xmlStart)
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
 
         dump = xmlreader.XmlDump(xmlFilename)
         self.parser = dump.parse()
@@ -527,7 +527,7 @@ class History:
 
     def __init__(self, reportThread):
         self.reportThread = reportThread
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.semaphore = threading.Semaphore()
         self.datfilename = pywikibot.config.datafilepath(
             'deadlinks', 'deadlinks-%s-%s.dat' % (self.site.family.name, self.site.code))
@@ -682,7 +682,7 @@ class DeadLinkReportThread(threading.Thread):
 
                 if archiveURL:
                     archiveMsg = u'\n' + \
-                                 i18n.twtranslate(pywikibot.getSite(),
+                                 i18n.twtranslate(pywikibot.Site(),
                                                   'weblinkchecker-archive_msg',
                                                   {'URL': archiveURL})
                 else:
@@ -690,7 +690,7 @@ class DeadLinkReportThread(threading.Thread):
                 # The caption will default to "Dead link". But if there is
                 # already such a caption, we'll use "Dead link 2",
                 # "Dead link 3", etc.
-                caption = i18n.twtranslate(pywikibot.getSite(),
+                caption = i18n.twtranslate(pywikibot.Site(),
                                            'weblinkchecker-caption')
                 i = 1
                 count = u''
@@ -702,13 +702,13 @@ class DeadLinkReportThread(threading.Thread):
                 caption += count
                 content += '\n\n== %s ==\n\n%s\n\n%s%s--~~~~' % \
                            (caption,
-                            i18n.twtranslate(pywikibot.getSite(),
+                            i18n.twtranslate(pywikibot.Site(),
                                              'weblinkchecker-report'),
                             errorReport,
                             archiveMsg)
                 comment = u'[[%s#%s|→]] %s' % \
                           (talkPage.title(), caption,
-                           i18n.twtranslate(pywikibot.getSite(),
+                           i18n.twtranslate(pywikibot.Site(),
                                             'weblinkchecker-summary'))
                 try:
                     talkPage.put(content, comment)
@@ -778,7 +778,7 @@ def RepeatPageGenerator():
     pageTitles = list(pageTitles)
     pageTitles.sort()
     for pageTitle in pageTitles:
-        page = pywikibot.Page(pywikibot.getSite(), pageTitle)
+        page = pywikibot.Page(pywikibot.Site(), pageTitle)
         yield page
 
 
@@ -843,7 +843,7 @@ def main():
 
     if singlePageTitle:
         singlePageTitle = ' '.join(singlePageTitle)
-        page = pywikibot.Page(pywikibot.getSite(), singlePageTitle)
+        page = pywikibot.Page(pywikibot.Site(), singlePageTitle)
         gen = iter([page])
 
     if xmlFilename:

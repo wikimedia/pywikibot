@@ -924,9 +924,9 @@ def main():
 
     if editSummary == '':
         # Load default summary message.
-        editSummary = i18n.twtranslate(pywikibot.getSite(),
+        editSummary = i18n.twtranslate(pywikibot.Site(),
                                        'cosmetic_changes-standalone')
-    site = pywikibot.getSite()
+    site = pywikibot.Site()
     site.login()
     if pageTitle:
         gen = iter([pywikibot.Page(pywikibot.Link(t, site)) for t in pageTitle])

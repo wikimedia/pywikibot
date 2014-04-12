@@ -161,7 +161,7 @@ class PageFromFileRobot:
             self.put(title, contents)
 
     def put(self, title, contents):
-        mysite = pywikibot.getSite()
+        mysite = pywikibot.Site()
 
         page = pywikibot.Page(mysite, title)
         # Show the title of the page we're working on.

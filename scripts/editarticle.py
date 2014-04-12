@@ -35,7 +35,7 @@ class ArticleEditor(object):
     def __init__(self, *args):
         self.set_options(*args)
         self.setpage()
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.site.login()
 
     def set_options(self, *args):
@@ -60,7 +60,7 @@ class ArticleEditor(object):
 
     def setpage(self):
         """Sets page and page title"""
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
         pageTitle = self.options.page or pywikibot.input(u"Page to edit:")
         self.page = pywikibot.Page(pywikibot.Link(pageTitle, site))
         if not self.options.edit_redirect and self.page.isRedirectPage():
@@ -85,7 +85,7 @@ class ArticleEditor(object):
         if new and old != new:
             pywikibot.showDiff(old, new)
             changes = pywikibot.input(u"What did you change?")
-            comment = i18n.twtranslate(pywikibot.getSite(), 'editarticle-edit',
+            comment = i18n.twtranslate(pywikibot.Site(), 'editarticle-edit',
                                        {'description': changes})
             try:
                 self.page.put(new, comment=comment, minorEdit=False,

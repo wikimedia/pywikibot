@@ -80,7 +80,7 @@ class RedirectGenerator:
     def __init__(self, xmlFilename=None, namespaces=[], offset=-1,
                  use_move_log=False, use_api=False, start=None, until=None,
                  number=None, step=None):
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.site.login()
         self.xmlFilename = xmlFilename
         self.namespaces = namespaces
@@ -146,7 +146,7 @@ class RedirectGenerator:
                     # remove leading and trailing whitespace
                     target = target.strip('_')
                     # capitalize the first letter
-                    if not pywikibot.getSite().nocapitalize:
+                    if not pywikibot.Site().nocapitalize:
                         source = source[:1].upper() + source[1:]
                         target = target[:1].upper() + target[1:]
                     if '#' in target:
@@ -374,7 +374,7 @@ class RedirectGenerator:
 class RedirectRobot:
     def __init__(self, action, generator, always=False, number=None,
                  delete=False):
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.action = action
         self.generator = generator
         self.always = always

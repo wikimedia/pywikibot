@@ -179,7 +179,7 @@ class XmlDumpPageGenerator:
         self.xmlStart = xmlStart
         self.namespaces = namespaces
         self.skipping = bool(xmlStart)
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
 
         import xmlreader
         dump = xmlreader.XmlDump(xmlFilename)
@@ -212,7 +212,7 @@ class RefLink:
     def __init__(self, link, name):
         self.refname = name
         self.link = link
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.linkComment = i18n.twtranslate(self.site, 'reflinks-comment')
         self.url = re.sub(u'#.*', '', self.link)
         self.title = None
@@ -290,7 +290,7 @@ class DuplicateReferences:
             u'(?i).*name\s*=\s*(?P<quote>"?)\s*(?P<name>.+)\s*(?P=quote).*')
         self.GROUPS = re.compile(
             u'(?i).*group\s*=\s*(?P<quote>"?)\s*(?P<group>.+)\s*(?P=quote).*')
-        self.autogen = i18n.twtranslate(pywikibot.getSite(), 'reflinks-autogen')
+        self.autogen = i18n.twtranslate(pywikibot.Site(), 'reflinks-autogen')
 
     def process(self, text):
         # keys are ref groups
@@ -401,7 +401,7 @@ class ReferencesRobot:
         self.acceptall = acceptall
         self.limit = limit
         self.ignorepdf = ignorepdf
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         # Check
         manual = 'mw:Manual:Pywikibot/refLinks'
         if self.site.family.name == 'wikipedia':

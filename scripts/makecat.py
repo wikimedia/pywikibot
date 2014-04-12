@@ -52,7 +52,7 @@ def rawtoclean(c):
 
 def isdate(s):
     """returns true if s is a date or year """
-    dict, val = date.getAutoFormat(pywikibot.getSite().language(), s)
+    dict, val = date.getAutoFormat(pywikibot.Site().language(), s)
     return dict is not None
 
 
@@ -159,7 +159,7 @@ def asktoadd(pl):
             pywikibot.output(u"l: Give a list of the pages to check")
         elif answer == 'a':
             pagetitle = raw_input("Specify page to add:")
-            page = pywikibot.Page(pywikibot.getSite(), pagetitle)
+            page = pywikibot.Page(pywikibot.Site(), pagetitle)
             if not page in checked.keys():
                 include(page)
         elif answer == 'x':
@@ -219,7 +219,7 @@ try:
         workingcatname = raw_input("Which page to start with? ")
     else:
         workingcatname = ' '.join(workingcatname)
-    mysite = pywikibot.getSite()
+    mysite = pywikibot.Site()
     workingcatname = unicode(workingcatname, 'utf-8')
     pywikibot.setAction(i18n.twtranslate(mysite, 'makecat-create', {'cat': workingcatname}))
     workingcat = pywikibot.Category(mysite,

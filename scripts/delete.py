@@ -81,7 +81,7 @@ def main():
 
     # read command line parameters
     localargs = pywikibot.handleArgs()
-    mysite = pywikibot.getSite()
+    mysite = pywikibot.Site()
 
     for arg in localargs:
         if arg == '-always':

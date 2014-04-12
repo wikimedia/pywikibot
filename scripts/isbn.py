@@ -1403,7 +1403,7 @@ class IsbnBot:
         self.format = format
         self.always = always
         self.isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
-        self.comment = i18n.twtranslate(pywikibot.getSite(), 'isbn-formatting')
+        self.comment = i18n.twtranslate(pywikibot.Site(), 'isbn-formatting')
 
     def treat(self, page):
         try:
@@ -1503,7 +1503,7 @@ def main():
             if not genFactory.handleArg(arg):
                 pageTitle.append(arg)
 
-    site = pywikibot.getSite()
+    site = pywikibot.Site()
     site.login()
     if pageTitle:
         gen = iter([pywikibot.Page(pywikibot.Link(t, site))

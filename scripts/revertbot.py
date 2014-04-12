@@ -38,7 +38,7 @@ class BaseRevertBot(object):
                 item = iterator.next()
             except StopIteration:
                 self.log(u'Fetching new batch of contributions')
-                data = list(pywikibot.getSite().usercontribs(user=self.site.username(), namespaces=ns, total=max))
+                data = list(pywikibot.Site().usercontribs(user=self.site.username(), namespaces=ns, total=max))
                 never_continue = True
                 iterator = iter(data)
             else:
@@ -69,12 +69,12 @@ class BaseRevertBot(object):
         return 'top' in item
 
     def revert(self, item):
-        if len(pywikibot.Page(pywikibot.getSite(), item['title']).fullVersionHistory()) > 1:
-            rev = pywikibot.Page(pywikibot.getSite(), item['title']).fullVersionHistory()[1]
+        if len(pywikibot.Page(pywikibot.Site(), item['title']).fullVersionHistory()) > 1:
+            rev = pywikibot.Page(pywikibot.Site(), item['title']).fullVersionHistory()[1]
         else:
             return False
 
-        comment = i18n.twtranslate(pywikibot.getSite(), 'revertbot-revert', {'revid': rev[0], 'author': rev[2], 'timestamp': rev[1]})
+        comment = i18n.twtranslate(pywikibot.Site(), 'revertbot-revert', {'revid': rev[0], 'author': rev[2], 'timestamp': rev[1]})
 
         if self.comment:
             comment += ': ' + self.comment
@@ -107,7 +107,7 @@ class myRevertBot(BaseRevertBot):
 def main():
     for arg in pywikibot.handleArgs():
         continue
-    bot = myRevertBot(site=pywikibot.getSite())
+    bot = myRevertBot(site=pywikibot.Site())
     bot.revert_contribs()
 
 if __name__ == "__main__":

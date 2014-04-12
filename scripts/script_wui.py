@@ -261,7 +261,7 @@ def wiki_logger(buffer, page, rev=None):
         rev = page.latestRevision()
         link = page.permalink(oldid=rev)
     # append to page
-    outpage = pywikibot.Page(pywikibot.getSite(), bot_config['ConfCSSoutput'])
+    outpage = pywikibot.Page(pywikibot.Site(), bot_config['ConfCSSoutput'])
     text = outpage.get()
     outpage.put(text + u"\n== Simulation vom %s mit [%s code:%s] ==\n<pre>\n%s</pre>\n\n" % (pywikibot.Timestamp.now().isoformat(' '), link, rev, buffer))
 #                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
@@ -277,7 +277,7 @@ def main():
     __simulate = pywikibot.config.simulate
     __sys_argv = sys.argv
 
-    site = pywikibot.getSite()
+    site = pywikibot.Site()
     site.login()
     chan = '#' + site.language() + '.' + site.family.name
     bot = ScriptWUIBot(site, chan, site.user() + "_WUI", "irc.wikimedia.org")

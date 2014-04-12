@@ -84,7 +84,7 @@ def appendtext(page, apptext):
             if choice == 'a':
                 always = True
         if always or choice == 'y':
-            page.put(text, pywikibot.translate(pywikibot.getSite(), comment))
+            page.put(text, pywikibot.translate(pywikibot.Site(), comment))
 
 
 def main():
@@ -97,13 +97,13 @@ def main():
         if arg == '-start':
             start = True
 
-    mysite = pywikibot.getSite()
+    mysite = pywikibot.Site()
     # If anything needs to be prepared, you can do it here
-    template_image = pywikibot.translate(pywikibot.getSite(),
+    template_image = pywikibot.translate(pywikibot.Site(),
                                          template_to_the_image)
-    template_user = pywikibot.translate(pywikibot.getSite(),
+    template_user = pywikibot.translate(pywikibot.Site(),
                                         template_to_the_user).encode("utf-8")
-    except_text_translated = pywikibot.translate(pywikibot.getSite(),
+    except_text_translated = pywikibot.translate(pywikibot.Site(),
                                                  except_text).encode("utf-8")
     basicgenerator = pagegenerators.UnusedFilesGenerator()
     generator = pagegenerators.PreloadingGenerator(basicgenerator)

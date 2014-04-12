@@ -569,7 +569,7 @@ class CategoryListifyRobot:
         self.editSummary = editSummary
         self.overwrite = overwrite
         self.showImages = showImages
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.cat = pywikibot.Category(self.site, catTitle)
         self.list = pywikibot.Page(self.site, listTitle)
         self.subCats = subCats
@@ -623,7 +623,7 @@ class CategoryRemoveRobot:
                  useSummaryForDeletion=True, titleRegex=None, inPlace=False,
                  pagesonly=False):
         self.editSummary = editSummary
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.cat = pywikibot.Category(self.site, catTitle)
         # get edit summary message
         self.useSummaryForDeletion = useSummaryForDeletion
@@ -705,7 +705,7 @@ class CategoryTidyRobot:
     def __init__(self, catTitle, catDB):
         self.catTitle = catTitle
         self.catDB = catDB
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.editSummary = i18n.twtranslate(self.site, 'category-changing',
                                             {'oldcat': self.catTitle,
                                              'newcat': u''})
@@ -861,7 +861,7 @@ class CategoryTreeRobot:
         self.filename = filename
         # TODO: make maxDepth changeable with a parameter or config file entry
         self.maxDepth = maxDepth
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
 
     def treeview(self, cat, currentDepth=0, parent=None):
         '''

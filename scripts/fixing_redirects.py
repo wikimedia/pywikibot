@@ -65,7 +65,7 @@ def treat(text, linkedPage, targetPage):
     """
     Based on the method of the same name in solve_disambiguation.py
     """
-    mysite = pywikibot.getSite()
+    mysite = pywikibot.Site()
     linktrail = mysite.linktrail()
 
     # make a backup of the original text so we can show the changes later
@@ -147,7 +147,7 @@ pageCache = []
 
 
 def workon(page):
-    mysite = pywikibot.getSite()
+    mysite = pywikibot.Site()
     try:
         text = page.get()
     except pywikibot.IsRedirectPage:
@@ -204,7 +204,7 @@ def main():
         else:
             genFactory.handleArg(arg)
 
-    mysite = pywikibot.getSite()
+    mysite = pywikibot.Site()
     if mysite.sitename() == 'wikipedia:nl':
         pywikibot.output(
             u'\03{lightred}There is consensus on the Dutch Wikipedia that bots should not be used to fix redirects.\03{default}')
@@ -212,7 +212,7 @@ def main():
 
     if featured:
         featuredList = i18n.translate(mysite, featured_articles)
-        ref = pywikibot.Page(pywikibot.getSite(), featuredList)
+        ref = pywikibot.Page(pywikibot.Site(), featuredList)
         gen = pagegenerators.ReferringPageGenerator(ref)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, [0])
     if not gen:

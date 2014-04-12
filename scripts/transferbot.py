@@ -51,7 +51,7 @@ docuReplacements = {
 def main():
     tohandle = pywikibot.handleArgs()
 
-    fromsite = pywikibot.getSite()
+    fromsite = pywikibot.Site()
     tolang = fromsite.code
     tofamily = fromsite.family.name
     prefix = ''

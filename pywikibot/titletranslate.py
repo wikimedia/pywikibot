@@ -108,8 +108,8 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                             newname = entry(value)
                             x = pywikibot.Link(
                                 newname,
-                                pywikibot.getSite(code=entryLang,
-                                                  fam=site.family))
+                                pywikibot.Site(code=entryLang,
+                                               fam=site.family))
                             if x not in result:
                                 result.append(x)  # add new page
     return result

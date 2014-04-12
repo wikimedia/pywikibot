@@ -239,7 +239,7 @@ class CommonscatBot:
         self.generator = generator
         self.always = always
         self.summary = summary
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
 
     def run(self):
         for page in self.generator:
@@ -572,10 +572,10 @@ def main():
             checkcurrent = True
             primaryCommonscat, commonscatAlternatives = \
                 CommonscatBot.getCommonscatTemplate(
-                    pywikibot.getSite().language())
+                    pywikibot.Site().language())
             generator = pagegenerators.NamespaceFilterPageGenerator(
                 pagegenerators.ReferringPageGenerator(
-                    pywikibot.Page(pywikibot.getSite(),
+                    pywikibot.Page(pywikibot.Site(),
                                    u'Template:' + primaryCommonscat),
                     onlyTemplateInclusion=True), ns)
 

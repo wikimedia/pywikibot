@@ -1342,7 +1342,7 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     # use the default imagerepository normally commons
-    site = pywikibot.getSite().image_repository()
+    site = pywikibot.Site().image_repository()
     site.login()
     for arg in pywikibot.handleArgs(*args):
         if arg.startswith('-yesterday'):

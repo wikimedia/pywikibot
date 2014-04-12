@@ -321,7 +321,7 @@ def followRedirects(categories):
     """ If a category is a redirect, replace the category with the target. """
     result = []
     for cat in categories:
-        categoryPage = pywikibot.Page(pywikibot.getSite(u'commons', u'commons'),
+        categoryPage = pywikibot.Page(pywikibot.Site(u'commons', u'commons'),
                                       cat, ns=14)
         if categoryPage.isCategoryRedirect():
             result.append(
@@ -453,7 +453,7 @@ def main(args):
     global search_wikis
     global hint_wiki
 
-    site = pywikibot.getSite(u'commons', u'commons')
+    site = pywikibot.Site(u'commons', u'commons')
     for arg in pywikibot.handleArgs():
         if arg == '-onlyfilter':
             onlyFilter = True

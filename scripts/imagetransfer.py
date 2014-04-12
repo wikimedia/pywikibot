@@ -289,7 +289,7 @@ class ImageTransferBot:
                 imagelist = [imagePage]
             else:
                 imagePage = (page.imagelinks(followRedirects=True)).result(
-                    {'title': page.title(), 'ns': pywikibot.getSite().image_namespace()})
+                    {'title': page.title(), 'ns': pywikibot.Site().image_namespace()})
                 imagelist = [imagePage]
 
             while len(imagelist) > 0:
@@ -350,23 +350,23 @@ def main():
         # connect the title's parts with spaces
         if pageTitle != []:
             pageTitle = ' '.join(pageTitle)
-            page = pywikibot.Page(pywikibot.getSite(), pageTitle)
+            page = pywikibot.Page(pywikibot.Site(), pageTitle)
         # if no page title was given as an argument, and none was
         # read from a file, query the user
         if not page:
             pageTitle = pywikibot.input(u'Which page to check:')
-            page = pywikibot.Page(pywikibot.getSite(), pageTitle)
+            page = pywikibot.Page(pywikibot.Site(), pageTitle)
             # generator which will yield only a single Page
         gen = iter([page])
 
     if not targetLang and not targetFamily:
-        targetSite = pywikibot.getSite('commons', 'commons')
+        targetSite = pywikibot.Site('commons', 'commons')
     else:
         if not targetLang:
-            targetLang = pywikibot.getSite().language
+            targetLang = pywikibot.Site().language
         if not targetFamily:
-            targetFamily = pywikibot.getSite().family
-        targetSite = pywikibot.getSite(targetLang, targetFamily)
+            targetFamily = pywikibot.Site().family
+        targetSite = pywikibot.Site(targetLang, targetFamily)
     bot = ImageTransferBot(gen, interwiki=interwiki, targetSite=targetSite,
                            keep_name=keep_name)
     bot.run()

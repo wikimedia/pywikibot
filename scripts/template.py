@@ -163,7 +163,7 @@ class XmlDumpTemplatePageGenerator:
 
     def __iter__(self):
         """Yield page objects until the entire XML dump has been read."""
-        mysite = pywikibot.getSite()
+        mysite = pywikibot.Site()
         dump = xmlreader.XmlDump(self.xmlfilename)
         # regular expression to find the original template.
         # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
@@ -172,7 +172,7 @@ class XmlDumpTemplatePageGenerator:
         templatePatterns = []
         for template in self.templates:
             templatePattern = template.title(withNamespace=False)
-            if not pywikibot.getSite().nocapitalize:
+            if not pywikibot.Site().nocapitalize:
                 templatePattern = '[%s%s]%s' % (templatePattern[0].upper(),
                                                 templatePattern[0].lower(),
                                                 templatePattern[1:])
@@ -245,7 +245,7 @@ class TemplateRobot:
 
         replacements = []
         exceptions = {}
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
         for old, new in self.templates.items():
             namespaces = list(site.namespace(10, all=True))
             if not site.nocapitalize:

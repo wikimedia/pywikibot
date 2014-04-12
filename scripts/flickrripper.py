@@ -118,7 +118,7 @@ def downloadPhoto(photoUrl=''):
 
 
 def findDuplicateImages(photo=None,
-                        site=pywikibot.getSite(u'commons', u'commons')):
+                        site=pywikibot.Site(u'commons', u'commons')):
     """ Takes the photo, calculates the SHA1 hash and asks the mediawiki api
     for a list of duplicates.
 
@@ -285,7 +285,7 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
                 newFilename = filename
                 skip = False
         #pywikibot.output(newPhotoDescription)
-        #if (pywikibot.Page(title=u'File:'+ filename, site=pywikibot.getSite()).exists()):
+        #if (pywikibot.Page(title=u'File:'+ filename, site=pywikibot.Site()).exists()):
         # I should probably check if the hash is the same and if not upload it under a different name
         #pywikibot.output(u'File:' + filename + u' already exists!')
         #else:
@@ -504,7 +504,7 @@ def usage():
 
 
 def main():
-    site = pywikibot.getSite(u'commons', u'commons')
+    site = pywikibot.Site(u'commons', u'commons')
     #imagerecat.initLists()
 
     #Get the api key

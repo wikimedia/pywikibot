@@ -91,12 +91,12 @@ def main(*args):
         else:
             namedict = config.usernames
     else:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
         namedict = {site.family.name: {site.code: None}}
     for familyName in namedict:
         for lang in namedict[familyName]:
             try:
-                site = pywikibot.getSite(code=lang, fam=familyName)
+                site = pywikibot.Site(code=lang, fam=familyName)
                 if logout:
                     site.logout()
                 else:

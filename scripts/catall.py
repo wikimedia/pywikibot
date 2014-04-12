@@ -59,7 +59,7 @@ q: quit.""")
 
 def make_categories(page, list, site=None):
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
     pllist = []
     for p in list:
         cattitle = "%s:%s" % (site.category_namespace(), p)
@@ -83,7 +83,7 @@ def main():
     else:
         start = ' '.join(start)
 
-    mysite = pywikibot.getSite()
+    mysite = pywikibot.Site()
 
     for p in mysite.allpages(start=start):
         try:

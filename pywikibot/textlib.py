@@ -70,7 +70,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
 
     """
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
 
     exceptionRegexes = {
         'comment':      re.compile(r'(?s)<!--.*?-->'),
@@ -407,7 +407,7 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]",
 
     """
     if insite is None:
-        insite = pywikibot.getSite()
+        insite = pywikibot.Site()
     fam = insite.family
     # when interwiki links forward to another family, retrieve pages & other
     # infos there
@@ -441,7 +441,7 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]",
                 # ignore text after the pipe
                 pagetitle = pagetitle[:pagetitle.index('|')]
             # we want the actual page objects rather than the titles
-            site = pywikibot.getSite(code=lang, fam=fam)
+            site = pywikibot.Site(code=lang, fam=fam)
             try:
                 result[site] = pywikibot.Page(site, pagetitle, insite=insite)
             except pywikibot.InvalidTitle:
@@ -462,7 +462,7 @@ def removeLanguageLinks(text, site=None, marker=''):
 
     """
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
     if not site.validLanguageLinks():
         return text
     # This regular expression will find every interwiki link, plus trailing
@@ -480,7 +480,7 @@ def removeLanguageLinks(text, site=None, marker=''):
 def removeLanguageLinksAndSeparator(text, site=None, marker='', separator=''):
     """
     Return text with all interlanguage links, plus any preceeding whitespace
-    and separateor occurrences removed.
+    and separator occurrences removed.
 
     If a link to an unknown language is encountered, a warning is printed.
     If a marker is defined, that string is placed at the location of the
@@ -509,7 +509,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
     # Find a marker that is not already in the text.
     marker = findmarker(oldtext)
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
     separator = site.family.interwiki_text_separator
     cseparator = site.family.category_text_separator
     separatorstripped = separator.strip()
@@ -595,7 +595,7 @@ def interwikiFormat(links, insite=None):
 
     """
     if insite is None:
-        insite = pywikibot.getSite()
+        insite = pywikibot.Site()
     if not links:
         return ''
 
@@ -620,7 +620,7 @@ def interwikiSort(sites, insite=None):
     if not sites:
         return []
     if insite is None:
-        insite = pywikibot.getSite()
+        insite = pywikibot.Site()
 
     sites.sort()
     putfirst = insite.interwiki_putfirst()
@@ -653,7 +653,7 @@ def getCategoryLinks(text, site=None):
     """
     result = []
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
     # Ignore category links within nowiki tags, pre tags, includeonly tags,
     # and HTML comments
     text = removeDisabledParts(text)
@@ -683,7 +683,7 @@ def removeCategoryLinks(text, site=None, marker=''):
     # NOTE: This assumes that language codes only consist of non-capital
     # ASCII letters and hyphens.
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
     catNamespace = '|'.join(site.category_namespaces())
     categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
     text = replaceExcept(text, categoryR, '',
@@ -699,14 +699,14 @@ def removeCategoryLinks(text, site=None, marker=''):
 def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
     """
     Return text with all category links, plus any preceeding whitespace
-    and separateor occurrences removed.
+    and separator occurrences removed.
 
     Put the string marker after the last replacement (at the end of the text
     if there is no replacement).
 
     """
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
     if separator:
         mymarker = findmarker(text, u'@C@')
         newtext = removeCategoryLinks(text, site, mymarker)
@@ -722,7 +722,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
 
     """
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
 
     catNamespace = '|'.join(site.category_namespaces())
     title = oldcat.title(withNamespace=False)
@@ -773,7 +773,7 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
     # Find a marker that is not already in the text.
     marker = findmarker(oldtext)
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
     if site.sitename() == 'wikipedia:de' and "{{Personendaten" in oldtext:
         raise pywikibot.Error("""\
 The Pywikibot is no longer allowed to touch categories on the German
@@ -836,7 +836,7 @@ def categoryFormat(categories, insite=None):
     if not categories:
         return ''
     if insite is None:
-        insite = pywikibot.getSite()
+        insite = pywikibot.Site()
 
     if isinstance(categories[0], basestring):
         if categories[0][0] == '[':
@@ -1166,7 +1166,7 @@ class TimeStripper(object):
 
     def __init__(self, site=None):
         if site is None:
-            self.site = pywikibot.getSite()
+            self.site = pywikibot.Site()
         else:
             self.site = site
 

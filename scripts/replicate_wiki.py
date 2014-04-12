@@ -64,7 +64,7 @@ class SyncSites:
 
         sites = options.destination_wiki
 
-        self.original = getSite(original_wiki, family)
+        self.original = Site(original_wiki, family)
 
         if options.namespace and 'help' in options.namespace:
             nsd = namespaces(self.original)
@@ -72,7 +72,7 @@ class SyncSites:
                 pywikibot.output('%s %s' % (k, nsd[k]))
             sys.exit()
 
-        self.sites = map(lambda s: getSite(s, family), sites)
+        self.sites = map(lambda s: Site(s, family), sites)
 
         self.differences = {}
         self.user_diff = {}

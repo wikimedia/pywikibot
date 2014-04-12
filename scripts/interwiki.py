@@ -931,7 +931,7 @@ class Subject(object):
                 hints=hints,
                 auto=globalvar.auto,
                 removebrackets=globalvar.hintnobracket,
-                site=pywikibot.getSite())
+                site=pywikibot.Site())
         for page in pages:
             if globalvar.contentsondisk:
                 page = StoredPage(page)
@@ -1653,7 +1653,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             frgnSiteDone = False
 
             for siteCode in lclSite.family.languages_by_size:
-                site = pywikibot.getSite(siteCode)
+                site = pywikibot.Site(siteCode)
                 if (not lclSiteDone and site == lclSite) or \
                    (not frgnSiteDone and site != lclSite and site in new):
                     if site == lclSite:
@@ -2117,7 +2117,7 @@ class InterwikiBot(object):
         self.generateUntil = until
 
     def dump(self, append=True):
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
         dumpfn = pywikibot.config.datafilepath(
             'data',
             'interwiki-dumps',
@@ -2218,8 +2218,8 @@ class InterwikiBot(object):
             # because we have to wait before submitting another modification to
             # go live. Select any language from counts.
             oc = self.counts
-        if pywikibot.getSite() in oc:
-            return pywikibot.getSite()
+        if pywikibot.Site() in oc:
+            return pywikibot.Site()
         for lang in oc:
             count = self.counts[lang]
             if count > max:
@@ -2230,7 +2230,7 @@ class InterwikiBot(object):
     def selectQuerySite(self):
         """Select the site the next query should go out for."""
         # How many home-language queries we still have?
-        mycount = self.counts.get(pywikibot.getSite(), 0)
+        mycount = self.counts.get(pywikibot.Site(), 0)
         # Do we still have enough subjects to work on for which the
         # home language has been retrieved? This is rough, because
         # some subjects may need to retrieve a second home-language page!
@@ -2253,8 +2253,8 @@ class InterwikiBot(object):
             # If we have a few, getting the home language is a good thing.
             if not globalvar.restoreAll:
                 try:
-                    if self.counts[pywikibot.getSite()] > 4:
-                        return pywikibot.getSite()
+                    if self.counts[pywikibot.Site()] > 4:
+                        return pywikibot.Site()
                 except KeyError:
                     pass
         # If getting the home language doesn't make sense, see how many
@@ -2500,7 +2500,7 @@ def main():
     elif globalvar.summary:
         globalvar.summary += u'; '
 
-    site = pywikibot.getSite()
+    site = pywikibot.Site()
     site.login()
     # ensure that we don't try to change main page
     try:
@@ -2569,7 +2569,7 @@ def main():
         if not singlePageTitle and not opthintsonly:
             singlePageTitle = pywikibot.input(u'Which page to check:')
         if singlePageTitle:
-            singlePage = pywikibot.Page(pywikibot.getSite(), singlePageTitle)
+            singlePage = pywikibot.Page(pywikibot.Site(), singlePageTitle)
         else:
             singlePage = None
         bot.add(singlePage, hints=globalvar.hints)

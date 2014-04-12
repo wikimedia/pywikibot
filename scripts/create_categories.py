@@ -40,7 +40,7 @@ from pywikibot import pagegenerators
 def createCategory(page, parent, basename):
     title = page.title(withNamespace=False)
 
-    newpage = pywikibot.Page(pywikibot.getSite(u'commons', u'commons'),
+    newpage = pywikibot.Page(pywikibot.Site(u'commons', u'commons'),
                                  u'Category:' + basename + u' ' + title)
     newtext = u''
     newtext += u'[[Category:' + parent + u'|' + title + u']]\n'

@@ -445,7 +445,7 @@ class XmlDumpNoReferencesPageGenerator:
         for entry in dump.parse():
             text = pywikibot.removeDisabledParts(entry.text)
             if self.refR.search(text) and not self.referencesR.search(text):
-                yield pywikibot.Page(pywikibot.getSite(), entry.title)
+                yield pywikibot.Page(pywikibot.Site(), entry.title)
 
 
 class NoReferencesBot:
@@ -453,7 +453,7 @@ class NoReferencesBot:
     def __init__(self, generator, always=False):
         self.generator = generator
         self.always = always
-        self.site = pywikibot.getSite()
+        self.site = pywikibot.Site()
         self.comment = i18n.twtranslate(self.site, 'noreferences-add-tag')
 
         self.refR = re.compile('</ref>', re.IGNORECASE)
@@ -462,12 +462,12 @@ class NoReferencesBot:
                                          re.IGNORECASE | re.DOTALL)
         try:
             self.referencesTemplates = referencesTemplates[
-                pywikibot.getSite().family.name][pywikibot.getSite().lang]
+                pywikibot.Site().family.name][pywikibot.Site().lang]
         except KeyError:
             self.referencesTemplates = []
         try:
             self.referencesText = referencesSubstitute[
-                pywikibot.getSite().family.name][pywikibot.getSite().lang]
+                pywikibot.Site().family.name][pywikibot.Site().lang]
         except KeyError:
             self.referencesText = u'<references />'
 
@@ -659,7 +659,7 @@ class NoReferencesBot:
                 pywikibot.output(u"Page %s is a disambig; skipping."
                                  % page.title(asLink=True))
                 continue
-            if pywikibot.getSite().sitename() == 'wikipedia:en' and \
+            if pywikibot.Site().sitename() == 'wikipedia:en' and \
                page.isIpEdit():
                 pywikibot.output(
                     u"Page %s is edited by IP. Possible vandalized"
@@ -705,12 +705,12 @@ def main():
                 pageTitle.append(arg)
 
     if pageTitle:
-        page = pywikibot.Page(pywikibot.getSite(), ' '.join(pageTitle))
+        page = pywikibot.Page(pywikibot.Site(), ' '.join(pageTitle))
         gen = iter([page])
     if not gen:
         gen = genFactory.getCombinedGenerator()
     if not gen:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
         try:
             cat = maintenance_category[site.family.name][site.lang]
         except:

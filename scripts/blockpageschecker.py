@@ -200,7 +200,7 @@ def showQuest(site, page):
                                   ['with browser', 'with gui', 'no'],
                                   ['b', 'g', 'n'], 'n')
     pathWiki = site.family.nicepath(site.lang)
-    url = 'http://%s%s%s?&redirect=no' % (pywikibot.getSite().hostname(),
+    url = 'http://%s%s%s?&redirect=no' % (pywikibot.Site().hostname(),
                                           pathWiki, page.urlname())
     if quest == 'b':
         webbrowser.open(url)
@@ -250,7 +250,7 @@ def main():
         pywikibot.output(u"Your project is not supported by this script.\n"
                          u"You have to edit the script and add it!")
         return
-    site = pywikibot.getSite()
+    site = pywikibot.Site()
     site.login()
     if protectedpages:
         generator = site.protectedpages(namespace=namespace, type=protectType)

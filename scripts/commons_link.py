@@ -52,7 +52,7 @@ class CommonsLinkBot:
         for page in self.generator:
             try:
                 pywikibot.output(u'\n>>>> %s <<<<' % page.title())
-                commons = pywikibot.getSite().image_repository()
+                commons = pywikibot.Site().image_repository()
                 commonspage = pywikibot.Page(commons, page.title())
                 try:
                     getcommons = commonspage.get(get_redirect=True)
@@ -83,7 +83,7 @@ class CommonsLinkBot:
                                 if self.acceptall or choice == 'y':
                                     try:
                                         msg = i18n.twtranslate(
-                                            pywikibot.getSite(), 'commons_link-template-added')
+                                            pywikibot.Site(), 'commons_link-template-added')
                                         page.put(text, msg)
                                     except pywikibot.EditConflict:
                                         pywikibot.output(
@@ -106,7 +106,7 @@ class CommonsLinkBot:
         for page in self.generator:
             try:
                 pywikibot.output(u'\n>>>> %s <<<<' % page.title())
-                commons = pywikibot.getSite().image_repository()
+                commons = pywikibot.Site().image_repository()
                 commonsCategory = pywikibot.Category(commons,
                                                      'Category:%s' % page.title())
                 try:
@@ -140,7 +140,7 @@ class CommonsLinkBot:
                                 if self.acceptall or choice == 'y':
                                     try:
                                         msg = i18n.twtranslate(
-                                            pywikibot.getSite(), 'commons_link-cat-template-added')
+                                            pywikibot.Site(), 'commons_link-cat-template-added')
                                         page.put(text, msg)
                                     except pywikibot.EditConflict:
                                         pywikibot.output(
@@ -171,23 +171,23 @@ def main():
         elif arg == ('categories'):
             action = 'categories'
         elif arg.startswith('-start:'):
-            start = pywikibot.Page(pywikibot.getSite(), arg[7:])
+            start = pywikibot.Page(pywikibot.Site(), arg[7:])
             gen = pagegenerators.AllpagesPageGenerator(
                 start.title(withNamespace=False),
                 namespace=start.namespace(),
                 includeredirects=False)
         elif arg.startswith('-cat:'):
-            cat = pywikibot.Category(pywikibot.getSite(),
+            cat = pywikibot.Category(pywikibot.Site(),
                                      'Category:%s' % arg[5:])
             gen = pagegenerators.CategorizedPageGenerator(cat)
         elif arg.startswith('-ref:'):
-            ref = pywikibot.Page(pywikibot.getSite(), arg[5:])
+            ref = pywikibot.Page(pywikibot.Site(), arg[5:])
             gen = pagegenerators.ReferringPageGenerator(ref)
         elif arg.startswith('-link:'):
-            link = pywikibot.Page(pywikibot.getSite(), arg[6:])
+            link = pywikibot.Page(pywikibot.Site(), arg[6:])
             gen = pagegenerators.LinkedPageGenerator(link)
         elif arg.startswith('-page:'):
-            singlepage = pywikibot.Page(pywikibot.getSite(), arg[6:])
+            singlepage = pywikibot.Page(pywikibot.Site(), arg[6:])
             gen = iter([singlepage])
         #else:
             #bug

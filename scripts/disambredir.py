@@ -152,7 +152,7 @@ def main():
         start = " ".join(start)
     else:
         start = "!"
-    mysite = pywikibot.getSite()
+    mysite = pywikibot.Site()
     linktrail = mysite.linktrail()
     try:
         generator = pagegenerators.CategorizedPageGenerator(

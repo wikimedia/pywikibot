@@ -471,7 +471,7 @@ class DisambiguationRobot(object):
         self.main_only = main_only
         self.minimum = minimum
 
-        self.mysite = pywikibot.getSite()
+        self.mysite = pywikibot.Site()
         self.mylang = self.mysite.language()
         self.comment = None
 
@@ -1040,7 +1040,7 @@ def main(*args):
                 generator = pagegenerators.TextfilePageGenerator(filename=arg[6:])
         elif arg.startswith('-pos:'):
             if arg[5] != ':':
-                mysite = pywikibot.getSite()
+                mysite = pywikibot.Site()
                 page = pywikibot.Page(pywikibot.Link(arg[5:], mysite))
                 if page.exists():
                     alternatives.append(page.title())
@@ -1064,10 +1064,10 @@ def main(*args):
             try:
                 if len(arg) <= len('-start:'):
                     generator = pagegenerators.CategorizedPageGenerator(
-                        pywikibot.getSite().disambcategory())
+                        pywikibot.Site().disambcategory())
                 else:
                     generator = pagegenerators.CategorizedPageGenerator(
-                        pywikibot.getSite().disambcategory(),
+                        pywikibot.Site().disambcategory(),
                         start=arg[7:])
                 generator = pagegenerators.NamespaceFilterPageGenerator(
                     generator, [0])

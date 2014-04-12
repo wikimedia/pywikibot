@@ -114,7 +114,7 @@ class ImageRobot:
         self.loose = loose
 
         # get edit summary message
-        mysite = pywikibot.getSite()
+        mysite = pywikibot.Site()
         if summary:
             self.editSummary = summary
         elif self.newImage:
@@ -135,7 +135,7 @@ class ImageRobot:
         # empty string if there are none.
 
         replacements = []
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
 
         if not site.nocapitalize:
             case = re.escape(self.oldImage[0].upper() + \
@@ -190,7 +190,7 @@ def main():
     if not oldImage:
         pywikibot.showHelp('image')
     else:
-        mysite = pywikibot.getSite()
+        mysite = pywikibot.Site()
         ns = mysite.image_namespace()
         oldImagePage = pywikibot.ImagePage(mysite, ns + ':' + oldImage)
         gen = pagegenerators.FileLinksGenerator(oldImagePage)

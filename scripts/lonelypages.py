@@ -116,14 +116,14 @@ def main():
                 nwlimit = 50    # Default: 50 pages
             else:
                 nwlimit = int(arg[10:])
-            generator = pywikibot.getSite().newpages(number=nwlimit)
+            generator = pywikibot.Site().newpages(number=nwlimit)
             nwpages = True
         elif arg == '-always':
             always = True
         else:
             genFactory.handleArg(arg)
     # Retrive the site
-    wikiSite = pywikibot.getSite()
+    wikiSite = pywikibot.Site()
 
     if not generator:
         generator = genFactory.getCombinedGenerator()

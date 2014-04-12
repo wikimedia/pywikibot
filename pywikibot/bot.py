@@ -243,7 +243,7 @@ def writelogheader():
     """
     # if site not available it's too early to print a header (work-a-round)
     try:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
     except AttributeError:
         return
 

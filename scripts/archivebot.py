@@ -85,7 +85,7 @@ import traceback
 
 ZERO = datetime.timedelta(0)
 
-Site = pywikibot.getSite()
+Site = pywikibot.Site()
 
 try:  # Get a constructor for the MD5 hash object
     import hashlib
@@ -513,7 +513,7 @@ def main():
     if not salt:
         salt = ''
 
-    Site = pywikibot.getSite()
+    Site = pywikibot.Site()
     language = Site.language()
 
     if not args or len(args) <= 1:

@@ -127,7 +127,7 @@ def add_text(page=None, addText=None, summary=None, regexSkip=None,
     if not addText:
         raise NoEnoughData('You have to specify what text you want to add!')
     if not summary:
-        summary = i18n.twtranslate(pywikibot.getSite(), 'add_text-adding',
+        summary = i18n.twtranslate(pywikibot.Site(), 'add_text-adding',
                                    {'adding': addText[:200]})
 
     # When a page is tagged as "really well written" it has a star in the
@@ -135,7 +135,7 @@ def add_text(page=None, addText=None, summary=None, regexSkip=None,
     # format) to make the stars appear.
 
     errorCount = 0
-    site = pywikibot.getSite()
+    site = pywikibot.Site()
     pathWiki = site.family.nicepath(site.lang)
 
     if putText:
@@ -316,10 +316,10 @@ def main():
         elif arg.startswith('-page'):
             if len(arg) == 5:
                 generator = [pywikibot.Page(
-                    pywikibot.getSite(),
+                    pywikibot.Site(),
                     pywikibot.input(u'What page do you want to use?'))]
             else:
-                generator = [pywikibot.Page(pywikibot.getSite(), arg[6:])]
+                generator = [pywikibot.Page(pywikibot.Site(), arg[6:])]
         elif arg.startswith('-excepturl'):
             if len(arg) == 10:
                 regexSkipUrl = pywikibot.input(u'What text should I skip?')
@@ -351,7 +351,7 @@ def main():
             'You have to specify the generator you want to use for the script!')
     if talkPage:
         generator = pagegenerators.PageWithTalkPageGenerator(generator)
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
         for namespace in site.namespaces():
             index = site.getNamespaceIndex(namespace)
             if index % 2 == 1 and index > 0:

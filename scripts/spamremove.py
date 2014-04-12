@@ -57,7 +57,7 @@ def main():
         pywikibot.output(u"No spam site specified.")
         return
 
-    mysite = pywikibot.getSite()
+    mysite = pywikibot.Site()
     pages = mysite.exturlusage(spamSite)
     if namespaces:
         pages = pagegenerators.NamespaceFilterPageGenerator(pages, namespaces)

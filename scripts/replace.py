@@ -268,7 +268,7 @@ class ReplaceRobot:
         self.recursive = recursive
         self.site = site
         if self.site is None:
-            self.site = pywikibot.getSite()
+            self.site = pywikibot.Site()
         if addedCat:
             cat_ns = site.category_namespaces()[0]
             self.addedCat = pywikibot.Page(self.site,
@@ -553,7 +553,7 @@ def main(*args):
                              commandline_replacements[1]))
         if not summary_commandline:
             edit_summary = i18n.twtranslate(
-                pywikibot.getSite(), 'replace-replacing',
+                pywikibot.Site(), 'replace-replacing',
                 {'description': ' (-%s +%s)' % (commandline_replacements[0],
                                                 commandline_replacements[1])}
             )
@@ -568,7 +568,7 @@ def main(*args):
                          for i in range(0, len(commandline_replacements), 2)]
                 replacementsDescription = '(%s)' % ', '.join(
                     [('-' + pair[0] + ' +' + pair[1]) for pair in pairs])
-                edit_summary = i18n.twtranslate(pywikibot.getSite(),
+                edit_summary = i18n.twtranslate(pywikibot.Site(),
                                                 'replace-replacing',
                                                 {'description':
                                                  replacementsDescription})
@@ -591,7 +591,7 @@ def main(*args):
             change += ' & -' + old + ' +' + new
             replacements.append((old, new))
         if not summary_commandline:
-            default_summary_message = i18n.twtranslate(pywikibot.getSite(),
+            default_summary_message = i18n.twtranslate(pywikibot.Site(),
                                                        'replace-replacing',
                                                        {'description': change})
             pywikibot.output(u'The summary message will default to: %s'
@@ -615,10 +615,10 @@ def main(*args):
             regex = fix['regex']
         if "msg" in fix:
             if isinstance(fix['msg'], basestring):
-                edit_summary = i18n.twtranslate(pywikibot.getSite(),
+                edit_summary = i18n.twtranslate(pywikibot.Site(),
                                                 str(fix['msg']))
             else:
-                edit_summary = pywikibot.translate(pywikibot.getSite(),
+                edit_summary = pywikibot.translate(pywikibot.Site(),
                                                    fix['msg'])
         if "exceptions" in fix:
             exceptions = fix['exceptions']
@@ -678,7 +678,7 @@ JOIN text ON (page_id = old_id)
 LIMIT 200""" % (whereClause, exceptClause)
         gen = pagegenerators.MySQLPageGenerator(query)
     elif PageTitles:
-        pages = [pywikibot.Page(pywikibot.getSite(), PageTitle)
+        pages = [pywikibot.Page(pywikibot.Site(), PageTitle)
                  for PageTitle in PageTitles]
         gen = iter(pages)
 

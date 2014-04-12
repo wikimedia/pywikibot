@@ -396,7 +396,7 @@ class BaseSite(object):
                           re.IGNORECASE | re.UNICODE | re.DOTALL)
 
     def sametitle(self, title1, title2):
-        """Return True iff title1 and title2 identify the same wiki page."""
+        """Return True if title1 and title2 identify the same wiki page."""
         # title1 and title2 may be unequal but still identify the same page,
         # if they use different aliases for the same namespace
 
@@ -3725,7 +3725,7 @@ class DataSite (APISite):
 
     def getPropertyType(self, prop):
         """
-        This is used sepecifically because we can cache
+        This is used specifically because we can cache
         the value for a much longer time (near infinite).
         """
         params = dict(

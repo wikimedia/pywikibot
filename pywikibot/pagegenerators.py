@@ -522,7 +522,7 @@ def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
 
     """
     if site is None:
-        site = pywikibot.getSite()
+        site = pywikibot.Site()
     if includeredirects:
         if includeredirects == 'only':
             filterredir = True
@@ -1102,7 +1102,7 @@ def UntaggedPageGenerator(untaggedProject, limit=500):
             'works!' % link)
     else:
         for result in results:
-            yield pywikibot.Page(pywikibot.getSite(), result)
+            yield pywikibot.Page(pywikibot.Site(), result)
 
 
 # following classes just ported from version 1 without revision; not tested
