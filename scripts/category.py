@@ -470,7 +470,7 @@ class CategoryMoveRobot(object):
             if self.history:
                 self._hist()
         self._change(pagegenerators.CategorizedPageGenerator(self.oldcat))
-        if not pagesonly:
+        if not self.pagesonly:
             self._change(pagegenerators.SubCategoriesPageGenerator( \
                 self.oldcat))
         if self.oldcat.isEmptyCategory() and self.delete_oldcat and \
