@@ -21,6 +21,7 @@ import os
 import os.path
 import sys
 import re
+import json
 
 _logger = "bot"
 
@@ -815,3 +816,32 @@ class Bot(object):
 
         if choice != 'n':
             page.put(newtext, async=(choice == 'a'))
+
+
+class WikidataBot:
+    """
+    Generic Wikidata Bot to be subclassed
+    used in claimit.py, coordinate_import.py and harvest_template.py
+    """
+
+    def cacheSources(self):
+        """
+        Fetches the sources from the onwiki list
+        and stores it internally
+        """
+        page = pywikibot.Page(self.repo, u'List of wikis/python', ns=4)
+        self.source_values = json.loads(page.get())
+        for family_code, family in self.source_values.iteritems():
+            for source_lang in family:
+                self.source_values[family_code][source_lang] = pywikibot.ItemPage(self.repo,
+                                                                                  family[source_lang])
+
+    def getSource(self, site):
+        """
+        Get the source for the specified site,
+        if possible
+        """
+        if site.family.name in self.source_values and site.code in self.source_values[site.family.name]:
+            source = pywikibot.Claim(self.repo, 'P143')
+            source.setTarget(self.source_values.get(site.family.name).get(site.code))
+            return source
