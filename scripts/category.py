@@ -399,6 +399,9 @@ class CategoryMoveRobot(object):
     subcategories.
     """
 
+    DELETION_COMMENT_AUTOMATIC = 0
+    DELETION_COMMENT_SAME_AS_EDIT_COMMENT = 1
+
     @deprecate_arg("oldCatTitle", "oldcat")
     @deprecate_arg("newCatTitle", "newcat")
     @deprecate_arg("batchMode", "batch")
@@ -410,7 +413,8 @@ class CategoryMoveRobot(object):
     @deprecate_arg("withHistory", "history")
     def __init__(self, oldcat, newcat=None, batch=False, comment='',
                  inplace=False, move_oldcat=True, delete_oldcat=True,
-                 title_regex=None, history=False, pagesonly=False):
+                 title_regex=None, history=False, pagesonly=False,
+                 deletion_comment=DELETION_COMMENT_AUTOMATIC):
         """Store all given parameters in the objects attributes.
 
         @param oldcat: The move source.
@@ -428,6 +432,12 @@ class CategoryMoveRobot(object):
         @param history: If True the history of the oldcat is posted on
             the talkpage of newcat.
         @param pagesonly: If True only move pages, not subcategories.
+        @param deletion_comment: Either string or special value:
+            DELETION_COMMENT_AUTOMATIC: use a generated message,
+            DELETION_COMMENT_SAME_AS_EDIT_COMMENT: use the same message for
+            delete that is also used for move.
+            If the value is not recognized, it's interpreted as
+            DELETION_COMMENT_AUTOMATIC.
         """
         self.site = pywikibot.Site()
         # Create attributes for the categories and their talk pages.
@@ -447,22 +457,40 @@ class CategoryMoveRobot(object):
         self.title_regex = title_regex
         self.history = history
         self.pagesonly = pagesonly
+        template_vars = {'oldcat': self.oldcat.title(withNamespace=False)}
+        if self.newcat:
+            template_vars.update({
+                'newcat': self.newcat.title(withNamespace=False),
+                'title': self.newcat.title(withNamespace=False)})
         # Set edit summary for changed pages.
-        self.comment = comment
-        if not self.comment:
+        if comment:
+            self.comment = comment
+        elif self.newcat:
+            self.comment = i18n.twtranslate(self.site,
+                                            'category-replacing',
+                                            template_vars)
+        else:
+            self.comment = i18n.twtranslate(self.site,
+                                            'category-removing',
+                                            template_vars)
+        # Set deletion reason for category page and talkpage.
+        if isinstance(deletion_comment, basestring):
+            # Deletion comment is set to given string.
+            self.deletion_comment = deletion_comment
+        elif deletion_comment == self.DELETION_COMMENT_SAME_AS_EDIT_COMMENT:
+            # Use the edit comment as the deletion comment.
+            self.deletion_comment = self.comment
+        else:
+            # Deletion comment is set to internationalized default.
             if self.newcat:
-                template_vars = {
-                    'oldcat': self.oldcat.title(withNamespace=False),
-                    'newcat': self.newcat.title(withNamespace=False)}
-                self.comment = i18n.twtranslate(self.site,
-                                                'category-replacing',
-                                                template_vars)
+                # Category is moved.
+                self.deletion_comment = i18n.twtranslate(self.site,
+                                                         'category-was-moved',
+                                                         template_vars)
             else:
-                template_vars = {'oldcat': self.oldcat.title(
-                    withNamespace=False)}
-                self.comment = i18n.twtranslate(self.site,
-                                                'category-removing',
-                                                template_vars)
+                # Category is deleted.
+                self.deletion_comment = i18n.twtranslate(self.site,
+                                                         'category-was-disbanded')
 
     def run(self):
         """The main bot function that does all the work.
@@ -490,14 +518,12 @@ class CategoryMoveRobot(object):
         """Private function to delete the category page and its talk page.
         Do not use this function from outside the class.
         """
-        template_vars = {'newcat': self.newcat.title(withNamespace=False),
-                         'title': self.newcat.title(withNamespace=False)}
-        comment = i18n.twtranslate(self.site,
-                                   'category-was-moved',
-                                   template_vars)
-        self.oldcat.delete(comment, not self.batch, mark=True)
+        self.oldcat.delete(self.deletion_comment,
+                           not self.batch, mark=True)
         if self.oldtalk.exists():
-            self.oldtalk.delete(comment, not self.batch, mark=True)
+            self.oldtalk.delete(self.deletion_comment,
+                                not self.batch,
+                                mark=True)
 
     def _change(self, gen):
         """Private function to move category contents.
@@ -965,8 +991,9 @@ def main(*args):
     # The generator gives the pages that should be worked upon.
     gen = None
 
-    # If this is set to true then the custom edit summary given for removing
+    # When this is True then the custom edit summary given for removing
     # categories from articles will also be used as the deletion reason.
+    # Otherwise it will generate deletion specific comments.
     useSummaryForDeletion = True
     action = None
     sort_by_last_name = False
@@ -1052,10 +1079,20 @@ def main(*args):
         if not toGiven:
             newCatTitle = pywikibot.input(
                 u'Please enter the new name of the category:')
-        bot = CategoryMoveRobot(oldCatTitle, newCatTitle, batchMode,
-                                editSummary, inPlace,
+        if useSummaryForDeletion:
+            deletion_comment = CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
+        else:
+            deletion_comment = CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC
+        bot = CategoryMoveRobot(oldcat=oldCatTitle,
+                                newcat=newCatTitle,
+                                batch=batchMode,
+                                comment=editSummary,
+                                inplace=inPlace,
                                 delete_oldcat=deleteEmptySourceCat,
-                                title_regex=titleRegex, history=withHistory)
+                                title_regex=titleRegex,
+                                history=withHistory,
+                                pagesonly=pagesonly,
+                                deletion_comment=deletion_comment)
         bot.run()
     elif action == 'tidy':
         catTitle = pywikibot.input(u'Which category do you want to tidy up?')
