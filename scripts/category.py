@@ -106,7 +106,7 @@ import bz2
 import pywikibot
 from pywikibot import config, pagegenerators
 from pywikibot import i18n
-from pywikibot import deprecate_arg
+from pywikibot import deprecate_arg, deprecated
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -597,6 +597,35 @@ class CategoryMoveRobot(object):
         return var
 
 
+class CategoryRemoveRobot(CategoryMoveRobot):
+
+    """Removes the category tag for a given category.
+
+    It always removes the category tag for all pages in that given category.
+
+    If pagesonly parameter is False it removes also the category from all
+    subcategories, without prompting. If the category is empty, it will be
+    tagged for deleting. Does not remove category tags pointing at
+    subcategories.
+
+    @deprecated: Using CategoryRemoveRobot is deprecated, use
+        CategoryMoveRobot without newcat param instead.
+    """
+
+    @deprecated('CategoryMoveRobot.__init__()')
+    def __init__(self, catTitle, batchMode=False, editSummary='',
+                 useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
+                 titleRegex=None, inPlace=False, pagesonly=False):
+        CategoryMoveRobot.__init__(
+            oldcat=catTitle,
+            batch=batchMode,
+            comment=editSummary,
+            deletion_comment=useSummaryForDeletion,
+            title_regex=titleRegex,
+            inplace=inPlace,
+            pagesonly=pagesonly)
+
+
 class CategoryListifyRobot:
 
     """Create a list containing all of the members in a category."""
@@ -646,75 +675,6 @@ class CategoryListifyRobot:
                              % self.list.title())
         else:
             self.list.put(listString, comment=self.editSummary)
-
-
-class CategoryRemoveRobot:
-
-    """Remove the category tag from all pages in a given category
-    and if pagesonly parameter is False also from the category pages of all
-    subcategories, without prompting.
-    If the category is empty, it will be tagged for deletion.
-    Do not remove category tags pointing at subcategories.
-
-    """
-
-    def __init__(self, catTitle, batchMode=False, editSummary='',
-                 useSummaryForDeletion=True, titleRegex=None, inPlace=False,
-                 pagesonly=False):
-        self.editSummary = editSummary
-        self.site = pywikibot.Site()
-        self.cat = pywikibot.Category(self.site, catTitle)
-        # get edit summary message
-        self.useSummaryForDeletion = useSummaryForDeletion
-        self.batchMode = batchMode
-        self.titleRegex = titleRegex
-        self.inPlace = inPlace
-        self.pagesonly = pagesonly
-        if not self.editSummary:
-            self.editSummary = i18n.twtranslate(self.site, 'category-removing',
-                                                {'oldcat': self.cat.title()})
-
-    def run(self):
-        empty = True
-        for article in self.cat.articles():
-            empty = False
-            if not self.titleRegex or re.search(self.titleRegex,
-                                                article.title()):
-                article.change_category(self.cat, None,
-                                        comment=self.editSummary,
-                                        inPlace=self.inPlace)
-        if empty:
-            pywikibot.output(u'There are no pages in category %s'
-                             % self.cat.title())
-        if self.pagesonly:
-            return
-
-        # Also removes the category tag from subcategories' pages
-        empty = True
-        for subcategory in self.cat.subcategories():
-            empty = False
-            subcategory.change_category(self.cat, None,
-                                        comment=self.editSummary,
-                                        inPlace=self.inPlace)
-        if empty:
-            pywikibot.output(u'There are no subcategories in category %s'
-                             % self.cat.title())
-        # Deletes the category page
-        if self.cat.exists() and self.cat.isEmptyCategory():
-            if self.useSummaryForDeletion and self.editSummary:
-                reason = self.editSummary
-            else:
-                reason = i18n.twtranslate(self.site, 'category-was-disbanded')
-            talkPage = self.cat.toggleTalkPage()
-            try:
-                self.cat.delete(reason, not self.batchMode)
-            except pywikibot.NoUsername:
-                pywikibot.output(
-                    u'You\'re not setup sysop info, category will not delete.'
-                    % self.cat.site())
-                return
-            if (talkPage.exists()):
-                talkPage.delete(reason=reason, prompt=not self.batchMode)
 
 
 class CategoryTidyRobot:
@@ -1068,9 +1028,15 @@ def main(*args):
         if not fromGiven:
             oldCatTitle = pywikibot.input(u'Please enter the name of the '
                                           u'category that should be removed:')
-        bot = CategoryRemoveRobot(oldCatTitle, batchMode, editSummary,
-                                  useSummaryForDeletion, inPlace=inPlace,
-                                  pagesonly=pagesonly)
+        bot = CategoryMoveRobot(oldcat=oldCatTitle,
+                                batch=batchMode,
+                                comment=editSummary,
+                                inplace=inPlace,
+                                delete_oldcat=deleteEmptySourceCat,
+                                title_regex=titleRegex,
+                                history=withHistory,
+                                pagesonly=pagesonly,
+                                deletion_comment=useSummaryForDeletion)
         bot.run()
     elif action == 'move':
         if not fromGiven:
