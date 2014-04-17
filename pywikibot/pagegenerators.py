@@ -846,6 +846,16 @@ def CategoryGenerator(generator):
         yield pywikibot.Category(page)
 
 
+def ImageGenerator(generator):
+    """
+    Wraps around another generator. Yields the same pages, but as ImagePage
+    objects instead of Page objects. Makes sense only if it is ascertained
+    that only images are being retrieved.
+    """
+    for page in generator:
+        yield pywikibot.ImagePage(page)
+
+
 def PageWithTalkPageGenerator(generator):
     """Yield pages and associated talk pages from another generator.
 
@@ -980,6 +990,13 @@ def UnCategorizedPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
     for page in site.uncategorizedpages(total=total):
+        yield page
+
+
+def UnCategorizedTemplateGenerator(total=100, site=None):
+    if site is None:
+        site = pywikibot.Site()
+    for page in site.uncategorizedtemplates(total=total):
         yield page
 
 
