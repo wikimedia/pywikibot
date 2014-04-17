@@ -118,7 +118,9 @@ cfd_templates = {
         'fi': [u'roskaa', u'poistettava', u'korjattava/nimi',
                u'yhdistettäväLuokka'],
         'he': [u'הצבעת מחיקה', u'למחוק'],
-        'nl': [u'categorieweg', u'catweg', u'wegcat', u'weg2']
+        'nl': [u'categorieweg', u'catweg', u'wegcat', u'weg2'],
+        # For testing purposes
+        'test': [u'delete']
     },
     'commons': {
         'commons': [u'cfd', u'move']
@@ -520,7 +522,8 @@ class CategoryMoveRobot(object):
         match = re.compile(REGEX,
                            re.IGNORECASE | re.MULTILINE | re.DOTALL)
         self.newcat.text = match.sub('', self.newcat.text)
-        for template_name in cfd_templates:
+        site_templates = pywikibot.translate(self.site, cfd_templates, fallback=False)
+        for template_name in site_templates:
             match = re.compile(r"{{%s.*?}}" % template_name, re.IGNORECASE)
             self.newcat.text = match.sub('', self.newcat.text)
         # Remove leading whitespace
