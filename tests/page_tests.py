@@ -141,12 +141,21 @@ class TestPageObject(PywikibotTestCase):
                          u"Test page")
         self.assertEqual(p1.title(asUrl=True),
                          "Help%3ATest_page%23Testing")
-        self.assertEqual(p1.title(asLink=True),
+        self.assertEqual(p1.title(asLink=True, insite=site),
                          u"[[Help:Test page#Testing]]")
-        self.assertEqual(p1.title(asLink=True, forceInterwiki=True),
+        self.assertEqual(p1.title(asLink=True, forceInterwiki=True, insite=site),
                          u"[[en:Help:Test page#Testing]]")
-        self.assertEqual(p1.title(asLink=True, textlink=True),
-                         p1.title(asLink=True))
+        self.assertEqual(p1.title(asLink=True, textlink=True, insite=site),
+                         p1.title(asLink=True, textlink=False, insite=site))
+        self.assertEqual(p1.title(asLink=True, withNamespace=False, insite=site),
+                         u"[[Help:Test page#Testing|Test page]]")
+        self.assertEqual(p1.title(asLink=True, forceInterwiki=True,
+                                  withNamespace=False, insite=site),
+                         u"[[en:Help:Test page#Testing|Test page]]")
+        self.assertEqual(p1.title(asLink=True, textlink=True,
+                                  withNamespace=False, insite=site),
+                         p1.title(asLink=True, textlink=False,
+                                  withNamespace=False, insite=site))
         # also test a page with non-ASCII chars and a different namespace
         p2 = pywikibot.Page(site, u"File:Jean-Léon Gérôme 003.jpg")
         self.assertEqual(p2.title(),
@@ -161,14 +170,22 @@ class TestPageObject(PywikibotTestCase):
                          u"Jean-Léon Gérôme 003.jpg")
         self.assertEqual(p2.title(asUrl=True),
                          u"File%3AJean-L%C3%A9on_G%C3%A9r%C3%B4me_003.jpg")
-        self.assertEqual(p2.title(asLink=True),
+        self.assertEqual(p2.title(asLink=True, insite=site),
                          u"[[File:Jean-Léon Gérôme 003.jpg]]")
-        self.assertEqual(p2.title(asLink=True, forceInterwiki=True),
+        self.assertEqual(p2.title(asLink=True, forceInterwiki=True, insite=site),
                          u"[[en:File:Jean-Léon Gérôme 003.jpg]]")
-        self.assertEqual(p2.title(asLink=True, textlink=True),
+        self.assertEqual(p2.title(asLink=True, textlink=True, insite=site),
                          u"[[:File:Jean-Léon Gérôme 003.jpg]]")
         self.assertEqual(p2.title(as_filename=True),
                          u"File_Jean-Léon_Gérôme_003.jpg")
+        self.assertEqual(p2.title(asLink=True, withNamespace=False, insite=site),
+                         u"[[File:Jean-Léon Gérôme 003.jpg|Jean-Léon Gérôme 003.jpg]]")
+        self.assertEqual(p2.title(asLink=True, forceInterwiki=True,
+                                  withNamespace=False, insite=site),
+                         u"[[en:File:Jean-Léon Gérôme 003.jpg|Jean-Léon Gérôme 003.jpg]]")
+        self.assertEqual(p2.title(asLink=True, textlink=True,
+                                  withNamespace=False, insite=site),
+                         u"[[:File:Jean-Léon Gérôme 003.jpg|Jean-Léon Gérôme 003.jpg]]")
 
     def testSection(self):
         """Test section() method."""

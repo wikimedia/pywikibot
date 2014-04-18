@@ -131,10 +131,14 @@ class Page(object):
               as_filename=False, insite=None):
         """Return the title of this Page, as a Unicode string.
 
-        @param underscore: if true, replace all ' ' characters with '_'
-        @param withNamespace: if false, omit the namespace prefix
+        @param underscore: (not used with asLink) if true, replace all ' '
+            characters with '_'
+        @param withNamespace: if false, omit the namespace prefix. If this
+            option is false and used together with asLink return a labeled
+            link like [[link|label]]
         @param withSection: if false, omit the section
-        @param asUrl: if true, quote title as if in an URL
+        @param asUrl: (not used with asLink) if true, quote title as if in an
+            URL
         @param asLink: if true, return the title in the form of a wikilink
         @param allowInterwiki: (only used if asLink is true) if true, format
             the link as an interwiki link if necessary
@@ -142,16 +146,19 @@ class Page(object):
             format the link as an interwiki link
         @param textlink: (only used if asLink is true) if true, place a ':'
             before Category: and Image: links
-        @param as_filename: if true, replace any characters that are unsafe
-            in filenames
+        @param as_filename: (not used with asLink) if true, replace any
+            characters that are unsafe in filenames
         @param insite: (only used if asLink is true) a site object where the
             title is to be shown. default is the current family/lang given by
             -family and -lang option i.e. config.family and config.mylang
 
         """
         title = self._link.canonical_title()
+        label = self._link.title
         if withSection and self._link.section:
-            title = title + "#" + self._link.section
+            section = u"#" + self._link.section
+        else:
+            section = u''
         if asLink:
             if insite:
                 target_code = insite.code
@@ -165,22 +172,25 @@ class Page(object):
                  or self.site.code != target_code)):
                 if self.site.family.name != target_family \
                    and self.site.family.name != self.site.code:
-                    return u'[[%s:%s:%s]]' % (self.site.family.name,
-                                              self.site.code,
-                                              title)
+                    title = u'%s:%s:%s' % (self.site.family.name,
+                                           self.site.code,
+                                           title)
                 else:
                     # use this form for sites like commons, where the
                     # code is the same as the family name
-                    return u'[[%s:%s]]' % (self.site.code,
-                                           title)
+                    title = u'%s:%s' % (self.site.code, title)
             elif textlink and (self.isImage() or self.isCategory()):
-                return u'[[:%s]]' % title
+                title = u':%s' % title
+            elif self.namespace() == 0 and not section:
+                withNamespace = True
+            if withNamespace:
+                return u'[[%s%s]]' % (title, section)
             else:
-                return u'[[%s]]' % title
+                return u'[[%s%s|%s]]' % (title, section, label)
         if not withNamespace and self.namespace() != 0:
-            title = self._link.title
-            if withSection and self._link.section:
-                title = title + "#" + self._link.section
+            title = label + section
+        else:
+            title += section
         if underscore or asUrl:
             title = title.replace(u' ', u'_')
         if asUrl:
