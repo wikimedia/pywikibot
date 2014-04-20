@@ -114,7 +114,6 @@ def main(*args):
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
-    genFactory = pagegenerators.GeneratorFactory()
     pageName = ''
     summary = None
     always = False
@@ -124,10 +123,11 @@ def main(*args):
     defaultProtection = 'sysop'
 
     # read command line parameters
-    localargs = pywikibot.handleArgs()
+    localargs = pywikibot.handleArgs(*args)
+    genFactory = pagegenerators.GeneratorFactory()
     mysite = pywikibot.Site()
 
-    for arg in pywikibot.handleArgs(*args):
+    for arg in localargs:
         if arg == '-always':
             always = True
         elif arg.startswith('-summary'):
