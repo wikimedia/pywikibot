@@ -108,6 +108,7 @@ class Throttle(object):
                                           'site': this_site})
                     if not pid and this_pid >= my_pid:
                         my_pid = this_pid + 1  # next unused process id
+                f.close()
 
             if not pid:
                 pid = my_pid

@@ -8,7 +8,11 @@ Objects representing WikidataQuery query syntax and API
 # Distributed under the terms of the MIT license.
 
 import json
-import urllib2
+import sys
+if sys.version_info[0] == 2:
+    from urllib2 import quote
+else:
+    from urllib.parse import quote
 from pywikibot.comms import http
 import pickle
 import os
@@ -421,7 +425,7 @@ class WikidataQuery():
         Get the query string for a given query or queryset
         @return query string including lables and props
         """
-        qStr = "q=%s" % urllib2.quote(str(q))
+        qStr = "q=%s" % quote(str(q))
 
         if labels:
             qStr += "&labels=%s" % ','.join(labels)
