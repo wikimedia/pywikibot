@@ -145,6 +145,16 @@ class HarvestRobot:
                                             continue
                                 elif claim.getType() == 'string':
                                     claim.setTarget(value.strip())
+                                elif claim.getType() == 'commonsMedia':
+                                    commonssite = pywikibot.Site("commons", "commons")
+                                    imagelink = pywikibot.Link(value, source=commonssite, defaultNamespace=6)
+                                    image = pywikibot.ImagePage(imagelink)
+                                    if image.isRedirectPage():
+                                        image = pywikibot.ImagePage(image.getRedirectTarget())
+                                    if not image.exists():
+                                        pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it' % (image.title(),))
+                                        continue
+                                    claim.setTarget(image)
                                 else:
                                     pywikibot.output("%s is not a supported datatype." % claim.getType())
                                     continue
