@@ -4017,6 +4017,42 @@ class DataSite (APISite):
         data = req.submit()
         return data
 
+    def createNewItemFromPage(self, page, bot=True, **kwargs):
+        """
+        Create a new Wikibase item for a provided page
+        @param page: page to fetch links from
+        @type page: pywikibot.Page
+        @param bot: whether to mark the edit as bot
+        @return: pywikibot.ItemPage of newly created item
+        """
+        sitelinks = {
+            page.site.dbName(): {
+                'site': page.site.dbName(),
+                'title': page.title(),
+            }
+        }
+        labels = {
+            page.site.language(): {
+                'language': page.site.language(),
+                'value': page.title(),
+            }
+        }
+        for link in page.iterlanglinks():
+            sitelinks[link.site.dbName()] = {
+                'site': link.site.dbName(),
+                'title': link.title,
+            }
+            labels[link.site.language()] = {
+                'language': link.site.language(),
+                'value': link.title,
+            }
+        data = {
+            'sitelinks': sitelinks,
+            'labels': labels,
+        }
+        result = self.editEntity({}, data, bot=bot, **kwargs)
+        return pywikibot.ItemPage(self, result['entity']['id'])
+
     # deprecated BaseSite methods
     def fam(self):
         raise NotImplementedError
