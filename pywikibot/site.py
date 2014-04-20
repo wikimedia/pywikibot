@@ -2394,21 +2394,21 @@ class APISite(BaseSite):
             edits to existing pages, "new" for new pages, "log" for log
             entries)
         @type changetype: basestring
-        @param showMinor: if True, only list minor edits; if False (and not
-            None), only list non-minor edits
-        @type showMinor: bool
-        @param showBot: if True, only list bot edits; if False (and not
-            None), only list non-bot edits
-        @type showBot: bool
-        @param showAnon: if True, only list anon edits; if False (and not
-            None), only list non-anon edits
-        @type showAnon: bool
+        @param showMinor: if True, only list minor edits; if False, only list
+            non-minor edits; if None, list all
+        @type showMinor: bool or None
+        @param showBot: if True, only list bot edits; if False, only list
+            non-bot edits; if None, list all
+        @type showBot: bool or None
+        @param showAnon: if True, only list anon edits; if False, only list
+            non-anon edits; if None, list all
+        @type showAnon: bool or None
         @param showRedirects: if True, only list edits to redirect pages; if
-            False (and not None), only list edits to non-redirect pages
-        @type showRedirects: bool
-        @param showPatrolled: if True, only list patrolled edits; if False
-            (and not None), only list non-patrolled edits
-        @type showPatrolled: bool
+            False, only list edits to non-redirect pages; if None, list all
+        @type showRedirects: bool or None
+        @param showPatrolled: if True, only list patrolled edits; if False,
+            only list non-patrolled edits; if None, list all
+        @type showPatrolled: bool or None
         @param topOnly: if True, only list changes that are the latest revision
             (default False)
         @type topOnly: bool
