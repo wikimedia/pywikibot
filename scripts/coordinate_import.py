@@ -18,18 +18,17 @@ python coordinate_import.py -lang:it -family:wikipedia -transcludes:Infobox_staz
 """
 #
 # (C) Multichill 2014
-# (C) Pywikibot team, 2013
+# (C) Pywikibot team, 2013-2014
 #
 # Distributed under the terms of MIT License.
 #
 __version__ = '$Id$'
 #
-import json
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators, WikidataBot
 
 
-class coordImportRobot:
+class CoordImportRobot(WikidataBot):
     """
     A bot to import coordinates to Wikidata
     """
@@ -40,31 +39,8 @@ class coordImportRobot:
 
         """
         self.generator = pagegenerators.PreloadingGenerator(generator)
-        self.site = pywikibot.Site()
         self.repo = pywikibot.Site().data_repository()
         self.cacheSources()
-
-    def getSource(self, lang):
-        """
-        Get the source for the specified language,
-        if possible
-        """
-        if lang in self.source_values:
-            source = pywikibot.Claim(self.repo, 'p143')
-            source.setTarget(self.source_values.get(lang))
-            return source
-
-    def cacheSources(self):
-        """
-        Fetches the sources from the onwiki list
-        and stores it internally
-        """
-        page = pywikibot.Page(self.repo, u'Wikidata:List of wikis/python')
-        self.source_values = json.loads(page.get())
-        self.source_values = self.source_values['wikipedia']
-        for source_lang in self.source_values:
-            self.source_values[source_lang] = pywikibot.ItemPage(self.repo,
-                                                                 self.source_values[source_lang])
 
     def run(self):
         """
@@ -88,7 +64,7 @@ class coordImportRobot:
                         pywikibot.output(u'Adding %s, %s to %s' % (coordinate.lat, coordinate.lon, item.title()))
                         item.addClaim(newclaim)
 
-                        source = self.getSource(page.site.language())
+                        source = self.getSource(page.site)
                         if source:
                             newclaim.addSource(source, bot=True)
 
@@ -102,7 +78,7 @@ def main():
 
     generator = gen.getCombinedGenerator()
 
-    coordbot = coordImportRobot(generator)
+    coordbot = CoordImportRobot(generator)
     coordbot.run()
 
 if __name__ == "__main__":

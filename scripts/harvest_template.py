@@ -16,7 +16,7 @@ python harvest_template.py -lang:nl -cat:Sisoridae -template:"Taxobox straalvinn
 """
 #
 # (C) Multichill, Amir, 2013
-# (C) Pywikibot team, 2013
+# (C) Pywikibot team, 2013-2014
 #
 # Distributed under the terms of MIT License.
 #
@@ -24,14 +24,13 @@ __version__ = '$Id$'
 #
 
 import re
-import json
 import pywikibot
-from pywikibot import pagegenerators as pg
+from pywikibot import pagegenerators as pg, WikidataBot
 
 docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
 
 
-class HarvestRobot:
+class HarvestRobot(WikidataBot):
     """
     A bot to add Wikidata claims
     """
@@ -50,28 +49,6 @@ class HarvestRobot:
         self.repo = pywikibot.Site().data_repository()
         self.cacheSources()
 
-    def getSource(self, site):
-        """
-        Get the source for the specified site,
-        if possible
-        """
-        if site.family.name in self.source_values and site.code in self.source_values[site.family.name]:
-            source = pywikibot.Claim(self.repo, 'P143')
-            source.setTarget(self.source_values.get(site.family.name).get(site.code))
-            return source
-
-    def cacheSources(self):
-        """
-        Fetches the sources from the onwiki list
-        and stores it internally
-        """
-        page = pywikibot.Page(self.repo, u'List of wikis/python', ns=4)
-        self.source_values = json.loads(page.get())
-        for family_code, family in self.source_values.iteritems():
-            for source_lang in family:
-                self.source_values[family_code][source_lang] = pywikibot.ItemPage(self.repo,
-                                                                                  family[source_lang])
-
     def run(self):
         """
         Starts the robot.
@@ -79,7 +56,7 @@ class HarvestRobot:
         self.templateTitles = self.getTemplateSynonyms(self.templateTitle)
         for page in self.generator:
             try:
-                self.procesPage(page)
+                self.processPage(page)
             except Exception as e:
                 pywikibot.exception(tb=True)
 
@@ -97,9 +74,9 @@ class HarvestRobot:
         titles.append(temp.title(withNamespace=False))
         return titles
 
-    def procesPage(self, page):
+    def processPage(self, page):
         """
-        Proces a single page
+        Process a single page
         """
         item = pywikibot.ItemPage.fromPage(page)
         pywikibot.output('Processing %s' % page)

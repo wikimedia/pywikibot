@@ -50,19 +50,18 @@ but 'p' must be included.
 """
 #
 # (C) Legoktm, 2013
-# (C) Pywikibot team, 2013
+# (C) Pywikibot team, 2013-2014
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
 #
 
-import json
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators, WikidataBot
 
 
-class ClaimRobot:
+class ClaimRobot(WikidataBot):
     """
     A bot to add Wikidata claims
     """
@@ -79,28 +78,6 @@ class ClaimRobot:
         self.exists_arg = exists_arg
         self.repo = pywikibot.Site().data_repository()
         self.cacheSources()
-
-    def getSource(self, lang):
-        """
-        Get the source for the specified language,
-        if possible
-        """
-        if lang in self.source_values:
-            source = pywikibot.Claim(self.repo, 'p143')
-            source.setTarget(self.source_values.get(lang))
-            return source
-
-    def cacheSources(self):
-        """
-        Fetches the sources from the onwiki list
-        and stores it internally
-        """
-        page = pywikibot.Page(self.repo, u'Wikidata:List of wikis/python')
-        self.source_values = json.loads(page.get())
-        self.source_values = self.source_values['wikipedia']
-        for source_lang in self.source_values:
-            self.source_values[source_lang] = pywikibot.ItemPage(self.repo,
-                                                                 self.source_values[source_lang])
 
     def run(self):
         """
@@ -147,7 +124,7 @@ class ClaimRobot:
                                      % (claim.getID(), claim.getTarget()))
                     item.addClaim(claim)
                     # A generator might yield pages from multiple languages
-                    source = self.getSource(page.site.language())
+                    source = self.getSource(page.site)
                     if source:
                         claim.addSource(source, bot=True)
                     # TODO FIXME: We need to check that we aren't adding a
