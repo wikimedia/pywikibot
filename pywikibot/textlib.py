@@ -20,7 +20,6 @@ except ImportError:
     mwparserfromhell = False
 import pywikibot
 import datetime
-from collections import OrderedDict
 import re
 import sys
 if sys.version_info[0] == 2:
@@ -920,7 +919,7 @@ def extract_templates_and_params(text):
     code = mwparserfromhell.parse(text)
     result = []
     for template in code.filter_templates(recursive=True):
-        params = OrderedDict()
+        params = {}
         for param in template.params:
             params[unicode(param.name)] = unicode(param.value)
         result.append((unicode(template.name.strip()), params))
@@ -1042,7 +1041,7 @@ def extract_templates_and_params_regex(text):
 
             # Parameters
             paramString = m.group('params')
-            params = OrderedDict()
+            params = {}
             numbered_param = 1
             if paramString:
                 # Replace wikilinks with markers
