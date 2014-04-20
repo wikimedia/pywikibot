@@ -131,9 +131,11 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         Use chmod 600 password-file.
 
         All lines below should be valid Python tuples in the form
-        (code, family, username, password) or (username, password)
-        to set a default password for an username. Default usernames
-        should occur above specific usernames.
+        (code, family, username, password),
+        (family, username, password) or
+        (username, password)
+        to set a default password for an username. The last matching entry will
+        be used, so default usernames should occur above specific usernames.
 
         If the username or password contain non-ascii characters, they
         should be stored using the utf-8 encoding.
@@ -142,21 +144,26 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         (u"my_username", u"my_default_password")
         (u"my_sysop_user", u"my_sysop_password")
-        (u"en", u"wikipedia", u"my_en_user", u"my_en_pass")
+        (u"wikipedia", u"my_wikipedia_user", u"my_wikipedia_pass")
+        (u"en", u"wikipedia", u"my_en_wikipedia_user", u"my_en_wikipedia_pass")
         """
         password_f = open(config.password_file)
         for line in password_f:
             if not line.strip():
                 continue
             entry = eval(line.decode('utf-8'))
-            if len(entry) == 2:    # for default userinfo
-                if entry[0] == self.username:
-                    self.password = entry[1]
-            elif len(entry) == 4:  # for userinfo included code and family
+            if len(entry) == 4:         # for userinfo included code and family
                 if entry[0] == self.site.code and \
                    entry[1] == self.site.family.name and \
                    entry[2] == self.username:
                     self.password = entry[3]
+            elif len(entry) == 3:       # for userinfo included family
+                if entry[0] == self.site.family.name and \
+                   entry[1] == self.username:
+                    self.password = entry[2]
+            elif len(entry) == 2:       # for default userinfo
+                if entry[0] == self.username:
+                    self.password = entry[1]
         password_f.close()
 
     def login(self, retry=False):
