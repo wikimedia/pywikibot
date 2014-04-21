@@ -12,7 +12,7 @@ __version__ = '$Id$'
 import datetime
 
 import pywikibot
-from utils import PywikibotTestCase, unittest
+from tests.utils import PywikibotTestCase, unittest
 from pywikibot.textlib import TimeStripper, tzoneFixedOffset
 
 

@@ -6,7 +6,7 @@
 #
 __version__ = '$Id$'
 
-from utils import unittest
+from tests.utils import unittest
 from pywikibot import date
 
 

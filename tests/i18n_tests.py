@@ -10,7 +10,7 @@ import os
 from pywikibot import i18n
 import shutil
 
-from utils import unittest
+from tests.utils import unittest
 
 
 class TestTranslate(unittest.TestCase):

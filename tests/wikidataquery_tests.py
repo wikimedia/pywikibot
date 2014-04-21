@@ -12,7 +12,7 @@ __version__ = '$Id$'
 
 
 import pywikibot.data.wikidataquery as query
-from utils import unittest
+from tests.utils import unittest
 
 import pywikibot
 from pywikibot.page import ItemPage, PropertyPage, Claim
