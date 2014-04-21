@@ -63,6 +63,8 @@ Options for several actions:
                   and do not remove them
  * -match       - Only work on pages whose titles match the given regex (for
                   move and remove actions).
+ * -depth:      - The max depth limit beyond which no subcategories will be
+                  listed.
 
 For the actions tidy and tree, the bot will store the category structure
 locally in category.dump. This saves time and server load, but if it uses
@@ -747,22 +749,21 @@ class CategoryTidyRobot:
 
         pywikibot.output('\n' + full_text[:contextLength] + '\n')
 
-        subcatlist = self.catDB.getSubcats(current_cat)
-        supercatlist = self.catDB.getSupercats(current_cat)
+        # we need list to index the choice
+        subcatlist = list(self.catDB.getSubcats(current_cat))
+        supercatlist = list(self.catDB.getSupercats(current_cat))
 
-        if len(subcatlist) == 0:
+        if not subcatlist:
             pywikibot.output('This category has no subcategories.\n')
-        if len(supercatlist) == 0:
+        if not supercatlist:
             pywikibot.output('This category has no supercategories.\n')
         # show subcategories as possible choices (with numbers)
-        for i in range(len(supercatlist)):
+        for i, supercat in enumerate(supercatlist):
             # layout: we don't expect a cat to have more than 10 supercats
-            pywikibot.output(u'u%d - Move up to %s'
-                             % (i, supercatlist[i].title()))
-        for i in range(len(subcatlist)):
+            pywikibot.output(u'u%d - Move up to %s' % (i, supercat.title()))
+        for i, subcat in enumerate(subcatlist):
             # layout: we don't expect a cat to have more than 100 subcats
-            pywikibot.output(u'%2d - Move down to %s'
-                             % (i, subcatlist[i].title()))
+            pywikibot.output(u'%2d - Move down to %s' % (i, subcat.title()))
         pywikibot.output(' j - Jump to another category')
         pywikibot.output(' s - Skip this article')
         pywikibot.output(' r - Remove this category tag')
@@ -843,8 +844,7 @@ class CategoryTidyRobot:
 
 
 class CategoryTreeRobot:
-    '''
-    Robot to create tree overviews of the category structure.
+    """ Robot to create tree overviews of the category structure.
 
     Parameters:
         * catTitle - The category which will be the tree's root.
@@ -854,7 +854,7 @@ class CategoryTreeRobot:
                      won't be a problem.
         * filename - The textfile where the tree should be saved; None to print
                      the tree to stdout.
-    '''
+    """
 
     def __init__(self, catTitle, catDB, filename=None, maxDepth=10):
         self.catTitle = catTitle
@@ -862,39 +862,41 @@ class CategoryTreeRobot:
         if filename and not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         self.filename = filename
-        # TODO: make maxDepth changeable with a parameter or config file entry
         self.maxDepth = maxDepth
         self.site = pywikibot.Site()
 
     def treeview(self, cat, currentDepth=0, parent=None):
-        '''
-        Returns a multi-line string which contains a tree view of all
+        """ Return a multi-line string which contains a tree view of all
         subcategories of cat, up to level maxDepth. Recursively calls itself.
 
         Parameters:
             * cat - the Category of the node we're currently opening
             * currentDepth - the current level in the tree (for recursion)
             * parent - the Category of the category we're coming from
-        '''
 
-        result = u'#' * currentDepth
-        result += '[[:%s|%s]]' % (cat.title(), cat.title().split(':', 1)[1])
+        """
+
+        result = u'#' * currentDepth + ' '
+        result += cat.title(asLink=True, textlink=True, withNamespace=False)
         result += ' (%d)' % len(self.catDB.getArticles(cat))
-        # We will remove an element of this array, but will need the original
-        # array later, so we create a shallow copy with [:]
-        supercats = self.catDB.getSupercats(cat)[:]
+        # We will remove an element of supercats, but need the original set
+        # later, so we create a list from the catDB.getSupercats(cat) set
+        supercats = list(self.catDB.getSupercats(cat))
         # Find out which other cats are supercats of the current cat
         try:
             supercats.remove(parent)
         except:
             pass
-        if supercats != []:
+        if supercats:
+            if currentDepth < self.maxDepth / 2:
+                # noisy dots
+                pywikibot.output('.', newline=False)
             supercat_names = []
-            for i in range(len(supercats)):
+            for i, cat in enumerate(supercats):
                 # create a list of wiki links to the supercategories
-                supercat_names.append('[[:%s|%s]]'
-                                      % (supercats[i].title(),
-                                         supercats[i].title().split(':', 1)[1]))
+                supercat_names.append(cat.title(asLink=True,
+                                                textlink=True,
+                                                withNamespace=False))
                 # print this list, separated with commas, using translations
                 # given in also_in_cats
             result += ' ' + i18n.twtranslate(self.site, 'category-also-in',
@@ -906,9 +908,9 @@ class CategoryTreeRobot:
                 # recurse into subdirectories
                 result += self.treeview(subcat, currentDepth + 1, parent=cat)
         else:
-            if self.catDB.getSubcats(cat) != []:
+            if self.catDB.getSubcats(cat):
                 # show that there are more categories beyond the depth limit
-                result += '#' * (currentDepth + 1) + '[...]\n'
+                result += '#' * (currentDepth + 1) + ' [...]\n'
         return result
 
     def run(self):
@@ -921,7 +923,9 @@ class CategoryTreeRobot:
 
         """
         cat = pywikibot.Category(self.site, self.catTitle)
+        pywikibot.output('Generating tree...', newline=False)
         tree = self.treeview(cat)
+        pywikibot.output(u'')
         if self.filename:
             pywikibot.output(u'Saving results in %s' % self.filename)
             import codecs
@@ -947,6 +951,8 @@ def main(*args):
     titleRegex = None
     pagesonly = False
     withHistory = False
+    rebuild = False
+    depth = 5
 
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
@@ -958,7 +964,6 @@ def main(*args):
     # If this is set to true then the custom edit summary given for removing
     # categories from articles will also be used as the deletion reason.
     useSummaryForDeletion = True
-    catDB = CategoryDatabase()
     action = None
     sort_by_last_name = False
     create_pages = False
@@ -982,7 +987,7 @@ def main(*args):
         elif arg == '-person':
             sort_by_last_name = True
         elif arg == '-rebuild':
-            catDB.rebuild()
+            rebuild = True
         elif arg.startswith('-from:'):
             oldCatTitle = arg[len('-from:'):].replace('_', ' ')
             fromGiven = True
@@ -1019,9 +1024,13 @@ def main(*args):
             follow_redirects = True
         elif arg == '-hist':
             withHistory = True
+        elif arg.startswith('-depth:'):
+            depth = int(arg[len('-depth:'):])
         else:
             genFactory.handleArg(arg)
     pywikibot.Site().login()
+
+    catDB = CategoryDatabase(rebuild=rebuild)
     gen = genFactory.getCombinedGenerator()
     if action == 'add':
         if not gen:
@@ -1065,7 +1074,7 @@ def main(*args):
         filename = pywikibot.input(
             u'Please enter the name of the file where the tree should be saved,'
             u'\nor press enter to simply show the tree:')
-        bot = CategoryTreeRobot(catTitle, catDB, filename)
+        bot = CategoryTreeRobot(catTitle, catDB, filename, depth)
         bot.run()
     elif action == 'listify':
         if not fromGiven:
