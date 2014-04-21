@@ -11,7 +11,7 @@ class Family(family.WikimediaFamily):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'pl', 'en', 'it', 'ru', 'de', 'fr', 'pt', 'es', 'cs', 'sk', 'bg',
+            'pl', 'en', 'it', 'ru', 'de', 'pt', 'fr', 'es', 'cs', 'sk', 'bg',
             'bs', 'tr', 'uk', 'sl', 'he', 'lt', 'fa', 'eo', 'el', 'id', 'zh',
             'ca', 'hu', 'fi', 'sv', 'li', 'nl', 'hr', 'nn', 'no', 'ja', 'az',
             'sa', 'hy', 'ar', 'et', 'ko', 'ml', 'gl', 'cy', 'ka', 'sr', 'ro',
