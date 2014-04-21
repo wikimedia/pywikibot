@@ -1058,6 +1058,11 @@ class Page(object):
         """
         return ItemPage.fromPage(self)
 
+    @deprecate_arg('tllimit', None)
+    @deprecated("Page.templates()")
+    def getTemplates(self, tllimit=5000):
+        return self.templates()
+
     def templates(self, content=False):
         """Return a list of Page objects for templates used on this Page.
 
