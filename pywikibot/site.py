@@ -16,6 +16,7 @@ try:
 except ImportError:
     from md5 import md5
 import datetime
+import imp
 import itertools
 import os
 import re
@@ -84,24 +85,16 @@ def Family(fam=None, fatal=True):
     if fam is None:
         fam = config.family
     try:
-        # first try the built-in families
-        name = "pywikibot.families.%s_family" % fam
-        __import__(name)
-        myfamily = sys.modules[name]
-    except ImportError:
-        # next see if user has defined a local family module
-        try:
-            sys.path.append(config.datafilepath('families'))
-            myfamily = __import__("%s_family" % fam)
-        except ImportError:
-            if fatal:
-                pywikibot.error(u"""\
+        myfamily = imp.load_source(fam, config.family_files[fam])
+    except (ImportError, KeyError):
+        if fatal:
+            pywikibot.error(u"""\
 Error importing the %s family. This probably means the family
 does not exist. Also check your configuration file."""
-                                % fam, exc_info=True)
-                sys.exit(1)
-            else:
-                raise Error("Family %s does not exist" % fam)
+                            % fam, exc_info=True)
+            sys.exit(1)
+        else:
+            raise Error("Family %s does not exist" % fam)
     return myfamily.Family()
 
 
@@ -881,10 +874,13 @@ class APISite(BaseSite):
         self._loginstatus = LoginStatus.IN_PROGRESS
         if hasattr(self, "_userinfo"):
             del self._userinfo
-        self.getuserinfo()
-        if self.userinfo['name'] == self._username[sysop] and \
-           self.logged_in(sysop):
-            return
+        try:
+            self.getuserinfo()
+            if self.userinfo['name'] == self._username[sysop] and \
+               self.logged_in(sysop):
+                return
+        except pywikibot.data.api.APIError:  # May occur if you are not logged in (no API read permissions).
+            pass
         loginMan = api.LoginManager(site=self, sysop=sysop,
                                     user=self._username[sysop])
         if loginMan.login(retry=True):
@@ -1331,12 +1327,15 @@ class APISite(BaseSite):
         version numbers and any other text contained in the version.
 
         """
-        if force:
-            self._getsiteinfo(force=True)    # drop/expire cache and reload
-        versionstring = self.siteinfo['generator']
-        m = re.match(r"^MediaWiki ([0-9]+)\.([0-9]+)(.*)$", versionstring)
-        if m:
-            return (int(m.group(1)), int(m.group(2)), m.group(3))
+        try:
+            if force:
+                self._getsiteinfo(force=True)    # drop/expire cache and reload
+            versionstring = self.siteinfo['generator']
+            m = re.match(r"^MediaWiki ([0-9]+)\.([0-9]+)(.*)$", versionstring)
+            if m:
+                return (int(m.group(1)), int(m.group(2)), m.group(3))
+        except pywikibot.data.api.APIError:  # May occur if you are not logged in (no API read permissions).
+            return (0, 0, 0)
 
     def loadpageinfo(self, page):
         """Load page info from api and save in page attributes"""
