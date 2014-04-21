@@ -578,7 +578,12 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
 
     @property
     def oldest_revision(self):
-        return self.getVersionHistory(reverseOrder=True, total=1)[0]
+        """
+        Return the first revision of this page.
+
+        @rtype: L{Revision}
+        """
+        return next(self.revisions(reverseOrder=True, total=1))
 
     def isRedirectPage(self):
         """Return True if this is a redirect, False if not or not existing."""
@@ -1384,6 +1389,14 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """
         return self.site.getredirtarget(self)
 
+    def revisions(self, reverseOrder=False, step=None, total=None):
+        """Generator which loads the version history as Revision instances."""
+        # TODO: Only request uncached revisions
+        self.site.loadrevisions(self, getText=False, rvdir=reverseOrder,
+                                step=step, total=total)
+        return (self._revisions[rev] for rev in
+                sorted(self._revisions, reverse=not reverseOrder)[:total])
+
     # BREAKING CHANGE: in old framework, default value for getVersionHistory
     #                  returned no more than 500 revisions; now, it iterates
     #                  all revisions unless 'total' argument is used
@@ -1449,6 +1462,30 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         history = self.getVersionHistory(step=step, total=total)
         users = set(entry.user for entry in history)
         return users
+
+    @deprecated('oldest_revision')
+    def getCreator(self):
+        """Get the first revision of the page.
+
+        DEPRECATED: Use Page.oldest_revision.
+
+        @rtype: tuple(username, Timestamp)
+        """
+        result = self.oldest_revision
+        return result.user, result.timestamp
+
+    @deprecated('revisions')
+    @deprecated_args(limit="total")
+    def getLatestEditors(self, total=1):
+        """Get a list of revision informations of the last total edits.
+
+        DEPRECATED: Use Page.revisions.
+
+        @param total: iterate no more than this number of revisions in total
+        @rtype: list of dict, each dict containing the username and Timestamp
+        """
+        return [{'user': rev.user, 'timestamp': rev.timestamp}
+                for rev in self.revisions(total=total)]
 
     @deprecate_arg("throttle", None)
     def move(self, newtitle, reason=None, movetalkpage=True, sysop=False,

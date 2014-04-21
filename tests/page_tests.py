@@ -252,6 +252,12 @@ class TestPageObjectEnglish(TestCase):
                                   withNamespace=False, insite=site),
                          u"[[:File:Jean-Léon Gérôme 003.jpg|Jean-Léon Gérôme 003.jpg]]")
 
+    def test_creation(self):
+        mainpage = self.get_mainpage()
+        creation = mainpage.getCreator()
+        self.assertEqual(creation[0], 'TwoOneTwo')
+        self.assertIsInstance(creation[1], pywikibot.Timestamp)
+
 
 class TestPageObject(DefaultSiteTestCase):
 
