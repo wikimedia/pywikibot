@@ -42,7 +42,4 @@ class UnixUI(terminal_interface_base.UI):
             # just to be sure, reset the color
             text += unixColors['default']
 
-        if hasattr(targetStream, 'encoding'):
-            targetStream.write(text)
-        else:
-            targetStream.write(text.encode(self.encoding, 'replace'))
+        targetStream.write(text.encode(self.encoding, 'replace'))
