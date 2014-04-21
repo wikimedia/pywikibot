@@ -35,7 +35,7 @@ if sys.version_info[0] == 2:
 else:
     from ssl import SSLError as SSLHandshakeError
     import queue as Queue
-    import urllib.parse as urlparse
+    import urllib as urlparse
     from http import cookiejar as cookielib
 
 from pywikibot import config
@@ -76,7 +76,7 @@ else:
 
 
 # Build up HttpProcessors
-pywikibot.log(u'Starting %(numthreads)i threads...' % locals())
+pywikibot.log('Starting %(numthreads)i threads...' % locals())
 for i in range(numthreads):
     proc = threadedhttp.HttpProcessor(http_queue, cookie_jar, connection_pool)
     proc.setDaemon(True)
@@ -92,7 +92,7 @@ def _flush():
     message = u'Waiting for %i network thread(s) to finish. Press ctrl-c to abort' % len(threads)
     if hasattr(sys, 'last_type'):
         # we quit because of an exception
-        print(sys.last_type)
+        print sys.last_type
         pywikibot.critical(message)
     else:
         pywikibot.log(message)

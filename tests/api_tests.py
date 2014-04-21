@@ -19,9 +19,9 @@ class TestApiFunctions(unittest.TestCase):
     def testObjectCreation(self):
         """Test that api.Request() creates an object with desired attributes"""
         req = api.Request(site=mysite, action="test", foo="", bar="test")
-        self.assertTrue(req)
+        self.assert_(req)
         self.assertEqual(req.site, mysite)
-        self.assertIn("foo", req.params)
+        self.assert_("foo" in req.params)
         self.assertEqual(req["bar"], "test")
         # test item assignment
         req["one"] = "1"
@@ -29,9 +29,8 @@ class TestApiFunctions(unittest.TestCase):
         # test compliance with dict interface
         # req.keys() should contain "action", "foo", "bar", "one"
         self.assertEqual(len(req.keys()), 4)
-        self.assertIn("test", req.values())
-        for item in req.items():
-            self.assertEqual(len(item), 2, item)
+        self.assert_("test" in req.values())
+        self.assert_(all(len(item) == 2 for item in req.items()))
 
 
 class TestPageGenerator(PywikibotTestCase):
@@ -71,7 +70,7 @@ class TestPageGenerator(PywikibotTestCase):
         for page in results:
             self.assertEqual(type(page), pywikibot.Page)
             self.assertEqual(page.site, mysite)
-            self.assertIn(page.title(), titles)
+            self.assert_(page.title() in titles)
 
 
 class TestCachedRequest(unittest.TestCase):
