@@ -391,11 +391,12 @@ class ReferringPageGeneratorWithIgnore:
 
 
 class PrimaryIgnoreManager(object):
-    '''
+    """
     If run with the -primary argument, reads from a file which pages should
     not be worked on; these are the ones where the user pressed n last time.
     If run without the -primary argument, doesn't ignore any pages.
-    '''
+
+    """
     def __init__(self, disambPage, enabled=False):
         self.disambPage = disambPage
         self.enabled = enabled
@@ -438,6 +439,7 @@ class PrimaryIgnoreManager(object):
 
 
 class DisambiguationRobot(object):
+
     ignore_contents = {
         'de': (u'{{[Ii]nuse}}',
                u'{{[Ll]öschen}}',
@@ -648,7 +650,8 @@ class DisambiguationRobot(object):
                     if not self.always:
                         # at the beginning of the link, start red color.
                         # at the end of the link, reset the color to default
-                        pywikibot.output(text[max(0, m.start() - context):m.start()]
+                        pywikibot.output(text[max(0, m.start() - context):
+                                              m.start()]
                                          + '\03{lightred}'
                                          + text[m.start():m.end()]
                                          + '\03{default}'
@@ -681,12 +684,12 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                         editor = editarticle.TextEditor()
                         if disambPage.isRedirectPage():
                             disambredir = disambPage.getRedirectTarget()
-                            disambigText = editor.edit(
+                            editor.edit(
                                 disambredir.get(),
                                 jumpIndex=m.start(),
                                 highlight=disambredir.title())
                         else:
-                            disambigText = editor.edit(
+                            editor.edit(
                                 disambPage.get(),
                                 jumpIndex=m.start(),
                                 highlight=disambPage.title())
@@ -706,7 +709,8 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                 elif choice in ['n', 'N']:
                     # skip this page
                     if self.primary:
-                        # If run with the -primary argument, skip this occurence next time.
+                        # If run with the -primary argument, skip this
+                        # occurence next time.
                         self.primaryIgnoreManager.ignore(refPage)
                     return True
                 elif choice in ['q', 'Q']:
@@ -737,9 +741,10 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                     link_text += trailing_chars
                 # '?', '/' for old choice
                 if choice in ['t', 'T', '?', '/']:
-                    #small chunk of text to search
+                    # small chunk of text to search
                     search_text = text[m.end():m.end() + context]
-                    #figure out where the link (and sentance) ends, put note there
+                    # figure out where the link (and sentance) ends, put note
+                    # there
                     end_of_word_match = re.search("\s", search_text)
                     if end_of_word_match:
                         position_split = end_of_word_match.start(0)
@@ -776,8 +781,8 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                         continue
                     if choice >= len(self.alternatives) or choice < 0:
                         pywikibot.output(
-u"Choice out of range. Please select a number between 0 and %i."
-                            % (len(self.alternatives) - 1))
+                            u"Choice out of range. Please select a number "
+                            u"between 0 and %i." % (len(self.alternatives) - 1))
                         # show list of possible choices
                         self.listAlternatives()
                         # step back to ask the user again what to do with the
@@ -843,7 +848,8 @@ u"Choice out of range. Please select a number between 0 and %i."
                 and self.primary_redir_template[disambPage.site.lang]
                     in disambPage.templates(get_redirect=True)):
                 baseTerm = disambPage.title()
-                for template in disambPage.templatesWithParams(get_redirect=True):
+                for template in disambPage.templatesWithParams(
+                        get_redirect=True):
                     if template[0] == self.primary_redir_template[
                         disambPage.site.lang] \
                             and len(template[1]) > 0:
@@ -977,8 +983,8 @@ u"Page does not exist, using the first link in page %s."
             ]
 
         for disambPage in self.generator:
-            self.primaryIgnoreManager = PrimaryIgnoreManager(disambPage,
-                                                             enabled=self.primary)
+            self.primaryIgnoreManager = PrimaryIgnoreManager(
+                disambPage, enabled=self.primary)
 
             if not self.findAlternatives(disambPage):
                 continue
@@ -1021,7 +1027,6 @@ def main(*args):
     main_only = False
 
     # For sorting the linked pages, case can be ignored
-    ignoreCase = False
     minimum = 0
 
     for arg in pywikibot.handleArgs(*args):
@@ -1035,9 +1040,11 @@ def main(*args):
             always = arg[8:]
         elif arg.startswith('-file'):
             if len(arg) == 5:
-                generator = pagegenerators.TextfilePageGenerator(filename=None)
+                generator = pagegenerators.TextfilePageGenerator(
+                    filename=None)
             else:
-                generator = pagegenerators.TextfilePageGenerator(filename=arg[6:])
+                generator = pagegenerators.TextfilePageGenerator(
+                    filename=arg[6:])
         elif arg.startswith('-pos:'):
             if arg[5] != ':':
                 mysite = pywikibot.Site()
