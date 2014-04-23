@@ -69,8 +69,8 @@ class BaseRevertBot(object):
         return 'top' in item
 
     def revert(self, item):
-        if len(pywikibot.Page(pywikibot.Site(), item['title']).fullVersionHistory()) > 1:
-            rev = pywikibot.Page(pywikibot.Site(), item['title']).fullVersionHistory()[1]
+        if len(pywikibot.Page(pywikibot.Site(), item['title']).fullVersionHistory(total=2)) > 1:
+            rev = pywikibot.Page(pywikibot.Site(), item['title']).fullVersionHistory(total=2)[1]
         else:
             return False
 
