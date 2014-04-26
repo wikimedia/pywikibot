@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-Robot which runs python framework scripts as (sub-)bot and provides a
+Bot which runs python framework scripts as (sub-)bot and provides a
 WikiUserInterface (WUI) with Lua support for bot operators.
 
 This script needs external libraries (see imports and comments there)
@@ -21,13 +21,13 @@ Syntax example:
         Default operating mode.
 """
 ## @package script_wui
-#  @brief   Script WikiUserInterface (WUI) Robot
+#  @brief   Script WikiUserInterface (WUI) Bot
 #
 #  @copyright Dr. Trigon, 2012
 #
 #  @section FRAMEWORK
 #
-#  Python wikipedia robot framework, DrTrigonBot.
+#  Python wikipedia bot framework, DrTrigonBot.
 #  @see http://pywikipediabot.sourceforge.net/
 #  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #

@@ -12,7 +12,7 @@ This script understands various command-line arguments:
 
 -purge            Do not touch but purge the page
 
--redir            specifies that the robot should work on redirect pages;
+-redir            specifies that the bot should work on redirect pages;
                   otherwise, they will be skipped.
 
 All other parameters will be regarded as a page title; in this case, the bot

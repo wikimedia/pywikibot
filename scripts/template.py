@@ -77,7 +77,7 @@ It only performs substitutions in main article namespace and doesn't prompt to
 start replacing. Note that -putthrottle: is a global pywikipedia parameter.
 
     python template.py -putthrottle:30 -namespace:0 lived -subst -always
-        -summary:"ROBOT: Substituting {{lived}}, see [[WP:SUBST]]."
+        -summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."
 
 
 This next example removes the templates {{cfr}}, {{cfru}}, and {{cfr-speedy}}
@@ -189,7 +189,7 @@ class XmlDumpTemplatePageGenerator:
 
 class TemplateRobot:
     """
-    This robot will load all pages yielded by a page generator and replace or
+    This bot will load all pages yielded by a page generator and replace or
     remove all occurences of the old template, or substitute them with the
     template's text.
 

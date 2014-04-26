@@ -49,14 +49,14 @@ import re
 
 class ImageRobot:
     """
-    This robot will load all pages yielded by a file links image page generator and
+    This bot will load all pages yielded by a file links image page generator and
     replace or remove all occurences of the old image.
     """
     # Summary messages for replacing images
     msg_replace = {
         'ar': u'روبوت - استبدال الصورة %s مع %s',
         'de': u'Bot: Ersetze Bild %s durch %s',
-        'en': u'Robot: Replacing image %s with %s',
+        'en': u'Bot: Replacing image %s with %s',
         'es': u'Robot - Reemplazando imagen %s por %s',
         'fa': u'ربات: جایگزین کردن تصویر %s با %s',
         'fr': u'Bot: Remplace image %s par %s',
@@ -126,7 +126,7 @@ class ImageRobot:
 
     def run(self):
         """
-        Starts the robot's action.
+        Starts the bot's action.
         """
         # regular expression to find the original template.
         # {{vfd}} does the same thing as {{Vfd}}, so both will be found.

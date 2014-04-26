@@ -38,7 +38,7 @@ These command-line arguments can be used to specify which pages to work on:
 
                    This implies -noredirect.
 
-    -restore:      restore a set of "dumped" pages the robot was working on
+    -restore:      restore a set of "dumped" pages the bot was working on
                    when it terminated. The dump file will be subsequently
                    removed.
 
@@ -68,11 +68,11 @@ Additionaly, these arguments can be used to restrict the bot to certain pages:
                    want to iterate over all categories starting at M, use
                    -start:Category:M.
 
-    -number:       used as -number:#, specifies that the robot should process
+    -number:       used as -number:#, specifies that the bot should process
                    that amount of pages and then stop. This is only useful in
                    combination with -start. The default is not to stop.
 
-    -until:        used as -until:title, specifies that the robot should
+    -until:        used as -until:title, specifies that the bot should
                    process pages in wiki default sort order up to, and
                    including, "title" and then stop. This is only useful in
                    combination with -start. The default is not to stop.
@@ -124,7 +124,7 @@ These arguments control miscellanous bot behaviour:
 
 These arguments are useful to provide hints to the bot:
 
-    -hint:         used as -hint:de:Anweisung to give the robot a hint
+    -hint:         used as -hint:de:Anweisung to give the bot a hint
                    where to start looking for translations. If no text
                    is given after the second ':', the name of the page
                    itself is used as the title for the hint, unless the
@@ -194,7 +194,7 @@ These arguments are useful to provide hints to the bot:
                    dates, only use found links and hints.
                    (note: without ending colon)
 
-    -hintnobracket used to make the robot strip everything in brackets,
+    -hintnobracket used to make the bot strip everything in brackets,
                    and surrounding spaces from the page name, before it is
                    used in a -hint:xy: where the page name has been left out,
                    or -hint:all:, -hint:10:, etc. without a name, or
@@ -304,7 +304,7 @@ The following arguments influence how many pages the bot works on at once:
     -query:        The maximum number of pages that the bot will load at once.
                    Default value is 50.
 
-Some configuration option can be used to change the working of this robot:
+Some configuration option can be used to change the working of this bot:
 
 interwiki_min_subjects: the minimum amount of subjects that should be processed
                     at the same time.

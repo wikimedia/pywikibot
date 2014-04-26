@@ -723,7 +723,7 @@ class DeadLinkReportThread(threading.Thread):
 
 class WeblinkCheckerRobot:
     """
-    Robot which will use several LinkCheckThreads at once to search for dead
+    Bot which will use several LinkCheckThreads at once to search for dead
     weblinks on pages provided by the given generator.
 
     """

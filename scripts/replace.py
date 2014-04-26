@@ -322,7 +322,7 @@ class ReplaceRobot:
 
     def run(self):
         """
-        Starts the robot.
+        Starts the bot.
         """
         # Run the generator which will yield Pages which might need to be
         # changed.

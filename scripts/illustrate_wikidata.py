@@ -49,7 +49,7 @@ class IllustrateRobot(WikidataBot):
 
     def run(self):
         """
-        Starts the robot.
+        Starts the bot.
         """
         for page in self.generator:
             pywikibot.output(u'Working on %s' % page.title())

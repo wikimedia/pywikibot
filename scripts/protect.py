@@ -61,7 +61,7 @@ docuReplacements = {
 
 
 class ProtectionRobot:
-    """ This robot allows protection of pages en masse. """
+    """ This bot allows protection of pages en masse. """
 
     def __init__(self, generator, summary, always=False, unprotect=False,
                  edit='sysop', move='sysop', create='sysop'):
@@ -81,7 +81,7 @@ class ProtectionRobot:
         self.move = move
 
     def run(self):
-        """ Starts the robot's action.
+        """ Starts the bot's action.
         Loop through everything in the page generator and (un)protect it.
 
         """

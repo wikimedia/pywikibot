@@ -42,7 +42,7 @@ class NewItemRobot:
 
     def run(self):
         """
-        Starts the robot.
+        Starts the bot.
         """
         pywikibot.output('Page age is set to %s days so only pages created before %s will be considered.' % (self.pageAge, self.pageAgeBefore.isoformat()))
         pywikibot.output('Last edit is set to %s days so only pages last edited before %s will be considered.' % (self.lastEdit, self.lastEditBefore.isoformat()))

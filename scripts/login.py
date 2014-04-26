@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-Script to log the robot in to a wiki account.
+Script to log the bot in to a wiki account.
 
-Suggestion is to make a special account to use for robot use only. Make
-sure this robot account is well known on your home wiki before using.
+Suggestion is to make a special account to use for bot use only. Make
+sure this bot account is well known on your home wiki before using.
 
 Parameters:
 
