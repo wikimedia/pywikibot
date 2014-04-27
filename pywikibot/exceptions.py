@@ -10,23 +10,16 @@ Exception classes used throughout the framework.
 __version__ = '$Id$'
 
 
-from pywikibot import config
+from pywikibot.tools import UnicodeMixin
 
 # TODO: These are copied from wikipedia.py; not certain that all of them
 # will be needed in the rewrite.
 
 
-class Error(Exception):
+class Error(Exception, UnicodeMixin):
     """Wikipedia error"""
     def __init__(self, arg):
         self.unicode = arg
-        try:
-            self.string = arg.encode(config.console_encoding, "xmlcharrefreplace")
-        except (AttributeError, TypeError):
-            self.string = arg.encode("ascii", "xmlcharrefreplace")
-
-    def __str__(self):
-        return self.string
 
     def __unicode__(self):
         return self.unicode

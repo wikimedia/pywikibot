@@ -10,7 +10,24 @@ __version__ = '$Id$'
 import sys
 import threading
 import time
-import Queue
+
+if sys.version_info[0] > 2:
+    import queue as Queue
+else:
+    import Queue
+
+
+class UnicodeMixin(object):
+    """Mixin class to handle defining the proper __str__/__unicode__
+       methods in Python 2 or 3.
+    """
+
+    if sys.version_info[0] >= 3:
+        def __str__(self):
+            return self.__unicode__()
+    else:
+        def __str__(self):
+            return self.__unicode__().encode('utf8')
 
 
 class ThreadedGenerator(threading.Thread):
@@ -141,7 +158,7 @@ class ThreadList(list):
     ...
 
     """
-    def __init__(self, limit=sys.maxint, *args):
+    def __init__(self, limit=128, *args):
         self.limit = limit
         list.__init__(self, *args)
         for item in list(self):
