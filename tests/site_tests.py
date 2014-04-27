@@ -15,6 +15,10 @@ from pywikibot.site import must_be
 from tests import patch_request, unpatch_request
 from tests.utils import PywikibotTestCase, unittest
 
+import sys
+if sys.version_info[0] > 2:
+    basestring = (str, )
+
 mysite = None
 mainpage = None
 imagepage = None
