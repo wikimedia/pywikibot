@@ -392,11 +392,16 @@ class Request(MutableMapping):
             if code.startswith(u'internal_api_error_'):
                 self.wait()
                 continue
-            # bugs 46535, 62126
+            # bugs 46535, 62126, 64494
             # maybe removed when it 46535 is solved
             if code == "failed-save" and action == 'wbeditentity':
-                self.wait()
-                continue
+                try:
+                    message = result["error"]["messages"]["0"]["name"]
+                except KeyError:
+                    message = None
+                if message == u'edit-already-exists':
+                    self.wait()
+                    continue
             # raise error
             try:
                 pywikibot.log(u"API Error: query=\n%s"
