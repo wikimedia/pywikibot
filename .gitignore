@@ -5,7 +5,7 @@ user-*.py
 *.pyc
 /.tox
 /*.egg
-data*
+/data*
 logs*
 *cache*
 .idea

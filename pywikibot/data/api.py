@@ -35,8 +35,13 @@ from pywikibot import config, login
 from pywikibot.exceptions import *
 
 import sys
+
 if sys.version_info[0] > 2:
     basestring = (str, )
+    from urllib.parse import urlencode, unquote
+    unicode = str
+else:
+    from urllib import urlencode, unquote
 
 _logger = "data.api"
 
@@ -174,9 +179,17 @@ class Request(MutableMapping):
         return iter(self.params.items())
 
     def http_params(self):
-        """Return the parameters formatted for inclusion in an HTTP request."""
+        """Return the parameters formatted for inclusion in an HTTP request.
+
+        self.params MUST be either
+           list of unicode
+           unicode (may be |-separated list)
+           str in site encoding (may be |-separated list)
+        """
 
         for key in self.params:
+            if isinstance(self.params[key], bytes):
+                self.params[key] = self.params[key].decode(self.site.encoding())
             if isinstance(self.params[key], basestring):
                 # convert a stringified sequence into a list
                 self.params[key] = self.params[key].split("|")
@@ -192,7 +205,7 @@ class Request(MutableMapping):
                 self.params["meta"] = meta
             uiprop = self.params.get("uiprop", [])
             uiprop = set(uiprop + ["blockinfo", "hasmsg"])
-            self.params["uiprop"] = list(uiprop)
+            self.params["uiprop"] = list(sorted(uiprop))
             if "properties" in self.params:
                 if "info" in self.params["properties"]:
                     inprop = self.params.get("inprop", [])
@@ -208,18 +221,20 @@ class Request(MutableMapping):
         for key in self.params:
             try:
                 self.params[key] = "|".join(self.params[key])
-                if isinstance(self.params[key], unicode):
-                    self.params[key] = self.params[key].encode(self.site.encoding())
+                self.params[key] = self.params[key].encode(self.site.encoding())
             except Exception:
                 pywikibot.error(
                     u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
                     % (key, self.site.encoding(), self.params[key]))
-        return urllib.urlencode(self.params)
+        return urlencode(self.params)
 
     def __str__(self):
-        return urllib.unquote(self.site.scriptpath()
+        return unquote(self.site.scriptpath()
                               + "/api.php?"
                               + self.http_params())
+
+    def __repr__(self):
+        return "%s.%s<%s->%r>" % (self.__class__.__module__, self.__class__.__name__, self.site, str(self))
 
     def _simulate(self, action):
         if action and config.simulate and action in config.actions_to_block:
@@ -441,8 +456,14 @@ class CachedRequest(Request):
             # directory already exists
             pass
 
+    def _uniquedescriptionstr(self):
+        return (repr(self.site) + repr(sorted(self.iteritems())))
+
     def _create_file_name(self):
-        return hashlib.sha256(str(self.site) + str(self)).hexdigest()
+        self.http_params()  # normalize self.iteritems()
+        return hashlib.sha256(
+            self._uniquedescriptionstr().encode('utf-8')
+        ).hexdigest()
 
     def _cachefile_path(self):
         return os.path.join(self._get_cache_dir(), self._create_file_name())
@@ -453,20 +474,25 @@ class CachedRequest(Request):
     def _load_cache(self):
         """ Returns whether the cache can be used """
         try:
-            sitestr, selfstr, self._data, self._cachetime = pickle.load(open(self._cachefile_path()))
-            assert(sitestr == str(self.site))
-            assert(selfstr == str(self))
+            with open(self._cachefile_path(), 'rb') as f:
+                uniquedescr, self._data, self._cachetime = pickle.load(f)
+            assert(uniquedescr == str(self._uniquedescriptionstr()))
             if self._expired(self._cachetime):
                 self._data = None
                 return False
             return True
-        except Exception:
+        except IOError as e:
+            # file not found
+            return False
+        except Exception as e:
+            pywikibot.output("Could not load cache: %r" % e)
             return False
 
     def _write_cache(self, data):
         """ writes data to self._cachefile_path() """
-        data = [str(self.site), str(self), data, datetime.datetime.now()]
-        pickle.dump(data, open(self._cachefile_path(), 'w'))
+        data = [self._uniquedescriptionstr(), data, datetime.datetime.now()]
+        with open(self._cachefile_path(), 'wb') as f:
+            pickle.dump(data, f)
 
     def submit(self):
         cached_available = self._load_cache()
@@ -661,7 +687,9 @@ class QueryGenerator(object):
                     new_limit = min(self.query_limit, self.limit - count)
                 else:
                     new_limit = None
-                if "rvprop" in self.request \
+
+                if new_limit and \
+                        "rvprop" in self.request \
                         and "content" in self.request["rvprop"]:
                     # queries that retrieve page content have lower limits
                     # Note: although API allows up to 500 pages for content
@@ -727,7 +755,7 @@ class QueryGenerator(object):
                     # otherwise we proceed as usual
                     else:
                         count += 1
-                    if self.limit > 0 and count >= self.limit:
+                    if self.limit and count >= self.limit:
                         return
             if self.module == "random" and self.limit:
                 # "random" module does not return "query-continue"
