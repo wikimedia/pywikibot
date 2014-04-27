@@ -338,7 +338,7 @@ class CosmeticChangesToolkit:
             thisNs = namespaces.pop(0)
             if nsNumber == 6 and family.name == 'wikipedia':
                 if self.site.lang in ('en', 'fr') and \
-                   family.versionnumber(self.site.lang) >= 14:
+                   self.site.versionnumber() >= 14:
                     # do not change "Image" on en-wiki and fr-wiki
                     assert u'Image' in namespaces
                     namespaces.remove(u'Image')
