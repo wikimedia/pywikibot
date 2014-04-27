@@ -723,6 +723,27 @@ def must_be(group=None, right=None):
     return decorator
 
 
+def need_version(number):
+    """ Decorator to require a certain mediawiki version number.
+
+    @param number: the mw version number required
+    @return: a decorator to make sure the requirement is statisfied when
+        the decorated function is called.
+    """
+    def decorator(fn):
+        def callee(self, *args, **kwargs):
+            if self.versionnumber() < number:
+                raise NotImplementedError(
+                    u'Method or function "%s"\n'
+                    u"isn't implemented in mediawiki version < %d"
+                    % (fn.__name__, number))
+            return fn(self, *args, **kwargs)
+        callee.__name__ = fn.__name__
+        callee.__doc__ = fn.__doc__
+        return callee
+    return decorator
+
+
 class APISite(BaseSite):
     """API interface to MediaWiki site.
 
@@ -3593,27 +3614,27 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return wigen
 
+    @need_version(18)
     def broken_redirects(self, step=None, total=None):
         """Yield Pages without language links from Special:BrokenRedirects."""
-        assert self.versionnumber >= 18
         brgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="BrokenRedirects",
                                 step=step, total=total)
         return brgen
 
+    @need_version(18)
     def double_redirects(self, step=None, total=None):
         """Yield Pages without language links from Special:BrokenRedirects."""
-        assert self.versionnumber >= 18
         drgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="DoubleRedirects",
                                 step=step, total=total)
         return drgen
 
+    @need_version(18)
     def redirectpages(self, step=None, total=None):
         """Yield redirect pages from Special:ListRedirects."""
-        assert self.versionnumber >= 18
         lrgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Listredirects",
