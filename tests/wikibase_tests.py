@@ -49,6 +49,8 @@ class TestGeneral(PywikibotTestCase):
         # test WbTime
         t = pywikibot.WbTime(year=2010, hour=12, minute=43)
         self.assertEqual(t.toTimestr(), '+00000002010-01-01T12:43:00Z')
+        self.assertRaises(ValueError, pywikibot.WbTime, precision=15)
+        self.assertRaises(ValueError, pywikibot.WbTime, precision='invalid_precision')
 
         # test WikibasePage.__cmp__
         self.assertEqual(pywikibot.ItemPage.fromPage(mainpage), pywikibot.ItemPage(repo, 'q5296'))

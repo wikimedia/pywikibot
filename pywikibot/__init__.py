@@ -224,21 +224,21 @@ class WbTime(object):
         """
         if year is None:
             raise ValueError('no year given')
-        self.precision = WbTime.PRECISION['second']
+        self.precision = self.PRECISION['second']
         if second is None:
-            self.precision = WbTime.PRECISION['minute']
+            self.precision = self.PRECISION['minute']
             second = 0
         if minute is None:
-            self.precision = WbTime.PRECISION['hour']
+            self.precision = self.PRECISION['hour']
             minute = 0
         if hour is None:
-            self.precision = WbTime.PRECISION['day']
+            self.precision = self.PRECISION['day']
             hour = 0
         if day is None:
-            self.precision = WbTime.PRECISION['month']
+            self.precision = self.PRECISION['month']
             day = 1
         if month is None:
-            self.precision = WbTime.PRECISION['year']
+            self.precision = self.PRECISION['year']
             month = 1
         self.year = long(year)
         self.month = month
@@ -253,10 +253,10 @@ class WbTime(object):
 
         # if precision is given it overwrites the autodetection above
         if precision is not None:
-            if isinstance(precision, int):
+            if isinstance(precision, int) and precision in self.PRECISION.values():
                 self.precision = precision
-            elif precision in WbTime.PRECISION:
-                self.precision = WbTime.PRECISION[precision]
+            elif precision in self.PRECISION:
+                self.precision = self.PRECISION[precision]
             else:
                 raise ValueError('Invalid precision: "%s"' % precision)
 
@@ -274,8 +274,8 @@ class WbTime(object):
         """
         Function which converts the the data to a UTC date/time string
         """
-        return WbTime.FORMATSTR.format(self.year, self.month, self.day,
-                                        self.hour, self.minute, self.second)
+        return self.FORMATSTR.format(self.year, self.month, self.day,
+                                     self.hour, self.minute, self.second)
 
     def toWikibase(self):
         """
