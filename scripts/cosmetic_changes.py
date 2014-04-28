@@ -259,9 +259,9 @@ class CosmeticChangesToolkit:
         # German Wikipedia. See
         # http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Position_der_Personendaten_am_.22Artikelende.22
         # ignoring nn-wiki of cause of the comment line above iw section
-        if not self.template and not '{{Personendaten' in text and \
-           not '{{SORTIERUNG' in text and not '{{DEFAULTSORT' in text and \
-           not self.site.lang in ('et', 'it', 'bg', 'ru'):
+        if not self.template and '{{Personendaten' not in text and \
+           '{{SORTIERUNG' not in text and '{{DEFAULTSORT' not in text and \
+           self.site.lang not in ('et', 'it', 'bg', 'ru'):
             categories = pywikibot.getCategoryLinks(text, site=self.site)
 
         if not self.talkpage:  # and pywikibot.calledModuleName() <> 'interwiki':

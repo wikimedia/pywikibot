@@ -328,7 +328,7 @@ class Page(object):
 
         # If not already stored, fetch revision
         if not hasattr(self, "_revid") \
-                or not self._revid in self._revisions \
+                or self._revid not in self._revisions \
                 or self._revisions[self._revid].text is None:
             try:
                 self.site.loadrevisions(self, getText=True, sysop=sysop)
@@ -350,7 +350,7 @@ class Page(object):
         @param oldid: The revid of the revision desired.
 
         """
-        if force or not oldid in self._revisions \
+        if force or oldid not in self._revisions \
                 or self._revisions[oldid].text is None:
             self.site.loadrevisions(self,
                                     getText=True,
@@ -2488,7 +2488,7 @@ class WikibasePage(Page):
         self.labels = {}
         if 'labels' in self._content:
             for lang in self._content['labels']:
-                if not 'removed' in self._content['labels'][lang]:  # Bug 54767
+                if 'removed' not in self._content['labels'][lang]:  # Bug 54767
                     self.labels[lang] = self._content['labels'][lang]['value']
 
         #descriptions
@@ -2706,7 +2706,7 @@ class ItemPage(WikibasePage):
         if force or not hasattr(self, '_content'):
             self.get(force=force)
         dbname = self.getdbName(site)
-        if not dbname in self.sitelinks:
+        if dbname not in self.sitelinks:
             raise pywikibot.NoPage(self)
         else:
             return self.sitelinks[dbname]

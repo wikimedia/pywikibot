@@ -67,7 +67,7 @@ def main():
                                {'url': spamSite})
     for i, p in enumerate(pages, 1):
         text = p.text
-        if not spamSite in text:
+        if spamSite not in text:
             continue
         # Show the title of the page we're working on.
         # Highlight the title in purple.

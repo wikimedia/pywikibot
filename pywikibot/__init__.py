@@ -155,7 +155,7 @@ class Coordinate(object):
         for the Wikibase API.
         FIXME Should this be in the DataSite object?
         """
-        if not self.globe in self.site.globes():
+        if self.globe not in self.site.globes():
             raise NotImplementedError(u"%s is not supported in Wikibase yet." % self.globe)
         return {'latitude': self.lat,
                 'longitude': self.lon,
@@ -410,7 +410,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     except ImportError:
         raise ValueError("Invalid interface name '%(interface)s'" % locals())
     key = '%s:%s:%s' % (fam, code, user)
-    if not key in _sites or not isinstance(_sites[key], __Site):
+    if key not in _sites or not isinstance(_sites[key], __Site):
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
         pywikibot.debug(u"Instantiating Site object '%(site)s'"
                         % {'site': _sites[key]}, _logger)

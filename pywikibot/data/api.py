@@ -733,7 +733,7 @@ class QueryGenerator(object):
                 # "random" module does not return "query-continue"
                 # now we loop for a new random query
                 continue
-            if not "query-continue" in self.data:
+            if "query-continue" not in self.data:
                 return
             if all(key not in self.data["query-continue"] for key in self.continuekey):
                 pywikibot.log(

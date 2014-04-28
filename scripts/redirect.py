@@ -787,7 +787,7 @@ def main(*args):
             except ValueError:
 #-namespace:all Process all namespaces. Works only with the API read interface.
                 pass
-            if not ns in namespaces:
+            if ns not in namespaces:
                 namespaces.append(ns)
         elif arg.startswith('-offset:'):
             offset = int(arg[8:])

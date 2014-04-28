@@ -512,9 +512,9 @@ class FeaturedBot(pywikibot.Bot):
                                  site.code), re.IGNORECASE)
 
         tosite = self.site
-        if not fromsite.lang in self.cache:
+        if fromsite.lang not in self.cache:
             self.cache[fromsite.lang] = {}
-        if not tosite.lang in self.cache[fromsite.lang]:
+        if tosite.lang not in self.cache[fromsite.lang]:
             self.cache[fromsite.lang][tosite.lang] = {}
         cc = self.cache[fromsite.lang][tosite.lang]
         if self.getOption('nocache') is True or \

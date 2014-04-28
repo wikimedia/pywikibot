@@ -310,7 +310,7 @@ class DuplicateReferences:
 
             params = match.group('params')
             group = self.GROUPS.match(params)
-            if not group in foundRefs:
+            if group not in foundRefs:
                 foundRefs[group] = {}
 
             groupdict = foundRefs[group]
@@ -331,7 +331,7 @@ class DuplicateReferences:
 
                     if name == 'population':
                         pywikibot.output(content)
-                    if not name in foundRefNames:
+                    if name not in foundRefNames:
                         # first time ever we meet this name
                         if name == 'population':
                             pywikibot.output("in")

@@ -91,7 +91,7 @@ def listchoice(clist=[], message=None, default=None):
         except ValueError:
             pass
         if isinstance(choice, basestring):
-            if not choice in clist:
+            if choice not in clist:
                 print("Invalid response")
             else:
                 return choice

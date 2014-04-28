@@ -868,14 +868,14 @@ class APISite(BaseSite):
             # Return all messages
             if keys == u'*' or keys == [u'*']:
                 for msg in msg_query:
-                    if not 'missing' in msg:
+                    if 'missing' not in msg:
                         self._msgcache[msg['name']] = msg['*']
                 return self._msgcache
             # Return only given keys
             else:
                 for _key in keys:
                     for msg in msg_query:
-                        if msg['name'] == _key and not 'missing' in msg:
+                        if msg['name'] == _key and 'missing' not in msg:
                             self._msgcache[_key] = msg['*']
                             break
                     else:
@@ -3544,7 +3544,7 @@ class DataSite (APISite):
             params['props'] = '|'.join(props)
         req = api.Request(site=self, **params)
         data = req.submit()
-        if not 'success' in data:
+        if 'success' not in data:
             raise pywikibot.data.api.APIError(data['errors'])
         return data['entities']
 

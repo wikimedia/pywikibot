@@ -129,7 +129,7 @@ class SyncSites:
         pages = imap(lambda p: p.title(),
                      self.original.allpages('!', namespace=namespace))
         for p in pages:
-            if not p in ['MediaWiki:Sidebar', 'MediaWiki:Mainpage',
+            if p not in ['MediaWiki:Sidebar', 'MediaWiki:Mainpage',
                          'MediaWiki:Sitenotice', 'MediaWiki:MenuSidebar']:
                 try:
                     self.check_page(p)

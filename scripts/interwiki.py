@@ -733,7 +733,7 @@ class PageTree(object):
 
     def add(self, page):
         site = page.site
-        if not site in self.tree:
+        if site not in self.tree:
             self.tree[site] = []
         self.tree[site].append(page)
         self.size += 1
@@ -1226,7 +1226,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     if newhint == '?':
                         t += globalvar.showtextlinkadd
                         pywikibot.output(self.originPage.get()[:t])
-                    elif newhint and not ':' in newhint:
+                    elif newhint and ':' not in newhint:
                         pywikibot.output(
                             u'Please enter a hint in the format '
                             u'language:pagename or type nothing if you do not '
@@ -1742,8 +1742,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         import userlib
                         user = userlib.User(page.site, page.userName())
                         # erstmal auch keine namen mit bot
-                        if not 'bot' in user.groups() \
-                           and not 'bot' in page.userName().lower():
+                        if 'bot' not in user.groups() \
+                           and 'bot' not in page.userName().lower():
                             smallWikiAllowed = True
                         else:
                             _now = datetime.datetime.utcnow()

@@ -383,7 +383,7 @@ class PageArchiver(object):
            and not self.Page.title() + '/' == archive[:len(self.Page.title()) + 1] \
            and not self.key_ok():
             raise ArchiveSecurityError("Archive page %r does not start with page title (%s)!" % (archive, self.Page.title()))
-        if not archive in self.archives:
+        if archive not in self.archives:
             self.archives[archive] = DiscussionPage(archive, self, vars)
         return self.archives[archive].feedThread(thread, maxArchiveSize)
 

@@ -85,7 +85,7 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None):
             pass
         else:
             cats = [x for x in pl.categories()]
-            if not workingcat in cats:
+            if workingcat not in cats:
                 cats = [x for x in pl.categories()]
                 for c in cats:
                     if c in parentcats:
@@ -160,7 +160,7 @@ def asktoadd(pl):
         elif answer == 'a':
             pagetitle = raw_input("Specify page to add:")
             page = pywikibot.Page(pywikibot.Site(), pagetitle)
-            if not page in checked.keys():
+            if page not in checked.keys():
                 include(page)
         elif answer == 'x':
             if pl.exists():
