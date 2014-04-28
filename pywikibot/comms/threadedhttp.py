@@ -9,7 +9,7 @@ This class extends httplib2, adding support for:
 
 """
 
-# (C) 2007 Pywikibot team, 2007-2013
+# (C) 2007 Pywikibot team, 2007-2014
 # (C) 2006 Httplib 2 team, 2006
 # (C) 2007 Metaweb Technologies, Inc.
 #
@@ -205,7 +205,8 @@ class Http(httplib2.Http):
         headers['connection'] = headers.pop('connection', 'keep-alive')
 
         # determine connection pool key and fetch connection
-        (scheme, authority, request_uri, defrag_uri) = httplib2.urlnorm(httplib2.iri2uri(uri))
+        (scheme, authority, request_uri,
+         defrag_uri) = httplib2.urlnorm(httplib2.iri2uri(uri))
         conn_key = scheme + ":" + authority
 
         connection = self.connection_pool.pop_connection(conn_key)
@@ -246,7 +247,8 @@ class Http(httplib2.Http):
         redirectable_response = ((response.status == 303) or
                                  (response.status in [300, 301, 302, 307] and
                                   method in ["GET", "HEAD"]))
-        if self.follow_redirects and (max_redirects > 0) and redirectable_response:
+        if (self.follow_redirects and (max_redirects > 0) and
+                redirectable_response):
             (response, content) = self._follow_redirect(
                 uri, method, body, headers, response, content, max_redirects)
 
@@ -255,7 +257,8 @@ class Http(httplib2.Http):
     def _follow_redirect(self, uri, method, body, headers, response,
                          content, max_redirects):
         """Internal function to follow a redirect recieved by L{request}"""
-        (scheme, authority, absolute_uri, defrag_uri) = httplib2.urlnorm(httplib2.iri2uri(uri))
+        (scheme, authority, absolute_uri,
+         defrag_uri) = httplib2.urlnorm(httplib2.iri2uri(uri))
         if self.cache:
             cachekey = defrag_uri
         else:
@@ -270,7 +273,8 @@ class Http(httplib2.Http):
         # Fix-up relative redirects (which violate an RFC 2616 MUST)
         if "location" in response:
             location = response['location']
-            (scheme, authority, path, query, fragment) = httplib2.parse_uri(location)
+            (scheme, authority, path, query,
+             fragment) = httplib2.parse_uri(location)
             if authority is None:
                 response['location'] = httplib2.urlparse.urljoin(uri, location)
                 pywikibot.debug(u"Relative redirect: changed [%s] to [%s]"

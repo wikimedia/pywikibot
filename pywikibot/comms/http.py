@@ -13,7 +13,7 @@ This module is responsible for
 """
 
 #
-# (C) Pywikipedia bot team, 2007
+# (C) Pywikipedia bot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -66,7 +66,8 @@ threads = []
 connection_pool = threadedhttp.ConnectionPool()
 http_queue = Queue.Queue()
 
-cookie_jar = threadedhttp.LockableCookieJar(config.datafilepath("pywikibot.lwp"))
+cookie_jar = threadedhttp.LockableCookieJar(
+    config.datafilepath("pywikibot.lwp"))
 try:
     cookie_jar.load()
 except (IOError, cookielib.LoadError):
@@ -89,7 +90,8 @@ def _flush():
     for i in threads:
         http_queue.put(None)
 
-    message = u'Waiting for %i network thread(s) to finish. Press ctrl-c to abort' % len(threads)
+    message = (u'Waiting for %i network thread(s) to finish. '
+               u'Press ctrl-c to abort' % len(threads))
     if hasattr(sys, 'last_type'):
         # we quit because of an exception
         print sys.last_type
