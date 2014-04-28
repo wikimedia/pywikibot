@@ -16,7 +16,8 @@ def GetData(request, site=None, back_response=False):
     result = req.submit()
 
     if back_response:
-        pywikibot.warning(u"back_response is no longer supported; an empty response object will be returned")
+        pywikibot.warning(u"back_response is no longer supported; an empty "
+                          u"response object will be returned")
         import StringIO
         res_dummy = StringIO.StringIO()
         res_dummy.__dict__.update({u'code': 0, u'msg': u''})
