@@ -9,7 +9,7 @@ __version__ = '$Id$'
 
 import datetime
 import pywikibot
-from pywikibot.data.api import CachedRequest
+from pywikibot.data.api import CachedRequest, QueryGenerator
 from tests.utils import unittest
 
 
@@ -45,6 +45,11 @@ class DryAPITests(unittest.TestCase):
     def test_expired(self):
         self.assertFalse(self.req._expired(datetime.datetime.now()))
         self.assertTrue(self.req._expired(datetime.datetime.now() - datetime.timedelta(days=2)))
+
+    def test_query_constructor(self):
+        qGen1 = QueryGenerator(action="query", meta="siteinfo")
+        qGen2 = QueryGenerator(meta="siteinfo")
+        self.assertEqual(str(qGen1.request), str(qGen2.request))
 
 if __name__ == '__main__':
     unittest.main()
