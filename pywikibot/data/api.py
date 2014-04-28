@@ -499,9 +499,9 @@ class QueryGenerator(object):
         assumed.
 
         """
-        if "action" in kwargs and "action" != "query":
+        if "action" in kwargs and kwargs["action"] != "query":
             raise Error("%s: 'action' must be 'query', not %s"
-                        % (self.__class__.__name__, kwargs["query"]))
+                        % (self.__class__.__name__, kwargs["action"]))
         else:
             kwargs["action"] = "query"
         try:
