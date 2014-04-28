@@ -214,8 +214,8 @@ class SandboxBot(pywikibot.Bot):
                             pywikibot.output(u'Standard content was changed, '
                                              u'sandbox cleaned.')
                     else:
-                        edit_delta = datetime.datetime.utcnow() - \
-                            pywikibot.Timestamp.fromISOformat(sandboxPage.editTime())
+                        edit_delta = (datetime.datetime.utcnow() -
+                                      sandboxPage.editTime())
                         delta = self.getOption('delay_td') - edit_delta
                         # Is the last edit more than 'delay' minutes ago?
                         if delta <= datetime.timedelta(0):
