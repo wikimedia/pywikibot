@@ -1333,12 +1333,13 @@ class Page(object):
             pywikibot.output(u'Deleting %s.' % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the deletion:')
 
-        if self.site.username(sysop=True):  # If user is a sysop, delete the page
+        # If user is a sysop, delete the page
+        if self.site.username(sysop=True):
             answer = u'y'
             if prompt and not hasattr(self.site, '_noDeletePrompt'):
                 answer = pywikibot.inputChoice(
-                    u'Do you want to delete %s?' % self.title(asLink=True,
-                                                              forceInterwiki=True),
+                    u'Do you want to delete %s?' % self.title(
+                        asLink=True, forceInterwiki=True),
                     ['Yes', 'No', 'All'],
                     ['Y', 'N', 'A'],
                     'N')
@@ -1572,20 +1573,6 @@ class Page(object):
                                  % (self.title(asLink=True), error.message))
         return False
 
-    @property
-    def categoryinfo(self):
-        """If supported, return a dict containing category content values:
-
-        Numbers of pages, subcategories, files, and total contents.
-
-        """
-        if not self.isCategory():
-            return  # should this raise an exception??
-        try:
-            return self.site.categoryinfo(self)
-        except NotImplementedError:
-            return
-
 ######## DEPRECATED METHODS ########
 
     @deprecated("Site.encoding()")
@@ -1726,13 +1713,13 @@ class ImagePage(Page):
             username, resolution, filesize, comment).
 
         """
-        #TODO; return value may need to change
+        # TODO; return value may need to change
         return self.site.loadimageinfo(self, history=True)
 
     def getFileVersionHistoryTable(self):
         """Return the version history in the form of a wiki table."""
         lines = []
-        #TODO: if getFileVersionHistory changes, make sure this follows it
+        # TODO: if getFileVersionHistory changes, make sure this follows it
         for (datetime, username, resolution, size, comment) \
                 in self.getFileVersionHistory():
             lines.append(u'| %s || %s || %s || %s || <nowiki>%s</nowiki>'
@@ -2048,6 +2035,15 @@ class Category(Page):
             targetCat.put(newtext, creationSummary)
             return True
 
+    @property
+    def categoryinfo(self):
+        """return a dict containing category content values:
+
+        Numbers of pages, subcategories, files, and total contents.
+
+        """
+        return self.site.categoryinfo(self)
+
 #### DEPRECATED METHODS ####
     @deprecated("list(Category.subcategories(...))")
     def subcategoriesList(self, recurse=False):
@@ -2224,8 +2220,8 @@ class User(Page):
         @type subpage: unicode
         """
         if self._isAutoblock:
-            #This user is probably being queried for purpose of lifting
-            #an autoblock, so has no user pages per se.
+            # This user is probably being queried for purpose of lifting
+            # an autoblock, so has no user pages per se.
             raise AutoblockUser(
                 "This is an autoblock ID, you can only use to unblock it.")
         if subpage:
@@ -2241,8 +2237,8 @@ class User(Page):
         @type subpage: unicode
         """
         if self._isAutoblock:
-            #This user is probably being queried for purpose of lifting
-            #an autoblock, so has no user talk pages per se.
+            # This user is probably being queried for purpose of lifting
+            # an autoblock, so has no user talk pages per se.
             raise AutoblockUser(
                 "This is an autoblock ID, you can only use to unblock it.")
         if subpage:
@@ -2438,12 +2434,12 @@ class WikibasePage(Page):
             id = 'ids'
             site = 'sites'
             title = 'titles'
-        #id overrides all
+        # id overrides all
         if hasattr(self, 'id'):
             params[id] = self.id
             return params
 
-        #the rest only applies to ItemPages, but is still needed here.
+        # the rest only applies to ItemPages, but is still needed here.
         if hasattr(self, '_site') and hasattr(self, '_title'):
             params[site] = self._site.dbName()
             params[title] = self._title
@@ -2476,7 +2472,7 @@ class WikibasePage(Page):
             self.lastrevid = self._content['lastrevid']
         else:
             raise pywikibot.NoPage(self)
-        #aliases
+        # aliases
         self.aliases = {}
         if 'aliases' in self._content:
             for lang in self._content['aliases']:
@@ -2484,14 +2480,14 @@ class WikibasePage(Page):
                 for value in self._content['aliases'][lang]:
                     self.aliases[lang].append(value['value'])
 
-        #labels
+        # labels
         self.labels = {}
         if 'labels' in self._content:
             for lang in self._content['labels']:
                 if 'removed' not in self._content['labels'][lang]:  # Bug 54767
                     self.labels[lang] = self._content['labels'][lang]['value']
 
-        #descriptions
+        # descriptions
         self.descriptions = {}
         if 'descriptions' in self._content:
             for lang in self._content['descriptions']:
@@ -2648,7 +2644,7 @@ class ItemPage(WikibasePage):
         """
         super(ItemPage, self).get(force=force, *args)
 
-        #claims
+        # claims
         self.claims = {}
         if 'claims' in self._content:
             for pid in self._content['claims']:
@@ -2658,7 +2654,7 @@ class ItemPage(WikibasePage):
                     c.on_item = self
                     self.claims[pid].append(c)
 
-        #sitelinks
+        # sitelinks
         self.sitelinks = {}
         if 'sitelinks' in self._content:
             for dbname in self._content['sitelinks']:
@@ -2749,7 +2745,7 @@ class ItemPage(WikibasePage):
                 dbName = self.getdbName(obj.site)
                 data[dbName] = {'site': dbName, 'title': obj.title()}
             else:
-                #TODO: Do some verification here
+                # TODO: Do some verification here
                 dbName = obj['site']
                 data[dbName] = obj
         data = {'sitelinks': data}
@@ -2965,7 +2961,7 @@ class Claim(PropertyPage):
 
         data = self.repo.changeClaimTarget(self, snaktype=snaktype,
                                            **kwargs)
-        #TODO: Re-create the entire item from JSON, not just id
+        # TODO: Re-create the entire item from JSON, not just id
         self.snak = data['claim']['id']
 
     def getTarget(self):
@@ -3326,7 +3322,7 @@ not supported by PyWikiBot!"""
 
         # Pages with "/./" or "/../" appearing in the URLs will
         # often be unreachable due to the way web browsers deal
-        #* with 'relative' URLs. Forbid them explicitly.
+        # * with 'relative' URLs. Forbid them explicitly.
 
         if u'.' in t and (
                 t == u'.' or t == u'..'
@@ -3546,8 +3542,8 @@ def html2unicode(text, ignore=None):
         158: 382,   # ž
         159: 376    # Ÿ
     }
-    #ensuring that illegal &#129; &#141; and &#157, which have no known values,
-    #don't get converted to unichr(129), unichr(141) or unichr(157)
+    # ensuring that illegal &#129; &#141; and &#157, which have no known values,
+    # don't get converted to unichr(129), unichr(141) or unichr(157)
     ignore = set(ignore) | set([129, 141, 157])
     result = u''
     i = 0
