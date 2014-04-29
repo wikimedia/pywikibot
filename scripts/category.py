@@ -876,41 +876,37 @@ class CategoryTreeRobot:
 
         """
 
-        result = u'#' * currentDepth + ' '
+        result = u'#' * currentDepth
+        if currentDepth > 0:
+            result += u' '
         result += cat.title(asLink=True, textlink=True, withNamespace=False)
         result += ' (%d)' % len(self.catDB.getArticles(cat))
-        # We will remove an element of supercats, but need the original set
-        # later, so we create a list from the catDB.getSupercats(cat) set
-        supercats = list(self.catDB.getSupercats(cat))
+        if currentDepth < self.maxDepth / 2:
+            # noisy dots
+            pywikibot.output('.', newline=False)
         # Find out which other cats are supercats of the current cat
-        try:
-            supercats.remove(parent)
-        except:
-            pass
-        if supercats:
-            if currentDepth < self.maxDepth / 2:
-                # noisy dots
-                pywikibot.output('.', newline=False)
-            supercat_names = []
-            for i, cat in enumerate(supercats):
-                # create a list of wiki links to the supercategories
+        supercat_names = []
+        for cat in self.catDB.getSupercats(cat):
+            # create a list of wiki links to the supercategories
+            if cat != parent:
                 supercat_names.append(cat.title(asLink=True,
                                                 textlink=True,
                                                 withNamespace=False))
-                # print this list, separated with commas, using translations
-                # given in also_in_cats
+        if supercat_names:
+            # print this list, separated with commas, using translations
+            # given in also_in_cats
             result += ' ' + i18n.twtranslate(self.site, 'category-also-in',
                                              {'alsocat': ', '.join(
                                                  supercat_names)})
+        del supercat_names
         result += '\n'
         if currentDepth < self.maxDepth:
             for subcat in self.catDB.getSubcats(cat):
                 # recurse into subdirectories
                 result += self.treeview(subcat, currentDepth + 1, parent=cat)
-        else:
-            if self.catDB.getSubcats(cat):
-                # show that there are more categories beyond the depth limit
-                result += '#' * (currentDepth + 1) + ' [...]\n'
+        elif self.catDB.getSubcats(cat):
+            # show that there are more categories beyond the depth limit
+            result += '#' * (currentDepth + 1) + ' [...]\n'
         return result
 
     def run(self):
@@ -1097,4 +1093,5 @@ if __name__ == "__main__":
     except pywikibot.Error:
         pywikibot.error("Fatal error:", exc_info=True)
     finally:
-        catDB.dump()
+        if 'catDB' in globals():
+            catDB.dump()
