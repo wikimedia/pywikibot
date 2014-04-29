@@ -2251,6 +2251,10 @@ def WikidataQueryPageGenerator(query, site=None):
     pywikibot.output(u'retrieved %d items' % data[u'status'][u'items'])
     for item in data[u'items']:
         page = pywikibot.ItemPage(repo, u'Q{0}'.format(item))
+        if isinstance(site, pywikibot.site.DataSite):
+            yield page
+            continue
+
         try:
             link = page.getSitelink(site)
         except pywikibot.NoPage:
