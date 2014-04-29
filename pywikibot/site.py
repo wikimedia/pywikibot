@@ -927,18 +927,36 @@ class APISite(BaseSite):
 
         return self._months_names
 
+    def expand_text(self, text, title=None, includecomments=None):
+        """ Parses the given text for preprocessing and rendering
+        e.g expand templates and strip comments if includecomments
+        parameter is not True. Keeps text inside
+        <nowiki></nowiki> tags unchanges etc. Can be used to parse
+        magic parser words like {{CURRENTTIMESTAMP}}.
+
+        @param text: text to be expanded
+        @type text: unicode
+        @param title: page title without section
+        @type title: unicode
+        @param includecomments: if True do not strip comments
+        @type includecomments: bool
+        @return: unicode
+
+        """
+        req = api.Request(site=self, action='expandtemplates', text=text)
+        if title is not None:
+            req['title'] = title
+        if includecomments is True:
+            req['includecomments'] = u''
+        return req.submit()['expandtemplates']['*']
+
     def getcurrenttimestamp(self):
         """Return server time, {{CURRENTTIMESTAMP}}, as a string.
 
         Format is 'yyyymmddhhmmss'
 
         """
-        r = api.Request(site=self,
-                        action="parse",
-                        text="{{CURRENTTIMESTAMP}}",
-                        contentmodel="wikitext")
-        result = r.submit()
-        return re.search('\d+', result['parse']['text']['*']).group()
+        return self.expand_text("{{CURRENTTIMESTAMP}}")
 
     def getcurrenttime(self):
         """Return a Timestamp object representing the current server time."""
