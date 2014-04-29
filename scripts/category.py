@@ -323,7 +323,7 @@ class AddCategory:
             comment = self.editSummary
             if not comment:
                 comment = i18n.twtranslate(page.site, 'category-adding',
-                                                {'newcat': newcatTitle})
+                                           {'newcat': newcatTitle})
             pywikibot.output(u'Comment: %s' % comment)
             if not self.dry:
                 if not self.always:
@@ -449,16 +449,14 @@ class CategoryMoveRobot(object):
         self.comment = comment
         if not self.comment:
             if self.newcat:
-                template_vars = { \
-                    'oldcat': self.oldcat.title(
-                    withNamespace=False),
-                    'newcat': self.newcat.title(
-                    withNamespace=False)}
+                template_vars = {
+                    'oldcat': self.oldcat.title(withNamespace=False),
+                    'newcat': self.newcat.title(withNamespace=False)}
                 self.comment = i18n.twtranslate(self.site,
                                                 'category-replacing',
                                                 template_vars)
             else:
-                template_vars = {'oldcat': self.oldcat.title( \
+                template_vars = {'oldcat': self.oldcat.title(
                     withNamespace=False)}
                 self.comment = i18n.twtranslate(self.site,
                                                 'category-removing',
@@ -475,8 +473,7 @@ class CategoryMoveRobot(object):
                 self._hist()
         self._change(pagegenerators.CategorizedPageGenerator(self.oldcat))
         if not self.pagesonly:
-            self._change(pagegenerators.SubCategoriesPageGenerator( \
-                self.oldcat))
+            self._change(pagegenerators.SubCategoriesPageGenerator(self.oldcat))
         if self.oldcat.isEmptyCategory() and self.delete_oldcat and \
                 ((self.newcat and self.move_oldcat) or not self.newcat):
             self._delete()
@@ -524,7 +521,8 @@ class CategoryMoveRobot(object):
         match = re.compile(REGEX,
                            re.IGNORECASE | re.MULTILINE | re.DOTALL)
         self.newcat.text = match.sub('', self.newcat.text)
-        site_templates = pywikibot.translate(self.site, cfd_templates, fallback=False)
+        site_templates = pywikibot.translate(self.site, cfd_templates,
+                                             fallback=False)
         for template_name in site_templates:
             match = re.compile(r"{{%s.*?}}" % template_name, re.IGNORECASE)
             self.newcat.text = match.sub('', self.newcat.text)
@@ -641,12 +639,11 @@ class CategoryRemoveRobot:
                                                 {'oldcat': self.cat.title()})
 
     def run(self):
-        articles = set(self.cat.articles())
-        if len(articles) == 0:
+        if self.cat.categoryinfo['pages'] == 0:
             pywikibot.output(u'There are no articles in category %s'
                              % self.cat.title())
         else:
-            for article in articles:
+            for article in self.cat.articles():
                 if not self.titleRegex or re.search(self.titleRegex,
                                                     article.title()):
                     article.change_category(self.cat, None,
@@ -656,12 +653,11 @@ class CategoryRemoveRobot:
             return
 
         # Also removes the category tag from subcategories' pages
-        subcategories = set(self.cat.subcategories())
-        if len(subcategories) == 0:
+        if self.cat.categoryinfo['subcats'] == 0:
             pywikibot.output(u'There are no subcategories in category %s'
                              % self.cat.title())
         else:
-            for subcategory in subcategories:
+            for subcategory in self.cat.subcategories():
                 subcategory.change_category(self.cat, None,
                                             comment=self.editSummary,
                                             inPlace=self.inPlace)
@@ -831,12 +827,11 @@ class CategoryTidyRobot:
     def run(self):
         cat = pywikibot.Category(self.site, self.catTitle)
 
-        articles = set(cat.articles())
-        if len(articles) == 0:
+        if cat.categoryinfo['pages'] == 0:
             pywikibot.output(u'There are no articles in category ' +
                              self.catTitle)
         else:
-            preloadingGen = pagegenerators.PreloadingGenerator(iter(articles))
+            preloadingGen = pagegenerators.PreloadingGenerator(cat.articles())
             for article in preloadingGen:
                 pywikibot.output('')
                 pywikibot.output(u'=' * 67)
@@ -880,7 +875,7 @@ class CategoryTreeRobot:
         if currentDepth > 0:
             result += u' '
         result += cat.title(asLink=True, textlink=True, withNamespace=False)
-        result += ' (%d)' % len(self.catDB.getArticles(cat))
+        result += ' (%d)' % cat.categoryinfo['pages']
         if currentDepth < self.maxDepth / 2:
             # noisy dots
             pywikibot.output('.', newline=False)
