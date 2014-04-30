@@ -419,14 +419,22 @@ class Page(object):
         """
         return self.properties(force=force).get('defaultsort')
 
-    def expand_text(self, refresh=False):
-        """Return the page text with all templates expanded."""
-        if not hasattr(self, "_expanded_text") or (
-                self._expanded_text is None) or refresh:
-            req = pywikibot.data.api.Request(
-                action="expandtemplates", text=self.text,
-                title=self.title(withSection=False), site=self.site)
-            self._expanded_text = req.submit()["expandtemplates"]["*"]
+    @deprecate_arg('refresh', 'force')
+    def expand_text(self, force=False, includecomments=False):
+        """Return the page text with all templates and parser words expanded.
+
+        @param force: force updating from the live site
+        @param includecomments: Also strip comments if includecomments
+            parameter is not True.
+        @return: unicode or None
+
+        """
+        if not hasattr(self, '_expanded_text') or (
+                self._expanded_text is None) or force:
+            self._expanded_text = self.site.expand_text(
+                self.text,
+                title=self.title(withSection=False),
+                includecomments=includecomments)
         return self._expanded_text
 
     def userName(self):
