@@ -23,6 +23,10 @@ import time
 
 class TestApiFunctions(unittest.TestCase):
 
+    def setUp(self):
+        super(TestApiFunctions, self).setUp()
+        self.repo = pywikibot.Site('wikidata', 'wikidata').data_self.repository()
+
     def testQueries(self):
         """
         Test that we produce the expected query strings and that
@@ -93,68 +97,65 @@ class TestApiFunctions(unittest.TestCase):
         """
         Queries using Wikibase page structures like ItemPage
         """
-        repo = pywikibot.Site('wikidata', 'wikidata').data_repository()
 
-        q = query.HasClaim(PropertyPage(repo, "P99"))
+        q = query.HasClaim(PropertyPage(self.repo, "P99"))
         self.assertEqual(str(q), "claim[99]")
 
-        q = query.HasClaim(PropertyPage(repo, "P99"),
-                            ItemPage(repo, "Q100"))
+        q = query.HasClaim(PropertyPage(self.repo, "P99"),
+                            ItemPage(self.repo, "Q100"))
         self.assertEqual(str(q), "claim[99:100]")
 
-        q = query.HasClaim(99, [100, PropertyPage(repo, "P101")])
+        q = query.HasClaim(99, [100, PropertyPage(self.repo, "P101")])
         self.assertEqual(str(q), "claim[99:100,101]")
 
-        q = query.StringClaim(PropertyPage(repo, "P99"),
+        q = query.StringClaim(PropertyPage(self.repo, "P99"),
                                 "Hello")
         self.assertEqual(str(q), 'string[99:"Hello"]')
 
-        q = query.Tree(ItemPage(repo, "Q92"), [1], 2)
+        q = query.Tree(ItemPage(self.repo, "Q92"), [1], 2)
         self.assertEqual(str(q), 'tree[92][1][2]')
 
-        q = query.Tree(ItemPage(repo, "Q92"), [PropertyPage(repo, "P101")], 2)
+        q = query.Tree(ItemPage(self.repo, "Q92"), [PropertyPage(self.repo, "P101")], 2)
         self.assertEqual(str(q), 'tree[92][101][2]')
 
-        self.assertRaises(TypeError, lambda: query.Tree(PropertyPage(repo, "P92"),
-                                                        [PropertyPage(repo, "P101")],
+        self.assertRaises(TypeError, lambda: query.Tree(PropertyPage(self.repo, "P92"),
+                                                        [PropertyPage(self.repo, "P101")],
                                                         2))
 
         c = pywikibot.Coordinate(50, 60)
-        q = query.Around(PropertyPage(repo, "P625"), c, 23.4)
+        q = query.Around(PropertyPage(self.repo, "P625"), c, 23.4)
         self.assertEqual(str(q), 'around[625,50,60,23.4]')
 
-        begin = pywikibot.WbTime(year=1999)
-        end = pywikibot.WbTime(year=2010, hour=1)
+        begin = pywikibot.WbTime(site=self.repo, year=1999)
+        end = pywikibot.WbTime(site=self.repo, year=2010, hour=1)
 
         #note no second comma
-        q = query.Between(PropertyPage(repo, "P569"), begin)
+        q = query.Between(PropertyPage(self.repo, "P569"), begin)
         self.assertEqual(str(q), 'between[569,+00000001999-01-01T00:00:00Z]')
 
-        q = query.Between(PropertyPage(repo, "P569"), end=end)
+        q = query.Between(PropertyPage(self.repo, "P569"), end=end)
         self.assertEqual(str(q), 'between[569,,+00000002010-01-01T01:00:00Z]')
 
         q = query.Between(569, begin, end)
         self.assertEqual(str(q), 'between[569,+00000001999-01-01T00:00:00Z,+00000002010-01-01T01:00:00Z]')
 
         # try negative year
-        begin = pywikibot.WbTime(year=-44)
+        begin = pywikibot.WbTime(site=self.repo, year=-44)
         q = query.Between(569, begin, end)
         self.assertEqual(str(q), 'between[569,-00000000044-01-01T00:00:00Z,+00000002010-01-01T01:00:00Z]')
 
     def testQueriesDirectFromClaim(self):
         """
-        Test construction of the  the right Query from a page.Claim
+        Test construction of the right Query from a page.Claim
         """
 
-        repo = pywikibot.Site('wikidata', 'wikidata').data_repository()
-
-        claim = Claim(repo, 'P17')
-        claim.setTarget(pywikibot.ItemPage(repo, 'Q35'))
+        claim = Claim(self.repo, 'P17')
+        claim.setTarget(pywikibot.ItemPage(self.repo, 'Q35'))
 
         q = query.fromClaim(claim)
         self.assertEqual(str(q), 'claim[17:35]')
 
-        claim = Claim(repo, 'P268')
+        claim = Claim(self.repo, 'P268')
         claim.setTarget('somestring')
 
         q = query.fromClaim(claim)

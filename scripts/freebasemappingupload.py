@@ -47,7 +47,7 @@ class FreebaseMapperRobot:
         freebasedumpitem = pywikibot.ItemPage(self.repo, 'Q15241312')  # Freebase data dump
         self.statedin.setTarget(freebasedumpitem)
         self.dateofpub = pywikibot.Claim(self.repo, 'P577')  # date of publication
-        oct28 = pywikibot.WbTime(year=2013, month=10, day=28, precision='day')
+        oct28 = pywikibot.WbTime(site=self.repo, year=2013, month=10, day=28, precision='day')
         self.dateofpub.setTarget(oct28)
 
         for line in gzip.open(self.filename):
