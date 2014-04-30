@@ -1022,7 +1022,7 @@ class Family(object):
         return (None, None)
 
     def shared_data_repository(self, code, transcluded=False):
-        """Return the shared wikidata repository, if any."""
+        """Return the shared Wikibase repository, if any."""
         return (None, None)
 
     @pywikibot.deprecated("Site.getcurrenttime()")

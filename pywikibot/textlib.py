@@ -97,7 +97,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         'interwiki':    re.compile(r'(?i)\[\[:?(%s)\s?:[^\]]*\]\][\s]*'
                                    % '|'.join(site.validLanguageLinks() +
                                               list(site.family.obsolete.keys()))),
-        # Wikidata property inclusions
+        # Wikibase property inclusions
         'property':     re.compile(r'(?i)\{\{\s*#property:\s*p\d+\s*\}\}'),
         # Module invocations (currently only Lua)
         'invoke':       re.compile(r'(?i)\{\{\s*#invoke:.*?}\}'),

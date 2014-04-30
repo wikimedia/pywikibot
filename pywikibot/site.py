@@ -1109,19 +1109,19 @@ class APISite(BaseSite):
 
     @property
     def has_image_repository(self):
-        """Return True if site has a shared image repository like commons"""
+        """Return True if site has a shared image repository like Commons"""
         code, fam = self.shared_image_repository()
         return bool(code or fam)
 
     @property
     def has_data_repository(self):
-        """Return True if site has a shared image repository like wikidata"""
+        """Return True if site has a shared data repository like Wikidata"""
         code, fam = self.shared_data_repository()
         return bool(code or fam)
 
     @property
     def has_transcluded_data(self):
-        """Return True if site has a shared image repository like wikidata"""
+        """Return True if site has a shared data repository like Wikidata"""
         code, fam = self.shared_data_repository(True)
         return bool(code or fam)
 
@@ -1133,7 +1133,7 @@ class APISite(BaseSite):
             return pywikibot.Site(code, fam, self.username())
 
     def data_repository(self):
-        """Return Site object for data repository e.g. wikidata."""
+        """Return Site object for data repository e.g. Wikidata."""
 
         code, fam = self.shared_data_repository()
         if bool(code or fam):
