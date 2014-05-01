@@ -4,7 +4,7 @@ __version__ = '$Id$'
 
 from pywikibot import family
 
-# The wikidata family
+# The Wikidata family
 
 
 class Family(family.WikimediaFamily):
@@ -25,6 +25,10 @@ class Family(family.WikimediaFamily):
             return (None, None)
         else:
             return (code, self.name)
+
+    def calendarmodel(self, code):
+        """Default calendar model for WbTime datatype"""
+        return 'http://www.wikidata.org/entity/Q1985727'
 
     def globes(self, code):
         """Supported globes for Coordinate datatype"""

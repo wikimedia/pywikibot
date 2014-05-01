@@ -215,7 +215,7 @@ class WbTime(object):
     FORMATSTR = '{0:+012d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
     def __init__(self, year=None, month=None, day=None, hour=None, minute=None, second=None, precision=None, before=0,
-                 after=0, timezone=0, calendarmodel='http://www.wikidata.org/entity/Q1985727'):
+                 after=0, timezone=0, calendarmodel=None, site=None):
         """
         Creates a new WbTime object. The precision can be set
         by the Wikibase int value (0-14) or by a human readable
@@ -249,6 +249,10 @@ class WbTime(object):
         self.after = after
         self.before = before
         self.timezone = timezone
+        if calendarmodel is None:
+            if site is None:
+                site = Site().data_repository()
+            calendarmodel = site.calendarmodel()
         self.calendarmodel = calendarmodel
 
         # if precision is given it overwrites the autodetection above
@@ -262,13 +266,13 @@ class WbTime(object):
 
     @staticmethod
     def fromTimestr(datetimestr, precision=14, before=0, after=0, timezone=0,
-                    calendarmodel='http://www.wikidata.org/entity/Q1985727'):
+                    calendarmodel=None, site=None):
         match = re.match('([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z', datetimestr)
         if not match:
             raise ValueError(u"Invalid format: '%s'" % datetimestr)
         t = match.groups()
         return WbTime(long(t[0]), int(t[1]), int(t[2]), int(t[3]), int(t[4]), int(t[5]),
-                      precision, before, after, timezone, calendarmodel)
+                      precision, before, after, timezone, calendarmodel, site)
 
     def toTimestr(self):
         """
