@@ -25,7 +25,7 @@ class TestApiFunctions(unittest.TestCase):
 
     def setUp(self):
         super(TestApiFunctions, self).setUp()
-        self.repo = pywikibot.Site('wikidata', 'wikidata').data_self.repository()
+        self.repo = pywikibot.Site('wikidata', 'wikidata').data_repository()
 
     def testQueries(self):
         """
