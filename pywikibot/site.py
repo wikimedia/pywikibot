@@ -631,7 +631,6 @@ class APISite(BaseSite):
         if self.family.versionnumber(self.code) >= 14:
             self._namespaces[6] = [u"File"]
             self._namespaces[7] = [u"File talk"]
-        self.sitelock = threading.Lock()
         self._msgcache = {}
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
         return
