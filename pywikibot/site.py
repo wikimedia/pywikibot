@@ -84,6 +84,8 @@ class LoginStatus(object):
     def __repr__(self):
         return 'LoginStatus(%s)' % (LoginStatus.name(self.state))
 
+_families = {}
+
 
 def Family(fam=None, fatal=True):
     """Import the named family.
@@ -98,6 +100,9 @@ def Family(fam=None, fatal=True):
     """
     if fam is None:
         fam = config.family
+    if fam in _families:
+        return _families[fam]
+
     try:
         myfamily = imp.load_source(fam, config.family_files[fam])
     except (ImportError, KeyError):
@@ -109,7 +114,8 @@ does not exist. Also check your configuration file."""
             sys.exit(1)
         else:
             raise Error("Family %s does not exist" % fam)
-    return myfamily.Family()
+    _families[fam] = myfamily.Family()
+    return _families[fam]
 
 
 class BaseSite(object):
@@ -212,6 +218,19 @@ class BaseSite(object):
         if self.family == other.family:
             return cmp(self.code, other.code)
         return cmp(self.family.name, other.family.name)
+
+    def __getstate__(self):
+        """ Remove Lock based classes before pickling """
+        new = self.__dict__.copy()
+        del new['_pagemutex']
+        if '_throttle' in new:
+            del new['_throttle']
+        return new
+
+    def __setstate__(self, attrs):
+        """ Restore things removed in __getstate__ """
+        self.__dict__.update(attrs)
+        self._pagemutex = threading.Lock()
 
     def user(self):
         """Return the currently-logged in bot user, or None."""
@@ -675,6 +694,19 @@ class APISite(BaseSite):
                     if site['dbname'] == dbname:
                         return APISite(site['code'], site['code'])
         raise ValueError("Cannot parse a site out of %s." % dbname)
+
+    def __getstate__(self):
+        """ Remove Lock based classes before pickling """
+        new = super(APISite, self).__getstate__()
+        del new['sitelock']
+        del new['_msgcache']
+        return new
+
+    def __setstate__(self, attrs):
+        """ Restore things removed in __getstate__ """
+        super(APISite, self).__setstate__(attrs)
+        self.sitelock = threading.Lock()
+        self._msgcache = {}
 
     def _generator(self, gen_class, type_arg=None, namespaces=None,
                    step=None, total=None, **args):

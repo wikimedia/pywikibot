@@ -997,6 +997,17 @@ class TestSiteObject(PywikibotTestCase):
         mysite.loadrevisions(mypage, step=5, total=12)
         self.assertEqual(len(mypage._revisions), 12)
 
+    def testPickleAbility(self):
+        import pickle
+        #fam = pywikibot.site.Family('wikipedia')
+        #site = pywikibot.Site('en', fam)
+        #pywikibot.output(site.family.__dict__)
+        #pickle.dumps(site)
+        site = pywikibot.Site('en', 'wikipedia')
+        #pywikibot.output(site.family.__dict__)
+        pickle.dumps(site)
+        self.assertTrue(True)  # No exception thrown!
+
 
 class TestSiteLoadRevisions(PywikibotTestCase):
     """Test cases for Site.loadrevision() method."""
