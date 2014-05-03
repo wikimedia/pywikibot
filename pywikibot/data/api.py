@@ -457,7 +457,7 @@ class CachedRequest(Request):
             pass
 
     def _uniquedescriptionstr(self):
-        return (repr(self.site) + repr(sorted(self.iteritems())))
+        return (repr(self.site) + repr(self.site.user()) + repr(sorted(self.iteritems())))
 
     def _create_file_name(self):
         self.http_params()  # normalize self.iteritems()
