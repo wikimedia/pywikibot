@@ -63,7 +63,8 @@ setup(
               for package in find_packages()
               if package.startswith('pywikibot.')],
     install_requires=[
-        'httplib2>=0.6.0'
+        'httplib2>=0.6.0',
+        'mwparserfromhell>=0.3.3'
     ],
     dependency_links=[
         'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1'
