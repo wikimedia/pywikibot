@@ -79,16 +79,16 @@ def run_python_file(filename, argv, argvu):
 if not os.environ.get("PY3", False):
     if sys.version_info[0] != 2:
         raise RuntimeError("ERROR: Pywikibot only runs under Python 2")
-    if sys.version_info[1] < 6:
-        raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6 "
+    if sys.version_info < (2, 6, 5):
+        raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 "
                            "or higher")
 else:
     if sys.version_info[0] not in (2, 3):
         raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2 "
                            "or Python 3")
     version = tuple(sys.version_info)[:3]
-    if version < (2, 6):
-        raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6 "
+    if version < (2, 6, 5):
+        raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 "
                            "or higher")
     if version >= (3, ) and version < (3, 3):
         raise RuntimeError("ERROR: Pywikibot only runs under Python 3.3 "
