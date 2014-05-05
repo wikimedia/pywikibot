@@ -25,7 +25,8 @@ extra_deps = {
     'Google': ['google'],
     'IRC': ['irc'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
-    'Tkinter': ['Pillow']
+    'Tkinter': ['Pillow'],
+    'rcstream': ['socketIO-client'],
 }
 
 if sys.version_info[0] == 2:

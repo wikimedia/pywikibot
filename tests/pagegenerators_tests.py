@@ -25,6 +25,7 @@ from tests.aspects import (
     TestCase,
     WikidataTestCase,
     DefaultSiteTestCase,
+    WikimediaDefaultSiteTestCase,
 )
 from tests.thread_tests import GeneratorIntersectTestCase
 
@@ -602,6 +603,33 @@ class EnglishWikipediaPageGeneratorIntersectTestCase(GeneratorIntersectTestCase)
                                    'Category:Candidates_for_speedy_deletion'))
              ])
 
+
+class LiveRCPageGeneratorTestCase(WikimediaDefaultSiteTestCase):
+
+    """ Test case for Live Recent Changes pagegenerator.
+
+    Works best on a busy site, as three changes are requested
+    """
+
+    length = 3
+
+    def test_RC_pagegenerator_result(self):
+        site = self.get_site()
+        pagegenerator = pagegenerators.LiveRCPageGenerator(site, total=self.length)
+        entries = list(pagegenerator)
+        self.assertEqual(len(entries), self.length)
+
+        testentry = entries[0]
+        self.assertEqual(testentry.site, site)
+        self.assertTrue(hasattr(testentry, '_rcinfo'))
+
+        rcinfo = testentry._rcinfo
+        self.assertEqual(rcinfo['server_name'], site.hostname())
+        self.assertEqual(rcinfo['wiki'], site.dbName())
+
+        for key in ["id", "type", "namespace", "title", "comment", "timestamp",
+                    "user", "bot"]:
+            self.assertIn(key, rcinfo.keys())
 
 if __name__ == "__main__":
     try:
