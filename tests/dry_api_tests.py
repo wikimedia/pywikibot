@@ -16,13 +16,15 @@ from tests.utils import unittest
 class DryAPITests(unittest.TestCase):
 
     def setUp(self):
-        self.parms = {'site': pywikibot.Site('en'),
+        self.basesite = pywikibot.Site('en', 'wikipedia')
+        self.altsite = pywikibot.Site('de', 'wikipedia')
+        self.parms = {'site': self.basesite,
                       'action': 'query',
                       'meta': 'userinfo'}
         self.req = CachedRequest(expiry=1, **self.parms)
         self.expreq = CachedRequest(expiry=0, **self.parms)
-        self.diffreq = CachedRequest(expiry=1, site=pywikibot.Site('en'), action='query', meta='siteinfo')
-        self.diffsite = CachedRequest(expiry=1, site=pywikibot.Site('de'), action='query', meta='userinfo')
+        self.diffreq = CachedRequest(expiry=1, site=self.basesite, action='query', meta='siteinfo')
+        self.diffsite = CachedRequest(expiry=1, site=self.altsite, action='query', meta='userinfo')
 
     def test_expiry_formats(self):
         self.assertEqual(self.req.expiry, CachedRequest(datetime.timedelta(days=1), **self.parms).expiry)
