@@ -992,6 +992,7 @@ class TestSiteLoadRevisions(PywikibotTestCase):
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
     def setUp(self):
+        super(TestSiteLoadRevisions, self).setUp()
         code, family = "en", "wikipedia"
         self.mysite = pywikibot.Site(code, family)
         self.mainpage = pywikibot.Page(pywikibot.Link("Main Page", self.mysite))

@@ -26,8 +26,12 @@ class TestRequest(CachedRequest):
 
 
 def patch_request():
+    global original_expired
     pywikibot.data.api.Request = TestRequest
+    original_expired = pywikibot.data.api.CachedRequest._expired
+    pywikibot.data.api.CachedRequest._expired = lambda *args, **kwargs: False
 
 
 def unpatch_request():
     pywikibot.data.api.Request = _original_Request
+    pywikibot.data.api.CachedRequest._expired = original_expired
