@@ -2629,15 +2629,6 @@ class ItemPage(WikibasePage):
         i._title = page.title()
         return i
 
-    def __make_site(self, dbname):
-        """
-        Converts a Site.dbName() into a Site object.
-        Rather hackish method that only works for WMF sites
-        """
-        lang = dbname.replace('wiki', '')
-        lang = lang.replace('_', '-')
-        return pywikibot.Site(lang, 'wikipedia')
-
     def get(self, force=False, *args):
         """
         Fetches all page data, and caches it
@@ -2660,11 +2651,6 @@ class ItemPage(WikibasePage):
         self.sitelinks = {}
         if 'sitelinks' in self._content:
             for dbname in self._content['sitelinks']:
-                # Due to issues with locked/obsolete sites
-                # this part is commented out
-                #site = self.__make_site(dbname)
-                #self.sitelinks[site] = pywikibot.Page(
-                #    site, self._content['sitelinks'][dbname]['title'])
                 self.sitelinks[dbname] = self._content[
                     'sitelinks'][dbname]['title']
 
