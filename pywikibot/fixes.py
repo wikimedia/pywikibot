@@ -452,8 +452,8 @@ fixes = {
         }
     },
 
-    #Corrections for Arabic Wikipedia and any Arabic wiki.
-    #python replace.py -fix:correct-ar -start:! -always
+    # Corrections for Arabic Wikipedia and any Arabic wiki.
+    #   python replace.py -fix:correct-ar -start:! -always
 
     'correct-ar': {
         'regex': True,
@@ -461,7 +461,7 @@ fixes = {
             'ar': u'تدقيق إملائي',
         },
         'replacements': [
-            #(u' ,', u' ،'), #FIXME: Do not replace comma in non-Arabic text, interwiki, image links or <math> syntax.
+            #(u' ,', u' ،'), # FIXME: Do not replace comma in non-Arabic text, interwiki, image links or <math> syntax.
             (r'\b' + u'إمرأة' + r'\b', u'امرأة'),
             (r'\b' + u'الى' + r'\b', u'إلى'),
             (r'\b' + u'إسم' + r'\b', u'اسم'),

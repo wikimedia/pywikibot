@@ -85,7 +85,7 @@ def getversion_svn(path=None):
     _program_dir = path or _get_program_dir()
     entries = open(os.path.join(_program_dir, '.svn/entries'))
     version = entries.readline().strip()
-    #use sqlite table for new entries format
+    # use sqlite table for new entries format
     if version == "12":
         entries.close()
         from sqlite3 import dbapi2 as sqlite

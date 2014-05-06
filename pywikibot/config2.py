@@ -23,7 +23,7 @@ import platform
 # variables that are intended only for internal use and not to be exported
 # to other modules.
 
-############## ACCOUNT SETTINGS ##############
+# ############# ACCOUNT SETTINGS ##############
 
 # The family of sites we are working on. wikipedia.py will import
 # families/xxx_family.py so if you want to change this variable,
@@ -185,7 +185,7 @@ register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
 # Set to True to override the {{bots}} exclusion protocol (at your own risk!)
 ignore_bot_templates = False
 
-############## USER INTERFACE SETTINGS ##############
+# ############# USER INTERFACE SETTINGS ##############
 
 # The encoding that's used in the user's console, i.e. how strings are encoded
 # when they are read by raw_input(). On Windows systems' DOS box, this should
@@ -196,8 +196,8 @@ ignore_bot_templates = False
 try:
     console_encoding = __sys.stdout.encoding
 except:
-    #When using pywikipedia inside a daemonized twisted application,
-    #we get "StdioOnnaStick instance has no attribute 'encoding'"
+    # When using pywikipedia inside a daemonized twisted application,
+    # we get "StdioOnnaStick instance has no attribute 'encoding'"
     console_encoding = None
 
 # The encoding the user would like to see text transliterated to. This can be
@@ -254,7 +254,7 @@ try:
 except:
     colorized_output = False
 
-############## EXTERNAL EDITOR SETTINGS ##############
+# ############# EXTERNAL EDITOR SETTINGS ##############
 # The command for the editor you want to use. If set to None, a simple Tkinter
 # editor will be used.
 # On Windows systems, this script tries to determine the default text editor.
@@ -286,7 +286,7 @@ editor_encoding = 'utf-8'
 # highlighting in your text editor.
 editor_filename_extension = 'wiki'
 
-############## LOGFILE SETTINGS ##############
+# ############# LOGFILE SETTINGS ##############
 
 # Defines for which scripts a logfile should be enabled. Logfiles will be
 # saved in the 'logs' subdirectory.
@@ -319,7 +319,7 @@ verbose_output = 0
 # (overrides log setting above)
 debug_log = []
 
-############## INTERWIKI SETTINGS ##############
+# ############# INTERWIKI SETTINGS ##############
 
 # Should interwiki.py report warnings for missing links between foreign
 # languages?
@@ -366,7 +366,7 @@ without_interwiki = False
 # them in RAM.
 interwiki_contents_on_disk = False
 
-############## SOLVE_DISAMBIGUATION SETTINGS ############
+# ############# SOLVE_DISAMBIGUATION SETTINGS ############
 #
 # Set disambiguation_comment[FAMILY][LANG] to a non-empty string to override
 # the default edit comment for the solve_disambiguation bot.
@@ -378,12 +378,12 @@ interwiki_contents_on_disk = False
 
 sort_ignore_case = False
 
-############## IMAGE RELATED SETTINGS ##############
+# ############# IMAGE RELATED SETTINGS ##############
 # If you set this to True, images will be uploaded to Wikimedia
 # Commons by default.
 upload_to_commons = False
 
-############## SETTINGS TO AVOID SERVER OVERLOAD ##############
+# ############# SETTINGS TO AVOID SERVER OVERLOAD ##############
 
 # Slow down the robot such that it never requests a second page within
 # 'minthrottle' seconds. This can be lengthened if the server is slow,
@@ -423,7 +423,7 @@ max_retries = 25
 # Minimum time to wait before resubmitting a failed API request.
 retry_wait = 5
 
-############## TABLE CONVERSION BOT SETTINGS ##############
+# ############# TABLE CONVERSION BOT SETTINGS ##############
 
 # will split long paragraphs for better reading the source.
 # only table2wiki.py use it by now
@@ -435,7 +435,7 @@ deIndentTables = True
 table2wikiAskOnlyWarnings = True
 table2wikiSkipWarnings = False
 
-############## WEBLINK CHECKER SETTINGS ##############
+# ############# WEBLINK CHECKER SETTINGS ##############
 
 # How many external links should weblinkchecker.py check at the same time?
 # If you have a fast connection, you might want to increase this number so
@@ -444,12 +444,12 @@ max_external_links = 50
 
 report_dead_links_on_talk = False
 
-############## DATABASE SETTINGS ##############
+# ############# DATABASE SETTINGS ##############
 db_hostname = 'localhost'
 db_username = 'wikiuser'
 db_password = ''
 
-############## SEARCH ENGINE SETTINGS ##############
+# ############# SEARCH ENGINE SETTINGS ##############
 
 # Some scripts allow querying Google via the Google Web API. To use this
 # feature, you must install the pyGoogle module from http://pygoogle.sf.net/
@@ -466,7 +466,7 @@ yahoo_appid = ''
 # http://search.msn.com/developer
 msn_appid = ''
 
-############## COPYRIGHT SETTINGS ##############
+# ############# COPYRIGHT SETTINGS ##############
 
 # Enable/disable search engine in copyright.py script
 copyright_google = True
@@ -519,18 +519,19 @@ copyright_show_length = True
 # number of results.
 copyright_economize_query = True
 
-############## HTTP SETTINGS ##############
+# ############# HTTP SETTINGS ##############
 # Use a persistent http connection. An http connection has to be established
 # only once per site object, making stuff a whole lot faster. Do NOT EVER
 # use this if you share Site objects across threads without proper locking.
-## DISABLED FUNCTION. Setting this variable will not have any effect.
+#
+# DISABLED FUNCTION. Setting this variable will not have any effect.
 persistent_http = False
 
 # Default socket timeout. Set to None to disable timeouts.
 socket_timeout = 120  # set a pretty long timeout just in case...
 
 
-############## COSMETIC CHANGES SETTINGS ##############
+# ############# COSMETIC CHANGES SETTINGS ##############
 # The bot can make some additional changes to each page it edits, e.g. fix
 # whitespace or positioning of interwiki and category links.
 
@@ -570,7 +571,7 @@ cosmetic_changes_disable = {}
 cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
                                 'touch']
 
-############## REPLICATION BOT ################
+# ############# REPLICATION BOT ################
 # You can add replicate_replace to your user_config.py, which has the following
 # format:
 #
@@ -582,9 +583,10 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
 # liwiki. Note that this does not take the origin wiki into account.
 replicate_replace = {}
 
-############## FURTHER SETTINGS ##############
+# ############# FURTHER SETTINGS ##############
 
-### Proxy configuration ###
+# Proxy configuration
+
 # assign prox = None to connect directly
 # For proxy support first run: apt-get install python-socks.py
 # then change your user-config.py like:
@@ -596,7 +598,8 @@ replicate_replace = {}
 # Configuration variable 'socks' is defined but unknown. Misspelled?proxy = None
 proxy = None
 
-### Simulate settings ###
+# Simulate settings
+
 # Defines what actions the bots are NOT allowed to do (e.g. 'edit') on wikipedia
 # servers. Allows simulation runs of bots to be carried out without changing any
 # page on the server side. This setting may be overridden in user_config.py.

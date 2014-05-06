@@ -520,7 +520,7 @@ class WikidataQuery():
 
         fullQueryString = self.getQueryString(q, labels, props)
 
-        #try to get cached data first
+        # try to get cached data first
         data = self.readFromCache(fullQueryString)
 
         if data:
@@ -534,7 +534,7 @@ class WikidataQuery():
         if not data:
             return None
 
-        #cache data for next time
+        # cache data for next time
         self.saveToCache(fullQueryString, data)
 
         return data

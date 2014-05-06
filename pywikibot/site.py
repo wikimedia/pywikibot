@@ -580,27 +580,27 @@ class APISite(BaseSite):
     Do not use directly; use pywikibot.Site function.
 
     """
-##    Site methods from version 1.0 (as these are implemented in this file,
-##    or declared deprecated/obsolete, they will be removed from this list)
-##########
-##    cookies: return user's cookies as a string
-##
-##    urlEncode: Encode a query to be sent using an http POST request.
-##    postForm: Post form data to an address at this site.
-##    postData: Post encoded form data to an http address at this site.
-##
-##    version: Return MediaWiki version string from Family file.
-##    versionnumber: Return int identifying the MediaWiki version.
-##    live_version: Return version number read from Special:Version.
-##    checkCharset(charset): Warn if charset doesn't match family file.
-##
-##    linktrail: Return regex for trailing chars displayed as part of a link.
-##    disambcategory: Category in which disambiguation pages are listed.
-##
-##    Methods that yield Page objects derived from a wiki's Special: pages
-##    (note, some methods yield other information in a tuple along with the
-##    Pages; see method docs for details) --
-##
+#    Site methods from version 1.0 (as these are implemented in this file,
+#    or declared deprecated/obsolete, they will be removed from this list)
+#########
+#    cookies: return user's cookies as a string
+#
+#    urlEncode: Encode a query to be sent using an http POST request.
+#    postForm: Post form data to an address at this site.
+#    postData: Post encoded form data to an http address at this site.
+#
+#    version: Return MediaWiki version string from Family file.
+#    versionnumber: Return int identifying the MediaWiki version.
+#    live_version: Return version number read from Special:Version.
+#    checkCharset(charset): Warn if charset doesn't match family file.
+#
+#    linktrail: Return regex for trailing chars displayed as part of a link.
+#    disambcategory: Category in which disambiguation pages are listed.
+#
+#    Methods that yield Page objects derived from a wiki's Special: pages
+#    (note, some methods yield other information in a tuple along with the
+#    Pages; see method docs for details) --
+#
 
     def __init__(self, code, fam=None, user=None, sysop=None):
         BaseSite.__init__(self, code, fam, user, sysop)
@@ -1007,7 +1007,7 @@ class APISite(BaseSite):
         Group 1 in the regex match object will be the target title.
 
         """
-        #NOTE: this is needed, since the API can give false positives!
+        # NOTE: this is needed, since the API can give false positives!
         try:
             keywords = set(s.lstrip("#")
                            for s in self.getmagicwords("redirect"))
@@ -2465,7 +2465,7 @@ class APISite(BaseSite):
                                 wlprop="user|comment|timestamp|title|ids|flags",
                                 wlallrev="", namespaces=namespaces,
                                 step=step, total=total)
-        #TODO: allow users to ask for "patrol" as well?
+        # TODO: allow users to ask for "patrol" as well?
         if start is not None:
             wlgen.request["wlstart"] = str(start)
         if end is not None:
@@ -2687,10 +2687,10 @@ class APISite(BaseSite):
             pywikibot.warning(
                 u"editpage: Invalid watch value '%(watch)s' ignored."
                 % locals())
-## FIXME: API gives 'badmd5' error
-##        md5hash = md5()
-##        md5hash.update(urllib.quote_plus(text.encode(self.encoding())))
-##        params['md5'] = md5hash.digest()
+# FIXME: API gives 'badmd5' error
+#        md5hash = md5()
+#        md5hash.update(urllib.quote_plus(text.encode(self.encoding())))
+#        params['md5'] = md5hash.digest()
         req = api.Request(site=self, **params)
         while True:
             try:
@@ -2866,7 +2866,7 @@ class APISite(BaseSite):
         if "move" not in result:
             pywikibot.error(u"movepage: %s" % result)
             raise Error("movepage: unexpected response")
-        #TODO: Check for talkmove-error messages
+        # TODO: Check for talkmove-error messages
         if "talkmove-error-code" in result["move"]:
             pywikibot.warning(
                 u"movepage: Talk page %s not moved"
@@ -3019,9 +3019,9 @@ class APISite(BaseSite):
         finally:
             self.unlock_page(page)
 
-    #TODO: implement undelete
+    # TODO: implement undelete
 
-    #TODO: implement patrol
+    # TODO: implement patrol
 
     @must_be(group='sysop')
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
@@ -3292,7 +3292,7 @@ class APISite(BaseSite):
         this is derived from the "upload" log events instead.
 
         """
-        #TODO: update docstring
+        # TODO: update docstring
         for event in logevents(self, logtype="upload", user=user,
                                start=start, end=end, reverse=reverse,
                                step=step, total=total):
@@ -3403,7 +3403,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return uigen
 
-    #synonym
+    # synonym
     uncategorizedfiles = uncategorizedimages
 
     @deprecate_arg("number", None)
@@ -3448,7 +3448,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return uigen
 
-    #synonym
+    # synonym
     unusedimages = unusedfiles
 
     @deprecate_arg("number", None)
@@ -3601,7 +3601,7 @@ class DataSite (APISite):
             props='datatype',
         )
         expiry = datetime.timedelta(days=365 * 100)
-        #Store it for 100 years
+        # Store it for 100 years
         req = api.CachedRequest(expiry, site=self, **params)
         data = req.submit()
 
@@ -3616,7 +3616,7 @@ class DataSite (APISite):
 
         if dtype == 'globe-coordinate':
             dtype = 'globecoordinate'
-            #TODO Fix this
+            # TODO Fix this
         return dtype
 
     @must_be(group='user')
@@ -3660,7 +3660,7 @@ class DataSite (APISite):
         req = api.Request(site=self, **params)
         data = req.submit()
         claim.snak = data['claim']['id']
-        #Update the item
+        # Update the item
         if claim.getID() in item.claims:
             item.claims[claim.getID()].append(claim)
         else:
@@ -3676,7 +3676,7 @@ class DataSite (APISite):
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
         if not claim.snak:
-            #We need to already have the snak value
+            # We need to already have the snak value
             raise pywikibot.NoPage(claim)
         params = dict(action='wbsetclaimvalue',
                       claim=claim.snak,
@@ -3716,7 +3716,7 @@ class DataSite (APISite):
         if bot:
             params['bot'] = 1
         params['token'] = self.token(claim, 'edit')
-        #build up the snak
+        # build up the snak
         if isinstance(source, list):
             sources = source
         else:
@@ -3786,7 +3786,7 @@ class DataSite (APISite):
                 qualifier.hash is not None):
             params['snakhash'] = qualifier.hash
         params['token'] = self.token(claim, 'edit')
-        #build up the snak
+        # build up the snak
         if qualifier.getSnakType() == 'value':
             params['value'] = json.dumps(qualifier._formatDataValue())
         params['snaktype'] = qualifier.getSnakType()
@@ -3962,10 +3962,10 @@ class DataSite (APISite):
         raise NotImplementedError
 
 
-#### METHODS NOT IMPLEMENTED YET ####
+# ### METHODS NOT IMPLEMENTED YET ####
 class NotImplementedYet:
 
-    #TODO: is this needed any more? can it be obtained from the http module?
+    # TODO: is this needed any more? can it be obtained from the http module?
     def cookies(self, sysop=False):
         """Return a string containing the user's current cookies."""
         self._loadCookies(sysop=sysop)

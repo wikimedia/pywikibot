@@ -319,7 +319,7 @@ class TestPageObject(PywikibotTestCase):
 
     def testReferences(self):
         count = 0
-        #Ignore redirects for time considerations
+        # Ignore redirects for time considerations
         for p in mainpage.getReferences(follow_redirects=False):
             count += 1
             self.assertType(p, pywikibot.Page)
@@ -363,24 +363,24 @@ class TestPageObject(PywikibotTestCase):
 
 # methods that still need tests implemented or expanded:
 
-##    def autoFormat(self):
-##    def isAutoTitle(self):
-##    def getOldVersion(self, oldid, force=False, get_redirect=False,
-##                      sysop=False):
-##    text = property(_textgetter, _textsetter, _cleartext,
-##                    "The edited wikitext (unicode) of this Page")
-##    def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
-##                      onlyTemplateInclusion=False, redirectsOnly=False,
-##                      namespaces=None):
-##    def backlinks(self, followRedirects=True, filterRedirects=None,
-##                  namespaces=None):
-##    def embeddedin(self, filter_redirects=None, namespaces=None):
-##    def getVersionHistory(self, reverseOrder=False, getAll=False,
-##                          revCount=500):
-##    def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
-##                               getAll=False, revCount=500):
-##    def fullVersionHistory(self):
-##    def contributingUsers(self):
+#    def autoFormat(self):
+#    def isAutoTitle(self):
+#    def getOldVersion(self, oldid, force=False, get_redirect=False,
+#                      sysop=False):
+#    text = property(_textgetter, _textsetter, _cleartext,
+#                    "The edited wikitext (unicode) of this Page")
+#    def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
+#                      onlyTemplateInclusion=False, redirectsOnly=False,
+#                      namespaces=None):
+#    def backlinks(self, followRedirects=True, filterRedirects=None,
+#                  namespaces=None):
+#    def embeddedin(self, filter_redirects=None, namespaces=None):
+#    def getVersionHistory(self, reverseOrder=False, getAll=False,
+#                          revCount=500):
+#    def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
+#                               getAll=False, revCount=500):
+#    def fullVersionHistory(self):
+#    def contributingUsers(self):
 
 
 if __name__ == '__main__':

@@ -103,7 +103,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         'invoke':       re.compile(r'(?i)\{\{\s*#invoke:.*?}\}'),
         # categories
         'category':     re.compile(u'\[\[ *(?:%s)\s*:.*?\]\]' % u'|'.join(site.namespace(14, all=True))),
-        #files
+        # files
         'file':         re.compile(u'\[\[ *(?:%s)\s*:.*?\]\]' % u'|'.join(site.namespace(6, all=True))),
 
     }
@@ -219,8 +219,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                 # group references such as \2 or \g<name>.
                 # On the other hand, this approach does not work because it
                 # can't handle lookahead or lookbehind (see bug #1731008):
-                #replacement = old.sub(new, text[match.start():match.end()])
-                #text = text[:match.start()] + replacement + text[match.end():]
+                #
+                #  replacement = old.sub(new, text[match.start():match.end()])
+                #  text = text[:match.start()] + replacement + text[match.end():]
 
                 # So we have to process the group references manually.
                 replacement = new
@@ -374,9 +375,9 @@ def expandmarker(text, marker='', separator=''):
     return marker
 
 
-#-------------------------------------------------
+# -----------------------------------------------
 # Functions dealing with interwiki language links
-#-------------------------------------------------
+# -----------------------------------------------
 # Note - MediaWiki supports several kinds of interwiki links; two kinds are
 #        interlanguage links. We deal here with those kinds only.
 #        A family has by definition only one kind of interlanguage links:
@@ -523,7 +524,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
     if s:
         if site.language() in site.family.interwiki_attop or \
            u'<!-- interwiki at top -->' in oldtext:
-            #do not add separator if interwiki links are on one line
+            # do not add separator if interwiki links are on one line
             newtext = s + (u'' if site.language()
                            in site.family.interwiki_on_one_line
                            else separator) + s2.replace(marker, '').strip()
@@ -625,7 +626,7 @@ def interwikiSort(sites, insite=None):
     sites.sort()
     putfirst = insite.interwiki_putfirst()
     if putfirst:
-        #In this case I might have to change the order
+        # In this case I might have to change the order
         firstsites = []
         for code in putfirst:
             if code in insite.validLanguageLinks():
@@ -635,14 +636,14 @@ def interwikiSort(sites, insite=None):
                     firstsites = firstsites + [site]
         sites = firstsites + sites
     if insite.interwiki_putfirst_doubled(sites):
-        #some (all?) implementations return False
+        # some (all?) implementations return False
         sites = insite.interwiki_putfirst_doubled(sites) + sites
     return sites
 
 
-#---------------------------------------
+# -------------------------------------
 # Functions dealing with category links
-#---------------------------------------
+# -------------------------------------
 
 def getCategoryLinks(text, site=None):
     """Return a list of category links found in text.
@@ -690,7 +691,7 @@ def removeCategoryLinks(text, site=None, marker=''):
                          ['nowiki', 'comment', 'math', 'pre', 'source'],
                          marker=marker)
     if marker:
-        #avoid having multiple linefeeds at the end of the text
+        # avoid having multiple linefeeds at the end of the text
         text = re.sub('\s*%s' % re.escape(marker), config.LS + marker,
                       text.strip())
     return text.strip()
@@ -856,9 +857,9 @@ def categoryFormat(categories, insite=None):
     return sep.join(catLinks) + config.line_separator
 
 
-#---------------------------------------
+# -------------------------------------
 # Functions dealing with external links
-#---------------------------------------
+# -------------------------------------
 
 def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     """Return a regex that matches external links."""
@@ -890,9 +891,9 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     return linkR
 
 
-#----------------------------------
+# --------------------------------
 # Functions dealing with templates
-#----------------------------------
+# --------------------------------
 
 def extract_templates_and_params(text):
     """Return a list of templates found in text.
@@ -1015,29 +1016,29 @@ def extract_templates_and_params_regex(text):
             if not name or name.startswith('#'):
                 continue
 
-## TODO: merged from wikipedia.py - implement the following
-##            if self.site().isInterwikiLink(name):
-##                continue
-##            # {{DEFAULTSORT:...}}
-##            defaultKeys = self.site().versionnumber() > 13 and \
-##                          self.site().getmagicwords('defaultsort')
-##            # It seems some wikis does not have this magic key
-##            if defaultKeys:
-##                found = False
-##                for key in defaultKeys:
-##                    if name.startswith(key):
-##                        found = True
-##                        break
-##                if found: continue
-##
-##            try:
-##                name = Page(self.site(), name).title()
-##            except InvalidTitle:
-##                if name:
-##                    output(
-##                        u"Page %s contains invalid template name {{%s}}."
-##                       % (self.title(), name.strip()))
-##                continue
+# TODO: merged from wikipedia.py - implement the following
+#            if self.site().isInterwikiLink(name):
+#                continue
+#            # {{DEFAULTSORT:...}}
+#            defaultKeys = self.site().versionnumber() > 13 and \
+#                          self.site().getmagicwords('defaultsort')
+#            # It seems some wikis does not have this magic key
+#            if defaultKeys:
+#                found = False
+#                for key in defaultKeys:
+#                    if name.startswith(key):
+#                        found = True
+#                        break
+#                if found: continue
+#
+#            try:
+#                name = Page(self.site(), name).title()
+#            except InvalidTitle:
+#                if name:
+#                    output(
+#                        u"Page %s contains invalid template name {{%s}}."
+#                       % (self.title(), name.strip()))
+#                continue
 
             # Parameters
             paramString = m.group('params')
@@ -1099,9 +1100,9 @@ def glue_template_and_params(template_and_params):
     return u'{{%s\n%s}}' % (template, text)
 
 
-#----------------------------------
+# --------------------------
 # Page parsing functionality
-#----------------------------------
+# --------------------------
 
 def does_text_contain_section(pagetext, section):
     """
@@ -1127,9 +1128,9 @@ def does_text_contain_section(pagetext, section):
     return bool(m)
 
 
-#---------------------------------
+# ---------------------------------------
 # Time parsing functionality (Archivebot)
-#---------------------------------
+# ---------------------------------------
 
 class tzoneFixedOffset(datetime.tzinfo):
     """
@@ -1189,7 +1190,7 @@ class TimeStripper(object):
         self.pmonthR = re.compile(monthR, re.U)
         self.pdayR = re.compile(dayR)
 
-        #order is important to avoid mismatch when searching
+        # order is important to avoid mismatch when searching
         self.patterns = [
             self.ptimeR,
             self.timeznR,
@@ -1227,32 +1228,32 @@ class TimeStripper(object):
 
         """
         _line = line
-        #match date fields
+        # match date fields
         dateDict = dict()
         for pat in self.patterns:
             line, matchDict = self.last_match_and_replace(line, pat)
             if matchDict:
                 dateDict.update(matchDict)
 
-        #all fields matched -> date valid
+        # all fields matched -> date valid
         if all(g in dateDict for g in self.groups):
-            #remove 'time' key, now splitted in hour/minute and not needed by datetime
+            # remove 'time' key, now splitted in hour/minute and not needed by datetime
             del dateDict['time']
 
-            #replace month name in original language with month number
+            # replace month name in original language with month number
             try:
                 dateDict['month'] = self.origNames2monthNum[dateDict['month']]
             except KeyError:
                 pywikibot.output(u'incorrect month name in page')
 
-            #convert to integers
+            # convert to integers
             for k, v in dateDict.items():
                 try:
                     dateDict[k] = int(v)
                 except ValueError:
                     pass
 
-            #find timezone
+            # find timezone
             dateDict['tzinfo'] = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
                                                   self.site.siteinfo['timezone'])
 

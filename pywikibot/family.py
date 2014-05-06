@@ -332,7 +332,7 @@ class Family(object):
             'dmoz':             'dmoz',
             'dmozs':            'dmozs',
             'docbook':          'docbook',
-##            'doi':              'doi',
+#            'doi':              'doi',
             'doom_wiki':        'doom_wiki',
             'download':         'download',
             'drae':             'drae',
@@ -819,15 +819,19 @@ class Family(object):
         #     '_default'; values are a list of namespace numbers
         self.crossnamespace = collections.defaultdict(dict)
         ##
-        ## Examples :
-        ## Allowing linking to pt' 102 NS from any other lang' 0 NS is
-        # self.crossnamespace[0] = {
-        #     '_default': { 'pt': [102]}
-        # }
-        ## While allowing linking from pt' 102 NS to any other lang' = NS is
-        # self.crossnamespace[102] = {
-        #     'pt': { '_default': [0]}
-        # }
+        # Examples :
+        #
+        # Allowing linking to pt' 102 NS from any other lang' 0 NS is
+        #
+        #   self.crossnamespace[0] = {
+        #       '_default': { 'pt': [102]}
+        #   }
+        #
+        # While allowing linking from pt' 102 NS to any other lang' = NS is
+        #
+        #   self.crossnamespace[102] = {
+        #       'pt': { '_default': [0]}
+        #   }
 
     @property
     def iwkeys(self):
@@ -841,8 +845,8 @@ class Family(object):
 
         """
         self.langs[code] = location
-##        for num, val in namespaces.items():
-##            self.namespaces[num][code] = val
+#        for num, val in namespaces.items():
+#            self.namespaces[num][code] = val
 
     def get_known_families(self, site):
         return self.known_families

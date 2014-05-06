@@ -390,7 +390,7 @@ class Family(family.WikimediaFamily):
             'km': {
                 '_default': [0, 4, 12],
             },
-            #wrong wikipedia namespace alias
+            # wrong wikipedia namespace alias
             'mzn': {
                 '_default': [0, 4],
 

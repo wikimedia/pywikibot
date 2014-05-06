@@ -1581,7 +1581,7 @@ class Page(object):
                                  % (self.title(asLink=True), error.message))
         return False
 
-######## DEPRECATED METHODS ########
+# ####### DEPRECATED METHODS ########
 
     @deprecated("Site.encoding()")
     def encoding(self):
@@ -1619,7 +1619,7 @@ class Page(object):
         """
         return self.title(asUrl=True)
 
-####### DISABLED METHODS (warnings provided) ######
+# ###### DISABLED METHODS (warnings provided) ######
     # these methods are easily replaced by editing the page's text using
     # textlib methods and then using put() on the result.
 
@@ -2052,7 +2052,7 @@ class Category(Page):
         """
         return self.site.categoryinfo(self)
 
-#### DEPRECATED METHODS ####
+# ### DEPRECATED METHODS ####
     @deprecated("list(Category.subcategories(...))")
     def subcategoriesList(self, recurse=False):
         """DEPRECATED: Equivalent to list(self.subcategories(...))"""
@@ -2668,9 +2668,9 @@ class ItemPage(WikibasePage):
             for dbname in self._content['sitelinks']:
                 # Due to issues with locked/obsolete sites
                 # this part is commented out
-##                site = self.__make_site(dbname)
-##                self.sitelinks[site] = pywikibot.Page(
-##                    site, self._content['sitelinks'][dbname]['title'])
+                #site = self.__make_site(dbname)
+                #self.sitelinks[site] = pywikibot.Page(
+                #    site, self._content['sitelinks'][dbname]['title'])
                 self.sitelinks[dbname] = self._content[
                     'sitelinks'][dbname]['title']
 

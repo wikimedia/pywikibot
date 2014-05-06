@@ -218,7 +218,7 @@ class transliterator(object):
         for char in u"Cʗǃ":
             self.trans[char] = u"!"
 
-        #Punctuation and typography
+        # Punctuation and typography
         for char in u"«»“”„¨":
             self.trans[char] = u'"'
         for char in u"‘’′":
@@ -2025,15 +2025,15 @@ class transliterator(object):
     def transliterate(self, char, default="?", prev="-", next="-"):
         if char in self.trans:
             return self.trans[char]
-        #Arabic
+        # Arabic
         if char == u"◌":
             return prev
-        #Japanese
+        # Japanese
         if char == u"ッ":
             return self.transliterate(next)[0]
         if char in u"々仝ヽヾゝゞ〱〲〳〵〴〵":
             return prev
-        #Lao
+        # Lao
         if char == u"ຫ":
             if next in u"ງຍນຣລຼຼວ":
                 return ""

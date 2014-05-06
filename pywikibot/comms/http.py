@@ -145,12 +145,12 @@ def request(site, uri, ssl=False, *args, **kwargs):
     while not request.lock.acquire(False):
         time.sleep(0.1)
 
-    #TODO: do some error correcting stuff
+    # TODO: do some error correcting stuff
     if isinstance(request.data, SSLHandshakeError):
         if SSL_CERT_VERIFY_FAILED in str(request.data):
             raise FatalServerError(str(request.data))
 
-    #if all else fails
+    # if all else fails
     if isinstance(request.data, Exception):
         raise request.data
 

@@ -289,9 +289,9 @@ class Request(MutableMapping):
                     rawdata = http.request(self.site, uri, ssl, method="POST",
                                            headers={'Content-Type': 'application/x-www-form-urlencoded'},
                                            body=paramstring)
-##                import traceback
-##                traceback.print_stack()
-##                print rawdata
+#                import traceback
+#                traceback.print_stack()
+#                print rawdata
             except Server504Error:
                 pywikibot.log(u"Caught HTTP 504 error; retrying")
                 self.wait()
@@ -300,7 +300,7 @@ class Request(MutableMapping):
                 # This error is not going to be fixed by just waiting
                 pywikibot.error(traceback.format_exc())
                 raise
-            #TODO: what other exceptions can occur here?
+            # TODO: what other exceptions can occur here?
             except Exception as e:
                 # for any other error on the http request, wait and retry
                 pywikibot.error(traceback.format_exc())

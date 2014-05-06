@@ -38,24 +38,24 @@ def _altlang(code):
     This code is used by other translating methods below.
 
     """
-    #Akan
+    # Akan
     if code in ['ak', 'tw']:
         return ['ak', 'tw']
-    #Amharic
+    # Amharic
     if code in ['aa', 'ti']:
         return ['am']
-    #Arab
+    # Arab
     if code in ['arc', 'arz', 'so']:
         return ['ar']
     if code == 'kab':
         return ['ar', 'fr']
-    #Bulgarian
+    # Bulgarian
     if code in ['cu', 'mk']:
         return ['bg', 'sr', 'sh']
-    #Czech
+    # Czech
     if code in ['cs', 'sk']:
         return ['cs', 'sk']
-    #German
+    # German
     if code in ['bar', 'frr', 'ksh', 'pdc', 'pfl']:
         return ['de']
     if code == 'lb':
@@ -72,13 +72,13 @@ def _altlang(code):
         return ['de', 'it']
     if code == 'stq':
         return ['nds', 'de']
-    #Greek
+    # Greek
     if code in ['grc', 'pnt']:
         return ['el']
-    #Esperanto
+    # Esperanto
     if code in ['io', 'nov']:
         return ['eo']
-    #Spanish
+    # Spanish
     if code in ['an', 'arn', 'ast', 'ay', 'ca', 'ext', 'lad', 'nah', 'nv', 'qu',
                 'yua']:
         return ['es']
@@ -88,22 +88,22 @@ def _altlang(code):
         return ['es', 'fr']
     if code == 'cbk-zam':
         return ['es', 'tl']
-    #Estonian
+    # Estonian
     if code == 'fiu-vro':
         return ['et']
     if code == 'liv':
         return ['et', 'lv']
-    #Persian (Farsi)
+    # Persian (Farsi)
     if code == 'ps':
         return ['fa']
     if code in ['glk', 'mzn']:
         return ['glk', 'mzn', 'fa', 'ar']
-    #Finnish
+    # Finnish
     if code == 'vep':
         return ['fi', 'ru']
     if code == 'fit':
         return ['fi', 'sv']
-    #French
+    # French
     if code in ['bm', 'br', 'ht', 'kg', 'ln', 'mg', 'nrm', 'pcd',
                 'rw', 'sg', 'ty', 'wa']:
         return ['fr']
@@ -111,46 +111,46 @@ def _altlang(code):
         return ['fr', 'ca', 'es']
     if code in ['co', 'frp']:
         return ['fr', 'it']
-    #Hindi
+    # Hindi
     if code in ['sa']:
         return ['hi']
     if code in ['ne', 'new']:
         return ['ne', 'new', 'hi']
-    #Indonesian and Malay
+    # Indonesian and Malay
     if code in ['ace', 'bug', 'bjn', 'id', 'jv', 'ms', 'su']:
         return ['id', 'ms', 'jv']
     if code == 'map-bms':
         return ['jv', 'id', 'ms']
-    #Inuit languages
+    # Inuit languages
     if code in ['ik', 'iu']:
         return ['iu', 'kl']
     if code == 'kl':
         return ['da', 'iu', 'no']
-    #Italian
+    # Italian
     if code in ['eml', 'fur', 'lij', 'lmo', 'nap', 'pms', 'roa-tara', 'sc',
                 'scn', 'vec']:
         return ['it']
-    #Lithuanian
+    # Lithuanian
     if code in ['bat-smg']:
         return ['lt']
-    #Latvian
+    # Latvian
     if code == 'ltg':
         return ['lv']
-    #Dutch
+    # Dutch
     if code in ['af', 'fy', 'li', 'pap', 'srn', 'vls', 'zea']:
         return ['nl']
     if code == ['nds-nl']:
         return ['nds', 'nl']
-    #Polish
+    # Polish
     if code in ['csb', 'szl']:
         return ['pl']
-    #Portuguese
+    # Portuguese
     if code in ['fab', 'mwl', 'tet']:
         return ['pt']
-    #Romanian
+    # Romanian
     if code in ['mo', 'roa-rup']:
         return ['ro']
-    #Russian and Belarusian
+    # Russian and Belarusian
     if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'inh', 'kk', 'koi', 'krc',
                 'kv', 'ky', 'lbe', 'lez', 'mdf', 'mhr', 'mn', 'mrj', 'myv',
                 'os', 'sah', 'tg', 'udm', 'uk', 'xal']:
@@ -163,32 +163,32 @@ def _altlang(code):
         return ['be', 'be-x-old', 'ru']
     if code == 'kaa':
         return ['uz', 'ru']
-    #Serbocroatian
+    # Serbocroatian
     if code in ['bs', 'hr', 'sh']:
         return ['sh', 'hr', 'bs', 'sr', 'sr-el']
     if code == 'sr':
         return ['sr-el', 'sh', 'hr', 'bs']
-    #Tagalog
+    # Tagalog
     if code in ['bcl', 'ceb', 'ilo', 'pag', 'pam', 'war']:
         return ['tl']
-    #Turkish and Kurdish
+    # Turkish and Kurdish
     if code in ['diq', 'ku']:
         return ['ku', 'ku-latn', 'tr']
     if code == 'gag':
         return ['tr']
     if code == 'ckb':
         return ['ku']
-    #Ukrainian
+    # Ukrainian
     if code in ['crh', 'rue']:
         return ['uk', 'ru']
-    #Chinese
+    # Chinese
     if code in ['minnan', 'zh', 'zh-classical', 'zh-min-nan', 'zh-tw',
                 'zh-hans', 'zh-hant']:
         return ['zh', 'zh-tw', 'zh-cn', 'zh-classical']
     if code in ['cdo', 'gan', 'hak', 'ii', 'wuu', 'za', 'zh-cdo',
                 'zh-classical', 'zh-cn', 'zh-yue']:
         return ['zh', 'zh-cn', 'zh-tw', 'zh-classical']
-    #Scandinavian languages
+    # Scandinavian languages
     if code in ['da', 'sv']:
         return ['da', 'no', 'nb', 'sv', 'nn']
     if code in ['fo', 'is']:
@@ -199,7 +199,7 @@ def _altlang(code):
         return ['no', 'nb', 'da', 'nn', 'sv']
     if code == 'se':
         return ['sv', 'no', 'nb', 'nn', 'fi']
-    #Other languages
+    # Other languages
     if code in ['bi', 'tpi']:
         return ['bi', 'tpi']
     if code == 'yi':
@@ -216,7 +216,7 @@ def _altlang(code):
         return ['meu', 'hmo']
     if code == ['as']:
         return ['bn']
-    #Default value
+    # Default value
     return []
 
 

@@ -336,14 +336,14 @@ class TestSiteObject(PywikibotTestCase):
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertFalse(page.isRedirectPage())
-##        for page in mysite.allpages(filterlanglinks=True, total=5):
-##            self.assertType(page, pywikibot.Page)
-##            self.assertTrue(mysite.page_exists(page))
-##            self.assertEqual(page.namespace(), 0)
-##        for page in mysite.allpages(filterlanglinks=False, total=5):
-##            self.assertType(page, pywikibot.Page)
-##            self.assertTrue(mysite.page_exists(page))
-##            self.assertEqual(page.namespace(), 0)
+#        for page in mysite.allpages(filterlanglinks=True, total=5):
+#            self.assertType(page, pywikibot.Page)
+#            self.assertTrue(mysite.page_exists(page))
+#            self.assertEqual(page.namespace(), 0)
+#        for page in mysite.allpages(filterlanglinks=False, total=5):
+#            self.assertType(page, pywikibot.Page)
+#            self.assertTrue(mysite.page_exists(page))
+#            self.assertEqual(page.namespace(), 0)
         for page in mysite.allpages(minsize=100, total=5):
             self.assertType(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
@@ -403,10 +403,10 @@ class TestSiteObject(PywikibotTestCase):
         for cat in mysite.allcategories(total=5, prefix="Def"):
             self.assertType(cat, pywikibot.Category)
             self.assertTrue(cat.title(withNamespace=False).startswith("Def"))
-##        # Bug # 15985
-##        for cat in mysite.allcategories(total=5, start="Hij", reverse=True):
-##            self.assertType(cat, pywikibot.Category)
-##            self.assertTrue(cat.title(withNamespace=False) <= "Hij")
+#        # Bug # 15985
+#        for cat in mysite.allcategories(total=5, start="Hij", reverse=True):
+#            self.assertType(cat, pywikibot.Category)
+#            self.assertTrue(cat.title(withNamespace=False) <= "Hij")
 
     def testAllUsers(self):
         """Test the site.allusers() method"""
@@ -449,11 +449,11 @@ class TestSiteObject(PywikibotTestCase):
             self.assertType(impage, pywikibot.ImagePage)
             self.assertTrue(mysite.page_exists(impage))
             self.assertTrue(impage.title(withNamespace=False) >= "Ba")
-##        # Bug # 15985
-##        for impage in mysite.allimages(start="Da", reverse=True, total=5):
-##            self.assertType(impage, pywikibot.ImagePage)
-##            self.assertTrue(mysite.page_exists(impage))
-##            self.assertTrue(impage.title() <= "Da")
+#        # Bug # 15985
+#        for impage in mysite.allimages(start="Da", reverse=True, total=5):
+#            self.assertType(impage, pywikibot.ImagePage)
+#            self.assertTrue(mysite.page_exists(impage))
+#            self.assertTrue(impage.title() <= "Da")
         for impage in mysite.allimages(prefix="Ch", total=5):
             self.assertType(impage, pywikibot.ImagePage)
             self.assertTrue(mysite.page_exists(impage))
@@ -1015,19 +1015,19 @@ class TestSiteLoadRevisions(PywikibotTestCase):
     def testLoadRevisions_revids(self):
         """Test the site.loadrevisions() method, listing based on revid."""
 
-        #revids as list of int
+        # revids as list of int
         self.mysite.loadrevisions(self.mainpage, revids=[139992, 139993])
         self.assertTrue(all(rev in self.mainpage._revisions for rev in [139992, 139993]))
-        #revids as list of str
+        # revids as list of str
         self.mysite.loadrevisions(self.mainpage, revids=['139994', '139995'])
         self.assertTrue(all(rev in self.mainpage._revisions for rev in [139994, 139995]))
-        #revids as int
+        # revids as int
         self.mysite.loadrevisions(self.mainpage, revids=140000)
         self.assertTrue(140000 in self.mainpage._revisions)
-        #revids as str
+        # revids as str
         self.mysite.loadrevisions(self.mainpage, revids='140001')
         self.assertTrue(140001 in self.mainpage._revisions)
-        #revids belonging to a different page raises Exception
+        # revids belonging to a different page raises Exception
         self.assertRaises(pywikibot.Error, self.mysite.loadrevisions,
                           self.mainpage, revids=130000)
 

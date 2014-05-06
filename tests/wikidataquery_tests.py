@@ -62,18 +62,18 @@ class TestApiFunctions(unittest.TestCase):
         q = query.Tree(92, [1], 2)
         self.assertEqual(str(q), 'tree[92][1][2]')
 
-        #missing third arg
+        # missing third arg
         q = query.Tree(92, 1)
         self.assertEqual(str(q), 'tree[92][1][]')
 
-        #missing second arg
+        # missing second arg
         q = query.Tree(92, reverse=3)
         self.assertEqual(str(q), 'tree[92][][3]')
 
         q = query.Tree([92, 93], 1, [2, 7])
         self.assertEqual(str(q), 'tree[92,93][1][2,7]')
 
-        #bad tree arg types
+        # bad tree arg types
         self.assertRaises(TypeError, lambda: query.Tree(99, "hello"))
 
         q = query.Link("enwiki")
@@ -82,11 +82,11 @@ class TestApiFunctions(unittest.TestCase):
         q = query.NoLink(["enwiki", "frwiki"])
         self.assertEqual(str(q), 'nolink[enwiki,frwiki]')
 
-        #bad link arg types
+        # bad link arg types
         self.assertRaises(TypeError, lambda: query.Link(99))
         self.assertRaises(TypeError, lambda: query.Link([99]))
 
-        #HasClaim with tree as arg
+        # HasClaim with tree as arg
         q = query.HasClaim(99, query.Tree(1, 2, 3))
         self.assertEqual(str(q), "claim[99:(tree[1][2][3])]")
 
@@ -129,7 +129,7 @@ class TestApiFunctions(unittest.TestCase):
         begin = pywikibot.WbTime(site=self.repo, year=1999)
         end = pywikibot.WbTime(site=self.repo, year=2010, hour=1)
 
-        #note no second comma
+        # note no second comma
         q = query.Between(PropertyPage(self.repo, "P569"), begin)
         self.assertEqual(str(q), 'between[569,+00000001999-01-01T00:00:00Z]')
 
@@ -189,13 +189,14 @@ class TestApiFunctions(unittest.TestCase):
         q1 = query.HasClaim(99, 100)
         q2 = query.HasClaim(99, 101)
 
-        #different joiners get explicit grouping parens (the api also allows implicit, but we don't do that)
+        # different joiners get explicit grouping parens (the api also allows
+        # implicit, but we don't do that)
         qs1 = q1.AND(q2)
         qs2 = q1.OR(qs1).AND(query.HasClaim(98))
 
         self.assertEqual(str(qs2), '(claim[99:100] OR (claim[99:100] AND claim[99:101])) AND claim[98]')
 
-        #if the joiners are the same, no need to group
+        # if the joiners are the same, no need to group
         qs1 = q1.AND(q2)
         qs2 = q1.AND(qs1).AND(query.HasClaim(98))
 
@@ -222,7 +223,7 @@ class TestApiFunctions(unittest.TestCase):
 
         self.assertEqual(w.getUrl(qs), "http://example.com/api?q=link%5Benwiki%5D")
 
-        #check labels and props work OK
+        # check labels and props work OK
         qs = w.getQueryString(query.Link("enwiki"), ['en', 'fr'], ['prop'])
         self.assertEqual(qs, "q=link%5Benwiki%5D&labels=en,fr&props=prop")
 
@@ -236,10 +237,10 @@ class TestApiSlowFunctions(unittest.TestCase):
 
         w = query.WikidataQuery(cacheMaxAge=0)
 
-        #this query doesn't return any items, save a bit of bandwidth!
+        # this query doesn't return any items, save a bit of bandwidth!
         q = query.HasClaim(105).AND([query.NoClaim(225), query.HasClaim(100)])
 
-        #check that the cache file is created
+        # check that the cache file is created
         cacheFile = w.getCacheFilename(w.getQueryString(q, [], []))
 
         # remove existing cache file

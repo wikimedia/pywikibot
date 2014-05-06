@@ -67,7 +67,7 @@ class LogEntry(object):
         return self.data['action']
 
     def user(self):
-        #TODO use specific User class ?
+        # TODO use specific User class ?
         return self.data['user']
 
     def timestamp(self):
@@ -99,7 +99,7 @@ class BlockEntry(LogEntry):
            if this block action targets a username or IP.
         * Returns the blockid if this log reflects the removal of an autoblock
         """
-        #TODO what for IP ranges ?
+        # TODO what for IP ranges ?
         if self.isAutoblockRemoval:
             return self._blockid
         else:
@@ -201,7 +201,7 @@ class PatrolEntry(LogEntry):
 class NewUsersEntry(LogEntry):
     _expectedType = 'newusers'
 
-#TODO entries for merge,suppress,makebot,gblblock,renameuser,globalauth,gblrights ?
+# TODO entries for merge,suppress,makebot,gblblock,renameuser,globalauth,gblrights ?
 
 
 class LogEntryFactory(object):

@@ -966,7 +966,7 @@ def WikidataItemGenerator(gen):
             yield pywikibot.ItemPage.fromPage(page)
 
 
-#TODO below
+# TODO below
 @deprecate_arg("extension", None)
 @deprecate_arg("number", "total")
 @deprecate_arg("repeat", None)
@@ -1245,42 +1245,42 @@ class GoogleSearchPageGenerator:
             estimatedTotalResultsCount = data.meta.estimatedTotalResultsCount
             offset += 10
 
-#############
-##    commented out because it is probably not in compliance with Google's
-##    "Terms of service" (see 5.3, http://www.google.com/accounts/TOS?loc=US)
-##
-##    def queryViaWeb(self, query):
-##        """
-##        Google has stopped giving out API license keys, and sooner or later
-##        they will probably shut down the service.
-##        This is a quick and ugly solution: we just grab the search results from
-##        the normal web interface.
-##        """
-##        linkR = re.compile(r'<a href="([^>"]+?)" class=l>', re.IGNORECASE)
-##        offset = 0
-##
-##        while True:
-##            pywikibot.output("Google: Querying page %d" % (offset / 100 + 1))
-##            address = "http://www.google.com/search?q=%s&num=100&hl=en&start=%d" \
-##                      % (urllib.quote_plus(query), offset)
-##            # we fake being Firefox because Google blocks unknown browsers
-##            request = urllib2.Request(
-##                address, None,
-##                {'User-Agent':
-##                 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.8) Gecko/20051128 '
-##                 'SUSE/1.5-0.1 Firefox/1.5'})
-##            urlfile = urllib2.urlopen(request)
-##            page = urlfile.read()
-##            urlfile.close()
-##            for url in linkR.findall(page):
-##                yield url
-##
-##            # Is there a "Next" link for next page of results?
-##            if "<div id=nn>" in page:
-##                offset += 100  # Yes, go to next page of results.
-##            else:
-##                return
-#############
+# ############
+#    commented out because it is probably not in compliance with Google's
+#    "Terms of service" (see 5.3, http://www.google.com/accounts/TOS?loc=US)
+#
+#    def queryViaWeb(self, query):
+#        """
+#        Google has stopped giving out API license keys, and sooner or later
+#        they will probably shut down the service.
+#        This is a quick and ugly solution: we just grab the search results from
+#        the normal web interface.
+#        """
+#        linkR = re.compile(r'<a href="([^>"]+?)" class=l>', re.IGNORECASE)
+#        offset = 0
+#
+#        while True:
+#            pywikibot.output("Google: Querying page %d" % (offset / 100 + 1))
+#            address = "http://www.google.com/search?q=%s&num=100&hl=en&start=%d" \
+#                      % (urllib.quote_plus(query), offset)
+#            # we fake being Firefox because Google blocks unknown browsers
+#            request = urllib2.Request(
+#                address, None,
+#                {'User-Agent':
+#                 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.8) Gecko/20051128 '
+#                 'SUSE/1.5-0.1 Firefox/1.5'})
+#            urlfile = urllib2.urlopen(request)
+#            page = urlfile.read()
+#            urlfile.close()
+#            for url in linkR.findall(page):
+#                yield url
+#
+#            # Is there a "Next" link for next page of results?
+#            if "<div id=nn>" in page:
+#                offset += 100  # Yes, go to next page of results.
+#            else:
+#                return
+# ###########
 
     def __iter__(self):
         # restrict query to local site

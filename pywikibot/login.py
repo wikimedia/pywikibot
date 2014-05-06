@@ -189,17 +189,17 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                 return False
         self.storecookiedata(cookiedata)
         pywikibot.log(u"Should be logged in now")
-##        # Show a warning according to the local bot policy
-##   FIXME: disabled due to recursion; need to move this to the Site object after
-##   login
-##        if not self.botAllowed():
-##            logger.error(
-##                u"Username '%(name)s' is not listed on [[%(page)s]]."
-##                 % {'name': self.username,
-##                    'page': botList[self.site.family.name][self.site.code]})
-##            logger.error(
-##"Please make sure you are allowed to use the robot before actually using it!")
-##            return False
+#        # Show a warning according to the local bot policy
+#   FIXME: disabled due to recursion; need to move this to the Site object after
+#   login
+#        if not self.botAllowed():
+#            logger.error(
+#                u"Username '%(name)s' is not listed on [[%(page)s]]."
+#                 % {'name': self.username,
+#                    'page': botList[self.site.family.name][self.site.code]})
+#            logger.error(
+#"Please make sure you are allowed to use the robot before actually using it!")
+#            return False
         return True
 
     def showCaptchaWindow(self, url):

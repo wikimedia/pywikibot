@@ -9,5 +9,5 @@ The "data" module provides several physical layers of data access to the wiki.
 #
 __version__ = '$Id$'
 
-#Import the classes exposed by this module:
+# Import the classes exposed by this module:
 # TODO
