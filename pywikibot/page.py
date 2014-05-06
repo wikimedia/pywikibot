@@ -745,6 +745,10 @@ class Page(object):
             content=content
         )
 
+    def protection(self):
+        """Returns a dictionary reflecting page protections"""
+        return self.site.page_restrictions(self)
+
     def canBeEdited(self):
         """Return bool indicating whether this page can be edited.
 
