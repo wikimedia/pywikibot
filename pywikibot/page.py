@@ -1803,7 +1803,7 @@ class Category(Page):
             for member in self.site.categorymembers(
                     self, namespaces=[14], step=step,
                     total=total, content=content):
-                subcat = Category(self.site, member.title())
+                subcat = Category(member)
                 self._subcats.append(subcat)
                 yield subcat
                 if total is not None:
