@@ -106,7 +106,7 @@ class TestSiteObject(PywikibotTestCase):
         ns = mysite.namespaces()
         self.assertType(ns, dict)
         self.assertTrue(all(x in ns for x in range(0, 16)))
-            # built-in namespaces always present
+        # built-in namespaces always present
         self.assertType(mysite.ns_normalize("project"), basestring)
         self.assertTrue(all(isinstance(key, int)
                             for key in ns))

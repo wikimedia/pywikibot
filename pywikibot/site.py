@@ -1341,7 +1341,7 @@ class APISite(BaseSite):
             # no "pages" element indicates a circular redirect
             raise pywikibot.CircularRedirect(redirmap[title])
         pagedata = list(result['query']['pages'].values())[0]
-            # there should be only one value in 'pages', and it is the target
+        # there should be only one value in 'pages', and it is the target
         if self.sametitle(pagedata['title'], target_title):
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
             api.update_page(target, pagedata)
@@ -1391,13 +1391,13 @@ class APISite(BaseSite):
                 pywikibot.debug(u"Preloading %s" % pagedata, _logger)
                 try:
                     if pagedata['title'] not in cache:
-#                       API always returns a "normalized" title which is
-#                       usually the same as the canonical form returned by
-#                       page.title(), but sometimes not (e.g.,
-#                       gender-specific localizations of "User" namespace).
-#                       This checks to see if there is a normalized title in
-#                       the response that corresponds to the canonical form
-#                       used in the query.
+                        # API always returns a "normalized" title which is
+                        # usually the same as the canonical form returned by
+                        # page.title(), but sometimes not (e.g.,
+                        # gender-specific localizations of "User" namespace).
+                        # This checks to see if there is a normalized title in
+                        # the response that corresponds to the canonical form
+                        # used in the query.
                         for key in cache:
                             if self.sametitle(key, pagedata['title']):
                                 cache[pagedata['title']] = cache[key]

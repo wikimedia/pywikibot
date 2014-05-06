@@ -19,7 +19,8 @@ __version__ = '$Id$'
 
 
 import logging.handlers
-       # all output goes thru python std library "logging" module
+# all output goes thru python std library "logging" module
+
 import re
 
 from ircbot import SingleServerIRCBot

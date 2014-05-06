@@ -1450,10 +1450,12 @@ class checkImagesBot(object):
 
                 if self.allLicenses:
                     self.license_found = self.allLicenses[0].title()
-        self.some_problem = False  # If it has "some_problem" it must check
-                                   # the additional settings.
-        # if self.settingsData, use addictional settings
+
+        # If it has "some_problem" it must check the additional settings.
+        self.some_problem = False
+
         if self.settingsData:
+            # use additional settings
             self.findAdditionalProblems()
 
         if self.some_problem:
@@ -1601,9 +1603,9 @@ class checkImagesBot(object):
                 newGen.append(imageData[0])
             return newGen
         else:
-##            pywikibot.output(
-##                u"The wait option is available only with the standard "
-##                u"generator.")
+            #pywikibot.output(
+            #    u"The wait option is available only with the standard "
+            #    u"generator.")
             pywikibot.output(
                 u"The wait option is not available at core yet.")
             return generator

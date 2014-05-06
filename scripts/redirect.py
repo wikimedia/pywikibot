@@ -129,7 +129,7 @@ class RedirectGenerator:
                     if target.startswith('%s:' % code) \
                             or target.startswith(':%s:' % code):
                         if code == self.site.language():
-                        # link to our wiki, but with the lang prefix
+                            # link to our wiki, but with the lang prefix
                             target = target[(len(code) + 1):]
                             if target.startswith(':'):
                                 target = target[1:]
@@ -777,15 +777,17 @@ def main(*args):
         elif arg.startswith('-namespace:'):
             ns = arg[11:]
             if ns == '':
-        ## "-namespace:" does NOT yield -namespace:0 further down the road!
+                # "-namespace:" does NOT yield -namespace:0 further down the road!
                 ns = i18n.input('pywikibot-enter-namespace-number')
-#  TODO! at least for some generators enter a namespace by its name or number
+            # TODO! at least for some generators enter a namespace by its name
+            # or number
             if ns == '':
                 ns = '0'
             try:
                 ns = int(ns)
             except ValueError:
-#-namespace:all Process all namespaces. Works only with the API read interface.
+                # -namespace:all Process all namespaces.
+                # Only works with the API read interface.
                 pass
             if ns not in namespaces:
                 namespaces.append(ns)

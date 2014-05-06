@@ -19,10 +19,12 @@ from pywikibot import config
 
 _logger = "wiki.throttle"
 
-pid = False     # global process identifier
-                # when the first Throttle is instantiated, it will set this
-                # variable to a positive integer, which will apply to all
-                # throttle objects created by this process.
+# global process identifier
+#
+# When the first Throttle is instantiated, it will set this variable to a
+# positive integer, which will apply to all throttle objects created by this
+# process.
+pid = False
 
 
 class Throttle(object):
@@ -52,10 +54,16 @@ class Throttle(object):
         self.last_read = 0
         self.last_write = 0
         self.next_multiplicity = 1.0
-        self.checkdelay = 300   # Check logfile again after this many seconds
-        self.dropdelay = 600    # Ignore processes that have not made
-                                # a check in this many seconds
-        self.releasepid = 1200  # Free the process id after this many seconds
+
+        # Check logfile again after this many seconds:
+        self.checkdelay = 300
+
+        # Ignore processes that have not made a check in this many seconds:
+        self.dropdelay = 600
+
+        # Free the process id after this many seconds:
+        self.releasepid = 1200
+
         self.lastwait = 0.0
         self.delay = 0
         self.checktime = 0
@@ -94,8 +102,8 @@ class Throttle(object):
                         ptime = int(line[1].split('.')[0])
                         this_site = line[2].rstrip()
                     except (IndexError, ValueError):
-                        continue    # Sometimes the file gets corrupted
-                                    # ignore that line
+                        # Sometimes the file gets corrupted ignore that line
+                        continue
                     if now - ptime > self.releasepid:
                         continue    # process has expired, drop from file
                     if now - ptime <= self.dropdelay \
@@ -208,8 +216,8 @@ class Throttle(object):
                     ptime = int(line[1].split('.')[0])
                     this_site = line[2].rstrip()
                 except (IndexError, ValueError):
-                    continue    # Sometimes the file gets corrupted
-                                # ignore that line
+                    # Sometimes the file gets corrupted ignore that line
+                    continue
                 if now - ptime <= self.releasepid \
                    and this_pid != pid:
                     processes.append({'pid': this_pid,

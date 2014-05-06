@@ -519,7 +519,8 @@ def stopme():
 
         def remaining():
             remainingPages = page_put_queue.qsize() - 1
-                # -1 because we added a None element to stop the queue
+            # -1 because we added a None element to stop the queue
+
             remainingSeconds = datetime.timedelta(
                 seconds=(remainingPages * config.put_throttle))
             return (remainingPages, remainingSeconds)

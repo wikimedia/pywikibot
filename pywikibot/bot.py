@@ -16,7 +16,8 @@ __version__ = '$Id$'
 
 import logging
 import logging.handlers
-       # all output goes thru python std library "logging" module
+# all output goes thru python std library "logging" module
+
 import os
 import os.path
 import sys
@@ -188,12 +189,14 @@ def init_handlers(strm=None):
         moduleName = "terminal-interface"
 
     logging.addLevelName(VERBOSE, "VERBOSE")
-        # for messages to be displayed on terminal at "verbose" setting
-        # use INFO for messages to be displayed even on non-verbose setting
+    # for messages to be displayed on terminal at "verbose" setting
+    # use INFO for messages to be displayed even on non-verbose setting
+
     logging.addLevelName(STDOUT, "STDOUT")
-        # for messages to be displayed to stdout
+    # for messages to be displayed to stdout
+
     logging.addLevelName(INPUT, "INPUT")
-        # for prompts requiring user response
+    # for prompts requiring user response
 
     root_logger = logging.getLogger("pywiki")
     root_logger.setLevel(DEBUG + 1)  # all records except DEBUG go to logger
