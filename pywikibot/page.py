@@ -42,7 +42,7 @@ reNamespace = re.compile("^(.+?) *: *(.*)$")
 # Note: Link objects (defined later on) represent a wiki-page's title, while
 # Page objects (defined here) represent the page itself, including its contents.
 
-class Page(object):
+class Page(pywikibot.UnicodeMixin):
     """Page: A MediaWiki page
 
     This object only implements internally methods that do not require
@@ -214,12 +214,6 @@ class Page(object):
 
         """
         return self._link.section
-
-    def __str__(self):
-        """Return a console representation of the pagelink."""
-        return self.title(asLink=True, forceInterwiki=True
-                          ).encode(config.console_encoding,
-                                   "xmlcharrefreplace")
 
     def __unicode__(self):
         return self.title(asLink=True, forceInterwiki=True)
