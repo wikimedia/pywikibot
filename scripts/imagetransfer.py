@@ -82,13 +82,6 @@ nowCommonsTemplate = {
     'zh': u'{{NowCommons|Image:%s}}',
 }
 
-#nowCommonsThis = {
-    #'en': u'{{NowCommonsThis|%s}}',
-    #'it': u'{{NowCommons omonima|%s}}',
-    #'kk': u'{{NowCommonsThis|%s}}',
-    #'pt': u'{{NowCommonsThis|%s}}',
-#}
-
 nowCommonsMessage = {
     'ar': u'الملف الآن متوفر في ويكيميديا كومنز.',
     'de': u'Datei ist jetzt auf Wikimedia Commons verfügbar.',
@@ -109,15 +102,6 @@ nowCommonsMessage = {
     'sr': u'Слика је сада доступна и на Викимедија Остави.',
     'zh': u'檔案已存在於維基共享資源。',
 }
-
-#nowCommonsThisMessage = {
-    #'ar': u'الملف الآن متوفر في كومنز بنفس الاسم.',
-    #'en': u'File is now available on Commons with the same name.',
-    #'he': u'הקובץ זמין כעת בוויקישיתוף בשם זהה.',
-    #'it': u'L\'immagine è adesso disponibile su Wikimedia Commons con lo stesso nome.',
-    #'kk': u'Файлды дәл сол атауымен енді Ортаққордан қатынауға болады.',
-    #'pt': u'Esta imagem está agora no Commons com o mesmo nome.',
-#}
 
 # Translations for license templates.
 # Must only be given when they are in fact different.
