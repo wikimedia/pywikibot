@@ -44,6 +44,35 @@ class DryAPITests(unittest.TestCase):
         self.assertNotEqual(self.req._cachefile_path(), self.diffreq._cachefile_path())
         self.assertNotEqual(self.req._cachefile_path(), self.diffsite._cachefile_path())
 
+    def test_cachefile_path_different_users(self):
+        # Mock basesite object to test this.
+        class MockSite(pywikibot.site.BaseSite):
+            def __init__(self):
+                self._user = 'user'
+
+            def user(self):
+                return self._user
+
+            def encoding(self):
+                return 'utf-8'
+
+            def __repr__(self):
+                return "MockSite()"
+
+            def __getattr__(self, attr):
+                raise Exception("Attribute %r not defined" % attr)
+
+        site = MockSite()
+        req = CachedRequest(expiry=1, site=site, action='query', meta='siteinfo')
+        userpath = req._cachefile_path()
+
+        site._user = 'sysop'
+
+        req = CachedRequest(expiry=1, site=site, action='query', meta='siteinfo')
+        sysoppath = req._cachefile_path()
+
+        self.assertNotEqual(userpath, sysoppath)
+
     def test_expired(self):
         self.assertFalse(self.req._expired(datetime.datetime.now()))
         self.assertTrue(self.req._expired(datetime.datetime.now() - datetime.timedelta(days=2)))
