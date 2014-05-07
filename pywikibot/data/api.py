@@ -760,7 +760,8 @@ class QueryGenerator(object):
                     # otherwise we proceed as usual
                     else:
                         count += 1
-                    if self.limit and count >= self.limit:
+                    # note: self.limit could be -1
+                    if self.limit > 0 and count >= self.limit:
                         return
             if self.module == "random" and self.limit:
                 # "random" module does not return "query-continue"
