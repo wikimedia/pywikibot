@@ -12,11 +12,11 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'mg', 'fr', 'sh', 'zh', 'es', 'lt', 'ru', 'el', 'pl', 'nl',
-            'sv', 'ko', 'de', 'tr', 'ku', 'ta', 'hu', 'it', 'kn', 'fi', 'io',
+            'sv', 'ko', 'de', 'tr', 'ku', 'it', 'ta', 'hu', 'fi', 'kn', 'io',
             'vi', 'chr', 'pt', 'no', 'ml', 'my', 'id', 'li', 'ro', 'ja', 'et',
             'te', 'jv', 'fa', 'cs', 'ca', 'ar', 'eu', 'gl', 'lo', 'uk', 'hy',
-            'br', 'fj', 'eo', 'bg', 'hr', 'th', 'oc', 'ps', 'is', 'vo', 'uz',
-            'simple', 'zh-min-nan', 'cy', 'az', 'scn', 'sr', 'ast', 'da', 'af',
+            'br', 'fj', 'eo', 'bg', 'th', 'hr', 'ps', 'oc', 'is', 'vo', 'uz',
+            'simple', 'zh-min-nan', 'cy', 'az', 'scn', 'sr', 'da', 'ast', 'af',
             'he', 'sw', 'or', 'hi', 'fy', 'tl', 'nn', 'wa', 'ur', 'la', 'sq',
             'pnb', 'ka', 'sm', 'sl', 'nah', 'tt', 'lb', 'bs', 'lv', 'sk', 'tk',
             'hsb', 'nds', 'kk', 'ky', 'be', 'km', 'mk', 'ms', 'ga', 'wo', 'ang',
