@@ -47,7 +47,7 @@ class pwb_install(install.install):
     def run(self):
         install.install.do_egg_install(self)
 
-        if sys.stdin.isatty():
+        if sys.stdin.isatty() and sys.stdout.isatty():
             import subprocess
             python = sys.executable
             python = python.replace("pythonw.exe", "python.exe")  # for Windows
