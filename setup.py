@@ -54,9 +54,12 @@ class pwb_install(install.install):
             subprocess.call([python, "generate_user_files.py"])
 
 setup(
-    name='Pywikipediabot',
+    name='pywikibot',
     version='2.0b1',
     description='Python Wikipedia Bot Framework',
+    long_description=open('README.rst').read(),
+    maintainer='The pywikibot team',
+    maintainer_email='pywikipedia-l@lists.wikimedia.org',
     license='MIT License',
     packages=['pywikibot'] + \
              [package
@@ -69,11 +72,13 @@ setup(
     dependency_links=[
         'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1'
     ],
+    url='https://mediawiki.org/wiki/Pywikibot',
+    download_url='https://github.com/wikimedia/pywikibot-core/archive/master.zip#egg=pywikibot-2.0b1',
     test_suite=testcollector,
     tests_require=test_deps,
     classifiers=[
         'License :: OSI Approved :: MIT License',
-        'Development Status :: 4 - Beta'
+        'Development Status :: 4 - Beta',
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
         'Environment :: Console',
