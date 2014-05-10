@@ -21,6 +21,7 @@ import itertools
 import os
 import re
 import sys
+from distutils.version import LooseVersion as LV
 import threading
 import time
 import urllib
@@ -574,7 +575,7 @@ def must_be(group=None, right=None):
     return decorator
 
 
-def need_version(number):
+def need_version(version):
     """ Decorator to require a certain mediawiki version number.
 
     @param number: the mw version number required
@@ -583,11 +584,11 @@ def need_version(number):
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):
-            if self.versionnumber() < number:
+            if LV(self.version()) < LV(version):
                 raise NotImplementedError(
                     u'Method or function "%s"\n'
-                    u"isn't implemented in mediawiki version < %d"
-                    % (fn.__name__, number))
+                    u"isn't implemented in mediawiki version < %s"
+                    % (fn.__name__, version))
             return fn(self, *args, **kwargs)
         callee.__name__ = fn.__name__
         callee.__doc__ = fn.__doc__
@@ -649,7 +650,7 @@ class APISite(BaseSite):
             14: [u"Category"],
             15: [u"Category talk"],
         }
-        if self.family.versionnumber(self.code) >= 14:
+        if LV(self.family.version(self.code)) >= LV("1.14"):
             self._namespaces[6] = [u"File"]
             self._namespaces[7] = [u"File talk"]
         self._msgcache = {}
@@ -2329,7 +2330,7 @@ class APISite(BaseSite):
         if reverse:
             rcgen.request["rcdir"] = "newer"
         if pagelist:
-            if self.versionnumber() > 14:
+            if LV(self.version()) > LV("1.14"):
                 pywikibot.warning(
                     u"recentchanges: pagelist option is disabled; ignoring.")
             else:
@@ -3482,7 +3483,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return wigen
 
-    @need_version(18)
+    @need_version("1.18")
     def broken_redirects(self, step=None, total=None):
         """Yield Pages without language links from Special:BrokenRedirects."""
         brgen = self._generator(api.PageGenerator,
@@ -3491,7 +3492,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return brgen
 
-    @need_version(18)
+    @need_version("1.18")
     def double_redirects(self, step=None, total=None):
         """Yield Pages without language links from Special:BrokenRedirects."""
         drgen = self._generator(api.PageGenerator,
@@ -3500,7 +3501,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return drgen
 
-    @need_version(18)
+    @need_version("1.18")
     def redirectpages(self, step=None, total=None):
         """Yield redirect pages from Special:ListRedirects."""
         lrgen = self._generator(api.PageGenerator,
