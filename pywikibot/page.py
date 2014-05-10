@@ -1812,7 +1812,7 @@ class Category(Page):
                 yield subcat
                 if total is not None:
                     total -= 1
-                    if not total:
+                    if total == 0:
                         return
                 if recurse:
                     for item in subcat.subcategories(
@@ -1820,14 +1820,14 @@ class Category(Page):
                         yield item
                         if total is not None:
                             total -= 1
-                            if not total:
+                            if total == 0:
                                 return
         else:
             for subcat in self._subcats:
                 yield subcat
                 if total is not None:
                     total -= 1
-                    if not total:
+                    if total == 0:
                         return
                 if recurse:
                     for item in subcat.subcategories(
@@ -1835,7 +1835,7 @@ class Category(Page):
                         yield item
                         if total is not None:
                             total -= 1
-                            if not total:
+                            if total == 0:
                                 return
 
     @deprecate_arg("startFrom", "startsort")
@@ -1895,7 +1895,7 @@ class Category(Page):
             yield member
             if total is not None:
                 total -= 1
-                if not total:
+                if total == 0:
                     return
         if recurse:
             if not isinstance(recurse, bool) and recurse:
@@ -1913,7 +1913,7 @@ class Category(Page):
                     yield article
                     if total is not None:
                         total -= 1
-                        if not total:
+                        if total == 0:
                             return
 
     def members(self, recurse=False, namespaces=None, step=None, total=None,
@@ -1925,7 +1925,7 @@ class Category(Page):
             yield member
             if total is not None:
                 total -= 1
-                if not total:
+                if total == 0:
                     return
         if recurse:
             if not isinstance(recurse, bool) and recurse:
@@ -1937,7 +1937,7 @@ class Category(Page):
                     yield article
                     if total is not None:
                         total -= 1
-                        if not total:
+                        if total == 0:
                             return
 
     def isEmptyCategory(self):
