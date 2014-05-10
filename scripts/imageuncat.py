@@ -18,7 +18,6 @@ from datetime import datetime
 from datetime import timedelta
 import pywikibot
 from pywikibot import pagegenerators
-import query
 
 #Probably unneeded because these are hidden categories. Have to figure it out.
 ignoreCategories = [u'[[Category:CC-BY-SA-3.0]]',
@@ -1235,37 +1234,18 @@ puttext = u'\n{{Uncategorized|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMO
 putcomment = u'Please add categories to this image'
 
 
-def uploadedYesterday(site=None):
+def uploadedYesterday(site):
     '''
     Return a pagegenerator containing all the pictures uploaded yesterday.
     Should probably copied to somewhere else
+
     '''
-    result = []
-    dateformat = "%Y-%m-%dT00:00:00Z"
-    today = datetime.utcnow()
+
+    today = pywikibot.Timestamp.utcnow()
     yesterday = today + timedelta(days=-1)
 
-    params = {
-        'action':  'query',
-        'list':    'logevents',
-        'leprop':  'title',
-        'letype':  'upload',
-        'ledir':   'newer',
-        'lelimit': '5000',
-        'lestart': yesterday.strftime(dateformat),
-        'leend':   today.strftime(dateformat)
-    }
-
-    data = query.GetData(params, site)
-    try:
-        for item in data['query']['logevents']:
-            result.append(item['title'])
-    except IndexError:
-        raise NoPage(u'API Error, nothing found in the APIs')
-    except KeyError:
-        raise NoPage(u'API Error, nothing found in the APIs')
-
-    return pagegenerators.PagesFromTitlesGenerator(result, site)
+    for logentry in site.logevents(logtype='upload', start=yesterday, end=today, reverse=True):
+        yield logentry.title()
 
 
 def recentChanges(site=None, delay=0, block=70):
@@ -1357,7 +1337,7 @@ def main(*args):
         pywikibot.output(
             u'You have to specify the generator you want to use for the program!')
     else:
-        pregenerator = site.preloadpages(generator)
+        pregenerator = pagegenerators.PreloadingGenerator(generator)
         for page in pregenerator:
             pywikibot.output(page.title())
             if page.exists() and (page.namespace() == 6) \
