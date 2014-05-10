@@ -52,6 +52,14 @@ class TestGeneral(PywikibotTestCase):
         self.assertRaises(ValueError, pywikibot.WbTime, site=wikidata, precision=15)
         self.assertRaises(ValueError, pywikibot.WbTime, site=wikidata, precision='invalid_precision')
 
+        # test WbQuantity
+        q = pywikibot.WbQuantity(amount=1234, error=1)
+        self.assertEqual(q.toWikibase(), {'amount': 1234, 'lowerBound': 1233, 'upperBound': 1235, 'unit': '1', })
+        q = pywikibot.WbQuantity(amount=5, error=(2, 3))
+        self.assertEqual(q.toWikibase(), {'amount': 5, 'lowerBound': 2, 'upperBound': 7, 'unit': '1', })
+        self.assertRaises(ValueError, pywikibot.WbQuantity, amount=None, error=1)
+        self.assertRaises(NotImplementedError, pywikibot.WbQuantity, amount=789, unit='invalid_unit')
+
         # test WikibasePage.__cmp__
         self.assertEqual(pywikibot.ItemPage.fromPage(mainpage), pywikibot.ItemPage(repo, 'q5296'))
 

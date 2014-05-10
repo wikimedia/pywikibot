@@ -313,6 +313,64 @@ class WbTime(object):
             u"timezone=%(timezone)d, calendarmodel='%(calendarmodel)s')" % self.__dict__
 
 
+class WbQuantity(object):
+    """ A Wikibase quantity representation"""
+
+    def __init__(self, amount, unit=None, error=None):
+        """
+        Creates a new WbQuantity object. The amount is a number representing
+        this quantity. The unit is currently not used (only unit-less
+        quantities are supported). The error is a number indicating the
+        uncertainty of the amount (e.g. ±1). Alternatively the error can be
+        expressed as a tuple, where the first value is the upper error and the
+        second is the lower error value.
+        """
+        if amount is None:
+            raise ValueError('no amount given')
+        if unit is not None and unit != '1':
+            raise NotImplementedError('Currently only unit-less quantities are supported')
+        if unit is None:
+            unit = '1'
+        self.amount = long(amount)
+        self.unit = unit
+        upperError = lowerError = 0
+        if isinstance(error, tuple):
+            upperError, lowerError = error
+        elif error is not None:
+            upperError = lowerError = error
+        self.upperBound = self.amount + upperError
+        self.lowerBound = self.amount - lowerError
+
+    def toWikibase(self):
+        """
+        Function which converts the data to a JSON object
+        for the Wikibase API.
+        """
+        json = {'amount': self.amount,
+                'upperBound': self.upperBound,
+                'lowerBound': self.lowerBound,
+                'unit': self.unit
+                }
+        return json
+
+    @staticmethod
+    def fromWikibase(wb):
+        amount = long(wb[u'amount'])
+        upperBound = long(wb[u'upperBound'])
+        lowerBound = long(wb[u'lowerBound'])
+        error = (upperBound - amount, amount - lowerBound)
+        return WbQuantity(amount, wb[u'unit'], error)
+
+    def __str__(self):
+        return str(self.toWikibase())
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+    def __repr__(self):
+        return u"WbQuantity(amount=%(amount)d, upperBound=%(upperBound)d, lowerBound=%(lowerBound)d, unit=%(unit)s" % self.__dict__
+
+
 def deprecated(instead=None):
     """Decorator to output a method deprecation warning.
 

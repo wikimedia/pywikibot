@@ -2886,6 +2886,9 @@ class Claim(PropertyPage):
             elif claim.getType() == 'time':
                 claim.target = pywikibot.WbTime.fromWikibase(
                     data['mainsnak']['datavalue']['value'])
+            elif claim.getType() == 'quantity':
+                claim.target = pywikibot.WbQuantity.fromWikibase(
+                    data['mainsnak']['datavalue']['value'])
             else:
                 # This covers string, url types
                 claim.target = data['mainsnak']['datavalue']['value']
@@ -3068,6 +3071,8 @@ class Claim(PropertyPage):
         elif self.getType() == 'globecoordinate':
             value = self.getTarget().toWikibase()
         elif self.getType() == 'time':
+            value = self.getTarget().toWikibase()
+        elif self.getType() == 'quantity':
             value = self.getTarget().toWikibase()
         else:
             raise NotImplementedError('%s datatype is not supported yet.'
