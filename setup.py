@@ -23,8 +23,8 @@ test_deps = []
 testcollector = "tests"
 
 if sys.version_info[0] == 2:
-    if sys.version_info[1] < 6:
-        raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6 or higher")
+    if sys.version_info < (2, 6, 5):
+        raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6.5 or higher")
     elif sys.version_info[1] == 6:
         test_deps = ['unittest2']
         testcollector = "tests.utils.collector"
@@ -77,7 +77,6 @@ setup(
         'Operating System :: OS Independent',
         'Intended Audience :: Developers',
         'Environment :: Console',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7'
     ],
     cmdclass={
