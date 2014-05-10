@@ -1984,9 +1984,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 try:
                     if globalvar.async:
                         page.put_async(newtext, comment=mcomment)
-                        status = 302
                     else:
-                        status, reason, data = page.put(newtext, comment=mcomment)
+                        page.put(newtext, comment=mcomment)
                 except pywikibot.LockedPage:
                     pywikibot.output(u'Page %s is locked. Skipping.' % page)
                     raise SaveError(u'Locked')
@@ -2020,11 +2019,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     time.sleep(timeout)
                 else:
                     break
-            if str(status) == '302':
-                return True
-            else:
-                pywikibot.output(u'%s %s' % (status, reason))
-                return False
+            return True
         elif answer == 'g':
             raise GiveUpOnPage(u'User asked us to give up')
         else:
