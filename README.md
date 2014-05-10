@@ -23,9 +23,9 @@ If you wish to write your own script it's very easy to get started:
 import pywikibot
 site = pywikibot.Site('en', 'wikipedia')  # The site we want to run our bot on
 page = pywikibot.Page(site, 'Wikipedia:Sandbox')
-text = page.get()  # The current text on the page
-text = text.replace('foo', 'bar')
-page.put(text, 'Replacing "foo" with "bar"')  # Saves the page
+text = page.text  # The current text on the page
+page.text = text.replace('foo', 'bar')
+page.save('Replacing "foo" with "bar"')  # Saves the page
 ```
 
 ## Contributing
