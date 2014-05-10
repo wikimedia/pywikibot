@@ -23,12 +23,6 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot import pagegenerators
 
-# ***** SETTINGS *******#
-#
-# - EDIT BELOW -     #
-#
-# **********************#
-
 comment = {
     'ar': u'صور للاستبعاد',
     'en': u'images for elimination',
@@ -53,24 +47,17 @@ except_text = {
     'it': u'<table id="mw_metadata" class="mw_metadata">',
 }
 
-# ***** SETTINGS *******#
-#
-# - EDIT ABOVE -     #
-#
-# **********************#
 
-
-def appendtext(page, apptext):
-    global always
+def appendtext(page, apptext, always):
     if page.isRedirectPage():
-        page = page.getRedirectTarget().encode("utf-8")
+        page = page.getRedirectTarget()
     if not page.exists():
         if page.isTalkPage():
             text = u''
         else:
             raise pywikibot.NoPage(u"Page '%s' does not exist" % page.title())
     else:
-        text = page.get()
+        text = page.text
     # Here you can go editing. If you find you do not
     # want to edit this page, just return
     oldtext = text
@@ -80,49 +67,51 @@ def appendtext(page, apptext):
         if not always:
             choice = pywikibot.inputChoice(
                 u'Do you want to accept these changes?', ['Yes', 'No', 'All'],
-                ['y', 'N', 'a'], 'N')
+                'yNa', 'N')
             if choice == 'a':
                 always = True
         if always or choice == 'y':
-            page.put(text, pywikibot.translate(pywikibot.Site(), comment))
+            page.text = text
+            page.save(pywikibot.translate(pywikibot.Site(), comment))
 
 
 def main():
-    global always
     always = False
 
     for arg in pywikibot.handleArgs():
         if arg == '-always':
             always = True
-        if arg == '-start':
-            start = True
 
     mysite = pywikibot.Site()
     # If anything needs to be prepared, you can do it here
     template_image = pywikibot.translate(pywikibot.Site(),
-                                         template_to_the_image)
+                                         template_to_the_image, fallback=False)
     template_user = pywikibot.translate(pywikibot.Site(),
-                                        template_to_the_user).encode("utf-8")
-    except_text_translated = pywikibot.translate(pywikibot.Site(),
-                                                 except_text).encode("utf-8")
-    basicgenerator = pagegenerators.UnusedFilesGenerator()
-    generator = pagegenerators.PreloadingGenerator(basicgenerator)
-    for page in generator:
-        pywikibot.output("\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % page.title())
-        if except_text_translated not in page.getImagePageHtml() and \
-                'http://' not in page.get():
-            pywikibot.output(u'\n' + page.title())
-            if template_image in page.get():
+                                        template_to_the_user, fallback=False)
+    except_text_translated = pywikibot.translate(pywikibot.Site(), except_text,
+                                                 fallback=False)
+    if not(template_image and template_user and except_text_translated):
+        pywikibot.warning(u'This script is not localized for %s site.' % mysite)
+        return
+    generator = pagegenerators.UnusedFilesGenerator()
+    generator = pagegenerators.PreloadingGenerator(generator)
+    for image in generator:
+        if (except_text_translated.encode('utf-8')
+                not in image.getImagePageHtml() and
+                u'http://' not in image.text):
+            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
+                             % image.title())
+            if template_image in image.text:
                 pywikibot.output(u"%s done already"
-                                 % page.title(asLink=True))
+                                 % image.title(asLink=True))
                 continue
-            appendtext(page, u"\n\n" + template_image)
-            uploader = page.getFileVersionHistory().pop(0)['user']
-            usertalkname = 'User Talk:%s' % uploader
-            usertalkpage = pywikibot.Page(mysite, usertalkname)
-            msg2uploader = template_user % {'title': page.title()}
-            # msg2uploader = msg2uploader.encode("utf-8")
-            appendtext(usertalkpage, msg2uploader)
+            appendtext(image, u"\n\n" + template_image, always)
+            uploader = image.getFileVersionHistory().pop(0)['user']
+            user = pywikibot.User(mysite, uploader)
+            usertalkpage = user.getUserTalkPage()
+            msg2uploader = template_user % {'title': image.title()}
+            appendtext(usertalkpage, msg2uploader, always)
+
+
 if __name__ == "__main__":
     main()
