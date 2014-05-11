@@ -72,7 +72,7 @@ setup(
     dependency_links=[
         'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1'
     ],
-    url='https://mediawiki.org/wiki/Pywikibot',
+    url='https://www.mediawiki.org/wiki/Pywikibot',
     download_url='https://github.com/wikimedia/pywikibot-core/archive/master.zip#egg=pywikibot-2.0b1',
     test_suite=testcollector,
     tests_require=test_deps,
