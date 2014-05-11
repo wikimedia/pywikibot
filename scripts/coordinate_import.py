@@ -62,11 +62,14 @@ class CoordImportRobot(WikidataBot):
                         newclaim = pywikibot.Claim(self.repo, u'P625')
                         newclaim.setTarget(coordinate)
                         pywikibot.output(u'Adding %s, %s to %s' % (coordinate.lat, coordinate.lon, item.title()))
-                        item.addClaim(newclaim)
+                        try:
+                            item.addClaim(newclaim)
 
-                        source = self.getSource(page.site)
-                        if source:
-                            newclaim.addSource(source, bot=True)
+                            source = self.getSource(page.site)
+                            if source:
+                                newclaim.addSource(source, bot=True)
+                        except CoordinateGlobeUnknownException as e:
+                            pywikibot.output(u'Skipping unsupported globe: %s' % e.args)
 
 
 def main():

@@ -156,7 +156,7 @@ class Coordinate(object):
         FIXME Should this be in the DataSite object?
         """
         if self.globe not in self.site.globes():
-            raise NotImplementedError(u"%s is not supported in Wikibase yet." % self.globe)
+            raise CoordinateGlobeUnknownException(u"%s is not supported in Wikibase yet." % self.globe)
         return {'latitude': self.lat,
                 'longitude': self.lon,
                 'altitude': self.alt,
