@@ -2660,7 +2660,8 @@ class APISite(BaseSite):
 
     @must_be(group='user')
     def editpage(self, page, summary, minor=True, notminor=False,
-                 bot=True, recreate=True, createonly=False, watch=None):
+                 bot=True, recreate=True, createonly=False, nocreate=False,
+                 watch=None):
         """Submit an edited Page object to be saved to the wiki.
 
         @param page: The Page to be saved; its .text property will be used
@@ -2673,6 +2674,7 @@ class APISite(BaseSite):
             title has previously been deleted
         @param createonly: if True, raise an error if this title already
             exists on the wiki
+        @param nocreate: if True, raise an error if the page does not exist
         @param watch: Specify how the watchlist is affected by this edit, set
             to one of "watch", "unwatch", "preferences", "nochange":
             * watch: add the page to the watchlist
@@ -2720,6 +2722,8 @@ class APISite(BaseSite):
             params['recreate'] = ""
         if createonly:
             params['createonly'] = ""
+        if nocreate:
+            params['nocreate'] = ""
         if watch in ["watch", "unwatch", "preferences", "nochange"]:
             params['watchlist'] = watch
         elif watch:
