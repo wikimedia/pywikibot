@@ -1055,6 +1055,9 @@ def update_page(page, pagedict):
     if "pageprops" in pagedict:
         page._pageprops = pagedict['pageprops']
 
+    if "flowinfo" in pagedict:
+        page._flowinfo = pagedict['flowinfo']['flow']
+
 
 if __name__ == "__main__":
     from pywikibot import Site, logging
