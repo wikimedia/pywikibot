@@ -1579,6 +1579,14 @@ class Page(pywikibot.UnicodeMixin):
                                  % (self.title(asLink=True), error.message))
         return False
 
+    def isFlowPage(self):
+        """Whether the given title is a Flow page"""
+        if not self.site.hasExtension('Flow', False):
+            return False
+        if not hasattr(self, '_flowinfo'):
+            self.site.loadflowinfo(self)
+        return 'enabled' in self._flowinfo
+
 # ####### DEPRECATED METHODS ########
 
     @deprecated("Site.encoding()")

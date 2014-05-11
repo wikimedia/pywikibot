@@ -1299,6 +1299,24 @@ class APISite(BaseSite):
             return (pageitem['imageinfo']
                     if history else pageitem['imageinfo'][0])
 
+    def loadflowinfo(self, page):
+        """
+        Loads Flow-related information about a given page
+        Assumes that the Flow extension is installed
+        """
+        title = page.title(withSection=False)
+        query = self._generator(api.PropertyGenerator,
+                                type_arg="flowinfo",
+                                titles=title.encode(self.encoding()),
+                                )
+        for pageitem in query:
+            if not self.sametitle(pageitem['title'], title):
+                pywikibot.warning(
+                    u"loadflowinfo: Query on %s returned data on '%s'"
+                    % (page, pageitem['title']))
+                continue
+            api.update_page(page, pageitem)
+
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
         if not hasattr(page, "_pageid"):
