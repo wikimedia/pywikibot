@@ -393,6 +393,16 @@ class Page(pywikibot.UnicodeMixin):
         if hasattr(self, "_text"):
             del self._text
 
+    def preloadText(self):
+        """Return the text returned by EditFormPreloadText See API module "info".
+
+        Application: on Wikisource wikis, text can be preloaded even if
+        a page does not exist, if an Index page is present.
+
+        """
+        self.site.loadpageinfo(self, preload=True)
+        return self._preloadedtext
+
     def properties(self, force=False):
         """
         Returns the various page properties stored for a page
