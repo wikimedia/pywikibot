@@ -932,9 +932,9 @@ class Page(pywikibot.UnicodeMixin):
 
         """
         self.text = newtext
-        return self.save(comment=comment, watch=watchArticle,
-                         minor=minorEdit, botflag=botflag, force=force,
-                         async=async, callback=callback, **kwargs)
+        self.save(comment=comment, watch=watchArticle, minor=minorEdit,
+                  botflag=botflag, force=force, async=async, callback=callback,
+                  **kwargs)
 
     def put_async(self, newtext, comment=u'', watchArticle=None,
                   minorEdit=True, botflag=None, force=False, callback=None,
@@ -947,9 +947,9 @@ class Page(pywikibot.UnicodeMixin):
         backwards-compatibility.
 
         """
-        return self.put(newtext, comment=comment, watchArticle=watchArticle,
-                        minorEdit=minorEdit, botflag=botflag, force=force,
-                        async=True, callback=callback, **kwargs)
+        self.put(newtext, comment=comment, watchArticle=watchArticle,
+                 minorEdit=minorEdit, botflag=botflag, force=force, async=True,
+                 callback=callback, **kwargs)
 
     def watch(self, unwatch=False):
         """Add or remove this page to/from bot account's watchlist.
