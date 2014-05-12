@@ -665,14 +665,19 @@ class APISite(BaseSite):
                                 action='sitematrix')
         data = req.submit()
         for num in data['sitematrix']:
-            if num in ['specials', 'count']:
+            if num == 'count':
                 continue
-            lang = data['sitematrix'][num]['code']
-            for site in data['sitematrix'][num]['site']:
-                if site['dbname'] == dbname:
-                    if site['code'] == 'wiki':
-                        site['code'] = 'wikipedia'
-                    return APISite(lang, site['code'])
+            if 'code' in data['sitematrix'][num]:
+                lang = data['sitematrix'][num]['code']
+                for site in data['sitematrix'][num]['site']:
+                    if site['dbname'] == dbname:
+                        if site['code'] == 'wiki':
+                            site['code'] = 'wikipedia'
+                        return APISite(lang, site['code'])
+            else:
+                for site in data['sitematrix'][num]:
+                    if site['dbname'] == dbname:
+                        return APISite(site['code'], site['code'])
         raise ValueError("Cannot parse a site out of %s." % dbname)
 
     def _generator(self, gen_class, type_arg=None, namespaces=None,
