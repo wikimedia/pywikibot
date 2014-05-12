@@ -15,7 +15,7 @@ from pywikibot import deprecate_arg
 from pywikibot import deprecated
 from pywikibot import config
 import pywikibot.site
-
+from pywikibot.tools import ComparableMixin
 import hashlib
 
 try:
@@ -42,7 +42,7 @@ reNamespace = re.compile("^(.+?) *: *(.*)$")
 # Note: Link objects (defined later on) represent a wiki-page's title, while
 # Page objects (defined here) represent the page itself, including its contents.
 
-class Page(pywikibot.UnicodeMixin):
+class Page(pywikibot.UnicodeMixin, ComparableMixin):
     """Page: A MediaWiki page
 
     This object only implements internally methods that do not require
@@ -223,23 +223,13 @@ class Page(pywikibot.UnicodeMixin):
         return "%s(%s)" % (self.__class__.__name__,
                            self.title().encode(config.console_encoding))
 
-    def __cmp__(self, other):
-        """Test for equality and inequality of Page objects.
-
+    def _cmpkey(self):
+        """
         Page objects are "equal" if and only if they are on the same site
         and have the same normalized title, including section if any.
 
-        Page objects are sortable by namespace first, then by title.
-
-        """
-        if not isinstance(other, Page):
-            # especially, return -1 if other is None
-            return -1
-        if self.site != other.site:
-            return cmp(self.site, other.site)
-        if self.namespace() != other.namespace():
-            return cmp(self.namespace(), other.namespace())
-        return cmp(self._link.title, other._link.title)
+        Page objects are sortable by site, namespace then title."""
+        return (self.site, self.namespace(), self.title())
 
     def __hash__(self):
         # Pseudo method that makes it possible to store Page objects as keys
@@ -2401,25 +2391,6 @@ class WikibasePage(Page):
         self.repo = self.site
         self._isredir = False  # Wikibase pages cannot be a redirect
 
-    def __cmp__(self, other):
-        """Test for equality and inequality of WikibasePage objects.
-
-        Page objects are "equal" if and only if they are on the same site
-        and have the same normalized title, including section if any.
-
-        Page objects are sortable by namespace first, then by title.
-
-        This is basically the same as Page.__cmp__ but slightly different.
-        """
-        if not isinstance(other, Page):
-            # especially, return -1 if other is None
-            return -1
-        if self.site != other.site:
-            return cmp(self.site, other.site)
-        if self.namespace() != other.namespace():
-            return cmp(self.namespace(), other.namespace())
-        return cmp(self.title(), other.title())
-
     def title(self, **kwargs):
         if self.namespace() == 0:
             self._link._text = self.getID()
@@ -3115,7 +3086,7 @@ class Revision(object):
         self.minor = minor
 
 
-class Link(object):
+class Link(ComparableMixin):
     """A Mediawiki link (local or interwiki)
 
     Has the following attributes:
@@ -3427,23 +3398,14 @@ not supported by PyWikiBot!"""
     def __str__(self):
         return self.astext().encode("ascii", "backslashreplace")
 
-    def __cmp__(self, other):
-        """Test for equality and inequality of Link objects.
-
+    def _cmpkey(self):
+        """
         Link objects are "equal" if and only if they are on the same site
         and have the same normalized title, including section if any.
 
         Link objects are sortable by site, then namespace, then title.
-
         """
-        if not isinstance(other, Link):
-            # especially, return -1 if other is None
-            return -1
-        if not self.site == other.site:
-            return cmp(self.site, other.site)
-        if self.namespace != other.namespace:
-            return cmp(self.namespace, other.namespace)
-        return cmp(self.title, other.title)
+        return (self.site, self.namespace, self.title)
 
     def __unicode__(self):
         return self.astext()
