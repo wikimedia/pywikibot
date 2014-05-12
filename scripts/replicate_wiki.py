@@ -27,7 +27,6 @@ __version__ = '$Id$'
 #
 
 import sys
-import re
 from pywikibot import *
 from itertools import imap
 
@@ -65,6 +64,7 @@ class SyncSites:
         sites = options.destination_wiki
 
         self.original = Site(original_wiki, family)
+        self.original.login()
 
         if options.namespace and 'help' in options.namespace:
             nsd = namespaces(self.original)
@@ -78,28 +78,24 @@ class SyncSites:
         self.user_diff = {}
         pywikibot.output('Syncing to', newline=False)
         for s in self.sites:
+            s.login()
             self.differences[s] = []
             self.user_diff[s] = []
             pywikibot.output(str(s), newline=False)
         pywikibot.output('')
 
     def check_sysops(self):
-        '''Check if sysops are the same
+        '''Check if sysops are the same on all wikis '''
+        def get_users(site):
+            userlist = [ul['name'] for ul in site.allusers(group='sysop')]
+            return set(userlist)
 
-        TODO: implement for API and make optional
-        '''
-        #def get_users(site):
-        #    userlist = site.getUrl(site.get_address('Special:Userlist&group=sysop'))
-        #    # Hackery but working. At least on MW 1.15.0
-        #    # User namespace is number 2
-        #    return set(re.findall(site.namespace(2) + ':(\w+)["\&]',  userlist))
-        #
-        #ref_users = get_users(self.original)
-        #for site in self.sites:
-        #    users = get_users(site)
-        #    diff = list(ref_users.difference(users))
-        #    diff.sort()
-        #    self.user_diff[site] = diff
+        ref_users = get_users(self.original)
+        for site in self.sites:
+            users = get_users(site)
+            diff = list(ref_users.difference(users))
+            diff.sort()
+            self.user_diff[site] = diff
 
     def check_namespaces(self):
         '''Check all namespaces, to be ditched for clarity'''
@@ -142,7 +138,7 @@ class SyncSites:
     def generate_overviews(self):
         '''Create page on wikis with overview of bot results'''
         for site in self.sites:
-            sync_overview_page = Page(site, 'User:' + site.loggedInAs() + '/sync.py overview')
+            sync_overview_page = Page(site, 'User:' + site.user() + '/sync.py overview')
             output = "== Pages that differ from original ==\n\n"
             if self.differences[site]:
                 output += "".join(map(lambda l: '* [[:' + l + "]]\n", self.differences[site]))
@@ -159,7 +155,7 @@ class SyncSites:
             sync_overview_page.put(output, self.put_message(site))
 
     def put_message(self, site):
-        return site.loggedInAs() + ' sync.py synchronization from ' + str(self.original)
+        return site.user() + ' replicate_wiki.py synchronization from ' + str(self.original)
 
     def check_page(self, pagename):
         '''Check one page'''
@@ -215,7 +211,7 @@ if __name__ == '__main__':
                         help="actually replace pages (without this option you will only get an overview page)")
     parser.add_argument("-o", "--original", dest="original_wiki",
                         help="original wiki")
-    parser.add_argument('destination_wiki', metavar='N', type=str, nargs='+',
+    parser.add_argument('destination_wiki', metavar='destination', type=str, nargs='+',
                         help='destination wiki(s)')
     parser.add_argument("-ns", "--namespace", dest="namespace",
                         help="specify namespace")
