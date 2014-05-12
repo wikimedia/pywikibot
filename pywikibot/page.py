@@ -1447,7 +1447,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     @deprecate_arg("throttle", None)
     def protect(self, edit='sysop', move='sysop', unprotect=False,
-                reason=None, prompt=True):
+                reason=None, prompt=True, expiry=None):
         """(Un)protect a wiki page. Requires administrator status.
 
         Valid protection levels (in MediaWiki 1.12) are '' (equivalent to
@@ -1459,6 +1459,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             all protection levels to '')
         @param reason: Edit summary.
         @param prompt: If true, ask user for confirmation.
+        @param expiry: When the block should expire
 
         """
         if reason is None:
@@ -1483,7 +1484,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                 answer = 'y'
                 self.site._noProtectPrompt = True
         if answer in ['y', 'Y']:
-            return self.site.protect(self, edit, move, reason)
+            return self.site.protect(self, edit, move, reason, expiry)
 
     def change_category(self, oldCat, newCat, comment=None, sortKey=None,
                         inPlace=True):
