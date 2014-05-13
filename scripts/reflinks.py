@@ -52,6 +52,7 @@ import StringIO
 
 import pywikibot
 from pywikibot import pagegenerators
+from pywikibot import xmlreader
 import noreferences
 from pywikibot import i18n
 
@@ -181,7 +182,6 @@ class XmlDumpPageGenerator:
         self.skipping = bool(xmlStart)
         self.site = pywikibot.Site()
 
-        import xmlreader
         dump = xmlreader.XmlDump(xmlFilename)
         self.parser = dump.parse()
 
@@ -836,7 +836,7 @@ def main():
         # syntax error, show help text from the top of this file
         pywikibot.showHelp('reflinks')
         return
-    generator = pagegenerators.PreloadingGenerator(generator, pageNumber=50)
+    generator = pagegenerators.PreloadingGenerator(generator, step=50)
     generator = pagegenerators.RedirectFilterPageGenerator(generator)
     bot = ReferencesRobot(generator, always, limit, ignorepdf)
     bot.run()
