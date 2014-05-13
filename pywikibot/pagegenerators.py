@@ -235,8 +235,8 @@ class GeneratorFactory(object):
         dupfiltergen = DuplicateFilterPageGenerator(gensList)
 
         if self.articlefilter:
-            return RegexBodyFilterPageGenerator(PreloadingGenerator(dupfiltergen),
-                                                self.articlefilter)
+            return RegexBodyFilterPageGenerator(
+                PreloadingGenerator(dupfiltergen), self.articlefilter)
         else:
             return dupfiltergen
 
@@ -487,7 +487,8 @@ class GeneratorFactory(object):
             gen = RegexFilterPageGenerator(self.site.allpages(), regex)
         elif arg.startswith('-grep'):
             if len(arg) == 5:
-                self.articlefilter = pywikibot.input(u'Which pattern do you want to grep?')
+                self.articlefilter = pywikibot.input(
+                    u'Which pattern do you want to grep?')
             else:
                 self.articlefilter = arg[6:]
             return True
@@ -835,20 +836,83 @@ def DuplicateFilterPageGenerator(generator):
             yield page
 
 
-def RegexFilterPageGenerator(generator, regex):
-    """Yield pages from another generator whose titles match regex."""
-    reg = re.compile(regex, re.I)
-    for page in generator:
-        if reg.match(page.title(withNamespace=False)):
-            yield page
+class RegexFilter(object):
 
+    @classmethod
+    def __filter_match(cls, regex, string, quantifier):
+        """ return True if string matches precompiled regex list with depending
+        on the quantifier parameter (see below).
 
-def RegexBodyFilterPageGenerator(generator, regex):
-    """Yield pages from another generator whose body matches regex with options re.IGNORECASE|re.DOTALL."""
-    reg = re.compile(regex, re.IGNORECASE | re.DOTALL)
-    for page in generator:
-        if reg.search(page.text):
-            yield page
+        """
+        if quantifier == 'all':
+            match = all(r.search(string) for r in regex)
+        else:
+            match = any(r.search(string) for r in regex)
+        return (quantifier == 'none') ^ match
+
+    @classmethod
+    def __precompile(cls, regex, flag):
+        """ precompile the regex list if needed """
+        # Enable multiple regexes
+        if not isinstance(regex, list):
+            regex = [regex]
+        # Test if regex is already compiled.
+        # We assume that all list componets have the same type
+        if isinstance(regex[0], basestring):
+            regex = [re.compile(r, flag) for r in regex]
+        return regex
+
+    @classmethod
+    @deprecate_arg("inverse", "quantifier")
+    def titlefilter(cls, generator, regex, quantifier='any',
+                    ignore_namespace=True):
+        """ Yield pages from another generator whose title matches regex with
+        options re.IGNORECASE dependig on the quantifier parameter.
+        If ignore_namespace is False, the whole page title is compared.
+        NOTE: if you want to check for a match at the beginning of the title,
+        you have to start the regex with "^"
+
+        @param generator: another generator
+        @type generator: any generator or iterator
+        @param regex: a regex which should match the page title
+        @type regex: a single regex string or a list of regex strings or a
+            compiled regex or a list of compiled regexes
+        @param quantifier: must be one of the following values:
+            'all' - yields page if title is matched by all regexes
+            'any' - yields page if title is matched by any regexes
+            'none' - yields page if title is NOT matched by any regexes
+        @type quantifier: string of ('all', 'any', 'none')
+        @param ignore_namespace: ignore the namespace when matching the title
+        @type ignore_namespace: bool
+        @return: return a page depending on the matching parameters
+
+        """
+        # for backwards compatibility with compat for inverse parameter
+        if quantifier is False:
+            quantifier = 'any'
+        elif quantifier is True:
+            quantifier = 'none'
+        reg = cls.__precompile(regex, re.I)
+        for page in generator:
+            title = page.title(withNamespace=not ignore_namespace)
+            if cls.__filter_match(reg, title, quantifier):
+                yield page
+
+    @classmethod
+    def contentfilter(cls, generator, regex, quantifier='any'):
+        """Yield pages from another generator whose body matches regex with
+        options re.IGNORECASE|re.DOTALL dependig on the quantifier parameter.
+
+        For parameters see titlefilter above
+
+        """
+        reg = cls.__precompile(regex, re.IGNORECASE | re.DOTALL)
+        return (page for page in generator
+                if cls.__filter_match(reg, page.text, quantifier))
+
+# name the generator methods
+RegexFilterPageGenerator = RegexFilter.titlefilter
+RegexBodyFilterPageGenerator = RegexFilter.contentfilter
 
 
 def CombinedPageGenerator(generators):
@@ -1110,13 +1174,15 @@ def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
         yield page
 
 
-def SearchPageGenerator(query, step=None, total=None, namespaces=None, site=None):
+def SearchPageGenerator(query, step=None, total=None, namespaces=None,
+                        site=None):
     """
     Provides a list of results using the internal MediaWiki search engine
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.search(query, step=step, total=total, namespaces=namespaces):
+    for page in site.search(query, step=step, total=total,
+                            namespaces=namespaces):
         yield page
 
 
@@ -1136,8 +1202,8 @@ def UntaggedPageGenerator(untaggedProject, limit=500):
     results = re.findall(REGEXP, http.request(site=None, uri=link))
     if not results:
         raise pywikibot.Error(
-            'Nothing found at %s! Try to use the tool by yourself to be sure that it '
-            'works!' % link)
+            u'Nothing found at %s! Try to use the tool by yourself to be sure '
+            u'that it works!' % link)
     else:
         for result in results:
             yield pywikibot.Page(pywikibot.Site(), result)
@@ -1193,22 +1259,12 @@ class GoogleSearchPageGenerator:
             site = pywikibot.Site()
         self.site = site
 
-    #########
-    # partially commented out because it is probably not in compliance with
-    # Google's "Terms of service"
-    # (see 5.3, http://www.google.com/accounts/TOS?loc=US)
     def queryGoogle(self, query):
-        #if config.google_key:
-        if True:
-            #try:
-                for url in self.queryViaSoapApi(query):
-                    yield url
-                return
-            #except ImportError:
-                #pass
-        # No google license key, or pygoogle not installed. Do it the ugly way.
-        #for url in self.queryViaWeb(query):
-        #    yield url
+        #########
+        # Google's "Terms of service"
+        # (see 5.3, http://www.google.com/accounts/TOS?loc=US)
+        for url in self.queryViaSoapApi(query):
+            yield url
 
     def queryViaSoapApi(self, query):
         import google
@@ -1399,4 +1455,5 @@ def WikidataQueryPageGenerator(query, site=None):
 
 
 if __name__ == "__main__":
-    pywikibot.output('Pagegenerators cannot be run as script - are you looking for listpages.py?')
+    pywikibot.output(u'Pagegenerators cannot be run as script - are you '
+                     u'looking for listpages.py?')
