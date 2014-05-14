@@ -10,6 +10,7 @@ Tests for the site module.
 __version__ = '$Id$'
 
 
+from distutils.version import LooseVersion as LV
 import pywikibot
 from pywikibot.site import must_be
 from tests import patch_request, unpatch_request
@@ -648,7 +649,7 @@ class TestSiteObject(PywikibotTestCase):
             prefix = title[:title.index(":")]
             self.assertTrue(mysite.ns_index(prefix) in [6, 7])
             self.assertTrue(change["ns"] in [6, 7])
-        if mysite.versionnumber() <= 14:
+        if LV(mysite.version()) <= LV("1.14"):
             for change in mysite.recentchanges(pagelist=[mainpage, imagepage],
                                                total=5):
                 self.assertType(change, dict)

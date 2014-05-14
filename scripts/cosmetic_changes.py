@@ -74,6 +74,7 @@ __version__ = '$Id$'
 #
 
 import re
+from distutils.version import LooseVersion as LV
 import pywikibot
 import isbn
 from pywikibot import pagegenerators
@@ -338,7 +339,7 @@ class CosmeticChangesToolkit:
             thisNs = namespaces.pop(0)
             if nsNumber == 6 and family.name == 'wikipedia':
                 if self.site.lang in ('en', 'fr') and \
-                   self.site.versionnumber() >= 14:
+                   LV(self.site.version()) >= LV('1.14'):
                     # do not change "Image" on en-wiki and fr-wiki
                     assert u'Image' in namespaces
                     namespaces.remove(u'Image')

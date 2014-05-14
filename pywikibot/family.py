@@ -959,14 +959,18 @@ class Family(object):
 
     # Which version of MediaWiki is used?
     def version(self, code):
-        """Return MediaWiki version number as a string."""
-        # Don't use this, use versionnumber() instead. This only exists
-        # to not break family files.
+        """ Return MediaWiki version number as a string.
+        Use LooseVersion from distutils.version to compare version strings.
+
+        """
         # Here we return the latest mw release for downloading
         return '1.20wmf2'
 
+    @pywikibot.deprecated("version()")
     def versionnumber(self, code):
-        """Return an int identifying MediaWiki version.
+        """ DEPRECATED, use version() instead and use
+        distutils.version.LooseVersion to compare version strings.
+        Return an int identifying MediaWiki version.
 
         Currently this is implemented as returning the minor version
         number; i.e., 'X' in version '1.X.Y'
@@ -1066,9 +1070,11 @@ class WikimediaFamily(Family):
         ]
 
     def version(self, code):
-        """Return Wikimedia projects version number as a string."""
-        # Don't use this, use versionnumber() instead. This only exists
-        # to not break family files.
+        """Return Wikimedia projects version number as a string.
+        Use LooseVersion from distutils.version to compate versions.
+
+        """
+        # Here we return the latest mw release for downloading
         return '1.24wmf3'
 
     def shared_image_repository(self, code):
