@@ -1832,9 +1832,6 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         for iw in re.finditer('<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
             try:
                 ignorepage = pywikibot.Page(page.site, iw.groups()[0])
-            except (pywikibot.NoSuchSite, ):
-                continue
-            try:
                 if (new[ignorepage.site] == ignorepage) and \
                    (ignorepage.site != page.site):
                     if (ignorepage not in interwikis):
@@ -1849,6 +1846,10 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                             % {'to': ignorepage,
                                'from': page})
             except KeyError:
+                pass
+            except pywikibot.NoSuchSite:
+                pass
+            except pywikibot.InvalidTitle:
                 pass
 
         # sanity check - the page we are fixing must be the only one for that
