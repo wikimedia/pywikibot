@@ -22,6 +22,8 @@ These command line parameters can be used to specify which pages to work on:
 
     -always       Don't prompt you for each replacement.
 
+    -quiet        Use this option to get less output
+
 All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
 
@@ -448,11 +450,12 @@ class XmlDumpNoReferencesPageGenerator:
                 yield pywikibot.Page(pywikibot.Site(), entry.title)
 
 
-class NoReferencesBot:
+class NoReferencesBot(object):
 
-    def __init__(self, generator, always=False):
+    def __init__(self, generator, always=False, verbose=True):
         self.generator = generator
         self.always = always
+        self.verbose = verbose
         self.site = pywikibot.Site()
         self.comment = i18n.twtranslate(self.site, 'noreferences-add-tag')
 
@@ -462,38 +465,38 @@ class NoReferencesBot:
                                          re.IGNORECASE | re.DOTALL)
         try:
             self.referencesTemplates = referencesTemplates[
-                pywikibot.Site().family.name][pywikibot.Site().lang]
+                self.site.family.name][self.site.code]
         except KeyError:
             self.referencesTemplates = []
         try:
             self.referencesText = referencesSubstitute[
-                pywikibot.Site().family.name][pywikibot.Site().lang]
+                self.site.family.name][self.site.code]
         except KeyError:
             self.referencesText = u'<references />'
 
-    def lacksReferences(self, text, verbose=True):
+    def lacksReferences(self, text):
         """
         Checks whether or not the page is lacking a references tag.
         """
         oldTextCleaned = pywikibot.removeDisabledParts(text)
         if self.referencesR.search(oldTextCleaned) or \
            self.referencesTagR.search(oldTextCleaned):
-            if verbose:
+            if self.verbose:
                 pywikibot.output(u'No changes necessary: references tag found.')
             return False
         elif self.referencesTemplates:
             templateR = u'{{(' + u'|'.join(self.referencesTemplates) + ')'
             if re.search(templateR, oldTextCleaned, re.IGNORECASE | re.UNICODE):
-                if verbose:
+                if self.verbose:
                     pywikibot.output(
                         u'No changes necessary: references template found.')
                 return False
         if not self.refR.search(oldTextCleaned):
-            if verbose:
+            if self.verbose:
                 pywikibot.output(u'No changes necessary: no ref tags found.')
             return False
         else:
-            if verbose:
+            if self.verbose:
                 pywikibot.output(u'Found ref without references.')
             return True
 
@@ -611,15 +614,16 @@ class NoReferencesBot:
         if not self.always:
             choice = pywikibot.inputChoice(
                 u'Do you want to accept these changes?',
-                ['Yes', 'No', 'Always yes'], ['y', 'N', 'a'], 'Y')
+                ['Yes', 'No', 'Always yes'], 'yNa', 'Y')
             if choice == 'n':
                 return
             elif choice == 'a':
                 self.always = True
 
+        page.text = newText
         if self.always:
             try:
-                page.put(newText, self.comment)
+                page.save(self.comment)
             except pywikibot.EditConflict:
                 pywikibot.output(u'Skipping %s because of edit conflict'
                                  % (page.title(),))
@@ -631,8 +635,7 @@ class NoReferencesBot:
                 pywikibot.output(u'Skipping %s (locked page)' % (page.title(),))
         else:
             # Save the page in the background. No need to catch exceptions.
-            page.put_async(newText, self.comment)
-        return
+            page.save(self.comment, async=True)
 
     def run(self):
 
@@ -642,7 +645,7 @@ class NoReferencesBot:
             pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                              % page.title())
             try:
-                text = page.get()
+                text = page.text
             except pywikibot.NoPage:
                 pywikibot.output(u"Page %s does not exist?!"
                                  % page.title(asLink=True))
@@ -659,7 +662,7 @@ class NoReferencesBot:
                 pywikibot.output(u"Page %s is a disambig; skipping."
                                  % page.title(asLink=True))
                 continue
-            if pywikibot.Site().sitename() == 'wikipedia:en' and \
+            if self.site.sitename() == 'wikipedia:en' and \
                page.isIpEdit():
                 pywikibot.output(
                     u"Page %s is edited by IP. Possible vandalized"
@@ -671,7 +674,7 @@ class NoReferencesBot:
 
 
 def main():
-    #page generator
+    # page generator
     gen = None
     # This temporary array is used to read the page title if one single
     # page to work on is specified by the arguments.
@@ -681,6 +684,8 @@ def main():
     namespaces = []
     # Never ask before changing a page
     always = False
+    # No verbose output
+    verbose = True
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
@@ -700,6 +705,8 @@ def main():
                 namespaces.append(arg[11:])
         elif arg == '-always':
             always = True
+        elif arg == '-quiet':
+            verbose = False
         else:
             if not genFactory.handleArg(arg):
                 pageTitle.append(arg)
@@ -727,7 +734,7 @@ def main():
         if namespaces:
             gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = NoReferencesBot(preloadingGen, always)
+        bot = NoReferencesBot(preloadingGen, always, verbose)
         bot.run()
 
 if __name__ == "__main__":
