@@ -17,12 +17,10 @@ import sys
 import os
 import tempfile
 import pywikibot
-from pywikibot import config2 as config
+from pywikibot import config
 
 
 class TextEditor(object):
-    def __init__(self):
-        pass
 
     def command(self, tempFilename, text, jumpIndex=None):
         command = config.editor
@@ -65,7 +63,7 @@ class TextEditor(object):
 
     def restoreLinebreaks(self, text):
         if text is None:
-            return None
+            return
         if sys.platform == 'win32':
             return text.replace('\n', '\r\n')
         # TODO: Mac OS handling
