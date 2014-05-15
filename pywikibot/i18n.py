@@ -264,7 +264,7 @@ def _extract_plural(code, message, parameters):
     return message
 
 
-def translate(code, xdict, parameters=None, fallback=False):
+def translate(code, xdict, parameters=None, fallback=True):
     """Return the most appropriate translation from a translation dict.
 
     @param code The language code
