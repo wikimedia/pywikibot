@@ -612,7 +612,6 @@ class APISite(BaseSite):
 #    postData: Post encoded form data to an http address at this site.
 #
 #    version: Return MediaWiki version string from Family file.
-#    versionnumber: Return int identifying the MediaWiki version.
 #    live_version: Return version number read from Special:Version.
 #    checkCharset(charset): Warn if charset doesn't match family file.
 #
