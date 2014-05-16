@@ -186,8 +186,8 @@ class ImageTransferBot:
                                                           ['comment', 'math',
                                                            'nowiki', 'pre'])
 
-            description = i18n.translate(self.targetSite, copy_message) \
-                          % (sourceSite, description)
+            description = i18n.translate(self.targetSite, copy_message,
+                                         fallback=True) % (sourceSite, description)
             description += '\n\n' + str(sourceImagePage.getFileVersionHistoryTable())
             # add interwiki link
             if sourceSite.family == self.targetSite.family:
@@ -209,7 +209,7 @@ class ImageTransferBot:
             if targetFilename and self.targetSite.family.name == 'commons' and \
                self.targetSite.code == 'commons':
                 # upload to Commons was successful
-                reason = i18n.translate(sourceSite, nowCommonsMessage)
+                reason = i18n.translate(sourceSite, nowCommonsMessage, fallback=True)
                 # try to delete the original image if we have a sysop account
                 if sourceSite.family.name in config.sysopnames and \
                    sourceSite.lang in config.sysopnames[sourceSite.family.name]:

@@ -139,7 +139,7 @@ def workon(page, links):
             continue
         text = treat(text, page2, target)
     if text != page.get():
-        comment = pywikibot.translate(mysite, msg)
+        comment = pywikibot.translate(mysite, msg, fallback=True)
         page.put(text, comment)
 
 

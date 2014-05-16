@@ -172,14 +172,18 @@ class PageFromFileRobot:
         if self.summary:
             comment = self.summary
         else:
-            comment = pywikibot.translate(mysite, self.msg)
+            comment = pywikibot.translate(mysite, self.msg, fallback=True)
 
         comment_top = comment + " - " + pywikibot.translate(mysite,
-                                                            self.msg_top)
+                                                            self.msg_top,
+                                                            fallback=True)
         comment_bottom = comment + " - " + pywikibot.translate(mysite,
-                                                               self.msg_bottom)
-        comment_force = comment + " *** " + pywikibot.translate(mysite,
-                                                                self.msg_force) + " ***"
+                                                               self.msg_bottom
+                                                               fallback=True)
+        comment_force = "%s *** %s ***" % (comment,
+                                           pywikibot.translate(mysite,
+                                                               self.msg_force,
+                                                               fallback=True))
 
         # Remove trailing newlines (cause troubles when creating redirects)
         contents = re.sub('^[\r\n]*', '', contents)

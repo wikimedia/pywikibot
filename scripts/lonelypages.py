@@ -134,8 +134,8 @@ def main():
     # Take the configurations according to our project
     comment = i18n.twtranslate(wikiSite, 'lonelypages-comment-add-template')
     commentdisambig = i18n.twtranslate(wikiSite, 'lonelypages-comment-add-disambig-template')
-    template = i18n.translate(wikiSite, Template, fallback=False)
-    exception = i18n.translate(wikiSite, exception_regex, fallback=False)
+    template = i18n.translate(wikiSite, Template)
+    exception = i18n.translate(wikiSite, exception_regex)
     if template is None or exception is None:
         raise Exception("Missing configuration for site %r" % wikiSite)
     # EnablePage part

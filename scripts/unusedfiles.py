@@ -72,7 +72,8 @@ def appendtext(page, apptext, always):
                 always = True
         if always or choice == 'y':
             page.text = text
-            page.save(pywikibot.translate(pywikibot.Site(), comment))
+            page.save(pywikibot.translate(pywikibot.Site(), comment,
+                                          fallback=True))
 
 
 def main():
@@ -85,11 +86,10 @@ def main():
     mysite = pywikibot.Site()
     # If anything needs to be prepared, you can do it here
     template_image = pywikibot.translate(pywikibot.Site(),
-                                         template_to_the_image, fallback=False)
+                                         template_to_the_image)
     template_user = pywikibot.translate(pywikibot.Site(),
-                                        template_to_the_user, fallback=False)
-    except_text_translated = pywikibot.translate(pywikibot.Site(), except_text,
-                                                 fallback=False)
+                                        template_to_the_user)
+    except_text_translated = pywikibot.translate(pywikibot.Site(), except_text)
     if not(template_image and template_user and except_text_translated):
         pywikibot.warning(u'This script is not localized for %s site.' % mysite)
         return

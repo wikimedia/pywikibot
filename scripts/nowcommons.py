@@ -180,8 +180,6 @@ word_to_skip = {
     'it': ['stemma', 'stub', 'hill40 '],
 }
 
-#nowCommonsMessage = imagetransfer.nowCommonsMessage
-
 
 class NowCommonsDeleteBot:
     def __init__(self):
@@ -309,7 +307,7 @@ class NowCommonsDeleteBot:
 
     def run(self):
         commons = pywikibot.Site('commons', 'commons')
-        comment = i18n.translate(self.site, nowCommonsMessage)
+        comment = i18n.translate(self.site, nowCommonsMessage, fallback=True)
 
         for page in self.getPageGenerator():
             if use_hash:
