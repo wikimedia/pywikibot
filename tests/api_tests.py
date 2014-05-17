@@ -73,6 +73,40 @@ class TestPageGenerator(PywikibotTestCase):
             self.assertEqual(page.site, mysite)
             self.assertIn(page.title(), titles)
 
+    def test_initial_limit(self):
+        self.assertEqual(self.gen.limit, None)  # limit is initaly None
+
+    def test_limit_as_number(self):
+        for i in range(-2, 4):
+            self.gen.set_maximum_items(i)
+            self.assertEqual(self.gen.limit, i)
+
+    def test_limit_as_string(self):
+        for i in range(-2, 4):
+            self.gen.set_maximum_items(str(i))
+            self.assertEqual(self.gen.limit, i)
+
+    def test_wrong_limit_setting(self):
+        with self.assertRaisesRegexp(
+                ValueError,
+                "invalid literal for int\(\) with base 10: 'test'"):
+            self.gen.set_maximum_items('test')
+
+    def test_limits(self):
+        """Test that PageGenerator yields the requested amount of pages"""
+        for i in range(4, 0, -1):
+            self.gen.set_maximum_items(i)  # set total amount of pages
+            results = [p for p in self.gen]
+            self.assertEqual(len(results), i)
+
+        self.gen.set_maximum_items(0)
+        results = [p for p in self.gen]
+        self.assertEqual(len(results), 4)  # total=0 but 4 expected (really?)
+
+        self.gen.set_maximum_items(-1)
+        results = [p for p in self.gen]
+        self.assertEqual(len(results), 4)  # total=-1 but 4 expected
+
 
 class TestCachedRequest(unittest.TestCase):
     def testResults(self):
