@@ -1055,6 +1055,9 @@ def update_page(page, pagedict):
     if "pageprops" in pagedict:
         page._pageprops = pagedict['pageprops']
 
+    if 'preload' in pagedict:
+        page._preloadedtext = pagedict['preload']
+
     if "flowinfo" in pagedict:
         page._flowinfo = pagedict['flowinfo']['flow']
 

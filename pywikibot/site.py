@@ -1231,13 +1231,18 @@ class APISite(BaseSite):
         except pywikibot.data.api.APIError:  # May occur if you are not logged in (no API read permissions).
             return (0, 0, 0)
 
-    def loadpageinfo(self, page):
+    def loadpageinfo(self, page, preload=False):
         """Load page info from api and save in page attributes"""
         title = page.title(withSection=False)
+        inprop = 'protection'
+        if preload:
+            inprop += '|preload'
+
         query = self._generator(api.PropertyGenerator,
                                 type_arg="info",
                                 titles=title.encode(self.encoding()),
-                                inprop="protection")
+                                inprop=inprop)
+
         for pageitem in query:
             if not self.sametitle(pageitem['title'], title):
                 pywikibot.warning(
