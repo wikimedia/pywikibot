@@ -486,7 +486,8 @@ class WelcomeBot(object):
 
             # blacklist from wikipage
             badword_page = pywikibot.Page(self.site,
-                                          pywikibot.translate(self.site, bad_pag))
+                                          pywikibot.translate(self.site,
+                                                              bad_pag))
             list_loaded = list()
             if badword_page.exists():
                 pywikibot.output(u'\nLoading the bad words list from %s...'
@@ -585,7 +586,8 @@ class WelcomeBot(object):
                                      % username)
                 else:
                     # Adding the log.
-                    rep_text += pywikibot.translate(self.site, report_text) % username
+                    rep_text += pywikibot.translate(self.site,
+                                                    report_text) % username
                     if self.site.code == 'it':
                         rep_text = "%s%s}}" % (rep_text, self.bname[username])
 
@@ -606,7 +608,7 @@ class WelcomeBot(object):
             return
 
         text = u''
-        logg = pywikibot.translate(self.site, logbook, fallback=False)
+        logg = pywikibot.translate(self.site, logbook)
         if not logg:
             return
 
