@@ -150,8 +150,7 @@ class SandboxBot(pywikibot.Bot):
         self.site.login()
         if self.getOption('user'):
             localSandboxTitle = pywikibot.translate(self.site,
-                                                    user_sandboxTemplate,
-                                                    fallback=False)
+                                                    user_sandboxTemplate)
             localSandbox = pywikibot.Page(self.site, localSandboxTitle)
             content.update(user_content)
             sandboxTitle[self.site.lang] = [item.title() for item in
@@ -171,8 +170,7 @@ class SandboxBot(pywikibot.Bot):
         while True:
             wait = False
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-            localSandboxTitle = pywikibot.translate(self.site, sandboxTitle,
-                                                    fallback=False)
+            localSandboxTitle = pywikibot.translate(self.site, sandboxTitle)
             if type(localSandboxTitle) is list:
                 titles = localSandboxTitle
             else:
@@ -183,8 +181,7 @@ class SandboxBot(pywikibot.Bot):
                                  % sandboxPage.title(asLink=True))
                 try:
                     text = sandboxPage.get()
-                    translatedContent = pywikibot.translate(self.site, content,
-                                                            fallback=False)
+                    translatedContent = pywikibot.translate(self.site, content)
                     translatedMsg = i18n.twtranslate(self.site,
                                                      'clean_sandbox-cleaned')
                     subst = 'subst:' in translatedContent
