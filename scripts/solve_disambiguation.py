@@ -935,16 +935,16 @@ u"Page does not exist, using the first link in page %s."
             try:
                 self.comment = pywikibot.translate(
                     self.mysite,
-                    config.disambiguation_comment[self.mysite.family.name]
-                ) % (disambPage.title(), targets)
+                    config.disambiguation_comment[self.mysite.family.name],
+                    fallback=True) % (disambPage.title(), targets)
 
             # Backwards compatibility, type error probably caused by too
             # many arguments for format string
             except TypeError:
                 self.comment = pywikibot.translate(
                     self.mysite,
-                    config.disambiguation_comment[self.mysite.family.name]
-                ) % disambPage.title()
+                    config.disambiguation_comment[self.mysite.family.name],
+                    fallback=True) % disambPage.title()
         elif disambPage.isRedirectPage():
             # when working on redirects, there's another summary message
             if unlink and not new_targets:

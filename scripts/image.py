@@ -118,10 +118,12 @@ class ImageRobot:
         if summary:
             self.editSummary = summary
         elif self.newImage:
-            self.editSummary = pywikibot.translate(mysite, self.msg_replace) \
+            self.editSummary = pywikibot.translate(mysite, self.msg_replace,
+                                                   fallback=True) \
             % (self.oldImage, self.newImage)
         else:
-            self.editSummary = pywikibot.translate(mysite, self.msg_remove) \
+            self.editSummary = pywikibot.translate(mysite, self.msg_remove,
+                                                   fallback=True) \
             % self.oldImage
 
     def run(self):

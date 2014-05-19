@@ -24,37 +24,50 @@ class TestTranslate(unittest.TestCase):
         self.msg_no_english = {'ja': u'test-no-english JA'}
 
     def testLocalized(self):
-        self.assertEqual(i18n.translate('en', self.msg_localized),
+        self.assertEqual(i18n.translate('en', self.msg_localized,
+                                        fallback=True),
                          u'test-localized EN')
-        self.assertEqual(i18n.translate('nl', self.msg_localized),
+        self.assertEqual(i18n.translate('nl', self.msg_localized,
+                                        fallback=True),
                          u'test-localized NL')
-        self.assertEqual(i18n.translate('fy', self.msg_localized),
+        self.assertEqual(i18n.translate('fy', self.msg_localized,
+                                        fallback=True),
                          u'test-localized FY')
 
     def testSemiLocalized(self):
-        self.assertEqual(i18n.translate('en', self.msg_semi_localized),
+        self.assertEqual(i18n.translate('en', self.msg_semi_localized,
+                                        fallback=True),
                          u'test-semi-localized EN')
-        self.assertEqual(i18n.translate('nl', self.msg_semi_localized),
+        self.assertEqual(i18n.translate('nl', self.msg_semi_localized,
+                                        fallback=True),
                          u'test-semi-localized NL')
-        self.assertEqual(i18n.translate('fy', self.msg_semi_localized),
+        self.assertEqual(i18n.translate('fy', self.msg_semi_localized,
+                                        fallback=True),
                          u'test-semi-localized NL')
 
     def testNonLocalized(self):
-        self.assertEqual(i18n.translate('en', self.msg_non_localized),
+        self.assertEqual(i18n.translate('en', self.msg_non_localized,
+                                        fallback=True),
                          u'test-non-localized EN')
-        self.assertEqual(i18n.translate('fy', self.msg_non_localized),
+        self.assertEqual(i18n.translate('fy', self.msg_non_localized,
+                                        fallback=True),
                          u'test-non-localized EN')
-        self.assertEqual(i18n.translate('nl', self.msg_non_localized),
+        self.assertEqual(i18n.translate('nl', self.msg_non_localized,
+                                        fallback=True),
                          u'test-non-localized EN')
-        self.assertEqual(i18n.translate('ru', self.msg_non_localized),
+        self.assertEqual(i18n.translate('ru', self.msg_non_localized,
+                                        fallback=True),
                          u'test-non-localized EN')
 
     def testNoEnglish(self):
-        self.assertEqual(i18n.translate('en', self.msg_no_english),
+        self.assertEqual(i18n.translate('en', self.msg_no_english,
+                                        fallback=True),
                          u'test-no-english JA')
-        self.assertEqual(i18n.translate('fy', self.msg_no_english),
+        self.assertEqual(i18n.translate('fy', self.msg_no_english,
+                                        fallback=True),
                          u'test-no-english JA')
-        self.assertEqual(i18n.translate('nl', self.msg_no_english),
+        self.assertEqual(i18n.translate('nl', self.msg_no_english,
+                                        fallback=True),
                          u'test-no-english JA')
 
 

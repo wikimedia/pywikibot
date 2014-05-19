@@ -435,9 +435,10 @@ class CommonscatBot:
         if self.summary:
             comment = self.summary
         else:
-            comment = pywikibot.translate(page.site(),
-                                          msg_change) % {'oldcat': oldcat,
-                                                         'newcat': newcat}
+            comment = pywikibot.translate(page.site,
+                                          msg_change,
+                                          fallback=True) % {'oldcat': oldcat,
+                                                            'newcat': newcat}
         self.save(newtext, page, comment)
 
     def findCommonscatLink(self, page=None):
