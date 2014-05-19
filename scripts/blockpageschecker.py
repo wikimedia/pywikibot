@@ -262,7 +262,7 @@ def main():
     TNR = pywikibot.translate(site, templateNoRegex)
     TU = pywikibot.translate(site, templateUnique)
 
-    category = pywikibot.translate(site, categoryToCheck)
+    categories = pywikibot.translate(site, categoryToCheck)
     commentUsed = i18n.twtranslate(site, 'blockpageschecker-summary')
     if not generator:
         generator = genFactory.getCombinedGenerator()
@@ -270,7 +270,7 @@ def main():
         generator = list()
         pywikibot.output(u'Loading categories...')
         # Define the category if no other generator has been setted
-        for CAT in category:
+        for CAT in categories:
             cat = pywikibot.Category(site, CAT)
             # Define the generator
             gen = pagegenerators.CategorizedPageGenerator(cat)
@@ -283,8 +283,7 @@ def main():
         pagename = page.title(asLink=True)
         pywikibot.output('Loading %s...' % pagename)
         try:
-            text = page.get()
-            restrictions = site.page_restrictions(page)
+            text = page.text
         except pywikibot.NoPage:
             pywikibot.output("%s doesn't exist! Skipping..." % pagename)
             continue
@@ -302,18 +301,16 @@ def main():
                              "it! Skipping..." % pagename)
             continue
         """
-        if 'edit' in restrictions.keys():
+        restrictions = page.protection()
+        try:
             editRestr = restrictions['edit']
-        else:
+        except KeyError:
             editRestr = None
-        if editRestr and editRestr[0] == 'sysop':
-            try:
-                config.sysopnames[site.family.name][site.lang]
-            except:
-                pywikibot.output(u"%s is sysop-protected: "
-                                 u"this account can't edit it! Skipping..."
-                                 % pagename)
-                continue
+        if not page.canBeEdited():
+            pywikibot.output(u"%s is protected: "
+                             u"this account can't edit it! Skipping..."
+                             % pagename)
+            continue
 
         # Understand, according to the template in the page, what should be the
         # protection and compare it with what there really is.
@@ -454,7 +451,7 @@ def main():
                 if choice == 'a':
                     always = True
             if always or choice == 'y':
-                while 1:
+                while True:
                     try:
                         page.put(text, commentUsed, force=True)
                     except pywikibot.EditConflict:
