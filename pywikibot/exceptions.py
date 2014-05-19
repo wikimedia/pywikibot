@@ -156,3 +156,11 @@ class AutoblockUser(Error):
 
 class UserActionRefuse(Error):
     pass
+
+
+class WikiBaseError(Error):
+    pass
+
+
+class CoordinateGlobeUnknownException(WikiBaseError, NotImplementedError):
+    """ This globe is not implemented yet in either WikiBase or pywikibot """
