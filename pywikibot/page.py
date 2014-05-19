@@ -787,7 +787,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                     return False
                 else:
                     bots = template[1][0].split(',')
-                    if 'all' in bots or calledModuleName() in bots \
+                    if 'all' in bots or pywikibot.calledModuleName() in bots \
                        or username in bots:
                         return False
             elif title == 'Bots':
@@ -801,9 +801,9 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                     if ttype == 'deny':
                         return not ('all' in bots or username in bots)
                     if ttype == 'allowscript':
-                        return 'all' in bots or calledModuleName() in bots
+                        return 'all' in bots or pywikibot.calledModuleName() in bots
                     if ttype == 'denyscript':
-                        return not ('all' in bots or calledModuleName() in bots)
+                        return not ('all' in bots or pywikibot.calledModuleName() in bots)
         # no restricting template found
         return True
 
