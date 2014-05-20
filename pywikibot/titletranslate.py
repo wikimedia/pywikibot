@@ -2,7 +2,7 @@
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Yuri Astrakhan, 2005
-# (C) Pywikibot team, 2003-2010
+# (C) Pywikibot team, 2003-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,6 +12,7 @@ import re
 
 import pywikibot
 import pywikibot.date as date
+from pywikibot import config
 
 
 def translate(page, hints=None, auto=True, removebrackets=False, site=None,
@@ -27,7 +28,7 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
     to all known target languages and inserted into the list.
 
     """
-    result = []
+    result = set()
     if site is None and page:
         site = page.site
     if family is None and site:
@@ -55,8 +56,8 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                     newname = page.title()
                 # ... unless we do want brackets
                 if removebrackets:
-                    newname = re.sub(re.compile(r"\W*?\(.*?\)\W*?", re.UNICODE),
-                                     u" ", newname)
+                    newname = re.sub(re.compile(r"\W*?\(.*?\)\W*?",
+                                                re.UNICODE), u" ", newname)
             try:
                 number = int(codes)
                 codes = site.family.languages_by_size[:number]
@@ -71,10 +72,9 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                 if newcode in site.languages():
                     if newcode != site.code:
                         x = pywikibot.Link(newname, site.getSite(code=newcode))
-                        if x not in result:
-                            result.append(x)
+                        result.add(x)
                 else:
-                    if pywikibot.verbose:
+                    if config.verbose_output:
                         pywikibot.output(u"Ignoring unknown language code %s"
                                          % newcode)
 
@@ -82,20 +82,20 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
     # existing interwiki links.
     if auto and page:
         # search inside all dictionaries for this link
-        dictName, value = date.getAutoFormat(page.site.code,
-                                             page.title())
+        sitelang = page.site.code
+        dictName, value = date.getAutoFormat(sitelang, page.title())
         if dictName:
             if not (dictName == 'yearsBC' and
-                    page.site.code in date.maxyearBC and
-                    value > date.maxyearBC[page.site.code]) or \
+                    sitelang in date.maxyearBC and
+                    value > date.maxyearBC[sitelang]) or \
                     (dictName == 'yearsAD' and
-                     page.site.code in date.maxyearAD and
-                     value > date.maxyearAD[page.site.code]):
+                     sitelang in date.maxyearAD and
+                     value > date.maxyearAD[sitelang]):
                 pywikibot.output(
                     u'TitleTranslate: %s was recognized as %s with value %d'
                     % (page.title(), dictName, value))
                 for entryLang, entry in date.formats[dictName].items():
-                    if entryLang != page.site.code:
+                    if entryLang != sitelang:
                         if (dictName == 'yearsBC' and
                                 entryLang in date.maxyearBC and
                                 value > date.maxyearBC[entryLang]):
@@ -104,15 +104,14 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                               entryLang in date.maxyearAD and
                               value > date.maxyearAD[entryLang]):
                             pass
-            else:
+                        else:
                             newname = entry(value)
                             x = pywikibot.Link(
                                 newname,
                                 pywikibot.Site(code=entryLang,
                                                fam=site.family))
-                            if x not in result:
-                                result.append(x)  # add new page
-    return result
+                            result.add(x)
+    return list(result)
 
 bcDateErrors = [u'[[ko:%d년]]']
 
