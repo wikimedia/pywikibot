@@ -48,7 +48,7 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                     continue
                 ns = page.namespace()
                 if ns:
-                    newname = u'%s:%s' % (family.namespace('_default', ns),
+                    newname = u'%s:%s' % (site.namespace(ns),
                                           page.title(withNamespace=False))
                 else:
                     # article in the main namespace
