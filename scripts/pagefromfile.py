@@ -178,7 +178,7 @@ class PageFromFileRobot:
                                                             self.msg_top,
                                                             fallback=True)
         comment_bottom = comment + " - " + pywikibot.translate(mysite,
-                                                               self.msg_bottom
+                                                               self.msg_bottom,
                                                                fallback=True)
         comment_force = "%s *** %s ***" % (comment,
                                            pywikibot.translate(mysite,
