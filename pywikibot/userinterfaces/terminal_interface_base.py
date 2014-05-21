@@ -217,10 +217,10 @@ class UI:
         while True:
             prompt = '%s (%s)' % (question, ', '.join(options))
             answer = self.input(prompt)
-            if answer.lower() in hotkeys or answer.upper() in hotkeys:
-                return answer
-            elif default and answer == '':  # empty string entered
+            if default and answer == '':  # empty string entered
                 return default
+            elif answer.lower() in hotkeys or answer.upper() in hotkeys:
+                return answer
 
     def editText(self, text, jumpIndex=None, highlight=None):
         """Return the text as edited by the user.
