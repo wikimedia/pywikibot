@@ -467,8 +467,11 @@ class CategoryMoveRobot(object):
         For readability it is splitted into several helper functions.
         """
         if self.newcat and self.move_oldcat and not self.newcat.exists():
-            self._movecat()
-            self._movetalk()
+            if "move-categorypages" in self.site.userinfo["rights"]:
+                self.oldcat.move(self.newcat, reason=self.comment, movetalkpage=True)
+            else:
+                self._movecat()
+                self._movetalk()
             if self.history:
                 self._hist()
         self._change(pagegenerators.CategorizedPageGenerator(self.oldcat))
