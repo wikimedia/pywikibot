@@ -3287,7 +3287,7 @@ not supported by PyWikiBot!"""
                 if newsite == self._site:
                     if not t:
                         # Can't have an empty self-link
-                        raise pywikibot.Error(
+                        raise pywikibot.InvalidTitle(
                             "Invalid link title: '%s'" % self._text)
                     firstPass = False
                     continue
@@ -3305,7 +3305,7 @@ not supported by PyWikiBot!"""
         m = Link.illegal_titles_pattern.search(t)
         if m:
             raise pywikibot.InvalidTitle(
-                u"contains illegal char(s) '%s'" % m.group(0))
+                u"%s contains illegal char(s) %s" % (repr(t), repr(m.group(0))))
 
         # Pages with "/./" or "/../" appearing in the URLs will
         # often be unreachable due to the way web browsers deal
