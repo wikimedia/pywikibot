@@ -215,7 +215,7 @@ class DiscussionThread(object):
             self.timestamp = max(self.timestamp, timestamp)
 
     def size(self):
-        return len(self.title) + len(self.content) + 12
+        return len(self.title.encode('utf-8')) + len(self.content.encode('utf-8')) + 12
 
     def toText(self):
         return "== " + self.title + ' ==\n\n' + self.content
@@ -291,7 +291,7 @@ class DiscussionPage(pywikibot.Page):
         return self.full
 
     def size(self):
-        return len(self.header) + sum([t.size() for t in self.threads])
+        return len(self.header.encode('utf-8')) + sum(t.size() for t in self.threads)
 
     def update(self, summary, sortThreads=False):
         if sortThreads:
