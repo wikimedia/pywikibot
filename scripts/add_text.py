@@ -136,7 +136,7 @@ def add_text(page=None, addText=None, summary=None, regexSkip=None,
 
     errorCount = 0
     site = pywikibot.Site()
-    pathWiki = site.family.nicepath(site.lang)
+    pathWiki = site.family.nicepath(site.code)
 
     if putText:
         pywikibot.output(u'Loading %s...' % page.title())
@@ -159,7 +159,7 @@ def add_text(page=None, addText=None, summary=None, regexSkip=None,
     # Understand if the bot has to skip the page or not
     # In this way you can use both -except and -excepturl
     if regexSkipUrl is not None:
-        url = '%s%s' % (pathWiki, page.urlname())
+        url = '%s%s' % (pathWiki, page.title(asUrl=True))
         result = re.findall(regexSkipUrl, site.getUrl(url))
         if result != []:
             pywikibot.output(
