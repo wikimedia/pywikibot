@@ -1727,7 +1727,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         continue
                     mods, mcomment, adding, removing, modifying \
                         = compareLanguages(old, new, insite=site)
-                    #cannot create userlib.User with IP
+                    #cannot create pywikibot.User with IP
                     smallWikiAllowed = (
                         page.isIpEdit() or
                         len(removing) > 0 or
@@ -1739,8 +1739,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         )
                     )
                     if not smallWikiAllowed:
-                        import userlib
-                        user = userlib.User(page.site, page.userName())
+                        user = pywikibot.User(page.site, page.userName())
                         # erstmal auch keine namen mit bot
                         if 'bot' not in user.groups() \
                            and 'bot' not in page.userName().lower():
