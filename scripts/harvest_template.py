@@ -3,16 +3,19 @@
 """
 Usage:
 
-python harvest_template.py -lang:nl -template:"Taxobox straalvinnige" orde P70 familie P71 geslacht P74
+python harvest_template.py <generators> -template:"..." template_parameter PID [template_parameter PID]
 
 This will work on all pages that transclude the template in the article
 namespace
 
-You can use any typical pagegenerator to provide with a list of pages:
+These command line parameters can be used to specify which pages to work on:
+
+&params;
+
+Examples:
 
 python harvest_template.py -lang:nl -cat:Sisoridae -template:"Taxobox straalvinnige" -namespace:0 orde P70 familie P71 geslacht P74
 
-&params;
 """
 #
 # (C) Multichill, Amir, 2013
