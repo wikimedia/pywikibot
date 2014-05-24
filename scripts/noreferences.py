@@ -686,12 +686,12 @@ def main():
     always = False
     # No verbose output
     verbose = True
-    # This factory is responsible for processing command line arguments
-    # that are also used by other scripts and that determine on which pages
-    # to work on.
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
     genFactory = pagegenerators.GeneratorFactory()
 
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg.startswith('-xml'):
             if len(arg) == 4:
                 xmlFilename = i18n.input('pywikibot-enter-xml-filename')

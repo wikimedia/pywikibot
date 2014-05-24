@@ -291,12 +291,16 @@ def main():
     talkPage = False
     reorderEnabled = True
     namespaces = []
-    # Load a lot of default generators
-    genFactory = pagegenerators.GeneratorFactory()
+
     # Put the text above or below the text?
     up = False
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
+    genFactory = pagegenerators.GeneratorFactory()
+
     # Loading the arguments
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg.startswith('-textfile'):
             if len(arg) == 9:
                 textfile = pywikibot.input(

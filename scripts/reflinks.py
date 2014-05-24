@@ -780,15 +780,18 @@ class ReferencesRobot:
 
 
 def main():
-    genFactory = pagegenerators.GeneratorFactory()
-
     xmlFilename = None
     always = False
     ignorepdf = False
     limit = None
     namespaces = []
     generator = None
-    for arg in pywikibot.handleArgs():
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
+    genFactory = pagegenerators.GeneratorFactory()
+
+    for arg in local_args:
         if arg.startswith('-namespace:'):
             try:
                 namespaces.append(int(arg[11:]))

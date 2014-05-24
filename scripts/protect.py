@@ -123,11 +123,11 @@ def main(*args):
     defaultProtection = 'sysop'
 
     # read command line parameters
-    localargs = pywikibot.handleArgs(*args)
+    local_args = pywikibot.handleArgs(*args)
     genFactory = pagegenerators.GeneratorFactory()
     mysite = pywikibot.Site()
 
-    for arg in localargs:
+    for arg in local_args:
         if arg == '-always':
             always = True
         elif arg.startswith('-summary'):
@@ -138,7 +138,7 @@ def main(*args):
         elif arg.startswith('-images'):
             pywikibot.output('\n\03{lightred}-image option is deprecated. '
                              'Please use -imagelinks instead.\03{default}\n')
-            localargs.append('-imagelinks' + arg[7:])
+            local_args.append('-imagelinks' + arg[7:])
         elif arg.startswith('-unprotect'):
             defaultProtection = 'none'
         elif arg.startswith('-edit'):

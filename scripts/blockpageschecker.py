@@ -223,11 +223,16 @@ def main():
     protectedpages = False
     protectType = 'edit'
     namespace = 0
-    genFactory = pagegenerators.GeneratorFactory()
+
     # To prevent Infinite loops
     errorCount = 0
-    # Loading the default options.
-    for arg in pywikibot.handleArgs():
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
+    genFactory = pagegenerators.GeneratorFactory()
+
+    # Process local args
+    for arg in local_args:
         if arg == '-always':
             always = True
         elif arg == '-move':

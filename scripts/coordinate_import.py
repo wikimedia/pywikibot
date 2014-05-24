@@ -73,9 +73,11 @@ class CoordImportRobot(WikidataBot):
 
 
 def main():
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
     gen = pagegenerators.GeneratorFactory()
 
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if gen.handleArg(arg):
             continue
 

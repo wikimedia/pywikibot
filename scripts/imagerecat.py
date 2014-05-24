@@ -441,20 +441,22 @@ def getCheckCategoriesTemplate(usage, galleries, ncats):
     return result
 
 
-def main(args):
+def main():
     """
     Main loop. Get a generator and options. Work on all images in the generator.
     """
     generator = None
     onlyFilter = False
     onlyUncat = False
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
     genFactory = pagegenerators.GeneratorFactory()
 
     global search_wikis
     global hint_wiki
 
-    site = pywikibot.Site(u'commons', u'commons')
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg == '-onlyfilter':
             onlyFilter = True
         elif arg == '-onlyuncat':
@@ -468,12 +470,14 @@ def main(args):
 
     generator = genFactory.getCombinedGenerator()
     if not generator:
+        site = pywikibot.Site(u'commons', u'commons')
         generator = pagegenerators.CategorizedPageGenerator(
             pywikibot.Category(site, u'Category:Media needing categories'),
             recurse=True)
+
     initLists()
     categorizeImages(generator, onlyFilter, onlyUncat)
     pywikibot.output(u'All done')
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

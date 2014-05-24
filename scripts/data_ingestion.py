@@ -284,12 +284,14 @@ class DataIngestionBot:
         else:
             pywikibot.output(u'%s is not a supported source format')
 
-def main(args):
+def main():
     generator = None;
 
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
     genFactory = pagegenerators.GeneratorFactory()
 
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         genFactory.handleArg(arg)
 
     generator = genFactory.getCombinedGenerator()
@@ -302,7 +304,7 @@ def main(args):
 
 if __name__ == "__main__":
     try:
-        main(sys.argv[1:])
+        main()
     finally:
         print "All done!"
 '''

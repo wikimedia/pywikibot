@@ -72,13 +72,17 @@ class TouchBot(pywikibot.Bot):
 
 def main(*args):
     gen = None
-    genFactory = pagegenerators.GeneratorFactory()
     options = {}
     # If the user chooses to work on a single page, this temporary array is
     # used to read the words from the page title. The words will later be
     # joined with spaces to retrieve the full title.
     pageTitle = []
-    for arg in pywikibot.handleArgs(*args):
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs(*args)
+    genFactory = pagegenerators.GeneratorFactory()
+
+    for arg in local_args:
         if genFactory.handleArg(arg):
             continue
         if arg.startswith("-"):

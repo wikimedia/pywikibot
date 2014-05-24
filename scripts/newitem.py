@@ -89,9 +89,11 @@ def main():
     pageAge = 21
     lastEdit = 7
 
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
     gen = pagegenerators.GeneratorFactory()
 
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg.startswith('-pageage:'):
             pageAge = int(arg[9:])
         elif arg.startswith('-lastedit:'):

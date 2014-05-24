@@ -298,14 +298,16 @@ def main(*args):
     editSummary = ''
     addedCat = ''
     acceptAll = False
-    genFactory = pagegenerators.GeneratorFactory()
     # If xmlfilename is None, references will be loaded from the live wiki.
     xmlfilename = None
     user = None
     skip = False
     timestamp = None
+
     # read command line parameters
-    for arg in pywikibot.handleArgs(*args):
+    local_args = pywikibot.handleArgs(*args)
+    genFactory = pagegenerators.GeneratorFactory()
+    for arg in local_args:
         if arg == '-remove':
             remove = True
         elif arg == '-subst':

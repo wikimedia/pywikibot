@@ -478,16 +478,16 @@ def main(*args):
     allowoverlap = False
     # Do not recurse replacement
     recursive = False
-    # This factory is responsible for processing command line arguments
-    # that are also used by other scripts and that determine on which pages
-    # to work on.
-    genFactory = pagegenerators.GeneratorFactory()
     # Between a regex and another (using -fix) sleep some time (not to waste
     # too much CPU
     sleep = None
 
     # Read commandline parameters.
-    for arg in pywikibot.handleArgs(*args):
+
+    local_args = pywikibot.handleArgs(*args)
+    genFactory = pagegenerators.GeneratorFactory()
+
+    for arg in local_args:
         if genFactory.handleArg(arg):
             continue
         if arg == '-regex':

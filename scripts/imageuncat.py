@@ -1319,12 +1319,16 @@ def main(*args):
     Grab a bunch of images and tag them if they are not categorized.
     '''
     generator = None
-    genFactory = pagegenerators.GeneratorFactory()
+
+    local_args = pywikibot.handleArgs(*args)
 
     # use the default imagerepository normally commons
     site = pywikibot.Site().image_repository()
+
+    genFactory = pagegenerators.GeneratorFactory(site)
+
     site.login()
-    for arg in pywikibot.handleArgs(*args):
+    for arg in local_args:
         if arg.startswith('-yesterday'):
             generator = uploadedYesterday(site)
         elif arg.startswith('-recentchanges'):

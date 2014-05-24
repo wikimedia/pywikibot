@@ -148,9 +148,13 @@ def listsEqual(list1, list2):
 
 def main():
     exists_arg = ''
-    gen = pagegenerators.GeneratorFactory()
     commandline_claims = list()
-    for arg in pywikibot.handleArgs():
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
+    gen = pagegenerators.GeneratorFactory()
+
+    for arg in local_args:
         # Handle args specifying how to handle duplicate claims
         if arg.startswith('-exists:'):
             exists_arg = arg.split(':')[1].strip('"')

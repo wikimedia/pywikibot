@@ -84,10 +84,13 @@ class IllustrateRobot(WikidataBot):
 
 
 def main():
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
     gen = pg.GeneratorFactory()
+
     wdproperty = u'P18'
 
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg.startswith('-property'):
             if len(arg) == 9:
                 wdproperty = pywikibot.input(
