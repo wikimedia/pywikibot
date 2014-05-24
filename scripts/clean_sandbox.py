@@ -26,6 +26,14 @@ This script understands the following command-line arguments:
                    Please be also aware that the rules when to clean the
                    user sandbox differ from those for project sandbox.
 
+    -page          Run the bot on specific page, you can use this when
+                   you haven't configured clean_candbox for your wiki.
+
+    -text          The text that substitutes in the sandbox, you can use this
+                   when you haven't configured clean_candbox for your wiki.
+
+    -summary       Summary of the edit made by bot.
+
 """
 #
 # (C) Leonardo Gregianin, 2006
@@ -135,6 +143,9 @@ class SandboxBot(pywikibot.Bot):
         'delay': None,
         'delay_td': None,
         'user': False,
+        'text': "",
+        'page': None,
+        'summary': "",
     }
 
     def __init__(self, **kwargs):
@@ -160,8 +171,8 @@ class SandboxBot(pywikibot.Bot):
                 content[self.site.code] = None
                 pywikibot.output(
                     u'Not properly set-up to run in user namespace!')
-        if sandboxTitle.get(self.site.code) is None or content.get(
-                self.site.code) is None:
+        if (not sandboxTitle.get(self.site.code) and not self.getOption('page')) or (not content.get(
+                self.site.code) and not self.getOption('text')):
             pywikibot.output(u'This bot is not configured for the given site '
                              u'(%s), exiting.' % self.site)
             sys.exit(0)
@@ -170,8 +181,11 @@ class SandboxBot(pywikibot.Bot):
         while True:
             wait = False
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-            localSandboxTitle = pywikibot.translate(self.site, sandboxTitle)
-            if type(localSandboxTitle) is list:
+            if self.getOption('page'):
+                localSandboxTitle = self.getOption('page')
+            else:
+                localSandboxTitle = pywikibot.translate(self.site, sandboxTitle)
+            if isinstance(localSandboxTitle, list):
                 titles = localSandboxTitle
             else:
                 titles = [localSandboxTitle]
@@ -181,9 +195,15 @@ class SandboxBot(pywikibot.Bot):
                                  % sandboxPage.title(asLink=True))
                 try:
                     text = sandboxPage.get()
-                    translatedContent = pywikibot.translate(self.site, content)
-                    translatedMsg = i18n.twtranslate(self.site,
-                                                     'clean_sandbox-cleaned')
+                    if not self.getOption('text'):
+                        translatedContent = pywikibot.translate(self.site, content)
+                    else:
+                        translatedContent = self.getOption('text')
+                    if self.getOption('summary'):
+                        translatedMsg = self.getOption('summary')
+                    else:
+                        translatedMsg = i18n.twtranslate(
+                            self.site, 'clean_sandbox-cleaned')
                     subst = 'subst:' in translatedContent
                     pos = text.find(translatedContent.strip())
                     if text.strip() == translatedContent.strip():
@@ -256,8 +276,25 @@ def main():
             opts['no_repeat'] = False
         elif arg.startswith('-delay:'):
             opts['delay'] = int(arg[7:])
+        elif arg.startswith('-page'):
+            if len(arg) == 5:
+                opts['page'] = pywikibot.input(
+                    u'Which page do you want to change?')
+            else:
+                opts['page'] = arg[6:]
+        elif arg.startswith('-text'):
+            if len(arg) == 5:
+                opts['text'] = pywikibot.input(
+                    u'What text do you want to substitute?')
+            else:
+                opts['text'] = arg[6:]
         elif arg == '-user':
             opts['user'] = True
+        elif arg.startswith('-summary'):
+            if len(arg) == len('-summary'):
+                opts['summary'] = pywikibot.input(u'Enter the summary:')
+            else:
+                opts['summary'] = arg[9:]
         else:
             pywikibot.showHelp('clean_sandbox')
             return
