@@ -952,6 +952,37 @@ class APISite(BaseSite):
 
         return self._months_names
 
+    def list_to_text(self, args):
+        """Join a list of strings together into a human-readable
+        list. The MediaWiki message 'and' is used as separator
+        between the last two arguments.
+        If present, other arguments are joined using a comma.
+
+        @param args: text to be expanded
+        @type args: iterable
+        @return: unicode
+
+        """
+        if not args:
+            return u''
+        args = [unicode(e) for e in args]
+        msgs = {
+            'and': ',',
+            'comma-separator': ', ',
+            'word-separator': ' '
+        }
+        try:
+            self.mediawiki_messages(list(msgs.keys()))
+        except KeyError:
+            pass
+        for msg in msgs:
+            try:
+                msgs[msg] = self.mediawiki_message(msg)
+            except KeyError:
+                pass
+        concat = msgs['and'] + msgs['word-separator']
+        return msgs['comma-separator'].join(args[:-2] + [concat.join(args[-2:])])
+
     def expand_text(self, text, title=None, includecomments=None):
         """ Parses the given text for preprocessing and rendering
         e.g expand templates and strip comments if includecomments

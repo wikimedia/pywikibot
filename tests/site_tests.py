@@ -180,6 +180,9 @@ class TestSiteObject(PywikibotTestCase):
         self.assertType(ver[2], basestring)
         self.assertType(mysite.months_names, list)
         self.assertEqual(mysite.months_names[4], (u'May', u'May'))
+        self.assertEqual(mysite.list_to_text(('pywikibot',)), 'pywikibot')
+        self.assertEqual(mysite.list_to_text(('Pride', 'Prejudice')), 'Pride and Prejudice')
+        self.assertEqual(mysite.list_to_text(('This', 'that', 'the other')), 'This, that and the other')
 
     def testPageMethods(self):
         """Test ApiSite methods for getting page-specific info"""
