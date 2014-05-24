@@ -109,9 +109,9 @@ Report, Bad and white list guide:
         * dio is a badword
         * Claudio is a normal name
         * The username is "Claudio90 fuck!"
-        * The Bot find dio and set "warning"
-        * The Bot find Claudio and set "ok"
-        * The Bot find fuck at the end and set "warning"
+        * The Bot finds dio and sets "warning"
+        * The Bot finds Claudio and sets "ok"
+        * The Bot finds fuck at the end and sets "warning"
         * Result: The username is reported.
 4)  When a user is reported you have to check him and do:
         * If he's ok, put the {{welcome}}
@@ -174,7 +174,7 @@ badword at all but can be used for some bad-nickname.
 # (C) Daniel Herding, 2007
 # (C) Alex Shih-Han Lin, 2009-2010
 # (C) xqt, 2009-2011
-# (C) Pywikipedia bot team, 2008-2010
+# (C) Pywikibot team, 2008-2010
 #
 # Distributed under the terms of the MIT license.
 #
@@ -942,7 +942,7 @@ def main():
         elif arg == '-quick':
             globalvar.quick = True
 
-    # Filename and pywikipedia path
+    # Filename and pywikibot path
     # file where is stored the random signature index
     filename = pywikibot.config.datafilepath('welcome-%s-%s.data'
                                              % (pywikibot.Site().family.name,

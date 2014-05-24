@@ -24,7 +24,7 @@ testcollector = "tests"
 
 if sys.version_info[0] == 2:
     if sys.version_info < (2, 6, 5):
-        raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2.6.5 or higher")
+        raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 or higher")
     elif sys.version_info[1] == 6:
         test_deps = ['unittest2']
         testcollector = "tests.utils.collector"
@@ -32,7 +32,7 @@ if sys.version_info[0] == 2:
 if sys.version_info[0] == 3:
     if not os.environ.get('PY3', False):
         # use setup.py test --python3ok  to run tests
-        print("ERROR: Pywikipediabot only runs under Python 2")
+        print("ERROR: Pywikibot only runs under Python 2")
         sys.exit(1)
     if sys.version_info[1] < 3:
         print("ERROR: Python 3.3 or higher is required!")
@@ -56,7 +56,7 @@ class pwb_install(install.install):
 setup(
     name='pywikibot',
     version='2.0b1',
-    description='Python Wikipedia Bot Framework',
+    description='Python MediaWiki Bot Framework',
     long_description=open('README.rst').read(),
     maintainer='The pywikibot team',
     maintainer_email='pywikipedia-l@lists.wikimedia.org',

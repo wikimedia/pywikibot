@@ -3,7 +3,7 @@
 Objects representing WikidataQuery query syntax and API
 """
 #
-# (C) Pywikipedia bot team, 2013
+# (C) Pywikibot team, 2013
 #
 # Distributed under the terms of the MIT license.
 
@@ -396,7 +396,7 @@ def fromClaim(claim):
 
 class WikidataQuery():
     """
-    An interface to the WikidatQuery API. Default host is
+    An interface to the WikidataQuery API. Default host is
     http://wdq.wmflabs.org, but you can substitute
     a different one.
 
@@ -423,7 +423,7 @@ class WikidataQuery():
     def getQueryString(self, q, labels=[], props=[]):
         """
         Get the query string for a given query or queryset
-        @return query string including lables and props
+        @return query string including labels and props
         """
         qStr = "q=%s" % quote(str(q))
 

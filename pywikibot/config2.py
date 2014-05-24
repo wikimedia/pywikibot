@@ -196,7 +196,7 @@ ignore_bot_templates = False
 try:
     console_encoding = __sys.stdout.encoding
 except:
-    # When using pywikipedia inside a daemonized twisted application,
+    # When using pywikibot inside a daemonized twisted application,
     # we get "StdioOnnaStick instance has no attribute 'encoding'"
     console_encoding = None
 
@@ -738,7 +738,7 @@ if transliteration_target == 'not set':
         print("WARNING: Running on Windows and transliteration_target is not "
               "set.")
         print("Please see "
-              "http://www.mediawiki.org/wiki/Manual:Pywikipediabot/Windows")
+              "https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot/Windows")
     else:
         transliteration_target = None
 elif transliteration_target in ('None', 'none'):

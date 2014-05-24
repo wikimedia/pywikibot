@@ -9,4 +9,4 @@ user-*.py
 logs*
 *cache*
 .idea
-Pywikipediabot.egg-info/
+pywikibot.egg-info/

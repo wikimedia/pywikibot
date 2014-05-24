@@ -333,7 +333,7 @@ if __name__ == "__main__":
         if os.path.exists(os.path.join(base_dir, "user-config.py")):
             break
         do_copy = raw_input("Do you want to copy user files from an existing "
-                            "pywikipedia installation? ").upper().strip()
+                            "pywikibot installation? ").upper().strip()
         if do_copy and "YES".startswith(do_copy):
             oldpath = raw_input("Path to existing wikipedia.py? ")
             if not os.path.exists(oldpath):

@@ -1163,7 +1163,7 @@ class tzoneFixedOffset(datetime.tzinfo):
 
 class TimeStripper(object):
     """
-    Find timetstamp in page text and returns it as timezone aware datetime object
+    Find timestamp in page text and returns it as timezone aware datetime object
     """
 
     def __init__(self, site=None):

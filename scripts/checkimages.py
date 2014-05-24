@@ -6,7 +6,7 @@ description is present and if there are other problems in the image's
 description.
 
 This script will have to be configured for each language. Please submit
-translations as addition to the pywikipediabot framework.
+translations as addition to the pywikibot framework.
 
 Everything that needs customisation is indicated by comments.
 
@@ -84,7 +84,7 @@ right parameter.
 # (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
 # (C) Siebrand Mazeland, 2007-2010
 # (C) Filnik, 2007-2011
-# (C) Pywikipedia team, 2007-2014
+# (C) Pywikibot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #

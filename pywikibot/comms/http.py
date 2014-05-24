@@ -13,7 +13,7 @@ This module is responsible for
 """
 
 #
-# (C) Pywikipedia bot team, 2007-2014
+# (C) Pywikibot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,9 +55,9 @@ _logger = "comm.http"
 SSL_CERT_VERIFY_FAILED = ":14090086:"
 
 # the User-agent: header. The default is
-# '<script>/<revision> Pywikipediabot/2.0', where '<script>' is the currently
-# executing script and version is the SVN revision of Pywikipediabot.
-USER_AGENT_FORMAT = '{script}/r{version[rev]} Pywikipediabot/2.0'
+# '<script>/<revision> Pywikibot/2.0', where '<script>' is the currently
+# executing script and version is the Git revision of Pywikibot.
+USER_AGENT_FORMAT = '{script}/r{version[rev]} Pywikibot/2.0'
 useragent = USER_AGENT_FORMAT.format(script=pywikibot.calledModuleName(),
                                      version=pywikibot.version.getversiondict())
 numthreads = 1

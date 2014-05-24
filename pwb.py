@@ -84,7 +84,7 @@ if not os.environ.get("PY3", False):
                            "or higher")
 else:
     if sys.version_info[0] not in (2, 3):
-        raise RuntimeError("ERROR: Pywikipediabot only runs under Python 2 "
+        raise RuntimeError("ERROR: Pywikibot only runs under Python 2 "
                            "or Python 3")
     version = tuple(sys.version_info)[:3]
     if version < (2, 6, 5):
