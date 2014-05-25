@@ -160,7 +160,7 @@ class ImageTransferBot:
         self.targetSite = targetSite
         self.keep_name = keep_name
 
-    def transferImage(self, sourceImagePage, debug=False):
+    def transferImage(self, sourceImagePage):
         """Gets a wikilink to an image, downloads it and its description,
            and uploads it to another wikipedia.
            Returns the filename which was used to upload the image
@@ -168,9 +168,6 @@ class ImageTransferBot:
 
         """
         sourceSite = sourceImagePage.site
-        if debug:
-            print "-" * 50
-            print "Found image: %s" % imageTitle
         url = sourceImagePage.fileUrl().encode('utf-8')
         pywikibot.output(u"URL should be: %s" % url)
         # localize the text that should be printed on the image description page
@@ -293,7 +290,7 @@ class ImageTransferBot:
                         pywikibot.output(
                             u'The image is already on Wikimedia Commons.')
                     else:
-                        self.transferImage(imagelist[todo], debug=False)
+                        self.transferImage(imagelist[todo])
                     # remove the selected image from the list
                     imagelist = imagelist[:todo] + imagelist[todo + 1:]
                 else:
