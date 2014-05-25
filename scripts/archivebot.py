@@ -503,7 +503,9 @@ def main():
 
     if calc:
         if not salt:
-            parser.error('Note: you must specify a salt to calculate a key')
+            pywikibot.error('Note: you must specify a salt to calculate a key')
+            return
+
         s = new_hash()
         s.update(salt + '\n')
         s.update(calc + '\n')
