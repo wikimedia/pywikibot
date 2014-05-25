@@ -94,6 +94,9 @@ class HarvestRobot(WikidataBot):
         if not item.exists():
             pywikibot.output('%s doesn\'t have a wikidata item :(' % page)
             #TODO FIXME: We should provide an option to create the page
+        item.get()
+        if set(self.fields.values()) <= set(item.claims.keys()):
+            pywikibot.output('%s item %s has claims for all properties. Skipping' % (page, item.title()))
         else:
             pagetext = page.get()
             templates = pywikibot.extract_templates_and_params(pagetext)
@@ -121,8 +124,9 @@ class HarvestRobot(WikidataBot):
                                 pywikibot.output(
                                     u'A claim for %s already exists. Skipping'
                                     % claim.getID())
-                                # TODO FIXME: This is a very crude way of dupe
-                                # checking
+                                # TODO: Implement smarter approach to merging
+                                # harvested values with existing claims esp.
+                                # without overwriting humans unintentionally.
                             else:
                                 if claim.getType() == 'wikibase-item':
                                     # Try to extract a valid page
