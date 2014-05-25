@@ -77,7 +77,7 @@ methods still work, but print a warning message in debug mode):
 - titleWithoutNamespace(): replaced by Page.title(withNamespace=False)
 - sectionFreeTitle(): replaced by Page.title(withSection=False)
 - aslink(): replaced by Page.title(asLink=True)
-- encoding(): replaced by Page.site().encoding()
+- encoding(): replaced by Page.site.encoding()
 
 The following methods of the Page object have been obsoleted and no longer
 work (but these methods don't appear to be used anywhere in the code
