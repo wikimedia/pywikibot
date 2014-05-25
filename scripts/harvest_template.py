@@ -3,7 +3,11 @@
 """
 Usage:
 
-python harvest_template.py <generators> -template:"..." template_parameter PID [template_parameter PID]
+python harvest_template.py -transcludes:"..." template_parameter PID [template_parameter PID]
+
+   or
+
+python harvest_template.py [generators] -template:"..." template_parameter PID [template_parameter PID]
 
 This will work on all pages that transclude the template in the article
 namespace
@@ -160,7 +164,7 @@ class HarvestRobot(WikidataBot):
 
 def main():
     commandline_arguments = list()
-    templateTitle = u''
+    template_title = u''
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handleArgs()
@@ -169,16 +173,21 @@ def main():
     for arg in local_args:
         if arg.startswith('-template'):
             if len(arg) == 9:
-                templateTitle = pywikibot.input(
+                template_title = pywikibot.input(
                     u'Please enter the template to work on:')
             else:
-                templateTitle = arg[10:]
+                template_title = arg[10:]
         elif gen.handleArg(arg):
-            continue
+            if arg.startswith(u'-transcludes:'):
+                template_title = arg[13:]
         else:
             commandline_arguments.append(arg)
 
-    if len(commandline_arguments) % 2 or not templateTitle:
+    if not template_title:
+        pywikibot.error('Please specify either -template or -transcludes argument')
+        return
+
+    if len(commandline_arguments) % 2:
         raise ValueError  # or something.
     fields = dict()
 
@@ -187,10 +196,10 @@ def main():
 
     generator = gen.getCombinedGenerator()
     if not generator:
-        # TODO: Build a transcluding generator based on templateTitle
-        return
+        gen.handleArg(u'-transcludes:' + template_title)
+        generator = gen.getCombinedGenerator()
 
-    bot = HarvestRobot(generator, templateTitle, fields)
+    bot = HarvestRobot(generator, template_title, fields)
     bot.run()
 
 if __name__ == "__main__":
