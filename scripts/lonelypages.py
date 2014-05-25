@@ -240,7 +240,7 @@ def main():
                         always = True
                         choice = 'y'
                 if choice == 'y':
-                    page.text = newtext
+                    page.text = newtxt
                     try:
                         page.save(comment)
                     except pywikibot.EditConflict:
