@@ -64,8 +64,12 @@ class HarvestRobot(WikidataBot):
         """
         Fetches redirects of the title, so we can check against them
         """
-        pywikibot.output('Finding redirects...')  # Put some output here since it can take a while
         temp = pywikibot.Page(pywikibot.Site(), title, ns=10)
+        if not temp.exists():
+            pywikibot.error(u'Template %s does not exist.' % temp.title())
+            exit()
+
+        pywikibot.output('Finding redirects...')  # Put some output here since it can take a while
         if temp.isRedirectPage():
             temp = temp.getRedirectTarget()
         titles = [page.title(withNamespace=False)
@@ -88,13 +92,20 @@ class HarvestRobot(WikidataBot):
             templates = pywikibot.extract_templates_and_params(pagetext)
             for (template, fielddict) in templates:
                 # Clean up template
-                template = pywikibot.Page(page.site, template,
-                                          ns=10).title(withNamespace=False)
+                try:
+                    template = pywikibot.Page(page.site, template,
+                                              ns=10).title(withNamespace=False)
+                except pywikibot.exceptions.InvalidTitle as e:
+                    pywikibot.error(u"Failed parsing template; '%s' should be the template name." % template)
+                    continue
                 # We found the template we were looking for
                 if template in self.templateTitles:
                     for field, value in fielddict.items():
                         field = field.strip()
                         value = value.strip()
+                        if not field or not value:
+                            continue
+
                         # This field contains something useful for us
                         if field in self.fields:
                             # Check if the property isn't already set
