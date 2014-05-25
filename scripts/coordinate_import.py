@@ -26,6 +26,7 @@ __version__ = '$Id$'
 #
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
+from pywikibot.exceptions import CoordinateGlobeUnknownException
 
 
 class CoordImportRobot(WikidataBot):
