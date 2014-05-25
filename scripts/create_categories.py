@@ -65,7 +65,7 @@ def createCategory(page, parent, basename):
         pywikibot.output(u'%s already exists, skipping' % newpage.title())
 
 
-def main(args):
+def main():
     '''
     Main loop. Get a generator and options.
     '''
@@ -74,9 +74,11 @@ def main(args):
     basename = u''
     always = False
 
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
     genFactory = pagegenerators.GeneratorFactory()
 
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg == '-always':
             always = True
         elif arg.startswith('-parent:'):
@@ -96,4 +98,4 @@ def main(args):
     pywikibot.output(u'All done')
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

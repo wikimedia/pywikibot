@@ -145,10 +145,14 @@ class HarvestRobot(WikidataBot):
 
 
 def main():
-    gen = pg.GeneratorFactory()
     commandline_arguments = list()
     templateTitle = u''
-    for arg in pywikibot.handleArgs():
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
+    gen = pg.GeneratorFactory()
+
+    for arg in local_args:
         if arg.startswith('-template'):
             if len(arg) == 9:
                 templateTitle = pywikibot.input(

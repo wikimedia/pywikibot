@@ -797,6 +797,8 @@ def check(url):
 
 
 def main():
+    global day
+
     gen = None
     singlePageTitle = []
     xmlFilename = None
@@ -804,13 +806,13 @@ def main():
     # default to [] which means all namespaces will be processed
     namespaces = []
     HTTPignore = []
-    # This factory is responsible for processing command line arguments
-    # that are also used by other scripts and that determine on which pages
-    # to work on.
-    genFactory = pagegenerators.GeneratorFactory()
-    global day
     day = 7
-    for arg in pywikibot.handleArgs():
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
+    genFactory = pagegenerators.GeneratorFactory()
+
+    for arg in local_args:
         if arg == '-talk':
             config.report_dead_links_on_talk = True
         elif arg == '-notalk':

@@ -134,6 +134,11 @@ class BasicBot:
 
 def main():
     global site
+
+    # Process global arguments to determine desired site
+    local_args = pywikibot.handleArgs()
+    site = pywikibot.Site()
+
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
@@ -148,7 +153,7 @@ def main():
     dry = False
 
     # Parse command line arguments
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg.startswith("-dry"):
             dry = True
         else:
@@ -156,7 +161,7 @@ def main():
             # -start:XYZ or -ref:Asdf was given.
             if not genFactory.handleArg(arg):
                 pageTitleParts.append(arg)
-    site = pywikibot.Site()
+
     site.login()
     if pageTitleParts != []:
         # We will only work on a single page.

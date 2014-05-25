@@ -79,13 +79,15 @@ def main():
     enablePage = None  # Check if someone set an enablePage or not
     limit = 50000    # Hope that there aren't so many lonely pages in a project
     generator = None  # Check if bot should use default generator or not
-    # Load all default generators!
-    genFactory = pagegenerators.GeneratorFactory()
     nwpages = False  # Check variable for newpages
     always = False  # Check variable for always
     disambigPage = None  # If no disambigPage given, not use it.
+
     # Arguments!
-    for arg in pywikibot.handleArgs():
+    local_args = pywikibot.handleArgs()
+    genFactory = pagegenerators.GeneratorFactory()
+
+    for arg in local_args:
         if arg.startswith('-enable'):
             if len(arg) == 7:
                 enablePage = pywikibot.input(

@@ -80,10 +80,10 @@ def main():
     generator = None
 
     # read command line parameters
-    localargs = pywikibot.handleArgs()
+    local_args = pywikibot.handleArgs()
     mysite = pywikibot.Site()
 
-    for arg in localargs:
+    for arg in local_args:
         if arg == '-always':
             always = True
         elif arg.startswith('-summary'):
@@ -94,7 +94,7 @@ def main():
         elif arg.startswith('-images'):
             pywikibot.output('\n\03{lightred}-image option is deprecated. '
                              'Please use -imageused instead.\03{default}\n')
-            localargs.append('-imageused' + arg[7:])
+            local_args.append('-imageused' + arg[7:])
         elif arg.startswith('-undelete'):
             undelete = True
         else:

@@ -560,10 +560,12 @@ def main():
     always = False
     ns = []
     ns.append(14)
-    # Load a lot of default generators
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
     genFactory = pagegenerators.GeneratorFactory()
 
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg.startswith('-summary'):
             if len(arg) == 8:
                 summary = pywikibot.input(u'What summary do you want to use?')

@@ -947,10 +947,10 @@ def main(*args):
     rebuild = False
     depth = 5
 
-    # This factory is responsible for processing command line arguments
-    # that are also used by other scripts and that determine on which pages
-    # to work on.
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs(*args)
     genFactory = pagegenerators.GeneratorFactory()
+
     # The generator gives the pages that should be worked upon.
     gen = None
 
@@ -962,7 +962,7 @@ def main(*args):
     create_pages = False
     follow_redirects = False
     deleteEmptySourceCat = True
-    for arg in pywikibot.handleArgs(*args):
+    for arg in local_args:
         if arg == 'add':
             action = 'add'
         elif arg == 'remove':

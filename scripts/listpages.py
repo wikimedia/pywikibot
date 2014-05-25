@@ -31,8 +31,11 @@ def main(*args):
     notitle = False
     page_get = False
 
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs(*args)
     genFactory = GeneratorFactory()
-    for arg in pywikibot.handleArgs(*args):
+
+    for arg in local_args:
         if arg == '-notitle':
             notitle = True
         elif arg == '-get':

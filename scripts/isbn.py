@@ -1478,16 +1478,16 @@ def main():
     # Which namespaces should be processed?
     # default to [] which means all namespaces will be processed
     namespaces = []
-    # This factory is responsible for processing command line arguments
-    # that are also used by other scripts and that determine on which pages
-    # to work on.
-    genFactory = pagegenerators.GeneratorFactory()
     # Never ask before changing a page
     always = False
     to13 = False
     format = False
 
-    for arg in pywikibot.handleArgs():
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
+    genFactory = pagegenerators.GeneratorFactory()
+
+    for arg in local_args:
         if arg.startswith('-namespace:'):
             try:
                 namespaces.append(int(arg[11:]))

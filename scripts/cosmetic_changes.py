@@ -908,12 +908,12 @@ def main():
     answer = 'y'
     always = False
     async = False
-    # This factory is responsible for processing command line arguments
-    # that are also used by other scripts and that determine on which pages
-    # to work on.
+
+    # Process global args and prepare generator args parser
+    local_args = pywikibot.handleArgs()
     genFactory = pagegenerators.GeneratorFactory()
 
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg.startswith('-summary:'):
             editSummary = arg[len('-summary:'):]
         elif arg == '-always':
