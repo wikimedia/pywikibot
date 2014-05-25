@@ -85,6 +85,31 @@ class HarvestRobot(WikidataBot):
         titles.append(temp.title(withNamespace=False))
         return titles
 
+    def _template_link_target(self, item, link_text):
+        linked_page = None
+
+        link = pywikibot.Link(link_text)
+        linked_page = pywikibot.Page(link)
+
+        if not linked_page.exists():
+            pywikibot.output(u'%s doesn\'t exist so it can\'t be linked. Skipping' % (linked_page))
+            return
+
+        if linked_page.isRedirectPage():
+            linked_page = linked_page.getRedirectTarget()
+
+        linked_item = pywikibot.ItemPage.fromPage(linked_page)
+
+        if not linked_item.exists():
+            pywikibot.output(u'%s doesn\'t have a wikidata item to link with. Skipping' % (linked_page))
+            return
+
+        if linked_item.title() == item.title():
+            pywikibot.output(u'%s links to itself. Skipping' % (linked_page))
+            return
+
+        return linked_item
+
     def processPage(self, page):
         """
         Process a single page
@@ -96,7 +121,7 @@ class HarvestRobot(WikidataBot):
             #TODO FIXME: We should provide an option to create the page
         item.get()
         if set(self.fields.values()) <= set(item.claims.keys()):
-            pywikibot.output('%s item %s has claims for all properties. Skipping' % (page, item.title()))
+            pywikibot.output(u'%s item %s has claims for all properties. Skipping' % (page, item.title()))
         else:
             pagetext = page.get()
             templates = pywikibot.extract_templates_and_params(pagetext)
@@ -131,17 +156,16 @@ class HarvestRobot(WikidataBot):
                                 if claim.getType() == 'wikibase-item':
                                     # Try to extract a valid page
                                     match = re.search(pywikibot.link_regex, value)
-                                    if match:
-                                        try:
-                                            link = pywikibot.Link(match.group(1))
-                                            linkedPage = pywikibot.Page(link)
-                                            if linkedPage.isRedirectPage():
-                                                linkedPage = linkedPage.getRedirectTarget()
-                                            linkedItem = pywikibot.ItemPage.fromPage(linkedPage)
-                                            claim.setTarget(linkedItem)
-                                        except pywikibot.exceptions.NoPage:
-                                            pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it' % (linkedItem.title(),))
-                                            continue
+                                    if not match:
+                                        pywikibot.output(u'%s field %s value %s isnt a wikilink. Skipping' % (claim.getID(), field, value))
+                                        continue
+
+                                    link_text = match.group(1)
+                                    linked_item = self._template_link_target(item, link_text)
+                                    if not linked_item:
+                                        continue
+
+                                    claim.setTarget(linked_item)
                                 elif claim.getType() == 'string':
                                     claim.setTarget(value.strip())
                                 elif claim.getType() == 'commonsMedia':
