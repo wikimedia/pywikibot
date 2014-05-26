@@ -2863,25 +2863,20 @@ class Claim(PropertyPage):
             claim.isQualifier = True
         claim.snaktype = data['mainsnak']['snaktype']
         if claim.getSnakType() == 'value':
+            value = data['mainsnak']['datavalue']['value']
             if claim.getType() == 'wikibase-item':
-                claim.target = ItemPage(site, 'Q' +
-                                        str(data['mainsnak']['datavalue']
-                                            ['value']['numeric-id']))
+                claim.target = ItemPage(site, 'Q' + str(value['numeric-id']))
             elif claim.getType() == 'commonsMedia':
-                claim.target = ImagePage(site.image_repository(), 'File:' +
-                                         data['mainsnak']['datavalue']['value'])
+                claim.target = ImagePage(site.image_repository(), value)
             elif claim.getType() == 'globecoordinate':
-                claim.target = pywikibot.Coordinate.fromWikibase(
-                    data['mainsnak']['datavalue']['value'], site)
+                claim.target = pywikibot.Coordinate.fromWikibase(value, site)
             elif claim.getType() == 'time':
-                claim.target = pywikibot.WbTime.fromWikibase(
-                    data['mainsnak']['datavalue']['value'])
+                claim.target = pywikibot.WbTime.fromWikibase(value)
             elif claim.getType() == 'quantity':
-                claim.target = pywikibot.WbQuantity.fromWikibase(
-                    data['mainsnak']['datavalue']['value'])
+                claim.target = pywikibot.WbQuantity.fromWikibase(value)
             else:
                 # This covers string, url types
-                claim.target = data['mainsnak']['datavalue']['value']
+                claim.target = value
         if 'rank' in data:  # References/Qualifiers don't have ranks
             claim.rank = data['rank']
         if 'references' in data:
@@ -2930,6 +2925,7 @@ class Claim(PropertyPage):
                  'globecoordinate': pywikibot.Coordinate,
                  'url': basestring,
                  'time': pywikibot.WbTime,
+                 'quantity': pywikibot.WbQuantity,
                  }
         if self.getType() in types:
             if not isinstance(value, types[self.getType()]):
@@ -3054,15 +3050,11 @@ class Claim(PropertyPage):
         if self.getType() == 'wikibase-item':
             value = {'entity-type': 'item',
                      'numeric-id': self.getTarget().getID(numeric=True)}
-        elif self.getType() in ['string', 'url']:
+        elif self.getType() in ('string', 'url'):
             value = self.getTarget()
         elif self.getType() == 'commonsMedia':
             value = self.getTarget().title(withNamespace=False)
-        elif self.getType() == 'globecoordinate':
-            value = self.getTarget().toWikibase()
-        elif self.getType() == 'time':
-            value = self.getTarget().toWikibase()
-        elif self.getType() == 'quantity':
+        elif self.getType() in ('globecoordinate', 'time', 'quantity'):
             value = self.getTarget().toWikibase()
         else:
             raise NotImplementedError('%s datatype is not supported yet.'
