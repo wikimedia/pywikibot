@@ -29,8 +29,10 @@ class NewItemRobot:
         """
         Arguments:
             * generator    - A generator that yields Page objects.
-            * pageAge      - The minimum number of days that has passed since the page was created
-            * lastEdit     - The minimum number of days that has passed since the page was last edited
+            * pageAge      - The minimum number of days that has passed since
+                             the page was created
+            * lastEdit     - The minimum number of days that has passed since
+                             the page was last edited
 
         """
         self.generator = pagegenerators.PreloadingGenerator(generator)
@@ -44,29 +46,44 @@ class NewItemRobot:
         """
         Starts the bot.
         """
-        pywikibot.output('Page age is set to %s days so only pages created before %s will be considered.' % (self.pageAge, self.pageAgeBefore.isoformat()))
-        pywikibot.output('Last edit is set to %s days so only pages last edited before %s will be considered.' % (self.lastEdit, self.lastEditBefore.isoformat()))
+        pywikibot.output('Page age is set to %s days so only pages created'
+                         '\nbefore %s will be considered.'
+                         % (self.pageAge, self.pageAgeBefore.isoformat()))
+        pywikibot.output('Last edit is set to %s days so only pages last edited'
+                         '\nbefore %s will be considered.'
+                         % (self.lastEdit, self.lastEditBefore.isoformat()))
 
         for page in self.generator:
             pywikibot.output('Processing %s' % page)
             item = pywikibot.ItemPage.fromPage(page)
             if item.exists():
-                pywikibot.output('%s already has an item: %s. Doing a null edit on the page.' % (page, item))
-                page.put(page.get())
+                pywikibot.output('%s already has an item: %s.\n'
+                                 'Doing a null edit on the page.'
+                                 % (page, item))
+                page.put(page.text)
             elif page.isRedirectPage():
                 pywikibot.output('%s is a redirect page. Skipping.' % page)
             elif page.editTime() > self.lastEditBefore:
-                pywikibot.output('Last edit on %s was on %s. Too recent. Skipping.' % (page, page.editTime().isoformat()))
+                pywikibot.output(
+                    'Last edit on %s was on %s.\nToo recent. Skipping.'
+                    % (page, page.editTime().isoformat()))
             else:
-                (revId, revTimestamp, revUser, revComment) = page.getVersionHistory(reverseOrder=True, total=1)[0]
+                (revId, revTimestamp, revUser,
+                 revComment) = page.getVersionHistory(reverseOrder=True,
+                                                      total=1)[0]
                 if revTimestamp > self.pageAgeBefore:
-                    pywikibot.output('Page creation of %s on %s is too recent. Skipping.' % (page, page.editTime().isoformat()))
+                    pywikibot.output(
+                        'Page creation of %s on %s is too recent. Skipping.'
+                        % (page, page.editTime().isoformat()))
                 elif page.langlinks():
                     # FIXME: Implement this
-                    pywikibot.output('Found language links (interwiki links). Haven\'t implemented that yet so skipping.')
+                    pywikibot.output(
+                        "Found language links (interwiki links).\n"
+                        "Haven't implemented that yet so skipping.")
                 else:
                     # FIXME: i18n
-                    summary = u'Bot: New item with sitelink from %s' % (page.title(asLink=True, insite=self.repo), )
+                    summary = (u'Bot: New item with sitelink from %s'
+                               % page.title(asLink=True, insite=self.repo))
 
                     data = {'sitelinks':
                             {item.getdbName(page.site):
@@ -82,7 +99,7 @@ class NewItemRobot:
                     pywikibot.output(summary)
                     item.editEntity(data, summary=summary)
                     # And do a null edit to force update
-                    page.put(page.get())
+                    page.put(page.text)
 
 
 def main():
@@ -98,12 +115,12 @@ def main():
             pageAge = int(arg[9:])
         elif arg.startswith('-lastedit:'):
             lastEdit = int(arg[10:])
-        if gen.handleArg(arg):
-            continue
+        else:
+            gen.handleArg(arg)
 
     generator = gen.getCombinedGenerator()
     if not generator:
-        # FIXME: Should throw some help
+        pywikibot.showHelp()
         return
 
     bot = NewItemRobot(generator, pageAge, lastEdit)
