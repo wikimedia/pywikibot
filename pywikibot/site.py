@@ -2989,15 +2989,16 @@ class APISite(BaseSite):
         "alreadyrolled": "Page [[%(title)s]] already rolled back; action aborted.",
     }  # other errors shouldn't arise because we check for those errors
 
-    def rollbackpage(self, page, summary=u''):
+    def rollbackpage(self, page, **kwargs):
         """Roll back page to version before last user's edits.
+
+        The keyword arguments are those supported by the rollback API.
 
         As a precaution against errors, this method will fail unless
         the page history contains at least two revisions, and at least
         one that is not by the same user who made the last edit.
 
         @param page: the Page to be rolled back (must exist)
-        @param summary: edit summary (defaults to a standardized message)
 
         """
         if len(page._revisions) < 2:
@@ -3015,16 +3016,13 @@ class APISite(BaseSite):
             raise pywikibot.Error(
                 u"Rollback of %s aborted; only one user in revision history."
                 % page.title(asLink=True))
-        summary = summary or (
-            u"Reverted edits by [[Special:Contributions/%(last_user)s|%(last_user)s]] "
-            u"([[User talk:%(last_user)s|Talk]]) to last version by %(prev_user)s"
-            % locals())
         token = self.token(page, "rollback")
         self.lock_page(page)
         req = api.Request(site=self, action="rollback",
                           title=page.title(withSection=False),
                           user=last_user,
-                          token=token)
+                          token=token,
+                          **kwargs)
         try:
             result = req.submit()
         except api.APIError as err:
