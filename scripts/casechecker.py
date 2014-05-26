@@ -249,8 +249,8 @@ class CaseChecker(object):
         self.seenUnresolvedLinks = set()
 
         # TODO: handle "continue"
-        if self.site.lang in self.whitelists:
-            wlpage = self.whitelists[self.site.lang]
+        if self.site.code in self.whitelists:
+            wlpage = self.whitelists[self.site.code]
             pywikibot.output(u'Loading whitelist from %s' % wlpage)
             wlparams = {
                 'action': 'query',
@@ -288,7 +288,7 @@ class CaseChecker(object):
                                             for i in self.knownWords]))
         else:
             pywikibot.output(u'Whitelist is not known for language %s'
-                             % self.site.lang)
+                             % self.site.code)
 
     def RunQuery(self, params):
         while True:
