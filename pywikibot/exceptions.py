@@ -37,6 +37,7 @@ ServerError: a problem with the server.
 
 WikiBaseError: any issue specific to Wikibase.
   - CoordinateGlobeUnknownException: globe is not implemented yet.
+  - EntityTypeUnknownException: entity type is not available on the site.
 
 """
 #
@@ -296,6 +297,15 @@ class WikiBaseError(Error):
 class CoordinateGlobeUnknownException(WikiBaseError, NotImplementedError):
 
     """ This globe is not implemented yet in either WikiBase or pywikibot """
+
+    pass
+
+
+class EntityTypeUnknownException(WikiBaseError):
+
+    """The requested entity type is not recognised on this site"""
+
+    pass
 
 # TODO: Warn about the deprecated usage
 import pywikibot.data.api

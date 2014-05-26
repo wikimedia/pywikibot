@@ -12,6 +12,7 @@ import os
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.page import WikibasePage
+from pywikibot.site import Namespace
 from pywikibot.data.api import APIError
 import json
 import copy
@@ -238,11 +239,10 @@ class TestItemLoad(PywikibotTestCase):
             check(title, APIError)
 
     def test_item_untrimmed_title(self):
-        # spaces in the title cause an error
         item = pywikibot.ItemPage(wikidata, ' Q60 ')
         self.assertEqual(item._link._title, 'Q60')
-        self.assertEqual(item.title(), ' Q60 ')
-        self.assertRaises(APIError, item.get)
+        self.assertEqual(item.title(), 'Q60')
+        item.get()
 
     def test_item_missing(self):
         # this item is deleted
@@ -390,9 +390,11 @@ class TestRedirects(PywikibotTestCase):
 class TestPropertyPage(PywikibotTestCase):
 
     def test_property_empty_property(self):
+        """Test creating a PropertyPage without a title."""
         self.assertRaises(pywikibot.Error, pywikibot.PropertyPage, wikidata)
 
     def test_globe_coordinate(self):
+        """Test a coordinate PropertyPage has the correct type."""
         property_page = pywikibot.PropertyPage(wikidata, 'P625')
         self.assertEqual(property_page.type, 'globe-coordinate')
         self.assertEqual(property_page.getType(), 'globecoordinate')
@@ -523,6 +525,153 @@ class TestWriteNormalizeData(PywikibotTestCase):
         response = WikibasePage._normalizeData(
             copy.deepcopy(self.data_out))
         self.assertEqual(response, self.data_out)
+
+
+class TestNamespaces(PywikibotTestCase):
+    """Test cases to test namespaces of Wikibase entities"""
+
+    def test_empty_wikibase_page(self):
+        # As a base class it should be able to instantiate
+        # it with minimal arguments
+        page = pywikibot.page.WikibasePage(wikidata)
+        self.assertRaises(AttributeError, page.namespace)
+        page = pywikibot.page.WikibasePage(wikidata, title='')
+        self.assertRaises(AttributeError, page.namespace)
+
+        page = pywikibot.page.WikibasePage(wikidata, ns=0)
+        self.assertEqual(page.namespace(), 0)
+        page = pywikibot.page.WikibasePage(wikidata, entity_type='item')
+        self.assertEqual(page.namespace(), 0)
+
+        page = pywikibot.page.WikibasePage(wikidata, ns=120)
+        self.assertEqual(page.namespace(), 120)
+        page = pywikibot.page.WikibasePage(wikidata, title='', ns=120)
+        self.assertEqual(page.namespace(), 120)
+        page = pywikibot.page.WikibasePage(wikidata, entity_type='property')
+        self.assertEqual(page.namespace(), 120)
+
+        # mismatch in namespaces
+        self.assertRaises(ValueError, pywikibot.page.WikibasePage, wikidata,
+                          ns=0, entity_type='property')
+        self.assertRaises(ValueError, pywikibot.page.WikibasePage, wikidata,
+                          ns=120, entity_type='item')
+
+    def test_wikibase_link_namespace(self):
+        """Test the title resolved to a namespace correctly."""
+        # title without any namespace clues (ns or entity_type)
+        # should verify the Link namespace is appropriate
+        page = pywikibot.page.WikibasePage(wikidata, title='Q6')
+        self.assertEqual(page.namespace(), 0)
+        page = pywikibot.page.WikibasePage(wikidata, title='Property:P60')
+        self.assertEqual(page.namespace(), 120)
+
+    def test_wikibase_namespace_selection(self):
+        """Test various ways to correctly specify the namespace."""
+        page = pywikibot.page.ItemPage(wikidata, 'Q6')
+        self.assertEqual(page.namespace(), 0)
+        page = pywikibot.page.ItemPage(wikidata, title='Q6')
+        self.assertEqual(page.namespace(), 0)
+
+        page = pywikibot.page.WikibasePage(wikidata, title='Q6', ns=0)
+        self.assertEqual(page.namespace(), 0)
+        page = pywikibot.page.WikibasePage(wikidata, title='Q6',
+                                           entity_type='item')
+        self.assertEqual(page.namespace(), 0)
+
+        page = pywikibot.page.PropertyPage(wikidata, 'Property:P60')
+        self.assertEqual(page.namespace(), 120)
+        page = pywikibot.page.PropertyPage(wikidata, 'P60')
+        self.assertEqual(page.namespace(), 120)
+
+        page = pywikibot.page.WikibasePage(wikidata, title='P60', ns=120)
+        self.assertEqual(page.namespace(), 120)
+        page = pywikibot.page.WikibasePage(wikidata, title='P60',
+                                           entity_type='property')
+        self.assertEqual(page.namespace(), 120)
+
+    def test_wrong_namespaces(self):
+        """Test incorrect namespaces for Wikibase entities."""
+        # All subclasses of WikibasePage raise a ValueError
+        # if the namespace for the page title is not correct
+        self.assertRaises(ValueError, pywikibot.page.WikibasePage, wikidata,
+                          title='Wikidata:Main Page')
+        self.assertRaises(ValueError, pywikibot.ItemPage, wikidata, 'File:Q1')
+        self.assertRaises(ValueError, pywikibot.PropertyPage, wikidata, 'File:P60')
+
+    def test_item_unknown_namespace(self):
+        """Test unknown namespaces for Wikibase entities."""
+        # The 'Invalid:' is not a known namespace, so is parsed to be
+        # part of the title in namespace 0
+        # TODO: These items have inappropriate titles, which should
+        #       raise an error.
+        item = pywikibot.ItemPage(wikidata, 'Invalid:Q1')
+        self.assertEqual(item.namespace(), 0)
+        self.assertEqual(item.id, 'INVALID:Q1')
+        self.assertEqual(item.title(), 'INVALID:Q1')
+        self.assertEqual(hasattr(item, '_content'), False)
+        self.assertRaises(APIError, item.get)
+        self.assertEqual(hasattr(item, '_content'), False)
+        self.assertEqual(item.title(), 'INVALID:Q1')
+
+
+class TestAlternateNamespaces(PywikibotTestCase):
+    """Test cases to test namespaces of Wikibase entities"""
+
+    def setUp(self):
+        super(TestAlternateNamespaces, self).setUp()
+
+        class DrySite(pywikibot.site.DataSite):
+            _namespaces = {
+                90: Namespace(id=90,
+                              canonical_name='Item',
+                              defaultcontentmodel='wikibase-item'),
+                92: Namespace(id=92,
+                              canonical_name='Prop',
+                              defaultcontentmodel='wikibase-property')
+            }
+
+            __init__ = lambda *args: None
+            code = 'test'
+            family = lambda: None
+            family.name = 'test'
+            _logged_in_as = None
+            _siteinfo = {'case': 'first-letter'}
+            _item_namespace = None
+            _property_namespace = None
+
+            def encoding(self):
+                return 'utf-8'
+
+            def encodings(self):
+                return []
+
+        self.site = DrySite('test', 'mock', None, None)
+
+    def test_alternate_item_namespace(self):
+        item = pywikibot.ItemPage(self.site, 'Q60')
+        self.assertEqual(item.namespace(), 90)
+        self.assertEqual(item.id, 'Q60')
+        self.assertEqual(item.title(), 'Item:Q60')
+        self.assertEqual(item._defined_by(), {'ids': 'Q60'})
+
+        item = pywikibot.ItemPage(self.site, 'Item:Q60')
+        self.assertEqual(item.namespace(), 90)
+        self.assertEqual(item.id, 'Q60')
+        self.assertEqual(item.title(), 'Item:Q60')
+        self.assertEqual(item._defined_by(), {'ids': 'Q60'})
+
+    def test_alternate_property_namespace(self):
+        prop = pywikibot.PropertyPage(self.site, 'P21')
+        self.assertEqual(prop.namespace(), 92)
+        self.assertEqual(prop.id, 'P21')
+        self.assertEqual(prop.title(), 'Prop:P21')
+        self.assertEqual(prop._defined_by(), {'ids': 'P21'})
+
+        prop = pywikibot.PropertyPage(self.site, 'Prop:P21')
+        self.assertEqual(prop.namespace(), 92)
+        self.assertEqual(prop.id, 'P21')
+        self.assertEqual(prop.title(), 'Prop:P21')
+        self.assertEqual(prop._defined_by(), {'ids': 'P21'})
 
 
 if __name__ == '__main__':

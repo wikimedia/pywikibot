@@ -4334,6 +4334,62 @@ class APISite(BaseSite):
 
 class DataSite(APISite):
 
+    """Wikibase data capable site."""
+
+    def __init__(self, code, fam, user, sysop):
+        """Constructor."""
+        APISite.__init__(self, code, fam, user, sysop)
+        self._item_namespace = None
+        self._property_namespace = None
+
+    def _cache_entity_namespaces(self):
+        """Find namespaces for each known wikibase entity type."""
+        self._item_namespace = False
+        self._property_namespace = False
+
+        for namespace in self.namespaces().values():
+            content_model = namespace.info.get('defaultcontentmodel')
+            if content_model == 'wikibase-item':
+                self._item_namespace = namespace
+            elif content_model == 'wikibase-property':
+                self._property_namespace = namespace
+
+    @property
+    def item_namespace(self):
+        """
+        Return namespace for items.
+
+        @return: item namespace
+        @rtype: Namespace
+        """
+        if self._item_namespace is None:
+            self._cache_entity_namespaces()
+
+        if isinstance(self._item_namespace, Namespace):
+            return self._item_namespace
+        else:
+            raise pywikibot.exceptions.EntityTypeUnknownException(
+                '%r does not support entity type "item"'
+                % self)
+
+    @property
+    def property_namespace(self):
+        """
+        Return namespace for properties.
+
+        @return: property namespace
+        @rtype: Namespace
+        """
+        if self._property_namespace is None:
+            self._cache_entity_namespaces()
+
+        if isinstance(self._property_namespace, Namespace):
+            return self._property_namespace
+        else:
+            raise pywikibot.exceptions.EntityTypeUnknownException(
+                '%r does not support entity type "property"'
+                % self)
+
     def __getattr__(self, attr):
         """Provide data access methods.
 

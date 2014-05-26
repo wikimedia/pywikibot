@@ -20,7 +20,7 @@ __version__ = '$Id$'
 import sys
 import pywikibot
 from pywikibot import config
-import pywikibot.site
+from pywikibot.site import Namespace
 from pywikibot.exceptions import AutoblockUser, UserActionRefuse
 from pywikibot.tools import ComparableMixin, deprecated, deprecate_arg
 from pywikibot import textlib
@@ -2612,24 +2612,96 @@ class WikibasePage(Page):
     """
 
     def __init__(self, site, title=u"", **kwargs):
-        """ Constructor. """
+        """ Constructor.
+
+        If title is provided, either ns or entity_type must also be provided,
+        and will be checked against the title parsed using the Page
+        initialisation logic.
+
+        @param site: Wikibase data site
+        @type site: DataSite
+        @param title: normalized title of the page
+        @type title: unicode
+        @param ns: namespace
+        @type ns: Namespace instance, or int
+        @param entity_type: Wikibase entity type
+        @type entity_type: str ('item' or 'property')
+
+        @raise TypeError: incorrect use of parameters
+        @raise ValueError: incorrect namespace
+        @raise pywikibot.Error: title parsing problems
+        @raise NotImplementedError: the entity type is not supported
+        """
         if not isinstance(site, pywikibot.site.DataSite):
             raise TypeError("site must be a pywikibot.site.DataSite object")
+        if title and ('ns' not in kwargs and 'entity_type' not in kwargs):
+            pywikibot.debug("%s.__init__: %s title %r specified without "
+                            "ns or entity_type"
+                            % (self.__class__.__name__, site, title),
+                            layer='wikibase')
+
+        self._namespace = None
+
+        if 'ns' in kwargs:
+            if isinstance(kwargs['ns'], Namespace):
+                self._namespace = kwargs.pop('ns')
+                kwargs['ns'] = self._namespace.id
+            else:
+                # numerical namespace given
+                ns = int(kwargs['ns'])
+                if site.item_namespace.id == ns:
+                    self._namespace = site.item_namespace
+                elif site.property_namespace.id == ns:
+                    self._namespace = site.property_namespace
+                else:
+                    raise ValueError('%r: Namespace "%d" is not valid'
+                                     % self.site)
+
+        if 'entity_type' in kwargs:
+            entity_type = kwargs.pop('entity_type')
+            if entity_type == 'item':
+                entity_type_ns = site.item_namespace
+            elif entity_type == 'property':
+                entity_type_ns = site.property_namespace
+            else:
+                raise ValueError('Wikibase entity type "%s" unknown'
+                                 % entity_type)
+
+            if self._namespace:
+                if self._namespace != entity_type_ns:
+                    raise ValueError('Namespace "%d" is not valid for Wikibase'
+                                     ' entity type "%s"'
+                                     % (kwargs['ns'], entity_type))
+            else:
+                self._namespace = entity_type_ns
+                kwargs['ns'] = self._namespace.id
+
         Page.__init__(self, site, title, **kwargs)
+
+        # If a title was not provided,
+        # avoid checks which may cause an exception.
+        if not title:
+            self.repo = site
+            return
+
+        if self._namespace:
+            if self._link.namespace != self._namespace.id:
+                raise ValueError(u"'%s' is not in the namespace %d"
+                                 % (title, self._namespace.id))
+        else:
+            # Neither ns or entity_type was provided.
+            # Use the _link to determine entity type.
+            ns = self._link.namespace
+            if self.site.item_namespace.id == ns:
+                self._namespace = self.site.item_namespace
+            elif self.site.property_namespace.id == ns:
+                self._namespace = self.site.property_namespace
+            else:
+                raise ValueError('%r: Namespace "%d" is not valid'
+                                 % (self.site, ns))
+
+        # .site forces a parse of the Link title to determine site
         self.repo = self.site
-
-    def title(self, **kwargs):
-        """ Page title.
-
-        If the item was instantiated without an ID,
-        fetch the ID and reparse the title.
-        """
-        if self.namespace() == 0:
-            self.getID()
-            if self._link._text != self.id:
-                self._link._text = self.id
-                del self._link._title
-        return Page(self).title(**kwargs)
 
     def _defined_by(self, singular=False):
         """
@@ -2665,6 +2737,14 @@ class WikibasePage(Page):
             params[id] = self.getID()
 
         return params
+
+    def namespace(self):
+        """Return the number of the namespace of the entity.
+
+        @return: Namespace id
+        @rtype: int
+        """
+        return self._namespace.id
 
     def exists(self):
         """
@@ -2872,7 +2952,7 @@ class WikibasePage(Page):
 
 class ItemPage(WikibasePage):
 
-    """ A Wikibase item.
+    """ Wikibase entity of type 'item'.
 
     A Wikibase item may be defined by either a 'Q' id (qid),
     or by a site & title.
@@ -2888,9 +2968,26 @@ class ItemPage(WikibasePage):
         @param site: data repository
         @type site: pywikibot.site.DataSite
         @param title: id number of item, "Q###"
+        @type title: str
         """
-        super(ItemPage, self).__init__(site, title, ns=0)
-        self.id = title.upper()  # This might cause issues if not ns0?
+        super(ItemPage, self).__init__(site, title,
+                                       ns=site.item_namespace)
+        self.id = self._link.title.upper()
+
+    def title(self, **kwargs):
+        """
+        Get the title of the page.
+
+        All optional keyword parameters are passed to the superclass.
+        """
+        # If the item was instantiated without an ID,
+        # remove the existing Link title, force the Link text to be reparsed.
+        self.getID()
+        if self._link._text != self.id:
+            self._link._text = self.id
+            del self._link._title
+
+        return super(ItemPage, self).title(**kwargs)
 
     @classmethod
     def fromPage(cls, page):
@@ -3107,6 +3204,8 @@ class Property():
         """
         Constructor.
 
+        @param site: data repository
+        @type site: pywikibot.site.DataSite
         @param datatype: datatype of the property;
             if not given, it will be queried via the API
         @type datatype: basestring
@@ -3160,7 +3259,7 @@ class PropertyPage(WikibasePage, Property):
     A Wikibase entity in the property namespace.
 
     Should be created as:
-        PropertyPage(DataSite, 'Property:P21')
+        PropertyPage(DataSite, 'P21')
     """
 
     def __init__(self, source, title=u""):
@@ -3169,9 +3268,11 @@ class PropertyPage(WikibasePage, Property):
 
         @param source: data repository property is on
         @type source: pywikibot.site.DataSite
-        @param title: page name of property, like "Property:P##"
+        @param title: page name of property, like "P##"
+        @type title: str
         """
-        WikibasePage.__init__(self, source, title, ns=120)
+        WikibasePage.__init__(self, source, title,
+                              ns=source.property_namespace)
         Property.__init__(self, source, title)
         self.id = self.title(withNamespace=False).upper()
         if not self.id.startswith(u'P'):
