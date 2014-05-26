@@ -918,6 +918,32 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
             yield page
 
 
+@deprecated_args(ignoreList='ignore_list')
+def PageTitleFilterPageGenerator(generator, ignore_list):
+    """
+    Yield only those pages are not listed in the ignore list.
+
+    @param ignore_list: family names are mapped to dictionaries
+        in which language codes are mapped to lists of page titles
+    @type ignore_list: dict
+
+    """
+    def is_ignored(page):
+        if page.site.family.name in ignore_list and \
+        page.site.code in ignore_list[page.site.family.name]:
+            for ig in ignore_list[page.site.family.name][page.site.code]:
+                if re.search(ig, page.title()):
+                    return True
+        return False
+
+    for page in generator:
+        if is_ignored(page):
+            if config.verbose_output:
+                pywikibot.output('Ignoring page %s' % page.title())
+        else:
+            yield page
+
+
 def RedirectFilterPageGenerator(generator, no_redirects=True):
     """Yield pages from another generator that are redirects or not."""
     for page in generator:
