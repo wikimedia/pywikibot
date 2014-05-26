@@ -92,7 +92,7 @@ def DATA(site, name, hide):
     except pywikibot.PageNotFound:
         return
     cat = pywikibot.Category(site, title)
-    if type(hide) == dict:
+    if isinstance(hide, dict):
         hide = hide.get(site.code)
     for article in cat.articles(endsort=hide):
         yield article

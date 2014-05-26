@@ -416,16 +416,16 @@ class BaseSite(object):
         else:
             ns2, name2 = 0, title2
         for space in self.namespaces():  # iterate over all valid namespaces
-            if type(ns1) is not int and valid_namespace(ns1, space):
+            if not isinstance(ns1, int) and valid_namespace(ns1, space):
                 ns1 = space
-            if type(ns2) is not int and valid_namespace(ns2, space):
+            if not isinstance(ns2, int) and valid_namespace(ns2, space):
                 ns2 = space
-        if type(ns1) is not int:
+        if not isinstance(ns1, int):
             # no valid namespace prefix found, so the string followed by ":"
             # must be part of the title
             name1 = ns1 + ":" + name1
             ns1 = 0
-        if type(ns2) is not int:
+        if not isinstance(ns2, int):
             name2 = ns2 + ":" + name2
             ns2 = 0
         if ns1 != ns2:
@@ -3585,7 +3585,7 @@ class DataSite (APISite):
     @deprecated("pywikibot.WikibasePage")
     def get_item(self, source, **params):
         """get the data for multiple Wikibase items"""
-        if type(source) == int or \
+        if isinstance(source, int) or \
            isinstance(source, basestring) and source.isdigit():
             ids = 'q' + str(source)
             wbrequest = api.Request(site=self, action="wbgetentities", ids=ids,

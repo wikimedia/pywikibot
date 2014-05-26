@@ -350,7 +350,7 @@ class Request(MutableMapping):
                 continue
             if not result:
                 result = {}
-            if type(result) is not dict:
+            if not isinstance(result, dict):
                 raise APIError("Unknown",
                                "Unable to process query response of type %s."
                                % type(result),

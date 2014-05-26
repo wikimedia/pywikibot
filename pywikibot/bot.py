@@ -626,7 +626,7 @@ def handleArgs(*args):
             try:
                 _arg, _val = arg[1:].split(':')
                 # explicitly check for int (so bool doesn't match)
-                if type(getattr(config, _arg)) is not int:
+                if not isinstance(getattr(config, _arg), int):
                     raise TypeError
                 setattr(config, _arg, int(_val))
             except (ValueError, TypeError, AttributeError):

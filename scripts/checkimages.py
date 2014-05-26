@@ -930,7 +930,7 @@ class checkImagesBot(object):
     def countEdits(self, pagename, userlist):
         """Function to count the edit of a user or a list of users in a page."""
         # self.botolist
-        if type(userlist) == str:
+        if isinstance(userlist, basestring):
             userlist = [userlist]
         page = pywikibot.Page(self.site, pagename)
         history = page.getVersionHistory()
