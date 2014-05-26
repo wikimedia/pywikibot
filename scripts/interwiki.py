@@ -2390,7 +2390,7 @@ def botMayEdit(page):
         tmpl, loc = moved_links[page.site.lang]
     except KeyError:
         pass
-    if type(tmpl) != list:
+    if not isinstance(tmpl, list):
         tmpl = [tmpl]
     try:
         tmpl += ignoreTemplates[page.site.lang]

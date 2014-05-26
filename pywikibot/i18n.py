@@ -242,7 +242,7 @@ def _extract_plural(code, message, parameters):
                              "occurences.")
         i = 0
         for selector, variants in plural_items:
-            if type(parameters) == dict:
+            if isinstance(parameters, dict):
                 num = int(parameters[selector])
             elif isinstance(parameters, basestring):
                 num = int(parameters)
@@ -299,7 +299,7 @@ def translate(code, xdict, parameters=None, fallback=False):
         code = code.code
 
     # Check whether xdict has multiple projects
-    if type(xdict) == dict:
+    if isinstance(xdict, dict):
         if family in xdict:
             xdict = xdict[family]
         elif 'wikipedia' in xdict:
@@ -307,7 +307,7 @@ def translate(code, xdict, parameters=None, fallback=False):
 
     # Get the translated string
     trans = None
-    if type(xdict) != dict:
+    if not isinstance(xdict, dict):
         trans = xdict
     elif code in xdict:
         trans = xdict[code]
@@ -355,7 +355,7 @@ def twtranslate(code, twtitle, parameters=None):
     if hasattr(code, 'code'):
         lang = code.code
     # check whether we need the language code back
-    elif type(code) == list:
+    elif isinstance(code, list):
         lang = code.pop()
         code_needed = True
     else:
@@ -455,7 +455,7 @@ def twntranslate(code, twtitle, parameters=None):
     # check for PLURAL variants
     trans = _extract_plural(lang, trans, parameters)
     # we always have a dict for replacement of translatewiki messages
-    if parameters and type(parameters) == dict:
+    if parameters and isinstance(parameters, dict):
         try:
             return trans % parameters
         except KeyError:

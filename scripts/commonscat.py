@@ -336,7 +336,7 @@ class CommonscatBot:
             templatesInThePage = page.templates()
             templatesWithParams = page.templatesWithParams()
             for template in ignoreTemplates[page.site.language()]:
-                if type(template) != tuple:
+                if not isinstance(template, tuple):
                     for pageTemplate in templatesInThePage:
                         if pageTemplate.title(withNamespace=False) == template:
                             return True
