@@ -104,7 +104,7 @@ import re
 import pickle
 import bz2
 import pywikibot
-from pywikibot import catlib, config, pagegenerators
+from pywikibot import config, pagegenerators
 from pywikibot import i18n
 from pywikibot import deprecate_arg
 
@@ -786,8 +786,8 @@ class CategoryTidyRobot:
             elif choice in ['j', 'J']:
                 newCatTitle = pywikibot.input(u'Please enter the category the '
                                               u'article should be moved to:')
-                newCat = catlib.Category(pywikibot.Link('Category:' +
-                                                        newCatTitle))
+                newCat = pywikibot.Category(pywikibot.Link('Category:' +
+                                                           newCatTitle))
                 # recurse into chosen category
                 self.move_to_category(article, original_cat, newCat)
                 flag = True
