@@ -569,7 +569,7 @@ cosmetic_changes_disable = {}
 # Appending the script name also works:
 # cosmetic_changes_deny_script.append('your_script_name')
 cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
-                                'touch']
+                                'newitem', 'touch']
 
 # ############# REPLICATION BOT ################
 # You can add replicate_replace to your user_config.py, which has the following
