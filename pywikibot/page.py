@@ -2704,12 +2704,21 @@ class WikibasePage(Page):
         """
         Internal function to provide the API parameters to identify the entity.
 
+        The API parameters may be 'id' if the ItemPage has one,
+        or 'site'&'title' if instantiated via ItemPage.fromPage with
+        lazy_load enabled.
+
         Once an item's "p/q##" is looked up, that will be used for all future
         requests.
+
+        An empty dict is returned if the ItemPage is instantiated without
+        either ID (internally it has id = '-1') or site&title.
 
         @param singular: Whether the parameter names should use the singular
                          form
         @type singular: bool
+        @return: API parameters
+        @rtype: dict
         """
         params = {}
         if singular:
@@ -2720,18 +2729,24 @@ class WikibasePage(Page):
             id = 'ids'
             site = 'sites'
             title = 'titles'
+
+        lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
+
         # id overrides all
         if hasattr(self, 'id'):
-            params[id] = self.id
-            return params
-
-        # the rest only applies to ItemPages, but is still needed here.
-        if hasattr(self, '_site') and hasattr(self, '_title'):
+            if self.id != '-1':
+                params[id] = self.id
+        elif lazy_loading_id:
             params[site] = self._site.dbName()
             params[title] = self._title
         else:
-            quit()
-            params[id] = self.getID()
+            # if none of the above applies, this item is in an invalid state
+            # which needs to be raise as an exception, but also logged in case
+            # an exception handler is catching the generic Error.
+            pywikibot.error('%s is in invalid state' %
+                                            self.__class__.__name__)
+            raise pywikibot.Error('%s is in invalid state' %
+                                            self.__class__.__name__)
 
         return params
 
@@ -2767,9 +2782,16 @@ class WikibasePage(Page):
         """
         lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
         if force or not hasattr(self, '_content'):
-            data = self.repo.loadcontent(self._defined_by(), *args)
-            self.id = list(data.keys())[0]
-            self._content = data[self.id]
+            identification = self._defined_by()
+            if not identification:
+                raise pywikibot.NoPage(self)
+
+            data = self.repo.loadcontent(identification, *args)
+            item_index = list(data.keys())[0]
+            if lazy_loading_id or item_index != '-1':
+                self.id = item_index
+
+            self._content = data[item_index]
         if 'lastrevid' in self._content:
             self.lastrevid = self._content['lastrevid']
         else:
@@ -2818,7 +2840,8 @@ class WikibasePage(Page):
         if not hasattr(self, 'id') or force:
             self.get(force=force)
         if numeric:
-            return int(self.id[1:])
+            return int(self.id[1:]) if self.id != '-1' else -1
+
         return self.id
 
     def latestRevision(self):
@@ -2911,6 +2934,10 @@ class WikibasePage(Page):
                                        baserevid=baserevid, **kwargs)
         self.lastrevid = updates['entity']['lastrevid']
 
+        lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
+        if lazy_loading_id or self.id == '-1':
+            self.__init__(self.site, title=updates['entity']['id'])
+
     def editLabels(self, labels, **kwargs):
         """
         Edit entity labels.
@@ -2964,49 +2991,97 @@ class ItemPage(WikibasePage):
 
         @param site: data repository
         @type site: pywikibot.site.DataSite
-        @param title: id number of item, "Q###"
+        @param title: id number of item, "Q###",
+                      -1 or None for an empty item.
         @type title: str
         """
+        # Special case for empty item
+        if title is None or title == '-1':
+            super(ItemPage, self).__init__(site, u'-1', ns=0)
+            self.id = u'-1'
+            return
+
         super(ItemPage, self).__init__(site, title,
                                        ns=site.item_namespace)
-        self.id = self._link.title.upper()
+
+        # Link.__init__, called from Page.__init__, has cleaned the title
+        # stripping whitespace and uppercasing the first letter according
+        # to the namespace case=first-letter.
+
+        # Validate the title is 'Q' and a positive integer.
+        if not re.match('^Q[1-9]\d*$', self._link.title):
+            raise pywikibot.InvalidTitle(
+                u"'%s' is not a valid item page title"
+                % self._link.title)
+
+        self.id = self._link.title
 
     def title(self, **kwargs):
         """
-        Get the title of the page.
+        Return ID as title of the ItemPage.
+
+        If the ItemPage was lazy-loaded via ItemPage.fromPage, this method
+        will fetch the wikibase item ID for the page, potentially raising
+        NoPage with the page on the linked wiki if it does not exist, or
+        does not have a corresponding wikibase item ID.
+
+        This method also refreshes the title if the id property was set.
+        i.e. item.id = 'Q60'
 
         All optional keyword parameters are passed to the superclass.
         """
-        # If the item was instantiated without an ID,
-        # remove the existing Link title, force the Link text to be reparsed.
-        self.getID()
-        if self._link._text != self.id:
-            self._link._text = self.id
-            del self._link._title
+        # If instantiated via ItemPage.fromPage using site and title,
+        # _site and _title exist, and id does not exist.
+        lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
+
+        if lazy_loading_id or self._link._text != self.id:
+            # If the item is lazy loaded or has been modified,
+            # _link._text is stale.  Removing _link._title
+            # forces Link to re-parse ._text into ._title.
+            if hasattr(self._link, '_title'):
+                del self._link._title
+            self._link._text = self.getID()
+            self._link.parse()
+            # Remove the temporary values that are no longer needed after
+            # the .getID() above has called .get(), which populated .id
+            if hasattr(self, '_site'):
+                del self._title
+                del self._site
 
         return super(ItemPage, self).title(**kwargs)
 
     @classmethod
-    def fromPage(cls, page):
+    def fromPage(cls, page, lazy_load=False):
         """
         Get the ItemPage for a Page that links to it.
 
-        @param page: Page
+        @exception NoPage  There is no corresponding ItemPage for the page
+        @param page: Page to look for corresponding data item
+        @type  page: pywikibot.Page
+        @param lazy_load: Do not raise NoPage if either page or corresponding
+                          ItemPage does not exist.
+        @type  lazy_load: bool
         @return: ItemPage
         """
         if not page.site.has_transcluded_data:
             raise pywikibot.WikiBaseError(u'%s has no transcluded data'
                                           % page.site)
+        if not lazy_load and not page.exists():
+            raise pywikibot.NoPage(page)
+
         repo = page.site.data_repository()
         if hasattr(page,
                    '_pageprops') and page.properties().get('wikibase_item'):
             # If we have already fetched the pageprops for something else,
             # we already have the id, so use it
             return cls(repo, page.properties().get('wikibase_item'))
-        i = cls(repo, 'null')
+        i = cls(repo)
+        # clear id, and temporarily store data needed to lazy loading the item
         del i.id
         i._site = page.site
         i._title = page.title()
+        if not lazy_load and not i.exists():
+            raise pywikibot.NoPage(i)
         return i
 
     def get(self, force=False, *args, **kwargs):
@@ -3273,7 +3348,8 @@ class PropertyPage(WikibasePage, Property):
         Property.__init__(self, source, title)
         self.id = self.title(withNamespace=False).upper()
         if not self.id.startswith(u'P'):
-            raise ValueError(u"'%s' is not a property page!" % self.title())
+            raise pywikibot.InvalidTitle(
+                u"'%s' is not an property page title" % title)
 
     def get(self, force=False, *args):
         """
