@@ -477,7 +477,7 @@ class LinkCheckThread(threading.Thread):
     will die.
 
     """
-    def __init__(self, page, url, history, HTTPignore):
+    def __init__(self, page, url, history, HTTPignore, day):
         threading.Thread.__init__(self)
         self.page = page
         self.url = url
@@ -486,6 +486,7 @@ class LinkCheckThread(threading.Thread):
         self.setName((u'%s - %s' % (page.title(), url)).encode('utf-8',
                                                                'replace'))
         self.HTTPignore = HTTPignore
+        self.day = day
 
     def run(self):
         linkChecker = LinkChecker(self.url, HTTPignore=self.HTTPignore)
@@ -502,7 +503,7 @@ class LinkCheckThread(threading.Thread):
         else:
             pywikibot.output('*[[%s]] links to %s - %s.'
                              % (self.page.title(), self.url, message))
-            self.history.setLinkDead(self.url, message, self.page, day)
+            self.history.setLinkDead(self.url, message, self.page, self.day)
 
 
 class History:
@@ -616,20 +617,18 @@ class History:
             return False
 
     def save(self):
-        """
-        Saves the .dat file to disk.
-        """
+        """ Saves the .dat file to disk. """
         datfile = open(self.datfilename, 'w')
         pickle.dump(self.historyDict, datfile)
         datfile.close()
 
 
 class DeadLinkReportThread(threading.Thread):
-    '''
+    """
     A Thread that is responsible for posting error reports on talk pages. There
     will only be one DeadLinkReportThread, and it is using a semaphore to make
     sure that two LinkCheckerThreads can not access the queue at the same time.
-    '''
+    """
     def __init__(self):
         threading.Thread.__init__(self)
         self.semaphore = threading.Semaphore()
@@ -727,7 +726,7 @@ class WeblinkCheckerRobot:
     weblinks on pages provided by the given generator.
 
     """
-    def __init__(self, generator, HTTPignore=[]):
+    def __init__(self, generator, HTTPignore=None, day=7):
         self.generator = generator
         if config.report_dead_links_on_talk:
             #pywikibot.output("Starting talk page thread")
@@ -738,7 +737,11 @@ class WeblinkCheckerRobot:
         else:
             reportThread = None
         self.history = History(reportThread)
-        self.HTTPignore = HTTPignore
+        if HTTPignore is None:
+            self.HTTPignore = []
+        else:
+            self.HTTPignore = HTTPignore
+        self.day = day
 
     def run(self):
         for page in self.generator:
@@ -762,7 +765,7 @@ class WeblinkCheckerRobot:
                     # wait 100 ms
                     time.sleep(0.1)
                 thread = LinkCheckThread(page, url, self.history,
-                                         self.HTTPignore)
+                                         self.HTTPignore, self.day)
                 # thread dies when program terminates
                 thread.setDaemon(True)
                 thread.start()
@@ -797,8 +800,6 @@ def check(url):
 
 
 def main():
-    global day
-
     gen = None
     singlePageTitle = []
     xmlFilename = None
@@ -865,7 +866,7 @@ def main():
         pageNumber = max(240, config.max_external_links * 2)
         gen = pagegenerators.PreloadingGenerator(gen, step=pageNumber)
         gen = pagegenerators.RedirectFilterPageGenerator(gen)
-        bot = WeblinkCheckerRobot(gen, HTTPignore)
+        bot = WeblinkCheckerRobot(gen, HTTPignore, day)
         try:
             bot.run()
         finally:
