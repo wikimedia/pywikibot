@@ -56,8 +56,8 @@ replacements = (
     ('(?<!\.)wikipedia\.', u'pywikibot.'),
     # site instance call
     ('pywikibot\.getSite\s*\(\s*', 'pywikibot.Site('),
-    # lang is differen from code. We should use code in core
-    ('([Ss])ite.lang(\W*)', r'\1ite.code\2'),
+    # lang is different from code. We should use code in core
+    ('([Ss])ite.lang(?:uage\(\))?', r'\1ite.code'),
     # change compat library classes to pywikibot intrinsic classes
     ('catlib\.Category\s*\(\s*', 'pywikibot.Category('),
     ('catlib\.change_category\s*\((\s*)(?P<article>.+?),\s*(?P<oldcat>.+?),',
