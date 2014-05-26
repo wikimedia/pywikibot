@@ -44,8 +44,9 @@ class IllustrateRobot(WikidataBot):
         self.cacheSources()
 
         claim = pywikibot.Claim(self.repo, self.wdproperty)
-        if not claim.getType() == 'commonsMedia':
-            raise ValueError(u'%s is of type %s, should be commonsMedia' % (self.wdproperty, claim.getType()))
+        if claim.type != 'commonsMedia':
+            raise ValueError(u'%s is of type %s, should be commonsMedia'
+                             % (self.wdproperty, claim.type))
 
     def run(self):
         """

@@ -3835,21 +3835,21 @@ class DataSite(APISite):
 
         snak = {}
         for sourceclaim in sources:
-            if sourceclaim.getType() == 'wikibase-item':
+            if sourceclaim.type == 'wikibase-item':
                 datavalue = {'type': 'wikibase-entityid',
                              'value': sourceclaim._formatDataValue(),
                              }
-            elif sourceclaim.getType() in ['string', 'url']:
+            elif sourceclaim.type in ['string', 'url']:
                 datavalue = {'type': 'string',
                              'value': sourceclaim._formatDataValue(),
                              }
-            elif sourceclaim.getType() == 'time':
+            elif sourceclaim.type == 'time':
                 datavalue = {'type': 'time',
                              'value': sourceclaim._formatDataValue(),
                              }
             else:
                 raise NotImplementedError('%s datatype is not supported yet.'
-                                          % sourceclaim.getType())
+                                          % sourceclaim.type)
             valuesnaks = []
             if sourceclaim.getID() in snak:
                 valuesnaks = snak[sourceclaim.getID()]
