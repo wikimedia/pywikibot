@@ -85,7 +85,7 @@ import traceback
 
 ZERO = datetime.timedelta(0)
 
-Site = pywikibot.Site()
+site = pywikibot.Site()
 
 try:  # Get a constructor for the MD5 hash object
     import hashlib
@@ -94,10 +94,10 @@ except ImportError:  # Old python?
     import md5
     new_hash = md5.md5
 
-language = Site.language()
+language = site.language()
 
 
-def message(key, lang=Site.language()):
+def message(key, lang=site.language()):
     return i18n.twtranslate(lang, key)
 
 
@@ -151,13 +151,13 @@ def str2size(str):
         return (int(str[:-1]) * 1024, 'B')
 
 
-def generateTransclusions(Site, template, namespaces=[]):
+def generate_transclusions(site, template, namespaces=[]):
     pywikibot.output(u'Fetching template transclusions...')
-    transclusionPage = pywikibot.Page(Site, template, ns=10)
-    gen = pagegenerators.ReferringPageGenerator(transclusionPage,
+    transclusion_page = pywikibot.Page(site, template, ns=10)
+    gen = pagegenerators.ReferringPageGenerator(transclusion_page,
                                                 onlyTemplateInclusion=True)
     if namespaces:
-        gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces, Site)
+        gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces, site)
     for page in gen:
         yield page
 
@@ -193,14 +193,14 @@ class DiscussionThread(object):
         self.title = title
         self.now = now
         self.content = ""
-        self.ts = TimeStripper(site=Site)
+        self.ts = TimeStripper(site=site)
         self.timestamp = None
 
     def __repr__(self):
         return '%s("%s",%d bytes)' \
                % (self.__class__.__name__, self.title, len(self.content))
 
-    def feedLine(self, line):
+    def feed_line(self, line):
         if not self.content and not line:
             return
 
@@ -217,20 +217,20 @@ class DiscussionThread(object):
     def size(self):
         return len(self.title.encode('utf-8')) + len(self.content.encode('utf-8')) + 12
 
-    def toText(self):
+    def to_text(self):
         return "== " + self.title + ' ==\n\n' + self.content
 
-    def shouldBeArchived(self, Archiver):
-        algo = Archiver.get('algo')
-        reT = re.search(r'^old\((.*)\)$', algo)
-        if reT:
+    def should_be_archived(self, archiver):
+        algo = archiver.get('algo')
+        re_t = re.search(r'^old\((.*)\)$', algo)
+        if re_t:
             if not self.timestamp:
                 return ''
             #TODO: handle this:
                 #return 'unsigned'
-            maxage = str2time(reT.group(1))
+            maxage = str2time(re_t.group(1))
             if self.now - self.timestamp > maxage:
-                return message('archivebot-older-than') + ' ' + reT.group(1)
+                return message('archivebot-older-than') + ' ' + re_t.group(1)
         return ''
 
 
@@ -239,7 +239,7 @@ class DiscussionPage(pywikibot.Page):
     page. Feed threads to it and run an update() afterwards."""
 
     def __init__(self, title, archiver, vars=None):
-        pywikibot.Page.__init__(self, Site, title)
+        pywikibot.Page.__init__(self, site, title)
         self.threads = []
         self.full = False
         self.archiver = archiver
@@ -247,59 +247,59 @@ class DiscussionPage(pywikibot.Page):
         self.now = datetime.datetime.utcnow().replace(tzinfo=tzoneUTC())
 
         try:
-            self.loadPage()
+            self.load_page()
         except pywikibot.NoPage:
             self.header = archiver.get('archiveheader',
                                        message('archivebot-archiveheader'))
             if self.vars:
                 self.header = self.header % self.vars
 
-    def loadPage(self):
+    def load_page(self):
         """Loads the page to be archived and breaks it up into threads."""
         self.header = ''
         self.threads = []
         self.archives = {}
-        self.archivedThreads = 0
+        self.archived_threads = 0
         lines = self.get().split('\n')
         found = False  # Reading header
-        curThread = None
+        cur_thread = None
         for line in lines:
-            threadHeader = re.search('^== *([^=].*?) *== *$', line)
-            if threadHeader:
+            thread_header = re.search('^== *([^=].*?) *== *$', line)
+            if thread_header:
                 found = True  # Reading threads now
-                if curThread:
-                    self.threads.append(curThread)
-                curThread = DiscussionThread(threadHeader.group(1), self.now)
+                if cur_thread:
+                    self.threads.append(cur_thread)
+                cur_thread = DiscussionThread(thread_header.group(1), self.now)
             else:
                 if found:
-                    curThread.feedLine(line)
+                    cur_thread.feed_line(line)
                 else:
                     self.header += line + '\n'
-        if curThread:
-            self.threads.append(curThread)
+        if cur_thread:
+            self.threads.append(cur_thread)
         pywikibot.output(u'%d Threads found on %s' % (len(self.threads), self))
 
-    def feedThread(self, thread, maxArchiveSize=(250 * 1024, 'B')):
+    def feed_thread(self, thread, max_archive_size=(250 * 1024, 'B')):
         self.threads.append(thread)
-        self.archivedThreads += 1
-        if maxArchiveSize[1] == 'B':
-            if self.size() >= maxArchiveSize[0]:
+        self.archived_threads += 1
+        if max_archive_size[1] == 'B':
+            if self.size() >= max_archive_size[0]:
                 self.full = True
-        elif maxArchiveSize[1] == 'T':
-            if len(self.threads) >= maxArchiveSize[0]:
+        elif max_archive_size[1] == 'T':
+            if len(self.threads) >= max_archive_size[0]:
                 self.full = True
         return self.full
 
     def size(self):
         return len(self.header.encode('utf-8')) + sum(t.size() for t in self.threads)
 
-    def update(self, summary, sortThreads=False):
-        if sortThreads:
+    def update(self, summary, sort_threads=False):
+        if sort_threads:
             pywikibot.output(u'Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
         newtext = re.sub('\n*$', '\n\n', self.header)  # Fix trailing newlines
         for t in self.threads:
-            newtext += t.toText()
+            newtext += t.to_text()
         if self.full:
             summary += ' ' + message('archivebot-archive-full')
         self.put(newtext, comment=summary)
@@ -312,7 +312,7 @@ class PageArchiver(object):
 
     algo = 'none'
 
-    def __init__(self, Page, tpl, salt, force=False):
+    def __init__(self, page, tpl, salt, force=False):
         self.attributes = {
             'algo': ['old(24h)', False],
             'archive': ['', False],
@@ -323,16 +323,16 @@ class PageArchiver(object):
         self.tpl = tpl
         self.salt = salt
         self.force = force
-        self.Page = DiscussionPage(Page.title(), self)
-        self.loadConfig()
-        self.commentParams = {
-            'from': self.Page.title(),
+        self.page = DiscussionPage(page.title(), self)
+        self.load_config()
+        self.comment_params = {
+            'from': self.page.title(),
         }
         self.archives = {}
-        self.archivedThreads = 0
-        self.monthNum2origNames = {}
-        for n, (_long, _short) in enumerate(Site.months_names):
-            self.monthNum2origNames[n + 1] = {"long": _long, "short": _short}
+        self.archived_threads = 0
+        self.month_num2orig_names = {}
+        for n, (_long, _short) in enumerate(site.months_names):
+            self.month_num2orig_names[n + 1] = {"long": _long, "short": _short}
 
     def get(self, attr, default=''):
         return self.attributes.get(attr, [default])[0]
@@ -355,13 +355,13 @@ class PageArchiver(object):
     def key_ok(self):
         s = new_hash()
         s.update(self.salt + '\n')
-        s.update(self.Page.title().encode('utf8') + '\n')
+        s.update(self.page.title().encode('utf8') + '\n')
         return self.get('key') == s.hexdigest()
 
-    def loadConfig(self):
-        pywikibot.output(u'Looking for: {{%s}} in %s' % (self.tpl, self.Page))
-        for tpl in self.Page.templatesWithParams():
-            if tpl[0] == pywikibot.Page(Site, self.tpl, ns=10):
+    def load_config(self):
+        pywikibot.output(u'Looking for: {{%s}} in %s' % (self.tpl, self.page))
+        for tpl in self.page.templatesWithParams():
+            if tpl[0] == pywikibot.Page(site, self.tpl, ns=10):
                 for param in tpl[1]:
                     item, value = param.split('=', 1)
                     self.set(item.strip(), value.strip())
@@ -371,7 +371,7 @@ class PageArchiver(object):
         if not self.get('algo', ''):
             raise MissingConfigError(u'Missing algo')
 
-    def feedArchive(self, archive, thread, maxArchiveSize, vars=None):
+    def feed_archive(self, archive, thread, max_archive_size, vars=None):
         """Feed the thread to one of the archives.
         If it doesn't exist yet, create it.
         If archive name is an empty string (or None),
@@ -380,86 +380,86 @@ class PageArchiver(object):
         if not archive:
             return
         if not self.force \
-           and not self.Page.title() + '/' == archive[:len(self.Page.title()) + 1] \
+           and not self.page.title() + '/' == archive[:len(self.page.title()) + 1] \
            and not self.key_ok():
-            raise ArchiveSecurityError("Archive page %r does not start with page title (%s)!" % (archive, self.Page.title()))
+            raise ArchiveSecurityError("Archive page %r does not start with page title (%s)!" % (archive, self.page.title()))
         if archive not in self.archives:
             self.archives[archive] = DiscussionPage(archive, self, vars)
-        return self.archives[archive].feedThread(thread, maxArchiveSize)
+        return self.archives[archive].feed_thread(thread, max_archive_size)
 
-    def analyzePage(self):
-        maxArchSize = str2size(self.get('maxarchivesize'))
-        archCounter = int(self.get('counter', '1'))
-        oldthreads = self.Page.threads
-        self.Page.threads = []
+    def analyze_page(self):
+        max_arch_size = str2size(self.get('maxarchivesize'))
+        arch_counter = int(self.get('counter', '1'))
+        oldthreads = self.page.threads
+        self.page.threads = []
         whys = []
         pywikibot.output(u'Processing %d threads' % len(oldthreads))
         for t in oldthreads:
-            if len(oldthreads) - self.archivedThreads \
+            if len(oldthreads) - self.archived_threads \
                <= int(self.get('minthreadsleft', 5)):
-                self.Page.threads.append(t)
+                self.page.threads.append(t)
                 continue  # Because there's too little threads left.
             # TODO: Make an option so that unstamped (unsigned) posts get
             # archived.
-            why = t.shouldBeArchived(self)
+            why = t.should_be_archived(self)
             if why:
                 archive = self.get('archive')
                 vars = {
-                    'counter': archCounter,
+                    'counter': arch_counter,
                     'year': t.timestamp.year,
                     'month': t.timestamp.month,
-                    'monthname': self.monthNum2origNames[t.timestamp.month]['long'],
-                    'monthnameshort': self.monthNum2origNames[t.timestamp.month]['short'],
+                    'monthname': self.month_num2orig_names[t.timestamp.month]['long'],
+                    'monthnameshort': self.month_num2orig_names[t.timestamp.month]['short'],
                     'week': int(time.strftime('%W', t.timestamp.timetuple())),
                 }
-                archive = pywikibot.Page(Site, archive % vars).title()
-                if self.feedArchive(archive, t, maxArchSize, vars):
-                    archCounter += 1
-                    self.set('counter', str(archCounter))
+                archive = pywikibot.Page(site, archive % vars).title()
+                if self.feed_archive(archive, t, max_arch_size, vars):
+                    arch_counter += 1
+                    self.set('counter', str(arch_counter))
                 whys.append(why)
-                self.archivedThreads += 1
+                self.archived_threads += 1
             else:
-                self.Page.threads.append(t)
+                self.page.threads.append(t)
         return set(whys)
 
     def run(self):
-        if not self.Page.botMayEdit():
+        if not self.page.botMayEdit():
             return
-        whys = self.analyzePage()
+        whys = self.analyze_page()
         mintoarchive = int(self.get('minthreadstoarchive', 2))
-        if self.archivedThreads < mintoarchive:
+        if self.archived_threads < mintoarchive:
             # We might not want to archive a measly few threads
             # (lowers edit frequency)
             pywikibot.output(u'Only %d (< %d) threads are old enough. Skipping'
-                             % (self.archivedThreads, mintoarchive))
+                             % (self.archived_threads, mintoarchive))
             return
         if whys:
-            pywikibot.output(u'Archiving %d thread(s).' % self.archivedThreads)
+            pywikibot.output(u'Archiving %d thread(s).' % self.archived_threads)
             # Save the archives first (so that bugs don't cause a loss of data)
             for a in sorted(self.archives.keys()):
-                self.commentParams['count'] = self.archives[a].archivedThreads
+                self.comment_params['count'] = self.archives[a].archived_threads
                 comment = i18n.twntranslate(language,
                                             'archivebot-archive-summary',
-                                            self.commentParams)
+                                            self.comment_params)
                 self.archives[a].update(comment)
 
             # Save the page itself
             rx = re.compile('{{' + self.tpl + '\n.*?\n}}', re.DOTALL)
-            self.Page.header = rx.sub(self.attr2text(), self.Page.header)
-            self.commentParams['count'] = self.archivedThreads
-            self.commentParams['archives'] \
+            self.page.header = rx.sub(self.attr2text(), self.page.header)
+            self.comment_params['count'] = self.archived_threads
+            self.comment_params['archives'] \
                 = ', '.join(['[[' + a.title() + ']]' for a in self.archives.values()])
-            if not self.commentParams['archives']:
-                self.commentParams['archives'] = '/dev/null'
-            self.commentParams['why'] = ', '.join(whys)
+            if not self.comment_params['archives']:
+                self.comment_params['archives'] = '/dev/null'
+            self.comment_params['why'] = ', '.join(whys)
             comment = i18n.twntranslate(language,
                                         'archivebot-page-summary',
-                                        self.commentParams)
-            self.Page.update(comment)
+                                        self.comment_params)
+            self.page.update(comment)
 
 
 def main():
-    global Site, language
+    global site, language
 
     import sys
 
@@ -515,8 +515,8 @@ def main():
     if not salt:
         salt = ''
 
-    Site = pywikibot.Site()
-    language = Site.language()
+    site = pywikibot.Site()
+    language = site.language()
 
     if not args or len(args) <= 1:
         pywikibot.output(u'NOTE: you must specify a template to run the bot')
@@ -531,13 +531,13 @@ def main():
                 ns = [str(namespace)]
             else:
                 ns = []
-            for pg in generateTransclusions(Site, a, ns):
+            for pg in generate_transclusions(site, a, ns):
                 pagelist.append(pg)
         if filename:
             for pg in file(filename, 'r').readlines():
-                pagelist.append(pywikibot.Page(Site, pg, ns=10))
+                pagelist.append(pywikibot.Page(site, pg, ns=10))
         if pagename:
-            pagelist.append(pywikibot.Page(Site, pagename,
+            pagelist.append(pywikibot.Page(site, pagename,
                                            ns=3))
         pagelist = sorted(pagelist)
         for pg in iter(pagelist):
@@ -545,8 +545,8 @@ def main():
             # Catching exceptions, so that errors in one page do not bail out
             # the entire process
             try:
-                Archiver = PageArchiver(pg, a, salt, force)
-                Archiver.run()
+                archiver = PageArchiver(pg, a, salt, force)
+                archiver.run()
                 time.sleep(10)
             except:
                 pywikibot.output(u'Error occured while processing page %s' % pg)
