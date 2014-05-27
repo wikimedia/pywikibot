@@ -815,6 +815,39 @@ class APISite(BaseSite):
 
     userinfo = property(fget=getuserinfo, doc=getuserinfo.__doc__)
 
+    def getglobaluserinfo(self):
+        """Retrieve globaluserinfo from site and store in _globaluserinfo
+        attribute.
+
+        self._globaluserinfo will be a dict with the following keys and values:
+
+          - id: user id (numeric str)
+          - home: dbname of home wiki
+          - registration: registration date as Timestamp
+          - groups: list of groups (could be empty)
+          - rights: list of rights (could be empty)
+          - editcount: global editcount
+
+        """
+        if not hasattr(self, "_globaluserinfo"):
+            uirequest = api.Request(
+                site=self,
+                action="query",
+                meta="globaluserinfo",
+                guiprop="groups|rights|editcount"
+            )
+            uidata = uirequest.submit()
+            assert 'query' in uidata, \
+                   "API userinfo response lacks 'query' key"
+            assert 'globaluserinfo' in uidata['query'], \
+                   "API userinfo response lacks 'userinfo' key"
+            self._globaluserinfo = uidata['query']['globaluserinfo']
+            ts = self._globaluserinfo['registration']
+            self._globaluserinfo['registration'] = pywikibot.Timestamp.fromISOformat(ts)
+        return self._globaluserinfo
+
+    globaluserinfo = property(fget=getglobaluserinfo, doc=getuserinfo.__doc__)
+
     def is_blocked(self, sysop=False):
         """Return true if and only if user is blocked.
 
