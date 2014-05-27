@@ -11,10 +11,6 @@ on the same topic in different languages).
 __version__ = '$Id$'
 #
 
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
 import datetime
 import imp
 import itertools
@@ -2740,10 +2736,6 @@ class APISite(BaseSite):
             pywikibot.warning(
                 u"editpage: Invalid watch value '%(watch)s' ignored."
                 % locals())
-# FIXME: API gives 'badmd5' error
-#        md5hash = md5()
-#        md5hash.update(urllib.quote_plus(text.encode(self.encoding())))
-#        params['md5'] = md5hash.digest()
         req = api.Request(site=self, **params)
         while True:
             try:
