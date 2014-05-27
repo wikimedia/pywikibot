@@ -548,9 +548,9 @@ def main():
                 archiver = PageArchiver(pg, a, salt, force)
                 archiver.run()
                 time.sleep(10)
-            except:
-                pywikibot.output(u'Error occured while processing page %s' % pg)
-                traceback.print_exc()
+            except Exception as e:
+                pywikibot.output(u'Error occured while processing page %s: %s' % (pg, e))
+                pywikibot.output(traceback.format_exc())
 
 if __name__ == '__main__':
     main()
