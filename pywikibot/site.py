@@ -2692,7 +2692,7 @@ class APISite(BaseSite):
 
         """
         text = page.text
-        if not text:
+        if text is None:
             raise Error("editpage: no text to be saved")
         try:
             lastrev = page.latestRevision()
