@@ -2750,7 +2750,7 @@ class ItemPage(WikibasePage):
         @type claims: list
 
         """
-        # this check allows single claims to be remove by pushing them into a
+        # this check allows single claims to be removed by pushing them into a
         # list of length one.
         if isinstance(claims, pywikibot.Claim):
             claims = [claims]

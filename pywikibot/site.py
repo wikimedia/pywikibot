@@ -3539,7 +3539,7 @@ class APISite(BaseSite):
         return lrgen
 
 
-class DataSite (APISite):
+class DataSite(APISite):
 
     def __getattr__(self, attr):
         """Calls to methods get_info, get_sitelinks, get_aliases, get_labels,
@@ -3568,7 +3568,7 @@ class DataSite (APISite):
 
     @deprecated("pywikibot.PropertyPage")
     def _get_propertyitem(self, props, source, **params):
-        """generic method to get the data for multiple Wikibase items"""
+        """Generic method to get the data for multiple Wikibase items"""
         wbdata = self.get_item(source, props=props, **params)
         assert props in wbdata, \
                "API wbgetentities response lacks %s key" % props
@@ -3576,7 +3576,7 @@ class DataSite (APISite):
 
     @deprecated("pywikibot.WikibasePage")
     def get_item(self, source, **params):
-        """get the data for multiple Wikibase items"""
+        """Get the data for multiple Wikibase items"""
         if isinstance(source, int) or \
            isinstance(source, basestring) and source.isdigit():
             ids = 'q' + str(source)
@@ -3585,11 +3585,11 @@ class DataSite (APISite):
             wbdata = wbrequest.submit()
             assert 'success' in wbdata, \
                    "API wbgetentities response lacks 'success' key"
-            assert wbdata['success'] == 1, "API 'success' key ist not 1"
+            assert wbdata['success'] == 1, "API 'success' key is not 1"
             assert 'entities' in wbdata, \
                    "API wbgetentities response lacks 'entities' key"
             assert ids in wbdata['entities'], \
-                   "API  wbgetentities response lacks %s key" % ids
+                   "API wbgetentities response lacks %s key" % ids
             return wbdata['entities'][ids]
         else:
             # not implemented yet

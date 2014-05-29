@@ -609,7 +609,7 @@ actions_to_block = ['edit', 'watch', 'move', 'delete', 'undelete', 'protect',
 # Set simulate to True or use -simulate option to block all actions given above.
 simulate = False
 
-# How many pages should be put to a queue in asynchroneous mode.
+# How many pages should be put to a queue in asynchronous mode.
 # If maxsize is <= 0, the queue size is infinite.
 # Increasing this value will increase memory space but could speed up
 # processing. As higher this value this effect will decrease.
