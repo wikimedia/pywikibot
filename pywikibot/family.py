@@ -964,7 +964,7 @@ class Family(object):
 
         """
         # Here we return the latest mw release for downloading
-        return '1.20wmf2'
+        return '1.24wmf7'
 
     @pywikibot.deprecated("version()")
     def versionnumber(self, code):

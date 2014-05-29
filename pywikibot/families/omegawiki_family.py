@@ -22,7 +22,7 @@ class Family(family.Family):
         return 'www.omegawiki.org'
 
     def version(self, code):
-        return "1.16alpha"
+        return "1.22.6"
 
     def scriptpath(self, code):
         return ''
