@@ -354,7 +354,7 @@ class Request(MutableMapping):
                 raise APIError("Unknown",
                                "Unable to process query response of type %s."
                                % type(result),
-                               {'data': result})
+                               data=result)
             if self['action'] == 'query':
                 if 'userinfo' in result.get('query', ()):
                     if hasattr(self.site, '_userinfo'):
