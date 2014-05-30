@@ -24,7 +24,6 @@ URL = 'http://wikistats.wmflabs.org/api.php?action=dump&table=%s&format=xml'
 
 familiesDict = {
     'anarchopedia': 'anarchopedias',
-    'gentoo':       'gentoo',
     'wikibooks':    'wikibooks',
     'wikinews':     'wikinews',
     'wikipedia':    'wikipedias',
