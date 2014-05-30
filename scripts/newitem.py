@@ -6,6 +6,16 @@ This script creates new items on Wikidata based on certain criteria.
 * When was the last edit on the page?
 * Does the page contain interwiki's?
 
+This script understands various command-line arguments:
+
+-lastedit         The minimum number of days that has passed since the page was
+                  last edited.
+
+-pageage          The minimum number of days that has passed since the page was
+                  created.
+
+-touch            Do a null edit on every page which has a wikibase item.
+
 """
 #
 # (C) Multichill, 2014
@@ -21,31 +31,28 @@ from pywikibot import pagegenerators
 from datetime import timedelta
 
 
-class NewItemRobot:
-    """
-    A bot to create new items
-    """
-    def __init__(self, generator, pageAge, lastEdit):
-        """
-        Arguments:
-            * generator    - A generator that yields Page objects.
-            * pageAge      - The minimum number of days that has passed since
-                             the page was created
-            * lastEdit     - The minimum number of days that has passed since
-                             the page was last edited
+class NewItemRobot(pywikibot.Bot):
+    """ A bot to create new items """
 
-        """
+    def __init__(self, generator, **kwargs):
+        """ Only accepts options defined in availableOptions """
+
+        self.availableOptions.update({
+            'lastedit': 7,
+            'pageage': 21,
+            'touch': False,
+        })
+
+        super(NewItemRobot, self).__init__(**kwargs)
         self.generator = pagegenerators.PreloadingGenerator(generator)
         self.repo = pywikibot.Site().data_repository()
-        self.pageAge = pageAge
+        self.pageAge = self.getOption('pageage')
+        self.lastEdit = self.getOption('lastedit')
         self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(days=self.pageAge)
-        self.lastEdit = lastEdit
         self.lastEditBefore = self.repo.getcurrenttime() - timedelta(days=self.lastEdit)
 
     def run(self):
-        """
-        Starts the bot.
-        """
+        """ Starts the bot. """
         pywikibot.output('Page age is set to %s days so only pages created'
                          '\nbefore %s will be considered.'
                          % (self.pageAge, self.pageAgeBefore.isoformat()))
@@ -55,17 +62,21 @@ class NewItemRobot:
 
         for page in self.generator:
             pywikibot.output('Processing %s' % page)
+            if not page.exists():
+                pywikibot.output(u'%s does not exist anymore. Skipping...'
+                                 % page)
+                continue
             item = pywikibot.ItemPage.fromPage(page)
             if item.exists():
-                pywikibot.output('%s already has an item: %s.\n'
-                                 'Doing a null edit on the page.'
-                                 % (page, item))
-                page.put(page.text)
+                pywikibot.output(u'%s already has an item: %s.' % (page, item))
+                if self.getOption('touch'):
+                    pywikibot.output(u'Doing a null edit on the page.')
+                    page.put(page.text)
             elif page.isRedirectPage():
-                pywikibot.output('%s is a redirect page. Skipping.' % page)
+                pywikibot.output(u'%s is a redirect page. Skipping.' % page)
             elif page.editTime() > self.lastEditBefore:
                 pywikibot.output(
-                    'Last edit on %s was on %s.\nToo recent. Skipping.'
+                    u'Last edit on %s was on %s.\nToo recent. Skipping.'
                     % (page, page.editTime().isoformat()))
             else:
                 (revId, revTimestamp, revUser,
@@ -73,7 +84,7 @@ class NewItemRobot:
                                                       total=1)[0]
                 if revTimestamp > self.pageAgeBefore:
                     pywikibot.output(
-                        'Page creation of %s on %s is too recent. Skipping.'
+                        u'Page creation of %s on %s is too recent. Skipping.'
                         % (page, page.editTime().isoformat()))
                 elif page.langlinks():
                     # FIXME: Implement this
@@ -103,27 +114,28 @@ class NewItemRobot:
 
 
 def main():
-    pageAge = 21
-    lastEdit = 7
-
     # Process global args and prepare generator args parser
     local_args = pywikibot.handleArgs()
     gen = pagegenerators.GeneratorFactory()
 
+    options = {}
     for arg in local_args:
-        if arg.startswith('-pageage:'):
-            pageAge = int(arg[9:])
-        elif arg.startswith('-lastedit:'):
-            lastEdit = int(arg[10:])
+        if (
+                arg.startswith('-pageage:') or
+                arg.startswith('-lastedit:')):
+            key, val = arg.split(':', 1)
+            options[key[1:]] = int(val)
+        elif gen.handleArg(arg):
+            pass
         else:
-            gen.handleArg(arg)
+            options[arg[1:].lower()] = True
 
     generator = gen.getCombinedGenerator()
     if not generator:
         pywikibot.showHelp()
         return
 
-    bot = NewItemRobot(generator, pageAge, lastEdit)
+    bot = NewItemRobot(generator, **options)
     bot.run()
 
 if __name__ == "__main__":
