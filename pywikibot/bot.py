@@ -788,7 +788,7 @@ class Bot(object):
         except KeyError:
             raise pywikibot.Error(u'%s is not a valid bot option.' % option)
 
-    def userPut(self, page, oldtext, newtext):
+    def userPut(self, page, oldtext, newtext, **kwargs):
         """
         Print differences, ask user for confirmation,
         and puts the page if needed.
@@ -817,8 +817,12 @@ class Bot(object):
                 # Remember the choice
                 self.options['always'] = True
 
+        if 'async' not in kwargs:
+            kwargs['async'] = (choice == 'a')
+
         if choice != 'n':
-            page.put(newtext, async=(choice == 'a'))
+            page.text = newtext
+            page.save(**kwargs)
 
 
 class WikidataBot:
