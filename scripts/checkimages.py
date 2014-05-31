@@ -98,7 +98,7 @@ import locale
 import urllib
 import pywikibot
 from pywikibot import pagegenerators as pg
-from pywikibot import config
+from pywikibot import config, i18n
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -596,19 +596,19 @@ class checkImagesBot(object):
         self.site = site
         self.logFullError = logFullError
         self.logFulNumber = logFulNumber
-        self.rep_page = pywikibot.translate(self.site, report_page)
-        self.rep_text = pywikibot.translate(self.site, report_text)
-        self.com = pywikibot.translate(self.site, msg_comm10)
-        hiddentemplatesRaw = pywikibot.translate(self.site, HiddenTemplate)
+        self.rep_page = i18n.translate(self.site, report_page)
+        self.rep_text = i18n.translate(self.site, report_text)
+        self.com = i18n.translate(self.site, msg_comm10)
+        hiddentemplatesRaw = i18n.translate(self.site, HiddenTemplate)
         self.hiddentemplates = set([pywikibot.Page(self.site, tmp)
                                     for tmp in hiddentemplatesRaw])
-        self.pageHidden = pywikibot.translate(self.site,
+        self.pageHidden = i18n.translate(self.site,
                                               PageWithHiddenTemplates)
-        self.pageAllowed = pywikibot.translate(self.site,
+        self.pageAllowed = i18n.translate(self.site,
                                                PageWithAllowedTemplates)
-        self.comment = pywikibot.translate(self.site, msg_comm, fallback=True)
+        self.comment = i18n.translate(self.site, msg_comm, fallback=True)
         # Adding the bot's nickname at the notification text if needed.
-        botolist = pywikibot.translate(self.site, bot_list)
+        botolist = i18n.translate(self.site, bot_list)
         project = pywikibot.Site().family.name
         self.project = project
         bot = config.usernames[project]
@@ -738,7 +738,7 @@ class checkImagesBot(object):
             self.report_image(self.image_to_report, self.rep_page, self.com,
                               repme)
             return
-        upBots = pywikibot.translate(self.site, uploadBots)
+        upBots = i18n.translate(self.site, uploadBots)
         luser = pywikibot.url2link(nick, self.site, self.site)
 
         if upBots:
@@ -753,9 +753,9 @@ class checkImagesBot(object):
 
     def put_mex_in_talk(self):
         """ Function to put the warning in talk page of the uploader."""
-        commento2 = pywikibot.translate(self.site, msg_comm2, fallback=True)
-        emailPageName = pywikibot.translate(self.site, emailPageWithText)
-        emailSubj = pywikibot.translate(self.site, emailSubject)
+        commento2 = i18n.translate(self.site, msg_comm2, fallback=True)
+        emailPageName = i18n.translate(self.site, emailPageWithText)
+        emailSubj = i18n.translate(self.site, emailSubject)
         if self.notification2:
             self.notification2 = self.notification2 % self.image_to_report
         else:
@@ -785,11 +785,11 @@ class checkImagesBot(object):
                 testoattuale = self.talk_page.get()
             except pywikibot.NoPage:
                 second_text = False
-                testoattuale = pywikibot.translate(self.site, empty)
+                testoattuale = i18n.translate(self.site, empty)
         except pywikibot.NoPage:
             pywikibot.output(u'The user page is blank')
             second_text = False
-            testoattuale = pywikibot.translate(self.site, empty)
+            testoattuale = i18n.translate(self.site, empty)
         if self.commTalk:
             commentox = self.commTalk
         else:
@@ -999,13 +999,13 @@ class checkImagesBot(object):
 
     def checkImageDuplicated(self, duplicates_rollback):
         """ Function to check the duplicated files. """
-        dupText = pywikibot.translate(self.site, duplicatesText)
-        dupRegex = pywikibot.translate(self.site, duplicatesRegex)
-        dupTalkHead = pywikibot.translate(self.site, duplicate_user_talk_head)
-        dupTalkText = pywikibot.translate(self.site, duplicates_user_talk_text)
-        dupComment_talk = pywikibot.translate(self.site,
+        dupText = i18n.translate(self.site, duplicatesText)
+        dupRegex = i18n.translate(self.site, duplicatesRegex)
+        dupTalkHead = i18n.translate(self.site, duplicate_user_talk_head)
+        dupTalkText = i18n.translate(self.site, duplicates_user_talk_text)
+        dupComment_talk = i18n.translate(self.site,
                                               duplicates_comment_talk)
-        dupComment_image = pywikibot.translate(self.site,
+        dupComment_image = i18n.translate(self.site,
                                                duplicates_comment_image)
         duplicateRegex = r'\[\[:File:%s\]\] has the following duplicates' \
                          % re.escape(self.convert_to_url(self.imageName))
@@ -1215,7 +1215,7 @@ class checkImagesBot(object):
 
     def takesettings(self):
         """ Function to take the settings from the wiki. """
-        settingsPage = pywikibot.translate(self.site, page_with_settings)
+        settingsPage = i18n.translate(self.site, page_with_settings)
         try:
             if not settingsPage:
                 self.settingsData = None
@@ -1276,7 +1276,7 @@ class checkImagesBot(object):
 
     def load_licenses(self):
         """ Load the list of the licenses """
-##        catName = pywikibot.translate(self.site, category_with_licenses)
+##        catName = i18n.translate(self.site, category_with_licenses)
 ##        cat = pywikibot.Category(pywikibot.Site(), catName)
 ##        categories = [page.title() for page in pagegenerators.SubCategoriesPageGenerator(cat)]
 ##        categories.append(catName)
@@ -1287,7 +1287,7 @@ class checkImagesBot(object):
 ##            gen = pagegenerators.CategorizedPageGenerator(cat)
 ##            pages = [page for page in gen]
 ##            list_licenses.extend(pages)
-        catName = pywikibot.translate(self.site, category_with_licenses)
+        catName = i18n.translate(self.site, category_with_licenses)
         if not catName:
             raise pywikibot.Error(
                 u'No licenses allowed provided, add that option to the code to '
@@ -1506,7 +1506,7 @@ class checkImagesBot(object):
         # Print a starting message only if no images has been skipped
         if not self.skip_list:
             pywikibot.output(
-                pywikibot.translate(
+                i18n.translate(
                     'en',
                     u'Skipping the first {{PLURAL:num|file|%(num)s files}}:\n',
                     {'num': skip_number}))
@@ -1593,7 +1593,7 @@ class checkImagesBot(object):
     def isTagged(self):
         """ Understand if a file is already tagged or not. """
         # Is the image already tagged? If yes, no need to double-check, skip
-        for i in pywikibot.translate(self.site, txt_find):
+        for i in i18n.translate(self.site, txt_find):
             # If there are {{ use regex, otherwise no (if there's not the
             # {{ may not be a template and the regex will be wrong)
             if '{{' in i:
@@ -1671,15 +1671,15 @@ class checkImagesBot(object):
         # get the extension from the image's name
         extension = self.imageName.split('.')[-1]
         # Load the notification messages
-        HiddenTN = pywikibot.translate(self.site, HiddenTemplateNotification)
-        self.unvertext = pywikibot.translate(self.site, n_txt)
-        di = pywikibot.translate(self.site, delete_immediately)
-        dih = pywikibot.translate(self.site, delete_immediately_head)
-        din = pywikibot.translate(self.site, delete_immediately_notification)
-        nh = pywikibot.translate(self.site, nothing_head)
-        nn = pywikibot.translate(self.site, nothing_notification)
-        dels = pywikibot.translate(self.site, msg_del_comm, fallback=True)
-        smwl = pywikibot.translate(self.site, second_message_without_license)
+        HiddenTN = i18n.translate(self.site, HiddenTemplateNotification)
+        self.unvertext = i18n.translate(self.site, n_txt)
+        di = i18n.translate(self.site, delete_immediately)
+        dih = i18n.translate(self.site, delete_immediately_head)
+        din = i18n.translate(self.site, delete_immediately_notification)
+        nh = i18n.translate(self.site, nothing_head)
+        nn = i18n.translate(self.site, nothing_notification)
+        dels = i18n.translate(self.site, msg_del_comm, fallback=True)
+        smwl = i18n.translate(self.site, second_message_without_license)
 
         # Some formatting for delete immediately template
         di = u'\n%s' % di

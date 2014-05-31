@@ -133,12 +133,12 @@ Hallo %(admin)s,
                             admin = pywikibot.User(self.site, self.info['user'])
                             adminPage = admin.getUserTalkPage()
                             adminText = adminPage.get()
-                            note = pywikibot.translate(self.site.code,
-                                                       self.note_admin,
-                                                       self.parts)
-                            comment = pywikibot.translate(self.site.code,
-                                                          self.msg_admin,
-                                                          self.parts)
+                            note = i18n.translate(self.site.code,
+                                                  self.note_admin,
+                                                  self.parts)
+                            comment = i18n.translate(self.site.code,
+                                                     self.msg_admin,
+                                                     self.parts)
                             adminText += note
                             self.save(adminText, adminPage, comment, False)
                         ### test for pt-wiki
@@ -153,9 +153,9 @@ Hallo %(admin)s,
                                                     u'{{%s|2}}' % unblock_tpl)
                         talkText = talkText.replace(u'{{%s|1}}' % unblock_tpl,
                                                     u'{{%s|2}}' % unblock_tpl)
-                        talkComment = pywikibot.translate(self.site.code,
-                                                          self.msg_user
-                                                          % self.parts)
+                        talkComment = i18n.translate(self.site.code,
+                                                     self.msg_user
+                                                     % self.parts)
 
                         # some test stuff
                         if pywikibot.logger.isEnabledFor(pywikibot.DEBUG) \
@@ -172,8 +172,8 @@ Hallo %(admin)s,
                                                     u'{{%s|4}}' % unblock_tpl)
                         talkText = talkText.replace(u'{{%s|1}}' % unblock_tpl,
                                                     u'{{%s|4}}' % unblock_tpl)
-                        talkComment = pywikibot.translate(self.site.code,
-                                                          self.msg_done)
+                        talkComment = i18n.translate(self.site.code,
+                                                     self.msg_done)
                 # Step 2
                 # Admin has been notified.
                 # Wait for 2 hours, than put a message to the project page
@@ -183,12 +183,12 @@ Hallo %(admin)s,
                         #       check whether this entry already esists
                         project = pywikibot.Page(self.site, project_name)
                         projText = project.get()
-                        note = pywikibot.translate(self.site.code,
-                                                   self.note_project,
-                                                   self.parts)
-                        comment = pywikibot.translate(self.site.code,
-                                                      self.msg_admin,
-                                                      self.parts)
+                        note = i18n.translate(self.site.code,
+                                              self.note_project,
+                                              self.parts)
+                        comment = i18n.translate(self.site.code,
+                                                 self.msg_admin,
+                                                 self.parts)
                         projText += note
                         self.save(projText, project, comment, botflag=False)
                         talkText = talkText.replace(u'{{%s|2}}' % unblock_tpl,
@@ -199,8 +199,8 @@ Hallo %(admin)s,
                         # User is unblocked. Review can be closed
                         talkText = talkText.replace(u'{{%s|2}}' % unblock_tpl,
                                                     u'{{%s|4}}' % unblock_tpl)
-                        talkComment = pywikibot.translate(self.site.code,
-                                                          self.msg_done)
+                        talkComment = i18n.translate(self.site.code,
+                                                     self.msg_done)
                 # Step 3
                 # Admin is notified, central project page has a message
                 # Discussion is going on
@@ -212,8 +212,8 @@ Hallo %(admin)s,
                         # User is unblocked. Review can be closed
                         talkText = talkText.replace(u'{{%s|3}}' % unblock_tpl,
                                                     u'{{%s|4}}' % unblock_tpl)
-                        talkComment = pywikibot.translate(self.site.code,
-                                                          self.msg_done)
+                        talkComment = i18n.translate(self.site.code,
+                                                     self.msg_done)
                 # Step 4
                 # Review is closed
                 elif templates[1][0] == u'4':

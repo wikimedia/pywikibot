@@ -226,7 +226,7 @@ class RefLink:
 
     def refDead(self):
         """Dead link, tag it with a {{dead link}}"""
-        tag = pywikibot.translate(self.site, deadLinkTag) % self.link
+        tag = i18n.translate(self.site, deadLinkTag) % self.link
         return '<ref%s>%s</ref>' % (self.refname, tag)
 
     def transform(self, ispdf=False):
@@ -414,9 +414,9 @@ class ReferencesRobot(Bot):
         else:
             self.msg = self.getOption('summary')
         self.stopPage = pywikibot.Page(self.site,
-                                       pywikibot.translate(self.site, stopPage))
+                                       i18n.translate(self.site, stopPage))
 
-        local = pywikibot.translate(self.site, badtitles)
+        local = i18n.translate(self.site, badtitles)
         if local:
             bad = '(' + globalbadtitles + '|' + local + ')'
         else:

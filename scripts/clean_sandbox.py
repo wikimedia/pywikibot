@@ -42,7 +42,7 @@ This script understands the following command-line arguments:
 # (C) Siebrand Mazeland, 2007
 # (C) xqt, 2009-2014
 # (C) Dr. Trigon, 2012
-# (C) Pywikibot team, 2012-2013
+# (C) Pywikibot team, 2012-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -160,8 +160,8 @@ class SandboxBot(pywikibot.Bot):
         self.site = pywikibot.Site()
         self.site.login()
         if self.getOption('user'):
-            localSandboxTitle = pywikibot.translate(self.site,
-                                                    user_sandboxTemplate)
+            localSandboxTitle = i18n.translate(self.site,
+                                               user_sandboxTemplate)
             localSandbox = pywikibot.Page(self.site, localSandboxTitle)
             content.update(user_content)
             sandboxTitle[self.site.lang] = [item.title() for item in
@@ -184,7 +184,7 @@ class SandboxBot(pywikibot.Bot):
             if self.getOption('page'):
                 localSandboxTitle = self.getOption('page')
             else:
-                localSandboxTitle = pywikibot.translate(self.site, sandboxTitle)
+                localSandboxTitle = i18n.translate(self.site, sandboxTitle)
             if isinstance(localSandboxTitle, list):
                 titles = localSandboxTitle
             else:
@@ -196,7 +196,7 @@ class SandboxBot(pywikibot.Bot):
                 try:
                     text = sandboxPage.get()
                     if not self.getOption('text'):
-                        translatedContent = pywikibot.translate(self.site, content)
+                        translatedContent = i18n.translate(self.site, content)
                     else:
                         translatedContent = self.getOption('text')
                     if self.getOption('summary'):

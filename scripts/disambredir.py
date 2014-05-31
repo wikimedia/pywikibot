@@ -14,7 +14,7 @@ __version__ = '$Id$'
 #
 import re
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import i18n, pagegenerators
 
 msg = {
     'ar': u'تغيير التحويلات في صفحة توضيح',
@@ -139,7 +139,7 @@ def workon(page, links):
             continue
         text = treat(text, page2, target)
     if text != page.get():
-        comment = pywikibot.translate(mysite, msg, fallback=True)
+        comment = i18n.translate(mysite, msg, fallback=True)
         page.put(text, comment)
 
 

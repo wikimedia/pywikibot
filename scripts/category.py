@@ -525,7 +525,7 @@ class CategoryMoveRobot(object):
         match = re.compile(REGEX,
                            re.IGNORECASE | re.MULTILINE | re.DOTALL)
         self.newcat.text = match.sub('', self.newcat.text)
-        site_templates = pywikibot.translate(self.site, cfd_templates)
+        site_templates = i18n.translate(self.site, cfd_templates)
         for template_name in site_templates:
             match = re.compile(r"{{%s.*?}}" % template_name, re.IGNORECASE)
             self.newcat.text = match.sub('', self.newcat.text)

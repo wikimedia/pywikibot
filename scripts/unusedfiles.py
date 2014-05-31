@@ -21,7 +21,7 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import i18n, pagegenerators
 
 comment = {
     'ar': u'صور للاستبعاد',
@@ -72,8 +72,8 @@ def appendtext(page, apptext, always):
                 always = True
         if always or choice == 'y':
             page.text = text
-            page.save(pywikibot.translate(pywikibot.Site(), comment,
-                                          fallback=True))
+            page.save(i18n.translate(pywikibot.Site(), comment,
+                                     fallback=True))
 
 
 def main():
@@ -85,11 +85,11 @@ def main():
 
     mysite = pywikibot.Site()
     # If anything needs to be prepared, you can do it here
-    template_image = pywikibot.translate(pywikibot.Site(),
-                                         template_to_the_image)
-    template_user = pywikibot.translate(pywikibot.Site(),
-                                        template_to_the_user)
-    except_text_translated = pywikibot.translate(pywikibot.Site(), except_text)
+    template_image = i18n.translate(pywikibot.Site(),
+                                    template_to_the_image)
+    template_user = i18n.translate(pywikibot.Site(),
+                                   template_to_the_user)
+    except_text_translated = i18n.translate(pywikibot.Site(), except_text)
     if not(template_image and template_user and except_text_translated):
         pywikibot.warning(u'This script is not localized for %s site.' % mysite)
         return

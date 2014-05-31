@@ -193,7 +193,7 @@ from pywikibot import config
 
 locale.setlocale(locale.LC_ALL, '')
 
-# Script users the class pywikibot.translate() to find the right
+# Script uses the method i18n.translate() to find the right
 # page/user/summary/etc so the need to specify language and project have
 # been eliminated.
 # FIXME: Not all language/project combinations have been defined yet.
@@ -486,8 +486,8 @@ class WelcomeBot(object):
 
             # blacklist from wikipage
             badword_page = pywikibot.Page(self.site,
-                                          pywikibot.translate(self.site,
-                                                              bad_pag))
+                                          i18n.translate(self.site,
+                                                         bad_pag))
             list_loaded = list()
             if badword_page.exists():
                 pywikibot.output(u'\nLoading the bad words list from %s...'
@@ -502,7 +502,7 @@ class WelcomeBot(object):
         if not hasattr(self, '_whitelist') or force:
             # initialize whitelist
             whitelist_default = ['emiliano']
-            wtlpg = pywikibot.translate(self.site, whitelist_pg)
+            wtlpg = i18n.translate(self.site, whitelist_pg)
             list_white = list()
             if wtlpg:
                 whitelist_page = pywikibot.Page(self.site, wtlpg)
@@ -568,8 +568,8 @@ class WelcomeBot(object):
             # name in queue is max, put detail to report page
             pywikibot.output("Updating badname accounts to report page...")
             rep_page = pywikibot.Page(self.site,
-                                      pywikibot.translate(self.site,
-                                                          report_page))
+                                      i18n.translate(self.site,
+                                                     report_page))
             if rep_page.exists():
                 text_get = rep_page.get()
             else:
@@ -586,8 +586,8 @@ class WelcomeBot(object):
                                      % username)
                 else:
                     # Adding the log.
-                    rep_text += pywikibot.translate(self.site,
-                                                    report_text) % username
+                    rep_text += i18n.translate(self.site,
+                                               report_text) % username
                     if self.site.code == 'it':
                         rep_text = "%s%s}}" % (rep_text, self.bname[username])
 
@@ -608,7 +608,7 @@ class WelcomeBot(object):
             return
 
         text = u''
-        logg = pywikibot.translate(self.site, logbook)
+        logg = i18n.translate(self.site, logbook)
         if not logg:
             return
 
@@ -626,7 +626,7 @@ class WelcomeBot(object):
             showStatus()
             pywikibot.output(
                 'Log page is not exist, getting information for page creation')
-            text = pywikibot.translate(self.site, logpage_header)
+            text = i18n.translate(self.site, logpage_header)
             text += u'\n!%s' % self.site.namespace(2)
             text += u'\n!%s' % capitalize(
                 self.site.mediawiki_message('contribslink'))
@@ -657,7 +657,7 @@ class WelcomeBot(object):
         signText = u''
         creg = re.compile(r"^\* ?(.*?)$", re.M)
         if not globalvar.signFileName:
-            signPageName = pywikibot.translate(self.site, random_sign)
+            signPageName = i18n.translate(self.site, random_sign)
             if not signPageName:
                 showStatus(4)
                 pywikibot.output(
@@ -734,7 +734,7 @@ class WelcomeBot(object):
                         if self.badNameFilter(users.name()):
                             self.reportBadAccount(users.name())
                             continue
-                        welcome_text = pywikibot.translate(self.site, netext)
+                        welcome_text = i18n.translate(self.site, netext)
                         if globalvar.randomSign:
                             if self.site.family != 'wikinews':
                                 welcome_text = (welcome_text
@@ -749,7 +749,7 @@ class WelcomeBot(object):
                             welcome_text = (welcome_text
                                             % globalvar.defaultSign)
                         if self.site.code in final_new_text_additions:
-                            welcome_text += pywikibot.translate(
+                            welcome_text += i18n.translate(
                                 self.site, final_new_text_additions)
                         welcome_comment = i18n.twtranslate(self.site,
                                                            'welcome-welcome')
@@ -766,7 +766,7 @@ class WelcomeBot(object):
                                              u'skipping this user.')
 
                     if globalvar.makeWelcomeLog and \
-                       pywikibot.translate(self.site, logbook):
+                       i18n.translate(self.site, logbook):
                         showStatus(5)
                         if welcomed_count == 1:
                             pywikibot.output(u'One user has been welcomed.')
@@ -794,7 +794,7 @@ class WelcomeBot(object):
                                          % (users.name(), users.editCount()))
                     # That user mustn't be welcomed.
                     continue
-            if globalvar.makeWelcomeLog and pywikibot.translate(
+            if globalvar.makeWelcomeLog and i18n.translate(
                     self.site, logbook) and welcomed_count > 0:
                 showStatus()
                 if welcomed_count == 1:

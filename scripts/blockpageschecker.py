@@ -262,14 +262,14 @@ def main():
     if protectedpages:
         generator = site.protectedpages(namespace=namespace, type=protectType)
     # Take the right templates to use, the category and the comment
-    TSP = pywikibot.translate(site, templateSemiProtection)
-    TTP = pywikibot.translate(site, templateTotalProtection)
-    TSMP = pywikibot.translate(site, templateSemiMoveProtection)
-    TTMP = pywikibot.translate(site, templateTotalMoveProtection)
-    TNR = pywikibot.translate(site, templateNoRegex)
-    TU = pywikibot.translate(site, templateUnique)
+    TSP = i18n.translate(site, templateSemiProtection)
+    TTP = i18n.translate(site, templateTotalProtection)
+    TSMP = i18n.translate(site, templateSemiMoveProtection)
+    TTMP = i18n.translate(site, templateTotalMoveProtection)
+    TNR = i18n.translate(site, templateNoRegex)
+    TU = i18n.translate(site, templateUnique)
 
-    categories = pywikibot.translate(site, categoryToCheck)
+    categories = i18n.translate(site, categoryToCheck)
     commentUsed = i18n.twtranslate(site, 'blockpageschecker-summary')
     if not generator:
         generator = genFactory.getCombinedGenerator()

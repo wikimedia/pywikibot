@@ -545,7 +545,7 @@ class DisambiguationRobot(object):
         """
         # TODO: break this function up into subroutines!
 
-        dn_template_str = pywikibot.translate(self.mysite, dn_template)
+        dn_template_str = i18n.translate(self.mysite, dn_template)
         include = False
         unlink = False
         new_targets = []
@@ -933,7 +933,7 @@ u"Page does not exist, using the first link in page %s."
         if (self.mysite.family.name in config.disambiguation_comment and
                 self.mylang in config.disambiguation_comment[self.mysite.family.name]):
             try:
-                self.comment = pywikibot.translate(
+                self.comment = i18n.translate(
                     self.mysite,
                     config.disambiguation_comment[self.mysite.family.name],
                     fallback=True) % (disambPage.title(), targets)
@@ -941,7 +941,7 @@ u"Page does not exist, using the first link in page %s."
             # Backwards compatibility, type error probably caused by too
             # many arguments for format string
             except TypeError:
-                self.comment = pywikibot.translate(
+                self.comment = i18n.translate(
                     self.mysite,
                     config.disambiguation_comment[self.mysite.family.name],
                     fallback=True) % disambPage.title()

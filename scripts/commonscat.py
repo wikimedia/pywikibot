@@ -67,7 +67,7 @@ import re
 
 import add_text
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import i18n, pagegenerators
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -419,10 +419,10 @@ class CommonscatBot:
         if self.summary:
             comment = self.summary
         else:
-            comment = pywikibot.translate(page.site,
-                                          msg_change,
-                                          fallback=True) % {'oldcat': oldcat,
-                                                            'newcat': newcat}
+            comment = i18n.translate(page.site,
+                                     msg_change,
+                                     fallback=True) % {'oldcat': oldcat,
+                                                       'newcat': newcat}
         self.save(newtext, page, comment)
 
     def findCommonscatLink(self, page=None):

@@ -618,8 +618,8 @@ def main(*args):
                 edit_summary = i18n.twtranslate(pywikibot.Site(),
                                                 str(fix['msg']))
             else:
-                edit_summary = pywikibot.translate(pywikibot.Site(),
-                                                   fix['msg'], fallback=True)
+                edit_summary = i18n.translate(pywikibot.Site(),
+                                              fix['msg'], fallback=True)
         if "exceptions" in fix:
             exceptions = fix['exceptions']
         if "nocase" in fix:

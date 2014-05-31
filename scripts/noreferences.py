@@ -522,7 +522,7 @@ class NoReferencesBot(object):
 
         """
         # Is there an existing section where we can add the references tag?
-        for section in pywikibot.translate(self.site, referencesSections):
+        for section in i18n.translate(self.site, referencesSections):
             sectionR = re.compile(r'\r?\n=+ *%s *=+ *\r?\n' % section)
             index = 0
             while index < len(oldText):
@@ -547,7 +547,7 @@ class NoReferencesBot(object):
                     break
 
         # Create a new section for the references tag
-        for section in pywikibot.translate(self.site, placeBeforeSections):
+        for section in i18n.translate(self.site, placeBeforeSections):
             # Find out where to place the new section
             sectionR = re.compile(r'\r?\n(?P<ident>=+) *%s *(?P=ident) *\r?\n'
                                   % section)
@@ -613,7 +613,7 @@ class NoReferencesBot(object):
             newSection = u'\n%s\n' % (self.referencesText)
         else:
             newSection = u'\n%s %s %s\n%s\n' % (ident,
-                                                pywikibot.translate(
+                                                i18n.translate(
                                                     self.site,
                                                     referencesSections)[0],
                                                 ident, self.referencesText)
