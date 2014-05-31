@@ -1173,9 +1173,11 @@ class TimeStripper(object):
             self.site = site
 
         self.origNames2monthNum = {}
-        for n, (_long, _short) in enumerate(self.site.months_names):
-            self.origNames2monthNum[_long] = n + 1
-            self.origNames2monthNum[_short] = n + 1
+        for n, (_long, _short) in enumerate(self.site.months_names, start=1):
+            self.origNames2monthNum[_long] = n
+            self.origNames2monthNum[_short] = n
+            if _short.endswith('.'):
+                self.origNames2monthNum[_short[:-1]] = n
 
         self.groups = [u'year', u'month',  u'hour',  u'time', u'day', u'minute', u'tzinfo']
 
