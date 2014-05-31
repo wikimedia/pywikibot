@@ -198,7 +198,7 @@ class DiscussionThread(object):
 
     def __repr__(self):
         return '%s("%s",%d bytes)' \
-               % (self.__class__.__name__, self.title, len(self.content))
+               % (self.__class__.__name__, self.title, len(self.content.encode('utf-8')))
 
     def feed_line(self, line):
         if not self.content and not line:
