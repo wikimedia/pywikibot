@@ -662,14 +662,14 @@ def handleArgs(*args):
     return nonGlobalArgs
 
 
-def showHelp(name=""):
-    # argument, if given, is ignored
-    modname = calledModuleName()
-    if not modname:
+def showHelp(module_name=None):
+    if not module_name:
+        module_name = calledModuleName()
+    if not module_name:
         try:
-            modname = sys.modules['__main__'].main.__module__
+            module_name = sys.modules['__main__'].main.__module__
         except NameError:
-            modname = "no_module"
+            module_name = "no_module"
 
     globalHelp = u'''
 Global arguments available for all bots:
@@ -727,17 +727,17 @@ Global arguments available for all bots:
 -<config var>:n   You may use all given numeric config variables as option and
                   modify it with command line.
 
-''' % modname
+''' % module_name
     try:
-        module = __import__('%s' % modname)
+        module = __import__('%s' % module_name)
         helpText = module.__doc__.decode('utf-8')
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
                 helpText = helpText.replace(key, value.strip('\n\r'))
         pywikibot.stdout(helpText)  # output to STDOUT
     except Exception:
-        if modname:
-            pywikibot.stdout(u'Sorry, no help available for %s' % modname)
+        if module_name:
+            pywikibot.stdout(u'Sorry, no help available for %s' % module_name)
         pywikibot.log('showHelp:', exc_info=True)
     pywikibot.stdout(globalHelp)
 
