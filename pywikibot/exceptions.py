@@ -16,8 +16,9 @@ from pywikibot.tools import UnicodeMixin
 # will be needed in the rewrite.
 
 
-class Error(Exception, UnicodeMixin):
+class Error(UnicodeMixin, Exception):
     """Wikipedia error"""
+    # NOTE: UnicodeMixin must be the first object Error class is derived from.
     def __init__(self, arg):
         self.unicode = arg
 
@@ -102,9 +103,12 @@ class EditConflict(PageNotSaved):
 
 
 class SpamfilterError(PageNotSaved):
-    """Saving the page has failed because the MediaWiki spam filter detected a blacklisted URL."""
+    """Saving the page has failed because the MediaWiki spam filter detected a
+    blacklisted URL.
+    """
     def __init__(self, arg):
-        super(SpamfilterError, self).__init__(u'MediaWiki spam filter has been triggered')
+        super(SpamfilterError, self).__init__(
+            u'MediaWiki spam filter has been triggered')
         self.url = arg
         self.args = arg,
 
