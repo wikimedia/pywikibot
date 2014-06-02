@@ -14,11 +14,12 @@ compatible as possible, so that in most cases it should be possible to convert
 scripts to the new interface simply by changing import statements and doing
 global search-and-replace on module names, as discussed in this document.
 
-With pywikipedia scripts were importing "wikipedia" or "pagegenerators"
-libraries; pywikibot is now written as a standard package, and other modules
-are contained within it (e.g., pywikibot.site contains Site classes). However,
-most commonly-used names are imported into the pywikibot namespace, so that
-module names don't need to be used unless specified in the documentation.
+With pywikibot compat branch scripts were importing "wikipedia" or 
+"pagegenerators" libraries; pywikibot is now written as a standard package,
+and other modules are contained within it (e.g., pywikibot.site contains Site
+classes). However, most commonly-used names are imported into the pywikibot
+namespace, so that module names don't need to be used unless specified in the
+documentation.
 
 Make sure that the directory that contains the "pywikibot" subdirectory (or
 folder) is in sys.path.
@@ -35,6 +36,11 @@ The following changes, at a minimum, need to be made to allow scripts to run:
 
 wikipedia.setAction() no longer works; you must revise the script to pass an
 explicit edit summary message on each put() or put_async() call.
+
+There is a helper script which does a lot of changes automatically.
+Just call it:
+pwb.py maintenance/compat2core [<script to convert>]
+and follow the instructions and hints.
 
 == Python librairies ==
 
