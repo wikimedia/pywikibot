@@ -38,6 +38,12 @@ if sys.version_info[0] == 3:
         print("ERROR: Python 3.3 or higher is required!")
         sys.exit(1)
 
+dependencies = ['httplib2>=0.6.0']
+if os.name != 'nt':
+    # See bug 66010, Windows users will have issues
+    # when trying to build the C modules.
+    dependencies.append('mwparserfromhell>=0.3.3')
+
 
 class pwb_install(install.install):
     """
@@ -65,10 +71,7 @@ setup(
              [package
               for package in find_packages()
               if package.startswith('pywikibot.')],
-    install_requires=[
-        'httplib2>=0.6.0',
-        'mwparserfromhell>=0.3.3'
-    ],
+    install_requires=dependencies,
     dependency_links=[
         'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1'
     ],
