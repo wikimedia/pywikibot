@@ -771,7 +771,7 @@ class APISite(BaseSite):
 
     def logout(self):
         uirequest = api.Request(site=self, action="logout")
-        uidata = uirequest.submit()
+        uirequest.submit()
         self._loginstatus = LoginStatus.NOT_LOGGED_IN
         if hasattr(self, "_userinfo"):
             del self._userinfo
@@ -952,7 +952,7 @@ class APISite(BaseSite):
 
         """
         try:
-            v = self.mediawiki_messages(keys)
+            self.mediawiki_messages(keys)
             return True
         except KeyError:
             return False

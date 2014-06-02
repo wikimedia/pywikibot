@@ -34,7 +34,6 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.editor import TextEditor
 from pywikibot import i18n
-from pywikibot import config
 
 
 class UnlinkBot:
