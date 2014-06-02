@@ -468,7 +468,8 @@ class CategoryMoveRobot(object):
         """
         if self.newcat and self.move_oldcat and not self.newcat.exists():
             if "move-categorypages" in self.site.userinfo["rights"]:
-                self.oldcat.move(self.newcat, reason=self.comment, movetalkpage=True)
+                self.oldcat.move(self.newcat.title(), reason=self.comment,
+                                 movetalkpage=True)
             else:
                 self._movecat()
                 self._movetalk()
@@ -1053,9 +1054,8 @@ def main(*args):
                 u'Please enter the new name of the category:')
         bot = CategoryMoveRobot(oldCatTitle, newCatTitle, batchMode,
                                 editSummary, inPlace,
-                                deleteEmptySourceCat=deleteEmptySourceCat,
-                                titleRegex=titleRegex,
-                                withHistory=withHistory)
+                                delete_oldcat=deleteEmptySourceCat,
+                                title_regex=titleRegex, history=withHistory)
         bot.run()
     elif action == 'tidy':
         catTitle = pywikibot.input(u'Which category do you want to tidy up?')
