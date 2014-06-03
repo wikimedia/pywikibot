@@ -332,7 +332,7 @@ _listTypes = [list, tuple]
 
 
 def escapePattern2(pattern):
-    """Converts a string pattern into a regex expression and cache.
+    """Convert a string pattern into a regex expression and cache.
     Allows matching of any _digitDecoders inside the string.
     Returns a compiled regex object and a list of digit decoders
 
@@ -1953,7 +1953,7 @@ def makeMonthList(pattern):
 
 
 def makeMonthNamedList(lang, pattern, makeUpperCase=None):
-    """Creates a list of 12 elements based on the name of the month.
+    """Create a list of 12 elements based on the name of the month.
     The language-dependent month name is used as a formating argument to the
     pattern. The pattern must be have one %s that will be replaced by the
     localized month name.
@@ -2279,12 +2279,12 @@ for monthId in range(12):
 
 
 def getNumberOfDaysInMonth(month):
-    """Returns the number of days in a given month, 1 being January, etc."""
+    """Return the number of days in a given month, 1 being January, etc."""
     return formatLimits[dayMnthFmts[month-1]][2]-1
 
 
 def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
-    """Returns (dictName,value), where value can be a year, date, etc, and
+    """Return (dictName,value), where value can be a year, date, etc, and
     dictName is 'YearBC', 'December', etc.
 
     """

@@ -81,7 +81,7 @@ class ProtectionRobot:
         self.move = move
 
     def run(self):
-        """ Starts the bot's action.
+        """ Start the bot's action.
         Loop through everything in the page generator and (un)protect it.
 
         """

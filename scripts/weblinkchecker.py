@@ -507,7 +507,7 @@ class LinkCheckThread(threading.Thread):
 
 
 class History:
-    """ Stores previously found dead links. The URLs are dictionary keys, and
+    """ Store previously found dead links. The URLs are dictionary keys, and
     values are lists of tuples where each tuple represents one time the URL was
     found dead. Tuples have the form (title, date, error) where title is the
     wiki page where the URL was found, date is an instance of time, and error is
@@ -617,7 +617,7 @@ class History:
             return False
 
     def save(self):
-        """ Saves the .dat file to disk. """
+        """ Save the .dat file to disk. """
         datfile = open(self.datfilename, 'w')
         pickle.dump(self.historyDict, datfile)
         datfile.close()

@@ -52,7 +52,7 @@ class NewItemRobot(pywikibot.Bot):
         self.lastEditBefore = self.repo.getcurrenttime() - timedelta(days=self.lastEdit)
 
     def run(self):
-        """ Starts the bot. """
+        """ Start the bot. """
         pywikibot.output('Page age is set to %s days so only pages created'
                          '\nbefore %s will be considered.'
                          % (self.pageAge, self.pageAgeBefore.isoformat()))

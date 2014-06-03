@@ -337,7 +337,7 @@ def translate(code, xdict, parameters=None, fallback=False):
 
 
 def twtranslate(code, twtitle, parameters=None):
-    """ Uses TranslateWiki files to provide translations based on the TW title
+    """ Use TranslateWiki files to provide translations based on the TW title
         twtitle, which corresponds to a page on TW.
 
         @param code The language code
@@ -465,7 +465,7 @@ def twntranslate(code, twtitle, parameters=None):
 
 
 def twhas_key(code, twtitle):
-    """ Uses TranslateWiki files to to check whether specified translation
+    """ Use TranslateWiki files to to check whether specified translation
         based on the TW title is provided. No code fallback is made.
 
         @param code The language code

@@ -157,7 +157,7 @@ class XmlDump(object):
             self.restrictions)
 
     def _create_revision(self, revision):
-        """Creates a Single revision"""
+        """Create a Single revision"""
         revisionid = revision.findtext("{%s}id" % self.uri)
         timestamp = revision.findtext("{%s}timestamp" % self.uri)
         comment = revision.findtext("{%s}comment" % self.uri)

@@ -59,7 +59,7 @@ class DeletionRobot:
         self.undelete = undelete
 
     def run(self):
-        """ Starts the robot's action:
+        """ Start the robot's action:
         Loop through everything in the page generator and delete it.
 
         """

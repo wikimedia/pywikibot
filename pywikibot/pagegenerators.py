@@ -819,7 +819,7 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
 
 
 def RedirectFilterPageGenerator(generator, no_redirects=True):
-    """Yields pages from another generator that are redirects or not."""
+    """Yield pages from another generator that are redirects or not."""
     for page in generator:
         if not page.isRedirectPage() and no_redirects:
             yield page
@@ -1163,7 +1163,7 @@ def RandomRedirectPageGenerator(total=10, site=None):
 
 def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
                             site=None):
-    """Yields all pages that include a specified link, according to
+    """Yield all pages that include a specified link, according to
     [[Special:Linksearch]].
 
     """

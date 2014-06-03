@@ -161,9 +161,9 @@ class ImageTransferBot:
         self.keep_name = keep_name
 
     def transferImage(self, sourceImagePage):
-        """Gets a wikilink to an image, downloads it and its description,
-           and uploads it to another wikipedia.
-           Returns the filename which was used to upload the image
+        """Get a wikilink to an image, download it and its description,
+           and upload it to another wikipedia.
+           Return the filename which was used to upload the image
            This function is used by imagetransfer.py and by copy_table.py
 
         """

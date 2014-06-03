@@ -214,7 +214,7 @@ class RefLink:
         self.title = None
 
     def refTitle(self):
-        """Returns the <ref> with its new title"""
+        """Return the <ref> with its new title"""
         return '<ref%s>[%s %s<!-- %s -->]</ref>' % (self.refname, self.link,
                                                     self.title,
                                                     self.linkComment)
@@ -441,7 +441,7 @@ class ReferencesRobot:
             r'application/(?:xhtml\+xml|xml)|text/(?:ht|x)ml')
 
     def put_page(self, page, new):
-        """ Prints diffs between orginal and new (text), puts new text for page
+        """ Print diffs between orginal and new (text), put new text for page
 
         """
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
@@ -512,7 +512,7 @@ class ReferencesRobot:
             os.unlink(infile)
 
     def run(self):
-        """ Runs the Bot """
+        """ Run the Bot """
         try:
             deadLinks = codecs.open(listof404pages, 'r', 'latin_1').read()
         except IOError:

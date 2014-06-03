@@ -119,7 +119,7 @@ def downloadPhoto(photoUrl=''):
 
 def findDuplicateImages(photo=None,
                         site=pywikibot.Site(u'commons', u'commons')):
-    """ Takes the photo, calculates the SHA1 hash and asks the mediawiki api
+    """ Take the photo, calculate the SHA1 hash and ask the mediawiki api
     for a list of duplicates.
 
     TODO: Add exception handling, fix site thing

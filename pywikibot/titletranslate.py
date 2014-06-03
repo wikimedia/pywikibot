@@ -122,7 +122,7 @@ def appendFormatedDates(result, dictName, value):
 
 
 def getPoisonedLinks(pl):
-    """Returns a list of known corrupted links that should be removed if seen
+    """Return a list of known corrupted links that should be removed if seen
 
     """
     result = []

@@ -477,7 +477,7 @@ class CachedRequest(Request):
         return dt + self.expiry < datetime.datetime.now()
 
     def _load_cache(self):
-        """ Returns whether the cache can be used """
+        """ Return whether the cache can be used """
         try:
             with open(self._cachefile_path(), 'rb') as f:
                 uniquedescr, self._data, self._cachetime = pickle.load(f)
@@ -924,7 +924,7 @@ class LogEntryListGenerator(ListGenerator):
 
 
 class LoginManager(login.LoginManager):
-    """Supplies getCookie() method to use API interface."""
+    """Supply getCookie() method to use API interface."""
     def getCookie(self, remember=True, captchaId=None, captchaAnswer=None):
         """Login to the site.
 

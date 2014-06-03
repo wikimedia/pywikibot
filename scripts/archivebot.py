@@ -255,7 +255,7 @@ class DiscussionPage(pywikibot.Page):
                 self.header = self.header % self.vars
 
     def load_page(self):
-        """Loads the page to be archived and breaks it up into threads."""
+        """Load the page to be archived and break it up into threads."""
         self.header = ''
         self.threads = []
         self.archives = {}

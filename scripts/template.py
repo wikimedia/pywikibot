@@ -236,7 +236,7 @@ class TemplateRobot:
                     site, 'template-changing', Param)
 
     def run(self):
-        """Starts the robot's action."""
+        """Start the robot's action."""
         # regular expression to find the original template.
         # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
         # The old syntax, {{msg:vfd}}, will also be found.

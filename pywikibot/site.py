@@ -898,7 +898,7 @@ class APISite(BaseSite):
         return group.lower() in self._userinfo['groups']
 
     def messages(self, sysop=False):
-        """Returns true if the user has new messages, and false otherwise."""
+        """Return true if the user has new messages, and false otherwise."""
         if not self.logged_in(sysop):
             self.login(sysop)
         return 'hasmsg' in self._userinfo
@@ -1013,7 +1013,7 @@ class APISite(BaseSite):
         return msgs['comma-separator'].join(args[:-2] + [concat.join(args[-2:])])
 
     def expand_text(self, text, title=None, includecomments=None):
-        """ Parses the given text for preprocessing and rendering
+        """ Parse the given text for preprocessing and rendering
         e.g expand templates and strip comments if includecomments
         parameter is not True. Keeps text inside
         <nowiki></nowiki> tags unchanges etc. Can be used to parse
@@ -1394,7 +1394,7 @@ class APISite(BaseSite):
         return page._pageid > 0
 
     def page_restrictions(self, page):
-        """Returns a dictionary reflecting page protections"""
+        """Return a dictionary reflecting page protections"""
         if not self.page_exists(page):
             raise NoPage(page)
         if not hasattr(page, "_protection"):
@@ -3680,7 +3680,7 @@ class DataSite(APISite):
         return data['entities']
 
     def preloaditempages(self, pagelist, groupsize=50):
-        """Yields ItemPages with content prefilled.
+        """Yield ItemPages with content prefilled.
 
         Note that pages will be iterated in a different order
         than in the underlying pagelist.

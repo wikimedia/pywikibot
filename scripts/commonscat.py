@@ -246,7 +246,7 @@ class CommonscatBot:
             self.treat(page)
 
     def treat(self, page):
-        """ Loads the given page, does some changes, and saves it. """
+        """ Load the given page, do some changes, and save it. """
         if not page.exists():
             pywikibot.output(u'Page %s does not exist. Skipping.'
                              % page.title(asLink=True))
@@ -264,7 +264,7 @@ class CommonscatBot:
         return
 
     def load(self, page):
-        """ Loads the given page, does some changes, and saves it. """
+        """ Load the given page, do some changes, and save it. """
         try:
             text = page.get()
         except pywikibot.NoPage:

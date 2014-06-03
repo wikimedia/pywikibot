@@ -14,7 +14,7 @@ class TestDate(unittest.TestCase):
     """Test cases for date library"""
 
     def testMapEntry(self):
-        """Tests the validity of the pywikibot.date format maps."""
+        """Test the validity of the pywikibot.date format maps."""
         for formatName in date.formats:
             step = 1
             if formatName in date.decadeFormats:

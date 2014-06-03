@@ -740,7 +740,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         )
 
     def protection(self):
-        """Returns a dictionary reflecting page protections"""
+        """Return a dictionary reflecting page protections"""
         return self.site.page_restrictions(self)
 
     def canBeEdited(self):
@@ -1325,7 +1325,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     @deprecate_arg("throttle", None)
     def delete(self, reason=None, prompt=True, mark=False):
-        """Deletes the page from the wiki. Requires administrator status.
+        """Delete the page from the wiki. Requires administrator status.
 
         @param reason: The edit summary for the deletion, or rationale
             for deletion if requesting. If None, ask for it.
@@ -3033,7 +3033,7 @@ class Claim(PropertyPage):
             self.sources.remove(source_dict)
 
     def addQualifier(self, qualifier, **kwargs):
-        """Adds the given qualifier
+        """Add the given qualifier
 
         @param qualifier: the qualifier to add
         @type qualifier: Claim
