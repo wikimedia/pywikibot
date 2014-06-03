@@ -315,6 +315,8 @@ logfilesize = 1024
 logfilecount = 5
 # set to 1 (or higher) to generate "informative" messages to terminal
 verbose_output = 0
+# set to True to fetch the pywiki version online
+log_pywiki_repo_version = False
 # if True, include a lot of debugging info in logfile
 # (overrides log setting above)
 debug_log = []

@@ -258,11 +258,15 @@ def writelogheader():
 
     # new framework release/revision? (handleArgs needs to be called first)
     try:
-        log(u'VERSION: %s' % unicode((version.getversion().strip(),
-                                      version.getversion_onlinerepo(),
-                                      site.live_version())))
+        log(u'VERSION: %s' %
+            version.getversion(online=config.log_pywiki_repo_version).strip())
     except version.ParseError:
         exception()
+
+    if config.log_pywiki_repo_version:
+        log(u'PYWIKI REPO VERSION: %s' % unicode(version.getversion_onlinerepo()))
+
+    log(u'SITE VERSION: %s' % unicode(site.live_version()))
 
     # system
     if hasattr(os, 'uname'):

@@ -28,14 +28,21 @@ def _get_program_dir():
     return _program_dir
 
 
-def getversion():
+def getversion(online=True):
+    """Return a pywikibot version string
+    @param online: (optional) Include information obtained online
+    """
     data = dict(getversiondict())  # copy dict to prevent changes in 'chache'
-    try:
-        hsh2 = getversion_onlinerepo()
-        hsh1 = data['hsh']
-        data['cmp_ver'] = 'OUTDATED' if hsh1 != hsh2 else 'ok'
-    except Exception:
-        data['cmp_ver'] = 'n/a'
+    data['cmp_ver'] = 'n/a'
+
+    if online:
+        try:
+            hsh2 = getversion_onlinerepo()
+            hsh1 = data['hsh']
+            data['cmp_ver'] = 'OUTDATED' if hsh1 != hsh2 else 'ok'
+        except Exception:
+            pass
+
     data['hsh'] = data['hsh'][:7]  # make short hash from full hash
     return '%(tag)s (%(hsh)s, %(rev)s, %(date)s, %(cmp_ver)s)' % data
 
