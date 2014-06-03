@@ -21,7 +21,7 @@ cache = None
 
 class ParseError(Exception):
 
-    """ Parsing went wrong """
+    """ Parsing went wrong. """
 
 
 def _get_program_dir():
@@ -182,14 +182,18 @@ def getversion_nightly():
 
 
 def getversion_onlinerepo(repo=None):
-    """ Retrieve revision number of framework online repository's svnroot """
+    """Retrieve current framework revision number from online repository.
+
+    @param repo: (optional) Online repository location
+    @type repo: URL or string
+    """
     url = repo or 'https://git.wikimedia.org/feed/pywikibot/core'
     hsh = None
+    buf = urllib.urlopen(url).readlines()
     try:
-        buf = urllib.urlopen(url).readlines()
         hsh = buf[13].split('/')[5][:-1]
-    except:
-        raise ParseError
+    except Exception as e:
+        raise ParseError(repr(e) + ' while parsing ' + repr(buf))
     return hsh
 
 
