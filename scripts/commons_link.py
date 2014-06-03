@@ -34,8 +34,6 @@ and option can be one of these:
 # Ported by Geoffrey "GEOFBOT" Mon for Google Code-In 2013
 # User:Sn1per
 #
-
-
 __version__ = '$Id$'
 
 import re
@@ -55,7 +53,7 @@ class CommonsLinkBot:
                 commons = pywikibot.Site().image_repository()
                 commonspage = pywikibot.Page(commons, page.title())
                 try:
-                    getcommons = commonspage.get(get_redirect=True)
+                    getcommons = commonspage.text
                     if page.title() == commonspage.title():
                         oldText = page.get()
                         text = oldText
@@ -110,7 +108,7 @@ class CommonsLinkBot:
                 commonsCategory = pywikibot.Category(commons,
                                                      'Category:%s' % page.title())
                 try:
-                    getcommonscat = commonsCategory.get(get_redirect=True)
+                    getcommonscat = commonsCategory.text
                     commonsCategoryTitle = commonsCategory.title()
                     categoryname = commonsCategoryTitle.split('Category:', 1)[1]
                     if page.title() == categoryname:
