@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#coding: utf-8
+# -*- coding: utf-8  -*-
 """
 This bot takes its input from a file that contains a number of
 pages to be put on the wiki. The pages should all have the same
@@ -52,7 +52,7 @@ __version__ = '$Id$'
 import re
 import codecs
 import pywikibot
-from pywikibot import config
+from pywikibot import config, Bot
 
 
 class NoTitle(Exception):
@@ -61,7 +61,7 @@ class NoTitle(Exception):
         self.offset = offset
 
 
-class PageFromFileRobot:
+class PageFromFileRobot(Bot):
     """
     Responsible for writing pages to the wiki, with the titles and contents
     given by a PageFromFileReader.
@@ -146,21 +146,24 @@ class PageFromFileRobot:
         'zh': u'機器人: 覆寫已存在的文字',
     }
 
-    def __init__(self, reader, force, append, summary, minor, autosummary,
-                 nocontent):
+    def __init__(self, reader, **kwargs):
+        self.availableOptions.update({
+            'force': False,
+            'append': None,
+            'summary': None,
+            'minor': False,
+            'autosummary': False,
+            'nocontent': '',
+        })
+
+        super(PageFromFileRobot, self).__init__(**kwargs)
         self.reader = reader
-        self.force = force
-        self.append = append
-        self.summary = summary
-        self.minor = minor
-        self.autosummary = autosummary
-        self.nocontent = nocontent
 
     def run(self):
         for title, contents in self.reader.run():
-            self.put(title, contents)
+            self.save(title, contents)
 
-    def put(self, title, contents):
+    def save(self, title, contents):
         mysite = pywikibot.Site()
 
         page = pywikibot.Page(mysite, title)
@@ -169,8 +172,8 @@ class PageFromFileRobot:
         pywikibot.output(u">>> \03{lightpurple}%s\03{default} <<<"
                          % page.title())
 
-        if self.summary:
-            comment = self.summary
+        if self.getOption('summary'):
+            comment = self.getOption('summary')
         else:
             comment = pywikibot.translate(mysite, self.msg, fallback=True)
 
@@ -189,22 +192,23 @@ class PageFromFileRobot:
         contents = re.sub('^[\r\n]*', '', contents)
 
         if page.exists():
-            if self.nocontent != u'':
+            if self.getOption('nocontent') != u'':
                 pagecontents = page.get()
-                if pagecontents.find(self.nocontent) != -1 or pagecontents.find(self.nocontent.lower()) != -1:
-                    pywikibot.output(u'Page has %s so it is skipped' % (self.nocontent))
+                if pagecontents.find(self.getOption('nocontent')) != -1 or \
+                pagecontents.find(self.getOption('nocontent').lower()) != -1:
+                    pywikibot.output(u'Page has %s so it is skipped' % self.getOption('nocontent'))
                     return
-            if self.append == "Top":
+            if self.getOption('append') == 'top':
                 pywikibot.output(u"Page %s already exists, appending on top!"
                                      % title)
                 contents = contents + page.get()
                 comment = comment_top
-            elif self.append == "Bottom":
+            elif self.getOption('append') == 'bottom':
                 pywikibot.output(u"Page %s already exists, appending on bottom!"
                                      % title)
                 contents = page.get() + contents
                 comment = comment_bottom
-            elif self.force:
+            elif self.getOption('force'):
                 pywikibot.output(u"Page %s already exists, ***overwriting!"
                                  % title)
                 comment = comment_force
@@ -212,11 +216,12 @@ class PageFromFileRobot:
                 pywikibot.output(u"Page %s already exists, not adding!" % title)
                 return
         else:
-            if self.autosummary:
+            if self.getOption('autosummary'):
                 comment = ''
-                pywikibot.setAction('')
+                config.default_edit_summary = ''
         try:
-            page.put(contents, comment=comment, minorEdit=self.minor)
+            page.text = contents
+            page.save(comment, minorEdit=self.getOption('minor'))
         except pywikibot.LockedPage:
             pywikibot.output(u"Page %s is locked; skipping." % title)
         except pywikibot.EditConflict:
@@ -286,7 +291,7 @@ class PageFromFileReader:
         try:
             title = titleR.search(contents).group(1)
             if self.notitle:
-                #Remove title (to allow creation of redirects)
+                # Remove title (to allow creation of redirects)
                 contents = titleR.sub('', contents, count=1)
         except AttributeError:
             raise NoTitle(location.end())
@@ -305,14 +310,9 @@ def main():
     pageEndMarker = "{{-stop-}}"
     titleStartMarker = u"'''"
     titleEndMarker = u"'''"
-    nocontent = u""
+    options = {}
     include = False
-    force = False
-    append = None
     notitle = False
-    summary = None
-    minor = False
-    autosummary = False
 
     for arg in pywikibot.handleArgs():
         if arg.startswith("-start:"):
@@ -323,37 +323,34 @@ def main():
             filename = arg[6:]
         elif arg == "-include":
             include = True
-        elif arg == "-appendtop":
-            append = "Top"
-        elif arg == "-appendbottom":
-            append = "Bottom"
+        elif arg.startswith('-append') and arg[7:] in ('top', 'bottom'):
+            options['append'] = arg[7:]
         elif arg == "-force":
-            force = True
+            options['force'] = True
         elif arg == "-safe":
-            force = False
-            append = None
+            options['force'] = False
+            options['append'] = None
         elif arg == '-notitle':
             notitle = True
         elif arg == '-minor':
-            minor = True
+            options['minor'] = True
         elif arg.startswith('-nocontent:'):
-            nocontent = arg[11:]
+            options['nocontent'] = arg[11:]
         elif arg.startswith("-titlestart:"):
             titleStartMarker = arg[12:]
         elif arg.startswith("-titleend:"):
             titleEndMarker = arg[10:]
         elif arg.startswith("-summary:"):
-            summary = arg[9:]
+            options['summary'] = arg[9:]
         elif arg == '-autosummary':
-            autosummary = True
+            options['autosummary'] = True
         else:
             pywikibot.output(u"Disregarding unknown argument %s." % arg)
 
     reader = PageFromFileReader(filename, pageStartMarker, pageEndMarker,
                                 titleStartMarker, titleEndMarker, include,
                                 notitle)
-    bot = PageFromFileRobot(reader, force, append, summary, minor, autosummary,
-                            nocontent)
+    bot = PageFromFileRobot(reader, **options)
     bot.run()
 
 if __name__ == "__main__":
