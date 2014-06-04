@@ -71,7 +71,9 @@ replacements = (
     ('\.sectionFreeTitle\s*\(\s*\)', '.title(withSection=False)'),
     ('\.aslink\s*\(\s*\)', '.title(asLink=True)'),
     # other deprecated methods
-    ('\.encoding\s*\(\s*\)', '.site.encoding()'),
+    ('(?<!site)\.encoding\s*\(\s*\)', '.site.encoding()'),
+    # new core methods
+    ('\.get\s*\(\s*get_redirect\s*=\s*True\s*\)', '.text'),
     # stopme() is doen by the framework itself
     ('(\s*)try\:\s*\r?\n\s+main\(\)\s*\r?\n\s*finally\:\s*\r?\n\s+pywikibot\.stopme\(\)',
      r'\1main()'),
