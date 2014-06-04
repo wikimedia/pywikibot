@@ -76,9 +76,9 @@ class CategoryRedirectBot(object):
         self.dbl_redir_comment = 'category_redirect-fix-double'
         self.maint_comment = 'category_redirect-comment'
         self.edit_request_text = i18n.twtranslate(
-            self.site.lang, 'category_redirect-edit-request') + u'\n~~~~'
+            self.site.code, 'category_redirect-edit-request') + u'\n~~~~'
         self.edit_request_item = i18n.twtranslate(
-            self.site.lang, 'category_redirect-edit-request-item')
+            self.site.code, 'category_redirect-edit-request-item')
 
     def move_contents(self, oldCatTitle, newCatTitle, editSummary):
         """The worker function that moves pages out of oldCat into newCat"""
@@ -215,7 +215,7 @@ class CategoryRedirectBot(object):
 
         # check for hard-redirected categories that are not already marked
         # with an appropriate template
-        comment = i18n.twtranslate(self.site.lang, self.redir_comment)
+        comment = i18n.twtranslate(self.site.code, self.redir_comment)
         for page in pagegenerators.PreloadingGenerator(
                 self.site.allpages(namespace=14, filterredir=True), step=250):
             # generator yields all hard redirect pages in namespace 14
@@ -238,7 +238,8 @@ class CategoryRedirectBot(object):
                            % {'cat': target.title(withNamespace=False),
                               'template': template_list[0]})
                 try:
-                    page.put(newtext, comment, minorEdit=True)
+                    page.text = newtext
+                    page.save(comment)
                     self.log_text.append(u"* Added {{tl|%s}} to %s"
                                          % (template_list[0],
                                             page.title(asLink=True,
@@ -255,7 +256,7 @@ class CategoryRedirectBot(object):
 
         pywikibot.output("Done checking hard-redirect category pages.")
 
-        comment = i18n.twtranslate(self.site.lang, self.move_comment)
+        comment = i18n.twtranslate(self.site.code, self.move_comment)
         counts, destmap, catmap = {}, {}, {}
         catlist, nonemptypages = [], []
         redircat = pywikibot.Category(
@@ -294,7 +295,7 @@ class CategoryRedirectBot(object):
                     pass
                 # do a null edit on cat
                 try:
-                    cat.put(cat.get(get_redirect=True))
+                    cat.save()
                 except:
                     pass
 
@@ -333,7 +334,7 @@ class CategoryRedirectBot(object):
                 # do a null edit on cat to update any special redirect
                 # categories this wiki might maintain
                 try:
-                    cat.put(cat.get(get_redirect=True))
+                    cat.save()
                 except:
                     pass
                 continue
@@ -345,7 +346,7 @@ class CategoryRedirectBot(object):
                                                       textlink=True))
                     # do a null edit on cat
                     try:
-                        cat.put(cat.get(get_redirect=True))
+                        cat.save()
                     except:
                         pass
                 else:
@@ -354,7 +355,7 @@ class CategoryRedirectBot(object):
                         % (cat.title(asLink=True, textlink=True),
                            dest.title(asLink=True, textlink=True),
                            double.title(asLink=True, textlink=True)))
-                    oldtext = cat.get(get_redirect=True)
+                    oldtext = cat.text
                     # remove the old redirect from the old text,
                     # leaving behind any non-redirect text
                     oldtext = template_regex.sub("", oldtext)
@@ -363,10 +364,9 @@ class CategoryRedirectBot(object):
                                   'ncat': double.title(withNamespace=False)})
                     newtext = newtext + oldtext.strip()
                     try:
-                        cat.put(newtext,
-                                i18n.twtranslate(self.site.lang,
-                                                 self.dbl_redir_comment),
-                                minorEdit=True)
+                        cat.text = newtext
+                        cat.save(i18n.twtranslate(self.site.code,
+                                                  self.dbl_redir_comment))
                     except pywikibot.Error as e:
                         self.log_text.append("** Failed: %s" % e)
                 continue
@@ -386,30 +386,30 @@ class CategoryRedirectBot(object):
             counts[cat_title] = found
             # do a null edit on cat
             try:
-                cat.put(cat.get(get_redirect=True))
+                cat.save()
             except:
                 pass
-            continue
 
         cPickle.dump(record, open(datafile, "wb"), -1)
 
-        pywikibot.setAction(i18n.twtranslate(self.site.lang,
-                                             self.maint_comment))
         self.log_text.sort()
         problems.sort()
         newredirs.sort()
-        self.log_page.put(u"\n== %i-%02i-%02iT%02i:%02i:%02iZ ==\n"
-                          % time.gmtime()[:6]
-                          + u"\n".join(self.log_text)
-                          + u"\n* New redirects since last report:\n"
-                          + u"\n".join(newredirs)
-                          + u"\n" + u"\n".join(problems)
-                          + u"\n" + self.get_log_text())
+        comment = i18n.twtranslate(self.site.code, self.maint_comment)
+        self.log_page.text = (u"\n== %i-%02i-%02iT%02i:%02i:%02iZ ==\n"
+                              % time.gmtime()[:6]
+                              + u"\n".join(self.log_text)
+                              + u"\n* New redirects since last report:\n"
+                              + u"\n".join(newredirs)
+                              + u"\n" + u"\n".join(problems)
+                              + u"\n" + self.get_log_text())
+        self.log_page.save(comment)
         if self.edit_requests:
-            edit_request_page.put(self.edit_request_text
-                                  % {'itemlist': u"\n" + u"\n".join(
-                                      (self.edit_request_item % item)
-                                      for item in self.edit_requests)})
+            edit_request_page.text = (self.edit_request_text
+                                      % {'itemlist': u"\n" + u"\n".join(
+                                          (self.edit_request_item % item)
+                                          for item in self.edit_requests)})
+            edit_request_page.save(comment)
 
 
 def main(*args):
