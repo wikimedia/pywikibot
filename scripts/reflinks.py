@@ -30,6 +30,9 @@ See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
 
 -ignorepdf        Do not handle PDF files (handy if you use Windows and can't
                   get pdfinfo)
+
+-summary          Use a custom edit summary. Otherwise it uses the default
+                  one from i18n/reflinks.py
 """
 # (C) 2008 - Nicolas Dumazet ( en:User:NicDumZ )
 # (C) Pywikibot team, 2008-2014
@@ -385,7 +388,8 @@ class DuplicateReferences:
 
 class ReferencesRobot:
 
-    def __init__(self, generator, acceptall=False, limit=None, ignorepdf=False):
+    def __init__(self, generator, acceptall=False, limit=None, ignorepdf=False,
+                 summary=None):
         """
         - generator : Page generator
         - acceptall : boolean, is -always on ?
@@ -407,7 +411,10 @@ class ReferencesRobot:
                 break
         if code:
             manual += '/%s' % code
-        self.msg = i18n.twtranslate(self.site, 'reflinks-msg', locals())
+        if summary is None:
+            self.msg = i18n.twtranslate(self.site, 'reflinks-msg', locals())
+        else:
+            self.msg = summary
         self.stopPage = pywikibot.Page(self.site,
                                        pywikibot.translate(self.site, stopPage))
 
@@ -455,10 +462,12 @@ class ReferencesRobot:
             if choice == 'a':
                 self.acceptall = True
             if choice == 'y':
-                page.put_async(new, self.msg)
+                page.text = new
+                page.save(self.msg, async=True)
         if self.acceptall:
             try:
-                page.put(new, self.msg)
+                page.text = new
+                page.save(self.msg)
             except pywikibot.EditConflict:
                 pywikibot.output(u'Skipping %s because of edit conflict'
                                   % (page.title(),))
@@ -786,6 +795,7 @@ def main():
     limit = None
     namespaces = []
     generator = None
+    summary = None
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handleArgs()
@@ -798,7 +808,7 @@ def main():
             except ValueError:
                 namespaces.append(arg[11:])
         elif arg.startswith('-summary:'):
-            pywikibot.setAction(arg[9:])
+            summary = arg[9:]
         elif arg == '-always':
             always = True
         elif arg == '-ignorepdf':
@@ -830,11 +840,11 @@ def main():
         generator = genFactory.getCombinedGenerator()
     if not generator:
         # syntax error, show help text from the top of this file
-        pywikibot.showHelp('reflinks')
+        pywikibot.showHelp()
         return
     generator = pagegenerators.PreloadingGenerator(generator, step=50)
     generator = pagegenerators.RedirectFilterPageGenerator(generator)
-    bot = ReferencesRobot(generator, always, limit, ignorepdf)
+    bot = ReferencesRobot(generator, always, limit, ignorepdf, summary)
     bot.run()
 
 if __name__ == "__main__":
