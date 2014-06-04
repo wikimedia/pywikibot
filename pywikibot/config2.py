@@ -587,15 +587,11 @@ replicate_replace = {}
 
 # Proxy configuration
 
-# assign prox = None to connect directly
-# For proxy support first run: apt-get install python-socks.py
-# then change your user-config.py like:
-# import httplib2
-# import socks
-# proxy = httplib2.ProxyInfo(socks.PROXY_TYPE_HTTP, 'localhost', 8000)
-# The following lines will be printed, but it works:
-# Configuration variable 'httplib2' is defined but unknown. Misspelled?
-# Configuration variable 'socks' is defined but unknown. Misspelled?proxy = None
+# For proxy support, install socksipy or httplib2 0.7+
+# then add these three lines to your user-config.py:
+# from httplib2 import ProxyInfo, socks
+# proxy = ProxyInfo(socks.PROXY_TYPE_HTTP, 'localhost', 8000)
+# del ProxyInfo, socks
 proxy = None
 
 # Simulate settings
