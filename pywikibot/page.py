@@ -2637,7 +2637,7 @@ class WikibasePage(Page):
                 return False
         return 'lastrevid' in self._content
 
-    def get(self, force=False, *args):
+    def get(self, force=False, *args, **kwargs):
         """
         Fetch all page data, and cache it.
 
@@ -2839,7 +2839,7 @@ class ItemPage(WikibasePage):
         i._title = page.title()
         return i
 
-    def get(self, force=False, *args):
+    def get(self, force=False, *args, **kwargs):
         """
         Fetch all item data, and cache it.
 
@@ -2847,7 +2847,7 @@ class ItemPage(WikibasePage):
         @type force: bool
         @param args: values of props
         """
-        super(ItemPage, self).get(force=force, *args)
+        super(ItemPage, self).get(force=force, *args, **kwargs)
 
         # claims
         self.claims = {}

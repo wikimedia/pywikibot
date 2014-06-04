@@ -21,6 +21,7 @@ from tests.utils import PywikibotTestCase, unittest
 site = pywikibot.Site('en', 'wikipedia')
 mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
 wikidata = site.data_repository()
+wikidatatest = pywikibot.Site('test', 'wikidata').data_repository()
 
 
 # fetch a page which is very likely to be unconnected, which doesnt have
@@ -301,6 +302,21 @@ class TestClaimSetValue(PywikibotTestCase):
         self.assertRaises(ValueError, claim.setTarget, 'foo')
         claim = pywikibot.Claim(wikidata, 'P856')
         self.assertRaises(ValueError, claim.setTarget, pywikibot.WbTime(2001))
+
+
+class TestPageMethods(PywikibotTestCase):
+    """Test cases to test methods of Page() behave correctly with Wikibase"""
+
+    def test_item_save(self):
+        self.wdp = pywikibot.ItemPage(wikidatatest, 'Q6')
+        item = self.wdp.data_item()
+        self.assertRaises(APIError, item.title)
+        self.assertRaises(pywikibot.PageNotSaved, self.wdp.save)
+        self.wdp.previousRevision()
+        self.assertEquals(self.wdp.langlinks(), [])
+        self.assertEquals(self.wdp.templates(), [])
+        self.assertFalse(self.wdp.isCategoryRedirect())
+        self.wdp.templatesWithParams()
 
 
 class TestLinks(PywikibotTestCase):
