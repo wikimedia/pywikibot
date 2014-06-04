@@ -343,18 +343,11 @@ class FeaturedBot(pywikibot.Bot):
             self.featuredWithInterwiki(fromsite, task)
 
     def featuredArticles(self, site, task, cache):
-        code = site.lang
         articles = []
-        if task == 'good':
-            info = good_name
-            code = 'wikidata'
-        elif task == 'former':
-            info = former_name
-            code = 'wikidata'
-        elif task == 'list':
-            info = lists_name
+        info = globals()[task + '_name']
+        if task == 'lists':
+            code = site.code
         else:
-            info = featured_name
             code = 'wikidata'
         try:
             method = info[code][0]
@@ -487,7 +480,7 @@ class FeaturedBot(pywikibot.Bot):
                 remove_templates += template['_default']
             except KeyError:
                 remove_templates = template['_default']
-        elif task == 'list':
+        elif task == 'lists':
             try:
                 add_templates = template_lists[lang]
                 add_templates += template_lists['_default']
