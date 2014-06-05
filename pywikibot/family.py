@@ -964,7 +964,7 @@ class Family(object):
 
         """
         # Here we return the latest mw release for downloading
-        return '1.24wmf7'
+        return '1.23.0'
 
     @pywikibot.deprecated("version()")
     def versionnumber(self, code):
@@ -1074,8 +1074,8 @@ class WikimediaFamily(Family):
         Use LooseVersion from distutils.version to compate versions.
 
         """
-        # Here we return the latest mw release for downloading
-        return '1.24wmf5'
+        # Here we return the latest mw release of wikimedia projects
+        return '1.24wmf6'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
