@@ -843,9 +843,9 @@ def categoryFormat(categories, insite=None):
         if categories[0][0] == '[':
             catLinks = categories
         else:
-            catLinks = ['[[Category:' + category + ']]' for category in categories]
+            catLinks = ['[[Category:%s]]' % category for category in categories]
     else:
-        catLinks = [category.aslink(noInterwiki=True)
+        catLinks = [category.title(asLink=True, allowInterwiki=False)
                     for category in categories]
 
     if insite.category_on_one_line():
