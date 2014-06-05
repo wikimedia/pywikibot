@@ -489,6 +489,7 @@ from .page import html2unicode, url2unicode, unicode2html
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 
+@deprecated("comment parameter for page saving method")
 def setAction(s):
     """Set a summary to use for changed page submissions"""
     config.default_edit_summary = s
