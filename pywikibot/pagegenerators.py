@@ -129,13 +129,16 @@ parameterHelp = u"""\
                   Argument can be given as "-unusedfiles:n" where
                   n is the maximum number of articles to work on.
 
+-lonelypages      Work on all articles that are not linked from any other article.
+                  Argument can be given as "-lonelypages:n" where
+                  n is the maximum number of articles to work on.
+
 -unwatched        Work on all articles that are not watched by anyone.
                   Argument can be given as "-unwatched:n" where
                   n is the maximum number of articles to work on.
 
 -usercontribs     Work on all articles that were edited by a certain user :
                   Example : -usercontribs:DumZiBoT
-
 
 -weblink          Work on all articles that contain an external link to
                   a given URL; may be given as "-weblink:url"
@@ -307,6 +310,11 @@ class GeneratorFactory(object):
                 gen = UnusedFilesGenerator()
             else:
                 gen = UnusedFilesGenerator(total=int(arg[13:]))
+        elif arg.startswith('-lonelypages'):
+            if len(arg) == 12:
+                gen = LonelyPagesPageGenerator()
+            else:
+                gen = LonelyPagesPageGenerator(total=int(arg[13:]))
         elif arg.startswith('-unwatched'):
             if len(arg) == 10:
                 gen = UnwatchedPagesPageGenerator()
