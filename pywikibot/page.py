@@ -2580,10 +2580,16 @@ class WikibasePage(Page):
         self._isredir = False  # Wikibase pages cannot be a redirect
 
     def title(self, **kwargs):
-        """ Page title. """
+        """ Page title.
+
+        If the item was instantiated without an ID,
+        fetch the ID and reparse the title.
+        """
         if self.namespace() == 0:
-            self._link._text = self.getID()
-            del self._link._title
+            self.getID()
+            if self._link._text != self.id:
+                self._link._text = self.id
+                del self._link._title
         return Page(self).title(**kwargs)
 
     @deprecated("_defined_by")

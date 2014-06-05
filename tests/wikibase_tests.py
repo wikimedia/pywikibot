@@ -167,6 +167,46 @@ class TestItemLoad(PywikibotTestCase):
         item.get()
         self.assertEquals(hasattr(item, '_content'), True)
 
+    def test_load_item_set_id(self):
+        """Test setting item.id attribute on empty item."""
+        item = pywikibot.ItemPage(wikidata, '-1')
+        self.assertEquals(item._link._title, '-1')
+        item.id = 'Q60'
+        self.assertEquals(hasattr(item, '_content'), False)
+        self.assertEquals(item.getID(), 'Q60')
+        self.assertEquals(hasattr(item, '_content'), False)
+        item.get()
+        self.assertEquals(hasattr(item, '_content'), True)
+        self.assertTrue('en' in item.labels)
+        self.assertEquals(item.labels['en'], 'New York City')
+        self.assertEquals(item.title(), 'Q60')
+
+    def test_reuse_item_set_id(self):
+        """
+        Test modifying item.id attribute.
+
+        Some scripts are using item.id = 'Q60' semantics, which does work
+        but modifying item.id does not currently work, and this test
+        highlights that it breaks silently.
+        """
+        item = pywikibot.ItemPage(wikidata, 'Q60')
+        item.get()
+        self.assertEquals(item.labels['en'], 'New York City')
+
+        # When the id attribute is modified, the ItemPage goes into
+        # an inconsistent state.
+        item.id = 'Q5296'
+        # The title is updated correctly
+        self.assertEquals(item.title(), 'Q5296')
+
+        # This del has no effect on the test; it is here to demonstrate that
+        # it doesnt help to clear this piece of saved state.
+        del item._content
+        # The labels are not updated; assertion showing undesirable behaviour:
+        self.assertEquals(item.labels['en'], 'New York City')
+        # TODO: This is the assertion that this test should be using:
+        #self.assertTrue(item.labels['en'].lower().endswith('main page'))
+
     def test_empty_item(self):
         # should not raise an error as the constructor only requires
         # the site parameter, with the title parameter defaulted to None
