@@ -3,7 +3,7 @@
 Interface functions to Mediawiki's api.php
 """
 #
-# (C) Pywikipedia bot team, 2007-12
+# (C) Pywikipedia bot team, 2007-14
 #
 # Distributed under the terms of the MIT license.
 #
@@ -249,8 +249,8 @@ class Request(MutableMapping):
         @return:  The data retrieved from api.php (a dict)
 
         """
-        paramstring = self.http_params()
         while True:
+            paramstring = self.http_params()
             action = self.params.get("action", "")
             simulate = self._simulate(action)
             if simulate:
