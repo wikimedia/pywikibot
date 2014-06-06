@@ -21,7 +21,7 @@ class DrySite(pywikibot.site.APISite):
 
 class TestDrySite(PywikibotTestCase):
     def test_logged_in(self):
-        x = DrySite('en')
+        x = DrySite('en', 'wikipedia')
 
         x._userinfo = {'name': None, 'groups': []}
         x._username = ['normal_user', 'sysop_user']
