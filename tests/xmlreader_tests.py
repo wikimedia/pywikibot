@@ -17,8 +17,9 @@ from tests.utils import unittest
 
 class XmlReaderTestCase(unittest.TestCase):
 
-    def setUp(self):
-        self.path = os.path.dirname(os.path.abspath(__file__))
+    @classmethod
+    def setUpClass(cls):
+        cls.path = os.path.dirname(os.path.abspath(__file__))
 
     def test_XmlDumpAllRevs(self):
         pages = [r for r in
