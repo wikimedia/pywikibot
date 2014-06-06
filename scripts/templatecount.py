@@ -31,7 +31,7 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}.
 """
 #
 # (c) Pywikibot team, 2006-2014
-# (c) xqt, 2009-2013
+# (c) xqt, 2009-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -113,10 +113,8 @@ def main():
     namespaces = []
 
     for arg in pywikibot.handleArgs():
-        if arg == '-count':
-            operation = "Count"
-        elif arg == '-list':
-            operation = "List"
+        if arg in ('-count', '-list'):
+            operation = arg[1:]
         elif arg.startswith('-namespace:'):
             try:
                 namespaces.append(int(arg[len('-namespace:'):]))
@@ -142,12 +140,10 @@ def main():
             argsList.remove('reflist')
         elif choice == 'n':
             return
-        else:
-            pass
 
-    if operation == "Count":
+    if operation == "count":
         robot.countTemplates(argsList, namespaces)
-    elif operation == "List":
+    elif operation == "list":
         robot.listTemplates(argsList, namespaces)
 
 if __name__ == "__main__":
