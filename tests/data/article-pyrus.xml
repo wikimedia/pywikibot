@@ -1,0 +1,101 @@
+<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mediawiki.org/xml/export-0.3/ http://www.mediawiki.org/xml/export-0.3.xsd" version="0.3" xml:lang="en">
+  <siteinfo>
+    <sitename>Wikipedia</sitename>
+    <base>http://en.wikipedia.org/wiki/Main_Page</base>
+    <generator>MediaWiki 1.16alpha-wmf</generator>
+    <case>first-letter</case>
+    <namespaces>
+      <namespace key="-2">Media</namespace>
+      <namespace key="-1">Special</namespace>
+      <namespace key="0" />
+      <namespace key="1">Talk</namespace>
+      <namespace key="2">User</namespace>
+      <namespace key="3">User talk</namespace>
+      <namespace key="4">Wikipedia</namespace>
+      <namespace key="5">Wikipedia talk</namespace>
+      <namespace key="6">File</namespace>
+      <namespace key="7">File talk</namespace>
+      <namespace key="8">MediaWiki</namespace>
+      <namespace key="9">MediaWiki talk</namespace>
+      <namespace key="10">Template</namespace>
+      <namespace key="11">Template talk</namespace>
+      <namespace key="12">Help</namespace>
+      <namespace key="13">Help talk</namespace>
+      <namespace key="14">Category</namespace>
+      <namespace key="15">Category talk</namespace>
+      <namespace key="100">Portal</namespace>
+      <namespace key="101">Portal talk</namespace>
+    </namespaces>
+  </siteinfo>
+  <page>
+    <title>Pyrus</title>
+    <id>9261472</id>
+    <redirect />
+    <revision>
+      <id>104997415</id>
+      <timestamp>2007-02-02T02:39:52Z</timestamp>
+      <contributor>
+        <username>Melburnian</username>
+        <id>555187</id>
+      </contributor>
+      <comment>moved [[Pyrus]] to [[Pyrus (brand)]]: all links to ''Pyrus'' are related to the pear tree or fruit</comment>
+      <text xml:space="preserve">#REDIRECT [[Pyrus (brand)]]</text>
+    </revision>
+    <revision>
+      <id>104997738</id>
+      <timestamp>2007-02-02T02:41:24Z</timestamp>
+      <contributor>
+        <username>Melburnian</username>
+        <id>555187</id>
+      </contributor>
+      <comment>all links to ''Pyrus'' are related to the pear tree or fruit</comment>
+      <text xml:space="preserve">#REDIRECT [[Pear]]</text>
+    </revision>
+    <revision>
+      <id>189729426</id>
+      <timestamp>2008-02-07T14:06:10Z</timestamp>
+      <contributor>
+        <username>Jkokemueller</username>
+        <id>6303952</id>
+      </contributor>
+      <comment>Added disambiguation</comment>
+      <text xml:space="preserve">'''Pyrus''' may refer to:
+
+* [[Pear]], trees of the genus ''Pyrus'' and the fruit of that tree, edible in some species
+* [[Main//Pyrus DMS]], a [[Document Management System]]</text>
+    </revision>
+    <revision>
+      <id>190346463</id>
+      <timestamp>2008-02-10T07:21:12Z</timestamp>
+      <contributor>
+        <username>IceCreamAntisocial</username>
+        <id>346507</id>
+      </contributor>
+      <minor/>
+      <comment>rv</comment>
+      <text xml:space="preserve">#REDIRECT [[Pear]]</text>
+    </revision>
+    <revision>
+      <id>238138507</id>
+      <timestamp>2008-09-13T12:57:33Z</timestamp>
+      <contributor>
+        <username>Cottonapple4</username>
+        <id>7707615</id>
+      </contributor>
+      <comment>[[WP:AES|←]] Redirected page to [[Pear]]</comment>
+      <text xml:space="preserve">#REDIRECT [[Pear]]
+[[Category:Maloideae]]</text>
+    </revision>
+    <revision>
+      <id>238392911</id>
+      <timestamp>2008-09-14T17:08:56Z</timestamp>
+      <contributor>
+        <username>Rkitko</username>
+        <id>536375</id>
+      </contributor>
+      <minor/>
+      <comment>Reverted edits by [[Special:Contributions/Cottonapple4|Cottonapple4]] ([[User talk:Cottonapple4|talk]]) to last version by IceCreamAntisocial</comment>
+      <text xml:space="preserve">#REDIRECT [[Pear]]</text>
+    </revision>
+  </page>
+</mediawiki>
