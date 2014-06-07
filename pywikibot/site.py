@@ -3728,9 +3728,6 @@ class DataSite(APISite):
         except KeyError:
             dtype = data['entities'][prop.getID().lower()]['datatype']
 
-        if dtype == 'globe-coordinate':
-            dtype = 'globecoordinate'
-            # TODO Fix this
         return dtype
 
     @must_be(group='user')

@@ -2765,12 +2765,53 @@ class ItemPage(WikibasePage):
         self.repo.mergeItems(fromItem=self, toItem=item, **kwargs)
 
 
-class PropertyPage(WikibasePage):
+class Property():
+    types = {'wikibase-item': ItemPage,
+             'string': basestring,
+             'commonsMedia': ImagePage,
+             'globe-coordinate': pywikibot.Coordinate,
+             'url': basestring,
+             'time': pywikibot.WbTime,
+             'quantity': pywikibot.WbQuantity,
+             }
+
+    def __init__(self, site, id=None):
+        self.repo = site
+        self.id = id.upper()
+
+    @property
+    def type(self):
+        """
+        Return the type of this property
+        """
+        if not hasattr(self, '_type'):
+            self._type = self.repo.getPropertyType(self)
+        return self._type
+
+    @deprecated("Property.type")
+    def getType(self):
+        """
+        Return the type of this property
+        It returns 'globecoordinate' for type 'globe-coordinate'
+        in order to be backwards compatible.  See
+        https://gerrit.wikimedia.org/r/#/c/135405/ for background.
+        """
+        if self.type == 'globe-coordinate':
+            return 'globecoordinate'
+        else:
+            return self._type
+
+    def getID(self):
+        return self.id
+
+
+class PropertyPage(WikibasePage, Property):
     """
     Any page in the property namespace
     Should be created as:
         PropertyPage(DataSite, 'Property:P21')
     """
+
     def __init__(self, source, title=u""):
         """
         @param source: data repository property is on
@@ -2778,6 +2819,7 @@ class PropertyPage(WikibasePage):
         @param title: page name of property, like "Property:P##"
         """
         WikibasePage.__init__(self, source, title, ns=120)
+        Property.__init__(self, source, title)
         self.id = self.title(withNamespace=False).upper()
         if not self.id.startswith(u'P'):
             raise ValueError(u"'%s' is not a property page!" % self.title())
@@ -2786,15 +2828,6 @@ class PropertyPage(WikibasePage):
         if force or not hasattr(self, '_content'):
             WikibasePage.get(self, force=force, *args)
         self.type = self._content['datatype']
-
-    def getType(self):
-        """
-        Returns the type that this item uses
-        Examples: item, commons media file, StringValue, NumericalValue
-        """
-        if not hasattr(self, 'type'):
-            self.type = self.repo.getPropertyType(self)
-        return self.type
 
     def newClaim(self, *args, **kwargs):
         """
@@ -2816,7 +2849,7 @@ class QueryPage(WikibasePage):
             raise ValueError(u"'%s' is not a query page!" % self.title())
 
 
-class Claim(PropertyPage):
+class Claim(Property):
     """
     Claims are standard claims as well as references.
     """
@@ -2833,7 +2866,7 @@ class Claim(PropertyPage):
         @param isReference: whether specified claim is a reference
         @param isQualifier: whether specified claim is a qualifier
         """
-        PropertyPage.__init__(self, site, 'Property:' + pid)
+        Property.__init__(self, site, pid)
         self.snak = snak
         self.hash = hash
         self.isReference = isReference
@@ -2864,15 +2897,15 @@ class Claim(PropertyPage):
         claim.snaktype = data['mainsnak']['snaktype']
         if claim.getSnakType() == 'value':
             value = data['mainsnak']['datavalue']['value']
-            if claim.getType() == 'wikibase-item':
+            if claim.type == 'wikibase-item':
                 claim.target = ItemPage(site, 'Q' + str(value['numeric-id']))
-            elif claim.getType() == 'commonsMedia':
+            elif claim.type == 'commonsMedia':
                 claim.target = ImagePage(site.image_repository(), value)
-            elif claim.getType() == 'globecoordinate':
+            elif claim.type == 'globe-coordinate':
                 claim.target = pywikibot.Coordinate.fromWikibase(value, site)
-            elif claim.getType() == 'time':
+            elif claim.type == 'time':
                 claim.target = pywikibot.WbTime.fromWikibase(value)
-            elif claim.getType() == 'quantity':
+            elif claim.type == 'quantity':
                 claim.target = pywikibot.WbQuantity.fromWikibase(value)
             else:
                 # This covers string, url types
@@ -2919,18 +2952,10 @@ class Claim(PropertyPage):
         Sets the target to the passed value.
         There should be checks to ensure type compliance
         """
-        types = {'wikibase-item': ItemPage,
-                 'string': basestring,
-                 'commonsMedia': ImagePage,
-                 'globecoordinate': pywikibot.Coordinate,
-                 'url': basestring,
-                 'time': pywikibot.WbTime,
-                 'quantity': pywikibot.WbQuantity,
-                 }
-        if self.getType() in types:
-            if not isinstance(value, types[self.getType()]):
-                raise ValueError("%s is not type %s."
-                                 % (value, str(types[self.getType()])))
+        value_class = self.types[self.type]
+        if not isinstance(value, value_class):
+            raise ValueError("%s is not type %s."
+                                 % (value, value_class))
         self.target = value
 
     def changeTarget(self, value=None, snaktype='value', **kwargs):
@@ -3047,18 +3072,18 @@ class Claim(PropertyPage):
         """
         Format the target into the proper JSON datavalue that Wikibase wants
         """
-        if self.getType() == 'wikibase-item':
+        if self.type == 'wikibase-item':
             value = {'entity-type': 'item',
                      'numeric-id': self.getTarget().getID(numeric=True)}
-        elif self.getType() in ('string', 'url'):
+        elif self.type in ('string', 'url'):
             value = self.getTarget()
-        elif self.getType() == 'commonsMedia':
+        elif self.type == 'commonsMedia':
             value = self.getTarget().title(withNamespace=False)
-        elif self.getType() in ('globecoordinate', 'time', 'quantity'):
+        elif self.type in ('globe-coordinate', 'time', 'quantity'):
             value = self.getTarget().toWikibase()
         else:
             raise NotImplementedError('%s datatype is not supported yet.'
-                                      % self.getType())
+                                      % self.type)
         return value
 
 
