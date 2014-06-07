@@ -229,7 +229,9 @@ class FeaturedBot(pywikibot.Bot):
         self.filename = None
         self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
-        if self.getOption('fromlang') is True:  # must be a list
+
+        # if no source site is given, give up
+        if self.getOption('fromlang') is True:
             self.options['fromlang'] = False
 
         # setup tasks running
@@ -406,56 +408,49 @@ class FeaturedBot(pywikibot.Bot):
             if not quiet:
                 pywikibot.output(u"%s -> no corresponding page in %s"
                                  % (page.title(), oursite))
-            return
-
-        if ourpage.section():
+        elif ourpage.section():
             pywikibot.output(u"%s -> our page is a section link: %s"
                              % (page.title(), ourpage.title()))
-            return
-
-        if not ourpage.exists():
+        elif not ourpage.exists():
             pywikibot.output(u"%s -> our page doesn't exist: %s"
                              % (page.title(), ourpage.title()))
-            return
+        else:
+            if ourpage.isRedirectPage():
+                ourpage = ourpage.getRedirectTarget()
 
-        if ourpage.isRedirectPage():
-            ourpage = ourpage.getRedirectTarget()
-        pywikibot.output(u"%s -> corresponding page is %s"
-                         % (page.title(), ourpage.title()))
-        if ourpage.namespace() != 0:
-            pywikibot.output(u"%s -> not in the main namespace, skipping"
-                             % page.title())
-            return
-
-        if ourpage.isRedirectPage():
-            pywikibot.output(u"%s -> double redirect, skipping" % page.title())
-            return
-
-        if not ourpage.exists():
-            pywikibot.output(u"%s -> page doesn't exist, skipping"
-                             % ourpage.title())
-            return
-
-        backpage = None
-        for link in ourpage.iterlanglinks():
-            if link.site == page.site:
-                backpage = pywikibot.Page(link)
-                break
-
-        if not backpage:
-            pywikibot.output(u"%s -> no back interwiki ref" % page.title())
-            return
-
-        if backpage == page:
-            # everything is ok
-            return ourpage
-        if backpage.isRedirectPage():
-            backpage = backpage.getRedirectTarget()
-        if backpage == page:
-            # everything is ok
-            return ourpage
-        pywikibot.output(u"%s -> back interwiki ref target is %s"
-                         % (page.title(), backpage.title()))
+            pywikibot.output(u"%s -> corresponding page is %s"
+                             % (page.title(), ourpage.title()))
+            if ourpage.namespace() != 0:
+                pywikibot.output(u"%s -> not in the main namespace, skipping"
+                                 % page.title())
+            elif ourpage.isRedirectPage():
+                pywikibot.output(u"%s -> double redirect, skipping" % page.title())
+            elif not ourpage.exists():
+                pywikibot.output(u"%s -> page doesn't exist, skipping"
+                                 % ourpage.title())
+            else:
+                backpage = None
+                for link in ourpage.iterlanglinks():
+                    if link.site == page.site:
+                        backpage = pywikibot.Page(link)
+                        break
+                if not backpage:
+                    pywikibot.output(u"%s -> no back interwiki ref" % page.title())
+                elif backpage == page:
+                    # everything is ok
+                    yield ourpage
+                elif backpage.isRedirectPage():
+                    backpage = backpage.getRedirectTarget()
+                    if backpage == page:
+                        # everything is ok
+                        yield ourpage
+                    else:
+                        pywikibot.output(
+                            u"%s -> back interwiki ref target is redirect to %s"
+                            % (page.title(), backpage.title()))
+                else:
+                    pywikibot.output(u"%s -> back interwiki ref target is %s"
+                                     % (page.title(), backpage.title()))
 
     def getTemplateList(self, code, task):
         add_templates = []
@@ -497,14 +492,12 @@ class FeaturedBot(pywikibot.Bot):
         return add_templates, remove_templates
 
     def featuredWithInterwiki(self, fromsite, task):
-        """Place or remove the Link_GA/FA template on/from a page"""
+        """ Read featured articles and find the corresponding pages.
 
-        def compile_link(site, templates):
-            """compile one link template list"""
-            findtemplate = '(%s)' % '|'.join(templates)
-            return re.compile(r"\{\{%s\|%s\}\}"
-                              % (findtemplate.replace(u' ', u'[ _]'),
-                                 site.code), re.IGNORECASE)
+        Find corresponding pages on other sites, place the template and
+        remember the page in the cache dict.
+
+        """
 
         tosite = self.site
         if fromsite.code not in self.cache:
@@ -522,73 +515,84 @@ class FeaturedBot(pywikibot.Bot):
             return  # count only, we are ready here
         gen = PreloadingGenerator(gen)
 
-        add_tl, remove_tl = self.getTemplateList(tosite.code, task)
-        re_Link_add = compile_link(fromsite, add_tl)
-        re_Link_remove = compile_link(fromsite, remove_tl)
-        interactive = self.getOption('interactive')
         for source in gen:
             if source.isRedirectPage():
                 source = source.getRedirectTarget()
 
             if not source.exists():
                 pywikibot.output(u"source page doesn't exist: %s"
-                                 % source.title())
+                                 % source)
                 continue
 
-            atrans = self.findTranslated(source, tosite)
-            if not atrans:
-                continue
+            for dest in self.findTranslated(source, tosite):
+                self.add_template(source, dest, task, fromsite)
+                cc[source.title()] = dest.title()
 
-            text = atrans.text
-            m1 = add_tl and re_Link_add.search(text)
-            m2 = remove_tl and re_Link_remove.search(text)
-            changed = False
-            if add_tl:
-                if m1:
-                    pywikibot.output(u"(already added)")
-                else:
-                    # insert just before interwiki
-                    if (not interactive or
-                        pywikibot.input(
-                            u'Connecting %s -> %s. Proceed? [Y/N]'
-                            % (source.title(), atrans.title())) in ['Y', 'y']):
-                        if self.getOption('side'):
-                            # Placing {{Link FA|xx}} right next to
-                            # corresponding interwiki
-                            text = (text[:m1.end()] +
-                                    u" {{%s|%s}}" % (add_tl[0], fromsite.code) +
-                                    text[m1.end():])
-                        else:
-                            # Moving {{Link FA|xx}} to top of interwikis
-                            iw = pywikibot.getLanguageLinks(text, self.site)
-                            text = pywikibot.removeLanguageLinks(text, self.site)
-                            text += u"%s{{%s|%s}}%s" % (LS, add_tl[0],
-                                                        fromsite.code, LS)
-                            text = pywikibot.replaceLanguageLinks(text,
-                                                                  iw, self.site)
-                        changed = True
-            if remove_tl:
-                if m2:
-                    if (changed or  # Don't force the user to say "Y" twice
-                        not interactive or
-                        pywikibot.input(
-                            u'Connecting %s -> %s. Proceed? [Y/N]'
-                            % (source.title(), atrans.title())) in ['Y', 'y']):
-                        text = re.sub(re_Link_remove, '', text)
-                        changed = True
-                elif task == 'former':
-                    pywikibot.output(u"(already removed)")
-            cc[source.title()] = atrans.title()
-            if changed:
-                comment = i18n.twtranslate(self.site, 'featured-' + task,
-                                           {'page': unicode(source)})
-                try:
-                    atrans.put(text, comment)
-                except pywikibot.LockedPage:
-                    pywikibot.output(u'Page %s is locked!'
-                                     % atrans.title())
-                except pywikibot.PageNotSaved:
-                    pywikibot.output(u"Page not saved")
+    def add_template(self, source, dest, task, fromsite):
+        """Place or remove the Link_GA/FA template on/from a page."""
+
+        def compile_link(site, templates):
+            """compile one link template list."""
+            findtemplate = '(%s)' % '|'.join(templates)
+            return re.compile(r"\{\{%s\|%s\}\}"
+                              % (findtemplate.replace(u' ', u'[ _]'),
+                                 site.code), re.IGNORECASE)
+
+        tosite = dest.site
+        add_tl, remove_tl = self.getTemplateList(tosite.code, task)
+        re_Link_add = compile_link(fromsite, add_tl)
+        re_Link_remove = compile_link(fromsite, remove_tl)
+
+        text = dest.text
+        m1 = add_tl and re_Link_add.search(text)
+        m2 = remove_tl and re_Link_remove.search(text)
+        changed = False
+        interactive = self.getOption('interactive')
+        if add_tl:
+            if m1:
+                pywikibot.output(u"(already added)")
+            else:
+                # insert just before interwiki
+                if (not interactive or
+                    pywikibot.input(
+                        u'Connecting %s -> %s. Proceed? [Y/N]'
+                        % (source.title(), dest.title())) in ['Y', 'y']):
+                    if self.getOption('side'):
+                        # Placing {{Link FA|xx}} right next to
+                        # corresponding interwiki
+                        text = (text[:m1.end()] +
+                                u" {{%s|%s}}" % (add_tl[0], fromsite.code) +
+                                text[m1.end():])
+                    else:
+                        # Moving {{Link FA|xx}} to top of interwikis
+                        iw = pywikibot.getLanguageLinks(text, tosite)
+                        text = pywikibot.removeLanguageLinks(text, tosite)
+                        text += u"%s{{%s|%s}}%s" % (LS, add_tl[0],
+                                                    fromsite.code, LS)
+                        text = pywikibot.replaceLanguageLinks(text,
+                                                              iw, tosite)
+                    changed = True
+        if remove_tl:
+            if m2:
+                if (changed or  # Don't force the user to say "Y" twice
+                    not interactive or
+                    pywikibot.input(
+                        u'Connecting %s -> %s. Proceed? [Y/N]'
+                        % (source.title(), dest.title())) in ['Y', 'y']):
+                    text = re.sub(re_Link_remove, '', text)
+                    changed = True
+            elif task == 'former':
+                pywikibot.output(u"(already removed)")
+        if changed:
+            comment = i18n.twtranslate(tosite, 'featured-' + task,
+                                       {'page': unicode(source)})
+            try:
+                dest.put(text, comment)
+            except pywikibot.LockedPage:
+                pywikibot.output(u'Page %s is locked!'
+                                 % dest.title())
+            except pywikibot.PageNotSaved:
+                pywikibot.output(u"Page not saved")
 
 
 def main(*args):
