@@ -17,19 +17,23 @@ class Family(family.WikimediaFamily):
         self.interwiki_forward = 'wikipedia'
 
         self.category_redirect_templates = {
-            'commons': (u'Category redirect',
-                        u'Categoryredirect',
-                        u'Synonym taxon category redirect',
-                        u'Invalid taxon category redirect',
-                        u'Monotypic taxon category redirect',
-                        u'See cat',
-                        u'Seecat',
-                        u'See category',
-                        u'Catredirect',
-                        u'Cat redirect',
-                        u'Cat-red',
-                        u'Catredir',
-                        u'Redirect category'),
+            'commons': (
+                u'Category redirect',
+                u'Categoryredirect',
+                u'Catredirect',
+                u'Cat redirect',
+                u'Catredir',
+                u'Cat-red',
+                u'See cat',
+                u'Seecat',
+                u'See category',
+                u'Redirect category',
+                u'Redirect cat',
+                u'Redir cat',
+                u'Synonym taxon category redirect',
+                u'Invalid taxon category redirect',
+                u'Monotypic taxon category redirect',
+            ),
         }
 
         self.disambcatname = {
