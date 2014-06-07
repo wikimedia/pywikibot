@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """ Script to create user files (user-config.py, user-fixes.py) """
 #
-# (C) Pywikibot team, 2010-2013
+# (C) Pywikibot team, 2010-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -79,7 +79,7 @@ def listchoice(clist=[], message=None, default=None):
     message += u": "
 
     for n, i in enumerate(clist):
-        print (u"%d: %s" % (n + 1, i))
+        print(u"%d: %s" % (n + 1, i))
 
     while True:
         choice = raw_input(message)
@@ -135,12 +135,12 @@ the environment variable "PYWIKIBOT2_DIR" equal to this directory name in
 your operating system. See your operating system documentation for how to
 set environment variables.""" % locals(), width=76)
     for line in msg:
-        print line
+        print(line)
     ok = raw_input("Is this OK? ([y]es, [N]o) ")
     if ok in ["Y", "y"]:
         base_dir = new_base
         return True
-    print "Aborting changes."
+    print("Aborting changes.")
     return False
 
 
