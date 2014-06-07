@@ -227,6 +227,7 @@ class FeaturedBot(pywikibot.Bot):
         self.cache = dict()
         self.filename = None
         self.site = pywikibot.Site()
+        self.repo = self.site.data_repository()
         if self.getOption('fromlang') is True:  # must be a list
             self.options['fromlang'] = False
 
@@ -248,7 +249,7 @@ class FeaturedBot(pywikibot.Bot):
                 item_no = featured_name['wikidata'][1]
             elif task == 'former':
                 item_no = former_name['wikidata'][1]
-            dp = pywikibot.ItemPage(self.site.data_repository(), item_no)
+            dp = pywikibot.ItemPage(self.repo, item_no)
             dp.get()
             for key in sorted(dp.sitelinks.keys()):
                 try:
