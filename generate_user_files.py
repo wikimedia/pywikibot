@@ -34,7 +34,7 @@ def get_base_dir():
     # copied from config2.py, without the lines that check whether the
     # directory already contains a user-config.py file
     # this code duplication is nasty, should fix
-    NAME = "pywikibot"
+    NAME = u"pywikibot"
     for arg in sys.argv[1:]:
         if arg.startswith("-dir:"):
             base_dir = arg[5:]
@@ -71,15 +71,15 @@ if console_encoding is None or sys.platform == 'cygwin':
 
 def listchoice(clist=[], message=None, default=None):
     if not message:
-        message = "Select"
+        message = u"Select"
 
     if default:
-        message += " (default: %s)" % default
+        message += u" (default: %s)" % default
 
-    message += ": "
+    message += u": "
 
     for n, i in enumerate(clist):
-        print ("%d: %s" % (n + 1, i))
+        print (u"%d: %s" % (n + 1, i))
 
     while True:
         choice = raw_input(message)
@@ -128,7 +128,7 @@ def change_base_dir():
             break
 
     from textwrap import wrap
-    msg = wrap("""WARNING: Your user files will be created in the directory
+    msg = wrap(u"""WARNING: Your user files will be created in the directory
 '%(new_base)s' you have chosen. To access these files, you will either have
 to use the argument "-dir:%(new_base)s" every time you run the bot, or set
 the environment variable "PYWIKIBOT2_DIR" equal to this directory name in
@@ -146,7 +146,7 @@ set environment variables.""" % locals(), width=76)
 
 def file_exists(filename):
     if os.path.exists(filename):
-        print("'%s' already exists." % filename)
+        print(u"'%s' already exists." % filename)
         return True
     return False
 
@@ -161,20 +161,20 @@ def get_site_and_lang():
         )
         known_families = sorted(known_families)
         fam = listchoice(known_families,
-                         "Select family of sites we are working on, "
-                         "just enter the number not name",
-                         default='wikipedia')
+                         u"Select family of sites we are working on, "
+                         u"just enter the number not name",
+                         default=u'wikipedia')
         if fam not in single_wiki_families:
             codesds = codecs.open(os.path.join(pywikibot_dir,
-                                               "pywikibot",
-                                               "families",
-                                               "%s_family.py" % fam),
+                                               u"pywikibot",
+                                               u"families",
+                                               u"%s_family.py" % fam),
                                   "r", "utf-8").read()
-            rre = re.compile("self\.languages\_by\_size *\= *(.+?)\]",
+            rre = re.compile(u"self\.languages\_by\_size *\= *(.+?)\]",
                              re.DOTALL)
             known_langs = []
             if not rre.findall(codesds):
-                rre = re.compile("self\.langs *\= *(.+?)\}", re.DOTALL)
+                rre = re.compile(u"self\.langs *\= *(.+?)\}", re.DOTALL)
                 if rre.findall(codesds):
                     import ast
                     known_langs = ast.literal_eval(
@@ -182,13 +182,13 @@ def get_site_and_lang():
             else:
                 known_langs = eval(rre.findall(codesds)[0] + u"]")
             print("This is the list of known language(s):")
-            print(" ".join(sorted(known_langs)))
+            print(u" ".join(sorted(known_langs)))
             mylang = raw_input("The language code of the site we're working on "
                                "(default: 'en'): ") or 'en'
         else:
             mylang = fam
 
-        username = raw_input("Username (%s %s): "
+        username = raw_input(u"Username (%s %s): "
                              % (mylang, fam))
         username = unicode(username, console_encoding)
         return fam, mylang, username
@@ -232,7 +232,7 @@ def create_user_config():
 
         f = codecs.open(_fnc, "w", "utf-8")
         if choice == 'E':
-            f.write("""# -*- coding: utf-8  -*-
+            f.write(u"""# -*- coding: utf-8  -*-
 
 # This is an automatically generated file. You can find more configuration
 # parameters in 'config.py' file.
@@ -278,7 +278,7 @@ usernames['%s']['%s'] = u'%s'
 
 %s""" % (fam, mylang, fam, mylang, mainusername, config_text))
         else:
-            f.write("""# -*- coding: utf-8  -*-
+            f.write(u"""# -*- coding: utf-8  -*-
 family = '%s'
 mylang = '%s'
 usernames['%s']['%s'] = u'%s'
@@ -289,18 +289,18 @@ usernames['%s']['%s'] = u'%s'
             username = username or mainusername
             # Escape ''s
             username = username.replace("'", "\\'")
-            f.write("usernames['%(fam)s']['%(mylang)s'] = u'%(username)s'\n"
+            f.write(u"usernames['%(fam)s']['%(mylang)s'] = u'%(username)s'\n"
                     % locals())
 
         f.close()
-        print("'%s' written." % _fnc)
+        print(u"'%s' written." % _fnc)
 
 
 def create_user_fixes():
     _fnf = os.path.join(base_dir, "user-fixes.py")
     if not file_exists(_fnf):
         f = codecs.open(_fnf, "w", "utf-8")
-        f.write(r"""# -*- coding: utf-8  -*-
+        f.write(ur"""# -*- coding: utf-8  -*-
 
 #
 # This is only an example. Don't use it.
@@ -318,11 +318,11 @@ fixes['example'] = {
 
 """)
         f.close()
-        print("'%s' written." % _fnf)
+        print(u"'%s' written." % _fnf)
 
 if __name__ == "__main__":
     while True:
-        print('\nYour default user directory is "%s"' % base_dir)
+        print(u'\nYour default user directory is "%s"' % base_dir)
         ok = raw_input("How to proceed? ([K]eep [c]hange) ").upper().strip()
         if (not ok) or "KEEP".startswith(ok):
             break
