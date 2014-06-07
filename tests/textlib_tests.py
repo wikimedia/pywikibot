@@ -15,6 +15,7 @@ import os
 
 import pywikibot
 import pywikibot.textlib as textlib
+from pywikibot import config
 
 from tests.utils import unittest
 
@@ -22,10 +23,16 @@ files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")
 
 for f in ["enwiki_help_editing"]:
-    files[f] = codecs.open(os.path.join(dirname, f + ".page"), 'r', 'utf-8').read()
+    files[f] = codecs.open(os.path.join(dirname, f + ".page"),
+                           'r', 'utf-8').read()
 
 
 class TestSectionFunctions(unittest.TestCase):
+    def setUp(self):
+        self.site = pywikibot.Site('en', 'wikipedia')
+        self.catresult1 = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
+                           % {'LS': config.LS})
+
     def contains(self, fn, sn):
         return textlib.does_text_contain_section(
             files[fn], sn)
@@ -80,6 +87,46 @@ class TestSectionFunctions(unittest.TestCase):
         self.assertContains("enwiki_help_editing", u"[[Help]]ful tips", "Containing link")
         self.assertContains("enwiki_help_editing", u"[[:Help]]ful tips", "Containing link with preleading colon")
         self.assertNotContains("enwiki_help_editing", u"Helpful tips", "section header must contain a link")
+
+
+class TestFormatFunctions(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.site = pywikibot.Site('en', 'wikipedia')
+        cls.catresult = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
+                          % {'LS': config.LS})
+
+    def test_interwiki_format(self):
+        interwikis = {
+            'de': pywikibot.Page(pywikibot.Link('de:German')),
+            'fr': pywikibot.Page(pywikibot.Link('fr:French'))
+        }
+        self.assertEqual('[[de:German]]%(LS)s[[fr:French]]%(LS)s'
+                         % {'LS': config.LS},
+                         textlib.interwikiFormat(interwikis, self.site))
+
+    def test_category_format_raw(self):
+        self.assertEqual(self.catresult,
+                         textlib.categoryFormat(['[[Category:Cat1]]',
+                                                 '[[Category:Cat2]]'],
+                                                self.site))
+
+    def test_category_format_bare(self):
+        self.assertEqual(self.catresult,
+                         textlib.categoryFormat(['Cat1', 'Cat2'], self.site))
+
+    def test_category_format_Category(self):
+        data = [pywikibot.Category(self.site, 'Cat1'),
+                pywikibot.Category(self.site, 'Cat2')]
+        self.assertEqual(self.catresult,
+                         textlib.categoryFormat(data, self.site))
+
+    def test_category_format_Page(self):
+        data = [pywikibot.Page(self.site, 'Category:Cat1'),
+                pywikibot.Page(self.site, 'Category:Cat2')]
+        self.assertEqual(self.catresult,
+                         textlib.categoryFormat(data, self.site))
 
 
 if __name__ == '__main__':
