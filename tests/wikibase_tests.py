@@ -49,7 +49,7 @@ class TestGeneral(PywikibotTestCase):
         self.assertEqual(item2.getID(), 'Q5296')
         self.assertEqual(item.labels['en'], 'Main Page')
         prop = pywikibot.PropertyPage(repo, 'Property:P21')
-        self.assertEqual(prop.getType(), 'wikibase-item')
+        self.assertEqual(prop.type, 'wikibase-item')
         self.assertEqual(prop.namespace(), 120)
         claim = pywikibot.Claim(repo, 'p21')
         self.assertRaises(ValueError, claim.setTarget, value="test")
@@ -232,6 +232,44 @@ class TestItemLoad(PywikibotTestCase):
         page = get_test_unconnected_page(site)
         link = page._link
         self._test_fromPage_noitem(link)
+
+
+class TestPropertyPage(PywikibotTestCase):
+
+    def test_property_empty_property(self):
+        self.assertRaises(pywikibot.Error, pywikibot.PropertyPage, wikidata)
+
+    def test_globe_coordinate(self):
+        property_page = pywikibot.PropertyPage(wikidata, 'P625')
+        self.assertEquals(property_page.type, 'globe-coordinate')
+        self.assertEquals(property_page.getType(), 'globecoordinate')
+
+        claim = pywikibot.Claim(wikidata, 'P625')
+        self.assertEquals(claim.type, 'globe-coordinate')
+        self.assertEquals(claim.getType(), 'globecoordinate')
+
+
+class TestClaimSetValue(PywikibotTestCase):
+
+    def test_set_website(self):
+        claim = pywikibot.Claim(wikidata, 'P856')
+        self.assertEquals(claim.type, 'url')
+        claim.setTarget('http://en.wikipedia.org/')
+        self.assertEquals(claim.target, 'http://en.wikipedia.org/')
+
+    def test_set_date(self):
+        claim = pywikibot.Claim(wikidata, 'P569')
+        self.assertEquals(claim.type, 'time')
+        claim.setTarget(pywikibot.WbTime(year=2001, month=01, day=01))
+        self.assertEquals(claim.target.year, 2001)
+        self.assertEquals(claim.target.month, 1)
+        self.assertEquals(claim.target.day, 1)
+
+    def test_set_incorrect_target_value(self):
+        claim = pywikibot.Claim(wikidata, 'P569')
+        self.assertRaises(ValueError, claim.setTarget, 'foo')
+        claim = pywikibot.Claim(wikidata, 'P856')
+        self.assertRaises(ValueError, claim.setTarget, pywikibot.WbTime(2001))
 
 
 class TestLinks(PywikibotTestCase):
