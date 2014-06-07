@@ -67,6 +67,7 @@ import re
 import pywikibot
 from pywikibot import i18n
 from pywikibot.pagegenerators import PreloadingGenerator
+from pywikibot.config2 import LS  # line separator
 
 
 def CAT(site, name, hide):
@@ -525,20 +526,20 @@ class FeaturedBot(pywikibot.Bot):
         re_Link_add = compile_link(fromsite, add_tl)
         re_Link_remove = compile_link(fromsite, remove_tl)
         interactive = self.getOption('interactive')
-        for a in gen:
-            if a.isRedirectPage():
-                a = a.getRedirectTarget()
+        for source in gen:
+            if source.isRedirectPage():
+                source = source.getRedirectTarget()
 
-            if not a.exists():
+            if not source.exists():
                 pywikibot.output(u"source page doesn't exist: %s"
-                                 % a.title())
+                                 % source.title())
                 continue
 
-            atrans = self.findTranslated(a, tosite)
+            atrans = self.findTranslated(source, tosite)
             if not atrans:
                 continue
 
-            text = atrans.get()
+            text = atrans.text
             m1 = add_tl and re_Link_add.search(text)
             m2 = remove_tl and re_Link_remove.search(text)
             changed = False
@@ -550,7 +551,7 @@ class FeaturedBot(pywikibot.Bot):
                     if (not interactive or
                         pywikibot.input(
                             u'Connecting %s -> %s. Proceed? [Y/N]'
-                            % (a.title(), atrans.title())) in ['Y', 'y']):
+                            % (source.title(), atrans.title())) in ['Y', 'y']):
                         if self.getOption('side'):
                             # Placing {{Link FA|xx}} right next to
                             # corresponding interwiki
@@ -561,8 +562,8 @@ class FeaturedBot(pywikibot.Bot):
                             # Moving {{Link FA|xx}} to top of interwikis
                             iw = pywikibot.getLanguageLinks(text, self.site)
                             text = pywikibot.removeLanguageLinks(text, self.site)
-                            text += u"\r\n{{%s|%s}}\r\n" % (add_tl[0],
-                                                            fromsite.code)
+                            text += u"%s{{%s|%s}}%s" % (LS, add_tl[0],
+                                                        fromsite.code, LS)
                             text = pywikibot.replaceLanguageLinks(text,
                                                                   iw, self.site)
                         changed = True
@@ -572,15 +573,15 @@ class FeaturedBot(pywikibot.Bot):
                         not interactive or
                         pywikibot.input(
                             u'Connecting %s -> %s. Proceed? [Y/N]'
-                            % (a.title(), atrans.title())) in ['Y', 'y']):
+                            % (source.title(), atrans.title())) in ['Y', 'y']):
                         text = re.sub(re_Link_remove, '', text)
                         changed = True
                 elif task == 'former':
                     pywikibot.output(u"(already removed)")
-            cc[a.title()] = atrans.title()
+            cc[source.title()] = atrans.title()
             if changed:
                 comment = i18n.twtranslate(self.site, 'featured-' + task,
-                                           {'page': unicode(a)})
+                                           {'page': unicode(source)})
                 try:
                     atrans.put(text, comment)
                 except pywikibot.LockedPage:
