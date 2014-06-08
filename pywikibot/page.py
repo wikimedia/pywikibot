@@ -3021,6 +3021,12 @@ class Property():
              'quantity': pywikibot.WbQuantity,
              }
 
+    value_types = {'wikibase-item': 'wikibase-entityid',
+                   'commonsMedia': 'string',
+                   'url': 'string',
+                   'globe-coordinate': 'globecoordinate',
+                   }
+
     def __init__(self, site, id=None, datatype=None):
         """
         Constructor.
@@ -3398,9 +3404,9 @@ class Claim(Property):
         self.on_item.lastrevid = data['pageinfo']['lastrevid']
         self.qualifiers[qualifier.getID()].append(qualifier)
 
-    def _formatDataValue(self):
+    def _formatValue(self):
         """
-        Format the target into the proper JSON datavalue that Wikibase wants.
+        Format the target into the proper JSON value that Wikibase wants.
 
         @return: dict
         """
@@ -3417,6 +3423,14 @@ class Claim(Property):
             raise NotImplementedError('%s datatype is not supported yet.'
                                       % self.type)
         return value
+
+    def _formatDataValue(self):
+        """
+        Format the target into the proper JSON datavalue that Wikibase wants.
+        """
+        return {'value': self._formatValue(),
+                'type': self.value_types.get(self.type, self.type)
+                }
 
 
 class Revision(object):
