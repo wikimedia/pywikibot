@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 Bot to add images to Wikidata items. The image is extracted from the page_props.
-For this to be available the PageImages extension (https://www.mediawiki.org/wiki/Extension:PageImages) needs to be installed
+For this to be available the PageImages extension
+(https://www.mediawiki.org/wiki/Extension:PageImages) needs to be installed
 
 Usage:
 
 python illustrate_wikidata.py <some generator>
-
-python harvest_template.py -lang:en -catr:Category:Railway_stations_in_New_York
 
 &params;
 """
