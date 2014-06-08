@@ -119,7 +119,7 @@ def downloadPhoto(photoUrl=''):
 
 def findDuplicateImages(photo=None,
                         site=pywikibot.Site(u'commons', u'commons')):
-    """ Take the photo, calculate the SHA1 hash and ask the mediawiki api
+    """ Take the photo, calculate the SHA1 hash and ask the MediaWiki api
     for a list of duplicates.
 
     TODO: Add exception handling, fix site thing
@@ -195,7 +195,7 @@ def getFilename(photoInfo=None, site=None, project=u'Flickr'):
 
 
 def cleanUpTitle(title):
-    """ Clean up the title of a potential mediawiki page. Otherwise the title of
+    """ Clean up the title of a potential MediaWiki page. Otherwise the title of
     the page might not be allowed by the software.
 
     """

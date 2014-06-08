@@ -58,7 +58,7 @@ class Photo(object):
     def findDuplicateImages(self,
                             site=pywikibot.Site(u'commons', u'commons')):
         """
-        Takes the photo, calculates the SHA1 hash and asks the mediawiki api
+        Takes the photo, calculates the SHA1 hash and asks the MediaWiki api
         for a list of duplicates.
 
         TODO: Add exception handling, fix site thing
@@ -192,7 +192,7 @@ class DataIngestionBot:
 
     def findDuplicateImages(self, photo=None, site=pywikibot.Site(u'commons', u'commons')):
         """
-        Takes the photo, calculates the SHA1 hash and asks the mediawiki api for a list of duplicates.
+        Takes the photo, calculates the SHA1 hash and asks the MediaWiki api for a list of duplicates.
 
         TODO: Add exception handling, fix site thing
         """

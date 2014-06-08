@@ -572,7 +572,7 @@ def must_be(group=None, right=None):
 
 
 def need_version(version):
-    """ Decorator to require a certain mediawiki version number.
+    """ Decorator to require a certain MediaWiki version number.
 
     @param number: the mw version number required
     @return: a decorator to make sure the requirement is statisfied when
@@ -583,7 +583,7 @@ def need_version(version):
             if LV(self.version()) < LV(version):
                 raise NotImplementedError(
                     u'Method or function "%s"\n'
-                    u"isn't implemented in mediawiki version < %s"
+                    u"isn't implemented in MediaWiki version < %s"
                     % (fn.__name__, version))
             return fn(self, *args, **kwargs)
         callee.__name__ = fn.__name__

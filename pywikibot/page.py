@@ -589,7 +589,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         By default, loads a list of template names from the Family file;
         if the value in the Family file is None no entry was made, looks for
         the list on [[MediaWiki:Disambiguationspage]]. If this page does not
-        exist, take the mediawiki message.
+        exist, take the MediaWiki message.
 
         If get_Index is True then also load the templates for index articles
         which are given on en-wiki
@@ -2164,7 +2164,7 @@ class User(Page):
     @deprecated('User.registration()')
     def registrationTime(self, force=False):
         """ Return registration date for this user, as a long in
-        Mediawiki's internal timestamp format, or 0 if the date is unknown.
+        MediaWiki's internal timestamp format, or 0 if the date is unknown.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
@@ -2206,7 +2206,7 @@ class User(Page):
         return 'blockedby' in self.getprops(force)
 
     def isEmailable(self, force=False):
-        """ Return True if emails can be send to this user through mediawiki,
+        """ Return True if emails can be send to this user through MediaWiki,
         False otherwise.
 
         @param force: if True, forces reloading the data from API
@@ -2262,7 +2262,7 @@ class User(Page):
                          self.site, defaultNamespace=3))
 
     def sendMail(self, subject, text, ccme=False):
-        """ Send an email to this user via mediawiki's email interface.
+        """ Send an email to this user via MediaWiki's email interface.
         Return True on success, False otherwise.
         This method can raise an UserActionRefuse exception in case this user
         doesn't allow sending email to him or the currently logged in bot
@@ -3123,7 +3123,7 @@ class Revision(object):
 
 
 class Link(ComparableMixin):
-    """A Mediawiki link (local or interwiki)
+    """A MediaWiki link (local or interwiki)
 
     Has the following attributes:
 
@@ -3187,7 +3187,7 @@ class Link(ComparableMixin):
         # Normalize unicode string to a NFC (composed) format to allow
         # proper string comparisons. According to
         # http://svn.wikimedia.org/viewvc/mediawiki/branches/REL1_6/phase3/includes/normal/UtfNormal.php?view=markup
-        # the mediawiki code normalizes everything to NFC, not NFKC
+        # the MediaWiki code normalizes everything to NFC, not NFKC
         # (which might result in information loss).
         t = unicodedata.normalize('NFC', t)
 

@@ -63,10 +63,10 @@ docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
 
-localized_msg = ('fr', 'it', 'pl')  # localized message at mediawiki
+localized_msg = ('fr', 'it', 'pl')  # localized message at MediaWiki
 
 # localized message at specific wikipedia site
-# should be moved to mediawiki pywikibot manual
+# should be moved to MediaWiki pywikibot manual
 
 
 stopPage = {
