@@ -2801,8 +2801,11 @@ class Property():
         else:
             return self._type
 
-    def getID(self):
-        return self.id
+    def getID(self, numeric=False):
+        if numeric:
+            return int(self.id[1:])
+        else:
+            return self.id
 
 
 class PropertyPage(WikibasePage, Property):
