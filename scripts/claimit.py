@@ -170,11 +170,11 @@ def main():
     repo = pywikibot.Site().data_repository()
     for i in range(0, len(commandline_claims), 2):
         claim = pywikibot.Claim(repo, commandline_claims[i])
-        if claim.getType() == 'wikibase-item':
+        if claim.type == 'wikibase-item':
             target = pywikibot.ItemPage(repo, commandline_claims[i + 1])
-        elif claim.getType() == 'string':
+        elif claim.type == 'string':
             target = commandline_claims[i + 1]
-        elif claim.getType() == 'globecoordinate':
+        elif claim.type == 'globe-coordinate':
             coord_args = map(float, commandline_claims[i + 1].split(','))
             if len(coord_args) >= 3:
                 precision = coord_args[2]
@@ -184,7 +184,7 @@ def main():
         else:
             raise NotImplementedError(
                 "%s datatype is not yet supported by claimit.py"
-                % claim.getType())
+                % claim.type)
         claim.setTarget(target)
         claims.append(claim)
 

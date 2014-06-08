@@ -385,13 +385,13 @@ def fromClaim(claim):
     if not isinstance(claim, Claim):
         raise(TypeError, "claim must be a page.Claim")
 
-    if claim.getType() == 'wikibase-item':
+    if claim.type == 'wikibase-item':
         return HasClaim(claim.getID(numeric=True), claim.getTarget().getID(numeric=True))
-    if claim.getType() == 'string':
+    if claim.type == 'string':
         return StringClaim(claim.getID(numeric=True), claim.getTarget())
     else:
         raise(TypeError, "Cannot construct a query from a claim of type %s"
-                % claim.getType())
+                % claim.type)
 
 
 class WikidataQuery():

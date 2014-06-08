@@ -153,7 +153,7 @@ class HarvestRobot(WikidataBot):
                                 # harvested values with existing claims esp.
                                 # without overwriting humans unintentionally.
                             else:
-                                if claim.getType() == 'wikibase-item':
+                                if claim.type == 'wikibase-item':
                                     # Try to extract a valid page
                                     match = re.search(pywikibot.link_regex, value)
                                     if not match:
@@ -166,9 +166,9 @@ class HarvestRobot(WikidataBot):
                                         continue
 
                                     claim.setTarget(linked_item)
-                                elif claim.getType() == 'string':
+                                elif claim.type == 'string':
                                     claim.setTarget(value.strip())
-                                elif claim.getType() == 'commonsMedia':
+                                elif claim.type == 'commonsMedia':
                                     commonssite = pywikibot.Site("commons", "commons")
                                     imagelink = pywikibot.Link(value, source=commonssite, defaultNamespace=6)
                                     image = pywikibot.ImagePage(imagelink)
@@ -179,7 +179,7 @@ class HarvestRobot(WikidataBot):
                                         continue
                                     claim.setTarget(image)
                                 else:
-                                    pywikibot.output("%s is not a supported datatype." % claim.getType())
+                                    pywikibot.output("%s is not a supported datatype." % claim.type)
                                     continue
 
                                 pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget()))
