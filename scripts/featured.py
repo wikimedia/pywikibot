@@ -285,7 +285,7 @@ class FeaturedBot(pywikibot.Bot):
             return ()
 
     def hastemplate(self, task):
-        add_tl, remove_tl = self.getTemplateList(self.site.lang, task)
+        add_tl, remove_tl = self.getTemplateList(self.site.code, task)
         for tl in add_tl:
             tp = pywikibot.Page(self.site, tl, ns=10)
             if not tp.exists():
@@ -368,7 +368,7 @@ class FeaturedBot(pywikibot.Bot):
             if p.namespace() == 0:  # Article
                 articles.append(p)
             # Article talk (like in English)
-            elif p.namespace() == 1 and site.lang != 'el':
+            elif p.namespace() == 1 and site.code != 'el':
                 articles.append(pywikibot.Page(p.site,
                                 p.title(withNamespace=False)))
         pywikibot.output(
@@ -457,40 +457,40 @@ class FeaturedBot(pywikibot.Bot):
         pywikibot.output(u"%s -> back interwiki ref target is %s"
                          % (page.title(), backpage.title()))
 
-    def getTemplateList(self, lang, task):
+    def getTemplateList(self, code, task):
         add_templates = []
         remove_templates = []
         if task == 'featured':
             try:
-                add_templates = template[lang]
+                add_templates = template[code]
                 add_templates += template['_default']
             except KeyError:
                 add_templates = template['_default']
             try:
-                remove_templates = template_good[lang]
+                remove_templates = template_good[code]
                 remove_templates += template_good['_default']
             except KeyError:
                 remove_templates = template_good['_default']
         elif task == 'good':
             try:
-                add_templates = template_good[lang]
+                add_templates = template_good[code]
                 add_templates += template_good['_default']
             except KeyError:
                 add_templates = template_good['_default']
             try:
-                remove_templates = template[lang]
+                remove_templates = template[code]
                 remove_templates += template['_default']
             except KeyError:
                 remove_templates = template['_default']
         elif task == 'lists':
             try:
-                add_templates = template_lists[lang]
+                add_templates = template_lists[code]
                 add_templates += template_lists['_default']
             except KeyError:
                 add_templates = template_lists['_default']
         else:  # task == 'former'
             try:
-                remove_templates = template[lang]
+                remove_templates = template[code]
                 remove_templates += template['_default']
             except KeyError:
                 remove_templates = template['_default']
@@ -507,11 +507,11 @@ class FeaturedBot(pywikibot.Bot):
                                  site.code), re.IGNORECASE)
 
         tosite = self.site
-        if fromsite.lang not in self.cache:
-            self.cache[fromsite.lang] = {}
-        if tosite.lang not in self.cache[fromsite.lang]:
-            self.cache[fromsite.lang][tosite.lang] = {}
-        cc = self.cache[fromsite.lang][tosite.lang]
+        if fromsite.code not in self.cache:
+            self.cache[fromsite.code] = {}
+        if tosite.code not in self.cache[fromsite.code]:
+            self.cache[fromsite.code][tosite.code] = {}
+        cc = self.cache[fromsite.code][tosite.code]
         if self.getOption('nocache') is True or \
            fromsite.code in self.getOption('nocache'):
             cc = {}
