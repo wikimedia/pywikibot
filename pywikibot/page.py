@@ -3477,7 +3477,10 @@ not supported by PyWikiBot!"""
         Assumes that the lang & title come clean, no checks are made.
         """
         link = Link.__new__(Link)
-        link._site = pywikibot.Site(lang, source.family.name)
+        if source.family.interwiki_forward:
+            link._site = pywikibot.Site(lang, source.family.interwiki_forward)
+        else:
+            link._site = pywikibot.Site(lang, source.family.name)
         link._section = None
         link._source = source
 
