@@ -42,6 +42,7 @@ if sys.version_info[0] == 2:
         test_deps.append('unittest2')
         script_deps['replicate_wiki.py'] = ['argparse']
         testcollector = "tests.utils.collector"
+        dependencies.append('ordereddict')
 
 if sys.version_info[0] == 3:
     if not os.environ.get('PY3', False):

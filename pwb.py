@@ -125,6 +125,15 @@ if StrictVersion(httplib2.__version__) < StrictVersion("0.6.0"):
           "Try running 'git submodule update --init'.")
     sys.exit(1)
 
+if sys.version_info[0] == 2 and sys.version_info[1] == 6:
+    try:
+        import ordereddict
+    except ImportError as e:
+        print("ImportError: %s" % e)
+        print("pywikibot depends on module ordereddict in Python 2.6.")
+        print("Upgrade to Python 2.7, or run 'pip install ordereddict'")
+        sys.exit(1)
+
 if "PYWIKIBOT2_DIR" not in os.environ:
     os.environ["PYWIKIBOT2_DIR"] = os.path.split(__file__)[0]
 
