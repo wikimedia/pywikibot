@@ -553,4 +553,7 @@ class Family(family.WikimediaFamily):
         return self.code2encoding(code),
 
     def shared_data_repository(self, code, transcluded=False):
-        return ('wikidata', 'wikidata')
+        if code in ['test', 'test2']:
+            return ('test', 'wikidata')
+        else:
+            return ('wikidata', 'wikidata')
