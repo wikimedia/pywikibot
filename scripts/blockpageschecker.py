@@ -195,19 +195,21 @@ def understandBlock(text, TTP, TSP, TSMP, TTMP, TU):
     return ('editable', r'\A\n')
 
 
-def showQuest(site, page):
+def showQuest(page):
     quest = pywikibot.inputChoice(u'Do you want to open the page?',
                                   ['with browser', 'with gui', 'no'],
                                   ['b', 'g', 'n'], 'n')
-    pathWiki = site.family.nicepath(site.lang)
-    url = 'http://%s%s%s?&redirect=no' % (pywikibot.Site().hostname(),
-                                          pathWiki, page.urlname())
+    site = page.site
+    url = '%s://%s%s?redirect=no' % (site.protocol(),
+                                     site.hostname(),
+                                     site.nice_get_address(
+                                         page.title(asUrl=True)))
     if quest == 'b':
         webbrowser.open(url)
     elif quest == 'g':
         from pywikibot import editor as editarticle
         editor = editarticle.TextEditor()
-        editor.edit(page.get())
+        editor.edit(page.text)
 
 
 def main():
@@ -295,7 +297,7 @@ def main():
         except pywikibot.IsRedirectPage:
             pywikibot.output("%s is a redirect! Skipping..." % pagename)
             if show:
-                showQuest(site, page)
+                showQuest(page)
             continue
         """
         # This check does not work :
