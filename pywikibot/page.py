@@ -29,6 +29,7 @@ except ImportError:
 
 import logging
 import re
+import sys
 import unicodedata
 import collections
 
@@ -3623,7 +3624,12 @@ def html2unicode(text, ignore=None):
             except KeyError:
                 pass
             if unicodeCodepoint and unicodeCodepoint not in ignore:
-                result += unichr(unicodeCodepoint)
+                # solve narrow Python build exception (UTF-16)
+                if unicodeCodepoint > sys.maxunicode:
+                    unicode_literal = lambda n: eval("u'\U%08x'" % n)
+                    result += unicode_literal(unicodeCodepoint)
+                else:
+                    result += unichr(unicodeCodepoint)
             else:
                 # Leave the entity unchanged
                 result += text[match.start():match.end()]
