@@ -852,6 +852,16 @@ class Family(object):
         return self.known_families
 
     def linktrail(self, code, fallback='_default'):
+        """Return regex for trailing chars displayed as part of a link.
+
+        Returns a string, not a compiled regular expression object.
+
+        This reads from the family file, and ''not'' from
+        [[MediaWiki:Linktrail]], because the MW software currently uses a
+        built-in linktrail from its message files and ignores the wiki
+        value.
+
+        """
         if code in self.linktrails:
             return self.linktrails[code]
         elif fallback:
