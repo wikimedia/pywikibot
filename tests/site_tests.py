@@ -1117,6 +1117,21 @@ class TestSiteLoadRevisions(PywikibotTestCase):
         # TODO test other optional arguments
 
 
+class TestCommonsSite(PywikibotTestCase):
+    """Test cases for Site methods on Commons."""
+    family = "commons"
+    code = "commons"
+
+    def testInterWikiForward(self):
+        self.site = pywikibot.Site(self.code, self.family)
+        self.mainpage = pywikibot.Page(pywikibot.Link("Main Page", self.site))
+        # test pagelanglinks on commons,
+        # which forwards interwikis to wikipedia
+        ll = next(self.site.pagelanglinks(self.mainpage))
+        self.assertType(ll, pywikibot.Link)
+        self.assertEquals(ll.site.family.name, 'wikipedia')
+
+
 if __name__ == '__main__':
     try:
         unittest.main()
