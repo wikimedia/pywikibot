@@ -1438,17 +1438,26 @@ class APISite(BaseSite):
         if "query" not in result or "redirects" not in result["query"]:
             raise RuntimeError(
                 "getredirtarget: No 'redirects' found for page %s."
-                % title)
-        redirmap = dict((item['from'], item['to'])
+                % title.encode(self.encoding()))
+        redirmap = dict((item['from'],
+                         {'title': item['to'],
+                          'section': u'#' + item['tofragment']
+                          if 'tofragment' in item and item['tofragment']
+                          else ''})
                         for item in result['query']['redirects'])
+        if 'normalized' in result['query']:
+            for item in result['query']['normalized']:
+                if item['from'] == title:
+                    title = item['to']
+                    break
         if title not in redirmap:
             raise RuntimeError(
                 "getredirtarget: 'redirects' contains no key for page %s."
-                % title)
-        target_title = redirmap[title]
+                % title.encode(self.encoding()))
+        target_title = u'%(title)s%(section)s' % redirmap[title]
         if target_title == title or "pages" not in result['query']:
             # no "pages" element indicates a circular redirect
-            raise pywikibot.CircularRedirect(redirmap[title])
+            raise pywikibot.CircularRedirect(target_title)
         pagedata = list(result['query']['pages'].values())[0]
         # there should be only one value in 'pages', and it is the target
         if self.sametitle(pagedata['title'], target_title):
@@ -1542,7 +1551,7 @@ class APISite(BaseSite):
                 raise Error(
                     u"token: Query on page %s returned data on page [[%s]]"
                     % (page.title(withSection=False, asLink=True),
-                        item['title']))
+                       item['title']))
             api.update_page(page, item)
             pywikibot.debug(unicode(item), _logger)
             return item[tokentype + "token"]
