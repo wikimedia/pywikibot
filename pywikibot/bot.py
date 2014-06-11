@@ -23,6 +23,7 @@ import os.path
 import sys
 import re
 import json
+import datetime
 
 _logger = "bot"
 
@@ -255,6 +256,9 @@ def writelogheader():
 
     # script call
     log(u'COMMAND: %s' % unicode(sys.argv))
+
+    # script call time stamp
+    log(u'DATE: %s UTC' % str(datetime.datetime.utcnow()))
 
     # new framework release/revision? (handleArgs needs to be called first)
     try:
