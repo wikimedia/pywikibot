@@ -1,8 +1,7 @@
 #!/usr/bin/python
-# coding: utf-8
-
+# -*- coding: utf-8 -*-
 """
-Include commons template in home wiki.
+Include Commons template in home wiki.
 
 This bot functions mainly in the en.wikipedia, because it
 compares the names of articles and category in English
@@ -11,18 +10,14 @@ an article in Commons will not be in English but with
 redirect, this also functions.
 
 Run:
-Syntax: python commons_link.py action [-option]
+Syntax: python commons_link.py [action] [pagegenerator]
 
 where action can be one of these:
  * pages      : Run over articles, include {{commons}}
  * categories : Run over categories, include {{commonscat}}
 
-and option can be one of these:
- * -cat     : Work on all pages which are in a specific category.
- * -ref     : Work on all pages that link to a certain page.
- * -link    : Work on all pages that are linked from a certain page.
- * -start   : Work on all pages on the home wiki, starting at the named page.
- * -page    : Work on one page.
+and pagegenerator can be one of these:
+&params;
 
 """
 #
@@ -34,172 +29,106 @@ and option can be one of these:
 # Ported by Geoffrey "GEOFBOT" Mon for Google Code-In 2013
 # User:Sn1per
 #
+
+
 __version__ = '$Id$'
 
 import re
 import pywikibot
-from pywikibot import pagegenerators, i18n
+from pywikibot import textlib, pagegenerators, i18n, Bot
+
+docuReplacements = {
+    '&params;':     pagegenerators.parameterHelp,
+}
 
 
-class CommonsLinkBot:
-    def __init__(self, generator, acceptall=False):
+class CommonsLinkBot(Bot):
+    def __init__(self, generator, **kwargs):
+        self.availableOptions.update({
+            'action': None,
+        })
+        super(CommonsLinkBot, self).__init__(**kwargs)
+
         self.generator = generator
-        self.acceptall = acceptall
+        self.findTemplate = re.compile(ur'\{\{[Ss]isterlinks')
+        self.findTemplate2 = re.compile(ur'\{\{[Cc]ommonscat')
+        self.findTemplate3 = re.compile(ur'\{\{[Cc]ommons')
 
-    def pages(self):
+    def run(self):
+        if not all((self.getOption('action'), self.generator)):
+            return
+        catmode = (self.getOption('action') == 'categories')
         for page in self.generator:
             try:
                 pywikibot.output(u'\n>>>> %s <<<<' % page.title())
-                commons = pywikibot.Site().image_repository()
-                commonspage = pywikibot.Page(commons, page.title())
+                commons = page.site.image_repository()
+                commonspage = getattr(pywikibot,
+                                      ('Page', 'Category')[catmode]
+                                      )(commons, page.title())
                 try:
-                    getcommons = commonspage.text
-                    if page.title() == commonspage.title():
+                    getcommons = commonspage.get(get_redirect=True)
+                    pagetitle = commonspage.title(withNamespace=not catmode)
+                    if page.title() == pagetitle:
                         oldText = page.get()
                         text = oldText
 
-                        # for commons template
-                        findTemplate = re.compile(ur'\{\{[Cc]ommonscat')
-                        s = findTemplate.search(text)
-                        findTemplate2 = re.compile(ur'\{\{[Ss]isterlinks')
-                        s2 = findTemplate2.search(text)
+                        # for Commons/Commonscat template
+                        s = self.findTemplate.search(text)
+                        s2 = getattr(self, 'findTemplate%d'
+                                           % (2, 3)[catmode]).search(text)
                         if s or s2:
                             pywikibot.output(u'** Already done.')
                         else:
-                            text = pywikibot.replaceCategoryLinks(
-                                text + u'{{commons|%s}}' % commonspage.title(),
-                                list(page.categories()))
-                            if oldText != text:
-                                pywikibot.showDiff(oldText, text)
-                                if not self.acceptall:
-                                    choice = pywikibot.inputChoice(
-                                        u'Do you want to accept these changes?',
-                                        ['Yes', 'No', 'All'], ['y', 'N', 'a'],
-                                        'N')
-                                    if choice == 'a':
-                                        self.acceptall = True
-                                if self.acceptall or choice == 'y':
-                                    try:
-                                        msg = i18n.twtranslate(
-                                            pywikibot.Site(), 'commons_link-template-added')
-                                        page.put(text, msg)
-                                    except pywikibot.EditConflict:
-                                        pywikibot.output(
-                                            u'Skipping %s because of edit '
-                                            u'conflict'
-                                            % (page.title()))
+                            cats = textlib.getCategoryLinks(text, site=page.site)
+                            text = textlib.replaceCategoryLinks(
+                                u'%s{{commons%s|%s}}'
+                                % (text, ('', 'cat')[catmode], pagetitle),
+                                cats)
+                            comment = i18n.twtranslate(page.site,
+                                                       'commons_link%s-template-added'
+                                                       % ('', '-cat')[catmode])
+                            try:
+                                self.userPut(page, oldText, text, comment=comment)
+                            except pywikibot.EditConflict:
+                                pywikibot.output(
+                                    u'Skipping %s because of edit conflict'
+                                    % page.title())
 
                 except pywikibot.NoPage:
-                    pywikibot.output(u'Page does not exist in Commons!')
+                    pywikibot.output(u'%s does not exist in Commons'
+                                     % page.__class__.__name__)
 
             except pywikibot.NoPage:
-                pywikibot.output(u'Page %s does not exist?!' % page.title())
+                pywikibot.output(u'Page %s does not exist' % page.title())
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u'Page %s is a redirect; skipping.'
                                  % page.title())
             except pywikibot.LockedPage:
-                pywikibot.output(u'Page %s is locked?!' % page.title())
-
-    def categories(self):
-        for page in self.generator:
-            try:
-                pywikibot.output(u'\n>>>> %s <<<<' % page.title())
-                commons = pywikibot.Site().image_repository()
-                commonsCategory = pywikibot.Category(commons,
-                                                     'Category:%s' % page.title())
-                try:
-                    getcommonscat = commonsCategory.text
-                    commonsCategoryTitle = commonsCategory.title()
-                    categoryname = commonsCategoryTitle.split('Category:', 1)[1]
-                    if page.title() == categoryname:
-                        oldText = page.get()
-                        text = oldText
-
-                        # for commonscat template
-                        findTemplate = re.compile(ur'\{\{[Cc]ommons')
-                        s = findTemplate.search(text)
-                        findTemplate2 = re.compile(ur'\{\{[Ss]isterlinks')
-                        s2 = findTemplate2.search(text)
-                        if s or s2:
-                            pywikibot.output(u'** Already done.')
-                        else:
-                            text = pywikibot.replaceCategoryLinks(
-                                text + u'{{commonscat|%s}}' % categoryname,
-                                list(page.categories()))
-                            if oldText != text:
-                                pywikibot.showDiff(oldText, text)
-                                if not self.acceptall:
-                                    choice = pywikibot.inputChoice(
-                                        u'Do you want to accept these changes?',
-                                        ['Yes', 'No', 'All'], ['y', 'N', 'a'],
-                                        'N')
-                                    if choice == 'a':
-                                        self.acceptall = True
-                                if self.acceptall or choice == 'y':
-                                    try:
-                                        msg = i18n.twtranslate(
-                                            pywikibot.Site(), 'commons_link-cat-template-added')
-                                        page.put(text, msg)
-                                    except pywikibot.EditConflict:
-                                        pywikibot.output(
-                                            u'Skipping %s because of edit '
-                                            u'conflict'
-                                            % (page.title()))
-
-                except pywikibot.NoPage:
-                    pywikibot.output(u'Category does not exist in Commons!')
-
-            except pywikibot.NoPage:
-                pywikibot.output(u'Page %s does not exist?!' % page.title())
-            except pywikibot.IsRedirectPage:
-                pywikibot.output(u'Page %s is a redirect; skipping.'
-                                 % page.title())
-            except pywikibot.LockedPage:
-                pywikibot.output(u'Page %s is locked?!' % page.title())
+                pywikibot.output(u'Page %s is locked' % page.title())
 
 
 def main():
-    singlepage = []
-    gen = None
-    start = None
-    action = None
-    for arg in pywikibot.handleArgs():
-        if arg == ('pages'):
-            action = 'pages'
-        elif arg == ('categories'):
-            action = 'categories'
-        elif arg.startswith('-start:'):
-            start = pywikibot.Page(pywikibot.Site(), arg[7:])
-            gen = pagegenerators.AllpagesPageGenerator(
-                start.title(withNamespace=False),
-                namespace=start.namespace(),
-                includeredirects=False)
-        elif arg.startswith('-cat:'):
-            cat = pywikibot.Category(pywikibot.Site(),
-                                     'Category:%s' % arg[5:])
-            gen = pagegenerators.CategorizedPageGenerator(cat)
-        elif arg.startswith('-ref:'):
-            ref = pywikibot.Page(pywikibot.Site(), arg[5:])
-            gen = pagegenerators.ReferringPageGenerator(ref)
-        elif arg.startswith('-link:'):
-            link = pywikibot.Page(pywikibot.Site(), arg[6:])
-            gen = pagegenerators.LinkedPageGenerator(link)
-        elif arg.startswith('-page:'):
-            singlepage = pywikibot.Page(pywikibot.Site(), arg[6:])
-            gen = iter([singlepage])
-        #else:
-            #bug
+    options = {}
 
-    if action == 'pages':
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = CommonsLinkBot(preloadingGen, acceptall=False)
-        bot.pages()
-    elif action == 'categories':
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = CommonsLinkBot(preloadingGen, acceptall=False)
-        bot.categories()
-    else:
-        pywikibot.showHelp(u'commons_link')
+    local_args = pywikibot.handleArgs()
+    genFactory = pagegenerators.GeneratorFactory()
+
+    for arg in local_args:
+        if arg in ('pages', 'categories'):
+            options['action'] = arg
+        elif arg == '-always':
+            options['always'] = True
+        else:
+            genFactory.handleArg(arg)
+
+    if 'action' in options:
+        gen = genFactory.getCombinedGenerator()
+        if gen:
+            gen = pagegenerators.PreloadingGenerator(gen)
+            bot = CommonsLinkBot(gen, **options)
+            bot.run()
+            return
+    pywikibot.showHelp()
 
 
 if __name__ == "__main__":
