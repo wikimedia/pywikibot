@@ -1,6 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
+This script can be used for reverting certain edits.
+
+The following command line parameters are supported:
+
+&params;
+
+-username         Edits of which user need to be reverted.
 """
 #
 # (C) Bryan Tong Minh, 2008
@@ -17,6 +24,11 @@ __version__ = '$Id$'
 import re
 import pywikibot
 from pywikibot import i18n
+from pywikibot import pagegenerators
+
+docuReplacements = {
+    '&params;': pagegenerators.parameterHelp
+}
 
 
 class BaseRevertBot(object):
@@ -25,9 +37,12 @@ class BaseRevertBot(object):
     Subclass this bot and override callback to get it to do something useful.
 
     """
-    def __init__(self, site, comment=None):
+    def __init__(self, site, user=None, comment=None):
         self.site = site
         self.comment = comment
+        self.user = user
+        if not self.user:
+            self.user = self.site.username()
 
     def get_contributions(self, max=500, ns=None):
         count = 0
@@ -38,7 +53,7 @@ class BaseRevertBot(object):
                 item = iterator.next()
             except StopIteration:
                 self.log(u'Fetching new batch of contributions')
-                data = list(pywikibot.Site().usercontribs(user=self.site.username(), namespaces=ns, total=max))
+                data = list(pywikibot.Site().usercontribs(user=self.user, namespaces=ns, total=max))
                 never_continue = True
                 iterator = iter(data)
             else:
@@ -46,7 +61,6 @@ class BaseRevertBot(object):
                 yield item
 
     def revert_contribs(self, callback=None):
-        self.site.forceLogin()
 
         if callback is None:
             callback = self.callback
@@ -83,10 +97,10 @@ class BaseRevertBot(object):
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                          % page.title(asLink=True, forceInterwiki=True,
                                       textlink=True))
-        old = page.get()
-        new = rev[3]
-        pywikibot.showDiff(old, new)
-        page.put(new, comment)
+        old = page.text
+        page.text = rev[3]
+        pywikibot.showDiff(old, page.text)
+        page.save(comment)
         return comment
 
     def log(self, msg):
@@ -105,9 +119,15 @@ class myRevertBot(BaseRevertBot):
 
 
 def main():
+    user = None
     for arg in pywikibot.handleArgs():
-        continue
-    bot = myRevertBot(site=pywikibot.Site())
+        if arg.startswith('-username'):
+            if len(arg) == 9:
+                user = pywikibot.input(
+                    u'Please enter username of the person you want to revert:')
+            else:
+                user = arg[10:]
+    bot = myRevertBot(site=pywikibot.Site(), user=user)
     bot.revert_contribs()
 
 if __name__ == "__main__":
