@@ -16,7 +16,7 @@ import itertools
 
 test_deps = []
 
-dependencies = ['httplib2>=0.6.0']
+dependencies = ['httplib2>=0.9.0']
 
 extra_deps = {}
 
