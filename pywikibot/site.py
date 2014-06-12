@@ -1690,24 +1690,17 @@ class APISite(BaseSite):
             if item['*'] not in self._namespaces[ns]:
                 self._namespaces[ns].aliases.append(item['*'])
 
-    def hasExtension(self, name, unknown=NotImplementedError):
+    @need_version("1.14")
+    @deprecate_arg("unknown", None)
+    def hasExtension(self, name):
         """ Determine whether extension `name` is loaded.
 
-        @param name: The extension to check for
-        @param unknown: The value to return if the site does not list loaded
-                        extensions. Valid values are an exception to raise,
-                        True or False. Default: NotImplementedError
-
-        @return: bool
+        @param name: The extension to check for, case insenstive
+        @type name: str
+        @return: If the extension is loaded
+        @rtype: bool
         """
-        try:
-            extensions = self.siteinfo['extensions']
-        except KeyError:
-            if isinstance(unknown, type) and issubclass(unknown, Exception):
-                raise unknown(
-                    "Feature 'hasExtension' only available in MW 1.14+")
-            else:
-                return unknown
+        extensions = self.siteinfo['extensions']
         for ext in extensions:
             if ext['name'].lower() == name.lower():
                 return True
