@@ -4,7 +4,7 @@ Objects representing MediaWiki sites (wikis) and families (groups of wikis
 on the same topic in different languages).
 """
 #
-# (C) Pywikibot team, 2008-2012
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1033,7 +1033,12 @@ class APISite(BaseSite):
             req['title'] = title
         if includecomments is True:
             req['includecomments'] = u''
-        return req.submit()['expandtemplates']['*']
+        if LV(self.version()) > LV("1.24wmf7"):
+            key = 'wikitext'
+            req['prop'] = key
+        else:
+            key = '*'
+        return req.submit()['expandtemplates'][key]
 
     def getcurrenttimestamp(self):
         """Return server time, {{CURRENTTIMESTAMP}}, as a string.
