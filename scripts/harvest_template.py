@@ -119,6 +119,7 @@ class HarvestRobot(WikidataBot):
         if not item.exists():
             pywikibot.output('%s doesn\'t have a wikidata item :(' % page)
             #TODO FIXME: We should provide an option to create the page
+            return
         item.get()
         if set(self.fields.values()) <= set(item.claims.keys()):
             pywikibot.output(u'%s item %s has claims for all properties. Skipping' % (page, item.title()))
