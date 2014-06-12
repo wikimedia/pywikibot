@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """User-interface related functions for building bots."""
 #
-# (C) Pywikibot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -315,7 +315,7 @@ def writelogheader():
     if config.log_pywiki_repo_version:
         log(u'PYWIKI REPO VERSION: %s' % unicode(version.getversion_onlinerepo()))
 
-    log(u'SITE VERSION: %s' % unicode(site.live_version()))
+    log(u'SITE VERSION: %s' % site.version())
 
     # messages on bot discussion page?
     if site.logged_in():

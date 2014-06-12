@@ -1210,8 +1210,6 @@ class APISite(BaseSite):
 #    postForm: Post form data to an address at this site.
 #    postData: Post encoded form data to an http address at this site.
 #
-#    version: Return MediaWiki version string from Family file.
-#    live_version: Return version number read from Special:Version.
 #    checkCharset(charset): Warn if charset doesn't match family file.
 #
 #    linktrail: Return regex for trailing chars displayed as part of a link.
@@ -1910,6 +1908,22 @@ class APISite(BaseSite):
 
     lang = property(fget=language, doc=language.__doc__)
 
+    def version(self):
+        """
+        Return live project version number as a string.
+
+        This overwrites the corresponding family method for APISite class. Use
+        LooseVersion from distutils.version to compare versions.
+        """
+        try:
+            version = self.siteinfo.get('generator', expiry=1).split(' ')[1]
+        except pywikibot.data.api.APIError:
+            # May occur if you are not logged in (no API read permissions).
+            pywikibot.exception(
+                'You have no API read permissions. Seems you are not logged in')
+            version = self.family.version(self.code)
+        return version
+
     @property
     def has_image_repository(self):
         """Return True if site has a shared image repository like Commons."""
@@ -1971,6 +1985,7 @@ class APISite(BaseSite):
             return self.namespaces()[num]
         return self.namespaces()[num][0]
 
+    @deprecated("version()")
     def live_version(self, force=False):
         """Return the 'real' version number found on [[Special:Version]].
 

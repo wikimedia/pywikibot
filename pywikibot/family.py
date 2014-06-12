@@ -1087,15 +1087,6 @@ class WikimediaFamily(Family):
             'wikisource', 'wikiversity', 'wiktionary',
         ]
 
-    def version(self, code):
-        """
-        Return Wikimedia projects version number as a string.
-
-        Use LooseVersion from distutils.version to compate versions.
-        """
-        # Here we return the latest mw release of wikimedia projects
-        return '1.24wmf17'
-
     def shared_image_repository(self, code):
         return ('commons', 'commons')
 

@@ -188,6 +188,9 @@ class TestSiteObject(DefaultSiteTestCase):
 
         self.assertIsInstance(mysite.siteinfo, pywikibot.site.Siteinfo)
         self.assertIsInstance(mysite.months_names, list)
+        ver = mysite.version()
+        self.assertIsInstance(ver, basestring)
+        self.assertIsNotNone(re.search('^\d+\.\d+.*?\d*$', ver))
         self.assertEqual(mysite.list_to_text(('pywikibot',)), 'pywikibot')
 
     def testEnglishSpecificMethods(self):
