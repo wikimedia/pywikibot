@@ -234,19 +234,6 @@ class BaseSite(object):
     def __hash__(self):
         return hash(repr(self))
 
-    def linktrail(self):
-        """Return regex for trailing chars displayed as part of a link.
-
-        Returns a string, not a compiled regular expression object.
-
-        This reads from the family file, and ''not'' from
-        [[MediaWiki:Linktrail]], because the MW software currently uses a
-        built-in linktrail from its message files and ignores the wiki
-        value.
-
-        """
-        return self.family.linktrail(self.code)
-
     def languages(self):
         """Return list of all valid language codes for this site's Family."""
 
@@ -488,11 +475,6 @@ class BaseSite(object):
 
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
 
-    def nice_get_address(self, title):
-        """Return shorter URL path to retrieve page titled 'title'."""
-
-        return self.family.nice_get_address(self.lang, title)
-
     # deprecated methods for backwards-compatibility
 
     @deprecated("family attribute")
@@ -645,7 +627,7 @@ class APISite(BaseSite):
             14: [u"Category"],
             15: [u"Category talk"],
         }
-        if LV(self.family.version(self.code)) >= LV("1.14"):
+        if LV(self.version()) >= LV("1.14"):
             self._namespaces[6] = [u"File"]
             self._namespaces[7] = [u"File talk"]
         self._msgcache = {}
@@ -2863,8 +2845,8 @@ class APISite(BaseSite):
                     elif "url" in captcha:
                         import webbrowser
                         webbrowser.open('%s://%s%s'
-                                        % (self.family.protocol(self.code),
-                                           self.family.hostname(self.code),
+                                        % (self.protocol(),
+                                           self.hostname(),
                                            captcha["url"]))
                         req['captchaword'] = cap_answerwikipedia.input(
                             "Please view CAPTCHA in your browser, "
