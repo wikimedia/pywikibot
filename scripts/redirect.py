@@ -379,20 +379,6 @@ class RedirectRobot(Bot):
         self.exiting = False
         self._valid_template = None
 
-    def prompt(self, question):
-        if not self.getOption('always'):
-            choice = pywikibot.inputChoice(question,
-                                           ['Yes', 'No', 'All', 'Quit'],
-                                           ['y', 'N', 'a', 'q'], 'N')
-            if choice == 'n':
-                return False
-            elif choice == 'q':
-                self.exiting = True
-                return False
-            elif choice == 'a':
-                self.options['always'] = True
-        return True
-
     def has_valid_template(self, twtitle):
         """Check whether a template from translatewiki.net does exist on real
         wiki. We assume we are always working on self.site
@@ -415,8 +401,6 @@ class RedirectRobot(Bot):
         # get reason for deletion text
         for redir_name in self.generator.retrieve_broken_redirects():
             self.delete_1_broken_redirect(redir_name)
-            if self.exiting:
-                break
 
     def moved_page(self, source):
         gen = iter(self.site.logevents(logtype='move', page=source, total=1))
@@ -471,7 +455,7 @@ class RedirectRobot(Bot):
                             content)
                         pywikibot.showDiff(content, text)
                         pywikibot.output(u'Summary - %s' % reason)
-                        if self.prompt(
+                        if self.user_confirm(
                                 u'Redirect target %s has been moved to %s.\n'
                                 u'Do you want to fix %s?'
                                 % (targetPage, movedTarget, redir_page)):
@@ -487,7 +471,7 @@ class RedirectRobot(Bot):
                                 pywikibot.output(u'%s is locked.'
                                                  % redir_page.title())
                                 pass
-                elif self.getOption('delete') and self.prompt(
+                elif self.getOption('delete') and self.user_confirm(
                         u'Redirect target %s does not exist.\n'
                         u'Do you want to delete %s?'
                         % (targetPage.title(asLink=True),
@@ -532,8 +516,6 @@ class RedirectRobot(Bot):
     def fix_double_redirects(self):
         for redir_name in self.generator.retrieve_double_redirects():
             self.fix_1_double_redirect(redir_name)
-            if self.exiting:
-                break
 
     def fix_1_double_redirect(self,  redir_name):
         redir = pywikibot.Page(self.site, redir_name)
@@ -677,7 +659,7 @@ class RedirectRobot(Bot):
                                        {'to': targetPage.title(asLink=True)}
                                        )
             pywikibot.showDiff(oldText, text)
-            if self.prompt(u'Do you want to accept the changes?'):
+            if self.user_confirm(u'Do you want to accept the changes?'):
                 try:
                     redir.put(text, summary)
                 except pywikibot.LockedPage:
@@ -713,10 +695,11 @@ class RedirectRobot(Bot):
             else:
                 self.fix_1_double_redirect(redir_name)
                 count += 1
-            if self.exiting or (self.getOption('number') and count >= self.getOption('number')):
+            if self.getOption('number') and count >= self.getOption('number'):
                 break
 
     def run(self):
+        """Run the script method selected by 'action' parameter."""
         # TODO: make all generators return a redirect type indicator,
         #       thus make them usable with 'both'
         if self.action == 'double':

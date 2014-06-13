@@ -47,16 +47,10 @@ class CapitalizeBot(Bot):
 
         super(CapitalizeBot, self).__init__(**kwargs)
         self.generator = generator
-        self.done = False
-
-    def run(self):
-        for page in self.generator:
-            if self.done:
-                break
-            if page.exists():
-                self.treat(page)
 
     def treat(self, page):
+        if not page.exists():
+            return
         if page.isRedirectPage():
             page = page.getRedirectTarget()
         page_t = page.title()
@@ -81,7 +75,7 @@ class CapitalizeBot(Bot):
                 if choice == 'a':
                     self.options['always'] = True
                 elif choice == 'q':
-                    self.done = True
+                    self.quit()
             if self.getOption('always') or choice == 'y':
                 comment = i18n.twtranslate(
                     page.site,
@@ -114,10 +108,7 @@ def main():
     if gen:
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
         bot = CapitalizeBot(preloadingGen, **options)
-        try:
-            bot.run()
-        except KeyboardInterrupt:
-            pywikibot.output('\nQuitting program...')
+        bot.run()
     else:
         pywikibot.showHelp()
 

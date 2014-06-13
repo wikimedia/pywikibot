@@ -766,10 +766,25 @@ Global arguments available for all bots:
     pywikibot.stdout(globalHelp)
 
 
+class QuitKeyboardInterrupt(KeyboardInterrupt):
+
+    """The user has cancelled processing at a prompt."""
+
+
 class Bot(object):
 
     """
-    Generic Bot to be subclassed
+    Generic Bot to be subclassed.
+
+    This class provides a run() method for basic processing of a
+    generator one page at a time.
+
+    If the subclass places a page generator in self.generator,
+    Bot will process each page in the generator, invoking the method treat()
+    which must then be implemented by subclasses.
+
+    If the subclass does not set a generator, or does not override
+    treat() or run(), NotImplementedError is raised.
     """
 
     # Bot configuration.
@@ -820,8 +835,30 @@ class Bot(object):
         except KeyError:
             raise pywikibot.Error(u'%s is not a valid bot option.' % option)
 
+    def user_confirm(self, question):
+        """ Obtain user response if bot option 'always' not enabled. """
+        if self.getOption('always'):
+            return True
+
+        choice = pywikibot.inputChoice(question,
+                                       ['Yes', 'No', 'All', 'Quit'],
+                                       ['y', 'N', 'a', 'q'], 'N')
+        if choice == 'n':
+            return False
+
+        if choice == 'q':
+            self.quit()
+
+        if choice == 'a':
+            # Remember the choice
+            self.options['always'] = True
+
+        return True
+
     def userPut(self, page, oldtext, newtext, **kwargs):
         """
+        Save a new revision of a page, with user confirmation as required.
+
         Print differences, ask user for confirmation,
         and puts the page if needed.
 
@@ -836,25 +873,48 @@ class Bot(object):
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                          % page.title())
         pywikibot.showDiff(oldtext, newtext)
+        if 'comment' in kwargs:
+            pywikibot.output(u'Comment: %s' % kwargs['comment'])
 
-        choice = 'a'
-        if not self.getOption('always'):
-            choice = pywikibot.inputChoice(
-                u'Do you want to accept these changes?',
-                ['Yes', 'No', 'All'],
-                ['y', 'N', 'a'],
-                'N'
-            )
-            if choice == 'a':
-                # Remember the choice
-                self.options['always'] = True
+        if not self.user_confirm('Do you want to accept these changes?'):
+            return
 
-        if 'async' not in kwargs:
-            kwargs['async'] = (choice == 'a')
+        if 'async' not in kwargs and self.options['always']:
+            kwargs['async'] = True
 
-        if choice != 'n':
-            page.text = newtext
-            page.save(**kwargs)
+        page.text = newtext
+        page.save(**kwargs)
+
+    def quit(self):
+        """Cleanup and quit processing."""
+        raise QuitKeyboardInterrupt
+
+    def treat(self, page):
+        """Process one page (Abstract method)."""
+        raise NotImplementedError('Method %s.treat() not implemented.'
+                                  % self.__class__.__name__)
+
+    def run(self):
+        """Process all pages in generator."""
+        if not hasattr(self, 'generator'):
+            raise NotImplementedError('Variable %s.generator not set.'
+                                      % self.__class__.__name__)
+        try:
+            for page in self.generator:
+                self.treat(page)
+        except QuitKeyboardInterrupt:
+            pywikibot.output('\nUser quit %s bot run...' %
+                             self.__class__.__name__)
+        except KeyboardInterrupt:
+            # TODO: If the ^C occurred during an input()
+            #       it should be handled as a QuitKeyboardInterrupt
+            #       as developers shouldnt need a backtrace to find
+            #       where the input() code is.
+            if config.verbose_output:
+                raise
+            else:
+                pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
+                                 self.__class__.__name__)
 
 
 class WikidataBot:

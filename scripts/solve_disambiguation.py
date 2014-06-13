@@ -79,14 +79,12 @@ __version__ = '$Id$'
 #
 
 import re
-import sys
 import codecs
 
 import pywikibot
 from pywikibot import editor as editarticle
-from pywikibot import pagegenerators
-from pywikibot import config
-from pywikibot import i18n
+from pywikibot import pagegenerators, config, i18n
+from pywikibot.bot import Bot, QuitKeyboardInterrupt
 
 # Disambiguation Needed template
 dn_template = {
@@ -437,7 +435,7 @@ class PrimaryIgnoreManager(object):
                 pass
 
 
-class DisambiguationRobot(object):
+class DisambiguationRobot(Bot):
 
     ignore_contents = {
         'de': (u'{{[Ii]nuse}}',
@@ -714,7 +712,7 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                     return True
                 elif choice in ['q', 'Q']:
                     # quit the program
-                    return False
+                    self.quit()
                 elif choice in ['s', 'S']:
                     # Next link on this page
                     n -= 1
@@ -876,7 +874,7 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
 Please enter the name of the page where the redirect should have pointed at,
 or press enter to quit:""")
                     if user_input == "":
-                        sys.exit(1)
+                        self.quit()
                     else:
                         self.alternatives.append(user_input)
                 except pywikibot.IsNotRedirectPage:
@@ -1001,9 +999,12 @@ u"Page does not exist, using the first link in page %s."
             preloadingGen = pagegenerators.PreloadingGenerator(gen)
             for refPage in preloadingGen:
                 if not self.primaryIgnoreManager.isIgnored(refPage):
-                    # run until the user selected 'quit'
-                    if not self.treat(refPage, disambPage):
-                        break
+                    try:
+                        self.treat(refPage, disambPage)
+                    except QuitKeyboardInterrupt:
+                        pywikibot.output('\nUser quit %s bot run...' %
+                                         self.__class__.__name__)
+                        return
 
             # clear alternatives before working on next disambiguation page
             self.alternatives = []

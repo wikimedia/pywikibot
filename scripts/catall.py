@@ -21,7 +21,6 @@ Options:
 __version__ = '$Id$'
 #
 
-import sys
 import pywikibot
 from pywikibot import i18n, textlib
 
@@ -55,8 +54,7 @@ q: quit.""")
             chosen = None
             done = True
         elif choice == "q":
-            print "quit..."
-            sys.exit()
+            raise pywikibot.QuitKeyboardInterrupt
         else:
             chosen.append(choice)
     return chosen
@@ -113,4 +111,7 @@ def main():
             pywikibot.output(u'%s is a redirect' % p.title())
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pywikibot.output('\nQuitting program...')

@@ -53,7 +53,7 @@ import time
 import datetime
 import sys
 import pywikibot
-from pywikibot import i18n
+from pywikibot import i18n, Bot
 
 content = {
     'commons': u'{{Sandbox}}\n<!-- Please edit only below this line. -->',
@@ -136,7 +136,7 @@ user_sandboxTemplate = {
 }
 
 
-class SandboxBot(pywikibot.Bot):
+class SandboxBot(Bot):
     availableOptions = {
         'hours': 1,
         'no_repeat': True,
@@ -304,10 +304,7 @@ def main():
             return
 
     bot = SandboxBot(**opts)
-    try:
-        bot.run()
-    except KeyboardInterrupt:
-        pywikibot.output('\nQuitting program...')
+    bot.run()
 
 if __name__ == "__main__":
     main()

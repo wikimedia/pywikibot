@@ -126,9 +126,8 @@ __version__ = '$Id$'
 import re
 import time
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import i18n, textlib, pagegenerators, Bot
 from pywikibot import editor as editarticle
-from pywikibot import i18n, textlib
 import webbrowser
 
 # Imports predefined replacements tasks from fixes.py
@@ -219,7 +218,7 @@ class XmlDumpReplacePageGenerator:
         return False
 
 
-class ReplaceRobot:
+class ReplaceRobot(Bot):
     """
     A bot that can do text replacements.
     """
@@ -399,7 +398,7 @@ class ReplaceRobot:
                     new_text = original_text
                     continue
                 if choice == 'q':
-                    return
+                    self.quit()
                 if choice == 'a':
                     self.acceptall = True
                 if choice == 'y':

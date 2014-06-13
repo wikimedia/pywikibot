@@ -65,9 +65,9 @@ __version__ = '$Id$'
 
 import re
 
-import add_text
+from add_text import add_text
 import pywikibot
-from pywikibot import i18n, pagegenerators
+from pywikibot import i18n, pagegenerators, Bot
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -234,17 +234,13 @@ msg_change = {
 }
 
 
-class CommonscatBot:
+class CommonscatBot(Bot):
 
     def __init__(self, generator, always, summary=None):
+        super(CommonscatBot, self).__init__(always=always)
         self.generator = generator
-        self.always = always
         self.summary = summary
         self.site = pywikibot.Site()
-
-    def run(self):
-        for page in self.generator:
-            self.treat(page)
 
     def treat(self, page):
         """ Load the given page, do some changes, and save it. """
@@ -262,46 +258,6 @@ class CommonscatBot:
                              % page.title(asLink=True))
         else:
             self.addCommonscat(page)
-
-    def save(self, text, page, comment, minorEdit=True, botflag=True):
-        # only save if something was changed
-        if text != page.get():
-            # Show the title of the page we're working on.
-            # Highlight the title in purple.
-            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                             % page.title())
-            # show what was changed
-            pywikibot.showDiff(page.get(), text)
-            pywikibot.output(u'Comment: %s' % comment)
-            if not self.always:
-                choice = pywikibot.inputChoice(
-                    u'Do you want to accept these changes?',
-                    ['Yes', 'No', 'Always', 'Quit'],
-                    ['y', 'N', 'a', 'q'], 'N')
-                if choice == 'a':
-                    self.always = True
-                elif choice == 'q':
-                    import sys
-                    sys.exit()
-            if self.always or choice == 'y':
-                try:
-                    # Save the page
-                    page.put(text, comment=comment,
-                             minorEdit=minorEdit, botflag=botflag)
-                except pywikibot.LockedPage:
-                    pywikibot.output(u"Page %s is locked; skipping."
-                                     % page.title(asLink=True))
-                except pywikibot.EditConflict:
-                    pywikibot.output(
-                        u'Skipping %s because of edit conflict'
-                        % (page.title()))
-                except pywikibot.SpamfilterError as error:
-                    pywikibot.output(
-                        u'Cannot change %s because of spam blacklist entry %s'
-                        % (page.title(), error.url))
-                else:
-                    return True
-        return False
 
     @classmethod
     def getCommonscatTemplate(self, code=None):
@@ -382,11 +338,9 @@ class CommonscatBot:
                 else:
                     textToAdd = u'{{%s|%s}}' % (primaryCommonscat,
                                                 commonscatLink)
-                (success, status, self.always) = add_text.add_text(page,
-                                                                   textToAdd,
-                                                                   self.summary,
-                                                                   None, None,
-                                                                   self.always)
+                always = self.getOption('always')
+                rv = add_text(page, textToAdd, self.summary, always=always)
+                self.options['always'] = rv[2]
                 return True
         return True
 
@@ -423,7 +377,20 @@ class CommonscatBot:
                                      msg_change,
                                      fallback=True) % {'oldcat': oldcat,
                                                        'newcat': newcat}
-        self.save(newtext, page, comment)
+
+        try:
+            self.userPut(page, page.text, newtext, comment=comment)
+        except pywikibot.LockedPage:
+            pywikibot.output(u"Page %s is locked; skipping."
+                             % page.title(asLink=True))
+        except pywikibot.EditConflict:
+            pywikibot.output(
+                u'Skipping %s because of edit conflict'
+                % (page.title()))
+        except pywikibot.SpamfilterError as error:
+            pywikibot.output(
+                u'Cannot change %s because of spam blacklist entry %s'
+                % (page.title(), error.url))
 
     def findCommonscatLink(self, page=None):
         # In Pywikibot 2.0, page.interwiki() now returns Link objects, not Page objects

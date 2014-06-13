@@ -848,7 +848,6 @@ class CosmeticChangesBot(Bot):
         super(CosmeticChangesBot, self).__init__(**kwargs)
 
         self.generator = generator
-        self.done = False
 
     def treat(self, page):
         try:
@@ -873,15 +872,6 @@ class CosmeticChangesBot(Bot):
         except pywikibot.EditConflict:
             pywikibot.output("An edit conflict has occured at %s."
                              % page.title(asLink=True))
-
-    def run(self):
-        try:
-            for page in self.generator:
-                if self.done:
-                    break
-                self.treat(page)
-        except KeyboardInterrupt:
-            pywikibot.output('\nQuitting program...')
 
 
 def main():

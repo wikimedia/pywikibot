@@ -41,7 +41,6 @@ Furthermore, the following command line parameters are supported:
 __version__ = '$Id$'
 #
 
-import sys
 import re
 import pywikibot
 from pywikibot import i18n, pagegenerators, Bot
@@ -121,7 +120,7 @@ class MovePagesBot(Bot):
                     self.options['always'] = True
                     self.moveOne(page, newPageTitle)
                 elif choice2 == 'q':
-                    sys.exit()
+                    self.quit()
                 elif choice2 == 'n':
                     pass
                 else:
@@ -161,7 +160,7 @@ class MovePagesBot(Bot):
                     self.appendAll = True
                     self.moveOne(page, newPageTitle)
                 elif choice2 == 'q':
-                    sys.exit()
+                    self.quit()
                 elif choice2 == 'n':
                     pass
                 else:
@@ -195,7 +194,7 @@ class MovePagesBot(Bot):
                     self.regexAll = True
                     self.moveOne(page, newPageTitle)
                 elif choice2 == 'q':
-                    sys.exit()
+                    self.quit()
                 elif choice2 == 'n':
                     pass
                 else:
@@ -203,13 +202,9 @@ class MovePagesBot(Bot):
             elif choice == 'n':
                 pass
             elif choice == 'q':
-                sys.exit()
+                self.quit()
             else:
                 self.treat(page)
-
-    def run(self):
-        for page in self.generator:
-            self.treat(page)
 
 
 def main():

@@ -65,7 +65,7 @@ script_input = {
     'catall': 'q\n',  # q for quit
     'editarticle': 'Test page\n',
     'interwiki': 'Test page\n',
-    # 'misspelling': 'q\n',   # pressing 'q' doesnt work. bug 68663
+    'misspelling': 'q\n',
     'pagefromfile': 'q\n',
     'replace': 'foo\nbar\n\n\n',  # match, replacement,
                                   # Enter to begin, Enter for default summary.

@@ -118,6 +118,11 @@ starsList = [
 def add_text(page, addText, summary=None, regexSkip=None,
              regexSkipUrl=None, always=False, up=False, putText=True,
              oldTextGiven=None, reorderEnabled=True, create=False):
+    """
+    Add text to a page.
+
+    @rtype: tuple of (text, newtext, always)
+    """
     site = page.site
     if not summary:
         summary = i18n.twtranslate(site, 'add_text-adding',

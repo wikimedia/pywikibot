@@ -68,7 +68,6 @@ class UnlinkBot(Bot):
         # note that the definition of 'letter' varies from language to language.
         self.linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?(\|(?P<label>[^\]]*))?\]\](?P<linktrail>%s)'
                                 % linktrail)
-        self.done = False
         self.comment = i18n.twtranslate(self.pageToUnlink.site, 'unlink-unlinking',
                                         self.pageToUnlink.title())
 
@@ -128,8 +127,7 @@ class UnlinkBot(Bot):
                 elif choice == 'a':
                     self.options['always'] = True
                 elif choice == 'q':
-                    self.done = True
-                    return text, False
+                    self.quit()
             new = match.group('label') or match.group('title')
             new += match.group('linktrail')
             return text[:match.start()] + new + text[match.end():], False
@@ -167,12 +165,6 @@ class UnlinkBot(Bot):
                              % page.title(asLink=True))
         except pywikibot.LockedPage:
             pywikibot.output(u"Page %s is locked?!" % page.title(asLink=True))
-
-    def run(self):
-        for page in self.generator:
-            if self.done:
-                break
-            self.treat(page)
 
 
 def main():
