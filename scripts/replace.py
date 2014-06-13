@@ -386,7 +386,7 @@ class ReplaceRobot:
                 if choice == 'b':
                     webbrowser.open("http://%s%s" % (
                         page.site.hostname(),
-                        page.site.nice_get_address(page.title())
+                        page.site.nice_get_address(page.title(asUrl=True))
                     ))
                     i18n.input('pywikibot-enter-finished-browser')
                     try:
