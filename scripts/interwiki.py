@@ -1964,7 +1964,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 if answer == 'b':
                     webbrowser.open("http://%s%s" % (
                         page.site.hostname(),
-                        page.site.nice_get_address(page.title())
+                        page.site.nice_get_address(page.title(asUrl=True))
                     ))
                     pywikibot.input(u"Press Enter when finished in browser.")
                     return True
