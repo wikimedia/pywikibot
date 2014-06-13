@@ -126,8 +126,9 @@ def add_text(page=None, addText=None, summary=None, regexSkip=None,
              oldTextGiven=None, reorderEnabled=True, create=False):
     if not addText:
         raise NoEnoughData('You have to specify what text you want to add!')
+    site = page.site
     if not summary:
-        summary = i18n.twtranslate(pywikibot.Site(), 'add_text-adding',
+        summary = i18n.twtranslate(site, 'add_text-adding',
                                    {'adding': addText[:200]})
 
     # When a page is tagged as "really well written" it has a star in the
@@ -135,8 +136,6 @@ def add_text(page=None, addText=None, summary=None, regexSkip=None,
     # format) to make the stars appear.
 
     errorCount = 0
-    site = pywikibot.Site()
-    pathWiki = site.family.nicepath(site.code)
 
     if putText:
         pywikibot.output(u'Loading %s...' % page.title())
@@ -159,7 +158,7 @@ def add_text(page=None, addText=None, summary=None, regexSkip=None,
     # Understand if the bot has to skip the page or not
     # In this way you can use both -except and -excepturl
     if regexSkipUrl is not None:
-        url = '%s%s' % (pathWiki, page.title(asUrl=True))
+        url = site.nice_get_address(page.title(asUrl=True))
         result = re.findall(regexSkipUrl, site.getUrl(url))
         if result != []:
             pywikibot.output(
@@ -236,8 +235,8 @@ Match was: %s''' % result)
                     return (False, False, always)
                 elif choice == 'b':
                     webbrowser.open("http://%s%s" % (
-                        page.site.hostname(),
-                        page.site.nice_get_address(page.title())
+                        site.hostname(),
+                        site.nice_get_address(page.title(asUrl=True))
                     ))
                     pywikibot.input("Press Enter when finished in browser.")
             if always or choice == 'y':
