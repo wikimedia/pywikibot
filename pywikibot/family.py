@@ -1075,7 +1075,7 @@ class WikimediaFamily(Family):
 
         """
         # Here we return the latest mw release of wikimedia projects
-        return '1.24wmf7'
+        return '1.24wmf8'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
