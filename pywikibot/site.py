@@ -3752,7 +3752,8 @@ class DataSite(APISite):
             params['value'] = json.dumps(claim._formatDataValue())
         if 'summary' in kwargs:
             params['summary'] = kwargs['summary']
-        params['token'] = self.token(item, 'edit')
+        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
+                                     'edit')
         req = api.Request(site=self, **params)
         data = req.submit()
         claim.snak = data['claim']['id']
@@ -3782,7 +3783,8 @@ class DataSite(APISite):
             params['bot'] = 1
         if 'summary' in kwargs:
             params['summary'] = kwargs['summary']
-        params['token'] = self.token(claim, 'edit')
+        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
+                                     'edit')
         if snaktype == 'value':
             params['value'] = json.dumps(claim._formatDataValue())
 
@@ -3811,7 +3813,8 @@ class DataSite(APISite):
             params['baserevid'] = claim.on_item.lastrevid
         if bot:
             params['bot'] = 1
-        params['token'] = self.token(claim, 'edit')
+        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
+                                     'edit')
         # build up the snak
         if isinstance(source, list):
             sources = source
@@ -3881,7 +3884,8 @@ class DataSite(APISite):
                 hasattr(qualifier, 'hash') and
                 qualifier.hash is not None):
             params['snakhash'] = qualifier.hash
-        params['token'] = self.token(claim, 'edit')
+        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
+                                     'edit')
         # build up the snak
         if qualifier.getSnakType() == 'value':
             params['value'] = json.dumps(qualifier._formatDataValue())
