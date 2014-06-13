@@ -331,7 +331,7 @@ class WbQuantity(object):
             raise NotImplementedError('Currently only unit-less quantities are supported')
         if unit is None:
             unit = '1'
-        self.amount = long(amount)
+        self.amount = amount
         self.unit = unit
         upperError = lowerError = 0
         if isinstance(error, tuple):
@@ -355,11 +355,11 @@ class WbQuantity(object):
 
     @staticmethod
     def fromWikibase(wb):
-        amount = long(wb[u'amount'])
-        upperBound = long(wb[u'upperBound'])
-        lowerBound = long(wb[u'lowerBound'])
+        amount = eval(wb['amount'])
+        upperBound = eval(wb['upperBound'])
+        lowerBound = eval(wb['lowerBound'])
         error = (upperBound - amount, amount - lowerBound)
-        return WbQuantity(amount, wb[u'unit'], error)
+        return WbQuantity(amount, wb['unit'], error)
 
     def __str__(self):
         return str(self.toWikibase())
@@ -368,7 +368,8 @@ class WbQuantity(object):
         return self.__dict__ == other.__dict__
 
     def __repr__(self):
-        return u"WbQuantity(amount=%(amount)d, upperBound=%(upperBound)d, lowerBound=%(lowerBound)d, unit=%(unit)s" % self.__dict__
+        return (u"WbQuantity(amount=%(amount)s, upperBound=%(upperBound)s, "
+                u"lowerBound=%(lowerBound)s, unit=%(unit)s)" % self.__dict__)
 
 
 def deprecated(instead=None):
