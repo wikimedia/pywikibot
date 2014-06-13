@@ -318,24 +318,22 @@ class CommonscatBot:
         return False
 
     @classmethod
-    def getCommonscatTemplate(self, lang=None):
-        """Get the template name in a language. Expects the language code.
+    def getCommonscatTemplate(self, code=None):
+        """Get the template name of a site. Expects the site code.
         Return as tuple containing the primary template and it's alternatives
 
         """
-        if lang in commonscatTemplates:
-            return commonscatTemplates[lang]
+        if code in commonscatTemplates:
+            return commonscatTemplates[code]
         else:
             return commonscatTemplates[u'_default']
 
     def skipPage(self, page):
-        '''
-        Do we want to skip this page?
-        '''
-        if page.site.language() in ignoreTemplates:
+        """Do we want to skip this page?"""
+        if page.site.code in ignoreTemplates:
             templatesInThePage = page.templates()
             templatesWithParams = page.templatesWithParams()
-            for template in ignoreTemplates[page.site.language()]:
+            for template in ignoreTemplates[page.site.code]:
                 if not isinstance(template, tuple):
                     for pageTemplate in templatesInThePage:
                         if pageTemplate.title(withNamespace=False) == template:
@@ -356,7 +354,7 @@ class CommonscatBot:
         pywikibot.output(u'Working on ' + page.title())
         # Get the right templates for this page
         primaryCommonscat, commonscatAlternatives = self.getCommonscatTemplate(
-            page.site.language())
+            page.site.code)
         commonscatLink = self.getCommonscatLink(page)
         if commonscatLink:
             pywikibot.output(u'Commonscat template is already on %s'
@@ -458,7 +456,7 @@ class CommonscatBot:
                         if (checkedCommonscat != u''):
                             pywikibot.output(
                                 u"Found link for %s at [[%s:%s]] to %s."
-                                % (page.title(), ipage.site.language(),
+                                % (page.title(), ipage.site.code,
                                    ipage.title(), checkedCommonscat))
                             return checkedCommonscat
             except pywikibot.BadTitle:
@@ -467,11 +465,11 @@ class CommonscatBot:
         return u''
 
     def getCommonscatLink(self, wikipediaPage=None):
-        '''
+        """
         Go through the page and return a tuple of (<templatename>, <target>)
-        '''
+        """
         primaryCommonscat, commonscatAlternatives = self.getCommonscatTemplate(
-            wikipediaPage.site.language())
+            wikipediaPage.site.code)
         commonscatTemplate = u''
         commonscatTarget = u''
         commonscatLinktext = u''
@@ -575,7 +573,7 @@ def main():
             checkcurrent = True
             primaryCommonscat, commonscatAlternatives = \
                 CommonscatBot.getCommonscatTemplate(
-                    pywikibot.Site().language())
+                    pywikibot.Site().code)
             generator = pagegenerators.NamespaceFilterPageGenerator(
                 pagegenerators.ReferringPageGenerator(
                     pywikibot.Page(pywikibot.Site(),
