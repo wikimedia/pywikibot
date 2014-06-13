@@ -228,7 +228,9 @@ class TestSiteObject(PywikibotTestCase):
     def testTokens(self):
         """Test ability to get page tokens."""
         for ttype in ("edit", "move"):  # token types for non-sysops
-            self.assertIsInstance(mysite.token(mainpage, ttype), basestring)
+            token = mysite.token(mainpage, ttype)
+            self.assertIsInstance(token, basestring)
+            self.assertEqual(token, mysite.tokens[ttype])
         self.assertRaises(KeyError, mysite.token, mainpage, "invalidtype")
 
     def testPreload(self):
