@@ -23,7 +23,6 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import pagegenerators
 from pywikibot.compat import query
 
 
@@ -120,7 +119,7 @@ Hallo %(admin)s,
         unblock_tpl = self.unblock_tpl[self.site.code]
         project_name = self.project_name[self.site.code]
         user = pywikibot.User(self.site, userPage.title(withNamespace=False))
-        saveAdmin = saveProject = False
+        # saveAdmin = saveProject = False
         talkComment = None
         for templates in userPage.templatesWithParams():
             if templates[0] == unblock_tpl:
@@ -244,7 +243,7 @@ Hallo %(admin)s,
             }
 
     def SysopGenerator(self):
-        params = param = {
+        params = {
             'action':  'query',
             'list':    'allusers',
             'augroup': 'sysop',
@@ -274,10 +273,9 @@ Hallo %(admin)s,
                              % page.title(asLink=True))
         else:
             return text
-        return None
 
     def save(self, text, page, comment, minorEdit=True, botflag=True):
-        if text != page.get():
+        if text != page.text:
             # Show the title of the page we're working on.
             # Highlight the title in purple.
             pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
@@ -290,10 +288,11 @@ Hallo %(admin)s,
                     u'Do you want to accept these changes?',
                     ['Yes', 'No'], ['y', 'N'], 'N')
                 if choice == 'y':
+                    page.text = text
                     try:
                         # Save the page
-                        page.put(text, comment=comment, minorEdit=minorEdit,
-                                 botflag=botflag)
+                        page.save(comment=comment, minorEdit=minorEdit,
+                                  botflag=botflag)
                     except pywikibot.LockedPage:
                         pywikibot.output(u"Page %s is locked; skipping."
                                          % page.title(asLink=True))
@@ -307,7 +306,6 @@ Hallo %(admin)s,
                             u'%s' % (page.title(), error.url))
                     else:
                         return True
-        return
 
 
 def main():
