@@ -43,6 +43,7 @@ reNamespace = re.compile("^(.+?) *: *(.*)$")
 # Page objects (defined here) represent the page itself, including its contents.
 
 class Page(pywikibot.UnicodeMixin, ComparableMixin):
+
     """Page: A MediaWiki page
 
     This object only implements internally methods that do not require
@@ -1641,6 +1642,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
 
 class ImagePage(Page):
+
     """A subclass of Page representing an image descriptor wiki page.
 
     Supports the same interface as Page, with the following added methods:
@@ -1756,6 +1758,7 @@ class ImagePage(Page):
 
 
 class Category(Page):
+
     """A page in the Category: namespace"""
 
     @deprecate_arg("insite", None)
@@ -2091,6 +2094,7 @@ ip_regexp = re.compile(r'^(?:(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}'
 
 
 class User(Page):
+
     """A class that represents a Wiki user.
     """
 
@@ -2391,6 +2395,7 @@ class User(Page):
 
 
 class WikibasePage(Page):
+
     """
     The base page for the Wikibase extension.
     There really should be no need to call this directly
@@ -2809,6 +2814,7 @@ class Property():
 
 
 class PropertyPage(WikibasePage, Property):
+
     """
     Any page in the property namespace
     Should be created as:
@@ -2842,6 +2848,7 @@ class PropertyPage(WikibasePage, Property):
 
 
 class QueryPage(WikibasePage):
+
     """
     For future usage, not implemented yet
     """
@@ -2853,6 +2860,7 @@ class QueryPage(WikibasePage):
 
 
 class Claim(Property):
+
     """
     Claims are standard claims as well as references.
     """
@@ -3091,6 +3099,7 @@ class Claim(Property):
 
 
 class Revision(object):
+
     """A structure holding information about a single revision of a Page."""
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
                  text=None, minor=False):
@@ -3123,6 +3132,7 @@ class Revision(object):
 
 
 class Link(ComparableMixin):
+
     """A MediaWiki link (local or interwiki)
 
     Has the following attributes:

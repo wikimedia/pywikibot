@@ -19,10 +19,12 @@ from pywikibot import config2 as config
 
 
 class GraphImpossible(Exception):
+
     "Drawing a graph is not possible on your system."
 
 
 class GraphSavingThread(threading.Thread):
+
     """
     Rendering a graph can take extremely long. We use
     multithreading because of that.

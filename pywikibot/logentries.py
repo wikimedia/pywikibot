@@ -17,6 +17,7 @@ _logger = "wiki"
 
 
 class LogDict(dict):
+
     """
     Simple custom dictionary that raises a custom KeyError and logs
     debugging information when a key is missing
@@ -28,6 +29,7 @@ class LogDict(dict):
 
 
 class LogEntry(object):
+
     """Generic log entry"""
 
     # Log type expected. None for every type, or one of the (letype) str :
@@ -205,6 +207,7 @@ class NewUsersEntry(LogEntry):
 
 
 class LogEntryFactory(object):
+
     """
     LogEntry Factory
 

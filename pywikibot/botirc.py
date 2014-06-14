@@ -38,6 +38,7 @@ import pywikibot
 
 
 class IRCBot(pywikibot.Bot, SingleServerIRCBot):
+
     """
     Generic IRC Bot to be subclassed
 

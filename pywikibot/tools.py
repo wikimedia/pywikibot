@@ -18,6 +18,7 @@ else:
 
 
 class UnicodeMixin(object):
+
     """Mixin class to handle defining the proper __str__/__unicode__
        methods in Python 2 or 3.
     """
@@ -60,6 +61,7 @@ class ComparableMixin(object):
 
 
 class ThreadedGenerator(threading.Thread):
+
     """Look-ahead generator class.
 
     Runs a generator in a separate thread and queues the results; can
@@ -171,6 +173,7 @@ def itergroup(iterable, size):
 
 
 class ThreadList(list):
+
     """A simple threadpool class to limit the number of simultaneous threads.
 
     Any threading.Thread object can be added to the pool using the append()

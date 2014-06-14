@@ -38,10 +38,12 @@ _logger = "wiki.site"
 
 
 class PageInUse(pywikibot.Error):
+
     """Page cannot be reserved for writing due to existing lock."""
 
 
 class LoginStatus(object):
+
     """ Enum for Login statuses.
 
     >>> LoginStatus.NOT_ATTEMPTED
@@ -96,6 +98,7 @@ does not exist. Also check your configuration file."""
 
 
 class BaseSite(object):
+
     """Site methods that are independent of the communication interface."""
     # to implement a specific interface, define a Site class that inherits
     # from this
@@ -575,6 +578,7 @@ def need_version(version):
 
 
 class APISite(BaseSite):
+
     """API interface to MediaWiki site.
 
     Do not use directly; use pywikibot.Site function.

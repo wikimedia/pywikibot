@@ -46,6 +46,7 @@ if os.name != 'nt':
 
 
 class pwb_install(install.install):
+
     """
     Setuptools' install command subclassed to automatically call
     `generate_user_files.py` after installing the package.

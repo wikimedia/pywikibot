@@ -35,6 +35,7 @@ from pywikibot.i18n import translate
 
 
 class Timestamp(datetime.datetime):
+
     """Class for handling Mediawiki timestamps.
 
     This inherits from datetime.datetime, so it can use all of the methods
@@ -94,6 +95,7 @@ class Timestamp(datetime.datetime):
 
 
 class Coordinate(object):
+
     """
     Class for handling and storing Coordinates.
     For now its just being used for DataSite, but
@@ -209,6 +211,7 @@ class Coordinate(object):
 
 
 class WbTime(object):
+
     """ A Wikibase time representation"""
 
     PRECISION = {'1000000000': 0, '100000000': 1, '10000000': 2, '1000000': 3, '100000': 4, '10000': 5, 'millenia': 6, 'century': 7, 'decade': 8, 'year': 9, 'month': 10, 'day': 11, 'hour': 12, 'minute': 13, 'second': 14}
@@ -314,6 +317,7 @@ class WbTime(object):
 
 
 class WbQuantity(object):
+
     """ A Wikibase quantity representation"""
 
     def __init__(self, amount, unit=None, error=None):
