@@ -27,6 +27,19 @@ import logging
 import atexit
 import time
 
+# Verify that a working httplib2 is present.
+try:
+    import httplib2
+except ImportError:
+    print("Error: Python module httplib2 >= 0.6.0 is required.")
+    sys.exit(1)
+
+from distutils.version import StrictVersion
+if StrictVersion(httplib2.__version__) < StrictVersion("0.6.0"):
+    print("Error: Python module httplib2 (%s) is not 0.6.0 or greater." %
+          httplib2.__file__)
+    sys.exit(1)
+
 if sys.version_info[0] == 2:
     from httplib2 import SSLHandshakeError
     import Queue

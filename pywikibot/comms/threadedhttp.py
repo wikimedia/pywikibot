@@ -42,17 +42,7 @@ from pywikibot import config
 _logger = "comm.threadedhttp"
 
 
-# easy_install safeguarded dependencies
-try:
-    import httplib2
-except ImportError:
-    try:
-        import pkg_resources
-        pkg_resources.require("httplib2")
-    except ImportError:
-        pywikibot.error(
-            u"Error: You need the python module httplib2 to use this module")
-        sys.exit(1)
+import httplib2
 
 
 class ConnectionPool(object):
