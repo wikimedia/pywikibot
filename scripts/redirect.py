@@ -708,8 +708,6 @@ class RedirectRobot:
     def fix_double_or_delete_broken_redirects(self):
         # TODO: part of this should be moved to generator, the rest merged into
         # self.run()
-        # get reason for deletion text
-        delete_reason = i18n.twtranslate(self.site, 'redirect-remove-broken')
         count = 0
         for (redir_name, code, target, final)\
                 in self.generator.get_redirects_via_api(maxlen=2):
@@ -821,7 +819,4 @@ def main(*args):
         bot.run()
 
 if __name__ == '__main__':
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()
