@@ -301,7 +301,7 @@ class Http(httplib2.Http):
                                 headers=headers,
                                 max_redirects=max_redirects - 1)
         else:
-            raise RedirectLimit(
+            raise httplib2.RedirectLimit(
                 "Redirected more times than redirection_limit allows.",
                 response, content)
 
