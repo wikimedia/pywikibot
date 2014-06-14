@@ -64,14 +64,45 @@ class TestGeneral(PywikibotTestCase):
 
         # test WbQuantity
         q = pywikibot.WbQuantity(amount=1234, error=1)
-        self.assertEqual(q.toWikibase(), {'amount': 1234, 'lowerBound': 1233, 'upperBound': 1235, 'unit': '1', })
+        self.assertEqual(q.toWikibase(),
+                         {'amount': 1234, 'lowerBound': 1233,
+                          'upperBound': 1235, 'unit': '1', })
         q = pywikibot.WbQuantity(amount=5, error=(2, 3))
-        self.assertEqual(q.toWikibase(), {'amount': 5, 'lowerBound': 2, 'upperBound': 7, 'unit': '1', })
-        self.assertRaises(ValueError, pywikibot.WbQuantity, amount=None, error=1)
-        self.assertRaises(NotImplementedError, pywikibot.WbQuantity, amount=789, unit='invalid_unit')
+        self.assertEqual(q.toWikibase(),
+                         {'amount': 5, 'lowerBound': 2, 'upperBound': 7,
+                          'unit': '1', })
+        q = pywikibot.WbQuantity(amount=0.044405586)
+        self.assertEqual(q.toWikibase(),
+                         {'amount': 0.044405586, 'lowerBound': 0.044405586,
+                          'upperBound': 0.044405586, 'unit': '1', })
+        # test other WbQuantity methods
+        self.assertEqual("%s" % q,
+                         "{'amount': 0.044405586, 'lowerBound': 0.044405586, "
+                         "'unit': '1', 'upperBound': 0.044405586}")
+        self.assertEqual("%r" % q,
+                         "WbQuantity(amount=0.044405586, "
+                         "upperBound=0.044405586, lowerBound=0.044405586, "
+                         "unit=1)")
+        self.assertEqual(q, q)
+
+        # test WbQuantity.fromWikibase() instantiating
+        q = pywikibot.WbQuantity.fromWikibase({u'amount': u'+0.0229',
+                                               u'lowerBound': u'0',
+                                               u'upperBound': u'1',
+                                               u'unit': u'1'})
+        self.assertEqual(q.toWikibase(),
+                         {'amount': 0.0229, 'lowerBound': 0, 'upperBound': 1,
+                          'unit': '1', })
+
+        # test WbQuantity error handling
+        self.assertRaises(ValueError, pywikibot.WbQuantity, amount=None,
+                          error=1)
+        self.assertRaises(NotImplementedError, pywikibot.WbQuantity, amount=789,
+                          unit='invalid_unit')
 
         # test WikibasePage.__cmp__
-        self.assertEqual(pywikibot.ItemPage.fromPage(mainpage), pywikibot.ItemPage(repo, 'q5296'))
+        self.assertEqual(pywikibot.ItemPage.fromPage(mainpage),
+                         pywikibot.ItemPage(repo, 'q5296'))
 
     def testItemPageExtensionability(self):
         class MyItemPage(pywikibot.ItemPage):
