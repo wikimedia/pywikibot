@@ -1429,7 +1429,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 # FIXME: What errors are we catching here?
                 # except: should be avoided!!
                 except:
-                    #raise
+                    # raise
                     pywikibot.output(u'File autonomous_problems.dat open or corrupted! Try again with -restore.')
                     sys.exit()
                 iw = ()
@@ -1505,7 +1505,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             if page.exists() and not page.isRedirectPage() and not page.isCategoryRedirect():
                 site = page.site
                 if site.family.interwiki_forward:
-                    #TODO: allow these cases to be propagated!
+                    # TODO: allow these cases to be propagated!
                     continue  # inhibit the forwarding families pages to be updated.
                 if site == self.originPage.site:
                     if page != self.originPage:
@@ -1552,7 +1552,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                                      % (i, page2))
                     self.whereReport(page2, indent=8)
                 while True:
-                    #TODO: allow answer to repeat previous or go back after a mistake
+                    # TODO: allow answer to repeat previous or go back after a mistake
                     answer = pywikibot.input(u"Which variant should be used? (<number>, [n]one, [g]ive up) ").lower()
                     if answer:
                         if answer == 'g':
@@ -1583,7 +1583,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     if acceptall:
                         answer = 'a'
                     else:
-                        #TODO: allow answer to repeat previous or go back after a mistake
+                        # TODO: allow answer to repeat previous or go back after a mistake
                         answer = pywikibot.inputChoice(u'What should be done?', ['accept', 'reject', 'give up', 'accept all'], ['a', 'r', 'g', 'l'], 'a')
                     if answer == 'l':  # accept all
                         acceptall = True
@@ -1639,11 +1639,11 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         # TODO: should be move to assemble()
         # replaceLinks will skip the site it's working on.
         if self.originPage.site not in new:
-            #TODO: make this possible as well.
+            # TODO: make this possible as well.
             if not self.originPage.site.family.interwiki_forward:
                 new[self.originPage.site] = self.originPage
 
-        #self.replaceLinks(self.originPage, new, True)
+        # self.replaceLinks(self.originPage, new, True)
 
         updatedSites = []
         notUpdatedSites = []
@@ -1727,7 +1727,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         continue
                     mods, mcomment, adding, removing, modifying \
                         = compareLanguages(old, new, insite=site)
-                    #cannot create pywikibot.User with IP
+                    # cannot create pywikibot.User with IP
                     smallWikiAllowed = (
                         page.isIpEdit() or
                         len(removing) > 0 or
@@ -1771,7 +1771,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         break
 
         # disabled graph drawing for minor problems: it just takes too long
-        #if notUpdatedSites != [] and config.interwiki_graph:
+        # if notUpdatedSites != [] and config.interwiki_graph:
         #    # at least one site was not updated, save a conflict graph
         #    self.createGraph()
 
@@ -1890,7 +1890,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 if rmsite == page.site:
                     continue
                 rmPage = old[rmsite]
-                #put it to new means don't delete it
+                # put it to new means don't delete it
                 if (
                     not globalvar.cleanup or
                     unicode(rmPage) not in globalvar.remove or
@@ -2164,8 +2164,8 @@ class InterwikiBot(object):
                     if page.isTalkPage():
                         pywikibot.output(u'Skipping: %s is a talk page' % page)
                         continue
-                    #doesn't work: page must be preloaded for this test
-                    #if page.isEmpty():
+                    # doesn't work: page must be preloaded for this test
+                    # if page.isEmpty():
                     #    pywikibot.output(u'Skipping: %s is a empty page' % page.title())
                     #    continue
                     if page.namespace() == 10:
@@ -2368,8 +2368,8 @@ def compareLanguages(old, new, insite):
         # Version info marks bots without unicode error
         # This also prevents abuse filter blocking on de-wiki
 
-        #if not pywikibot.unicode_error:
-        #    mcomment += u'r%s) (' % sys.version.split()[0]
+        # if not pywikibot.unicode_error:
+        #     mcomment += u'r%s) (' % sys.version.split()[0]
 
         mcomment += globalvar.summary
 
@@ -2595,7 +2595,7 @@ def main():
             except WindowsError:
                 pass
 
-#===========
+# ===========
 globalvar = Global()
 
 if __name__ == "__main__":
