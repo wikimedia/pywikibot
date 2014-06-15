@@ -193,6 +193,12 @@ placeBeforeSections = {
         u'Przipisy',
         u'Připisy',
     ],
+    'th': [
+        u'อ่านเพิ่มเติม',
+        u'แหล่งข้อมูลอื่น',
+        u'ดูเพิ่ม',
+        u'หมายเหตุ',
+    ],
     'zh': [
         u'外部链接',
         u'外部連结',
@@ -330,6 +336,11 @@ referencesSections = {
         u'Przipisy',
         u'Připisy',
     ],
+    'th': [
+        u'อ้างอิง',
+        u'เชิงอรรถ',
+        u'หมายเหตุ',
+    ],
     'zh': [
         u'參考資料',
         u'参考资料',
@@ -379,6 +390,7 @@ referencesTemplates = {
                u'Примечания', u'Список примечаний',
                u'Сноска', u'Сноски'],
         'szl': [u'Przipisy', u'Připisy'],
+        'th': [u'รายการอ้างอิง'],
         'zh': [u'Reflist', u'RefFoot', u'NoteFoot'],
     },
 }
@@ -399,6 +411,7 @@ referencesSubstitute = {
         'pl': u'{{Przypisy}}',
         'ru': u'{{примечания}}',
         'szl': u'{{Przipisy}}',
+        'th': u'{{รายการอ้างอิง}}',
         'zh': u'{{reflist}}',
     },
 }
