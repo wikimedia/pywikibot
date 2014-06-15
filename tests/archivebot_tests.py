@@ -9,12 +9,8 @@ Tests for several scripts.
 #
 __version__ = '$Id$'
 
-import sys
-#from datetime import datetime
-
 import pywikibot
 import pywikibot.page
-#from pywikibot.textlib import TimeStripper
 from tests.utils import unittest
 
 THREADS = {
