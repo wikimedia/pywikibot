@@ -20,6 +20,7 @@ cache = None
 
 
 class ParseError(Exception):
+
     """ Parsing went wrong """
 
 

@@ -28,6 +28,7 @@ pid = False
 
 
 class Throttle(object):
+
     """Control rate of access to wiki server
 
     Calling this object blocks the calling thread until at least 'delay'

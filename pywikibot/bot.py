@@ -107,6 +107,7 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
 
 class LoggingFormatter(logging.Formatter):
+
     """Format LogRecords for output to file.
 
     This formatter *ignores* the 'newline' key of the LogRecord, because
@@ -751,6 +752,7 @@ Global arguments available for all bots:
 
 
 class Bot(object):
+
     """
     Generic Bot to be subclassed
     """
@@ -834,6 +836,7 @@ class Bot(object):
 
 
 class WikidataBot:
+
     """
     Generic Wikidata Bot to be subclassed
     used in claimit.py, coordinate_import.py and harvest_template.py

@@ -44,6 +44,7 @@ def parseRestrictions(restrictions):
 
 
 class XmlEntry:
+
     """
     Represents a page.
     """
@@ -66,6 +67,7 @@ class XmlEntry:
 
 
 class XmlParserThread(threading.Thread):
+
     """
     This XML parser will run as a single thread. This allows the XmlDump
     generator to yield pages before the parser has finished reading the
@@ -83,6 +85,7 @@ class XmlParserThread(threading.Thread):
 
 
 class XmlDump(object):
+
     """
     Represents an XML dump file. Reads the local file at initialization,
     parses it, and offers access to the resulting XmlEntries via a generator.

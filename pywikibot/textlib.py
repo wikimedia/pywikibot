@@ -1134,6 +1134,7 @@ def does_text_contain_section(pagetext, section):
 # ---------------------------------------
 
 class tzoneFixedOffset(datetime.tzinfo):
+
     """
     Class building tzinfo objects for fixed-offset time zones
 
@@ -1162,6 +1163,7 @@ class tzoneFixedOffset(datetime.tzinfo):
 
 
 class TimeStripper(object):
+
     """
     Find timestamp in page text and returns it as timezone aware datetime object
     """

@@ -194,6 +194,7 @@ __doc__ = __doc__.replace("&params;", parameterHelp)
 
 
 class GeneratorFactory(object):
+
     """Process command line arguments and return appropriate page generator.
     This factory is responsible for processing command line arguments
     that are used by many scripts and that determine which pages to work on.
@@ -1221,6 +1222,7 @@ def UntaggedPageGenerator(untaggedProject, limit=500):
 
 
 class YahooSearchPageGenerator:
+
     """ To use this generator, install pYsearch """
 
     # values larger than 100 fail
@@ -1253,6 +1255,7 @@ class YahooSearchPageGenerator:
 
 
 class GoogleSearchPageGenerator:
+
     """
     To use this generator, you must install the pyGoogle module from
     http://pygoogle.sf.net/ and get a Google Web API license key from
