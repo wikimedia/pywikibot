@@ -1006,7 +1006,8 @@ def update_page(page, pagedict):
                 anon='anon' in rev,
                 comment=rev.get('comment', u''),
                 minor='minor' in rev,
-                text=rev.get('*', None)
+                text=rev.get('*', None),
+                rollbacktoken=rev.get('rollbacktoken', None)
             )
             page._revisions[revision.revid] = revision
 

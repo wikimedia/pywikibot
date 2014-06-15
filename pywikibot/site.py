@@ -1807,7 +1807,7 @@ class APISite(BaseSite):
     def loadrevisions(self, page, getText=False, revids=None,
                       startid=None, endid=None, starttime=None,
                       endtime=None, rvdir=None, user=None, excludeuser=None,
-                      section=None, sysop=False, step=None, total=None):
+                      section=None, sysop=False, step=None, total=None, rollback=False):
         """Retrieve and store revision information.
 
         By default, retrieves the last (current) revision of the page,
@@ -1880,7 +1880,9 @@ class APISite(BaseSite):
             rvargs[u"rvprop"] = u"ids|flags|timestamp|user|comment|content"
             if section is not None:
                 rvargs[u"rvsection"] = unicode(section)
-
+        if rollback:
+            self.login(sysop=sysop)
+            rvargs[u"rvtoken"] = "rollback"
         if revids is None:
             rvtitle = page.title(withSection=False).encode(self.encoding())
             rvargs[u"titles"] = rvtitle
