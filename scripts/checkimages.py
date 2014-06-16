@@ -306,9 +306,9 @@ nothing_notification = {
     'it': u"{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza licenza|%s|__botnick__}} --~~~~",
     'ja': u"\n{{subst:Image copyright|File:%s}}--~~~~",
     'ko': u'\n{{subst:User:Kwjbot IV/untagged|%s}} --~~~~',
-    'ta': u'\n{{subst:Di-no license-notice|படிமம்:%s}} ~~~~ ',
+    'ta': u'\n{{subst:Di-no license-notice|படிமம்:%s}} ~~~~',
     'ur': u"{{subst:ماخذ تصویر|File:%s}}--~~~~",
-    'zh': u'\n{{subst:Uploadvionotice|File:%s}} ~~~~ ',
+    'zh': u'\n{{subst:Uploadvionotice|File:%s}} ~~~~',
 }
 
 # This is a list of what bots used this script in your project.
