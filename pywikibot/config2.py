@@ -626,6 +626,9 @@ line_separator = LS = u'\n'
 # if the user has already installed the library.
 use_mwparserfromhell = True
 
+# location of i18n messages for scripts
+i18n_dir = 'scripts/i18n'
+
 # End of configuration section
 # ============================
 

@@ -8,6 +8,7 @@ __version__ = '$Id$'
 
 import os
 from pywikibot import i18n
+from pywikibot import config2 as config
 import shutil
 
 from tests.utils import unittest
@@ -73,12 +74,11 @@ class TestTranslate(unittest.TestCase):
 
 class TestTWN(unittest.TestCase):
     def setUp(self):
-        self.path = os.path.split(os.path.realpath(__file__))[0]
-        shutil.copyfile(os.path.join(self.path, 'i18n', 'test.py'),
-                        os.path.join(self.path, '..', 'scripts', 'i18n', 'test.py'))
+        self.orig_i18n_dir = config.i18n_dir
+        config.i18n_dir = 'tests/i18n'
 
     def tearDown(self):
-        os.remove(os.path.join(self.path, '..', 'scripts', 'i18n', 'test.py'))
+        config.i18n_dir = self.orig_i18n_dir
 
 
 class TestTWTranslate(TestTWN):
