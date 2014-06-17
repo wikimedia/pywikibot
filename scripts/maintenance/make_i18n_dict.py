@@ -47,13 +47,13 @@ class i18nBot(object):
         print "# -*- coding: utf-8 -*-"
         print "msg = {"
         for code in keys:
-            print "\t'%s': {" % code
+            print "    '%s': {" % code
             for msg in self.messages:
                 label = "%s-%s" % (self.scriptname, msg)
                 if label in self.dict[code]:
-                    print "\t\t'%s': u'%s'," \
-                          % (label, self.dict[code][label])
-            print "\t},"
+                    print "        '%s': u'%s'," % (label,
+                                                    self.dict[code][label])
+            print "    },"
         print "};"
 
     def read(self, item):
