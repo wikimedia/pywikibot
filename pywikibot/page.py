@@ -450,6 +450,30 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             self.site.loadrevisions(self)
         return self._revisions[rev].anon
 
+    def lastNonBotUser(self):
+        """Return name or IP address of last human/non-bot user to edit page.
+
+           Returns the most recent human editor out of the last revisions
+           If it was not able to retrieve a human user returns None.
+           If the edit was done by a bot which is no longer flagged as 'bot',
+           i.e. which is not returned by Site.botusers(), it will be returned
+           as a non-bot edit.
+
+        """
+
+        if hasattr(self, '_lastNonBotUser'):
+            return self._lastNonBotUser
+
+        self._lastNonBotUser = None
+        for vh in self.getVersionHistory():
+            (revid, timestmp, username, comment) = vh[:4]
+
+            if username and (not self.site.isBot(username)):
+                self._lastNonBotUser = username
+                break
+
+        return self._lastNonBotUser
+
     def editTime(self):
         """Return timestamp of last revision to page.
 

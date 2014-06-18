@@ -2158,6 +2158,32 @@ class APISite(BaseSite):
             limit = number
         return self.allcategories(total=limit)
 
+    def isBot(self, username):
+        """Return True is username is a bot user. """
+
+        return username in [userdata['name'] for userdata in self.botusers()]
+
+    def botusers(self, step=None, total=None):
+        """Iterate bot users.
+
+        Iterated values are dicts containing 'name', 'userid', 'editcount',
+        'registration', and 'groups' keys. 'groups' will be present only if
+        the user is a member of at least 1 group, and will be a list of
+        unicodes; all the other values are unicodes and should always be
+        present.
+
+        """
+
+        if not hasattr(self, "_bots"):
+            self._bots = {}
+
+        if not self._bots:
+            for item in self.allusers(group='bot', step=step, total=total):
+                self._bots.setdefault(item['name'], item)
+
+        for value in self._bots.values():
+            yield value
+
     def allusers(self, start="!", prefix="", group=None, step=None,
                  total=None):
         """Iterate registered users, ordered by username.
