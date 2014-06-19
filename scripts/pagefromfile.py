@@ -52,7 +52,7 @@ __version__ = '$Id$'
 import re
 import codecs
 import pywikibot
-from pywikibot import config, Bot
+from pywikibot import config, Bot, i18n
 
 
 class NoTitle(Exception):
@@ -66,85 +66,6 @@ class PageFromFileRobot(Bot):
     Responsible for writing pages to the wiki, with the titles and contents
     given by a PageFromFileReader.
     """
-
-    msg = {
-        'ar': u'استيراد تلقائي للمقالات',
-        'de': u'Automatischer Import von Artikeln',
-        'en': u'Automated import of articles',
-        'fa': u'درون‌ریزی خودکار مقاله‌ها',
-        'fr': u'Import automatique',
-        'he': u'ייבוא ערכים אוטומטי',
-        'ia': u'Importation automatic de articulos',
-        'id': u'Impor artikel automatis',
-        'it': u'Caricamento automatico',
-        'ja': u'記事の自動取り込み',
-        'ksh': u'Bot: automatesch huhjelaade',
-        'mzn': u'ربوت:صفحه شه خاد به خاد دله دکته',
-        'nl': u'Geautomatiseerde import',
-        'no': u'bot: Automatisk import',
-        'pl': u'Automatyczny import artykułów',
-        'pt': u'Importação automática de artigos',
-        'uk': u'Автоматичний імпорт статей',
-        'zh': u'機器人: 自動匯入頁面',
-    }
-
-    # The following messages are added to topic when the page already exists
-    msg_top = {
-        'ar': u'كتابة على الأعلى',
-        'de': u'ergänze am Anfang',
-        'en': u'append on top',
-        'fa': u'به بالا اضافه شد',
-        'he': u'הוספה בראש הדף',
-        'fr': u'rajouté en haut',
-        'id': u'ditambahkan di atas',
-        'it': u'aggiungo in cima',
-        'ja': u'冒頭への追加',
-        'ksh': u'un dofüürjesaz',
-        'nl': u'bovenaan toegevoegd',
-        'no': u'legger til øverst',
-        'pl': u'dodaj na górze',
-        'pt': u'adicionado no topo',
-        'uk': u'додано зверху',
-        'zh': u'機器人: 增加至最上層',
-    }
-
-    msg_bottom = {
-        'ar': u'كتابة على الأسفل',
-        'de': u'ergänze am Ende',
-        'en': u'append on bottom',
-        'fa': u'به پایین اضافه شد',
-        'he': u'הוספה בתחתית הדף',
-        'fr': u'rajouté en bas',
-        'id': u'ditambahkan di bawah',
-        'it': u'aggiungo in fondo',
-        'ja': u'末尾への追加',
-        'ksh': u'un aanjehange',
-        'nl': u'onderaan toegevoegd',
-        'no': u'legger til nederst',
-        'pl': u'dodaj na dole',
-        'pt': u'adicionando no fim',
-        'uk': u'додано знизу',
-        'zh': u'機器人: 增加至最底層',
-    }
-
-    msg_force = {
-        'ar': u'تمت الكتابة على النص الموجود',
-        'de': u'bestehender Text überschrieben',
-        'en': u'existing text overwritten',
-        'fa': u'متن جایگزین شد',
-        'he': u'הטקסט הישן נמחק',
-        'fr': u'texte existant écrasé',
-        'id': u'menimpa teks yang ada',
-        'it': u'sovrascritto il testo esistente',
-        'ja': u'存在するテキストの上書き',
-        'ksh': u'un komplët ußjetuusch',
-        'nl': u'bestaande tekst overschreven',
-        'no': u'erstatter eksisterende tekst',
-        'pl': u'aktualny tekst nadpisany',
-        'pt': u'sobrescrever texto',
-        'uk': u'існуючий текст перезаписано',
-        'zh': u'機器人: 覆寫已存在的文字',
-    }
 
     def __init__(self, reader, **kwargs):
         self.availableOptions.update({
@@ -175,18 +96,14 @@ class PageFromFileRobot(Bot):
         if self.getOption('summary'):
             comment = self.getOption('summary')
         else:
-            comment = pywikibot.translate(mysite, self.msg, fallback=True)
+            comment = i18n.twtranslate(mysite, 'pagefromfile-msg')
 
-        comment_top = comment + " - " + pywikibot.translate(mysite,
-                                                            self.msg_top,
-                                                            fallback=True)
-        comment_bottom = comment + " - " + pywikibot.translate(mysite,
-                                                               self.msg_bottom,
-                                                               fallback=True)
-        comment_force = "%s *** %s ***" % (comment,
-                                           pywikibot.translate(mysite,
-                                                               self.msg_force,
-                                                               fallback=True))
+        comment_top = comment + " - " + i18n.twtranslate(
+            mysite, 'pagefromfile-msg_top')
+        comment_bottom = comment + " - " + i18n.twtranslate(
+            mysite, 'pagefromfile-msg_bottom')
+        comment_force = "%s *** %s ***" % (
+            comment, i18n.twtranslate(mysite, 'pagefromfile-msg_force'))
 
         # Remove trailing newlines (cause troubles when creating redirects)
         contents = re.sub('^[\r\n]*', '', contents)
@@ -221,7 +138,7 @@ class PageFromFileRobot(Bot):
                 config.default_edit_summary = ''
         try:
             page.text = contents
-            page.save(comment, minorEdit=self.getOption('minor'))
+            page.save(comment, minor=self.getOption('minor'))
         except pywikibot.LockedPage:
             pywikibot.output(u"Page %s is locked; skipping." % title)
         except pywikibot.EditConflict:
