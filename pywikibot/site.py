@@ -69,6 +69,12 @@ class LoginStatus(object):
         raise KeyError("Value %r could not be found in this enum"
                        % search_value)
 
+    def __init__(self, state):
+        self.state = state
+
+    def __repr__(self):
+        return 'LoginStatus(%s)' % (LoginStatus.name(self.state))
+
 
 def Family(fam=None, fatal=True):
     """Import the named family.

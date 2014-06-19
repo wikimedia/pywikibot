@@ -462,7 +462,19 @@ class CachedRequest(Request):
             pass
 
     def _uniquedescriptionstr(self):
-        return (repr(self.site) + repr(sorted(self.iteritems())))
+        login_status = self.site._loginstatus
+
+        if login_status > pywikibot.site.LoginStatus.NOT_LOGGED_IN and \
+                hasattr(self.site, '_userinfo') and \
+                'name' in self.site._userinfo:
+            user_key = pywikibot.page.User(self.site,
+                                           self.site._userinfo['name'])
+        else:
+            user_key = pywikibot.site.LoginStatus(
+                max(login_status, pywikibot.site.LoginStatus.NOT_LOGGED_IN))
+
+        return (repr(self.site) + repr(user_key) +
+                repr(sorted(self.iteritems())))
 
     def _create_file_name(self):
         self.http_params()  # normalize self.iteritems()
