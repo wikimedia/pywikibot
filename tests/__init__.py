@@ -13,6 +13,9 @@ from pywikibot.data.api import CachedRequest
 
 
 class TestRequest(CachedRequest):
+
+    """Add caching to every Request except logins."""
+
     def __init__(self, *args, **kwargs):
         super(TestRequest, self).__init__(0, *args, **kwargs)
 
@@ -22,7 +25,33 @@ class TestRequest(CachedRequest):
         return path
 
     def _expired(self, dt):
+        """Never invalidate cached data."""
         return False
+
+    def _load_cache(self):
+        """Return whether the cache can be used."""
+        if not super(TestRequest, self)._load_cache():
+            return False
+
+        if 'lgpassword' in self._uniquedescriptionstr():
+            self._delete_cache()
+            self._data = None
+            return False
+
+        return True
+
+    def _delete_cache(self):
+        """Delete cached response if it exists."""
+        self._load_cache()
+        if self._cachetime:
+            os.remove(self._cachefile_path())
+
+    def _write_cache(self, data):
+        """Write data except login details."""
+        if 'lgpassword' in self._uniquedescriptionstr():
+            return
+
+        return super(TestRequest, self)._write_cache(data)
 
 
 def patch_request():
