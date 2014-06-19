@@ -3106,26 +3106,29 @@ class APISite(BaseSite):
     }
 
     @must_be(group='sysop')
-    def protect(self, page, edit, move, summary, expiry=None):
+    def protect(self, page, protections, summary, expiry=None):
         """(Un)protect a wiki page. Requires administrator status.
 
-        Valid protection levels (in MediaWiki 1.12) are '' (equivalent to
-        'none'), 'autoconfirmed', and 'sysop'.
-
-        @param edit: Level of edit protection
-        @param move: Level of move protection
-        @param unprotect: If true, unprotect the page (equivalent to setting
-            all protection levels to '')
-        @param reason: Edit summary.
-        @param prompt: If true, ask user for confirmation.
-        @param expiry: When the block should expire
-
+        @param protections: A dict mapping type of protection to protection
+            level of that type. Valid types of protection are 'edit', 'move',
+            'create', and 'upload'. Valid protection levels (in MediaWiki 1.12)
+            are '' (equivalent to 'none'), 'autoconfirmed', and 'sysop'.
+            If None is given, however, that protection will be skipped.
+        @param summary: Edit summary.
+        @param expiry: When the block should expire. This expiry will be applied
+            to all protections. If None, 'infinite', 'indefinite', 'never', or ''
+            is given, there is no expiry.
+        @type expiry: pywikibot.Timestamp, string in GNU timestamp format
+            (including ISO 8601).
         """
         token = self.token(page, "protect")
         self.lock_page(page)
+
+        protectList = [type + '=' + level for type, level in protections.items()
+                       if level is not None]
         req = api.Request(site=self, action="protect", token=token,
                           title=page.title(withSection=False),
-                          protections="edit=" + edit + "|" + "move=" + move,
+                          protections=protectList,
                           reason=summary)
         if isinstance(expiry, pywikibot.Timestamp):
             expiry = expiry.toISOformat()

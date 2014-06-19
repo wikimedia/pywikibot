@@ -1483,21 +1483,27 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return self.site.undelete(self, comment)
 
     @deprecate_arg("throttle", None)
-    def protect(self, edit='sysop', move='sysop', unprotect=False,
-                reason=None, prompt=True, expiry=None):
+    def protect(self, edit='sysop', move='sysop', create=None, upload=None,
+                unprotect=False, reason=None, prompt=True, expiry=None):
         """(Un)protect a wiki page. Requires administrator status.
 
         Valid protection levels (in MediaWiki 1.12) are '' (equivalent to
-        'none'), 'autoconfirmed', and 'sysop'.
+        'none'), 'autoconfirmed', and 'sysop'. If None is given, however,
+        that protection will be skipped.
 
         @param edit: Level of edit protection
         @param move: Level of move protection
-        @param unprotect: If true, unprotect the page (equivalent to setting
-            all protection levels to '')
+        @param create: Level of create protection
+        @param upload: Level of upload protection
+        @param unprotect: If true, unprotect page editing and moving
+            (equivalent to set both edit and move to '')
         @param reason: Edit summary.
         @param prompt: If true, ask user for confirmation.
-        @param expiry: When the block should expire
-
+        @param expiry: When the block should expire. This expiry will be applied
+            to all protections. If None, 'infinite', 'indefinite', 'never', or ''
+            is given, there is no expiry.
+        @type expiry: pywikibot.Timestamp, string in GNU timestamp format
+            (including ISO 8601).
         """
         if reason is None:
             if unprotect:
@@ -1509,6 +1515,9 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             reason = pywikibot.input(u'Please enter a reason for the action:')
         if unprotect:
             edit = move = ""
+            # Apply to only edit and move for backward compatibility.
+            # To unprotect article creation, for example,
+            # create must be set to '' and the rest must be None
         answer = 'y'
         if prompt and not hasattr(self.site, '_noProtectPrompt'):
             answer = pywikibot.inputChoice(
@@ -1521,7 +1530,13 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                 answer = 'y'
                 self.site._noProtectPrompt = True
         if answer in ['y', 'Y']:
-            return self.site.protect(self, edit, move, reason, expiry)
+            protections = {
+                'edit': edit,
+                'move': move,
+                'create': create,
+                'upload': upload,
+            }
+            return self.site.protect(self, protections, reason, expiry)
 
     def change_category(self, oldCat, newCat, comment=None, sortKey=None,
                         inPlace=True):
