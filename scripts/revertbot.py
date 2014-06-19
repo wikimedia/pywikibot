@@ -8,6 +8,9 @@ The following command line parameters are supported:
 &params;
 
 -username         Edits of which user need to be reverted.
+
+-rollback         Rollback edits instead of reverting them.
+                  Note that in rollback, no diff would be shown.
 """
 #
 # (C) Bryan Tong Minh, 2008
@@ -32,17 +35,20 @@ docuReplacements = {
 
 
 class BaseRevertBot(object):
-    """ Base revert bot
+
+    """Base revert bot.
 
     Subclass this bot and override callback to get it to do something useful.
 
     """
-    def __init__(self, site, user=None, comment=None):
+
+    def __init__(self, site, user=None, comment=None, rollback=False):
         self.site = site
         self.comment = comment
         self.user = user
         if not self.user:
             self.user = self.site.username()
+        self.rollback = rollback
 
     def get_contributions(self, max=500, ns=None):
         count = 0
@@ -83,25 +89,33 @@ class BaseRevertBot(object):
         return 'top' in item
 
     def revert(self, item):
-        if len(pywikibot.Page(pywikibot.Site(), item['title']).fullVersionHistory(total=2)) > 1:
-            rev = pywikibot.Page(pywikibot.Site(), item['title']).fullVersionHistory(total=2)[1]
+        history = pywikibot.Page(self.site, item['title']).fullVersionHistory(
+            total=2, rollback=self.rollback)
+        if len(history) > 1:
+            rev = history[1]
         else:
             return False
-
         comment = i18n.twtranslate(pywikibot.Site(), 'revertbot-revert', {'revid': rev[0], 'author': rev[2], 'timestamp': rev[1]})
-
         if self.comment:
             comment += ': ' + self.comment
-
         page = pywikibot.Page(self.site, item['title'])
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                          % page.title(asLink=True, forceInterwiki=True,
                                       textlink=True))
-        old = page.text
-        page.text = rev[3]
-        pywikibot.showDiff(old, page.text)
-        page.save(comment)
-        return comment
+        if not self.rollback:
+            old = page.text
+            page.text = rev[3]
+            pywikibot.showDiff(old, page.text)
+            page.save(comment)
+            return comment
+        try:
+            pywikibot.data.api.Request(action="rollback", title=page.title(), user=self.user,
+                                           token=rev[4], markbot=1).submit()
+        except pywikibot.data.api.APIError as e:
+            if e == "badtoken: Invalid token":
+                pywikibot.out("There is an issue for rollbacking the edit, Giving up")
+                return False
+        return u"The edit(s) made in %s by %s was rollbacked" % (page.title(), self.user)
 
     def log(self, msg):
         pywikibot.output(msg)
@@ -112,7 +126,7 @@ class myRevertBot(BaseRevertBot):
     def callback(self, item):
         if 'top' in item:
             page = pywikibot.Page(self.site, item['title'])
-            text = page.get()
+            text = page.get(get_redirect=True)
             pattern = re.compile(u'\[\[.+?:.+?\..+?\]\]', re.UNICODE)
             return pattern.search(text) >= 0
         return False
@@ -120,6 +134,7 @@ class myRevertBot(BaseRevertBot):
 
 def main():
     user = None
+    rollback = False
     for arg in pywikibot.handleArgs():
         if arg.startswith('-username'):
             if len(arg) == 9:
@@ -127,7 +142,9 @@ def main():
                     u'Please enter username of the person you want to revert:')
             else:
                 user = arg[10:]
-    bot = myRevertBot(site=pywikibot.Site(), user=user)
+        elif arg == '-rollback':
+            rollback = True
+    bot = myRevertBot(site=pywikibot.Site(), user=user, rollback=rollback)
     bot.revert_contribs()
 
 if __name__ == "__main__":

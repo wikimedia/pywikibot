@@ -1292,22 +1292,24 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return result
 
     def fullVersionHistory(self, reverseOrder=False, step=None,
-                           total=None):
+                           total=None, rollback=False):
         """Iterate previous versions including wikitext.
 
         Takes same arguments as getVersionHistory.
 
+        @param rollback: Returns rollback token.
         @return: A generator that yields tuples consisting of revision ID,
             edit date/time, user name and content
 
         """
         self.site.loadrevisions(self, getText=True,
                                 rvdir=reverseOrder,
-                                step=step, total=total)
+                                step=step, total=total, rollback=rollback)
         return [(self._revisions[rev].revid,
                  self._revisions[rev].timestamp,
                  self._revisions[rev].user,
-                 self._revisions[rev].text
+                 self._revisions[rev].text,
+                 self._revisions[rev].rollbacktoken
                  ) for rev in sorted(self._revisions,
                                      reverse=not reverseOrder)
                 ]
@@ -3126,7 +3128,7 @@ class Revision(object):
 
     """A structure holding information about a single revision of a Page."""
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
-                 text=None, minor=False):
+                 text=None, minor=False, rollbacktoken=None):
         """All parameters correspond to object attributes (e.g., revid
         parameter is stored as self.revid)
 
@@ -3153,6 +3155,7 @@ class Revision(object):
         self.anon = anon
         self.comment = comment
         self.minor = minor
+        self.rollbacktoken = rollbacktoken
 
 
 class Link(ComparableMixin):
