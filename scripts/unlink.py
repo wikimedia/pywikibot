@@ -1,23 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 """
 This bot unlinks a page on every page that links to it.
 
 This script understands this command-line argument:
 
-    -namespace:n - Number of namespace to process. The parameter can be used
+    -namespace:n   Number of namespace to process. The parameter can be used
                    multiple times. It works in combination with all other
                    parameters, except for the -start parameter. If you e.g.
                    want to iterate over all user pages starting at User:M, use
                    -start:User:M.
 
-All other parameters will be regarded as part of the title of the page that
-should be unlinked.
+Any other parameter will be regarded as the title of the page
+that should be unlinked.
 
 Example:
 
-python unlink.py Foo bar -namespace:0 -namespace:6
+python unlink.py "Foo bar" -namespace:0 -namespace:6
 
     Removes links to the page [[Foo bar]] in articles and image descriptions.
 """
@@ -31,20 +30,27 @@ __version__ = '$Id$'
 
 import re
 import pywikibot
-from pywikibot import pagegenerators
 from pywikibot.editor import TextEditor
-from pywikibot import i18n
+from pywikibot import pagegenerators, i18n, Bot
 
 
-class UnlinkBot:
+class UnlinkBot(Bot):
 
-    def __init__(self, pageToUnlink, namespaces, always):
+    def __init__(self, pageToUnlink, **kwargs):
+        self.availableOptions.update({
+            'namespaces': [],
+            # Which namespaces should be processed?
+            # default to [] which means all namespaces will be processed
+        })
+
+        super(UnlinkBot, self).__init__(**kwargs)
         self.pageToUnlink = pageToUnlink
+        linktrail = self.pageToUnlink.site.linktrail()
+
         gen = pagegenerators.ReferringPageGenerator(pageToUnlink)
-        if namespaces != []:
-            gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
+        if self.getOption('namespaces') != []:
+            gen = pagegenerators.NamespaceFilterPageGenerator(gen, self.getOption('namespaces'))
         self.generator = pagegenerators.PreloadingGenerator(gen)
-        linktrail = pywikibot.getSite().linktrail()
         # The regular expression which finds links. Results consist of four
         # groups:
         #
@@ -62,9 +68,8 @@ class UnlinkBot:
         # note that the definition of 'letter' varies from language to language.
         self.linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?(\|(?P<label>[^\]]*))?\]\](?P<linktrail>%s)'
                                 % linktrail)
-        self.always = always
         self.done = False
-        self.comment = i18n.twtranslate(pywikibot.getSite(), 'unlink-unlinking',
+        self.comment = i18n.twtranslate(self.pageToUnlink.site, 'unlink-unlinking',
                                         self.pageToUnlink.title())
 
     def handleNextLink(self, text, match, context=100):
@@ -91,7 +96,7 @@ class UnlinkBot:
         else:
             # at the beginning of the link, start red color.
             # at the end of the link, reset the color to default
-            if self.always:
+            if self.getOption('always'):
                 choice = 'a'
             else:
                 pywikibot.output(
@@ -121,7 +126,7 @@ class UnlinkBot:
                     return self.handleNextLink(text, match,
                                                context=context + 100)
                 elif choice == 'a':
-                    self.always = True
+                    self.options['always'] = True
                 elif choice == 'q':
                     self.done = True
                     return text, False
@@ -152,7 +157,8 @@ class UnlinkBot:
                 pywikibot.output(u'No changes necessary.')
             else:
                 pywikibot.showDiff(oldText, text)
-                page.put(text, self.comment)
+                page.text = text
+                page.save(self.comment)
         except pywikibot.NoPage:
             pywikibot.output(u"Page %s does not exist?!"
                              % page.title(asLink=True))
@@ -170,31 +176,30 @@ class UnlinkBot:
 
 
 def main():
-    # This temporary array is used to read the page title if one single
-    # page that should be unlinked.
-    pageTitle = []
-    # Which namespaces should be processed?
-    # default to [] which means all namespaces will be processed
-    namespaces = []
-    always = False
+    # This temporary string is used to read the title
+    # of the page that should be unlinked.
+    page_title = None
+    options = {}
 
     for arg in pywikibot.handleArgs():
         if arg.startswith('-namespace:'):
+            if 'namespaces' not in options:
+                options['namespaces'] = []
             try:
-                namespaces.append(int(arg[11:]))
+                options['namespaces'].append(int(arg[11:]))
             except ValueError:
-                namespaces.append(arg[11:])
+                options['namespaces'].append(arg[11:])
         elif arg == '-always':
-            always = True
+            options['always'] = True
         else:
-            pageTitle.append(arg)
+            page_title = arg
 
-    if pageTitle:
-        page = pywikibot.Page(pywikibot.getSite(), ' '.join(pageTitle))
-        bot = UnlinkBot(page, namespaces, always)
+    if page_title:
+        page = pywikibot.Page(pywikibot.Site(), page_title)
+        bot = UnlinkBot(page, **options)
         bot.run()
     else:
-        pywikibot.showHelp('unlink')
+        pywikibot.showHelp()
 
 if __name__ == "__main__":
     main()
