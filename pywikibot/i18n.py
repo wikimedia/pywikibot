@@ -20,6 +20,9 @@ from . import config2 as config
 
 PLURAL_PATTERN = '{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
+# Package name for the translation messages
+messages_package_name = 'scripts.i18n'
+
 
 def _altlang(code):
     """Define fallback languages for particular languages.
@@ -349,7 +352,7 @@ def twtranslate(code, twtitle, parameters=None):
         import table.
     """
     package = twtitle.split("-")[0]
-    transdict = getattr(__import__("scripts.i18n", fromlist=[package]), package).msg
+    transdict = getattr(__import__(messages_package_name, fromlist=[package]), package).msg
 
     code_needed = False
     # If a site is given instead of a code, use its language
