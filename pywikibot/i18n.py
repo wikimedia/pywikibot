@@ -12,7 +12,6 @@ __version__ = '$Id$'
 #
 
 import re
-from os import sep as os_dir_sep
 import locale
 from pywikibot import Error
 from .plural import plural_rules
@@ -349,8 +348,7 @@ def twtranslate(code, twtitle, parameters=None):
         import table.
     """
     package = twtitle.split("-")[0]
-    import_dir = config.i18n_dir[:].replace(os_dir_sep, '.')
-    transdict = getattr(__import__(import_dir, fromlist=[package]), package).msg
+    transdict = getattr(__import__("scripts.i18n", fromlist=[package]), package).msg
 
     code_needed = False
     # If a site is given instead of a code, use its language
