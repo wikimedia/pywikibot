@@ -6,9 +6,7 @@
 #
 __version__ = '$Id$'
 
-import os
 from pywikibot import i18n
-import shutil
 
 from tests.utils import unittest
 
@@ -73,12 +71,11 @@ class TestTranslate(unittest.TestCase):
 
 class TestTWN(unittest.TestCase):
     def setUp(self):
-        self.path = os.path.split(os.path.realpath(__file__))[0]
-        shutil.copyfile(os.path.join(self.path, 'i18n', 'test.py'),
-                        os.path.join(self.path, '..', 'scripts', 'i18n', 'test.py'))
+        self.orig_messages_package_name = i18n.messages_package_name
+        i18n.messages_package_name = 'tests.i18n'
 
     def tearDown(self):
-        os.remove(os.path.join(self.path, '..', 'scripts', 'i18n', 'test.py'))
+        i18n.messages_package_name = self.orig_messages_package_name
 
 
 class TestTWTranslate(TestTWN):
