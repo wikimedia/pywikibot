@@ -480,15 +480,16 @@ class RedirectRobot:
                                 u'Do you want to fix %s?'
                                 % (targetPage, movedTarget, redir_page)):
                             try:
-                                redir_page.put(text, reason)
+                                redir_page.text = text
+                                redir_page.save(reason)
                             except pywikibot.NoUsername:
                                 pywikibot.output(u"Page [[%s]] not saved; "
                                                  u"sysop privileges required."
-                                                 % redir.title())
+                                                 % redir_page.title())
                                 pass
                             except pywikibot.LockedPage:
                                 pywikibot.output(u'%s is locked.'
-                                                 % redir.title())
+                                                 % redir_page.title())
                                 pass
                 elif self.delete and self.prompt(
                         u'Redirect target %s does not exist.\n'
