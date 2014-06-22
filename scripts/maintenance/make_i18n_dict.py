@@ -43,7 +43,13 @@ class i18nBot(object):
 
     def print_all(self):
         keys = self.dict.keys()
+        keys.remove('qqq')
         keys.sort()
+        keys.insert(0, 'qqq')
+        if 'en' in keys:
+            keys.remove('en')
+            keys.insert(0, 'en')
+
         print "# -*- coding: utf-8 -*-"
         print "msg = {"
         for code in keys:
@@ -58,20 +64,22 @@ class i18nBot(object):
 
     def read(self, item):
         msg = getattr(self.script, item)
-        self.keys = msg.keys()
-        self.keys.append('qqq')
-        self.keys.sort()
-        for code in self.keys:
+        keys = msg.keys()
+        keys.append('qqq')
+        for code in keys:
             label = "%s-%s" % (self.scriptname, item)
             if code == 'qqq':
                 if code not in self.dict:
                     self.dict[code] = {}
-                self.dict[code][label] = \
-                    u'Edit summary for %s report' % self.scriptname
+                self.dict[code][label] = (
+                    u'Edit summary for message %s of %s report'
+                    % (self.scriptname, item))
             elif code != 'commons':
                 if code not in self.dict:
                     self.dict[code] = {}
                 self.dict[code][label] = msg[code]
+        if 'en' not in keys:
+            print 'WARNING: "en" key missing for message %s' % item
 
     def run(self):
         for msg in self.messages:
