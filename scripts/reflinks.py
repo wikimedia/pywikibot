@@ -54,10 +54,8 @@ import gzip
 import StringIO
 
 import pywikibot
-from pywikibot import pagegenerators
-from pywikibot import xmlreader
+from pywikibot import i18n, pagegenerators, xmlreader, Bot
 import noreferences
-from pywikibot import i18n
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -233,25 +231,25 @@ class RefLink:
 
     def transform(self, ispdf=False):
         """Normalize the title"""
-        #convert html entities
+        # convert html entities
         if not ispdf:
             self.title = pywikibot.html2unicode(self.title)
         self.title = re.sub(r'-+', '-', self.title)
-        #remove formatting, i.e long useless strings
+        # remove formatting, i.e long useless strings
         self.title = re.sub(r'[\.+\-=]{4,}', ' ', self.title)
-        #remove \n and \r and Unicode spaces from titles
+        # remove \n and \r and Unicode spaces from titles
         self.title = re.sub(r'(?u)\s', ' ', self.title)
         self.title = re.sub(r'[\n\r\t]', ' ', self.title)
-        #remove extra whitespaces
-        #remove leading and trailing ./;/,/-/_/+/ /
+        # remove extra whitespaces
+        # remove leading and trailing ./;/,/-/_/+/ /
         self.title = re.sub(r' +', ' ', self.title.strip(r'=.;,-+_ '))
 
         self.avoid_uppercase()
-        #avoid closing the link before the end
+        # avoid closing the link before the end
         self.title = self.title.replace(']', '&#93;')
-        #avoid multiple } being interpreted as a template inclusion
+        # avoid multiple } being interpreted as a template inclusion
         self.title = self.title.replace('}}', '}&#125;')
-        #prevent multiple quotes being interpreted as '' or '''
+        # prevent multiple quotes being interpreted as '' or '''
         self.title = self.title.replace('\'\'', '\'&#39;')
         self.title = pywikibot.unicode2html(self.title, self.site.encoding())
         # TODO : remove HTML when both opening and closing tags are included
@@ -386,21 +384,21 @@ class DuplicateReferences:
         return text
 
 
-class ReferencesRobot:
+class ReferencesRobot(Bot):
 
-    def __init__(self, generator, acceptall=False, limit=None, ignorepdf=False,
-                 summary=None):
+    def __init__(self, generator, **kwargs):
         """
         - generator : Page generator
-        - acceptall : boolean, is -always on ?
-        - limit : int, stop after n modified pages
-        - ignorepdf : boolean
 
         """
+        self.availableOptions.update({
+            'ignorepdf': False,  # boolean
+            'limit': None,  # int, stop after n modified pages
+            'summary': None,
+        })
+
+        super(ReferencesRobot, self).__init__(**kwargs)
         self.generator = generator
-        self.acceptall = acceptall
-        self.limit = limit
-        self.ignorepdf = ignorepdf
         self.site = pywikibot.Site()
         # Check
         manual = 'mw:Manual:Pywikibot/refLinks'
@@ -411,10 +409,10 @@ class ReferencesRobot:
                 break
         if code:
             manual += '/%s' % code
-        if summary is None:
+        if self.getOption('summary') is None:
             self.msg = i18n.twtranslate(self.site, 'reflinks-msg', locals())
         else:
-            self.msg = summary
+            self.msg = self.getOption('summary')
         self.stopPage = pywikibot.Page(self.site,
                                        pywikibot.translate(self.site, stopPage))
 
@@ -446,42 +444,6 @@ class ReferencesRobot:
         # Authorized mime types for HTML pages
         self.MIME = re.compile(
             r'application/(?:xhtml\+xml|xml)|text/(?:ht|x)ml')
-
-    def put_page(self, page, new):
-        """ Print diffs between orginal and new (text), put new text for page
-
-        """
-        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % page.title())
-        pywikibot.showDiff(page.get(), new)
-        if not self.acceptall:
-            choice = pywikibot.inputChoice(u'Do you want to accept ' +
-                                           u'these changes?',
-                                           ['Yes', 'No', 'All'],
-                                           ['y', 'N', 'a'], 'N')
-            if choice == 'a':
-                self.acceptall = True
-            if choice == 'y':
-                page.text = new
-                page.save(self.msg, async=True)
-        if self.acceptall:
-            try:
-                page.text = new
-                page.save(self.msg)
-            except pywikibot.EditConflict:
-                pywikibot.output(u'Skipping %s because of edit conflict'
-                                  % (page.title(),))
-            except pywikibot.SpamfilterError as e:
-                pywikibot.output(
-                    u'Cannot change %s because of blacklist entry %s'
-                    % (page.title(), e.url))
-            except pywikibot.PageNotSaved as error:
-                pywikibot.error(u'putting page: %s' % (error.args,))
-            except pywikibot.LockedPage:
-                pywikibot.output(u'Skipping %s (locked page)'
-                                  % (page.title(),))
-            except pywikibot.ServerError as e:
-                pywikibot.output(u'Server Error : %s' % e)
 
     def httpError(self, err_num, link, pagetitleaslink):
         """Log HTTP Error"""
@@ -553,10 +515,10 @@ class ReferencesRobot:
                     pywikibot.removeDisabledParts(page.get())):
 
                 link = match.group(u'url')
-                #debugging purpose
-                #print link
+                # debugging purpose
+                # print link
                 if u'jstor.org' in link:
-                    #TODO: Clean URL blacklist
+                    # TODO: Clean URL blacklist
                     continue
 
                 ref = RefLink(link, match.group('name'))
@@ -568,12 +530,12 @@ class ReferencesRobot:
                     except UnicodeError:
                         ref.url = urllib2.quote(ref.url.encode("utf8"), "://")
                         f = urllib2.urlopen(ref.url)
-                    #Try to get Content-Type from server
+                    # Try to get Content-Type from server
                     headers = f.info()
                     contentType = headers.getheader('Content-Type')
                     if contentType and not self.MIME.search(contentType):
                         if ref.link.lower().endswith('.pdf') and \
-                           not self.ignorepdf:
+                           not self.getOption('ignorepdf'):
                             # If file has a PDF suffix
                             self.getPDFTitle(ref, f)
                         else:
@@ -659,7 +621,7 @@ class ReferencesRobot:
                     if f:
                         f.close()
 
-                #remove <script>/<style>/comments/CDATA tags
+                # remove <script>/<style>/comments/CDATA tags
                 linkedpagetext = self.NON_HTML.sub('', linkedpagetext)
 
                 meta_content = self.META_CONTENT.search(linkedpagetext)
@@ -765,16 +727,30 @@ class ReferencesRobot:
 
             new_text = self.deduplicator.process(new_text)
 
-            if new_text == page.get():
-                pywikibot.output('No changes were necessary in %s'
-                                 % page.title(asLink=True))
+            try:
+                self.userPut(page, page.text, new_text, comment=self.msg)
+            except pywikibot.EditConflict:
+                pywikibot.output(u'Skipping %s because of edit conflict'
+                                 % page.title())
+            except pywikibot.SpamfilterError as e:
+                pywikibot.output(
+                    u'Cannot change %s because of blacklist entry %s'
+                    % (page.title(), e.url))
+            except pywikibot.PageNotSaved as error:
+                pywikibot.error(u'putting page: %s' % (error.args,))
+            except pywikibot.LockedPage:
+                pywikibot.output(u'Skipping %s (locked page)'
+                                 % page.title())
+            except pywikibot.ServerError as e:
+                pywikibot.output(u'Server Error : %s' % e)
+
+            if new_text == page.text:
                 continue
+            else:
+                editedpages += 1
 
-            editedpages += 1
-            self.put_page(page, new_text)
-
-            if self.limit and editedpages >= self.limit:
-                pywikibot.output('Edited %s pages, stopping.' % self.limit)
+            if self.getOption('limit') and editedpages >= self.getOption('limit'):
+                pywikibot.output('Edited %s pages, stopping.' % self.getOption('limit'))
                 return
 
             if editedpages % 20 == 0:
@@ -790,12 +766,9 @@ class ReferencesRobot:
 
 def main():
     xmlFilename = None
-    always = False
-    ignorepdf = False
-    limit = None
+    options = {}
     namespaces = []
     generator = None
-    summary = None
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handleArgs()
@@ -808,13 +781,13 @@ def main():
             except ValueError:
                 namespaces.append(arg[11:])
         elif arg.startswith('-summary:'):
-            summary = arg[9:]
+            options['summary'] = arg[9:]
         elif arg == '-always':
-            always = True
+            options['always'] = True
         elif arg == '-ignorepdf':
-            ignorepdf = True
+            options['ignorepdf'] = True
         elif arg.startswith('-limit:'):
-            limit = int(arg[7:])
+            options['limit'] = int(arg[7:])
         elif arg.startswith('-xmlstart'):
             if len(arg) == 9:
                 xmlStart = pywikibot.input(
@@ -844,7 +817,7 @@ def main():
         return
     generator = pagegenerators.PreloadingGenerator(generator, step=50)
     generator = pagegenerators.RedirectFilterPageGenerator(generator)
-    bot = ReferencesRobot(generator, always, limit, ignorepdf, summary)
+    bot = ReferencesRobot(generator, **options)
     bot.run()
 
 if __name__ == "__main__":
