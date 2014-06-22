@@ -429,6 +429,7 @@ def twntranslate(code, twtitle, parameters=None):
         },
     }
     #use a number
+    >>> from pywikibot import i18n
     >>> i18n.twntranslate('en', 'test-changing', 0) % {'num': 'no'}
     Bot: Changing no pages.
     #use a string
