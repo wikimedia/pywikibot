@@ -159,6 +159,8 @@ def _get_base_dir():
     return base_dir
 
 _base_dir = _get_base_dir()
+# Save base_dir for use by other modules
+base_dir = _base_dir
 
 
 family_files = {}
@@ -712,7 +714,7 @@ for _key, _val in list(globals().items()):
             print("WARNING: Type of '%(_key)s' changed" % locals())
             print("         %(was)s: %(old)s" % {'was': "Was", 'old': ot})
             print("         %(now)s: %(new)s" % {'now': "Now", 'new': nt})
-        del nt, ot
+        del nt, ot, ov
     else:
         print(("WARNING: "
               "Configuration variable %(_key)r is defined but unknown.\n"
@@ -737,9 +739,6 @@ if transliteration_target == 'not set':
         transliteration_target = None
 elif transliteration_target in ('None', 'none'):
     transliteration_target = None
-
-# Save base_dir for use by other modules
-base_dir = _base_dir
 
 
 #
