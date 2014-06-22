@@ -48,10 +48,9 @@ and follow the instructions and hints.
 so that these dependencies will be loaded automatically when the package is
 installed, and users won't need to worry about this...]
 
-To run pywikibot, you will need the httplib2, simplejson, and setuptools
+To run pywikibot, you will need the httplib2 and simplejson:
 packages--
 * httplib2   : http://code.google.com/p/httplib2/
-* setuptools : http://pypi.python.org/pypi/setuptools/
 * simplejson : http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7.1/docs/index.html
 
 or, if you already have setuptools installed, just execute
