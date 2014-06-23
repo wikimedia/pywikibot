@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
+An incomplete sample script.
+
 This is not a complete bot; rather, it is a template from which simple
 bots can be made. You can rename it to mybot.py, then edit it in
 whatever way you want.
@@ -35,13 +37,18 @@ docuReplacements = {
 
 
 class BasicBot:
+
+    """An incomplete sample bot."""
+
     # Edit summary message that should be used is placed on /i18n subdirectory.
     # The file containing these messages should have the same name as the caller
     # script (i.e. basic.py in this case)
 
     def __init__(self, generator, dry):
         """
-        Constructor. Parameters:
+        Constructor.
+
+        Parameters:
             @param generator: The page generator that determines on which pages
                               to work.
             @type generator: generator.
@@ -49,20 +56,20 @@ class BasicBot:
                         what would have been changed.
             @type dry: boolean.
         """
-        site = pywikibot.Site()
         self.generator = generator
         self.dry = dry
+
         # Set the edit summary message
+        site = pywikibot.Site()
         self.summary = i18n.twtranslate(site, 'basic-changing')
 
     def run(self):
+        """ Process each page from the generator. """
         for page in self.generator:
             self.treat(page)
 
     def treat(self, page):
-        """
-        Loads the given page, does some changes, and saves it.
-        """
+        """ Load the given page, does some changes, and saves it. """
         text = self.load(page)
         if not text:
             return
@@ -79,9 +86,7 @@ class BasicBot:
             pywikibot.output(u'Page %s not saved.' % page.title(asLink=True))
 
     def load(self, page):
-        """
-        Loads the given page, does some changes, and saves it.
-        """
+        """ Load the text of the given page. """
         try:
             # Load the page
             text = page.get()
@@ -97,6 +102,7 @@ class BasicBot:
 
     def save(self, text, page, comment=None, minorEdit=True,
              botflag=True):
+        """ Update the given page with new text. """
         # only save if something was changed
         if text != page.get():
             # Show the title of the page we're working on.
@@ -133,8 +139,7 @@ class BasicBot:
 
 
 def main():
-    global site
-
+    """ Process command line arguments and invoke BasicBot. """
     # Process global arguments to determine desired site
     local_args = pywikibot.handleArgs()
     site = pywikibot.Site()
