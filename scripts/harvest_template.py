@@ -65,7 +65,7 @@ class HarvestRobot(WikidataBot):
             try:
                 self.processPage(page)
             except Exception as e:
-                pywikibot.exception(tb=True)
+                pywikibot.exception(msg=e, tb=True)
 
     def getTemplateSynonyms(self, title):
         """
@@ -131,7 +131,7 @@ class HarvestRobot(WikidataBot):
                 try:
                     template = pywikibot.Page(page.site, template,
                                               ns=10).title(withNamespace=False)
-                except pywikibot.exceptions.InvalidTitle as e:
+                except pywikibot.exceptions.InvalidTitle:
                     pywikibot.error(u"Failed parsing template; '%s' should be the template name." % template)
                     continue
                 # We found the template we were looking for

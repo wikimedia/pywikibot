@@ -867,7 +867,6 @@ global filename
 
 
 def main():
-    number_user = 0
     for arg in pywikibot.handleArgs():
         if arg.startswith('-edit'):
             if len(arg) == 5:
