@@ -24,6 +24,8 @@ __version__ = '$Id$'
 
 import os
 import sys
+# Please keep _imported_modules in sync with the imports above
+_imported_modules = ('os', 'sys')
 
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
@@ -705,13 +707,25 @@ def shortpath(path):
     return path
 # System-level and User-level changes.
 # Store current variables and their types.
-_glv = {}
-_glv.update(globals())
+_glv = dict((_key, _val) for _key, _val in globals().items()
+             if _key[0] != '_' and _key not in _imported_modules)
 _gl = list(_glv.keys())
 _tp = {}
 for _key in _gl:
     if _key[0] != '_':
         _tp[_key] = type(globals()[_key])
+
+# Create an environment for user-config.py which is
+# a shallow copy of the core config settings, so that
+# we can detect modified config items easily.
+_uc = {}
+for _key, _val in _glv.items():
+    if isinstance(_val, dict):
+        _uc[_key] = {}
+        if len(_val.keys()) > 0:
+            _uc[_key].update(_val)
+    else:
+        _uc[_key] = _val
 
 # Get the user files
 _thislevel = 0
@@ -728,7 +742,7 @@ for _filename in _fns:
         _fileuid = _filestatus[4]
         if sys.platform == 'win32' or _fileuid in [os.getuid(), 0]:
             if sys.platform == 'win32' or _filemode & 0o02 == 0:
-                exec(compile(open(_filename).read(), _filename, 'exec'))
+                exec(compile(open(_filename).read(), _filename, 'exec'), _uc)
             else:
                 print("WARNING: Skipped '%(fn)s': writeable by others."
                       % {'fn': _filename})
@@ -737,8 +751,10 @@ for _filename in _fns:
                   % {'fn': _filename})
 
 # Test for obsoleted and/or unknown variables.
-for _key, _val in list(globals().items()):
+for _key, _val in list(_uc.items()):
     if _key.startswith('_'):
+        pass
+    elif _key in _imported_modules:
         pass
     elif _key in _gl:
         nt = type(_val)
@@ -760,6 +776,14 @@ for _key, _val in list(globals().items()):
         print("WARNING: "
               "Configuration variable %(_key)r is defined but unknown.\n"
               "Misspelled?" % locals())
+
+# Copy the user config settings into globals
+_modified = [_key for _key in _gl
+             if _uc[_key] != globals()[_key] or
+             _key in ('usernames', 'sysopnames', 'disambiguation_comment')]
+
+for _key in _modified:
+    globals()[_key] = _uc[_key]
 
 # Fix up default console_encoding
 if console_encoding is None:
@@ -799,7 +823,7 @@ if __name__ == "__main__":
         if _name[0] != '_':
             if not type(globals()[_name]) in [types.FunctionType,
                                               types.ModuleType]:
-                if _all or _glv[_name] != globals()[_name]:
+                if _all or _name in _modified:
                     _value = globals()[_name]
                     if _name in _private_values and _value:
                         if isinstance(_value, dict):
