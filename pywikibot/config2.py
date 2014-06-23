@@ -686,7 +686,7 @@ for _filename in _fns:
         _filemode = _filestatus[0]
         _fileuid = _filestatus[4]
         if sys.platform == 'win32' or _fileuid in [os.getuid(), 0]:
-            if sys.platform == 'win32' or _filemode & 0o02 == 0 or True:
+            if sys.platform == 'win32' or _filemode & 0o02 == 0:
                 exec(compile(open(_filename).read(), _filename, 'exec'))
             else:
                 print("WARNING: Skipped '%(fn)s': writeable by others."
