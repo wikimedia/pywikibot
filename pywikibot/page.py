@@ -960,9 +960,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         else:
             watchval = "unwatch"
         if not force and not self.botMayEdit():
-            raise pywikibot.PageNotSaved(
-                "Page %s not saved; editing restricted by {{bots}} template"
-                % self.title(asLink=True))
+            raise pywikibot.OtherPageSaveError(
+                self, "Editing restricted by {{bots}} template")
         if botflag is None:
             botflag = ("bot" in self.site.userinfo["rights"])
         if async:
@@ -986,20 +985,17 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                                       watch=watchval, bot=botflag, **kwargs)
             if not done:
                 pywikibot.warning(u"Page %s not saved" % link)
-                raise pywikibot.PageNotSaved(link)
+                raise pywikibot.PageNotSaved(self)
             else:
                 pywikibot.output(u"Page %s saved" % link)
-        except pywikibot.LockedPage as err:
-            # re-raise the LockedPage exception so that calling program
-            # can re-try if appropriate
-            if not callback and not async:
-                raise
         # TODO: other "expected" error types to catch?
         except pywikibot.Error as err:
             pywikibot.log(u"Error saving page %s (%s)\n" % (link, err),
                           exc_info=True)
             if not callback and not async:
-                raise pywikibot.PageNotSaved("%s: %s" % (link, err))
+                if isinstance(err, pywikibot.PageSaveRelatedError):
+                    raise err
+                raise pywikibot.OtherPageSaveError(self, err)
         if callback:
             callback(self, err)
 

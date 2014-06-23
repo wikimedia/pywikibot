@@ -474,13 +474,13 @@ def main():
                                          u'blacklist entry %s'
                                          % (page.title(), e.url))
                         break
-                    except pywikibot.PageNotSaved as error:
-                        pywikibot.output(u'Error putting page: %s'
-                                         % (error.args,))
-                        break
                     except pywikibot.LockedPage:
                         pywikibot.output(u'The page is still protected. '
                                          u'Skipping...')
+                        break
+                    except pywikibot.PageNotSaved as error:
+                        pywikibot.output(u'Error putting page: %s'
+                                         % (error.args,))
                         break
                     else:
                         # Break only if the errors are one after the other

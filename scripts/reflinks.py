@@ -744,11 +744,11 @@ class ReferencesRobot(Bot):
                 pywikibot.output(
                     u'Cannot change %s because of blacklist entry %s'
                     % (page.title(), e.url))
-            except pywikibot.PageNotSaved as error:
-                pywikibot.error(u'putting page: %s' % (error.args,))
             except pywikibot.LockedPage:
                 pywikibot.output(u'Skipping %s (locked page)'
                                  % page.title())
+            except pywikibot.PageNotSaved as error:
+                pywikibot.error(u'putting page: %s' % (error.args,))
             except pywikibot.ServerError as e:
                 pywikibot.output(u'Server Error : %s' % e)
 
