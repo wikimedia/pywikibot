@@ -1223,7 +1223,14 @@ def UntaggedPageGenerator(untaggedProject, limit=500):
 
 class YahooSearchPageGenerator:
 
-    """ To use this generator, install pYsearch """
+    """
+    Page generator using Yahoo! search results.
+
+    To use this generator, you need to install the package 'pYsearch'.
+    https://pypi.python.org/pypi/pYsearch
+
+    To use this generator, install pYsearch
+    """
 
     # values larger than 100 fail
     def __init__(self, query=None, count=100, site=None):
@@ -1234,7 +1241,15 @@ class YahooSearchPageGenerator:
         self.site = site
 
     def queryYahoo(self, query):
-        from yahoo.search.web import WebSearch
+        """ Perform a query using python package 'pYsearch'. """
+        try:
+            from yahoo.search.web import WebSearch
+        except ImportError:
+            pywikibot.error("ERROR: generator YahooSearchPageGenerator "
+                            "depends on package 'pYsearch'.\n"
+                            "To install, please run: pip install pYsearch")
+            exit(1)
+
         srch = WebSearch(config.yahoo_appid, query=query, results=self.count)
         dom = srch.get_results()
         results = srch.parse_results(dom)
@@ -1257,11 +1272,16 @@ class YahooSearchPageGenerator:
 class GoogleSearchPageGenerator:
 
     """
-    To use this generator, you must install the pyGoogle module from
-    http://pygoogle.sf.net/ and get a Google Web API license key from
-    http://www.google.com/apis/index.html . The google_key must be set to your
-    license key in your configuration.
+    Page generator using Google search results.
 
+    To use this generator, you need to install the package 'google'.
+    https://pypi.python.org/pypi/google
+
+    This package has been available since 2010, hosted on github
+    since 2012, and provided by pypi since 2013.
+
+    As there are concerns about Google's Terms of Service, this
+    generator prints a warning for each query.
     """
 
     def __init__(self, query=None, site=None):
@@ -1271,83 +1291,30 @@ class GoogleSearchPageGenerator:
         self.site = site
 
     def queryGoogle(self, query):
-        #########
-        # Google's "Terms of service"
-        # (see 5.3, http://www.google.com/accounts/TOS?loc=US)
-        for url in self.queryViaSoapApi(query):
+        """
+        Perform a query using python package 'google'.
+
+        The terms of service as at June 2014 give two conditions that
+        may apply to use of search:
+            1. Dont access [Google Services] using a method other than
+               the interface and the instructions that [they] provide.
+            2. Don't remove, obscure, or alter any legal notices
+               displayed in or along with [Google] Services.
+
+        Both of those issues should be managed by the package 'google',
+        however pywikibot will at least ensure the user sees the TOS
+        in order to comply with the second condition.
+        """
+        try:
+            import google
+        except ImportError:
+            pywikibot.error("ERROR: generator GoogleSearchPageGenerator "
+                            "depends on package 'google'.\n"
+                            "To install, please run: pip install google.")
+            exit(1)
+        pywikibot.warning('Please read http://www.google.com/accounts/TOS')
+        for url in google.search(query):
             yield url
-
-    def queryViaSoapApi(self, query):
-        import google
-        google.LICENSE_KEY = config.google_key
-        offset = 0
-        estimatedTotalResultsCount = None
-        while not estimatedTotalResultsCount or \
-                offset < estimatedTotalResultsCount:
-            while True:
-                # Google often yields 502 errors.
-                try:
-                    pywikibot.output(u'Querying Google, offset %i' % offset)
-                    data = google.doGoogleSearch(query, start=offset,
-                                                 filter=False)
-                    break
-                except KeyboardInterrupt:
-                    raise
-                except:
-                    # SOAPpy.Errors.HTTPError or SOAP.HTTPError
-                    # (502 Bad Gateway) can happen here, depending on the module
-                    # used. It's not easy to catch this properly because
-                    # pygoogle decides which one of the soap modules to use.
-                    pywikibot.output(u"An error occured. "
-                                     u"Retrying in 10 seconds...")
-                    time.sleep(10)
-                    continue
-
-            for result in data.results:
-                yield result.URL
-            # give an estimate of pages to work on, but only once.
-            if not estimatedTotalResultsCount:
-                pywikibot.output(u'Estimated total result count: %i pages.'
-                                 % data.meta.estimatedTotalResultsCount)
-            estimatedTotalResultsCount = data.meta.estimatedTotalResultsCount
-            offset += 10
-
-# ############
-#    commented out because it is probably not in compliance with Google's
-#    "Terms of service" (see 5.3, http://www.google.com/accounts/TOS?loc=US)
-#
-#    def queryViaWeb(self, query):
-#        """
-#        Google has stopped giving out API license keys, and sooner or later
-#        they will probably shut down the service.
-#        This is a quick and ugly solution: we just grab the search results from
-#        the normal web interface.
-#        """
-#        linkR = re.compile(r'<a href="([^>"]+?)" class=l>', re.IGNORECASE)
-#        offset = 0
-#
-#        while True:
-#            pywikibot.output("Google: Querying page %d" % (offset / 100 + 1))
-#            address = "http://www.google.com/search?q=%s&num=100&hl=en&start=%d" \
-#                      % (urllib.quote_plus(query), offset)
-#            # we fake being Firefox because Google blocks unknown browsers
-#            request = urllib2.Request(
-#                address, None,
-#                {'User-Agent':
-#                 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.8) Gecko/20051128 '
-#                 'SUSE/1.5-0.1 Firefox/1.5'})
-#            urlfile = urllib2.urlopen(request)
-#            page = urlfile.read()
-#            urlfile.close()
-#            for url in linkR.findall(page):
-#                yield url
-#
-#            # Is there a "Next" link for next page of results?
-#            if "<div id=nn>" in page:
-#                offset += 100  # Yes, go to next page of results.
-#            else:
-#                return
-# ###########
 
     def __iter__(self):
         # restrict query to local site
