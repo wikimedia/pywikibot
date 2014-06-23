@@ -262,8 +262,7 @@ class CommonscatBot:
             pywikibot.output(u'Page %s is a disambiguation. Skipping.'
                              % page.title(asLink=True))
         else:
-            (status, always) = self.addCommonscat(page)
-        return
+            self.addCommonscat(page)
 
     def load(self, page):
         """ Load the given page, do some changes, and save it. """
@@ -369,14 +368,14 @@ class CommonscatBot:
                 # The current commonscat link is good
                 pywikibot.output(u'Commonscat link at %s to Category:%s is ok'
                                  % (page.title(), currentCommonscatTarget))
-                return (True, self.always)
+                return True
             elif checkedCommonscatTarget != u'':
                 # We have a new Commonscat link, replace the old one
                 self.changeCommonscat(page, currentCommonscatTemplate,
                                       currentCommonscatTarget,
                                       primaryCommonscat,
                                       checkedCommonscatTarget, LinkText, Note)
-                return (True, self.always)
+                return True
             else:
                 #Commonscat link is wrong
                 commonscatLink = self.findCommonscatLink(page)
@@ -403,8 +402,8 @@ class CommonscatBot:
                                                                    self.summary,
                                                                    None, None,
                                                                    self.always)
-                return (True, self.always)
-        return (True, self.always)
+                return True
+        return True
 
     def changeCommonscat(self, page=None, oldtemplate=u'', oldcat=u'',
                          newtemplate=u'', newcat=u'', linktitle=u'',
