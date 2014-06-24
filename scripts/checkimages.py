@@ -47,7 +47,7 @@ This script understands the following command-line arguments:
 -url[:#]            Define the url where are the images
 
 -untagged[:#]       Use daniel's tool as generator:
-                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
+                    https://toolserver.org/~daniel/WikiSense/UntaggedImages.php
 
 -nologerror         If given, this option will disable the error that is risen
                     when the log is full.
@@ -831,7 +831,7 @@ class checkImagesBot(object):
         lang = untaggedProject.split('.', 1)[0]
         project = '.%s' % untaggedProject.split('.', 1)[1]
 
-        URL = u'http://toolserver.org/~daniel/WikiSense/UntaggedImages.php?'
+        URL = u'https://toolserver.org/~daniel/WikiSense/UntaggedImages.php?'
         if lang == 'commons':
             link = (
                 URL +
@@ -845,7 +845,7 @@ class checkImagesBot(object):
             )
         text = self.site.getUrl(link, no_hostname=True)
         results = re.findall(
-            r"<td valign='top' title='Name'><a href='http://.*?\.org/w/index\.php\?title=(.*?)'>.*?</a></td>",
+            r"<td valign='top' title='Name'><a href='http[s]?://.*?\.org/w/index\.php\?title=(.*?)'>.*?</a></td>",
             text)
         if results:
             for result in results:

@@ -6,12 +6,12 @@
 # Question: "Windows cmd encoding change causes Python crash" [3] by Alex [4],
 # Answered [5] by David-Sarah Hopwood [6].
 #
-# [1] http://stackoverflow.com
-# [2] http://creativecommons.org/licenses/by-sa/3.0/
-# [3] http://stackoverflow.com/questions/878972
-# [4] http://stackoverflow.com/users/85185
-# [4] http://stackoverflow.com/a/3259271/118671
-# [5] http://stackoverflow.com/users/393146
+# [1] https://stackoverflow.com
+# [2] https://creativecommons.org/licenses/by-sa/3.0/
+# [3] https://stackoverflow.com/questions/878972
+# [4] https://stackoverflow.com/users/85185
+# [4] https://stackoverflow.com/a/3259271/118671
+# [5] https://stackoverflow.com/users/393146
 #
 ################################################
 #
@@ -51,16 +51,16 @@ if sys.platform == "win32":
     # This also fixes <http://bugs.python.org/issue1602>.
     # Credit to Michael Kaplan <http://blogs.msdn.com/b/michkap/archive/2010/04/07/9989346.aspx>
     # and TZOmegaTZIOY
-    # <http://stackoverflow.com/questions/878972/windows-cmd-encoding-change-causes-python-crash/1432462#1432462>.
+    # <https://stackoverflow.com/questions/878972/windows-cmd-encoding-change-causes-python-crash/1432462#1432462>.
     try:
-        # <http://msdn.microsoft.com/en-us/library/ms683231(VS.85).aspx>
+        # <https://msdn.microsoft.com/en-us/library/ms683231(VS.85).aspx>
         # HANDLE WINAPI GetStdHandle(DWORD nStdHandle);
         # returns INVALID_HANDLE_VALUE, NULL, or a valid handle
         #
-        # <http://msdn.microsoft.com/en-us/library/aa364960(VS.85).aspx>
+        # <https://msdn.microsoft.com/en-us/library/aa364960(VS.85).aspx>
         # DWORD WINAPI GetFileType(DWORD hFile);
         #
-        # <http://msdn.microsoft.com/en-us/library/ms683167(VS.85).aspx>
+        # <https://msdn.microsoft.com/en-us/library/ms683167(VS.85).aspx>
         # BOOL WINAPI GetConsoleMode(HANDLE hConsole, LPDWORD lpMode);
 
         GetStdHandle = WINFUNCTYPE(HANDLE, DWORD)(("GetStdHandle", windll.kernel32))
@@ -184,7 +184,7 @@ if sys.platform == "win32":
                                 n = DWORD(0)
                                 # There is a shorter-than-documented limitation on the
                                 # length of the string passed to WriteConsoleW (see
-                                # <http://tahoe-lafs.org/trac/tahoe-lafs/ticket/1232>.
+                                # <https://tahoe-lafs.org/trac/tahoe-lafs/ticket/1232>.
                                 retval = WriteConsoleW(self._hConsole, text,
                                                        min(remaining, 10000),
                                                        byref(n), None)

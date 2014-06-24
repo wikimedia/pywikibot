@@ -25,7 +25,7 @@ class Family(object):
             self.name = None
 
         # For interwiki sorting order see
-        # http://meta.wikimedia.org/wiki/Interwiki_sorting_order
+        # https://meta.wikimedia.org/wiki/Interwiki_sorting_order
 
         # The sorting order by language name from meta
         # MediaWiki:Interwiki_config-sorting_order-native-languagename
@@ -806,7 +806,7 @@ class Family(object):
         }
 
         # LDAP domain if your wiki uses LDAP authentication,
-        # http://www.mediawiki.org/wiki/Extension:LDAP_Authentication
+        # https://www.mediawiki.org/wiki/Extension:LDAP_Authentication
         self.ldapDomain = ()
 
         # Allows crossnamespace interwiki linking.

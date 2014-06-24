@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 This bot will search for references which are only made of a link without title,
-(i.e. <ref>[http://www.google.fr/]</ref> or <ref>http://www.google.fr/</ref>)
+(i.e. <ref>[https://www.google.fr/]</ref> or <ref>https://www.google.fr/</ref>)
 and will fetch the html title from the link to use it as the title of the wiki
 link in the reference, i.e.
-<ref>[http://www.google.fr/search?q=test test - Google Search]</ref>
+<ref>[https://www.google.fr/search?q=test test - Google Search]</ref>
 
 The bot checks every 20 edits a special stop page : if the page has been edited,
 it stops.

@@ -57,14 +57,14 @@ class FreebaseMapperRobot:
         if not line or line.startswith('#'):
             return
         mid, sameas, qid, dot = line.split()
-        if sameas != '<http://www.w3.org/2002/07/owl#sameAs>':
+        if sameas != '<https://www.w3.org/2002/07/owl#sameAs>':
             return
         if dot != '.':
             return
-        if not mid.startswith('<http://rdf.freebase.com/ns/m'):
+        if not mid.startswith('<https://rdf.freebase.com/ns/m'):
             return
         mid = '/m/' + mid[30:-1]
-        if not qid.startswith('<http://www.wikidata.org/entity/Q'):
+        if not qid.startswith('<https://www.wikidata.org/entity/Q'):
             return
         qid = 'Q' + qid[33:-1]
         data = pywikibot.ItemPage(self.repo, qid)

@@ -52,7 +52,7 @@ docuReplacements = {
 }
 
 # Maps each group number to the list of its publisher number ranges.
-# Taken from http://www.isbn-international.org/converter/ranges.htm
+# Taken from https://www.isbn-international.org/converter/ranges.htm
 ranges = {
     '0': [  # English speaking area
         ('00', '19'),
@@ -1263,7 +1263,7 @@ class ISBN13(ISBN):
                                        % self.code)
 
     def calculateChecksum(self):
-        # See http://en.wikipedia.org/wiki/ISBN#Check_digit_in_ISBN_13
+        # See https://en.wikipedia.org/wiki/ISBN#Check_digit_in_ISBN_13
         sum = 0
         for i in range(0, 13 - 1, 2):
             sum += self.digits()[i]
@@ -1298,7 +1298,7 @@ class ISBN10(ISBN):
         Raises an InvalidIsbnException if the checksum shows that the
         ISBN is incorrect.
         """
-        # See http://en.wikipedia.org/wiki/ISBN#Check_digit_in_ISBN_10
+        # See https://en.wikipedia.org/wiki/ISBN#Check_digit_in_ISBN_10
         sum = 0
         for i in range(0, 9):
             sum += (i + 1) * int(self.digits()[i])

@@ -10,7 +10,7 @@ These command line parameters can be used to specify which pages to work on:
 &params;
 
 -xml              Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see http://download.wikimedia.org).
+                  or pages-meta-current, see https://download.wikimedia.org).
                   Argument can also be given as "-xml:filename".
 
 -page             Only edit a specific page.

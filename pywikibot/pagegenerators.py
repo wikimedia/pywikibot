@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """
 This module offers a wide variety of page generators. A page generator is an
-object that is iterable (see http://www.python.org/dev/peps/pep-0255/ ) and
+object that is iterable (see http://legacy.python.org/dev/peps/pep-0255/ ) and
 that yields page objects on which other scripts can then work.
 
 In general, there is no need to run this script directly. It can, however,
@@ -1197,10 +1197,10 @@ def SearchPageGenerator(query, step=None, total=None, namespaces=None,
 
 def UntaggedPageGenerator(untaggedProject, limit=500):
     """ Function to get the pages returned by this tool:
-    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
+    https://toolserver.org/~daniel/WikiSense/UntaggedImages.php
     """
-    URL = "http://toolserver.org/~daniel/WikiSense/UntaggedImages.php?"
-    REGEXP = r"<td valign='top' title='Name'><a href='http://.*?" \
+    URL = "https://toolserver.org/~daniel/WikiSense/UntaggedImages.php?"
+    REGEXP = r"<td valign='top' title='Name'><a href='http[s]?://.*?" \
              "\.org/w/index\.php\?title=(.*?)'>.*?</a></td>"
     lang, project = untaggedProject.split('.', 1)
     if lang == 'commons':
@@ -1326,14 +1326,14 @@ class GoogleSearchPageGenerator:
                 title = url[len(base):]
                 page = pywikibot.Page(pywikibot.Link(title, self.site))
                 # Google contains links in the format
-                # http://de.wikipedia.org/wiki/en:Foobar
+                # https://de.wikipedia.org/wiki/en:Foobar
                 if page.site == self.site:
                     yield page
 
 
 def MySQLPageGenerator(query, site=None):
     """
-    Requires oursql <http://pythonhosted.org/oursql/> or
+    Requires oursql <https://pythonhosted.org/oursql/> or
     MySQLdb <https://sourceforge.net/projects/mysql-python/>
     Yields a list of pages based on a MySQL query. Each query
     should provide the page namespace and page title. An example

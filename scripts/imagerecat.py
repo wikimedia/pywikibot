@@ -150,7 +150,7 @@ def getCommonshelperCats(imagepage):
             if tries < maxtries:
                 tries += 1
                 commonsHelperPage = urllib.urlopen(
-                    "http://toolserver.org/~daniel/WikiSense/CommonSense.php?%s" % parameters)
+                    "https://toolserver.org/~daniel/WikiSense/CommonSense.php?%s" % parameters)
                 matches = commonsenseRe.search(
                     commonsHelperPage.read().decode('utf-8'))
                 gotInfo = True
@@ -209,7 +209,7 @@ def getOpenStreetMapCats(latitude, longitude):
 
 def getOpenStreetMap(latitude, longitude):
     """
-    Get the result from http://nominatim.openstreetmap.org/reverse
+    Get the result from https://nominatim.openstreetmap.org/reverse
     and put it in a list of tuples to play around with
     """
     result = []
@@ -217,7 +217,7 @@ def getOpenStreetMap(latitude, longitude):
     parameters = urllib.urlencode({'lat': latitude, 'lon': longitude, 'accept-language': 'en'})
     while not gotInfo:
         try:
-            page = urllib.urlopen("http://nominatim.openstreetmap.org/reverse?format=xml&%s" % parameters)
+            page = urllib.urlopen("https://nominatim.openstreetmap.org/reverse?format=xml&%s" % parameters)
             et = xml.etree.ElementTree.parse(page)
             gotInfo = True
         except IOError:
@@ -375,7 +375,7 @@ def filterParents(categories):
     filterCategoriesRe = re.compile('\[\[Category:([^\]]*)\]\]')
     try:
         filterCategoriesPage = urllib.urlopen(
-            "http://toolserver.org/~multichill/filtercats.php?%s" % parameters)
+            "https://toolserver.org/~multichill/filtercats.php?%s" % parameters)
         result = filterCategoriesRe.findall(
             filterCategoriesPage.read().decode('utf-8'))
     except IOError:

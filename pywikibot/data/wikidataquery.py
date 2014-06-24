@@ -397,7 +397,7 @@ def fromClaim(claim):
 class WikidataQuery():
     """
     An interface to the WikidataQuery API. Default host is
-    http://wdq.wmflabs.org, but you can substitute
+    https://wdq.wmflabs.org/, but you can substitute
     a different one.
 
     Caching defaults to a subdir of the system temp directory with a
@@ -406,7 +406,7 @@ class WikidataQuery():
     Set a zero or negative maxCacheAge to disable caching
     """
 
-    def __init__(self, host="http://wdq.wmflabs.org", cacheDir=None,
+    def __init__(self, host="https://wdq.wmflabs.org", cacheDir=None,
                     cacheMaxAge=60):
         self.host = host
         self.cacheMaxAge = cacheMaxAge

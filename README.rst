@@ -42,4 +42,4 @@ started.
 
 .. image:: https://secure.travis-ci.org/wikimedia/pywikibot-core.png?branch=master
    :alt: Build Status
-   :target: http://travis-ci.org/wikimedia/pywikibot-core
+   :target: https://travis-ci.org/wikimedia/pywikibot-core

@@ -389,7 +389,7 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
 
     If toStdout is True, the text will be sent to standard output,
     so that it can be piped to another process. All other text will
-    be sent to stderr. See: http://en.wikipedia.org/wiki/Pipeline_%28Unix%29
+    be sent to stderr. See: https://en.wikipedia.org/wiki/Pipeline_%28Unix%29
 
     text can contain special sequences to create colored output. These
     consist of the escape character \03 and the color name in curly braces,

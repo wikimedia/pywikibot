@@ -10,7 +10,7 @@ These command line parameters can be used to specify which pages to work on:
 &params;
 
 -xml              Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see http://download.wikimedia.org).
+                  or pages-meta-current, see https://download.wikimedia.org).
                   Argument can also be given as "-xml:filename".
 
 -page             Only edit a specific page.
@@ -91,7 +91,7 @@ Examples:
 
 If you want to change templates from the old syntax, e.g. {{msg:Stub}}, to the
 new syntax, e.g. {{Stub}}, download an XML dump file (pages-articles) from
-http://download.wikimedia.org, then use this command:
+https://download.wikimedia.org, then use this command:
 
     python replace.py -xml -regex "{{msg:(.*?)}}" "{{\\1}}"
 

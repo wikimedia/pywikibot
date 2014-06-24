@@ -39,7 +39,7 @@ Unprotect all pages listed in text file "unprotect.txt" without prompting.
 """
 
 #
-# Written by http://it.wikisource.org/wiki/Utente:Qualc1
+# Written by https://it.wikisource.org/wiki/Utente:Qualc1
 # Created by modifying delete.py
 #
 # (c) Pywikibot team, 2008-2014

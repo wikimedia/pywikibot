@@ -395,7 +395,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
     retry = False
     found_start_id = not start_id
 
-    # http://www.flickr.com/services/api/flickr.groups.pools.getPhotos.html
+    # https://www.flickr.com/services/api/flickr.groups.pools.getPhotos.html
     # Get the photos in a group
     if group_id:
         #First get the total number of photo's in the group
@@ -427,7 +427,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
                     pywikibot.output(u'Flickr api problem, sleeping')
                     time.sleep(30)
 
-    # http://www.flickr.com/services/api/flickr.photosets.getPhotos.html
+    # https://www.flickr.com/services/api/flickr.photosets.getPhotos.html
     # Get the photos in a photoset
     elif photoset_id:
         photos = flickr.photosets_getPhotos(photoset_id=photoset_id,
@@ -456,7 +456,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
                     pywikibot.output(u'Flickr api problem, sleeping')
                     time.sleep(30)
 
-    # http://www.flickr.com/services/api/flickr.people.getPublicPhotos.html
+    # https://www.flickr.com/services/api/flickr.people.getPublicPhotos.html
     # Get the (public) photos uploaded by a user
     elif user_id:
         photos = flickr.people_getPublicPhotos(user_id=user_id,
@@ -511,7 +511,7 @@ def main():
     if not config.flickr['api_key']:
         pywikibot.output('Flickr api key not found! Get yourself an api key')
         pywikibot.output(
-            'Any flickr user can get a key at http://www.flickr.com/services/api/keys/apply/')
+            'Any flickr user can get a key at https://www.flickr.com/services/api/keys/apply/')
         return
 
     if 'api_secret' in config.flickr and config.flickr['api_secret']:

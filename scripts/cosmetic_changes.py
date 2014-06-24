@@ -258,7 +258,7 @@ class CosmeticChangesToolkit:
 
         # The PyWikipediaBot is no longer allowed to touch categories on the
         # German Wikipedia. See
-        # http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Position_der_Personendaten_am_.22Artikelende.22
+        # https://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Position_der_Personendaten_am_.22Artikelende.22
         # ignoring nn-wiki of cause of the comment line above iw section
         if not self.template and '{{Personendaten' not in text and \
            '{{SORTIERUNG' not in text and '{{DEFAULTSORT' not in text and \
@@ -526,7 +526,7 @@ class CosmeticChangesToolkit:
             8206,   # left-to-right mark (&ltr;)
             8207,   # right-to-left mark (&rtl;)
         ]
-        # ignore ' see http://eo.wikipedia.org/w/index.php?title=Liberec&diff=next&oldid=2320801
+        # ignore ' see https://eo.wikipedia.org/w/index.php?title=Liberec&diff=next&oldid=2320801
         #if self.site.lang == 'eo':
         #    ignore += [39]
         if self.template:
@@ -620,7 +620,7 @@ class CosmeticChangesToolkit:
                       'startspace']
         # link to the wiki working on
         ## TODO: disable this for difflinks and titled links
-        ## http://de.wikipedia.org/w/index.php?title=Wikipedia%3aVandalismusmeldung&diff=103109563&oldid=103109271
+        ## https://de.wikipedia.org/w/index.php?title=Wikipedia%3aVandalismusmeldung&diff=103109563&oldid=103109271
 ##        text = pywikibot.replaceExcept(text,
 ##                                       r'\[https?://%s\.%s\.org/wiki/(?P<link>\S+)\s+(?P<title>.+?)\s?\]'
 ##                                       % (self.site.lang, self.site.family.name),
@@ -684,7 +684,7 @@ class CosmeticChangesToolkit:
         return text
 
     def fixReferences(self, text):
-        #http://en.wikipedia.org/wiki/User:AnomieBOT/source/tasks/OrphanReferenceFixer.pm
+        #https://en.wikipedia.org/wiki/User:AnomieBOT/source/tasks/OrphanReferenceFixer.pm
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
 
@@ -791,7 +791,7 @@ class CosmeticChangesToolkit:
             text = pywikibot.replaceExcept(text, str(i), new[i], exceptions)
         return text
 
-    # Retrieved from "http://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup"
+    # Retrieved from "https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup"
     def commonsfiledesc(self, text):
         # section headers to {{int:}} versions
         exceptions = ['comment', 'includeonly', 'math', 'noinclude', 'nowiki',

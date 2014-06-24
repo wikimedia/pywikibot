@@ -285,8 +285,8 @@ class TestClaimSetValue(PywikibotTestCase):
     def test_set_website(self):
         claim = pywikibot.Claim(wikidata, 'P856')
         self.assertEquals(claim.type, 'url')
-        claim.setTarget('http://en.wikipedia.org/')
-        self.assertEquals(claim.target, 'http://en.wikipedia.org/')
+        claim.setTarget('https://en.wikipedia.org/')
+        self.assertEquals(claim.target, 'https://en.wikipedia.org/')
 
     def test_set_date(self):
         claim = pywikibot.Claim(wikidata, 'P569')

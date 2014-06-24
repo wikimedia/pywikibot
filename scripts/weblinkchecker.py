@@ -122,7 +122,7 @@ docuReplacements = {
 
 ignorelist = [
     # Officialy reserved for testing, documentation, etc. in
-    # http://tools.ietf.org/html/rfc2606#page-2
+    # https://tools.ietf.org/html/rfc2606#page-2
     # top-level domains:
     re.compile('.*[\./@]test(/.*)?'),
     re.compile('.*[\./@]example(/.*)?'),
@@ -244,7 +244,7 @@ class LinkChecker(object):
         self.header = {
             # 'User-agent': pywikibot.useragent,
             # we fake being Firefox because some webservers block unknown
-            # clients, e.g. http://images.google.de/images?q=Albit gives a 403
+            # clients, e.g. https://images.google.de/images?q=Albit gives a 403
             # when using the PyWikipediaBot user agent.
             'User-agent': 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.8) Gecko/20051128 SUSE/1.5-0.1 Firefox/1.5',
             'Accept': 'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
@@ -392,7 +392,7 @@ class LinkChecker(object):
         except httplib.error, error:
             return False, u'HTTP Error: %s' % error.__class__.__name__
         except socket.error, error:
-            # http://docs.python.org/lib/module-socket.html :
+            # https://docs.python.org/2/library/socket.html :
             # socket.error :
             # The accompanying value is either a string telling what went
             # wrong or a pair (errno, string) representing an error
@@ -519,7 +519,7 @@ class History:
     Example:
 
     dict = {
-        'http://www.example.org/page': [
+        'https://www.example.org/page': [
             ('WikiPageTitle', DATE, '404: File not found'),
             ('WikiPageName2', DATE, '404: File not found'),
         ]

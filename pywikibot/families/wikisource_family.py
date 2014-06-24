@@ -23,7 +23,7 @@ class Family(family.WikimediaFamily):
                            for lang in self.languages_by_size])
         self.langs['-'] = 'wikisource.org'
 
-        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # Global bot allowed languages on https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
             'ca', 'el', 'fa', 'it', 'ko', 'no', 'pl', 'vi', 'zh',
         ]
@@ -45,9 +45,9 @@ class Family(family.WikimediaFamily):
         }
 
         self.obsolete = {
-            'ang': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
+            'ang': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
             'dk': 'da',
-            'ht': None,   # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
+            'ht': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
             'jp': 'ja',
             'minnan': 'zh-min-nan',
             'nb': 'no',

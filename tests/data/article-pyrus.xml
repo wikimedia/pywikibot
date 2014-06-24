@@ -1,7 +1,7 @@
-<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mediawiki.org/xml/export-0.3/ http://www.mediawiki.org/xml/export-0.3.xsd" version="0.3" xml:lang="en">
+<mediawiki xmlns="https://www.mediawiki.org/xml/export-0.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.mediawiki.org/xml/export-0.3/ https://www.mediawiki.org/xml/export-0.3.xsd" version="0.3" xml:lang="en">
   <siteinfo>
     <sitename>Wikipedia</sitename>
-    <base>http://en.wikipedia.org/wiki/Main_Page</base>
+    <base>https://en.wikipedia.org/wiki/Main_Page</base>
     <generator>MediaWiki 1.16alpha-wmf</generator>
     <case>first-letter</case>
     <namespaces>

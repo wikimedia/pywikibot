@@ -84,8 +84,8 @@ class FamilyFileGenerator(object):
         self.base_url = url
         self.name = name
 
-        self.wikis = {}  # {'http://wiki/$1': Wiki('http://wiki/$1'), ...}
-        self.langs = []  # [Wiki('http://wiki/$1'), ...]
+        self.wikis = {}  # {'https://wiki/$1': Wiki('https://wiki/$1'), ...}
+        self.langs = []  # [Wiki('https://wiki/$1'), ...]
 
     def run(self):
         print("Generating family file from %s" % self.base_url)
@@ -307,7 +307,7 @@ class Wiki(object):
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: %s <url> <short name>" % sys.argv[0])
-        print("Example: %s http://www.mywiki.bogus/wiki/Main_Page mywiki"
+        print("Example: %s https://www.mywiki.bogus/wiki/Main_Page mywiki"
               % sys.argv[0])
         print("This will create the file families/mywiki_family.py")
 

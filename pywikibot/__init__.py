@@ -508,7 +508,7 @@ def showDiff(oldtext, newtext):
 
     """
     # This is probably not portable to non-terminal interfaces....
-    # For information on difflib, see http://pydoc.org/2.3/difflib.html
+    # For information on difflib, see http://pydoc.org/2.1/difflib.html
     color = {
         '+': 'lightgreen',
         '-': 'lightred',

@@ -33,7 +33,7 @@ help = u"""
                                   disabled, see
                   * fckeditor   - Try to convert FCKeditor HTML tags to wiki
                                   syntax.
-                                  http://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
+                                  https://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
 
 """
 
@@ -128,7 +128,7 @@ fixes = {
             # Leerzeichen und Komma vertauscht
             (u'([a-zäöüß](\]\])?) ,((\[\[)?[a-zäöüA-ZÄÖÜ])',                                                                          r'\1, \3'),
             # Plenks (d. h. Leerzeichen auch vor dem Komma/Punkt/Ausrufezeichen/Fragezeichen)
-            # Achtung bei Französisch: http://de.wikipedia.org/wiki/Plenk#Sonderfall_Franz.C3.B6sisch
+            # Achtung bei Französisch: https://de.wikipedia.org/wiki/Plenk#Sonderfall_Franz.C3.B6sisch
             # Leerzeichen vor Doppelpunkt/Semikolon kann korrekt sein, nach irgendeiner Norm für Zitationen.
             (u'([a-zäöüß](\]\])?) ([,\.!\?]) ((\[\[)?[a-zäöüA-ZÄÖÜ])',                                                                          r'\1\3 \4'),
             #(u'([a-z]\.)([A-Z])',                                                                             r'\1 \2'),

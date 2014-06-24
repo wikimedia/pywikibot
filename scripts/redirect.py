@@ -22,7 +22,7 @@ both           Both of the above.
 and arguments can be:
 
 -xml           Retrieve information from a local XML dump
-               (http://download.wikimedia.org). Argument can also be given as
+               (https://download.wikimedia.org). Argument can also be given as
                "-xml:filename.xml". Cannot be used with -fullscan or -moves.
 
 -fullscan      Retrieve redirect pages from live wiki, not from a special page

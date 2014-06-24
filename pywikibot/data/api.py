@@ -86,7 +86,7 @@ class Request(MutableMapping):
 
     This is the lowest-level interface to the API, and can be used for any
     request that a particular site's API supports. See the API documentation
-    (http://www.mediawiki.org/wiki/API) and site-specific settings for
+    (https://www.mediawiki.org/wiki/API) and site-specific settings for
     details on what parameters are accepted for each request type.
 
     Uploading files is a special case: to upload, the parameter "mime" must
@@ -101,7 +101,7 @@ class Request(MutableMapping):
 
     >>> r = Request(site=mysite, action="query", meta="userinfo")
     >>> # This is equivalent to
-    >>> # http://{path}/api.php?action=query&meta=userinfo&format=json
+    >>> # https://{path}/api.php?action=query&meta=userinfo&format=json
     >>> # change a parameter
     >>> r['meta'] = "userinfo|siteinfo"
     >>> # add a new parameter

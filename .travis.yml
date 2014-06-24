@@ -27,8 +27,8 @@ script:
 env:
   global:
     # This is the encrypted password, which can only be decrypted by Travis itself
-    # See http://about.travis-ci.org/docs/user/encryption-keys/
-    # And http://about.travis-ci.org/docs/user/build-configuration/#Secure-environment-variables
+    # See http://docs.travis-ci.com/user/encryption-keys/
+    # And http://docs.travis-ci.com/user/build-configuration/#Secure-environment-variables
     # Command use to generate: travis encrypt USER_PASSWORD=<pwd> -r wikimedia/pywikibot-core
     - secure: kofInMlisiTBt9o/Ustc/vySlkKfxGzGCX2LwA1D2waym8sDTS0o5gMJ5LsrT/BUKwZbe1vLozPHqZrrkQvsdTml+DpZuotzdILs0m0f3BUoexEC6OON5IDljuxFyETrD1Ug44ih5Mc4lVFOdTcBzg501ZmswGwQrBvg/OyEFfE=
 

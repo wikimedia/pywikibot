@@ -28,13 +28,13 @@ Syntax example:
 #  @section FRAMEWORK
 #
 #  Python wikipedia bot framework, DrTrigonBot.
-#  @see http://pywikipediabot.sourceforge.net/
-#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  @see https://www.mediawiki.org/wiki/Pywikibot
+#  @see https://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 #  @section LICENSE
 #
 #  Distributed under the terms of the MIT license.
-#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  @see https://de.wikipedia.org/wiki/MIT-Lizenz
 #
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #  @todo Simulationen werden ausgeführt und das Resultat mit eindeutiger
@@ -71,7 +71,7 @@ import gc
 import resource
 import re
 
-# http://labix.org/lunatic-python
+# https://labix.org/lunatic-python
 try:
     import lua          # installed packages (on f15: 'lua', 'lunatic-python')
 except ImportError:
@@ -199,7 +199,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 # Define a function for the thread
 def main_script(page, rev=None, params=None):
     # http://opensourcehacker.com/2011/02/23/temporarily-capturing-python-logging-output-to-a-string-buffer/
-    # http://docs.python.org/release/2.6/library/logging.html
+    # https://docs.python.org/release/2.6/library/logging.html
     from StringIO import StringIO
     import logging
 

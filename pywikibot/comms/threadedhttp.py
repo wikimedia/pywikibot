@@ -299,7 +299,7 @@ class HttpRequest(object):
 
     >>> import Queue
     >>> queue = Queue.Queue()
-    >>> request = HttpRequest('http://www.google.com')
+    >>> request = HttpRequest('https://www.google.com')
     >>> queue.put(request)
     >>> request.lock.acquire()
     >>> print request.data

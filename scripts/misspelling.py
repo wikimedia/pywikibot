@@ -94,7 +94,7 @@ class MisspellingRobot(DisambiguationRobot):
                     correctSpelling = params[-1]
                     # On de.wikipedia, there are some cases where the
                     # misspelling is ambigous, see for example:
-                    # http://de.wikipedia.org/wiki/Buthan
+                    # https://de.wikipedia.org/wiki/Buthan
                     for match in self.linkR.finditer(correctSpelling):
                         self.alternatives.append(match.group('title'))
 

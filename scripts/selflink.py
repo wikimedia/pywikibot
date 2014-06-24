@@ -146,7 +146,7 @@ class SelflinkBot(Bot):
             oldText = page.text
             # Inside image maps, don't touch selflinks, as they're used
             # to create tooltip labels. See for example:
-            # http://de.wikipedia.org/w/index.php?diff=next&oldid=35721641
+            # https://de.wikipedia.org/w/index.php?diff=next&oldid=35721641
             if '<imagemap>' in page.text:
                 pywikibot.output(
                     u'Skipping page %s because it contains an image map.'

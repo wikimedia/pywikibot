@@ -217,7 +217,7 @@ transliteration_target = 'not set'
 # The encoding in which textfiles are stored, which contain lists of page
 # titles. The most used is: 'utf-8'. 'utf-8-sig' recognizes BOM but it is
 # available on Python 2.5 or higher. For a complete list please see:
-# http://docs.python.org/library/codecs.html#standard-encodings
+# https://docs.python.org/2/library/codecs.html#standard-encodings
 textfile_encoding = 'utf-8'
 
 # tkinter isn't yet ready
@@ -332,7 +332,9 @@ interwiki_backlink = True
 interwiki_shownew = True
 
 # Should interwiki.py output a graph PNG file on conflicts?
-# You need pydot for this: http://dkbza.org/pydot.html
+# You need pydot for this:
+# https://pypi.python.org/pypi/pydot/1.0.2
+# https://code.google.com/p/pydot/
 interwiki_graph = False
 
 # Specifies that the robot should process that amount of subjects at a time,
@@ -354,11 +356,11 @@ interwiki_min_subjects = 100
 interwiki_graph_formats = ['png']
 
 # You can post the contents of your autonomous_problems.dat to the wiki,
-# e.g. to http://de.wikipedia.org/wiki/Wikipedia:Interwiki-Konflikte .
+# e.g. to https://de.wikipedia.org/wiki/Wikipedia:Interwiki-Konflikte .
 # This allows others to assist you in resolving interwiki problems.
 # To help these people, you can upload the interwiki graphs to your
 # webspace somewhere. Set the base URL here, e.g.:
-# 'http://www.example.org/~yourname/interwiki-graphs/'
+# 'https://www.example.org/~yourname/interwiki-graphs/'
 interwiki_graph_url = None
 
 # Save file with local articles without interwikis.
@@ -407,7 +409,7 @@ put_throttle = 10
 noisysleep = 3.0
 
 # Defer bot edits during periods of database server lag.  For details, see
-# http://www.mediawiki.org/wiki/Maxlag_parameter
+# https://www.mediawiki.org/wiki/Maxlag_parameter
 # You can set this variable to a number of seconds, or to None (or 0) to
 # disable this behavior. Higher values are more aggressive in seeking
 # access to the wiki.
@@ -455,18 +457,18 @@ db_password = ''
 # ############# SEARCH ENGINE SETTINGS ##############
 
 # Some scripts allow querying Google via the Google Web API. To use this
-# feature, you must install the pyGoogle module from http://pygoogle.sf.net/
+# feature, you must install the pyGoogle module from http://pygoogle.sourceforge.net
 # and have a Google Web API license key. Note that Google doesn't give out
 # license keys anymore.
 google_key = ''
 
 # Some scripts allow using the Yahoo! Search Web Services. To use this feature,
-# you must install the pYsearch module from http://pysearch.sourceforge.net/
-# and get a Yahoo AppID from http://developer.yahoo.com
+# you must install the pYsearch module from http://pysearch.sourceforge.net
+# and get a Yahoo AppID from https://developer.yahoo.com/
 yahoo_appid = ''
 
 # To use Windows Live Search web service you must get an AppID from
-# http://search.msn.com/developer
+# http://www.bing.com/dev/en-us/dev-center
 msn_appid = ''
 
 # ############# COPYRIGHT SETTINGS ##############
@@ -621,7 +623,7 @@ max_queue_size = 64
 line_separator = LS = u'\n'
 
 # Settings to enable mwparserfromhell
-# <http://mwparserfromhell.readthedocs.org/en/latest/>
+# <https://mwparserfromhell.readthedocs.org/en/latest/>
 # Currently used in textlib.extract_templates_and_params
 # This is more accurate than our current regex, but only works
 # if the user has already installed the library.

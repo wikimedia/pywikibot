@@ -1567,7 +1567,7 @@ class APISite(BaseSite):
                                 namespaces=namespaces, step=step, total=total,
                                 g_content=content, **blargs)
         if followRedirects:
-            # bug: see http://bugzilla.wikimedia.org/show_bug.cgi?id=7304
+            # bug: see https://bugzilla.wikimedia.org/show_bug.cgi?id=7304
             # links identified by MediaWiki as redirects may not really be,
             # so we have to check each "redirect" page and see if it
             # really redirects to this page
@@ -2255,7 +2255,7 @@ class APISite(BaseSite):
         Note that logevents only logs user blocks, while this method
         iterates all blocks including IP ranges.  The iterator yields dicts
         containing keys corresponding to the block properties (see
-        http://www.mediawiki.org/wiki/API:Query_-_Lists for documentation).
+        https://www.mediawiki.org/wiki/API:Query_-_Lists for documentation).
 
         @param starttime: start iterating at this Timestamp
         @param endtime: stop iterating at this Timestamp
@@ -2863,7 +2863,7 @@ class APISite(BaseSite):
                                   % page.title())
                     return True
                 page._revid = result["edit"]["newrevid"]
-                # see http://www.mediawiki.org/wiki/API:Wikimania_2006_API_discussion#Notes
+                # see https://www.mediawiki.org/wiki/API:Wikimania_2006_API_discussion#Notes
                 # not safe to assume that saved text is the same as sent
                 self.loadrevisions(page, getText=True)
                 return True
@@ -3742,7 +3742,7 @@ class DataSite(APISite):
         # the IDs returned from the API can be upper or lowercase, depending
         # on the version. See for more information:
         # https://bugzilla.wikimedia.org/show_bug.cgi?id=53894
-        # http://lists.wikimedia.org/pipermail/wikidata-tech/2013-September/000296.html
+        # https://lists.wikimedia.org/pipermail/wikidata-tech/2013-September/000296.html
         try:
             dtype = data['entities'][prop.getID()]['datatype']
         except KeyError:

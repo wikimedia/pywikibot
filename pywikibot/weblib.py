@@ -23,11 +23,11 @@ def getInternetArchiveURL(url, timestamp=None):
         timestamp - requested archive date. The version closest to that moment
                     is returned. Format: YYYYMMDDhhmmss or part thereof.
 
-    See [[:mw:Archived Pages]] and http://archive.org/help/wayback_api.php
+    See [[:mw:Archived Pages]] and https://archive.org/help/wayback_api.php
     for more details.
     """
     import json
-    uri = u'http://archive.org/wayback/available?'
+    uri = u'https://archive.org/wayback/available?'
 
     query = {'url': url}
 

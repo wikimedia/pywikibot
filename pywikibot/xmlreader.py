@@ -4,7 +4,7 @@
 Each XmlEntry object represents a page, as read from an XML source
 
 The XmlDump class reads a pages_current XML dump (like the ones offered on
-http://dumps.wikimedia.org/backup-index.html) and offers a generator over
+https://dumps.wikimedia.org/backup-index.html) and offers a generator over
 XmlEntry objects which can be used by other bots.
 """
 #

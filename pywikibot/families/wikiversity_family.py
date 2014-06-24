@@ -18,5 +18,5 @@ class Family(family.WikimediaFamily):
         self.langs = dict([(lang, '%s.wikiversity.org' % lang)
                            for lang in self.languages_by_size])
 
-        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # Global bot allowed languages on https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = ['ja', ]

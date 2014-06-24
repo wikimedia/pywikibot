@@ -266,7 +266,7 @@ class DataIngestionBot:
         database = {}
 
         reader = csv.DictReader(open(self.configuration.get('csvFile'), "rb"), dialect=self.configuration.get('csvDialect'), delimiter=self.configuration.csvDelimiter)
-        # FIXME : Encoding problems http://docs.python.org/library/csv.html#csv-examples
+        # FIXME : Encoding problems https://docs.python.org/2/library/csv.html#csv-examples
         for row in reader:
             self.metadataCSV(row)
             self.processFile(metadata)

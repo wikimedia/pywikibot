@@ -58,7 +58,7 @@ python add_text.py -excepturl:"class='catlinks'>" -uncat
 This script has been written by Botwiki's staff, if you want to help us
 or you need some help regarding this script, you can find us here:
 
-* http://botwiki.sno.cc
+* http://botwiki.sno.cc/wiki/Main_Page
 
 """
 

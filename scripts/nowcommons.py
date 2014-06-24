@@ -194,17 +194,17 @@ class NowCommonsDeleteBot:
             return nowCommons['_default']
 
     def useHashGenerator(self):
-        # http://toolserver.org/~multichill/nowcommons.php?language=it&page=2&filter=
+        # https://toolserver.org/~multichill/nowcommons.php?language=it&page=2&filter=
         lang = self.site.lang
         num_page = 0
         word_to_skip_translated = i18n.translate(self.site, word_to_skip)
         images_processed = list()
         while 1:
-            url = ('http://toolserver.org/~multichill/nowcommons.php?'
+            url = ('https://toolserver.org/~multichill/nowcommons.php?'
                    'language=%s&page=%s&filter=') % (lang, num_page)
             HTML_text = self.site.getUrl(url, no_hostname=True)
             reg = r'<[Aa] href="(?P<urllocal>.*?)">(?P<imagelocal>.*?)</[Aa]> +?</td><td>\n\s*?'
-            reg += r'<[Aa] href="(?P<urlcommons>http://commons.wikimedia.org/.*?)" \
+            reg += r'<[Aa] href="(?P<urlcommons>http[s]?://commons.wikimedia.org/.*?)" \
                    >Image:(?P<imagecommons>.*?)</[Aa]> +?</td><td>'
             regex = re.compile(reg, re.UNICODE)
             found_something = False

@@ -20,7 +20,7 @@ from xml.etree import cElementTree
 import pywikibot
 from pywikibot.site import Family
 
-URL = 'http://wikistats.wmflabs.org/api.php?action=dump&table=%s&format=xml'
+URL = 'https://wikistats.wmflabs.org/api.php?action=dump&table=%s&format=xml'
 
 familiesDict = {
     'anarchopedia': 'anarchopedias',

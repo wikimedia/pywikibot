@@ -1657,7 +1657,7 @@ class transliterator(object):
         self.trans[u"໗"] = "7"
         self.trans[u"໘"] = "8"
         self.trans[u"໙"] = "9"
-        # from: http://www.wikidata.org/wiki/MediaWiki:Gadget-SimpleTransliterate.js
+        # from: https://www.wikidata.org/wiki/MediaWiki:Gadget-SimpleTransliterate.js
         self.trans[u"ଂ"] = "anusvara"
         self.trans[u"ઇ"] = "i"
         self.trans[u"എ"] = "e"

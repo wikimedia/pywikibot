@@ -14,7 +14,7 @@ These command line parameters can be used to specify which pages to work on:
 &params;
 
 -xml              Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see http://download.wikimedia.org).
+                  or pages-meta-current, see https://download.wikimedia.org).
                   Argument can also be given as "-xml:filename".
 
 -protectedpages:  Check all the blocked pages; useful when you have not
@@ -41,7 +41,7 @@ Furthermore, the following command line parameters are supported:
 You have to edit this script in order to add your preferences
 otherwise the script won't work!
 
-If you have problems, ask on botwiki ( http://botwiki.sno.cc )
+If you have problems, ask on botwiki ( http://botwiki.sno.cc/wiki/Main_Page )
 or on IRC (#pywikipediabot)
 
 --- Example of how to use the script ---

@@ -304,7 +304,7 @@ def removeHTMLParts(text, keeptags=['tt', 'nowiki', 'small', 'sup']):
 
     """
     # try to merge with 'removeDisabledParts()' above into one generic function
-    # thanks to http://www.hellboundhackers.org/articles/841-using-python-39;s-htmlparser-class.html
+    # thanks to https://www.hellboundhackers.org/articles/read-article.php?article_id=841
     parser = _GetDataHTML()
     parser.keeptags = keeptags
     parser.feed(text)
@@ -312,7 +312,7 @@ def removeHTMLParts(text, keeptags=['tt', 'nowiki', 'small', 'sup']):
     return parser.textdata
 
 
-# thanks to http://docs.python.org/library/htmlparser.html
+# thanks to https://docs.python.org/2/library/htmlparser.html
 class _GetDataHTML(HTMLParser):
     textdata = u''
     keeptags = []
@@ -780,7 +780,7 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
 The Pywikibot is no longer allowed to touch categories on the German
 Wikipedia on pages that contain the Personendaten template because of the
 non-standard placement of that template.
-See http://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Position_der_Personendaten_am_.22Artikelende.22
+See https://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Position_der_Personendaten_am_.22Artikelende.22
 """)
     separator = site.family.category_text_separator
     iseparator = site.family.interwiki_text_separator
@@ -877,7 +877,7 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     notInside = '\]\s<>"'
     # The first half of this regular expression is required because '' is
     # not allowed inside links. For example, in this wiki text:
-    #       ''Please see http://www.example.org.''
+    #       ''Please see https://www.example.org.''
     # .'' shouldn't be considered as part of the link.
     regex = r'(?P<url>http[s]?://[^%(notInside)s]*?[^%(notAtEnd)s]' \
             r'(?=[%(notAtEnd)s]*\'\')|http[s]?://[^%(notInside)s]*' \

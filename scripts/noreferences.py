@@ -11,7 +11,7 @@ These command line parameters can be used to specify which pages to work on:
 &params;
 
     -xml          Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see http://download.wikimedia.org).
+                  or pages-meta-current, see https://download.wikimedia.org).
                   Argument can also be given as "-xml:filename".
 
     -namespace:n  Number or name of namespace to process. The parameter can be

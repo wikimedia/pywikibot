@@ -1744,7 +1744,7 @@ class ImagePage(Page):
                 u'http://wikitravel.org/upload/shared/')
         else:
             return self.fileUrl().startswith(
-                'http://upload.wikimedia.org/wikipedia/commons/')
+                'https://upload.wikimedia.org/wikipedia/commons/')
 
     @deprecated("ImagePage.getFileSHA1Sum()")
     def getFileMd5Sum(self):
@@ -3239,7 +3239,7 @@ class Link(ComparableMixin):
 
         # Normalize unicode string to a NFC (composed) format to allow
         # proper string comparisons. According to
-        # http://svn.wikimedia.org/viewvc/mediawiki/branches/REL1_6/phase3/includes/normal/UtfNormal.php?view=markup
+        # https://svn.wikimedia.org/viewvc/mediawiki/branches/REL1_6/phase3/includes/normal/UtfNormal.php?view=markup
         # the MediaWiki code normalizes everything to NFC, not NFKC
         # (which might result in information loss).
         t = unicodedata.normalize('NFC', t)

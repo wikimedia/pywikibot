@@ -315,7 +315,8 @@ interwiki_backlink: if set to True, all problems in foreign wikis will
 interwiki_shownew:  should interwiki.py display every new link it discovers?
 
 interwiki_graph:    output a graph PNG file on conflicts? You need pydot for
-                    this: http://dkbza.org/pydot.html
+                    this: https://pypi.python.org/pypi/pydot/1.0.2
+                    https://code.google.com/p/pydot/
 
 interwiki_graph_format: the file format for interwiki graphs
 
@@ -1706,7 +1707,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                                         and page.namespace() == 10 and
                                         u'Country data' in page.title(withNamespace=False))
                 # edit restriction on is-wiki
-                # http://is.wikipedia.org/wiki/Wikipediaspjall:V%C3%A9lmenni
+                # https://is.wikipedia.org/wiki/Wikipediaspjall:V%C3%A9lmenni
                 # and zh-wiki for template namespace which prevents increasing the queue
                 # allow edits for the same conditions as -whenneeded
                 # or the last edit wasn't a bot

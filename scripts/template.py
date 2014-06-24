@@ -24,7 +24,7 @@ Command line options:
              the same effect.
 
 -xml         retrieve information from a local dump
-             (http://download.wikimedia.org). If this argument isn\'t given,
+             (https://download.wikimedia.org). If this argument isn\'t given,
              info will be loaded from the maintenance page of the live wiki.
              argument can also be given as "-xml:filename.xml".
 

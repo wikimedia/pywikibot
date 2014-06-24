@@ -21,7 +21,7 @@ from pywikibot.data import api
 
 #
 # Permutations code was taken from
-# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/190465
+# https://code.activestate.com/recipes/190465/
 #
 def xuniqueCombinations(items, n):
     if n == 0:
@@ -38,7 +38,7 @@ def xuniqueCombinations(items, n):
 # This code makes this script Windows ONLY!!!
 # Feel free to adapt it to another platform
 #
-# Adapted from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/496901
+# Adapted from https://code.activestate.com/recipes/496901/
 #
 STD_OUTPUT_HANDLE = -11
 
