@@ -510,6 +510,8 @@ def main():
         if not arg.startswith('-'):
             args.append(arg)
 
+    site = pywikibot.Site()
+
     if calc:
         if not salt:
             pywikibot.showHelp()
@@ -517,6 +519,11 @@ def main():
                 'NOTE: you must specify a salt to calculate a key using '
                 '-salt:SALT option.')
             return
+        page = pywikibot.Page(site, calc)
+        if page.exists():
+            calc = page.title()
+        else:
+            pywikibot.output(u'NOTE: the specified page "%s" does not (yet) exist.' % calc)
         s = md5()
         s.update(salt + '\n')
         s.update(calc + '\n')
@@ -531,7 +538,6 @@ def main():
         pywikibot.output(u'NOTE: you must specify a template to run the bot.')
         return
 
-    site = pywikibot.Site()
     for a in args:
         pagelist = []
         if not filename and not pagename:
