@@ -33,13 +33,21 @@ except ImportError:
     sys.exit(1)
 
 from distutils.version import StrictVersion
+# httplib2 0.6.0 was released with __version__ as '$Rev$'
+#                and no module variable CA_CERTS.
+if httplib2.__version__ == '$Rev$' and 'CA_CERTS' not in httplib2.__dict__:
+    httplib2.__version__ = '0.6.0'
 if StrictVersion(httplib2.__version__) < StrictVersion("0.6.0"):
     print("Error: Python module httplib2 (%s) is not 0.6.0 or greater." %
           httplib2.__file__)
     sys.exit(1)
 
 if sys.version_info[0] == 2:
-    from httplib2 import SSLHandshakeError
+    if 'SSLHandshakeError' in httplib2.__dict__:
+        from httplib2 import SSLHandshakeError
+    elif httplib2.__version__ == '0.6.0':
+        from httplib2 import ServerNotFoundError as SSLHandshakeError
+
     import Queue
     import urlparse
     import cookielib

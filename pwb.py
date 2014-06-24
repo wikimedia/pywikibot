@@ -109,15 +109,19 @@ try:
 except ImportError as e:
     print("ImportError: %s" % e)
     print("Python module httplib2 >= 0.6.0 is required.")
-    print("Did you clone without --recursive?"
+    print("Did you clone without --recursive?\n"
           "Try running 'git submodule update --init'.")
     sys.exit(1)
 
+# httplib2 0.6.0 was released with __version__ as '$Rev$'
+#                and no module variable CA_CERTS.
+if httplib2.__version__ == '$Rev$' and 'CA_CERTS' not in httplib2.__dict__:
+    httplib2.__version__ = '0.6.0'
 from distutils.version import StrictVersion
 if StrictVersion(httplib2.__version__) < StrictVersion("0.6.0"):
     print("Python module httplib2 (%s) needs to be 0.6.0 or greater." %
           httplib2.__file__)
-    print("Did you clone without --recursive?"
+    print("Did you clone without --recursive?\n"
           "Try running 'git submodule update --init'.")
     sys.exit(1)
 
