@@ -19,7 +19,6 @@ import logging.handlers
 # all output goes thru python std library "logging" module
 
 import os
-import os.path
 import sys
 import re
 import json
@@ -268,21 +267,47 @@ def writelogheader():
     except version.ParseError:
         exception()
 
-    if config.log_pywiki_repo_version:
-        log(u'PYWIKI REPO VERSION: %s' % unicode(version.getversion_onlinerepo()))
-
-    log(u'SITE VERSION: %s' % unicode(site.live_version()))
-
     # system
     if hasattr(os, 'uname'):
         log(u'SYSTEM: %s' % unicode(os.uname()))
 
+    all_modules = sys.modules.keys()
+
+    # These are the main dependencies of pywikibot.
+    check_package_list = ['httplib2', 'mwparserfromhell']
+
+    # report all imported packages
+    if config.verbose_output:
+        check_package_list += all_modules
+
+    packages = version.package_versions(check_package_list)
+
+    log(u'PACKAGES:')
+    for name in sorted(packages.keys()):
+        info = packages[name]
+        if 'path' not in info:
+            if 'type' in info:
+                info['path'] = '[' + info['type'] + ']'
+            else:
+                info['path'] = '[path unknown]'
+        if 'ver' not in info:
+            info['ver'] = '??'
+        if 'err' in info:
+            log(u'  %(name)s: %(err)s' % info)
+        else:
+            log(u'  %(name)s (%(path)s) = %(ver)s' % info)
+
     # imported modules
     log(u'MODULES:')
-    for item in list(sys.modules.keys()):
+    for item in list(all_modules):
         ver = version.getfileversion('%s.py' % item.replace('.', '/'))
         if ver:
             log(u'  %s' % ver)
+
+    if config.log_pywiki_repo_version:
+        log(u'PYWIKI REPO VERSION: %s' % unicode(version.getversion_onlinerepo()))
+
+    log(u'SITE VERSION: %s' % unicode(site.live_version()))
 
     # messages on bot discussion page?
     if site.logged_in():

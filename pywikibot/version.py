@@ -216,3 +216,101 @@ def getfileversion(filename):
         return u'%s %s %s' % (filename, __version__[5:-1][:7], mtime)
     else:
         return None
+
+
+def package_versions(modules=None, builtins=False, standard_lib=None):
+    """ Retrieve package version information.
+
+    When builtins or standard_lib are None, they will be included only
+    if a version was found in the package.
+
+    @param modules: Modules to inspect
+    @type modules: list of strings
+    @param builtins: Include builtins
+    @type builtins: Boolean, or None for automatic selection
+    @param standard_lib: Include standard library packages
+    @type standard_lib: Boolean, or None for automatic selection
+    """
+    import sys
+
+    if not modules:
+        modules = sys.modules.keys()
+
+    import distutils.sysconfig
+    std_lib_dir = distutils.sysconfig.get_python_lib(standard_lib=True)
+
+    root_packages = set([key.split('.')[0]
+                         for key in modules])
+
+    builtin_packages = set([name.split('.')[0] for name in root_packages
+                            if name in sys.builtin_module_names or
+                            '_' + name in sys.builtin_module_names])
+
+    # Improve performance by removing builtins from the list if possible.
+    if builtins is False:
+        root_packages = list(root_packages - builtin_packages)
+
+    std_lib_packages = []
+
+    paths = {}
+    data = {}
+
+    for name in root_packages:
+        try:
+            package = __import__(name, level=0)
+        except Exception as e:
+            data[name] = {'name': name, 'err': e}
+            continue
+
+        info = {'package': package, 'name': name}
+
+        if name in builtin_packages:
+            info['type'] = 'builtins'
+
+        if '__file__' in package.__dict__:
+            # Determine if this file part is of the standard library.
+            if os.path.normcase(package.__file__).startswith(
+                    os.path.normcase(std_lib_dir)):
+                std_lib_packages.append(name)
+                if standard_lib is False:
+                    continue
+                info['type'] = 'standard libary'
+
+            # Strip '__init__.py' from the filename.
+            path = package.__file__
+            if '__init__.py' in path:
+                path = path[0:path.index('__init__.py')]
+
+            info['path'] = path
+            assert(path not in paths)
+            paths[path] = name
+
+        if '__version__' in package.__dict__:
+            info['ver'] = package.__version__
+        elif name == 'mwlib':  # mwlib 0.14.3 does not include a __init__.py
+            module = __import__(name + '._version',
+                                fromlist=['_version'], level=0)
+            if '__version__' in module.__dict__:
+                info['ver'] = module.__version__
+                path = module.__file__
+                path = path[0:path.index('_version.')]
+                info['path'] = path
+
+        # If builtins or standard_lib is None,
+        # only include package if a version was found.
+        if (builtins is None and name in builtin_packages) or \
+                (standard_lib is None and name in std_lib_packages):
+            if 'ver' in info:
+                data[name] = info
+        else:
+            data[name] = info
+
+    # Remove any sub-packages which were loaded with a different name.
+    # e.g. 'wikipedia_family.py' is loaded as 'wikipedia'
+    for path, name in paths.items():
+        for other_path in set(paths) - set([path]):
+            if path.startswith(other_path) and not other_path.startswith(path):
+                del paths[path]
+                del data[name]
+
+    return data
