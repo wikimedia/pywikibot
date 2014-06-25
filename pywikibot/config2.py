@@ -21,6 +21,8 @@ import sys
 # variables that are intended only for internal use and not to be exported
 # to other modules.
 
+_private_values = ['authenticate', 'proxy', 'db_password']
+
 # ############# ACCOUNT SETTINGS ##############
 
 # The family of sites we are working on. wikipedia.py will import
@@ -761,7 +763,18 @@ if __name__ == "__main__":
             if not type(globals()[_name]) in [types.FunctionType,
                                               types.ModuleType]:
                 if _all or _glv[_name] != globals()[_name]:
-                    print("%s=%s" % (_name, repr(globals()[_name])))
+                    _value = globals()[_name]
+                    if _name in _private_values and _value:
+                        if isinstance(_value, dict):
+                            _value = '{ ...xxxxxxxx... }'
+                        elif hasattr(_value, '__dict__'):
+                            _value = '%s( ...xxxxxxxx... )' % \
+                                     _value.__class__.__name__
+                        else:
+                            _value = repr('xxxxxxxx')
+                    else:
+                        _value = repr(_value)
+                    print("%s=%s" % (_name, _value))
 
 # cleanup all locally-defined variables
 for __var in list(globals().keys()):
