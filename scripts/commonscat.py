@@ -67,7 +67,6 @@ import re
 
 import add_text
 import pywikibot
-from pywikibot import config
 from pywikibot import pagegenerators
 
 docuReplacements = {
@@ -263,20 +262,6 @@ class CommonscatBot:
                              % page.title(asLink=True))
         else:
             self.addCommonscat(page)
-
-    def load(self, page):
-        """ Load the given page, do some changes, and save it. """
-        try:
-            text = page.get()
-        except pywikibot.NoPage:
-            pywikibot.output(u"Page %s does not exist; skipping."
-                             % page.title(asLink=True))
-        except pywikibot.IsRedirectPage:
-            pywikibot.output(u"Page %s is a redirect; skipping."
-                             % page.title(asLink=True))
-        else:
-            return text
-        return None
 
     def save(self, text, page, comment, minorEdit=True, botflag=True):
         # only save if something was changed
@@ -572,19 +557,20 @@ def main():
                 summary = arg[9:]
         elif arg.startswith('-checkcurrent'):
             checkcurrent = True
-            primaryCommonscat, commonscatAlternatives = \
-                CommonscatBot.getCommonscatTemplate(
-                    pywikibot.Site().code)
-            generator = pagegenerators.NamespaceFilterPageGenerator(
-                pagegenerators.ReferringPageGenerator(
-                    pywikibot.Page(pywikibot.Site(),
-                                   u'Template:' + primaryCommonscat),
-                    onlyTemplateInclusion=True), ns)
-
         elif arg == '-always':
             always = True
         else:
             genFactory.handleArg(arg)
+
+    if checkcurrent:
+        primaryCommonscat, commonscatAlternatives = \
+            CommonscatBot.getCommonscatTemplate(
+                pywikibot.Site().code)
+        generator = pagegenerators.NamespaceFilterPageGenerator(
+            pagegenerators.ReferringPageGenerator(
+                pywikibot.Page(pywikibot.Site(),
+                               u'Template:' + primaryCommonscat),
+                onlyTemplateInclusion=True), ns)
 
     if not generator:
         generator = genFactory.getCombinedGenerator()
