@@ -35,6 +35,6 @@ env:
 notifications:
   irc:
     channels:
-      - "chat.freenode.net#pywikipediabot"
+      - "chat.freenode.net#pywikibot"
     on_success: change
     on_failure: always
