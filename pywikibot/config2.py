@@ -458,12 +458,6 @@ db_password = ''
 
 # ############# SEARCH ENGINE SETTINGS ##############
 
-# Some scripts allow querying Google via the Google Web API. To use this
-# feature, you must install the pyGoogle module from http://pygoogle.sourceforge.net
-# and have a Google Web API license key. Note that Google doesn't give out
-# license keys anymore.
-google_key = ''
-
 # Some scripts allow using the Yahoo! Search Web Services. To use this feature,
 # you must install the pYsearch module from http://pysearch.sourceforge.net
 # and get a Yahoo AppID from https://developer.yahoo.com/
