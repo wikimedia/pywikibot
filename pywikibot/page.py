@@ -15,6 +15,7 @@ from pywikibot import deprecate_arg
 from pywikibot import deprecated
 from pywikibot import config
 import pywikibot.site
+from pywikibot.exceptions import AutoblockUser, UserActionRefuse
 from pywikibot.tools import ComparableMixin
 import hashlib
 
@@ -3104,7 +3105,7 @@ class Claim(Property):
         @param sources: the sources to remove
         @type sources: list of pywikibot.Claim
         """
-        data = self.repo.removeSources(self, sources, **kwargs)
+        self.repo.removeSources(self, sources, **kwargs)
         for source in sources:
             source_dict = collections.defaultdict(list)
             source_dict[source.getID()].append(source)
@@ -3631,6 +3632,18 @@ def html2unicode(text, ignore=None):
             result += text
             found = False
     return result
+
+
+def UnicodeToAsciiHtml(s):
+    """Convert unicode to a bytestring using HTML entities."""
+    html = []
+    for c in s:
+        cord = ord(c)
+        if 31 < cord < 128:
+            html.append(c)
+        else:
+            html.append('&#%d;' % cord)
+    return ''.join(html)
 
 
 def unicode2html(x, encoding):
