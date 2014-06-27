@@ -1133,16 +1133,26 @@ class APISite(BaseSite):
         assert 'namespaces' in sidata, \
                "API siteinfo response lacks 'namespaces' key"
         self._siteinfo = sidata['general']
+
         nsdata = sidata['namespaces']
         for nskey in nsdata:
             ns = int(nskey)
-            if ns in self._namespaces:
-                if nsdata[nskey]["*"] in self._namespaces[ns]:
+            # this is the preferred form so it goes at front of list
+            self._namespaces.setdefault(ns, []).insert(0, nsdata[nskey]["*"])
+
+            if LV(self.version()) >= LV("1.14"):
+                # nsdata["0"] has no canonical key.
+                # canonical ns -2 to 15 are hard coded in self._namespaces
+                # do not get them from API result to avoid canonical duplicates
+                if -2 <= ns <= 15:
                     continue
-                # this is the preferred form so it goes at front of list
-                self._namespaces[ns].insert(0, nsdata[nskey]["*"])
-            else:
-                self._namespaces[ns] = [nsdata[nskey]["*"]]
+                if 'canonical' not in nsdata[nskey]:
+                    pywikibot.warning(
+                        u'namespace %s without a canonical name. Misconfigured?'
+                        % self._namespaces[ns][0])
+                    continue
+                self._namespaces.setdefault(ns, []).append(nsdata[nskey]["canonical"])
+
         if 'namespacealiases' in sidata:
             aliasdata = sidata['namespacealiases']
             for item in aliasdata:
@@ -1150,6 +1160,7 @@ class APISite(BaseSite):
                     continue
                 # this is a less preferred form so it goes at the end
                 self._namespaces[int(item['id'])].append(item["*"])
+
         if 'extensions' in sidata:
             self._extensions = sidata['extensions']
         else:
