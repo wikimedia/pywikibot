@@ -2962,7 +2962,7 @@ class APISite(BaseSite):
                                         % (self.protocol(),
                                            self.hostname(),
                                            captcha["url"]))
-                        req['captchaword'] = cap_answerwikipedia.input(
+                        req['captchaword'] = pywikibot.input(
                             "Please view CAPTCHA in your browser, "
                             "then type answer here:")
                         continue
@@ -3124,7 +3124,7 @@ class APISite(BaseSite):
                           token=token,
                           **kwargs)
         try:
-            result = req.submit()
+            req.submit()
         except api.APIError as err:
             errdata = {
                 'site': self,
@@ -3162,7 +3162,7 @@ class APISite(BaseSite):
                           title=page.title(withSection=False),
                           reason=summary)
         try:
-            result = req.submit()
+            req.submit()
         except api.APIError as err:
             errdata = {
                 'site': self,
@@ -3216,14 +3216,11 @@ class APISite(BaseSite):
         if expiry:
             req['expiry'] = expiry
         try:
-            result = req.submit()
+            req.submit()
         except api.APIError as err:
             errdata = {
                 'site': self,
-                'title': page.title(withSection=False),
                 'user': self.user(),
-                'level-edit': edit,
-                'level-move': move
             }
             if err.code in self._protect_errors:
                 raise Error(self._protect_errors[err.code] % errdata)
@@ -3322,16 +3319,6 @@ class APISite(BaseSite):
     def linksearch(self, siteurl, limit=None):
         """Backwards-compatible interface to exturlusage()"""
         return self.exturlusage(siteurl, total=limit)
-
-    @deprecated('Site().logevents(logtype="upload",...)')
-    @deprecate_arg("repeat", None)
-    def newimages(self, number=100, lestart=None, leend=None, leuser=None,
-                  letitle=None):
-        """Yield ImagePages from most recent uploads"""
-        if isinstance(letitle, basestring):
-            letitle = pywikibot.Page(pywikibot.Link(letitle))
-        return self.logevents(logtype="upload", total=number, start=lestart,
-                              end=leend, user=leuser, page=letitle)
 
     def getFilesFromAnHash(self, hash_found=None):
         """Return all images that have the same hash.
@@ -3506,13 +3493,14 @@ class APISite(BaseSite):
 
         """
         # TODO: update docstring
-        for event in logevents(self, logtype="upload", user=user,
-                               start=start, end=end, reverse=reverse,
-                               step=step, total=total):
-            image = pywikibot.ImagePage(self, event['title'])
-            date = pywikibot.Timestamp.fromISOformat(event['timestamp'])
-            user = event['user']
-            comment = event['comment'] or u''
+        for event in self.logevents(logtype="upload", user=user,
+                                    start=start, end=end, reverse=reverse,
+                                    step=step, total=total):
+            # event.title() actually returns a Page
+            image = pywikibot.ImagePage(event.title())
+            date = event.timestamp()
+            user = event.user()
+            comment = event.comment() or u''
             yield (image, date, user, comment)
 
     @deprecate_arg("number", None)

@@ -15,3 +15,5 @@ __version__ = '$Id$'
 
 
 from pywikibot import User
+
+__all__ = ['User']

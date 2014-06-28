@@ -10,7 +10,7 @@ Objects representing Mediawiki log entries
 __version__ = '$Id$'
 #
 
-from pywikibot.exceptions import *
+from pywikibot.exceptions import Error
 import pywikibot
 
 _logger = "wiki"

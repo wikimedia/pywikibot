@@ -20,3 +20,5 @@ from pywikibot import Category
 def change_category(article, oldCat, newCat, comment=None, sortKey=None,
                     inPlace=True):
     return article.change_category(oldCat, newCat, comment, sortKey, inPlace)
+
+__all__ = ['Category', 'change_category']
