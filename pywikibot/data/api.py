@@ -16,7 +16,6 @@ from email.mime.nonmultipart import MIMENonMultipart
 import datetime
 import hashlib
 import json
-import logging
 import mimetypes
 import os
 try:
@@ -27,12 +26,10 @@ import pprint
 import re
 import traceback
 import time
-import urllib
-import warnings
 
 import pywikibot
 from pywikibot import config, login
-from pywikibot.exceptions import *
+from pywikibot.exceptions import Server504Error, FatalServerError, Error
 
 import sys
 
@@ -62,11 +59,6 @@ class APIError(pywikibot.Error):
 
     def __str__(self):
         return "%(code)s: %(info)s" % self.__dict__
-
-
-class APIWarning(UserWarning):
-    """The API returned a warning message."""
-    pass
 
 
 class TimeoutError(pywikibot.Error):
@@ -316,7 +308,7 @@ class Request(MutableMapping):
                 pywikibot.error(traceback.format_exc())
                 raise
             # TODO: what other exceptions can occur here?
-            except Exception as e:
+            except Exception:
                 # for any other error on the http request, wait and retry
                 pywikibot.error(traceback.format_exc())
                 pywikibot.log(u"%s, %s" % (uri, paramstring))
