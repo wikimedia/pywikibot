@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (C) Pywikipedia bot team, 2003-2014
+# (C) Pywikibot team, 2003-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,7 +31,6 @@ unixColors = {
 
 class UnixUI(terminal_interface_base.UI):
     def printColorized(self, text, targetStream):
-        lastColor = None
         totalcount = 0
         for key, value in unixColors.items():
             ckey = '\03{%s}' % key

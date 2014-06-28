@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# (C) Pywikipedia bot team, 2003-2013
+# (C) Pywikibot team, 2003-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,7 @@ import re
 import sys
 import pywikibot as wikipedia
 from pywikibot import config
-from pywikibot.bot import DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING
+from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
 import logging
 
 transliterator = transliteration.transliterator(config.console_encoding)
