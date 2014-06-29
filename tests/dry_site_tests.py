@@ -53,6 +53,7 @@ class TestMustBe(NoSiteTestCase):
         self._logged_in_as = None
         self.obsolete = False
         super(TestMustBe, self).setUp()
+        self.version = lambda: '1.13'  # pre 1.14
 
     def login(self, sysop):
         # mock call

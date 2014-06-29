@@ -69,6 +69,9 @@ class MockCachedRequestKeyTests(NoSiteTestCase):
                 self._user = 'anon'
                 pywikibot.site.BaseSite.__init__(self, 'mock', MockFamily())
 
+            def version(self):
+                return '1.13'  # pre 1.14
+
             def languages(self):
                 return ['mock']
 

@@ -20,6 +20,7 @@ import os
 import re
 import sys
 from distutils.version import LooseVersion as LV
+from collections import Iterable
 import threading
 import time
 import urllib
@@ -119,6 +120,276 @@ does not exist. Also check your configuration file."""
             raise Error("Family %s does not exist" % fam)
     _families[fam] = myfamily.Family()
     return _families[fam]
+
+
+class Namespace(Iterable):
+
+    """ Namespace site data object.
+
+    This is backwards compatible with the structure of entries
+    in site._namespaces which were a list of
+    [customised namespace,
+     canonical namespace name?,
+     namespace alias*]
+
+    If the canonical_name is not provided for a namespace between -2
+    and 15, the MediaWiki 1.14+ built-in names are used.
+    Enable use_image_name to use built-in names from MediaWiki 1.13
+    and earlier as the details.
+
+    Image and File are aliases of each other by default.
+
+    If only one of canonical_name and custom_name are available, both
+    properties will have the same value.
+    """
+
+    # These are the MediaWiki built-in names for MW 1.14+.
+    # Namespace prefixes are always case-insensitive, but the
+    # canonical forms are capitalized.
+    canonical_namespaces = {
+        -2: u"Media",
+        -1: u"Special",
+        0: u"",
+        1: u"Talk",
+        2: u"User",
+        3: u"User talk",
+        4: u"Project",
+        5: u"Project talk",
+        6: u"File",
+        7: u"File talk",
+        8: u"MediaWiki",
+        9: u"MediaWiki talk",
+        10: u"Template",
+        11: u"Template talk",
+        12: u"Help",
+        13: u"Help talk",
+        14: u"Category",
+        15: u"Category talk",
+    }
+
+    def __init__(self, id, canonical_name=None, custom_name=None,
+                 aliases=None, use_image_name=False, **kwargs):
+        """Constructor.
+
+        @param custom_name: Name defined in server LocalSettings.php
+        @type custom_name: unicode
+        @param canonical_name: Canonical name
+        @type canonical_name: str
+        @param aliases: Aliases
+        @type aliases: list of unicode
+        @param use_image_name: Use 'Image' as default canonical
+                               for 'File' namespace
+        @param use_image_name: bool
+
+        """
+        self.id = id
+
+        if aliases is None:
+            self.aliases = list()
+        else:
+            self.aliases = aliases
+
+        if not canonical_name and id in self.canonical_namespaces:
+            if use_image_name:
+                if id == 6:
+                    canonical_name = u'Image'
+                elif id == 7:
+                    canonical_name = u"Image talk"
+
+            if not canonical_name:
+                canonical_name = self.canonical_namespaces[id]
+
+        assert(custom_name is not None or canonical_name is not None)
+
+        self.custom_name = custom_name if custom_name is not None else canonical_name
+        self.canonical_name = canonical_name if canonical_name is not None else custom_name
+
+        if not aliases:
+            if id in (6, 7):
+                if use_image_name:
+                    alias = u'File'
+                else:
+                    alias = u'Image'
+                if id == 7:
+                    alias += u' talk'
+                self.aliases = [alias]
+            else:
+                self.aliases = list()
+        else:
+            self.aliases = aliases
+
+        self.info = kwargs
+
+    def __getattr__(self, attr):
+        """Look for undefined attributes in info."""
+        if attr in self.info:
+            return self.info[attr]
+        else:
+            raise AttributeError("%s instance has no attribute '%s'"
+                                 % (self.__class__.__name__, attr))
+
+    def _distinct(self):
+        if self.custom_name == self.canonical_name:
+            return [self.canonical_name] + self.aliases
+        else:
+            return [self.custom_name, self.canonical_name] + self.aliases
+
+    def _contains_lowercase_name(self, name):
+        """Determine a lowercase normalised name is a name of this namespace.
+
+        """
+        return name in [x.lower() for x in self._distinct()]
+
+    def __contains__(self, item):
+        """Determine if item is a name of this namespace.
+
+        The comparison is case insensitive, and item may have a single
+        colon on one or both sides of the name.
+
+        @param item: name to check
+        @type item: basestring
+        """
+        if item == '' and self.id == 0:
+            return True
+
+        name = Namespace.normalize_name(item)
+        if not name:
+            return False
+
+        return self._contains_lowercase_name(name.lower())
+
+    def __len__(self):
+        """Obtain length of the iterable."""
+        if self.custom_name == self.canonical_name:
+            return len(self.aliases) + 1
+        else:
+            return len(self.aliases) + 2
+
+    def __iter__(self):
+        """Return an iterator."""
+        return iter(self._distinct())
+
+    def __getitem__(self, index):
+        """Obtain an item from the iterable."""
+        if self.custom_name != self.canonical_name:
+            if index == 0:
+                return self.custom_name
+            else:
+                index -= 1
+
+        if index == 0:
+            return self.canonical_name
+        else:
+            return self.aliases[index - 1]
+
+    def __str__(self):
+        """Return a string representation."""
+        if self.id == 0:
+            return ':'
+        elif self.id in (6, 14):
+            return ':' + self.canonical_name + ':'
+        else:
+            return self.canonical_name + ':'
+
+    def __unicode__(self):
+        """Return a unicode string representation."""
+        if self.id == 0:
+            return u':'
+        elif self.id in (6, 14):
+            return u':' + self.custom_name + u':'
+        else:
+            return u'' + self.custom_name + u':'
+
+    def __index__(self):
+        return self.id
+
+    def __eq__(self, other):
+        """Compare whether two namespace objects are equal."""
+        if isinstance(other, int):
+            return self.id == other
+        elif isinstance(other, Namespace):
+            return self.id == other.id
+        elif isinstance(other, basestring):
+            return other in self
+        elif other is None:
+            return self.id == 0
+
+    def __ne__(self, other):
+        """Compare whether two namespace objects are not equal."""
+        if self.id == other.id:
+            return False
+        else:
+            return True
+
+    def __cmp__(self, other):
+        """Compare two namespace ids."""
+        if self.id == other.id:
+            return 0
+        elif self.id > other.id:
+            return 1
+        else:
+            return -1
+
+    def __repr__(self):
+        """Return a reconstructable representation."""
+        return '%s(id=%d, custom_name=%r, canonical_name=%r, aliases=%r, ' \
+               'kwargs=%r)' \
+               % (self.__class__.__name__, self.id, self.custom_name,
+                  self.canonical_name, self.aliases, self.info)
+
+    @staticmethod
+    def builtin_namespaces(use_image_name=False):
+        """Return a dict of the builtin namespaces."""
+        return dict([(i, Namespace(i, use_image_name=use_image_name))
+                     for i in range(-2, 16)])
+
+    @staticmethod
+    def normalize_name(name):
+        """Remove an optional colon before and after name.
+
+        TODO: reject illegal characters.
+        """
+        if name == '':
+            return ''
+
+        parts = name.split(':', 4)
+        count = len(parts)
+        if count > 3:
+            return False
+        elif count == 3:
+            if parts[2] != '':
+                return False
+
+        # Discard leading colon
+        if count >= 2 and parts[0] == '' and parts[1]:
+            return parts[1]
+        elif parts[0]:
+            return parts[0]
+        return False
+
+    @staticmethod
+    def lookup_name(name, namespaces=None):
+        """Find the namespace for a name.
+
+        @param name: Name of the namespace.
+        @param namespaces: namespaces to search
+                           default: builtins only
+        @type namespaces: dict of Namespace
+        @return: Namespace or None
+        """
+        if not namespaces:
+            namespaces = Namespace.builtin_namespaces()
+
+        name = Namespace.normalize_name(name)
+        if name is False:
+            return None
+        name = name.lower()
+
+        for namespace in namespaces.values():
+            if namespace._contains_lowercase_name(name):
+                return namespace
+
+        return None
 
 
 class BaseSite(object):
@@ -293,6 +564,9 @@ class BaseSite(object):
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
+        if not hasattr(self, '_namespaces'):
+            use_image_name = LV(self.version()) < LV("1.14")
+            self._namespaces = Namespace.builtin_namespaces(use_image_name)
         return self._namespaces
 
     def ns_normalize(self, value):
@@ -638,33 +912,6 @@ class APISite(BaseSite):
     def __init__(self, code, fam=None, user=None, sysop=None):
         """ Constructor. """
         BaseSite.__init__(self, code, fam, user, sysop)
-        self._namespaces = {
-            # These are the MediaWiki built-in names, which always work.
-            # Localized names are loaded later upon accessing the wiki.
-            # Namespace prefixes are always case-insensitive, but the
-            # canonical forms are capitalized
-            -2: [u"Media"],
-            -1: [u"Special"],
-            0: [u""],
-            1: [u"Talk"],
-            2: [u"User"],
-            3: [u"User talk"],
-            4: [u"Project"],
-            5: [u"Project talk"],
-            6: [u"Image"],
-            7: [u"Image talk"],
-            8: [u"MediaWiki"],
-            9: [u"MediaWiki talk"],
-            10: [u"Template"],
-            11: [u"Template talk"],
-            12: [u"Help"],
-            13: [u"Help talk"],
-            14: [u"Category"],
-            15: [u"Category talk"],
-        }
-        if LV(self.version()) >= LV("1.14"):
-            self._namespaces[6] = [u"File"]
-            self._namespaces[7] = [u"File talk"]
         self._msgcache = {}
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
         return
@@ -1219,31 +1466,39 @@ class APISite(BaseSite):
         self._siteinfo = sidata['general']
 
         nsdata = sidata['namespaces']
+
+        self._namespaces = {}
+
+        # In MW 1.14, API siprop 'namespaces' added 'canonical',
+        # and Image became File with Image as an alias.
+        # For versions lower than 1.14, APISite needs to override
+        # the defaults defined in Namespace.
+        is_mw114 = LV(self.version()) >= LV('1.14')
+
         for nskey in nsdata:
             ns = int(nskey)
-            # this is the preferred form so it goes at front of list
-            self._namespaces.setdefault(ns, []).insert(0, nsdata[nskey]["*"])
+            custom_name = None
+            canonical_name = None
+            if ns == 0:
+                canonical_name = nsdata[nskey].pop('*')
+                custom_name = canonical_name
+            else:
+                custom_name = nsdata[nskey].pop('*')
+                if is_mw114:
+                    canonical_name = nsdata[nskey].pop('canonical')
 
-            if LV(self.version()) >= LV("1.14"):
-                # nsdata["0"] has no canonical key.
-                # canonical ns -2 to 15 are hard coded in self._namespaces
-                # do not get them from API result to avoid canonical duplicates
-                if -2 <= ns <= 15:
-                    continue
-                if 'canonical' not in nsdata[nskey]:
-                    pywikibot.warning(
-                        u'namespace %s without a canonical name. Misconfigured?'
-                        % self._namespaces[ns][0])
-                    continue
-                self._namespaces.setdefault(ns, []).append(nsdata[nskey]["canonical"])
+            # Remove the 'id' from nsdata
+            nsdata[nskey].pop('id')
+            namespace = Namespace(ns, canonical_name, custom_name,
+                                  use_image_name=is_mw114, **nsdata[nskey])
+
+            self._namespaces[ns] = namespace
 
         if 'namespacealiases' in sidata:
             aliasdata = sidata['namespacealiases']
             for item in aliasdata:
-                if item["*"] in self._namespaces[int(item['id'])]:
-                    continue
-                # this is a less preferred form so it goes at the end
-                self._namespaces[int(item['id'])].append(item["*"])
+                ns = int(item['id'])
+                self._namespaces[ns].aliases.append(item['*'])
 
         if 'extensions' in sidata:
             self._extensions = sidata['extensions']
