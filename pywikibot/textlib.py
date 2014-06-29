@@ -1232,7 +1232,6 @@ class TimeStripper(object):
         -. year, month, hour, time, day, minute, tzinfo
 
         """
-        _line = line
         # match date fields
         dateDict = dict()
         for pat in self.patterns:
