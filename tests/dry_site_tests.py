@@ -14,6 +14,8 @@ from tests.utils import PywikibotTestCase, unittest
 
 
 class DrySite(pywikibot.site.APISite):
+    _loginstatus = pywikibot.site.LoginStatus.NOT_ATTEMPTED
+
     @property
     def userinfo(self):
         return self._userinfo

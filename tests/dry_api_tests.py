@@ -48,6 +48,8 @@ class DryAPITests(unittest.TestCase):
         # Mock basesite object to test this.
         class MockSite(pywikibot.site.APISite):
 
+            _loginstatus = pywikibot.site.LoginStatus.NOT_ATTEMPTED
+
             _namespaces = {2: 'User'}
 
             def __init__(self):
