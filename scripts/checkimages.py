@@ -888,7 +888,6 @@ class checkImagesBot(object):
 
     def returnOlderTime(self, listGiven, timeListGiven):
         """ Get some time and return the oldest of them """
-        usage = False
         num = 0
         num_older = None
         max_usage = 0
@@ -1115,7 +1114,6 @@ class checkImagesBot(object):
                 if len(images_to_tag_list) != 0 and not only_report:
                     already_reported_in_past = self.countEdits(
                         u'File:%s' % images_to_tag_list[-1], self.botolist)
-                    image_to_resub = images_to_tag_list[-1]
                     from_regex = r'\n\*\[\[:File:%s\]\]' \
                                  % re.escape(self.convert_to_url(
                                      self.imageName))
@@ -1488,7 +1486,6 @@ class checkImagesBot(object):
     def load(self, raw):
         """ Load a list of objects from a string using regex. """
         list_loaded = []
-        pos = 0
         # I search with a regex how many user have not the talk page
         # and i put them in a list (i find it more easy and secure)
         regl = r"(\"|\')(.*?)\1(?:,|\])"
