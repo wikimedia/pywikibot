@@ -6,6 +6,7 @@
 #
 __version__ = '$Id$'
 
+import sys
 from . import terminal_interface_base
 
 unixColors = {
@@ -41,7 +42,11 @@ class UnixUI(terminal_interface_base.UI):
             # just to be sure, reset the color
             text += unixColors['default']
 
-        if hasattr(targetStream, 'encoding') and targetStream.encoding:
+        # .encoding does not mean we can write unicode
+        # to the stream pre-2.7.
+        if sys.version_info >= (2, 7) and \
+           hasattr(targetStream, 'encoding') and \
+           targetStream.encoding:
             text = text.encode(targetStream.encoding, 'replace').decode(targetStream.encoding)
             targetStream.write(text)
         else:
