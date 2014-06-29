@@ -23,7 +23,6 @@ __version__ = '$Id$'
 import codecs
 import itertools
 import re
-import time
 import pywikibot
 from pywikibot import date
 from pywikibot import config
@@ -1123,7 +1122,7 @@ def WantedPagesPageGenerator(total=100, site=None):
 def AncientPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
-    for page, date in site.ancientpages(total=total):
+    for page, timestamp in site.ancientpages(total=total):
         yield page
 
 
