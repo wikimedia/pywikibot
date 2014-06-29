@@ -18,7 +18,7 @@ from pywikibot.tools import UnicodeMixin
 
 class Error(UnicodeMixin, Exception):
 
-    """Wikipedia error"""
+    """Pywikibot error"""
     # NOTE: UnicodeMixin must be the first object Error class is derived from.
     def __init__(self, arg):
         self.unicode = arg
