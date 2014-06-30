@@ -72,6 +72,8 @@ class UploadRobot:
         """Return name of temp file in which remote file is saved."""
         pywikibot.output(u'Reading file %s' % self.url)
         resume = False
+        rlen = 0
+        _contents = None
         dt = 15
         uo = urllib.URLopener()
         retrieved = False
@@ -226,7 +228,7 @@ class UploadRobot:
                 pywikibot.output(u"Upload aborted.")
                 return
 
-        except Exception as e:
+        except Exception:
             pywikibot.error("Upload error: ", exc_info=True)
 
         else:
