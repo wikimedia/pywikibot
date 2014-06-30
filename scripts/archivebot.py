@@ -277,7 +277,9 @@ class DiscussionPage(pywikibot.Page):
                     self.header += line + '\n'
         if cur_thread:
             self.threads.append(cur_thread)
-        if pywikibot.calledModuleName() != 'archivebot_tests':
+        # This extra info is not desirable when run under the unittest
+        # framework, which may be run either directly or via setup.py
+        if pywikibot.calledModuleName() not in ['archivebot_tests', 'setup']:
             pywikibot.output(u'%d Threads found on %s'
                              % (len(self.threads), self))
 
