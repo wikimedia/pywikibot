@@ -29,7 +29,16 @@ from pywikibot import config
 from pywikibot import deprecated
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
-from pywikibot.exceptions import *
+from pywikibot.exceptions import (
+    EditConflict,
+    Error,
+    LockedPage,
+    NoPage,
+    NoSuchSite,
+    NoUsername,
+    SpamfilterError,
+    UserBlocked,
+)
 
 if sys.version_info[0] > 2:
     basestring = (str,)
@@ -743,7 +752,7 @@ class APISite(BaseSite):
             if self.userinfo['name'] == self._username[sysop] and \
                self.logged_in(sysop):
                 return
-        except pywikibot.data.api.APIError:  # May occur if you are not logged in (no API read permissions).
+        except api.APIError:  # May occur if you are not logged in (no API read permissions).
             pass
         loginMan = api.LoginManager(site=self, sysop=sysop,
                                     user=self._username[sysop])
@@ -1285,7 +1294,7 @@ class APISite(BaseSite):
             m = re.match(r"^MediaWiki ([0-9]+)\.([0-9]+)(.*)$", versionstring)
             if m:
                 return (int(m.group(1)), int(m.group(2)), m.group(3))
-        except pywikibot.data.api.APIError:  # May occur if you are not logged in (no API read permissions).
+        except api.APIError:  # May occur if you are not logged in (no API read permissions).
             return (0, 0, 0)
 
     def loadpageinfo(self, page, preload=False):
@@ -2037,25 +2046,22 @@ class APISite(BaseSite):
             level; can only be used if protect_type is specified
         @param reverse: if True, iterate in reverse Unicode lexigraphic
             order (default: iterate in forward order)
-        @param includeredirects: DEPRECATED, use filterredirs instead
+        @param includeredirects: DEPRECATED, use filterredir instead
         @param content: if True, load the current content of each iterated page
             (default False)
 
         """
         if not isinstance(namespace, int):
             raise Error("allpages: only one namespace permitted.")
+
         if includeredirects is not None:
-            pywikibot.debug(
-                u"allpages: 'includeRedirects' argument is deprecated; "
-                u"use 'filterredirs'.",
-                _logger)
             if includeredirects:
                 if includeredirects == "only":
-                    filterredirs = True
+                    filterredir = True
                 else:
-                    filterredirs = None
+                    filterredir = None
             else:
-                filterredirs = False
+                filterredir = False
 
         apgen = self._generator(api.PageGenerator, type_arg="allpages",
                                 gapnamespace=str(namespace),
@@ -3035,7 +3041,6 @@ class APISite(BaseSite):
         for rev in sorted(list(page._revisions.keys()), reverse=True):
             # start with most recent revision first
             if rev.user != last_user:
-                prev_user = rev.user
                 break
         else:
             raise pywikibot.Error(
@@ -3336,9 +3341,8 @@ class APISite(BaseSite):
             if not os.path.isfile(source_filename):
                 raise ValueError("File '%s' does not exist."
                                  % source_filename)
-            filesize = os.path.getsize(source_filename)
             # TODO: if file size exceeds some threshold (to be determined),
-            #       upload by chunks
+            #       upload by chunks (--> os.path.getsize(source_filename))
             req = api.Request(site=self, action="upload", token=token,
                               filename=imagepage.title(withNamespace=False),
                               file=source_filename, comment=comment,
@@ -3358,7 +3362,7 @@ class APISite(BaseSite):
             req["ignorewarnings"] = ""
         try:
             result = req.submit()
-        except api.APIError as err:
+        except api.APIError:
             # TODO: catch and process foreseeable errors
             raise
         result = result["upload"]
@@ -3404,7 +3408,6 @@ class APISite(BaseSite):
         # N.B. API still provides no way to access Special:Newpages content
         # directly, so we get new pages indirectly through 'recentchanges'
 
-        namespaces = namespaces if namespaces is not None else namespace
         gen = self.recentchanges(
             start=start, end=end, reverse=reverse,
             namespaces=namespaces, changetype="new", user=user,
@@ -3702,7 +3705,7 @@ class DataSite(APISite):
         req = api.Request(site=self, **params)
         data = req.submit()
         if 'success' not in data:
-            raise pywikibot.data.api.APIError(data['errors'])
+            raise api.APIError(data['errors'])
         return data['entities']
 
     def preloaditempages(self, pagelist, groupsize=50):

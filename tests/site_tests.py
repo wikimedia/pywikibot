@@ -952,6 +952,9 @@ class TestSiteObject(PywikibotTestCase):
             self.assertType(rndpage, pywikibot.Page)
             self.assertTrue(rndpage.namespace() in [6, 7])
 
+    # TODO: test newimages, longpages, shortpages, ancientpages, unwatchedpages
+    #       and the other following methods in site.py
+
     def testExtensions(self):
         # test automatically getting _extensions
         del mysite._extensions
