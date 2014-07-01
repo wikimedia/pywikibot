@@ -77,12 +77,12 @@ class TestGeneral(PywikibotTestCase):
                           'upperBound': 0.044405586, 'unit': '1', })
         # test other WbQuantity methods
         self.assertEqual("%s" % q,
-                         "{'amount': 0.044405586, 'lowerBound': 0.044405586, "
-                         "'unit': '1', 'upperBound': 0.044405586}")
+                         "{'amount': %(val)r, 'lowerBound': %(val)r, "
+                         "'unit': '1', 'upperBound': %(val)r}" % {'val': 0.044405586})
         self.assertEqual("%r" % q,
-                         "WbQuantity(amount=0.044405586, "
-                         "upperBound=0.044405586, lowerBound=0.044405586, "
-                         "unit=1)")
+                         "WbQuantity(amount=%(val)s, "
+                         "upperBound=%(val)s, lowerBound=%(val)s, "
+                         "unit=1)" % {'val': 0.044405586})
         self.assertEqual(q, q)
 
         # test WbQuantity.fromWikibase() instantiating
