@@ -422,7 +422,7 @@ class ReferencesRobot(Bot):
         else:
             bad = globalbadtitles
         self.titleBlackList = re.compile(bad, re.I | re.S | re.X)
-        self.norefbot = noreferences.NoReferencesBot(None)
+        self.norefbot = noreferences.NoReferencesBot(None, verbose=False)
         self.deduplicator = DuplicateReferences()
         try:
             self.stopPageRevId = self.stopPage.latestRevision()
@@ -722,7 +722,7 @@ class ReferencesRobot(Bot):
 
             # Add <references/> when needed, but ignore templates !
             if page.namespace != 10:
-                if self.norefbot.lacksReferences(new_text, verbose=False):
+                if self.norefbot.lacksReferences(new_text):
                     new_text = self.norefbot.addReferences(new_text)
 
             new_text = self.deduplicator.process(new_text)
