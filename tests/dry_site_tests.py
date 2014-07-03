@@ -52,6 +52,7 @@ class TestMustBe(PywikibotTestCase):
         self.family.name = 'test'
         self._logged_in_as = None
         self.obsolete = False
+        super(TestMustBe, self).setUp()
 
     def login(self, sysop):
         # mock call

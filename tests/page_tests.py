@@ -22,7 +22,7 @@ badpage = pywikibot.Page(pywikibot.page.Link("There is no page with this title",
                          site))
 
 
-class TestLinkObject(unittest.TestCase):
+class TestLinkObject(PywikibotTestCase):
     """Test cases for Link objects"""
 
     enwiki = pywikibot.Site("en", "wikipedia")

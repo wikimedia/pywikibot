@@ -6,20 +6,20 @@
 # Distributed under the terms of the MIT license.
 __version__ = '$Id$'
 
-import pywikibot
-
-from tests.utils import unittest
+from tests.utils import unittest, PywikibotTestCase
 from pywikibot.page import ip_regexp
 
 
-class PyWikiIpRegexCase(unittest.TestCase):
+class PyWikiIpRegexCase(PywikibotTestCase):
     """Unit test class for ip_regexp"""
 
     def setUp(self):
         self.total = 0
         self.fail = 0
+        super(PyWikiIpRegexCase, self).setUp()
 
     def tearDown(self):
+        super(PyWikiIpRegexCase, self).tearDown()
         print '%d tests done, %d failed' % (self.total, self.fail)
         if self.fail:
             raise AssertionError

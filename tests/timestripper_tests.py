@@ -16,12 +16,13 @@ from tests.utils import PywikibotTestCase, unittest
 from pywikibot.textlib import TimeStripper, tzoneFixedOffset
 
 
-class TestTimeStripper(unittest.TestCase):
+class TestTimeStripper(PywikibotTestCase):
     """Test cases for Link objects"""
 
     def setUp(self):
         site = pywikibot.Site('fr', 'wikipedia')
         self.ts = TimeStripper(site)
+        super(TestTimeStripper, self).setUp()
 
     def test_findmarker(self):
         """Test that string which is not part of text is found"""

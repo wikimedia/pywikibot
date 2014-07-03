@@ -12,10 +12,10 @@ __version__ = '$Id$'
 
 import os.path
 from pywikibot import xmlreader
-from tests.utils import unittest
+from tests.utils import unittest, PywikibotTestCase
 
 
-class XmlReaderTestCase(unittest.TestCase):
+class XmlReaderTestCase(PywikibotTestCase):
 
     @classmethod
     def setUpClass(cls):
