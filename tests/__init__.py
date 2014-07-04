@@ -34,17 +34,10 @@ class TestRequest(CachedRequest):
             return False
 
         if 'lgpassword' in self._uniquedescriptionstr():
-            self._delete_cache()
             self._data = None
             return False
 
         return True
-
-    def _delete_cache(self):
-        """Delete cached response if it exists."""
-        self._load_cache()
-        if self._cachetime:
-            os.remove(self._cachefile_path())
 
     def _write_cache(self, data):
         """Write data except login details."""
