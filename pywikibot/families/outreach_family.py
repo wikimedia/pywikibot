@@ -14,6 +14,3 @@ class Family(family.WikimediaFamily):
             'outreach': 'outreach.wikimedia.org',
         }
         self.interwiki_forward = 'wikipedia'
-
-    def version(self, code):
-        return "1.24wmf6"
