@@ -743,6 +743,26 @@ class APISite(BaseSite):
 
     def login(self, sysop=False):
         """Log the user in if not already logged in."""
+        # TODO: this should include an assert that loginstatus
+        #       is not already IN_PROGRESS, however the
+        #       login status may be left 'IN_PROGRESS' because
+        #       of exceptions or if the first method of login
+        #       (below) is successful.  Instead, log the problem,
+        #       to be increased to 'warning' level once majority
+        #       of issues are resolved.
+        if self._loginstatus == LoginStatus.IN_PROGRESS:
+            pywikibot.log(
+                u'%r.login(%r) called when a previous login was in progress.'
+                % (self, sysop)
+            )
+        # There are several ways that the site may already be
+        # logged in, and we do not need to hit the server again.
+        # logged_in() is False if _userinfo exists, which means this
+        # will have no effect for the invocation from api.py
+        if self.logged_in(sysop):
+            self._loginstatus = (LoginStatus.AS_SYSOP
+                                 if sysop else LoginStatus.AS_USER)
+            return
         # check whether a login cookie already exists for this user
         self._loginstatus = LoginStatus.IN_PROGRESS
         if hasattr(self, "_userinfo"):
