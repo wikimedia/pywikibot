@@ -335,7 +335,7 @@ second_message_without_license = {
     'it': u':{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza licenza2|%s|__botnick__}} --~~~~',
 }
 
-# You can add some settings to wikipedia. In this way, you can change them
+# You can add some settings to a wiki page. In this way, you can change them
 # without touching the code. That's useful if you are running the bot on
 # Toolserver.
 page_with_settings = {
@@ -613,7 +613,7 @@ class checkImagesBot(object):
         self.project = project
         bot = config.usernames[project]
         try:
-            botnick = bot[self.site.lang]
+            botnick = bot[self.site.code]
         except KeyError:
             raise pywikibot.NoUsername(
                 u"You have to specify an username for your bot in this project "
@@ -763,8 +763,6 @@ class checkImagesBot(object):
         second_text = False
         # Getting the talk page's history, to check if there is another
         # advise...
-        # The try block is used to prevent error if you use an old
-        # wikipedia.py's version.
         try:
             testoattuale = self.talk_page.get()
             history = self.talk_page.getLatestEditors(limit=10)
@@ -980,7 +978,7 @@ class checkImagesBot(object):
                 # project.
                 return
             if re.findall(r'\bstemma\b', self.imageName.lower()) and \
-               self.site.lang == 'it':
+               self.site.code == 'it':
                 pywikibot.output(
                     u'%s has "stemma" inside, means that it\'s ok.'
                     % self.imageName)
@@ -1033,7 +1031,7 @@ class checkImagesBot(object):
                 for duplicate in duplicates:
                     DupePage = pywikibot.ImagePage(self.site, duplicate)
 
-                    if DupePage.urlname() != self.image.urlname() or \
+                    if DupePage.title(asUrl=True) != self.image.title(asUrl=True) or \
                        self.timestamp is None:
                         self.timestamp = DupePage.getLatestUploader()[1]
                     data = time.strptime(self.timestamp, u"%Y-%m-%dT%H:%M:%SZ")
@@ -1297,7 +1295,7 @@ class checkImagesBot(object):
         pywikibot.output(u'\nLoading the allowed licenses...\n')
         cat = pywikibot.Category(self.site, catName)
         list_licenses = list(cat.articles())
-        if self.site.lang == 'commons':
+        if self.site.code == 'commons':
             no_licenses_to_skip = pywikibot.Category(self.site,
                                                      'License-related tags')
             for license_given in no_licenses_to_skip.articles():
@@ -1895,7 +1893,7 @@ def main():
 
     # A little block-statement to ensure that the bot will not start with
     # en-parameters
-    if site.lang not in project_inserted:
+    if site.code not in project_inserted:
         pywikibot.output(u"Your project is not supported by this script.\n"
                          u"You have to edit the script and add it!")
         return
