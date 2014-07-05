@@ -157,8 +157,8 @@ class BaseSite(object):
         """Return this Site's throttle.  Initialize a new one if needed."""
 
         if not hasattr(self, "_throttle"):
-            self._throttle = Throttle(self, multiplydelay=True,
-                                      verbosedelay=False)
+            self._throttle = Throttle(self, multiplydelay=True)
+
         return self._throttle
 
     @property

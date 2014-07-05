@@ -38,7 +38,7 @@ class Throttle(object):
 
     """
     def __init__(self, site, mindelay=None, maxdelay=None, writedelay=None,
-                 multiplydelay=True, verbosedelay=False):
+                 multiplydelay=True):
         self.lock = threading.RLock()
         self.mysite = str(site)
         self.ctrlfilename = config.datafilepath('throttle.ctrl')
@@ -67,7 +67,6 @@ class Throttle(object):
         self.lastwait = 0.0
         self.delay = 0
         self.checktime = 0
-        self.verbosedelay = verbosedelay
         self.multiplydelay = multiplydelay
         if self.multiplydelay:
             self.checkMultiplicity()
@@ -134,12 +133,8 @@ class Throttle(object):
             else:
                 f.close()
             self.process_multiplicity = count
-            if self.verbosedelay:
-                pywikibot.output(u"Found %(count)s %(mysite)s processes "
-                                 u"running, including this one." % locals())
-            else:
-                pywikibot.log(u"Found %(count)s %(mysite)s processes "
-                              u"running, including this one." % locals())
+            pywikibot.log(u"Found %(count)s %(mysite)s processes "
+                          u"running, including this one." % locals())
         finally:
             self.lock.release()
 
@@ -254,7 +249,7 @@ class Throttle(object):
             self.next_multiplicity = math.log(1 + requestsize) / math.log(2.0)
             # Announce the delay if it exceeds a preset limit
             if wait > 0:
-                if wait > config.noisysleep or self.verbosedelay:
+                if wait > config.noisysleep:
                     pywikibot.output(
                         u"Sleeping for %(wait).1f seconds, %(now)s"
                         % {'wait': wait,
