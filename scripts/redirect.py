@@ -569,11 +569,8 @@ class RedirectRobot:
                     u"Redirect target section %s doesn't exist."
                     % newRedir.title(asLink=True))
             except pywikibot.CircularRedirect as e:
-                try:
-                    pywikibot.warning(u"Skipping circular redirect: [[%s]]"
-                                      % str(e))
-                except UnicodeDecodeError:
-                    pywikibot.warning(u"Skipping circular redirect")
+                pywikibot.exception(e)
+                pywikibot.output(u"Skipping %s." % newRedir)
                 break
             except pywikibot.BadTitle as e:
                 # str(e) is in the format 'BadTitle: [[Foo]]'

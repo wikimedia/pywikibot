@@ -78,7 +78,7 @@ class IsNotRedirectPage(PageRelatedError):
     message = u"Page %s is not a redirect page."
 
 
-class CircularRedirect(Error):
+class CircularRedirect(PageRelatedError):
 
     """Page is a circular redirect
 
@@ -87,6 +87,7 @@ class CircularRedirect(Error):
     or indirectly redirects back to this one)
 
     """
+    message = u"Page %s is a circular redirect."
 
 
 class InvalidTitle(Error):
