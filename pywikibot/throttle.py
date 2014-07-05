@@ -229,6 +229,27 @@ class Throttle(object):
             return
         f.close()
 
+    def wait(self, seconds):
+        """Wait for seconds seconds.
+
+        Announce the delay if it exceeds a preset limit.
+
+        """
+        if seconds <= 0:
+            return
+
+        message = (u"Sleeping for %(seconds).1f seconds, %(now)s" % {
+            'seconds': seconds,
+            'now': time.strftime("%Y-%m-%d %H:%M:%S",
+                                 time.localtime())
+        })
+        if seconds > config.noisysleep:
+            pywikibot.output(message)
+        else:
+            pywikibot.log(message)
+
+        time.sleep(seconds)
+
     def __call__(self, requestsize=1, write=False):
         """Block the calling program if the throttle time has not expired.
 
@@ -248,24 +269,9 @@ class Throttle(object):
             # size of the request. Getting 64 pages at once allows 6 times
             # the delay time for the server.
             self.next_multiplicity = math.log(1 + requestsize) / math.log(2.0)
-            # Announce the delay if it exceeds a preset limit
-            if wait > 0:
-                if wait > config.noisysleep:
-                    pywikibot.output(
-                        u"Sleeping for %(wait).1f seconds, %(now)s"
-                        % {'wait': wait,
-                           'now':  time.strftime("%Y-%m-%d %H:%M:%S",
-                                                 time.localtime())
-                           })
-                else:
-                    pywikibot.log(
-                        u"Sleeping for %(wait).1f seconds, %(now)s"
-                        % {'wait': wait,
-                           'now':  time.strftime("%Y-%m-%d %H:%M:%S",
-                                                 time.localtime())
-                           })
 
-                time.sleep(wait)
+            self.wait(wait)
+
             if write:
                 self.last_write = time.time()
             else:
@@ -287,21 +293,8 @@ class Throttle(object):
             delay = min(max(5, lagtime // 2), 120)
             # account for any time we waited while acquiring the lock
             wait = delay - (time.time() - started)
-            if wait > 0:
-                if wait > config.noisysleep:
-                    pywikibot.output(
-                        u"Sleeping for %(wait).1f seconds, %(now)s"
-                        % {'wait': wait,
-                           'now': time.strftime("%Y-%m-%d %H:%M:%S",
-                                                time.localtime())
-                           })
-                else:
-                    pywikibot.log(
-                        u"Sleeping for %(wait).1f seconds, %(now)s"
-                        % {'wait': wait,
-                           'now': time.strftime("%Y-%m-%d %H:%M:%S",
-                                                time.localtime())
-                           })
-                time.sleep(wait)
+
+            self.wait(wait)
+
         finally:
             self.lock.release()
