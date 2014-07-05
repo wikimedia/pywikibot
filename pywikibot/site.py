@@ -584,7 +584,7 @@ def need_version(version):
     """ Decorator to require a certain MediaWiki version number.
 
     @param number: the mw version number required
-    @return: a decorator to make sure the requirement is statisfied when
+    @return: a decorator to make sure the requirement is satisfied when
         the decorated function is called.
     """
     def decorator(fn):
@@ -3465,7 +3465,7 @@ class APISite(BaseSite):
         Newpages again. If there is no new page, it blocks until there is
         one, sleeping between subsequent fetches of Newpages.
 
-        The objects yielded are dependent on paramater returndict.
+        The objects yielded are dependent on parameter returndict.
         When true, it yields a tuple composed of a Page object and a dict of
         attributes.
         When false, it yields a tuple composed of the Page object,

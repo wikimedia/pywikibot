@@ -36,7 +36,7 @@ def _altlang(code):
     one with a translation, with 'en' and '_default' as a last resort.
 
     For example, if for language 'xx', you want the preference of languages
-    to be: xx > fr > ru > en, you let altlang return ['fr', 'ru'].
+    to be: xx > fr > ru > en, you let this method return ['fr', 'ru'].
 
     This code is used by other translating methods below.
 
@@ -285,7 +285,7 @@ def translate(code, xdict, parameters=None, fallback=False):
 
     Given a language code and a dictionary, returns the dictionary's value for
     key 'code' if this key exists; otherwise tries to return a value for an
-    alternative language that is most applicable to use on the Wikipedia in
+    alternative language that is most applicable to use on the wiki in
     language 'code' except fallback is False.
 
     The language itself is always checked first, then languages that
@@ -397,14 +397,14 @@ def twtranslate(code, twtitle, parameters=None):
 # Maybe this function should be merged with twtranslate
 def twntranslate(code, twtitle, parameters=None):
     """ First implementation of plural support for translations based on the
-    TW title twtitle, which corresponds to a page on TW.
+    TranslateWiki title twtitle, which corresponds to a page on TranslateWiki.
 
     @param code The language code
     @param twtitle The TranslateWiki string title, in <package>-<key> format
     @param parameters For passing (plural) parameters.
 
-    Support is implemented like in MediaWiki extension. If the tw message
-    contains a plural tag inside which looks like
+    Support is implemented like in MediaWiki extension. If the TranslateWiki
+    message contains a plural tag inside which looks like
     {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
     it takes that variant calculated by the plural_rules depending on the number
     value. Multiple plurals are allowed.

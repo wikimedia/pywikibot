@@ -100,7 +100,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         remember    Remember login (default: True)
         captchaId   A dictionary containing the captcha id and answer, if any
 
-        Returns cookie data if succesful, None otherwise.
+        Returns cookie data if successful, None otherwise.
         """
         # NOT IMPLEMENTED - see data/api.py for implementation
 
@@ -134,7 +134,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         to set a default password for an username. The last matching entry will
         be used, so default usernames should occur above specific usernames.
 
-        If the username or password contain non-ascii characters, they
+        If the username or password contain non-ASCII characters, they
         should be stored using the utf-8 encoding.
 
         Example:

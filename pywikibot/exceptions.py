@@ -141,7 +141,7 @@ class FatalServerError(ServerError):
 
 class Server504Error(Error):
 
-    """Server timed out with http 504 code"""
+    """Server timed out with HTTP 504 code"""
 
 
 class BadTitle(Error):

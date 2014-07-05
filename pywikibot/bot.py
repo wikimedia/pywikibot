@@ -54,6 +54,8 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
     def doRollover(self):
         """
+        Modified naming system for logging files.
+
         Overwrites the default Rollover renaming by inserting the count number
         between file name root and extension. If backupCount is >= 1, the system
         will successively create new files with the same pathname as the base
@@ -67,7 +69,7 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         If backupCount is >= 1 do not rotate but create new numbered filenames.
         The newest file has the highest number except some older numbered files
         where deleted and the bot was restarted. In this case the ordering
-        starts from the lowest availlable (unused) number.
+        starts from the lowest available (unused) number.
 
         """
         if self.stream:
@@ -101,7 +103,7 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         self.stream = self._open()
 
     def format(self, record):
-        """Strip trailing newlines before outputting text to file"""
+        """Strip trailing newlines before outputting text to file."""
         text = logging.handlers.RotatingFileHandler.format(self, record)
         return text.rstrip("\r\n")
 
@@ -117,7 +119,8 @@ class LoggingFormatter(logging.Formatter):
     """
     def formatException(self, ei):
         """
-        Make sure that the exception trace is converted to unicode:
+        Convert exception trace to unicode if necessary.
+
             * our pywikibot.Error traces are encoded in our
               console encoding, which is needed for plainly printing them.
             * but when it comes to logging using logging.exception,
@@ -244,8 +247,9 @@ def init_handlers(strm=None):
 
 def writelogheader():
     """
-    Save additional version, system and status info to the logfile in use,
-    so that the user can look it up later to track errors or report bugs.
+    Save additional version, system and status info to the log file in use.
+
+    This may help the user to track errors or report bugs.
     """
     # if site not available it's too early to print a header (work-a-round)
     try:
@@ -340,7 +344,7 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
               **kwargs):
     """Format output and send to the logging module.
 
-    Backend function used by all the user-output convenience functions.
+    Helper function used by all the user-output convenience functions.
 
     """
     if _logger:
@@ -385,7 +389,7 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     If decoder is None, text should be a unicode string. Otherwise it
     should be encoded in the given encoding.
 
-    If newline is True, a linebreak will be added after printing the text.
+    If newline is True, a line feed will be added after printing the text.
 
     If toStdout is True, the text will be sent to standard output,
     so that it can be piped to another process. All other text will
@@ -534,7 +538,7 @@ def calledModuleName():
 def handleArgs(*args):
     """Handle standard command line arguments, return the rest as a list.
 
-    Takes the commandline arguments as Unicode strings, processes all
+    Takes the command line arguments as Unicode strings, processes all
     global parameters such as -lang or -log. Returns a list of all arguments
     that are not global. This makes sure that global arguments are applied
     first, regardless of the order in which the arguments were given.
@@ -702,13 +706,13 @@ Global arguments available for all bots:
 
 -help             Show this help text.
 
--log              Enable the logfile, using the default filename
+-log              Enable the log file, using the default filename
                   '%s-bot.log'
                   Logs will be stored in the logs subdirectory.
 
--log:xyz          Enable the logfile, using 'xyz' as the filename.
+-log:xyz          Enable the log file, using 'xyz' as the filename.
 
--nolog            Disable the logfile (if it is enabled by default).
+-nolog            Disable the log file (if it is enabled by default).
 
 -maxlag           Sets a new maxlag parameter to a number of seconds. Defer bot
                   edits during periods of database server lag. Default is set by
@@ -718,7 +722,7 @@ Global arguments available for all bots:
 -pt:n             saving pages.
 -put_throttle:n
 
--debug:item       Enable the logfile and include extensive debugging data
+-debug:item       Enable the log file and include extensive debugging data
 -debug            for component "item" (for all components if the second form
                   is used).
 
@@ -844,8 +848,9 @@ class WikidataBot:
 
     def cacheSources(self):
         """
-        Fetches the sources from the onwiki list
-        and stores it internally
+        Fetch the sources from the list on Wikidata.
+
+        It is stored internally and reused by getSource()
         """
         page = pywikibot.Page(self.repo, u'List of wikis/python', ns=4)
         self.source_values = json.loads(page.get())

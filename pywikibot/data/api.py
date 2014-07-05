@@ -934,7 +934,7 @@ class LoginManager(login.LoginManager):
 
         Parameters are all ignored.
 
-        Returns cookie data if succesful, None otherwise.
+        Returns cookie data if successful, None otherwise.
 
         """
         if hasattr(self, '_waituntil'):
