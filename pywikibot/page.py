@@ -1013,10 +1013,18 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param summary: The edit summary for the modification (optional, but
             most wikis strongly encourage its use)
         @type summary: unicode
-        @param watch: if True, add or if False, remove this Page to/from bot
-            user's watchlist; if None (default), follow bot account's default
-            settings
-        @type watch: bool or None
+        @param watch: Specify how the watchlist is affected by this edit, set
+            to one of "watch", "unwatch", "preferences", "nochange":
+            * watch: add the page to the watchlist
+            * unwatch: remove the page from the watchlist
+            * preferences: use the preference settings (Default)
+            * nochange: don't change the watchlist
+            If None (default), follow bot account's default settings
+
+            For backward compatibility watch parameter may also be boolean:
+            if True, add or if False, remove this Page to/from bot
+            user's watchlist.
+        @type watch: string, bool (deprecated) or None
         @param minor: if True, mark this edit as minor
         @type minor: bool
         @param botflag: if True, mark this edit as made by a bot (default:
@@ -1035,25 +1043,23 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         if not summary:
             summary = config.default_edit_summary
-        if watch is None:
-            watchval = None
-        elif watch:
-            watchval = "watch"
-        else:
-            watchval = "unwatch"
+        if watch is True:
+            watch = 'watch'
+        elif watch is False:
+            watch = 'unwatch'
         if not force and not self.botMayEdit():
             raise pywikibot.OtherPageSaveError(
                 self, "Editing restricted by {{bots}} template")
         if async:
             pywikibot.async_request(self._save, summary=summary, minor=minor,
-                                    watchval=watchval, botflag=botflag,
+                                    watch=watch, botflag=botflag,
                                     async=async, callback=callback, **kwargs)
         else:
-            self._save(summary=summary, minor=minor, watchval=watchval,
+            self._save(summary=summary, minor=minor, watch=watch,
                        botflag=botflag, async=async, callback=callback,
                        **kwargs)
 
-    def _save(self, summary, minor, watchval, botflag, async, callback,
+    def _save(self, summary, minor, watch, botflag, async, callback,
               **kwargs):
         """Helper function for save()."""
         err = None
@@ -1062,7 +1068,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             summary = self._cosmetic_changes_hook(summary) or summary
         try:
             done = self.site.editpage(self, summary=summary, minor=minor,
-                                      watch=watchval, bot=botflag, **kwargs)
+                                      watch=watch, bot=botflag, **kwargs)
             if not done:
                 pywikibot.warning(u"Page %s not saved" % link)
                 raise pywikibot.PageNotSaved(self)
