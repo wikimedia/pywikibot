@@ -3,7 +3,7 @@
 Interface functions to Mediawiki's api.php
 """
 #
-# (C) Pywikipedia bot team, 2007-14
+# (C) Pywikibot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -235,6 +235,27 @@ class Request(MutableMapping):
                 % action)
             return {action: {'result': 'Success', 'nochange': ''}}
 
+    def _is_wikibase_error_retryable(self, error):
+        ERR_MSG = u'edit-already-exists'
+        messages = error.pop("messages", None)
+        # bug 66619, after gerrit 124323 breaking change we have a
+        # list of messages
+        if isinstance(messages, list):
+            for item in messages:
+                message = item["name"]
+                if message == ERR_MSG:
+                    break
+            else:  # no break
+                message = None
+        elif isinstance(messages, dict):
+            try:  # behaviour before gerrit 124323 braking change
+                message = messages["0"]["name"]
+            except KeyError:  # unsure the new output is always a list
+                message = messages["name"]
+        else:
+            message = None
+        return message == ERR_MSG
+
     def submit(self):
         """Submit a query and parse the response.
 
@@ -399,16 +420,13 @@ class Request(MutableMapping):
             if code.startswith(u'internal_api_error_'):
                 self.wait()
                 continue
-            # bugs 46535, 62126, 64494
+            # bugs 46535, 62126, 64494, 66619
             # maybe removed when it 46535 is solved
-            if code == "failed-save" and action == 'wbeditentity':
-                try:
-                    message = result["error"]["messages"]["0"]["name"]
-                except KeyError:
-                    message = None
-                if message == u'edit-already-exists':
-                    self.wait()
-                    continue
+            if code == "failed-save" and \
+               action == 'wbeditentity' and \
+               self._is_wikibase_error_retryable(result["error"]):
+                self.wait()
+                continue
             # raise error
             try:
                 pywikibot.log(u"API Error: query=\n%s"
