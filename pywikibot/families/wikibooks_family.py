@@ -16,8 +16,8 @@ class Family(family.WikimediaFamily):
             'hr', 'tr', 'no', 'th', 'sr', 'ar', 'gl', 'ko', 'ta', 'mk', 'tl',
             'ro', 'is', 'ka', 'tt', 'lt', 'az', 'eo', 'uk', 'bg', 'sk', 'sl',
             'el', 'hy', 'ms', 'si', 'li', 'la', 'ml', 'ur', 'ang', 'ia', 'cv',
-            'et', 'bn', 'km', 'hi', 'mr', 'oc', 'kk', 'eu', 'sa', 'fy', 'ie',
-            'ne', 'te', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'cy',
+            'et', 'bn', 'km', 'hi', 'mr', 'oc', 'kk', 'sa', 'eu', 'ne', 'fy',
+            'ie', 'te', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'cy',
             'zh-min-nan', 'ku', 'uz',
         ]
 
