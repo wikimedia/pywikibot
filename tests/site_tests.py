@@ -12,8 +12,6 @@ __version__ = '$Id$'
 
 from distutils.version import LooseVersion as LV
 import pywikibot
-from pywikibot.site import must_be
-from tests import patch_request, unpatch_request
 from tests.utils import PywikibotTestCase, unittest
 
 import sys
@@ -53,7 +51,7 @@ class TestSiteObject(PywikibotTestCase):
         self.assertType(mysite.linktrail(), basestring)
         self.assertType(mysite.redirect(default=True), basestring)
         self.assertType(mysite.disambcategory(), pywikibot.Category)
-        self.assertEqual(mysite.linkto("foo"), u"[[Foo]]")  # deprecated
+        self.assertEqual(pywikibot.Link("foo", source=mysite), u"[[Foo]]")
         self.assertFalse(mysite.isInterwikiLink("foo"))
         self.assertType(mysite.redirectRegex().pattern, basestring)
         self.assertType(mysite.category_on_one_line(), bool)
@@ -79,7 +77,7 @@ class TestSiteObject(PywikibotTestCase):
         langs = mysite.languages()
         self.assertType(langs, list)
         self.assertTrue(mysite.code in langs)
-        obs = mysite.family.obsolete
+        mysite.family.obsolete
         ipf = mysite.interwiki_putfirst()
         if ipf:  # Not all languages use this
             self.assertType(ipf, list)
