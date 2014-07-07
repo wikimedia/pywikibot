@@ -51,7 +51,7 @@ class TestSiteObject(PywikibotTestCase):
         self.assertType(mysite.linktrail(), basestring)
         self.assertType(mysite.redirect(default=True), basestring)
         self.assertType(mysite.disambcategory(), pywikibot.Category)
-        self.assertEqual(pywikibot.Link("foo", source=mysite), u"[[Foo]]")
+        self.assertEqual(unicode(pywikibot.Link("foo", source=mysite)), u"[[Foo]]")
         self.assertFalse(mysite.isInterwikiLink("foo"))
         self.assertType(mysite.redirectRegex().pattern, basestring)
         self.assertType(mysite.category_on_one_line(), bool)
