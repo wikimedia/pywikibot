@@ -695,19 +695,6 @@ class APISite(BaseSite):
                         return APISite(site['code'], site['code'])
         raise ValueError("Cannot parse a site out of %s." % dbname)
 
-    def __getstate__(self):
-        """ Remove Lock based classes before pickling """
-        new = super(APISite, self).__getstate__()
-        del new['sitelock']
-        del new['_msgcache']
-        return new
-
-    def __setstate__(self, attrs):
-        """ Restore things removed in __getstate__ """
-        super(APISite, self).__setstate__(attrs)
-        self.sitelock = threading.Lock()
-        self._msgcache = {}
-
     def _generator(self, gen_class, type_arg=None, namespaces=None,
                    step=None, total=None, **args):
         """Convenience method that returns an API generator.

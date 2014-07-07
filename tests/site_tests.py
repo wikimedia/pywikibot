@@ -999,12 +999,7 @@ class TestSiteObject(PywikibotTestCase):
 
     def testPickleAbility(self):
         import pickle
-        #fam = pywikibot.site.Family('wikipedia')
-        #site = pywikibot.Site('en', fam)
-        #pywikibot.output(site.family.__dict__)
-        #pickle.dumps(site)
         site = pywikibot.Site('en', 'wikipedia')
-        #pywikibot.output(site.family.__dict__)
         pickle.dumps(site)
         self.assertTrue(True)  # No exception thrown!
 
