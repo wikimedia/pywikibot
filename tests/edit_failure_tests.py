@@ -55,6 +55,15 @@ class TestSaveFailure(TestCase):
         page = pywikibot.Page(self.site, 'User:John Vandenberg/nobots')
         self.assertRaisesRegex(OtherPageSaveError, 'nobots', page.save)
 
+    def test_touch(self):
+        """Test that Page.touch() does not do a real edit."""
+        page = pywikibot.Page(self.site, 'User:Xqt/sandbox')
+        old_text = page.text
+        page.text += '\n*Add a new line to page'
+        page.touch()
+        new_text = page.get(force=True)
+        self.assertEqual(old_text, new_text)
+
 
 class TestActionFailure(TestCase):
 
