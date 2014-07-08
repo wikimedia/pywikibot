@@ -1007,7 +1007,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     @deprecated_args(comment='summary', sysop=None)
     def save(self, summary=None, watch=None, minor=True, botflag=None,
-             force=False, async=False, callback=None, **kwargs):
+             force=False, async=False, callback=None,
+             apply_cosmetic_changes=None, **kwargs):
         """Save the current contents of page's text to the wiki.
 
         @param summary: The edit summary for the modification (optional, but
@@ -1039,7 +1040,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
             if the page was saved successfully. The callback is intended for
             use by bots that need to keep track of which saves were
             successful.
-
+        @param apply_cosmetic_changes: Overwrites the cosmetic_changes
+            configuration value to this value unless it's None.
+        @type apply_cosmetic_changes: bool or None
         """
         if not summary:
             summary = config.default_edit_summary
@@ -1053,18 +1056,19 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if async:
             pywikibot.async_request(self._save, summary=summary, minor=minor,
                                     watch=watch, botflag=botflag,
-                                    async=async, callback=callback, **kwargs)
+                                    async=async, callback=callback,
+                                    cc=apply_cosmetic_changes, **kwargs)
         else:
             self._save(summary=summary, minor=minor, watch=watch,
                        botflag=botflag, async=async, callback=callback,
-                       **kwargs)
+                       cc=apply_cosmetic_changes, **kwargs)
 
     def _save(self, summary, minor, watch, botflag, async, callback,
-              **kwargs):
+              cc, **kwargs):
         """Helper function for save()."""
         err = None
         link = self.title(asLink=True)
-        if config.cosmetic_changes:
+        if cc or cc is None and config.cosmetic_changes:
             summary = self._cosmetic_changes_hook(summary) or summary
         try:
             done = self.site.editpage(self, summary=summary, minor=minor,
