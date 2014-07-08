@@ -361,6 +361,11 @@ class TestPageObject(PywikibotTestCase):
         for p in mainpage.extlinks():
             self.assertType(p, unicode)
 
+    def testPickleAbility(self):
+        import pickle
+        pickle.dumps(mainpage)
+        self.assertTrue(True)  # No exception thrown!
+
 # methods that still need tests implemented or expanded:
 
 #    def autoFormat(self):
