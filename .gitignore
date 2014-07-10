@@ -3,6 +3,7 @@ pywikibot.lwp
 user-*.py
 *.bak
 *.pyc
+*.py~
 /.tox
 /*.egg
 /data*
