@@ -117,10 +117,12 @@ class LoggingFormatter(logging.Formatter):
     whether the output to the user's console does.
 
     """
+
     def formatException(self, ei):
-        """
+        r"""
         Convert exception trace to unicode if necessary.
 
+        Make sure that the exception trace is converted to unicode:
             * our pywikibot.Error traces are encoded in our
               console encoding, which is needed for plainly printing them.
             * but when it comes to logging using logging.exception,
@@ -186,7 +188,6 @@ def init_handlers(strm=None):
     Accordingly, do ''not'' use print statements in bot code; instead,
     use pywikibot.output function.
     """
-
     global _handlers_initialized
 
     moduleName = calledModuleName()
@@ -366,7 +367,7 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
 
 
 def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
-    """Output a message to the user via the userinterface.
+    r"""Output a message to the user via the userinterface.
 
     Works like print, but uses the encoding used by the user's console
     (console_encoding in the configuration file) instead of ASCII.
@@ -756,13 +757,19 @@ class Bot(object):
 
     def __init__(self, **kwargs):
         """
-        Only accepts options defined in availableOptions
+        Only accept options defined in availableOptions.
+
+        @param kwargs: bot options
+        @type kwargs: dict
         """
         self.setOptions(**kwargs)
 
     def setOptions(self, **kwargs):
         """
-        Sets the instance options
+        Set the instance options.
+
+        @param kwargs: options
+        @type kwargs: dict
         """
         # contains the options overriden from defaults
         self.options = {}
@@ -780,6 +787,7 @@ class Bot(object):
     def getOption(self, option):
         """
         Get the current value of an option.
+
         @param option: key defined in Bot.availableOptions
         """
         try:
@@ -827,8 +835,9 @@ class Bot(object):
 class WikidataBot:
 
     """
-    Generic Wikidata Bot to be subclassed
-    used in claimit.py, coordinate_import.py and harvest_template.py
+    Generic Wikidata Bot to be subclassed.
+
+    Used in claimit.py, coordinate_import.py and harvest_template.py
     """
 
     def cacheSources(self):
@@ -846,8 +855,12 @@ class WikidataBot:
 
     def getSource(self, site):
         """
-        Get the source for the specified site,
-        if possible
+        Create a Claim usable as a source for Wikibase statements.
+
+        @param site: site that is the source of assertions.
+        @type site: Site
+
+        @return: Claim
         """
         if site.family.name in self.source_values and site.code in self.source_values[site.family.name]:
             source = pywikibot.Claim(self.repo, 'P143')
