@@ -1392,6 +1392,17 @@ class APISite(BaseSite):
             # User blocked
             raise UserBlocked('User is blocked in site %s' % self)
 
+    def assert_valid_iter_params(self, msg_prefix, start, end, reverse):
+        """Validate iterating API parameters."""
+        if reverse:
+            if end < start:
+                raise Error(
+                    "%s: end must be later than start with reverse=True" % msg_prefix)
+        else:
+            if start < end:
+                raise Error(
+                    "%s: start must be later than end with reverse=False" % msg_prefix)
+
     def has_right(self, right, sysop=False):
         """Return true if and only if the user has a specific right.
 
@@ -2871,16 +2882,8 @@ class APISite(BaseSite):
 
         """
         if start and end:
-            if reverse:
-                if end < start:
-                    raise Error(
-                        "logevents: "
-                        "end must be later than start with reverse=True")
-            else:
-                if start < end:
-                    raise Error(
-                        "logevents: "
-                        "start must be later than end with reverse=False")
+            self.assert_valid_iter_params('logevents', start, end, reverse)
+
         legen = self._generator(api.LogEntryListGenerator, type_arg=logtype,
                                 step=step, total=total)
         if logtype is not None:
@@ -2941,16 +2944,8 @@ class APISite(BaseSite):
 
         """
         if start and end:
-            if reverse:
-                if end < start:
-                    raise Error(
-                        "recentchanges: "
-                        "end must be later than start with reverse=True")
-            else:
-                if start < end:
-                    raise Error(
-                        "recentchanges: "
-                        "start must be later than end with reverse=False")
+            self.assert_valid_iter_params('recentchanges', start, end, reverse)
+
         rcgen = self._generator(api.ListGenerator, type_arg="recentchanges",
                                 rcprop="user|comment|timestamp|title|ids"
                                        "|sizes|redirect|loginfo|flags",
@@ -3056,17 +3051,10 @@ class APISite(BaseSite):
         if not (user or userprefix):
             raise Error(
                 "usercontribs: either user or userprefix must be non-empty")
+
         if start and end:
-            if reverse:
-                if end < start:
-                    raise Error(
-                        "usercontribs: "
-                        "end must be later than start with reverse=True")
-            else:
-                if start < end:
-                    raise Error(
-                        "usercontribs: "
-                        "start must be later than end with reverse=False")
+            self.assert_valid_iter_params('usercontribs', start, end, reverse)
+
         ucgen = self._generator(api.ListGenerator, type_arg="usercontribs",
                                 ucprop="ids|title|timestamp|comment|flags",
                                 namespaces=namespaces, step=step,
@@ -3106,16 +3094,8 @@ class APISite(BaseSite):
 
         """
         if start and end:
-            if reverse:
-                if end < start:
-                    raise Error(
-                        "watchlist_revs: "
-                        "end must be later than start with reverse=True")
-            else:
-                if start < end:
-                    raise Error(
-                        "watchlist_revs: "
-                        "start must be later than end with reverse=False")
+            self.assert_valid_iter_params('watchlist_revs', start, end, reverse)
+
         wlgen = self._generator(api.ListGenerator, type_arg="watchlist",
                                 wlprop="user|comment|timestamp|title|ids|flags",
                                 wlallrev="", namespaces=namespaces,
@@ -3157,16 +3137,8 @@ class APISite(BaseSite):
 
         """
         if start and end:
-            if reverse:
-                if end < start:
-                    raise Error(
-                        "deletedrevs: "
-                        "end must be later than start with reverse=True")
-            else:
-                if start < end:
-                    raise Error(
-                        "deletedrevs: "
-                        "start must be later than end with reverse=False")
+            self.assert_valid_iter_params('deletedrevs', start, end, reverse)
+
         if not self.logged_in():
             self.login()
         if "deletedhistory" not in self.userinfo['rights']:
