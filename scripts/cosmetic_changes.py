@@ -515,7 +515,7 @@ class CosmeticChangesToolkit:
     def resolveHtmlEntities(self, text):
         ignore = [
             38,     # Ampersand (&amp;)
-            39,     # Bugzilla 24093
+            39,     # Single quotation mark (&quot;) - Bugzilla 24093
             60,     # Less than (&lt;)
             62,     # Great than (&gt;)
             91,     # Opening bracket - sometimes used intentionally inside links
@@ -526,9 +526,6 @@ class CosmeticChangesToolkit:
             8206,   # left-to-right mark (&ltr;)
             8207,   # right-to-left mark (&rtl;)
         ]
-        # ignore ' see https://eo.wikipedia.org/w/index.php?title=Liberec&diff=next&oldid=2320801
-        #if self.site.lang == 'eo':
-        #    ignore += [39]
         if self.template:
             ignore += [58]
         text = pywikibot.html2unicode(text, ignore=ignore)
