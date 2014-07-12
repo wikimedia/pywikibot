@@ -1,7 +1,9 @@
 # -*- coding: utf-8  -*-
 """
-Objects representing MediaWiki sites (wikis) and families (groups of wikis
-on the same topic in different languages).
+Objects representing MediaWiki sites (wikis).
+
+This module also includes functions to load families, which are
+groups of wikis on the same topic in different languages.
 """
 #
 # (C) Pywikibot team, 2008-2014
@@ -64,6 +66,7 @@ class LoginStatus(object):
     >>> LoginStatus.name(0)
     'AS_USER'
     """
+
     NOT_ATTEMPTED = -3
     IN_PROGRESS = -2
     NOT_LOGGED_IN = -1
@@ -121,11 +124,11 @@ does not exist. Also check your configuration file."""
 class BaseSite(object):
 
     """Site methods that are independent of the communication interface."""
-    # to implement a specific interface, define a Site class that inherits
-    # from this
 
     def __init__(self, code, fam=None, user=None, sysop=None):
         """
+        Constructor.
+
         @param code: the site's language code
         @type code: str
         @param fam: wiki family name (optional)
@@ -179,16 +182,13 @@ class BaseSite(object):
     @property
     def throttle(self):
         """Return this Site's throttle.  Initialize a new one if needed."""
-
         if not hasattr(self, "_throttle"):
             self._throttle = Throttle(self, multiplydelay=True)
-
         return self._throttle
 
     @property
     def family(self):
         """The Family object for this Site's wiki family."""
-
         return self.__family
 
     @property
@@ -212,7 +212,6 @@ class BaseSite(object):
 
     def __cmp__(self, other):
         """Perform equality and inequality tests on Site objects."""
-
         if not isinstance(other, BaseSite):
             return 1
         if self.family == other.family:
@@ -220,7 +219,7 @@ class BaseSite(object):
         return cmp(self.family.name, other.family.name)
 
     def __getstate__(self):
-        """ Remove Lock based classes before pickling """
+        """ Remove Lock based classes before pickling. """
         new = self.__dict__.copy()
         del new['_pagemutex']
         if '_throttle' in new:
@@ -228,13 +227,12 @@ class BaseSite(object):
         return new
 
     def __setstate__(self, attrs):
-        """ Restore things removed in __getstate__ """
+        """ Restore things removed in __getstate__. """
         self.__dict__.update(attrs)
         self._pagemutex = threading.Lock()
 
     def user(self):
         """Return the currently-logged in bot user, or None."""
-
         if self.logged_in(True):
             return self._username[True]
         elif self.logged_in(False):
@@ -244,8 +242,7 @@ class BaseSite(object):
         return self._username[sysop]
 
     def __getattr__(self, attr):
-        """Calls to methods not defined in this object are passed to Family."""
-
+        """Delegate undefined methods calls to the Family object."""
         if hasattr(self.__class__, attr):
             return getattr(self.__class__, attr)
         try:
@@ -260,7 +257,6 @@ class BaseSite(object):
 
     def sitename(self):
         """Return string representing this Site's name and code."""
-
         return self.family.name + ':' + self.code
 
     __str__ = sitename
@@ -273,19 +269,16 @@ class BaseSite(object):
 
     def languages(self):
         """Return list of all valid language codes for this site's Family."""
-
         return list(self.family.langs.keys())
 
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""
-
         nsnames = [name for name in self.namespaces().values()]
         return [lang for lang in self.languages()
                 if lang[:1].upper() + lang[1:] not in nsnames]
 
     def ns_index(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
-
         for ns in self.namespaces():
             if namespace.lower() in [name.lower()
                                      for name in self.namespaces()[ns]]:
@@ -295,7 +288,6 @@ class BaseSite(object):
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
-
         return self._namespaces
 
     def ns_normalize(self, value):
@@ -321,12 +313,10 @@ class BaseSite(object):
 
     def pagenamecodes(self, default=True):
         """Return list of localized PAGENAME tags for the site."""
-
         return [u"PAGENAME"]
 
     def pagename2codes(self, default=True):
         """Return list of localized PAGENAMEE tags for the site."""
-
         return [u"PAGENAMEE"]
 
     def lock_page(self, page, block=True):
@@ -366,7 +356,6 @@ class BaseSite(object):
 
     def disambcategory(self):
         """Return Category in which disambig pages are listed."""
-
         try:
             name = '%s:%s' % (self.namespace(14),
                               self.family.disambcatname[self.code])
@@ -377,10 +366,14 @@ class BaseSite(object):
 
     @deprecated("pywikibot.Link")
     def linkto(self, title, othersite=None):
-        """Return unicode string in the form of a wikilink to 'title'
+        """DEPRECATED. Return a wikilink to a page.
 
-        Use optional Site argument 'othersite' to generate an interwiki link.
+        @param title: Title of the page to link to
+        @type title: unicode
+        @param othersite: Generate a interwiki link for use on this site.
+        @type othersite: Site (optional)
 
+        @return: unicode
         """
         return pywikibot.Link(title, self).astext(othersite)
 
@@ -414,12 +407,17 @@ class BaseSite(object):
         # title1 and title2 may be unequal but still identify the same page,
         # if they use different aliases for the same namespace
 
-        def valid_namespace(text, number):
-            """Return True if text is a valid alias for namespace with given
-            number.
+        def valid_namespace(alias, ns):
+            """Determine if a string is a valid alias for a namespace.
 
+            @param alias: namespace alias
+            @type alias: unicode
+            @param ns: namespace
+            @type ns: int
+
+            @return: bool
             """
-            for alias in self.namespace(number, all=True):
+            for text in self.namespace(ns, all=True):
                 if text.lower() == alias.lower():
                     return True
             return False
@@ -480,12 +478,10 @@ class BaseSite(object):
 
     def category_on_one_line(self):
         """Return True if this site wants all category links on one line."""
-
         return self.code in self.family.category_on_one_line
 
     def interwiki_putfirst(self):
         """Return list of language codes for ordering of interwiki links."""
-
         return self.family.interwiki_putfirst.get(self.code, None)
 
     def interwiki_putfirst_doubled(self, list_of_links):
@@ -509,7 +505,6 @@ class BaseSite(object):
 
     def getSite(self, code):
         """Return Site object for language 'code' in this Family."""
-
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
 
     # deprecated methods for backwards-compatibility
@@ -517,12 +512,11 @@ class BaseSite(object):
     @deprecated("family attribute")
     def fam(self):
         """Return Family object for this Site."""
-
         return self.family
 
     @deprecated("urllib.urlencode()")
     def urlEncode(self, query):
-        """DEPRECATED"""
+        """DEPRECATED."""
         return urllib.urlencode(query)
 
     @deprecated("pywikibot.comms.http.request")
@@ -544,31 +538,27 @@ class BaseSite(object):
 
     @deprecated()
     def postForm(self, address, predata, sysop=False, cookies=None):
-        """DEPRECATED"""
+        """DEPRECATED."""
         return self.getUrl(address, data=predata)
 
     @deprecated()
     def postData(self, address, data, contentType=None, sysop=False,
                  compress=True, cookies=None):
-        """DEPRECATED"""
+        """DEPRECATED."""
         return self.getUrl(address, data=data)
 
 
 def must_be(group=None, right=None):
-    """ Decorator to require a certain user status. For now, only the values
-        group = 'user' and group = 'sysop' are supported. The right property
-        will be ignored for now.
+    """ Decorator to require a certain user status when method is called.
 
-        @param group: the group the logged in user should belong to
-                      this parameter can be overridden by
-                      keyword argument 'as_group'
-                      legal values: 'user' and 'sysop'
-        @param right: the rights the logged in user should have
-                      not supported yet and thus ignored.
-        @returns: a decorator to make sure the requirement is statisfied when
-                  the decorated function is called. The function can be called
-                  with as_group='sysop' to override the group set in the
-                  decorator.
+    @param group: The group the logged in user should belong to
+                  this parameter can be overridden by
+                  keyword argument 'as_group'.
+    @type group: str ('user' or 'sysop')
+    @param right: The rights the logged in user should have.
+                  Not supported yet and thus ignored.
+
+    @return: method decorator
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):
@@ -618,6 +608,7 @@ class APISite(BaseSite):
     Do not use directly; use pywikibot.Site function.
 
     """
+
 #    Site methods from version 1.0 (as these are implemented in this file,
 #    or declared deprecated/obsolete, they will be removed from this list)
 #########
@@ -640,6 +631,7 @@ class APISite(BaseSite):
 #
 
     def __init__(self, code, fam=None, user=None, sysop=None):
+        """ Constructor. """
         BaseSite.__init__(self, code, fam, user, sysop)
         self._namespaces = {
             # These are the MediaWiki built-in names, which always work.
@@ -730,12 +722,16 @@ class APISite(BaseSite):
         return gen
 
     def logged_in(self, sysop=False):
-        """Return True if logged in with the user specified in user-config.py
-       (or the sysop user specified if the sysop parameter is True).
+        """Verify the bot is logged into the site as the expected user.
+
+        The expected usernames are those provided as either the user or sysop
+        parameter at instantiation.
 
         @param sysop: if True, test if user is logged in as the sysop user
                      instead of the normal user.
+        @type sysop: bool
 
+        @return: bool
         """
         if not hasattr(self, "_userinfo"):
             return False
@@ -757,6 +753,11 @@ class APISite(BaseSite):
 
         DEPRECATED (use .user() method instead)
 
+        @param sysop: if True, test if user is logged in as the sysop user
+                     instead of the normal user.
+        @type sysop: bool
+
+        @return: bool
         """
         return self.logged_in(sysop) and self.user()
 
@@ -790,6 +791,10 @@ class APISite(BaseSite):
     forceLogin = login  # alias for backward-compatibility
 
     def logout(self):
+        """ Logout of the site and load details for the logged out user.
+
+        Also logs out of the global account if linked to the user.
+        """
         uirequest = api.Request(site=self, action="logout")
         uirequest.submit()
         self._loginstatus = LoginStatus.NOT_LOGGED_IN
@@ -832,8 +837,7 @@ class APISite(BaseSite):
     userinfo = property(fget=getuserinfo, doc=getuserinfo.__doc__)
 
     def getglobaluserinfo(self):
-        """Retrieve globaluserinfo from site and store in _globaluserinfo
-        attribute.
+        """Retrieve globaluserinfo from site and cache it.
 
         self._globaluserinfo will be a dict with the following keys and values:
 
@@ -874,11 +878,9 @@ class APISite(BaseSite):
             self.login(sysop)
         return 'blockinfo' in self._userinfo
 
+    @deprecated('is_blocked()')
     def isBlocked(self, sysop=False):
-        """Deprecated synonym for is_blocked"""
-        pywikibot.debug(
-            u"Site method 'isBlocked' should be changed to 'is_blocked'",
-            _logger)
+        """DEPRECATED."""
         return self.is_blocked(sysop)
 
     def checkBlocks(self, sysop=False):
@@ -903,7 +905,7 @@ class APISite(BaseSite):
 
     @deprecated("Site.has_right()")
     def isAllowed(self, right, sysop=False):
-        """Deprecated; retained for backwards-compatibility"""
+        """DEPRECATED."""
         return self.has_right(right, sysop)
 
     def has_group(self, group, sysop=False):
@@ -924,13 +926,16 @@ class APISite(BaseSite):
         return 'hasmsg' in self._userinfo
 
     def mediawiki_messages(self, keys):
-        """Return the MediaWiki message text for each 'key' in keys in a dict:
-           -. dict['key'] = text message
+        """Fetch the text of a set of MediaWiki messages.
 
-           keys='*' or ['*'] will return all messages
+        If keys is '*' or ['*'], all messages will be fetched.
+        The returned dict uses each key to store the associated message.
 
+        @param keys: MediaWiki messages to fetch
+        @type keys: set of str, '*' or ['*']
+
+        @return: dict
         """
-
         if not all(_key in self._msgcache for _key in keys):
             msg_query = api.QueryGenerator(
                 site=self,
@@ -959,17 +964,32 @@ class APISite(BaseSite):
         return dict((_key, self._msgcache[_key]) for _key in keys)
 
     def mediawiki_message(self, key):
-        """Return the MediaWiki message text for key 'key' """
+        """Fetch the text for a MediaWiki message.
+
+        @param key: name of MediaWiki message
+        @type key: str
+
+        @return: unicode
+        """
         return self.mediawiki_messages([key])[key]
 
     def has_mediawiki_message(self, key):
-        """Return True if this site defines a MediaWiki message for 'key' """
+        """Determine if the site defines a MediaWiki message.
+
+        @param key: name of MediaWiki message
+        @type key: str
+
+        @return: bool
+        """
         return self.has_all_mediawiki_messages([key])
 
     def has_all_mediawiki_messages(self, keys):
-        """Return True if this site defines MediaWiki messages for all 'keys';
-           False otherwise.
+        """Confirm that the site defines a set of MediaWiki messages.
 
+        @param keys: names of MediaWiki messages
+        @type keys: set of str
+
+        @return: bool
         """
         try:
             self.mediawiki_messages(keys)
@@ -979,9 +999,12 @@ class APISite(BaseSite):
 
     @property
     def months_names(self):
-        """Return a zero-indexed list of (month name, abbreviation) tuples,
-           ordered by month in calendar, in original site language.
+        """Obtain month names from the site messages.
 
+        The list is zero-indexed, ordered by month in calendar, and should
+        be in the original site language.
+
+        @return: list of tuples (month name, abbreviation)
         """
         if hasattr(self, "_months_names"):
             return self._months_names
@@ -1002,15 +1025,16 @@ class APISite(BaseSite):
         return self._months_names
 
     def list_to_text(self, args):
-        """Join a list of strings together into a human-readable
-        list. The MediaWiki message 'and' is used as separator
+        """Convert a list of strings into human-readable text.
+
+        The MediaWiki message 'and' is used as separator
         between the last two arguments.
         If present, other arguments are joined using a comma.
 
         @param args: text to be expanded
         @type args: iterable
-        @return: unicode
 
+        @return: unicode
         """
         if not args:
             return u''
@@ -1033,7 +1057,8 @@ class APISite(BaseSite):
         return msgs['comma-separator'].join(args[:-2] + [concat.join(args[-2:])])
 
     def expand_text(self, text, title=None, includecomments=None):
-        """ Parse the given text for preprocessing and rendering
+        """ Parse the given text for preprocessing and rendering.
+
         e.g expand templates and strip comments if includecomments
         parameter is not True. Keeps text inside
         <nowiki></nowiki> tags unchanges etc. Can be used to parse
@@ -1192,10 +1217,12 @@ class APISite(BaseSite):
     def hasExtension(self, name, unknown=NotImplementedError):
         """ Determine whether extension `name` is loaded.
 
-            @param name The extension to check for
-            @param unknown The value to return if the site does not list loaded
-                           extensions. Valid values are an exception to raise,
-                           True or False. Default: NotImplementedError
+        @param name: The extension to check for
+        @param unknown: The value to return if the site does not list loaded
+                        extensions. Valid values are an exception to raise,
+                        True or False. Default: NotImplementedError
+
+        @return: bool
         """
         if not hasattr(self, '_extensions'):
             self._getsiteinfo()
@@ -1213,56 +1240,50 @@ class APISite(BaseSite):
     @property
     def siteinfo(self):
         """Site information dict."""
-
         if not hasattr(self, "_siteinfo"):
             self._getsiteinfo()
         return self._siteinfo
 
     def case(self):
         """Return this site's capitalization rule."""
-
         return self.siteinfo['case']
 
     def dbName(self):
         """Return this site's internal id."""
-
         return self.siteinfo['wikiid']
 
     def language(self):
         """Return the code for the language of this Site."""
-
         return self.siteinfo['lang']
 
     lang = property(fget=language, doc=language.__doc__)
 
     @property
     def has_image_repository(self):
-        """Return True if site has a shared image repository like Commons"""
+        """Return True if site has a shared image repository like Commons."""
         code, fam = self.shared_image_repository()
         return bool(code or fam)
 
     @property
     def has_data_repository(self):
-        """Return True if site has a shared data repository like Wikidata"""
+        """Return True if site has a shared data repository like Wikidata."""
         code, fam = self.shared_data_repository()
         return bool(code or fam)
 
     @property
     def has_transcluded_data(self):
-        """Return True if site has a shared data repository like Wikidata"""
+        """Return True if site has a shared data repository like Wikidata."""
         code, fam = self.shared_data_repository(True)
         return bool(code or fam)
 
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
-
         code, fam = self.shared_image_repository()
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username())
 
     def data_repository(self):
         """Return Site object for data repository e.g. Wikidata."""
-
         code, fam = self.shared_data_repository()
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username(),
@@ -1283,7 +1304,6 @@ class APISite(BaseSite):
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
-
         if not hasattr(self, "_siteinfo"):
             self._getsiteinfo()
         return self._namespaces
@@ -1300,7 +1320,7 @@ class APISite(BaseSite):
         return self.namespaces()[num][0]
 
     def live_version(self, force=False):
-        """Return the 'real' version number found on [[Special:Version]]
+        """Return the 'real' version number found on [[Special:Version]].
 
         Return value is a tuple (int, int, str) of the major and minor
         version numbers and any other text contained in the version.
@@ -1317,7 +1337,7 @@ class APISite(BaseSite):
             return (0, 0, 0)
 
     def loadpageinfo(self, page, preload=False):
-        """Load page info from api and save in page attributes"""
+        """Load page info from api and store in page attributes."""
         title = page.title(withSection=False)
         inprop = 'protection'
         if preload:
@@ -1337,8 +1357,7 @@ class APISite(BaseSite):
             api.update_page(page, pageitem)
 
     def loadcoordinfo(self, page):
-        """Load [[mw:Extension:GeoData]] info"""
-        # prop=coordinates&titles=Wikimedia Foundation&format=jsonfm&coprop=type|name|dim|country|region&coprimary=all
+        """Load [[mw:Extension:GeoData]] info."""
         title = page.title(withSection=False)
         query = self._generator(api.PropertyGenerator,
                                 type_arg="coordinates",
@@ -1370,7 +1389,7 @@ class APISite(BaseSite):
             api.update_page(page, pageitem)
 
     def loadimageinfo(self, page, history=False):
-        """Load image info from api and save in page attributes
+        """Load image info from api and save in page attributes.
 
         @param history: if true, return the image's version history
 
@@ -1396,8 +1415,9 @@ class APISite(BaseSite):
 
     def loadflowinfo(self, page):
         """
-        Loads Flow-related information about a given page
-        Assumes that the Flow extension is installed
+        Load Flow-related information about a given page.
+
+        FIXME: Assumes that the Flow extension is installed.
         """
         title = page.title(withSection=False)
         query = self._generator(api.PropertyGenerator,
@@ -1419,7 +1439,7 @@ class APISite(BaseSite):
         return page._pageid > 0
 
     def page_restrictions(self, page):
-        """Return a dictionary reflecting page protections"""
+        """Return a dictionary reflecting page protections."""
         if not self.page_exists(page):
             raise NoPage(page)
         if not hasattr(page, "_protection"):
@@ -1428,10 +1448,13 @@ class APISite(BaseSite):
 
     def page_can_be_edited(self, page):
         """
-        Returns True if and only if:
+        Determine if the page can be edited.
+
+        Return True if and only if:
           - page is unprotected, and bot has an account for this site, or
           - page is protected, and bot has a sysop account for this site.
 
+        @return: bool
         """
         rest = self.page_restrictions(page)
         sysop_protected = "edit" in rest and rest['edit'][0] == 'sysop'
@@ -1657,7 +1680,6 @@ class APISite(BaseSite):
                        withTemplateInclusion=True, onlyTemplateInclusion=False,
                        namespaces=None, step=None, total=None, content=False):
         """Convenience method combining pagebacklinks and page_embeddedin."""
-
         if onlyTemplateInclusion:
             return self.page_embeddedin(page, namespaces=namespaces,
                                         filterRedirects=filterRedirects,
@@ -2184,7 +2206,7 @@ class APISite(BaseSite):
 
     @deprecated("Site.allcategories()")
     def categories(self, number=10, repeat=False):
-        """Deprecated; retained for backwards-compatibility"""
+        """DEPRECATED."""
         if repeat:
             limit = None
         else:
@@ -2193,7 +2215,6 @@ class APISite(BaseSite):
 
     def isBot(self, username):
         """Return True is username is a bot user. """
-
         return username in [userdata['name'] for userdata in self.botusers()]
 
     def botusers(self, step=None, total=None):
@@ -2206,7 +2227,6 @@ class APISite(BaseSite):
         present.
 
         """
-
         if not hasattr(self, "_bots"):
             self._bots = {}
 
@@ -2728,6 +2748,8 @@ class APISite(BaseSite):
     @deprecated("Site.randompages()")
     def randompage(self, redirect=False):
         """
+        DEPRECATED.
+
         @param redirect: Return a random redirect page
         @return: pywikibot.Page
         """
@@ -3654,11 +3676,11 @@ class APISite(BaseSite):
 class DataSite(APISite):
 
     def __getattr__(self, attr):
-        """Calls to methods get_info, get_sitelinks, get_aliases, get_labels,
-        get_descriptions, get_urls
+        """Provide data access methods.
 
+        Methods provided are get_info, get_sitelinks, get_aliases,
+        get_labels, get_descriptions, and get_urls.
         """
-
         if hasattr(self.__class__, attr):
             return getattr(self.__class__, attr)
         if attr.startswith("get_"):
@@ -3680,7 +3702,7 @@ class DataSite(APISite):
 
     @deprecated("pywikibot.PropertyPage")
     def _get_propertyitem(self, props, source, **params):
-        """Generic method to get the data for multiple Wikibase items"""
+        """Generic method to get the data for multiple Wikibase items."""
         wbdata = self.get_item(source, props=props, **params)
         assert props in wbdata, \
                "API wbgetentities response lacks %s key" % props
@@ -3688,7 +3710,7 @@ class DataSite(APISite):
 
     @deprecated("pywikibot.WikibasePage")
     def get_item(self, source, **params):
-        """Get the data for multiple Wikibase items"""
+        """Get the data for multiple Wikibase items."""
         if isinstance(source, int) or \
            isinstance(source, basestring) and source.isdigit():
             ids = 'q' + str(source)
@@ -3709,13 +3731,16 @@ class DataSite(APISite):
 
     def loadcontent(self, identification, *props):
         """
+        Fetch the current content of a Wikibase item.
+
         This is called loadcontent since
         wbgetentities does not support fetching old
         revisions. Eventually this will get replaced by
         an actual loadrevisions.
-        @param identification Parameters used to identify the page(s)
-        @type identification dict
-        @param props the optional properties to fetch.
+
+        @param identification: Parameters used to identify the page(s)
+        @type identification: dict
+        @param props: the optional properties to fetch.
         """
         params = dict(**identification)
         params['action'] = 'wbgetentities'
@@ -3754,6 +3779,8 @@ class DataSite(APISite):
 
     def getPropertyType(self, prop):
         """
+        Obtain the type of a property.
+
         This is used specifically because we can cache
         the value for a much longer time (near infinite).
         """
@@ -3830,8 +3857,12 @@ class DataSite(APISite):
     @must_be(group='user')
     def changeClaimTarget(self, claim, snaktype='value', bot=True, **kwargs):
         """
-        Sets the claim target to whatever claim.target is
-        An optional snaktype lets you set a novalue or somevalue.
+        Set the claim target to the value of the provided claim target.
+
+        @param claim: The source of the claim target value
+        @type claim: Claim
+        @param snaktype: An optional snaktype. Default: 'value'
+        @type snaktype: str ('value', 'novalue' or 'somevalue')
         """
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
@@ -3860,12 +3891,13 @@ class DataSite(APISite):
     def editSource(self, claim, source, new=False, bot=True, **kwargs):
         """
         Create/Edit a source.
-        @param claim A Claim object to add the source to
-        @type claim pywikibot.Claim
-        @param source A Claim object to be used as a source
-        @type source pywikibot.Claim
-        @param new Whether to create a new one if the "source" already exists
-        @type new bool
+
+        @param claim: A Claim object to add the source to
+        @type claim: Claim
+        @param source: A Claim object to be used as a source
+        @type source: Claim
+        @param new: Whether to create a new one if the "source" already exists
+        @type new: bool
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError("The claim cannot have a source.")
@@ -3927,12 +3959,12 @@ class DataSite(APISite):
     @must_be(group='user')
     def editQualifier(self, claim, qualifier, new=False, bot=True, **kwargs):
         """
-        Create/Edit a qualifier
+        Create/Edit a qualifier.
 
         @param claim: A Claim object to add the qualifier to
-        @type claim: pywikibot.Claim
+        @type claim: Claim
         @param qualifier: A Claim object to be used as a qualifier
-        @type qualifier: pywikibot.Claim
+        @type qualifier: Claim
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError("The claim cannot have a qualifier.")
@@ -3981,11 +4013,12 @@ class DataSite(APISite):
     @must_be(group='user')
     def removeSources(self, claim, sources, bot=True, **kwargs):
         """
-        Removes sources.
-        @param claim A Claim object to remove the sources from
-        @type claim pywikibot.Claim
-        @param sources A list of Claim objects that are sources
-        @type sources pywikibot.Claim
+        Remove sources.
+
+        @param claim: A Claim object to remove the sources from
+        @type claim: Claim
+        @param sources: A list of Claim objects that are sources
+        @type sources: Claim
         """
         params = dict(action='wbremovereferences')
         if bot:
@@ -4003,7 +4036,8 @@ class DataSite(APISite):
 
     def linkTitles(self, page1, page2, bot=True):
         """
-        Link two pages together
+        Link two pages together.
+
         @param page1: First page to link
         @type page1: pywikibot.Page
         @param page2: Second page to link
@@ -4027,7 +4061,8 @@ class DataSite(APISite):
 
     def mergeItems(self, fromItem, toItem, **kwargs):
         """
-        Merge two items together
+        Merge two items together.
+
         @param fromItem: Item to merge from
         @type fromItem: pywikibot.ItemPage
         @param toItem: Item to merge into
@@ -4049,7 +4084,8 @@ class DataSite(APISite):
 
     def createNewItemFromPage(self, page, bot=True, **kwargs):
         """
-        Create a new Wikibase item for a provided page
+        Create a new Wikibase item for a provided page.
+
         @param page: page to fetch links from
         @type page: pywikibot.Page
         @param bot: whether to mark the edit as bot
