@@ -1,6 +1,13 @@
 # -*- coding: utf-8  -*-
 """
-Objects representing various types of MediaWiki pages.
+Objects representing various types of MediaWiki, including Wikibase, pages.
+
+This module also includes objects:
+* Link: an internal or interwiki link in wikitext.
+* Revision: a single change to a wiki page.
+* Property: a type of semantic data.
+* Claim: an instance of a semantic assertion.
+
 """
 #
 # (C) Pywikibot team, 2008-2014
@@ -46,7 +53,7 @@ reNamespace = re.compile("^(.+?) *: *(.*)$")
 
 class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
-    """Page: A MediaWiki page
+    """Page: A MediaWiki page.
 
     This object only implements internally methods that do not require
     reading from or writing to the wiki.  All other methods are delegated
@@ -123,6 +130,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     def namespace(self):
         """Return the number of the namespace of the page.
 
+        @return: int
         """
         return self._link.namespace
 
@@ -219,6 +227,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return self._link.section
 
     def __unicode__(self):
+        """Return a unicode string representation."""
         return self.title(asLink=True, forceInterwiki=True)
 
     def __repr__(self):
@@ -228,16 +237,22 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     def _cmpkey(self):
         """
+        Key for comparison of Page objects.
+
         Page objects are "equal" if and only if they are on the same site
         and have the same normalized title, including section if any.
 
-        Page objects are sortable by site, namespace then title."""
+        Page objects are sortable by site, namespace then title.
+        """
         return (self.site, self.namespace(), self.title())
 
     def __hash__(self):
-        # Pseudo method that makes it possible to store Page objects as keys
-        # in hash-tables. This relies on the fact that the string
-        # representation of an instance can not change after the construction.
+        """
+        A stable identifier to be used as a key in hash-tables.
+
+        This relies on the fact that the string
+        representation of an instance can not change after the construction.
+        """
         return hash(unicode(self))
 
     def autoFormat(self):
@@ -278,10 +293,10 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         @exception SectionError   The section does not exist on a page with
                                   a # link
 
-        @param force            reload all page attributes, including errors.
-        @param get_redirect     return the redirect text, do not follow the
+        @param force:           reload all page attributes, including errors.
+        @param get_redirect:    return the redirect text, do not follow the
                                 redirect, do not raise an exception.
-        @param sysop            if the user has a sysop account, use it to
+        @param sysop:           if the user has a sysop account, use it to
                                 retrieve this page
 
         """
@@ -366,7 +381,10 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     @property
     def text(self):
-        """Return the current (edited) wikitext, loading it if necessary."""
+        """Return the current (edited) wikitext, loading it if necessary.
+
+        @return: unicode
+        """
         if not hasattr(self, '_text') or self._text is None:
             try:
                 self._text = self.get(get_redirect=True)
@@ -377,29 +395,38 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     @text.setter
     def text(self, value):
-        """Update the edited wikitext"""
+        """Update the current (edited) wikitext.
+
+        @param value: New value or None
+        @param value: basestring
+        """
         self._text = None if value is None else unicode(value)
 
     @text.deleter
     def text(self):
-        """Delete the edited wikitext"""
+        """Delete the current (edited) wikitext."""
         if hasattr(self, "_text"):
             del self._text
 
     def preloadText(self):
-        """Return the text returned by EditFormPreloadText See API module "info".
+        """The text returned by EditFormPreloadText.
+
+        See API module "info".
 
         Application: on Wikisource wikis, text can be preloaded even if
         a page does not exist, if an Index page is present.
 
+        @return: unicode
         """
         self.site.loadpageinfo(self, preload=True)
         return self._preloadedtext
 
     def properties(self, force=False):
         """
-        Returns the various page properties stored for a page
+        Return the properties of the page.
+
         @param force: force updating from the live site
+
         @return: dict
         """
         if not hasattr(self, '_pageprops') or force:
@@ -409,9 +436,10 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     def defaultsort(self, force=False):
         """
-        Returns the value of {{DEFAULTSORT:}} magic word or None if no
-        defaultsort has been defined.
+        Extract value of the {{DEFAULTSORT:}} magic word from the page.
+
         @param force: force updating from the live site
+
         @return: unicode or None
         """
         return self.properties(force=force).get('defaultsort')
@@ -423,8 +451,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         @param force: force updating from the live site
         @param includecomments: Also strip comments if includecomments
             parameter is not True.
-        @return: unicode or None
 
+        @return: unicode or None
         """
         if not hasattr(self, '_expanded_text') or (
                 self._expanded_text is None) or force:
@@ -437,6 +465,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     def userName(self):
         """Return name or IP address of last user to edit page.
 
+        @return: unicode
         """
         rev = self.latestRevision()
         if rev not in self._revisions:
@@ -446,6 +475,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     def isIpEdit(self):
         """Return True if last editor was unregistered.
 
+        @return: bool
         """
         rev = self.latestRevision()
         if rev not in self._revisions:
@@ -455,14 +485,15 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     def lastNonBotUser(self):
         """Return name or IP address of last human/non-bot user to edit page.
 
-           Returns the most recent human editor out of the last revisions
-           If it was not able to retrieve a human user returns None.
-           If the edit was done by a bot which is no longer flagged as 'bot',
-           i.e. which is not returned by Site.botusers(), it will be returned
-           as a non-bot edit.
+        Determine the most recent human editor out of the last revisions.
+        If it was not able to retrieve a human user, returns None.
 
+        If the edit was done by a bot which is no longer flagged as 'bot',
+        i.e. which is not returned by Site.botusers(), it will be returned
+        as a non-bot edit.
+
+        @return: unicode
         """
-
         if hasattr(self, '_lastNonBotUser'):
             return self._lastNonBotUser
 
@@ -479,6 +510,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     def editTime(self):
         """Return timestamp of last revision to page.
 
+        @return: pywikibot.Timestamp
         """
         rev = self.latestRevision()
         if rev not in self._revisions:
@@ -486,7 +518,10 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return self._revisions[rev].timestamp
 
     def previousRevision(self):
-        """Return the revision id for the previous revision of this Page."""
+        """Return the revision id for the previous revision of this Page.
+
+        @return: long
+        """
         self.getVersionHistory(total=2)
         revkey = sorted(self._revisions, reverse=True)[1]
         return revkey
@@ -497,6 +532,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         If the title includes a section, return False if this section isn't
         found.
 
+        @return: bool
         """
         return self.site.page_exists(self)
 
@@ -505,9 +541,16 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return self.site.page_isredirect(self)
 
     def isStaticRedirect(self, force=False):
-        """Return True if this is a redirect containing the magic word
-        __STATICREDIRECT__, False if not or not existing.
+        """
+        Determine whether the page is a static redirect.
 
+        A static redirect must be a valid redirect, and contain the magic word
+        __STATICREDIRECT__.
+
+        @param force: Bypass local caching
+        @type force: bool
+
+        @return: bool
         """
         found = False
         if self.isRedirectPage():
@@ -521,8 +564,10 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return found
 
     def isCategoryRedirect(self):
-        """Return True if this is a category redirect page, False otherwise."""
+        """Return True if this is a category redirect page, False otherwise.
 
+        @return: bool
+        """
         if not self.isCategory():
             return False
         if not hasattr(self, "_catredirect"):
@@ -551,7 +596,10 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return bool(self._catredirect)
 
     def getCategoryRedirectTarget(self):
-        """If this is a category redirect, return the target category title."""
+        """If this is a category redirect, return the target category title.
+
+        @return: Category
+        """
         if self.isCategoryRedirect():
             return Category(Link(self._catredirect, self.site))
         raise pywikibot.IsNotRedirectPage(self.title())
@@ -562,6 +610,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         Character count ignores language links and category links.
         Can raise the same exceptions as get().
 
+        @return bool
         """
         txt = self.get()
         txt = pywikibot.removeLanguageLinks(txt, site=self.site)
@@ -580,8 +629,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         otherwise, returns the associated talk page.  The returned page need
         not actually exist on the wiki.
 
-        Returns None if self is a special page.
-
+        @return: Page or None if self is a special page.
         """
         ns = self.namespace()
         if ns < 0:  # Special page
@@ -624,8 +672,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         Template:Disambig is always assumed to be default, and will be
         appended regardless of its existence.
 
+        @return: bool
         """
-
         if self.site.hasExtension('Disambiguator', False):
             # If the Disambiguator extension is loaded, use it
             return 'disambiguation' in self.properties()
@@ -767,21 +815,25 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         )
 
     def protection(self):
-        """Return a dictionary reflecting page protections"""
+        """Return a dictionary reflecting page protections.
+
+        @return: dict
+        """
         return self.site.page_restrictions(self)
 
     def canBeEdited(self):
-        """Return bool indicating whether this page can be edited.
+        """Determine whether the page may be edited.
 
         This returns True if and only if:
           - page is unprotected, and bot has an account for this site, or
           - page is protected, and bot has a sysop account for this site.
 
+        @return: bool
         """
         return self.site.page_can_be_edited(self)
 
     def botMayEdit(self):
-        """Return True if this page allows bots to edit it.
+        """Determine whether the active bot is allowed to edit the page.
 
         This will be True if the page doesn't contain {{bots}} or
         {{nobots}}, or it contains them and the active bot is allowed to
@@ -793,6 +845,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         to override this by setting ignore_bot_templates=True in
         user-config.py, or using page.put(force=True).
 
+        @return: bool
         """
         # TODO: move this to Site object?
         if config.ignore_bot_templates:  # Check the "master ignore switch"
@@ -887,6 +940,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     def _save(self, comment, minor, watchval, botflag, async, callback,
               **kwargs):
+        """Helper function for save()."""
         err = None
         link = self.title(asLink=True)
         if config.cosmetic_changes:
@@ -983,14 +1037,16 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         """Add or remove this page to/from bot account's watchlist.
 
         @param unwatch: True to unwatch, False (default) to watch.
-        @return: True if successful, False otherwise.
+        @type unwatch: bool
 
+        @return: bool; True if successful, False otherwise.
         """
         return self.site.watchpage(self, unwatch)
 
     def purge(self, **kwargs):
         """Purge the server's cache for this page.
 
+        @return: bool
         """
         return self.site.purgepages([self], **kwargs)
 
@@ -1004,12 +1060,16 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         external links are omitted.
 
         @param namespaces: only iterate links in these namespaces
+        @param namespaces: int, or list of ints
         @param step: limit each API call to this number of pages
+        @type step: int
         @param total: iterate no more than this number of pages in total
+        @type total: int
         @param content: if True, retrieve the content of the current version
             of each linked page (default False)
-        @return: a generator that yields Page objects.
+        @type content: bool
 
+        @return: a generator that yields Page objects.
         """
         return self.site.pagelinks(self, namespaces=namespaces, step=step,
                                    total=total, content=content)
@@ -1020,8 +1080,9 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         @param expand: if True (default), include interwiki links found in
             templates transcluded onto this page; if False, only iterate
             interwiki links found in this page's own wikitext
-        @return: a generator that yields Link objects
+        @type expand: bool
 
+        @return: a generator that yields Link objects
         """
         # This function does not exist in the API, so it has to be
         # implemented by screen-scraping
@@ -1052,7 +1113,9 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
         @param include_obsolete: if true, return even Link objects whose site
                                  is obsolete
+        @type include_obsolete: bool
 
+        @return: list of Link objects.
         """
         # Note: We preload a list of *all* langlinks, including links to
         # obsolete sites, and store that in self._langlinks. We then filter
@@ -1073,8 +1136,9 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         @param total: iterate no more than this number of pages in total
         @param include_obsolete: if true, yield even Link object whose site
                                  is obsolete
-        @return: a generator that yields Link objects.
+        @type include_obsolete: bool
 
+        @return: a generator that yields Link objects.
         """
         if hasattr(self, '_langlinks'):
             return iter(self.langlinks(include_obsolete=include_obsolete))
@@ -1087,7 +1151,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     def data_item(self):
         """
-        Convinience function to get the Wikibase item of a page
+        Convenience function to get the Wikibase item of a page.
+
         @return: ItemPage
         """
         return ItemPage.fromPage(self)
@@ -1095,6 +1160,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     @deprecate_arg('tllimit', None)
     @deprecated("Page.templates()")
     def getTemplates(self):
+        """DEPRECATED. Use templates()."""
         return self.templates()
 
     def templates(self, content=False):
@@ -1106,7 +1172,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
         @param content: if True, retrieve the content of the current version
             of each template (default False)
-
+        @param content: bool
         """
         # Data might have been preloaded
         if not hasattr(self, '_templates'):
@@ -1125,6 +1191,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each template (default False)
+        @param content: bool
 
         """
         if hasattr(self, '_templates'):
@@ -1226,8 +1293,9 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return self.site.page_extlinks(self, step=step, total=total)
 
     def coordinates(self, primary_only=False):
-        """Return a list of Coordinate objects for points
-        on the page using [[mw:Extension:GeoData]]
+        """Return a list of Coordinate objects for points on the page.
+
+        Uses [[mw:Extension:GeoData]]
 
         @param primary_only: Only return the coordinate indicated to be primary
         @return: A list of Coordinate objects
@@ -1246,6 +1314,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         If this page is not a redirect page, will raise an IsNotRedirectPage
         exception. This method also can raise a NoPage exception.
 
+        @return: Page
         """
         return self.site.getredirtarget(self)
 
@@ -1281,7 +1350,6 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
                                step=None, total=None):
         """Return the version history as a wiki table."""
-
         result = '{| class="wikitable"\n'
         result += '! oldid || date/time || username || edit summary\n'
         for oldid, time, username, summary \
@@ -1502,9 +1570,9 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             (equivalent to set both edit and move to '')
         @param reason: Edit summary.
         @param prompt: If true, ask user for confirmation.
-        @param expiry: When the block should expire. This expiry will be applied
-            to all protections. If None, 'infinite', 'indefinite', 'never', or ''
-            is given, there is no expiry.
+        @param expiry: When the block should expire. This expiry will be
+            applied to all protections.
+            None, 'infinite', 'indefinite', 'never', and '' mean no expiry.
         @type expiry: pywikibot.Timestamp, string in GNU timestamp format
             (including ISO 8601).
         """
@@ -1626,7 +1694,10 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return False
 
     def isFlowPage(self):
-        """Whether the given title is a Flow page"""
+        """Whether the given title is a Flow page.
+
+        @return: bool
+        """
         if not self.site.hasExtension('Flow', False):
             return False
         if not hasattr(self, '_flowinfo'):
@@ -1637,7 +1708,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     @deprecated("Site.encoding()")
     def encoding(self):
-        """DEPRECATED: use Site.encoding() instead"""
+        """DEPRECATED: use self.site.encoding instead."""
         return self.site.encoding()
 
     @deprecated("Page.title(withNamespace=False)")
@@ -1703,8 +1774,10 @@ class ImagePage(Page):
     usingPages                : Iterate Pages on which the image is displayed.
 
     """
+
     @deprecate_arg("insite", None)
     def __init__(self, source, title=u""):
+        """Constructor."""
         Page.__init__(self, source, title, 6)
         if self.namespace() != 6:
             raise ValueError(u"'%s' is not in the image namespace!" % title)
@@ -1732,11 +1805,17 @@ class ImagePage(Page):
 
     @deprecated("fileIsShared")
     def fileIsOnCommons(self):
-        """Return True if the image is stored on Wikimedia Commons"""
+        """DEPRECATED. Check if the image is stored on Wikimedia Commons.
+
+        @return: bool
+        """
         return self.fileIsShared()
 
     def fileIsShared(self):
-        """Return True if image is stored on any known shared repository."""
+        """Check if the image is stored on any known shared repository.
+
+        @return: bool
+        """
         # as of now, the only known repositories are commons and wikitravel
         # TODO: put the URLs to family file
         if not self.site.has_image_repository:
@@ -1803,11 +1882,14 @@ class ImagePage(Page):
 
 class Category(Page):
 
-    """A page in the Category: namespace"""
+    """A page in the Category: namespace."""
 
     @deprecate_arg("insite", None)
     def __init__(self, source, title=u"", sortKey=None):
-        """All parameters are the same as for Page() constructor.
+        """
+        Constructor.
+
+        All parameters are the same as for Page() constructor.
 
         """
         Page.__init__(self, source, title, ns=14)
@@ -1900,7 +1982,7 @@ class Category(Page):
                  starttime=None, endtime=None, startsort=None,
                  endsort=None):
         """
-        Yields all articles in the current category.
+        Yield all articles in the current category.
 
         By default, yields all *pages* in the category that are not
         subcategories!
@@ -1975,7 +2057,6 @@ class Category(Page):
     def members(self, recurse=False, namespaces=None, step=None, total=None,
                 content=False):
         """Yield all category contents (subcats, pages, and files)."""
-
         for member in self.site.categorymembers(
                 self, namespaces, step=step, total=total, content=content):
             yield member
@@ -2099,32 +2180,35 @@ class Category(Page):
 
     @property
     def categoryinfo(self):
-        """return a dict containing category content values:
+        """Return a dict containing information about the category.
+
+        The dict contains values for:
 
         Numbers of pages, subcategories, files, and total contents.
 
+        @return: dict
         """
         return self.site.categoryinfo(self)
 
 # ### DEPRECATED METHODS ####
     @deprecated("list(Category.subcategories(...))")
     def subcategoriesList(self, recurse=False):
-        """DEPRECATED: Equivalent to list(self.subcategories(...))"""
+        """DEPRECATED: Equivalent to list(self.subcategories(...))."""
         return sorted(list(set(self.subcategories(recurse))))
 
     @deprecated("list(Category.articles(...))")
     def articlesList(self, recurse=False):
-        """DEPRECATED: equivalent to list(self.articles(...))"""
+        """DEPRECATED: equivalent to list(self.articles(...))."""
         return sorted(list(set(self.articles(recurse))))
 
     @deprecated("Category.categories()")
     def supercategories(self):
-        """DEPRECATED: equivalent to self.categories()"""
+        """DEPRECATED: equivalent to self.categories()."""
         return self.categories()
 
     @deprecated("list(Category.categories(...))")
     def supercategoriesList(self):
-        """DEPRECATED: equivalent to list(self.categories(...))"""
+        """DEPRECATED: equivalent to list(self.categories(...))."""
         return sorted(list(set(self.categories())))
 
 
@@ -2140,12 +2224,15 @@ ip_regexp = re.compile(r'^(?:(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}'
 class User(Page):
 
     """A class that represents a Wiki user.
+
+    This class also represents the Wiki page User:<username>
     """
 
     @deprecate_arg("site", "source")
     @deprecate_arg("name", "title")
     def __init__(self, source, title=u''):
         """Initializer for a User object.
+
         All parameters are the same as for Page() constructor.
         """
         if len(title) > 1 and title[0] == u'#':
@@ -2164,12 +2251,21 @@ class User(Page):
                 "This is an autoblock ID, you can only use to unblock it.")
 
     def name(self):
+        """
+        The username.
+
+        @return: unicode
+        """
         return self.username
 
     @property
     def username(self):
-        """ Convenience method that returns the title of the page with
-        namespace prefix omitted, aka the username, as a Unicode string.
+        """ The username.
+
+        Convenience method that returns the title of the page with
+        namespace prefix omitted, which is the username.
+
+        @return: unicode
         """
         if self._isAutoblock:
             return u'#' + self.title(withNamespace=False)
@@ -2177,11 +2273,18 @@ class User(Page):
             return self.title(withNamespace=False)
 
     def isRegistered(self, force=False):
-        """ Return True if a user with this name is registered on this site,
-        False otherwise.
+        """ Determine if the user is registered on the site.
+
+        It is possible to have a page named User:xyz and not have
+        a corresponding user with username xyz.
+
+        The page does not need to exist for this method to return
+        True.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
+
+        @return: bool
         """
         if self.isAnonymous():
             return False
@@ -2189,14 +2292,19 @@ class User(Page):
             return self.getprops(force).get('missing') is None
 
     def isAnonymous(self):
+        """ Determine if the user is editing as an IP address.
+
+        @return: bool
+        """
         return ip_regexp.match(self.username) is not None
 
     def getprops(self, force=False):
-        """ Return a Dictionary that contains user's properties. Use cached
-        values if already called before, otherwise fetch data from the API.
+        """ Return a properties about the user.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
+
+        @return: dict
         """
         if force:
             del self._userprops
@@ -2211,11 +2319,12 @@ class User(Page):
 
     @deprecated('User.registration()')
     def registrationTime(self, force=False):
-        """ Return registration date for this user, as a long in
-        MediaWiki's internal timestamp format, or 0 if the date is unknown.
+        """ DEPRECATED. Fetch registration date for this user.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
+
+        @return: long (MediaWiki's internal timestamp format) or 0
         """
         if self.registration():
             return long(self.registration().strftime('%Y%m%d%H%M%S'))
@@ -2223,22 +2332,26 @@ class User(Page):
             return 0
 
     def registration(self, force=False):
-        """ Return registration date for this user as a pywikibot.Timestamp
-        object, or None if the date is unknown.
+        """ Fetch registration date for this user.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
+
+        @return: pywikibot.Timestamp or None
         """
         reg = self.getprops(force).get('registration')
         if reg:
             return pywikibot.Timestamp.fromISOformat(reg)
 
     def editCount(self, force=False):
-        """ Return edit count for this user as int. This is always 0 for
-        'anonymous' users.
+        """ Return edit count for a registered user.
+
+        Always returns 0 for 'anonymous' users.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
+
+        @return: long
         """
         if 'editcount' in self.getprops(force):
             return self.getprops()['editcount']
@@ -2246,28 +2359,34 @@ class User(Page):
             return 0
 
     def isBlocked(self, force=False):
-        """ Return True if this user is currently blocked, False otherwise.
+        """ Determine whether the user is currently blocked.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
+
+        @return: bool
         """
         return 'blockedby' in self.getprops(force)
 
     def isEmailable(self, force=False):
-        """ Return True if emails can be send to this user through MediaWiki,
-        False otherwise.
+        """ Determine whether emails may be send to this user through MediaWiki.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
+
+        @return: bool
         """
         return 'emailable' in self.getprops(force)
 
     def groups(self, force=False):
-        """ Return a list of groups to wich this user belongs. The return value
-        is guaranteed to be a list object, possibly empty.
+        """ Return a list of groups to which this user belongs.
+
+        The list of groups may be empty.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
+
+        @return: list
         """
         if 'groups' in self.getprops(force):
             return self.getprops()['groups']
@@ -2275,8 +2394,7 @@ class User(Page):
             return []
 
     def getUserPage(self, subpage=u''):
-        """ Return a pywikibot.Page object corresponding to this user's main
-        page, or a subpage of it if subpage is set.
+        """ Return a Page object relative to this user's main page.
 
         @param subpage: subpage part to be appended to the main
                             page title (optional)
@@ -2292,8 +2410,7 @@ class User(Page):
         return Page(Link(self.title() + subpage, self.site))
 
     def getUserTalkPage(self, subpage=u''):
-        """ Return a pywikibot.Page object corresponding to this user's main
-        talk page, or a subpage of it if subpage is set.
+        """ Return a Page object relative to this user's main talk page.
 
         @param subpage: subpage part to be appended to the main
                             talk page title (optional)
@@ -2311,6 +2428,7 @@ class User(Page):
 
     def sendMail(self, subject, text, ccme=False):
         """ Send an email to this user via MediaWiki's email interface.
+
         Return True on success, False otherwise.
         This method can raise an UserActionRefuse exception in case this user
         doesn't allow sending email to him or the currently logged in bot
@@ -2354,7 +2472,8 @@ class User(Page):
     def block(self, expiry, reason, anononly=True, nocreate=True,
               autoblock=True, noemail=False, reblock=False):
         """
-        Blocks a user
+        Block user.
+
         @param expiry: When the block should expire
         @type expiry: pywikibot.Timestamp|str
         @param reason: Block reason
@@ -2383,8 +2502,9 @@ class User(Page):
     @deprecated("contributions")
     @deprecate_arg("limit", "total")  # To be consistent with rest of framework
     def editedPages(self, total=500):
-        """ Deprecated function that wraps 'contributions' for backwards
-        compatibility. Yields pywikibot.Page objects that this user has
+        """ DEPRECATED. Use contributions().
+
+        Yields pywikibot.Page objects that this user has
         edited, with an upper bound of 'total'. Pages returned are not
         guaranteed to be unique.
 
@@ -2397,8 +2517,9 @@ class User(Page):
     @deprecate_arg("limit", "total")  # To be consistent with rest of framework
     @deprecate_arg("namespace", "namespaces")
     def contributions(self, total=500, namespaces=[]):
-        """ Yield tuples describing this user edits with an upper bound of
-        'limit'. Each tuple is composed of a pywikibot.Page object,
+        """ Yield tuples describing this user edits.
+
+        Each tuple is composed of a pywikibot.Page object,
         the revision id (int), the edit timestamp (as a pywikibot.Timestamp
         object), and the comment (unicode).
         Pages returned are not guaranteed to be unique.
@@ -2420,6 +2541,7 @@ class User(Page):
     @deprecate_arg("number", "total")
     def uploadedImages(self, total=10):
         """ Yield tuples describing files uploaded by this user.
+
         Each tuple is composed of a pywikibot.Page, the timestamp (str in
         ISO8601 format), comment (unicode) and a bool for pageid > 0.
         Pages returned are not guaranteed to be unique.
@@ -2442,9 +2564,12 @@ class WikibasePage(Page):
 
     """
     The base page for the Wikibase extension.
-    There really should be no need to call this directly
+
+    There should be no need to instantiate this directly.
     """
+
     def __init__(self, site, title=u"", **kwargs):
+        """ Constructor. """
         if not isinstance(site, pywikibot.site.DataSite):
             raise TypeError("site must be a pywikibot.site.DataSite object")
         Page.__init__(self, site, title, **kwargs)
@@ -2452,6 +2577,7 @@ class WikibasePage(Page):
         self._isredir = False  # Wikibase pages cannot be a redirect
 
     def title(self, **kwargs):
+        """ Page title. """
         if self.namespace() == 0:
             self._link._text = self.getID()
             del self._link._title
@@ -2459,13 +2585,16 @@ class WikibasePage(Page):
 
     @deprecated("_defined_by")
     def __defined_by(self, singular=False):
+        """ DEPRECATED. """
         return self._defined_by(singular=singular)
 
     def _defined_by(self, singular=False):
         """
-        returns the parameters needed by the API to identify an item.
+        Internal function to provide the API parameters to identify the entity.
+
         Once an item's "p/q##" is looked up, that will be used for all future
         requests.
+
         @param singular: Whether the parameter names should use the singular
                          form
         @type singular: bool
@@ -2495,6 +2624,11 @@ class WikibasePage(Page):
         return params
 
     def exists(self):
+        """
+        Determine if an entity exists in the data repository.
+
+        @return: bool
+        """
         if not hasattr(self, '_content'):
             try:
                 self.get()
@@ -2505,9 +2639,11 @@ class WikibasePage(Page):
 
     def get(self, force=False, *args):
         """
-        Fetches all page data, and caches it
-        force will override caching
-        args can be used to specify custom props.
+        Fetch all page data, and cache it.
+
+        @param force: override caching
+        @type force: bool
+        @param args: may be used to specify custom props.
         """
         if force or not hasattr(self, '_content'):
             data = self.repo.loadcontent(self._defined_by(), *args)
@@ -2546,10 +2682,12 @@ class WikibasePage(Page):
 
     def getID(self, numeric=False, force=False):
         """
-        @param numeric Strip the first letter and return an int
-        @type numeric bool
-        @param force Force an update of new data
-        @type force bool
+        Get the entity identifier.
+
+        @param numeric: Strip the first letter and return an int
+        @type numeric: bool
+        @param force: Force an update of new data
+        @type force: bool
         """
         if not hasattr(self, 'id') or force:
             self.get(force=force)
@@ -2558,16 +2696,23 @@ class WikibasePage(Page):
         return self.id
 
     def latestRevision(self):
+        """
+        Get the revision identifier for the most recent revision of the entity.
+
+        @return: long
+        """
         if not hasattr(self, 'lastrevid'):
             self.get()
         return self.lastrevid
 
     def __normalizeLanguages(self, data):
         """
-        Helper function to convert any site objects
-        into the language they may represent.
-        @param data The dict to check
-        @type data dict
+        Helper function to replace site objects with their language codes.
+
+        @param data: The dict to check
+        @type data: dict
+
+        @return: dict
         """
         for key in data:
             if isinstance(key, pywikibot.site.BaseSite):
@@ -2577,8 +2722,10 @@ class WikibasePage(Page):
 
     def getdbName(self, site):
         """
-        Helper function to normalize site
-        objects into dbnames
+        Helper function to obtain a dbName for a Site.
+
+        @param site: The site to look up.
+        @type site: Site
         """
         if isinstance(site, pywikibot.site.BaseSite):
             return site.dbName()
@@ -2586,14 +2733,16 @@ class WikibasePage(Page):
 
     def editEntity(self, data, **kwargs):
         """
-        Enables updating of entities through wbeditentity
+        Edit an entity using Wikibase wbeditentity API.
+
         This function is wrapped around by:
          *editLabels
          *editDescriptions
          *editAliases
          *ItemPage.setSitelinks
-        @param data Data to be saved
-        @type data dict
+
+        @param data: Data to be saved
+        @type data: dict
         """
         if hasattr(self, 'lastrevid'):
             baserevid = self.lastrevid
@@ -2605,6 +2754,8 @@ class WikibasePage(Page):
 
     def editLabels(self, labels, **kwargs):
         """
+        Edit entity labels.
+
         Labels should be a dict, with the key
         as a language or a site object. The
         value should be the string to set it to.
@@ -2618,6 +2769,8 @@ class WikibasePage(Page):
 
     def editDescriptions(self, descriptions, **kwargs):
         """
+        Edit entity descriptions.
+
         Descriptions should be a dict, with the key
         as a language or a site object. The
         value should be the string to set it to.
@@ -2631,6 +2784,8 @@ class WikibasePage(Page):
 
     def editAliases(self, aliases, **kwargs):
         """
+        Edit entity aliases.
+
         Aliases should be a dict, with the key
         as a language or a site object. The
         value should be a list of strings.
@@ -2643,9 +2798,20 @@ class WikibasePage(Page):
 
 
 class ItemPage(WikibasePage):
+
+    """ A Wikibase item.
+
+    A Wikibase item may be defined by either a 'Q' id (qid),
+    or by a site & title.
+
+    If an item is defined by site & title, once an item's qid has
+    been looked up, the item is then defined by the qid.
+    """
+
     def __init__(self, site, title=None):
         """
-        defined by qid XOR site AND title
+        Constructor.
+
         @param site: data repository
         @type site: pywikibot.site.DataSite
         @param title: id number of item, "Q###"
@@ -2656,7 +2822,8 @@ class ItemPage(WikibasePage):
     @classmethod
     def fromPage(cls, page):
         """
-        Get the ItemPage based on a Page that links to it
+        Get the ItemPage for a Page that links to it.
+
         @param page: Page
         @return: ItemPage
         """
@@ -2674,9 +2841,11 @@ class ItemPage(WikibasePage):
 
     def get(self, force=False, *args):
         """
-        Fetches all page data, and caches it
-        force will override caching
-        args are the values of props
+        Fetch all item data, and cache it.
+
+        @param force: override caching
+        @type force: bool
+        @param args: values of props
         """
         super(ItemPage, self).get(force=force, *args)
 
@@ -2706,7 +2875,8 @@ class ItemPage(WikibasePage):
 
     def iterlinks(self, family=None):
         """
-        Iterates through all the sitelinks
+        Iterate through all the sitelinks.
+
         @param family: string/Family object which represents what family of
                        links to iterate
         @type family: str|pywikibot.family.Family
@@ -2725,10 +2895,15 @@ class ItemPage(WikibasePage):
 
     def getSitelink(self, site, force=False):
         """
-        Returns the title (unicode string) for the specific site
-        site is a pywikibot.Site or database name
-        force will override caching
-        If the item doesn't have that language, raise NoPage
+        Return the title for the specific site.
+
+        If the item doesn't have that language, raise NoPage.
+
+        @param site: Site to find the linked page of.
+        @type site: pywikibot.Site or database name
+        @param force: override caching
+
+        @return: unicode
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
@@ -2740,6 +2915,8 @@ class ItemPage(WikibasePage):
 
     def setSitelink(self, sitelink, **kwargs):
         """
+        Set sitelinks. Calls setSitelinks().
+
         A sitelink can either be a Page object,
         or a {'site':dbname,'title':title} dictionary.
         """
@@ -2747,13 +2924,16 @@ class ItemPage(WikibasePage):
 
     def removeSitelink(self, site, **kwargs):
         """
-        A site can either be a Site object,
-        or it can be a dbName.
+        Remove a sitelink.
+
+        A site can either be a Site object, or it can be a dbName.
         """
         self.removeSitelinks([site], **kwargs)
 
     def removeSitelinks(self, sites, **kwargs):
         """
+        Remove sitelinks.
+
         Sites should be a list, with values either
         being Site objects, or dbNames.
         """
@@ -2765,11 +2945,12 @@ class ItemPage(WikibasePage):
 
     def setSitelinks(self, sitelinks, **kwargs):
         """
+        Set sitelinks.
+
         Sitelinks should be a list. Each item in the
         list can either be a Page object, or a dict
         with a value for 'site' and 'title'.
         """
-
         data = {}
         for obj in sitelinks:
             if isinstance(obj, Page):
@@ -2784,18 +2965,20 @@ class ItemPage(WikibasePage):
 
     def addClaim(self, claim, bot=True, **kwargs):
         """
-        Adds the claim to the item
-        @param claim The claim to add
-        @type claim Claim
-        @param bot Whether to flag as bot (if possible)
-        @type bot bool
+        Add a claim to the item.
+
+        @param claim: The claim to add
+        @type claim: Claim
+        @param bot: Whether to flag as bot (if possible)
+        @type bot: bool
         """
         self.repo.addClaim(self, claim, bot=bot, **kwargs)
         claim.on_item = self
 
     def removeClaims(self, claims, **kwargs):
         """
-        Removes the claims from the item
+        Remove the claims from the item.
+
         @type claims: list
 
         """
@@ -2807,7 +2990,8 @@ class ItemPage(WikibasePage):
 
     def mergeInto(self, item, **kwargs):
         """
-        Merges the item into another item
+        Merge the item into another item.
+
         @param item: The item to merge into
         @type item: pywikibot.ItemPage
         """
@@ -2815,6 +2999,19 @@ class ItemPage(WikibasePage):
 
 
 class Property():
+
+    """
+    A Wikibase property.
+
+    While every Wikibase property has a Page on the data repository,
+    this object is for when the property is used as part of another concept
+    where the property is not _the_ Page of the property.
+
+    For example, a claim on an ItemPage has many property attributes, and so
+    it subclasses this Property class, but a claim does not have Page like
+    behaviour and semantics.
+    """
+
     types = {'wikibase-item': ItemPage,
              'string': basestring,
              'commonsMedia': ImagePage,
@@ -2825,13 +3022,16 @@ class Property():
              }
 
     def __init__(self, site, id=None):
+        """Constructor."""
         self.repo = site
         self.id = id.upper()
 
     @property
     def type(self):
         """
-        Return the type of this property
+        Return the type of this property.
+
+        @return: str
         """
         if not hasattr(self, '_type'):
             self._type = self.repo.getPropertyType(self)
@@ -2840,7 +3040,8 @@ class Property():
     @deprecated("Property.type")
     def getType(self):
         """
-        Return the type of this property
+        Return the type of this property.
+
         It returns 'globecoordinate' for type 'globe-coordinate'
         in order to be backwards compatible.  See
         https://gerrit.wikimedia.org/r/#/c/135405/ for background.
@@ -2851,6 +3052,12 @@ class Property():
             return self._type
 
     def getID(self, numeric=False):
+        """
+        Get the identifier of this property.
+
+        @param numeric: Strip the first letter and return an int
+        @type numeric: bool
+        """
         if numeric:
             return int(self.id[1:])
         else:
@@ -2860,13 +3067,16 @@ class Property():
 class PropertyPage(WikibasePage, Property):
 
     """
-    Any page in the property namespace
+    A Wikibase entity in the property namespace.
+
     Should be created as:
         PropertyPage(DataSite, 'Property:P21')
     """
 
     def __init__(self, source, title=u""):
         """
+        Constructor.
+
         @param source: data repository property is on
         @type source: pywikibot.site.DataSite
         @param title: page name of property, like "Property:P##"
@@ -2878,14 +3088,20 @@ class PropertyPage(WikibasePage, Property):
             raise ValueError(u"'%s' is not a property page!" % self.title())
 
     def get(self, force=False, *args):
+        """
+        Fetch the property entity, and cache it.
+
+        @param force: override caching
+        @param args: values of props
+        """
         if force or not hasattr(self, '_content'):
             WikibasePage.get(self, force=force, *args)
         self.type = self._content['datatype']
 
     def newClaim(self, *args, **kwargs):
         """
-        Convenicence function to create a new claim object
-        for a specific property
+        Convenicence function to create a new claim object for this property.
+
         @return: Claim
         """
         return Claim(self.site, self.getID(), *args, **kwargs)
@@ -2894,9 +3110,13 @@ class PropertyPage(WikibasePage, Property):
 class QueryPage(WikibasePage):
 
     """
-    For future usage, not implemented yet
+    A Wikibase Query entity.
+
+    For future usage, not implemented yet.
     """
+
     def __init__(self, site, title):
+        """Constructor."""
         WikibasePage.__init__(self, site, title, ns=122)
         self.id = self.title(withNamespace=False).upper()
         if not self.id.startswith(u'U'):
@@ -2906,11 +3126,16 @@ class QueryPage(WikibasePage):
 class Claim(Property):
 
     """
+    A Claim on a Wikibase entity.
+
     Claims are standard claims as well as references.
     """
+
     def __init__(self, site, pid, snak=None, hash=None, isReference=False,
                  isQualifier=False):
         """
+        Constructor.
+
         Defined by the "snak" value, supplemented by site + pid
 
         @param site: repository the claim is on
@@ -2938,8 +3163,12 @@ class Claim(Property):
     @staticmethod
     def fromJSON(site, data):
         """
-        Creates the claim object from JSON returned
-        in the API call.
+        Create a claim object from JSON returned in the API call.
+
+        @param data: JSON containing claim data
+        @type data: dict
+
+        @return: Claim
         """
         claim = Claim(site, data['mainsnak']['property'])
         if 'id' in data:
@@ -2980,9 +3209,13 @@ class Claim(Property):
     @staticmethod
     def referenceFromJSON(site, data):
         """
+        Create a dict of claims from reference JSON returned in the API call.
+
         Reference objects are represented a
         bit differently, and require some
         more handling.
+
+        @return: dict
         """
         source = collections.defaultdict(list)
         for prop in list(data['snaks'].values()):
@@ -2995,17 +3228,26 @@ class Claim(Property):
     @staticmethod
     def qualifierFromJSON(site, data):
         """
+        Create a Claim for a qualifer from JSON.
+
         Qualifier objects are represented a bit
         differently like references, but I'm not
         sure if this even requires it's own function.
+
+        @return: Claim
         """
         wrap = {'mainsnak': data}
         return Claim.fromJSON(site, wrap)
 
     def setTarget(self, value):
         """
-        Sets the target to the passed value.
-        There should be checks to ensure type compliance
+        Set the target value in the local object.
+
+        @param value: The new target value.
+        @type value: object
+
+        Raises ValueError if value is not of the type
+               required for the Claim type.
         """
         value_class = self.types[self.type]
         if not isinstance(value, value_class):
@@ -3015,7 +3257,12 @@ class Claim(Property):
 
     def changeTarget(self, value=None, snaktype='value', **kwargs):
         """
-        This actually saves the new target.
+        Set the target value in the data repository.
+
+        @param value: The new target value.
+        @type value: object
+        @param snaktype: The new snaktype.
+        @type value: str ('value', 'somevalue', or 'novalue')
         """
         if value:
             self.setTarget(value)
@@ -3027,19 +3274,28 @@ class Claim(Property):
 
     def getTarget(self):
         """
-        Returns object that the property is associated with.
+        Return the target value of this Claim.
+
         None is returned if no target is set
+
+        @return: object
         """
         return self.target
 
     def getSnakType(self):
         """
-        Returns the "snaktype"
-        Can be "value", "somevalue" or "novalue"
+        Return the "snaktype".
+
+        @return: str ('value', 'somevalue' or 'novalue')
         """
         return self.snaktype
 
     def setSnakType(self, value):
+        """Set the "snaktype".
+
+        @param value: Type of snak
+        @type value: str ('value', 'somevalue', or 'novalue')
+        """
         if value in ['value', 'somevalue', 'novalue']:
             self.snaktype = value
         else:
@@ -3047,17 +3303,21 @@ class Claim(Property):
                 "snaktype must be 'value', 'somevalue', or 'novalue'.")
 
     def getRank(self):
+        """Return the rank of the Claim."""
         return self.rank
 
     def setRank(self):
         """
+        Set the rank of the Claim.
+
         Has not been implemented in the Wikibase API yet
         """
         raise NotImplementedError
 
     def changeSnakType(self, value=None, **kwargs):
         """
-        This actually saves the new snakvalue.
+        Save the new snakvalue.
+
         TODO: Is this function really needed?
         """
         if value:
@@ -3066,13 +3326,16 @@ class Claim(Property):
 
     def getSources(self):
         """
-        Returns a list of sources. Each source is a list of Claims.
+        Return a list of sources, each being a list of Claims.
+
+        @return: list
         """
         return self.sources
 
     def addSource(self, claim, **kwargs):
         """
-        Adds the claim as a source.
+        Add the claim as a source.
+
         @param claim: the claim to add
         @type claim: pywikibot.Claim
         """
@@ -3080,7 +3343,8 @@ class Claim(Property):
 
     def addSources(self, claims, **kwargs):
         """
-        Adds the claims as one source.
+        Add the claims as one source.
+
         @param claims: the claims to add
         @type claims: list of pywikibot.Claim
         """
@@ -3094,7 +3358,8 @@ class Claim(Property):
 
     def removeSource(self, source, **kwargs):
         """
-        Removes the source.
+        Remove the source.  Calls removeSources().
+
         @param source: the source to remove
         @type source: pywikibot.Claim
         """
@@ -3102,7 +3367,8 @@ class Claim(Property):
 
     def removeSources(self, sources, **kwargs):
         """
-        Removes the individual sources.
+        Remove the sources.
+
         @param sources: the sources to remove
         @type sources: list of pywikibot.Claim
         """
@@ -3113,7 +3379,7 @@ class Claim(Property):
             self.sources.remove(source_dict)
 
     def addQualifier(self, qualifier, **kwargs):
-        """Add the given qualifier
+        """Add the given qualifier.
 
         @param qualifier: the qualifier to add
         @type qualifier: Claim
@@ -3125,7 +3391,9 @@ class Claim(Property):
 
     def _formatDataValue(self):
         """
-        Format the target into the proper JSON datavalue that Wikibase wants
+        Format the target into the proper JSON datavalue that Wikibase wants.
+
+        @return: dict
         """
         if self.type == 'wikibase-item':
             value = {'entity-type': 'item',
@@ -3145,9 +3413,13 @@ class Claim(Property):
 class Revision(object):
 
     """A structure holding information about a single revision of a Page."""
+
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
                  text=None, minor=False, rollbacktoken=None):
-        """All parameters correspond to object attributes (e.g., revid
+        """
+        Constructor.
+
+        All parameters correspond to object attributes (e.g., revid
         parameter is stored as self.revid)
 
         @param revid: Revision id number
@@ -3178,7 +3450,7 @@ class Revision(object):
 
 class Link(ComparableMixin):
 
-    """A MediaWiki link (local or interwiki)
+    """A MediaWiki link (local or interwiki).
 
     Has the following attributes:
 
@@ -3192,6 +3464,7 @@ class Link(ComparableMixin):
         following a '|' character inside the link
 
     """
+
     illegal_titles_pattern = re.compile(
         # Matching titles will be held as illegal.
         r'''[\x00-\x1f\x23\x3c\x3e\x5b\x5d\x7b\x7c\x7d\x7f]'''
@@ -3205,7 +3478,7 @@ class Link(ComparableMixin):
     )
 
     def __init__(self, text, source=None, defaultNamespace=0):
-        """Constructor
+        """Constructor.
 
         @param text: the link text (everything appearing between [[ and ]]
             on a wiki page)
@@ -3264,6 +3537,7 @@ class Link(ComparableMixin):
         self._text = t
 
     def __repr__(self):
+        """Return a more complete string representation."""
         return "pywikibot.page.Link(%r, %r)" % (self.title, self.site)
 
     def parse_site(self):
@@ -3307,8 +3581,10 @@ class Link(ComparableMixin):
         return (fam.name, code)  # text before : doesn't match any known prefix
 
     def parse(self):
-        """Parse text; called internally when accessing attributes"""
+        """Parse wikitext of the link.
 
+        Called internally when accessing attributes.
+        """
         self._site = self._source
         self._namespace = self._defaultns
         t = self._text
@@ -3422,30 +3698,50 @@ not supported by PyWikiBot!"""
 
     @property
     def site(self):
+        """Return the site of the link.
+
+        @return: unicode
+        """
         if not hasattr(self, "_site"):
             self.parse()
         return self._site
 
     @property
     def namespace(self):
+        """Return the namespace of the link.
+
+        @return: unicode
+        """
         if not hasattr(self, "_namespace"):
             self.parse()
         return self._namespace
 
     @property
     def title(self):
+        """Return the title of the link.
+
+        @return: unicode
+        """
         if not hasattr(self, "_title"):
             self.parse()
         return self._title
 
     @property
     def section(self):
+        """Return the section of the link.
+
+        @return: unicode
+        """
         if not hasattr(self, "_section"):
             self.parse()
         return self._section
 
     @property
     def anchor(self):
+        """Return the anchor of the link.
+
+        @return: unicode
+        """
         if not hasattr(self, "_anchor"):
             self.parse()
         return self._anchor
@@ -3487,10 +3783,13 @@ not supported by PyWikiBot!"""
                                   title)
 
     def __str__(self):
+        """Return a string representation."""
         return self.astext().encode("ascii", "backslashreplace")
 
     def _cmpkey(self):
         """
+        Key for comparison of Link objects.
+
         Link objects are "equal" if and only if they are on the same site
         and have the same normalized title, including section if any.
 
@@ -3499,9 +3798,14 @@ not supported by PyWikiBot!"""
         return (self.site, self.namespace, self.title)
 
     def __unicode__(self):
+        """Return a unicode string representation.
+
+        @return unicode
+        """
         return self.astext()
 
     def __hash__(self):
+        """A stable identifier to be used as a key in hash-tables."""
         return hash(u'%s:%s:%s' % (self.site.family.name,
                                    self.site.code,
                                    self.title))
@@ -3510,9 +3814,14 @@ not supported by PyWikiBot!"""
     def fromPage(page, source=None):
         """
         Create a Link to a Page.
-        @param source: Link from site source
-        """
 
+        @param page: target Page
+        @type page: Page
+        @param source: Link from site source
+        @param source: Site
+
+        @return: Link
+        """
         link = Link.__new__(Link)
         link._site = page.site
         link._section = page.section()
@@ -3529,7 +3838,17 @@ not supported by PyWikiBot!"""
     def langlinkUnsafe(lang, title, source):
         """
         Create a "lang:title" Link linked from source.
+
         Assumes that the lang & title come clean, no checks are made.
+
+        @param lang: target site code (language)
+        @type lang: str
+        @param title: target Page
+        @type title: unicode
+        @param source: Link from site source
+        @param source: Site
+
+        @return: Link
         """
         link = Link.__new__(Link)
         if source.family.interwiki_forward:
@@ -3560,7 +3879,13 @@ not supported by PyWikiBot!"""
 
 
 def html2unicode(text, ignore=None):
-    """Return text, replacing HTML entities by equivalent unicode characters."""
+    """Replace HTML entities with equivalent unicode.
+
+    @param ignore: HTML entities to ignore
+    @param ignore: list of int
+
+    @return: unicode
+    """
     if ignore is None:
         ignore = []
     # This regular expression will match any decimal and hexadecimal entity and
@@ -3654,13 +3979,19 @@ def UnicodeToAsciiHtml(s):
 
 def unicode2html(x, encoding):
     """
-Ensure unicode string is encodable, or else convert to ASCII for HTML.
+    Convert unicode string to requested HTML encoding.
 
-Arguments are a unicode string and an encoding. Attempt to encode the
-string into the desired format; if that doesn't work, encode the unicode
-into html &#; entities. If it does work, return it unchanged.
+    Attempt to encode the
+    string into the desired format; if that doesn't work, encode the unicode
+    into html &#; entities. If it does work, return it unchanged.
 
-"""
+    @param x: String to update
+    @type x: unicode
+    @param encoding: Encoding to use
+    @type encoding: str
+
+    @return: str
+    """
     try:
         x.encode(encoding)
     except UnicodeError:
