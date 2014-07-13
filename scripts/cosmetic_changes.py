@@ -530,9 +530,6 @@ class CosmeticChangesToolkit:
             8206,   # Left-to-right mark (&ltr;)
             8207,   # Right-to-left mark (&rtl;)
         ]
-        # ignore ' see https://eo.wikipedia.org/w/index.php?title=Liberec&diff=next&oldid=2320801
-        #if self.site.lang == 'eo':
-        #    ignore += [39]
         if self.template:
             ignore += [58]
         text = pywikibot.html2unicode(text, ignore=ignore)
