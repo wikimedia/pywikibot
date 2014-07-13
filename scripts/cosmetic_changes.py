@@ -515,16 +515,20 @@ class CosmeticChangesToolkit:
     def resolveHtmlEntities(self, text):
         ignore = [
             38,     # Ampersand (&amp;)
-            39,     # Bugzilla 24093
+            39,     # Single quotation mark (&quot;) - Bugzilla 24093
             60,     # Less than (&lt;)
             62,     # Great than (&gt;)
-            91,     # Opening bracket - sometimes used intentionally inside links
-            93,     # Closing bracket - sometimes used intentionally inside links
-            124,    # Vertical bar (??) - used intentionally in navigation bar templates on de:
-            160,    # Non-breaking space (&nbsp;) - not supported by Firefox textareas
+            91,     # Opening square bracket ([)
+                    # - sometimes used intentionally inside links
+            93,     # Closing square bracket (])
+                    # - used intentionally inside links
+            124,    # Vertical bar (|)
+                    # - used intentionally in navigation bar templates on w:de
+            160,    # Non-breaking space (&nbsp;)
+                    # - not supported by Firefox textareas
             173,    # Soft-hypen (&shy;) - enable editing
-            8206,   # left-to-right mark (&ltr;)
-            8207,   # right-to-left mark (&rtl;)
+            8206,   # Left-to-right mark (&ltr;)
+            8207,   # Right-to-left mark (&rtl;)
         ]
         # ignore ' see https://eo.wikipedia.org/w/index.php?title=Liberec&diff=next&oldid=2320801
         #if self.site.lang == 'eo':
