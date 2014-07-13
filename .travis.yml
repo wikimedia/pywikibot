@@ -13,6 +13,10 @@ install:
   - echo "family = 'wikipedia'" >> ~/.pywikibot/user-config.py
   - echo "usernames['wikipedia']['en'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
   - echo "password_file = os.path.expanduser('~/.pywikibot/passwordfile')" >> ~/.pywikibot/user-config.py
+  - echo "debug_log.append('')" >> ~/.pywikibot/user-config.py
+  - echo "log.append('*')" >> ~/.pywikibot/user-config.py
+  - echo "logfilename = 'tests.log'" >> ~/.pywikibot/user-config.py
+  - echo "logfilesize = 10000" >> ~/.pywikibot/user-config.py
 
   - touch ~/.pywikibot/passwordfile
   - echo "('Pywikibot-test', '"$USER_PASSWORD"')" > ~/.pywikibot/passwordfile
@@ -23,6 +27,11 @@ install:
 
 script:
   - python setup.py test
+  - echo '============='
+  - echo '==== LOG ====
+  - ls ~/.pywikibot/logs/*
+  - echo '============='
+  - sed -e "s/lgpassword=\([^&]*\)/lgpassword=xxxxxxx/g" ~/.pywikibot/logs/tests.log
 
 env:
   global:
