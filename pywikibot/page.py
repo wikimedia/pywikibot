@@ -1094,7 +1094,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     @deprecate_arg('tllimit', None)
     @deprecated("Page.templates()")
-    def getTemplates(self, tllimit=5000):
+    def getTemplates(self):
         return self.templates()
 
     def templates(self, content=False):

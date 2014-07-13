@@ -957,7 +957,7 @@ class checkImagesBot(object):
         if commons_image_with_this_hash and \
            commons_image_with_this_hash is not 'None':
             servTMP = pywikibot.translate(self.site, serviceTemplates)
-            templatesInTheImage = self.image.getTemplates()
+            templatesInTheImage = self.image.templates()
             if servTMP is not None:
                 for template in servTMP:
                     if pywikibot.Page(self.site,
