@@ -11,7 +11,7 @@ __version__ = '$Id$'
 
 import pywikibot
 import pywikibot.page
-from tests.utils import unittest
+from tests.utils import unittest, PywikibotTestCase
 
 THREADS = {
     'als': 4, 'ar': 1, 'bar': 0, 'bg': 0, 'bjn': 1, 'bs': 0, 'ca': 5, 'ckb': 2,
@@ -82,7 +82,7 @@ class TestArchiveBotMeta(type):
         return type.__new__(cls, name, bases, dct)
 
 
-class TestArchiveBot(unittest.TestCase):
+class TestArchiveBot(PywikibotTestCase):
 
     """Test archivebot script"""
 

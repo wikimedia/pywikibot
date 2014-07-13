@@ -17,7 +17,7 @@ import pywikibot
 import pywikibot.textlib as textlib
 from pywikibot import config
 
-from tests.utils import unittest
+from tests.utils import unittest, PywikibotTestCase
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")
@@ -27,11 +27,12 @@ for f in ["enwiki_help_editing"]:
                            'r', 'utf-8').read()
 
 
-class TestSectionFunctions(unittest.TestCase):
+class TestSectionFunctions(PywikibotTestCase):
     def setUp(self):
         self.site = pywikibot.Site('en', 'wikipedia')
         self.catresult1 = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
                            % {'LS': config.LS})
+        super(TestSectionFunctions, self).setUp()
 
     def contains(self, fn, sn):
         return textlib.does_text_contain_section(
@@ -89,7 +90,7 @@ class TestSectionFunctions(unittest.TestCase):
         self.assertNotContains("enwiki_help_editing", u"Helpful tips", "section header must contain a link")
 
 
-class TestFormatFunctions(unittest.TestCase):
+class TestFormatFunctions(PywikibotTestCase):
 
     @classmethod
     def setUpClass(cls):

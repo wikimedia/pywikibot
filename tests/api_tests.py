@@ -14,7 +14,7 @@ from tests.utils import PywikibotTestCase, unittest
 mysite = pywikibot.Site('en', 'wikipedia')
 
 
-class TestApiFunctions(unittest.TestCase):
+class TestApiFunctions(PywikibotTestCase):
 
     def testObjectCreation(self):
         """Test that api.Request() creates an object with desired attributes"""

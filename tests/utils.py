@@ -4,8 +4,11 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import print_function
 __version__ = '$Id$'
 #
+import time
+import sys
 try:
     # Unittest2 is a backport of python 2.7s unittest module to python 2.6
     # Trying to import unittest2 has to happen first because 2.6 does have a
@@ -17,6 +20,9 @@ try:
     import unittest2 as unittest
 except ImportError:
     import unittest
+
+# Number of seconds each test may consume before a note is added after the test.
+test_duration_warning_interval = 10
 
 
 def collector():
@@ -37,5 +43,14 @@ class PywikibotTestCase(unittest.TestCase):
     def setUp(self):
         patch_request()
 
+        self.test_start = time.time()
+
     def tearDown(self):
+        self.test_completed = time.time()
+        duration = self.test_completed - self.test_start
+
+        if duration > test_duration_warning_interval:
+            print(' %0.3fs' % duration, end=' ')
+            sys.stdout.flush()
+
         unpatch_request()
