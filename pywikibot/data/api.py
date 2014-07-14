@@ -483,12 +483,16 @@ class CachedRequest(Request):
     def _load_cache(self):
         """ Return whether the cache can be used """
         try:
-            with open(self._cachefile_path(), 'rb') as f:
+            filename = self._cachefile_path()
+            with open(filename, 'rb') as f:
                 uniquedescr, self._data, self._cachetime = pickle.load(f)
             assert(uniquedescr == str(self._uniquedescriptionstr()))
             if self._expired(self._cachetime):
                 self._data = None
                 return False
+            pywikibot.debug(u"%s: cache hit (%s) for API request: %s"
+                            % (self.__class__.__name__, filename, uniquedescr),
+                            _logger)
             return True
         except IOError as e:
             # file not found
