@@ -32,10 +32,11 @@ __version__ = '$Id$'
 import time
 import sys
 import os
+import inspect
 
 import pywikibot
 
-from pywikibot import config, Site
+from pywikibot import config, log, Site
 from pywikibot.site import BaseSite
 from pywikibot.family import WikimediaFamily
 
@@ -63,6 +64,66 @@ class TestCaseBase(unittest.TestCase):
             assertRegexpMatches is deprecated in Python 3.
             """
             return self.assertRegexpMatches(*args, **kwargs)
+
+
+class TestLoggingMixin(TestCaseBase):
+
+    """Logging for test cases."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up test class."""
+        cls._log_prefix = inspect.getfile(cls) + ':' + cls.__name__
+
+    def setUp(self):
+        """Set up each unit test."""
+        super(TestLoggingMixin, self).setUp()
+
+        if hasattr(self, '_outcomeForDoCleanups'):
+            # Python 3 unittest & nose
+            outcome = self._outcomeForDoCleanups
+        elif hasattr(self, '_outcome'):
+            # Python 3.4 nose
+            outcome = self._outcome
+        elif hasattr(self, '_resultForDoCleanups'):
+            # Python 2 unittest & nose
+            outcome = self._resultForDoCleanups
+        else:
+            return
+
+        self._previous_errors = len(outcome.errors)
+        # nose 3.4 doesn't has failures
+        if hasattr(outcome, 'failures'):
+            self._previous_failures = len(outcome.failures)
+
+        log('START ' + self._log_prefix + '.' + self._testMethodName)
+
+    def tearDown(self):
+        """Tear down test."""
+        super(TestLoggingMixin, self).tearDown()
+
+        if hasattr(self, '_outcomeForDoCleanups'):
+            # Python 3 unittest & nose
+            outcome = self._outcomeForDoCleanups
+        elif hasattr(self, '_outcome'):
+            # Python 3.4 nose
+            outcome = self._outcome
+        elif hasattr(self, '_resultForDoCleanups'):
+            # Python 2 unittest & nose
+            outcome = self._resultForDoCleanups
+        else:
+            return
+
+        if len(outcome.errors) > self._previous_errors:
+            status = ' NOT OK: ERROR'
+        # nose 3.4 doesn't has failures
+        elif (hasattr(outcome, 'failures') and
+                len(outcome.failures) > self._previous_failures):
+            status = ' NOT OK: FAILURE'
+        else:
+            status = ' OK'
+
+        log('END ' + self._log_prefix + '.' + self._testMethodName + status)
 
 
 class TestTimerMixin(TestCaseBase):
@@ -402,9 +463,9 @@ class MetaTestCaseClass(type):
         return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
 
 
-class TestCase(TestTimerMixin, TestCaseBase):
+class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
 
-    """Run tests on multiple sites."""
+    """Run tests on pre-defined sites."""
 
     __metaclass__ = MetaTestCaseClass
 
