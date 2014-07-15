@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 #
 # (C) Merlijn van Deen, 2010-2013
-# (C) Pywikibot team, 2010-2013
+# (C) Pywikibot team, 2010-2014
 #
 # Distributed under the terms of the MIT license
 #
@@ -39,7 +39,8 @@ else:
 def urlopen(url):
     req = urllib2.Request(
         url,
-        headers={'User-agent': 'Pywikibot Family File Generator 2.0 - https://www.mediawiki.org/wiki/pywikibot'})
+        headers={'User-agent': 'Pywikibot Family File Generator 2.0'
+                               ' - https://www.mediawiki.org/wiki/Pywikibot'})
     uo = urllib2.urlopen(req)
     try:
         if sys.version_info[0] == 2:

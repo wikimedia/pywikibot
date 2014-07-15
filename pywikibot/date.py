@@ -8,7 +8,7 @@ lists which are required by some other programs.
 # (C) Daniel Herding, 2004
 # (C) Ævar Arnfjörð Bjarmason, 2004
 # (C) Andre Engels, 2004-2005
-# (C) Yuri Astrakhan, 2005-2006  FirstnameLastname@gmail.com
+# (C) Yuri Astrakhan, 2005-2006  (<Firstname><Lastname>@gmail.com)
 #       (years/decades/centuries/millenniums  str <=> int  conversions)
 # (C) Pywikibot team, 2004-2014
 #

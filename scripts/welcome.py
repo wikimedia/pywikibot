@@ -939,7 +939,7 @@ def main():
         elif arg == '-quick':
             globalvar.quick = True
 
-    # Filename and pywikibot path
+    # Filename and Pywikibot path
     # file where is stored the random signature index
     filename = pywikibot.config.datafilepath('welcome-%s-%s.data'
                                              % (pywikibot.Site().family.name,

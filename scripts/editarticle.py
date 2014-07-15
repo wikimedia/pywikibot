@@ -10,7 +10,7 @@ Edit a Wikipedia article with your favourite editor.
        - ...
 """
 #
-# (C) Gerrit Holl 2004
+# (C) Gerrit Holl, 2004
 # (C) Pywikibot team, 2004-2014
 #
 # Distributed under the terms of the MIT license.

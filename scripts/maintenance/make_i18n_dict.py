@@ -17,8 +17,8 @@ If you have the messages as instance constants you may call the bot as follows:
 >>> bot = i18nBot('<scriptname>.<class instance>', '<msg dict1>', '<msg dict2>')
 """
 #
-# (C) xqt 2013-2014
-# (C) Pywikipedia bot team, 2013
+# (C) xqt, 2013-2014
+# (C) Pywikibot team, 2013-2014
 #
 # Distributed under the terms of the MIT license.
 #

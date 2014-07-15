@@ -24,7 +24,7 @@ Command line options:
 """
 
 #
-# (C) Pywikipedia bot team, 2007-2014
+# (C) Pywikibot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #
