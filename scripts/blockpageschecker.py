@@ -37,13 +37,6 @@ Furthermore, the following command line parameters are supported:
 -move           The bot will check if the page is blocked also for the move
                 option, not only for edit
 
---- Warning! ---
-You have to edit this script in order to add your preferences
-otherwise the script won't work!
-
-If you have problems, ask on botwiki ( http://botwiki.sno.cc/wiki/Main_Page )
-or on IRC (#pywikipediabot)
-
 --- Example of how to use the script ---
 
 python blockpageschecker.py -always
