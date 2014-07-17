@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2013
+# (C) Pywikibot team, 2003-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -114,22 +114,29 @@ def _get_base_dir():
         provided in this argument
     2.  If the user has a PYWIKIBOT2_DIR environment variable, use the value
         of it
-    3.  Use (and if necessary create) a 'pywikibot' folder under
+    3.  If user-config presents in current directory, use the current directory
+    4.  Use (and if necessary create) a 'pywikibot' folder under
         'Application Data' or 'AppData\Roaming' (Windows) or
         '.pywikibot' directory (Unix and similar) under the user's home
         directory.
 
     """
     NAME = "pywikibot"
+    base_dir = ""
     for arg in sys.argv[1:]:
         if arg.startswith("-dir:"):
             base_dir = arg[5:]
             sys.argv.remove(arg)
             break
+    current_exists = os.path.exists(
+        os.path.join(os.path.abspath("."), "user-config.py"))
+    if current_exists and "PYWIKIBOT2_DIR" not in os.environ and not base_dir:
+        base_dir = os.path.abspath(".")
+        return base_dir
     else:
         if "PYWIKIBOT2_DIR" in os.environ:
             base_dir = os.environ["PYWIKIBOT2_DIR"]
-        else:
+        elif not base_dir:
             is_windows = sys.platform == 'win32'
             home = os.path.expanduser("~")
             if is_windows:
@@ -164,7 +171,9 @@ _base_dir = _get_base_dir()
 # Save base_dir for use by other modules
 base_dir = _base_dir
 
-
+for arg in sys.argv[1:]:
+    if arg.startswith("-verbose") or arg == "-v":
+        print "The base directory is %s" % base_dir
 family_files = {}
 
 
