@@ -681,7 +681,9 @@ class ReferencesRobot(Bot):
                 elif u'.zh' in ref.link:
                     enc.append("gbk")
 
-                u = linkedpagetext
+                if not 'utf-8' in enc:
+                    enc.append('utf-8')
+                u = linkedpagetext.decode(enc[0])   # Bug 67410
 
                 # Retrieves the first non empty string inside <title> tags
                 for m in self.TITLE.finditer(u):
