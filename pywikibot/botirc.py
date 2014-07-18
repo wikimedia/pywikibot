@@ -7,7 +7,7 @@ http://python-irclib.sourceforge.net/
 """
 #
 # (C) Balasyum
-# (C) Pywikibot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,7 +62,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         self.other_ns = re.compile(
             u'14\[\[07(' + u'|'.join([item[0] for item in
                                         list(site.namespaces().values()) if item[0]]) + u')')
-        self.api_url = self.site.family.apipath(self.site.lang)
+        self.api_url = self.site.apipath()
         self.api_url += '?action=query&meta=siteinfo&siprop=statistics&format=xml'
         self.api_found = re.compile(r'articles="(.*?)"')
         self.re_edit = re.compile(
