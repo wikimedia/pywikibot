@@ -36,7 +36,7 @@ from pywikibot.i18n import translate
 
 class Timestamp(datetime.datetime):
 
-    """Class for handling Mediawiki timestamps.
+    """Class for handling MediaWiki timestamps.
 
     This inherits from datetime.datetime, so it can use all of the methods
     and operations of a datetime object.  To ensure that the results of any
@@ -44,7 +44,7 @@ class Timestamp(datetime.datetime):
     objects (and datetime.timedeltas) in any operation.
 
     Use Timestamp.fromISOformat() and Timestamp.fromtimestampformat() to
-    create Timestamp objects from Mediawiki string formats.
+    create Timestamp objects from MediaWiki string formats.
 
     Use Site.getcurrenttime() for the current time; this is more reliable
     than using Timestamp.utcnow().
@@ -106,7 +106,7 @@ class Coordinate(object):
         """
         @param lat: Latitude
         @type lat: float
-        @param lon: Longitute
+        @param lon: Longitude
         @type lon: float
         @param alt: Altitute? TODO FIXME
         @param precision: precision
@@ -119,7 +119,7 @@ class Coordinate(object):
         @type name: str
         @param dim: Dimension (in meters)
         @type dim: int
-        @param entity: The url entity of a Wikibase item
+        @param entity: The URL entity of a Wikibase item
         @type entity: str
         """
         self.lat = lat

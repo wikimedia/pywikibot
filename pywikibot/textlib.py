@@ -50,9 +50,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     """
     Return text with 'old' replaced by 'new', ignoring specified types of text.
 
-    Skips occurences of 'old' within exceptions; e.g., within nowiki tags or
+    Skips occurrences of 'old' within exceptions; e.g., within nowiki tags or
     HTML comments. If caseInsensitive is true, then use case insensitive
-    regex matching. If allowoverlap is true, overlapping occurences are all
+    regex matching. If allowoverlap is true, overlapping occurrences are all
     replaced (watch out when using this, it might lead to infinite loops!).
 
     Parameters:
@@ -379,9 +379,9 @@ def expandmarker(text, marker='', separator=''):
 # Functions dealing with interwiki language links
 # -----------------------------------------------
 # Note - MediaWiki supports several kinds of interwiki links; two kinds are
-#        interlanguage links. We deal here with those kinds only.
-#        A family has by definition only one kind of interlanguage links:
-#        1 - interlanguage links inside the own family.
+#        inter-language links. We deal here with those kinds only.
+#        A family has by definition only one kind of inter-language links:
+#        1 - inter-language links inside the own family.
 #            They go to a corresponding page in another language in the same
 #            family, such as from 'en.wikipedia' to 'pt.wikipedia', or from
 #            'es.wiktionary' to 'arz.wiktionary'.
@@ -392,7 +392,7 @@ def expandmarker(text, marker='', separator=''):
 #            'commons' to 'zh.wikipedia, or from 'incubator' to 'en.wikipedia'.
 #            Families having those have one member only, and do not have
 #            language-specific sites. The name of the target family of their
-#            interlanguage links is kept in their interwiki_forward attribute.
+#            inter-language links is kept in their interwiki_forward attribute.
 #        These functions only deal with links of these two kinds only.  They
 #        do not find or change links of other kinds, nor any that are formatted
 #        as in-line interwiki links (e.g., "[[:es:Articulo]]".
@@ -400,9 +400,10 @@ def expandmarker(text, marker='', separator=''):
 def getLanguageLinks(text, insite=None, pageLink="[[]]",
                      template_subpage=False):
     """
-    Return a dict of interlanguage links found in text.
+    Return a dict of inter-language links found in text.
 
-    Dict uses language codes as keys and Page objects as values.
+    The returned dict uses language codes as keys and Page objects as values.
+
     Do not call this routine directly, use Page.interwiki() method
     instead.
 
@@ -454,11 +455,11 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]",
 
 
 def removeLanguageLinks(text, site=None, marker=''):
-    """Return text with all interlanguage links removed.
+    """Return text with all inter-language links removed.
 
     If a link to an unknown language is encountered, a warning is printed.
     If a marker is defined, that string is placed at the location of the
-    last occurence of an interwiki link (at the end if there are no
+    last occurrence of an interwiki link (at the end if there are no
     interwiki links).
 
     """
@@ -480,12 +481,12 @@ def removeLanguageLinks(text, site=None, marker=''):
 
 def removeLanguageLinksAndSeparator(text, site=None, marker='', separator=''):
     """
-    Return text with all interlanguage links, plus any preceeding whitespace
+    Return text with all inter-language links, plus any preceding whitespace
     and separator occurrences removed.
 
     If a link to an unknown language is encountered, a warning is printed.
     If a marker is defined, that string is placed at the location of the
-    last occurence of an interwiki link (at the end if there are no
+    last occurrence of an interwiki link (at the end if there are no
     interwiki links).
 
     """
@@ -500,7 +501,7 @@ def removeLanguageLinksAndSeparator(text, site=None, marker='', separator=''):
 
 def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                          template=False, template_subpage=False):
-    """Replace interlanguage links in the text with a new set of links.
+    """Replace inter-language links in the text with a new set of links.
 
     'new' should be a dict with the Site objects as keys, and Page or Link
     objects as values (i.e., just like the dict returned by getLanguageLinks
@@ -699,7 +700,7 @@ def removeCategoryLinks(text, site=None, marker=''):
 
 def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
     """
-    Return text with all category links, plus any preceeding whitespace
+    Return text with all category links, plus any preceding whitespace
     and separator occurrences removed.
 
     Put the string marker after the last replacement (at the end of the text
@@ -902,7 +903,7 @@ def extract_templates_and_params(text):
     template in the page, with the template title as the first entry and a
     dict of parameters as the second entry.  Parameters are indexed by
     strings; as in MediaWiki, an unnamed parameter is given a parameter name
-    with an integer value corresponding to its position among the unnnamed
+    with an integer value corresponding to its position among the unnamed
     parameters, and if this results multiple parameters with the same name
     only the last value provided will be returned.
 
@@ -1117,11 +1118,11 @@ def does_text_contain_section(pagetext, section):
     Note: It does not care whether a section string may contain spaces or
           underlines. Both will match.
           If a section parameter contains a internal link, it will match the
-          section with or without a preleading colon which is required for a
+          section with or without a preceding colon which is required for a
           text link e.g. for categories and files.
 
     """
-    # match preleading colon for text links
+    # match preceding colon for text links
     section = re.sub(r'\\\[\\\[(\\\:)?', '\[\[\:?', re.escape(section))
     # match underscores and white spaces
     section = re.sub(r'\\[ _]', '[ _]', section)

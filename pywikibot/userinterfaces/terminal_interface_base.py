@@ -230,7 +230,7 @@ class UI:
         Parameters:
             * text      - a Unicode string
             * jumpIndex - an integer: position at which to put the caret
-            * highlight - a substring; each occurence will be highlighted
+            * highlight - a substring; each occurrence will be highlighted
 
         """
         try:

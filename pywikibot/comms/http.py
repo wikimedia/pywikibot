@@ -7,8 +7,8 @@ This module handles communication between the bot and the HTTP threads.
 This module is responsible for
     - Setting up a connection pool
     - Providing a (blocking) interface for HTTP requests
-    - Translate site objects with query strings into urls
-    - Urlencoding all data
+    - Translate site objects with query strings into URLs
+    - URL-encoding all data
     - Basic HTTP error handling
 """
 
@@ -127,12 +127,12 @@ def request(site, uri, ssl=False, *args, **kwargs):
     L{httplib2.Http.request}, but the uri is relative
 
     If the site argument is None the uri has to be absolute and is
-    taken. In this case ssl is ignored. Used for requests to non wiki
+    taken. In this case SSL is ignored. Used for requests to non wiki
     pages.
 
     @param site: The Site to connect to
     @param uri: the URI to retrieve (relative to the site's scriptpath)
-    @param ssl: Use https connection
+    @param ssl: Use HTTPS connection
     @return: The received data (a unicode string).
 
     """

@@ -669,7 +669,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         If get_Index is True then also load the templates for index articles
         which are given on en-wiki
 
-        Template:Disambig is always assumed to be default, and will be
+        'Template:Disambig' is always assumed to be default, and will be
         appended regardless of its existence.
 
         @return: bool
@@ -1109,7 +1109,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                 continue
 
     def langlinks(self, include_obsolete=False):
-        """Return a list of all interlanguage Links on this page.
+        """Return a list of all inter-language Links on this page.
 
         @param include_obsolete: if true, return even Link objects whose site
                                  is obsolete
@@ -1130,7 +1130,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             return filter(lambda i: not i.site.obsolete, self._langlinks)
 
     def iterlanglinks(self, step=None, total=None, include_obsolete=False):
-        """Iterate all interlanguage links on this page.
+        """Iterate all inter-language links on this page.
 
         @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
@@ -1295,7 +1295,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     def coordinates(self, primary_only=False):
         """Return a list of Coordinate objects for points on the page.
 
-        Uses [[mw:Extension:GeoData]]
+        Uses the MediaWiki extension GeoData.
 
         @param primary_only: Only return the coordinate indicated to be primary
         @return: A list of Coordinate objects
@@ -3100,7 +3100,7 @@ class PropertyPage(WikibasePage, Property):
 
     def newClaim(self, *args, **kwargs):
         """
-        Convenicence function to create a new claim object for this property.
+        Helper function to create a new claim object for this property.
 
         @return: Claim
         """
@@ -3142,7 +3142,7 @@ class Claim(Property):
         @type site: pywikibot.site.DataSite
         @param pid: property id, with "P" prefix
         @param snak: snak identifier for claim
-        @param hash: hash identifer for references
+        @param hash: hash identifier for references
         @param isReference: whether specified claim is a reference
         @param isQualifier: whether specified claim is a qualifier
         """
@@ -3228,7 +3228,7 @@ class Claim(Property):
     @staticmethod
     def qualifierFromJSON(site, data):
         """
-        Create a Claim for a qualifer from JSON.
+        Create a Claim for a qualifier from JSON.
 
         Qualifier objects are represented a bit
         differently like references, but I'm not
@@ -3261,7 +3261,7 @@ class Claim(Property):
 
         @param value: The new target value.
         @type value: object
-        @param snaktype: The new snaktype.
+        @param snaktype: The new snak type.
         @type value: str ('value', 'somevalue', or 'novalue')
         """
         if value:
@@ -3284,14 +3284,14 @@ class Claim(Property):
 
     def getSnakType(self):
         """
-        Return the "snaktype".
+        Return the type of snak.
 
         @return: str ('value', 'somevalue' or 'novalue')
         """
         return self.snaktype
 
     def setSnakType(self, value):
-        """Set the "snaktype".
+        """Set the type of snak.
 
         @param value: Type of snak
         @type value: str ('value', 'somevalue', or 'novalue')
@@ -3316,7 +3316,7 @@ class Claim(Property):
 
     def changeSnakType(self, value=None, **kwargs):
         """
-        Save the new snakvalue.
+        Save the new snak value.
 
         TODO: Is this function really needed?
         """
@@ -3547,7 +3547,7 @@ class Link(ComparableMixin):
         with multiple interwiki prefixes (such as "wikt:fr:Parlais") need
         to be re-parsed on the first linked wiki to get the actual site.
 
-        @return: tuple of (familyname, languagecode) for the linked site.
+        @return: tuple of (family-name, language-code) for the linked site.
 
         """
         t = self._text
@@ -3966,7 +3966,7 @@ def html2unicode(text, ignore=None):
 
 
 def UnicodeToAsciiHtml(s):
-    """Convert unicode to a bytestring using HTML entities."""
+    """Convert unicode to a str using HTML entities."""
     html = []
     for c in s:
         cord = ord(c)
@@ -3983,7 +3983,7 @@ def unicode2html(x, encoding):
 
     Attempt to encode the
     string into the desired format; if that doesn't work, encode the unicode
-    into html &#; entities. If it does work, return it unchanged.
+    into HTML &#; entities. If it does work, return it unchanged.
 
     @param x: String to update
     @type x: unicode
@@ -4000,7 +4000,7 @@ def unicode2html(x, encoding):
 
 
 def url2unicode(title, site, site2=None):
-    """Convert url-encoded text to unicode using site's encoding.
+    """Convert URL-encoded text to unicode using site's encoding.
 
     If site2 is provided, try its encodings as well.  Uses the first encoding
     that doesn't cause an error.
