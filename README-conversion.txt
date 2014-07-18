@@ -42,7 +42,7 @@ Just call it:
 pwb.py maintenance/compat2core [<script to convert>]
 and follow the instructions and hints.
 
-== Python librairies ==
+== Python libraries ==
 
 [Note: the goal will be to package pywikibot with setuptools easy_install,
 so that these dependencies will be loaded automatically when the package is
@@ -127,5 +127,17 @@ namespace. Any references to "userlib.User" can be replaced by
 The following changes have occured in the User object:
 
 - contributions(): returns a pywikibot.Timestamp object instead of a Mediawiki one
+
+=== Command-line arguments ===
+
+Scripts that supported unnamed arguments as titles of pages on which to work,
+now require that those titles be written as standard pagegenerators, e.g.:
+
+    python script.py -page:"A title"
+
+while unlink.py and other scripts that required page titles as main arguments
+now need only that the titles be wrapped in quotes, as:
+
+    python unlink.py "A title"
 
 # MORE TO COME #
