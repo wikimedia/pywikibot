@@ -3021,10 +3021,18 @@ class Property():
              'quantity': pywikibot.WbQuantity,
              }
 
-    def __init__(self, site, id=None):
-        """Constructor."""
+    def __init__(self, site, id=None, datatype=None):
+        """
+        Constructor.
+
+        @param datatype: datatype of the property;
+            if not given, it will be queried via the API
+        @type datatype: basestring
+        """
         self.repo = site
         self.id = id.upper()
+        if datatype:
+            self._type = datatype
 
     @property
     def type(self):
@@ -3132,7 +3140,7 @@ class Claim(Property):
     """
 
     def __init__(self, site, pid, snak=None, hash=None, isReference=False,
-                 isQualifier=False):
+                 isQualifier=False, **kwargs):
         """
         Constructor.
 
@@ -3146,7 +3154,7 @@ class Claim(Property):
         @param isReference: whether specified claim is a reference
         @param isQualifier: whether specified claim is a qualifier
         """
-        Property.__init__(self, site, pid)
+        Property.__init__(self, site, pid, **kwargs)
         self.snak = snak
         self.hash = hash
         self.isReference = isReference
@@ -3170,7 +3178,8 @@ class Claim(Property):
 
         @return: Claim
         """
-        claim = Claim(site, data['mainsnak']['property'])
+        claim = Claim(site, data['mainsnak']['property'],
+                      datatype=data['mainsnak'].get('datatype', None))
         if 'id' in data:
             claim.snak = data['id']
         elif 'hash' in data:
