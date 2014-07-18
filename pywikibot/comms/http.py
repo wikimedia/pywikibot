@@ -43,11 +43,13 @@ if sys.version_info[0] == 2:
     import Queue
     import urlparse
     import cookielib
+    from urllib2 import quote
 else:
     from ssl import SSLError as SSLHandshakeError
     import queue as Queue
     import urllib.parse as urlparse
     from http import cookiejar as cookielib
+    from urlparse import quote
 
 from pywikibot import config
 from pywikibot.exceptions import FatalServerError, Server504Error
@@ -65,12 +67,7 @@ _logger = "comm.http"
 # cf. `openssl errstr 14090086`
 SSL_CERT_VERIFY_FAILED = ":14090086:"
 
-# the User-agent: header. The default is
-# '<script>/<revision> Pywikibot/2.0', where '<script>' is the currently
-# executing script and version is the Git revision of Pywikibot.
-USER_AGENT_FORMAT = '{script}/r{version[rev]} Pywikibot/2.0'
-useragent = USER_AGENT_FORMAT.format(script=pywikibot.calledModuleName(),
-                                     version=pywikibot.version.getversiondict())
+
 numthreads = 1
 threads = []
 
@@ -148,9 +145,12 @@ def request(site, uri, ssl=False, *args, **kwargs):
     else:
         baseuri = uri
 
-    # set default user-agent string
-    kwargs.setdefault("headers", {})
-    kwargs["headers"].setdefault("user-agent", useragent)
+    kwargs["headers"]["user-agent"] = config.USER_AGENT_FORMAT.format(
+        script=pywikibot.calledModuleName(),
+        version=pywikibot.version.getversiondict()['rev'],
+        username=quote(site.username()),
+        lang=site.lang,
+        family=site.family.name)
     request = threadedhttp.HttpRequest(baseuri, *args, **kwargs)
     http_queue.put(request)
     while not request.lock.acquire(False):
