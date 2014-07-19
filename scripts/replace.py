@@ -364,7 +364,8 @@ class ReplaceRobot:
                     if self.addedCat not in cats:
                         cats.append(self.addedCat)
                         new_text = pywikibot.replaceCategoryLinks(new_text,
-                                                                  cats)
+                                                                  cats,
+                                                                  site=page.site)
                 # Show the title of the page we're working on.
                 # Highlight the title in purple.
                 pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"

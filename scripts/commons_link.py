@@ -83,7 +83,7 @@ class CommonsLinkBot(Bot):
                             text = textlib.replaceCategoryLinks(
                                 u'%s{{commons%s|%s}}'
                                 % (text, ('', 'cat')[catmode], pagetitle),
-                                cats)
+                                cats, site=page.site)
                             comment = i18n.twtranslate(page.site,
                                                        'commons_link%s-template-added'
                                                        % ('', '-cat')[catmode])
