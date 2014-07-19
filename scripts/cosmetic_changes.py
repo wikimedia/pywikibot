@@ -170,7 +170,7 @@ class CosmeticChangesToolkit:
         if self.site.sitename() == u'commons:commons' and self.namespace == 6:
             text = self.commonsfiledesc(text)
         text = self.fixSelfInterwiki(text)
-## bug 66921       text = self.standardizePageFooter(text)
+        text = self.standardizePageFooter(text)
         text = self.fixSyntaxSave(text)
         text = self.cleanUpLinks(text)
         text = self.cleanUpSectionHeaders(text)
