@@ -89,7 +89,8 @@ class TestSiteObject(PywikibotTestCase):
         """Test cases for methods manipulating namespace names"""
 
         builtins = {
-            'Talk': 1,  # these should work in any MW wiki
+            '': 0,  # these should work in any MW wiki
+            'Talk': 1,
             'User': 2,
             'User talk': 3,
             'Project': 4,
