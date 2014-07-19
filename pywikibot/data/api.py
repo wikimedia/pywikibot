@@ -26,6 +26,7 @@ import pprint
 import re
 import traceback
 import time
+from distutils.version import LooseVersion as LV
 
 import pywikibot
 from pywikibot import config, login
@@ -141,7 +142,20 @@ class Request(MutableMapping):
             "wbremoveclaims", "wbsetclaimvalue", "wbsetreference",
             "wbremovereferences"
         )
-        if self.params["action"] == "edit":
+        # MediaWiki 1.23 allows assertion for any action,
+        # whereas earlier WMF wikis and others used an extension which
+        # could only allow assert for action=edit.  Do not look up
+        # the extension info if the siteinfo has not been loaded,
+        # otherwise cyclic recursion will occur.
+
+        # Check siteinfo has not been loaded to avoid infinite loop
+        if hasattr(self.site, "_siteinfo"):
+            use_assert_edit_extension = self.site.hasExtension('AssertEdit', False)
+        else:
+            use_assert_edit_extension = True
+
+        if (self.write and LV(self.site.version()) >= LV("1.23") or
+                self.params["action"] == "edit" and use_assert_edit_extension):
             pywikibot.debug(u"Adding user assertion", _logger)
             self.params["assert"] = "user"  # make sure user is logged in
 
