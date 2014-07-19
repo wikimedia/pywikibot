@@ -92,7 +92,7 @@ This will move all pages in the category US to the category United States.
 # (C) Cyde, 2006-2010
 # (C) Anreas J Schwab, 2007
 # (C) xqt, 2009-2014
-# (C) Pywikibot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -131,11 +131,13 @@ cfd_templates = {
 
 
 class CategoryDatabase:
-    '''This is a temporary knowledge base saving for each category the contained
+
+    """This is a temporary knowledge base saving for each category the contained
     subcategories and articles, so that category pages do not need to be loaded
     over and over again
 
-    '''
+    """
+
     def __init__(self, rebuild=False, filename='category.dump.bz2'):
         if rebuild:
             self.rebuild()
@@ -163,11 +165,11 @@ class CategoryDatabase:
         self.superclassDB = {}
 
     def getSubcats(self, supercat):
-        '''For a given supercategory, return a list of Categorys for all its
+        """For a given supercategory, return a list of Categorys for all its
         subcategories. Saves this list in a temporary database so that it won't
         be loaded from the server next time it's required.
 
-        '''
+        """
         # if we already know which subcategories exist here
         if supercat in self.catContentDB:
             return self.catContentDB[supercat][0]
@@ -179,11 +181,11 @@ class CategoryDatabase:
             return subcatset
 
     def getArticles(self, cat):
-        '''For a given category, return a list of Pages for all its articles.
+        """For a given category, return a list of Pages for all its articles.
         Saves this list in a temporary database so that it won't be loaded from
         the server next time it's required.
 
-        '''
+        """
         # if we already know which articles exist here
         if cat in self.catContentDB:
             return self.catContentDB[cat][1]
@@ -205,10 +207,9 @@ class CategoryDatabase:
             return supercatset
 
     def dump(self, filename='category.dump.bz2'):
-        '''Saves the contents of the dictionaries superclassDB and catContentDB
+        """Save the contents of the dictionaries superclassDB and catContentDB
         to disk.
-
-        '''
+        """
         if not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         if self.catContentDB or self.superclassDB:
@@ -236,7 +237,8 @@ class CategoryDatabase:
 
 
 class AddCategory:
-    '''A robot to mass-add a category to a list of pages.'''
+
+    """A robot to mass-add a category to a list of pages."""
 
     def __init__(self, generator, sort_by_last_name=False, create=False,
                  editSummary='', follow_redirects=False, dry=False):
@@ -250,7 +252,7 @@ class AddCategory:
         self.editSummary = editSummary
 
     def sorted_by_last_name(self, catlink, pagelink):
-        '''Return a Category with key that sorts persons by their last name.
+        """Return a Category with key that sorts persons by their last name.
 
         Parameters: catlink - The Category to be linked
                     pagelink - the Page to be placed in the category
@@ -260,7 +262,7 @@ class AddCategory:
         (senior)]], this function will return this Category:
         [[Category:Author|Dumas, Alexandre]]
 
-        '''
+        """
         page_name = pagelink.title()
         site = pagelink.site
         # regular expression that matches a name followed by a space and
@@ -290,9 +292,7 @@ class AddCategory:
         pywikibot.output(u"%d page(s) processed." % counter)
 
     def load(self, page):
-        """
-        Loads the given page, does some changes, and saves it.
-        """
+        """Load the given page, do some changes, and save it."""
         try:
             # Load the page
             text = page.get()
@@ -393,10 +393,12 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
 
 
 class CategoryMoveRobot(object):
+
     """Bot to move pages from one category to another or to remove
     pages from categories. The bot moves per default pages and
     subcategories.
     """
+
     @deprecate_arg("oldCatTitle", "oldcat")
     @deprecate_arg("newCatTitle", "newcat")
     @deprecate_arg("batchMode", "batch")
@@ -568,7 +570,9 @@ class CategoryMoveRobot(object):
 
 
 class CategoryListifyRobot:
-    '''Creates a list containing all of the members in a category.'''
+
+    """Create a list containing all of the members in a category."""
+
     def __init__(self, catTitle, listTitle, editSummary, overwrite=False,
                  showImages=False, subCats=False, talkPages=False,
                  recurse=False):
@@ -617,13 +621,14 @@ class CategoryListifyRobot:
 
 
 class CategoryRemoveRobot:
-    '''Removes the category tag from all pages in a given category
-    and if pagesonly parameter is False also from the category pages of all
-    subcategories, without prompting. If the category is empty, it will be
-    tagged for deleting. Does not remove category tags pointing at
-    subcategories.
 
-    '''
+    """Remove the category tag from all pages in a given category
+    and if pagesonly parameter is False also from the category pages of all
+    subcategories, without prompting.
+    If the category is empty, it will be tagged for deletion.
+    Do not remove category tags pointing at subcategories.
+
+    """
 
     def __init__(self, catTitle, batchMode=False, editSummary='',
                  useSummaryForDeletion=True, titleRegex=None, inPlace=False,
@@ -683,6 +688,7 @@ class CategoryRemoveRobot:
 
 
 class CategoryTidyRobot:
+
     """Script to help a human to tidy up a category by moving its articles into
     subcategories
 
@@ -706,6 +712,7 @@ class CategoryTidyRobot:
        account uses this skin
 
     """
+
     def __init__(self, catTitle, catDB):
         self.catTitle = catTitle
         self.catDB = catDB
@@ -715,13 +722,13 @@ class CategoryTidyRobot:
                                              'newcat': u''})
 
     def move_to_category(self, article, original_cat, current_cat):
-        '''
+        """
         Given an article which is in category original_cat, ask the user if
         it should be moved to one of original_cat's subcategories.
         Recursively run through subcategories' subcategories.
         NOTE: current_cat is only used for internal recursion. You should
         always use current_cat = original_cat.
-        '''
+        """
         pywikibot.output(u'')
         # Show the title of the page where the link was found.
         # Highlight the title in purple.
@@ -763,12 +770,11 @@ class CategoryTidyRobot:
         for i, subcat in enumerate(subcatlist):
             # layout: we don't expect a cat to have more than 100 subcats
             pywikibot.output(u'%2d - Move down to %s' % (i, subcat.title()))
-        pywikibot.output(' j - Jump to another category')
-        pywikibot.output(' s - Skip this article')
-        pywikibot.output(' r - Remove this category tag')
-        pywikibot.output(
-            ' ? - Print first part of the page (longer and longer)')
-        pywikibot.output(u'Enter - Save category as %s' % current_cat.title())
+        pywikibot.output(' j - Jump to another category\n'
+                         ' s - Skip this article\n'
+                         ' r - Remove this category tag\n'
+                         ' ? - Print first part of the page (longer and longer)\n'
+                         u'Enter - Save category as %s' % current_cat.title())
 
         flag = False
         while not flag:
@@ -831,8 +837,8 @@ class CategoryTidyRobot:
         cat = pywikibot.Category(self.site, self.catTitle)
 
         if cat.categoryinfo['pages'] == 0:
-            pywikibot.output(u'There are no articles in category ' +
-                             self.catTitle)
+            pywikibot.output(u'There are no articles in category %s'
+                             % self.catTitle)
         else:
             preloadingGen = pagegenerators.PreloadingGenerator(cat.articles())
             for article in preloadingGen:
@@ -842,6 +848,7 @@ class CategoryTidyRobot:
 
 
 class CategoryTreeRobot:
+
     """ Robot to create tree overviews of the category structure.
 
     Parameters:
@@ -873,7 +880,6 @@ class CategoryTreeRobot:
             * parent - the Category of the category we're coming from
 
         """
-
         result = u'#' * currentDepth
         if currentDepth > 0:
             result += u' '
@@ -964,18 +970,8 @@ def main(*args):
     follow_redirects = False
     deleteEmptySourceCat = True
     for arg in local_args:
-        if arg == 'add':
-            action = 'add'
-        elif arg == 'remove':
-            action = 'remove'
-        elif arg == 'move':
-            action = 'move'
-        elif arg == 'tidy':
-            action = 'tidy'
-        elif arg == 'tree':
-            action = 'tree'
-        elif arg == 'listify':
-            action = 'listify'
+        if arg in ('add', 'remove', 'move', 'tidy', 'tree', 'listify'):
+            action = arg
         elif arg == '-nodelete':
             deleteEmptySourceCat = False
         elif arg == '-person':
@@ -1081,7 +1077,7 @@ def main(*args):
                                    talkPages=talkPages, recurse=recurse)
         bot.run()
     else:
-        pywikibot.showHelp('category')
+        pywikibot.showHelp()
 
 
 if __name__ == "__main__":
