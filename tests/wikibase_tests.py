@@ -224,6 +224,15 @@ class TestItemLoad(PywikibotTestCase):
         self.assertRaises(pywikibot.InvalidTitle, pywikibot.ItemPage.fromPage, page)
 
     def _test_fromPage_noitem(self, link):
+        """Helper function to test a page without an associated item.
+
+        It tests two of the ways to fetch an item:
+        1. the Page already has props, which should contain a item id if
+           present, and that item id is used to instantiate the item, and
+        2. the page doesnt have props, in which case the site&titles is
+           used to lookup the item id, but that lookup occurs after
+           instantiation, during the first attempt to use the data item.
+        """
         for props in [True, False]:
             for method in ['title', 'get', 'getID', 'exists']:
                 page = pywikibot.Page(link)
@@ -243,8 +252,15 @@ class TestItemLoad(PywikibotTestCase):
                 else:
                     self.assertRaises(pywikibot.NoPage, getattr(item, method))
 
-                # invoking any of those methods changes the title to '-1'
-                self.assertEquals(item._link._title, '-1')
+                # The invocation above of a fetching method shouldnt change
+                # the local item, but it does!  The title changes to '-1'.
+                #
+                # However when identifying the item for 'en:Test page'
+                # (a deleted page), the exception handling is smarter, and no
+                # local data is modified in this scenario.  This case is
+                # separately tested in test_fromPage_missing_lazy.
+                if link.title != 'Test page':
+                    self.assertEquals(item._link._title, '-1')
 
                 self.assertEquals(hasattr(item, '_content'), True)
 
@@ -265,6 +281,21 @@ class TestItemLoad(PywikibotTestCase):
         page = get_test_unconnected_page(site)
         link = page._link
         self._test_fromPage_noitem(link)
+
+    def test_fromPage_missing_lazy(self):
+        """Test lazy loading of item from nonexistent source page."""
+        # this is a deleted page, and should not have a wikidata item
+        link = pywikibot.page.Link("Test page", site)
+        page = pywikibot.Page(link)
+        item = pywikibot.ItemPage.fromPage(page)
+
+        # Now verify that delay loading will result in the desired semantics.
+        # It should not raise NoPage on the wikibase item which has a title
+        # like '-1' or 'Null', as that is useless to determine the cause
+        # without a full debug log.
+        # It should raise NoPage on the page, as that is what the
+        # bot operator needs to see in the log output.
+        self.assertRaisesRegexp(pywikibot.NoPage, 'Test page', item.get)
 
 
 class TestPropertyPage(PywikibotTestCase):
