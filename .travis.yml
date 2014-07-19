@@ -4,19 +4,13 @@ python:
   - '2.6'
   - '2.7'
 
-env:
-  - LANG=en FAMILY=wikipedia
-  - LANG=ar FAMILY=wikipedia
-  - LANG=test FAMILY=wikidata
-
 install:
   - mkdir ~/.pywikibot
 
   - touch ~/.pywikibot/user-config.py
   - echo "import os" >> ~/.pywikibot/user-config.py
-  - echo "mylang = '$LANG'" >> ~/.pywikibot/user-config.py
-  - echo "family = '$FAMILY'" >> ~/.pywikibot/user-config.py
-  - echo "usernames['$FAMILY']['$LANG'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
+  - echo "mylang = 'en'" >> ~/.pywikibot/user-config.py
+  - echo "family = 'wikipedia'" >> ~/.pywikibot/user-config.py
   - echo "usernames['wikipedia']['en'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
   - echo "password_file = os.path.expanduser('~/.pywikibot/passwordfile')" >> ~/.pywikibot/user-config.py
 
