@@ -3867,7 +3867,7 @@ class DataSite(APISite):
         if bot:
             params['bot'] = 1
         if claim.getSnakType() == 'value':
-            params['value'] = json.dumps(claim._formatDataValue())
+            params['value'] = json.dumps(claim._formatValue())
         if 'summary' in kwargs:
             params['summary'] = kwargs['summary']
         params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
@@ -3908,7 +3908,7 @@ class DataSite(APISite):
         params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
                                      'edit')
         if snaktype == 'value':
-            params['value'] = json.dumps(claim._formatDataValue())
+            params['value'] = json.dumps(claim._formatValue())
 
         params['baserevid'] = claim.on_item.lastrevid
         req = api.Request(site=self, **params)
@@ -3946,21 +3946,7 @@ class DataSite(APISite):
 
         snak = {}
         for sourceclaim in sources:
-            if sourceclaim.type == 'wikibase-item':
-                datavalue = {'type': 'wikibase-entityid',
-                             'value': sourceclaim._formatDataValue(),
-                             }
-            elif sourceclaim.type in ['string', 'url']:
-                datavalue = {'type': 'string',
-                             'value': sourceclaim._formatDataValue(),
-                             }
-            elif sourceclaim.type == 'time':
-                datavalue = {'type': 'time',
-                             'value': sourceclaim._formatDataValue(),
-                             }
-            else:
-                raise NotImplementedError('%s datatype is not supported yet.'
-                                          % sourceclaim.type)
+            datavalue = sourceclaim._formatDataValue()
             valuesnaks = []
             if sourceclaim.getID() in snak:
                 valuesnaks = snak[sourceclaim.getID()]
@@ -4011,7 +3997,7 @@ class DataSite(APISite):
                                      'edit')
         # build up the snak
         if qualifier.getSnakType() == 'value':
-            params['value'] = json.dumps(qualifier._formatDataValue())
+            params['value'] = json.dumps(qualifier._formatValue())
         params['snaktype'] = qualifier.getSnakType()
         params['property'] = qualifier.getID()
 

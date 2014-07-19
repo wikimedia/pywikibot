@@ -55,7 +55,7 @@ class TestGeneral(PywikibotTestCase):
         claim = pywikibot.Claim(repo, 'p21')
         self.assertRaises(ValueError, claim.setTarget, value="test")
         claim.setTarget(pywikibot.ItemPage(repo, 'q1'))
-        self.assertEqual(claim._formatDataValue(), {'entity-type': 'item', 'numeric-id': 1})
+        self.assertEqual(claim._formatValue(), {'entity-type': 'item', 'numeric-id': 1})
 
         # test WbTime
         t = pywikibot.WbTime(site=wikidata, year=2010, hour=12, minute=43)
