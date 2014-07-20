@@ -4,7 +4,7 @@ Script to copy images to Wikimedia Commons, or to another wiki.
 
 Syntax:
 
-    python imagetransfer.py pagename [-interwiki] [-targetLang:xx] -targetFamily:yy]
+    python imagetransfer.py pagename [-interwiki] [-tolang:xx] [-tofamily:yy]
 
 Arguments:
 
@@ -38,7 +38,6 @@ import pywikibot
 import upload
 from pywikibot import config
 from pywikibot import i18n
-from pywikibot import pagegenerators
 
 copy_message = {
     'ar': u"هذه الصورة تم نقلها من %s. الوصف الأصلي كان:\r\n\r\n%s",
@@ -298,16 +297,17 @@ class ImageTransferBot:
 
 
 def main():
-    # if -file is not used, this temporary array is used to read the page title.
-    pageTitle = []
-    page = None
+    pageTitle = None
     gen = None
+
     interwiki = False
     keep_name = False
     targetLang = None
     targetFamily = None
 
-    for arg in pywikibot.handleArgs():
+    local_args = pywikibot.handleArgs()
+
+    for arg in local_args:
         if arg == '-interwiki':
             interwiki = True
         elif arg.startswith('-keepname'):
@@ -316,29 +316,15 @@ def main():
             targetLang = arg[8:]
         elif arg.startswith('-tofamily:'):
             targetFamily = arg[10:]
-        elif arg.startswith('-file'):
-            if len(arg) == 5:
-                filename = pywikibot.input(
-                    u'Please enter the list\'s filename: ')
-            else:
-                filename = arg[6:]
-            gen = pagegenerators.TextfilePageGenerator(filename)
-        else:
-            pageTitle.append(arg)
+        elif not pageTitle:
+            pageTitle = arg
 
-    if not gen:
-        # if the page title is given as a command line argument,
-        # connect the title's parts with spaces
-        if pageTitle != []:
-            pageTitle = ' '.join(pageTitle)
-            page = pywikibot.Page(pywikibot.Site(), pageTitle)
-        # if no page title was given as an argument, and none was
-        # read from a file, query the user
-        if not page:
-            pageTitle = pywikibot.input(u'Which page to check:')
-            page = pywikibot.Page(pywikibot.Site(), pageTitle)
-            # generator which will yield only a single Page
+    if pageTitle:
+        page = pywikibot.Page(pywikibot.Site(), pageTitle)
         gen = iter([page])
+    else:
+        pywikibot.showHelp()
+        return
 
     if not targetLang and not targetFamily:
         targetSite = pywikibot.Site('commons', 'commons')

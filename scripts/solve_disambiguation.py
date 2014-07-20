@@ -3,12 +3,11 @@
 """
 Script to help a human solve disambiguations by presenting a set of options.
 
-Specify the disambiguation page on the command line, or enter it at the
-prompt after starting the program. (If the disambiguation page title starts
-with a '-', you cannot name it on the command line, but you can enter it at
-the prompt.)  The program will pick up the page, and look for all
-alternative links, and show them with a number adjacent to them.  It will
-then automatically loop over all pages referring to the disambiguation page,
+Specify the disambiguation page on the command line.
+
+The program will pick up the page, and look for all alternative links,
+and show them with a number adjacent to them.  It will then automatically
+loop over all pages referring to the disambiguation page,
 and show 30 characters of context on each side of the reference to help you
 make the decision between the alternatives.  It will ask you to type the
 number of the appropriate replacement, and perform the change.
@@ -1017,19 +1016,17 @@ def main(*args):
     alternatives = []
     getAlternatives = True
     dnSkip = False
-    # if the -file argument is used, page titles are dumped in this array.
-    # otherwise it will only contain one page.
     generator = None
-    # This temporary array is used to read the page title if one single
-    # page to work on is specified by the arguments.
-    pageTitle = []
+    pageTitle = None
     primary = False
     main_only = False
 
     # For sorting the linked pages, case can be ignored
     minimum = 0
 
-    for arg in pywikibot.handleArgs(*args):
+    local_args = pywikibot.handleArgs(*args)
+
+    for arg in local_args:
         if arg.startswith('-primary:'):
             primary = True
             getAlternatives = False
@@ -1081,29 +1078,19 @@ def main(*args):
             except pywikibot.NoPage:
                 pywikibot.output("Disambiguation category for your wiki is not known.")
                 raise
-        elif arg.startswith("-"):
-            pywikibot.output("Unrecognized command line argument: %s" % arg)
-            # show help text and exit
-            pywikibot.showHelp()
-        else:
-            pageTitle.append(arg)
+        elif not pageTitle:
+            pageTitle = arg
+
     site = pywikibot.Site()
     site.login()
 
-    # if the disambiguation page is given as a command line argument,
-    # connect the title's parts with spaces
-    if pageTitle != []:
-        pageTitle = ' '.join(pageTitle)
+    if pageTitle:
         page = pywikibot.Page(pywikibot.Link(pageTitle, site))
         generator = iter([page])
 
-    # if no disambiguation page was given as an argument, and none was
-    # read from a file, query the user
     if not generator:
-        pageTitle = pywikibot.input(
-            u'On which disambiguation page do you want to work?')
-        page = pywikibot.Page(pywikibot.Link(pageTitle, site))
-        generator = iter([page])
+        pywikibot.showHelp()
+        return
 
     bot = DisambiguationRobot(always, alternatives, getAlternatives, dnSkip,
                               generator, primary, main_only,

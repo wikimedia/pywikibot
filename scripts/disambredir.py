@@ -3,6 +3,12 @@
 """
 Goes through the disambiguation pages, checks their links, and asks for
 each link that goes to a redirect page whether it should be replaced.
+
+Usage:
+    python disambredir.py [start]
+
+If no starting name is provided, the bot starts at '!'.
+
 """
 #
 # (c) André Engels and others, 2006-2009
@@ -144,21 +150,24 @@ def workon(page, links):
 
 
 def main():
-    start = []
-    for arg in pywikibot.handleArgs():
-        start.append(arg)
-    if start:
-        start = " ".join(start)
-    else:
-        start = "!"
+    local_args = pywikibot.handleArgs()
+
+    generator = None
+    start = local_args[0] if local_args else '!'
+
     mysite = pywikibot.Site()
     try:
+        mysite.disambcategory()
+    except pywikibot.Error as e:
+        pywikibot.output(e)
+    else:
         generator = pagegenerators.CategorizedPageGenerator(
             mysite.disambcategory(), start=start)
-    except pywikibot.NoPage:
-        pywikibot.output(
-            "The bot does not know the disambiguation category for your wiki.")
-        raise
+
+    if not generator:
+        pywikibot.showHelp()
+        return
+
     # only work on articles
     generator = pagegenerators.NamespaceFilterPageGenerator(generator, [0])
     generator = pagegenerators.PreloadingGenerator(generator)

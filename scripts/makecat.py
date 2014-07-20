@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
 """
-This bot takes as its argument (or, if no argument is given, asks for it), the
-name of a new or existing category. It will then try to find new articles for
-this category (pages linked to and from pages already in the category), asking
-the user which pages to include and which not.
+This bot takes as its argument the name of a new or existing category.
+
+It will then try to find new articles for this category
+(pages linked to and from pages already in the category),
+asking the user which pages to include and which not.
 
 Arguments:
    -nodates  automatically skip all pages that are years or dates (years
@@ -39,6 +40,7 @@ L(ist) - show current list of pages to include or to check
 __version__ = '$Id$'
 #
 
+import sys
 import codecs
 import pywikibot
 from pywikibot import date, pagegenerators, i18n
@@ -192,7 +194,7 @@ try:
     checkbroken = True
     removeparent = True
     main = True
-    workingcatname = []
+    workingcatname = ''
     tocheck = []
     for arg in pywikibot.handleArgs():
         if arg.startswith('-nodate'):
@@ -206,13 +208,13 @@ try:
             removeparent = False
         elif arg.startswith('-all'):
             main = False
-        else:
-            workingcatname.append(arg)
+        elif not workingcatname:
+            workingcatname = arg
 
-    if len(workingcatname) == 0:
-        workingcatname = pywikibot.input("Which page to start with? ")
-    else:
-        workingcatname = ' '.join(workingcatname)
+    if not workingcatname:
+        pywikibot.showHelp()
+        sys.exit(0)
+
     mysite = pywikibot.Site()
     pywikibot.setAction(i18n.twtranslate(mysite, 'makecat-create', {'cat': workingcatname}))
     workingcat = pywikibot.Category(mysite,
