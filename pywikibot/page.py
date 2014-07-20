@@ -2836,6 +2836,9 @@ class ItemPage(WikibasePage):
         @param page: Page
         @return: ItemPage
         """
+        if not page.site.has_transcluded_data:
+            raise pywikibot.WikiBaseError(u'%s has no transcluded data'
+                                          % page.site)
         repo = page.site.data_repository()
         if hasattr(page,
                    '_pageprops') and page.properties().get('wikibase_item'):
