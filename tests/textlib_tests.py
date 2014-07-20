@@ -100,8 +100,8 @@ class TestFormatFunctions(PywikibotTestCase):
 
     def test_interwiki_format(self):
         interwikis = {
-            'de': pywikibot.Page(pywikibot.Link('de:German')),
-            'fr': pywikibot.Page(pywikibot.Link('fr:French'))
+            'de': pywikibot.Page(pywikibot.Link('de:German', self.site)),
+            'fr': pywikibot.Page(pywikibot.Link('fr:French', self.site))
         }
         self.assertEqual('[[de:German]]%(LS)s[[fr:French]]%(LS)s'
                          % {'LS': config.LS},
