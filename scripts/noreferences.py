@@ -24,9 +24,6 @@ These command line parameters can be used to specify which pages to work on:
 
     -quiet        Use this option to get less output
 
-All other parameters will be regarded as part of the title of a single page,
-and the bot will only work on that single page.
-
 If neither a page title nor a page generator is given, it takes all pages from
 the default maintenance category.
 
@@ -689,9 +686,6 @@ class NoReferencesBot(object):
 def main():
     # page generator
     gen = None
-    # This temporary array is used to read the page title if one single
-    # page to work on is specified by the arguments.
-    pageTitle = []
     # Which namespaces should be processed?
     # default to [] which means all namespaces will be processed
     namespaces = []
@@ -721,12 +715,8 @@ def main():
         elif arg == '-quiet':
             verbose = False
         else:
-            if not genFactory.handleArg(arg):
-                pageTitle.append(arg)
+            genFactory.handleArg(arg)
 
-    if pageTitle:
-        page = pywikibot.Page(pywikibot.Site(), ' '.join(pageTitle))
-        gen = iter([page])
     if not gen:
         gen = genFactory.getCombinedGenerator()
     if not gen:

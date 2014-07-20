@@ -18,9 +18,6 @@ The following parameters are supported:
                   the predefined message texts with original and replacements
                   inserted.
 
-All other parameters will be regarded as part of the title of a single page,
-and the bot will only work on that single page.
-
 &warning;
 
 For regular use, it is recommended to put this line into your user-config.py:
@@ -887,9 +884,6 @@ class CosmeticChangesBot(Bot):
 
 
 def main():
-    #page generator
-    gen = None
-    pageTitle = []
     answer = 'y'
     options = {}
 
@@ -904,8 +898,8 @@ def main():
             options['always'] = True
         elif arg == '-async':
             options['async'] = True
-        elif not genFactory.handleArg(arg):
-            pageTitle.append(arg)
+        else:
+            genFactory.handleArg(arg)
 
     site = pywikibot.Site()
     site.login()
@@ -914,13 +908,9 @@ def main():
         # Load default summary message.
         options['comment'] = i18n.twtranslate(site,
                                               'cosmetic_changes-standalone')
-    if pageTitle:
-        gen = iter([pywikibot.Page(pywikibot.Link(t, site)) for t in pageTitle])
-    if not gen:
-        gen = genFactory.getCombinedGenerator()
-    if not gen:
-        pywikibot.showHelp()
-    else:
+
+    gen = genFactory.getCombinedGenerator()
+    if gen:
         if not options.get('always'):
             answer = pywikibot.inputChoice(
                 warning + '\nDo you really want to continue?',
@@ -929,6 +919,8 @@ def main():
             preloadingGen = pagegenerators.PreloadingGenerator(gen)
             bot = CosmeticChangesBot(preloadingGen, **options)
             bot.run()
+    else:
+        pywikibot.showHelp()
 
 if __name__ == "__main__":
     try:

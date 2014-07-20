@@ -11,11 +11,10 @@ The following parameters are supported:
 
 -
 
-All other parameters will be regarded as part of the title of a single page,
-and the bot will only work on that single page.
 """
 #
 # (C) xqt, 2010-2014
+# (C) Pywikibot team, 2014
 #
 # Distributed under the terms of the MIT license.
 #

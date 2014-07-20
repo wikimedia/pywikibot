@@ -54,9 +54,6 @@ Furthermore, the following command line parameters are supported:
 -day         the first time found dead link longer than x day ago, it should
              probably be fixed or removed. if no set, default is 7 day.
 
-All other parameters will be regarded as part of the title of a single page,
-and the bot will only work on that single page.
-
 The following config variables are supported:
 
 max_external_links        - The maximum number of web pages that should be
@@ -121,7 +118,7 @@ docuReplacements = {
 }
 
 ignorelist = [
-    # Officialy reserved for testing, documentation, etc. in
+    # Officially reserved for testing, documentation, etc. in
     # https://tools.ietf.org/html/rfc2606#page-2
     # top-level domains:
     re.compile('.*[\./@]test(/.*)?'),
@@ -801,7 +798,6 @@ def check(url):
 
 def main():
     gen = None
-    singlePageTitle = []
     xmlFilename = None
     # Which namespaces should be processed?
     # default to [] which means all namespaces will be processed
@@ -841,13 +837,7 @@ def main():
             else:
                 xmlFilename = arg[5:]
         else:
-            if not genFactory.handleArg(arg):
-                singlePageTitle.append(arg)
-
-    if singlePageTitle:
-        singlePageTitle = ' '.join(singlePageTitle)
-        page = pywikibot.Page(pywikibot.Site(), singlePageTitle)
-        gen = iter([page])
+            genFactory.handleArg(arg)
 
     if xmlFilename:
         try:

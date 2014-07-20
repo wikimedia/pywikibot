@@ -14,9 +14,6 @@ This script understands various command-line arguments:
 
 -redir            specifies that the bot should work on redirect pages;
                   otherwise, they will be skipped.
-
-All other parameters will be regarded as a page title; in this case, the bot
-will only touch a single page.
 """
 #
 # (C) Pywikibot team, 2009-2014
@@ -73,10 +70,6 @@ class TouchBot(pywikibot.Bot):
 def main(*args):
     gen = None
     options = {}
-    # If the user chooses to work on a single page, this temporary array is
-    # used to read the words from the page title. The words will later be
-    # joined with spaces to retrieve the full title.
-    pageTitle = []
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handleArgs(*args)
@@ -87,21 +80,14 @@ def main(*args):
             continue
         if arg.startswith("-"):
             options[arg[1:].lower()] = True
-        else:
-            pageTitle.append(arg)
     pywikibot.Site().login()
     gen = genFactory.getCombinedGenerator()
-    if not gen:
-        if pageTitle:
-            # work on a single page
-            page = pywikibot.Page(pywikibot.Link(' '.join(pageTitle)))
-            gen = iter([page])
-        else:
-            pywikibot.showHelp()
-            return
-    preloadingGen = pagegenerators.PreloadingGenerator(gen)
-    bot = TouchBot(preloadingGen, **options)
-    bot.run()
+    if gen:
+        preloadingGen = pagegenerators.PreloadingGenerator(gen)
+        bot = TouchBot(preloadingGen, **options)
+        bot.run()
+    else:
+        pywikibot.showHelp()
 
 
 if __name__ == "__main__":

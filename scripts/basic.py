@@ -14,8 +14,6 @@ The following parameters are supported:
 -dry              If given, doesn't do any real changes, but only shows
                   what would have been changed.
 
-All other parameters will be regarded as part of the title of a single page,
-and the bot will only work on that single page.
 """
 #
 # (C) Pywikibot team, 2006-2014
@@ -150,9 +148,6 @@ def main():
     genFactory = pagegenerators.GeneratorFactory()
     # The generator gives the pages that should be worked upon.
     gen = None
-    # This temporary array is used to read the page title if one single
-    # page to work on is specified by the arguments.
-    pageTitleParts = []
     # If dry is True, doesn't do any real changes, but only show
     # what would have been changed.
     dry = False
@@ -162,17 +157,9 @@ def main():
         if arg.startswith("-dry"):
             dry = True
         else:
-            # check if a standard argument like
-            # -start:XYZ or -ref:Asdf was given.
-            if not genFactory.handleArg(arg):
-                pageTitleParts.append(arg)
+            genFactory.handleArg(arg)
 
     site.login()
-    if pageTitleParts != []:
-        # We will only work on a single page.
-        pageTitle = ' '.join(pageTitleParts)
-        page = pywikibot.Page(pywikibot.Link(pageTitle, site))
-        gen = iter([page])
 
     if not gen:
         gen = genFactory.getCombinedGenerator()
