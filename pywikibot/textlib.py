@@ -649,8 +649,8 @@ def interwikiSort(sites, insite=None):
 def getCategoryLinks(text, site=None):
     """Return a list of category links found in text.
 
-    List contains Category objects.
-    Do not call this routine directly, use Page.categories() instead.
+    @return: all category links found
+    @returntype: list of Category objects
 
     """
     result = []
