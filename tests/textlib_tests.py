@@ -130,6 +130,26 @@ class TestFormatFunctions(PywikibotTestCase):
                          textlib.categoryFormat(data, self.site))
 
 
+class TestCategoryRearrangement(PywikibotTestCase):
+
+    """
+    Tests to ensure that sorting keys are not being lost when
+    using .getCategoryLinks() and .replaceCategoryLinks().
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.site = pywikibot.Site('en', 'wikipedia')
+        cls.old = ('[[Category:Cat1]]%(LS)s[[Category:Cat2|]]%(LS)s'
+                   '[[Category:Cat1| ]]%(LS)s[[Category:Cat2|key]]'
+                   % {'LS': config.LS})
+
+    def test_replace_category_links(self):
+        cats = textlib.getCategoryLinks(self.old, site=self.site)
+        new = textlib.replaceCategoryLinks(self.old, cats, site=self.site)
+        self.assertEqual(old, new)
+
+
 if __name__ == '__main__':
     try:
         unittest.main()

@@ -1913,7 +1913,7 @@ class Category(Page):
 
         """
         key = sortKey or self.sortKey
-        if key:
+        if key is not None:
             titleWithSortKey = '%s|%s' % (self.title(withSection=False),
                                           key)
         else:
