@@ -64,7 +64,7 @@ class Timestamp(datetime.datetime):
         return cls.strptime(ts, cls.mediawikiTSFormat)
 
     def toISOformat(self):
-        """Convert the Timestamp object to an ISO 8601 timestamp"""
+        """Convert the Timestamp object to an ISO 8601 timestamp."""
         return self.strftime(self.ISO8601Format)
 
     def totimestampformat(self):
@@ -72,7 +72,7 @@ class Timestamp(datetime.datetime):
         return self.strftime(self.mediawikiTSFormat)
 
     def __str__(self):
-        """Return a string format recognized by the API"""
+        """Return a string format recognized by the API."""
         return self.toISOformat()
 
     def __add__(self, other):
@@ -98,12 +98,16 @@ class Coordinate(object):
 
     """
     Class for handling and storing Coordinates.
+
     For now its just being used for DataSite, but
     in the future we can use it for the GeoData extension.
     """
+
     def __init__(self, lat, lon, alt=None, precision=None, globe='earth',
                  typ="", name="", dim=None, site=None, entity=''):
         """
+        Represent a geo coordinate.
+
         @param lat: Latitude
         @type lat: float
         @param lon: Longitude
@@ -153,9 +157,9 @@ class Coordinate(object):
 
     def toWikibase(self):
         """
-        Function which converts the data to a JSON object
-        for the Wikibase API.
-        FIXME Should this be in the DataSite object?
+        Export the data to a JSON object for the Wikibase API.
+
+        FIXME: Should this be in the DataSite object?
         """
         if self.globe not in self.site.globes():
             raise CoordinateGlobeUnknownException(u"%s is not supported in Wikibase yet." % self.globe)
@@ -168,7 +172,7 @@ class Coordinate(object):
 
     @staticmethod
     def fromWikibase(data, site):
-        """Constructor to create an object from Wikibase's JSON output"""
+        """Constructor to create an object from Wikibase's JSON output."""
         globes = {}
         for k in site.globes():
             globes[site.globes()[k]] = k
@@ -206,7 +210,7 @@ class Coordinate(object):
         return self._precision
 
     def precisionToDim(self):
-        """Convert precision from Wikibase to GeoData's dim"""
+        """Convert precision from Wikibase to GeoData's dim."""
         raise NotImplementedError
 
 
@@ -220,9 +224,10 @@ class WbTime(object):
     def __init__(self, year=None, month=None, day=None, hour=None, minute=None, second=None, precision=None, before=0,
                  after=0, timezone=0, calendarmodel=None, site=None):
         """
-        Creates a new WbTime object. The precision can be set
-        by the Wikibase int value (0-14) or by a human readable
-        string, e.g., 'hour'. If no precision is given, it is set
+        Create a new WbTime object.
+
+        The precision can be set by the Wikibase int value (0-14) or by a human
+        readable string, e.g., 'hour'. If no precision is given, it is set
         according to the given time units.
         """
         if year is None:
@@ -279,15 +284,18 @@ class WbTime(object):
 
     def toTimestr(self):
         """
-        Function which converts the the data to a UTC date/time string
+        Convert the data to a UTC date/time string.
+
+        @return: str
         """
         return self.FORMATSTR.format(self.year, self.month, self.day,
                                      self.hour, self.minute, self.second)
 
     def toWikibase(self):
         """
-        Function which converts the data to a JSON object
-        for the Wikibase API.
+        Convert the data to a JSON object for the Wikibase API.
+
+        @return: dict
         """
         json = {'time': self.toTimestr(),
                 'precision': self.precision,
@@ -318,16 +326,18 @@ class WbTime(object):
 
 class WbQuantity(object):
 
-    """ A Wikibase quantity representation"""
+    """A Wikibase quantity representation."""
 
     def __init__(self, amount, unit=None, error=None):
-        """
-        Creates a new WbQuantity object. The amount is a number representing
-        this quantity. The unit is currently not used (only unit-less
-        quantities are supported). The error is a number indicating the
-        uncertainty of the amount (e.g. ±1). Alternatively the error can be
-        expressed as a tuple, where the first value is the upper error and the
-        second is the lower error value.
+        u"""
+        Create a new WbQuantity object.
+
+        @param amount: number representing this quantity
+        @type amount: float
+        @param unit: not used (only unit-less quantities are supported)
+        @param error: the uncertainty of the amount (e.g. ±1)
+        @type error: float, or tuple of two floats, where the first value is
+                     the upper error and the second is the lower error value.
         """
         if amount is None:
             raise ValueError('no amount given')
@@ -347,8 +357,7 @@ class WbQuantity(object):
 
     def toWikibase(self):
         """
-        Function which converts the data to a JSON object
-        for the Wikibase API.
+        Convert the data to a JSON object for the Wikibase API.
         """
         json = {'amount': self.amount,
                 'upperBound': self.upperBound,
@@ -398,7 +407,7 @@ def deprecated(instead=None):
 
 
 def deprecate_arg(old_arg, new_arg):
-    """Decorator to declare old_arg deprecated and replace it with new_arg"""
+    """Decorator to declare old_arg deprecated and replace it with new_arg."""
     _logger = ""
 
     def decorator(method):
@@ -503,9 +512,9 @@ def setAction(s):
 def showDiff(oldtext, newtext):
     """
     Output a string showing the differences between oldtext and newtext.
+
     The differences are highlighted (only on compatible systems) to show which
     changes were made.
-
     """
     # This is probably not portable to non-terminal interfaces....
     # For information on difflib, see http://pydoc.org/2.1/difflib.html
