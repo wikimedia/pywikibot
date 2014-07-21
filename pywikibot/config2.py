@@ -94,10 +94,13 @@ available_ssl_project = [
     u'species', u'incubator'
 ]
 
-# password_file = ".passwd"
-# A password file with default passwords. For more information, please
-# see LoginManager.readPassword in login.py.
 # By default you are asked for a password on the terminal.
+# A password file may be used. e.g. password_file = ".passwd"
+# The password file should consist of lines containing
+# Python tuples of any of the following formats:
+# (code, family, username, password)
+# (family, username, password)
+# (username, password)
 password_file = None
 
 # edit summary to use if not supplied by bot script
