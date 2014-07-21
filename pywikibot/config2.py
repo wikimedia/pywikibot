@@ -1,4 +1,18 @@
 # -*- coding: utf-8 -*-
+"""
+Module to define and load pywikibot configuration.
+
+Provides two family class methods which can be used in
+the user-config:
+- register_family_file
+- register_families_folder
+
+Sets module global base_dir and provides utility methods to
+build paths relative to base_dir:
+- makepath
+- datafilepath
+- shortpath
+"""
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Pywikibot team, 2003-2014
@@ -107,7 +121,7 @@ default_edit_summary = u'Wikipedia python library v.2'
 
 
 def _get_base_dir():
-    """Return the directory in which user-specific information is stored.
+    r"""Return the directory in which user-specific information is stored.
 
     This is determined in the following order -
     1.  If the script was called with a -dir: argument, use the directory
@@ -179,6 +193,7 @@ family_files = {}
 
 
 def register_family_file(family_name, file_path):
+    """Register a single family class file."""
     usernames[family_name] = {}
     sysopnames[family_name] = {}
     disambiguation_comment[family_name] = {}
@@ -186,6 +201,7 @@ def register_family_file(family_name, file_path):
 
 
 def register_families_folder(folder_path):
+    """Register all family class files contained in a directory."""
     for file_name in os.listdir(folder_path):
         if file_name.endswith("_family.py"):
             family_name = file_name[:-len("_family.py")]
