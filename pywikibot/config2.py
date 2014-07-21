@@ -284,9 +284,8 @@ if sys.platform == 'win32':
         # Notepad is even worse than our Tkinter editor.
         if editor.lower().endswith('notepad.exe'):
             editor = None
-    except:
-        # XXX what are we catching here?
-        #raise
+    except WindowsError:
+        # Catch any key lookup errors
         editor = None
 else:
     editor = None
@@ -724,9 +723,9 @@ for _key, _val in list(globals().items()):
             print("         %(now)s: %(new)s" % {'now': "Now", 'new': nt})
         del nt, ot, ov
     else:
-        print(("WARNING: "
+        print("WARNING: "
               "Configuration variable %(_key)r is defined but unknown.\n"
-              "Misspelled?" % locals()))
+              "Misspelled?" % locals())
 
 # Fix up default console_encoding
 if console_encoding is None:
