@@ -173,7 +173,7 @@ base_dir = _base_dir
 
 for arg in sys.argv[1:]:
     if arg.startswith("-verbose") or arg == "-v":
-        print "The base directory is %s" % base_dir
+        print("The base directory is %s" % base_dir)
         break
 family_files = {}
 
