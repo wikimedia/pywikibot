@@ -663,7 +663,7 @@ def getCategoryLinks(text, site=None):
     text = removeDisabledParts(text)
     catNamespace = '|'.join(site.category_namespaces())
     R = re.compile(r'\[\[\s*(?P<namespace>%s)\s*:\s*(?P<catName>.+?)'
-                   r'(?:\|(?P<sortKey>.*))?\s*\]\]'
+                   r'(?:\|(?P<sortKey>.*?))?\]\]'
                    % catNamespace, re.I)
     for match in R.finditer(text):
         cat = pywikibot.Category(pywikibot.Link(
