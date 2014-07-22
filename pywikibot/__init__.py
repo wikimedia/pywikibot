@@ -440,46 +440,36 @@ _sites = {}
 
 
 def Site(code=None, fam=None, user=None, sysop=None, interface=None):
-    """Return the specified Site object.
+    """A factory method to obtain a Site object.
 
-    Returns a cached object if possible, otherwise instantiates a new one.
+    Site objects are cached and reused by this method.
 
-    @param code: language code
+    By default rely on config settings. These defaults may all be overriden
+    using the method parameters.
+
+    @param code: language code (override config.mylang)
     @type code: string
-    @param fam: family name or object
+    @param fam: family name or object (override config.family)
     @type fam: string or Family
-    @param user: bot user name to use on this site
+    @param user: bot user name to use on this site (override config.usernames)
     @type user: unicode
-
+    @param sysop: sysop user to use on this site (override config.sysopnames)
+    @type sysop: unicode
+    @param interface: site interface (override config.site_interface)
+    @type interface: string
     """
     _logger = "wiki"
 
-    if code is None:
-        code = config.mylang
-    if fam is None:
-        fam = config.family
-    if user is None:
-        try:
-            user = config.usernames[fam][code]
-        except KeyError:
-            user = None
-    if user is None:
-        try:
-            user = config.usernames[fam]['*']
-        except KeyError:
-            user = None
-    if sysop is None:
-        try:
-            sysop = config.sysopnames[fam][code]
-        except KeyError:
-            sysop = None
-    if sysop is None:
-        try:
-            sysop = config.sysopnames[fam]['*']
-        except KeyError:
-            sysop = None
-    if interface is None:
-        interface = config.site_interface
+    # Fallback to config defaults
+    code = code or config.mylang
+    fam = fam or config.family
+    interface = interface or config.site_interface
+
+    user = user or config.usernames[fam].get(code, None) \
+        or config.usernames[fam].get('*', None)
+    sysop = sysop or config.sysopnames[fam].get(code, None) \
+        or config.sysopnames[fam].get('*', None)
+
     try:
         tmp = __import__('pywikibot.site', fromlist=[interface])
         __Site = getattr(tmp, interface)
