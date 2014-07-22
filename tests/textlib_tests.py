@@ -147,7 +147,7 @@ class TestCategoryRearrangement(PywikibotTestCase):
     def test_replace_category_links(self):
         cats = textlib.getCategoryLinks(self.old, site=self.site)
         new = textlib.replaceCategoryLinks(self.old, cats, site=self.site)
-        self.assertEqual(old, new)
+        self.assertEqual(self.old, new)
 
 
 if __name__ == '__main__':
