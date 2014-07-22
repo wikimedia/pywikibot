@@ -14,6 +14,7 @@ Parameters:
 # (C) Leonardo Gregianin, 2007
 # (C) Filnik, 2008
 # (c) xqt, 2011-2014
+# (C) Pywikibot team, 2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,7 +22,7 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import i18n, pagegenerators
+from pywikibot import i18n, pagegenerators, Bot
 
 comment = {
     'ar': u'صور للاستبعاد',
@@ -48,73 +49,73 @@ except_text = {
 }
 
 
-def appendtext(page, apptext, always):
-    if page.isRedirectPage():
-        page = page.getRedirectTarget()
-    if not page.exists():
-        if page.isTalkPage():
-            text = u''
+class UnusedFilesBot(Bot):
+
+    def __init__(self, site, **kwargs):
+        super(UnusedFilesBot, self).__init__(**kwargs)
+        self.site = site
+
+    def run(self):
+        template_image = i18n.translate(self.site,
+                                        template_to_the_image)
+        template_user = i18n.translate(self.site,
+                                       template_to_the_user)
+        except_text_translated = i18n.translate(self.site, except_text)
+        summary = i18n.translate(self.site, comment, fallback=True)
+        if not all([template_image, template_user, except_text_translated, comment]):
+            raise pywikibot.Error(u'This script is not localized for %s site.'
+                                  % self.site)
+        self.summary = summary
+        generator = pagegenerators.UnusedFilesGenerator(site=self.site)
+        generator = pagegenerators.PreloadingGenerator(generator)
+        for image in generator:
+            if not image.exists():
+                pywikibot.output(u"File '%s' does not exist (see bug 69133)."
+                                 % image.title())
+                continue
+            if (except_text_translated.encode('utf-8')
+                    not in image.getImagePageHtml() and
+                    u'http://' not in image.text):
+                if template_image in image.text:
+                    pywikibot.output(u"%s done already"
+                                     % image.title(asLink=True))
+                    continue
+                self.append_text(image, u"\n\n" + template_image)
+                uploader = image.getFileVersionHistory().pop(0)['user']
+                user = pywikibot.User(image.site, uploader)
+                usertalkpage = user.getUserTalkPage()
+                msg2uploader = template_user % {'title': image.title()}
+                self.append_text(usertalkpage, msg2uploader)
+
+    def append_text(self, page, apptext):
+        if page.isRedirectPage():
+            page = page.getRedirectTarget()
+        if page.exists():
+            text = page.text
         else:
-            raise pywikibot.NoPage(u"Page '%s' does not exist" % page.title())
-    else:
-        text = page.text
-    # Here you can go editing. If you find you do not
-    # want to edit this page, just return
-    oldtext = text
-    text += apptext
-    if text != oldtext:
-        pywikibot.showDiff(oldtext, text)
-        if not always:
-            choice = pywikibot.inputChoice(
-                u'Do you want to accept these changes?', ['Yes', 'No', 'All'],
-                'yNa', 'N')
-            if choice == 'a':
-                always = True
-        if always or choice == 'y':
-            page.text = text
-            page.save(i18n.translate(pywikibot.Site(), comment,
-                                     fallback=True))
+            if page.isTalkPage():
+                text = u''
+            else:
+                raise pywikibot.NoPage(u"Page '%s' does not exist" % page.title())
+
+        oldtext = text
+        text += apptext
+        self.userPut(page, oldtext, text, comment=self.summary)
 
 
 def main():
-    always = False
+    options = {}
 
     for arg in pywikibot.handleArgs():
         if arg == '-always':
-            always = True
+            options['always'] = True
 
-    mysite = pywikibot.Site()
-    # If anything needs to be prepared, you can do it here
-    template_image = i18n.translate(pywikibot.Site(),
-                                    template_to_the_image)
-    template_user = i18n.translate(pywikibot.Site(),
-                                   template_to_the_user)
-    except_text_translated = i18n.translate(pywikibot.Site(), except_text)
-    if not(template_image and template_user and except_text_translated):
-        pywikibot.warning(u'This script is not localized for %s site.' % mysite)
-        return
-    generator = pagegenerators.UnusedFilesGenerator()
-    generator = pagegenerators.PreloadingGenerator(generator)
-    for image in generator:
-        if not image.exists():
-            pywikibot.output(u"File '%s' does not exist (see bug 69133)."
-                             % image.title())
-            continue
-        if (except_text_translated.encode('utf-8')
-                not in image.getImagePageHtml() and
-                u'http://' not in image.text):
-            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                             % image.title())
-            if template_image in image.text:
-                pywikibot.output(u"%s done already"
-                                 % image.title(asLink=True))
-                continue
-            appendtext(image, u"\n\n" + template_image, always)
-            uploader = image.getFileVersionHistory().pop(0)['user']
-            user = pywikibot.User(mysite, uploader)
-            usertalkpage = user.getUserTalkPage()
-            msg2uploader = template_user % {'title': image.title()}
-            appendtext(usertalkpage, msg2uploader, always)
+    bot = UnusedFilesBot(pywikibot.Site(), **options)
+    try:
+        bot.run()
+    except pywikibot.Error as e:
+        pywikibot.showHelp()
+        pywikibot.warning(e)
 
 
 if __name__ == "__main__":
