@@ -420,7 +420,8 @@ class CategoryMoveRobot(object):
     def __init__(self, oldcat, newcat=None, batch=False, comment='',
                  inplace=False, move_oldcat=True, delete_oldcat=True,
                  title_regex=None, history=False, pagesonly=False,
-                 deletion_comment=DELETION_COMMENT_AUTOMATIC):
+                 deletion_comment=DELETION_COMMENT_AUTOMATIC,
+                 wikibase=True):
         """Store all given parameters in the objects attributes.
 
         @param oldcat: The move source.
@@ -444,8 +445,11 @@ class CategoryMoveRobot(object):
             delete that is also used for move.
             If the value is not recognized, it's interpreted as
             DELETION_COMMENT_AUTOMATIC.
+        @param wikibase: If True, update the Wikibase item of the
+            old category.
         """
         self.site = pywikibot.Site()
+        self.can_move_cats = ('move-categorypages' in self.site.userinfo['rights'])
         # Create attributes for the categories and their talk pages.
         self.oldcat = self._makecat(oldcat)
         self.oldtalk = self.oldcat.toggleTalkPage()
@@ -463,6 +467,16 @@ class CategoryMoveRobot(object):
         self.title_regex = title_regex
         self.history = history
         self.pagesonly = pagesonly
+        self.wikibase = wikibase
+
+        if not self.can_move_cats:
+            repo = self.site.data_repository()
+            if repo.username() is None and self.wikibase:
+                # The bot can't move categories nor update the Wikibase repo
+                raise pywikibot.NoUsername(u"The 'wikibase' option is turned on"
+                                           u" and %s has no registered username."
+                                           % repo)
+
         template_vars = {'oldcat': self.oldcat.title(withNamespace=False)}
         if self.newcat:
             template_vars.update({
@@ -509,7 +523,7 @@ class CategoryMoveRobot(object):
         - _delete()
         """
         if self.newcat and self.move_oldcat and not self.newcat.exists():
-            if "move-categorypages" in self.site.userinfo["rights"]:
+            if self.can_move_cats:
                 oldcattitle = self.oldcat.title()
                 self.oldcat.move(self.newcat.title(), reason=self.comment,
                                  movetalkpage=True)
@@ -517,6 +531,8 @@ class CategoryMoveRobot(object):
             else:
                 self._movecat()
                 self._movetalk()
+                if self.wikibase:
+                    self._update_wikibase_item()
             if self.history:
                 self._hist()
         self._change(pagegenerators.CategorizedPageGenerator(self.oldcat))
@@ -589,6 +605,19 @@ class CategoryMoveRobot(object):
                                        {'newcat': self.newcat.title(),
                                         'title': self.newcat.title()})
             self.oldtalk.move(self.newtalk.title(), comment)
+
+    def _update_wikibase_item(self):
+        """Private function to update the Wikibase item for the category.
+
+        Do not use this function from outside the class.
+        """
+        if self.oldcat.exists():
+            item = pywikibot.ItemPage.fromPage(self.oldcat)
+            if item.exists():
+                comment = i18n.twtranslate(self.site, 'category-was-moved',
+                                           {'newcat': self.newcat.title(),
+                                            'title': self.newcat.title()})
+                item.setSitelink(self.newcat, summary=comment)
 
     def _hist(self):
         """Private function to copy the history of the to-be-deleted category.
@@ -964,6 +993,7 @@ def main(*args):
     recurse = False
     titleRegex = None
     pagesonly = False
+    wikibase = True
     withHistory = False
     rebuild = False
     depth = 5
@@ -1023,6 +1053,8 @@ def main(*args):
             recurse = True
         elif arg == '-pagesonly':
             pagesonly = True
+        elif arg == '-nowb':
+            wikibase = False
         elif arg == '-create':
             create_pages = True
         elif arg == '-redirect':
@@ -1085,7 +1117,8 @@ def main(*args):
                                 title_regex=titleRegex,
                                 history=withHistory,
                                 pagesonly=pagesonly,
-                                deletion_comment=deletion_comment)
+                                deletion_comment=deletion_comment,
+                                wikibase=wikibase)
     elif action == 'tidy':
         catTitle = pywikibot.input(u'Which category do you want to tidy up?')
         bot = CategoryTidyRobot(catTitle, catDB)
