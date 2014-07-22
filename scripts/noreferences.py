@@ -419,18 +419,7 @@ referencesSubstitute = {
 # <references />
 noTitleRequired = [u'pl', u'be', u'szl']
 
-maintenance_category = {
-    'wikipedia': {
-        'be-x-old': u'Вікіпэдыя:Старонкі з адсутным сьпісам зносак',
-        'cs': u'Údržba:Články s chybějící značkou REFERENCES',
-        'de': u'Wikipedia:Seite mit fehlendem References-Tag',
-        'en': u'Pages with missing references list',
-        'fa': u'صفحه‌های با یادکرد خراب (فقدان پانویس)',
-        'ja': u'Refタグがあるのにreferencesタグがないページ',
-        'simple': u'Wikipedia pages with broken references',
-        'zh': u'参考资料格式错误的页面',
-    },
-}
+maintenance_category = 'cite_error_refs_without_references_category'
 
 
 class XmlDumpNoReferencesPageGenerator:
@@ -689,7 +678,7 @@ def main():
     if not gen:
         site = pywikibot.Site()
         try:
-            cat = i18n.translate(site, maintenance_category)
+            cat = site.mediawiki_message(maintenance_category)
         except:
             pass
         else:
