@@ -91,7 +91,7 @@ class ProtectionRobot:
                          prompt=self.prompt, edit=self.edit, move=self.move)
 
 
-def choiceProtectionLevel(operation, default):
+def choiceProtectionLevel(operation, default, protectionLevels):
     """ Asks a valid protection level for "operation".
     Returns the protection level chosen by user.
 
@@ -108,7 +108,6 @@ def choiceProtectionLevel(operation, default):
 
 
 def main(*args):
-    global protectionLevels
     protectionLevels = ['sysop', 'autoconfirmed', 'none']
 
     # This factory is responsible for processing command line arguments
@@ -144,15 +143,18 @@ def main(*args):
         elif arg.startswith('-edit'):
             edit = arg[len('-edit:'):]
             if edit not in protectionLevels:
-                edit = choiceProtectionLevel('edit', defaultProtection)
+                edit = choiceProtectionLevel(
+                    'edit', defaultProtection, protectionLevels)
         elif arg.startswith('-move'):
             move = arg[len('-move:'):]
             if move not in protectionLevels:
-                move = choiceProtectionLevel('move', defaultProtection)
+                move = choiceProtectionLevel(
+                    'move', defaultProtection, protectionLevels)
         elif arg.startswith('-create'):
             create = arg[len('-create:'):]
             if create not in protectionLevels:
-                create = choiceProtectionLevel('create', defaultProtection)
+                create = choiceProtectionLevel(
+                    'create', defaultProtection, protectionLevels)
         else:
             genFactory.handleArg(arg)
             found = arg.find(':') + 1
