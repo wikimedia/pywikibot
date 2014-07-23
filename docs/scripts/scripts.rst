@@ -330,6 +330,11 @@ scripts.spamremove script
 
 .. automodule:: scripts.spamremove
 
+scripts.speedy\_delete script
+-----------------------------
+
+.. automodule:: scripts.speedy_delete
+
 scripts.standardize\_interwiki script
 -------------------------------------
 

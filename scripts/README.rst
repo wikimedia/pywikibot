@@ -209,15 +209,13 @@ The contents of the package
     | states-redirect.py     | A robot to add redirects to cities for state            |
     |                        | abbreviations.                                          |
     +------------------------+---------------------------------------------------------+
-    | #speedy_delete.py      | This bot load a list of pages from the category of      |
-    |                        | candidates for speedy deletion and give the             |
-    |                        | user an interactive prompt to decide whether            |
-    |                        | each should be deleted or not.                          |
+    | speedy_delete.py       | Help sysops to quickly check and/or delete pages listed |
+    |                        | for speedy deletion.                                    |
     +------------------------+---------------------------------------------------------+
     | #spellcheck.py         | This bot spellchecks wiki pages.                        |
     +------------------------+---+-----------------------------------------------------+
-    | #standardize_notes.py      | Converts external links and notes/references to     |
-    |                            | Footnote3 ref/note format.  Rewrites References.    |
+    | #standardize_notes.py  | Converts external links and notes/references to         |
+    |                        | Footnote3 ref/note format.  Rewrites References.        |
     +----------------------------+-----------------------------------------------------+
     | #statistics_in_wikitable.py| This bot renders statistics provided by             |
     |                            | [[Special:Statistics]] in a table on a wiki page.   |
