@@ -15,16 +15,16 @@ class Family(family.WikimediaFamily):
             'sv', 'ko', 'it', 'de', 'ku', 'tr', 'ta', 'hu', 'fi', 'kn', 'io',
             'vi', 'pt', 'chr', 'no', 'ml', 'id', 'my', 'ja', 'li', 'ro', 'et',
             'te', 'jv', 'ca', 'fa', 'cs', 'ar', 'eu', 'gl', 'lo', 'uk', 'hy',
-            'br', 'fj', 'eo', 'bg', 'th', 'hr', 'ps', 'uz', 'oc', 'az', 'is',
-            'vo', 'simple', 'cy', 'zh-min-nan', 'da', 'scn', 'sr', 'ast', 'af',
+            'br', 'fj', 'th', 'eo', 'bg', 'hr', 'ps', 'uz', 'az', 'oc', 'is',
+            'vo', 'cy', 'simple', 'zh-min-nan', 'da', 'scn', 'sr', 'ast', 'af',
             'he', 'sw', 'or', 'hi', 'fy', 'tl', 'wa', 'nn', 'ur', 'la', 'sq',
-            'pnb', 'ka', 'sm', 'sl', 'nah', 'lv', 'tt', 'lb', 'bs', 'nds', 'sk',
-            'tk', 'hsb', 'kk', 'ky', 'mk', 'be', 'km', 'ms', 'ga', 'wo', 'sa',
+            'pnb', 'ka', 'sm', 'sl', 'nah', 'lv', 'tt', 'lb', 'bs', 'kk', 'nds',
+            'sk', 'tk', 'hsb', 'mk', 'ky', 'be', 'km', 'ms', 'ga', 'wo', 'sa',
             'ang', 'co', 'mn', 'tg', 'gn', 'mr', 'ug', 'csb', 'st', 'so', 'ia',
             'sd', 'si', 'kl', 'vec', 'an', 'jbo', 'ln', 'fo', 'zu', 'gv', 'kw',
-            'gu', 'rw', 'bn', 'om', 'qu', 'ss', 'ie', 'mt', 'pa', 'roa-rup',
-            'iu', 'na', 'su', 'am', 'mi', 'za', 'ne', 'gd', 'tpi', 'yi', 'ti',
-            'sg', 'tn', 'dv', 'ts', 'ha', 'ks', 'ay',
+            'gu', 'rw', 'bn', 'om', 'qu', 'ss', 'ie', 'mt', 'pa', 'na',
+            'roa-rup', 'iu', 'su', 'am', 'mi', 'za', 'ne', 'gd', 'tpi', 'yi',
+            'ti', 'sg', 'tn', 'dv', 'ts', 'ha', 'ks', 'ay',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang)
