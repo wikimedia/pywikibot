@@ -463,6 +463,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     # Fallback to config defaults
     code = code or config.mylang
     fam = fam or config.family
+    if hasattr(fam, 'name'):
+        fam = fam.name
     interface = interface or config.site_interface
 
     user = user or config.usernames[fam].get(code, None) \
