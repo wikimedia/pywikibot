@@ -34,7 +34,7 @@ Furthermore, the following command line parameters are supported:
 #
 # (C) Leonardo Gregianin, 2006
 # (C) Andreas J. Schwab, 2007
-# (C) Pywikibot team, 2006-2013
+# (C) Pywikibot team, 2006-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,8 +44,7 @@ __version__ = '$Id$'
 import sys
 import re
 import pywikibot
-from pywikibot import i18n
-from pywikibot import pagegenerators
+from pywikibot import i18n, pagegenerators, Bot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -54,30 +53,32 @@ docuReplacements = {
 }
 
 
-class MovePagesBot:
-    def __init__(self, generator, addprefix, noredirect, movetalkpage,
-                 always, skipredirects, summary):
+class MovePagesBot(Bot):
+    def __init__(self, generator, **kwargs):
+        self.availableOptions.update({
+            'prefix': None,
+            'noredirect': False,
+            'movetalkpage': True,
+            'skipredirects': False,
+            'summary': None,
+        })
+        super(MovePagesBot, self).__init__(**kwargs)
+
         self.generator = generator
-        self.addprefix = addprefix
-        self.noredirect = noredirect
-        self.movetalkpage = movetalkpage
-        self.always = always
-        self.skipredirects = skipredirects
-        self.summary = summary
         self.appendAll = False
         self.regexAll = False
         self.noNamespace = False
 
     def moveOne(self, page, newPageTitle):
         try:
-            msg = self.summary
+            msg = self.getOption('summary')
             if not msg:
-                msg = i18n.twtranslate(pywikibot.Site(), 'movepages-moving')
+                msg = i18n.twtranslate(page.site, 'movepages-moving')
             pywikibot.output(u'Moving page %s to [[%s]]'
                              % (page.title(asLink=True),
                                 newPageTitle))
-            page.move(newPageTitle, reason=msg, movetalkpage=self.movetalkpage,
-                      deleteAndMove=self.noredirect)
+            page.move(newPageTitle, reason=msg, movetalkpage=self.getOption('movetalkpage'),
+                      deleteAndMove=self.getOption('noredirect'))
         except pywikibot.NoPage:
             pywikibot.output(u'Page %s does not exist!' % page.title())
         except pywikibot.IsRedirectPage:
@@ -93,7 +94,7 @@ class MovePagesBot:
         # Highlight the title in purple.
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                          % page.title())
-        if self.skipredirects and page.isRedirectPage():
+        if self.getOption('skipredirects') and page.isRedirectPage():
             pywikibot.output(u'Page %s is a redirect; skipping.' % page.title())
             return
         pagetitle = page.title(withNamespace=False)
@@ -107,17 +108,17 @@ class MovePagesBot:
             newPageTitle = self.regex.sub(self.replacePattern, pagetitle)
             if not self.noNamespace and namesp:
                 newPageTitle = (u'%s:%s' % (namesp, newPageTitle))
-        if self.addprefix:
-            newPageTitle = (u'%s%s' % (self.addprefix, pagetitle))
-        if self.addprefix or self.appendAll or self.regexAll:
-            if not self.always:
+        if self.getOption('prefix'):
+            newPageTitle = (u'%s%s' % (self.getOption('prefix'), pagetitle))
+        if self.getOption('prefix') or self.appendAll or self.regexAll:
+            if not self.getOption('always'):
                 choice2 = pywikibot.inputChoice(
                     u'Change the page title to "%s"?' % newPageTitle,
                     ['yes', 'no', 'all', 'quit'], ['y', 'n', 'a', 'q'])
                 if choice2 == 'y':
                     self.moveOne(page, newPageTitle)
                 elif choice2 == 'a':
-                    self.always = True
+                    self.options['always'] = True
                     self.moveOne(page, newPageTitle)
                 elif choice2 == 'q':
                     sys.exit()
@@ -213,13 +214,8 @@ class MovePagesBot:
 
 def main():
     gen = None
-    prefix = None
     oldName = None
-    noredirect = False
-    movetalkpage = True
-    always = False
-    skipredirects = False
-    summary = None
+    options = {}
     fromToPairs = []
 
     # Process global args and prepare generator args parser
@@ -244,13 +240,13 @@ def main():
                 pywikibot.warning(
                     u'file %s contains odd number of links' % filename)
         elif arg == '-noredirect':
-            noredirect = True
+            options['noredirect'] = True
         elif arg == '-notalkpage':
-            movetalkpage = False
+            options['movetalkpage'] = False
         elif arg == '-always':
-            always = True
+            options['always'] = True
         elif arg == '-skipredirects':
-            skipredirects = True
+            options['skipredirects'] = True
         elif arg.startswith('-from:'):
             if oldName:
                 pywikibot.warning(u'-from:%s without -to:' % oldName)
@@ -263,31 +259,30 @@ def main():
                 pywikibot.warning(u'%s without -from' % arg)
         elif arg.startswith('-prefix'):
             if len(arg) == len('-prefix'):
-                prefix = pywikibot.input(u'Enter the prefix:')
+                options['prefix'] = pywikibot.input(u'Enter the prefix:')
             else:
-                prefix = arg[8:]
+                options['prefix'] = arg[8:]
         elif arg.startswith('-summary'):
             if len(arg) == len('-summary'):
-                summary = pywikibot.input(u'Enter the summary:')
+                options['summary'] = pywikibot.input(u'Enter the summary:')
             else:
-                summary = arg[9:]
+                options['summary'] = arg[9:]
         else:
             genFactory.handleArg(arg)
 
     if oldName:
         pywikibot.warning(u'-from:%s without -to:' % oldName)
+    site = pywikibot.Site()
     for pair in fromToPairs:
-        page = pywikibot.Page(pywikibot.Site(), pair[0])
-        bot = MovePagesBot(None, prefix, noredirect, movetalkpage, always,
-                           skipredirects, summary)
+        page = pywikibot.Page(site, pair[0])
+        bot = MovePagesBot(None, **options)
         bot.moveOne(page, pair[1])
 
     if not gen:
         gen = genFactory.getCombinedGenerator()
     if gen:
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = MovePagesBot(preloadingGen, prefix, noredirect, movetalkpage,
-                           always, skipredirects, summary)
+        bot = MovePagesBot(preloadingGen, **options)
         bot.run()
     elif not fromToPairs:
         pywikibot.showHelp()
