@@ -227,7 +227,6 @@ class TestScriptMeta(type):
                                'imagerecat',      # bug 68658
                                'imagetransfer',   # bug 68659
                                'pagefromfile',    # bug 68660
-                               'template',        # bug 68661 - zero output
                                'transferbot',     # raises custom Exception
                                'upload',          # raises custom ValueError
                                ] or \
