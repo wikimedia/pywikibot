@@ -21,7 +21,7 @@ Furthermore, the following command line parameters are supported:
 
 -enable:          Enable or disable the bot via a Wiki Page.
 
--disambig:        Set a page where the bot save the name of the disambig
+-disambig:        Set a page where the bot saves the name of the disambig
                   pages found (default: skip the pages)
 
 -limit:           Set how many pages check.
@@ -43,10 +43,10 @@ __version__ = '$Id$'
 #
 
 import re
+import sys
 
 import pywikibot
-from pywikibot import i18n
-from pywikibot import pagegenerators
+from pywikibot import i18n, pagegenerators, Bot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -54,7 +54,7 @@ docuReplacements = {
     '&params;':     pagegenerators.parameterHelp,
 }
 
-Template = {
+template = {
     'ar': u'{{يتيمة|تاريخ={{نسخ:اسم_شهر}} {{نسخ:عام}}}}',
     'ca': u'{{Orfe|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}',
     'en': u'{{Orphan|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}',
@@ -75,137 +75,91 @@ exception_regex = {
 }
 
 
-def main():
-    enablePage = None  # Check if someone set an enablePage or not
-    limit = 50000    # Hope that there aren't so many lonely pages in a project
-    generator = None  # Check if bot should use default generator or not
-    nwpages = False  # Check variable for newpages
-    always = False  # Check variable for always
-    disambigPage = None  # If no disambigPage given, not use it.
+class LonelyPagesBot(Bot):
+    def __init__(self, generator, **kwargs):
+        self.availableOptions.update({
+            'enablePage': None,    # Check if someone set an enablePage or not
+            'disambigPage': None,  # If no disambigPage given, not use it.
+        })
+        super(LonelyPagesBot, self).__init__(**kwargs)
+        self.generator = generator
 
-    # Arguments!
-    local_args = pywikibot.handleArgs()
-    genFactory = pagegenerators.GeneratorFactory()
+        # Take the configurations according to our project
+        self.site = pywikibot.Site()
+        if self.getOption('enablePage'):
+            self.options['enablePage'] = pywikibot.Page(
+                self.site, self.getOption('enablePage'))
+        self.comment = i18n.twtranslate(
+            self.site, 'lonelypages-comment-add-template')
+        self.commentdisambig = i18n.twtranslate(
+            self.site, 'lonelypages-comment-add-disambig-template')
+        self.template = i18n.translate(self.site, template)
+        self.exception = i18n.translate(self.site, exception_regex)
+        if self.template is None or self.exception is None:
+            pywikibot.showHelp()
+            sys.exit(u'Missing configuration for site %s' % self.site)
+        # DisambigPage part
+        if self.getOption('disambigPage') is not None:
+            self.disambigpage = pywikibot.Page(self.site, self.getOption('disambigPage'))
+            try:
+                self.disambigtext = self.disambigpage.get()
+            except pywikibot.NoPage:
+                pywikibot.output(u"%s doesn't esist, skip!" % self.disambigpage.title())
+                self.disambigtext = ''
+            except pywikibot.IsRedirectPage:
+                pywikibot.output(u"%s is a redirect, don't use it!"
+                                 % self.disambigpage.title())
+                self.options['disambigPage'] = None
 
-    for arg in local_args:
-        if arg.startswith('-enable'):
-            if len(arg) == 7:
-                enablePage = pywikibot.input(
-                    u'Would you like to check if the bot should run or not?')
-            else:
-                enablePage = arg[8:]
-        if arg.startswith('-disambig'):
-            if len(arg) == 9:
-                disambigPage = pywikibot.input(
-                    u'In which page should the bot save the disambig pages?')
-            else:
-                disambigPage = arg[10:]
-        elif arg.startswith('-limit'):
-            if len(arg) == 6:
-                limit = int(pywikibot.input(
-                    u'How many pages do you want to check?'))
-            else:
-                limit = int(arg[7:])
-        elif arg.startswith('-newpages'):
-            if len(arg) == 9:
-                nwlimit = 50  # Default: 50 pages
-            else:
-                nwlimit = int(arg[10:])
-            generator = pywikibot.Site().newpages(number=nwlimit)
-            nwpages = True
-        elif arg == '-always':
-            always = True
-        else:
-            genFactory.handleArg(arg)
-    # Retrive the site
-    wikiSite = pywikibot.Site()
+    def enable_page(self):
+        enable = self.getOption('enablePage')
+        if enable is not None:
+            try:
+                getenable = enable.get()
+            except pywikibot.NoPage:
+                pywikibot.output(
+                    u"%s doesn't esist, I use the page as if it was blank!"
+                    % enable.title())
+                getenable = ''
+            except pywikibot.IsRedirectPage:
+                pywikibot.output(u"%s is a redirect, skip!" % enable.title())
+                getenable = ''
+            return getenable == 'enable'
+        return True
 
-    if not generator:
-        generator = genFactory.getCombinedGenerator()
-
-    # If the generator is not given, use the default one
-    if not generator:
-        generator = wikiSite.lonelypages(repeat=True, number=limit)
-    # Take the configurations according to our project
-    comment = i18n.twtranslate(wikiSite, 'lonelypages-comment-add-template')
-    commentdisambig = i18n.twtranslate(wikiSite, 'lonelypages-comment-add-disambig-template')
-    template = i18n.translate(wikiSite, Template)
-    exception = i18n.translate(wikiSite, exception_regex)
-    if template is None or exception is None:
-        raise Exception("Missing configuration for site %r" % wikiSite)
-    # EnablePage part
-    if enablePage is not None:
-        # Define the Page Object
-        enable = pywikibot.Page(wikiSite, enablePage)
-        # Loading the page's data
-        try:
-            getenable = enable.text
-        except pywikibot.NoPage:
-            pywikibot.output(
-                u"%s doesn't esist, I use the page as if it was blank!"
-                % enable.title())
-            getenable = ''
-        except pywikibot.IsRedirectPage:
-            pywikibot.output(u"%s is a redirect, skip!" % enable.title())
-            getenable = ''
+    def run(self):
         # If the enable page is set to disable, turn off the bot
         # (useful when the bot is run on a server)
-        if getenable != 'enable':
+        if not self.enable_page():
             pywikibot.output('The bot is disabled')
             return
-    # DisambigPage part
-    if disambigPage is not None:
-        disambigpage = pywikibot.Page(wikiSite, disambigPage)
-        try:
-            disambigtext = disambigpage.get()
-        except pywikibot.NoPage:
-            pywikibot.output(u"%s doesn't esist, skip!" % disambigpage.title())
-            disambigtext = ''
-        except pywikibot.IsRedirectPage:
-            pywikibot.output(u"%s is a redirect, don't use it!"
-                             % disambigpage.title())
-            disambigPage = None
-    # Main Loop
-    for page in generator:
-        if nwpages:
-            # The newpages generator returns a tuple, not a Page object.
-            page = page[0]
+        # Main Loop
+        for page in self.generator:
+            self.treat(page)
+
+    def treat(self, page):
         pywikibot.output(u"Checking %s..." % page.title())
         if page.isRedirectPage():  # If redirect, skip!
             pywikibot.output(u'%s is a redirect! Skip...' % page.title())
-            continue
-        # refs is not a list, it's a generator while resList... is a list, yes.
-        refs = page.getReferences()
-        refsList = list()
-        for j in refs:
-            if j is None:
-                # We have to find out why the function returns that value
-                pywikibot.error(u'1 --> Skip page')
-                continue
-            refsList.append(j)
-        # This isn't possible with a generator
-        if refsList != []:
+            return
+        refs = list(page.getReferences(total=1))
+        if len(refs) > 0:
             pywikibot.output(u"%s isn't orphan! Skip..." % page.title())
-            continue
-        # Never understood how a list can turn in "None", but it happened :-S
-        elif refsList is None:
-            # We have to find out why the function returns that value
-            pywikibot.error(u'2 --> Skip page')
-            continue
+            return
         else:
             # no refs, no redirect; check if there's already the template
             try:
                 oldtxt = page.get()
             except pywikibot.NoPage:
                 pywikibot.output(u"%s doesn't exist! Skip..." % page.title())
-                continue
+                return
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u"%s is a redirect! Skip..." % page.title())
-                continue
+                return
             # I've used a loop in a loop. If I use continue in the second loop,
             # it won't do anything in the first. So let's create a variable to
             # avoid this problem.
-            for regexp in exception:
+            for regexp in self.exception:
                 res = re.findall(regexp, oldtxt.lower())
                 # Found a template! Let's skip the page!
                 if res != []:
@@ -214,40 +168,60 @@ def main():
                         % page.title())
                     break
             else:
-                continue
-            if page.isDisambig() and disambigPage is not None:
+                return
+            if page.isDisambig() and self.getOption('disambigPage') is not None:
                 pywikibot.output(u'%s is a disambig page, report..'
                                  % page.title())
-                if not page.title().lower() in disambigtext.lower():
-                    disambigtext = u"%s\n*[[%s]]" % (disambigtext, page.title())
-                    disambigpage.put(disambigtext, commentdisambig)
-                    continue
+                if not page.title().lower() in self.disambigtext.lower():
+                    self.disambigtext = u"%s\n*[[%s]]" % (self.disambigtext, page.title())
+                    self.disambigpage.text = self.disambigtext
+                    self.disambigpage.save(self.commentdisambig)
+                    return
             # Is the page a disambig but there's not disambigPage? Skip!
             elif page.isDisambig():
                 pywikibot.output(u'%s is a disambig page, skip...'
                                  % page.title())
-                continue
+                return
             else:
                 # Ok, the page need the template. Let's put it there!
                 # Adding the template in the text
-                newtxt = u"%s\n%s" % (template, oldtxt)
-                pywikibot.output(u"\t\t>>> %s <<<" % page.title())
-                pywikibot.showDiff(oldtxt, newtxt)
-                choice = 'y'
-                if not always:
-                    choice = pywikibot.inputChoice(
-                        u'Orphan page found, add template?',
-                        ['Yes', 'No', 'All'], 'yna')
-                    if choice == 'a':
-                        always = True
-                        choice = 'y'
-                if choice == 'y':
-                    page.text = newtxt
-                    try:
-                        page.save(comment)
-                    except pywikibot.EditConflict:
-                        pywikibot.output(u'Edit Conflict! Skip...')
-                        continue
+                newtxt = u"%s\n%s" % (self.template, oldtxt)
+                self.userPut(page, oldtxt, newtxt, comment=self.comment)
+
+
+def main():
+    options = {}
+
+    local_args = pywikibot.handleArgs()
+    genFactory = pagegenerators.GeneratorFactory()
+    site = pywikibot.Site()
+
+    for arg in local_args:
+        if arg.startswith('-enable'):
+            if len(arg) == 7:
+                options['enablePage'] = pywikibot.input(
+                    u'Would you like to check if the bot should run or not?')
+            else:
+                options['enablePage'] = arg[8:]
+        elif arg.startswith('-disambig'):
+            if len(arg) == 9:
+                options['disambigPage'] = pywikibot.input(
+                    u'In which page should the bot save the disambig pages?')
+            else:
+                options['disambigPage'] = arg[10:]
+        elif arg == '-always':
+            options['always'] = True
+        else:
+            genFactory.handleArg(arg)
+
+    generator = genFactory.getCombinedGenerator()
+
+    # If the generator is not given, use the default one
+    if not generator:
+        generator = site.lonelypages(total=genFactory.limit)
+
+    bot = LonelyPagesBot(generator, **options)
+    bot.run()
 
 if __name__ == '__main__':
     main()
