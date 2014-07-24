@@ -33,8 +33,7 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import i18n
-from pywikibot import pagegenerators
+from pywikibot import i18n, pagegenerators, Bot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -43,20 +42,25 @@ docuReplacements = {
 }
 
 
-class DeletionRobot:
+class DeletionRobot(Bot):
     """ This robot allows deletion of pages en masse. """
 
-    def __init__(self, generator, summary, always=False, undelete=True):
+    def __init__(self, generator, summary, **kwargs):
         """
-        Arguments:
-            * generator - A page generator.
-            * always - Delete without prompting?
+        Constructor.
 
+        @param generator: the pages to work on
+        @type  generator: iterable
+        @param summary: the reason for the (un)deletion
+        @type  summary: unicode
         """
+        self.availableOptions.update({
+            'undelete': False,
+        })
+        super(DeletionRobot, self).__init__(**kwargs)
+
         self.generator = generator
         self.summary = summary
-        self.prompt = not always
-        self.undelete = undelete
 
     def run(self):
         """ Start the robot's action:
@@ -65,27 +69,26 @@ class DeletionRobot:
         """
         for page in self.generator:
             pywikibot.output(u'Processing page %s' % page.title())
-            if self.undelete:
+            if self.getOption('undelete'):
                 page.undelete(self.summary)
             else:
-                page.delete(self.summary, self.prompt)
+                page.delete(self.summary, not self.getOption('always'))
 
 
 def main():
-    genFactory = pagegenerators.GeneratorFactory()
     pageName = ''
     summary = None
-    always = False
-    undelete = False
     generator = None
+    options = {}
 
     # read command line parameters
     local_args = pywikibot.handleArgs()
+    genFactory = pagegenerators.GeneratorFactory()
     mysite = pywikibot.Site()
 
     for arg in local_args:
         if arg == '-always':
-            always = True
+            options['always'] = True
         elif arg.startswith('-summary'):
             if len(arg) == len('-summary'):
                 summary = pywikibot.input(u'Enter a reason for the deletion:')
@@ -96,7 +99,7 @@ def main():
                              'Please use -imageused instead.\03{default}\n')
             local_args.append('-imageused' + arg[7:])
         elif arg.startswith('-undelete'):
-            undelete = True
+            options['undelete'] = True
         else:
             genFactory.handleArg(arg)
             found = arg.find(':') + 1
@@ -125,8 +128,8 @@ def main():
     if generator:
         if summary is None:
             summary = pywikibot.input(u'Enter a reason for the %sdeletion:'
-                                      % ['', 'un'][undelete])
-        bot = DeletionRobot(generator, summary, always, undelete)
+                                      % ['', 'un'][options.get('undelete', False)])
+        bot = DeletionRobot(generator, summary, **options)
         bot.run()
     else:
         # Show help text from the top of this file
