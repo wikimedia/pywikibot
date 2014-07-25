@@ -314,7 +314,7 @@ class TestPageMethods(PywikibotTestCase):
     def test_item_save(self):
         self.wdp = pywikibot.ItemPage(wikidatatest, 'Q6')
         item = self.wdp.data_item()
-        self.assertRaises(APIError, item.title)
+        self.assertRaises(pywikibot.NoPage, item.title)
         self.assertRaises(pywikibot.PageNotSaved, self.wdp.save)
         self.wdp.previousRevision()
         self.assertEquals(self.wdp.langlinks(), [])
