@@ -45,7 +45,7 @@ __version__ = '$Id$'
 
 import re
 import pywikibot
-from pywikibot import pagegenerators, i18n
+from pywikibot import i18n, pagegenerators, Bot
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -1159,27 +1159,6 @@ ranges = {
 }
 
 
-class IsbnBot:
-    def __init__(self, generator):
-        self.generator = generator
-
-    def run(self):
-        for page in self.generator:
-            try:
-                text = page.get(get_redirect=self.touch_redirects)
-                # convert ISBN numbers
-                page.put(text)
-            except pywikibot.NoPage:
-                pywikibot.output(u"Page %s does not exist?!"
-                                 % page.title(asLink=True))
-            except pywikibot.IsRedirectPage:
-                pywikibot.output(u"Page %s is a redirect; skipping."
-                                 % page.title(asLink=True))
-            except pywikibot.LockedPage:
-                pywikibot.output(u"Page %s is locked?!"
-                                 % page.title(asLink=True))
-
-
 class InvalidIsbnException(pywikibot.Error):
     """Invalid ISBN"""
 
@@ -1395,13 +1374,16 @@ def convertIsbn10toIsbn13(text):
     return text
 
 
-class IsbnBot:
+class IsbnBot(Bot):
 
-    def __init__(self, generator, to13=False, format=False, always=False):
+    def __init__(self, generator, **kwargs):
+        self.availableOptions.update({
+            'to13': False,
+            'format': False,
+        })
+        super(IsbnBot, self).__init__(**kwargs)
+
         self.generator = generator
-        self.to13 = to13
-        self.format = format
-        self.always = always
         self.isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
         self.comment = i18n.twtranslate(pywikibot.Site(), 'isbn-formatting')
 
@@ -1416,53 +1398,29 @@ class IsbnBot:
                     pywikibot.output(e)
 
             newText = oldText
-            if self.to13:
+            if self.getOption('to13'):
                 newText = self.isbnR.sub(_isbn10toIsbn13, newText)
 
-            if self.format:
+            if self.getOption('format'):
                 newText = self.isbnR.sub(_hyphenateIsbnNumber, newText)
-            self.save(page, newText)
+            try:
+                self.userPut(page, page.text, newText, comment=self.comment)
+            except pywikibot.EditConflict:
+                pywikibot.output(u'Skipping %s because of edit conflict'
+                                 % page.title())
+            except pywikibot.SpamfilterError as e:
+                pywikibot.output(
+                    u'Cannot change %s because of blacklist entry %s'
+                    % (page.title(), e.url))
+            except pywikibot.LockedPage:
+                pywikibot.output(u'Skipping %s (locked page)'
+                                 % page.title())
         except pywikibot.NoPage:
-            pywikibot.output(u"Page %s does not exist?!"
+            pywikibot.output(u"Page %s does not exist"
                              % page.title(asLink=True))
         except pywikibot.IsRedirectPage:
             pywikibot.output(u"Page %s is a redirect; skipping."
                              % page.title(asLink=True))
-        except pywikibot.LockedPage:
-            pywikibot.output(u"Page %s is locked?!" % page.title(asLink=True))
-
-    def save(self, page, text):
-        if text != page.get():
-            # Show the title of the page we're working on.
-            # Highlight the title in purple.
-            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                             % page.title())
-            pywikibot.showDiff(page.get(), text)
-            if not self.always:
-                choice = pywikibot.inputChoice(
-                    u'Do you want to accept these changes?',
-                    ['Yes', 'No', 'Always yes'], ['y', 'N', 'a'], 'N')
-                if choice == 'n':
-                    return
-                elif choice == 'a':
-                    self.always = True
-
-            if self.always:
-                try:
-                    page.put(text, comment=self.comment)
-                except pywikibot.EditConflict:
-                    pywikibot.output(u'Skipping %s because of edit conflict'
-                                     % (page.title(),))
-                except pywikibot.SpamfilterError as e:
-                    pywikibot.output(
-                        u'Cannot change %s because of blacklist entry %s'
-                        % (page.title(), e.url))
-                except pywikibot.LockedPage:
-                    pywikibot.output(u'Skipping %s (locked page)'
-                                     % (page.title(),))
-            else:
-                # Save the page in the background. No need to catch exceptions.
-                page.put(text, comment=self.comment, async=True)
 
     def run(self):
         for page in self.generator:
@@ -1470,54 +1428,25 @@ class IsbnBot:
 
 
 def main():
-    #page generator
-    gen = None
-    # This temporary array is used to read the page title if one single
-    # page to work on is specified by the arguments.
-    pageTitle = []
-    # Which namespaces should be processed?
-    # default to [] which means all namespaces will be processed
-    namespaces = []
-    # Never ask before changing a page
-    always = False
-    to13 = False
-    format = False
+    options = {}
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handleArgs()
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-namespace:'):
-            try:
-                namespaces.append(int(arg[11:]))
-            except ValueError:
-                namespaces.append(arg[11:])
-        elif arg == '-always':
-            always = True
-        elif arg == '-to13':
-            to13 = True
-        elif arg == '-format':
-            format = True
+        if arg.startswith('-') and arg[1:] in ('always', 'to13', 'format'):
+            options[arg[1:]] = True
         else:
-            if not genFactory.handleArg(arg):
-                pageTitle.append(arg)
+            genFactory.handleArg(arg)
 
-    site = pywikibot.Site()
-    site.login()
-    if pageTitle:
-        gen = iter([pywikibot.Page(pywikibot.Link(t, site))
-                    for t in pageTitle])
-    if not gen:
-        gen = genFactory.getCombinedGenerator()
-    if not gen:
-        pywikibot.showHelp('isbn')
-    else:
-        if namespaces != []:
-            gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
+    gen = genFactory.getCombinedGenerator()
+    if gen:
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = IsbnBot(preloadingGen, to13=to13, format=format, always=always)
+        bot = IsbnBot(preloadingGen, **options)
         bot.run()
+    else:
+        pywikibot.showHelp()
 
 if __name__ == "__main__":
     main()
