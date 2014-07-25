@@ -77,9 +77,7 @@ import re
 from distutils.version import LooseVersion as LV
 import pywikibot
 import isbn
-from pywikibot import pagegenerators
-from pywikibot import i18n
-from pywikibot import config2 as config
+from pywikibot import config, i18n, pagegenerators, Bot
 
 warning = """
 ATTENTION: You can run this script as a stand-alone for testing purposes.
@@ -843,14 +841,16 @@ class CosmeticChangesToolkit:
         return text
 
 
-class CosmeticChangesBot:
-    def __init__(self, generator, acceptall=False,
-                 comment=u'Robot: Cosmetic changes', async=False):
+class CosmeticChangesBot(Bot):
+    def __init__(self, generator, **kwargs):
+        self.availableOptions.update({
+            'async': False,
+            'comment': u'Robot: Cosmetic changes',
+        })
+        super(CosmeticChangesBot, self).__init__(**kwargs)
+
         self.generator = generator
-        self.acceptall = acceptall
-        self.comment = comment
         self.done = False
-        self.async = async
 
     def treat(self, page):
         try:
@@ -862,22 +862,8 @@ class CosmeticChangesBot:
                                                namespace=page.namespace(),
                                                pageTitle=page.title())
             changedText = ccToolkit.change(page.get())
-            if changedText.strip() != page.get().strip():
-                if not self.acceptall:
-                    choice = pywikibot.inputChoice(
-                        u'Do you want to accept these changes?',
-                        ['Yes', 'No', 'All', 'Quit'], ['y', 'n', 'a', 'q'], 'n')
-                    if choice == 'a':
-                        self.acceptall = True
-                    elif choice == 'q':
-                        self.done = True
-                        return
-                if self.acceptall or choice == 'y':
-                    page.text = changedText
-                    page.save(comment=self.comment, async=self.async)
-            else:
-                pywikibot.output('No changes were necessary in %s'
-                                 % page.title())
+            self.userPut(page, page.text, changedText, comment=self.comment,
+                         async=self.getOption('async'))
         except pywikibot.NoPage:
             pywikibot.output("Page %s does not exist?!"
                              % page.title(asLink=True))
@@ -904,10 +890,8 @@ def main():
     #page generator
     gen = None
     pageTitle = []
-    editSummary = ''
     answer = 'y'
-    always = False
-    async = False
+    options = {}
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handleArgs()
@@ -915,20 +899,20 @@ def main():
 
     for arg in local_args:
         if arg.startswith('-summary:'):
-            editSummary = arg[len('-summary:'):]
+            options['comment'] = arg[len('-summary:'):]
         elif arg == '-always':
-            always = True
+            options['always'] = True
         elif arg == '-async':
-            async = True
+            options['async'] = True
         elif not genFactory.handleArg(arg):
             pageTitle.append(arg)
 
-    if editSummary == '':
-        # Load default summary message.
-        editSummary = i18n.twtranslate(pywikibot.Site(),
-                                       'cosmetic_changes-standalone')
     site = pywikibot.Site()
     site.login()
+
+    if 'comment' not in options or not options['comment']:
+        # Load default summary message.
+        options['comment'] = i18n.twtranslate(site, 'cosmetic_changes-standalone')
     if pageTitle:
         gen = iter([pywikibot.Page(pywikibot.Link(t, site)) for t in pageTitle])
     if not gen:
@@ -942,8 +926,7 @@ def main():
                 ['yes', 'no'], ['y', 'n'], 'n')
         if answer == 'y':
             preloadingGen = pagegenerators.PreloadingGenerator(gen)
-            bot = CosmeticChangesBot(preloadingGen, acceptall=always,
-                                     comment=editSummary, async=async)
+            bot = CosmeticChangesBot(preloadingGen, **options)
             bot.run()
 
 if __name__ == "__main__":
