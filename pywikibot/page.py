@@ -99,7 +99,10 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             self._revisions = {}
         elif isinstance(source, Page):
             # copy all of source's attributes to this object
-            self.__dict__ = source.__dict__
+            # without overwriting non-None values
+            self.__dict__.update((k, v) for k, v in source.__dict__.items()
+                                 if k not in self.__dict__ or
+                                 self.__dict__[k] is None)
             if title:
                 # overwrite title
                 self._link = Link(title, source=source.site,
@@ -1892,11 +1895,11 @@ class Category(Page):
         All parameters are the same as for Page() constructor.
 
         """
+        self.sortKey = sortKey
         Page.__init__(self, source, title, ns=14)
         if self.namespace() != 14:
             raise ValueError(u"'%s' is not in the category namespace!"
                              % title)
-        self.sortKey = sortKey
 
     @deprecate_arg("forceInterwiki", None)
     @deprecate_arg("textlink", None)
