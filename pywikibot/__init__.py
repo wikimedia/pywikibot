@@ -463,14 +463,15 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     # Fallback to config defaults
     code = code or config.mylang
     fam = fam or config.family
-    if hasattr(fam, 'name'):
-        fam = fam.name
     interface = interface or config.site_interface
 
-    user = user or config.usernames[fam].get(code, None) \
-        or config.usernames[fam].get('*', None)
-    sysop = sysop or config.sysopnames[fam].get(code, None) \
-        or config.sysopnames[fam].get('*', None)
+    # config.usernames is initialised with a dict for each family name
+    family_name = str(fam)
+    if family_name in config.usernames:
+        user = user or config.usernames[family_name].get(code) \
+            or config.usernames[family_name].get('*')
+        sysop = sysop or config.sysopnames[family_name].get(code) \
+            or config.sysopnames[family_name].get('*')
 
     try:
         tmp = __import__('pywikibot.site', fromlist=[interface])
