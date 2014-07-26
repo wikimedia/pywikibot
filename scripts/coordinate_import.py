@@ -84,8 +84,11 @@ def main():
 
     generator = gen.getCombinedGenerator()
 
-    coordbot = CoordImportRobot(generator)
-    coordbot.run()
+    if generator:
+        coordbot = CoordImportRobot(generator)
+        coordbot.run()
+    else:
+        pywikibot.showHelp()
 
 if __name__ == "__main__":
     main()
