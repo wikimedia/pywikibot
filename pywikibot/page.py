@@ -1583,7 +1583,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     @deprecate_arg("throttle", None)
     def protect(self, edit=False, move=False, create=None, upload=None,
-                unprotect=False, reason=None, prompt=True, protections=None,
+                unprotect=False, reason=None, prompt=None, protections=None,
                 **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
 
@@ -1596,7 +1596,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         @type  protections: dict
         @param reason: Reason for the action
         @type  reason: basestring
-        @param prompt: Whether to ask user for confirmation
+        @param prompt: Whether to ask user for confirmation (deprecated).
+                       Defaults to protections is None
         @type  prompt: bool
         """
         def deprecated(value, arg_name):
@@ -1637,6 +1638,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             protections = dict(
                 [(p_type, "") for p_type in self.applicable_protections()])
         answer = 'y'
+        if called_using_deprecated_arg and prompt is None:
+            prompt = True
         if prompt:
             pywikibot.bot.warning(u'"prompt" argument of protect() is '
                                   'deprecated')
