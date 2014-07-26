@@ -848,7 +848,8 @@ def categoryFormat(categories, insite=None):
         else:
             catLinks = ['[[Category:%s]]' % category for category in categories]
     else:
-        catLinks = [category.aslink() for category in categories]
+        catLinks = [pywikibot.Category(category).aslink()
+                    for category in categories]
 
     if insite.category_on_one_line():
         sep = ' '
