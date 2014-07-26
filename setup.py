@@ -12,6 +12,7 @@ __version__ = '$Id$'
 
 import sys
 import os
+import itertools
 
 from ez_setup import use_setuptools
 use_setuptools()
@@ -22,11 +23,24 @@ from setuptools.command import install
 test_deps = []
 testcollector = "tests"
 
+dependencies = ['httplib2>=0.6.0']
+
+extra_deps = {}
+
+script_deps = {
+    'script_wui.py': ['irc', 'lunatic-python', 'crontab'],
+    # Note: None of the 'lunatic-python' repos on github support MS Windows.
+    'flickrripper.py': ['PIL', 'flickrapi'],
+    # Note: 'PIL' is not available via pip2.7 on MS Windows,
+    #       however it is available with setuptools.
+}
+
 if sys.version_info[0] == 2:
     if sys.version_info < (2, 6, 5):
         raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 or higher")
     elif sys.version_info[1] == 6:
-        test_deps = ['unittest2']
+        test_deps.append('unittest2')
+        script_deps['replicate_wiki.py'] = ['argparse']
         testcollector = "tests.utils.collector"
 
 if sys.version_info[0] == 3:
@@ -38,7 +52,6 @@ if sys.version_info[0] == 3:
         print("ERROR: Python 3.3 or higher is required!")
         sys.exit(1)
 
-dependencies = ['httplib2>=0.6.0']
 if os.name != 'nt':
     # See bug 66010, Windows users will have issues
     # when trying to build the C modules.
@@ -60,6 +73,13 @@ class pwb_install(install.install):
             python = python.replace("pythonw.exe", "python.exe")  # for Windows
             subprocess.call([python, "generate_user_files.py"])
 
+
+extra_deps.update(script_deps)
+# Add script dependencies as test dependencies,
+# so scripts can be compiled in test suite.
+if 'PYSETUP_TEST_EXTRAS' in os.environ:
+    test_deps += list(itertools.chain(*(script_deps.values())))
+
 setup(
     name='pywikibot',
     version='2.0b1',
@@ -73,8 +93,11 @@ setup(
               for package in find_packages()
               if package.startswith('pywikibot.')],
     install_requires=dependencies,
+    extras_require=extra_deps,
     dependency_links=[
-        'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1'
+        'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1',
+        'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
+        'git+https://github.com/jayvdb/parse-crontab.git#egg=crontab',
     ],
     url='https://www.mediawiki.org/wiki/Pywikibot',
     download_url='https://github.com/wikimedia/pywikibot-core/archive/master.zip#egg=pywikibot-2.0b1',

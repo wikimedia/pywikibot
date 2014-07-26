@@ -4,6 +4,10 @@ python:
   - '2.7'
   - '2.6'
 
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y python-imaging-tk liblua5.1-dev
+
 install:
   - mkdir ~/.pywikibot
 
@@ -34,7 +38,7 @@ env:
     - secure: kofInMlisiTBt9o/Ustc/vySlkKfxGzGCX2LwA1D2waym8sDTS0o5gMJ5LsrT/BUKwZbe1vLozPHqZrrkQvsdTml+DpZuotzdILs0m0f3BUoexEC6OON5IDljuxFyETrD1Ug44ih5Mc4lVFOdTcBzg501ZmswGwQrBvg/OyEFfE=
   matrix:
     - LANGUAGE=en FAMILY=wikipedia
-    - LANGUAGE=ar FAMILY=wikipedia
+    - LANGUAGE=ar FAMILY=wikipedia PYSETUP_TEST_EXTRAS=1
     - LANGUAGE=test FAMILY=wikidata
 
 notifications:
