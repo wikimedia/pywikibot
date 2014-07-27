@@ -912,7 +912,8 @@ def main():
 
     if 'comment' not in options or not options['comment']:
         # Load default summary message.
-        options['comment'] = i18n.twtranslate(site, 'cosmetic_changes-standalone')
+        options['comment'] = i18n.twtranslate(site,
+                                              'cosmetic_changes-standalone')
     if pageTitle:
         gen = iter([pywikibot.Page(pywikibot.Link(t, site)) for t in pageTitle])
     if not gen:
@@ -920,7 +921,7 @@ def main():
     if not gen:
         pywikibot.showHelp()
     else:
-        if not always:
+        if not options.get('always'):
             answer = pywikibot.inputChoice(
                 warning + '\nDo you really want to continue?',
                 ['yes', 'no'], ['y', 'n'], 'n')
