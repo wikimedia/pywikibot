@@ -470,8 +470,10 @@ class CategoryMoveRobot(object):
         """
         if self.newcat and self.move_oldcat and not self.newcat.exists():
             if "move-categorypages" in self.site.userinfo["rights"]:
+                oldcattitle = self.oldcat.title()
                 self.oldcat.move(self.newcat.title(), reason=self.comment,
                                  movetalkpage=True)
+                self.oldcat = pywikibot.Category(self.oldcat.site, oldcattitle)
             else:
                 self._movecat()
                 self._movetalk()
