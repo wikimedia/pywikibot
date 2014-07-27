@@ -649,28 +649,30 @@ class CategoryRemoveRobot:
                                                 {'oldcat': self.cat.title()})
 
     def run(self):
-        if self.cat.categoryinfo['pages'] == 0:
-            pywikibot.output(u'There are no articles in category %s'
+        empty = True
+        for article in self.cat.articles():
+            empty = False
+            if not self.titleRegex or re.search(self.titleRegex,
+                                                article.title()):
+                article.change_category(self.cat, None,
+                                        comment=self.editSummary,
+                                        inPlace=self.inPlace)
+        if empty:
+            pywikibot.output(u'There are no pages in category %s'
                              % self.cat.title())
-        else:
-            for article in self.cat.articles():
-                if not self.titleRegex or re.search(self.titleRegex,
-                                                    article.title()):
-                    article.change_category(self.cat, None,
-                                            comment=self.editSummary,
-                                            inPlace=self.inPlace)
         if self.pagesonly:
             return
 
         # Also removes the category tag from subcategories' pages
-        if self.cat.categoryinfo['subcats'] == 0:
+        empty = True
+        for subcategory in self.cat.subcategories():
+            empty = False
+            subcategory.change_category(self.cat, None,
+                                        comment=self.editSummary,
+                                        inPlace=self.inPlace)
+        if empty:
             pywikibot.output(u'There are no subcategories in category %s'
                              % self.cat.title())
-        else:
-            for subcategory in self.cat.subcategories():
-                subcategory.change_category(self.cat, None,
-                                            comment=self.editSummary,
-                                            inPlace=self.inPlace)
         # Deletes the category page
         if self.cat.exists() and self.cat.isEmptyCategory():
             if self.useSummaryForDeletion and self.editSummary:
