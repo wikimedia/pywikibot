@@ -366,6 +366,17 @@ class TestPageObject(PywikibotTestCase):
         pickle.dumps(mainpage)
         self.assertTrue(True)  # No exception thrown!
 
+    def testRepr(self):
+        s = repr(mainpage)
+        self.assertType(s, str)
+
+    def testReprUnicode(self):
+        site = pywikibot.Site('ar', 'wikipedia')
+        page = pywikibot.Page(site, 'Main Page')
+        page = page.toggleTalkPage()
+        s = repr(page)
+        self.assertType(s, str)
+
 # methods that still need tests implemented or expanded:
 
 #    def autoFormat(self):
