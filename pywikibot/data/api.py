@@ -483,14 +483,16 @@ class CachedRequest(Request):
         if login_status > pywikibot.site.LoginStatus.NOT_LOGGED_IN and \
                 hasattr(self.site, '_userinfo') and \
                 'name' in self.site._userinfo:
-            user_key = pywikibot.page.User(self.site,
-                                           self.site._userinfo['name'])
+            # This uses the format of Page.__repr__(), without the encoding
+            # it performs. This string cant be encoded otherwise it creates an
+            # exception when _create_file_name() tries to encode it again.
+            user_key = u'User(User:%s)' % self.site._userinfo['name']
         else:
             user_key = pywikibot.site.LoginStatus(
                 max(login_status, pywikibot.site.LoginStatus.NOT_LOGGED_IN))
+            user_key = repr(user_key)
 
-        return (repr(self.site) + repr(user_key) +
-                repr(sorted(self.iteritems())))
+        return repr(self.site) + user_key + repr(sorted(self.iteritems()))
 
     def _create_file_name(self):
         self.http_params()  # normalize self.iteritems()
