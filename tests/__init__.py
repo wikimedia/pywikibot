@@ -11,6 +11,11 @@ import pywikibot.data.api
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.data.api import CachedRequest
 
+_cache_dir = os.path.join(os.path.split(__file__)[0], 'apicache')
+
+CachedRequest._get_cache_dir = staticmethod(
+    lambda *args: CachedRequest._make_dir(_cache_dir))
+
 
 class TestRequest(CachedRequest):
 
@@ -18,11 +23,6 @@ class TestRequest(CachedRequest):
 
     def __init__(self, *args, **kwargs):
         super(TestRequest, self).__init__(0, *args, **kwargs)
-
-    def _get_cache_dir(self):
-        path = os.path.join(os.path.split(__file__)[0], 'apicache')
-        self._make_dir(path)
-        return path
 
     def _expired(self, dt):
         """Never invalidate cached data."""

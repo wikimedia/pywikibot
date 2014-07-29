@@ -441,17 +441,35 @@ class CachedRequest(Request):
         self._data = None
         self._cachetime = None
 
-    def _get_cache_dir(self):
+    @staticmethod
+    def _get_cache_dir():
+        """The base directory path for cache entries.
+
+        The directory will be created if it does not already exist.
+
+        @return: basestring
+        """
         path = os.path.join(pywikibot.config2.base_dir, 'apicache')
-        self._make_dir(path)
+        CachedRequest._make_dir(path)
         return path
 
-    def _make_dir(self, dir):
+    @staticmethod
+    def _make_dir(dir):
+        """Create directory if it does not exist already.
+
+        The directory name (dir) is returned unmodified.
+
+        @param dir: directory path
+        @type dir: basestring
+
+        @return: basestring
+        """
         try:
             os.makedirs(dir)
         except OSError:
             # directory already exists
             pass
+        return dir
 
     def _uniquedescriptionstr(self):
         login_status = self.site._loginstatus
@@ -475,7 +493,8 @@ class CachedRequest(Request):
         ).hexdigest()
 
     def _cachefile_path(self):
-        return os.path.join(self._get_cache_dir(), self._create_file_name())
+        return os.path.join(CachedRequest._get_cache_dir(),
+                            self._create_file_name())
 
     def _expired(self, dt):
         return dt + self.expiry < datetime.datetime.now()
