@@ -2648,6 +2648,7 @@ class WikibasePage(Page):
         @type force: bool
         @param args: may be used to specify custom props.
         """
+        lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
         if force or not hasattr(self, '_content'):
             data = self.repo.loadcontent(self._defined_by(), *args)
             self.id = list(data.keys())[0]
@@ -2655,7 +2656,12 @@ class WikibasePage(Page):
         if 'lastrevid' in self._content:
             self.lastrevid = self._content['lastrevid']
         else:
+            if lazy_loading_id:
+                p = Page(self._site, self._title)
+                if not p.exists():
+                    raise pywikibot.NoPage(p)
             raise pywikibot.NoPage(self)
+
         # aliases
         self.aliases = {}
         if 'aliases' in self._content:
