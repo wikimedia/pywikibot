@@ -104,6 +104,21 @@ class ArchiveSecurityError(pywikibot.Error):
     (or incorrect)."""
 
 
+def str2localized_duration(site, string):
+    """Translate a duration written in the shorthand notation (ex. "24h", "7d")
+    into an expression in the local language of the wiki ("24 hours", "7 days").
+    """
+    if string[-1] == 'd':
+        template = site.mediawiki_message('Days')
+    elif string[-1] == 'h':
+        template = site.mediawiki_message('Hours')
+    if template:
+        exp = i18n.translate(site.code, template, int(string[:-1]))
+        return exp.replace('$1', string[:-1])
+    else:
+        return string
+
+
 def str2time(string):
     """Accepts a string defining a time period:
     7d - 7 days
@@ -217,9 +232,9 @@ class DiscussionThread(object):
             # return 'unsigned'
             maxage = str2time(re_t.group(1))
             if self.now - self.timestamp > maxage:
-                return u'%s %s' % (i18n.twtranslate(self.code,
-                                                    'archivebot-older-than'),
-                                   re_t.group(1))
+                msg = i18n.twtranslate(self.code, 'archivebot-older-than')
+                duration = str2localized_duration(archiver.site, re_t.group(1))
+                return u'%s %s' % (msg, duration)
         return ''
 
 
