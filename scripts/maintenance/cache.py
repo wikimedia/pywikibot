@@ -82,6 +82,10 @@ class CacheEntry(api.CachedRequest):
         """ Directory of the cached entry. """
         return self.directory
 
+    def _cachefile_path(self):
+        return os.path.join(self._get_cache_dir(),
+                            self._create_file_name())
+
     def _load_cache(self):
         """ Load the cache entry. """
         with open(self._cachefile_path(), 'rb') as f:
