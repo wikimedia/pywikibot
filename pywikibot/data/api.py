@@ -472,6 +472,12 @@ class CachedRequest(Request):
         return dir
 
     def _uniquedescriptionstr(self):
+        """ Unique description for the cache entry.
+
+        If this is modified, please also update
+        scripts/maintenance/cache.py to support
+        the new key and all previous keys. """
+
         login_status = self.site._loginstatus
 
         if login_status > pywikibot.site.LoginStatus.NOT_LOGGED_IN and \
