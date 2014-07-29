@@ -22,15 +22,15 @@ scripts_path = os.path.join(base_path, 'scripts')
 
 
 script_deps = {
-    'script_wui.py': ['crontab', 'lua'],
+    'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
 
-    'flickrripper.py': ['ImageTk', 'flickrapi'],
+    'flickrripper': ['ImageTk', 'flickrapi'],
     # Note: 'PIL' is not available via pip2.7 on MS Windows,
     #       however it is available with setuptools.
 }
 if sys.version_info < (2, 7):
-    script_deps['replicate_wiki.py'] = ['argparse']
+    script_deps['replicate_wiki'] = ['argparse']
 
 
 def check_script_deps(script_name):
@@ -46,21 +46,31 @@ def check_script_deps(script_name):
     return True
 
 
-def runnable_script_list(scripts_path):
-    """List of scripts which may be executed."""
-    dir_list = os.listdir(scripts_path)
-    script_list = [name[0:-3] for name in dir_list  # strip .py
-                   if name.endswith('.py')
-                   and not name.startswith('_')  # skip __init__.py and _*
-                   and check_script_deps(name)
-                   and name != 'login.py'        # this is moved to be first
-                   and name != 'imageuncat.py'   # this halts indefinitely
-                   and name != 'welcome.py'      # result depends on speed
-                   and name != 'script_wui.py'   # depends on lua compiling
-                   and name != 'editarticle.py'  # requires a X DISPLAY
-                   and name != 'makecat.py'      # bug 69781
-                   ]
-    return ['login'] + script_list
+failed_dep_script_list = [name
+                          for name in script_deps
+                          if not check_script_deps(name)]
+
+unrunnable_script_list = [
+    'script_wui',   # depends on lua compiling
+    'editarticle',  # requires a X DISPLAY
+]
+
+deadlock_script_list = [
+    'makecat',      # bug 69781
+]
+
+script_list = (['login'] +
+               [name[0:-3] for name in os.listdir(scripts_path)  # strip '.py'
+                if name.endswith('.py')
+                and not name.startswith('_')  # skip __init__.py and _*
+                and name != 'login.py'        # this is moved to be first
+                ]
+               )
+
+runnable_script_list = (['login'] +
+                        sorted(set(script_list) -
+                               set(['login']) -
+                               set(unrunnable_script_list)))
 
 script_input = {
     'catall': 'q\n',  # q for quit
@@ -85,6 +95,7 @@ auto_run_script_list = [
     'clean_sandbox',
     'disambredir',
     'imagerecat',
+    'login',
     'lonelypages',
     'misspelling',
     'revertbot',
@@ -130,6 +141,45 @@ no_args_expected_results = {
     'revertbot': 'Fetching new batch of contributions',
     'upload': 'ERROR: Upload error',
 }
+
+
+def collector(loader=unittest.loader.defaultTestLoader):
+    """Load the default tests."""
+    # Note: Raising SkipTest during load_tests will
+    # cause the loader to fallback to its own
+    # discover() ordering of unit tests.
+
+    enable_autorun_tests = (
+        os.environ.get('PYWIKIBOT2_TEST_AUTORUN', '0') == '1')
+
+    tests = (['test__login_execution'] +
+             ['test_' + name + '_execution'
+              for name in sorted(script_list)
+              if name != 'login'
+              and name not in deadlock_script_list] +
+             ['test__login_no_args'])
+
+    tests += ['test_' + name + '_no_args'
+              for name in sorted(script_list)
+              if name != 'login'
+              and name not in deadlock_script_list
+              and name not in failed_dep_script_list  # no_args = execution
+              and name not in unrunnable_script_list
+              and (enable_autorun_tests or name not in auto_run_script_list)]
+
+    test_list = ['tests.script_tests.TestScript.' + name
+                 for name in tests]
+
+    tests = loader.loadTestsFromNames(test_list)
+    suite = unittest.TestSuite()
+    suite.addTests(tests)
+    return suite
+
+
+def load_tests(loader=unittest.loader.defaultTestLoader,
+               tests=None, pattern=None):
+    """Load the default modules."""
+    return collector(loader)
 
 
 def execute(command, data_in=None, timeout=0):
@@ -195,10 +245,12 @@ class TestScriptMeta(type):
                                  result['stderr'])
             return testScript
 
-        for script_name in runnable_script_list(scripts_path):
+        for script_name in script_list:
             # force login to be the first, alphabetically, so the login
             # message does not unexpectedly occur during execution of
             # another script.
+            # unrunnable script tests are disabled by default in load_tests()
+
             if script_name == 'login':
                 test_name = 'test__' + script_name + '_execution'
             else:
@@ -212,6 +264,17 @@ class TestScriptMeta(type):
                                ]:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = 'Test running ' + script_name + '.'
+            dct[test_name].__name__ = test_name
+
+            # Ideally all scripts should execute -help without
+            # connecting to a site.  However pywikibot always
+            # logs site.live_version().
+            # TODO: make logging live_version() optional, then set
+            #         dct[test_name].site = True
+            #       for only the tests which dont respond to -help
+
+            if script_name in deadlock_script_list:
+                dct[test_name].__test__ = False
 
             if script_name == 'login':
                 test_name = 'test__' + script_name + '_no_args'
@@ -222,6 +285,7 @@ class TestScriptMeta(type):
             if script_name in ['checkimages',     # bug 68613
                                'data_ingestion',  # bug 68611
                                'flickrripper',    # bug 68606 (and deps)
+                               'script_wui',      # Error on any user except DrTrigonBot
                                'upload',          # raises custom ValueError
                                ] or (
                     ((config.family != 'wikipedia' or config.mylang != 'en') and script_name == 'cfd') or
@@ -232,12 +296,28 @@ class TestScriptMeta(type):
                 'Test running ' + script_name + ' without arguments.'
             dct[test_name].__name__ = test_name
 
+            # Disable test bt default in nosetests
+            if script_name in unrunnable_script_list + deadlock_script_list:
+                dct[test_name].__test__ = False
+
+            # TODO: Ideally any script not on the auto_run_script_list
+            # can be set as 'not a site' test, but that will require
+            # auditing all code in main() to ensure it exits without
+            # connecting to a site.  There are outstanding bugs about
+            # connections during initialisation.
+            #
+            # dct[test_name].site = True
+
         return type.__new__(cls, name, bases, dct)
 
 
 class TestScript(PywikibotTestCase):
 
-    """Test cases for scripts."""
+    """Test cases for scripts.
+
+    This class sets the nose 'site' attribute on each test
+    depending on whether it is in the auto_run_script_list.
+    """
 
     __metaclass__ = TestScriptMeta
 

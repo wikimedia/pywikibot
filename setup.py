@@ -15,7 +15,6 @@ import os
 import itertools
 
 test_deps = []
-testcollector = "tests"
 
 dependencies = ['httplib2>=0.6.0']
 
@@ -40,7 +39,6 @@ if sys.version_info[0] == 2:
             sys.modules['unittest'] = unittest2
 
         script_deps['replicate_wiki.py'] = ['argparse']
-        testcollector = "tests.utils.collector"
         dependencies.append('ordereddict')
 
 if sys.version_info[0] == 3:
@@ -108,7 +106,7 @@ setup(
     ],
     url='https://www.mediawiki.org/wiki/Pywikibot',
     download_url='https://github.com/wikimedia/pywikibot-core/archive/master.zip#egg=pywikibot-2.0b1',
-    test_suite=testcollector,
+    test_suite="tests.collector",
     tests_require=test_deps,
     classifiers=[
         'License :: OSI Approved :: MIT License',

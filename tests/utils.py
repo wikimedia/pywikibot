@@ -9,27 +9,11 @@ __version__ = '$Id$'
 #
 import time
 import sys
-
-if sys.version_info < (2, 7):
-    # Unittest2 is a backport of python 2.7s unittest module to python 2.6
-    import unittest2 as unittest
-else:
-    import unittest
-
 import pywikibot
+from tests import patch_request, unpatch_request, unittest
 
 # Number of seconds each test may consume before a note is added after the test.
 test_duration_warning_interval = 10
-
-
-def collector():
-    # This test collector loads tests from the `tests` directory in files
-    # matching the pattern `*tests.py`. This gets used by `setup.py test` when
-    # running on Python 2.6 to use the unittest2 test runner instead of the
-    # unittest one.
-    return unittest.loader.defaultTestLoader.discover("tests", "*tests.py")
-
-from tests import patch_request, unpatch_request
 
 
 class BaseTestCase(unittest.TestCase):
