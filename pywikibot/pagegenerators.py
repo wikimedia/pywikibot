@@ -208,11 +208,15 @@ class GeneratorFactory(object):
         if self.site is None:
             self.site = pywikibot.Site()
 
-    def getCombinedGenerator(self):
+    def getCombinedGenerator(self, gen=None):
         """Return the combination of all accumulated generators.
 
         Only call this after all arguments have been parsed.
         """
+
+        if gen:
+            self.gens.insert(0, gen)
+
         namespaces = [int(n) for n in self.namespaces]
         for i in range(len(self.gens)):
             if isinstance(self.gens[i], pywikibot.data.api.QueryGenerator):
