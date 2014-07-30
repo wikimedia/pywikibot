@@ -371,6 +371,11 @@ u'Unless using solely -subst or -remove, you must give an even number of templat
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
     if user:
         gen = UserEditFilterGenerator(gen, user, timestamp, skip)
+
+    if not genFactory.gens:
+        # make sure that proper namespace filtering etc. is handled
+        gen = genFactory.getCombinedGenerator(gen)
+
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
 
     bot = TemplateRobot(preloadingGen, templates, subst, remove, editSummary,
