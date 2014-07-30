@@ -464,7 +464,6 @@ def main(*args):
     # if -xml flag is present
     xmlFilename = None
     useSql = False
-    PageTitles = []
     # will become True when the user presses a ('yes to all') or uses the
     # -always flag.
     acceptall = False
@@ -505,12 +504,6 @@ def main(*args):
                 xmlFilename = arg[5:]
         elif arg == '-sql':
             useSql = True
-        elif arg.startswith('-page'):
-            if len(arg) == 5:
-                PageTitles.append(pywikibot.input(
-                    u'Which page do you want to change?'))
-            else:
-                PageTitles.append(arg[6:])
         elif arg.startswith('-excepttitle:'):
             exceptions['title'].append(arg[13:])
         elif arg.startswith('-requiretitle:'):
@@ -545,7 +538,6 @@ def main(*args):
         else:
             commandline_replacements.append(arg)
     pywikibot.Site().login()
-    gen = genFactory.getCombinedGenerator()
     if (len(commandline_replacements) % 2):
         raise pywikibot.Error('require even number of replacements.')
     elif (len(commandline_replacements) == 2 and fix is None):
@@ -677,10 +669,8 @@ JOIN text ON (page_id = old_id)
 %s
 LIMIT 200""" % (whereClause, exceptClause)
         gen = pagegenerators.MySQLPageGenerator(query)
-    elif PageTitles:
-        pages = [pywikibot.Page(pywikibot.Site(), PageTitle)
-                 for PageTitle in PageTitles]
-        gen = iter(pages)
+
+    gen = genFactory.getCombinedGenerator(gen)
 
     if not gen:
         # syntax error, show help text from the top of this file
