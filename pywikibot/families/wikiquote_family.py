@@ -12,7 +12,7 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'pl', 'en', 'it', 'ru', 'de', 'pt', 'es', 'fr', 'cs', 'sk', 'bg',
-            'bs', 'tr', 'uk', 'sl', 'he', 'fa', 'lt', 'eo', 'el', 'ca', 'zh',
+            'bs', 'tr', 'uk', 'he', 'sl', 'fa', 'lt', 'eo', 'el', 'ca', 'zh',
             'id', 'hu', 'fi', 'sv', 'li', 'nl', 'hr', 'nn', 'ja', 'no', 'az',
             'sa', 'hy', 'ar', 'et', 'ko', 'gl', 'ml', 'cy', 'ka', 'sr', 'ro',
             'ku', 'te', 'th', 'da', 'eu', 'ta', 'is', 'vi', 'af', 'sq', 'hi',
