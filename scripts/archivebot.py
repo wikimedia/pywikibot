@@ -52,6 +52,15 @@ archiveheader        Content that will be put on new archive pages as the
 key                  A secret key that (if valid) allows archives to not be
                      subpages of the page being archived.
 
+Variables below can be used in the value for "archive" in the template above:
+
+%(counter)d          the current value of the counter
+%(year)d             year of the thread being archived
+%(quarter)d          quarter of the year of the thread being archived
+%(month)d            month (as a number 1-12) of the thread being archived
+%(monthname)s        English name of the month above
+%(monthnameshort)s   first three letters of the name above
+%(week)d             week number of the thread being archived
 
 Options (may be omitted):
   -help           show this help message and exit
@@ -78,6 +87,7 @@ import os
 import re
 import locale
 from hashlib import md5
+from math import ceil
 
 import pywikibot
 from pywikibot import i18n
@@ -421,6 +431,7 @@ class PageArchiver(object):
                 params = {
                     'counter': arch_counter,
                     'year': t.timestamp.year,
+                    'quarter': int(ceil(float(t.timestamp.month) / 3)),
                     'month': t.timestamp.month,
                     'monthname': self.month_num2orig_names[t.timestamp.month]['long'],
                     'monthnameshort': self.month_num2orig_names[t.timestamp.month]['short'],
