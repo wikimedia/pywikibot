@@ -11,7 +11,7 @@ class Family(family.WikimediaFamily):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'nl', 'sv', 'de', 'fr', 'it', 'ru', 'es', 'vi', 'war', 'pl',
+            'en', 'sv', 'nl', 'de', 'fr', 'it', 'ru', 'es', 'vi', 'war', 'pl',
             'ceb', 'ja', 'pt', 'zh', 'uk', 'ca', 'no', 'fa', 'fi', 'id', 'cs',
             'ar', 'ko', 'ms', 'hu', 'ro', 'sr', 'tr', 'min', 'kk', 'sh', 'eo',
             'sk', 'da', 'eu', 'lt', 'bg', 'he', 'hr', 'sl', 'uz', 'hy', 'et',
@@ -35,9 +35,9 @@ class Family(family.WikimediaFamily):
             'to', 'arc', 'kl', 'bjn', 'kbd', 'lo', 'ha', 'pap', 'tpi', 'av',
             'lbe', 'mdf', 'jbo', 'na', 'wo', 'bxr', 'ty', 'srn', 'ig', 'nso',
             'kaa', 'kg', 'tet', 'ab', 'ltg', 'zu', 'za', 'cdo', 'tyv', 'chy',
-            'rmy', 'tw', 'cu', 'tn', 'chr', 'om', 'roa-rup', 'got', 'bi', 'pih',
+            'tw', 'rmy', 'cu', 'tn', 'chr', 'om', 'roa-rup', 'got', 'bi', 'pih',
             'rn', 'sm', 'bm', 'ss', 'iu', 'sd', 'pnt', 'ki', 'xh', 'ts', 'ee',
-            'ak', 'fj', 'ti', 'lg', 'ks', 'sg', 'ny', 'ff', 've', 'cr', 'st',
+            'ak', 'fj', 'ti', 'lg', 'ks', 'ff', 'sg', 'ny', 've', 'cr', 'st',
             'dz', 'tum', 'ik', 'ch',
         ]
 
