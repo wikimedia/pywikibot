@@ -78,6 +78,7 @@ from distutils.version import LooseVersion as LV
 import pywikibot
 import isbn
 from pywikibot import config, i18n, pagegenerators, Bot
+from pywikibot.page import url2unicode
 
 warning = """
 ATTENTION: You can run this script as a stand-alone for testing purposes.
@@ -427,8 +428,8 @@ class CosmeticChangesToolkit:
                                              titleLength)
 
                     # Convert URL-encoded characters to unicode
-                    titleWithSection = pywikibot.url2unicode(titleWithSection,
-                                                             site=self.site)
+                    titleWithSection = url2unicode(titleWithSection,
+                                                   encodings=self.site)
 
                     if titleWithSection == '':
                         # just skip empty links.
