@@ -193,8 +193,12 @@ class SandboxBot(pywikibot.Bot):
                 sandboxPage = pywikibot.Page(self.site, title)
                 pywikibot.output(u'Preparing to process sandbox page %s'
                                  % sandboxPage.title(asLink=True))
+                if sandboxPage.isRedirectPage():
+                    pywikibot.warning(
+                        u'%s is a redirect page, cleaning it anyway'
+                        % sandboxPage.title(asLink=True))
                 try:
-                    text = sandboxPage.get()
+                    text = sandboxPage.get(get_redirect=True)
                     if not self.getOption('text'):
                         translatedContent = i18n.translate(self.site, content)
                     else:
