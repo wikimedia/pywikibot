@@ -20,7 +20,7 @@ class Family(family.Family):
         return u'www.wikia.com'
 
     def version(self, code):
-        return "1.19.17"
+        return "1.19.18"
 
     def scriptpath(self, code):
         return ''
