@@ -261,7 +261,7 @@ class NowCommonsDeleteBot(Bot):
                 break
 
     def getPageGenerator(self):
-        if use_hash:
+        if self.getOption('use_hash'):
             gen = self.useHashGenerator()
         else:
             nowCommonsTemplates = [pywikibot.Page(self.site, title,
@@ -309,7 +309,7 @@ class NowCommonsDeleteBot(Bot):
         comment = i18n.translate(self.site, nowCommonsMessage, fallback=True)
 
         for page in self.getPageGenerator():
-            if use_hash:
+            if self.getOption('use_hash'):
                 # Page -> Has the namespace | commons image -> Not
                 images_list = page    # 0 -> local image, 1 -> commons image
                 page = pywikibot.Page(self.site, images_list[0])
@@ -325,18 +325,18 @@ class NowCommonsDeleteBot(Bot):
                     pywikibot.output(u'File is already on Commons.')
                     continue
                 md5 = localImagePage.getFileMd5Sum()
-                if use_hash:
+                if self.getOption('use_hash'):
                     filenameOnCommons = images_list[1]
                 else:
                     filenameOnCommons = self.findFilenameOnCommons(
                         localImagePage)
-                if not filenameOnCommons and not use_hash:
+                if not filenameOnCommons and not self.getOption('use_hash'):
                     pywikibot.output(u'NowCommons template not found.')
                     continue
                 commonsImagePage = pywikibot.ImagePage(commons, 'Image:%s'
                                                        % filenameOnCommons)
                 if localImagePage.title(withNamespace=False) == \
-                 commonsImagePage.title(withNamespace=False) and use_hash:
+                 commonsImagePage.title(withNamespace=False) and self.getOption('use_hash'):
                     pywikibot.output(
                         u'The local and the commons images have the same name')
                 if localImagePage.title(withNamespace=False) != \
@@ -378,7 +378,7 @@ class NowCommonsDeleteBot(Bot):
                                 # refresh because we want the updated list
                                 usingPages = len(list(pywikibot.ImagePage(
                                     self.site, page.title()).usingPages()))
-                                if usingPages > 0 and use_hash:
+                                if usingPages > 0 and self.getOption('use_hash'):
                                     # just an enter
                                     pywikibot.input(
                                         u'There are still %s pages with this \
@@ -397,7 +397,7 @@ class NowCommonsDeleteBot(Bot):
                     if md5 == commonsImagePage.getFileMd5Sum():
                         pywikibot.output(
                             u'The image is identical to the one on Commons.')
-                        if len(localImagePage.getFileVersionHistory()) > 1 and not use_hash:
+                        if len(localImagePage.getFileVersionHistory()) > 1 and not self.getOption('use_hash'):
                             pywikibot.output(
                                 u"This image has a version history. Please \
                                 delete it manually after making sure that the \
