@@ -12,6 +12,7 @@ import sys
 import time
 import subprocess
 import pywikibot
+from pywikibot import config
 from tests.utils import unittest, PywikibotTestCase
 
 
@@ -53,6 +54,8 @@ def runnable_script_list(scripts_path):
                    and not name.startswith('_')  # skip __init__.py and _*
                    and check_script_deps(name)
                    and name != 'imageuncat.py'   # this halts indefinitely
+                   and name != 'watchlist.py'    # result depends on speed
+                   and name != 'script_wui.py'   # depends on lua compiling
                    ]
     return script_list
 
@@ -205,7 +208,6 @@ class TestScriptMeta(type):
                                             no_args_expected_results)
             if script_name in ['add_text',        # raises custom NoEnoughData
                                'checkimages',     # bug 68613
-                               'cfd',             # bug 69015
                                'commonscat',      # raises custom NoEnoughData
                                'claimit',         # bug 68657 - zero output
                                'data_ingestion',  # bug 68611
@@ -214,15 +216,14 @@ class TestScriptMeta(type):
                                'flickrripper',    # bug 68606 (and deps)
                                'imagerecat',      # bug 68658
                                'imagetransfer',   # bug 68659
-                               'lonelypages',     # raises custom Exception
-                               'misspelling',     # bug 68665
                                'pagefromfile',    # bug 68660
-                               'script_wui',      # bug 68797
                                'template',        # bug 68661 - zero output
                                'transferbot',     # raises custom Exception
                                'upload',          # raises custom ValueError
-                               'watchlist',       # fails on Wikidata only
-                               ]:
+                               ] or \
+                    (config.family == 'wikidata' and script_name == 'lonelypages') or \
+                    ((config.family != 'wikipedia' or config.mylang != 'en') and script_name == 'cfd') or \
+                    (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling'):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = \
                 'Test running ' + script_name + ' without arguments.'
