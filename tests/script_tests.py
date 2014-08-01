@@ -24,7 +24,7 @@ script_deps = {
     'script_wui.py': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
 
-    'flickrripper.py': ['PIL', 'flickrapi'],
+    'flickrripper.py': ['ImageTk', 'flickrapi'],
     # Note: 'PIL' is not available via pip2.7 on MS Windows,
     #       however it is available with setuptools.
 }
@@ -51,7 +51,9 @@ def runnable_script_list(scripts_path):
     script_list = [name[0:-3] for name in dir_list  # strip .py
                    if name.endswith('.py')
                    and not name.startswith('_')  # skip __init__.py and _*
-                   and check_script_deps(name)]
+                   and check_script_deps(name)
+                   and name != 'imageuncat.py'   # this halts indefinitely
+                   ]
     return script_list
 
 script_input = {
