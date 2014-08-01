@@ -134,7 +134,8 @@ class TestCategoryRearrangement(PywikibotTestCase):
 
     """
     Tests to ensure that sorting keys are not being lost when
-    using .getCategoryLinks() and .replaceCategoryLinks().
+    using .getCategoryLinks() and .replaceCategoryLinks(),
+    with both a newline and an empty string as separators.
     """
 
     @classmethod
@@ -143,12 +144,21 @@ class TestCategoryRearrangement(PywikibotTestCase):
         cls.old = ('[[Category:Cat1]]%(LS)s[[Category:Cat2|]]%(LS)s'
                    '[[Category:Cat1| ]]%(LS)s[[Category:Cat2|key]]'
                    % {'LS': config.LS})
+        cls.cats = textlib.getCategoryLinks(cls.old, site=cls.site)
 
-    def test_replace_category_links(self):
-        cats = textlib.getCategoryLinks(self.old, site=self.site)
-        new = textlib.replaceCategoryLinks(self.old, cats, site=self.site)
+    def test_standard_links(self):
+        new = textlib.replaceCategoryLinks(self.old, self.cats, site=self.site)
         self.assertEqual(self.old, new)
 
+    def test_adjoining_links(self):
+        old = self.old.replace(config.LS, '')
+        cats = textlib.getCategoryLinks(old, site=self.site)
+        self.assertEqual(self.cats, cats)
+        sep = config.LS
+        config.line_separator = ''  # use an empty separator temporarily
+        new = textlib.replaceCategoryLinks(old, cats, site=self.site)
+        self.assertEqual(old, new)
+        config.line_separator = sep  # restore the default separator
 
 if __name__ == '__main__':
     try:
