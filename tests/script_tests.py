@@ -90,6 +90,7 @@ auto_run_script_list = [
     'solve_disambiguation',
     'unusedfiles',
     'upload',
+    'watchlist',
     'welcome',
 ]
 
@@ -194,6 +195,7 @@ class TestScriptMeta(type):
                                'data_ingestion',  # bug 68611
                                'flickrripper',    # bug 68606 (and others)
                                'replicate_wiki',  # bug 68664
+                               'script_wui',      # Failing on travis-ci
                                ]:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = 'Test running ' + script_name + '.'
@@ -203,6 +205,7 @@ class TestScriptMeta(type):
                                             no_args_expected_results)
             if script_name in ['add_text',        # raises custom NoEnoughData
                                'checkimages',     # bug 68613
+                               'cfd',             # bug 69015
                                'commonscat',      # raises custom NoEnoughData
                                'claimit',         # bug 68657 - zero output
                                'data_ingestion',  # bug 68611
@@ -211,11 +214,14 @@ class TestScriptMeta(type):
                                'flickrripper',    # bug 68606 (and deps)
                                'imagerecat',      # bug 68658
                                'imagetransfer',   # bug 68659
+                               'lonelypages',     # raises custom Exception
+                               'misspelling',     # bug 68665
                                'pagefromfile',    # bug 68660
                                'script_wui',      # bug 68797
                                'template',        # bug 68661 - zero output
                                'transferbot',     # raises custom Exception
                                'upload',          # raises custom ValueError
+                               'watchlist',       # fails on Wikidata only
                                ]:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = \
