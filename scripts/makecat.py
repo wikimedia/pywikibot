@@ -94,7 +94,7 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None):
                             break
                 else:
                     pl.put(pywikibot.replaceCategoryLinks(
-                        text, cats + [actualworkingcat]))
+                        text, cats + [actualworkingcat], site=pl.site))
     if cl:
         if checkforward:
             for page2 in pl.linkedPages():

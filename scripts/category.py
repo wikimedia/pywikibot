@@ -386,7 +386,7 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
                 catpl = self.sorted_by_last_name(catpl, page)
             pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
             cats.append(catpl)
-            text = pywikibot.replaceCategoryLinks(text, cats)
+            text = pywikibot.replaceCategoryLinks(text, cats, site=page.site)
             if not self.save(text, page, newcatTitle):
                 pywikibot.output(u'Page %s not saved.'
                                  % page.title(asLink=True))

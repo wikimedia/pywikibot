@@ -1633,7 +1633,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         # get list of Category objects the article is in and remove possible
         # duplicates
         cats = []
-        for cat in pywikibot.textlib.getCategoryLinks(self.text):
+        for cat in pywikibot.textlib.getCategoryLinks(self.text,
+                                                      site=self.site):
             if cat not in cats:
                 cats.append(cat)
 
@@ -1658,11 +1659,13 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
         if inPlace or self.namespace() == 10:
             oldtext = self.get(get_redirect=True)
-            newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, newCat)
+            newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, newCat,
+                                                       site=self.site)
         else:
             if newCat:
                 cats[cats.index(oldCat)] = Category(site, newCat.title(),
-                                                    sortKey=sortKey)
+                                                    sortKey=sortKey,
+                                                    site=self.site)
             else:
                 cats.pop(cats.index(oldCat))
             oldtext = self.get(get_redirect=True)
