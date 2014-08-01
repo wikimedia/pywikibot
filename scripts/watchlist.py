@@ -2,8 +2,8 @@
 """
 Allows access to the bot account's watchlist.
 
-The function refresh() downloads the current watchlist and saves it to disk. It
-is run automatically when a bot first tries to save a page retrieved. The
+The function refresh() downloads the current watchlist and saves it to disk.
+It is run automatically when a bot first tries to save a page retrieved. The
 watchlist can be updated manually by running this script. The list will also
 be reloaded automatically once a month.
 
@@ -36,6 +36,7 @@ cache = {}
 
 
 def get(site=None):
+    """Load the watchlist, fetching it if necessary."""
     if site is None:
         site = pywikibot.Site()
     if site in cache:
@@ -65,12 +66,13 @@ def get(site=None):
 
 
 def isWatched(pageName, site=None):
+    """Check whether a page is being watched."""
     watchlist = get(site)
     return pageName in watchlist
 
 
 def refresh(site, sysop=False):
-    # get watchlist special page's URL
+    """Fetch the watchlist."""
     if not site.logged_in(sysop=sysop):
         site.forceLogin(sysop=sysop)
 
@@ -105,16 +107,18 @@ def refresh(site, sysop=False):
     # The file is stored in the watchlists subdir. Create if necessary.
     f = open(config.datafilepath('watchlists',
                                  'watchlist-%s-%s%s.dat'
-                                 % (site.family.name, lang, '-sysop' if sysop else '')),
+                                 % (site.family.name, lang,
+                                    '-sysop' if sysop else '')),
              'w')
     pickle.dump(watchlist, f)
     f.close()
 
 
 def refresh_all(new=False, sysop=False):
+    """Fetch and locally cache several watchlists."""
     if new:
         pywikibot.output(
-            'Downloading All watchlists for your accounts in user-config.py')
+            'Downloading all watchlists for your accounts in user-config.py')
         for family in config.usernames:
             for lang in config.usernames[family]:
                 refresh(pywikibot.Site(lang, family), sysop=sysop)
@@ -137,6 +141,7 @@ def refresh_all(new=False, sysop=False):
 
 
 def main():
+    """ Script entry point. """
     local_args = pywikibot.handleArgs()
     all = False
     new = False
