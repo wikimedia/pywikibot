@@ -4,9 +4,8 @@ This module offers a wide variety of page generators. A page generator is an
 object that is iterable (see http://legacy.python.org/dev/peps/pep-0255/ ) and
 that yields page objects on which other scripts can then work.
 
-In general, there is no need to run this script directly. It can, however,
-be run for testing purposes. It will then print the page titles to standard
-output.
+Pagegenerators.py cannot be run as script. For testing purposes listpages.py can
+be used instead, to print page titles to standard output.
 
 These parameters are supported to specify which pages titles to print:
 
