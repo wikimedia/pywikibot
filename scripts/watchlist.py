@@ -137,10 +137,11 @@ def refresh_all(new=False, sysop=False):
 
 
 def main():
+    local_args = pywikibot.handleArgs()
     all = False
     new = False
     sysop = False
-    for arg in pywikibot.handleArgs():
+    for arg in local_args:
         if arg in ('-all', '-update'):
             all = True
         elif arg == '-new':
