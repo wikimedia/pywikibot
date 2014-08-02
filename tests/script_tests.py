@@ -53,12 +53,13 @@ def runnable_script_list(scripts_path):
                    if name.endswith('.py')
                    and not name.startswith('_')  # skip __init__.py and _*
                    and check_script_deps(name)
+                   and name != 'login.py'        # this is moved to be first
                    and name != 'imageuncat.py'   # this halts indefinitely
                    and name != 'watchlist.py'    # result depends on speed
                    and name != 'welcome.py'      # result depends on speed
                    and name != 'script_wui.py'   # depends on lua compiling
                    ]
-    return script_list
+    return ['login'] + script_list
 
 script_input = {
     'catall': 'q\n',  # q for quit
@@ -192,7 +193,13 @@ class TestScriptMeta(type):
             return testScript
 
         for script_name in runnable_script_list(scripts_path):
-            test_name = 'test_' + script_name + '_execution'
+            # force login to be the first, alphabetically, so the login
+            # message does not unexpectedly occur during execution of
+            # another script.
+            if script_name == 'login':
+                test_name = 'test__' + script_name + '_execution'
+            else:
+                test_name = 'test_' + script_name + '_execution'
             dct[test_name] = test_execution(script_name, ['-help'])
             if script_name in ['shell', 'version',
                                'checkimages',     # bug 68613
@@ -204,7 +211,10 @@ class TestScriptMeta(type):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = 'Test running ' + script_name + '.'
 
-            test_name = 'test_' + script_name + '_no_args'
+            if script_name == 'login':
+                test_name = 'test__' + script_name + '_no_args'
+            else:
+                test_name = 'test_' + script_name + '_no_args'
             dct[test_name] = test_execution(script_name, ['-simulate'],
                                             no_args_expected_results)
             if script_name in ['add_text',        # raises custom NoEnoughData
