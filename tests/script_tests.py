@@ -55,6 +55,7 @@ def runnable_script_list(scripts_path):
                    and check_script_deps(name)
                    and name != 'imageuncat.py'   # this halts indefinitely
                    and name != 'watchlist.py'    # result depends on speed
+                   and name != 'welcome.py'      # result depends on speed
                    and name != 'script_wui.py'   # depends on lua compiling
                    ]
     return script_list
