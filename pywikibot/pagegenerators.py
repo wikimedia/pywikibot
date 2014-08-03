@@ -1189,9 +1189,8 @@ def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.exturlusage(link, namespaces=namespaces, step=step,
-                                 total=total, content=False):
-        yield page
+    return site.exturlusage(link, namespaces=namespaces, step=step,
+                                 total=total, content=False)
 
 
 def SearchPageGenerator(query, step=None, total=None, namespaces=None,
