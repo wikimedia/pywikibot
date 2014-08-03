@@ -14,8 +14,8 @@ See imagerecat.py (still working on that one) to add these images to categories.
 __version__ = '$Id$'
 #
 
-from datetime import datetime
 from datetime import timedelta
+
 import pywikibot
 from pywikibot import pagegenerators
 
