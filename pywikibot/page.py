@@ -1859,15 +1859,17 @@ class ImagePage(Page):
             username, resolution, filesize, comment).
 
         """
-        # TODO; return value may need to change
         return self.site.loadimageinfo(self, history=True)
 
     def getFileVersionHistoryTable(self):
         """Return the version history in the form of a wiki table."""
         lines = []
-        # TODO: if getFileVersionHistory changes, make sure this follows it
-        for (datetime, username, resolution, size, comment) \
-                in self.getFileVersionHistory():
+        for info in self.getFileVersionHistory():
+            datetime = info['timestamp']
+            username = info['user']
+            resolution = '%dx%d' % (info['height'], info['width'])
+            size = info['size']
+            comment = info['comment']
             lines.append(u'| %s || %s || %s || %s || <nowiki>%s</nowiki>'
                          % (datetime, username, resolution, size, comment))
         return u'{| border="1"\n! date/time || username || resolution || size || edit summary\n|----\n' + \
