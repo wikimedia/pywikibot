@@ -132,10 +132,9 @@ cfd_templates = {
 
 class CategoryDatabase:
 
-    """This is a temporary knowledge base saving for each category the contained
-    subcategories and articles, so that category pages do not need to be loaded
-    over and over again
+    """Temporary database saving pages and subcategories for each category.
 
+    This prevents loading the category pages over and over again.
     """
 
     def __init__(self, rebuild=False, filename='category.dump.bz2'):
@@ -165,10 +164,10 @@ class CategoryDatabase:
         self.superclassDB = {}
 
     def getSubcats(self, supercat):
-        """For a given supercategory, return a list of Categorys for all its
-        subcategories. Saves this list in a temporary database so that it won't
-        be loaded from the server next time it's required.
+        """Return the list of subcategories for a given supercategory.
 
+        Saves this list in a temporary database so that it won't be loaded from
+        the server next time it's required.
         """
         # if we already know which subcategories exist here
         if supercat in self.catContentDB:
@@ -181,10 +180,10 @@ class CategoryDatabase:
             return subcatset
 
     def getArticles(self, cat):
-        """For a given category, return a list of Pages for all its articles.
+        """Return the list of pages for a given category.
+
         Saves this list in a temporary database so that it won't be loaded from
         the server next time it's required.
-
         """
         # if we already know which articles exist here
         if cat in self.catContentDB:
@@ -207,8 +206,11 @@ class CategoryDatabase:
             return supercatset
 
     def dump(self, filename='category.dump.bz2'):
-        """Save the contents of the dictionaries superclassDB and catContentDB
-        to disk.
+        """Save the dictionaries to disk if not empty.
+
+        Pickle the contents of the dictionaries superclassDB and catContentDB
+        if at least one is not empty. If both are empty, removes the file from
+        the disk.
         """
         if not os.path.isabs(filename):
             filename = config.datafilepath(filename)
@@ -394,9 +396,13 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
 
 class CategoryMoveRobot(object):
 
-    """Bot to move pages from one category to another or to remove
-    pages from categories. The bot moves per default pages and
-    subcategories.
+    """Change or remove the category from the pages.
+
+    If the new category is given changes the category from the old to the new
+    one. Otherwise remove the category from the page and the category if it's
+    empty.
+
+    Per default the operation applies to pages and subcategories.
     """
 
     DELETION_COMMENT_AUTOMATIC = 0
@@ -494,7 +500,13 @@ class CategoryMoveRobot(object):
 
     def run(self):
         """The main bot function that does all the work.
-        For readability it is splitted into several helper functions.
+
+        For readability it is splitted into several helper functions:
+        - _movecat()
+        - _movetalk()
+        - _hist()
+        - _change()
+        - _delete()
         """
         if self.newcat and self.move_oldcat and not self.newcat.exists():
             if "move-categorypages" in self.site.userinfo["rights"]:
@@ -516,7 +528,9 @@ class CategoryMoveRobot(object):
 
     def _delete(self):
         """Private function to delete the category page and its talk page.
-        Do not use this function from outside the class.
+
+        Do not use this function from outside the class. Automatically marks
+        the pages if they can't be removed due to missing permissions.
         """
         self.oldcat.delete(self.deletion_comment,
                            not self.batch, mark=True)
@@ -527,6 +541,7 @@ class CategoryMoveRobot(object):
 
     def _change(self, gen):
         """Private function to move category contents.
+
         Do not use this function from outside the class.
 
         @param gen: Generator containing pages or categories.
@@ -540,6 +555,7 @@ class CategoryMoveRobot(object):
 
     def _movecat(self):
         """Private function to move the category page.
+
         Do not use this function from outside the class.
         """
         # Some preparing
@@ -565,6 +581,7 @@ class CategoryMoveRobot(object):
 
     def _movetalk(self):
         """Private function to move the category talk page.
+
         Do not use this function from outside the class.
         """
         if self.oldtalk.exists():
@@ -574,9 +591,10 @@ class CategoryMoveRobot(object):
             self.oldtalk.move(self.newtalk.title(), comment)
 
     def _hist(self):
-        """Private function to create a history table with the history
-        of the old category on the new talk page.
-        Do not use this function from outside the class.
+        """Private function to copy the history of the to-be-deleted category.
+
+        Do not use this function from outside the class. It adds a table with
+        the history of the old category on the new talk page.
         """
         history = self.oldcat.getVersionHistoryTable()
         title = i18n.twtranslate(self.site, 'category-section-title',
@@ -588,9 +606,12 @@ class CategoryMoveRobot(object):
         self.newtalk.save(comment)
 
     def _makecat(self, var):
-        """Private helper function to get a Category object either from
-        a string or use just use the given one (for backwards
-        compatibility).
+        """Private helper function to get a Category object.
+
+        Checks if the instance given is a Category object and returns it.
+        Otherwise creates a new object using the value as the title (for
+        backwards compatibility).
+        @param var: Either the title as a string or a Category object.
         """
         if not isinstance(var, pywikibot.Category):
             var = pywikibot.Category(self.site, var)
@@ -679,8 +700,7 @@ class CategoryListifyRobot:
 
 class CategoryTidyRobot:
 
-    """Script to help a human to tidy up a category by moving its articles into
-    subcategories
+    """Script to help by moving articles of the category into subcategories.
 
     Specify the category name on the command line. The program will pick up the
     page, and look for all subcategories and supercategories, and show them with
@@ -713,6 +733,8 @@ class CategoryTidyRobot:
 
     def move_to_category(self, article, original_cat, current_cat):
         """
+        Ask if it should be moved to one of the subcategories.
+
         Given an article which is in category original_cat, ask the user if
         it should be moved to one of original_cat's subcategories.
         Recursively run through subcategories' subcategories.
@@ -861,8 +883,10 @@ class CategoryTreeRobot:
         self.site = pywikibot.Site()
 
     def treeview(self, cat, currentDepth=0, parent=None):
-        """ Return a multi-line string which contains a tree view of all
-        subcategories of cat, up to level maxDepth. Recursively calls itself.
+        """ Return a tree view of all subcategories of cat.
+
+        The multi-line string contains a tree view of all subcategories of cat,
+        up to level maxDepth. Recursively calls itself.
 
         Parameters:
             * cat - the Category of the node we're currently opening
@@ -904,8 +928,10 @@ class CategoryTreeRobot:
         return result
 
     def run(self):
-        """Print the multi-line string generated by treeview or save it to a
-        file.
+        """Handle the multi-line string generated by treeview.
+
+        After string was generated by treeview it is either printed to the
+        console or saved it to a file.
 
         Parameters:
             * catTitle - the title of the category which will be the tree's root
