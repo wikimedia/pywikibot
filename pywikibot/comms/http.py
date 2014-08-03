@@ -152,7 +152,7 @@ def request(site, uri, ssl=False, *args, **kwargs):
         else:
             proto = site.protocol()
             host = site.hostname()
-        baseuri = urlparse.urljoin("%(proto)s://%(host)s" % locals(), uri)
+        baseuri = urlparse.urljoin("%s://%s" % (proto, host), uri)
     else:
         baseuri = uri
 
