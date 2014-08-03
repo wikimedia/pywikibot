@@ -43,7 +43,10 @@ from pywikibot import config
 import upload
 
 import flickrapi                  # see: http://stuvel.eu/projects/flickrapi
-from Tkinter import *
+from Tkinter import (
+    Tk, Label, Entry, Scrollbar, Text, Button,
+    END, VERTICAL, NORMAL, WORD
+)
 from PIL import Image, ImageTk    # see: http://www.pythonware.com/products/pil/
 
 flickr_allowed_license = {
@@ -66,19 +69,16 @@ def getPhoto(flickr=None, photo_id=''):
     TODO: Add exception handling
 
     """
-    gotPhoto = False
-    while not gotPhoto:
+    while True:
         try:
             photoInfo = flickr.photos_getInfo(photo_id=photo_id)
             #xml.etree.ElementTree.dump(photoInfo)
             photoSizes = flickr.photos_getSizes(photo_id=photo_id)
             #xml.etree.ElementTree.dump(photoSizes)
-            gotPhoto = True
+            return photoInfo, photoSizes
         except flickrapi.exceptions.FlickrError:
-            gotPhotos = False
             pywikibot.output(u'Flickr api problem, sleeping')
             time.sleep(30)
-    return photoInfo, photoSizes
 
 
 def isAllowedLicense(photoInfo=None):
@@ -391,8 +391,6 @@ class Tkdialog:
 def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
               start_id='', end_id='', tags=u''):
     """ Loop over a set of Flickr photos. """
-    result = []
-    retry = False
     found_start_id = not start_id
 
     # https://www.flickr.com/services/api/flickr.groups.pools.getPhotos.html
@@ -504,9 +502,6 @@ def usage():
 
 
 def main():
-    site = pywikibot.Site(u'commons', u'commons')
-    #imagerecat.initLists()
-
     #Get the api key
     if not config.flickr['api_key']:
         pywikibot.output('Flickr api key not found! Get yourself an api key')

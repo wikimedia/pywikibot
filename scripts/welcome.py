@@ -862,8 +862,6 @@ def load_word_function(raw):
     return list_loaded
 
 globalvar = Global()
-global bot
-global filename
 
 
 def main():
@@ -959,11 +957,6 @@ def main():
             pywikibot.output("Put welcomed users before quit...")
             bot.makelogpage(bot.welcomed_users)
         pywikibot.output("\nQuitting...")
-
-
-if __name__ == "__main__":
-    try:
-        main()
     finally:
         # If there is the savedata, the script must save the number_user.
         if globalvar.randomSign and globalvar.saveSignIndex and \
@@ -972,3 +965,6 @@ if __name__ == "__main__":
             f = file(filename, 'w')
             cPickle.dump(bot.welcomed_users, f)
             f.close()
+
+if __name__ == "__main__":
+    main()

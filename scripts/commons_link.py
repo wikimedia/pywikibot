@@ -66,7 +66,7 @@ class CommonsLinkBot(Bot):
                                       ('Page', 'Category')[catmode]
                                       )(commons, page.title())
                 try:
-                    getcommons = commonspage.get(get_redirect=True)
+                    commonspage.get(get_redirect=True)
                     pagetitle = commonspage.title(withNamespace=not catmode)
                     if page.title() == pagetitle:
                         oldText = page.get()

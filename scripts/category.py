@@ -953,8 +953,6 @@ class CategoryTreeRobot:
 
 
 def main(*args):
-    global catDB
-
     fromGiven = False
     toGiven = False
     batchMode = False
@@ -1035,10 +1033,15 @@ def main(*args):
             depth = int(arg[len('-depth:'):])
         else:
             genFactory.handleArg(arg)
+
     pywikibot.Site().login()
+
+    catDB = None
+    bot = None
 
     catDB = CategoryDatabase(rebuild=rebuild)
     gen = genFactory.getCombinedGenerator()
+
     if action == 'add':
         if not gen:
             # default for backwards compatibility
@@ -1049,7 +1052,6 @@ def main(*args):
         gen = pagegenerators.PreloadingGenerator(gen)
         bot = AddCategory(gen, sort_by_last_name, create_pages, editSummary,
                           follow_redirects)
-        bot.run()
     elif action == 'remove':
         if not fromGiven:
             oldCatTitle = pywikibot.input(u'Please enter the name of the '
@@ -1063,7 +1065,6 @@ def main(*args):
                                 history=withHistory,
                                 pagesonly=pagesonly,
                                 deletion_comment=useSummaryForDeletion)
-        bot.run()
     elif action == 'move':
         if not fromGiven:
             oldCatTitle = pywikibot.input(
@@ -1085,11 +1086,9 @@ def main(*args):
                                 history=withHistory,
                                 pagesonly=pagesonly,
                                 deletion_comment=deletion_comment)
-        bot.run()
     elif action == 'tidy':
         catTitle = pywikibot.input(u'Which category do you want to tidy up?')
         bot = CategoryTidyRobot(catTitle, catDB)
-        bot.run()
     elif action == 'tree':
         catTitle = pywikibot.input(
             u'For which category do you want to create a tree view?')
@@ -1097,7 +1096,6 @@ def main(*args):
             u'Please enter the name of the file where the tree should be saved,'
             u'\nor press enter to simply show the tree:')
         bot = CategoryTreeRobot(catTitle, catDB, filename, depth)
-        bot.run()
     elif action == 'listify':
         if not fromGiven:
             oldCatTitle = pywikibot.input(
@@ -1108,16 +1106,18 @@ def main(*args):
         bot = CategoryListifyRobot(oldCatTitle, newCatTitle, editSummary,
                                    overwrite, showImages, subCats=True,
                                    talkPages=talkPages, recurse=recurse)
-        bot.run()
+
+    if bot:
+        try:
+            bot.run()
+        except pywikibot.Error:
+            pywikibot.error("Fatal error:", exc_info=True)
+        finally:
+            if catDB:
+                catDB.dump()
     else:
         pywikibot.showHelp()
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except pywikibot.Error:
-        pywikibot.error("Fatal error:", exc_info=True)
-    finally:
-        if 'catDB' in globals():
-            catDB.dump()
+    main()

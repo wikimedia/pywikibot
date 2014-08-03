@@ -681,7 +681,7 @@ class ReferencesRobot(Bot):
                 elif u'.zh' in ref.link:
                     enc.append("gbk")
 
-                if not 'utf-8' in enc:
+                if 'utf-8' not in enc:
                     enc.append('utf-8')
                 u = linkedpagetext.decode(enc[0])   # Bug 67410
 

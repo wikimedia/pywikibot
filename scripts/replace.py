@@ -654,8 +654,8 @@ def main(*args):
                                           replacements, exceptions)
     elif useSql:
         whereClause = 'WHERE (%s)' % ' OR '.join(
-            ["old_text RLIKE '%s'" % prepareRegexForMySQL(old.pattern)
-             for (old, new) in replacements])
+            ["old_text RLIKE '%s'" % prepareRegexForMySQL(old_regexp.pattern)
+             for (old_regexp, new_text) in replacements])
         if exceptions:
             exceptClause = 'AND NOT (%s)' % ' OR '.join(
                 ["old_text RLIKE '%s'" % prepareRegexForMySQL(exc.pattern)

@@ -59,7 +59,7 @@ __version__ = '$Id$'
 import sys
 import re
 import webbrowser
-import urllib
+
 import pywikibot
 from pywikibot import i18n, Bot
 from pywikibot import pagegenerators as pg
@@ -239,8 +239,8 @@ class NowCommonsDeleteBot(Bot):
                                  % image_local)
                 pywikibot.output(u'Local: %s\nCommons: %s\n'
                                  % (url_local, url_commons))
-                result1 = webbrowser.open(url_local, 0, 1)
-                result2 = webbrowser.open(url_commons, 0, 1)
+                webbrowser.open(url_local, 0, 1)
+                webbrowser.open(url_commons, 0, 1)
                 if image_local.split('Image:')[1] == image_commons:
                     choice = pywikibot.inputChoice(
                         u'The local and the commons images have the same name, continue?',
