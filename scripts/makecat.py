@@ -44,12 +44,6 @@ import pywikibot
 from pywikibot import date, pagegenerators, i18n
 
 
-def rawtoclean(c):
-    #Given the 'raw' category, provides the 'clean' category
-    c2 = c.title().split('|')[0]
-    return pywikibot.Page(mysite, c2)
-
-
 def isdate(s):
     """returns true if s is a date or year """
     dict, val = date.getAutoFormat(pywikibot.Site().language(), s)
@@ -158,7 +152,7 @@ def asktoadd(pl):
             pywikibot.output(u"a: Add another page")
             pywikibot.output(u"l: Give a list of the pages to check")
         elif answer == 'a':
-            pagetitle = raw_input("Specify page to add:")
+            pagetitle = pywikibot.input("Specify page to add:")
             page = pywikibot.Page(pywikibot.Site(), pagetitle)
             if page not in checked.keys():
                 include(page)
@@ -216,11 +210,10 @@ try:
             workingcatname.append(arg)
 
     if len(workingcatname) == 0:
-        workingcatname = raw_input("Which page to start with? ")
+        workingcatname = pywikibot.input("Which page to start with? ")
     else:
         workingcatname = ' '.join(workingcatname)
     mysite = pywikibot.Site()
-    workingcatname = unicode(workingcatname, 'utf-8')
     pywikibot.setAction(i18n.twtranslate(mysite, 'makecat-create', {'cat': workingcatname}))
     workingcat = pywikibot.Category(mysite,
                                     u'%s:%s'
