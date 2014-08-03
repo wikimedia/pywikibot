@@ -24,13 +24,13 @@ Command line options:
 __version__ = '$Id$'
 #
 
-import pywikibot
-from pywikibot import config
 import re
-import sys
 import pickle
 import os.path
 import time
+
+import pywikibot
+from pywikibot import config
 
 cache = {}
 
