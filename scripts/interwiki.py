@@ -2593,7 +2593,7 @@ def main():
             try:
                 os.remove(dumpFileName)
                 pywikibot.output(u'Dumpfile %s deleted' % dumpFileName.split('\\')[-1])
-            except WindowsError:
+            except OSError:
                 pass
 
 # ===========
