@@ -210,6 +210,7 @@ class FeaturedBot(pywikibot.Bot):
 
         self.availableOptions.update({
             'async':  False,  # asynchron putting a page?
+            'afterpage': u"!",
             'count': False,   # featuredcount
             'featured': False,
             'former': False,
@@ -378,7 +379,7 @@ class FeaturedBot(pywikibot.Bot):
             % (site, len(articles), task))
         while articles:
             p = articles.pop(0)
-            if p.title() < afterpage:
+            if p.title() < self.getOption('afterpage'):
                 continue
 
             if u"/" in p.title() and p.namespace() != 0:
@@ -596,15 +597,12 @@ class FeaturedBot(pywikibot.Bot):
 
 
 def main(*args):
-    global afterpage
-    afterpage = u"!"
-
     options = {}
     for arg in pywikibot.handleArgs():
         if arg.startswith('-fromlang:'):
             options[arg[1:9]] = arg[10:].split(",")
         elif arg.startswith('-after:'):
-            afterpage = arg[7:]
+            options['afterpage'] = arg[7:]
         elif arg.startswith('-nocache:'):
             options[arg[1:8]] = arg[9:].split(",")
         else:
