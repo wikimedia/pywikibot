@@ -31,8 +31,10 @@ __version__ = '$Id$'
 #
 
 import sys
-from pywikibot import *
 from itertools import imap
+
+import pywikibot
+from pywikibot import config, Page
 
 
 def namespaces(site):
@@ -67,7 +69,7 @@ class SyncSites:
 
         sites = options.destination_wiki
 
-        self.original = Site(original_wiki, family)
+        self.original = pywikibot.Site(original_wiki, family)
         self.original.login()
 
         if options.namespace and 'help' in options.namespace:
@@ -76,7 +78,7 @@ class SyncSites:
                 pywikibot.output('%s %s' % (k, nsd[k]))
             sys.exit()
 
-        self.sites = map(lambda s: Site(s, family), sites)
+        self.sites = map(lambda s: pywikibot.Site(s, family), sites)
 
         self.differences = {}
         self.user_diff = {}

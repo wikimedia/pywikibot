@@ -203,7 +203,7 @@ def getfileversion(filename):
     """
     _program_dir = _get_program_dir()
     __version__ = None
-    size, mtime = None, None
+    mtime = None
     fn = os.path.join(_program_dir, filename)
     if os.path.exists(fn):
         for line in open(fn, 'r').readlines():
