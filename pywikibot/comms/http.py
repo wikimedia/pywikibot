@@ -144,15 +144,23 @@ def request(site, uri, ssl=False, *args, **kwargs):
         baseuri = urlparse.urljoin("%(proto)s://%(host)s" % locals(), uri)
     else:
         baseuri = uri
-    username = site.username()
-    if not username:
-        username = ""
-    kwargs["headers"]["user-agent"] = config.USER_AGENT_FORMAT.format(
-        script=pywikibot.calledModuleName(),
-        version=pywikibot.version.getversiondict()['rev'],
-        username=quote(username),
-        lang=site.code,
-        family=site.family.name)
+    if "headers" not in kwargs:
+        kwargs["headers"] = {}
+    if site:
+        username = site.username()
+        if not username:
+            username = ""
+        kwargs["headers"]["user-agent"] = config.USER_AGENT_FORMAT.format(
+            script=pywikibot.calledModuleName(),
+            version=pywikibot.version.getversiondict()['rev'],
+            username=quote(username),
+            lang=site.code,
+            family=site.family.name)
+    else:
+        USER_AGENT_FORMAT = '{script}/{version} Pywikibot/2.0'
+        kwargs["headers"]["user-agent"] = USER_AGENT_FORMAT.format(
+            script=pywikibot.calledModuleName(),
+            version=pywikibot.version.getversiondict()['rev'])
     request = threadedhttp.HttpRequest(baseuri, *args, **kwargs)
     http_queue.put(request)
     while not request.lock.acquire(False):
