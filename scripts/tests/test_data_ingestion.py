@@ -6,7 +6,7 @@ __version__ = '$Id$'
 
 import os
 import unittest
-import data_ingestion
+from scripts import data_ingestion
 
 
 class TestPhoto(unittest.TestCase):

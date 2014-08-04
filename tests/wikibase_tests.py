@@ -26,7 +26,7 @@ wikidatatest = pywikibot.Site('test', 'wikidata').data_repository()
 
 # fetch a page which is very likely to be unconnected, which doesnt have
 # a generator, and unit tests may be used to test old versions of pywikibot
-def get_test_unconnected_page(site):
+def _get_test_unconnected_page(site):
     gen = pagegenerators.NewpagesPageGenerator(site=site, total=10,
                                                namespaces=[1, ])
     for page in gen:
@@ -348,7 +348,7 @@ class TestItemLoad(PywikibotTestCase):
 
     def test_fromPage_noitem(self):
         # this is a new page, and should not have a wikidata item yet
-        page = get_test_unconnected_page(site)
+        page = _get_test_unconnected_page(site)
         link = page._link
         self._test_fromPage_noitem(link)
 
