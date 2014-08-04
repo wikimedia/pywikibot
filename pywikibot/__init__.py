@@ -53,7 +53,7 @@ from pywikibot.textlib import (
 from pywikibot.tools import UnicodeMixin
 from pywikibot.i18n import translate
 
-__all__ = [
+__all__ = (
     'config', 'ui', 'UnicodeMixin', 'translate',
     'Page', 'ImagePage', 'Category', 'Link', 'User',
     'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
@@ -75,7 +75,7 @@ __all__ = [
     'getCategoryLinks', 'categoryFormat', 'replaceCategoryLinks',
     'removeCategoryLinks', 'removeCategoryLinksAndSeparator',
     'replaceCategoryInPlace', 'compileLinkR', 'extract_templates_and_params',
-]
+)
 
 
 class Timestamp(datetime.datetime):
