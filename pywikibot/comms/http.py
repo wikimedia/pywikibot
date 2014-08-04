@@ -151,7 +151,7 @@ def request(site, uri, ssl=False, *args, **kwargs):
         script=pywikibot.calledModuleName(),
         version=pywikibot.version.getversiondict()['rev'],
         username=quote(username),
-        lang=site.lang,
+        lang=site.code,
         family=site.family.name)
     request = threadedhttp.HttpRequest(baseuri, *args, **kwargs)
     http_queue.put(request)
