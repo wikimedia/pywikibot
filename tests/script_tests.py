@@ -107,6 +107,7 @@ no_args_expected_results = {
     'archivebot': 'NOTE: you must specify a template to run the bot',
     'commonscat': 'add_text.NoEnoughData',
     'create_categories': 'No pages to work on',
+    # TODO: until done here, remember to set editor = None in user_config.py
     'editarticle': 'Nothing changed',  # This masks related bug 68645 but that
                                        # bug is more broadly about config
                                        # rather than editarticle.
@@ -220,7 +221,6 @@ class TestScriptMeta(type):
             if script_name in ['add_text',        # raises custom NoEnoughData
                                'checkimages',     # bug 68613
                                'commonscat',      # raises custom NoEnoughData
-                               'claimit',         # bug 68657 - zero output
                                'data_ingestion',  # bug 68611
                                'disambredir',     # quittable auto-run with
                                                   # highly variable output.
