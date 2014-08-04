@@ -13,10 +13,10 @@ else:
     from urllib.parse import urlparse
 
 import pywikibot.weblib as weblib
-from tests.utils import unittest, PywikibotTestCase
+from tests.utils import unittest, NoSiteTestCase
 
 
-class TestArchiveSites(PywikibotTestCase):
+class TestArchiveSites(NoSiteTestCase):
     def testInternetArchiveNewest(self):
         archivedversion = weblib.getInternetArchiveURL('https://google.com')
         parsed = urlparse(archivedversion)

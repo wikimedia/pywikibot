@@ -6,11 +6,11 @@
 # Distributed under the terms of the MIT license.
 __version__ = '$Id$'
 
-from tests.utils import unittest, PywikibotTestCase
+from tests.utils import unittest, NoSiteTestCase
 from pywikibot.page import ip_regexp
 
 
-class PyWikiIpRegexCase(PywikibotTestCase):
+class PyWikiIpRegexCase(NoSiteTestCase):
     """Unit test class for ip_regexp"""
 
     def setUp(self):

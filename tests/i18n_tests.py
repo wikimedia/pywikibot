@@ -8,10 +8,10 @@ __version__ = '$Id$'
 
 from pywikibot import i18n
 
-from tests.utils import unittest, PywikibotTestCase
+from tests.utils import unittest, NoSiteTestCase
 
 
-class TestTranslate(PywikibotTestCase):
+class TestTranslate(NoSiteTestCase):
     def setUp(self):
         self.msg_localized = {'en': u'test-localized EN',
                               'nl': u'test-localized NL',
@@ -70,7 +70,7 @@ class TestTranslate(PywikibotTestCase):
                          u'test-no-english JA')
 
 
-class TestTWN(PywikibotTestCase):
+class TestTWN(NoSiteTestCase):
     def setUp(self):
         self.orig_messages_package_name = i18n.messages_package_name
         i18n.messages_package_name = 'tests.i18n'
