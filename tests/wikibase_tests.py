@@ -205,7 +205,7 @@ class TestItemLoad(PywikibotTestCase):
         # The labels are not updated; assertion showing undesirable behaviour:
         self.assertEquals(item.labels['en'], 'New York City')
         # TODO: This is the assertion that this test should be using:
-        #self.assertTrue(item.labels['en'].lower().endswith('main page'))
+        # self.assertTrue(item.labels['en'].lower().endswith('main page'))
 
     def test_empty_item(self):
         # should not raise an error as the constructor only requires

@@ -49,6 +49,7 @@ if os.name == "nt":
     class pywikibotWrapper(object):
         def init(self):
             import pywikibot
+            pywikibot.version._get_program_dir()
 
         def output(self, *args, **kwargs):
             import pywikibot
@@ -181,7 +182,7 @@ if __name__ == "__main__":
             self.assertEqual(newstdout.getvalue(), "")
             self.assertEqual(newstderr.getvalue(), "output\n")
 
-        def test_output(self):
+        def test_output_stdout(self):
             pywikibot.output("output", toStdout=True)
             self.assertEqual(newstdout.getvalue(), "output\n")
             self.assertEqual(newstderr.getvalue(), "")
@@ -221,7 +222,7 @@ if __name__ == "__main__":
             self.assertEqual(newstdout.getvalue(), "")
             self.assertEqual(newstderr.getvalue(), "ERROR: TestException: Testing Exception\n")
 
-        def test_exception(self):
+        def test_exception_tb(self):
             class TestException(Exception):
                 pass
             try:
@@ -462,7 +463,6 @@ if __name__ == "__main__":
     class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
         @classmethod
         def setUpClass(cls):
-            import inspect
             cls.setUpProcess(["cmd", "/k", "echo off"])
 
         @classmethod
