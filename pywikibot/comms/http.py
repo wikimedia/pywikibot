@@ -144,11 +144,13 @@ def request(site, uri, ssl=False, *args, **kwargs):
         baseuri = urlparse.urljoin("%(proto)s://%(host)s" % locals(), uri)
     else:
         baseuri = uri
-
+    username = site.username()
+    if not username:
+        username = ""
     kwargs["headers"]["user-agent"] = config.USER_AGENT_FORMAT.format(
         script=pywikibot.calledModuleName(),
         version=pywikibot.version.getversiondict()['rev'],
-        username=quote(site.username()),
+        username=quote(username),
         lang=site.lang,
         family=site.family.name)
     request = threadedhttp.HttpRequest(baseuri, *args, **kwargs)
