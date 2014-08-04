@@ -12,7 +12,6 @@ __version__ = '$Id$'
 
 import datetime
 import difflib
-import logging
 import math
 import re
 import sys
@@ -28,10 +27,55 @@ else:
 # who want to continue using both
 
 from pywikibot import config2 as config
-from pywikibot.bot import *
-from pywikibot.exceptions import *
-from pywikibot.textlib import *
+from pywikibot.bot import (
+    output, warning, error, critical, debug, stdout, exception,
+    input, inputChoice, handleArgs, showHelp, ui, log,
+    calledModuleName, Bot, WikidataBot,
+)
+from pywikibot.exceptions import (
+    Error, InvalidTitle, BadTitle, NoPage, SectionError,
+    NoSuchSite, NoUsername, UserBlocked,
+    PageRelatedError, IsRedirectPage, IsNotRedirectPage,
+    PageNotSaved, UploadWarning, LockedPage, EditConflict,
+    ServerError, FatalServerError, Server504Error,
+    CaptchaError, SpamfilterError, CircularRedirect,
+    WikiBaseError, CoordinateGlobeUnknownException,
+)
+from pywikibot.textlib import (
+    unescape, replaceExcept, removeDisabledParts, removeHTMLParts,
+    isDisabled, interwikiFormat, interwikiSort,
+    getLanguageLinks, replaceLanguageLinks,
+    removeLanguageLinks, removeLanguageLinksAndSeparator,
+    getCategoryLinks, categoryFormat, replaceCategoryLinks,
+    removeCategoryLinks, removeCategoryLinksAndSeparator,
+    replaceCategoryInPlace, compileLinkR, extract_templates_and_params,
+)
+from pywikibot.tools import UnicodeMixin
 from pywikibot.i18n import translate
+
+__all__ = [
+    'config', 'ui', 'UnicodeMixin', 'translate',
+    'Page', 'ImagePage', 'Category', 'Link', 'User',
+    'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
+    'html2unicode', 'url2unicode', 'unicode2html',
+    'stdout', 'output', 'warning', 'error', 'critical', 'debug', 'exception',
+    'input', 'inputChoice', 'handleArgs', 'showHelp', 'ui', 'log',
+    'calledModuleName', 'Bot', 'WikidataBot',
+    'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
+    'NoSuchSite', 'NoUsername', 'UserBlocked',
+    'PageRelatedError', 'IsRedirectPage', 'IsNotRedirectPage',
+    'PageNotSaved', 'UploadWarning', 'LockedPage', 'EditConflict',
+    'ServerError', 'FatalServerError', 'Server504Error',
+    'CaptchaError',  'SpamfilterError', 'CircularRedirect',
+    'WikiBaseError', 'CoordinateGlobeUnknownException',
+    'unescape', 'replaceExcept', 'removeDisabledParts', 'removeHTMLParts',
+    'isDisabled', 'interwikiFormat', 'interwikiSort',
+    'getLanguageLinks', 'replaceLanguageLinks',
+    'removeLanguageLinks', 'removeLanguageLinksAndSeparator',
+    'getCategoryLinks', 'categoryFormat', 'replaceCategoryLinks',
+    'removeCategoryLinks', 'removeCategoryLinksAndSeparator',
+    'replaceCategoryInPlace', 'compileLinkR', 'extract_templates_and_params',
+]
 
 
 class Timestamp(datetime.datetime):
@@ -416,16 +460,16 @@ def deprecate_arg(old_arg, new_arg):
             if old_arg in __kw:
                 if new_arg:
                     if new_arg in __kw:
-                        pywikibot.warning(
+                        warning(
 u"%(new_arg)s argument of %(meth_name)s replaces %(old_arg)s; cannot use both."
                             % locals())
                     else:
-                        pywikibot.warning(
+                        warning(
 u"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
                             % locals())
                         __kw[new_arg] = __kw[old_arg]
                 else:
-                    pywikibot.debug(
+                    debug(
 u"%(old_arg)s argument of %(meth_name)s is deprecated."
                         % locals(), _logger)
                 del __kw[old_arg]
@@ -481,7 +525,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     key = '%s:%s:%s' % (fam, code, user)
     if key not in _sites or not isinstance(_sites[key], __Site):
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
-        pywikibot.debug(u"Instantiating Site object '%(site)s'"
+        debug(u"Instantiating Site object '%(site)s'"
                         % {'site': _sites[key]}, _logger)
     return _sites[key]
 
@@ -581,7 +625,7 @@ def stopme():
     _logger = "wiki"
 
     if not stopped:
-        pywikibot.debug(u"stopme() called", _logger)
+        debug(u"stopme() called", _logger)
 
         def remaining():
             remainingPages = page_put_queue.qsize() - 1
@@ -616,7 +660,7 @@ Really exit?""" % remaining(),
     # only need one drop() call because all throttles use the same global pid
     try:
         list(_sites.values())[0].throttle.drop()
-        pywikibot.log(u"Dropped throttle(s).")
+        log(u"Dropped throttle(s).")
     except IndexError:
         pass
 

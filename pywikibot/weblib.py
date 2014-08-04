@@ -60,7 +60,7 @@ def getWebCitationURL(url, timestamp=None):
     query = {'returnxml': 'true',
              'url': url}
 
-    if not timestamp is None:
+    if timestamp is not None:
         query['date'] = timestamp
 
     uri = uri + urllib.urlencode(query)

@@ -23,6 +23,7 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot.compat import query
+from pywikibot import i18n
 
 
 class BlockreviewBot:
