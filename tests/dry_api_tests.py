@@ -8,7 +8,6 @@ __version__ = '$Id$'
 #
 
 import datetime
-import hashlib
 import pywikibot
 from pywikibot.data.api import CachedRequest, QueryGenerator
 from utils import unittest

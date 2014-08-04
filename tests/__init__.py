@@ -9,6 +9,9 @@ __version__ = '$Id$'
 import os
 import sys
 
+__all__ = ['httplib2', 'OrderedDict', '_cache_dir', 'TestRequest',
+           'patch_request', 'unpatch_request']
+
 # Verify that the unit tests have a base working environment:
 # - httplib2 is mandatory
 # - ordereddict is only needed as a fallback for python 2.6
@@ -71,6 +74,9 @@ class TestRequest(CachedRequest):
             return
 
         return super(TestRequest, self)._write_cache(data)
+
+
+original_expired = None
 
 
 def patch_request():
