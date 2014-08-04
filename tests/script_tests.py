@@ -227,7 +227,6 @@ class TestScriptMeta(type):
                                'imagerecat',      # bug 68658
                                'imagetransfer',   # bug 68659
                                'pagefromfile',    # bug 68660
-                               'transferbot',     # raises custom Exception
                                'upload',          # raises custom ValueError
                                ] or \
                     (config.family == 'wikidata' and script_name == 'lonelypages') or \
