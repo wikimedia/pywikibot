@@ -45,7 +45,7 @@ def get(site=None):
     else:
         fn = config.datafilepath('watchlists',
                                  'watchlist-%s-%s.dat'
-                                 % (site.family.name, site.lang))
+                                 % (site.family.name, site.code))
         try:
             # find out how old our saved dump is (in seconds)
             file_age = time.time() - os.path.getmtime(fn)
@@ -98,16 +98,11 @@ def refresh(site, sysop=False):
         else:
             break
 
-    if site.family.name == 'wikidata':
-        lang = 'wikidata'
-    else:
-        lang = site.lang
-
     # Save the watchlist to disk
     # The file is stored in the watchlists subdir. Create if necessary.
     f = open(config.datafilepath('watchlists',
                                  'watchlist-%s-%s%s.dat'
-                                 % (site.family.name, lang,
+                                 % (site.family.name, site.code,
                                     '-sysop' if sysop else '')),
              'w')
     pickle.dump(watchlist, f)
@@ -158,9 +153,10 @@ def main():
     elif new:
         refresh_all(new, sysop=sysop)
     else:
-        refresh(pywikibot.Site(), sysop=sysop)
+        site = pywikibot.Site()
+        refresh(site, sysop=sysop)
 
-        watchlist = get(pywikibot.Site())
+        watchlist = get(site)
         pywikibot.output(u'%i pages in the watchlist.' % len(watchlist))
         for pageName in watchlist:
             pywikibot.output(pageName, toStdout=True)
