@@ -376,9 +376,9 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
         # Discard leading colon
         if count >= 2 and parts[0] == '' and parts[1]:
-            return parts[1]
+            return parts[1].strip()
         elif parts[0]:
-            return parts[0]
+            return parts[0].strip()
         return False
 
     @staticmethod
@@ -806,55 +806,42 @@ class BaseSite(ComparableMixin):
                           re.IGNORECASE | re.UNICODE | re.DOTALL)
 
     def sametitle(self, title1, title2):
-        """Return True if title1 and title2 identify the same wiki page."""
-        # title1 and title2 may be unequal but still identify the same page,
-        # if they use different aliases for the same namespace
+        """
+        Return True if title1 and title2 identify the same wiki page.
 
-        def valid_namespace(alias, ns):
-            """Determine if a string is a valid alias for a namespace.
-
-            @param alias: namespace alias
-            @type alias: unicode
-            @param ns: namespace
-            @type ns: int
-
-            @return: bool
-            """
-            for text in self.namespace(ns, all=True):
-                if text.lower() == alias.lower():
-                    return True
-            return False
+        title1 and title2 may be unequal but still identify the same page,
+        if they use different aliases for the same namespace.
+        """
+        def ns_split(title):
+            """Separate the namespace from the name."""
+            if ':' not in title:
+                title = ':' + title
+            ns, _, name = title.partition(':')
+            ns = Namespace.lookup_name(ns, self.namespaces) or default_ns
+            return ns, name
 
         if title1 == title2:
             return True
+        # Replace underscores with spaces and multiple combinations of them
+        # with only one space
+        title1 = re.sub(r'[_ ]+', ' ', title1)
+        title2 = re.sub(r'[_ ]+', ' ', title2)
+        if title1 == title2:
+            return True
+        default_ns = self.namespaces[0]
         # determine whether titles contain namespace prefixes
-        if ":" in title1:
-            ns1, name1 = title1.split(":", 1)
-        else:
-            ns1, name1 = 0, title1
-        if ":" in title2:
-            ns2, name2 = title2.split(":", 1)
-        else:
-            ns2, name2 = 0, title2
-        for space in self.namespaces():  # iterate over all valid namespaces
-            if not isinstance(ns1, int) and valid_namespace(ns1, space):
-                ns1 = space
-            if not isinstance(ns2, int) and valid_namespace(ns2, space):
-                ns2 = space
-        if not isinstance(ns1, int):
-            # no valid namespace prefix found, so the string followed by ":"
-            # must be part of the title
-            name1 = ns1 + ":" + name1
-            ns1 = 0
-        if not isinstance(ns2, int):
-            name2 = ns2 + ":" + name2
-            ns2 = 0
-        if ns1 != ns2:
+        ns1_obj, name1 = ns_split(title1)
+        ns2_obj, name2 = ns_split(title2)
+        if ns1_obj != ns2_obj:
             # pages in different namespaces
             return False
-        if self.case() == "first-letter":
-            name1 = name1[:1].upper() + name1[1:]
-            name2 = name2[:1].upper() + name2[1:]
+        name1 = name1.strip()
+        name2 = name2.strip()
+        # If the namespace has a case definition it's overriding the site's
+        # case definition
+        if (ns1_obj.case if hasattr(ns1_obj, 'case') else self.case()) == 'first-letter':
+            name1 = name1[0].upper() + name1[1:]
+            name2 = name2[0].upper() + name2[1:]
         return name1 == name2
 
     # namespace shortcuts for backwards-compatibility

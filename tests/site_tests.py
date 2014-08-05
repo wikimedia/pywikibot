@@ -144,6 +144,17 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertFalse(mysite.isInterwikiLink("foo"))
         self.assertIsInstance(mysite.redirectRegex().pattern, basestring)
         self.assertIsInstance(mysite.category_on_one_line(), bool)
+        self.assertTrue(mysite.sametitle("Template:Test", "Template:Test"))
+        self.assertTrue(mysite.sametitle("Template: Test", "Template:   Test"))
+        self.assertTrue(mysite.sametitle('Test name', 'Test name'))
+        self.assertFalse(mysite.sametitle('Test name', 'Test Name'))
+        # User, MediaWiki (both since 1.16) and Special are always
+        # first-letter (== only first non-namespace letter is case insenstive)
+        # See also: https://www.mediawiki.org/wiki/Manual:$wgCapitalLinks
+        self.assertTrue(mysite.sametitle("Special:Always", "Special:always"))
+        if LV(mysite.version()) >= LV('1.16'):
+            self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
+            self.assertTrue(mysite.sametitle('MediaWiki:Always', 'MediaWiki:always'))
 
     def testConstructors(self):
         """Test cases for site constructors."""
@@ -1609,6 +1620,47 @@ class TestDataSiteClientPreloading(DefaultWikidataClientTestCase):
         self.assertIsInstance(item, pywikibot.ItemPage)
         self.assertTrue(hasattr(item, '_content'))
         self.assertEqual(item.id, 'Q5296')
+
+
+class TestSameTitleSite(TestCase):
+
+    """Test APISite.sametitle on sites with known behaviour."""
+
+    sites = {
+        'enwp': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+        'dewp': {
+            'family': 'wikipedia',
+            'code': 'de',
+        },
+        'enwt': {
+            'family': 'wiktionary',
+            'code': 'en',
+        }
+    }
+
+    def check(self, site, case_sensitive):
+        self.assertEqual(site.sametitle('Foo', 'foo'), not case_sensitive)
+        self.assertTrue(site.sametitle('File:Foo', 'Image:Foo'))
+        self.assertTrue(site.sametitle(':Foo', 'Foo'))
+        self.assertFalse(site.sametitle('User:Foo', 'Foo'))
+
+    def test_enwp(self):
+        self.check(self.get_site('enwp'), False)
+        self.assertFalse(self.get_site('enwp').sametitle(
+            'Template:Test template', 'Template:Test Template'))
+
+    def test_dewp(self):
+        site = self.get_site('dewp')
+        self.check(site, False)
+        self.assertTrue(site.sametitle('Benutzer:Foo', 'User:Foo'))
+        self.assertTrue(site.sametitle('Benutzerin:Foo', 'User:Foo'))
+        self.assertTrue(site.sametitle('Benutzerin:Foo', 'Benutzer:Foo'))
+
+    def test_enwt(self):
+        self.check(self.get_site('enwt'), True)
 
 
 if __name__ == '__main__':
