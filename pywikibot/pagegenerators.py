@@ -70,9 +70,9 @@ parameterHelp = u"""\
 -search           Work on all pages that are found in a MediaWiki search
                   across all namespaces.
 
--namespace        Filter the page generator to only yield pages in the
--ns               specified namespaces. Separate multiple namespace
-                  numbers with commas. Example "-ns:0,2,4"
+-namespaces       Filter the page generator to only yield pages in the
+-namespace        specified namespaces. Separate multiple namespace
+-ns               numbers with commas. Example "-ns:0,2,4"
                   If used with -newpages, -namepace/ns must be provided
                   before -newpages.
                   If used with -recentchanges, efficiency is improved if
@@ -220,11 +220,10 @@ class GeneratorFactory(object):
         if gen:
             self.gens.insert(0, gen)
 
-        namespaces = [int(n) for n in self.namespaces]
         for i in range(len(self.gens)):
             if isinstance(self.gens[i], pywikibot.data.api.QueryGenerator):
                 if self.namespaces:
-                    self.gens[i].set_namespace(namespaces)
+                    self.gens[i].set_namespace(self.namespaces)
                 if self.step:
                     self.gens[i].set_query_increment(self.step)
                 if self.limit:
@@ -232,7 +231,7 @@ class GeneratorFactory(object):
             else:
                 if self.namespaces:
                     self.gens[i] = NamespaceFilterPageGenerator(self.gens[i],
-                                                                namespaces)
+                                                                self.namespaces)
                 if self.limit:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
@@ -352,11 +351,10 @@ class GeneratorFactory(object):
             else:
                 gen = RandomPageGenerator(total=int(arg[8:]))
         elif arg.startswith('-recentchanges'):
-            namespaces = [int(n) for n in self.namespaces] or None
             if len(arg) >= 15:
-                gen = RecentChangesPageGenerator(namespaces=namespaces, total=int(arg[15:]))
+                gen = RecentChangesPageGenerator(namespaces=self.namespaces, total=int(arg[15:]))
             else:
-                gen = RecentChangesPageGenerator(namespaces=namespaces, total=60)
+                gen = RecentChangesPageGenerator(namespaces=self.namespaces, total=60)
             gen = DuplicateFilterPageGenerator(gen)
         elif arg.startswith('-file'):
             textfilename = arg[6:]
@@ -364,19 +362,24 @@ class GeneratorFactory(object):
                 textfilename = pywikibot.input(
                     u'Please enter the local file name:')
             gen = TextfilePageGenerator(textfilename)
-        elif arg.startswith('-namespace'):
-            if len(arg) == len('-namespace'):
-                self.namespaces.append(
-                    pywikibot.input(u'What namespace are you filtering on?'))
-            else:
-                self.namespaces.extend(arg[len('-namespace:'):].split(","))
-            return True
-        elif arg.startswith('-ns'):
-            if len(arg) == len('-ns'):
-                self.namespaces.append(
-                    pywikibot.input(u'What namespace are you filtering on?'))
-            else:
-                self.namespaces.extend(arg[len('-ns:'):].split(","))
+        elif arg.startswith('-namespace') or arg.startswith('-ns'):
+            value = None
+            if arg.startswith('-ns:'):
+                value = arg[len('-ns:'):]
+            elif arg.startswith('-namespace:'):
+                value = arg[len('-namespace:'):]
+            elif arg.startswith('-namespaces:'):
+                value = arg[len('-namespaces:'):]
+            if not value:
+                value = pywikibot.input(
+                    u'What namespace are you filtering on?')
+            try:
+                self.namespaces.extend(
+                    [int(ns) for ns in value.split(",")]
+                )
+            except ValueError:
+                pywikibot.output(u'Invalid namespaces argument: %s' % value)
+                return False
             return True
         elif arg.startswith('-step'):
             if len(arg) == len('-step'):
@@ -477,11 +480,10 @@ class GeneratorFactory(object):
             # partial workaround for bug 67249
             # to use -namespace/ns with -newpages, -ns must be given before -newpages
             # otherwise default namespace is 0
-            namespaces = [int(n) for n in self.namespaces] or 0
             if len(arg) >= 10:
-                gen = NewpagesPageGenerator(namespaces=namespaces, total=int(arg[10:]))
+                gen = NewpagesPageGenerator(namespaces=self.namespaces, total=int(arg[10:]))
             else:
-                gen = NewpagesPageGenerator(namespaces=namespaces, total=60)
+                gen = NewpagesPageGenerator(namespaces=self.namespaces, total=60)
         elif arg.startswith('-imagesused'):
             imagelinkstitle = arg[len('-imagesused:'):]
             if not imagelinkstitle:
