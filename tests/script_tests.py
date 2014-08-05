@@ -57,6 +57,7 @@ def runnable_script_list(scripts_path):
                    and name != 'imageuncat.py'   # this halts indefinitely
                    and name != 'welcome.py'      # result depends on speed
                    and name != 'script_wui.py'   # depends on lua compiling
+                   and name != 'editarticle.py'  # requires a X DISPLAY
                    ]
     return ['login'] + script_list
 
