@@ -678,7 +678,8 @@ def main():
     if not gen:
         site = pywikibot.Site()
         try:
-            cat = site.mediawiki_message(maintenance_category)
+            cat = site.expand_text(
+                site.mediawiki_message(maintenance_category))
         except:
             pass
         else:
