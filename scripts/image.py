@@ -142,7 +142,7 @@ class ImageRobot(Bot):
         replacements = []
 
         if not self.site.nocapitalize:
-            case = re.escape(self.old_image[0].upper() + \
+            case = re.escape(self.old_image[0].upper() +
                              self.old_image[0].lower())
             escaped = '[' + case + ']' + re.escape(self.old_image[1:])
         else:

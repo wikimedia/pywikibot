@@ -254,8 +254,8 @@ class TemplateRobot(Bot):
             else:
                 pattern = re.escape(old)
             pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-            templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces) + \
-                                       r':|[mM][sS][gG]:)?' + pattern + \
+            templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces) +
+                                       r':|[mM][sS][gG]:)?' + pattern +
                                        r'(?P<parameters>\s*\|.+?|) *}}',
                                        re.DOTALL)
 

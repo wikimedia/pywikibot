@@ -89,7 +89,7 @@ setup(
     maintainer='The pywikibot team',
     maintainer_email='pywikipedia-l@lists.wikimedia.org',
     license='MIT License',
-    packages=['pywikibot'] + \
+    packages=['pywikibot'] +
              [package
               for package in find_packages()
               if package.startswith('pywikibot.')],

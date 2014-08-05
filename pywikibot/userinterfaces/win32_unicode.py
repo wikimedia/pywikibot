@@ -113,7 +113,7 @@ if sys.platform == "win32":
                 real_stderr = False
 
         if real_stdin:
-            ReadConsoleW = WINFUNCTYPE(BOOL, HANDLE, LPVOID, DWORD, POINTER(DWORD), \
+            ReadConsoleW = WINFUNCTYPE(BOOL, HANDLE, LPVOID, DWORD, POINTER(DWORD),
                                        LPVOID)(("ReadConsoleW", windll.kernel32))
 
             class UnicodeInput:
@@ -136,7 +136,7 @@ if sys.platform == "win32":
             # BOOL WINAPI WriteConsoleW(HANDLE hOutput, LPWSTR lpBuffer, DWORD nChars,
             #                           LPDWORD lpCharsWritten, LPVOID lpReserved);
 
-            WriteConsoleW = WINFUNCTYPE(BOOL, HANDLE, LPWSTR, DWORD, POINTER(DWORD), \
+            WriteConsoleW = WINFUNCTYPE(BOOL, HANDLE, LPWSTR, DWORD, POINTER(DWORD),
                                         LPVOID)(("WriteConsoleW", windll.kernel32))
 
             class UnicodeOutput:
