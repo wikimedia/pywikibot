@@ -44,7 +44,6 @@ from tests.utils import unittest
 if os.name == "nt":
     from multiprocessing.managers import BaseManager
     import threading
-    import win32clipboard
 
     class pywikibotWrapper(object):
         def init(self):
@@ -396,11 +395,15 @@ if __name__ == "__main__":
                 time.sleep(0.01)
 
         def setclip(self, text):
+            import win32clipboard
+
             win32clipboard.OpenClipboard()
             win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT, unicode(text))
             win32clipboard.CloseClipboard()
 
         def getclip(self):
+            import win32clipboard
+
             win32clipboard.OpenClipboard()
             data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
             win32clipboard.CloseClipboard()
