@@ -42,8 +42,7 @@ __version__ = '$Id$'
 
 import re
 import pywikibot
-from pywikibot import i18n
-from pywikibot import pagegenerators
+from pywikibot import i18n, pagegenerators, Bot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -460,12 +459,15 @@ class XmlDumpNoReferencesPageGenerator:
                 yield pywikibot.Page(pywikibot.Site(), entry.title)
 
 
-class NoReferencesBot(object):
+class NoReferencesBot(Bot):
 
-    def __init__(self, generator, always=False, verbose=True):
-        self.generator = generator
-        self.always = always
-        self.verbose = verbose
+    def __init__(self, generator, **kwargs):
+        self.availableOptions.update({
+            'verbose': True,
+        })
+        super(NoReferencesBot, self).__init__(**kwargs)
+
+        self.generator = pagegenerators.PreloadingGenerator(generator)
         self.site = pywikibot.Site()
         self.comment = i18n.twtranslate(self.site, 'noreferences-add-tag')
 
@@ -491,22 +493,22 @@ class NoReferencesBot(object):
         oldTextCleaned = pywikibot.removeDisabledParts(text)
         if self.referencesR.search(oldTextCleaned) or \
            self.referencesTagR.search(oldTextCleaned):
-            if self.verbose:
+            if self.getOption('verbose'):
                 pywikibot.output(u'No changes necessary: references tag found.')
             return False
         elif self.referencesTemplates:
             templateR = u'{{(' + u'|'.join(self.referencesTemplates) + ')'
             if re.search(templateR, oldTextCleaned, re.IGNORECASE | re.UNICODE):
-                if self.verbose:
+                if self.getOption('verbose'):
                     pywikibot.output(
                         u'No changes necessary: references template found.')
                 return False
         if not self.refR.search(oldTextCleaned):
-            if self.verbose:
+            if self.getOption('verbose'):
                 pywikibot.output(u'No changes necessary: no ref tags found.')
             return False
         else:
-            if self.verbose:
+            if self.getOption('verbose'):
                 pywikibot.output(u'Found ref without references.')
             return True
 
@@ -554,7 +556,7 @@ class NoReferencesBot(object):
                 if match:
                     if pywikibot.isDisabled(oldText, match.start()):
                         pywikibot.output(
-                            'Existing  %s section is commented out, won\'t add '
+                            'Existing %s section is commented out, won\'t add '
                             'the references in front of it.' % section)
                         index = match.end()
                     else:
@@ -582,10 +584,10 @@ class NoReferencesBot(object):
         # won't work with nested templates
         # the negative lookahead assures that we'll match the last template
         # occurence in the temp text.
-        ### fix me:
-        ### {{commons}} or {{commonscat}} are part of Weblinks section
-        ### * {{template}} is mostly part of a section
-        ### so templatePattern must be fixed
+        # FIXME:
+        # {{commons}} or {{commonscat}} are part of Weblinks section
+        # * {{template}} is mostly part of a section
+        # so templatePattern must be fixed
         templatePattern = r'\r?\n{{((?!}}).)+?}}\s*'
         commentPattern = r'<!--((?!-->).)*?-->\s*'
         metadataR = re.compile(r'(\r?\n)?(%s|%s|%s|%s)$'
@@ -615,37 +617,6 @@ class NoReferencesBot(object):
                                                     referencesSections)[0],
                                                 ident, self.referencesText)
         return oldText[:index] + newSection + oldText[index:]
-
-    def save(self, page, newText):
-        """
-        Saves the page to the wiki, if the user accepts the changes made.
-        """
-        pywikibot.showDiff(page.get(), newText)
-        if not self.always:
-            choice = pywikibot.inputChoice(
-                u'Do you want to accept these changes?',
-                ['Yes', 'No', 'Always yes'], 'yNa', 'Y')
-            if choice == 'n':
-                return
-            elif choice == 'a':
-                self.always = True
-
-        page.text = newText
-        if self.always:
-            try:
-                page.save(self.comment)
-            except pywikibot.EditConflict:
-                pywikibot.output(u'Skipping %s because of edit conflict'
-                                 % (page.title(),))
-            except pywikibot.SpamfilterError as e:
-                pywikibot.output(
-                    u'Cannot change %s because of blacklist entry %s'
-                    % (page.title(), e.url))
-            except pywikibot.LockedPage:
-                pywikibot.output(u'Skipping %s (locked page)' % (page.title(),))
-        else:
-            # Save the page in the background. No need to catch exceptions.
-            page.save(self.comment, async=True)
 
     def run(self):
 
@@ -680,19 +651,21 @@ class NoReferencesBot(object):
                 continue
             if self.lacksReferences(text):
                 newText = self.addReferences(text)
-                self.save(page, newText)
+                try:
+                    self.userPut(page, page.text, newText, comment=self.comment)
+                except pywikibot.EditConflict:
+                    pywikibot.output(u'Skipping %s because of edit conflict'
+                                     % page.title())
+                except pywikibot.SpamfilterError as e:
+                    pywikibot.output(
+                        u'Cannot change %s because of blacklist entry %s'
+                        % (page.title(), e.url))
+                except pywikibot.LockedPage:
+                    pywikibot.output(u'Skipping %s (locked page)' % page.title())
 
 
 def main():
-    # page generator
-    gen = None
-    # Which namespaces should be processed?
-    # default to [] which means all namespaces will be processed
-    namespaces = []
-    # Never ask before changing a page
-    always = False
-    # No verbose output
-    verbose = True
+    options = {}
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handleArgs()
@@ -704,41 +677,30 @@ def main():
                 xmlFilename = i18n.input('pywikibot-enter-xml-filename')
             else:
                 xmlFilename = arg[5:]
-            gen = XmlDumpNoReferencesPageGenerator(xmlFilename)
-        elif arg.startswith('-namespace:'):
-            try:
-                namespaces.append(int(arg[11:]))
-            except ValueError:
-                namespaces.append(arg[11:])
+            genFactory.gens.append(XmlDumpNoReferencesPageGenerator(xmlFilename))
         elif arg == '-always':
-            always = True
+            options['always'] = True
         elif arg == '-quiet':
-            verbose = False
+            options['verbose'] = False
         else:
             genFactory.handleArg(arg)
 
-    if not gen:
-        gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator()
     if not gen:
         site = pywikibot.Site()
         try:
-            cat = maintenance_category[site.family.name][site.lang]
+            cat = i18n.translate(site, maintenance_category)
         except:
             pass
         else:
-            if not namespaces:
-                namespaces = [0]
             cat = pywikibot.Category(site, "%s:%s" % (
                 site.category_namespace(), cat))
-            gen = pagegenerators.CategorizedPageGenerator(cat)
-    if not gen:
-        pywikibot.showHelp('noreferences')
-    else:
-        if namespaces:
-            gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = NoReferencesBot(preloadingGen, always, verbose)
+            gen = cat.articles(namespaces=genFactory.namespaces or [0])
+    if gen:
+        bot = NoReferencesBot(gen, **options)
         bot.run()
+    else:
+        pywikibot.showHelp()
 
 if __name__ == "__main__":
     main()
