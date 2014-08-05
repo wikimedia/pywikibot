@@ -144,6 +144,8 @@ def _get_base_dir():
         '.pywikibot' directory (Unix and similar) under the user's home
         directory.
 
+    Set PYWIKIBOT2_NO_USER_CONFIG=1 to disable loading user-config.py
+
     """
     NAME = "pywikibot"
     base_dir = ""
@@ -183,11 +185,13 @@ def _get_base_dir():
     if not os.path.exists(os.path.join(base_dir, "user-config.py")):
         exc_text = ("No user-config.py found in directory '%(base_dir)s'.\n"
                     % locals())
-        exc_text += "  Please check that user-config.py is stored in the correct location.\n"
-        exc_text += "  Directory where user-config.py is searched is determined as follows:\n\n"
-        exc_text += "    " + _get_base_dir.__doc__
-
-        raise RuntimeError(exc_text)
+        if os.environ.get('PYWIKIBOT2_NO_USER_CONFIG', '0') == '1':
+            print(exc_text)
+        else:
+            exc_text += "  Please check that user-config.py is stored in the correct location.\n"
+            exc_text += "  Directory where user-config.py is searched is determined as follows:\n\n"
+            exc_text += "    " + _get_base_dir.__doc__
+            raise RuntimeError(exc_text)
 
     return base_dir
 
@@ -711,7 +715,11 @@ for _key in _gl:
 
 # Get the user files
 _thislevel = 0
-_fns = [os.path.join(_base_dir, "user-config.py")]
+if os.environ.get('PYWIKIBOT2_NO_USER_CONFIG', '0') == '1':
+    print("WARNING: Skipping loading of user-config.py.")
+    _fns = []
+else:
+    _fns = [os.path.join(_base_dir, "user-config.py")]
 for _filename in _fns:
     _thislevel += 1
     if os.path.exists(_filename):
