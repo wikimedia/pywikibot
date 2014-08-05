@@ -637,11 +637,7 @@ class DisambiguationRobot(Bot):
                 # This loop will run while the user doesn't choose an option
                 # that will actually change the page
                 while True:
-                    # Show the title of the page where the link was found.
-                    # Highlight the title in purple.
-                    pywikibot.output(
-                        u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                        % refPage.title())
+                    self.current_page = refPage
 
                     if not self.always:
                         # at the beginning of the link, start red color.

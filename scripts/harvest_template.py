@@ -109,7 +109,7 @@ class HarvestRobot(WikidataBot):
     def processPage(self, page):
         """Process a single page."""
         item = pywikibot.ItemPage.fromPage(page)
-        pywikibot.output('Processing %s' % page)
+        self.current_page = page
         if not item.exists():
             pywikibot.output('%s doesn\'t have a wikidata item :(' % page)
             #TODO FIXME: We should provide an option to create the page

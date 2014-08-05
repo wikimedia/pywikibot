@@ -293,7 +293,7 @@ class CommonscatBot(Bot):
         category is found add it to the page.
 
         """
-        pywikibot.output(u'Working on ' + page.title())
+        self.current_page = page
         # Get the right templates for this page
         primaryCommonscat, commonscatAlternatives = self.getCommonscatTemplate(
             page.site.code)

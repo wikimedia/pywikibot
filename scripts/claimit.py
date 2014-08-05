@@ -90,7 +90,7 @@ class ClaimRobot(WikidataBot):
         if self.exists_arg:
             pywikibot.output('\'exists\' argument set to \'%s\'' % self.exists_arg)
         for page in self.generator:
-            pywikibot.output('Processing %s' % page)
+            self.current_page = page
             item = pywikibot.ItemPage.fromPage(page)
             if not item.exists():
                 # TODO FIXME: We should provide an option to create the page

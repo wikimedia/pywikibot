@@ -133,10 +133,7 @@ class UnlinkBot(Bot):
             return text[:match.start()] + new + text[match.end():], False
 
     def treat(self, page):
-        # Show the title of the page we're working on.
-        # Highlight the title in purple.
-        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % page.title())
+        self.current_page = page
         try:
             oldText = page.get()
             text = oldText

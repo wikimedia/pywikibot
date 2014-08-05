@@ -60,7 +60,7 @@ class NewItemRobot(pywikibot.Bot):
                          % (self.lastEdit, self.lastEditBefore.isoformat()))
 
         for page in self.generator:
-            pywikibot.output('Processing %s' % page)
+            self.current_page = page
             if not page.exists():
                 pywikibot.output(u'%s does not exist anymore. Skipping...'
                                  % page)
