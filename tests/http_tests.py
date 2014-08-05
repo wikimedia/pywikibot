@@ -11,10 +11,10 @@ __version__ = '$Id$'
 
 
 from pywikibot.comms import http, threadedhttp
-from tests.utils import unittest
+from tests.utils import unittest, NoSiteTestCase
 
 
-class HttpTestCase(unittest.TestCase):
+class HttpTestCase(NoSiteTestCase):
 
     def test_get(self):
         r = http.request(site=None, uri='http://www.wikipedia.org/')

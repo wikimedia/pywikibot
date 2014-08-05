@@ -10,7 +10,7 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot.site import must_be
 
-from tests.utils import PywikibotTestCase, unittest
+from tests.utils import unittest, NoSiteTestCase
 
 
 class DrySite(pywikibot.site.APISite):
@@ -21,7 +21,7 @@ class DrySite(pywikibot.site.APISite):
         return self._userinfo
 
 
-class TestDrySite(PywikibotTestCase):
+class TestDrySite(NoSiteTestCase):
     def test_logged_in(self):
         x = DrySite('en', 'wikipedia')
 
@@ -41,7 +41,7 @@ class TestDrySite(PywikibotTestCase):
         self.assertFalse(x.logged_in(False))
 
 
-class TestMustBe(PywikibotTestCase):
+class TestMustBe(NoSiteTestCase):
     """Test cases for the must_be decorator."""
 
     # Implemented without setUpClass(cls) and global variables as objects

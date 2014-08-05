@@ -6,7 +6,7 @@
 #
 __version__ = '$Id$'
 
-from tests.utils import unittest, PywikibotTestCase
+from tests.utils import unittest, NoSiteTestCase
 from pywikibot import date
 
 
@@ -49,7 +49,7 @@ class TestDateMeta(type):
         return type.__new__(cls, name, bases, dct)
 
 
-class TestDate(PywikibotTestCase):
+class TestDate(NoSiteTestCase):
     """Test cases for date library processed by unittest"""
     __metaclass__ = TestDateMeta
 

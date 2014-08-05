@@ -9,12 +9,13 @@ __version__ = '$Id$'
 import datetime
 import pywikibot
 import pywikibot.data.api as api
-from tests.utils import PywikibotTestCase, unittest
+from tests.utils import unittest
+from tests.utils import SiteTestCase, NoSiteTestCase, CachedTestCase
 
 mysite = pywikibot.Site('en', 'wikipedia')
 
 
-class TestApiFunctions(PywikibotTestCase):
+class TestApiFunctions(CachedTestCase):
 
     def testObjectCreation(self):
         """Test that api.Request() creates an object with desired attributes"""
@@ -34,7 +35,7 @@ class TestApiFunctions(PywikibotTestCase):
             self.assertEqual(len(item), 2, item)
 
 
-class TestPageGenerator(PywikibotTestCase):
+class TestPageGenerator(CachedTestCase):
     def setUp(self):
         super(TestPageGenerator, self).setUp()
         self.gen = api.PageGenerator(site=mysite,
@@ -108,7 +109,7 @@ class TestPageGenerator(PywikibotTestCase):
         self.assertEqual(len(results), 4)  # total=-1 but 4 expected
 
 
-class TestCachedRequest(unittest.TestCase):
+class TestCachedRequest(SiteTestCase):
     def testResults(self):
         # Run the cached query twice to ensure the
         # data returned is equal
