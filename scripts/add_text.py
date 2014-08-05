@@ -117,15 +117,9 @@ starsList = [
 ]
 
 
-class NoEnoughData(pywikibot.Error):
-    """ Error class for when the user doesn't specified all the data needed """
-
-
-def add_text(page=None, addText=None, summary=None, regexSkip=None,
+def add_text(page=None, addText, summary=None, regexSkip=None,
              regexSkipUrl=None, always=False, up=False, putText=True,
              oldTextGiven=None, reorderEnabled=True, create=False):
-    if not addText:
-        raise NoEnoughData('You have to specify what text you want to add!')
     site = page.site
     if not summary:
         summary = i18n.twtranslate(site, 'add_text-adding',
@@ -350,8 +344,8 @@ def main():
     if not generator:
         generator = genFactory.getCombinedGenerator()
     if not generator:
-        raise NoEnoughData(
-            'You have to specify the generator you want to use for the script!')
+        pywikibot.showHelp()
+        return
     if talkPage:
         generator = pagegenerators.PageWithTalkPageGenerator(generator)
         site = pywikibot.Site()

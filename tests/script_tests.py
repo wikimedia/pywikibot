@@ -102,9 +102,7 @@ auto_run_script_list = [
 # Some of these are not pretty, but at least they are informative
 # and not backtraces starting deep in the pywikibot package.
 no_args_expected_results = {
-    'add_text': 'NoEnoughData',
     'archivebot': 'NOTE: you must specify a template to run the bot',
-    'commonscat': 'add_text.NoEnoughData',
     'create_categories': 'No pages to work on',
     # TODO: until done here, remember to set editor = None in user_config.py
     'editarticle': 'Nothing changed',  # This masks related bug 68645 but that
@@ -217,9 +215,7 @@ class TestScriptMeta(type):
                 test_name = 'test_' + script_name + '_no_args'
             dct[test_name] = test_execution(script_name, ['-simulate'],
                                             no_args_expected_results)
-            if script_name in ['add_text',        # raises custom NoEnoughData
-                               'checkimages',     # bug 68613
-                               'commonscat',      # raises custom NoEnoughData
+            if script_name in ['checkimages',     # bug 68613
                                'data_ingestion',  # bug 68611
                                'disambredir',     # quittable auto-run with
                                                   # highly variable output.

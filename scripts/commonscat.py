@@ -56,7 +56,7 @@ November 2013
 #
 # (C) Multichill, 2008-2009
 # (C) Xqt, 2009-2014
-# (C) Pywikibot team, 2008-2012
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -574,13 +574,14 @@ def main():
 
     if not generator:
         generator = genFactory.getCombinedGenerator()
-    if not generator:
-        raise add_text.NoEnoughData(u'You have to specify the generator you '
-                                    u'want to use for the script!')
 
-    pregenerator = pagegenerators.PreloadingGenerator(generator)
-    bot = CommonscatBot(pregenerator, always, summary)
-    bot.run()
+    if generator:
+        pregenerator = pagegenerators.PreloadingGenerator(generator)
+        bot = CommonscatBot(pregenerator, always, summary)
+        bot.run()
+    else:
+        pywikibot.showHelp()
+
 
 if __name__ == "__main__":
     main()
