@@ -2740,6 +2740,20 @@ class WikibasePage(Page):
                 del data[key]
         return data
 
+    def __normalizeData(self, data):
+        for prop in ('labels', 'descriptions', 'aliases'):
+            if prop in data:
+                data[prop] = self.__normalizeLanguages(data[prop])
+                if prop == 'aliases':
+                    for key, values in data[prop].iteritems():
+                        for index, value in enumerate(values):
+                            data[prop][key][index] = {'language': key,
+                                                      'value': value}
+                else:
+                    for key, value in data[prop].iteritems():
+                        data[prop][key] = {'language': key, 'value': value}
+        return data
+
     def getdbName(self, site):
         """
         Helper function to obtain a dbName for a Site.
@@ -2768,6 +2782,9 @@ class WikibasePage(Page):
             baserevid = self.lastrevid
         else:
             baserevid = None
+
+        data = self.__normalizeData(data)
+
         updates = self.repo.editEntity(self._defined_by(singular=True), data,
                                        baserevid=baserevid, **kwargs)
         self.lastrevid = updates['entity']['lastrevid']
@@ -2781,9 +2798,6 @@ class WikibasePage(Page):
         value should be the string to set it to.
         You can set it to '' to remove the label.
         """
-        labels = self.__normalizeLanguages(labels)
-        for key in labels:
-            labels[key] = {'language': key, 'value': labels[key]}
         data = {'labels': labels}
         self.editEntity(data, **kwargs)
 
@@ -2796,9 +2810,6 @@ class WikibasePage(Page):
         value should be the string to set it to.
         You can set it to '' to remove the description.
         """
-        descriptions = self.__normalizeLanguages(descriptions)
-        for key in descriptions:
-            descriptions[key] = {'language': key, 'value': descriptions[key]}
         data = {'descriptions': descriptions}
         self.editEntity(data, **kwargs)
 
@@ -2810,9 +2821,6 @@ class WikibasePage(Page):
         as a language or a site object. The
         value should be a list of strings.
         """
-        aliases = self.__normalizeLanguages(aliases)
-        for (key, strings) in list(aliases.items()):
-            aliases[key] = [{'language': key, 'value': i} for i in strings]
         data = {'aliases': aliases}
         self.editEntity(data, **kwargs)
 
