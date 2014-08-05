@@ -60,6 +60,12 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
 
+# This is required for the text that is shown when you run this script
+# with the parameter -help or without parameters.
+docuReplacements = {
+    '&params;': pagegenerators.parameterHelp,
+}
+
 
 class ClaimRobot(WikidataBot):
     """
@@ -190,7 +196,8 @@ def main():
 
     generator = gen.getCombinedGenerator()
     if not generator:
-        # FIXME: Should throw some help
+        # show help text from the top of this file
+        pywikibot.showHelp()
         return
 
     bot = ClaimRobot(generator, claims, exists_arg)
