@@ -1126,23 +1126,11 @@ class APISite(BaseSite):
     def getmagicwords(self, word):
         """Return list of localized "word" magic words for the site."""
         if not hasattr(self, "_magicwords"):
-            sirequest = api.CachedRequest(
-                expiry=config.API_config_expiry,
-                site=self,
-                action="query",
-                meta="siteinfo",
-                siprop="magicwords"
-            )
             try:
-                sidata = sirequest.submit()
-                assert 'query' in sidata, \
-                       "API siteinfo response lacks 'query' key"
-                sidata = sidata['query']
-                assert 'magicwords' in sidata, \
-                       "API siteinfo response lacks 'magicwords' key"
+                # don't cache in _siteinfo, because we cache it in _magicwords
+                magicwords = self._add_siteinfo("magicwords", False)
                 self._magicwords = dict((item["name"], item["aliases"])
-                                        for item in sidata["magicwords"])
-
+                                        for item in magicwords)
             except api.APIError:
                 # hack for older sites that don't support 1.13 properties
                 # probably should delete if we're not going to support pre-1.13
@@ -1186,6 +1174,44 @@ class APISite(BaseSite):
     def pagename2codes(self, default=True):
         """Return list of localized PAGENAMEE tags for the site."""
         return self.getmagicwords("pagenamee")
+
+    def _add_siteinfo(self, prop, cache, force=False):
+        """
+        Retrieve additional siteinfo and optionally cache it.
+
+        Queries the site and returns the properties. It can cache the value
+        so that future queries will access the cache. With C{force} set to
+        True it won't access the cache but it can still cache the value. If
+        the property doesn't exists it returns None.
+
+        @param prop: The property name of the siteinfo.
+        @type prop: str
+        @param cache: Should this be cached?
+        @type cache: bool
+        @param force: Should the cache be skipped?
+        @type force: bool
+        @return: The properties of the site.
+        @rtype: various (depends on prop)
+        """
+        if not hasattr(self, '_siteinfo'):
+            force = True  # if it doesn't exists there won't be a cache
+            if cache:  # but only initialise cache if that is requested
+                self._getsiteinfo()
+        if not force and prop in self._siteinfo:
+            return self._siteinfo[prop]
+        data = pywikibot.data.api.CachedRequest(
+            expiry=0 if force else pywikibot.config.API_config_expiry,
+            site=self,
+            action='query',
+            meta='siteinfo',
+            siprop=prop).submit()
+        try:
+            prop_data = data['query'][prop]
+        except KeyError:
+            prop_data = None
+        if cache:
+            self._siteinfo[prop] = prop_data
+        return prop_data
 
     def _getsiteinfo(self, force=False):
         """Retrieve siteinfo and namespaces from site."""
@@ -3202,8 +3228,45 @@ class APISite(BaseSite):
         "protect-invalidlevel": "Invalid protection level"
     }
 
+    def protection_types(self):
+        """
+        Return the protection types available on this site.
+
+        With MediaWiki version 1.23 protection types can be retrieved. To
+        support older wikis, the default protection types 'create', 'edit',
+        'move' and 'upload' are returned.
+
+        @return protection types available
+        @rtype: set of unicode instances
+        """
+        # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
+        restrictions = self._add_siteinfo('restrictions', True)
+        if restrictions is None or 'types' not in restrictions:
+            return set([u'create', u'edit', u'move', u'upload'])
+        else:
+            return set(restrictions['types'])
+
+    def protection_levels(self):
+        """
+        Return the protection levels available on this site.
+
+        With MediaWiki version 1.23 protection levels can be retrieved. To
+        support older wikis, the default protection levels '', 'autoconfirmed',
+        and 'sysop' are returned.
+
+        @return protection types available
+        @rtype: set of unicode instances
+        """
+        # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
+        restrictions = self._add_siteinfo('restrictions', True)
+        if restrictions is None or 'levels' not in restrictions:
+            return set([u'', u'autoconfirmed', u'sysop'])
+        else:
+            return set(restrictions['levels'])
+
     @must_be(group='sysop')
-    def protect(self, page, protections, summary, expiry=None):
+    @deprecate_arg("summary", "reason")
+    def protect(self, page, protections, reason, expiry=None, **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
 
         @param protections: A dict mapping type of protection to protection
@@ -3211,22 +3274,25 @@ class APISite(BaseSite):
             'create', and 'upload'. Valid protection levels (in MediaWiki 1.12)
             are '' (equivalent to 'none'), 'autoconfirmed', and 'sysop'.
             If None is given, however, that protection will be skipped.
-        @param summary: Edit summary.
+        @type  protections: dict
+        @param reason: Reason for the action
+        @type  reason: basestring
         @param expiry: When the block should expire. This expiry will be applied
             to all protections. If None, 'infinite', 'indefinite', 'never', or ''
             is given, there is no expiry.
         @type expiry: pywikibot.Timestamp, string in GNU timestamp format
             (including ISO 8601).
         """
-        token = self.token(page, "protect")
+        token = self.token(page, 'protect')
         self.lock_page(page)
 
-        protectList = [type + '=' + level for type, level in protections.items()
+        protectList = [ptype + '=' + level for ptype, level in protections.items()
                        if level is not None]
-        req = api.Request(site=self, action="protect", token=token,
+        req = api.Request(site=self, action='protect', token=token,
                           title=page.title(withSection=False),
                           protections=protectList,
-                          reason=summary)
+                          reason=reason,
+                          **kwargs)
         if isinstance(expiry, pywikibot.Timestamp):
             expiry = expiry.toISOformat()
         if expiry:

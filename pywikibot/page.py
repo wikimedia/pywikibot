@@ -824,6 +824,30 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         """
         return self.site.page_restrictions(self)
 
+    def applicable_protections(self):
+        """
+        Return the protection types allowed for that page.
+
+        If the page doesn't exists it only returns "create". Otherwise it
+        returns all protection types provided by the site, except "create".
+        It also removes "upload" if that page is not in the File namespace.
+
+        It is possible, that it returns an empty set, but only if original
+        protection types were removed.
+
+        @return: set of unicode
+        """
+        # Currently hard coded, but a future API update might allow us to
+        # properly determine the applicable protection types
+        p_types = set(self.site.protection_types())
+        if not self.exists():
+            return set(['create']) if 'create' in p_types else set()
+        else:
+            p_types.remove('create')  # no existing page allows that
+            if not self.isImage():  # only file pages allow upload
+                p_types.remove('upload')
+            return p_types
+
     def canBeEdited(self):
         """Determine whether the page may be edited.
 
@@ -1557,60 +1581,76 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return self.site.undelete(self, comment)
 
     @deprecate_arg("throttle", None)
-    def protect(self, edit='sysop', move='sysop', create=None, upload=None,
-                unprotect=False, reason=None, prompt=True, expiry=None):
+    def protect(self, edit=False, move=False, create=None, upload=None,
+                unprotect=False, reason=None, prompt=True, protections=None,
+                **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
 
         Valid protection levels (in MediaWiki 1.12) are '' (equivalent to
         'none'), 'autoconfirmed', and 'sysop'. If None is given, however,
         that protection will be skipped.
 
-        @param edit: Level of edit protection
-        @param move: Level of move protection
-        @param create: Level of create protection
-        @param upload: Level of upload protection
-        @param unprotect: If true, unprotect page editing and moving
-            (equivalent to set both edit and move to '')
-        @param reason: Edit summary.
-        @param prompt: If true, ask user for confirmation.
-        @param expiry: When the block should expire. This expiry will be
-            applied to all protections.
-            None, 'infinite', 'indefinite', 'never', and '' mean no expiry.
-        @type expiry: pywikibot.Timestamp, string in GNU timestamp format
-            (including ISO 8601).
+        @param protections: A dict mapping type of protection to protection
+            level of that type.
+        @type  protections: dict
+        @param reason: Reason for the action
+        @type  reason: basestring
+        @param prompt: Whether to ask user for confirmation
+        @type  prompt: bool
         """
-        if reason is None:
-            if unprotect:
-                un = u'un'
+        def deprecated(value, arg_name):
+            # if protections was set and value is None, don't interpret that
+            # argument. But otherwise warn that the parameter was set
+            # (even implicit)
+            if called_using_deprecated_arg:
+                if value is False:  # explicit test for False (don't use not)
+                    value = "sysop"
+                if value == "none":  # 'none' doesn't seem do be accepted
+                    value = ""
+                if value is not None:  # empty string is allowed
+                    protections[arg_name] = value
+                    pywikibot.bot.warning(u'"protections" argument of '
+                                          'protect() replaces "{}".'.format(arg_name))
             else:
-                un = u''
-            pywikibot.output(u'Preparing to %sprotect %s.'
-                             % (un, self.title(asLink=True)))
+                if value:
+                    pywikibot.bot.warning(u'"protections" argument of '
+                                          'protect() replaces "{}"; cannot '
+                                          'use both.'.format(arg_name))
+
+        # buffer that, because it might get changed
+        called_using_deprecated_arg = protections is None
+        if called_using_deprecated_arg:
+            protections = {}
+        deprecated(edit, "edit")
+        deprecated(move, "move")
+        deprecated(create, "create")
+        deprecated(upload, "upload")
+
+        if reason is None:
+            pywikibot.output(u'Preparing to protection change of %s.'
+                             % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the action:')
         if unprotect:
-            edit = move = ""
-            # Apply to only edit and move for backward compatibility.
-            # To unprotect article creation, for example,
-            # create must be set to '' and the rest must be None
+            pywikibot.bot.warning(u'"unprotect" argument of protect() is '
+                                  'deprecated')
+            protections = dict(
+                [(p_type, "") for p_type in self.applicable_protections()])
         answer = 'y'
+        if prompt:
+            pywikibot.bot.warning(u'"prompt" argument of protect() is '
+                                  'deprecated')
         if prompt and not hasattr(self.site, '_noProtectPrompt'):
             answer = pywikibot.inputChoice(
                 u'Do you want to change the protection level of %s?'
                 % self.title(asLink=True, forceInterwiki=True),
                 ['Yes', 'No', 'All'],
-                ['Y', 'N', 'A'],
+                ['y', 'N', 'a'],
                 'N')
-            if answer in ['a', 'A']:
+            if answer == 'a':
                 answer = 'y'
                 self.site._noProtectPrompt = True
-        if answer in ['y', 'Y']:
-            protections = {
-                'edit': edit,
-                'move': move,
-                'create': create,
-                'upload': upload,
-            }
-            return self.site.protect(self, protections, reason, expiry)
+        if answer == 'y':
+            return self.site.protect(self, protections, reason, **kwargs)
 
     def change_category(self, oldCat, newCat, comment=None, sortKey=None,
                         inPlace=True):
