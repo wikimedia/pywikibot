@@ -344,7 +344,7 @@ class CosmeticChangesToolkit:
                     assert u'Kép' in namespaces
                     namespaces.remove(u'Kép')
                 elif self.site.code == 'pt':
-                    # bug #3346901 should be implemented
+                    # bug 55242 should be implemented
                     continue
             # lowerspaced and underscored namespaces
             for i in range(len(namespaces)):
@@ -773,7 +773,7 @@ class CosmeticChangesToolkit:
         text = pywikibot.replaceExcept(text, u'[ىي]', u'ی', exceptions)
         return text
         # replace persian/arabic digits
-        ## deactivated due to bug #3539407
+        # deactivated due to bug 55185
         for i in range(0, 10):
             text = pywikibot.replaceExcept(text, old[i], new[i], exceptions)
         # do not change digits in class, style and table params
