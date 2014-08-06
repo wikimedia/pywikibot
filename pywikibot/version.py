@@ -87,10 +87,21 @@ def getversiondict():
     return cache
 
 
-def getversion_svn(path=None):
-    import httplib
-    import xml.dom.minidom
-    _program_dir = path or _get_program_dir()
+def svn_rev_info(path):
+    """Fetch information about the current revision of an Subversion checkout.
+
+    Returns three strings:
+    * 'tag': name for the repository
+    * 'rev': current Subversion revision identifier
+    * 'date': date of current revision
+
+    @param path: directory of the Subversion checkout
+    @return: tag (name for the repository),
+             rev (current Subversion revision identifier),
+             date (date of current revision)
+    @return: C{tuple} of 3 C{str}
+    """
+    _program_dir = path
     entries = open(os.path.join(_program_dir, '.svn/entries'))
     version = entries.readline().strip()
     # use sqlite table for new entries format
@@ -120,6 +131,19 @@ order by revision desc, changed_date desc""")
         date = time.strptime(entries.readline()[:19], '%Y-%m-%dT%H:%M:%S')
         rev = entries.readline()[:-1]
         entries.close()
+    return tag, rev, date
+
+
+def github_svn_rev2hash(tag, rev):
+    """Convert a Subversion revision to a Git hash using Github.
+
+    @param tag: name of the Subversion repo on Github
+    @param rev: Subversion revision identifier
+    @return: the git hash
+    @rtype: str
+    """
+    import httplib
+    import xml.dom.minidom
     conn = httplib.HTTPSConnection('github.com')
     conn.request('PROPFIND', '/wikimedia/%s/!svn/vcc/default' % tag,
                  "<?xml version='1.0' encoding='utf-8'?>"
@@ -128,6 +152,22 @@ order by revision desc, changed_date desc""")
     resp = conn.getresponse()
     dom = xml.dom.minidom.parse(resp)
     hsh = dom.getElementsByTagName("C:git-commit")[0].firstChild.nodeValue
+    return hsh
+
+
+def getversion_svn(path=None):
+    """Get version info for a Subversion checkout.
+
+    @param path: directory of the Subversion checkout
+    @return: tag (name for the repository),
+             rev (current Subversion revision identifier),
+             date (date of current revision),
+             hash (git hash for the Subversion revision)
+    @return: C{tuple} of 4 C{str}
+    """
+    _program_dir = path or _get_program_dir()
+    tag, rev, date = svn_rev_info(_program_dir)
+    hsh = github_svn_rev2hash(tag, rev)
     rev = 's%s' % rev
     if (not date or not tag or not rev) and not path:
         raise ParseError
