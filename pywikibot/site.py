@@ -171,7 +171,12 @@ class BaseSite(object):
                 user = user[0].upper() + user[1:]
             if sysop:
                 sysop = sysop[0].upper() + sysop[1:]
+        if user:
+            user = user.replace('_', ' ')
+        if sysop:
+            sysop = sysop.replace('_', ' ')
         self._username = [user, sysop]
+
         self.use_hard_category_redirects = (
             self.code in self.family.use_hard_category_redirects)
 
