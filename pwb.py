@@ -20,6 +20,8 @@ import imp
 import os
 import sys
 
+pwb = None
+
 
 def tryimport_pwb():
     # See if we can import pywikibot. If so, we need to patch pwb.argvu, too.
@@ -125,9 +127,12 @@ if StrictVersion(httplib2.__version__) < StrictVersion("0.6.0"):
           "Try running 'git submodule update --init'.")
     sys.exit(1)
 
+del httplib2
+
 if sys.version_info[0] == 2 and sys.version_info[1] == 6:
     try:
         import ordereddict
+        del ordereddict
     except ImportError as e:
         print("ImportError: %s" % e)
         print("pywikibot depends on module ordereddict in Python 2.6.")

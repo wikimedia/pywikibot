@@ -53,8 +53,8 @@ import hashlib
 import pywikibot
 from pywikibot.data import api
 
-from pywikibot.site import APISite, DataSite, LoginStatus  # noqa
-from pywikibot.page import User  # noqa
+from pywikibot.site import APISite, DataSite, LoginStatus  # flake8: noqa
+from pywikibot.page import User  # flake8: noqa
 
 
 class ParseError(Exception):

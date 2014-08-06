@@ -18,7 +18,6 @@ __version__ = "$Id$"
 # system imports
 import sys
 import re
-import os
 import codecs
 from collections import defaultdict
 from distutils.version import LooseVersion as V
@@ -28,11 +27,11 @@ if sys.version_info[0] == 3:
 
 # creating & retrieving urls
 if sys.version_info[0] == 2:
-    from urlparse import urlparse, urljoin, ParseResult
+    from urlparse import urlparse, urljoin
     import urllib2
     from urllib2 import HTTPError
 else:
-    from urllib.parse import urlparse, urljoin, ParseResult
+    from urllib.parse import urlparse, urljoin
     from urllib.error import HTTPError
     import urllib.request as urllib2
 

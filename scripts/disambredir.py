@@ -56,7 +56,7 @@ def treat(text, linkedPage, targetPage):
         if m.group('title') == '' or mysite.isInterwikiLink(m.group('title')):
             continue
         else:
-            actualLinkPage = pywikibot.Page(page.site, m.group('title'))
+            actualLinkPage = pywikibot.Page(mysite, m.group('title'))
             # Check whether the link found is to page.
             if actualLinkPage != linkedPage:
                 continue
@@ -139,12 +139,11 @@ def workon(page, links):
             continue
         text = treat(text, page2, target)
     if text != page.get():
-        comment = i18n.translate(mysite, msg, fallback=True)
+        comment = i18n.translate(page.site, msg, fallback=True)
         page.put(text, comment)
 
 
 def main():
-    global mysite, linktrail, page
     start = []
     for arg in pywikibot.handleArgs():
         start.append(arg)
@@ -153,7 +152,6 @@ def main():
     else:
         start = "!"
     mysite = pywikibot.Site()
-    linktrail = mysite.linktrail()
     try:
         generator = pagegenerators.CategorizedPageGenerator(
             mysite.disambcategory(), start=start)

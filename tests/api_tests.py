@@ -10,7 +10,7 @@ import datetime
 import pywikibot
 import pywikibot.data.api as api
 from tests.utils import unittest
-from tests.utils import SiteTestCase, NoSiteTestCase, CachedTestCase
+from tests.utils import SiteTestCase, CachedTestCase
 
 mysite = pywikibot.Site('en', 'wikipedia')
 
