@@ -201,7 +201,6 @@ class TestScriptMeta(type):
                 test_name = 'test_' + script_name + '_execution'
             dct[test_name] = test_execution(script_name, ['-help'])
             if script_name in ['shell', 'version',
-                               'checkimages',     # bug 68613
                                'data_ingestion',  # bug 68611
                                'flickrripper',    # bug 68606 (and others)
                                'replicate_wiki',  # bug 68664

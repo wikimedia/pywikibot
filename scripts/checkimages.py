@@ -1961,13 +1961,12 @@ def main():
 
 
 if __name__ == "__main__":
-    old = datetime.datetime.strptime(
-        str(datetime.datetime.utcnow()).split('.')[0], "%Y-%m-%d %H:%M:%S")
+    start = time.time()
     try:
         main()
-    finally:
-        final = datetime.datetime.strptime(
-            str(datetime.datetime.utcnow()).split('.')[0], "%Y-%m-%d %H:%M:%S")
-        delta = final - old
-        secs_of_diff = delta.seconds
-        pywikibot.output("Execution time: %s seconds\n" % secs_of_diff)
+    except SystemExit:
+        pass
+    else:
+        final = time.time()
+        delta = int(final - start)
+        pywikibot.output("Execution time: %s seconds\n" % delta)
