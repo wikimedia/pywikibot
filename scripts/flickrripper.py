@@ -42,7 +42,15 @@ import pywikibot
 from pywikibot import config
 import upload
 
-import flickrapi                  # see: http://stuvel.eu/projects/flickrapi
+try:
+    import flickrapi                  # see: http://stuvel.eu/projects/flickrapi
+except ImportError:
+    import sys
+    pywikibot.error('This script requires the python flickrapi module')
+    pywikibot.error('See: http://stuvel.eu/projects/flickrapi')
+    pywikibot.exception()
+    sys.exit()
+
 from Tkinter import (
     Tk, Label, Entry, Scrollbar, Text, Button,
     END, VERTICAL, NORMAL, WORD
@@ -72,9 +80,9 @@ def getPhoto(flickr=None, photo_id=''):
     while True:
         try:
             photoInfo = flickr.photos_getInfo(photo_id=photo_id)
-            #xml.etree.ElementTree.dump(photoInfo)
+            # xml.etree.ElementTree.dump(photoInfo)
             photoSizes = flickr.photos_getSizes(photo_id=photo_id)
-            #xml.etree.ElementTree.dump(photoSizes)
+            # xml.etree.ElementTree.dump(photoSizes)
             return photoInfo, photoSizes
         except flickrapi.exceptions.FlickrError:
             pywikibot.output(u'Flickr api problem, sleeping')
@@ -166,7 +174,7 @@ def getFilename(photoInfo=None, site=None, project=u'Flickr'):
         title = cleanUpTitle(title)
 
     if not title:
-        #find the max length for a mw title
+        # find the max length for a mw title
         maxBytes = 240 - len(project.encode('utf-8')) \
                        - len(username.encode('utf-8'))
         description = photoInfo.find('photo').find('description').text
@@ -260,12 +268,12 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
         pywikibot.output(str(photo_id))
         (photoInfo, photoSizes) = getPhoto(flickr, photo_id)
     if isAllowedLicense(photoInfo) or override:
-        #Get the url of the largest photo
+        # Get the url of the largest photo
         photoUrl = getPhotoUrl(photoSizes)
-        #Should download the photo only once
+        # Should download the photo only once
         photo = downloadPhoto(photoUrl)
 
-        #Don't upload duplicate images, should add override option
+        # Don't upload duplicate images, should add override option
         duplicates = findDuplicateImages(photo)
         if duplicates:
             pywikibot.output(u'Found duplicate image at %s' % duplicates.pop())
@@ -276,7 +284,7 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
                                                 flickrreview, reviewer,
                                                 override, addCategory,
                                                 removeCategories)
-            #pywikibot.output(photoDescription)
+            # pywikibot.output(photoDescription)
             if not autonomous:
                 (newPhotoDescription, newFilename, skip) = Tkdialog(
                     photoDescription, photo, filename).run()
@@ -284,14 +292,14 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
                 newPhotoDescription = photoDescription
                 newFilename = filename
                 skip = False
-        #pywikibot.output(newPhotoDescription)
-        #if (pywikibot.Page(title=u'File:'+ filename, site=pywikibot.Site()).exists()):
+        # pywikibot.output(newPhotoDescription)
+        # if (pywikibot.Page(title=u'File:'+ filename, site=pywikibot.Site()).exists()):
         # I should probably check if the hash is the same and if not upload it under a different name
-        #pywikibot.output(u'File:' + filename + u' already exists!')
-        #else:
-            #Do the actual upload
-            #Would be nice to check before I upload if the file is already at Commons
-            #Not that important for this program, but maybe for derived programs
+        # pywikibot.output(u'File:' + filename + u' already exists!')
+        # else:
+            # Do the actual upload
+            # Would be nice to check before I upload if the file is already at Commons
+            # Not that important for this program, but maybe for derived programs
             if not skip:
                 bot = upload.UploadRobot(photoUrl,
                                          description=newPhotoDescription,
@@ -309,7 +317,7 @@ class Tkdialog:
     """ The user dialog. """
     def __init__(self, photoDescription, photo, filename):
         self.root = Tk()
-        #"%dx%d%+d%+d" % (width, height, xoffset, yoffset)
+        # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
         self.root.geometry("%ix%i+10-10" % (config.tkhorsize, config.tkvertsize))
 
         self.root.title(filename)
@@ -319,7 +327,7 @@ class Tkdialog:
         self.skip = False
         self.exit = False
 
-        ## Init of the widgets
+        # --Init of the widgets
         # The image
         self.image = self.getImage(self.photo, 800, 600)
         self.imagePanel = Label(self.root, image=self.image)
@@ -343,7 +351,7 @@ class Tkdialog:
         self.okButton = Button(self.root, text="OK", command=self.okFile)
         self.skipButton = Button(self.root, text="Skip", command=self.skipFile)
 
-        ## Start grid
+        # --Start grid
 
         # The image
         self.imagePanel.grid(row=0, column=0, rowspan=11, columnspan=4)
@@ -396,7 +404,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
     # https://www.flickr.com/services/api/flickr.groups.pools.getPhotos.html
     # Get the photos in a group
     if group_id:
-        #First get the total number of photo's in the group
+        # First get the total number of photo's in the group
         photos = flickr.groups_pools_getPhotos(group_id=group_id,
                                                user_id=user_id, tags=tags,
                                                per_page='100', page='1')
@@ -460,7 +468,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
         photos = flickr.people_getPublicPhotos(user_id=user_id,
                                                per_page='100', page='1')
         pages = photos.find('photos').attrib['pages']
-        #flickrapi.exceptions.FlickrError
+        # flickrapi.exceptions.FlickrError
         for i in range(1, int(pages) + 1):
             gotPhotos = False
             while not gotPhotos:
@@ -502,7 +510,7 @@ def usage():
 
 
 def main():
-    #Get the api key
+    # Get the api key
     if not config.flickr['api_key']:
         pywikibot.output('Flickr api key not found! Get yourself an api key')
         pywikibot.output(
