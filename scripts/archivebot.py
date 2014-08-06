@@ -242,9 +242,10 @@ class DiscussionThread(object):
             # return 'unsigned'
             maxage = str2time(re_t.group(1))
             if self.now - self.timestamp > maxage:
-                msg = i18n.twtranslate(self.code, 'archivebot-older-than')
                 duration = str2localized_duration(archiver.site, re_t.group(1))
-                return u'%s %s' % (msg, duration)
+                return i18n.twtranslate(self.code,
+                                        'archivebot-older-than',
+                                        {'duration': duration})
         return ''
 
 
