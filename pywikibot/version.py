@@ -144,11 +144,18 @@ def getversion_git(path=None):
         cmd = 'git.cmd'
 
     tag = open(os.path.join(_program_dir, '.git/config'), 'r').read()
-    s = tag.find('url = ', tag.find('[remote "origin"]'))
-    e = tag.find('\n', s)
-    tag = tag[(s + 6):e]
-    t = tag.strip().split('/')
-    tag = '[%s] %s' % (t[0][:-1], '-'.join(t[3:]))
+    # Try 'origin' and then 'gerrit' as remote name; bail if can't find either.
+    remote_pos = tag.find('[remote "origin"]')
+    if remote_pos == -1:
+        remote_pos = tag.find('[remote "gerrit"]')
+    if remote_pos == -1:
+        tag = '?'
+    else:
+        s = tag.find('url = ', )
+        e = tag.find('\n', s)
+        tag = tag[(s + 6):e]
+        t = tag.strip().split('/')
+        tag = '[%s] %s' % (t[0][:-1], '-'.join(t[3:]))
     info = subprocess.Popen([cmd, '--no-pager',
                              'log', '-1',
                              '--pretty=format:"%ad|%an|%h|%H|%d"'
