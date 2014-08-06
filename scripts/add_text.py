@@ -117,7 +117,7 @@ starsList = [
 ]
 
 
-def add_text(page=None, addText, summary=None, regexSkip=None,
+def add_text(page, addText, summary=None, regexSkip=None,
              regexSkipUrl=None, always=False, up=False, putText=True,
              oldTextGiven=None, reorderEnabled=True, create=False):
     site = page.site
