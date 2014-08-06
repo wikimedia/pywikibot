@@ -23,3 +23,5 @@ if __name__ == '__main__':
         pywikibot.output(u'unicode test: triggers problem #3081100')
     else:
         pywikibot.output(u'unicode test: ok')
+    import httplib2
+    pywikibot.output('httplib2 version: %s' % httplib2.__version__)
