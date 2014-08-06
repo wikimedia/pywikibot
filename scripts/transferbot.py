@@ -48,6 +48,29 @@ docuReplacements = {
 }
 
 
+class WikiTransferException(Exception):
+    """Base class for exceptions from this script.
+
+    Makes it easier for clients to catch all expected exceptions that the script might
+    throw
+    """
+    pass
+
+
+class TargetSiteMissing(WikiTransferException):
+    """Thrown when the target site is the same as the source site.
+
+    Based on the way each are initialized, this is likely to happen when the target site
+    simply hasn't been specified.
+    """
+    pass
+
+
+class TargetPagesMissing(WikiTransferException):
+    """Thrown if no page range has been specified for the script to operate on."""
+    pass
+
+
 def main():
     tohandle = pywikibot.handleArgs()
 
@@ -75,11 +98,11 @@ def main():
 
     tosite = pywikibot.Site(tolang, tofamily)
     if fromsite == tosite:
-        raise Exception('Target site not different from source site')
+        raise TargetSiteMissing('Target site not different from source site')
 
     gen = genFactory.getCombinedGenerator()
     if not gen:
-        raise Exception('Target pages not specified')
+        raise TargetPagesMissing('Target pages not specified')
 
     gen_args = ' '.join(gen_args)
     pywikibot.output(u"""
@@ -129,4 +152,13 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except TargetSiteMissing as e:
+        pywikibot.error(u'Need to specify a target site and/or language')
+        pywikibot.error(u'Try running this script with -help for help/usage')
+        pywikibot.exception()
+    except TargetPagesMissing as e:
+        pywikibot.error(u'Need to specify a page range')
+        pywikibot.error(u'Try running this script with -help for help/usage')
+        pywikibot.exception()
