@@ -151,7 +151,7 @@ def getversion_git(path=None):
     if remote_pos == -1:
         tag = '?'
     else:
-        s = tag.find('url = ', )
+        s = tag.find('url = ', remote_pos)
         e = tag.find('\n', s)
         tag = tag[(s + 6):e]
         t = tag.strip().split('/')
