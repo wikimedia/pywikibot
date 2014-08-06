@@ -226,10 +226,9 @@ class TestScriptMeta(type):
                                'pagefromfile',    # bug 68660
                                'transferbot',     # raises custom Exception
                                'upload',          # raises custom ValueError
-                               ] or \
-                    (config.family == 'wikidata' and script_name == 'lonelypages') or \
-                    ((config.family != 'wikipedia' or config.mylang != 'en') and script_name == 'cfd') or \
-                    (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling'):
+                               ] or (
+                    ((config.family != 'wikipedia' or config.mylang != 'en') and script_name == 'cfd') or
+                    (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = \
                 'Test running ' + script_name + ' without arguments.'
