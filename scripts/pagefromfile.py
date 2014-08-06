@@ -17,6 +17,7 @@ Specific arguments:
 -start:xxx      Specify the text that marks the beginning of a page
 -end:xxx        Specify the text that marks the end of a page
 -file:xxx       Give the filename we are getting our material from
+                (default: dict.txt)
 -include        The beginning and end markers should be included
                 in the page.
 -titlestart:xxx Use xxx in place of ''' for identifying the
@@ -25,7 +26,7 @@ Specific arguments:
                 end of page title
 -notitle        do not include the title, including titlestart, and
                 titleend, in the page
--nocontent      If page has this statment it dosen't append
+-nocontent      If page has this statment it doesn't append
                 (example: -nocontent:"{{infobox")
 -summary:xxx    Use xxx as the edit summary for the upload - if
                 a page exists, standard messages are appended
@@ -49,8 +50,10 @@ If the page to be uploaded already exists:
 __version__ = '$Id$'
 #
 
+import os
 import re
 import codecs
+
 import pywikibot
 from pywikibot import config, Bot, i18n
 
@@ -154,9 +157,18 @@ class PageFromFileReader:
     Responsible for reading the file.
 
     The run() method yields a (title, contents) tuple for each found page.
+
     """
+
     def __init__(self, filename, pageStartMarker, pageEndMarker,
                  titleStartMarker, titleEndMarker, include, notitle):
+        """Constructor.
+
+        Check if self.file name exists. If not, ask for a new filename.
+        User can quit.
+
+        """
+
         self.filename = filename
         self.pageStartMarker = pageStartMarker
         self.pageEndMarker = pageEndMarker
@@ -166,13 +178,15 @@ class PageFromFileReader:
         self.notitle = notitle
 
     def run(self):
-        pywikibot.output('Reading \'%s\'...' % self.filename)
+        """Read file and yield page title and content."""
+
+        pywikibot.output('\n\nReading \'%s\'...' % self.filename)
         try:
             f = codecs.open(self.filename, 'r',
                             encoding=config.textfile_encoding)
         except IOError as err:
             pywikibot.output(str(err))
-            return
+            raise IOError
 
         text = f.read()
         position = 0
@@ -264,11 +278,27 @@ def main():
         else:
             pywikibot.output(u"Disregarding unknown argument %s." % arg)
 
-    reader = PageFromFileReader(filename, pageStartMarker, pageEndMarker,
-                                titleStartMarker, titleEndMarker, include,
-                                notitle)
-    bot = PageFromFileRobot(reader, **options)
-    bot.run()
+    failed_filename = False
+    while not os.path.isfile(filename):
+        pywikibot.output('\nFile \'%s\' does not exist. ' % filename)
+        _input = pywikibot.input(
+            'Please enter the file name [q to quit]:')
+        if _input == 'q':
+            failed_filename = True
+            break
+        else:
+            filename = _input
+
+    # show help text from the top of this file if reader failed
+    # or User quit.
+    if failed_filename:
+        pywikibot.showHelp()
+    else:
+        reader = PageFromFileReader(filename, pageStartMarker, pageEndMarker,
+                                    titleStartMarker, titleEndMarker, include,
+                                    notitle)
+        bot = PageFromFileRobot(reader, **options)
+        bot.run()
 
 if __name__ == "__main__":
     main()

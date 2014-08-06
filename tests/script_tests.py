@@ -66,6 +66,7 @@ script_input = {
     'editarticle': 'Test page\n',
     'interwiki': 'Test page\n',
     # 'misspelling': 'q\n',   # pressing 'q' doesnt work. bug 68663
+    'pagefromfile': 'q\n',
     'replace': 'foo\nbar\n\n\n',  # match, replacement,
                                   # Enter to begin, Enter for default summary.
     'shell': '\n',  # exits on end of stdin
@@ -111,6 +112,7 @@ no_args_expected_results = {
     'imageuncat': 'You have to specify the generator ',
     'interwiki': 'does not exist. Skipping.',  # 'Test page' does not exist
     'login': 'Logged in on ',
+    'pagefromfile': 'Please enter the file name',
     'replace': 'Press Enter to use this default message',
     'replicate_wiki': 'error: too few arguments',
     'script_wui': 'Pre-loading all relevant page contents',
@@ -214,7 +216,6 @@ class TestScriptMeta(type):
                                'data_ingestion',  # bug 68611
                                'flickrripper',    # bug 68606 (and deps)
                                'imagerecat',      # bug 68658
-                               'pagefromfile',    # bug 68660
                                'upload',          # raises custom ValueError
                                ] or (
                     ((config.family != 'wikipedia' or config.mylang != 'en') and script_name == 'cfd') or
