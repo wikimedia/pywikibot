@@ -33,6 +33,15 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from solve_disambiguation import DisambiguationRobot
 
+HELP_MSG = """\n
+mispelling.py does not support site {site}.
+
+Help Pywikibot team to provide support for your wiki by submitting
+a bug to:
+    https://bugzilla.wikimedia.org/enter_bug.cgi?product=Pywikibot
+with category containing misspelling pages or a template for
+these misspellings.\n"""
+
 
 class MisspellingRobot(DisambiguationRobot):
 
@@ -61,16 +70,15 @@ class MisspellingRobot(DisambiguationRobot):
 
     def createPageGenerator(self, firstPageTitle):
         mysite = pywikibot.Site()
-        mylang = mysite.lang
+        mylang = mysite.code
         if mylang in self.misspellingCategory:
             misspellingCategoryTitle = self.misspellingCategory[mylang]
             misspellingCategory = pywikibot.Category(mysite,
                                                      misspellingCategoryTitle)
             generator = pagegenerators.CategorizedPageGenerator(
                 misspellingCategory, recurse=True, start=firstPageTitle)
-        else:
-            misspellingTemplateName = 'Template:%s' \
-                                      % self.misspellingTemplate[mylang]
+        elif mylang in self.misspellingTemplate:
+            misspellingTemplateName = 'Template:%s' % self.misspellingTemplate[mylang]
             misspellingTemplate = pywikibot.Page(mysite,
                                                  misspellingTemplateName)
             generator = pagegenerators.ReferringPageGenerator(
@@ -79,6 +87,12 @@ class MisspellingRobot(DisambiguationRobot):
                 pywikibot.output(
                     u'-start parameter unsupported on this wiki because there '
                     u'is no category for misspellings.')
+        else:
+            pywikibot.output(HELP_MSG.format(site=mysite))
+
+            empty_gen = (i for i in [])
+            return empty_gen
+
         preloadingGen = pagegenerators.PreloadingGenerator(generator)
         return preloadingGen
 
