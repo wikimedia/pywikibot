@@ -63,11 +63,8 @@ def runnable_script_list(scripts_path):
 
 script_input = {
     'catall': 'q\n',  # q for quit
-    'disambredir': '\n',  # prompts for user to choose action to take
     'editarticle': 'Test page\n',
-    'imagetransfer': 'Test page\n',
     'interwiki': 'Test page\n',
-    'makecat': 'Test page\n\n',
     # 'misspelling': 'q\n',   # pressing 'q' doesnt work. bug 68663
     'replace': 'foo\nbar\n\n\n',  # match, replacement,
                                   # Enter to begin, Enter for default summary.
@@ -84,15 +81,14 @@ auto_run_script_list = [
     'category_redirect',
     'cfd',
     'clean_sandbox',
+    'disambredir',
     'lonelypages',
-    'makecat',
     'misspelling',
     'revertbot',
     'noreferences',
     'nowcommons',
     'script_wui',
     'shell',
-    'solve_disambiguation',
     'unusedfiles',
     'upload',
     'watchlist',
@@ -127,7 +123,6 @@ no_args_expected_results = {
     # The following auto-run and typically cant be validated,
     # however these strings are very likely to exist within
     # the timeout of 5 seconds.
-    'makecat': '(Default is [[',
     'revertbot': 'Fetching new batch of contributions',
     'upload': 'ERROR: Upload error',
 }
@@ -217,15 +212,13 @@ class TestScriptMeta(type):
                                             no_args_expected_results)
             if script_name in ['checkimages',     # bug 68613
                                'data_ingestion',  # bug 68611
-                               'disambredir',     # quittable auto-run with
-                                                  # highly variable output.
                                'flickrripper',    # bug 68606 (and deps)
                                'imagerecat',      # bug 68658
-                               'imagetransfer',   # bug 68659
                                'pagefromfile',    # bug 68660
                                'upload',          # raises custom ValueError
                                ] or (
                     ((config.family != 'wikipedia' or config.mylang != 'en') and script_name == 'cfd') or
+                    (config.family == 'wikipedia' and script_name == 'disambredir') or
                     (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = \

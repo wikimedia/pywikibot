@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Add or change categories on a number of pages. Usage: catall.py name - goes
-through pages, starting at 'name'. Provides the categories on the page and asks
-whether to change them. If no starting name is provided, the bot starts at 'A'.
+Add or change categories on a number of pages.
+
+Usage:
+    catall.py [start]
+
+Provides the categories on the page and asks whether to change them.
+
+If no starting name is provided, the bot starts at 'A'.
 
 Options:
 -onlynew : Only run on pages that do not yet have a category.
@@ -71,18 +76,15 @@ def make_categories(page, list, site=None):
 
 def main():
     docorrections = True
-    start = []
+    start = 'A'
 
-    for arg in pywikibot.handleArgs():
+    local_args = pywikibot.handleArgs()
+
+    for arg in local_args:
         if arg == '-onlynew':
             docorrections = False
         else:
-            start.append(arg)
-
-    if not start:
-        start = 'A'
-    else:
-        start = ' '.join(start)
+            start = arg
 
     mysite = pywikibot.Site()
 

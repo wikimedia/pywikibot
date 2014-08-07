@@ -2422,7 +2422,7 @@ def readWarnfile(filename, bot):
 
 
 def main():
-    singlePageTitle = []
+    singlePageTitle = ''
     opthintsonly = False
     # Which namespaces should be processed?
     # default to [] which means all namespaces will be processed
@@ -2491,7 +2491,8 @@ def main():
             until = arg[7:]
         else:
             if not genFactory.handleArg(arg):
-                singlePageTitle.append(arg)
+                if not singlePageTitle:
+                    singlePageTitle = arg
 
     # Do not use additional summary with autonomous mode
     if globalvar.autonomous:
@@ -2564,7 +2565,6 @@ def main():
         # TODO: filter namespaces if -namespace parameter was used
         readWarnfile(warnfile, bot)
     else:
-        singlePageTitle = ' '.join(singlePageTitle)
         if not singlePageTitle and not opthintsonly:
             singlePageTitle = pywikibot.input(u'Which page to check:')
         if singlePageTitle:
