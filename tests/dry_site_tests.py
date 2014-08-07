@@ -9,6 +9,7 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot.site import must_be, need_version
+from pywikibot.comms.http import user_agent
 
 from tests.utils import unittest, NoSiteTestCase, DummySiteinfo
 
@@ -43,6 +44,56 @@ class TestDrySite(NoSiteTestCase):
         x._userinfo['groups'] = ['sysop']
         self.assertTrue(x.logged_in(True))
         self.assertFalse(x.logged_in(False))
+
+    def test_user_agent(self):
+        x = DrySite('en', 'wikipedia')
+
+        x._userinfo = {'name': 'foo'}
+        x._username = ('foo', None)
+
+        self.assertEqual('Pywikibot/' + pywikibot.__release__,
+                          user_agent(x, format_string='{pwb}'))
+
+        self.assertEqual(x.family.name,
+                         user_agent(x, format_string='{family}'))
+        self.assertEqual(x.code,
+                         user_agent(x, format_string='{lang}'))
+        self.assertEqual(x.family.name + ' ' + x.code,
+                         user_agent(x, format_string='{family} {lang}'))
+
+        self.assertEqual(x.username(),
+                         user_agent(x, format_string='{username}'))
+
+        x._userinfo = {'name': u'!'}
+        x._username = (u'!', None)
+
+        self.assertEqual('!', user_agent(x, format_string='{username}'))
+
+        x._userinfo = {'name': u'foo bar'}
+        x._username = (u'foo bar', None)
+
+        self.assertEqual('foo_bar', user_agent(x, format_string='{username}'))
+
+        old_config = '{script}/{version} Pywikibot/2.0 (User:{username})'
+
+        pywikibot.version.getversiondict()
+        script_value = pywikibot.calledModuleName() + '/' + pywikibot.version.cache['rev']
+
+        self.assertEqual(script_value + ' Pywikibot/2.0 (User:foo_bar)',
+                         user_agent(x, format_string=old_config))
+
+        x._userinfo = {'name': u'⁂'}
+        x._username = (u'⁂', None)
+
+        self.assertEqual('%E2%81%82',
+                         user_agent(x, format_string='{username}'))
+
+        x._userinfo = {'name': u'127.0.0.1'}
+        x._username = (None, None)
+
+        self.assertEqual('Foo', user_agent(x, format_string='Foo {username}'))
+        self.assertEqual('Foo (wikipedia:en)',
+                         user_agent(x, format_string='Foo ({script_comments})'))
 
 
 class TestMustBe(NoSiteTestCase):

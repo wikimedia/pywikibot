@@ -123,6 +123,85 @@ atexit.register(_flush)
 # export cookie_jar to global namespace
 pywikibot.cookie_jar = cookie_jar
 
+USER_AGENT_PRODUCTS = {
+    'python': 'Python/' + '.'.join([str(i) for i in sys.version_info]),
+    'httplib2': 'httplib2/' + httplib2.__version__,
+    'pwb': 'Pywikibot/' + pywikibot.__release__,
+}
+
+
+def user_agent_username(username=None):
+    """
+    Reduce username to a representation permitted in HTTP headers.
+
+    To achieve that, this function:
+    1) replaces spaces (' ') with '_'
+    2) encodes the username as 'utf-8' and if the username is not ASCII
+    3) URL encodes the username if it is not ASCII, or contains '%'
+    """
+    if not username:
+        return ''
+    username = username.replace(' ', '_')  # Avoid spaces or %20.
+    try:
+        username = username.encode('ascii')
+        # % is legal in the default $wgLegalTitleChars
+        # This is so that ops know the real pywikibot will not
+        # allow a useragent in the username to allow through a hand-coded
+        # percent-encoded value.
+        if '%' in username:
+            return quote(username)
+        else:
+            return username
+    except UnicodeEncodeError:
+        pass
+    username = quote(username.encode('utf-8'))
+    return username
+
+
+def user_agent(site=None, format_string=None):
+    values = USER_AGENT_PRODUCTS.copy()
+
+    # This is the Pywikibot revision; also map it to {version} at present.
+    if pywikibot.version.cache:
+        values['revision'] = pywikibot.version.cache['rev']
+    else:
+        values['revision'] = ''
+    values['version'] = values['revision']
+
+    values['script'] = pywikibot.calledModuleName()
+
+    # TODO: script_product should add the script version, if known
+    values['script_product'] = pywikibot.calledModuleName()
+
+    script_comments = []
+    username = ''
+    if site:
+        script_comments.append(str(site))
+
+        # TODO: there are several ways of identifying a user, and username
+        # is not the best for a HTTP header if the username isnt ASCII.
+        if site.username():
+            username = user_agent_username(site.username())
+            script_comments.append(
+                'User:' + username)
+
+    values.update({
+        'family': site.family.name if site else '',
+        'code': site.code if site else '',
+        'lang': site.code if site else '',  # TODO: use site.lang, if known
+        'site': str(site) if site else '',
+        'username': username,
+        'script_comments': '; '.join(script_comments)
+    })
+
+    if not format_string:
+        format_string = config.user_agent_format
+
+    formatted = format_string.format(**values)
+    # clean up after any blank components
+    formatted = formatted.replace(u'()', u'').replace(u'  ', u' ').strip()
+    return formatted
+
 
 def request(site, uri, ssl=False, *args, **kwargs):
     """Queue a request to be submitted to Site.
@@ -151,24 +230,10 @@ def request(site, uri, ssl=False, *args, **kwargs):
         baseuri = urlparse.urljoin("%s://%s" % (proto, host), uri)
     else:
         baseuri = uri
-    if "headers" not in kwargs:
-        kwargs["headers"] = {}
-    if site:
-        username = site.username()
-        if not username:
-            username = ""
 
-        kwargs["headers"]["user-agent"] = config.USER_AGENT_FORMAT.format(
-            script=pywikibot.calledModuleName(),
-            version=pywikibot.version.getversiondict()['rev'],
-            username=quote(username.encode('utf-8')),
-            lang=site.code,
-            family=site.family.name)
-    else:
-        USER_AGENT_FORMAT = '{script}/{version} Pywikibot/2.0'
-        kwargs["headers"]["user-agent"] = USER_AGENT_FORMAT.format(
-            script=pywikibot.calledModuleName(),
-            version=pywikibot.version.getversiondict()['rev'])
+    format_string = kwargs.setdefault("headers", {}).get("user-agent")
+    kwargs["headers"]["user-agent"] = user_agent(site, format_string)
+
     request = threadedhttp.HttpRequest(baseuri, *args, **kwargs)
     http_queue.put(request)
     while not request.lock.acquire(False):
