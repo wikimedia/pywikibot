@@ -13,7 +13,6 @@ __version__ = '$Id$'
 import os
 import time
 import datetime
-import urllib
 import subprocess
 
 import pywikibot.config2 as config
@@ -146,15 +145,17 @@ def github_svn_rev2hash(tag, rev):
     @return: the git hash
     @rtype: str
     """
-    import httplib
+    from StringIO import StringIO
     import xml.dom.minidom
-    conn = httplib.HTTPSConnection('github.com')
-    conn.request('PROPFIND', '/wikimedia/%s/!svn/vcc/default' % tag,
-                 "<?xml version='1.0' encoding='utf-8'?>"
-                 "<propfind xmlns=\"DAV:\"><allprop/></propfind>",
-                 {'Label': rev, 'User-Agent': 'SVN/1.7.5-pywikibot1'})
-    resp = conn.getresponse()
-    dom = xml.dom.minidom.parse(resp)
+    from pywikibot.comms import http
+
+    uri = 'https://github.com/wikimedia/%s/!svn/vcc/default' % tag
+    data = http.request(site=None, uri=uri, method='PROPFIND',
+                        body="<?xml version='1.0' encoding='utf-8'?>"
+                        "<propfind xmlns=\"DAV:\"><allprop/></propfind>",
+                        headers={'label': str(rev), 'user-agent': 'SVN/1.7.5 {pwb}'})
+
+    dom = xml.dom.minidom.parse(StringIO(data))
     hsh = dom.getElementsByTagName("C:git-commit")[0].firstChild.nodeValue
     return hsh
 
@@ -239,9 +240,12 @@ def getversion_onlinerepo(repo=None):
     @param repo: (optional) Online repository location
     @type repo: URL or string
     """
+    from pywikibot.comms import http
+
     url = repo or 'https://git.wikimedia.org/feed/pywikibot/core'
     hsh = None
-    buf = urllib.urlopen(url).readlines()
+    buf = http.request(site=None, uri=url)
+    buf = buf.split('\r\n')
     try:
         hsh = buf[13].split('/')[5][:-1]
     except Exception as e:
