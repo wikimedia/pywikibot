@@ -2597,11 +2597,6 @@ class WikibasePage(Page):
                 del self._link._title
         return Page(self).title(**kwargs)
 
-    @deprecated("_defined_by")
-    def __defined_by(self, singular=False):
-        """ DEPRECATED. """
-        return self._defined_by(singular=singular)
-
     def _defined_by(self, singular=False):
         """
         Internal function to provide the API parameters to identify the entity.
