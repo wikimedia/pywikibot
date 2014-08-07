@@ -11,6 +11,7 @@ __version__ = '$Id$'
 
 
 from distutils.version import LooseVersion as LV
+from collections import Iterable
 import pywikibot
 from tests.utils import PywikibotTestCase, unittest
 
@@ -115,18 +116,25 @@ class TestSiteObject(PywikibotTestCase):
         self.assertType(mysite.ns_normalize("project"), basestring)
         self.assertTrue(all(isinstance(key, int)
                             for key in ns))
-        self.assertTrue(all(isinstance(val, list)
+        self.assertTrue(all(isinstance(val, Iterable)
                             for val in ns.values()))
         self.assertTrue(all(isinstance(name, basestring)
                             for val in ns.values()
                             for name in val))
         self.assertTrue(all(isinstance(mysite.namespace(key), basestring)
                             for key in ns))
-        self.assertTrue(all(isinstance(mysite.namespace(key, True), list)
+        self.assertTrue(all(isinstance(mysite.namespace(key, True), Iterable)
                             for key in ns))
         self.assertTrue(all(isinstance(item, basestring)
                             for key in ns
                             for item in mysite.namespace(key, True)))
+
+    def testNamespaceCase(self):
+        site = pywikibot.Site('en', 'wiktionary')
+        main_namespace = site.namespaces()[0]
+        self.assertEquals(main_namespace.case, 'case-sensitive')
+        user_namespace = site.namespaces()[2]
+        self.assertEquals(user_namespace.case, 'first-letter')
 
     def testApiMethods(self):
         """Test generic ApiSite methods"""

@@ -40,6 +40,8 @@ class TestGeneral(PywikibotTestCase):
         if not site.has_transcluded_data:
             return
         repo = site.data_repository()
+        item_namespace = repo.namespaces()[0]
+        self.assertEqual(item_namespace.defaultcontentmodel, 'wikibase-item')
         item = pywikibot.ItemPage.fromPage(mainpage)
         self.assertType(item, pywikibot.ItemPage)
         self.assertEqual(item.getID(), 'Q5296')
