@@ -164,10 +164,10 @@ class SandboxBot(pywikibot.Bot):
                                                user_sandboxTemplate)
             localSandbox = pywikibot.Page(self.site, localSandboxTitle)
             content.update(user_content)
-            sandboxTitle[self.site.lang] = [item.title() for item in
+            sandboxTitle[self.site.code] = [item.title() for item in
                                             localSandbox.getReferences(
                                                 onlyTemplateInclusion=True)]
-            if self.site.lang not in user_sandboxTemplate:
+            if self.site.code not in user_sandboxTemplate:
                 content[self.site.code] = None
                 pywikibot.output(
                     u'Not properly set-up to run in user namespace!')
@@ -198,7 +198,7 @@ class SandboxBot(pywikibot.Bot):
                         u'%s is a redirect page, cleaning it anyway'
                         % sandboxPage.title(asLink=True))
                 try:
-                    text = sandboxPage.get(get_redirect=True)
+                    text = sandboxPage.text
                     if not self.getOption('text'):
                         translatedContent = i18n.translate(self.site, content)
                     else:
