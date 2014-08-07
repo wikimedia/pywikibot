@@ -6,6 +6,7 @@
 #
 __version__ = '$Id$'
 
+import os
 import sys
 if sys.version_info[0] == 2:
     from urlparse import urlparse
@@ -17,6 +18,12 @@ from tests.utils import unittest, NoSiteTestCase
 
 
 class TestArchiveSites(NoSiteTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        if os.environ.get('TRAVIS', 'false') == 'true':
+            raise unittest.SkipTest('Weblib tests are disabled on Travis-CI')
+
     def testInternetArchiveNewest(self):
         archivedversion = weblib.getInternetArchiveURL('https://google.com')
         parsed = urlparse(archivedversion)
