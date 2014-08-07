@@ -182,7 +182,7 @@ class CosmeticChangesToolkit:
         text = self.fixReferences(text)
         text = self.fixStyle(text)
         text = self.fixTypo(text)
-        if self.site.lang in ['ckb', 'fa']:
+        if self.site.code in ['ckb', 'fa']:
             text = self.fixArabicLetters(text)
         try:
             text = isbn.hyphenateIsbnNumbers(text)
@@ -200,7 +200,7 @@ class CosmeticChangesToolkit:
         """
         if not self.talkpage and pywikibot.calledModuleName() != 'interwiki':
             interwikiR = re.compile(r'\[\[%s\s?:([^\[\]\n]*)\]\]'
-                                    % self.site.lang)
+                                    % self.site.code)
             text = interwikiR.sub(r'[[\1]]', text)
         return text
 
@@ -257,7 +257,7 @@ class CosmeticChangesToolkit:
         # ignoring nn-wiki of cause of the comment line above iw section
         if not self.template and '{{Personendaten' not in text and \
            '{{SORTIERUNG' not in text and '{{DEFAULTSORT' not in text and \
-           self.site.lang not in ('et', 'it', 'bg', 'ru'):
+           self.site.code not in ('et', 'it', 'bg', 'ru'):
             categories = pywikibot.getCategoryLinks(text, site=self.site)
 
         if not self.talkpage:  # and pywikibot.calledModuleName() <> 'interwiki':
@@ -265,7 +265,7 @@ class CosmeticChangesToolkit:
             if self.template:
                 loc = None
                 try:
-                    tmpl, loc = moved_links[self.site.lang]
+                    tmpl, loc = moved_links[self.site.code]
                     del tmpl
                 except KeyError:
                     pass
@@ -289,7 +289,7 @@ class CosmeticChangesToolkit:
         # Adding categories
         if categories:
             ##Sorting categories in alphabetic order. beta test only on Persian Wikipedia, TODO fix bug for sorting
-            #if self.site.language() == 'fa':
+            #if self.site.code == 'fa':
             #   categories.sort()
             ##Taking main cats to top
             #   for name in categories:
@@ -333,16 +333,16 @@ class CosmeticChangesToolkit:
             namespaces = list(self.site.namespace(nsNumber, all=True))
             thisNs = namespaces.pop(0)
             if nsNumber == 6 and family.name == 'wikipedia':
-                if self.site.lang in ('en', 'fr') and \
+                if self.site.code in ('en', 'fr') and \
                    LV(self.site.version()) >= LV('1.14'):
                     # do not change "Image" on en-wiki and fr-wiki
                     assert u'Image' in namespaces
                     namespaces.remove(u'Image')
-                if self.site.lang == 'hu':
+                if self.site.code == 'hu':
                     # do not change "Kép" on hu-wiki
                     assert u'Kép' in namespaces
                     namespaces.remove(u'Kép')
-                elif self.site.lang == 'pt':
+                elif self.site.code == 'pt':
                     # bug #3346901 should be implemented
                     continue
             # lowerspaced and underscored namespaces
@@ -366,7 +366,7 @@ class CosmeticChangesToolkit:
         """
         # not wanted at ru
         # arz uses english stylish codes
-        if self.site.lang not in ['arz', 'ru']:
+        if self.site.code not in ['arz', 'ru']:
             exceptions = ['nowiki', 'comment', 'math', 'pre']
             for magicWord in ['img_thumbnail', 'img_left', 'img_center',
                               'img_right', 'img_none', 'img_framed',
@@ -593,9 +593,9 @@ class CosmeticChangesToolkit:
     def replaceDeprecatedTemplates(self, text):
         exceptions = ['comment', 'math', 'nowiki', 'pre']
         if self.site.family.name in deprecatedTemplates and \
-           self.site.lang in deprecatedTemplates[self.site.family.name]:
+           self.site.code in deprecatedTemplates[self.site.family.name]:
             for template in deprecatedTemplates[
-                    self.site.family.name][self.site.lang]:
+                    self.site.family.name][self.site.code]:
                 old = template[0]
                 new = template[1]
                 if new is None:
@@ -619,7 +619,7 @@ class CosmeticChangesToolkit:
         ## https://de.wikipedia.org/w/index.php?title=Wikipedia%3aVandalismusmeldung&diff=103109563&oldid=103109271
 ##        text = pywikibot.replaceExcept(text,
 ##                                       r'\[https?://%s\.%s\.org/wiki/(?P<link>\S+)\s+(?P<title>.+?)\s?\]'
-##                                       % (self.site.lang, self.site.family.name),
+##                                       % (self.site.code, self.site.family.name),
 ##                                       r'[[\g<link>|\g<title>]]', exceptions)
         # external link in double brackets
         text = pywikibot.replaceExcept(
@@ -699,7 +699,7 @@ class CosmeticChangesToolkit:
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
         # convert prettytable to wikitable class
-        if self.site.language in ('de', 'en'):
+        if self.site.code in ('de', 'en'):
             text = pywikibot.replaceExcept(text,
                                            r'(class="[^"]*)prettytable([^"]*")',
                                            r'\1wikitable\2', exceptions)
@@ -748,7 +748,7 @@ class CosmeticChangesToolkit:
             'fa': u'۰۱۲۳۴۵۶۷۸۹',
         }
         faChrs = u'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
-        new = digits.pop(self.site.lang)
+        new = digits.pop(self.site.code)
         # This only works if there are only two items in digits dict
         old = digits[digits.keys()[0]]
         # do not change inside file links
@@ -762,7 +762,7 @@ class CosmeticChangesToolkit:
                                      % {'fa': faChrs}))
         exceptions.append(pattern)
         text = pywikibot.replaceExcept(text, u',', u'،', exceptions)
-        if self.site.lang == 'ckb':
+        if self.site.code == 'ckb':
             text = pywikibot.replaceExcept(text,
                                            u'\u0647([.\u060c_<\\]\\s])',
                                            u'\u06d5\\1', exceptions)
