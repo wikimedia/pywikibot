@@ -3554,12 +3554,14 @@ class Link(ComparableMixin):
         else:
             self._anchor = None
 
+        # Convert URL-encoded characters to unicode
+        encodings = [self._source.encoding()] + list(self._source.encodings())
+
+        self._text = url2unicode(self._text, encodings=encodings)
+
         # Clean up the name, it can come from anywhere.
         # Convert HTML entities to unicode
         t = html2unicode(self._text)
-
-        # Convert URL-encoded characters to unicode
-        t = url2unicode(t, site=self._source)
 
         # Normalize unicode string to a NFC (composed) format to allow
         # proper string comparisons. According to
@@ -4048,21 +4050,31 @@ def unicode2html(x, encoding):
     return x
 
 
-def url2unicode(title, site, site2=None):
-    """Convert URL-encoded text to unicode using site's encoding.
-
-    If site2 is provided, try its encodings as well.  Uses the first encoding
-    that doesn't cause an error.
-
+@deprecate_arg('site2', None)
+@deprecate_arg('site', 'encodings')
+def url2unicode(title, encodings='utf-8'):
     """
-    # create a list of all possible encodings for both hint sites
-    encList = [site.encoding()] + list(site.encodings())
-    if site2 and site2 != site:
-        encList.append(site2.encoding())
-        encList += list(site2.encodings())
+    Convert URL-encoded text to unicode using several encoding.
+
+    Uses the first encoding that doesn't cause an error.
+
+    @param data: URL-encoded character data to convert
+    @type data: str
+    @param encodings: Encodings to attempt to use during conversion.
+    @type encodings: str, list or Site
+    @return: unicode
+
+    @exception UnicodeError: Could not convert using any encoding.
+    """
+    if isinstance(encodings, basestring):
+        encodings = [encodings]
+    elif isinstance(encodings, pywikibot.site.BaseSite):
+        # create a list of all possible encodings for both hint sites
+        site = encodings
+        encodings = [site.encoding()] + list(site.encodings())
+
     firstException = None
-    # try to handle all encodings (will probably retry utf-8)
-    for enc in encList:
+    for enc in encodings:
         try:
             t = title.encode(enc)
             t = unquote_to_bytes(t)
