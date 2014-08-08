@@ -71,15 +71,18 @@ import gc
 import resource
 import re
 
-# https://labix.org/lunatic-python
-try:
-    import lua          # installed packages (on f15: 'lua', 'lunatic-python')
-except ImportError:
-    import _lua as lua  # compiled in externals with patch (ubuntu on TS/labs)
-# https://github.com/josiahcarlson/parse-crontab
+# https://labix.org/lunatic-python is bit-rotting, and there are maintained
+# versions on github:
+# https://github.com/bastibe/lunatic-python.git
+# https://github.com/AlereDevices/lunatic-python.git
+import lua
+# The crontab package is https://github.com/josiahcarlson/parse-crontab
+# version 0.20 installs a package called 'tests' which conflicts with our
+# test suite.  Use https://github.com/jayvdb/parse-crontab until it is fixed.
 import crontab
 
 import pywikibot
+# pywikibot.botirc depends on https://pypi.python.org/pypi/irc
 import pywikibot.botirc
 
 
