@@ -191,7 +191,7 @@ def main():
 
     if old_image:
         site = pywikibot.Site()
-        old_imagepage = pywikibot.ImagePage(site, old_image)
+        old_imagepage = pywikibot.FilePage(site, old_image)
         gen = pagegenerators.FileLinksGenerator(old_imagepage)
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
         bot = ImageRobot(preloadingGen, old_image, new_image, **options)

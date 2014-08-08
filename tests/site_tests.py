@@ -312,7 +312,7 @@ class TestSiteObject(PywikibotTestCase):
             for cm in mysite.categorymembers(cat):
                 self.assertType(cat, pywikibot.Page)
         # test pageimages
-        self.assertTrue(all(isinstance(im, pywikibot.ImagePage)
+        self.assertTrue(all(isinstance(im, pywikibot.FilePage)
                             for im in mysite.pageimages(mainpage)))
         # test pagetemplates
         self.assertTrue(all(isinstance(te, pywikibot.Page)
@@ -473,27 +473,27 @@ class TestSiteObject(PywikibotTestCase):
 
         ai = list(mysite.allimages(total=10))
         self.assertTrue(len(ai) <= 10)
-        self.assertTrue(all(isinstance(image, pywikibot.ImagePage)
+        self.assertTrue(all(isinstance(image, pywikibot.FilePage)
                             for image in ai))
         for impage in mysite.allimages(start="Ba", total=5):
-            self.assertType(impage, pywikibot.ImagePage)
+            self.assertType(impage, pywikibot.FilePage)
             self.assertTrue(mysite.page_exists(impage))
             self.assertTrue(impage.title(withNamespace=False) >= "Ba")
 #        # Bug # 15985
 #        for impage in mysite.allimages(start="Da", reverse=True, total=5):
-#            self.assertType(impage, pywikibot.ImagePage)
+#            self.assertType(impage, pywikibot.FilePage)
 #            self.assertTrue(mysite.page_exists(impage))
 #            self.assertTrue(impage.title() <= "Da")
         for impage in mysite.allimages(prefix="Ch", total=5):
-            self.assertType(impage, pywikibot.ImagePage)
+            self.assertType(impage, pywikibot.FilePage)
             self.assertTrue(mysite.page_exists(impage))
             self.assertTrue(impage.title(withNamespace=False).startswith("Ch"))
         for impage in mysite.allimages(minsize=100, total=5):
-            self.assertType(impage, pywikibot.ImagePage)
+            self.assertType(impage, pywikibot.FilePage)
             self.assertTrue(mysite.page_exists(impage))
             self.assertTrue(impage._imageinfo["size"] >= 100)
         for impage in mysite.allimages(maxsize=2000, total=5):
-            self.assertType(impage, pywikibot.ImagePage)
+            self.assertType(impage, pywikibot.FilePage)
             self.assertTrue(mysite.page_exists(impage))
             self.assertTrue(impage._imageinfo["size"] <= 2000)
 

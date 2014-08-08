@@ -55,7 +55,7 @@ from pywikibot.i18n import translate
 
 __all__ = (
     'config', 'ui', 'UnicodeMixin', 'translate',
-    'Page', 'ImagePage', 'Category', 'Link', 'User',
+    'Page', 'FilePage', 'ImagePage', 'Category', 'Link', 'User',
     'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
     'html2unicode', 'url2unicode', 'unicode2html',
     'stdout', 'output', 'warning', 'error', 'critical', 'debug', 'exception',
@@ -533,7 +533,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
 getSite = Site  # alias for backwards-compability
 
 
-from .page import Page, ImagePage, Category, Link, User, ItemPage, PropertyPage, Claim
+from .page import Page, FilePage, ImagePage, Category, Link, User, ItemPage, PropertyPage, Claim
 from .page import html2unicode, url2unicode, unicode2html
 
 

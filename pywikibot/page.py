@@ -71,7 +71,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
           - If the first argument is a Page, create a copy of that object.
             This can be used to convert an existing Page into a subclass
-            object, such as Category or ImagePage.  (If the title is also
+            object, such as Category or FilePage.  (If the title is also
             given as the second argument, creates a copy with that title;
             this is used when pages are moved.)
           - If the first argument is a Site, create a Page on that Site
@@ -1230,13 +1230,13 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     @deprecate_arg("followRedirects", None)
     @deprecate_arg("loose", None)
     def imagelinks(self, step=None, total=None, content=False):
-        """Iterate ImagePage objects for images displayed on this Page.
+        """Iterate FilePage objects for images displayed on this Page.
 
         @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each image description page (default False)
-        @return: a generator that yields ImagePage objects.
+        @return: a generator that yields FilePage objects.
 
         """
         return self.site.pageimages(self, step=step, total=total,
@@ -1805,23 +1805,11 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         pywikibot.warning(u"Page.replaceImage() is no longer supported.")
 
 
-class ImagePage(Page):
+class FilePage(Page):
 
-    """A subclass of Page representing an image descriptor wiki page.
+    """A subclass of Page representing a file description page.
 
-    Supports the same interface as Page, with the following added methods:
-
-    getImagePageHtml          : Download image page and return raw HTML text.
-    fileURL                   : Return the URL for the image described on this
-                                page.
-    fileIsShared              : Return True if image stored on a shared
-                                repository like Wikimedia Commons or Wikitravel.
-    getFileMd5Sum             : Return image file's MD5 checksum.
-    getFileVersionHistory     : Return the image file's version history.
-    getFileVersionHistoryTable: Return the version history in the form of a
-                                wiki table.
-    usingPages                : Iterate Pages on which the image is displayed.
-
+    Supports the same interface as Page, with some added methods.
     """
 
     @deprecate_arg("insite", None)
@@ -1829,14 +1817,14 @@ class ImagePage(Page):
         """Constructor."""
         Page.__init__(self, source, title, 6)
         if self.namespace() != 6:
-            raise ValueError(u"'%s' is not in the image namespace!" % title)
+            raise ValueError(u"'%s' is not in the file namespace!" % title)
 
     def getImagePageHtml(self):
         """
-        Download the image page, and return the HTML, as a unicode string.
+        Download the file page, and return the HTML, as a unicode string.
 
         Caches the HTML code, so that if you run this method twice on the
-        same ImagePage object, the page will only be downloaded once.
+        same FilePage object, the page will only be downloaded once.
         """
         if not hasattr(self, '_imagePageHtml'):
             from pywikibot.comms import http
@@ -1846,7 +1834,7 @@ class ImagePage(Page):
         return self._imagePageHtml
 
     def fileUrl(self):
-        """Return the URL for the image described on this page."""
+        """Return the URL for the file described on this page."""
         # TODO add scaling option?
         if not hasattr(self, '_imageinfo'):
             self._imageinfo = self.site.loadimageinfo(self)
@@ -1861,7 +1849,7 @@ class ImagePage(Page):
         return self.fileIsShared()
 
     def fileIsShared(self):
-        """Check if the image is stored on any known shared repository.
+        """Check if the file is stored on any known shared repository.
 
         @return: bool
         """
@@ -1878,7 +1866,7 @@ class ImagePage(Page):
             return self.fileUrl().startswith(
                 'https://upload.wikimedia.org/wikipedia/commons/')
 
-    @deprecated("ImagePage.getFileSHA1Sum()")
+    @deprecated("FilePage.getFileSHA1Sum()")
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
 # FIXME: MD5 might be performed on incomplete file due to server disconnection
@@ -1892,13 +1880,13 @@ class ImagePage(Page):
         return md5Checksum
 
     def getFileSHA1Sum(self):
-        """Return image file's SHA1 checksum."""
+        """Return the file's SHA1 checksum."""
         if not hasattr(self, '_imageinfo'):
             self._imageinfo = self.site.loadimageinfo(self)
         return self._imageinfo['sha1']
 
     def getFileVersionHistory(self):
-        """Return the image file's version history.
+        """Return the file's version history.
 
         @return: An iterator yielding tuples containing (timestamp,
             username, resolution, filesize, comment).
@@ -1921,7 +1909,7 @@ class ImagePage(Page):
                u'\n|----\n'.join(lines) + '\n|}'
 
     def usingPages(self, step=None, total=None, content=False):
-        """Yield Pages on which the image is displayed.
+        """Yield Pages on which the file is displayed.
 
         @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
@@ -1931,6 +1919,9 @@ class ImagePage(Page):
         """
         return self.site.imageusage(
             self, step=step, total=total, content=content)
+
+
+ImagePage = FilePage
 
 
 class Category(Page):
@@ -2606,7 +2597,7 @@ class User(Page):
             raise StopIteration
         for item in self.site.logevents(
                 logtype='upload', user=self.username, total=total):
-            yield (ImagePage(self.site, item.title().title()),
+            yield (FilePage(self.site, item.title().title()),
                    unicode(item.timestamp()),
                    item.comment(),
                    item.pageid() > 0
@@ -3085,7 +3076,7 @@ class Property():
 
     types = {'wikibase-item': ItemPage,
              'string': basestring,
-             'commonsMedia': ImagePage,
+             'commonsMedia': FilePage,
              'globe-coordinate': pywikibot.Coordinate,
              'url': basestring,
              'time': pywikibot.WbTime,
@@ -3254,7 +3245,7 @@ class Claim(Property):
             if claim.type == 'wikibase-item':
                 claim.target = ItemPage(site, 'Q' + str(value['numeric-id']))
             elif claim.type == 'commonsMedia':
-                claim.target = ImagePage(site.image_repository(), value)
+                claim.target = FilePage(site.image_repository(), value)
             elif claim.type == 'globe-coordinate':
                 claim.target = pywikibot.Coordinate.fromWikibase(value, site)
             elif claim.type == 'time':

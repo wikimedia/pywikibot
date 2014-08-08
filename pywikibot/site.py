@@ -2743,7 +2743,7 @@ class APISite(BaseSite):
                   total=None, content=False):
         """Iterate all images, ordered by image title.
 
-        Yields ImagePages, but these pages need not exist on the wiki.
+        Yields FilePages, but these pages need not exist on the wiki.
 
         @param start: start at this title (name need not exist)
         @param prefix: only iterate titles starting with this substring
@@ -2835,11 +2835,11 @@ class APISite(BaseSite):
 
     def imageusage(self, image, namespaces=None, filterredir=None,
                    step=None, total=None, content=False):
-        """Iterate Pages that contain links to the given ImagePage.
+        """Iterate Pages that contain links to the given FilePage.
 
-        @param image: the image to search for (ImagePage need not exist on
+        @param image: the image to search for (FilePage need not exist on
             the wiki)
-        @type image: ImagePage
+        @type image: FilePage
         @param filterredir: if True, only yield redirects; if False (and not
             None), only yield non-redirects (default: yield both)
         @param content: if True, load the current content of each iterated page
@@ -3812,22 +3812,23 @@ class APISite(BaseSite):
     def getImagesFromAnHash(self, hash_found=None):
         return self.getFilesFromAnHash(hash_found)
 
-    def upload(self, imagepage, source_filename=None, source_url=None,
+    @deprecate_arg('imagepage', 'filepage')
+    def upload(self, filepage, source_filename=None, source_url=None,
                comment=None, text=None, watch=False, ignore_warnings=False):
         """Upload a file to the wiki.
 
         Either source_filename or source_url, but not both, must be provided.
 
-        @param imagepage: an ImagePage object from which the wiki-name of the
+        @param filepage: a FilePage object from which the wiki-name of the
             file will be obtained.
         @param source_filename: path to the file to be uploaded
         @param source_url: URL of the file to be uploaded
         @param comment: Edit summary; if this is not provided, then
-            imagepage.text will be used. An empty summary is not permitted.
+            filepage.text will be used. An empty summary is not permitted.
             This may also serve as the initial page text (see below).
         @param text: Initial page text; if this is not set, then
-            imagepage.text will be used, or comment.
-        @param watch: If true, add imagepage to the bot user's watchlist
+            filepage.text will be used, or comment.
+        @param watch: If true, add filepage to the bot user's watchlist
         @param ignore_warnings: if true, ignore API warnings and force
             upload (for example, to overwrite an existing file); default False
 
@@ -3855,15 +3856,15 @@ class APISite(BaseSite):
             raise ValueError("APISite.upload: must provide either "
                              "source_filename or source_url, not both.")
         if comment is None:
-            comment = imagepage.text
+            comment = filepage.text
         if not comment:
             raise ValueError("APISite.upload: cannot upload file without "
                              "a summary/description.")
         if text is None:
-            text = imagepage.text
+            text = filepage.text
         if not text:
             text = comment
-        token = self.token(imagepage, "edit")
+        token = self.token(filepage, "edit")
         if source_filename:
             # upload local file
             # make sure file actually exists
@@ -3873,7 +3874,7 @@ class APISite(BaseSite):
             # TODO: if file size exceeds some threshold (to be determined),
             #       upload by chunks (--> os.path.getsize(source_filename))
             req = api.Request(site=self, action="upload", token=token,
-                              filename=imagepage.title(withNamespace=False),
+                              filename=filepage.title(withNamespace=False),
                               file=source_filename, comment=comment,
                               text=text, mime=True)
         else:
@@ -3883,7 +3884,7 @@ class APISite(BaseSite):
                     "User '%s' is not authorized to upload by URL on site %s."
                     % (self.user(), self))
             req = api.Request(site=self, action="upload", token=token,
-                              filename=imagepage.title(withNamespace=False),
+                              filename=filepage.title(withNamespace=False),
                               url=source_url, comment=comment, text=text)
         if watch:
             req["watch"] = ""
@@ -3905,7 +3906,7 @@ class APISite(BaseSite):
             pywikibot.output(u"Upload: unrecognized response: %s" % result)
         if result["result"] == "Success":
             pywikibot.output(u"Upload successful.")
-            imagepage._imageinfo = result["imageinfo"]
+            filepage._imageinfo = result["imageinfo"]
             return
 
     @deprecate_arg("number", "step")
@@ -3952,13 +3953,11 @@ class APISite(BaseSite):
                 yield (newpage, pageitem['timestamp'], pageitem['newlen'],
                        u'', pageitem['user'], pageitem['comment'])
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
-    def newimages(self, user=None, start=None, end=None, reverse=False,
-                  step=None, total=None):
-        """Yield information about newly uploaded images.
+    def newfiles(self, user=None, start=None, end=None, reverse=False,
+                 step=None, total=None):
+        """Yield information about newly uploaded files.
 
-        Yields a tuple of ImagePage, Timestamp, user(unicode), comment(unicode).
+        Yields a tuple of FilePage, Timestamp, user(unicode), comment(unicode).
 
         N.B. the API does not provide direct access to Special:Newimages, so
         this is derived from the "upload" log events instead.
@@ -3969,11 +3968,17 @@ class APISite(BaseSite):
                                     start=start, end=end, reverse=reverse,
                                     step=step, total=total):
             # event.title() actually returns a Page
-            image = pywikibot.ImagePage(event.title())
+            filepage = pywikibot.FilePage(event.title())
             date = event.timestamp()
             user = event.user()
             comment = event.comment() or u''
-            yield (image, date, user, comment)
+            yield (filepage, date, user, comment)
+
+    @deprecated("Site().newfiles()")
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def newimages(self, *args, **kwargs):
+        return self.newfiles(*args, **kwargs)
 
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
@@ -4069,7 +4074,7 @@ class APISite(BaseSite):
     @deprecate_arg("repeat", None)
     def uncategorizedimages(self, number=None, repeat=True,
                             step=None, total=None):
-        """Yield ImagePages from Special:Uncategorizedimages."""
+        """Yield FilePages from Special:Uncategorizedimages."""
         uigen = self._generator(api.ImagePageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedimages",
@@ -4111,18 +4116,19 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return ucgen
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
     def unusedfiles(self, step=None, total=None):
-        """Yield ImagePage objects from Special:Unusedimages."""
+        """Yield FilePage objects from Special:Unusedimages."""
         uigen = self._generator(api.ImagePageGenerator,
                                 type_arg="querypage",
                                 gqppage="Unusedimages",
                                 step=step, total=total)
         return uigen
 
-    # synonym
-    unusedimages = unusedfiles
+    @deprecated("Site().unusedfiles()")
+    @deprecate_arg("number", None)
+    @deprecate_arg("repeat", None)
+    def unusedimages(self, *args, **kwargs):
+        return self.unusedfiles(*args, **kwargs)
 
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)

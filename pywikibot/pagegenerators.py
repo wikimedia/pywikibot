@@ -311,12 +311,12 @@ class GeneratorFactory(object):
                     'pywikibot-enter-file-links-processing')
             if fileLinksPageTitle.startswith(self.site.namespace(6)
                                              + ":"):
-                fileLinksPage = pywikibot.ImagePage(self.site,
-                                                    fileLinksPageTitle)
+                fileLinksPage = pywikibot.FilePage(self.site,
+                                                   fileLinksPageTitle)
             else:
-                fileLinksPage = pywikibot.ImagePage(self.site,
-                                                    'Image:' +
-                                                    fileLinksPageTitle)
+                fileLinksPage = pywikibot.FilePage(self.site,
+                                                   'Image:' +
+                                                   fileLinksPageTitle)
             gen = FileLinksGenerator(fileLinksPage)
         elif arg.startswith('-unusedfiles'):
             if len(arg) == 12:
@@ -663,8 +663,8 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
         yield pywikibot.Page(pywikibot.Link(item["title"], site))
 
 
-def FileLinksGenerator(referredImagePage, step=None, total=None, content=False):
-    return referredImagePage.usingPages(step=step, total=total, content=content)
+def FileLinksGenerator(referredFilePage, step=None, total=None, content=False):
+    return referredFilePage.usingPages(step=step, total=total, content=content)
 
 
 def ImagesPageGenerator(pageWithImages, step=None, total=None, content=False):
@@ -956,14 +956,17 @@ def CategoryGenerator(generator):
         yield pywikibot.Category(page)
 
 
-def ImageGenerator(generator):
+def FileGenerator(generator):
     """
-    Wraps around another generator. Yields the same pages, but as ImagePage
+    Wraps around another generator. Yields the same pages, but as FilePage
     objects instead of Page objects. Makes sense only if it is ascertained
     that only images are being retrieved.
     """
     for page in generator:
-        yield pywikibot.ImagePage(page)
+        yield pywikibot.FilePage(page)
+
+
+ImageGenerator = FileGenerator
 
 
 def PageWithTalkPageGenerator(generator):
@@ -1064,7 +1067,7 @@ def UnusedFilesGenerator(total=100, site=None, extension=None):
     if site is None:
         site = pywikibot.Site()
     for page in site.unusedfiles(total=total):
-        yield pywikibot.ImagePage(page.site, page.title())
+        yield pywikibot.FilePage(page.site, page.title())
 
 
 @deprecate_arg("number", "total")

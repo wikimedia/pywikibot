@@ -4,9 +4,9 @@
 This is a helper script to convert compat 1.0 scripts to the new core 2.0
 framework.
 
-NOTE: Please be aware that this script is not be able to convert your codes
+NOTE: Please be aware that this script is not able to convert your codes
 completely. It may support you with some automatic replacements and it gives
-some warnings and hints for converting. Please refer the converting guide
+some warnings and hints for converting. Please refer to the converting guide
 README-conversion.txt in the core framework folder and check your codes finally.
 
 The scripts asks for the .py file and converts it to
@@ -36,7 +36,7 @@ import re
 import codecs
 import pywikibot
 
-# be carefull with replacement order!
+# be careful with replacement order!
 replacements = (
     # doc strings
     ('#\r?\n__version__',
@@ -63,6 +63,8 @@ replacements = (
     ('catlib\.change_category\s*\((\s*)(?P<article>.+?),\s*(?P<oldcat>.+?),',
      r'\g<article>.change_category(\1\g<oldcat>,'),
     ('userlib\.User\s*\(\s*', 'pywikibot.User('),
+    # change ImagePage to FilePage
+    ('pywikibot\.ImagePage\s*\(\s*', 'pywikibot.FilePage('),
     # deprecated title methods
     ('\.urlname\s*\(\s*\)', '.title(asUrl=True)'),
     ('\.urlname\s*\(\s*(?:withNamespace\s*=\s*)?(True|False)+\s*\)',
@@ -72,9 +74,10 @@ replacements = (
     ('\.aslink\s*\(\s*\)', '.title(asLink=True)'),
     # other deprecated methods
     ('(?<!site)\.encoding\s*\(\s*\)', '.site.encoding()'),
+    ('\.newimages\s*\(', '.newfiles('),
     # new core methods
     ('\.get\s*\(\s*get_redirect\s*=\s*True\s*\)', '.text'),
-    # stopme() is doen by the framework itself
+    # stopme() is done by the framework itself
     ('(\s*)try\:\s*\r?\n\s+main\(\)\s*\r?\n\s*finally\:\s*\r?\n\s+pywikibot\.stopme\(\)',
      r'\1main()'),
 )
@@ -95,7 +98,7 @@ warnings = (
      'User.contributions() returns a pywikibot.Timestamp object instead of a\n'
      'MediaWiki one'),
     ('.getFileMd5Sum(',
-     'ImagePage.getFileMd5Sum() is deprecated should be replaced by '
+     'FilePage.getFileMd5Sum() is deprecated should be replaced by '
      'getFileSHA1Sum()'),
     (' wikipedia.',
      '"wikipedia" library has been changed to "pywikibot".'),

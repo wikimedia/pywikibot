@@ -320,7 +320,7 @@ class NowCommonsDeleteBot(Bot):
                 pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                                  % page.title())
             try:
-                localImagePage = pywikibot.ImagePage(self.site, page.title())
+                localImagePage = pywikibot.FilePage(self.site, page.title())
                 if localImagePage.fileIsShared():
                     pywikibot.output(u'File is already on Commons.')
                     continue
@@ -333,7 +333,7 @@ class NowCommonsDeleteBot(Bot):
                 if not filenameOnCommons and not self.getOption('use_hash'):
                     pywikibot.output(u'NowCommons template not found.')
                     continue
-                commonsImagePage = pywikibot.ImagePage(commons, 'Image:%s'
+                commonsImagePage = pywikibot.FilePage(commons, 'Image:%s'
                                                        % filenameOnCommons)
                 if localImagePage.title(withNamespace=False) == \
                  commonsImagePage.title(withNamespace=False) and self.getOption('use_hash'):
@@ -362,7 +362,7 @@ class NowCommonsDeleteBot(Bot):
                                 oImageRobot.run()
                                 # If the image is used with the urlname the
                                 # previous function won't work
-                                if len(list(pywikibot.ImagePage(self.site,
+                                if len(list(pywikibot.FilePage(self.site,
                                                                 page.title()).usingPages())) > 0 and \
                                                                 self.getOption('replaceloose'):
                                     oImageRobot = image.ImageRobot(
@@ -376,7 +376,7 @@ class NowCommonsDeleteBot(Bot):
                                         self.getOption('replaceloose'))
                                     oImageRobot.run()
                                 # refresh because we want the updated list
-                                usingPages = len(list(pywikibot.ImagePage(
+                                usingPages = len(list(pywikibot.FilePage(
                                     self.site, page.title()).usingPages()))
                                 if usingPages > 0 and self.getOption('use_hash'):
                                     # just an enter

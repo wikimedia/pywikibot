@@ -637,7 +637,7 @@ class checkImagesBot(object):
 
         """
         self.imageName = imageName
-        self.image = pywikibot.ImagePage(self.site, self.imageName)
+        self.image = pywikibot.FilePage(self.site, self.imageName)
         self.timestamp = None
         self.uploader = None
 
@@ -705,7 +705,7 @@ class checkImagesBot(object):
 
         """
         # Get the image's description
-        reportPageObject = pywikibot.ImagePage(self.site, self.image_to_report)
+        reportPageObject = pywikibot.FilePage(self.site, self.image_to_report)
 
         try:
             reportPageText = reportPageObject.get()
@@ -847,7 +847,7 @@ class checkImagesBot(object):
             text)
         if results:
             for result in results:
-                wikiPage = pywikibot.ImagePage(self.site, result)
+                wikiPage = pywikibot.FilePage(self.site, result)
                 yield wikiPage
         else:
             pywikibot.output(link)
@@ -863,7 +863,7 @@ class checkImagesBot(object):
         regex = re.compile(r'%s' % regexp, re.UNICODE | re.DOTALL)
         results = regex.findall(textrun)
         for image in results:
-            yield pywikibot.ImagePage(self.site, image)
+            yield pywikibot.FilePage(self.site, image)
 
     def loadHiddenTemplates(self):
         """ Function to load the white templates """
@@ -891,7 +891,7 @@ class checkImagesBot(object):
         max_usage = 0
         for element in listGiven:
             imageName = element[1]
-            imagePage = pywikibot.ImagePage(self.site, imageName)
+            imagePage = pywikibot.FilePage(self.site, imageName)
             imageUsage = [page for page in imagePage.usingPages()]
             if len(imageUsage) > 0 and len(imageUsage) > max_usage:
                 max_usage = len(imageUsage)
@@ -1009,7 +1009,7 @@ class checkImagesBot(object):
                                                duplicates_comment_image)
         duplicateRegex = r'\[\[:File:%s\]\] has the following duplicates' \
                          % re.escape(self.convert_to_url(self.imageName))
-        imagePage = pywikibot.ImagePage(self.site, self.imageName)
+        imagePage = pywikibot.FilePage(self.site, self.imageName)
         hash_found = imagePage.getHash()
         duplicates = self.site.getFilesFromAnHash(hash_found)
 
@@ -1029,7 +1029,7 @@ class checkImagesBot(object):
                 time_list = []
 
                 for duplicate in duplicates:
-                    DupePage = pywikibot.ImagePage(self.site, duplicate)
+                    DupePage = pywikibot.FilePage(self.site, duplicate)
 
                     if DupePage.title(asUrl=True) != self.image.title(asUrl=True) or \
                        self.timestamp is None:
@@ -1040,16 +1040,16 @@ class checkImagesBot(object):
                     time_list.append(data_seconds)
                 older_image = self.returnOlderTime(time_image_list, time_list)
                 # And if the images are more than two?
-                Page_oder_image = pywikibot.ImagePage(self.site, older_image)
+                Page_oder_image = pywikibot.FilePage(self.site, older_image)
                 string = ''
                 images_to_tag_list = []
 
                 for duplicate in duplicates:
-                    if pywikibot.ImagePage(self.site, duplicate) \
-                       == pywikibot.ImagePage(self.site, older_image):
+                    if pywikibot.FilePage(self.site, duplicate) \
+                       == pywikibot.FilePage(self.site, older_image):
                         # the older image, not report also this as duplicate
                         continue
-                    DupePage = pywikibot.ImagePage(self.site, duplicate)
+                    DupePage = pywikibot.FilePage(self.site, duplicate)
                     try:
                         DupPageText = DupePage.get()
                         older_page_text = Page_oder_image.get()

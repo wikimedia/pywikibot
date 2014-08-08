@@ -198,7 +198,7 @@ class UploadRobot:
         filename = self.process_filename()
 
         site = self.targetSite
-        imagepage = pywikibot.ImagePage(site, filename)  # normalizes filename
+        imagepage = pywikibot.FilePage(site, filename)  # normalizes filename
         imagepage.text = self.description
 
         pywikibot.output(u'Uploading file to %s via API....' % site)

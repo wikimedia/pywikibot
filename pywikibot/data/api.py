@@ -927,14 +927,14 @@ class CategoryPageGenerator(PageGenerator):
 
 class ImagePageGenerator(PageGenerator):
 
-    """Like PageGenerator, but yields ImagePage objects instead of Pages."""
+    """Like PageGenerator, but yields FilePage objects instead of Pages."""
 
     def result(self, pagedata):
         p = PageGenerator.result(self, pagedata)
-        image = pywikibot.ImagePage(p)
+        filepage = pywikibot.FilePage(p)
         if 'imageinfo' in pagedata:
-            image._imageinfo = pagedata['imageinfo'][0]
-        return image
+            filepage._imageinfo = pagedata['imageinfo'][0]
+        return filepage
 
 
 class PropertyGenerator(QueryGenerator):

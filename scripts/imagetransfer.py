@@ -265,7 +265,7 @@ class ImageTransferBot:
                 for linkedPage in page.interwiki():
                     imagelist.append(linkedPage.imagelinks(followRedirects=True))
             elif page.isImage():
-                imagePage = pywikibot.ImagePage(page.site, page.title())
+                imagePage = pywikibot.FilePage(page.site, page.title())
                 imagelist = [imagePage]
             else:
                 imagePage = (page.imagelinks(followRedirects=True)).result(

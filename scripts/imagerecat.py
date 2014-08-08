@@ -76,7 +76,7 @@ def categorizeImages(generator, onlyFilter, onlyUncat):
     for page in generator:
         if page.exists() and (page.namespace() == 6) and \
            (not page.isRedirectPage()):
-            imagepage = pywikibot.ImagePage(page.site, page.title())
+            imagepage = pywikibot.FilePage(page.site, page.title())
             pywikibot.output(u'Working on ' + imagepage.title())
 
             if onlyUncat and not(u'Uncategorized' in imagepage.templates()):

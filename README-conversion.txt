@@ -73,7 +73,7 @@ string found between [[ and ]] delimiters.  The new Link object (more on
 this below) handles link parsing and interpretation that doesn't require
 access to the wiki server.
 
-A third syntax allows easy conversion from a Page object to an ImagePage or
+A third syntax allows easy conversion from a Page object to a FilePage or
 Category, or vice versa: e.g., Category(pageobj) converts a Page to a
 Category, as long as the page is in the category namespace.
 
@@ -99,9 +99,10 @@ The following methods have had their outputs changed:
 
 - getVersionHistory(): Returns a pywikibot.Timestamp object instead of a MediaWiki one
 
-=== ImagePage objects ===
+=== FilePage objects ===
 
-For ImagePage objects, the getFileMd5Sum() method is deprecated; it is
+The old ImagePage class has been renamed into FilePage.
+For FilePage objects, the getFileMd5Sum() method is deprecated; it is
 recommended to replace it with getFileSHA1Sum(), because MediaWiki now
 stores the SHA1 hash of images.
 

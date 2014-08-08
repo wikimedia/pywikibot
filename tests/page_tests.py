@@ -352,7 +352,7 @@ class TestPageObject(PywikibotTestCase):
         for p in mainpage.langlinks():
             self.assertType(p, pywikibot.Link)
         for p in mainpage.imagelinks():
-            self.assertType(p, pywikibot.ImagePage)
+            self.assertType(p, pywikibot.FilePage)
         for p in mainpage.templates():
             self.assertType(p, pywikibot.Page)
         for t, params in mainpage.templatesWithParams():

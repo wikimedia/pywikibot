@@ -172,9 +172,9 @@ class HarvestRobot(WikidataBot):
                                 elif claim.type == 'commonsMedia':
                                     commonssite = pywikibot.Site("commons", "commons")
                                     imagelink = pywikibot.Link(value, source=commonssite, defaultNamespace=6)
-                                    image = pywikibot.ImagePage(imagelink)
+                                    image = pywikibot.FilePage(imagelink)
                                     if image.isRedirectPage():
-                                        image = pywikibot.ImagePage(image.getRedirectTarget())
+                                        image = pywikibot.FilePage(image.getRedirectTarget())
                                     if not image.exists():
                                         pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it' % (image.title(),))
                                         continue
