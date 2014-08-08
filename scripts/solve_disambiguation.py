@@ -1082,7 +1082,6 @@ def main(*args):
             pageTitle = arg
 
     site = pywikibot.Site()
-    site.login()
 
     if pageTitle:
         page = pywikibot.Page(pywikibot.Link(pageTitle, site))
@@ -1091,6 +1090,8 @@ def main(*args):
     if not generator:
         pywikibot.showHelp()
         return
+
+    site.login()
 
     bot = DisambiguationRobot(always, alternatives, getAlternatives, dnSkip,
                               generator, primary, main_only,

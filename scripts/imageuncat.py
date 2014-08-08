@@ -1327,7 +1327,6 @@ def main(*args):
 
     genFactory = pagegenerators.GeneratorFactory(site)
 
-    site.login()
     for arg in local_args:
         if arg.startswith('-yesterday'):
             generator = uploadedYesterday(site)
@@ -1342,6 +1341,7 @@ def main(*args):
             u'You have to specify the generator you want to use for the program!')
     else:
         pregenerator = pagegenerators.PreloadingGenerator(generator)
+        site.login()
         for page in pregenerator:
             pywikibot.output(page.title())
             if page.exists() and (page.namespace() == 6) \

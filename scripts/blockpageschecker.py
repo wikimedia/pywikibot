@@ -250,8 +250,9 @@ def main():
         pywikibot.output(u"Your project is not supported by this script.\n"
                          u"You have to edit the script and add it!")
         return
+
     site = pywikibot.Site()
-    site.login()
+
     if protectedpages:
         generator = site.protectedpages(namespace=namespace, type=protectType)
     # Take the right templates to use, the category and the comment

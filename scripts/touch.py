@@ -80,11 +80,12 @@ def main(*args):
             continue
         if arg.startswith("-"):
             options[arg[1:].lower()] = True
-    pywikibot.Site().login()
+
     gen = genFactory.getCombinedGenerator()
     if gen:
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
         bot = TouchBot(preloadingGen, **options)
+        pywikibot.Site().login()
         bot.run()
     else:
         pywikibot.showHelp()

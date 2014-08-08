@@ -158,7 +158,6 @@ class SandboxBot(pywikibot.Bot):
             self.availableOptions['delay_td'] = datetime.timedelta(minutes=d)
 
         self.site = pywikibot.Site()
-        self.site.login()
         if self.getOption('user'):
             localSandboxTitle = i18n.translate(self.site,
                                                user_sandboxTemplate)
@@ -178,6 +177,7 @@ class SandboxBot(pywikibot.Bot):
             sys.exit(0)
 
     def run(self):
+        self.site.login()
         while True:
             wait = False
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())

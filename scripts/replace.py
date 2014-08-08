@@ -538,7 +538,7 @@ def main(*args):
             allowoverlap = True
         else:
             commandline_replacements.append(arg)
-    pywikibot.Site().login()
+
     if (len(commandline_replacements) % 2):
         raise pywikibot.Error('require even number of replacements.')
     elif (len(commandline_replacements) == 2 and fix is None):
@@ -681,6 +681,7 @@ LIMIT 200""" % (whereClause, exceptClause)
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
     bot = ReplaceRobot(preloadingGen, replacements, exceptions, acceptall,
                        allowoverlap, recursive, add_cat, sleep, edit_summary)
+    pywikibot.Site().login()
     bot.run()
 
 

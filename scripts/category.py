@@ -1066,8 +1066,6 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
-    pywikibot.Site().login()
-
     catDB = None
     bot = None
 
@@ -1141,6 +1139,8 @@ def main(*args):
                                    talkPages=talkPages, recurse=recurse)
 
     if bot:
+        pywikibot.Site().login()
+
         try:
             bot.run()
         except pywikibot.Error:

@@ -159,8 +159,6 @@ def main():
         else:
             genFactory.handleArg(arg)
 
-    site.login()
-
     if not gen:
         gen = genFactory.getCombinedGenerator()
     if gen:
