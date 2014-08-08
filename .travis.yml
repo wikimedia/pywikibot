@@ -41,6 +41,7 @@ env:
     - LANGUAGE=en FAMILY=wikipedia
     - LANGUAGE=ar FAMILY=wikipedia PYSETUP_TEST_EXTRAS=1
     - LANGUAGE=test FAMILY=wikidata
+    - LANGUAGE=fr FAMILY=wiktionary
 
 matrix:
   allow_failures:
