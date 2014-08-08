@@ -81,7 +81,6 @@ class RedirectGenerator:
                  use_move_log=False, use_api=False, start=None, until=None,
                  number=None, step=None):
         self.site = pywikibot.Site()
-        self.site.login()
         self.xmlFilename = xmlFilename
         self.namespaces = namespaces
         if use_api and not self.namespaces:
@@ -811,6 +810,7 @@ def main(*args):
     ):
         pywikibot.showHelp()
     else:
+        self.site.login()
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
                                 fullscan, start, until, number, step)
         bot = RedirectRobot(action, gen, always, number, delete)

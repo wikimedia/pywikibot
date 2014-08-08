@@ -902,7 +902,6 @@ def main():
             genFactory.handleArg(arg)
 
     site = pywikibot.Site()
-    site.login()
 
     if 'comment' not in options or not options['comment']:
         # Load default summary message.
@@ -916,6 +915,7 @@ def main():
                 warning + '\nDo you really want to continue?',
                 ['yes', 'no'], ['y', 'n'], 'n')
         if answer == 'y':
+            site.login()
             preloadingGen = pagegenerators.PreloadingGenerator(gen)
             bot = CosmeticChangesBot(preloadingGen, **options)
             bot.run()

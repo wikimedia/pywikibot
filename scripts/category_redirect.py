@@ -36,13 +36,12 @@ class CategoryRedirectBot(object):
     def __init__(self):
         self.cooldown = 7  # days
         self.site = pywikibot.Site()
-        self.site.login()
         self.catprefix = self.site.namespace(14) + ":"
         self.log_text = []
         self.edit_requests = []
         self.log_page = pywikibot.Page(self.site,
                                        u"User:%(user)s/category redirect log"
-                                       % {'user': self.site.user()})
+                                       % {'user': self.site.username()})
 
         # Localization:
 
@@ -172,6 +171,7 @@ class CategoryRedirectBot(object):
         """Run the bot"""
         global destmap, catlist, catmap
 
+        # user() invokes login()
         user = self.site.user()
         problems = []
         newredirs = []

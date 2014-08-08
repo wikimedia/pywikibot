@@ -36,7 +36,6 @@ class ArticleEditor(object):
         self.set_options(*args)
         self.setpage()
         self.site = pywikibot.Site()
-        self.site.login()
 
     def set_options(self, *args):
         """Parse commandline and set options attribute"""
@@ -76,6 +75,7 @@ class ArticleEditor(object):
             % fn)
 
     def run(self):
+        self.site.login()
         try:
             old = self.page.get(get_redirect=self.options.edit_redirect)
         except pywikibot.NoPage:

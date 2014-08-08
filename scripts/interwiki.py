@@ -2501,7 +2501,6 @@ def main():
         globalvar.summary += u'; '
 
     site = pywikibot.Site()
-    site.login()
     # ensure that we don't try to change main page
     try:
         mainpagename = site.mediawiki_message('mainpage')
@@ -2552,6 +2551,7 @@ def main():
                 namespace = 0
             hintlessPageGen = pagegenerators.CombinedPageGenerator([hintlessPageGen, pagegenerators.AllpagesPageGenerator(nextPage, namespace, includeredirects=False)])
 
+    site.login()
     bot = InterwikiBot()
 
     if not hintlessPageGen:
