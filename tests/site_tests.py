@@ -136,6 +136,23 @@ class TestSiteObject(PywikibotTestCase):
         user_namespace = site.namespaces()[2]
         self.assertEquals(user_namespace.case, 'first-letter')
 
+    def testNamespaceAliases(self):
+        site = pywikibot.Site('nn', 'wikipedia')
+
+        namespaces = site.namespaces()
+        image_namespace = namespaces[6]
+        self.assertEquals(image_namespace.custom_name, 'Fil')
+        self.assertEquals(image_namespace.canonical_name, 'File')
+        self.assertEquals(str(image_namespace), ':File:')
+        self.assertEquals(unicode(image_namespace), ':Fil:')
+        self.assertEquals(image_namespace.aliases, ['Image'])
+        self.assertEquals(len(image_namespace), 3)
+
+        self.assertEquals(len(namespaces[1].aliases), 0)
+        self.assertEquals(len(namespaces[4].aliases), 1)
+        self.assertEquals(namespaces[4].aliases[0], 'WP')
+        self.assertIn('WP', namespaces[4])
+
     def testApiMethods(self):
         """Test generic ApiSite methods"""
 

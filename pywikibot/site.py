@@ -1490,7 +1490,7 @@ class APISite(BaseSite):
             # Remove the 'id' from nsdata
             nsdata[nskey].pop('id')
             namespace = Namespace(ns, canonical_name, custom_name,
-                                  use_image_name=is_mw114, **nsdata[nskey])
+                                  use_image_name=not is_mw114, **nsdata[nskey])
 
             self._namespaces[ns] = namespace
 
@@ -1498,7 +1498,8 @@ class APISite(BaseSite):
             aliasdata = sidata['namespacealiases']
             for item in aliasdata:
                 ns = int(item['id'])
-                self._namespaces[ns].aliases.append(item['*'])
+                if item['*'] not in self._namespaces[ns]:
+                    self._namespaces[ns].aliases.append(item['*'])
 
         if 'extensions' in sidata:
             self._extensions = sidata['extensions']
