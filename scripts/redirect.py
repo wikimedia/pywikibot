@@ -810,7 +810,7 @@ def main(*args):
     ):
         pywikibot.showHelp()
     else:
-        self.site.login()
+        pywikibot.Site().login()
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
                                 fullscan, start, until, number, step)
         bot = RedirectRobot(action, gen, always, number, delete)
