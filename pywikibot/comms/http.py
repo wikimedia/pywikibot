@@ -158,10 +158,11 @@ def request(site, uri, ssl=False, *args, **kwargs):
         username = site.username()
         if not username:
             username = ""
+
         kwargs["headers"]["user-agent"] = config.USER_AGENT_FORMAT.format(
             script=pywikibot.calledModuleName(),
             version=pywikibot.version.getversiondict()['rev'],
-            username=quote(username),
+            username=quote(username.encode('utf-8')),
             lang=site.code,
             family=site.family.name)
     else:
