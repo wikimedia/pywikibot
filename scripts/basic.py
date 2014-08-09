@@ -140,7 +140,6 @@ def main():
     """ Process command line arguments and invoke BasicBot. """
     # Process global arguments to determine desired site
     local_args = pywikibot.handleArgs()
-    site = pywikibot.Site()
 
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
