@@ -61,8 +61,7 @@ else:
 
 from pywikibot import config
 from pywikibot.exceptions import FatalServerError, Server504Error
-import pywikibot
-from . import threadedhttp
+from pywikibot.comms import threadedhttp
 import pywikibot.version
 
 _logger = "comm.http"
