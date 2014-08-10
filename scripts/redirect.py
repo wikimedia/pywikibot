@@ -61,7 +61,7 @@ and arguments can be:
 #
 # (C) Daniel Herding, 2004.
 # (C) Purodha Blissenbach, 2009.
-# (C) xqt, 2009-2013
+# (C) xqt, 2009-2014
 # (C) Pywikibot team, 2004-2013
 #
 # Distributed under the terms of the MIT license.
@@ -72,8 +72,7 @@ __version__ = '$Id$'
 import re
 import datetime
 import pywikibot
-from pywikibot import i18n
-from pywikibot import xmlreader
+from pywikibot import i18n, xmlreader
 
 
 class RedirectGenerator:
@@ -671,7 +670,7 @@ class RedirectRobot:
             text = self.site.redirectRegex().sub(
                 '#%s %s' % (self.site.redirect(True),
                             targetlink),
-                oldText)
+                oldText, 1)
             if redir.title() == targetPage.title() or text == oldText:
                 pywikibot.output(u"Note: Nothing left to do on %s"
                                  % redir.title(asLink=True))
