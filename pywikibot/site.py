@@ -1702,6 +1702,12 @@ class APISite(BaseSite):
                     u"loadimageinfo: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
             api.update_page(page, pageitem)
+            if "missing" in pageitem:
+                raise pywikibot.NoPage(page)
+            if "imageinfo" not in pageitem:
+                raise Error(
+                    u"loadimageinfo: Query on %s returned no imageinfo"
+                    % page)
             return (pageitem['imageinfo']
                     if history else pageitem['imageinfo'][0])
 
