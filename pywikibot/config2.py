@@ -38,6 +38,8 @@ _imported_modules = ('os', 'sys')
 # to other modules.
 
 _private_values = ['authenticate', 'proxy', 'db_password']
+_deprecated_variables = ['use_SSL_onlogin', 'use_SSL_always',
+                         'available_ssl_project_comment']
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -103,17 +105,15 @@ solve_captcha = True
 authenticate = {}
 
 #
-#    Security Connection for Wikimedia Projects
+# Secure connection overrides
 #
+# These settings are deprecated.  They existed to support the Wikimedia
+# family which only served HTTPS on https://secure.wikimedia.org/<site>/<uri>
+# Use Family.protocol()
 use_SSL_onlogin = False  # if available, use SSL when logging in
 use_SSL_always = False   # if available, use SSL for all API queries
-
-# Available security projects
-available_ssl_project = [
-    u'wikipedia', u'wikinews', u'wikisource', u'wiktionary', u'wikibooks',
-    u'wikiquote', u'wikiversity', u'meta', u'mediawiki', u'commons',
-    u'species', u'incubator'
-]
+# Available secure projects should be listed here.
+available_ssl_project = []
 
 # By default you are asked for a password on the terminal.
 # A password file may be used. e.g. password_file = ".passwd"
@@ -785,6 +785,10 @@ _modified = [_key for _key in _gl
 
 for _key in _modified:
     globals()[_key] = _uc[_key]
+
+    if _key in _deprecated_variables:
+        print("WARNING: '%s' is no longer a supported configuration variable."
+              "\nPlease inform the maintainers if you depend on it." % _key)
 
 # Fix up default console_encoding
 if console_encoding is None:

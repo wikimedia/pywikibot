@@ -62,6 +62,7 @@ else:
 from pywikibot import config
 from pywikibot.exceptions import FatalServerError, Server504Error
 from pywikibot.comms import threadedhttp
+from pywikibot.tools import deprecate_arg
 import pywikibot.version
 
 _logger = "comm.http"
@@ -204,29 +205,33 @@ def user_agent(site=None, format_string=None):
     return formatted
 
 
-def request(site, uri, ssl=False, *args, **kwargs):
+@deprecate_arg('ssl', None)
+def request(site=None, uri=None, *args, **kwargs):
     """Queue a request to be submitted to Site.
 
     All parameters not listed below are the same as
-    L{httplib2.Http.request}, but the uri is relative
+    L{httplib2.Http.request}.
 
-    If the site argument is None the uri has to be absolute and is
-    taken. In this case SSL is ignored. Used for requests to non wiki
-    pages.
+    If the site argument is provided, the uri is relative to the site's
+    scriptpath.
+
+    If the site argument is None, the uri must be absolute, and is
+    used for requests to non wiki pages.
 
     @param site: The Site to connect to
-    @param uri: the URI to retrieve (relative to the site's scriptpath)
-    @param ssl: Use HTTPS connection
+    @type site: L{pywikibot.site.Site}
+    @param uri: the URI to retrieve
+    @type uri: str
     @return: The received data (a unicode string).
 
     """
+    assert(site or uri)
     if site:
-        if ssl:
-            proto = "https"
+        proto = site.protocol()
+        if proto == 'https':
             host = site.ssl_hostname()
             uri = site.ssl_pathprefix() + uri
         else:
-            proto = site.protocol()
             host = site.hostname()
         baseuri = urlparse.urljoin("%s://%s" % (proto, host), uri)
     else:
