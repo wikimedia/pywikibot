@@ -73,9 +73,14 @@ class TestArchiveBotMeta(type):
         for code in THREADS:
             test_name = "test_wikipedia_" + code
 
-            if code in ['ar', 'ckb', 'en', 'fa', 'frr', 'no', 'pdc', 'pt', 'th',
-                        'ug']:
+            if code in ['ar', 'ckb', 'fa', 'pdc', 'th']:
                 # expected failures - should be fixed
+                # 'ar', 'ckb', 'fa': no digits in date, regex does not match
+                # 'pdc': changed month name setting in wiki over time (?)
+                #   in old posts in talk page, February is "Feb.", site message gives
+                #   <message name="feb" xml:space="preserve">Han.</message>.
+                #   for new entries it should work
+                # 'th': year is 2552 while regex assumes 19..|20.., might be fixed
                 dct[test_name] = unittest.expectedFailure(test_method(code))
             else:
                 dct[test_name] = test_method(code)
