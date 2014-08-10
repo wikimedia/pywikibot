@@ -47,7 +47,9 @@ lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
 
 class APIError(pywikibot.Error):
+
     """The wiki site returned an error message."""
+
     def __init__(self, code, info, **kwargs):
         """Save error dict returned by MW API."""
         self.code = code
@@ -67,6 +69,7 @@ class TimeoutError(pywikibot.Error):
 
 
 class Request(MutableMapping):
+
     """A request to a Site's api.php interface.
 
     Attributes of this object (except for the special parameters listed
@@ -121,6 +124,7 @@ class Request(MutableMapping):
     @param format: (optional) Defaults to "json"
 
     """
+
     def __init__(self, **kwargs):
         try:
             self.site = kwargs.pop("site")
@@ -277,7 +281,7 @@ class Request(MutableMapping):
     def submit(self):
         """Submit a query and parse the response.
 
-        @return:  The data retrieved from api.php (a dict)
+        @return: a dict containing data retrieved from api.php
 
         """
         while True:
@@ -469,7 +473,10 @@ class Request(MutableMapping):
 
 class CachedRequest(Request):
     def __init__(self, expiry, *args, **kwargs):
-        """ expiry should be either a number of days or a datetime.timedelta object """
+        """Construct a CachedRequest object.
+
+        @param expiry: either a number of days or a datetime.timedelta object
+        """
         super(CachedRequest, self).__init__(*args, **kwargs)
         if not isinstance(expiry, datetime.timedelta):
             expiry = datetime.timedelta(expiry)
@@ -479,7 +486,7 @@ class CachedRequest(Request):
 
     @staticmethod
     def _get_cache_dir():
-        """The base directory path for cache entries.
+        """Return the base directory path for cache entries.
 
         The directory will be created if it does not already exist.
 
@@ -508,11 +515,12 @@ class CachedRequest(Request):
         return dir
 
     def _uniquedescriptionstr(self):
-        """ Unique description for the cache entry.
+        """Return unique description for the cache entry.
 
         If this is modified, please also update
         scripts/maintenance/cache.py to support
-        the new key and all previous keys. """
+        the new key and all previous keys.
+        """
 
         login_status = self.site._loginstatus
 
@@ -544,7 +552,7 @@ class CachedRequest(Request):
         return dt + self.expiry < datetime.datetime.now()
 
     def _load_cache(self):
-        """ Return whether the cache can be used """
+        """Return whether the cache can be used."""
         try:
             with open(self._cachefile_path(), 'rb') as f:
                 uniquedescr, self._data, self._cachetime = pickle.load(f)
@@ -561,7 +569,7 @@ class CachedRequest(Request):
             return False
 
     def _write_cache(self, data):
-        """ writes data to self._cachefile_path() """
+        """Write data to self._cachefile_path()."""
         data = [self._uniquedescriptionstr(), data, datetime.datetime.now()]
         with open(self._cachefile_path(), 'wb') as f:
             pickle.dump(data, f)
@@ -575,6 +583,7 @@ class CachedRequest(Request):
 
 
 class QueryGenerator(object):
+
     """Base class for iterators that handle responses to API action=query.
 
     By default, the iterator will iterate each item in the query response,
@@ -590,11 +599,12 @@ class QueryGenerator(object):
     links. See the API documentation for specific query options.
 
     """
+
     def __init__(self, **kwargs):
-        """
-        Constructor: kwargs are used to create a Request object;
-        see that object's documentation for values. 'action'='query' is
-        assumed.
+        """Construct a QueryGenerator object.
+
+        kwargs are used to create a Request object; see that object's
+        documentation for values. 'action'='query' is assumed.
 
         """
         if "action" in kwargs and kwargs["action"] != "query":
@@ -644,7 +654,7 @@ class QueryGenerator(object):
     def __modules(self):
         """
         Instance cache: hold the query data for paraminfo on
-        querymodule=self.module at self.site
+        querymodule=self.module at self.site.
 
         """
         if not hasattr(self.site, "_modules"):
@@ -653,13 +663,13 @@ class QueryGenerator(object):
 
     @__modules.deleter
     def __modules(self):
-        """Delete the instance cache - maybe we don't need it"""
+        """Delete the instance cache - maybe we don't need it."""
         if hasattr(self.site, "_modules"):
             del self.site._modules
 
     @property
     def _modules(self):
-        """Query api on self.site for paraminfo on querymodule=self.module"""
+        """Query api on self.site for paraminfo on querymodule=self.module."""
         if not set(self.module.split('|')) <= set(self.__modules.keys()):
             paramreq = CachedRequest(expiry=config.API_config_expiry,
                                      site=self.site, action="paraminfo",
@@ -711,7 +721,7 @@ class QueryGenerator(object):
         self.limit = int(value)
 
     def update_limit(self):
-        """Set query limit for self.module based on api response"""
+        """Set query limit for self.module based on api response."""
 
         for mod in self.module.split('|'):
             for param in self._modules[mod].get("parameters", []):
@@ -745,7 +755,7 @@ class QueryGenerator(object):
                     return
 
     def __iter__(self):
-        """Submit request and iterate the response based on self.resultkey
+        """Submit request and iterate the response based on self.resultkey.
 
         Continues response as needed until limit (if any) is reached.
 
@@ -857,13 +867,15 @@ class QueryGenerator(object):
 
 
 class PageGenerator(QueryGenerator):
+
     """Iterator for response to a request of type action=query&generator=foo.
 
     This class can be used for any of the query types that are listed in the
-    API documentation as being able to be used as a generator.  Instances of
+    API documentation as being able to be used as a generator. Instances of
     this class iterate Page objects.
 
     """
+
     def __init__(self, generator, g_content=False, **kwargs):
         """
         Required and optional parameters are as for C{Request}, except that
@@ -905,6 +917,7 @@ class PageGenerator(QueryGenerator):
 
 
 class CategoryPageGenerator(PageGenerator):
+
     """Like PageGenerator, but yields Category objects instead of Pages."""
 
     def result(self, pagedata):
@@ -913,6 +926,7 @@ class CategoryPageGenerator(PageGenerator):
 
 
 class ImagePageGenerator(PageGenerator):
+
     """Like PageGenerator, but yields ImagePage objects instead of Pages."""
 
     def result(self, pagedata):
@@ -924,7 +938,8 @@ class ImagePageGenerator(PageGenerator):
 
 
 class PropertyGenerator(QueryGenerator):
-    """Iterator for queries of type action=query&property=...
+
+    """Iterator for queries of type action=query&prop=...
 
     See the API documentation for types of page properties that can be
     queried.
@@ -936,12 +951,13 @@ class PropertyGenerator(QueryGenerator):
     be supplied when instantiating this class).
 
     """
+
     def __init__(self, prop, **kwargs):
         """
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and prop is required.
 
-        @param prop: the "property=" type from api.php
+        @param prop: the "prop=" type from api.php
         @type prop: str
 
         """
@@ -950,6 +966,7 @@ class PropertyGenerator(QueryGenerator):
 
 
 class ListGenerator(QueryGenerator):
+
     """Iterator for queries of type action=query&list=...
 
     See the API documentation for types of lists that can be queried.  Lists
@@ -963,6 +980,7 @@ class ListGenerator(QueryGenerator):
     returned information into a Page object.
 
     """
+
     def __init__(self, listaction, **kwargs):
         """
         Required and optional parameters are as for C{Request}, except that
@@ -976,10 +994,12 @@ class ListGenerator(QueryGenerator):
 
 
 class LogEntryListGenerator(ListGenerator):
+
     """
     Like ListGenerator, but specialized for listaction="logevents" :
     yields LogEntry objects instead of dicts.
     """
+
     def __init__(self, logtype=None, **kwargs):
         ListGenerator.__init__(self, "logevents", **kwargs)
 
@@ -991,13 +1011,15 @@ class LogEntryListGenerator(ListGenerator):
 
 
 class LoginManager(login.LoginManager):
+
     """Supply getCookie() method to use API interface."""
+
     def getCookie(self, remember=True, captchaId=None, captchaAnswer=None):
         """Login to the site.
 
         Parameters are all ignored.
 
-        Returns cookie data if successful, None otherwise.
+        @return: cookie data if successful, None otherwise.
 
         """
         if hasattr(self, '_waituntil'):
