@@ -100,7 +100,7 @@ def main(*args):
                 if logout:
                     site.logout()
                 else:
-                    site.login()
+                    site.login(sysop)
                 user = site.user()
                 if user:
                     pywikibot.output(u"Logged in on %(site)s as %(user)s." % locals())
