@@ -108,7 +108,11 @@ def Family(fam=None, fatal=True):
         return _families[fam]
 
     try:
-        myfamily = imp.load_source(fam, config.family_files[fam])
+        # Ignore warnings due to dots in family names.
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            myfamily = imp.load_source(fam, config.family_files[fam])
     except (ImportError, KeyError):
         if fatal:
             pywikibot.error(u"""\
