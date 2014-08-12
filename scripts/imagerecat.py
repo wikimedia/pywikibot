@@ -76,7 +76,7 @@ def categorizeImages(generator, onlyFilter, onlyUncat):
     for page in generator:
         if page.exists() and (page.namespace() == 6) and \
            (not page.isRedirectPage()):
-            imagepage = pywikibot.ImagePage(page.site(), page.title())
+            imagepage = pywikibot.ImagePage(page.site, page.title())
             pywikibot.output(u'Working on ' + imagepage.title())
 
             if onlyUncat and not(u'Uncategorized' in imagepage.templates()):
@@ -390,7 +390,7 @@ def filterParents(categories):
 
 def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
     """ Remove the old categories and add the new categories to the image. """
-    newtext = pywikibot.removeCategoryLinks(imagepage.get(), imagepage.site())
+    newtext = pywikibot.removeCategoryLinks(imagepage.text, imagepage.site)
     if not onlyFilter:
         newtext = removeTemplates(newtext)
         newtext = newtext + getCheckCategoriesTemplate(usage, galleries,
@@ -402,8 +402,9 @@ def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
         comment = u'Filtering categories'
     else:
         comment = u'Image is categorized by a bot using data from [[Commons:Tools#CommonSense|CommonSense]]'
-    pywikibot.showDiff(imagepage.get(), newtext)
-    imagepage.put(newtext, comment)
+    pywikibot.showDiff(imagepage.text, newtext)
+    imagepage.text = newtext
+    imagepage.save(comment)
     return
 
 
