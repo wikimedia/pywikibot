@@ -69,11 +69,11 @@ def SetColor(color):
             pass
 
     if color == FOREGROUND_BLUE:
-        print '(b:',
+        print('(b:'),
     if color == FOREGROUND_GREEN:
-        print '(g:',
+        print('(g:'),
     if color == FOREGROUND_RED:
-        print '(r:',
+        print('(r:'),
 
 # end of console code
 
@@ -329,20 +329,20 @@ class CaseChecker(object):
 
             if not self.doFailed:
                 for namespace in self.namespaces:
-                    self.currentTitle = None
+                    self.currentTitle is None
                     self.queryParams['gapnamespace'] = namespace
                     self.queryParams['gapfrom'] = self.apfrom
                     for data in self.RunQuery(self.queryParams):
                         self.ProcessDataBlock(data)
             else:
-                self.currentTitle = None
+                self.currentTitle is None
                 batchSize = 10
-                for batchStart in xrange(0, len(self.titleList), batchSize):
+                for batchStart in range(0, len(self.titleList), batchSize):
                     self.queryParams['titles'] = self.titleList[
                         batchStart:batchStart + batchSize]
                     for data in self.RunQuery(self.queryParams):
                         self.ProcessDataBlock(data)
-            print "*" * 29, "Done"
+            print("*" * 29 + " Done")
         except:
             pywikibot.output(u'Exception at Title = %s, Next = %s'
                              % (self.currentTitle, self.apfrom))
@@ -400,7 +400,7 @@ class CaseChecker(object):
                                         follow_redirects=False):
                                     if p.namespace() == 2:
                                         continue
-                                    oldText = p.get(get_redirect=True)
+                                    oldText = p.text
                                     newText = self.ReplaceLink(oldText, title,
                                                                newTitle)
                                     if not self.PutNewPage(
@@ -758,14 +758,14 @@ class CaseChecker(object):
     def PutNewPage(self, pageObj, pageTxt, msg):
         title = pageObj.title(asLink=True, textlink=True)
         coloredMsg = u', '.join([self.ColorCodeWord(m) for m in msg])
-        if pageObj.get(get_redirect=True) == pageTxt:
+        if pageObj.text == pageTxt:
             self.WikiLog(u"* Error: Text replacement failed in %s (%s)"
                          % (self.MakeLink(title, False), coloredMsg))
         else:
             pywikibot.output(u'Case Replacements: %s' % u', '.join(msg))
+            pageObj.text = pageTxt
             try:
-                pageObj.put(
-                    pageTxt,
+                pageObj.save(
                     u'%s: %s'
                     % (i18n.twtranslate(
                         self.site,
@@ -774,7 +774,7 @@ class CaseChecker(object):
                 return True
             except KeyboardInterrupt:
                 raise
-            except:
+            except (pywikibot.LockedPage, pywikibot.PageNotSaved):
                 self.WikiLog(u"* Error: Could not save updated page %s (%s)"
                              % (self.MakeLink(title, False), coloredMsg))
         return False
