@@ -16,6 +16,8 @@ from tests.utils import unittest, NoSiteTestCase
 
 class HttpTestCase(NoSiteTestCase):
 
+    net = True
+
     def test_get(self):
         r = http.request(site=None, uri='http://www.wikipedia.org/')
         self.assertIsInstance(r, str)

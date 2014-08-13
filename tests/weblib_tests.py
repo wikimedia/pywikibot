@@ -19,6 +19,8 @@ from tests.utils import unittest, NoSiteTestCase
 
 class TestArchiveSites(NoSiteTestCase):
 
+    net = True
+
     @classmethod
     def setUpClass(cls):
         if os.environ.get('TRAVIS', 'false') == 'true':
