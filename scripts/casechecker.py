@@ -329,13 +329,13 @@ class CaseChecker(object):
 
             if not self.doFailed:
                 for namespace in self.namespaces:
-                    self.currentTitle is None
+                    self.currentTitle = None
                     self.queryParams['gapnamespace'] = namespace
                     self.queryParams['gapfrom'] = self.apfrom
                     for data in self.RunQuery(self.queryParams):
                         self.ProcessDataBlock(data)
             else:
-                self.currentTitle is None
+                self.currentTitle = None
                 batchSize = 10
                 for batchStart in range(0, len(self.titleList), batchSize):
                     self.queryParams['titles'] = self.titleList[
