@@ -181,6 +181,12 @@ parameterHelp = u"""\
 
 -grep             A regular expression that needs to match the article
                   otherwise the page won't be returned.
+                  Multiple -grep:regexpr can be provided and the page will
+                  be returned if content is matched by any of the regexpr
+                  provided.
+                  Case insensitive regular expressions will be used and
+                  dot matches any character, including a newline.
+
 """
 
 docuReplacements = {'&params;': parameterHelp}
@@ -206,7 +212,7 @@ class GeneratorFactory(object):
         self.namespaces = []
         self.step = None
         self.limit = None
-        self.articlefilter = None
+        self.articlefilter_list = []
         self.site = site
         if self.site is None:
             self.site = pywikibot.Site()
@@ -244,9 +250,9 @@ class GeneratorFactory(object):
 
         dupfiltergen = DuplicateFilterPageGenerator(gensList)
 
-        if self.articlefilter:
+        if self.articlefilter_list:
             return RegexBodyFilterPageGenerator(
-                PreloadingGenerator(dupfiltergen), self.articlefilter)
+                PreloadingGenerator(dupfiltergen), self.articlefilter_list)
         else:
             return dupfiltergen
 
@@ -507,10 +513,10 @@ class GeneratorFactory(object):
             gen = RegexFilterPageGenerator(self.site.allpages(), regex)
         elif arg.startswith('-grep'):
             if len(arg) == 5:
-                self.articlefilter = pywikibot.input(
-                    u'Which pattern do you want to grep?')
+                self.articlefilter_list.append(pywikibot.input(
+                    u'Which pattern do you want to grep?'))
             else:
-                self.articlefilter = arg[6:]
+                self.articlefilter_list.append(arg[6:])
             return True
         elif arg.startswith('-yahoo'):
             gen = YahooSearchPageGenerator(arg[7:])
