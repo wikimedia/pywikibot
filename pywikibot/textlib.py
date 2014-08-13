@@ -856,7 +856,7 @@ def categoryFormat(categories, insite=None):
     else:
         sep = config.line_separator
     # Some people don't like the categories sorted
-    #catLinks.sort()
+    # catLinks.sort()
     return sep.join(catLinks) + config.line_separator
 
 
@@ -1181,6 +1181,8 @@ class TimeStripper(object):
         for n, (_long, _short) in enumerate(self.site.months_names, start=1):
             self.origNames2monthNum[_long] = n
             self.origNames2monthNum[_short] = n
+            # in some cases month in ~~~~ might end without dot even if
+            # site.months_names do not.
             if _short.endswith('.'):
                 self.origNames2monthNum[_short[:-1]] = n
 
@@ -1189,20 +1191,22 @@ class TimeStripper(object):
         timeR = r'(?P<time>(?P<hour>[0-2]\d)[:\.h](?P<minute>[0-5]\d))'
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
         yearR = r'(?P<year>(19|20)\d\d)'
-        monthR = r'(?P<month>(%s))' % (u'|'.join(self.origNames2monthNum))
-        dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))'
+        # if months name contain a dot, it needs to be escaped.
+        escaped_months = [re.escape(_) for _ in self.origNames2monthNum]
+        monthR = r'(?P<month>(%s))' % u'|'.join(escaped_months)
+        dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?'
 
         self.ptimeR = re.compile(timeR)
-        self.timeznR = re.compile(timeznR)
-        self.yearR = re.compile(yearR)
+        self.ptimeznR = re.compile(timeznR)
+        self.pyearR = re.compile(yearR)
         self.pmonthR = re.compile(monthR, re.U)
         self.pdayR = re.compile(dayR)
 
         # order is important to avoid mismatch when searching
         self.patterns = [
             self.ptimeR,
-            self.timeznR,
-            self.yearR,
+            self.ptimeznR,
+            self.pyearR,
             self.pmonthR,
             self.pdayR,
         ]
@@ -1218,12 +1222,21 @@ class TimeStripper(object):
         Take the rightmost match, to prevent spurious earlier matches, and replace with marker
         """
         m = None
+        cnt = 0
         for m in pat.finditer(txt):
-            pass
+            cnt += 1
 
         if m:
             marker = self.findmarker(txt)
-            txt = pat.sub(marker, txt)
+            # month and day format might be identical (e.g. see bug 69315),
+            # avoid to wipe out day, after month is matched.
+            # replace all matches but the one before last, which is the day candidate.
+            if pat == self.pmonthR:
+                txt = pat.sub(marker, txt, cnt - 2)
+                # matched month needs to be wiped out (last match of txt)
+                txt = re.sub(r'(.*)%s' % m.group(), r'\1%s' % marker, txt)
+            else:
+                txt = pat.sub(marker, txt)
             return (txt, m.groupdict())
         else:
             return (txt, None)
@@ -1241,7 +1254,6 @@ class TimeStripper(object):
             line, matchDict = self.last_match_and_replace(line, pat)
             if matchDict:
                 dateDict.update(matchDict)
-
         # all fields matched -> date valid
         if all(g in dateDict for g in self.groups):
             # remove 'time' key, now splitted in hour/minute and not needed by datetime
@@ -1251,14 +1263,19 @@ class TimeStripper(object):
             try:
                 dateDict['month'] = self.origNames2monthNum[dateDict['month']]
             except KeyError:
-                pywikibot.output(u'incorrect month name in page')
+                pywikibot.output(u'incorrect month name "%s" in page in site %s'
+                                 % (dateDict['month'], self.site))
+                raise KeyError
 
             # convert to integers
             for k, v in dateDict.items():
+                if k == 'tzinfo':
+                    continue
                 try:
                     dateDict[k] = int(v)
                 except ValueError:
-                    pass
+                    raise ValueError('Value: %s could not be converted for key: %s.'
+                                     % (v, k))
 
             # find timezone
             dateDict['tzinfo'] = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
