@@ -3149,22 +3149,6 @@ class PropertyPage(WikibasePage, Property):
         return Claim(self.site, self.getID(), *args, **kwargs)
 
 
-class QueryPage(WikibasePage):
-
-    """
-    A Wikibase Query entity.
-
-    For future usage, not implemented yet.
-    """
-
-    def __init__(self, site, title):
-        """Constructor."""
-        WikibasePage.__init__(self, site, title, ns=122)
-        self.id = self.title(withNamespace=False).upper()
-        if not self.id.startswith(u'U'):
-            raise ValueError(u"'%s' is not a query page!" % self.title())
-
-
 class Claim(Property):
 
     """
