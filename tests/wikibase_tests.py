@@ -13,8 +13,10 @@ __version__ = '$Id$'
 import os
 import pywikibot
 from pywikibot import pagegenerators
+from pywikibot.page import WikibasePage
 from pywikibot.data.api import APIError
 import json
+import copy
 
 from tests.utils import PywikibotTestCase, unittest
 
@@ -442,6 +444,69 @@ class TestLinks(PywikibotTestCase):
 
         self.assertEquals(len(wikilinks), 3)
         self.assertEquals(len(wvlinks), 2)
+
+
+class TestWriteNormalizeLang(PywikibotTestCase):
+    """Test cases for routines that normalize languages in a dict.
+
+    Exercises WikibasePage._normalizeLanguages with data that is
+    not normalized and data which is already normalized.
+    """
+
+    def setUp(self):
+        super(TestWriteNormalizeLang, self).setUp()
+        self.site = pywikibot.Site('en', 'wikipedia')
+        self.lang_out = {'en': 'foo'}
+
+    def test_normalize_lang(self):
+        lang_in = {self.site: 'foo'}
+
+        response = WikibasePage._normalizeLanguages(lang_in)
+        self.assertEquals(response, self.lang_out)
+
+    def test_normalized_lang(self):
+        response = WikibasePage._normalizeData(
+            copy.deepcopy(self.lang_out))
+        self.assertEquals(response, self.lang_out)
+
+
+class TestWriteNormalizeData(PywikibotTestCase):
+    """Test cases for routines that normalize data for writing to Wikidata.
+
+    Exercises WikibasePage._normalizeData with data that is not normalized
+    and data which is already normalized.
+    """
+
+    def setUp(self):
+        super(TestWriteNormalizeData, self).setUp()
+        self.data_out = {'aliases':
+                         {'en':
+                            [
+                                {'language': 'en',
+                                 'value': 'Bah'}
+                            ],
+                          },
+                         'labels':
+                          {'en':
+                             {'language': 'en',
+                              'value': 'Foo'},
+                           }
+                         }
+
+    def test_normalize_data(self):
+        data_in = {'aliases':
+                   {'en': ['Bah']},
+                   'labels':
+                   {'en': 'Foo'},
+                   }
+
+        response = WikibasePage._normalizeData(data_in)
+        self.assertEquals(response, self.data_out)
+
+    def test_normalized_data(self):
+        response = WikibasePage._normalizeData(
+            copy.deepcopy(self.data_out))
+        self.assertEquals(response, self.data_out)
 
 
 if __name__ == '__main__':

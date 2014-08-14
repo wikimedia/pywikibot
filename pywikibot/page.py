@@ -2756,14 +2756,16 @@ class WikibasePage(Page):
             self.get()
         return self.lastrevid
 
-    def __normalizeLanguages(self, data):
+    @staticmethod
+    def _normalizeLanguages(data):
         """
         Helper function to replace site objects with their language codes.
 
-        @param data: The dict to check
+        @param data: The dict to normalize.
         @type data: dict
 
-        @return: dict
+        @return: the altered dict from parameter data.
+        @rtype: dict
         """
         for key in data:
             if isinstance(key, pywikibot.site.BaseSite):
@@ -2771,18 +2773,32 @@ class WikibasePage(Page):
                 del data[key]
         return data
 
-    def __normalizeData(self, data):
-        for prop in ('labels', 'descriptions', 'aliases'):
-            if prop in data:
-                data[prop] = self.__normalizeLanguages(data[prop])
-                if prop == 'aliases':
-                    for key, values in data[prop].iteritems():
-                        for index, value in enumerate(values):
-                            data[prop][key][index] = {'language': key,
-                                                      'value': value}
-                else:
-                    for key, value in data[prop].iteritems():
-                        data[prop][key] = {'language': key, 'value': value}
+    @staticmethod
+    def _normalizeData(data):
+        """
+        Helper function to expand data into the Wikibase API structure.
+
+        @param data: The dict to normalize
+        @type data: dict
+
+        @return: the altered dict from parameter data.
+        @rtype: dict
+        """
+        for prop in ('labels', 'descriptions'):
+            if prop not in data:
+                continue
+            data[prop] = WikibasePage._normalizeLanguages(data[prop])
+            for key, value in data[prop].iteritems():
+                if isinstance(value, basestring):
+                    data[prop][key] = {'language': key, 'value': value}
+
+        if 'aliases' in data:
+            for key, values in data['aliases'].iteritems():
+                if (isinstance(values, list) and
+                        isinstance(values[0], basestring)):
+                    data['aliases'][key] = [{'language': key, 'value': value}
+                                            for value in values]
+
         return data
 
     def getdbName(self, site):
@@ -2814,7 +2830,7 @@ class WikibasePage(Page):
         else:
             baserevid = None
 
-        data = self.__normalizeData(data)
+        data = WikibasePage._normalizeData(data)
 
         updates = self.repo.editEntity(self._defined_by(singular=True), data,
                                        baserevid=baserevid, **kwargs)
@@ -3473,6 +3489,9 @@ class Claim(Property):
     def _formatDataValue(self):
         """
         Format the target into the proper JSON datavalue that Wikibase wants.
+
+        @return: Wikibase API representation with type and value.
+        @rtype: dict
         """
         return {'value': self._formatValue(),
                 'type': self.value_types.get(self.type, self.type)
