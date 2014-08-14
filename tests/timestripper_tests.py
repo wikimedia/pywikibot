@@ -16,13 +16,13 @@ from tests.utils import PywikibotTestCase, unittest
 from pywikibot.textlib import TimeStripper, tzoneFixedOffset
 
 
-class TestTimeStripper(PywikibotTestCase):
-    """Test cases for Link objects"""
+class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
+    """Test cases for TimeStripper methods"""
 
     def setUp(self):
         site = pywikibot.Site('fr', 'wikipedia')
         self.ts = TimeStripper(site)
-        super(TestTimeStripper, self).setUp()
+        super(TestTimeStripperWithNoDigitsAsMonths, self).setUp()
 
     def test_findmarker(self):
         """Test that string which is not part of text is found"""
@@ -32,15 +32,43 @@ class TestTimeStripper(PywikibotTestCase):
                          '@@@@@@')
 
     def test_last_match_and_replace(self):
-        """Test that pattern matches the righmost item"""
+        """Test that pattern matches and removes items correctly."""
 
-        txtWithMatch = u'this string has one 1998, 1999 and 3000 in it'
+        txtWithOneMatch = u'this string has 3000, 1999 and 3000 in it'
+        txtWithTwoMatch = u'this string has 1998, 1999 and 3000 in it'
         txtWithNoMatch = u'this string has no match'
         pat = self.ts.pyearR
 
-        self.assertEqual(self.ts.last_match_and_replace(txtWithMatch, pat),
-                         (u'this string has one @@, @@ and 3000 in it',
+        self.assertEqual(self.ts.last_match_and_replace(txtWithOneMatch, pat),
+                         (u'this string has 3000, @@ and 3000 in it',
                           {'year': u'1999'})
+                         )
+        self.assertEqual(self.ts.last_match_and_replace(txtWithTwoMatch, pat),
+                         (u'this string has @@, @@ and 3000 in it',
+                          {'year': u'1999'})
+                         )
+        self.assertEqual(self.ts.last_match_and_replace(txtWithNoMatch, pat),
+                         (txtWithNoMatch,
+                          None)
+                         )
+
+        txtWithOneMatch = u'this string has XXX, YYY and fév in it'
+        txtWithTwoMatch = u'this string has XXX, mars and fév in it'
+        txtWithThreeMatch = u'this string has avr, mars and fév in it'
+        txtWithNoMatch = u'this string has no match'
+        pat = self.ts.pmonthR
+
+        self.assertEqual(self.ts.last_match_and_replace(txtWithOneMatch, pat),
+                         (u'this string has XXX, YYY and @@ in it',
+                          {'month': u'fév'})
+                         )
+        self.assertEqual(self.ts.last_match_and_replace(txtWithTwoMatch, pat),
+                         (u'this string has XXX, @@ and @@ in it',
+                          {'month': u'fév'})
+                         )
+        self.assertEqual(self.ts.last_match_and_replace(txtWithThreeMatch, pat),
+                         (u'this string has @@, @@ and @@ in it',
+                          {'month': u'fév'})
                          )
         self.assertEqual(self.ts.last_match_and_replace(txtWithNoMatch, pat),
                          (txtWithNoMatch,
@@ -62,8 +90,55 @@ class TestTimeStripper(PywikibotTestCase):
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
 
+class TestTimeStripperWithDigitsAsMonths(PywikibotTestCase):
+    """Test cases for TimeStripper methods"""
+
+    def setUp(self):
+        site = pywikibot.Site('cs', 'wikipedia')
+        self.ts = TimeStripper(site)
+        super(TestTimeStripperWithDigitsAsMonths, self).setUp()
+
+    def test_last_match_and_replace(self):
+        """Test that pattern matches and removes items correctly."""
+
+        txtWithOneMatch = u'this string has XX. YY. 12. in it'
+        txtWithTwoMatch = u'this string has XX. 1. 12. in it'
+        txtWithThreeMatch = u'this string has 1. 1. 12. in it'
+        txtWithNoMatch = u'this string has no match'
+        pat = self.ts.pmonthR
+
+        self.assertEqual(self.ts.last_match_and_replace(txtWithOneMatch, pat),
+                         (u'this string has XX. YY. 12. in it',
+                          {'month': u'12.'})
+                         )
+        self.assertEqual(self.ts.last_match_and_replace(txtWithTwoMatch, pat),
+                         (u'this string has XX. 1. 12. in it',
+                          {'month': u'12.'})
+                         )
+        self.assertEqual(self.ts.last_match_and_replace(txtWithThreeMatch, pat),
+                         (u'this string has @@ 1. 12. in it',
+                          {'month': u'12.'})
+                         )
+        self.assertEqual(self.ts.last_match_and_replace(txtWithNoMatch, pat),
+                         (txtWithNoMatch,
+                          None)
+                         )
+
+    def test_timestripper(self):
+        txtMatch = u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)'
+        txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
+
+        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
+                                 self.ts.site.siteinfo['timezone'])
+
+        res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
+
+        self.assertEqual(self.ts.timestripper(txtMatch), res)
+        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
+
+
 class TestEnglishTimeStripper(PywikibotTestCase):
-    """Test cases for Link objects"""
+    """Test cases for English language"""
 
     def setUp(self):
         site = pywikibot.Site('en', 'wikipedia')
@@ -86,7 +161,7 @@ class TestEnglishTimeStripper(PywikibotTestCase):
 
 
 class TestCzechTimeStripper(PywikibotTestCase):
-    """Test cases for Link objects"""
+    """Test cases for Czech language"""
 
     def setUp(self):
         site = pywikibot.Site('cs', 'wikipedia')
@@ -109,7 +184,7 @@ class TestCzechTimeStripper(PywikibotTestCase):
 
 
 class TestPortugueseTimeStripper(PywikibotTestCase):
-    """Test cases for Link objects"""
+    """Test cases for Portuguese language"""
 
     def setUp(self):
         site = pywikibot.Site('pt', 'wikipedia')
@@ -132,7 +207,7 @@ class TestPortugueseTimeStripper(PywikibotTestCase):
 
 
 class TestNorwegianTimeStripper(PywikibotTestCase):
-    """Test cases for Link objects"""
+    """Test cases for Norwegian language"""
 
     def setUp(self):
         site = pywikibot.Site('no', 'wikipedia')
@@ -149,6 +224,43 @@ class TestNorwegianTimeStripper(PywikibotTestCase):
                                  self.ts.site.siteinfo['timezone'])
 
         res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
+
+        self.assertEqual(self.ts.timestripper(txtMatch), res)
+        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
+
+
+class TestVietnameseTimeStripper(PywikibotTestCase):
+    """Test cases for Vietnamese language"""
+
+    def setUp(self):
+        site = pywikibot.Site('vi', 'wikipedia')
+        self.ts = TimeStripper(site)
+        super(TestVietnameseTimeStripper, self).setUp()
+
+    def test_timestripper_01(self):
+        """Test that correct date is matched"""
+
+        txtMatch = u'16:41, ngày 15 tháng 9 năm 2008 (UTC) 16:41, ngày 12 tháng 9 năm 2008 (UTC)'
+        txtNoMatch = u'16:41, ngày 15 March 9 năm 2008 (UTC) 16:41, ngày 12 March 9 năm 2008 (UTC)'
+
+        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
+                                 self.ts.site.siteinfo['timezone'])
+
+        res = datetime.datetime(2008, 9, 12, 16, 41, tzinfo=tzone)
+
+        self.assertEqual(self.ts.timestripper(txtMatch), res)
+        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
+
+    def test_timestripper_02(self):
+        """Test that correct date is matched"""
+
+        txtMatch = u'21:18, ngày 13 tháng 8 năm 2014 (UTC) 21:18, ngày 14 tháng 8 năm 2014 (UTC)'
+        txtNoMatch = u'21:18, ngày 13 March 8 năm 2014 (UTC) 21:18, ngày 14 March 8 năm 2014 (UTC)'
+
+        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
+                                 self.ts.site.siteinfo['timezone'])
+
+        res = datetime.datetime(2014, 8, 14, 21, 18, tzinfo=tzone)
 
         self.assertEqual(self.ts.timestripper(txtMatch), res)
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)

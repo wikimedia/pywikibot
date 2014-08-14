@@ -1201,9 +1201,11 @@ class TimeStripper(object):
         # work around for cs wiki: if month are in digits, we assume
         # that format is dd. mm. (with dot and spaces optional)
         if any(_.isdigit() for _ in self.origNames2monthNum):
+            self.is_digit_month = True
             monthR = r'(?P<month>(%s)|\d{1,2}\.?)' % u'|'.join(escaped_months)
             dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?\s*[01]?\d\.?'
         else:
+            self.is_digit_month = False
             monthR = r'(?P<month>(%s))' % u'|'.join(escaped_months)
             dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?'
 
@@ -1244,8 +1246,11 @@ class TimeStripper(object):
             # replace all matches but the last two
             # (i.e. allow to search for dd. mm.)
             if pat == self.pmonthR:
-                if cnt > 2:
-                    txt = pat.sub(marker, txt, cnt - 2)
+                if self.is_digit_month:
+                    if cnt > 2:
+                        txt = pat.sub(marker, txt, cnt - 2)
+                else:
+                    txt = pat.sub(marker, txt)
             else:
                 txt = pat.sub(marker, txt)
             return (txt, m.groupdict())
