@@ -1318,7 +1318,7 @@ class GoogleSearchPageGenerator:
                displayed in or along with [Google] Services.
 
         Both of those issues should be managed by the package 'google',
-        however pywikibot will at least ensure the user sees the TOS
+        however Pywikibot will at least ensure the user sees the TOS
         in order to comply with the second condition.
         """
         try:

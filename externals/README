@@ -1,4 +1,4 @@
-This package is only necessary to run pywikibot from a fully self-sufficient
+This package is only necessary to run Pywikibot from a fully self-sufficient
 (no other dependencies other than python 2.6+) directory.
 This is especially useful on Windows.
 

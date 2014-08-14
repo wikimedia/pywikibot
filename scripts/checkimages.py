@@ -6,7 +6,7 @@ description is present and if there are other problems in the image's
 description.
 
 This script will have to be configured for each language. Please submit
-translations as addition to the pywikibot framework.
+translations as addition to the Pywikibot framework.
 
 Everything that needs customisation is indicated by comments.
 

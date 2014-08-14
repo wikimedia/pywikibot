@@ -17,7 +17,7 @@ python coordinate_import.py -lang:it -family:wikipedia -transcludes:Infobox_staz
 &params;
 """
 #
-# (C) Multichill 2014
+# (C) Multichill, 2014
 # (C) Pywikibot team, 2013-2014
 #
 # Distributed under the terms of MIT License.

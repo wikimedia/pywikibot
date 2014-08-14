@@ -22,7 +22,7 @@ to replace all occurences of 'Hoofdpagina' with 'Veurblaad' when writing to
 liwiki. Note that this does not take the origin wiki into account.
 """
 #
-# (C) Kasper Souren 2012-2013
+# (C) Kasper Souren, 2012-2013
 # (C) Pywikibot team, 2013-2014
 #
 # Distributed under the terms of the MIT license.

@@ -18,10 +18,13 @@ Command-line arguments:
 Example: "python capitalize_redirects.py -start:B -always"
 """
 #
-# (C) Yrithinnd
+# (C) Yrithinnd, 2006
 # (C) Pywikibot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
+#
+# Originally derived from:
+#    http://en.wikipedia.org/wiki/User:Drinibot/CapitalizationRedirects
 #
 # Automatically converted from compat branch by compat2core.py script
 #

@@ -16,7 +16,7 @@ options -file, -ref, -links, ...
 #
 # This script based on disambredir.py and solve_disambiguation.py
 #
-# (C) Pywikipedia team, 2004-2014
+# (C) Pywikibot team, 2004-2014
 #
 # Distributed under the terms of the MIT license.
 #

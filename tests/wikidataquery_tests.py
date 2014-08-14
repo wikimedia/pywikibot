@@ -3,7 +3,7 @@
 Test cases for the WikidataQuery query syntax and API
 """
 #
-# (C) Pywikipedia bot team, 2013
+# (C) Pywikibot team, 2014
 #
 # Distributed under the terms of the MIT license.
 #

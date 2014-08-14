@@ -69,12 +69,12 @@ on pages in the User: and User talk: namespaces, do:
 
     python template.py test -subst -namespace:2 -namespace:3
 
-Note that -namespace: is a global pywikibot parameter
+Note that -namespace: is a global Pywikibot parameter
 
 
 This next example substitutes the template lived with a supplied edit summary.
 It only performs substitutions in main article namespace and doesn't prompt to
-start replacing. Note that -putthrottle: is a global pywikibot parameter.
+start replacing. Note that -putthrottle: is a global Pywikibot parameter.
 
     python template.py -putthrottle:30 -namespace:0 lived -subst -always
         -summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."

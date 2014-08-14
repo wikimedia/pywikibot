@@ -5,8 +5,8 @@ Text editor class for your favourite editor.
 """
 
 #
-# (C) Gerrit Holl 2004
-# (C) Pywikibot team, 2004-2013
+# (C) Gerrit Holl, 2004
+# (C) Pywikibot team, 2004-2014
 #
 # Distributed under the terms of the MIT license.
 #
