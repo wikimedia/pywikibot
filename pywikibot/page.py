@@ -24,6 +24,7 @@ from pywikibot import config
 import pywikibot.site
 from pywikibot.exceptions import AutoblockUser, UserActionRefuse
 from pywikibot.tools import ComparableMixin
+from pywikibot import textlib
 import hashlib
 
 try:
@@ -616,8 +617,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         @return bool
         """
         txt = self.get()
-        txt = pywikibot.removeLanguageLinks(txt, site=self.site)
-        txt = pywikibot.removeCategoryLinks(txt, site=self.site)
+        txt = textlib.removeLanguageLinks(txt, site=self.site)
+        txt = textlib.removeCategoryLinks(txt, site=self.site)
         return len(txt) < 4
 
     def isTalkPage(self):
@@ -1094,7 +1095,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         else:
             text = self.text
         for linkmatch in pywikibot.link_regex.finditer(
-                pywikibot.removeDisabledParts(text)):
+                textlib.removeDisabledParts(text)):
             linktitle = linkmatch.group("title")
             link = Link(linktitle, self.site)
             # only yield links that are to a different site and that
@@ -1229,7 +1230,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         # WARNING: may not return all templates used in particularly
         # intricate cases such as template substitution
         titles = list(t.title() for t in self.templates())
-        templates = pywikibot.extract_templates_and_params(self.text)
+        templates = textlib.extract_templates_and_params(self.text)
         # backwards-compatibility: convert the dict returned as the second
         # element into a list in the format used by old scripts
         result = []
@@ -1633,8 +1634,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         # get list of Category objects the article is in and remove possible
         # duplicates
         cats = []
-        for cat in pywikibot.textlib.getCategoryLinks(self.text,
-                                                      site=self.site):
+        for cat in textlib.getCategoryLinks(self.text, site=self.site):
             if cat not in cats:
                 cats.append(cat)
 
@@ -1659,8 +1659,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
         if inPlace or self.namespace() == 10:
             oldtext = self.get(get_redirect=True)
-            newtext = pywikibot.replaceCategoryInPlace(oldtext, oldCat, newCat,
-                                                       site=self.site)
+            newtext = textlib.replaceCategoryInPlace(oldtext, oldCat, newCat,
+                                                     site=self.site)
         else:
             if newCat:
                 cats[cats.index(oldCat)] = Category(site, newCat.title(),
@@ -1670,7 +1670,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                 cats.pop(cats.index(oldCat))
             oldtext = self.get(get_redirect=True)
             try:
-                newtext = pywikibot.replaceCategoryLinks(oldtext, cats)
+                newtext = textlib.replaceCategoryLinks(oldtext, cats)
             except ValueError:
                 # Make sure that the only way replaceCategoryLinks() can return
                 # a ValueError is in the case of interwiki links to self.
