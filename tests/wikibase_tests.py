@@ -384,6 +384,25 @@ class TestPropertyPage(PywikibotTestCase):
         self.assertEquals(claim.type, 'globe-coordinate')
         self.assertEquals(claim.getType(), 'globecoordinate')
 
+    def test_get(self):
+        property_page = pywikibot.PropertyPage(wikidata, 'P625')
+        property_page.get()
+        self.assertEquals(property_page.type, 'globe-coordinate')
+
+    def test_new_claim(self):
+        """Test that PropertyPage.newClaim uses cached datatype."""
+        property_page = pywikibot.PropertyPage(wikidata, 'P625')
+        property_page.get()
+        claim = property_page.newClaim()
+        self.assertEquals(claim.type, 'globe-coordinate')
+
+        # Now verify that it isnt fetching the type from the property
+        # data in the repo by setting the cache to the incorrect type
+        # and checking that it is the cached value that is used.
+        property_page._type = 'wikibase-item'
+        claim = property_page.newClaim()
+        self.assertEquals(claim.type, 'wikibase-item')
+
 
 class TestClaimSetValue(PywikibotTestCase):
 
