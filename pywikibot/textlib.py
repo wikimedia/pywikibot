@@ -1191,10 +1191,21 @@ class TimeStripper(object):
         timeR = r'(?P<time>(?P<hour>[0-2]\d)[:\.h](?P<minute>[0-5]\d))'
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
         yearR = r'(?P<year>(19|20)\d\d)'
-        # if months name contain a dot, it needs to be escaped.
-        escaped_months = [re.escape(_) for _ in self.origNames2monthNum]
-        monthR = r'(?P<month>(%s))' % u'|'.join(escaped_months)
-        dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?'
+
+        # if months have 'digits' as names, they need to be
+        # removed; will be handled as digits in regex, adding d+{1,2}\.?
+        escaped_months = [_ for _ in self.origNames2monthNum if
+                          not _.strip('.').isdigit()]
+        escaped_months = [re.escape(_) for _ in escaped_months]
+
+        # work around for cs wiki: if month are in digits, we assume
+        # that format is dd. mm. (with dot and spaces optional)
+        if any(_.isdigit() for _ in self.origNames2monthNum):
+            monthR = r'(?P<month>(%s)|\d{1,2}\.?)' % u'|'.join(escaped_months)
+            dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?\s*[01]?\d\.?'
+        else:
+            monthR = r'(?P<month>(%s))' % u'|'.join(escaped_months)
+            dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?'
 
         self.ptimeR = re.compile(timeR)
         self.ptimeznR = re.compile(timeznR)
@@ -1230,11 +1241,11 @@ class TimeStripper(object):
             marker = self.findmarker(txt)
             # month and day format might be identical (e.g. see bug 69315),
             # avoid to wipe out day, after month is matched.
-            # replace all matches but the one before last, which is the day candidate.
+            # replace all matches but the last two
+            # (i.e. allow to search for dd. mm.)
             if pat == self.pmonthR:
-                txt = pat.sub(marker, txt, cnt - 2)
-                # matched month needs to be wiped out (last match of txt)
-                txt = re.sub(r'(.*)%s' % m.group(), r'\1%s' % marker, txt)
+                if cnt > 2:
+                    txt = pat.sub(marker, txt, cnt - 2)
             else:
                 txt = pat.sub(marker, txt)
             return (txt, m.groupdict())
@@ -1254,6 +1265,7 @@ class TimeStripper(object):
             line, matchDict = self.last_match_and_replace(line, pat)
             if matchDict:
                 dateDict.update(matchDict)
+
         # all fields matched -> date valid
         if all(g in dateDict for g in self.groups):
             # remove 'time' key, now splitted in hour/minute and not needed by datetime
