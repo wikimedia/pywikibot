@@ -83,6 +83,7 @@ auto_run_script_list = [
     'cfd',
     'clean_sandbox',
     'disambredir',
+    'imagerecat',
     'lonelypages',
     'misspelling',
     'revertbot',
@@ -215,7 +216,6 @@ class TestScriptMeta(type):
             if script_name in ['checkimages',     # bug 68613
                                'data_ingestion',  # bug 68611
                                'flickrripper',    # bug 68606 (and deps)
-                               'imagerecat',      # bug 68658
                                'upload',          # raises custom ValueError
                                ] or (
                     ((config.family != 'wikipedia' or config.mylang != 'en') and script_name == 'cfd') or
