@@ -17,7 +17,7 @@ import pywikibot
 import pywikibot.textlib as textlib
 from pywikibot import config
 
-from tests.utils import unittest, PywikibotTestCase
+from tests.utils import unittest, NoSiteTestCase, PywikibotTestCase
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")
@@ -27,9 +27,8 @@ for f in ["enwiki_help_editing"]:
                            'r', 'utf-8').read()
 
 
-class TestSectionFunctions(PywikibotTestCase):
+class TestSectionFunctions(NoSiteTestCase):
     def setUp(self):
-        self.site = pywikibot.Site('en', 'wikipedia')
         self.catresult1 = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
                            % {'LS': config.LS})
         super(TestSectionFunctions, self).setUp()
