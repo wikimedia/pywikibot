@@ -336,10 +336,16 @@ class Namespace(Iterable):
 
     def __repr__(self):
         """Return a reconstructable representation."""
-        return '%s(id=%d, custom_name=%r, canonical_name=%r, aliases=%r, ' \
-               'kwargs=%r)' \
+        if self.info:
+            kwargs = ', ' + ', '.join([key + '=' + repr(value)
+                                       for (key, value) in
+                                       [(key, self.info[key])
+                                        for key in sorted(self.info)]])
+        else:
+            kwargs = ''
+        return '%s(id=%d, custom_name=%r, canonical_name=%r, aliases=%r%s)' \
                % (self.__class__.__name__, self.id, self.custom_name,
-                  self.canonical_name, self.aliases, self.info)
+                  self.canonical_name, self.aliases, kwargs)
 
     @staticmethod
     def builtin_namespaces(use_image_name=False):

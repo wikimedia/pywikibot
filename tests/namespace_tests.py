@@ -182,6 +182,32 @@ class TestNamespaceObject(PywikibotTestCase):
         self.assertEquals(Namespace.normalize_name(u'::File:'), False)
         self.assertEquals(Namespace.normalize_name(u'::File::'), False)
 
+    def test_repr(self):
+        a = Namespace(id=0, canonical_name=u'Foo')
+        s = repr(a)
+        r = "Namespace(id=0, custom_name=u'Foo', canonical_name=u'Foo', aliases=[])"
+        self.assertEquals(s, r)
+
+        a.info['defaultcontentmodel'] = 'bar'
+        r = {'defaultcontentmodel': 'bar'}
+        self.assertEquals(a.info, r)
+
+        s = repr(a)
+        r = "Namespace(id=0, custom_name=u'Foo', canonical_name=u'Foo', aliases=[], defaultcontentmodel='bar')"
+        self.assertEquals(s, r)
+
+        a.info['case'] = 'upper'
+        r = {'defaultcontentmodel': 'bar', 'case': 'upper'}
+        self.assertEquals(a.info, r)
+
+        s = repr(a)
+        r = "Namespace(id=0, custom_name=u'Foo', canonical_name=u'Foo', aliases=[], case='upper', defaultcontentmodel='bar')"
+        self.assertEquals(s, r)
+
+        b = eval(repr(a))
+        self.assertEquals(a, b)
+        self.assertEquals(a.info, b.info)
+
 
 if __name__ == '__main__':
     try:
