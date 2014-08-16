@@ -157,7 +157,7 @@ class Request(MutableMapping):
         # otherwise be a problem.
         # This situation is only tripped when one of the first actions
         # on the site is a write action and the extension isn't installed.
-        if hasattr(self.site, "_extensions"):
+        if 'extensions' in self.site.siteinfo:
             use_assert_edit_extension = self.site.hasExtension('AssertEdit', False)
         else:
             use_assert_edit_extension = True

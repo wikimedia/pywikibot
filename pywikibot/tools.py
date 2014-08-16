@@ -10,6 +10,7 @@ __version__ = '$Id$'
 import sys
 import threading
 import time
+from collections import Mapping
 
 if sys.version_info[0] > 2:
     import queue as Queue
@@ -214,6 +215,44 @@ class ThreadList(list):
             time.sleep(2)
         list.append(self, thd)
         thd.start()
+
+
+class CombinedError(KeyError, IndexError):
+
+    """An error that gets caught by both KeyError and IndexError."""
+
+
+class EmptyDefault(str, Mapping):
+
+    """
+    A default for a not existing siteinfo property.
+
+    It should be chosen if there is no better default known. It acts like an
+    empty collections, so it can be iterated through it savely if treated as a
+    list, tuple, set or dictionary. It is also basically an empty string.
+
+    Accessing a value via __getitem__ will result in an combined KeyError and
+    IndexError.
+    """
+
+    def __init__(self):
+        """Initialise the default as an empty string."""
+        str.__init__(self)
+
+    # http://stackoverflow.com/a/13243870/473890
+    def _empty_iter(self):
+        """An iterator which does nothing."""
+        return
+        yield
+
+    def __getitem__(self, key):
+        """Raise always a L{CombinedError}."""
+        raise CombinedError(key)
+
+    iteritems = itervalues = iterkeys = __iter__ = _empty_iter
+
+
+EMPTY_DEFAULT = EmptyDefault()
 
 
 if __name__ == "__main__":
