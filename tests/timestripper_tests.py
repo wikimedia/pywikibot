@@ -9,19 +9,22 @@ __version__ = '$Id$'
 
 import datetime
 
-import pywikibot
-from tests.utils import PywikibotTestCase, unittest
 from pywikibot.textlib import TimeStripper, tzoneFixedOffset
+from tests.aspects import unittest, TestCase
 
 
-class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
+class TestTimeStripperWithNoDigitsAsMonths(TestCase):
 
     """Test cases for TimeStripper methods."""
 
+    family = 'wikipedia'
+    code = 'fr'
+
+    cached = True
+
     def setUp(self):
-        site = pywikibot.Site('fr', 'wikipedia')
-        self.ts = TimeStripper(site)
         super(TestTimeStripperWithNoDigitsAsMonths, self).setUp()
+        self.ts = TimeStripper(self.get_site())
 
     def test_findmarker(self):
         """Test that string which is not part of text is found."""
@@ -72,33 +75,27 @@ class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
                           None)
                          )
 
-    def test_timestripper(self):
-        """Test that correct date is matched."""
-        txtMatch = u'3 février 2010 à 19:48 (CET) 7 février 2010 à 19:48 (CET)'
-        txtNoMatch = u'3 March 2010 19:48 (CET) 7 March 2010 19:48 (CET)'
+    def test_hour(self):
+        """Test that correct hour is matched."""
         txtHourInRange = u'7 février 2010 à 23:00 (CET)'
         txtHourOutOfRange = u'7 février 2010 à 24:00 (CET)'
-
-        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
-                                 self.ts.site.siteinfo['timezone'])
-
-        res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
-
-        self.assertEqual(self.ts.timestripper(txtMatch), res)
-        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
         self.assertNotEqual(self.ts.timestripper(txtHourInRange), None)
         self.assertEqual(self.ts.timestripper(txtHourOutOfRange), None)
 
 
-class TestTimeStripperWithDigitsAsMonths(PywikibotTestCase):
+class TestTimeStripperWithDigitsAsMonths(TestCase):
 
-    """Test cases for TimeStripper methods."""
+    """Test cases for TimeStripper methods"""
+
+    family = 'wikipedia'
+    code = 'cs'
+
+    cached = True
 
     def setUp(self):
-        site = pywikibot.Site('cs', 'wikipedia')
-        self.ts = TimeStripper(site)
         super(TestTimeStripperWithDigitsAsMonths, self).setUp()
+        self.ts = TimeStripper(self.get_site())
 
     def test_last_match_and_replace(self):
         """Test that pattern matches and removes items correctly."""
@@ -125,144 +122,97 @@ class TestTimeStripperWithDigitsAsMonths(PywikibotTestCase):
                           None)
                          )
 
-    def test_timestripper(self):
-        txtMatch = u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)'
-        txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
+
+class TestTimeStripperLanguage(TestCase):
+
+    """Test cases for English language"""
+
+    sites = {
+        'cswiki': {
+            'family': 'wikipedia',
+            'code': 'cs',
+            'match': u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
+        },
+        'enwiki': {
+            'family': 'wikipedia',
+            'code': 'en',
+            'match': u'3 February 2010 19:48 (UTC) 7 February 2010 19:48 (UTC)',
+            'nomatch': u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
+        },
+        'frwiki': {
+            'family': 'wikipedia',
+            'code': 'fr',
+            'match': u'3 février 2010 à 19:48 (CET) 7 février 2010 à 19:48 (CET)',
+            'nomatch': u'3 March 2010 19:48 (CET) 7 March 2010 19:48 (CET)',
+        },
+        'nowiki': {
+            'family': 'wikipedia',
+            'code': 'no',
+            'match': u'3. feb 2010 kl. 19:48 (CET) 7. feb 2010 kl. 19:48 (UTC)',
+        },
+        'ptwiki': {
+            'family': 'wikipedia',
+            'code': 'pt',
+            'match': u'19h48min de 3 de fevereiro de 2010‎ (UTC) 19h48min de 7 de fevereiro de 2010‎ (UTC)',
+        },
+        'viwiki': {
+            'family': 'wikipedia',
+            'code': 'vi',
+            'match': u'19:48, ngày 15 tháng 9 năm 2008 (UTC) 19:48, ngày 7 tháng 2 năm 2010 (UTC)',
+            'match2': u'16:41, ngày 15 tháng 9 năm 2008 (UTC) 16:41, ngày 12 tháng 9 năm 2008 (UTC)',
+            'match3':  u'21:18, ngày 13 tháng 8 năm 2014 (UTC) 21:18, ngày 14 tháng 8 năm 2014 (UTC)',
+            'nomatch1': u'21:18, ngày 13 March 8 năm 2014 (UTC) 21:18, ngày 14 March 8 năm 2014 (UTC)',
+        },
+    }
+
+    cached = True
+
+    def test_timestripper_match(self, key):
+        """Test that correct date is matched."""
+        self.ts = TimeStripper(self.get_site(key))
 
         tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
                                  self.ts.site.siteinfo['timezone'])
+
+        txtMatch = self.sites[key]['match']
 
         res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
 
         self.assertEqual(self.ts.timestripper(txtMatch), res)
-        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
+        if 'match2' not in self.sites[key]:
+            return
 
-class TestEnglishTimeStripper(PywikibotTestCase):
-
-    """Test cases for English language."""
-
-    def setUp(self):
-        site = pywikibot.Site('en', 'wikipedia')
-        self.ts = TimeStripper(site)
-        super(TestEnglishTimeStripper, self).setUp()
-
-    def test_timestripper(self):
-        """Test that correct date is matched."""
-        txtMatch = u'3 February 2010 19:48 (UTC) 7 February 2010 19:48 (UTC)'
-        txtNoMatch = u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)'
-
-        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
-                                 self.ts.site.siteinfo['timezone'])
-
-        res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
-
-        self.assertEqual(self.ts.timestripper(txtMatch), res)
-        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
-
-
-class TestCzechTimeStripper(PywikibotTestCase):
-
-    """Test cases for Czech language."""
-
-    def setUp(self):
-        site = pywikibot.Site('cs', 'wikipedia')
-        self.ts = TimeStripper(site)
-        super(TestCzechTimeStripper, self).setUp()
-
-    def test_timestripper(self):
-        """Test that correct date is matched."""
-        txtMatch = u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)'
-        txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
-
-        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
-                                 self.ts.site.siteinfo['timezone'])
-
-        res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
-
-        self.assertEqual(self.ts.timestripper(txtMatch), res)
-        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
-
-
-class TestPortugueseTimeStripper(PywikibotTestCase):
-
-    """Test cases for Portuguese language."""
-
-    def setUp(self):
-        site = pywikibot.Site('pt', 'wikipedia')
-        self.ts = TimeStripper(site)
-        super(TestPortugueseTimeStripper, self).setUp()
-
-    def test_timestripper(self):
-        """Test that correct date is matched."""
-        txtMatch = u'19h48min de 3 de fevereiro de 2010‎ (UTC) 19h48min de 7 de fevereiro de 2010‎ (UTC)'
-        txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
-
-        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
-                                 self.ts.site.siteinfo['timezone'])
-
-        res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
-
-        self.assertEqual(self.ts.timestripper(txtMatch), res)
-        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
-
-
-class TestNorwegianTimeStripper(PywikibotTestCase):
-
-    """Test cases for Norwegian language."""
-
-    def setUp(self):
-        site = pywikibot.Site('no', 'wikipedia')
-        self.ts = TimeStripper(site)
-        super(TestNorwegianTimeStripper, self).setUp()
-
-    def test_timestripper(self):
-        """Test that correct date is matched."""
-        txtMatch = u'3. feb 2010 kl. 19:48 (CET) 7. feb 2010 kl. 19:48 (UTC)'
-        txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
-
-        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
-                                 self.ts.site.siteinfo['timezone'])
-
-        res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
-
-        self.assertEqual(self.ts.timestripper(txtMatch), res)
-        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
-
-
-class TestVietnameseTimeStripper(PywikibotTestCase):
-
-    """Test cases for Vietnamese language."""
-
-    def setUp(self):
-        site = pywikibot.Site('vi', 'wikipedia')
-        self.ts = TimeStripper(site)
-        super(TestVietnameseTimeStripper, self).setUp()
-
-    def test_timestripper_01(self):
-        """Test that correct date is matched."""
-        txtMatch = u'16:41, ngày 15 tháng 9 năm 2008 (UTC) 16:41, ngày 12 tháng 9 năm 2008 (UTC)'
-        txtNoMatch = u'16:41, ngày 15 March 9 năm 2008 (UTC) 16:41, ngày 12 March 9 năm 2008 (UTC)'
-
-        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
-                                 self.ts.site.siteinfo['timezone'])
+        txtMatch = self.sites[key]['match2']
 
         res = datetime.datetime(2008, 9, 12, 16, 41, tzinfo=tzone)
 
         self.assertEqual(self.ts.timestripper(txtMatch), res)
-        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
-    def test_timestripper_02(self):
-        """Test that correct date is matched."""
-        txtMatch = u'21:18, ngày 13 tháng 8 năm 2014 (UTC) 21:18, ngày 14 tháng 8 năm 2014 (UTC)'
-        txtNoMatch = u'21:18, ngày 13 March 8 năm 2014 (UTC) 21:18, ngày 14 March 8 năm 2014 (UTC)'
+        if 'match3' not in self.sites[key]:
+            return
 
-        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
-                                 self.ts.site.siteinfo['timezone'])
+        txtMatch = self.sites[key]['match3']
 
         res = datetime.datetime(2014, 8, 14, 21, 18, tzinfo=tzone)
 
         self.assertEqual(self.ts.timestripper(txtMatch), res)
+
+    def test_timestripper_nomatch(self, key):
+        """Test that correct date is not matched."""
+        self.ts = TimeStripper(self.get_site(key))
+
+        if 'nomatch' in self.sites[key]:
+            txtNoMatch = self.sites[key]['nomatch']
+        else:
+            txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
+
+        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
+
+        if 'nomatch1' not in self.sites[key]:
+            return
+
+        txtNoMatch = self.sites[key]['nomatch1']
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
 

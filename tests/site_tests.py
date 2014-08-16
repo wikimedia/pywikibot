@@ -16,7 +16,7 @@ import re
 
 import pywikibot
 from pywikibot.exceptions import Error, NoPage
-from tests.utils import SiteTestCase, PywikibotTestCase, unittest
+from tests.aspects import unittest, TestCase
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -27,17 +27,20 @@ mainpage = None
 imagepage = None
 
 
-class TestSiteObject(PywikibotTestCase):
+class TestSiteObject(TestCase):
 
     """Test cases for Site methods."""
 
     family = "wikipedia"
     code = "en"
 
+    cached = True
+
     @classmethod
     def setUpClass(cls):
         global mysite, mainpage, imagepage
-        mysite = pywikibot.Site(cls.code, cls.family)
+        super(TestSiteObject, cls).setUpClass()
+        mysite = cls.get_site()
         mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
         imagepage = next(iter(mainpage.imagelinks()))  # 1st image on main page
 
@@ -1050,16 +1053,20 @@ class TestSiteObject(PywikibotTestCase):
                               page_from, 'Main Page', 'test')
 
 
-class TestSiteLoadRevisions(PywikibotTestCase):
+class TestSiteLoadRevisions(TestCase):
 
     """Test cases for Site.loadrevision() method."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
     def setUp(self):
         super(TestSiteLoadRevisions, self).setUp()
-        code, family = "en", "wikipedia"
-        self.mysite = pywikibot.Site(code, family)
+        self.mysite = self.get_site()
         self.mainpage = pywikibot.Page(pywikibot.Link("Main Page", self.mysite))
 
     def testLoadRevisions_basic(self):
@@ -1164,15 +1171,17 @@ class TestSiteLoadRevisions(PywikibotTestCase):
         # TODO test other optional arguments
 
 
-class TestCommonsSite(PywikibotTestCase):
+class TestCommonsSite(TestCase):
 
     """Test cases for Site methods on Commons."""
 
     family = "commons"
     code = "commons"
 
+    cached = True
+
     def testInterWikiForward(self):
-        self.site = pywikibot.Site(self.code, self.family)
+        self.site = self.get_site()
         self.mainpage = pywikibot.Page(pywikibot.Link("Main Page", self.site))
         # test pagelanglinks on commons,
         # which forwards interwikis to wikipedia
@@ -1181,13 +1190,24 @@ class TestCommonsSite(PywikibotTestCase):
         self.assertEqual(ll.site.family.name, 'wikipedia')
 
 
-class TestUploadEnabledSite(SiteTestCase):
+class TestUploadEnabledSite(TestCase):
+
+    sites = {
+        'wikidatatest': {
+            'family': 'wikidata',
+            'code': 'test',
+        },
+        'wikipediatest': {
+            'family': 'wikipedia',
+            'code': 'test',
+        }
+    }
 
     def test_is_uploaddisabled(self):
-        site = pywikibot.Site('test', 'wikipedia')
+        site = self.get_site('wikipediatest')
         self.assertFalse(site.is_uploaddisabled())
 
-        site = pywikibot.Site('test', 'wikidata')
+        site = self.get_site('wikidatatest')
         self.assertTrue(site.is_uploaddisabled())
 
 

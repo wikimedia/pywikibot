@@ -11,7 +11,8 @@ import pywikibot
 from pywikibot.site import must_be, need_version
 from pywikibot.comms.http import user_agent
 
-from tests.utils import unittest, NoSiteTestCase, DummySiteinfo
+from tests.utils import DummySiteinfo
+from tests.aspects import unittest, TestCase
 
 
 class DrySite(pywikibot.site.APISite):
@@ -26,7 +27,10 @@ class DrySite(pywikibot.site.APISite):
         return DummySiteinfo({})
 
 
-class TestDrySite(NoSiteTestCase):
+class TestDrySite(TestCase):
+
+    net = False
+
     def test_logged_in(self):
         x = DrySite('en', 'wikipedia')
 
@@ -96,9 +100,11 @@ class TestDrySite(NoSiteTestCase):
                          user_agent(x, format_string='Foo ({script_comments})'))
 
 
-class TestMustBe(NoSiteTestCase):
+class TestMustBe(TestCase):
 
     """Test cases for the must_be decorator."""
+
+    net = False
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
@@ -161,9 +167,11 @@ class TestMustBe(NoSiteTestCase):
         self.assertRaises(pywikibot.NoSuchSite, self.call_this_user_req_function, args, kwargs)
 
 
-class TestNeedVersion(NoSiteTestCase):
+class TestNeedVersion(TestCase):
 
     """Test cases for the need_version decorator."""
+
+    net = False
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'

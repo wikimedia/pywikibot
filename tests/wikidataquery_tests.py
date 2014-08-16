@@ -10,7 +10,7 @@ __version__ = '$Id$'
 
 
 import pywikibot.data.wikidataquery as query
-from tests.utils import unittest, NoSiteTestCase, PywikibotTestCase
+from tests.aspects import unittest, WikidataTestCase, TestCase
 
 import pywikibot
 from pywikibot.page import ItemPage, PropertyPage, Claim
@@ -19,11 +19,11 @@ import os
 import time
 
 
-class TestApiFunctions(PywikibotTestCase):
+class TestApiFunctions(WikidataTestCase):
 
     def setUp(self):
         super(TestApiFunctions, self).setUp()
-        self.repo = pywikibot.Site('wikidata', 'wikidata').data_repository()
+        self.repo = self.get_repo()
 
     def testQueries(self):
         """
@@ -215,7 +215,7 @@ class TestApiFunctions(PywikibotTestCase):
         self.assertEqual(qs, "q=link%5Benwiki%5D&labels=en,fr&props=prop")
 
 
-class TestApiSlowFunctions(NoSiteTestCase):
+class TestApiSlowFunctions(TestCase):
 
     net = True
 

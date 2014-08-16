@@ -9,7 +9,7 @@ __version__ = '$Id$'
 
 from collections import Iterable
 from pywikibot.site import Namespace
-from tests.utils import NoSiteTestCase, unittest
+from tests.aspects import unittest, TestCase
 
 import sys
 if sys.version_info[0] > 2:
@@ -17,9 +17,11 @@ if sys.version_info[0] > 2:
     unicode = str
 
 
-class TestNamespaceObject(NoSiteTestCase):
+class TestNamespaceObject(TestCase):
 
     """Test cases for Namespace class."""
+
+    net = False
 
     # These should work in any MW wiki
     builtin_ids = {

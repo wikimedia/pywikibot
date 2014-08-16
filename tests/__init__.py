@@ -172,6 +172,10 @@ CachedRequest._get_cache_dir = staticmethod(
     lambda *args: CachedRequest._make_dir(_cache_dir))
 
 
+cache_misses = 0
+cache_hits = 0
+
+
 class TestRequest(CachedRequest):
 
     """Add caching to every Request except logins."""
@@ -186,11 +190,16 @@ class TestRequest(CachedRequest):
     def _load_cache(self):
         """Return whether the cache can be used."""
         if not super(TestRequest, self)._load_cache():
+            global cache_misses
+            cache_misses += 1
             return False
 
         if 'lgpassword' in self._uniquedescriptionstr():
             self._data = None
             return False
+
+        global cache_hits
+        cache_hits += 1
 
         return True
 

@@ -9,16 +9,18 @@ __version__ = '$Id$'
 import datetime
 import pywikibot
 import pywikibot.data.api as api
-from tests.utils import unittest
-from tests.utils import SiteTestCase, CachedTestCase
-
-mysite = pywikibot.Site('en', 'wikipedia')
+from tests.aspects import unittest, TestCase
 
 
-class TestApiFunctions(CachedTestCase):
+class TestApiFunctions(TestCase):
+
+    family = 'wikipedia'
+    code = 'en'
+    cached = True
 
     def testObjectCreation(self):
         """Test that api.Request() creates an object with desired attributes"""
+        mysite = self.get_site()
         req = api.Request(site=mysite, action="test", foo="", bar="test")
         self.assertTrue(req)
         self.assertEqual(req.site, mysite)
@@ -35,9 +37,16 @@ class TestApiFunctions(CachedTestCase):
             self.assertEqual(len(item), 2, item)
 
 
-class TestPageGenerator(CachedTestCase):
+class TestPageGenerator(TestCase):
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
+
     def setUp(self):
         super(TestPageGenerator, self).setUp()
+        mysite = self.get_site()
         self.gen = api.PageGenerator(site=mysite,
                                      generator="links",
                                      titles="User:R'n'B")
@@ -67,6 +76,7 @@ class TestPageGenerator(CachedTestCase):
         """Test that PageGenerator yields pages with expected attributes."""
         titles = ["Broadcaster.com", "Broadcaster (definition)",
                   "Wiktionary", "Wikipedia:Disambiguation"]
+        mysite = self.get_site()
         results = [p for p in self.gen]
         self.assertEqual(len(results), 4)
         for page in results:
@@ -109,8 +119,20 @@ class TestPageGenerator(CachedTestCase):
         self.assertEqual(len(results), 4)  # total=-1 but 4 expected
 
 
-class TestCachedRequest(SiteTestCase):
+class TestCachedRequest(TestCase):
+
+    """Test API Request caching.
+
+    This test class does not use the forced test caching.
+    """
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = False
+
     def testResults(self):
+        mysite = self.get_site()
         # Run the cached query twice to ensure the
         # data returned is equal
         params = {'action': 'query',

@@ -14,10 +14,10 @@ else:
     from urllib.parse import urlparse
 
 import pywikibot.weblib as weblib
-from tests.utils import unittest, NoSiteTestCase
+from tests.aspects import unittest, TestCase
 
 
-class TestArchiveSites(NoSiteTestCase):
+class TestArchiveSites(TestCase):
 
     net = True
 
@@ -25,6 +25,7 @@ class TestArchiveSites(NoSiteTestCase):
     def setUpClass(cls):
         if os.environ.get('TRAVIS', 'false') == 'true':
             raise unittest.SkipTest('Weblib tests are disabled on Travis-CI')
+        super(TestArchiveSites, cls).setUpClass()
 
     def testInternetArchiveNewest(self):
         archivedversion = weblib.getInternetArchiveURL('https://google.com')

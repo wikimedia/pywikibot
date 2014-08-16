@@ -11,7 +11,7 @@ import sys
 import subprocess
 import pywikibot
 
-from tests.utils import unittest, SiteTestCase
+from tests.aspects import unittest, TestCase
 
 pypath = sys.executable
 basepath = os.path.split(os.path.split(__file__)[0])[0]
@@ -23,7 +23,7 @@ def check_output(command):
     return subprocess.Popen(command, stdout=subprocess.PIPE).communicate()[0]
 
 
-class TestPwb(SiteTestCase):
+class TestPwb(TestCase):
 
     """
     Test pwb.py functionality.
@@ -31,6 +31,10 @@ class TestPwb(SiteTestCase):
     This is registered as a Site test because it will not run
     without a user-config.py
     """
+
+    pwb = True
+    net = True
+    site = True
 
     def setUp(self):
         self.oldenviron = os.environ.copy()

@@ -17,12 +17,7 @@ from pywikibot.data.api import APIError
 import json
 import copy
 
-from tests.utils import PywikibotTestCase, unittest
-
-site = pywikibot.Site('en', 'wikipedia')
-mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
-wikidata = site.data_repository()
-wikidatatest = pywikibot.Site('test', 'wikidata').data_repository()
+from tests.aspects import unittest, WikidataTestCase, TestCase
 
 
 # fetch a page which is very likely to be unconnected, which doesnt have
@@ -35,15 +30,19 @@ def _get_test_unconnected_page(site):
             return page
 
 
-class TestGeneral(PywikibotTestCase):
+class TestGeneral(WikidataTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestGeneral, cls).setUpClass()
+        enwiki = pywikibot.Site('en', 'wikipedia')
+        cls.mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", enwiki))
 
     def testWikibase(self):
-        if not site.has_transcluded_data:
-            return
-        repo = site.data_repository()
+        repo = self.get_repo()
         item_namespace = repo.namespaces()[0]
         self.assertEqual(item_namespace.defaultcontentmodel, 'wikibase-item')
-        item = pywikibot.ItemPage.fromPage(mainpage)
+        item = pywikibot.ItemPage.fromPage(self.mainpage)
         self.assertIsInstance(item, pywikibot.ItemPage)
         self.assertEqual(item.getID(), 'Q5296')
         self.assertEqual(item.title(), 'Q5296')
@@ -65,10 +64,10 @@ class TestGeneral(PywikibotTestCase):
         self.assertEqual(claim._formatValue(), {'entity-type': 'item', 'numeric-id': 1})
 
         # test WbTime
-        t = pywikibot.WbTime(site=wikidata, year=2010, hour=12, minute=43)
+        t = pywikibot.WbTime(site=repo, year=2010, hour=12, minute=43)
         self.assertEqual(t.toTimestr(), '+00000002010-01-01T12:43:00Z')
-        self.assertRaises(ValueError, pywikibot.WbTime, site=wikidata, precision=15)
-        self.assertRaises(ValueError, pywikibot.WbTime, site=wikidata, precision='invalid_precision')
+        self.assertRaises(ValueError, pywikibot.WbTime, site=repo, precision=15)
+        self.assertRaises(ValueError, pywikibot.WbTime, site=repo, precision='invalid_precision')
 
         # test WbQuantity
         q = pywikibot.WbQuantity(amount=1234, error=1)
@@ -109,45 +108,17 @@ class TestGeneral(PywikibotTestCase):
                           unit='invalid_unit')
 
         # test WikibasePage.__cmp__
-        self.assertEqual(pywikibot.ItemPage.fromPage(mainpage),
+        self.assertEqual(pywikibot.ItemPage.fromPage(self.mainpage),
                          pywikibot.ItemPage(repo, 'q5296'))
 
     def testItemPageExtensionability(self):
         class MyItemPage(pywikibot.ItemPage):
             pass
-        self.assertIsInstance(MyItemPage.fromPage(mainpage), MyItemPage)
-
-    def test_not_supported_family(self):
-        """Test that family without a data repository causes error."""
-        # Wikispecies is not supported by Wikidata yet.
-        species_site = pywikibot.Site('species', 'species')
-        self.wdp = pywikibot.Page(species_site, 'Main Page')
-        self.assertRaises(pywikibot.WikiBaseError,
-                          pywikibot.ItemPage.fromPage, self.wdp)
-        self.assertRaisesRegexp(pywikibot.WikiBaseError,
-                                'species.*no transcluded data',
-                                self.wdp.data_item)
-
-    def test_own_client(self):
-        """Test that a data repository family can be its own client."""
-        # Note: these tests do not yet verify that pywikibot can
-        # utilise this Wikibase configuration, as it is not yet
-        # working correctly on Wikidata.
-
-        # The main Wikidata is its own client.
-        self.wdp = pywikibot.Page(wikidata,
-                                  wikidata.siteinfo['mainpage'])
-        item = pywikibot.ItemPage.fromPage(self.wdp)
-        self.assertEqual(item.site, self.wdp.site)
-
-        # test.wikidata is also
-        self.wdp = pywikibot.Page(wikidatatest,
-                                  wikidatatest.siteinfo['mainpage'])
-        item = pywikibot.ItemPage.fromPage(self.wdp)
-        self.assertEqual(item.site, self.wdp.site)
+        self.assertIsInstance(MyItemPage.fromPage(self.mainpage), MyItemPage)
 
 
-class TestItemLoad(PywikibotTestCase):
+class TestItemLoad(WikidataTestCase):
+
     """Test each of the three code paths for item creation:
        1. by Q id
        2. ItemPage.fromPage(page)
@@ -159,7 +130,27 @@ class TestItemLoad(PywikibotTestCase):
        3. missing pages to fromPage
        4. unconnected pages to fromPage
     """
+
+    sites = {
+        'wikidata': {
+            'family': 'wikidata',
+            'code': 'wikidata',
+        },
+        'enwiki': {
+            'family': 'wikipedia',
+            'code': 'en',
+        }
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        global wikidata
+        super(TestItemLoad, cls).setUpClass()
+        cls.site = cls.get_site('enwiki')
+        cls.nyc = pywikibot.Page(pywikibot.page.Link("New York City", cls.site))
+
     def test_item_normal(self):
+        wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, 'Q60')
         self.assertEqual(item._link._title, 'Q60')
         self.assertEqual(item.id, 'Q60')
@@ -174,6 +165,7 @@ class TestItemLoad(PywikibotTestCase):
 
     def test_load_item_set_id(self):
         """Test setting item.id attribute on empty item."""
+        wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, '-1')
         self.assertEqual(item._link._title, '-1')
         item.id = 'Q60'
@@ -194,6 +186,7 @@ class TestItemLoad(PywikibotTestCase):
         but modifying item.id does not currently work, and this test
         highlights that it breaks silently.
         """
+        wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, 'Q60')
         item.get()
         self.assertEqual(item.labels['en'], 'New York City')
@@ -215,9 +208,12 @@ class TestItemLoad(PywikibotTestCase):
     def test_empty_item(self):
         # should not raise an error as the constructor only requires
         # the site parameter, with the title parameter defaulted to None
+        wikidata = self.get_repo()
         self.assertRaises(TypeError, pywikibot.ItemPage, wikidata)
 
     def test_item_invalid_titles(self):
+
+        wikidata = self.get_repo()
 
         def check(title, exception):
             item = pywikibot.ItemPage(wikidata, title)
@@ -239,12 +235,14 @@ class TestItemLoad(PywikibotTestCase):
             check(title, APIError)
 
     def test_item_untrimmed_title(self):
+        wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, ' Q60 ')
         self.assertEqual(item._link._title, 'Q60')
         self.assertEqual(item.title(), 'Q60')
         item.get()
 
     def test_item_missing(self):
+        wikidata = self.get_repo()
         # this item is deleted
         item = pywikibot.ItemPage(wikidata, 'Q404')
         self.assertEqual(item._link._title, 'Q404')
@@ -261,7 +259,7 @@ class TestItemLoad(PywikibotTestCase):
         self.assertEqual(item.exists(), False)
 
     def test_fromPage_noprops(self):
-        page = pywikibot.Page(pywikibot.page.Link("New York City", site))
+        page = self.nyc
         item = pywikibot.ItemPage.fromPage(page)
         self.assertEqual(item._link._title, 'Null')  # not good
         self.assertEqual(hasattr(item, 'id'), False)
@@ -275,7 +273,7 @@ class TestItemLoad(PywikibotTestCase):
         self.assertEqual(item.exists(), True)
 
     def test_fromPage_props(self):
-        page = pywikibot.Page(pywikibot.page.Link("New York City", site))
+        page = self.nyc
         # fetch page properties
         page.properties()
         item = pywikibot.ItemPage.fromPage(page)
@@ -293,7 +291,7 @@ class TestItemLoad(PywikibotTestCase):
         self.assertEqual(item.exists(), True)
 
     def test_fromPage_invalid_title(self):
-        page = pywikibot.Page(pywikibot.page.Link("[]", site))
+        page = pywikibot.Page(pywikibot.page.Link("[]", self.site))
         self.assertRaises(pywikibot.InvalidTitle, pywikibot.ItemPage.fromPage, page)
 
     def _test_fromPage_noitem(self, link):
@@ -341,24 +339,24 @@ class TestItemLoad(PywikibotTestCase):
 
     def test_fromPage_redirect(self):
         # this is a redirect, and should not have a wikidata item
-        link = pywikibot.page.Link("Main page", site)
+        link = pywikibot.page.Link("Main page", self.site)
         self._test_fromPage_noitem(link)
 
     def test_fromPage_missing(self):
         # this is a deleted page, and should not have a wikidata item
-        link = pywikibot.page.Link("Test page", site)
+        link = pywikibot.page.Link("Test page", self.site)
         self._test_fromPage_noitem(link)
 
     def test_fromPage_noitem(self):
         # this is a new page, and should not have a wikidata item yet
-        page = _get_test_unconnected_page(site)
+        page = _get_test_unconnected_page(self.site)
         link = page._link
         self._test_fromPage_noitem(link)
 
     def test_fromPage_missing_lazy(self):
         """Test lazy loading of item from nonexistent source page."""
         # this is a deleted page, and should not have a wikidata item
-        link = pywikibot.page.Link("Test page", site)
+        link = pywikibot.page.Link("Test page", self.site)
         page = pywikibot.Page(link)
         item = pywikibot.ItemPage.fromPage(page)
 
@@ -371,30 +369,34 @@ class TestItemLoad(PywikibotTestCase):
         self.assertRaisesRegexp(pywikibot.NoPage, 'Test page', item.get)
 
 
-class TestRedirects(PywikibotTestCase):
+class TestRedirects(WikidataTestCase):
 
     """Test redirect and non-redirect items."""
 
     def test_normal_item(self):
+        wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, 'Q1')
         self.assertFalse(item.isRedirectPage())
         self.assertRaises(pywikibot.IsNotRedirectPage, item.getRedirectTarget)
 
     def test_redirect_item(self):
+        wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, 'Q10008448')
         target = pywikibot.ItemPage(wikidata, 'Q8422626')
         self.assertTrue(item.isRedirectPage())
         self.assertEqual(item.getRedirectTarget(), target)
 
 
-class TestPropertyPage(PywikibotTestCase):
+class TestPropertyPage(WikidataTestCase):
 
     def test_property_empty_property(self):
         """Test creating a PropertyPage without a title."""
+        wikidata = self.get_repo()
         self.assertRaises(pywikibot.Error, pywikibot.PropertyPage, wikidata)
 
     def test_globe_coordinate(self):
         """Test a coordinate PropertyPage has the correct type."""
+        wikidata = self.get_repo()
         property_page = pywikibot.PropertyPage(wikidata, 'P625')
         self.assertEqual(property_page.type, 'globe-coordinate')
         self.assertEqual(property_page.getType(), 'globecoordinate')
@@ -404,34 +406,38 @@ class TestPropertyPage(PywikibotTestCase):
         self.assertEqual(claim.getType(), 'globecoordinate')
 
     def test_get(self):
+        wikidata = self.get_repo()
         property_page = pywikibot.PropertyPage(wikidata, 'P625')
         property_page.get()
-        self.assertEquals(property_page.type, 'globe-coordinate')
+        self.assertEqual(property_page.type, 'globe-coordinate')
 
     def test_new_claim(self):
         """Test that PropertyPage.newClaim uses cached datatype."""
+        wikidata = self.get_repo()
         property_page = pywikibot.PropertyPage(wikidata, 'P625')
         property_page.get()
         claim = property_page.newClaim()
-        self.assertEquals(claim.type, 'globe-coordinate')
+        self.assertEqual(claim.type, 'globe-coordinate')
 
         # Now verify that it isnt fetching the type from the property
         # data in the repo by setting the cache to the incorrect type
         # and checking that it is the cached value that is used.
         property_page._type = 'wikibase-item'
         claim = property_page.newClaim()
-        self.assertEquals(claim.type, 'wikibase-item')
+        self.assertEqual(claim.type, 'wikibase-item')
 
 
-class TestClaimSetValue(PywikibotTestCase):
+class TestClaimSetValue(WikidataTestCase):
 
     def test_set_website(self):
+        wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P856')
         self.assertEqual(claim.type, 'url')
         claim.setTarget('https://en.wikipedia.org/')
         self.assertEqual(claim.target, 'https://en.wikipedia.org/')
 
     def test_set_date(self):
+        wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P569')
         self.assertEqual(claim.type, 'time')
         claim.setTarget(pywikibot.WbTime(year=2001, month=1, day=1, site=wikidata))
@@ -440,17 +446,23 @@ class TestClaimSetValue(PywikibotTestCase):
         self.assertEqual(claim.target.day, 1)
 
     def test_set_incorrect_target_value(self):
+        wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P569')
         self.assertRaises(ValueError, claim.setTarget, 'foo')
         claim = pywikibot.Claim(wikidata, 'P856')
         self.assertRaises(ValueError, claim.setTarget, pywikibot.WbTime(2001, site=wikidata))
 
 
-class TestPageMethods(PywikibotTestCase):
+class TestPageMethods(WikidataTestCase):
+
     """Test cases to test methods of Page() behave correctly with Wikibase"""
+
+    family = 'wikidata'
+    code = 'test'
 
     def test_page_methods(self):
         """Test ItemPage methods inherited from superclass Page."""
+        wikidatatest = self.get_repo()
         self.wdp = pywikibot.ItemPage(wikidatatest, 'Q6')
         self.assertRaises(pywikibot.PageNotSaved, self.wdp.save)
         self.wdp.previousRevision()
@@ -460,20 +472,36 @@ class TestPageMethods(PywikibotTestCase):
         self.wdp.templatesWithParams()
 
 
-class TestLinks(PywikibotTestCase):
+class TestLinks(WikidataTestCase):
 
-    """Test cases to test links stored in Wikidata."""
+    """Test cases to test links stored in Wikidata.
+
+    Uses a stored data file for the wikibase item.
+    However wikibase creates site objects for each sitelink, and the unit test
+    directly creates a Site for 'wikipedia:af' to use in a comparison.
+    """
+
+    sites = {
+        'wikidata': {
+            'family': 'wikidata',
+            'code': 'wikidata',
+        },
+        'afwiki': {
+            'family': 'wikipedia',
+            'code': 'af',
+        }
+    }
 
     def setUp(self):
         super(TestLinks, self).setUp()
-        self.wdp = pywikibot.ItemPage(wikidata, 'Q60')
+        self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
         self.wdp.id = 'Q60'
         self.wdp._content = json.load(open(os.path.join(os.path.split(__file__)[0], 'pages', 'Q60_only_sitelinks.wd')))
         self.wdp.get()
 
     def test_iterlinks_page_object(self):
         page = [pg for pg in self.wdp.iterlinks() if pg.site.language() == 'af'][0]
-        self.assertEqual(page, pywikibot.Page(pywikibot.Site('af', 'wikipedia'), u'New York Stad'))
+        self.assertEqual(page, pywikibot.Page(self.get_site('afwiki'), u'New York Stad'))
 
     def test_iterlinks_filtering(self):
         wikilinks = list(self.wdp.iterlinks('wikipedia'))
@@ -483,12 +511,16 @@ class TestLinks(PywikibotTestCase):
         self.assertEqual(len(wvlinks), 2)
 
 
-class TestWriteNormalizeLang(PywikibotTestCase):
+class TestWriteNormalizeLang(TestCase):
+
     """Test cases for routines that normalize languages in a dict.
 
     Exercises WikibasePage._normalizeLanguages with data that is
     not normalized and data which is already normalized.
     """
+
+    family = 'wikipedia'
+    lang = 'en'
 
     def setUp(self):
         super(TestWriteNormalizeLang, self).setUp()
@@ -507,12 +539,15 @@ class TestWriteNormalizeLang(PywikibotTestCase):
         self.assertEqual(response, self.lang_out)
 
 
-class TestWriteNormalizeData(PywikibotTestCase):
+class TestWriteNormalizeData(TestCase):
+
     """Test cases for routines that normalize data for writing to Wikidata.
 
     Exercises WikibasePage._normalizeData with data that is not normalized
     and data which is already normalized.
     """
+
+    net = False
 
     def setUp(self):
         super(TestWriteNormalizeData, self).setUp()
@@ -546,12 +581,14 @@ class TestWriteNormalizeData(PywikibotTestCase):
         self.assertEqual(response, self.data_out)
 
 
-class TestNamespaces(PywikibotTestCase):
+class TestNamespaces(WikidataTestCase):
+
     """Test cases to test namespaces of Wikibase entities"""
 
     def test_empty_wikibase_page(self):
         # As a base class it should be able to instantiate
         # it with minimal arguments
+        wikidata = self.get_repo()
         page = pywikibot.page.WikibasePage(wikidata)
         self.assertRaises(AttributeError, page.namespace)
         page = pywikibot.page.WikibasePage(wikidata, title='')
@@ -577,6 +614,7 @@ class TestNamespaces(PywikibotTestCase):
 
     def test_wikibase_link_namespace(self):
         """Test the title resolved to a namespace correctly."""
+        wikidata = self.get_repo()
         # title without any namespace clues (ns or entity_type)
         # should verify the Link namespace is appropriate
         page = pywikibot.page.WikibasePage(wikidata, title='Q6')
@@ -586,6 +624,7 @@ class TestNamespaces(PywikibotTestCase):
 
     def test_wikibase_namespace_selection(self):
         """Test various ways to correctly specify the namespace."""
+        wikidata = self.get_repo()
         page = pywikibot.page.ItemPage(wikidata, 'Q6')
         self.assertEqual(page.namespace(), 0)
         page = pywikibot.page.ItemPage(wikidata, title='Q6')
@@ -610,6 +649,7 @@ class TestNamespaces(PywikibotTestCase):
 
     def test_wrong_namespaces(self):
         """Test incorrect namespaces for Wikibase entities."""
+        wikidata = self.get_repo()
         # All subclasses of WikibasePage raise a ValueError
         # if the namespace for the page title is not correct
         self.assertRaises(ValueError, pywikibot.page.WikibasePage, wikidata,
@@ -623,6 +663,7 @@ class TestNamespaces(PywikibotTestCase):
         # part of the title in namespace 0
         # TODO: These items have inappropriate titles, which should
         #       raise an error.
+        wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, 'Invalid:Q1')
         self.assertEqual(item.namespace(), 0)
         self.assertEqual(item.id, 'INVALID:Q1')
@@ -633,8 +674,11 @@ class TestNamespaces(PywikibotTestCase):
         self.assertEqual(item.title(), 'INVALID:Q1')
 
 
-class TestAlternateNamespaces(PywikibotTestCase):
+class TestAlternateNamespaces(TestCase):
+
     """Test cases to test namespaces of Wikibase entities"""
+
+    net = False
 
     def setUp(self):
         super(TestAlternateNamespaces, self).setUp()
@@ -691,6 +735,61 @@ class TestAlternateNamespaces(PywikibotTestCase):
         self.assertEqual(prop.id, 'P21')
         self.assertEqual(prop.title(), 'Prop:P21')
         self.assertEqual(prop._defined_by(), {'ids': 'P21'})
+
+
+class TestOwnClient(TestCase):
+
+    sites = {
+        # The main Wikidata is its own client.
+        'wikidata': {
+            'family': 'wikidata',
+            'code': 'wikidata',
+        },
+        # test.wikidata is also
+        'wikidatatest': {
+            'family': 'wikidata',
+            'code': 'test',
+        },
+    }
+
+    def test_own_client(self, key):
+        """Test that a data repository family can be its own client."""
+        site = self.get_site(key)
+
+        page = pywikibot.Page(site, 'Wikidata:Main Page')
+        item = pywikibot.ItemPage.fromPage(page)
+        self.assertEqual(item.site, site)
+
+
+class TestUnconnectedClient(TestCase):
+
+    """Test clients not connected to a data repository."""
+
+    sites = {
+        # Wikispecies is not supported by Wikidata yet.
+        'species': {
+            'family': 'species',
+            'code': 'species',
+            'page_title': 'Main Page',
+        },
+        # fr.wiktionary is not supported by Wikidata yet.
+        'frwikt': {
+            'family': 'wiktionary',
+            'code': 'fr',
+            'page_title': 'and',
+        },
+    }
+
+    def test_not_supported_family(self, key):
+        """Test that family without a data repository causes error."""
+        site = self.get_site(key)
+
+        self.wdp = pywikibot.Page(site, self.sites[key]['page_title'])
+        self.assertRaises(pywikibot.WikiBaseError,
+                          pywikibot.ItemPage.fromPage, self.wdp)
+        self.assertRaisesRegexp(pywikibot.WikiBaseError,
+                                'no transcluded data',
+                                self.wdp.data_item)
 
 
 if __name__ == '__main__':
