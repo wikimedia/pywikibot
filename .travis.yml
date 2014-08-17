@@ -45,10 +45,6 @@ env:
     - LANGUAGE=test FAMILY=wikidata
     - LANGUAGE=fr FAMILY=wiktionary
 
-matrix:
-  allow_failures:
-    - python: "2.6"
-
 notifications:
   irc:
     channels:
