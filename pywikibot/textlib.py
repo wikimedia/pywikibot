@@ -1196,7 +1196,9 @@ class TimeStripper(object):
         # removed; will be handled as digits in regex, adding d+{1,2}\.?
         escaped_months = [_ for _ in self.origNames2monthNum if
                           not _.strip('.').isdigit()]
-        escaped_months = [re.escape(_) for _ in escaped_months]
+        # match longest names first.
+        escaped_months = [re.escape(_) for
+                          _ in sorted(escaped_months, reverse=True)]
 
         # work around for cs wiki: if month are in digits, we assume
         # that format is dd. mm. (with dot and spaces optional)

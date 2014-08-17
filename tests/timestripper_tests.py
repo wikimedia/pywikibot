@@ -52,23 +52,23 @@ class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
                           None)
                          )
 
-        txtWithOneMatch = u'this string has XXX, YYY and fév in it'
-        txtWithTwoMatch = u'this string has XXX, mars and fév in it'
-        txtWithThreeMatch = u'this string has avr, mars and fév in it'
+        txtWithOneMatch = u'this string has XXX, YYY and février in it'
+        txtWithTwoMatch = u'this string has XXX, mars and février in it'
+        txtWithThreeMatch = u'this string has avr, mars and février in it'
         txtWithNoMatch = u'this string has no match'
         pat = self.ts.pmonthR
 
         self.assertEqual(self.ts.last_match_and_replace(txtWithOneMatch, pat),
                          (u'this string has XXX, YYY and @@ in it',
-                          {'month': u'fév'})
+                          {'month': u'février'})
                          )
         self.assertEqual(self.ts.last_match_and_replace(txtWithTwoMatch, pat),
                          (u'this string has XXX, @@ and @@ in it',
-                          {'month': u'fév'})
+                          {'month': u'février'})
                          )
         self.assertEqual(self.ts.last_match_and_replace(txtWithThreeMatch, pat),
                          (u'this string has @@, @@ and @@ in it',
-                          {'month': u'fév'})
+                          {'month': u'février'})
                          )
         self.assertEqual(self.ts.last_match_and_replace(txtWithNoMatch, pat),
                          (txtWithNoMatch,
