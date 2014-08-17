@@ -27,6 +27,8 @@ install:
   - python setup.py install
   - cd ../..
 
+  - pip install unittest2
+
 script:
   - python setup.py test
 

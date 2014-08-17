@@ -14,12 +14,6 @@ import sys
 import os
 import itertools
 
-from ez_setup import use_setuptools
-use_setuptools()
-
-from setuptools import setup, find_packages
-from setuptools.command import install
-
 test_deps = []
 testcollector = "tests"
 
@@ -39,7 +33,12 @@ if sys.version_info[0] == 2:
     if sys.version_info < (2, 6, 5):
         raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 or higher")
     elif sys.version_info[1] == 6:
-        test_deps.append('unittest2')
+        # work around distutils hardcoded unittest dependency
+        import unittest
+        if 'test' in sys.argv and sys.version_info < (2, 7):
+            import unittest2
+            sys.modules['unittest'] = unittest2
+
         script_deps['replicate_wiki.py'] = ['argparse']
         testcollector = "tests.utils.collector"
         dependencies.append('ordereddict')
@@ -58,6 +57,20 @@ if os.name != 'nt':
     # when trying to build the C modules.
     dependencies.append('mwparserfromhell>=0.3.3')
 
+extra_deps.update(script_deps)
+# Add script dependencies as test dependencies,
+# so scripts can be compiled in test suite.
+if 'PYSETUP_TEST_EXTRAS' in os.environ:
+    test_deps += list(itertools.chain(*(script_deps.values())))
+
+
+# late import of setuptools due to monkey-patching above
+from ez_setup import use_setuptools
+use_setuptools()
+
+from setuptools import setup, find_packages
+from setuptools.command import install
+
 
 class pwb_install(install.install):
 
@@ -73,13 +86,6 @@ class pwb_install(install.install):
             python = sys.executable
             python = python.replace("pythonw.exe", "python.exe")  # for Windows
             subprocess.call([python, "generate_user_files.py"])
-
-
-extra_deps.update(script_deps)
-# Add script dependencies as test dependencies,
-# so scripts can be compiled in test suite.
-if 'PYSETUP_TEST_EXTRAS' in os.environ:
-    test_deps += list(itertools.chain(*(script_deps.values())))
 
 setup(
     name='pywikibot',
