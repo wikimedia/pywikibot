@@ -9,16 +9,11 @@ __version__ = '$Id$'
 #
 import time
 import sys
-try:
+
+if sys.version_info < (2, 7):
     # Unittest2 is a backport of python 2.7s unittest module to python 2.6
-    # Trying to import unittest2 has to happen first because 2.6 does have a
-    # unittest module in the standard library but that doesn't support all the
-    # features of the one found in python 2.7, so importing unittest first and
-    # then trying to figure out if it supports the features used would mean
-    # checking the module contents etc. Just catching an ImportError once is
-    # much easier.
     import unittest2 as unittest
-except ImportError:
+else:
     import unittest
 
 import pywikibot
