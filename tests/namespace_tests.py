@@ -11,14 +11,14 @@ __version__ = '$Id$'
 
 from collections import Iterable
 from pywikibot.site import Namespace
-from tests.utils import PywikibotTestCase, unittest
+from tests.utils import NoSiteTestCase, unittest
 
 import sys
 if sys.version_info[0] > 2:
     basestring = (str, )
 
 
-class TestNamespaceObject(PywikibotTestCase):
+class TestNamespaceObject(NoSiteTestCase):
     """Test cases for Namespace class."""
 
     # These should work in any MW wiki
