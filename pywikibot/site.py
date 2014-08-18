@@ -20,13 +20,15 @@ import os
 import re
 import sys
 from distutils.version import LooseVersion as LV
-from collections import Iterable
+from collections import Iterable, Container
 import threading
 import time
 import urllib
 import json
+import copy
 
 import pywikibot
+import pywikibot.tools as tools
 from pywikibot import deprecate_arg
 from pywikibot import config
 from pywikibot import deprecated
@@ -890,6 +892,226 @@ def need_version(version):
     return decorator
 
 
+class Siteinfo(Container):
+
+    """
+    A 'dictionary' like container for siteinfo.
+
+    This class queries the server to get the requested siteinfo property.
+    Optionally it can cache this directly in the instance so that later
+    requests don't need to query the server.
+
+    All values of the siteinfo property 'general' are directly available.
+    """
+
+    def __init__(self, site):
+        """Initialise it with an empty cache."""
+        self._site = site
+        self._cache = {}
+
+    @staticmethod
+    def _get_default(key):
+        """
+        Return the default value for different properties.
+
+        If the property is 'restrictions' it returns a dictionary with:
+            'cascadinglevels': 'sysop'
+            'semiprotectedlevels': 'autoconfirmed'
+            'levels': '' (everybody), 'autoconfirmed', 'sysop'
+            'types': 'create', 'edit', 'move', 'upload'
+        Otherwise it returns L{tools.EMPTY_DEFAULT}.
+
+        @param key: The property name
+        @type key: str
+        @return: The default value
+        @rtype: dict or L{tools.EmptyDefault}
+        """
+        if key == 'restrictions':
+            # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
+            return {
+                'cascadinglevels': ['sysop'],
+                'semiprotectedlevels': ['autoconfirmed'],
+                'levels': ['', 'autoconfirmed', 'sysop'],
+                'types': ['create', 'edit', 'move', 'upload']
+            }
+        else:
+            return tools.EMPTY_DEFAULT
+
+    def _get_siteinfo(self, prop, force=False):
+        """
+        Retrieve a siteinfo property. All properties which the site doesn't
+        support contain the default value. Because pre-1.12 no data was
+        returned when a property doesn't exists, it queries each property
+        independetly if a property is invalid.
+
+        @param prop: The property names of the siteinfo.
+        @type prop: str or iterable
+        @param force: Don't access the cached request.
+        @type force: bool
+        @return: A dictionary with the properties of the site. Each entry in
+            the dictionary is a tuple of the value and a boolean to save if it
+            is the default value.
+        @rtype: dict (the values)
+        @see: U{https://www.mediawiki.org/wiki/API:Meta#siteinfo_.2F_si}
+        """
+        if isinstance(prop, basestring):
+            props = [prop]
+        else:
+            props = prop
+        if len(props) == 0:
+            raise ValueError('At least one property name must be provided.')
+        try:
+            data = pywikibot.data.api.CachedRequest(
+                expiry=0 if force else pywikibot.config.API_config_expiry,
+                site=self._site,
+                action='query',
+                meta='siteinfo',
+                siprop='|'.join(props)).submit()
+        except api.APIError as e:
+            if e.code == 'siunknown_siprop':
+                if len(props) == 1:
+                    pywikibot.log(u"Unable to get siprop '{0}'".format(props[0]))
+                    return {props[0]: (Siteinfo._get_default(props[0]), True)}
+                else:
+                    pywikibot.log(u"Unable to get siteinfo, because at least "
+                                  u"one property is unknown: '{0}'".format(
+                                  u"', '".join(props)))
+                    results = {}
+                    for prop in props:
+                        results.update(self._get_siteinfo(prop, force))
+                    return results
+            else:
+                raise
+        else:
+            result = {}
+            if 'warnings' in data:
+                invalid_properties = []
+                for prop in re.match(u"^Unrecognized values? for parameter "
+                                     u"'siprop': ([^,]+(?:, [^,]+)*)$",
+                                     data['warnings']['siteinfo']['*']).group(1).split(','):
+                    prop = prop.strip()
+                    invalid_properties += [prop]
+                    result[prop] = (Siteinfo._get_default(prop), True)
+                pywikibot.log(u"Unable to get siprop(s) '{0}'".format(
+                    u"', '".join(invalid_properties)))
+            if 'query' in data:
+                # todo iterate through the properties!
+                for prop in props:
+                    if prop in data['query']:
+                        result[prop] = (data['query'][prop], False)
+            return result
+
+    def _get_general(self, key, force):
+        """
+        Return a siteinfo property which is loaded by default.
+
+        The property 'general' will be queried if it wasn't yet or it's forced.
+        Additionally all uncached default properties are queried. This way
+        multiple default properties are queried with one request. It'll cache
+        always all results.
+
+        @param key: The key to search for.
+        @type key: str
+        @param force: If 'general' should be queried in any case.
+        @type force: bool
+        @return: If that property was retrived via this method. Returns an
+            empty tuple if it wasn't retrieved.
+        @rtype: various (the value), bool (if the default value is used)
+        """
+        if 'general' not in self._cache:
+            pywikibot.debug('general siteinfo not loaded yet.', _logger)
+            force = True
+            props = ['namespaces', 'namespacealiases']
+        else:
+            props = []
+        if force:
+            props = [prop for prop in props if prop not in self._cache]
+            if props:
+                pywikibot.debug(
+                    u"Load siteinfo properties '{0}' along with 'general'".format(
+                        u"', '".join(props)), _logger)
+            props += ['general']
+            default_info = self._get_siteinfo(props, force)
+            for prop in props:
+                self._cache[prop] = default_info[prop]
+            if key in default_info:
+                return default_info[key]
+        if key in self._cache['general'][0]:
+            return self._cache['general'][0][key], False
+        else:
+            return tuple()
+
+    def __getitem__(self, key):
+        """Return a siteinfo property, caching and not forcing it."""
+        return self.get(key, False)  # caches and doesn't force it
+
+    def get(self, key, get_default=True, cache=True, force=False):
+        """
+        Return a siteinfo property.
+
+        @param key: The name of the siteinfo property.
+        @type key: str
+        @param get_default: Whether to throw an KeyError if the key is invalid.
+        @type get_default: bool
+        @param cache: Caches the result interally so that future accesses via
+            this method won't query the server.
+        @type cache: bool
+        @param force: Ignores the cache and always queries the server to get
+            the newest value.
+        @type force: bool
+        @return: The gathered property
+        @rtype: various
+        @see: L{_get_siteinfo}
+        """
+        if not force:
+            try:
+                cached = self._get_cached(key)
+            except KeyError:
+                cached = None
+            # a not recognised result was cached, but they aren't requested
+            if cached:
+                if cached[1] and not get_default:
+                    raise KeyError(key)
+                else:
+                    return copy.deepcopy(cached[0])
+        preloaded = self._get_general(key, force)
+        if not preloaded:
+            preloaded = self._get_siteinfo(key, force)[key]
+        else:
+            cache = False
+        if preloaded[1] and not get_default:
+            raise KeyError(key)
+        else:
+            if cache:
+                self._cache[key] = preloaded
+            return copy.deepcopy(preloaded[0])
+
+    def _get_cached(self, key):
+        """Return the cached value or a KeyError exception if not cached."""
+        if 'general' in self._cache:
+            if key in self._cache['general'][0]:
+                return (self._cache['general'][0][key], False)
+            else:
+                return self._cache[key]
+        raise KeyError(key)
+
+    def __contains__(self, key):
+        """Return whether the value is cached."""
+        try:
+            self._get_cached(key)
+        except KeyError:
+            return False
+        else:
+            return True
+
+    def is_recognised(self, key):
+        """Return if 'key' is a valid property name. 'None' if not cached."""
+        try:
+            return not self._get_cached(key)[1]
+        except KeyError:
+            return None
+
+
 class APISite(BaseSite):
 
     """API interface to MediaWiki site.
@@ -924,6 +1146,7 @@ class APISite(BaseSite):
         BaseSite.__init__(self, code, fam, user, sysop)
         self._msgcache = {}
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
+        self._siteinfo = Siteinfo(self)
         return
 
     @staticmethod
@@ -1067,8 +1290,6 @@ class APISite(BaseSite):
                                  if sysop else LoginStatus.AS_USER)
         else:
             self._loginstatus = LoginStatus.NOT_LOGGED_IN  # failure
-        if not hasattr(self, "_siteinfo"):
-            self._getsiteinfo()
 
     forceLogin = login  # alias for backward-compatibility
 
@@ -1383,15 +1604,9 @@ class APISite(BaseSite):
     def getmagicwords(self, word):
         """Return list of localized "word" magic words for the site."""
         if not hasattr(self, "_magicwords"):
-            try:
-                # don't cache in _siteinfo, because we cache it in _magicwords
-                magicwords = self._add_siteinfo("magicwords", False)
-                self._magicwords = dict((item["name"], item["aliases"])
+            magicwords = self.siteinfo.get("magicwords", cache=False)
+            self._magicwords = dict((item["name"], item["aliases"])
                                         for item in magicwords)
-            except api.APIError:
-                # hack for older sites that don't support 1.13 properties
-                # probably should delete if we're not going to support pre-1.13
-                self._magicwords = {}
 
         if word in self._magicwords:
             return self._magicwords[word]
@@ -1432,76 +1647,7 @@ class APISite(BaseSite):
         """Return list of localized PAGENAMEE tags for the site."""
         return self.getmagicwords("pagenamee")
 
-    def _add_siteinfo(self, prop, cache, force=False):
-        """
-        Retrieve additional siteinfo and optionally cache it.
-
-        Queries the site and returns the properties. It can cache the value
-        so that future queries will access the cache. With C{force} set to
-        True it won't access the cache but it can still cache the value. If
-        the property doesn't exists it returns None.
-
-        @param prop: The property name of the siteinfo.
-        @type prop: str
-        @param cache: Should this be cached?
-        @type cache: bool
-        @param force: Should the cache be skipped?
-        @type force: bool
-        @return: The properties of the site.
-        @rtype: various (depends on prop)
-        """
-        if not hasattr(self, '_siteinfo'):
-            force = True  # if it doesn't exists there won't be a cache
-            if cache:  # but only initialise cache if that is requested
-                self._getsiteinfo()
-        if not force and prop in self._siteinfo:
-            return self._siteinfo[prop]
-        data = pywikibot.data.api.CachedRequest(
-            expiry=0 if force else pywikibot.config.API_config_expiry,
-            site=self,
-            action='query',
-            meta='siteinfo',
-            siprop=prop).submit()
-        try:
-            prop_data = data['query'][prop]
-        except KeyError:
-            prop_data = None
-        if cache:
-            self._siteinfo[prop] = prop_data
-        return prop_data
-
-    def _getsiteinfo(self, force=False):
-        """Retrieve siteinfo and namespaces from site."""
-        sirequest = api.CachedRequest(
-            expiry=(0 if force else config.API_config_expiry),
-            site=self,
-            action="query",
-            meta="siteinfo",
-            siprop="general|namespaces|namespacealiases|extensions"
-        )
-        try:
-            sidata = sirequest.submit()
-        except api.APIError:
-            # hack for older sites that don't support 1.12 properties
-            # probably should delete if we're not going to support pre-1.12
-            sirequest = api.Request(
-                site=self,
-                action="query",
-                meta="siteinfo",
-                siprop="general|namespaces"
-            )
-            sidata = sirequest.submit()
-
-        assert 'query' in sidata, \
-               "API siteinfo response lacks 'query' key"
-        sidata = sidata['query']
-        assert 'general' in sidata, \
-               "API siteinfo response lacks 'general' key"
-        assert 'namespaces' in sidata, \
-               "API siteinfo response lacks 'namespaces' key"
-        self._siteinfo = sidata['general']
-
-        nsdata = sidata['namespaces']
+    def _build_namespaces(self):
 
         self._namespaces = {}
 
@@ -1511,36 +1657,27 @@ class APISite(BaseSite):
         # the defaults defined in Namespace.
         is_mw114 = LV(self.version()) >= LV('1.14')
 
-        for nskey in nsdata:
-            ns = int(nskey)
+        for nsdata in self.siteinfo.get('namespaces', cache=False).values():
+            ns = nsdata.pop('id')
             custom_name = None
             canonical_name = None
             if ns == 0:
-                canonical_name = nsdata[nskey].pop('*')
+                canonical_name = nsdata.pop('*')
                 custom_name = canonical_name
             else:
-                custom_name = nsdata[nskey].pop('*')
+                custom_name = nsdata.pop('*')
                 if is_mw114:
-                    canonical_name = nsdata[nskey].pop('canonical')
+                    canonical_name = nsdata.pop('canonical')
 
-            # Remove the 'id' from nsdata
-            nsdata[nskey].pop('id')
             namespace = Namespace(ns, canonical_name, custom_name,
-                                  use_image_name=not is_mw114, **nsdata[nskey])
-
+                                  use_image_name=not is_mw114,
+                                  **nsdata)
             self._namespaces[ns] = namespace
 
-        if 'namespacealiases' in sidata:
-            aliasdata = sidata['namespacealiases']
-            for item in aliasdata:
-                ns = int(item['id'])
-                if item['*'] not in self._namespaces[ns]:
-                    self._namespaces[ns].aliases.append(item['*'])
-
-        if 'extensions' in sidata:
-            self._extensions = sidata['extensions']
-        else:
-            self._extensions = None
+        for item in self.siteinfo.get('namespacealiases'):
+            ns = int(item['id'])
+            if item['*'] not in self._namespaces[ns]:
+                self._namespaces[ns].aliases.append(item['*'])
 
     def hasExtension(self, name, unknown=NotImplementedError):
         """ Determine whether extension `name` is loaded.
@@ -1552,15 +1689,15 @@ class APISite(BaseSite):
 
         @return: bool
         """
-        if not hasattr(self, '_extensions'):
-            self._getsiteinfo()
-        if self._extensions is None:
+        try:
+            extensions = self.siteinfo['extensions']
+        except KeyError:
             if isinstance(unknown, type) and issubclass(unknown, Exception):
                 raise unknown(
                     "Feature 'hasExtension' only available in MW 1.14+")
             else:
                 return unknown
-        for ext in self._extensions:
+        for ext in extensions:
             if ext['name'].lower() == name.lower():
                 return True
         return False
@@ -1568,8 +1705,6 @@ class APISite(BaseSite):
     @property
     def siteinfo(self):
         """Site information dict."""
-        if not hasattr(self, "_siteinfo"):
-            self._getsiteinfo()
         return self._siteinfo
 
     def case(self):
@@ -1632,8 +1767,8 @@ class APISite(BaseSite):
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
-        if not hasattr(self, "_siteinfo"):
-            self._getsiteinfo()
+        if not hasattr(self, '_namespaces'):
+            self._build_namespaces()
         return self._namespaces
 
     def namespace(self, num, all=False):
@@ -1655,9 +1790,7 @@ class APISite(BaseSite):
 
         """
         try:
-            if force:
-                self._getsiteinfo(force=True)    # drop/expire cache and reload
-            versionstring = self.siteinfo['generator']
+            versionstring = self.siteinfo.get('generator', force=force)
             m = re.match(r"^MediaWiki ([0-9]+)\.([0-9]+)(.*)$", versionstring)
             if m:
                 return (int(m.group(1)), int(m.group(2)), m.group(3))
@@ -3504,37 +3637,22 @@ class APISite(BaseSite):
         """
         Return the protection types available on this site.
 
-        With MediaWiki version 1.23 protection types can be retrieved. To
-        support older wikis, the default protection types 'create', 'edit',
-        'move' and 'upload' are returned.
-
         @return protection types available
         @rtype: set of unicode instances
+        @see: L{Siteinfo._get_default()}
         """
-        # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
-        restrictions = self._add_siteinfo('restrictions', True)
-        if restrictions is None or 'types' not in restrictions:
-            return set([u'create', u'edit', u'move', u'upload'])
-        else:
-            return set(restrictions['types'])
+        return set(self.siteinfo.get('restrictions')['types'])
 
     def protection_levels(self):
         """
         Return the protection levels available on this site.
 
-        With MediaWiki version 1.23 protection levels can be retrieved. To
-        support older wikis, the default protection levels '', 'autoconfirmed',
-        and 'sysop' are returned.
-
         @return protection types available
         @rtype: set of unicode instances
+        @see: L{Siteinfo._get_default()}
         """
         # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
-        restrictions = self._add_siteinfo('restrictions', True)
-        if restrictions is None or 'levels' not in restrictions:
-            return set([u'', u'autoconfirmed', u'sysop'])
-        else:
-            return set(restrictions['levels'])
+        return set(self.siteinfo.get('restrictions')['levels'])
 
     @must_be(group='sysop')
     @deprecate_arg("summary", "reason")

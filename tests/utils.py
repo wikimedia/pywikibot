@@ -108,3 +108,33 @@ class CachedTestCase(SiteTestCase):
         unpatch_request()
 
 PywikibotTestCase = CachedTestCase
+
+
+class DummySiteinfo():
+
+    def __init__(self, cache):
+        self._cache = dict((key, (item, False)) for key, item in cache.iteritems())
+
+    def __getitem__(self, key):
+        return self.get(key, False)
+
+    def get(self, key, get_default=True, cache=True, force=False):
+        if not force and key in self._cache:
+            loaded = self._cache[key]
+            if not loaded[1] and not get_default:
+                raise KeyError(key)
+            else:
+                return loaded[0]
+        elif get_default:
+            default = pywikibot.site.Siteinfo._get_default(key)
+            if cache:
+                self._cache[key] = (default, True)
+            return default
+        else:
+            raise KeyError(key)
+
+    def __contains__(self, key):
+        return False
+
+    def is_recognised(self, key):
+        return None

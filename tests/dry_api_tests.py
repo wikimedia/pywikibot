@@ -10,7 +10,7 @@ __version__ = '$Id$'
 import datetime
 import pywikibot
 from pywikibot.data.api import CachedRequest, QueryGenerator
-from utils import unittest, NoSiteTestCase, SiteTestCase
+from utils import unittest, NoSiteTestCase, SiteTestCase, DummySiteinfo
 
 
 class DryCachedRequestTests(SiteTestCase):
@@ -68,6 +68,7 @@ class MockCachedRequestKeyTests(NoSiteTestCase):
             def __init__(self):
                 self._user = 'anon'
                 pywikibot.site.BaseSite.__init__(self, 'mock', MockFamily())
+                self._siteinfo = DummySiteinfo({'case': 'first-letter'})
 
             def version(self):
                 return '1.13'  # pre 1.14
@@ -84,9 +85,9 @@ class MockCachedRequestKeyTests(NoSiteTestCase):
             def encodings(self):
                 return []
 
-            def _getsiteinfo(self):
-                self._siteinfo = {'case': 'first-letter'}
-                return {}
+            @property
+            def siteinfo(self):
+                return self._siteinfo
 
             def __repr__(self):
                 return "MockSite()"

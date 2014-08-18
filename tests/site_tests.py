@@ -14,6 +14,8 @@ from distutils.version import LooseVersion as LV
 from collections import Iterable
 import pywikibot
 from tests.utils import PywikibotTestCase, unittest
+from datetime import datetime
+import re
 
 import sys
 if sys.version_info[0] > 2:
@@ -196,12 +198,7 @@ class TestSiteObject(PywikibotTestCase):
         self.assertFalse('*' in mysite.mediawiki_messages(['*']))
 
         self.assertType(mysite.getcurrenttimestamp(), basestring)
-        self.assertType(mysite.siteinfo, dict)
-        self.assertType(mysite.case(), basestring)
-        ver = mysite.live_version()
-        self.assertType(ver, tuple)
-        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
-        self.assertType(ver[2], basestring)
+        self.assertType(mysite.siteinfo, pywikibot.site.Siteinfo)
         self.assertType(mysite.months_names, list)
         self.assertEqual(mysite.months_names[4], (u'May', u'May'))
         self.assertEqual(mysite.list_to_text(('pywikibot',)), 'pywikibot')
@@ -980,8 +977,9 @@ class TestSiteObject(PywikibotTestCase):
     #       and the other following methods in site.py
 
     def testExtensions(self):
-        # test automatically getting _extensions
-        del mysite._extensions
+        # test automatically getting extensions cache
+        if 'extensions' in mysite.siteinfo:
+            del mysite.siteinfo._cache['extensions']
         self.assertTrue(mysite.hasExtension('Disambiguator'))
 
         # test case-sensitivity
@@ -990,7 +988,7 @@ class TestSiteObject(PywikibotTestCase):
         self.assertFalse(mysite.hasExtension('ThisExtensionDoesNotExist'))
 
         # test behavior for sites that do not report extensions
-        mysite._extensions = None
+        mysite.siteinfo._cache['extensions'] = (None, True)
         self.assertRaises(NotImplementedError, mysite.hasExtension, ('anything'))
 
         class MyException(Exception):
@@ -999,7 +997,7 @@ class TestSiteObject(PywikibotTestCase):
 
         self.assertTrue(mysite.hasExtension('anything', True))
         self.assertFalse(mysite.hasExtension('anything', False))
-        del mysite._extensions
+        del mysite.siteinfo._cache['extensions']
 
     def test_API_limits_with_site_methods(self):
         # test step/total parameters for different sitemethods
@@ -1026,6 +1024,47 @@ class TestSiteObject(PywikibotTestCase):
         site = pywikibot.Site('en', 'wikipedia')
         pickle.dumps(site)
         self.assertTrue(True)  # No exception thrown!
+
+    def testSiteinfo(self):
+        """Test the siteinfo property."""
+        # general enteries
+        self.assertIsInstance(mysite.siteinfo['timeoffset'], (int, float))
+        self.assertTrue(-12 * 60 <= mysite.siteinfo['timeoffset'] <= +14 * 60)
+        self.assertEqual(mysite.siteinfo['timeoffset'] % 15, 0)
+        self.assertRegexpMatches(mysite.siteinfo['timezone'], "([A-Z]{3,4}|[A-Z][a-z]+/[A-Z][a-z]+)")
+        self.assertType(datetime.strptime(mysite.siteinfo['time'], "%Y-%m-%dT%H:%M:%SZ"), datetime)
+        self.assertTrue(mysite.siteinfo['maxuploadsize'] > 0)
+        self.assertIn(mysite.case(), ["first-letter", "case-sensitive"])
+        self.assertEqual(re.findall("\$1", mysite.siteinfo['articlepath']), ["$1"])
+        ver = mysite.live_version()
+        self.assertType(ver, tuple)
+        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
+        self.assertType(ver[2], basestring)
+
+        def entered_loop(iterable):
+            for iterable_item in iterable:
+                return True
+            return False
+
+        self.assertType(mysite.siteinfo.get('restrictions'), dict)
+        self.assertTrue('restrictions' in mysite.siteinfo)
+        # the following line only works in 1.23+
+        self.assertTrue(mysite.siteinfo.is_recognised('restrictions'))
+        del mysite.siteinfo._cache['restrictions']
+        self.assertType(mysite.siteinfo.get('restrictions', cache=False), dict)
+        self.assertFalse('restrictions' in mysite.siteinfo)
+
+        not_exists = 'this-property-does-not-exist'
+        self.assertRaises(KeyError, mysite.siteinfo.__getitem__, not_exists)
+        self.assertFalse(not_exists in mysite.siteinfo)
+        self.assertEqual(len(mysite.siteinfo.get(not_exists)), 0)
+        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists)))
+        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).iteritems()))
+        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).itervalues()))
+        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).iterkeys()))
+        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).items()))
+        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).values()))
+        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).keys()))
 
 
 class TestSiteLoadRevisions(PywikibotTestCase):

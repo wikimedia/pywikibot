@@ -10,7 +10,7 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot.site import must_be
 
-from tests.utils import unittest, NoSiteTestCase
+from tests.utils import unittest, NoSiteTestCase, DummySiteinfo
 
 
 class DrySite(pywikibot.site.APISite):
@@ -19,6 +19,10 @@ class DrySite(pywikibot.site.APISite):
     @property
     def userinfo(self):
         return self._userinfo
+
+    @property
+    def siteinfo(self):
+        return DummySiteinfo({})
 
 
 class TestDrySite(NoSiteTestCase):
