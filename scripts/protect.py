@@ -186,10 +186,10 @@ def main(*args):
             if arg.startswith('-'):
                 delimiter = arg.find(':')
                 if delimiter > 0:
-                    p_type = arg[1:delimiter]
+                    p_type_arg = arg[1:delimiter]
                     level = arg[delimiter + 1:]
-                    if p_type in protection_types:
-                        protections[p_type] = level
+                    if p_type_arg in protection_types:
+                        protections[p_type_arg] = level
                         is_p_type = True
             if not is_p_type:
                 if not genFactory.handleArg(arg):

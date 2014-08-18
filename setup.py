@@ -34,7 +34,7 @@ if sys.version_info[0] == 2:
         raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 or higher")
     elif sys.version_info[1] == 6:
         # work around distutils hardcoded unittest dependency
-        import unittest
+        import unittest  # flake8: noqa
         if 'test' in sys.argv and sys.version_info < (2, 7):
             import unittest2
             sys.modules['unittest'] = unittest2
