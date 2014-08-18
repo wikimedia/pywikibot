@@ -181,7 +181,12 @@ class TestScriptMeta(type):
                                       result['stderr'])
                 elif (args and '-help' in args) or \
                         script_name not in auto_run_script_list:
-                    self.assertEqual(result['stderr'], '')
+                    stderr = [l for l in result['stderr'].split('\n')
+                              if not l.startswith('Sleeping for ')]
+                    pywikibot.output('\n'.join(
+                        [l for l in result['stderr'].split('\n')
+                         if l.startswith('Sleeping for ')]))
+                    self.assertEqual('\n'.join(stderr), '')
                     self.assertIn('Global arguments available for all',
                                   result['stdout'])
                     self.assertEqual(result['exit_code'], 0)
