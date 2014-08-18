@@ -294,7 +294,9 @@ class AddCategory:
         pywikibot.output(u"%d page(s) processed." % counter)
 
     def load(self, page):
-        """Load the given page, do some changes, and save it."""
+        """Load the given page's content.
+
+        If page doesn't exists returns an empty string."""
         try:
             # Load the page
             text = page.get()
@@ -302,26 +304,20 @@ class AddCategory:
             if self.create:
                 pywikibot.output(u"Page %s doesn't exist yet; creating."
                                  % (page.title(asLink=True)))
-                text = ''
+                return ''
             else:
                 pywikibot.output(u"Page %s does not exist; skipping."
                                  % page.title(asLink=True))
-        except pywikibot.IsRedirectPage:
-            redirTarget = page.getRedirectTarget()
-            if self.follow_redirects:
-                text = redirTarget.get()
-            else:
-                pywikibot.warning(u"Page %s is a redirect to %s; skipping."
-                                  % (page.title(asLink=True),
-                                     redirTarget.title(asLink=True)))
         else:
             return text
 
-    def save(self, text, page, newcatTitle, minorEdit=True, botflag=True):
+    def save(self, text, page, newcatTitle, minorEdit=True, botflag=True, old_text=None):
+        if old_text is None:
+            old_text = self.load(page)
         # only save if something was changed
-        if text != page.get():
+        if text != old_text:
             # show what was changed
-            pywikibot.showDiff(page.get(), text)
+            pywikibot.showDiff(old_text, text)
             comment = self.editSummary
             if not comment:
                 comment = i18n.twtranslate(page.site, 'category-adding',
@@ -364,9 +360,22 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
         return False
 
     def treat(self, page):
+        if page.isRedirectPage():
+            # if it's a redirect use the redirect target instead
+            redirTarget = page.getRedirectTarget()
+            if self.follow_redirects:
+                page = redirTarget
+            else:
+                pywikibot.warning(u"Page %s is a redirect to %s; skipping."
+                                  % (page.title(asLink=True),
+                                     redirTarget.title(asLink=True)))
+                # loading it will throw an error if we don't jump out before
+                return
         text = self.load(page)
         if text is None:
             return
+        # store old text, so we don't have reload it every time
+        old_text = text
         cats = [c for c in page.categories()]
         # Show the title of the page we're working on.
         # Highlight the title in purple.
@@ -389,7 +398,7 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
             pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
             cats.append(catpl)
             text = pywikibot.replaceCategoryLinks(text, cats, site=page.site)
-            if not self.save(text, page, newcatTitle):
+            if not self.save(text, page, newcatTitle, old_text=old_text):
                 pywikibot.output(u'Page %s not saved.'
                                  % page.title(asLink=True))
 
