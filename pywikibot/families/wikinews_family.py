@@ -47,3 +47,6 @@ class Family(family.WikimediaFamily):
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }
+
+    def shared_data_repository(self, code, transcluded=False):
+        return ('wikidata', 'wikidata')
