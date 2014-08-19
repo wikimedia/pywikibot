@@ -77,9 +77,7 @@ import codecs
 import time
 
 import pywikibot
-from pywikibot import config
-from pywikibot import i18n
-from pywikibot import pagegenerators
+from pywikibot import config, i18n, pagegenerators, textlib
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -173,23 +171,23 @@ Match was: %s''' % result)
         addText = addText.replace('\\n', config.line_separator)
         if (reorderEnabled):
             # Getting the categories
-            categoriesInside = pywikibot.getCategoryLinks(newtext, site)
+            categoriesInside = textlib.getCategoryLinks(newtext, site)
             # Deleting the categories
-            newtext = pywikibot.removeCategoryLinks(newtext, site)
+            newtext = textlib.removeCategoryLinks(newtext, site)
             # Getting the interwiki
-            interwikiInside = pywikibot.getLanguageLinks(newtext, site)
+            interwikiInside = textlib.getLanguageLinks(newtext, site)
             # Removing the interwiki
-            newtext = pywikibot.removeLanguageLinks(newtext, site)
+            newtext = textlib.removeLanguageLinks(newtext, site)
 
             # Adding the text
             newtext += u"%s%s" % (config.line_separator, addText)
             # Reputting the categories
-            newtext = pywikibot.replaceCategoryLinks(newtext,
-                                                     categoriesInside, site,
-                                                     True)
+            newtext = textlib.replaceCategoryLinks(newtext,
+                                                   categoriesInside, site,
+                                                   True)
             # Dealing the stars' issue
             allstars = []
-            starstext = pywikibot.removeDisabledParts(text)
+            starstext = textlib.removeDisabledParts(text)
             for star in starsList:
                 regex = re.compile('(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
                                    % star, re.I)
@@ -203,8 +201,8 @@ Match was: %s''' % result)
                 for element in allstars:
                     newtext += '%s%s' % (element.strip(), config.LS)
             # Adding the interwiki
-            newtext = pywikibot.replaceLanguageLinks(newtext, interwikiInside,
-                                                     site)
+            newtext = textlib.replaceLanguageLinks(newtext, interwikiInside,
+                                                   site)
         else:
             newtext += u"%s%s" % (config.line_separator, addText)
     else:

@@ -36,8 +36,7 @@ import re
 import sys
 import pywikibot
 import upload
-from pywikibot import config
-from pywikibot import i18n
+from pywikibot import config, i18n, textlib
 
 copy_message = {
     'ar': u"هذه الصورة تم نقلها من %s. الوصف الأصلي كان:\r\n\r\n%s",
@@ -178,9 +177,9 @@ class ImageTransferBot:
                                                   self.targetSite.sitename())].iteritems():
                     new = '{{%s}}' % new
                     old = re.compile('{{%s}}' % old)
-                    description = pywikibot.replaceExcept(description, old, new,
-                                                          ['comment', 'math',
-                                                           'nowiki', 'pre'])
+                    description = textlib.replaceExcept(description, old, new,
+                                                        ['comment', 'math',
+                                                         'nowiki', 'pre'])
 
             description = i18n.translate(self.targetSite, copy_message,
                                          fallback=True) % (sourceSite, description)

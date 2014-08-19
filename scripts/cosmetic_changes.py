@@ -74,7 +74,7 @@ import re
 from distutils.version import LooseVersion as LV
 import pywikibot
 import isbn
-from pywikibot import config, i18n, pagegenerators, Bot
+from pywikibot import config, i18n, textlib, pagegenerators, Bot
 from pywikibot.page import url2unicode
 
 warning = """
@@ -259,7 +259,7 @@ class CosmeticChangesToolkit:
         if not self.template and '{{Personendaten' not in text and \
            '{{SORTIERUNG' not in text and '{{DEFAULTSORT' not in text and \
            self.site.code not in ('et', 'it', 'bg', 'ru'):
-            categories = pywikibot.getCategoryLinks(text, site=self.site)
+            categories = textlib.getCategoryLinks(text, site=self.site)
 
         if not self.talkpage:  # and pywikibot.calledModuleName() <> 'interwiki':
             subpage = False
@@ -272,13 +272,13 @@ class CosmeticChangesToolkit:
                     pass
                 if loc is not None and loc in self.title:
                     subpage = True
-            interwikiLinks = pywikibot.getLanguageLinks(
+            interwikiLinks = textlib.getLanguageLinks(
                 text, insite=self.site, template_subpage=subpage)
 
             # Removing the interwiki
-            text = pywikibot.removeLanguageLinks(text, site=self.site)
+            text = textlib.removeLanguageLinks(text, site=self.site)
             # Removing the stars' issue
-            starstext = pywikibot.removeDisabledParts(text)
+            starstext = textlib.removeDisabledParts(text)
             for star in starsList:
                 regex = re.compile('(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
                                    % star, re.I)
@@ -297,8 +297,8 @@ class CosmeticChangesToolkit:
             #       if re.search(u"(.+?)\|(.{,1}?)",name.title()) or name.title()==name.title().split(":")[0]+title:
             #            categories.remove(name)
             #            categories.insert(0, name)
-            text = pywikibot.replaceCategoryLinks(text, categories,
-                                                  site=self.site)
+            text = textlib.replaceCategoryLinks(text, categories,
+                                                site=self.site)
         # Adding stars templates
         if allstars:
             text = text.strip() + self.site.family.interwiki_text_separator
@@ -308,10 +308,10 @@ class CosmeticChangesToolkit:
                 pywikibot.log(u'%s' % element.strip())
         # Adding the interwiki
         if interwikiLinks:
-            text = pywikibot.replaceLanguageLinks(text, interwikiLinks,
-                                                  site=self.site,
-                                                  template=self.template,
-                                                  template_subpage=subpage)
+            text = textlib.replaceLanguageLinks(text, interwikiLinks,
+                                                site=self.site,
+                                                template=self.template,
+                                                template_subpage=subpage)
         return text
 
     def translateAndCapitalizeNamespaces(self, text):
@@ -353,7 +353,7 @@ class CosmeticChangesToolkit:
                 namespaces[i] = item
             namespaces.append(thisNs[0].lower() + thisNs[1:])
             if thisNs and namespaces:
-                text = pywikibot.replaceExcept(
+                text = textlib.replaceExcept(
                     text,
                     r'\[\[\s*(%s) *:(?P<nameAndLabel>.*?)\]\]'
                     % '|'.join(namespaces),
@@ -375,7 +375,7 @@ class CosmeticChangesToolkit:
                 aliases = self.site.getmagicwords(magicWord)
                 if not aliases:
                     continue
-                text = pywikibot.replaceExcept(
+                text = textlib.replaceExcept(
                     text,
                     r'\[\[(?P<left>.+?:.+?\..+?\|) *(' + '|'.join(aliases) +
                     ') *(?P<right>(\|.*?)?\]\])',
@@ -503,9 +503,9 @@ class CosmeticChangesToolkit:
             r'(?P<newline>[\n]*)\[\[(?P<titleWithSection>[^\]\|]+)(\|(?P<label>[^\]\|]*))?\]\](?P<linktrail>' +
             self.site.linktrail() + ')')
 
-        text = pywikibot.replaceExcept(text, linkR, handleOneLink,
-                                       ['comment', 'math', 'nowiki', 'pre',
-                                        'startspace'])
+        text = textlib.replaceExcept(text, linkR, handleOneLink,
+                                     ['comment', 'math', 'nowiki', 'pre',
+                                      'startspace'])
         return text
 
     def resolveHtmlEntities(self, text):
@@ -532,8 +532,8 @@ class CosmeticChangesToolkit:
         return text
 
     def validXhtml(self, text):
-        text = pywikibot.replaceExcept(text, r'(?i)<br[ /]*>', r'<br />',
-                                       ['comment', 'math', 'nowiki', 'pre'])
+        text = textlib.replaceExcept(text, r'(?i)<br[ /]*>', r'<br />',
+                                     ['comment', 'math', 'nowiki', 'pre'])
         return text
 
     def removeUselessSpaces(self, text):
@@ -541,8 +541,8 @@ class CosmeticChangesToolkit:
         spaceAtLineEndR = re.compile(' $')
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table',
                       'template']
-        text = pywikibot.replaceExcept(text, multipleSpacesR, ' ', exceptions)
-        text = pywikibot.replaceExcept(text, spaceAtLineEndR, '', exceptions)
+        text = textlib.replaceExcept(text, multipleSpacesR, ' ', exceptions)
+        text = textlib.replaceExcept(text, spaceAtLineEndR, '', exceptions)
         return text
 
     def removeNonBreakingSpaceBeforePercent(self, text):
@@ -552,8 +552,8 @@ class CosmeticChangesToolkit:
         manually.
 
         """
-        text = pywikibot.replaceExcept(text, r'(\d)&nbsp;%', r'\1 %',
-                                       ['timeline'])
+        text = textlib.replaceExcept(text, r'(\d)&nbsp;%', r'\1 %',
+                                     ['timeline'])
         return text
 
     def cleanUpSectionHeaders(self, text):
@@ -566,7 +566,7 @@ class CosmeticChangesToolkit:
         German Wikipedia. It might be that it is not wanted on other wikis.
         If there are any complaints, please file a bug report.
         """
-        return pywikibot.replaceExcept(
+        return textlib.replaceExcept(
             text,
             r'(?m)^(={1,7}) *(?P<title>[^=]+?) *\1 *\r?\n',
             r'\1 \g<title> \1%s' % config.LS,
@@ -584,7 +584,7 @@ class CosmeticChangesToolkit:
         if not self.template:
             exceptions = ['comment', 'math', 'nowiki', 'pre', 'source', 'template',
                           'timeline', self.site.redirectRegex()]
-            text = pywikibot.replaceExcept(
+            text = textlib.replaceExcept(
                 text,
                 r'(?m)^(?P<bullet>[:;]*(\*+|#+)[:;\*#]*)(?P<char>[^\s\*#:;].+?)',
                 '\g<bullet> \g<char>',
@@ -605,7 +605,7 @@ class CosmeticChangesToolkit:
                     new = '{{%s}}' % new
                 if not self.site.nocapitalize:
                     old = '[' + old[0].upper() + old[0].lower() + ']' + old[1:]
-                text = pywikibot.replaceExcept(
+                text = textlib.replaceExcept(
                     text,
                     r'\{\{([mM][sS][gG]:)?%s(?P<parameters>\|[^}]+|)}}' % old,
                     new, exceptions)
@@ -618,30 +618,30 @@ class CosmeticChangesToolkit:
         # link to the wiki working on
         ## TODO: disable this for difflinks and titled links
         ## https://de.wikipedia.org/w/index.php?title=Wikipedia%3aVandalismusmeldung&diff=103109563&oldid=103109271
-##        text = pywikibot.replaceExcept(text,
-##                                       r'\[https?://%s\.%s\.org/wiki/(?P<link>\S+)\s+(?P<title>.+?)\s?\]'
-##                                       % (self.site.code, self.site.family.name),
-##                                       r'[[\g<link>|\g<title>]]', exceptions)
+##        text = textlib.replaceExcept(text,
+##                                     r'\[https?://%s\.%s\.org/wiki/(?P<link>\S+)\s+(?P<title>.+?)\s?\]'
+##                                     % (self.site.code, self.site.family.name),
+##                                     r'[[\g<link>|\g<title>]]', exceptions)
         # external link in double brackets
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(
             text,
             r'\[\[(?P<url>https?://[^\]]+?)\]\]',
             r'[\g<url>]', exceptions)
         # external link starting with double bracket
-        text = pywikibot.replaceExcept(text,
-                                       r'\[\[(?P<url>https?://.+?)\]',
-                                       r'[\g<url>]', exceptions)
+        text = textlib.replaceExcept(text,
+                                     r'\[\[(?P<url>https?://.+?)\]',
+                                     r'[\g<url>]', exceptions)
         # external link and description separated by a dash, with
         # whitespace in front of the dash, so that it is clear that
         # the dash is not a legitimate part of the URL.
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(
             text,
             r'\[(?P<url>https?://[^\|\] \r\n]+?) +\| *(?P<label>[^\|\]]+?)\]',
             r'[\g<url> \g<label>]', exceptions)
         # dash in external link, where the correct end of the URL can
         # be detected from the file extension. It is very unlikely that
         # this will cause mistakes.
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(
             text,
             r'\[(?P<url>https?://[^\|\] ]+?(\.pdf|\.html|\.htm|\.php|\.asp|\.aspx|\.jsp)) *\| *(?P<label>[^\|\]]+?)\]',
             r'[\g<url> \g<label>]', exceptions)
@@ -652,26 +652,26 @@ class CosmeticChangesToolkit:
         # Keep in mind that MediaWiki automatically converts <br> to <br />
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
-        text = pywikibot.replaceExcept(text, r'(?i)<b>(.*?)</b>', r"'''\1'''",
-                                       exceptions)
-        text = pywikibot.replaceExcept(text, r'(?i)<strong>(.*?)</strong>',
-                                       r"'''\1'''", exceptions)
-        text = pywikibot.replaceExcept(text, r'(?i)<i>(.*?)</i>', r"''\1''",
-                                       exceptions)
-        text = pywikibot.replaceExcept(text, r'(?i)<em>(.*?)</em>', r"''\1''",
-                                       exceptions)
+        text = textlib.replaceExcept(text, r'(?i)<b>(.*?)</b>', r"'''\1'''",
+                                     exceptions)
+        text = textlib.replaceExcept(text, r'(?i)<strong>(.*?)</strong>',
+                                     r"'''\1'''", exceptions)
+        text = textlib.replaceExcept(text, r'(?i)<i>(.*?)</i>', r"''\1''",
+                                     exceptions)
+        text = textlib.replaceExcept(text, r'(?i)<em>(.*?)</em>', r"''\1''",
+                                     exceptions)
         # horizontal line without attributes in a single line
-        text = pywikibot.replaceExcept(text, r'(?i)([\r\n])<hr[ /]*>([\r\n])',
-                                       r'\1----\2', exceptions)
+        text = textlib.replaceExcept(text, r'(?i)([\r\n])<hr[ /]*>([\r\n])',
+                                     r'\1----\2', exceptions)
         # horizontal line with attributes; can't be done with wiki syntax
         # so we only make it XHTML compliant
-        text = pywikibot.replaceExcept(text, r'(?i)<hr ([^>/]+?)>',
-                                       r'<hr \1 />',
-                                       exceptions)
+        text = textlib.replaceExcept(text, r'(?i)<hr ([^>/]+?)>',
+                                     r'<hr \1 />',
+                                     exceptions)
         # a header where only spaces are in the same line
         for level in range(1, 7):
             equals = '\\1%s \\2 %s\\3' % ("=" * level, "=" * level)
-            text = pywikibot.replaceExcept(
+            text = textlib.replaceExcept(
                 text,
                 r'(?i)([\r\n]) *<h%d> *([^<]+?) *</h%d> *([\r\n])'
                 % (level, level),
@@ -688,12 +688,12 @@ class CosmeticChangesToolkit:
         # it should be name = " or name=" NOT name   ="
         text = re.sub(r'(?i)<ref +name(= *| *=)"', r'<ref name="', text)
         #remove empty <ref/>-tag
-        text = pywikibot.replaceExcept(text,
-                                       r'(?i)(<ref\s*/>|<ref *>\s*</ref>)',
-                                       r'', exceptions)
-        text = pywikibot.replaceExcept(text,
-                                       r'(?i)<ref\s+([^>]+?)\s*>\s*</ref>',
-                                       r'<ref \1/>', exceptions)
+        text = textlib.replaceExcept(text,
+                                     r'(?i)(<ref\s*/>|<ref *>\s*</ref>)',
+                                     r'', exceptions)
+        text = textlib.replaceExcept(text,
+                                     r'(?i)<ref\s+([^>]+?)\s*>\s*</ref>',
+                                     r'<ref \1/>', exceptions)
         return text
 
     def fixStyle(self, text):
@@ -701,30 +701,30 @@ class CosmeticChangesToolkit:
                       'startspace']
         # convert prettytable to wikitable class
         if self.site.code in ('de', 'en'):
-            text = pywikibot.replaceExcept(text,
-                                           r'(class="[^"]*)prettytable([^"]*")',
-                                           r'\1wikitable\2', exceptions)
+            text = textlib.replaceExcept(text,
+                                         r'(class="[^"]*)prettytable([^"]*")',
+                                         r'\1wikitable\2', exceptions)
         return text
 
     def fixTypo(self, text):
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace', 'gallery', 'hyperlink', 'interwiki', 'link']
         # change <number> ccm -> <number> cm³
-        text = pywikibot.replaceExcept(text, r'(\d)\s*&nbsp;ccm',
-                                       r'\1&nbsp;' + u'cm³', exceptions)
-        text = pywikibot.replaceExcept(text,
-                                       r'(\d)\s*ccm', r'\1&nbsp;' + u'cm³',
-                                       exceptions)
+        text = textlib.replaceExcept(text, r'(\d)\s*&nbsp;ccm',
+                                     r'\1&nbsp;' + u'cm³', exceptions)
+        text = textlib.replaceExcept(text,
+                                     r'(\d)\s*ccm', r'\1&nbsp;' + u'cm³',
+                                     exceptions)
         # Solve wrong Nº sign with °C or °F
         # additional exception requested on fr-wiki for this stuff
         pattern = re.compile(u'«.*?»', re.UNICODE)
         exceptions.append(pattern)
-        text = pywikibot.replaceExcept(text, r'(\d)\s*&nbsp;' + u'[º°]([CF])',
-                                       r'\1&nbsp;' + u'°' + r'\2', exceptions)
-        text = pywikibot.replaceExcept(text, r'(\d)\s*' + u'[º°]([CF])',
-                                       r'\1&nbsp;' + u'°' + r'\2', exceptions)
-        text = pywikibot.replaceExcept(text, u'º([CF])', u'°' + r'\1',
-                                       exceptions)
+        text = textlib.replaceExcept(text, r'(\d)\s*&nbsp;' + u'[º°]([CF])',
+                                     r'\1&nbsp;' + u'°' + r'\2', exceptions)
+        text = textlib.replaceExcept(text, r'(\d)\s*' + u'[º°]([CF])',
+                                     r'\1&nbsp;' + u'°' + r'\2', exceptions)
+        text = textlib.replaceExcept(text, u'º([CF])', u'°' + r'\1',
+                                     exceptions)
         return text
 
     def fixArabicLetters(self, text):
@@ -762,20 +762,20 @@ class CosmeticChangesToolkit:
         exceptions.append(re.compile(u"[^%(fa)s] *?\"*? *?, *?[^%(fa)s]"
                                      % {'fa': faChrs}))
         exceptions.append(pattern)
-        text = pywikibot.replaceExcept(text, u',', u'،', exceptions)
+        text = textlib.replaceExcept(text, u',', u'،', exceptions)
         if self.site.code == 'ckb':
-            text = pywikibot.replaceExcept(text,
-                                           u'\u0647([.\u060c_<\\]\\s])',
-                                           u'\u06d5\\1', exceptions)
-            text = pywikibot.replaceExcept(text, u'ه‌', u'ە', exceptions)
-            text = pywikibot.replaceExcept(text, u'ه', u'ھ', exceptions)
-        text = pywikibot.replaceExcept(text, u'ك', u'ک', exceptions)
-        text = pywikibot.replaceExcept(text, u'[ىي]', u'ی', exceptions)
+            text = textlib.replaceExcept(text,
+                                         u'\u0647([.\u060c_<\\]\\s])',
+                                         u'\u06d5\\1', exceptions)
+            text = textlib.replaceExcept(text, u'ه‌', u'ە', exceptions)
+            text = textlib.replaceExcept(text, u'ه', u'ھ', exceptions)
+        text = textlib.replaceExcept(text, u'ك', u'ک', exceptions)
+        text = textlib.replaceExcept(text, u'[ىي]', u'ی', exceptions)
         return text
         # replace persian/arabic digits
         # deactivated due to bug 55185
         for i in range(0, 10):
-            text = pywikibot.replaceExcept(text, old[i], new[i], exceptions)
+            text = textlib.replaceExcept(text, old[i], new[i], exceptions)
         # do not change digits in class, style and table params
         pattern = re.compile(u'\w+=(".+?"|\d+)', re.UNICODE)
         exceptions.append(pattern)
@@ -785,7 +785,7 @@ class CosmeticChangesToolkit:
         exceptions.append('table')  # exclude tables for now
         # replace digits
         for i in range(0, 10):
-            text = pywikibot.replaceExcept(text, str(i), new[i], exceptions)
+            text = textlib.replaceExcept(text, str(i), new[i], exceptions)
         return text
 
     # Retrieved from "https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup"
@@ -793,46 +793,46 @@ class CosmeticChangesToolkit:
         # section headers to {{int:}} versions
         exceptions = ['comment', 'includeonly', 'math', 'noinclude', 'nowiki',
                       'pre', 'source', 'ref', 'timeline']
-        text = pywikibot.replaceExcept(text,
-                                       r"([\r\n]|^)\=\= *Summary *\=\=",
-                                       r"\1== {{int:filedesc}} ==",
-                                       exceptions, True)
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(text,
+                                     r"([\r\n]|^)\=\= *Summary *\=\=",
+                                     r"\1== {{int:filedesc}} ==",
+                                     exceptions, True)
+        text = textlib.replaceExcept(
             text,
             r"([\r\n])\=\= *\[\[Commons:Copyright tags\|Licensing\]\]: *\=\=",
             r"\1== {{int:license-header}} ==", exceptions, True)
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(
             text,
             r"([\r\n])\=\= *(Licensing|License information|{{int:license}}) *\=\=",
             r"\1== {{int:license-header}} ==", exceptions, True)
 
         # frequent field values to {{int:}} versions
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(
             text,
             r'([\r\n]\|[Ss]ource *\= *)(?:[Oo]wn work by uploader|[Oo]wn work|[Ee]igene [Aa]rbeit) *([\r\n])',
             r'\1{{own}}\2', exceptions, True)
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(
             text,
             r'(\| *Permission *\=) *(?:[Ss]ee below|[Ss]iehe unten) *([\r\n])',
             r'\1\2', exceptions, True)
 
         # added to transwikied pages
-        text = pywikibot.replaceExcept(text, r'__NOTOC__', '', exceptions, True)
+        text = textlib.replaceExcept(text, r'__NOTOC__', '', exceptions, True)
 
         # tracker element for js upload form
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(
             text,
             r'<!-- *{{ImageUpload\|(?:full|basic)}} *-->',
             '', exceptions[1:], True)
-        text = pywikibot.replaceExcept(text, r'{{ImageUpload\|(?:basic|full)}}',
-                                       '', exceptions, True)
+        text = textlib.replaceExcept(text, r'{{ImageUpload\|(?:basic|full)}}',
+                                     '', exceptions, True)
 
         # duplicated section headers
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(
             text,
             r'([\r\n]|^)\=\= *{{int:filedesc}} *\=\=(?:[\r\n ]*)\=\= *{{int:filedesc}} *\=\=',
             r'\1== {{int:filedesc}} ==', exceptions, True)
-        text = pywikibot.replaceExcept(
+        text = textlib.replaceExcept(
             text,
             r'([\r\n]|^)\=\= *{{int:license-header}} *\=\=(?:[\r\n ]*)\=\= *{{int:license-header}} *\=\=',
             r'\1== {{int:license-header}} ==', exceptions, True)

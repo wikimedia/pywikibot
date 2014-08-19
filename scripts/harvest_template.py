@@ -32,7 +32,7 @@ __version__ = '$Id$'
 
 import re
 import pywikibot
-from pywikibot import pagegenerators as pg, WikidataBot
+from pywikibot import pagegenerators as pg, textlib, WikidataBot
 
 docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
 
@@ -125,7 +125,7 @@ class HarvestRobot(WikidataBot):
             pywikibot.output(u'%s item %s has claims for all properties. Skipping' % (page, item.title()))
         else:
             pagetext = page.get()
-            templates = pywikibot.extract_templates_and_params(pagetext)
+            templates = textlib.extract_templates_and_params(pagetext)
             for (template, fielddict) in templates:
                 # Clean up template
                 try:

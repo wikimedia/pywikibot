@@ -55,7 +55,7 @@ This script understands various command-line arguments:
 # (C) Maxim Razin, 2005
 # (C) Leonardo Gregianin, 2005-2008
 # (C) xqt, 2009-2014
-# (C) Pywikibot team, 2005-2012
+# (C) Pywikibot team, 2005-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,7 +65,7 @@ __version__ = '$Id$'
 import pickle
 import re
 import pywikibot
-from pywikibot import i18n
+from pywikibot import i18n, textlib
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.config2 import LS  # line separator
 
@@ -566,12 +566,12 @@ class FeaturedBot(pywikibot.Bot):
                                 text[m1.end():])
                     else:
                         # Moving {{Link FA|xx}} to top of interwikis
-                        iw = pywikibot.getLanguageLinks(text, tosite)
-                        text = pywikibot.removeLanguageLinks(text, tosite)
+                        iw = textlib.getLanguageLinks(text, tosite)
+                        text = textlib.removeLanguageLinks(text, tosite)
                         text += u"%s{{%s|%s}}%s" % (LS, add_tl[0],
                                                     fromsite.code, LS)
-                        text = pywikibot.replaceLanguageLinks(text,
-                                                              iw, tosite)
+                        text = textlib.replaceLanguageLinks(text,
+                                                            iw, tosite)
                     changed = True
         if remove_tl:
             if m2:

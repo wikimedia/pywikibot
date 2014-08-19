@@ -105,7 +105,7 @@ import pickle
 import bz2
 import pywikibot
 from pywikibot import config, pagegenerators
-from pywikibot import i18n
+from pywikibot import i18n, textlib
 from pywikibot import deprecate_arg, deprecated
 
 # This is required for the text that is shown when you run this script
@@ -397,7 +397,7 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
                 catpl = self.sorted_by_last_name(catpl, page)
             pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
             cats.append(catpl)
-            text = pywikibot.replaceCategoryLinks(text, cats, site=page.site)
+            text = textlib.replaceCategoryLinks(text, cats, site=page.site)
             if not self.save(text, page, newcatTitle, old_text=old_text):
                 pywikibot.output(u'Page %s not saved.'
                                  % page.title(asLink=True))

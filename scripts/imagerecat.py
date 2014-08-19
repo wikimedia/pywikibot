@@ -40,7 +40,7 @@ import socket
 import xml.etree.ElementTree
 
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators, textlib
 
 category_blacklist = []
 countries = []
@@ -390,7 +390,7 @@ def filterParents(categories):
 
 def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
     """ Remove the old categories and add the new categories to the image. """
-    newtext = pywikibot.removeCategoryLinks(imagepage.text, imagepage.site)
+    newtext = textlib.removeCategoryLinks(imagepage.text, imagepage.site)
     if not onlyFilter:
         newtext = removeTemplates(newtext)
         newtext = newtext + getCheckCategoriesTemplate(usage, galleries,

@@ -42,7 +42,7 @@ __version__ = '$Id$'
 
 import re
 import pywikibot
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators, textlib, Bot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -443,7 +443,7 @@ class XmlDumpNoReferencesPageGenerator:
         import xmlreader
         dump = xmlreader.XmlDump(self.xmlFilename)
         for entry in dump.parse():
-            text = pywikibot.removeDisabledParts(entry.text)
+            text = textlib.removeDisabledParts(entry.text)
             if self.refR.search(text) and not self.referencesR.search(text):
                 yield pywikibot.Page(pywikibot.Site(), entry.title)
 
@@ -479,7 +479,7 @@ class NoReferencesBot(Bot):
         """
         Checks whether or not the page is lacking a references tag.
         """
-        oldTextCleaned = pywikibot.removeDisabledParts(text)
+        oldTextCleaned = textlib.removeDisabledParts(text)
         if self.referencesR.search(oldTextCleaned) or \
            self.referencesTagR.search(oldTextCleaned):
             if self.getOption('verbose'):
@@ -516,7 +516,7 @@ class NoReferencesBot(Bot):
             while index < len(oldText):
                 match = sectionR.search(oldText, index)
                 if match:
-                    if pywikibot.isDisabled(oldText, match.start()):
+                    if textlib.isDisabled(oldText, match.start()):
                         pywikibot.output(
                             'Existing  %s section is commented out, skipping.'
                             % section)
@@ -543,7 +543,7 @@ class NoReferencesBot(Bot):
             while index < len(oldText):
                 match = sectionR.search(oldText, index)
                 if match:
-                    if pywikibot.isDisabled(oldText, match.start()):
+                    if textlib.isDisabled(oldText, match.start()):
                         pywikibot.output(
                             'Existing %s section is commented out, won\'t add '
                             'the references in front of it.' % section)

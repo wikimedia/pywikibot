@@ -25,7 +25,7 @@ Todo:
 """
 #
 # (C) Multichill, 2009
-# (C) Pywikibot team, 2009-2013
+# (C) Pywikibot team, 2009-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,7 +39,7 @@ import hashlib
 import base64
 import time
 import pywikibot
-from pywikibot import config
+from pywikibot import config, textlib
 import upload
 
 try:
@@ -236,9 +236,9 @@ def buildDescription(flinfoDescription=u'', flickrreview=False, reviewer=u'',
     """
     description = u'== {{int:filedesc}} ==\n%s' % flinfoDescription
     if removeCategories:
-        description = pywikibot.removeCategoryLinks(description,
-                                                    pywikibot.Site(
-                                                        'commons', 'commons'))
+        description = textlib.removeCategoryLinks(description,
+                                                  pywikibot.Site(
+                                                      'commons', 'commons'))
     if override:
         description = description.replace(u'{{cc-by-sa-2.0}}\n', u'')
         description = description.replace(u'{{cc-by-2.0}}\n', u'')

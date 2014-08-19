@@ -107,11 +107,7 @@ import threading
 import time
 
 import pywikibot
-from pywikibot import i18n
-from pywikibot import config
-from pywikibot import pagegenerators
-from pywikibot import xmlreader
-from pywikibot import weblib
+from pywikibot import i18n, config, pagegenerators, textlib, xmlreader, weblib
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -144,7 +140,7 @@ ignorelist = [
 
 
 def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
-    text = pywikibot.removeDisabledParts(text)
+    text = textlib.removeDisabledParts(text)
 
     # MediaWiki parses templates before parsing external links. Thus, there
     # might be a | or a } directly after a URL which does not belong to
@@ -168,8 +164,8 @@ def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
 
     # Remove HTML comments in URLs as well as URLs in HTML comments.
     # Also remove text inside nowiki links etc.
-    text = pywikibot.removeDisabledParts(text)
-    linkR = pywikibot.compileLinkR(withoutBracketed, onlyBracketed)
+    text = textlib.removeDisabledParts(text)
+    linkR = textlib.compileLinkR(withoutBracketed, onlyBracketed)
     for m in linkR.finditer(text):
         if m.group('url'):
             yield m.group('url')
