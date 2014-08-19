@@ -59,10 +59,10 @@ and arguments can be:
 
 """
 #
-# (C) Daniel Herding, 2004.
-# (C) Purodha Blissenbach, 2009.
+# (C) Daniel Herding, 2004
+# (C) Purodha Blissenbach, 2009
 # (C) xqt, 2009-2014
-# (C) Pywikibot team, 2004-2013
+# (C) Pywikibot team, 2004-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -72,7 +72,7 @@ __version__ = '$Id$'
 import re
 import datetime
 import pywikibot
-from pywikibot import i18n, xmlreader
+from pywikibot import i18n, xmlreader, Bot
 
 
 class RedirectGenerator:
@@ -93,12 +93,12 @@ class RedirectGenerator:
         self.api_step = step
 
     def get_redirects_from_dump(self, alsoGetPageTitles=False):
-        '''
+        """
         Load a local XML dump file, look at all pages which have the
         redirect flag set, and find out where they're pointing at. Return
         a dictionary where the redirect names are the keys and the redirect
         targets are the values.
-        '''
+        """
         xmlFilename = self.xmlFilename
         redict = {}
         # open xml dump and read page titles out of it
@@ -162,10 +162,7 @@ class RedirectGenerator:
             return redict
 
     def get_redirect_pages_via_api(self):
-        """Return generator that yields
-        Pages that are redirects.
-
-        """
+        """Yield Pages that are redirects."""
         for ns in self.namespaces:
             done = False
             gen = self.site.allpages(start=self.api_start,
@@ -332,7 +329,7 @@ class RedirectGenerator:
                 yield redir_name.title()
 
     def get_moved_pages_redirects(self):
-        '''generate redirects to recently-moved pages'''
+        """Generate redirects to recently-moved pages."""
         # this will run forever, until user interrupts it
 
         if self.offset <= 0:
@@ -369,20 +366,21 @@ class RedirectGenerator:
                 continue
 
 
-class RedirectRobot:
-    def __init__(self, action, generator, always=False, number=None,
-                 delete=False):
+class RedirectRobot(Bot):
+    def __init__(self, action, generator, **kwargs):
+        self.availableOptions.update({
+            'number': None,
+            'delete': False,
+        })
+        super(RedirectRobot, self).__init__(**kwargs)
         self.site = pywikibot.Site()
         self.action = action
         self.generator = generator
-        self.always = always
-        self.number = number
-        self.delete = delete
         self.exiting = False
         self._valid_template = None
 
     def prompt(self, question):
-        if not self.always:
+        if not self.getOption('always'):
             choice = pywikibot.inputChoice(question,
                                            ['Yes', 'No', 'All', 'Quit'],
                                            ['y', 'N', 'a', 'q'], 'N')
@@ -392,11 +390,11 @@ class RedirectRobot:
                 self.exiting = True
                 return False
             elif choice == 'a':
-                self.always = True
+                self.options['always'] = True
         return True
 
     def has_valid_template(self, twtitle):
-        """"Check whether a template from translatewiki.net does exist on real
+        """Check whether a template from translatewiki.net does exist on real
         wiki. We assume we are always working on self.site
 
         @param twtitle - a sting which is the i18n key
@@ -489,7 +487,7 @@ class RedirectRobot:
                                 pywikibot.output(u'%s is locked.'
                                                  % redir_page.title())
                                 pass
-                elif self.delete and self.prompt(
+                elif self.getOption('delete') and self.prompt(
                         u'Redirect target %s does not exist.\n'
                         u'Do you want to delete %s?'
                         % (targetPage.title(asLink=True),
@@ -518,7 +516,7 @@ class RedirectRobot:
                             redir_page.put(content, reason)
                         else:
                             pywikibot.output(
-                                u'No speedy deletion template availlable')
+                                u'No speedy deletion template available')
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u"Redirect target %s is also a redirect! "
                                  u"Won't delete anything."
@@ -582,7 +580,7 @@ class RedirectRobot:
                                      % redir.title(asLink=True))
                     break
                 else:
-                    if self.always:
+                    if self.getOption('always'):
                         pywikibot.output(
                             u"Skipping: Redirect target %s doesn't exist."
                             % newRedir.title(asLink=True))
@@ -603,7 +601,7 @@ class RedirectRobot:
                     pywikibot.warning(
                         u'redirect target (%s) is on a different site.'
                         % targetPage.title(asLink=True))
-                    if self.always:
+                    if self.getOption('always'):
                         break  # skip if automatic
                 mw_msg = targetPage.site.mediawiki_message(
                     'wikieditor-toolbar-tool-redirect-example')
@@ -715,7 +713,7 @@ class RedirectRobot:
             else:
                 self.fix_1_double_redirect(redir_name)
                 count += 1
-            if self.exiting or (self.number and count >= self.number):
+            if self.exiting or (self.getOption('number') and count >= self.getOption('number')):
                 break
 
     def run(self):
@@ -730,7 +728,7 @@ class RedirectRobot:
 
 
 def main(*args):
-    # read command line parameters
+    options = {}
     # what the bot should do (either resolve double redirs, or delete broken
     # redirs)
     action = None
@@ -750,8 +748,6 @@ def main(*args):
     until = ''
     number = None
     step = None
-    always = False
-    delete = False
     for arg in pywikibot.handleArgs(*args):
         if arg == 'double' or arg == 'do':
             action = 'double'
@@ -796,9 +792,9 @@ def main(*args):
         elif arg.startswith('-step:'):
             step = int(arg[6:])
         elif arg == '-always':
-            always = True
+            options['always'] = True
         elif arg == '-delete':
-            delete = True
+            options['delete'] = True
         else:
             pywikibot.output(u'Unknown argument: %s' % arg)
 
@@ -812,7 +808,7 @@ def main(*args):
         pywikibot.Site().login()
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
                                 fullscan, start, until, number, step)
-        bot = RedirectRobot(action, gen, always, number, delete)
+        bot = RedirectRobot(action, gen, number=number, **options)
         bot.run()
 
 if __name__ == '__main__':
