@@ -30,7 +30,7 @@ from pywikibot import config2 as config
 from pywikibot.bot import (
     output, warning, error, critical, debug, stdout, exception,
     input, inputChoice, handleArgs, showHelp, ui, log,
-    calledModuleName, Bot, WikidataBot,
+    calledModuleName, Bot, WikidataBot, QuitKeyboardInterrupt,
 )
 from pywikibot.exceptions import (
     Error, InvalidTitle, BadTitle, NoPage, SectionError,
@@ -75,6 +75,7 @@ __all__ = (
     'getCategoryLinks', 'categoryFormat', 'replaceCategoryLinks',
     'removeCategoryLinks', 'removeCategoryLinksAndSeparator',
     'replaceCategoryInPlace', 'compileLinkR', 'extract_templates_and_params',
+    'QuitKeyboardInterrupt',
 )
 
 
