@@ -314,6 +314,55 @@ u"%(old_arg)s argument of %(meth_name)s is deprecated."
     return decorator
 
 
+def redirect_func(target, source_module=None, target_module=None):
+    """
+    Return a function which can be used to redirect to 'target'.
+
+    It also acts like marking that function deprecated and copies all
+    parameters.
+
+    @param target: The targeted function which is to be executed.
+    @type target: callable
+    @param source_module: The module of the old function. If '.' defaults
+        to target_module. If 'None' (default) it tries to guess it from the
+        executing function.
+    @type source_module: basestring
+    @param target_module: The module of the target function. If
+        'None' (default) it tries to get it from the target. Might not work
+        with nested classes.
+    @type target_module: basestring
+    @return: A new function which adds a warning prior to each execution.
+    @rtype: callable
+    """
+    class Wrapper(object):
+        def __init__(self, function, source, target):
+            self._function = function
+            self.parameters = {'new': function.func_name,
+                               'target': target,
+                               'source': source}
+            self.warning = ('{source}{new} is DEPRECATED, use {target}{new} '
+                            'instead.').format(**self.parameters)
+
+        def call(self, *a, **kw):
+            warning(self.warning)
+            return self._function(*a, **kw)
+
+    if target_module is None:
+        target_module = target.__module__
+        if hasattr(target, 'im_class'):
+            target_module += '.' + target.im_class.__name__
+    if target_module and target_module[-1] != '.':
+        target_module += '.'
+    if source_module is '.':
+        source_module = target_module
+    elif source_module and source_module[-1] != '.':
+        source_module += '.'
+    else:
+        source_module = (sys._getframe(1).f_code.co_filename.rsplit("/", 1)[0]
+                         .replace("/", ".") + ".")
+    return Wrapper(target, source_module, target_module).call
+
+
 if __name__ == "__main__":
     def _test():
         import doctest

@@ -41,21 +41,24 @@ from pywikibot.exceptions import (
     CaptchaError, SpamfilterError, CircularRedirect,
     WikiBaseError, CoordinateGlobeUnknownException,
 )
-from pywikibot.textlib import (
-    unescape, replaceExcept, removeDisabledParts, removeHTMLParts,
-    isDisabled, interwikiFormat, interwikiSort,
-    getLanguageLinks, replaceLanguageLinks,
-    removeLanguageLinks, removeLanguageLinksAndSeparator,
-    getCategoryLinks, categoryFormat, replaceCategoryLinks,
-    removeCategoryLinks, removeCategoryLinksAndSeparator,
-    replaceCategoryInPlace, compileLinkR, extract_templates_and_params,
-)
-from pywikibot.tools import UnicodeMixin, deprecated, deprecate_arg
+from pywikibot.tools import UnicodeMixin, redirect_func
 from pywikibot.i18n import translate
 from pywikibot.data.api import UploadWarning
+import pywikibot.textlib as textlib
+import pywikibot.tools
+
+textlib_methods = (
+    'unescape', 'replaceExcept', 'removeDisabledParts', 'removeHTMLParts',
+    'isDisabled', 'interwikiFormat', 'interwikiSort',
+    'getLanguageLinks', 'replaceLanguageLinks',
+    'removeLanguageLinks', 'removeLanguageLinksAndSeparator',
+    'getCategoryLinks', 'categoryFormat', 'replaceCategoryLinks',
+    'removeCategoryLinks', 'removeCategoryLinksAndSeparator',
+    'replaceCategoryInPlace', 'compileLinkR', 'extract_templates_and_params',
+)
 
 __all__ = (
-    'config', 'ui', 'UnicodeMixin', 'translate', 'deprecated', 'deprecate_arg',
+    'config', 'ui', 'UnicodeMixin', 'translate',
     'Page', 'FilePage', 'ImagePage', 'Category', 'Link', 'User',
     'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
     'html2unicode', 'url2unicode', 'unicode2html',
@@ -67,17 +70,24 @@ __all__ = (
     'PageRelatedError', 'IsRedirectPage', 'IsNotRedirectPage',
     'PageNotSaved', 'UploadWarning', 'LockedPage', 'EditConflict',
     'ServerError', 'FatalServerError', 'Server504Error',
-    'CaptchaError',  'SpamfilterError', 'CircularRedirect',
+    'CaptchaError', 'SpamfilterError', 'CircularRedirect',
     'WikiBaseError', 'CoordinateGlobeUnknownException',
-    'unescape', 'replaceExcept', 'removeDisabledParts', 'removeHTMLParts',
-    'isDisabled', 'interwikiFormat', 'interwikiSort',
-    'getLanguageLinks', 'replaceLanguageLinks',
-    'removeLanguageLinks', 'removeLanguageLinksAndSeparator',
-    'getCategoryLinks', 'categoryFormat', 'replaceCategoryLinks',
-    'removeCategoryLinks', 'removeCategoryLinksAndSeparator',
-    'replaceCategoryInPlace', 'compileLinkR', 'extract_templates_and_params',
     'QuitKeyboardInterrupt',
 )
+# flake8 is unable to detect concatenation in the same operation
+# like:
+# ) + textlib_methods
+# so instead use this trick
+globals()['__all__'] = __all__ + textlib_methods
+
+for _name in textlib_methods:
+    target = getattr(textlib, _name)
+    wrapped_func = redirect_func(target)
+    globals()[_name] = wrapped_func
+
+
+deprecated = redirect_func(pywikibot.tools.deprecated)
+deprecate_arg = redirect_func(pywikibot.tools.deprecate_arg)
 
 
 class Timestamp(datetime.datetime):
@@ -491,7 +501,7 @@ from .page import html2unicode, url2unicode, unicode2html
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 
-@deprecated("comment parameter for page saving method")
+@pywikibot.tools.deprecated("comment parameter for page saving method")
 def setAction(s):
     """Set a summary to use for changed page submissions"""
     config.default_edit_summary = s
