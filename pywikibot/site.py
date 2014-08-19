@@ -1691,8 +1691,25 @@ class APISite(BaseSite):
                 self._namespaces[ns].aliases.append(item['*'])
 
     @need_version("1.14")
-    @deprecate_arg("unknown", None)
-    def hasExtension(self, name):
+    @deprecated("has_extension")
+    def hasExtension(self, name, unknown=None):
+        """ Determine whether extension `name` is loaded.
+
+        Use L{has_extension} instead!
+
+        @param name: The extension to check for, case insenstive
+        @type name: str
+        @param unknown: Old parameter which shouldn't be used anymore.
+        @return: If the extension is loaded
+        @rtype: bool
+        """
+        if unknown is not None:
+            pywikibot.debug(u'unknown argument of hasExtension is deprecated.',
+                            _logger)
+        return self.has_extension(name)
+
+    @need_version("1.14")
+    def has_extension(self, name):
         """ Determine whether extension `name` is loaded.
 
         @param name: The extension to check for, case insenstive

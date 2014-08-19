@@ -980,24 +980,16 @@ class TestSiteObject(PywikibotTestCase):
         # test automatically getting extensions cache
         if 'extensions' in mysite.siteinfo:
             del mysite.siteinfo._cache['extensions']
-        self.assertTrue(mysite.hasExtension('Disambiguator'))
+        self.assertTrue(mysite.has_extension('Disambiguator'))
 
         # test case-sensitivity
-        self.assertTrue(mysite.hasExtension('disambiguator'))
+        self.assertTrue(mysite.has_extension('disambiguator'))
 
-        self.assertFalse(mysite.hasExtension('ThisExtensionDoesNotExist'))
+        self.assertFalse(mysite.has_extension('ThisExtensionDoesNotExist'))
 
         # test behavior for sites that do not report extensions
-        mysite.siteinfo._cache['extensions'] = (None, True)
-        self.assertRaises(NotImplementedError, mysite.hasExtension, ('anything'))
-
-        class MyException(Exception):
-            pass
-        self.assertRaises(MyException, mysite.hasExtension, 'anything', MyException)
-
-        self.assertTrue(mysite.hasExtension('anything', True))
-        self.assertFalse(mysite.hasExtension('anything', False))
-        del mysite.siteinfo._cache['extensions']
+        # TODO: Simulate a version to old to support this
+        # self.assertRaises(NotImplementedError, mysite.has_extension, ('anything'))
 
     def test_API_limits_with_site_methods(self):
         # test step/total parameters for different sitemethods

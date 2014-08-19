@@ -678,7 +678,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
         @return: bool
         """
-        if self.site.hasExtension('Disambiguator', False):
+        if self.site.has_extension('Disambiguator'):
             # If the Disambiguator extension is loaded, use it
             return 'disambiguation' in self.properties()
 
@@ -1747,7 +1747,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
         @return: bool
         """
-        if not self.site.hasExtension('Flow', False):
+        if not self.site.has_extension('Flow'):
             return False
         if not hasattr(self, '_flowinfo'):
             self.site.loadflowinfo(self)
