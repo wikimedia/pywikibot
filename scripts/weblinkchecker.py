@@ -174,7 +174,8 @@ def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
 
 
 class XmlDumpPageGenerator:
-    """Xml generator that yiels pages containing a web link"""
+
+    """Xml generator that yiels pages containing a web link."""
 
     def __init__(self, xmlFilename, xmlStart, namespaces):
         self.xmlStart = xmlStart
@@ -215,6 +216,7 @@ class XmlDumpPageGenerator:
 
 
 class LinkChecker(object):
+
     """
     Given a HTTP URL, tries to load the page from the Internet and checks if it
     is still online.
@@ -466,6 +468,7 @@ class LinkChecker(object):
 
 
 class LinkCheckThread(threading.Thread):
+
     """ A thread responsible for checking one URL. After checking the page, it
     will die.
 
@@ -500,6 +503,7 @@ class LinkCheckThread(threading.Thread):
 
 
 class History:
+
     """ Store previously found dead links. The URLs are dictionary keys, and
     values are lists of tuples where each tuple represents one time the URL was
     found dead. Tuples have the form (title, date, error) where title is the
@@ -537,9 +541,7 @@ class History:
             self.historyDict = {}
 
     def log(self, url, error, containingPage, archiveURL):
-        """
-        Logs an error report to a text file in the deadlinks subdirectory.
-        """
+        """Logs an error report to a text file in the deadlinks subdirectory."""
         if archiveURL:
             errorReport = u'* %s ([%s archive])\n' % (url, archiveURL)
         else:
@@ -567,9 +569,7 @@ class History:
                                      archiveURL)
 
     def setLinkDead(self, url, error, page, day):
-        """
-        Adds the fact that the link was found dead to the .dat file.
-        """
+        """Adds the fact that the link was found dead to the .dat file."""
         self.semaphore.acquire()
         now = time.time()
         if url in self.historyDict:
@@ -617,11 +617,13 @@ class History:
 
 
 class DeadLinkReportThread(threading.Thread):
+
     """
     A Thread that is responsible for posting error reports on talk pages. There
     will only be one DeadLinkReportThread, and it is using a semaphore to make
     sure that two LinkCheckerThreads can not access the queue at the same time.
     """
+
     def __init__(self):
         threading.Thread.__init__(self)
         self.semaphore = threading.Semaphore()
@@ -714,6 +716,7 @@ class DeadLinkReportThread(threading.Thread):
 
 
 class WeblinkCheckerRobot:
+
     """
     Bot which will use several LinkCheckThreads at once to search for dead
     weblinks on pages provided by the given generator.
@@ -787,7 +790,7 @@ def countLinkCheckThreads():
 
 
 def check(url):
-    """Peform a check on URL"""
+    """Peform a check on URL."""
     c = LinkChecker(url)
     return c.check()
 

@@ -296,7 +296,8 @@ class AddCategory:
     def load(self, page):
         """Load the given page's content.
 
-        If page doesn't exists returns an empty string."""
+        If page doesn't exists returns an empty string.
+        """
         try:
             # Load the page
             text = page.get()

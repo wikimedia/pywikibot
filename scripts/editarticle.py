@@ -38,7 +38,7 @@ class ArticleEditor(object):
         self.site = pywikibot.Site()
 
     def set_options(self, *args):
-        """Parse commandline and set options attribute"""
+        """Parse commandline and set options attribute."""
         my_args = []
         for arg in pywikibot.handleArgs(*args):
             my_args.append(arg)
@@ -58,7 +58,7 @@ class ArticleEditor(object):
             self.options.page = args[0]
 
     def setpage(self):
-        """Sets page and page title"""
+        """Sets page and page title."""
         site = pywikibot.Site()
         pageTitle = self.options.page or pywikibot.input(u"Page to edit:")
         self.page = pywikibot.Page(pywikibot.Link(pageTitle, site))

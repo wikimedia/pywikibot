@@ -49,25 +49,31 @@ docuReplacements = {
 
 
 class WikiTransferException(Exception):
+
     """Base class for exceptions from this script.
 
     Makes it easier for clients to catch all expected exceptions that the script might
     throw
     """
+
     pass
 
 
 class TargetSiteMissing(WikiTransferException):
+
     """Thrown when the target site is the same as the source site.
 
     Based on the way each are initialized, this is likely to happen when the target site
     simply hasn't been specified.
     """
+
     pass
 
 
 class TargetPagesMissing(WikiTransferException):
+
     """Thrown if no page range has been specified for the script to operate on."""
+
     pass
 
 

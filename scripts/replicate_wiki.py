@@ -38,7 +38,7 @@ from pywikibot import config, Page
 
 
 def namespaces(site):
-    """dict from namespace number to prefix"""
+    """dict from namespace number to prefix."""
     ns = dict(map(lambda n: (site.getNamespaceIndex(n), n),
                   site.namespaces()))
     ns[0] = ''
@@ -46,13 +46,14 @@ def namespaces(site):
 
 
 def multiple_replace(text, word_dict):
-    """Replace all occurrences in text of key value pairs in word_dict"""
+    """Replace all occurrences in text of key value pairs in word_dict."""
     for key in word_dict:
         text = text.replace(key, word_dict[key])
     return text
 
 
 class SyncSites:
+
     """Work is done in here."""
 
     def __init__(self, options):
@@ -91,7 +92,7 @@ class SyncSites:
         pywikibot.output('')
 
     def check_sysops(self):
-        """Check if sysops are the same on all wikis """
+        """Check if sysops are the same on all wikis."""
         def get_users(site):
             userlist = [ul['name'] for ul in site.allusers(group='sysop')]
             return set(userlist)
@@ -104,7 +105,7 @@ class SyncSites:
             self.user_diff[site] = diff
 
     def check_namespaces(self):
-        """Check all namespaces, to be ditched for clarity"""
+        """Check all namespaces, to be ditched for clarity."""
         namespaces = [
             0,    # Main
             8,    # MediaWiki
@@ -125,8 +126,7 @@ class SyncSites:
             self.check_namespace(ns)
 
     def check_namespace(self, namespace):
-        """Check an entire namespace"""
-
+        """Check an entire namespace."""
         pywikibot.output("\nCHECKING NAMESPACE %s" % namespace)
         pages = imap(lambda p: p.title(),
                      self.original.allpages('!', namespace=namespace))
@@ -144,7 +144,7 @@ class SyncSites:
         pywikibot.output('')
 
     def generate_overviews(self):
-        """Create page on wikis with overview of bot results"""
+        """Create page on wikis with overview of bot results."""
         for site in self.sites:
             sync_overview_page = Page(site,
                                       'User:%s/sync.py overview' % site.user())
@@ -171,8 +171,7 @@ class SyncSites:
                 % (site.user(), str(self.original)))
 
     def check_page(self, pagename):
-        """Check one page"""
-
+        """Check one page."""
         pywikibot.output("\nChecking %s" % pagename)
         sys.stdout.flush()
         page1 = Page(self.original, pagename)

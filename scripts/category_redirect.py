@@ -80,7 +80,7 @@ class CategoryRedirectBot(object):
             self.site.code, 'category_redirect-edit-request-item')
 
     def move_contents(self, oldCatTitle, newCatTitle, editSummary):
-        """The worker function that moves pages out of oldCat into newCat"""
+        """The worker function that moves pages out of oldCat into newCat."""
         while True:
             try:
                 oldCat = pywikibot.Category(self.site,
@@ -168,7 +168,7 @@ class CategoryRedirectBot(object):
         return log_text
 
     def run(self):
-        """Run the bot"""
+        """Run the bot."""
         global destmap, catlist, catmap
 
         # user() invokes login()

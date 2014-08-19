@@ -73,9 +73,7 @@ class CreateCategoriesBot(Bot):
 
 
 def main():
-    """
-    Main loop. Get a generator and options.
-    """
+    """Main loop. Get a generator and options."""
     parent = None
     basename = None
     options = {}

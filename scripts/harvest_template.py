@@ -57,9 +57,7 @@ class HarvestRobot(WikidataBot):
         self.cacheSources()
 
     def run(self):
-        """
-        Starts the robot.
-        """
+        """Starts the robot."""
         self.templateTitles = self.getTemplateSynonyms(self.templateTitle)
         for page in self.generator:
             try:
@@ -68,9 +66,7 @@ class HarvestRobot(WikidataBot):
                 pywikibot.exception(msg=e, tb=True)
 
     def getTemplateSynonyms(self, title):
-        """
-        Fetches redirects of the title, so we can check against them
-        """
+        """Fetches redirects of the title, so we can check against them."""
         temp = pywikibot.Page(pywikibot.Site(), title, ns=10)
         if not temp.exists():
             pywikibot.error(u'Template %s does not exist.' % temp.title())
@@ -111,9 +107,7 @@ class HarvestRobot(WikidataBot):
         return linked_item
 
     def processPage(self, page):
-        """
-        Process a single page
-        """
+        """Process a single page."""
         item = pywikibot.ItemPage.fromPage(page)
         pywikibot.output('Processing %s' % page)
         if not item.exists():

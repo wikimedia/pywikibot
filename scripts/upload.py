@@ -126,7 +126,7 @@ class UploadRobot:
         return tempname
 
     def process_filename(self):
-        """Return base filename portion of self.url"""
+        """Return base filename portion of self.url."""
         # Isolate the pure name
         filename = self.url
         # Filename may be either a local file path or a URL

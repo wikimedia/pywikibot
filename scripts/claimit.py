@@ -86,9 +86,7 @@ class ClaimRobot(WikidataBot):
         self.cacheSources()
 
     def run(self):
-        """
-        Starts the robot.
-        """
+        """Starts the robot."""
         if self.exists_arg:
             pywikibot.output('\'exists\' argument set to \'%s\'' % self.exists_arg)
         for page in self.generator:

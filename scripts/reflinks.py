@@ -171,7 +171,8 @@ listof404pages = '404-links.txt'
 
 
 class XmlDumpPageGenerator:
-    """Xml generator that yiels pages containing bare references"""
+
+    """Xml generator that yiels pages containing bare references."""
 
     def __init__(self, xmlFilename, xmlStart, namespaces):
         self.xmlStart = xmlStart
@@ -204,7 +205,8 @@ class XmlDumpPageGenerator:
 
 
 class RefLink:
-    """Container to handle a single bare reference"""
+
+    """Container to handle a single bare reference."""
 
     def __init__(self, link, name):
         self.refname = name
@@ -215,22 +217,22 @@ class RefLink:
         self.title = None
 
     def refTitle(self):
-        """Return the <ref> with its new title"""
+        """Return the <ref> with its new title."""
         return '<ref%s>[%s %s<!-- %s -->]</ref>' % (self.refname, self.link,
                                                     self.title,
                                                     self.linkComment)
 
     def refLink(self):
-        """No title has been found, return the unbracketed link"""
+        """No title has been found, return the unbracketed link."""
         return '<ref%s>%s</ref>' % (self.refname, self.link)
 
     def refDead(self):
-        """Dead link, tag it with a {{dead link}}"""
+        """Dead link, tag it with a {{dead link}}."""
         tag = i18n.translate(self.site, deadLinkTag) % self.link
         return '<ref%s>%s</ref>' % (self.refname, tag)
 
     def transform(self, ispdf=False):
-        """Normalize the title"""
+        """Normalize the title."""
         # convert html entities
         if not ispdf:
             self.title = pywikibot.html2unicode(self.title)
@@ -275,6 +277,7 @@ class RefLink:
 
 
 class DuplicateReferences:
+
     """ When some references are duplicated in an article,
     name the first, and remove the content of the others
 
@@ -387,10 +390,7 @@ class DuplicateReferences:
 class ReferencesRobot(Bot):
 
     def __init__(self, generator, **kwargs):
-        """
-        - generator : Page generator
-
-        """
+        """- generator : Page generator."""
         self.availableOptions.update({
             'ignorepdf': False,  # boolean
             'limit': None,  # int, stop after n modified pages
@@ -446,7 +446,7 @@ class ReferencesRobot(Bot):
             r'application/(?:xhtml\+xml|xml)|text/(?:ht|x)ml')
 
     def httpError(self, err_num, link, pagetitleaslink):
-        """Log HTTP Error"""
+        """Log HTTP Error."""
         pywikibot.output(u'HTTP error (%s) for %s on %s'
                          % (err_num, link, pagetitleaslink), toStdout=True)
 
@@ -483,7 +483,7 @@ class ReferencesRobot(Bot):
             os.unlink(infile)
 
     def run(self):
-        """ Run the Bot """
+        """Run the Bot."""
         try:
             deadLinks = codecs.open(listof404pages, 'r', 'latin_1').read()
         except IOError:

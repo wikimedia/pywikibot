@@ -206,8 +206,7 @@ class FeaturedBot(pywikibot.Bot):
     # The values are the default values
 
     def __init__(self, **kwargs):
-        """ Only accepts options defined in availableOptions """
-
+        """Only accepts options defined in availableOptions."""
         self.availableOptions.update({
             'async':  False,  # asynchron putting a page?
             'afterpage': u"!",
@@ -244,8 +243,7 @@ class FeaturedBot(pywikibot.Bot):
             self.tasks = ['featured']
 
     def itersites(self, task):
-        """ generator for site codes to be processed """
-
+        """generator for site codes to be processed."""
         def _generator():
             if task == 'good':
                 item_no = good_name['wikidata'][1]

@@ -362,12 +362,12 @@ docuReplacements = {
 
 
 class SaveError(pywikibot.Error):
-    """
-    An attempt to save a page with changed interwiki has failed.
-    """
+
+    """An attempt to save a page with changed interwiki has failed."""
 
 
 class LinkMustBeRemoved(SaveError):
+
     """
     An interwiki link has to be removed, but this can't be done because of user
     preferences or because the user chose not to change the page.
@@ -375,9 +375,8 @@ class LinkMustBeRemoved(SaveError):
 
 
 class GiveUpOnPage(pywikibot.Error):
-    """
-    The user chose not to work on this page and its linked pages any more.
-    """
+
+    """The user chose not to work on this page and its linked pages any more."""
 
 
 # Subpage templates. Must be in lower case,
@@ -451,10 +450,12 @@ ignoreTemplates = {
 
 
 class Global(object):
+
     """
     Container class for global settings.
     Use of globals outside of this is to be avoided.
     """
+
     autonomous = False
     confirm = False
     always = False
@@ -498,7 +499,7 @@ class Global(object):
     repository = False
 
     def readOptions(self, arg):
-        """ Read all commandline parameters for the global container """
+        """Read all commandline parameters for the global container."""
         if arg == '-noauto':
             self.auto = False
         elif arg.startswith('-hint:'):
@@ -618,6 +619,7 @@ class Global(object):
 
 
 class StoredPage(pywikibot.Page):
+
     """
     Store the Page contents on disk to avoid sucking too much
     memory when a big number of Page objects will be loaded
@@ -687,10 +689,12 @@ class StoredPage(pywikibot.Page):
 
 
 class PageTree(object):
+
     """
     Structure to manipulate a set of pages.
     Allows filtering efficiently by Site.
     """
+
     def __init__(self):
         # self.tree :
         # Dictionary:
@@ -716,9 +720,7 @@ class PageTree(object):
         self.size = 0
 
     def filter(self, site):
-        """
-        Iterates over pages that are in Site site
-        """
+        """Iterates over pages that are in Site site."""
         try:
             for page in self.tree[site]:
                 yield page
@@ -743,9 +745,7 @@ class PageTree(object):
             pass
 
     def removeSite(self, site):
-        """
-        Removes all pages from Site site
-        """
+        """Removes all pages from Site site."""
         try:
             self.size -= len(self.tree[site])
             del self.tree[site]
@@ -753,9 +753,7 @@ class PageTree(object):
             pass
 
     def siteCounts(self):
-        """
-        Yields (Site, number of pages in site) pairs
-        """
+        """Yields (Site, number of pages in site) pairs"""
         for site, d in self.tree.items():
             yield site, len(d)
 
@@ -766,6 +764,7 @@ class PageTree(object):
 
 
 class Subject(object):
+
     """
     Class to follow the progress of a single 'subject' (i.e. a page with
     all its translations)
@@ -825,8 +824,8 @@ class Subject(object):
 
     def __init__(self, originPage=None, hints=None):
         """Constructor. Takes as arguments the Page on the home wiki
-           plus optionally a list of hints for translation"""
-
+           plus optionally a list of hints for translation
+           """
         if globalvar.contentsondisk:
             if originPage:
                 originPage = StoredPage(originPage)
@@ -908,7 +907,7 @@ class Subject(object):
                         return page
 
     def translate(self, hints=None, keephintedsites=False):
-        """Add the given translation hints to the todo list"""
+        """Add the given translation hints to the todo list."""
         if globalvar.same and self.originPage:
             if hints:
                 links = titletranslate.translate(
@@ -970,9 +969,7 @@ class Subject(object):
         return result
 
     def makeForcedStop(self, counter):
-        """
-        Ends work on the page before the normal end.
-        """
+        """Ends work on the page before the normal end."""
         for site, count in self.todo.siteCounts():
             counter.minus(site, count)
         self.todo = PageTree()
@@ -1798,9 +1795,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     del page._contents
 
     def replaceLinks(self, page, newPages):
-        """
-        Returns True if saving was successful.
-        """
+        """Returns True if saving was successful."""
         if globalvar.localonly:
             # In this case only continue on the Page we started with
             if page != self.originPage:
@@ -2096,7 +2091,7 @@ class InterwikiBot(object):
         self.generated = 0
 
     def add(self, page, hints=None):
-        """Add a single subject to the list"""
+        """Add a single subject to the list."""
         subj = Subject(page, hints=hints)
         self.subjects.append(subj)
         for site, count in subj.openSites():
@@ -2105,7 +2100,8 @@ class InterwikiBot(object):
 
     def setPageGenerator(self, pageGenerator, number=None, until=None):
         """Add a generator of subjects. Once the list of subjects gets
-           too small, this generator is called to produce more Pages"""
+           too small, this generator is called to produce more Pages
+           """
         self.pageGenerator = pageGenerator
         self.generateNumber = number
         self.generateUntil = until
@@ -2131,7 +2127,8 @@ class InterwikiBot(object):
     def generateMore(self, number):
         """Generate more subjects. This is called internally when the
            list of subjects becomes too small, but only if there is a
-           PageGenerator"""
+           PageGenerator
+           """
         fs = self.firstSubject()
         if fs and (not globalvar.quiet):
             pywikibot.output(u"NOTE: The first unfinished subject is %s"
@@ -2193,7 +2190,7 @@ class InterwikiBot(object):
                 break
 
     def firstSubject(self):
-        """Return the first subject that is still being worked on"""
+        """Return the first subject that is still being worked on."""
         if self.subjects:
             return self.subjects[0]
 
@@ -2201,7 +2198,8 @@ class InterwikiBot(object):
         """Return the site that has the most
            open queries plus the number. If there is nothing left, return
            None. Only languages that are TODO for the first Subject
-           are returned."""
+           are returned.
+           """
         max = 0
         maxlang = None
         if not self.firstSubject():
@@ -2305,22 +2303,22 @@ class InterwikiBot(object):
                 del self.subjects[i]
 
     def isDone(self):
-        """Check whether there is still more work to do"""
+        """Check whether there is still more work to do."""
         return len(self) == 0 and self.pageGenerator is None
 
     def plus(self, site, count=1):
-        """This is a routine that the Subject class expects in a counter"""
+        """This is a routine that the Subject class expects in a counter."""
         try:
             self.counts[site] += count
         except KeyError:
             self.counts[site] = count
 
     def minus(self, site, count=1):
-        """This is a routine that the Subject class expects in a counter"""
+        """This is a routine that the Subject class expects in a counter."""
         self.counts[site] -= count
 
     def run(self):
-        """Start the process until finished"""
+        """Start the process until finished."""
         while not self.isDone():
             self.queryStep()
 

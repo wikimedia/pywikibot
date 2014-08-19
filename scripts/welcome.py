@@ -406,8 +406,10 @@ class FilenameNotSet(pywikibot.Error):
 
 
 class Global(object):
+
     """Container class for global settings.
-       Use of globals outside of this is to be avoided."""
+       Use of globals outside of this is to be avoided.
+       """
 
     attachEditCount = 1     # number of edits that an user required to be welcomed
     dumpToLog = 15          # number of users that are required to add the log :)

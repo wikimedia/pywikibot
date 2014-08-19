@@ -48,9 +48,7 @@ class IllustrateRobot(WikidataBot):
                              % (self.wdproperty, claim.type))
 
     def run(self):
-        """
-        Starts the bot.
-        """
+        """Starts the bot."""
         for page in self.generator:
             pywikibot.output(u'Working on %s' % page.title())
             item = pywikibot.ItemPage.fromPage(page)

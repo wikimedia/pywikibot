@@ -47,7 +47,7 @@ from pywikibot import date, pagegenerators, i18n, textlib
 
 
 def isdate(s):
-    """returns true if s is a date or year """
+    """returns true if s is a date or year."""
     dict, val = date.getAutoFormat(pywikibot.Site().language(), s)
     return dict is not None
 
