@@ -110,7 +110,7 @@ This will move all pages in the category US to the category United States.
 # (C) Ben McIlwain (CydeWeys), 2006-2015
 # (C) Anreas J Schwab, 2007
 # (C) xqt, 2009-2016
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -814,8 +814,8 @@ class CategoryListifyRobot(object):
 
         listString = ""
         for article in setOfArticles:
-            if (not article.isImage() or
-                    self.showImages) and not article.isCategory():
+            if (not article.is_filepage() or
+                    self.showImages) and not article.is_categorypage():
                 if self.talkPages and not article.isTalkPage():
                     listString += "*[[%s]] -- [[%s|talk]]\n" \
                                   % (article.title(),

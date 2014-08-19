@@ -27,7 +27,7 @@ used on a page reachable via interwiki links.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2016
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -244,7 +244,7 @@ class ImageTransferBot(object):
                     imagelist.extend(
                         linkedPage.imagelinks(
                             followRedirects=True))
-            elif page.isImage():
+            elif page.is_filepage():
                 imagePage = pywikibot.FilePage(page.site, page.title())
                 imagelist = [imagePage]
             else:

@@ -398,24 +398,24 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertEqual(p4.isTalkPage(), True)
 
     def testIsCategory(self):
-        """Test isCategory method."""
+        """Test is_categorypage method."""
         site = self.get_site()
         p1 = pywikibot.Page(site, u"First page")
         p2 = pywikibot.Page(site, u"Category:Second page")
         p3 = pywikibot.Page(site, u"Category talk:Second page")
-        self.assertEqual(p1.isCategory(), False)
-        self.assertEqual(p2.isCategory(), True)
-        self.assertEqual(p3.isCategory(), False)
+        self.assertEqual(p1.is_categorypage(), False)
+        self.assertEqual(p2.is_categorypage(), True)
+        self.assertEqual(p3.is_categorypage(), False)
 
-    def testIsImage(self):
-        """Test C{Page.isImage} check."""
+    def testIsFile(self):
+        """Test C{Page.is_filepage} check."""
         site = self.get_site()
         p1 = pywikibot.Page(site, u"First page")
         p2 = pywikibot.Page(site, u"File:Second page")
         p3 = pywikibot.Page(site, u"Image talk:Second page")
-        self.assertEqual(p1.isImage(), False)
-        self.assertEqual(p2.isImage(), True)
-        self.assertEqual(p3.isImage(), False)
+        self.assertEqual(p1.is_filepage(), False)
+        self.assertEqual(p2.is_filepage(), True)
+        self.assertEqual(p3.is_filepage(), False)
 
     def testApiMethods(self):
         """Test various methods that rely on API."""

@@ -2429,7 +2429,7 @@ def page_empty_check(page):
         # Check if the page contains at least 50 characters
         return len(page.text) < 50
     else:
-        if not page.isCategory():
+        if not page.is_categorypage():
             txt = page.get()
             txt = textlib.removeLanguageLinks(txt, site=page.site)
             txt = textlib.removeCategoryLinks(txt, site=page.site)

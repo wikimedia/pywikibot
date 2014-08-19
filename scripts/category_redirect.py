@@ -23,7 +23,7 @@ Usage:
 
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -242,7 +242,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                 # race condition: someone else removed the redirect while we
                 # were checking for it
                 continue
-            if target.isCategory():
+            if target.is_categorypage():
                 # this is a hard-redirect to a category page
                 newtext = (u"{{%(template)s|%(cat)s}}"
                            % {'cat': target.title(withNamespace=False),

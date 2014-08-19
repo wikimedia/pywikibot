@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
-# (C) Pywikibot team, 2006-2016
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -469,7 +469,7 @@ class CaseChecker(object):
                            if i not in self.knownWords and
                            self.romanNumSfxPtrn.match(i) is not None)
 
-        if len(badWords) == 0 or self.Page(title).isImage():
+        if len(badWords) == 0 or self.Page(title).is_filepage():
             return
         count = 0
         ambigBadWords = set()
