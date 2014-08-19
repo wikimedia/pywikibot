@@ -337,7 +337,7 @@ that you have to break it off, use "-continue" next time.
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
 # (C) xqt, 2009-2014
-# (C) Pywikibot team, 2007-2013
+# (C) Pywikibot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -354,11 +354,7 @@ import pickle
 import socket
 import webbrowser
 import pywikibot
-from pywikibot import config
-from pywikibot import pagegenerators
-from pywikibot import i18n
-from pywikibot import interwiki_graph
-from pywikibot import titletranslate
+from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph, titletranslate
 
 docuReplacements = {
     '&pagegenerators_help;': pagegenerators.parameterHelp
@@ -1919,9 +1915,9 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         pywikibot.output(u"Changes to be made: %s" % mods)
         oldtext = page.get()
         template = (page.namespace() == 10)
-        newtext = pywikibot.replaceLanguageLinks(oldtext, new,
-                                                 site=page.site,
-                                                 template=template)
+        newtext = textlib.replaceLanguageLinks(oldtext, new,
+                                               site=page.site,
+                                               template=template)
         # This is for now. Later there should be different funktions for each
         # kind
         if not botMayEdit(page):

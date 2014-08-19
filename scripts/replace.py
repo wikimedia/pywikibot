@@ -128,7 +128,7 @@ import time
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot import editor as editarticle
-from pywikibot import i18n
+from pywikibot import i18n, textlib
 import webbrowser
 
 # Imports predefined replacements tasks from fixes.py
@@ -186,7 +186,7 @@ class XmlDumpReplacePageGenerator:
                         and not self.isTextExcepted(entry.text):
                     new_text = entry.text
                     for old, new in self.replacements:
-                        new_text = pywikibot.replaceExcept(
+                        new_text = textlib.replaceExcept(
                             new_text, old, new, self.excsInside, self.site)
                     if new_text != entry.text:
                         yield pywikibot.Page(self.site, entry.title)
@@ -257,7 +257,7 @@ class ReplaceRobot:
                 regular expressions.
             inside-tags
                 A list of strings. These strings must be keys from the
-                exceptionRegexes dictionary in pywikibot.replaceExcept().
+                exceptionRegexes dictionary in textlib.replaceExcept().
 
         """
         self.generator = generator
@@ -315,9 +315,9 @@ class ReplaceRobot:
         for old, new in self.replacements:
             if self.sleep is not None:
                 time.sleep(self.sleep)
-            new_text = pywikibot.replaceExcept(new_text, old, new, exceptions,
-                                               allowoverlap=self.allowoverlap,
-                                               site=self.site)
+            new_text = textlib.replaceExcept(new_text, old, new, exceptions,
+                                             allowoverlap=self.allowoverlap,
+                                             site=self.site)
         return new_text
 
     def run(self):
@@ -363,9 +363,9 @@ class ReplaceRobot:
                     cats = page.categories(nofollow_redirects=True)
                     if self.addedCat not in cats:
                         cats.append(self.addedCat)
-                        new_text = pywikibot.replaceCategoryLinks(new_text,
-                                                                  cats,
-                                                                  site=page.site)
+                        new_text = textlib.replaceCategoryLinks(new_text,
+                                                                cats,
+                                                                site=page.site)
                 # Show the title of the page we're working on.
                 # Highlight the title in purple.
                 pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"

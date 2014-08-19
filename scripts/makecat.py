@@ -43,7 +43,7 @@ __version__ = '$Id$'
 import sys
 import codecs
 import pywikibot
-from pywikibot import date, pagegenerators, i18n
+from pywikibot import date, pagegenerators, i18n, textlib
 
 
 def isdate(s):
@@ -89,7 +89,7 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None):
                             pl.change_category(actualworkingcat)
                             break
                 else:
-                    pl.put(pywikibot.replaceCategoryLinks(
+                    pl.put(textlib.replaceCategoryLinks(
                         text, cats + [actualworkingcat], site=pl.site))
     if cl:
         if checkforward:

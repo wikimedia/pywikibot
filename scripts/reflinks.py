@@ -54,7 +54,7 @@ import gzip
 import StringIO
 
 import pywikibot
-from pywikibot import i18n, pagegenerators, xmlreader, Bot
+from pywikibot import i18n, pagegenerators, textlib, xmlreader, Bot
 import noreferences
 
 docuReplacements = {
@@ -512,7 +512,7 @@ class ReferencesRobot(Bot):
 
             # for each link to change
             for match in linksInRef.finditer(
-                    pywikibot.removeDisabledParts(page.get())):
+                    textlib.removeDisabledParts(page.get())):
 
                 link = match.group(u'url')
                 # debugging purpose

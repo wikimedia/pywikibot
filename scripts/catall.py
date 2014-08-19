@@ -23,7 +23,7 @@ __version__ = '$Id$'
 
 import sys
 import pywikibot
-from pywikibot import i18n
+from pywikibot import i18n, textlib
 
 
 def choosecats(pagetext):
@@ -69,8 +69,8 @@ def make_categories(page, list, site=None):
     for p in list:
         cattitle = "%s:%s" % (site.category_namespace(), p)
         pllist.append(pywikibot.Page(site, cattitle))
-    page.put_async(pywikibot.replaceCategoryLinks(page.get(), pllist,
-                                                  site=page.site),
+    page.put_async(textlib.replaceCategoryLinks(page.get(), pllist,
+                                                site=page.site),
                    comment=i18n.twtranslate(site.code, 'catall-changing'))
 
 
