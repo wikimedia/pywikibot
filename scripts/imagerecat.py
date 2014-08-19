@@ -50,9 +50,7 @@ hint_wiki = u''
 
 
 def initLists():
-    """
-    Get the list of countries & the blacklist from Commons.
-    """
+    """Get the list of countries & the blacklist from Commons."""
     global category_blacklist
     global countries
 
@@ -99,7 +97,7 @@ def categorizeImages(generator, onlyFilter, onlyUncat):
 
 
 def getCurrentCats(imagepage):
-    """ Get the categories currently on the image """
+    """Get the categories currently on the image."""
     result = []
     for cat in imagepage.categories():
         result.append(cat.title(withNamespace=False))
@@ -185,9 +183,7 @@ def getCommonshelperCats(imagepage):
 
 
 def getOpenStreetMapCats(latitude, longitude):
-    """
-    Get a list of location categories based on the OSM nomatim tool
-    """
+    """Get a list of location categories based on the OSM nomatim tool."""
     result = []
     locationList = getOpenStreetMap(latitude, longitude)
     for i in range(0, len(locationList)):
@@ -262,7 +258,7 @@ def getCategoryByName(name, parent=u'', grandparent=u''):
 
 
 def getUsage(use):
-    """ Parse the Commonsense output to get the usage """
+    """Parse the Commonsense output to get the usage."""
     result = []
     lang = ''
     project = ''
@@ -409,9 +405,7 @@ def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
 
 
 def removeTemplates(oldtext=u''):
-    """
-    Remove {{Uncategorized}} and {{Check categories}} templates
-    """
+    """Remove {{Uncategorized}} and {{Check categories}} templates."""
     result = re.sub(
         u'\{\{\s*([Uu]ncat(egori[sz]ed( image)?)?|[Nn]ocat|[Nn]eedscategory)[^}]*\}\}', u'', oldtext)
     result = re.sub(u'<!-- Remove this line once you have added categories -->',
@@ -421,9 +415,7 @@ def removeTemplates(oldtext=u''):
 
 
 def getCheckCategoriesTemplate(usage, galleries, ncats):
-    """
-    Build the check categories template with all parameters
-    """
+    """Build the check categories template with all parameters."""
     result = u'{{Check categories|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}\n'
     usageCounter = 1
     for (lang, project, article) in usage:
@@ -442,9 +434,7 @@ def getCheckCategoriesTemplate(usage, galleries, ncats):
 
 
 def main():
-    """
-    Main loop. Get a generator and options. Work on all images in the generator.
-    """
+    """Main loop. Get a generator and options. Work on all images in the generator."""
     generator = None
     onlyFilter = False
     onlyUncat = False

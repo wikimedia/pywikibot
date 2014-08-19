@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-"""
-A generic bot to do data ingestion (batch uploading) to Commons
-"""
+"""A generic bot to do data ingestion (batch uploading) to Commons"""
 #
 # (C) Pywikibot team, 2013
 #
@@ -23,6 +21,7 @@ import upload
 
 
 class Photo(object):
+
     """
     Represents a Photo (or other file), with metadata, to upload to Commons.
 
@@ -75,10 +74,7 @@ class Photo(object):
         return fmt % self.metadata
 
     def getDescription(self, template, extraparams={}):
-        """
-        Generate a description for a file
-        """
-
+        """Generate a description for a file."""
         params = {}
         params.update(self.metadata)
         params.update(extraparams)

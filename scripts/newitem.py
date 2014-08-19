@@ -35,8 +35,7 @@ class NewItemRobot(pywikibot.Bot):
     """ A bot to create new items """
 
     def __init__(self, generator, **kwargs):
-        """ Only accepts options defined in availableOptions """
-
+        """Only accepts options defined in availableOptions."""
         self.availableOptions.update({
             'lastedit': 7,
             'pageage': 21,

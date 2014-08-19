@@ -423,11 +423,13 @@ maintenance_category = 'cite_error_refs_without_references_category'
 
 
 class XmlDumpNoReferencesPageGenerator:
+
     """
     Generator which will yield Pages that might lack a references tag.
     These pages will be retrieved from a local XML dump file
     (pages-articles or pages-meta-current).
     """
+
     def __init__(self, xmlFilename):
         """
         Arguments:
@@ -476,9 +478,7 @@ class NoReferencesBot(Bot):
             self.referencesText = u'<references />'
 
     def lacksReferences(self, text):
-        """
-        Checks whether or not the page is lacking a references tag.
-        """
+        """Checks whether or not the page is lacking a references tag."""
         oldTextCleaned = textlib.removeDisabledParts(text)
         if self.referencesR.search(oldTextCleaned) or \
            self.referencesTagR.search(oldTextCleaned):

@@ -109,9 +109,7 @@ Hallo %(admin)s,
                                      % page.title(asLink=True))
 
     def treat(self, userPage):
-        """
-        Loads the given page, does some changes, and saves it.
-        """
+        """Loads the given page, does some changes, and saves it."""
         talkText = self.load(userPage)
         if not talkText:
             # sanity check. No talk page found.
@@ -259,9 +257,7 @@ Hallo %(admin)s,
                                      defaultNamespace=3)
 
     def load(self, page):
-        """
-        Loads the given page, does some changes, and saves it.
-        """
+        """Loads the given page, does some changes, and saves it."""
         try:
             # Load the page
             text = page.get()

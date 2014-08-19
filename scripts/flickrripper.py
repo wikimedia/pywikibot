@@ -95,7 +95,6 @@ def isAllowedLicense(photoInfo=None):
 
     TODO: Maybe add more licenses
     """
-
     license = photoInfo.find('photo').attrib['license']
     if flickr_allowed_license[int(license)]:
         return True
@@ -104,9 +103,7 @@ def isAllowedLicense(photoInfo=None):
 
 
 def getPhotoUrl(photoSizes=None):
-    """
-    Get the url of the jpg file with the highest resolution
-    """
+    """Get the url of the jpg file with the highest resolution."""
     url = ''
     # The assumption is that the largest image is last
     for size in photoSizes.find('sizes').findall('size'):
@@ -139,7 +136,7 @@ def findDuplicateImages(photo=None,
 
 
 def getTags(photoInfo=None):
-    """ Get all the tags on a photo """
+    """Get all the tags on a photo."""
     result = []
     for tag in photoInfo.find('photo').find('tags').findall('tag'):
         result.append(tag.text.lower())
@@ -263,7 +260,7 @@ def buildDescription(flinfoDescription=u'', flickrreview=False, reviewer=u'',
 def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
                  override=u'', addCategory=u'', removeCategories=False,
                  autonomous=False):
-    """ Process a single Flickr photo """
+    """Process a single Flickr photo."""
     if photo_id:
         pywikibot.output(str(photo_id))
         (photoInfo, photoSizes) = getPhoto(flickr, photo_id)
@@ -314,7 +311,9 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
 
 
 class Tkdialog:
+
     """ The user dialog. """
+
     def __init__(self, photoDescription, photo, filename):
         self.root = Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
@@ -370,7 +369,7 @@ class Tkdialog:
         self.descriptionScrollbar.grid(row=14, column=5)
 
     def getImage(self, photo, width, height):
-        """ Take the StringIO object and build an imageTK thumbnail """
+        """Take the StringIO object and build an imageTK thumbnail."""
         image = Image.open(photo)
         image.thumbnail((width, height))
         imageTk = ImageTk.PhotoImage(image)

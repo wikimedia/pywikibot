@@ -1160,7 +1160,7 @@ ranges = {
 
 
 class InvalidIsbnException(pywikibot.Error):
-    """Invalid ISBN"""
+    """Invalid ISBN."""
 
 
 class ISBN:
@@ -1169,9 +1169,7 @@ class ISBN:
     """
 
     def format(self):
-        """
-        Puts hyphens into this ISBN number.
-        """
+        """Puts hyphens into this ISBN number."""
         result = ''
         rest = ''
         for digit in self.digits():
@@ -1221,9 +1219,7 @@ class ISBN13(ISBN):
         return ['978', '979']
 
     def digits(self):
-        """
-        Returns a list of the digits in the ISBN code.
-        """
+        """Returns a list of the digits in the ISBN code."""
         result = []
         for c in self.code:
             if c.isdigit():
@@ -1260,9 +1256,7 @@ class ISBN10(ISBN):
         return []
 
     def digits(self):
-        """
-        Returns a list of the digits and Xs in the ISBN code.
-        """
+        """Returns a list of the digits and Xs in the ISBN code."""
         result = []
         for c in self.code:
             if c.isdigit() or c in 'Xx':
@@ -1335,9 +1329,7 @@ def getIsbn(code):
 
 
 def _hyphenateIsbnNumber(match):
-    """
-    Helper function to deal with a single ISBN
-    """
+    """Helper function to deal with a single ISBN."""
     code = match.group('code')
     try:
         i = getIsbn(code)
@@ -1355,9 +1347,7 @@ def hyphenateIsbnNumbers(text):
 
 
 def _isbn10toIsbn13(match):
-    """
-    Helper function to deal with a single ISBN
-    """
+    """Helper function to deal with a single ISBN."""
     code = match.group('code')
     try:
         i = getIsbn(code)

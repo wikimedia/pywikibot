@@ -159,9 +159,7 @@ class CosmeticChangesToolkit:
         self.title = pageTitle
 
     def change(self, text):
-        """
-        Given a wiki source code text, return the cleaned up version.
-        """
+        """Given a wiki source code text, return the cleaned up version."""
         oldText = text
         if self.site.sitename() == u'commons:commons' and self.namespace == 6:
             text = self.commonsfiledesc(text)
@@ -315,9 +313,7 @@ class CosmeticChangesToolkit:
         return text
 
     def translateAndCapitalizeNamespaces(self, text):
-        """
-        Makes sure that localized namespace names are used.
-        """
+        """Makes sure that localized namespace names are used."""
         # arz uses english stylish codes
         if self.site.sitename() == 'wikipedia:arz':
             return text
@@ -362,9 +358,7 @@ class CosmeticChangesToolkit:
         return text
 
     def translateMagicWords(self, text):
-        """
-        Makes sure that localized namespace names are used.
-        """
+        """Makes sure that localized namespace names are used."""
         # not wanted at ru
         # arz uses english stylish codes
         if self.site.code not in ['arz', 'ru']:

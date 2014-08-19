@@ -418,9 +418,7 @@ class CommonscatBot(Bot):
         return u''
 
     def getCommonscatLink(self, wikipediaPage=None):
-        """
-        Go through the page and return a tuple of (<templatename>, <target>)
-        """
+        """Go through the page and return a tuple of (<templatename>, <target>)"""
         primaryCommonscat, commonscatAlternatives = self.getCommonscatTemplate(
             wikipediaPage.site.code)
         commonscatTemplate = u''
@@ -504,7 +502,6 @@ def main():
     """ Parse the command line arguments and get a pagegenerator to work on.
     Iterate through all the pages.
     """
-
     summary = None
     generator = None
     checkcurrent = False

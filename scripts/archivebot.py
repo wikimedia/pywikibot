@@ -101,8 +101,10 @@ class MalformedConfigError(pywikibot.Error):
 
 
 class MissingConfigError(pywikibot.Error):
+
     """The config is missing in the header (either it's in one of the threads
-    or transcluded from another page)."""
+    or transcluded from another page).
+    """
 
 
 class AlgorithmError(MalformedConfigError):
@@ -110,8 +112,10 @@ class AlgorithmError(MalformedConfigError):
 
 
 class ArchiveSecurityError(pywikibot.Error):
+
     """Archive is not a subpage of page being archived and key not specified
-    (or incorrect)."""
+    (or incorrect).
+    """
 
 
 def str2localized_duration(site, string):
@@ -133,7 +137,8 @@ def str2time(string):
     """Accepts a string defining a time period:
     7d - 7 days
     36h - 36 hours
-    Returns the corresponding timedelta object."""
+    Returns the corresponding timedelta object.
+    """
     if string.endswith('d'):
         return datetime.timedelta(days=int(string[:-1]))
     elif string.endswith('h'):
@@ -172,9 +177,8 @@ def generate_transclusions(site, template, namespaces=[]):
 
 
 class TZoneUTC(datetime.tzinfo):
-    """
-    Class building a UTC tzinfo object
-    """
+
+    """Class building a UTC tzinfo object."""
 
     def utcoffset(self, dt):
         return ZERO
@@ -190,6 +194,7 @@ class TZoneUTC(datetime.tzinfo):
 
 
 class DiscussionThread(object):
+
     """An object representing a discussion thread on a page, that is something
     of the form:
 
@@ -250,8 +255,10 @@ class DiscussionThread(object):
 
 
 class DiscussionPage(pywikibot.Page):
+
     """A class that represents a single discussion page as well as an archive
-    page. Feed threads to it and run an update() afterwards."""
+    page. Feed threads to it and run an update() afterwards.
+    """
 
     def __init__(self, source, archiver, params=None):
         super(DiscussionPage, self).__init__(source)
@@ -339,9 +346,11 @@ class DiscussionPage(pywikibot.Page):
 
 
 class PageArchiver(object):
+
     """A class that encapsulates all archiving methods.
     __init__ expects a pywikibot.Page object.
-    Execute by running the .run() method."""
+    Execute by running the .run() method.
+    """
 
     algo = 'none'
 

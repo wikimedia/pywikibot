@@ -142,6 +142,7 @@ docuReplacements = {
 
 
 class XmlDumpReplacePageGenerator:
+
     """
     Iterator that will yield Pages that might contain text to replace.
 
@@ -219,9 +220,9 @@ class XmlDumpReplacePageGenerator:
 
 
 class ReplaceRobot(Bot):
-    """
-    A bot that can do text replacements.
-    """
+
+    """A bot that can do text replacements."""
+
     def __init__(self, generator, replacements, exceptions={},
                  acceptall=False, allowoverlap=False, recursive=False,
                  addedCat=None, sleep=None, summary='', site=None):
@@ -276,9 +277,7 @@ class ReplaceRobot(Bot):
         self.summary = summary
 
     def isTitleExcepted(self, title):
-        """
-        Iff one of the exceptions applies for the given title, returns True.
-        """
+        """Iff one of the exceptions applies for the given title, returns True."""
         if "title" in self.exceptions:
             for exc in self.exceptions['title']:
                 if exc.search(title):
@@ -320,9 +319,7 @@ class ReplaceRobot(Bot):
         return new_text
 
     def run(self):
-        """
-        Starts the bot.
-        """
+        """Starts the bot."""
         # Run the generator which will yield Pages which might need to be
         # changed.
         for page in self.generator:

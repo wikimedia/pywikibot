@@ -559,6 +559,7 @@ project_inserted = ['ar', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
 
 
 class LogIsFull(pywikibot.Error):
+
     """An exception indicating that the log is full and the Bot cannot add
     other data to prevent Errors.
 
@@ -566,6 +567,7 @@ class LogIsFull(pywikibot.Error):
 
 
 class NothingFound(pywikibot.Error):
+
     """ An exception indicating that a regex has return [] instead of results.
 
     """
@@ -592,7 +594,7 @@ class checkImagesBot(object):
 
     def __init__(self, site, logFulNumber=25000, sendemailActive=False,
                  duplicatesReport=False, logFullError=True):
-        """ Constructor, define some global variable """
+        """Constructor, define some global variable."""
         self.site = site
         self.logFullError = logFullError
         self.logFulNumber = logFulNumber
@@ -688,7 +690,7 @@ class checkImagesBot(object):
                 break
 
     def uploadBotChangeFunction(self, reportPageText, upBotArray):
-        """Detect the user that has uploaded the file through the upload bot"""
+        """Detect the user that has uploaded the file through the upload bot."""
         regex = upBotArray[1]
         results = re.findall(regex, reportPageText)
 
@@ -866,7 +868,7 @@ class checkImagesBot(object):
             yield pywikibot.FilePage(self.site, image)
 
     def loadHiddenTemplates(self):
-        """ Function to load the white templates """
+        """Function to load the white templates."""
         # A template as {{en is not a license! Adding also them in the
         # whitelist template...
         for langK in pywikibot.site.Family('wikipedia').langs.keys():
@@ -885,7 +887,7 @@ class checkImagesBot(object):
         return self.hiddentemplates
 
     def returnOlderTime(self, listGiven, timeListGiven):
-        """ Get some time and return the oldest of them """
+        """Get some time and return the oldest of them."""
         num = 0
         num_older = None
         max_usage = 0
@@ -942,7 +944,7 @@ class checkImagesBot(object):
         return number_edits
 
     def checkImageOnCommons(self):
-        """ Checking if the file is on commons """
+        """Checking if the file is on commons."""
         pywikibot.output(u'Checking if [[%s]] is on commons...'
                          % self.imageName)
         commons_site = pywikibot.Site('commons', 'commons')
@@ -1275,7 +1277,7 @@ class checkImagesBot(object):
         return self.settingsData  # Useless, but it doesn't harm..
 
     def load_licenses(self):
-        """ Load the list of the licenses """
+        """Load the list of the licenses."""
 ##        catName = i18n.translate(self.site, category_with_licenses)
 ##        cat = pywikibot.Category(pywikibot.Site(), catName)
 ##        categories = [page.title() for page in pagegenerators.SubCategoriesPageGenerator(cat)]
@@ -1761,7 +1763,7 @@ class checkImagesBot(object):
 
 
 def main():
-    """ Main function """
+    """Main function."""
     # Command line configurable parameters
     repeat = True  # Restart after having check all the images?
     limit = 80  # How many images check?

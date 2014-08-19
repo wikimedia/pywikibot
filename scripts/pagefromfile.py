@@ -59,12 +59,15 @@ from pywikibot import config, Bot, i18n
 
 
 class NoTitle(Exception):
-    """No title found"""
+
+    """No title found."""
+
     def __init__(self, offset):
         self.offset = offset
 
 
 class PageFromFileRobot(Bot):
+
     """
     Responsible for writing pages to the wiki, with the titles and contents
     given by a PageFromFileReader.
@@ -153,6 +156,7 @@ class PageFromFileRobot(Bot):
 
 
 class PageFromFileReader:
+
     """
     Responsible for reading the file.
 
@@ -163,7 +167,6 @@ class PageFromFileReader:
     def __init__(self, filename, pageStartMarker, pageEndMarker,
                  titleStartMarker, titleEndMarker, include, notitle):
         """Constructor.
-
         Check if self.file name exists. If not, ask for a new filename.
         User can quit.
 
@@ -179,7 +182,6 @@ class PageFromFileReader:
 
     def run(self):
         """Read file and yield page title and content."""
-
         pywikibot.output('\n\nReading \'%s\'...' % self.filename)
         try:
             f = codecs.open(self.filename, 'r',

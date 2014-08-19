@@ -158,7 +158,7 @@ project_inserted = ['en', 'fr', 'it', 'ja', 'pt', 'zh']
 
 
 def understandBlock(text, TTP, TSP, TSMP, TTMP, TU):
-    """ Understand if the page is blocked and if it has the right template """
+    """Understand if the page is blocked and if it has the right template."""
     if TTP:
         for catchRegex in TTP:  # TTP = templateTotalProtection
             resultCatch = re.findall(catchRegex, text)
@@ -206,7 +206,7 @@ def showQuest(page):
 
 
 def main():
-    """ Main Function """
+    """Main Function."""
     # Loading the comments
     global categoryToCheck, project_inserted
     # always, define a generator to understand if the user sets one,

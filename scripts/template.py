@@ -143,11 +143,13 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False):
 
 
 class XmlDumpTemplatePageGenerator:
+
     """
     Generator which will yield Pages to pages that might contain the chosen
     template. These pages will be retrieved from a local XML dump file
     (cur table).
     """
+
     def __init__(self, templates, xmlfilename):
         """
         Arguments:
@@ -186,6 +188,7 @@ class XmlDumpTemplatePageGenerator:
 
 
 class TemplateRobot(Bot):
+
     """
     This bot will load all pages yielded by a page generator and replace or
     remove all occurences of the old template, or substitute them with the

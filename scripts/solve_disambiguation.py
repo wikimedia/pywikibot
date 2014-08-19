@@ -388,6 +388,7 @@ class ReferringPageGeneratorWithIgnore:
 
 
 class PrimaryIgnoreManager(object):
+
     """
     If run with the -primary argument, reads from a file which pages should
     not be worked on; these are the ones where the user pressed n last time.
