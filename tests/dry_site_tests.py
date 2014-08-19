@@ -8,7 +8,7 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot.site import must_be
+from pywikibot.site import must_be, need_version
 
 from tests.utils import unittest, NoSiteTestCase, DummySiteinfo
 
@@ -107,6 +107,34 @@ class TestMustBe(NoSiteTestCase):
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
         self.assertRaises(pywikibot.NoSuchSite, self.call_this_user_req_function, args, kwargs)
+
+
+class TestNeedVersion(NoSiteTestCase):
+    """Test cases for the must_be decorator."""
+
+    # Implemented without setUpClass(cls) and global variables as objects
+    # were not completely disposed and recreated but retained 'memory'
+    def setUp(self):
+        super(TestNeedVersion, self).setUp()
+        self.version = lambda: "1.13"
+
+    @need_version("1.14")
+    def too_new(self):
+        return True
+
+    @need_version("1.13")
+    def old_enough(self):
+        return True
+
+    @need_version("1.12")
+    def older(self):
+        return True
+
+    def testNeedVersion(self):
+        self.assertRaises(NotImplementedError, self.too_new)
+        self.assertTrue(self.old_enough())
+        self.assertTrue(self.older())
+
 
 if __name__ == '__main__':
     unittest.main()

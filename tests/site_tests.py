@@ -987,10 +987,6 @@ class TestSiteObject(PywikibotTestCase):
 
         self.assertFalse(mysite.has_extension('ThisExtensionDoesNotExist'))
 
-        # test behavior for sites that do not report extensions
-        # TODO: Simulate a version to old to support this
-        # self.assertRaises(NotImplementedError, mysite.has_extension, ('anything'))
-
     def test_API_limits_with_site_methods(self):
         # test step/total parameters for different sitemethods
         mypage = pywikibot.Page(mysite, 'Albert Einstein')
