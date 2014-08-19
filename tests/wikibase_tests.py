@@ -254,9 +254,8 @@ class TestItemLoad(PywikibotTestCase):
         self.assertEquals(hasattr(item, '_content'), False)
         self.assertRaises(pywikibot.NoPage, item.get)
         self.assertEquals(hasattr(item, '_content'), True)
-        # the title has now changed
-        self.assertEquals(item._link._title, '-1')
-        self.assertEquals(item.title(), '-1')
+        self.assertEquals(item._link._title, 'Q404')
+        self.assertEquals(item.title(), 'Q404')
         self.assertEquals(item.exists(), False)
 
     def test_fromPage_noprops(self):
