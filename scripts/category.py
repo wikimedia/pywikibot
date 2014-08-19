@@ -242,16 +242,18 @@ class AddCategory:
 
     """A robot to mass-add a category to a list of pages."""
 
-    def __init__(self, generator, sort_by_last_name=False, create=False,
-                 editSummary='', follow_redirects=False, dry=False):
+    @deprecate_arg('editSummary', 'comment')
+    def __init__(self, generator, newcat=None, sort_by_last_name=False,
+                 create=False, comment='', follow_redirects=False,
+                 dry=False):
         self.generator = generator
+        self.newcat = newcat
         self.sort = sort_by_last_name
         self.create = create
         self.follow_redirects = follow_redirects
         self.always = False
         self.dry = dry
-        self.newcatTitle = None
-        self.editSummary = editSummary
+        self.comment = comment
 
     def sorted_by_last_name(self, catlink, pagelink):
         """Return a Category with key that sorts persons by their last name.
@@ -285,8 +287,6 @@ class AddCategory:
             return pywikibot.Page(site, catlink.title())
 
     def run(self):
-        self.newcatTitle = pywikibot.input(
-            u'Category to add (do not give namespace):')
         counter = 0
         for page in self.generator:
             self.treat(page)
@@ -300,7 +300,7 @@ class AddCategory:
         """
         try:
             # Load the page
-            text = page.get()
+            text = page.text
         except pywikibot.NoPage:
             if self.create:
                 pywikibot.output(u"Page %s doesn't exist yet; creating."
@@ -312,17 +312,17 @@ class AddCategory:
         else:
             return text
 
-    def save(self, text, page, newcatTitle, minorEdit=True, botflag=True, old_text=None):
+    def save(self, text, page, newcat, minorEdit=True, botflag=True, old_text=None):
         if old_text is None:
             old_text = self.load(page)
         # only save if something was changed
         if text != old_text:
             # show what was changed
             pywikibot.showDiff(old_text, text)
-            comment = self.editSummary
+            comment = self.comment
             if not comment:
                 comment = i18n.twtranslate(page.site, 'category-adding',
-                                           {'newcat': newcatTitle})
+                                           {'newcat': newcat})
             pywikibot.output(u'Comment: %s' % comment)
             if not self.dry:
                 if not self.always:
@@ -386,10 +386,10 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
         pywikibot.output(u"Current categories:")
         for cat in cats:
             pywikibot.output(u"* %s" % cat.title())
-        newcatTitle = self.newcatTitle
+        newcat = self.newcat
         if not page.site.nocapitalize:
-            newcatTitle = newcatTitle[:1].upper() + newcatTitle[1:]
-        catpl = pywikibot.Page(page.site, newcatTitle, ns=14)
+            newcat = newcat[:1].upper() + newcat[1:]
+        catpl = pywikibot.Page(page.site, newcat, ns=14)
         if catpl in cats:
             pywikibot.output(u"%s is already in %s."
                              % (page.title(), catpl.title()))
@@ -399,7 +399,7 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
             pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
             cats.append(catpl)
             text = textlib.replaceCategoryLinks(text, cats, site=page.site)
-            if not self.save(text, page, newcatTitle, old_text=old_text):
+            if not self.save(text, page, newcat, old_text=old_text):
                 pywikibot.output(u'Page %s not saved.'
                                  % page.title(asLink=True))
 
@@ -1083,6 +1083,9 @@ def main(*args):
     gen = genFactory.getCombinedGenerator()
 
     if action == 'add':
+        if not toGiven:
+            newCatTitle = pywikibot.input(
+                u'Category to add (do not give namespace):')
         if not gen:
             # default for backwards compatibility
             genFactory.handleArg('-links')
@@ -1090,8 +1093,12 @@ def main(*args):
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.
         gen = pagegenerators.PreloadingGenerator(gen)
-        bot = AddCategory(gen, sort_by_last_name, create_pages, editSummary,
-                          follow_redirects)
+        bot = AddCategory(gen,
+                          newcat=newCatTitle,
+                          sort_by_last_name=sort_by_last_name,
+                          create=create_pages,
+                          comment=editSummary,
+                          follow_redirects=follow_redirects)
     elif action == 'remove':
         if not fromGiven:
             oldCatTitle = pywikibot.input(u'Please enter the name of the '
