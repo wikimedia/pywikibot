@@ -197,7 +197,11 @@ class TestSiteObject(PywikibotTestCase):
         self.assertTrue(len(mysite.mediawiki_messages(['*'])) > 10)
         self.assertFalse('*' in mysite.mediawiki_messages(['*']))
 
-        self.assertType(mysite.getcurrenttimestamp(), basestring)
+        self.assertType(mysite.getcurrenttime(), pywikibot.Timestamp)
+        ts = mysite.getcurrenttimestamp()
+        self.assertType(ts, basestring)
+        self.assertRegexpMatches(ts, r'(19|20)\d\d[0-1]\d[0-3]\d[0-2]\d[0-5]\d[0-5]\d')
+
         self.assertType(mysite.siteinfo, pywikibot.site.Siteinfo)
         self.assertType(mysite.months_names, list)
         self.assertEqual(mysite.months_names[4], (u'May', u'May'))
