@@ -58,6 +58,7 @@ def runnable_script_list(scripts_path):
                    and name != 'welcome.py'      # result depends on speed
                    and name != 'script_wui.py'   # depends on lua compiling
                    and name != 'editarticle.py'  # requires a X DISPLAY
+                   and name != 'makecat.py'      # bug 69781
                    ]
     return ['login'] + script_list
 
