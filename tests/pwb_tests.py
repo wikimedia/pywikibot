@@ -25,7 +25,8 @@ def check_output(command):
 
 class TestPwb(SiteTestCase):
 
-    """Test pwb.py functionality.
+    """
+    Test pwb.py functionality.
 
     This is registered as a Site test because it will not run
     without a user-config.py
@@ -41,8 +42,12 @@ class TestPwb(SiteTestCase):
             os.environ['PYWIKIBOT2_DIR'] = self.oldenviron['PYWIKIBOT2_DIR']
 
     def testScriptEnvironment(self):
-        """Make sure the environment is not contaminated, and is the same as
-           the environment we get when directly running a script."""
+        """
+        Test environment of pywikibot.
+
+        Make sure the environment is not contaminated, and is the same as
+        the environment we get when directly running a script.
+        """
         test = os.path.join(testbasepath, 'print_locals.py')
 
         direct = check_output([pypath, test])

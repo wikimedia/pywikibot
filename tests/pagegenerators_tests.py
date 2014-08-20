@@ -14,7 +14,8 @@ from tests.utils import unittest, PywikibotTestCase
 
 
 class TestPageGenerators(PywikibotTestCase):
-    """Test pagegenerators methods"""
+
+    """Test pagegenerators methods."""
 
     titles = [
         # just a bunch of randomly selected titles

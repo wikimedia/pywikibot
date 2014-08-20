@@ -11,7 +11,7 @@ from pywikibot.page import ip_regexp
 
 
 class PyWikiIpRegexCase(NoSiteTestCase):
-    """Unit test class for ip_regexp"""
+    """Unit test class for ip_regexp."""
 
     def setUp(self):
         self.total = 0

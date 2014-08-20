@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Tests for the Wikidata parts of the page module.
-"""
+"""Tests for the Wikidata parts of the page module."""
 #
 # (C) Pywikibot team, 2008-2014
 #
@@ -423,7 +421,9 @@ class TestPageMethods(PywikibotTestCase):
 
 
 class TestLinks(PywikibotTestCase):
-    """Test cases to test links stored in Wikidata"""
+
+    """Test cases to test links stored in Wikidata."""
+
     def setUp(self):
         super(TestLinks, self).setUp()
         self.wdp = pywikibot.ItemPage(wikidata, 'Q60')

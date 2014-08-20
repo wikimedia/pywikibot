@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Tests for the page module.
-"""
+"""Tests for the page module."""
 #
 # (C) Pywikibot team, 2008-2014
 #
@@ -23,7 +21,8 @@ badpage = pywikibot.Page(pywikibot.page.Link("There is no page with this title",
 
 
 class TestLinkObject(PywikibotTestCase):
-    """Test cases for Link objects"""
+
+    """Test cases for Link objects."""
 
     enwiki = pywikibot.Site("en", "wikipedia")
     frwiki = pywikibot.Site("fr", "wikipedia")

@@ -46,6 +46,7 @@ class TestDrySite(NoSiteTestCase):
 
 
 class TestMustBe(NoSiteTestCase):
+
     """Test cases for the must_be decorator."""
 
     # Implemented without setUpClass(cls) and global variables as objects
@@ -110,7 +111,8 @@ class TestMustBe(NoSiteTestCase):
 
 
 class TestNeedVersion(NoSiteTestCase):
-    """Test cases for the must_be decorator."""
+
+    """Test cases for the need_version decorator."""
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'

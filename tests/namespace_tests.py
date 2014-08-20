@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Tests for the Namespace class.
-"""
+"""Tests for the Namespace class."""
 #
 # (C) Pywikibot team, 2014
 #
@@ -19,6 +17,7 @@ if sys.version_info[0] > 2:
 
 
 class TestNamespaceObject(NoSiteTestCase):
+
     """Test cases for Namespace class."""
 
     # These should work in any MW wiki
@@ -51,8 +50,7 @@ class TestNamespaceObject(NoSiteTestCase):
     all_builtin_ids = dict(builtin_ids.items() + old_builtin_ids.items())
 
     def testNamespaceTypes(self):
-        """Test cases for methods manipulating namespace names"""
-
+        """Test cases for methods manipulating namespace names."""
         ns = Namespace.builtin_namespaces(use_image_name=False)
 
         self.assertType(ns, dict)

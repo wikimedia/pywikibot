@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Tests for xmlreader module.
-"""
+"""Tests for xmlreader module."""
 #
 # (C) Pywikibot team, 2014
 #

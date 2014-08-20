@@ -14,12 +14,12 @@ class TestDateMeta(type):
     """Test meta class"""
 
     def __new__(cls, name, bases, dct):
-        """create the new class"""
+        """Create the new class"""
 
         def test_method(formatname):
 
             def testMapEntry(self):
-                """The test ported from date.py"""
+                """The test ported from date.py."""
                 step = 1
                 if formatname in date.decadeFormats:
                     step = 10
@@ -50,7 +50,9 @@ class TestDateMeta(type):
 
 
 class TestDate(NoSiteTestCase):
-    """Test cases for date library processed by unittest"""
+
+    """Test cases for date library processed by unittest."""
+
     __metaclass__ = TestDateMeta
 
 
