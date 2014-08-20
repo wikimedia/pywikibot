@@ -127,21 +127,23 @@ class TestGeneral(PywikibotTestCase):
                                 'species.*no transcluded data',
                                 self.wdp.data_item)
 
-        # test.wikidata does not have a data repository.
-        self.wdp = pywikibot.ItemPage(wikidatatest, 'Q6')
-        self.assertRaises(pywikibot.WikiBaseError,
-                          pywikibot.ItemPage.fromPage, self.wdp)
+    def test_own_client(self):
+        """Test that a data repository family can be its own client."""
+        # Note: these tests do not yet verify that pywikibot can
+        # utilise this Wikibase configuration, as it is not yet
+        # working correctly on Wikidata.
 
-        # The main Wikidata also does not have a data repository.
-        # It is a data repository, but no pages on Wikidata have
-        # a linked page.
-        self.wdp = pywikibot.ItemPage(wikidata, 'Q60')
-        self.assertRaises(pywikibot.WikiBaseError,
-                          pywikibot.ItemPage.fromPage, self.wdp)
+        # The main Wikidata is its own client.
+        self.wdp = pywikibot.ItemPage(wikidata,
+                                      wikidata.siteinfo['mainpage'])
+        item = pywikibot.ItemPage.fromPage(self.wdp)
+        del item
 
-        self.wdp = pywikibot.Page(wikidata, 'Main Page', ns=4)
-        self.assertRaises(pywikibot.WikiBaseError,
-                          pywikibot.ItemPage.fromPage, self.wdp)
+        # test.wikidata is also
+        self.wdp = pywikibot.ItemPage(wikidatatest,
+                                      wikidatatest.siteinfo['mainpage'])
+        item = pywikibot.ItemPage.fromPage(self.wdp)
+        del item
 
 
 class TestItemLoad(PywikibotTestCase):
@@ -413,7 +415,6 @@ class TestPageMethods(PywikibotTestCase):
     def test_page_methods(self):
         """Test ItemPage methods inherited from superclass Page."""
         self.wdp = pywikibot.ItemPage(wikidatatest, 'Q6')
-        self.assertRaises(pywikibot.WikiBaseError, self.wdp.data_item)
         self.assertRaises(pywikibot.PageNotSaved, self.wdp.save)
         self.wdp.previousRevision()
         self.assertEquals(self.wdp.langlinks(), [])

@@ -17,14 +17,17 @@ class Family(family.WikimediaFamily):
         }
 
     def shared_data_repository(self, code, transcluded=False):
-        """Always return a repository tupe. This enables testing whether
-        the site object is the repository itself, see Site.is_data_repository()
-
         """
-        if transcluded:
-            return (None, None)
-        else:
-            return (code, self.name)
+        Indicate Wikidata is both a repository and its own client.
+
+        Until 20 August 2014, Wikidata was only a data repository,
+        and this method only returned a tuple with data if
+        transcluded was False.
+
+        On that date, the software was enhanced so that Wikidata
+        could store sitelinks to itself.
+        """
+        return (code, self.name)
 
     def calendarmodel(self, code):
         """Default calendar model for WbTime datatype"""
