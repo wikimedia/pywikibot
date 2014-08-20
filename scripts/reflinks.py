@@ -434,7 +434,7 @@ class ReferencesRobot(Bot):
         # Regex to grasp content-type meta HTML tag in HTML source
         self.META_CONTENT = re.compile(r'(?i)<meta[^>]*content\-type[^>]*>')
         # Extract the encoding from a charset property (from content-type !)
-        self.CHARSET = re.compile(r'(?i)charset\s*=\s*(?P<enc>[^\'";>/]*)')
+        self.CHARSET = re.compile(r'(?i)charset\s*=\s*(?P<enc>[^\'",;>/]*)')
         # Extract html title from page
         self.TITLE = re.compile(r'(?is)(?<=<title>).*?(?=</title>)')
         # Matches content inside <script>/<style>/HTML comments
@@ -683,7 +683,11 @@ class ReferencesRobot(Bot):
 
                 if 'utf-8' not in enc:
                     enc.append('utf-8')
-                u = linkedpagetext.decode(enc[0])   # Bug 67410
+                try:
+                    u = linkedpagetext.decode(enc[0])   # Bug 67410
+                except (UnicodeDecodeError, LookupError) as e:
+                    pywikibot.output(u'%s : Decoding error - %s' % (ref.link, e))
+                    continue
 
                 # Retrieves the first non empty string inside <title> tags
                 for m in self.TITLE.finditer(u):
