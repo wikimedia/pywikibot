@@ -7,7 +7,9 @@
 #
 __version__ = '$Id$'
 
-from pywikibot.tools import deprecated, deprecate_arg, add_full_name
+from pywikibot.tools import (
+    deprecated, deprecate_arg, deprecated_args, add_full_name
+)
 from tests.aspects import unittest, DeprecationTestCase, TestCase
 
 
@@ -98,7 +100,19 @@ def deprecated_func_bad_args(self):
 
 @deprecate_arg('bah', 'foo')
 def deprecated_func_arg(foo=None):
-    """Deprecated function with arg 'self'."""
+    """Deprecated arg 'bah'."""
+    return foo
+
+
+@deprecated_args(bah='foo')
+def deprecated_func_arg2(foo=None):
+    """Test deprecated_args with one rename."""
+    return foo
+
+
+@deprecated_args(bah='foo', silent=False, loud=True, old=None)
+def deprecated_func_arg3(foo=None):
+    """Test deprecated_args with three drops and one rename."""
     return foo
 
 
@@ -340,23 +354,60 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertDeprecation(__name__ + '.DeprecatedClass is deprecated.')
 
     def test_deprecate_function_arg(self):
-        rv = deprecated_func_arg()
+        def tests(func):
+            rv = func()
+            self.assertEqual(rv, None)
+            self.assertNoDeprecation()
+
+            rv = func('a')
+            self.assertEqual(rv, 'a')
+            self.assertNoDeprecation()
+
+            rv = func(bah='b')
+            self.assertEqual(rv, 'b')
+            self.assertDeprecation('bah argument of ' + __name__ + '.' + func.__name__ + ' is deprecated; use foo instead.')
+
+            DeprecatorTestCase._reset_messages()
+
+            rv = func(foo=1)
+            self.assertEqual(rv, 1)
+            self.assertNoDeprecation()
+
+            self.assertRaisesRegex(
+                TypeError,
+                r"deprecated_func_arg2?\(\) got multiple values for (keyword )?argument 'foo'",
+                func,
+                'a', bah='b'
+            )
+            DeprecatorTestCase._reset_messages()
+
+        tests(deprecated_func_arg)
+        tests(deprecated_func_arg2)
+
+    def test_deprecate_and_remove_function_args(self):
+        rv = deprecated_func_arg3()
         self.assertEqual(rv, None)
         self.assertNoDeprecation()
 
-        rv = deprecated_func_arg('a')
-        self.assertEqual(rv, 'a')
+        rv = deprecated_func_arg3(foo=1, silent=42)
+        self.assertEqual(rv, 1)
         self.assertNoDeprecation()
 
-        rv = deprecated_func_arg(bah='b')
-        self.assertEqual(rv, 'b')
-        self.assertDeprecation('bah argument of ' + __name__ + '.deprecated_func_arg is deprecated; use foo instead.')
+        rv = deprecated_func_arg3(2)
+        self.assertEqual(rv, 2)
+        self.assertNoDeprecation()
+
+        rv = deprecated_func_arg3(3, loud='3')
+        self.assertEqual(rv, 3)
+        self.assertDeprecation('loud argument of ' + __name__ + '.deprecated_func_arg3 is deprecated.')
 
         DeprecatorTestCase._reset_messages()
 
-        rv = deprecated_func_arg(foo=1)
-        self.assertEqual(rv, 1)
-        self.assertNoDeprecation()
+        rv = deprecated_func_arg3(4, old='4')
+        self.assertEqual(rv, 4)
+        self.assertDeprecation('old argument of ' + __name__ + '.deprecated_func_arg3 is deprecated.')
+
+        DeprecatorTestCase._reset_messages()
 
     def test_deprecated_instance_method_zero_arg(self):
         """Test @deprecate_arg with classes, without arguments."""

@@ -13,7 +13,7 @@ import codecs
 
 import pywikibot
 from pywikibot import config
-from pywikibot.tools import deprecate_arg
+from pywikibot.tools import deprecated_args
 from pywikibot.exceptions import NoUsername
 
 _logger = "wiki.login"
@@ -32,8 +32,7 @@ botList = {
 
 
 class LoginManager:
-    @deprecate_arg("username", "user")
-    @deprecate_arg("verbose", None)
+    @deprecated_args(username="user", verbose=None)
     def __init__(self, password=None, sysop=False, site=None, user=None):
         if site is not None:
             self.site = site

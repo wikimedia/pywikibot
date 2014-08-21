@@ -115,7 +115,9 @@ import pywikibot
 from pywikibot import Bot
 from pywikibot import config, pagegenerators
 from pywikibot import i18n, textlib
-from pywikibot.tools import deprecate_arg, deprecated, ModuleDeprecationWrapper
+from pywikibot.tools import (
+    deprecated_args, deprecated, ModuleDeprecationWrapper
+)
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -269,8 +271,7 @@ class CategoryAddBot(Bot):
 
     """A robot to mass-add a category to a list of pages."""
 
-    @deprecate_arg('editSummary', 'comment')
-    @deprecate_arg('dry', None)
+    @deprecated_args(editSummary='comment', dry=None)
     def __init__(self, generator, newcat=None, sort_by_last_name=False,
                  create=False, comment='', follow_redirects=False):
         super(CategoryAddBot, self).__init__()
@@ -386,15 +387,11 @@ class CategoryMoveRobot(object):
     DELETION_COMMENT_AUTOMATIC = 0
     DELETION_COMMENT_SAME_AS_EDIT_COMMENT = 1
 
-    @deprecate_arg("oldCatTitle", "oldcat")
-    @deprecate_arg("newCatTitle", "newcat")
-    @deprecate_arg("batchMode", "batch")
-    @deprecate_arg("editSummary", "comment")
-    @deprecate_arg("inPlace", "inplace")
-    @deprecate_arg("moveCatPage", "move_oldcat")
-    @deprecate_arg("deleteEmptySourceCat", "delete_oldcat")
-    @deprecate_arg("titleRegex", "title_regex")
-    @deprecate_arg("withHistory", "history")
+    @deprecated_args(oldCatTitle='oldcat', newCatTitle='newcat',
+                     batchMode='batch', editSummary='comment',
+                     inPlace='inplace', moveCatPage='move_oldcat',
+                     deleteEmptySourceCat='delete_oldcat',
+                     titleRegex='title_regex', withHistory='history')
     def __init__(self, oldcat, newcat=None, batch=False, comment='',
                  inplace=False, move_oldcat=True, delete_oldcat=True,
                  title_regex=None, history=False, pagesonly=False,

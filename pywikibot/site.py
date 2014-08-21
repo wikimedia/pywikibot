@@ -29,7 +29,7 @@ import pywikibot
 import pywikibot.family
 from pywikibot.tools import (
     itergroup, deprecated, deprecate_arg, UnicodeMixin, ComparableMixin,
-    redirect_func, add_decorated_full_name,
+    redirect_func, add_decorated_full_name, deprecated_args
 )
 from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.throttle import Throttle
@@ -2979,9 +2979,7 @@ class APISite(BaseSite):
                                  'subcats': 0}
         return category._catinfo
 
-    @deprecate_arg("throttle", None)
-    @deprecate_arg("limit", "total")
-    @deprecate_arg("includeredirects", "filterredir")
+    @deprecated_args(throttle=None, limit="total", includeredirects="filterredir")
     def allpages(self, start="!", prefix="", namespace=0, filterredir=None,
                  filterlanglinks=None, minsize=None, maxsize=None,
                  protect_type=None, protect_level=None, reverse=False,
@@ -4533,11 +4531,11 @@ class APISite(BaseSite):
                 filepage._imageinfo = result["imageinfo"]
             return
 
-    @deprecate_arg("number", "step")
-    @deprecate_arg("repeat", None)
-    @deprecate_arg("namespace", "namespaces")
-    @deprecate_arg("rc_show", None)
-    @deprecate_arg("get_redirect", None)  # 20120822
+    @deprecated_args(number="step",
+                     repeat=None,
+                     namespace="namespaces",
+                     rc_show=None,
+                     get_redirect=None)  # 20120822
     def newpages(self, user=None, returndict=False,
                  start=None, end=None, reverse=False, showBot=False,
                  showRedirects=False, excludeuser=None,
@@ -4597,13 +4595,11 @@ class APISite(BaseSite):
             yield (filepage, date, user, comment)
 
     @deprecated("Site().newfiles()")
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def newimages(self, *args, **kwargs):
         return self.newfiles(*args, **kwargs)
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def longpages(self, step=None, total=None):
         """Yield Pages and lengths from Special:Longpages.
 
@@ -4619,8 +4615,7 @@ class APISite(BaseSite):
             yield (pywikibot.Page(self, pageitem['title']),
                    int(pageitem['value']))
 
-    @deprecate_arg("number", "total")
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number="total", repeat=None)
     def shortpages(self, step=None, total=None):
         """Yield Pages and lengths from Special:Shortpages.
 
@@ -4636,8 +4631,7 @@ class APISite(BaseSite):
             yield (pywikibot.Page(self, pageitem['title']),
                    int(pageitem['value']))
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def deadendpages(self, step=None, total=None):
         """Yield Page objects retrieved from Special:Deadendpages.
 
@@ -4649,8 +4643,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return degen
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def ancientpages(self, step=None, total=None):
         """Yield Pages, datestamps from Special:Ancientpages.
 
@@ -4664,8 +4657,7 @@ class APISite(BaseSite):
             yield (pywikibot.Page(self, pageitem['title']),
                    pywikibot.Timestamp.fromISOformat(pageitem['timestamp']))
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def lonelypages(self, step=None, total=None):
         """Yield Pages retrieved from Special:Lonelypages.
 
@@ -4677,8 +4669,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return lpgen
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def unwatchedpages(self, step=None, total=None):
         """Yield Pages from Special:Unwatchedpages (requires Admin privileges).
 
@@ -4701,8 +4692,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return wpgen
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def uncategorizedcategories(self, number=None, repeat=True,
                                 step=None, total=None):
         """Yield Categories from Special:Uncategorizedcategories.
@@ -4716,8 +4706,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return ucgen
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def uncategorizedimages(self, number=None, repeat=True,
                             step=None, total=None):
         """Yield FilePages from Special:Uncategorizedimages.
@@ -4734,8 +4723,7 @@ class APISite(BaseSite):
     # synonym
     uncategorizedfiles = uncategorizedimages
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def uncategorizedpages(self, number=None, repeat=True,
                            step=None, total=None):
         """Yield Pages from Special:Uncategorizedpages.
@@ -4749,8 +4737,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return upgen
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def uncategorizedtemplates(self, number=None, repeat=True, step=None,
                                total=None):
         """Yield Pages from Special:Uncategorizedtemplates.
@@ -4764,8 +4751,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return utgen
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def unusedcategories(self, step=None, total=None):
         """Yield Category objects from Special:Unusedcategories.
 
@@ -4791,13 +4777,11 @@ class APISite(BaseSite):
         return uigen
 
     @deprecated("Site().unusedfiles()")
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def unusedimages(self, *args, **kwargs):
         return self.unusedfiles(*args, **kwargs)
 
-    @deprecate_arg("number", None)
-    @deprecate_arg("repeat", None)
+    @deprecated_args(number=None, repeat=None)
     def withoutinterwiki(self, step=None, total=None):
         """Yield Pages without language links from Special:Withoutinterwiki.
 
