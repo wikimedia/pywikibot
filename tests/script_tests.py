@@ -230,6 +230,7 @@ class TestScriptMeta(type):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = \
                 'Test running ' + script_name + ' without arguments.'
+            dct[test_name].__name__ = test_name
 
         return type.__new__(cls, name, bases, dct)
 

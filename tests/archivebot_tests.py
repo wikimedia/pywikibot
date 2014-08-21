@@ -84,6 +84,7 @@ class TestArchiveBotMeta(type):
                 dct[test_name] = unittest.expectedFailure(test_method(code))
             else:
                 dct[test_name] = test_method(code)
+            dct[test_name].__name__ = test_name
         return type.__new__(cls, name, bases, dct)
 
 
