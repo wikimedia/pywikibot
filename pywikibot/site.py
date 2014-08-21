@@ -1080,10 +1080,10 @@ class Siteinfo(Container):
         # expire = 0 (or timedelta(0)) are always expired and their bool is
         # False, so skip them EXCEPT if it's literally False, then they expire
         # never: "expiry is False" is different than "not expiry"!
+        # if it's a int convert to timedelta
+        if expiry is not False and isinstance(expiry, (int, float)):
+            expiry = datetime.timedelta(expiry)
         if expiry or expiry is False:
-            # if it's a int convert to timedelta
-            if expiry is not False and isinstance(expiry, (int, float)):
-                expiry = datetime.timedelta(expiry)
             try:
                 cached = self._get_cached(key)
             except KeyError:
@@ -1664,7 +1664,7 @@ class APISite(BaseSite):
         """
         if LV(self.version()) >= LV("1.16"):
             return pywikibot.Timestamp.fromISOformat(
-                self.siteinfo.get('time', force=True))
+                self.siteinfo.get('time', expiry=0))
         else:
             return pywikibot.Timestamp.fromtimestampformat(
                 self.expand_text("{{CURRENTTIMESTAMP}}"))
