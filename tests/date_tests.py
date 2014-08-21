@@ -46,6 +46,7 @@ class TestDateMeta(type):
         for formatname in date.formats:
             test_name = "test_" + formatname
             dct[test_name] = test_method(formatname)
+            dct[test_name].__name__ = test_name
         return type.__new__(cls, name, bases, dct)
 
 
