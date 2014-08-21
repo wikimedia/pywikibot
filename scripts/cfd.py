@@ -66,7 +66,7 @@ def main():
     robot = None
 
     m = ReCheck()
-    for line in page.get().split("\n"):
+    for line in page.text.split("\n"):
         if nobots.search(line):
             # NO BOTS!!!
             pass
@@ -114,9 +114,9 @@ def main():
                 pywikibot.output(summary, toStdout=True)
                 robot = None
             else:
-                robot = category.CategoryMoveRobot(oldCatTitle=src, newCatTitle=dest, batchMode=True,
-                                                   editSummary=summary, inPlace=True, moveCatPage=True,
-                                                   deleteEmptySourceCat=True, useSummaryForDeletion=True)
+                robot = category.CategoryMoveRobot(oldcat=src, newcat=dest, batch=True,
+                                                   comment=summary, inplace=True, move_oldcat=True,
+                                                   delete_oldcat=True, deletion_comment=True)
         elif m.check(deletecat, line):
             src = m.result.group(1)
             # I currently don't see any reason to handle these two cases separately, though
@@ -127,8 +127,8 @@ def main():
                 summary = "Robot - Removing category " + src + " per [[WP:CFD|CFD]] at " + thisDay + "."
             else:
                 continue
-            robot = category.CategoryRemoveRobot(catTitle=src, batchMode=True, editSummary=summary,
-                                                 useSummaryForDeletion=True, inPlace=True)
+            robot = category.CategoryMoveRobot(oldcat=src, batch=True, comment=summary,
+                                                 deletion_comment=True, inplace=True)
         else:
             # This line does not fit any of our regular expressions, so ignore it.
             pass
@@ -148,7 +148,7 @@ def main():
 def findDay(pageTitle, oldDay):
     page = pywikibot.Page(pywikibot.Site(), u"Category:" + pageTitle)
     try:
-        pageSrc = page.get()
+        pageSrc = page.text
         m = findday.search(pageSrc)
     except pywikibot.NoPage:
         m = None
