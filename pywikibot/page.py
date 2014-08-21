@@ -18,12 +18,10 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import deprecate_arg
-from pywikibot import deprecated
 from pywikibot import config
 import pywikibot.site
 from pywikibot.exceptions import AutoblockUser, UserActionRefuse
-from pywikibot.tools import ComparableMixin
+from pywikibot.tools import ComparableMixin, deprecated, deprecate_arg
 from pywikibot import textlib
 import hashlib
 

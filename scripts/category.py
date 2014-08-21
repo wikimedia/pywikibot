@@ -106,7 +106,7 @@ import bz2
 import pywikibot
 from pywikibot import config, pagegenerators
 from pywikibot import i18n, textlib
-from pywikibot import deprecate_arg, deprecated
+from pywikibot.tools import deprecate_arg, deprecated
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

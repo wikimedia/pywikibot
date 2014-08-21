@@ -28,10 +28,8 @@ import json
 import copy
 
 import pywikibot
-import pywikibot.tools as tools
-from pywikibot import deprecate_arg
 from pywikibot import config
-from pywikibot import deprecated
+from pywikibot.tools import itergroup, deprecated, deprecate_arg
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -919,12 +917,12 @@ class Siteinfo(Container):
             'semiprotectedlevels': 'autoconfirmed'
             'levels': '' (everybody), 'autoconfirmed', 'sysop'
             'types': 'create', 'edit', 'move', 'upload'
-        Otherwise it returns L{tools.EMPTY_DEFAULT}.
+        Otherwise it returns L{pywikibot.tools.EMPTY_DEFAULT}.
 
         @param key: The property name
         @type key: str
         @return: The default value
-        @rtype: dict or L{tools.EmptyDefault}
+        @rtype: dict or L{pywikibot.tools.EmptyDefault}
         """
         if key == 'restrictions':
             # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
@@ -935,7 +933,7 @@ class Siteinfo(Container):
                 'types': ['create', 'edit', 'move', 'upload']
             }
         else:
-            return tools.EMPTY_DEFAULT
+            return pywikibot.tools.EMPTY_DEFAULT
 
     def _get_siteinfo(self, prop, expiry):
         """
@@ -2066,7 +2064,6 @@ class APISite(BaseSite):
         @param langlinks: preload list of language links found in the pages
 
         """
-        from pywikibot.tools import itergroup
         for sublist in itergroup(pagelist, groupsize):
             pageids = [str(p._pageid) for p in sublist
                        if hasattr(p, "_pageid") and p._pageid > 0]
@@ -4285,7 +4282,6 @@ class DataSite(APISite):
         @param groupsize: how many pages to query at a time
         @type groupsize: int
         """
-        from pywikibot.tools import itergroup
         for sublist in itergroup(pagelist, groupsize):
             req = {'ids': [], 'titles': [], 'sites': []}
             for p in sublist:

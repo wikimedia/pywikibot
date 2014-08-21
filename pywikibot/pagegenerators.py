@@ -23,9 +23,8 @@ import codecs
 import itertools
 import re
 import pywikibot
-from pywikibot import date
-from pywikibot import config
-from pywikibot import deprecate_arg, i18n
+from pywikibot import date, config, i18n
+from pywikibot.tools import deprecate_arg
 from pywikibot.comms import http
 import pywikibot.data.wikidataquery as wdquery
 
