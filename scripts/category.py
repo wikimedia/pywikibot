@@ -676,7 +676,7 @@ class CategoryRemoveRobot(CategoryMoveRobot):
     def __init__(self, catTitle, batchMode=False, editSummary='',
                  useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
                  titleRegex=None, inPlace=False, pagesonly=False):
-        CategoryMoveRobot.__init__(
+        super(CategoryRemoveRobot, self).__init__(
             oldcat=catTitle,
             batch=batchMode,
             comment=editSummary,
