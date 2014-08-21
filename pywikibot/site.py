@@ -1608,6 +1608,7 @@ class APISite(BaseSite):
         concat = msgs['and'] + msgs['word-separator']
         return msgs['comma-separator'].join(args[:-2] + [concat.join(args[-2:])])
 
+    @need_version("1.12")
     def expand_text(self, text, title=None, includecomments=None):
         """ Parse the given text for preprocessing and rendering.
 
@@ -1638,17 +1639,35 @@ class APISite(BaseSite):
         return req.submit()['expandtemplates'][key]
 
     def getcurrenttimestamp(self):
-        """Return server time, {{CURRENTTIMESTAMP}}, as a string.
-
-        Format is 'yyyymmddhhmmss'
-
         """
-        return self.expand_text("{{CURRENTTIMESTAMP}}")
+        Return the server time as a MediaWiki timestamp string.
+
+        It calls L{getcurrenttime} first so it queries the server to get the
+        current server time.
+
+        @return: the server time
+        @rtype: str (as 'yyyymmddhhmmss')
+        """
+        return self.getcurrenttime().totimestampformat()
 
     def getcurrenttime(self):
-        """Return a Timestamp object representing the current server time."""
-        ts = self.getcurrenttimestamp()
-        return pywikibot.Timestamp.fromtimestampformat(ts)
+        """
+        Return a Timestamp object representing the current server time.
+
+        For wikis with a version newer than 1.16 it uses the 'time' property
+        of the siteinfo 'general'. It'll force a reload before returning the
+        time. It requests to expand the text '{{CURRENTTIMESTAMP}}' for older
+        wikis.
+
+        @return the current server time
+        @rtype: L{Timestamp}
+        """
+        if LV(self.version()) >= LV("1.16"):
+            return pywikibot.Timestamp.fromISOformat(
+                self.siteinfo.get('time', force=True))
+        else:
+            return pywikibot.Timestamp.fromtimestampformat(
+                self.expand_text("{{CURRENTTIMESTAMP}}"))
 
     def getmagicwords(self, word):
         """Return list of localized "word" magic words for the site."""
