@@ -12,8 +12,9 @@ import logging
 import re
 import collections
 
-from . import config2 as config
 import pywikibot
+from pywikibot import config2 as config
+from pywikibot.tools import deprecated
 
 logger = logging.getLogger("pywiki.wiki.family")
 
@@ -976,7 +977,7 @@ class Family(object):
         # Here we return the latest mw release for downloading
         return '1.23.2'
 
-    @pywikibot.deprecated("version()")
+    @deprecated("version()")
     def versionnumber(self, code):
         """ DEPRECATED, use version() instead and use
         distutils.version.LooseVersion to compare version strings.
@@ -1046,7 +1047,7 @@ class Family(object):
         """Return the shared Wikibase repository, if any."""
         return (None, None)
 
-    @pywikibot.deprecated("Site.getcurrenttime()")
+    @deprecated("Site.getcurrenttime()")
     def server_time(self, code):
         """
         DEPRECATED, use Site.getcurrenttime() instead

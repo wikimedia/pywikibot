@@ -50,11 +50,11 @@ from pywikibot.textlib import (
     removeCategoryLinks, removeCategoryLinksAndSeparator,
     replaceCategoryInPlace, compileLinkR, extract_templates_and_params,
 )
-from pywikibot.tools import UnicodeMixin
+from pywikibot.tools import UnicodeMixin, deprecated, deprecate_arg
 from pywikibot.i18n import translate
 
 __all__ = (
-    'config', 'ui', 'UnicodeMixin', 'translate',
+    'config', 'ui', 'UnicodeMixin', 'translate', 'deprecated', 'deprecate_arg',
     'Page', 'FilePage', 'ImagePage', 'Category', 'Link', 'User',
     'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
     'html2unicode', 'url2unicode', 'unicode2html',
@@ -428,57 +428,6 @@ class WbQuantity(object):
     def __repr__(self):
         return (u"WbQuantity(amount=%(amount)s, upperBound=%(upperBound)s, "
                 u"lowerBound=%(lowerBound)s, unit=%(unit)s)" % self.__dict__)
-
-
-def deprecated(instead=None):
-    """Decorator to output a method deprecation warning.
-
-    @param instead: if provided, will be used to specify the replacement
-    @type instead: string
-    """
-    def decorator(method):
-        def wrapper(*args, **kwargs):
-            funcname = method.__name__
-            classname = args[0].__class__.__name__
-            if instead:
-                warning(u"%s.%s is DEPRECATED, use %s instead."
-                        % (classname, funcname, instead))
-            else:
-                warning(u"%s.%s is DEPRECATED." % (classname, funcname))
-            return method(*args, **kwargs)
-        wrapper.__name__ = method.__name__
-        return wrapper
-    return decorator
-
-
-def deprecate_arg(old_arg, new_arg):
-    """Decorator to declare old_arg deprecated and replace it with new_arg."""
-    _logger = ""
-
-    def decorator(method):
-        def wrapper(*__args, **__kw):
-            meth_name = method.__name__
-            if old_arg in __kw:
-                if new_arg:
-                    if new_arg in __kw:
-                        warning(
-u"%(new_arg)s argument of %(meth_name)s replaces %(old_arg)s; cannot use both."
-                            % locals())
-                    else:
-                        warning(
-u"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
-                            % locals())
-                        __kw[new_arg] = __kw[old_arg]
-                else:
-                    debug(
-u"%(old_arg)s argument of %(meth_name)s is deprecated."
-                        % locals(), _logger)
-                del __kw[old_arg]
-            return method(*__args, **__kw)
-        wrapper.__doc__ = method.__doc__
-        wrapper.__name__ = method.__name__
-        return wrapper
-    return decorator
 
 
 _sites = {}

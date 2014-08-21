@@ -1,7 +1,6 @@
 import pywikibot
 from pywikibot.data import api
-from pywikibot import deprecated
-from pywikibot import deprecate_arg
+from pywikibot.tools import deprecated, deprecate_arg
 
 
 @deprecated("pywikibot.data.api.Request")

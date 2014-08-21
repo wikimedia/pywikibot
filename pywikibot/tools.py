@@ -5,6 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import print_function
 __version__ = '$Id$'
 
 import sys
@@ -16,6 +17,13 @@ if sys.version_info[0] > 2:
     import queue as Queue
 else:
     import Queue
+
+
+# These variables are functions debug(str) and warning(str)
+# which are initially the builtin print function.
+# They exist here as the deprecators in this module rely only on them.
+# pywikibot updates these function variables in bot.init_handlers()
+debug = warning = print
 
 
 class UnicodeMixin(object):
@@ -253,6 +261,57 @@ class EmptyDefault(str, Mapping):
 
 
 EMPTY_DEFAULT = EmptyDefault()
+
+
+def deprecated(instead=None):
+    """Decorator to output a method deprecation warning.
+
+    @param instead: if provided, will be used to specify the replacement
+    @type instead: string
+    """
+    def decorator(method):
+        def wrapper(*args, **kwargs):
+            funcname = method.__name__
+            classname = args[0].__class__.__name__
+            if instead:
+                warning(u"%s.%s is DEPRECATED, use %s instead."
+                        % (classname, funcname, instead))
+            else:
+                warning(u"%s.%s is DEPRECATED." % (classname, funcname))
+            return method(*args, **kwargs)
+        wrapper.__name__ = method.__name__
+        return wrapper
+    return decorator
+
+
+def deprecate_arg(old_arg, new_arg):
+    """Decorator to declare old_arg deprecated and replace it with new_arg."""
+    _logger = ""
+
+    def decorator(method):
+        def wrapper(*__args, **__kw):
+            meth_name = method.__name__
+            if old_arg in __kw:
+                if new_arg:
+                    if new_arg in __kw:
+                        warning(
+u"%(new_arg)s argument of %(meth_name)s replaces %(old_arg)s; cannot use both."
+                            % locals())
+                    else:
+                        warning(
+u"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
+                            % locals())
+                        __kw[new_arg] = __kw[old_arg]
+                else:
+                    debug(
+u"%(old_arg)s argument of %(meth_name)s is deprecated."
+                        % locals(), _logger)
+                del __kw[old_arg]
+            return method(*__args, **__kw)
+        wrapper.__doc__ = method.__doc__
+        wrapper.__name__ = method.__name__
+        return wrapper
+    return decorator
 
 
 if __name__ == "__main__":
