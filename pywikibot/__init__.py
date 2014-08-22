@@ -36,7 +36,7 @@ from pywikibot.exceptions import (
     Error, InvalidTitle, BadTitle, NoPage, SectionError,
     NoSuchSite, NoUsername, UserBlocked,
     PageRelatedError, IsRedirectPage, IsNotRedirectPage,
-    PageNotSaved, UploadWarning, LockedPage, EditConflict,
+    PageNotSaved, LockedPage, EditConflict,
     ServerError, FatalServerError, Server504Error,
     CaptchaError, SpamfilterError, CircularRedirect,
     WikiBaseError, CoordinateGlobeUnknownException,
@@ -52,6 +52,7 @@ from pywikibot.textlib import (
 )
 from pywikibot.tools import UnicodeMixin, deprecated, deprecate_arg
 from pywikibot.i18n import translate
+from pywikibot.data.api import UploadWarning
 
 __all__ = (
     'config', 'ui', 'UnicodeMixin', 'translate', 'deprecated', 'deprecate_arg',

@@ -46,7 +46,7 @@ _logger = "data.api"
 lagpattern = re.compile(r"Waiting for [\d.]+: (?P<lag>\d+) seconds? lagged")
 
 
-class APIError(pywikibot.Error):
+class APIError(Error):
 
     """The wiki site returned an error message."""
 
@@ -58,13 +58,26 @@ class APIError(pywikibot.Error):
         self.unicode = unicode(self.__str__())
 
     def __repr__(self):
-        return 'APIError("%(code)s", "%(info)s", %(other)s)' % self.__dict__
+        return '{name}("{code}", "{info}", {other})'.format(
+            name=self.__class__.__name__, **self.__dict__)
 
     def __str__(self):
         return "%(code)s: %(info)s" % self.__dict__
 
 
-class TimeoutError(pywikibot.Error):
+class UploadWarning(APIError):
+
+    """Upload failed with a warning message (passed as the argument)."""
+
+    def __init__(self, code, message):
+        super(UploadWarning, self).__init__(code, message)
+
+    @property
+    def message(self):
+        return self.info
+
+
+class TimeoutError(Error):
     pass
 
 

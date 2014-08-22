@@ -3944,7 +3944,7 @@ class APISite(BaseSite):
         if "warnings" in result:
             warning = list(result["warnings"].keys())[0]
             message = result["warnings"][warning]
-            raise pywikibot.UploadWarning(upload_warnings[warning]
+            raise pywikibot.UploadWarning(warning, upload_warnings[warning]
                                           % {'msg': message})
         elif "result" not in result:
             pywikibot.output(u"Upload: unrecognized response: %s" % result)
