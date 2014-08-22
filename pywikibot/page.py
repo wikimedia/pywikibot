@@ -1705,8 +1705,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         else:
             if newCat:
                 cats[cats.index(oldCat)] = Category(site, newCat.title(),
-                                                    sortKey=sortKey,
-                                                    site=self.site)
+                                                    sortKey=sortKey)
             else:
                 cats.pop(cats.index(oldCat))
             oldtext = self.get(get_redirect=True)
