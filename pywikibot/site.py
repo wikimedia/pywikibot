@@ -288,6 +288,9 @@ class Namespace(Iterable):
 
     def __str__(self):
         """Return a string representation."""
+        if sys.version_info[0] > 2:
+            return self.__unicode__()
+
         if self.id == 0:
             return ':'
         elif self.id in (6, 14):

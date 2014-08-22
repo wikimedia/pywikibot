@@ -11,12 +11,16 @@ and for TranslateWiki-based translations
 __version__ = '$Id$'
 #
 
+import sys
 import re
 import locale
 from pywikibot import Error
 from .plural import plural_rules
 import pywikibot
 from . import config2 as config
+
+if sys.version_info[0] == 3:
+    basestring = (str, )
 
 PLURAL_PATTERN = '{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 

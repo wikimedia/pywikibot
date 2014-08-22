@@ -20,7 +20,7 @@ class PyWikiIpRegexCase(NoSiteTestCase):
 
     def tearDown(self):
         super(PyWikiIpRegexCase, self).tearDown()
-        print '%d tests done, %d failed' % (self.total, self.fail)
+        print('%d tests done, %d failed' % (self.total, self.fail))
         if self.fail:
             raise AssertionError
 
@@ -33,7 +33,7 @@ class PyWikiIpRegexCase(NoSiteTestCase):
             self.fail += 1
             failed = True
         if failed:
-            print '"%s" should match %s - not OK' % (IP, result)
+            print('"%s" should match %s - not OK' % (IP, result))
 
     def test_IP(self):
         # test from http://download.dartware.com/thirdparty/test-ipv6-regex.pl
