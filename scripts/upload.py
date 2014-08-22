@@ -9,6 +9,7 @@ Arguments:
   -filename     Target filename
   -noverify     Do not ask for verification of the upload description if one
                 is given
+  -abortonwarn  Abort upload on warning
 
 If any other arguments are given, the first is the URL or filename to upload,
 and the rest is a proposed description to go with the upload. If none of these
@@ -40,7 +41,7 @@ class UploadRobot:
     def __init__(self, url, urlEncoding=None, description=u'',
                  useFilename=None, keepFilename=False,
                  verifyDescription=True, ignoreWarning=False,
-                 targetSite=None, uploadByUrl=False):
+                 targetSite=None, uploadByUrl=False, abortOnWarn=False):
         """
         @param ignoreWarning: Set this to True if you want to upload even if
             another file would be overwritten or another mistake would be
@@ -54,6 +55,7 @@ class UploadRobot:
         self.keepFilename = keepFilename
         self.verifyDescription = verifyDescription
         self.ignoreWarning = ignoreWarning
+        self.abortOnWarn = abortOnWarn
         if config.upload_to_commons:
             self.targetSite = targetSite or pywikibot.Site('commons',
                                                            'commons')
@@ -218,8 +220,11 @@ class UploadRobot:
         except pywikibot.UploadWarning as warn:
             pywikibot.output(u"We got a warning message: ", newline=False)
             pywikibot.output(str(warn))
-            answer = pywikibot.inputChoice(u"Do you want to ignore?",
-                                           ['Yes', 'No'], ['y', 'N'], 'N')
+            if self.abortOnWarn:
+                answer = "N"
+            else:
+                answer = pywikibot.inputChoice(u"Do you want to ignore?",
+                                               ['Yes', 'No'], ['y', 'N'], 'N')
             if answer == "y":
                 self.ignoreWarning = 1
                 self.keepFilename = True
@@ -252,6 +257,7 @@ def main(*args):
     keepFilename = False
     useFilename = None
     verifyDescription = True
+    abortOnWarn = False
 
     # process all global bot args
     # returns a list of non-global args, i.e. args for upload.py
@@ -263,6 +269,8 @@ def main(*args):
                 useFilename = arg[10:]
             elif arg.startswith('-noverify'):
                 verifyDescription = False
+            elif arg.startswith('-abortonwarn'):
+                abortOnWarn = True
             elif url == u'':
                 url = arg
             else:
@@ -270,7 +278,8 @@ def main(*args):
     description = u' '.join(description)
     bot = UploadRobot(url, description=description, useFilename=useFilename,
                       keepFilename=keepFilename,
-                      verifyDescription=verifyDescription)
+                      verifyDescription=verifyDescription,
+                      abortOnWarn=abortOnWarn)
     bot.run()
 
 if __name__ == "__main__":
