@@ -265,7 +265,7 @@ class NowCommonsDeleteBot(Bot):
             gen = self.useHashGenerator()
         else:
             nowCommonsTemplates = [pywikibot.Page(self.site, title,
-                                                  defaultNamespace=10)
+                                                  ns=10)
                                    for title in self.ncTemplates()]
             gens = [pg.ReferringPageGenerator(t, followRedirects=True,
                                               onlyTemplateInclusion=True)

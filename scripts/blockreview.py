@@ -94,7 +94,7 @@ Hallo %(admin)s,
         try:
             genPage = pywikibot.Page(self.site,
                                      self.unblock_tpl[self.site.code],
-                                     defaultNamespace=10)
+                                     ns=10)
         except KeyError:
             pywikibot.error(u'Language "%s" not supported by this bot.'
                             % self.site.code)
@@ -254,7 +254,7 @@ Hallo %(admin)s,
             if 'bot' not in user['groups']:
                 # yield the sysop talkpage
                 yield pywikibot.Page(self.site, user['name'],
-                                     defaultNamespace=3)
+                                     ns=3)
 
     def load(self, page):
         """Loads the given page, does some changes, and saves it."""
