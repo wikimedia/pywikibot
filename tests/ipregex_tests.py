@@ -7,39 +7,46 @@
 # Distributed under the terms of the MIT license.
 __version__ = '$Id$'
 
+from pywikibot.tools import ip
+
 from tests.aspects import unittest, TestCase
-from pywikibot.page import ip_regexp
 
 
-class PyWikiIpRegexCase(TestCase):
+class TestIPBase(TestCase):
 
-    """Unit test class for ip_regexp."""
+    """Unit test class base for IP matching."""
 
     net = False
 
     def setUp(self):
+        """Set up test."""
         self.total = 0
         self.fail = 0
-        super(PyWikiIpRegexCase, self).setUp()
+        self.errors = []
+        super(TestIPBase, self).setUp()
 
     def tearDown(self):
-        super(PyWikiIpRegexCase, self).tearDown()
-        print('%d tests done, %d failed' % (self.total, self.fail))
-        if self.fail:
-            raise AssertionError
+        """Tear down test."""
+        super(TestIPBase, self).tearDown()
+        if not self.fail:
+            print('%d tests done' % self.total)
+        else:
+            print('%d of %d tests failed:\n%s'
+                  % (self.fail, self.total, '\n'.join(self.errors)))
 
     def ipv6test(self, result, IP):
+        """Perform one IP test."""
         self.total += 1
-        failed = False
         try:
-            self.assertEqual(result, bool(ip_regexp.match(IP)))
+            self.assertEqual(result, self._do_ip_test(IP))
         except AssertionError:
             self.fail += 1
-            failed = True
-        if failed:
-            print('"%s" should match %s - not OK' % (IP, result))
+            self.errors.append(
+                '"%s" match should be %s - not OK'
+                % (IP, result))
 
-    def test_IP(self):
+    def _run_tests(self):
+        """Test various IP."""
         # test from http://download.dartware.com/thirdparty/test-ipv6-regex.pl
         self.ipv6test(False, "")  # empty string
         self.ipv6test(True, "::1")  # loopback, compressed, non-routable
@@ -61,9 +68,9 @@ class PyWikiIpRegexCase(TestCase):
         self.ipv6test(True, "0000:0000:0000:0000:0000:0000:0000:0000")
         self.ipv6test(False, "02001:0000:1234:0000:0000:C1C0:ABCD:0876")  # extra 0 not allowed!
         self.ipv6test(False, "2001:0000:1234:0000:00001:C1C0:ABCD:0876")  # extra 0 not allowed!
-        # self.ipv6test(True, " 2001:0000:1234:0000:0000:C1C0:ABCD:0876")  # leading space
-        # self.ipv6test(True, "2001:0000:1234:0000:0000:C1C0:ABCD:0876")  # trailing space
-        # self.ipv6test(True, " 2001:0000:1234:0000:0000:C1C0:ABCD:0876  ")  # leading and trailing space
+        self.ipv6test(False, " 2001:0000:1234:0000:0000:C1C0:ABCD:0876")  # leading space
+        self.ipv6test(False, "2001:0000:1234:0000:0000:C1C0:ABCD:0876 ")  # trailing space
+        self.ipv6test(False, " 2001:0000:1234:0000:0000:C1C0:ABCD:0876 ")  # leading and trailing space
         self.ipv6test(False, "2001:0000:1234:0000:0000:C1C0:ABCD:0876  0")  # junk after valid address
         self.ipv6test(False, "2001:0000:1234: 0000:0000:C1C0:ABCD:0876")  # internal space
 
@@ -187,7 +194,6 @@ class PyWikiIpRegexCase(TestCase):
         self.ipv6test(True, "::ffff:12.34.56.78")
         self.ipv6test(False, "::ffff:2.3.4")
         self.ipv6test(False, "::ffff:257.1.2.3")
-        # self.ipv6test(False, "1.2.3.4")  # IPv4 address
 
         self.ipv6test(False, "1.2.3.4:1111:2222:3333:4444::5555")  # Aeron
         self.ipv6test(False, "1.2.3.4:1111:2222:3333::5555")
@@ -204,20 +210,18 @@ class PyWikiIpRegexCase(TestCase):
         self.ipv6test(False, "fe80:0000:0000:0000:0204:61ff:254.157.241.086")
         self.ipv6test(True, "::ffff:192.0.2.128")   # but this is OK, since there's a single digit
         self.ipv6test(False, "XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:1.2.3.4")
-        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:00.00.00.00")
-        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:000.000.000.000")
         self.ipv6test(False, "1111:2222:3333:4444:5555:6666:256.256.256.256")
 
-        # Not testing address with subnet mask
-        # self.ipv6test(True, "2001:0DB8:0000:CD30:0000:0000:0000:0000/60")  # full, with prefix
-        # self.ipv6test(True, "2001:0DB8::CD30:0:0:0:0/60")  # compressed, with prefix
-        # self.ipv6test(True, "2001:0DB8:0:CD30::/60")  # compressed, with prefix #2
-        # self.ipv6test(True, "::/128")  # compressed, unspecified address type, non-routable
-        # self.ipv6test(True, "::1/128")  # compressed, loopback address type, non-routable
-        # self.ipv6test(True, "FF00::/8")  # compressed, multicast address type
-        # self.ipv6test(True, "FE80::/10")  # compressed, link-local unicast, non-routable
-        # self.ipv6test(True, "FEC0::/10")  # compressed, site-local unicast, deprecated
-        # self.ipv6test(False, "124.15.6.89/60")  # standard IPv4, prefix not allowed
+        # Subnet mask not accepted
+        self.ipv6test(False, "2001:0DB8:0000:CD30:0000:0000:0000:0000/60")  # full, with prefix
+        self.ipv6test(False, "2001:0DB8::CD30:0:0:0:0/60")  # compressed, with prefix
+        self.ipv6test(False, "2001:0DB8:0:CD30::/60")  # compressed, with prefix #2
+        self.ipv6test(False, "::/128")  # compressed, unspecified address type, non-routable
+        self.ipv6test(False, "::1/128")  # compressed, loopback address type, non-routable
+        self.ipv6test(False, "FF00::/8")  # compressed, multicast address type
+        self.ipv6test(False, "FE80::/10")  # compressed, link-local unicast, non-routable
+        self.ipv6test(False, "FEC0::/10")  # compressed, site-local unicast, deprecated
+        self.ipv6test(False, "124.15.6.89/60")  # standard IPv4, prefix not allowed
 
         self.ipv6test(True, "fe80:0000:0000:0000:0204:61ff:fe9d:f156")
         self.ipv6test(True, "fe80:0:0:0:204:61ff:fe9d:f156")
@@ -450,7 +454,6 @@ class PyWikiIpRegexCase(TestCase):
         self.ipv6test(False, "1111:2222:3333:1.2.3.4")
         self.ipv6test(False, "1111:2222:1.2.3.4")
         self.ipv6test(False, "1111:1.2.3.4")
-        # self.ipv6test(False, "1.2.3.4")  # ipv4 address
 
         # Missing :
         self.ipv6test(False, "11112222:3333:4444:5555:6666:1.2.3.4")
@@ -608,12 +611,56 @@ class PyWikiIpRegexCase(TestCase):
         self.ipv6test(False, "::3333:4444:5555:6666:7777:8888:")
         self.ipv6test(False, "::2222:3333:4444:5555:6666:7777:8888:")
 
-        # Additional cases: http://crisp.tweakblogs.net/blog/2031/ipv6-validation-%28and-caveats%29.html
+        # Additional cases:
+        # http://crisp.tweakblogs.net/blog/2031/ipv6-validation-%28and-caveats%29.html
         self.ipv6test(True, "0:a:b:c:d:e:f::")
         self.ipv6test(True, "::0:a:b:c:d:e:f")  # syntactically correct, but bad form (::0:... could be combined)
         self.ipv6test(True, "a:b:c:d:e:f:0::")
         self.ipv6test(False, "':10.0.0.1")
 
+
+class IPRegexTestCase(TestIPBase):
+
+    """Test IP regex."""
+
+    def _do_ip_test(self, address):
+        return bool(ip.ip_regexp.match(address))
+
+    def test_regex(self):
+        """Test IP regex."""
+        self._run_tests()
+        # The following only work with the IP regex.  See below.
+        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:00.00.00.00")
+        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:000.000.000.000")
+        self.assertEqual(self.fail, 0)
+
+
+class IPAddressModuleTestCase(TestIPBase):
+
+    """Test ipaddress module."""
+
+    def _do_ip_test(self, address):
+        return ip.is_IP(address)
+
+    @classmethod
+    def setUpClass(cls):
+        """Check ipaddress module is available."""
+        if hasattr(ip.ip_address, '__fake__'):
+            raise unittest.SkipTest('module ipaddress not available')
+        super(IPAddressModuleTestCase, cls).setUpClass()
+
+    def test_ipaddress_module(self):
+        """Test ipaddress module."""
+        self._run_tests()
+        self.assertEqual(self.fail, 0)
+
+    @unittest.expectedFailure
+    def test_ipaddress_module_failures(self):
+        """Test known bugs in the ipaddress module."""
+        # The following fail with the ipaddress module. See T76286
+        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:00.00.00.00")
+        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:000.000.000.000")
+        self.assertEqual(self.fail, 0)
 
 if __name__ == "__main__":
     try:
