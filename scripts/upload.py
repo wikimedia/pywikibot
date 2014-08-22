@@ -9,7 +9,8 @@ Arguments:
   -filename     Target filename
   -noverify     Do not ask for verification of the upload description if one
                 is given
-  -abortonwarn  Abort upload on warning
+  -abortonwarn: Abort upload on the specified warning type. If no warning type
+                is specified abort on all warnings.
 
 If any other arguments are given, the first is the URL or filename to upload,
 and the rest is a proposed description to go with the upload. If none of these
@@ -34,6 +35,7 @@ import urllib
 import urlparse
 import tempfile
 import pywikibot
+import pywikibot.data.api
 from pywikibot import config
 
 
@@ -41,7 +43,7 @@ class UploadRobot:
     def __init__(self, url, urlEncoding=None, description=u'',
                  useFilename=None, keepFilename=False,
                  verifyDescription=True, ignoreWarning=False,
-                 targetSite=None, uploadByUrl=False, abortOnWarn=False):
+                 targetSite=None, uploadByUrl=False, aborts=[]):
         """
         @param ignoreWarning: Set this to True if you want to upload even if
             another file would be overwritten or another mistake would be
@@ -55,7 +57,7 @@ class UploadRobot:
         self.keepFilename = keepFilename
         self.verifyDescription = verifyDescription
         self.ignoreWarning = ignoreWarning
-        self.abortOnWarn = abortOnWarn
+        self.aborts = aborts
         if config.upload_to_commons:
             self.targetSite = targetSite or pywikibot.Site('commons',
                                                            'commons')
@@ -189,6 +191,13 @@ class UploadRobot:
                 self.description = newDescription
         return filename
 
+    def abort_on_warn(self, warn_code):
+        """Determine if the warning message should cause an abort."""
+        if self.aborts is True:
+            return True
+        else:
+            return warn_code in self.aborts
+
     def upload_image(self, debug=False):
         """Upload the image at self.url to the target wiki.
 
@@ -217,10 +226,9 @@ class UploadRobot:
                 site.upload(imagepage, source_filename=temp,
                             ignore_warnings=self.ignoreWarning)
 
-        except pywikibot.UploadWarning as warn:
-            pywikibot.output(u"We got a warning message: ", newline=False)
-            pywikibot.output(str(warn))
-            if self.abortOnWarn:
+        except pywikibot.data.api.UploadWarning as warn:
+            pywikibot.output(u"We got a warning message: {0}".format(warn.message))
+            if self.abort_on_warn(warn.code):
                 answer = "N"
             else:
                 answer = pywikibot.inputChoice(u"Do you want to ignore?",
@@ -257,7 +265,7 @@ def main(*args):
     keepFilename = False
     useFilename = None
     verifyDescription = True
-    abortOnWarn = False
+    aborts = set()
 
     # process all global bot args
     # returns a list of non-global args, i.e. args for upload.py
@@ -270,7 +278,10 @@ def main(*args):
             elif arg.startswith('-noverify'):
                 verifyDescription = False
             elif arg.startswith('-abortonwarn'):
-                abortOnWarn = True
+                if len(arg) > len('-abortonwarn:') and aborts is not True:
+                    aborts.add(arg[len('-abortonwarn:'):])
+                else:
+                    aborts = True
             elif url == u'':
                 url = arg
             else:
@@ -279,7 +290,7 @@ def main(*args):
     bot = UploadRobot(url, description=description, useFilename=useFilename,
                       keepFilename=keepFilename,
                       verifyDescription=verifyDescription,
-                      abortOnWarn=abortOnWarn)
+                      aborts=aborts)
     bot.run()
 
 if __name__ == "__main__":

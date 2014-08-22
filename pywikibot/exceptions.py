@@ -168,11 +168,6 @@ class CaptchaError(Error):
     """Captcha is asked and config.solve_captcha == False."""
 
 
-class UploadWarning(Error):
-
-    """Upload failed with a warning message (passed as the argument)."""
-
-
 class AutoblockUser(Error):
 
     """
@@ -193,3 +188,7 @@ class WikiBaseError(Error):
 class CoordinateGlobeUnknownException(WikiBaseError, NotImplementedError):
 
     """ This globe is not implemented yet in either WikiBase or pywikibot """
+
+# TODO: Warn about the deprecated usage
+import pywikibot.data.api
+UploadWarning = pywikibot.data.api.UploadWarning
