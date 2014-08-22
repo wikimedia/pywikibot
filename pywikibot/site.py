@@ -3950,7 +3950,10 @@ class APISite(BaseSite):
             pywikibot.output(u"Upload: unrecognized response: %s" % result)
         if result["result"] == "Success":
             pywikibot.output(u"Upload successful.")
-            filepage._imageinfo = result["imageinfo"]
+            # If we receive a nochange, that would mean we're in simulation
+            # mode, don't attempt to access imageinfo
+            if "nochange" not in result:
+                filepage._imageinfo = result["imageinfo"]
             return
 
     @deprecate_arg("number", "step")
