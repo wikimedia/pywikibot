@@ -150,14 +150,19 @@ class Request(MutableMapping):
         if "action" not in kwargs:
             raise ValueError("'action' specification missing from Request.")
         self.update(**kwargs)
+        # Actions that imply database updates on the server, used for various
+        # things like throttling or skipping actions when we're in simulation
+        # mode
         self.write = self.params["action"] in (
             "edit", "move", "rollback", "delete", "undelete",
             "protect", "block", "unblock", "watch", "patrol",
-            "import", "userrights", "upload", "wbeditentity",
-            "wbsetlabel", "wbsetdescription", "wbsetaliases",
-            "wblinktitles", "wbsetsitelink", "wbcreateclaim",
-            "wbremoveclaims", "wbsetclaimvalue", "wbsetreference",
-            "wbremovereferences"
+            "import", "userrights", "upload", "emailuser",
+            "createaccount", "setnotificationtimestamp",
+            "filerevert", "options", "purge", "revisiondelete",
+            "wbeditentity", "wbsetlabel", "wbsetdescription",
+            "wbsetaliases", "wblinktitles", "wbsetsitelink",
+            "wbcreateclaim", "wbremoveclaims", "wbsetclaimvalue",
+            "wbsetreference", "wbremovereferences"
         )
         # MediaWiki 1.23 allows assertion for any action,
         # whereas earlier WMF wikis and others used an extension which
@@ -264,7 +269,7 @@ class Request(MutableMapping):
         return "%s.%s<%s->%r>" % (self.__class__.__module__, self.__class__.__name__, self.site, str(self))
 
     def _simulate(self, action):
-        if action and config.simulate and action in config.actions_to_block:
+        if action and config.simulate and (self.write or action in config.actions_to_block):
             pywikibot.output(
                 u'\03{lightyellow}SIMULATION: %s action blocked.\03{default}'
                 % action)

@@ -638,11 +638,11 @@ proxy = None
 
 # Simulate settings
 
-# Defines what actions the bots are NOT allowed to do (e.g. 'edit') on wikipedia
-# servers. Allows simulation runs of bots to be carried out without changing any
-# page on the server side. This setting may be overridden in user_config.py.
-actions_to_block = ['edit', 'watch', 'move', 'delete', 'undelete', 'protect',
-                    'emailuser']
+# Defines what additional actions the bots are NOT allowed to do (e.g. 'edit')
+# on the wiki server. Allows simulation runs of bots to be carried out without
+# changing any page on the server side. Use this setting to add more actions
+# in user-config.py for wikis with extra write actions.
+actions_to_block = []
 
 # Set simulate to True or use -simulate option to block all actions given above.
 simulate = False
