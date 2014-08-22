@@ -909,10 +909,6 @@ class Bot(object):
             pywikibot.output('\nUser quit %s bot run...' %
                              self.__class__.__name__)
         except KeyboardInterrupt:
-            # TODO: If the ^C occurred during an input()
-            #       it should be handled as a QuitKeyboardInterrupt
-            #       as developers shouldnt need a backtrace to find
-            #       where the input() code is.
             if config.verbose_output:
                 raise
             else:
