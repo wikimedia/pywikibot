@@ -738,15 +738,15 @@ class WelcomeBot(object):
                             continue
                         welcome_text = i18n.translate(self.site, netext)
                         if globalvar.randomSign:
-                            if self.site.family != 'wikinews':
+                            if self.site.family.name != 'wikinews':
                                 welcome_text = (welcome_text
                                                 % choice(self.defineSign()))
-                            if self.site.family == 'wiktionary' and \
+                            if self.site.family.name == 'wiktionary' and \
                                self.site.code == 'it':
                                 pass
                             else:
                                 welcome_text += timeselected
-                        elif (self.site.family != 'wikinews' and
+                        elif (self.site.family.name != 'wikinews' and
                               self.site.code != 'it'):
                             welcome_text = (welcome_text
                                             % globalvar.defaultSign)
