@@ -100,6 +100,7 @@ import sys
 import pywikibot
 from pywikibot import pagegenerators as pg
 from pywikibot import config, i18n
+from pywikibot.family import Family
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -875,7 +876,7 @@ class checkImagesBot(object):
         """Function to load the white templates."""
         # A template as {{en is not a license! Adding also them in the
         # whitelist template...
-        for langK in pywikibot.site.Family('wikipedia').langs.keys():
+        for langK in Family.load('wikipedia').langs.keys():
             self.hiddentemplates.add(pywikibot.Page(self.site,
                                                     u'Template:%s' % langK))
         # Hidden template loading

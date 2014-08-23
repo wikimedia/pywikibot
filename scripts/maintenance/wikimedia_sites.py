@@ -18,7 +18,7 @@ from xml.etree import cElementTree
 import sys
 
 import pywikibot
-from pywikibot.site import Family
+from pywikibot.family import Family
 
 if sys.version_info[0] > 2:
     from urllib.request import urlopen
@@ -46,8 +46,8 @@ def update_family(families):
     for family in families or familiesDict.keys():
         pywikibot.output('\nChecking family %s:' % family)
 
-        original = Family(family).languages_by_size
-        obsolete = Family(family).obsolete
+        original = Family.load(family).languages_by_size
+        obsolete = Family.load(family).obsolete
 
         feed = urlopen(URL % familiesDict[family])
         tree = cElementTree.parse(feed)
