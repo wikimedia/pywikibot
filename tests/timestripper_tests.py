@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Tests for archivebot.py/Timestripper.
-"""
+"""Tests for archivebot.py/Timestripper."""
 #
 # (C) Pywikibot team, 2014
 #
@@ -17,7 +15,8 @@ from pywikibot.textlib import TimeStripper, tzoneFixedOffset
 
 
 class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
-    """Test cases for TimeStripper methods"""
+
+    """Test cases for TimeStripper methods."""
 
     def setUp(self):
         site = pywikibot.Site('fr', 'wikipedia')
@@ -25,15 +24,13 @@ class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
         super(TestTimeStripperWithNoDigitsAsMonths, self).setUp()
 
     def test_findmarker(self):
-        """Test that string which is not part of text is found"""
-
+        """Test that string which is not part of text is found."""
         txt = u'this is a string with a maker is @@@@already present'
         self.assertEqual(self.ts.findmarker(txt, base=u'@@', delta='@@'),
                          '@@@@@@')
 
     def test_last_match_and_replace(self):
         """Test that pattern matches and removes items correctly."""
-
         txtWithOneMatch = u'this string has 3000, 1999 and 3000 in it'
         txtWithTwoMatch = u'this string has 1998, 1999 and 3000 in it'
         txtWithNoMatch = u'this string has no match'
@@ -76,8 +73,7 @@ class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
                          )
 
     def test_timestripper(self):
-        """Test that correct date is matched"""
-
+        """Test that correct date is matched."""
         txtMatch = u'3 février 2010 à 19:48 (CET) 7 février 2010 à 19:48 (CET)'
         txtNoMatch = u'3 March 2010 19:48 (CET) 7 March 2010 19:48 (CET)'
 
@@ -91,7 +87,8 @@ class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
 
 
 class TestTimeStripperWithDigitsAsMonths(PywikibotTestCase):
-    """Test cases for TimeStripper methods"""
+
+    """Test cases for TimeStripper methods."""
 
     def setUp(self):
         site = pywikibot.Site('cs', 'wikipedia')
@@ -100,7 +97,6 @@ class TestTimeStripperWithDigitsAsMonths(PywikibotTestCase):
 
     def test_last_match_and_replace(self):
         """Test that pattern matches and removes items correctly."""
-
         txtWithOneMatch = u'this string has XX. YY. 12. in it'
         txtWithTwoMatch = u'this string has XX. 1. 12. in it'
         txtWithThreeMatch = u'this string has 1. 1. 12. in it'
@@ -138,7 +134,8 @@ class TestTimeStripperWithDigitsAsMonths(PywikibotTestCase):
 
 
 class TestEnglishTimeStripper(PywikibotTestCase):
-    """Test cases for English language"""
+
+    """Test cases for English language."""
 
     def setUp(self):
         site = pywikibot.Site('en', 'wikipedia')
@@ -146,8 +143,7 @@ class TestEnglishTimeStripper(PywikibotTestCase):
         super(TestEnglishTimeStripper, self).setUp()
 
     def test_timestripper(self):
-        """Test that correct date is matched"""
-
+        """Test that correct date is matched."""
         txtMatch = u'3 February 2010 19:48 (UTC) 7 February 2010 19:48 (UTC)'
         txtNoMatch = u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)'
 
@@ -161,7 +157,8 @@ class TestEnglishTimeStripper(PywikibotTestCase):
 
 
 class TestCzechTimeStripper(PywikibotTestCase):
-    """Test cases for Czech language"""
+
+    """Test cases for Czech language."""
 
     def setUp(self):
         site = pywikibot.Site('cs', 'wikipedia')
@@ -169,8 +166,7 @@ class TestCzechTimeStripper(PywikibotTestCase):
         super(TestCzechTimeStripper, self).setUp()
 
     def test_timestripper(self):
-        """Test that correct date is matched"""
-
+        """Test that correct date is matched."""
         txtMatch = u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)'
         txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
 
@@ -184,7 +180,8 @@ class TestCzechTimeStripper(PywikibotTestCase):
 
 
 class TestPortugueseTimeStripper(PywikibotTestCase):
-    """Test cases for Portuguese language"""
+
+    """Test cases for Portuguese language."""
 
     def setUp(self):
         site = pywikibot.Site('pt', 'wikipedia')
@@ -192,8 +189,7 @@ class TestPortugueseTimeStripper(PywikibotTestCase):
         super(TestPortugueseTimeStripper, self).setUp()
 
     def test_timestripper(self):
-        """Test that correct date is matched"""
-
+        """Test that correct date is matched."""
         txtMatch = u'19h48min de 3 de fevereiro de 2010‎ (UTC) 19h48min de 7 de fevereiro de 2010‎ (UTC)'
         txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
 
@@ -207,7 +203,8 @@ class TestPortugueseTimeStripper(PywikibotTestCase):
 
 
 class TestNorwegianTimeStripper(PywikibotTestCase):
-    """Test cases for Norwegian language"""
+
+    """Test cases for Norwegian language."""
 
     def setUp(self):
         site = pywikibot.Site('no', 'wikipedia')
@@ -215,8 +212,7 @@ class TestNorwegianTimeStripper(PywikibotTestCase):
         super(TestNorwegianTimeStripper, self).setUp()
 
     def test_timestripper(self):
-        """Test that correct date is matched"""
-
+        """Test that correct date is matched."""
         txtMatch = u'3. feb 2010 kl. 19:48 (CET) 7. feb 2010 kl. 19:48 (UTC)'
         txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
 
@@ -230,7 +226,8 @@ class TestNorwegianTimeStripper(PywikibotTestCase):
 
 
 class TestVietnameseTimeStripper(PywikibotTestCase):
-    """Test cases for Vietnamese language"""
+
+    """Test cases for Vietnamese language."""
 
     def setUp(self):
         site = pywikibot.Site('vi', 'wikipedia')
@@ -238,8 +235,7 @@ class TestVietnameseTimeStripper(PywikibotTestCase):
         super(TestVietnameseTimeStripper, self).setUp()
 
     def test_timestripper_01(self):
-        """Test that correct date is matched"""
-
+        """Test that correct date is matched."""
         txtMatch = u'16:41, ngày 15 tháng 9 năm 2008 (UTC) 16:41, ngày 12 tháng 9 năm 2008 (UTC)'
         txtNoMatch = u'16:41, ngày 15 March 9 năm 2008 (UTC) 16:41, ngày 12 March 9 năm 2008 (UTC)'
 
@@ -252,8 +248,7 @@ class TestVietnameseTimeStripper(PywikibotTestCase):
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
     def test_timestripper_02(self):
-        """Test that correct date is matched"""
-
+        """Test that correct date is matched."""
         txtMatch = u'21:18, ngày 13 tháng 8 năm 2014 (UTC) 21:18, ngày 14 tháng 8 năm 2014 (UTC)'
         txtNoMatch = u'21:18, ngày 13 March 8 năm 2014 (UTC) 21:18, ngày 14 March 8 năm 2014 (UTC)'
 

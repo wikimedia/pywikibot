@@ -114,10 +114,11 @@ class TestTWTranslate(TestTWN):
 
 
 class TestTWNTranslate(TestTWN):
-    " Test {{PLURAL:}} support "
+
+    """Test {{PLURAL:}} support."""
 
     def testNumber(self):
-        """ use a number """
+        """Use a number..."""
         self.assertEqual(
             i18n.twntranslate('de', 'test-plural', 0) % {'num': 0},
             u'Bot: Ändere 0 Seiten.')
@@ -144,25 +145,25 @@ class TestTWNTranslate(TestTWN):
             u'Bot: Changing three pages.')
 
     def testString(self):
-        """ use a string """
+        """Use a string."""
         self.assertEqual(
             i18n.twntranslate('en', 'test-plural', '1') % {'num': 'one'},
             u'Bot: Changing one page.')
 
     def testDict(self):
-        """ use a dictionary """
+        """Use a dictionary."""
         self.assertEqual(
             i18n.twntranslate('en', 'test-plural', {'num': 2}),
             u'Bot: Changing 2 pages.')
 
     def testExtended(self):
-        """ use additional format strings """
+        """Use additional format strings."""
         self.assertEqual(
             i18n.twntranslate('fr', 'test-plural', {'num': 1, 'descr': 'seulement'}),
             u'Robot: Changer seulement une page.')
 
     def testExtendedOutside(self):
-        """ use additional format strings also outside """
+        """Use additional format strings also outside."""
         self.assertEqual(
             i18n.twntranslate('fr', 'test-plural', 1) % {'descr': 'seulement'},
             u'Robot: Changer seulement une page.')
@@ -210,7 +211,7 @@ class TestTWNTranslate(TestTWN):
             u'Bot: Ändere 11 Zeilen von mehreren Seiten.')
 
     def testMultipleWrongParameterLength(self):
-        """ Test wrong parameter lenght"""
+        """Test wrong parameter lenght."""
         with self.assertRaisesRegexp(ValueError, "Length of parameter does not match PLURAL occurences"):
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals', (1, 2))
@@ -224,7 +225,7 @@ class TestTWNTranslate(TestTWN):
                 u'Bot: Ändere dreihunderteinundzwanzig Zeilen von mehreren Seiten.')
 
     def testMultipleNonNumbers(self):
-        """ Numbers or string numbers are required for tuple or list items """
+        """Numbers or string numbers are required for tuple or list items."""
         with self.assertRaisesRegexp(ValueError, "invalid literal for int\(\) with base 10: 'drei'"):
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals', ["drei", "1", 1])

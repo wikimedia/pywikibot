@@ -40,7 +40,7 @@ class BaseTestCase(unittest.TestCase):
     """
 
     def assertType(self, obj, cls):
-        """Assert that obj is an instance of type cls"""
+        """Assert that obj is an instance of type cls."""
         return self.assertTrue(isinstance(obj, cls))
 
     def setUp(self):

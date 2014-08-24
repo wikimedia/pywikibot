@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Tests for the page module.
-"""
+"""Tests for the user interface."""
 #
 # (C) Pywikibot team, 2008-2014
 #

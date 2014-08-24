@@ -94,7 +94,7 @@ class TestPageGenerator(CachedTestCase):
             self.gen.set_maximum_items('test')
 
     def test_limits(self):
-        """Test that PageGenerator yields the requested amount of pages"""
+        """Test that PageGenerator yields the requested amount of pages."""
         for i in range(4, 0, -1):
             self.gen.set_maximum_items(i)  # set total amount of pages
             results = [p for p in self.gen]

@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Test cases for the WikidataQuery query syntax and API
-"""
+"""Test cases for the WikidataQuery query syntax and API."""
 #
 # (C) Pywikibot team, 2014
 #
@@ -29,10 +27,11 @@ class TestApiFunctions(PywikibotTestCase):
 
     def testQueries(self):
         """
-        Test that we produce the expected query strings and that
+        Test Queries and check whether they're behaving correctly.
+
+        Check that we produce the expected query strings and that
         invalid inputs are rejected correctly
         """
-
         q = query.HasClaim(99)
         self.assertEqual(str(q), "claim[99]")
 
@@ -94,10 +93,7 @@ class TestApiFunctions(PywikibotTestCase):
         self.assertEqual(str(q), "claim[99:(tree[1][2,5][3,90])]")
 
     def testQueriesWDStructures(self):
-        """
-        Queries using Wikibase page structures like ItemPage
-        """
-
+        """Queries using Wikibase page structures like ItemPage."""
         q = query.HasClaim(PropertyPage(self.repo, "P99"))
         self.assertEqual(str(q), "claim[99]")
 
@@ -145,10 +141,7 @@ class TestApiFunctions(PywikibotTestCase):
         self.assertEqual(str(q), 'between[569,-00000000044-01-01T00:00:00Z,+00000002010-01-01T01:00:00Z]')
 
     def testQueriesDirectFromClaim(self):
-        """
-        Test construction of the right Query from a page.Claim
-        """
-
+        """Test construction of the right Query from a page.Claim."""
         claim = Claim(self.repo, 'P17')
         claim.setTarget(pywikibot.ItemPage(self.repo, 'Q35'))
 
@@ -162,10 +155,7 @@ class TestApiFunctions(PywikibotTestCase):
         self.assertEqual(str(q), 'string[268:"somestring"]')
 
     def testQuerySets(self):
-        """
-        Test that we can join queries together correctly
-        """
-
+        """Test that we can join queries together correctly."""
         # construct via queries
         qs = query.HasClaim(99, 100).AND(query.HasClaim(99, 101))
 
@@ -212,10 +202,7 @@ class TestApiFunctions(PywikibotTestCase):
         self.assertEqual(str(qs), 'link[enwiki] AND nolink[dewiki]')
 
     def testQueryApiSyntax(self):
-        """
-        Test that we can generate the API query correctly
-        """
-
+        """Test that we can generate the API query correctly."""
         w = query.WikidataQuery("http://example.com")
 
         qs = w.getQueryString(query.Link("enwiki"))
@@ -233,10 +220,7 @@ class TestApiSlowFunctions(NoSiteTestCase):
     net = True
 
     def testQueryApiGetter(self):
-        """
-        Test that we can actually retreive data and that caching works
-        """
-
+        """Test that we can actually retreive data and that caching works."""
         w = query.WikidataQuery(cacheMaxAge=0)
 
         # this query doesn't return any items, save a bit of bandwidth!

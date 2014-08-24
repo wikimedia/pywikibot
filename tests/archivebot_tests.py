@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Tests for several scripts.
-"""
+"""Tests for archivebot scripts."""
 #
 # (C) Pywikibot team, 2014
 #
@@ -33,7 +31,7 @@ class TestArchiveBotMeta(type):
         def test_method(code):
 
             def test_archivebot(self):
-                """Test archivebot for one site"""
+                """Test archivebot for one site."""
                 site = pywikibot.Site(code, 'wikipedia')
                 page = pywikibot.Page(site, 'user talk:xqt')
                 talk = archivebot.DiscussionPage(page, None)
@@ -90,7 +88,7 @@ class TestArchiveBotMeta(type):
 
 class TestArchiveBot(PywikibotTestCase):
 
-    """Test archivebot script"""
+    """Test archivebot script."""
 
     __metaclass__ = TestArchiveBotMeta
 
