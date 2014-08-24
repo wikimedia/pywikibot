@@ -9,10 +9,10 @@ __version__ = '$Id$'
 from . import transliteration
 import re
 import sys
-import pywikibot as wikipedia
+import logging
+import pywikibot
 from pywikibot import config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
-import logging
 
 transliterator = transliteration.transliterator(config.console_encoding)
 
@@ -185,11 +185,14 @@ class UI:
             sys.stdout.write('\07')
         # TODO: make sure this is logged as well
         self.output(question + ' ')
-        if password:
-            import getpass
-            text = getpass.getpass('')
-        else:
-            text = self._raw_input()
+        try:
+            if password:
+                import getpass
+                text = getpass.getpass('')
+            else:
+                text = self._raw_input()
+        except KeyboardInterrupt:
+            raise pywikibot.QuitKeyboardInterrupt()
         text = unicode(text, self.encoding)
         return text
 
@@ -245,20 +248,20 @@ class UI:
         """Show the user a CAPTCHA image and return the answer."""
         try:
             import webbrowser
-            wikipedia.output(u'Opening CAPTCHA in your web browser...')
+            pywikibot.output(u'Opening CAPTCHA in your web browser...')
             if webbrowser.open(url):
-                return wikipedia.input(
+                return pywikibot.input(
                     u'What is the solution of the CAPTCHA that is shown in '
                     u'your web browser?')
             else:
                 raise
         except:
-            wikipedia.output(u'Error in opening web browser: %s'
+            pywikibot.output(u'Error in opening web browser: %s'
                              % sys.exc_info()[0])
-            wikipedia.output(
+            pywikibot.output(
                 u'Please copy this url to your web browser and open it:\n %s'
                 % url)
-            return wikipedia.input(
+            return pywikibot.input(
                 u'What is the solution of the CAPTCHA at this url ?')
 
     def argvu(self):
