@@ -3858,7 +3858,8 @@ class APISite(BaseSite):
 
     @deprecate_arg('imagepage', 'filepage')
     def upload(self, filepage, source_filename=None, source_url=None,
-               comment=None, text=None, watch=False, ignore_warnings=False):
+               comment=None, text=None, watch=False, ignore_warnings=False,
+               chunk_size=0):
         """Upload a file to the wiki.
 
         Either source_filename or source_url, but not both, must be provided.
@@ -3875,7 +3876,11 @@ class APISite(BaseSite):
         @param watch: If true, add filepage to the bot user's watchlist
         @param ignore_warnings: if true, ignore API warnings and force
             upload (for example, to overwrite an existing file); default False
-
+        @param chunk_size: The chunk size in bytesfor chunked uploading (see
+            U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}). It
+            will only upload in chunks, if the version number is 1.20 or higher
+            and the chunk size is positive but lower than the file size.
+        @type chunk_size: int
         """
         upload_warnings = {
             # map API warning codes to user error messages
@@ -3909,18 +3914,51 @@ class APISite(BaseSite):
         if not text:
             text = comment
         token = self.token(filepage, "edit")
+        result = None
         if source_filename:
             # upload local file
             # make sure file actually exists
             if not os.path.isfile(source_filename):
                 raise ValueError("File '%s' does not exist."
                                  % source_filename)
-            # TODO: if file size exceeds some threshold (to be determined),
-            #       upload by chunks (--> os.path.getsize(source_filename))
+            additional_parameters = {}
+            throttle = True
+            filesize = os.path.getsize(source_filename)
+            if (chunk_size > 0 and chunk_size < filesize and
+                    LV(self.version()) >= LV('1.20')):
+                offset = 0
+                file_key = None
+                with open(source_filename, 'rb') as f:
+                    while True:
+                        f.seek(offset)
+                        chunk = f.read(chunk_size)
+                        req = api.Request(site=self, action='upload', token=token,
+                                          stash='1', offset=offset, filesize=filesize,
+                                          filename=filepage.title(withNamespace=False),
+                                          mime_params={}, throttle=throttle)
+                        req.mime_params['chunk'] = (chunk, None, {'filename': req.params['filename']})
+                        if file_key:
+                            req['filekey'] = file_key
+                        # TODO: Proper error and warning handling
+                        data = req.submit()['upload']
+                        if 'warnings' in data:
+                            result = data
+                            break
+                        file_key = data['filekey']
+                        throttle = False
+                        new_offset = int(data['offset'])
+                        if offset + len(chunk) != new_offset:
+                            pywikibot.warning('Unexpected offset.')
+                        offset = new_offset
+                        if data['result'] != 'Continue':  # finished
+                            additional_parameters['filekey'] = file_key
+                            break
+            else:
+                additional_parameters = {'file': source_filename, 'mime': True}
             req = api.Request(site=self, action="upload", token=token,
                               filename=filepage.title(withNamespace=False),
-                              file=source_filename, comment=comment,
-                              text=text, mime=True)
+                              comment=comment, text=text, throttle=throttle,
+                              **additional_parameters)
         else:
             # upload by URL
             if "upload_by_url" not in self.userinfo["rights"]:
@@ -3930,16 +3968,17 @@ class APISite(BaseSite):
             req = api.Request(site=self, action="upload", token=token,
                               filename=filepage.title(withNamespace=False),
                               url=source_url, comment=comment, text=text)
-        if watch:
-            req["watch"] = ""
-        if ignore_warnings:
-            req["ignorewarnings"] = ""
-        try:
-            result = req.submit()
-        except api.APIError:
-            # TODO: catch and process foreseeable errors
-            raise
-        result = result["upload"]
+        if not result:
+            if watch:
+                req["watch"] = ""
+            if ignore_warnings:
+                req["ignorewarnings"] = ""
+            try:
+                result = req.submit()
+            except api.APIError:
+                # TODO: catch and process foreseeable errors
+                raise
+            result = result["upload"]
         pywikibot.debug(result, _logger)
         if "warnings" in result:
             warning = list(result["warnings"].keys())[0]

@@ -129,6 +129,8 @@ class Request(MutableMapping):
     @param site: The Site to which the request will be submitted. If not
            supplied, uses the user's configured default Site.
     @param mime: If true, send in "multipart/form-data" format (default False)
+    @param mime_params: A dictionary of parameter which should only be
+           transferred via mime mode. If not None sets mime to True.
     @param max_retries: (optional) Maximum number of times to retry after
            errors, defaults to 25
     @param retry_wait: (optional) Minimum time to wait after an error,
@@ -143,7 +145,15 @@ class Request(MutableMapping):
             self.site = kwargs.pop("site")
         except KeyError:
             self.site = pywikibot.Site()
-        self.mime = kwargs.pop("mime", False)
+        if 'mime_params' in kwargs:
+            self.mime_params = kwargs.pop('mime_params')
+            # mime may not be different from mime_params
+            if 'mime' in kwargs and kwargs.pop('mime') != self.mime:
+                raise ValueError('If mime_params is set, mime may not differ '
+                                 'from it.')
+        else:
+            self.mime = kwargs.pop('mime', False)
+        self.throttle = kwargs.pop('throttle', False)
         self.max_retries = kwargs.pop("max_retries", pywikibot.config.max_retries)
         self.retry_wait = kwargs.pop("retry_wait", pywikibot.config.retry_wait)
         self.params = {}
@@ -210,6 +220,23 @@ class Request(MutableMapping):
     def iteritems(self):
         return iter(self.params.items())
 
+    @property
+    def mime(self):
+        """Return whether mime parameters are defined."""
+        return self.mime_params is not None
+
+    @mime.setter
+    def mime(self, value):
+        """
+        Change whether mime parameter should be defined.
+
+        This will clear the mime parameters.
+        """
+        try:
+            self.mime_params = dict(value)
+        except TypeError:
+            self.mime_params = {} if value else None
+
     def http_params(self):
         """Return the parameters formatted for inclusion in an HTTP request.
 
@@ -218,7 +245,9 @@ class Request(MutableMapping):
            unicode (may be |-separated list)
            str in site encoding (may be |-separated list)
         """
-
+        if self.mime_params and set(self.params.keys()) & set(self.mime_params.keys()):
+            raise ValueError('The mime_params and params may not share the '
+                             'same keys.')
         for key in self.params:
             if isinstance(self.params[key], bytes):
                 self.params[key] = self.params[key].decode(self.site.encoding())
@@ -296,6 +325,23 @@ class Request(MutableMapping):
             message = None
         return message == ERR_MSG
 
+    @staticmethod
+    def _generate_MIME_part(key, content, keytype, headers):
+        if not keytype:
+            try:
+                content.encode("ascii")
+                keytype = ("text", "plain")
+            except UnicodeError:
+                keytype = ("application", "octet-stream")
+        submsg = MIMENonMultipart(*keytype)
+        content_headers = {'name': key}
+        if headers:
+            content_headers.update(headers)
+        submsg.add_header("Content-disposition", "form-data",
+                          **content_headers)
+        submsg.set_payload(content)
+        return submsg
+
     def submit(self):
         """Submit a query and parse the response.
 
@@ -308,7 +354,10 @@ class Request(MutableMapping):
             simulate = self._simulate(action)
             if simulate:
                 return simulate
-            self.site.throttle(write=self.write)
+            if self.throttle:
+                self.site.throttle(write=self.write)
+            else:
+                pywikibot.log("Action '{0}' is submitted not throttled.".format(action))
             uri = self.site.scriptpath() + "/api.php"
             ssl = False
             if self.site.family.name in config.available_ssl_project:
@@ -328,22 +377,15 @@ class Request(MutableMapping):
                             filetype = mimetypes.guess_type(local_filename)[0] \
                                 or 'application/octet-stream'
                             file_content = file(local_filename, "rb").read()
-                            submsg = MIMENonMultipart(*filetype.split("/"))
-                            submsg.add_header("Content-disposition",
-                                              "form-data", name=key,
-                                              filename=local_filename)
-                            submsg.set_payload(file_content)
+                            submsg = Request._generate_MIME_part(
+                                key, file_content, filetype.split('/'),
+                                {'filename': local_filename})
                         else:
-                            try:
-                                self.params[key].encode("ascii")
-                                keytype = ("text", "plain")
-                            except UnicodeError:
-                                keytype = ("application", "octet-stream")
-                            submsg = MIMENonMultipart(*keytype)
-                            submsg.add_header("Content-disposition", "form-data",
-                                              name=key)
-                            submsg.set_payload(self.params[key])
+                            submsg = Request._generate_MIME_part(
+                                key, self.params[key], None, None)
                         container.attach(submsg)
+                    for key, value in self.mime_params.items():
+                        container.attach(Request._generate_MIME_part(key, *value))
                     # strip the headers to get the HTTP message body
                     body = container.as_string()
                     marker = "\n\n"  # separates headers from body
