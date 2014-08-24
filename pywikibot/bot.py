@@ -33,6 +33,7 @@ INPUT = 25
 import pywikibot
 from pywikibot import config
 from pywikibot import version
+from pywikibot.tools import deprecated
 
 if sys.version_info[0] > 2:
     unicode = str
@@ -507,8 +508,42 @@ def input(question, password=False):
     return data
 
 
+def input_choice(question, answers, default=None, return_shortcut=True,
+                 automatic_quit=True):
+    """
+    Ask the user the question and return one of the valid answers.
+
+    @param answers: The valid answers each containing a full length answer and
+        a shortcut. Each value must be unique.
+    @type answers: Iterable containing an iterable of length two
+    @param default: The result if no answer was entered. It must not be in the
+        valid answers and can be disabled by setting it to None. If it should
+        be linked with the valid answers it must be its shortcut.
+    @type default: basestring
+    @param return_shortcut: Whether the shortcut or the index of the answer is
+        returned.
+    @type return_shortcut: bool
+    @param automatic_quit: Adds the option 'Quit' ('q') and throw a
+            L{QuitKeyboardInterrupt} if selected (default).
+    @type automatic_quit: bool
+    @return: The selected answer shortcut or index. Is -1 if the default is
+        selected, it does not return the shortcut and the default is not a
+        valid shortcut.
+    @rtype: int (if not return shortcut), basestring (otherwise)
+    """
+    # make sure logging system has been initialized
+    if not _handlers_initialized:
+        init_handlers()
+
+    return ui.input_choice(question, answers, default, return_shortcut,
+                           automatic_quit)
+
+
+@deprecated('input_choice')
 def inputChoice(question, answers, hotkeys, default=None):
     """Ask the user a question with several options, return the user's choice.
+
+    DEPRECATED: Use L{input_choice} instead!
 
     The user's input will be case-insensitive, so the hotkeys should be
     distinctive case-insensitively.
@@ -529,8 +564,9 @@ def inputChoice(question, answers, hotkeys, default=None):
     if not _handlers_initialized:
         init_handlers()
 
-    data = ui.inputChoice(question, answers, hotkeys, default).lower()
-    return data
+    return ui.input_choice(question=question, options=zip(answers, hotkeys),
+                           default=default, return_shortcut=True,
+                           automatic_quit=False)
 
 
 # Command line parsing and help

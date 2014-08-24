@@ -13,6 +13,7 @@ import logging
 import pywikibot
 from pywikibot import config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
+from pywikibot.tools import deprecated
 
 transliterator = transliteration.transliterator(config.console_encoding)
 
@@ -204,34 +205,103 @@ class UI:
             text = text.decode(self.encoding)
         return text
 
+    def input_choice(self, question, options, default=None, return_shortcut=True,
+                     automatic_quit=True):
+        """
+        Ask the user and returns a value from the options.
+
+        @param question: The question, without trailing whitespace.
+        @type question: basestring
+        @param options: All available options. Each entry contains the full
+            length answer and a shortcut of only one character. The shortcut
+            must not appear in the answer.
+        @type options: iterable containing iterables of length 2
+        @param default: The default answer if no was entered. None to require
+            an answer.
+        @type default: basestring
+        @param return_shortcut: Whether the shortcut or the index in the option
+            should be returned.
+        @type return_shortcut: bool
+        @param automatic_quit: Adds the option 'Quit' ('q') and throw a
+            L{QuitKeyboardInterrupt} if selected. If it's an integer it
+            doesn't add the option but throw the exception when the option was
+            selected.
+        @type automatic_quit: bool or int
+        @return: If return_shortcut the shortcut of options or the value of
+            default (if it's not None). Otherwise the index of the answer in
+            options. If default is not a shortcut, it'll return -1.
+        @rtype: int (if not return_shortcut), lowercased basestring (otherwise)
+        """
+        if len(options) == 0:
+            raise ValueError("No options are given.")
+        options = list(options)
+        if automatic_quit is True:
+            options += [('Quit', 'q')]
+            quit_index = len(options) - 1
+        elif automatic_quit is not False:
+            quit_index = automatic_quit
+        else:
+            quit_index = None
+        if default:
+            default = default.lower()
+        valid = {}
+        default_index = -1
+        formatted_options = []
+        for i, option in enumerate(options):
+            if len(option) != 2:
+                raise ValueError('Option #{0} does not consist of an option '
+                                 'and shortcut.'.format(i))
+            option, shortcut = option
+            if option.lower() in valid:
+                raise ValueError(
+                    'Multiple identical options ({0}).'.format(option))
+            shortcut = shortcut.lower()
+            if shortcut in valid:
+                raise ValueError(
+                    'Multiple identical shortcuts ({0}).'.format(shortcut))
+            valid[option.lower()] = i
+            valid[shortcut] = i
+            index = option.lower().find(shortcut)
+            if shortcut == default:
+                default_index = i
+                shortcut = shortcut.upper()
+            if index >= 0:
+                option = '{0}[{1}]{2}'.format(option[:index], shortcut,
+                                              option[index + len(shortcut):])
+            else:
+                option = '{0} [{1}]'.format(option, shortcut)
+            formatted_options += [option]
+        question = '{0} ({1})'.format(question, ', '.join(formatted_options))
+        answer = None
+        while answer is None:
+            answer = self.input(question)
+            if default and not answer:  # nothing entered
+                answer = default_index
+            else:
+                answer = valid.get(answer.lower(), None)
+        if quit_index == answer:
+            raise pywikibot.QuitKeyboardInterrupt()
+        elif not return_shortcut:
+            return answer
+        elif answer < 0:
+            return default
+        else:
+            return options[answer][1].lower()
+
+    @deprecated('input_choice')
     def inputChoice(self, question, options, hotkeys, default=None):
         """
         Ask the user a question with a predefined list of acceptable answers.
+
+        DEPRECATED: Use L{input_choice} instead!
+
+        Directly calls L{input_choice} with the options and hotkeys zipped
+        into a tuple list. It always returns the hotkeys and throws no
+        L{QuitKeyboardInterrupt} if quit was selected.
         """
-        options = options[:]  # we don't want to edit the passed parameter
-        for i in range(len(options)):
-            option = options[i]
-            hotkey = hotkeys[i]
-            # try to mark a part of the option name as the hotkey
-            m = re.search('[%s%s]' % (hotkey.lower(), hotkey.upper()), option)
-            if hotkey == default:
-                caseHotkey = hotkey.upper()
-            else:
-                caseHotkey = hotkey
-            if m:
-                pos = m.start()
-                options[i] = '%s[%s]%s' % (option[:pos], caseHotkey,
-                                           option[pos + 1:])
-            else:
-                options[i] = '%s [%s]' % (option, caseHotkey)
-        # loop until the user entered a valid choice
-        while True:
-            prompt = '%s (%s)' % (question, ', '.join(options))
-            answer = self.input(prompt)
-            if default and answer == '':  # empty string entered
-                return default
-            elif answer.lower() in hotkeys or answer.upper() in hotkeys:
-                return answer
+        return self.input_choice(question=question, options=zip(options, hotkeys),
+                                 default=default, return_shortcut=True,
+                                 automatic_quit=False)
 
     def editText(self, text, jumpIndex=None, highlight=None):
         """Return the text as edited by the user.
