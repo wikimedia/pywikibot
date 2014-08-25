@@ -118,7 +118,7 @@ class TestTWNTranslate(TestTWN):
     """Test {{PLURAL:}} support."""
 
     def testNumber(self):
-        """Use a number..."""
+        """Use a number."""
         self.assertEqual(
             i18n.twntranslate('de', 'test-plural', 0) % {'num': 0},
             u'Bot: Ändere 0 Seiten.')
