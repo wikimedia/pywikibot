@@ -985,7 +985,7 @@ class Siteinfo(Container):
                 raise
         else:
             result = {}
-            if 'warnings' in data:
+            if 'warnings' in data and 'siteinfo' in data['warnings']:
                 invalid_properties = []
                 for prop in re.match(u"^Unrecognized values? for parameter "
                                      u"'siprop': ([^,]+(?:, [^,]+)*)$",
