@@ -337,11 +337,7 @@ def redirect_func(target, source_module=None, target_module=None):
     class Wrapper(object):
         def __init__(self, function, source, target):
             self._function = function
-            if hasattr(function, '__name__'):
-                func_name = function.__name__
-            else:
-                func_name = function.func_name
-            self.parameters = {'new': func_name,
+            self.parameters = {'new': function.__name__,
                                'target': target,
                                'source': source}
             self.warning = ('{source}{new} is DEPRECATED, use {target}{new} '
