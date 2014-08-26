@@ -2191,7 +2191,17 @@ class APISite(BaseSite):
         """Preload one or multiple tokens.
 
         For all MediaWiki versions prior to 1.20, only one token can be
-        retrieved at once.
+        retrieved at once. For MediaWiki versions since 1.24wmfXXX a new token
+        system was introduced which reduced the amount of tokens available.
+        Most of them were merged into the 'csrf' token. If the token type in
+        the parameter is not known it'll default to the 'csrf' token. The other
+        token types available are:
+        - deleteglobalaccount
+        - patrol
+        - rollback
+        - setglobalaccountstatus
+        - userrights
+        - watch
 
         @param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
@@ -2209,8 +2219,21 @@ class APISite(BaseSite):
                     if (tokentype + 'token') in item:
                         storage[tokentype] = item[tokentype + 'token']
         else:
-            data = api.Request(site=self, action='tokens',
-                               type='|'.join(types)).submit()
+            if LV(self.version()) < LV('1.24wmf19'):
+                data = api.Request(site=self, action='tokens',
+                                   type='|'.join(types)).submit()
+            else:
+                # TODO: Fetch that from the API with paraminfo
+                special_names = set('deleteglobalaccount', 'patrol', 'rollback',
+                                    'setglobalaccountstatus', 'userrights',
+                                    'watch')
+                new_tokens = [token if token in special_names else 'csrf'
+                              for token in types]
+                data = api.Request(action='query',
+                                   tokens='|'.join(new_tokens)).submit()
+                if 'query' in data:
+                    data = data['query']
+
             if 'tokens' in data and data['tokens']:
                 storage.update(dict((key[:-5], val)
                                     for key, val in data['tokens'].items()))
