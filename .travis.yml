@@ -10,7 +10,8 @@ before_install:
   - sudo apt-get install -y python-imaging-tk liblua5.1-dev
 
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install ordereddict; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install ordereddict unittest2; fi
+  - pip install six
   - mkdir ~/.pywikibot
 
   - touch ~/.pywikibot/user-config.py
@@ -27,8 +28,6 @@ install:
   - cd externals/httplib2
   - python setup.py install
   - cd ../..
-
-  - pip install unittest2
 
   - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then export USE_NOSE=1; fi
 

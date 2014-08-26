@@ -335,6 +335,10 @@ class TestScript(PywikibotTestCase):
             os.environ['PYWIKIBOT2_DIR'] = self.old_pywikibot_dir
 
 
+if sys.version_info[0] > 2:
+    import six
+    TestScript = six.add_metaclass(TestScriptMeta)(TestScript)
+
 if __name__ == '__main__':
     try:
         unittest.main()
