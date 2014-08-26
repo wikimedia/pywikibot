@@ -16,7 +16,7 @@ import re
 
 import pywikibot
 from pywikibot.exceptions import Error, NoPage
-from tests.utils import PywikibotTestCase, unittest
+from tests.utils import SiteTestCase, PywikibotTestCase, unittest
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -1177,6 +1177,16 @@ class TestCommonsSite(PywikibotTestCase):
         ll = next(self.site.pagelanglinks(self.mainpage))
         self.assertIsInstance(ll, pywikibot.Link)
         self.assertEqual(ll.site.family.name, 'wikipedia')
+
+
+class TestUploadEnabledSite(SiteTestCase):
+
+    def test_is_uploaddisabled(self):
+        site = pywikibot.Site('commons', 'commons')
+        self.assertFalse(site.is_uploaddisabled())
+
+        site = pywikibot.Site('wikidata', 'wikidata')
+        self.assertTrue(site.is_uploaddisabled())
 
 
 if __name__ == '__main__':

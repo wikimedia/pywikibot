@@ -3897,6 +3897,33 @@ class APISite(BaseSite):
     def getImagesFromAnHash(self, hash_found=None):
         return self.getFilesFromAnHash(hash_found)
 
+    def is_uploaddisabled(self):
+        """Return True if upload is disabled on site.
+
+        If not called directly, it is cached by the first attempted
+        upload action.
+
+        """
+        if hasattr(self, '_uploaddisabled'):
+            return self._uploaddisabled
+        else:
+            # attempt a fake upload; on enabled sites will fail for:
+            # missingparam: One of the parameters
+            #    filekey, file, url, statuskey is required
+            # TODO: is there another way?
+            try:
+                dummy = pywikibot.FilePage(self, title='dummy')
+                token = self.token(dummy, 'edit')
+                req = api.Request(site=self, action="upload",
+                                  token=token, throttle=False)
+                req.submit()
+            except api.APIError as error:
+                if error.code == u'uploaddisabled':
+                    self._uploaddisabled = True
+                else:
+                    self._uploaddisabled = False
+                return self._uploaddisabled
+
     @deprecate_arg('imagepage', 'filepage')
     def upload(self, filepage, source_filename=None, source_url=None,
                comment=None, text=None, watch=False, ignore_warnings=False,
@@ -3923,6 +3950,7 @@ class APISite(BaseSite):
             and the chunk size is positive but lower than the file size.
         @type chunk_size: int
         """
+
         upload_warnings = {
             # map API warning codes to user error messages
             # %(msg)s will be replaced by message string from API responsse
@@ -3980,8 +4008,14 @@ class APISite(BaseSite):
                         req.mime_params['chunk'] = (chunk, None, {'filename': req.params['filename']})
                         if file_key:
                             req['filekey'] = file_key
-                        # TODO: Proper error and warning handling
-                        data = req.submit()['upload']
+                        try:
+                            data = req.submit()['upload']
+                            self._uploaddisabled = False
+                        except api.APIError as error:
+                            # TODO: catch and process foreseeable errors
+                            if error.code == u'uploaddisabled':
+                                self._uploaddisabled = True
+                            raise error
                         if 'warnings' in data:
                             result = data
                             break
@@ -4016,11 +4050,15 @@ class APISite(BaseSite):
                 req["ignorewarnings"] = ""
             try:
                 result = req.submit()
-            except api.APIError:
+                self._uploaddisabled = False
+            except api.APIError as error:
                 # TODO: catch and process foreseeable errors
-                raise
+                if error.code == u'uploaddisabled':
+                    self._uploaddisabled = True
+                raise error
             result = result["upload"]
-        pywikibot.debug(result, _logger)
+            pywikibot.debug(result, _logger)
+
         if "warnings" in result:
             warning = list(result["warnings"].keys())[0]
             message = result["warnings"][warning]
