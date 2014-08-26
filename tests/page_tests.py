@@ -286,24 +286,24 @@ class TestPageObject(PywikibotTestCase):
         """Test various methods that rely on API."""
         # since there is no way to predict what data the wiki will return,
         # we only check that the returned objects are of correct type.
-        self.assertType(mainpage.get(), unicode)
-        self.assertType(maintalk.get(), unicode)
+        self.assertIsInstance(mainpage.get(), unicode)
+        self.assertIsInstance(maintalk.get(), unicode)
         self.assertRaises(pywikibot.NoPage, badpage.get)
-        self.assertType(mainpage.latestRevision(), int)
-        self.assertType(mainpage.userName(), unicode)
-        self.assertType(mainpage.isIpEdit(), bool)
-        self.assertType(mainpage.exists(), bool)
-        self.assertType(mainpage.isRedirectPage(), bool)
-        self.assertType(mainpage.isEmpty(), bool)
+        self.assertIsInstance(mainpage.latestRevision(), int)
+        self.assertIsInstance(mainpage.userName(), unicode)
+        self.assertIsInstance(mainpage.isIpEdit(), bool)
+        self.assertIsInstance(mainpage.exists(), bool)
+        self.assertIsInstance(mainpage.isRedirectPage(), bool)
+        self.assertIsInstance(mainpage.isEmpty(), bool)
         self.assertEqual(mainpage.toggleTalkPage(), maintalk)
         self.assertEqual(maintalk.toggleTalkPage(), mainpage)
-        self.assertType(mainpage.isDisambig(), bool)
-        self.assertType(mainpage.canBeEdited(), bool)
-        self.assertType(mainpage.botMayEdit(), bool)
-        self.assertType(mainpage.editTime(), pywikibot.Timestamp)
-        self.assertType(mainpage.previousRevision(), int)
-        self.assertType(mainpage.permalink(), basestring)
-        self.assertType(mainpage.purge(), bool)
+        self.assertIsInstance(mainpage.isDisambig(), bool)
+        self.assertIsInstance(mainpage.canBeEdited(), bool)
+        self.assertIsInstance(mainpage.botMayEdit(), bool)
+        self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
+        self.assertIsInstance(mainpage.previousRevision(), int)
+        self.assertIsInstance(mainpage.permalink(), basestring)
+        self.assertIsInstance(mainpage.purge(), bool)
 
     def testIsDisambig(self):
         """
@@ -323,44 +323,44 @@ class TestPageObject(PywikibotTestCase):
         # Ignore redirects for time considerations
         for p in mainpage.getReferences(follow_redirects=False):
             count += 1
-            self.assertType(p, pywikibot.Page)
+            self.assertIsInstance(p, pywikibot.Page)
             if count >= 10:
                 break
         count = 0
         for p in mainpage.backlinks(followRedirects=False):
             count += 1
-            self.assertType(p, pywikibot.Page)
+            self.assertIsInstance(p, pywikibot.Page)
             if count >= 10:
                 break
         count = 0
         for p in mainpage.embeddedin():
             count += 1
-            self.assertType(p, pywikibot.Page)
+            self.assertIsInstance(p, pywikibot.Page)
             if count >= 10:
                 break
 
     def testLinks(self):
         for p in mainpage.linkedPages():
-            self.assertType(p, pywikibot.Page)
+            self.assertIsInstance(p, pywikibot.Page)
         iw = list(mainpage.interwiki(expand=True))
         for p in iw:
-            self.assertType(p, pywikibot.Link)
+            self.assertIsInstance(p, pywikibot.Link)
         for p2 in mainpage.interwiki(expand=False):
-            self.assertType(p2, pywikibot.Link)
+            self.assertIsInstance(p2, pywikibot.Link)
             self.assertTrue(p2 in iw)
         for p in mainpage.langlinks():
-            self.assertType(p, pywikibot.Link)
+            self.assertIsInstance(p, pywikibot.Link)
         for p in mainpage.imagelinks():
-            self.assertType(p, pywikibot.FilePage)
+            self.assertIsInstance(p, pywikibot.FilePage)
         for p in mainpage.templates():
-            self.assertType(p, pywikibot.Page)
+            self.assertIsInstance(p, pywikibot.Page)
         for t, params in mainpage.templatesWithParams():
-            self.assertType(t, pywikibot.Page)
-            self.assertType(params, list)
+            self.assertIsInstance(t, pywikibot.Page)
+            self.assertIsInstance(params, list)
         for p in mainpage.categories():
-            self.assertType(p, pywikibot.Category)
+            self.assertIsInstance(p, pywikibot.Category)
         for p in mainpage.extlinks():
-            self.assertType(p, unicode)
+            self.assertIsInstance(p, unicode)
 
     def testPickleAbility(self):
         import pickle
@@ -369,14 +369,14 @@ class TestPageObject(PywikibotTestCase):
 
     def testRepr(self):
         s = repr(mainpage)
-        self.assertType(s, str)
+        self.assertIsInstance(s, str)
 
     def testReprUnicode(self):
         site = pywikibot.Site('ar', 'wikipedia')
         page = pywikibot.Page(site, 'Main Page')
         page = page.toggleTalkPage()
         s = repr(page)
-        self.assertType(s, str)
+        self.assertIsInstance(s, str)
 
 # methods that still need tests implemented or expanded:
 

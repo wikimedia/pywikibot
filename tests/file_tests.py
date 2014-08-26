@@ -21,7 +21,7 @@ class TestShareFiles(SiteTestCase):
         itwp = pywikibot.Site('it', 'wikipedia')
         itwp_file = pywikibot.ImagePage(itwp, title)
         for using in itwp_file.usingPages():
-            self.assertType(using, pywikibot.Page)
+            self.assertIsInstance(using, pywikibot.Page)
 
         commons_file = pywikibot.ImagePage(commons, title)
 
@@ -41,7 +41,7 @@ class TestShareFiles(SiteTestCase):
         enwp = pywikibot.Site('en', 'wikipedia')
         enwp_file = pywikibot.ImagePage(enwp, title)
         for using in enwp_file.usingPages():
-            self.assertType(using, pywikibot.Page)
+            self.assertIsInstance(using, pywikibot.Page)
 
         commons_file = pywikibot.ImagePage(commons, title)
 
@@ -61,7 +61,7 @@ class TestShareFiles(SiteTestCase):
         itwp = pywikibot.Site('it', 'wikipedia')
         itwp_file = pywikibot.ImagePage(itwp, title)
         for using in itwp_file.usingPages():
-            self.assertType(using, pywikibot.Page)
+            self.assertIsInstance(using, pywikibot.Page)
 
         commons_file = pywikibot.ImagePage(commons, title)
 

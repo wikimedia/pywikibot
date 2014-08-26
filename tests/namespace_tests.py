@@ -53,7 +53,7 @@ class TestNamespaceObject(NoSiteTestCase):
         """Test cases for methods manipulating namespace names."""
         ns = Namespace.builtin_namespaces(use_image_name=False)
 
-        self.assertType(ns, dict)
+        self.assertIsInstance(ns, dict)
         self.assertTrue(all(x in ns for x in range(0, 16)))
 
         self.assertTrue(all(isinstance(key, int)

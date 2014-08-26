@@ -23,10 +23,6 @@ class BaseTestCase(unittest.TestCase):
     Adds timing info to stdout.
     """
 
-    def assertType(self, obj, cls):
-        """Assert that obj is an instance of type cls."""
-        return self.assertTrue(isinstance(obj, cls))
-
     def setUp(self):
         self.test_start = time.time()
 

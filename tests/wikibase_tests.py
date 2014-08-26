@@ -41,7 +41,7 @@ class TestGeneral(PywikibotTestCase):
         item_namespace = repo.namespaces()[0]
         self.assertEqual(item_namespace.defaultcontentmodel, 'wikibase-item')
         item = pywikibot.ItemPage.fromPage(mainpage)
-        self.assertType(item, pywikibot.ItemPage)
+        self.assertIsInstance(item, pywikibot.ItemPage)
         self.assertEqual(item.getID(), 'Q5296')
         self.assertEqual(item.title(), 'Q5296')
         self.assertTrue('en' in item.labels)
