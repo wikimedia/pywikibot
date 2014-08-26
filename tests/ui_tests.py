@@ -27,15 +27,11 @@
 #
 __version__ = '$Id$'
 
-try:
-    import cStringIO
-except ImportError:
-    from io import StringIO as cStringIO
-
 import logging
 import os
 import sys
 import time
+from io import StringIO
 
 from tests.utils import unittest
 
@@ -90,9 +86,9 @@ if __name__ == "__main__":
     oldstdout = sys.stdout
     oldstdin = sys.stdin
 
-    newstdout = cStringIO.StringIO()
-    newstderr = cStringIO.StringIO()
-    newstdin = cStringIO.StringIO()
+    newstdout = StringIO()
+    newstderr = StringIO()
+    newstdin = StringIO()
 
     def patch():
         sys.stdout = newstdout

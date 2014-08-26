@@ -238,7 +238,7 @@ class TestTWNTranslate(TestTWN):
                 u'Bot: Ändere elf Zeilen von mehreren Seiten.')
 
     def testAllParametersExist(self):
-        with self.assertRaisesRegexp(KeyError, "u'line'"):
+        with self.assertRaisesRegexp(KeyError, repr(u'line')):
             # all parameters must be inside twntranslate
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals',

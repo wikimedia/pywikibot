@@ -26,6 +26,8 @@ if sys.version_info[0] == 2:
     from HTMLParser import HTMLParser
 else:
     from html.parser import HTMLParser
+    basestring = (str,)
+    unicode = str
 
 from . import config2 as config
 

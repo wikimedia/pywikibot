@@ -17,6 +17,7 @@ This module also includes objects:
 __version__ = '$Id$'
 #
 
+import sys
 import pywikibot
 from pywikibot import config
 import pywikibot.site
@@ -25,11 +26,11 @@ from pywikibot.tools import ComparableMixin, deprecated, deprecate_arg
 from pywikibot import textlib
 import hashlib
 
-try:
+if sys.version_info[0] == 2:
     import htmlentitydefs
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
-except ImportError:
-    unicode = str
+else:
+    unicode = basestring = str
     from html import entities as htmlentitydefs
     from urllib.parse import quote_from_bytes, unquote_to_bytes
 
@@ -4019,7 +4020,7 @@ def html2unicode(text, ignore=None):
             if unicodeCodepoint and unicodeCodepoint not in ignore:
                 # solve narrow Python build exception (UTF-16)
                 if unicodeCodepoint > sys.maxunicode:
-                    unicode_literal = lambda n: eval("u'\U%08x'" % n)
+                    unicode_literal = lambda n: eval(r"u'\U%08x'" % n)
                     result += unicode_literal(unicodeCodepoint)
                 else:
                     result += unichr(unicodeCodepoint)

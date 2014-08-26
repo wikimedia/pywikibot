@@ -93,7 +93,7 @@ PywikibotTestCase = CachedTestCase
 class DummySiteinfo():
 
     def __init__(self, cache):
-        self._cache = dict((key, (item, False)) for key, item in cache.iteritems())
+        self._cache = dict((key, (item, False)) for key, item in cache.items())
 
     def __getitem__(self, key):
         return self.get(key, False)

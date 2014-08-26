@@ -57,7 +57,7 @@ else:
     import queue as Queue
     import urllib.parse as urlparse
     from http import cookiejar as cookielib
-    from urlparse import quote
+    from urllib.parse import quote
 
 from pywikibot import config
 from pywikibot.exceptions import FatalServerError, Server504Error

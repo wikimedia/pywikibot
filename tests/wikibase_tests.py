@@ -395,7 +395,7 @@ class TestClaimSetValue(PywikibotTestCase):
     def test_set_date(self):
         claim = pywikibot.Claim(wikidata, 'P569')
         self.assertEquals(claim.type, 'time')
-        claim.setTarget(pywikibot.WbTime(year=2001, month=01, day=01, site=wikidata))
+        claim.setTarget(pywikibot.WbTime(year=2001, month=1, day=1, site=wikidata))
         self.assertEquals(claim.target.year, 2001)
         self.assertEquals(claim.target.month, 1)
         self.assertEquals(claim.target.day, 1)

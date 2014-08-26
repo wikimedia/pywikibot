@@ -10,7 +10,7 @@ __version__ = '$Id$'
 import datetime
 import pywikibot
 from pywikibot.data.api import CachedRequest, QueryGenerator
-from utils import unittest, NoSiteTestCase, SiteTestCase, DummySiteinfo
+from tests.utils import unittest, NoSiteTestCase, SiteTestCase, DummySiteinfo
 
 
 class DryCachedRequestTests(SiteTestCase):
