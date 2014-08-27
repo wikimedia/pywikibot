@@ -341,9 +341,11 @@ def main():
         else:
             genFactory.handleArg(arg)
     if textfile and not addText:
-        f = codecs.open(textfile, 'r', config.textfile_encoding)
-        addText = f.read()
-        f.close()
+        with codecs.open(textfile, 'r', config.textfile_encoding) as f:
+            addText = f.read()
+    if not addText:
+        pywikibot.error("The text to add wasn't given.")
+        return
     if not generator:
         generator = genFactory.getCombinedGenerator()
     if not generator:
