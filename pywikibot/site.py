@@ -3530,8 +3530,8 @@ class APISite(BaseSite):
             raise Error("Cannot move page %s to its own title."
                         % oldtitle)
         if not page.exists():
-            raise Error("Cannot move page %s because it does not exist on %s."
-                        % (oldtitle, self))
+            raise NoPage("Cannot move page %s because it does not exist on %s."
+                         % (oldtitle, self))
         token = self.token(page, "move")
         self.lock_page(page)
         req = api.Request(site=self, action="move", to=newtitle,
