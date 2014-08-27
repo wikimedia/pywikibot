@@ -343,13 +343,13 @@ def main():
     if textfile and not addText:
         with codecs.open(textfile, 'r', config.textfile_encoding) as f:
             addText = f.read()
-    if not addText:
-        pywikibot.error("The text to add wasn't given.")
-        return
     if not generator:
         generator = genFactory.getCombinedGenerator()
     if not generator:
         pywikibot.showHelp()
+        return
+    if not addText:
+        pywikibot.error("The text to add wasn't given.")
         return
     if talkPage:
         generator = pagegenerators.PageWithTalkPageGenerator(generator)
