@@ -11,6 +11,15 @@ Arguments:
                 is given
   -abortonwarn: Abort upload on the specified warning type. If no warning type
                 is specified abort on all warnings.
+  -chunked:     Upload the file in chunks (more overhead, but restartable). If
+                no value is specified the chunk size is 1 MiB. The value must
+                be a number which can be preceded by a suffix. The units are:
+                  No suffix: Bytes
+                  'k': Kilobytes (1000 B)
+                  'M': Megabytes (1000000 B)
+                  'Ki': Kibibytes (1024 B)
+                  'Mi': Mebibytes (1024x1024 B)
+                The suffixes are case insenstive.
 
 If any other arguments are given, the first is the URL or filename to upload,
 and the rest is a proposed description to go with the upload. If none of these
@@ -34,6 +43,8 @@ import time
 import urllib
 import urlparse
 import tempfile
+import re
+import math
 import pywikibot
 import pywikibot.data.api
 from pywikibot import config
@@ -43,7 +54,7 @@ class UploadRobot:
     def __init__(self, url, urlEncoding=None, description=u'',
                  useFilename=None, keepFilename=False,
                  verifyDescription=True, ignoreWarning=False,
-                 targetSite=None, uploadByUrl=False, aborts=[]):
+                 targetSite=None, uploadByUrl=False, aborts=[], chunk_size=0):
         """
         @param ignoreWarning: Set this to True if you want to upload even if
             another file would be overwritten or another mistake would be
@@ -58,6 +69,7 @@ class UploadRobot:
         self.verifyDescription = verifyDescription
         self.ignoreWarning = ignoreWarning
         self.aborts = aborts
+        self.chunk_size = chunk_size
         if config.upload_to_commons:
             self.targetSite = targetSite or pywikibot.Site('commons',
                                                            'commons')
@@ -224,7 +236,8 @@ class UploadRobot:
                 else:
                     temp = self.url
                 site.upload(imagepage, source_filename=temp,
-                            ignore_warnings=self.ignoreWarning)
+                            ignore_warnings=self.ignoreWarning,
+                            chunk_size=self.chunk_size)
 
         except pywikibot.data.api.UploadWarning as warn:
             pywikibot.output(u"We got a warning message: {0}".format(warn.message))
@@ -266,6 +279,8 @@ def main(*args):
     useFilename = None
     verifyDescription = True
     aborts = set()
+    chunk_size = 0
+    chunk_size_regex = re.compile(r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
 
     # process all global bot args
     # returns a list of non-global args, i.e. args for upload.py
@@ -282,6 +297,30 @@ def main(*args):
                     aborts.add(arg[len('-abortonwarn:'):])
                 else:
                     aborts = True
+            elif arg.startswith('-chunked'):
+                match = chunk_size_regex.match(arg)
+                if match:
+                    if match.group(1):  # number was in there
+                        base = float(match.group(1))
+                        if match.group(2):  # suffix too
+                            suffix = match.group(2).lower()
+                            if suffix == "k":
+                                suffix = 1000
+                            elif suffix == "m":
+                                suffix = 1000000
+                            elif suffix == "ki":
+                                suffix = 1 << 10
+                            elif suffix == "mi":
+                                suffix = 1 << 20
+                            else:
+                                pass  # huh?
+                        else:
+                            suffix = 1
+                        chunk_size = math.trunc(base * suffix)
+                    else:
+                        chunk_size = 1 << 20  # default to 1 MiB
+                else:
+                    pywikibot.error('Chunk size parameter is not valid.')
             elif url == u'':
                 url = arg
             else:
@@ -290,7 +329,7 @@ def main(*args):
     bot = UploadRobot(url, description=description, useFilename=useFilename,
                       keepFilename=keepFilename,
                       verifyDescription=verifyDescription,
-                      aborts=aborts)
+                      aborts=aborts, chunk_size=chunk_size)
     bot.run()
 
 if __name__ == "__main__":
