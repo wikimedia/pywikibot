@@ -44,8 +44,9 @@ class LoginManager:
             self.username = user
         elif sysop:
             try:
-                self.username = config.sysopnames[
-                    self.site.family.name][self.site.code]
+                family_sysopnames = config.sysopnames[self.site.family.name]
+                self.username = family_sysopnames.get(self.site.code, None)
+                self.username = self.username or family_sysopnames['*']
             except KeyError:
                 raise NoUsername(u"""\
 ERROR: Sysop username for %(fam_name)s:%(wiki_code)s is undefined.
@@ -56,8 +57,9 @@ sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                                     'wiki_code': self.site.code})
         else:
             try:
-                self.username = config.usernames[
-                    self.site.family.name][self.site.code]
+                family_usernames = config.usernames[self.site.family.name]
+                self.username = family_usernames.get(self.site.code, None)
+                self.username = self.username or family_usernames['*']
             except:
                 raise NoUsername(u"""\
 ERROR: Username for %(fam_name)s:%(wiki_code)s is undefined.
@@ -196,7 +198,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 #                 % {'name': self.username,
 #                    'page': botList[self.site.family.name][self.site.code]})
 #            logger.error(
-#"Please make sure you are allowed to use the robot before actually using it!")
+# "Please make sure you are allowed to use the robot before actually using it!")
 #            return False
         return True
 
