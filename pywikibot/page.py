@@ -120,6 +120,15 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         """Return the Site object for the wiki on which this Page resides."""
         return self._link.site
 
+    def version(self):
+        """Return MediaWiki version number of the Site object for the wiki
+        on which this Page resides.
+
+        This is needed to use @need_version() decorator for methods of
+        Page objects.
+        """
+        return self.site.version()
+
     @property
     def image_repository(self):
         """Return the Site object for the image repository."""
@@ -2119,19 +2128,16 @@ class Category(Page):
                         if total == 0:
                             return
 
+    @pywikibot.site.need_version("1.13")
     def isEmptyCategory(self):
         """Return True if category has no members (including subcategories)."""
         ci = self.categoryinfo
         return sum(ci[k] for k in ['files', 'pages', 'subcats']) == 0
 
+    @pywikibot.site.need_version("1.11")
     def isHiddenCategory(self):
         """Return True if the category is hidden."""
-        # FIXME
-        # This should use action=query&list=allcategories
-        # setting acfrom and acto to the category title and adding
-        # acprop=hidden but currently fails  in some cases
-        # (see bug 48824)
-        return '__HIDDENCAT__' in self.expand_text()
+        return u'hiddencat' in self.properties()
 
     def copyTo(self, cat, message):
         """
