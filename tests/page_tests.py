@@ -400,6 +400,17 @@ class TestPageObject(PywikibotTestCase):
 #    def contributingUsers(self):
 
 
+class TestCategoryObject(PywikibotTestCase):
+
+    def test_isEmptyCategory(self):
+        """Test if category is empty or not"""
+        site = pywikibot.Site('en', 'wikipedia')
+        cat_empty = pywikibot.Category(site, u'Category:foooooo')
+        cat_not_empty = pywikibot.Category(site, u'Category:Wikipedia categories')
+        self.assertTrue(cat_empty.isEmptyCategory())
+        self.assertFalse(cat_not_empty.isEmptyCategory())
+
+
 if __name__ == '__main__':
     try:
         unittest.main()
