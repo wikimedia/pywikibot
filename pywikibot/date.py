@@ -79,63 +79,69 @@ def multi(value, tuplst):
 # Various filters are item dependent.
 #
 def dh_noConv(value, pattern, limit):
-    """decoding helper for a single integer value, no conversion, no rounding"""
+    """Helper for decoding a single integer value, no conversion, no rounding."""
     return dh(value, pattern, encNoConv, decSinglVal, limit)
 
 
 def dh_dayOfMnth(value, pattern):
-    """decoding helper for a single integer value <=31, no conversion,
-    no rounding (used in days of month)
+    """
+    Helper for decoding a single integer value.
 
+    The single integer should be <=31, no conversion,
+    no rounding (used in days of month).
     """
     # For now use January because it has all 31 days
     return dh_noConv(value, pattern, formatLimits[dayMnthFmts[0]][0])
 
 
 def dh_mnthOfYear(value, pattern):
-    """decoding helper for a single integer value >=1000, no conversion,
-    no rounding (used in month of the year)
+    """
+    Helper for decoding a single integer value.
 
+    The value should be >=1000, no conversion,
+    no rounding (used in month of the year)
     """
     return dh_noConv(value, pattern, _formatLimit_MonthOfYear[0])
 
 
 def dh_decAD(value, pattern):
-    """decoding helper for a single integer value, no conversion,
-    round to decimals (used in decades)
+    """
+    Helper for decoding a single integer value.
 
+    It should be no conversion, round to decimals (used in decades)
     """
     return dh(value, pattern, encDec0, decSinglVal, formatLimits['DecadeAD'][0])
 
 
 def dh_decBC(value, pattern):
-    """decoding helper for a single integer value, no conversion,
-    round to decimals (used in decades)
+    """
+    Helper for decoding a single integer value.
 
+    It should be no conversion, round to decimals (used in decades)
     """
     return dh(value, pattern, encDec0, decSinglVal, formatLimits['DecadeBC'][0])
 
 
 def dh_yearBC(value, pattern):
-    """decoding helper for a year value, no conversion, no rounding,
-    limits to 3000
+    """Helper for decoding a year value.
 
+    The value should have no conversion, no rounding, limits to 3000.
     """
     return dh_noConv(value, pattern, formatLimits['YearBC'][0])
 
 
 def dh_yearAD(value, pattern):
-    """decoding helper for a year value, no conversion, no rounding,
-    limits to 3000
+    """Helper for decoding a year value.
 
+    The value should have no conversion, no rounding, limits to 3000.
     """
     return dh_noConv(value, pattern, formatLimits['YearAD'][0])
 
 
 def dh_simpleYearAD(value):
-    """decoding helper for a single integer value representing a year with
-    no extra symbols
+    """Helper for decoding a single integer value.
 
+    This value should be representing a year with no extra symbols.
     """
     return dh_yearAD(value, u'%d')
 
@@ -332,10 +338,11 @@ _listTypes = [list, tuple]
 
 
 def escapePattern2(pattern):
-    """Convert a string pattern into a regex expression and cache.
-    Allows matching of any _digitDecoders inside the string.
-    Returns a compiled regex object and a list of digit decoders
+    """
+    Convert a string pattern into a regex expression and cache.
 
+    Allows matching of any _digitDecoders inside the string.
+    Returns a compiled regex object and a list of digit decoders.
     """
 
     if pattern not in _escPtrnCache2:

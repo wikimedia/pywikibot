@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
-Text editor class for your favourite editor.
-"""
+"""Text editor class for your favourite editor."""
 
 #
 # (C) Gerrit Holl, 2004
