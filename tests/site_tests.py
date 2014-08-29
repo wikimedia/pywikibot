@@ -8,14 +8,16 @@
 __version__ = '$Id$'
 
 
+import sys
 from distutils.version import LooseVersion as LV
 from collections import Iterable
-import pywikibot
-from tests.utils import PywikibotTestCase, unittest
 from datetime import datetime
 import re
 
-import sys
+import pywikibot
+from pywikibot.exceptions import Error, NoPage
+from tests.utils import PywikibotTestCase, unittest
+
 if sys.version_info[0] > 2:
     basestring = (str, )
 
@@ -1034,6 +1036,14 @@ class TestSiteObject(PywikibotTestCase):
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).items()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).values()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).keys()))
+
+    def test_movepage(self):
+        self.assertRaises(Error, mysite.movepage, mainpage, 'Main Page', 'test')
+
+        page_from = pywikibot.Page(mysite, 'Not exiting page')
+        if not page_from.exists():
+            self.assertRaises(NoPage, mysite.movepage,
+                              page_from, 'Main Page', 'test')
 
 
 class TestSiteLoadRevisions(PywikibotTestCase):
