@@ -229,7 +229,8 @@ def _altlang(code):
 
 class TranslationError(Error):
 
-    """ Raised when no correct translation could be found """
+    """Raised when no correct translation could be found."""
+
     pass
 
 

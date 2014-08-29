@@ -129,7 +129,9 @@ class GraphDrawer:
 
     def createGraph(self):
         """
-        See http://meta.wikimedia.org/wiki/Interwiki_graphs
+        Create graph of the interwiki links.
+
+        For more info see U{http://meta.wikimedia.org/wiki/Interwiki_graphs}
         """
         pywikibot.output(u'Preparing graph for %s'
                          % self.subject.originPage.title())
