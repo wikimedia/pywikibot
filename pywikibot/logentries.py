@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Objects representing Mediawiki log entries
-"""
+"""Objects representing Mediawiki log entries."""
 #
 # (C) Pywikibot team, 2007-2013
 #
@@ -23,6 +21,7 @@ class LogDict(dict):
 
     It also logs debugging information when a key is missing.
     """
+
     def __missing__(self, key):
         pywikibot.debug(u"API log entry received:\n" + repr(self),
                         _logger)
@@ -127,7 +126,7 @@ class BlockEntry(LogEntry):
         """
         Return a list of (str) flags associated with the block entry.
 
-        Raises an Error if the entry is an unblocking log entry
+        It raises an Error if the entry is an unblocking log entry.
         """
         if hasattr(self, '_flags'):
             return self._flags
@@ -138,8 +137,8 @@ class BlockEntry(LogEntry):
         """
         Return a datetime.timedelta representing the block duration.
 
-        It returns None if block is indefinite.
-        Raises an Error if the entry is an unblocking log entry
+        @return: datetime.timedelta, or None if block is indefinite.
+        @raises Error: the entry is an unblocking log entry.
         """
         if hasattr(self, '_duration'):
             return self._duration
@@ -154,7 +153,7 @@ class BlockEntry(LogEntry):
         """
         Return a Timestamp representing the block expiry date.
 
-        Raises an Error if the entry is an unblocking log entry
+        @raises Error: the entry is an unblocking log entry.
         """
         if hasattr(self, '_expiry'):
             return self._expiry
@@ -185,7 +184,7 @@ class MoveEntry(LogEntry):
         return self.data['move']['new_ns']
 
     def new_title(self):
-        """Page object of the new title"""
+        """Return page object of the new title."""
         if not hasattr(self, '_new_title'):
             self._new_title = pywikibot.Page(pywikibot.Link(self.data['move']['new_title']))
         return self._new_title
@@ -217,7 +216,7 @@ class NewUsersEntry(LogEntry):
 class LogEntryFactory(object):
 
     """
-    LogEntry Factory
+    LogEntry Factory.
 
     Only available method is create()
     """
@@ -257,7 +256,7 @@ class LogEntryFactory(object):
         @param logdata: <item> returned by the api
         @type logdata: dict
 
-        @return LogEntry object representing logdata
+        @return: LogEntry object representing logdata
         """
         return self._creator(logdata)
 
@@ -266,7 +265,8 @@ class LogEntryFactory(object):
         """
         Return the class corresponding to the @logtype string parameter.
 
-        Returns LogEntry if logtype is unknown or not supported
+        @return: specified subclass of LogEntry, or LogEntry
+        @rtype: class
         """
         try:
             return LogEntryFactory._logtypes[logtype]
@@ -276,6 +276,10 @@ class LogEntryFactory(object):
     def _createFromData(self, logdata):
         """
         Check for logtype from data, and creates the correct LogEntry.
+
+        @param logdata: log entry data
+        @type logdata: dict
+        @rtype: LogEntry
         """
         try:
             logtype = logdata['type']

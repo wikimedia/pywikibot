@@ -141,7 +141,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     def namespace(self):
         """Return the number of the namespace of the page.
 
-        @return: int
+        @return: namespace of the page
+        @rtype: int
         """
         return self._link.namespace
 
@@ -394,7 +395,8 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     def text(self):
         """Return the current (edited) wikitext, loading it if necessary.
 
-        @return: unicode
+        @return: text of the page
+        @rtype: unicode
         """
         if not hasattr(self, '_text') or self._text is None:
             try:
@@ -3567,7 +3569,8 @@ class Claim(Property):
         """
         Format the target into the proper JSON value that Wikibase wants.
 
-        @return: dict
+        @return: JSON value
+        @rtype: dict
         """
         if self.type == 'wikibase-item':
             value = {'entity-type': 'item',

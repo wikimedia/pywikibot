@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Mechanics to slow down wiki read and/or write rate.
-"""
+"""Mechanics to slow down wiki read and/or write rate."""
 #
 # (C) Pywikibot team, 2008
 #
@@ -180,7 +178,7 @@ class Throttle(object):
         return thisdelay
 
     def waittime(self, write=False):
-        """Return waiting time in seconds if a query would be made right now"""
+        """Return waiting time in seconds if a query would be made right now."""
         # Take the previous requestsize in account calculating the desired
         # delay this time
         thisdelay = self.getDelay(write=write)
