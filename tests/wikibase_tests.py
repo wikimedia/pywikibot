@@ -46,10 +46,10 @@ class TestGeneral(PywikibotTestCase):
         self.assertIsInstance(item, pywikibot.ItemPage)
         self.assertEqual(item.getID(), 'Q5296')
         self.assertEqual(item.title(), 'Q5296')
-        self.assertTrue('en' in item.labels)
+        self.assertIn('en', item.labels)
         self.assertTrue(item.labels['en'].lower().endswith('main page'))
-        self.assertTrue('en' in item.aliases)
-        self.assertTrue('HomePage' in item.aliases['en'])
+        self.assertIn('en', item.aliases)
+        self.assertIn('HomePage', item.aliases['en'])
         self.assertEqual(item.namespace(), 0)
         item2 = pywikibot.ItemPage(repo, 'q5296')
         self.assertEqual(item2.getID(), 'Q5296')
@@ -160,30 +160,30 @@ class TestItemLoad(PywikibotTestCase):
     """
     def test_item_normal(self):
         item = pywikibot.ItemPage(wikidata, 'Q60')
-        self.assertEquals(item._link._title, 'Q60')
-        self.assertEquals(item.id, 'Q60')
-        self.assertEquals(hasattr(item, '_title'), False)
-        self.assertEquals(hasattr(item, '_site'), False)
-        self.assertEquals(item.title(), 'Q60')
-        self.assertEquals(item.getID(), 'Q60')
-        self.assertEquals(item.getID(numeric=True), 60)
-        self.assertEquals(hasattr(item, '_content'), False)
+        self.assertEqual(item._link._title, 'Q60')
+        self.assertEqual(item.id, 'Q60')
+        self.assertEqual(hasattr(item, '_title'), False)
+        self.assertEqual(hasattr(item, '_site'), False)
+        self.assertEqual(item.title(), 'Q60')
+        self.assertEqual(item.getID(), 'Q60')
+        self.assertEqual(item.getID(numeric=True), 60)
+        self.assertEqual(hasattr(item, '_content'), False)
         item.get()
-        self.assertEquals(hasattr(item, '_content'), True)
+        self.assertEqual(hasattr(item, '_content'), True)
 
     def test_load_item_set_id(self):
         """Test setting item.id attribute on empty item."""
         item = pywikibot.ItemPage(wikidata, '-1')
-        self.assertEquals(item._link._title, '-1')
+        self.assertEqual(item._link._title, '-1')
         item.id = 'Q60'
-        self.assertEquals(hasattr(item, '_content'), False)
-        self.assertEquals(item.getID(), 'Q60')
-        self.assertEquals(hasattr(item, '_content'), False)
+        self.assertEqual(hasattr(item, '_content'), False)
+        self.assertEqual(item.getID(), 'Q60')
+        self.assertEqual(hasattr(item, '_content'), False)
         item.get()
-        self.assertEquals(hasattr(item, '_content'), True)
-        self.assertTrue('en' in item.labels)
-        self.assertEquals(item.labels['en'], 'New York City')
-        self.assertEquals(item.title(), 'Q60')
+        self.assertEqual(hasattr(item, '_content'), True)
+        self.assertIn('en', item.labels)
+        self.assertEqual(item.labels['en'], 'New York City')
+        self.assertEqual(item.title(), 'Q60')
 
     def test_reuse_item_set_id(self):
         """
@@ -195,19 +195,19 @@ class TestItemLoad(PywikibotTestCase):
         """
         item = pywikibot.ItemPage(wikidata, 'Q60')
         item.get()
-        self.assertEquals(item.labels['en'], 'New York City')
+        self.assertEqual(item.labels['en'], 'New York City')
 
         # When the id attribute is modified, the ItemPage goes into
         # an inconsistent state.
         item.id = 'Q5296'
         # The title is updated correctly
-        self.assertEquals(item.title(), 'Q5296')
+        self.assertEqual(item.title(), 'Q5296')
 
         # This del has no effect on the test; it is here to demonstrate that
         # it doesnt help to clear this piece of saved state.
         del item._content
         # The labels are not updated; assertion showing undesirable behaviour:
-        self.assertEquals(item.labels['en'], 'New York City')
+        self.assertEqual(item.labels['en'], 'New York City')
         # TODO: This is the assertion that this test should be using:
         # self.assertTrue(item.labels['en'].lower().endswith('main page'))
 
@@ -224,13 +224,13 @@ class TestItemLoad(PywikibotTestCase):
                 ucfirst_title = title[0].upper() + title[1:]
             else:
                 ucfirst_title = title
-            self.assertEquals(item._link._title, ucfirst_title)
-            self.assertEquals(item.id, title.upper())
-            self.assertEquals(item.title(), title.upper())
-            self.assertEquals(hasattr(item, '_content'), False)
+            self.assertEqual(item._link._title, ucfirst_title)
+            self.assertEqual(item.id, title.upper())
+            self.assertEqual(item.title(), title.upper())
+            self.assertEqual(hasattr(item, '_content'), False)
             self.assertRaises(exception, item.get)
-            self.assertEquals(hasattr(item, '_content'), False)
-            self.assertEquals(item.title(), title.upper())
+            self.assertEqual(hasattr(item, '_content'), False)
+            self.assertEqual(item.title(), title.upper())
 
         check('', KeyError)
 
@@ -240,57 +240,57 @@ class TestItemLoad(PywikibotTestCase):
     def test_item_untrimmed_title(self):
         # spaces in the title cause an error
         item = pywikibot.ItemPage(wikidata, ' Q60 ')
-        self.assertEquals(item._link._title, 'Q60')
-        self.assertEquals(item.title(), ' Q60 ')
+        self.assertEqual(item._link._title, 'Q60')
+        self.assertEqual(item.title(), ' Q60 ')
         self.assertRaises(APIError, item.get)
 
     def test_item_missing(self):
         # this item is deleted
         item = pywikibot.ItemPage(wikidata, 'Q404')
-        self.assertEquals(item._link._title, 'Q404')
-        self.assertEquals(item.title(), 'Q404')
-        self.assertEquals(hasattr(item, '_content'), False)
-        self.assertEquals(item.id, 'Q404')
-        self.assertEquals(item.getID(), 'Q404')
-        self.assertEquals(item.getID(numeric=True), 404)
-        self.assertEquals(hasattr(item, '_content'), False)
+        self.assertEqual(item._link._title, 'Q404')
+        self.assertEqual(item.title(), 'Q404')
+        self.assertEqual(hasattr(item, '_content'), False)
+        self.assertEqual(item.id, 'Q404')
+        self.assertEqual(item.getID(), 'Q404')
+        self.assertEqual(item.getID(numeric=True), 404)
+        self.assertEqual(hasattr(item, '_content'), False)
         self.assertRaises(pywikibot.NoPage, item.get)
-        self.assertEquals(hasattr(item, '_content'), True)
-        self.assertEquals(item._link._title, 'Q404')
-        self.assertEquals(item.title(), 'Q404')
-        self.assertEquals(item.exists(), False)
+        self.assertEqual(hasattr(item, '_content'), True)
+        self.assertEqual(item._link._title, 'Q404')
+        self.assertEqual(item.title(), 'Q404')
+        self.assertEqual(item.exists(), False)
 
     def test_fromPage_noprops(self):
         page = pywikibot.Page(pywikibot.page.Link("New York City", site))
         item = pywikibot.ItemPage.fromPage(page)
-        self.assertEquals(item._link._title, 'Null')  # not good
-        self.assertEquals(hasattr(item, 'id'), False)
-        self.assertEquals(hasattr(item, '_content'), False)
-        self.assertEquals(item.title(), 'Q60')
-        self.assertEquals(hasattr(item, '_content'), True)
-        self.assertEquals(item.id, 'Q60')
-        self.assertEquals(item.getID(), 'Q60')
-        self.assertEquals(item.getID(numeric=True), 60)
+        self.assertEqual(item._link._title, 'Null')  # not good
+        self.assertEqual(hasattr(item, 'id'), False)
+        self.assertEqual(hasattr(item, '_content'), False)
+        self.assertEqual(item.title(), 'Q60')
+        self.assertEqual(hasattr(item, '_content'), True)
+        self.assertEqual(item.id, 'Q60')
+        self.assertEqual(item.getID(), 'Q60')
+        self.assertEqual(item.getID(numeric=True), 60)
         item.get()
-        self.assertEquals(item.exists(), True)
+        self.assertEqual(item.exists(), True)
 
     def test_fromPage_props(self):
         page = pywikibot.Page(pywikibot.page.Link("New York City", site))
         # fetch page properties
         page.properties()
         item = pywikibot.ItemPage.fromPage(page)
-        self.assertEquals(item._link._title, 'Q60')
-        self.assertEquals(item.id, 'Q60')
-        self.assertEquals(hasattr(item, '_content'), False)
-        self.assertEquals(item.title(), 'Q60')
-        self.assertEquals(hasattr(item, '_content'), False)
-        self.assertEquals(item.id, 'Q60')
-        self.assertEquals(item.getID(), 'Q60')
-        self.assertEquals(item.getID(numeric=True), 60)
-        self.assertEquals(hasattr(item, '_content'), False)
+        self.assertEqual(item._link._title, 'Q60')
+        self.assertEqual(item.id, 'Q60')
+        self.assertEqual(hasattr(item, '_content'), False)
+        self.assertEqual(item.title(), 'Q60')
+        self.assertEqual(hasattr(item, '_content'), False)
+        self.assertEqual(item.id, 'Q60')
+        self.assertEqual(item.getID(), 'Q60')
+        self.assertEqual(item.getID(numeric=True), 60)
+        self.assertEqual(hasattr(item, '_content'), False)
         item.get()
-        self.assertEquals(hasattr(item, '_content'), True)
-        self.assertEquals(item.exists(), True)
+        self.assertEqual(hasattr(item, '_content'), True)
+        self.assertEqual(item.exists(), True)
 
     def test_fromPage_invalid_title(self):
         page = pywikibot.Page(pywikibot.page.Link("[]", site))
@@ -313,15 +313,15 @@ class TestItemLoad(PywikibotTestCase):
                     page.properties()
 
                 item = pywikibot.ItemPage.fromPage(page)
-                self.assertEquals(hasattr(item, 'id'), False)
-                self.assertEquals(hasattr(item, '_title'), True)
-                self.assertEquals(hasattr(item, '_site'), True)
-                self.assertEquals(hasattr(item, '_content'), False)
+                self.assertEqual(hasattr(item, 'id'), False)
+                self.assertEqual(hasattr(item, '_title'), True)
+                self.assertEqual(hasattr(item, '_site'), True)
+                self.assertEqual(hasattr(item, '_content'), False)
 
-                self.assertEquals(item._link._title, 'Null')
+                self.assertEqual(item._link._title, 'Null')
                 # the method 'exists' does not raise an exception
                 if method == 'exists':
-                    self.assertEquals(item.exists(), False)
+                    self.assertEqual(item.exists(), False)
                 else:
                     self.assertRaises(pywikibot.NoPage, getattr(item, method))
 
@@ -333,11 +333,11 @@ class TestItemLoad(PywikibotTestCase):
                 # local data is modified in this scenario.  This case is
                 # separately tested in test_fromPage_missing_lazy.
                 if link.title != 'Test page':
-                    self.assertEquals(item._link._title, '-1')
+                    self.assertEqual(item._link._title, '-1')
 
-                self.assertEquals(hasattr(item, '_content'), True)
+                self.assertEqual(hasattr(item, '_content'), True)
 
-                self.assertEquals(item.exists(), False)
+                self.assertEqual(item.exists(), False)
 
     def test_fromPage_redirect(self):
         # this is a redirect, and should not have a wikidata item
@@ -378,29 +378,29 @@ class TestPropertyPage(PywikibotTestCase):
 
     def test_globe_coordinate(self):
         property_page = pywikibot.PropertyPage(wikidata, 'P625')
-        self.assertEquals(property_page.type, 'globe-coordinate')
-        self.assertEquals(property_page.getType(), 'globecoordinate')
+        self.assertEqual(property_page.type, 'globe-coordinate')
+        self.assertEqual(property_page.getType(), 'globecoordinate')
 
         claim = pywikibot.Claim(wikidata, 'P625')
-        self.assertEquals(claim.type, 'globe-coordinate')
-        self.assertEquals(claim.getType(), 'globecoordinate')
+        self.assertEqual(claim.type, 'globe-coordinate')
+        self.assertEqual(claim.getType(), 'globecoordinate')
 
 
 class TestClaimSetValue(PywikibotTestCase):
 
     def test_set_website(self):
         claim = pywikibot.Claim(wikidata, 'P856')
-        self.assertEquals(claim.type, 'url')
+        self.assertEqual(claim.type, 'url')
         claim.setTarget('https://en.wikipedia.org/')
-        self.assertEquals(claim.target, 'https://en.wikipedia.org/')
+        self.assertEqual(claim.target, 'https://en.wikipedia.org/')
 
     def test_set_date(self):
         claim = pywikibot.Claim(wikidata, 'P569')
-        self.assertEquals(claim.type, 'time')
+        self.assertEqual(claim.type, 'time')
         claim.setTarget(pywikibot.WbTime(year=2001, month=1, day=1, site=wikidata))
-        self.assertEquals(claim.target.year, 2001)
-        self.assertEquals(claim.target.month, 1)
-        self.assertEquals(claim.target.day, 1)
+        self.assertEqual(claim.target.year, 2001)
+        self.assertEqual(claim.target.month, 1)
+        self.assertEqual(claim.target.day, 1)
 
     def test_set_incorrect_target_value(self):
         claim = pywikibot.Claim(wikidata, 'P569')
@@ -417,8 +417,8 @@ class TestPageMethods(PywikibotTestCase):
         self.wdp = pywikibot.ItemPage(wikidatatest, 'Q6')
         self.assertRaises(pywikibot.PageNotSaved, self.wdp.save)
         self.wdp.previousRevision()
-        self.assertEquals(self.wdp.langlinks(), [])
-        self.assertEquals(self.wdp.templates(), [])
+        self.assertEqual(self.wdp.langlinks(), [])
+        self.assertEqual(self.wdp.templates(), [])
         self.assertFalse(self.wdp.isCategoryRedirect())
         self.wdp.templatesWithParams()
 
@@ -436,14 +436,14 @@ class TestLinks(PywikibotTestCase):
 
     def test_iterlinks_page_object(self):
         page = [pg for pg in self.wdp.iterlinks() if pg.site.language() == 'af'][0]
-        self.assertEquals(page, pywikibot.Page(pywikibot.Site('af', 'wikipedia'), u'New York Stad'))
+        self.assertEqual(page, pywikibot.Page(pywikibot.Site('af', 'wikipedia'), u'New York Stad'))
 
     def test_iterlinks_filtering(self):
         wikilinks = list(self.wdp.iterlinks('wikipedia'))
         wvlinks = list(self.wdp.iterlinks('wikivoyage'))
 
-        self.assertEquals(len(wikilinks), 3)
-        self.assertEquals(len(wvlinks), 2)
+        self.assertEqual(len(wikilinks), 3)
+        self.assertEqual(len(wvlinks), 2)
 
 
 class TestWriteNormalizeLang(PywikibotTestCase):
@@ -462,12 +462,12 @@ class TestWriteNormalizeLang(PywikibotTestCase):
         lang_in = {self.site: 'foo'}
 
         response = WikibasePage._normalizeLanguages(lang_in)
-        self.assertEquals(response, self.lang_out)
+        self.assertEqual(response, self.lang_out)
 
     def test_normalized_lang(self):
         response = WikibasePage._normalizeData(
             copy.deepcopy(self.lang_out))
-        self.assertEquals(response, self.lang_out)
+        self.assertEqual(response, self.lang_out)
 
 
 class TestWriteNormalizeData(PywikibotTestCase):
@@ -501,12 +501,12 @@ class TestWriteNormalizeData(PywikibotTestCase):
                    }
 
         response = WikibasePage._normalizeData(data_in)
-        self.assertEquals(response, self.data_out)
+        self.assertEqual(response, self.data_out)
 
     def test_normalized_data(self):
         response = WikibasePage._normalizeData(
             copy.deepcopy(self.data_out))
-        self.assertEquals(response, self.data_out)
+        self.assertEqual(response, self.data_out)
 
 
 if __name__ == '__main__':
