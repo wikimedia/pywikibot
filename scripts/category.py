@@ -887,15 +887,17 @@ class CategoryTidyRobot:
     def run(self):
         cat = pywikibot.Category(self.site, self.catTitle)
 
-        if cat.categoryinfo['pages'] == 0:
-            pywikibot.output(u'There are no articles in category %s'
+        empty = True
+        preloadingGen = pagegenerators.PreloadingGenerator(cat.articles())
+        for article in preloadingGen:
+            empty = False
+            pywikibot.output('')
+            pywikibot.output(u'=' * 67)
+            self.move_to_category(article, cat, cat)
+
+        if empty:
+            pywikibot.output(u'There are no articles or files in category %s'
                              % self.catTitle)
-        else:
-            preloadingGen = pagegenerators.PreloadingGenerator(cat.articles())
-            for article in preloadingGen:
-                pywikibot.output('')
-                pywikibot.output(u'=' * 67)
-                self.move_to_category(article, cat, cat)
 
 
 class CategoryTreeRobot:
