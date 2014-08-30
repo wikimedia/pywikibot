@@ -45,9 +45,11 @@ import urlparse
 import tempfile
 import re
 import math
+
 import pywikibot
 import pywikibot.data.api
 from pywikibot import config
+from pywikibot.bot import QuitKeyboardInterrupt
 
 
 class UploadRobot:
@@ -79,9 +81,7 @@ class UploadRobot:
         self.uploadByUrl = uploadByUrl
 
     def urlOK(self):
-        """Return true if self.url looks like an URL or an existing local file.
-
-        """
+        """Return True if self.url is an URL or an existing local file."""
         return "://" in self.url or os.path.exists(self.url)
 
     def read_file_content(self):
@@ -102,7 +102,8 @@ class UploadRobot:
             infile = uo.open(self.url)
 
             if 'text/html' in infile.info().getheader('Content-Type'):
-                pywikibot.output(u"Couldn't download the image: the requested URL was not found on server.")
+                pywikibot.output(u"Couldn't download the image: "
+                                 "the requested URL was not found on server.")
                 return
 
             content_len = infile.info().getheader('Content-Length')
@@ -134,7 +135,7 @@ class UploadRobot:
                         dt += 60
             else:
                 pywikibot.log(
-                    u"WARNING: No check length to retrieved data is possible.")
+                    u"WARNING: length check of retrieved data not possible.")
         handle, tempname = tempfile.mkstemp()
         t = os.fdopen(handle, "wb")
         t.write(_contents)
@@ -174,7 +175,8 @@ class UploadRobot:
                 invalid = set(forbidden) & set(newfn)
                 if invalid:
                     c = "".join(invalid)
-                    pywikibot.output("Invalid character(s): %s. Please try again" % c)
+                    pywikibot.output(
+                        'Invalid character(s): %s. Please try again' % c)
                     continue
                 if ext not in allowed_formats:
                     choice = pywikibot.inputChoice(
@@ -187,20 +189,34 @@ class UploadRobot:
             if newfn != '':
                 filename = newfn
         # A proper description for the submission.
-        pywikibot.output(u"The suggested description is:")
-        pywikibot.output(self.description)
-        if self.verifyDescription:
-            newDescription = u''
-            choice = pywikibot.inputChoice(
-                u'Do you want to change this description?',
-                ['Yes', 'No'], ['y', 'N'], 'n')
-            if choice == 'y':
-                from pywikibot import editor as editarticle
-                editor = editarticle.TextEditor()
-                newDescription = editor.edit(self.description)
-            # if user saved / didn't press Cancel
-            if newDescription:
-                self.description = newDescription
+        # Empty descriptions are not accepted.
+        pywikibot.output(u'The suggested description is:\n%s'
+                         % self.description)
+
+        while not self.description or self.verifyDescription:
+            if not self.description:
+                pywikibot.output(
+                    u'\03{lightred}It is not possible to upload a file '
+                    'without a summary/description.\03{default}')
+
+            if not self.description or self.verifyDescription:
+                newDescription = u''
+                # if no description, default is 'yes'
+                default = 'y' if not self.description else 'n'
+                choice = pywikibot.inputChoice(
+                    u'Do you want to change this description?',
+                    ['Yes', 'No', 'Quit'], ['y', 'n', 'q'], default)
+                if choice == 'y':
+                    from pywikibot import editor as editarticle
+                    editor = editarticle.TextEditor()
+                    newDescription = editor.edit(self.description)
+                elif choice == 'q':
+                    raise QuitKeyboardInterrupt
+                # if user saved / didn't press Cancel
+                if newDescription:
+                    self.description = newDescription
+                    break
+
         return filename
 
     def abort_on_warn(self, warn_code):
@@ -240,7 +256,8 @@ class UploadRobot:
                             chunk_size=self.chunk_size)
 
         except pywikibot.data.api.UploadWarning as warn:
-            pywikibot.output(u"We got a warning message: {0}".format(warn.message))
+            pywikibot.output(
+                u'We got a warning message: {0}'.format(warn.message))
             if self.abort_on_warn(warn.code):
                 answer = "N"
             else:
@@ -258,7 +275,7 @@ class UploadRobot:
             pywikibot.error("Upload error: ", exc_info=True)
 
         else:
-            #No warning, upload complete.
+            # No warning, upload complete.
             pywikibot.output(u"Upload successful.")
             return filename  # data['filename']
 
@@ -280,7 +297,8 @@ def main(*args):
     verifyDescription = True
     aborts = set()
     chunk_size = 0
-    chunk_size_regex = re.compile(r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
+    chunk_size_regex = r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$'
+    chunk_size_regex = re.compile(chunk_size_regex, re.I)
 
     # process all global bot args
     # returns a list of non-global args, i.e. args for upload.py
