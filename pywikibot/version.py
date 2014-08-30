@@ -143,7 +143,8 @@ def getversion_git(path=None):
         # some windows git versions provide git.cmd instead of git.exe
         cmd = 'git.cmd'
 
-    tag = open(os.path.join(_program_dir, '.git/config'), 'r').read()
+    with open(os.path.join(_program_dir, '.git/config'), 'r') as f:
+        tag = f.read()
     # Try 'origin' and then 'gerrit' as remote name; bail if can't find either.
     remote_pos = tag.find('[remote "origin"]')
     if remote_pos == -1:
@@ -213,10 +214,11 @@ def getfileversion(filename):
     mtime = None
     fn = os.path.join(_program_dir, filename)
     if os.path.exists(fn):
-        for line in open(fn, 'r').readlines():
-            if line.find('__version__') == 0:
-                exec(line)
-                break
+        with open(fn, 'r') as f:
+            for line in f.readlines():
+                if line.find('__version__') == 0:
+                    exec(line)
+                    break
         stat = os.stat(fn)
         mtime = datetime.datetime.fromtimestamp(stat.st_mtime).isoformat(' ')
     if mtime and __version__:
