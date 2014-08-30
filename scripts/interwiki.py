@@ -2516,8 +2516,8 @@ def main():
             namespaces = []
         else:
             ns = 'all'
-        hintlessPageGen = pagegenerators.NewpagesPageGenerator(newPages,
-                                                               namespace=ns)
+        hintlessPageGen = pagegenerators.NewpagesPageGenerator(total=newPages,
+                                                               namespaces=ns)
 
     elif optRestore or optContinue or globalvar.restoreAll:
         dumpFileName = pywikibot.config.datafilepath(
