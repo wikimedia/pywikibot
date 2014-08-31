@@ -24,22 +24,22 @@ class XmlReaderTestCase(NoSiteTestCase):
                  xmlreader.XmlDump(os.path.join(self.path, 'data',
                                                 "article-pear.xml"),
                                    allrevisions=True).parse()]
-        self.assertEquals(4, len(pages))
-        self.assertEquals(u"Automated conversion", pages[0].comment)
-        self.assertEquals(u"Pear", pages[0].title)
-        self.assertEquals(u"24278", pages[0].id)
+        self.assertEqual(4, len(pages))
+        self.assertEqual(u"Automated conversion", pages[0].comment)
+        self.assertEqual(u"Pear", pages[0].title)
+        self.assertEqual(u"24278", pages[0].id)
         self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
-        self.assertEquals(u"Quercusrobur", pages[1].username)
-        self.assertEquals(u"Pear", pages[0].title)
+        self.assertEqual(u"Quercusrobur", pages[1].username)
+        self.assertEqual(u"Pear", pages[0].title)
 
     def test_XmlDumpFirstRev(self):
         pages = [r for r in
                  xmlreader.XmlDump(os.path.join(self.path, 'data',
                                                 "article-pear.xml")).parse()]
-        self.assertEquals(1, len(pages))
-        self.assertEquals(u"Automated conversion", pages[0].comment)
-        self.assertEquals(u"Pear", pages[0].title)
-        self.assertEquals(u"24278", pages[0].id)
+        self.assertEqual(1, len(pages))
+        self.assertEqual(u"Automated conversion", pages[0].comment)
+        self.assertEqual(u"Pear", pages[0].title)
+        self.assertEqual(u"24278", pages[0].id)
         self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
         self.assertTrue(not pages[0].isredirect)
 

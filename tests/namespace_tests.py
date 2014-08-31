@@ -84,19 +84,19 @@ class TestNamespaceObject(NoSiteTestCase):
         y = Namespace(id=6, custom_name=u'dummy', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'], **kwargs)
 
-        self.assertEquals(y.id, 6)
-        self.assertEquals(y.custom_name, u'dummy')
-        self.assertEquals(y.canonical_name, u'File')
+        self.assertEqual(y.id, 6)
+        self.assertEqual(y.custom_name, u'dummy')
+        self.assertEqual(y.canonical_name, u'File')
 
-        self.assertNotEquals(y.custom_name, u'Dummy')
-        self.assertNotEquals(y.canonical_name, u'file')
+        self.assertNotEqual(y.custom_name, u'Dummy')
+        self.assertNotEqual(y.canonical_name, u'file')
 
         self.assertIn(u'Image', y.aliases)
         self.assertIn(u'Immagine', y.aliases)
 
-        self.assertEquals(len(y), 4)
-        self.assertEquals(list(y), ['dummy', u'File', u'Image', u'Immagine'])
-        self.assertEquals(y.case, u'first-letter')
+        self.assertEqual(len(y), 4)
+        self.assertEqual(list(y), ['dummy', u'File', u'Image', u'Immagine'])
+        self.assertEqual(y.case, u'first-letter')
 
     def testNamespaceNameCase(self):
         """Namespace names are always case-insensitive."""
@@ -115,30 +115,30 @@ class TestNamespaceObject(NoSiteTestCase):
     def testNamespaceToString(self):
         ns = Namespace.builtin_namespaces(use_image_name=False)
 
-        self.assertEquals(str(ns[0]), ':')
-        self.assertEquals(str(ns[1]), 'Talk:')
-        self.assertEquals(str(ns[6]), ':File:')
+        self.assertEqual(str(ns[0]), ':')
+        self.assertEqual(str(ns[1]), 'Talk:')
+        self.assertEqual(str(ns[6]), ':File:')
 
-        self.assertEquals(unicode(ns[0]), u':')
-        self.assertEquals(unicode(ns[1]), u'Talk:')
-        self.assertEquals(unicode(ns[6]), u':File:')
+        self.assertEqual(unicode(ns[0]), u':')
+        self.assertEqual(unicode(ns[1]), u'Talk:')
+        self.assertEqual(unicode(ns[6]), u':File:')
 
         kwargs = {u'case': u'first-letter'}
         y = Namespace(id=6, custom_name=u'ملف', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'], **kwargs)
 
         if sys.version_info[0] == 2:
-            self.assertEquals(str(y), ':File:')
-            self.assertEquals(unicode(y), u':ملف:')
+            self.assertEqual(str(y), ':File:')
+            self.assertEqual(unicode(y), u':ملف:')
         else:
-            self.assertEquals(str(y), u':ملف:')
+            self.assertEqual(str(y), u':ملف:')
 
     def testNamespaceCompare(self):
         a = Namespace(id=0, canonical_name=u'')
 
-        self.assertEquals(a, 0)
-        self.assertEquals(a, '')
-        self.assertEquals(a, None)
+        self.assertEqual(a, 0)
+        self.assertEqual(a, '')
+        self.assertEqual(a, None)
 
         x = Namespace(id=6, custom_name=u'dummy', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'])
@@ -147,23 +147,23 @@ class TestNamespaceObject(NoSiteTestCase):
         z = Namespace(id=7, custom_name=u'dummy', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'])
 
-        self.assertEquals(x, x)
-        self.assertEquals(x, y)
-        self.assertNotEquals(x, a)
-        self.assertNotEquals(x, z)
+        self.assertEqual(x, x)
+        self.assertEqual(x, y)
+        self.assertNotEqual(x, a)
+        self.assertNotEqual(x, z)
 
-        self.assertEquals(x, 6)
-        self.assertEquals(x, u'dummy')
-        self.assertEquals(x, u'Dummy')
-        self.assertEquals(x, u'file')
-        self.assertEquals(x, u'File')
-        self.assertEquals(x, u':File')
-        self.assertEquals(x, u':File:')
-        self.assertEquals(x, u'File:')
-        self.assertEquals(x, u'image')
-        self.assertEquals(x, u'Image')
+        self.assertEqual(x, 6)
+        self.assertEqual(x, u'dummy')
+        self.assertEqual(x, u'Dummy')
+        self.assertEqual(x, u'file')
+        self.assertEqual(x, u'File')
+        self.assertEqual(x, u':File')
+        self.assertEqual(x, u':File:')
+        self.assertEqual(x, u'File:')
+        self.assertEqual(x, u'image')
+        self.assertEqual(x, u'Image')
 
-        self.assertEquals(y, u'ملف')
+        self.assertEqual(y, u'ملف')
 
         # FIXME: Namespace is missing operators required for py3
         if sys.version_info[0] > 2:
@@ -174,48 +174,48 @@ class TestNamespaceObject(NoSiteTestCase):
         self.assertTrue(z > x)
 
     def testNamespaceNormalizeName(self):
-        self.assertEquals(Namespace.normalize_name(u'File'), u'File')
-        self.assertEquals(Namespace.normalize_name(u':File'), u'File')
-        self.assertEquals(Namespace.normalize_name(u'File:'), u'File')
-        self.assertEquals(Namespace.normalize_name(u':File:'), u'File')
+        self.assertEqual(Namespace.normalize_name(u'File'), u'File')
+        self.assertEqual(Namespace.normalize_name(u':File'), u'File')
+        self.assertEqual(Namespace.normalize_name(u'File:'), u'File')
+        self.assertEqual(Namespace.normalize_name(u':File:'), u'File')
 
-        self.assertEquals(Namespace.normalize_name(u''), u'')
+        self.assertEqual(Namespace.normalize_name(u''), u'')
 
-        self.assertEquals(Namespace.normalize_name(u':'), False)
-        self.assertEquals(Namespace.normalize_name(u'::'), False)
-        self.assertEquals(Namespace.normalize_name(u':::'), False)
-        self.assertEquals(Namespace.normalize_name(u':File::'), False)
-        self.assertEquals(Namespace.normalize_name(u'::File:'), False)
-        self.assertEquals(Namespace.normalize_name(u'::File::'), False)
+        self.assertEqual(Namespace.normalize_name(u':'), False)
+        self.assertEqual(Namespace.normalize_name(u'::'), False)
+        self.assertEqual(Namespace.normalize_name(u':::'), False)
+        self.assertEqual(Namespace.normalize_name(u':File::'), False)
+        self.assertEqual(Namespace.normalize_name(u'::File:'), False)
+        self.assertEqual(Namespace.normalize_name(u'::File::'), False)
 
     def test_repr(self):
         a = Namespace(id=0, canonical_name=u'Foo')
         s = repr(a)
         r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[])" \
             % (unicode('Foo'), unicode('Foo'))
-        self.assertEquals(s, r)
+        self.assertEqual(s, r)
 
         a.info['defaultcontentmodel'] = 'bar'
         r = {'defaultcontentmodel': 'bar'}
-        self.assertEquals(a.info, r)
+        self.assertEqual(a.info, r)
 
         s = repr(a)
         r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], defaultcontentmodel='bar')" \
             % (unicode('Foo'), unicode('Foo'))
-        self.assertEquals(s, r)
+        self.assertEqual(s, r)
 
         a.info['case'] = 'upper'
         r = {'defaultcontentmodel': 'bar', 'case': 'upper'}
-        self.assertEquals(a.info, r)
+        self.assertEqual(a.info, r)
 
         s = repr(a)
         r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], case='upper', defaultcontentmodel='bar')" \
             % (unicode('Foo'), unicode('Foo'))
-        self.assertEquals(s, r)
+        self.assertEqual(s, r)
 
         b = eval(repr(a))
-        self.assertEquals(a, b)
-        self.assertEquals(a.info, b.info)
+        self.assertEqual(a, b)
+        self.assertEqual(a.info, b.info)
 
 
 if __name__ == '__main__':

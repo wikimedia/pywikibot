@@ -245,8 +245,8 @@ class TestApiSlowFunctions(NoSiteTestCase):
 
         self.assertTrue(os.path.exists(cacheFile))
 
-        self.assertTrue('status' in data)
-        self.assertTrue('items' in data)
+        self.assertIn('status', data)
+        self.assertIn('items', data)
 
         t1 = time.time()
         data = w.query(q)

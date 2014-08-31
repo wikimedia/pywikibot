@@ -347,7 +347,7 @@ class TestPageObject(PywikibotTestCase):
             self.assertIsInstance(p, pywikibot.Link)
         for p2 in mainpage.interwiki(expand=False):
             self.assertIsInstance(p2, pywikibot.Link)
-            self.assertTrue(p2 in iw)
+            self.assertIn(p2, iw)
         for p in mainpage.langlinks():
             self.assertIsInstance(p, pywikibot.Link)
         for p in mainpage.imagelinks():
