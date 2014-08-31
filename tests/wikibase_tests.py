@@ -371,6 +371,22 @@ class TestItemLoad(PywikibotTestCase):
         self.assertRaisesRegexp(pywikibot.NoPage, 'Test page', item.get)
 
 
+class TestRedirects(PywikibotTestCase):
+
+    """Test redirect and non-redirect items."""
+
+    def test_normal_item(self):
+        item = pywikibot.ItemPage(wikidata, 'Q1')
+        self.assertFalse(item.isRedirectPage())
+        self.assertRaises(pywikibot.IsNotRedirectPage, item.getRedirectTarget)
+
+    def test_redirect_item(self):
+        item = pywikibot.ItemPage(wikidata, 'Q10008448')
+        target = pywikibot.ItemPage(wikidata, 'Q8422626')
+        self.assertTrue(item.isRedirectPage())
+        self.assertEqual(item.getRedirectTarget(), target)
+
+
 class TestPropertyPage(PywikibotTestCase):
 
     def test_property_empty_property(self):

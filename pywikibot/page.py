@@ -2616,7 +2616,6 @@ class WikibasePage(Page):
             raise TypeError("site must be a pywikibot.site.DataSite object")
         Page.__init__(self, site, title, **kwargs)
         self.repo = self.site
-        self._isredir = False  # Wikibase pages cannot be a redirect
 
     def title(self, **kwargs):
         """ Page title.
