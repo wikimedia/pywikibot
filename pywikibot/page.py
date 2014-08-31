@@ -2121,9 +2121,8 @@ class Category(Page):
 
     def isEmptyCategory(self):
         """Return True if category has no members (including subcategories)."""
-        for member in self.site.categorymembers(self, total=1):
-            return False
-        return True
+        ci = self.categoryinfo
+        return sum(ci[k] for k in ['files', 'pages', 'subcats']) == 0
 
     def isHiddenCategory(self):
         """Return True if the category is hidden."""
