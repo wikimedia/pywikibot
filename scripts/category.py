@@ -377,7 +377,7 @@ Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
             return
         # store old text, so we don't have reload it every time
         old_text = text
-        cats = [c for c in page.categories()]
+        cats = textlib.getCategoryLinks(text)
         # Show the title of the page we're working on.
         # Highlight the title in purple.
         pywikibot.output(
