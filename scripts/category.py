@@ -921,7 +921,8 @@ class CategoryTidyRobot(pywikibot.Bot):
                 flag = True
             elif choice in ['j', 'J']:
                 newCatTitle = pywikibot.input(u'Please enter the category the '
-                                              u'article should be moved to:')
+                                              u'article should be moved to:',
+                                              default=None)  # require an answer
                 newCat = pywikibot.Category(pywikibot.Link('Category:' +
                                                            newCatTitle))
                 # recurse into chosen category
