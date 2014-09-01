@@ -145,7 +145,7 @@ Hallo %(admin)s,
                             from pywikibot import pagegenerators as pg
                             gen = pg.PreloadingGenerator(self.SysopGenerator())
                             for sysop in gen:
-                                print sysop.title()
+                                print(sysop.title())
 
                         talkText = talkText.replace(u'{{%s}}' % unblock_tpl,
                                                     u'{{%s|2}}' % unblock_tpl)
@@ -227,9 +227,8 @@ Hallo %(admin)s,
 
     def getInfo(self, user):
         if not self.info:
-            self.info = self.site.logpages(1, mode='block',
-                                           title=user.getUserPage().title(),
-                                           dump=True).next()
+            self.info = next(self.site.logpages(
+                1, mode='block', title=user.getUserPage().title(), dump=True))
             self.parts = {
                 'admin':    self.info['user'],
                 'user':     self.info['title'],
@@ -296,7 +295,7 @@ Hallo %(admin)s,
                         pywikibot.output(
                             u'Skipping %s because of edit conflict'
                             % (page.title()))
-                    except pywikibot.SpamfilterError, error:
+                    except pywikibot.SpamfilterError as error:
                         pywikibot.output(
                             u'Cannot change %s because of spam blacklist entry '
                             u'%s' % (page.title(), error.url))

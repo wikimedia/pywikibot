@@ -52,11 +52,11 @@ class BaseRevertBot(object):
 
     def get_contributions(self, max=500, ns=None):
         count = 0
-        iterator = iter(xrange(0))
+        iterator = pywikibot.tools.empty_iterator()
         never_continue = False
         while count != max or never_continue:
             try:
-                item = iterator.next()
+                item = next(iterator)
             except StopIteration:
                 self.log(u'Fetching new batch of contributions')
                 data = list(pywikibot.Site().usercontribs(user=self.user, namespaces=ns, total=max))

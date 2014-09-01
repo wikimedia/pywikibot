@@ -214,6 +214,8 @@ class XmlDumpPageGenerator:
             except NameError:
                 pass
 
+    __next__ = next
+
 
 class LinkChecker(object):
 
@@ -381,12 +383,12 @@ class LinkChecker(object):
         """
         try:
             wasRedirected = self.resolveRedirect(useHEAD=useHEAD)
-        except UnicodeError, error:
+        except UnicodeError as error:
             return False, u'Encoding Error: %s (%s)' % (
                 error.__class__.__name__, unicode(error))
-        except httplib.error, error:
+        except httplib.error as error:
             return False, u'HTTP Error: %s' % error.__class__.__name__
-        except socket.error, error:
+        except socket.error as error:
             # https://docs.python.org/2/library/socket.html :
             # socket.error :
             # The accompanying value is either a string telling what went
@@ -399,7 +401,7 @@ class LinkChecker(object):
                 try:
                     msg = error[1]
                 except IndexError:
-                    print u'### DEBUG information for #2972249'
+                    print(u'### DEBUG information for #2972249')
                     raise IndexError(type(error))
             # TODO: decode msg. On Linux, it's encoded in UTF-8.
             # How is it encoded in Windows? Or can we somehow just
@@ -447,16 +449,16 @@ class LinkChecker(object):
         else:
             try:
                 conn = self.getConnection()
-            except httplib.error, error:
+            except httplib.error as error:
                 return False, u'HTTP Error: %s' % error.__class__.__name__
             try:
                 conn.request('GET', '%s%s'
                              % (self.path, self.query), None, self.header)
-            except socket.error, error:
+            except socket.error as error:
                 return False, u'Socket Error: %s' % repr(error[1])
             try:
                 self.response = conn.getresponse()
-            except Exception, error:
+            except Exception as error:
                 return False, u'Error: %s' % error
             # read the server's encoding, in case we need it later
             self.readEncodingFromResponse(self.response)
@@ -706,7 +708,7 @@ class DeadLinkReportThread(threading.Thread):
                                             'weblinkchecker-summary'))
                 try:
                     talkPage.put(content, comment)
-                except pywikibot.SpamfilterError, error:
+                except pywikibot.SpamfilterError as error:
                     pywikibot.output(
                         u'\03{lightaqua}** SpamfilterError while trying to '
                         u'change %s: %s\03{default}'
@@ -770,13 +772,10 @@ class WeblinkCheckerRobot:
 def RepeatPageGenerator():
     history = History(None)
     pageTitles = set()
-    for (key, value) in history.historyDict.iteritems():
+    for value in history.historyDict.values():
         for entry in value:
-            pageTitle = entry[0]
-            pageTitles.add(pageTitle)
-    pageTitles = list(pageTitles)
-    pageTitles.sort()
-    for pageTitle in pageTitles:
+            pageTitles.add(entry[0])
+    for pageTitle in sorted(pageTitles):
         page = pywikibot.Page(pywikibot.Site(), pageTitle)
         yield page
 

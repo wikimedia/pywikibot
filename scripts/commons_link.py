@@ -50,9 +50,9 @@ class CommonsLinkBot(Bot):
         super(CommonsLinkBot, self).__init__(**kwargs)
 
         self.generator = generator
-        self.findTemplate = re.compile(ur'\{\{[Ss]isterlinks')
-        self.findTemplate2 = re.compile(ur'\{\{[Cc]ommonscat')
-        self.findTemplate3 = re.compile(ur'\{\{[Cc]ommons')
+        self.findTemplate = re.compile(r'\{\{[Ss]isterlinks')
+        self.findTemplate2 = re.compile(r'\{\{[Cc]ommonscat')
+        self.findTemplate3 = re.compile(r'\{\{[Cc]ommons')
 
     def run(self):
         if not all((self.getOption('action'), self.generator)):

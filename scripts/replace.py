@@ -598,7 +598,7 @@ def main(*args):
             fix = fixes.fixes[fix]
         except KeyError:
             pywikibot.output(u'Available predefined fixes are: %s'
-                             % fixes.fixes.keys())
+                             % ', '.join(fixes.fixes.keys()))
             return
         if "regex" in fix:
             regex = fix['regex']

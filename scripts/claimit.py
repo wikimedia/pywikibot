@@ -179,7 +179,7 @@ def main():
         elif claim.type == 'string':
             target = commandline_claims[i + 1]
         elif claim.type == 'globe-coordinate':
-            coord_args = map(float, commandline_claims[i + 1].split(','))
+            coord_args = [float(c) for c in commandline_claims[i + 1].split(',')]
             if len(coord_args) >= 3:
                 precision = coord_args[2]
             else:

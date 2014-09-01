@@ -168,7 +168,10 @@ class UI:
         self._print(text, targetStream)
 
     def _raw_input(self):
-        return raw_input()
+        if sys.version_info[0] >= 3:
+            return input()
+        else:
+            return raw_input()
 
     def input(self, question, password=False):
         """

@@ -38,9 +38,7 @@ exceptions = ['www']
 
 
 def update_family(families):
-    if not families:
-        families = familiesDict.keys()
-    for family in families:
+    for family in families or familiesDict.keys():
         pywikibot.output('\nChecking family %s:' % family)
 
         original = Family(family).languages_by_size
@@ -89,7 +87,7 @@ def update_family(families):
             family_file_name = 'pywikibot/families/%s_family.py' % family
             family_file = codecs.open(family_file_name, 'r', 'utf8')
             family_text = family_file.read()
-            old = re.findall(ur'(?msu)^ {8}self.languages_by_size.+?\]',
+            old = re.findall(r'(?msu)^ {8}self.languages_by_size.+?\]',
                              family_text)[0]
             family_text = family_text.replace(old, text)
             family_file = codecs.open(family_file_name, 'w', 'utf8')

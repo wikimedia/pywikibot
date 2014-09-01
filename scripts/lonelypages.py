@@ -65,12 +65,12 @@ template = {
 
 # Use regex to prevent to put the same template twice!
 exception_regex = {
-    'ar': [ur'\{\{(?:قالب:|)(يتيمة)[\|\}]'],
+    'ar': [u'\\{\\{(?:قالب:|)(يتيمة)[\\|\\}]'],
     'ca': [r'\{\{(?:template:|)(orfe)[\|\}]'],
     'en': [r'\{\{(?:template:|)(orphan)[\|\}]',
            r'\{\{(?:template:|)(wi)[\|\}]'],
     'it': [r'\{\{(?:template:|)(o|a)[\|\}]'],
-    'ja': [ur'\{\{(?:template:|)(孤立)[\|\}]'],
+    'ja': [u'\\{\\{(?:template:|)(孤立)[\\|\\}]'],
     'zh': [r'\{\{(?:template:|)(orphan)[\|\}]'],
 }
 

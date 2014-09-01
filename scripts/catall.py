@@ -92,8 +92,8 @@ def main():
             cats = p.categories()
             if not cats:
                 pywikibot.output(u"========== %s ==========" % p.title())
-                print "No categories"
-                print "-" * 40
+                print("No categories")
+                print("-" * 40)
                 newcats = choosecats(text)
                 if newcats != [] and newcats is not None:
                     make_categories(p, newcats, mysite)
@@ -101,7 +101,7 @@ def main():
                 pywikibot.output(u"========== %s ==========" % p.title())
                 for c in cats:
                     pywikibot.output(c.title())
-                print "-" * 40
+                print("-" * 40)
                 newcats = choosecats(text)
                 if newcats is None:
                     make_categories(p, [], mysite)

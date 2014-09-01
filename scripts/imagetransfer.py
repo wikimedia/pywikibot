@@ -174,7 +174,7 @@ class ImageTransferBot:
             # try to translate license templates
             if (sourceSite.sitename(), self.targetSite.sitename()) in licenseTemplates:
                 for old, new in licenseTemplates[(sourceSite.sitename(),
-                                                  self.targetSite.sitename())].iteritems():
+                                                  self.targetSite.sitename())].items():
                     new = '{{%s}}' % new
                     old = re.compile('{{%s}}' % old)
                     description = textlib.replaceExcept(description, old, new,
@@ -189,10 +189,10 @@ class ImageTransferBot:
                 description += "\r\n\r\n" + unicode(sourceImagePage)
         except pywikibot.NoPage:
             description = ''
-            print "Image does not exist or description page is empty."
+            print("Image does not exist or description page is empty.")
         except pywikibot.IsRedirectPage:
             description = ''
-            print "Image description page is redirect."
+            print("Image description page is redirect.")
         else:
             bot = upload.UploadRobot(url=url, description=description,
                                      targetSite=self.targetSite,
@@ -225,7 +225,7 @@ class ImageTransferBot:
         for i in range(len(imagelist)):
             image = imagelist[i]
             #sourceSite = sourceImagePage.site
-            print "-" * 60
+            print("-" * 60)
             pywikibot.output(u"%s. Found image: %s"
                              % (i, image.title(asLink=True)))
             try:
@@ -243,7 +243,7 @@ class ImageTransferBot:
                     targetImage.get(throttle=False)
                     pywikibot.output(u"Image with this name is already on %s."
                                      % self.targetSite)
-                    print "-" * 60
+                    print("-" * 60)
                     pywikibot.output(targetImage.get(throttle=False))
                     sys.exit()
                 except pywikibot.NoPage:
@@ -255,7 +255,7 @@ class ImageTransferBot:
 
             except pywikibot.NoPage:
                 break
-        print "=" * 60
+        print("=" * 60)
 
     def run(self):
         for page in self.generator:

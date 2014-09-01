@@ -95,7 +95,7 @@ class TextEditor(ScrolledText):
                    '<<undo>>': ['<Control-Key-z>', '<Control-Key-Z>'],
                    }
 
-        for event, keylist in keydefs.iteritems():
+        for event, keylist in keydefs.items():
             if keylist:
                 self.event_add(event, *keylist)
 
@@ -335,7 +335,7 @@ class EditBoxWindow(Tkinter.Frame):
         if highlight:
             self.find_all(highlight)
         if jumpIndex:
-            print jumpIndex
+            print(jumpIndex)
             # lines are indexed starting at 1
             line = text[:jumpIndex].count('\n') + 1
             column = jumpIndex - (text[:jumpIndex].rfind('\n') + 1)

@@ -78,9 +78,10 @@ class GraphDrawer:
             node.set_color('green')
             node.set_style('filled,bold')
         # if we found more than one valid page for this language:
-        if len(filter(lambda p: p.site == page.site and p.exists()
-                                and not p.isRedirectPage(),          # noqa
-                      list(self.subject.foundIn.keys()))) > 1:
+        # TODO: Only iterate through at most 2 elements
+        if len([p for p in self.subject.foundIn.keys()
+                if p.site == page.site and p.exists() and
+                not p.isRedirectPage()]) > 1:          # noqa
             # mark conflict by octagonal node
             node.set_shape('octagon')
         self.graph.add_node(node)

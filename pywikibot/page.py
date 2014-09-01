@@ -1154,7 +1154,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         if include_obsolete:
             return self._langlinks
         else:
-            return filter(lambda i: not i.site.obsolete, self._langlinks)
+            return [i for i in self._langlinks if not i.site.obsolete]
 
     def iterlanglinks(self, step=None, total=None, include_obsolete=False):
         """Iterate all inter-language links on this page.
@@ -2784,12 +2784,12 @@ class WikibasePage(Page):
             if prop not in data:
                 continue
             data[prop] = WikibasePage._normalizeLanguages(data[prop])
-            for key, value in data[prop].iteritems():
+            for key, value in data[prop].items():
                 if isinstance(value, basestring):
                     data[prop][key] = {'language': key, 'value': value}
 
         if 'aliases' in data:
-            for key, values in data['aliases'].iteritems():
+            for key, values in data['aliases'].items():
                 if (isinstance(values, list) and
                         isinstance(values[0], basestring)):
                     data['aliases'][key] = [{'language': key, 'value': value}

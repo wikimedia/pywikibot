@@ -177,7 +177,7 @@ class Query():
 
     def validateOrRaise(self, msg=None):
         if not self.validate():
-            raise(TypeError, msg)
+            raise TypeError(msg)
 
     def convertWDType(self, item):
         """
@@ -281,10 +281,12 @@ class Tree(Query):
         # check sensible things coming in, as we lose info once we do
         # type conversion
         if not self.isOrContainsOnlyTypes(item, [int, ItemPage]):
-            raise(TypeError, "The item paramter must contain or be integer IDs or page.ItemPages")
+            raise TypeError("The item paramter must contain or be integer IDs "
+                            "or page.ItemPages")
         elif (not self.isOrContainsOnlyTypes(forward, [int, PropertyPage])
                 or not self.isOrContainsOnlyTypes(reverse, [int, PropertyPage])):
-            raise(TypeError, "The forward and reverse parameters must contain or be integer IDs or page.PropertyPages")
+            raise TypeError("The forward and reverse parameters must contain "
+                            "or be integer IDs or page.PropertyPages")
 
         self.item = self.convertWDTypes(item)
         self.forward = self.convertWDTypes(forward)
@@ -383,15 +385,15 @@ def fromClaim(claim):
     """
 
     if not isinstance(claim, Claim):
-        raise(TypeError, "claim must be a page.Claim")
+        raise TypeError("claim must be a page.Claim")
 
     if claim.type == 'wikibase-item':
         return HasClaim(claim.getID(numeric=True), claim.getTarget().getID(numeric=True))
     if claim.type == 'string':
         return StringClaim(claim.getID(numeric=True), claim.getTarget())
     else:
-        raise(TypeError, "Cannot construct a query from a claim of type %s"
-                % claim.type)
+        raise TypeError("Cannot construct a query from a claim of type %s"
+                        % claim.type)
 
 
 class WikidataQuery():

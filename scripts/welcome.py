@@ -964,9 +964,8 @@ def main():
         if globalvar.randomSign and globalvar.saveSignIndex and \
            bot.welcomed_users:
             import cPickle
-            f = file(filename, 'w')
-            cPickle.dump(bot.welcomed_users, f)
-            f.close()
+            with open(filename, 'w') as f:
+                cPickle.dump(bot.welcomed_users, f)
 
 if __name__ == "__main__":
     main()

@@ -26,6 +26,13 @@ else:
 debug = warning = print
 
 
+def empty_iterator():
+    # http://stackoverflow.com/a/13243870/473890
+    """An iterator which does nothing."""
+    return
+    yield
+
+
 class UnicodeMixin(object):
 
     """Mixin class to handle defining the proper __str__/__unicode__
@@ -159,13 +166,13 @@ def itergroup(iterable, size):
     Example:
 
     >>> i = itergroup(xrange(25), 10)
-    >>> print i.next()
+    >>> print next(i)
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    >>> print i.next()
+    >>> print next(i)
     [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-    >>> print i.next()
+    >>> print next(i)
     [20, 21, 22, 23, 24]
-    >>> print i.next()
+    >>> print next(i)
     Traceback (most recent call last):
      ...
     StopIteration
@@ -247,11 +254,9 @@ class EmptyDefault(str, Mapping):
         """Initialise the default as an empty string."""
         str.__init__(self)
 
-    # http://stackoverflow.com/a/13243870/473890
     def _empty_iter(self):
-        """An iterator which does nothing."""
-        return
-        yield
+        """An iterator which does nothing and drops the argument."""
+        return empty_iterator()
 
     def __getitem__(self, key):
         """Raise always a L{CombinedError}."""
@@ -349,8 +354,8 @@ def redirect_func(target, source_module=None, target_module=None):
 
     if target_module is None:
         target_module = target.__module__
-        if hasattr(target, 'im_class'):
-            target_module += '.' + target.im_class.__name__
+        if hasattr(target, '__self__'):
+            target_module += '.' + target.__self__.__class__.__name__
     if target_module and target_module[-1] != '.':
         target_module += '.'
     if source_module is '.':
