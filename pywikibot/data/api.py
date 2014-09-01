@@ -153,7 +153,7 @@ class Request(MutableMapping):
                                  'from it.')
         else:
             self.mime = kwargs.pop('mime', False)
-        self.throttle = kwargs.pop('throttle', False)
+        self.throttle = kwargs.pop('throttle', True)
         self.max_retries = kwargs.pop("max_retries", pywikibot.config.max_retries)
         self.retry_wait = kwargs.pop("retry_wait", pywikibot.config.retry_wait)
         self.params = {}
