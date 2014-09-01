@@ -841,9 +841,10 @@ class Family(object):
         return list(self.langs.keys())
 
     def _addlang(self, code, location, namespaces={}):
-        """Add a new language to the langs and namespaces of the family.
-           This is supposed to be called in the constructor of the family.
+        """
+        Add a new language to the langs and namespaces of the family.
 
+        This is supposed to be called in the constructor of the family.
         """
         self.langs[code] = location
 #        for num, val in namespaces.items():
@@ -861,7 +862,6 @@ class Family(object):
         [[MediaWiki:Linktrail]], because the MW software currently uses a
         built-in linktrail from its message files and ignores the wiki
         value.
-
         """
         if code in self.linktrails:
             return self.linktrails[code]
@@ -919,6 +919,10 @@ class Family(object):
         """
         Can be overridden to return 'https'. Other protocols are not supported.
 
+        @param code: language code
+        @type code: string
+        @return: protocol that this family uses
+        @rtype: string
         """
         return 'http'
 
@@ -940,7 +944,6 @@ class Family(object):
         The default value is the one used on Wikimedia Foundation wikis,
         but needs to be overridden in the family file for any wiki that
         uses a different value.
-
         """
         return '/w'
 
@@ -971,21 +974,21 @@ class Family(object):
     # Which version of MediaWiki is used?
     def version(self, code):
         """ Return MediaWiki version number as a string.
-        Use LooseVersion from distutils.version to compare version strings.
 
+        Use LooseVersion from distutils.version to compare version strings.
         """
         # Here we return the latest mw release for downloading
         return '1.23.2'
 
     @deprecated("version()")
     def versionnumber(self, code):
-        """ DEPRECATED, use version() instead and use
-        distutils.version.LooseVersion to compare version strings.
+        """ DEPRECATED, use version() instead.
+
+        Use distutils.version.LooseVersion to compare version strings.
         Return an int identifying MediaWiki version.
 
         Currently this is implemented as returning the minor version
         number; i.e., 'X' in version '1.X.Y'
-
         """
         R = re.compile(r"(\d+).(\d+)")
         M = R.search(self.version(code))
@@ -995,22 +998,20 @@ class Family(object):
         return 1000 * int(M.group(1)) + int(M.group(2)) - 1000
 
     def code2encoding(self, code):
-        """Return the encoding for a specific language wiki"""
+        """Return the encoding for a specific language wiki."""
         return 'utf-8'
 
     def code2encodings(self, code):
-        """Return a list of historical encodings for a specific language
-           wiki"""
+        """Return list of historical encodings for a specific language Wiki."""
         return self.code2encoding(code),
 
     # aliases
     def encoding(self, code):
-        """Return the encoding for a specific language wiki"""
+        """Return the encoding for a specific language Wiki."""
         return self.code2encoding(code)
 
     def encodings(self, code):
-        """Return a list of historical encodings for a specific language
-           wiki"""
+        """Return list of historical encodings for a specific language Wiki."""
         return self.code2encodings(code)
 
     def __cmp__(self, otherfamily):
@@ -1028,15 +1029,8 @@ class Family(object):
     def __repr__(self):
         return 'Family("%s")' % self.name
 
-    def RversionTab(self, code):
-        """Change this to some regular expression that shows the page we
-        found is an existing page, in case the normal regexp does not work.
-
-        """
-        return None
-
     def has_query_api(self, code):
-        """Is query.php installed in the wiki?"""
+        """Check query.php installed in the wiki."""
         return False
 
     def shared_image_repository(self, code):
@@ -1050,22 +1044,32 @@ class Family(object):
     @deprecated("Site.getcurrenttime()")
     def server_time(self, code):
         """
-        DEPRECATED, use Site.getcurrenttime() instead
-        Return a datetime object representing server time"""
+        DEPRECATED, use Site.getcurrenttime() instead.
+
+        Return a datetime object representing server time.
+        """
         return pywikibot.Site(code, self).getcurrenttime()
 
     def isPublic(self, code):
-        """Does the wiki require logging in before viewing it?"""
+        """Check the wiki require logging in before viewing it."""
         return True
 
     def post_get_convert(self, site, getText):
-        """Do a conversion on the retrieved text from the wiki
-        i.e. Esperanto X-conversion """
+        """
+        Do a conversion on the retrieved text from the Wiki.
+
+        For example a X-conversion in Esperanto
+        U{https://en.wikipedia.org/wiki/Esperanto_orthography#X-system}.
+        """
         return getText
 
     def pre_put_convert(self, site, putText):
-        """Do a conversion on the text to insert on the wiki
-        i.e. Esperanto X-conversion """
+        """
+        Do a conversion on the text to insert on the Wiki.
+
+        For example a X-conversion in Esperanto
+        U{https://en.wikipedia.org/wiki/Esperanto_orthography#X-system}.
+        """
         return putText
 
 
@@ -1084,9 +1088,10 @@ class WikimediaFamily(Family):
         ]
 
     def version(self, code):
-        """Return Wikimedia projects version number as a string.
-        Use LooseVersion from distutils.version to compate versions.
+        """
+        Return Wikimedia projects version number as a string.
 
+        Use LooseVersion from distutils.version to compate versions.
         """
         # Here we return the latest mw release of wikimedia projects
         return '1.24wmf17'
