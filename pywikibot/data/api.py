@@ -220,6 +220,10 @@ class Request(MutableMapping):
     def iteritems(self):
         return iter(self.params.items())
 
+    def items(self):
+        """Return a list of tuples containg the parameters in any order."""
+        return list(self.params.items())
+
     @property
     def mime(self):
         """Return whether mime parameters are defined."""
@@ -596,10 +600,10 @@ class CachedRequest(Request):
                 max(login_status, pywikibot.site.LoginStatus.NOT_LOGGED_IN))
             user_key = repr(user_key)
 
-        return repr(self.site) + user_key + repr(sorted(self.iteritems()))
+        return repr(self.site) + user_key + repr(sorted(self.items()))
 
     def _create_file_name(self):
-        self.http_params()  # normalize self.iteritems()
+        self.http_params()  # normalize self.params
         return hashlib.sha256(
             self._uniquedescriptionstr().encode('utf-8')
         ).hexdigest()
@@ -898,7 +902,7 @@ class QueryGenerator(object):
                     else:
                         count += 1
                     # note: self.limit could be -1
-                    if self.limit > 0 and count >= self.limit:
+                    if self.limit and self.limit > 0 and count >= self.limit:
                         return
             if self.module == "random" and self.limit:
                 # "random" module does not return "query-continue"

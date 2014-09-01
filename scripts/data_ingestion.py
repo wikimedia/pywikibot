@@ -173,7 +173,7 @@ class DataIngestionBot:
                     field = field.strip()
                     value = value.strip()
                     configuration[field] = value
-        print configuration
+        print(configuration)
         return configuration
 
 
@@ -302,5 +302,5 @@ if __name__ == "__main__":
     try:
         main()
     finally:
-        print "All done!"
+        print("All done!")
 '''

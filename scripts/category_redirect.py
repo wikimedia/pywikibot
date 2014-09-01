@@ -183,14 +183,13 @@ class CategoryRedirectBot(object):
         datafile = pywikibot.config.datafilepath("%s-catmovebot-data"
                                                  % self.site.dbName())
         try:
-            inp = open(datafile, "rb")
-            record = cPickle.load(inp)
-            inp.close()
+            with open(datafile, "rb") as inp:
+                record = cPickle.load(inp)
         except IOError:
             record = {}
         if record:
-            cPickle.dump(record, open(datafile + ".bak", "wb"), -1)
-
+            with open(datafile + ".bak", "wb") as f:
+                cPickle.dump(record, f, -1)
         try:
             template_list = self.site.family.category_redirect_templates[
                 self.site.code]
@@ -390,7 +389,8 @@ class CategoryRedirectBot(object):
             except:
                 pass
 
-        cPickle.dump(record, open(datafile, "wb"), -1)
+        with open(datafile, "wb") as f:
+            cPickle.dump(record, f, -1)
 
         self.log_text.sort()
         problems.sort()

@@ -77,7 +77,7 @@ class SelflinkBot(Bot):
             return False
         try:
             linkedPage = pywikibot.Page(page.site, title=match.group('title'))
-        except pywikibot.InvalidTitle, err:
+        except pywikibot.InvalidTitle as err:
             pywikibot.warning(u'%s' % err)
             return False
 

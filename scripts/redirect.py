@@ -292,7 +292,7 @@ class RedirectGenerator:
 ##                u'Getting a list of all redirects and of all page titles...')
 ##            redirs, pageTitles = self.get_redirects_from_dump(
 ##                                            alsoGetPageTitles=True)
-##            for (key, value) in redirs.iteritems():
+##            for (key, value) in redirs.items():
 ##                if value not in pageTitles:
 ##                    yield key
 

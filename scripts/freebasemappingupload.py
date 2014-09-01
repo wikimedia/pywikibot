@@ -75,7 +75,7 @@ class FreebaseMapperRobot:
             label = data.labels['en']
         else:
             # Just pick up the first label
-            label = data.labels.values()[0]
+            label = list(data.labels.values())[0]
         pywikibot.output('Parsed: %s <--> %s' % (qid, mid))
         pywikibot.output('%s is %s' % (data.getID(), label))
         if data.claims and 'P646' in data.claims:

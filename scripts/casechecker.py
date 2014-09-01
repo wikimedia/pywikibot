@@ -358,7 +358,7 @@ class CaseChecker(object):
             return
 
         firstItem = True
-        for pageID, page in data['query']['pages'].iteritems():
+        for pageID, page in data['query']['pages'].items():
             printed = False
             title = page['title']
             self.currentTitle = title
@@ -588,7 +588,7 @@ class CaseChecker(object):
 
         if len(mapLcl) + len(mapLat) - ambigBadWordsCount < count:
             # We cannot auto-translate - offer a list of suggested words
-            suggestions = mapLcl.values() + mapLat.values()
+            suggestions = list(mapLcl.values()) + list(mapLat.values())
             if len(suggestions) > 0:
                 infoText += u", word suggestions: " + u', '.join(
                     [self.ColorCodeWord(t) for t in suggestions])
@@ -650,9 +650,9 @@ class CaseChecker(object):
             return pagesExist[0]
         elif len(pagesExist) == 0 and len(pagesRedir) > 0:
             if len(pagesRedir) == 1:
-                return pagesRedir.keys()[0]
+                return list(pagesRedir.keys())[0]
             t = None
-            for k, v in pagesRedir.iteritems():
+            for v in pagesRedir.values():
                 if not t:
                     t = v  # first item
                 elif t != v:
@@ -660,7 +660,7 @@ class CaseChecker(object):
             else:
                 # all redirects point to the same target
                 # pick the first one, doesn't matter what it is
-                return pagesRedir.keys()[0]
+                return list(pagesRedir.keys())[0]
 
         if not self.autonomous:
             pywikibot.output(u'Could not auto-decide for page %s. Which link '

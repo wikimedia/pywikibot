@@ -492,11 +492,9 @@ class DisambiguationRobot(Bot):
         return None
 
     def makeAlternativesUnique(self):
-        # remove duplicate entries
-        result = {}
-        for i in self.alternatives:
-            result[i] = None
-        self.alternatives = result.keys()
+        # remove duplicate entries stable
+        unique = set(self.alternatives)
+        self.alternatives = [alt for alt in self.alternatives if alt in unique]
 
     def listAlternatives(self):
         list = u'\n'

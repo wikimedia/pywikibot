@@ -203,6 +203,8 @@ class XmlDumpPageGenerator:
             if linksInRef.search(entry.text):
                 return page
 
+    __next__ = next
+
 
 class RefLink:
 

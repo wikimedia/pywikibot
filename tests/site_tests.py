@@ -414,7 +414,7 @@ class TestSiteObject(PywikibotTestCase):
             self.assertTrue(page.title(withNamespace=False) >= "From")
             self.assertTrue(hasattr(page, "_fromid"))
         errgen = mysite.alllinks(unique=True, fromids=True)
-        self.assertRaises(pywikibot.Error, errgen.next)
+        self.assertRaises(pywikibot.Error, next, errgen)
 
     def testAllCategories(self):
         """Test the site.allcategories() method"""
@@ -1030,9 +1030,10 @@ class TestSiteObject(PywikibotTestCase):
         self.assertNotIn(not_exists, mysite.siteinfo)
         self.assertEqual(len(mysite.siteinfo.get(not_exists)), 0)
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists)))
-        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).iteritems()))
-        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).itervalues()))
-        self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).iterkeys()))
+        if sys.version_info[0] == 2:
+            self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).iteritems()))
+            self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).itervalues()))
+            self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).iterkeys()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).items()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).values()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).keys()))

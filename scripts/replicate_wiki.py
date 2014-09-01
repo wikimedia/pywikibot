@@ -31,7 +31,6 @@ __version__ = '$Id$'
 #
 
 import sys
-from itertools import imap
 
 import pywikibot
 from pywikibot import config, Page
@@ -39,8 +38,7 @@ from pywikibot import config, Page
 
 def namespaces(site):
     """dict from namespace number to prefix."""
-    ns = dict(map(lambda n: (site.getNamespaceIndex(n), n),
-                  site.namespaces()))
+    ns = dict((site.getNamespaceIndex(n), n) for n in site.namespaces())
     ns[0] = ''
     return ns
 
@@ -79,7 +77,7 @@ class SyncSites:
                 pywikibot.output('%s %s' % (k, nsd[k]))
             sys.exit()
 
-        self.sites = map(lambda s: pywikibot.Site(s, family), sites)
+        self.sites = [pywikibot.Site(s, family) for s in sites]
 
         self.differences = {}
         self.user_diff = {}
@@ -128,8 +126,8 @@ class SyncSites:
     def check_namespace(self, namespace):
         """Check an entire namespace."""
         pywikibot.output("\nCHECKING NAMESPACE %s" % namespace)
-        pages = imap(lambda p: p.title(),
-                     self.original.allpages('!', namespace=namespace))
+        pages = (p.title() for p in self.original.allpages(
+            '!', namespace=namespace))
         for p in pages:
             if p not in ['MediaWiki:Sidebar', 'MediaWiki:Mainpage',
                          'MediaWiki:Sitenotice', 'MediaWiki:MenuSidebar']:
@@ -150,15 +148,15 @@ class SyncSites:
                                       'User:%s/sync.py overview' % site.user())
             output = "== Pages that differ from original ==\n\n"
             if self.differences[site]:
-                output += "".join(map(lambda l: '* [[:%s]]\n' % l,
-                                      self.differences[site]))
+                output += "".join('* [[:%s]]\n' % l for l in
+                                  self.differences[site])
             else:
                 output += "All important pages are the same"
 
             output += "\n\n== Admins from original that are missing here ==\n\n"
             if self.user_diff[site]:
-                output += "".join(map(lambda l: '* %s\n' % l.replace('_', ' '),
-                                      self.user_diff[site]))
+                output += "".join('* %s\n' % l.replace('_', ' ') for l in
+                                  self.user_diff[site])
             else:
                 output += "All users from original are also present on this wiki"
 

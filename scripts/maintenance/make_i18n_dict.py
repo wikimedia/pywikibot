@@ -42,7 +42,7 @@ class i18nBot(object):
         self.dict = dict()
 
     def print_all(self):
-        keys = self.dict.keys()
+        keys = list(self.dict.keys())
         keys.remove('qqq')
         keys.sort()
         keys.insert(0, 'qqq')
@@ -50,21 +50,21 @@ class i18nBot(object):
             keys.remove('en')
             keys.insert(0, 'en')
 
-        print "# -*- coding: utf-8 -*-"
-        print "msg = {"
+        print("# -*- coding: utf-8 -*-")
+        print("msg = {")
         for code in keys:
-            print "    '%s': {" % code
+            print("    '%s': {" % code)
             for msg in self.messages:
                 label = "%s-%s" % (self.scriptname, msg)
                 if label in self.dict[code]:
-                    print "        '%s': u'%s'," % (label,
-                                                    self.dict[code][label])
-            print "    },"
-        print "};"
+                    print("        '%s': u'%s'," % (label,
+                                                    self.dict[code][label]))
+            print("    },")
+        print("};")
 
     def read(self, item):
         msg = getattr(self.script, item)
-        keys = msg.keys()
+        keys = list(msg.keys())
         keys.append('qqq')
         for code in keys:
             label = "%s-%s" % (self.scriptname, item)
@@ -79,7 +79,7 @@ class i18nBot(object):
                     self.dict[code] = {}
                 self.dict[code][label] = msg[code]
         if 'en' not in keys:
-            print 'WARNING: "en" key missing for message %s' % item
+            print('WARNING: "en" key missing for message %s' % item)
 
     def run(self):
         for msg in self.messages:
@@ -87,4 +87,4 @@ class i18nBot(object):
         self.print_all()
 
 if __name__ == "__main__":
-    print __doc__
+    print(__doc__)

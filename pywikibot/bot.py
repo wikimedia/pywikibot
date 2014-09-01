@@ -469,7 +469,7 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
       ...
     or alternatively:
       ...
-      except Exception, e:
+      except Exception as e:
           pywikibot.exception(e)
       ...
     """
@@ -932,7 +932,7 @@ class WikidataBot:
         """
         page = pywikibot.Page(self.repo, u'List of wikis/python', ns=4)
         self.source_values = json.loads(page.get())
-        for family_code, family in self.source_values.iteritems():
+        for family_code, family in self.source_values.items():
             for source_lang in family:
                 self.source_values[family_code][source_lang] = pywikibot.ItemPage(self.repo,
                                                                                   family[source_lang])
