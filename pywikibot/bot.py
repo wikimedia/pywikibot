@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-User-interface related functions for building bots
-"""
+"""User-interface related functions for building bots"""
 #
 # (C) Pywikibot team, 2008-2013
 #
