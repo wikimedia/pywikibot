@@ -32,6 +32,7 @@ if sys.version_info[0] == 2:
     from urllib import urlopen
 else:
     unicode = basestring = str
+    long = int
     from html import entities as htmlentitydefs
     from urllib.parse import quote_from_bytes, unquote_to_bytes
     from urllib.request import urlopen
@@ -2863,7 +2864,7 @@ class WikibasePage(Page):
         if diffto and 'aliases' in diffto:
             for lang in set(diffto['aliases'].keys()) - set(aliases.keys()):
                 aliases[lang] = []
-        for lang, strings in aliases.items():
+        for lang, strings in list(aliases.items()):
             if diffto and 'aliases' in diffto and lang in diffto['aliases']:
                 empty = len(diffto['aliases'][lang]) - len(strings)
                 if empty > 0:
@@ -3622,7 +3623,7 @@ class Claim(Property):
             if len(self.qualifiers) > 0:
                 data['qualifiers'] = {}
                 data['qualifiers-order'] = list(self.qualifiers.keys())
-                for prop, qualifiers in self.qualifiers.iteritems():
+                for prop, qualifiers in self.qualifiers.items():
                     for qualifier in qualifiers:
                         qualifier.isQualifier = True
                     data['qualifiers'][prop] = [qualifier.toJSON() for qualifier in qualifiers]
@@ -3630,7 +3631,7 @@ class Claim(Property):
                 data['references'] = []
                 for collection in self.sources:
                     reference = {'snaks': {}, 'snaks-order': list(collection.keys())}
-                    for prop, val in collection.iteritems():
+                    for prop, val in collection.items():
                         reference['snaks'][prop] = []
                         for source in val:
                             source.isReference = True
@@ -4237,9 +4238,14 @@ not supported by PyWikiBot!"""
                                   self.site.code,
                                   title)
 
-    def __str__(self):
-        """Return a string representation."""
-        return self.astext().encode("ascii", "backslashreplace")
+    if sys.version_info[0] > 2:
+        def __str__(self):
+            """Return a string representation."""
+            return self.__unicode__()
+    else:
+        def __str__(self):
+            """Return a string representation."""
+            return self.astext().encode("ascii", "backslashreplace")
 
     def _cmpkey(self):
         """

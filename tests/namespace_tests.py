@@ -129,11 +129,11 @@ class TestNamespaceObject(TestCase):
         y = Namespace(id=6, custom_name=u'ملف', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'], **kwargs)
 
-        if sys.version_info[0] == 2:
-            self.assertEqual(str(y), ':File:')
+        self.assertEqual(str(y), ':File:')
+        if sys.version_info[0] <= 2:
             self.assertEqual(unicode(y), u':ملف:')
-        else:
-            self.assertEqual(str(y), u':ملف:')
+        self.assertEqual(y.canonical_prefix(), ':File:')
+        self.assertEqual(y.custom_prefix(), u':ملف:')
 
     def testNamespaceCompare(self):
         a = Namespace(id=0, canonical_name=u'')
@@ -166,10 +166,6 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(x, u'Image')
 
         self.assertEqual(y, u'ملف')
-
-        # FIXME: Namespace is missing operators required for py3
-        if sys.version_info[0] > 2:
-            return
 
         self.assertLess(a, x)
         self.assertGreater(x, a)

@@ -74,7 +74,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         if not ('N' in match.group('flags')):
             return
         try:
-            msg = unicode(e.arguments()[0], 'utf-8')
+            msg = e.arguments()[0].decode('utf-8')
         except UnicodeDecodeError:
             return
         if self.other_ns.match(msg):

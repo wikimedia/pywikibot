@@ -951,10 +951,6 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertLessEqual(len(dr['revisions']), 10)
         self.assertTrue(all(isinstance(rev, dict)
                             for rev in dr['revisions']))
-        dr2 = list(mysite.deletedrevs(page=mainpage, total=10))[0]
-        self.assertLessEqual(len(dr2['revisions']), 10)
-        self.assertTrue(all(isinstance(rev, dict)
-                            for rev in dr2['revisions']))
         for item in mysite.deletedrevs(start="2008-10-11T01:02:03Z",
                                        page=mainpage, total=5):
             for rev in item['revisions']:
@@ -1303,7 +1299,8 @@ class TestNonEnglishWikipediaSite(TestCase):
         self.assertEqual(image_namespace.custom_name, 'Fil')
         self.assertEqual(image_namespace.canonical_name, 'File')
         self.assertEqual(str(image_namespace), ':File:')
-        self.assertEqual(unicode(image_namespace), ':Fil:')
+        self.assertEqual(image_namespace.custom_prefix(), ':Fil:')
+        self.assertEqual(image_namespace.canonical_prefix(), ':File:')
         self.assertEqual(image_namespace.aliases, ['Image'])
         self.assertEqual(len(image_namespace), 3)
 

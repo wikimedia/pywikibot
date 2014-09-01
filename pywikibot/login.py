@@ -9,6 +9,7 @@
 #
 __version__ = '$Id$'
 #
+import codecs
 
 import pywikibot
 from pywikibot import config
@@ -146,11 +147,11 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         (u"wikipedia", u"my_wikipedia_user", u"my_wikipedia_pass")
         (u"en", u"wikipedia", u"my_en_wikipedia_user", u"my_en_wikipedia_pass")
         """
-        password_f = open(config.password_file)
+        password_f = codecs.open(config.password_file, encoding='utf-8')
         for line in password_f:
             if not line.strip():
                 continue
-            entry = eval(line.decode('utf-8'))
+            entry = eval(line)
             if len(entry) == 4:         # for userinfo included code and family
                 if entry[0] == self.site.code and \
                    entry[1] == self.site.family.name and \

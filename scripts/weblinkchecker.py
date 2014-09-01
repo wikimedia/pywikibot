@@ -112,6 +112,7 @@ if sys.version_info[0] > 2:
     import urllib.parse as urlparse
     import urllib.request as urllib
     import http.client as httplib
+    basestring = (str, )
 else:
     import urlparse
     import urllib

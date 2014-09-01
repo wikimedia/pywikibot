@@ -19,7 +19,6 @@ __version__ = "$Id$"
 #
 
 import os
-import string
 import optparse
 import tempfile
 
@@ -30,7 +29,8 @@ from pywikibot.editor import TextEditor
 
 class ArticleEditor(object):
     # join lines if line starts with this ones
-    joinchars = string.letters + '[]' + string.digits
+    # TODO: No apparent usage
+    # joinchars = string.letters + '[]' + string.digits
 
     def __init__(self, *args):
         self.set_options(*args)

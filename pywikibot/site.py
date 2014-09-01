@@ -29,7 +29,9 @@ import copy
 import pywikibot
 from pywikibot import config
 from pywikibot.family import AutoFamily
-from pywikibot.tools import itergroup, deprecated, deprecate_arg
+from pywikibot.tools import (
+    itergroup, deprecated, deprecate_arg, UnicodeMixin, ComparableMixin,
+)
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -146,7 +148,7 @@ does not exist. Also check your configuration file."""
     return _families[fam]
 
 
-class Namespace(Iterable):
+class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
     """ Namespace site data object.
 
@@ -306,26 +308,31 @@ class Namespace(Iterable):
         else:
             return self.aliases[index - 1]
 
-    def __str__(self):
-        """Return a string representation."""
-        if sys.version_info[0] > 2:
-            return self.__unicode__()
-
-        if self.id == 0:
-            return ':'
-        elif self.id in (6, 14):
-            return ':' + self.canonical_name + ':'
+    @staticmethod
+    def _colons(id, name):
+        """Return the name with required colons, depending on the ID."""
+        if id == 0:
+            return u':'
+        elif id in (6, 14):
+            return u':' + name + u':'
         else:
-            return self.canonical_name + ':'
+            return u'' + name + u':'
+
+    def __str__(self):
+        """Return a the canonical string representation."""
+        return self.canonical_prefix()
 
     def __unicode__(self):
-        """Return a unicode string representation."""
-        if self.id == 0:
-            return u':'
-        elif self.id in (6, 14):
-            return u':' + self.custom_name + u':'
-        else:
-            return u'' + self.custom_name + u':'
+        """Return a the custom string representation."""
+        return self.custom_prefix()
+
+    def canonical_prefix(self):
+        """Return the canonical name with required colons."""
+        return Namespace._colons(self.id, self.canonical_name)
+
+    def custom_prefix(self):
+        """Return the custom name with required colons."""
+        return Namespace._colons(self.id, self.custom_name)
 
     def __index__(self):
         return self.id
@@ -348,14 +355,9 @@ class Namespace(Iterable):
         else:
             return True
 
-    def __cmp__(self, other):
-        """Compare two namespace ids."""
-        if self.id == other.id:
-            return 0
-        elif self.id > other.id:
-            return 1
-        else:
-            return -1
+    def _cmpkey(self):
+        """Return the ID as a comparison key."""
+        return self.id
 
     def __repr__(self):
         """Return a reconstructable representation."""
@@ -425,7 +427,7 @@ class Namespace(Iterable):
         return None
 
 
-class BaseSite(object):
+class BaseSite(ComparableMixin):
 
     """Site methods that are independent of the communication interface."""
 
@@ -519,13 +521,9 @@ class BaseSite(object):
         """
         return self.__code
 
-    def __cmp__(self, other):
+    def _cmpkey(self):
         """Perform equality and inequality tests on Site objects."""
-        if not isinstance(other, BaseSite):
-            return 1
-        if self.family == other.family:
-            return cmp(self.code, other.code)
-        return cmp(self.family.name, other.family.name)
+        return (self.family.name, self.code)
 
     def __getstate__(self):
         """ Remove Lock based classes before pickling. """
