@@ -122,7 +122,7 @@ def asktoadd(pl):
     pywikibot.output(u'')
     pywikibot.output(u"==%s==" % pl.title())
     while True:
-        answer = raw_input("y(es)/n(o)/i(gnore)/(o)ther options? ")
+        answer = pywikibot.input("[y]es/[n]o/[i]gnore/[o]ther options?")
         if answer == 'y':
             include(pl)
             break
