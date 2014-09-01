@@ -16,6 +16,8 @@ class Family(family.WikimediaFamily):
             'test': 'test.wikidata.org',
         }
 
+        self.interwiki_forward = 'wikipedia'
+
     def shared_data_repository(self, code, transcluded=False):
         """
         Indicate Wikidata is both a repository and its own client.
