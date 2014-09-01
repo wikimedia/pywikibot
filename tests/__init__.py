@@ -9,8 +9,8 @@ __version__ = '$Id$'
 import os
 import sys
 
-__all__ = ['httplib2', 'OrderedDict', '_cache_dir', 'TestRequest',
-           'patch_request', 'unpatch_request']
+__all__ = ('httplib2', 'OrderedDict', '_cache_dir', 'TestRequest',
+           'patch_request', 'unpatch_request')
 
 # Verify that the unit tests have a base working environment:
 # - httplib2 is mandatory

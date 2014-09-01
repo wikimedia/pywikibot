@@ -57,28 +57,29 @@ textlib_methods = (
     'replaceCategoryInPlace', 'compileLinkR', 'extract_templates_and_params',
 )
 
-__all__ = (
-    'config', 'ui', 'UnicodeMixin', 'translate',
-    'Page', 'FilePage', 'ImagePage', 'Category', 'Link', 'User',
-    'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
-    'html2unicode', 'url2unicode', 'unicode2html',
-    'stdout', 'output', 'warning', 'error', 'critical', 'debug', 'exception',
-    'input', 'inputChoice', 'handleArgs', 'showHelp', 'ui', 'log',
-    'calledModuleName', 'Bot', 'WikidataBot',
-    'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
-    'NoSuchSite', 'NoUsername', 'UserBlocked',
-    'PageRelatedError', 'IsRedirectPage', 'IsNotRedirectPage',
-    'PageNotSaved', 'UploadWarning', 'LockedPage', 'EditConflict',
-    'ServerError', 'FatalServerError', 'Server504Error',
-    'CaptchaError', 'SpamfilterError', 'CircularRedirect',
-    'WikiBaseError', 'CoordinateGlobeUnknownException',
-    'QuitKeyboardInterrupt',
-)
+# pep257 doesn't understand when the first entry is on the next line
+__all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
+           'Page', 'FilePage', 'ImagePage', 'Category', 'Link', 'User',
+           'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
+           'html2unicode', 'url2unicode', 'unicode2html',
+           'stdout', 'output', 'warning', 'error', 'critical', 'debug', 'exception',
+           'input', 'inputChoice', 'handleArgs', 'showHelp', 'ui', 'log',
+           'calledModuleName', 'Bot', 'WikidataBot',
+           'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
+           'NoSuchSite', 'NoUsername', 'UserBlocked',
+           'PageRelatedError', 'IsRedirectPage', 'IsNotRedirectPage',
+           'PageNotSaved', 'UploadWarning', 'LockedPage', 'EditConflict',
+           'ServerError', 'FatalServerError', 'Server504Error',
+           'CaptchaError', 'SpamfilterError', 'CircularRedirect',
+           'WikiBaseError', 'CoordinateGlobeUnknownException',
+           'QuitKeyboardInterrupt',
+           )
 # flake8 is unable to detect concatenation in the same operation
 # like:
 # ) + textlib_methods
+# pep257 also doesn't support __all__ multiple times in a document
 # so instead use this trick
-globals()['__all__'] = __all__ + textlib_methods
+globals()['__all__'] = globals()['__all__'] + textlib_methods
 
 for _name in textlib_methods:
     target = getattr(textlib, _name)
