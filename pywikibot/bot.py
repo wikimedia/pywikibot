@@ -914,12 +914,10 @@ class Bot(object):
                                  self.__class__.__name__)
 
 
-class WikidataBot:
+class WikidataBot(Bot):
 
     """
     Generic Wikidata Bot to be subclassed.
-
-    Used in claimit.py, coordinate_import.py and harvest_template.py
     """
 
     def cacheSources(self):
