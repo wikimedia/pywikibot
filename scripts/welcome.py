@@ -433,9 +433,13 @@ class Global(object):
 
 class WelcomeBot(object):
 
+    """Bot to add welcome messages on User pages."""
+
     def __init__(self):
-        #Initial
+        """Constructor."""
+
         self.site = pywikibot.Site()
+        self.check_managed_sites()
         self.bname = dict()
 
         self._totallyCount = 0
@@ -445,6 +449,23 @@ class WelcomeBot(object):
             self.defineSign(True)
         if __name__ != '__main__':  # use only in module call
             self._checkQueue = []
+
+    def check_managed_sites(self):
+        """Check that site is managed by welcome.py."""
+        # Raises KeyError if site is not in netext with right family.
+        try:
+            site_netext = netext[self.site.family.name]
+        except KeyError:
+            raise KeyError(
+                u'Site %s not managed by welcome.py: family "%s" missing in netext.'
+                % (self.site, self.site.family.name))
+        # Raises KeyError if site is not in netext with language.
+        try:
+            site_netext = site_netext[self.site.code]
+        except KeyError:
+            raise KeyError(
+                u'Site %s not managed by welcome.py: lang "%s" missing in netext[%s].'
+                % (self.site, self.site.code, self.site.family.name))
 
     def badNameFilter(self, name, force=False):
         if not globalvar.filtBadName:
@@ -950,7 +971,15 @@ def main():
         pywikibot.warning(
             'both -offset and -timeoffset were provided, ignoring -offset')
         globalvar.offset = 0
-    bot = WelcomeBot()
+
+    try:
+        bot = WelcomeBot()
+    except KeyError as error:
+        # site not managed by welcome.py
+        pywikibot.showHelp()
+        pywikibot.warning(error)
+        return
+
     try:
         bot.run()
     except KeyboardInterrupt:
