@@ -1046,8 +1046,6 @@ class Siteinfo(Container):
             default_info = self._get_siteinfo(props, expiry)
             for prop in props:
                 self._cache[prop] = default_info[prop]
-            if key in default_info:
-                return default_info[key]
         if key in self._cache['general'][0]:
             return self._cache['general'][0][key], self._cache['general']
         else:
