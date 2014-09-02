@@ -880,7 +880,7 @@ class Bot(object):
         if not self.user_confirm('Do you want to accept these changes?'):
             return
 
-        if 'async' not in kwargs and self.options['always']:
+        if 'async' not in kwargs and self.getOption('always'):
             kwargs['async'] = True
 
         page.text = newtext
