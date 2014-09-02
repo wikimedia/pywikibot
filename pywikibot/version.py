@@ -56,6 +56,8 @@ def getversiondict():
         _program_dir = _get_program_dir()
         if os.path.isdir(os.path.join(_program_dir, '.svn')):
             (tag, rev, date, hsh) = getversion_svn(_program_dir)
+        elif os.path.isdir(os.path.join(_program_dir, '../.svn')):
+            (tag, rev, date, hsh) = getversion_svn(os.path.join(_program_dir, '..'))
         else:
             (tag, rev, date, hsh) = getversion_git(_program_dir)
     except Exception:
