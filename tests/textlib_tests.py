@@ -162,6 +162,39 @@ class TestCategoryRearrangement(PywikibotTestCase):
         self.assertEqual(old, new)
         config.line_separator = sep  # restore the default separator
 
+
+class TestTemplatesInCategory(PywikibotTestCase):
+
+    """Tests to verify that templates in category links are handled."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.site = pywikibot.Site('en', 'wikipedia')
+
+    def test_templates(self):
+        self.assertEqual(textlib.getCategoryLinks(
+            '[[Category:{{P1|Foo}}]]', self.site),
+            [pywikibot.page.Category(self.site, 'Foo')])
+        self.assertEqual(textlib.getCategoryLinks(
+            '[[Category:{{P1|Foo}}|bar]]', self.site),
+            [pywikibot.page.Category(self.site, 'Foo', sortKey='bar')])
+        self.assertEqual(textlib.getCategoryLinks(
+            '[[Category:{{P1|{{P2|L33t|Foo}}}}|bar]]', self.site),
+            [pywikibot.page.Category(self.site, 'Foo', sortKey='bar')])
+        self.assertEqual(textlib.getCategoryLinks(
+            '[[Category:Foo{{!}}bar]]', self.site),
+            [pywikibot.page.Category(self.site, 'Foo', sortKey='bar')])
+        self.assertEqual(textlib.getCategoryLinks(
+            '[[Category:Foo{{!}}bar]][[Category:Wiki{{P2||pedia}}]]',
+            self.site),
+            [pywikibot.page.Category(self.site, 'Foo', sortKey='bar'),
+             pywikibot.page.Category(self.site, 'Wikipedia')])
+        self.assertEqual(textlib.getCategoryLinks(
+            '[[Category:Foo{{!}}and{{!}}bar]]', self.site),
+            [pywikibot.page.Category(self.site, 'Foo', sortKey='and|bar')])
+        self.assertRaises(pywikibot.InvalidTitle, textlib.getCategoryLinks,
+                          '[[Category:nasty{{{!}}]]', self.site)
+
 if __name__ == '__main__':
     try:
         unittest.main()

@@ -664,15 +664,21 @@ def getCategoryLinks(text, site=None):
     # and HTML comments
     text = removeDisabledParts(text)
     catNamespace = '|'.join(site.category_namespaces())
-    R = re.compile(r'\[\[\s*(?P<namespace>%s)\s*:\s*(?P<catName>.+?)'
-                   r'(?:\|(?P<sortKey>.*?))?\]\]'
+    R = re.compile(r'\[\[\s*(?P<namespace>%s)\s*:\s*(?P<rest>.+?)\]\]'
                    % catNamespace, re.I)
     for match in R.finditer(text):
+        if '{{' in match.group('rest'):
+            rest = site.expand_text(match.group('rest'))
+        else:
+            rest = match.group('rest')
+        if '|' in rest:
+            title, sortKey = rest.split('|', 1)
+        else:
+            title, sortKey = rest, None
         cat = pywikibot.Category(pywikibot.Link(
-                                 '%s:%s' % (match.group('namespace'),
-                                            match.group('catName')),
+                                 '%s:%s' % (match.group('namespace'), title),
                                  site),
-                                 sortKey=match.group('sortKey'))
+                                 sortKey=sortKey)
         result.append(cat)
     return result
 
