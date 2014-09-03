@@ -410,6 +410,13 @@ class TestCategoryObject(PywikibotTestCase):
         self.assertTrue(cat_empty.isEmptyCategory())
         self.assertFalse(cat_not_empty.isEmptyCategory())
 
+    def test_isHiddenCategory(self):
+        site = pywikibot.Site('en', 'wikipedia')
+        cat_hidden = pywikibot.Category(site, u'Category:Hidden categories')
+        cat_not_hidden = pywikibot.Category(site, u'Category:Wikipedia categories')
+        self.assertTrue(cat_hidden.isHiddenCategory())
+        self.assertFalse(cat_not_hidden.isHiddenCategory())
+
 
 if __name__ == '__main__':
     try:
