@@ -89,7 +89,7 @@ class ProtectionRobot(Bot):
         protections.
         """
         for page in self.generator:
-            pywikibot.output(u'Processing page %s' % page.title())
+            self.current_page = page
             if not self.getOption('always'):
                 choice = pywikibot.inputChoice(
                     u'Do you want to change the protection level of %s?'

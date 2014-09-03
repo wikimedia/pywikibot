@@ -94,10 +94,7 @@ class PageFromFileRobot(Bot):
         mysite = pywikibot.Site()
 
         page = pywikibot.Page(mysite, title)
-        # Show the title of the page we're working on.
-        # Highlight the title in purple.
-        pywikibot.output(u">>> \03{lightpurple}%s\03{default} <<<"
-                         % page.title())
+        self.current_page = page
 
         if self.getOption('summary'):
             comment = self.getOption('summary')

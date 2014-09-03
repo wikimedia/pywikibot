@@ -138,10 +138,7 @@ class SelflinkBot(Bot):
             return False
 
     def treat(self, page):
-        # Show the title of the page we're working on.
-        # Highlight the title in purple.
-        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % page.title())
+        self.current_page = page
         try:
             oldText = page.text
             # Inside image maps, don't touch selflinks, as they're used

@@ -845,10 +845,7 @@ class CosmeticChangesBot(Bot):
 
     def treat(self, page):
         try:
-            # Show the title of the page we're working on.
-            # Highlight the title in purple.
-            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                             % page.title())
+            self.current_page = page
             ccToolkit = CosmeticChangesToolkit(page.site, debug=True,
                                                namespace=page.namespace(),
                                                pageTitle=page.title())

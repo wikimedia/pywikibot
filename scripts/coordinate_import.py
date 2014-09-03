@@ -63,7 +63,7 @@ class CoordImportRobot(WikidataBot):
     def run(self):
         """Start the robot."""
         for page in self.generator:
-            pywikibot.output(u'Working on %s' % page.title())
+            self.current_page = page
             item = pywikibot.ItemPage.fromPage(page)
 
             if item.exists():

@@ -50,7 +50,7 @@ class IllustrateRobot(WikidataBot):
     def run(self):
         """Starts the bot."""
         for page in self.generator:
-            pywikibot.output(u'Working on %s' % page.title())
+            self.current_page = page
             item = pywikibot.ItemPage.fromPage(page)
 
             if item.exists():

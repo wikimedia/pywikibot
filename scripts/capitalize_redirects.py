@@ -54,10 +54,7 @@ class CapitalizeBot(Bot):
         if page.isRedirectPage():
             page = page.getRedirectTarget()
         page_t = page.title()
-        # Show the title of the page we're working on.
-        # Highlight the title in purple.
-        pywikibot.output(u"\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % page_t)
+        self.current_page = page
         if self.getOption('titlecase'):
             page_cap = pywikibot.Page(page.site, page_t.title())
         else:

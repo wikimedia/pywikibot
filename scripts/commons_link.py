@@ -60,7 +60,7 @@ class CommonsLinkBot(Bot):
         catmode = (self.getOption('action') == 'categories')
         for page in self.generator:
             try:
-                pywikibot.output(u'\n>>>> %s <<<<' % page.title())
+                self.current_page = page
                 commons = page.site.image_repository()
                 commonspage = getattr(pywikibot,
                                       ('Page', 'Category')[catmode]

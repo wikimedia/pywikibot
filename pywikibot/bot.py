@@ -796,6 +796,8 @@ class Bot(object):
         'always': False,  # ask for confirmation when putting a page?
     }
 
+    _current_page = None
+
     def __init__(self, **kwargs):
         """
         Only accept options defined in availableOptions.
@@ -836,6 +838,33 @@ class Bot(object):
         except KeyError:
             raise pywikibot.Error(u'%s is not a valid bot option.' % option)
 
+    @property
+    def current_page(self):
+        return self._current_page
+
+    @current_page.setter
+    def current_page(self, page):
+        """Set the current working page as a property.
+
+        When the value is actually changed, the page title is printed
+        to the standard output (highlighted in purple) and logged
+        with a VERBOSE level.
+
+        This also prevents the same title from being printed twice.
+
+        @param page: the working page
+        @type  page: pywikibot.Page
+        """
+        if page != self._current_page:
+            self._current_page = page
+            msg = u'Working on %r' % page
+            if config.colorized_output:
+                log(msg)
+                stdout(u'\n\n>>> \03{lightpurple}%s\03{default} <<<'
+                       % page.title())
+            else:
+                stdout(msg)
+
     def user_confirm(self, question):
         """ Obtain user response if bot option 'always' not enabled. """
         if self.getOption('always'):
@@ -871,8 +900,7 @@ class Bot(object):
                              % page.title(asLink=True))
             return
 
-        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % page.title())
+        self.current_page = page
         pywikibot.showDiff(oldtext, newtext)
         if 'comment' in kwargs:
             pywikibot.output(u'Comment: %s' % kwargs['comment'])

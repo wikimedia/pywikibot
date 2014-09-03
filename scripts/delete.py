@@ -68,7 +68,7 @@ class DeletionRobot(Bot):
 
         """
         for page in self.generator:
-            pywikibot.output(u'Processing page %s' % page.title())
+            self.current_page = page
             if self.getOption('undelete'):
                 page.undelete(self.summary)
             else:

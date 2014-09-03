@@ -315,10 +315,7 @@ class NowCommonsDeleteBot(Bot):
                 page = pywikibot.Page(self.site, images_list[0])
             else:
                 # If use_hash is true, we have already print this before, no need
-                # Show the title of the page we're working on.
-                # Highlight the title in purple.
-                pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                                 % page.title())
+                self.current_page = page
             try:
                 localImagePage = pywikibot.FilePage(self.site, page.title())
                 if localImagePage.fileIsShared():
