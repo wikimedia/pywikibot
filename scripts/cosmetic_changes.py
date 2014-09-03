@@ -850,7 +850,8 @@ class CosmeticChangesBot(Bot):
                                                namespace=page.namespace(),
                                                pageTitle=page.title())
             changedText = ccToolkit.change(page.get())
-            self.userPut(page, page.text, changedText, comment=self.comment,
+            self.userPut(page, page.text, changedText,
+                         comment=self.getOption('comment'),
                          async=self.getOption('async'))
         except pywikibot.NoPage:
             pywikibot.output("Page %s does not exist?!"
