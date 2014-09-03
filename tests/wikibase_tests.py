@@ -134,16 +134,16 @@ class TestGeneral(PywikibotTestCase):
         # working correctly on Wikidata.
 
         # The main Wikidata is its own client.
-        self.wdp = pywikibot.ItemPage(wikidata,
-                                      wikidata.siteinfo['mainpage'])
+        self.wdp = pywikibot.Page(wikidata,
+                                  wikidata.siteinfo['mainpage'])
         item = pywikibot.ItemPage.fromPage(self.wdp)
-        del item
+        self.assertEqual(item.site, self.wdp.site)
 
         # test.wikidata is also
-        self.wdp = pywikibot.ItemPage(wikidatatest,
-                                      wikidatatest.siteinfo['mainpage'])
+        self.wdp = pywikibot.Page(wikidatatest,
+                                  wikidatatest.siteinfo['mainpage'])
         item = pywikibot.ItemPage.fromPage(self.wdp)
-        del item
+        self.assertEqual(item.site, self.wdp.site)
 
 
 class TestItemLoad(PywikibotTestCase):
