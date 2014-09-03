@@ -42,6 +42,7 @@ from pywikibot.exceptions import (
     SpamfilterError,
     UserBlocked,
 )
+from pywikibot.echo import Notification
 
 if sys.version_info[0] > 2:
     basestring = (str,)
@@ -1479,6 +1480,41 @@ class APISite(BaseSite):
         if not self.logged_in(sysop):
             self.login(sysop)
         return 'hasmsg' in self._userinfo
+
+    def notifications(self, **kwargs):
+        """Yield Notification objects from the Echo extension."""
+        if self.has_extension('Echo'):
+            params = dict(site=self, action='query',
+                          meta='notifications',
+                          notprop='list', notformat='text')
+
+            for key in kwargs:
+                params['not' + key] = kwargs[key]
+
+            data = api.Request(**params).submit()
+            for notif in data['query']['notifications']['list'].values():
+                yield Notification.fromJSON(self, notif)
+
+    def notifications_mark_read(self, **kwargs):
+        """Mark one, some or all notifications,
+        selected via keyword arguments, as read.
+
+        @return: whether the action was successful
+        @rtype: bool
+        """
+        if self.has_extension('Echo'):
+            # TODO: ensure that the 'echomarkread' action
+            # is supported by the site
+            req = api.Request(site=self,
+                              action='echomarkread',
+                              token=self.token(pywikibot.Page(self, u'Main Page'),
+                                               'edit'),  # Use a dummy page
+                              **kwargs)
+            data = req.submit()
+            try:
+                return data['query']['echomarkread']['result'] == 'success'
+            except KeyError:
+                return False
 
     def mediawiki_messages(self, keys):
         """Fetch the text of a set of MediaWiki messages.
