@@ -76,9 +76,7 @@ disambiguation_comment = {}
 # User agent format.
 # For the meaning and more help in customization see:
 # https://www.mediawiki.org/wiki/Manual:Pywikibot/User-agent
-# The default is script, revision number and user name
-# For more information see https://meta.wikimedia.org/wiki/User-agent_policy
-USER_AGENT_FORMAT = '{script}/{version} Pywikibot/2.0 (User:{username})'
+user_agent_format = '{script_product} ({script_comments}) {pwb} ({revision}) {httplib2} {python}'
 
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
