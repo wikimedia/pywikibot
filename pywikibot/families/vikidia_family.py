@@ -1,12 +1,16 @@
 # -*- coding: utf-8  -*-
-
+"""Family module for Vikidia."""
 __version__ = '$Id$'
 
 from pywikibot import family
 
 
 class Family(family.Family):
+
+    """Family class for Vikidia."""
+
     def __init__(self):
+        """Constructor."""
         family.Family.__init__(self)
         self.name = 'vikidia'
 
@@ -39,11 +43,11 @@ class Family(family.Family):
 
     # Which version of MediaWiki is used? REQUIRED
     def version(self, code):
-        # Replace with the actual version being run on your wiki
+        """Return the version for this family."""
         return '1.23.1'
 
     def code2encoding(self, code):
-        """Return the encoding for a specific language wiki"""
+        """Return the encoding for a specific language wiki."""
         # Most wikis nowadays use UTF-8, but change this if yours uses
         # a different encoding
         return 'utf-8'

@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Family module for Wikisource."""
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -6,7 +7,11 @@ __version__ = '$Id$'
 
 # The Wikimedia family that is known as Wikisource
 class Family(family.WikimediaFamily):
+
+    """Family class for Wikisource."""
+
     def __init__(self):
+        """Constructor."""
         super(Family, self).__init__()
         self.name = 'wikisource'
 
@@ -92,4 +97,5 @@ class Family(family.WikimediaFamily):
                 self.crossnamespace[item].update({key: self.authornamespaces})
 
     def shared_data_repository(self, code, transcluded=False):
+        """Return the shared data repository for this site."""
         return ('wikidata', 'wikidata')

@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Family module for Wikiversity."""
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -6,7 +7,11 @@ __version__ = '$Id$'
 
 # The Wikimedia family that is known as Wikiversity
 class Family(family.WikimediaFamily):
+
+    """Family class for Wikiversity."""
+
     def __init__(self):
+        """Constructor."""
         super(Family, self).__init__()
         self.name = 'wikiversity'
 

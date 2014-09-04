@@ -1,4 +1,6 @@
 # -*- coding: utf-8  -*-
+"""Family module for Wikiquote."""
+
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -6,7 +8,11 @@ __version__ = '$Id$'
 
 # The Wikimedia family that is known as Wikiquote
 class Family(family.WikimediaFamily):
+
+    """Family class for Wikiquote."""
+
     def __init__(self):
+        """Constructor."""
         super(Family, self).__init__()
         self.name = 'wikiquote'
 
@@ -83,7 +89,9 @@ class Family(family.WikimediaFamily):
 
     def code2encodings(self, code):
         """
-        Return a list of historical encodings for a specific language wikipedia
+        Return a list of historical encodings for a specific language.
+
+        @param code: site code
         """
         # Historic compatibility
         if code == 'pl':
@@ -93,4 +101,5 @@ class Family(family.WikimediaFamily):
         return self.code2encoding(code),
 
     def shared_data_repository(self, code, transcluded=False):
+        """Return the shared data repository for this family."""
         return ('wikidata', 'wikidata')

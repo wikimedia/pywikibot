@@ -1,4 +1,6 @@
 # -*- coding: utf-8  -*-
+"""Family module for Wikipedia."""
+
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -6,7 +8,11 @@ __version__ = '$Id$'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 class Family(family.WikimediaFamily):
+
+    """Family module for Wikipedia."""
+
     def __init__(self):
+        """Constructor."""
         super(Family, self).__init__()
         self.name = 'wikipedia'
 
@@ -530,6 +536,7 @@ class Family(family.WikimediaFamily):
         }
 
     def get_known_families(self, site):
+        """Override the family interwiki prefixes for each site."""
         # In Swedish Wikipedia 's:' is part of page title not a family
         # prefix for 'wikisource'.
         if site.language() == 'sv':
@@ -541,8 +548,7 @@ class Family(family.WikimediaFamily):
             return self.known_families
 
     def code2encodings(self, code):
-        """Return a list of historical encodings for a specific language
-           wikipedia"""
+        """Return a list of historical encodings for a specific site."""
         # Historic compatibility
         if code == 'pl':
             return 'utf-8', 'iso8859-2'
@@ -553,6 +559,7 @@ class Family(family.WikimediaFamily):
         return self.code2encoding(code),
 
     def shared_data_repository(self, code, transcluded=False):
+        """Return the shared data repository for this site."""
         if code in ['test', 'test2']:
             return ('test', 'wikidata')
         else:
