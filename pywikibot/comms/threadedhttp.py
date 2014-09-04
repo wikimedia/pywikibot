@@ -46,6 +46,8 @@ class ConnectionPool(object):
 
     def __init__(self, maxnum=5):
         """
+        Constructor.
+
         @param maxnum: Maximum number of connections per identifier.
                        The pool drops excessive connections added.
 
@@ -132,6 +134,8 @@ class Http(httplib2.Http):
     """
     def __init__(self, *args, **kwargs):
         """
+        Constructor.
+
         @param cookiejar: (optional) CookieJar to use. A new one will be
                used when not supplied.
         @param connection_pool: (optional) Connection pool to use. A new one
@@ -244,7 +248,7 @@ class Http(httplib2.Http):
 
     def _follow_redirect(self, uri, method, body, headers, response,
                          content, max_redirects):
-        """Internal function to follow a redirect recieved by L{request}"""
+        """Internal function to follow a redirect recieved by L{request}."""
         (scheme, authority, absolute_uri,
          defrag_uri) = httplib2.urlnorm(httplib2.iri2uri(uri))
         if self.cache:
@@ -308,7 +312,11 @@ class HttpRequest(object):
 
     """
     def __init__(self, *args, **kwargs):
-        """See C{Http.request} for parameters."""
+        """
+        Constructor.
+
+        See C{Http.request} for parameters.
+        """
         self.args = args
         self.kwargs = kwargs
         self.data = None
@@ -319,6 +327,8 @@ class HttpProcessor(threading.Thread):
     """Thread object to spawn multiple HTTP connection threads."""
     def __init__(self, queue, cookiejar, connection_pool):
         """
+        Constructor.
+
         @param queue: The C{Queue.Queue} object that contains L{HttpRequest}
                objects.
         @param cookiejar: The C{LockableCookieJar} cookie object to share among
@@ -380,8 +390,9 @@ class HttpProcessor(threading.Thread):
 # ========================================================================
 
 class DummyRequest(object):
-    """Simulated urllib2.Request object for httplib2
-       implements only what's necessary for cookielib.CookieJar to work
+    """Simulated urllib2.Request object for httplib2.
+
+       Implements only what's necessary for cookielib.CookieJar to work.
     """
     def __init__(self, url, headers=None):
         self.url = url
@@ -424,8 +435,9 @@ class DummyRequest(object):
 
 
 class DummyResponse(object):
-    """Simulated urllib2.Request object for httplib2
-       implements only what's necessary for cookielib.CookieJar to work
+    """Simulated urllib2.Request object for httplib2.
+
+       Implements only what's necessary for cookielib.CookieJar to work.
     """
     def __init__(self, response):
         self.response = response
@@ -435,8 +447,9 @@ class DummyResponse(object):
 
 
 class DummyMessage(object):
-    """Simulated mimetools.Message object for httplib2
-       implements only what's necessary for cookielib.CookieJar to work
+    """Simulated mimetools.Message object for httplib2.
+
+       Implements only what's necessary for cookielib.CookieJar to work.
     """
     def __init__(self, response):
         self.response = response

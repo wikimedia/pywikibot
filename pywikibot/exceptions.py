@@ -57,6 +57,7 @@ from pywikibot.tools import UnicodeMixin
 class Error(UnicodeMixin, Exception):
 
     """Pywikibot error"""
+
     # NOTE: UnicodeMixin must be the first object Error class is derived from.
     def __init__(self, arg):
         self.unicode = arg
@@ -69,6 +70,9 @@ class PageRelatedError(Error):
 
     """
     Abstract Exception, used when the exception concerns a particular Page.
+
+    This class should be used when the Exception concerns a particular
+    Page, and when a generic message can be written once for all.
     """
 
     # Preformated UNICODE message where the page title will be inserted
@@ -105,6 +109,7 @@ class PageRelatedError(Error):
 class PageSaveRelatedError(PageRelatedError):
 
     """Saving the page has failed"""
+
     message = u"Page %s was not saved."
 
     # This property maintains backwards compatibility with
@@ -119,6 +124,7 @@ class PageSaveRelatedError(PageRelatedError):
 class OtherPageSaveError(PageSaveRelatedError):
 
     """Saving the page has failed due to uncatchable error."""
+
     message = "Edit to page %(title)s failed:\n%(reason)s"
 
     def __init__(self, page, reason):
@@ -139,28 +145,41 @@ class NoUsername(Error):
 
     """Username is not in user-config.py"""
 
+    pass
+
 
 class NoPage(PageRelatedError):
 
     """Page does not exist"""
+
     message = u"Page %s doesn't exist."
+
+    pass
 
 
 class NoSuchSite(Error):
 
     """Site does not exist"""
 
+    pass
+
 
 class IsRedirectPage(PageRelatedError):
 
     """Page is a redirect page"""
+
     message = u"Page %s is a redirect page."
+
+    pass
 
 
 class IsNotRedirectPage(PageRelatedError):
 
     """Page is not a redirect page"""
+
     message = u"Page %s is not a redirect page."
+
+    pass
 
 
 class CircularRedirect(PageRelatedError):
@@ -172,6 +191,7 @@ class CircularRedirect(PageRelatedError):
     or indirectly redirects back to this one)
 
     """
+
     message = u"Page %s is a circular redirect."
 
 
@@ -179,28 +199,41 @@ class InvalidTitle(Error):
 
     """Invalid page title"""
 
+    pass
+
 
 class LockedPage(PageSaveRelatedError):
 
     """Page is locked"""
+
     message = u"Page %s is locked."
+
+    pass
 
 
 class LockedNoPage(LockedPage):
 
     """Title is locked against creation"""
+
     message = u"Page %s does not exist and is locked preventing creation."
+
+    pass
 
 
 class CascadeLockedPage(LockedPage):
 
     """Page is locked due to cascading protection"""
+
     message = u"Page %s is locked due to cascading protection."
+
+    pass
 
 
 class SectionError(Error):
 
     """The section specified by # does not exist"""
+
+    pass
 
 
 PageNotSaved = PageSaveRelatedError
@@ -209,26 +242,33 @@ PageNotSaved = PageSaveRelatedError
 class EditConflict(PageSaveRelatedError):
 
     """There has been an edit conflict while uploading the page"""
+
     message = u"Page %s could not be saved due to an edit conflict"
+
+    pass
 
 
 class PageDeletedConflict(EditConflict):
 
     """Page was deleted since being retrieved"""
+
     message = u"Page %s has been deleted since last retrieved."
+
+    pass
 
 
 class PageCreatedConflict(EditConflict):
 
     """Page was created by another user"""
+
     message = u"Page %s has been created since last retrieved."
+
+    pass
 
 
 class SpamfilterError(PageSaveRelatedError):
 
-    """Saving the page has failed because the MediaWiki spam filter detected a
-    blacklisted URL.
-    """
+    """Page save failed because MediaWiki detected a blacklisted spam URL."""
 
     message = "Edit to page %(title)s rejected by spam filter due to content:\n%(url)s"
 
@@ -241,16 +281,21 @@ class ServerError(Error):
 
     """Got unexpected server response"""
 
+    pass
+
 
 class FatalServerError(ServerError):
 
-    """A fatal server error that's not going to be corrected by just sending
-    the request again."""
+    """A fatal server error will not be corrected by resending the request."""
+
+    pass
 
 
 class Server504Error(Error):
 
     """Server timed out with HTTP 504 code"""
+
+    pass
 
 
 class BadTitle(Error):
@@ -261,29 +306,40 @@ class BadTitle(Error):
 # been blocked, the bot operator should address the reason for the block
 # before continuing.
 
+    pass
+
 
 class UserBlocked(Error):
 
     """Your username or IP has been blocked"""
+
+    pass
 
 
 class PageNotFound(Error):
 
     """Page not found in list"""
 
+    pass
+
 
 class CaptchaError(Error):
 
     """Captcha is asked and config.solve_captcha == False."""
 
+    pass
+
 
 class AutoblockUser(Error):
 
-    """
+    """Requested action on a virtual autoblock user not valid.
+
     The class AutoblockUserError is an exception that is raised whenever
     an action is requested on a virtual autoblock user that's not available
     for him (i.e. roughly everything except unblock).
     """
+
+    pass
 
 
 class UserActionRefuse(Error):
@@ -306,6 +362,7 @@ class EntityTypeUnknownException(WikiBaseError):
     """The requested entity type is not recognised on this site"""
 
     pass
+
 
 # TODO: Warn about the deprecated usage
 import pywikibot.data.api

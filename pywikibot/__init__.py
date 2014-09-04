@@ -123,15 +123,15 @@ class Timestamp(datetime.datetime):
 
     @classmethod
     def fromtimestampformat(cls, ts):
-        """Convert the internal MediaWiki timestamp format to a Timestamp object."""
+        """Convert a MediaWiki internal timestamp to a Timestamp object."""
         return cls.strptime(ts, cls.mediawikiTSFormat)
 
     def toISOformat(self):
-        """Convert the Timestamp object to an ISO 8601 timestamp."""
+        """Convert object to an ISO 8601 timestamp."""
         return self.strftime(self.ISO8601Format)
 
     def totimestampformat(self):
-        """Convert the Timestamp object to the internal MediaWiki timestamp format."""
+        """Convert object to a MediaWiki internal timestamp."""
         return self.strftime(self.mediawikiTSFormat)
 
     def __str__(self):
@@ -254,6 +254,8 @@ class Coordinate(object):
     @property
     def precision(self):
         """
+        Return the precision of the geo coordinate.
+
         The biggest error (in degrees) will be given by the longitudinal error - the same error in meters becomes larger
         (in degrees) further up north. We can thus ignore the latitudinal error.
 
@@ -431,6 +433,11 @@ class WbQuantity(object):
 
     @staticmethod
     def fromWikibase(wb):
+        """
+        Create a WbQuanity from the JSON data given by the Wikibase API.
+
+        @param wb: Wikibase JSON
+        """
         amount = eval(wb['amount'])
         upperBound = eval(wb['upperBound'])
         lowerBound = eval(wb['lowerBound'])

@@ -121,8 +121,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return self._link.site
 
     def version(self):
-        """Return MediaWiki version number of the Site object for the wiki
-        on which this Page resides.
+        """Return MediaWiki version number of the page site.
 
         This is needed to use @need_version() decorator for methods of
         Page objects.

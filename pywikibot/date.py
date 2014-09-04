@@ -1,8 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-This file is not runnable, but it only consists of various
-lists which are required by some other programs.
-"""
+"""Date data and manipulation module."""
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
@@ -47,8 +44,11 @@ snglValsFormats = ['CurrEvents']
 
 
 def multi(value, tuplst):
-    """This method is used when more than one pattern is used for the same
-    entry. Example: 1st century, 2nd century, etc.
+    """
+    Run multiple pattern checks for the same entry.
+
+    For example: 1st century, 2nd century, etc.
+
     The tuplst is a list of tupples. Each tupple must contain two functions:
     first to encode/decode a single value (e.g. simpleInt), second is a
     predicate function with an integer parameter that returns true or false.
@@ -227,9 +227,14 @@ def dh_constVal(value, ind, match):
 
 
 def alwaysTrue(x):
-    """This function always returns True - its used for multiple value
-    selection function to accept all other values
+    """
+    Return True, always.
 
+    It is used for multiple value selection function to accept all other values.
+
+    @param x: not used
+    @return: True
+    @rtype: bool
     """
     return True
 
@@ -1931,8 +1936,9 @@ for monthOfYear in yrMnthFmts:
 
 
 def addFmt1(lang, isMnthOfYear, patterns):
-    """Add 12 month formats for a specific type ('January','Feb..), for a given
-    language. The function must accept one parameter for the ->int or ->string
+    """Add 12 month formats for a specific type ('January','Feb..), for a given language.
+
+    The function must accept one parameter for the ->int or ->string
     conversions, just like everywhere else in the formats map.
     The patterns parameter is a list of 12 elements to be used for each month.
 
@@ -1961,6 +1967,7 @@ def makeMonthList(pattern):
 
 def makeMonthNamedList(lang, pattern, makeUpperCase=None):
     """Create a list of 12 elements based on the name of the month.
+
     The language-dependent month name is used as a formating argument to the
     pattern. The pattern must be have one %s that will be replaced by the
     localized month name.
@@ -2291,9 +2298,13 @@ def getNumberOfDaysInMonth(month):
 
 
 def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
-    """Return (dictName,value), where value can be a year, date, etc, and
-    dictName is 'YearBC', 'December', etc.
+    """
+    Return first matching formatted date value.
 
+    @param lang: language code
+    @param title: value to format
+    @return: dictName ('YearBC', 'December', ...) and value (a year, date, ...)
+    @rtype: tuple
     """
     for dictName, dict in formats.items():
         try:

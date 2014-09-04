@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Interface functions to Mediawiki's api.php
-"""
+"""Interface to Mediawiki's api.php."""
 #
 # (C) Pywikibot team, 2007-2014
 #
@@ -141,6 +139,7 @@ class Request(MutableMapping):
     """
 
     def __init__(self, **kwargs):
+        """Constructor."""
         try:
             self.site = kwargs.pop("site")
         except KeyError:
@@ -713,7 +712,9 @@ class QueryGenerator(object):
     @property
     def __modules(self):
         """
-        Instance cache: hold the query data for paraminfo on
+        Cache paraminfo in this request's Site object.
+
+        Hold the query data for paraminfo on
         querymodule=self.module at self.site.
 
         """
@@ -938,6 +939,8 @@ class PageGenerator(QueryGenerator):
 
     def __init__(self, generator, g_content=False, **kwargs):
         """
+        Constructor.
+
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and generator is required.
 
@@ -999,7 +1002,7 @@ class ImagePageGenerator(PageGenerator):
 
 class PropertyGenerator(QueryGenerator):
 
-    """Iterator for queries of type action=query&prop=...
+    """Iterator for queries of type action=query&prop=foo.
 
     See the API documentation for types of page properties that can be
     queried.
@@ -1014,6 +1017,8 @@ class PropertyGenerator(QueryGenerator):
 
     def __init__(self, prop, **kwargs):
         """
+        Constructor.
+
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and prop is required.
 
@@ -1027,7 +1032,7 @@ class PropertyGenerator(QueryGenerator):
 
 class ListGenerator(QueryGenerator):
 
-    """Iterator for queries of type action=query&list=...
+    """Iterator for queries of type action=query&list=foo.
 
     See the API documentation for types of lists that can be queried.  Lists
     include both side-wide information (such as 'allpages') and page-specific
@@ -1043,6 +1048,8 @@ class ListGenerator(QueryGenerator):
 
     def __init__(self, listaction, **kwargs):
         """
+        Constructor.
+
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and listaction is required.
 
@@ -1056,11 +1063,13 @@ class ListGenerator(QueryGenerator):
 class LogEntryListGenerator(ListGenerator):
 
     """
-    Like ListGenerator, but specialized for listaction="logevents" :
-    yields LogEntry objects instead of dicts.
+    Iterator for queries of list 'logevents'.
+
+    Yields LogEntry objects instead of dicts.
     """
 
     def __init__(self, logtype=None, **kwargs):
+        """Constructor."""
         ListGenerator.__init__(self, "logevents", **kwargs)
 
         from pywikibot import logentries
@@ -1124,7 +1133,7 @@ class LoginManager(login.LoginManager):
 
 
 def update_page(page, pagedict):
-    """Update attributes of Page object page, based on query data in pagedict
+    """Update attributes of Page object page, based on query data in pagedict.
 
     @param page: object to be updated
     @type page: Page

@@ -74,8 +74,9 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
     def botAllowed(self):
         """
-        Checks whether the bot is listed on a specific page to comply with
-        the policy on the respective wiki.
+        Check whether the bot is listed on a specific page.
+
+        This allows bots to comply with the policy on the respective wiki.
         """
         if self.site.family.name in botList \
                 and self.site.code in botList[self.site.family.name]:

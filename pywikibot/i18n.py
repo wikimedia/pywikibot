@@ -1,7 +1,9 @@
 # -*- coding: utf-8  -*-
 """
-Various i18n functions, both for the internal translation system
-and for TranslateWiki-based translations
+Various i18n functions.
+
+Helper functions for both the internal translation system
+and for TranslateWiki-based translations.
 """
 #
 # (C) Pywikibot team, 2004-2014
@@ -235,8 +237,8 @@ class TranslationError(Error):
 
 
 def _extract_plural(code, message, parameters):
-    """Check for the plural variants in message and replace them depending on
-    parameter settings.
+    """Check for the plural variants in message and replace them.
+
     @param message: the message to be replaced
     @type message: unicode string
     @param parameters: plural parameters passed from other methods
@@ -346,8 +348,7 @@ def translate(code, xdict, parameters=None, fallback=False):
 
 
 def twtranslate(code, twtitle, parameters=None):
-    """ Use TranslateWiki files to provide translations based on the TW title
-        twtitle, which corresponds to a page on TW.
+    """Translate a message.
 
         @param code The language code
         @param twtitle The TranslateWiki string title, in <package>-<key> format
@@ -401,8 +402,7 @@ def twtranslate(code, twtitle, parameters=None):
 
 # Maybe this function should be merged with twtranslate
 def twntranslate(code, twtitle, parameters=None):
-    """ First implementation of plural support for translations based on the
-    TranslateWiki title twtitle, which corresponds to a page on TranslateWiki.
+    """Translate a message with plural support.
 
     @param code The language code
     @param twtitle The TranslateWiki string title, in <package>-<key> format
@@ -475,14 +475,17 @@ def twntranslate(code, twtitle, parameters=None):
 
 
 def twhas_key(code, twtitle):
-    """ Use TranslateWiki files to to check whether specified translation
-        based on the TW title is provided. No code fallback is made.
+    """
+    Check if a message has a translation in the specified language code.
 
-        @param code The language code
-        @param twtitle The TranslateWiki string title, in <package>-<key> format
+    The translations are retrieved from i18n.<package>, based on the callers
+    import table.
 
-        The translations are retrieved from i18n.<package>, based on the callers
-        import table.
+    No code fallback is made.
+
+    @param code The language code
+    @param twtitle The TranslateWiki string title, in <package>-<key> format
+
     """
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
@@ -494,6 +497,7 @@ def twhas_key(code, twtitle):
 
 def input(twtitle, parameters=None, password=False):
     """ Ask the user a question, return the user's answer.
+
         @param twtitle The TranslateWiki string title, in <package>-<key> format
         @param parameters For passing parameters. In the future, this will
                           be used for plural support.

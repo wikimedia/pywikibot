@@ -1,6 +1,8 @@
 # -*- coding: utf-8  -*-
 """
-This module offers a wide variety of page generators. A page generator is an
+This module offers a wide variety of page generators.
+
+A page generator is an
 object that is iterable (see http://legacy.python.org/dev/peps/pep-0255/ ) and
 that yields page objects on which other scripts can then work.
 
@@ -209,6 +211,7 @@ __doc__ = __doc__.replace("&params;", parameterHelp)
 class GeneratorFactory(object):
 
     """Process command line arguments and return appropriate page generator.
+
     This factory is responsible for processing command line arguments
     that are used by many scripts and that determine which pages to work on.
     """
@@ -679,13 +682,13 @@ def ImagesPageGenerator(pageWithImages, step=None, total=None, content=False):
 
 
 def InterwikiPageGenerator(page):
-    """Iterator over all interwiki (non-language) links on a page."""
+    """Iterate over all interwiki (non-language) links on a page."""
     for link in page.interwiki():
         yield pywikibot.Page(link)
 
 
 def LanguageLinksPageGenerator(page, step=None, total=None):
-    """Iterator over all interwiki language links on a page."""
+    """Iterate over all interwiki language links on a page."""
     for link in page.iterlanglinks(step=step, total=total):
         yield pywikibot.Page(link)
 
@@ -694,7 +697,7 @@ def ReferringPageGenerator(referredPage, followRedirects=False,
                            withTemplateInclusion=True,
                            onlyTemplateInclusion=False,
                            step=None, total=None, content=False):
-    '''Yields all pages referring to a specific page.'''
+    """Yield all pages referring to a specific page."""
     return referredPage.getReferences(
         follow_redirects=followRedirects,
         withTemplateInclusion=withTemplateInclusion,
@@ -804,7 +807,7 @@ def PagesFromTitlesGenerator(iterable, site=None):
 @deprecate_arg("number", "total")
 def UserContributionsGenerator(username, namespaces=None, site=None,
                                step=None, total=None):
-    """Yield unique pages edited by user:username
+    """Yield unique pages edited by user:username.
 
     @param namespaces: list of namespace numbers to fetch contribs from
 
@@ -820,8 +823,7 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
 
 def NamespaceFilterPageGenerator(generator, namespaces, site=None):
     """
-    Wraps around another generator. Yields only those pages that are in one
-    of the given namespaces.
+    A generator yielding pages from another generator in given namespaces.
 
     The namespace list can contain both integers (namespace numbers) and
     strings/unicode strings (namespace names).
@@ -873,9 +875,11 @@ class RegexFilter(object):
 
     @classmethod
     def __filter_match(cls, regex, string, quantifier):
-        """ return True if string matches precompiled regex list with depending
-        on the quantifier parameter (see below).
+        """Return True if string matches precompiled regex list.
 
+        @param quantifier: a qualifer
+        @type quantifier: str of 'all', 'any' or 'none'
+        @rtype: bool
         """
         if quantifier == 'all':
             match = all(r.search(string) for r in regex)
@@ -885,7 +889,7 @@ class RegexFilter(object):
 
     @classmethod
     def __precompile(cls, regex, flag):
-        """ precompile the regex list if needed """
+        """ precompile the regex list if needed. """
         # Enable multiple regexes
         if not isinstance(regex, list):
             regex = [regex]
@@ -899,8 +903,9 @@ class RegexFilter(object):
     @deprecate_arg("inverse", "quantifier")
     def titlefilter(cls, generator, regex, quantifier='any',
                     ignore_namespace=True):
-        """ Yield pages from another generator whose title matches regex with
-        options re.IGNORECASE dependig on the quantifier parameter.
+        """ Yield pages from another generator whose title matches regex.
+
+        Uses regex option re.IGNORECASE depending on the quantifier parameter.
         If ignore_namespace is False, the whole page title is compared.
         NOTE: if you want to check for a match at the beginning of the title,
         you have to start the regex with "^"
@@ -933,10 +938,11 @@ class RegexFilter(object):
 
     @classmethod
     def contentfilter(cls, generator, regex, quantifier='any'):
-        """Yield pages from another generator whose body matches regex with
-        options re.IGNORECASE|re.DOTALL dependig on the quantifier parameter.
+        """Yield pages from another generator whose body matches regex.
 
-        For parameters see titlefilter above
+        Uses regex option re.IGNORECASE depending on the quantifier parameter.
+
+        For parameters see titlefilter above.
 
         """
         reg = cls.__precompile(regex, re.IGNORECASE | re.DOTALL)
@@ -965,8 +971,9 @@ def CategoryGenerator(generator):
 
 def FileGenerator(generator):
     """
-    Wraps around another generator. Yields the same pages, but as FilePage
-    objects instead of Page objects. Makes sense only if it is ascertained
+    Yield pages from another generator as FilePage objects.
+
+    Makes sense only if it is ascertained
     that only images are being retrieved.
     """
     for page in generator:
@@ -1102,8 +1109,7 @@ def NewimagesPageGenerator(step=None, total=None, site=None):
 
 def WikidataItemGenerator(gen):
     """
-    A wrapper generator used to take another generator
-    and yield their relevant Wikidata items
+    A wrapper generator used to yield Wikidata items of another generator.
     """
     for page in gen:
         if isinstance(page, pywikibot.ItemPage):
@@ -1249,8 +1255,9 @@ def RandomRedirectPageGenerator(total=10, site=None):
 
 def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
                             site=None):
-    """Yield all pages that include a specified link, according to
-    [[Special:Linksearch]].
+    """Yield all pages that include a specified link.
+
+    Obtains data from [[Special:Linksearch]].
 
     """
     if site is None:
@@ -1262,7 +1269,7 @@ def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
 def SearchPageGenerator(query, step=None, total=None, namespaces=None,
                         site=None):
     """
-    Provides a list of results using the internal MediaWiki search engine
+    Yield pages from the MediaWiki internal search engine.
     """
     if site is None:
         site = pywikibot.Site()
@@ -1272,7 +1279,10 @@ def SearchPageGenerator(query, step=None, total=None, namespaces=None,
 
 
 def UntaggedPageGenerator(untaggedProject, limit=500):
-    """ Function to get the pages returned by this tool:
+    """
+    Yield pages from defunct toolserver UntaggedImages.php.
+
+    It was using this tool:
     https://toolserver.org/~daniel/WikiSense/UntaggedImages.php
     """
     URL = "https://toolserver.org/~daniel/WikiSense/UntaggedImages.php?"
@@ -1409,16 +1419,19 @@ class GoogleSearchPageGenerator:
 
 def MySQLPageGenerator(query, site=None):
     """
-    Requires oursql <https://pythonhosted.org/oursql/> or
-    MySQLdb <https://sourceforge.net/projects/mysql-python/>
-    Yields a list of pages based on a MySQL query. Each query
-    should provide the page namespace and page title. An example
+    Yield a list of pages based on a MySQL query.
+
+    Each query should provide the page namespace and page title. An example
     query that yields all ns0 pages might look like:
         SELECT
          page_namespace,
          page_title,
         FROM page
         WHERE page_namespace = 0;
+
+    Requires oursql <https://pythonhosted.org/oursql/> or
+    MySQLdb <https://sourceforge.net/projects/mysql-python/>
+
     @param query: MySQL query to execute
     @param site: Site object or raw database name
     @type site: pywikibot.Site|str

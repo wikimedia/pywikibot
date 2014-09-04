@@ -20,6 +20,8 @@ from pywikibot import config
 
 class TextEditor(object):
 
+    """Text editor."""
+
     def command(self, tempFilename, text, jumpIndex=None):
         command = config.editor
         if jumpIndex:
@@ -69,7 +71,8 @@ class TextEditor(object):
 
     def edit(self, text, jumpIndex=None, highlight=None):
         """
-        Calls the editor and thus allows the user to change the text.
+        Call the editor and thus allows the user to change the text.
+
         Returns the modified text. Halts the thread's operation until the editor
         is closed.
 
