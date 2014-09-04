@@ -25,6 +25,10 @@ stdin = sys.stdin
 stdout = sys.stdout
 stderr = sys.stderr
 argv = sys.argv
+
+if sys.version_info[0] > 2:
+    unicode = str
+
 if sys.platform == "win32":
     import codecs
     from ctypes import WINFUNCTYPE, windll, POINTER
@@ -178,7 +182,7 @@ if sys.platform == "win32":
                             self._stream.write(text)
                         else:
                             if not isinstance(text, unicode):
-                                text = str(text).decode('utf-8')
+                                text = bytes(text).decode('utf-8')
                             remaining = len(text)
                             while remaining > 0:
                                 n = DWORD(0)
@@ -246,7 +250,7 @@ if sys.platform == "win32":
         # Also skip option arguments to the Python interpreter.
         while len(argv) > 0:
             arg = argv[0]
-            if not arg.startswith(u"-") or arg == u"-":
+            if not arg.startswith(b"-") or arg == u"-":
                 break
             argv = argv[1:]
             if arg == u'-m':

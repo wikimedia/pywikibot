@@ -46,6 +46,7 @@ from pywikibot.echo import Notification
 
 if sys.version_info[0] > 2:
     basestring = (str,)
+    unicode = str
 
 _logger = "wiki.site"
 

@@ -19,6 +19,7 @@ These parameters are supported to specify which pages titles to print:
 __version__ = '$Id$'
 #
 
+import sys
 import codecs
 import itertools
 import re
@@ -27,6 +28,10 @@ from pywikibot import date, config, i18n
 from pywikibot.tools import deprecate_arg
 from pywikibot.comms import http
 import pywikibot.data.wikidataquery as wdquery
+
+if sys.version_info[0] > 2:
+    basestring = (str, )
+    unicode = str
 
 # ported from version 1 for backwards-compatibility
 # most of these functions just wrap a Site or Page method that returns

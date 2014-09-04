@@ -303,7 +303,10 @@ except:
 # On Windows systems, this script tries to determine the default text editor.
 if sys.platform == 'win32':
     try:
-        import _winreg
+        if sys.version_info[0] > 2:
+            import winreg as _winreg
+        else:
+            import _winreg
         _key1 = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
                                 'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\OpenWithProgids')
         _progID = _winreg.EnumValue(_key1, 1)[0]
