@@ -128,6 +128,26 @@ class TestPageGenerators(PywikibotTestCase):
                                                           quantifier='none')
         self.assertEqual(len(tuple(gen)), 9)
 
+    def test_RepeatingGenerator(self):
+        self.assertFunction("RepeatingGenerator")
+        # site.recentchanges() includes external edits (from wikidata),
+        # so total=4 is not too high
+        items = list(
+            pagegenerators.RepeatingGenerator(self.site.recentchanges,
+                                              key_func=lambda x: x['revid'],
+                                              sleep_duration=10,
+                                              reverse=True,
+                                              namespaces=[0],
+                                              total=4)
+        )
+        self.assertEqual(len(items), 4)
+        timestamps = [pywikibot.Timestamp.fromISOformat(item['timestamp'])
+                      for item in items]
+        self.assertEqual(sorted(timestamps), timestamps)
+        self.assertTrue(all(item['ns'] == 0 for item in items))
+        self.assertEqual(len(set(item['revid'] for item in items)), 4)
+
+
 if __name__ == "__main__":
     try:
         unittest.main()

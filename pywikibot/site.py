@@ -4048,9 +4048,7 @@ class APISite(BaseSite):
         """Yield new articles (as Page objects) from recent changes.
 
         Starts with the newest article and fetches the number of articles
-        specified in the first argument. If repeat is True, it fetches
-        Newpages again. If there is no new page, it blocks until there is
-        one, sleeping between subsequent fetches of Newpages.
+        specified in the first argument.
 
         The objects yielded are dependent on parameter returndict.
         When true, it yields a tuple composed of a Page object and a dict of

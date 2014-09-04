@@ -23,6 +23,7 @@ import sys
 import codecs
 import itertools
 import re
+import time
 import pywikibot
 from pywikibot import date, config, i18n
 from pywikibot.tools import deprecate_arg
@@ -986,6 +987,56 @@ def PageWithTalkPageGenerator(generator):
         yield page
         if not page.isTalkPage():
             yield page.toggleTalkPage()
+
+
+def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
+                       total=None, **kwargs):
+    """Yield items in live time.
+
+    The provided generator must support parameter 'start', 'end',
+    'reverse', and 'total' such as site.recentchanges(), site.logevents().
+
+    For example:
+
+    To fetch revisions in recentchanges in live time, call
+        gen = RepeatingGenerator(site.recentchanges, lambda x: x['revid'])
+
+    To fetch new pages in live time, call
+        gen = RepeatingGenerator(site.newpages, lambda x: x[0])
+
+    Note that other parameters not listed below will be passed
+    to the generator function. Parameter 'reverse', 'start', 'end'
+    will always be discarded to prevent the generator yielding items
+    in wrong order.
+
+    @param generator: a function returning a generator that will be queried
+    @param key_func: a function returning key that will be used to detect
+        duplicate entry
+    @param sleep_duration: duration between each query
+    @param total: if it is a positive number, iterate no more than this
+        number of items in total. Otherwise, iterate forever
+    @type total: int or None
+    @return: a generator yielding items in ascending order by time
+    """
+    kwargs.pop('reverse', None)  # always get newest item first
+    kwargs.pop('start', None)  # don't set start time
+    kwargs.pop('end', None)  # don't set stop time
+
+    seen = set()
+    while total is None or len(seen) < total:
+        def filtered_generator():
+            for item in generator(total=None if seen else 1, **kwargs):
+                key = key_func(item)
+                if key not in seen:
+                    seen.add(key)
+                    yield item
+                    if len(seen) == total:
+                        return
+                else:
+                    break
+            time.sleep(sleep_duration)
+        for item in list(filtered_generator())[::-1]:
+            yield item
 
 
 @deprecate_arg("pageNumber", "step")
