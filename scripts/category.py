@@ -138,15 +138,19 @@ class CategoryDatabase:
     """
 
     def __init__(self, rebuild=False, filename='category.dump.bz2'):
+        if not os.path.isabs(filename):
+            filename = config.datafilepath(filename)
+        self.filename = filename
+        self.loaded = False
         if rebuild:
             self.rebuild()
-        else:
+
+    def _load(self):
+        if not self.loaded:
             try:
-                if not os.path.isabs(filename):
-                    filename = config.datafilepath(filename)
-                f = bz2.BZ2File(filename, 'r')
+                f = bz2.BZ2File(self.filename, 'r')
                 pywikibot.output(u'Reading dump from %s'
-                                 % config.shortpath(filename))
+                                 % config.shortpath(self.filename))
                 databases = pickle.load(f)
                 f.close()
                 # keys are categories, values are 2-tuples with lists as
@@ -162,6 +166,7 @@ class CategoryDatabase:
     def rebuild(self):
         self.catContentDB = {}
         self.superclassDB = {}
+        self.loaded = True
 
     def getSubcats(self, supercat):
         """Return the list of subcategories for a given supercategory.
@@ -169,6 +174,7 @@ class CategoryDatabase:
         Saves this list in a temporary database so that it won't be loaded from
         the server next time it's required.
         """
+        self._load()
         # if we already know which subcategories exist here
         if supercat in self.catContentDB:
             return self.catContentDB[supercat][0]
@@ -185,6 +191,7 @@ class CategoryDatabase:
         Saves this list in a temporary database so that it won't be loaded from
         the server next time it's required.
         """
+        self._load()
         # if we already know which articles exist here
         if cat in self.catContentDB:
             return self.catContentDB[cat][1]
@@ -196,6 +203,7 @@ class CategoryDatabase:
             return articleset
 
     def getSupercats(self, subcat):
+        self._load()
         # if we already know which subcategories exist here
         if subcat in self.superclassDB:
             return self.superclassDB[subcat]
@@ -205,14 +213,18 @@ class CategoryDatabase:
             self.superclassDB[subcat] = supercatset
             return supercatset
 
-    def dump(self, filename='category.dump.bz2'):
+    def dump(self, filename=None):
         """Save the dictionaries to disk if not empty.
 
         Pickle the contents of the dictionaries superclassDB and catContentDB
         if at least one is not empty. If both are empty, removes the file from
         the disk.
+
+        If the filename is None, it'll use the filename determined in __init__.
         """
-        if not os.path.isabs(filename):
+        if filename is None:
+            filename = self.filename
+        elif not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         if self.catContentDB or self.superclassDB:
             pywikibot.output(u'Dumping to %s, please wait...'
