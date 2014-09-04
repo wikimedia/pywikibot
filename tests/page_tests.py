@@ -7,11 +7,15 @@
 #
 __version__ = '$Id$'
 
-
+import sys
 import pywikibot
 import pywikibot.page
 
 from tests.utils import PywikibotTestCase, unittest
+
+if sys.version_info[0] > 2:
+    basestring = (str, )
+    unicode = str
 
 site = pywikibot.Site('en', 'wikipedia')
 mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))

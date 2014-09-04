@@ -20,6 +20,7 @@ from tests.utils import PywikibotTestCase, unittest
 
 if sys.version_info[0] > 2:
     basestring = (str, )
+    unicode = str
 
 mysite = None
 mainpage = None

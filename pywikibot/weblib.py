@@ -11,7 +11,12 @@ or querying third-party sites.
 #
 __version__ = '$Id$'
 
-import urllib
+import sys
+if sys.version_info[0] == 2:
+    from urllib import urlencode
+else:
+    from urllib.parse import urlencode
+
 from pywikibot.comms import http
 
 
@@ -34,7 +39,7 @@ def getInternetArchiveURL(url, timestamp=None):
     if timestamp is not None:
         query['timestamp'] = timestamp
 
-    uri = uri + urllib.urlencode(query)
+    uri = uri + urlencode(query)
     jsontext = http.request(uri=uri, site=None)
     if "closest" in jsontext:
         data = json.loads(jsontext)
@@ -63,7 +68,7 @@ def getWebCitationURL(url, timestamp=None):
     if timestamp is not None:
         query['date'] = timestamp
 
-    uri = uri + urllib.urlencode(query)
+    uri = uri + urlencode(query)
     xmltext = http.request(uri=uri, site=None)
     if "success" in xmltext:
         data = ET.fromstring(xmltext)
