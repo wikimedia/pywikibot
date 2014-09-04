@@ -193,29 +193,32 @@ class UploadRobot:
         pywikibot.output(u'The suggested description is:\n%s'
                          % self.description)
 
+        # Description must be set and verified
+        if not self.description:
+            self.verifyDescription = True
+
         while not self.description or self.verifyDescription:
             if not self.description:
                 pywikibot.output(
                     u'\03{lightred}It is not possible to upload a file '
                     'without a summary/description.\03{default}')
 
-            if not self.description or self.verifyDescription:
-                newDescription = u''
-                # if no description, default is 'yes'
-                default = 'y' if not self.description else 'n'
-                choice = pywikibot.inputChoice(
-                    u'Do you want to change this description?',
-                    ['Yes', 'No', 'Quit'], ['y', 'n', 'q'], default)
-                if choice == 'y':
-                    from pywikibot import editor as editarticle
-                    editor = editarticle.TextEditor()
-                    newDescription = editor.edit(self.description)
-                elif choice == 'q':
-                    raise QuitKeyboardInterrupt
+            # if no description, default is 'yes'
+            default = 'y' if not self.description else 'n'
+            choice = pywikibot.inputChoice(
+                u'Do you want to change this description?',
+                ['Yes', 'No', 'Quit'], ['y', 'n', 'q'], default)
+            if choice == 'y':
+                from pywikibot import editor as editarticle
+                editor = editarticle.TextEditor()
+                newDescription = editor.edit(self.description)
                 # if user saved / didn't press Cancel
                 if newDescription:
                     self.description = newDescription
-                    break
+            if choice == 'q':
+                raise QuitKeyboardInterrupt
+            else:
+                self.verifyDescription = False
 
         return filename
 
