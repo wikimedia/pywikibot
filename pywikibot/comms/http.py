@@ -256,4 +256,13 @@ def request(site, uri, ssl=False, *args, **kwargs):
         pywikibot.warning(u"Http response status %(status)s"
                           % {'status': request.data[0].status})
 
-    return request.data[1]
+    pos = request.data[0]['content-type'].find('charset=')
+    if pos >= 0:
+        pos += len('charset=')
+        encoding = request.data[0]['content-type'][pos:]
+    else:
+        encoding = 'ascii'
+        # Don't warn, many pages don't contain one
+        pywikibot.log(u"Http response doesn't contain a charset.")
+
+    return request.data[1].decode(encoding)

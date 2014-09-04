@@ -20,7 +20,7 @@ class HttpTestCase(NoSiteTestCase):
 
     def test_get(self):
         r = http.request(site=None, uri='http://www.wikipedia.org/')
-        self.assertIsInstance(r, str)
+        self.assertIsInstance(r, str if sys.version_info[0] >= 3 else unicode)
         self.assertIn('<html lang="mul"', r)
 
     def test_request(self):
@@ -32,8 +32,8 @@ class HttpTestCase(NoSiteTestCase):
         self.assertIsInstance(r[0]['status'], str)
         self.assertEqual(r[0]['status'], '200')
 
-        self.assertIsInstance(r[1], str)
-        self.assertIn('<html lang="mul"', r[1])
+        self.assertIsInstance(r[1], bytes if sys.version_info[0] >= 3 else str)
+        self.assertIn(b'<html lang="mul"', r[1])
         self.assertEqual(int(r[0]['content-length']), len(r[1]))
 
     def test_gzip(self):
