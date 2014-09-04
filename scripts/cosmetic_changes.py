@@ -18,6 +18,9 @@ The following parameters are supported:
                   the predefined message texts with original and replacements
                   inserted.
 
+-ignore:          Ignores if an error occured and either skips the page or
+                  only that method. It can be set to 'page' or 'method'.
+
 &warning;
 
 For regular use, it is recommended to put this line into your user-config.py:
@@ -147,9 +150,15 @@ deprecatedTemplates = {
 }
 
 
+CANCEL_ALL = False
+CANCEL_PAGE = 1
+CANCEL_METHOD = 2
+
+
 class CosmeticChangesToolkit:
+
     def __init__(self, site, debug=False, redirect=False, namespace=None,
-                 pageTitle=None):
+                 pageTitle=None, ignore=CANCEL_ALL):
         self.site = site
         self.debug = debug
         self.redirect = redirect
@@ -157,40 +166,77 @@ class CosmeticChangesToolkit:
         self.template = (self.namespace == 10)
         self.talkpage = self.namespace >= 0 and self.namespace % 2 == 1
         self.title = pageTitle
+        self.ignore = ignore
 
-    def change(self, text):
-        """Given a wiki source code text, return the cleaned up version."""
-        oldText = text
-        if self.site.sitename() == u'commons:commons' and self.namespace == 6:
-            text = self.commonsfiledesc(text)
-        text = self.fixSelfInterwiki(text)
-        text = self.standardizePageFooter(text)
-        text = self.fixSyntaxSave(text)
-        text = self.cleanUpLinks(text)
-        text = self.cleanUpSectionHeaders(text)
-        text = self.putSpacesInLists(text)
-        text = self.translateAndCapitalizeNamespaces(text)
-##        text = self.translateMagicWords(text)
-        text = self.replaceDeprecatedTemplates(text)
-##        text = self.resolveHtmlEntities(text)
-        text = self.validXhtml(text)
-        text = self.removeUselessSpaces(text)
-        text = self.removeNonBreakingSpaceBeforePercent(text)
+        self.common_methods = (
+            self.commonsfiledesc,
+            self.fixSelfInterwiki,
+            self.standardizePageFooter,
+            self.fixSyntaxSave,
+            self.cleanUpLinks,
+            self.cleanUpSectionHeaders,
+            self.putSpacesInLists,
+            self.translateAndCapitalizeNamespaces,
+##            self.translateMagicWords,
+            self.replaceDeprecatedTemplates,
+##            self.resolveHtmlEntities,
+            self.validXhtml,
+            self.removeUselessSpaces,
+            self.removeNonBreakingSpaceBeforePercent,
 
-        text = self.fixHtml(text)
-        text = self.fixReferences(text)
-        text = self.fixStyle(text)
-        text = self.fixTypo(text)
-        if self.site.code in ['ckb', 'fa']:
-            text = self.fixArabicLetters(text)
+            self.fixHtml,
+            self.fixReferences,
+            self.fixStyle,
+            self.fixTypo,
+
+            self.fixArabicLetters,
+        )
+
+    def safe_execute(self, method, text):
+        """Execute the method and catch exceptions if enabled."""
+        result = None
         try:
-            text = isbn.hyphenateIsbnNumbers(text)
+            result = method(text)
+        except Exception as e:
+            if self.ignore == CANCEL_METHOD:
+                pywikibot.warning(u'Unable to perform "{0}" on "{1}"!'.format(
+                    method.__name__, self.title))
+                pywikibot.exception(e)
+            else:
+                raise
+        return text if result is None else text
+
+    @staticmethod
+    def isbn_execute(text):
+        """Hyphenate ISBN numbers and catch 'InvalidIsbnException'."""
+        try:
+            return isbn.hyphenateIsbnNumbers(text)
         except isbn.InvalidIsbnException as error:
             pywikibot.log(u"ISBN error: %s" % error)
-            pass
-        if self.debug:
-            pywikibot.showDiff(oldText, text)
+            return None
+
+    def _change(self, text):
+        """Execute all clean up methods."""
+        for method in self.common_methods:
+            text = self.safe_execute(method, text)
+        text = self.safe_execute(CosmeticChangesToolkit.isbn_execute, text)
         return text
+
+    def change(self, text):
+        """Execute all clean up methods and catch errors if activated."""
+        try:
+            new_text = self._change(text)
+        except Exception as e:
+            if self.ignore == CANCEL_PAGE:
+                pywikibot.warning(u'Skipped "{0}", because an error occured.'.format(self.title))
+                pywikibot.exception(e)
+                return False
+            else:
+                raise
+        else:
+            if self.debug:
+                pywikibot.showDiff(text, new_text)
+            return new_text
 
     def fixSelfInterwiki(self, text):
         """
@@ -722,6 +768,8 @@ class CosmeticChangesToolkit:
         return text
 
     def fixArabicLetters(self, text):
+        if self.site.code not in ['ckb', 'fa']:
+            return
         exceptions = [
             'gallery',
             'hyperlink',
@@ -784,6 +832,8 @@ class CosmeticChangesToolkit:
 
     # Retrieved from "https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup"
     def commonsfiledesc(self, text):
+        if self.site.sitename() != u'commons:commons' or self.namespace == 6:
+            return
         # section headers to {{int:}} versions
         exceptions = ['comment', 'includeonly', 'math', 'noinclude', 'nowiki',
                       'pre', 'source', 'ref', 'timeline']
@@ -838,6 +888,7 @@ class CosmeticChangesBot(Bot):
         self.availableOptions.update({
             'async': False,
             'comment': u'Robot: Cosmetic changes',
+            'ignore': CANCEL_ALL,
         })
         super(CosmeticChangesBot, self).__init__(**kwargs)
 
@@ -848,11 +899,13 @@ class CosmeticChangesBot(Bot):
             self.current_page = page
             ccToolkit = CosmeticChangesToolkit(page.site, debug=True,
                                                namespace=page.namespace(),
-                                               pageTitle=page.title())
+                                               pageTitle=page.title(),
+                                               ignore=self.getOption('ignore'))
             changedText = ccToolkit.change(page.get())
-            self.userPut(page, page.text, changedText,
-                         comment=self.getOption('comment'),
-                         async=self.getOption('async'))
+            if changedText is not False:
+                self.userPut(page, page.text, changedText,
+                             comment=self.getOption('comment'),
+                             async=self.getOption('async'))
         except pywikibot.NoPage:
             pywikibot.output("Page %s does not exist?!"
                              % page.title(asLink=True))
@@ -881,6 +934,14 @@ def main():
             options['always'] = True
         elif arg == '-async':
             options['async'] = True
+        elif arg.startswith('-ignore:'):
+            ignore_mode = arg[len('-ignore:'):].lower()
+            if ignore_mode == 'method':
+                options['ignore'] = CANCEL_METHOD
+            elif ignore_mode == 'page':
+                options['ignore'] = CANCEL_PAGE
+            else:
+                raise ValueError('Unknown ignore mode "{0}"!'.format(ignore_mode))
         else:
             genFactory.handleArg(arg)
 
