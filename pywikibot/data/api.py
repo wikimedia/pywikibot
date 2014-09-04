@@ -185,13 +185,9 @@ class Request(MutableMapping):
         # otherwise be a problem.
         # This situation is only tripped when one of the first actions
         # on the site is a write action and the extension isn't installed.
-        if 'extensions' in self.site.siteinfo:
-            use_assert_edit_extension = self.site.has_extension('AssertEdit')
-        else:
-            use_assert_edit_extension = True
-
         if ((self.write and LV(self.site.version()) >= LV("1.23")) or
-                (self.params["action"] == "edit" and use_assert_edit_extension)):
+                (self.params['action'] == 'edit' and
+                 self.site.has_extension('AssertEdit'))):
             pywikibot.debug(u"Adding user assertion", _logger)
             self.params["assert"] = "user"  # make sure user is logged in
 
