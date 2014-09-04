@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Family module for Wikivoyage."""
 
 __version__ = '$Id$'
 
@@ -8,7 +9,11 @@ from pywikibot import family
 
 
 class Family(family.WikimediaFamily):
+
+    """Family class for Wikivoyage."""
+
     def __init__(self):
+        """Constructor."""
         super(Family, self).__init__()
         self.name = 'wikivoyage'
         self.languages_by_size = [
@@ -22,4 +27,5 @@ class Family(family.WikimediaFamily):
         self.cross_allowed = ['es', 'ru', ]
 
     def shared_data_repository(self, code, transcluded=False):
+        """Return the shared data repository for this site."""
         return ('wikidata', 'wikidata')

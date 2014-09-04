@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Family module for Wikimedia chapter wikis."""
 
 __version__ = '$Id$'
 
@@ -7,7 +8,11 @@ from pywikibot import family
 
 # The wikis of Chapters of the Wikimedia Foundation living at a xy.wikimedia.org url
 class Family(family.Family):
+
+    """Family class for Wikimedia chapter wikis."""
+
     def __init__(self):
+        """Constructor."""
         family.Family.__init__(self)
         self.name = 'wikimediachapter'
 

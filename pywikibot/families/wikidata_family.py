@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-
+"""Family module for Wikidata."""
 __version__ = '$Id$'
 
 from pywikibot import family
@@ -8,7 +8,11 @@ from pywikibot import family
 
 
 class Family(family.WikimediaFamily):
+
+    """Family class for Wikidata."""
+
     def __init__(self):
+        """Constructor."""
         super(Family, self).__init__()
         self.name = 'wikidata'
         self.langs = {
@@ -32,11 +36,11 @@ class Family(family.WikimediaFamily):
         return (code, self.name)
 
     def calendarmodel(self, code):
-        """Default calendar model for WbTime datatype"""
+        """Default calendar model for WbTime datatype."""
         return 'http://www.wikidata.org/entity/Q1985727'
 
     def globes(self, code):
-        """Supported globes for Coordinate datatype"""
+        """Supported globes for Coordinate datatype."""
         return {
             'ariel': 'http://www.wikidata.org/entity/Q3343',
             'callisto': 'http://www.wikidata.org/entity/Q3134',

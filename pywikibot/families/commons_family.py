@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Family module for Wikimedia Commons."""
 
 __version__ = '$Id$'
 
@@ -7,7 +8,11 @@ from pywikibot import family
 
 # The Wikimedia Commons family
 class Family(family.WikimediaFamily):
+
+    """Family class for Wikimedia Commons."""
+
     def __init__(self):
+        """Constructor."""
         super(Family, self).__init__()
         self.name = 'commons'
         self.langs = {
@@ -41,4 +46,5 @@ class Family(family.WikimediaFamily):
         }
 
     def shared_data_repository(self, code, transcluded=False):
+        """Return the shared data repository for this site."""
         return ('wikidata', 'wikidata')

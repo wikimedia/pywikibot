@@ -1,4 +1,6 @@
 # -*- coding: utf-8  -*-
+"""Family module for Wikinews."""
+
 from pywikibot import family
 
 __version__ = '$Id$'
@@ -6,7 +8,11 @@ __version__ = '$Id$'
 
 # The Wikimedia family that is known as Wikinews
 class Family(family.WikimediaFamily):
+
+    """Family class for Wikinews."""
+
     def __init__(self):
+        """Constructor."""
         super(Family, self).__init__()
         self.name = 'wikinews'
 
@@ -49,4 +55,5 @@ class Family(family.WikimediaFamily):
         }
 
     def shared_data_repository(self, code, transcluded=False):
+        """Return the shared data repository for this site."""
         return ('wikidata', 'wikidata')
