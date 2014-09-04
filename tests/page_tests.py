@@ -27,6 +27,8 @@ class TestLinkObject(PywikibotTestCase):
     enwiki = pywikibot.Site("en", "wikipedia")
     frwiki = pywikibot.Site("fr", "wikipedia")
     itwikt = pywikibot.Site("it", "wiktionary")
+    enws = pywikibot.Site("en", "wikisource")
+    itws = pywikibot.Site("it", "wikisource")
 
     namespaces = {0: [u""],        # en.wikipedia.org namespaces for testing
                   1: [u"Talk:"],   # canonical form first, then others
@@ -91,6 +93,7 @@ class TestLinkObject(PywikibotTestCase):
                 self.assertEqual(m.title, self.titles[title])
 
     def testHashCmp(self):
+        """Test hash comparison."""
         # All links point to en:wikipedia:Test
         l1 = pywikibot.page.Link('Test', source=self.enwiki)
         l2 = pywikibot.page.Link('en:Test', source=self.frwiki)
@@ -109,6 +112,22 @@ class TestLinkObject(PywikibotTestCase):
 
         self.assertNotEqual(l1, other)
         self.assertNotEqual(hash(l1), hash(other))
+
+    def test_ns_title(self):
+        """Test that title is returned with correct namespace."""
+        l1 = pywikibot.page.Link('Indice:Test', source=self.itws)
+        self.assertEqual(l1.ns_title(), 'Index:Test')
+        self.assertEqual(l1.ns_title(onsite=self.enws), 'Index:Test')
+
+        # wikisource:it kept Autore as canonical name
+        l2 = pywikibot.page.Link('Autore:Albert Einstein', source=self.itws)
+        self.assertEqual(l2.ns_title(), 'Autore:Albert Einstein')
+        self.assertEqual(l2.ns_title(onsite=self.enws), 'Author:Albert Einstein')
+
+        # Translation namespace does not exist on wikisource:it
+        l3 = pywikibot.page.Link('Translation:Albert Einstein', source=self.enws)
+        self.assertEqual(l3.ns_title(), 'Translation:Albert Einstein')
+        self.assertRaises(pywikibot.Error, l3.ns_title, onsite=self.itws)
 
 
 class TestPageObject(PywikibotTestCase):

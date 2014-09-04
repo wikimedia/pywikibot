@@ -3846,6 +3846,41 @@ not supported by PyWikiBot!"""
         else:
             return self.title
 
+    def ns_title(self, onsite=None):
+        """Return full page title, including namespace.
+
+        @param onsite: site object
+            if specified, present title using onsite local namespace,
+            otherwise use self canonical namespace.
+
+            if no corresponding namespace is found in onsite,
+            pywikibot.Error is raised.
+
+        """
+
+        ns_id = self.namespace
+        ns = self.site.namespaces()[ns_id]
+        ns_names = list(self.site.namespaces()[ns_id])
+
+        if onsite is None:
+            namespace = ns.canonical_name
+        else:
+            # look for corresponding ns in onsite by name comparison
+            for name in ns_names:
+                onsite_ns = ns.lookup_name(name, namespaces=onsite.namespaces())
+            # not found
+            if onsite_ns is None:
+                raise pywikibot.Error(
+                    u'No corresponding namespace found for namespace %s on %s.'
+                    % (self.site.namespaces()[ns_id], onsite))
+            else:
+                namespace = onsite_ns.custom_name
+
+        if namespace:
+            return u'%s:%s' % (namespace, self.title)
+        else:
+            return self.title
+
     def astext(self, onsite=None):
         """Return a text representation of the link.
 
