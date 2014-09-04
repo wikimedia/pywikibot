@@ -143,7 +143,10 @@ def user_agent_username(username=None):
         return ''
     username = username.replace(' ', '_')  # Avoid spaces or %20.
     try:
-        username = username.encode('ascii')
+        username.encode('ascii')  # just test, but not actually use it
+    except UnicodeEncodeError:
+        pass
+    else:
         # % is legal in the default $wgLegalTitleChars
         # This is so that ops know the real pywikibot will not
         # allow a useragent in the username to allow through a hand-coded
@@ -152,8 +155,6 @@ def user_agent_username(username=None):
             return quote(username)
         else:
             return username
-    except UnicodeEncodeError:
-        pass
     username = quote(username.encode('utf-8'))
     return username
 

@@ -16,6 +16,8 @@ import datetime
 import urllib
 import subprocess
 
+import pywikibot.config2 as config
+
 cache = None
 
 
@@ -206,7 +208,7 @@ def getversion_git(path=None):
                              '--date=iso'],
                             cwd=_program_dir,
                             stdout=subprocess.PIPE).stdout.read()
-    info = info.split('|')
+    info = info.decode(config.console_encoding).split('|')
     date = info[0][:-6]
     date = time.strptime(date.strip('"'), '%Y-%m-%d %H:%M:%S')
     rev = subprocess.Popen([cmd, 'rev-list', 'HEAD'],
