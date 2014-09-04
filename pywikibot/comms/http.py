@@ -252,7 +252,9 @@ def request(site, uri, ssl=False, *args, **kwargs):
     if request.data[0].status == 504:
         raise Server504Error("Server %s timed out" % site.hostname())
 
-    if request.data[0].status != 200:
+    # HTTP status 207 is also a success status for Webdav FINDPROP,
+    # used by the version module.
+    if request.data[0].status not in (200, 207):
         pywikibot.warning(u"Http response status %(status)s"
                           % {'status': request.data[0].status})
 
