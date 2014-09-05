@@ -78,15 +78,8 @@ class MovePagesBot(Bot):
                                 newPageTitle))
             page.move(newPageTitle, reason=msg, movetalkpage=self.getOption('movetalkpage'),
                       deleteAndMove=self.getOption('noredirect'))
-        except pywikibot.NoPage:
-            pywikibot.output(u'Page %s does not exist!' % page.title())
-        except pywikibot.IsRedirectPage:
-            pywikibot.output(u'Page %s is a redirect; skipping.' % page.title())
-        except pywikibot.LockedPage:
-            pywikibot.output(u'Page %s is locked!' % page.title())
-        except pywikibot.PageNotSaved as e:
-            #target newPageTitle already exists
-            pywikibot.output(e.message)
+        except pywikibot.PageRelatedError as error:
+            pywikibot.output(error)
 
     def treat(self, page):
         self.current_page = page

@@ -31,6 +31,7 @@ PageSaveRelatedError: page exceptions within the save operation on a Page.
   - EditConflict: Edit conflict while uploading the page
       - PageDeletedConflict: Page was deleted since being retrieved
       - PageCreatedConflict: Page was created by another user
+      - ArticleExistsConflict: Page article already exists
 
 ServerError: a problem with the server.
   - FatalServerError: A fatal/non-recoverable server error
@@ -262,6 +263,15 @@ class PageCreatedConflict(EditConflict):
     """Page was created by another user"""
 
     message = u"Page %s has been created since last retrieved."
+
+    pass
+
+
+class ArticleExistsConflict(EditConflict):
+
+    """Page already exists."""
+
+    message = u"Destination article %s already exists and is not a redirect to the source article"
 
     pass
 

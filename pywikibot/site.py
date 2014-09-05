@@ -20,7 +20,7 @@ import os
 import re
 import sys
 from distutils.version import LooseVersion as LV
-from collections import Iterable, Container
+from collections import Iterable, Container, namedtuple
 import threading
 import time
 import json
@@ -38,6 +38,7 @@ from pywikibot.exceptions import (
     EditConflict,
     PageCreatedConflict,
     PageDeletedConflict,
+    ArticleExistsConflict,
     LockedPage,
     CascadeLockedPage,
     LockedNoPage,
@@ -3593,6 +3594,7 @@ class APISite(BaseSite):
                 pywikibot.log(str(result))
                 return False
 
+    OnErrorExc = namedtuple('OnErrorExc', 'exception on_new_page')
     # catalog of move errors for use in error messages
     _mv_errors = {
         "noapiwrite": "API editing not enabled on %(site)s wiki",
@@ -3607,16 +3609,14 @@ class APISite(BaseSite):
 "User %(user)s is not authorized to move pages on %(site)s wiki",
         "immobilenamespace":
 "Pages in %(oldnamespace)s namespace cannot be moved on %(site)s wiki",
-        "articleexists":
-"Cannot move because page [[%(newtitle)s]] already exists on %(site)s wiki",
-        "protectedpage":
-"Page [[%(oldtitle)s]] is protected against moving on %(site)s wiki",
-        "protectedtitle":
-"Page [[%(newtitle)s]] is protected against creation on %(site)s wiki",
+        "articleexists": OnErrorExc(exception=ArticleExistsConflict, on_new_page=True),
+        # "protectedpage" can happen in both directions.
+        "protectedpage": OnErrorExc(exception=LockedPage, on_new_page=None),
+        "protectedtitle": OnErrorExc(exception=LockedNoPage, on_new_page=True),
         "nonfilenamespace":
 "Cannot move a file to %(newnamespace)s namespace on %(site)s wiki",
         "filetypemismatch":
-"[[%(newtitle)s]] file extension does not match content of [[%(oldtitle)s]]"
+"[[%(newtitle)s]] file extension does not match content of [[%(oldtitle)s]]",
     }
 
     @must_be(group='user')
@@ -3636,6 +3636,7 @@ class APISite(BaseSite):
         """
         oldtitle = page.title(withSection=False)
         newlink = pywikibot.Link(newtitle, self)
+        newpage = pywikibot.Page(newlink)
         if newlink.namespace:
             newtitle = self.namespace(newlink.namespace) + ":" + newlink.title
         else:
@@ -3666,16 +3667,34 @@ class APISite(BaseSite):
                     u"movepage: received '%s' even though bot is logged in"
                     % err.code,
                     _logger)
-            errdata = {
-                'site': self,
-                'oldtitle': oldtitle,
-                'oldnamespace': self.namespace(page.namespace()),
-                'newtitle': newtitle,
-                'newnamespace': self.namespace(newlink.namespace),
-                'user': self.user(),
-            }
             if err.code in self._mv_errors:
-                raise Error(self._mv_errors[err.code] % errdata)
+                on_error = self._mv_errors[err.code]
+                if hasattr(on_error, 'exception'):
+                    # LockedPage can be raised both if "from" or "to" page
+                    # are locked for the user.
+                    # Both pages locked is not considered
+                    # (a double failure has low probability)
+                    if issubclass(on_error.exception, LockedPage):
+                        # we assume "from" is locked unless proven otherwise
+                        failed_page = page
+                        if newpage.exists():
+                            for prot in self.page_restrictions(newpage).values():
+                                if prot[0] not in self._userinfo['groups']:
+                                    failed_page = newpage
+                                    break
+                    else:
+                        failed_page = newpage if on_error.on_new_page else page
+                    raise on_error.exception(failed_page)
+                else:
+                    errdata = {
+                        'site': self,
+                        'oldtitle': oldtitle,
+                        'oldnamespace': self.namespace(page.namespace()),
+                        'newtitle': newtitle,
+                        'newnamespace': self.namespace(newlink.namespace),
+                        'user': self.user(),
+                    }
+                    raise Error(on_error % errdata)
             pywikibot.debug(u"movepage: Unexpected error code '%s' received."
                             % err.code,
                             _logger)
