@@ -3576,6 +3576,7 @@ class APISite(BaseSite):
 "[[%(newtitle)s]] file extension does not match content of [[%(oldtitle)s]]"
     }
 
+    @must_be(group='user')
     def movepage(self, page, newtitle, summary, movetalk=True,
                  noredirect=False):
         """Move a Page to a new title.
