@@ -1155,6 +1155,21 @@ class Siteinfo(Container):
             return None
 
 
+class TokenWallet(object):
+
+    """Container for tokens."""
+
+    def __init__(self, site):
+        self.site = site
+        self.site._tokens = {}
+
+    def __getitem__(self, key):
+        storage = self.site._tokens.setdefault(self.site.user(), {})
+        if key not in storage:
+            self.site.preload_tokens([key])
+        return storage[key]
+
+
 class APISite(BaseSite):
 
     """API interface to MediaWiki site.
@@ -1190,7 +1205,7 @@ class APISite(BaseSite):
         self._msgcache = {}
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
         self._siteinfo = Siteinfo(self)
-        return
+        self.tokens = TokenWallet(self)
 
     @staticmethod
     def fromDBName(dbname):
@@ -2172,6 +2187,35 @@ class APISite(BaseSite):
                 api.update_page(page, pagedata)
                 yield page
 
+    def preload_tokens(self, types):
+        """Preload one or multiple tokens.
+
+        For all MediaWiki versions prior to 1.20, only one token can be
+        retrieved at once.
+
+        @param types: the types of token (e.g., "edit", "move", "delete");
+            see API documentation for full list of types
+        @type  types: iterable
+        """
+        storage = self._tokens.setdefault(self.user(), {})
+        if LV(self.version()) < LV('1.20'):
+            for tokentype in types:
+                query = api.PropertyGenerator('info',
+                                              titles='Dummy page',
+                                              intoken=tokentype,
+                                              site=self)
+                for item in query:
+                    pywikibot.debug(unicode(item), _logger)
+                    if (tokentype + 'token') in item:
+                        storage[tokentype] = item[tokentype + 'token']
+        else:
+            data = api.Request(site=self, action='tokens',
+                               type='|'.join(types)).submit()
+            if 'tokens' in data and data['tokens']:
+                storage.update(dict((key[:-5], val)
+                                    for key, val in data['tokens'].items()))
+
+    @deprecated("the 'tokens' property")
     def token(self, page, tokentype):
         """Return token retrieved from wiki to allow changing page content.
 
@@ -2180,19 +2224,7 @@ class APISite(BaseSite):
             see API documentation for full list of types
 
         """
-        query = api.PropertyGenerator("info",
-                                      titles=page.title(withSection=False),
-                                      intoken=tokentype,
-                                      site=self)
-        for item in query:
-            if not self.sametitle(item['title'], page.title(withSection=False)):
-                raise Error(
-                    u"token: Query on page %s returned data on page [[%s]]"
-                    % (page.title(withSection=False, asLink=True),
-                       item['title']))
-            api.update_page(page, item)
-            pywikibot.debug(unicode(item), _logger)
-            return item[tokentype + "token"]
+        return self.tokens[tokentype]
 
     # following group of methods map more-or-less directly to API queries
 
@@ -3396,7 +3428,7 @@ class APISite(BaseSite):
             lastrev = None
             if not recreate:
                 raise
-        token = self.token(page, "edit")
+        token = self.tokens['edit']
         # getting token also updates the 'lastrevid' value, which allows us to
         # detect if page has been changed since last time text was retrieved.
 
@@ -3570,7 +3602,7 @@ class APISite(BaseSite):
         if not page.exists():
             raise NoPage("Cannot move page %s because it does not exist on %s."
                          % (oldtitle, self))
-        token = self.token(page, "move")
+        token = self.tokens['move']
         self.lock_page(page)
         req = api.Request(site=self, action="move", to=newtitle,
                           token=token, reason=summary)
@@ -3688,7 +3720,7 @@ class APISite(BaseSite):
         @param summary: Edit summary (required!).
 
         """
-        token = self.token(page, "delete")
+        token = self.tokens['delete']
         self.lock_page(page)
         req = api.Request(site=self, action="delete", token=token,
                           title=page.title(withSection=False),
@@ -3758,7 +3790,7 @@ class APISite(BaseSite):
         @type expiry: pywikibot.Timestamp, string in GNU timestamp format
             (including ISO 8601).
         """
-        token = self.token(page, 'protect')
+        token = self.tokens['protect']
         self.lock_page(page)
 
         protectList = [ptype + '=' + level for ptype, level in protections.items()
@@ -3796,7 +3828,7 @@ class APISite(BaseSite):
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
                   autoblock=True, noemail=False, reblock=False):
 
-        token = self.token(user, 'block')
+        token = self.tokens['block']
         if isinstance(expiry, pywikibot.Timestamp):
             expiry = expiry.toISOformat()
         req = api.Request(site=self, action='block', user=user.username,
@@ -3818,7 +3850,7 @@ class APISite(BaseSite):
     @must_be(group='sysop')
     def unblockuser(self, user, reason):
 
-        token = self.token(user, 'block')
+        token = self.tokens['block']
         req = api.Request(site=self, action='unblock', user=user.username,
                           reason=reason, token=token)
 
@@ -3833,7 +3865,7 @@ class APISite(BaseSite):
         @return: True if API returned expected response; False otherwise
 
         """
-        token = self.token(page, "watch")
+        token = self.tokens['watch']
         req = api.Request(action="watch", token=token,
                           title=page.title(withSection=False))
         if unwatch:
@@ -3954,7 +3986,7 @@ class APISite(BaseSite):
             text = filepage.text
         if not text:
             text = comment
-        token = self.token(filepage, "edit")
+        token = self.tokens['edit']
         result = None
         if source_filename:
             # upload local file
@@ -4436,8 +4468,7 @@ class DataSite(APISite):
             params['bot'] = 1
         if 'baserevid' in kwargs and kwargs['baserevid']:
             params['baserevid'] = kwargs['baserevid']
-        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
-                                     'edit')  # Use a dummy page
+        params['token'] = self.tokens['edit']
         for arg in kwargs:
             if arg in ['clear', 'data', 'exclude', 'summary']:
                 params[arg] = kwargs[arg]
@@ -4461,8 +4492,7 @@ class DataSite(APISite):
             params['value'] = json.dumps(claim._formatValue())
         if 'summary' in kwargs:
             params['summary'] = kwargs['summary']
-        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
-                                     'edit')
+        params['token'] = self.tokens['edit']
         req = api.Request(site=self, **params)
         data = req.submit()
         claim.snak = data['claim']['id']
@@ -4496,8 +4526,7 @@ class DataSite(APISite):
             params['bot'] = 1
         if 'summary' in kwargs:
             params['summary'] = kwargs['summary']
-        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
-                                     'edit')
+        params['token'] = self.tokens['edit']
         if snaktype == 'value':
             params['value'] = json.dumps(claim._formatValue())
 
@@ -4527,8 +4556,7 @@ class DataSite(APISite):
             params['baserevid'] = claim.on_item.lastrevid
         if bot:
             params['bot'] = 1
-        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
-                                     'edit')
+        params['token'] = self.tokens['edit']
         # build up the snak
         if isinstance(source, list):
             sources = source
@@ -4584,8 +4612,7 @@ class DataSite(APISite):
                 hasattr(qualifier, 'hash') and
                 qualifier.hash is not None):
             params['snakhash'] = qualifier.hash
-        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
-                                     'edit')
+        params['token'] = self.tokens['edit']
         # build up the snak
         if qualifier.getSnakType() == 'value':
             params['value'] = json.dumps(qualifier._formatValue())
@@ -4606,8 +4633,7 @@ class DataSite(APISite):
         if bot:
             params['bot'] = 1
         params['claim'] = '|'.join(claim.snak for claim in claims)
-        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
-                                     'edit')  # Use a dummy page
+        params['token'] = self.tokens['edit']
         for kwarg in kwargs:
             if kwarg in ['baserevid', 'summary']:
                 params[kwarg] = kwargs[kwarg]
@@ -4630,8 +4656,7 @@ class DataSite(APISite):
             params['bot'] = 1
         params['statement'] = claim.snak
         params['references'] = '|'.join(source.hash for source in sources)
-        params['token'] = self.token(pywikibot.Page(self, u'Main Page'),
-                                     'edit')  # Use a dummy page
+        params['token'] = self.tokens['edit']
         for kwarg in kwargs:
             if kwarg in ['baserevid', 'summary']:
                 params[kwarg] = kwargs[kwarg]
@@ -4656,7 +4681,7 @@ class DataSite(APISite):
             'totitle': page1.title(),
             'fromsite': page2.site.dbName(),
             'fromtitle': page2.title(),
-            'token': self.token(page1, 'edit')
+            'token': self.tokens['edit']
         }
         if bot:
             params['bot'] = 1
@@ -4678,7 +4703,7 @@ class DataSite(APISite):
             'action': 'wbmergeitems',
             'fromid': fromItem.getID(),
             'toid': toItem.getID(),
-            'token': self.token(toItem, 'edit')
+            'token': self.tokens['edit']
         }
         for kwarg in kwargs:
             if kwarg in ['ignoreconflicts', 'summary']:
