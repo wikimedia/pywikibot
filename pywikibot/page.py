@@ -29,18 +29,18 @@ import hashlib
 if sys.version_info[0] == 2:
     import htmlentitydefs
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
+    from urllib import urlopen
 else:
     unicode = basestring = str
     from html import entities as htmlentitydefs
     from urllib.parse import quote_from_bytes, unquote_to_bytes
+    from urllib.request import urlopen
 
 import logging
 import re
 import sys
 import unicodedata
 import collections
-
-import urllib
 
 logger = logging.getLogger("pywiki.wiki.page")
 
@@ -1878,7 +1878,7 @@ class FilePage(Page):
         """Return image file's MD5 checksum."""
 # FIXME: MD5 might be performed on incomplete file due to server disconnection
 # (see bug #1795683).
-        f = urllib.urlopen(self.fileUrl())
+        f = urlopen(self.fileUrl())
         # TODO: check whether this needs a User-Agent header added
         h = hashlib.md5()
         h.update(f.read())

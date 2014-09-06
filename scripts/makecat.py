@@ -122,6 +122,8 @@ def asktoadd(pl):
     pywikibot.output(u'')
     pywikibot.output(u"==%s==" % pl.title())
     while True:
+        # TODO: Use pywikibot.inputChoice?
+        # (needs the support for 'other options')
         answer = pywikibot.input("[y]es/[n]o/[i]gnore/[o]ther options?")
         if answer == 'y':
             include(pl)

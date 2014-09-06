@@ -21,14 +21,18 @@ are taken into account.
 #
 __version__ = '$Id$'
 #
-
-import cPickle
+import sys
 import re
 import time
 from datetime import datetime, timedelta
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot import i18n
+
+if sys.version_info[0] > 2:
+    import pickle as cPickle
+else:
+    import cPickle
 
 
 class CategoryRedirectBot(object):

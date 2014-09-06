@@ -43,19 +43,29 @@ __version__ = '$Id$'
 #
 
 import re
-import urllib2
-import httplib
 import socket
 import codecs
 import subprocess
 import tempfile
 import os
 import gzip
-import StringIO
+import sys
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, textlib, xmlreader, Bot
 import noreferences
+
+# TODO: Convert to httlib2
+if sys.version_info[0] > 2:
+    from urllib.parse import quote
+    from urllib.request import urlopen
+    from urllib.error import HTTPError, URLError
+    import http.client as httplib
+    import io as StringIO
+else:
+    from urllib2 import quote, urlopen, HTTPError, URLError
+    import httplib
+    import StringIO
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -528,10 +538,10 @@ class ReferencesRobot(Bot):
                 try:
                     socket.setdefaulttimeout(20)
                     try:
-                        f = urllib2.urlopen(ref.url.decode("utf8"))
+                        f = urlopen(ref.url.decode("utf8"))
                     except UnicodeError:
-                        ref.url = urllib2.quote(ref.url.encode("utf8"), "://")
-                        f = urllib2.urlopen(ref.url)
+                        ref.url = quote(ref.url.encode("utf8"), "://")
+                        f = urlopen(ref.url)
                     # Try to get Content-Type from server
                     headers = f.info()
                     contentType = headers.getheader('Content-Type')
@@ -596,7 +606,7 @@ class ReferencesRobot(Bot):
                         u'\03{lightred}Bad link\03{default} : %s in %s'
                         % (ref.url, page.title(asLink=True)))
                     continue
-                except urllib2.HTTPError as e:
+                except HTTPError as e:
                     pywikibot.output(u'HTTP error (%s) for %s on %s'
                                      % (e.code, ref.url,
                                         page.title(asLink=True)),
@@ -608,7 +618,7 @@ class ReferencesRobot(Bot):
                         repl = ref.refDead()
                         new_text = new_text.replace(match.group(), repl)
                     continue
-                except (urllib2.URLError,
+                except (URLError,
                         socket.error,
                         IOError,
                         httplib.error) as e:

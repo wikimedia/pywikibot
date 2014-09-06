@@ -14,6 +14,7 @@ import os
 import time
 import datetime
 import subprocess
+import sys
 
 import pywikibot.config2 as config
 
@@ -145,7 +146,10 @@ def github_svn_rev2hash(tag, rev):
     @return: the git hash
     @rtype: str
     """
-    from StringIO import StringIO
+    if sys.version_info[0] > 2:
+        from io import StringIO
+    else:
+        from StringIO import StringIO
     import xml.dom.minidom
     from pywikibot.comms import http
 

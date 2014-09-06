@@ -34,13 +34,20 @@ __version__ = '$Id$'
 #
 
 import re
-import urllib
 import time
 import socket
 import xml.etree.ElementTree
+import sys
 
 import pywikibot
 from pywikibot import pagegenerators, textlib
+
+if sys.version_info[0] > 2:
+    from urllib.parse import urlencode
+    from urllib.request import urlopen
+else:
+    from urllib import urlencode, urlopen
+
 
 category_blacklist = []
 countries = []
@@ -119,14 +126,14 @@ def getCommonshelperCats(imagepage):
     lang = site.language()
     family = site.family.name
     if lang == u'commons' and family == u'commons':
-        parameters = urllib.urlencode(
+        parameters = urlencode(
             {'i': imagepage.title(withNamespace=False).encode('utf-8'),
              'r': 'on',
              'go-clean': 'Find+Categories',
              'p': search_wikis,
              'cl': hint_wiki})
     elif family == u'wikipedia':
-        parameters = urllib.urlencode(
+        parameters = urlencode(
             {'i': imagepage.title(withNamespace=False).encode('utf-8'),
              'r': 'on',
              'go-move': 'Find+Categories',
@@ -147,7 +154,7 @@ def getCommonshelperCats(imagepage):
         try:
             if tries < maxtries:
                 tries += 1
-                commonsHelperPage = urllib.urlopen(
+                commonsHelperPage = urlopen(
                     "https://toolserver.org/~daniel/WikiSense/CommonSense.php?%s" % parameters)
                 matches = commonsenseRe.search(
                     commonsHelperPage.read().decode('utf-8'))
@@ -210,10 +217,10 @@ def getOpenStreetMap(latitude, longitude):
     """
     result = []
     gotInfo = False
-    parameters = urllib.urlencode({'lat': latitude, 'lon': longitude, 'accept-language': 'en'})
+    parameters = urlencode({'lat': latitude, 'lon': longitude, 'accept-language': 'en'})
     while not gotInfo:
         try:
-            page = urllib.urlopen("https://nominatim.openstreetmap.org/reverse?format=xml&%s" % parameters)
+            page = urlopen("https://nominatim.openstreetmap.org/reverse?format=xml&%s" % parameters)
             et = xml.etree.ElementTree.parse(page)
             gotInfo = True
         except IOError:
@@ -366,11 +373,11 @@ def filterParents(categories):
     for cat in categories:
         cat = cat.replace('_', ' ')
         toFilter = toFilter + "[[Category:" + cat + "]]\n"
-    parameters = urllib.urlencode({'source': toFilter.encode('utf-8'),
+    parameters = urlencode({'source': toFilter.encode('utf-8'),
                                    'bot': '1'})
     filterCategoriesRe = re.compile('\[\[Category:([^\]]*)\]\]')
     try:
-        filterCategoriesPage = urllib.urlopen(
+        filterCategoriesPage = urlopen(
             "https://toolserver.org/~multichill/filtercats.php?%s" % parameters)
         result = filterCategoriesRe.findall(
             filterCategoriesPage.read().decode('utf-8'))

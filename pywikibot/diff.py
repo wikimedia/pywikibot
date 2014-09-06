@@ -11,7 +11,11 @@ __version__ = '$Id$'
 
 
 import difflib
-import itertools
+import sys
+if sys.version_info[0] > 2:
+    from itertools import zip_longest
+else:
+    from itertools import izip_longest as zip_longest
 
 import pywikibot
 
@@ -129,7 +133,7 @@ class Hunk(object):
 
         colored_line = u''
         state = 'Close'
-        for char, char_ref in itertools.izip_longest(line, line_ref.strip(), fillvalue=' '):
+        for char, char_ref in zip_longest(line, line_ref.strip(), fillvalue=' '):
             char_tagged = char
             if state == 'Close':
                 if char_ref != ' ':
