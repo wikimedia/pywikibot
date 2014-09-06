@@ -1,6 +1,43 @@
 # -*- coding: utf-8  -*-
 """
 Exception classes used throughout the framework.
+
+Error: Base class, all exceptions should the subclass of this class.
+  - NoUsername: Username is not in user-config.py
+  - UserBlockedY: our username or IP has been blocked
+  - AutoblockUser: requested action on a virtual autoblock user not valid
+  - UserActionRefuse
+  - NoSuchSite: Site does not exist
+  - BadTitle: Server responded with BadTitle
+  - InvalidTitle: Invalid page title
+  - PageNotFound: Page not found in list
+  - CaptchaError: Captcha is asked and config.solve_captcha == False
+  - Server504Error: Server timed out with HTTP 504 code
+
+PageRelatedError: any exception which is caused by an operation on a Page.
+  - NoPage: Page does not exist
+  - IsRedirectPage: Page is a redirect page
+  - IsNotRedirectPage: Page is not a redirect page
+  - CircularRedirect: Page is a circular redirect
+  - SectionError: The section specified by # does not exist
+  - LockedPage: Page is locked
+      - LockedNoPage: Title is locked against creation
+      - CascadeLockedPage: Page is locked due to cascading protection
+
+PageSaveRelatedError: page exceptions within the save operation on a Page.
+  (alias: PageNotSaved)
+  - SpamfilterError: MediaWiki spam filter detected a blacklisted URL
+  - OtherPageSaveError: misc. other save related exception.
+  - EditConflict: Edit conflict while uploading the page
+      - PageDeletedConflict: Page was deleted since being retrieved
+      - PageCreatedConflict: Page was created by another user
+
+ServerError: a problem with the server.
+  - FatalServerError: A fatal/non-recoverable server error
+
+WikiBaseError: any issue specific to Wikibase.
+  - CoordinateGlobeUnknownException: globe is not implemented yet.
+
 """
 #
 # (C) Pywikibot team, 2008
@@ -29,25 +66,72 @@ class Error(UnicodeMixin, Exception):
 
 class PageRelatedError(Error):
 
-    """Abstract Exception, used when the Exception concerns a particular
-    Page, and when a generic message can be written once for all"""
+    """
+    Abstract Exception, used when the exception concerns a particular Page.
+    """
+
     # Preformated UNICODE message where the page title will be inserted
     # Override this in subclasses.
     # u"Oh noes! Page %s is too funky, we should not delete it ;("
     message = None
 
-    def __init__(self, page):
+    def __init__(self, page, message=None):
         """
-        @param page
+        Constructor.
+
+        @param page: Page that caused the exception
         @type page: Page object
         """
+        if message:
+            self.message = message
+
         if self.message is None:
             raise Error("PageRelatedError is abstract. Can't instantiate it!")
-        super(PageRelatedError, self).__init__(self.message % page)
-        self._page = page
+
+        self.page = page
+        self.title = page.title(asLink=True)
+        self.site = page.site
+
+        if '%(' in self.message and ')s' in self.message:
+            super(PageRelatedError, self).__init__(self.message % self.__dict__)
+        else:
+            super(PageRelatedError, self).__init__(self.message % page)
 
     def getPage(self):
         return self._page
+
+
+class PageSaveRelatedError(PageRelatedError):
+
+    """Saving the page has failed"""
+    message = u"Page %s was not saved."
+
+    # This property maintains backwards compatibility with
+    # the old PageNotSaved which inherited from Error
+    # (not PageRelatedError) and exposed the normal 'args'
+    # which could be printed
+    @property
+    def args(self):
+        return unicode(self)
+
+
+class OtherPageSaveError(PageSaveRelatedError):
+
+    """Saving the page has failed due to uncatchable error."""
+    message = "Edit to page %(title)s failed:\n%(reason)s"
+
+    def __init__(self, page, reason):
+        """ Constructor.
+
+        @param reason: Details of the problem
+        @type reason: Exception or basestring
+        """
+        self.reason = reason
+        super(OtherPageSaveError, self).__init__(page)
+
+    @property
+    def args(self):
+        return unicode(self.reason)
 
 
 class NoUsername(Error):
@@ -95,10 +179,22 @@ class InvalidTitle(Error):
     """Invalid page title"""
 
 
-class LockedPage(PageRelatedError):
+class LockedPage(PageSaveRelatedError):
 
     """Page is locked"""
     message = u"Page %s is locked."
+
+
+class LockedNoPage(LockedPage):
+
+    """Title is locked against creation"""
+    message = u"Page %s does not exist and is locked preventing creation."
+
+
+class CascadeLockedPage(LockedPage):
+
+    """Page is locked due to cascading protection"""
+    message = u"Page %s is locked due to cascading protection."
 
 
 class SectionError(Error):
@@ -106,26 +202,38 @@ class SectionError(Error):
     """The section specified by # does not exist"""
 
 
-class PageNotSaved(Error):
-
-    """Saving the page has failed"""
+PageNotSaved = PageSaveRelatedError
 
 
-class EditConflict(PageNotSaved):
+class EditConflict(PageSaveRelatedError):
 
     """There has been an edit conflict while uploading the page"""
+    message = u"Page %s could not be saved due to an edit conflict"
 
 
-class SpamfilterError(PageNotSaved):
+class PageDeletedConflict(EditConflict):
+
+    """Page was deleted since being retrieved"""
+    message = u"Page %s has been deleted since last retrieved."
+
+
+class PageCreatedConflict(EditConflict):
+
+    """Page was created by another user"""
+    message = u"Page %s has been created since last retrieved."
+
+
+class SpamfilterError(PageSaveRelatedError):
 
     """Saving the page has failed because the MediaWiki spam filter detected a
     blacklisted URL.
     """
-    def __init__(self, arg):
-        super(SpamfilterError, self).__init__(
-            u'MediaWiki spam filter has been triggered')
-        self.url = arg
-        self.args = arg,
+
+    message = "Edit to page %(title)s rejected by spam filter due to content:\n%(url)s"
+
+    def __init__(self, page, url):
+        self.url = url
+        super(SpamfilterError, self).__init__(page)
 
 
 class ServerError(Error):

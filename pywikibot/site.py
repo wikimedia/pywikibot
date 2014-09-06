@@ -32,9 +32,14 @@ from pywikibot.tools import itergroup, deprecated, deprecate_arg
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import (
-    EditConflict,
     Error,
+    PageSaveRelatedError,
+    EditConflict,
+    PageCreatedConflict,
+    PageDeletedConflict,
     LockedPage,
+    CascadeLockedPage,
+    LockedNoPage,
     NoPage,
     NoSuchSite,
     NoUsername,
@@ -3375,23 +3380,26 @@ class APISite(BaseSite):
             rngen.request["grnredirect"] = ""
         return rngen
 
-    # catalog of editpage error codes, for use in generating messages
+    # Catalog of editpage error codes, for use in generating messages.
+    # The block at the bottom are page related errors.
     _ep_errors = {
         "noapiwrite": "API editing not enabled on %(site)s wiki",
         "writeapidenied": "User %(user)s is not authorized to edit on %(site)s wiki",
-        "protectedtitle": "Title %(title)s is protected against creation on %(site)s",
         "cantcreate": "User %(user)s not authorized to create new pages on %(site)s wiki",
         "cantcreate-anon": """Bot is not logged in, and anon users are not authorized to create new pages on %(site)s wiki""",
-        "articleexists": "Page %(title)s already exists on %(site)s wiki",
         "noimageredirect-anon": """Bot is not logged in, and anon users are not authorized to create image redirects on %(site)s wiki""",
         "noimageredirect": "User %(user)s not authorized to create image redirects on %(site)s wiki",
-        "spamdetected": "Edit to page %(title)s rejected by spam filter due to content:\n",
         "filtered": "%(info)s",
         "contenttoobig": "%(info)s",
         "noedit-anon": """Bot is not logged in, and anon users are not authorized to edit on %(site)s wiki""",
         "noedit": "User %(user)s not authorized to edit pages on %(site)s wiki",
-        "pagedeleted": "Page %(title)s has been deleted since last retrieved from %(site)s wiki",
-        "editconflict": "Page %(title)s not saved due to edit conflict.",
+
+        "editconflict": EditConflict,
+        "articleexists": PageCreatedConflict,
+        "pagedeleted": PageDeletedConflict,
+        "protectedpage": LockedPage,
+        "protectedtitle": LockedNoPage,
+        "cascadeprotected": CascadeLockedPage,
     }
 
     @must_be(group='user')
@@ -3439,8 +3447,7 @@ class APISite(BaseSite):
         # before the page is saved.
         self.lock_page(page)
         if lastrev is not None and page.latestRevision() != lastrev:
-            raise EditConflict(
-                "editpage: Edit conflict detected; saving aborted.")
+            raise EditConflict(page)
         params = dict(action="edit",
                       title=page.title(withSection=False),
                       text=text, token=token, summary=summary)
@@ -3479,23 +3486,17 @@ class APISite(BaseSite):
                         u"editpage: received '%s' even though bot is logged in"
                         % err.code,
                         _logger)
-                errdata = {
-                    'site': self,
-                    'title': page.title(withSection=False),
-                    'user': self.user(),
-                    'info': err.info
-                }
-                if err.code == "spamdetected":
-                    raise SpamfilterError(
-                        self._ep_errors[err.code] % errdata
-                        + err.info[err.info.index("fragment: ") + 9:])
-
-                if err.code == "editconflict":
-                    raise EditConflict(self._ep_errors[err.code] % errdata)
-                if err.code in ("protectedpage", "cascadeprotected"):
-                    raise LockedPage(errdata['title'])
                 if err.code in self._ep_errors:
-                    raise Error(self._ep_errors[err.code] % errdata)
+                    if issubclass(self._ep_errors[err.code], PageSaveRelatedError):
+                        raise self._ep_errors[err.code](page)
+                    else:
+                        errdata = {
+                            'site': self,
+                            'title': page.title(withSection=False),
+                            'user': self.user(),
+                            'info': err.info
+                        }
+                        raise Error(self._ep_errors[err.code] % errdata)
                 pywikibot.debug(
                     u"editpage: Unexpected error code '%s' received."
                     % err.code,
@@ -3539,6 +3540,8 @@ class APISite(BaseSite):
                             u"page not saved"
                             % captcha)
                         return False
+                elif 'spamblacklist' in result['edit']:
+                    raise SpamfilterError(page, result['edit']['spamblacklist'])
                 else:
                     self.unlock_page(page)
                     pywikibot.error(u"editpage: unknown failure reason %s"
@@ -3603,8 +3606,9 @@ class APISite(BaseSite):
             raise Error("Cannot move page %s to its own title."
                         % oldtitle)
         if not page.exists():
-            raise NoPage("Cannot move page %s because it does not exist on %s."
-                         % (oldtitle, self))
+            raise NoPage(page,
+                         "Cannot move page %(page)s because it "
+                         "does not exist on %(site)s.")
         token = self.tokens['move']
         self.lock_page(page)
         req = api.Request(site=self, action="move", to=newtitle,

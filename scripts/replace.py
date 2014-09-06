@@ -412,12 +412,12 @@ class ReplaceRobot(Bot):
                     pywikibot.output(
                         u'Cannot change %s because of blacklist entry %s'
                         % (page.title(), e.url))
-                except pywikibot.PageNotSaved as error:
-                    pywikibot.output(u'Error putting page: %s'
-                                     % (error.args,))
                 except pywikibot.LockedPage:
                     pywikibot.output(u'Skipping %s (locked page)'
                                      % (page.title(),))
+                except pywikibot.PageNotSaved as error:
+                    pywikibot.output(u'Error putting page: %s'
+                                     % (error.args,))
 
 
 def prepareRegexForMySQL(pattern):

@@ -260,12 +260,12 @@ Match was: %s''' % result)
                         u'Cannot change %s because of blacklist entry %s'
                         % (page.title(), e.url))
                     return (False, False, always)
-                except pywikibot.PageNotSaved as error:
-                    pywikibot.output(u'Error putting page: %s' % error.args)
-                    return (False, False, always)
                 except pywikibot.LockedPage:
                     pywikibot.output(u'Skipping %s (locked page)'
                                      % page.title())
+                    return (False, False, always)
+                except pywikibot.PageNotSaved as error:
+                    pywikibot.output(u'Error putting page: %s' % error.args)
                     return (False, False, always)
                 else:
                     # Break only if the errors are one after the other...
