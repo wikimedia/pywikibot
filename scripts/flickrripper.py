@@ -32,12 +32,11 @@ Todo:
 __version__ = '$Id$'
 #
 
-import urllib
 import re
-import StringIO
 import hashlib
 import base64
 import time
+import sys
 import pywikibot
 from pywikibot import config, textlib
 import upload
@@ -45,16 +44,26 @@ import upload
 try:
     import flickrapi                  # see: http://stuvel.eu/projects/flickrapi
 except ImportError:
-    import sys
     pywikibot.error('This script requires the python flickrapi module')
     pywikibot.error('See: http://stuvel.eu/projects/flickrapi')
     pywikibot.exception()
     sys.exit()
 
-from Tkinter import (
-    Tk, Label, Entry, Scrollbar, Text, Button,
-    END, VERTICAL, NORMAL, WORD
-)
+if sys.version_info[0] > 2:
+    from urllib.parse import urlencode
+    from urllib.request import urlopen
+    import io as StringIO
+    from tkinter import (
+        Tk, Label, Entry, Scrollbar, Text, Button,
+        END, VERTICAL, NORMAL, WORD
+    )
+else:
+    from urllib import urlencode, urlopen
+    import StringIO
+    from Tkinter import (
+        Tk, Label, Entry, Scrollbar, Text, Button,
+        END, VERTICAL, NORMAL, WORD
+    )
 from PIL import Image, ImageTk    # see: http://www.pythonware.com/products/pil/
 
 flickr_allowed_license = {
@@ -118,7 +127,7 @@ def downloadPhoto(photoUrl=''):
     TODO: Add exception handling
 
     """
-    imageFile = urllib.urlopen(photoUrl).read()
+    imageFile = urlopen(photoUrl).read()
     return StringIO.StringIO(imageFile)
 
 
@@ -150,9 +159,9 @@ def getFlinfoDescription(photo_id=0):
 
     TODO: Add exception handling, try a couple of times
     """
-    parameters = urllib.urlencode({'id': photo_id, 'raw': 'on'})
+    parameters = urlencode({'id': photo_id, 'raw': 'on'})
 
-    rawDescription = urllib.urlopen(
+    rawDescription = urlopen(
         "http://wikipedia.ramselehof.de/flinfo.php?%s" % parameters).read()
 
     return rawDescription.decode('utf-8')

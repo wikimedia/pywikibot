@@ -40,16 +40,22 @@ __version__ = '$Id$'
 
 import os
 import time
-import urllib
-import urlparse
 import tempfile
 import re
 import math
+import sys
 
 import pywikibot
 import pywikibot.data.api
 from pywikibot import config
 from pywikibot.bot import QuitKeyboardInterrupt
+
+if sys.version_info[0] > 2:
+    from urllib.parse import urlparse
+    from urllib.request import URLopener
+else:
+    from urlparse import urlparse
+    from urllib import URLopener
 
 
 class UploadRobot:
@@ -91,7 +97,7 @@ class UploadRobot:
         rlen = 0
         _contents = None
         dt = 15
-        uo = urllib.URLopener()
+        uo = URLopener()
         retrieved = False
 
         while not retrieved:
@@ -149,7 +155,7 @@ class UploadRobot:
         # Filename may be either a local file path or a URL
         if "://" in filename:
             # extract the path portion of the URL
-            filename = urlparse.urlparse(filename).path
+            filename = urlparse(filename).path
         filename = os.path.basename(filename)
 
         if self.useFilename:

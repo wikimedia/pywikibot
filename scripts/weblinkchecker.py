@@ -99,15 +99,23 @@ __version__ = '$Id$'
 import re
 import codecs
 import pickle
-import httplib
 import socket
-import urlparse
-import urllib
 import threading
 import time
+import sys
 
 import pywikibot
 from pywikibot import i18n, config, pagegenerators, textlib, xmlreader, weblib
+
+# TODO: Convert to httlib2
+if sys.version_info[0] > 2:
+    import urllib.parse as urlparse
+    import urllib.request as urllib
+    import http.client as httplib
+else:
+    import urlparse
+    import urllib
+    import httplib
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp

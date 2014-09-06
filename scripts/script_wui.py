@@ -62,7 +62,6 @@ __version__ = '$Id$'
 
 
 import datetime
-import thread
 import threading
 import sys
 import os
@@ -84,6 +83,11 @@ import crontab
 import pywikibot
 # pywikibot.botirc depends on https://pypi.python.org/pypi/irc
 import pywikibot.botirc
+
+if sys.version_info[0] > 2:
+    import _thread as thread
+else:
+    import thread
 
 
 bot_config = {
@@ -203,7 +207,10 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 def main_script(page, rev=None, params=None):
     # http://opensourcehacker.com/2011/02/23/temporarily-capturing-python-logging-output-to-a-string-buffer/
     # https://docs.python.org/release/2.6/library/logging.html
-    from StringIO import StringIO
+    if sys.version_info[0] > 2:
+        from io import StringIO
+    else:
+        from StringIO import StringIO
     import logging
 
     # safety; default mode is safe (no writing)

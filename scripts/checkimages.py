@@ -95,7 +95,6 @@ import re
 import time
 import datetime
 import locale
-import urllib
 import pywikibot
 from pywikibot import pagegenerators as pg
 from pywikibot import config, i18n
@@ -917,14 +916,8 @@ class checkImagesBot(object):
                 return imageName
 
     def convert_to_url(self, page):
-        # Function stolen from wikipedia.py
-        """The name of the page this Page refers to, in a form suitable for the
-        URL of the page.
-
-        """
-        title = page.replace(u" ", u"_")
-        encodedTitle = title.encode(self.site.encoding())
-        return urllib.quote(encodedTitle)
+        """Return the page title suitable as for an URL."""
+        return page.title(asUrl=True)
 
     def countEdits(self, pagename, userlist):
         """Function to count the edit of a user or a list of users in a page."""

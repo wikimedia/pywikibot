@@ -23,7 +23,6 @@ from distutils.version import LooseVersion as LV
 from collections import Iterable, Container
 import threading
 import time
-import urllib
 import json
 import copy
 
@@ -45,8 +44,11 @@ from pywikibot.exceptions import (
 from pywikibot.echo import Notification
 
 if sys.version_info[0] > 2:
+    from urllib.parse import urlencode
     basestring = (str,)
     unicode = str
+else:
+    from urllib import urlencode
 
 _logger = "wiki.site"
 
@@ -811,7 +813,7 @@ class BaseSite(object):
     @deprecated("urllib.urlencode()")
     def urlEncode(self, query):
         """DEPRECATED."""
-        return urllib.urlencode(query)
+        return urlencode(query)
 
     @deprecated("pywikibot.comms.http.request")
     def getUrl(self, path, retry=True, sysop=False, data=None,
@@ -825,7 +827,7 @@ class BaseSite(object):
         from pywikibot.comms import http
         if data:
             if not isinstance(data, basestring):
-                data = urllib.urlencode(data)
+                data = urlencode(data)
             return http.request(self, path, method="PUT", body=data)
         else:
             return http.request(self, path)

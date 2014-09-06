@@ -186,7 +186,7 @@ import re
 import locale
 import codecs
 from random import choice
-from string import capitalize
+import sys
 import pywikibot
 from pywikibot import i18n
 from pywikibot import config
@@ -651,7 +651,7 @@ class WelcomeBot(object):
                 'Log page is not exist, getting information for page creation')
             text = i18n.translate(self.site, logpage_header)
             text += u'\n!%s' % self.site.namespace(2)
-            text += u'\n!%s' % capitalize(
+            text += u'\n!%s' % str.capitalize(
                 self.site.mediawiki_message('contribslink'))
 
         for result in queue:
@@ -992,7 +992,10 @@ def main():
         # If there is the savedata, the script must save the number_user.
         if globalvar.randomSign and globalvar.saveSignIndex and \
            bot.welcomed_users:
-            import cPickle
+            if sys.version_info[0] > 2:
+                import pickle as cPickle
+            else:
+                import cPickle
             with open(filename, 'w') as f:
                 cPickle.dump(bot.welcomed_users, f)
 

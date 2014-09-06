@@ -10,14 +10,21 @@ __version__ = '$Id$'
 #
 
 import posixpath
-import urlparse
-import urllib
 import hashlib
 import base64
-import StringIO
+import sys
 
 import pywikibot
 import upload
+
+if sys.version_info[0] > 2:
+    from urllib.parse import urlparse
+    from urllib.request import urlopen
+    import io as StringIO
+else:
+    from urlparse import urlparse
+    from urllib import urlopen
+    import StringIO
 
 
 class Photo(object):
@@ -37,7 +44,7 @@ class Photo(object):
         self.metadata = metadata
         self.metadata["_url"] = URL
         self.metadata["_filename"] = filename = posixpath.split(
-            urlparse.urlparse(URL)[2])[1]
+            urlparse(URL)[2])[1]
         self.metadata["_ext"] = ext = filename.split(".")[-1]
         if ext == filename:
             self.metadata["_ext"] = ext = None
@@ -50,7 +57,7 @@ class Photo(object):
         TODO: Add exception handling
         """
         if not self.contents:
-            imageFile = urllib.urlopen(self.URL).read()
+            imageFile = urlopen(self.URL).read()
             self.contents = StringIO.StringIO(imageFile)
         return self.contents
 
@@ -183,7 +190,7 @@ class DataIngestionBot:
 
         TODO: Add exception handling
         """
-        imageFile = urllib.urlopen(photoUrl).read()
+        imageFile = urlopen(photoUrl).read()
         return StringIO.StringIO(imageFile)
 
     def findDuplicateImages(self, photo=None, site=pywikibot.Site(u'commons', u'commons')):
