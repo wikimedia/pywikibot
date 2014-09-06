@@ -41,6 +41,12 @@ Options for "move" action:
  * -hist        - Creates a nice wikitable on the talk page of target category
                   that contains detailed page history of the source category.
  * -nodelete    - Don't delete the old category after move
+ * -nowb        - Don't update the wikibase repository
+ * -allowsplit  - If that option is not set, it only moves the talk and main
+                  page together.
+ * -mvtogether  - Only move the pages/subcategories of a category, if the
+                  target page (and talk page, if -allowsplit is not set)
+                  doesn't exist.
 
 Options for several actions:
  * -rebuild     - reset the database
@@ -446,7 +452,7 @@ class CategoryMoveRobot(object):
                  inplace=False, move_oldcat=True, delete_oldcat=True,
                  title_regex=None, history=False, pagesonly=False,
                  deletion_comment=DELETION_COMMENT_AUTOMATIC,
-                 wikibase=True):
+                 wikibase=True, allow_split=False, move_together=False):
         """Store all given parameters in the objects attributes.
 
         @param oldcat: The move source.
@@ -472,6 +478,10 @@ class CategoryMoveRobot(object):
             DELETION_COMMENT_AUTOMATIC.
         @param wikibase: If True, update the Wikibase item of the
             old category.
+        @param allow_split: If False only moves page and talk page together.
+        @param move_together: If True moves the pages/subcategories only if
+            page and talk page could be moved or both source page and target
+            page don't exist.
         """
         self.site = pywikibot.Site()
         self.can_move_cats = ('move-categorypages' in self.site.userinfo['rights'])
@@ -492,11 +502,14 @@ class CategoryMoveRobot(object):
         self.title_regex = title_regex
         self.history = history
         self.pagesonly = pagesonly
-        self.wikibase = wikibase
+        # if that page doesn't has a wikibase
+        self.wikibase = wikibase and self.site.has_data_repository
+        self.allow_split = allow_split
+        self.move_together = move_together
 
         if not self.can_move_cats:
             repo = self.site.data_repository()
-            if repo.username() is None and self.wikibase:
+            if self.wikibase and repo.username() is None:
                 # The bot can't move categories nor update the Wikibase repo
                 raise pywikibot.NoUsername(u"The 'wikibase' option is turned on"
                                            u" and %s has no registered username."
@@ -547,35 +560,61 @@ class CategoryMoveRobot(object):
         - _change()
         - _delete()
         """
-        if self.newcat and self.move_oldcat and not self.newcat.exists():
+        # can_move_* determines if the page can be moved safely (target
+        # doesn't exist but source does), move_items determines if the
+        # items (pages/subcategories) of the category could be moved into
+        # a new (non existent) category.
+        can_move_page = CategoryMoveRobot.check_move(
+            'category page', self.oldcat, self.newcat)
+        can_move_talk = CategoryMoveRobot.check_move(
+            'category talk page', self.oldtalk, self.newtalk)
+        if not self.newcat:  # delete
+            move_items = True
+        else:
+            move_items = not self.newcat.exists() or not self.move_together
+            if not self.allow_split:
+                can_move_page = can_move_page and move_items
+                can_move_talk = can_move_talk and move_items
+        if self.newcat and self.move_oldcat:
             if self.can_move_cats:
-                oldcattitle = self.oldcat.title()
-                self.oldcat.move(self.newcat.title(), reason=self.comment,
-                                 movetalkpage=True)
-                self.oldcat = pywikibot.Category(self.oldcat.site, oldcattitle)
+                if can_move_page:
+                    oldcattitle = self.oldcat.title()
+                    self.oldcat.move(self.newcat.title(), reason=self.comment,
+                                     movetalkpage=can_move_talk)
+                    self.oldcat = pywikibot.Category(self.oldcat.site,
+                                                     oldcattitle)
             else:
-                self._movecat()
-                self._movetalk()
+                if can_move_page:
+                    self._movecat()
+                if can_move_talk:
+                    self._movetalk()
                 if self.wikibase:
                     self._update_wikibase_item()
-            if self.history:
+            if self.history and can_move_page:
                 self._hist()
-        self._change(pagegenerators.CategorizedPageGenerator(self.oldcat))
-        if not self.pagesonly:
-            self._change(pagegenerators.SubCategoriesPageGenerator(self.oldcat))
+
+        if move_items:
+            self._change(pagegenerators.CategorizedPageGenerator(self.oldcat))
+            if not self.pagesonly:
+                self._change(
+                    pagegenerators.SubCategoriesPageGenerator(self.oldcat))
+        else:
+            pywikibot.log("Didn't move pages/subcategories, because the "
+                          "category page hasn't been moved.")
         if self.oldcat.isEmptyCategory() and self.delete_oldcat and \
                 ((self.newcat and self.move_oldcat) or not self.newcat):
-            self._delete()
+            self._delete(can_move_page, can_move_talk)
 
-    def _delete(self):
+    def _delete(self, moved_page, moved_talk):
         """Private function to delete the category page and its talk page.
 
         Do not use this function from outside the class. Automatically marks
         the pages if they can't be removed due to missing permissions.
         """
-        self.oldcat.delete(self.deletion_comment,
-                           not self.batch, mark=True)
-        if self.oldtalk.exists():
+        if moved_page:
+            self.oldcat.delete(self.deletion_comment,
+                               not self.batch, mark=True)
+        if moved_talk:
             self.oldtalk.delete(self.deletion_comment,
                                 not self.batch,
                                 mark=True)
@@ -594,14 +633,31 @@ class CategoryMoveRobot(object):
                                      comment=self.comment,
                                      inPlace=self.inplace)
 
+    @staticmethod
+    def check_move(name, old_page, new_page):
+        """Return if the old page can be safely moved to the new page."""
+        move_possible = True
+        if new_page and new_page.exists():
+            pywikibot.warning(u"The {0} target '{1}' already "
+                              u"exists.".format(name, new_page.title()))
+            move_possible = False
+        if not old_page.exists():
+            # only warn if not a talk page
+            log = (pywikibot.log if old_page.namespace() % 2 else
+                    pywikibot.warning)
+            log(u"Moving {0} '{1}' requested, but the page doesn't "
+                u"exist.".format(name, old_page.title()))
+            move_possible = False
+        return move_possible
+
     def _movecat(self):
         """Private function to move the category page.
 
         Do not use this function from outside the class.
         """
         # Some preparing
-        pywikibot.output('Moving text from %s to %s.' % (self.oldcat.title(),
-                                                         self.newcat.title()))
+        pywikibot.output('Moving text from %s to %s.' % (
+                         self.oldcat.title(), self.newcat.title()))
         authors = ', '.join(self.oldcat.contributingUsers())
         template_vars = (self.oldcat.title(), authors)
         comment = i18n.twtranslate(self.site,
@@ -612,7 +668,7 @@ class CategoryMoveRobot(object):
         match = re.compile(REGEX,
                            re.IGNORECASE | re.MULTILINE | re.DOTALL)
         self.newcat.text = match.sub('', self.newcat.text)
-        site_templates = i18n.translate(self.site, cfd_templates)
+        site_templates = i18n.translate(self.site, cfd_templates) or ()
         for template_name in site_templates:
             match = re.compile(r"{{%s.*?}}" % template_name, re.IGNORECASE)
             self.newcat.text = match.sub('', self.newcat.text)
@@ -625,11 +681,10 @@ class CategoryMoveRobot(object):
 
         Do not use this function from outside the class.
         """
-        if self.oldtalk.exists():
-            comment = i18n.twtranslate(self.site, 'category-was-moved',
-                                       {'newcat': self.newcat.title(),
-                                        'title': self.newcat.title()})
-            self.oldtalk.move(self.newtalk.title(), comment)
+        comment = i18n.twtranslate(self.site, 'category-was-moved',
+                                   {'newcat': self.newcat.title(),
+                                    'title': self.newcat.title()})
+        self.oldtalk.move(self.newtalk.title(), comment)
 
     def _update_wikibase_item(self):
         """Private function to update the Wikibase item for the category.
@@ -1023,6 +1078,8 @@ def main(*args):
     wikibase = True
     withHistory = False
     rebuild = False
+    allow_split = False
+    move_together = False
     depth = 5
 
     # Process global args and prepare generator args parser
@@ -1082,6 +1139,10 @@ def main(*args):
             pagesonly = True
         elif arg == '-nowb':
             wikibase = False
+        elif arg == '-allowsplit':
+            allow_split = True
+        elif arg == '-mvtogether':
+            move_together = True
         elif arg == '-create':
             create_pages = True
         elif arg == '-redirect':
@@ -1150,7 +1211,9 @@ def main(*args):
                                 history=withHistory,
                                 pagesonly=pagesonly,
                                 deletion_comment=deletion_comment,
-                                wikibase=wikibase)
+                                wikibase=wikibase,
+                                allow_split=allow_split,
+                                move_together=move_together)
     elif action == 'tidy':
         catTitle = pywikibot.input(u'Which category do you want to tidy up?')
         bot = CategoryTidyRobot(catTitle, catDB)
