@@ -141,12 +141,16 @@ class CategoryDatabase:
         if not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         self.filename = filename
-        self.loaded = False
         if rebuild:
             self.rebuild()
 
+    @property
+    def is_loaded(self):
+        """Return whether the contents have been loaded."""
+        return hasattr(self, 'catContentDB') and hasattr(self, 'superclassDB')
+
     def _load(self):
-        if not self.loaded:
+        if not self.is_loaded():
             try:
                 f = bz2.BZ2File(self.filename, 'r')
                 pywikibot.output(u'Reading dump from %s'
@@ -166,7 +170,6 @@ class CategoryDatabase:
     def rebuild(self):
         self.catContentDB = {}
         self.superclassDB = {}
-        self.loaded = True
 
     def getSubcats(self, supercat):
         """Return the list of subcategories for a given supercategory.
@@ -226,7 +229,7 @@ class CategoryDatabase:
             filename = self.filename
         elif not os.path.isabs(filename):
             filename = config.datafilepath(filename)
-        if self.catContentDB or self.superclassDB:
+        if self.is_loaded and (self.catContentDB or self.superclassDB):
             pywikibot.output(u'Dumping to %s, please wait...'
                              % config.shortpath(filename))
             f = bz2.BZ2File(filename, 'w')
