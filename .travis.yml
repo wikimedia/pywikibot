@@ -20,6 +20,8 @@ install:
   - echo "family = '$FAMILY'" >> ~/.pywikibot/user-config.py
   - echo "usernames['$FAMILY']['$LANGUAGE'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
   - echo "usernames['wikipedia']['en'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
+  - echo "usernames['wikipedia']['test'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
+  - echo "usernames['wikidata']['test'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
   - echo "password_file = os.path.expanduser('~/.pywikibot/passwordfile')" >> ~/.pywikibot/user-config.py
 
   - touch ~/.pywikibot/passwordfile
