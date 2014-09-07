@@ -26,6 +26,8 @@ class GraphImpossible(Exception):
 class GraphSavingThread(threading.Thread):
 
     """
+    Threaded graph renderer.
+
     Rendering a graph can take extremely long. We use
     multithreading because of that.
 
@@ -50,7 +52,11 @@ class GraphSavingThread(threading.Thread):
 
 
 class GraphDrawer:
+
+    """Graphviz (dot) code creator."""
+
     def __init__(self, subject):
+        """Constructor."""
         if not pydotfound:
             raise GraphImpossible('pydot is not installed.')
         self.graph = None
@@ -153,6 +159,16 @@ class GraphDrawer:
 
 
 def getFilename(page, extension=None):
+    """
+    Create a filename that is unique for the page.
+
+    @param page: page used to create the new filename
+    @type page: Page
+    @param extension: file extension
+    @type extension: str
+    @return: filename of <family>-<lang>-<page>.<ext>
+    @rtype: str
+    """
     filename = '%s-%s-%s' % (page.site.family.name,
                              page.site.language(),
                              page.titleForFilename())

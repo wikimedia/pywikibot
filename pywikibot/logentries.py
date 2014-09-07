@@ -19,8 +19,9 @@ _logger = "wiki"
 class LogDict(dict):
 
     """
-    Simple custom dictionary that raises a custom KeyError and logs
-    debugging information when a key is missing
+    Simple custom dict that raises a custom KeyError when a key is missing.
+
+    It also logs debugging information when a key is missing.
     """
     def __missing__(self, key):
         pywikibot.debug(u"API log entry received:\n" + repr(self),
@@ -30,7 +31,7 @@ class LogDict(dict):
 
 class LogEntry(object):
 
-    """Generic log entry"""
+    """Generic log entry."""
 
     # Log type expected. None for every type, or one of the (letype) str :
     # block/patrol/etc...
@@ -38,7 +39,7 @@ class LogEntry(object):
     _expectedType = None
 
     def __init__(self, apidata):
-        """Initialize object from a logevent dict returned by MW API"""
+        """Initialize object from a logevent dict returned by MW API."""
         self.data = LogDict(apidata)
         if self._expectedType is not None and self._expectedType != self.type():
             raise Error("Wrong log type! Expecting %s, received %s instead."
@@ -57,7 +58,7 @@ class LogEntry(object):
         return self.data['ns']
 
     def title(self):
-        """Page on which action was performed"""
+        """Page on which action was performed."""
         if not hasattr(self, '_title'):
             self._title = pywikibot.Page(pywikibot.Link(self.data['title']))
         return self._title
@@ -73,7 +74,7 @@ class LogEntry(object):
         return self.data['user']
 
     def timestamp(self):
-        """Timestamp object corresponding to event timestamp"""
+        """Timestamp object corresponding to event timestamp."""
         if not hasattr(self, '_timestamp'):
             self._timestamp = pywikibot.Timestamp.fromISOformat(self.data['timestamp'])
         return self._timestamp
@@ -86,6 +87,7 @@ class BlockEntry(LogEntry):
     _expectedType = 'block'
 
     def __init__(self, apidata):
+        """Constructor."""
         super(BlockEntry, self).__init__(apidata)
         # see en.wikipedia.org/w/api.php?action=query&list=logevents&letype=block&lelimit=1&lestart=2009-03-04T00:35:07Z
         # When an autoblock is removed, the "title" field is not a page title
@@ -97,6 +99,8 @@ class BlockEntry(LogEntry):
 
     def title(self):
         """
+        Return the blocked account or IP.
+
         * Returns the Page object of username or IP
            if this block action targets a username or IP.
         * Returns the blockid if this log reflects the removal of an autoblock
@@ -121,7 +125,8 @@ class BlockEntry(LogEntry):
 
     def flags(self):
         """
-        Returns a list of (str) flags associated with the block entry.
+        Return a list of (str) flags associated with the block entry.
+
         Raises an Error if the entry is an unblocking log entry
         """
         if hasattr(self, '_flags'):
@@ -131,8 +136,9 @@ class BlockEntry(LogEntry):
 
     def duration(self):
         """
-        Returns a datetime.timedelta representing the block duration,
-        or None if block is indefinite
+        Return a datetime.timedelta representing the block duration.
+
+        It returns None if block is indefinite.
         Raises an Error if the entry is an unblocking log entry
         """
         if hasattr(self, '_duration'):
@@ -146,7 +152,8 @@ class BlockEntry(LogEntry):
 
     def expiry(self):
         """
-        Returns a Timestamp representing the block expiry date
+        Return a Timestamp representing the block expiry date.
+
         Raises an Error if the entry is an unblocking log entry
         """
         if hasattr(self, '_expiry'):
@@ -185,8 +192,9 @@ class MoveEntry(LogEntry):
 
     def suppressedredirect(self):
         """
-        Returns True if no redirect was created from the old title
-        to the new title during the move
+        Return True if no redirect was created during the move.
+
+        @rtype: bool
         """
         # Introduced in MW r47901
         return 'suppressedredirect' in self.data['move']
@@ -213,6 +221,7 @@ class LogEntryFactory(object):
 
     Only available method is create()
     """
+
     _logtypes = {
         'block': BlockEntry,
         'protect': ProtectEntry,
@@ -227,6 +236,8 @@ class LogEntryFactory(object):
 
     def __init__(self, logtype=None):
         """
+        Constructor.
+
         @param logtype: The log type of the log entries, if known in advance.
                         If None, the Factory will fetch the log entry from
                         the data to create each object.
@@ -241,7 +252,8 @@ class LogEntryFactory(object):
 
     def create(self, logdata):
         """
-        Instantiates the LogEntry object representing logdata
+        Instantiate the LogEntry object representing logdata.
+
         @param logdata: <item> returned by the api
         @type logdata: dict
 
@@ -252,7 +264,8 @@ class LogEntryFactory(object):
     @staticmethod
     def _getEntryClass(logtype):
         """
-        Returns the class corresponding to the @logtype string parameter.
+        Return the class corresponding to the @logtype string parameter.
+
         Returns LogEntry if logtype is unknown or not supported
         """
         try:
@@ -262,7 +275,7 @@ class LogEntryFactory(object):
 
     def _createFromData(self, logdata):
         """
-        Checks for logtype from data, and creates the correct LogEntry
+        Check for logtype from data, and creates the correct LogEntry.
         """
         try:
             logtype = logdata['type']

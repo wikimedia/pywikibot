@@ -114,6 +114,8 @@ class UI:
 
     def output(self, text, toStdout=False, targetStream=None):
         """
+        Output text to a stream.
+
         If a character can't be displayed in the encoding used by the user's
         terminal, it will be replaced with a question mark or by a
         transliteration.
@@ -275,8 +277,9 @@ class UI:
 
 
 class TerminalHandler(logging.Handler):
-    """A handler class that writes logging records, appropriately formatted, to
-    a stream connected to a terminal. This class does not close the stream,
+    """A handler class that writes logging records to a terminal.
+
+    This class does not close the stream,
     as sys.stdout or sys.stderr may be (and usually will be) used.
 
     Slightly modified version of the StreamHandler class that ships with

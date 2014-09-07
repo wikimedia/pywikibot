@@ -32,7 +32,8 @@ def _get_program_dir():
 
 
 def getversion(online=True):
-    """Return a pywikibot version string
+    """Return a pywikibot version string.
+
     @param online: (optional) Include information obtained online
     """
     data = dict(getversiondict())  # copy dict to prevent changes in 'chache'
@@ -258,8 +259,10 @@ def getversion_onlinerepo(repo=None):
 
 
 def getfileversion(filename):
-    """ Retrieve revision number of file (__version__ variable containing Id tag)
-        without importing it (thus can be done for any file)
+    """Retrieve revision number of file.
+
+    Extracts __version__ variable containing Id tag, without importing it.
+    (thus can be done for any file)
     """
     _program_dir = _get_program_dir()
     __version__ = None

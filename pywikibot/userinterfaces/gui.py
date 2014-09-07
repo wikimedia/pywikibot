@@ -160,14 +160,15 @@ class TextEditor(ScrolledText):
         return "break"
 
     def find_all(self, s):
-        '''
-        Highlight all occurrences of string s, and select the first one. If
-        the string has already been highlighted, jump to the next occurrence
+        """
+        Highlight all occurrences of string s, and select the first one.
+
+        If the string has already been highlighted, jump to the next occurrence
         after the current selection. (You cannot go backwards using the
         button, but you can manually place the cursor anywhere in the
         document to start searching from that point.)
 
-        '''
+        """
         if hasattr(self, "_highlight") and self._highlight == s:
             try:
                 if self.get(Tkinter.SEL_FIRST, Tkinter.SEL_LAST) == s:
@@ -325,6 +326,8 @@ class EditBoxWindow(Tkinter.Frame):
 
     def edit(self, text, jumpIndex=None, highlight=None):
         """
+        Provide user with editor to modify text.
+
         Parameters:
             * text      - a Unicode string
             * jumpIndex - an integer: position at which to put the caret

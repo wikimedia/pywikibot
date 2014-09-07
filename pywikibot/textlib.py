@@ -36,7 +36,7 @@ TEMP_REGEX = re.compile(
 
 
 def unescape(s):
-    """Replace escaped HTML-special characters by their originals"""
+    """Replace escaped HTML-special characters by their originals."""
     if '&' not in s:
         return s
     s = s.replace("&lt;", "<")
@@ -263,7 +263,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
 
 def removeDisabledParts(text, tags=['*']):
     """
-    Return text without portions where wiki markup is disabled
+    Return text without portions where wiki markup is disabled.
 
     Parts that can/will be removed are --
     * HTML comments
@@ -296,7 +296,7 @@ def removeDisabledParts(text, tags=['*']):
 
 def removeHTMLParts(text, keeptags=['tt', 'nowiki', 'small', 'sup']):
     """
-    Return text without portions where HTML markup is disabled
+    Return text without portions where HTML markup is disabled.
 
     Parts that can/will be removed are --
     * HTML and all wiki tags
@@ -334,6 +334,7 @@ class _GetDataHTML(HTMLParser):
 def isDisabled(text, index, tags=['*']):
     """
     Return True if text[index] is disabled, e.g. by a comment or by nowiki tags.
+
     For the tags parameter, see removeDisabledParts() above.
 
     """
@@ -483,8 +484,7 @@ def removeLanguageLinks(text, site=None, marker=''):
 
 def removeLanguageLinksAndSeparator(text, site=None, marker='', separator=''):
     """
-    Return text with all inter-language links, plus any preceding whitespace
-    and separator occurrences removed.
+    Return text with inter-language links and preceding separators removed.
 
     If a link to an unknown language is encountered, a warning is printed.
     If a marker is defined, that string is placed at the location of the
@@ -710,8 +710,7 @@ def removeCategoryLinks(text, site=None, marker=''):
 
 def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
     """
-    Return text with all category links, plus any preceding whitespace
-    and separator occurrences removed.
+    Return text with all category links and preceding separators removed.
 
     Put the string marker after the last replacement (at the end of the text
     if there is no replacement).
@@ -729,9 +728,9 @@ def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
 
 
 def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
-    """Replace the category oldcat with the category newcat and return
-       the modified text.
+    """Replace the category oldcat with the category newcat.
 
+    @return: the modified text
     """
     if site is None:
         site = pywikibot.Site()
@@ -772,8 +771,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
 
 def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
     """
-    Replace the category links given in the wikitext given
-    in oldtext by the new links given in new.
+    Replace all existing category links with new category links.
 
     'new' should be a list of Category objects or strings
           which can be either the raw name or [[Category:..]].
@@ -923,9 +921,9 @@ def extract_templates_and_params(text):
 
     @param text: The wikitext from which templates are extracted
     @type text: unicode or string
-
+    @return: list of template name and params
+    @rtype: list of tuple
     """
-
     if not (config.use_mwparserfromhell and mwparserfromhell):
         return extract_templates_and_params_regex(text)
     code = mwparserfromhell.parse(text)
@@ -940,10 +938,18 @@ def extract_templates_and_params(text):
 
 def extract_templates_and_params_regex(text):
     """
-    See the documentation for extract_templates_and_params
-    This does basically the same thing, but uses regex.
-    @param text:
-    @return:
+    Extract templates with params using a regex.
+
+    This function should not be called directly.
+
+    Use extract_templates_and_params, which will fallback to using this
+    regex based implementation when the mwparserfromhell implementation
+    is not used.
+
+    @param text: The wikitext from which templates are extracted
+    @type text: unicode or string
+    @return: list of template name and params
+    @rtype: list of tuple
     """
 
     # remove commented-out stuff etc.
@@ -1147,7 +1153,7 @@ def does_text_contain_section(pagetext, section):
 class tzoneFixedOffset(datetime.tzinfo):
 
     """
-    Class building tzinfo objects for fixed-offset time zones
+    Class building tzinfo objects for fixed-offset time zones.
 
     @offset: a number indicating fixed offset in minutes east from UTC
     @name: a string with name of the timezone"""
@@ -1176,7 +1182,7 @@ class tzoneFixedOffset(datetime.tzinfo):
 class TimeStripper(object):
 
     """
-    Find timestamp in page text and returns it as timezone aware datetime object
+    Find timestamp in page and return it as timezone aware datetime object.
     """
 
     def __init__(self, site=None):
@@ -1242,7 +1248,7 @@ class TimeStripper(object):
 
     def last_match_and_replace(self, txt, pat):
         """
-        Take the rightmost match, to prevent spurious earlier matches, and replace with marker
+        Take the rightmost match, to prevent spurious earlier matches, and replace with marker.
         """
         m = None
         cnt = 0
@@ -1270,6 +1276,7 @@ class TimeStripper(object):
     def timestripper(self, line):
         """
         Find timestamp in line and convert it to time zone aware datetime.
+
         All the following items must be matched, otherwise None is returned:
         -. year, month, hour, time, day, minute, tzinfo
 

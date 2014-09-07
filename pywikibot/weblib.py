@@ -1,9 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Functions for manipulating external links
-or querying third-party sites.
-
-"""
+"""Functions for manipulating external links or querying third-party sites."""
 #
 # (C) Pywikibot team, 2013
 #

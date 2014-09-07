@@ -952,7 +952,9 @@ class Siteinfo(Container):
 
     def _get_siteinfo(self, prop, expiry):
         """
-        Retrieve a siteinfo property. All properties which the site doesn't
+        Retrieve a siteinfo property.
+
+        All properties which the site doesn't
         support contain the default value. Because pre-1.12 no data was
         returned when a property doesn't exists, it queries each property
         independetly if a property is invalid.
@@ -1531,8 +1533,7 @@ class APISite(BaseSite):
                 yield Notification.fromJSON(self, notif)
 
     def notifications_mark_read(self, **kwargs):
-        """Mark one, some or all notifications,
-        selected via keyword arguments, as read.
+        """Mark selected notifications as read.
 
         @return: whether the action was successful
         @rtype: bool

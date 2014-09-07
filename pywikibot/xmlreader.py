@@ -23,9 +23,10 @@ import xml.sax
 
 def parseRestrictions(restrictions):
     """
-    Parses the characters within a restrictions tag and returns
-    strings representing user groups allowed to edit and to move
-    a page, where None means there are no restrictions.
+    Parse the characters within a restrictions tag.
+
+    Returns strings representing user groups allowed to edit and
+    to move a page, where None means there are no restrictions.
     """
     if not restrictions:
         return None, None
@@ -69,7 +70,9 @@ class XmlEntry:
 class XmlParserThread(threading.Thread):
 
     """
-    This XML parser will run as a single thread. This allows the XmlDump
+    XML parser that will run as a single thread.
+
+    This allows the XmlDump
     generator to yield pages before the parser has finished reading the
     entire dump.
 
@@ -87,7 +90,9 @@ class XmlParserThread(threading.Thread):
 class XmlDump(object):
 
     """
-    Represents an XML dump file. Reads the local file at initialization,
+    Represents an XML dump file.
+
+    Reads the local file at initialization,
     parses it, and offers access to the resulting XmlEntries via a generator.
 
     @param allrevisions: boolean
@@ -102,7 +107,7 @@ class XmlDump(object):
             self._parse = self._parse_only_latest
 
     def parse(self):
-        """Generator using cElementTree iterparse function"""
+        """Generator using cElementTree iterparse function."""
         if self.filename.endswith('.bz2'):
             import bz2
             source = bz2.BZ2File(self.filename)
@@ -133,7 +138,7 @@ class XmlDump(object):
                 yield rev
 
     def _parse_only_latest(self, event, elem):
-        """Parser that yields only the latest revision"""
+        """Parser that yields only the latest revision."""
         if event == "end" and elem.tag == "{%s}page" % self.uri:
             self._headers(elem)
             revision = elem.find("{%s}revision" % self.uri)
@@ -142,7 +147,7 @@ class XmlDump(object):
             self.root.clear()
 
     def _parse_all(self, event, elem):
-        """Parser that yields all revisions"""
+        """Parser that yields all revisions."""
         if event == "start" and elem.tag == "{%s}page" % self.uri:
             self._headers(elem)
         if event == "end" and elem.tag == "{%s}revision" % self.uri:
@@ -151,6 +156,7 @@ class XmlDump(object):
             self.root.clear()
 
     def _headers(self, elem):
+        """Extract headers from XML chunk."""
         self.title = elem.findtext("{%s}title" % self.uri)
         self.ns = elem.findtext("{%s}ns" % self.uri)
         self.pageid = elem.findtext("{%s}id" % self.uri)
@@ -160,7 +166,7 @@ class XmlDump(object):
             self.restrictions)
 
     def _create_revision(self, revision):
-        """Create a Single revision"""
+        """Create a Single revision."""
         revisionid = revision.findtext("{%s}id" % self.uri)
         timestamp = revision.findtext("{%s}timestamp" % self.uri)
         comment = revision.findtext("{%s}comment" % self.uri)
