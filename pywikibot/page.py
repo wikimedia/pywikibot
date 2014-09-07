@@ -1476,12 +1476,12 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                     u'Do you want to delete %s?' % self.title(
                         asLink=True, forceInterwiki=True),
                     ['Yes', 'No', 'All'],
-                    ['Y', 'N', 'A'],
-                    'N')
-                if answer in ['a', 'A']:
+                    ['y', 'n', 'a'],
+                    'n')
+                if answer == 'a':
                     answer = 'y'
                     self.site._noDeletePrompt = True
-            if answer in ['y', 'Y']:
+            if answer == 'y':
                 return self.site.deletepage(self, reason)
         else:  # Otherwise mark it for deletion
             if mark or hasattr(self.site, '_noMarkDeletePrompt'):
@@ -1492,12 +1492,12 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                     "for deletion instead?" % self.title(asLink=True,
                                                          forceInterwiki=True),
                     ['Yes', 'No', 'All'],
-                    ['Y', 'N', 'A'],
-                    'N')
-                if answer in ['a', 'A']:
+                    ['y', 'n', 'a'],
+                    'n')
+                if answer == 'a':
                     answer = 'y'
                     self.site._noMarkDeletePrompt = True
-            if answer in ['y', 'Y']:
+            if answer == 'y':
                 template = '{{delete|1=%s}}\n' % reason
                 self.text = template + self.text
                 return self.save(comment=reason)
