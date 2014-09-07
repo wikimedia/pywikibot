@@ -914,6 +914,9 @@ class Siteinfo(Container):
     All values of the siteinfo property 'general' are directly available.
     """
 
+    WARNING_REGEX = re.compile(u"^Unrecognized values? for parameter "
+                               u"'siprop': ([^,]+(?:, [^,]+)*)$")
+
     def __init__(self, site):
         """Initialise it with an empty cache."""
         self._site = site
@@ -964,19 +967,33 @@ class Siteinfo(Container):
         @rtype: dict (the values)
         @see: U{https://www.mediawiki.org/wiki/API:Meta#siteinfo_.2F_si}
         """
+        def warn_handler(mod, message):
+            """Return True if the warning is handled."""
+            matched = Siteinfo.WARNING_REGEX.match(message)
+            if mod == 'siteinfo' and matched:
+                invalid_properties.extend(
+                    prop.strip() for prop in matched.group(1).split(','))
+                return True
+            else:
+                return False
+
         if isinstance(prop, basestring):
             props = [prop]
         else:
             props = prop
         if len(props) == 0:
             raise ValueError('At least one property name must be provided.')
+        invalid_properties = []
         try:
-            data = pywikibot.data.api.CachedRequest(
+            request = pywikibot.data.api.CachedRequest(
                 expiry=pywikibot.config.API_config_expiry if expiry is False else expiry,
                 site=self._site,
                 action='query',
                 meta='siteinfo',
-                siprop='|'.join(props)).submit()
+                siprop='|'.join(props))
+            # warnings are handled later
+            request._warning_handler = warn_handler
+            data = request.submit()
         except api.APIError as e:
             if e.code == 'siunknown_siprop':
                 if len(props) == 1:
@@ -994,13 +1011,8 @@ class Siteinfo(Container):
                 raise
         else:
             result = {}
-            if 'warnings' in data and 'siteinfo' in data['warnings']:
-                invalid_properties = []
-                for prop in re.match(u"^Unrecognized values? for parameter "
-                                     u"'siprop': ([^,]+(?:, [^,]+)*)$",
-                                     data['warnings']['siteinfo']['*']).group(1).split(','):
-                    prop = prop.strip()
-                    invalid_properties += [prop]
+            if invalid_properties:
+                for prop in invalid_properties:
                     result[prop] = (Siteinfo._get_default(prop), False)
                 pywikibot.log(u"Unable to get siprop(s) '{0}'".format(
                     u"', '".join(invalid_properties)))

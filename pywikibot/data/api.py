@@ -160,6 +160,7 @@ class Request(MutableMapping):
         if "action" not in kwargs:
             raise ValueError("'action' specification missing from Request.")
         self.update(**kwargs)
+        self._warning_handler = None
         # Actions that imply database updates on the server, used for various
         # things like throttling or skipping actions when we're in simulation
         # mode
@@ -342,6 +343,25 @@ class Request(MutableMapping):
         submsg.set_payload(content)
         return submsg
 
+    def _handle_warnings(self, result):
+        if 'warnings' in result:
+            for mod, warning in result['warnings'].items():
+                if mod == 'info':
+                    continue
+                if '*' in warning:
+                    text = warning['*']
+                elif 'html' in warning:
+                    # Bugzilla 49978
+                    text = warning['html']['*']
+                else:
+                    pywikibot.warning(
+                        u'API warning ({0})of unknown format: {1}'.
+                        format(mod, warning))
+                    continue
+                if (not callable(self._warning_handler) or
+                        not self._warning_handler(mod, text)):
+                    pywikibot.warning(u"API warning (%s): %s" % (mod, text))
+
     def submit(self):
         """Submit a query and parse the response.
 
@@ -470,21 +490,7 @@ class Request(MutableMapping):
                     self.site.login(status)
                     # retry the previous query
                     continue
-            if "warnings" in result:
-                modules = [k for k in result["warnings"] if k != "info"]
-                for mod in modules:
-                    if '*' in result["warnings"][mod]:
-                        text = result["warnings"][mod]['*']
-                    elif 'html' in result["warnings"][mod]:
-                        # Bugzilla 49978
-                        text = result["warnings"][mod]['html']['*']
-                    else:
-                        # This is just a warning, we shouldn't raise an
-                        # exception because of it
-                        continue
-                    pywikibot.warning(
-                        u"API warning (%s): %s"
-                        % (mod, text))
+            self._handle_warnings(result)
             if "error" not in result:
                 return result
             if "*" in result["error"]:
@@ -639,6 +645,8 @@ class CachedRequest(Request):
         if not cached_available:
             self._data = super(CachedRequest, self).submit()
             self._write_cache(self._data)
+        else:
+            self._handle_warnings(self._data)
         return self._data
 
 
