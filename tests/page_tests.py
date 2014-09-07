@@ -143,7 +143,7 @@ class TestPageObject(PywikibotTestCase):
         self.assertEqual(str(mainpage), "[[%s%s:%s]]"
                                         % (family_name, site.code,
                                            mainpage.title()))
-        self.assertTrue(mainpage < maintalk)
+        self.assertLess(mainpage, maintalk)
 
     def testSite(self):
         """Test site() method"""

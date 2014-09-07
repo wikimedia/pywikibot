@@ -169,9 +169,9 @@ class TestNamespaceObject(NoSiteTestCase):
         if sys.version_info[0] > 2:
             return
 
-        self.assertTrue(a < x)
-        self.assertTrue(x > a)
-        self.assertTrue(z > x)
+        self.assertLess(a, x)
+        self.assertGreater(x, a)
+        self.assertGreater(z, x)
 
     def testNamespaceNormalizeName(self):
         self.assertEqual(Namespace.normalize_name(u'File'), u'File')

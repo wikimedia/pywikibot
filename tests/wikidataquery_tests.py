@@ -253,7 +253,7 @@ class TestApiSlowFunctions(NoSiteTestCase):
         t2 = time.time()
 
         # check that the cache access is fast
-        self.assertTrue(t2 - t1 < 0.2)
+        self.assertLess(t2 - t1, 0.2)
 
 
 if __name__ == '__main__':
