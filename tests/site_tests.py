@@ -1184,10 +1184,10 @@ class TestCommonsSite(PywikibotTestCase):
 class TestUploadEnabledSite(SiteTestCase):
 
     def test_is_uploaddisabled(self):
-        site = pywikibot.Site('commons', 'commons')
+        site = pywikibot.Site('test', 'wikipedia')
         self.assertFalse(site.is_uploaddisabled())
 
-        site = pywikibot.Site('wikidata', 'wikidata')
+        site = pywikibot.Site('test', 'wikidata')
         self.assertTrue(site.is_uploaddisabled())
 
 

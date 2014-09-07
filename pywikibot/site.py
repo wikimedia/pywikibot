@@ -3885,6 +3885,7 @@ class APISite(BaseSite):
         return ((unwatch and "unwatched" in watched)
                 or (not unwatch and "watched" in result))
 
+    @must_be(group='user')
     def purgepages(self, pages, **kwargs):
         """Purge the server's cache for one or multiple pages.
 
@@ -3936,6 +3937,7 @@ class APISite(BaseSite):
     def getImagesFromAnHash(self, hash_found=None):
         return self.getFilesFromAnHash(hash_found)
 
+    @must_be(group='user')
     def is_uploaddisabled(self):
         """Return True if upload is disabled on site.
 
@@ -3959,8 +3961,14 @@ class APISite(BaseSite):
             except api.APIError as error:
                 if error.code == u'uploaddisabled':
                     self._uploaddisabled = True
-                else:
+                elif error.code == u'missingparam':
+                    # If the upload module is enabled, the above dummy request
+                    # does not have sufficient parameters and will cause a
+                    # 'missingparam' error.
                     self._uploaddisabled = False
+                else:
+                    # Unexpected error
+                    raise
                 return self._uploaddisabled
 
     @deprecate_arg('imagepage', 'filepage')
