@@ -3286,7 +3286,7 @@ class PropertyPage(WikibasePage, Property):
         """
         if force or not hasattr(self, '_content'):
             WikibasePage.get(self, force=force, *args)
-        self.type = self._content['datatype']
+        self._type = self._content['datatype']
 
     def newClaim(self, *args, **kwargs):
         """
@@ -3294,7 +3294,8 @@ class PropertyPage(WikibasePage, Property):
 
         @return: Claim
         """
-        return Claim(self.site, self.getID(), *args, **kwargs)
+        return Claim(self.site, self.getID(), datatype=self.type,
+                      *args, **kwargs)
 
 
 class Claim(Property):
