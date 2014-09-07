@@ -73,6 +73,9 @@ class MockCachedRequestKeyTests(NoSiteTestCase):
             def version(self):
                 return '1.13'  # pre 1.14
 
+            def protocol(self):
+                return 'http'
+
             def languages(self):
                 return ['mock']
 

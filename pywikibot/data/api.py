@@ -79,6 +79,25 @@ class TimeoutError(Error):
     pass
 
 
+class EnableSSLSiteWrapper(object):
+    """Wrapper to change the site protocol to https."""
+
+    def __init__(self, site):
+        self._site = site
+
+    def __repr__(self):
+        return repr(self._site)
+
+    def __eq__(self, other):
+        return self._site == other
+
+    def __getattr__(self, attr):
+        return getattr(self._site, attr)
+
+    def protocol(self):
+        return 'https'
+
+
 class Request(MutableMapping):
 
     """A request to a Site's api.php interface.
@@ -190,6 +209,11 @@ class Request(MutableMapping):
                  self.site.has_extension('AssertEdit'))):
             pywikibot.debug(u"Adding user assertion", _logger)
             self.params["assert"] = "user"  # make sure user is logged in
+
+        if (self.site.protocol() == 'http' and (config.use_SSL_always or (
+                self.params["action"] == "login" and config.use_SSL_onlogin))
+                and self.site.family.name in config.available_ssl_project):
+            self.site = EnableSSLSiteWrapper(self.site)
 
     # implement dict interface
     def __getitem__(self, key):
@@ -378,12 +402,6 @@ class Request(MutableMapping):
             else:
                 pywikibot.log("Action '{0}' is submitted not throttled.".format(action))
             uri = self.site.scriptpath() + "/api.php"
-            ssl = False
-            if self.site.family.name in config.available_ssl_project:
-                if action == "login" and config.use_SSL_onlogin:
-                    ssl = True
-                elif config.use_SSL_always:
-                    ssl = True
             try:
                 if self.mime:
                     # construct a MIME message containing all API key/values
@@ -412,10 +430,10 @@ class Request(MutableMapping):
                     body = body[eoh + len(marker):]
                     # retrieve the headers from the MIME object
                     mimehead = dict(list(container.items()))
-                    rawdata = http.request(self.site, uri, ssl, method="POST",
+                    rawdata = http.request(self.site, uri, method="POST",
                                            headers=mimehead, body=body)
                 else:
-                    rawdata = http.request(self.site, uri, ssl, method="POST",
+                    rawdata = http.request(self.site, uri, method="POST",
                                            headers={'Content-Type': 'application/x-www-form-urlencoded'},
                                            body=paramstring)
 #                import traceback
