@@ -28,11 +28,11 @@ class TestShareFiles(SiteTestCase):
         self.assertFalse(itwp_file.exists())
         self.assertTrue(commons_file.exists())
 
-        self.assertRaises(pywikibot.NoPage, itwp_file.fileIsShared)
+        self.assertTrue(itwp_file.fileIsShared())
         self.assertTrue(commons_file.fileIsShared())
         self.assertTrue(commons_file.fileUrl())
 
-        self.assertRaises(pywikibot.NoPage, itwp_file.fileUrl)
+        self.assertIn('/wikipedia/commons/', itwp_file.fileUrl())
         self.assertRaises(pywikibot.NoPage, itwp_file.get)
 
     def testLocalOnly(self):

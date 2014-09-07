@@ -1859,8 +1859,6 @@ class FilePage(Page):
         # TODO: put the URLs to family file
         if not self.site.has_image_repository:
             return False
-        elif not self.exists():
-            raise pywikibot.NoPage(self)
         elif 'wikitravel_shared' in self.site.shared_image_repository():
             return self.fileUrl().startswith(
                 u'http://wikitravel.org/upload/shared/')
