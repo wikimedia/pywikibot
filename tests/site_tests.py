@@ -15,6 +15,7 @@ from datetime import datetime
 import re
 
 import pywikibot
+from pywikibot.data import api
 from tests.aspects import (
     unittest, TestCase,
     DefaultSiteTestCase,
@@ -1031,6 +1032,33 @@ class SiteUserTestCase(DefaultSiteTestCase):
             self.assertIsInstance(user, dict)
             self.assertTrue(user["name"]
                             in ["Jimbo Wales", "Brion VIBBER", "Tim Starling"])
+
+    def testPatrol(self):
+        """Test the site.patrol() method."""
+        mysite = self.get_site()
+
+        rc = list(mysite.recentchanges(total=1))[0]
+
+        # site.patrol() needs params
+        self.assertRaises(pywikibot.Error, lambda x: list(x), mysite.patrol())
+        result = list(mysite.patrol(rcid=rc['rcid']))
+
+        if hasattr(mysite, u'_patroldisabled') and mysite._patroldisabled:
+            raise unittest.SkipTest(u'Patrolling is disabled on %s wiki.'
+                                    % mysite)
+
+        result = result[0]
+        self.assertIsInstance(result, dict)
+
+        try:
+            # no such rcid, revid or too old revid
+            result = list(mysite.patrol(rcid=0, revid=[0, 1]))
+        except api.APIError as error:
+            if error.code == u'badtoken':
+                raise unittest.SkipTest(error)
+        except pywikibot.Error as error:
+            #expected result
+            pass
 
 
 class SiteRandomTestCase(DefaultSiteTestCase):

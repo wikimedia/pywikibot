@@ -57,8 +57,11 @@ if sys.version_info[0] > 2:
     from urllib.parse import urlencode
     basestring = (str,)
     unicode = str
+    from itertools import zip_longest
 else:
     from urllib import urlencode
+    from itertools import izip_longest as zip_longest
+
 
 _logger = "wiki.site"
 
@@ -4084,7 +4087,100 @@ class APISite(BaseSite):
 
     # TODO: implement undelete
 
-    # TODO: implement patrol
+    _patrol_errors = {
+        "nosuchrcid": "There is no change with rcid %(rcid)s",
+        "nosuchrevid": "There is no change with revid %(revid)s",
+        "patroldisabled": "Patrolling is disabled on %(site)s wiki",
+        "noautopatrol": "User %(user)s has no permission to patrol its own changes, 'autopatrol' is needed",
+        "notpatrollable": "The revision %(revid)s can't be patrolled as it's too old."
+    }
+
+    # test it with:
+    # python -m unittest tests.site_tests.SiteUserTestCase.testPatrol
+
+    def patrol(self, rcid=None, revid=None, revision=None):
+        """Return a generator of patrolled pages.
+
+        Pages to be patrolled are identified by rcid, revid or revision.
+        At least one of the parameters is mandatory.
+        See https://www.mediawiki.org/wiki/API:Patrol.
+
+        @param rcid: an int/string/iterable/iterator providing rcid of pages
+            to be patrolled.
+        @type rcid: iterable/iterator which returns a number or string which
+             contains only digits; it also supports a string (as above) or int
+        @param revid: an int/string/iterable/iterator providing revid of pages
+            to be patrolled.
+        @type revid: iterable/iterator which returns a number or string which
+             contains only digits; it also supports a string (as above) or int.
+        @param revision: an Revision/iterable/iterator providing Revision object
+            of pages to be patrolled.
+        @type revision: iterable/iterator which returns a Revision object; it
+            also supports a single Revision.
+        @yield: dict with 'rcid', 'ns' and 'title' of the patrolled page.
+
+        """
+
+        # If patrol is not enabled, attr will be set the first time a
+        # request is done.
+        if hasattr(self, u'_patroldisabled'):
+            if self._patroldisabled:
+                return
+
+        if all(_ is None for _ in [rcid, revid, revision]):
+            raise Error('No rcid, revid or revision provided.')
+
+        if isinstance(rcid, int) or isinstance(rcid, basestring):
+            rcid = set([rcid])
+        if isinstance(revid, int) or isinstance(revid, basestring):
+            revid = set([revid])
+        if isinstance(revision, pywikibot.page.Revision):
+            revision = set([revision])
+
+        # Handle param=None.
+        rcid = rcid or set()
+        revid = revid or set()
+        revision = revision or set()
+
+        # TODO: remove exeception for mw < 1.22
+        if (revid or revision) and LV(self.version()) < LV("1.22"):
+            raise NotImplementedError(
+                u'Support of "revid" parameter\n'
+                u'is not implemented in MediaWiki version < "1.22"')
+        else:
+            combined_revid = set(revid) | set(r.revid for r in revision)
+
+        gen = itertools.chain(
+            zip_longest(rcid, [], fillvalue='rcid'),
+            zip_longest(combined_revid, [], fillvalue='revid'))
+
+        token = self.tokens['patrol']
+
+        for idvalue, idtype in gen:
+            req = api.Request(site=self, action='patrol',
+                              token=token, **{idtype: idvalue})
+
+            try:
+                result = req.submit()
+            except api.APIError as err:
+                # patrol is disabled, store in attr to avoid other requests
+                if err.code == u'patroldisabled':
+                    self._patroldisabled = True
+                    return
+
+                errdata = {
+                    'site': self,
+                    'user': self.user(),
+                }
+                errdata[idtype] = idvalue
+                if err.code in self._patrol_errors:
+                    raise Error(self._patrol_errors[err.code] % errdata)
+                pywikibot.debug(u"protect: Unexpected error code '%s' received."
+                                % err.code,
+                                _logger)
+                raise
+
+            yield result['patrol']
 
     @must_be(group='sysop')
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
