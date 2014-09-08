@@ -23,7 +23,7 @@ extra_deps = {}
 script_deps = {
     'script_wui.py': ['irc', 'lunatic-python', 'crontab'],
     # Note: None of the 'lunatic-python' repos on github support MS Windows.
-    'flickrripper.py': ['PIL', 'flickrapi'],
+    'flickrripper.py': ['Pillow', 'flickrapi'],
     # Note: 'PIL' is not available via pip2.7 on MS Windows,
     #       however it is available with setuptools.
 }
