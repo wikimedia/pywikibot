@@ -76,6 +76,8 @@ class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
         """Test that correct date is matched."""
         txtMatch = u'3 février 2010 à 19:48 (CET) 7 février 2010 à 19:48 (CET)'
         txtNoMatch = u'3 March 2010 19:48 (CET) 7 March 2010 19:48 (CET)'
+        txtHourInRange = u'7 février 2010 à 23:00 (CET)'
+        txtHourOutOfRange = u'7 février 2010 à 24:00 (CET)'
 
         tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
                                  self.ts.site.siteinfo['timezone'])
@@ -84,6 +86,9 @@ class TestTimeStripperWithNoDigitsAsMonths(PywikibotTestCase):
 
         self.assertEqual(self.ts.timestripper(txtMatch), res)
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)
+
+        self.assertNotEqual(self.ts.timestripper(txtHourInRange), None)
+        self.assertEqual(self.ts.timestripper(txtHourOutOfRange), None)
 
 
 class TestTimeStripperWithDigitsAsMonths(PywikibotTestCase):
