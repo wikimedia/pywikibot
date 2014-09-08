@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-"""User-interface related functions for building bots"""
+"""User-interface related functions for building bots."""
 #
 # (C) Pywikibot team, 2008-2013
 #
@@ -49,6 +49,8 @@ pywikibot.argvu = ui.argvu()
 # Logging module configuration
 class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
+    """Modified RotatingFileHandler supporting unlimited amount of backups."""
+
     def doRollover(self):
         """
         Modified naming system for logging files.
@@ -63,7 +65,7 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         when it gets filled up, it is closed and renamed to "app.1.log", and if
         files "app.1.log", "app.2.log" etc. already exist, then they are
         renamed to "app.2.log", "app.3.log" etc. respectively.
-        If backupCount is >= 1 do not rotate but create new numbered filenames.
+        If backupCount is == -1 do not rotate but create new numbered filenames.
         The newest file has the highest number except some older numbered files
         where deleted and the bot was restarted. In this case the ordering
         starts from the lowest available (unused) number.
@@ -946,6 +948,8 @@ class WikidataBot(Bot):
 
     """
     Generic Wikidata Bot to be subclassed.
+
+    Source claims (P143) can be created for specific sites.
     """
 
     def cacheSources(self):

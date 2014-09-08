@@ -1,4 +1,4 @@
-""" Module with the graphviz drawing calls """
+""" Module with the Graphviz drawing calls. """
 #
 # (C) Pywikibot team, 2006-2010
 #
@@ -20,7 +20,7 @@ from pywikibot import config2 as config
 
 class GraphImpossible(Exception):
 
-    "Drawing a graph is not possible on your system."
+    """Drawing a graph is not possible on your system."""
 
 
 class GraphSavingThread(threading.Thread):

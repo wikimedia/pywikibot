@@ -348,14 +348,15 @@ def translate(code, xdict, parameters=None, fallback=False):
 
 
 def twtranslate(code, twtitle, parameters=None):
-    """Translate a message.
+    """
+    Translate a message.
 
-        @param code The language code
-        @param twtitle The TranslateWiki string title, in <package>-<key> format
-        @param parameters For passing parameters.
+    The translations are retrieved from i18n.<package>, based on the callers
+    import table.
 
-        The translations are retrieved from i18n.<package>, based on the callers
-        import table.
+    @param code: The language code
+    @param twtitle: The TranslateWiki string title, in <package>-<key> format
+    @param parameters: For passing parameters.
     """
     package = twtitle.split("-")[0]
     transdict = getattr(__import__(messages_package_name, fromlist=[package]), package).msg
@@ -402,11 +403,11 @@ def twtranslate(code, twtitle, parameters=None):
 
 # Maybe this function should be merged with twtranslate
 def twntranslate(code, twtitle, parameters=None):
-    """Translate a message with plural support.
+    r"""Translate a message with plural support.
 
-    @param code The language code
-    @param twtitle The TranslateWiki string title, in <package>-<key> format
-    @param parameters For passing (plural) parameters.
+    @param code: The language code
+    @param twtitle: The TranslateWiki string title, in <package>-<key> format
+    @param parameters: For passing (plural) parameters.
 
     Support is implemented like in MediaWiki extension. If the TranslateWiki
     message contains a plural tag inside which looks like
@@ -452,7 +453,6 @@ def twntranslate(code, twtitle, parameters=None):
 
     The translations are retrieved from i18n.<package>, based on the callers
     import table.
-
     """
     # If a site is given instead of a code, use its language
     if hasattr(code, 'code'):
@@ -483,9 +483,8 @@ def twhas_key(code, twtitle):
 
     No code fallback is made.
 
-    @param code The language code
-    @param twtitle The TranslateWiki string title, in <package>-<key> format
-
+    @param code: The language code
+    @param twtitle: The TranslateWiki string title, in <package>-<key> format
     """
     package = twtitle.split("-")[0]
     transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
@@ -496,20 +495,17 @@ def twhas_key(code, twtitle):
 
 
 def input(twtitle, parameters=None, password=False):
-    """ Ask the user a question, return the user's answer.
+    """
+    Ask the user a question, return the user's answer.
 
-        @param twtitle The TranslateWiki string title, in <package>-<key> format
-        @param parameters For passing parameters. In the future, this will
-                          be used for plural support.
-        @param password Hides the user's input (for password entry)
-        Returns a unicode string
+    The prompt message is retrieved via L{twtranslate} and either uses the
+    config variable 'userinterface_lang' or the default locale as the language
+    code.
 
-        The translations are retrieved from i18n.<package>, based on the callers
-        import table.
-        Translation code should be set by in the user_config.py like
-        userinterface_lang = 'de'
-        default is os locale setting
-
+    @param twtitle: The TranslateWiki string title, in <package>-<key> format
+    @param parameters: The values which will be applied to the translated text
+    @param password: Hides the user's input (for password entry)
+    @rtype: unicode string
     """
     code = config.userinterface_lang or \
            locale.getdefaultlocale()[0].split('_')[0]

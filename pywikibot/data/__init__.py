@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-The "data" module provides several physical layers of data access to the wiki.
-"""
+"""Module providing several layers of data access to the wiki."""
 #
 # (C) Pywikibot team, 2007-2014
 #

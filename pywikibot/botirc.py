@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 """
-User-interface related functions for building bots
+User-interface related functions for building bots.
 
 Note: the script requires the Python IRC library
 http://python-irclib.sourceforge.net/
@@ -30,7 +30,7 @@ import pywikibot
 class IRCBot(pywikibot.Bot, SingleServerIRCBot):
 
     """
-    Generic IRC Bot to be subclassed
+    A generic IRC Bot to be subclassed.
 
     A Bot that displays the ordinal number of the new articles being created
     visible on the Recent Changes list. The Bot doesn't make any edits, no

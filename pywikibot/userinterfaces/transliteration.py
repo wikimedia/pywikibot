@@ -1,8 +1,12 @@
 # -*- coding: utf-8  -*-
+"""Module to transliterate text."""
 __version__ = '$Id$'
 
 
 class transliterator(object):
+
+    """Class to transliterating text."""
+
     def __init__(self, encoding):
         self.trans = {}
         for char in u"ÀÁÂẦẤẪẨẬÃĀĂẰẮẴẶẲȦǠẠḀȂĄǍẢ":

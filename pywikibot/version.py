@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-""" Module to determine the pywikibot version (tag, revision and date) """
+""" Module to determine the pywikibot version (tag, revision and date). """
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2014
 # (C) xqt, 2010-2014
@@ -95,16 +95,12 @@ def getversiondict():
 def svn_rev_info(path):
     """Fetch information about the current revision of an Subversion checkout.
 
-    Returns three strings:
-    * 'tag': name for the repository
-    * 'rev': current Subversion revision identifier
-    * 'date': date of current revision
-
     @param path: directory of the Subversion checkout
-    @return: tag (name for the repository),
-             rev (current Subversion revision identifier),
-             date (date of current revision)
-    @return: C{tuple} of 3 C{str}
+    @return:
+        - tag (name for the repository),
+        - rev (current Subversion revision identifier),
+        - date (date of current revision),
+    @rtype: C{tuple} of 3 C{str}
     """
     _program_dir = path
     entries = open(os.path.join(_program_dir, '.svn/entries'))
@@ -169,11 +165,12 @@ def getversion_svn(path=None):
     """Get version info for a Subversion checkout.
 
     @param path: directory of the Subversion checkout
-    @return: tag (name for the repository),
-             rev (current Subversion revision identifier),
-             date (date of current revision),
-             hash (git hash for the Subversion revision)
-    @return: C{tuple} of 4 C{str}
+    @return:
+        - tag (name for the repository),
+        - rev (current Subversion revision identifier),
+        - date (date of current revision),
+        - hash (git hash for the Subversion revision)
+    @rtype: C{tuple} of 4 C{str}
     """
     _program_dir = path or _get_program_dir()
     tag, rev, date = svn_rev_info(_program_dir)

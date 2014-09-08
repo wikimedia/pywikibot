@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-"""Miscellaneous helper functions (not wiki-dependent)"""
+"""Miscellaneous helper functions (not wiki-dependent)."""
 #
 # (C) Pywikibot team, 2008
 #
@@ -47,6 +47,9 @@ class UnicodeMixin(object):
 
 # From http://python3porting.com/preparing.html
 class ComparableMixin(object):
+
+    """Mixin class to allow comparing to other objects of this class."""
+
     def _compare(self, other, method):
         try:
             return method(self._cmpkey(), other._cmpkey())
@@ -204,6 +207,7 @@ class ThreadList(list):
     ...
 
     """
+
     def __init__(self, limit=128, *args):
         self.limit = limit
         list.__init__(self, *args)

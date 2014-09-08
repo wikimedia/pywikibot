@@ -3952,7 +3952,6 @@ not supported by PyWikiBot!"""
             pywikibot.Error is raised.
 
         """
-
         ns_id = self.namespace
         ns = self.site.namespaces()[ns_id]
         ns_names = list(self.site.namespaces()[ns_id])
