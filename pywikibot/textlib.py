@@ -1202,7 +1202,7 @@ class TimeStripper(object):
 
         self.groups = [u'year', u'month',  u'hour',  u'time', u'day', u'minute', u'tzinfo']
 
-        timeR = r'(?P<time>(?P<hour>[0-2]\d)[:\.h](?P<minute>[0-5]\d))'
+        timeR = r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h](?P<minute>[0-5]\d))'
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
         yearR = r'(?P<year>(19|20)\d\d)'
 
