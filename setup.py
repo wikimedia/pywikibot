@@ -37,6 +37,12 @@ script_deps = {
     #       however it is available with setuptools.
 }
 
+dependency_links=[
+    'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1',
+    'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
+    'git+https://github.com/jayvdb/parse-crontab.git#egg=crontab',
+]
+
 if sys.version_info[0] == 2:
     if sys.version_info < (2, 6, 5):
         raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 or higher")
@@ -58,6 +64,8 @@ if sys.version_info[0] == 3:
     if sys.version_info[1] < 3:
         print("ERROR: Python 3.3 or higher is required!")
         sys.exit(1)
+
+    dependency_links.append('hg+https://bitbucket.org/sybren/flickrapi#egg=flickrapi')
 
 if os.name != 'nt':
     # See bug 66010, Windows users will have issues
@@ -112,12 +120,8 @@ setup(
               for package in find_packages()
               if package.startswith('pywikibot.')],
     install_requires=dependencies,
+    dependency_links=dependency_links,
     extras_require=extra_deps,
-    dependency_links=[
-        'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1',
-        'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
-        'git+https://github.com/jayvdb/parse-crontab.git#egg=crontab',
-    ],
     url='https://www.mediawiki.org/wiki/Pywikibot',
     download_url='https://github.com/wikimedia/pywikibot-core/archive/master.zip#egg=pywikibot-2.0b1',
     test_suite="tests.collector",

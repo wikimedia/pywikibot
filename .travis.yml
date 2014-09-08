@@ -33,6 +33,7 @@ install:
   - cd ../..
 
   - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then export PY3=1; fi
+  - python -c "import setuptools; print(setuptools.__version__)"
 
 script:
   - if [[ "$USE_NOSE" == "1" ]]; then nosetests -v -a '!site,!net' tests; else python setup.py test; fi
