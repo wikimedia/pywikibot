@@ -98,7 +98,10 @@ class DummySiteinfo():
     def __getitem__(self, key):
         return self.get(key, False)
 
-    def get(self, key, get_default=True, cache=True, force=False):
+    def get(self, key, get_default=True, cache=True, expiry=False):
+        # Default values are always expired, so only expiry=False doesn't force
+        # a reload
+        force = expiry is not False
         if not force and key in self._cache:
             loaded = self._cache[key]
             if not loaded[1] and not get_default:
@@ -108,7 +111,7 @@ class DummySiteinfo():
         elif get_default:
             default = pywikibot.site.Siteinfo._get_default(key)
             if cache:
-                self._cache[key] = (default, True)
+                self._cache[key] = (default, False)
             return default
         else:
             raise KeyError(key)
@@ -118,3 +121,6 @@ class DummySiteinfo():
 
     def is_recognised(self, key):
         return None
+
+    def get_requested_time(self, key):
+        return False
