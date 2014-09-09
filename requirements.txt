@@ -1,0 +1,58 @@
+# This is a PIP requirements file
+#
+# All dependencies can be installed using:
+# $ sudo pip install -r requirements.txt
+#
+# It is organised so that simple requirements
+# are processed first, and more difficult packages
+# are last.
+# All dependencies other than  httplib2 are optional.
+#
+# It is good practise to install packages using the system
+# package manager if it has a packaged version.  If you are
+# unsure, please use pip as described at the top of the file.
+#
+# To get a list of potential matches, use
+#
+# $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs yum search
+#     or
+# $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
+
+# mandatory; see README.conversion.txt
+httplib2>=0.9.0
+
+# core option 'daemonize':
+daemonize
+
+# core interwiki_graph.py:
+pydot
+
+# core pagegenerators
+yahoo
+google
+
+# scripts/script_wui.py:
+crontab
+
+# scipts/replicate_wiki.py
+argparse
+
+# scripts/flickrripper.py
+Pillow
+flickrapi
+
+# scripts/tests/test_data_ingestion.py
+test_utils
+
+# incomplete core component botirc
+irc
+
+# textlib.py
+mwparserfromhell>=0.3.3
+
+# The mysql generator in pagegenerators depends on either oursql or MySQLdb
+# pywikibot prefers oursql
+oursql
+
+# scripts/script_wui.py depends on Lua, which is not available using pip
+# but can be obtained from: https://github.com/bastibe/lunatic-python

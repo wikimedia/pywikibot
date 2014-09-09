@@ -18,7 +18,16 @@ test_deps = []
 
 dependencies = ['httplib2>=0.6.0']
 
-extra_deps = {}
+extra_deps = {
+    # Core library dependencies
+    'daemonize': ['daemonize'],
+    'Graphviz':  ['pydot'],
+    'MySQL': ['oursql'],
+    'Yahoo': ['yahoo'],
+    'Google': ['google'],
+    'IRC': ['irc'],
+    'mwparserfromhell': ['mwparserfromhell>=0.3.3']
+}
 
 script_deps = {
     'script_wui.py': ['irc', 'lunatic-python', 'crontab'],
@@ -53,7 +62,12 @@ if sys.version_info[0] == 3:
 if os.name != 'nt':
     # See bug 66010, Windows users will have issues
     # when trying to build the C modules.
-    dependencies.append('mwparserfromhell>=0.3.3')
+    dependencies += extra_deps['mwparserfromhell']
+
+if os.name == 'nt':
+    # FIXME: tests/ui_tests.py suggests pywinauto 0.4.2
+    # which isnt provided on pypi.
+    test_deps += ['pywin32>=218', 'pywinauto>=0.4.0']
 
 extra_deps.update(script_deps)
 # Add script dependencies as test dependencies,
