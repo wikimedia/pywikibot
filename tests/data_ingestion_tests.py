@@ -5,12 +5,16 @@
 __version__ = '$Id$'
 
 import os
-from tests import unittest
+from tests.aspects import unittest, TestCase
 from scripts import data_ingestion
 
 
-class TestPhoto(unittest.TestCase):
+class TestPhoto(TestCase):
+
+    net = True
+
     def setUp(self):
+        super(TestPhoto, self).setUp()
         self.obj = data_ingestion.Photo(URL='http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png',
                                         metadata={'description.en': '"Sounds" icon',
                                                   'source': 'http://commons.wikimedia.org/wiki/File:Sound-icon.svg',
@@ -43,8 +47,12 @@ class TestPhoto(unittest.TestCase):
 }}""")  # noqa
 
 
-class TestCSVReader(unittest.TestCase):
+class TestCSVReader(TestCase):
+
+    net = False
+
     def setUp(self):
+        super(TestCSVReader, self).setUp()
         fileobj = open(os.path.join(os.path.split(__file__)[0], 'data', 'csv_ingestion.csv'))
         self.iterator = data_ingestion.CSVReader(fileobj, 'url')
         self.obj = next(self.iterator)

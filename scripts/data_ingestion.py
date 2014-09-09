@@ -15,7 +15,10 @@ import base64
 import sys
 
 import pywikibot
-import upload
+# TODO: nosetests3 fails on 'import <other_script>', which is used by many
+# of our scripts, but only data_ingestion is directly imported (not via pwb).
+# https://github.com/nose-devs/nose/issues/839
+from scripts import upload
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
