@@ -5,7 +5,7 @@
 __version__ = '$Id$'
 
 import os
-import unittest
+from tests import unittest
 from scripts import data_ingestion
 
 
