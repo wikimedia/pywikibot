@@ -11,10 +11,10 @@ import sys
 import pywikibot
 from pywikibot.comms import http, threadedhttp
 from pywikibot import config2 as config
-from tests.utils import unittest, NoSiteTestCase
+from tests.aspects import unittest, TestCase
 
 
-class HttpTestCase(NoSiteTestCase):
+class HttpTestCase(TestCase):
 
     net = True
 
@@ -76,7 +76,9 @@ class HttpTestCase(NoSiteTestCase):
         self.assertEqual('%E2%81%82', http.user_agent_username(u'⁂'))
 
 
-class DefaultUserAgentTestCase(NoSiteTestCase):
+class DefaultUserAgentTestCase(TestCase):
+
+    net = False
 
     def setUp(self):
         self.orig_format = config.user_agent_format

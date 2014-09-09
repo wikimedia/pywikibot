@@ -22,13 +22,13 @@ from tests.utils import SiteTestCase, unittest
 
 
 class TestSaveFailure(SiteTestCase):
+
     """Test cases for edits which should fail to save."""
 
     write = True
 
-    def setUp(self):
-        super(TestSaveFailure, self).setUp()
-        self.site = pywikibot.Site('test', 'wikipedia')
+    family = 'wikipedia'
+    code = 'test'
 
     def test_protected(self):
         """Test that protected titles raise the appropriate exception."""
@@ -47,6 +47,7 @@ class TestSaveFailure(SiteTestCase):
         """Test that {{nobots}} raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:John Vandenberg/nobots')
         self.assertRaisesRegexp(OtherPageSaveError, 'nobots', page.save)
+
 
 if __name__ == '__main__':
     try:

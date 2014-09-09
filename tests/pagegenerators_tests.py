@@ -10,12 +10,17 @@ import sys
 import pywikibot
 from pywikibot import pagegenerators
 
-from tests.utils import unittest, PywikibotTestCase
+from tests.aspects import unittest, TestCase
 
 
-class TestPageGenerators(PywikibotTestCase):
+class TestPageGenerators(TestCase):
 
     """Test pagegenerators methods."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
 
     titles = [
         # just a bunch of randomly selected titles
@@ -35,8 +40,8 @@ class TestPageGenerators(PywikibotTestCase):
     ]
 
     def setUp(self):
-        self.site = pywikibot.Site('en', 'wikipedia')
         super(TestPageGenerators, self).setUp()
+        self.site = self.get_site()
 
     def assertFunction(self, obj):
         self.assertTrue(hasattr(pagegenerators, obj))

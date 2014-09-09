@@ -8,17 +8,37 @@ __version__ = '$Id$'
 
 import pywikibot
 
-from tests.utils import unittest, SiteTestCase
-
-commons = pywikibot.Site('commons', 'commons')
+from tests.aspects import unittest, TestCase
 
 
-class TestShareFiles(SiteTestCase):
+class TestShareFiles(TestCase):
+
+    sites = {
+        'enwiki': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+        'itwiki': {
+            'family': 'wikipedia',
+            'code': 'it',
+        },
+        'testwiki': {
+            'family': 'wikipedia',
+            'code': 'test',
+        },
+        'commons': {
+            'family': 'commons',
+            'code': 'commons',
+        },
+    }
+
+    cached = True
 
     def testSharedOnly(self):
         title = 'File:Sepp Maier 1.JPG'
 
-        itwp = pywikibot.Site('it', 'wikipedia')
+        commons = self.get_site('commons')
+        itwp = self.get_site('itwiki')
         itwp_file = pywikibot.ImagePage(itwp, title)
         for using in itwp_file.usingPages():
             self.assertIsInstance(using, pywikibot.Page)
@@ -38,7 +58,8 @@ class TestShareFiles(SiteTestCase):
     def testLocalOnly(self):
         title = 'File:April Fools Day Adminship discussion (2005).png'
 
-        enwp = pywikibot.Site('en', 'wikipedia')
+        commons = self.get_site('commons')
+        enwp = self.get_site('enwiki')
         enwp_file = pywikibot.ImagePage(enwp, title)
         for using in enwp_file.usingPages():
             self.assertIsInstance(using, pywikibot.Page)
@@ -58,7 +79,8 @@ class TestShareFiles(SiteTestCase):
     def testOnBoth(self):
         title = 'File:Pulsante spam.png'
 
-        itwp = pywikibot.Site('it', 'wikipedia')
+        commons = self.get_site('commons')
+        itwp = self.get_site('itwiki')
         itwp_file = pywikibot.ImagePage(itwp, title)
         for using in itwp_file.usingPages():
             self.assertIsInstance(using, pywikibot.Page)
@@ -76,7 +98,8 @@ class TestShareFiles(SiteTestCase):
         """Test file page, without local file, existing on the local wiki."""
         title = 'File:Sepp Maier 1.JPG'
 
-        testwp = pywikibot.Site('test', 'wikipedia')
+        commons = self.get_site('commons')
+        testwp = self.get_site('testwiki')
         testwp_file = pywikibot.ImagePage(testwp, title)
 
         self.assertTrue(testwp_file.fileUrl())

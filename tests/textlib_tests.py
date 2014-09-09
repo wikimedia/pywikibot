@@ -18,7 +18,7 @@ import pywikibot
 import pywikibot.textlib as textlib
 from pywikibot import config
 
-from tests.utils import unittest, NoSiteTestCase, PywikibotTestCase
+from tests.aspects import unittest, TestCase
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")
@@ -28,7 +28,10 @@ for f in ["enwiki_help_editing"]:
                            'r', 'utf-8').read()
 
 
-class TestSectionFunctions(NoSiteTestCase):
+class TestSectionFunctions(TestCase):
+
+    net = False
+
     def setUp(self):
         self.catresult1 = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
                            % {'LS': config.LS})
@@ -92,11 +95,17 @@ class TestSectionFunctions(NoSiteTestCase):
         self.assertNotContains("enwiki_help_editing", u"Helpful tips", "section header must contain a link")
 
 
-class TestFormatFunctions(PywikibotTestCase):
+class TestFormatFunctions(TestCase):
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
 
     @classmethod
     def setUpClass(cls):
-        cls.site = pywikibot.Site('en', 'wikipedia')
+        super(TestFormatFunctions, cls).setUpClass()
+        cls.site = cls.get_site()
         cls.catresult = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
                           % {'LS': config.LS})
 
@@ -132,7 +141,7 @@ class TestFormatFunctions(PywikibotTestCase):
                          textlib.categoryFormat(data, self.site))
 
 
-class TestCategoryRearrangement(PywikibotTestCase):
+class TestCategoryRearrangement(TestCase):
 
     """
     Tests to ensure that sorting keys are not being lost when
@@ -140,9 +149,15 @@ class TestCategoryRearrangement(PywikibotTestCase):
     with both a newline and an empty string as separators.
     """
 
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
+
     @classmethod
     def setUpClass(cls):
-        cls.site = pywikibot.Site('en', 'wikipedia')
+        super(TestCategoryRearrangement, cls).setUpClass()
+        cls.site = cls.get_site()
         cls.old = ('[[Category:Cat1]]%(LS)s[[Category:Cat2|]]%(LS)s'
                    '[[Category:Cat1| ]]%(LS)s[[Category:Cat2|key]]'
                    % {'LS': config.LS})
@@ -163,15 +178,17 @@ class TestCategoryRearrangement(PywikibotTestCase):
         config.line_separator = sep  # restore the default separator
 
 
-class TestTemplatesInCategory(PywikibotTestCase):
+class TestTemplatesInCategory(TestCase):
 
     """Tests to verify that templates in category links are handled."""
 
-    @classmethod
-    def setUpClass(cls):
-        cls.site = pywikibot.Site('en', 'wikipedia')
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
 
     def test_templates(self):
+        self.site = self.get_site()
         self.assertEqual(textlib.getCategoryLinks(
             '[[Category:{{P1|Foo}}]]', self.site),
             [pywikibot.page.Category(self.site, 'Foo')])

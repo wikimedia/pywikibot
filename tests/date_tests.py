@@ -6,16 +6,16 @@
 #
 __version__ = '$Id$'
 
-from tests.utils import unittest, NoSiteTestCase
 from pywikibot import date
+from tests.aspects import unittest, MetaTestCaseClass, TestCase
 
 
-class TestDateMeta(type):
+class TestDateMeta(MetaTestCaseClass):
+
     """Test meta class"""
 
     def __new__(cls, name, bases, dct):
         """Create the new class"""
-
         def test_method(formatname):
 
             def testMapEntry(self):
@@ -50,11 +50,13 @@ class TestDateMeta(type):
         return type.__new__(cls, name, bases, dct)
 
 
-class TestDate(NoSiteTestCase):
+class TestDate(TestCase):
 
     """Test cases for date library processed by unittest."""
 
     __metaclass__ = TestDateMeta
+
+    net = False
 
 
 if __name__ == '__main__':

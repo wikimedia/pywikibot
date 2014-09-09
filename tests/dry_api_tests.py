@@ -10,14 +10,28 @@ __version__ = '$Id$'
 import datetime
 import pywikibot
 from pywikibot.data.api import CachedRequest, QueryGenerator
-from tests.utils import unittest, NoSiteTestCase, SiteTestCase, DummySiteinfo
+from pywikibot.family import Family
+from tests.utils import DummySiteinfo
+from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 
-class DryCachedRequestTests(SiteTestCase):
+class DryCachedRequestTests(TestCase):
+
+    sites = {
+        'basesite': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+        'altsite': {
+            'family': 'wikipedia',
+            'code': 'de',
+        },
+    }
 
     def setUp(self):
-        self.basesite = pywikibot.Site('en', 'wikipedia')
-        self.altsite = pywikibot.Site('de', 'wikipedia')
+        super(DryCachedRequestTests, self).setUp()
+        self.basesite = self.get_site('basesite')
+        self.altsite = self.get_site('altsite')
         self.parms = {'site': self.basesite,
                       'action': 'query',
                       'meta': 'userinfo'}
@@ -25,8 +39,6 @@ class DryCachedRequestTests(SiteTestCase):
         self.expreq = CachedRequest(expiry=0, **self.parms)
         self.diffreq = CachedRequest(expiry=1, site=self.basesite, action='query', meta='siteinfo')
         self.diffsite = CachedRequest(expiry=1, site=self.altsite, action='query', meta='userinfo')
-
-        super(DryCachedRequestTests, self).setUp()
 
     def test_expiry_formats(self):
         self.assertEqual(self.req.expiry, CachedRequest(datetime.timedelta(days=1), **self.parms).expiry)
@@ -51,9 +63,12 @@ class DryCachedRequestTests(SiteTestCase):
         self.assertNotEqual(self.req._cachefile_path(), self.diffsite._cachefile_path())
 
 
-class MockCachedRequestKeyTests(NoSiteTestCase):
+class MockCachedRequestKeyTests(TestCase):
+
+    net = False
+
     def setUp(self):
-        class MockFamily(pywikibot.family.Family):
+        class MockFamily(Family):
 
             @property
             def name(self):
@@ -149,7 +164,7 @@ class MockCachedRequestKeyTests(NoSiteTestCase):
         self.assertEqual(en_user_path, ar_user_path)
 
 
-class DryQueryGenTests(SiteTestCase):
+class DryQueryGenTests(DefaultSiteTestCase):
 
     def test_query_constructor(self):
         """Test QueryGenerator constructor.

@@ -7,87 +7,15 @@
 from __future__ import print_function
 __version__ = '$Id$'
 #
-import time
-import sys
 import pywikibot
-from tests import patch_request, unpatch_request, unittest
+from tests import aspects
+from tests import unittest  # flake8: noqa
 
-# Number of seconds each test may consume before a note is added after the test.
-test_duration_warning_interval = 10
-
-
-class BaseTestCase(unittest.TestCase):
-
-    """Base class for all test cases.
-
-    Adds timing info to stdout.
-    """
-
-    def setUp(self):
-        self.test_start = time.time()
-
-    def tearDown(self):
-        self.test_completed = time.time()
-        duration = self.test_completed - self.test_start
-
-        if duration > test_duration_warning_interval:
-            print(' %0.3fs' % duration, end=' ')
-            sys.stdout.flush()
-
-
-class NoSiteTestCase(BaseTestCase):
-
-    """Test cases not connected to a Site object.
-
-    Do not use this for mock Site objects.
-
-    Never set a class or instance variable called 'site'
-    As it will prevent tests from executing when invoked as:
-    $ nosetests -a '!site' -v
-    """
-
-    def setUp(self):
-        self.old_Site_lookup_method = pywikibot.Site
-        pywikibot.Site = lambda *args: self.fail('%s: Site() not permitted'
-                                                 % self.__class__.__name__)
-
-        super(NoSiteTestCase, self).setUp()
-
-    def tearDown(self):
-        super(NoSiteTestCase, self).tearDown()
-
-        pywikibot.Site = self.old_Site_lookup_method
-
-
-class SiteTestCase(BaseTestCase):
-
-    """Test cases connected to a Site object.
-
-    Do not use this for mock Site objects.
-    """
-
-    site = True
-
-
-class CachedTestCase(SiteTestCase):
-
-    """Aggressively cached API test cases.
-
-    Patches pywikibot.data.api to aggressively cache
-    API responses.
-    """
-
-    def setUp(self):
-        patch_request()
-
-        super(CachedTestCase, self).setUp()
-
-    def tearDown(self):
-        super(CachedTestCase, self).tearDown()
-
-        unpatch_request()
-
-PywikibotTestCase = CachedTestCase
+BaseTestCase = aspects.TestCase
+NoSiteTestCase = aspects.TestCase
+SiteTestCase = aspects.TestCase
+CachedTestCase = aspects.TestCase
+PywikibotTestCase = aspects.TestCase
 
 
 class DummySiteinfo():

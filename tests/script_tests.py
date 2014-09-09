@@ -13,7 +13,7 @@ import time
 import subprocess
 import pywikibot
 from pywikibot import config
-from tests.utils import unittest, PywikibotTestCase
+from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 
 
 base_path = os.path.split(os.path.split(__file__)[0])[0]
@@ -206,7 +206,7 @@ def execute(command, data_in=None, timeout=0):
             'stderr': data_out[1]}
 
 
-class TestScriptMeta(type):
+class TestScriptMeta(MetaTestCaseClass):
 
     """Test meta class."""
 
@@ -311,7 +311,7 @@ class TestScriptMeta(type):
         return type.__new__(cls, name, bases, dct)
 
 
-class TestScript(PywikibotTestCase):
+class TestScript(DefaultSiteTestCase, PwbTestCase):
 
     """Test cases for scripts.
 
@@ -320,6 +320,8 @@ class TestScript(PywikibotTestCase):
     """
 
     __metaclass__ = TestScriptMeta
+
+    site = True
 
     def setUp(self):
         """Prepare the environment for running the pwb.py script."""

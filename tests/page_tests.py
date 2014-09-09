@@ -11,28 +11,54 @@ import sys
 import pywikibot
 import pywikibot.page
 
-from tests.utils import PywikibotTestCase, unittest
+from tests.aspects import unittest, TestCase
 
 if sys.version_info[0] > 2:
     basestring = (str, )
     unicode = str
 
-site = pywikibot.Site('en', 'wikipedia')
-mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
-maintalk = pywikibot.Page(pywikibot.page.Link("Talk:Main Page", site))
-badpage = pywikibot.Page(pywikibot.page.Link("There is no page with this title",
-                         site))
+# These two globals are only used in TestPageObject.
+site = None
+mainpage = None
 
 
-class TestLinkObject(PywikibotTestCase):
+class TestLinkObject(TestCase):
 
     """Test cases for Link objects."""
 
-    enwiki = pywikibot.Site("en", "wikipedia")
-    frwiki = pywikibot.Site("fr", "wikipedia")
-    itwikt = pywikibot.Site("it", "wiktionary")
-    enws = pywikibot.Site("en", "wikisource")
-    itws = pywikibot.Site("it", "wikisource")
+    sites = {
+        'enwiki': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+        'frwiki': {
+            'family': 'wikipedia',
+            'code': 'fr',
+        },
+        'itwikt': {
+            'family': 'wiktionary',
+            'code': 'it',
+        },
+        'enws': {
+            'family': 'wikisource',
+            'code': 'en',
+        },
+        'itws': {
+            'family': 'wikisource',
+            'code': 'it',
+        },
+    }
+
+    cached = True
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestLinkObject, cls).setUpClass()
+        cls.enwiki = cls.get_site('enwiki')
+        cls.frwiki = cls.get_site('frwiki')
+        cls.itwikt = cls.get_site('itwikt')
+        cls.enws = cls.get_site('enws')
+        cls.itws = cls.get_site('itws')
 
     namespaces = {0: [u""],        # en.wikipedia.org namespaces for testing
                   1: [u"Talk:"],   # canonical form first, then others
@@ -134,7 +160,22 @@ class TestLinkObject(PywikibotTestCase):
         self.assertRaises(pywikibot.Error, l3.ns_title, onsite=self.itws)
 
 
-class TestPageObject(PywikibotTestCase):
+class TestPageObject(TestCase):
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
+
+    @classmethod
+    def setUpClass(cls):
+        global site, mainpage
+        super(TestPageObject, cls).setUpClass()
+        site = cls.get_site()
+        mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
+        cls.maintalk = pywikibot.Page(pywikibot.page.Link("Talk:Main Page", site))
+        cls.badpage = pywikibot.Page(pywikibot.page.Link(
+                                     "There is no page with this title", site))
 
     def testGeneral(self):
         family_name = (site.family.name + ':'
@@ -143,7 +184,7 @@ class TestPageObject(PywikibotTestCase):
         self.assertEqual(str(mainpage), "[[%s%s:%s]]"
                                         % (family_name, site.code,
                                            mainpage.title()))
-        self.assertLess(mainpage, maintalk)
+        self.assertLess(mainpage, self.maintalk)
 
     def testSite(self):
         """Test site() method"""
@@ -152,8 +193,8 @@ class TestPageObject(PywikibotTestCase):
     def testNamespace(self):
         """Test namespace() method"""
         self.assertEqual(mainpage.namespace(), 0)
-        self.assertEqual(maintalk.namespace(), 1)
-        self.assertEqual(badpage.namespace(), 0)
+        self.assertEqual(self.maintalk.namespace(), 1)
+        self.assertEqual(self.badpage.namespace(), 0)
 
     def testTitle(self):
         """Test title() method options."""
@@ -309,17 +350,16 @@ class TestPageObject(PywikibotTestCase):
         """Test various methods that rely on API."""
         # since there is no way to predict what data the wiki will return,
         # we only check that the returned objects are of correct type.
-        self.assertIsInstance(mainpage.get(), unicode)
-        self.assertIsInstance(maintalk.get(), unicode)
-        self.assertRaises(pywikibot.NoPage, badpage.get)
+        self.assertIsInstance(self.maintalk.get(), unicode)
+        self.assertRaises(pywikibot.NoPage, self.badpage.get)
         self.assertIsInstance(mainpage.latestRevision(), int)
         self.assertIsInstance(mainpage.userName(), unicode)
         self.assertIsInstance(mainpage.isIpEdit(), bool)
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
         self.assertIsInstance(mainpage.isEmpty(), bool)
-        self.assertEqual(mainpage.toggleTalkPage(), maintalk)
-        self.assertEqual(maintalk.toggleTalkPage(), mainpage)
+        self.assertEqual(mainpage.toggleTalkPage(), self.maintalk)
+        self.assertEqual(self.maintalk.toggleTalkPage(), mainpage)
         self.assertIsInstance(mainpage.isDisambig(), bool)
         self.assertIsInstance(mainpage.canBeEdited(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
@@ -423,7 +463,10 @@ class TestPageObject(PywikibotTestCase):
 #    def contributingUsers(self):
 
 
-class TestCategoryObject(PywikibotTestCase):
+class TestCategoryObject(TestCase):
+
+    site = True
+    cached = True
 
     def test_isEmptyCategory(self):
         """Test if category is empty or not"""
