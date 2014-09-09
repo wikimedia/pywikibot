@@ -489,12 +489,6 @@ def MakeParameter(decoder, param):
 # or not, or generating dates.
 # See dh() for additional information.
 #
-#
-#          ***********   ATTENTION! ***********
-#
-#   You must test this table before submitting it to CVS by calling
-#   date.test()  method
-#
 formats = {
     'MonthName': {
         'af': lambda v: slh(v, [u"Januarie", u"Februarie", u"Maart", u"April",
