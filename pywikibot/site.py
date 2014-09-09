@@ -1185,20 +1185,61 @@ class TokenWallet(object):
 
     def __init__(self, site):
         self.site = site
-        self.site._tokens = {}
-        # TODO: Fetch that from the API with paraminfo
-        self.special_names = set(['deleteglobalaccount', 'patrol', 'rollback',
-                                  'setglobalaccountstatus', 'userrights',
-                                  'watch'])
+        self._tokens = {}
+        self.failed_cache = set()  # cache unavailable tokens.
+
+    def load_tokens(self, types, all=False):
+        """Preload one or multiple tokens."""
+        assert(self.site.logged_in())
+
+        self._tokens.setdefault(self.site.user(), {}).update(
+            self.site.get_tokens(types, all=all))
+
+        # Preload all only the first time.
+        # When all=True types is extended in site.get_tokens().
+        # Keys not recognised as tokens, are cached so they are not requested
+        # any longer.
+        if all:
+            for key in types:
+                if key not in self._tokens[self.site.user()]:
+                    self.failed_cache.add((self.site.user(), key))
 
     def __getitem__(self, key):
-        storage = self.site._tokens.setdefault(self.site.user(), {})
-        if (LV(self.site.version()) >= LV('1.24wmf19')
-                and key not in self.special_names):
-            key = 'csrf'
-        if key not in storage:
-            self.site.preload_tokens([key])
-        return storage[key]
+        assert(self.site.logged_in())
+
+        user_tokens = self._tokens.setdefault(self.site.user(), {})
+        # always preload all for users without tokens
+        failed_cache_key = (self.site.user(), key)
+
+        try:
+            key = self.site.validate_tokens([key])[0]
+        except IndexError:
+            raise Error(
+                u"Requested token '{0}' is invalid on {1} wiki."
+                .format(key, self.site))
+
+        if (key not in user_tokens and
+                failed_cache_key not in self.failed_cache):
+                    self.load_tokens([key], all=not user_tokens)
+
+        if key in user_tokens:
+            return user_tokens[key]
+        else:
+            # token not allowed for self.site.user() on self.site
+            self.failed_cache.add(failed_cache_key)
+            # to be changed back to a plain KeyError?
+            raise Error(
+                u"Action '{0}' is not allowed for user {1} on {2} wiki."
+                .format(key, self.site.user(), self.site))
+
+    def __contains__(self, key):
+        return key in self._tokens.setdefault(self.site.user(), {})
+
+    def __str__(self):
+        return self._tokens.__str__()
+
+    def __repr__(self):
+        return self._tokens.__repr__()
 
 
 class APISite(BaseSite):
@@ -1228,12 +1269,63 @@ class APISite(BaseSite):
 #    Pages; see method docs for details) --
 #
 
+    # Constants for token management.
+    # For all MediaWiki versions prior to 1.20.
+    TOKENS_0 = set(['edit',
+                    'delete',
+                    'protect',
+                    'move',
+                    'block',
+                    'unblock',
+                    'email',
+                    'import',
+                    'watch',
+                    ])
+
+    # For all MediaWiki versions, with 1.20 <= version < 1.24wmf19
+    TOKENS_1 = set(['block',
+                    'centralauth',
+                    'delete',
+                    'deleteglobalaccount',
+                    'edit',
+                    'email',
+                    'import',
+                    'move',
+                    'options',
+                    'patrol',
+                    'protect',
+                    'setglobalaccountstatus',
+                    'unblock',
+                    'watch',
+                    ])
+
+    # For all MediaWiki versions >= 1.24wmf19
+    TOKENS_2 = set(['csrf',
+                    'deleteglobalaccount',
+                    'patrol',
+                    'rollback',
+                    'setglobalaccountstatus',
+                    'userrights',
+                    'watch',
+                    ])
+
     def __init__(self, code, fam=None, user=None, sysop=None):
         """ Constructor. """
         BaseSite.__init__(self, code, fam, user, sysop)
         self._msgcache = {}
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
         self._siteinfo = Siteinfo(self)
+        self.tokens = TokenWallet(self)
+
+    def __getstate__(self):
+        """ Remove token wallet before pickling. """
+        new = super(APISite, self).__getstate__()
+        del new['tokens']
+        return new
+
+    def __setstate__(self, attrs):
+        """ Restore things removed in __getstate__. """
+        super(APISite, self).__setstate__()
         self.tokens = TokenWallet(self)
 
     @staticmethod
@@ -2266,15 +2358,39 @@ class APISite(BaseSite):
                 api.update_page(page, pagedata)
                 yield page
 
-    def preload_tokens(self, types):
+    def validate_tokens(self, types):
+        """Validate if requested tokens are acceptable.
+
+        Valid tokens depend on mw version.
+
+        """
+
+        _version = LV(self.version())
+        if _version < LV('1.20'):
+            valid_types = [token for token in types if token in self.TOKENS_0]
+        elif _version < LV('1.24wmf19'):
+            valid_types = [token for token in types if token in self.TOKENS_1]
+        else:
+            valid_types = []
+            for token in types:
+                if ((token in self.TOKENS_0 or token in self.TOKENS_1) and
+                        token not in self.TOKENS_2):
+                    token = 'csrf'
+                if token in self.TOKENS_2:
+                    valid_types.append(token)
+
+        return valid_types
+
+    def get_tokens(self, types, all=False):
         """Preload one or multiple tokens.
 
         For all MediaWiki versions prior to 1.20, only one token can be
-        retrieved at once. For MediaWiki versions since 1.24wmfXXX a new token
+        retrieved at once.
+        For MediaWiki versions since 1.24wmfXXX a new token
         system was introduced which reduced the amount of tokens available.
         Most of them were merged into the 'csrf' token. If the token type in
-        the parameter is not known it'll default to the 'csrf' token. The other
-        token types available are:
+        the parameter is not known it will default to the 'csrf' token.
+        The other token types available are:
         - deleteglobalaccount
         - patrol
         - rollback
@@ -2285,34 +2401,60 @@ class APISite(BaseSite):
         @param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
         @type  types: iterable
+        @param all: load all available tokens
+        @type all: bool
+
+        return: a dict with retrieved valid tokens.
+
         """
-        storage = self._tokens.setdefault(self.user(), {})
-        if LV(self.version()) < LV('1.20'):
-            for tokentype in types:
+
+        def warn_handler(mod, text):
+            """Filter warnings for not available tokens."""
+            return re.match(r'Action \'\w+\' is not allowed for the current user',
+                            text)
+
+        user_tokens = {}
+        _version = LV(self.version())
+        if _version < LV('1.20'):
+            if all:
+                types.extend(self.TOKENS_0)
+            for tokentype in self.validate_tokens(types):
                 query = api.PropertyGenerator('info',
                                               titles='Dummy page',
                                               intoken=tokentype,
                                               site=self)
+                query.request._warning_handler = warn_handler
+
                 for item in query:
                     pywikibot.debug(unicode(item), _logger)
                     if (tokentype + 'token') in item:
-                        storage[tokentype] = item[tokentype + 'token']
+                        user_tokens[tokentype] = item[tokentype + 'token']
+
         else:
-            if LV(self.version()) < LV('1.24wmf19'):
-                data = api.Request(site=self, action='tokens',
-                                   type='|'.join(types)).submit()
+            if _version < LV('1.24wmf19'):
+                if all:
+                    types.extend(self.TOKENS_1)
+                req = api.Request(site=self, action='tokens',
+                                   type='|'.join(self.validate_tokens(types)))
             else:
-                new_tokens = [token if token in self.tokens.special_names else 'csrf'
-                              for token in types]
-                data = api.Request(site=self, action='query', meta='tokens',
-                                   type='|'.join(new_tokens)).submit()
-                if 'query' in data:
-                    data = data['query']
+                if all:
+                    types.extend(self.TOKENS_2)
+
+                req = api.Request(site=self, action='query', meta='tokens',
+                                   type='|'.join(self.validate_tokens(types)))
+
+            req._warning_handler = warn_handler
+            data = req.submit()
+
+            if 'query' in data:
+                data = data['query']
 
             if 'tokens' in data and data['tokens']:
-                storage.update(dict((key[:-5], val)
+                user_tokens = dict((key[:-5], val)
                                     for key, val in data['tokens'].items()
-                                    if val != '+\\'))
+                                    if val != '+\\')
+
+        return user_tokens
 
     @deprecated("the 'tokens' property")
     def token(self, page, tokentype):
