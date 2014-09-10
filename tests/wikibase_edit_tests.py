@@ -94,9 +94,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
                 }
             }
         }
-        item = pywikibot.ItemPage(testsite, 'null')
-        item._defined_by = lambda singular=None: {}
-        #del item.id
+        item = pywikibot.ItemPage(testsite)
         item.editEntity(data)
 
 
