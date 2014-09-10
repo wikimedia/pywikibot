@@ -588,8 +588,17 @@ class TestSiteObject(DefaultSiteTestCase):
     def testImageusage(self):
         """Test the site.imageusage() method"""
         mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        imagepage = next(iter(mainpage.imagelinks()))  # 1st image on main page
+        # Find a page which uses an image, so we can test imageusage
+        # If there are no images included in pages it'll skip this test
+        for page in mysite.allpages(filterredir=False):
+            try:
+                imagepage = next(iter(page.imagelinks()))  # 1st image of page
+            except StopIteration:
+                pass
+            else:
+                break
+        else:
+            raise unittest.SkipTest("No images on site {0!r}".format(mysite))
 
         iu = list(mysite.imageusage(imagepage, total=10))
         self.assertLessEqual(len(iu), 10)
@@ -652,7 +661,12 @@ class TestSiteObject(DefaultSiteTestCase):
         """Test the site.recentchanges() method"""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        imagepage = next(iter(mainpage.imagelinks()))
+        try:
+            # 1st image on main page
+            imagepage = next(iter(mysite.allimages()))
+        except StopIteration:
+            print("No images on site {0!r}".format(mysite))
+            imagepage = None
         rc = list(mysite.recentchanges(total=10))
         self.assertLessEqual(len(rc), 10)
         self.assertTrue(all(isinstance(change, dict)
@@ -702,12 +716,15 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIn(mysite.ns_index(prefix), [6, 7])
             self.assertIn(change["ns"], [6, 7])
         if LV(mysite.version()) <= LV("1.14"):
-            for change in mysite.recentchanges(pagelist=[mainpage, imagepage],
+            pagelist = [mainpage]
+            if imagepage:
+                pagelist += [imagepage]
+            titlelist = set(page.title() for page in pagelist)
+            for change in mysite.recentchanges(pagelist=pagelist,
                                                total=5):
                 self.assertIsInstance(change, dict)
                 self.assertIn("title", change)
-                self.assertIn(change["title"], (mainpage.title(),
-                                                imagepage.title()))
+                self.assertIn(change["title"], titlelist)
         for typ in ("edit", "new", "log"):
             for change in mysite.recentchanges(changetype=typ, total=5):
                 self.assertIsInstance(change, dict)
