@@ -23,7 +23,7 @@ cache = None
 
 class ParseError(Exception):
 
-    """ Parsing went wrong. """
+    """Parsing went wrong."""
 
 
 def _get_program_dir():
@@ -260,6 +260,12 @@ def getfileversion(filename):
 
     Extracts __version__ variable containing Id tag, without importing it.
     (thus can be done for any file)
+
+    The version variable containing the Id tag is read and
+    returned. Because it doesn't import it, the version can
+    be retrieved from any file.
+    @param filename: Name of the file to get version
+    @type filename: string
     """
     _program_dir = _get_program_dir()
     __version__ = None

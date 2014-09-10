@@ -335,8 +335,7 @@ def isDisabled(text, index, tags=['*']):
     """
     Return True if text[index] is disabled, e.g. by a comment or by nowiki tags.
 
-    For the tags parameter, see removeDisabledParts() above.
-
+    For the tags parameter, see L{removeDisabledParts}.
     """
     # Find a marker that is not already in the text.
     marker = findmarker(text)
@@ -508,7 +507,6 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
     'new' should be a dict with the Site objects as keys, and Page or Link
     objects as values (i.e., just like the dict returned by getLanguageLinks
     function).
-
     """
     # Find a marker that is not already in the text.
     marker = findmarker(oldtext)
@@ -596,7 +594,6 @@ def interwikiFormat(links, insite=None):
 
     Return a unicode string that is formatted for inclusion in insite
     (defaulting to the current site).
-
     """
     if insite is None:
         insite = pywikibot.Site()
@@ -654,8 +651,7 @@ def getCategoryLinks(text, site=None):
     """Return a list of category links found in text.
 
     @return: all category links found
-    @returntype: list of Category objects
-
+    @rtype: list of Category objects
     """
     result = []
     if site is None:
@@ -688,7 +684,6 @@ def removeCategoryLinks(text, site=None, marker=''):
 
     Put the string marker after the last replacement (at the end of the text
     if there is no replacement).
-
     """
     # This regular expression will find every link that is possibly an
     # interwiki link, plus trailing whitespace. The language code is grouped.
@@ -728,9 +723,14 @@ def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
 
 
 def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
-    """Replace the category oldcat with the category newcat.
+    """
+    Replace old category with new one and return the modified text.
 
+    @param oldtext: Content of the old category
+    @param oldcat: pywikibot.Category object of the old category
+    @param newcat: pywikibot.Category object of the new category
     @return: the modified text
+    @rtype: unicode
     """
     if site is None:
         site = pywikibot.Site()
@@ -752,11 +752,9 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
         r'^[^\S\n]*\[\[\s*(%s)\s*:\s*%s\s*((?:\|[^]]+)?\]\])[^\S\n]*\n'
         % (catNamespace, title), re.I | re.M)
     if newcat is None:
-        """ First go through and try the more restrictive regex that removes
-        an entire line, if the category is the only thing on that line (this
-        prevents blank lines left over in category lists following a removal.)
-        """
-
+        # First go through and try the more restrictive regex that removes
+        # an entire line, if the category is the only thing on that line (this
+        # prevents blank lines left over in category lists following a removal.)
         text = replaceExcept(oldtext, categoryRN, '',
                              ['nowiki', 'comment', 'math', 'pre', 'source'])
         text = replaceExcept(text, categoryR, '',
@@ -773,12 +771,11 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
     """
     Replace all existing category links with new category links.
 
-    'new' should be a list of Category objects or strings
-          which can be either the raw name or [[Category:..]].
-
-    If addOnly is True, the old category won't be deleted and the
-    category(s) given will be added (and so they won't replace anything).
-
+    @param oldtext: The text that needs to be replaced.
+    @param new: Should be a list of Category objects or strings
+        which can be either the raw name or [[Category:..]].
+    @param addOnly: If addOnly is True, the old category won't be deleted and the
+        category(s) given will be added (and so they won't replace anything).
     """
     # Find a marker that is not already in the text.
     marker = findmarker(oldtext)
@@ -841,7 +838,6 @@ def categoryFormat(categories, insite=None):
         which can be either the raw name or [[Category:..]].
 
     The string is formatted for inclusion in insite.
-
     """
     if not categories:
         return ''
@@ -951,7 +947,6 @@ def extract_templates_and_params_regex(text):
     @return: list of template name and params
     @rtype: list of tuple
     """
-
     # remove commented-out stuff etc.
     thistxt = removeDisabledParts(text)
 
@@ -1108,7 +1103,6 @@ def glue_template_and_params(template_and_params):
     You can use items from extract_templates_and_params here to get
     an equivalent template wiki text (it may happen that the order
     of the params changes).
-
     """
     (template, params) = template_and_params
     text = u''
@@ -1136,7 +1130,6 @@ def does_text_contain_section(pagetext, section):
           If a section parameter contains a internal link, it will match the
           section with or without a preceding colon which is required for a
           text link e.g. for categories and files.
-
     """
     # match preceding colon for text links
     section = re.sub(r'\\\[\\\[(\\\:)?', '\[\[\:?', re.escape(section))
@@ -1155,8 +1148,9 @@ class tzoneFixedOffset(datetime.tzinfo):
     """
     Class building tzinfo objects for fixed-offset time zones.
 
-    @offset: a number indicating fixed offset in minutes east from UTC
-    @name: a string with name of the timezone"""
+    @param offset: a number indicating fixed offset in minutes east from UTC
+    @param name: a string with name of the timezone
+    """
 
     def __init__(self, offset, name):
         self.__offset = datetime.timedelta(minutes=offset)
@@ -1248,7 +1242,9 @@ class TimeStripper(object):
 
     def last_match_and_replace(self, txt, pat):
         """
-        Take the rightmost match, to prevent spurious earlier matches, and replace with marker.
+        Take the rightmost match and replace with marker.
+
+        It does so to prevent spurious earlier matches.
         """
         m = None
         cnt = 0
@@ -1279,7 +1275,6 @@ class TimeStripper(object):
 
         All the following items must be matched, otherwise None is returned:
         -. year, month, hour, time, day, minute, tzinfo
-
         """
         # match date fields
         dateDict = dict()

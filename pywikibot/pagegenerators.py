@@ -215,6 +215,7 @@ class GeneratorFactory(object):
     This factory is responsible for processing command line arguments
     that are used by many scripts and that determine which pages to work on.
     """
+
     def __init__(self, site=None):
         self.gens = []
         self.namespaces = []
@@ -230,7 +231,6 @@ class GeneratorFactory(object):
 
         Only call this after all arguments have been parsed.
         """
-
         if gen:
             self.gens.insert(0, gen)
 
@@ -889,7 +889,7 @@ class RegexFilter(object):
 
     @classmethod
     def __precompile(cls, regex, flag):
-        """ precompile the regex list if needed. """
+        """Precompile the regex list if needed."""
         # Enable multiple regexes
         if not isinstance(regex, list):
             regex = [regex]
@@ -906,6 +906,7 @@ class RegexFilter(object):
         """ Yield pages from another generator whose title matches regex.
 
         Uses regex option re.IGNORECASE depending on the quantifier parameter.
+
         If ignore_namespace is False, the whole page title is compared.
         NOTE: if you want to check for a match at the beginning of the title,
         you have to start the regex with "^"
@@ -1050,7 +1051,6 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
 @deprecate_arg("lookahead", None)
 def PreloadingGenerator(generator, step=50):
     """Yield preloaded pages taken from another generator."""
-
     # pages may be on more than one site, for example if an interwiki
     # generator is used, so use a separate preloader for each site
     sites = {}

@@ -46,9 +46,8 @@ def parseRestrictions(restrictions):
 
 class XmlEntry:
 
-    """
-    Represents a page.
-    """
+    """Represent a page."""
+
     def __init__(self, title, ns, id, text, username, ipedit, timestamp,
                  editRestriction, moveRestriction, revisionid, comment,
                  redirect):
