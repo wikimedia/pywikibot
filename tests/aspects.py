@@ -19,7 +19,6 @@ __version__ = '$Id$'
         skip if the user is blocked.
         sysop flag, implement in site & page, and
             possibly some of the script tests.
-        wikimedia flag
         labs flag, for wikidataquery
         slow flag
             wikiquerydata - quite slow
@@ -38,6 +37,7 @@ import pywikibot
 
 from pywikibot import config, Site
 from pywikibot.site import BaseSite
+from pywikibot.family import WikimediaFamily
 
 import tests
 from tests import unittest, patch_request, unpatch_request
@@ -467,6 +467,48 @@ class DefaultSiteTestCase(TestCase):
 
     family = config.family
     code = config.mylang
+
+
+class WikimediaSiteTestCase(TestCase):
+
+    """Test class uses only WMF sites."""
+
+    wmf = True
+
+
+class WikimediaDefaultSiteTestCase(DefaultSiteTestCase, WikimediaSiteTestCase):
+
+    """Test class to run against a WMF site, preferring the default site."""
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up the test class.
+
+        Check that the default site is a Wikimedia site.
+        Use en.wikipedia.org as a fallback.
+        """
+        super(WikimediaDefaultSiteTestCase, cls).setUpClass()
+
+        assert(hasattr(cls, 'site') and hasattr(cls, 'sites'))
+
+        assert(len(cls.sites) == 1)
+
+        site = cls.get_site()
+
+        if not isinstance(site.family, WikimediaFamily):
+            print('%s using English Wikipedia instead of non-WMF config.family %s.'
+                  % (cls.__name__, cls.family))
+            cls.family = 'wikipedia'
+            cls.code = 'en'
+            cls.site = pywikibot.Site('en', 'wikipedia')
+            cls.sites = {
+                cls.site: {
+                    'family': 'wikipedia',
+                    'code': 'en',
+                    'site': cls.site
+                }
+            }
 
 
 class WikibaseTestCase(TestCase):

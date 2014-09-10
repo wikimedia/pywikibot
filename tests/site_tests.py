@@ -15,21 +15,27 @@ from datetime import datetime
 import re
 
 import pywikibot
-from tests.aspects import unittest, TestCase
+from tests.aspects import (
+    unittest, TestCase,
+    DefaultSiteTestCase,
+    WikimediaDefaultSiteTestCase,
+)
 
 if sys.version_info[0] > 2:
     basestring = (str, )
     unicode = str
 
 
-class TestSiteObject(TestCase):
+class TestSiteObject(DefaultSiteTestCase):
 
     """Test cases for Site methods."""
 
-    family = "wikipedia"
-    code = "en"
-
     cached = True
+
+    def testPickleAbility(self):
+        import pickle
+        mysite = self.get_site()
+        pickle.dumps(mysite)
 
     def testBaseMethods(self):
         """Test cases for BaseSite methods."""
@@ -37,7 +43,7 @@ class TestSiteObject(TestCase):
         self.assertEqual(mysite.family.name, self.family)
         self.assertEqual(mysite.code, self.code)
         self.assertIsInstance(mysite.lang, basestring)
-        self.assertEqual(mysite, pywikibot.Site("en", "wikipedia"))
+        self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
         self.assertIsInstance(mysite.user(), (basestring, type(None)))
         self.assertEqual(mysite.sitename(),
                          "%s:%s" % (self.family,
@@ -47,8 +53,16 @@ class TestSiteObject(TestCase):
                          % (self.code, self.family))
         self.assertIsInstance(mysite.linktrail(), basestring)
         self.assertIsInstance(mysite.redirect(default=True), basestring)
-        self.assertIsInstance(mysite.disambcategory(), pywikibot.Category)
-        self.assertEqual(unicode(pywikibot.Link("foo", source=mysite)), u"[[Foo]]")
+        try:
+            dabcat = mysite.disambcategory()
+        except pywikibot.Error as e:
+            self.assertIn('No disambiguation category name found', str(e))
+        else:
+            self.assertIsInstance(dabcat, pywikibot.Category)
+
+        foo = unicode(pywikibot.Link("foo", source=mysite))
+        self.assertEqual(foo, u"[[foo]]" if mysite.nocapitalize else u"[[Foo]]")
+
         self.assertFalse(mysite.isInterwikiLink("foo"))
         self.assertIsInstance(mysite.redirectRegex().pattern, basestring)
         self.assertIsInstance(mysite.category_on_one_line(), bool)
@@ -125,30 +139,6 @@ class TestSiteObject(TestCase):
                             for key in ns
                             for item in mysite.namespace(key, True)))
 
-    def testNamespaceCase(self):
-        site = pywikibot.Site('en', 'wiktionary')
-        main_namespace = site.namespaces()[0]
-        self.assertEqual(main_namespace.case, 'case-sensitive')
-        user_namespace = site.namespaces()[2]
-        self.assertEqual(user_namespace.case, 'first-letter')
-
-    def testNamespaceAliases(self):
-        site = pywikibot.Site('nn', 'wikipedia')
-
-        namespaces = site.namespaces()
-        image_namespace = namespaces[6]
-        self.assertEqual(image_namespace.custom_name, 'Fil')
-        self.assertEqual(image_namespace.canonical_name, 'File')
-        self.assertEqual(str(image_namespace), ':File:')
-        self.assertEqual(unicode(image_namespace), ':Fil:')
-        self.assertEqual(image_namespace.aliases, ['Image'])
-        self.assertEqual(len(image_namespace), 3)
-
-        self.assertEqual(len(namespaces[1].aliases), 0)
-        self.assertEqual(len(namespaces[4].aliases), 1)
-        self.assertEqual(namespaces[4].aliases[0], 'WP')
-        self.assertIn('WP', namespaces[4])
-
     def testApiMethods(self):
         """Test generic ApiSite methods."""
         mysite = self.get_site()
@@ -198,8 +188,16 @@ class TestSiteObject(TestCase):
 
         self.assertIsInstance(mysite.siteinfo, pywikibot.site.Siteinfo)
         self.assertIsInstance(mysite.months_names, list)
-        self.assertEqual(mysite.months_names[4], (u'May', u'May'))
         self.assertEqual(mysite.list_to_text(('pywikibot',)), 'pywikibot')
+
+    def testEnglishSpecificMethods(self):
+        """Test Site methods using English specific inputs and outputs."""
+        mysite = self.get_site()
+        if mysite.lang != 'en':
+            raise unittest.SkipTest(
+                'English-specific tests not valid on %s' % mysite)
+
+        self.assertEqual(mysite.months_names[4], (u'May', u'May'))
         self.assertEqual(mysite.list_to_text(('Pride', 'Prejudice')), 'Pride and Prejudice')
         self.assertEqual(mysite.list_to_text(('This', 'that', 'the other')), 'This, that and the other')
 
@@ -225,7 +223,12 @@ class TestSiteObject(TestCase):
         """Test ability to get page tokens."""
         mysite = self.get_site()
         for ttype in ("edit", "move"):  # token types for non-sysops
-            token = mysite.tokens[ttype]
+            try:
+                token = self.site.tokens[ttype]
+            except KeyError:
+                raise unittest.SkipTest(
+                    "Testing '%s' token not possible with user on %s"
+                    % (ttype, self.site))
             self.assertIsInstance(token, basestring)
             self.assertEqual(token, mysite.tokens[ttype])
 
@@ -251,6 +254,10 @@ class TestSiteObject(TestCase):
     def testItemPreload(self):
         """Test that ItemPage preloading works."""
         mysite = self.get_site()
+        if not mysite.has_data_repository:
+            raise unittest.SkipTest('%s does not have a data repository'
+                                    % mysite)
+
         datasite = mysite.data_repository()
 
         items = [pywikibot.ItemPage(datasite, 'q' + str(num)) for num in range(1, 6)]
@@ -388,6 +395,10 @@ class TestSiteObject(TestCase):
         for page in mysite.allpages(maxsize=200, total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
+            if len(page.text) > 200 and mysite.data_repository() == mysite:
+                print('%s.text is > 200 bytes while raw JSON is <= 200'
+                      % page)
+                continue
             self.assertLessEqual(len(page.text), 200)
         for page in mysite.allpages(protect_type="edit", total=5):
             self.assertIsInstance(page, pywikibot.Page)
@@ -737,11 +748,12 @@ class TestSiteObject(TestCase):
         """Test the site.search() method"""
         mysite = self.get_site()
         try:
-            se = list(mysite.search("wiki", total=10))
-            self.assertLessEqual(len(se), 10)
+            se = list(mysite.search("wiki", total=100))
+            self.assertLessEqual(len(se), 100)
             self.assertTrue(all(isinstance(hit, pywikibot.Page)
                                 for hit in se))
-            self.assertTrue(all(hit.namespace() == 0 for hit in se))
+            search_ns = [ns.id for ns in mysite.get_searched_namespaces(force=True)]
+            self.assertTrue(all(hit.namespace() in search_ns for hit in se))
             for hit in mysite.search("common", namespaces=4, total=5):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertEqual(hit.namespace(), 4)
@@ -991,6 +1003,13 @@ class TestSiteObject(TestCase):
     # TODO: test newimages, longpages, shortpages, ancientpages, unwatchedpages
     #       and the other following methods in site.py
 
+
+class TestSiteExtensions(WikimediaDefaultSiteTestCase):
+
+    """Test cases for Site extensions."""
+
+    cached = True
+
     def testExtensions(self):
         mysite = self.get_site()
         # test automatically getting extensions cache
@@ -1002,6 +1021,16 @@ class TestSiteObject(TestCase):
         self.assertTrue(mysite.has_extension('disambiguator'))
 
         self.assertFalse(mysite.has_extension('ThisExtensionDoesNotExist'))
+
+
+class TestSiteAPILimits(TestCase):
+
+    """Test cases for Site method that use API limits."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
 
     def test_API_limits_with_site_methods(self):
         # test step/total parameters for different sitemethods
@@ -1024,13 +1053,16 @@ class TestSiteObject(TestCase):
         mysite.loadrevisions(mypage, step=5, total=12)
         self.assertEqual(len(mypage._revisions), 12)
 
-    def testPickleAbility(self):
-        site = self.get_site()
-        import pickle
-        pickle.dumps(site)
+
+class TestSiteInfo(WikimediaDefaultSiteTestCase):
+
+    """Test cases for Site metadata and capabilities."""
+
+    cached = True
 
     def testSiteinfo(self):
         """Test the siteinfo property."""
+        mysite = self.get_site()
         # general enteries
         mysite = self.get_site()
         self.assertIsInstance(mysite.siteinfo['timeoffset'], (int, float))
@@ -1208,6 +1240,47 @@ class TestCommonsSite(TestCase):
         ll = next(self.site.pagelanglinks(self.mainpage))
         self.assertIsInstance(ll, pywikibot.Link)
         self.assertEqual(ll.site.family.name, 'wikipedia')
+
+
+class TestWiktionarySite(TestCase):
+
+    family = 'wiktionary'
+    code = 'en'
+
+    cached = True
+
+    def testNamespaceCase(self):
+        site = self.get_site()
+
+        main_namespace = site.namespaces()[0]
+        self.assertEqual(main_namespace.case, 'case-sensitive')
+        user_namespace = site.namespaces()[2]
+        self.assertEqual(user_namespace.case, 'first-letter')
+
+
+class TestNonEnglishWikipediaSite(TestCase):
+
+    family = 'wikipedia'
+    code = 'nn'
+
+    cached = True
+
+    def testNamespaceAliases(self):
+        site = self.get_site()
+
+        namespaces = site.namespaces()
+        image_namespace = namespaces[6]
+        self.assertEqual(image_namespace.custom_name, 'Fil')
+        self.assertEqual(image_namespace.canonical_name, 'File')
+        self.assertEqual(str(image_namespace), ':File:')
+        self.assertEqual(unicode(image_namespace), ':Fil:')
+        self.assertEqual(image_namespace.aliases, ['Image'])
+        self.assertEqual(len(image_namespace), 3)
+
+        self.assertEqual(len(namespaces[1].aliases), 0)
+        self.assertEqual(len(namespaces[4].aliases), 1)
+        self.assertEqual(namespaces[4].aliases[0], 'WP')
+        self.assertIn('WP', namespaces[4])
 
 
 class TestUploadEnabledSite(TestCase):
