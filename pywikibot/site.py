@@ -1473,6 +1473,40 @@ class APISite(BaseSite):
             # User blocked
             raise UserBlocked('User is blocked in site %s' % self)
 
+    def get_searched_namespaces(self, force=False):
+        """
+        Retrieve the default searched namespaces for the user.
+
+        If no user is logged in, it returns the namespaces used by default.
+        Otherwise it returns the user preferences. It caches the last result
+        and returns it, if the username or login status hasn't changed.
+
+        @param force: Whether the cache should be discarded.
+        @return: The namespaces which are searched by default.
+        @rtype: C{set} of L{Namespace}
+        """
+        # TODO: Integrate into _userinfo
+        if (force or not hasattr(self, "_useroptions")
+                or self.user() != self._useroptions['_name']):
+            uirequest = api.Request(
+                site=self,
+                action="query",
+                meta="userinfo",
+                uiprop="options"
+            )
+            uidata = uirequest.submit()
+            assert 'query' in uidata, \
+                   "API userinfo response lacks 'query' key"
+            assert 'userinfo' in uidata['query'], \
+                   "API userinfo response lacks 'userinfo' key"
+            self._useroptions = uidata['query']['userinfo']['options']
+            # To determine if user name has changed
+            self._useroptions['_name'] = (
+                None if 'anon' in uidata['query']['userinfo'] else
+                uidata['query']['userinfo']['name'])
+        return set(ns for ns in self.namespaces().values() if ns.id >= 0
+                   and self._useroptions['searchNs{0}'.format(ns.id)] in ['1', True])
+
     def assert_valid_iter_params(self, msg_prefix, start, end, reverse):
         """Validate iterating API parameters."""
         if reverse:
