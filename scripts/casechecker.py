@@ -413,11 +413,10 @@ class CaseChecker(object):
                                         self.site, "casechecker-delete-summary")
                                     newText = i18n.twtranslate(
                                         self.site,
-                                        "casechecker-delete-reason", redirTitle,
-                                        fallback=False)
+                                        "casechecker-delete-reason", redirTitle)
                                     if newText:
-                                        src.put(newText, editSummary,
-                                                minorEdit=False)
+                                        src.text = u'{{delete}}\n\n' + newText
+                                        src.save(editSummary, minor=False)
                                         changed = True
 
                             elif not dst.exists():
