@@ -26,6 +26,9 @@ class DummySiteinfo():
     def __getitem__(self, key):
         return self.get(key, False)
 
+    def __setitem__(self, key, value):
+        self._cache[key] = (value, False)
+
     def get(self, key, get_default=True, cache=True, expiry=False):
         # Default values are always expired, so only expiry=False doesn't force
         # a reload
