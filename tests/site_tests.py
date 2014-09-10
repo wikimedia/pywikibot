@@ -15,16 +15,11 @@ from datetime import datetime
 import re
 
 import pywikibot
-from pywikibot.exceptions import Error, NoPage
 from tests.aspects import unittest, TestCase
 
 if sys.version_info[0] > 2:
     basestring = (str, )
     unicode = str
-
-mysite = None
-mainpage = None
-imagepage = None
 
 
 class TestSiteObject(TestCase):
@@ -36,16 +31,9 @@ class TestSiteObject(TestCase):
 
     cached = True
 
-    @classmethod
-    def setUpClass(cls):
-        global mysite, mainpage, imagepage
-        super(TestSiteObject, cls).setUpClass()
-        mysite = cls.get_site()
-        mainpage = pywikibot.Page(pywikibot.Link("Main Page", mysite))
-        imagepage = next(iter(mainpage.imagelinks()))  # 1st image on main page
-
     def testBaseMethods(self):
         """Test cases for BaseSite methods."""
+        mysite = self.get_site()
         self.assertEqual(mysite.family.name, self.family)
         self.assertEqual(mysite.code, self.code)
         self.assertIsInstance(mysite.lang, basestring)
@@ -82,6 +70,7 @@ class TestSiteObject(TestCase):
 
     def testLanguageMethods(self):
         """Test cases for languages() and related methods"""
+        mysite = self.get_site()
         langs = mysite.languages()
         self.assertIsInstance(langs, list)
         self.assertIn(mysite.code, langs)
@@ -95,6 +84,7 @@ class TestSiteObject(TestCase):
 
     def testNamespaceMethods(self):
         """Test cases for methods manipulating namespace names."""
+        mysite = self.get_site()
         builtins = {
             '': 0,  # these should work in any MW wiki
             'Talk': 1,
@@ -161,6 +151,7 @@ class TestSiteObject(TestCase):
 
     def testApiMethods(self):
         """Test generic ApiSite methods."""
+        mysite = self.get_site()
         self.assertIsInstance(mysite.logged_in(), bool)
         self.assertIsInstance(mysite.logged_in(True), bool)
         self.assertIsInstance(mysite.userinfo, dict)
@@ -214,6 +205,8 @@ class TestSiteObject(TestCase):
 
     def testPageMethods(self):
         """Test ApiSite methods for getting page-specific info."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
         self.assertIsInstance(mysite.page_exists(mainpage), bool)
         self.assertIsInstance(mysite.page_restrictions(mainpage), dict)
         self.assertIsInstance(mysite.page_can_be_edited(mainpage), bool)
@@ -230,14 +223,21 @@ class TestSiteObject(TestCase):
 
     def testTokens(self):
         """Test ability to get page tokens."""
+        mysite = self.get_site()
         for ttype in ("edit", "move"):  # token types for non-sysops
-            token = mysite.token(mainpage, ttype)
+            token = mysite.tokens[ttype]
             self.assertIsInstance(token, basestring)
             self.assertEqual(token, mysite.tokens[ttype])
+
+    def testInvalidToken(self):
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
         self.assertRaises(KeyError, mysite.token, mainpage, "invalidtype")
 
     def testPreload(self):
         """Test that preloading works."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
         count = 0
         for page in mysite.preloadpages(mysite.pagelinks(mainpage, total=10)):
             self.assertIsInstance(page, pywikibot.Page)
@@ -250,6 +250,7 @@ class TestSiteObject(TestCase):
 
     def testItemPreload(self):
         """Test that ItemPage preloading works."""
+        mysite = self.get_site()
         datasite = mysite.data_repository()
 
         items = [pywikibot.ItemPage(datasite, 'q' + str(num)) for num in range(1, 6)]
@@ -258,6 +259,8 @@ class TestSiteObject(TestCase):
 
     def testLinkMethods(self):
         """Test site methods for getting links to and from a page."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
         backlinks = set(mysite.pagebacklinks(mainpage, namespaces=[0]))
         # only non-redirects:
         filtered = set(mysite.pagebacklinks(mainpage, namespaces=0,
@@ -332,6 +335,7 @@ class TestSiteObject(TestCase):
 
     def testAllPages(self):
         """Test the site.allpages() method"""
+        mysite = self.get_site()
         fwd = list(mysite.allpages(total=10))
         self.assertLessEqual(len(fwd), 10)
         for page in fwd:
@@ -398,6 +402,7 @@ class TestSiteObject(TestCase):
 
     def testAllLinks(self):
         """Test the site.alllinks() method"""
+        mysite = self.get_site()
         fwd = list(mysite.alllinks(total=10))
         self.assertLessEqual(len(fwd), 10)
         self.assertTrue(all(isinstance(link, pywikibot.Page) for link in fwd))
@@ -424,6 +429,7 @@ class TestSiteObject(TestCase):
 
     def testAllCategories(self):
         """Test the site.allcategories() method"""
+        mysite = self.get_site()
         ac = list(mysite.allcategories(total=10))
         self.assertLessEqual(len(ac), 10)
         self.assertTrue(all(isinstance(cat, pywikibot.Category)
@@ -441,6 +447,7 @@ class TestSiteObject(TestCase):
 
     def testAllUsers(self):
         """Test the site.allusers() method"""
+        mysite = self.get_site()
         au = list(mysite.allusers(total=10))
         self.assertLessEqual(len(au), 10)
         for user in au:
@@ -470,6 +477,7 @@ class TestSiteObject(TestCase):
 
     def testAllImages(self):
         """Test the site.allimages() method"""
+        mysite = self.get_site()
         ai = list(mysite.allimages(total=10))
         self.assertLessEqual(len(ai), 10)
         self.assertTrue(all(isinstance(image, pywikibot.FilePage)
@@ -498,6 +506,7 @@ class TestSiteObject(TestCase):
 
     def testBlocks(self):
         """Test the site.blocks() method"""
+        mysite = self.get_site()
         props = ("id", "by", "timestamp", "expiry", "reason")
         bl = list(mysite.blocks(total=10))
         self.assertLessEqual(len(bl), 10)
@@ -555,6 +564,7 @@ class TestSiteObject(TestCase):
 
     def testExturlusage(self):
         """Test the site.exturlusage() method"""
+        mysite = self.get_site()
         url = "www.google.com"
         eu = list(mysite.exturlusage(url, total=10))
         self.assertLessEqual(len(eu), 10)
@@ -566,6 +576,10 @@ class TestSiteObject(TestCase):
 
     def testImageusage(self):
         """Test the site.imageusage() method"""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        imagepage = next(iter(mainpage.imagelinks()))  # 1st image on main page
+
         iu = list(mysite.imageusage(imagepage, total=10))
         self.assertLessEqual(len(iu), 10)
         self.assertTrue(all(isinstance(link, pywikibot.Page)
@@ -582,6 +596,8 @@ class TestSiteObject(TestCase):
 
     def testLogEvents(self):
         """Test the site.logevents() method"""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
         le = list(mysite.logevents(total=10))
         self.assertLessEqual(len(le), 10)
         self.assertTrue(all(isinstance(entry, pywikibot.logentries.LogEntry)
@@ -623,6 +639,9 @@ class TestSiteObject(TestCase):
 
     def testRecentchanges(self):
         """Test the site.recentchanges() method"""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        imagepage = next(iter(mainpage.imagelinks()))
         rc = list(mysite.recentchanges(total=10))
         self.assertLessEqual(len(rc), 10)
         self.assertTrue(all(isinstance(change, dict)
@@ -716,6 +735,7 @@ class TestSiteObject(TestCase):
 
     def testSearch(self):
         """Test the site.search() method"""
+        mysite = self.get_site()
         try:
             se = list(mysite.search("wiki", total=10))
             self.assertLessEqual(len(se), 10)
@@ -742,6 +762,7 @@ class TestSiteObject(TestCase):
 
     def testUsercontribs(self):
         """Test the site.usercontribs() method"""
+        mysite = self.get_site()
         uc = list(mysite.usercontribs(user=mysite.user(), total=10))
         self.assertLessEqual(len(uc), 10)
         self.assertTrue(all(isinstance(contrib, dict)
@@ -814,6 +835,7 @@ class TestSiteObject(TestCase):
 
     def testWatchlistrevs(self):
         """Test the site.watchlist_revs() method"""
+        mysite = self.get_site()
         wl = list(mysite.watchlist_revs(total=10))
         self.assertLessEqual(len(wl), 10)
         self.assertTrue(all(isinstance(rev, dict)
@@ -881,6 +903,8 @@ class TestSiteObject(TestCase):
 
     def testDeletedrevs(self):
         """Test the site.deletedrevs() method"""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
         if not mysite.logged_in(True):
             try:
                 mysite.login(True)
@@ -939,6 +963,7 @@ class TestSiteObject(TestCase):
 
     def testUsers(self):
         """Test the site.users() method"""
+        mysite = self.get_site()
         us = list(mysite.users(mysite.user()))
         self.assertEqual(len(us), 1)
         self.assertIsInstance(us[0], dict)
@@ -950,6 +975,7 @@ class TestSiteObject(TestCase):
 
     def testRandompages(self):
         """Test the site.randompages() method"""
+        mysite = self.get_site()
         rn = list(mysite.randompages(total=10))
         self.assertLessEqual(len(rn), 10)
         self.assertTrue(all(isinstance(a_page, pywikibot.Page)
@@ -966,6 +992,7 @@ class TestSiteObject(TestCase):
     #       and the other following methods in site.py
 
     def testExtensions(self):
+        mysite = self.get_site()
         # test automatically getting extensions cache
         if 'extensions' in mysite.siteinfo:
             del mysite.siteinfo._cache['extensions']
@@ -978,6 +1005,7 @@ class TestSiteObject(TestCase):
 
     def test_API_limits_with_site_methods(self):
         # test step/total parameters for different sitemethods
+        mysite = self.get_site()
         mypage = pywikibot.Page(mysite, 'Albert Einstein')
         mycat = pywikibot.Page(mysite, 'Category:1879 births')
 
@@ -997,14 +1025,14 @@ class TestSiteObject(TestCase):
         self.assertEqual(len(mypage._revisions), 12)
 
     def testPickleAbility(self):
+        site = self.get_site()
         import pickle
-        site = pywikibot.Site('en', 'wikipedia')
         pickle.dumps(site)
-        self.assertTrue(True)  # No exception thrown!
 
     def testSiteinfo(self):
         """Test the siteinfo property."""
         # general enteries
+        mysite = self.get_site()
         self.assertIsInstance(mysite.siteinfo['timeoffset'], (int, float))
         self.assertTrue(-12 * 60 <= mysite.siteinfo['timeoffset'] <= +14 * 60)
         self.assertEqual(mysite.siteinfo['timeoffset'] % 15, 0)
@@ -1043,14 +1071,6 @@ class TestSiteObject(TestCase):
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).items()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).values()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).keys()))
-
-    def test_movepage(self):
-        self.assertRaises(Error, mysite.movepage, mainpage, 'Main Page', 'test')
-
-        page_from = pywikibot.Page(mysite, 'Not exiting page')
-        if not page_from.exists():
-            self.assertRaises(NoPage, mysite.movepage,
-                              page_from, 'Main Page', 'test')
 
 
 class TestSiteLoadRevisions(TestCase):

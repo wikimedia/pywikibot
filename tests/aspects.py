@@ -426,6 +426,35 @@ class TestCase(TestTimerMixin, TestCaseBase, unittest.TestCase):
         # Create an instance method named the same as the class method
         self.get_site = lambda name=None: self.__class__.get_site(name)
 
+    def get_mainpage(self, site=None):
+        """Create a Page object for the sites main page."""
+        if not site:
+            site = self.get_site()
+
+        if hasattr(self, '_mainpage'):
+            # For multi-site test classes, or site is specified as a param,
+            # the cached mainpage object may not be the desired site.
+            if self._mainpage.site == site:
+                return self._mainpage
+
+        mainpage = pywikibot.Page(site, site.siteinfo['mainpage'])
+        if mainpage.isRedirectPage():
+            mainpage = mainpage.getRedirectTarget()
+
+        self._mainpage = mainpage
+
+        return mainpage
+
+    def get_missing_article(self, site=None):
+        if not site:
+            site = self.get_site()
+        page = pywikibot.Page(pywikibot.page.Link(
+                              "There is no page with this title", site))
+        if page.exists():
+            raise unittest.SkipTest("Did not find a page that does not exist.")
+
+        return page
+
 
 if sys.version_info[0] > 2:
     import six

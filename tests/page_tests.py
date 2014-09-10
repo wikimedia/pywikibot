@@ -17,10 +17,6 @@ if sys.version_info[0] > 2:
     basestring = (str, )
     unicode = str
 
-# These two globals are only used in TestPageObject.
-site = None
-mainpage = None
-
 
 class TestLinkObject(TestCase):
 
@@ -167,37 +163,37 @@ class TestPageObject(TestCase):
 
     cached = True
 
-    @classmethod
-    def setUpClass(cls):
-        global site, mainpage
-        super(TestPageObject, cls).setUpClass()
-        site = cls.get_site()
-        mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", site))
-        cls.maintalk = pywikibot.Page(pywikibot.page.Link("Talk:Main Page", site))
-        cls.badpage = pywikibot.Page(pywikibot.page.Link(
-                                     "There is no page with this title", site))
-
     def testGeneral(self):
+        site = self.get_site()
+        mainpage = self.get_mainpage()
+        maintalk = mainpage.toggleTalkPage()
+
         family_name = (site.family.name + ':'
                        if pywikibot.config2.family != site.family.name
                        else u'')
         self.assertEqual(str(mainpage), "[[%s%s:%s]]"
                                         % (family_name, site.code,
                                            mainpage.title()))
-        self.assertLess(mainpage, self.maintalk)
+        self.assertLess(mainpage, maintalk)
 
     def testSite(self):
         """Test site() method"""
-        self.assertEqual(mainpage.site, site)
+        mainpage = self.get_mainpage()
+        self.assertEqual(mainpage.site, self.site)
 
     def testNamespace(self):
         """Test namespace() method"""
+        mainpage = self.get_mainpage()
+        maintalk = mainpage.toggleTalkPage()
+        badpage = self.get_missing_article()
+
         self.assertEqual(mainpage.namespace(), 0)
-        self.assertEqual(self.maintalk.namespace(), 1)
-        self.assertEqual(self.badpage.namespace(), 0)
+        self.assertEqual(maintalk.namespace(), 1)
+        self.assertEqual(badpage.namespace(), 0)
 
     def testTitle(self):
         """Test title() method options."""
+        site = self.get_site()
         p1 = pywikibot.Page(site, u"Help:Test page#Testing")
         self.assertEqual(p1.title(),
                          u"Help:Test page#Testing")
@@ -297,6 +293,7 @@ class TestPageObject(TestCase):
     def testSection(self):
         """Test section() method."""
         # use same pages as in previous test
+        site = self.get_site()
         p1 = pywikibot.Page(site, u"Help:Test page#Testing")
         p2 = pywikibot.Page(site, u"File:Jean-Léon Gérôme 003.jpg")
         self.assertEqual(p1.section(), u"Testing")
@@ -304,6 +301,7 @@ class TestPageObject(TestCase):
 
     def testIsTalkPage(self):
         """Test isTalkPage() method."""
+        site = self.get_site()
         p1 = pywikibot.Page(site, u"First page")
         p2 = pywikibot.Page(site, u"Talk:First page")
         p3 = pywikibot.Page(site, u"User:Second page")
@@ -315,6 +313,7 @@ class TestPageObject(TestCase):
 
     def testIsCategory(self):
         """Test isCategory method."""
+        site = self.get_site()
         p1 = pywikibot.Page(site, u"First page")
         p2 = pywikibot.Page(site, u"Category:Second page")
         p3 = pywikibot.Page(site, u"Category talk:Second page")
@@ -323,6 +322,7 @@ class TestPageObject(TestCase):
         self.assertEqual(p3.isCategory(), False)
 
     def testIsImage(self):
+        site = self.get_site()
         p1 = pywikibot.Page(site, u"First page")
         p2 = pywikibot.Page(site, u"File:Second page")
         p3 = pywikibot.Page(site, u"Image talk:Second page")
@@ -331,12 +331,14 @@ class TestPageObject(TestCase):
         self.assertEqual(p3.isImage(), False)
 
     def testIsRedirect(self):
+        site = self.get_site()
         p1 = pywikibot.Page(site, u'User:Legoktm/R1')
         p2 = pywikibot.Page(site, u'User:Legoktm/R2')
         self.assertTrue(p1.isRedirectPage())
         self.assertEqual(p1.getRedirectTarget(), p2)
 
     def testPageGet(self):
+        site = self.get_site()
         p1 = pywikibot.Page(site, u'User:Legoktm/R2')
         p2 = pywikibot.Page(site, u'User:Legoktm/R1')
         p3 = pywikibot.Page(site, u'User:Legoktm/R3')
@@ -348,18 +350,21 @@ class TestPageObject(TestCase):
 
     def testApiMethods(self):
         """Test various methods that rely on API."""
+        mainpage = self.get_mainpage()
+        maintalk = mainpage.toggleTalkPage()
+        badpage = self.get_missing_article()
         # since there is no way to predict what data the wiki will return,
         # we only check that the returned objects are of correct type.
-        self.assertIsInstance(self.maintalk.get(), unicode)
-        self.assertRaises(pywikibot.NoPage, self.badpage.get)
+        self.assertIsInstance(maintalk.get(), unicode)
+        self.assertRaises(pywikibot.NoPage, badpage.get)
         self.assertIsInstance(mainpage.latestRevision(), int)
         self.assertIsInstance(mainpage.userName(), unicode)
         self.assertIsInstance(mainpage.isIpEdit(), bool)
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
         self.assertIsInstance(mainpage.isEmpty(), bool)
-        self.assertEqual(mainpage.toggleTalkPage(), self.maintalk)
-        self.assertEqual(self.maintalk.toggleTalkPage(), mainpage)
+        self.assertEqual(mainpage.toggleTalkPage(), maintalk)
+        self.assertEqual(maintalk.toggleTalkPage(), mainpage)
         self.assertIsInstance(mainpage.isDisambig(), bool)
         self.assertIsInstance(mainpage.canBeEdited(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
@@ -370,9 +375,9 @@ class TestPageObject(TestCase):
 
     def testIsDisambig(self):
         """
-        Test the integration with
-        Extension:Disambiguator
+        Test the integration with Extension:Disambiguator.
         """
+        site = self.get_site()
         if not site.has_extension('Disambiguator'):
             raise unittest.SkipTest('Disambiguator extension not loaded on test site')
         pg = pywikibot.Page(site, 'Random')
@@ -382,6 +387,7 @@ class TestPageObject(TestCase):
         self.assertFalse(pg.isDisambig())
 
     def testReferences(self):
+        mainpage = self.get_mainpage()
         count = 0
         # Ignore redirects for time considerations
         for p in mainpage.getReferences(follow_redirects=False):
@@ -403,6 +409,7 @@ class TestPageObject(TestCase):
                 break
 
     def testLinks(self):
+        mainpage = self.get_mainpage()
         for p in mainpage.linkedPages():
             self.assertIsInstance(p, pywikibot.Page)
         iw = list(mainpage.interwiki(expand=True))
@@ -426,18 +433,18 @@ class TestPageObject(TestCase):
             self.assertIsInstance(p, unicode)
 
     def testPickleAbility(self):
+        mainpage = self.get_mainpage()
         import pickle
         pickle.dumps(mainpage)
         self.assertTrue(True)  # No exception thrown!
 
     def testRepr(self):
+        mainpage = self.get_mainpage()
         s = repr(mainpage)
         self.assertIsInstance(s, str)
 
     def testReprUnicode(self):
-        site = pywikibot.Site('ar', 'wikipedia')
-        page = pywikibot.Page(site, 'Main Page')
-        page = page.toggleTalkPage()
+        page = pywikibot.Page(self.get_site(), u'Ō')
         s = repr(page)
         self.assertIsInstance(s, str)
 
@@ -465,19 +472,21 @@ class TestPageObject(TestCase):
 
 class TestCategoryObject(TestCase):
 
-    site = True
+    family = 'wikipedia'
+    code = 'en'
+
     cached = True
 
     def test_isEmptyCategory(self):
         """Test if category is empty or not"""
-        site = pywikibot.Site('en', 'wikipedia')
+        site = self.get_site()
         cat_empty = pywikibot.Category(site, u'Category:foooooo')
         cat_not_empty = pywikibot.Category(site, u'Category:Wikipedia categories')
         self.assertTrue(cat_empty.isEmptyCategory())
         self.assertFalse(cat_not_empty.isEmptyCategory())
 
     def test_isHiddenCategory(self):
-        site = pywikibot.Site('en', 'wikipedia')
+        site = self.get_site()
         cat_hidden = pywikibot.Category(site, u'Category:Hidden categories')
         cat_not_hidden = pywikibot.Category(site, u'Category:Wikipedia categories')
         self.assertTrue(cat_hidden.isHiddenCategory())

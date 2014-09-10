@@ -14,6 +14,8 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import (
+    Error,
+    NoPage,
     LockedPage,
     SpamfilterError,
     OtherPageSaveError,
@@ -47,6 +49,35 @@ class TestSaveFailure(SiteTestCase):
         """Test that {{nobots}} raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:John Vandenberg/nobots')
         self.assertRaisesRegexp(OtherPageSaveError, 'nobots', page.save)
+
+
+class TestActionFailure(SiteTestCase):
+
+    """Test cases for actions which should fail to save."""
+
+    write = True
+
+    family = 'wikipedia'
+    code = 'test'
+
+    def test_movepage(self):
+        """Test that site.movepage raises the appropriate exceptions."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        try:
+            mysite.tokens['move']
+        except KeyError:
+            raise unittest.SkipTest(
+                "movepage test requires 'move' token not given to user on %s"
+                % self.site)
+
+        self.assertRaises(Error, mysite.movepage,
+                          mainpage, mainpage.title(), 'test')
+
+        page_from = self.get_missing_article()
+        if not page_from.exists():
+            self.assertRaises(NoPage, mysite.movepage,
+                              page_from, 'Main Page', 'test')
 
 
 if __name__ == '__main__':

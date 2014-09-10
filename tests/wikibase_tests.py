@@ -144,7 +144,6 @@ class TestItemLoad(WikidataTestCase):
 
     @classmethod
     def setUpClass(cls):
-        global wikidata
         super(TestItemLoad, cls).setUpClass()
         cls.site = cls.get_site('enwiki')
         cls.nyc = pywikibot.Page(pywikibot.page.Link("New York City", cls.site))
