@@ -294,6 +294,21 @@ class UploadRobot:
             return filename  # data['filename']
 
     def run(self):
+
+        # early check that upload is enabled
+        if self.targetSite.is_uploaddisabled():
+            pywikibot.error(
+                "Upload error: Local file uploads are disabled on %s."
+                % self.targetSite)
+            return
+
+        # early check that user has proper rights to upload
+        if "upload" not in self.targetSite.userinfo["rights"]:
+            pywikibot.error(
+                "User '%s' does not have upload rights on site %s."
+                % (self.targetSite.user(), self.targetSite))
+            return
+
         while not self.urlOK():
             if not self.url:
                 pywikibot.output(u'No input filename given')
