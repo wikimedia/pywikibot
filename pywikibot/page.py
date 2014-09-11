@@ -2834,30 +2834,27 @@ class WikibasePage(Page):
                 'descriptions': self.descriptions,
                 }
 
-    def toJSON(self, diffto=None):
-        labels = self._normalizeLanguages(self.labels).copy()
-        if diffto and 'labels' in diffto:
-            old = set(diffto['labels'].keys())
-            new = set(labels.keys())
-            for lang in old - new:
-                labels[lang] = ''
-            for lang in old.intersection(new):
-                if labels[lang] == diffto['labels'][lang]['value']:
-                    del labels[lang]
-        for lang in labels:
-            labels[lang] = {'language': lang, 'value': labels[lang]}
+    def _diff_to(self, type_key, key_name, value_name, diffto, data):
+        assert(type_key not in data)
+        source = self._normalizeLanguages(getattr(self, type_key)).copy()
+        diffto = {} if not diffto else diffto.get(type_key, {})
+        new = set(source.keys())
+        for key in diffto:
+            if key in new:
+                if source[key] == diffto[key][value_name]:
+                    del source[key]
+            else:
+                source[key] = ''
+        for key, value in source.items():
+            source[key] = {key_name: key, value_name: value}
+        if source:
+            data[type_key] = source
 
-        descriptions = self._normalizeLanguages(self.descriptions).copy()
-        if diffto and 'descriptions' in diffto:
-            old = set(diffto['descriptions'].keys())
-            new = set(descriptions.keys())
-            for lang in old - new:
-                descriptions[lang] = ''
-            for lang in old.intersection(new):
-                if descriptions[lang] == diffto['descriptions'][lang]['value']:
-                    del descriptions[lang]
-        for lang in descriptions:
-            descriptions[lang] = {'language': lang, 'value': descriptions[lang]}
+    def toJSON(self, diffto=None):
+        data = {}
+        self._diff_to('labels', 'language', 'value', diffto, data)
+
+        self._diff_to('descriptions', 'language', 'value', diffto, data)
 
         aliases = self._normalizeLanguages(self.aliases).copy()
         if diffto and 'aliases' in diffto:
@@ -2874,10 +2871,8 @@ class WikibasePage(Page):
             if lang in aliases:
                 aliases[lang] = [{'language': lang, 'value': i} for i in strings]
 
-        data = {}
-        for key in ('labels', 'descriptions', 'aliases'):
-            if len(locals()[key]) > 0:
-                data[key] = locals()[key]
+        if aliases:
+            data['aliases'] = aliases
         return data
 
     def getID(self, numeric=False, force=False):
@@ -3176,17 +3171,7 @@ class ItemPage(WikibasePage):
     def toJSON(self, diffto=None):
         data = super(ItemPage, self).toJSON(diffto=diffto)
 
-        sitelinks = self.sitelinks.copy()
-        if diffto and 'sitelinks' in diffto:
-            old = set(diffto['sitelinks'].keys())
-            new = set(sitelinks.keys())
-            for dbName in old - new:
-                sitelinks[dbName] = ''
-            for dbName in old.intersection(new):
-                if sitelinks[dbName] == diffto['sitelinks'][dbName]['title']:
-                    del sitelinks[dbName]
-        for dbName in sitelinks:
-            sitelinks[dbName] = {'site': dbName, 'title': sitelinks[dbName]}
+        self._diff_to('sitelinks', 'site', 'title', diffto, data)
 
         claims = self.claims.copy()
         for prop in claims.keys():
@@ -3198,17 +3183,12 @@ class ItemPage(WikibasePage):
         if diffto and 'claims' in diffto:
             temp = {}
             for prop in claims:
-                for claim1 in claims[prop]:
-                    seen = False
-                    if prop in diffto['claims']:
-                        for claim2 in diffto['claims'][prop]:
-                            if claim2 == claim1:
-                                seen = True
-                                break
-                    if not seen:
+                for claim in claims[prop]:
+                    if (prop not in diffto['claims'] or
+                            claim not in diffto['claims'][prop]):
                         if prop not in temp:
                             temp[prop] = []
-                        temp[prop].append(claim1)
+                        temp[prop].append(claim)
             for prop in diffto['claims']:
                 if prop not in claims:
                     claims[prop] = []
@@ -3220,9 +3200,8 @@ class ItemPage(WikibasePage):
                         temp[prop].append({'id': claim1['id'], 'remove': ''})
             claims = temp
 
-        for key in ('sitelinks', 'claims'):
-            if len(locals()[key]) > 0:
-                data[key] = locals()[key]
+        if claims:
+            data['claims'] = claims
         return data
 
     def iterlinks(self, family=None):
