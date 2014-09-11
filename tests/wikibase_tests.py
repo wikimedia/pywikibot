@@ -9,6 +9,7 @@ __version__ = '$Id$'
 #
 
 import os
+import sys
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.page import WikibasePage
@@ -826,6 +827,11 @@ class TestUnconnectedClient(TestCase):
 class TestJSON(WikidataTestCase):
 
     """Test cases to test toJSON() functions."""
+
+    @classmethod
+    def setUpClass(cls):
+        if not sys.version_info >= (2, 7):
+            raise unittest.SkipTest("Fails on Python 2.6")
 
     def setUp(self):
         super(TestJSON, self).setUp()

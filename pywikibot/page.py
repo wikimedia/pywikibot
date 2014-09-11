@@ -2973,8 +2973,10 @@ class WikibasePage(Page):
          *ItemPage.setSitelinks
 
         @param data: Data to be saved
-        @type data: dict
+        @type data: dict (must be not None for python 2.6; bug 70707)
         """
+        assert(sys.version_info >= (2, 7) or data is not None)
+
         if hasattr(self, 'lastrevid'):
             baserevid = self.lastrevid
         else:
