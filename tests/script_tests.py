@@ -348,7 +348,7 @@ class TestScriptMeta(MetaTestCaseClass):
             else:
                 test_name = 'test_' + script_name + '_help'
             dct[test_name] = test_execution(script_name, ['-help'])
-            if script_name in ['shell', 'version',
+            if script_name in ['version',
                                'data_ingestion',  # bug 68611
                                'replicate_wiki',  # bug 68664
                                'script_wui',      # Failing on travis-ci
