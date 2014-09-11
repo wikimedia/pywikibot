@@ -3052,7 +3052,7 @@ class ItemPage(WikibasePage):
         """
         # Special case for empty item
         if title is None or title == '-1':
-            super(ItemPage, self).__init__(site, u'-1', ns=0)
+            super(ItemPage, self).__init__(site, u'-1', ns=site.item_namespace)
             self.id = u'-1'
             return
 
