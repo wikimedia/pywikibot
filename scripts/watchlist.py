@@ -57,9 +57,8 @@ def get(site=None):
         except OSError:
             # no saved watchlist exists yet, retrieve one
             refresh(site)
-        f = open(fn, 'r')
-        watchlist = pickle.load(f)
-        f.close()
+        with open(fn, 'rb') as f:
+            watchlist = pickle.load(f)
         # create cached copy
         cache[site] = watchlist
     return watchlist
@@ -100,13 +99,12 @@ def refresh(site, sysop=False):
 
     # Save the watchlist to disk
     # The file is stored in the watchlists subdir. Create if necessary.
-    f = open(config.datafilepath('watchlists',
-                                 'watchlist-%s-%s%s.dat'
-                                 % (site.family.name, site.code,
-                                    '-sysop' if sysop else '')),
-             'w')
-    pickle.dump(watchlist, f)
-    f.close()
+    with open(config.datafilepath('watchlists',
+                                  'watchlist-%s-%s%s.dat'
+                                  % (site.family.name, site.code,
+                                     '-sysop' if sysop else '')),
+              'wb') as f:
+        pickle.dump(watchlist, f)
 
 
 def refresh_all(new=False, sysop=False):

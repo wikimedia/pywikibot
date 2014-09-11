@@ -543,9 +543,8 @@ class History:
         # from time to time
         self.logCount = 0
         try:
-            datfile = open(self.datfilename, 'r')
-            self.historyDict = pickle.load(datfile)
-            datfile.close()
+            with open(self.datfilename, 'rb') as datfile:
+                self.historyDict = pickle.load(datfile)
         except (IOError, EOFError):
             # no saved history exists yet, or history dump broken
             self.historyDict = {}
@@ -621,9 +620,8 @@ class History:
 
     def save(self):
         """ Save the .dat file to disk. """
-        datfile = open(self.datfilename, 'w')
-        pickle.dump(self.historyDict, datfile)
-        datfile.close()
+        with open(self.datfilename, 'wb') as datfile:
+            pickle.dump(self.historyDict, datfile)
 
 
 class DeadLinkReportThread(threading.Thread):
