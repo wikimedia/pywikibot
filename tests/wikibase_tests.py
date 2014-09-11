@@ -832,6 +832,7 @@ class TestJSON(WikidataTestCase):
     def setUpClass(cls):
         if not sys.version_info >= (2, 7):
             raise unittest.SkipTest("Fails on Python 2.6")
+        super(TestJSON, cls).setUpClass()
 
     def setUp(self):
         super(TestJSON, self).setUp()
