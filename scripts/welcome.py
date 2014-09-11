@@ -996,7 +996,7 @@ def main():
                 import pickle as cPickle
             else:
                 import cPickle
-            with open(filename, 'w') as f:
+            with open(filename, 'wb') as f:
                 cPickle.dump(bot.welcomed_users, f)
 
 if __name__ == "__main__":

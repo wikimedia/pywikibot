@@ -484,13 +484,13 @@ class WikidataQuery():
             now = time.time()
 
             if ((now - mtime) / 60) < self.cacheMaxAge:
-
-                try:
-                    data = pickle.load(open(cacheFile, 'r'))
-                except pickle.UnpicklingError:
-                    pywikibot.warning(u"Couldn't read cached data from %s"
-                                        % cacheFile)
-                    data = None
+                with open(cacheFile, 'rb') as f:
+                    try:
+                        data = pickle.load(f)
+                    except pickle.UnpicklingError:
+                        pywikibot.warning(u"Couldn't read cached data from %s"
+                                            % cacheFile)
+                        data = None
 
                 return data
 
@@ -517,10 +517,11 @@ class WikidataQuery():
         if not os.path.exists(self.cacheDir):
             os.makedirs(self.cacheDir)
 
-        try:
-            pickle.dump(data, open(cacheFile, 'w'))
-        except IOError:
-            pywikibot.warning(u"Failed to write cache file %s" % cacheFile)
+        with open(cacheFile, 'wb') as f:
+            try:
+                pickle.dump(data, f)
+            except IOError:
+                pywikibot.warning(u"Failed to write cache file %s" % cacheFile)
 
     def getDataFromHost(self, queryStr):
         """

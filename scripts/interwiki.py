@@ -356,6 +356,9 @@ import webbrowser
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph, titletranslate
 
+if sys.version_info[0] > 2:
+    unicode = str
+
 docuReplacements = {
     '&pagegenerators_help;': pagegenerators.parameterHelp
 }
@@ -2117,10 +2120,9 @@ class InterwikiBot(object):
             mode = 'appended'
         else:
             mode = 'written'
-        f = open(dumpfn, mode[0])
         titles = [s.originPage.title() for s in self.subjects]
-        pickle.dump(titles, f)
-        f.close()
+        with open(dumpfn, mode[0] + 'b') as f:
+            pickle.dump(titles, f)
         pywikibot.output(u'Dump %s (%s) %s.' % (site.lang, site.family.name, mode))
         return dumpfn
 
@@ -2526,9 +2528,8 @@ def main():
             u'%s-%s.pickle' % (site.family.name, site.lang)
         )
         try:
-            f = open(dumpFileName, 'r')
-            dumpedTitles = pickle.load(f)
-            f.close()
+            with open(dumpFileName, 'rb') as f:
+                dumpedTitles = pickle.load(f)
         except (EOFError, IOError):
             dumpedTitles = []
         pages = [pywikibot.Page(site, title) for title in dumpedTitles]
