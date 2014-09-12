@@ -2281,13 +2281,13 @@ class APISite(BaseSite):
                                    type='|'.join(types)).submit()
             else:
                 # TODO: Fetch that from the API with paraminfo
-                special_names = set('deleteglobalaccount', 'patrol', 'rollback',
-                                    'setglobalaccountstatus', 'userrights',
-                                    'watch')
+                special_names = set(['deleteglobalaccount', 'patrol', 'rollback',
+                                     'setglobalaccountstatus', 'userrights',
+                                     'watch'])
                 new_tokens = [token if token in special_names else 'csrf'
                               for token in types]
-                data = api.Request(action='query',
-                                   tokens='|'.join(new_tokens)).submit()
+                data = api.Request(action='query', meta='tokens',
+                                   type='|'.join(new_tokens)).submit()
                 if 'query' in data:
                     data = data['query']
 
