@@ -1186,9 +1186,16 @@ class TokenWallet(object):
     def __init__(self, site):
         self.site = site
         self.site._tokens = {}
+        # TODO: Fetch that from the API with paraminfo
+        self.special_names = set(['deleteglobalaccount', 'patrol', 'rollback',
+                                  'setglobalaccountstatus', 'userrights',
+                                  'watch'])
 
     def __getitem__(self, key):
         storage = self.site._tokens.setdefault(self.site.user(), {})
+        if (LV(self.site.version()) >= LV('1.24wmf19')
+                and key not in self.special_names):
+            key = 'csrf'
         if key not in storage:
             self.site.preload_tokens([key])
         return storage[key]
@@ -2296,20 +2303,17 @@ class APISite(BaseSite):
                 data = api.Request(site=self, action='tokens',
                                    type='|'.join(types)).submit()
             else:
-                # TODO: Fetch that from the API with paraminfo
-                special_names = set(['deleteglobalaccount', 'patrol', 'rollback',
-                                     'setglobalaccountstatus', 'userrights',
-                                     'watch'])
-                new_tokens = [token if token in special_names else 'csrf'
+                new_tokens = [token if token in self.tokens.special_names else 'csrf'
                               for token in types]
-                data = api.Request(action='query', meta='tokens',
+                data = api.Request(site=self, action='query', meta='tokens',
                                    type='|'.join(new_tokens)).submit()
                 if 'query' in data:
                     data = data['query']
 
             if 'tokens' in data and data['tokens']:
                 storage.update(dict((key[:-5], val)
-                                    for key, val in data['tokens'].items()))
+                                    for key, val in data['tokens'].items()
+                                    if val != '+\\'))
 
     @deprecated("the 'tokens' property")
     def token(self, page, tokentype):
