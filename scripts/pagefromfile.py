@@ -28,6 +28,8 @@ Specific arguments:
                 titleend, in the page
 -nocontent      If page has this statment it doesn't append
                 (example: -nocontent:"{{infobox")
+-noredirect     if you don't want to upload on redirect page
+                it is True by default and bot adds pages to redirected pages
 -summary:xxx    Use xxx as the edit summary for the upload - if
                 a page exists, standard messages are appended
                 after xxx for appending, prepending, or replacement
@@ -81,6 +83,7 @@ class PageFromFileRobot(Bot):
             'minor': False,
             'autosummary': False,
             'nocontent': '',
+            'redirect': True
         })
 
         super(PageFromFileRobot, self).__init__(**kwargs)
@@ -112,8 +115,11 @@ class PageFromFileRobot(Bot):
         contents = re.sub('^[\r\n]*', '', contents)
 
         if page.exists():
+            if not self.getOption('redirect') and page.isRedirectPage():
+                pywikibot.output(u"Page %s is redirect, skipping!" % title)
+                return
+            pagecontents = page.get(get_redirect=True)
             if self.getOption('nocontent') != u'':
-                pagecontents = page.get()
                 if pagecontents.find(self.getOption('nocontent')) != -1 or \
                 pagecontents.find(self.getOption('nocontent').lower()) != -1:
                     pywikibot.output(u'Page has %s so it is skipped' % self.getOption('nocontent'))
@@ -121,12 +127,12 @@ class PageFromFileRobot(Bot):
             if self.getOption('append') == 'top':
                 pywikibot.output(u"Page %s already exists, appending on top!"
                                      % title)
-                contents = contents + page.get()
+                contents = contents + pagecontents
                 comment = comment_top
             elif self.getOption('append') == 'bottom':
                 pywikibot.output(u"Page %s already exists, appending on bottom!"
                                      % title)
-                contents = page.get() + contents
+                contents = pagecontents + contents
                 comment = comment_bottom
             elif self.getOption('force'):
                 pywikibot.output(u"Page %s already exists, ***overwriting!"
@@ -260,6 +266,8 @@ def main():
         elif arg == "-safe":
             options['force'] = False
             options['append'] = None
+        elif arg == "-noredirect":
+            options['redirect'] = False
         elif arg == '-notitle':
             notitle = True
         elif arg == '-minor':
