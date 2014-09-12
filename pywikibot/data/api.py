@@ -381,9 +381,11 @@ class Request(MutableMapping):
                         u'API warning ({0})of unknown format: {1}'.
                         format(mod, warning))
                     continue
-                if (not callable(self._warning_handler) or
-                        not self._warning_handler(mod, text)):
-                    pywikibot.warning(u"API warning (%s): %s" % (mod, text))
+                # multiple warnings are in text separated by a newline
+                for single_warning in text.splitlines():
+                    if (not callable(self._warning_handler) or
+                            not self._warning_handler(mod, single_warning)):
+                        pywikibot.warning(u"API warning (%s): %s" % (mod, single_warning))
 
     def submit(self):
         """Submit a query and parse the response.
