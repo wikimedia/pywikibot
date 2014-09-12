@@ -1029,12 +1029,13 @@ class Siteinfo(Container):
 
     @staticmethod
     def _is_expired(cache_date, expire):
+        """Return true if the cache date is expired."""
         if expire is False:  # can never expire
             return False
         elif not cache_date:  # default values are always expired
             return True
         else:
-            return datetime.datetime.utcnow() - expire < cache_date
+            return cache_date + expire >= datetime.datetime.utcnow()
 
     def _get_general(self, key, expiry):
         """
