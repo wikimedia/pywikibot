@@ -493,19 +493,28 @@ class TestPageMethods(WikidataTestCase):
 
     """Test cases to test methods of Page() behave correctly with Wikibase."""
 
-    family = 'wikidata'
-    code = 'test'
-
     def test_page_methods(self):
         """Test ItemPage methods inherited from superclass Page."""
-        wikidatatest = self.get_repo()
-        self.wdp = pywikibot.ItemPage(wikidatatest, 'Q6')
-        self.assertRaises(pywikibot.PageNotSaved, self.wdp.save)
+        self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
         self.wdp.previousRevision()
         self.assertEqual(self.wdp.langlinks(), [])
         self.assertEqual(self.wdp.templates(), [])
         self.assertFalse(self.wdp.isCategoryRedirect())
+
+    def __test_item_templates(self):
+        """Test templatesWithParams."""
+        self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
         self.wdp.templatesWithParams()
+
+    def __test_item_bot_may_edit(self):
+        """Test botMayEdit."""
+        site = self.get_site()
+        page = pywikibot.Page(site, 'Q60')
+        self.assertTrue(page.botMayEdit())
+
+        repo = self.get_repo()
+        item = pywikibot.ItemPage(repo, 'Q60')
+        self.assertTrue(item.botMayEdit())
 
 
 class TestLinks(WikidataTestCase):

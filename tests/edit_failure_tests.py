@@ -20,10 +20,10 @@ from pywikibot import (
     SpamfilterError,
     OtherPageSaveError,
 )
-from tests.utils import SiteTestCase, unittest
+from tests.aspects import unittest, TestCase, WikibaseTestCase
 
 
-class TestSaveFailure(SiteTestCase):
+class TestSaveFailure(TestCase):
 
     """Test cases for edits which should fail to save."""
 
@@ -51,7 +51,7 @@ class TestSaveFailure(SiteTestCase):
         self.assertRaisesRegexp(OtherPageSaveError, 'nobots', page.save)
 
 
-class TestActionFailure(SiteTestCase):
+class TestActionFailure(TestCase):
 
     """Test cases for actions which should fail to save."""
 
@@ -78,6 +78,22 @@ class TestActionFailure(SiteTestCase):
         if not page_from.exists():
             self.assertRaises(NoPage, mysite.movepage,
                               page_from, 'Main Page', 'test')
+
+
+class TestWikibaseSaveTest(WikibaseTestCase):
+
+    """Test case for WikibasePage.save on Wikidata test site."""
+
+    family = 'wikidata'
+    code = 'test'
+
+    write = True
+
+    def test_itempage_save(self):
+        """Test ItemPage save method inherited from superclass Page."""
+        repo = self.get_repo()
+        item = pywikibot.ItemPage(repo, 'Q6')
+        self.assertRaises(pywikibot.PageNotSaved, item.save)
 
 
 if __name__ == '__main__':
