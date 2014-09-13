@@ -11,3 +11,4 @@ logs*
 *cache*
 .idea
 pywikibot.egg-info/
+pywikibot/families/
