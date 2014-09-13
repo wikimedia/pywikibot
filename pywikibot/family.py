@@ -917,7 +917,9 @@ class Family(object):
     # Methods
     def protocol(self, code):
         """
-        Can be overridden to return 'https'. Other protocols are not supported.
+        The protocol to use to connect to the site.
+
+        May be overridden to return 'https'. Other protocols are not supported.
 
         @param code: language code
         @type code: string
@@ -925,6 +927,17 @@ class Family(object):
         @rtype: string
         """
         return 'http'
+
+    def ignore_certificate_error(self, code):
+        """
+        Return whether a HTTPS certificate error should be ignored.
+
+        @param code: language code
+        @type code: string
+        @return: flag to allow access if certificate has an error.
+        @rtype: bool
+        """
+        return False
 
     def hostname(self, code):
         """The hostname to use for standard http connections."""

@@ -51,3 +51,11 @@ class Family(family.Family):
         # Most wikis nowadays use UTF-8, but change this if yours uses
         # a different encoding
         return 'utf-8'
+
+    def protocol(self, code):
+        """Return https as the protocol for this family."""
+        return "https"
+
+    def ignore_certificate_error(self, code):
+        """Ignore certificate errors."""
+        return True  # has self-signed certificate for a different domain.
