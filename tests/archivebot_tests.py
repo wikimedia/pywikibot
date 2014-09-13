@@ -39,30 +39,29 @@ class TestArchiveBot(TestCase):
         site = self.get_site(code)
         page = pywikibot.Page(site, 'user talk:xqt')
         talk = archivebot.DiscussionPage(page, None)
-        self.assertTrue(isinstance(talk.archives, dict))
-        self.assertTrue(isinstance(talk.archived_threads, int))
+        self.assertIsInstance(talk.archives, dict)
+        self.assertIsInstance(talk.archived_threads, int)
         self.assertTrue(talk.archiver is None)
-        self.assertTrue(isinstance(talk.header, basestring))
-        self.assertTrue(isinstance(talk.timestripper, TimeStripper))
+        self.assertIsInstance(talk.header, basestring)
+        self.assertIsInstance(talk.timestripper, TimeStripper)
 
-        self.assertTrue(isinstance(talk.threads, list))
+        self.assertIsInstance(talk.threads, list)
         self.assertGreaterEqual(
             len(talk.threads), THREADS[code],
             u'%d Threads found on %s,\n%d or more expected'
             % (len(talk.threads), talk, THREADS[code]))
 
         for thread in talk.threads:
-            self.assertTrue(isinstance(thread,
-                                       archivebot.DiscussionThread))
-            self.assertTrue(isinstance(thread.title, basestring))
-            self.assertTrue(isinstance(thread.now, datetime))
+            self.assertIsInstance(thread, archivebot.DiscussionThread)
+            self.assertIsInstance(thread.title, basestring)
+            self.assertIsInstance(thread.now, datetime)
             self.assertEqual(thread.now, talk.now)
-            self.assertTrue(isinstance(thread.ts, TimeStripper))
+            self.assertIsInstance(thread.ts, TimeStripper)
             self.assertEqual(thread.ts, talk.timestripper)
-            self.assertTrue(isinstance(thread.code, basestring))
+            self.assertIsInstance(thread.code, basestring)
             self.assertEqual(thread.code, talk.timestripper.site.code)
-            self.assertTrue(isinstance(thread.content, basestring))
-            self.assertTrue(isinstance(thread.timestamp, datetime))
+            self.assertIsInstance(thread.content, basestring)
+            self.assertIsInstance(thread.timestamp, datetime)
 
     expected_failures = ['ar', 'ckb', 'fa', 'pdc', 'th']
     # expected failures - should be fixed
