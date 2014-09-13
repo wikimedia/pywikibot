@@ -501,12 +501,12 @@ class TestPageMethods(WikidataTestCase):
         self.assertEqual(self.wdp.templates(), [])
         self.assertFalse(self.wdp.isCategoryRedirect())
 
-    def __test_item_templates(self):
+    def test_item_templates(self):
         """Test templatesWithParams."""
         self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
         self.wdp.templatesWithParams()
 
-    def __test_item_bot_may_edit(self):
+    def test_item_bot_may_edit(self):
         """Test botMayEdit."""
         site = self.get_site()
         page = pywikibot.Page(site, 'Q60')
