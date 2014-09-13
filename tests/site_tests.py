@@ -776,8 +776,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertLessEqual(len(se), 100)
             self.assertTrue(all(isinstance(hit, pywikibot.Page)
                                 for hit in se))
-            search_ns = [ns.id for ns in mysite.get_searched_namespaces(force=True)]
-            self.assertTrue(all(hit.namespace() in search_ns for hit in se))
+            self.assertTrue(all(hit.namespace() == 0 for hit in se))
             for hit in mysite.search("common", namespaces=4, total=5):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertEqual(hit.namespace(), 4)
