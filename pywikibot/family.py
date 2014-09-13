@@ -8,9 +8,15 @@
 __version__ = '$Id$'
 #
 
+import sys
 import logging
 import re
 import collections
+
+if sys.version_info[0] == 2:
+    from urlparse import urlparse
+else:
+    from urllib.parse import urlparse
 
 import pywikibot
 from pywikibot import config2 as config
@@ -1091,4 +1097,30 @@ class WikimediaFamily(Family):
         return ('commons', 'commons')
 
     def protocol(self, code):
+        """Return 'https' as the protocol."""
         return 'https'
+
+
+class AutoFamily(Family):
+
+    """Family that automatically loads the site configuration."""
+
+    def __init__(self, name, url, site=None):
+        """Constructor."""
+        super(AutoFamily, self).__init__()
+        self.name = name
+        self.url = urlparse(url)
+        self.langs = {
+            name: self.url.netloc
+        }
+
+    def protocol(self, code):
+        """Return the protocol of the URL."""
+        return self.url.scheme
+
+    def scriptpath(self, code):
+        """Extract the script path from the URL."""
+        if self.url.path.endswith('/api.php'):
+            return self.url.path[0:-8]
+        else:
+            return super(AutoFamily, self).scriptpath(code)

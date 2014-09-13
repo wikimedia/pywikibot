@@ -28,6 +28,7 @@ import copy
 
 import pywikibot
 from pywikibot import config
+from pywikibot.family import AutoFamily
 from pywikibot.tools import itergroup, deprecated, deprecate_arg
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
@@ -117,6 +118,14 @@ def Family(fam=None, fatal=True):
         fam = config.family
     if fam in _families:
         return _families[fam]
+
+    if fam in config.family_files:
+        family_file = config.family_files[fam]
+
+        if family_file.startswith('http://') or family_file.startswith('https://'):
+            myfamily = AutoFamily(fam, family_file)
+            _families[fam] = myfamily
+            return _families[fam]
 
     try:
         # Ignore warnings due to dots in family names.
