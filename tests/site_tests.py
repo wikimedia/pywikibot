@@ -944,45 +944,52 @@ class TestSiteObject(DefaultSiteTestCase):
                 pywikibot.warning(
                     "Cannot test Site.deleted_revs; no sysop account configured.")
                 return
-        dr = list(mysite.deletedrevs(total=10, page=mainpage))
-        self.assertLessEqual(len(dr), 10)
+        dr = list(mysite.deletedrevs(total=10, page=mainpage))[0]
+        self.assertLessEqual(len(dr['revisions']), 10)
         self.assertTrue(all(isinstance(rev, dict)
-                            for rev in dr))
-        dr2 = list(mysite.deletedrevs(page=mainpage, total=10))
-        self.assertLessEqual(len(dr2), 10)
+                            for rev in dr['revisions']))
+        dr2 = list(mysite.deletedrevs(page=mainpage, total=10))[0]
+        self.assertLessEqual(len(dr2['revisions']), 10)
         self.assertTrue(all(isinstance(rev, dict)
-                            for rev in dr2))
-        for rev in mysite.deletedrevs(start="2008-10-11T01:02:03Z",
-                                      page=mainpage, total=5):
-            self.assertIsInstance(rev, dict)
-            self.assertLessEqual(rev['timestamp'], "2008-10-11T01:02:03Z")
-        for rev in mysite.deletedrevs(end="2008-04-01T02:03:04Z",
-                                      page=mainpage, total=5):
-            self.assertIsInstance(rev, dict)
-            self.assertGreaterEqual(rev['timestamp'], "2008-10-11T02:03:04Z")
-        for rev in mysite.deletedrevs(start="2008-10-11T03:05:07Z",
-                                      page=mainpage, total=5,
-                                      reverse=True):
-            self.assertIsInstance(rev, dict)
-            self.assertGreaterEqual(rev['timestamp'], "2008-10-11T03:05:07Z")
-        for rev in mysite.deletedrevs(end="2008-10-11T04:06:08Z",
-                                      page=mainpage, total=5,
-                                      reverse=True):
-            self.assertIsInstance(rev, dict)
-            self.assertLessEqual(rev['timestamp'], "2008-10-11T04:06:08Z")
-        for rev in mysite.deletedrevs(start="2008-10-13T11:59:59Z",
-                                      end="2008-10-13T00:00:01Z",
-                                      page=mainpage, total=5):
-            self.assertIsInstance(rev, dict)
-            self.assertTrue(
-                "2008-10-13T00:00:01Z" <= rev['timestamp'] <= "2008-10-13T11:59:59Z")
-        for rev in mysite.deletedrevs(start="2008-10-15T06:00:01Z",
-                                      end="2008-10-15T23:59:59Z",
-                                      page=mainpage, reverse=True,
-                                      total=5):
-            self.assertIsInstance(rev, dict)
-            self.assertTrue(
-                "2008-10-15T06:00:01Z" <= rev['timestamp'] <= "2008-10-15T23:59:59Z")
+                            for rev in dr2['revisions']))
+        for item in mysite.deletedrevs(start="2008-10-11T01:02:03Z",
+                                       page=mainpage, total=5):
+            for rev in item['revisions']:
+                self.assertIsInstance(rev, dict)
+                self.assertLessEqual(rev['timestamp'], "2008-10-11T01:02:03Z")
+        for item in mysite.deletedrevs(end="2008-04-01T02:03:04Z",
+                                       page=mainpage, total=5):
+            for rev in item['revisions']:
+                self.assertIsInstance(rev, dict)
+                self.assertGreaterEqual(rev['timestamp'], "2008-10-11T02:03:04Z")
+        for item in mysite.deletedrevs(start="2008-10-11T03:05:07Z",
+                                       page=mainpage, total=5,
+                                       reverse=True):
+            for rev in item['revisions']:
+                self.assertIsInstance(rev, dict)
+                self.assertGreaterEqual(rev['timestamp'], "2008-10-11T03:05:07Z")
+        for item in mysite.deletedrevs(end="2008-10-11T04:06:08Z",
+                                       page=mainpage, total=5,
+                                       reverse=True):
+            for rev in item['revisions']:
+                self.assertIsInstance(rev, dict)
+                self.assertLessEqual(rev['timestamp'], "2008-10-11T04:06:08Z")
+        for item in mysite.deletedrevs(start="2008-10-13T11:59:59Z",
+                                       end="2008-10-13T00:00:01Z",
+                                       page=mainpage, total=5):
+            for rev in item['revisions']:
+                self.assertIsInstance(rev, dict)
+                self.assertLessEqual(rev['timestamp'], "2008-10-13T11:59:59Z")
+                self.assertGreaterEqual(rev['timestamp'], "2008-10-13T00:00:01Z")
+        for item in mysite.deletedrevs(start="2008-10-15T06:00:01Z",
+                                       end="2008-10-15T23:59:59Z",
+                                       page=mainpage, reverse=True,
+                                       total=5):
+            for rev in item['revisions']:
+                self.assertIsInstance(rev, dict)
+                self.assertLessEqual(rev['timestamp'], "2008-10-15T23:59:59Z")
+                self.assertGreaterEqual(rev['timestamp'], "2008-10-15T06:00:01Z")
+
         # start earlier than end
         self.assertRaises(pywikibot.Error, mysite.deletedrevs,
                           page=mainpage, start="2008-09-03T00:00:01Z",
