@@ -1585,8 +1585,7 @@ class APISite(BaseSite):
             # is supported by the site
             req = api.Request(site=self,
                               action='echomarkread',
-                              token=self.token(pywikibot.Page(self, u'Main Page'),
-                                               'edit'),  # Use a dummy page
+                              token=self.tokens['edit'],
                               **kwargs)
             data = req.submit()
             try:
@@ -3798,7 +3797,7 @@ class APISite(BaseSite):
             raise pywikibot.Error(
                 u"Rollback of %s aborted; only one user in revision history."
                 % page.title(asLink=True))
-        token = self.token(page, "rollback")
+        token = self.tokens["rollback"]
         self.lock_page(page)
         req = api.Request(site=self, action="rollback",
                           title=page.title(withSection=False),
@@ -4064,8 +4063,7 @@ class APISite(BaseSite):
             #    filekey, file, url, statuskey is required
             # TODO: is there another way?
             try:
-                dummy = pywikibot.FilePage(self, title='dummy')
-                token = self.token(dummy, 'edit')
+                token = self.tokens['edit']
                 req = api.Request(site=self, action="upload",
                                   token=token, throttle=False)
                 req.submit()

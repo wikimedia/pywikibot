@@ -237,8 +237,12 @@ class TestSiteObject(DefaultSiteTestCase):
 
     def testInvalidToken(self):
         mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        self.assertRaises(KeyError, mysite.token, mainpage, "invalidtype")
+        if LV(mysite.version()) >= LV('1.23wmf19'):
+            # Currently with the new token API all unknown types are treated
+            # as csrf tokens, so it won't throw an error here
+            # a patch is in development: https://gerrit.wikimedia.org/r/#/c/159394
+            raise unittest.SkipTest('No invalid token with the new token API possible')
+        self.assertRaises(KeyError, lambda t: mysite.tokens[t], "invalidtype")
 
     def testPreload(self):
         """Test that preloading works."""
