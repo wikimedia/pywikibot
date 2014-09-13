@@ -75,6 +75,17 @@ class UploadWarning(APIError):
         return self.info
 
 
+class APIMWException(APIError):
+
+    """The API site returned an error about a MediaWiki internal exception."""
+
+    def __init__(self, mediawiki_exception_class_name, info, **kwargs):
+        """Save error dict returned by MW API."""
+        self.mediawiki_exception_class_name = mediawiki_exception_class_name
+        code = 'internal_api_error_' + mediawiki_exception_class_name
+        super(APIMWException, self).__init__(code, info, **kwargs)
+
+
 class TimeoutError(Error):
     pass
 
@@ -514,6 +525,7 @@ class Request(MutableMapping):
             self._handle_warnings(result)
             if "error" not in result:
                 return result
+
             if "*" in result["error"]:
                 # help text returned
                 result['error']['help'] = result['error'].pop("*")
@@ -526,9 +538,26 @@ class Request(MutableMapping):
                         u"Pausing due to database lag: " + info)
                     self.site.throttle.lag(int(lag.group("lag")))
                     continue
+
             if code.startswith(u'internal_api_error_'):
-                self.wait()
-                continue
+                class_name = code[len(u'internal_api_error_'):]
+                if class_name in ['DBConnectionError',  # r 4984 & r 4580
+                                  'DBQueryError',  # bug 58158
+                                  'ReadOnlyError'  # bug 59227
+                                  ]:
+
+                    pywikibot.log(u'MediaWiki exception %s; retrying.'
+                                  % class_name)
+                    self.wait()
+                    continue
+
+                pywikibot.log(u"MediaWiki exception %s: query=\n%s"
+                              % (class_name,
+                                 pprint.pformat(self.params)))
+                pywikibot.log(u"           response=\n%s" % result)
+
+                raise APIMWException(class_name, info, **result["error"])
+
             # bugs 46535, 62126, 64494, 66619
             # maybe removed when it 46535 is solved
             if code == "failed-save" and \
@@ -542,6 +571,7 @@ class Request(MutableMapping):
                               % pprint.pformat(self.params))
                 pywikibot.log(u"           response=\n%s"
                               % result)
+
                 raise APIError(code, info, **result["error"])
             except TypeError:
                 raise RuntimeError(result)
