@@ -431,13 +431,15 @@ class Request(MutableMapping):
                     eoh = body.find(marker)
                     body = body[eoh + len(marker):]
                     # retrieve the headers from the MIME object
-                    mimehead = dict(list(container.items()))
-                    rawdata = http.request(self.site, uri, method="POST",
-                                           headers=mimehead, body=body)
+                    headers = dict(list(container.items()))
                 else:
-                    rawdata = http.request(self.site, uri, method="POST",
-                                           headers={'Content-Type': 'application/x-www-form-urlencoded'},
-                                           body=paramstring)
+                    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+                    body = paramstring
+
+                rawdata = http.request(
+                    self.site, uri, method="POST",
+                    headers=headers, body=body)
+
 #                import traceback
 #                traceback.print_stack()
 #                print rawdata
