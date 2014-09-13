@@ -40,3 +40,11 @@ class Family(family.Family):
     def apipath(self, code):
         """Return the path to api.php for this family."""
         return '/api.php'
+
+    def protocol(self, code):
+        """Return https as the protocol for this family."""
+        return "https"
+
+    def ignore_certificate_error(self, code):
+        """Ignore certificate errors."""
+        return True  # has an expired certificate.

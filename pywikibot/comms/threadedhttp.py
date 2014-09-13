@@ -350,6 +350,11 @@ class HttpProcessor(threading.Thread):
             if item is None:
                 pywikibot.debug(u"Shutting down thread.", _logger)
                 return
+
+            # This needs to be set per request, however it is only used
+            # the first time the pooled connection is created.
+            self.http.disable_ssl_certificate_validation = \
+                item.kwargs.pop('disable_ssl_certificate_validation', False)
             try:
                 item.data = self.http.request(*item.args, **item.kwargs)
             finally:
@@ -459,7 +464,7 @@ class DummyMessage(object):
         self.response.get(k.lower(), None)
         if k not in self.response:
             return []
-        #return self.response[k].split(re.compile(',\\s*'))
+        # return self.response[k].split(re.compile(',\\s*'))
 
         # httplib2 joins multiple values for the same header
         #  using ','.  but the netscape cookie format uses ','

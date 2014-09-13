@@ -234,6 +234,9 @@ def request(site=None, uri=None, *args, **kwargs):
         else:
             host = site.hostname()
         baseuri = urlparse.urljoin("%s://%s" % (proto, host), uri)
+
+        kwargs.setdefault("disable_ssl_certificate_validation",
+                          site.ignore_certificate_error())
     else:
         baseuri = uri
 

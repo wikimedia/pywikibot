@@ -30,3 +30,11 @@ class Family(family.Family):
     def nicepath(self, code):
         """Return the nice article path for this family."""
         return "%s/" % self.path(self, code)
+
+    def protocol(self, code):
+        """Return https as the protocol for this family."""
+        return "https"
+
+    def ignore_certificate_error(self, code):
+        """Ignore certificate errors."""
+        return True  # has a different domain in its certificate.
