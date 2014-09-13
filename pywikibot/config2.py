@@ -24,6 +24,7 @@ __version__ = '$Id$'
 
 import os
 import sys
+import collections
 # Please keep _imported_modules in sync with the imports above
 _imported_modules = ('os', 'sys')
 
@@ -71,9 +72,9 @@ mylang = 'language'
 # If you have a unique syop account for all languages of a family,
 # you can use '*'
 # sysopnames['myownwiki']['*'] = 'mySingleUsername'
-usernames = {}
-sysopnames = {}
-disambiguation_comment = {}
+usernames = collections.defaultdict(dict)
+sysopnames = collections.defaultdict(dict)
+disambiguation_comment = collections.defaultdict(dict)
 
 # User agent format.
 # For the meaning and more help in customization see:
@@ -220,6 +221,7 @@ def register_families_folder(folder_path):
         if file_name.endswith("_family.py"):
             family_name = file_name[:-len("_family.py")]
             register_family_file(family_name, os.path.join(folder_path, file_name))
+
 
 # Get the names of all known families, and initialize with empty dictionaries.
 # ‘families/’ is a subdirectory of the directory in which config2.py is found.
@@ -722,8 +724,11 @@ for _key in _gl:
 _uc = {}
 for _key, _val in _glv.items():
     if isinstance(_val, dict):
-        _uc[_key] = {}
-        if len(_val.keys()) > 0:
+        if isinstance(_val, collections.defaultdict):
+            _uc[_key] = collections.defaultdict(dict)
+        else:
+            _uc[_key] = {}
+        if len(_val) > 0:
             _uc[_key].update(_val)
     else:
         _uc[_key] = _val
