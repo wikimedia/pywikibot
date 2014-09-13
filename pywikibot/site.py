@@ -3250,7 +3250,8 @@ class APISite(BaseSite):
         @param namespaces: search only in these namespaces (defaults to 0)
         @type namespaces: list of ints, or an empty list to signal all
             namespaces
-        @param getredirects: if True, include redirects in results
+        @param getredirects: if True, include redirects in results. Since
+            version MediaWiki 1.23 it will always return redirects.
         @param content: if True, load the current content of each iterated page
             (default False)
 
@@ -3268,7 +3269,7 @@ class APISite(BaseSite):
                                 gsrsearch=searchstring, gsrwhat=where,
                                 namespaces=namespaces, step=step,
                                 total=total, g_content=content)
-        if getredirects:
+        if getredirects and LV(self.version()) < LV('1.23'):
             srgen.request["gsrredirects"] = ""
         return srgen
 
