@@ -84,8 +84,12 @@ class TestGeneral(WikidataTestCase):
                           'upperBound': 0.044405586, 'unit': '1', })
         # test other WbQuantity methods
         self.assertEqual("%s" % q,
-                         "{'amount': %(val)r, 'lowerBound': %(val)r, "
-                         "'unit': '1', 'upperBound': %(val)r}" % {'val': 0.044405586})
+                         '{\n'
+                         '    "amount": %(val)r, \n'
+                         '    "lowerBound": %(val)r, \n'
+                         '    "unit": "1", \n'
+                         '    "upperBound": %(val)r\n'
+                         '}' % {'val': 0.044405586})
         self.assertEqual("%r" % q,
                          "WbQuantity(amount=%(val)s, "
                          "upperBound=%(val)s, lowerBound=%(val)s, "

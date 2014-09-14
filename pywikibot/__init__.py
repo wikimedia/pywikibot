@@ -16,6 +16,7 @@ import math
 import re
 import sys
 import threading
+import json
 
 if sys.version_info[0] == 2:
     from Queue import Queue
@@ -377,7 +378,7 @@ class WbTime(object):
                                   ts[u'calendarmodel'])
 
     def __str__(self):
-        return str(self.toWikibase())
+        return json.dumps(self.toWikibase(), indent=4, sort_keys=True)
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
@@ -445,7 +446,7 @@ class WbQuantity(object):
         return WbQuantity(amount, wb['unit'], error)
 
     def __str__(self):
-        return str(self.toWikibase())
+        return json.dumps(self.toWikibase(), indent=4, sort_keys=True)
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
