@@ -26,6 +26,34 @@ if sys.version_info[0] > 2:
     unicode = str
 
 
+class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase):
+
+    """Test cases for Site deprecated methods."""
+
+    cached = True
+
+    def test_live_version(self):
+        """Test live_version."""
+        mysite = self.get_site()
+        ver = mysite.live_version()
+        self.assertIsInstance(ver, tuple)
+        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
+        self.assertIsInstance(ver[2], basestring)
+
+    def test_token(self):
+        """Test ability to get page tokens."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        ttype = "edit"
+        try:
+            token = mysite.tokens[ttype]
+        except KeyError:
+            raise unittest.SkipTest(
+                "Testing '%s' token not possible with user on %s"
+                % (ttype, self.site))
+        self.assertEqual(token, mysite.token(mainpage, ttype))
+
+
 class TestSiteObject(DefaultSiteTestCase):
 
     """Test cases for Site methods."""
@@ -1103,10 +1131,6 @@ class TestSiteInfo(WikimediaDefaultSiteTestCase):
         self.assertGreater(mysite.siteinfo['maxuploadsize'], 0)
         self.assertIn(mysite.case(), ["first-letter", "case-sensitive"])
         self.assertEqual(re.findall("\$1", mysite.siteinfo['articlepath']), ["$1"])
-        ver = mysite.live_version()
-        self.assertIsInstance(ver, tuple)
-        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
-        self.assertIsInstance(ver[2], basestring)
 
         def entered_loop(iterable):
             for iterable_item in iterable:
