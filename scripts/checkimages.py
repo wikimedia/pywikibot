@@ -95,9 +95,14 @@ import re
 import time
 import datetime
 import locale
+import sys
+
 import pywikibot
 from pywikibot import pagegenerators as pg
 from pywikibot import config, i18n
+
+if sys.version_info[0] > 2:
+    basestring = (str, )
 
 locale.setlocale(locale.LC_ALL, '')
 

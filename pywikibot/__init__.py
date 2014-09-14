@@ -378,7 +378,8 @@ class WbTime(object):
                                   ts[u'calendarmodel'])
 
     def __str__(self):
-        return json.dumps(self.toWikibase(), indent=4, sort_keys=True)
+        return json.dumps(self.toWikibase(), indent=4, sort_keys=True,
+                          separators=(',', ': '))
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
@@ -446,7 +447,8 @@ class WbQuantity(object):
         return WbQuantity(amount, wb['unit'], error)
 
     def __str__(self):
-        return json.dumps(self.toWikibase(), indent=4, sort_keys=True)
+        return json.dumps(self.toWikibase(), indent=4, sort_keys=True,
+                          separators=(',', ': '))
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__

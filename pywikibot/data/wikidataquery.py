@@ -464,7 +464,7 @@ class WikidataQuery():
         """
         Encode a query into a unique and universally safe format.
         """
-        encQuery = hashlib.sha1(queryStr).hexdigest() + ".wdq_cache"
+        encQuery = hashlib.sha1(queryStr.encode('utf8')).hexdigest() + ".wdq_cache"
         return os.path.join(self.cacheDir, encQuery)
 
     def readFromCache(self, queryStr):

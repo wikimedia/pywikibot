@@ -13,6 +13,7 @@ import posixpath
 import hashlib
 import base64
 import sys
+import io
 
 import pywikibot
 # TODO: nosetests3 fails on 'import <other_script>', which is used by many
@@ -23,11 +24,9 @@ from scripts import upload
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
     from urllib.request import urlopen
-    import io as StringIO
 else:
     from urlparse import urlparse
     from urllib import urlopen
-    import StringIO
 
 
 class Photo(object):
@@ -55,13 +54,13 @@ class Photo(object):
 
     def downloadPhoto(self):
         """
-        Download the photo and store it in a StringIO.StringIO object.
+        Download the photo and store it in a io.BytesIO object.
 
         TODO: Add exception handling
         """
         if not self.contents:
             imageFile = urlopen(self.URL).read()
-            self.contents = StringIO.StringIO(imageFile)
+            self.contents = io.BytesIO(imageFile)
         return self.contents
 
     def findDuplicateImages(self,
@@ -189,12 +188,12 @@ class DataIngestionBot:
 
     def downloadPhoto(self, photoUrl=''):
         """
-        Download the photo and store it in a StrinIO.StringIO object.
+        Download the photo and store it in a io.BytesIO object.
 
         TODO: Add exception handling
         """
         imageFile = urlopen(photoUrl).read()
-        return StringIO.StringIO(imageFile)
+        return io.BytesIO(imageFile)
 
     def findDuplicateImages(self, photo=None, site=pywikibot.Site(u'commons', u'commons')):
         """

@@ -8,6 +8,7 @@ with mixed latin and cyrilic alphabets.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import print_function
 __version__ = '$Id$'
 
 import os
@@ -17,6 +18,9 @@ import codecs
 import pywikibot
 from pywikibot import i18n
 from pywikibot.data import api
+
+if sys.version_info[0] > 2:
+    xrange = range
 
 
 #
@@ -69,11 +73,11 @@ def SetColor(color):
             pass
 
     if color == FOREGROUND_BLUE:
-        print('(b:'),
+        print('(b:', end=' ')
     if color == FOREGROUND_GREEN:
-        print('(g:'),
+        print('(g:', end=' ')
     if color == FOREGROUND_RED:
-        print('(r:'),
+        print('(r:', end=' ')
 
 # end of console code
 

@@ -132,7 +132,7 @@ class LoggingFormatter(logging.Formatter):
         """
         strExc = logging.Formatter.formatException(self, ei)
 
-        if isinstance(strExc, str):
+        if sys.version_info[0] < 3 and isinstance(strExc, str):
             return strExc.decode(config.console_encoding) + '\n'
         else:
             return strExc + '\n'
@@ -757,7 +757,9 @@ Global arguments available for all bots:
 ''' % module_name
     try:
         module = __import__('%s' % module_name)
-        helpText = module.__doc__.decode('utf-8')
+        helpText = module.__doc__
+        if sys.version_info[0] < 3:
+            helpText = helpText.decode('utf-8')
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
                 helpText = helpText.replace(key, value.strip('\n\r'))

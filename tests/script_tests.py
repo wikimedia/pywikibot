@@ -127,7 +127,6 @@ no_args_expected_results = {
     'login': 'Logged in on ',
     'pagefromfile': 'Please enter the file name',
     'replace': 'Press Enter to use this default message',
-    'replicate_wiki': 'error: too few arguments',
     'script_wui': 'Pre-loading all relevant page contents',
     'shell': 'Welcome to the',
     'spamremove': 'No spam site specified',
@@ -141,6 +140,11 @@ no_args_expected_results = {
     'revertbot': 'Fetching new batch of contributions',
     'upload': 'ERROR: Upload error',
 }
+
+if sys.version_info[0] > 2:
+    no_args_expected_results['replicate_wiki'] = 'error: the following arguments are required: destination'
+else:
+    no_args_expected_results['replicate_wiki'] = 'error: too few arguments'
 
 
 def collector(loader=unittest.loader.defaultTestLoader):
@@ -184,6 +188,11 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
 
 def execute(command, data_in=None, timeout=0):
     """Execute a command and capture outputs."""
+    def decode(stream):
+        if sys.version_info[0] > 2:
+            return stream.decode(config.console_encoding)
+        else:
+            return stream
     options = {
         'stdout': subprocess.PIPE,
         'stderr': subprocess.PIPE
@@ -193,7 +202,10 @@ def execute(command, data_in=None, timeout=0):
 
     p = subprocess.Popen(command, **options)
     if data_in is not None:
+        if sys.version_info[0] > 2:
+            data_in = data_in.encode(config.console_encoding)
         p.stdin.write(data_in)
+        p.stdin.flush()  # _communicate() otherwise has a broken pipe
     waited = 0
     while waited < timeout and p.poll() is None:
         time.sleep(1)
@@ -202,8 +214,8 @@ def execute(command, data_in=None, timeout=0):
         p.kill()
     data_out = p.communicate()
     return {'exit_code': p.returncode,
-            'stdout': data_out[0],
-            'stderr': data_out[1]}
+            'stdout': decode(data_out[0]),
+            'stderr': decode(data_out[1])}
 
 
 class TestScriptMeta(MetaTestCaseClass):

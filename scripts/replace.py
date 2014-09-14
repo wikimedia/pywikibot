@@ -125,13 +125,18 @@ __version__ = '$Id$'
 
 import re
 import time
+import webbrowser
+import sys
+
 import pywikibot
 from pywikibot import i18n, textlib, pagegenerators, Bot
 from pywikibot import editor as editarticle
-import webbrowser
 
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
+
+if sys.version_info[0] > 2:
+    basestring = (str, )
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

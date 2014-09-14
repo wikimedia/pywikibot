@@ -1304,7 +1304,8 @@ class TestNonEnglishWikipediaSite(TestCase):
         self.assertEqual(image_namespace.custom_name, 'Fil')
         self.assertEqual(image_namespace.canonical_name, 'File')
         self.assertEqual(str(image_namespace), ':File:')
-        self.assertEqual(unicode(image_namespace), ':Fil:')
+        self.assertEqual(image_namespace.custom_prefix(), ':Fil:')
+        self.assertEqual(image_namespace.canonical_prefix(), ':File:')
         self.assertEqual(image_namespace.aliases, ['Image'])
         self.assertEqual(len(image_namespace), 3)
 

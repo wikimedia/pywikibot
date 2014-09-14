@@ -8,11 +8,15 @@
 __version__ = '$Id$'
 
 from datetime import datetime
+import sys
 import pywikibot
 import pywikibot.page
 from pywikibot.textlib import TimeStripper
 from scripts import archivebot
 from tests.aspects import unittest, TestCase
+
+if sys.version_info[0] > 2:
+    basestring = (str,)
 
 THREADS = {
     'als': 4, 'ar': 1, 'bar': 0, 'bg': 0, 'bjn': 1, 'bs': 0, 'ca': 5, 'ckb': 2,

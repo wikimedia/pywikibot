@@ -25,8 +25,8 @@ class TestPhoto(TestCase):
                                         )
 
     def test_downloadPhoto(self):
-        f = open(os.path.join(os.path.split(__file__)[0], 'data', 'MP_sounds.png'))
-        self.assertEqual(f.read(), self.obj.downloadPhoto().read())
+        with open(os.path.join(os.path.split(__file__)[0], 'data', 'MP_sounds.png'), 'rb') as f:
+            self.assertEqual(f.read(), self.obj.downloadPhoto().read())
 
     def test_findDuplicateImages(self):
         duplicates = self.obj.findDuplicateImages()

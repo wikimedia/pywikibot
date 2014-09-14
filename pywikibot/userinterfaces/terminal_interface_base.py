@@ -102,7 +102,9 @@ class UI:
             line, count = colorTagR.subn('', line)
             if count > 0:
                 line += ' ***'
-            targetStream.write(line.encode(self.encoding, 'replace'))
+            if sys.version_info[0] < 3:
+                line = line.encode(self.encoding, 'replace')
+            targetStream.write(line)
 
     printColorized = printNonColorized
 
@@ -198,7 +200,8 @@ class UI:
                 text = self._raw_input()
         except KeyboardInterrupt:
             raise pywikibot.QuitKeyboardInterrupt()
-        text = unicode(text, self.encoding)
+        if sys.version_info[0] < 3:
+            text = text.decode(self.encoding)
         return text
 
     def inputChoice(self, question, options, hotkeys, default=None):
