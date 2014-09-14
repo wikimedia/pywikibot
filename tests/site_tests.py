@@ -947,7 +947,12 @@ class TestSiteObject(DefaultSiteTestCase):
                 pywikibot.warning(
                     "Cannot test Site.deleted_revs; no sysop account configured.")
                 return
-        dr = list(mysite.deletedrevs(total=10, page=mainpage))[0]
+        gen = mysite.deletedrevs(total=10, page=mainpage)
+        for dr in gen:
+            break
+        else:
+            raise unittest.SkipTest(
+                '{0} contains no deleted revisions.'.format(mainpage))
         self.assertLessEqual(len(dr['revisions']), 10)
         self.assertTrue(all(isinstance(rev, dict)
                             for rev in dr['revisions']))
