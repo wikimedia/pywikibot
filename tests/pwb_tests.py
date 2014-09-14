@@ -23,6 +23,7 @@ def check_output(command):
     return subprocess.Popen(command, stdout=subprocess.PIPE).communicate()[0]
 
 
+@unittest.skipIf(sys.version_info[0] > 2, "The mapping is different in Python 3")
 class TestPwb(TestCase):
 
     """
