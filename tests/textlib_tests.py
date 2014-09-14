@@ -23,8 +23,9 @@ files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")
 
 for f in ["enwiki_help_editing"]:
-    files[f] = codecs.open(os.path.join(dirname, f + ".page"),
-                           'r', 'utf-8').read()
+    with codecs.open(os.path.join(dirname, f + ".page"),
+                     'r', 'utf-8') as content:
+        files[f] = content.read()
 
 
 class TestSectionFunctions(TestCase):

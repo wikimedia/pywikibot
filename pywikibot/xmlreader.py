@@ -122,19 +122,22 @@ class XmlDump(object):
                                       bufsize=65535).stdout
         else:
             # assume it's an uncompressed XML file
-            source = open(self.filename)
-        context = iterparse(source, events=("start", "end", "start-ns"))
-        self.root = None
+            source = open(self.filename, 'rb')
+        try:
+            context = iterparse(source, events=("start", "end", "start-ns"))
+            self.root = None
 
-        for event, elem in context:
-            if event == "start-ns" and elem[0] == "":
-                self.uri = elem[1]
-                continue
-            if event == "start" and self.root is None:
-                self.root = elem
-                continue
-            for rev in self._parse(event, elem):
-                yield rev
+            for event, elem in context:
+                if event == "start-ns" and elem[0] == "":
+                    self.uri = elem[1]
+                    continue
+                if event == "start" and self.root is None:
+                    self.root = elem
+                    continue
+                for rev in self._parse(event, elem):
+                    yield rev
+        finally:
+            source.close()
 
     def _parse_only_latest(self, event, elem):
         """Parser that yields only the latest revision."""

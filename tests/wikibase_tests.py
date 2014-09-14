@@ -545,7 +545,8 @@ class TestLinks(WikidataTestCase):
         super(TestLinks, self).setUp()
         self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
         self.wdp.id = 'Q60'
-        self.wdp._content = json.load(open(os.path.join(os.path.split(__file__)[0], 'pages', 'Q60_only_sitelinks.wd')))
+        with open(os.path.join(os.path.split(__file__)[0], 'pages', 'Q60_only_sitelinks.wd')) as f:
+            self.wdp._content = json.load(f)
         self.wdp.get()
 
     def test_iterlinks_page_object(self):
@@ -852,8 +853,8 @@ class TestJSON(WikidataTestCase):
         wikidata = self.get_repo()
         self.wdp = pywikibot.ItemPage(wikidata, 'Q60')
         self.wdp.id = 'Q60'
-        self.wdp._content = json.load(
-            open(os.path.join(os.path.split(__file__)[0], 'pages', 'Q60.wd')))
+        with open(os.path.join(os.path.split(__file__)[0], 'pages', 'Q60.wd')) as f:
+            self.wdp._content = json.load(f)
         self.wdp.get()
         del self.wdp._content['id']
         del self.wdp._content['type']
@@ -863,7 +864,7 @@ class TestJSON(WikidataTestCase):
         old = json.dumps(self.wdp._content, indent=2, sort_keys=True)
         new = json.dumps(self.wdp.toJSON(), indent=2, sort_keys=True)
 
-        self.assertEquals(old, new)
+        self.assertEqual(old, new)
 
     def test_json_diff(self):
         del self.wdp.labels['en']

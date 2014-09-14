@@ -51,6 +51,27 @@ class XmlReaderTestCase(TestCase):
                                                 "article-pyrus.xml")).parse()]
         self.assertTrue(pages[0].isredirect)
 
+    def _compare(self, previous, variant, all_revisions):
+        result = [entry.__dict__ for entry in xmlreader.XmlDump(
+            os.path.join(self.path, 'data', 'article-pyrus' + variant),
+            all_revisions).parse()]
+        if previous:
+            self.assertEqual(previous, result)
+        return result
+
+    def _compare_variants(self, all_revisions):
+        previous = None
+        previous = self._compare(previous, '.xml', all_revisions)
+        previous = self._compare(previous, '-utf16.xml', all_revisions)
+        previous = self._compare(previous, '.xml.bz2', all_revisions)
+        previous = self._compare(previous, '-utf16.xml.bz2', all_revisions)
+
+    def test_XmlDump_compare_all(self):
+        self._compare_variants(True)
+
+    def test_XmlDump_compare_single(self):
+        self._compare_variants(False)
+
 
 if __name__ == '__main__':
     try:
