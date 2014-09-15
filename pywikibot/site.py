@@ -350,10 +350,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
     def __ne__(self, other):
         """Compare whether two namespace objects are not equal."""
-        if self.id == other.id:
-            return False
-        else:
-            return True
+        return not self.__eq__(other)
 
     def _cmpkey(self):
         """Return the ID as a comparison key."""
