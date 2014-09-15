@@ -11,7 +11,7 @@ import sys
 import pywikibot
 import pywikibot.page
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -156,7 +156,7 @@ class TestLinkObject(TestCase):
         self.assertRaises(pywikibot.Error, l3.ns_title, onsite=self.itws)
 
 
-class TestPageObject(TestCase):
+class TestPageObjectEnglish(TestCase):
 
     family = 'wikipedia'
     code = 'en'
@@ -171,59 +171,54 @@ class TestPageObject(TestCase):
         family_name = (site.family.name + ':'
                        if pywikibot.config2.family != site.family.name
                        else u'')
-        self.assertEqual(str(mainpage), "[[%s%s:%s]]"
+        self.assertEqual(str(mainpage), u"[[%s%s:%s]]"
                                         % (family_name, site.code,
                                            mainpage.title()))
         self.assertLess(mainpage, maintalk)
 
-    def testSite(self):
-        """Test site() method"""
-        mainpage = self.get_mainpage()
-        self.assertEqual(mainpage.site, self.site)
-
-    def testNamespace(self):
-        """Test namespace() method"""
-        mainpage = self.get_mainpage()
-        maintalk = mainpage.toggleTalkPage()
-        badpage = self.get_missing_article()
-
-        self.assertEqual(mainpage.namespace(), 0)
-        self.assertEqual(maintalk.namespace(), 1)
-        self.assertEqual(badpage.namespace(), 0)
-
-    def testTitle(self):
-        """Test title() method options."""
+    def testHelpTitle(self):
+        """Test title() method options in Help namespace."""
         site = self.get_site()
         p1 = pywikibot.Page(site, u"Help:Test page#Testing")
+        ns_name = u"Help"
+        if site.namespaces()[12][0] != ns_name:
+            ns_name = site.namespaces()[12][0]
         self.assertEqual(p1.title(),
-                         u"Help:Test page#Testing")
+                         ns_name + u":Test page#Testing")
         self.assertEqual(p1.title(underscore=True),
-                         u"Help:Test_page#Testing")
+                         ns_name + u":Test_page#Testing")
         self.assertEqual(p1.title(withNamespace=False),
                          u"Test page#Testing")
         self.assertEqual(p1.title(withSection=False),
-                         u"Help:Test page")
+                         ns_name + u":Test page")
         self.assertEqual(p1.title(withNamespace=False, withSection=False),
                          u"Test page")
         self.assertEqual(p1.title(asUrl=True),
-                         "Help%3ATest_page%23Testing")
+                         ns_name + "%3ATest_page%23Testing")
         self.assertEqual(p1.title(asLink=True, insite=site),
-                         u"[[Help:Test page#Testing]]")
+                         u"[[" + ns_name + u":Test page#Testing]]")
         self.assertEqual(p1.title(asLink=True, forceInterwiki=True, insite=site),
-                         u"[[en:Help:Test page#Testing]]")
+                         u"[[en:" + ns_name + u":Test page#Testing]]")
         self.assertEqual(p1.title(asLink=True, textlink=True, insite=site),
                          p1.title(asLink=True, textlink=False, insite=site))
         self.assertEqual(p1.title(asLink=True, withNamespace=False, insite=site),
-                         u"[[Help:Test page#Testing|Test page]]")
+                         u"[[" + ns_name + u":Test page#Testing|Test page]]")
         self.assertEqual(p1.title(asLink=True, forceInterwiki=True,
                                   withNamespace=False, insite=site),
-                         u"[[en:Help:Test page#Testing|Test page]]")
+                         u"[[en:" + ns_name + ":Test page#Testing|Test page]]")
         self.assertEqual(p1.title(asLink=True, textlink=True,
                                   withNamespace=False, insite=site),
                          p1.title(asLink=True, textlink=False,
                                   withNamespace=False, insite=site))
+
+    def testFileTitle(self):
+        """Test title() method options in File namespace."""
         # also test a page with non-ASCII chars and a different namespace
+        site = self.get_site()
         p2 = pywikibot.Page(site, u"File:Jean-Léon Gérôme 003.jpg")
+        ns_name = u"File"
+        if site.namespaces()[6][0] != ns_name:
+            ns_name = site.namespaces()[6][0]
         self.assertEqual(p2.title(),
                          u"File:Jean-Léon Gérôme 003.jpg")
         self.assertEqual(p2.title(underscore=True),
@@ -252,7 +247,31 @@ class TestPageObject(TestCase):
         self.assertEqual(p2.title(asLink=True, textlink=True,
                                   withNamespace=False, insite=site),
                          u"[[:File:Jean-Léon Gérôme 003.jpg|Jean-Léon Gérôme 003.jpg]]")
+
+
+class TestPageObject(DefaultSiteTestCase):
+
+    cached = True
+
+    def testSite(self):
+        """Test site() method"""
+        mainpage = self.get_mainpage()
+        self.assertEqual(mainpage.site, self.site)
+
+    def testNamespace(self):
+        """Test namespace() method"""
+        mainpage = self.get_mainpage()
+        maintalk = mainpage.toggleTalkPage()
+        badpage = self.get_missing_article()
+
+        self.assertEqual(mainpage.namespace(), 0)
+        self.assertEqual(maintalk.namespace(), 1)
+        self.assertEqual(badpage.namespace(), 0)
+
+    def testTitle(self):
+        """Test title() method options in article namespace."""
         # at last test article namespace
+        site = self.get_site()
         p2 = pywikibot.Page(site, u"Test page")
         self.assertEqual(p2.title(),
                          u"Test page")
@@ -288,7 +307,7 @@ class TestPageObject(TestCase):
                          p2.title(withNamespace=False, as_filename=True))
         self.assertEqual(p2.title(withNamespace=False, asLink=True,
                                   forceInterwiki=True, insite=site),
-                         u"[[en:Test page|Test page]]")
+                         u"[[" + site.code + u":Test page|Test page]]")
 
     def testSection(self):
         """Test section() method."""
@@ -329,24 +348,6 @@ class TestPageObject(TestCase):
         self.assertEqual(p1.isImage(), False)
         self.assertEqual(p2.isImage(), True)
         self.assertEqual(p3.isImage(), False)
-
-    def testIsRedirect(self):
-        site = self.get_site()
-        p1 = pywikibot.Page(site, u'User:Legoktm/R1')
-        p2 = pywikibot.Page(site, u'User:Legoktm/R2')
-        self.assertTrue(p1.isRedirectPage())
-        self.assertEqual(p1.getRedirectTarget(), p2)
-
-    def testPageGet(self):
-        site = self.get_site()
-        p1 = pywikibot.Page(site, u'User:Legoktm/R2')
-        p2 = pywikibot.Page(site, u'User:Legoktm/R1')
-        p3 = pywikibot.Page(site, u'User:Legoktm/R3')
-
-        text = u'This page is used in the [[mw:Manual:Pywikipediabot]] testing suite.'
-        self.assertEqual(p1.get(), text)
-        self.assertRaises(pywikibot.exceptions.IsRedirectPage, p2.get)
-        self.assertRaises(pywikibot.exceptions.NoPage, p3.get)
 
     def testApiMethods(self):
         """Test various methods that rely on API."""
@@ -468,6 +469,32 @@ class TestPageObject(TestCase):
 #                               getAll=False, revCount=500):
 #    def fullVersionHistory(self):
 #    def contributingUsers(self):
+
+
+class TestPageRedirects(TestCase):
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
+
+    def testIsRedirect(self):
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Legoktm/R1')
+        p2 = pywikibot.Page(site, u'User:Legoktm/R2')
+        self.assertTrue(p1.isRedirectPage())
+        self.assertEqual(p1.getRedirectTarget(), p2)
+
+    def testPageGet(self):
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Legoktm/R2')
+        p2 = pywikibot.Page(site, u'User:Legoktm/R1')
+        p3 = pywikibot.Page(site, u'User:Legoktm/R3')
+
+        text = u'This page is used in the [[mw:Manual:Pywikipediabot]] testing suite.'
+        self.assertEqual(p1.get(), text)
+        self.assertRaises(pywikibot.exceptions.IsRedirectPage, p2.get)
+        self.assertRaises(pywikibot.exceptions.NoPage, p3.get)
 
 
 class TestCategoryObject(TestCase):
