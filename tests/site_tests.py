@@ -250,28 +250,6 @@ class TestSiteObject(DefaultSiteTestCase):
         if a:
             self.assertEqual(a[0], mainpage)
 
-    def testTokens(self):
-        """Test ability to get page tokens."""
-        mysite = self.get_site()
-        for ttype in ("edit", "move"):  # token types for non-sysops
-            try:
-                token = self.site.tokens[ttype]
-            except KeyError:
-                raise unittest.SkipTest(
-                    "Testing '%s' token not possible with user on %s"
-                    % (ttype, self.site))
-            self.assertIsInstance(token, basestring)
-            self.assertEqual(token, mysite.tokens[ttype])
-
-    def testInvalidToken(self):
-        mysite = self.get_site()
-        if LV(mysite.version()) >= LV('1.23wmf19'):
-            # Currently with the new token API all unknown types are treated
-            # as csrf tokens, so it won't throw an error here
-            # a patch is in development: https://gerrit.wikimedia.org/r/#/c/159394
-            raise unittest.SkipTest('No invalid token with the new token API possible')
-        self.assertRaises(KeyError, lambda t: mysite.tokens[t], "invalidtype")
-
     def testPreload(self):
         """Test that preloading works."""
         mysite = self.get_site()
@@ -1075,6 +1053,64 @@ class SiteRandomTestCase(DefaultSiteTestCase):
     #       and the other following methods in site.py
 
 
+class TestSiteTokens(DefaultSiteTestCase):
+
+    """Test cases for tokens in Site methods."""
+
+    user = True
+
+    def setUp(self):
+        """Store version."""
+        self.mysite = self.get_site()
+        self._version = LV(self.mysite.version())
+        self.orig_version = self.mysite.version
+
+    def tearDown(self):
+        """Restore version."""
+        self.mysite.version = self.orig_version
+
+    def test_tokens_in_mw_119(self):
+        """Test ability to get page tokens."""
+        self.mysite.version = lambda: '1.19'
+        for ttype in ("edit", "move"):  # token types for non-sysops
+            token = self.site.tokens[ttype]
+            self.assertIsInstance(token, basestring)
+            self.assertEqual(token, self.mysite.tokens[ttype])
+        # test __contains__
+        self.assertIn("edit", self.mysite.tokens)
+
+    def test_tokens_in_mw_120_124wmf18(self):
+        """Test ability to get page tokens."""
+        if self._version < LV('1.20'):
+            raise unittest.SkipTest(
+                u'Site %s version %s is too low for this tests.'
+                % (self.mysite, self._version))
+        self.mysite.version = lambda: '1.21'
+        for ttype in ("edit", "move"):  # token types for non-sysops
+            token = self.mysite.tokens[ttype]
+            self.assertIsInstance(token, basestring)
+            self.assertEqual(token, self.mysite.tokens[ttype])
+        # test __contains__
+        self.assertIn("edit", self.mysite.tokens)
+
+    def test_tokens_in_mw_124wmf19(self):
+        """Test ability to get page tokens."""
+        if self._version < LV('1.24wmf19'):
+            raise unittest.SkipTest(
+                u'Site %s version %s is too low for this tests.'
+                % (self.mysite, self._version))
+        self.mysite.version = lambda: '1.24wmf20'
+        for ttype in ("edit", "move"):  # token types for non-sysops
+            token = self.mysite.tokens[ttype]
+            self.assertIsInstance(token, basestring)
+            self.assertEqual(token, self.mysite.tokens[ttype])
+        # test __contains__
+        self.assertIn("csrf", self.mysite.tokens)
+
+    def testInvalidToken(self):
+        self.assertRaises(pywikibot.Error, lambda t: self.mysite.tokens[t], "invalidtype")
+
+
 class TestSiteExtensions(WikimediaDefaultSiteTestCase):
 
     """Test cases for Site extensions."""
@@ -1364,10 +1400,11 @@ class TestUploadEnabledSite(TestCase):
         }
     }
 
-    def test_is_uploaddisabled(self):
+    def test_is_uploaddisabled_wp(self):
         site = self.get_site('wikipediatest')
         self.assertFalse(site.is_uploaddisabled())
 
+    def test_is_uploaddisabled_wd(self):
         site = self.get_site('wikidatatest')
         self.assertTrue(site.is_uploaddisabled())
 
