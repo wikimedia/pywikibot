@@ -649,6 +649,13 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIsInstance(using, pywikibot.Page)
             self.assertFalse(using.isRedirectPage())
 
+
+class SiteUserTestCase(DefaultSiteTestCase):
+
+    """Test site method using a user."""
+
+    user = True
+
     def testLogEvents(self):
         """Test the site.logevents() method"""
         mysite = self.get_site()
@@ -1043,6 +1050,11 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIsInstance(user, dict)
             self.assertTrue(user["name"]
                             in ["Jimbo Wales", "Brion VIBBER", "Tim Starling"])
+
+
+class SiteRandomTestCase(DefaultSiteTestCase):
+
+    """Test random methods of a site."""
 
     def testRandompages(self):
         """Test the site.randompages() method"""

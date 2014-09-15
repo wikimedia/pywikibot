@@ -215,6 +215,17 @@ class RequireUserMixin(TestCaseBase):
                 '%s: Unable able to login to %s'
                 % cls.__name__, cls.site)
 
+    def setUp(self):
+        """
+        Set up the test case.
+
+        Login to the site if it is not logged in.
+        """
+        super(RequireUserMixin, self).setUp()
+        site = self.get_site()
+        if not site.logged_in():
+            site.login()
+
 
 class MetaTestCaseClass(type):
 
@@ -446,6 +457,7 @@ class TestCase(TestTimerMixin, TestCaseBase, unittest.TestCase):
         return mainpage
 
     def get_missing_article(self, site=None):
+        """Get a Page which refers to a missing page on the site."""
         if not site:
             site = self.get_site()
         page = pywikibot.Page(pywikibot.page.Link(
