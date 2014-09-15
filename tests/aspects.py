@@ -561,7 +561,7 @@ class WikibaseTestCase(TestCase):
 
     def __init__(self, *args, **kwargs):
         """Constructor."""
-        super(TestCase, self).__init__(*args, **kwargs)
+        super(WikibaseTestCase, self).__init__(*args, **kwargs)
 
         if not hasattr(self, 'sites'):
             return
