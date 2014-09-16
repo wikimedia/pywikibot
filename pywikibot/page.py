@@ -4410,8 +4410,10 @@ def html2unicode(text, ignore=None):
             except KeyError:
                 pass
             if unicodeCodepoint and unicodeCodepoint not in ignore:
-                # solve narrow Python build exception (UTF-16)
-                if unicodeCodepoint > sys.maxunicode:
+                if sys.version_info[0] > 2:
+                    result += chr(unicodeCodepoint)
+                elif unicodeCodepoint > sys.maxunicode:
+                    # solve narrow Python 2 build exception (UTF-16)
                     unicode_literal = lambda n: eval(r"u'\U%08x'" % n)
                     result += unicode_literal(unicodeCodepoint)
                 else:
