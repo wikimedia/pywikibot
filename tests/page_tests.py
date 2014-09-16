@@ -262,10 +262,12 @@ class TestPageObject(DefaultSiteTestCase):
         """Test namespace() method"""
         mainpage = self.get_mainpage()
         maintalk = mainpage.toggleTalkPage()
-        badpage = self.get_missing_article()
 
-        self.assertEqual(mainpage.namespace(), 0)
-        self.assertEqual(maintalk.namespace(), 1)
+        if u':' not in mainpage.title():
+            self.assertEqual(mainpage.namespace(), 0)
+        self.assertEqual(maintalk.namespace(), mainpage.namespace() + 1)
+
+        badpage = self.get_missing_article()
         self.assertEqual(badpage.namespace(), 0)
 
     def testTitle(self):
