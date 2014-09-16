@@ -388,7 +388,15 @@ class TestCase(TestTimerMixin, TestCaseBase, unittest.TestCase):
 
         for data in cls.sites.values():
             if 'site' not in data:
-                site = Site(data['code'], data['family'])
+                # If the test is not cached, fetch a new Site for this class
+                if not hasattr(cls, 'cached') or not cls.cached:
+                    orig_sites = pywikibot._sites
+                    pywikibot._sites = {}
+                    site = Site(data['code'], data['family'])
+                    pywikibot._sites = orig_sites
+                else:
+                    site = Site(data['code'], data['family'])
+
                 data['site'] = site
 
         if len(cls.sites) == 1:
