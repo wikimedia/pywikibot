@@ -64,10 +64,14 @@ __version__ = '$Id$'
 
 import pickle
 import re
+import sys
 import pywikibot
 from pywikibot import i18n, textlib
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.config2 import LS  # line separator
+
+if sys.version_info[0] > 2:
+    unichr = chr
 
 
 def CAT(site, name, hide):
