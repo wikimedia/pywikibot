@@ -1069,43 +1069,36 @@ class TestSiteTokens(DefaultSiteTestCase):
         """Restore version."""
         self.mysite.version = self.orig_version
 
+    def _test_tokens(self, version, test_version, in_tested, additional_token):
+        if version and self._version < LV(version):
+            raise unittest.SkipTest(
+                u'Site %s version %s is too low for this tests.'
+                % (self.mysite, self._version))
+        self.mysite.version = lambda: test_version
+        for ttype in ("edit", "move", additional_token):
+            try:
+                token = self.mysite.tokens[ttype]
+            except pywikibot.Error as error_msg:
+                self.assertRegexpMatches(
+                    unicode(error_msg),
+                    "Action '[a-z]+' is not allowed for user .* on .* wiki.")
+            else:
+                self.assertIsInstance(token, basestring)
+                self.assertEqual(token, self.mysite.tokens[ttype])
+        # test __contains__
+        self.assertIn(in_tested, self.mysite.tokens)
+
     def test_tokens_in_mw_119(self):
         """Test ability to get page tokens."""
-        self.mysite.version = lambda: '1.19'
-        for ttype in ("edit", "move"):  # token types for non-sysops
-            token = self.site.tokens[ttype]
-            self.assertIsInstance(token, basestring)
-            self.assertEqual(token, self.mysite.tokens[ttype])
-        # test __contains__
-        self.assertIn("edit", self.mysite.tokens)
+        self._test_tokens(None, '1.19', 'edit', 'delete')
 
     def test_tokens_in_mw_120_124wmf18(self):
         """Test ability to get page tokens."""
-        if self._version < LV('1.20'):
-            raise unittest.SkipTest(
-                u'Site %s version %s is too low for this tests.'
-                % (self.mysite, self._version))
-        self.mysite.version = lambda: '1.21'
-        for ttype in ("edit", "move"):  # token types for non-sysops
-            token = self.mysite.tokens[ttype]
-            self.assertIsInstance(token, basestring)
-            self.assertEqual(token, self.mysite.tokens[ttype])
-        # test __contains__
-        self.assertIn("edit", self.mysite.tokens)
+        self._test_tokens('1.20', '1.21', 'edit', 'deleteglobalaccount')
 
     def test_tokens_in_mw_124wmf19(self):
         """Test ability to get page tokens."""
-        if self._version < LV('1.24wmf19'):
-            raise unittest.SkipTest(
-                u'Site %s version %s is too low for this tests.'
-                % (self.mysite, self._version))
-        self.mysite.version = lambda: '1.24wmf20'
-        for ttype in ("edit", "move"):  # token types for non-sysops
-            token = self.mysite.tokens[ttype]
-            self.assertIsInstance(token, basestring)
-            self.assertEqual(token, self.mysite.tokens[ttype])
-        # test __contains__
-        self.assertIn("csrf", self.mysite.tokens)
+        self._test_tokens('1.24wmf19', '1.24wmf20', 'csrf', 'deleteglobalaccount')
 
     def testInvalidToken(self):
         self.assertRaises(pywikibot.Error, lambda t: self.mysite.tokens[t], "invalidtype")
