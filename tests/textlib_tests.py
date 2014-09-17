@@ -11,7 +11,6 @@ try:
 except ImportError:
     mwparserfromhell = False
 import codecs
-import sys
 import os
 
 import pywikibot
@@ -66,7 +65,6 @@ class TestSectionFunctions(TestCase):
         self.assertEqual(func('{{a|b|c=d}}'), [('a', {u'1': 'b', 'c': 'd'})])
         self.assertEqual(func('{{a|b={{c}}}}'), [('c', {}), (u'a', {u'b': u'{{c}}'})])
 
-    @unittest.skipIf(sys.version_info[0] > 2, "Fails on Python 3")
     def testSpacesInSection(self):
         self.assertContains("enwiki_help_editing", u"Minor_edits")
         self.assertNotContains("enwiki_help_editing", u"#Minor edits", "Incorrect, '#Minor edits' does not work")
@@ -78,7 +76,6 @@ class TestSectionFunctions(TestCase):
         self.assertContains("enwiki_help_editing", u"Talk_.28discussion.29_pages", "As used in the TOC")
         self.assertContains("enwiki_help_editing", u"Talk_(discussion)_pages", "Understood by mediawiki")
 
-    @unittest.skipIf(sys.version_info[0] > 2, "Fails on Python 3")
     def test_spaces_outside_section(self):
         self.assertContains("enwiki_help_editing", u"Naming and_moving")
         self.assertContains("enwiki_help_editing", u" Naming and_moving ")

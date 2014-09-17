@@ -1132,9 +1132,9 @@ def does_text_contain_section(pagetext, section):
           text link e.g. for categories and files.
     """
     # match preceding colon for text links
-    section = re.sub(r'\\\[\\\[(\\\:)?', '\[\[\:?', re.escape(section))
+    section = re.sub(r'\\\[\\\[(\\:)?', '\[\[\:?', re.escape(section))
     # match underscores and white spaces
-    section = re.sub(r'\\[ _]', '[ _]', section)
+    section = re.sub(r'\\?[ _]', '[ _]', section)
     m = re.search("=+[ ']*%s[ ']*=+" % section, pagetext)
     return bool(m)
 
