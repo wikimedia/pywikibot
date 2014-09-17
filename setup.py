@@ -57,10 +57,6 @@ if sys.version_info[0] == 2:
         dependencies.append('ordereddict')
 
 if sys.version_info[0] == 3:
-    if not os.environ.get('PY3', False):
-        # use setup.py test --python3ok  to run tests
-        print("ERROR: Pywikibot only runs under Python 2")
-        sys.exit(1)
     if sys.version_info[1] < 3:
         print("ERROR: Python 3.3 or higher is required!")
         sys.exit(1)

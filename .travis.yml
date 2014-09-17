@@ -32,7 +32,6 @@ install:
   - python setup.py install
   - cd ../..
 
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then export PY3=1; fi
   - python -c "import setuptools; print(setuptools.__version__)"
 
 script:
