@@ -409,7 +409,6 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
         self.assertIsInstance(mainpage.previousRevision(), int)
         self.assertIsInstance(mainpage.permalink(), basestring)
-        self.assertIsInstance(mainpage.purge(), bool)
 
     def testIsDisambig(self):
         """Test the integration with Extension:Disambiguator."""
@@ -577,6 +576,18 @@ class TestCategoryObject(TestCase):
         cat_not_hidden = pywikibot.Category(site, u'Category:Wikipedia categories')
         self.assertTrue(cat_hidden.isHiddenCategory())
         self.assertFalse(cat_not_hidden.isHiddenCategory())
+
+
+class TestPageUserAction(DefaultSiteTestCase):
+
+    """Test page user actions."""
+
+    cached = True
+    user = True
+
+    def test_purge(self):
+        mainpage = self.get_mainpage()
+        self.assertIsInstance(mainpage.purge(), bool)
 
 
 if __name__ == '__main__':

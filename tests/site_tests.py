@@ -144,11 +144,6 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertFalse(mysite.isInterwikiLink("foo"))
         self.assertIsInstance(mysite.redirectRegex().pattern, basestring)
         self.assertIsInstance(mysite.category_on_one_line(), bool)
-        for grp in ("user", "autoconfirmed", "bot", "sysop", "nosuchgroup"):
-            self.assertIsInstance(mysite.has_group(grp), bool)
-        for rgt in ("read", "edit", "move", "delete", "rollback", "block",
-                    "nosuchright"):
-            self.assertIsInstance(mysite.has_right(rgt), bool)
 
     def testConstructors(self):
         """Test cases for site constructors."""
@@ -223,21 +218,6 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertIsInstance(mysite.logged_in(), bool)
         self.assertIsInstance(mysite.logged_in(True), bool)
         self.assertIsInstance(mysite.userinfo, dict)
-        self.assertIsInstance(mysite.is_blocked(), bool)
-        self.assertIsInstance(mysite.messages(), bool)
-        self.assertIsInstance(mysite.has_right("edit"), bool)
-        self.assertFalse(mysite.has_right("nonexistent_right"))
-        self.assertIsInstance(mysite.has_group("bots"), bool)
-        self.assertFalse(mysite.has_group("nonexistent_group"))
-        try:
-            self.assertIsInstance(mysite.is_blocked(True), bool)
-            self.assertIsInstance(mysite.has_right("edit", True), bool)
-            self.assertFalse(mysite.has_right("nonexistent_right", True))
-            self.assertIsInstance(mysite.has_group("bots", True), bool)
-            self.assertFalse(mysite.has_group("nonexistent_group", True))
-        except pywikibot.NoUsername:
-            pywikibot.warning(
-                "Cannot test Site methods for sysop; no sysop account configured.")
 
         for msg in ("1movedto2", "about", "aboutpage", "aboutsite",
                     "accesskey-n-portal"):
@@ -619,9 +599,9 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertRaises(pywikibot.Error, mysite.blocks,
                           starttime="2008-08-03T23:59:59Z",
                           endtime="2008-08-03T00:00:01Z", reverse=True, total=5)
-        for block in mysite.blocks(users=mysite.user(), total=5):
+        for block in mysite.blocks(users='80.100.22.71', total=5):
             self.assertIsInstance(block, dict)
-            self.assertEqual(block['user'], mysite.user())
+            self.assertEqual(block['user'], '80.100.22.71')
 
     def testExturlusage(self):
         """Test the site.exturlusage() method."""
@@ -712,6 +692,20 @@ class SiteUserTestCase(DefaultSiteTestCase):
     """Test site method using a user."""
 
     user = True
+
+    def test_methods(self):
+        mysite = self.get_site()
+        self.assertIsInstance(mysite.is_blocked(), bool)
+        self.assertIsInstance(mysite.messages(), bool)
+        self.assertIsInstance(mysite.has_right("edit"), bool)
+        self.assertFalse(mysite.has_right("nonexistent_right"))
+        self.assertIsInstance(mysite.has_group("bots"), bool)
+        self.assertFalse(mysite.has_group("nonexistent_group"))
+        for grp in ("user", "autoconfirmed", "bot", "sysop", "nosuchgroup"):
+            self.assertIsInstance(mysite.has_group(grp), bool)
+        for rgt in ("read", "edit", "move", "delete", "rollback", "block",
+                    "nosuchright"):
+            self.assertIsInstance(mysite.has_right(rgt), bool)
 
     def testLogEvents(self):
         """Test the site.logevents() method."""
@@ -1028,17 +1022,25 @@ class SiteUserTestCase(DefaultSiteTestCase):
         for rev in mysite.watchlist_revs(showAnon=False, total=5):
             self.assertIsInstance(rev, dict)
 
+
+class SiteSysopTestCase(DefaultSiteTestCase):
+
+    """Test site method using a sysop account."""
+
+    sysop = True
+
+    def test_methods(self):
+        mysite = self.get_site()
+        self.assertIsInstance(mysite.is_blocked(True), bool)
+        self.assertIsInstance(mysite.has_right("edit", True), bool)
+        self.assertFalse(mysite.has_right("nonexistent_right", True))
+        self.assertIsInstance(mysite.has_group("bots", True), bool)
+        self.assertFalse(mysite.has_group("nonexistent_group", True))
+
     def testDeletedrevs(self):
         """Test the site.deletedrevs() method."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        if not mysite.logged_in(True):
-            try:
-                mysite.login(True)
-            except pywikibot.NoUsername:
-                pywikibot.warning(
-                    "Cannot test Site.deleted_revs; no sysop account configured.")
-                return
         gen = mysite.deletedrevs(total=10, page=mainpage)
         for dr in gen:
             break
@@ -1095,6 +1097,13 @@ class SiteUserTestCase(DefaultSiteTestCase):
                           page=mainpage, start="2008-09-03T23:59:59Z",
                           end="2008-09-03T00:00:01Z", reverse=True,
                           total=5)
+
+
+class SiteUserTestCase2(DefaultSiteTestCase):
+
+    """More tests that rely on a user account."""
+
+    user = True
 
     def testUsers(self):
         """Test the site.users() method."""
@@ -1503,20 +1512,23 @@ class TestUploadEnabledSite(TestCase):
         'wikidatatest': {
             'family': 'wikidata',
             'code': 'test',
+            'enabled': False,
         },
         'wikipediatest': {
             'family': 'wikipedia',
             'code': 'test',
+            'enabled': True,
         }
     }
 
-    def test_is_uploaddisabled_wp(self):
-        site = self.get_site('wikipediatest')
-        self.assertFalse(site.is_uploaddisabled())
+    user = True
 
-    def test_is_uploaddisabled_wd(self):
-        site = self.get_site('wikidatatest')
-        self.assertTrue(site.is_uploaddisabled())
+    def test_is_uploaddisabled(self, key):
+        site = self.get_site(key)
+        if self.sites[key]['enabled']:
+            self.assertFalse(site.is_uploaddisabled())
+        else:
+            self.assertTrue(site.is_uploaddisabled())
 
 
 class TestDataSitePreloading(WikidataTestCase):
