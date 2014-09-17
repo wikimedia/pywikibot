@@ -248,7 +248,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
     def __getattr__(self, attr):
         """Look for undefined attributes in info."""
-        if attr in self.info:
+        if hasattr(self, 'info') and attr in self.info:
             return self.info[attr]
         else:
             raise AttributeError("%s instance has no attribute '%s'"
