@@ -50,6 +50,12 @@ import re
 
 from warnings import warn
 
+if sys.platform == 'win32':
+    if sys.version_info[0] > 2:
+        import winreg
+    else:
+        import _winreg as winreg
+
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
 # names and some magic variables (like __name__)
@@ -421,25 +427,6 @@ tkvertsize = 1000
 # editor will be used.
 editor = os.environ.get('EDITOR', None)
 # On Windows systems, this script tries to determine the default text editor.
-if sys.platform == 'win32':
-    try:
-        if sys.version_info[0] > 2:
-            import winreg as _winreg
-        else:
-            import _winreg
-        _key1 = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
-                                'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.txt\OpenWithProgids')
-        _progID = _winreg.EnumValue(_key1, 1)[0]
-        _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT,
-                                '%s\shell\open\command' % _progID)
-        _cmd = _winreg.QueryValueEx(_key2, None)[0]
-        _cmd = _cmd.replace('%1', '')
-        # Notepad is even worse than our Tkinter editor.
-        if not _cmd.lower().endswith('notepad.exe'):
-            editor = _cmd
-    except WindowsError:
-        # Catch any key lookup errors
-        pass
 
 # Warning: DO NOT use an editor which doesn't support Unicode to edit pages!
 # You will BREAK non-ASCII symbols!
@@ -844,6 +831,51 @@ def shortpath(path):
     if path.startswith(base_dir):
         return path[len(base_dir) + len(os.path.sep):]
     return path
+
+
+def _win32_extension_command(extension):
+    """Get the command from the Win32 registry for an extension."""
+    fileexts_key = r'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
+    key_name = fileexts_key + r'\.' + extension + r'\OpenWithProgids'
+    _winreg = winreg  # exists for git blame only; do not use
+    try:
+        key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_name)
+        _progID = winreg.EnumValue(key1, 0)[0]
+        _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT,
+                                '%s\shell\open\command' % _progID)
+        _cmd = _winreg.QueryValueEx(_key2, None)[0]
+        # See T102465 for issues relating to using this value.
+        cmd = _cmd
+        if cmd.find('%1'):
+            cmd = cmd[:cmd.find('%1')]
+            # Remove any trailing characher, which should be a quote or space
+            # and then remove all whitespace.
+            return cmd[:-1].strip()
+    except WindowsError as e:
+        # Catch any key lookup errors
+        print('WARNING: Unable to find editor for files *.' + extension)
+        print(e)
+
+
+def _detect_win32_editor():
+    """Detect the best Win32 editor."""
+    # Notepad is even worse than our Tkinter editor.
+    unusable_exes = ['notepad.exe',
+                     'py.exe',
+                     'pyw.exe',
+                     'python.exe',
+                     'pythonw.exe']
+
+    for ext in ['py', 'txt']:
+        editor = _win32_extension_command(ext)
+        if editor:
+            for unusable in unusable_exes:
+                if unusable in editor.lower():
+                    break
+            else:
+                return editor
+
+
 # System-level and User-level changes.
 # Store current variables and their types.
 _glv = dict((_key, _val) for _key, _val in globals().items()
@@ -962,6 +994,10 @@ if transliteration_target == 'not set':
         transliteration_target = None
 elif transliteration_target in ('None', 'none'):
     transliteration_target = None
+
+
+if sys.platform == 'win32' and editor is None:
+    editor = _detect_win32_editor()
 
 if sys.platform == 'win32' and editor:
     # single character string literals from
