@@ -112,9 +112,10 @@ import bz2
 import sys
 
 import pywikibot
+from pywikibot import Bot
 from pywikibot import config, pagegenerators
 from pywikibot import i18n, textlib
-from pywikibot.tools import deprecate_arg, deprecated
+from pywikibot.tools import deprecate_arg, deprecated, ModuleDeprecationWrapper
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -264,21 +265,21 @@ class CategoryDatabase:
                                  % config.shortpath(filename))
 
 
-class AddCategory:
+class CategoryAddBot(Bot):
 
     """A robot to mass-add a category to a list of pages."""
 
     @deprecate_arg('editSummary', 'comment')
+    @deprecate_arg('dry', None)
     def __init__(self, generator, newcat=None, sort_by_last_name=False,
-                 create=False, comment='', follow_redirects=False,
-                 dry=False):
+                 create=False, comment='', follow_redirects=False):
+        super(CategoryAddBot, self).__init__()
         self.generator = generator
         self.newcat = newcat
         self.sort = sort_by_last_name
         self.create = create
         self.follow_redirects = follow_redirects
         self.always = False
-        self.dry = dry
         self.comment = comment
 
     def sorted_by_last_name(self, catlink, pagelink):
@@ -301,133 +302,74 @@ class AddCategory:
         match_object = bracketsR.match(page_name)
         if match_object:
             page_name = match_object.group(1)
-        split_string = page_name.split(' ')
+        split_string = page_name.rsplit(' ', 1)
         if len(split_string) > 1:
             # pull last part of the name to the beginning, and append the
             # rest after a comma; e.g., "John von Neumann" becomes
             # "Neumann, John von"
-            sorted_key = split_string[-1] + ', ' + ' '.join(split_string[:-1])
+            sorted_key = split_string[1] + ', ' + split_string[0]
             # give explicit sort key
             return pywikibot.Page(site, catlink.title() + '|' + sorted_key)
         else:
             return pywikibot.Page(site, catlink.title())
-
-    def run(self):
-        counter = 0
-        for page in self.generator:
-            self.treat(page)
-            counter += 1
-        pywikibot.output(u"%d page(s) processed." % counter)
-
-    def load(self, page):
-        """Load the given page's content.
-
-        If page doesn't exists returns an empty string.
-        """
-        try:
-            # Load the page
-            text = page.text
-        except pywikibot.NoPage:
-            if self.create:
-                pywikibot.output(u"Page %s doesn't exist yet; creating."
-                                 % (page.title(asLink=True)))
-                return ''
-            else:
-                pywikibot.output(u"Page %s does not exist; skipping."
-                                 % page.title(asLink=True))
-        else:
-            return text
-
-    def save(self, text, page, newcat, minorEdit=True, botflag=True, old_text=None):
-        if old_text is None:
-            old_text = self.load(page)
-        # only save if something was changed
-        if text != old_text:
-            # show what was changed
-            pywikibot.showDiff(old_text, text)
-            comment = self.comment
-            if not comment:
-                comment = i18n.twtranslate(page.site, 'category-adding',
-                                           {'newcat': newcat})
-            pywikibot.output(u'Comment: %s' % comment)
-            if not self.dry:
-                if not self.always:
-                    confirm = 'y'
-                    while True:
-                        choice = pywikibot.inputChoice(
-                            u'Do you want to accept these changes?',
-                            ['Yes', 'No', 'Always'], ['y', 'N', 'a'], 'N')
-                        if choice == 'a':
-                            confirm = pywikibot.inputChoice(u"""\
-This should be used if and only if you are sure that your links are correct!
-Are you sure?""", ['Yes', 'No'], ['y', 'n'], 'n')
-                            if confirm == 'y':
-                                self.always = True
-                                break
-                        else:
-                            break
-                if self.always or choice == 'y':
-                    try:
-                        # Save the page
-                        page.put(text, comment=comment,
-                                 minorEdit=minorEdit, botflag=botflag)
-                    except pywikibot.LockedPage:
-                        pywikibot.output(u"Page %s is locked; skipping."
-                                         % page.title(asLink=True))
-                    except pywikibot.EditConflict:
-                        pywikibot.output(
-                            u'Skipping %s because of edit conflict'
-                            % (page.title()))
-                    except pywikibot.SpamfilterError as error:
-                        pywikibot.output(
-                            u'Cannot change %s because of spam blacklist entry '
-                            u'%s' % (page.title(), error.url))
-                    else:
-                        return True
-        return False
 
     def treat(self, page):
         if page.isRedirectPage():
             # if it's a redirect use the redirect target instead
             redirTarget = page.getRedirectTarget()
             if self.follow_redirects:
-                page = redirTarget
+                self.current_page = redirTarget
             else:
                 pywikibot.warning(u"Page %s is a redirect to %s; skipping."
                                   % (page.title(asLink=True),
                                      redirTarget.title(asLink=True)))
                 # loading it will throw an error if we don't jump out before
                 return
-        text = self.load(page)
-        if text is None:
+        else:
+            self.current_page = page
+        if self.current_page.exists():
+            # Load the page
+            text = self.current_page.text
+        elif self.create:
+            pywikibot.output(u"Page %s doesn't exist yet; creating."
+                             % (self.current_page.title(asLink=True)))
+            text = ''
+        else:
+            pywikibot.output(u"Page %s does not exist; skipping."
+                             % self.current_page.title(asLink=True))
             return
         # store old text, so we don't have reload it every time
         old_text = text
         cats = textlib.getCategoryLinks(text)
-        # Show the title of the page we're working on.
-        # Highlight the title in purple.
-        pywikibot.output(
-            u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-            % page.title())
         pywikibot.output(u"Current categories:")
         for cat in cats:
             pywikibot.output(u"* %s" % cat.title())
         newcat = self.newcat
-        if not page.site.nocapitalize:
+        if not self.current_page.site.nocapitalize:
             newcat = newcat[:1].upper() + newcat[1:]
-        catpl = pywikibot.Page(page.site, newcat, ns=14)
+        catpl = pywikibot.Page(self.current_page.site, newcat, ns=14)
         if catpl in cats:
             pywikibot.output(u"%s is already in %s."
-                             % (page.title(), catpl.title()))
+                             % (self.current_page.title(), catpl.title()))
         else:
             if self.sort:
-                catpl = self.sorted_by_last_name(catpl, page)
+                catpl = self.sorted_by_last_name(catpl, self.current_page)
             pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
             cats.append(catpl)
-            text = textlib.replaceCategoryLinks(text, cats, site=page.site)
-            if not self.save(text, page, newcat, old_text=old_text):
-                pywikibot.output(u'Page %s not saved.'
-                                 % page.title(asLink=True))
+            text = textlib.replaceCategoryLinks(text, cats,
+                                                site=self.current_page.site)
+            comment = self.comment
+            if not comment:
+                comment = i18n.twtranslate(self.current_page.site,
+                                           'category-adding',
+                                           {'newcat': newcat})
+            try:
+                self.userPut(self.current_page, old_text, text,
+                             comment=comment, minor=True, botflag=True)
+            except pywikibot.PageSaveRelatedError as error:
+                pywikibot.output(u'Page %s not saved: %s'
+                                 % (self.current_page.title(asLink=True),
+                                    error))
 
 
 class CategoryMoveRobot(object):
@@ -1179,12 +1121,12 @@ def main(*args):
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.
         gen = pagegenerators.PreloadingGenerator(gen)
-        bot = AddCategory(gen,
-                          newcat=newCatTitle,
-                          sort_by_last_name=sort_by_last_name,
-                          create=create_pages,
-                          comment=editSummary,
-                          follow_redirects=follow_redirects)
+        bot = CategoryAddBot(gen,
+                             newcat=newCatTitle,
+                             sort_by_last_name=sort_by_last_name,
+                             create=create_pages,
+                             comment=editSummary,
+                             follow_redirects=follow_redirects)
     elif action == 'remove':
         if not fromGiven:
             oldCatTitle = pywikibot.input(u'Please enter the name of the '
@@ -1259,3 +1201,6 @@ def main(*args):
 
 if __name__ == "__main__":
     main()
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('AddCategory', CategoryAddBot)
