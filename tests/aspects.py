@@ -557,7 +557,7 @@ class WikibaseTestCase(TestCase):
             if (hasattr(cls, 'repo') and
                     cls.repo != site['site'].data_repository()):
                 raise Exception(
-                    '%s: sites do not not all have the same data repository'
+                    '%s: sites do not all have the same data repository'
                     % cls.__name__)
 
             cls.repo = site['site'].data_repository()
