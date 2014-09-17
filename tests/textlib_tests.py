@@ -52,7 +52,7 @@ class TestSectionFunctions(TestCase):
 
     def testExtractTemplates(self):
         if not (pywikibot.config.use_mwparserfromhell and mwparserfromhell):
-            return  # We'll test the regex function in the test below
+            raise unittest.SkipTest('mwparserfromhell not available or enabled')
         func = textlib.extract_templates_and_params  # It's really long.
         self.assertEqual(func('{{a}}'), [('a', {})])
         self.assertEqual(func('{{a|b=c}}'), [('a', {'b': 'c'})])
