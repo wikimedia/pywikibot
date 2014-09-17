@@ -1314,7 +1314,7 @@ class APISite(BaseSite):
                     ])
 
     def __init__(self, code, fam=None, user=None, sysop=None):
-        """ Constructor. """
+        """Constructor."""
         BaseSite.__init__(self, code, fam, user, sysop)
         self._msgcache = {}
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
@@ -1322,14 +1322,14 @@ class APISite(BaseSite):
         self.tokens = TokenWallet(self)
 
     def __getstate__(self):
-        """ Remove token wallet before pickling. """
+        """Remove TokenWallet before pickling, for security reasons."""
         new = super(APISite, self).__getstate__()
         del new['tokens']
         return new
 
     def __setstate__(self, attrs):
-        """ Restore things removed in __getstate__. """
-        super(APISite, self).__setstate__()
+        """Restore things removed in __getstate__."""
+        super(APISite, self).__setstate__(attrs)
         self.tokens = TokenWallet(self)
 
     @staticmethod

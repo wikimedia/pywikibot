@@ -438,8 +438,9 @@ class TestPageObject(DefaultSiteTestCase):
     def testPickleAbility(self):
         mainpage = self.get_mainpage()
         import pickle
-        pickle.dumps(mainpage)
-        self.assertTrue(True)  # No exception thrown!
+        mainpage_str = pickle.dumps(mainpage)
+        mainpage_unpickled = pickle.loads(mainpage_str)
+        self.assertEqual(mainpage, mainpage_unpickled)
 
     def testRepr(self):
         mainpage = self.get_mainpage()

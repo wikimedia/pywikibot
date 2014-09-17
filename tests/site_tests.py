@@ -64,7 +64,9 @@ class TestSiteObject(DefaultSiteTestCase):
     def testPickleAbility(self):
         import pickle
         mysite = self.get_site()
-        pickle.dumps(mysite)
+        mysite_str = pickle.dumps(mysite)
+        mysite_pickled = pickle.loads(mysite_str)
+        self.assertEqual(mysite, mysite_pickled)
 
     def testBaseMethods(self):
         """Test cases for BaseSite methods."""
