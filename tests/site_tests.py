@@ -31,6 +31,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase):
     """Test cases for Site deprecated methods."""
 
     cached = True
+    user = True
 
     def test_live_version(self):
         """Test live_version."""
