@@ -56,11 +56,24 @@ Variables below can be used in the value for "archive" in the template above:
 
 %(counter)d          the current value of the counter
 %(year)d             year of the thread being archived
+%(isoyear)d          ISO year of the thread being archived
+%(isoweek)d          ISO week number of the thread being archived
 %(quarter)d          quarter of the year of the thread being archived
 %(month)d            month (as a number 1-12) of the thread being archived
 %(monthname)s        English name of the month above
 %(monthnameshort)s   first three letters of the name above
 %(week)d             week number of the thread being archived
+
+The ISO calendar starts with the Monday of the week which has at least four
+days in the new Gregorian calendar. If January 1st is between Monday and
+Thursday (including), the first week of that year started the Monday of that
+week, which is in the year before if January 1st is not a Monday. If it's
+between Friday or Sunday (including) the following week is then the first week
+of the year. So up to three days are still counted as the year before.
+
+See also:
+ - http://www.phys.uu.nl/~vgent/calendar/isocalendar.htm
+ - https://docs.python.org/3.4/library/datetime.html#datetime.date.isocalendar
 
 Options (may be omitted):
   -help           show this help message and exit
@@ -456,6 +469,8 @@ class PageArchiver(object):
                 params = {
                     'counter': arch_counter,
                     'year': t.timestamp.year,
+                    'isoyear': t.timestamp.isocalendar()[0],
+                    'isoweek': t.timestamp.isocalendar()[1],
                     'quarter': int(ceil(float(t.timestamp.month) / 3)),
                     'month': t.timestamp.month,
                     'monthname': self.month_num2orig_names[t.timestamp.month]['long'],
