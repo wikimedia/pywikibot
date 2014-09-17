@@ -207,10 +207,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 def main_script(page, rev=None, params=None):
     # http://opensourcehacker.com/2011/02/23/temporarily-capturing-python-logging-output-to-a-string-buffer/
     # https://docs.python.org/release/2.6/library/logging.html
-    if sys.version_info[0] > 2:
-        from io import StringIO
-    else:
-        from StringIO import StringIO
+    from io import StringIO
     import logging
 
     # safety; default mode is safe (no writing)
