@@ -980,3 +980,38 @@ class WikidataBot(Bot):
             source = pywikibot.Claim(self.repo, 'P143')
             source.setTarget(self.source_values.get(site.family.name).get(site.code))
             return source
+
+    def run(self):
+        """Process all pages in generator."""
+        if not hasattr(self, 'generator'):
+            raise NotImplementedError('Variable %s.generator not set.'
+                                      % self.__class__.__name__)
+
+        treat_missing_item = hasattr(self, 'treat_missing_item')
+
+        try:
+            for page in self.generator:
+                if not page.exists():
+                    pywikibot.output('%s doesn\'t exist.' % page)
+                try:
+                    item = pywikibot.ItemPage.fromPage(page)
+                except pywikibot.NoPage:
+                    item = None
+                if not item:
+                    if not treat_missing_item:
+                        pywikibot.output(
+                            '%s doesn\'t have a wikidata item.' % page)
+                        #TODO FIXME: Add an option to create the item
+                        continue
+                self.treat(page, item)
+        except QuitKeyboardInterrupt:
+            pywikibot.output('\nUser quit %s bot run...' %
+                             self.__class__.__name__)
+        except KeyboardInterrupt:
+            if config.verbose_output:
+                raise
+            else:
+                pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
+                                 self.__class__.__name__)
+        except Exception as e:
+                pywikibot.exception(msg=e, tb=True)

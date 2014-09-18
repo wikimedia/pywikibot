@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This script creates new items on Wikidata based on certain criteria.
+
 * When was the (Wikipedia) page created?
 * When was the last edit on the page?
 * Does the page contain interwiki's?
@@ -27,12 +28,13 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators, WikidataBot
 from datetime import timedelta
 
 
-class NewItemRobot(pywikibot.Bot):
-    """ A bot to create new items """
+class NewItemRobot(WikidataBot):
+
+    """ A bot to create new items. """
 
     def __init__(self, generator, **kwargs):
         """Only accepts options defined in availableOptions."""
@@ -49,9 +51,7 @@ class NewItemRobot(pywikibot.Bot):
         self.lastEdit = self.getOption('lastedit')
         self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(days=self.pageAge)
         self.lastEditBefore = self.repo.getcurrenttime() - timedelta(days=self.lastEdit)
-
-    def run(self):
-        """ Start the bot. """
+        self.treat_missing_item = True
         pywikibot.output('Page age is set to %s days so only pages created'
                          '\nbefore %s will be considered.'
                          % (self.pageAge, self.pageAgeBefore.isoformat()))
@@ -59,65 +59,63 @@ class NewItemRobot(pywikibot.Bot):
                          '\nbefore %s will be considered.'
                          % (self.lastEdit, self.lastEditBefore.isoformat()))
 
-        for page in self.generator:
-            self.current_page = page
-            if not page.exists():
-                pywikibot.output(u'%s does not exist anymore. Skipping...'
-                                 % page)
-                continue
-            try:
-                item = pywikibot.ItemPage.fromPage(page)
-            except pywikibot.NoPage:
-                pass
-            else:
-                pywikibot.output(u'%s already has an item: %s.' % (page, item))
-                if self.getOption('touch'):
-                    pywikibot.output(u'Doing a null edit on the page.')
-                    page.put(page.text)
-                continue
+    def treat(self, page, item):
+        """ Treat page/item. """
+        if item and item.exists():
+            pywikibot.output(u'%s already has an item: %s.' % (page, item))
+            if self.getOption('touch'):
+                pywikibot.output(u'Doing a null edit on the page.')
+                page.put(page.text)
+            return
 
-            if page.isRedirectPage():
-                pywikibot.output(u'%s is a redirect page. Skipping.' % page)
-            elif page.editTime() > self.lastEditBefore:
-                pywikibot.output(
-                    u'Last edit on %s was on %s.\nToo recent. Skipping.'
-                    % (page, page.editTime().isoformat()))
-            else:
-                (revId, revTimestamp, revUser,
-                 revComment) = page.getVersionHistory(reverseOrder=True,
-                                                      total=1)[0]
-                if revTimestamp > self.pageAgeBefore:
-                    pywikibot.output(
-                        u'Page creation of %s on %s is too recent. Skipping.'
-                        % (page, page.editTime().isoformat()))
-                elif page.langlinks():
-                    # FIXME: Implement this
-                    pywikibot.output(
-                        "Found language links (interwiki links).\n"
-                        "Haven't implemented that yet so skipping.")
-                else:
-                    # FIXME: i18n
-                    summary = (u'Bot: New item with sitelink from %s'
-                               % page.title(asLink=True, insite=self.repo))
+        self.current_page = page
 
-                    data = {'sitelinks':
-                            {page.site.dbName():
-                             {'site': page.site.dbName(),
-                              'title': page.title()}
-                             },
-                            'labels':
-                            {page.site.lang:
-                             {'language': page.site.lang,
-                              'value': page.title()}
-                             }
-                            }
-                    pywikibot.output(summary)
+        if page.isRedirectPage():
+            pywikibot.output(u'%s is a redirect page. Skipping.' % page)
+            return
+        if page.editTime() > self.lastEditBefore:
+            pywikibot.output(
+                u'Last edit on %s was on %s.\nToo recent. Skipping.'
+                % (page, page.editTime().isoformat()))
+            return
 
-                    # Create empty item object and add 'data'
-                    item = pywikibot.ItemPage(page.site.data_repository())
-                    item.editEntity(data, summary=summary)
-                    # And do a null edit to force update
-                    page.put(page.text)
+        (revId, revTimestamp, revUser,
+         revComment) = page.getVersionHistory(reverseOrder=True, total=1)[0]
+        if revTimestamp > self.pageAgeBefore:
+            pywikibot.output(
+                u'Page creation of %s on %s is too recent. Skipping.'
+                % (page, page.editTime().isoformat()))
+            return
+
+        if page.langlinks():
+            # FIXME: Implement this
+            pywikibot.output(
+                "Found language links (interwiki links).\n"
+                "Haven't implemented that yet so skipping.")
+            return
+
+        # FIXME: i18n
+        summary = (u'Bot: New item with sitelink from %s'
+                   % page.title(asLink=True, insite=self.repo))
+
+        data = {'sitelinks':
+                {page.site.dbName():
+                 {'site': page.site.dbName(),
+                  'title': page.title()}
+                 },
+                'labels':
+                {page.site.lang:
+                 {'language': page.site.lang,
+                  'value': page.title()}
+                 }
+                }
+
+        pywikibot.output(summary)
+
+        item = pywikibot.ItemPage(page.site.data_repository())
+        item.editEntity(data, summary=summary)
+        # And do a null edit to force update
+        page.put(page.text)
 
 
 def main():

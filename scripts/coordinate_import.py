@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
+Coordinate importing script.
+
 Usage:
 
 python coordinate_import.py -lang:en -family:wikipedia -cat:Category:Coordinates_not_on_Wikidata
@@ -30,11 +32,13 @@ from pywikibot.exceptions import CoordinateGlobeUnknownException
 
 
 class CoordImportRobot(WikidataBot):
-    """
-    A bot to import coordinates to Wikidata
-    """
+
+    """A bot to import coordinates to Wikidata."""
+
     def __init__(self, generator):
         """
+        Constructor.
+
         Arguments:
             * generator    - A generator that yields Page objects.
 
@@ -60,41 +64,41 @@ class CoordImportRobot(WikidataBot):
                 if self.prop in claim.qualifiers:
                     return prop
 
-    def run(self):
-        """Start the robot."""
-        for page in self.generator:
-            self.current_page = page
-            item = pywikibot.ItemPage.fromPage(page)
+    def treat(self, page, item):
+        """Treat page/item."""
+        self.current_page = page
 
-            if item.exists():
-                pywikibot.output(u'Found %s' % item.title())
-                coordinate = page.coordinates(primary_only=True)
+        coordinate = page.coordinates(primary_only=True)
 
-                if coordinate:
-                    claims = item.get().get('claims')
-                    if self.prop in claims:
-                        pywikibot.output(u'Item %s already contains coordinates (%s)'
-                                         % (item.title(), self.prop))
-                    else:
-                        prop = self.has_coord_qualifier(claims)
-                        if prop:
-                            pywikibot.output(u'Item %s already contains coordinates'
-                                             u' (%s) as qualifier for %s'
-                                             % (item.title(), self.prop, prop))
-                        else:
-                            newclaim = pywikibot.Claim(self.repo, self.prop)
-                            newclaim.setTarget(coordinate)
-                            pywikibot.output(u'Adding %s, %s to %s' % (coordinate.lat,
-                                                                       coordinate.lon,
-                                                                       item.title()))
-                            try:
-                                item.addClaim(newclaim)
+        if not coordinate:
+            return
 
-                                source = self.getSource(page.site)
-                                if source:
-                                    newclaim.addSource(source, bot=True)
-                            except CoordinateGlobeUnknownException as e:
-                                pywikibot.output(u'Skipping unsupported globe: %s' % e.args)
+        claims = item.get().get('claims')
+        if self.prop in claims:
+            pywikibot.output(u'Item %s already contains coordinates (%s)'
+                             % (item.title(), self.prop))
+            return
+
+        prop = self.has_coord_qualifier(claims)
+        if prop:
+            pywikibot.output(u'Item %s already contains coordinates'
+                             u' (%s) as qualifier for %s'
+                             % (item.title(), self.prop, prop))
+            return
+
+        newclaim = pywikibot.Claim(self.repo, self.prop)
+        newclaim.setTarget(coordinate)
+        pywikibot.output(u'Adding %s, %s to %s' % (coordinate.lat,
+                                                   coordinate.lon,
+                                                   item.title()))
+        try:
+            item.addClaim(newclaim)
+
+            source = self.getSource(page.site)
+            if source:
+                newclaim.addSource(source, bot=True)
+        except CoordinateGlobeUnknownException as e:
+            pywikibot.output(u'Skipping unsupported globe: %s' % e.args)
 
 
 def main():

@@ -697,8 +697,11 @@ class CategoryMoveRobot(object):
         Do not use this function from outside the class.
         """
         if self.oldcat.exists():
-            item = pywikibot.ItemPage.fromPage(self.oldcat)
-            if item.exists():
+            try:
+                item = pywikibot.ItemPage.fromPage(self.oldcat)
+            except pywikibot.NoPage:
+                item = None
+            if item and item.exists():
                 comment = i18n.twtranslate(self.site, 'category-was-moved',
                                            {'newcat': self.newcat.title(),
                                             'title': self.newcat.title()})
