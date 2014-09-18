@@ -29,7 +29,7 @@ from pywikibot import config2 as config
 from pywikibot.bot import (
     output, warning, error, critical, debug, stdout, exception,
     input, input_choice, input_yn, inputChoice, handle_args, showHelp, ui, log,
-    calledModuleName, Bot, WikidataBot, QuitKeyboardInterrupt,
+    calledModuleName, Bot, CurrentPageBot, WikidataBot, QuitKeyboardInterrupt,
     # the following are flagged as deprecated on usage
     handleArgs,
 )
@@ -70,7 +70,7 @@ __all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
            'stdout', 'output', 'warning', 'error', 'critical', 'debug',
            'exception', 'input_choice', 'input', 'input_yn', 'inputChoice',
            'handle_args', 'handleArgs', 'showHelp', 'ui', 'log',
-           'calledModuleName', 'Bot', 'WikidataBot',
+           'calledModuleName', 'Bot', 'CurrentPageBot', 'WikidataBot',
            'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
            'SiteDefinitionError', 'NoSuchSite', 'UnknownSite', 'UnknownFamily',
            'NoUsername', 'UserBlocked', 'UserActionRefuse',

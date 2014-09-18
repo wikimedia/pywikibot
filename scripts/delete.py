@@ -34,7 +34,7 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators, CurrentPageBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -43,7 +43,7 @@ docuReplacements = {
 }
 
 
-class DeletionRobot(Bot):
+class DeletionRobot(CurrentPageBot):
 
     """ This robot allows deletion of pages en masse. """
 
@@ -63,20 +63,22 @@ class DeletionRobot(Bot):
 
         self.summary = summary
 
-    def treat(self, page):
+    def treat_page(self):
         """Process one page from the generator."""
-        self.current_page = page
         if self.getOption('undelete'):
-            if page.exists():
-                pywikibot.output(u'Skipping: %s already exists.' % page)
+            if self.current_page.exists():
+                pywikibot.output(u'Skipping: {0} already exists.'.format(
+                    self.current_page))
             else:
-                page.undelete(self.summary)
+                self.current_page.undelete(self.summary)
         else:
-            if page.exists():
-                page.delete(self.summary, not self.getOption('always'),
-                            self.getOption('always'))
+            if self.current_page.exists():
+                self.current_page.delete(self.summary,
+                                         not self.getOption('always'),
+                                         self.getOption('always'))
             else:
-                pywikibot.output(u'Skipping: %s does not exist.' % page)
+                pywikibot.output(u'Skipping: {0} does not exist.'.format(
+                    self.current_page))
 
 
 def main(*args):

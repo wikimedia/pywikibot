@@ -77,7 +77,8 @@ import re
 from pywikibot.tools import MediaWikiVersion
 import pywikibot
 import isbn
-from pywikibot import config, i18n, textlib, pagegenerators, Bot
+from pywikibot import config, i18n, textlib, pagegenerators
+from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
 from pywikibot.page import url2unicode
 from pywikibot.tools import deprecate_arg
 
@@ -194,6 +195,12 @@ class CosmeticChangesToolkit:
 
             self.fixArabicLetters,
         )
+
+    @classmethod
+    def from_page(cls, page, diff, ignore):
+        """Create toolkit based on the page."""
+        return cls(page.site, diff=diff, namespace=page.namespace(),
+                   pageTitle=page.title(), ignore=ignore)
 
     def safe_execute(self, method, text):
         """Execute the method and catch exceptions if enabled."""
@@ -891,7 +898,7 @@ class CosmeticChangesToolkit:
         return text
 
 
-class CosmeticChangesBot(Bot):
+class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
 
     """Cosmetic changes bot."""
 
@@ -905,29 +912,22 @@ class CosmeticChangesBot(Bot):
 
         self.generator = generator
 
-    def treat(self, page):
+    def treat_page(self):
+        """Treat page with the cosmetic toolkit."""
         try:
-            self.current_page = page
-            ccToolkit = CosmeticChangesToolkit(page.site, diff=False,
-                                               namespace=page.namespace(),
-                                               pageTitle=page.title(),
-                                               ignore=self.getOption('ignore'))
-            changedText = ccToolkit.change(page.get())
+            ccToolkit = CosmeticChangesToolkit.from_page(
+                self.current_page, True, self.getOption('ignore'))
+            changedText = ccToolkit.change(self.current_page.get())
             if changedText is not False:
-                self.userPut(page, page.text, changedText,
-                             comment=self.getOption('comment'),
-                             async=self.getOption('async'))
-        except pywikibot.NoPage:
-            pywikibot.output("Page %s does not exist?!"
-                             % page.title(asLink=True))
-        except pywikibot.IsRedirectPage:
-            pywikibot.output("Page %s is a redirect; skipping."
-                             % page.title(asLink=True))
+                self.put_current(newtext=changedText,
+                                 comment=self.getOption('comment'),
+                                 async=self.getOption('async'))
         except pywikibot.LockedPage:
-            pywikibot.output("Page %s is locked?!" % page.title(asLink=True))
+            pywikibot.output("Page %s is locked?!"
+                             % self.current_page.title(asLink=True))
         except pywikibot.EditConflict:
             pywikibot.output("An edit conflict has occured at %s."
-                             % page.title(asLink=True))
+                             % self.current_page.title(asLink=True))
 
 
 def main(*args):

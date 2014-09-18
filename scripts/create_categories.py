@@ -47,7 +47,8 @@ class CreateCategoriesBot(Bot):
         self.basename = basename
         self.comment = u'Creating new category'
 
-    def create_category(self, page):
+    def treat(self, page):
+        """Create category in commons for that page."""
         title = page.title(withNamespace=False)
 
         newpage = pywikibot.Category(pywikibot.Site('commons', 'commons'),
@@ -69,10 +70,6 @@ class CreateCategoriesBot(Bot):
         else:
             # FIXME: Add overwrite option
             pywikibot.output(u'%s already exists, skipping' % newpage.title())
-
-    def run(self):
-        for page in self.generator:
-            self.create_category(page)
 
 
 def main(*args):
