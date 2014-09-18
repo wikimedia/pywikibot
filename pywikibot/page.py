@@ -2779,6 +2779,20 @@ class WikibasePage(Page):
                 return False
         return 'lastrevid' in self._content
 
+    def botMayEdit(self):
+        """
+        Return whether bots may edit this page.
+
+        Because there is currently no system to mark a page that it shouldn't
+        be edited by bots on Wikibase pages it always returns True. The content
+        of the page is not text but a dict, the original way (to search for a
+        template) doesn't apply.
+
+        @return: True
+        @rtype: boolean
+        """
+        return True
+
     def get(self, force=False, *args, **kwargs):
         """
         Fetch all page data, and cache it.
