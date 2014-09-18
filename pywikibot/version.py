@@ -204,19 +204,21 @@ def getversion_git(path=None):
         tag = tag[(s + 6):e]
         t = tag.strip().split('/')
         tag = '[%s] %s' % (t[0][:-1], '-'.join(t[3:]))
-    info = subprocess.Popen([cmd, '--no-pager',
-                             'log', '-1',
-                             '--pretty=format:"%ad|%an|%h|%H|%d"'
-                             '--abbrev-commit',
-                             '--date=iso'],
-                            cwd=_program_dir,
-                            stdout=subprocess.PIPE).stdout.read()
+    with subprocess.Popen([cmd, '--no-pager',
+                           'log', '-1',
+                           '--pretty=format:"%ad|%an|%h|%H|%d"'
+                           '--abbrev-commit',
+                           '--date=iso'],
+                          cwd=_program_dir,
+                          stdout=subprocess.PIPE).stdout as stdout:
+        info = stdout.read()
     info = info.decode(config.console_encoding).split('|')
     date = info[0][:-6]
     date = time.strptime(date.strip('"'), '%Y-%m-%d %H:%M:%S')
-    rev = subprocess.Popen([cmd, 'rev-list', 'HEAD'],
-                           cwd=_program_dir,
-                           stdout=subprocess.PIPE).stdout.read()
+    with subprocess.Popen([cmd, 'rev-list', 'HEAD'],
+                          cwd=_program_dir,
+                          stdout=subprocess.PIPE).stdout as stdout:
+        rev = stdout.read()
     rev = 'g%s' % len(rev.splitlines())
     hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
