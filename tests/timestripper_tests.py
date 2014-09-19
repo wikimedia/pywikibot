@@ -139,6 +139,12 @@ class TestTimeStripperLanguage(TestCase):
             'match': u'3 February 2010 19:48 (UTC) 7 February 2010 19:48 (UTC)',
             'nomatch': u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
         },
+        'fawiki': {
+            'family': 'wikipedia',
+            'code': 'fa',
+            'match': u'۳ فوریهٔ  ۲۰۱۰، ساعت ۱۹:۴۸ (UTC) ۷ فوریهٔ  ۲۰۱۰، ساعت ۱۹:۴۸ (UTC)',
+            'nomatch': u'۳ ۲ ۲۰۱۴ ۱۹:۴۸ (UTC) ۷ ۲ ۲۰۱۰ ۱۹:۴۸ (UTC)',
+        },
         'frwiki': {
             'family': 'wikipedia',
             'code': 'fr',
