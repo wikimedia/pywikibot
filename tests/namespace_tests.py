@@ -193,19 +193,13 @@ class TestNamespaceObject(TestCase):
             % (unicode('Foo'), unicode('Foo'))
         self.assertEqual(s, r)
 
-        a.info['defaultcontentmodel'] = 'bar'
-        r = {'defaultcontentmodel': 'bar'}
-        self.assertEqual(a.info, r)
-
+        a.defaultcontentmodel = 'bar'
         s = repr(a)
         r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], defaultcontentmodel='bar')" \
             % (unicode('Foo'), unicode('Foo'))
         self.assertEqual(s, r)
 
-        a.info['case'] = 'upper'
-        r = {'defaultcontentmodel': 'bar', 'case': 'upper'}
-        self.assertEqual(a.info, r)
-
+        a.case = 'upper'
         s = repr(a)
         r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], case='upper', defaultcontentmodel='bar')" \
             % (unicode('Foo'), unicode('Foo'))
@@ -213,7 +207,6 @@ class TestNamespaceObject(TestCase):
 
         b = eval(repr(a))
         self.assertEqual(a, b)
-        self.assertEqual(a.info, b.info)
 
 
 if __name__ == '__main__':

@@ -244,15 +244,8 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         else:
             self.aliases = aliases
 
-        self.info = kwargs
-
-    def __getattr__(self, attr):
-        """Look for undefined attributes in info."""
-        if hasattr(self, 'info') and attr in self.info:
-            return self.info[attr]
-        else:
-            raise AttributeError("%s instance has no attribute '%s'"
-                                 % (self.__class__.__name__, attr))
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def _distinct(self):
         if self.custom_name == self.canonical_name:
@@ -358,13 +351,18 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
     def __repr__(self):
         """Return a reconstructable representation."""
-        if self.info:
+        standard_attr = ['id', 'custom_name', 'canonical_name', 'aliases']
+        extra = [(key, self.__dict__[key])
+                 for key in sorted(self.__dict__)
+                 if key not in standard_attr]
+
+        if extra:
             kwargs = ', ' + ', '.join([key + '=' + repr(value)
                                        for (key, value) in
-                                       [(key, self.info[key])
-                                        for key in sorted(self.info)]])
+                                       extra])
         else:
             kwargs = ''
+
         return '%s(id=%d, custom_name=%r, canonical_name=%r, aliases=%r%s)' \
                % (self.__class__.__name__, self.id, self.custom_name,
                   self.canonical_name, self.aliases, kwargs)
@@ -4650,7 +4648,10 @@ class DataSite(APISite):
         self._property_namespace = False
 
         for namespace in self.namespaces().values():
-            content_model = namespace.info.get('defaultcontentmodel')
+            if not hasattr(namespace, 'defaultcontentmodel'):
+                continue
+
+            content_model = namespace.defaultcontentmodel
             if content_model == 'wikibase-item':
                 self._item_namespace = namespace
             elif content_model == 'wikibase-property':
