@@ -599,6 +599,14 @@ class WikibaseClientTestCase(WikibaseTestCase):
                     % (cls.__name__, site['site']))
 
 
+class DefaultWikibaseClientTestCase(WikibaseClientTestCase,
+                                    DefaultSiteTestCase):
+
+    """Run tests against any site connected to a Wikibase."""
+
+    pass
+
+
 class WikidataTestCase(WikibaseTestCase):
 
     """Test cases use Wikidata."""
@@ -607,6 +615,25 @@ class WikidataTestCase(WikibaseTestCase):
     code = 'wikidata'
 
     cached = True
+
+
+class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
+
+    """Run tests against any site connected to Wikidata."""
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up the test class.
+
+        Require the data repository is wikidata.org.
+        """
+        super(WikibaseClientTestCase, cls).setUpClass()
+
+        if str(cls.get_repo()) != 'wikidata:wikidata':
+            raise unittest.SkipTest(
+                u'%s: %s is not connected to Wikidata.'
+                % (cls.__name__, cls.get_site()))
 
 
 class PwbTestCase(TestCase):
