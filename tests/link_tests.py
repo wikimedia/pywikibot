@@ -6,13 +6,11 @@
 #
 __version__ = '$Id$'
 
-import os
 import pywikibot
 from pywikibot import config2 as config
 from pywikibot.page import Link
+from pywikibot.exceptions import Error, InvalidTitle
 from tests.aspects import unittest, TestCase
-
-show_failures = os.environ.get('PYWIKIBOT2_TEST_SHOW_FAILURE', '0') == '1'
 
 # ---- The first set of tests are explicit links, starting with a ':'.
 
@@ -210,50 +208,20 @@ class TestFullyQualifiedExplicitLinkDifferentFamilyParser(TestCase):
         config.mylang = 'en'
         config.family = 'wikisource'
         link = Link(':en:wikipedia:Main Page')
-        if show_failures:
-            link.parse()
-        else:
-            self.assertRaisesRegex(
-                pywikibot.Error,
-                "Improperly formatted interwiki link ':en:wikipedia:Main Page'",
-                link.parse)
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('enws'))
-        if show_failures:
-            self.assertEqual(link.title, 'Main Page')
-            self.assertEqual(link.namespace, 0)
-        else:
-            try:
-                link.title
-            except pywikibot.Error as e:
-                self.assertEqual(str(e), "Improperly formatted interwiki link ':en:wikipedia:Main Page'")
+        link.parse()
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Main Page')
+        self.assertEqual(link.namespace, 0)
 
     def test_fully_qualified_NS1_code(self):
         """Test ':en:wikipedia:Main Page' on enwp is namespace 1."""
         config.mylang = 'en'
         config.family = 'wikisource'
         link = Link(':en:wikipedia:Talk:Main Page')
-        if show_failures:
-            link.parse()
-        else:
-            self.assertRaisesRegex(
-                pywikibot.Error,
-                "Improperly formatted interwiki link ':en:wikipedia:Talk:Main Page'",
-                link.parse)
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('enws'))
-        if show_failures:
-            self.assertEqual(link.title, 'Main Page')
-            self.assertEqual(link.namespace, 1)
-        else:
-            try:
-                link.title
-            except pywikibot.Error as e:
-                self.assertEqual(str(e), "Improperly formatted interwiki link ':en:wikipedia:Talk:Main Page'")
+        link.parse()
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Main Page')
+        self.assertEqual(link.namespace, 1)
 
     def test_fully_qualified_NS0_family(self):
         """Test ':wikipedia:en:Main Page' on enws is namespace 0."""
@@ -296,16 +264,9 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(TestCase):
         config.family = 'wikidata'
         link = Link(':en:wikipedia:Main Page')
         link.parse()
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('wikidata'))
-        if show_failures:
-            self.assertEqual(link.title, 'Main Page')
-            self.assertEqual(link.namespace, 4)
-        else:
-            self.assertEqual(link.title, 'En:wikipedia:Main Page')
-            self.assertEqual(link.namespace, 0)
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Main Page')
+        self.assertEqual(link.namespace, 4)
 
     def test_fully_qualified_NS1_code(self):
         """Test ':en:wikipedia:Talk:Main Page' on wikidata is namespace 4."""
@@ -313,52 +274,29 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(TestCase):
         config.family = 'wikidata'
         link = Link(':en:wikipedia:Talk:Main Page')
         link.parse()
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('wikidata'))
-        if show_failures:
-            self.assertEqual(link.title, 'Talk:Main Page')
-            self.assertEqual(link.namespace, 4)
-        else:
-            self.assertEqual(link.title, 'En:wikipedia:Talk:Main Page')
-            self.assertEqual(link.namespace, 0)
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Talk:Main Page')
+        self.assertEqual(link.namespace, 4)
 
     def test_fully_qualified_NS0_family(self):
         """Test ':wikipedia:en:Main Page' on wikidata is namespace 0."""
         config.mylang = 'wikidata'
         config.family = 'wikidata'
         link = Link(':wikipedia:en:Main Page')
-        if show_failures:
-            link.parse()
-            self.assertEqual(link.site, self.get_site('enwp'))
-            self.assertEqual(link.title, 'Main Page')
-            self.assertEqual(link.namespace, 0)
-        else:
-            self.assertRaisesRegex(
-                pywikibot.NoSuchSite,
-                'Language wikidata does not exist in family wikipedia',
-                link.parse)  # very bad
+        link.parse()
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Main Page')
+        self.assertEqual(link.namespace, 0)
 
     def test_fully_qualified_NS1_family(self):
         """Test ':wikipedia:en:Talk:Main Page' on wikidata is namespace 1."""
         config.mylang = 'wikidata'
         config.family = 'wikidata'
         link = Link(':wikipedia:en:Talk:Main Page')
-        if show_failures:
-            link.parse()
-        else:
-            self.assertRaisesRegex(
-                pywikibot.NoSuchSite,
-                'Language wikidata does not exist in family wikipedia',
-                link.parse)  # very bad
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('wikidata'))
-        if show_failures:
-            self.assertEqual(link.title, 'Main Page')
-            self.assertEqual(link.namespace, 1)
+        link.parse()
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Main Page')
+        self.assertEqual(link.namespace, 1)
 
 
 class TestFullyQualifiedNoLangFamilyExplicitLinkParser(TestCase):
@@ -384,32 +322,20 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(TestCase):
         config.mylang = 'en'
         config.family = 'wikipedia'
         link = Link(':testwiki:wikidata:Q6')
-        if show_failures:
-            link.parse()
-            self.assertEqual(link.site, self.get_site('wikidata'))
-            self.assertEqual(link.title, 'Q6')
-            self.assertEqual(link.namespace, 0)
-        else:
-            self.assertRaisesRegex(
-                pywikibot.Error,
-                'Family testwiki does not exist',
-                link.parse)  # very bad
+        link.parse()
+        self.assertEqual(link.site, self.get_site('wikidata'))
+        self.assertEqual(link.title, 'Q6')
+        self.assertEqual(link.namespace, 0)
 
     def test_fully_qualified_NS1_code(self):
         """Test ':testwiki:wikidata:Talk:Q6' on enwp is namespace 1."""
         config.mylang = 'en'
         config.family = 'wikipedia'
         link = Link(':testwiki:wikidata:Talk:Q6')
-        if show_failures:
-            link.parse()
-            self.assertEqual(link.site, self.get_site('wikidata'))
-            self.assertEqual(link.title, 'Q6')
-            self.assertEqual(link.namespace, 1)
-        else:
-            self.assertRaisesRegex(
-                pywikibot.Error,
-                'Family testwiki does not exist',
-                link.parse)  # very bad
+        link.parse()
+        self.assertEqual(link.site, self.get_site('wikidata'))
+        self.assertEqual(link.title, 'Q6')
+        self.assertEqual(link.namespace, 1)
 
     def test_fully_qualified_NS0_family(self):
         """Test ':wikidata:testwiki:Q6' on enwp is namespace 0."""
@@ -417,14 +343,9 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(TestCase):
         config.family = 'wikipedia'
         link = Link(':wikidata:testwiki:Q6')
         link.parse()
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('test.wp'))
-            self.assertEqual(link.title, 'Q6')
-            self.assertEqual(link.namespace, 0)
-        else:
-            self.assertEqual(link.site, self.get_site('enwp'))
-            self.assertEqual(link.title, 'Wikidata:testwiki:Q6')
-            self.assertEqual(link.namespace, 0)
+        self.assertEqual(link.site, self.get_site('test.wp'))
+        self.assertEqual(link.title, 'Q6')
+        self.assertEqual(link.namespace, 0)
 
     def test_fully_qualified_NS1_family(self):
         """Test ':wikidata:testwiki:Talk:Q6' on enwp is namespace 1."""
@@ -432,14 +353,9 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(TestCase):
         config.family = 'wikipedia'
         link = Link(':wikidata:testwiki:Talk:Q6')
         link.parse()
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('test.wp'))
-            self.assertEqual(link.title, 'Q6')
-            self.assertEqual(link.namespace, 1)
-        else:
-            self.assertEqual(link.site, self.get_site('enwp'))
-            self.assertEqual(link.title, 'Wikidata:testwiki:Talk:Q6')
-            self.assertEqual(link.namespace, 0)
+        self.assertEqual(link.site, self.get_site('test.wp'))
+        self.assertEqual(link.title, 'Q6')
+        self.assertEqual(link.namespace, 1)
 
 
 class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(TestCase):
@@ -643,50 +559,20 @@ class TestFullyQualifiedImplicitLinkDifferentFamilyParser(TestCase):
         config.mylang = 'en'
         config.family = 'wikisource'
         link = Link('en:wikipedia:Main Page')
-        if show_failures:
-            link.parse()
-        else:
-            self.assertRaisesRegex(
-                pywikibot.Error,
-                "Improperly formatted interwiki link 'en:wikipedia:Main Page'",
-                link.parse)
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('enws'))
-        if show_failures:
-            self.assertEqual(link.title, 'Main Page')
-            self.assertEqual(link.namespace, 0)
-        else:
-            try:
-                link.title
-            except pywikibot.Error as e:
-                self.assertEqual(str(e), "Improperly formatted interwiki link 'en:wikipedia:Main Page'")
+        link.parse()
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Main Page')
+        self.assertEqual(link.namespace, 0)
 
     def test_fully_qualified_NS1_code(self):
         """Test 'en:wikipedia:Main Page' on enws is namespace 1."""
         config.mylang = 'en'
         config.family = 'wikisource'
         link = Link('en:wikipedia:Talk:Main Page')
-        if show_failures:
-            link.parse()
-        else:
-            self.assertRaisesRegex(
-                pywikibot.Error,
-                "Improperly formatted interwiki link 'en:wikipedia:Talk:Main Page'",
-                link.parse)
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('enws'))
-        if show_failures:
-            self.assertEqual(link.title, 'Main Page')
-            self.assertEqual(link.namespace, 1)
-        else:
-            try:
-                link.title
-            except pywikibot.Error as e:
-                self.assertEqual(str(e), "Improperly formatted interwiki link 'en:wikipedia:Talk:Main Page'")
+        link.parse()
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Main Page')
+        self.assertEqual(link.namespace, 1)
 
     def test_fully_qualified_NS0_family(self):
         """Test 'wikipedia:en:Main Page' on enws is namespace 0."""
@@ -729,16 +615,9 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(TestCase):
         config.family = 'wikidata'
         link = Link('en:wikipedia:Main Page')
         link.parse()
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('wikidata'))
-        if show_failures:
-            self.assertEqual(link.title, 'Main Page')
-            self.assertEqual(link.namespace, 4)
-        else:
-            self.assertEqual(link.title, 'En:wikipedia:Main Page')
-            self.assertEqual(link.namespace, 0)
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Main Page')
+        self.assertEqual(link.namespace, 4)
 
     def test_fully_qualified_NS1_code(self):
         """Test 'en:wikipedia:Talk:Main Page' on wikidata is not namespace 1."""
@@ -746,52 +625,29 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(TestCase):
         config.family = 'wikidata'
         link = Link('en:wikipedia:Talk:Main Page')
         link.parse()
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('wikidata'))
-        if show_failures:
-            self.assertEqual(link.title, 'Talk:Main Page')
-            self.assertEqual(link.namespace, 4)
-        else:
-            self.assertEqual(link.title, 'En:wikipedia:Talk:Main Page')
-            self.assertEqual(link.namespace, 0)
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Talk:Main Page')
+        self.assertEqual(link.namespace, 4)
 
     def test_fully_qualified_NS0_family(self):
         """Test 'wikipedia:en:Main Page' on wikidata is namespace 0."""
         config.mylang = 'wikidata'
         config.family = 'wikidata'
         link = Link('wikipedia:en:Main Page')
-        if show_failures:
-            link.parse()
-            self.assertEqual(link.site, self.get_site('enwp'))
-            self.assertEqual(link.namespace, 0)
-            self.assertEqual(link.title, 'Main Page')
-        else:
-            self.assertRaisesRegex(
-                pywikibot.NoSuchSite,
-                'Language wikidata does not exist in family wikipedia',
-                link.parse)  # very bad
+        link.parse()
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.namespace, 0)
+        self.assertEqual(link.title, 'Main Page')
 
     def test_fully_qualified_NS1_family(self):
         """Test 'wikipedia:en:Talk:Main Page' on wikidata is namespace 1."""
         config.mylang = 'wikidata'
         config.family = 'wikidata'
         link = Link('wikipedia:en:Talk:Main Page')
-        if show_failures:
-            link.parse()
-        else:
-            self.assertRaisesRegex(
-                pywikibot.NoSuchSite,
-                'Language wikidata does not exist in family wikipedia',
-                link.parse)  # very bad
-        if show_failures:
-            self.assertEqual(link.site, self.get_site('enwp'))
-        else:
-            self.assertEqual(link.site, self.get_site('wikidata'))
-        if show_failures:
-            self.assertEqual(link.title, 'Main Page')
-            self.assertEqual(link.namespace, 1)
+        link.parse()
+        self.assertEqual(link.site, self.get_site('enwp'))
+        self.assertEqual(link.title, 'Main Page')
+        self.assertEqual(link.namespace, 1)
 
 
 class TestFullyQualifiedNoLangFamilyImplicitLinkParser(TestCase):
@@ -805,32 +661,20 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(TestCase):
         config.mylang = 'en'
         config.family = 'wikipedia'
         link = Link('testwiki:wikidata:Q6')
-        if show_failures:
-            link.parse()
-            self.assertEqual(link.site, pywikibot.Site('wikidata', 'wikidata'))
-            self.assertEqual(link.title, 'Q6')
-            self.assertEqual(link.namespace, 0)
-        else:
-            self.assertRaisesRegex(
-                pywikibot.Error,
-                'Family testwiki does not exist',
-                link.parse)  # very bad
+        link.parse()
+        self.assertEqual(link.site, pywikibot.Site('wikidata', 'wikidata'))
+        self.assertEqual(link.title, 'Q6')
+        self.assertEqual(link.namespace, 0)
 
     def test_fully_qualified_NS1_code(self):
         """Test 'testwiki:wikidata:Talk:Q6' on enwp is namespace 1."""
         config.mylang = 'en'
         config.family = 'wikipedia'
         link = Link('testwiki:wikidata:Talk:Q6')
-        if show_failures:
-            link.parse()
-            self.assertEqual(link.site, pywikibot.Site('wikidata', 'wikidata'))
-            self.assertEqual(link.title, 'Q6')
-            self.assertEqual(link.namespace, 1)
-        else:
-            self.assertRaisesRegex(
-                pywikibot.Error,
-                'Family testwiki does not exist',
-                link.parse)  # very bad
+        link.parse()
+        self.assertEqual(link.site, pywikibot.Site('wikidata', 'wikidata'))
+        self.assertEqual(link.title, 'Q6')
+        self.assertEqual(link.namespace, 1)
 
     def test_fully_qualified_NS0_family(self):
         """Test 'wikidata:testwiki:Q6' on enwp is namespace 0."""
@@ -838,14 +682,9 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(TestCase):
         config.family = 'wikipedia'
         link = Link('wikidata:testwiki:Q6')
         link.parse()
-        if show_failures:
-            self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
-            self.assertEqual(link.title, 'Q6')
-            self.assertEqual(link.namespace, 0)
-        else:
-            self.assertEqual(link.site, pywikibot.Site('en', 'wikipedia'))
-            self.assertEqual(link.title, 'Wikidata:testwiki:Q6')
-            self.assertEqual(link.namespace, 0)
+        self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
+        self.assertEqual(link.title, 'Q6')
+        self.assertEqual(link.namespace, 0)
 
     def test_fully_qualified_NS1_family(self):
         """Test 'wikidata:testwiki:Talk:Q6' on enwp is namespace 1."""
@@ -853,14 +692,9 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(TestCase):
         config.family = 'wikipedia'
         link = Link('wikidata:testwiki:Talk:Q6')
         link.parse()
-        if show_failures:
-            self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
-            self.assertEqual(link.title, 'Q6')
-            self.assertEqual(link.namespace, 1)
-        else:
-            self.assertEqual(link.site, pywikibot.Site('en', 'wikipedia'))
-            self.assertEqual(link.title, 'Wikidata:testwiki:Talk:Q6')
-            self.assertEqual(link.namespace, 0)
+        self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
+        self.assertEqual(link.title, 'Q6')
+        self.assertEqual(link.namespace, 1)
 
 
 class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(TestCase):
@@ -908,6 +742,74 @@ class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(TestCase):
         self.assertEqual(link.site, self.get_site())
         self.assertEqual(link.title, 'Main Page')
         self.assertEqual(link.namespace, 1)
+
+
+class TestEmptyTitle(TestCase):
+
+    """Test links which contain no title."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_interwiki_mainpage(self):
+        """Test that Link allow links without a title to the main page."""
+        link = Link('en:', self.get_site())
+        link.parse()
+        self.assertEqual(link.site, self.get_site())
+        self.assertEqual(link.title, '')
+        self.assertEqual(link.namespace, 0)
+
+    def test_interwiki_namespace_without_title(self):
+        """Test that Link doesn't allow links without a title."""
+        link = Link('en:Help:', self.get_site())
+        self.assertRaisesRegex(
+            InvalidTitle, "'en:Help:' has no title.", link.parse)
+
+    def test_no_text(self):
+        """Test that Link doesn't allow empty."""
+        link = Link('', self.get_site())
+        self.assertRaisesRegex(
+            InvalidTitle, "The link does not contain a page title", link.parse)
+
+    def test_namespace_lookalike(self):
+        """Test that Link does only detect valid namespaces."""
+        link = Link('CAT:', self.get_site())
+        link.parse()
+        self.assertEqual(link.site, self.get_site())
+        self.assertEqual(link.title, 'CAT:')
+        self.assertEqual(link.namespace, 0)
+
+        link = Link('en:CAT:', self.get_site())
+        link.parse()
+        self.assertEqual(link.site, self.get_site())
+        self.assertEqual(link.title, 'CAT:')
+        self.assertEqual(link.namespace, 0)
+
+
+class TestInvalidInterwikiLinks(TestCase):
+
+    """Test links to non-wikis."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_non_wiki_prefix(self):
+        """Test that Link fails if the interwiki prefix is not a wiki."""
+        link = Link('bugzilla:1337')
+        self.assertRaisesRegex(
+            Error,
+            'bugzilla:1337 is not a local page on wikipedia:en, and the '
+            'interwiki prefix bugzilla is not supported by PyWikiBot!',
+            link.parse)
+
+    def test_other_wiki_prefix(self):
+        """Test that Link fails if the interwiki prefix is a unknown family."""
+        link = Link('bulba:this-will-never-work')
+        self.assertRaisesRegex(
+            Error,
+            'bulba:this-will-never-work is not a local page on wikipedia:en, '
+            'and the interwiki prefix bulba is not supported by PyWikiBot!',
+            link.parse)
 
 
 if __name__ == '__main__':
