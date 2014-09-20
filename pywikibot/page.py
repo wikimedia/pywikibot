@@ -4118,7 +4118,12 @@ not supported by PyWikiBot!"""
         if self._namespace != -1 and len(t) > 255:
             raise pywikibot.InvalidTitle("(over 255 bytes): '%s'" % t)
 
-        if self._site.case() == 'first-letter':
+        if hasattr(self._site.namespaces()[self._namespace], 'case'):
+            case = self._site.namespaces()[self._namespace].case
+        else:
+            case = self._site.case()
+
+        if case == 'first-letter':
             t = t[:1].upper() + t[1:]
 
         # Can't make a link to a namespace alone...
