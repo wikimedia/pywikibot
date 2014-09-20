@@ -631,6 +631,22 @@ class TestWriteNormalizeData(TestCase):
         self.assertEqual(response, self.data_out)
 
 
+class TestPreloadingItemGenerator(TestCase):
+
+    """Test preloading item generator."""
+
+    family = 'wikidata'
+    code = 'wikidata'
+
+    def test_non_item_gen(self):
+        """Test TestPreloadingItemGenerator with ReferringPageGenerator."""
+        site = self.get_site()
+        instance_of_page = pywikibot.Page(site, 'Property:P31')
+        ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page, total=5)
+        gen = pagegenerators.PreloadingItemGenerator(ref_gen)
+        self.assertTrue(all(isinstance(item, pywikibot.ItemPage) for item in gen))
+
+
 class TestNamespaces(WikidataTestCase):
 
     """Test cases to test namespaces of Wikibase entities."""

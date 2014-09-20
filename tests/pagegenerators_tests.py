@@ -10,7 +10,7 @@ import sys
 import pywikibot
 from pywikibot import pagegenerators
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, WikidataTestCase
 
 
 class TestPageGenerators(TestCase):
@@ -151,6 +151,19 @@ class TestPageGenerators(TestCase):
         self.assertEqual(sorted(timestamps), timestamps)
         self.assertTrue(all(item['ns'] == 0 for item in items))
         self.assertEqual(len(set(item['revid'] for item in items)), 4)
+
+
+class TestPreloadingItemGenerator(WikidataTestCase):
+
+    """Test preloading item generator."""
+
+    def test_non_item_gen(self):
+        """Test TestPreloadingItemGenerator with ReferringPageGenerator."""
+        site = self.get_site()
+        instance_of_page = pywikibot.Page(site, 'Property:P31')
+        ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page, total=5)
+        gen = pagegenerators.PreloadingItemGenerator(ref_gen)
+        self.assertTrue(all(isinstance(item, pywikibot.ItemPage) for item in gen))
 
 
 if __name__ == "__main__":

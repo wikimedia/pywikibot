@@ -1082,6 +1082,16 @@ def PreloadingItemGenerator(generator, step=50):
     """
     sites = {}
     for page in generator:
+        if not isinstance(page, pywikibot.page.WikibasePage):
+            datasite = page.site.data_repository()
+            if page.namespace() != datasite.item_namespace:
+                pywikibot.output(
+                    u'PreloadingItemGenerator skipping %s as it is not in %s'
+                    % (page, datasite.item_namespace))
+                continue
+
+            page = pywikibot.ItemPage(datasite, page.title())
+
         site = page.site
         sites.setdefault(site, []).append(page)
         if len(sites[site]) >= step:
