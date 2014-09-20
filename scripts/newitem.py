@@ -65,13 +65,18 @@ class NewItemRobot(pywikibot.Bot):
                 pywikibot.output(u'%s does not exist anymore. Skipping...'
                                  % page)
                 continue
-            item = pywikibot.ItemPage.fromPage(page)
-            if item.exists():
+            try:
+                item = pywikibot.ItemPage.fromPage(page)
+            except pywikibot.NoPage:
+                pass
+            else:
                 pywikibot.output(u'%s already has an item: %s.' % (page, item))
                 if self.getOption('touch'):
                     pywikibot.output(u'Doing a null edit on the page.')
                     page.put(page.text)
-            elif page.isRedirectPage():
+                continue
+
+            if page.isRedirectPage():
                 pywikibot.output(u'%s is a redirect page. Skipping.' % page)
             elif page.editTime() > self.lastEditBefore:
                 pywikibot.output(
@@ -96,8 +101,8 @@ class NewItemRobot(pywikibot.Bot):
                                % page.title(asLink=True, insite=self.repo))
 
                     data = {'sitelinks':
-                            {item.getdbName(page.site):
-                             {'site': item.getdbName(page.site),
+                            {page.site.dbName():
+                             {'site': page.site.dbName(),
                               'title': page.title()}
                              },
                             'labels':
@@ -107,6 +112,9 @@ class NewItemRobot(pywikibot.Bot):
                              }
                             }
                     pywikibot.output(summary)
+
+                    # Create empty item object and add 'data'
+                    item = pywikibot.ItemPage(page.site.data_repository())
                     item.editEntity(data, summary=summary)
                     # And do a null edit to force update
                     page.put(page.text)
