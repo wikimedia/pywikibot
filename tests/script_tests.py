@@ -280,8 +280,8 @@ class TestScriptMeta(MetaTestCaseClass):
 
             # Ideally all scripts should execute -help without
             # connecting to a site.  However pywikibot always
-            # logs site.live_version().
-            # TODO: make logging live_version() optional, then set
+            # logs site.version() from live wiki.
+            # TODO: make logging version() optional, then set
             #         dct[test_name].site = True
             #       for only the tests which dont respond to -help
 
