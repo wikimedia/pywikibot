@@ -748,9 +748,11 @@ class TestAlternateNamespaces(TestCase):
         class DrySite(pywikibot.site.DataSite):
             _namespaces = {
                 90: Namespace(id=90,
+                              case='first-letter',
                               canonical_name='Item',
                               defaultcontentmodel='wikibase-item'),
                 92: Namespace(id=92,
+                              case='first-letter',
                               canonical_name='Prop',
                               defaultcontentmodel='wikibase-property')
             }
