@@ -156,6 +156,10 @@ parameterHelp = u"""\
                   Argument can be given as "-withoutinterwiki:n" where
                   n is some number (??).
 
+-mysqlquery       Takes a Mysql query string like
+                  "SELECT page_namespace, page_title, FROM page
+                  WHERE page_namespace = 0" and works on the resulting pages.
+
 -wikidataquery    Takes a WikidataQuery query string like claim[31:12280]
                   and works on the resulting pages.
 
@@ -538,6 +542,12 @@ class GeneratorFactory(object):
                 query = pywikibot.input(
                     u'WikidataQuery string:')
             gen = WikidataQueryPageGenerator(query)
+        elif arg.startswith('-mysqlquery'):
+            query = arg[len('-mysqlquery:'):]
+            if not query:
+                query = pywikibot.input(
+                    u'Mysql query string:')
+            gen = MySQLPageGenerator(query)
 
         if gen:
             self.gens.append(gen)
