@@ -33,6 +33,15 @@ from . import config2 as config
 
 TEMP_REGEX = re.compile(
     '{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')
+NON_LATIN_DIGITS = [
+    u'٠١٢٣٤٥٦٧٨٩',  # ckb
+    u'۰۱۲۳۴۵۶۷۸۹',  # fa
+    u'೦೧೨೩೪೫೬೭೮೯',  # kn
+    u'०१२३४५६७८९',  # hi and some other
+    u'০১২৩৪৫৬৭৮৯',  # bn
+    u'૦૧૨૩૪૫૬૭૮૯',  # gu
+    u'୦୧୨୩୪୫୬୭୮୯',  # or
+]
 
 
 def unescape(s):
@@ -1198,8 +1207,7 @@ class TimeStripper(object):
 
         timeR = r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h](?P<minute>[0-5]\d))'
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
-        yearR = r'(?P<year>(19|20)\d\d)'
-
+        yearR = r'(?P<year>(19|20)\d\d)(?:%s)?' % u'\ub144'
         # if months have 'digits' as names, they need to be
         # removed; will be handled as digits in regex, adding d+{1,2}\.?
         escaped_months = [_ for _ in self.origNames2monthNum if
@@ -1207,13 +1215,14 @@ class TimeStripper(object):
         # match longest names first.
         escaped_months = [re.escape(_) for
                           _ in sorted(escaped_months, reverse=True)]
-
         # work around for cs wiki: if month are in digits, we assume
         # that format is dd. mm. (with dot and spaces optional)
+        # the last one is workaround for Korean
         if any(_.isdigit() for _ in self.origNames2monthNum):
             self.is_digit_month = True
-            monthR = r'(?P<month>(%s)|\d{1,2}\.?)' % u'|'.join(escaped_months)
-            dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?\s*[01]?\d\.?'
+            monthR = r'(?P<month>(%s)(?:\u0654)?|(?:1[012]|0?[1-9])\.?(?:\uc6d4)?)' \
+                % u'|'.join(escaped_months)
+            dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))(?:%s)?\.?\s*[01]?\d\.?' % u'\uc77c'
         else:
             self.is_digit_month = False
             monthR = r'(?P<month>(%s))' % u'|'.join(escaped_months)
@@ -1222,7 +1231,7 @@ class TimeStripper(object):
         self.ptimeR = re.compile(timeR)
         self.ptimeznR = re.compile(timeznR)
         self.pyearR = re.compile(yearR)
-        self.pmonthR = re.compile(monthR, re.U)
+        self.pmonthR = re.compile(monthR)
         self.pdayR = re.compile(dayR)
 
         # order is important to avoid mismatch when searching
@@ -1235,10 +1244,17 @@ class TimeStripper(object):
         ]
 
     def findmarker(self, text, base=u'@@', delta='@'):
-        # find a string which is not part of text
+        """Find a string which is not part of text."""
         while base in text:
             base += delta
         return base
+
+    def fix_digits(self, line):
+        """Make non-latin digits like Persian to latin to parse."""
+        for system in NON_LATIN_DIGITS:
+            for i in range(0, 10):
+                line = line.replace(system[i], str(i))
+        return line
 
     def last_match_and_replace(self, txt, pat):
         """
@@ -1278,6 +1294,7 @@ class TimeStripper(object):
         """
         # match date fields
         dateDict = dict()
+        line = self.fix_digits(line)
         for pat in self.patterns:
             line, matchDict = self.last_match_and_replace(line, pat)
             if matchDict:
