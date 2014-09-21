@@ -9,13 +9,11 @@ __version__ = '$Id$'
 import datetime
 import pywikibot
 import pywikibot.data.api as api
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 
-class TestApiFunctions(TestCase):
+class TestApiFunctions(DefaultSiteTestCase):
 
-    family = 'wikipedia'
-    code = 'en'
     cached = True
 
     def testObjectCreation(self):
@@ -119,25 +117,23 @@ class TestPageGenerator(TestCase):
         self.assertEqual(len(results), 4)  # total=-1 but 4 expected
 
 
-class TestCachedRequest(TestCase):
+class TestCachedRequest(DefaultSiteTestCase):
 
     """Test API Request caching.
 
     This test class does not use the forced test caching.
     """
 
-    family = 'wikipedia'
-    code = 'en'
-
     cached = False
 
     def testResults(self):
         mysite = self.get_site()
+        mainpage = self.get_mainpage()
         # Run the cached query twice to ensure the
         # data returned is equal
         params = {'action': 'query',
                   'prop': 'info',
-                  'titles': 'Main Page',
+                  'titles': mainpage.title(),
                   }
         req = api.CachedRequest(datetime.timedelta(minutes=10),
                                 site=mysite, **params)
