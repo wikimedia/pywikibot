@@ -37,6 +37,8 @@ import hashlib
 import base64
 import time
 import sys
+import io
+
 import pywikibot
 from pywikibot import config, textlib
 import upload
@@ -52,14 +54,12 @@ except ImportError:
 if sys.version_info[0] > 2:
     from urllib.parse import urlencode
     from urllib.request import urlopen
-    import io as StringIO
     from tkinter import (
         Tk, Label, Entry, Scrollbar, Text, Button,
         END, VERTICAL, NORMAL, WORD
     )
 else:
     from urllib import urlencode, urlopen
-    import StringIO
     from Tkinter import (
         Tk, Label, Entry, Scrollbar, Text, Button,
         END, VERTICAL, NORMAL, WORD
@@ -122,13 +122,13 @@ def getPhotoUrl(photoSizes=None):
 
 def downloadPhoto(photoUrl=''):
     """
-    Download the photo and store it in a StrinIO.StringIO object.
+    Download the photo and store it in a io.BytesIO object.
 
     TODO: Add exception handling
 
     """
     imageFile = urlopen(photoUrl).read()
-    return StringIO.StringIO(imageFile)
+    return io.BytesIO(imageFile)
 
 
 def findDuplicateImages(photo=None,
@@ -378,7 +378,7 @@ class Tkdialog:
         self.descriptionScrollbar.grid(row=14, column=5)
 
     def getImage(self, photo, width, height):
-        """Take the StringIO object and build an imageTK thumbnail."""
+        """Take the BytesIO object and build an imageTK thumbnail."""
         image = Image.open(photo)
         image.thumbnail((width, height))
         imageTk = ImageTk.PhotoImage(image)

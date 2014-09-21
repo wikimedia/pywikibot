@@ -50,6 +50,7 @@ import tempfile
 import os
 import gzip
 import sys
+import io
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, textlib, xmlreader, Bot
@@ -61,11 +62,9 @@ if sys.version_info[0] > 2:
     from urllib.request import urlopen
     from urllib.error import HTTPError, URLError
     import http.client as httplib
-    import io as StringIO
 else:
     from urllib2 import quote, urlopen, HTTPError, URLError
     import httplib
-    import StringIO
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -592,7 +591,7 @@ class ReferencesRobot(Bot):
                         # through f.read(). It might fetch big files/pages.
                         # However, truncating an encoded gzipped stream is not
                         # an option, for unzipping will fail.
-                        compressed = StringIO.StringIO(f.read())
+                        compressed = io.StringIO(f.read())
                         f = gzip.GzipFile(fileobj=compressed)
 
                     # Read the first 1,000,000 bytes (0.95 MB)
