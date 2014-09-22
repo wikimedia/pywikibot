@@ -126,6 +126,7 @@ class Family(family.WikimediaFamily):
             'tokipona': None,
             'xh': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Xhosa_Wiktionary
             'yo': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wiktionary
+            'za': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zhuang_Wiktionary
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }
