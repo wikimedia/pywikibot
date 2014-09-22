@@ -1041,7 +1041,12 @@ class SiteUserTestCase(DefaultSiteTestCase):
 
         # site.patrol() needs params
         self.assertRaises(pywikibot.Error, lambda x: list(x), mysite.patrol())
-        result = list(mysite.patrol(rcid=rc['rcid']))
+        try:
+            result = list(mysite.patrol(rcid=rc['rcid']))
+        except api.APIError as error:
+            if error.code == u'permissiondenied':
+                raise unittest.SkipTest(error)
+            raise
 
         if hasattr(mysite, u'_patroldisabled') and mysite._patroldisabled:
             raise unittest.SkipTest(u'Patrolling is disabled on %s wiki.'
