@@ -1027,6 +1027,7 @@ class PageGenerator(QueryGenerator):
         if not ('inprop' in kwargs and 'protection' in kwargs['inprop']):
             appendParams(kwargs, 'inprop', 'protection')
         appendParams(kwargs, 'iiprop', 'timestamp|user|comment|url|size|sha1|metadata')
+        self.props = kwargs['prop'].split('|')
         QueryGenerator.__init__(self, generator=generator, **kwargs)
         self.resultkey = "pages"  # element to look for in result
 
@@ -1038,7 +1039,7 @@ class PageGenerator(QueryGenerator):
 
         """
         p = pywikibot.Page(self.site, pagedata['title'], pagedata['ns'])
-        update_page(p, pagedata)
+        update_page(p, pagedata, self.props)
         return p
 
 
@@ -1090,7 +1091,13 @@ class PropertyGenerator(QueryGenerator):
 
         """
         QueryGenerator.__init__(self, prop=prop, **kwargs)
+        self._props = frozenset(prop.split('|'))
         self.resultkey = "pages"
+
+    @property
+    def props(self):
+        """The requested property names."""
+        return self._props
 
 
 class ListGenerator(QueryGenerator):
@@ -1195,14 +1202,18 @@ class LoginManager(login.LoginManager):
         pywikibot.cookie_jar.save()
 
 
-def update_page(page, pagedict):
+def update_page(page, pagedict, props=[]):
     """Update attributes of Page object page, based on query data in pagedict.
 
     @param page: object to be updated
     @type page: Page
     @param pagedict: the contents of a "page" element of a query response
     @type pagedict: dict
-
+    @param prop: the property names which resulted in pagedict. If a missing
+        value in pagedict can indicate both 'false' and 'not present' the
+        property which would make the value present must be in the props
+        parameter.
+    @type prop: iterable of string
     """
     if "pageid" in pagedict:
         page._pageid = int(pagedict['pageid'])
@@ -1211,7 +1222,8 @@ def update_page(page, pagedict):
     else:
         raise AssertionError(
             "Page %s has neither 'pageid' nor 'missing' attribute" % pagedict['title'])
-    page._isredir = 'redirect' in pagedict
+    if 'info' in props:
+        page._isredir = 'redirect' in pagedict
     if 'touched' in pagedict:
         page._timestamp = pagedict['touched']
     if 'protection' in pagedict:
