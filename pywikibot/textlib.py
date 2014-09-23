@@ -1223,9 +1223,9 @@ class TimeStripper(object):
         # the last one is workaround for Korean
         if any(_.isdigit() for _ in self.origNames2monthNum):
             self.is_digit_month = True
-            monthR = r'(?P<month>(%s)(?:\u0654)?|(?:1[012]|0?[1-9])\.?(?:\uc6d4)?)' \
+            monthR = r'(?P<month>(%s)|(?:1[012]|0?[1-9])\.)' \
                 % u'|'.join(escaped_months)
-            dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))(?:%s)?\.?\s*[01]?\d\.?' % u'\uc77c'
+            dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))(?:%s)?\.?\s*(?:[01]?\d\.)?' % u'\uc77c'
         else:
             self.is_digit_month = False
             monthR = r'(?P<month>(%s))' % u'|'.join(escaped_months)
