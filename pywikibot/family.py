@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-
+"""Objects representing MediaWiki families."""
 #
 # (C) Pywikibot team, 2004-2014
 #
@@ -12,6 +12,7 @@ import sys
 import logging
 import re
 import collections
+import imp
 
 if sys.version_info[0] == 2:
     from urlparse import urlparse
@@ -21,12 +22,15 @@ else:
 import pywikibot
 from pywikibot import config2 as config
 from pywikibot.tools import deprecated
+from pywikibot.exceptions import Error
 
 logger = logging.getLogger("pywiki.wiki.family")
 
 
-# Parent class for all wiki families
 class Family(object):
+
+    """Parent class for all wiki families."""
+
     def __init__(self):
         if not hasattr(self, 'name'):
             self.name = None
@@ -840,6 +844,51 @@ class Family(object):
         #       'pt': { '_default': [0]}
         #   }
 
+    _families = {}
+
+    @staticmethod
+    def load(fam=None, fatal=True):
+        """Import the named family.
+
+        @param fam: family name (if omitted, uses the configured default)
+        @type fam: str
+        @param fatal: if True, the bot will stop running if the given family is
+            unknown. If False, it will only raise a ValueError exception.
+        @param fatal: bool
+        @return: a Family instance configured for the named family.
+
+        """
+        if fam is None:
+            fam = config.family
+        if fam in Family._families:
+            return Family._families[fam]
+
+        if fam in config.family_files:
+            family_file = config.family_files[fam]
+
+            if family_file.startswith('http://') or family_file.startswith('https://'):
+                myfamily = AutoFamily(fam, family_file)
+                Family._families[fam] = myfamily
+                return Family._families[fam]
+
+        try:
+            # Ignore warnings due to dots in family names.
+            import warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", RuntimeWarning)
+                myfamily = imp.load_source(fam, config.family_files[fam])
+        except (ImportError, KeyError):
+            if fatal:
+                pywikibot.error(u"""\
+    Error importing the %s family. This probably means the family
+    does not exist. Also check your configuration file."""
+                                % fam, exc_info=True)
+                sys.exit(1)
+            else:
+                raise Error("Family %s does not exist" % fam)
+        Family._families[fam] = myfamily.Family()
+        return Family._families[fam]
+
     @property
     def iwkeys(self):
         if self.interwiki_forward:
@@ -1033,11 +1082,23 @@ class Family(object):
         """Return list of historical encodings for a specific language Wiki."""
         return self.code2encodings(code)
 
-    def __cmp__(self, otherfamily):
+    def __eq__(self, other):
+        """Compare self with other.
+
+        If other is not a Family() object, try to create one.
+        """
+        if not isinstance(other, Family):
+            other = self.load(other, fatal=False)
         try:
-            return cmp(self.name, otherfamily.name)
+            return self.name == other.name
         except AttributeError:
-            return cmp(id(self), id(otherfamily))
+            return id(self) == id(other)
+
+    def __ne__(self, other):
+        try:
+            return not self.__eq__(other)
+        except Error:
+            return False
 
     def __hash__(self):
         return hash(self.name)
@@ -1092,8 +1153,10 @@ class Family(object):
         return putText
 
 
-# Parent class for all wikimedia families
 class WikimediaFamily(Family):
+
+    """#Class for all wikimedia families."""
+
     def __init__(self):
         super(WikimediaFamily, self).__init__()
 

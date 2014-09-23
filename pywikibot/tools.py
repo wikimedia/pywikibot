@@ -321,7 +321,8 @@ u"%(old_arg)s argument of %(meth_name)s is deprecated."
     return decorator
 
 
-def redirect_func(target, source_module=None, target_module=None):
+def redirect_func(target, source_module=None, target_module=None,
+                  old_name=None):
     """
     Return a function which can be used to redirect to 'target'.
 
@@ -338,16 +339,20 @@ def redirect_func(target, source_module=None, target_module=None):
         'None' (default) it tries to get it from the target. Might not work
         with nested classes.
     @type target_module: basestring
+    @param old_name: The old function name. If None it uses the name of the
+        new function.
+    @type old_name: basestring
     @return: A new function which adds a warning prior to each execution.
     @rtype: callable
     """
     class Wrapper(object):
-        def __init__(self, function, source, target):
-            self._function = function
-            self.parameters = {'new': function.__name__,
-                               'target': target,
-                               'source': source}
-            self.warning = ('{source}{new} is DEPRECATED, use {target}{new} '
+        def __init__(self):
+            self._function = target
+            self.parameters = {'new': target.__name__,
+                               'old': old_name or target.__name__,
+                               'target': target_module,
+                               'source': source_module}
+            self.warning = ('{source}{old} is DEPRECATED, use {target}{new} '
                             'instead.').format(**self.parameters)
 
         def call(self, *a, **kw):
@@ -367,7 +372,7 @@ def redirect_func(target, source_module=None, target_module=None):
     else:
         source_module = (sys._getframe(1).f_code.co_filename.rsplit("/", 1)[0]
                          .replace("/", ".") + ".")
-    return Wrapper(target, source_module, target_module).call
+    return Wrapper().call
 
 
 if __name__ == "__main__":

@@ -18,13 +18,16 @@ __version__ = '$Id$'
 #
 
 import sys
-import pywikibot
-from pywikibot import config
-from pywikibot.site import Namespace
-from pywikibot.exceptions import AutoblockUser, UserActionRefuse
-from pywikibot.tools import ComparableMixin, deprecated, deprecate_arg
-from pywikibot import textlib
+import logging
+import re
+import unicodedata
+import collections
 import hashlib
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 
 if sys.version_info[0] == 2:
     import htmlentitydefs
@@ -37,15 +40,14 @@ else:
     from urllib.parse import quote_from_bytes, unquote_to_bytes
     from urllib.request import urlopen
 
-import logging
-import re
-import sys
-import unicodedata
-import collections
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
+import pywikibot
+from pywikibot import config
+from pywikibot.family import Family
+from pywikibot.site import Namespace
+from pywikibot.exceptions import AutoblockUser, UserActionRefuse
+from pywikibot.tools import ComparableMixin, deprecated, deprecate_arg
+from pywikibot import textlib
+
 
 logger = logging.getLogger("pywiki.wiki.page")
 
@@ -3253,9 +3255,8 @@ class ItemPage(WikibasePage):
         """
         if not hasattr(self, 'sitelinks'):
             self.get()
-        if family is not None and not isinstance(family,
-                                                 pywikibot.family.Family):
-            family = pywikibot.site.Family(family)
+        if family is not None and not isinstance(family, Family):
+            family = Family.load(family)
         for dbname in self.sitelinks:
             pg = Page(pywikibot.site.APISite.fromDBName(dbname),
                       self.sitelinks[dbname])

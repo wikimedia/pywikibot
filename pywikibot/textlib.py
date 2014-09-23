@@ -18,10 +18,10 @@ try:
     import mwparserfromhell
 except ImportError:
     mwparserfromhell = False
-import pywikibot
 import datetime
 import re
 import sys
+
 if sys.version_info[0] == 2:
     from HTMLParser import HTMLParser
 else:
@@ -29,7 +29,10 @@ else:
     basestring = (str,)
     unicode = str
 
-from . import config2 as config
+from pywikibot import config2 as config
+import pywikibot
+from pywikibot.family import Family
+
 
 TEMP_REGEX = re.compile(
     '{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')
@@ -425,7 +428,7 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]",
     # when interwiki links forward to another family, retrieve pages & other
     # infos there
     if fam.interwiki_forward:
-        fam = pywikibot.site.Family(fam.interwiki_forward)
+        fam = Family.load(fam.interwiki_forward)
     result = {}
     # Ignore interwiki links within nowiki tags, includeonly tags, pre tags,
     # and HTML comments
