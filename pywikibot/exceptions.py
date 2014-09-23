@@ -20,14 +20,14 @@ PageRelatedError: any exception which is caused by an operation on a Page.
   - IsNotRedirectPage: Page is not a redirect page
   - CircularRedirect: Page is a circular redirect
   - SectionError: The section specified by # does not exist
-  - LockedPage: Page is locked
-      - LockedNoPage: Title is locked against creation
-      - CascadeLockedPage: Page is locked due to cascading protection
 
 PageSaveRelatedError: page exceptions within the save operation on a Page.
   (alias: PageNotSaved)
   - SpamfilterError: MediaWiki spam filter detected a blacklisted URL
   - OtherPageSaveError: misc. other save related exception.
+  - LockedPage: Page is locked
+      - LockedNoPage: Title is locked against creation
+      - CascadeLockedPage: Page is locked due to cascading protection
   - EditConflict: Edit conflict while uploading the page
       - PageDeletedConflict: Page was deleted since being retrieved
       - PageCreatedConflict: Page was created by another user
