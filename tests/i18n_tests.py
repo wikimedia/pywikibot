@@ -218,13 +218,13 @@ class TestTWNTranslate(TestTWN):
 
     def testMultipleWrongParameterLength(self):
         """Test wrong parameter lenght."""
-        with self.assertRaisesRegexp(ValueError, "Length of parameter does not match PLURAL occurences"):
+        with self.assertRaisesRegex(ValueError, "Length of parameter does not match PLURAL occurences"):
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals', (1, 2))
                 % {'action': u'Ändere', 'line': u'drei'},
                 u'Bot: Ändere drei Zeilen von mehreren Seiten.')
 
-        with self.assertRaisesRegexp(ValueError, "Length of parameter does not match PLURAL occurences"):
+        with self.assertRaisesRegex(ValueError, "Length of parameter does not match PLURAL occurences"):
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals', ["321"])
                 % {'action': u'Ändere', 'line': u'dreihunderteinundzwanzig'},
@@ -232,19 +232,19 @@ class TestTWNTranslate(TestTWN):
 
     def testMultipleNonNumbers(self):
         """Numbers or string numbers are required for tuple or list items."""
-        with self.assertRaisesRegexp(ValueError, "invalid literal for int\(\) with base 10: 'drei'"):
+        with self.assertRaisesRegex(ValueError, "invalid literal for int\(\) with base 10: 'drei'"):
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals', ["drei", "1", 1])
                 % {'action': u'Ändere', 'line': u'drei'},
                 u'Bot: Ändere drei Zeilen von einer Seite.')
-        with self.assertRaisesRegexp(ValueError, "invalid literal for int\(\) with base 10: 'elf'"):
+        with self.assertRaisesRegex(ValueError, "invalid literal for int\(\) with base 10: 'elf'"):
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals',
                                   {'action': u'Ändere', 'line': "elf", 'page': 2}),
                 u'Bot: Ändere elf Zeilen von mehreren Seiten.')
 
     def testAllParametersExist(self):
-        with self.assertRaisesRegexp(KeyError, repr(u'line')):
+        with self.assertRaisesRegex(KeyError, repr(u'line')):
             # all parameters must be inside twntranslate
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals',

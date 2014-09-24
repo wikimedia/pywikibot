@@ -43,12 +43,12 @@ class TestSaveFailure(TestCase):
         """Test that spam in content raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
         page.text = 'http://badsite.com'
-        self.assertRaisesRegexp(SpamfilterError, 'badsite.com', page.save)
+        self.assertRaisesRegex(SpamfilterError, 'badsite.com', page.save)
 
     def test_nobots(self):
         """Test that {{nobots}} raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:John Vandenberg/nobots')
-        self.assertRaisesRegexp(OtherPageSaveError, 'nobots', page.save)
+        self.assertRaisesRegex(OtherPageSaveError, 'nobots', page.save)
 
 
 class TestActionFailure(TestCase):

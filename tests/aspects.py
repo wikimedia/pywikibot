@@ -48,13 +48,13 @@ class TestCaseBase(object):
     """Base class for all tests."""
 
     if sys.version_info[0] < 3:
-        def assertRaisesRegex(self, *args):
+        def assertRaisesRegex(self, *args, **kwargs):
             """
             Wrapper of unittest.assertRaisesRegexp for Python 2 unittest.
 
             assertRaisesRegexp is deprecated in Python 3.
             """
-            return self.assertRaisesRegexp(*args)
+            return self.assertRaisesRegexp(*args, **kwargs)
 
 
 class TestTimerMixin(TestCaseBase):

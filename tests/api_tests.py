@@ -96,7 +96,7 @@ class TestPageGenerator(TestCase):
             self.assertEqual(self.gen.limit, i)
 
     def test_wrong_limit_setting(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
                 ValueError,
                 "invalid literal for int\(\) with base 10: 'test'"):
             self.gen.set_maximum_items('test')

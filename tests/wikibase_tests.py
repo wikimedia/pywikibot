@@ -394,7 +394,7 @@ class TestItemLoad(WikidataTestCase):
         # ItemPage.fromPage should raise an exception when not lazy loading
         # and that exception should refer to the source title 'Test page'
         # not the Item being created.
-        self.assertRaisesRegexp(pywikibot.NoPage, 'Test page',
+        self.assertRaisesRegex(pywikibot.NoPage, 'Test page',
                                 pywikibot.ItemPage.fromPage,
                                 page, lazy_load=False)
 
@@ -406,7 +406,7 @@ class TestItemLoad(WikidataTestCase):
         # without a full debug log.
         # It should raise NoPage on the source page, with title 'Test page'
         # as that is what the bot operator needs to see in the log output.
-        self.assertRaisesRegexp(pywikibot.NoPage, 'Test page', item.get)
+        self.assertRaisesRegex(pywikibot.NoPage, 'Test page', item.get)
 
 
 class TestRedirects(WikidataTestCase):
@@ -851,7 +851,7 @@ class TestUnconnectedClient(TestCase):
         self.wdp = pywikibot.Page(site, self.sites[key]['page_title'])
         self.assertRaises(pywikibot.WikiBaseError,
                           pywikibot.ItemPage.fromPage, self.wdp)
-        self.assertRaisesRegexp(pywikibot.WikiBaseError,
+        self.assertRaisesRegex(pywikibot.WikiBaseError,
                                 'no transcluded data',
                                 self.wdp.data_item)
 
@@ -904,7 +904,7 @@ class TestJSON(WikidataTestCase):
             }
         }
         diff = self.wdp.toJSON(diffto=self.wdp._content)
-        self.assertEquals(diff, expected)
+        self.assertEqual(diff, expected)
 
 
 if __name__ == '__main__':
