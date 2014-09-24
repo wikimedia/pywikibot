@@ -61,7 +61,7 @@ textlib_methods = (
 
 # pep257 doesn't understand when the first entry is on the next line
 __all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
-           'Page', 'FilePage', 'ImagePage', 'Category', 'Link', 'User',
+           'Page', 'FilePage', 'Category', 'Link', 'User',
            'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
            'html2unicode', 'url2unicode', 'unicode2html',
            'stdout', 'output', 'warning', 'error', 'critical', 'debug',
@@ -542,7 +542,6 @@ getSite = Site  # alias for backwards-compability
 from .page import (
     Page,
     FilePage,
-    ImagePage,
     Category,
     Link,
     User,
@@ -714,3 +713,6 @@ _putthread = threading.Thread(target=async_manager)
 # identification for debugging purposes
 _putthread.setName('Put-Thread')
 _putthread.setDaemon(True)
+
+wrapper = pywikibot.tools.ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('ImagePage', FilePage)

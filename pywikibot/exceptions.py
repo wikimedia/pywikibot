@@ -374,6 +374,7 @@ class EntityTypeUnknownException(WikiBaseError):
     pass
 
 
-# TODO: Warn about the deprecated usage
 import pywikibot.data.api
-UploadWarning = pywikibot.data.api.UploadWarning
+import pywikibot.tools
+wrapper = pywikibot.tools.ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('UploadWarning', pywikibot.data.api.UploadWarning)

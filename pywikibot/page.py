@@ -1930,7 +1930,9 @@ class FilePage(Page):
             self, step=step, total=total, content=content)
 
 
-ImagePage = FilePage
+import pywikibot.tools
+wrapper = pywikibot.tools.ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('ImagePage', FilePage)
 
 
 class Category(Page):

@@ -425,6 +425,82 @@ def redirect_func(target, source_module=None, target_module=None,
     return Wrapper().call
 
 
+class ModuleDeprecationWrapper(object):
+
+    """A wrapper for a module to deprecate classes or variables of it."""
+
+    def __init__(self, module):
+        """
+        Initialise the wrapper.
+
+        It will automatically overwrite the module with this instance in
+        C{sys.modules}.
+
+        @param module: The module name or instance
+        @type module: str or module
+        """
+        if isinstance(module, basestring):
+            module = sys.modules[module]
+        super(ModuleDeprecationWrapper, self).__setattr__('_deprecated', {})
+        super(ModuleDeprecationWrapper, self).__setattr__('_module', module)
+        sys.modules[module.__name__] = self
+
+    def _add_deprecated_attr(self, name, replacement=None,
+                             replacement_name=None):
+        """
+        Add the name to the local deprecated names dict.
+
+        @param name: The name of the deprecated class or variable. It may not
+            be already deprecated.
+        @type name: str
+        @param replacement: The replacement value which should be returned
+            instead. If the name is already an attribute of that module this
+            must be None. If None it'll return the attribute of the module.
+        @type replacement: any
+        @param replacement_name: The name of the new replaced value. Required
+            if C{replacement} is not None and it has no __name__ attribute.
+        @type replacement_name: str
+        """
+        if '.' in name:
+            raise ValueError('Deprecated name "{0}" may not contain '
+                             '".".'.format(name))
+        if name in self._deprecated:
+            raise ValueError('Name "{0}" is already deprecated.'.format(name))
+        if replacement is not None and hasattr(self._module, name):
+            raise ValueError('Module has already an attribute named '
+                             '"{0}".'.format(name))
+        if replacement_name is None:
+            if hasattr(replacement, '__name__'):
+                replacement_name = replacement.__module__
+                if hasattr(replacement, '__self__'):
+                    replacement_name += '.'
+                    replacement_name += replacement.__self__.__class__.__name__
+                replacement_name += '.' + replacement.__name__
+            else:
+                raise TypeError('Replacement must have a __name__ attribute '
+                                'or a replacement name must be set '
+                                'specifically.')
+        self._deprecated[name] = (replacement_name, replacement)
+
+    def __setattr__(self, attr, value):
+        """Set a the value of the wrapped module."""
+        setattr(self._module, attr, value)
+
+    def __getattr__(self, attr):
+        """Return the attribute with a deprecation warning if required."""
+        if attr in self._deprecated:
+            if self._deprecated[attr][0]:
+                warning(u"{0}.{1} is DEPRECATED, use {2} instead.".format(
+                        self._module.__name__, attr,
+                        self._deprecated[attr][0]))
+                if self._deprecated[attr][1]:
+                    return self._deprecated[attr][1]
+            else:
+                warning(u"{0}.{1} is DEPRECATED.".format(
+                        self._module.__name__, attr))
+        return getattr(self._module, attr)
+
+
 if __name__ == "__main__":
     def _test():
         import doctest
