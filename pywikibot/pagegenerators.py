@@ -1483,7 +1483,7 @@ def MySQLPageGenerator(query, site=None):
             break
         if pageName:
             namespace = site.namespace(namespaceNumber)
-            pageName = unicode(pageName, site.encoding())
+            pageName = pageName.decode(site.encoding())
             if namespace:
                 pageTitle = '%s:%s' % (namespace, pageName)
             else:

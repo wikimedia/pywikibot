@@ -378,7 +378,7 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
                'newline': ("\n" if newline else "")}
 
     if decoder:
-        text = unicode(text, decoder)
+        text = text.decode(decoder)
     elif not isinstance(text, unicode):
         if not isinstance(text, str):
             # looks like text is a non-text object.
@@ -387,9 +387,9 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
             text = unicode(text)
         else:
             try:
-                text = unicode(text, 'utf-8')
+                text = text.decode('utf-8')
             except UnicodeDecodeError:
-                text = unicode(text, 'iso8859-1')
+                text = text.decode('iso8859-1')
 
     logger.log(_level, text, extra=context, **kwargs)
 
