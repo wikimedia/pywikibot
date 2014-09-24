@@ -151,6 +151,11 @@ class TestTimeStripperLanguage(TestCase):
             'match': u'3 février 2010 à 19:48 (CET) 7 février 2010 à 19:48 (CET)',
             'nomatch': u'3 March 2010 19:48 (CET) 7 March 2010 19:48 (CET)',
         },
+        'kowiki': {
+            'family': 'wikipedia',
+            'code': 'ko',
+            'match': u'2010년 2월 3일 (수) 19:48 (KST) 2010년 2월 7일 (수) 19:48 (KST)',
+        },
         'nowiki': {
             'family': 'wikipedia',
             'code': 'no',
