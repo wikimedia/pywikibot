@@ -11,10 +11,13 @@ __version__ = '$Id$'
 import sys
 import threading
 import time
+import re
 from collections import Mapping
+from distutils.version import Version
 
 if sys.version_info[0] > 2:
     import queue as Queue
+    basestring = (str,)
 else:
     import Queue
 
@@ -75,6 +78,53 @@ class ComparableMixin(object):
 
     def __ne__(self, other):
         return self._compare(other, lambda s, o: s != o)
+
+
+class MediaWikiVersion(Version):
+
+    """Version object to allow comparing 'wmf' versions with normal ones."""
+
+    MEDIAWIKI_VERSION = re.compile(r'(\d+(?:\.\d+)*)(?:wmf(\d+))?')
+
+    def parse(self, vstring):
+        version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(vstring)
+        if not version_match:
+            raise ValueError('Invalid version number')
+        components = [int(n) for n in version_match.group(1).split('.')]
+        self.wmf_version = None
+        if version_match.group(2):  # wmf version
+            self.wmf_version = int(version_match.group(2))
+        self.version = tuple(components)
+
+    def __str__(self):
+        vstring = '.'.join(str(v) for v in self.version)
+        if self.wmf_version:
+            vstring += 'wmf{0}'.format(self.wmf_version)
+        return vstring
+
+    def _cmp(self, other):
+        if isinstance(other, basestring):
+            other = MediaWikiVersion(other)
+
+        if self.version > other.version:
+            return 1
+        if self.version < other.version:
+            return -1
+        if self.wmf_version and other.wmf_version:
+            if self.wmf_version > other.wmf_version:
+                return 1
+            if self.wmf_version < other.wmf_version:
+                return -1
+            return 0
+        elif other.wmf_version:
+            return 1
+        elif self.wmf_version:
+            return -1
+        else:
+            return 0
+
+    if sys.version_info[0] == 2:
+        __cmp__ = _cmp
 
 
 class ThreadedGenerator(threading.Thread):

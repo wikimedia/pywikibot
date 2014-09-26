@@ -51,6 +51,7 @@ _cache_dir = os.path.join(_tests_dir, 'apicache')
 
 library_test_modules = [
     'date',
+    'mediawikiversion',
     'ipregex',
     'xmlreader',
     'textlib',

@@ -1043,7 +1043,7 @@ class Family(object):
     def version(self, code):
         """ Return MediaWiki version number as a string.
 
-        Use LooseVersion from distutils.version to compare version strings.
+        Use L{pywikibot.tools.MediaWikiVersion} to compare version strings.
         """
         # Here we return the latest mw release for downloading
         return '1.23.2'
@@ -1052,7 +1052,7 @@ class Family(object):
     def versionnumber(self, code):
         """ DEPRECATED, use version() instead.
 
-        Use distutils.version.LooseVersion to compare version strings.
+        Use L{pywikibot.tools.MediaWikiVersion} to compare version strings.
         Return an int identifying MediaWiki version.
 
         Currently this is implemented as returning the minor version

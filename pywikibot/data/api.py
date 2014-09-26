@@ -24,10 +24,10 @@ import pprint
 import re
 import traceback
 import time
-from distutils.version import LooseVersion as LV
 
 import pywikibot
 from pywikibot import config, login
+from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.exceptions import Server504Error, FatalServerError, Error
 
 import sys

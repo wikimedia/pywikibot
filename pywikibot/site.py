@@ -18,7 +18,6 @@ import itertools
 import os
 import re
 import sys
-from distutils.version import LooseVersion as LV
 from collections import Iterable, Container, namedtuple
 import threading
 import time
@@ -30,6 +29,7 @@ import pywikibot.family
 from pywikibot.tools import (
     itergroup, deprecated, deprecate_arg, UnicodeMixin, ComparableMixin,
 )
+from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -1977,7 +1977,7 @@ class APISite(BaseSite):
         Return live project version number as a string.
 
         This overwrites the corresponding family method for APISite class. Use
-        LooseVersion from distutils.version to compare versions.
+        L{pywikibot.tools.MediaWikiVersion} to compare MediaWiki versions.
         """
         try:
             version = self.siteinfo.get('generator', expiry=1).split(' ')[1]

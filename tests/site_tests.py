@@ -9,12 +9,12 @@ __version__ = '$Id$'
 
 
 import sys
-from distutils.version import LooseVersion as LV
 from collections import Iterable
 from datetime import datetime
 import re
 
 import pywikibot
+from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.data import api
 from tests.aspects import (
     unittest, TestCase,

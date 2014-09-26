@@ -74,7 +74,7 @@ __version__ = '$Id$'
 #
 
 import re
-from distutils.version import LooseVersion as LV
+from pywikibot.tools import MediaWikiVersion as LV
 import pywikibot
 import isbn
 from pywikibot import config, i18n, textlib, pagegenerators, Bot
