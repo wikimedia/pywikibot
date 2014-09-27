@@ -36,15 +36,15 @@ from pywikibot.family import Family
 
 TEMP_REGEX = re.compile(
     '{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')
-NON_LATIN_DIGITS = [
-    u'٠١٢٣٤٥٦٧٨٩',  # ckb
-    u'۰۱۲۳۴۵۶۷۸۹',  # fa
-    u'೦೧೨೩೪೫೬೭೮೯',  # kn
-    u'०१२३४५६७८९',  # hi and some other
-    u'০১২৩৪৫৬৭৮৯',  # bn
-    u'૦૧૨૩૪૫૬૭૮૯',  # gu
-    u'୦୧୨୩୪୫୬୭୮୯',  # or
-]
+NON_LATIN_DIGITS = {
+    'ckb': u'٠١٢٣٤٥٦٧٨٩',
+    'fa': u'۰۱۲۳۴۵۶۷۸۹',
+    'kn': u'೦೧೨೩೪೫೬೭೮೯',
+    'hi': u'०१२३४५६७८९',
+    'bn': u'০১২৩৪৫৬৭৮৯',
+    'gu': u'૦૧૨૩૪૫૬૭૮૯',
+    'or': u'୦୧୨୩୪୫୬୭୮୯',
+}
 
 
 def unescape(s):
@@ -1254,7 +1254,7 @@ class TimeStripper(object):
 
     def fix_digits(self, line):
         """Make non-latin digits like Persian to latin to parse."""
-        for system in NON_LATIN_DIGITS:
+        for system in NON_LATIN_DIGITS.values():
             for i in range(0, 10):
                 line = line.replace(system[i], str(i))
         return line
