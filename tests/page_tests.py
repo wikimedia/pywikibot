@@ -452,6 +452,25 @@ class TestPageObject(DefaultSiteTestCase):
         s = repr(page)
         self.assertIsInstance(s, str)
 
+    def test_redirect(self):
+        """Test that the redirect option is set correctly."""
+        mysite = self.get_site()
+        for page in mysite.allpages(filterredir=True, total=1):
+            break
+        else:
+            unittest.SkipTest('No redirect pages on site {0!r}'.format(mysite))
+        # This page is already initialised
+        self.assertTrue(hasattr(page, '_isredir'))
+        # call api.update_page without prop=info
+        del page._isredir
+        page.isDisambig()
+        self.assertTrue(page.isRedirectPage())
+
+        page_copy = pywikibot.Page(mysite, page.title())
+        self.assertFalse(hasattr(page_copy, '_isredir'))
+        page_copy.isDisambig()
+        self.assertTrue(page_copy.isRedirectPage())
+
 # methods that still need tests implemented or expanded:
 
 #    def autoFormat(self):

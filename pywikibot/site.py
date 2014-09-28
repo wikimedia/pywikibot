@@ -2071,6 +2071,16 @@ class APISite(BaseSite):
         except api.APIError:  # May occur if you are not logged in (no API read permissions).
             return (0, 0, 0)
 
+    def _update_page(self, page, query, method_name):
+        for pageitem in query:
+            if not self.sametitle(pageitem['title'],
+                                  page.title(withSection=False)):
+                pywikibot.warning(
+                    u"{0}: Query on {1} returned data on '{2}'".format(
+                    method_name, page, pageitem['title']))
+                continue
+            api.update_page(page, pageitem, query.props)
+
     def loadpageinfo(self, page, preload=False):
         """Load page info from api and store in page attributes."""
         title = page.title(withSection=False)
@@ -2082,14 +2092,7 @@ class APISite(BaseSite):
                                 type_arg="info",
                                 titles=title.encode(self.encoding()),
                                 inprop=inprop)
-
-        for pageitem in query:
-            if not self.sametitle(pageitem['title'], title):
-                pywikibot.warning(
-                    u"loadpageinfo: Query on %s returned data on '%s'"
-                    % (page, pageitem['title']))
-                continue
-            api.update_page(page, pageitem)
+        self._update_page(page, query, 'loadpageinfo')
 
     def loadcoordinfo(self, page):
         """Load [[mw:Extension:GeoData]] info."""
@@ -2101,13 +2104,7 @@ class APISite(BaseSite):
                                         'country', 'region',
                                         'globe'],
                                 coprimary='all')
-        for pageitem in query:
-            if not self.sametitle(pageitem['title'], title):
-                pywikibot.warning(
-                    u"loadcoordinfo: Query on %s returned data on '%s'"
-                    % (page, pageitem['title']))
-                continue
-            api.update_page(page, pageitem)
+        self._update_page(page, query, 'loadcoordinfo')
 
     def loadpageprops(self, page):
         title = page.title(withSection=False)
@@ -2115,13 +2112,7 @@ class APISite(BaseSite):
                                 type_arg="pageprops",
                                 titles=title.encode(self.encoding()),
                                 )
-        for pageitem in query:
-            if not self.sametitle(pageitem['title'], title):
-                pywikibot.warning(
-                    u"loadpageprops: Query on %s returned data on '%s'"
-                    % (page, pageitem['title']))
-                continue
-            api.update_page(page, pageitem)
+        self._update_page(page, query, 'loadpageprops')
 
     def loadimageinfo(self, page, history=False):
         """Load image info from api and save in page attributes.
@@ -2144,7 +2135,7 @@ class APISite(BaseSite):
                 raise Error(
                     u"loadimageinfo: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
-            api.update_page(page, pageitem)
+            api.update_page(page, pageitem, query.props)
             if "imageinfo" not in pageitem:
                 if "missing" in pageitem:
                     raise NoPage(page)
@@ -2166,13 +2157,7 @@ class APISite(BaseSite):
                                 type_arg="flowinfo",
                                 titles=title.encode(self.encoding()),
                                 )
-        for pageitem in query:
-            if not self.sametitle(pageitem['title'], title):
-                pywikibot.warning(
-                    u"loadflowinfo: Query on %s returned data on '%s'"
-                    % (page, pageitem['title']))
-                continue
-            api.update_page(page, pageitem)
+        self._update_page(page, query, 'loadflowinfo')
 
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
@@ -2252,7 +2237,7 @@ class APISite(BaseSite):
         # there should be only one value in 'pages', and it is the target
         if self.sametitle(pagedata['title'], target_title):
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
-            api.update_page(target, pagedata)
+            api.update_page(target, pagedata, ['info'])
             page._redirtarget = target
         else:
             # double redirect; target is an intermediate redirect
@@ -2320,7 +2305,7 @@ class APISite(BaseSite):
                     pywikibot.debug(u"titles=%s" % list(cache.keys()), _logger)
                     continue
                 page = cache[pagedata['title']]
-                api.update_page(page, pagedata)
+                api.update_page(page, pagedata, rvgen.props)
                 yield page
 
     def validate_tokens(self, types):
@@ -2819,7 +2804,7 @@ class APISite(BaseSite):
                     % (page, pagedata['title']))
             if "missing" in pagedata:
                 raise NoPage(page)
-            api.update_page(page, pagedata)
+            api.update_page(page, pagedata, rvgen.props)
 
     def pageinterwiki(self, page):
         # No such function in the API (this method isn't called anywhere)
@@ -2876,12 +2861,7 @@ class APISite(BaseSite):
         ciquery = self._generator(api.PropertyGenerator,
                                   type_arg="categoryinfo",
                                   titles=cititle.encode(self.encoding()))
-        for pageitem in ciquery:
-            if not self.sametitle(pageitem['title'], cititle):
-                raise Error(
-                    u"categoryinfo: Query on %s returned data on '%s'"
-                    % (category, pageitem['title']))
-            api.update_page(category, pageitem)
+        self._update_page(category, ciquery, 'categoryinfo')
 
     def categoryinfo(self, category):
         if not hasattr(category, "_catinfo"):
