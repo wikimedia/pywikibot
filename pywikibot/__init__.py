@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-The initialization file for the Pywikibot framework.
-"""
+"""The initialization file for the Pywikibot framework."""
 #
 # (C) Pywikibot team, 2008-2013
 #
@@ -66,7 +64,8 @@ __all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
            'Page', 'FilePage', 'ImagePage', 'Category', 'Link', 'User',
            'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
            'html2unicode', 'url2unicode', 'unicode2html',
-           'stdout', 'output', 'warning', 'error', 'critical', 'debug', 'exception',
+           'stdout', 'output', 'warning', 'error', 'critical', 'debug',
+           'exception',
            'input', 'inputChoice', 'handleArgs', 'showHelp', 'ui', 'log',
            'calledModuleName', 'Bot', 'WikidataBot',
            'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
@@ -114,6 +113,7 @@ class Timestamp(datetime.datetime):
     than using Timestamp.utcnow().
 
     """
+
     mediawikiTSFormat = "%Y%m%d%H%M%S"
     ISO8601Format = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -226,7 +226,9 @@ class Coordinate(object):
         FIXME: Should this be in the DataSite object?
         """
         if self.globe not in self.site.globes():
-            raise CoordinateGlobeUnknownException(u"%s is not supported in Wikibase yet." % self.globe)
+            raise CoordinateGlobeUnknownException(
+                u"%s is not supported in Wikibase yet."
+                % self.globe)
         return {'latitude': self.lat,
                 'longitude': self.lon,
                 'altitude': self.alt,
@@ -254,25 +256,29 @@ class Coordinate(object):
 
     @property
     def precision(self):
-        """
+        u"""
         Return the precision of the geo coordinate.
 
-        The biggest error (in degrees) will be given by the longitudinal error - the same error in meters becomes larger
-        (in degrees) further up north. We can thus ignore the latitudinal error.
+        The biggest error (in degrees) will be given by the longitudinal error;
+        the same error in meters becomes larger (in degrees) further up north.
+        We can thus ignore the latitudinal error.
 
         The longitudinal can be derived as follows:
 
         In small angle approximation (and thus in radians):
 
-        Δλ ≈ Δpos / r_φ, where r_φ is the radius of earth at the given latitude. Δλ is the error in longitude.
+        Δλ ≈ Δpos / r_φ, where r_φ is the radius of earth at the given latitude.
+        Δλ is the error in longitude.
 
-           r_φ = r cos φ, where r is the radius of earth, φ the latitude
+            r_φ = r cos φ, where r is the radius of earth, φ the latitude
 
-        Therefore: precision = math.degrees( self._dim / ( radius * math.cos( math.radians( self.lat ) ) ) )
+        Therefore:
+        precision = math.degrees(self._dim/(radius*math.cos(math.radians(self.lat))))
         """
         if not self._precision:
             radius = 6378137  # TODO: Support other globes
-            self._precision = math.degrees(self._dim / (radius * math.cos(math.radians(self.lat))))
+            self._precision = math.degrees(
+                self._dim / (radius * math.cos(math.radians(self.lat))))
         return self._precision
 
     def precisionToDim(self):
@@ -282,13 +288,31 @@ class Coordinate(object):
 
 class WbTime(object):
 
-    """ A Wikibase time representation"""
+    """A Wikibase time representation."""
 
-    PRECISION = {'1000000000': 0, '100000000': 1, '10000000': 2, '1000000': 3, '100000': 4, '10000': 5, 'millenia': 6, 'century': 7, 'decade': 8, 'year': 9, 'month': 10, 'day': 11, 'hour': 12, 'minute': 13, 'second': 14}
+    PRECISION = {'1000000000': 0,
+                 '100000000': 1,
+                 '10000000': 2,
+                 '1000000': 3,
+                 '100000': 4,
+                 '10000': 5,
+                 'millenia': 6,
+                 'century': 7,
+                 'decade': 8,
+                 'year': 9,
+                 'month': 10,
+                 'day': 11,
+                 'hour': 12,
+                 'minute': 13,
+                 'second': 14
+                 }
+
     FORMATSTR = '{0:+012d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
-    def __init__(self, year=None, month=None, day=None, hour=None, minute=None, second=None, precision=None, before=0,
-                 after=0, timezone=0, calendarmodel=None, site=None):
+    def __init__(self, year=None, month=None, day=None,
+                 hour=None, minute=None, second=None,
+                 precision=None, before=0, after=0,
+                 timezone=0, calendarmodel=None, site=None):
         """
         Create a new WbTime object.
 
@@ -331,7 +355,8 @@ class WbTime(object):
 
         # if precision is given it overwrites the autodetection above
         if precision is not None:
-            if isinstance(precision, int) and precision in self.PRECISION.values():
+            if (isinstance(precision, int) and
+                    precision in self.PRECISION.values()):
                 self.precision = precision
             elif precision in self.PRECISION:
                 self.precision = self.PRECISION[precision]
@@ -341,11 +366,13 @@ class WbTime(object):
     @staticmethod
     def fromTimestr(datetimestr, precision=14, before=0, after=0, timezone=0,
                     calendarmodel=None, site=None):
-        match = re.match('([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z', datetimestr)
+        match = re.match('([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
+                         datetimestr)
         if not match:
             raise ValueError(u"Invalid format: '%s'" % datetimestr)
         t = match.groups()
-        return WbTime(long(t[0]), int(t[1]), int(t[2]), int(t[3]), int(t[4]), int(t[5]),
+        return WbTime(long(t[0]), int(t[1]), int(t[2]),
+                      int(t[3]), int(t[4]), int(t[5]),
                       precision, before, after, timezone, calendarmodel, site)
 
     def toTimestr(self):
@@ -374,8 +401,9 @@ class WbTime(object):
 
     @staticmethod
     def fromWikibase(ts):
-        return WbTime.fromTimestr(ts[u'time'], ts[u'precision'], ts[u'before'], ts[u'after'], ts[u'timezone'],
-                                  ts[u'calendarmodel'])
+        return WbTime.fromTimestr(ts[u'time'], ts[u'precision'],
+                                  ts[u'before'], ts[u'after'],
+                                  ts[u'timezone'], ts[u'calendarmodel'])
 
     def __str__(self):
         return json.dumps(self.toWikibase(), indent=4, sort_keys=True,
@@ -388,7 +416,8 @@ class WbTime(object):
         return u"WbTime(year=%(year)d, month=%(month)d, day=%(day)d, " \
             u"hour=%(hour)d, minute=%(minute)d, second=%(second)d, " \
             u"precision=%(precision)d, before=%(before)d, after=%(after)d, " \
-            u"timezone=%(timezone)d, calendarmodel='%(calendarmodel)s')" % self.__dict__
+            u"timezone=%(timezone)d, calendarmodel='%(calendarmodel)s')" \
+            % self.__dict__
 
 
 class WbQuantity(object):
@@ -409,7 +438,8 @@ class WbQuantity(object):
         if amount is None:
             raise ValueError('no amount given')
         if unit is not None and unit != '1':
-            raise NotImplementedError('Currently only unit-less quantities are supported')
+            raise NotImplementedError(
+                'Currently only unit-less quantities are supported')
         if unit is None:
             unit = '1'
         self.amount = amount
@@ -423,9 +453,7 @@ class WbQuantity(object):
         self.lowerBound = self.amount - lowerError
 
     def toWikibase(self):
-        """
-        Convert the data to a JSON object for the Wikibase API.
-        """
+        """Convert the data to a JSON object for the Wikibase API."""
         json = {'amount': self.amount,
                 'upperBound': self.upperBound,
                 'lowerBound': self.lowerBound,
@@ -511,7 +539,17 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
 getSite = Site  # alias for backwards-compability
 
 
-from .page import Page, FilePage, ImagePage, Category, Link, User, ItemPage, PropertyPage, Claim
+from .page import (
+    Page,
+    FilePage,
+    ImagePage,
+    Category,
+    Link,
+    User,
+    ItemPage,
+    PropertyPage,
+    Claim,
+)
 from .page import html2unicode, url2unicode, unicode2html
 
 
@@ -520,7 +558,7 @@ link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 @pywikibot.tools.deprecated("comment parameter for page saving method")
 def setAction(s):
-    """Set a summary to use for changed page submissions"""
+    """Set a summary to use for changed page submissions."""
     config.default_edit_summary = s
 
 
