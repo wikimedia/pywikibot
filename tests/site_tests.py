@@ -20,6 +20,8 @@ from tests.aspects import (
     unittest, TestCase,
     DefaultSiteTestCase,
     WikimediaDefaultSiteTestCase,
+    WikidataTestCase,
+    DefaultWikidataClientTestCase,
 )
 
 if sys.version_info[0] > 2:
@@ -267,19 +269,6 @@ class TestSiteObject(DefaultSiteTestCase):
             count += 1
             if count >= 5:
                 break
-
-    def testItemPreload(self):
-        """Test that ItemPage preloading works."""
-        mysite = self.get_site()
-        if not mysite.has_data_repository:
-            raise unittest.SkipTest('%s does not have a data repository'
-                                    % mysite)
-
-        datasite = mysite.data_repository()
-
-        items = [pywikibot.ItemPage(datasite, 'q' + str(num)) for num in range(1, 6)]
-        for page in datasite.preloaditempages(items):
-            self.assertTrue(hasattr(page, '_content'))
 
     def testLinkMethods(self):
         """Test site methods for getting links to and from a page."""
@@ -1436,6 +1425,55 @@ class TestUploadEnabledSite(TestCase):
     def test_is_uploaddisabled_wd(self):
         site = self.get_site('wikidatatest')
         self.assertTrue(site.is_uploaddisabled())
+
+
+class TestDataSitePreloading(WikidataTestCase):
+
+    """Test DataSite.preloaditempages for repo pages."""
+
+    def test_item(self):
+        """Test that ItemPage preloading works for Item objects."""
+        datasite = self.get_repo()
+        items = [pywikibot.ItemPage(datasite, 'q' + str(num))
+                 for num in range(1, 6)]
+
+        seen = []
+        for item in datasite.preloaditempages(items):
+            self.assertIsInstance(item, pywikibot.ItemPage)
+            self.assertTrue(hasattr(item, '_content'))
+            self.assertNotIn(item, seen)
+            seen.append(item)
+        self.assertEqual(len(seen), 5)
+
+    def test_item_as_page(self):
+        """Test that ItemPage preloading works for Page objects."""
+        site = self.get_site()
+        datasite = self.get_repo()
+        pages = [pywikibot.Page(site, 'q' + str(num))
+                 for num in range(1, 6)]
+
+        seen = []
+        for item in datasite.preloaditempages(pages):
+            self.assertIsInstance(item, pywikibot.ItemPage)
+            self.assertTrue(hasattr(item, '_content'))
+            self.assertNotIn(item, seen)
+            seen.append(item)
+        self.assertEqual(len(seen), 5)
+
+
+class TestDataSiteClientPreloading(DefaultWikidataClientTestCase):
+
+    """Test DataSite.preloaditempages for client pages."""
+
+    def test_non_item(self):
+        """Test that ItemPage preloading works with Page generator."""
+        mainpage = self.get_mainpage()
+        datasite = self.get_repo()
+
+        item = next(datasite.preloaditempages([mainpage]))
+        self.assertIsInstance(item, pywikibot.ItemPage)
+        self.assertTrue(hasattr(item, '_content'))
+        self.assertEqual(item.id, 'Q5296')
 
 
 if __name__ == '__main__':

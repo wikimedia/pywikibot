@@ -4812,16 +4812,26 @@ class DataSite(APISite):
         Note that pages will be iterated in a different order
         than in the underlying pagelist.
 
-        @param pagelist: an iterable that yields ItemPage objects
+        @param pagelist: an iterable that yields either WikibasePage objects,
+                         or Page objects linked to an ItemPage.
         @param groupsize: how many pages to query at a time
         @type groupsize: int
         """
         for sublist in itergroup(pagelist, groupsize):
             req = {'ids': [], 'titles': [], 'sites': []}
             for p in sublist:
-                ident = p._defined_by()
-                for key in ident:
-                    req[key].append(ident[key])
+                if isinstance(p, pywikibot.page.WikibasePage):
+                    ident = p._defined_by()
+                    for key in ident:
+                        req[key].append(ident[key])
+                else:
+                    assert(p.site.has_data_repository)
+                    if (p.site == p.site.data_repository() and
+                            p.namespace() == p.data_repository.item_namespace):
+                        req['ids'].append(p.title(withNamespace=False))
+                    else:
+                        req['sites'].append(p.site.dbName())
+                        req['titles'].append(p._link._text)
 
             req = api.Request(site=self, action='wbgetentities', **req)
             data = req.submit()
