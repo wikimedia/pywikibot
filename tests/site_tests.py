@@ -218,7 +218,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertIsInstance(mysite.getcurrenttime(), pywikibot.Timestamp)
         ts = mysite.getcurrenttimestamp()
         self.assertIsInstance(ts, basestring)
-        self.assertRegexpMatches(ts, r'(19|20)\d\d[0-1]\d[0-3]\d[0-2]\d[0-5]\d[0-5]\d')
+        self.assertRegex(ts, r'(19|20)\d\d[0-1]\d[0-3]\d[0-2]\d[0-5]\d[0-5]\d')
 
         self.assertIsInstance(mysite.siteinfo, pywikibot.site.Siteinfo)
         self.assertIsInstance(mysite.months_names, list)
@@ -1104,7 +1104,7 @@ class TestSiteTokens(DefaultSiteTestCase):
             try:
                 token = self.mysite.tokens[ttype]
             except pywikibot.Error as error_msg:
-                self.assertRegexpMatches(
+                self.assertRegex(
                     unicode(error_msg),
                     "Action '[a-z]+' is not allowed for user .* on .* wiki.")
             else:
@@ -1193,7 +1193,7 @@ class TestSiteInfo(WikimediaDefaultSiteTestCase):
         self.assertIsInstance(mysite.siteinfo['timeoffset'], (int, float))
         self.assertTrue(-12 * 60 <= mysite.siteinfo['timeoffset'] <= +14 * 60)
         self.assertEqual(mysite.siteinfo['timeoffset'] % 15, 0)
-        self.assertRegexpMatches(mysite.siteinfo['timezone'], "([A-Z]{3,4}|[A-Z][a-z]+/[A-Z][a-z]+)")
+        self.assertRegex(mysite.siteinfo['timezone'], "([A-Z]{3,4}|[A-Z][a-z]+/[A-Z][a-z]+)")
         self.assertIsInstance(datetime.strptime(mysite.siteinfo['time'], "%Y-%m-%dT%H:%M:%SZ"), datetime)
         self.assertGreater(mysite.siteinfo['maxuploadsize'], 0)
         self.assertIn(mysite.case(), ["first-letter", "case-sensitive"])

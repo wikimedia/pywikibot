@@ -56,6 +56,14 @@ class TestCaseBase(object):
             """
             return self.assertRaisesRegexp(*args, **kwargs)
 
+        def assertRegex(self, *args, **kwargs):
+            """
+            Wrapper of unittest.assertRegexpMatches for Python 2 unittest.
+
+            assertRegexpMatches is deprecated in Python 3.
+            """
+            return self.assertRegexpMatches(*args, **kwargs)
+
 
 class TestTimerMixin(TestCaseBase):
 
