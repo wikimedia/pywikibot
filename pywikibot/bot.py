@@ -690,6 +690,7 @@ def handleArgs(*args):
 
 
 def showHelp(module_name=None):
+    """Show help for the Bot."""
     if not module_name:
         module_name = calledModuleName()
     if not module_name:
@@ -844,6 +845,7 @@ class Bot(object):
 
     @property
     def current_page(self):
+        """Return the current working page as a property."""
         return self._current_page
 
     @current_page.setter
