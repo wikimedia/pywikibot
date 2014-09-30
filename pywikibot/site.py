@@ -28,6 +28,7 @@ import pywikibot
 import pywikibot.family
 from pywikibot.tools import (
     itergroup, deprecated, deprecate_arg, UnicodeMixin, ComparableMixin,
+    redirect_func,
 )
 from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.throttle import Throttle
@@ -105,10 +106,9 @@ class LoginStatus(object):
         return 'LoginStatus(%s)' % (LoginStatus.name(self.state))
 
 
-Family = pywikibot.tools.redirect_func(pywikibot.family.Family.load,
-                                       'pywikibot.site',
-                                       'pywikibot.family.Family',
-                                       'Family')
+Family = redirect_func(pywikibot.family.Family.load,
+                       target_module='pywikibot.family.Family',
+                       old_name='Family')
 
 
 class Namespace(Iterable, ComparableMixin, UnicodeMixin):
@@ -549,7 +549,9 @@ class BaseSite(ComparableMixin):
                                      for name in self.namespaces()[ns]]:
                 return ns
 
-    getNamespaceIndex = ns_index  # for backwards-compatibility
+    # for backwards-compatibility
+    getNamespaceIndex = redirect_func(ns_index, old_name='getNamespaceIndex',
+                                      class_name='BaseSite')
 
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
@@ -568,7 +570,10 @@ class BaseSite(ComparableMixin):
         index = self.ns_index(value)
         return self.namespace(index)
 
-    normalizeNamespace = ns_normalize  # for backwards-compatibility
+    # for backwards-compatibility
+    normalizeNamespace = redirect_func(ns_normalize,
+                                       old_name='normalizeNamespace',
+                                       class_name='BaseSite')
 
     def redirect(self, default=True):
         """Return list of localized redirect tags for the site.
@@ -1435,7 +1440,9 @@ class APISite(BaseSite):
         else:
             self._loginstatus = LoginStatus.NOT_LOGGED_IN  # failure
 
-    forceLogin = login  # alias for backward-compatibility
+    # alias for backward-compatibility
+    forceLogin = redirect_func(login, old_name='forceLogin',
+                               class_name='APISite')
 
     def logout(self):
         """ Logout of the site and load details for the logged out user.

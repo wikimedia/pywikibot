@@ -372,7 +372,7 @@ u"%(old_arg)s argument of %(meth_name)s is deprecated."
 
 
 def redirect_func(target, source_module=None, target_module=None,
-                  old_name=None):
+                  old_name=None, class_name=None):
     """
     Return a function which can be used to redirect to 'target'.
 
@@ -392,27 +392,17 @@ def redirect_func(target, source_module=None, target_module=None,
     @param old_name: The old function name. If None it uses the name of the
         new function.
     @type old_name: basestring
+    @param class_name: The name of the class. It's added to the target and
+        source module (separated by a '.').
+    @type class_name: basestring
     @return: A new function which adds a warning prior to each execution.
     @rtype: callable
     """
-    class Wrapper(object):
-        def __init__(self):
-            self._function = target
-            self.parameters = {'new': target.__name__,
-                               'old': old_name or target.__name__,
-                               'target': target_module,
-                               'source': source_module}
-            self.warning = ('{source}{old} is DEPRECATED, use {target}{new} '
-                            'instead.').format(**self.parameters)
-
-        def call(self, *a, **kw):
-            warning(self.warning)
-            return self._function(*a, **kw)
-
+    def call(*a, **kw):
+        warning(warn_message)
+        return target(*a, **kw)
     if target_module is None:
         target_module = target.__module__
-        if hasattr(target, '__self__'):
-            target_module += '.' + target.__self__.__class__.__name__
     if target_module and target_module[-1] != '.':
         target_module += '.'
     if source_module is '.':
@@ -420,9 +410,16 @@ def redirect_func(target, source_module=None, target_module=None,
     elif source_module and source_module[-1] != '.':
         source_module += '.'
     else:
-        source_module = (sys._getframe(1).f_code.co_filename.rsplit("/", 1)[0]
-                         .replace("/", ".") + ".")
-    return Wrapper().call
+        source_module = sys._getframe(1).f_globals['__name__'] + '.'
+    if class_name:
+        target_module += class_name + '.'
+        source_module += class_name + '.'
+    warn_message = ('{source}{old} is DEPRECATED, use {target}{new} '
+                    'instead.').format(new=target.__name__,
+                                       old=old_name or target.__name__,
+                                       target=target_module,
+                                       source=source_module)
+    return call
 
 
 class ModuleDeprecationWrapper(object):
