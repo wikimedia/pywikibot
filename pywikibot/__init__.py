@@ -528,7 +528,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
         __Site = getattr(tmp, interface)
     except ImportError:
         raise ValueError("Invalid interface name '%(interface)s'" % locals())
-    key = '%s:%s:%s' % (fam, code, user)
+    key = '%s:%s:%s:%s' % (interface, fam, code, user)
     if key not in _sites or not isinstance(_sites[key], __Site):
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
         debug(u"Instantiating Site object '%(site)s'"
