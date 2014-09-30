@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
-"""
+r"""
 Print a list of pages, as defined by page generator parameters.
+
 Optionally, it also prints page content to STDOUT.
 
 These parameters are supported to specify which pages titles to print:
@@ -110,8 +111,7 @@ class Formatter(object):
             is found when outputlang is not None.
 
         """
-
-        self.site = page._link._site
+        self.site = page._link.site
         self.title = page._link.title
         self.loc_title = page._link.canonical_title()
         self.can_title = page._link.ns_title()
@@ -142,6 +142,7 @@ class Formatter(object):
 
 
 def main(*args):
+    """Main function."""
     gen = None
     notitle = False
     fmt = '1'
