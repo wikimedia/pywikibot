@@ -69,7 +69,7 @@ if console_encoding is None or sys.platform == 'cygwin':
     console_encoding = "iso-8859-1"
 
 
-def listchoice(clist=[], message=None, default=None):
+def listchoice(clist, message=None, default=None):
     if not message:
         message = u"Select"
 
@@ -89,16 +89,17 @@ def listchoice(clist=[], message=None, default=None):
         try:
             choice = int(choice)
         except ValueError:
-            pass
-        if isinstance(choice, basestring):
+            # User typed choice name
             if choice not in clist:
                 print("Invalid response")
+                continue
             else:
                 return choice
-        try:
-            return clist[int(choice) - 1]
-        except:
-            if not isinstance(choice, basestring):
+
+        # User typed choice number
+        if 1 <= choice <= len(clist):
+                return clist[choice - 1]
+        else:
                 print("Invalid response")
 
 
