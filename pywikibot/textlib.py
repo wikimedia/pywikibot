@@ -39,12 +39,32 @@ TEMP_REGEX = re.compile(
 NON_LATIN_DIGITS = {
     'ckb': u'٠١٢٣٤٥٦٧٨٩',
     'fa': u'۰۱۲۳۴۵۶۷۸۹',
+    'km': u'០១២៣៤៥៦៧៨៩',
     'kn': u'೦೧೨೩೪೫೬೭೮೯',
-    'hi': u'०१२३४५६७८९',
     'bn': u'০১২৩৪৫৬৭৮৯',
     'gu': u'૦૧૨૩૪૫૬૭૮૯',
     'or': u'୦୧୨୩୪୫୬୭୮୯',
 }
+
+
+def to_local_digits(phrase, lang):
+    """
+    Change Latin digits based on language to localized version.
+
+    Be aware that this function only returns for several language
+    And doesn't touch the input if other languages are asked.
+    @param phrase: The phrase to convert to localized numerical
+    @param lang: language code
+    @return: The localized version
+    @rtype: unicode
+    """
+    digits = NON_LATIN_DIGITS.get(lang)
+    if not digits:
+        return phrase
+    phrase = u"%s" % phrase
+    for i in range(10):
+        phrase = phrase.replace(str(i), digits[i])
+    return phrase
 
 
 def unescape(s):
