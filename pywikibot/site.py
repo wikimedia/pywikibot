@@ -4306,8 +4306,7 @@ class APISite(BaseSite):
                 "User '%s' does not have upload rights on site %s."
                 % (self.user(), self))
         # check for required parameters
-        if (source_filename and source_url)\
-                or (source_filename is None and source_url is None):
+        if bool(source_filename) == bool(source_url):
             raise ValueError("APISite.upload: must provide either "
                              "source_filename or source_url, not both.")
         if comment is None:
@@ -4353,7 +4352,7 @@ class APISite(BaseSite):
                             if error.code == u'uploaddisabled':
                                 self._uploaddisabled = True
                             raise error
-                        if 'warnings' in data:
+                        if 'warnings' in data and not ignore_warnings:
                             result = data
                             break
                         file_key = data['filekey']
@@ -4400,7 +4399,8 @@ class APISite(BaseSite):
             result = result["upload"]
             pywikibot.debug(result, _logger)
 
-        if "warnings" in result:
+        if "warnings" in result and not ignore_warnings:
+            #TODO: Handle multiple warnings at the same time
             warning = list(result["warnings"].keys())[0]
             message = result["warnings"][warning]
             raise pywikibot.UploadWarning(warning, upload_warnings[warning]

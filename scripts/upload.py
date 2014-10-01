@@ -273,7 +273,7 @@ class UploadRobot:
                 answer = pywikibot.inputChoice(u"Do you want to ignore?",
                                                ['Yes', 'No'], ['y', 'N'], 'N')
             if answer == "y":
-                self.ignoreWarning = 1
+                self.ignoreWarning = True
                 self.keepFilename = True
                 return self.upload_image(debug)
             else:
