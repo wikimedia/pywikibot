@@ -23,6 +23,7 @@ class TextEditor(object):
     """Text editor."""
 
     def command(self, tempFilename, text, jumpIndex=None):
+        """Return editor selected in user-config.py."""
         command = config.editor
         if jumpIndex:
             # Some editors make it possible to mark occurences of substrings,
@@ -56,12 +57,14 @@ class TextEditor(object):
         return command
 
     def convertLinebreaks(self, text):
+        """Convert line-breaks."""
         if sys.platform == 'win32':
             return text.replace('\r\n', '\n')
         # TODO: Mac OS handling
         return text
 
     def restoreLinebreaks(self, text):
+        """Restore line-breaks."""
         if text is None:
             return
         if sys.platform == 'win32':
@@ -87,7 +90,7 @@ class TextEditor(object):
         if config.editor:
             tempFilename = '%s.%s' % (tempfile.mktemp(),
                                       config.editor_filename_extension)
-            tempFile = open(tempFilename, 'w')
+            tempFile = open(tempFilename, 'wb')
             tempFile.write(text.encode(config.editor_encoding))
             tempFile.close()
             creationDate = os.stat(tempFilename).st_mtime
@@ -98,7 +101,7 @@ class TextEditor(object):
                 # Nothing changed
                 return None
             else:
-                newcontent = open(tempFilename).read().decode(config.editor_encoding)
+                newcontent = open(tempFilename, 'rb').read().decode(config.editor_encoding)
                 os.unlink(tempFilename)
                 return self.restoreLinebreaks(newcontent)
         else:
