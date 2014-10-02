@@ -18,7 +18,7 @@ class Family(family.WikimediaFamily):
         self.name = 'wikivoyage'
         self.languages_by_size = [
             'en', 'de', 'fr', 'it', 'pt', 'nl', 'pl', 'ru', 'es', 'vi', 'sv',
-            'zh', 'he', 'ro', 'uk', 'el',
+            'zh', 'he', 'ro', 'uk', 'el', 'fa'
         ]
 
         self.langs = dict([(lang, '%s.wikivoyage.org' % lang)
