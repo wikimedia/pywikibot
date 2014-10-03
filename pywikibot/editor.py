@@ -14,6 +14,7 @@ __version__ = "$Id$"
 import sys
 import os
 import tempfile
+import codecs
 import pywikibot
 from pywikibot import config
 
@@ -90,9 +91,9 @@ class TextEditor(object):
         if config.editor:
             tempFilename = '%s.%s' % (tempfile.mktemp(),
                                       config.editor_filename_extension)
-            tempFile = open(tempFilename, 'wb')
-            tempFile.write(text.encode(config.editor_encoding))
-            tempFile.close()
+            with codecs.open(tempFilename, 'w',
+                             encoding=config.editor_encoding) as tempFile:
+                tempFile.write(text)
             creationDate = os.stat(tempFilename).st_mtime
             command = self.command(tempFilename, text, jumpIndex)
             os.system(command)
@@ -101,7 +102,9 @@ class TextEditor(object):
                 # Nothing changed
                 return None
             else:
-                newcontent = open(tempFilename, 'rb').read().decode(config.editor_encoding)
+                with codecs.open(tempFilename, 'r',
+                                 encoding=config.editor_encoding) as temp_file:
+                    newcontent = temp_file.read()
                 os.unlink(tempFilename)
                 return self.restoreLinebreaks(newcontent)
         else:
