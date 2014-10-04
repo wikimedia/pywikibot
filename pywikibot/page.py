@@ -4512,7 +4512,7 @@ def url2unicode(title, encodings='utf-8'):
         try:
             t = title.encode(enc)
             t = unquote_to_bytes(t)
-            return unicode(t, enc)
+            return t.decode(enc)
         except UnicodeError as ex:
             if not firstException:
                 firstException = ex
