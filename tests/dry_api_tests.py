@@ -1,4 +1,17 @@
 # -*- coding: utf-8  -*-
+"""
+API tests which do not interact with a site.
+
+Some of these tests are not 'net = False' (and not run by jenkins), as they
+instantiate a Request, and the Request constructor will call pywikibot.Site()
+when a site parameter is not provided to __init__.
+
+The test framework yet doesn't have the ability to allow instantiation of a
+real Site without also allowing the Site object to be used.
+
+While those tests are 'net = False', they do not initiate any network requests,
+and they _should_ be 'dry'.
+"""
 #
 # (C) Pywikibot team, 2012-2014
 #
@@ -7,15 +20,23 @@
 __version__ = '$Id$'
 #
 
+import os
+import sys
 import datetime
+from email.mime.multipart import MIMEMultipart
+
 import pywikibot
-from pywikibot.data.api import CachedRequest, QueryGenerator
+from pywikibot.data.api import Request, CachedRequest, QueryGenerator
 from pywikibot.family import Family
+
+from tests import _data_dir
 from tests.utils import DummySiteinfo
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 
 class DryCachedRequestTests(TestCase):
+
+    """Test CachedRequest using real site objects."""
 
     sites = {
         'basesite': {
@@ -64,6 +85,8 @@ class DryCachedRequestTests(TestCase):
 
 
 class MockCachedRequestKeyTests(TestCase):
+
+    """Test CachedRequest using moke site objects."""
 
     net = False
 
@@ -164,14 +187,61 @@ class MockCachedRequestKeyTests(TestCase):
         self.assertEqual(en_user_path, ar_user_path)
 
 
-class DryQueryGenTests(DefaultSiteTestCase):
+class DryMimeTests(TestCase):
+
+    """Test MIME request handling without a real site."""
+
+    net = False
+
+    def test_mime_file_payload(self):
+        """Test Request._generate_MIME_part loads binary as binary."""
+        local_filename = os.path.join(_data_dir, 'MP_sounds.png')
+        with open(local_filename, 'rb') as f:
+            file_content = f.read()
+        submsg = Request._generate_MIME_part(
+            'file', file_content, ('image', 'png'),
+            {'filename': local_filename})
+        self.assertEqual(file_content, submsg.get_payload(decode=True))
+
+    @unittest.skipIf(sys.version_info[0] > 2, "Currently fails on Python 3")
+    def test_mime_file_container(self):
+        local_filename = os.path.join(_data_dir, 'MP_sounds.png')
+        with open(local_filename, 'rb') as f:
+            file_content = f.read()
+        submsg = Request._generate_MIME_part(
+            'file', file_content, ('image', 'png'),
+            {'filename': local_filename})
+
+        container = MIMEMultipart(_subtype='form-data')
+        container.attach(submsg)
+        if sys.version_info[0] > 2:
+            body = container.as_bytes()
+            marker = b"\n\n"
+        else:
+            body = container.as_string()
+            marker = "\n\n"
+        eoh = body.find(marker)
+        body = body[eoh + len(marker):]
+        self.assertNotEqual(body.find(file_content), -1)
+
+
+class MimeTests(DefaultSiteTestCase):
+
+    """Test MIME request handling with a real site."""
+
+    def test_upload_object(self):
+        """Test Request object prepared to upload."""
+        req = Request(action="upload", file='MP_sounds.png', mime=True,
+                      filename=os.path.join(_data_dir, 'MP_sounds.png'))
+        self.assertEqual(req.mime, True)
+
+
+class QueryGenTests(DefaultSiteTestCase):
+
+    """Test QueryGenerator with a real site."""
 
     def test_query_constructor(self):
-        """Test QueryGenerator constructor.
-
-        QueryGenerator constructor will call pywikibot.Site()
-        if a site paramter is not provided.
-        """
+        """Test QueryGenerator constructor."""
         qGen1 = QueryGenerator(action="query", meta="siteinfo")
         qGen2 = QueryGenerator(meta="siteinfo")
         self.assertEqual(str(qGen1.request), str(qGen2.request))
