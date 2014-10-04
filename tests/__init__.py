@@ -48,6 +48,7 @@ from pywikibot.data.api import CachedRequest
 
 _tests_dir = os.path.split(__file__)[0]
 _cache_dir = os.path.join(_tests_dir, 'apicache')
+_data_dir = os.path.join(_tests_dir, 'data')
 
 library_test_modules = [
     'date',
