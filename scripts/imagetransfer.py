@@ -152,11 +152,12 @@ licenseTemplates = {
 
 class ImageTransferBot:
     def __init__(self, generator, targetSite=None, interwiki=False,
-                 keep_name=False):
+                 keep_name=False, ignore_warning=False):
         self.generator = generator
         self.interwiki = interwiki
         self.targetSite = targetSite
         self.keep_name = keep_name
+        self.ignore_warning = ignore_warning
 
     def transferImage(self, sourceImagePage):
         """Get a wikilink to an image, download it and its description,
@@ -199,7 +200,8 @@ class ImageTransferBot:
                                      targetSite=self.targetSite,
                                      urlEncoding=sourceSite.encoding(),
                                      keepFilename=self.keep_name,
-                                     verifyDescription=not self.keep_name)
+                                     verifyDescription=not self.keep_name,
+                                     ignore_warning=self.ignore_warning)
             # try to upload
             targetFilename = bot.run()
             if targetFilename and self.targetSite.family.name == 'commons' and \
