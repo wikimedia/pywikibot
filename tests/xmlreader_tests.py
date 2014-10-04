@@ -10,6 +10,7 @@ __version__ = '$Id$'
 
 import os.path
 from pywikibot import xmlreader
+from tests import _data_dir
 from tests.aspects import unittest, TestCase
 
 
@@ -17,13 +18,9 @@ class XmlReaderTestCase(TestCase):
 
     net = False
 
-    @classmethod
-    def setUpClass(cls):
-        cls.path = os.path.dirname(os.path.abspath(__file__))
-
     def test_XmlDumpAllRevs(self):
         pages = [r for r in
-                 xmlreader.XmlDump(os.path.join(self.path, 'data',
+                 xmlreader.XmlDump(os.path.join(_data_dir,
                                                 "article-pear.xml"),
                                    allrevisions=True).parse()]
         self.assertEqual(4, len(pages))
@@ -36,7 +33,7 @@ class XmlReaderTestCase(TestCase):
 
     def test_XmlDumpFirstRev(self):
         pages = [r for r in
-                 xmlreader.XmlDump(os.path.join(self.path, 'data',
+                 xmlreader.XmlDump(os.path.join(_data_dir,
                                                 "article-pear.xml")).parse()]
         self.assertEqual(1, len(pages))
         self.assertEqual(u"Automated conversion", pages[0].comment)
@@ -47,13 +44,13 @@ class XmlReaderTestCase(TestCase):
 
     def test_XmlDumpRedirect(self):
         pages = [r for r in
-                 xmlreader.XmlDump(os.path.join(self.path, 'data',
+                 xmlreader.XmlDump(os.path.join(_data_dir,
                                                 "article-pyrus.xml")).parse()]
         self.assertTrue(pages[0].isredirect)
 
     def _compare(self, previous, variant, all_revisions):
         result = [entry.__dict__ for entry in xmlreader.XmlDump(
-            os.path.join(self.path, 'data', 'article-pyrus' + variant),
+            os.path.join(_data_dir, 'article-pyrus' + variant),
             all_revisions).parse()]
         if previous:
             self.assertEqual(previous, result)
