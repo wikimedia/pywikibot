@@ -29,7 +29,7 @@ class Family(family.WikimediaFamily):
             'ang', 'mn', 'co', 'tg', 'gn', 'mr', 'ug', 'csb', 'st', 'so', 'ia',
             'sd', 'si', 'vec', 'kl', 'an', 'jbo', 'ln', 'fo', 'bn', 'zu', 'gv',
             'kw', 'gu', 'rw', 'om', 'na', 'qu', 'ss', 'ie', 'mt', 'pa',
-            'roa-rup', 'iu', 'su', 'am', 'mi', 'za', 'ne', 'gd', 'tpi', 'yi',
+            'roa-rup', 'iu', 'su', 'am', 'mi', 'ne', 'gd', 'tpi', 'yi',
             'ti', 'sg', 'tn', 'dv', 'ts', 'ha', 'ks', 'ay',
         ]
 
