@@ -634,9 +634,20 @@ class CategoryMoveRobot(object):
         for page in pagegenerators.PreloadingGenerator(gen):
             if not self.title_regex or re.search(self.title_regex,
                                                  page.title()):
+
                 page.change_category(self.oldcat, self.newcat,
                                      comment=self.comment,
                                      inPlace=self.inplace)
+
+                # Categories for templates can be included in <includeonly> section
+                # of Template:X/doc subpage.
+                if page.namespace() == 10:
+                    doc_page = pywikibot.Page(page.site, page.title() + '/doc')
+                    if doc_page.exists():
+                        doc_page.change_category(self.oldcat, self.newcat,
+                                                 comment=self.comment,
+                                                 inPlace=self.inplace,
+                                                 include=['includeonly'])
 
     @staticmethod
     def check_move(name, old_page, new_page):

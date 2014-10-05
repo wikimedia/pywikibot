@@ -273,7 +273,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     return text
 
 
-def removeDisabledParts(text, tags=['*']):
+def removeDisabledParts(text, tags=['*'], include=[]):
     """
     Return text without portions where wiki markup is disabled.
 
@@ -284,7 +284,9 @@ def removeDisabledParts(text, tags=['*']):
     * includeonly tags
 
     The exact set of parts which should be removed can be passed as the
-    'parts' parameter, which defaults to all.
+    'tags' parameter, which defaults to all.
+    Or, in alternative, default parts that shall not be removed can be
+    specified in the 'include' param.
 
     """
     regexes = {
@@ -298,7 +300,7 @@ def removeDisabledParts(text, tags=['*']):
     if '*' in tags:
         tags = list(regexes.keys())
     # add alias
-    tags = set(tags)
+    tags = set(tags) - set(include)
     if 'source' in tags:
         tags.add('syntaxhighlight')
     toRemoveR = re.compile('|'.join([regexes[tag] for tag in tags]),
@@ -659,8 +661,12 @@ def interwikiSort(sites, insite=None):
 # Functions dealing with category links
 # -------------------------------------
 
-def getCategoryLinks(text, site=None):
+def getCategoryLinks(text, site=None, include=[]):
     """Return a list of category links found in text.
+
+    @param include: list of tags which should not be removed by
+        removeDisabledParts() and where CategoryLinks can be searched.
+    @type: list
 
     @return: all category links found
     @rtype: list of Category objects
@@ -670,7 +676,7 @@ def getCategoryLinks(text, site=None):
         site = pywikibot.Site()
     # Ignore category links within nowiki tags, pre tags, includeonly tags,
     # and HTML comments
-    text = removeDisabledParts(text)
+    text = removeDisabledParts(text, include=include)
     catNamespace = '|'.join(site.category_namespaces())
     R = re.compile(r'\[\[\s*(?P<namespace>%s)\s*:\s*(?P<rest>.+?)\]\]'
                    % catNamespace, re.I)
@@ -1130,7 +1136,7 @@ def glue_template_and_params(template_and_params):
 
 def does_text_contain_section(pagetext, section):
     """
-    Determines whether the page text contains the given section title.
+    Determine whether the page text contains the given section title.
 
     @param pagetext: The wikitext of a page
     @type text: unicode or string
@@ -1187,9 +1193,7 @@ class tzoneFixedOffset(datetime.tzinfo):
 
 class TimeStripper(object):
 
-    """
-    Find timestamp in page and return it as timezone aware datetime object.
-    """
+    """Find timestamp in page and return it as timezone aware datetime object."""
 
     def __init__(self, site=None):
         if site is None:
