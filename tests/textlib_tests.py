@@ -172,8 +172,9 @@ class TestCategoryRearrangement(TestCase):
         sep = config.LS
         config.line_separator = ''  # use an empty separator temporarily
         new = textlib.replaceCategoryLinks(old, cats, site=self.site)
+        # restore the default separator
+        config.line_separator = sep
         self.assertEqual(old, new)
-        config.line_separator = sep  # restore the default separator
 
 
 class TestTemplatesInCategory(TestCase):
