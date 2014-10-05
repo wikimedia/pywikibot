@@ -14,7 +14,6 @@ from email.mime.nonmultipart import MIMENonMultipart
 import datetime
 import hashlib
 import json
-import mimetypes
 import os
 try:
     import cPickle as pickle
@@ -425,12 +424,12 @@ class Request(MutableMapping):
         return message == ERR_MSG
 
     @staticmethod
-    def _generate_MIME_part(key, content, keytype, headers):
+    def _generate_MIME_part(key, content, keytype=None, headers=None):
         if not keytype:
             try:
                 content.encode("ascii")
                 keytype = ("text", "plain")
-            except UnicodeError:
+            except (UnicodeError, AttributeError):
                 keytype = ("application", "octet-stream")
         submsg = MIMENonMultipart(*keytype)
         content_headers = {'name': key}
@@ -440,6 +439,35 @@ class Request(MutableMapping):
                           **content_headers)
         submsg.set_payload(content)
         return submsg
+
+    @staticmethod
+    def _build_mime_request(params, mime_params):
+        """Construct a MIME multipart form post.
+
+        @param params: HTTP request params
+        @type params: dict
+        @param mime_params: HTTP request parts which must be sent in the body
+        @type mime_params: dict of (content, keytype, headers)
+        @return: HTTP request headers and body
+        @rtype: (headers, body)
+        """
+        # construct a MIME message containing all API key/values
+        container = MIMEMultipart(_subtype='form-data')
+        for key, value in params.items():
+            submsg = Request._generate_MIME_part(key, value)
+            container.attach(submsg)
+        for key, value in mime_params.items():
+            submsg = Request._generate_MIME_part(key, *value)
+            container.attach(submsg)
+
+        # strip the headers to get the HTTP message body
+        body = container.as_string()
+        marker = "\n\n"  # separates headers from body
+        eoh = body.find(marker)
+        body = body[eoh + len(marker):]
+        # retrieve the headers from the MIME object
+        headers = dict(list(container.items()))
+        return headers, body
 
     def _handle_warnings(self, result):
         if 'warnings' in result:
@@ -482,32 +510,8 @@ class Request(MutableMapping):
             uri = self.site.scriptpath() + "/api.php"
             try:
                 if self.mime:
-                    # construct a MIME message containing all API key/values
-                    container = MIMEMultipart(_subtype='form-data')
-                    for key, value in self._encoded_items().items():
-                        # key "file" requires special treatment in a multipart
-                        # message
-                        if key == "file":
-                            local_filename = value
-                            filetype = mimetypes.guess_type(local_filename)[0] \
-                                or 'application/octet-stream'
-                            file_content = file(local_filename, "rb").read()
-                            submsg = Request._generate_MIME_part(
-                                key, file_content, filetype.split('/'),
-                                {'filename': self._params['filename'][0]})
-                        else:
-                            submsg = Request._generate_MIME_part(
-                                key, value, None, None)
-                        container.attach(submsg)
-                    for key, value in self.mime_params.items():
-                        container.attach(Request._generate_MIME_part(key, *value))
-                    # strip the headers to get the HTTP message body
-                    body = container.as_string()
-                    marker = "\n\n"  # separates headers from body
-                    eoh = body.find(marker)
-                    body = body[eoh + len(marker):]
-                    # retrieve the headers from the MIME object
-                    headers = dict(list(container.items()))
+                    (headers, body) = Request._build_mime_request(
+                        self._encoded_items(), self.mime_params)
                 else:
                     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
                     body = paramstring

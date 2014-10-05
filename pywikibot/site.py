@@ -23,6 +23,7 @@ import threading
 import time
 import json
 import copy
+import mimetypes
 
 import pywikibot
 import pywikibot.family
@@ -4383,6 +4384,7 @@ class APISite(BaseSite):
             text = comment
         token = self.tokens['edit']
         result = None
+        file_page_title = filepage.title(withNamespace=False)
         if source_filename:
             # upload local file
             # make sure file actually exists
@@ -4392,20 +4394,22 @@ class APISite(BaseSite):
             additional_parameters = {}
             throttle = True
             filesize = os.path.getsize(source_filename)
-            if (chunk_size > 0 and chunk_size < filesize and
-                    LV(self.version()) >= LV('1.20')):
-                offset = 0
-                file_key = None
-                with open(source_filename, 'rb') as f:
+            chunked_upload = (chunk_size > 0 and chunk_size < filesize and
+                              LV(self.version()) >= LV('1.20'))
+            with open(source_filename, 'rb') as f:
+                if chunked_upload:
+                    offset = 0
+                    file_key = None
                     while True:
                         f.seek(offset)
                         chunk = f.read(chunk_size)
-                        file_page_title = filepage.title(withNamespace=False)
                         req = api.Request(site=self, action='upload', token=token,
                                           stash='1', offset=offset, filesize=filesize,
                                           filename=file_page_title,
                                           mime_params={}, throttle=throttle)
-                        req.mime_params['chunk'] = (chunk, None, {'filename': file_page_title})
+                        req.mime_params['chunk'] = (chunk,
+                                                    ("application", "octet-stream"),
+                                                    {'filename': file_page_title})
                         if file_key:
                             req['filekey'] = file_key
                         try:
@@ -4432,10 +4436,19 @@ class APISite(BaseSite):
                         if data['result'] != 'Continue':  # finished
                             additional_parameters['filekey'] = file_key
                             break
-            else:
-                additional_parameters = {'file': source_filename, 'mime': True}
+                else:  # not chunked upload
+                    file_contents = f.read()
+                    filetype = (mimetypes.guess_type(source_filename)[0]
+                                or 'application/octet-stream')
+                    additional_parameters = {
+                        'mime_params': {
+                            'file': (file_contents,
+                                     filetype.split('/'),
+                                     {'filename': file_page_title})
+                        }
+                    }
             req = api.Request(site=self, action="upload", token=token,
-                              filename=filepage.title(withNamespace=False),
+                              filename=file_page_title,
                               comment=comment, text=text, throttle=throttle,
                               **additional_parameters)
         else:
@@ -4445,7 +4458,7 @@ class APISite(BaseSite):
                     "User '%s' is not authorized to upload by URL on site %s."
                     % (self.user(), self))
             req = api.Request(site=self, action="upload", token=token,
-                              filename=filepage.title(withNamespace=False),
+                              filename=file_page_title,
                               url=source_url, comment=comment, text=text)
         if not result:
             if watch:
