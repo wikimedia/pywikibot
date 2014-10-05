@@ -23,10 +23,14 @@ __version__ = '$Id$'
 import os
 import sys
 import datetime
-from email.mime.multipart import MIMEMultipart
 
 import pywikibot
-from pywikibot.data.api import Request, CachedRequest, QueryGenerator
+from pywikibot.data.api import (
+    Request,
+    MIMEMultipart,
+    CachedRequest,
+    QueryGenerator,
+)
 from pywikibot.family import Family
 
 from tests import _data_dir
@@ -203,7 +207,6 @@ class DryMimeTests(TestCase):
             {'filename': local_filename})
         self.assertEqual(file_content, submsg.get_payload(decode=True))
 
-    @unittest.skipIf(sys.version_info[0] > 2, "Currently fails on Python 3")
     def test_mime_file_container(self):
         local_filename = os.path.join(_data_dir, 'MP_sounds.png')
         with open(local_filename, 'rb') as f:
