@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""API test module."""
 #
 # (C) Pywikibot team, 2007-2014
 #
@@ -14,28 +15,32 @@ from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 class TestApiFunctions(DefaultSiteTestCase):
 
+    """API Request object test class."""
+
     cached = True
 
     def testObjectCreation(self):
-        """Test that api.Request() creates an object with desired attributes"""
+        """Test api.Request() constructor."""
         mysite = self.get_site()
         req = api.Request(site=mysite, action="test", foo="", bar="test")
         self.assertTrue(req)
         self.assertEqual(req.site, mysite)
-        self.assertIn("foo", req.params)
-        self.assertEqual(req["bar"], "test")
+        self.assertIn("foo", req._params)
+        self.assertEqual(req["bar"], ["test"])
         # test item assignment
         req["one"] = "1"
-        self.assertEqual(req.params['one'], "1")
+        self.assertEqual(req._params['one'], ["1"])
         # test compliance with dict interface
         # req.keys() should contain "action", "foo", "bar", "one"
         self.assertEqual(len(req.keys()), 4)
-        self.assertIn("test", req.values())
+        self.assertIn("test", req._encoded_items().values())
         for item in req.items():
             self.assertEqual(len(item), 2, item)
 
 
 class TestPageGenerator(TestCase):
+
+    """API PageGenerator object test class."""
 
     family = 'wikipedia'
     code = 'en'

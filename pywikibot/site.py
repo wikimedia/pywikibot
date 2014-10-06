@@ -4337,11 +4337,12 @@ class APISite(BaseSite):
                     while True:
                         f.seek(offset)
                         chunk = f.read(chunk_size)
+                        file_page_title = filepage.title(withNamespace=False)
                         req = api.Request(site=self, action='upload', token=token,
                                           stash='1', offset=offset, filesize=filesize,
-                                          filename=filepage.title(withNamespace=False),
+                                          filename=file_page_title,
                                           mime_params={}, throttle=throttle)
-                        req.mime_params['chunk'] = (chunk, None, {'filename': req.params['filename']})
+                        req.mime_params['chunk'] = (chunk, None, {'filename': file_page_title})
                         if file_key:
                             req['filekey'] = file_key
                         try:

@@ -27,7 +27,7 @@ import time
 
 import pywikibot
 from pywikibot import config, login
-from pywikibot.tools import MediaWikiVersion as LV
+from pywikibot.tools import MediaWikiVersion as LV, deprecated
 from pywikibot.exceptions import Server504Error, FatalServerError, Error
 
 import sys
@@ -144,8 +144,8 @@ class Request(MutableMapping):
     >>> # add a new parameter
     >>> r['siprop'] = "namespaces"
     >>> # note that "uiprop" param gets added automatically
-    >>> r.params
-    {'action': 'query', 'meta': 'userinfo|siteinfo', 'siprop': 'namespaces'}
+    >>> r._params
+    {'action': [u'query'], 'meta': [u'userinfo', u'siteinfo'], 'siprop': [u'namespaces']}
     >>> data = r.submit()
     >>> type(data)
     <type 'dict'>
@@ -185,15 +185,16 @@ class Request(MutableMapping):
         self.throttle = kwargs.pop('throttle', True)
         self.max_retries = kwargs.pop("max_retries", pywikibot.config.max_retries)
         self.retry_wait = kwargs.pop("retry_wait", pywikibot.config.retry_wait)
-        self.params = {}
+        self._params = {}
         if "action" not in kwargs:
             raise ValueError("'action' specification missing from Request.")
+        self.action = kwargs['action']
         self.update(**kwargs)
         self._warning_handler = None
         # Actions that imply database updates on the server, used for various
         # things like throttling or skipping actions when we're in simulation
         # mode
-        self.write = self.params["action"] in (
+        self.write = self.action in (
             "edit", "move", "rollback", "delete", "undelete",
             "protect", "block", "unblock", "watch", "patrol",
             "import", "userrights", "upload", "emailuser",
@@ -216,44 +217,65 @@ class Request(MutableMapping):
         # This situation is only tripped when one of the first actions
         # on the site is a write action and the extension isn't installed.
         if ((self.write and LV(self.site.version()) >= LV("1.23")) or
-                (self.params['action'] == 'edit' and
+                (self.action == 'edit' and
                  self.site.has_extension('AssertEdit'))):
             pywikibot.debug(u"Adding user assertion", _logger)
-            self.params["assert"] = "user"  # make sure user is logged in
+            self["assert"] = 'user'  # make sure user is logged in
 
         if (self.site.protocol() == 'http' and (config.use_SSL_always or (
-                self.params["action"] == "login" and config.use_SSL_onlogin))
+                self.action == 'login' and config.use_SSL_onlogin))
                 and self.site.family.name in config.available_ssl_project):
             self.site = EnableSSLSiteWrapper(self.site)
 
     # implement dict interface
     def __getitem__(self, key):
-        return self.params[key]
+        return self._params[key]
 
     def __setitem__(self, key, value):
-        self.params[key] = value
+        """Set MediaWiki API request parameter.
+
+        @param key: param key
+        @type key: basestring
+        @param value: param value
+        @type value: list of unicode, unicode, or str in site encoding
+            Any string type may use a |-separated list
+        """
+        # Allow site encoded bytes (note: str is a subclass of bytes in py2)
+        if isinstance(value, bytes):
+            value = value.decode(self.site.encoding())
+
+        if isinstance(value, unicode):
+            value = value.split("|")
+
+        try:
+            iter(value)
+        except TypeError:
+            # convert any non-iterable value into a single-element list
+            value = [unicode(value)]
+
+        self._params[key] = value
 
     def __delitem__(self, key):
-        del self.params[key]
+        del self._params[key]
 
     def keys(self):
-        return list(self.params.keys())
+        return list(self._params.keys())
 
     def __contains__(self, key):
-        return self.params.__contains__(key)
+        return self._params.__contains__(key)
 
     def __iter__(self):
-        return self.params.__iter__()
+        return self._params.__iter__()
 
     def __len__(self):
-        return len(self.params)
+        return len(self._params)
 
     def iteritems(self):
-        return iter(self.params.items())
+        return iter(self._params.items())
 
     def items(self):
         """Return a list of tuples containg the parameters in any order."""
-        return list(self.params.items())
+        return list(self._params.items())
 
     @property
     def mime(self):
@@ -272,62 +294,102 @@ class Request(MutableMapping):
         except TypeError:
             self.mime_params = {} if value else None
 
+    @deprecated('_http_param_string')
     def http_params(self):
         """Return the parameters formatted for inclusion in an HTTP request.
 
-        self.params MUST be either
-           list of unicode
-           unicode (may be |-separated list)
-           str in site encoding (may be |-separated list)
+        DEPRECATED.  See _encoded_items for explanation of encoding used.
         """
-        if self.mime_params and set(self.params.keys()) & set(self.mime_params.keys()):
+        self._add_defaults()
+        return self._http_param_string()
+
+    def _add_defaults(self):
+        """
+        Add default parameters to the API request.
+
+        This method will only add them once.
+        """
+        if hasattr(self, '__defaulted'):
+            return
+
+        if self.mime_params and set(self._params.keys()) & set(self.mime_params.keys()):
             raise ValueError('The mime_params and params may not share the '
                              'same keys.')
-        for key in self.params:
-            if isinstance(self.params[key], bytes):
-                self.params[key] = self.params[key].decode(self.site.encoding())
-            if isinstance(self.params[key], basestring):
-                # convert a stringified sequence into a list
-                self.params[key] = self.params[key].split("|")
-            try:
-                iter(self.params[key])
-            except TypeError:
-                # convert any non-iterable value into a single-element list
-                self.params[key] = [str(self.params[key])]
-        if self.params["action"] == ['query']:
-            meta = self.params.get("meta", [])
+
+        if self.action == 'query':
+            meta = self._params.get("meta", [])
             if "userinfo" not in meta:
                 meta.append("userinfo")
-                self.params["meta"] = meta
-            uiprop = self.params.get("uiprop", [])
+                self._params["meta"] = meta
+            uiprop = self._params.get("uiprop", [])
             uiprop = set(uiprop + ["blockinfo", "hasmsg"])
-            self.params["uiprop"] = list(sorted(uiprop))
-            if "properties" in self.params:
-                if "info" in self.params["properties"]:
-                    inprop = self.params.get("inprop", [])
+            self._params["uiprop"] = list(sorted(uiprop))
+            if "properties" in self._params:
+                if "info" in self._params["properties"]:
+                    inprop = self._params.get("inprop", [])
                     info = set(inprop + ["protection", "talkid", "subjectid"])
-                    self.params["info"] = list(info)
-        if "maxlag" not in self.params and config.maxlag:
-            self.params["maxlag"] = [str(config.maxlag)]
-        if "format" not in self.params:
-            self.params["format"] = ["json"]
-        if self.params['format'] != ["json"]:
+                    self._params["info"] = list(info)
+        if "maxlag" not in self._params and config.maxlag:
+            self._params["maxlag"] = [str(config.maxlag)]
+        if "format" not in self._params:
+            self._params["format"] = ["json"]
+        elif self._params['format'] != ["json"]:
             raise TypeError("Query format '%s' cannot be parsed."
-                            % self.params['format'])
-        for key in self.params:
+                            % self._params['format'])
+
+        self.__defaulted = True
+
+    def _encoded_items(self):
+        """
+        Build a dict of params with minimal encoding needed for the site.
+
+        This helper method only prepares params for serialisation or
+        transmission, so it only encodes values which are not ASCII,
+        requiring callers to consider how to handle ASCII vs other values,
+        however the output is designed to enable __str__ and __repr__ to
+        do the right thing in most circumstances.
+
+        Servers which use an encoding that is not a superset of ASCII
+        are not supported.
+
+        @return: Parameters either in the site encoding, or ASCII strings
+        @rtype: dict with values of either str or bytes
+        """
+        params = {}
+        for key, value in self._params.items():
+            value = u"|".join(value)
+            # If the value is encodable as ascii, do not encode it.
+            # This means that any value which can be encoded as ascii
+            # is presumed to be ascii, and servers using a site encoding
+            # which is not a superset of ascii may be problematic.
             try:
-                self.params[key] = "|".join(self.params[key])
-                self.params[key] = self.params[key].encode(self.site.encoding())
-            except Exception:
-                pywikibot.error(
-                    u"http_params: Key '%s' could not be encoded to '%s'; params=%r"
-                    % (key, self.site.encoding(), self.params[key]))
-        return urlencode(self.params)
+                value.encode('ascii')
+                # In Python 2, ascii API params should be represented as 'foo'
+                # rather than u'foo'
+                if sys.version_info[0] == 2:
+                    value = str(value)
+            except UnicodeError:
+                try:
+                    value = value.encode(self.site.encoding())
+                except Exception:
+                    pywikibot.error(
+                        u"_encoded_items: '%s' could not be encoded as '%s':"
+                        u" %r" % (key, self.site.encoding(), value))
+            params[key] = value
+        return params
+
+    def _http_param_string(self):
+        """
+        Return the parameters as a HTTP URL query fragment.
+
+        URL encodes the parameters provided by _encoded_items()
+        """
+        return urlencode(self._encoded_items())
 
     def __str__(self):
         return unquote(self.site.scriptpath()
                               + "/api.php?"
-                              + self.http_params())
+                              + self._http_param_string())
 
     def __repr__(self):
         return "%s.%s<%s->%r>" % (self.__class__.__module__, self.__class__.__name__, self.site, str(self))
@@ -404,26 +466,27 @@ class Request(MutableMapping):
         @return: a dict containing data retrieved from api.php
 
         """
+        self._add_defaults()
         while True:
-            paramstring = self.http_params()
-            action = self.params.get("action", "")
-            simulate = self._simulate(action)
+            paramstring = self._http_param_string()
+            simulate = self._simulate(self.action)
             if simulate:
                 return simulate
             if self.throttle:
                 self.site.throttle(write=self.write)
             else:
-                pywikibot.log("Action '{0}' is submitted not throttled.".format(action))
+                pywikibot.log(
+                    "Submitting unthrottled action '{0}'.".format(self.action))
             uri = self.site.scriptpath() + "/api.php"
             try:
                 if self.mime:
                     # construct a MIME message containing all API key/values
                     container = MIMEMultipart(_subtype='form-data')
-                    for key in self.params:
+                    for key, value in self._encoded_items().items():
                         # key "file" requires special treatment in a multipart
                         # message
                         if key == "file":
-                            local_filename = self.params[key]
+                            local_filename = value
                             filetype = mimetypes.guess_type(local_filename)[0] \
                                 or 'application/octet-stream'
                             file_content = file(local_filename, "rb").read()
@@ -432,7 +495,7 @@ class Request(MutableMapping):
                                 {'filename': local_filename})
                         else:
                             submsg = Request._generate_MIME_part(
-                                key, self.params[key], None, None)
+                                key, value, None, None)
                         container.attach(submsg)
                     for key, value in self.mime_params.items():
                         container.attach(Request._generate_MIME_part(key, *value))
@@ -484,13 +547,14 @@ class Request(MutableMapping):
                     % self.site)
                 pywikibot.debug(rawdata, _logger)
                 # there might also be an overflow, so try a smaller limit
-                for param in self.params:
+                for param in self._params:
                     if param.endswith("limit"):
-                        value = self.params[param]
+                        # param values are stored a list of str
+                        value = self._params[param][0]
                         try:
-                            self.params[param] = str(int(value) // 2)
+                            self._params[param] = [str(int(value) // 2)]
                             pywikibot.output(u"Set %s = %s"
-                                             % (param, self.params[param]))
+                                             % (param, self._params[param]))
                         except:
                             pass
                 self.wait()
@@ -502,7 +566,7 @@ class Request(MutableMapping):
                                "Unable to process query response of type %s."
                                % type(result),
                                data=result)
-            if self['action'] == 'query':
+            if self.action == 'query':
                 if 'userinfo' in result.get('query', ()):
                     if hasattr(self.site, '_userinfo'):
                         self.site._userinfo.update(result['query']['userinfo'])
@@ -553,7 +617,7 @@ class Request(MutableMapping):
 
                 pywikibot.log(u"MediaWiki exception %s: query=\n%s"
                               % (class_name,
-                                 pprint.pformat(self.params)))
+                                 pprint.pformat(self._params)))
                 pywikibot.log(u"           response=\n%s" % result)
 
                 raise APIMWException(class_name, info, **result["error"])
@@ -561,14 +625,14 @@ class Request(MutableMapping):
             # bugs 46535, 62126, 64494, 66619
             # maybe removed when it 46535 is solved
             if code == "failed-save" and \
-               action == 'wbeditentity' and \
+               self.action == 'wbeditentity' and \
                self._is_wikibase_error_retryable(result["error"]):
                 self.wait()
                 continue
             # raise error
             try:
                 pywikibot.log(u"API Error: query=\n%s"
-                              % pprint.pformat(self.params))
+                              % pprint.pformat(self._params))
                 pywikibot.log(u"           response=\n%s"
                               % result)
 
@@ -638,7 +702,6 @@ class CachedRequest(Request):
         scripts/maintenance/cache.py to support
         the new key and all previous keys.
         """
-
         login_status = self.site._loginstatus
 
         if login_status > pywikibot.site.LoginStatus.NOT_LOGGED_IN and \
@@ -653,10 +716,10 @@ class CachedRequest(Request):
                 max(login_status, pywikibot.site.LoginStatus.NOT_LOGGED_IN))
             user_key = repr(user_key)
 
-        return repr(self.site) + user_key + repr(sorted(self.items()))
+        request_key = repr(sorted(list(self._encoded_items().items())))
+        return repr(self.site) + user_key + request_key
 
     def _create_file_name(self):
-        self.http_params()  # normalize self.params
         return hashlib.sha256(
             self._uniquedescriptionstr().encode('utf-8')
         ).hexdigest()
