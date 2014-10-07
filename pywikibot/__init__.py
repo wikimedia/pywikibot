@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__release__ = '2.0b1'
+__release__ = '2.0b2'
 __version__ = '$Id$'
 
 import datetime

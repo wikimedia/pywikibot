@@ -103,9 +103,14 @@ class pwb_install(install.install):
             python = python.replace("pythonw.exe", "python.exe")  # for Windows
             subprocess.call([python, "generate_user_files.py"])
 
+name = 'pywikibot'
+version = '2.0b2'
+github_url = 'https://github.com/wikimedia/pywikibot-core'
+download_url = github_url + '/archive/master.zip#egg=' + name + '-' + version
+
 setup(
-    name='pywikibot',
-    version='2.0b1',
+    name=name,
+    version=version,
     description='Python MediaWiki Bot Framework',
     long_description=open('README.rst').read(),
     maintainer='The pywikibot team',
@@ -119,7 +124,7 @@ setup(
     dependency_links=dependency_links,
     extras_require=extra_deps,
     url='https://www.mediawiki.org/wiki/Pywikibot',
-    download_url='https://github.com/wikimedia/pywikibot-core/archive/master.zip#egg=pywikibot-2.0b1',
+    download_url=download_url,
     test_suite="tests.collector",
     tests_require=test_deps,
     classifiers=[
