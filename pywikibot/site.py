@@ -4358,10 +4358,14 @@ class APISite(BaseSite):
                             break
                         file_key = data['filekey']
                         throttle = False
-                        new_offset = int(data['offset'])
-                        if offset + len(chunk) != new_offset:
-                            pywikibot.warning('Unexpected offset.')
-                        offset = new_offset
+                        if 'offset' in data:
+                            new_offset = int(data['offset'])
+                            if offset + len(chunk) != new_offset:
+                                pywikibot.warning('Unexpected offset.')
+                            offset = new_offset
+                        else:
+                            pywikibot.warning('Offset was not supplied.')
+                            offset += len(chunk)
                         if data['result'] != 'Continue':  # finished
                             additional_parameters['filekey'] = file_key
                             break
