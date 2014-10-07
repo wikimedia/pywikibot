@@ -3305,7 +3305,7 @@ class APISite(BaseSite):
                    }
         if showPatrolled is not None and (
                 self.has_right('patrol') or self.has_right('patrolmarks')):
-            rcgen.request['rcprop'] += '|patrolled'
+            rcgen.request['rcprop'] += ['patrolled']
             filters['patrolled'] = showPatrolled
         rcshow = []
         for item in filters:
