@@ -219,6 +219,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
     def _contains_lowercase_name(self, name):
         """Determine a lowercase normalised name is a name of this namespace.
 
+        @rtype: bool
         """
         return name in [x.lower() for x in self._distinct()]
 
@@ -230,6 +231,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
         @param item: name to check
         @type item: basestring
+        @rtype: bool
         """
         if item == '' and self.id == 0:
             return True
@@ -2314,7 +2316,6 @@ class APISite(BaseSite):
         Valid tokens depend on mw version.
 
         """
-
         _version = LV(self.version())
         if _version < LV('1.20'):
             valid_types = [token for token in types if token in self.TOKENS_0]
@@ -2357,7 +2358,6 @@ class APISite(BaseSite):
         return: a dict with retrieved valid tokens.
 
         """
-
         def warn_handler(mod, text):
             """Filter warnings for not available tokens."""
             return re.match(r'Action \'\w+\' is not allowed for the current user',
@@ -4060,7 +4060,6 @@ class APISite(BaseSite):
         @yield: dict with 'rcid', 'ns' and 'title' of the patrolled page.
 
         """
-
         # If patrol is not enabled, attr will be set the first time a
         # request is done.
         if hasattr(self, u'_patroldisabled'):
@@ -4205,7 +4204,7 @@ class APISite(BaseSite):
 
     @deprecated("Site().exturlusage")
     def linksearch(self, siteurl, limit=None):
-        """Backwards-compatible interface to exturlusage()"""
+        """Backwards-compatible interface to exturlusage()."""
         return self.exturlusage(siteurl, total=limit)
 
     def getFilesFromAnHash(self, hash_found=None):
@@ -4287,7 +4286,6 @@ class APISite(BaseSite):
             and the chunk size is positive but lower than the file size.
         @type chunk_size: int
         """
-
         upload_warnings = {
             # map API warning codes to user error messages
             # %(msg)s will be replaced by message string from API responsse
@@ -4492,6 +4490,8 @@ class APISite(BaseSite):
 
         Yields a tuple of Page object, length(int).
 
+        @param step: request batch size
+        @param total: number of pages to return
         """
         lpgen = self._generator(api.ListGenerator,
                                 type_arg="querypage", qppage="Longpages",
@@ -4507,6 +4507,8 @@ class APISite(BaseSite):
 
         Yields a tuple of Page object, length(int).
 
+        @param step: request batch size
+        @param total: number of pages to return
         """
         spgen = self._generator(api.ListGenerator,
                                 type_arg="querypage", qppage="Shortpages",
@@ -4518,7 +4520,11 @@ class APISite(BaseSite):
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
     def deadendpages(self, step=None, total=None):
-        """Yield Page objects retrieved from Special:Deadendpages."""
+        """Yield Page objects retrieved from Special:Deadendpages.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         degen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Deadendpages",
                                 step=step, total=total)
@@ -4527,7 +4533,11 @@ class APISite(BaseSite):
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
     def ancientpages(self, step=None, total=None):
-        """Yield Pages, datestamps from Special:Ancientpages."""
+        """Yield Pages, datestamps from Special:Ancientpages.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         apgen = self._generator(api.ListGenerator,
                                 type_arg="querypage", qppage="Ancientpages",
                                 step=step, total=total)
@@ -4538,7 +4548,11 @@ class APISite(BaseSite):
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
     def lonelypages(self, step=None, total=None):
-        """Yield Pages retrieved from Special:Lonelypages."""
+        """Yield Pages retrieved from Special:Lonelypages.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         lpgen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Lonelypages",
                                 step=step, total=total)
@@ -4549,6 +4563,8 @@ class APISite(BaseSite):
     def unwatchedpages(self, step=None, total=None):
         """Yield Pages from Special:Unwatchedpages (requires Admin privileges).
 
+        @param step: request batch size
+        @param total: number of pages to return
         """
         uwgen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Unwatchedpages",
@@ -4558,6 +4574,8 @@ class APISite(BaseSite):
     def wantedpages(self, step=None, total=None):
         """Yield Pages from Special:Wantedpages.
 
+        @param step: request batch size
+        @param total: number of pages to return
         """
         wpgen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Wantedpages",
@@ -4568,7 +4586,11 @@ class APISite(BaseSite):
     @deprecate_arg("repeat", None)
     def uncategorizedcategories(self, number=None, repeat=True,
                                 step=None, total=None):
-        """Yield Categories from Special:Uncategorizedcategories."""
+        """Yield Categories from Special:Uncategorizedcategories.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         ucgen = self._generator(api.CategoryPageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedcategories",
@@ -4579,7 +4601,11 @@ class APISite(BaseSite):
     @deprecate_arg("repeat", None)
     def uncategorizedimages(self, number=None, repeat=True,
                             step=None, total=None):
-        """Yield FilePages from Special:Uncategorizedimages."""
+        """Yield FilePages from Special:Uncategorizedimages.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         uigen = self._generator(api.ImagePageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedimages",
@@ -4593,7 +4619,11 @@ class APISite(BaseSite):
     @deprecate_arg("repeat", None)
     def uncategorizedpages(self, number=None, repeat=True,
                            step=None, total=None):
-        """Yield Pages from Special:Uncategorizedpages."""
+        """Yield Pages from Special:Uncategorizedpages.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         upgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedpages",
@@ -4604,7 +4634,11 @@ class APISite(BaseSite):
     @deprecate_arg("repeat", None)
     def uncategorizedtemplates(self, number=None, repeat=True, step=None,
                                total=None):
-        """Yield Pages from Special:Uncategorizedtemplates."""
+        """Yield Pages from Special:Uncategorizedtemplates.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         utgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedtemplates",
@@ -4614,7 +4648,11 @@ class APISite(BaseSite):
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
     def unusedcategories(self, step=None, total=None):
-        """Yield Category objects from Special:Unusedcategories."""
+        """Yield Category objects from Special:Unusedcategories.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         ucgen = self._generator(api.CategoryPageGenerator,
                                 type_arg="querypage",
                                 gqppage="Unusedcategories",
@@ -4622,7 +4660,11 @@ class APISite(BaseSite):
         return ucgen
 
     def unusedfiles(self, step=None, total=None):
-        """Yield FilePage objects from Special:Unusedimages."""
+        """Yield FilePage objects from Special:Unusedimages.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         uigen = self._generator(api.ImagePageGenerator,
                                 type_arg="querypage",
                                 gqppage="Unusedimages",
@@ -4638,7 +4680,11 @@ class APISite(BaseSite):
     @deprecate_arg("number", None)
     @deprecate_arg("repeat", None)
     def withoutinterwiki(self, step=None, total=None):
-        """Yield Pages without language links from Special:Withoutinterwiki."""
+        """Yield Pages without language links from Special:Withoutinterwiki.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         wigen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Withoutinterwiki",
@@ -4647,7 +4693,11 @@ class APISite(BaseSite):
 
     @need_version("1.18")
     def broken_redirects(self, step=None, total=None):
-        """Yield Pages without language links from Special:BrokenRedirects."""
+        """Yield Pages without language links from Special:BrokenRedirects.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         brgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="BrokenRedirects",
@@ -4656,7 +4706,11 @@ class APISite(BaseSite):
 
     @need_version("1.18")
     def double_redirects(self, step=None, total=None):
-        """Yield Pages without language links from Special:BrokenRedirects."""
+        """Yield Pages without language links from Special:BrokenRedirects.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         drgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="DoubleRedirects",
@@ -4665,7 +4719,11 @@ class APISite(BaseSite):
 
     @need_version("1.18")
     def redirectpages(self, step=None, total=None):
-        """Yield redirect pages from Special:ListRedirects."""
+        """Yield redirect pages from Special:ListRedirects.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
         lrgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Listredirects",

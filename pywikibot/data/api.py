@@ -87,10 +87,12 @@ class APIMWException(APIError):
 
 
 class TimeoutError(Error):
-    pass
+
+    """API request failed with a timeout error."""
 
 
 class EnableSSLSiteWrapper(object):
+
     """Wrapper to change the site protocol to https."""
 
     def __init__(self, site):
@@ -653,6 +655,9 @@ class Request(MutableMapping):
 
 
 class CachedRequest(Request):
+
+    """Cached request."""
+
     def __init__(self, expiry, *args, **kwargs):
         """Construct a CachedRequest object.
 
@@ -906,7 +911,6 @@ class QueryGenerator(object):
 
     def update_limit(self):
         """Set query limit for self.module based on api response."""
-
         for mod in self.module.split('|'):
             for param in self._modules[mod].get("parameters", []):
                 if param["name"] == "limit":
