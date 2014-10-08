@@ -1161,7 +1161,15 @@ class TokenWallet(object):
         self.failed_cache = set()  # cache unavailable tokens.
 
     def load_tokens(self, types, all=False):
-        """Preload one or multiple tokens."""
+        """
+        Preload one or multiple tokens.
+
+        @param types: the types of token.
+        @type  types: iterable
+        @param all: load all available tokens, if None only if it can be done
+            in one request.
+        @type all: bool
+        """
         assert(self.site.logged_in())
 
         self._tokens.setdefault(self.site.user(), {}).update(
@@ -1171,7 +1179,7 @@ class TokenWallet(object):
         # When all=True types is extended in site.get_tokens().
         # Keys not recognised as tokens, are cached so they are not requested
         # any longer.
-        if all:
+        if all is not False:
             for key in types:
                 if key not in self._tokens[self.site.user()]:
                     self.failed_cache.add((self.site.user(), key))
@@ -1192,7 +1200,7 @@ class TokenWallet(object):
 
         if (key not in user_tokens and
                 failed_cache_key not in self.failed_cache):
-                    self.load_tokens([key], all=not user_tokens)
+                    self.load_tokens([key], all=False if user_tokens else None)
 
         if key in user_tokens:
             return user_tokens[key]
@@ -2359,7 +2367,8 @@ class APISite(BaseSite):
         @param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
         @type  types: iterable
-        @param all: load all available tokens
+        @param all: load all available tokens, if None only if it can be done
+            in one request.
         @type all: bool
 
         return: a dict with retrieved valid tokens.
@@ -2389,12 +2398,12 @@ class APISite(BaseSite):
 
         else:
             if _version < LV('1.24wmf19'):
-                if all:
+                if all is not False:
                     types.extend(self.TOKENS_1)
                 req = api.Request(site=self, action='tokens',
                                    type='|'.join(self.validate_tokens(types)))
             else:
-                if all:
+                if all is not False:
                     types.extend(self.TOKENS_2)
 
                 req = api.Request(site=self, action='query', meta='tokens',
