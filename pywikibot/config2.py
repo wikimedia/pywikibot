@@ -131,7 +131,7 @@ password_file = None
 default_edit_summary = u'Wikipedia python library v.2'
 
 
-def _get_base_dir():
+def get_base_dir(test_directory=None):
     r"""Return the directory in which user-specific information is stored.
 
     This is determined in the following order -
@@ -147,7 +147,20 @@ def _get_base_dir():
 
     Set PYWIKIBOT2_NO_USER_CONFIG=1 to disable loading user-config.py
 
+    @param test_directory: Assume that a user config file exists in this
+        directory. Used to test whether placing a user config file in this
+        directory will cause it to be selected as the base directory.
+    @type test_directory: str or None
     """
+    def exists(directory):
+        directory = os.path.abspath(directory)
+        if directory == test_directory:
+            return True
+        else:
+            return os.path.exists(os.path.join(directory, 'user-config.py'))
+
+    if test_directory is not None:
+        test_directory = os.path.abspath(test_directory)
     NAME = "pywikibot"
     base_dir = ""
     for arg in sys.argv[1:]:
@@ -155,24 +168,22 @@ def _get_base_dir():
             base_dir = arg[5:]
             sys.argv.remove(arg)
             break
-    current_exists = os.path.exists(
-        os.path.join(os.path.abspath("."), "user-config.py"))
-    if current_exists and "PYWIKIBOT2_DIR" not in os.environ and not base_dir:
-        base_dir = os.path.abspath(".")
-        return base_dir
     else:
-        if "PYWIKIBOT2_DIR" in os.environ:
-            base_dir = os.environ["PYWIKIBOT2_DIR"]
-        elif not base_dir:
-            is_windows = sys.platform == 'win32'
+        if 'PYWIKIBOT2_DIR' in os.environ:
+            base_dir = os.environ['PYWIKIBOT2_DIR']
+        elif exists('.'):
+            return os.path.abspath('.')
+        else:
             home = os.path.expanduser("~")
-            if is_windows:
+            if sys.platform == 'win32':
                 import platform
-                _win_version = int(platform.version()[0])
-                if _win_version == 5:
+                win_version = int(platform.version()[0])
+                if win_version == 5:
                     base_dir = os.path.join(home, "Application Data", NAME)
-                elif _win_version == 6:
+                elif win_version == 6:
                     base_dir = os.path.join(home, "AppData\\Roaming", NAME)
+                #TODO: Throw exception otherwise to notify the user that the
+                #      version of Windows is not (yet) supported
             else:
                 base_dir = os.path.join(home, "." + NAME)
             if not os.path.isdir(base_dir):
@@ -181,22 +192,21 @@ def _get_base_dir():
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file
     if not os.path.isdir(base_dir):
-        raise RuntimeError("Directory '%(base_dir)s' does not exist."
-                           % locals())
-    if not os.path.exists(os.path.join(base_dir, "user-config.py")):
-        exc_text = ("No user-config.py found in directory '%(base_dir)s'.\n"
-                    % locals())
+        raise RuntimeError("Directory '%s' does not exist." % base_dir)
+    if not exists(base_dir):
+        exc_text = "No user-config.py found in directory '%s'.\n" % base_dir
         if os.environ.get('PYWIKIBOT2_NO_USER_CONFIG', '0') == '1':
             print(exc_text)
         else:
             exc_text += "  Please check that user-config.py is stored in the correct location.\n"
             exc_text += "  Directory where user-config.py is searched is determined as follows:\n\n"
-            exc_text += "    " + _get_base_dir.__doc__
+            exc_text += "    " + get_base_dir.__doc__
             raise RuntimeError(exc_text)
 
     return base_dir
 
-_base_dir = _get_base_dir()
+_get_base_dir = get_base_dir  # for backward compatibility
+_base_dir = get_base_dir()
 # Save base_dir for use by other modules
 base_dir = _base_dir
 
