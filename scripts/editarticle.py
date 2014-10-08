@@ -15,7 +15,7 @@ Edit a Wikipedia article with your favourite editor.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = "$Id$"
+__version__ = '$Id$'
 #
 
 import os
