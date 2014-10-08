@@ -183,11 +183,19 @@ class SelflinkBot(Bot):
             self.treat(page)
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     # Page generator
     gen = None
     # Process global args and prepare generator args parser
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
     genFactory = GeneratorFactory()
     botArgs = {}
 
@@ -207,7 +215,4 @@ def main():
     bot.run()
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

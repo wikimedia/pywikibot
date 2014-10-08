@@ -272,9 +272,17 @@ class SandboxBot(Bot):
                 time.sleep(self.getOption('hours') * 60 * 60)
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     opts = {}
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg.startswith('-hours:'):
             opts['hours'] = float(arg[7:])
             opts['no_repeat'] = False

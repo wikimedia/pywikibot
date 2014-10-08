@@ -40,7 +40,7 @@ class ArticleEditor(object):
     def set_options(self, *args):
         """Parse commandline and set options attribute."""
         my_args = []
-        for arg in pywikibot.handleArgs(*args):
+        for arg in pywikibot.handle_args(args):
             my_args.append(arg)
         parser = optparse.OptionParser()
         parser.add_option("-r", "--edit_redirect", action="store_true",
@@ -97,6 +97,14 @@ class ArticleEditor(object):
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     app = ArticleEditor(*args)
     app.run()
 

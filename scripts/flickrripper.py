@@ -517,7 +517,15 @@ def usage():
     return
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     # Get the api key
     if not config.flickr['api_key']:
         pywikibot.output('Flickr api key not found! Get yourself an api key')
@@ -567,7 +575,7 @@ def main():
 
     # Should be renamed to overrideLicense or something like that
     override = u''
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg.startswith('-group_id'):
             if len(arg) == 9:
                 group_id = pywikibot.input(u'What is the group_id of the pool?')

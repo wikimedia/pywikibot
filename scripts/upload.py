@@ -319,6 +319,14 @@ class UploadRobot:
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     url = u''
     description = []
     keepFilename = False
@@ -331,7 +339,7 @@ def main(*args):
 
     # process all global bot args
     # returns a list of non-global args, i.e. args for upload.py
-    for arg in pywikibot.handleArgs(*args):
+    for arg in pywikibot.handle_args(args):
         if arg:
             if arg.startswith('-keep'):
                 keepFilename = True

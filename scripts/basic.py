@@ -136,10 +136,17 @@ class BasicBot:
         return False
 
 
-def main():
-    """ Process command line arguments and invoke BasicBot. """
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     # Process global arguments to determine desired site
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
 
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages

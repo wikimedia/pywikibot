@@ -498,9 +498,14 @@ class CommonscatBot(Bot):
             return u''
 
 
-def main():
-    """ Parse the command line arguments and get a pagegenerator to work on.
-    Iterate through all the pages.
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
     """
     summary = None
     generator = None
@@ -510,7 +515,7 @@ def main():
     ns.append(14)
 
     # Process global args and prepare generator args parser
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:

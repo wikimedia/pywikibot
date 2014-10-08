@@ -149,12 +149,20 @@ def listsEqual(list1, list2):
     return True
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     exists_arg = ''
     commandline_claims = list()
 
     # Process global args and prepare generator args parser
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
     gen = pagegenerators.GeneratorFactory()
 
     for arg in local_args:

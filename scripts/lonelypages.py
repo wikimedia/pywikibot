@@ -189,10 +189,18 @@ class LonelyPagesBot(Bot):
                 self.userPut(page, oldtxt, newtxt, comment=self.comment)
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     options = {}
 
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
     site = pywikibot.Site()
 

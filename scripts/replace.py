@@ -438,6 +438,14 @@ def prepareRegexForMySQL(pattern):
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     add_cat = None
     gen = None
     # summary message
@@ -485,7 +493,7 @@ def main(*args):
 
     # Read commandline parameters.
 
-    local_args = pywikibot.handleArgs(*args)
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:

@@ -274,10 +274,18 @@ def wiki_logger(buffer, page, rev=None):
 #                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     global __simulate, __sys_argv
 
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         pywikibot.showHelp('script_wui')
         return
 
@@ -295,5 +303,4 @@ def main():
         raise
 
 if __name__ == "__main__":
-    # run bot
     main()

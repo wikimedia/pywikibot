@@ -598,8 +598,16 @@ class FeaturedBot(pywikibot.Bot):
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     options = {}
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg.startswith('-fromlang:'):
             options[arg[1:9]] = arg[10:].split(",")
         elif arg.startswith('-after:'):
@@ -617,7 +625,4 @@ def main(*args):
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

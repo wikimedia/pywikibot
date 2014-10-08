@@ -524,7 +524,15 @@ class PageArchiver(object):
             self.page.update(comment)
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     filename = None
     pagename = None
     namespace = None
@@ -537,7 +545,7 @@ def main():
         if arg.startswith(name):
             yield arg[len(name) + 1:]
 
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         for v in if_arg_value(arg, '-file'):
             filename = v
         for v in if_arg_value(arg, '-locale'):

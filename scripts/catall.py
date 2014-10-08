@@ -72,11 +72,19 @@ def make_categories(page, list, site=None):
                    comment=i18n.twtranslate(site.code, 'catall-changing'))
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and perform task.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     docorrections = True
     start = 'A'
 
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
 
     for arg in local_args:
         if arg == '-onlynew':

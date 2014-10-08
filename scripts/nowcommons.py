@@ -429,10 +429,18 @@ class NowCommonsDeleteBot(Bot):
                 continue
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     options = {}
 
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg.startswith('-') and \
         arg[1:] in ('always', 'replace', 'replaceloose', 'replaceonly'):
             options[arg[1:]] = True

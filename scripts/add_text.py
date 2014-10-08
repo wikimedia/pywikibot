@@ -275,7 +275,15 @@ Match was: %s''' % result)
             return (text, newtext, always)
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     # If none, the var is setted only for check purpose.
     summary = None
     addText = None
@@ -292,7 +300,7 @@ def main():
     up = False
 
     # Process global args and prepare generator args parser
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
 
     # Loading the arguments

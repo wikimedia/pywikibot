@@ -107,12 +107,20 @@ class TemplateCountRobot:
             yield template, transcludingArray
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     operation = None
     argsList = []
     namespaces = []
 
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg in ('-count', '-list'):
             operation = arg[1:]
         elif arg.startswith('-namespace:'):

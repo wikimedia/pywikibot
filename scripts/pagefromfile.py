@@ -241,8 +241,15 @@ class PageFromFileReader:
             return location.end(), title, contents
 
 
-def main():
-    """Main function."""
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     # Adapt these to the file you are using. 'pageStartMarker' and
     # 'pageEndMarker' are the beginning and end of each entry. Take text that
     # should be included and does not occur elsewhere in the text.
@@ -257,7 +264,7 @@ def main():
     include = False
     notitle = False
 
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg.startswith("-start:"):
             pageStartMarker = arg[7:]
         elif arg.startswith("-end:"):

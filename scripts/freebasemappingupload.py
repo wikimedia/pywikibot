@@ -96,9 +96,17 @@ class FreebaseMapperRobot:
             pywikibot.output('Claim added!')
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     filename = 'fb2w.nt.gz'  # Default filename
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg.startswith('-filename'):
             filename = arg[11:]
     bot = FreebaseMapperRobot(filename)
