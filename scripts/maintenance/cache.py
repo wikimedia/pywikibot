@@ -319,12 +319,12 @@ def main():
 
         # Also process the base directory, if it isnt the current directory
         if os.path.abspath(os.getcwd()) != pywikibot.config2.base_dir:
-            cache_dirs += [
+            cache_paths += [
                 os.path.join(pywikibot.config2.base_dir, 'apicache')]
 
         # Also process the user home cache, if it isnt the config directory
         if os.path.expanduser('~/.pywikibot') != pywikibot.config2.base_dir:
-            cache_dirs += [
+            cache_paths += [
                 os.path.join(os.path.expanduser('~/.pywikibot'), 'apicache')]
 
     if delete:
