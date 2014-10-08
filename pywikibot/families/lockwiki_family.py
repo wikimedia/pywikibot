@@ -29,7 +29,7 @@ class Family(family.Family):
 
     def nicepath(self, code):
         """Return the nice article path for this family."""
-        return "%s/" % self.path(self, code)
+        return "%s/" % self.path(code)
 
     def protocol(self, code):
         """Return https as the protocol for this family."""
