@@ -370,12 +370,11 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
         else:
             data[name] = info
 
-    # Remove any sub-packages which were loaded with a different name.
+    # Remove any sub-modules which were loaded with a different name.
     # e.g. 'wikipedia_family.py' is loaded as 'wikipedia'
+    _program_dir = _get_program_dir()
     for path, name in paths.items():
-        for other_path in set(paths) - set([path]):
-            if path.startswith(other_path) and not other_path.startswith(path):
-                del paths[path]
-                del data[name]
+        if _program_dir in path:
+            del data[name]
 
     return data
