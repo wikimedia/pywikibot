@@ -36,6 +36,8 @@ from pywikibot import pagegenerators, i18n, Bot
 
 class UnlinkBot(Bot):
 
+    """Page unlinking bot."""
+
     def __init__(self, pageToUnlink, **kwargs):
         self.availableOptions.update({
             'namespaces': [],
@@ -73,7 +75,7 @@ class UnlinkBot(Bot):
 
     def handleNextLink(self, text, match, context=100):
         """
-        Returns a tuple (text, jumpToBeginning).
+        Return a tuple (text, jumpToBeginning).
 
         text is the unicode string after the current link has been processed.
         jumpToBeginning is a boolean which specifies if the cursor position

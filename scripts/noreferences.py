@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-
 """
-This script goes over multiple pages, searches for pages where <references />
+This script adds a missing references section to pages.
+
+It goes over multiple pages, searches for pages where <references />
 is missing although a <ref> tag is present, and in that case adds a new
 references section.
 
@@ -426,12 +427,15 @@ class XmlDumpNoReferencesPageGenerator:
 
     """
     Generator which will yield Pages that might lack a references tag.
+
     These pages will be retrieved from a local XML dump file
     (pages-articles or pages-meta-current).
     """
 
     def __init__(self, xmlFilename):
         """
+        Constructor.
+
         Arguments:
             * xmlFilename  - The dump's path, either absolute or relative
         """
@@ -452,7 +456,10 @@ class XmlDumpNoReferencesPageGenerator:
 
 class NoReferencesBot(Bot):
 
+    """References section bot."""
+
     def __init__(self, generator, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
             'verbose': True,
         })
@@ -478,7 +485,7 @@ class NoReferencesBot(Bot):
             self.referencesText = u'<references />'
 
     def lacksReferences(self, text):
-        """Checks whether or not the page is lacking a references tag."""
+        """Check whether or not the page is lacking a references tag."""
         oldTextCleaned = textlib.removeDisabledParts(text)
         if self.referencesR.search(oldTextCleaned) or \
            self.referencesTagR.search(oldTextCleaned):
@@ -503,8 +510,9 @@ class NoReferencesBot(Bot):
 
     def addReferences(self, oldText):
         """
-        Tries to add a references tag into an existing section where it fits
-        into. If there is no such section, creates a new section containing
+        Add a references tag into an existing section where it fits into.
+
+        If there is no such section, creates a new section containing
         the references tag.
         * Returns : The modified pagetext
 

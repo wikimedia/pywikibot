@@ -37,6 +37,9 @@ from pywikibot import pagegenerators, Bot
 
 
 class CreateCategoriesBot(Bot):
+
+    """Category creator bot."""
+
     def __init__(self, generator, parent, basename, **kwargs):
         super(CreateCategoriesBot, self).__init__(**kwargs)
         self.generator = generator

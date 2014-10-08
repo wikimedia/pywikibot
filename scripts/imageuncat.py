@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Program to add uncat template to images without categories at commons.
+
 See imagerecat.py (still working on that one) to add these images to categories.
 
 """
@@ -1235,12 +1236,11 @@ putcomment = u'Please add categories to this image'
 
 
 def uploadedYesterday(site):
-    '''
+    """
     Return a pagegenerator containing all the pictures uploaded yesterday.
+
     Should probably copied to somewhere else
-
-    '''
-
+    """
     today = pywikibot.Timestamp.utcnow()
     yesterday = today + timedelta(days=-1)
 
@@ -1249,11 +1249,12 @@ def uploadedYesterday(site):
 
 
 def recentChanges(site=None, delay=0, block=70):
-    '''
+    """
     Return a pagegenerator containing all the images edited in a certain timespan.
+
     The delay is the amount of minutes to wait and the block is the timespan to return images in.
     Should probably be copied to somewhere else
-    '''
+    """
     rcstart = site.getcurrenttime() + timedelta(minutes=-(delay + block))
     rcend = site.getcurrenttime() + timedelta(minutes=-delay)
 
@@ -1267,13 +1268,13 @@ def recentChanges(site=None, delay=0, block=70):
 
 
 def isUncat(page):
-    '''
-    Do we want to skip this page?
+    """
+    Do we want to skip this page.
 
     If we found a category which is not in the ignore list it means
     that the page is categorized so skip the page.
     If we found a template which is in the ignore list, skip the page.
-    '''
+    """
     pywikibot.output(u'Working on ' + page.title())
 
     for category in page.categories():
@@ -1298,9 +1299,12 @@ def isUncat(page):
 
 
 def addUncat(page):
-    '''
-    Add the uncat template to the page
-    '''
+    """
+    Add the uncat template to the page.
+
+    @param page: Page to be modified
+    @rtype: Page
+    """
     newtext = page.get() + puttext
     pywikibot.showDiff(page.get(), newtext)
     try:

@@ -28,6 +28,9 @@ from pywikibot.editor import TextEditor
 
 
 class ArticleEditor(object):
+
+    """Edit a wiki page."""
+
     # join lines if line starts with this ones
     # TODO: No apparent usage
     # joinchars = string.letters + '[]' + string.digits
@@ -58,7 +61,7 @@ class ArticleEditor(object):
             self.options.page = args[0]
 
     def setpage(self):
-        """Sets page and page title."""
+        """Set page and page title."""
         site = pywikibot.Site()
         pageTitle = self.options.page or pywikibot.input(u"Page to edit:")
         self.page = pywikibot.Page(pywikibot.Link(pageTitle, site))

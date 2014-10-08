@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8    -*-
 """
-Script to upload the mappings of Freebase to Wikidata
+Script to upload the mappings of Freebase to Wikidata.
+
 Can be easily adapted to upload other String identifiers as well
 
 This bot needs the dump from
@@ -30,6 +31,8 @@ import pywikibot
 
 
 class FreebaseMapperRobot:
+
+    """Freebase Mapping bot."""
 
     def __init__(self, filename):
         self.repo = pywikibot.Site('wikidata', 'wikidata').data_repository()

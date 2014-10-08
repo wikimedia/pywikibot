@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 This script can be used to delete and undelete pages en masse.
+
 Of course, you will need an admin account on the relevant wiki.
 
 These command line parameters can be used to specify which pages to work on:
@@ -43,6 +44,7 @@ docuReplacements = {
 
 
 class DeletionRobot(Bot):
+
     """ This robot allows deletion of pages en masse. """
 
     def __init__(self, generator, summary, **kwargs):
@@ -63,9 +65,10 @@ class DeletionRobot(Bot):
         self.summary = summary
 
     def run(self):
-        """ Start the robot's action:
-        Loop through everything in the page generator and delete it.
+        """
+        Run bot.
 
+        Loop through everything in the page generator and delete it.
         """
         for page in self.generator:
             self.current_page = page

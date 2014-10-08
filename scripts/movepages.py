@@ -53,6 +53,9 @@ docuReplacements = {
 
 
 class MovePagesBot(Bot):
+
+    """Page move bot."""
+
     def __init__(self, generator, **kwargs):
         self.availableOptions.update({
             'prefix': None,

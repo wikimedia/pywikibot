@@ -3,6 +3,7 @@
 
 """
 Script to remove links that are being or have been spammed.
+
 Usage:
 
 spamremove.py www.spammedsite.com

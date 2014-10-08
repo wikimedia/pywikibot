@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-This bot appends some text to all unused images and other text to the
-respective uploaders.
+This bot appends some text to all unused images and notifies uploaders.
 
 Parameters:
 
@@ -50,6 +49,8 @@ except_text = {
 
 
 class UnusedFilesBot(Bot):
+
+    """Unused files bot."""
 
     def __init__(self, site, **kwargs):
         super(UnusedFilesBot, self).__init__(**kwargs)

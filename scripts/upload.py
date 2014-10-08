@@ -59,11 +59,16 @@ else:
 
 
 class UploadRobot:
+
+    """Upload bot."""
+
     def __init__(self, url, urlEncoding=None, description=u'',
                  useFilename=None, keepFilename=False,
                  verifyDescription=True, ignoreWarning=False,
                  targetSite=None, uploadByUrl=False, aborts=[], chunk_size=0):
         """
+        Constructor.
+
         @param ignoreWarning: Set this to True if you want to upload even if
             another file would be overwritten or another mistake would be
             risked.
@@ -294,7 +299,7 @@ class UploadRobot:
             return filename  # data['filename']
 
     def run(self):
-
+        """Run bot."""
         # early check that upload is enabled
         if self.targetSite.is_uploaddisabled():
             pywikibot.error(

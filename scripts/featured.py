@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
+Manage featured/good article/list status template.
+
 This script understands various command-line arguments:
 
  Task commands:
@@ -205,6 +207,9 @@ former_name = {
 
 
 class FeaturedBot(pywikibot.Bot):
+
+    """Featured article bot."""
+
     # Bot configuration.
     # Only the keys of the dict can be passed as init options
     # The values are the default values
@@ -247,7 +252,7 @@ class FeaturedBot(pywikibot.Bot):
             self.tasks = ['featured']
 
     def itersites(self, task):
-        """generator for site codes to be processed."""
+        """Generator for site codes to be processed."""
         def _generator():
             if task == 'good':
                 item_no = good_name['wikidata'][1]
@@ -500,7 +505,6 @@ class FeaturedBot(pywikibot.Bot):
         remember the page in the cache dict.
 
         """
-
         tosite = self.site
         if fromsite.code not in self.cache:
             self.cache[fromsite.code] = {}
@@ -532,7 +536,6 @@ class FeaturedBot(pywikibot.Bot):
 
     def add_template(self, source, dest, task, fromsite):
         """Place or remove the Link_GA/FA template on/from a page."""
-
         def compile_link(site, templates):
             """compile one link template list."""
             findtemplate = '(%s)' % '|'.join(templates)

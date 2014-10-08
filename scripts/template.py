@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Very simple script to replace a template with another one,
-and to convert the old MediaWiki boilerplate format to the new template format.
+Very simple script to replace a template with another one.
+
+It also converts the old MediaWiki boilerplate format to the new template format.
 
 Syntax: python template.py [-remove] [xml[:filename]] oldTemplate [newTemplate]
 
@@ -24,7 +25,7 @@ Command line options:
              the same effect.
 
 -xml         retrieve information from a local dump
-             (https://download.wikimedia.org). If this argument isn\'t given,
+             (https://download.wikimedia.org). If this argument isn't given,
              info will be loaded from the maintenance page of the live wiki.
              argument can also be given as "-xml:filename.xml".
 
@@ -115,8 +116,9 @@ from scripts import replace
 
 def UserEditFilterGenerator(generator, username, timestamp=None, skip=False):
     """
-    Generator which will yield Pages depending of user:username is an Author of
-    that page (only looks at the last 100 editors).
+    Generator which will yield Pages modified by username.
+
+    It only looks at the last 100 editors.
     If timestamp is set in MediaWiki format JJJJMMDDhhmmss, older edits are
     ignored
     If skip is set, pages edited by the given user are ignored otherwise only
@@ -145,13 +147,16 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False):
 class XmlDumpTemplatePageGenerator:
 
     """
-    Generator which will yield Pages to pages that might contain the chosen
-    template. These pages will be retrieved from a local XML dump file
-    (cur table).
+    Generator which yield Pages that transclude a template.
+
+    These pages will be retrieved from a local XML dump file
+    (cur table), and may not still transclude the template.
     """
 
     def __init__(self, templates, xmlfilename):
         """
+        Constructor.
+
         Arguments:
             * templateNames - A list of Page object representing the searched
                               templates
@@ -189,12 +194,8 @@ class XmlDumpTemplatePageGenerator:
 
 class TemplateRobot(Bot):
 
-    """
-    This bot will load all pages yielded by a page generator and replace or
-    remove all occurences of the old template, or substitute them with the
-    template's text.
+    """This bot will replace, remove or subst all occurences of a template."""
 
-    """
     def __init__(self, generator, templates, **kwargs):
         """
         Constructor.

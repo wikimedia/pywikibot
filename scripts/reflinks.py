@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """
+Fetch and add titles for bare links in references.
+
 This bot will search for references which are only made of a link without title,
 (i.e. <ref>[https://www.google.fr/]</ref> or <ref>https://www.google.fr/</ref>)
 and will fetch the html title from the link to use it as the title of the wiki
@@ -181,7 +183,7 @@ listof404pages = '404-links.txt'
 
 class XmlDumpPageGenerator:
 
-    """Xml generator that yiels pages containing bare references."""
+    """Xml generator that yields pages containing bare references."""
 
     def __init__(self, xmlFilename, xmlStart, namespaces):
         self.xmlStart = xmlStart
@@ -268,9 +270,10 @@ class RefLink:
         # TODO : remove HTML when both opening and closing tags are included
 
     def avoid_uppercase(self):
-        """ If title has more than 6 characters and has 60% of uppercase
-        characters, capitalize() it
+        """
+        Convert to title()-case if title is 70% uppercase characters.
 
+        Skip title that has less than 6 characters.
         """
         if len(self.title) <= 6:
             return
@@ -289,10 +292,12 @@ class RefLink:
 
 class DuplicateReferences:
 
-    """ When some references are duplicated in an article,
-    name the first, and remove the content of the others
+    """Helper to de-duplicate references in text.
 
+    When some references are duplicated in an article,
+    name the first, and remove the content of the others
     """
+
     def __init__(self):
         # Match references
         self.REFS = re.compile(
@@ -400,6 +405,8 @@ class DuplicateReferences:
 
 class ReferencesRobot(Bot):
 
+    """References bot."""
+
     def __init__(self, generator, **kwargs):
         """- generator : Page generator."""
         self.availableOptions.update({
@@ -463,7 +470,8 @@ class ReferencesRobot(Bot):
 
     def getPDFTitle(self, ref, f):
         """ Use pdfinfo to retrieve title from a PDF.
-        Unix-only, I'm afraid.
+
+        FIXME: Unix-only, I'm afraid.
 
         """
         pywikibot.output(u'PDF file.')

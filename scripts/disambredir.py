@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-Goes through the disambiguation pages, checks their links, and asks for
-each link that goes to a redirect page whether it should be replaced.
+User assisted updating redirect links on disambiguation pages.
 
 Usage:
     python disambredir.py [start]
