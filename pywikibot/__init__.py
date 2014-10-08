@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2013
+# (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
@@ -536,7 +536,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     return _sites[key]
 
 
-getSite = Site  # alias for backwards-compability
+# alias for backwards-compability
+getSite = pywikibot.tools.redirect_func(Site, old_name='getSite')
 
 
 from .page import (
