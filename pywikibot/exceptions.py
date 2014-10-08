@@ -104,7 +104,7 @@ class PageRelatedError(Error):
             super(PageRelatedError, self).__init__(self.message % page)
 
     def getPage(self):
-        return self._page
+        return self.page
 
 
 class PageSaveRelatedError(PageRelatedError):
