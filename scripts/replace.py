@@ -295,6 +295,7 @@ class ReplaceRobot(Bot):
                                            cat_ns + ':' + addedCat)
         self.sleep = sleep
         self.summary = summary
+        self.changed_pages = 0
 
     def isTitleExcepted(self, title):
         """
@@ -343,6 +344,11 @@ class ReplaceRobot(Bot):
                                              allowoverlap=self.allowoverlap,
                                              site=self.site)
         return new_text
+
+    def count_changes(self, page, err):
+        """Count succesfully changed pages."""
+        if not isinstance(err, Exception):
+            self.changed_pages += 1
 
     def run(self):
         """Start the bot."""
@@ -424,12 +430,12 @@ class ReplaceRobot(Bot):
                 if choice == 'a':
                     self.acceptall = True
                 if choice == 'y':
-                    page.put_async(new_text, self.summary)
+                    page.put_async(new_text, self.summary, callback=self.count_changes)
                 # choice must be 'N'
                 break
             if self.acceptall and new_text != original_text:
                 try:
-                    page.put(new_text, self.summary)
+                    page.put(new_text, self.summary, callback=self.count_changes)
                 except pywikibot.EditConflict:
                     pywikibot.output(u'Skipping %s because of edit conflict'
                                      % (page.title(),))
@@ -713,6 +719,12 @@ LIMIT 200""" % (whereClause, exceptClause)
                        allowoverlap, recursive, add_cat, sleep, edit_summary)
     pywikibot.Site().login()
     bot.run()
+
+    def display_edit_counter(bot):
+        pywikibot.output(u'\n%s pages changed.' % bot.changed_pages)
+
+    # Queue last request to display number of changed pages.
+    pywikibot.async_request(display_edit_counter, bot)
 
 
 if __name__ == "__main__":
