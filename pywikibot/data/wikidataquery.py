@@ -20,6 +20,7 @@ import tempfile
 
 from pywikibot.page import ItemPage, PropertyPage, Claim
 import pywikibot
+from pywikibot import config
 
 
 def listify(x):
@@ -519,7 +520,7 @@ class WikidataQuery():
 
         with open(cacheFile, 'wb') as f:
             try:
-                pickle.dump(data, f)
+                pickle.dump(data, f, protocol=config.pickle_protocol)
             except IOError:
                 pywikibot.warning(u"Failed to write cache file %s" % cacheFile)
 

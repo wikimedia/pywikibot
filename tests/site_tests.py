@@ -14,6 +14,7 @@ from datetime import datetime
 import re
 
 import pywikibot
+from pywikibot import config
 from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.data import api
 from tests.aspects import (
@@ -67,7 +68,7 @@ class TestSiteObject(DefaultSiteTestCase):
     def testPickleAbility(self):
         import pickle
         mysite = self.get_site()
-        mysite_str = pickle.dumps(mysite)
+        mysite_str = pickle.dumps(mysite, protocol=config.pickle_protocol)
         mysite_pickled = pickle.loads(mysite_str)
         self.assertEqual(mysite, mysite_pickled)
 

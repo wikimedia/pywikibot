@@ -26,8 +26,7 @@ import re
 import time
 from datetime import datetime, timedelta
 import pywikibot
-from pywikibot import pagegenerators
-from pywikibot import i18n
+from pywikibot import i18n, pagegenerators, config
 
 if sys.version_info[0] > 2:
     import pickle as cPickle
@@ -193,7 +192,7 @@ class CategoryRedirectBot(object):
             record = {}
         if record:
             with open(datafile + ".bak", "wb") as f:
-                cPickle.dump(record, f, -1)
+                cPickle.dump(record, f, protocol=config.pickle_protocol)
         try:
             template_list = self.site.family.category_redirect_templates[
                 self.site.code]
@@ -394,7 +393,7 @@ class CategoryRedirectBot(object):
                 pass
 
         with open(datafile, "wb") as f:
-            cPickle.dump(record, f, -1)
+            cPickle.dump(record, f, protocol=config.pickle_protocol)
 
         self.log_text.sort()
         problems.sort()

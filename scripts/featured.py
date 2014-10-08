@@ -66,7 +66,7 @@ import pickle
 import re
 import sys
 import pywikibot
-from pywikibot import i18n, textlib
+from pywikibot import i18n, textlib, config
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.config2 import LS  # line separator
 
@@ -320,9 +320,8 @@ class FeaturedBot(pywikibot.Bot):
         if not self.getOption('nocache') is True:
             pywikibot.output(u'Writing %d items to cache file %s.'
                              % (len(self.cache), self.filename))
-            f = open(self.filename, "wb")
-            pickle.dump(self.cache, f)
-            f.close()
+            with open(self.filename, "wb") as f:
+                pickle.dump(self.cache, f, protocol=config.pickle_protocol)
         self.cache = dict()
 
     def run(self):

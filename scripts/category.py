@@ -250,7 +250,7 @@ class CategoryDatabase:
             }
             # store dump to disk in binary format
             try:
-                pickle.dump(databases, f, protocol=pickle.HIGHEST_PROTOCOL)
+                pickle.dump(databases, f, protocol=config.pickle_protocol)
             except pickle.PicklingError:
                 pass
             f.close()
