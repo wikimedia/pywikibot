@@ -547,7 +547,6 @@ class Request(MutableMapping):
                 pywikibot.warning(
                     "Non-JSON response received from server %s; the server may be down."
                     % self.site)
-                pywikibot.debug(rawdata, _logger)
                 # there might also be an overflow, so try a smaller limit
                 for param in self._params:
                     if param.endswith("limit"):
