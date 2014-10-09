@@ -1046,7 +1046,7 @@ class Family(object):
         Use L{pywikibot.tools.MediaWikiVersion} to compare version strings.
         """
         # Here we return the latest mw release for downloading
-        return '1.23.2'
+        return '1.23.5'
 
     @deprecated("version()")
     def versionnumber(self, code):
