@@ -1040,7 +1040,7 @@ def extract_templates_and_params_regex(text):
             if not name or name.startswith('#'):
                 continue
 
-# TODO: merged from wikipedia.py - implement the following
+# TODO: implement the following; 'self' and site dont exist in this function
 #            if self.site().isInterwikiLink(name):
 #                continue
 #            # {{DEFAULTSORT:...}}

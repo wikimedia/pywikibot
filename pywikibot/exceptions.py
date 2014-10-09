@@ -51,9 +51,6 @@ __version__ = '$Id$'
 
 from pywikibot.tools import UnicodeMixin
 
-# TODO: These are copied from wikipedia.py; not certain that all of them
-# will be needed in the rewrite.
-
 
 class Error(UnicodeMixin, Exception):
 

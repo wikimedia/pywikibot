@@ -338,12 +338,12 @@ if __name__ == "__main__":
         if pywikibot.inputChoice(
                 "Do you want to copy user files from an existing Pywikibot "
                 "installation?", ["yes", "no"], ["y", "n"]) == "y":
-            oldpath = pywikibot.input("Path to existing wikipedia.py?")
+            oldpath = pywikibot.input("Path to existing user-config.py?")
             if not os.path.exists(oldpath):
                 pywikibot.error("Not a valid path")
                 continue
             if os.path.isfile(oldpath):
-                # User probably typed /wikipedia.py at the end, so strip it
+                # User probably typed /user-config.py at the end, so strip it
                 oldpath = os.path.dirname(oldpath)
             if not os.path.isfile(os.path.join(oldpath, "user-config.py")):
                 pywikibot.error("No user_config.py found in that directory")

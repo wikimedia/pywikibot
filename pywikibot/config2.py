@@ -44,9 +44,9 @@ _deprecated_variables = ['use_SSL_onlogin', 'use_SSL_always',
 
 # ############# ACCOUNT SETTINGS ##############
 
-# The family of sites we are working on. wikipedia.py will import
+# The family of sites we are working on. pywikibot will import
 # families/xxx_family.py so if you want to change this variable,
-# you need to write such a file.
+# you need to write such a file if one does not exist.
 family = 'wikipedia'
 # The language code of the site we're working on.
 mylang = 'language'
@@ -128,7 +128,7 @@ password_file = None
 # edit summary to use if not supplied by bot script
 # WARNING: this should NEVER be used in practice, ALWAYS supply a more
 #          relevant summary for bot edits
-default_edit_summary = u'Wikipedia python library v.2'
+default_edit_summary = u'Pywikibot v.2'
 
 
 def get_base_dir(test_directory=None):

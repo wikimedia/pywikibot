@@ -82,7 +82,7 @@ def getversiondict():
             except:
                 # nothing worked; version unknown (but suppress exceptions)
                 # the value is most likely '$Id' + '$', it means that
-                # wikipedia.py got imported without using svn at all
+                # pywikibot was imported without using version control at all.
                 return dict(tag='', rev='-1 (unknown)', date='0 (unknown)',
                             hsh='(unknown)')
 
