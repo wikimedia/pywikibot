@@ -22,12 +22,6 @@ class TestFamily(TestCase):
 
     net = False
 
-    def setUp(self):
-        super(TestCase, self).setUp()
-
-    def tearDown(self):
-        super(TestCase, self).tearDown()
-
     def test_eq_different_families_by_name(self):
         """Test that two Family with same name are equal."""
         family_1 = Family()
