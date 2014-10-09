@@ -260,7 +260,7 @@ class FeaturedBot(pywikibot.Bot):
             for key in sorted(dp.sitelinks.keys()):
                 try:
                     site = self.site.fromDBName(key)
-                except pywikibot.NoSuchSite:
+                except pywikibot.SiteDefinitionError:
                     pywikibot.output('"%s" is not a valid site. Skipping...'
                                      % key)
                 else:

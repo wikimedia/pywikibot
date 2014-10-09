@@ -7,12 +7,15 @@ Error: Base class, all exceptions should the subclass of this class.
   - UserBlockedY: our username or IP has been blocked
   - AutoblockUser: requested action on a virtual autoblock user not valid
   - UserActionRefuse
-  - NoSuchSite: Site does not exist
   - BadTitle: Server responded with BadTitle
   - InvalidTitle: Invalid page title
   - PageNotFound: Page not found in list
   - CaptchaError: Captcha is asked and config.solve_captcha == False
   - Server504Error: Server timed out with HTTP 504 code
+
+SiteDefinitionError: Site loading problem
+  - UnknownSite: Site does not exist in Family
+  - UnknownFamily: Family is not registered
 
 PageRelatedError: any exception which is caused by an operation on a Page.
   - NoPage: Page does not exist
@@ -155,9 +158,29 @@ class NoPage(PageRelatedError):
     pass
 
 
-class NoSuchSite(Error):
+class SiteDefinitionError(Error):
 
     """Site does not exist"""
+
+    pass
+
+
+# The name 'NoSuchSite' was used for all site related issues,
+# and it used message "Site does not exist".
+# These are retain for backwards compatibility with scripts.
+NoSuchSite = SiteDefinitionError
+
+
+class UnknownSite(SiteDefinitionError):
+
+    """Site does not exist in Family"""
+
+    pass
+
+
+class UnknownFamily(SiteDefinitionError):
+
+    """Family is not registered"""
 
     pass
 

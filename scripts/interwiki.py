@@ -1370,7 +1370,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 self.originPage = page
             try:
                 iw = page.langlinks()
-            except pywikibot.NoSuchSite:
+            except pywikibot.UnknownSite:
                 if not globalvar.quiet:
                     pywikibot.output(u"NOTE: site %s does not exist."
                                      % page.site)
@@ -1841,7 +1841,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                                'from': page})
             except KeyError:
                 pass
-            except pywikibot.NoSuchSite:
+            except pywikibot.SiteDefinitionError:
                 pass
             except pywikibot.InvalidTitle:
                 pass

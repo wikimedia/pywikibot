@@ -44,7 +44,10 @@ import pywikibot
 from pywikibot import config
 from pywikibot.family import Family
 from pywikibot.site import Namespace
-from pywikibot.exceptions import AutoblockUser, UserActionRefuse, NoSuchSite
+from pywikibot.exceptions import (
+    AutoblockUser, UserActionRefuse,
+    SiteDefinitionError
+)
 from pywikibot.tools import ComparableMixin, deprecated, deprecate_arg
 from pywikibot import textlib
 
@@ -4059,8 +4062,8 @@ class Link(ComparableMixin):
                 newsite = self._site.interwiki(prefix)
             except KeyError:
                 break  # text before : doesn't match any known prefix
-            except NoSuchSite:
-                raise pywikibot.Error(
+            except SiteDefinitionError:
+                raise SiteDefinitionError(
                     u'{0} is not a local page on {1}, and the interwiki prefix '
                     '{2} is not supported by PyWikiBot!'.format(
                     self._text, self._site, prefix))

@@ -58,7 +58,7 @@ __version__ = '$Id$'
 import pywikibot
 from os.path import join
 from pywikibot import config
-from pywikibot.exceptions import NoSuchSite
+from pywikibot.exceptions import SiteDefinitionError
 
 
 def main(*args):
@@ -109,7 +109,7 @@ def main(*args):
                         pywikibot.output(u"Logged out of %(site)s." % locals())
                     else:
                         pywikibot.output(u"Not logged in on %(site)s." % locals())
-            except NoSuchSite:
+            except SiteDefinitionError:
                 pywikibot.output(u'%s.%s is not a valid site, please remove it'
                                  u' from your config' % (lang, familyName))
 if __name__ == "__main__":

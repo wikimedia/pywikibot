@@ -666,7 +666,7 @@ class DeprecationTestCase(TestCase):
     deprecation_messages = []
 
     @staticmethod
-    def _record_messages(msg):
+    def _record_messages(msg, *args, **kwargs):
         DeprecationTestCase.deprecation_messages.append(msg)
 
     @staticmethod
