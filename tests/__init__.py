@@ -61,9 +61,13 @@ library_test_modules = [
     'dry_api',
     'dry_site',
     'api',
+    'family',
     'site',
+    'link',
+    'interwiki_link',
     'page',
     'file',
+    'edit_failure',
     'timestripper',
     'pagegenerators',
     'wikidataquery',
@@ -71,12 +75,15 @@ library_test_modules = [
     'i18n',
     'ui',
     'wikibase',
+    'wikibase_edit',
+    'upload',
 ]
 
 script_test_modules = [
     'pwb',
     'script',
     'archivebot',
+    'data_ingestion',
 ]
 
 disabled_test_modules = [
