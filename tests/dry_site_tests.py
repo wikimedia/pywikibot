@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Tests against a fake Site object."""
 #
 # (C) Pywikibot team, 2012-2014
 #
@@ -8,14 +9,18 @@ __version__ = '$Id$'
 #
 
 import pywikibot
+from pywikibot.tools import deprecated
 from pywikibot.site import must_be, need_version
 from pywikibot.comms.http import user_agent
 
 from tests.utils import DummySiteinfo
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, DeprecationTestCase
 
 
 class DrySite(pywikibot.site.APISite):
+
+    """Fake APISite object."""
+
     _loginstatus = pywikibot.site.LoginStatus.NOT_ATTEMPTED
 
     @property
@@ -28,6 +33,8 @@ class DrySite(pywikibot.site.APISite):
 
 
 class TestDrySite(TestCase):
+
+    """Tests against a fake Site object."""
 
     net = False
 
@@ -167,7 +174,7 @@ class TestMustBe(TestCase):
         self.assertRaises(pywikibot.NoSuchSite, self.call_this_user_req_function, args, kwargs)
 
 
-class TestNeedVersion(TestCase):
+class TestNeedVersion(DeprecationTestCase):
 
     """Test cases for the need_version decorator."""
 
@@ -191,10 +198,61 @@ class TestNeedVersion(TestCase):
     def older(self):
         return True
 
-    def testNeedVersion(self):
+    @need_version("1.14")
+    @deprecated
+    def deprecated_unavailable_method(self):
+        return True
+
+    @deprecated
+    @need_version("1.14")
+    def deprecated_unavailable_method2(self):
+        return True
+
+    @need_version("1.12")
+    @deprecated
+    def deprecated_available_method(self):
+        return True
+
+    @deprecated
+    @need_version("1.12")
+    def deprecated_available_method2(self):
+        return True
+
+    def test_need_version(self):
         self.assertRaises(NotImplementedError, self.too_new)
         self.assertTrue(self.old_enough())
         self.assertTrue(self.older())
+
+    def test_need_version_fail_with_deprecated(self):
+        """Test order of combined version check and deprecation warning."""
+        # The outermost decorator is the version check, so no deprecation message.
+        self.assertRaisesRegex(
+            NotImplementedError,
+            #__name__ + '.TestNeedVersion.deprecated_unavailable_method',
+            'deprecated_unavailable_method',
+            self.deprecated_unavailable_method)
+        self.assertNoDeprecation()
+
+        # The deprecator is first, but the version check still raises exception.
+        self.assertRaisesRegex(
+            NotImplementedError,
+            #__name__ + '.TestNeedVersion.deprecated_unavailable_method2',
+            'deprecated_unavailable_method2',
+            self.deprecated_unavailable_method2)
+        self.assertDeprecation(
+            __name__ + '.TestNeedVersion.deprecated_unavailable_method2 is deprecated.')
+
+    def test_need_version_success_with_deprecated(self):
+        """Test order of combined version check and deprecation warning."""
+        self.deprecated_available_method()
+        self.assertDeprecation(
+            __name__ + '.TestNeedVersion.deprecated_available_method is deprecated.')
+
+        TestNeedVersion._reset_messages()
+
+        self.deprecated_available_method2()
+        self.assertDeprecation(
+            __name__ + '.TestNeedVersion.deprecated_available_method2 is deprecated.')
 
 
 if __name__ == '__main__':

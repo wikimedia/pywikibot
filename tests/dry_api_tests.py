@@ -21,13 +21,11 @@ __version__ = '$Id$'
 #
 
 import os
-import sys
 import datetime
 
 import pywikibot
 from pywikibot.data.api import (
     Request,
-    MIMEMultipart,
     CachedRequest,
     QueryGenerator,
 )

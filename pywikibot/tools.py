@@ -11,6 +11,7 @@ __version__ = '$Id$'
 import sys
 import threading
 import time
+import inspect
 import re
 from collections import Mapping
 from distutils.version import Version
@@ -319,54 +320,207 @@ class EmptyDefault(str, Mapping):
 
 EMPTY_DEFAULT = EmptyDefault()
 
+# Decorators
+#
+# Decorator functions without parameters are _invoked_ differently from
+# decorator functions with function syntax.  For example, @deprecated causes
+# a different invocation to @deprecated().
 
-def deprecated(instead=None):
-    """Decorator to output a method deprecation warning.
+# The former is invoked with the decorated function as args[0].
+# The latter is invoked with the decorator arguments as *args & **kwargs,
+# and it must return a callable which will be invoked with the decorated
+# function as args[0].
+
+# The follow deprecators may support both syntax, e.g. @deprecated and
+# @deprecated() both work.  In order to achieve that, the code inspects
+# args[0] to see if it callable.  Therefore, a decorator must not accept
+# only one arg, and that arg be a callable, as it will be detected as
+# a deprecator without any arguments.
+
+
+def add_decorated_full_name(obj):
+    """Extract full object name, including class, and store in __full_name__.
+
+    This must be done on all decorators that are chained together, otherwise
+    the second decorator will have the wrong full name.
+
+    @param obj: A object being decorated
+    @type obj: object
+    """
+    if hasattr(obj, '__full_name__'):
+        return
+    # The current frame is add_decorated_full_name
+    # The next frame is the decorator
+    # The next frame is the object being decorated
+    frame = inspect.currentframe().f_back.f_back
+    class_name = frame.f_code.co_name
+    if class_name and class_name != '<module>':
+        obj.__full_name__ = (obj.__module__ + '.' +
+                             class_name + '.' +
+                             obj.__name__)
+    else:
+        obj.__full_name__ = (obj.__module__ + '.' +
+                             obj.__name__)
+
+
+def add_full_name(obj):
+    """
+    A decorator to add __full_name__ to the function being decorated.
+
+    This should be done for all decorators used in pywikibot, as any
+    decorator that does not add __full_name__ will prevent other
+    decorators in the same chain from being able to obtain it.
+
+    This can be used to monkey-patch decorators in other modules.
+    e.g.
+    <xyz>.foo = add_full_name(<xyz>.foo)
+
+    @param obj: The function to decorate
+    @type obj: callable
+    @return: decorating function
+    @rtype: function
+    """
+    def outer_wrapper(*outer_args, **outer_kwargs):
+        """Outer wrapper.
+
+        The outer wrapper may be the replacement function if the decorated
+        decorator was called without arguments, or the replacement decorator
+        if the decorated decorator was called without arguments.
+
+        @param outer_args: args
+        @type outer_args: list
+        @param outer_kwargs: kwargs
+        @type: outer_kwargs: dict
+        """
+        def inner_wrapper(*args, **kwargs):
+            """Replacement function.
+
+            If the decorator supported arguments, they are in outer_args,
+            and this wrapper is used to process the args which belong to
+            the function that the decorated decorator was decorating.
+
+            @param args: args passed to the decorated function.
+            @param kwargs: kwargs passed to the decorated function.
+            """
+            add_decorated_full_name(args[0])
+            return obj(*outer_args, **outer_kwargs)(*args, **kwargs)
+
+        inner_wrapper.__doc__ = obj.__doc__
+        inner_wrapper.__name__ = obj.__name__
+        inner_wrapper.__module__ = obj.__module__
+
+        # The decorator being decorated may have args, so both
+        # syntax need to be supported.
+        if (len(outer_args) == 1 and len(outer_kwargs) == 0 and
+                callable(outer_args[0])):
+            add_decorated_full_name(outer_args[0])
+            return obj(outer_args[0])
+        else:
+            return inner_wrapper
+
+    return outer_wrapper
+
+
+@add_full_name
+def deprecated(*args, **kwargs):
+    """Decorator to output a deprecation warning.
 
     @param instead: if provided, will be used to specify the replacement
     @type instead: string
     """
-    def decorator(method):
+    def decorator(obj):
+        """Outer wrapper.
+
+        The outer wrapper is used to create the decorating wrapper.
+
+        @param obj: function being wrapped
+        @type obj: object
+        """
         def wrapper(*args, **kwargs):
-            funcname = method.__name__
-            classname = args[0].__class__.__name__
+            """Replacement function.
+
+            @param args: args passed to the decorated function.
+            @type args: list
+            @param kwargs: kwargs passed to the decorated function.
+            @type kwargs: dict
+            @return: the value returned by the decorated function
+            @rtype: any
+            """
+            name = obj.__full_name__
             if instead:
-                warning(u"%s.%s is DEPRECATED, use %s instead."
-                        % (classname, funcname, instead))
+                warning(u"%s is deprecated, use %s instead." % (name, instead))
             else:
-                warning(u"%s.%s is DEPRECATED." % (classname, funcname))
-            return method(*args, **kwargs)
-        wrapper.__name__ = method.__name__
+                warning(u"%s is deprecated." % (name))
+            return obj(*args, **kwargs)
+
+        wrapper.__doc__ = obj.__doc__
+        wrapper.__name__ = obj.__name__
+        wrapper.__module__ = obj.__module__
         return wrapper
-    return decorator
+
+    without_parameters = len(args) == 1 and len(kwargs) == 0 and callable(args[0])
+    if 'instead' in kwargs:
+        instead = kwargs['instead']
+    elif not without_parameters and len(args) == 1:
+        instead = args[0]
+    else:
+        instead = False
+
+    # When called as @deprecated, return a replacement function
+    if without_parameters:
+        return decorator(args[0])
+    # Otherwise return a decorator, which returns a replacement function
+    else:
+        return decorator
 
 
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg."""
     _logger = ""
 
-    def decorator(method):
+    def decorator(obj):
+        """Outer wrapper.
+
+        The outer wrapper is used to create the decorating wrapper.
+
+        @param obj: function being wrapped
+        @type obj: object
+        """
         def wrapper(*__args, **__kw):
-            meth_name = method.__name__
+            """Replacement function.
+
+            @param __args: args passed to the decorated function
+            @type __args: list
+            @param __kwargs: kwargs passed to the decorated function
+            @type __kwargs: dict
+            @return: the value returned by the decorated function
+            @rtype: any
+            """
+            name = obj.__full_name__
             if old_arg in __kw:
                 if new_arg:
                     if new_arg in __kw:
                         warning(
-u"%(new_arg)s argument of %(meth_name)s replaces %(old_arg)s; cannot use both."
+u"%(new_arg)s argument of %(name)s replaces %(old_arg)s; cannot use both."
                             % locals())
                     else:
                         warning(
-u"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
+u"%(old_arg)s argument of %(name)s is deprecated; use %(new_arg)s instead."
                             % locals())
                         __kw[new_arg] = __kw[old_arg]
                 else:
                     debug(
-u"%(old_arg)s argument of %(meth_name)s is deprecated."
+u"%(old_arg)s argument of %(name)s is deprecated."
                         % locals(), _logger)
                 del __kw[old_arg]
-            return method(*__args, **__kw)
-        wrapper.__doc__ = method.__doc__
-        wrapper.__name__ = method.__name__
+            return obj(*__args, **__kw)
+
+        wrapper.__doc__ = obj.__doc__
+        wrapper.__name__ = obj.__name__
+        wrapper.__module__ = obj.__module__
+        if not hasattr(obj, '__full_name__'):
+            add_decorated_full_name(obj)
+        wrapper.__full_name__ = obj.__full_name__
         return wrapper
     return decorator
 

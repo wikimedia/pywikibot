@@ -29,7 +29,7 @@ import pywikibot
 import pywikibot.family
 from pywikibot.tools import (
     itergroup, deprecated, deprecate_arg, UnicodeMixin, ComparableMixin,
-    redirect_func,
+    redirect_func, add_decorated_full_name,
 )
 from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.throttle import Throttle
@@ -900,6 +900,10 @@ def must_be(group=None, right=None):
             return fn(self, *args, **kwargs)
         callee.__name__ = fn.__name__
         callee.__doc__ = fn.__doc__
+        callee.__module__ = callee.__module__
+        if not hasattr(fn, '__full_name__'):
+            add_decorated_full_name(fn)
+        callee.__full_name__ = fn.__full_name__
         return callee
 
     return decorator
@@ -922,6 +926,11 @@ def need_version(version):
             return fn(self, *args, **kwargs)
         callee.__name__ = fn.__name__
         callee.__doc__ = fn.__doc__
+        callee.__module__ = fn.__module__
+        if not hasattr(fn, '__full_name__'):
+            add_decorated_full_name(fn)
+        callee.__full_name__ = fn.__full_name__
+
         return callee
     return decorator
 
