@@ -1669,7 +1669,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             return self.site.protect(self, protections, reason, **kwargs)
 
     def change_category(self, oldCat, newCat, comment=None, sortKey=None,
-                        inPlace=True):
+                        inPlace=True, include=[]):
         """
         Remove page from oldCat and add it to newCat.
 
@@ -1683,17 +1683,21 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
         @param inPlace: if True, change categories in place rather than
                       rearranging them.
+
+        @param include: list of tags not to be disabled by default in relevant
+            textlib functions, where CategoryLinks can be searched.
+        @type: list
+
         @return: True if page was saved changed, otherwise False.
 
         """
         # get list of Category objects the article is in and remove possible
         # duplicates
         cats = []
-        for cat in textlib.getCategoryLinks(self.text, site=self.site):
+        for cat in textlib.getCategoryLinks(self.text, site=self.site,
+                                            include=include):
             if cat not in cats:
                 cats.append(cat)
-
-        site = self.site
 
         if not sortKey:
             sortKey = oldCat.sortKey
@@ -1718,7 +1722,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                                                      site=self.site)
         else:
             if newCat:
-                cats[cats.index(oldCat)] = Category(site, newCat.title(),
+                cats[cats.index(oldCat)] = Category(self.site, newCat.title(),
                                                     sortKey=sortKey)
             else:
                 cats.pop(cats.index(oldCat))
