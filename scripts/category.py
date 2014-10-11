@@ -573,6 +573,8 @@ class CategoryMoveRobot(object):
 
         @param gen: Generator containing pages or categories.
         """
+        template_docs = set()  # buffer for template doc pages preloading
+
         for page in pagegenerators.PreloadingGenerator(gen):
             if not self.title_regex or re.search(self.title_regex,
                                                  page.title()):
@@ -582,14 +584,24 @@ class CategoryMoveRobot(object):
                                      inPlace=self.inplace)
 
                 # Categories for templates can be included in <includeonly> section
-                # of Template:X/doc subpage.
+                # of Template:Page/doc subpage.
+                # TODO: doc page for a template can be Anypage/doc, as specified in
+                #    {{Template:Documentation}} -> not managed here
+                # TODO: decide if/how to enable/disable this feature
                 if page.namespace() == 10:
-                    doc_page = pywikibot.Page(page.site, page.title() + '/doc')
-                    if doc_page.exists():
-                        doc_page.change_category(self.oldcat, self.newcat,
-                                                 comment=self.comment,
-                                                 inPlace=self.inplace,
-                                                 include=['includeonly'])
+                    docs = page.site.doc_subpage  # return tuple
+                    for doc in docs:
+                        doc_page = pywikibot.Page(page.site, page.title() + doc)
+                        template_docs.add(doc_page)
+
+        for doc_page in pagegenerators.PreloadingGenerator(template_docs):
+            if (doc_page.exists() and
+                (not self.title_regex or
+                 re.search(self.title_regex, doc_page.title()))):
+                    doc_page.change_category(self.oldcat, self.newcat,
+                                             comment=self.comment,
+                                             inPlace=self.inplace,
+                                             include=['includeonly'])
 
     @staticmethod
     def check_move(name, old_page, new_page):

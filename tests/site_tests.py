@@ -59,6 +59,41 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase):
         self.assertEqual(token, mysite.token(mainpage, ttype))
 
 
+class TestBaseSiteProperties(TestCase):
+
+    """Test properties for BaseSite."""
+
+    sites = {
+        'enwk': {
+            'family': 'wiktionary',
+            'code': 'en',
+            'result': (),  # To be changed when wiktionary will have doc_subpage.
+        },
+        'enws': {
+            'family': 'wikisource',
+            'code': 'en',
+            'result': ('/doc',),
+        },
+        'dews': {
+            'family': 'wikisource',
+            'code': 'de',
+            'result': ('/Doku', '/Meta'),
+        },
+    }
+
+    cached = True
+
+    def testProperties(self):
+        """Test cases for BaseSite properties."""
+        # Test doc_subpage property.
+        mysite = self.get_site('enwk')
+        self.assertEqual(mysite.doc_subpage, self.sites['enwk']['result'])
+        mysite = self.get_site('enws')
+        self.assertEqual(mysite.doc_subpage, self.sites['enws']['result'])
+        mysite = self.get_site('dews')
+        self.assertEqual(mysite.doc_subpage, self.sites['dews']['result'])
+
+
 class TestSiteObject(DefaultSiteTestCase):
 
     """Test cases for Site methods."""
@@ -118,7 +153,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertEqual(pywikibot.site.APISite.fromDBName('wikidatawiki'), pywikibot.Site('wikidata', 'wikidata'))
 
     def testLanguageMethods(self):
-        """Test cases for languages() and related methods"""
+        """Test cases for languages() and related methods."""
         mysite = self.get_site()
         langs = mysite.languages()
         self.assertIsInstance(langs, list)
@@ -348,7 +383,7 @@ class TestSiteObject(DefaultSiteTestCase):
                             for el in mysite.page_extlinks(mainpage)))
 
     def testAllPages(self):
-        """Test the site.allpages() method"""
+        """Test the site.allpages() method."""
         mysite = self.get_site()
         fwd = list(mysite.allpages(total=10))
         self.assertLessEqual(len(fwd), 10)
@@ -419,7 +454,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIn("sysop", page._protection["edit"])
 
     def testAllLinks(self):
-        """Test the site.alllinks() method"""
+        """Test the site.alllinks() method."""
         mysite = self.get_site()
         fwd = list(mysite.alllinks(total=10))
         self.assertLessEqual(len(fwd), 10)
@@ -446,7 +481,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertRaises(pywikibot.Error, next, errgen)
 
     def testAllCategories(self):
-        """Test the site.allcategories() method"""
+        """Test the site.allcategories() method."""
         mysite = self.get_site()
         ac = list(mysite.allcategories(total=10))
         self.assertLessEqual(len(ac), 10)
@@ -464,7 +499,7 @@ class TestSiteObject(DefaultSiteTestCase):
 #            self.assertLessEqual(cat.title(withNamespace=False), "Hij")
 
     def testAllUsers(self):
-        """Test the site.allusers() method"""
+        """Test the site.allusers() method."""
         mysite = self.get_site()
         au = list(mysite.allusers(total=10))
         self.assertLessEqual(len(au), 10)
@@ -494,7 +529,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertTrue("groups" in user and "sysop" in user["groups"])
 
     def testAllImages(self):
-        """Test the site.allimages() method"""
+        """Test the site.allimages() method."""
         mysite = self.get_site()
         ai = list(mysite.allimages(total=10))
         self.assertLessEqual(len(ai), 10)
@@ -523,7 +558,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertLessEqual(impage._imageinfo["size"], 2000)
 
     def testBlocks(self):
-        """Test the site.blocks() method"""
+        """Test the site.blocks() method."""
         mysite = self.get_site()
         props = ("id", "by", "timestamp", "expiry", "reason")
         bl = list(mysite.blocks(total=10))
@@ -581,7 +616,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertEqual(block['user'], mysite.user())
 
     def testExturlusage(self):
-        """Test the site.exturlusage() method"""
+        """Test the site.exturlusage() method."""
         mysite = self.get_site()
         url = "www.google.com"
         eu = list(mysite.exturlusage(url, total=10))
@@ -670,7 +705,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
     user = True
 
     def testLogEvents(self):
-        """Test the site.logevents() method"""
+        """Test the site.logevents() method."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         le = list(mysite.logevents(total=10))
@@ -713,7 +748,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
                           end="2008-02-03T00:00:01Z", reverse=True, total=5)
 
     def testRecentchanges(self):
-        """Test the site.recentchanges() method"""
+        """Test the site.recentchanges() method."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         try:
@@ -817,7 +852,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
                 self.assertNotIn("patrolled", change)
 
     def testSearch(self):
-        """Test the site.search() method"""
+        """Test the site.search() method."""
         mysite = self.get_site()
         try:
             se = list(mysite.search("wiki", total=100))
@@ -844,7 +879,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
             raise
 
     def testUsercontribs(self):
-        """Test the site.usercontribs() method"""
+        """Test the site.usercontribs() method."""
         mysite = self.get_site()
         uc = list(mysite.usercontribs(user=mysite.user(), total=10))
         self.assertLessEqual(len(uc), 10)
@@ -917,7 +952,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
             self.assertNotIn("minor", contrib)
 
     def testWatchlistrevs(self):
-        """Test the site.watchlist_revs() method"""
+        """Test the site.watchlist_revs() method."""
         mysite = self.get_site()
         wl = list(mysite.watchlist_revs(total=10))
         self.assertLessEqual(len(wl), 10)
@@ -985,7 +1020,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
             self.assertIsInstance(rev, dict)
 
     def testDeletedrevs(self):
-        """Test the site.deletedrevs() method"""
+        """Test the site.deletedrevs() method."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         if not mysite.logged_in(True):
@@ -1053,7 +1088,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
                           total=5)
 
     def testUsers(self):
-        """Test the site.users() method"""
+        """Test the site.users() method."""
         mysite = self.get_site()
         us = list(mysite.users(mysite.user()))
         self.assertEqual(len(us), 1)
@@ -1102,7 +1137,7 @@ class SiteRandomTestCase(DefaultSiteTestCase):
     """Test random methods of a site."""
 
     def testRandompages(self):
-        """Test the site.randompages() method"""
+        """Test the site.randompages() method."""
         mysite = self.get_site()
         rn = list(mysite.randompages(total=10))
         self.assertLessEqual(len(rn), 10)
@@ -1285,7 +1320,7 @@ class TestSiteLoadRevisions(TestCase):
         self.mainpage = pywikibot.Page(pywikibot.Link("Main Page", self.mysite))
 
     def testLoadRevisions_basic(self):
-        """Test the site.loadrevisions() method"""
+        """Test the site.loadrevisions() method."""
         self.mysite.loadrevisions(self.mainpage, total=15)
         self.assertTrue(hasattr(self.mainpage, "_revid"))
         self.assertTrue(hasattr(self.mainpage, "_revisions"))
@@ -1294,7 +1329,7 @@ class TestSiteLoadRevisions(TestCase):
         self.assertEqual(self.mainpage._text, None)
 
     def testLoadRevisions_getText(self):
-        """Test the site.loadrevisions() method with getText=True"""
+        """Test the site.loadrevisions() method with getText=True."""
         self.mysite.loadrevisions(self.mainpage, getText=True, total=5)
         self.assertGreater(len(self.mainpage._text), 0)
 
@@ -1317,12 +1352,12 @@ class TestSiteLoadRevisions(TestCase):
                           self.mainpage, revids=130000)
 
     def testLoadRevisions_querycontinue(self):
-        """Test the site.loadrevisions() method with query-continue"""
+        """Test the site.loadrevisions() method with query-continue."""
         self.mysite.loadrevisions(self.mainpage, step=5, total=12)
         self.assertEqual(len(self.mainpage._revisions), 12)
 
     def testLoadRevisions_revdir(self):
-        """Test the site.loadrevisions() method with rvdir=True"""
+        """Test the site.loadrevisions() method with rvdir=True."""
         self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
         self.assertEqual(len(self.mainpage._revisions), 15)
 
