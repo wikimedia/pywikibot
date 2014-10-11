@@ -11,6 +11,7 @@ __version__ = '$Id$'
 import sys
 import threading
 import time
+import inspect
 import re
 from collections import Mapping
 from distutils.version import Version
@@ -321,22 +322,34 @@ EMPTY_DEFAULT = EmptyDefault()
 
 
 def deprecated(instead=None):
-    """Decorator to output a method deprecation warning.
+    """Decorator to output a deprecation warning.
+
+    A function is assumed to be an instance method when it has a 'self' param
+    in any position in the arg list, and the first parameter has a class
+    that is in the same module as the function.
 
     @param instead: if provided, will be used to specify the replacement
     @type instead: string
     """
-    def decorator(method):
+    def decorator(obj):
         def wrapper(*args, **kwargs):
-            funcname = method.__name__
-            classname = args[0].__class__.__name__
+            name = obj.__name__
+            if inspect.isfunction(obj):
+                arg_spec = inspect.getargspec(obj)
+                if args and 'self' in arg_spec.args:
+                    if args[0].__class__.__module__ == obj.__module__:
+                        name = args[0].__class__.__name__ + '.' + name
+                elif args and 'cls' in arg_spec.args:
+                    if inspect.isclass(args[0]):
+                        name = args[0].__name__ + '.' + name
+            name = obj.__module__ + '.' + name
             if instead:
-                warning(u"%s.%s is DEPRECATED, use %s instead."
-                        % (classname, funcname, instead))
+                warning(u"%s is DEPRECATED, use %s instead." % (name, instead))
             else:
-                warning(u"%s.%s is DEPRECATED." % (classname, funcname))
-            return method(*args, **kwargs)
-        wrapper.__name__ = method.__name__
+                warning(u"%s is DEPRECATED." % (name))
+            return obj(*args, **kwargs)
+        wrapper.__name__ = obj.__name__
+        wrapper.__doc__ = obj.__doc__
         return wrapper
     return decorator
 
