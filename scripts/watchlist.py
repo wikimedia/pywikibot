@@ -104,7 +104,7 @@ def refresh(site, sysop=False):
                                   % (site.family.name, site.code,
                                      '-sysop' if sysop else '')),
               'wb') as f:
-        pickle.dump(watchlist, f)
+        pickle.dump(watchlist, f, protocol=config.pickle_protocol)
 
 
 def refresh_all(new=False, sysop=False):

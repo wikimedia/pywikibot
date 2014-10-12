@@ -9,6 +9,7 @@ __version__ = '$Id$'
 
 import sys
 import pywikibot
+from pywikibot import config
 import pywikibot.page
 
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase
@@ -438,7 +439,7 @@ class TestPageObject(DefaultSiteTestCase):
     def testPickleAbility(self):
         mainpage = self.get_mainpage()
         import pickle
-        mainpage_str = pickle.dumps(mainpage)
+        mainpage_str = pickle.dumps(mainpage, protocol=config.pickle_protocol)
         mainpage_unpickled = pickle.loads(mainpage_str)
         self.assertEqual(mainpage, mainpage_unpickled)
 

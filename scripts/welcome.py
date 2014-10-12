@@ -997,7 +997,7 @@ def main():
             else:
                 import cPickle
             with open(filename, 'wb') as f:
-                cPickle.dump(bot.welcomed_users, f)
+                cPickle.dump(bot.welcomed_users, f, protocol=config.pickle_protocol)
 
 if __name__ == "__main__":
     main()

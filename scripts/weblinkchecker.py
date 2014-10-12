@@ -621,8 +621,8 @@ class History:
 
     def save(self):
         """ Save the .dat file to disk. """
-        with open(self.datfilename, 'wb') as datfile:
-            pickle.dump(self.historyDict, datfile)
+        with open(self.datfilename, 'wb') as f:
+            pickle.dump(self.historyDict, f, protocol=config.pickle_protocol)
 
 
 class DeadLinkReportThread(threading.Thread):

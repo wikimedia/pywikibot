@@ -756,7 +756,7 @@ class CachedRequest(Request):
         """Write data to self._cachefile_path()."""
         data = [self._uniquedescriptionstr(), data, datetime.datetime.now()]
         with open(self._cachefile_path(), 'wb') as f:
-            pickle.dump(data, f)
+            pickle.dump(data, f, protocol=config.pickle_protocol)
 
     def submit(self):
         cached_available = self._load_cache()

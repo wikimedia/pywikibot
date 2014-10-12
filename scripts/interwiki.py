@@ -2122,7 +2122,7 @@ class InterwikiBot(object):
             mode = 'written'
         titles = [s.originPage.title() for s in self.subjects]
         with open(dumpfn, mode[0] + 'b') as f:
-            pickle.dump(titles, f)
+            pickle.dump(titles, f, protocol=config.pickle_protocol)
         pywikibot.output(u'Dump %s (%s) %s.' % (site.lang, site.family.name, mode))
         return dumpfn
 
