@@ -51,7 +51,6 @@ _cache_dir = os.path.join(_tests_dir, 'apicache')
 _data_dir = os.path.join(_tests_dir, 'data')
 
 library_test_modules = [
-    'deprecation',
     'date',
     'mediawikiversion',
     'ipregex',
