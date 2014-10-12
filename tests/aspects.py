@@ -32,7 +32,6 @@ __version__ = '$Id$'
 import time
 import sys
 import os
-import re
 
 import pywikibot
 
@@ -658,40 +657,3 @@ class PwbTestCase(TestCase):
 
     pwb = True
     spawn = True
-
-
-class DeprecationTestCase(TestCase):
-
-    """Test cases for deprecation function in the tools module."""
-
-    deprecation_messages = []
-
-    @staticmethod
-    def _record_messages(msg):
-        DeprecationTestCase.deprecation_messages.append(msg)
-
-    def assertDeprecationRegex(self, pattern):
-        for msg in DeprecationTestCase.deprecation_messages:
-            if re.match(pattern, msg):
-                return
-        self.assertIn(pattern, DeprecationTestCase.deprecation_messages)
-
-    def assertDeprecation(self, name):
-        self.assertDeprecationRegex(name + ' is DEPRECATED.')
-
-    def setUp(self):
-        self.tools_warning = pywikibot.tools.warning
-        self.tools_debug = pywikibot.tools.debug
-
-        pywikibot.tools.warning = DeprecationTestCase._record_messages
-        pywikibot.tools.debug = DeprecationTestCase._record_messages
-
-        super(DeprecationTestCase, self).setUp()
-
-        DeprecationTestCase.deprecation_messages = []
-
-    def tearDown(self):
-        pywikibot.tools.warning = self.tools_warning
-        pywikibot.tools.debug = self.tools_warning
-
-        super(DeprecationTestCase, self).tearDown()
