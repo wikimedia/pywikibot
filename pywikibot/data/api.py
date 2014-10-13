@@ -737,6 +737,7 @@ class CachedRequest(Request):
 
     def _load_cache(self):
         """Return whether the cache can be used."""
+        self._add_defaults()
         try:
             with open(self._cachefile_path(), 'rb') as f:
                 uniquedescr, self._data, self._cachetime = pickle.load(f)
