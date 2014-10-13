@@ -1035,6 +1035,64 @@ class Family(object):
     def nice_get_address(self, code, title):
         return '%s%s' % (self.nicepath(code), title)
 
+    def _get_path_regex(self):
+        """
+        Return a regex matching the path after the domain.
+
+        It is using L{Family.path} and L{Family.nicepath} with code set to
+        'None'. If that returns a KeyError (L{Family.scriptpath} probably
+        using the C{langs} dictionary) it retries it with the key from
+        L{Family.langs} if it only contains one entry and throws an Error
+        otherwise. In that case the Family instance should overwrite this
+        method or supply code independent methods.
+
+        @raise Error: If it's not possible to automatically get a code
+            independent regex.
+        """
+        def _get_coded_path_regex(code):
+            return ('(?:' + re.escape(self.path(code) + '/') + '|' +
+                    re.escape(self.nicepath(code)) + ')')
+        try:
+            return _get_coded_path_regex(None)
+        except KeyError:
+            # Probably automatically generated family
+            if len(self.langs) == 1:
+                return _get_coded_path_regex(next(iter(self.langs.keys())))
+            else:
+                raise Error('Pywikibot is unable to generate an automatic '
+                            'path regex for the family {0}. It is recommended '
+                            'to overwrite "_get_path_regex" in that '
+                            'family.'.format(self.name))
+
+    def from_url(self, url):
+        """
+        Return whether this family matches the given url.
+
+        The protocol must match, if it is present in the URL. It must match
+        URLs generated via C{self.langs} and L{Family.nice_get_address} or
+        L{Family.path}.
+
+        It uses L{Family._get_path_regex} to generate a regex defining the path
+        after the domain.
+
+        @return: The language code of the url. None if that url is not from
+            this family.
+        @rtype: str or None
+        """
+        url_match = re.match(r'(?:(https?)://|//)?(.*){0}'
+                             '\$1'.format(self._get_path_regex()), url)
+        if not url_match:
+            return None
+        for code, domain in self.langs.items():
+            if domain == url_match.group(2):
+                break
+        else:
+            return None
+        if url_match.group(1) and url_match.group(1) != self.protocol(code):
+            return None
+        else:
+            return code
+
     def dbName(self, code):
         # returns the name of the MySQL database
         return '%s%s' % (code, self.name)

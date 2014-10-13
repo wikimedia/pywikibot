@@ -13,3 +13,6 @@ class Family(family.WikimediaFamily):
         self.langs = {
             'test': 'test.wikipedia.org',
         }
+
+    def from_url(self, url):
+        return None  # Don't accept this, but 'test' of 'wikipedia'

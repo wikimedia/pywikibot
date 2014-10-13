@@ -44,7 +44,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.family import Family
 from pywikibot.site import Namespace
-from pywikibot.exceptions import AutoblockUser, UserActionRefuse
+from pywikibot.exceptions import AutoblockUser, UserActionRefuse, NoSuchSite
 from pywikibot.tools import ComparableMixin, deprecated, deprecate_arg
 from pywikibot import textlib
 
@@ -4034,7 +4034,7 @@ class Link(ComparableMixin):
 
         # This code was adapted from Title.php : secureAndSplit()
         #
-        firstPass = True
+        first_other_site = None
         while u":" in t:
             # Initial colon indicates main namespace rather than default
             if t.startswith(u":"):
@@ -4044,50 +4044,37 @@ class Link(ComparableMixin):
                 t = t.lstrip(u":").lstrip(u" ")
                 continue
 
-            fam = self._site.family
             prefix = t[:t.index(u":")].lower()
             ns = self._site.ns_index(prefix)
             if ns:
                 # Ordinary namespace
                 t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
+                # 'namespace:' is not a valid title
+                if not t:
+                    raise pywikibot.InvalidTitle(
+                        "'{0}' has no title.".format(self._text))
                 self._namespace = ns
                 break
-            if prefix in list(fam.langs.keys())\
-                    or prefix in fam.get_known_families(site=self._site):
-                # looks like an interwiki link
-                if not firstPass:
-                    # Can't make a local interwiki link to an interwiki link.
-                    raise pywikibot.Error(
-                        "Improperly formatted interwiki link '%s'"
-                        % self._text)
-                t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
-                if prefix in list(fam.langs.keys()):
-                    newsite = pywikibot.Site(prefix, fam)
-                else:
-                    otherlang = self._site.code
-                    familyName = fam.get_known_families(site=self._site)[prefix]
-                    if familyName in ['commons', 'meta']:
-                        otherlang = familyName
-                    try:
-                        newsite = pywikibot.Site(otherlang, familyName)
-                    except ValueError:
-                        raise pywikibot.Error(
-                            """\
-%s is not a local page on %s, and the %s family is
-not supported by PyWikiBot!"""
-                            % (self._text, self._site, familyName))
-
-                # Redundant interwiki prefix to the local wiki
-                if newsite == self._site:
-                    if not t:
-                        # Can't have an empty self-link
-                        raise pywikibot.InvalidTitle(
-                            "Invalid link title: '%s'" % self._text)
-                    firstPass = False
-                    continue
-                self._site = newsite
+            try:
+                newsite = self._site.interwiki(prefix)
+            except KeyError:
+                break  # text before : doesn't match any known prefix
+            except NoSuchSite:
+                raise pywikibot.Error(
+                    '{0} is not a local page on {1}, and the interwiki prefix '
+                    '{2} is not supported by PyWikiBot!'.format(
+                    self._text, self._site, prefix))
             else:
-                break   # text before : doesn't match any known prefix
+                t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
+                if first_other_site:
+                    if not self._site.local_interwiki(prefix):
+                        raise pywikibot.InvalidTitle(
+                            '{0} links to a non local site {1} via an '
+                            'interwiki link to {2}.'.format(
+                            self._text, newsite, first_other_site))
+                elif newsite != self._source:
+                    first_other_site = newsite
+                self._site = newsite
 
         if u"#" in t:
             t, sec = t.split(u'#', 1)
@@ -4125,6 +4112,12 @@ not supported by PyWikiBot!"""
         if self._namespace != -1 and len(t) > 255:
             raise pywikibot.InvalidTitle("(over 255 bytes): '%s'" % t)
 
+        # "empty" local links can only be self-links
+        # with a fragment identifier.
+        if not self._text.strip():
+            raise pywikibot.InvalidTitle("The link does not contain a page "
+                                         "title")
+
         if hasattr(self._site.namespaces()[self._namespace], 'case'):
             case = self._site.namespaces()[self._namespace].case
         else:
@@ -4132,13 +4125,6 @@ not supported by PyWikiBot!"""
 
         if case == 'first-letter':
             t = t[:1].upper() + t[1:]
-
-        # Can't make a link to a namespace alone...
-        # "empty" local links can only be self-links
-        # with a fragment identifier.
-        if not t and self._site == self._source and self._namespace != 0:
-            raise pywikibot.Error("Invalid link (no page title): '%s'"
-                                  % self._text)
 
         self._title = t
 

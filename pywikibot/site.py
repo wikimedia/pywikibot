@@ -544,6 +544,55 @@ class BaseSite(ComparableMixin):
         return [lang for lang in self.languages()
                 if lang[:1].upper() + lang[1:] not in nsnames]
 
+    def interwiki(self, prefix):
+        """
+        Return the site for a corresponding interwiki prefix.
+
+        @raise NoSuchSite: if the url given in the interwiki table doesn't
+            match any of the existing families.
+        @raise KeyError: if the prefix is not an interwiki prefix.
+        """
+        # _iw_sites is a local cache to return a APISite instance depending
+        # on the interwiki prefix of that site
+        if not hasattr(self, '_iw_sites'):
+            self._iw_sites = {}
+        if prefix in self._iw_sites:
+            site = self._iw_sites[prefix]
+        else:
+            for interwiki in self.siteinfo['interwikimap']:
+                if interwiki['prefix'] == prefix:
+                    break
+            else:
+                raise KeyError(
+                    "'{0}' is not an interwiki prefix.".format(prefix))
+            try:
+                site = (pywikibot.Site(url=interwiki['url']),
+                        'local' in interwiki)
+            except Error:
+                site = (None, False)
+            self._iw_sites[prefix] = site
+        if site[0]:
+            return site[0]
+        else:
+            raise NoSuchSite(
+                "No family/site found for prefix '{0}'".format(prefix))
+
+    def local_interwiki(self, prefix):
+        """
+        Return whether the interwiki prefix is local.
+
+        A local interwiki prefix is handled by the target site like a normal
+        link. So if that link also contains an interwiki link it does follow
+        it as long as it's a local link.
+
+        @raise NoSuchSite: if the url given in the interwiki table doesn't
+            match any of the existing families.
+        @raise KeyError: if the prefix is not an interwiki prefix.
+        """
+        # Request if necessary
+        self.interwiki(prefix)
+        return self._iw_sites[prefix][1]
+
     def ns_index(self, namespace):
         """Given a namespace name, return its int index, or None if invalid."""
         for ns in self.namespaces():
