@@ -1162,6 +1162,16 @@ class PwbTestCase(TestCase):
         if self.orig_pywikibot_dir:
             os.environ['PYWIKIBOT2_DIR'] = self.orig_pywikibot_dir
 
+    def _execute(self, args, data_in=None, timeout=0, error=None):
+        from tests.utils import execute_pwb
+
+        site = self.get_site()
+
+        args = args + ['-family:' + site.family.name,
+                       '-code:' + site.code]
+
+        return execute_pwb(args, data_in, timeout, error)
+
 
 class DebugOnlyTestCase(TestCase):
 

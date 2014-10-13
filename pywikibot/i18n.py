@@ -4,6 +4,17 @@ Various i18n functions.
 
 Helper functions for both the internal translation system
 and for TranslateWiki-based translations.
+
+By default messages are assumed to reside in a package called
+'scripts.i18n'.  In pywikibot 2.0, that package is not packaged
+with pywikibot, and pywikibot 2.0 does not have a hard dependency
+on any i18n messages.  However, there are three user input questions
+in pagegenerators which will use i18 messages if they can be loaded.
+
+The default message location may be changed by calling
+L{set_message_package} with a package name.  The package must contain
+an __init__.py, and a message bundle called 'pywikibot' containing
+messages.  See L{twntranslate} for more information on the messages.
 """
 #
 # (C) Pywikibot team, 2004-2015
@@ -31,7 +42,50 @@ if sys.version_info[0] > 2:
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
 # Package name for the translation messages
-messages_package_name = 'scripts.i18n'
+_messages_package_name = 'scripts.i18n'
+# Flag to indicate whether translation messages are available
+_messages_available = None
+
+
+def set_messages_package(package_name):
+    """Set the package name where i18n messages are located."""
+    global _messages_package_name
+    global _messages_available
+    _messages_package_name = package_name
+    _messages_available = None
+
+
+def messages_available():
+    """
+    Return False if there are no i18n messages available.
+
+    To determine if messages are available, it looks for the package name
+    set using L{set_messages_package} for a message bundle called 'pywikibot'
+    containing messages.
+
+    @rtype: bool
+    """
+    global _messages_available
+    if _messages_available is not None:
+        return _messages_available
+    with warnings.catch_warnings():
+        # Ignore 'missing __init__.py' as import looks at the JSON
+        # directories before loading the python file.
+        try:
+            warnings.simplefilter("ignore", ImportWarning)
+            module = __import__(_messages_package_name, fromlist=['pywikibot'])
+        except ImportError:
+            _messages_available = False
+            return False
+
+    try:
+        getattr(module, 'pywikibot').msg
+    except AttributeError:
+        _messages_available = False
+        return False
+
+    _messages_available = True
+    return True
 
 
 def _altlang(code):
@@ -233,22 +287,37 @@ def _altlang(code):
     return []
 
 
-class TranslationError(Error):
+class TranslationError(Error, ImportError):
 
     """Raised when no correct translation could be found."""
+
+    # Inherits from ImportError, as this exception is now used
+    # where previously an ImportError would have been raised,
+    # and may have been caught by scripts as such.
 
     pass
 
 
 def _get_messages_bundle(name):
     """Load all translation messages for a bundle name."""
+    exception_message = 'Unknown problem'
+
     with warnings.catch_warnings():
         # Ignore 'missing __init__.py' as import looks at the JSON
         # directories before loading the python file.
         warnings.simplefilter("ignore", ImportWarning)
-        transdict = getattr(__import__(messages_package_name,
-                                       fromlist=[name]),
-                            name).msg
+        try:
+            transdict = getattr(__import__(_messages_package_name,
+                                           fromlist=[name]),
+                                name).msg
+        except ImportError as e:
+            exception_message = str(e)
+
+    if not transdict:
+        raise TranslationError(
+            'Could not load bundle %s from message package %s: %s'
+            % (name, _messages_package_name, exception_message))
+
     return transdict
 
 
@@ -379,6 +448,11 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
     @param fallback: Try an alternate language code
     @type fallback: boolean
     """
+    if not messages_available():
+        raise TranslationError(
+            'Unable to load messages package %s for bundle %s'
+            % (_messages_package_name, twtitle))
+
     package = twtitle.split("-")[0]
     transdict = _get_messages_bundle(package)
     code_needed = False
@@ -453,7 +527,7 @@ def twntranslate(code, twtitle, parameters=None):
         }
 
     >>> from pywikibot import i18n
-    >>> i18n.messages_package_name = 'tests.i18n'
+    >>> i18n.set_messages_package('tests.i18n')
     >>> # use a number
     >>> str(i18n.twntranslate('en', 'test-plural', 0) % {'num': 'no'})
     'Bot: Changing no pages.'
@@ -469,7 +543,6 @@ def twntranslate(code, twtitle, parameters=None):
     >>> # use format strings also outside
     >>> str(i18n.twntranslate('fr', 'test-plural', 10) % {'descr': 'seulement'})
     'Robot: Changer seulement quelques pages.'
-    >>> i18n.messages_package_name = 'scripts.i18n'
 
     The translations are retrieved from i18n.<package>, based on the callers
     import table.
@@ -513,6 +586,11 @@ def twhas_key(code, twtitle):
     """
     package = twtitle.split("-")[0]
     transdict = _get_messages_bundle(package)
+    if not transdict:
+        pywikibot.warning('twhas_key: Could not load message bundle %s.%s'
+                          % (_messages_package_name, package))
+        return False
+
     # If a site is given instead of a code, use its language
     if hasattr(code, 'code'):
         code = code.code
@@ -530,7 +608,7 @@ def twget_keys(twtitle):
     return (lang for lang in sorted(transdict.keys()) if lang != 'qqq')
 
 
-def input(twtitle, parameters=None, password=False):
+def input(twtitle, parameters=None, password=False, fallback_prompt=None):
     """
     Ask the user a question, return the user's answer.
 
@@ -541,9 +619,19 @@ def input(twtitle, parameters=None, password=False):
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     @param parameters: The values which will be applied to the translated text
     @param password: Hides the user's input (for password entry)
+    @param fallback_prompt: The English prompt if i18n is not available.
     @rtype: unicode string
     """
-    code = config.userinterface_lang or \
-           locale.getdefaultlocale()[0].split('_')[0]
-    trans = twtranslate(code, twtitle, parameters)
-    return pywikibot.input(trans, password)
+    if not messages_available():
+        if not fallback_prompt:
+            raise TranslationError(
+                'Unable to load messages package %s for bundle %s'
+                % (_messages_package_name, twtitle))
+        else:
+            prompt = fallback_prompt
+    else:
+        code = config.userinterface_lang or \
+            locale.getdefaultlocale()[0].split('_')[0]
+
+        prompt = twtranslate(code, twtitle, parameters)
+    return pywikibot.input(prompt, password)
