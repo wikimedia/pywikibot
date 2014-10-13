@@ -900,6 +900,13 @@ class Bot(object):
 
         Option used:
             * 'always'
+
+        Keyword args used:
+            * 'async' - passed to page.save
+            * 'comment' - passed to page.save
+            * 'show_diff' - show changes between oldtext and newtext (enabled)
+            * 'ignore_save_related_errors' - report and ignore (disabled)
+            * 'ignore_server_errors' - report and ignore (disabled)
         """
         if oldtext == newtext:
             pywikibot.output(u'No changes were needed on %s'
@@ -907,7 +914,12 @@ class Bot(object):
             return
 
         self.current_page = page
-        pywikibot.showDiff(oldtext, newtext)
+
+        show_diff = kwargs.pop('show_diff', True)
+
+        if show_diff:
+            pywikibot.showDiff(oldtext, newtext)
+
         if 'comment' in kwargs:
             pywikibot.output(u'Comment: %s' % kwargs['comment'])
 
@@ -918,7 +930,34 @@ class Bot(object):
             kwargs['async'] = True
 
         page.text = newtext
-        page.save(**kwargs)
+
+        ignore_save_related_errors = kwargs.pop('ignore_save_related_errors', False)
+        ignore_server_errors = kwargs.pop('ignore_server_errors', False)
+
+        try:
+            page.save(**kwargs)
+        except pywikibot.PageSaveRelatedError as e:
+            if not ignore_save_related_errors:
+                raise
+            if isinstance(e, pywikibot.EditConflict):
+                pywikibot.output(u'Skipping %s because of edit conflict'
+                                 % page.title())
+            elif isinstance(e, pywikibot.SpamfilterError):
+                pywikibot.output(
+                    u'Cannot change %s because of blacklist entry %s'
+                    % (page.title(), e.url))
+            elif isinstance(e, pywikibot.LockedPage):
+                pywikibot.output(u'Skipping %s (locked page)'
+                                 % page.title())
+            else:
+                pywikibot.error(
+                    u'Skipping %s because of a save related error: %s'
+                    % (page.title(), e))
+        except pywikibot.ServerError as e:
+            if not ignore_server_errors:
+                raise
+            pywikibot.error(u'Server Error while processing %s: %s'
+                            % (page.title(), e))
 
     def quit(self):
         """Cleanup and quit processing."""
