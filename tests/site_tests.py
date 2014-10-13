@@ -591,11 +591,27 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIsInstance(link, pywikibot.Page)
             self.assertIn(link.namespace(), (2, 3))
 
-    def testImageusage(self):
-        """Test the site.imageusage() method"""
+
+class TestImageUsage(DefaultSiteTestCase):
+
+    """Test cases for Site.imageusage method."""
+
+    cached = True
+
+    @property
+    def imagepage(self):
+        """Find an image which is used on a page.
+
+        If there are no images included in pages it'll skip all tests.
+
+        Note: This is not implemented as setUpClass which would be invoked
+        while initialising all tests, to reduce chance of an error preventing
+        all tests from running.
+        """
+        if hasattr(self.__class__, '_image_page'):
+            return self.__class__._image_page
+
         mysite = self.get_site()
-        # Find a page which uses an image, so we can test imageusage
-        # If there are no images included in pages it'll skip this test
         for page in mysite.allpages(filterredir=False):
             try:
                 imagepage = next(iter(page.imagelinks()))  # 1st image of page
@@ -606,16 +622,41 @@ class TestSiteObject(DefaultSiteTestCase):
         else:
             raise unittest.SkipTest("No images on site {0!r}".format(mysite))
 
+        pywikibot.output(u'site_tests.TestImageUsage found %s on %s'
+                         % (imagepage, page))
+
+        self.__class__._image_page = imagepage
+        return imagepage
+
+    def test_image_usage(self):
+        """Test the site.imageusage() method."""
+        mysite = self.get_site()
+        imagepage = self.imagepage
         iu = list(mysite.imageusage(imagepage, total=10))
         self.assertLessEqual(len(iu), 10)
         self.assertTrue(all(isinstance(link, pywikibot.Page)
                             for link in iu))
+
+    def test_image_usage_in_namespaces(self):
+        """Test the site.imageusage() method with namespaces."""
+        mysite = self.get_site()
+        imagepage = self.imagepage
         for using in mysite.imageusage(imagepage, namespaces=[3, 4], total=5):
             self.assertIsInstance(using, pywikibot.Page)
             self.assertIn(imagepage, list(using.imagelinks()))
+
+    def test_image_usage_in_redirects(self):
+        """Test the site.imageusage() method on redirects only."""
+        mysite = self.get_site()
+        imagepage = self.imagepage
         for using in mysite.imageusage(imagepage, filterredir=True, total=5):
             self.assertIsInstance(using, pywikibot.Page)
             self.assertTrue(using.isRedirectPage())
+
+    def test_image_usage_no_redirect_filter(self):
+        """Test the site.imageusage() method with redirects."""
+        mysite = self.get_site()
+        imagepage = self.imagepage
         for using in mysite.imageusage(imagepage, filterredir=False, total=5):
             self.assertIsInstance(using, pywikibot.Page)
             self.assertFalse(using.isRedirectPage())
