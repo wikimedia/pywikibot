@@ -418,9 +418,6 @@ def twntranslate(code, twtitle, parameters=None):
     Examples:
     If we had a test dictionary in test.py like
     msg = {
-        'de': {
-            'test-changing': u'Bot: Ändere %(num)d {{PLURAL:num|Seite|Seiten}}.',
-        },
         'en': {
             # number value as format sting is allowed
             'test-changing': u'Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.',
