@@ -122,62 +122,62 @@ class HarvestRobot(WikidataBot):
                                           ns=10).title(withNamespace=False)
             except pywikibot.exceptions.InvalidTitle:
                 pywikibot.error(u"Failed parsing template; '%s' should be the template name." % template)
-                return
+                continue
             # We found the template we were looking for
             if template in self.templateTitles:
                 for field, value in fielddict.items():
                     field = field.strip()
                     value = value.strip()
                     if not field or not value:
-                        return
+                        continue
 
-                        # This field contains something useful for us
-                        if field in self.fields:
-                            # Check if the property isn't already set
-                            claim = pywikibot.Claim(self.repo, self.fields[field])
-                            if claim.getID() in item.get().get('claims'):
-                                pywikibot.output(
-                                    u'A claim for %s already exists. Skipping'
-                                    % claim.getID())
-                                # TODO: Implement smarter approach to merging
-                                # harvested values with existing claims esp.
-                                # without overwriting humans unintentionally.
+                    # This field contains something useful for us
+                    if field in self.fields:
+                        # Check if the property isn't already set
+                        claim = pywikibot.Claim(self.repo, self.fields[field])
+                        if claim.getID() in item.get().get('claims'):
+                            pywikibot.output(
+                                u'A claim for %s already exists. Skipping'
+                                % claim.getID())
+                            # TODO: Implement smarter approach to merging
+                            # harvested values with existing claims esp.
+                            # without overwriting humans unintentionally.
+                        else:
+                            if claim.type == 'wikibase-item':
+                                # Try to extract a valid page
+                                match = re.search(pywikibot.link_regex, value)
+                                if not match:
+                                    pywikibot.output(u'%s field %s value %s isnt a wikilink. Skipping' % (claim.getID(), field, value))
+                                    continue
+
+                                link_text = match.group(1)
+                                linked_item = self._template_link_target(item, link_text)
+                                if not linked_item:
+                                    continue
+
+                                claim.setTarget(linked_item)
+                            elif claim.type == 'string':
+                                claim.setTarget(value.strip())
+                            elif claim.type == 'commonsMedia':
+                                commonssite = pywikibot.Site("commons", "commons")
+                                imagelink = pywikibot.Link(value, source=commonssite, defaultNamespace=6)
+                                image = pywikibot.FilePage(imagelink)
+                                if image.isRedirectPage():
+                                    image = pywikibot.FilePage(image.getRedirectTarget())
+                                if not image.exists():
+                                    pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it' % (image.title(),))
+                                    continue
+                                claim.setTarget(image)
                             else:
-                                if claim.type == 'wikibase-item':
-                                    # Try to extract a valid page
-                                    match = re.search(pywikibot.link_regex, value)
-                                    if not match:
-                                        pywikibot.output(u'%s field %s value %s isnt a wikilink. Skipping' % (claim.getID(), field, value))
-                                        return
+                                pywikibot.output("%s is not a supported datatype." % claim.type)
+                                continue
 
-                                    link_text = match.group(1)
-                                    linked_item = self._template_link_target(item, link_text)
-                                    if not linked_item:
-                                        return
-
-                                    claim.setTarget(linked_item)
-                                elif claim.type == 'string':
-                                    claim.setTarget(value.strip())
-                                elif claim.type == 'commonsMedia':
-                                    commonssite = pywikibot.Site("commons", "commons")
-                                    imagelink = pywikibot.Link(value, source=commonssite, defaultNamespace=6)
-                                    image = pywikibot.FilePage(imagelink)
-                                    if image.isRedirectPage():
-                                        image = pywikibot.FilePage(image.getRedirectTarget())
-                                    if not image.exists():
-                                        pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it' % (image.title(),))
-                                        return
-                                    claim.setTarget(image)
-                                else:
-                                    pywikibot.output("%s is not a supported datatype." % claim.type)
-                                    return
-
-                                pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget()))
-                                item.addClaim(claim)
-                                # A generator might yield pages from multiple sites
-                                source = self.getSource(page.site)
-                                if source:
-                                    claim.addSource(source, bot=True)
+                            pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget()))
+                            item.addClaim(claim)
+                            # A generator might yield pages from multiple sites
+                            source = self.getSource(page.site)
+                            if source:
+                                claim.addSource(source, bot=True)
 
 
 def main():
