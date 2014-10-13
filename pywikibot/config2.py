@@ -732,8 +732,7 @@ _glv = dict((_key, _val) for _key, _val in globals().items()
 _gl = list(_glv.keys())
 _tp = {}
 for _key in _gl:
-    if _key[0] != '_':
-        _tp[_key] = type(globals()[_key])
+    _tp[_key] = type(globals()[_key])
 
 # Create an environment for user-config.py which is
 # a shallow copy of the core config settings, so that
