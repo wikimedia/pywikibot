@@ -26,7 +26,7 @@ import os
 import sys
 import collections
 # Please keep _imported_modules in sync with the imports above
-_imported_modules = ('os', 'sys')
+_imported_modules = ('os', 'sys', 'collections')
 
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
