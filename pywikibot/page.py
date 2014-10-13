@@ -4052,7 +4052,7 @@ class Link(ComparableMixin):
                 # 'namespace:' is not a valid title
                 if not t:
                     raise pywikibot.InvalidTitle(
-                        "'{0}' has no title.".format(self._text))
+                        u"'{0}' has no title.".format(self._text))
                 self._namespace = ns
                 break
             try:
@@ -4061,7 +4061,7 @@ class Link(ComparableMixin):
                 break  # text before : doesn't match any known prefix
             except NoSuchSite:
                 raise pywikibot.Error(
-                    '{0} is not a local page on {1}, and the interwiki prefix '
+                    u'{0} is not a local page on {1}, and the interwiki prefix '
                     '{2} is not supported by PyWikiBot!'.format(
                     self._text, self._site, prefix))
             else:
@@ -4069,7 +4069,7 @@ class Link(ComparableMixin):
                 if first_other_site:
                     if not self._site.local_interwiki(prefix):
                         raise pywikibot.InvalidTitle(
-                            '{0} links to a non local site {1} via an '
+                            u'{0} links to a non local site {1} via an '
                             'interwiki link to {2}.'.format(
                             self._text, newsite, first_other_site))
                 elif newsite != self._source:
@@ -4102,15 +4102,15 @@ class Link(ComparableMixin):
                 or t.endswith(u"/..")
         ):
             raise pywikibot.InvalidTitle(
-                "(contains . / combinations): '%s'"
+                u"(contains . / combinations): '%s'"
                 % self._text)
 
         # Magic tilde sequences? Nu-uh!
         if u"~~~" in t:
-            raise pywikibot.InvalidTitle("(contains ~~~): '%s'" % self._text)
+            raise pywikibot.InvalidTitle(u"(contains ~~~): '%s'" % self._text)
 
         if self._namespace != -1 and len(t) > 255:
-            raise pywikibot.InvalidTitle("(over 255 bytes): '%s'" % t)
+            raise pywikibot.InvalidTitle(u"(over 255 bytes): '%s'" % t)
 
         # "empty" local links can only be self-links
         # with a fragment identifier.
