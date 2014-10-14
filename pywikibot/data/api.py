@@ -494,7 +494,7 @@ class Request(MutableMapping):
                             file_content = file(local_filename, "rb").read()
                             submsg = Request._generate_MIME_part(
                                 key, file_content, filetype.split('/'),
-                                {'filename': local_filename})
+                                {'filename': self._params['filename'][0]})
                         else:
                             submsg = Request._generate_MIME_part(
                                 key, value, None, None)
