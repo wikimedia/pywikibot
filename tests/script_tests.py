@@ -5,6 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import print_function
 __version__ = '$Id$'
 
 import os
@@ -156,14 +157,27 @@ def collector(loader=unittest.loader.defaultTestLoader):
     enable_autorun_tests = (
         os.environ.get('PYWIKIBOT2_TEST_AUTORUN', '0') == '1')
 
-    tests = (['test__login_execution'] +
-             ['test_' + name + '_execution'
+    if deadlock_script_list:
+        print('Skipping deadlock scripts:\n  %s'
+              % ', '.join(deadlock_script_list))
+
+    if unrunnable_script_list:
+        print('Skipping execution of unrunnable scripts:\n  %r'
+              % unrunnable_script_list)
+
+    if not enable_autorun_tests:
+        print('Skipping execution of auto-run scripts '
+              '(set PYWIKIBOT2_TEST_AUTORUN=1 to enable):\n  %r'
+              % auto_run_script_list)
+
+    tests = (['test__login_help'] +
+             ['test_' + name + '_help'
               for name in sorted(script_list)
               if name != 'login'
               and name not in deadlock_script_list] +
-             ['test__login_no_args'])
+             ['test__login_simulate'])
 
-    tests += ['test_' + name + '_no_args'
+    tests += ['test_' + name + '_simulate'
               for name in sorted(script_list)
               if name != 'login'
               and name not in deadlock_script_list
@@ -186,7 +200,7 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
     return collector(loader)
 
 
-def execute(command, data_in=None, timeout=0):
+def execute(command, data_in=None, timeout=0, error=None):
     """Execute a command and capture outputs."""
     def decode(stream):
         if sys.version_info[0] > 2:
@@ -201,21 +215,38 @@ def execute(command, data_in=None, timeout=0):
         options['stdin'] = subprocess.PIPE
 
     p = subprocess.Popen(command, **options)
+
     if data_in is not None:
         if sys.version_info[0] > 2:
             data_in = data_in.encode(config.console_encoding)
         p.stdin.write(data_in)
         p.stdin.flush()  # _communicate() otherwise has a broken pipe
+
+    stderr_lines = b''
     waited = 0
-    while waited < timeout and p.poll() is None:
+    while (error or (waited < timeout)) and p.poll() is None:
+        # In order to kill 'shell' and others early, read only a single
+        # line per second, and kill the process as soon as the expected
+        # output has been seen.
+        # Additional lines will be collected later with p.communicate()
+        if error:
+            line = p.stderr.readline()
+            stderr_lines += line
+            if error in decode(line):
+                break
         time.sleep(1)
         waited += 1
-    if timeout and p.poll() is None:
+
+    if (timeout or error) and p.poll() is None:
         p.kill()
+
+    if p.poll() is not None:
+        stderr_lines += p.stderr.read()
+
     data_out = p.communicate()
     return {'exit_code': p.returncode,
             'stdout': decode(data_out[0]),
-            'stderr': decode(data_out[1])}
+            'stderr': decode(stderr_lines + data_out[1])}
 
 
 class TestScriptMeta(MetaTestCaseClass):
@@ -224,7 +255,7 @@ class TestScriptMeta(MetaTestCaseClass):
 
     def __new__(cls, name, bases, dct):
         """Create the new class."""
-        def test_execution(script_name, args=None, expected_results=None):
+        def test_execution(script_name, args=[], expected_results=None):
             def testScript(self):
                 cmd = [sys.executable, pwb_path, script_name]
 
@@ -234,27 +265,71 @@ class TestScriptMeta(MetaTestCaseClass):
                 data_in = script_input.get(script_name)
 
                 timeout = 0
-                if script_name in auto_run_script_list:
+                if '-help' not in args and script_name in auto_run_script_list:
                     timeout = 5
-                result = execute(cmd, data_in, timeout=timeout)
 
                 if expected_results and script_name in expected_results:
-                    if expected_results[script_name] is not None:
-                        self.assertIn(expected_results[script_name],
-                                      result['stderr'])
-                elif (args and '-help' in args) or \
+                    error = expected_results[script_name]
+                else:
+                    error = None
+
+                result = execute(cmd, data_in, timeout=timeout, error=error)
+
+                stderr = result['stderr'].split('\n')
+                stderr_sleep = [l for l in stderr
+                                if l.startswith('Sleeping for ')]
+                stderr_other = [l for l in stderr
+                                if not l.startswith('Sleeping for ')]
+                if stderr_sleep:
+                    print(u'\n'.join(stderr_sleep))
+
+                if result['exit_code'] == -9:
+                    print(' killed', end='  ')
+
+                if '-help' in args or error or \
                         script_name not in auto_run_script_list:
-                    stderr = [l for l in result['stderr'].split('\n')
-                              if not l.startswith('Sleeping for ')]
-                    pywikibot.output('\n'.join(
-                        [l for l in result['stderr'].split('\n')
-                         if l.startswith('Sleeping for ')]))
-                    self.assertEqual('\n'.join(stderr), '')
-                    self.assertIn('Global arguments available for all',
-                                  result['stdout'])
-                    self.assertEqual(result['exit_code'], 0)
+
+                    if error:
+                        self.assertIn(error, result['stderr'])
+
+                        self.assertIn(result['exit_code'], [0, -9])
+                    else:
+                        if stderr_other == ['']:
+                            stderr_other = None
+                        self.assertIsNone(stderr_other)
+                        self.assertIn('Global arguments available for all',
+                                      result['stdout'])
+
+                        self.assertEqual(result['exit_code'], 0)
+                else:
+                    # auto-run
+                    self.assertIn(result['exit_code'], [0, -9])
+
+                    if (not result['stdout'] and not result['stderr']):
+                        print(' auto-run script unresponsive after %d seconds'
+                              % timeout, end=' ')
+                    elif 'SIMULATION: edit action blocked' in result['stderr']:
+                        print(' auto-run script simulated edit blocked',
+                              end='  ')
+                    else:
+                        print(' auto-run script stderr within %d seconds: %r'
+                              % (timeout, result['stderr']), end='  ')
+
                 self.assertNotIn('Traceback (most recent call last)',
                                  result['stderr'])
+                self.assertNotIn('deprecated', result['stderr'].lower())
+
+                # If stdout doesnt include global help..
+                if 'Global arguments available for all' not in result['stdout']:
+                    # Specifically look for deprecated
+                    self.assertNotIn('deprecated', result['stdout'].lower())
+                    # But also complain if there is any stdout
+                    if result['stdout'] == '':
+                        result['stdout'] = None
+                    self.assertIsNone(result['stdout'])
+
+                sys.stdout.flush()
+
             return testScript
 
         for script_name in script_list:
@@ -264,9 +339,9 @@ class TestScriptMeta(MetaTestCaseClass):
             # unrunnable script tests are disabled by default in load_tests()
 
             if script_name == 'login':
-                test_name = 'test__' + script_name + '_execution'
+                test_name = 'test__' + script_name + '_help'
             else:
-                test_name = 'test_' + script_name + '_execution'
+                test_name = 'test_' + script_name + '_help'
             dct[test_name] = test_execution(script_name, ['-help'])
             if script_name in ['shell', 'version',
                                'data_ingestion',  # bug 68611
@@ -275,7 +350,7 @@ class TestScriptMeta(MetaTestCaseClass):
                                'script_wui',      # Failing on travis-ci
                                ]:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
-            dct[test_name].__doc__ = 'Test running ' + script_name + '.'
+            dct[test_name].__doc__ = 'Test running ' + script_name + ' -help'
             dct[test_name].__name__ = test_name
 
             # Ideally all scripts should execute -help without
@@ -289,14 +364,18 @@ class TestScriptMeta(MetaTestCaseClass):
                 dct[test_name].__test__ = False
 
             if script_name == 'login':
-                test_name = 'test__' + script_name + '_no_args'
+                test_name = 'test__' + script_name + '_simulate'
             else:
-                test_name = 'test_' + script_name + '_no_args'
+                test_name = 'test_' + script_name + '_simulate'
             dct[test_name] = test_execution(script_name, ['-simulate'],
                                             no_args_expected_results)
-            if script_name in ['checkimages',     # bug 68613
+            if script_name in ['catall',          # stdout user interaction
+                               'checkimages',     # bug 68613
                                'data_ingestion',  # bug 68611
                                'flickrripper',    # bug 68606 (and deps)
+                               'lonelypages',     # custom return codes
+                               'nowcommons',      # deprecation warning
+                               'replicate_wiki',  # custom return codes
                                'script_wui',      # Error on any user except DrTrigonBot
                                'upload',          # raises custom ValueError
                                ] or (
@@ -305,10 +384,10 @@ class TestScriptMeta(MetaTestCaseClass):
                     (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = \
-                'Test running ' + script_name + ' without arguments.'
+                'Test running ' + script_name + ' -simulate.'
             dct[test_name].__name__ = test_name
 
-            # Disable test bt default in nosetests
+            # Disable test by default in nosetests
             if script_name in unrunnable_script_list + deadlock_script_list:
                 dct[test_name].__test__ = False
 
