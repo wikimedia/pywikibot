@@ -76,7 +76,6 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         end_date.setTarget(pywikibot.WbTime(year=2012))
         item.claims['P115'][0].addQualifier(end_date)
 
-    # metaclass cant handle this: @unittest.expectedFailure  # bug 69401
     def test_edit_entity_new_item(self):
         testsite = self.get_repo()
         ts = str(time.time())
