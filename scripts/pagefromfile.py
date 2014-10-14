@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
+Bot to upload pages from a file.
+
 This bot takes its input from a file that contains a number of
 pages to be put on the wiki. The pages should all have the same
 begin and end text (which may not overlap).
@@ -65,18 +67,23 @@ class NoTitle(Exception):
     """No title found."""
 
     def __init__(self, offset):
+        """Constructor."""
         self.offset = offset
 
 
 class PageFromFileRobot(Bot):
 
     """
-    Responsible for writing pages to the wiki, with the titles and contents
-    given by a PageFromFileReader.
+    Responsible for writing pages to the wiki.
+
+    Titles and contents are given by a PageFromFileReader.
+
     """
 
     def __init__(self, reader, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
+            'always': True,
             'force': False,
             'append': None,
             'summary': None,
@@ -90,10 +97,12 @@ class PageFromFileRobot(Bot):
         self.reader = reader
 
     def run(self):
+        """Start file processing and upload content."""
         for title, contents in self.reader.run():
             self.save(title, contents)
 
     def save(self, title, contents):
+        """Upload page content."""
         mysite = pywikibot.Site()
 
         page = pywikibot.Page(mysite, title)
@@ -145,17 +154,12 @@ class PageFromFileRobot(Bot):
             if self.getOption('autosummary'):
                 comment = ''
                 config.default_edit_summary = ''
-        try:
-            page.text = contents
-            page.save(comment, minor=self.getOption('minor'))
-        except pywikibot.LockedPage:
-            pywikibot.output(u"Page %s is locked; skipping." % title)
-        except pywikibot.EditConflict:
-            pywikibot.output(u'Skipping %s because of edit conflict' % title)
-        except pywikibot.SpamfilterError as error:
-            pywikibot.output(
-                u'Cannot change %s because of spam blacklist entry %s'
-                % (title, error.url))
+
+        self.userPut(page, page.text, contents,
+                     comment=comment,
+                     minor=self.getOption('minor'),
+                     show_diff=False,
+                     ignore_save_related_errors=True)
 
 
 class PageFromFileReader:
@@ -170,11 +174,11 @@ class PageFromFileReader:
     def __init__(self, filename, pageStartMarker, pageEndMarker,
                  titleStartMarker, titleEndMarker, include, notitle):
         """Constructor.
+
         Check if self.file name exists. If not, ask for a new filename.
         User can quit.
 
         """
-
         self.filename = filename
         self.pageStartMarker = pageStartMarker
         self.pageEndMarker = pageEndMarker
@@ -187,13 +191,14 @@ class PageFromFileReader:
         """Read file and yield page title and content."""
         pywikibot.output('\n\nReading \'%s\'...' % self.filename)
         try:
-            f = codecs.open(self.filename, 'r',
-                            encoding=config.textfile_encoding)
+            with codecs.open(self.filename, 'r',
+                             encoding=config.textfile_encoding) as f:
+                text = f.read()
+
         except IOError as err:
             pywikibot.output(str(err))
             raise IOError
 
-        text = f.read()
         position = 0
         length = 0
         while True:
@@ -214,6 +219,7 @@ class PageFromFileReader:
             yield title, contents
 
     def findpage(self, text):
+        """Find page to work on."""
         pageR = re.compile(re.escape(self.pageStartMarker) + "(.*?)" +
                            re.escape(self.pageEndMarker), re.DOTALL)
         titleR = re.compile(re.escape(self.titleStartMarker) + "(.*?)" +
@@ -236,6 +242,7 @@ class PageFromFileReader:
 
 
 def main():
+    """Main function."""
     # Adapt these to the file you are using. 'pageStartMarker' and
     # 'pageEndMarker' are the beginning and end of each entry. Take text that
     # should be included and does not occur elsewhere in the text.
