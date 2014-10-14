@@ -131,22 +131,60 @@ class TestCachedRequest(DefaultSiteTestCase):
 
     cached = False
 
-    def testResults(self):
+    def test_normal_use(self):
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        # Run the cached query twice to ensure the
-        # data returned is equal
+        # Run the cached query three times to ensure the
+        # data returned is equal, and the last two have
+        # the same cache time.
         params = {'action': 'query',
                   'prop': 'info',
                   'titles': mainpage.title(),
                   }
-        req = api.CachedRequest(datetime.timedelta(minutes=10),
-                                site=mysite, **params)
-        data = req.submit()
+        req1 = api.CachedRequest(datetime.timedelta(minutes=10),
+                                 site=mysite, **params)
+        data1 = req1.submit()
         req2 = api.CachedRequest(datetime.timedelta(minutes=10),
                                  site=mysite, **params)
         data2 = req2.submit()
-        self.assertEqual(data, data2)
+        req3 = api.CachedRequest(datetime.timedelta(minutes=10),
+                                 site=mysite, **params)
+        data3 = req3.submit()
+        self.assertEqual(data1, data2)
+        self.assertEqual(data2, data3)
+        self.assertIsNotNone(req2._cachetime)
+        self.assertIsNotNone(req3._cachetime)
+        self.assertEqual(req2._cachetime, req3._cachetime)
+
+    def test_internals(self):
+        mysite = self.get_site()
+        # Run tests on a missing page unique to this test run so it can
+        # not be cached the first request, but will be cached after.
+        now = datetime.datetime.now()
+        params = {'action': 'query',
+                  'prop': 'info',
+                  'titles': 'TestCachedRequest_test_internals ' + str(now),
+                  }
+        req = api.CachedRequest(datetime.timedelta(minutes=10),
+                                site=mysite, **params)
+        rv = req._load_cache()
+        self.assertFalse(rv)
+        self.assertIsNone(req._data)
+        self.assertIsNone(req._cachetime)
+
+        data = req.submit()
+
+        self.assertIsNotNone(req._data)
+        self.assertIsNone(req._cachetime)
+
+        rv = req._load_cache()
+
+        self.assertTrue(rv)
+        self.assertIsNotNone(req._data)
+        self.assertIsNotNone(req._cachetime)
+        self.assertGreater(req._cachetime, now)
+        self.assertEqual(req._data, data)
+
 
 if __name__ == '__main__':
     try:
