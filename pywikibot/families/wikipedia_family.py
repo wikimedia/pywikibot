@@ -558,6 +558,34 @@ class Family(family.WikimediaFamily):
             return 'utf-8', 'iso-8859-1'
         return self.code2encoding(code),
 
+        # Subpages for documentation.
+        # TODO: List is incomplete, to be completed for missing languages.
+        # TODO: Remove comments for appropriate pages
+        self.doc_subpages = {
+            '_default': ((u'/doc', ),
+                         ['ar', 'bn', 'cs', 'da', 'en', 'es', 'fa',
+                          'hu', 'id', 'ilo', 'ja', 'ms',
+                          'ms', 'pt', 'ro', 'ru', 'simple', 'vi', 'zh']
+                         ),
+            'ca': (u'/ús', ),
+            'de': (u'Doku', u'/Meta'),
+            'dsb': (u'/Dokumentacija', ),
+            'eu': (u'txantiloi dokumentazioa', u'/dok'),
+            # fi: no idea how to handle this type of subpage at :Metasivu:
+            'fi': ((), ),
+            'fr': (u'/documentation', ),
+            'hsb': (u'/Dokumentacija', ),
+            'it': (u'/Man', ),
+            'ka': (u'/ინფო', ),
+            'ko': (u'/설명문서', ),
+            'no': (u'/dok', ),
+            'nn': (u'/dok', ),
+            'pl': (u'/opis', ),
+            'sk': (u'/Dokumentácia', ),
+            'sv': (u'/dok', ),
+            'uk': (u'/Документація', ),
+        }
+
     def shared_data_repository(self, code, transcluded=False):
         """Return the shared data repository for this site."""
         if code in ['test', 'test2']:

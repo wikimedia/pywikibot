@@ -483,6 +483,37 @@ class BaseSite(ComparableMixin):
         """
         return self.__code
 
+    @property
+    def doc_subpage(self):
+        """Return the documentation subpage for this Site.
+
+        @return: tuple
+
+        """
+        if not hasattr(self, '_doc_subpage'):
+            try:
+                doc, codes = self.family.doc_subpages.get('_default', ((), []))
+                if self.code not in codes:
+                    try:
+                        doc = self.family.doc_subpages[self.code]
+                    # Language not defined in doc_subpages in x_family.py file
+                    # It will use default for the family.
+                    # should it just raise an Exception and fail?
+                    # this will help to check the dictionary ...
+                    except KeyError:
+                        pywikibot.warning(
+                            u"Site {0} has no language defined in doc_subpages dict in {1}_family.py file"
+                            .format(self, self.family.name))
+            # doc_subpages not defined in x_family.py file
+            except AttributeError:
+                doc = ()  # default
+                pywikibot.warning(
+                    u"Site {0} has no doc_subpages dict in {1}_family.py file"
+                    .format(self, self.family.name))
+            self._doc_subpage = doc
+
+        return self._doc_subpage
+
     def _cmpkey(self):
         """Perform equality and inequality tests on Site objects."""
         return (self.family.name, self.code)
