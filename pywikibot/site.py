@@ -46,7 +46,8 @@ from pywikibot.exceptions import (
     CascadeLockedPage,
     LockedNoPage,
     NoPage,
-    NoSuchSite,
+    UnknownSite,
+    SiteDefinitionError,
     NoUsername,
     SpamfilterError,
     UserBlocked,
@@ -408,7 +409,7 @@ class BaseSite(ComparableMixin):
         """
         self.__code = code.lower()
         if isinstance(fam, basestring) or fam is None:
-            self.__family = pywikibot.family.Family.load(fam, fatal=False)
+            self.__family = pywikibot.family.Family.load(fam)
         else:
             self.__family = fam
 
@@ -429,8 +430,8 @@ class BaseSite(ComparableMixin):
                         and oldcode == pywikibot.config.mylang:
                     pywikibot.config.mylang = self.__code
             else:
-                raise NoSuchSite("Language %s does not exist in family %s"
-                                 % (self.__code, self.__family.name))
+                raise UnknownSite("Language %s does not exist in family %s"
+                                  % (self.__code, self.__family.name))
 
         self.nocapitalize = self.code in self.family.nocapitalize
         if not self.nocapitalize:
@@ -549,8 +550,8 @@ class BaseSite(ComparableMixin):
         """
         Return the site for a corresponding interwiki prefix.
 
-        @raise NoSuchSite: if the url given in the interwiki table doesn't
-            match any of the existing families.
+        @raise SiteDefinitionError: if the url given in the interwiki table
+            doesn't match any of the existing families.
         @raise KeyError: if the prefix is not an interwiki prefix.
         """
         # _iw_sites is a local cache to return a APISite instance depending
@@ -575,7 +576,7 @@ class BaseSite(ComparableMixin):
         if site[0]:
             return site[0]
         else:
-            raise NoSuchSite(
+            raise SiteDefinitionError(
                 "No family/site found for prefix '{0}'".format(prefix))
 
     def local_interwiki(self, prefix):
@@ -586,8 +587,8 @@ class BaseSite(ComparableMixin):
         link. So if that link also contains an interwiki link it does follow
         it as long as it's a local link.
 
-        @raise NoSuchSite: if the url given in the interwiki table doesn't
-            match any of the existing families.
+        @raise SiteDefinitionError: if the url given in the interwiki table
+            doesn't match any of the existing families.
         @raise KeyError: if the prefix is not an interwiki prefix.
         """
         # Request if necessary
@@ -888,8 +889,8 @@ def must_be(group=None, right=None):
     def decorator(fn):
         def callee(self, *args, **kwargs):
             if self.obsolete:
-                raise NoSuchSite("Language %s in family %s is obsolete"
-                                 % (self.code, self.family.name))
+                raise UnknownSite("Language %s in family %s is obsolete"
+                                  % (self.code, self.family.name))
             grp = kwargs.pop('as_group', group)
             if grp == 'user':
                 self.login(False)

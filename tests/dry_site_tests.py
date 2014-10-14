@@ -12,6 +12,7 @@ import pywikibot
 from pywikibot.tools import deprecated
 from pywikibot.site import must_be, need_version
 from pywikibot.comms.http import user_agent
+from pywikibot.exceptions import UnknownSite
 
 from tests.utils import DummySiteinfo
 from tests.aspects import unittest, TestCase, DeprecationTestCase
@@ -171,7 +172,7 @@ class TestMustBe(TestCase):
         self.obsolete = True
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
-        self.assertRaises(pywikibot.NoSuchSite, self.call_this_user_req_function, args, kwargs)
+        self.assertRaises(UnknownSite, self.call_this_user_req_function, args, kwargs)
 
 
 class TestNeedVersion(DeprecationTestCase):

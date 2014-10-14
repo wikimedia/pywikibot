@@ -21,8 +21,8 @@ else:
 
 import pywikibot
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated
-from pywikibot.exceptions import Error
+from pywikibot.tools import deprecated, deprecate_arg
+from pywikibot.exceptions import UnknownFamily, Error
 
 logger = logging.getLogger("pywiki.wiki.family")
 
@@ -847,16 +847,14 @@ class Family(object):
     _families = {}
 
     @staticmethod
-    def load(fam=None, fatal=True):
+    @deprecate_arg('fatal', None)
+    def load(fam=None):
         """Import the named family.
 
         @param fam: family name (if omitted, uses the configured default)
         @type fam: str
-        @param fatal: if True, the bot will stop running if the given family is
-            unknown. If False, it will only raise a ValueError exception.
-        @param fatal: bool
         @return: a Family instance configured for the named family.
-
+        @raises UnknownFamily: family not known
         """
         if fam is None:
             fam = config.family
@@ -878,14 +876,7 @@ class Family(object):
                 warnings.simplefilter("ignore", RuntimeWarning)
                 myfamily = imp.load_source(fam, config.family_files[fam])
         except (ImportError, KeyError):
-            if fatal:
-                pywikibot.error(u"""\
-    Error importing the %s family. This probably means the family
-    does not exist. Also check your configuration file."""
-                                % fam, exc_info=True)
-                sys.exit(1)
-            else:
-                raise Error("Family %s does not exist" % fam)
+            raise UnknownFamily("Family %s does not exist" % fam)
         Family._families[fam] = myfamily.Family()
         return Family._families[fam]
 
@@ -1146,7 +1137,7 @@ class Family(object):
         If other is not a Family() object, try to create one.
         """
         if not isinstance(other, Family):
-            other = self.load(other, fatal=False)
+            other = self.load(other)
         try:
             return self.name == other.name
         except AttributeError:
@@ -1155,7 +1146,7 @@ class Family(object):
     def __ne__(self, other):
         try:
             return not self.__eq__(other)
-        except Error:
+        except UnknownFamily:
             return False
 
     def __hash__(self):
