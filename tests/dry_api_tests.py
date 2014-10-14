@@ -23,7 +23,6 @@ __version__ = '$Id$'
 import os
 import sys
 import datetime
-from email.mime.multipart import MIMEMultipart
 
 import pywikibot
 from pywikibot.data.api import Request, CachedRequest, QueryGenerator
@@ -208,20 +207,10 @@ class DryMimeTests(TestCase):
         local_filename = os.path.join(_data_dir, 'MP_sounds.png')
         with open(local_filename, 'rb') as f:
             file_content = f.read()
-        submsg = Request._generate_MIME_part(
-            'file', file_content, ('image', 'png'),
-            {'filename': local_filename})
-
-        container = MIMEMultipart(_subtype='form-data')
-        container.attach(submsg)
-        if sys.version_info[0] > 2:
-            body = container.as_bytes()
-            marker = b"\n\n"
-        else:
-            body = container.as_string()
-            marker = "\n\n"
-        eoh = body.find(marker)
-        body = body[eoh + len(marker):]
+        body = Request._build_mime_request({}, {
+            'file': (file_content, ('image', 'png'),
+                     {'filename': local_filename})
+        })[1]
         self.assertNotEqual(body.find(file_content), -1)
 
 
