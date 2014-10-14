@@ -39,11 +39,11 @@ class TestShareFiles(TestCase):
 
         commons = self.get_site('commons')
         itwp = self.get_site('itwiki')
-        itwp_file = pywikibot.ImagePage(itwp, title)
+        itwp_file = pywikibot.FilePage(itwp, title)
         for using in itwp_file.usingPages():
             self.assertIsInstance(using, pywikibot.Page)
 
-        commons_file = pywikibot.ImagePage(commons, title)
+        commons_file = pywikibot.FilePage(commons, title)
 
         self.assertFalse(itwp_file.exists())
         self.assertTrue(commons_file.exists())
@@ -60,11 +60,11 @@ class TestShareFiles(TestCase):
 
         commons = self.get_site('commons')
         enwp = self.get_site('enwiki')
-        enwp_file = pywikibot.ImagePage(enwp, title)
+        enwp_file = pywikibot.FilePage(enwp, title)
         for using in enwp_file.usingPages():
             self.assertIsInstance(using, pywikibot.Page)
 
-        commons_file = pywikibot.ImagePage(commons, title)
+        commons_file = pywikibot.FilePage(commons, title)
 
         self.assertTrue(enwp_file.fileUrl())
         self.assertTrue(enwp_file.exists())
@@ -81,11 +81,11 @@ class TestShareFiles(TestCase):
 
         commons = self.get_site('commons')
         itwp = self.get_site('itwiki')
-        itwp_file = pywikibot.ImagePage(itwp, title)
+        itwp_file = pywikibot.FilePage(itwp, title)
         for using in itwp_file.usingPages():
             self.assertIsInstance(using, pywikibot.Page)
 
-        commons_file = pywikibot.ImagePage(commons, title)
+        commons_file = pywikibot.FilePage(commons, title)
 
         self.assertTrue(itwp_file.fileUrl())
         self.assertTrue(itwp_file.exists())
@@ -100,13 +100,13 @@ class TestShareFiles(TestCase):
 
         commons = self.get_site('commons')
         testwp = self.get_site('testwiki')
-        testwp_file = pywikibot.ImagePage(testwp, title)
+        testwp_file = pywikibot.FilePage(testwp, title)
 
         self.assertTrue(testwp_file.fileUrl())
         self.assertTrue(testwp_file.exists())
         self.assertTrue(testwp_file.fileIsShared())
 
-        commons_file = pywikibot.ImagePage(commons, title)
+        commons_file = pywikibot.FilePage(commons, title)
         self.assertEqual(testwp_file.fileUrl(),
                          commons_file.fileUrl())
 
