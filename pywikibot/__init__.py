@@ -29,7 +29,7 @@ else:
 from pywikibot import config2 as config
 from pywikibot.bot import (
     output, warning, error, critical, debug, stdout, exception,
-    input, inputChoice, handleArgs, showHelp, ui, log,
+    input, input_choice, inputChoice, handleArgs, showHelp, ui, log,
     calledModuleName, Bot, WikidataBot, QuitKeyboardInterrupt,
 )
 from pywikibot.exceptions import (
@@ -66,7 +66,7 @@ __all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
            'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
            'html2unicode', 'url2unicode', 'unicode2html',
            'stdout', 'output', 'warning', 'error', 'critical', 'debug',
-           'exception',
+           'exception', 'input_choice',
            'input', 'inputChoice', 'handleArgs', 'showHelp', 'ui', 'log',
            'calledModuleName', 'Bot', 'WikidataBot',
            'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
