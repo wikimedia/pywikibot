@@ -9,7 +9,6 @@ __version__ = '$Id$'
 
 from collections import MutableMapping
 from pywikibot.comms import http
-from email.mime.multipart import MIMEMultipart
 from email.mime.nonmultipart import MIMENonMultipart
 import datetime
 import hashlib
@@ -32,11 +31,50 @@ from pywikibot.exceptions import Server504Error, FatalServerError, Error
 import sys
 
 if sys.version_info[0] > 2:
+    # Subclassing necessary to fix a possible bug of the email package
+    # in py3: see http://bugs.python.org/issue19003
+    # The following solution might be removed if/once the bug is fixed,
+    # unless the fix is not backported to py3.x versions that should
+    # instead support PWB.
     basestring = (str, )
     from urllib.parse import urlencode, unquote
     unicode = str
+
+    from io import BytesIO
+
+    import email.generator
+    from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
+
+    class CTEBinaryBytesGenerator(email.generator.BytesGenerator):
+
+        """Workaround for bug in python 3 email handling of CTE binary."""
+
+        def __init__(self, *args, **kwargs):
+            super(CTEBinaryBytesGenerator, self).__init__(*args, **kwargs)
+            self._writeBody = self._write_body
+
+        def _write_body(self, msg):
+            if msg['content-transfer-encoding'] == 'binary':
+                self._fp.write(msg.get_payload(decode=True))
+            else:
+                super(CTEBinaryBytesGenerator, self)._handle_text(msg)
+
+    class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
+
+        """Workaround for bug in python 3 email handling of CTE binary."""
+
+        def as_bytes(self, unixfrom=False, policy=None):
+            """Return unmodified binary payload."""
+            policy = self.policy if policy is None else policy
+            fp = BytesIO()
+            g = CTEBinaryBytesGenerator(fp, mangle_from_=False, policy=policy)
+            g.flatten(self, unixfrom=unixfrom)
+            return fp.getvalue()
+
+    MIMEMultipart = CTEBinaryMIMEMultipart
 else:
     from urllib import urlencode, unquote
+    from email.mime.multipart import MIMEMultipart
 
 _logger = "data.api"
 
@@ -437,6 +475,10 @@ class Request(MutableMapping):
             content_headers.update(headers)
         submsg.add_header("Content-disposition", "form-data",
                           **content_headers)
+
+        if keytype != ("text", "plain"):
+            submsg['Content-Transfer-Encoding'] = 'binary'
+
         submsg.set_payload(content)
         return submsg
 
@@ -461,12 +503,16 @@ class Request(MutableMapping):
             container.attach(submsg)
 
         # strip the headers to get the HTTP message body
-        body = container.as_string()
-        marker = "\n\n"  # separates headers from body
+        if sys.version_info[0] > 2:
+            body = container.as_bytes()
+            marker = b"\n\n"  # separates headers from body
+        else:
+            body = container.as_string()
+            marker = "\n\n"  # separates headers from body
         eoh = body.find(marker)
         body = body[eoh + len(marker):]
         # retrieve the headers from the MIME object
-        headers = dict(list(container.items()))
+        headers = dict(container.items())
         return headers, body
 
     def _handle_warnings(self, result):
