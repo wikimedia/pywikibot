@@ -43,6 +43,7 @@ if sys.version_info < (2, 7):
 else:
     import unittest
 
+from pywikibot import config
 import pywikibot.data.api
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.data.api import CachedRequest
@@ -182,6 +183,16 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
 CachedRequest._get_cache_dir = staticmethod(
     lambda *args: CachedRequest._make_dir(_cache_dir))
 
+
+# Travis-CI builds are set to retry twice, which aims to reduce the number
+# of 'red' builds caused by intermittant server problems, while also avoiding
+# the builds taking a long time due to retries.
+# The following allows builds to retry twice, but higher default values are
+# overriden here to restrict retries to only 1, so developer builds fail more
+# frequently in code paths resulting from mishandled server problems.
+if config.max_retries > 2:
+    print('max_retries reduced from %d to 1 for tests' % config.max_retries)
+    config.max_retries = 1
 
 cache_misses = 0
 cache_hits = 0
