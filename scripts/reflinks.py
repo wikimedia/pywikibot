@@ -744,22 +744,9 @@ class ReferencesRobot(Bot):
 
             new_text = self.deduplicator.process(new_text)
 
-            try:
-                self.userPut(page, page.text, new_text, comment=self.msg)
-            except pywikibot.EditConflict:
-                pywikibot.output(u'Skipping %s because of edit conflict'
-                                 % page.title())
-            except pywikibot.SpamfilterError as e:
-                pywikibot.output(
-                    u'Cannot change %s because of blacklist entry %s'
-                    % (page.title(), e.url))
-            except pywikibot.LockedPage:
-                pywikibot.output(u'Skipping %s (locked page)'
-                                 % page.title())
-            except pywikibot.PageNotSaved as error:
-                pywikibot.error(u'putting page: %s' % (error.args,))
-            except pywikibot.ServerError as e:
-                pywikibot.output(u'Server Error : %s' % e)
+            self.userPut(page, page.text, new_text, comment=self.msg,
+                         ignore_save_related_errors=True,
+                         ignore_server_errors=True)
 
             if new_text == page.text:
                 continue
