@@ -18,6 +18,19 @@ CachedTestCase = aspects.TestCase
 PywikibotTestCase = aspects.TestCase
 
 
+def expectedFailureIf(expect):
+    """
+    Unit test decorator to expect/allow failure under conditions.
+
+    @param expect: Flag to check if failure is allowed
+    @type expect: bool
+    """
+    if expect:
+        return unittest.expectedFailure
+    else:
+        return lambda orig: orig
+
+
 class DummySiteinfo():
 
     def __init__(self, cache):

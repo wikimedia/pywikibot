@@ -340,6 +340,8 @@ class MetaTestCaseClass(type):
 
             return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
 
+        # The following section is only processed if the test uses sites.
+
         if 'cacheinfo' in dct and dct['cacheinfo']:
             bases = tuple([CacheInfoMixin] + list(bases))
 
@@ -355,9 +357,16 @@ class MetaTestCaseClass(type):
         for test in tests:
             test_func = dct[test]
 
+            # method decorated with unittest.expectedFailure has no arguments
+            # so it is assumed to not be a multi-site test method.
+            if test_func.__code__.co_argcount == 0:
+                continue
+
+            # a normal test method only accepts 'self'
             if test_func.__code__.co_argcount == 1:
                 continue
 
+            # a multi-site test method only accepts 'self' and the site-key
             if test_func.__code__.co_argcount != 2:
                 raise Exception(
                     '%s: Test method %s must accept either 1 or 2 arguments; '

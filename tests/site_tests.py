@@ -9,6 +9,7 @@ __version__ = '$Id$'
 
 
 import sys
+import os
 from collections import Iterable
 from datetime import datetime
 import re
@@ -17,6 +18,8 @@ import pywikibot
 from pywikibot import config
 from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.data import api
+
+from tests.utils import expectedFailureIf
 from tests.aspects import (
     unittest, TestCase,
     DefaultSiteTestCase,
@@ -681,6 +684,7 @@ class TestImageUsage(DefaultSiteTestCase):
             self.assertIsInstance(using, pywikibot.Page)
             self.assertIn(imagepage, list(using.imagelinks()))
 
+    @expectedFailureIf(os.environ.get('TRAVIS', 'false') == 'true')
     def test_image_usage_in_redirects(self):
         """Test the site.imageusage() method on redirects only."""
         mysite = self.get_site()
