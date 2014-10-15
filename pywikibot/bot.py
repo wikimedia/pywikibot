@@ -152,7 +152,7 @@ class LoggingFormatter(logging.Formatter):
 # levels to sys.stderr; levels WARNING and above are labeled with the
 # level name.
 #
-# UserInterface objects must also define methods input(), inputChoice(),
+# UserInterface objects must also define methods input(), input_choice(),
 # editText(), and askForCaptcha(), all of which are documented in
 # userinterfaces/terminal_interface.py
 
@@ -731,7 +731,7 @@ def handle_args(args=None, do_help=True):
         showHelp()
         sys.exit(0)
 
-    pywikibot.debug(u"handleArgs() completed.", _logger)
+    pywikibot.debug(u"handle_args() completed.", _logger)
     return nonGlobalArgs
 
 
@@ -927,9 +927,12 @@ class Bot(object):
         if self.getOption('always'):
             return True
 
-        choice = pywikibot.inputChoice(question,
-                                       ['Yes', 'No', 'All', 'Quit'],
-                                       ['y', 'N', 'a', 'q'], 'N')
+        choice = pywikibot.input_choice(question,
+                                        [('Yes', 'y'),
+                                         ('No', 'N'),
+                                         ('All', 'a')],
+                                        default='N')
+
         if choice == 'n':
             return False
 
