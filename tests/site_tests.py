@@ -82,6 +82,16 @@ class TestBaseSiteProperties(TestCase):
             'code': 'de',
             'result': ('/Doku', '/Meta'),
         },
+        'commons': {
+            'family': 'commons',
+            'code': 'commons',
+            'result': ('/doc', ),
+        },
+        'wikidata': {
+            'family': 'wikidata',
+            'code': 'wikidata',
+            'result': ('/doc', ),
+        },
     }
 
     cached = True
@@ -89,12 +99,9 @@ class TestBaseSiteProperties(TestCase):
     def testProperties(self):
         """Test cases for BaseSite properties."""
         # Test doc_subpage property.
-        mysite = self.get_site('enwk')
-        self.assertEqual(mysite.doc_subpage, self.sites['enwk']['result'])
-        mysite = self.get_site('enws')
-        self.assertEqual(mysite.doc_subpage, self.sites['enws']['result'])
-        mysite = self.get_site('dews')
-        self.assertEqual(mysite.doc_subpage, self.sites['dews']['result'])
+        def test_properties(self, key):
+            mysite = self.get_site(key)
+            self.assertEqual(mysite.doc_subpage, self.sites[key]['result'])
 
 
 class TestSiteObject(DefaultSiteTestCase):

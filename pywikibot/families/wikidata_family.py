@@ -22,6 +22,11 @@ class Family(family.WikimediaFamily):
 
         self.interwiki_forward = 'wikipedia'
 
+        # Subpages for documentation.
+        self.doc_subpages = {
+            '_default': ((u'/doc', ), ['wikidata']),
+        }
+
     def shared_data_repository(self, code, transcluded=False):
         """
         Indicate Wikidata is both a repository and its own client.
