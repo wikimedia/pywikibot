@@ -570,11 +570,11 @@ class TestWriteNormalizeLang(TestCase):
     """
 
     family = 'wikipedia'
-    lang = 'en'
+    code = 'en'
 
     def setUp(self):
         super(TestWriteNormalizeLang, self).setUp()
-        self.site = pywikibot.Site('en', 'wikipedia')
+        self.site = self.get_site()
         self.lang_out = {'en': 'foo'}
 
     def test_normalize_lang(self):
