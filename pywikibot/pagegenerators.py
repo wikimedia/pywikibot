@@ -283,44 +283,32 @@ class GeneratorFactory(object):
         else:
             return dupfiltergen
 
-    def getCategoryGen(self, arg, length, recurse=False, content=False):
-        if len(arg) == length:
+    def getCategoryGen(self, arg, recurse=False, content=False,
+                       gen_func=None):
+        """Return generator based on Category defined by arg and gen_func."""
+        categoryname = arg.partition(':')[2]
+        if not categoryname:
             categoryname = i18n.input('pywikibot-enter-category-name')
-        else:
-            categoryname = arg[length + 1:]
         categoryname = categoryname.replace('#', '|')
-        ind = categoryname.find('|')
-        startfrom = None
-        if ind > 0:
-            startfrom = categoryname[ind + 1:]
-            categoryname = categoryname[:ind]
 
-        cat = pywikibot.Category(pywikibot.Link(categoryname,
-                                                defaultNamespace=14,
-                                                source=self.site))
-        # Link constructor automatically prepends localized namespace
-        # if not included in user's input
-        return CategorizedPageGenerator(cat, start=startfrom,
-                                        recurse=recurse, content=content)
-
-    def setSubCategoriesGen(self, arg, length, recurse=False, content=False):
-        if len(arg) == length:
-            categoryname = i18n.input('pywikibot-enter-category-name')
-        else:
-            categoryname = arg[length + 1:]
-
-        ind = categoryname.find('|')
-        if ind > 0:
-            startfrom = categoryname[ind + 1:]
-            categoryname = categoryname[:ind]
-        else:
+        categoryname, sep, startfrom = categoryname.partition('|')
+        if not startfrom:
             startfrom = None
 
+        # Insert Category: before category name to avoid parsing problems in
+        # Link.parse() when categoryname contains ":";
+        # Part before ":" might be interpreted as an interwiki prefix
+        prefix = categoryname.split(":", 1)[0]  # whole word if no ":" is present
+        if prefix not in self.site.namespaces()[14]:
+            categoryname = u'{0}:{1}'.format(self.site.namespace(14),
+                                             categoryname)
         cat = pywikibot.Category(pywikibot.Link(categoryname,
-                                                defaultNamespace=14,
-                                                source=self.site))
-        return SubCategoriesPageGenerator(cat, start=startfrom,
-                                          recurse=recurse, content=content)
+                                                defaultNamespace=14))
+
+        return gen_func(cat,
+                        start=startfrom,
+                        recurse=recurse,
+                        content=content)
 
     def handleArg(self, arg):
         """Parse one argument at a time.
@@ -438,15 +426,18 @@ class GeneratorFactory(object):
                 self.limit = int(arg[len('-limit:'):])
             return True
         elif arg.startswith('-catr'):
-            gen = self.getCategoryGen(arg, len('-catr'), recurse=True)
+            gen = self.getCategoryGen(arg, recurse=True,
+                                      gen_func=CategorizedPageGenerator)
         elif arg.startswith('-category'):
-            gen = self.getCategoryGen(arg, len('-category'))
+            gen = self.getCategoryGen(arg, gen_func=CategorizedPageGenerator)
         elif arg.startswith('-cat'):
-            gen = self.getCategoryGen(arg, len('-cat'))
+            gen = self.getCategoryGen(arg, gen_func=CategorizedPageGenerator)
         elif arg.startswith('-subcatsr'):
-            gen = self.setSubCategoriesGen(arg, 9, recurse=True)
+            gen = self.getCategoryGen(arg, recurse=True,
+                                      gen_func=SubCategoriesPageGenerator)
         elif arg.startswith('-subcats'):
-            gen = self.setSubCategoriesGen(arg, 8)
+            gen = self.getCategoryGen(arg,
+                                      gen_func=SubCategoriesPageGenerator)
         elif arg.startswith('-page'):
             if len(arg) == len('-page'):
                 gen = [pywikibot.Page(
