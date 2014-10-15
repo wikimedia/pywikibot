@@ -1,17 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-API tests which do not interact with a site.
-
-Some of these tests are not 'net = False' (and not run by jenkins), as they
-instantiate a Request, and the Request constructor will call pywikibot.Site()
-when a site parameter is not provided to __init__.
-
-The test framework yet doesn't have the ability to allow instantiation of a
-real Site without also allowing the Site object to be used.
-
-While those tests are 'net = False', they do not initiate any network requests,
-and they _should_ be 'dry'.
-"""
+"""API tests which do not interact with a site."""
 #
 # (C) Pywikibot team, 2012-2014
 #
@@ -33,7 +21,7 @@ from pywikibot.family import Family
 
 from tests import _data_dir
 from tests.utils import DummySiteinfo
-from tests.aspects import unittest, TestCase, DefaultSiteTestCase
+from tests.aspects import unittest, TestCase, DefaultDrySiteTestCase
 
 
 class DryCachedRequestTests(TestCase):
@@ -50,6 +38,8 @@ class DryCachedRequestTests(TestCase):
             'code': 'de',
         },
     }
+
+    dry = True
 
     def setUp(self):
         super(DryCachedRequestTests, self).setUp()
@@ -216,7 +206,7 @@ class DryMimeTests(TestCase):
         self.assertNotEqual(body.find(file_content), -1)
 
 
-class MimeTests(DefaultSiteTestCase):
+class MimeTests(DefaultDrySiteTestCase):
 
     """Test MIME request handling with a real site."""
 
@@ -227,7 +217,7 @@ class MimeTests(DefaultSiteTestCase):
         self.assertEqual(req.mime, True)
 
 
-class QueryGenTests(DefaultSiteTestCase):
+class QueryGenTests(DefaultDrySiteTestCase):
 
     """Test QueryGenerator with a real site."""
 

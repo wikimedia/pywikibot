@@ -18,7 +18,7 @@ import pywikibot
 import pywikibot.textlib as textlib
 from pywikibot import config
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, DefaultDrySiteTestCase
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")
@@ -96,7 +96,7 @@ class TestSectionFunctions(TestCase):
         self.assertNotContains("enwiki_help_editing", u"Helpful tips", "section header must contain a link")
 
 
-class TestFormatFunctions(TestCase):
+class TestFormatInterwiki(TestCase):
 
     """Test format functions."""
 
@@ -104,13 +104,6 @@ class TestFormatFunctions(TestCase):
     code = 'en'
 
     cached = True
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestFormatFunctions, cls).setUpClass()
-        cls.site = cls.get_site()
-        cls.catresult = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
-                          % {'LS': config.LS})
 
     def test_interwiki_format(self):
         interwikis = {
@@ -120,6 +113,16 @@ class TestFormatFunctions(TestCase):
         self.assertEqual('[[de:German]]%(LS)s[[fr:French]]%(LS)s'
                          % {'LS': config.LS},
                          textlib.interwikiFormat(interwikis, self.site))
+
+
+class TestFormatCategory(DefaultDrySiteTestCase):
+
+    """Test category formatting."""
+
+    dry = True
+
+    catresult = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
+                          % {'LS': config.LS})
 
     def test_category_format_raw(self):
         self.assertEqual(self.catresult,
@@ -144,7 +147,7 @@ class TestFormatFunctions(TestCase):
                          textlib.categoryFormat(data, self.site))
 
 
-class TestCategoryRearrangement(TestCase):
+class TestCategoryRearrangement(DefaultDrySiteTestCase):
 
     """
     Ensure that sorting keys are not being lost.
@@ -153,28 +156,22 @@ class TestCategoryRearrangement(TestCase):
     with both a newline and an empty string as separators.
     """
 
-    family = 'wikipedia'
-    code = 'en'
+    dry = True
 
-    cached = True
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestCategoryRearrangement, cls).setUpClass()
-        cls.site = cls.get_site()
-        cls.old = ('[[Category:Cat1]]%(LS)s[[Category:Cat2|]]%(LS)s'
-                   '[[Category:Cat1| ]]%(LS)s[[Category:Cat2|key]]'
-                   % {'LS': config.LS})
-        cls.cats = textlib.getCategoryLinks(cls.old, site=cls.site)
+    old = ('[[Category:Cat1]]%(LS)s[[Category:Cat2|]]%(LS)s'
+           '[[Category:Cat1| ]]%(LS)s[[Category:Cat2|key]]'
+           % {'LS': config.LS})
 
     def test_standard_links(self):
-        new = textlib.replaceCategoryLinks(self.old, self.cats, site=self.site)
+        cats = textlib.getCategoryLinks(self.old, site=self.site)
+        new = textlib.replaceCategoryLinks(self.old, cats, site=self.site)
         self.assertEqual(self.old, new)
 
     def test_adjoining_links(self):
+        cats_std = textlib.getCategoryLinks(self.old, site=self.site)
         old = self.old.replace(config.LS, '')
         cats = textlib.getCategoryLinks(old, site=self.site)
-        self.assertEqual(self.cats, cats)
+        self.assertEqual(cats_std, cats)
         sep = config.LS
         config.line_separator = ''  # use an empty separator temporarily
         new = textlib.replaceCategoryLinks(old, cats, site=self.site)
