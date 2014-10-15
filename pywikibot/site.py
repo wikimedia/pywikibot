@@ -597,7 +597,7 @@ class BaseSite(ComparableMixin):
                     break
             else:
                 raise KeyError(
-                    "'{0}' is not an interwiki prefix.".format(prefix))
+                    u"'{0}' is not an interwiki prefix.".format(prefix))
             try:
                 site = (pywikibot.Site(url=interwiki['url']),
                         'local' in interwiki)
@@ -608,7 +608,7 @@ class BaseSite(ComparableMixin):
             return site[0]
         else:
             raise SiteDefinitionError(
-                "No family/site found for prefix '{0}'".format(prefix))
+                u"No family/site found for prefix '{0}'".format(prefix))
 
     def local_interwiki(self, prefix):
         """
