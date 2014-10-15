@@ -476,6 +476,17 @@ def deprecated(*args, **kwargs):
 
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg."""
+    return deprecated_args(**{old_arg: new_arg})
+
+
+def deprecated_args(**arg_pairs):
+    """
+    Decorator to declare multiple args deprecated.
+
+    @param arg_pairs: Each entry points to the new argument name. With True or
+        None it drops the value and prints a warning. If False it just drops
+        the value.
+    """
     _logger = ""
 
     def decorator(obj):
@@ -497,22 +508,24 @@ def deprecate_arg(old_arg, new_arg):
             @rtype: any
             """
             name = obj.__full_name__
-            if old_arg in __kw:
-                if new_arg:
-                    if new_arg in __kw:
-                        warning(
-u"%(new_arg)s argument of %(name)s replaces %(old_arg)s; cannot use both."
-                            % locals())
-                    else:
-                        warning(
-u"%(old_arg)s argument of %(name)s is deprecated; use %(new_arg)s instead."
-                            % locals())
-                        __kw[new_arg] = __kw[old_arg]
-                else:
-                    debug(
-u"%(old_arg)s argument of %(name)s is deprecated."
-                        % locals(), _logger)
-                del __kw[old_arg]
+            for old_arg, new_arg in arg_pairs.items():
+                if old_arg in __kw:
+                    if new_arg not in [True, False, None]:
+                        if new_arg in __kw:
+                            warning(u"%(new_arg)s argument of %(name)s "
+                                    "replaces %(old_arg)s; cannot use both."
+                                    % locals())
+                        else:
+                            # If the value is positionally given this will
+                            # cause a TypeError, which is intentional
+                            warning(u"%(old_arg)s argument of %(name)s "
+                                    "is deprecated; use %(new_arg)s instead."
+                                    % locals())
+                            __kw[new_arg] = __kw[old_arg]
+                    elif new_arg is not False:
+                        debug(u"%(old_arg)s argument of %(name)s is "
+                              "deprecated." % locals(), _logger)
+                    del __kw[old_arg]
             return obj(*__args, **__kw)
 
         wrapper.__doc__ = obj.__doc__

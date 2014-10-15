@@ -28,7 +28,7 @@ import re
 import time
 import pywikibot
 from pywikibot import date, config, i18n
-from pywikibot.tools import deprecate_arg
+from pywikibot.tools import deprecated_args
 from pywikibot.comms import http
 import pywikibot.data.wikidataquery as wdquery
 
@@ -603,9 +603,7 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
                          content=content)
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("namespace", "namespaces")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", namespace="namespaces", repeat=None)
 def NewpagesPageGenerator(get_redirect=False, site=None,
                           namespaces=[0, ], step=None, total=None):
     """
@@ -814,7 +812,7 @@ def PagesFromTitlesGenerator(iterable, site=None):
         yield pywikibot.Page(pywikibot.Link(title, site))
 
 
-@deprecate_arg("number", "total")
+@deprecated_args(number="total")
 def UserContributionsGenerator(username, namespaces=None, site=None,
                                step=None, total=None):
     """Yield unique pages edited by user:username.
@@ -910,7 +908,7 @@ class RegexFilter(object):
         return regex
 
     @classmethod
-    @deprecate_arg("inverse", "quantifier")
+    @deprecated_args(inverse="quantifier")
     def titlefilter(cls, generator, regex, quantifier='any',
                     ignore_namespace=True):
         """ Yield pages from another generator whose title matches regex.
@@ -1057,8 +1055,7 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
             yield item
 
 
-@deprecate_arg("pageNumber", "step")
-@deprecate_arg("lookahead", None)
+@deprecated_args(pageNumber="step", lookahead=None)
 def PreloadingGenerator(generator, step=50):
     """Yield preloaded pages taken from another generator."""
     # pages may be on more than one site, for example if an interwiki
@@ -1117,7 +1114,7 @@ def PreloadingItemGenerator(generator, step=50):
                 yield i
 
 
-@deprecate_arg("number", "total")
+@deprecated_args(number="total")
 def NewimagesPageGenerator(step=None, total=None, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1143,9 +1140,7 @@ def WikidataItemGenerator(gen):
 
 
 # TODO below
-@deprecate_arg("extension", None)
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(extension=None, number="total", repeat=None)
 def UnusedFilesGenerator(total=100, site=None, extension=None):
     if site is None:
         site = pywikibot.Site()
@@ -1153,8 +1148,7 @@ def UnusedFilesGenerator(total=100, site=None, extension=None):
         yield pywikibot.FilePage(page.site, page.title())
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def WithoutInterwikiPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1162,8 +1156,7 @@ def WithoutInterwikiPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def UnCategorizedCategoryGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1171,8 +1164,7 @@ def UnCategorizedCategoryGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def UnCategorizedImageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1180,8 +1172,7 @@ def UnCategorizedImageGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def UnCategorizedPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1196,8 +1187,7 @@ def UnCategorizedTemplateGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def LonelyPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1205,8 +1195,7 @@ def LonelyPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def UnwatchedPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1221,8 +1210,7 @@ def WantedPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def AncientPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1230,8 +1218,7 @@ def AncientPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def DeadendPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1239,8 +1226,7 @@ def DeadendPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def LongPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1248,8 +1234,7 @@ def LongPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
-@deprecate_arg("repeat", None)
+@deprecated_args(number="total", repeat=None)
 def ShortPagesPageGenerator(total=100, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1257,7 +1242,7 @@ def ShortPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
+@deprecated_args(number="total")
 def RandomPageGenerator(total=10, site=None):
     if site is None:
         site = pywikibot.Site()
@@ -1265,7 +1250,7 @@ def RandomPageGenerator(total=10, site=None):
         yield page
 
 
-@deprecate_arg("number", "total")
+@deprecated_args(number="total")
 def RandomRedirectPageGenerator(total=10, site=None):
     if site is None:
         site = pywikibot.Site()

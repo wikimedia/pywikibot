@@ -48,7 +48,9 @@ from pywikibot.exceptions import (
     AutoblockUser, UserActionRefuse,
     SiteDefinitionError
 )
-from pywikibot.tools import ComparableMixin, deprecated, deprecate_arg
+from pywikibot.tools import (
+    ComparableMixin, deprecated, deprecate_arg, deprecated_args
+)
 from pywikibot import textlib
 
 
@@ -71,8 +73,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
 
     """
 
-    @deprecate_arg("insite", None)
-    @deprecate_arg("defaultNamespace", "ns")
+    @deprecated_args(insite=None, defaultNamespace="ns")
     def __init__(self, source, title=u"", ns=0):
         """Instantiate a Page object.
 
@@ -156,8 +157,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         """
         return self._link.namespace
 
-    @deprecate_arg("decode", None)
-    @deprecate_arg("savetitle", "asUrl")
+    @deprecated_args(decode=None, savetitle="asUrl")
     def title(self, underscore=False, withNamespace=True,
               withSection=True, asUrl=False, asLink=False,
               allowInterwiki=True, forceInterwiki=False, textlink=False,
@@ -237,8 +237,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                 title = title.replace(forbidden, '_')
         return title
 
-    @deprecate_arg("decode", None)
-    @deprecate_arg("underscore", None)
+    @deprecated_args(decode=None, underscore=None)
     def section(self):
         """Return the name of the section this Page refers to.
 
@@ -299,8 +298,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         """Return True if title of this Page is in the autoFormat dictionary."""
         return self.autoFormat()[0] is not None
 
-    @deprecate_arg("throttle", None)
-    @deprecate_arg("change_edit_time", None)
+    @deprecated_args(throttle=None, change_edit_time=None)
     def get(self, force=False, get_redirect=False, sysop=False):
         """Return the wiki-text of the page.
 
@@ -365,8 +363,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             self._getexception = pywikibot.IsRedirectPage(self)
             raise self._getexception
 
-    @deprecate_arg("throttle", None)
-    @deprecate_arg("change_edit_time", None)
+    @deprecated_args(throttle=None, change_edit_time=None)
     def getOldVersion(self, oldid, force=False, get_redirect=False,
                       sysop=False):
         """Return text of an old revision of this page; same options as get().
@@ -1242,8 +1239,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         return self.site.pagetemplates(self, step=step, total=total,
                                        content=content)
 
-    @deprecate_arg("followRedirects", None)
-    @deprecate_arg("loose", None)
+    @deprecated_args(followRedirects=None, loose=None)
     def imagelinks(self, step=None, total=None, content=False):
         """Iterate FilePage objects for images displayed on this Page.
 
@@ -1308,8 +1304,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
             result.append((pywikibot.Page(link, self.site), positional))
         return result
 
-    @deprecate_arg("nofollow_redirects", None)
-    @deprecate_arg("get_redirect", None)
+    @deprecated_args(nofollow_redirects=None, get_redirect=None)
     def categories(self, withSortKey=False, step=None, total=None,
                    content=False):
         """Iterate categories that the article is in.
@@ -1364,9 +1359,7 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
     # BREAKING CHANGE: in old framework, default value for getVersionHistory
     #                  returned no more than 500 revisions; now, it iterates
     #                  all revisions unless 'total' argument is used
-    @deprecate_arg("forceReload", None)
-    @deprecate_arg("revCount", "total")
-    @deprecate_arg("getAll", None)
+    @deprecated_args(forceReload=None, revCount="total", getAll=None)
     def getVersionHistory(self, reverseOrder=False, step=None,
                           total=None):
         """Load the version history page and return history information.
@@ -1390,14 +1383,13 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
                                      reverse=not reverseOrder)
                 ]
 
-    def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
-                               step=None, total=None):
+    @deprecated_args(forceReload=None)
+    def getVersionHistoryTable(self, reverseOrder=False, step=None, total=None):
         """Return the version history as a wiki table."""
         result = '{| class="wikitable"\n'
         result += '! oldid || date/time || username || edit summary\n'
         for oldid, time, username, summary \
-                in self.getVersionHistory(forceReload=forceReload,
-                                          reverseOrder=reverseOrder,
+                in self.getVersionHistory(reverseOrder=reverseOrder,
                                           step=step, total=total):
             result += '|----\n'
             result += '| %s || %s || %s || <nowiki>%s</nowiki>\n'\
@@ -1960,9 +1952,7 @@ class Category(Page):
             raise ValueError(u"'%s' is not in the category namespace!"
                              % title)
 
-    @deprecate_arg("forceInterwiki", None)
-    @deprecate_arg("textlink", None)
-    @deprecate_arg("noInterwiki", None)
+    @deprecated_args(forceInterwiki=None, textlink=None, noInterwiki=None)
     def aslink(self, sortKey=None):
         """Return a link to place a page in this Category.
 
@@ -1982,8 +1972,7 @@ class Category(Page):
             titleWithSortKey = self.title(withSection=False)
         return '[[%s]]' % titleWithSortKey
 
-    @deprecate_arg("startFrom", None)
-    @deprecate_arg("cacheResults", None)
+    @deprecated_args(startFrom=None, cacheResults=None)
     def subcategories(self, recurse=False, step=None, total=None,
                       content=False):
         """Iterate all subcategories of the current category.
@@ -2286,8 +2275,7 @@ class User(Page):
     This class also represents the Wiki page User:<username>
     """
 
-    @deprecate_arg("site", "source")
-    @deprecate_arg("name", "title")
+    @deprecated_args(site="source", name="title")
     def __init__(self, source, title=u''):
         """Initializer for a User object.
 
@@ -4477,8 +4465,7 @@ def unicode2html(x, encoding):
     return x
 
 
-@deprecate_arg('site2', None)
-@deprecate_arg('site', 'encodings')
+@deprecated_args(site2=None, site='encodings')
 def url2unicode(title, encodings='utf-8'):
     """
     Convert URL-encoded text to unicode using several encoding.
