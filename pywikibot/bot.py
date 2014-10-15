@@ -585,16 +585,25 @@ def calledModuleName():
     return os.path.basename(called)
 
 
-def handleArgs(*args):
-    """Handle standard command line arguments, return the rest as a list.
+def handle_args(args=None, do_help=True):
+    """
+    Handle standard command line arguments, and return the rest as a list.
 
     Takes the command line arguments as Unicode strings, processes all
-    global parameters such as -lang or -log. Returns a list of all arguments
-    that are not global. This makes sure that global arguments are applied
-    first, regardless of the order in which the arguments were given.
+    global parameters such as -lang or -log, initialises the logging layer,
+    which emits startup information into log at level 'verbose'.
+
+    This makes sure that global arguments are applied first,
+    regardless of the order in which the arguments were given.
 
     args may be passed as an argument, thereby overriding sys.argv
 
+    @param args: Command line arguments
+    @type args: list of unicode
+    @param do_help: Handle parameter '-help' to show help and invoke sys.exit
+    @type do_help: bool
+    @return: list of arguments not recognised globally
+    @rtype: list of unicode
     """
     # get commandline arguments if necessary
     if not args:
@@ -609,9 +618,9 @@ def handleArgs(*args):
         moduleName = "terminal-interface"
     nonGlobalArgs = []
     username = None
-    do_help = False
+    do_help = None if do_help else False
     for arg in args:
-        if arg == '-help':
+        if do_help is not False and arg == '-help':
             do_help = True
         elif arg.startswith('-family:'):
             config.family = arg[len("-family:"):]
@@ -721,8 +730,14 @@ def handleArgs(*args):
     if do_help:
         showHelp()
         sys.exit(0)
+
     pywikibot.debug(u"handleArgs() completed.", _logger)
     return nonGlobalArgs
+
+
+def handleArgs(*args):
+    """DEPRECATED. Use handle_args()."""
+    return handle_args(args)
 
 
 def showHelp(module_name=None):

@@ -29,8 +29,10 @@ else:
 from pywikibot import config2 as config
 from pywikibot.bot import (
     output, warning, error, critical, debug, stdout, exception,
-    input, input_choice, inputChoice, handleArgs, showHelp, ui, log,
+    input, input_choice, inputChoice, handle_args, showHelp, ui, log,
     calledModuleName, Bot, WikidataBot, QuitKeyboardInterrupt,
+    # the following are flagged as deprecated on usage
+    handleArgs,
 )
 from pywikibot.exceptions import (
     Error, InvalidTitle, BadTitle, NoPage, SectionError,
@@ -66,8 +68,8 @@ __all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
            'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
            'html2unicode', 'url2unicode', 'unicode2html',
            'stdout', 'output', 'warning', 'error', 'critical', 'debug',
-           'exception', 'input_choice',
-           'input', 'inputChoice', 'handleArgs', 'showHelp', 'ui', 'log',
+           'exception', 'input_choice', 'input', 'inputChoice',
+           'handle_args', 'handleArgs', 'showHelp', 'ui', 'log',
            'calledModuleName', 'Bot', 'WikidataBot',
            'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
            'SiteDefinitionError', 'NoSuchSite', 'UnknownSite', 'UnknownFamily',
