@@ -1448,7 +1448,7 @@ def MySQLPageGenerator(query, site=None):
         import MySQLdb as mysqldb
     if site is None:
         site = pywikibot.Site()
-    if isinstance(site, pywikibot.site.Site):
+    if isinstance(site, pywikibot.site.BaseSite):
         # We want to let people to set a custom dbname
         # since the master dbname might not be exactly
         # equal to the name on the replicated site
