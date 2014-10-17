@@ -96,12 +96,10 @@ class TestBaseSiteProperties(TestCase):
 
     cached = True
 
-    def testProperties(self):
+    def test_properties(self, key):
         """Test cases for BaseSite properties."""
-        # Test doc_subpage property.
-        def test_properties(self, key):
-            mysite = self.get_site(key)
-            self.assertEqual(mysite.doc_subpage, self.sites[key]['result'])
+        mysite = self.get_site(key)
+        self.assertEqual(mysite.doc_subpage, self.sites[key]['result'])
 
 
 class TestSiteObject(DefaultSiteTestCase):
