@@ -1451,6 +1451,8 @@ class TestCommonsSite(TestCase):
 
 class TestWiktionarySite(TestCase):
 
+    """Test Site Object on English Wiktionary."""
+
     family = 'wiktionary'
     code = 'en'
 
@@ -1466,6 +1468,8 @@ class TestWiktionarySite(TestCase):
 
 
 class TestNonEnglishWikipediaSite(TestCase):
+
+    """Test Site Object on Nynorsk Wikipedia."""
 
     family = 'wikipedia'
     code = 'nn'
@@ -1492,6 +1496,8 @@ class TestNonEnglishWikipediaSite(TestCase):
 
 
 class TestUploadEnabledSite(TestCase):
+
+    """Test Site.is_uploaddisabled."""
 
     sites = {
         'wikidatatest': {

@@ -40,16 +40,19 @@ if os.name == "nt":
     import threading
 
     class pywikibotWrapper(object):
+
+        """pywikibot wrapper class."""
+
         def init(self):
-            import pywikibot
+            import pywikibot  # noqa
             pywikibot.version._get_program_dir()
 
         def output(self, *args, **kwargs):
-            import pywikibot
+            import pywikibot  # noqa
             return pywikibot.output(*args, **kwargs)
 
         def request_input(self, *args, **kwargs):
-            import pywikibot
+            import pywikibot  # noqa
             self.input = None
 
             def threadedinput():
@@ -62,17 +65,20 @@ if os.name == "nt":
             return self.input
 
         def set_config(self, key, value):
-            import pywikibot
+            import pywikibot  # noqa
             setattr(pywikibot.config, key, value)
 
         def set_ui(self, key, value):
-            import pywikibot
+            import pywikibot  # noqa
             setattr(pywikibot.ui, key, value)
 
         def cls(self):
             os.system('cls')
 
     class pywikibotManager(BaseManager):
+
+        """pywikibot manager class."""
+
         pass
 
     pywikibotManager.register('pywikibot', pywikibotWrapper)
@@ -91,11 +97,13 @@ if __name__ == "__main__":
     newstdin = StringIO()
 
     def patch():
+        """Patch standard terminal files."""
         sys.stdout = newstdout
         sys.stderr = newstderr
         sys.stdin = newstdin
 
     def unpatch():
+        """un-patch standard terminal files."""
         sys.stdout = oldstdout
         sys.stderr = oldstderr
         sys.stdin = oldstdin
@@ -115,6 +123,9 @@ if __name__ == "__main__":
                       'newline': "\n"}
 
     class UITestCase(unittest.TestCase):
+
+        """UI tests."""
+
         def setUp(self):
             patch()
             newstdout.truncate(0)
@@ -130,6 +141,9 @@ if __name__ == "__main__":
             unpatch()
 
     class TestTerminalOutput(UITestCase):
+
+        """Terminal output tests."""
+
         def testOutputLevels_logging_debug(self):
             logger.log(DEBUG, 'debug', extra=loggingcontext)
             self.assertEqual(newstdout.getvalue(), "")
@@ -232,6 +246,9 @@ if __name__ == "__main__":
             self.assertNotEqual(stderrlines[-1], "\n")
 
     class TestTerminalInput(UITestCase):
+
+        """Terminal input tests."""
+
         def testInput(self):
             newstdin.write("input to read\n")
             newstdin.seek(0)
@@ -295,6 +312,9 @@ if __name__ == "__main__":
 
     @unittest.skipUnless(os.name == "posix", "requires Unix console")
     class TestTerminalOutputColorUnix(UITestCase):
+
+        """Terminal output color tests."""
+
         def testOutputColorizedText(self):
             pywikibot.output(u"normal text \03{lightpurple}light purple text\03{default} normal text")
             self.assertEqual(newstdout.getvalue(), "")
@@ -313,13 +333,16 @@ if __name__ == "__main__":
             self.assertEqual(newstderr.getvalue(), "normal text \x1b[35;1m light purple \x1b[94;1m light blue \x1b[35;1m light purple \x1b[0m normal text\n\x1b[0m")
 
         def testOutputColorCascade_incorrect(self):
-            ''' This test documents current (incorrect) behavior '''
+            """ Test incorrect behavior of testOutputColorCascade. """
             pywikibot.output(u"normal text \03{lightpurple} light purple \03{lightblue} light blue \03{default} light purple \03{default} normal text")
             self.assertEqual(newstdout.getvalue(), "")
             self.assertEqual(newstderr.getvalue(), "normal text \x1b[35;1m light purple \x1b[94;1m light blue \x1b[0m light purple \x1b[0m normal text\n\x1b[0m")
 
     @unittest.skipUnless(os.name == "posix", "requires Unix console")
     class TestTerminalUnicodeUnix(UITestCase):
+
+        """Terminal output tests for unix."""
+
         def testOutputUnicodeText(self):
             pywikibot.output(u"Заглавная_страница")
             self.assertEqual(newstdout.getvalue(), "")
@@ -339,6 +362,9 @@ if __name__ == "__main__":
 
     @unittest.skipUnless(os.name == "posix", "requires Unix console")
     class TestTransliterationUnix(UITestCase):
+
+        """Terminal output transliteration tests."""
+
         def testOutputTransliteratedUnicodeText(self):
             pywikibot.ui.encoding = 'latin-1'
             pywikibot.config.transliterate = True
@@ -348,6 +374,9 @@ if __name__ == "__main__":
 
     @unittest.skipUnless(os.name == "nt", "requires Windows console")
     class WindowsTerminalTestCase(UITestCase):
+
+        """MS Windows terminal tests."""
+
         @classmethod
         def setUpProcess(cls, command):
             import pywinauto
@@ -412,6 +441,9 @@ if __name__ == "__main__":
             self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{ENTER}', with_spaces=True)
 
     class TestWindowsTerminalUnicode(WindowsTerminalTestCase):
+
+        """MS Windows terminal unicode tests."""
+
         @classmethod
         def setUpClass(cls):
             import inspect
@@ -458,6 +490,9 @@ if __name__ == "__main__":
             self.assertEqual(returned, u"Заглавная_страница")
 
     class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
+
+        """MS Windows terminal unicode argument tests."""
+
         @classmethod
         def setUpClass(cls):
             cls.setUpProcess(["cmd", "/k", "echo off"])
@@ -488,6 +523,9 @@ if __name__ == "__main__":
 
 else:
     class TestTerminalUI(unittest.TestCase):
+
+        """Class to show all tests skipped under unittest."""
+
         @unittest.skip("Terminal UI tests can only be run by directly running tests/ui_tests.py")
         def testCannotBeRun(self):
             pass

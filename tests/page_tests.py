@@ -160,6 +160,8 @@ class TestLinkObject(TestCase):
 
 class TestPageObjectEnglish(TestCase):
 
+    """Test Page Object using English Wikipedia."""
+
     family = 'wikipedia'
     code = 'en'
 
@@ -252,6 +254,8 @@ class TestPageObjectEnglish(TestCase):
 
 
 class TestPageObject(DefaultSiteTestCase):
+
+    """Test Page object."""
 
     cached = True
 
@@ -524,6 +528,8 @@ class TestPageObject(DefaultSiteTestCase):
 
 class TestPageRedirects(TestCase):
 
+    """Test redirects."""
+
     family = 'wikipedia'
     code = 'en'
 
@@ -549,6 +555,8 @@ class TestPageRedirects(TestCase):
 
 
 class TestCategoryObject(TestCase):
+
+    """Test Category object."""
 
     family = 'wikipedia'
     code = 'en'

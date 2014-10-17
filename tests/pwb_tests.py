@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Test pwb.py."""
 #
 # (C) Pywikibot team, 2007-2014
 #
@@ -20,6 +21,7 @@ testbasepath = os.path.join(basepath, 'tests', 'pwb')
 
 
 def check_output(command):
+    """Execute and return the output of a command."""
     return subprocess.Popen(command, stdout=subprocess.PIPE).communicate()[0]
 
 

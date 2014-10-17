@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Test Link functionality."""
 #
 # (C) Pywikipedia bot team, 2014
 #
@@ -16,6 +17,8 @@ from tests.aspects import unittest, TestCase
 
 
 class TestPartiallyQualifiedExplicitLinkSameSiteParser(TestCase):
+
+    """Link tests."""
 
     family = 'wikipedia'
     code = 'en'
@@ -72,6 +75,8 @@ class TestPartiallyQualifiedExplicitLinkSameSiteParser(TestCase):
 
 class TestPartiallyQualifiedExplicitLinkDifferentCodeParser(TestCase):
 
+    """Link tests."""
+
     family = 'wikipedia'
     code = 'en'
     cached = True
@@ -106,6 +111,8 @@ class TestPartiallyQualifiedExplicitLinkDifferentCodeParser(TestCase):
 
 
 class TestPartiallyQualifiedExplicitLinkDifferentFamilyParser(TestCase):
+
+    """Link tests."""
 
     family = 'wikipedia'
     code = 'en'
@@ -142,6 +149,8 @@ class TestPartiallyQualifiedExplicitLinkDifferentFamilyParser(TestCase):
 
 class TestFullyQualifiedSameNamespaceFamilyParser(TestCase):
 
+    """Link tests."""
+
     family = 'wikipedia'
     code = 'en'
     cached = True
@@ -163,6 +172,8 @@ class TestFullyQualifiedSameNamespaceFamilyParser(TestCase):
 
 
 class TestFullyQualifiedExplicitLinkSameFamilyParser(TestCase):
+
+    """Link tests."""
 
     family = 'wikipedia'
     code = 'en'
@@ -190,6 +201,8 @@ class TestFullyQualifiedExplicitLinkSameFamilyParser(TestCase):
 
 
 class TestFullyQualifiedExplicitLinkDifferentFamilyParser(TestCase):
+
+    """Link tests."""
 
     sites = {
         'enws': {
@@ -246,6 +259,8 @@ class TestFullyQualifiedExplicitLinkDifferentFamilyParser(TestCase):
 
 class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(TestCase):
 
+    """Link tests."""
+
     sites = {
         'wikidata': {
             'family': 'wikidata',
@@ -300,6 +315,8 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(TestCase):
 
 
 class TestFullyQualifiedNoLangFamilyExplicitLinkParser(TestCase):
+
+    """Link tests."""
 
     sites = {
         'wikidata': {
@@ -360,6 +377,8 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(TestCase):
 
 class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(TestCase):
 
+    """Link tests."""
+
     family = 'species'
     code = 'species'
     cached = True
@@ -389,6 +408,8 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(TestCase):
 
 
 class TestPartiallyQualifiedImplicitLinkSameSiteParser(TestCase):
+
+    """Link tests."""
 
     family = 'wikipedia'
     code = 'en'
@@ -445,6 +466,8 @@ class TestPartiallyQualifiedImplicitLinkSameSiteParser(TestCase):
 
 class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(TestCase):
 
+    """Link tests."""
+
     family = 'wikipedia'
     code = 'en'
     cached = True
@@ -479,6 +502,8 @@ class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(TestCase):
 
 
 class TestPartiallyQualifiedImplicitLinkDifferentFamilyParser(TestCase):
+
+    """Link tests."""
 
     family = 'wikipedia'
     code = 'en'
@@ -515,6 +540,8 @@ class TestPartiallyQualifiedImplicitLinkDifferentFamilyParser(TestCase):
 
 class TestFullyQualifiedImplicitLinkSameFamilyParser(TestCase):
 
+    """Link tests."""
+
     family = 'wikipedia'
     code = 'en'
     cached = True
@@ -541,6 +568,8 @@ class TestFullyQualifiedImplicitLinkSameFamilyParser(TestCase):
 
 
 class TestFullyQualifiedImplicitLinkDifferentFamilyParser(TestCase):
+
+    """Link tests."""
 
     sites = {
         'enws': {
@@ -597,6 +626,8 @@ class TestFullyQualifiedImplicitLinkDifferentFamilyParser(TestCase):
 
 class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(TestCase):
 
+    """Link tests."""
+
     sites = {
         'wikidata': {
             'family': 'wikidata',
@@ -652,6 +683,8 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(TestCase):
 
 class TestFullyQualifiedNoLangFamilyImplicitLinkParser(TestCase):
 
+    """Link tests."""
+
     family = 'wikidata'
     code = 'test'
     cached = True
@@ -698,6 +731,8 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(TestCase):
 
 
 class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(TestCase):
+
+    """Link tests."""
 
     family = 'species'
     code = 'species'

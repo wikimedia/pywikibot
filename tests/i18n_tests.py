@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Test i18n module."""
 #
 # (C) Pywikibot team, 2007-2014
 #
@@ -12,6 +13,8 @@ from tests.aspects import unittest, TestCase
 
 
 class TestTranslate(TestCase):
+
+    """Test translate method."""
 
     net = False
 
@@ -75,6 +78,8 @@ class TestTranslate(TestCase):
 
 class TestTWN(TestCase):
 
+    """Base class for TranslateWiki tests."""
+
     net = False
 
     def setUp(self):
@@ -88,6 +93,8 @@ class TestTWN(TestCase):
 
 
 class TestTWTranslate(TestTWN):
+
+    """Test twtranslate method."""
 
     def testLocalized(self):
         self.assertEqual(i18n.twtranslate('en', 'test-localized'),
@@ -231,7 +238,7 @@ class TestTWNTranslate(TestTWN):
                 u'Bot: Ändere dreihunderteinundzwanzig Zeilen von mehreren Seiten.')
 
     def testMultipleNonNumbers(self):
-        """Numbers or string numbers are required for tuple or list items."""
+        """Test error handling for multiple non-numbers."""
         with self.assertRaisesRegex(ValueError, "invalid literal for int\(\) with base 10: 'drei'"):
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals', ["drei", "1", 1])

@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""FilePage tests."""
 #
 # (C) Pywikibot team, 2014
 #
@@ -12,6 +13,8 @@ from tests.aspects import unittest, TestCase
 
 
 class TestShareFiles(TestCase):
+
+    """Test methods fileIsShared, exists and fileUrl with shared files."""
 
     sites = {
         'enwiki': {

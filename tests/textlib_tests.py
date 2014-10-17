@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Test textlib module."""
 #
 # (C) Pywikibot team, 2007-2014
 #
@@ -29,6 +30,8 @@ for f in ["enwiki_help_editing"]:
 
 
 class TestSectionFunctions(TestCase):
+
+    """Test wikitext section handling function."""
 
     net = False
 
@@ -95,6 +98,8 @@ class TestSectionFunctions(TestCase):
 
 class TestFormatFunctions(TestCase):
 
+    """Test format functions."""
+
     family = 'wikipedia'
     code = 'en'
 
@@ -142,8 +147,9 @@ class TestFormatFunctions(TestCase):
 class TestCategoryRearrangement(TestCase):
 
     """
-    Tests to ensure that sorting keys are not being lost when
-    using .getCategoryLinks() and .replaceCategoryLinks(),
+    Ensure that sorting keys are not being lost.
+
+    Tests .getCategoryLinks() and .replaceCategoryLinks(),
     with both a newline and an empty string as separators.
     """
 

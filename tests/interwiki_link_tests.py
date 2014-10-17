@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Test Interwiki Link functionality."""
 #
 # (C) Pywikipedia bot team, 2014
 #
@@ -13,6 +14,8 @@ from tests.aspects import unittest, TestCase
 
 
 class TestPartiallyQualifiedLinkDifferentCodeParser(TestCase):
+
+    """Tests for interwiki links to local sites."""
 
     family = 'wikipedia'
     code = 'en'

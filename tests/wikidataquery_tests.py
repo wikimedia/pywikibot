@@ -21,9 +21,7 @@ import time
 
 class TestApiFunctions(WikidataTestCase):
 
-    def setUp(self):
-        super(TestApiFunctions, self).setUp()
-        self.repo = self.get_repo()
+    """Test WikiDataQuery API functions."""
 
     def testQueries(self):
         """
@@ -93,7 +91,7 @@ class TestApiFunctions(WikidataTestCase):
         self.assertEqual(str(q), "claim[99:(tree[1][2,5][3,90])]")
 
     def testQueriesWDStructures(self):
-        """Queries using Wikibase page structures like ItemPage."""
+        """Test queries using Wikibase page structures like ItemPage."""
         q = query.HasClaim(PropertyPage(self.repo, "P99"))
         self.assertEqual(str(q), "claim[99]")
 
@@ -216,6 +214,8 @@ class TestApiFunctions(WikidataTestCase):
 
 
 class TestApiSlowFunctions(TestCase):
+
+    """Test slow WikiDataQuery API functions."""
 
     net = True
 

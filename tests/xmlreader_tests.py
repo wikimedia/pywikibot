@@ -16,6 +16,8 @@ from tests.aspects import unittest, TestCase
 
 class XmlReaderTestCase(TestCase):
 
+    """XML Reader test cases."""
+
     net = False
 
     def test_XmlDumpAllRevs(self):

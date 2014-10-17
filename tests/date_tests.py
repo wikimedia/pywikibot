@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Tests for the date module."""
 #
 # (C) Pywikibot team, 2014
 #
@@ -12,10 +13,10 @@ from tests.aspects import unittest, MetaTestCaseClass, TestCase
 
 class TestDateMeta(MetaTestCaseClass):
 
-    """Test meta class"""
+    """Date test meta class."""
 
     def __new__(cls, name, bases, dct):
-        """Create the new class"""
+        """Create the new class."""
         def test_method(formatname):
 
             def testMapEntry(self):

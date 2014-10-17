@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 
-"""Unit tests for data_ingestion.py"""
+"""Unit tests for data_ingestion.py script."""
 __version__ = '$Id$'
 
 import os
@@ -11,6 +11,8 @@ from scripts import data_ingestion
 
 
 class TestPhoto(TestCase):
+
+    """Test Photo class."""
 
     net = True
 
@@ -49,6 +51,8 @@ class TestPhoto(TestCase):
 
 
 class TestCSVReader(TestCase):
+
+    """Test CSVReader class."""
 
     net = False
 

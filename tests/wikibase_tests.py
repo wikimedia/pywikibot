@@ -23,6 +23,7 @@ from tests.aspects import unittest, WikidataTestCase, TestCase
 # fetch a page which is very likely to be unconnected, which doesnt have
 # a generator, and unit tests may be used to test old versions of pywikibot
 def _get_test_unconnected_page(site):
+    """Get unconnected page from site for tests."""
     gen = pagegenerators.NewpagesPageGenerator(site=site, total=10,
                                                namespaces=[1, ])
     for page in gen:
@@ -31,6 +32,8 @@ def _get_test_unconnected_page(site):
 
 
 class TestGeneral(WikidataTestCase):
+
+    """General Wikibase tests."""
 
     @classmethod
     def setUpClass(cls):
@@ -443,6 +446,8 @@ class TestRedirects(WikidataTestCase):
 
 class TestPropertyPage(WikidataTestCase):
 
+    """Test PropertyPage."""
+
     def test_property_empty_property(self):
         """Test creating a PropertyPage without a title."""
         wikidata = self.get_repo()
@@ -482,6 +487,8 @@ class TestPropertyPage(WikidataTestCase):
 
 
 class TestClaimSetValue(WikidataTestCase):
+
+    """Test setting claim values."""
 
     def test_set_website(self):
         wikidata = self.get_repo()
@@ -816,6 +823,8 @@ class TestAlternateNamespaces(TestCase):
 
 
 class TestOwnClient(TestCase):
+
+    """Test that a data repository family can be its own client."""
 
     sites = {
         # The main Wikidata is its own client.

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+"""Test IP regex."""
 # -*- coding: utf-8  -*-
 #
 # (C) Pywikibot team, 2014

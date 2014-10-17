@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+""" Test i18n data. """
 msg = {
     'de': {
         'test-plural': u'Bot: Ändere %(num)d {{PLURAL:num|Seite|Seiten}}.',

@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Weblib test module."""
 #
 # (C) Pywikibot team, 2014
 #
@@ -18,6 +19,8 @@ from tests.aspects import unittest, TestCase
 
 
 class TestArchiveSites(TestCase):
+
+    """Test weblib methods to access archive websites."""
 
     net = True
 

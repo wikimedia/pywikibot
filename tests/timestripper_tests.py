@@ -23,6 +23,7 @@ class TestTimeStripperWithNoDigitsAsMonths(TestCase):
     cached = True
 
     def setUp(self):
+        """Set up test cases."""
         super(TestTimeStripperWithNoDigitsAsMonths, self).setUp()
         self.ts = TimeStripper(self.get_site())
 
@@ -86,7 +87,7 @@ class TestTimeStripperWithNoDigitsAsMonths(TestCase):
 
 class TestTimeStripperWithDigitsAsMonths(TestCase):
 
-    """Test cases for TimeStripper methods"""
+    """Test cases for TimeStripper methods."""
 
     family = 'wikipedia'
     code = 'cs'
@@ -125,7 +126,7 @@ class TestTimeStripperWithDigitsAsMonths(TestCase):
 
 class TestTimeStripperLanguage(TestCase):
 
-    """Test cases for English language"""
+    """Test cases for English language."""
 
     sites = {
         'cswiki': {

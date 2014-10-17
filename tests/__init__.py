@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Package tests."""
 #
 # (C) Pywikibot team, 2007-2014
 #
@@ -17,16 +18,16 @@ __all__ = ('httplib2', 'OrderedDict', '_cache_dir', 'TestRequest',
 # - ordereddict is only needed as a fallback for python 2.6
 # - mwparserfromhell is optional, so is only imported in textlib_tests
 try:
-    import httplib2
+    import httplib2  # noqa
 except ImportError as e:
     print("ImportError: %s" % e)
     sys.exit(1)
 
 try:
-    from collections import OrderedDict
+    from collections import OrderedDict  # noqa
 except ImportError:
     try:
-        from ordereddict import OrderedDict
+        from ordereddict import OrderedDict  # noqa
     except ImportError as e:
         print("ImportError: %s" % e)
         if sys.version_info[0] == 2 and sys.version_info[1] == 6:
@@ -191,6 +192,7 @@ class TestRequest(CachedRequest):
     """Add caching to every Request except logins."""
 
     def __init__(self, *args, **kwargs):
+        """Constructor."""
         super(TestRequest, self).__init__(0, *args, **kwargs)
 
     def _expired(self, dt):
@@ -225,6 +227,7 @@ original_expired = None
 
 
 def patch_request():
+    """Patch Request classes with TestRequest."""
     global original_expired
     pywikibot.data.api.Request = TestRequest
     original_expired = pywikibot.data.api.CachedRequest._expired
@@ -232,5 +235,6 @@ def patch_request():
 
 
 def unpatch_request():
+    """Un-patch Request classes with TestRequest."""
     pywikibot.data.api.Request = _original_Request
     pywikibot.data.api.CachedRequest._expired = original_expired
