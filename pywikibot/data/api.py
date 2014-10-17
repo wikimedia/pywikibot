@@ -908,22 +908,29 @@ class QueryGenerator(object):
 
     @property
     def _modules(self):
-        """Query api on self.site for paraminfo on querymodule=self.module."""
-        if not set(self.module.split('|')) <= set(self.__modules.keys()):
+        """Query api on self.site for paraminfo on self.module."""
+        modules = self.module.split('|')
+        if not set(modules) <= set(self.__modules.keys()):
+            if LV(self.site.version()) < LV('1.25wmf4'):
+                key = 'querymodules'
+                value = self.module
+            else:
+                key = 'modules'
+                value = ['query+' + module for module in modules]
             paramreq = CachedRequest(expiry=config.API_config_expiry,
                                      site=self.site, action="paraminfo",
-                                     querymodules=self.module)
+                                     **{key: value})
             data = paramreq.submit()
             assert "paraminfo" in data
-            assert "querymodules" in data["paraminfo"]
-            assert len(data["paraminfo"]["querymodules"]) == 1 + self.module.count("|")
-            for paraminfo in data["paraminfo"]["querymodules"]:
+            assert key in data["paraminfo"]
+            assert len(data["paraminfo"][key]) == len(modules)
+            for paraminfo in data["paraminfo"][key]:
                 assert paraminfo["name"] in self.module
                 if "missing" in paraminfo:
                     raise Error("Invalid query module name '%s'." % self.module)
                 self.__modules[paraminfo["name"]] = paraminfo
         _modules = {}
-        for m in self.module.split('|'):
+        for m in modules:
             _modules[m] = self.__modules[m]
         return _modules
 
