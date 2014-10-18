@@ -25,7 +25,7 @@ import time
 
 import pywikibot
 from pywikibot import config, login
-from pywikibot.tools import MediaWikiVersion as LV, deprecated, itergroup
+from pywikibot.tools import MediaWikiVersion, deprecated, itergroup
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, Error
 )
@@ -191,11 +191,11 @@ class ParamInfo(Container):
         # querymodules='info'; to avoid warnings sites with 1.25wmf4+
         # must only use 'modules' parameter.
         if self.modules_only_mode is None:
-            self.modules_only_mode = LV(self.site.version()) >= LV('1.25wmf4')
+            self.modules_only_mode = MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.25wmf4')
             if self.modules_only_mode:
                 self.paraminfo_keys = frozenset(['modules'])
             # Assume that by v1.26, it will be desirable to prefetch 'query'
-            if LV(self.site.version()) > LV('1.26'):
+            if MediaWikiVersion(self.site.version()) > MediaWikiVersion('1.26'):
                 self.preloaded_modules |= set(['query'])
 
         self.fetch(self.preloaded_modules, _init=True)
@@ -589,7 +589,7 @@ class Request(MutableMapping):
         # otherwise be a problem.
         # This situation is only tripped when one of the first actions
         # on the site is a write action and the extension isn't installed.
-        if ((self.write and LV(self.site.version()) >= LV("1.23")) or
+        if ((self.write and MediaWikiVersion(self.site.version()) >= MediaWikiVersion("1.23")) or
                 (self.action == 'edit' and
                  self.site.has_extension('AssertEdit'))):
             pywikibot.debug(u"Adding user assertion", _logger)
@@ -707,7 +707,7 @@ class Request(MutableMapping):
             # parameter. Querying siteinfo is save as it adds 'continue'.
             if ('continue' not in self._params and
                     'rawcontinue' not in self._params and
-                    LV(self.site.version()) >= LV('1.25wmf5')):
+                    MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.25wmf5')):
                 self._params['rawcontinue'] = ['']
         if "maxlag" not in self._params and config.maxlag:
             self._params["maxlag"] = [str(config.maxlag)]
@@ -1262,7 +1262,7 @@ class QueryGenerator(object):
                         % self.__class__.__name__)
 
         kwargs["indexpageids"] = ""  # always ask for list of pageids
-        if LV(self.site.version()) < LV('1.21'):
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.21'):
             self.continue_name = 'query-continue'
             self.continue_update = self._query_continue
         else:

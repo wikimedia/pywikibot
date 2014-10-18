@@ -32,7 +32,7 @@ from pywikibot.tools import (
     redirect_func, add_decorated_full_name, deprecated_args, remove_last_args,
     SelfCallDict, SelfCallString, signature,
 )
-from pywikibot.tools import MediaWikiVersion as LV
+from pywikibot.tools import MediaWikiVersion
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -691,7 +691,7 @@ class BaseSite(ComparableMixin):
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
         if not hasattr(self, '_namespaces'):
-            use_image_name = LV(self.version()) < LV("1.14")
+            use_image_name = MediaWikiVersion(self.version()) < MediaWikiVersion("1.14")
             self._namespaces = SelfCallDict(
                 Namespace.builtin_namespaces(use_image_name))
         return self._namespaces
@@ -995,7 +995,7 @@ def need_version(version):
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):
-            if LV(self.version()) < LV(version):
+            if MediaWikiVersion(self.version()) < MediaWikiVersion(version):
                 raise NotImplementedError(
                     u'Method or function "%s"\n'
                     u"isn't implemented in MediaWiki version < %s"
@@ -1967,7 +1967,7 @@ class APISite(BaseSite):
             req['title'] = title
         if includecomments is True:
             req['includecomments'] = u''
-        if LV(self.version()) > LV("1.24wmf7"):
+        if MediaWikiVersion(self.version()) > MediaWikiVersion("1.24wmf7"):
             key = 'wikitext'
             req['prop'] = key
         else:
@@ -1998,7 +1998,7 @@ class APISite(BaseSite):
         @return: the current server time
         @rtype: L{Timestamp}
         """
-        if LV(self.version()) >= LV("1.16"):
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion("1.16"):
             return pywikibot.Timestamp.fromISOformat(
                 self.siteinfo.get('time', expiry=0))
         else:
@@ -2058,7 +2058,7 @@ class APISite(BaseSite):
         # and Image became File with Image as an alias.
         # For versions lower than 1.14, APISite needs to override
         # the defaults defined in Namespace.
-        is_mw114 = LV(self.version()) >= LV('1.14')
+        is_mw114 = MediaWikiVersion(self.version()) >= MediaWikiVersion('1.14')
 
         for nsdata in self.siteinfo.get('namespaces', cache=False).values():
             ns = nsdata.pop('id')
@@ -2509,10 +2509,10 @@ class APISite(BaseSite):
         Valid tokens depend on mw version.
 
         """
-        _version = LV(self.version())
-        if _version < LV('1.20'):
+        _version = MediaWikiVersion(self.version())
+        if _version < MediaWikiVersion('1.20'):
             valid_types = [token for token in types if token in self.TOKENS_0]
-        elif _version < LV('1.24wmf19'):
+        elif _version < MediaWikiVersion('1.24wmf19'):
             valid_types = [token for token in types if token in self.TOKENS_1]
         else:
             valid_types = []
@@ -2558,8 +2558,8 @@ class APISite(BaseSite):
                             text)
 
         user_tokens = {}
-        _version = LV(self.version())
-        if _version < LV('1.20'):
+        _version = MediaWikiVersion(self.version())
+        if _version < MediaWikiVersion('1.20'):
             if all:
                 types.extend(self.TOKENS_0)
             for tokentype in self.validate_tokens(types):
@@ -2575,7 +2575,7 @@ class APISite(BaseSite):
                         user_tokens[tokentype] = item[tokentype + 'token']
 
         else:
-            if _version < LV('1.24wmf19'):
+            if _version < MediaWikiVersion('1.24wmf19'):
                 if all is not False:
                     types.extend(self.TOKENS_1)
                 req = api.Request(site=self, action='tokens',
@@ -3483,7 +3483,7 @@ class APISite(BaseSite):
         if reverse:
             rcgen.request["rcdir"] = "newer"
         if pagelist:
-            if LV(self.version()) > LV("1.14"):
+            if MediaWikiVersion(self.version()) > MediaWikiVersion("1.14"):
                 pywikibot.warning(
                     u"recentchanges: pagelist option is disabled; ignoring.")
             else:
@@ -3551,7 +3551,7 @@ class APISite(BaseSite):
                                 gsrsearch=searchstring, gsrwhat=where,
                                 namespaces=namespaces, step=step,
                                 total=total, g_content=content)
-        if getredirects and LV(self.version()) < LV('1.23'):
+        if getredirects and MediaWikiVersion(self.version()) < MediaWikiVersion('1.23'):
             srgen.request["gsrredirects"] = ""
         return srgen
 
@@ -4268,7 +4268,7 @@ class APISite(BaseSite):
         revision = revision or set()
 
         # TODO: remove exeception for mw < 1.22
-        if (revid or revision) and LV(self.version()) < LV("1.22"):
+        if (revid or revision) and MediaWikiVersion(self.version()) < MediaWikiVersion("1.22"):
             raise NotImplementedError(
                 u'Support of "revid" parameter\n'
                 u'is not implemented in MediaWiki version < "1.22"')
@@ -4515,7 +4515,7 @@ class APISite(BaseSite):
             throttle = True
             filesize = os.path.getsize(source_filename)
             chunked_upload = (chunk_size > 0 and chunk_size < filesize and
-                              LV(self.version()) >= LV('1.20'))
+                              MediaWikiVersion(self.version()) >= MediaWikiVersion('1.20'))
             with open(source_filename, 'rb') as f:
                 if chunked_upload:
                     offset = 0
