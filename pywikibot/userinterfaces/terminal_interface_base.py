@@ -233,7 +233,7 @@ class UI:
         @rtype: int (if not return_shortcut), lowercased basestring (otherwise)
         """
         if len(options) == 0:
-            raise ValueError("No options are given.")
+            raise ValueError(u'No options are given.')
         options = list(options)
         if automatic_quit is True:
             options += [('Quit', 'q')]
@@ -249,16 +249,16 @@ class UI:
         formatted_options = []
         for i, option in enumerate(options):
             if len(option) != 2:
-                raise ValueError('Option #{0} does not consist of an option '
-                                 'and shortcut.'.format(i))
+                raise ValueError(u'Option #{0} does not consist of an option '
+                                 u'and shortcut.'.format(i))
             option, shortcut = option
             if option.lower() in valid:
                 raise ValueError(
-                    'Multiple identical options ({0}).'.format(option))
+                    u'Multiple identical options ({0}).'.format(option))
             shortcut = shortcut.lower()
             if shortcut in valid:
                 raise ValueError(
-                    'Multiple identical shortcuts ({0}).'.format(shortcut))
+                    u'Multiple identical shortcuts ({0}).'.format(shortcut))
             valid[option.lower()] = i
             valid[shortcut] = i
             index = option.lower().find(shortcut)
@@ -266,12 +266,12 @@ class UI:
                 default_index = i
                 shortcut = shortcut.upper()
             if index >= 0:
-                option = '{0}[{1}]{2}'.format(option[:index], shortcut,
-                                              option[index + len(shortcut):])
+                option = u'{0}[{1}]{2}'.format(option[:index], shortcut,
+                                               option[index + len(shortcut):])
             else:
-                option = '{0} [{1}]'.format(option, shortcut)
+                option = u'{0} [{1}]'.format(option, shortcut)
             formatted_options += [option]
-        question = '{0} ({1})'.format(question, ', '.join(formatted_options))
+        question = u'{0} ({1})'.format(question, ', '.join(formatted_options))
         answer = None
         while answer is None:
             answer = self.input(question)
