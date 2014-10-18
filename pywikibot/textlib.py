@@ -491,7 +491,8 @@ def removeLanguageLinks(text, site=None, marker=''):
                             % languages, re.IGNORECASE)
     text = replaceExcept(text, interwikiR, '',
                          ['nowiki', 'comment', 'math', 'pre', 'source'],
-                         marker=marker)
+                         marker=marker,
+                         site=site)
     return text.strip()
 
 
@@ -713,7 +714,8 @@ def removeCategoryLinks(text, site=None, marker=''):
     categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
     text = replaceExcept(text, categoryR, '',
                          ['nowiki', 'comment', 'math', 'pre', 'source'],
-                         marker=marker)
+                         marker=marker,
+                         site=site)
     if marker:
         # avoid having multiple linefeeds at the end of the text
         text = re.sub('\s*%s' % re.escape(marker), config.LS + marker,
@@ -837,7 +839,7 @@ See https://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Positi
             elif site.language() in site.family.categories_last:
                 newtext = s2.replace(marker, '').strip() + separator + s
             else:
-                interwiki = getLanguageLinks(s2)
+                interwiki = getLanguageLinks(s2, insite=site)
                 s2 = removeLanguageLinksAndSeparator(s2.replace(marker, ''),
                                                      site, '',
                                                      iseparatorstripped
