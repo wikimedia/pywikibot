@@ -1276,7 +1276,7 @@ class TokenWallet(object):
                     self.failed_cache.add((self.site.user(), key))
 
     def __getitem__(self, key):
-        assert(self.site.logged_in())
+        assert(self.site.user())
 
         user_tokens = self._tokens.setdefault(self.site.user(), {})
         # always preload all for users without tokens
