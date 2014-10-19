@@ -1094,6 +1094,7 @@ class QueryGenerator(object):
             if self.module == "random" and self.limit:
                 # "random" module does not return "query-continue"
                 # now we loop for a new random query
+                del self.data  # a new request is needed
                 continue
             if "query-continue" not in self.data:
                 return
