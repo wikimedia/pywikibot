@@ -565,10 +565,6 @@ class Request(MutableMapping):
                 rawdata = http.request(
                     self.site, uri, method="POST",
                     headers=headers, body=body)
-
-#                import traceback
-#                traceback.print_stack()
-#                print rawdata
             except Server504Error:
                 pywikibot.log(u"Caught HTTP 504 error; retrying")
                 self.wait()
@@ -1005,13 +1001,24 @@ class QueryGenerator(object):
         Continues response as needed until limit (if any) is reached.
 
         """
+        previous_result_had_data = True
+        prev_limit = new_limit = None
+
         count = 0
         while True:
             if self.query_limit is not None:
+                prev_limit = new_limit
                 if self.limit is None:
                     new_limit = self.query_limit
                 elif self.limit > 0:
-                    new_limit = min(self.query_limit, self.limit - count)
+                    if previous_result_had_data:
+                        # self.resultkey in data in last request.submit()
+                        new_limit = min(self.query_limit, self.limit - count)
+                    else:
+                        # only "query-continue" returned. See Bug 72209.
+                        # increase new_limit to advance faster until new
+                        # useful data are found again.
+                        new_limit = min(new_limit * 2, self.query_limit)
                 else:
                     new_limit = None
 
@@ -1025,6 +1032,20 @@ class QueryGenerator(object):
                     new_limit = min(new_limit, self.api_limit // 10, 250)
                 if new_limit is not None:
                     self.request[self.prefix + "limit"] = str(new_limit)
+                if prev_limit != new_limit:
+                    pywikibot.debug(
+                        u"%s: query_limit: %s, api_limit: %s, "
+                        u"limit: %s, new_limit: %s, count: %s"
+                        % (self.__class__.__name__,
+                           self.query_limit, self.api_limit,
+                           self.limit, new_limit, count),
+                        _logger)
+                    pywikibot.debug(
+                        u"%s: %s: %s"
+                        % (self.__class__.__name__,
+                           self.prefix + "limit",
+                           self.request[self.prefix + "limit"]),
+                        _logger)
             if not hasattr(self, "data"):
                 self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
@@ -1085,12 +1106,17 @@ class QueryGenerator(object):
                     # note: self.limit could be -1
                     if self.limit and self.limit > 0 and count >= self.limit:
                         return
+                # self.resultkey in data in last request.submit()
+                previous_result_had_data = True
             else:
                 # if query-continue is present, self.resultkey might not have been
                 # fetched yet
                 if "query-continue" not in self.data:
                     # No results.
                     return
+                # self.resultkey not in data in last request.submit()
+                # only "query-continue" was retrieved.
+                previous_result_had_data = False
             if self.module == "random" and self.limit:
                 # "random" module does not return "query-continue"
                 # now we loop for a new random query
