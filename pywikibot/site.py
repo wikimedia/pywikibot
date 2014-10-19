@@ -4692,6 +4692,18 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return wpgen
 
+    def wantedcategories(self, step=None, total=None):
+        """Yield Pages from Special:Wantedcategories.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
+        wcgen = self._generator(api.CategoryPageGenerator,
+                                type_arg="querypage", gqppage="Wantedcategories",
+                                step=step, total=total)
+
+        return wcgen
+
     @deprecated_args(number=None, repeat=None)
     def uncategorizedcategories(self, number=None, repeat=True,
                                 step=None, total=None):
