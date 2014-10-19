@@ -175,7 +175,7 @@ class Request(MutableMapping):
 
     Example:
 
-    >>> r = Request(site=mysite, action="query", meta="userinfo")
+    >>> r = Request(action="query", meta="userinfo")
     >>> # This is equivalent to
     >>> # https://{path}/api.php?action=query&meta=userinfo&format=json
     >>> # change a parameter
@@ -183,15 +183,23 @@ class Request(MutableMapping):
     >>> # add a new parameter
     >>> r['siprop'] = "namespaces"
     >>> # note that "uiprop" param gets added automatically
-    >>> r._params
-    {'action': [u'query'], 'meta': [u'userinfo', u'siteinfo'], 'siprop': [u'namespaces']}
-    >>> data = r.submit()
-    >>> type(data)
-    <type 'dict'>
-    >>> data.keys()
+    >>> r.action  # doctest: +IGNORE_UNICODE
+    u'query'
+    >>> sorted(r._params.keys())  # doctest: +IGNORE_UNICODE
+    [u'action', u'meta', u'siprop']
+    >>> r._params['action']  # doctest: +IGNORE_UNICODE
     [u'query']
-    >>> data[u'query'].keys()
-    [u'userinfo', u'namespaces']
+    >>> r._params['meta']  # doctest: +IGNORE_UNICODE
+    [u'userinfo', u'siteinfo']
+    >>> r._params['siprop']  # doctest: +IGNORE_UNICODE
+    [u'namespaces']
+    >>> data = r.submit()  # doctest: +IGNORE_UNICODE
+    >>> isinstance(data, dict)
+    True
+    >>> sorted(data.keys())  # doctest: +IGNORE_UNICODE
+    ['query']
+    >>> sorted(data[u'query'].keys())  # doctest: +IGNORE_UNICODE
+    ['namespaces', 'userinfo']
 
     @param site: The Site to which the request will be submitted. If not
            supplied, uses the user's configured default Site.
@@ -1425,7 +1433,8 @@ def update_page(page, pagedict, props=[]):
 
 
 if __name__ == "__main__":
-    from pywikibot import Site, logging
+    import logging
+    from pywikibot import Site
     logging.getLogger("pywiki.data.api").setLevel(logging.DEBUG)
     mysite = Site("en", "wikipedia")
     pywikibot.output(u"starting test....")

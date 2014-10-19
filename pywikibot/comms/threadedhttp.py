@@ -301,14 +301,27 @@ class HttpRequest(object):
 
     Usage:
 
-    >>> import Queue
+    >>> from .http import Queue
     >>> queue = Queue.Queue()
-    >>> request = HttpRequest('https://www.google.com')
+    >>> cookiejar = LockableCookieJar()
+    >>> connection_pool = ConnectionPool()
+    >>> proc = HttpProcessor(queue, cookiejar, connection_pool)
+    >>> proc.setDaemon(True)
+    >>> proc.start()
+    >>> request = HttpRequest('https://hostname.invalid/')
     >>> queue.put(request)
     >>> request.lock.acquire()
-    >>> print request.data
+    True
+    >>> print(type(request.data))
+    <class 'httplib2.ServerNotFoundError'>
+    >>> print(request.data)
+    Unable to find the server at hostname.invalid
 
     C{request.lock.acquire()} will block until the data is available.
+
+    self.data will be either:
+    * a tuple of (dict, unicode) if the request was successful
+    * an exception
 
     """
     def __init__(self, *args, **kwargs):
