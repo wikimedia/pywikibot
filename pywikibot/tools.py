@@ -142,13 +142,13 @@ class ThreadedGenerator(threading.Thread):
     all the generated values, it must call the generator's stop() method to
     stop the background thread.  Example usage:
 
-    >>> gen = ThreadedGenerator(target=xrange, args=(20,))
+    >>> gen = ThreadedGenerator(target=range, args=(20,))
     >>> try:
     ...     for data in gen:
-    ...         print data,
+    ...         print(data, end=',')
     ... finally:
     ...     gen.stop()
-    0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+    0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,
 
     """
 
@@ -217,14 +217,14 @@ def itergroup(iterable, size):
 
     Example:
 
-    >>> i = itergroup(xrange(25), 10)
-    >>> print next(i)
+    >>> i = itergroup(range(25), 10)
+    >>> print(next(i))
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    >>> print next(i)
+    >>> print(next(i))
     [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-    >>> print next(i)
+    >>> print(next(i))
     [20, 21, 22, 23, 24]
-    >>> print next(i)
+    >>> print(next(i))
     Traceback (most recent call last):
      ...
     StopIteration
@@ -253,7 +253,7 @@ class ThreadList(list):
     >>> def work():
     ...     time.sleep(1)
     ...
-    >>> for x in xrange(20):
+    >>> for x in range(20):
     ...     pool.append(threading.Thread(target=work))
     ...
 

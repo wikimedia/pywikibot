@@ -420,33 +420,35 @@ def twntranslate(code, twtitle, parameters=None):
     msg = {
         'en': {
             # number value as format sting is allowed
-            'test-changing': u'Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.',
+            'test-plural': u'Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.',
         },
         'nl': {
             # format sting inside PLURAL tag is allowed
-            'test-changing': u'Bot: Pas {{PLURAL:num|1 pagina|%(num)d pagina\'s}} aan.',
+            'test-plural': u'Bot: Pas {{PLURAL:num|1 pagina|%(num)d pagina\'s}} aan.',
         },
         'fr': {
             # additional sting inside or outside PLURAL tag is allowed
-            'test-changing': u'Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.',
+            'test-plural': u'Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.',
         },
     }
-    #use a number
     >>> from pywikibot import i18n
-    >>> i18n.twntranslate('en', 'test-changing', 0) % {'num': 'no'}
-    Bot: Changing no pages.
-    #use a string
-    >>> i18n.twntranslate('en', 'test-changing', '1') % {'num': 'one'}
-    Bot: Changing one page.
-    #use a dictionary
-    >>> i18n.twntranslate('en', 'test-changing', {'num':2})
-    Bot: Changing 2 pages.
-    #use additional format strings
-    >>> i18n.twntranslate('fr', 'test-changing', {'num': 1, 'descr': 'seulement'})
-    Robot: Changer seulement une pages.
-    #use format strings also outside
-    >>> i18n.twntranslate('fr', 'test-changing', 10) % {'descr': 'seulement'}
-    Robot: Changer seulement quelques pages.
+    >>> i18n.messages_package_name = 'tests.i18n'
+    >>> # use a number
+    >>> str(i18n.twntranslate('en', 'test-plural', 0) % {'num': 'no'})
+    'Bot: Changing no pages.'
+    >>> # use a string
+    >>> str(i18n.twntranslate('en', 'test-plural', '1') % {'num': 'one'})
+    'Bot: Changing one page.'
+    >>> # use a dictionary
+    >>> str(i18n.twntranslate('en', 'test-plural', {'num':2}))
+    'Bot: Changing 2 pages.'
+    >>> # use additional format strings
+    >>> str(i18n.twntranslate('fr', 'test-plural', {'num': 1, 'descr': 'seulement'}))
+    'Robot: Changer seulement une page.'
+    >>> # use format strings also outside
+    >>> str(i18n.twntranslate('fr', 'test-plural', 10) % {'descr': 'seulement'})
+    'Robot: Changer seulement quelques pages.'
+    >>> i18n.messages_package_name = 'scripts.i18n'
 
     The translations are retrieved from i18n.<package>, based on the callers
     import table.
