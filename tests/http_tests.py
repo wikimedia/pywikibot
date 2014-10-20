@@ -36,7 +36,6 @@ class HttpTestCase(TestCase):
         self.assertIsInstance(r, unicode)
         self.assertIn('<html lang="mul"', r)
 
-    @expectedFailureIf(sys.version_info[0] == 3)  # bug 72247
     def test_https_cert_error(self):
         """Test http request function fails on ssl bad certificate."""
         self.assertRaises(pywikibot.FatalServerError,
