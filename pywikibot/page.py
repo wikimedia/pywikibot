@@ -3624,7 +3624,15 @@ class Claim(Property):
         @return: dict
         """
         source = OrderedDict()
-        for prop in data['snaks-order']:
+
+        # Before #84516 Wikibase did not implement snaks-order.
+        # https://gerrit.wikimedia.org/r/#/c/84516/
+        if 'snaks-order' in data:
+            prop_list = data['snaks-order']
+        else:
+            prop_list = data['snaks'].keys()
+
+        for prop in prop_list:
             for claimsnak in data['snaks'][prop]:
                 claim = Claim.fromJSON(site, {'mainsnak': claimsnak,
                                               'hash': data['hash']})
