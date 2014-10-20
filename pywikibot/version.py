@@ -346,6 +346,9 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
             if '__init__.py' in path:
                 path = path[0:path.index('__init__.py')]
 
+            if sys.version_info[0] == 2:
+                path = path.decode(sys.getfilesystemencoding())
+
             info['path'] = path
             assert(path not in paths)
             paths[path] = name
