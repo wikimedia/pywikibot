@@ -1761,8 +1761,15 @@ class checkImagesBot(object):
             return True
 
 
-def main():
-    """Main function."""
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     # Command line configurable parameters
     repeat = True  # Restart after having check all the images?
     limit = 80  # How many images check?
@@ -1781,7 +1788,7 @@ def main():
     generator = None
 
     # Here below there are the parameters.
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg.startswith('-limit'):
             if len(arg) == 7:
                 limit = int(pywikibot.input(

@@ -54,8 +54,16 @@ class ReCheck:
         return self.result
 
 
-def main():
-    pywikibot.handleArgs()
+def main(*args):
+    """
+    Process command line arguments and perform task.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
+    pywikibot.handle_args(args)
 
     page = pywikibot.Page(pywikibot.Site(), cfdPage)
 

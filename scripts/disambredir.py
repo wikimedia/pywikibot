@@ -149,8 +149,16 @@ def workon(page, links):
         page.put(text, comment)
 
 
-def main():
-    local_args = pywikibot.handleArgs()
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
+    local_args = pywikibot.handle_args(args)
 
     generator = None
     start = local_args[0] if local_args else '!'

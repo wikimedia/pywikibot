@@ -132,10 +132,18 @@ class myRevertBot(BaseRevertBot):
         return False
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     user = None
     rollback = False
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg.startswith('-username'):
             if len(arg) == 9:
                 user = pywikibot.input(

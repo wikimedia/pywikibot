@@ -138,6 +138,14 @@ def check_protection_level(operation, level, levels, default=None):
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     options = {}
     message_properties = {}
     generator = None
@@ -152,7 +160,7 @@ def main(*args):
     }
 
     # read command line parameters
-    local_args = pywikibot.handleArgs(*args)
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
     site = pywikibot.Site()
 

@@ -711,6 +711,14 @@ class RedirectRobot(Bot):
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     options = {}
     # what the bot should do (either resolve double redirs, or delete broken
     # redirs)
@@ -731,7 +739,7 @@ def main(*args):
     until = ''
     number = None
     step = None
-    for arg in pywikibot.handleArgs(*args):
+    for arg in pywikibot.handle_args(args):
         if arg == 'double' or arg == 'do':
             action = 'double'
         elif arg == 'broken' or arg == 'br':

@@ -1006,6 +1006,14 @@ u"Page does not exist, using the first link in page %s."
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     # the option that's always selected when the bot wonders what to do with
     # a link. If it's None, the user is prompted (default behaviour).
     always = None
@@ -1020,7 +1028,7 @@ def main(*args):
     # For sorting the linked pages, case can be ignored
     minimum = 0
 
-    local_args = pywikibot.handleArgs(*args)
+    local_args = pywikibot.handle_args(args)
 
     for arg in local_args:
         if arg.startswith('-primary:'):

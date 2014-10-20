@@ -298,7 +298,15 @@ class ImageTransferBot:
                     pywikibot.output(u'No such image number.')
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     pageTitle = None
     gen = None
 
@@ -307,7 +315,7 @@ def main():
     targetLang = None
     targetFamily = None
 
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
 
     for arg in local_args:
         if arg == '-interwiki':

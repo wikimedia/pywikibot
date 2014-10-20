@@ -62,11 +62,19 @@ from pywikibot.exceptions import SiteDefinitionError
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     password = None
     sysop = False
     logall = False
     logout = False
-    for arg in pywikibot.handleArgs(*args):
+    for arg in pywikibot.handle_args(args):
         if arg.startswith("-pass"):
             if len(arg) == 5:
                 password = pywikibot.input(u'Password for all accounts (no characters will be shown):',
@@ -112,5 +120,7 @@ def main(*args):
             except SiteDefinitionError:
                 pywikibot.output(u'%s.%s is not a valid site, please remove it'
                                  u' from your config' % (lang, familyName))
+
+
 if __name__ == "__main__":
     main()

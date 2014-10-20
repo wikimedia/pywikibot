@@ -416,7 +416,15 @@ class CategoryRedirectBot(object):
 
 
 def main(*args):
-    a = pywikibot.handleArgs(*args)
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
+    a = pywikibot.handle_args(args)
     if len(a) == 1:
         raise RuntimeError('Unrecognized argument "%s"' % a[0])
     elif a:

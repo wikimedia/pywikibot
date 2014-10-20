@@ -205,8 +205,15 @@ def showQuest(page):
         editor.edit(page.text)
 
 
-def main():
-    """Main Function."""
+def main(*args):
+    """
+    Process command line arguments and perform task.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     # Loading the comments
     global categoryToCheck, project_inserted
     # always, define a generator to understand if the user sets one,
@@ -223,7 +230,7 @@ def main():
     errorCount = 0
 
     # Process global args and prepare generator args parser
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
 
     # Process local args

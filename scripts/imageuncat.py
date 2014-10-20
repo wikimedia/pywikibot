@@ -1315,12 +1315,17 @@ def addUncat(page):
 
 
 def main(*args):
-    '''
-    Grab a bunch of images and tag them if they are not categorized.
-    '''
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     generator = None
 
-    local_args = pywikibot.handleArgs(*args)
+    local_args = pywikibot.handle_args(args)
 
     # use the default imagerepository normally commons
     site = pywikibot.Site().image_repository()

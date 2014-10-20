@@ -887,8 +887,16 @@ def load_word_function(raw):
 globalvar = Global()
 
 
-def main():
-    for arg in pywikibot.handleArgs():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
+    for arg in pywikibot.handle_args(args):
         if arg.startswith('-edit'):
             if len(arg) == 5:
                 globalvar.attachEditCount = int(pywikibot.input(

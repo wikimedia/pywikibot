@@ -75,14 +75,22 @@ class DeletionRobot(Bot):
                 page.delete(self.summary, not self.getOption('always'))
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     pageName = ''
     summary = None
     generator = None
     options = {}
 
     # read command line parameters
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
     mysite = pywikibot.Site()
 

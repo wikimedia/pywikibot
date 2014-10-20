@@ -72,14 +72,21 @@ class CreateCategoriesBot(Bot):
             self.create_category(page)
 
 
-def main():
-    """Main loop. Get a generator and options."""
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     parent = None
     basename = None
     options = {}
 
     # Process global args and prepare generator args parser
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:

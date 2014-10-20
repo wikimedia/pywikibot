@@ -37,11 +37,19 @@ from pywikibot import pagegenerators, i18n
 from pywikibot.editor import TextEditor
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and perform task.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     always = False
     namespaces = []
     spamSite = ''
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg == "-always":
             always = True
         elif arg.startswith('-namespace:'):

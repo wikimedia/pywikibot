@@ -133,13 +133,19 @@ def refresh_all(new=False, sysop=False):
                 refresh(pywikibot.Site(lang, family))
 
 
-def main():
-    """ Script entry point. """
-    local_args = pywikibot.handleArgs()
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     all = False
     new = False
     sysop = False
-    for arg in local_args:
+    for arg in pywikibot.handle_args(args):
         if arg in ('-all', '-update'):
             all = True
         elif arg == '-new':
@@ -160,7 +166,4 @@ def main():
             pywikibot.output(pageName, toStdout=True)
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+    main()

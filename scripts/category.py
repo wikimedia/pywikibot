@@ -1034,6 +1034,14 @@ class CategoryTreeRobot:
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     fromGiven = False
     toGiven = False
     batchMode = False
@@ -1053,7 +1061,7 @@ def main(*args):
     depth = 5
 
     # Process global args and prepare generator args parser
-    local_args = pywikibot.handleArgs(*args)
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
 
     # The generator gives the pages that should be worked upon.

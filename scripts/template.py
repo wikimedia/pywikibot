@@ -292,6 +292,14 @@ class TemplateRobot(Bot):
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     templateNames = []
     templates = {}
     options = {}
@@ -302,7 +310,7 @@ def main(*args):
     timestamp = None
 
     # read command line parameters
-    local_args = pywikibot.handleArgs(*args)
+    local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
     for arg in local_args:
         if arg == '-remove':

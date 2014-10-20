@@ -164,13 +164,21 @@ class UnlinkBot(Bot):
             pywikibot.output(u"Page %s is locked?!" % page.title(asLink=True))
 
 
-def main():
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     # This temporary string is used to read the title
     # of the page that should be unlinked.
     page_title = None
     options = {}
 
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args(args):
         if arg.startswith('-namespace:'):
             if 'namespaces' not in options:
                 options['namespaces'] = []
