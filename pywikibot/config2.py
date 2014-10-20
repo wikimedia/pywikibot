@@ -50,6 +50,8 @@ _deprecated_variables = ['use_SSL_onlogin', 'use_SSL_always',
 family = 'wikipedia'
 # The language code of the site we're working on.
 mylang = 'language'
+# If family and mylang are not modified from the above, the default is changed
+# to test:test, which is test.wikipedia.org, at the end of this module.
 
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. Please set your usernames by adding such lines to your
@@ -831,6 +833,11 @@ if transliteration_target == 'not set':
 elif transliteration_target in ('None', 'none'):
     transliteration_target = None
 
+# Fix up default site
+if family == 'wikipedia' and mylang == 'language':
+    print("WARNING: family and mylang are not set.\n"
+          "Defaulting to family='test' and mylang='test'.")
+    family = mylang = 'test'
 
 #
 # When called as main program, list all configuration variables
