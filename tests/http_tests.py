@@ -12,21 +12,106 @@ import pywikibot
 from pywikibot.comms import http, threadedhttp
 from pywikibot import config2 as config
 from tests.aspects import unittest, TestCase
+from tests.utils import expectedFailureIf
+
+if sys.version_info[0] == 3:
+    unicode = str
 
 
 class HttpTestCase(TestCase):
 
+    """Tests for http module."""
+
     net = True
 
-    def test_get(self):
+    def test_http(self):
+        """Test http request function."""
         r = http.request(site=None, uri='http://www.wikipedia.org/')
-        self.assertIsInstance(r, str if sys.version_info[0] >= 3 else unicode)
+        self.assertIsInstance(r, unicode)
         self.assertIn('<html lang="mul"', r)
 
-    def test_request(self):
+    def test_https(self):
+        """Test http request function using https."""
+        r = http.request(site=None, uri='https://www.wikiquote.org/')
+        self.assertIsInstance(r, unicode)
+        self.assertIn('<html lang="mul"', r)
+
+    @expectedFailureIf(sys.version_info[0] == 3)  # bug 72247
+    def test_https_cert_error(self):
+        """Test http request function fails on ssl bad certificate."""
+        self.assertRaises(pywikibot.FatalServerError,
+                          http.request,
+                          site=None,
+                          uri='https://www.omegawiki.org/')
+
+    @expectedFailureIf(sys.version_info[0] == 3)  # bug 72236
+    def test_https_ignore_cert_error(self):
+        """Test http request function ignoring ssl bad certificate."""
+        # As the connection is cached, the above test will cause
+        # subsequent requests to go to the existing, broken, connection.
+        # So, this uses a different host, which hopefully hasnt been
+        # connected previously by other tests.
+        r = http.request(site=None,
+                         uri='https://en.vikidia.org/wiki/Main_Page',
+                         disable_ssl_certificate_validation=True)
+        self.assertIsInstance(r, unicode)
+        self.assertIn('<title>Vikidia</title>', r)
+
+    def test_https_cert_invalid(self):
+        """Verify certificate is bad."""
+        try:
+            from pyasn1_modules import pem, rfc2459
+            from pyasn1.codec.der import decoder
+        except ImportError:
+            raise unittest.SkipTest('pyasn1 and pyasn1_modules not available.')
+
+        import ssl
+        import io
+
+        cert = ssl.get_server_certificate(addr=('en.vikidia.org', 443))
+        s = io.StringIO(unicode(cert))
+        substrate = pem.readPemFromFile(s)
+        cert = decoder.decode(substrate, asn1Spec=rfc2459.Certificate())[0]
+        tbs_cert = cert.getComponentByName('tbsCertificate')
+        issuer = tbs_cert.getComponentByName('issuer')
+        organisation = None
+        for rdn in issuer.getComponent():
+            for attr in rdn:
+                attr_type = attr.getComponentByName('type')
+                if attr_type == rfc2459.id_at_organizationName:
+                    value, _ = decoder.decode(attr.getComponentByName('value'),
+                                              asn1Spec=rfc2459.X520name())
+                    organisation = str(value.getComponent())
+                    break
+
+        self.assertEqual(organisation, 'TuxFamily.org non-profit organization')
+
+
+class ThreadedHttpTestCase(TestCase):
+
+    """Tests for threadedhttp module."""
+
+    net = True
+
+    def test_http(self):
         o = threadedhttp.Http()
         r = o.request('http://www.wikipedia.org/')
         self.assertIsInstance(r, tuple)
+        self.assertNotIsInstance(r[0], Exception)
+        self.assertIsInstance(r[0], dict)
+        self.assertIn('status', r[0])
+        self.assertIsInstance(r[0]['status'], str)
+        self.assertEqual(r[0]['status'], '200')
+
+        self.assertIsInstance(r[1], bytes if sys.version_info[0] >= 3 else str)
+        self.assertIn(b'<html lang="mul"', r[1])
+        self.assertEqual(int(r[0]['content-length']), len(r[1]))
+
+    def test_https(self):
+        o = threadedhttp.Http()
+        r = o.request('https://www.wikipedia.org/')
+        self.assertIsInstance(r, tuple)
+        self.assertNotIsInstance(r[0], Exception)
         self.assertIsInstance(r[0], dict)
         self.assertIn('status', r[0])
         self.assertIsInstance(r[0]['status'], str)
@@ -39,13 +124,24 @@ class HttpTestCase(TestCase):
     def test_gzip(self):
         o = threadedhttp.Http()
         r = o.request('http://www.wikipedia.org/')
+        self.assertIsInstance(r, tuple)
+        self.assertNotIsInstance(r[0], Exception)
         self.assertIn('-content-encoding', r[0])
         self.assertEqual(r[0]['-content-encoding'], 'gzip')
 
         url = 'https://test.wikidata.org/w/api.php?action=query&meta=siteinfo'
         r = o.request(url)
+        self.assertIsInstance(r, tuple)
+        self.assertNotIsInstance(r[0], Exception)
         self.assertIn('-content-encoding', r[0])
         self.assertEqual(r[0]['-content-encoding'], 'gzip')
+
+
+class UserAgentTestCase(TestCase):
+
+    """User agent formatting tests using a format string."""
+
+    net = False
 
     def test_user_agent(self):
         self.assertEqual('', http.user_agent(format_string='  '))
@@ -77,6 +173,8 @@ class HttpTestCase(TestCase):
 
 
 class DefaultUserAgentTestCase(TestCase):
+
+    """User agent formatting tests using the default config format string."""
 
     net = False
 
