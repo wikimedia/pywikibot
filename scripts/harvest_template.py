@@ -95,7 +95,7 @@ class HarvestRobot(WikidataBot):
         except pywikibot.NoPage:
             linked_item = None
 
-        if not item or not linked_item.exists():
+        if not linked_item or not linked_item.exists():
             pywikibot.output(u'%s doesn\'t have a wikidata item to link with. Skipping' % (linked_page))
             return
 
