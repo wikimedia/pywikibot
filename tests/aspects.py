@@ -67,6 +67,62 @@ class TestCaseBase(unittest.TestCase):
             """
             return self.assertRegexpMatches(*args, **kwargs)
 
+    def assertPageInNamespaces(self, page, namespaces):
+        """
+        Assert that Pages is in namespaces.
+
+        @param page: Page
+        @type page: Page
+        @param namespaces: expected namespaces
+        @type namespaces: int or set of int
+        """
+        if isinstance(namespaces, int):
+            namespaces = set([namespaces])
+
+        self.assertIn(page.namespace(), namespaces,
+                      "%s not in namespace %r" % (page, namespaces))
+
+    def assertPagesInNamespaces(self, gen, namespaces):
+        """
+        Assert that generator returns Pages all in namespaces.
+
+        @param gen: generator to iterate
+        @type gen: generator
+        @param namespaces: expected namespaces
+        @type namespaces: int or set of int
+        """
+        if isinstance(namespaces, int):
+            namespaces = set([namespaces])
+
+        for page in gen:
+            self.assertPageInNamespaces(page, namespaces)
+
+    def assertPagesInNamespacesAll(self, gen, namespaces, skip=False):
+        """
+        Try to confirm that generator returns Pages for all namespaces.
+
+        @param gen: generator to iterate
+        @type gen: generator
+        @param namespaces: expected namespaces
+        @type namespaces: int or set of int
+        @param count: maximum results to process
+        @type count: int
+        @param skip: skip test if not all namespaces found
+        @param skip: bool
+        """
+        if isinstance(namespaces, int):
+            namespaces = set([namespaces])
+        else:
+            assert(isinstance(namespaces, set))
+
+        page_namespaces = [page.namespace() for page in gen]
+
+        if skip and set(page_namespaces) != namespaces:
+            raise unittest.SkipTest('Pages in namespaces %r not found.'
+                                    % list(namespaces - set(page_namespaces)))
+        else:
+            self.assertEqual(set(page_namespaces), namespaces)
+
 
 class TestLoggingMixin(TestCaseBase):
 

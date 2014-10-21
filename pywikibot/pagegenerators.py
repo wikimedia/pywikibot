@@ -516,10 +516,11 @@ class GeneratorFactory(object):
             # partial workaround for bug 67249
             # to use -namespace/ns with -newpages, -ns must be given before -newpages
             # otherwise default namespace is 0
+            namespaces = self.namespaces or 0
             total = 60
             if len(arg) >= 10:
                 total = int(arg[10:])
-            gen = NewpagesPageGenerator(namespaces=self.namespaces,
+            gen = NewpagesPageGenerator(namespaces=namespaces,
                                         total=total,
                                         site=self.site)
         elif arg.startswith('-imagesused'):
