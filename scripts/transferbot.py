@@ -2,8 +2,9 @@
 # -*- coding: utf-8  -*-
 
 """
-This script transfers pages from a source wiki to a target wiki. It also
-copies edit history to a subpage.
+This script transfers pages from a source wiki to a target wiki.
+
+It also copies edit history to a subpage.
 
 -tolang:          The target site code.
 

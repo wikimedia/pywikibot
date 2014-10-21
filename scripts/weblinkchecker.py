@@ -1,7 +1,8 @@
 # -*- coding: utf-8  -*-
 """
-This bot is used for checking external links found at the wiki. It checks
-several pages at once, with a limit set by the config variable
+This bot is used for checking external links found at the wiki.
+
+It checks several pages at once, with a limit set by the config variable
 max_external_links, which defaults to 50.
 
 The bot won't change any wiki pages, it will only report dead links such that
@@ -149,6 +150,11 @@ ignorelist = [
 
 
 def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
+    """
+    Yield web links from text.
+
+    TODO: move to textlib
+    """
     text = textlib.removeDisabledParts(text)
 
     # MediaWiki parses templates before parsing external links. Thus, there
@@ -229,6 +235,8 @@ class XmlDumpPageGenerator:
 class LinkChecker(object):
 
     """
+    Check links.
+
     Given a HTTP URL, tries to load the page from the Internet and checks if it
     is still online.
 
@@ -239,9 +247,12 @@ class LinkChecker(object):
     correctly! (This will give a Socket Error)
 
     """
+
     def __init__(self, url, redirectChain=[], serverEncoding=None,
                  HTTPignore=[]):
         """
+        Constructor.
+
         redirectChain is a list of redirects which were resolved by
         resolveRedirect(). This is needed to detect redirect loops.
         """
@@ -322,12 +333,12 @@ class LinkChecker(object):
 
     def resolveRedirect(self, useHEAD=False):
         """
-        Requests the header from the server. If the page is an HTTP redirect,
-        returns the redirect target URL as a string. Otherwise returns None.
+        Return the redirect target URL as a string, if it is a HTTP redirect.
 
         If useHEAD is true, uses the HTTP HEAD method, which saves bandwidth
         by not downloading the body. Otherwise, the HTTP GET method is used.
 
+        @rtype: unicode or None
         """
         conn = self.getConnection()
         try:
@@ -387,8 +398,9 @@ class LinkChecker(object):
 
     def check(self, useHEAD=False):
         """
-        Returns True and the server status message if the page is alive.
-        Otherwise returns false
+        Return True and the server status message if the page is alive.
+
+        @rtype: tuple of (bool, unicode)
         """
         try:
             wasRedirected = self.resolveRedirect(useHEAD=useHEAD)
@@ -480,10 +492,11 @@ class LinkChecker(object):
 
 class LinkCheckThread(threading.Thread):
 
-    """ A thread responsible for checking one URL. After checking the page, it
-    will die.
+    """ A thread responsible for checking one URL.
 
+    After checking the page, it will die.
     """
+
     def __init__(self, page, url, history, HTTPignore, day):
         threading.Thread.__init__(self)
         self.page = page
@@ -515,7 +528,10 @@ class LinkCheckThread(threading.Thread):
 
 class History:
 
-    """ Store previously found dead links. The URLs are dictionary keys, and
+    """
+    Store previously found dead links.
+
+    The URLs are dictionary keys, and
     values are lists of tuples where each tuple represents one time the URL was
     found dead. Tuples have the form (title, date, error) where title is the
     wiki page where the URL was found, date is an instance of time, and error is
@@ -551,7 +567,7 @@ class History:
             self.historyDict = {}
 
     def log(self, url, error, containingPage, archiveURL):
-        """Logs an error report to a text file in the deadlinks subdirectory."""
+        """Log an error report to a text file in the deadlinks subdirectory."""
         if archiveURL:
             errorReport = u'* %s ([%s archive])\n' % (url, archiveURL)
         else:
@@ -579,7 +595,7 @@ class History:
                                      archiveURL)
 
     def setLinkDead(self, url, error, page, day):
-        """Adds the fact that the link was found dead to the .dat file."""
+        """Add the fact that the link was found dead to the .dat file."""
         self.semaphore.acquire()
         now = time.time()
         if url in self.historyDict:
@@ -604,8 +620,11 @@ class History:
 
     def setLinkAlive(self, url):
         """
-        If the link was previously found dead, removes it from the .dat file
-        and returns True, else returns False.
+        Record that the link is now alive.
+
+        If link was previously found dead, remove it from the .dat file.
+
+        @return: True if previously found dead, else returns False.
         """
         if url in self.historyDict:
             self.semaphore.acquire()
@@ -628,8 +647,9 @@ class History:
 class DeadLinkReportThread(threading.Thread):
 
     """
-    A Thread that is responsible for posting error reports on talk pages. There
-    will only be one DeadLinkReportThread, and it is using a semaphore to make
+    A Thread that is responsible for posting error reports on talk pages.
+
+    There is only one DeadLinkReportThread, and it is using a semaphore to make
     sure that two LinkCheckerThreads can not access the queue at the same time.
     """
 
@@ -641,10 +661,7 @@ class DeadLinkReportThread(threading.Thread):
         self.killed = False
 
     def report(self, url, errorReport, containingPage, archiveURL):
-        """ Tries to add an error report to the talk page belonging to the page
-        containing the dead link.
-
-        """
+        """Report error on talk page of the page containing the dead link."""
         self.semaphore.acquire()
         self.queue.append((url, errorReport, containingPage, archiveURL))
         self.semaphore.release()
@@ -727,10 +744,11 @@ class DeadLinkReportThread(threading.Thread):
 class WeblinkCheckerRobot:
 
     """
-    Bot which will use several LinkCheckThreads at once to search for dead
-    weblinks on pages provided by the given generator.
+    Bot which will search for dead weblinks.
 
+    It uses several LinkCheckThreads at once to process pages from generator.
     """
+
     def __init__(self, generator, HTTPignore=None, day=7):
         self.generator = generator
         if config.report_dead_links_on_talk:
@@ -777,6 +795,7 @@ class WeblinkCheckerRobot:
 
 
 def RepeatPageGenerator():
+    """Generator for pages in History."""
     history = History(None)
     pageTitles = set()
     for value in history.historyDict.values():
@@ -788,6 +807,12 @@ def RepeatPageGenerator():
 
 
 def countLinkCheckThreads():
+    """
+    Count LinkCheckThread threads.
+
+    @return: number of LinkCheckThread threads
+    @rtype: int
+    """
     i = 0
     for thread in threading.enumerate():
         if isinstance(thread, LinkCheckThread):

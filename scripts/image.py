@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This script can be used to change one image to another or remove an image
-entirely.
+This script can be used to change one image to another or remove an image.
 
 Syntax: python image.py image_name [new_image_name]
 
@@ -49,10 +48,7 @@ import re
 
 class ImageRobot(Bot):
 
-    """
-    This bot will load all pages yielded by a file links image page generator and
-    replace or remove all occurences of the old image.
-    """
+    """This bot will replace or remove all occurences of an old image."""
 
     # Summary messages for replacing images
     msg_replace = {

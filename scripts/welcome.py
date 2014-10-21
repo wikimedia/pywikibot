@@ -1,11 +1,10 @@
 # -*- coding: utf-8  -*-
-"""
-Script to welcome new users. This script works out of the box for Wikis that
+u"""
+Script to welcome new users.
+
+This script works out of the box for Wikis that
 have been defined in the script. It is currently used on the Dutch, Norwegian,
 Albanian, Italian Wikipedia, Wikimedia Commons and English Wikiquote.
-
-Note: You can download the latest version available
-from here: https://www.mediawiki.org/wiki/Manual:Pywikibot/welcome.py
 
 Ensure you have community support before running this bot!
 
@@ -402,14 +401,13 @@ logpage_header = {
 
 
 class FilenameNotSet(pywikibot.Error):
+
     """An exception indicating that a signature filename was not specifed."""
 
 
 class Global(object):
 
-    """Container class for global settings.
-       Use of globals outside of this is to be avoided.
-       """
+    """Container class for global settings."""
 
     attachEditCount = 1     # number of edits that an user required to be welcomed
     dumpToLog = 15          # number of users that are required to add the log :)
@@ -437,7 +435,6 @@ class WelcomeBot(object):
 
     def __init__(self):
         """Constructor."""
-
         self.site = pywikibot.Site()
         self.check_managed_sites()
         self.bname = dict()
@@ -856,6 +853,7 @@ class WelcomeBot(object):
 
 
 def showStatus(n=0):
+    """Output colorized status."""
     staColor = {
         0: 'lightpurple',
         1: 'lightaqua',
@@ -877,7 +875,7 @@ def showStatus(n=0):
 
 
 def load_word_function(raw):
-    """ This is a function used to load the badword and the whitelist."""
+    """Load the badword list and the whitelist."""
     page = re.compile(r"(?:\"|\')(.*?)(?:\"|\')(?:, |\))", re.UNICODE)
     list_loaded = page.findall(raw)
     if len(list_loaded) == 0:

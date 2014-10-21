@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-This script will display the list of pages transcluding a given list of
-templates. It can also be used to simply count the number of pages (rather than
+This script will display the list of pages transcluding a given list of templates.
+
+It can also be used to simply count the number of pages (rather than
 listing each individually).
 
 Syntax: python templatecount.py command [arguments]
@@ -45,6 +46,8 @@ templates = ['ref', 'note', 'ref label', 'note label', 'reflist']
 
 
 class TemplateCountRobot:
+
+    """Template count bot."""
 
     @staticmethod
     def countTemplates(templates, namespaces):

@@ -2,8 +2,7 @@
 # -*- coding: utf-8  -*-
 
 """
-This script goes over multiple pages of the home wiki, and reports invalid
-ISBN numbers.
+This script reports and fixes invalid ISBN numbers.
 
 Additionally, it can convert all ISBN-10 codes to the ISBN-13 format, and
 correct the ISBN format by placing hyphens.
@@ -1160,16 +1159,16 @@ ranges = {
 
 
 class InvalidIsbnException(pywikibot.Error):
+
     """Invalid ISBN."""
 
 
 class ISBN:
-    """
-    Abstract superclass
-    """
+
+    """Abstract superclass."""
 
     def format(self):
-        """Puts hyphens into this ISBN number."""
+        """Put hyphens into this ISBN number."""
         result = ''
         rest = ''
         for digit in self.digits():
@@ -1209,6 +1208,9 @@ class ISBN:
 
 
 class ISBN13(ISBN):
+
+    """ISBN 13."""
+
     def __init__(self, code, checksumMissing=False):
         self.code = code
         if checksumMissing:
@@ -1219,7 +1221,7 @@ class ISBN13(ISBN):
         return ['978', '979']
 
     def digits(self):
-        """Returns a list of the digits in the ISBN code."""
+        """Return a list of the digits in the ISBN code."""
         result = []
         for c in self.code:
             if c.isdigit():
@@ -1248,6 +1250,9 @@ class ISBN13(ISBN):
 
 
 class ISBN10(ISBN):
+
+    """ISBN 10."""
+
     def __init__(self, code):
         self.code = code
         self.checkValidity()
@@ -1256,7 +1261,7 @@ class ISBN10(ISBN):
         return []
 
     def digits(self):
-        """Returns a list of the digits and Xs in the ISBN code."""
+        """Return a list of the digits and Xs in the ISBN code."""
         result = []
         for c in self.code:
             if c.isdigit() or c in 'Xx':
@@ -1267,10 +1272,7 @@ class ISBN10(ISBN):
         return result
 
     def checkChecksum(self):
-        """
-        Raises an InvalidIsbnException if the checksum shows that the
-        ISBN is incorrect.
-        """
+        """Raise an InvalidIsbnException if the ISBN checksum is incorrect."""
         # See https://en.wikipedia.org/wiki/ISBN#Check_digit_in_ISBN_10
         sum = 0
         for i in range(0, 9):
@@ -1297,8 +1299,9 @@ class ISBN10(ISBN):
 
     def toISBN13(self):
         """
-        Creates a 13-digit ISBN from this 10-digit ISBN by prefixing the GS1
-        prefix '978' and recalculating the checksum.
+        Create a 13-digit ISBN from this 10-digit ISBN.
+
+        Adds the GS1 prefix '978' and recalculates the checksum.
         The hyphenation structure is taken from the format of the original
         ISBN number.
         """
@@ -1317,6 +1320,7 @@ class ISBN10(ISBN):
 
 
 def getIsbn(code):
+    """Return an ISBN object for the code."""
     try:
         i = ISBN13(code)
     except InvalidIsbnException as e13:
@@ -1341,6 +1345,7 @@ def _hyphenateIsbnNumber(match):
 
 
 def hyphenateIsbnNumbers(text):
+    """Helper function to hyphenate an ISBN."""
     isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[\dXx])')
     text = isbnR.sub(_hyphenateIsbnNumber, text)
     return text
@@ -1359,12 +1364,15 @@ def _isbn10toIsbn13(match):
 
 
 def convertIsbn10toIsbn13(text):
+    """Helper function to convert ISBN 10 to ISBN 13."""
     isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
     text = isbnR.sub(_isbn10toIsbn13, text)
     return text
 
 
 class IsbnBot(Bot):
+
+    """ISBN bot."""
 
     def __init__(self, generator, **kwargs):
         self.availableOptions.update({

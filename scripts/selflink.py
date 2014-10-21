@@ -2,8 +2,7 @@
 # -*- coding: utf-8  -*-
 
 """
-This bot goes over multiple pages of the site, searches for selflinks, and
-allows removing them.
+This bot searches for selflinks and allows removing them.
 
 These command line parameters can be used to specify which pages to work on:
 
@@ -33,6 +32,8 @@ docuReplacements = {
 
 
 class SelflinkBot(Bot):
+
+    """Self-link removal bot."""
 
     def __init__(self, generator, **kwargs):
         super(SelflinkBot, self).__init__(**kwargs)

@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-This module can do slight modifications to a wiki page source code such that
-the code looks cleaner. The changes are not supposed to change the look of the
-rendered wiki page.
+This module can do slight modifications to tidy a wiki page's source code.
+
+The changes are not supposed to change the look of the rendered wiki page.
 
 The following parameters are supported:
 
@@ -157,6 +157,8 @@ CANCEL_METHOD = 2
 
 class CosmeticChangesToolkit:
 
+    """Cosmetic changes toolkit."""
+
     def __init__(self, site, debug=False, redirect=False, namespace=None,
                  pageTitle=None, ignore=CANCEL_ALL):
         self.site = site
@@ -241,6 +243,7 @@ class CosmeticChangesToolkit:
     def fixSelfInterwiki(self, text):
         """
         Interwiki links to the site itself are displayed like local links.
+
         Remove their language code prefix.
         """
         if not self.talkpage and pywikibot.calledModuleName() != 'interwiki':
@@ -251,6 +254,8 @@ class CosmeticChangesToolkit:
 
     def standardizePageFooter(self, text):
         """
+        Standardize page footer.
+
         Makes sure that interwiki links, categories and star templates are
         put to the correct position and into the right order. This combines the
         old instances standardizeInterwiki and standardizeCategories
@@ -359,7 +364,7 @@ class CosmeticChangesToolkit:
         return text
 
     def translateAndCapitalizeNamespaces(self, text):
-        """Makes sure that localized namespace names are used."""
+        """Use localized namespace names."""
         # arz uses english stylish codes
         if self.site.sitename() == 'wikipedia:arz':
             return text
@@ -404,7 +409,7 @@ class CosmeticChangesToolkit:
         return text
 
     def translateMagicWords(self, text):
-        """Makes sure that localized namespace names are used."""
+        """Use localized magic words."""
         # not wanted at ru
         # arz uses english stylish codes
         if self.site.code not in ['arz', 'ru']:
@@ -587,10 +592,13 @@ class CosmeticChangesToolkit:
 
     def removeNonBreakingSpaceBeforePercent(self, text):
         """
+        Insert a non-breaking space between number and percent sign.
+
         Newer MediaWiki versions automatically place a non-breaking space in
         front of a percent sign, so it is no longer required to place it
         manually.
 
+        FIXME: which version should this be run on?
         """
         text = textlib.replaceExcept(text, r'(\d)&nbsp;%', r'\1 %',
                                      ['timeline'])
@@ -598,8 +606,8 @@ class CosmeticChangesToolkit:
 
     def cleanUpSectionHeaders(self, text):
         """
-        For better readability of section header source code, puts a space
-        between the equal signs and the title.
+        Add a space between the equal signs and the section title.
+
         Example: ==Section title== becomes == Section title ==
 
         NOTE: This space is recommended in the syntax help on the English and
@@ -614,8 +622,7 @@ class CosmeticChangesToolkit:
 
     def putSpacesInLists(self, text):
         """
-        For better readability of bullet list and enumeration wiki source code,
-        puts a space between the * or # and the text.
+        Add a space between the * or # and the text.
 
         NOTE: This space is recommended in the syntax help on the English,
         German, and French Wikipedia. It might be that it is not wanted on other
@@ -884,6 +891,9 @@ class CosmeticChangesToolkit:
 
 
 class CosmeticChangesBot(Bot):
+
+    """Cosmetic changes bot."""
+
     def __init__(self, generator, **kwargs):
         self.availableOptions.update({
             'async': False,

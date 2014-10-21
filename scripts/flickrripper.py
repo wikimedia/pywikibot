@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-Tool to copy a flickr stream to Commons
+Tool to copy a flickr stream to Commons.
 
 # Get a set to work on (start with just a username).
 # * Make it possible to delimit the set (from/to)
@@ -81,7 +81,7 @@ flickr_allowed_license = {
 
 def getPhoto(flickr=None, photo_id=''):
     """
-    Get the photo info and the photo sizes so we can use these later on
+    Get the photo info and the photo sizes so we can use these later on.
 
     TODO: Add exception handling
 
@@ -100,7 +100,7 @@ def getPhoto(flickr=None, photo_id=''):
 
 def isAllowedLicense(photoInfo=None):
     """
-    Check if the image contains the right license
+    Check if the image contains the right license.
 
     TODO: Maybe add more licenses
     """
@@ -133,7 +133,9 @@ def downloadPhoto(photoUrl=''):
 
 def findDuplicateImages(photo=None,
                         site=pywikibot.Site(u'commons', u'commons')):
-    """ Take the photo, calculate the SHA1 hash and ask the MediaWiki api
+    """ Find duplicate images.
+
+    Take the photo, calculate the SHA1 hash and ask the MediaWiki api
     for a list of duplicates.
 
     TODO: Add exception handling, fix site thing
@@ -155,7 +157,7 @@ def getTags(photoInfo=None):
 
 def getFlinfoDescription(photo_id=0):
     """
-    Get the description from http://wikipedia.ramselehof.de/flinfo.php
+    Get the description from http://wikipedia.ramselehof.de/flinfo.php.
 
     TODO: Add exception handling, try a couple of times
     """
@@ -168,8 +170,9 @@ def getFlinfoDescription(photo_id=0):
 
 
 def getFilename(photoInfo=None, site=None, project=u'Flickr'):
-    """ Build a good filename for the upload based on the username and the
-    title. Prevents naming collisions.
+    """ Build a good filename for the upload based on the username and title.
+
+    Prevents naming collisions.
 
     """
     if not site:
@@ -209,8 +212,9 @@ def getFilename(photoInfo=None, site=None, project=u'Flickr'):
 
 
 def cleanUpTitle(title):
-    """ Clean up the title of a potential MediaWiki page. Otherwise the title of
-    the page might not be allowed by the software.
+    """ Clean up the title of a potential MediaWiki page.
+
+    Otherwise the title of the page might not be allowed by the software.
 
     """
     title = title.strip()
@@ -236,8 +240,9 @@ def cleanUpTitle(title):
 
 def buildDescription(flinfoDescription=u'', flickrreview=False, reviewer=u'',
                      override=u'', addCategory=u'', removeCategories=False):
-    """ Build the final description for the image. The description is based on
-    the info from flickrinfo and improved.
+    """ Build the final description for the image.
+
+    The description is based on the info from flickrinfo and improved.
 
     """
     description = u'== {{int:filedesc}} ==\n%s' % flinfoDescription
@@ -324,6 +329,7 @@ class Tkdialog:
     """ The user dialog. """
 
     def __init__(self, photoDescription, photo, filename):
+        """Constructor."""
         self.root = Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
         self.root.geometry("%ix%i+10-10" % (config.tkhorsize, config.tkvertsize))
@@ -396,9 +402,10 @@ class Tkdialog:
         self.root.destroy()
 
     def run(self):
-        """ Activate the dialog and return the new name and if the image is
-        skipped.
+        """ Activate the dialog.
 
+        @return: new description, name, and if the image is skipped
+        @rtype: tuple of (unicode, unicode, bool)
         """
         self.root.mainloop()
         return self.photoDescription, self.filename, self.skip
@@ -504,7 +511,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
 
 def usage():
     """
-    Print usage information
+    Print usage information.
 
     TODO : Need more.
     """

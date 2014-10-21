@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-Bot which runs python framework scripts as (sub-)bot and provides a
-WikiUserInterface (WUI) with Lua support for bot operators.
+Bot which runs python framework scripts as (sub-)bot.
+
+It provides a WikiUserInterface (WUI) with Lua support for bot operators.
 
 This script needs external libraries (see imports and comments there)
 in order to run properly. Most of them can be checked-out at:
@@ -116,6 +117,9 @@ __sys_argv = []
 
 
 class ScriptWUIBot(pywikibot.botirc.IRCBot):
+
+    """WikiUserInterface bot."""
+
     def __init__(self, *arg):
         pywikibot.output(u'\03{lightgreen}* Initialization of bot\03{default}')
 
@@ -205,6 +209,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 
 # Define a function for the thread
 def main_script(page, rev=None, params=None):
+    """Main thread."""
     # http://opensourcehacker.com/2011/02/23/temporarily-capturing-python-logging-output-to-a-string-buffer/
     # https://docs.python.org/release/2.6/library/logging.html
     from io import StringIO
@@ -261,6 +266,7 @@ def main_script(page, rev=None, params=None):
 
 
 def wiki_logger(buffer, page, rev=None):
+    """Log to wiki."""
     # (might be a problem here for TS and SGE, output string has another encoding)
     #buffer  = buffer.decode(config.console_encoding)
     buffer = re.sub("\03\{(.*?)\}(.*?)\03\{default\}", "\g<2>", buffer)

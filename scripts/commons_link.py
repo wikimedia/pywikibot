@@ -43,6 +43,9 @@ docuReplacements = {
 
 
 class CommonsLinkBot(Bot):
+
+    """Commons linking bot."""
+
     def __init__(self, generator, **kwargs):
         self.availableOptions.update({
             'action': None,

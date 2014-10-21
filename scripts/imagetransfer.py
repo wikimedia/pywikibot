@@ -151,6 +151,9 @@ licenseTemplates = {
 
 
 class ImageTransferBot:
+
+    """Image transfer bot."""
+
     def __init__(self, generator, targetSite=None, interwiki=False,
                  keep_name=False, ignore_warning=False):
         self.generator = generator
@@ -160,11 +163,10 @@ class ImageTransferBot:
         self.ignore_warning = ignore_warning
 
     def transferImage(self, sourceImagePage):
-        """Get a wikilink to an image, download it and its description,
-           and upload it to another wikipedia.
-           Return the filename which was used to upload the image
-           This function is used by imagetransfer.py and by copy_table.py
+        """
+        Download image and its description, and upload it to another site.
 
+        @return: the filename which was used to upload the image
         """
         sourceSite = sourceImagePage.site
         url = sourceImagePage.fileUrl().encode('utf-8')

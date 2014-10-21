@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-This bot cleans a (user) sandbox by replacing the current contents with
-predefined text.
+This bot resets a (user) sandbox with predefined text.
 
 This script understands the following command-line arguments:
 
@@ -137,6 +136,9 @@ user_sandboxTemplate = {
 
 
 class SandboxBot(Bot):
+
+    """Sandbox reset bot."""
+
     availableOptions = {
         'hours': 1,
         'no_repeat': True,
@@ -149,6 +151,7 @@ class SandboxBot(Bot):
     }
 
     def __init__(self, **kwargs):
+        """Constructor."""
         super(SandboxBot, self).__init__(**kwargs)
         if self.getOption('delay') is None:
             d = min(15, max(5, int(self.getOption('hours') * 60)))
@@ -177,6 +180,7 @@ class SandboxBot(Bot):
             sys.exit(0)
 
     def run(self):
+        """Run bot."""
         self.site.login()
         while True:
             wait = False

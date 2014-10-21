@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
+u"""
 Script to help a human solve disambiguations by presenting a set of options.
 
 Specify the disambiguation page on the command line.
@@ -353,6 +353,9 @@ def correctcap(link, text):
 
 
 class ReferringPageGeneratorWithIgnore:
+
+    """Referring Page generator, with an ignore manager."""
+
     def __init__(self, disambPage, primary=False, minimum=0):
         self.disambPage = disambPage
         # if run with the -primary argument, enable the ignore manager
@@ -390,11 +393,14 @@ class ReferringPageGeneratorWithIgnore:
 class PrimaryIgnoreManager(object):
 
     """
+    Primary ignore manager.
+
     If run with the -primary argument, reads from a file which pages should
     not be worked on; these are the ones where the user pressed n last time.
     If run without the -primary argument, doesn't ignore any pages.
 
     """
+
     def __init__(self, disambPage, enabled=False):
         self.disambPage = disambPage
         self.enabled = enabled
@@ -438,6 +444,8 @@ class PrimaryIgnoreManager(object):
 
 class DisambiguationRobot(Bot):
 
+    """Disambiguation bot."""
+
     ignore_contents = {
         'de': (u'{{[Ii]nuse}}',
                u'{{[Ll]öschen}}',
@@ -478,13 +486,15 @@ class DisambiguationRobot(Bot):
         self.setupRegexes()
 
     def checkContents(self, text):
-        '''
+        """
+        Check if the text matches any of the ignore regexes.
+
         For a given text, returns False if none of the regular
         expressions given in the dictionary at the top of this class
         matches a substring of the text.
         Otherwise returns the substring which is matched by one of
         the regular expressions.
-        '''
+        """
         for ig in self.ignore_contents_regexes:
             match = ig.search(text)
             if match:
@@ -531,6 +541,8 @@ class DisambiguationRobot(Bot):
 
     def treat(self, refPage, disambPage):
         """
+        Treat a page.
+
         Parameters:
             disambPage - The disambiguation page or redirect we don't want
                 anything to link to

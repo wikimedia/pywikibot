@@ -2,6 +2,7 @@
 # -*- coding: utf-8  -*-
 """
 With this tool you can add the template {{commonscat}} to categories.
+
 The tool works by following the interwiki links. If the template is present on
 another langauge page, the bot will use it.
 
@@ -236,6 +237,8 @@ msg_change = {
 
 class CommonscatBot(Bot):
 
+    """Commons categorisation bot."""
+
     def __init__(self, generator, always, summary=None):
         super(CommonscatBot, self).__init__(always=always)
         self.generator = generator
@@ -262,6 +265,7 @@ class CommonscatBot(Bot):
     @classmethod
     def getCommonscatTemplate(self, code=None):
         """Get the template name of a site. Expects the site code.
+
         Return as tuple containing the primary template and it's alternatives
 
         """
@@ -271,7 +275,7 @@ class CommonscatBot(Bot):
             return commonscatTemplates[u'_default']
 
     def skipPage(self, page):
-        """Do we want to skip this page?"""
+        """Determine if the page should be skipped."""
         if page.site.code in ignoreTemplates:
             templatesInThePage = page.templates()
             templatesWithParams = page.templatesWithParams()
@@ -288,7 +292,10 @@ class CommonscatBot(Bot):
         return False
 
     def addCommonscat(self, page):
-        """Take a page. Go to all the interwiki page looking for a commonscat
+        """
+        Add CommonsCat template to page.
+
+        Take a page. Go to all the interwiki page looking for a commonscat
         template. When all the interwiki's links are checked and a proper
         category is found add it to the page.
 
@@ -418,7 +425,10 @@ class CommonscatBot(Bot):
         return u''
 
     def getCommonscatLink(self, wikipediaPage=None):
-        """Go through the page and return a tuple of (<templatename>, <target>)"""
+        """Find CommonsCat template on page.
+
+        @rtype: tuple of (<templatename>, <target>)
+        """
         primaryCommonscat, commonscatAlternatives = self.getCommonscatTemplate(
             wikipediaPage.site.code)
         commonscatTemplate = u''
@@ -444,7 +454,8 @@ class CommonscatBot(Bot):
         return None
 
     def checkCommonscatLink(self, name=""):
-        """ This function will return the name of a valid commons category
+        """ Return the name of a valid commons category.
+
         If the page is a redirect this function tries to follow it.
         If the page doesnt exists the function will return an empty string
 

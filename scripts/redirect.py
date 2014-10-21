@@ -1,9 +1,10 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Script to resolve double redirects, and to delete broken redirects. Requires
-access to MediaWiki's maintenance pages or to a XML dump file. Delete
-function requires adminship.
+Script to resolve double redirects, and to delete broken redirects.
+
+Requires access to MediaWiki's maintenance pages or to a XML dump file.
+Delete function requires adminship.
 
 Syntax:
 
@@ -76,6 +77,9 @@ from pywikibot import i18n, xmlreader, Bot
 
 
 class RedirectGenerator:
+
+    """Redirect generator."""
+
     def __init__(self, xmlFilename=None, namespaces=[], offset=-1,
                  use_move_log=False, use_api=False, start=None, until=None,
                  number=None, step=None):
@@ -94,6 +98,8 @@ class RedirectGenerator:
 
     def get_redirects_from_dump(self, alsoGetPageTitles=False):
         """
+        Extract redirects from dump.
+
         Load a local XML dump file, look at all pages which have the
         redirect flag set, and find out where they're pointing at. Return
         a dictionary where the redirect names are the keys and the redirect
@@ -180,10 +186,7 @@ class RedirectGenerator:
                 yield p
 
     def _next_redirect_group(self):
-        """
-        Return a generator that retrieves pageids from the API 500 at a time
-        and yields them as a list
-        """
+        """Generator that yields batches of 500 redirects as a list."""
         apiQ = []
         for page in self.get_redirect_pages_via_api():
             apiQ.append(str(page._pageid))
@@ -195,7 +198,8 @@ class RedirectGenerator:
 
     def get_redirects_via_api(self, maxlen=8):
         """
-        Return a generator that yields tuples of data about redirect Pages:
+        Return a generator that yields tuples of data about redirect Pages.
+
             0 - page title of a redirect page
             1 - type of redirect:
                          0 - broken redirect, target page title missing
@@ -331,7 +335,6 @@ class RedirectGenerator:
     def get_moved_pages_redirects(self):
         """Generate redirects to recently-moved pages."""
         # this will run forever, until user interrupts it
-
         if self.offset <= 0:
             self.offset = 1
         start = (datetime.datetime.utcnow() -
@@ -367,6 +370,9 @@ class RedirectGenerator:
 
 
 class RedirectRobot(Bot):
+
+    """Redirect bot."""
+
     def __init__(self, action, generator, **kwargs):
         self.availableOptions.update({
             'number': None,
@@ -380,10 +386,12 @@ class RedirectRobot(Bot):
         self._valid_template = None
 
     def has_valid_template(self, twtitle):
-        """Check whether a template from translatewiki.net does exist on real
-        wiki. We assume we are always working on self.site
+        """
+        Check whether a template from translatewiki.net exists on the wiki.
 
-        @param twtitle - a sting which is the i18n key
+        We assume we are always working on self.site
+
+        @param twtitle - a string which is the i18n key
 
         """
         if self._valid_template is None:

@@ -74,8 +74,9 @@ def initLists():
 
 
 def categorizeImages(generator, onlyFilter, onlyUncat):
-    """ Loop over all images in generator and try to categorize them. Get
-    category suggestions from CommonSense.
+    """ Loop over all images in generator and try to categorize them.
+
+    Get category suggestions from CommonSense.
 
     """
     for page in generator:
@@ -112,8 +113,9 @@ def getCurrentCats(imagepage):
 
 
 def getCommonshelperCats(imagepage):
-    """ Get category suggestions from CommonSense. Parse them and return a list
-    of suggestions.
+    """ Get category suggestions from CommonSense.
+
+    @rtype: list of unicode
 
     """
     commonshelperCats = []
@@ -212,8 +214,9 @@ def getOpenStreetMapCats(latitude, longitude):
 
 def getOpenStreetMap(latitude, longitude):
     """
-    Get the result from https://nominatim.openstreetmap.org/reverse
-    and put it in a list of tuples to play around with
+    Get the result from https://nominatim.openstreetmap.org/reverse .
+
+    @rtype: list of tuples
     """
     result = []
     gotInfo = False
@@ -246,7 +249,7 @@ def getOpenStreetMap(latitude, longitude):
 
 
 def getCategoryByName(name, parent=u'', grandparent=u''):
-
+    """Get category by name."""
     if not parent == u'':
         workname = name.strip() + u',_' + parent.strip()
         workcat = pywikibot.Category(pywikibot.Site(u'commons', u'commons'), workname)
@@ -336,6 +339,7 @@ def followRedirects(categories):
 
 def filterCountries(categories):
     """ Try to filter out ...by country categories.
+
     First make a list of any ...by country categories and try to find some
     countries. If a by country category has a subcategoy containing one of the
     countries found, add it. The ...by country categories remain in the set and

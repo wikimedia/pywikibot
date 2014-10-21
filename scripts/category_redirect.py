@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""This bot will move pages out of redirected categories
+"""This bot will move pages out of redirected categories.
 
 Usage: category_redirect.py [options]
 
@@ -36,7 +36,10 @@ else:
 
 class CategoryRedirectBot(object):
 
+    """Page category update bot."""
+
     def __init__(self):
+        """Constructor."""
         self.cooldown = 7  # days
         self.site = pywikibot.Site()
         self.catprefix = self.site.namespace(14) + ":"

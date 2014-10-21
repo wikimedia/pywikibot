@@ -1,8 +1,8 @@
 # -*- coding: utf-8  -*-
 """
-This script works similar to solve_disambiguation.py. It is supposed to fix
-links that contain common spelling mistakes. This is only possible on wikis
-that have a template for these misspellings.
+This script fixes links that contain common spelling mistakes.
+
+This is only possible on wikis that have a template for these misspellings.
 
 Command line options:
 
@@ -44,6 +44,8 @@ these misspellings.\n"""
 
 
 class MisspellingRobot(DisambiguationRobot):
+
+    """Spelling bot."""
 
     misspellingTemplate = {
         'da': None,                     # uses simple redirects

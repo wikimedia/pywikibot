@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-This script has the intention to correct all redirect
-links in featured pages or only one page of each wiki.
+Correct all redirect links in featured pages or only one page of each wiki.
 
 Can be using with:
 &params;

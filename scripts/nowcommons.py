@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-Script to delete files that are also present on Wikimedia Commons on a local
-wiki. Do not run this script on Wikimedia Commons itself. It works based on
+Script to delete files that are also present on Wikimedia Commons.
+
+Do not run this script on Wikimedia Commons itself. It works based on
 a given array of templates defined below.
 
 Files are downloaded and compared. If the files match, it can be deleted on
@@ -182,6 +183,9 @@ word_to_skip = {
 
 
 class NowCommonsDeleteBot(Bot):
+
+    """Bot to delete migrated files."""
+
     def __init__(self, **kwargs):
         self.availableOptions.update({
             'replace': False,

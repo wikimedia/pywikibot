@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8  -*-
 """
-This bot replicates all pages (from specific namespaces) in a wiki to a second
-wiki within one family.
+This bot replicates pages in a wiki to a second wiki within one family.
 
 Example:
 python replicate_wiki.py [-r] -ns 10 -f wikipedia -o nl li fy

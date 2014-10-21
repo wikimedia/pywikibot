@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-"""A generic bot to do data ingestion (batch uploading) to Commons"""
+"""A generic bot to do data ingestion (batch uploading) to Commons."""
 #
 # (C) Pywikibot team, 2013
 #
@@ -42,6 +42,7 @@ class Photo(object):
     """
 
     def __init__(self, URL, metadata):
+        """Constructor."""
         self.URL = URL
         self.metadata = metadata
         self.metadata["_url"] = URL
@@ -66,7 +67,9 @@ class Photo(object):
     def findDuplicateImages(self,
                             site=pywikibot.Site(u'commons', u'commons')):
         """
-        Takes the photo, calculates the SHA1 hash and asks the MediaWiki api
+        Find duplicates of the photo.
+
+        Calculates the SHA1 hash and asks the MediaWiki api
         for a list of duplicates.
 
         TODO: Add exception handling, fix site thing
@@ -77,8 +80,12 @@ class Photo(object):
 
     def getTitle(self, fmt):
         """
-        Given a format string with %(name)s entries, returns the string
-        formatted with metadata
+        Populate format string with %(name)s entries using metadata.
+
+        @param fmt: format string
+        @type fmt: unicode
+        @return: formatted string
+        @rtype: unicode
         """
         return fmt % self.metadata
 
@@ -102,6 +109,7 @@ class Photo(object):
 
 
 def CSVReader(fileobj, urlcolumn, *args, **kwargs):
+    """CSV reader."""
     import csv
     reader = csv.DictReader(fileobj, *args, **kwargs)
 
@@ -110,6 +118,9 @@ def CSVReader(fileobj, urlcolumn, *args, **kwargs):
 
 
 class DataIngestionBot:
+
+    """Data ingestion bot."""
+
     def __init__(self, reader, titlefmt, pagefmt,
                  site=pywikibot.Site(u'commons', u'commons')):
         self.reader = reader
