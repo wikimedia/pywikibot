@@ -3150,7 +3150,7 @@ class ItemPage(WikibasePage):
         # clear id, and temporarily store data needed to lazy loading the item
         del i.id
         i._site = page.site
-        i._title = page.title()
+        i._title = page.title(withSection=False)
         if not lazy_load and not i.exists():
             raise pywikibot.NoPage(i)
         return i

@@ -280,6 +280,20 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(item.exists())
 
+    def test_fromPage_noprops_with_section(self):
+        page = pywikibot.Page(self.nyc.site, self.nyc.title() + '#foo')
+        item = pywikibot.ItemPage.fromPage(page)
+        self.assertEqual(item._link._title, '-1')
+        self.assertTrue(hasattr(item, 'id'))
+        self.assertTrue(hasattr(item, '_content'))
+        self.assertEqual(item.title(), 'Q60')
+        self.assertTrue(hasattr(item, '_content'))
+        self.assertEqual(item.id, 'Q60')
+        self.assertEqual(item.getID(), 'Q60')
+        self.assertEqual(item.getID(numeric=True), 60)
+        item.get()
+        self.assertTrue(item.exists())
+
     def test_fromPage_props(self):
         page = self.nyc
         # fetch page properties
