@@ -147,7 +147,7 @@ docuReplacements = {
 }
 
 
-class XmlDumpReplacePageGenerator:
+class XmlDumpReplacePageGenerator(object):
 
     """
     Iterator that will yield Pages that might contain text to replace.
@@ -165,6 +165,7 @@ class XmlDumpReplacePageGenerator:
     """
 
     def __init__(self, xmlFilename, xmlStart, replacements, exceptions):
+        """Constructor."""
         self.xmlFilename = xmlFilename
         self.replacements = replacements
         self.exceptions = exceptions
@@ -182,6 +183,7 @@ class XmlDumpReplacePageGenerator:
         self.parser = dump.parse()
 
     def __iter__(self):
+        """Iterator method."""
         try:
             for entry in self.parser:
                 if self.skipping:
@@ -206,6 +208,11 @@ class XmlDumpReplacePageGenerator:
                 pass
 
     def isTitleExcepted(self, title):
+        """
+        Return True iff one of the exceptions applies for the given title.
+
+        @rtype: bool
+        """
         if "title" in self.exceptions:
             for exc in self.exceptions['title']:
                 if exc.search(title):
@@ -218,6 +225,11 @@ class XmlDumpReplacePageGenerator:
         return False
 
     def isTextExcepted(self, text):
+        """
+        Return True iff one of the exceptions applies for the given text.
+
+        @rtype: bool
+        """
         if "text-contains" in self.exceptions:
             for exc in self.exceptions['text-contains']:
                 if exc.search(text):
@@ -285,7 +297,11 @@ class ReplaceRobot(Bot):
         self.summary = summary
 
     def isTitleExcepted(self, title):
-        """Iff one of the exceptions applies for the given title, returns True."""
+        """
+        Return True iff one of the exceptions applies for the given title.
+
+        @rtype: bool
+        """
         if "title" in self.exceptions:
             for exc in self.exceptions['title']:
                 if exc.search(title):
@@ -379,10 +395,11 @@ class ReplaceRobot(Bot):
                 pywikibot.showDiff(original_text, new_text)
                 if self.acceptall:
                     break
-                choice = pywikibot.inputChoice(
+                choice = pywikibot.input_choice(
                     u'Do you want to accept these changes?',
-                    ['Yes', 'No', 'Edit', 'open in Browser', 'All', 'Quit'],
-                    ['y', 'N', 'e', 'b', 'a', 'q'], 'N')
+                    [('Yes', 'y'), ('No', 'n'), ('Edit', 'e'),
+                     ('open in Browser', 'b'), ('all', 'a')],
+                    default='N')
                 if choice == 'e':
                     editor = editarticle.TextEditor()
                     as_edited = editor.edit(original_text)
@@ -404,8 +421,6 @@ class ReplaceRobot(Bot):
                         break
                     new_text = original_text
                     continue
-                if choice == 'q':
-                    self.quit()
                 if choice == 'a':
                     self.acceptall = True
                 if choice == 'y':
@@ -437,8 +452,8 @@ def prepareRegexForMySQL(pattern):
     pattern = pattern.replace('\w', '[:alnum:]')
 
     pattern = pattern.replace("'", "\\" + "'")
-    #pattern = pattern.replace('\\', '\\\\')
-    #for char in ['[', ']', "'"]:
+    # pattern = pattern.replace('\\', '\\\\')
+    # for char in ['[', ']', "'"]:
     #    pattern = pattern.replace(char, '\%s' % char)
     return pattern
 
