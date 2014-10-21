@@ -43,8 +43,8 @@ class CoordImportRobot(WikidataBot):
             * generator    - A generator that yields Page objects.
 
         """
+        super(CoordImportRobot, self).__init__()
         self.generator = pagegenerators.PreloadingGenerator(generator)
-        self.repo = pywikibot.Site().data_repository()
         self.cacheSources()
         self.prop = 'P625'
 

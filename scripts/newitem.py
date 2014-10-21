@@ -46,7 +46,6 @@ class NewItemRobot(WikidataBot):
 
         super(NewItemRobot, self).__init__(**kwargs)
         self.generator = pagegenerators.PreloadingGenerator(generator)
-        self.repo = pywikibot.Site().data_repository()
         self.pageAge = self.getOption('pageage')
         self.lastEdit = self.getOption('lastedit')
         self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(days=self.pageAge)

@@ -53,11 +53,11 @@ class HarvestRobot(WikidataBot):
             * fields        - A dictionary of fields that are of use to us
 
         """
+        super(HarvestRobot, self).__init__()
         self.generator = pg.PreloadingGenerator(generator)
         self.templateTitle = templateTitle.replace(u'_', u' ')
         # TODO: Make it a list which also includes the redirects to the template
         self.fields = fields
-        self.repo = pywikibot.Site().data_repository()
         self.cacheSources()
         self.templateTitles = self.getTemplateSynonyms(self.templateTitle)
 
