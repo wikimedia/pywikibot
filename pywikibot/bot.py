@@ -1052,6 +1052,14 @@ class WikidataBot(Bot):
     Source claims (P143) can be created for specific sites.
     """
 
+    def __init__(self, **kwargs):
+        super(WikidataBot, self).__init__(**kwargs)
+        self.site = pywikibot.Site()
+        self.repo = self.site.data_repository()
+        if self.repo is None:
+            raise pywikibot.exceptions.WikiBaseError(
+                '%s is not connected to a data repository' % self.site)
+
     def cacheSources(self):
         """
         Fetch the sources from the list on Wikidata.

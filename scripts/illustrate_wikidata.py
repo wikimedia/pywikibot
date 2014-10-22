@@ -40,9 +40,9 @@ class IllustrateRobot(WikidataBot):
             * wdproperty    - The property to add. Should be of type commonsMedia
 
         """
+        super(IllustrateRobot, self).__init__()
         self.generator = pg.PreloadingGenerator(generator)
         self.wdproperty = wdproperty
-        self.repo = pywikibot.Site().data_repository()
         self.cacheSources()
 
         claim = pywikibot.Claim(self.repo, self.wdproperty)

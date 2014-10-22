@@ -81,10 +81,10 @@ class ClaimRobot(WikidataBot):
             * exists_arg   - String specifying how to handle duplicate claims
 
         """
+        super(ClaimRobot, self).__init__()
         self.generator = generator
         self.claims = claims
         self.exists_arg = exists_arg
-        self.repo = pywikibot.Site().data_repository()
         self.cacheSources()
         if self.exists_arg:
             pywikibot.output('\'exists\' argument set to \'%s\'' % self.exists_arg)
