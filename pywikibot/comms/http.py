@@ -48,12 +48,18 @@ if sys.version_info[0] == 2:
     elif httplib2.__version__ == '0.6.0':
         from httplib2 import ServerNotFoundError as SSLHandshakeError
 
+    # The OpenSSL error code for
+    #   certificate verify failed
+    # cf. `openssl errstr 14090086`
+    SSL_CERT_VERIFY_FAILED_MSG = ":14090086:"
+
     import Queue
     import urlparse
     import cookielib
     from urllib2 import quote
 else:
     from ssl import SSLError as SSLHandshakeError
+    SSL_CERT_VERIFY_FAILED_MSG = "SSL: CERTIFICATE_VERIFY_FAILED"
     import queue as Queue
     import urllib.parse as urlparse
     from http import cookiejar as cookielib
@@ -69,12 +75,6 @@ _logger = "comm.http"
 
 
 # global variables
-
-# The OpenSSL error code for
-#   certificate verify failed
-# cf. `openssl errstr 14090086`
-SSL_CERT_VERIFY_FAILED = ":14090086:"
-
 
 numthreads = 1
 threads = []
@@ -250,7 +250,7 @@ def request(site=None, uri=None, *args, **kwargs):
 
     # TODO: do some error correcting stuff
     if isinstance(request.data, SSLHandshakeError):
-        if SSL_CERT_VERIFY_FAILED in str(request.data):
+        if SSL_CERT_VERIFY_FAILED_MSG in str(request.data):
             raise FatalServerError(str(request.data))
 
     # if all else fails
