@@ -43,7 +43,7 @@ import tests
 from tests import unittest, patch_request, unpatch_request
 
 
-class TestCaseBase(object):
+class TestCaseBase(unittest.TestCase):
 
     """Base class for all tests."""
 
@@ -116,7 +116,7 @@ class DisableSiteMixin(TestCaseBase):
         pywikibot.Site = self.old_Site_lookup_method
 
 
-class ForceCacheMixin(object):
+class ForceCacheMixin(TestCaseBase):
 
     """Aggressively cached API test cases.
 
@@ -137,7 +137,7 @@ class ForceCacheMixin(object):
         unpatch_request()
 
 
-class CacheInfoMixin(object):
+class CacheInfoMixin(TestCaseBase):
 
     """Report cache hits and misses."""
 
@@ -387,7 +387,7 @@ class MetaTestCaseClass(type):
         return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
 
 
-class TestCase(TestTimerMixin, TestCaseBase, unittest.TestCase):
+class TestCase(TestTimerMixin, TestCaseBase):
 
     """Run tests on multiple sites."""
 
