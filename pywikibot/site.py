@@ -1058,6 +1058,9 @@ class Siteinfo(Container):
                 action='query',
                 meta='siteinfo',
                 siprop='|'.join(props))
+            # With 1.25wmf5 it'll require continue or rawcontinue. As we don't
+            # continue anyway we just always use continue.
+            request['continue'] = ''
             # warnings are handled later
             request._warning_handler = warn_handler
             data = request.submit()

@@ -196,6 +196,8 @@ class Request(MutableMapping):
     >>> data = r.submit()  # doctest: +IGNORE_UNICODE
     >>> isinstance(data, dict)
     True
+    >>> set(['query', 'batchcomplete', 'warnings']).issuperset(data.keys())
+    True
     >>> 'query' in data
     True
     >>> sorted(data[u'query'].keys())  # doctest: +IGNORE_UNICODE
@@ -376,6 +378,13 @@ class Request(MutableMapping):
                     inprop = self._params.get("inprop", [])
                     info = set(inprop + ["protection", "talkid", "subjectid"])
                     self._params["info"] = list(info)
+            # When neither 'continue' nor 'rawcontinue' is present and the
+            # version number is at least 1.25wmf5 we add a dummy rawcontinue
+            # parameter. Querying siteinfo is save as it adds 'continue'.
+            if ('continue' not in self._params and
+                    'rawcontinue' not in self._params and
+                    LV(self.site.version()) >= LV('1.25wmf5')):
+                self._params['rawcontinue'] = ['']
         if "maxlag" not in self._params and config.maxlag:
             self._params["maxlag"] = [str(config.maxlag)]
         if "format" not in self._params:
@@ -828,7 +837,7 @@ class QueryGenerator(object):
     """Base class for iterators that handle responses to API action=query.
 
     By default, the iterator will iterate each item in the query response,
-    and use the query-continue element, if present, to continue iterating as
+    and use the (query-)continue element, if present, to continue iterating as
     long as the wiki returns additional values.  However, if the iterator's
     limit attribute is set to a positive int, the iterator will stop after
     iterating that many values. If limit is negative, the limit parameter
@@ -868,6 +877,14 @@ class QueryGenerator(object):
                         % self.__class__.__name__)
 
         kwargs["indexpageids"] = ""  # always ask for list of pageids
+        if LV(self.site.version()) < LV('1.21'):
+            self.continue_name = 'query-continue'
+            self.continue_update = self._query_continue
+        else:
+            self.continue_name = 'continue'
+            self.continue_update = self._continue
+            # Explicitly enable the simplified continuation
+            kwargs['continue'] = ''
         self.request = Request(**kwargs)
         self.prefix = None
         self.api_limit = None
@@ -881,7 +898,7 @@ class QueryGenerator(object):
         else:                               # to look for when iterating
             self.resultkey = self.module
 
-        # usually the query-continue key is the same as the querymodule,
+        # usually the (query-)continue key is the same as the querymodule,
         # but not always
         # API can return more than one query-continue key, if multiple properties
         # are requested by the query, e.g.
@@ -1003,6 +1020,26 @@ class QueryGenerator(object):
                     self.request[self.prefix + "namespace"] = namespaces
                     return
 
+    def _query_continue(self):
+        if all(key not in self.data[self.continue_name]
+               for key in self.continuekey):
+            pywikibot.log(
+                u"Missing '%s' key(s) in ['%s'] value."
+                % (self.continuekey, self.continue_name))
+            return True
+        for query_continue_pair in self.data['query-continue'].values():
+            self._add_continues(query_continue_pair)
+
+    def _continue(self):
+        self._add_continues(self.data['continue'])
+
+    def _add_continues(self, continue_pair):
+        for key, value in continue_pair.items():
+            # query-continue can return ints (continue too?)
+            if isinstance(value, int):
+                value = str(value)
+            self.request[key] = value
+
     def __iter__(self):
         """Submit request and iterate the response based on self.resultkey.
 
@@ -1023,7 +1060,7 @@ class QueryGenerator(object):
                         # self.resultkey in data in last request.submit()
                         new_limit = min(self.query_limit, self.limit - count)
                     else:
-                        # only "query-continue" returned. See Bug 72209.
+                        # only "(query-)continue" returned. See Bug 72209.
                         # increase new_limit to advance faster until new
                         # useful data are found again.
                         new_limit = min(new_limit * 2, self.query_limit)
@@ -1117,35 +1154,25 @@ class QueryGenerator(object):
                 # self.resultkey in data in last request.submit()
                 previous_result_had_data = True
             else:
-                # if query-continue is present, self.resultkey might not have been
-                # fetched yet
-                if "query-continue" not in self.data:
+                # if (query-)continue is present, self.resultkey might not have
+                # been fetched yet
+                if self.continue_name not in self.data:
                     # No results.
                     return
                 # self.resultkey not in data in last request.submit()
-                # only "query-continue" was retrieved.
+                # only "(query-)continue" was retrieved.
                 previous_result_had_data = False
             if self.module == "random" and self.limit:
-                # "random" module does not return "query-continue"
+                # "random" module does not return "(query-)continue"
                 # now we loop for a new random query
                 del self.data  # a new request is needed
                 continue
-            if "query-continue" not in self.data:
+            if self.continue_name not in self.data:
                 return
-            if all(key not in self.data["query-continue"] for key in self.continuekey):
-                pywikibot.log(
-                    u"Missing '%s' key(s) in ['query-continue'] value."
-                    % self.continuekey)
+            if self.continue_update():
                 return
-            query_continue_pairs = self.data["query-continue"].values()
-            for query_continue_pair in query_continue_pairs:
-                for key, value in query_continue_pair.items():
-                    # query-continue can return ints
-                    if isinstance(value, int):
-                        value = str(value)
-                    self.request[key] = value
 
-            del self.data  # a new request with query-continue is needed
+            del self.data  # a new request with (query-)continue is needed
 
     def result(self, data):
         """Process result data as needed for particular subclass."""
