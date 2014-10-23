@@ -78,9 +78,8 @@ class NewItemRobot(WikidataBot):
                 % (page, page.editTime().isoformat()))
             return
 
-        (revId, revTimestamp, revUser,
-         revComment) = page.getVersionHistory(reverseOrder=True, total=1)[0]
-        if revTimestamp > self.pageAgeBefore:
+        rev = page.getVersionHistory(reverseOrder=True, total=1)[0]
+        if rev.timestamp > self.pageAgeBefore:
             pywikibot.output(
                 u'Page creation of %s on %s is too recent. Skipping.'
                 % (page, page.editTime().isoformat()))
