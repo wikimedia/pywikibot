@@ -246,14 +246,14 @@ class NowCommonsDeleteBot(Bot):
                 webbrowser.open(url_local, 0, 1)
                 webbrowser.open(url_commons, 0, 1)
                 if image_local.split('Image:')[1] == image_commons:
-                    choice = pywikibot.inputChoice(
-                        u'The local and the commons images have the same name, continue?',
-                        ['Yes', 'No'], ['y', 'N'], 'N')
+                    choice = pywikibot.input_yn(
+                        u'The local and the commons images have the same name, '
+                        'continue?', default=False, automatic_quit=False)
                 else:
-                    choice = pywikibot.inputChoice(
+                    choice = pywikibot.input_yn(
                         u'Are the two images equal?',
-                        ['Yes', 'No'], ['y', 'N'], 'N')
-                if choice == 'y':
+                        default=False, automatic_quit=False)
+                if choice:
                     yield [image_local, image_commons]
                 else:
                     continue
@@ -413,11 +413,11 @@ class NowCommonsDeleteBot(Bot):
                                 u'\n\n>>>> Description on \03{lightpurple}%s\03{default} <<<<\n'
                                 % commonsImagePage.title())
                             pywikibot.output(commonsText)
-                            choice = pywikibot.inputChoice(u'Does the description \
-                                                           on Commons contain all required source and license\n'
-                                                           u'information?',
-                                                           ['yes', 'no'], ['y', 'N'], 'N')
-                            if choice == 'y':
+                            if pywikibot.input_yn(
+                                    u'Does the description on Commons contain '
+                                    'all required source and license\n'
+                                    'information?',
+                                    default=False, automatic_quit=False):
                                 localImagePage.delete(
                                     '%s [[:commons:Image:%s]]'
                                     % (comment, filenameOnCommons), prompt=False)

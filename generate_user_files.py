@@ -98,7 +98,7 @@ your operating system. See your operating system documentation for how to
 set environment variables.""" % locals(), width=76)
     for line in msg:
         pywikibot.output(line)
-    if pywikibot.inputChoice("Is this OK?", ["yes", "no"], ["y", "n"], "n") == "y":
+    if pywikibot.input_yn('Is this OK?', default=False, automatic_quit=False):
         return new_base
     pywikibot.output("Aborting changes.")
     return False
@@ -170,10 +170,10 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
     while not mylang:
         mylang = pywikibot.input(message) or default_lang
         if known_langs and mylang and mylang not in known_langs:
-            if pywikibot.inputChoice("The language code {0} is not in the "
-                                     "list of known languages. Do you want to "
-                                     "continue?".format(mylang),
-                                     ["yes", "no"], ["y", "n"], "n") == "n":
+            if not pywikibot.input_yn("The language code {0} is not in the "
+                                      "list of known languages. Do you want "
+                                      "to continue?".format(mylang),
+                                      default=False, automatic_quit=False):
                 mylang = None
 
     username = None
@@ -250,8 +250,8 @@ def create_user_config():
         main_family, main_lang, main_username = get_site_and_lang()
 
         usernames = [(main_family, main_lang, main_username)]
-        while pywikibot.inputChoice("Do you want to add any other projects?",
-                                    ["yes", "no"], ["y", "n"], "n") == "y":
+        while pywikibot.input_yn("Do you want to add any other projects?",
+                                 default=False, automatic_quit=False):
             usernames += [get_site_and_lang(main_family, main_lang,
                                             main_username)]
 
@@ -259,9 +259,9 @@ def create_user_config():
             u"usernames['{0}']['{1}'] = u'{2}'".format(*username)
             for username in usernames)
 
-        extended = pywikibot.inputChoice(
-            "Which variant of user_config.py?",
-            ["small", "extended (with further information)"], ["s", "e"]) == "e"
+        extended = pywikibot.input_yn("Would you like the extended version of "
+                                      "user-config.py, with explanations "
+                                      "included?", automatic_quit=False)
 
         if extended:
             # config2.py will be in the pywikibot/ directory relative to this
@@ -321,8 +321,8 @@ fixes['example'] = {
 if __name__ == "__main__":
     while True:
         pywikibot.output(u'\nYour default user directory is "%s"' % base_dir)
-        if pywikibot.inputChoice("How to proceed?", ["keep", "change"],
-                                 ["k", "c"], "k") == "c":
+        if pywikibot.input_yn("Do you want to use that directory?",
+                              default=False, automatic_quit=False):
             new_base = change_base_dir()
             if new_base:
                 base_dir = new_base
@@ -335,9 +335,10 @@ if __name__ == "__main__":
     while True:
         if os.path.exists(os.path.join(base_dir, "user-config.py")):
             break
-        if pywikibot.inputChoice(
+        if pywikibot.input_yn(
                 "Do you want to copy user files from an existing Pywikibot "
-                "installation?", ["yes", "no"], ["y", "n"]) == "y":
+                "installation?",
+                automatic_quit=False):
             oldpath = pywikibot.input("Path to existing user-config.py?")
             if not os.path.exists(oldpath):
                 pywikibot.error("Not a valid path")
@@ -361,16 +362,16 @@ if __name__ == "__main__":
         else:
             break
     if not os.path.isfile(os.path.join(base_dir, "user-config.py")):
-        if pywikibot.inputChoice("Create user-config.py file? Required for "
-                                 "running bots.",
-                                 ["yes", "no"], ["y", "n"], "n") == "y":
+        if pywikibot.input_yn('Create user-config.py file? Required for '
+                              'running bots.',
+                              default=False, automatic_quit=False):
             create_user_config()
     elif not copied_config:
         pywikibot.output("user-config.py already exists in the directory")
     if not os.path.isfile(os.path.join(base_dir, "user-fixes.py")):
-        if pywikibot.inputChoice("Create user-fixes.py file? Optional and for "
-                                 "advanced users.",
-                                 ["yes", "no"], ["y", "n"], "n") == "y":
+        if pywikibot.input_yn('Create user-fixes.py file? Optional and for '
+                              'advanced users.',
+                              default=False, automatic_quit=False):
             create_user_fixes()
     elif not copied_fixes:
         pywikibot.output("user-fixes.py already exists in the directory")

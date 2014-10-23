@@ -277,10 +277,8 @@ class TemplateRobot(Bot):
                 template = pywikibot.Page(site, new, ns=10)
                 if not template.exists():
                     pywikibot.warning(u'Template "%s" does not exist.' % new)
-                    choice = pywikibot.inputChoice(
-                        u'Do you want to proceed anyway?',
-                        ['Yes', 'No'], ['y', 'N'], 'N')
-                    if choice == 'n':
+                    if not pywikibot.input_yn('Do you want to proceed anyway?',
+                                              default=False, automatic_quit=False):
                         continue
                 replacements.append((templateRegex,
                                      '{{%s\g<parameters>}}' % new))

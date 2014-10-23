@@ -100,9 +100,10 @@ def main(*args):
         if always:
             answer = "y"
         else:
-            answer = pywikibot.inputChoice(u'\nDelete the red lines?',
-                                           ['yes', 'no', 'edit'],
-                                           ['y', 'N', 'e'], 'n')
+            answer = pywikibot.input_choice(
+                u'\nDelete the red lines?',
+                [('yes', 'y'), ('no', 'n'), ('edit', 'e')],
+                'n', automatic_quit=False)
         if answer == "n":
             continue
         elif answer == "e":

@@ -104,11 +104,10 @@ class UnlinkBot(Bot):
                     text[max(0, match.start() - context):match.start()]
                     + '\03{lightred}' + text[match.start():match.end()]
                     + '\03{default}' + text[match.end():match.end() + context])
-                choice = pywikibot.inputChoice(
+                choice = pywikibot.input_choice(
                     u'\nWhat shall be done with this link?\n',
-                    ['unlink', 'skip', 'edit', 'more context',
-                     'unlink all', 'quit'],
-                    ['U', 's', 'e', 'm', 'a', 'q'], 'u')
+                    [('unlink', 'u'), ('skip', 's'), ('edit', 'e'),
+                     ('more context', 'm'), ('unlink all', 'a')], 'u')
                 pywikibot.output(u'')
 
                 if choice == 's':
@@ -128,8 +127,6 @@ class UnlinkBot(Bot):
                                                context=context + 100)
                 elif choice == 'a':
                     self.options['always'] = True
-                elif choice == 'q':
-                    self.quit()
             new = match.group('label') or match.group('title')
             new += match.group('linktrail')
             return text[:match.start()] + new + text[match.end():], False

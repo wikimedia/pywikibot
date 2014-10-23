@@ -55,7 +55,6 @@ class SelflinkBot(Bot):
             r'(?P<section>#[^\]\|]*)?'
             '(\|(?P<label>[^\]]*))?\]\]'
             r'(?P<linktrail>' + linktrail + ')')
-        self.done = False
 
     def handleNextLink(self, page, match, context=100):
         """Process the next link on a page, offering the user choices.
@@ -97,11 +96,10 @@ class SelflinkBot(Bot):
             matchText = match.group(0)
             pywikibot.output(
                 pre + '\03{lightred}' + matchText + '\03{default}' + post)
-            choice = pywikibot.inputChoice(
+            choice = pywikibot.input_choice(
                 u'\nWhat shall be done with this selflink?\n',
-                ['unlink', 'make bold', 'skip', 'edit', 'more context',
-                 'unlink all', 'quit'],
-                ['U', 'b', 's', 'e', 'm', 'a', 'q'], 'u')
+                [('unlink', 'u'), ('make bold', 'b'), ('skip', 's'),
+                 ('edit', 'e'), ('more context', 'm'), ('unlink all')], 'u')
             pywikibot.output(u'')
 
             if choice == 's':
@@ -121,9 +119,6 @@ class SelflinkBot(Bot):
                 return self.handleNextLink(page, match, context=context + 100)
             elif choice == 'a':
                 self.always = True
-            elif choice == 'q':
-                self.done = True
-                return False
 
         # choice was 'U', 'b', or 'a'
         new = match.group('label') or match.group('title')
@@ -151,7 +146,7 @@ class SelflinkBot(Bot):
                     % page.title(asLink=True))
                 return
             curpos = 0
-            while curpos < len(page.text) or self.done:
+            while curpos < len(page.text):
                 match = self.linkR.search(page.text, pos=curpos)
                 if not match:
                     break
@@ -176,12 +171,6 @@ class SelflinkBot(Bot):
                              % page.title(asLink=True))
         except pywikibot.LockedPage:
             pywikibot.output(u"Page %s is locked." % page.title(asLink=True))
-
-    def run(self):
-        for page in self.generator:
-            if self.done:
-                break
-            self.treat(page)
 
 
 def main(*args):

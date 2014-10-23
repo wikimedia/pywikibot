@@ -563,10 +563,11 @@ class WelcomeBot(object):
         #Queue process
         if name:
             if globalvar.confirm:
-                answer = pywikibot.inputChoice(
+                answer = pywikibot.input_choice(
                     u'%s may have an unwanted username, do you want to report '
                     u'this user?' % name,
-                    ['Yes', 'No', 'All'], ['y', 'N', 'a'], 'N')
+                    [('Yes', 'y'), ('No', 'n'), ('All', 'a')], 'n',
+                    automatic_quit=False)
                 if answer in ['a', 'all']:
                     answer = 'y'
                     globalvar.confirm = False

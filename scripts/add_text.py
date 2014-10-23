@@ -222,10 +222,10 @@ Match was: %s''' % result)
         # text in the page
         if putText:
             if not always:
-                choice = pywikibot.inputChoice(
+                choice = pywikibot.input_choice(
                     u'Do you want to accept these changes?',
-                    ['Yes', 'No', 'All', 'open in Browser'],
-                    ['y', 'n', 'a', 'b'], 'n')
+                    [('Yes', 'y'), ('No', 'n'), ('All', 'a'),
+                     ('open in Browser', 'b')], 'n', automatic_quit=False)
                 if choice == 'a':
                     always = True
                 elif choice == 'n':

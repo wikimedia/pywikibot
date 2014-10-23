@@ -111,10 +111,9 @@ class BasicBot:
             pywikibot.showDiff(page.get(), text)
             pywikibot.output(u'Comment: %s' % comment)
             if not self.dry:
-                choice = pywikibot.inputChoice(
-                    u'Do you want to accept these changes?',
-                    ['Yes', 'No'], ['y', 'N'], 'N')
-                if choice == 'y':
+                if pywikibot.input_yn(
+                        u'Do you want to accept these changes?',
+                        default=False, automatic_quit=False):
                     try:
                         page.text = text
                         # Save the page

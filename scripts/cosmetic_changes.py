@@ -938,7 +938,6 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    answer = 'y'
     options = {}
 
     # Process global args and prepare generator args parser
@@ -972,11 +971,9 @@ def main(*args):
 
     gen = genFactory.getCombinedGenerator()
     if gen:
-        if not options.get('always'):
-            answer = pywikibot.inputChoice(
+        if options.get('always') or pywikibot.input_yn(
                 warning + '\nDo you really want to continue?',
-                ['yes', 'no'], ['y', 'n'], 'n')
-        if answer == 'y':
+                default=False, automatic_quit=False):
             site.login()
             preloadingGen = pagegenerators.PreloadingGenerator(gen)
             bot = CosmeticChangesBot(preloadingGen, **options)
