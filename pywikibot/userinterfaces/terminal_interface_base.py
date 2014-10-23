@@ -232,9 +232,9 @@ class UI:
             options. If default is not a shortcut, it'll return -1.
         @rtype: int (if not return_shortcut), lowercased basestring (otherwise)
         """
+        options = list(options)
         if len(options) == 0:
             raise ValueError(u'No options are given.')
-        options = list(options)
         if automatic_quit is True:
             options += [('Quit', 'q')]
             quit_index = len(options) - 1
