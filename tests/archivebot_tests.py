@@ -70,7 +70,7 @@ class TestArchiveBot(TestCase):
             self.assertIsInstance(thread.content, basestring)
             self.assertIsInstance(thread.timestamp, datetime)
 
-    expected_failures = ['ar', 'pdc', 'th']
+    expected_failures = ['ar', 'pdc', 'th', 'uz']
     # expected failures - should be fixed
     # 'ar': Uses Arabic acronym for TZ
     # 'pdc': changed month name setting in wiki over time (?)
@@ -78,6 +78,7 @@ class TestArchiveBot(TestCase):
     #   <message name="feb" xml:space="preserve">Han.</message>.
     #   for new entries it should work
     # 'th': year is 2552 while regex assumes 19..|20.., might be fixed
+    # 'uz': a dash between day and month (24-Oktabr)
 
 
 if __name__ == '__main__':
