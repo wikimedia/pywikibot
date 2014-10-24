@@ -1064,8 +1064,8 @@ class QueryGenerator(object):
                 return
             if "query" not in self.data:
                 pywikibot.debug(
-                    u"%s: stopped iteration because 'query' not found in api response."
-                    % (self.__class__.__name__, self.resultkey),
+                    u"%s: stopped iteration because 'query' not found in api "
+                    u"response." % self.__class__.__name__,
                     _logger)
                 pywikibot.debug(unicode(self.data), _logger)
                 return
