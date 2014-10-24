@@ -196,8 +196,8 @@ class Request(MutableMapping):
     >>> data = r.submit()  # doctest: +IGNORE_UNICODE
     >>> isinstance(data, dict)
     True
-    >>> sorted(data.keys())  # doctest: +IGNORE_UNICODE
-    ['query']
+    >>> 'query' in data
+    True
     >>> sorted(data[u'query'].keys())  # doctest: +IGNORE_UNICODE
     ['namespaces', 'userinfo']
 
