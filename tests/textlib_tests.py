@@ -211,6 +211,24 @@ class TestTemplatesInCategory(TestCase):
         self.assertRaises(pywikibot.InvalidTitle, textlib.getCategoryLinks,
                           '[[Category:nasty{{{!}}]]', self.site)
 
+
+class TestLocalDigits(TestCase):
+
+    """Test to verify that local digits are correctly being handled."""
+
+    net = False
+
+    def test_to_local(self):
+        self.assertEqual(textlib.to_local_digits(299792458, 'en'), 299792458)
+        self.assertEqual(
+            textlib.to_local_digits(299792458, 'fa'), u"۲۹۹۷۹۲۴۵۸")
+        self.assertEqual(
+            textlib.to_local_digits(
+                u"299792458 flash", 'fa'), u"۲۹۹۷۹۲۴۵۸ flash")
+        self.assertEqual(
+            textlib.to_local_digits(
+                "299792458", 'km'), u"២៩៩៧៩២៤៥៨")
+
 if __name__ == '__main__':
     try:
         unittest.main()

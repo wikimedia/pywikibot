@@ -105,6 +105,7 @@ from math import ceil
 import pywikibot
 from pywikibot import i18n
 from pywikibot.textlib import TimeStripper
+from pywikibot.textlib import to_local_digits
 
 ZERO = datetime.timedelta(0)
 
@@ -466,16 +467,19 @@ class PageArchiver(object):
             why = t.should_be_archived(self)
             if why:
                 archive = self.get_attr('archive')
+                lang = self.site.lang
                 params = {
-                    'counter': arch_counter,
-                    'year': t.timestamp.year,
-                    'isoyear': t.timestamp.isocalendar()[0],
-                    'isoweek': t.timestamp.isocalendar()[1],
-                    'quarter': int(ceil(float(t.timestamp.month) / 3)),
-                    'month': t.timestamp.month,
+                    'counter': to_local_digits(arch_counter, lang),
+                    'year': to_local_digits(t.timestamp.year, lang),
+                    'isoyear': to_local_digits(t.timestamp.isocalendar()[0], lang),
+                    'isoweek': to_local_digits(t.timestamp.isocalendar()[1], lang),
+                    'quarter': to_local_digits(
+                        int(ceil(float(t.timestamp.month) / 3)), lang),
+                    'month': to_local_digits(t.timestamp.month, lang),
                     'monthname': self.month_num2orig_names[t.timestamp.month]['long'],
                     'monthnameshort': self.month_num2orig_names[t.timestamp.month]['short'],
-                    'week': int(time.strftime('%W', t.timestamp.timetuple())),
+                    'week': to_local_digits(
+                        int(time.strftime('%W', t.timestamp.timetuple())), lang),
                 }
                 archive = pywikibot.Page(self.site, archive % params)
                 if self.feed_archive(archive, t, max_arch_size, params):
