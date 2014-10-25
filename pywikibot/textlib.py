@@ -1272,6 +1272,8 @@ class TimeStripper(object):
             self.pdayR,
         ]
 
+        self.linkP = compileLinkR()
+
     def findmarker(self, text, base=u'@@', delta='@'):
         """Find a string which is not part of text."""
         while base in text:
@@ -1323,6 +1325,11 @@ class TimeStripper(object):
         """
         # match date fields
         dateDict = dict()
+        # Remove parts that are not supposed to contain the timestamp, in order
+        # to reduce false positives.
+        line = removeDisabledParts(line)
+        line = self.linkP.sub('', line)  # remove external links
+
         line = self.fix_digits(line)
         for pat in self.patterns:
             line, matchDict = self.last_match_and_replace(line, pat)
