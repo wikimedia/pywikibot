@@ -2344,7 +2344,7 @@ class APISite(BaseSite):
         target_title = u'%(title)s%(section)s' % redirmap[title]
         if target_title == title or "pages" not in result['query']:
             # no "pages" element indicates a circular redirect
-            raise pywikibot.CircularRedirect(target_title)
+            raise pywikibot.CircularRedirect(page)
         pagedata = list(result['query']['pages'].values())[0]
         # there should be only one value in 'pages', and it is the target
         if self.sametitle(pagedata['title'], target_title):
