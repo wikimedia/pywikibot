@@ -63,17 +63,18 @@ reNamespace = re.compile("^(.+?) *: *(.*)$")
 # Note: Link objects (defined later on) represent a wiki-page's title, while
 # Page objects (defined here) represent the page itself, including its contents.
 
-class Page(pywikibot.UnicodeMixin, ComparableMixin):
+class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
 
-    """Page: A MediaWiki page.
+    """BasePage: Base object for a MediaWiki page.
 
     This object only implements internally methods that do not require
     reading from or writing to the wiki.  All other methods are delegated
     to the Site object.
 
+    Will be subclassed by Page and WikibasePage.
+
     """
 
-    @deprecated_args(insite=None, defaultNamespace="ns")
     def __init__(self, source, title=u"", ns=0):
         """Instantiate a Page object.
 
@@ -105,6 +106,9 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         @type ns: int
 
         """
+        if title is None:
+            raise ValueError(u'Title cannot be None.')
+
         if isinstance(source, pywikibot.site.BaseSite):
             self._link = Link(title, source=source, defaultNamespace=ns)
             self._revisions = {}
@@ -1815,6 +1819,21 @@ class Page(pywikibot.UnicodeMixin, ComparableMixin):
         pywikibot.warning(u"Page.replaceImage() is no longer supported.")
 
 
+class Page(BasePage):
+
+    """Page: A MediaWiki page."""
+
+    @deprecate_arg("insite", None)
+    @deprecate_arg("defaultNamespace", "ns")
+    def __init__(self, source, title=u"", ns=0):
+        """Instantiate a Page object."""
+        if isinstance(source, pywikibot.site.BaseSite):
+            if not title:
+                raise ValueError(u'Title must be specified and not empty '
+                                 'if source is a Site.')
+        super(Page, self).__init__(source, title, ns)
+
+
 class FilePage(Page):
 
     """A subclass of Page representing a file description page.
@@ -1825,7 +1844,7 @@ class FilePage(Page):
     @deprecate_arg("insite", None)
     def __init__(self, source, title=u""):
         """Constructor."""
-        Page.__init__(self, source, title, 6)
+        super(FilePage, self).__init__(source, title, 6)
         if self.namespace() != 6:
             raise ValueError(u"'%s' is not in the file namespace!" % title)
 
@@ -2606,7 +2625,7 @@ class User(Page):
                    )
 
 
-class WikibasePage(Page):
+class WikibasePage(BasePage):
 
     """
     The base page for the Wikibase extension.
@@ -2679,7 +2698,7 @@ class WikibasePage(Page):
                 self._namespace = entity_type_ns
                 kwargs['ns'] = self._namespace.id
 
-        Page.__init__(self, site, title, **kwargs)
+        super(WikibasePage, self).__init__(site, title, **kwargs)
 
         # If a title was not provided,
         # avoid checks which may cause an exception.
@@ -3066,7 +3085,7 @@ class ItemPage(WikibasePage):
                       -1 or None for an empty item.
         @type title: str
         """
-        # Special case for empty item
+        # Special case for empty item.
         if title is None or title == '-1':
             super(ItemPage, self).__init__(site, u'-1', ns=site.item_namespace)
             self.id = u'-1'

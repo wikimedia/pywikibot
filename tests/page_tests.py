@@ -96,7 +96,7 @@ class TestLinkObject(TestCase):
                 ]
 
     def testNamespaces(self):
-        """Test that Link() normalizes namespace names"""
+        """Test that Link() normalizes namespace names."""
         for num in self.namespaces:
             for prefix in self.namespaces[num]:
                 l = pywikibot.page.Link(prefix + list(self.titles.keys())[0],
@@ -108,7 +108,7 @@ class TestLinkObject(TestCase):
                 self.assertEqual(m.namespace, num)
 
     def testTitles(self):
-        """Test that Link() normalizes titles"""
+        """Test that Link() normalizes titles."""
         for title in self.titles:
             for num in (0, 1):
                 l = pywikibot.page.Link(self.namespaces[num][0] + title,
@@ -255,12 +255,12 @@ class TestPageObject(DefaultSiteTestCase):
     cached = True
 
     def testSite(self):
-        """Test site() method"""
+        """Test site() method."""
         mainpage = self.get_mainpage()
         self.assertEqual(mainpage.site, self.site)
 
     def testNamespace(self):
-        """Test namespace() method"""
+        """Test namespace() method."""
         mainpage = self.get_mainpage()
         maintalk = mainpage.toggleTalkPage()
 
@@ -270,6 +270,35 @@ class TestPageObject(DefaultSiteTestCase):
 
         badpage = self.get_missing_article()
         self.assertEqual(badpage.namespace(), 0)
+
+    def testBasePageConstructor(self):
+        """Test BasePage constructor."""
+        site = self.get_site()
+
+        # Should not raise an error as the constructor only requires
+        # the site parameter, with the title parameter defaulted to
+        # empty string
+        page = pywikibot.page.BasePage(site)
+        self.assertEqual(page.title(), u'')
+        page = pywikibot.page.BasePage(site, title=u'')
+        self.assertEqual(page.title(), u'')
+        self.assertRaises(ValueError, pywikibot.page.BasePage, site, title=None)
+
+    def testPageConstructor(self):
+        """Test Page constructor."""
+        site = self.get_site()
+        mainpage = self.get_mainpage()
+
+        # Test that Page() needs a title when Site is used as source.
+        self.assertRaises(ValueError, pywikibot.Page, site)
+        self.assertRaises(ValueError, pywikibot.Page, site, '')
+
+        # Test Page as source.
+        p1 = pywikibot.Page(mainpage)
+        self.assertEqual(p1, mainpage)
+
+        # Test not valid source.
+        self.assertRaises(pywikibot.Error, pywikibot.Page, 'dummy')
 
     def testTitle(self):
         """Test title() method options in article namespace."""
@@ -378,9 +407,7 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertIsInstance(mainpage.purge(), bool)
 
     def testIsDisambig(self):
-        """
-        Test the integration with Extension:Disambiguator.
-        """
+        """Test the integration with Extension:Disambiguator."""
         site = self.get_site()
         if not site.has_extension('Disambiguator'):
             raise unittest.SkipTest('Disambiguator extension not loaded on test site')
@@ -528,7 +555,7 @@ class TestCategoryObject(TestCase):
     cached = True
 
     def test_isEmptyCategory(self):
-        """Test if category is empty or not"""
+        """Test if category is empty or not."""
         site = self.get_site()
         cat_empty = pywikibot.Category(site, u'Category:foooooo')
         cat_not_empty = pywikibot.Category(site, u'Category:Wikipedia categories')
