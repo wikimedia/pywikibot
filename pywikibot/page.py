@@ -1915,8 +1915,9 @@ class FilePage(Page):
     def getFileVersionHistory(self):
         """Return the file's version history.
 
-        @return: An iterator yielding tuples containing (timestamp,
-            username, resolution, filesize, comment).
+        @return: A list of dictionaries with the following keys:
+            [comment, sha1, url, timestamp, metadata,
+             height, width, mime, user, descriptionurl, size]
 
         """
         return self.site.loadimageinfo(self, history=True)
