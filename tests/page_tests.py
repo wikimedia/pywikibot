@@ -10,6 +10,7 @@ __version__ = '$Id$'
 import sys
 import pywikibot
 from pywikibot import config
+from pywikibot import InvalidTitle
 import pywikibot.page
 
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase
@@ -279,9 +280,9 @@ class TestPageObject(DefaultSiteTestCase):
         # the site parameter, with the title parameter defaulted to
         # empty string
         page = pywikibot.page.BasePage(site)
-        self.assertEqual(page.title(), u'')
+        self.assertRaises(InvalidTitle, page.title)
         page = pywikibot.page.BasePage(site, title=u'')
-        self.assertEqual(page.title(), u'')
+        self.assertRaises(InvalidTitle, page.title)
         self.assertRaises(ValueError, pywikibot.page.BasePage, site, title=None)
 
     def testPageConstructor(self):
