@@ -50,6 +50,7 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
     NoUsername,
     SpamfilterError,
+    NoCreateError,
     UserBlocked,
 )
 
@@ -3682,6 +3683,7 @@ class APISite(BaseSite):
         "noedit-anon": """Bot is not logged in, and anon users are not authorized to edit on %(site)s wiki""",
         "noedit": "User %(user)s not authorized to edit pages on %(site)s wiki",
 
+        "missingtitle": NoCreateError,
         "editconflict": EditConflict,
         "articleexists": PageCreatedConflict,
         "pagedeleted": PageDeletedConflict,
@@ -3775,9 +3777,7 @@ class APISite(BaseSite):
                         % err.code,
                         _logger)
                 if err.code in self._ep_errors:
-                    if issubclass(self._ep_errors[err.code], PageSaveRelatedError):
-                        raise self._ep_errors[err.code](page)
-                    else:
+                    if isinstance(self._ep_errors[err.code], basestring):
                         errdata = {
                             'site': self,
                             'title': page.title(withSection=False),
@@ -3785,6 +3785,8 @@ class APISite(BaseSite):
                             'info': err.info
                         }
                         raise Error(self._ep_errors[err.code] % errdata)
+                    else:
+                        raise self._ep_errors[err.code](page)
                 pywikibot.debug(
                     u"editpage: Unexpected error code '%s' received."
                     % err.code,

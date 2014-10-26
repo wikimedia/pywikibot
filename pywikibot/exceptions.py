@@ -35,6 +35,7 @@ PageSaveRelatedError: page exceptions within the save operation on a Page.
       - PageDeletedConflict: Page was deleted since being retrieved
       - PageCreatedConflict: Page was created by another user
       - ArticleExistsConflict: Page article already exists
+  - NoCreateError: parameter nocreate not allow page creation
 
 ServerError: a problem with the server.
   - FatalServerError: A fatal/non-recoverable server error
@@ -259,6 +260,13 @@ class SectionError(Error):
 
 PageNotSaved = PageSaveRelatedError
 
+class NoCreateError(PageSaveRelatedError):
+
+    """Parameter nocreate doesn't allow page creation."""
+
+    message = u"Page %s could not be created due to parameter nocreate"
+
+    pass
 
 class EditConflict(PageSaveRelatedError):
 
