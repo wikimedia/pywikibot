@@ -21,7 +21,7 @@ from .plural import plural_rules
 import pywikibot
 from . import config2 as config
 
-if sys.version_info[0] == 3:
+if sys.version_info[0] > 2:
     basestring = (str, )
 
 PLURAL_PATTERN = '{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'

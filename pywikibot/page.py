@@ -29,16 +29,16 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
-if sys.version_info[0] == 2:
-    import htmlentitydefs
-    from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
-    from urllib import urlopen
-else:
+if sys.version_info[0] > 2:
     unicode = basestring = str
     long = int
     from html import entities as htmlentitydefs
     from urllib.parse import quote_from_bytes, unquote_to_bytes
     from urllib.request import urlopen
+else:
+    import htmlentitydefs
+    from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
+    from urllib import urlopen
 
 import pywikibot
 from pywikibot import config

@@ -14,10 +14,10 @@ import re
 import collections
 import imp
 
-if sys.version_info[0] == 2:
-    from urlparse import urlparse
-else:
+if sys.version_info[0] > 2:
     from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
 
 import pywikibot
 from pywikibot import config2 as config

@@ -8,10 +8,10 @@
 __version__ = '$Id$'
 
 import sys
-if sys.version_info[0] == 2:
-    from urllib import urlencode
-else:
+if sys.version_info[0] > 2:
     from urllib.parse import urlencode
+else:
+    from urllib import urlencode
 
 from pywikibot.comms import http
 

@@ -25,12 +25,12 @@ import sys
 import re
 import threading
 
-if sys.version_info[0] == 2:
-    import cookielib
-    from urllib import splittype, splithost, unquote
-else:
+if sys.version_info[0] > 2:
     from http import cookiejar as cookielib
     from urllib.parse import splittype, splithost, unquote
+else:
+    import cookielib
+    from urllib import splittype, splithost, unquote
 
 import pywikibot
 from pywikibot import config
