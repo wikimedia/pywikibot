@@ -204,12 +204,14 @@ class RequireUserMixin(TestCaseBase):
     user = True
 
     @classmethod
-    def require_site_user(cls):
+    def require_site_user(cls, family, code, sysop=False):
         """Check the user config has a valid login to the site."""
-        if not cls.has_site_user(cls.family, cls.code):
+        if not cls.has_site_user(family, code, sysop=sysop):
             raise unittest.SkipTest(
-                '%s: No username for %s:%s'
-                % (cls.__name__, cls.family, cls.code))
+                '%s: No %susername for %s:%s'
+                % (cls.__name__,
+                   "sysop " if sysop else "",
+                   family, code))
 
     @classmethod
     def setUpClass(cls):
@@ -221,14 +223,19 @@ class RequireUserMixin(TestCaseBase):
         """
         super(RequireUserMixin, cls).setUpClass()
 
-        cls.require_site_user()
+        sysop = hasattr(cls, 'sysop') and cls.sysop
 
-        cls.site.login()
+        for site in cls.sites.values():
+            cls.require_site_user(site['family'], site['code'], sysop)
 
-        if not cls.site.user():
-            raise unittest.SkipTest(
-                '%s: Unable able to login to %s'
-                % cls.__name__, cls.site)
+            site['site'].login(sysop)
+
+            if not site['site'].user():
+                raise unittest.SkipTest(
+                    '%s: Unable able to login to %s as %s'
+                    % (cls.__name__,
+                       'sysop' if sysop else 'bot',
+                       site['site']))
 
     def setUp(self):
         """
@@ -237,9 +244,17 @@ class RequireUserMixin(TestCaseBase):
         Login to the site if it is not logged in.
         """
         super(RequireUserMixin, self).setUp()
-        site = self.get_site()
-        if not site.logged_in():
-            site.login()
+
+        sysop = hasattr(self, 'sysop') and self.sysop
+
+        # There may be many sites, and setUp doesnt know
+        # which site is to be tested; ensure they are all
+        # logged in.
+        for site in self.sites.values():
+            site = site['site']
+
+            if not site.logged_in(sysop):
+                site.login(sysop)
 
 
 class MetaTestCaseClass(type):
@@ -351,7 +366,7 @@ class MetaTestCaseClass(type):
         if 'write' in dct and dct['write']:
             bases = tuple([SiteWriteMixin] + list(bases))
 
-        if 'user' in dct and dct['user']:
+        if ('user' in dct and dct['user']) or ('sysop' in dct and dct['sysop']):
             bases = tuple([RequireUserMixin] + list(bases))
 
         for test in tests:
@@ -449,15 +464,17 @@ class TestCase(TestTimerMixin, TestCaseBase):
         return cls.sites[name]['site']
 
     @classmethod
-    def has_site_user(cls, family, code):
+    def has_site_user(cls, family, code, sysop=False):
         """Check the user config has a user for the site."""
         if not family:
             raise Exception('no family defined for %s' % cls.__name__)
         if not code:
             raise Exception('no site code defined for %s' % cls.__name__)
 
-        return code in config.usernames[family] or \
-           '*' in config.usernames[family]
+        usernames = config.sysopnames if sysop else config.usernames
+
+        return code in usernames[family] or \
+           '*' in usernames[family]
 
     def __init__(self, *args, **kwargs):
         """Constructor."""
@@ -666,6 +683,11 @@ class PwbTestCase(TestCase):
 
     pwb = True
     spawn = True
+    # pywikibot.handleArgs currently instantiates a Site object
+    # and tries to fetch the users messages.
+    site = True
+    net = True
+    user = True
 
 
 class DeprecationTestCase(TestCase):

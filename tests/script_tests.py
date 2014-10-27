@@ -415,6 +415,7 @@ class TestScript(DefaultSiteTestCase, PwbTestCase):
     site = True
 
     def setUp(self):
+        super(TestScript, self).setUp()
         """Prepare the environment for running the pwb.py script."""
         self.old_pywikibot_dir = None
         if 'PYWIKIBOT2_DIR' in os.environ:
@@ -423,6 +424,7 @@ class TestScript(DefaultSiteTestCase, PwbTestCase):
 
     def tearDown(self):
         """Restore the environment after running the pwb.py script."""
+        super(TestScript, self).tearDown()
         del os.environ['PYWIKIBOT2_DIR']
         if self.old_pywikibot_dir:
             os.environ['PYWIKIBOT2_DIR'] = self.old_pywikibot_dir
