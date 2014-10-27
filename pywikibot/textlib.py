@@ -874,24 +874,34 @@ See https://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Positi
 def categoryFormat(categories, insite=None):
     """Return a string containing links to all categories in a list.
 
-    'categories' should be a list of Category objects or strings
-        which can be either the raw name or [[Category:..]].
+    'categories' should be a list of Category or Page objects or strings
+    which can be either the raw name, [[Category:..]] or [[cat_localised_ns:...]].
 
     The string is formatted for inclusion in insite.
+    Category namespace is converted to localised namespace.
     """
     if not categories:
         return ''
     if insite is None:
         insite = pywikibot.Site()
 
-    if isinstance(categories[0], basestring):
-        if categories[0][0] == '[':
-            catLinks = categories
-        else:
-            catLinks = ['[[Category:%s]]' % category for category in categories]
-    else:
-        catLinks = [pywikibot.Category(category).aslink()
-                    for category in categories]
+    catLinks = []
+    for category in categories:
+        if isinstance(category, basestring):
+            category, separator, sortKey = category.strip('[]').partition('|')
+            sortKey = sortKey if separator else None
+            prefix = category.split(":", 1)[0]  # whole word if no ":" is present
+            if prefix not in insite.namespaces()[14]:
+                category = u'{0}:{1}'.format(insite.namespace(14), category)
+            category = pywikibot.Category(pywikibot.Link(category,
+                                                         insite,
+                                                         defaultNamespace=14),
+                                          sortKey=sortKey)
+        # Make sure a category is casted from Page to Category.
+        elif not isinstance(category, pywikibot.Category):
+            category = pywikibot.Category(category)
+        link = category.aslink()
+        catLinks.append(link)
 
     if insite.category_on_one_line():
         sep = ' '
