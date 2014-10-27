@@ -281,8 +281,8 @@ class TestPageObject(DefaultSiteTestCase):
         site = self.get_site()
 
         # Should not raise an error as the constructor only requires
-        # the site parameter, with the title parameter defaulted to
-        # empty string
+        # the site parameter.
+        # Empty string or None as title raises error.
         page = pywikibot.page.BasePage(site)
         self.assertRaises(InvalidTitle, page.title)
         page = pywikibot.page.BasePage(site, title=u'')
