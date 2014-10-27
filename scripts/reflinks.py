@@ -41,6 +41,7 @@ See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import division
 __version__ = '$Id$'
 #
 
@@ -286,7 +287,7 @@ class RefLink:
                 nb_letter += 1
             if letter.isdigit():
                 return
-        if float(nb_upper) / (nb_letter + 1) > .70:
+        if nb_upper / (nb_letter + 1) > .70:
             self.title = self.title.title()
 
 

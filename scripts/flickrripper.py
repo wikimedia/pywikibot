@@ -211,7 +211,7 @@ def getFilename(photoInfo=None, site=None, project=u'Flickr'):
             descBytes = len(description.encode('utf-8'))
             if descBytes > maxBytes:
                 # maybe we cut more than needed, anyway we do it
-                items = max(min(len(description), maxBytes / 4),
+                items = max(min(len(description), maxBytes // 4),
                             len(description) - descBytes + maxBytes)
                 description = description[:items]
             title = cleanUpTitle(description)

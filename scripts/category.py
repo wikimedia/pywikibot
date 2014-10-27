@@ -980,7 +980,7 @@ class CategoryTreeRobot:
             result += u' '
         result += cat.title(asLink=True, textlink=True, withNamespace=False)
         result += ' (%d)' % cat.categoryinfo['pages']
-        if currentDepth < self.maxDepth / 2:
+        if currentDepth < self.maxDepth // 2:
             # noisy dots
             pywikibot.output('.', newline=False)
         # Find out which other cats are supercats of the current cat
