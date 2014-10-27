@@ -91,12 +91,11 @@ class ProtectionRobot(Bot):
         for page in self.generator:
             self.current_page = page
             if not self.getOption('always'):
-                choice = pywikibot.inputChoice(
+                choice = pywikibot.input_choice(
                     u'Do you want to change the protection level of %s?'
                     % page.title(asLink=True, forceInterwiki=True),
-                    ['yes', 'No', 'all'],
-                    ['y', 'N', 'a'],
-                    'n')
+                    [('yes', 'y'), ('No', 'n'), ('all', 'a')],
+                    'n', automatic_quit=False)
                 if choice == 'n':
                     continue
                 elif choice == 'a':
@@ -128,9 +127,9 @@ def check_protection_level(operation, level, levels, default=None):
                 num += 1
             if level == default:
                 default_char = first_char[-1]
-        choice = pywikibot.inputChoice('Choice a protection level to %s:'
-                                       % operation, levels, first_char,
-                                       default=default_char)
+        choice = pywikibot.input_choice('Choice a protection level to %s:'
+                                        % operation, zip(levels, first_char),
+                                        default=default_char)
 
         return levels[first_char.index(choice)]
     else:

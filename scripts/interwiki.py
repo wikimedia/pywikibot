@@ -1058,12 +1058,13 @@ u"because page %s in the correct namespace has already been found."
                            linkedPage.namespace(), preferredPage))
                     return True
                 else:
-                    choice = pywikibot.inputChoice(
+                    choice = pywikibot.input_choice(
 u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         % (self.originPage, self.originPage.namespace(),
                            linkedPage, linkedPage.namespace()),
-                        ['Yes', 'No', 'Add an alternative', 'give up'],
-                        ['y', 'n', 'a', 'g'])
+                        [('Yes', 'y'), ('No', 'n'),
+                         ('Add an alternative', 'a'), ('give up', 'g')],
+                        automatic_quit=False)
                     if choice != 'y':
                         # Fill up foundIn, so that we will not ask again
                         self.foundIn[linkedPage] = [linkingPage]
@@ -1146,12 +1147,13 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         % (page, self.originPage, disambig))
                     return (True, None)
                 else:
-                    choice = pywikibot.inputChoice(
+                    choice = pywikibot.input_choice(
                         u"WARNING: %s is a disambiguation page, but %s doesn't "
                         u"seem to be one. Follow it anyway?"
                         % (self.originPage, page),
-                        ['Yes', 'No', 'Add an alternative', 'Give up'],
-                        ['y', 'n', 'a', 'g'])
+                        [('Yes', 'y'), ('No', 'n'),
+                         ('Add an alternative', 'a'), ('give up', 'g')],
+                        automatic_quit=False)
             elif not self.originPage.isDisambig() and page.isDisambig():
                 nondisambig = self.getFoundNonDisambig(page.site)
                 if nondisambig:
@@ -1161,12 +1163,13 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         % (page, self.originPage, nondisambig))
                     return (True, None)
                 else:
-                    choice = pywikibot.inputChoice(
+                    choice = pywikibot.input_choice(
                         u'WARNING: %s doesn\'t seem to be a disambiguation '
                         u'page, but %s is one. Follow it anyway?'
                         % (self.originPage, page),
-                        ['Yes', 'No', 'Add an alternative', 'Give up'],
-                        ['y', 'n', 'a', 'g'])
+                        [('Yes', 'y'), ('No', 'n'),
+                         ('Add an alternative', 'a'), ('give up', 'g')],
+                        automatic_quit=False)
             if choice == 'n':
                 return (True, None)
             elif choice == 'a':
@@ -1581,7 +1584,11 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         answer = 'a'
                     else:
                         # TODO: allow answer to repeat previous or go back after a mistake
-                        answer = pywikibot.inputChoice(u'What should be done?', ['accept', 'reject', 'give up', 'accept all'], ['a', 'r', 'g', 'l'], 'a')
+                        answer = pywikibot.input_choice(
+                            u'What should be done?',
+                            [('accept', 'a'), ('reject', 'r'),
+                             ('give up', 'g'), ('accept all', 'l')], 'a',
+                            automatic_quit=False)
                     if answer == 'l':  # accept all
                         acceptall = True
                         answer = 'a'
@@ -1952,10 +1959,12 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 # If we cannot ask, deny permission
                 answer = 'n'
             else:
-                answer = pywikibot.inputChoice(u'Submit?',
-                                               ['Yes', 'No', 'open in Browser',
-                                                'Give up', 'Always'],
-                                               ['y', 'n', 'b', 'g', 'a'])
+                answer = pywikibot.input_choice(u'Submit?',
+                                                [('Yes', 'y'), ('No', 'n'),
+                                                 ('open in Browser', 'b'),
+                                                 ('Give up', 'g'),
+                                                 ('Always', 'a')],
+                                                automatic_quit=False)
                 if answer == 'b':
                     webbrowser.open("http://%s%s" % (
                         page.site.hostname(),

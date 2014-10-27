@@ -570,10 +570,9 @@ class DisambiguationRobot(Bot):
                              % (refPage.title(), disambPage.title()))
             if disambPage.isRedirectPage():
                 target = self.alternatives[0]
-                choice = pywikibot.inputChoice(
-                    u'Do you want to make redirect %s point to %s?'
-                    % (refPage.title(), target), ['yes', 'no'], ['y', 'N'], 'N')
-                if choice == 'y':
+                if pywikibot.input_yn(u'Do you want to make redirect %s point '
+                                      'to %s?' % (refPage.title(), target),
+                                      default=False, automatic_quit=False):
                     redir_text = '#%s [[%s]]' \
                                  % (self.mysite.redirect(default=True), target)
                     try:
@@ -581,10 +580,11 @@ class DisambiguationRobot(Bot):
                     except pywikibot.PageNotSaved as error:
                         pywikibot.output(u'Page not saved: %s' % error.args)
             else:
-                choice = pywikibot.inputChoice(
+                choice = pywikibot.input_choice(
                     u'Do you want to work on pages linking to %s?'
-                    % refPage.title(), ['yes', 'no', 'change redirect'],
-                                       ['y', 'N', 'c'], 'N')
+                    % refPage.title(),
+                    [('yes', 'y'), ('no', 'n'), ('change redirect', 'c')], 'n',
+                    automatic_quit=False)
                 if choice == 'y':
                     gen = ReferringPageGeneratorWithIgnore(refPage,
                                                            self.primary)
@@ -1065,10 +1065,10 @@ def main(*args):
                 if page.exists():
                     alternatives.append(page.title())
                 else:
-                    answer = pywikibot.inputChoice(
-                        u'Possibility %s does not actually exist. Use it anyway?'
-                        % page.title(), ['yes', 'no'], ['y', 'N'], 'N')
-                    if answer == 'y':
+                    if pywikibot.input_yn(
+                            u'Possibility %s does not actually exist. Use it '
+                            'anyway?' % page.title(),
+                            default=False, automatic_quit=False):
                         alternatives.append(page.title())
             else:
                 alternatives.append(arg[5:])

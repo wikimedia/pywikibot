@@ -29,7 +29,7 @@ else:
 from pywikibot import config2 as config
 from pywikibot.bot import (
     output, warning, error, critical, debug, stdout, exception,
-    input, input_choice, inputChoice, handle_args, showHelp, ui, log,
+    input, input_choice, input_yn, inputChoice, handle_args, showHelp, ui, log,
     calledModuleName, Bot, WikidataBot, QuitKeyboardInterrupt,
     # the following are flagged as deprecated on usage
     handleArgs,
@@ -68,7 +68,7 @@ __all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
            'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
            'html2unicode', 'url2unicode', 'unicode2html',
            'stdout', 'output', 'warning', 'error', 'critical', 'debug',
-           'exception', 'input_choice', 'input', 'inputChoice',
+           'exception', 'input_choice', 'input', 'input_yn', 'inputChoice',
            'handle_args', 'handleArgs', 'showHelp', 'ui', 'log',
            'calledModuleName', 'Bot', 'WikidataBot',
            'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
@@ -699,11 +699,9 @@ def stopme():
             try:
                 _putthread.join(1)
             except KeyboardInterrupt:
-                answer = inputChoice(u"""\
-There are %i pages remaining in the queue. Estimated time remaining: %s
-Really exit?""" % remaining(),
-                    ['yes', 'no'], ['y', 'N'], 'N')
-                if answer == 'y':
+                if input_yn('There are %i pages remaining in the queue. '
+                            'Estimated time remaining: %s\nReally exit?'
+                            % remaining(), default=False, automatic_quit=False):
                     return
 
     # only need one drop() call because all throttles use the same global pid

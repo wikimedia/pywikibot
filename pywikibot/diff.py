@@ -245,8 +245,8 @@ class PatchManager(object):
                     ]
 
         question = 'Accept this hunk?'
-        answers = ['yes', 'no', 'stop', 'all', 'review', 'help']
-        hotkeys = ['y', 'n', 's', 'a', 'r', 'h']
+        answers = [('yes', 'y'), ('no', 'n'), ('stop', 's'), ('all', 'a'),
+                   ('review', 'r'), ('help', 'h')]
         actions = {'y': Hunk.APPR,
                    'n': Hunk.NOT_APPR,
                    's': Hunk.NOT_APPR,
@@ -261,7 +261,8 @@ class PatchManager(object):
             hunk = pending.pop(0)
 
             pywikibot.output(hunk.header + hunk.diff_text)
-            choice = pywikibot.inputChoice(question, answers, hotkeys, default='r')
+            choice = pywikibot.input_choice(question, answers, default='r',
+                                            automatic_quit=False)
 
             if choice in actions.keys():
                 hunk.reviewed = actions[choice]

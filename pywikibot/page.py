@@ -1480,12 +1480,11 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         if self.site.username(sysop=True):
             answer = u'y'
             if prompt and not hasattr(self.site, '_noDeletePrompt'):
-                answer = pywikibot.inputChoice(
+                answer = pywikibot.input_choice(
                     u'Do you want to delete %s?' % self.title(
                         asLink=True, forceInterwiki=True),
-                    ['Yes', 'No', 'All'],
-                    ['y', 'n', 'a'],
-                    'n')
+                    [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
+                    'n', automatic_quit=False)
                 if answer == 'a':
                     answer = 'y'
                     self.site._noDeletePrompt = True
@@ -1495,13 +1494,12 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
             if mark or hasattr(self.site, '_noMarkDeletePrompt'):
                 answer = 'y'
             else:
-                answer = pywikibot.inputChoice(
+                answer = pywikibot.input_choice(
                     u"Can't delete %s; do you want to mark it "
                     "for deletion instead?" % self.title(asLink=True,
                                                          forceInterwiki=True),
-                    ['Yes', 'No', 'All'],
-                    ['y', 'n', 'a'],
-                    'n')
+                    [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
+                    'n', automatic_quit=False)
                 if answer == 'a':
                     answer = 'y'
                     self.site._noMarkDeletePrompt = True
@@ -1655,12 +1653,11 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
             pywikibot.bot.warning(u'"prompt" argument of protect() is '
                                   'deprecated')
         if prompt and not hasattr(self.site, '_noProtectPrompt'):
-            answer = pywikibot.inputChoice(
+            answer = pywikibot.input_choice(
                 u'Do you want to change the protection level of %s?'
                 % self.title(asLink=True, forceInterwiki=True),
-                ['Yes', 'No', 'All'],
-                ['y', 'N', 'a'],
-                'N')
+                [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
+                'n', automatic_quit=False)
             if answer == 'a':
                 answer = 'y'
                 self.site._noProtectPrompt = True

@@ -516,6 +516,8 @@ def input_choice(question, answers, default=None, return_shortcut=True,
     """
     Ask the user the question and return one of the valid answers.
 
+    @param question: The question asked without trailing spaces.
+    @type answers: basestring
     @param answers: The valid answers each containing a full length answer and
         a shortcut. Each value must be unique.
     @type answers: Iterable containing an iterable of length two
@@ -527,7 +529,7 @@ def input_choice(question, answers, default=None, return_shortcut=True,
         returned.
     @type return_shortcut: bool
     @param automatic_quit: Adds the option 'Quit' ('q') and throw a
-            L{QuitKeyboardInterrupt} if selected (default).
+            L{QuitKeyboardInterrupt} if selected.
     @type automatic_quit: bool
     @return: The selected answer shortcut or index. Is -1 if the default is
         selected, it does not return the shortcut and the default is not a
@@ -540,6 +542,34 @@ def input_choice(question, answers, default=None, return_shortcut=True,
 
     return ui.input_choice(question, answers, default, return_shortcut,
                            automatic_quit)
+
+
+def input_yn(question, default=None, automatic_quit=True):
+    """
+    Ask the user a yes/no question and returns the answer as a bool.
+
+    @param question: The question asked without trailing spaces.
+    @type answers: basestring
+    @param default: The result if no answer was entered. It must be a bool or
+        'y' or 'n' and can be disabled by setting it to None.
+    @type default: basestring or bool
+    @param automatic_quit: Adds the option 'Quit' ('q') and throw a
+            L{QuitKeyboardInterrupt} if selected.
+    @type automatic_quit: bool
+    @return: Return True if the user selected yes and False if the user
+        selected no. If the default is not None it'll return True if default
+        is True or 'y' and False if default is False or 'n'.
+    @rtype: bool
+    """
+    if default not in ['y', 'Y', 'n', 'N']:
+        if default:
+            default = 'y'
+        elif default is not None:
+            default = 'n'
+    assert default in ['y', 'Y', 'n', 'N', None]
+
+    return input_choice(question, [('Yes', 'y'), ('No', 'n')], default,
+                        automatic_quit=automatic_quit) == 'y'
 
 
 @deprecated('input_choice')

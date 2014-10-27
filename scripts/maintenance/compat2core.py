@@ -144,9 +144,9 @@ class ConvertBot(object):
 
     def get_dest(self):
         self.dest = u'%s-core.%s' % tuple(self.source.rsplit(u'.', 1))
-        if not self.warnonly and pywikibot.inputChoice(
+        if not self.warnonly and not pywikibot.input_yn(
                 u'Destination file is %s.' % self.dest,
-                ['Yes', 'No'], ['y', 'n'], 'y') == 'n':
+                default=True, automatic_quit=False):
             pywikibot.output('Quitting...')
             exit()
 

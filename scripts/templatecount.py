@@ -145,8 +145,10 @@ def main(*args):
     if 'reflist' in argsList:
         pywikibot.output(
             u'NOTE: it will take a long time to count "reflist".')
-        choice = pywikibot.inputChoice(
-            u'Proceed anyway?', ['yes', 'no', 'skip'], ['y', 'n', 's'], 'y')
+        choice = pywikibot.input_choice(
+            u'Proceed anyway?',
+            [('yes', 'y'), ('no', 'n'), ('skip', 's')], 'y',
+            automatic_quit=False)
         if choice == 's':
             argsList.remove('reflist')
         elif choice == 'n':

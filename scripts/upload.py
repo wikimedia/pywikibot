@@ -48,7 +48,6 @@ import sys
 import pywikibot
 import pywikibot.data.api
 from pywikibot import config
-from pywikibot.bot import QuitKeyboardInterrupt
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
@@ -190,11 +189,10 @@ class UploadRobot:
                         'Invalid character(s): %s. Please try again' % c)
                     continue
                 if ext not in allowed_formats:
-                    choice = pywikibot.inputChoice(
-                        u"File format is not one of [%s], but %s. Continue?"
-                        % (u' '.join(allowed_formats), ext),
-                        ['yes', 'no'], ['y', 'N'], 'N')
-                    if choice == 'n':
+                    if not pywikibot.input_yn(
+                            u"File format is not one of [%s], but %s. Continue?"
+                            % (u' '.join(allowed_formats), ext),
+                            default=False, automatic_quit=False):
                         continue
                 break
             if newfn != '':
@@ -215,21 +213,16 @@ class UploadRobot:
                     'without a summary/description.\03{default}')
 
             # if no description, default is 'yes'
-            default = 'y' if not self.description else 'n'
-            choice = pywikibot.inputChoice(
-                u'Do you want to change this description?',
-                ['Yes', 'No', 'Quit'], ['y', 'n', 'q'], default)
-            if choice == 'y':
+            if pywikibot.input_yn(
+                    u'Do you want to change this description?',
+                    default=not self.description):
                 from pywikibot import editor as editarticle
                 editor = editarticle.TextEditor()
                 newDescription = editor.edit(self.description)
                 # if user saved / didn't press Cancel
                 if newDescription:
                     self.description = newDescription
-            if choice == 'q':
-                raise QuitKeyboardInterrupt
-            else:
-                self.verifyDescription = False
+            self.verifyDescription = False
 
         return filename
 
@@ -272,12 +265,9 @@ class UploadRobot:
         except pywikibot.data.api.UploadWarning as warn:
             pywikibot.output(
                 u'We got a warning message: {0}'.format(warn.message))
-            if self.abort_on_warn(warn.code):
-                answer = "N"
-            else:
-                answer = pywikibot.inputChoice(u"Do you want to ignore?",
-                                               ['Yes', 'No'], ['y', 'N'], 'N')
-            if answer == "y":
+            if (not self.abort_on_warn(warn.code) and
+                    pywikibot.input_yn(u"Do you want to ignore?",
+                                       default=False, automatic_quit=False)):
                 self.ignoreWarning = True
                 self.keepFilename = True
                 return self.upload_image(debug)

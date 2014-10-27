@@ -66,13 +66,11 @@ class CapitalizeBot(Bot):
             pywikibot.output(u'%s doesn\'t exist'
                              % page_cap.title(asLink=True))
             if not self.getOption('always'):
-                choice = pywikibot.inputChoice(
+                choice = pywikibot.input_choice(
                     u'Do you want to create a redirect?',
-                    ['Yes', 'No', 'All', 'Quit'], ['y', 'N', 'a', 'q'], 'N')
+                    [('Yes', 'y'), ('No', 'n'), ('All', 'a')], 'n')
                 if choice == 'a':
                     self.options['always'] = True
-                elif choice == 'q':
-                    self.quit()
             if self.getOption('always') or choice == 'y':
                 comment = i18n.twtranslate(
                     page.site,

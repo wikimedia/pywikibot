@@ -104,16 +104,14 @@ class MovePagesBot(Bot):
             newPageTitle = (u'%s%s' % (self.getOption('prefix'), pagetitle))
         if self.getOption('prefix') or self.appendAll or self.regexAll:
             if not self.getOption('always'):
-                choice2 = pywikibot.inputChoice(
+                choice2 = pywikibot.input_choice(
                     u'Change the page title to "%s"?' % newPageTitle,
-                    ['yes', 'no', 'all', 'quit'], ['y', 'n', 'a', 'q'])
+                    [('yes', 'y'), ('no', 'n'), ('all', 'a')])
                 if choice2 == 'y':
                     self.moveOne(page, newPageTitle)
                 elif choice2 == 'a':
                     self.options['always'] = True
                     self.moveOne(page, newPageTitle)
-                elif choice2 == 'q':
-                    self.quit()
                 elif choice2 == 'n':
                     pass
                 else:
@@ -121,12 +119,11 @@ class MovePagesBot(Bot):
             else:
                 self.moveOne(page, newPageTitle)
         else:
-            choice = pywikibot.inputChoice(u'What do you want to do?',
-                                           ['change page name',
-                                            'append to page name',
-                                            'use a regular expression',
-                                            'next page', 'quit'],
-                                           ['c', 'a', 'r', 'n', 'q'])
+            choice = pywikibot.input_choice(u'What do you want to do?',
+                                            [('change page name', 'c'),
+                                             ('append to page name', 'a'),
+                                             ('use a regular expression', 'r'),
+                                             ('next page', 'n')])
             if choice == 'c':
                 newPageTitle = pywikibot.input(u'New page name:')
                 self.moveOne(page, newPageTitle)
@@ -136,24 +133,20 @@ class MovePagesBot(Bot):
                 newPageTitle = (u'%s%s%s'
                                 % (self.pagestart, pagetitle, self.pageend))
                 if namesp:
-                    choice2 = pywikibot.inputChoice(
-                        u'Do you want to remove the namespace prefix "%s:"?'
-                        % namesp, ['yes', 'no'], ['y', 'n'])
-                    if choice2 == 'y':
+                    if pywikibot.input_yn(u'Do you want to remove the '
+                                          'namespace prefix "%s:"?' % namesp,
+                                          automatic_quit=False):
                         self.noNamespace = True
                     else:
                         newPageTitle = (u'%s:%s' % (namesp, newPageTitle))
-                choice2 = pywikibot.inputChoice(
+                choice2 = pywikibot.input_choice(
                     u'Change the page title to "%s"?'
-                    % newPageTitle, ['yes', 'no', 'all', 'quit'],
-                    ['y', 'n', 'a', 'q'])
+                    % newPageTitle, [('yes', 'y'), ('no', 'n'), ('all', 'a')])
                 if choice2 == 'y':
                     self.moveOne(page, newPageTitle)
                 elif choice2 == 'a':
                     self.appendAll = True
                     self.moveOne(page, newPageTitle)
-                elif choice2 == 'q':
-                    self.quit()
                 elif choice2 == 'n':
                     pass
                 else:
@@ -167,35 +160,29 @@ class MovePagesBot(Bot):
                     newPageTitle = self.regex.sub(self.replacePattern,
                                                   page.title())
                 else:
-                    choice2 = pywikibot.inputChoice(
-                        u'Do you want to remove the namespace prefix "%s:"?'
-                        % namesp, ['yes', 'no'], ['y', 'n'])
-                    if choice2 == 'y':
+                    if pywikibot.input_yn(u'Do you want to remove the '
+                                          'namespace prefix "%s:"?' % namesp,
+                                          automatic_quit=False):
                         newPageTitle = self.regex.sub(
                             self.replacePattern, page.title(withNamespace=False))
                         self.noNamespace = True
                     else:
                         newPageTitle = self.regex.sub(self.replacePattern,
                                                       page.title())
-                choice2 = pywikibot.inputChoice(
+                choice2 = pywikibot.input_choice(
                     u'Change the page title to "%s"?'
-                    % newPageTitle, ['yes', 'no', 'all', 'quit'],
-                    ['y', 'n', 'a', 'q'])
+                    % newPageTitle, [('yes', 'y'), ('no', 'n'), ('all', 'a')])
                 if choice2 == 'y':
                     self.moveOne(page, newPageTitle)
                 elif choice2 == 'a':
                     self.regexAll = True
                     self.moveOne(page, newPageTitle)
-                elif choice2 == 'q':
-                    self.quit()
                 elif choice2 == 'n':
                     pass
                 else:
                     self.treat(page)
             elif choice == 'n':
                 pass
-            elif choice == 'q':
-                self.quit()
             else:
                 self.treat(page)
 

@@ -380,10 +380,9 @@ class CaseChecker(object):
                     if self.replace:
                         if len(err[1]) == 1:
                             newTitle = err[1][0]
-##                            choice = pywikibot.inputChoice(u'Move %s to %s?'
-##                                                           % (title, newTitle),
-##                                                           ['Yes', 'No'],
-##                                                           ['y', 'n'])
+##                            choice = pywikibot.input_yn(u'Move %s to %s?'
+##                                                        % (title, newTitle),
+##                                                        automatic_quit=False)
                             editSummary = i18n.twtranslate(
                                 self.site, "casechecker-rename")
                             dst = self.Page(newTitle)
@@ -680,12 +679,10 @@ class CaseChecker(object):
                     msg = u'page exists'
                 self.ColorCodeWord(u'  %d: %s (%s)\n' % (count, t, msg), True)
                 count += 1
-            answers = [str(i) for i in xrange(0, count)]
-            choice = int(pywikibot.inputChoice(
-                u'Which link to choose? (0 to skip)',
-                answers, [a[0] for a in answers]))
-            if choice > 0:
-                return candidates[choice - 1]
+            answers = [('skip', 's')] + [(str(i), i) for i in range(1, count)]
+            choice = pywikibot.input_choice(u'Which link to choose?', answers)
+            if choice != 's':
+                return candidates[int(choice) - 1]
 
     def ColorCodeWord(self, word, toScreen=False):
         if not toScreen:

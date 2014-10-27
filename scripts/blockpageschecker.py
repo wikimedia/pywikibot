@@ -189,9 +189,10 @@ def understandBlock(text, TTP, TSP, TSMP, TTMP, TU):
 
 
 def showQuest(page):
-    quest = pywikibot.inputChoice(u'Do you want to open the page?',
-                                  ['with browser', 'with gui', 'no'],
-                                  ['b', 'g', 'n'], 'n')
+    quest = pywikibot.input_choice(
+        u'Do you want to open the page?',
+        [('with browser', 'b'), ('with gui', 'g'), ('no', 'n')], 'n',
+        automatic_quit=False)
     site = page.site
     url = '%s://%s%s?redirect=no' % (site.protocol(),
                                      site.hostname(),
@@ -452,10 +453,10 @@ def main(*args):
                              % page.title())
             pywikibot.showDiff(oldtext, text)
             if not always:
-                choice = pywikibot.inputChoice(u'Do you want to accept these '
-                                               u'changes?',
-                                               ['Yes', 'No', 'All'],
-                                               ['y', 'N', 'a'], 'N')
+                choice = pywikibot.input_choice(u'Do you want to accept these '
+                                                u'changes?',
+                                                [('Yes', 'y'), ('No', 'n'),
+                                                 ('All', 'a')], 'n')
                 if choice == 'a':
                     always = True
             if always or choice == 'y':
