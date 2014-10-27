@@ -142,9 +142,9 @@ def str2localized_duration(site, string):
         template = site.mediawiki_message('Hours')
     if template:
         exp = i18n.translate(site.code, template, int(string[:-1]))
-        return exp.replace('$1', string[:-1])
+        return to_local_digits(exp.replace('$1', string[:-1]), site.code)
     else:
-        return string
+        return to_local_digits(string, site.code)
 
 
 def str2time(string):
