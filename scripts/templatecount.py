@@ -48,9 +48,9 @@ class TemplateCountRobot:
 
     """Template count bot."""
 
-    @staticmethod
-    def countTemplates(templates, namespaces):
-        templateDict = TemplateCountRobot.template_dict(templates, namespaces)
+    @classmethod
+    def countTemplates(cls, templates, namespaces):
+        templateDict = cls.template_dict(templates, namespaces)
         pywikibot.output(u'\nNumber of transclusions per template',
                          toStdout=True)
         pywikibot.output(u'-' * 36, toStdout=True)
@@ -65,9 +65,9 @@ class TemplateCountRobot:
                          % datetime.datetime.utcnow().isoformat(),
                          toStdout=True)
 
-    @staticmethod
-    def listTemplates(templates, namespaces):
-        templateDict = TemplateCountRobot.template_dict(templates, namespaces)
+    @classmethod
+    def listTemplates(cls, templates, namespaces):
+        templateDict = cls.template_dict(templates, namespaces)
         pywikibot.output(u'\nList of pages transcluding templates:',
                          toStdout=True)
         for key in templates:
@@ -83,9 +83,9 @@ class TemplateCountRobot:
                          % datetime.datetime.utcnow().isoformat(),
                          toStdout=True)
 
-    @staticmethod
-    def template_dict(templates, namespaces):
-        gen = TemplateCountRobot.template_dict_generator(templates, namespaces)
+    @classmethod
+    def template_dict(cls, templates, namespaces):
+        gen = cls.template_dict_generator(templates, namespaces)
         templateDict = {}
         for template, transcludingArray in gen:
             templateDict[template] = transcludingArray

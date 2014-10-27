@@ -187,8 +187,8 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
     return collector(loader)
 
 
-CachedRequest._get_cache_dir = staticmethod(
-    lambda *args: CachedRequest._make_dir(_cache_dir))
+CachedRequest._get_cache_dir = classmethod(
+    lambda cls, *args: cls._make_dir(_cache_dir))
 
 
 # Travis-CI builds are set to retry twice, which aims to reduce the number

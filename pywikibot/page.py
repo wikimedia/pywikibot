@@ -3036,8 +3036,8 @@ class WikibasePage(BasePage):
                 del data[key]
         return data
 
-    @staticmethod
-    def _normalizeData(data):
+    @classmethod
+    def _normalizeData(cls, data):
         """
         Helper function to expand data into the Wikibase API structure.
 
@@ -3050,7 +3050,7 @@ class WikibasePage(BasePage):
         for prop in ('labels', 'descriptions'):
             if prop not in data:
                 continue
-            data[prop] = WikibasePage._normalizeLanguages(data[prop])
+            data[prop] = cls._normalizeLanguages(data[prop])
             for key, value in data[prop].items():
                 if isinstance(value, basestring):
                     data[prop][key] = {'language': key, 'value': value}
@@ -3656,8 +3656,8 @@ class Claim(Property):
         self.rank = 'normal'
         self.on_item = None  # The item it's on
 
-    @staticmethod
-    def fromJSON(site, data):
+    @classmethod
+    def fromJSON(cls, site, data):
         """
         Create a claim object from JSON returned in the API call.
 
@@ -3666,8 +3666,8 @@ class Claim(Property):
 
         @return: Claim
         """
-        claim = Claim(site, data['mainsnak']['property'],
-                      datatype=data['mainsnak'].get('datatype', None))
+        claim = cls(site, data['mainsnak']['property'],
+                    datatype=data['mainsnak'].get('datatype', None))
         if 'id' in data:
             claim.snak = data['id']
         elif 'hash' in data:
@@ -3685,15 +3685,15 @@ class Claim(Property):
             claim.rank = data['rank']
         if 'references' in data:
             for source in data['references']:
-                claim.sources.append(Claim.referenceFromJSON(site, source))
+                claim.sources.append(cls.referenceFromJSON(site, source))
         if 'qualifiers' in data:
             for prop in data['qualifiers-order']:
-                claim.qualifiers[prop] = [Claim.qualifierFromJSON(site, qualifier)
+                claim.qualifiers[prop] = [cls.qualifierFromJSON(site, qualifier)
                                           for qualifier in data['qualifiers'][prop]]
         return claim
 
-    @staticmethod
-    def referenceFromJSON(site, data):
+    @classmethod
+    def referenceFromJSON(cls, site, data):
         """
         Create a dict of claims from reference JSON returned in the API call.
 
@@ -3714,15 +3714,15 @@ class Claim(Property):
 
         for prop in prop_list:
             for claimsnak in data['snaks'][prop]:
-                claim = Claim.fromJSON(site, {'mainsnak': claimsnak,
-                                              'hash': data['hash']})
+                claim = cls.fromJSON(site, {'mainsnak': claimsnak,
+                                            'hash': data['hash']})
                 if claim.getID() not in source:
                     source[claim.getID()] = []
                 source[claim.getID()].append(claim)
         return source
 
-    @staticmethod
-    def qualifierFromJSON(site, data):
+    @classmethod
+    def qualifierFromJSON(cls, site, data):
         """
         Create a Claim for a qualifier from JSON.
 
@@ -3732,8 +3732,8 @@ class Claim(Property):
 
         @return: Claim
         """
-        return Claim.fromJSON(site, {'mainsnak': data,
-                                     'hash': data['hash']})
+        return cls.fromJSON(site, {'mainsnak': data,
+                                   'hash': data['hash']})
 
     def toJSON(self):
         data = {
@@ -4502,8 +4502,8 @@ class Link(ComparableMixin):
                                    self.site.code,
                                    self.title))
 
-    @staticmethod
-    def fromPage(page, source=None):
+    @classmethod
+    def fromPage(cls, page, source=None):
         """
         Create a Link to a Page.
 
@@ -4514,7 +4514,7 @@ class Link(ComparableMixin):
 
         @return: Link
         """
-        link = Link.__new__(Link)
+        link = cls.__new__(cls)
         link._site = page.site
         link._section = page.section()
         link._namespace = page.namespace()
@@ -4526,8 +4526,8 @@ class Link(ComparableMixin):
 
         return link
 
-    @staticmethod
-    def langlinkUnsafe(lang, title, source):
+    @classmethod
+    def langlinkUnsafe(cls, lang, title, source):
         """
         Create a "lang:title" Link linked from source.
 
@@ -4542,7 +4542,7 @@ class Link(ComparableMixin):
 
         @return: Link
         """
-        link = Link.__new__(Link)
+        link = cls.__new__(cls)
         if source.family.interwiki_forward:
             link._site = pywikibot.Site(lang, source.family.interwiki_forward)
         else:
