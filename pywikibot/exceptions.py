@@ -260,6 +260,7 @@ class SectionError(Error):
 
 PageNotSaved = PageSaveRelatedError
 
+
 class NoCreateError(PageSaveRelatedError):
 
     """Parameter nocreate doesn't allow page creation."""
@@ -267,6 +268,7 @@ class NoCreateError(PageSaveRelatedError):
     message = u"Page %s could not be created due to parameter nocreate"
 
     pass
+
 
 class EditConflict(PageSaveRelatedError):
 

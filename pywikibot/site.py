@@ -37,7 +37,6 @@ from pywikibot.data import api
 from pywikibot.exceptions import (
     Error,
     PageRelatedError,
-    PageSaveRelatedError,
     EditConflict,
     PageCreatedConflict,
     PageDeletedConflict,
