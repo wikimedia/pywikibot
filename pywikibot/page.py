@@ -522,11 +522,9 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
             return self._lastNonBotUser
 
         self._lastNonBotUser = None
-        for vh in self.getVersionHistory():
-            (revid, timestmp, username, comment) = vh[:4]
-
-            if username and (not self.site.isBot(username)):
-                self._lastNonBotUser = username
+        for entry in self.getVersionHistory():
+            if entry.user and (not self.site.isBot(entry.user)):
+                self._lastNonBotUser = entry.user
                 break
 
         return self._lastNonBotUser
@@ -544,11 +542,16 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
     def previousRevision(self):
         """Return the revision id for the previous revision of this Page.
 
+        If the page has only one revision, it shall return -1.
+
         @return: long
         """
-        self.getVersionHistory(total=2)
-        revkey = sorted(self._revisions, reverse=True)[1]
-        return revkey
+        history = self.getVersionHistory(total=2)
+
+        if len(history) == 1:
+            return -1
+        else:
+            return min(x.revid for x in history)
 
     def exists(self):
         """Return True if page exists on the wiki, even if it's a redirect.
@@ -1364,8 +1367,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
     #                  returned no more than 500 revisions; now, it iterates
     #                  all revisions unless 'total' argument is used
     @deprecated_args(forceReload=None, revCount="total", getAll=None)
-    def getVersionHistory(self, reverseOrder=False, step=None,
-                          total=None):
+    def getVersionHistory(self, reverseOrder=False, step=None, total=None):
         """Load the version history page and return history information.
 
         Return value is a list of tuples, where each tuple represents one
@@ -1379,25 +1381,21 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """
         self.site.loadrevisions(self, getText=False, rvdir=reverseOrder,
                                 step=step, total=total)
-        return [(self._revisions[rev].revid,
-                 self._revisions[rev].timestamp,
-                 self._revisions[rev].user,
-                 self._revisions[rev].comment
-                 ) for rev in sorted(self._revisions,
-                                     reverse=not reverseOrder)
-                ]
+
+        return [rev.hist_entry()
+                for revid, rev in sorted(self._revisions.items(),
+                                         reverse=not reverseOrder)
+                ][:total]
 
     @deprecated_args(forceReload=None)
     def getVersionHistoryTable(self, reverseOrder=False, step=None, total=None):
         """Return the version history as a wiki table."""
         result = '{| class="wikitable"\n'
         result += '! oldid || date/time || username || edit summary\n'
-        for oldid, time, username, summary \
-                in self.getVersionHistory(reverseOrder=reverseOrder,
-                                          step=step, total=total):
+        for entry in self.getVersionHistory(reverseOrder=reverseOrder,
+                                            step=step, total=total):
             result += '|----\n'
-            result += '| %s || %s || %s || <nowiki>%s</nowiki>\n'\
-                      % (oldid, time, username, summary)
+            result += '| %s || %s || %s || <nowiki>%s</nowiki>\n' % entry
         result += '|}\n'
         return result
 
@@ -1412,17 +1410,13 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
             edit date/time, user name and content
 
         """
-        self.site.loadrevisions(self, getText=True,
-                                rvdir=reverseOrder,
+        self.site.loadrevisions(self, getText=True, rvdir=reverseOrder,
                                 step=step, total=total, rollback=rollback)
-        return [(self._revisions[rev].revid,
-                 self._revisions[rev].timestamp,
-                 self._revisions[rev].user,
-                 self._revisions[rev].text,
-                 self._revisions[rev].rollbacktoken
-                 ) for rev in sorted(self._revisions,
-                                     reverse=not reverseOrder)
-                ]
+
+        return [rev.hist_entry()
+                for revid, rev in sorted(self._revisions.items(),
+                                         reverse=not reverseOrder)
+                ][:total]
 
     def contributingUsers(self, step=None, total=None):
         """Return a set of usernames (or IPs) of users who edited this page.
@@ -1431,8 +1425,8 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         @param total: iterate no more than this number of revisions in total
 
         """
-        edits = self.getVersionHistory(step=step, total=total)
-        users = set([edit[2] for edit in edits])
+        history = self.getVersionHistory(step=step, total=total)
+        users = set(entry.user for entry in history)
         return users
 
     @deprecate_arg("throttle", None)
@@ -3863,6 +3857,19 @@ class Revision(object):
 
     """A structure holding information about a single revision of a Page."""
 
+    HistEntry = collections.namedtuple('HistEntry',
+                                       ['revid',
+                                        'timestamp',
+                                        'user',
+                                        'comment'])
+
+    FullHistEntry = collections.namedtuple('FullHistEntry',
+                                           ['revid',
+                                            'timestamp',
+                                            'user',
+                                            'text',
+                                            'rollbacktoken'])
+
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
                  text=None, minor=False, rollbacktoken=None):
         """
@@ -3895,6 +3902,16 @@ class Revision(object):
         self.comment = comment
         self.minor = minor
         self.rollbacktoken = rollbacktoken
+
+    def hist_entry(self):
+        """Return a namedtuple with a Page history record."""
+        return Revision.HistEntry(self.revid, self.timestamp, self.user,
+                                  self.comment)
+
+    def full_hist_entry(self):
+        """Return a namedtuple with a Page full history record."""
+        return Revision.FullHistEntry(self.revid, self.timestamp, self.user,
+                                      self.text, self.rollbacktoken)
 
 
 class Link(ComparableMixin):

@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Script to check recently uploaded files. This script checks if a file
-description is present and if there are other problems in the image's
-description.
+Script to check recently uploaded files.
+
+This script checks if a file description is present and if there are other
+problems in the image's description.
 
 This script will have to be configured for each language. Please submit
 translations as addition to the Pywikibot framework.
@@ -565,24 +566,16 @@ project_inserted = ['ar', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
 
 class LogIsFull(pywikibot.Error):
 
-    """An exception indicating that the log is full and the Bot cannot add
-    other data to prevent Errors.
-
-    """
+    """Log is full and the Bot cannot add other data to prevent Errors."""
 
 
 class NothingFound(pywikibot.Error):
 
-    """ An exception indicating that a regex has return [] instead of results.
-
-    """
+    """Regex returned [] instead of results."""
 
 
 def printWithTimeZone(message):
-    """ Function to print the messages followed by the TimeZone encoded
-    correctly.
-
-    """
+    """Print the messages followed by the TimeZone encoded correctly."""
     if message[-1] != ' ':
         message = '%s ' % unicode(message)
     if locale.getlocale()[1]:
@@ -596,6 +589,8 @@ def printWithTimeZone(message):
 
 
 class checkImagesBot(object):
+
+    """A robot to check recently uploaded files."""
 
     def __init__(self, site, logFulNumber=25000, sendemailActive=False,
                  duplicatesReport=False, logFullError=True):
@@ -639,9 +634,10 @@ class checkImagesBot(object):
         self.list_licenses = self.load_licenses()
 
     def setParameters(self, imageName):
-        """ Function to set parameters, now only image but maybe it can be used
-        for others in "future"
+        """
+        Set parameters.
 
+        Now only image but maybe it can be used for others in "future".
         """
         self.imageName = imageName
         self.image = pywikibot.FilePage(self.site, self.imageName)
@@ -707,10 +703,7 @@ class checkImagesBot(object):
             return upBotArray[0]
 
     def tag_image(self, put=True):
-        """ Function to add the template in the image and to find out
-        who's the user that has uploaded the file.
-
-        """
+        """Add template to the Image page and find out the uploader."""
         # Get the image's description
         reportPageObject = pywikibot.FilePage(self.site, self.image_to_report)
 
@@ -829,9 +822,10 @@ class checkImagesBot(object):
                     return
 
     def untaggedGenerator(self, untaggedProject, limit):
-        """ Generator that yield the files without license. It's based on a
-        tool of the toolserver.
+        """
+        Generator that yield the files without license.
 
+        It's based on a tool of the toolserver.
         """
         lang = untaggedProject.split('.', 1)[0]
         project = '.%s' % untaggedProject.split('.', 1)[1]
@@ -863,10 +857,7 @@ class checkImagesBot(object):
                 u'that it works!')
 
     def regexGenerator(self, regexp, textrun):
-        """ Generator used when an user use a regex parsing a page to yield the
-        results
-
-        """
+        """Find page to yield using regex to parse text."""
         regex = re.compile(r'%s' % regexp, re.UNICODE | re.DOTALL)
         results = regex.findall(textrun)
         for image in results:
@@ -935,7 +926,7 @@ class checkImagesBot(object):
         user_list = list()
 
         for data in history:
-            user_list.append(data[2])
+            user_list.append(data.user)
         number_edits = 0
 
         for username in userlist:
@@ -1319,11 +1310,7 @@ class checkImagesBot(object):
         return list_licenses
 
     def miniTemplateCheck(self, template):
-        """
-        Check whether the given template given in the licenses allowed or in the
-        licenses to skip.
-
-        """
+        """Check if template is in allowed licenses or in licenses to skip."""
         # the list_licenses are loaded in the __init__
         # (not to load them multimple times)
         if template in self.list_licenses:
@@ -1345,11 +1332,12 @@ class checkImagesBot(object):
 
     def templateInList(self):
         """
+        Check if template is in list.
+
         The problem is the calls to the Mediawiki system because they can be
         pretty slow. While searching in a list of objects is really fast, so
         first of all let's see if we can find something in the info that we
         already have, then make a deeper check.
-
         """
         for template in self.licenses_found:
             result = self.miniTemplateCheck(template)
@@ -1368,10 +1356,12 @@ class checkImagesBot(object):
                     continue
 
     def smartDetection(self):
-        """The bot instead of checking if there's a simple template in the
+        """
+        Detect templates.
+
+        The bot instead of checking if there's a simple template in the
         image's description, checks also if that template is a license or
         something else. In this sense this type of check is smart.
-
         """
         self.seems_ok = False
         self.license_found = None
@@ -1522,9 +1512,10 @@ class checkImagesBot(object):
             pywikibot.output('')
 
     def wait(self, waitTime, generator, normal, limit):
-        """ Skip the images uploaded before x seconds to let
-            the users to fix the image's problem alone in the
-            first x seconds.
+        """
+        Skip the images uploaded before x seconds.
+
+        Let the users to fix the image's problem alone in the first x seconds.
         """
         imagesToSkip = 0
         # if normal, we can take as many images as "limit" has told us,
