@@ -424,87 +424,46 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
                                                user_id=user_id, tags=tags,
                                                per_page='100', page='1')
         pages = photos.find('photos').attrib['pages']
-
-        for i in range(1, int(pages) + 1):
-            gotPhotos = False
-            while not gotPhotos:
-                try:
-                    for photo in flickr.groups_pools_getPhotos(
-                        group_id=group_id, user_id=user_id, tags=tags,
-                        per_page='100', page=i
-                    ).find('photos').getchildren():
-                        gotPhotos = True
-                        if photo.attrib['id'] == start_id:
-                            found_start_id = True
-                        if found_start_id:
-                            if photo.attrib['id'] == end_id:
-                                pywikibot.output('Found end_id')
-                                return
-                            else:
-                                yield photo.attrib['id']
-
-                except flickrapi.exceptions.FlickrError:
-                    gotPhotos = False
-                    pywikibot.output(u'Flickr api problem, sleeping')
-                    time.sleep(30)
-
+        gen = lambda i: flickr.groups_pools_getPhotos(
+            group_id=group_id, user_id=user_id, tags=tags,
+            per_page='100', page=i
+        ).find('photos').getchildren()
     # https://www.flickr.com/services/api/flickr.photosets.getPhotos.html
     # Get the photos in a photoset
     elif photoset_id:
         photos = flickr.photosets_getPhotos(photoset_id=photoset_id,
                                             per_page='100', page='1')
         pages = photos.find('photoset').attrib['pages']
-
-        for i in range(1, int(pages) + 1):
-            gotPhotos = False
-            while not gotPhotos:
-                try:
-                    for photo in flickr.photosets_getPhotos(
-                        photoset_id=photoset_id, per_page='100', page=i
-                    ).find('photoset').getchildren():
-                        gotPhotos = True
-                        if photo.attrib['id'] == start_id:
-                            found_start_id = True
-                        if found_start_id:
-                            if photo.attrib['id'] == end_id:
-                                pywikibot.output('Found end_id')
-                                return
-                            else:
-                                yield photo.attrib['id']
-
-                except flickrapi.exceptions.FlickrError:
-                    gotPhotos = False
-                    pywikibot.output(u'Flickr api problem, sleeping')
-                    time.sleep(30)
-
+        gen = lambda i: flickr.photosets_getPhotos(
+            photoset_id=photoset_id, per_page='100', page=i
+        ).find('photoset').getchildren()
     # https://www.flickr.com/services/api/flickr.people.getPublicPhotos.html
     # Get the (public) photos uploaded by a user
     elif user_id:
         photos = flickr.people_getPublicPhotos(user_id=user_id,
                                                per_page='100', page='1')
         pages = photos.find('photos').attrib['pages']
-        # flickrapi.exceptions.FlickrError
-        for i in range(1, int(pages) + 1):
-            gotPhotos = False
-            while not gotPhotos:
-                try:
-                    for photo in flickr.people_getPublicPhotos(
-                        user_id=user_id, per_page='100', page=i
-                    ).find('photos').getchildren():
-                        gotPhotos = True
-                        if photo.attrib['id'] == start_id:
-                            found_start_id = True
-                        if found_start_id:
-                            if photo.attrib['id'] == end_id:
-                                pywikibot.output('Found end_id')
-                                return
-                            else:
-                                yield photo.attrib['id']
-
-                except flickrapi.exceptions.FlickrError:
-                    gotPhotos = False
-                    pywikibot.output(u'Flickr api problem, sleeping')
-                    time.sleep(30)
+        gen = lambda i: flickr.people_getPublicPhotos(
+            user_id=user_id, per_page='100', page=i
+        ).find('photos').getchildren()
+    for i in range(1, int(pages) + 1):
+        gotPhotos = False
+        while not gotPhotos:
+            try:
+                for photo in gen(i):
+                    gotPhotos = True
+                    if photo.attrib['id'] == start_id:
+                        found_start_id = True
+                    if found_start_id:
+                        if photo.attrib['id'] == end_id:
+                            pywikibot.output('Found end_id')
+                            return
+                        else:
+                            yield photo.attrib['id']
+            except flickrapi.exceptions.FlickrError:
+                gotPhotos = False
+                pywikibot.output(u'Flickr api problem, sleeping')
+                time.sleep(30)
 
     return
 
