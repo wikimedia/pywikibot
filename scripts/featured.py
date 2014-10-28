@@ -559,9 +559,10 @@ class FeaturedBot(pywikibot.Bot):
             else:
                 # insert just before interwiki
                 if (not interactive or
-                    pywikibot.input(
-                        u'Connecting %s -> %s. Proceed? [Y/N]'
-                        % (source.title(), dest.title())) in ['Y', 'y']):
+                    pywikibot.input_yn(
+                        u'Connecting %s -> %s. Proceed?'
+                        % (source.title(), dest.title()),
+                        default=False, automatic_quit=False)):
                     if self.getOption('side'):
                         # Placing {{Link FA|xx}} right next to
                         # corresponding interwiki
@@ -581,9 +582,10 @@ class FeaturedBot(pywikibot.Bot):
             if m2:
                 if (changed or  # Don't force the user to say "Y" twice
                     not interactive or
-                    pywikibot.input(
-                        u'Connecting %s -> %s. Proceed? [Y/N]'
-                        % (source.title(), dest.title())) in ['Y', 'y']):
+                    pywikibot.input_yn(
+                        u'Connecting %s -> %s. Proceed?'
+                        % (source.title(), dest.title()),
+                        default=False, automatic_quit=False)):
                     text = re.sub(re_Link_remove, '', text)
                     changed = True
             elif task == 'former':

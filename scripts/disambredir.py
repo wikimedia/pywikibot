@@ -73,17 +73,15 @@ def treat(text, linkedPage, targetPage):
         pywikibot.output(text[max(0, m.start() - context): m.start()] +
                          '\03{lightred}' + text[m.start(): m.end()] +
                          '\03{default}' + text[m.end(): m.end() + context])
-        while True:
-            choice = pywikibot.input(
-                u"Option (N=do not change, y=change link to \03{lightpurple}%s\03{default}, r=change and replace text, u=unlink)"
-                % targetPage.title())
-            try:
-                choice = choice[0]
-            except:
-                choice = 'N'
-            if choice in 'nNyYrRuU':
-                break
-        if choice in "nN":
+        choice = pywikibot.input_choice(
+            'What should be done with the link?',
+            (('Do not change', 'n'),
+             ('Change link to \03{lightpurple}%s\03{default}'
+              % targetPage.title(), 'y'),
+             ('Change and replace text', 'r'), ('Unlink', 'u')),
+            default='n', automatic_quit=False)
+
+        if choice == 'n':
             continue
 
         # The link looks like this:
@@ -101,20 +99,19 @@ def treat(text, linkedPage, targetPage):
         if trailing_chars:
             link_text += trailing_chars
 
-        if choice in "uU":
+        if choice == 'u':
             # unlink - we remove the section if there's any
             text = text[:m.start()] + link_text + text[m.end():]
             continue
-        replaceit = choice in "rR"
 
         if link_text[0].isupper():
             new_page_title = targetPage.title()
         else:
             new_page_title = (targetPage.title()[0].lower() +
                               targetPage.title()[1:])
-        if replaceit and trailing_chars:
+        if choice == 'r' and trailing_chars:
             newlink = "[[%s%s]]%s" % (new_page_title, section, trailing_chars)
-        elif replaceit or (new_page_title == link_text and not section):
+        elif choice == 'r' or (new_page_title == link_text and not section):
             newlink = "[[%s]]" % new_page_title
         # check if we can create a link with trailing characters instead of a
         # pipelink
