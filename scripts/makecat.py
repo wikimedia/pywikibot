@@ -104,11 +104,6 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None):
                     checked[refPage] = refPage
 
 
-def exclude(pl, real_exclude=True):
-    if real_exclude:
-        excludefile.write('%s\n' % pl.title())
-
-
 def asktoadd(pl):
     if pl.site != mysite:
         return
@@ -141,10 +136,9 @@ def asktoadd(pl):
             include(pl)
             break
         elif answer == 'n':
-            exclude(pl)
+            excludefile.write('%s\n' % pl.title())
             break
         elif answer == 'i':
-            exclude(pl, real_exclude=False)
             break
         elif answer == 'o':
             pywikibot.output(u"t: Give the beginning of the text of the page")
@@ -170,7 +164,6 @@ def asktoadd(pl):
                     include(pl, checklinks=False)
             else:
                 pywikibot.output(u"Page does not exist; not added.")
-                exclude(pl, real_exclude=False)
             break
         elif answer == 'l':
             pywikibot.output(u"Number of pages still to check: %s"
@@ -234,7 +227,6 @@ try:
                     line = line[:-1]
             except IndexError:
                 pass
-            exclude(line, real_exclude=False)
             pl = pywikibot.Page(mysite, line)
             checked[pl] = pl
         f.close()
@@ -253,7 +245,6 @@ try:
         for cat in subcatlist:
             artlist = list(cat.articles())
             for page in artlist:
-                exclude(page.title(), real_exclude=False)
                 checked[page] = page
     list = [x for x in workingcat.articles()]
     if list:
