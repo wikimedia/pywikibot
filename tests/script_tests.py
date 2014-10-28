@@ -412,8 +412,6 @@ class TestScript(DefaultSiteTestCase, PwbTestCase):
 
     __metaclass__ = TestScriptMeta
 
-    site = True
-
     def setUp(self):
         super(TestScript, self).setUp()
         """Prepare the environment for running the pwb.py script."""

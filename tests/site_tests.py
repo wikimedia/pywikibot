@@ -94,7 +94,7 @@ class TestBaseSiteProperties(TestCase):
         },
     }
 
-    cached = True
+    dry = True
 
     def test_properties(self, key):
         """Test cases for BaseSite properties."""

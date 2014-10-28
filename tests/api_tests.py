@@ -10,20 +10,25 @@ __version__ = '$Id$'
 import datetime
 import pywikibot
 import pywikibot.data.api as api
-from tests.aspects import unittest, TestCase, DefaultSiteTestCase
+from tests.aspects import (
+    unittest,
+    TestCase,
+    DefaultSiteTestCase,
+    DefaultDrySiteTestCase,
+)
 
 
-class TestApiFunctions(DefaultSiteTestCase):
+class TestApiFunctions(DefaultDrySiteTestCase):
 
     """API Request object test class."""
-
-    cached = True
 
     def testObjectCreation(self):
         """Test api.Request() constructor."""
         mysite = self.get_site()
         req = api.Request(site=mysite, action="test", foo="", bar="test")
         self.assertTrue(req)
+        self.assertEqual(req.site, mysite)
+        req = api.Request(action="test", foo="", bar="test")
         self.assertEqual(req.site, mysite)
         self.assertIn("foo", req._params)
         self.assertEqual(req["bar"], ["test"])
@@ -45,7 +50,7 @@ class TestPageGenerator(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    cached = True
+    dry = True
 
     def setUp(self):
         super(TestPageGenerator, self).setUp()
@@ -75,6 +80,11 @@ class TestPageGenerator(TestCase):
                       }
         }
 
+        # On a dry site, the namespace objects only have canonical names.
+        # Add custom_name for this site namespace, to match the live site.
+        if 'Wikipedia' not in self.site._namespaces:
+            self.site._namespaces[4].custom_name = 'Wikipedia'
+
     def testGeneratorResults(self):
         """Test that PageGenerator yields pages with expected attributes."""
         titles = ["Broadcaster.com", "Broadcaster (definition)",
@@ -88,7 +98,7 @@ class TestPageGenerator(TestCase):
             self.assertIn(page.title(), titles)
 
     def test_initial_limit(self):
-        self.assertEqual(self.gen.limit, None)  # limit is initaly None
+        self.assertEqual(self.gen.limit, None)  # limit is initally None
 
     def test_limit_as_number(self):
         for i in range(-2, 4):

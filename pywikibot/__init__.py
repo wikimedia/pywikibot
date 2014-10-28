@@ -510,8 +510,9 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     @type user: unicode
     @param sysop: sysop user to use on this site (override config.sysopnames)
     @type sysop: unicode
-    @param interface: site interface (override config.site_interface)
-    @type interface: string
+    @param interface: site class or name of class in pywikibot.site
+        (override config.site_interface)
+    @type interface: subclass of L{pywikibot.site.BaseSite} or string
     @param url: Instead of code and fam, does try to get a Site based on the
         URL. Still requires that the family supporting that URL exists.
     @type url: string
@@ -556,16 +557,22 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
         sysop = sysop or config.sysopnames[family_name].get(code) \
             or config.sysopnames[family_name].get('*')
 
-    try:
-        tmp = __import__('pywikibot.site', fromlist=[interface])
-        __Site = getattr(tmp, interface)
-    except ImportError:
-        raise ValueError("Invalid interface name '%(interface)s'" % locals())
-    key = '%s:%s:%s:%s' % (interface, fam, code, user)
-    if key not in _sites or not isinstance(_sites[key], __Site):
-        _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
-        debug(u"Instantiating Site object '%(site)s'"
-                        % {'site': _sites[key]}, _logger)
+    if not isinstance(interface, type):
+        # If it isnt a class, assume it is a string
+        try:
+            tmp = __import__('pywikibot.site', fromlist=[interface])
+            interface = getattr(tmp, interface)
+        except ImportError:
+            raise ValueError("Invalid interface name '%(interface)s'" % locals())
+
+    if not issubclass(interface, pywikibot.site.BaseSite):
+        warning('Site called with interface=%s' % interface.__name__)
+
+    key = '%s:%s:%s:%s' % (interface.__name__, fam, code, user)
+    if key not in _sites or not isinstance(_sites[key], interface):
+        _sites[key] = interface(code=code, fam=fam, user=user, sysop=sysop)
+        debug(u"Instantiated %s object '%s'"
+              % (interface.__name__, _sites[key]), _logger)
     return _sites[key]
 
 

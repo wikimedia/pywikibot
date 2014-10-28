@@ -122,6 +122,8 @@ Other class attributes
 ----------------------
 
 - 'net = False' : test class does not use a site
+- 'dry = True' : test class can use a fake site object
 - 'user = True' : test class needs to login to site
+- 'sysop = True' : test class needs to login to site as a sysop
 - 'write = True' : test class needs to write to a site
 

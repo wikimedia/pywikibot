@@ -1477,7 +1477,7 @@ class APISite(BaseSite):
         if sysop and 'sysop' not in self.userinfo['groups']:
             return False
 
-        if not self.userinfo['name']:
+        if 'name' not in self.userinfo or not self.userinfo['name']:
             return False
 
         if self.userinfo['name'] != self._username[sysop]:

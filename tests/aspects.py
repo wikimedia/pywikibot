@@ -38,6 +38,7 @@ import pywikibot
 from pywikibot import config, Site
 from pywikibot.site import BaseSite
 from pywikibot.family import WikimediaFamily
+from pywikibot.data.api import Request as _original_Request
 
 import tests
 from tests import unittest, patch_request, unpatch_request
@@ -135,6 +136,46 @@ class ForceCacheMixin(TestCaseBase):
         super(ForceCacheMixin, self).tearDown()
 
         unpatch_request()
+
+
+class SiteNotPermitted(pywikibot.site.BaseSite):
+
+    """Site interface to prevent sites being loaded."""
+
+    def __init__(self, code, fam=None, user=None, sysop=None):
+        raise pywikibot.SiteDefinitionError(
+            'Loading site %s:%s during dry test not permitted'
+            % (fam, code))
+
+
+class DisconnectedSiteMixin(TestCaseBase):
+
+    """Test cases using a disconnected Site object.
+
+    Do not use this for mock Site objects.
+
+    Never set a class or instance variable called 'site'
+    As it will prevent tests from executing when invoked as:
+    $ nosetests -a '!site' -v
+    """
+
+    def setUp(self):
+        """Set up test."""
+        self.old_config_interface = config.site_interface
+        # TODO: put a dummy subclass into config.site_interface
+        #       as the default, to show a useful error message.
+        config.site_interface = SiteNotPermitted
+
+        pywikibot.data.api.Request = tests.utils.DryRequest
+
+        super(DisconnectedSiteMixin, self).setUp()
+
+    def tearDown(self):
+        """Tear down test."""
+        super(DisconnectedSiteMixin, self).tearDown()
+
+        config.site_interface = self.old_config_interface
+        pywikibot.data.api.Request = _original_Request
 
 
 class CacheInfoMixin(TestCaseBase):
@@ -332,6 +373,9 @@ class MetaTestCaseClass(type):
                     }
                 }
 
+        if 'dry' in dct and dct['dry'] is True:
+            dct['net'] = False
+
         if (('sites' not in dct and 'site' not in dct) or
                 ('site' in dct and not dct['site'])):
             # Prevent use of pywikibot.Site
@@ -356,6 +400,12 @@ class MetaTestCaseClass(type):
             return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
 
         # The following section is only processed if the test uses sites.
+
+        if 'dry' in dct and dct['dry']:
+            bases = tuple([DisconnectedSiteMixin] + list(bases))
+            del dct['net']
+        else:
+            dct['net'] = True
 
         if 'cacheinfo' in dct and dct['cacheinfo']:
             bases = tuple([CacheInfoMixin] + list(bases))
@@ -425,18 +475,24 @@ class TestCase(TestTimerMixin, TestCaseBase):
         if not cls.sites:
             cls.sites = {}
 
+        # If the test is not cached, create new Site objects for this class
+        if not hasattr(cls, 'cached') or not cls.cached:
+            orig_sites = pywikibot._sites
+            pywikibot._sites = {}
+
+        interface = None  # defaults to 'APISite'
+        if hasattr(cls, 'dry') and cls.dry:
+            # Delay load to avoid cyclic import
+            from tests.utils import DrySite
+            interface = DrySite
+
         for data in cls.sites.values():
             if 'site' not in data:
-                # If the test is not cached, fetch a new Site for this class
-                if not hasattr(cls, 'cached') or not cls.cached:
-                    orig_sites = pywikibot._sites
-                    pywikibot._sites = {}
-                    site = Site(data['code'], data['family'])
-                    pywikibot._sites = orig_sites
-                else:
-                    site = Site(data['code'], data['family'])
+                data['site'] = Site(data['code'], data['family'],
+                                    interface=interface)
 
-                data['site'] = site
+        if not hasattr(cls, 'cached') or not cls.cached:
+            pywikibot._sites = orig_sites
 
         if len(cls.sites) == 1:
             key = next(iter(cls.sites.keys()))
@@ -528,6 +584,13 @@ class DefaultSiteTestCase(TestCase):
 
     family = config.family
     code = config.mylang
+
+
+class DefaultDrySiteTestCase(DefaultSiteTestCase):
+
+    """Run tests using the config specified site in offline mode."""
+
+    dry = True
 
 
 class WikimediaSiteTestCase(TestCase):

@@ -66,13 +66,26 @@ class TestGeneral(WikidataTestCase):
         claim.setTarget(pywikibot.ItemPage(repo, 'q1'))
         self.assertEqual(claim._formatValue(), {'entity-type': 'item', 'numeric-id': 1})
 
-        # test WbTime
+    def test_cmp(self):
+        """ Test WikibasePage.__cmp__. """
+        self.assertEqual(pywikibot.ItemPage.fromPage(self.mainpage),
+                         pywikibot.ItemPage(self.get_repo(), 'q5296'))
+
+
+class TestWikibaseTypes(WikidataTestCase):
+
+    """Test Wikibase data types."""
+
+    dry = True
+
+    def test_WbTime(self):
+        repo = self.get_repo()
         t = pywikibot.WbTime(site=repo, year=2010, hour=12, minute=43)
         self.assertEqual(t.toTimestr(), '+00000002010-01-01T12:43:00Z')
         self.assertRaises(ValueError, pywikibot.WbTime, site=repo, precision=15)
         self.assertRaises(ValueError, pywikibot.WbTime, site=repo, precision='invalid_precision')
 
-        # test WbQuantity
+    def test_WbQuantity(self):
         q = pywikibot.WbQuantity(amount=1234, error=1)
         self.assertEqual(q.toWikibase(),
                          {'amount': 1234, 'lowerBound': 1233,
@@ -114,14 +127,22 @@ class TestGeneral(WikidataTestCase):
         self.assertRaises(NotImplementedError, pywikibot.WbQuantity, amount=789,
                           unit='invalid_unit')
 
-        # test WikibasePage.__cmp__
-        self.assertEqual(pywikibot.ItemPage.fromPage(self.mainpage),
-                         pywikibot.ItemPage(repo, 'q5296'))
 
-    def testItemPageExtensionability(self):
+class TestItemPageExtensibility(TestCase):
+
+    """Test ItemPage extensibility."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def test_ItemPage_extensibility(self):
         class MyItemPage(pywikibot.ItemPage):
             pass
-        self.assertIsInstance(MyItemPage.fromPage(self.mainpage), MyItemPage)
+        page = pywikibot.Page(self.site, 'foo')
+        self.assertIsInstance(MyItemPage.fromPage(page, lazy_load=True),
+                              MyItemPage)
 
 
 class TestItemLoad(WikidataTestCase):
@@ -593,6 +614,8 @@ class TestWriteNormalizeLang(TestCase):
     family = 'wikipedia'
     code = 'en'
 
+    dry = True
+
     def setUp(self):
         super(TestWriteNormalizeLang, self).setUp()
         self.site = self.get_site()
@@ -757,65 +780,48 @@ class TestNamespaces(WikidataTestCase):
                           'Invalid:Q1')
 
 
-class TestAlternateNamespaces(TestCase):
+class TestAlternateNamespaces(WikidataTestCase):
 
     """Test cases to test namespaces of Wikibase entities."""
 
-    net = False
+    dry = True
 
-    def setUp(self):
-        super(TestAlternateNamespaces, self).setUp()
+    @classmethod
+    def setUpClass(cls):
+        super(TestAlternateNamespaces, cls).setUpClass()
 
-        class DrySite(pywikibot.site.DataSite):
-            _namespaces = {
-                90: Namespace(id=90,
-                              case='first-letter',
-                              canonical_name='Item',
-                              defaultcontentmodel='wikibase-item'),
-                92: Namespace(id=92,
-                              case='first-letter',
-                              canonical_name='Prop',
-                              defaultcontentmodel='wikibase-property')
-            }
-
-            __init__ = lambda *args: None
-            code = 'test'
-            family = lambda: None
-            family.name = 'test'
-            _logged_in_as = None
-            _siteinfo = {'case': 'first-letter'}
-            _item_namespace = None
-            _property_namespace = None
-
-            def encoding(self):
-                return 'utf-8'
-
-            def encodings(self):
-                return []
-
-        self.site = DrySite('test', 'mock', None, None)
+        cls.get_repo()._namespaces = {
+            90: Namespace(id=90,
+                          case='first-letter',
+                          canonical_name='Item',
+                          defaultcontentmodel='wikibase-item'),
+            92: Namespace(id=92,
+                          case='first-letter',
+                          canonical_name='Prop',
+                          defaultcontentmodel='wikibase-property')
+        }
 
     def test_alternate_item_namespace(self):
-        item = pywikibot.ItemPage(self.site, 'Q60')
+        item = pywikibot.ItemPage(self.repo, 'Q60')
         self.assertEqual(item.namespace(), 90)
         self.assertEqual(item.id, 'Q60')
         self.assertEqual(item.title(), 'Item:Q60')
         self.assertEqual(item._defined_by(), {'ids': 'Q60'})
 
-        item = pywikibot.ItemPage(self.site, 'Item:Q60')
+        item = pywikibot.ItemPage(self.repo, 'Item:Q60')
         self.assertEqual(item.namespace(), 90)
         self.assertEqual(item.id, 'Q60')
         self.assertEqual(item.title(), 'Item:Q60')
         self.assertEqual(item._defined_by(), {'ids': 'Q60'})
 
     def test_alternate_property_namespace(self):
-        prop = pywikibot.PropertyPage(self.site, 'P21')
+        prop = pywikibot.PropertyPage(self.repo, 'P21')
         self.assertEqual(prop.namespace(), 92)
         self.assertEqual(prop.id, 'P21')
         self.assertEqual(prop.title(), 'Prop:P21')
         self.assertEqual(prop._defined_by(), {'ids': 'P21'})
 
-        prop = pywikibot.PropertyPage(self.site, 'Prop:P21')
+        prop = pywikibot.PropertyPage(self.repo, 'Prop:P21')
         self.assertEqual(prop.namespace(), 92)
         self.assertEqual(prop.id, 'P21')
         self.assertEqual(prop.title(), 'Prop:P21')
@@ -867,6 +873,8 @@ class TestUnconnectedClient(TestCase):
         },
     }
 
+    dry = True
+
     def test_not_supported_family(self, key):
         """Test that family without a data repository causes error."""
         site = self.get_site(key)
@@ -882,6 +890,8 @@ class TestUnconnectedClient(TestCase):
 class TestJSON(WikidataTestCase):
 
     """Test cases to test toJSON() functions."""
+
+    dry = True
 
     @classmethod
     def setUpClass(cls):

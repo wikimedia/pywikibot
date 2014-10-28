@@ -14,33 +14,21 @@ from pywikibot.site import must_be, need_version
 from pywikibot.comms.http import user_agent
 from pywikibot.exceptions import UnknownSite
 
-from tests.utils import DummySiteinfo
-from tests.aspects import unittest, TestCase, DeprecationTestCase
+from tests.aspects import (
+    unittest, TestCase,
+    DefaultDrySiteTestCase,
+    DeprecationTestCase,
+)
 
 
-class DrySite(pywikibot.site.APISite):
-
-    """Fake APISite object."""
-
-    _loginstatus = pywikibot.site.LoginStatus.NOT_ATTEMPTED
-
-    @property
-    def userinfo(self):
-        return self._userinfo
-
-    @property
-    def siteinfo(self):
-        return DummySiteinfo({})
-
-
-class TestDrySite(TestCase):
+class TestDrySite(DefaultDrySiteTestCase):
 
     """Tests against a fake Site object."""
 
-    net = False
+    dry = True
 
     def test_logged_in(self):
-        x = DrySite('en', 'wikipedia')
+        x = self.get_site()
 
         x._userinfo = {'name': None, 'groups': []}
         x._username = ['normal_user', 'sysop_user']
@@ -58,7 +46,7 @@ class TestDrySite(TestCase):
         self.assertFalse(x.logged_in(False))
 
     def test_user_agent(self):
-        x = DrySite('en', 'wikipedia')
+        x = self.get_site()
 
         x._userinfo = {'name': 'foo'}
         x._username = ('foo', None)
@@ -104,7 +92,7 @@ class TestDrySite(TestCase):
         x._username = (None, None)
 
         self.assertEqual('Foo', user_agent(x, format_string='Foo {username}'))
-        self.assertEqual('Foo (wikipedia:en)',
+        self.assertEqual('Foo (' + x.family.name + ':' + x.code + ')',
                          user_agent(x, format_string='Foo ({script_comments})'))
 
 

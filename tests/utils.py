@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Test utilities."""
 #
 # (C) Pywikibot team, 2013-2014
 #
@@ -8,8 +9,12 @@ from __future__ import print_function
 __version__ = '$Id$'
 #
 import pywikibot
+from pywikibot.site import Namespace
+from pywikibot.data.api import CachedRequest
+from pywikibot.data.api import Request as _original_Request
+
 from tests import aspects
-from tests import unittest  # flake8: noqa
+from tests import unittest  # noqa
 
 BaseTestCase = aspects.TestCase
 NoSiteTestCase = aspects.TestCase
@@ -32,6 +37,8 @@ def expectedFailureIf(expect):
 
 
 class DummySiteinfo():
+
+    """Dummy class to use instead of L{pywikibot.site.Siteinfo}."""
 
     def __init__(self, cache):
         self._cache = dict((key, (item, False)) for key, item in cache.items())
@@ -68,3 +75,84 @@ class DummySiteinfo():
 
     def get_requested_time(self, key):
         return False
+
+
+class DryRequest(CachedRequest):
+
+    """Dummy class to use instead of L{pywikibot.data.api.Request}."""
+
+    def __init__(self, *args, **kwargs):
+        _original_Request.__init__(self, *args, **kwargs)
+
+    def _expired(self, dt):
+        """Never invalidate cached data."""
+        return False
+
+    def _write_cache(self, data):
+        """Never write data."""
+        return
+
+    def submit(self):
+        raise Exception(u'DryRequest rejecting request: %r'
+                        % self._params)
+
+
+class DrySite(pywikibot.site.APISite):
+
+    """Dummy class to use instead of L{pywikibot.site.APISite}."""
+
+    _loginstatus = pywikibot.site.LoginStatus.NOT_ATTEMPTED
+
+    def __init__(self, code, fam, user, sysop):
+        """Constructor."""
+        super(DrySite, self).__init__(code, fam, user, sysop)
+        self._userinfo = pywikibot.tools.EMPTY_DEFAULT
+        self._siteinfo = DummySiteinfo({})
+        self._siteinfo._cache['lang'] = (code, True)
+        self._namespaces = Namespace.builtin_namespaces()
+
+    @property
+    def userinfo(self):
+        return self._userinfo
+
+    def version(self):
+        return self.family.version(self.code)
+
+    def case(self):
+        if self.family.name == 'wiktionary':
+            return 'case-sensitive'
+        else:
+            return 'first-letter'
+
+    def image_repository(self):
+        """Return Site object for image repository e.g. commons."""
+        code, fam = self.shared_image_repository()
+        if bool(code or fam):
+            return pywikibot.Site(code, fam, self.username(),
+                                  interface=self.__class__)
+
+    def data_repository(self):
+        """Return Site object for data repository e.g. Wikidata."""
+        code, fam = self.shared_data_repository()
+        if bool(code or fam):
+            return pywikibot.Site(code, fam, self.username(),
+                                  interface=DryDataSite)
+
+
+class DryDataSite(DrySite, pywikibot.site.DataSite):
+
+    """Dummy class to use instead of L{pywikibot.site.DataSite}."""
+
+    def __init__(self, code, fam, user, sysop):
+        """Constructor."""
+        super(DryDataSite, self).__init__(code, fam, user, sysop)
+
+        self._namespaces[0].defaultcontentmodel = 'wikibase-item'
+
+        self._namespaces.update(
+            {
+                120: Namespace(id=120,
+                               case='first-letter',
+                               canonical_name='Property',
+                               defaultcontentmodel='wikibase-property')
+            })
