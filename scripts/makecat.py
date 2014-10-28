@@ -235,10 +235,13 @@ try:
     except IOError:
         # File does not exist
         excludefile = codecs.open(filename, 'w', encoding=mysite.encoding())
+
+    # Get parent categories in order to `removeparent`
     try:
         parentcats = workingcat.categories()
     except pywikibot.Error:
         parentcats = []
+
     # Do not include articles already in subcats; only checking direct subcats
     subcatlist = list(workingcat.subcategories())
     if subcatlist:
@@ -247,14 +250,12 @@ try:
             artlist = list(cat.articles())
             for page in artlist:
                 checked[page] = page
-    list = [x for x in workingcat.articles()]
-    if list:
-        for pl in list:
-            checked[pl] = pl
-        list = pagegenerators.PreloadingGenerator(list)
-        for pl in list:
-            include(pl)
-    else:
+
+    # Fetch articles in category, and mark as already checked (seen)
+    # If category is empty, ask user if they want to look for pages
+    # in a diferent category.
+    articles = list(workingcat.articles(content=True))
+    if not articles:
         pywikibot.output(
             u"Category %s does not exist or is empty. Which page to start with?"
             % workingcatname)
@@ -263,6 +264,9 @@ try:
             answer = workingcatname
         pywikibot.output(u'' + answer)
         pl = pywikibot.Page(mysite, answer)
+        articles = [pl]
+
+    for pl in articles:
         checked[pl] = pl
         include(pl)
 
