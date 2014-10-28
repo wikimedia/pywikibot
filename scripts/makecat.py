@@ -44,6 +44,7 @@ import sys
 import codecs
 import pywikibot
 from pywikibot import date, pagegenerators, i18n, textlib
+from pywikibot.tools import DequeGenerator
 
 
 def isdate(s):
@@ -197,7 +198,7 @@ try:
     removeparent = True
     main = True
     workingcatname = ''
-    tocheck = []
+    tocheck = DequeGenerator()
     for arg in pywikibot.handleArgs():
         if arg.startswith('-nodate'):
             skipdates = True
@@ -271,26 +272,14 @@ try:
             answer = workingcatname
         pywikibot.output(u'' + answer)
         pl = pywikibot.Page(mysite, answer)
-        tocheck = []
         checked[pl] = pl
         include(pl)
-    loaded = 0
-    while tocheck:
-        if loaded == 0:
-            if len(tocheck) < 50:
-                loaded = len(tocheck)
-            else:
-                loaded = 50
-            tocheck = [x for x in pagegenerators.PreloadingGenerator(tocheck[:loaded])]
-        if not checkbroken:
-            if not tocheck[0].exists():
-                pass
-            else:
-                asktoadd(tocheck[0])
-        else:
-            asktoadd(tocheck[0])
-        tocheck = tocheck[1:]
-        loaded -= 1
+
+    gen = pagegenerators.DequePreloadingGenerator(tocheck)
+
+    for page in gen:
+        if checkbroken or page.exists():
+            asktoadd(page)
 
 finally:
     try:
