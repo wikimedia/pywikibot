@@ -3728,24 +3728,16 @@ class APISite(BaseSite):
             if not recreate:
                 raise
         token = self.tokens['edit']
-        # getting token also updates the 'lastrevid' value, which allows us to
-        # detect if page has been changed since last time text was retrieved.
-
-        # note that the server can still return an 'editconflict' error
-        # if the page is updated after the token is retrieved but
-        # before the page is saved.
         self.lock_page(page)
-        if lastrev is not None and page.latestRevision() != lastrev:
-            raise EditConflict(page)
         params = dict(action="edit",
                       title=page.title(withSection=False),
                       text=text, token=token, summary=summary)
         if bot:
-            params["bot"] = ""
+            params['bot'] = ""
         if lastrev is not None:
             if lastrev not in page._revisions:
                 self.loadrevisions(page)
-            params["basetimestamp"] = page._revisions[lastrev].timestamp
+            params['basetimestamp'] = page._revisions[lastrev].timestamp
         if minor:
             params['minor'] = ""
         elif notminor:
