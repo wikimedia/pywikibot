@@ -13,7 +13,7 @@ import threading
 import time
 import inspect
 import re
-from collections import Mapping
+from collections import Mapping, deque
 from distutils.version import Version
 
 if sys.version_info[0] > 2:
@@ -319,6 +319,26 @@ class EmptyDefault(str, Mapping):
 
 
 EMPTY_DEFAULT = EmptyDefault()
+
+
+class DequeGenerator(deque):
+
+    """A generator that allows items to be added during generating."""
+
+    def __iter__(self):
+        """Return the object which will be iterated."""
+        return self
+
+    def next(self):
+        """Python 3 iterator method."""
+        if len(self):
+            return self.popleft()
+        else:
+            raise StopIteration
+
+    def __next__(self):
+        """Python 3 iterator method."""
+        return self.next()
 
 # Decorators
 #

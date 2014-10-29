@@ -28,7 +28,7 @@ import re
 import time
 import pywikibot
 from pywikibot import date, config, i18n
-from pywikibot.tools import deprecated_args
+from pywikibot.tools import deprecated_args, DequeGenerator
 from pywikibot.comms import http
 import pywikibot.data.wikidataquery as wdquery
 
@@ -1141,6 +1141,18 @@ def PreloadingGenerator(generator, step=50):
             # process any leftover sites that never reached the step
             for i in site.preloadpages(sites[site], step):
                 yield i
+
+
+def DequePreloadingGenerator(generator, step=50):
+    assert(isinstance(generator, DequeGenerator))
+
+    while True:
+        page_count = min(len(generator), step)
+        if not page_count:
+            raise StopIteration
+
+        for page in PreloadingGenerator(generator, page_count):
+            yield page
 
 
 def PreloadingItemGenerator(generator, step=50):

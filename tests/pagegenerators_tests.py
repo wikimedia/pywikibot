@@ -11,7 +11,12 @@ import sys
 import pywikibot
 from pywikibot import pagegenerators
 
-from tests.aspects import unittest, TestCase, WikidataTestCase
+from tests.aspects import (
+    unittest,
+    TestCase,
+    WikidataTestCase,
+    DefaultSiteTestCase,
+)
 
 
 class TestPageGenerators(TestCase):
@@ -152,6 +157,30 @@ class TestPageGenerators(TestCase):
         self.assertEqual(sorted(timestamps), timestamps)
         self.assertTrue(all(item['ns'] == 0 for item in items))
         self.assertEqual(len(set(item['revid'] for item in items)), 4)
+
+
+class TestDequePreloadingGenerator(DefaultSiteTestCase):
+
+    """Test preloading generator on lists."""
+
+    def test_deque_preloading(self):
+        """Test pages being added to a DequePreloadingGenerator."""
+        mainpage = self.get_mainpage()
+
+        pages = pywikibot.tools.DequeGenerator([mainpage])
+        gen = pagegenerators.DequePreloadingGenerator(pages)
+        pages_out = list()
+        for page in gen:
+            pages_out.append(page)
+            # Add a page to the generator
+            if page.namespace() == 0:
+                pages.extend([page.toggleTalkPage()])
+
+        self.assertTrue(all(isinstance(page, pywikibot.Page) for page in pages_out))
+        self.assertEqual(len(pages_out), 2)
+        self.assertEqual(pages_out[1].namespace(), 1)
+        self.assertIn(mainpage, pages_out)
+        self.assertIn(mainpage.toggleTalkPage(), pages_out)
 
 
 class TestPreloadingItemGenerator(WikidataTestCase):
