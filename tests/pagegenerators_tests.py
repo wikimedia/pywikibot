@@ -196,6 +196,52 @@ class TestPreloadingItemGenerator(WikidataTestCase):
         self.assertTrue(all(isinstance(item, pywikibot.ItemPage) for item in gen))
 
 
+class TestFactoryGenerator(DefaultSiteTestCase):
+
+    """Test pagegenerators.GeneratorFactory."""
+
+    def test_newpages_default(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-newpages')
+        gen = gf.getCombinedGenerator()
+        pages = set(gen)
+        self.assertEqual(len(pages), 60)
+
+    def test_newpages_ns_default(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-newpages:10')
+        gen = gf.getCombinedGenerator()
+        self.assertPagesInNamespaces(gen, 0)
+
+    def test_newpages_ns(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-newpages:10')
+        gen = gf.getCombinedGenerator()
+        self.assertPagesInNamespaces(gen, 1)
+
+    def test_recentchanges_ns_default(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-recentchanges:50')
+        gen = gf.getCombinedGenerator()
+        self.assertPagesInNamespacesAll(gen, set([0, 1, 2]), skip=True)
+
+    def test_recentchanges_ns(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-recentchanges:10')
+        gen = gf.getCombinedGenerator()
+        self.assertPagesInNamespaces(gen, 1)
+
+    def test_recentchanges_ns_multi(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-ns:3')
+        gf.handleArg('-recentchanges:10')
+        gen = gf.getCombinedGenerator()
+        self.assertPagesInNamespaces(gen, set([1, 3]))
+
+
 if __name__ == "__main__":
     try:
         unittest.main()
