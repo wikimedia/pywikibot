@@ -1,0 +1,4 @@
+file
+bracket
+MediaWiki:Test|foo
+under_score

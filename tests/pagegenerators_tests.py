@@ -7,10 +7,13 @@
 # Distributed under the terms of the MIT license.
 __version__ = '$Id$'
 
+import os
 import sys
+
 import pywikibot
 from pywikibot import pagegenerators
 
+from tests import _data_dir
 from tests.aspects import (
     unittest,
     TestCase,
@@ -29,7 +32,7 @@ class TestPageGenerators(TestCase):
 
     dry = True
 
-    titles = [
+    titles = (
         # just a bunch of randomly selected titles
         u"Cities in Burkina Faso",
         u"Eastern Sayan",
@@ -44,7 +47,7 @@ class TestPageGenerators(TestCase):
         u"Template:Template",
         u"Template:Template/Doc",
         u"Template:Template/Meta",
-    ]
+    )
 
     def setUp(self):
         super(TestPageGenerators, self).setUp()
@@ -60,7 +63,7 @@ class TestPageGenerators(TestCase):
     def test_PagesFromTitlesGenerator(self):
         self.assertFunction("PagesFromTitlesGenerator")
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
-        self.assertEqual(len(self.titles), len(tuple(gen)))
+        self.assertPagelistTitles(gen, self.titles)
 
     def test_NamespaceFilterPageGenerator(self):
         self.assertFunction("NamespaceFilterPageGenerator")
@@ -81,14 +84,19 @@ class TestPageGenerators(TestCase):
         self.assertFunction("RegexFilterPageGenerator")
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, '/doc')
-        self.assertEqual(len(tuple(gen)), 2)
+        self.assertPagelistTitles(gen,
+                                  ('Template:!/Doc', 'Template:Template/Doc'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, '/doc',
                                                       quantifier='none')
         self.assertEqual(len(tuple(gen)), 11)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'])
-        self.assertEqual(len(tuple(gen)), 4)
+        self.assertPagelistTitles(gen,
+                                  ('Template:!/Doc',
+                                   'Template:!/Meta',
+                                   'Template:Template/Doc',
+                                   'Template:Template/Meta'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'],
                                                       quantifier='none')
@@ -96,15 +104,19 @@ class TestPageGenerators(TestCase):
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'],
                                                       quantifier='all')
-        self.assertEqual(len(tuple(gen)), 0)
+        self.assertPagelistTitles(gen, ())
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['Template', '/meta'],
                                                       quantifier='all')
-        self.assertEqual(len(tuple(gen)), 1)
+        self.assertPagelistTitles(gen, ('Template:Template/Meta'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['template', '/meta'],
                                                       quantifier='any')
-        self.assertEqual(len(tuple(gen)), 4)
+        self.assertPagelistTitles(gen,
+                                  ('Template:!/Meta',
+                                   'Template:Template',
+                                   'Template:Template/Doc',
+                                   'Template:Template/Meta'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles,
                                                       site=self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['template', '/meta'],
@@ -116,7 +128,9 @@ class TestPageGenerators(TestCase):
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['template', '/meta'],
                                                       quantifier='all',
                                                       ignore_namespace=False)
-        self.assertEqual(len(tuple(gen)), 2)
+        self.assertPagelistTitles(gen,
+                                  ('Template:!/Meta',
+                                   'Template:Template/Meta'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles,
                                                       site=self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['template', '/meta'],
@@ -133,9 +147,10 @@ class TestPageGenerators(TestCase):
             p.text = u"This is the content of %s as a sample" % p.title()
             pages.append(p)
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), '/doc')
-        self.assertEqual(len(tuple(gen)), 2)
+        self.assertPagelistTitles(gen,
+                                  ('Template:!/Doc', 'Template:Template/Doc'))
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), 'This')
-        self.assertEqual(len(tuple(gen)), 13)
+        self.assertPagelistTitles(gen, self.titles)
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), 'talk',
                                                           quantifier='none')
         self.assertEqual(len(tuple(gen)), 9)
@@ -167,6 +182,27 @@ class TestRepeatingGenerator(TestCase):
         self.assertEqual(sorted(timestamps), timestamps)
         self.assertTrue(all(item['ns'] == 0 for item in items))
         self.assertEqual(len(set(item['revid'] for item in items)), 4)
+
+
+class TestTextfilePageGenerator(DefaultSiteTestCase):
+
+    """Test loading pages from a textfile."""
+
+    dry = True
+
+    expected_titles = ('File', 'Bracket', 'MediaWiki:Test', 'Under score')
+
+    def test_brackets(self):
+        filename = os.path.join(_data_dir, 'pagelist-brackets.txt')
+        site = self.get_site()
+        titles = list(pagegenerators.TextfilePageGenerator(filename, site))
+        self.assertPagelistTitles(titles, self.expected_titles)
+
+    def test_lines(self):
+        filename = os.path.join(_data_dir, 'pagelist-lines.txt')
+        site = self.get_site()
+        titles = list(pagegenerators.TextfilePageGenerator(filename, site))
+        self.assertPagelistTitles(titles, self.expected_titles)
 
 
 class TestDequePreloadingGenerator(DefaultSiteTestCase):
