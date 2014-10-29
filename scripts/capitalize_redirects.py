@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-
 """
-Bot to create capitalized redirects where the first character of the first
+Bot to create capitalized redirects.
+
+It creates redirects where the first character of the first
 word is uppercase and the remaining characters and words are lowercase.
 
 Command-line arguments:
@@ -40,6 +41,9 @@ docuReplacements = {
 
 
 class CapitalizeBot(Bot):
+
+    """Capitalization Bot."""
+
     def __init__(self, generator, **kwargs):
         self.availableOptions.update({
             'titlecase': False,

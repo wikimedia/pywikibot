@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-""" Script to enumerate all pages on the wiki and find all titles
-with mixed latin and cyrilic alphabets.
-"""
+"""Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
 # (C) Pywikibot team, 2006-2014
 #
@@ -83,6 +81,9 @@ def SetColor(color):
 
 
 class CaseChecker(object):
+
+    """Case checker."""
+
     # These words are always in one language, even though they could be typed
     # in both
     alwaysInLocal = [u'СССР', u'Как', u'как']

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This script processes the Categories for discussion working page.  It parses
-out the actions that need to be taken as a result of CFD discussions (as posted
-to the working page by an administrator) and performs them.
+This script processes the Categories for discussion working page.
+
+It parses out the actions that need to be taken as a result of CFD discussions
+(as posted to the working page by an administrator) and performs them.
 
 Syntax: python cfd.py
 
@@ -46,6 +47,9 @@ findday = re.compile(r"\[\[(Wikipedia:Categories for (?:discussion|deletion)/Log
 
 
 class ReCheck:
+
+    """Helper class."""
+
     def __init__(self):
         self.result = None
 

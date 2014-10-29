@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 """
-Generate a i18n file from a given script
+Generate a i18n file from a given script.
 
 usage:
 
@@ -27,6 +27,8 @@ __version__ = '$Id$'
 
 
 class i18nBot(object):
+
+    """I18n bot."""
 
     def __init__(self, script, *args):
         modules = script.split('.')

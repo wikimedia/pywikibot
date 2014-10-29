@@ -1,8 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-"""
-This is a Bot written by Filnik to add a text at the end of the page but above
-categories, interwiki and template for the stars of the interwiki (default).
+r"""
+This is a Bot to add a text at the end of the content of the page.
+
+By default it adds the text above categories, interwiki and template
+for the stars of the interwiki.
 
 Alternatively it may also add a text at the top of the page.
 These command line parameters can be used to specify which pages to work on:

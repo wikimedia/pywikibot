@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-This is a helper script to convert compat 1.0 scripts to the new core 2.0
-framework.
+A helper script to convert compat 1.0 scripts to the new core 2.0 framework.
 
 NOTE: Please be aware that this script is not able to convert your codes
 completely. It may support you with some automatic replacements and it gives
@@ -112,6 +111,8 @@ warnings = (
 
 
 class ConvertBot(object):
+
+    """Script conversion bot."""
 
     def __init__(self, filename=None, warnonly=False):
         self.source = filename
