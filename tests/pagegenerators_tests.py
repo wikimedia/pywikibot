@@ -173,14 +173,14 @@ class TestDequePreloadingGenerator(DefaultSiteTestCase):
         for page in gen:
             pages_out.append(page)
             # Add a page to the generator
-            if page.namespace() == 0:
+            if not page.isTalkPage():
                 pages.extend([page.toggleTalkPage()])
 
         self.assertTrue(all(isinstance(page, pywikibot.Page) for page in pages_out))
-        self.assertEqual(len(pages_out), 2)
-        self.assertEqual(pages_out[1].namespace(), 1)
         self.assertIn(mainpage, pages_out)
         self.assertIn(mainpage.toggleTalkPage(), pages_out)
+        self.assertEqual(len(pages_out), 2)
+        self.assertTrue(pages_out[1].isTalkPage())
 
 
 class TestPreloadingItemGenerator(WikidataTestCase):
