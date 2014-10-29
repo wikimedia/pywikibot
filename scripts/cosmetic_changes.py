@@ -79,6 +79,7 @@ import pywikibot
 import isbn
 from pywikibot import config, i18n, textlib, pagegenerators, Bot
 from pywikibot.page import url2unicode
+from pywikibot.tools import deprecate_arg
 
 warning = """
 ATTENTION: You can run this script as a stand-alone for testing purposes.
@@ -159,10 +160,11 @@ class CosmeticChangesToolkit:
 
     """Cosmetic changes toolkit."""
 
-    def __init__(self, site, debug=False, redirect=False, namespace=None,
+    @deprecate_arg('debug', 'diff')
+    def __init__(self, site, diff=False, redirect=False, namespace=None,
                  pageTitle=None, ignore=CANCEL_ALL):
         self.site = site
-        self.debug = debug
+        self.diff = diff
         self.redirect = redirect
         self.namespace = namespace
         self.template = (self.namespace == 10)
@@ -236,7 +238,7 @@ class CosmeticChangesToolkit:
             else:
                 raise
         else:
-            if self.debug:
+            if self.diff:
                 pywikibot.showDiff(text, new_text)
             return new_text
 
@@ -907,7 +909,7 @@ class CosmeticChangesBot(Bot):
     def treat(self, page):
         try:
             self.current_page = page
-            ccToolkit = CosmeticChangesToolkit(page.site, debug=True,
+            ccToolkit = CosmeticChangesToolkit(page.site, diff=False,
                                                namespace=page.namespace(),
                                                pageTitle=page.title(),
                                                ignore=self.getOption('ignore'))
