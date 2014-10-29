@@ -77,15 +77,17 @@ class Hunk(object):
             return l
 
         for tag, i1, i2, j1, j2 in self.group:
+            # equal/delete/insert add additional space after the sign as it's
+            # what difflib.ndiff does do too.
             if tag == 'equal':
                 for line in self.a[i1:i2]:
-                    yield ' ' + check_line(line)
+                    yield '  ' + check_line(line)
             if tag in ('delete'):
                 for line in self.a[i1:i2]:
-                    yield '-' + check_line(line)
+                    yield '- ' + check_line(line)
             if tag in ('insert'):
                 for line in self.b[j1:j2]:
-                    yield '+' + check_line(line)
+                    yield '+ ' + check_line(line)
             if tag in ('replace'):
                 for line in difflib.ndiff(self.a[i1:i2], self.b[j1:j2]):
                     yield check_line(line)
@@ -132,20 +134,20 @@ class Hunk(object):
                 return line
 
         colored_line = u''
-        state = 'Close'
+        color_closed = True
         for char, char_ref in zip_longest(line, line_ref.strip(), fillvalue=' '):
             char_tagged = char
-            if state == 'Close':
+            if color_closed:
                 if char_ref != ' ':
                     char_tagged = '\03{%s}%s' % (self.colors[color], char)
-                    state = 'Open'
-            elif state == 'Open':
+                    color_closed = False
+            else:
                 if char_ref == ' ':
                     char_tagged = '\03{default}%s' % char
-                    state = 'Close'
+                    color_closed = True
             colored_line += char_tagged
 
-        if state == 'Open':
+        if not color_closed:
             colored_line += '\03{default}'
 
         return colored_line
@@ -228,10 +230,14 @@ class PatchManager(object):
 
         # there is a section of unchanged text at the end of a, b.
         if i2 < len(self.a):
-            rng = (-1, (last[2], len(self.a)), (-1, -1))
+            rng = (-1, (i2, len(self.a)), (-1, -1))
             blocks.append(rng)
 
         return blocks
+
+    def print_hunks(self):
+        for hunk in self.hunks:
+            pywikibot.output(hunk.header + hunk.diff_text)
 
     def review_hunks(self):
         "Review hunks."

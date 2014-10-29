@@ -9,7 +9,6 @@ __release__ = '2.0b2'
 __version__ = '$Id$'
 
 import datetime
-import difflib
 import math
 import re
 import sys
@@ -49,6 +48,7 @@ from pywikibot.exceptions import (
 from pywikibot.tools import UnicodeMixin, redirect_func
 from pywikibot.i18n import translate
 from pywikibot.data.api import UploadWarning
+from pywikibot.diff import PatchManager
 import pywikibot.textlib as textlib
 import pywikibot.tools
 
@@ -609,60 +609,7 @@ def showDiff(oldtext, newtext):
     The differences are highlighted (only on compatible systems) to show which
     changes were made.
     """
-    # This is probably not portable to non-terminal interfaces....
-    # For information on difflib, see http://pydoc.org/2.1/difflib.html
-    color = {
-        '+': 'lightgreen',
-        '-': 'lightred',
-    }
-    diff = u''
-    colors = []
-    # This will store the last line beginning with + or -.
-    lastline = None
-    # For testing purposes only: show original, uncolored diff
-    #     for line in difflib.ndiff(oldtext.splitlines(), newtext.splitlines()):
-    #         print line
-    for line in difflib.ndiff(oldtext.splitlines(), newtext.splitlines()):
-        if line.startswith('?'):
-            # initialize color vector with None, which means default color
-            lastcolors = [None for c in lastline]
-            # colorize the + or - sign
-            lastcolors[0] = color[lastline[0]]
-            # colorize changed parts in red or green
-            for i in range(min(len(line), len(lastline))):
-                if line[i] != ' ':
-                    lastcolors[i] = color[lastline[0]]
-            diff += lastline + '\n'
-            # append one None (default color) for the newline character
-            colors += lastcolors + [None]
-        elif lastline:
-            diff += lastline + '\n'
-            # colorize the + or - sign only
-            lastcolors = [None for c in lastline]
-            lastcolors[0] = color[lastline[0]]
-            colors += lastcolors + [None]
-        lastline = None
-        if line[0] in ('+', '-'):
-            lastline = line
-    # there might be one + or - line left that wasn't followed by a ? line.
-    if lastline:
-        diff += lastline + '\n'
-        # colorize the + or - sign only
-        lastcolors = [None for c in lastline]
-        lastcolors[0] = color[lastline[0]]
-        colors += lastcolors + [None]
-
-    result = u''
-    lastcolor = None
-    for i in range(len(diff)):
-        if colors[i] != lastcolor:
-            if lastcolor is None:
-                result += '\03{%s}' % colors[i]
-            else:
-                result += '\03{default}'
-        lastcolor = colors[i]
-        result += diff[i]
-    output(result)
+    PatchManager(oldtext, newtext).print_hunks()
 
 
 # Throttle and thread handling
