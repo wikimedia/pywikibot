@@ -49,7 +49,7 @@ class TestCaseBase(unittest.TestCase):
 
     """Base class for all tests."""
 
-    if sys.version_info[0] == 2:
+    if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
         def assertRaisesRegex(self, *args, **kwargs):
             """
             Wrapper of unittest.assertRaisesRegexp for Python 2 unittest.
@@ -58,6 +58,7 @@ class TestCaseBase(unittest.TestCase):
             """
             return self.assertRaisesRegexp(*args, **kwargs)
 
+    if not hasattr(unittest.TestCase, 'assertRegex'):
         def assertRegex(self, *args, **kwargs):
             """
             Wrapper of unittest.assertRegexpMatches for Python 2 unittest.
