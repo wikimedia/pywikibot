@@ -206,7 +206,7 @@ class CosmeticChangesToolkit:
                 pywikibot.exception(e)
             else:
                 raise
-        return text if result is None else text
+        return text if result is None else result
 
     @staticmethod
     def isbn_execute(text):
