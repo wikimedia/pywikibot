@@ -1,8 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-This script checks the language list of each Wikimedia multiple-language site
-against the language lists
-"""
+"""Script that updates the language lists in Wikimedia family files."""
 #
 # (C) xqt, 2009-2014
 # (C) Pywikibot team, 2008-2014

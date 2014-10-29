@@ -111,29 +111,39 @@ ZERO = datetime.timedelta(0)
 
 
 class MalformedConfigError(pywikibot.Error):
+
     """There is an error in the configuration template."""
 
 
 class MissingConfigError(pywikibot.Error):
 
-    """The config is missing in the header (either it's in one of the threads
-    or transcluded from another page).
+    """
+    The config is missing in the header.
+
+    It's in one of the threads or transcluded from another page.
     """
 
 
 class AlgorithmError(MalformedConfigError):
+
     """Invalid specification of archiving algorithm."""
 
 
 class ArchiveSecurityError(pywikibot.Error):
 
-    """Archive is not a subpage of page being archived and key not specified
-    (or incorrect).
+    """
+    Page title is not a valid archive of page being archived.
+
+    The page title is neither a subpage of the page being archived,
+    nor does it match the key specified in the archive configuration template.
     """
 
 
 def str2localized_duration(site, string):
-    """Translate a duration written in the shorthand notation (ex. "24h", "7d")
+    """
+    Localise a shorthand duration.
+
+    Translates a duration written in the shorthand notation (ex. "24h", "7d")
     into an expression in the local language of the wiki ("24 hours", "7 days").
     """
     if string[-1] == 'd':
@@ -148,7 +158,10 @@ def str2localized_duration(site, string):
 
 
 def str2time(string):
-    """Accepts a string defining a time period:
+    """
+    Return a timedelta for a shorthand duration.
+
+    Accepts a string defining a time period:
     7d - 7 days
     36h - 36 hours
     Returns the corresponding timedelta object.
@@ -162,7 +175,10 @@ def str2time(string):
 
 
 def str2size(string):
-    """Accepts a string defining a size:
+    """
+    Return a size for a shorthand size.
+
+    Accepts a string defining a size:
     1337 - 1337 bytes
     150K - 150 kilobytes
     2M - 2 megabytes
@@ -209,8 +225,10 @@ class TZoneUTC(datetime.tzinfo):
 
 class DiscussionThread(object):
 
-    """An object representing a discussion thread on a page, that is something
-    of the form:
+    """
+    An object representing a discussion thread on a page.
+
+    It represents something that is of the form:
 
     == Title of thread ==
 
@@ -270,8 +288,10 @@ class DiscussionThread(object):
 
 class DiscussionPage(pywikibot.Page):
 
-    """A class that represents a single discussion page as well as an archive
-    page. Feed threads to it and run an update() afterwards.
+    """
+    A class that represents a single page of discussion threads.
+
+    Feed threads to it and run an update() afterwards.
     """
 
     def __init__(self, source, archiver, params=None):
@@ -362,6 +382,7 @@ class DiscussionPage(pywikibot.Page):
 class PageArchiver(object):
 
     """A class that encapsulates all archiving methods.
+
     __init__ expects a pywikibot.Page object.
     Execute by running the .run() method.
     """
@@ -431,6 +452,7 @@ class PageArchiver(object):
 
     def feed_archive(self, archive, thread, max_archive_size, params=None):
         """Feed the thread to one of the archives.
+
         If it doesn't exist yet, create it.
         If archive name is an empty string (or None),
         discard the thread (/dev/null).

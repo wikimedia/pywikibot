@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-Script to check language links for general pages. This works by downloading the
-page, and using existing translations plus hints from the command line to
+Script to check language links for general pages.
+
+Uses existing translations of a page, plus hints from the command line, to
 download the equivalent pages from other languages. All of such pages are
 downloaded as well and checked for interwiki links recursively until there are
 no more links that are encountered. A rationalization process then selects the
@@ -369,7 +370,7 @@ class SaveError(pywikibot.Error):
     """An attempt to save a page with changed interwiki has failed."""
 
 
-class LinkMustBeRemoved(SaveError):
+class LinkMustBeRemoved(SaveError):  # noqa
 
     """
     An interwiki link has to be removed, but this can't be done because of user
@@ -380,6 +381,8 @@ class LinkMustBeRemoved(SaveError):
 class GiveUpOnPage(pywikibot.Error):
 
     """The user chose not to work on this page and its linked pages any more."""
+
+    pass
 
 
 # Subpage templates. Must be in lower case,
@@ -456,6 +459,7 @@ class Global(object):
 
     """
     Container class for global settings.
+
     Use of globals outside of this is to be avoided.
     """
 
@@ -624,9 +628,10 @@ class Global(object):
 class StoredPage(pywikibot.Page):
 
     """
-    Store the Page contents on disk to avoid sucking too much
-    memory when a big number of Page objects will be loaded
-    at the same time.
+    Store the Page contents on disk.
+
+    This is to avoid sucking too much memory when a big number of Page objects
+    will be loaded at the same time.
     """
 
     # Please prefix the class members names by SP
@@ -695,6 +700,7 @@ class PageTree(object):
 
     """
     Structure to manipulate a set of pages.
+
     Allows filtering efficiently by Site.
     """
 
@@ -723,7 +729,7 @@ class PageTree(object):
         self.size = 0
 
     def filter(self, site):
-        """Iterates over pages that are in Site site."""
+        """Iterate over pages that are in Site site."""
         try:
             for page in self.tree[site]:
                 yield page
@@ -748,7 +754,7 @@ class PageTree(object):
             pass
 
     def removeSite(self, site):
-        """Removes all pages from Site site."""
+        """Remove all pages from Site site."""
         try:
             self.size -= len(self.tree[site])
             del self.tree[site]
@@ -756,7 +762,7 @@ class PageTree(object):
             pass
 
     def siteCounts(self):
-        """Yields (Site, number of pages in site) pairs"""
+        """Yield (Site, number of pages in site) pairs."""
         for site, d in self.tree.items():
             yield site, len(d)
 
@@ -768,10 +774,10 @@ class PageTree(object):
 
 class Subject(object):
 
-    """
-    Class to follow the progress of a single 'subject' (i.e. a page with
-    all its translations)
+    u"""
+    Class to follow the progress of a single 'subject'.
 
+    (i.e. a page with all its translations)
 
     Subject is a transitive closure of the binary relation on Page:
     "has_a_langlink_pointing_to".
@@ -826,9 +832,12 @@ class Subject(object):
     """
 
     def __init__(self, originPage=None, hints=None):
-        """Constructor. Takes as arguments the Page on the home wiki
-           plus optionally a list of hints for translation
-           """
+        """
+        Constructor.
+
+        Takes as arguments the Page on the home wiki
+        plus optionally a list of hints for translation
+        """
         if globalvar.contentsondisk:
             if originPage:
                 originPage = StoredPage(originPage)
@@ -869,6 +878,8 @@ class Subject(object):
 
     def getFoundDisambig(self, site):
         """
+        Return the first disambiguation found.
+
         If we found a disambiguation on the given site while working on the
         subject, this method returns it. If several ones have been found, the
         first one will be returned.
@@ -881,6 +892,8 @@ class Subject(object):
 
     def getFoundNonDisambig(self, site):
         """
+        Return the first non-disambiguation found.
+
         If we found a non-disambiguation on the given site while working on the
         subject, this method returns it. If several ones have been found, the
         first one will be returned.
@@ -894,6 +907,8 @@ class Subject(object):
 
     def getFoundInCorrectNamespace(self, site):
         """
+        Return the first page in the extended namespace.
+
         If we found a page that has the expected namespace on the given site
         while working on the subject, this method returns it. If several ones
         have been found, the first one will be returned.
@@ -942,7 +957,9 @@ class Subject(object):
 
     def openSites(self):
         """
-        Iterator. Yields (site, count) pairs:
+        Iterator.
+
+        Yields (site, count) pairs:
         * site is a site where we still have work to do on
         * count is the number of items in that Site that need work on
         """
@@ -950,6 +967,8 @@ class Subject(object):
 
     def whatsNextPageBatch(self, site):
         """
+        Return the next page batch.
+
         By calling this method, you 'promise' this instance that you will
         preload all the 'site' Pages that are in the todo list.
 
@@ -972,7 +991,7 @@ class Subject(object):
         return result
 
     def makeForcedStop(self, counter):
-        """Ends work on the page before the normal end."""
+        """End work on the page before the normal end."""
         for site, count in self.todo.siteCounts():
             counter.minus(site, count)
         self.todo = PageTree()
@@ -980,8 +999,9 @@ class Subject(object):
 
     def addIfNew(self, page, counter, linkingPage):
         """
-        Adds the pagelink given to the todo list, but only if we didn't know
-        it before. If it is added, update the counter accordingly.
+        Add the pagelink given to the todo list, if it hasnt been seen yet.
+
+        If it is added, update the counter accordingly.
 
         Also remembers where we found the page, regardless of whether it had
         already been found before or not.
@@ -1020,8 +1040,7 @@ class Subject(object):
 
     def namespaceMismatch(self, linkingPage, linkedPage, counter):
         """
-        Checks whether or not the given page has another namespace
-        than the origin page.
+        Check whether or not the given page has a different namespace.
 
         Returns True if the namespaces are different and the user
         has selected not to follow the linked page.
@@ -1110,8 +1129,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
 
     def disambigMismatch(self, page, counter):
         """
-        Checks whether or not the given page has the another disambiguation
-        status than the origin page.
+        Check whether the given page has a different disambiguation status.
 
         Returns a tuple (skip, alternativePage).
 
@@ -1247,6 +1265,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
 
     def batchLoaded(self, counter):
         """
+        Notify that the promised batch of pages was loaded.
+
         This is called by a worker to tell us that the promised batch of
         pages was loaded.
         In other words, all the pages in self.pending have already
@@ -1603,11 +1623,12 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         return result
 
     def finish(self):
-        """Round up the subject, making any necessary changes. This method
-           should be called exactly once after the todo list has gone empty.
+        """
+        Round up the subject, making any necessary changes.
+
+        This should be called exactly once after the todo list has gone empty.
 
         """
-
         if not self.isDone():
             raise Exception("Bugcheck: finish called before done")
         if not self.workonme:
@@ -1805,7 +1826,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     del page._contents
 
     def replaceLinks(self, page, newPages):
-        """Returns True if saving was successful."""
+        """Return True if saving was successful."""
         if globalvar.localonly:
             # In this case only continue on the Page we started with
             if page != self.originPage:
@@ -2087,11 +2108,15 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
 
 
 class InterwikiBot(object):
-    """A class keeping track of a list of subjects, controlling which pages
-       are queried from which languages when."""
+
+    """
+    A class keeping track of a list of subjects.
+
+    It controls which pages are queried from which languages when.
+    """
 
     def __init__(self):
-        """Constructor. We always start with empty lists."""
+        """Constructor."""
         self.subjects = []
         # We count how many pages still need to be loaded per site.
         # This allows us to find out from which site to retrieve pages next
@@ -2111,9 +2136,12 @@ class InterwikiBot(object):
             self.plus(site, count)
 
     def setPageGenerator(self, pageGenerator, number=None, until=None):
-        """Add a generator of subjects. Once the list of subjects gets
-           too small, this generator is called to produce more Pages
-           """
+        """
+        Add a generator of subjects.
+
+        Once the list of subjects gets too small,
+        this generator is called to produce more Pages.
+        """
         self.pageGenerator = pageGenerator
         self.generateNumber = number
         self.generateUntil = until
@@ -2136,10 +2164,12 @@ class InterwikiBot(object):
         return dumpfn
 
     def generateMore(self, number):
-        """Generate more subjects. This is called internally when the
-           list of subjects becomes too small, but only if there is a
-           PageGenerator
-           """
+        """Generate more subjects.
+
+        This is called internally when the
+        list of subjects becomes too small, but only if there is a
+        PageGenerator
+        """
         fs = self.firstSubject()
         if fs and (not globalvar.quiet):
             pywikibot.output(u"NOTE: The first unfinished subject is %s"
@@ -2206,11 +2236,12 @@ class InterwikiBot(object):
             return self.subjects[0]
 
     def maxOpenSite(self):
-        """Return the site that has the most
-           open queries plus the number. If there is nothing left, return
-           None. Only languages that are TODO for the first Subject
-           are returned.
-           """
+        """
+        Return the site that has the most open queries plus the number.
+
+        If there is nothing left, return None.
+        Only languages that are TODO for the first Subject are returned.
+        """
         max = 0
         maxlang = None
         if not self.firstSubject():
@@ -2318,14 +2349,14 @@ class InterwikiBot(object):
         return len(self) == 0 and self.pageGenerator is None
 
     def plus(self, site, count=1):
-        """This is a routine that the Subject class expects in a counter."""
+        """Helper routine that the Subject class expects in a counter."""
         try:
             self.counts[site] += count
         except KeyError:
             self.counts[site] = count
 
     def minus(self, site, count=1):
-        """This is a routine that the Subject class expects in a counter."""
+        """Helper routine that the Subject class expects in a counter."""
         self.counts[site] -= count
 
     def run(self):

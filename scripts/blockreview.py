@@ -2,6 +2,7 @@
 # -*- coding: utf-8  -*-
 """
 This bot implements a blocking review process for de-wiki first.
+
 For other sites this bot script must be changed.
 
 This script is run by [[de:User:xqt]]. It should
@@ -27,6 +28,9 @@ from pywikibot import i18n
 
 
 class BlockreviewBot:
+
+    """Block review bot."""
+
     # notes
     note_admin = {
         'de': u"""
@@ -78,10 +82,11 @@ Hallo %(admin)s,
 
     def __init__(self, dry=False):
         """
-        Constructor. Parameters:
-            * generator - The page generator that determines on which pages
+        Constructor.
+
+        @param generator: The page generator that determines on which pages
                           to work on.
-            * dry       - If True, doesn't do any real changes, but only shows
+        @param dry:       If True, doesn't do any real changes, but only shows
                           what would have been changed.
         """
         self.site = pywikibot.Site()
@@ -109,7 +114,7 @@ Hallo %(admin)s,
                                      % page.title(asLink=True))
 
     def treat(self, userPage):
-        """Loads the given page, does some changes, and saves it."""
+        """Load the given page, does some changes, and saves it."""
         talkText = self.load(userPage)
         if not talkText:
             # sanity check. No talk page found.
@@ -256,7 +261,7 @@ Hallo %(admin)s,
                                      ns=3)
 
     def load(self, page):
-        """Loads the given page, does some changes, and saves it."""
+        """Load the given page and return the page text."""
         try:
             # Load the page
             text = page.get()

@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-This is a script originally written by Wikihermit and then rewritten by Filnik,
-to delete the templates used to warn in the pages that a page is blocked, when
-the page isn't blocked at all. Indeed, very often sysops block the pages for a
-setted time but then the forget to delete the warning! This script is useful if
-you want to delete those useless warning left in these pages.
+A bot to remove stale protection templates from pages that are not protected.
+
+Very often sysops block the pages for a setted time but then the forget to
+remove the warning! This script is useful if you want to remove those useless
+warning left in these pages.
 
 Parameters:
 

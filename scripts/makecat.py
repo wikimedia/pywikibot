@@ -48,7 +48,7 @@ from pywikibot.tools import DequeGenerator
 
 
 def isdate(s):
-    """returns true if s is a date or year."""
+    """Return true if s is a date or year."""
     dict, val = date.getAutoFormat(pywikibot.Site().language(), s)
     return dict is not None
 
