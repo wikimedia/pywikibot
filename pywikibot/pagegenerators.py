@@ -923,14 +923,14 @@ def PageTitleFilterPageGenerator(generator, ignore_list):
     """
     Yield only those pages are not listed in the ignore list.
 
-    @param ignore_list: family names are mapped to dictionaries
-        in which language codes are mapped to lists of page titles
+    @param ignore_list: family names are mapped to dictionaries in which
+        language codes are mapped to lists of page titles. Each title must
+        be a valid regex as they are compared using L{re.search}.
     @type ignore_list: dict
 
     """
     def is_ignored(page):
-        if page.site.family.name in ignore_list and \
-        page.site.code in ignore_list[page.site.family.name]:
+        if page.site.code in ignore_list.get(page.site.family.name, {}):
             for ig in ignore_list[page.site.family.name][page.site.code]:
                 if re.search(ig, page.title()):
                     return True
