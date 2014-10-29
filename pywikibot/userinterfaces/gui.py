@@ -32,12 +32,14 @@ from idlelib.MultiCall import MultiCallCreator
 
 
 class TextEditor(ScrolledText):
+
     """A text widget with some editing enhancements.
 
     A lot of code here is copied or adapted from the idlelib/EditorWindow.py
     file in the standard Python distribution.
 
     """
+
     def __init__(self, master=None, **kwargs):
         # get default settings from user's IDLE configuration
         currentTheme = idleConf.CurrentTheme()
@@ -231,6 +233,8 @@ class TextEditor(ScrolledText):
 
 class EditBoxWindow(Tkinter.Frame):
 
+    """Edit box window."""
+
     def __init__(self, parent=None, **kwargs):
         if parent is None:
             # create a new window
@@ -386,6 +390,8 @@ class EditBoxWindow(Tkinter.Frame):
 
 # the following class isn't used anywhere in the framework: ####
 class ListBoxWindow:
+
+    """List box window."""
 
     # called when user pushes the OK button.
     # closes the window.

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""User interface for Win32 terminals."""
 #
 # (C) Pywikibot team, 2003-2013
 #
@@ -40,12 +41,18 @@ colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(list(windowsColors.keys())
 
 # Compat for python <= 2.5
 class Win32BaseUI(terminal_interface_base.UI):
+
+    """User interface for Win32 terminals without ctypes."""
+
     def __init__(self):
         terminal_interface_base.UI.__init__(self)
         self.encoding = 'ascii'
 
 
 class Win32CtypesUI(Win32BaseUI):
+
+    """User interface for Win32 terminals using ctypes."""
+
     def __init__(self):
         Win32BaseUI.__init__(self)
         from .win32_unicode import stdin, stdout, stderr, argv

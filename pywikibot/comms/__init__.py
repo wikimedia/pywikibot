@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Communication layer."""
 #
 # (C) Pywikibot team, 2007-2008
 #

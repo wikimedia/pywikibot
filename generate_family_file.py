@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 This script generates a family file from a given URL.
-Hackish, etc. Regexps, yes. Sorry, jwz.
 
+Hackish, etc. Regexps, yes. Sorry, jwz.
 """
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
@@ -54,6 +54,9 @@ def urlopen(url):
 
 
 class WikiHTMLPageParser(HTMLParser):
+
+    """Wiki HTML page parser."""
+
     def __init__(self, *args, **kwargs):
         HTMLParser.__init__(self, *args, **kwargs)
         self.generator = None
@@ -69,6 +72,9 @@ class WikiHTMLPageParser(HTMLParser):
 
 
 class FamilyFileGenerator(object):
+
+    """Family file creator."""
+
     def __init__(self, url=None, name=None, dointerwiki=None):
         if url is None:
             url = raw_input("Please insert URL to wiki: ")
@@ -216,6 +222,9 @@ class Family(family.Family):
 
 
 class Wiki(object):
+
+    """Minimal wiki site class."""
+
     REwgEnableApi = re.compile(r'wgEnableAPI ?= ?true')
     REwgServer = re.compile(r'wgServer ?= ?"([^"]*)"')
     REwgScriptPath = re.compile(r'wgScriptPath ?= ?"([^"]*)"')

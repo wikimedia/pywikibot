@@ -32,6 +32,9 @@ botList = {
 
 
 class LoginManager:
+
+    """Site login manager."""
+
     @deprecated_args(username="user", verbose=None)
     def __init__(self, password=None, sysop=False, site=None, user=None):
         if site is not None:

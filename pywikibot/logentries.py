@@ -83,6 +83,9 @@ class LogEntry(object):
 
 
 class BlockEntry(LogEntry):
+
+    """Block log entry."""
+
     _expectedType = 'block'
 
     def __init__(self, apidata):
@@ -162,22 +165,37 @@ class BlockEntry(LogEntry):
 
 
 class ProtectEntry(LogEntry):
+
+    """Protection log entry."""
+
     _expectedType = 'protect'
 
 
 class RightsEntry(LogEntry):
+
+    """Rights log entry."""
+
     _expectedType = 'rights'
 
 
 class DeleteEntry(LogEntry):
+
+    """Deletion log entry."""
+
     _expectedType = 'delete'
 
 
 class UploadEntry(LogEntry):
+
+    """Upload log entry."""
+
     _expectedType = 'upload'
 
 
 class MoveEntry(LogEntry):
+
+    """Move log entry."""
+
     _expectedType = 'move'
 
     def new_ns(self):
@@ -200,14 +218,23 @@ class MoveEntry(LogEntry):
 
 
 class ImportEntry(LogEntry):
+
+    """Import log entry."""
+
     _expectedType = 'import'
 
 
 class PatrolEntry(LogEntry):
+
+    """Patrol log entry."""
+
     _expectedType = 'patrol'
 
 
 class NewUsersEntry(LogEntry):
+
+    """New user log entry."""
+
     _expectedType = 'newusers'
 
 # TODO entries for merge,suppress,makebot,gblblock,renameuser,globalauth,gblrights ?

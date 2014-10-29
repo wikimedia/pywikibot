@@ -1,4 +1,4 @@
-# Stdout, stderr and argv support:
+""" Stdout, stderr and argv support for unicode. """
 ##############################################
 # Support for unicode in windows cmd.exe
 # Posted on Stack Overflow [1], available under CC-BY-SA [2]
@@ -121,6 +121,9 @@ if sys.platform == "win32":
                                        LPVOID)(("ReadConsoleW", windll.kernel32))
 
             class UnicodeInput:
+
+                """Unicode terminal input class."""
+
                 def __init__(self, hConsole, name, bufsize=1024):
                     self._hConsole = hConsole
                     self.bufsize = bufsize
@@ -144,6 +147,9 @@ if sys.platform == "win32":
                                         LPVOID)(("WriteConsoleW", windll.kernel32))
 
             class UnicodeOutput:
+
+                """Unicode terminal output class."""
+
                 def __init__(self, hConsole, stream, fileno, name):
                     self._hConsole = hConsole
                     self._stream = stream

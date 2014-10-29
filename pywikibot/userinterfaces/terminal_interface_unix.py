@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""User interface for unix terminals."""
 #
 # (C) Pywikibot team, 2003-2014
 #
@@ -31,6 +32,9 @@ unixColors = {
 
 
 class UnixUI(terminal_interface_base.UI):
+
+    """User interface for unix terminals."""
+
     def printColorized(self, text, targetStream):
         totalcount = 0
         for key, value in unixColors.items():

@@ -1,4 +1,5 @@
 # -*- coding: utf-8  -*-
+"""Title translate module."""
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Yuri Astrakhan, 2005
@@ -18,7 +19,7 @@ from pywikibot import config
 def translate(page, hints=None, auto=True, removebrackets=False, site=None,
               family=None):
     """
-    Goes through all entries in 'hints'. Returns a list of links to pages.
+    Return a list of links to pages on other sites based on hints.
 
     Entries for single page titles list those pages. Page titles for entries
     such as "all:" or "xyz:" or "20:" are first built from the page title of
@@ -122,9 +123,7 @@ def appendFormatedDates(result, dictName, value):
 
 
 def getPoisonedLinks(pl):
-    """Return a list of known corrupted links that should be removed if seen
-
-    """
+    """Return a list of known corrupted links that should be removed if seen."""
     result = []
     pywikibot.output(u'getting poisoned links for %s' % pl.title())
     dictName, value = date.getAutoFormat(pl.site.code, pl.title())

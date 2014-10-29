@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
-
 """
+XML reading module.
+
 Each XmlEntry object represents a page, as read from an XML source
 
 The XmlDump class reads a pages_current XML dump (like the ones offered on
@@ -77,6 +78,7 @@ class XmlParserThread(threading.Thread):
 
     There surely are more elegant ways to do this.
     """
+
     def __init__(self, filename, handler):
         threading.Thread.__init__(self)
         self.filename = filename
@@ -98,6 +100,7 @@ class XmlDump(object):
         If True, parse all revisions instead of only the latest one.
         Default: False.
     """
+
     def __init__(self, filename, allrevisions=False):
         self.filename = filename
         if allrevisions:

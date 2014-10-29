@@ -1,7 +1,11 @@
+"""CGI user interface."""
 import sys
 
 
 class UI:
+
+    """CGI user interface."""
+
     def __init__(self):
         pass
 

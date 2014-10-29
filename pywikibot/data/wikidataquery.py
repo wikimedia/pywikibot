@@ -26,11 +26,14 @@ from pywikibot import config
 def listify(x):
     """
     If given a non-list, encapsulate in a single-element list.
+
+    @rtype: list
     """
     return x if isinstance(x, list) else [x]
 
 
 class QuerySet():
+
     """
     A QuerySet represents a set of queries or other query sets.
 
@@ -43,6 +46,8 @@ class QuerySet():
     def __init__(self, q):
         """
         Initialise a query set from a Query or another QuerySet.
+
+        @type q: Query or QuerySet
         """
         self.qs = [q]
 
@@ -54,10 +59,9 @@ class QuerySet():
         this QuerySet, nest the current one in parens before joining
         - this makes the implicit grouping of the API explicit.
 
-        @return a new query set representing the joining of this one and
+        @return: a new query set representing the joining of this one and
             the arguments
         """
-
         if len(self.qs) > 1 and joiner != self.joiner:
             left = QuerySet(self)
         else:
@@ -73,12 +77,16 @@ class QuerySet():
     def AND(self, args):
         """
         Add the given args (Queries or QuerySets) to the Query set as a logical conjuction (AND).
+
+        @type args: Query or QuerySet
         """
         return self.addJoiner(args, "AND")
 
     def OR(self, args):
         """
         Add the given args (Queries or QuerySets) to the Query set as a logical disjunction (OR).
+
+        @type args: Query or QuerySet
         """
         return self.addJoiner(args, "OR")
 
@@ -88,7 +96,6 @@ class QuerySet():
 
         @rtype: str
         """
-
         def bracketIfQuerySet(q):
             if isinstance(q, QuerySet) and q.joiner != self.joiner:
                 return "(%s)" % q
@@ -121,12 +128,16 @@ class Query():
     def AND(self, ands):
         """
         Produce a query set ANDing this query and all the given query/sets.
+
+        @type ands: Query or list of Query
         """
         return QuerySet(self).addJoiner(ands, "AND")
 
     def OR(self, ors):
         """
         Produce a query set ORing this query and all the given query/sets.
+
+        @type ors: Query or list of Query
         """
         return QuerySet(self).addJoiner(ors, "OR")
 
@@ -141,6 +152,8 @@ class Query():
     def formatList(self, l):
         """
         Format and comma-join a list.
+
+        @type l: list
         """
         return ",".join([self.formatItem(x) for x in l])
 
@@ -148,6 +161,8 @@ class Query():
     def isOrContainsOnlyTypes(items, types):
         """
         Either this item is one of the given types, or it is a list of only those types.
+
+        @rtype: bool
         """
         if isinstance(items, list):
             for x in items:
@@ -221,6 +236,7 @@ class Query():
 
 
 class HasClaim(Query):
+
     """
     This is a Query of the form "claim[prop:val]".
 
@@ -261,19 +277,20 @@ class HasClaim(Query):
 
 
 class NoClaim(HasClaim):
+
+    """Query of the form noclaim[PROPERTY]."""
+
     queryType = "noclaim"
 
 
 class StringClaim(HasClaim):
-    """
-    Query of the form string[PROPERTY:"STRING",...].
-    """
+
+    """Query of the form string[PROPERTY:"STRING",...]."""
+
     queryType = "string"
 
     def formatItem(self, x):
-        """
-        Strings need quote-wrapping.
-        """
+        """Add quotes around string."""
         return '"%s"' % x
 
     def validate(self):
@@ -281,9 +298,9 @@ class StringClaim(HasClaim):
 
 
 class Tree(Query):
-    """
-    Query of the form tree[ITEM,...][PROPERTY,...]<PROPERTY,...>.
-    """
+
+    """Query of the form tree[ITEM,...][PROPERTY,...]<PROPERTY,...>."""
+
     queryType = "tree"
 
     def __init__(self, item, forward=[], reverse=[]):
@@ -294,7 +311,6 @@ class Tree(Query):
         @param forward List of forward properties, can be empty
         @param reverse List of reverse properties, can be empty
         """
-
         # check sensible things coming in, as we lose info once we do
         # type conversion
         if not self.isOrContainsOnlyTypes(item, [int, ItemPage]):
@@ -323,9 +339,9 @@ class Tree(Query):
 
 
 class Around(Query):
-    """
-    A query in the form around[PROPERTY,LATITUDE,LONGITUDE,RADIUS].
-    """
+
+    """A query in the form around[PROPERTY,LATITUDE,LONGITUDE,RADIUS]."""
+
     queryType = "around"
 
     def __init__(self, prop, coord, rad):
@@ -344,6 +360,7 @@ class Around(Query):
 
 
 class Between(Query):
+
     """
     A query in the form between[PROP, BEGIN, END].
 
@@ -354,6 +371,7 @@ class Between(Query):
     @param begin WbTime object representign the beginning of the period
     @param end WbTime object representing the end of the period
     """
+
     queryType = "between"
 
     def __init__(self, prop, begin=None, end=None):
@@ -375,6 +393,7 @@ class Between(Query):
 
 
 class Link(Query):
+
     """
     A query in the form link[LINK,...], which also includes nolink.
 
@@ -396,14 +415,19 @@ class Link(Query):
 
 
 class NoLink(Link):
+
+    """A query in the form nolink[..]."""
+
     queryType = "nolink"
 
 
 def fromClaim(claim):
     """
     Construct from a pywikibot.page Claim object.
-    """
 
+    @type claim: L{pywikibot.page.Claim}
+    @rtype: L{Query}
+    """
     if not isinstance(claim, Claim):
         raise TypeError("claim must be a page.Claim")
 
@@ -417,6 +441,7 @@ def fromClaim(claim):
 
 
 class WikidataQuery():
+
     """
     An interface to the WikidataQuery API.
 
@@ -464,6 +489,8 @@ class WikidataQuery():
     def getCacheFilename(self, queryStr):
         """
         Encode a query into a unique and universally safe format.
+
+        @rtype: unicode
         """
         encQuery = hashlib.sha1(queryStr.encode('utf8')).hexdigest() + ".wdq_cache"
         return os.path.join(self.cacheDir, encQuery)
@@ -474,7 +501,6 @@ class WikidataQuery():
 
         Returns None if the data is not there or if it is too old.
         """
-
         if self.cacheMaxAge <= 0:
             return None
 
@@ -503,7 +529,6 @@ class WikidataQuery():
 
         No return value.
         """
-
         if self.cacheMaxAge <= 0:
             return
 
@@ -527,6 +552,8 @@ class WikidataQuery():
     def getDataFromHost(self, queryStr):
         """
         Go and fetch a query from the host's API.
+
+        @rtype: dict
         """
         url = self.getUrl(queryStr)
 
@@ -550,7 +577,6 @@ class WikidataQuery():
 
         @return Python dict of the interpreted JSON or None on failure
         """
-
         fullQueryString = self.getQueryString(q, labels, props)
 
         # try to get cached data first

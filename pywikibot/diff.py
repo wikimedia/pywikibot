@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-User-interface related functions
-"""
+"""Diff module."""
 #
 # (C) Pywikibot team, 2014
 #
@@ -21,6 +19,7 @@ import pywikibot
 
 
 class Hunk(object):
+
     """One change hunk between a and b.
 
     a and b: two sequences of lines.
@@ -61,14 +60,12 @@ class Hunk(object):
 
     def get_header(self):
         """Provide header of unified diff."""
-
         a_rng = difflib._format_range_unified(*self.a_rng)
         b_rng = difflib._format_range_unified(*self.b_rng)
         return '@@ -{} +{} @@{}'.format(a_rng, b_rng, '\n')
 
     def create_diff(self):
         """Generator of diff text for this hunk, without formatting."""
-
         # make sure each line ends with '\n' to prevent
         # behaviour like http://bugs.python.org/issue2142
         def check_line(l):
@@ -94,7 +91,6 @@ class Hunk(object):
 
     def format_diff(self):
         """Color diff lines."""
-
         diff = iter(self.diff)
 
         l1, l2 = '', next(diff)
@@ -123,7 +119,6 @@ class Hunk(object):
         line_ref: string.
 
         """
-
         color = line[0]
 
         if line_ref is None:
@@ -167,23 +162,25 @@ class Hunk(object):
 
 
 class PatchManager(object):
+
     """Apply patches to text_a to obtain a new text.
 
     If all hunks are approved, text_b will be obtained.
-        letter by letter.
-
     """
 
     def __init__(self, text_a, text_b, n=0, by_letter=False):
         """Constructor.
 
-           text_a: string
-           text_b: string
-           n: int, line of context as defined in difflib.get_grouped_opcodes().
-           by_letter: if text_a and text_b are single lines, comparison can be done
-
+        @param text_a: base text
+        @type text_a: basestring
+        @param text_b: target text
+        @type text_b: basestring
+        @param n: line of context as defined in difflib.get_grouped_opcodes().
+        @type n: int
+        @param by_letter: if text_a and text_b are single lines, comparison can be done
+            letter by letter.
+        @type by_letter: bool
         """
-
         if '\n' in text_a or '\n' in text_b:
             self.a = text_a.splitlines(1)
             self.b = text_b.splitlines(1)
@@ -210,9 +207,7 @@ class PatchManager(object):
             [-1, (i1, i2), (-1, -1)] -> block a[i1:i2] does not change from a to b
                 then is there is no corresponding hunk.
             [hunk index, (i1, i2), (j1, j2)] -> block a[i1:i2] becomes b[j1:j2]
-
         """
-
         blocks = []
         i2 = 0
         for hunk_idx, group in enumerate(self.groups):
@@ -240,8 +235,7 @@ class PatchManager(object):
             pywikibot.output(hunk.header + hunk.diff_text)
 
     def review_hunks(self):
-        "Review hunks."
-
+        """Review hunks."""
         help_msg = ['y -> accept this hunk',
                     'n -> do not accept this hunk',
                     's -> do not accept this hunk and stop reviewing',
@@ -292,7 +286,6 @@ class PatchManager(object):
 
     def apply(self):
         """Apply changes. If there are undecided changes, ask to review."""
-
         if any(h.reviewed == h.PENDING for h in self.hunks):
             pywikibot.output("There are unreviewed hunks.\n"
                              "Please review them before proceeding.\n")
@@ -325,7 +318,6 @@ def cherry_pick(oldtext, newtext, n=0, by_letter=False):
     by_letter: if text_a and text_b are single lines, comparison can be done
 
     """
-
     patch = PatchManager(oldtext, newtext, n=n, by_letter=by_letter)
     pywikibot.output('\03{{lightpurple}}\n{:*^50}\03{{default}}\n'.format('  ALL CHANGES  '))
 

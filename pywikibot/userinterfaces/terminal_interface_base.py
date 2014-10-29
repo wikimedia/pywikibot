@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Base for terminal user interfaces."""
 #
 # (C) Pywikibot team, 2003-2014
 #
@@ -41,6 +42,9 @@ colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(colors))
 
 
 class UI:
+
+    """Base for terminal user interfaces."""
+
     def __init__(self):
         self.stdin = sys.stdin
         self.stdout = sys.stdout
@@ -61,7 +65,6 @@ class UI:
         others write theirs to sys.stderr.
 
         """
-
         if default_stream == 'stdout':
             default_stream = self.stdout
         elif default_stream == 'stderr':
@@ -187,7 +190,6 @@ class UI:
         Unlike raw_input, this function automatically adds a space after the
         question.
         """
-
         # sound the terminal bell to notify the user
         if config.ring_bell:
             sys.stdout.write('\07')
@@ -350,6 +352,7 @@ class UI:
 
 
 class TerminalHandler(logging.Handler):
+
     """A handler class that writes logging records to a terminal.
 
     This class does not close the stream,
@@ -391,16 +394,21 @@ class TerminalHandler(logging.Handler):
 
 
 class TerminalFormatter(logging.Formatter):
+
+    """Terminal logging formatter."""
+
     pass
 
 
 class MaxLevelFilter(logging.Filter):
+
     """Filter that only passes records at or below a specific level.
 
     (setting handler level only passes records at or *above* a specified level,
     so this provides the opposite functionality)
 
     """
+
     def __init__(self, level=None):
         self.level = level
 

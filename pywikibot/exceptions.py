@@ -56,7 +56,7 @@ __version__ = '$Id$'
 from pywikibot.tools import UnicodeMixin
 
 
-class Error(UnicodeMixin, Exception):
+class Error(UnicodeMixin, Exception):  # noqa
 
     """Pywikibot error"""
 
@@ -108,7 +108,7 @@ class PageRelatedError(Error):
         return self.page
 
 
-class PageSaveRelatedError(PageRelatedError):
+class PageSaveRelatedError(PageRelatedError):  # noqa
 
     """Saving the page has failed"""
 
@@ -145,12 +145,12 @@ class OtherPageSaveError(PageSaveRelatedError):
 
 class NoUsername(Error):
 
-    """Username is not in user-config.py"""
+    """Username is not in user-config.py."""
 
     pass
 
 
-class NoPage(PageRelatedError):
+class NoPage(PageRelatedError):  # noqa
 
     """Page does not exist"""
 
@@ -159,7 +159,7 @@ class NoPage(PageRelatedError):
     pass
 
 
-class SiteDefinitionError(Error):
+class SiteDefinitionError(Error):  # noqa
 
     """Site does not exist"""
 
@@ -172,21 +172,21 @@ class SiteDefinitionError(Error):
 NoSuchSite = SiteDefinitionError
 
 
-class UnknownSite(SiteDefinitionError):
+class UnknownSite(SiteDefinitionError):  # noqa
 
     """Site does not exist in Family"""
 
     pass
 
 
-class UnknownFamily(SiteDefinitionError):
+class UnknownFamily(SiteDefinitionError):  # noqa
 
     """Family is not registered"""
 
     pass
 
 
-class IsRedirectPage(PageRelatedError):
+class IsRedirectPage(PageRelatedError):  # noqa
 
     """Page is a redirect page"""
 
@@ -195,7 +195,7 @@ class IsRedirectPage(PageRelatedError):
     pass
 
 
-class IsNotRedirectPage(PageRelatedError):
+class IsNotRedirectPage(PageRelatedError):  # noqa
 
     """Page is not a redirect page"""
 
@@ -206,7 +206,7 @@ class IsNotRedirectPage(PageRelatedError):
 
 class CircularRedirect(PageRelatedError):
 
-    """Page is a circular redirect
+    """Page is a circular redirect.
 
     Exception argument is the redirect target; this may be the same title
     as this page or a different title (in which case the target page directly
@@ -217,14 +217,14 @@ class CircularRedirect(PageRelatedError):
     message = u"Page %s is a circular redirect."
 
 
-class InvalidTitle(Error):
+class InvalidTitle(Error):  # noqa
 
     """Invalid page title"""
 
     pass
 
 
-class LockedPage(PageSaveRelatedError):
+class LockedPage(PageSaveRelatedError):  # noqa
 
     """Page is locked"""
 
@@ -233,7 +233,7 @@ class LockedPage(PageSaveRelatedError):
     pass
 
 
-class LockedNoPage(LockedPage):
+class LockedNoPage(LockedPage):  # noqa
 
     """Title is locked against creation"""
 
@@ -242,7 +242,7 @@ class LockedNoPage(LockedPage):
     pass
 
 
-class CascadeLockedPage(LockedPage):
+class CascadeLockedPage(LockedPage):  # noqa
 
     """Page is locked due to cascading protection"""
 
@@ -251,7 +251,7 @@ class CascadeLockedPage(LockedPage):
     pass
 
 
-class SectionError(Error):
+class SectionError(Error):  # noqa
 
     """The section specified by # does not exist"""
 
@@ -270,7 +270,7 @@ class NoCreateError(PageSaveRelatedError):
     pass
 
 
-class EditConflict(PageSaveRelatedError):
+class EditConflict(PageSaveRelatedError):  # noqa
 
     """There has been an edit conflict while uploading the page"""
 
@@ -279,7 +279,7 @@ class EditConflict(PageSaveRelatedError):
     pass
 
 
-class PageDeletedConflict(EditConflict):
+class PageDeletedConflict(EditConflict):  # noqa
 
     """Page was deleted since being retrieved"""
 
@@ -288,7 +288,7 @@ class PageDeletedConflict(EditConflict):
     pass
 
 
-class PageCreatedConflict(EditConflict):
+class PageCreatedConflict(EditConflict):  # noqa
 
     """Page was created by another user"""
 
@@ -317,7 +317,7 @@ class SpamfilterError(PageSaveRelatedError):
         super(SpamfilterError, self).__init__(page)
 
 
-class ServerError(Error):
+class ServerError(Error):  # noqa
 
     """Got unexpected server response"""
 
@@ -331,7 +331,7 @@ class FatalServerError(ServerError):
     pass
 
 
-class Server504Error(Error):
+class Server504Error(Error):  # noqa
 
     """Server timed out with HTTP 504 code"""
 
@@ -349,14 +349,14 @@ class BadTitle(Error):
     pass
 
 
-class UserBlocked(Error):
+class UserBlocked(Error):  # noqa
 
     """Your username or IP has been blocked"""
 
     pass
 
 
-class PageNotFound(Error):
+class PageNotFound(Error):  # noqa
 
     """Page not found in list"""
 
@@ -383,23 +383,29 @@ class AutoblockUser(Error):
 
 
 class UserActionRefuse(Error):
+
+    """User action was refused."""
+
     pass
 
 
 class WikiBaseError(Error):
+
+    """Wikibase related error."""
+
     pass
 
 
 class CoordinateGlobeUnknownException(WikiBaseError, NotImplementedError):
 
-    """ This globe is not implemented yet in either WikiBase or pywikibot """
+    """This globe is not implemented yet in either WikiBase or pywikibot."""
 
     pass
 
 
 class EntityTypeUnknownException(WikiBaseError):
 
-    """The requested entity type is not recognised on this site"""
+    """The requested entity type is not recognised on this site."""
 
     pass
 
