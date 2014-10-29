@@ -22,12 +22,12 @@ import datetime
 import re
 import sys
 
-if sys.version_info[0] == 2:
-    from HTMLParser import HTMLParser
-else:
+if sys.version_info[0] > 2:
     from html.parser import HTMLParser
     basestring = (str,)
     unicode = str
+else:
+    from HTMLParser import HTMLParser
 
 from pywikibot import config2 as config
 import pywikibot

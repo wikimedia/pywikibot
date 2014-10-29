@@ -7,19 +7,19 @@
 
 import json
 import sys
-if sys.version_info[0] == 2:
-    from urllib2 import quote
-else:
+if sys.version_info[0] > 2:
     from urllib.parse import quote
-from pywikibot.comms import http
+else:
+    from urllib2 import quote
 import pickle
 import os
 import hashlib
 import time
 import tempfile
 
-from pywikibot.page import ItemPage, PropertyPage, Claim
 import pywikibot
+from pywikibot.comms import http
+from pywikibot.page import ItemPage, PropertyPage, Claim
 from pywikibot import config
 
 

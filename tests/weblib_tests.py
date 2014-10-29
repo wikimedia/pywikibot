@@ -9,10 +9,10 @@ __version__ = '$Id$'
 
 import os
 import sys
-if sys.version_info[0] == 2:
-    from urlparse import urlparse
-else:
+if sys.version_info[0] > 2:
     from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
 
 import pywikibot.weblib as weblib
 from tests.aspects import unittest, TestCase

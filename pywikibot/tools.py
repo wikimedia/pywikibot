@@ -41,7 +41,7 @@ class UnicodeMixin(object):
 
     """Mixin class to add __str__ method in Python 2 or 3."""
 
-    if sys.version_info[0] >= 3:
+    if sys.version_info[0] > 2:
         def __str__(self):
             return self.__unicode__()
     else:

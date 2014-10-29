@@ -16,11 +16,11 @@ import sys
 import threading
 import json
 
-if sys.version_info[0] == 2:
-    from Queue import Queue
-else:
+if sys.version_info[0] > 2:
     from queue import Queue
     long = int
+else:
+    from Queue import Queue
 
 # Use pywikibot. prefix for all in-package imports; this is to prevent
 # confusion with similarly-named modules in version 1 framework, for users

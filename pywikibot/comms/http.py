@@ -42,7 +42,14 @@ if StrictVersion(httplib2.__version__) < StrictVersion("0.6.0"):
           httplib2.__file__)
     sys.exit(1)
 
-if sys.version_info[0] == 2:
+if sys.version_info[0] > 2:
+    from ssl import SSLError as SSLHandshakeError
+    SSL_CERT_VERIFY_FAILED_MSG = "SSL: CERTIFICATE_VERIFY_FAILED"
+    import queue as Queue
+    import urllib.parse as urlparse
+    from http import cookiejar as cookielib
+    from urllib.parse import quote
+else:
     if 'SSLHandshakeError' in httplib2.__dict__:
         from httplib2 import SSLHandshakeError
     elif httplib2.__version__ == '0.6.0':
@@ -57,13 +64,6 @@ if sys.version_info[0] == 2:
     import urlparse
     import cookielib
     from urllib2 import quote
-else:
-    from ssl import SSLError as SSLHandshakeError
-    SSL_CERT_VERIFY_FAILED_MSG = "SSL: CERTIFICATE_VERIFY_FAILED"
-    import queue as Queue
-    import urllib.parse as urlparse
-    from http import cookiejar as cookielib
-    from urllib.parse import quote
 
 from pywikibot import config
 from pywikibot.exceptions import FatalServerError, Server504Error

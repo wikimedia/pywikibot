@@ -103,7 +103,7 @@ class UI:
             line, count = colorTagR.subn('', line)
             if count > 0:
                 line += ' ***'
-            if sys.version_info[0] < 3:
+            if sys.version_info[0] == 2:
                 line = line.encode(self.encoding, 'replace')
             targetStream.write(line)
 
@@ -173,7 +173,7 @@ class UI:
         self._print(text, targetStream)
 
     def _raw_input(self):
-        if sys.version_info[0] >= 3:
+        if sys.version_info[0] > 2:
             return input()
         else:
             return raw_input()
@@ -201,7 +201,7 @@ class UI:
                 text = self._raw_input()
         except KeyboardInterrupt:
             raise pywikibot.QuitKeyboardInterrupt()
-        if sys.version_info[0] < 3:
+        if sys.version_info[0] == 2:
             text = text.decode(self.encoding)
         return text
 

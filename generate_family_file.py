@@ -21,19 +21,20 @@ import re
 import codecs
 from collections import defaultdict
 from distutils.version import LooseVersion as V
-
-if sys.version_info[0] == 3:
-    raw_input = input
+import json
 
 # creating & retrieving urls
-if sys.version_info[0] == 2:
-    from urlparse import urlparse, urljoin
-    import urllib2
-    from urllib2 import HTTPError
-else:
+if sys.version_info[0] > 2:
     from urllib.parse import urlparse, urljoin
     from urllib.error import HTTPError
     import urllib.request as urllib2
+    from html.parser import HTMLParser
+    raw_input = input
+else:
+    from urlparse import urlparse, urljoin
+    import urllib2
+    from urllib2 import HTTPError
+    from HTMLParser import HTMLParser
 
 
 def urlopen(url):
@@ -43,20 +44,13 @@ def urlopen(url):
                                ' - https://www.mediawiki.org/wiki/Pywikibot'})
     uo = urllib2.urlopen(req)
     try:
-        if sys.version_info[0] == 2:
-            uo.charset = uo.headers.getfirstmatchingheader('Content-Type')[0].strip().split('charset=')[1]
-        else:
+        if sys.version_info[0] > 2:
             uo.charset = uo.headers.get_content_charset()
+        else:
+            uo.charset = uo.headers.getfirstmatchingheader('Content-Type')[0].strip().split('charset=')[1]
     except IndexError:
         uo.charset = 'latin-1'
     return uo
-
-# parsing response data
-import json
-if sys.version_info[0] == 2:
-    from HTMLParser import HTMLParser
-else:
-    from html.parser import HTMLParser
 
 
 class WikiHTMLPageParser(HTMLParser):

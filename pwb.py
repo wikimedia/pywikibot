@@ -56,10 +56,10 @@ def run_python_file(filename, argv, argvu):
     main_mod = imp.new_module('__main__')
     sys.modules['__main__'] = main_mod
     main_mod.__file__ = filename
-    if sys.version_info[0] == 2:
-        main_mod.__builtins__ = sys.modules['__builtin__']
-    else:
+    if sys.version_info[0] > 2:
         main_mod.builtins = sys.modules['builtins']
+    else:
+        main_mod.__builtins__ = sys.modules['__builtin__']
 
     # Set sys.argv and the first path element properly.
     old_argv = sys.argv
