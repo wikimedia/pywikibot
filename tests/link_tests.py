@@ -61,7 +61,7 @@ class TestLink(DefaultDrySiteTestCase):
 
     def test_invalid(self):
         self.assertRaises(InvalidTitle, Link('', self.get_site()).parse)
-        # TODO: self.assertRaises(InvalidTitle, Link(':', self.get_site()).parse)
+        self.assertRaises(InvalidTitle, Link(':', self.get_site()).parse)
         self.assertRaises(InvalidTitle, Link('__  __', self.get_site()).parse)
         self.assertRaises(InvalidTitle, Link('  __  ', self.get_site()).parse)
         # Bad characters forbidden regardless of wgLegalTitleChars
@@ -74,10 +74,9 @@ class TestLink(DefaultDrySiteTestCase):
         # URL encoding
         # %XX is understood by wikimedia but not %XXXX
         self.assertRaises(InvalidTitle, Link('A%2523B', self.get_site()).parse)
-        # Subject of NS_TALK does not roundtrip to NS_MAIN
-        # TODO: A link is invalid if their (non-)talk page would be in another
-        #       namespace than the link's "other" namespace
-        # TODO: self.assertRaises(InvalidTitle, Link('Talk:File:Example.svg', self.get_site()).parse)
+        # A link is invalid if their (non-)talk page would be in another
+        # namespace than the link's "other" namespace
+        self.assertRaises(InvalidTitle, Link('Talk:File:Example.svg', self.get_site()).parse)
         # Directory navigation
         self.assertRaises(InvalidTitle, Link('.', self.get_site()).parse)
         self.assertRaises(InvalidTitle, Link('..', self.get_site()).parse)
@@ -97,7 +96,7 @@ class TestLink(DefaultDrySiteTestCase):
         # Namespace prefix without actual title
         self.assertRaises(InvalidTitle, Link('Talk:', self.get_site()).parse)
         self.assertRaises(InvalidTitle, Link('Category: ', self.get_site()).parse)
-        # TODO: self.assertRaises(InvalidTitle, Link('Category: #bar', self.get_site()).parse)
+        self.assertRaises(InvalidTitle, Link('Category: #bar', self.get_site()).parse)
 
 
 # ---- The first set of tests are explicit links, starting with a ':'.

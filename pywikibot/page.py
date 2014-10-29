@@ -4055,7 +4055,9 @@ class Link(ComparableMixin):
         """
         self._site = self._source
         self._namespace = self._defaultns
+        self._is_interwiki = False
         t = self._text
+        ns_prefix = False
 
         # This code was adapted from Title.php : secureAndSplit()
         #
@@ -4074,11 +4076,8 @@ class Link(ComparableMixin):
             if ns:
                 # Ordinary namespace
                 t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
-                # 'namespace:' is not a valid title
-                if not t:
-                    raise pywikibot.InvalidTitle(
-                        u"'{0}' has no title.".format(self._text))
                 self._namespace = ns
+                ns_prefix = True
                 break
             try:
                 newsite = self._site.interwiki(prefix)
@@ -4100,12 +4099,29 @@ class Link(ComparableMixin):
                 elif newsite != self._source:
                     first_other_site = newsite
                 self._site = newsite
+                self._is_interwiki = True
 
         if u"#" in t:
             t, sec = t.split(u'#', 1)
             t, self._section = t.rstrip(), sec.lstrip()
         else:
             self._section = None
+
+        if ns_prefix:
+            # 'namespace:' is not a valid title
+            if not t:
+                raise pywikibot.InvalidTitle(
+                    u"'{0}' has no title.".format(self._text))
+            elif ':' in t and self._namespace >= 0:  # < 0 don't have talk
+                other_ns = self._site.namespaces[self._namespace - 1
+                                                 if self._namespace % 2 else
+                                                 self._namespace + 1]
+                if '' in other_ns:  # other namespace uses empty str as ns
+                    next_ns = t[:t.index(':')]
+                    if self._site.ns_index(next_ns):
+                        raise pywikibot.InvalidTitle(
+                            u"The (non-)talk page of '{0}' is a valid title "
+                            "in another namespace.".format(self._text))
 
         # Reject illegal characters.
         m = Link.illegal_titles_pattern.search(t)
@@ -4139,7 +4155,7 @@ class Link(ComparableMixin):
 
         # "empty" local links can only be self-links
         # with a fragment identifier.
-        if not self._text.strip():
+        if not t.strip() and not self._is_interwiki:
             raise pywikibot.InvalidTitle("The link does not contain a page "
                                          "title")
 
