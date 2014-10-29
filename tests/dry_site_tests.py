@@ -15,8 +15,9 @@ from pywikibot.comms.http import user_agent
 from pywikibot.exceptions import UnknownSite
 
 from tests.aspects import (
-    unittest, TestCase,
+    unittest,
     DefaultDrySiteTestCase,
+    DebugOnlyTestCase,
     DeprecationTestCase,
 )
 
@@ -96,7 +97,7 @@ class TestDrySite(DefaultDrySiteTestCase):
                          user_agent(x, format_string='Foo ({script_comments})'))
 
 
-class TestMustBe(TestCase):
+class TestMustBe(DebugOnlyTestCase):
 
     """Test cases for the must_be decorator."""
 
