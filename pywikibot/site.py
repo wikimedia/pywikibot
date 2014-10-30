@@ -29,7 +29,8 @@ import pywikibot
 import pywikibot.family
 from pywikibot.tools import (
     itergroup, deprecated, deprecate_arg, UnicodeMixin, ComparableMixin,
-    redirect_func, add_decorated_full_name, deprecated_args
+    redirect_func, add_decorated_full_name, deprecated_args,
+    SelfCallDict, SelfCallString,
 )
 from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.throttle import Throttle
@@ -555,11 +556,14 @@ class BaseSite(ComparableMixin):
             raise AttributeError("%s instance has no attribute '%s'"
                                  % (self.__class__.__name__, attr))
 
-    def sitename(self):
+    def __str__(self):
         """Return string representing this Site's name and code."""
         return self.family.name + ':' + self.code
 
-    __str__ = sitename
+    @property
+    def sitename(self):
+        """String representing this Site's name and code."""
+        return SelfCallString(self.__str__())
 
     def __repr__(self):
         return 'Site("%s", "%s")' % (self.code, self.family.name)
@@ -637,11 +641,13 @@ class BaseSite(ComparableMixin):
     getNamespaceIndex = redirect_func(ns_index, old_name='getNamespaceIndex',
                                       class_name='BaseSite')
 
+    @property
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
         if not hasattr(self, '_namespaces'):
             use_image_name = LV(self.version()) < LV("1.14")
-            self._namespaces = Namespace.builtin_namespaces(use_image_name)
+            self._namespaces = SelfCallDict(
+                Namespace.builtin_namespaces(use_image_name))
         return self._namespaces
 
     def ns_normalize(self, value):
@@ -2000,8 +2006,7 @@ class APISite(BaseSite):
         return self.getmagicwords("pagenamee")
 
     def _build_namespaces(self):
-
-        self._namespaces = {}
+        self._namespaces = SelfCallDict()
 
         # In MW 1.14, API siprop 'namespaces' added 'canonical',
         # and Image became File with Image as an alias.
@@ -2143,6 +2148,7 @@ class APISite(BaseSite):
         # 'title' is expected to be URL-encoded already
         return self.siteinfo["articlepath"].replace("$1", title)
 
+    @property
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
         if not hasattr(self, '_namespaces'):

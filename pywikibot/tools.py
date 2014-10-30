@@ -321,6 +321,24 @@ class EmptyDefault(str, Mapping):
 EMPTY_DEFAULT = EmptyDefault()
 
 
+class SelfCallMixin(object):
+
+    """Return self when called."""
+
+    def __call__(self):
+        return self
+
+
+class SelfCallDict(SelfCallMixin, dict):
+
+    """Dict with SelfCallMixin."""
+
+
+class SelfCallString(SelfCallMixin, str):
+
+    """Unicode string with SelfCallMixin."""
+
+
 class DequeGenerator(deque):
 
     """A generator that allows items to be added during generating."""

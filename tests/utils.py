@@ -9,6 +9,7 @@ from __future__ import print_function
 __version__ = '$Id$'
 #
 import pywikibot
+from pywikibot.tools import SelfCallDict
 from pywikibot.site import Namespace
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
@@ -109,7 +110,7 @@ class DrySite(pywikibot.site.APISite):
         self._userinfo = pywikibot.tools.EMPTY_DEFAULT
         self._siteinfo = DummySiteinfo({})
         self._siteinfo._cache['lang'] = (code, True)
-        self._namespaces = Namespace.builtin_namespaces()
+        self._namespaces = SelfCallDict(Namespace.builtin_namespaces())
 
     @property
     def userinfo(self):

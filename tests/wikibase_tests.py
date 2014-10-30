@@ -12,6 +12,7 @@ import os
 import sys
 import pywikibot
 from pywikibot import pagegenerators
+from pywikibot.tools import SelfCallDict
 from pywikibot.page import WikibasePage
 from pywikibot.site import Namespace
 import json
@@ -790,7 +791,7 @@ class TestAlternateNamespaces(WikidataTestCase):
     def setUpClass(cls):
         super(TestAlternateNamespaces, cls).setUpClass()
 
-        cls.get_repo()._namespaces = {
+        cls.get_repo()._namespaces = SelfCallDict({
             90: Namespace(id=90,
                           case='first-letter',
                           canonical_name='Item',
@@ -799,7 +800,7 @@ class TestAlternateNamespaces(WikidataTestCase):
                           case='first-letter',
                           canonical_name='Prop',
                           defaultcontentmodel='wikibase-property')
-        }
+        })
 
     def test_alternate_item_namespace(self):
         item = pywikibot.ItemPage(self.repo, 'Q60')
