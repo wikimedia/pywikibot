@@ -31,12 +31,10 @@ if sys.version_info[0] > 2:
     long = int
     from html import entities as htmlentitydefs
     from urllib.parse import quote_from_bytes, unquote_to_bytes
-    from urllib.request import urlopen
 else:
     chr = unichr  # noqa
     import htmlentitydefs
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
-    from urllib import urlopen
 
 import pywikibot
 
@@ -2104,14 +2102,11 @@ class FilePage(Page):
     @deprecated("FilePage.latest_file_info.sha1")
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
-        # FIXME: MD5 might be performed on incomplete file due to server disconnection
-        # (see bug #1795683).
-        f = urlopen(self.fileUrl())
         # TODO: check whether this needs a User-Agent header added
+        req = http.fetch(self.fileUrl())
         h = hashlib.md5()
-        h.update(f.read())
+        h.update(req.raw)
         md5Checksum = h.hexdigest()
-        f.close()
         return md5Checksum
 
     @deprecated("FilePage.latest_file_info.sha1")

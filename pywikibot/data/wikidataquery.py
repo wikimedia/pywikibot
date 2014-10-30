@@ -558,13 +558,13 @@ class WikidataQuery():
         url = self.getUrl(queryStr)
 
         try:
-            resp = http.request(None, url)
+            resp = http.fetch(url)
         except:
             pywikibot.warning(u"Failed to retrieve %s" % url)
             raise
 
         try:
-            data = json.loads(resp)
+            data = json.loads(resp.content)
         except ValueError:
             pywikibot.warning(u"Data received from host but no JSON could be decoded")
             raise pywikibot.ServerError("Data received from host but no JSON could be decoded")

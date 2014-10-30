@@ -144,11 +144,12 @@ def github_svn_rev2hash(tag, rev):
     from pywikibot.comms import http
 
     uri = 'https://github.com/wikimedia/%s/!svn/vcc/default' % tag
-    data = http.request(site=None, uri=uri, method='PROPFIND',
-                        body="<?xml version='1.0' encoding='utf-8'?>"
-                        "<propfind xmlns=\"DAV:\"><allprop/></propfind>",
-                        headers={'label': str(rev), 'user-agent': 'SVN/1.7.5 {pwb}'})
-
+    request = http.fetch(uri=uri, method='PROPFIND',
+                         body="<?xml version='1.0' encoding='utf-8'?>"
+                              "<propfind xmlns=\"DAV:\"><allprop/></propfind>",
+                         headers={'label': str(rev),
+                                  'user-agent': 'SVN/1.7.5 {pwb}'})
+    data = request.content
     dom = xml.dom.minidom.parse(StringIO(data))
     hsh = dom.getElementsByTagName("C:git-commit")[0].firstChild.nodeValue
     return hsh
@@ -240,14 +241,12 @@ def getversion_onlinerepo(repo=None):
     from pywikibot.comms import http
 
     url = repo or 'https://git.wikimedia.org/feed/pywikibot/core'
-    hsh = None
-    buf = http.request(site=None, uri=url)
-    buf = buf.split('\r\n')
+    buf = http.fetch(url).content.splitlines()
     try:
         hsh = buf[13].split('/')[5][:-1]
+        return hsh
     except Exception as e:
         raise ParseError(repr(e) + ' while parsing ' + repr(buf))
-    return hsh
 
 
 @deprecated('get_module_version, get_module_filename and get_module_mtime')

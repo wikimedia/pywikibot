@@ -21,9 +21,12 @@ This module is responsible for
 __version__ = '$Id$'
 __docformat__ = 'epytext'
 
-import sys
 import atexit
+import sys
 import time
+
+from distutils.version import StrictVersion
+from warnings import warn
 
 # Verify that a working httplib2 is present.
 try:
@@ -32,7 +35,6 @@ except ImportError:
     print("Error: Python module httplib2 >= 0.6.0 is required.")
     sys.exit(1)
 
-from distutils.version import StrictVersion
 # httplib2 0.6.0 was released with __version__ as '$Rev$'
 #                and no module variable CA_CERTS.
 if httplib2.__version__ == '$Rev$' and 'CA_CERTS' not in httplib2.__dict__:
@@ -220,7 +222,8 @@ def user_agent(site=None, format_string=None):
 
 
 @deprecate_arg('ssl', None)
-def request(site=None, uri=None, charset=None, *args, **kwargs):
+def request(site=None, uri=None, method='GET', body=None, headers=None,
+            **kwargs):
     """
     Request to Site with default error handling and response decoding.
 
@@ -244,9 +247,9 @@ def request(site=None, uri=None, charset=None, *args, **kwargs):
     """
     assert(site or uri)
     if not site:
-        # TODO: deprecate this usage, once the library code has been
-        # migrated to using the other request methods.
-        r = fetch(uri, *args, **kwargs)
+        warn('Invoking http.request without argument site is deprecated. '
+             'Use http.fetch.', DeprecationWarning, 2)
+        r = fetch(uri, method, body, headers, **kwargs)
         return r.content
 
     baseuri = site.base_url(uri)
@@ -254,11 +257,15 @@ def request(site=None, uri=None, charset=None, *args, **kwargs):
     kwargs.setdefault("disable_ssl_certificate_validation",
                       site.ignore_certificate_error())
 
-    format_string = kwargs.setdefault("headers", {}).get("user-agent")
-    kwargs["headers"]["user-agent"] = user_agent(site, format_string)
-    kwargs['charset'] = charset
+    if not headers:
+        headers = {}
+        format_string = None
+    else:
+        format_string = headers.get('user-agent', None)
 
-    r = fetch(baseuri, *args, **kwargs)
+    headers['user-agent'] = user_agent(site, format_string)
+
+    r = fetch(baseuri, method, body, headers, **kwargs)
     return r.content
 
 
