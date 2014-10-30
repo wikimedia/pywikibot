@@ -22,10 +22,6 @@ class Hunk(object):
 
     """One change hunk between a and b.
 
-    a and b: two sequences of lines.
-    grouped_opcode: list of 5-tuples describing how to turn a into b.
-        it has the same format as returned by difflib.get_opcodes().
-
     Note: parts of this code are taken from by difflib.get_grouped_opcodes().
 
     """
@@ -35,6 +31,15 @@ class Hunk(object):
     PENDING = 0
 
     def __init__(self, a, b, grouped_opcode):
+        """
+        Constructor.
+
+        @param a: sequence of lines
+        @param b: sequence of lines
+        @param grouped_opcode: list of 5-tuples describing how to turn a into b.
+            it has the same format as returned by difflib.get_opcodes().
+
+        """
         self.a = a
         self.b = b
         self.group = grouped_opcode
@@ -203,7 +208,8 @@ class PatchManager(object):
     def get_blocks(self):
         """Return list with blocks of indexes which compose a and, where applicable, b.
 
-        Format of each block:
+        Format of each block::
+
             [-1, (i1, i2), (-1, -1)] -> block a[i1:i2] does not change from a to b
                 then is there is no corresponding hunk.
             [hunk index, (i1, i2), (j1, j2)] -> block a[i1:i2] becomes b[j1:j2]

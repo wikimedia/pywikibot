@@ -445,7 +445,7 @@ def add_full_name(obj):
 def deprecated(*args, **kwargs):
     """Decorator to output a deprecation warning.
 
-    @param instead: if provided, will be used to specify the replacement
+    @kwarg instead: if provided, will be used to specify the replacement
     @type instead: string
     """
     def decorator(obj):

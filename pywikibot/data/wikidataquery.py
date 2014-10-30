@@ -56,8 +56,8 @@ class QuerySet():
         Add to this QuerySet using the given joiner.
 
         If the given joiner is not the same as we used before in
-        this QuerySet, nest the current one in parens before joining
-        - this makes the implicit grouping of the API explicit.
+        this QuerySet, nest the current one in parens before joining.
+        This makes the implicit grouping of the API explicit.
 
         @return: a new query set representing the joining of this one and
             the arguments
@@ -208,10 +208,10 @@ class Query():
 
         The resulting IDs may be used in query strings.
 
-        @param item A single item. One of ItemPages, PropertyPages, int
-        or anything that can be fed to int()
+        @param item: A single item. One of ItemPages, PropertyPages, int
+            or anything that can be fed to int()
 
-        @return the int ID of the item
+        @return: the int ID of the item
         """
         if isinstance(item, ItemPage) or isinstance(item, PropertyPage):
             return item.getID(numeric=True)
@@ -307,9 +307,9 @@ class Tree(Query):
         """
         Constructor.
 
-        @param item The root item
-        @param forward List of forward properties, can be empty
-        @param reverse List of reverse properties, can be empty
+        @param item: The root item
+        @param forward: List of forward properties, can be empty
+        @param reverse: List of reverse properties, can be empty
         """
         # check sensible things coming in, as we lose info once we do
         # type conversion
@@ -367,9 +367,9 @@ class Between(Query):
     You have to give prop and one of begin or end. Note that times have
     to be in UTC, timezones are not supported by the API
 
-    @param prop the property
-    @param begin WbTime object representign the beginning of the period
-    @param end WbTime object representing the end of the period
+    @param prop: the property
+    @param begin: WbTime object representign the beginning of the period
+    @param end: WbTime object representing the end of the period
     """
 
     queryType = "between"
@@ -474,7 +474,7 @@ class WikidataQuery():
         """
         Get the query string for a given query or queryset.
 
-        @return query string including labels and props
+        @return: string including labels and props
         """
         qStr = "q=%s" % quote(str(q))
 
@@ -499,7 +499,7 @@ class WikidataQuery():
         """
         Load the query result from the cache, if possible.
 
-        Returns None if the data is not there or if it is too old.
+        @return: None if the data is not there or if it is too old.
         """
         if self.cacheMaxAge <= 0:
             return None
@@ -527,7 +527,7 @@ class WikidataQuery():
         """
         Save data from a query to a cache file, if enabled.
 
-        No return value.
+        @rtype: None
         """
         if self.cacheMaxAge <= 0:
             return
@@ -575,7 +575,7 @@ class WikidataQuery():
         """
         Actually run a query over the API.
 
-        @return Python dict of the interpreted JSON or None on failure
+        @return: dict of the interpreted JSON or None on failure
         """
         fullQueryString = self.getQueryString(q, labels, props)
 

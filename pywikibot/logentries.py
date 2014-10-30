@@ -103,9 +103,10 @@ class BlockEntry(LogEntry):
         """
         Return the blocked account or IP.
 
-        * Returns the Page object of username or IP
-           if this block action targets a username or IP.
-        * Returns the blockid if this log reflects the removal of an autoblock
+        @return: the Page object of username or IP if this block action
+            targets a username or IP, or the blockid if this log reflects
+            the removal of an autoblock
+        @rtype: Page or int
         """
         # TODO what for IP ranges ?
         if self.isAutoblockRemoval:

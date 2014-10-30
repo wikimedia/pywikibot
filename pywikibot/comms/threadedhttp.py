@@ -140,13 +140,13 @@ class Http(httplib2.Http):
         """
         Constructor.
 
-        @param cookiejar: (optional) CookieJar to use. A new one will be
+        @kwarg cookiejar: (optional) CookieJar to use. A new one will be
                used when not supplied.
-        @param connection_pool: (optional) Connection pool to use. A new one
+        @kwarg connection_pool: (optional) Connection pool to use. A new one
                will be used when not supplied.
-        @param max_redirects: (optional) The maximum number of redirects to
+        @kwarg max_redirects: (optional) The maximum number of redirects to
                follow. 5 is default.
-        @param timeout: (optional) Socket timeout in seconds. Default is
+        @kwarg timeout: (optional) Socket timeout in seconds. Default is
                config.socket_timeout. Disable with None.
 
         """

@@ -188,13 +188,16 @@ def slh(value, lst):
     """This function helps in simple list value matching.
 
     !!!!! The index starts at 1, so 1st element has index 1, not 0 !!!!!
-        Usually it will be used as a lambda call in a map:
-            lambda v: slh(v, [u'January',u'February',...])
 
-        Usage scenarios:
-            formats['MonthName']['en'](1) => u'January'
-            formats['MonthName']['en'](u'January') => 1
-            formats['MonthName']['en'](u'anything else') => raise ValueError
+    Usually it will be used as a lambda call in a map::
+
+        lambda v: slh(v, [u'January',u'February',...])
+
+    Usage scenarios::
+
+        formats['MonthName']['en'](1) => u'January'
+        formats['MonthName']['en'](u'January') => 1
+        formats['MonthName']['en'](u'anything else') => raise ValueError
 
     """
     if isinstance(value, basestring):
@@ -400,23 +403,26 @@ def escapePattern2(pattern):
 def dh(value, pattern, encf, decf, filter=None):
     """This function helps in year parsing.
 
-    Usually it will be used as a lambda call in a map:
-        lambda v: dh(v, u'pattern string', encodingFunc, decodingFunc)
+    Usually it will be used as a lambda call in a map::
 
-    encodingFunc:
+        lambda v: dh(v, u'pattern string', encf, decf)
+
+    @param encf:
         Converts from an integer parameter to another integer or a tuple of
         integers. Depending on the pattern, each integer will be converted to a
         proper string representation, and will be passed as a format argument
-        to the pattern:
-                    pattern % encodingFunc(value)
-        This function is a complement of decodingFunc.
+        to the pattern::
 
-    decodingFunc:
+                    pattern % encf(value)
+
+        This function is a complement of decf.
+
+    @param decf:
         Converts a tuple/list of non-negative integers found in the original
         value string
         into a normalized value. The normalized value can be passed right back
         into dh() to produce the original string. This function is a complement
-        of encodingFunc. dh() interprets %d as a decimal and %s as a roman
+        of encf. dh() interprets %d as a decimal and %s as a roman
         numeral number.
 
     """

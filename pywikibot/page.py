@@ -281,7 +281,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         return hash(unicode(self))
 
     def autoFormat(self):
-        """Return L{date.autoFormat} dictName and value, if any.
+        """Return L{date.getAutoFormat} dictName and value, if any.
 
         Value can be a year, date, etc., and dictName is 'YearBC',
         'Year_December', or another dictionary name. Please note that two
@@ -310,12 +310,12 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         retrieved yet, or if force is True. This can raise the following
         exceptions that should be caught by the calling code:
 
-        @exception NoPage         The page does not exist
-        @exception IsRedirectPage The page is a redirect. The argument of the
-                                  exception is the title of the page it
-                                  redirects to.
-        @exception SectionError   The section does not exist on a page with
-                                  a # link
+        @exception NoPage:         The page does not exist
+        @exception IsRedirectPage: The page is a redirect. The argument of the
+                                   exception is the title of the page it
+                                   redirects to.
+        @exception SectionError:   The section does not exist on a page with
+                                   a # link
 
         @param force:           reload all page attributes, including errors.
         @param get_redirect:    return the redirect text, do not follow the
@@ -637,7 +637,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         Character count ignores language links and category links.
         Can raise the same exceptions as get().
 
-        @return bool
+        @rtype: bool
         """
         txt = self.get()
         txt = textlib.removeLanguageLinks(txt, site=self.site)
@@ -699,7 +699,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         'Template:Disambig' is always assumed to be default, and will be
         appended regardless of its existence.
 
-        @return: bool
+        @rtype: bool
         """
         if self.site.has_extension('Disambiguator'):
             # If the Disambiguator extension is loaded, use it
@@ -823,7 +823,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                    total=None, content=False):
         """Return an iterator for pages that embed this page as a template.
 
-        @param filterRedirects: if True, only iterate redirects; if False,
+        @param filter_redirects: if True, only iterate redirects; if False,
             omit redirects; if None, do not filter
         @param namespaces: only iterate pages in these namespaces
         @param step: limit each API call to this number of pages
@@ -1563,19 +1563,21 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         If no calls have been made since loadDeletedRevisions(), everything
         will be restored.
 
-        Simplest case:
+        Simplest case::
+
             Page(...).undelete('This will restore all revisions')
 
-        More complex:
+        More complex::
+
             pg = Page(...)
-            revs = pg.loadDeletedRevsions()
+            revs = pg.loadDeletedRevisions()
             for rev in revs:
                 if ... #decide whether to undelete a revision
                     pg.markDeletedRevision(rev) #mark for undeletion
             pg.undelete('This will restore only selected revisions.')
 
         @param comment: The undeletion edit summary.
-
+        @type comment: basestring
         """
         if comment is None:
             pywikibot.output(u'Preparing to undelete %s.'
@@ -1663,8 +1665,10 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """
         Remove page from oldCat and add it to newCat.
 
-        @param oldCat and newCat: should be Category objects.
-            If newCat is None, the category will be removed.
+        @param oldCat: category to be removed
+        @type oldCat: Category
+        @param newCat: category to be added, if any
+        @type newCat: Category or None
 
         @param comment: string to use as an edit summary
 
@@ -1676,9 +1680,10 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
 
         @param include: list of tags not to be disabled by default in relevant
             textlib functions, where CategoryLinks can be searched.
-        @type: list
+        @type include: list
 
         @return: True if page was saved changed, otherwise False.
+        @rtype: bool
 
         """
         # get list of Category objects the article is in and remove possible
@@ -1906,7 +1911,8 @@ class FilePage(Page):
     def getFileVersionHistory(self):
         """Return the file's version history.
 
-        @return: A list of dictionaries with the following keys:
+        @return: A list of dictionaries with the following keys::
+
             [comment, sha1, url, timestamp, metadata,
              height, width, mime, user, descriptionurl, size]
 
@@ -2058,7 +2064,7 @@ class Category(Page):
         @param total: iterate no more than this number of pages in
             total (at all levels)
         @param namespaces: only yield pages in the specified namespaces
-        @type namespace: int or list of ints
+        @type namespaces: int or list of ints
         @param content: if True, retrieve the content of the current version
             of each page (default False)
         @param sortby: determines the order in which results are generated,
@@ -2636,9 +2642,9 @@ class WikibasePage(BasePage):
         @type site: DataSite
         @param title: normalized title of the page
         @type title: unicode
-        @param ns: namespace
+        @kwarg ns: namespace
         @type ns: Namespace instance, or int
-        @param entity_type: Wikibase entity type
+        @kwarg entity_type: Wikibase entity type
         @type entity_type: str ('item' or 'property')
 
         @raise TypeError: incorrect use of parameters
@@ -2992,10 +2998,10 @@ class WikibasePage(BasePage):
         Edit an entity using Wikibase wbeditentity API.
 
         This function is wrapped around by:
-         *editLabels
-         *editDescriptions
-         *editAliases
-         *ItemPage.setSitelinks
+         - editLabels
+         - editDescriptions
+         - editAliases
+         - ItemPage.setSitelinks
 
         @param data: Data to be saved
         @type data: dict (must be not None for python 2.6; bug 70707)
@@ -3137,13 +3143,14 @@ class ItemPage(WikibasePage):
         """
         Get the ItemPage for a Page that links to it.
 
-        @exception NoPage  There is no corresponding ItemPage for the page
         @param page: Page to look for corresponding data item
         @type  page: pywikibot.Page
         @param lazy_load: Do not raise NoPage if either page or corresponding
                           ItemPage does not exist.
         @type  lazy_load: bool
         @return: ItemPage
+
+        @exception NoPage: There is no corresponding ItemPage for the page
         """
         if not page.site.has_transcluded_data:
             raise pywikibot.WikiBaseError(u'%s has no transcluded data'
@@ -3463,7 +3470,8 @@ class PropertyPage(WikibasePage, Property):
     """
     A Wikibase entity in the property namespace.
 
-    Should be created as:
+    Should be created as::
+
         PropertyPage(DataSite, 'P21')
     """
 
@@ -3674,8 +3682,8 @@ class Claim(Property):
         @param value: The new target value.
         @type value: object
 
-        Raises ValueError if value is not of the type
-               required for the Claim type.
+        @exception ValueError: if value is not of the type
+            required for the Claim type.
         """
         value_class = self.types[self.type]
         if not isinstance(value, value_class):
@@ -3690,7 +3698,7 @@ class Claim(Property):
         @param value: The new target value.
         @type value: object
         @param snaktype: The new snak type.
-        @type value: str ('value', 'somevalue', or 'novalue')
+        @type snaktype: str ('value', 'somevalue', or 'novalue')
         """
         if value:
             self.setTarget(value)
@@ -4298,7 +4306,7 @@ class Link(ComparableMixin):
     def __unicode__(self):
         """Return a unicode string representation.
 
-        @return unicode
+        @return: unicode
         """
         return self.astext()
 
@@ -4506,8 +4514,8 @@ def url2unicode(title, encodings='utf-8'):
 
     Uses the first encoding that doesn't cause an error.
 
-    @param data: URL-encoded character data to convert
-    @type data: str
+    @param title: URL-encoded character data to convert
+    @type title: str
     @param encodings: Encodings to attempt to use during conversion.
     @type encodings: str, list or Site
     @return: unicode

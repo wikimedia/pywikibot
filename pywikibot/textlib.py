@@ -89,18 +89,17 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     regex matching. If allowoverlap is true, overlapping occurrences are all
     replaced (watch out when using this, it might lead to infinite loops!).
 
-    Parameters:
-        text            - a unicode string
-        old             - a compiled or uncompiled regular expression
-        new             - a unicode string (which can contain regular
-                          expression references), or a function which takes
-                          a match object as parameter. See parameter repl of
-                          re.sub().
-        exceptions      - a list of strings which signal what to leave out,
-                          e.g. ['math', 'table', 'template']
-        caseInsensitive - a boolean
-        marker          - a string that will be added to the last replacement;
-                          if nothing is changed, it is added at the end
+    @type text: unicode
+    @param old: a compiled or uncompiled regular expression
+    @param new: a unicode string (which can contain regular
+        expression references), or a function which takes
+        a match object as parameter. See parameter repl of
+        re.sub().
+    @param exceptions: a list of strings which signal what to leave out,
+        e.g. ['math', 'table', 'template']
+    @type caseInsensitive: bool
+    @param marker: a string that will be added to the last replacement;
+        if nothing is changed, it is added at the end
 
     """
     if site is None:
@@ -687,7 +686,7 @@ def getCategoryLinks(text, site=None, include=[]):
 
     @param include: list of tags which should not be removed by
         removeDisabledParts() and where CategoryLinks can be searched.
-    @type: list
+    @type include: list
 
     @return: all category links found
     @rtype: list of Category objects
@@ -1170,16 +1169,18 @@ def does_text_contain_section(pagetext, section):
     """
     Determine whether the page text contains the given section title.
 
+    It does not care whether a section string may contain spaces or
+    underlines. Both will match.
+
+    If a section parameter contains a internal link, it will match the
+    section with or without a preceding colon which is required for a
+    text link e.g. for categories and files.
+
     @param pagetext: The wikitext of a page
-    @type text: unicode or string
+    @type pagetext: unicode or string
     @param section: a section of a page including wikitext markups
     @type section: unicode or string
 
-    Note: It does not care whether a section string may contain spaces or
-          underlines. Both will match.
-          If a section parameter contains a internal link, it will match the
-          section with or without a preceding colon which is required for a
-          text link e.g. for categories and files.
     """
     # match preceding colon for text links
     section = re.sub(r'\\\[\\\[(\\:)?', '\[\[\:?', re.escape(section))

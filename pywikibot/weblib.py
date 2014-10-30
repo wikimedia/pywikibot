@@ -19,13 +19,13 @@ from pywikibot.comms import http
 def getInternetArchiveURL(url, timestamp=None):
     """Return archived URL by Internet Archive.
 
-    Parameters:
-        url - url to search an archived version for
-        timestamp - requested archive date. The version closest to that moment
-                    is returned. Format: YYYYMMDDhhmmss or part thereof.
-
     See [[:mw:Archived Pages]] and https://archive.org/help/wayback_api.php
     for more details.
+
+    @param url: url to search an archived version for
+    @param timestamp: requested archive date. The version closest to that
+        moment is returned. Format: YYYYMMDDhhmmss or part thereof.
+
     """
     import json
     uri = u'https://archive.org/wayback/available?'
@@ -47,13 +47,13 @@ def getInternetArchiveURL(url, timestamp=None):
 def getWebCitationURL(url, timestamp=None):
     """Return archived URL by Web Citation.
 
-    Parameters:
-        url - url to search an archived version for
-        timestamp - requested archive date. The version closest to that moment
-                    is returned. Format: YYYYMMDDhhmmss or part thereof.
-
     See http://www.webcitation.org/doc/WebCiteBestPracticesGuide.pdf
     for more details
+
+    @param url: url to search an archived version for
+    @param timestamp: requested archive date. The version closest to that
+        moment is returned. Format: YYYYMMDDhhmmss or part thereof.
+
     """
     import xml.etree.ElementTree as ET
     uri = u'http://www.webcitation.org/query?'

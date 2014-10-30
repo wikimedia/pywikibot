@@ -24,8 +24,8 @@ PageRelatedError: any exception which is caused by an operation on a Page.
   - CircularRedirect: Page is a circular redirect
   - SectionError: The section specified by # does not exist
 
-PageSaveRelatedError: page exceptions within the save operation on a Page.
-  (alias: PageNotSaved)
+PageSaveRelatedError: page exceptions within the save operation on a Page
+(alias: PageNotSaved).
   - SpamfilterError: MediaWiki spam filter detected a blacklisted URL
   - OtherPageSaveError: misc. other save related exception.
   - LockedPage: Page is locked

@@ -310,11 +310,15 @@ class UI:
 
         Uses a Tkinter edit box because we don't have a console editor
 
-        Parameters:
-            * text      - a Unicode string
-            * jumpIndex - an integer: position at which to put the caret
-            * highlight - a substring; each occurrence will be highlighted
-
+        @param text: the text to be edited
+        @type text: unicode
+        @param jumpIndex: position at which to put the caret
+        @type jumpIndex: int
+        @param highlight: each occurence of this substring will be highlighted
+        @type highlight: unicode
+        @return: the modified text, or None if the user didn't save the text
+            file in his text editor
+        @rtype: unicode or None
         """
         try:
             import gui

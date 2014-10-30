@@ -4,14 +4,14 @@ Module to define and load pywikibot configuration.
 
 Provides two family class methods which can be used in
 the user-config:
-- register_family_file
-- register_families_folder
+ - register_family_file
+ - register_families_folder
 
 Sets module global base_dir and provides utility methods to
 build paths relative to base_dir:
-- makepath
-- datafilepath
-- shortpath
+ - makepath
+ - datafilepath
+ - shortpath
 """
 #
 # (C) Rob W.W. Hooft, 2003
@@ -136,16 +136,16 @@ default_edit_summary = u'Pywikibot v.2'
 def get_base_dir(test_directory=None):
     r"""Return the directory in which user-specific information is stored.
 
-    This is determined in the following order -
-    1.  If the script was called with a -dir: argument, use the directory
-        provided in this argument
-    2.  If the user has a PYWIKIBOT2_DIR environment variable, use the value
-        of it
-    3.  If user-config presents in current directory, use the current directory
-    4.  Use (and if necessary create) a 'pywikibot' folder under
-        'Application Data' or 'AppData\Roaming' (Windows) or
-        '.pywikibot' directory (Unix and similar) under the user's home
-        directory.
+    This is determined in the following order:
+     1.  If the script was called with a -dir: argument, use the directory
+         provided in this argument
+     2.  If the user has a PYWIKIBOT2_DIR environment variable, use the value
+         of it
+     3.  If user-config presents in current directory, use the current directory
+     4.  Use (and if necessary create) a 'pywikibot' folder under
+         'Application Data' or 'AppData\Roaming' (Windows) or
+         '.pywikibot' directory (Unix and similar) under the user's home
+         directory.
 
     Set PYWIKIBOT2_NO_USER_CONFIG=1 to disable loading user-config.py
 
@@ -153,6 +153,7 @@ def get_base_dir(test_directory=None):
         directory. Used to test whether placing a user config file in this
         directory will cause it to be selected as the base directory.
     @type test_directory: str or None
+    @rtype: unicode
     """
     def exists(directory):
         directory = os.path.abspath(directory)
@@ -708,12 +709,11 @@ pickle_protocol = 2
 def makepath(path):
     """Return a normalized absolute version of the path argument.
 
-    - if the given path already exists in the filesystem
-      the filesystem is not modified.
-
-    - otherwise makepath creates directories along the given path
-      using the dirname() of the path. You may append
-      a '/' to the path if you want it to be a directory path.
+     - if the given path already exists in the filesystem
+       the filesystem is not modified.
+     - otherwise makepath creates directories along the given path
+       using the dirname() of the path. You may append
+       a '/' to the path if you want it to be a directory path.
 
     from holger@trillke.net 2002/03/18
 

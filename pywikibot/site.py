@@ -118,10 +118,11 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
     """ Namespace site data object.
 
     This is backwards compatible with the structure of entries
-    in site._namespaces which were a list of
-    [customised namespace,
-     canonical namespace name?,
-     namespace alias*]
+    in site._namespaces which were a list of::
+
+        [customised namespace,
+         canonical namespace name?,
+         namespace alias*]
 
     If the canonical_name is not provided for a namespace between -2
     and 15, the MediaWiki 1.14+ built-in names are used.
@@ -944,7 +945,8 @@ def must_be(group=None, right=None):
 def need_version(version):
     """ Decorator to require a certain MediaWiki version number.
 
-    @param number: the mw version number required
+    @param version: the mw version number required
+    @type version: str
     @return: a decorator to make sure the requirement is satisfied when
         the decorated function is called.
     """
@@ -993,10 +995,10 @@ class Siteinfo(Container):
         Return the default value for different properties.
 
         If the property is 'restrictions' it returns a dictionary with:
-            'cascadinglevels': 'sysop'
-            'semiprotectedlevels': 'autoconfirmed'
-            'levels': '' (everybody), 'autoconfirmed', 'sysop'
-            'types': 'create', 'edit', 'move', 'upload'
+         - 'cascadinglevels': 'sysop'
+         - 'semiprotectedlevels': 'autoconfirmed'
+         - 'levels': '' (everybody), 'autoconfirmed', 'sysop'
+         - 'types': 'create', 'edit', 'move', 'upload'
         Otherwise it returns L{pywikibot.tools.EMPTY_DEFAULT}.
 
         @param key: The property name
@@ -1943,7 +1945,7 @@ class APISite(BaseSite):
         time. It requests to expand the text '{{CURRENTTIMESTAMP}}' for older
         wikis.
 
-        @return the current server time
+        @return: the current server time
         @rtype: L{Timestamp}
         """
         if LV(self.version()) >= LV("1.16"):
@@ -2451,12 +2453,12 @@ class APISite(BaseSite):
         Most of them were merged into the 'csrf' token. If the token type in
         the parameter is not known it will default to the 'csrf' token.
         The other token types available are:
-        - deleteglobalaccount
-        - patrol
-        - rollback
-        - setglobalaccountstatus
-        - userrights
-        - watch
+         - deleteglobalaccount
+         - patrol
+         - rollback
+         - setglobalaccountstatus
+         - userrights
+         - watch
 
         @param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
@@ -3714,7 +3716,7 @@ class APISite(BaseSite):
             * unwatch: remove the page from the watchlist
             * preferences: use the preference settings (Default)
             * nochange: don't change the watchlist
-        @param botflag: if True, mark edit with bot flag
+        @param bot: if True, mark edit with bot flag
         @return: True if edit succeeded, False if it failed
 
         """
@@ -4060,7 +4062,7 @@ class APISite(BaseSite):
         """
         Return the protection types available on this site.
 
-        @return protection types available
+        @return: protection types available
         @rtype: set of unicode instances
         @see: L{Siteinfo._get_default()}
         """
@@ -4070,7 +4072,7 @@ class APISite(BaseSite):
         """
         Return the protection levels available on this site.
 
-        @return protection types available
+        @return: protection types available
         @rtype: set of unicode instances
         @see: L{Siteinfo._get_default()}
         """
@@ -4136,9 +4138,6 @@ class APISite(BaseSite):
         "notpatrollable": "The revision %(revid)s can't be patrolled as it's too old."
     }
 
-    # test it with:
-    # python -m unittest tests.site_tests.SiteUserTestCase.testPatrol
-
     def patrol(self, rcid=None, revid=None, revision=None):
         """Return a generator of patrolled pages.
 
@@ -4158,7 +4157,8 @@ class APISite(BaseSite):
             of pages to be patrolled.
         @type revision: iterable/iterator which returns a Revision object; it
             also supports a single Revision.
-        @yield: dict with 'rcid', 'ns' and 'title' of the patrolled page.
+        @rtype: iterator of dict with 'rcid', 'ns' and 'title'
+            of the patrolled page.
 
         """
         # If patrol is not enabled, attr will be set the first time a

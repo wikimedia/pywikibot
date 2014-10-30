@@ -33,10 +33,6 @@ messages_package_name = 'scripts.i18n'
 def _altlang(code):
     """Define fallback languages for particular languages.
 
-    @param code The language code
-    @type code string
-    @return a list of strings as language codes
-
     If no translation is available to a specified language, translate() will
     try each of the specified fallback languages, in order, until it finds
     one with a translation, with 'en' and '_default' as a last resort.
@@ -46,6 +42,10 @@ def _altlang(code):
 
     This code is used by other translating methods below.
 
+    @param code: The language code
+    @type code: string
+    @return: language codes
+    @rtype: list of str
     """
     # Akan
     if code in ['ak', 'tw']:
@@ -278,18 +278,6 @@ def _extract_plural(code, message, parameters):
 def translate(code, xdict, parameters=None, fallback=False):
     """Return the most appropriate translation from a translation dict.
 
-    @param code The language code
-    @type code string or Site object
-    @param xdict dictionary with language codes as keys or extended dictionary
-                 with family names as keys containing language dictionaries or
-                 a single (unicode) string. May contain PLURAL tags as described
-                 in twntranslate
-    @type xdict dict, string, unicode
-    @param parameters For passing (plural) parameters
-    @type parameters dict, string, unicode, int
-    @param fallback Try an alternate language code
-    @type fallback boolean
-
     Given a language code and a dictionary, returns the dictionary's value for
     key 'code' if this key exists; otherwise tries to return a value for an
     alternative language that is most applicable to use on the wiki in
@@ -301,6 +289,18 @@ def translate(code, xdict, parameters=None, fallback=False):
     list.
 
     For PLURAL support have a look at the twntranslate method
+
+    @param code: The language code
+    @type code: string or Site object
+    @param xdict: dictionary with language codes as keys or extended dictionary
+                  with family names as keys containing language dictionaries or
+                  a single (unicode) string. May contain PLURAL tags as
+                  described in twntranslate
+    @type xdict: dict, string, unicode
+    @param parameters: For passing (plural) parameters
+    @type parameters: dict, string, unicode, int
+    @param fallback: Try an alternate language code
+    @type fallback: boolean
 
     """
     family = pywikibot.config.family
@@ -405,32 +405,31 @@ def twtranslate(code, twtitle, parameters=None):
 def twntranslate(code, twtitle, parameters=None):
     r"""Translate a message with plural support.
 
-    @param code: The language code
-    @param twtitle: The TranslateWiki string title, in <package>-<key> format
-    @param parameters: For passing (plural) parameters.
-
     Support is implemented like in MediaWiki extension. If the TranslateWiki
-    message contains a plural tag inside which looks like
-    {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
+    message contains a plural tag inside which looks like::
+
+        {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
+
     it takes that variant calculated by the plural_rules depending on the number
     value. Multiple plurals are allowed.
 
-    Examples:
-    If we had a test dictionary in test.py like
-    msg = {
-        'en': {
-            # number value as format sting is allowed
-            'test-plural': u'Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.',
-        },
-        'nl': {
-            # format sting inside PLURAL tag is allowed
-            'test-plural': u'Bot: Pas {{PLURAL:num|1 pagina|%(num)d pagina\'s}} aan.',
-        },
-        'fr': {
-            # additional sting inside or outside PLURAL tag is allowed
-            'test-plural': u'Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.',
-        },
-    }
+    As an examples, if we had a test dictionary in test.py like::
+
+        msg = {
+            'en': {
+                # number value as format sting is allowed
+                'test-plural': u'Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.',
+            },
+            'nl': {
+                # format sting inside PLURAL tag is allowed
+                'test-plural': u'Bot: Pas {{PLURAL:num|1 pagina|%(num)d pagina\'s}} aan.',
+            },
+            'fr': {
+                # additional sting inside or outside PLURAL tag is allowed
+                'test-plural': u'Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.',
+            },
+        }
+
     >>> from pywikibot import i18n
     >>> i18n.messages_package_name = 'tests.i18n'
     >>> # use a number
@@ -452,6 +451,11 @@ def twntranslate(code, twtitle, parameters=None):
 
     The translations are retrieved from i18n.<package>, based on the callers
     import table.
+
+    @param code: The language code
+    @param twtitle: The TranslateWiki string title, in <package>-<key> format
+    @param parameters: For passing (plural) parameters.
+
     """
     # If a site is given instead of a code, use its language
     if hasattr(code, 'code'):

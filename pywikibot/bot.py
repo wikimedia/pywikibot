@@ -122,12 +122,12 @@ class LoggingFormatter(logging.Formatter):
         r"""
         Convert exception trace to unicode if necessary.
 
-        Make sure that the exception trace is converted to unicode:
-            * our pywikibot.Error traces are encoded in our
-              console encoding, which is needed for plainly printing them.
-            * but when it comes to logging using logging.exception,
-              the Python logging module will try to use these traces,
-              and it will fail if they are console encoded strings.
+        Make sure that the exception trace is converted to unicode.
+
+        L{exceptions.Error} traces are encoded in our console encoding, which
+        is needed for plainly printing them.  However, when logging them
+        using logging.exception, the Python logging module will try to use
+        these traces, and it will fail if they are console encoded strings.
 
         Formatter.formatException also strips the trailing \n, which we need.
         """
@@ -165,9 +165,6 @@ def init_handlers(strm=None):
     This function must be called before using pywikibot.output(); and must
     be called again if the destination stream is changed.
 
-    @param strm: Output stream. If None, re-uses the last stream if one
-        was defined, otherwise uses sys.stderr
-
     Note: this function is called by handleArgs(), so it should normally
     not need to be called explicitly
 
@@ -175,18 +172,24 @@ def init_handlers(strm=None):
     Each type of output is handled by an appropriate handler object.
     This structure is used to permit eventual development of other
     user interfaces (GUIs) without modifying the core bot code.
+
     The following output levels are defined:
-       DEBUG - only for file logging; debugging messages
-       STDOUT - output that must be sent to sys.stdout (for bots that may
-                have their output redirected to a file or other destination)
-       VERBOSE - optional progress information for display to user
-       INFO - normal (non-optional) progress information for display to user
-       INPUT - prompts requiring user response
-       WARN - user warning messages
-       ERROR - user error messages
-       CRITICAL - fatal error messages
+     - DEBUG: only for file logging; debugging messages.
+     - STDOUT: output that must be sent to sys.stdout (for bots that may
+         have their output redirected to a file or other destination).
+     - VERBOSE: optional progress information for display to user.
+     - INFO: normal (non-optional) progress information for display to user.
+     - INPUT: prompts requiring user response.
+     - WARN: user warning messages.
+     - ERROR: user error messages.
+     - CRITICAL: fatal error messages.
+
     Accordingly, do ''not'' use print statements in bot code; instead,
     use pywikibot.output function.
+
+    @param strm: Output stream. If None, re-uses the last stream if one
+        was defined, otherwise uses sys.stderr
+
     """
     global _handlers_initialized
 
@@ -464,18 +467,21 @@ def debug(text, layer, decoder=None, newline=True, **kwargs):
 def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
     """Output an error traceback to the user via the userinterface.
 
-    @param tb: Set to True in order to output traceback also.
+    Use directly after an 'except' statement::
 
-    Use directly after an 'except' statement:
-      ...
-      except:
-          pywikibot.exception()
-      ...
-    or alternatively:
-      ...
-      except Exception as e:
-          pywikibot.exception(e)
-      ...
+        ...
+        except:
+            pywikibot.exception()
+        ...
+
+    or alternatively::
+
+        ...
+        except Exception as e:
+            pywikibot.exception(e)
+        ...
+
+    @param tb: Set to True in order to output traceback also.
     """
     if isinstance(msg, BaseException):
         exc_info = 1
@@ -494,14 +500,12 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
 def input(question, password=False):
     """Ask the user a question, return the user's answer.
 
-    Parameters:
-    * question - a unicode string that will be shown to the user. Don't add a
-                 space after the question mark/colon, this method will do this
-                 for you.
-    * password - if True, hides the user's input (for password entry).
-
-    Returns a unicode string.
-
+    @param question: a string that will be shown to the user. Don't add a
+        space after the question mark/colon, this method will do this for you.
+    @type question: unicode
+    @param password: if True, hides the user's input (for password entry).
+    @type password: bool
+    @rtype: unicode
     """
     # make sure logging system has been initialized
     if not _handlers_initialized:
@@ -517,7 +521,7 @@ def input_choice(question, answers, default=None, return_shortcut=True,
     Ask the user the question and return one of the valid answers.
 
     @param question: The question asked without trailing spaces.
-    @type answers: basestring
+    @type question: basestring
     @param answers: The valid answers each containing a full length answer and
         a shortcut. Each value must be unique.
     @type answers: Iterable containing an iterable of length two
@@ -549,7 +553,7 @@ def input_yn(question, default=None, automatic_quit=True):
     Ask the user a yes/no question and returns the answer as a bool.
 
     @param question: The question asked without trailing spaces.
-    @type answers: basestring
+    @type question: basestring
     @param default: The result if no answer was entered. It must be a bool or
         'y' or 'n' and can be disabled by setting it to None.
     @type default: basestring or bool
@@ -581,17 +585,16 @@ def inputChoice(question, answers, hotkeys, default=None):
     The user's input will be case-insensitive, so the hotkeys should be
     distinctive case-insensitively.
 
-    Parameters:
-    * question - a unicode string that will be shown to the user. Don't add a
-                 space after the question mark, this method will do this
-                 for you.
-    * answers  - a list of strings that represent the options.
-    * hotkeys  - a list of one-letter strings, one for each answer.
-    * default  - an element of hotkeys, or None. The default choice that will
+    @param question: a string that will be shown to the user. Don't add a
+        space after the question mark/colon, this method will do this for you.
+    @type question: basestring
+    @param answers: a list of strings that represent the options.
+    @type answers: list of basestring
+    @param hotkeys: a list of one-letter strings, one for each answer.
+    @param default: an element of hotkeys, or None. The default choice that will
                  be returned when the user just presses Enter.
-
-    Returns a one-letter string in lowercase.
-
+    @return: a one-letter string in lowercase.
+    @rtype: str
     """
     # make sure logging system has been initialized
     if not _handlers_initialized:
@@ -609,6 +612,7 @@ def calledModuleName():
     This is required because the -help option loads the module's docstring
     and because the module name will be used for the filename of the log.
 
+    @rtype: unicode
     """
     # get commandline arguments
     called = pywikibot.argvu[0].strip()
@@ -986,14 +990,14 @@ class Bot(object):
         and puts the page if needed.
 
         Option used:
-            * 'always'
+        * 'always'
 
         Keyword args used:
-            * 'async' - passed to page.save
-            * 'comment' - passed to page.save
-            * 'show_diff' - show changes between oldtext and newtext (enabled)
-            * 'ignore_save_related_errors' - report and ignore (disabled)
-            * 'ignore_server_errors' - report and ignore (disabled)
+        * 'async' - passed to page.save
+        * 'comment' - passed to page.save
+        * 'show_diff' - show changes between oldtext and newtext (enabled)
+        * 'ignore_save_related_errors' - report and ignore (disabled)
+        * 'ignore_server_errors' - report and ignore (disabled)
         """
         if oldtext == newtext:
             pywikibot.output(u'No changes were needed on %s'

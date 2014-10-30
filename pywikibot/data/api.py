@@ -203,22 +203,24 @@ class Request(MutableMapping):
     >>> sorted(data[u'query'].keys())  # doctest: +IGNORE_UNICODE
     ['namespaces', 'userinfo']
 
-    @param site: The Site to which the request will be submitted. If not
-           supplied, uses the user's configured default Site.
-    @param mime: If true, send in "multipart/form-data" format (default False)
-    @param mime_params: A dictionary of parameter which should only be
-           transferred via mime mode. If not None sets mime to True.
-    @param max_retries: (optional) Maximum number of times to retry after
-           errors, defaults to 25
-    @param retry_wait: (optional) Minimum time to wait after an error,
-           defaults to 5 seconds (doubles each retry until max of 120 is
-           reached)
-    @param format: (optional) Defaults to "json"
-
     """
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """
+        Constructor.
+
+        @kwarg site: The Site to which the request will be submitted. If not
+               supplied, uses the user's configured default Site.
+        @kwarg mime: If true, send in "multipart/form-data" format (default False)
+        @kwarg mime_params: A dictionary of parameter which should only be
+               transferred via mime mode. If not None sets mime to True.
+        @kwarg max_retries: (optional) Maximum number of times to retry after
+               errors, defaults to 25
+        @kwarg retry_wait: (optional) Minimum time to wait after an error,
+               defaults to 5 seconds (doubles each retry until max of 120 is
+               reached)
+        @kwarg format: (optional) Defaults to "json"
+        """
         try:
             self.site = kwargs.pop("site")
         except KeyError:
@@ -1402,11 +1404,11 @@ def update_page(page, pagedict, props=[]):
     @type page: Page
     @param pagedict: the contents of a "page" element of a query response
     @type pagedict: dict
-    @param prop: the property names which resulted in pagedict. If a missing
+    @param props: the property names which resulted in pagedict. If a missing
         value in pagedict can indicate both 'false' and 'not present' the
         property which would make the value present must be in the props
         parameter.
-    @type prop: iterable of string
+    @type props: iterable of string
     """
     if "pageid" in pagedict:
         page._pageid = int(pagedict['pageid'])

@@ -1098,12 +1098,12 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
     The provided generator must support parameter 'start', 'end',
     'reverse', and 'total' such as site.recentchanges(), site.logevents().
 
-    For example:
+    To fetch revisions in recentchanges in live time::
 
-    To fetch revisions in recentchanges in live time, call
         gen = RepeatingGenerator(site.recentchanges, lambda x: x['revid'])
 
-    To fetch new pages in live time, call
+    To fetch new pages in live time::
+
         gen = RepeatingGenerator(site.newpages, lambda x: x[0])
 
     Note that other parameters not listed below will be passed
@@ -1696,7 +1696,8 @@ def MySQLPageGenerator(query, site=None):
     Yield a list of pages based on a MySQL query.
 
     Each query should provide the page namespace and page title. An example
-    query that yields all ns0 pages might look like:
+    query that yields all ns0 pages might look like::
+
         SELECT
          page_namespace,
          page_title,

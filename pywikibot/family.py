@@ -1030,10 +1030,10 @@ class Family(object):
         """
         Return a regex matching the path after the domain.
 
-        It is using L{Family.path} and L{Family.nicepath} with code set to
-        'None'. If that returns a KeyError (L{Family.scriptpath} probably
+        It is using L{path} and L{nicepath} with code set to
+        'None'. If that returns a KeyError (L{scriptpath} probably
         using the C{langs} dictionary) it retries it with the key from
-        L{Family.langs} if it only contains one entry and throws an Error
+        C{langs} if it only contains one entry and throws an Error
         otherwise. In that case the Family instance should overwrite this
         method or supply code independent methods.
 

@@ -219,7 +219,7 @@ def request(site=None, uri=None, *args, **kwargs):
     used for requests to non wiki pages.
 
     @param site: The Site to connect to
-    @type site: L{pywikibot.site.Site}
+    @type site: L{pywikibot.site.BaseSite}
     @param uri: the URI to retrieve
     @type uri: str
     @return: The received data (a unicode string).

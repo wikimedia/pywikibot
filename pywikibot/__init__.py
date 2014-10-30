@@ -271,13 +271,13 @@ class Coordinate(object):
 
         In small angle approximation (and thus in radians):
 
-        Δλ ≈ Δpos / r_φ, where r_φ is the radius of earth at the given latitude.
+        M{Δλ ≈ Δpos / r_φ}, where r_φ is the radius of earth at the given latitude.
         Δλ is the error in longitude.
 
-            r_φ = r cos φ, where r is the radius of earth, φ the latitude
+        M{r_φ = r cos φ}, where r is the radius of earth, φ the latitude
 
-        Therefore:
-        precision = math.degrees(self._dim/(radius*math.cos(math.radians(self.lat))))
+        Therefore::
+            precision = math.degrees(self._dim/(radius*math.cos(math.radians(self.lat))))
         """
         if not self._precision:
             radius = 6378137  # TODO: Support other globes
