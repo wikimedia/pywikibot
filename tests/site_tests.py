@@ -1439,6 +1439,22 @@ class TestSiteLoadRevisions(TestCase):
         # TODO test other optional arguments
 
 
+class TestSiteLoadRevisionsSysop(DefaultSiteTestCase):
+
+    """Test cases for Site.loadrevision() method."""
+
+    sysop = True
+
+    def test_rollback(self):
+        """Test the site.loadrevisions() method with rollback."""
+        mainpage = self.get_mainpage()
+        self.site.loadrevisions(mainpage, total=12, rollback=True, sysop=True)
+        self.assertGreater(len(mainpage._revisions), 0)
+        self.assertLessEqual(len(mainpage._revisions), 12)
+        self.assertTrue(all(rev.rollbacktoken is not None
+                            for rev in mainpage._revisions.values()))
+
+
 class TestCommonsSite(TestCase):
 
     """Test cases for Site methods on Commons."""
