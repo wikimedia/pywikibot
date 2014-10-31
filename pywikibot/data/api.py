@@ -770,15 +770,19 @@ class CachedRequest(Request):
         If this is modified, please also update
         scripts/maintenance/cache.py to support
         the new key and all previous keys.
+
+        @rtype: unicode
         """
         login_status = self.site._loginstatus
 
         if login_status > pywikibot.site.LoginStatus.NOT_LOGGED_IN and \
                 hasattr(self.site, '_userinfo') and \
                 'name' in self.site._userinfo:
-            # This uses the format of Page.__repr__(), without the encoding
-            # it performs. This string cant be encoded otherwise it creates an
-            # exception when _create_file_name() tries to encode it again.
+            # This uses the format of Page.__repr__, without performing
+            # config.console_encoding as done by Page.__repr__.
+            # The returned value cant be encoded to anything other than
+            # ascii otherwise it creates an exception when _create_file_name()
+            # tries to encode it as utf-8.
             user_key = u'User(User:%s)' % self.site._userinfo['name']
         else:
             user_key = pywikibot.site.LoginStatus(
@@ -789,6 +793,11 @@ class CachedRequest(Request):
         return repr(self.site) + user_key + request_key
 
     def _create_file_name(self):
+        """
+        Return a unique ascii identifier for the cache entry.
+
+        @rtype: str (hexademical; i.e. characters 0-9 and a-f only)
+        """
         return hashlib.sha256(
             self._uniquedescriptionstr().encode('utf-8')
         ).hexdigest()
@@ -801,13 +810,17 @@ class CachedRequest(Request):
         return dt + self.expiry < datetime.datetime.now()
 
     def _load_cache(self):
-        """Return whether the cache can be used."""
+        """Load cache entry for request, if available.
+
+        @return: Whether the request was loaded from the cache
+        @rtype: bool
+        """
         self._add_defaults()
         try:
             filename = self._cachefile_path()
             with open(filename, 'rb') as f:
                 uniquedescr, self._data, self._cachetime = pickle.load(f)
-            assert(uniquedescr == str(self._uniquedescriptionstr()))
+            assert(uniquedescr == self._uniquedescriptionstr())
             if self._expired(self._cachetime):
                 self._data = None
                 return False
