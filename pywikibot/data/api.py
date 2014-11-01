@@ -671,20 +671,24 @@ class Request(MutableMapping):
 
             if code.startswith(u'internal_api_error_'):
                 class_name = code[len(u'internal_api_error_'):]
-                if class_name in ['DBConnectionError',  # r 4984 & r 4580
-                                  'DBQueryError',  # bug 58158
-                                  'ReadOnlyError'  # bug 59227
-                                  ]:
+                retry = class_name in ['DBConnectionError',  # bug 62974
+                                       'DBQueryError',  # bug 58158
+                                       'ReadOnlyError'  # bug 59227
+                                       ]
 
-                    pywikibot.log(u'MediaWiki exception %s; retrying.'
-                                  % class_name)
+                pywikibot.error("Detected MediaWiki API exception %s%s"
+                                % (class_name,
+                                   "; retrying" if retry else "; raising"))
+                pywikibot.log(u"MediaWiki exception %s details:\n"
+                              u"          query=\n%s\n"
+                              u"          response=\n%s"
+                              % (class_name,
+                                 pprint.pformat(self._params),
+                                 result))
+
+                if retry:
                     self.wait()
                     continue
-
-                pywikibot.log(u"MediaWiki exception %s: query=\n%s"
-                              % (class_name,
-                                 pprint.pformat(self._params)))
-                pywikibot.log(u"           response=\n%s" % result)
 
                 raise APIMWException(class_name, info, **result["error"])
 
