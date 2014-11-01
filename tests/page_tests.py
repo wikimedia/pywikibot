@@ -389,26 +389,37 @@ class TestPageObject(DefaultSiteTestCase):
     def testApiMethods(self):
         """Test various methods that rely on API."""
         mainpage = self.get_mainpage()
-        maintalk = mainpage.toggleTalkPage()
-        badpage = self.get_missing_article()
         # since there is no way to predict what data the wiki will return,
         # we only check that the returned objects are of correct type.
-        self.assertIsInstance(maintalk.get(), unicode)
-        self.assertRaises(pywikibot.NoPage, badpage.get)
+        self.assertIsInstance(mainpage.get(), unicode)
         self.assertIsInstance(mainpage.latestRevision(), int)
         self.assertIsInstance(mainpage.userName(), unicode)
         self.assertIsInstance(mainpage.isIpEdit(), bool)
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
         self.assertIsInstance(mainpage.isEmpty(), bool)
-        self.assertEqual(mainpage.toggleTalkPage(), maintalk)
-        self.assertEqual(maintalk.toggleTalkPage(), mainpage)
         self.assertIsInstance(mainpage.isDisambig(), bool)
         self.assertIsInstance(mainpage.canBeEdited(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
         self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
         self.assertIsInstance(mainpage.previousRevision(), int)
         self.assertIsInstance(mainpage.permalink(), basestring)
+
+    def test_talk_page(self):
+        """Test various methods that rely on API: talk page."""
+        mainpage = self.get_mainpage()
+        maintalk = mainpage.toggleTalkPage()
+        if not maintalk.exists():
+            raise unittest.SkipTest("No talk page for %s's main page"
+                                    % self.get_site())
+        self.assertIsInstance(maintalk.get(), unicode)
+        self.assertEqual(mainpage.toggleTalkPage(), maintalk)
+        self.assertEqual(maintalk.toggleTalkPage(), mainpage)
+
+    def test_bad_page(self):
+        """Test various methods that rely on API: bad page."""
+        badpage = self.get_missing_article()
+        self.assertRaises(pywikibot.NoPage, badpage.get)
 
     def testIsDisambig(self):
         """Test the integration with Extension:Disambiguator."""
