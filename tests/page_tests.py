@@ -501,7 +501,7 @@ class TestPageObject(DefaultSiteTestCase):
         for page in mysite.allpages(filterredir=True, total=1):
             break
         else:
-            unittest.SkipTest('No redirect pages on site {0!r}'.format(mysite))
+            raise unittest.SkipTest('No redirect pages on site {0!r}'.format(mysite))
         # This page is already initialised
         self.assertTrue(hasattr(page, '_isredir'))
         # call api.update_page without prop=info
