@@ -486,7 +486,7 @@ class TestSiteObject(DefaultSiteTestCase):
 #            self.assertIsInstance(cat, pywikibot.Category)
 #            self.assertLessEqual(cat.title(withNamespace=False), "Hij")
 
-    def testAllUsers(self):
+    def test_allusers(self):
         """Test the site.allusers() method."""
         mysite = self.get_site()
         au = list(mysite.allusers(total=10))
@@ -496,19 +496,31 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIn("name", user)
             self.assertIn("editcount", user)
             self.assertIn("registration", user)
+
+    def test_allusers_with_start(self):
+        """Test the site.allusers(start=..) method."""
+        mysite = self.get_site()
         for user in mysite.allusers(start="B", total=5):
             self.assertIsInstance(user, dict)
             self.assertIn("name", user)
             self.assertGreaterEqual(user["name"], "B")
             self.assertIn("editcount", user)
             self.assertIn("registration", user)
+
+    def test_allusers_with_prefix(self):
+        """Test the site.allusers(prefix=..) method."""
+        mysite = self.get_site()
         for user in mysite.allusers(prefix="C", total=5):
             self.assertIsInstance(user, dict)
             self.assertIn("name", user)
             self.assertTrue(user["name"].startswith("C"))
             self.assertIn("editcount", user)
             self.assertIn("registration", user)
-        for user in mysite.allusers(prefix="D", group="sysop", total=5):
+
+    def _test_allusers_with_group(self):
+        """Test the site.allusers(group=..) method."""
+        mysite = self.get_site()
+        for user in mysite.allusers(prefix="D", group="bot", total=5):
             self.assertIsInstance(user, dict)
             self.assertIn("name", user)
             self.assertTrue(user["name"].startswith("D"))
