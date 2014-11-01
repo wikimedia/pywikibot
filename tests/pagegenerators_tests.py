@@ -26,7 +26,7 @@ class TestPageGenerators(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    cached = True
+    dry = True
 
     titles = [
         # just a bunch of randomly selected titles
@@ -58,49 +58,49 @@ class TestPageGenerators(TestCase):
 
     def test_PagesFromTitlesGenerator(self):
         self.assertFunction("PagesFromTitlesGenerator")
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         self.assertEqual(len(self.titles), len(tuple(gen)))
 
     def test_NamespaceFilterPageGenerator(self):
         self.assertFunction("NamespaceFilterPageGenerator")
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, 0)
         self.assertEqual(len(tuple(gen)), 3)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, 1)
         self.assertEqual(len(tuple(gen)), 4)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, 10)
         self.assertEqual(len(tuple(gen)), 6)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, (1, 10))
         self.assertEqual(len(tuple(gen)), 10)
 
     def test_RegexFilterPageGenerator(self):
         self.assertFunction("RegexFilterPageGenerator")
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, '/doc')
         self.assertEqual(len(tuple(gen)), 2)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, '/doc',
                                                       quantifier='none')
         self.assertEqual(len(tuple(gen)), 11)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'])
         self.assertEqual(len(tuple(gen)), 4)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'],
                                                       quantifier='none')
         self.assertEqual(len(tuple(gen)), 9)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'],
                                                       quantifier='all')
         self.assertEqual(len(tuple(gen)), 0)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['Template', '/meta'],
                                                       quantifier='all')
         self.assertEqual(len(tuple(gen)), 1)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['template', '/meta'],
                                                       quantifier='any')
         self.assertEqual(len(tuple(gen)), 4)
@@ -139,8 +139,17 @@ class TestPageGenerators(TestCase):
                                                           quantifier='none')
         self.assertEqual(len(tuple(gen)), 9)
 
+
+class TestRepeatingGenerator(TestCase):
+
+    """Test RepeatingGenerator."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
+
     def test_RepeatingGenerator(self):
-        self.assertFunction("RepeatingGenerator")
         # site.recentchanges() includes external edits (from wikidata),
         # so total=4 is not too high
         items = list(

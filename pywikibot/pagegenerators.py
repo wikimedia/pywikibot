@@ -872,6 +872,7 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
     @param total: Maxmum number of pages to retrieve in total
     @type total: int
     @param namespaces: list of namespace numbers to fetch contribs from
+    @type namespaces: list of int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
 
@@ -895,11 +896,12 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
     NOTE: API-based generators that have a "namespaces" parameter perform
     namespace filtering more efficiently than this generator.
 
-    @param site: Site for generator results.
+    @param namespaces: list of namespace numbers to limit results
+    @type namespaces: list of int
+    @param site: Site for generator results, only needed if
+        namespaces contains namespace names.
     @type site: L{pywikibot.site.BaseSite}
     """
-    if site is None:
-        site = pywikibot.Site()
     if isinstance(namespaces, (int, basestring)):
         namespaces = [namespaces]
     # convert namespace names to namespace numbers
@@ -910,6 +912,9 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
                 # namespace might be given as str representation of int
                 index = int(ns)
             except ValueError:
+                # FIXME: deprecate providing strings as namespaces
+                if site is None:
+                    site = pywikibot.Site()
                 index = site.getNamespaceIndex(ns)
                 if index is None:
                     raise ValueError(u'Unknown namespace: %s' % ns)
