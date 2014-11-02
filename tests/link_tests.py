@@ -47,9 +47,9 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertEqual(Link('Category:' + 'X' * 248).title, 'X' * 248)
         self.assertEqual(Link('X' * 252).title, 'X' * 252)
         self.assertEqual(Link('A%20B').title, 'A B')
-        self.assertEqual(Link('A &eacute; B').title, 'A é B')
-        self.assertEqual(Link('A &#233; B').title, 'A é B')
-        self.assertEqual(Link('A &#x00E9; B').title, 'A é B')
+        self.assertEqual(Link('A &eacute; B').title, u'A é B')
+        self.assertEqual(Link('A &#233; B').title, u'A é B')
+        self.assertEqual(Link('A &#x00E9; B').title, u'A é B')
 
         l = Link('A | B')
         self.assertEqual(l.title, 'A')
