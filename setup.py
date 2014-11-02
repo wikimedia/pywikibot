@@ -1,7 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
-Installer script for Pywikibot 2.0 framework
-"""
+"""Installer script for Pywikibot 2.0 framework."""
 #
 # (C) Pywikibot team, 2009-2013
 #
@@ -37,7 +35,7 @@ script_deps = {
     #       however it is available with setuptools.
 }
 
-dependency_links=[
+dependency_links = [
     'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1',
     'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
     'git+https://github.com/jayvdb/parse-crontab.git#egg=crontab',
@@ -48,7 +46,7 @@ if sys.version_info[0] == 2:
         raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 or higher")
     elif sys.version_info[1] == 6:
         # work around distutils hardcoded unittest dependency
-        import unittest  # flake8: noqa
+        import unittest  # noqa
         if 'test' in sys.argv and sys.version_info < (2, 7):
             import unittest2
             sys.modules['unittest'] = unittest2
@@ -99,10 +97,9 @@ setup(
     maintainer='The pywikibot team',
     maintainer_email='pywikipedia-l@lists.wikimedia.org',
     license='MIT License',
-    packages=['pywikibot'] +
-             [package
-              for package in find_packages()
-              if package.startswith('pywikibot.')],
+    packages=['pywikibot'] + [package
+                              for package in find_packages()
+                              if package.startswith('pywikibot.')],
     install_requires=dependencies,
     dependency_links=dependency_links,
     extras_require=extra_deps,
