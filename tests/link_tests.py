@@ -11,7 +11,94 @@ import pywikibot
 from pywikibot import config2 as config
 from pywikibot.page import Link
 from pywikibot.exceptions import Error, InvalidTitle
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, DefaultDrySiteTestCase, TestCase
+
+
+# ---- Tests checking if the parser does (not) accept (in)valid titles
+
+
+class TestLink(DefaultDrySiteTestCase):
+
+    """
+    Test parsing links with DrySite.
+
+    The DrySite is using the builtin namespaces which behaviour is controlled
+    in this repository so namespace aware tests do work, even when the actual
+    default site is using completely different namespaces.
+    """
+
+    def test_valid(self):
+        self.assertEqual(Link('Sandbox').title, 'Sandbox')
+        self.assertEqual(Link('A "B"').title, 'A "B"')
+        self.assertEqual(Link('A \'B\'').title, 'A \'B\'')
+        self.assertEqual(Link('.com').title, '.com')
+        self.assertEqual(Link('~').title, '~')
+        self.assertEqual(Link('"').title, '"')
+        self.assertEqual(Link('\'').title, '\'')
+        self.assertEqual(Link('Talk:Sandbox').title, 'Sandbox')
+        self.assertEqual(Link('Talk:Foo:Sandbox').title, 'Foo:Sandbox')
+        self.assertEqual(Link('File:Example.svg').title, 'Example.svg')
+        self.assertEqual(Link('File_talk:Example.svg').title, 'Example.svg')
+        self.assertEqual(Link('Foo/.../Sandbox').title, 'Foo/.../Sandbox')
+        self.assertEqual(Link('Sandbox/...').title, 'Sandbox/...')
+        self.assertEqual(Link('A~~').title, 'A~~')
+        self.assertEqual(Link(':A').title, 'A')
+        # Length is 256 total, but only title part matters
+        self.assertEqual(Link('Category:' + 'X' * 248).title, 'X' * 248)
+        self.assertEqual(Link('X' * 252).title, 'X' * 252)
+        self.assertEqual(Link('A%20B').title, 'A B')
+        self.assertEqual(Link('A &eacute; B').title, 'A é B')
+        self.assertEqual(Link('A &#233; B').title, 'A é B')
+        self.assertEqual(Link('A &#x00E9; B').title, 'A é B')
+
+        l = Link('A | B')
+        self.assertEqual(l.title, 'A')
+        self.assertEqual(l.anchor, ' B')
+
+        l = Link('A%23B')
+        self.assertEqual(l.title, 'A')
+        self.assertEqual(l.section, 'B')
+
+    def test_invalid(self):
+        self.assertRaises(InvalidTitle, Link('').parse)
+        # TODO: self.assertRaises(InvalidTitle, Link(':').parse)
+        self.assertRaises(InvalidTitle, Link('__  __').parse)
+        self.assertRaises(InvalidTitle, Link('  __  ').parse)
+        # Bad characters forbidden regardless of wgLegalTitleChars
+        self.assertRaises(InvalidTitle, Link('A [ B').parse)
+        self.assertRaises(InvalidTitle, Link('A ] B').parse)
+        self.assertRaises(InvalidTitle, Link('A { B').parse)
+        self.assertRaises(InvalidTitle, Link('A } B').parse)
+        self.assertRaises(InvalidTitle, Link('A < B').parse)
+        self.assertRaises(InvalidTitle, Link('A > B').parse)
+        # URL encoding
+        # %XX is understood by wikimedia but not %XXXX
+        self.assertRaises(InvalidTitle, Link('A%2523B').parse)
+        # Subject of NS_TALK does not roundtrip to NS_MAIN
+        # TODO: A link is invalid if their (non-)talk page would be in another
+        #       namespace than the link's "other" namespace
+        # TODO: self.assertRaises(InvalidTitle, Link('Talk:File:Example.svg').parse)
+        # Directory navigation
+        self.assertRaises(InvalidTitle, Link('.').parse)
+        self.assertRaises(InvalidTitle, Link('..').parse)
+        self.assertRaises(InvalidTitle, Link('./Sandbox').parse)
+        self.assertRaises(InvalidTitle, Link('../Sandbox').parse)
+        self.assertRaises(InvalidTitle, Link('Foo/./Sandbox').parse)
+        self.assertRaises(InvalidTitle, Link('Foo/../Sandbox').parse)
+        self.assertRaises(InvalidTitle, Link('Sandbox/.').parse)
+        self.assertRaises(InvalidTitle, Link('Sandbox/..').parse)
+        # Tilde
+        self.assertRaises(InvalidTitle, Link('A ~~~ Name').parse)
+        self.assertRaises(InvalidTitle, Link('A ~~~~ Signature').parse)
+        self.assertRaises(InvalidTitle, Link('A ~~~~~ Timestamp').parse)
+        # Overlength
+        self.assertRaises(InvalidTitle, Link('x' * 256).parse)
+        self.assertRaises(InvalidTitle, Link('Invalid:' + 'X' * 248).parse)
+        # Namespace prefix without actual title
+        self.assertRaises(InvalidTitle, Link('Talk:').parse)
+        self.assertRaises(InvalidTitle, Link('Category: ').parse)
+        # TODO: self.assertRaises(InvalidTitle, Link('Category: #bar').parse)
+
 
 # ---- The first set of tests are explicit links, starting with a ':'.
 
