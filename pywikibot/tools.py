@@ -144,11 +144,11 @@ class ThreadedGenerator(threading.Thread):
 
     >>> gen = ThreadedGenerator(target=range, args=(20,))
     >>> try:
-    ...     for data in gen:
-    ...         print(data, end=',')
+    ...     data = list(gen)
     ... finally:
     ...     gen.stop()
-    0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,
+    >>> data
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
     """
 
