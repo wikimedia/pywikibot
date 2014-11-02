@@ -1735,21 +1735,13 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
             try:
                 self.put(newtext, comment)
                 return True
-            except pywikibot.EditConflict:
-                pywikibot.output(u'Skipping %s because of edit conflict'
-                                 % self.title())
-            except pywikibot.SpamfilterError as e:
-                pywikibot.output(u'Skipping %s because of blacklist entry %s'
-                                 % (self.title(), e.url))
-            except pywikibot.LockedPage:
-                pywikibot.output(u'Skipping %s because page is locked'
-                                 % self.title())
+            except pywikibot.PageSaveRelatedError as error:
+                pywikibot.output(u'Page %s not saved: %s'
+                                 % (self.title(asLink=True),
+                                    error))
             except pywikibot.NoUsername:
                 pywikibot.output(u'Page %s not saved; sysop privileges '
                                  u'required.' % self.title(asLink=True))
-            except pywikibot.PageNotSaved as error:
-                pywikibot.output(u'Saving page %s failed: %s'
-                                 % (self.title(asLink=True), error.message))
         return False
 
     def isFlowPage(self):
