@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-"""
+r"""
 This script runs commands on each entry in the API caches.
 
 Syntax: cache.py [-password] [-delete] [-c '...'] [dir ...]
@@ -53,15 +53,18 @@ import hashlib
 import pywikibot
 from pywikibot.data import api
 
-from pywikibot.site import APISite, DataSite, LoginStatus  # flake8: noqa
-from pywikibot.page import User  # flake8: noqa
+from pywikibot.site import APISite, DataSite, LoginStatus  # noqa
+from pywikibot.page import User  # noqa
 
 
 class ParseError(Exception):
+
     """ Error parsing. """
 
 
 class CacheEntry(api.CachedRequest):
+
+    """A Request cache entry."""
 
     def __init__(self, directory, filename):
         """ Constructor. """
@@ -94,7 +97,6 @@ class CacheEntry(api.CachedRequest):
 
     def parse_key(self):
         """ Parse the key loaded from the cache entry. """
-
         # find the start of the first parameter
         start = self.key.index('(')
         # find the end of the first object
@@ -171,20 +173,23 @@ class CacheEntry(api.CachedRequest):
         os.remove(self._cachefile_path())
 
 
-def process_entries(cache_path, func):
-    """ Check the contents of the cache. """
+def process_entries(cache_path, func, use_accesstime=None):
+    """
+    Check the contents of the cache.
 
-    # This program tries to use file access times to determine
-    # whether cache files are being used.
-    # However file access times are not always usable.
-    # On many modern filesystems, they have been disabled.
-    # On unix, check the filesystem mount options.  You may
-    # need to remount with 'strictatime'.
-    # - None  = detect
-    # - False = dont use
-    # - True  = always use
-    use_accesstime = None
+    This program tries to use file access times to determine
+    whether cache files are being used.
+    However file access times are not always usable.
+    On many modern filesystems, they have been disabled.
+    On unix, check the filesystem mount options.  You may
+    need to remount with 'strictatime'.
 
+    @param use_accesstime: Whether access times should be used.
+    @type use_accesstime: bool tristate:
+         - None  = detect
+         - False = dont use
+         - True  = always use
+    """
     if not cache_path:
         cache_path = os.path.join(pywikibot.config2.base_dir, 'apicache')
 
@@ -237,25 +242,25 @@ def process_entries(cache_path, func):
 
 
 def has_password(entry):
-    """ has a password in the entry """
+    """ Entry has a password in the entry. """
     if 'lgpassword' in entry._uniquedescriptionstr():
         return entry
 
 
 def is_logout(entry):
-    """ is a logout entry """
+    """ Entry is a logout entry. """
     if not entry._data and 'logout' in entry.key:
         return entry
 
 
 def empty_response(entry):
-    """ has no data """
+    """ Entry has no data. """
     if not entry._data and 'logout' not in entry.key:
         return entry
 
 
 def not_accessed(entry):
-    """ has never been accessed """
+    """ Entry has never been accessed. """
     if not hasattr(entry, 'stinfo'):
         return
 
