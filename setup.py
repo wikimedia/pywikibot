@@ -85,23 +85,6 @@ from ez_setup import use_setuptools
 use_setuptools()
 
 from setuptools import setup, find_packages
-from setuptools.command import install
-
-
-class pwb_install(install.install):
-
-    """
-    Setuptools' install command subclassed to automatically call
-    `generate_user_files.py` after installing the package.
-    """
-    def run(self):
-        install.install.do_egg_install(self)
-
-        if sys.stdin.isatty() and sys.stdout.isatty():
-            import subprocess
-            python = sys.executable
-            python = python.replace("pythonw.exe", "python.exe")  # for Windows
-            subprocess.call([python, "generate_user_files.py"])
 
 name = 'pywikibot'
 version = '2.0b2'
@@ -135,8 +118,5 @@ setup(
         'Environment :: Console',
         'Programming Language :: Python :: 2.7'
     ],
-    cmdclass={
-        'install': pwb_install
-    },
     use_2to3=False
 )
