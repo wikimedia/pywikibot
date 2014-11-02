@@ -417,15 +417,15 @@ def twntranslate(code, twtitle, parameters=None):
 
         msg = {
             'en': {
-                # number value as format sting is allowed
+                # number value as format string is allowed
                 'test-plural': u'Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.',
             },
             'nl': {
-                # format sting inside PLURAL tag is allowed
+                # format string inside PLURAL tag is allowed
                 'test-plural': u'Bot: Pas {{PLURAL:num|1 pagina|%(num)d pagina\'s}} aan.',
             },
             'fr': {
-                # additional sting inside or outside PLURAL tag is allowed
+                # additional string inside or outside PLURAL tag is allowed
                 'test-plural': u'Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.',
             },
         }
