@@ -345,7 +345,6 @@ class TestScriptMeta(MetaTestCaseClass):
             dct[test_name] = test_execution(script_name, ['-help'])
             if script_name in ['shell', 'version',
                                'data_ingestion',  # bug 68611
-                               'flickrripper',    # bug 68606 (and others)
                                'replicate_wiki',  # bug 68664
                                'script_wui',      # Failing on travis-ci
                                ]:
@@ -372,7 +371,7 @@ class TestScriptMeta(MetaTestCaseClass):
             if script_name in ['catall',          # stdout user interaction
                                'checkimages',     # bug 68613
                                'data_ingestion',  # bug 68611
-                               'flickrripper',    # bug 68606 (and deps)
+                               'flickrripper',    # Requires a flickr api key
                                'lonelypages',     # custom return codes
                                'nowcommons',      # deprecation warning
                                'replicate_wiki',  # custom return codes

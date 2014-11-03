@@ -537,6 +537,16 @@ yahoo_appid = ''
 # http://www.bing.com/dev/en-us/dev-center
 msn_appid = ''
 
+# ############# FLICKR RIPPER SETTINGS ##############
+
+# Using the Flickr api
+flickr = {
+    'api_key': u'',  # Provide your key!
+    'api_secret': u'',  # Api secret of your key (optional)
+    'review': False,  # Do we use automatically make our uploads reviewed?
+    'reviewer': u'',  # If so, under what reviewer name?
+}
+
 # ############# COPYRIGHT SETTINGS ##############
 
 # Enable/disable search engine in copyright.py script
