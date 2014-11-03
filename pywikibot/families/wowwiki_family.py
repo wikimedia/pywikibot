@@ -49,8 +49,6 @@ class Family(family.Family):
             'zh': 'zh.wow.wikia.com'
         }
 
-        self.content_id = "article"
-
         self.disambiguationTemplates['en'] = ['disambig', 'disambig/quest',
                                               'disambig/quest2',
                                               'disambig/achievement2']
