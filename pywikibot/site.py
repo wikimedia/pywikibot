@@ -317,6 +317,15 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         """Compare whether two namespace objects are not equal."""
         return not self.__eq__(other)
 
+    def __mod__(self, other):
+        return self.id.__mod__(other)
+
+    def __sub__(self, other):
+        return -(other) + self.id
+
+    def __add__(self, other):
+        return other + self.id
+
     def _cmpkey(self):
         """Return the ID as a comparison key."""
         return self.id
@@ -635,11 +644,15 @@ class BaseSite(ComparableMixin):
         return self._iw_sites[prefix][1]
 
     def ns_index(self, namespace):
-        """Given a namespace name, return its int index, or None if invalid."""
-        for ns in self.namespaces():
-            if namespace.lower() in [name.lower()
-                                     for name in self.namespaces()[ns]]:
-                return ns
+        """
+        Return the Namespace for a given namespace name.
+
+        @param namespace: name
+        @type namespace: unicode
+        @return: The matching Namespace object on this Site
+        @rtype: Namespace, or None if invalid
+        """
+        return Namespace.lookup_name(namespace, self.namespaces)
 
     # for backwards-compatibility
     getNamespaceIndex = redirect_func(ns_index, old_name='getNamespaceIndex',

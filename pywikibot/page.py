@@ -2709,7 +2709,7 @@ class WikibasePage(BasePage):
             elif self.site.property_namespace.id == ns:
                 self._namespace = self.site.property_namespace
             else:
-                raise ValueError('%r: Namespace "%d" is not valid'
+                raise ValueError('%r: Namespace "%r" is not valid'
                                  % (self.site, ns))
 
         # .site forces a parse of the Link title to determine site
