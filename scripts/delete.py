@@ -72,10 +72,14 @@ class DeletionRobot(Bot):
         """
         for page in self.generator:
             self.current_page = page
+
             if self.getOption('undelete'):
                 page.undelete(self.summary)
             else:
-                page.delete(self.summary, not self.getOption('always'))
+                if page.exists():
+                    page.delete(self.summary, not self.getOption('always'))
+                else:
+                    pywikibot.output(u'Skipping: %s does not exist.' % page)
 
 
 def main(*args):
