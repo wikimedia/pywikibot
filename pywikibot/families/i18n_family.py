@@ -11,17 +11,8 @@ class Family(family.Family):
 
     """Family class for Translate Wiki."""
 
-    def __init__(self):
-        """Constructor."""
-        family.Family.__init__(self)
-        self.name = 'i18n'
-        self.langs = {
-            'i18n': 'translatewiki.net',
-        }
-
-    def version(self, code):
-        """Return the version for this family."""
-        return "1.23alpha"
+    name = 'i18n'
+    langs = {'i18n': 'translatewiki.net'}
 
     def protocol(self, code):
         """Return https as the protocol for this family."""

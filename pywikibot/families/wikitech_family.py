@@ -10,17 +10,8 @@ class Family(family.Family):
 
     """Family class for Wikitech."""
 
-    def __init__(self):
-        """Constructor."""
-        super(Family, self).__init__()
-        self.name = 'wikitech'
-        self.langs = {
-            'en': 'wikitech.wikimedia.org',
-        }
-
-    def version(self, code):
-        """Return the version for this family."""
-        return '1.21wmf8'
+    name = 'wikitech'
+    langs = {'en': 'wikitech.wikimedia.org'}
 
     def protocol(self, code):
         """Return the protocol for this family."""

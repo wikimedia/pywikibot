@@ -11,17 +11,8 @@ class Family(family.Family):
 
     """Family class for OpenStreetMap wiki."""
 
-    def __init__(self):
-        """Constructor."""
-        family.Family.__init__(self)
-        self.name = 'osm'
-        self.langs = {
-            'en': 'wiki.openstreetmap.org',
-        }
-
-    def version(self, code):
-        """Return the version for this family."""
-        return "1.22.7"
+    name = 'osm'
+    langs = {'en': 'wiki.openstreetmap.org'}
 
     def protocol(self, code):
         """Return https as the protocol for this family."""
