@@ -212,7 +212,8 @@ class MimeTests(DefaultDrySiteTestCase):
 
     def test_upload_object(self):
         """Test Request object prepared to upload."""
-        req = Request(action="upload", file='MP_sounds.png', mime=True,
+        req = Request(site=self.get_site(), action="upload",
+                      file='MP_sounds.png', mime=True,
                       filename=os.path.join(_data_dir, 'MP_sounds.png'))
         self.assertEqual(req.mime, True)
 
@@ -223,8 +224,8 @@ class QueryGenTests(DefaultDrySiteTestCase):
 
     def test_query_constructor(self):
         """Test QueryGenerator constructor."""
-        qGen1 = QueryGenerator(action="query", meta="siteinfo")
-        qGen2 = QueryGenerator(meta="siteinfo")
+        qGen1 = QueryGenerator(site=self.get_site(), action="query", meta="siteinfo")
+        qGen2 = QueryGenerator(site=self.get_site(), meta="siteinfo")
         self.assertEqual(str(qGen1.request), str(qGen2.request))
 
 

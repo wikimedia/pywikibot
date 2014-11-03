@@ -18,7 +18,18 @@ from tests.aspects import (
 )
 
 
-class TestApiFunctions(DefaultDrySiteTestCase):
+class TestApiFunctions(DefaultSiteTestCase):
+
+    """API Request object test class."""
+
+    def testObjectCreation(self):
+        """Test api.Request() constructor with implicit site creation."""
+        req = api.Request(action="test", foo="", bar="test")
+        self.assertTrue(req)
+        self.assertEqual(req.site, self.get_site())
+
+
+class TestDryApiFunctions(DefaultDrySiteTestCase):
 
     """API Request object test class."""
 
@@ -27,8 +38,6 @@ class TestApiFunctions(DefaultDrySiteTestCase):
         mysite = self.get_site()
         req = api.Request(site=mysite, action="test", foo="", bar="test")
         self.assertTrue(req)
-        self.assertEqual(req.site, mysite)
-        req = api.Request(action="test", foo="", bar="test")
         self.assertEqual(req.site, mysite)
         self.assertIn("foo", req._params)
         self.assertEqual(req["bar"], ["test"])
