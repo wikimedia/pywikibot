@@ -181,7 +181,7 @@ def collector(loader=unittest.loader.defaultTestLoader):
               for name in sorted(script_list)
               if name != 'login'
               and name not in deadlock_script_list
-              and name not in failed_dep_script_list  # no_args = execution
+              and name not in failed_dep_script_list
               and name not in unrunnable_script_list
               and (enable_autorun_tests or name not in auto_run_script_list)]
 
@@ -347,7 +347,7 @@ class TestScriptMeta(MetaTestCaseClass):
                                'data_ingestion',  # bug 68611
                                'replicate_wiki',  # bug 68664
                                'script_wui',      # Failing on travis-ci
-                               ]:
+                               ] + failed_dep_script_list:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             dct[test_name].__doc__ = 'Test running ' + script_name + ' -help'
             dct[test_name].__name__ = test_name
@@ -377,7 +377,7 @@ class TestScriptMeta(MetaTestCaseClass):
                                'replicate_wiki',  # custom return codes
                                'script_wui',      # Error on any user except DrTrigonBot
                                'upload',          # raises custom ValueError
-                               ] or (
+                               ] + failed_dep_script_list or (
                     ((config.family != 'wikipedia' or config.mylang != 'en') and script_name == 'cfd') or
                     (config.family == 'wikipedia' and script_name == 'disambredir') or
                     (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):
