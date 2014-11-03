@@ -323,12 +323,12 @@ if __name__ == "__main__":
         pywikibot.output(u'\nYour default user directory is "%s"' % base_dir)
         if pywikibot.input_yn("Do you want to use that directory?",
                               default=False, automatic_quit=False):
+            break
+        else:
             new_base = change_base_dir()
             if new_base:
                 base_dir = new_base
                 break
-        else:
-            break
 
     copied_config = False
     copied_fixes = False
