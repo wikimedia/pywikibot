@@ -138,7 +138,8 @@ parameterHelp = u"""\
                   Argument can be given as "-unusedfiles:n" where
                   n is the maximum number of articles to work on.
 
--lonelypages      Work on all articles that are not linked from any other article.
+-lonelypages      Work on all articles that are not linked from any other
+                  article.
                   Argument can be given as "-lonelypages:n" where
                   n is the maximum number of articles to work on.
 
@@ -298,7 +299,7 @@ class GeneratorFactory(object):
         # Insert Category: before category name to avoid parsing problems in
         # Link.parse() when categoryname contains ":";
         # Part before ":" might be interpreted as an interwiki prefix
-        prefix = categoryname.split(":", 1)[0]  # whole word if no ":" is present
+        prefix = categoryname.split(":", 1)[0]  # whole word if ":" not present
         if prefix not in self.site.namespaces()[14]:
             categoryname = u'{0}:{1}'.format(self.site.namespace(14),
                                              categoryname)
@@ -514,7 +515,8 @@ class GeneratorFactory(object):
             gen = NewimagesPageGenerator(total=int(limit), site=self.site)
         elif arg.startswith('-newpages'):
             # partial workaround for bug 67249
-            # to use -namespace/ns with -newpages, -ns must be given before -newpages
+            # to use -namespace/ns with -newpages, -ns must be given
+            # before -newpages
             # otherwise default namespace is 0
             namespaces = self.namespaces or 0
             total = 60
@@ -537,7 +539,8 @@ class GeneratorFactory(object):
                 mediawikiQuery = pywikibot.input(
                     u'What do you want to search for?')
             # In order to be useful, all namespaces are required
-            gen = SearchPageGenerator(mediawikiQuery, namespaces=[], site=self.site)
+            gen = SearchPageGenerator(mediawikiQuery,
+                                      namespaces=[], site=self.site)
         elif arg.startswith('-google'):
             gen = GoogleSearchPageGenerator(arg[8:])
         elif arg.startswith('-titleregex'):
@@ -725,10 +728,12 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
 
 
 def FileLinksGenerator(referredFilePage, step=None, total=None, content=False):
+    """Yield Pages on which the file referredFilePage is displayed."""
     return referredFilePage.usingPages(step=step, total=total, content=content)
 
 
 def ImagesPageGenerator(pageWithImages, step=None, total=None, content=False):
+    """Yield FilePages displayed on pageWithImages."""
     return pageWithImages.imagelinks(step=step, total=total, content=content)
 
 
@@ -1055,6 +1060,7 @@ RegexBodyFilterPageGenerator = RegexFilter.contentfilter
 
 
 def CombinedPageGenerator(generators):
+    """Yield from each iterable until exhausted, then proceed with the next."""
     return itertools.chain(*generators)
 
 
@@ -1176,6 +1182,7 @@ def PreloadingGenerator(generator, step=50):
 
 
 def DequePreloadingGenerator(generator, step=50):
+    """Preload generator of type DequeGenerator."""
     assert(isinstance(generator, DequeGenerator))
 
     while True:
@@ -1617,6 +1624,7 @@ class YahooSearchPageGenerator:
             yield url
 
     def __iter__(self):
+        """Iterate results."""
         # restrict query to local site
         localQuery = '%s site:%s' % (self.query, self.site.hostname())
         base = 'http://%s%s' % (self.site.hostname(),
@@ -1682,6 +1690,7 @@ class GoogleSearchPageGenerator:
             yield url
 
     def __iter__(self):
+        """Iterate results."""
         # restrict query to local site
         localQuery = '%s site:%s' % (self.query, self.site.hostname())
         base = 'http://%s%s' % (self.site.hostname(),
