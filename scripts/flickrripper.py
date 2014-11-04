@@ -32,16 +32,51 @@ Todo:
 __version__ = '$Id$'
 #
 
-import re
-import hashlib
 import base64
-import time
-import sys
+import hashlib
 import io
+import re
+import sys
+import time
+
+if sys.version_info[0] > 2:
+    from urllib.parse import urlencode
+    from urllib.request import urlopen
+else:
+    from urllib import urlencode, urlopen
 
 import pywikibot
+
 from pywikibot import config, textlib
-import upload
+from scripts import upload
+
+try:
+    if sys.version_info[0] > 2:
+        from tkinter import (
+            Tk, Label, Entry, Scrollbar, Text, Button,
+            END, VERTICAL, NORMAL, WORD
+        )
+    else:
+        from Tkinter import (
+            Tk, Label, Entry, Scrollbar, Text, Button,
+            END, VERTICAL, NORMAL, WORD
+        )
+except ImportError:
+    pywikibot.error(
+        'This script requires Tkinter, which is typically part of Python,\n'
+        'but may be packaged separately on your platform.\n'
+        'See: https://www.mediawiki.org/wiki/Manual:Pywikibot/flickrripper.py')
+    pywikibot.exception()
+    sys.exit()
+
+try:
+    from PIL import Image, ImageTk
+except ImportError:
+    pywikibot.error(
+        'This script requires ImageTk from the Python Imaging Library (PIL).\n'
+        'See: https://www.mediawiki.org/wiki/Manual:Pywikibot/flickrripper.py')
+    pywikibot.exception()
+    sys.exit()
 
 try:
     import flickrapi                  # see: http://stuvel.eu/projects/flickrapi
@@ -50,21 +85,6 @@ except ImportError:
     pywikibot.error('See: http://stuvel.eu/projects/flickrapi')
     pywikibot.exception()
     sys.exit()
-
-if sys.version_info[0] > 2:
-    from urllib.parse import urlencode
-    from urllib.request import urlopen
-    from tkinter import (
-        Tk, Label, Entry, Scrollbar, Text, Button,
-        END, VERTICAL, NORMAL, WORD
-    )
-else:
-    from urllib import urlencode, urlopen
-    from Tkinter import (
-        Tk, Label, Entry, Scrollbar, Text, Button,
-        END, VERTICAL, NORMAL, WORD
-    )
-from PIL import Image, ImageTk    # see: http://www.pythonware.com/products/pil/
 
 flickr_allowed_license = {
     0: False,  # All Rights Reserved
