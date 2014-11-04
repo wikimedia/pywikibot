@@ -645,6 +645,7 @@ class ModuleDeprecationWrapper(object):
             module = sys.modules[module]
         super(ModuleDeprecationWrapper, self).__setattr__('_deprecated', {})
         super(ModuleDeprecationWrapper, self).__setattr__('_module', module)
+        super(ModuleDeprecationWrapper, self).__setattr__('__doc__', module.__doc__)
         sys.modules[module.__name__] = self
 
     def _add_deprecated_attr(self, name, replacement=None,
