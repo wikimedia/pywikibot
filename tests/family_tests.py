@@ -26,8 +26,14 @@ class TestFamily(TestCase):
 
     def test_family_load_valid(self):
         """Test that a family can be loaded via Family.load."""
-        f = Family.load('anarchopedia')
-        self.assertEqual(f.name, 'anarchopedia')
+        for name in pywikibot.config.family_files:
+            f = Family.load(name)
+            self.assertIsInstance(f.langs, dict)
+            self.assertNotEqual(f.langs, {})
+            # There is one inconsistency
+            if f.name == 'wikimediachapter' and name == 'wikimedia':
+                continue
+            self.assertEqual(f.name, name)
 
     def test_family_load_invalid(self):
         """Test that an invalid family raised UnknownFamily exception."""

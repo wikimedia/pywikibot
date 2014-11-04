@@ -35,6 +35,9 @@ class Family(object):
         if not hasattr(self, 'name'):
             self.name = None
 
+        if not hasattr(self, 'langs'):
+            self.langs = {}
+
         # For interwiki sorting order see
         # https://meta.wikimedia.org/wiki/Interwiki_sorting_order
 
@@ -113,8 +116,6 @@ class Family(object):
         self.fyinterwiki.remove('nb')
         self.fyinterwiki.sort(key=lambda x:
                               x.replace("y", "i") + x.count("y") * "!")
-
-        self.langs = {}
 
         self.namespacesWithSubpage = [2] + list(range(1, 16, 2))
 
