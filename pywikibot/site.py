@@ -299,6 +299,9 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
     def __index__(self):
         return self.id
 
+    def __hash__(self):
+        return self.id
+
     def __eq__(self, other):
         """Compare whether two namespace objects are equal."""
         if isinstance(other, int):

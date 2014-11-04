@@ -81,6 +81,9 @@ class TestNamespaceObject(TestCase):
         self.assertTrue(all(Namespace.lookup_name(b, ns).id == self.all_builtin_ids[b]
                             for b in self.all_builtin_ids))
 
+        # Use a namespace object as a dict key
+        self.assertEqual(ns[ns[6]], ns[6])
+
     def testNamespaceConstructor(self):
         kwargs = {u'case': u'first-letter'}
         y = Namespace(id=6, custom_name=u'dummy', canonical_name=u'File',
