@@ -67,6 +67,16 @@ class TestCaseBase(unittest.TestCase):
             """
             return self.assertRegexpMatches(*args, **kwargs)
 
+    if not hasattr(unittest.TestCase, 'assertCountEqual'):
+
+        def assertCountEqual(self, *args, **kwargs):
+            """
+            Wrapper of unittest.assertItemsEqual for Python 2 unittest.
+
+            assertItemsEqual is removed in Python 3.
+            """
+            return self.assertItemsEqual(*args, **kwargs)
+
     def assertPageInNamespaces(self, page, namespaces):
         """
         Assert that Pages is in namespaces.

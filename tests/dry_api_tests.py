@@ -226,7 +226,7 @@ class QueryGenTests(DefaultDrySiteTestCase):
         """Test QueryGenerator constructor."""
         qGen1 = QueryGenerator(site=self.get_site(), action="query", meta="siteinfo")
         qGen2 = QueryGenerator(site=self.get_site(), meta="siteinfo")
-        self.assertEqual(str(qGen1.request), str(qGen2.request))
+        self.assertCountEqual(qGen1.request._params.items(), qGen2.request._params.items())
 
 
 if __name__ == '__main__':
