@@ -52,33 +52,25 @@ class UnicodeMixin(object):
 # From http://python3porting.com/preparing.html
 class ComparableMixin(object):
 
-    """Mixin class to allow comparing to other objects of this class."""
-
-    def _compare(self, other, method):
-        try:
-            return method(self._cmpkey(), other._cmpkey())
-        except (AttributeError, TypeError):
-            # _cmpkey not implemented, or return different type,
-            # so I can't compare with "other".
-            return NotImplemented
+    """Mixin class to allow comparing to other objects which are comparable."""
 
     def __lt__(self, other):
-        return self._compare(other, lambda s, o: s < o)
+        return other >= self._cmpkey()
 
     def __le__(self, other):
-        return self._compare(other, lambda s, o: s <= o)
+        return other > self._cmpkey()
 
     def __eq__(self, other):
-        return self._compare(other, lambda s, o: s == o)
+        return other == self._cmpkey()
 
     def __ge__(self, other):
-        return self._compare(other, lambda s, o: s >= o)
+        return other < self._cmpkey()
 
     def __gt__(self, other):
-        return self._compare(other, lambda s, o: s > o)
+        return other <= self._cmpkey()
 
     def __ne__(self, other):
-        return self._compare(other, lambda s, o: s != o)
+        return other != self._cmpkey()
 
 
 class MediaWikiVersion(Version):
