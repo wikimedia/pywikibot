@@ -594,7 +594,7 @@ class CosmeticChangesToolkit:
 
     def removeNonBreakingSpaceBeforePercent(self, text):
         """
-        Insert a non-breaking space between number and percent sign.
+        Remove a non-breaking space between number and percent sign.
 
         Newer MediaWiki versions automatically place a non-breaking space in
         front of a percent sign, so it is no longer required to place it
