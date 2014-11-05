@@ -398,7 +398,7 @@ class TestScriptMeta(MetaTestCaseClass):
             #
             # dct[test_name].site = True
 
-        return type.__new__(cls, name, bases, dct)
+        return super(TestScriptMeta, cls).__new__(cls, name, bases, dct)
 
 
 class TestScript(DefaultSiteTestCase, PwbTestCase):
@@ -412,8 +412,8 @@ class TestScript(DefaultSiteTestCase, PwbTestCase):
     __metaclass__ = TestScriptMeta
 
     def setUp(self):
-        super(TestScript, self).setUp()
         """Prepare the environment for running the pwb.py script."""
+        super(TestScript, self).setUp()
         self.old_pywikibot_dir = None
         if 'PYWIKIBOT2_DIR' in os.environ:
             self.old_pywikibot_dir = os.environ['PYWIKIBOT2_DIR']
