@@ -252,6 +252,7 @@ def register_families_folder(folder_path):
 # Get the names of all known families, and initialize with empty dictionaries.
 # ‘families/’ is a subdirectory of the directory in which config2.py is found.
 register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
+register_family_file('wikiapiary', 'https://wikiapiary.com')
 
 # Set to True to override the {{bots}} exclusion protocol (at your own risk!)
 ignore_bot_templates = False
