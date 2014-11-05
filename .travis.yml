@@ -13,6 +13,8 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install ordereddict unittest2==0.6.0; fi
   - pip install six
   - mkdir ~/.pywikibot
+  - mkdir ~/.python-eggs
+  - chmod 700 ~/.python-eggs
 
   - touch ~/.pywikibot/user-config.py
   - echo "import os" >> ~/.pywikibot/user-config.py
