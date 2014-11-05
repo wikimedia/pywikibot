@@ -718,11 +718,7 @@ class WelcomeBot(object):
             if globalvar.quick and self.site.has_api():
                 us = [x for x in self.parseNewUserLog()]
                 showStatus()
-                try:
-                    pywikibot.User.getall(self.site, us)
-                except NotImplementedError:
-                    globalvar.quick = False
-                    us = self._parseNewUserLogOld()
+                pywikibot.User.getall(self.site, us)
             else:
                 us = (pywikibot.User(self.site, users.user()) for users in self.parseNewUserLog())
             for users in us:
