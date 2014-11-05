@@ -45,11 +45,6 @@ if sys.version_info[0] > 2:
 else:
     from urllib import urlencode, urlopen
 
-import pywikibot
-
-from pywikibot import config, textlib
-from scripts import upload
-
 try:
     if sys.version_info[0] > 2:
         from tkinter import (
@@ -61,30 +56,35 @@ try:
             Tk, Label, Entry, Scrollbar, Text, Button,
             END, VERTICAL, NORMAL, WORD
         )
-except ImportError:
-    pywikibot.error(
+except ImportError as e:
+    print(
         'This script requires Tkinter, which is typically part of Python,\n'
         'but may be packaged separately on your platform.\n'
         'See: https://www.mediawiki.org/wiki/Manual:Pywikibot/flickrripper.py')
-    pywikibot.exception()
+    print(e)
     sys.exit()
 
 try:
     from PIL import Image, ImageTk
-except ImportError:
-    pywikibot.error(
+except ImportError as e:
+    print(
         'This script requires ImageTk from the Python Imaging Library (PIL).\n'
         'See: https://www.mediawiki.org/wiki/Manual:Pywikibot/flickrripper.py')
-    pywikibot.exception()
+    print(e)
     sys.exit()
 
 try:
     import flickrapi                  # see: http://stuvel.eu/projects/flickrapi
-except ImportError:
-    pywikibot.error('This script requires the python flickrapi module')
-    pywikibot.error('See: http://stuvel.eu/projects/flickrapi')
-    pywikibot.exception()
+except ImportError as e:
+    print('This script requires the python flickrapi module. \n'
+          'See: http://stuvel.eu/projects/flickrapi')
+    print(e)
     sys.exit()
+
+import pywikibot
+
+from pywikibot import config, textlib
+from scripts import upload
 
 flickr_allowed_license = {
     0: False,  # All Rights Reserved
