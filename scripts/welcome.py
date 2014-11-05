@@ -669,7 +669,7 @@ class WelcomeBot(object):
                 time.sleep(10)
 
     def parseNewUserLog(self):
-        return self.site.logevents('newusers')
+        return self.site.logevents('newusers', total=globalvar.queryLimit)
 
     def defineSign(self, force=False):
         if hasattr(self, '_randomSignature') and not force:
