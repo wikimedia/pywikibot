@@ -207,6 +207,8 @@ def execute(command, data_in=None, timeout=0, error=None):
             return stream.decode(config.console_encoding)
         else:
             return stream
+    env = os.environ.copy()
+    env['PYTHONPATH'] = ":".join(sys.path)
     options = {
         'stdout': subprocess.PIPE,
         'stderr': subprocess.PIPE
@@ -214,7 +216,7 @@ def execute(command, data_in=None, timeout=0, error=None):
     if data_in is not None:
         options['stdin'] = subprocess.PIPE
 
-    p = subprocess.Popen(command, **options)
+    p = subprocess.Popen(command, env=env, **options)
 
     if data_in is not None:
         if sys.version_info[0] > 2:
@@ -412,8 +414,8 @@ class TestScript(DefaultSiteTestCase, PwbTestCase):
     __metaclass__ = TestScriptMeta
 
     def setUp(self):
-        super(TestScript, self).setUp()
         """Prepare the environment for running the pwb.py script."""
+        super(TestScript, self).setUp()
         self.old_pywikibot_dir = None
         if 'PYWIKIBOT2_DIR' in os.environ:
             self.old_pywikibot_dir = os.environ['PYWIKIBOT2_DIR']
