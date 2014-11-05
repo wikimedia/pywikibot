@@ -400,7 +400,7 @@ class TestScriptMeta(MetaTestCaseClass):
             #
             # dct[test_name].site = True
 
-        return type.__new__(cls, name, bases, dct)
+        return super(TestScriptMeta, cls).__new__(cls, name, bases, dct)
 
 
 class TestScript(DefaultSiteTestCase, PwbTestCase):
