@@ -38,6 +38,12 @@ crontab
 argparse
 
 # scripts/flickrripper.py
+# On Python 2, flickrapi 1.4.x or 2.x may be used.  Only 2.x works on Python 3.
+# The following automatically selects 2.x on all Python versions, which depends
+# on requests 2.x, which may cause pip to report an error like the following:
+#   pkg_resources.VersionConflict: (requests 1.2.3 (/usr/lib/python2.7/site-packages), Requirement.parse('requests>=2.2.1'))
+# If you see that on Python 2, change this to flickrapi==1.4.5
+# On Python 3, force pip to install requests 2.2.1, or remove flickrapi below.
 Pillow
 flickrapi
 
