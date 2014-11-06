@@ -187,7 +187,12 @@ class ThreadedGenerator(threading.Thread):
 
     def run(self):
         """Run the generator and store the results on the queue."""
-        self.__gen = self.generator(*self.args, **self.kwargs)
+        iterable = any([hasattr(self.generator, key)
+                        for key in ['__iter__', '__getitem__']])
+        if iterable and not self.args and not self.kwargs:
+            self.__gen = self.generator
+        else:
+            self.__gen = self.generator(*self.args, **self.kwargs)
         for result in self.__gen:
             while True:
                 if self.finished.isSet():
