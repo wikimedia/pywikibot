@@ -158,15 +158,17 @@ class CacheEntry(api.CachedRequest):
             (site, username, login_status, params) = self._parsed_key
         else:
             (site, username, login_status, params) = self.parse_key()
-        if site:
-            self.site = eval(site)
+        if not site:
+            raise ParseError('No Site')
+        self.site = eval(site)
         if login_status:
             self.site._loginstatus = eval('LoginStatus.%s'
                                           % login_status[12:-1])
         if username:
             self.site._username = [username, username]
-        if params:
-            self.params = dict(eval(params))
+        if not params:
+            raise ParseError('No request params')
+        self._params = dict(eval(params))
 
     def _delete(self):
         """ Delete the cache entry. """
