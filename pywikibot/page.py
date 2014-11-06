@@ -1987,9 +1987,52 @@ class FilePage(Page):
     @deprecate_arg("insite", None)
     def __init__(self, source, title=u""):
         """Constructor."""
+        self._file_revisions = {}  # dictionary to cache File history.
         super(FilePage, self).__init__(source, title, 6)
         if self.namespace() != 6:
             raise ValueError(u"'%s' is not in the file namespace!" % title)
+
+    @property
+    def latest_file_info(self):
+        """Retrieve and store information of latest Image rev. of FilePage.
+
+        At the same time, the whole history of Image is fetched and cached in
+        self._file_revisions
+
+        @return: instance of FileInfo()
+
+        """
+        if not len(self._file_revisions):
+            self.site.loadimageinfo(self, history=True)
+        latest_ts = max(self._file_revisions)
+        return self._file_revisions[latest_ts]
+
+    @property
+    def oldest_file_info(self):
+        """Retrieve and store information of oldest Image rev. of FilePage.
+
+        At the same time, the whole history of Image is fetched and cached in
+        self._file_revisions
+
+        @return: instance of FileInfo()
+
+        """
+        if not len(self._file_revisions):
+            self.site.loadimageinfo(self, history=True)
+        oldest_ts = min(self._file_revisions)
+        return self._file_revisions[oldest_ts]
+
+    def get_file_history(self):
+        """Return the file's version history.
+
+        @return: dictionary with:
+            key: timestamp of the entry
+            value: instance of FileInfo()
+
+        """
+        if not hasattr(self, '_file_revisions'):
+            self.site.loadimageinfo(self, history=True)
+        return self._file_revisions
 
     def getImagePageHtml(self):
         """
@@ -2008,9 +2051,7 @@ class FilePage(Page):
     def fileUrl(self):
         """Return the URL for the file described on this page."""
         # TODO add scaling option?
-        if not hasattr(self, '_imageinfo'):
-            self._imageinfo = self.site.loadimageinfo(self)
-        return self._imageinfo['url']
+        return self.latest_file_info.url
 
     @deprecated("fileIsShared")
     def fileIsOnCommons(self):
@@ -2036,11 +2077,11 @@ class FilePage(Page):
             return self.fileUrl().startswith(
                 'https://upload.wikimedia.org/wikipedia/commons/')
 
-    @deprecated("FilePage.getFileSHA1Sum()")
+    @deprecated("FilePage.latest_file_info.sha1")
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
-# FIXME: MD5 might be performed on incomplete file due to server disconnection
-# (see bug #1795683).
+        # FIXME: MD5 might be performed on incomplete file due to server disconnection
+        # (see bug #1795683).
         f = urlopen(self.fileUrl())
         # TODO: check whether this needs a User-Agent header added
         h = hashlib.md5()
@@ -2049,12 +2090,21 @@ class FilePage(Page):
         f.close()
         return md5Checksum
 
+    @deprecated("FilePage.latest_file_info.sha1")
     def getFileSHA1Sum(self):
         """Return the file's SHA1 checksum."""
-        if not hasattr(self, '_imageinfo'):
-            self._imageinfo = self.site.loadimageinfo(self)
-        return self._imageinfo['sha1']
+        return self.latest_file_info.sha1
 
+    @deprecated("FilePage.latest_file_info.user")
+    def getLatestUploader(self):
+        """Return a list with latest uploader of the FilePage and timestamp.
+
+        For compatibility with compat only.
+
+        """
+        return [self.latest_file_info.user, self.latest_file_info.timestamp]
+
+    @deprecated('FilePage.get_file_history()')
     def getFileVersionHistory(self):
         """Return the file's version history.
 
@@ -4156,6 +4206,51 @@ class Revision(object):
         """Return a namedtuple with a Page full history record."""
         return Revision.FullHistEntry(self.revid, self.timestamp, self.user,
                                       self.text, self.rollbacktoken)
+
+
+class FileInfo(pywikibot.UnicodeMixin):
+
+    """A structure holding imageinfo of latest rev. of FilePage.
+
+    All keys of API imageinfo dictionary are mapped to FileInfo attributes.
+    Attributes can be retrieved both as self['key'] or self.key.
+
+    Following attributes will be returned:
+        - timestamp, user, comment, url, size, sha1, mime, metadata
+        - archivename (not for latest revision)
+
+    See Site.loadimageinfo() for details.
+
+    Note: timestamp will be casted to pywikibot.Timestamp.
+    """
+
+    def __init__(self, file_revision):
+        """
+        Create class with the dictionary returned by site.loadimageinfo().
+
+        @param page: FilePage containing the image.
+        @type page: FilePage object
+        """
+        self.__dict__.update(file_revision)
+        self.timestamp = pywikibot.Timestamp.fromISOformat(self.timestamp)
+
+    def __getitem__(self, key):
+        """Access attributes also with dict.like keys."""
+        return getattr(self, key)
+
+    def __eq__(self, other):
+        """Test if two File_info objects are equal."""
+        return self.__dict__ == other.__dict__
+
+    def __unicode__(self):
+        """Return string representation."""
+        _content = u', '.join(
+            u'{0}: {1}'.format(k, v) for k, v in self.__dict__.items())
+        return u'{{{0}}}'.format(_content)
+
+    def __repr__(self):
+        """Return a more complete string representation."""
+        return self.__dict__.__repr__()
 
 
 class Link(ComparableMixin):

@@ -324,7 +324,7 @@ class NowCommonsDeleteBot(Bot):
                 if localImagePage.fileIsShared():
                     pywikibot.output(u'File is already on Commons.')
                     continue
-                sha1 = localImagePage.getFileSHA1Sum()
+                sha1 = localImagePage.latest_file_info.sha1
                 if self.getOption('use_hash'):
                     filenameOnCommons = images_list[1]
                 else:
@@ -394,7 +394,7 @@ class NowCommonsDeleteBot(Bot):
                             % localImagePage.title(withNamespace=False))
                 commonsText = commonsImagePage.get()
                 if self.getOption('replaceonly') is False:
-                    if sha1 == commonsImagePage.getFileSHA1Sum():
+                    if sha1 == commonsImagePage.latest_file_info.sha1:
                         pywikibot.output(
                             u'The image is identical to the one on Commons.')
                         if len(localImagePage.getFileVersionHistory()) > 1 and not self.getOption('use_hash'):

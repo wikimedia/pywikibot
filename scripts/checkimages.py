@@ -721,7 +721,7 @@ class checkImagesBot(object):
             if reportPageObject == self.image and self.uploader:
                 nick = self.uploader
             else:
-                nick = reportPageObject.getLatestUploader()[0]
+                nick = reportPageObject.latest_file_info.user
         except pywikibot.NoPage:
             pywikibot.output(
                 u"Seems that %s has only the description and not the file..."
@@ -897,7 +897,7 @@ class checkImagesBot(object):
         commons_site = pywikibot.Site('commons', 'commons')
         regexOnCommons = r"\[\[:File:%s\]\] is also on '''Commons''': \[\[commons:File:.*?\]\](?: \(same name\)|)$" \
                          % re.escape(self.imageName)
-        hash_found = self.image.getFileSHA1Sum()
+        hash_found = self.image.latest_file_info.sha1
         if not hash_found:
             return  # Image deleted, no hash found. Skip the image.
 
@@ -959,7 +959,7 @@ class checkImagesBot(object):
         duplicateRegex = r'\[\[:File:%s\]\] has the following duplicates' \
                          % re.escape(self.convert_to_url(self.imageName))
         imagePage = pywikibot.FilePage(self.site, self.imageName)
-        hash_found = imagePage.getFileSHA1Sum()
+        hash_found = imagePage.latest_file_info.sha1
         duplicates = self.site.getFilesFromAnHash(hash_found)
 
         if not duplicates:
@@ -982,7 +982,7 @@ class checkImagesBot(object):
 
                     if DupePage.title(asUrl=True) != self.image.title(asUrl=True) or \
                        self.timestamp is None:
-                        self.timestamp = DupePage.getLatestUploader()[1]
+                        self.timestamp = DupePage.latest_file_info.timestamp
                     data = time.strptime(self.timestamp, u"%Y-%m-%dT%H:%M:%SZ")
                     data_seconds = time.mktime(data)
                     time_image_list.append([data_seconds, duplicate])
@@ -1475,7 +1475,7 @@ class checkImagesBot(object):
                 loadOtherImages = True
                 for image in generator:
                     try:
-                        timestamp = image.getLatestUploader()[1]
+                        timestamp = image.latest_file_info.timestamp
                     except pywikibot.NoPage:
                         continue
                     # not relative to localtime
