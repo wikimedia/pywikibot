@@ -29,6 +29,8 @@ script_deps = {
     'flickrripper': ['PIL.ImageTk', 'flickrapi'],
     # Note: 'PIL' is not available via pip2.7 on MS Windows,
     #       however it is available with setuptools.
+
+    'states_redirect': ['pycountry'],
 }
 if sys.version_info < (2, 7):
     script_deps['replicate_wiki'] = ['argparse']
@@ -104,6 +106,7 @@ auto_run_script_list = [
     'nowcommons',
     'script_wui',
     'shell',
+    'states_redirect',
     'unusedfiles',
     'upload',
     'watchlist',

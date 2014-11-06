@@ -33,6 +33,7 @@ script_deps = {
     'flickrripper.py': ['Pillow', 'flickrapi'],
     # Note: 'PIL' is not available via pip2.7 on MS Windows,
     #       however it is available with setuptools.
+    'states_redirect.py': ['pycountry']
 }
 
 dependency_links = [
