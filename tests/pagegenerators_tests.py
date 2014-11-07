@@ -148,8 +148,6 @@ class TestRepeatingGenerator(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    cached = True
-
     def test_RepeatingGenerator(self):
         # site.recentchanges() includes external edits (from wikidata),
         # so total=4 is not too high
