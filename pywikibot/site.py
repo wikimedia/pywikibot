@@ -2011,7 +2011,7 @@ class APISite(BaseSite):
         return self.getmagicwords("pagenamee")
 
     def _build_namespaces(self):
-        self._namespaces = SelfCallDict()
+        _namespaces = SelfCallDict()
 
         # In MW 1.14, API siprop 'namespaces' added 'canonical',
         # and Image became File with Image as an alias.
@@ -2034,12 +2034,14 @@ class APISite(BaseSite):
             namespace = Namespace(ns, canonical_name, custom_name,
                                   use_image_name=not is_mw114,
                                   **nsdata)
-            self._namespaces[ns] = namespace
+            _namespaces[ns] = namespace
 
         for item in self.siteinfo.get('namespacealiases'):
             ns = int(item['id'])
-            if item['*'] not in self._namespaces[ns]:
-                self._namespaces[ns].aliases.append(item['*'])
+            if item['*'] not in _namespaces[ns]:
+                _namespaces[ns].aliases.append(item['*'])
+
+        self._namespaces = _namespaces
 
     @need_version("1.14")
     @deprecated("has_extension")
