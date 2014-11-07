@@ -301,15 +301,13 @@ def main(*args):
             if show:
                 showQuest(page)
             continue
-        """
-        # This check does not work :
+        # FIXME: This check does not work :
         # PreloadingGenerator cannot set correctly page.editRestriction
         # (see bug 55322)
-        if not page.canBeEdited():
-            pywikibot.output("%s is sysop-protected : this account can't edit "
-                             "it! Skipping..." % pagename)
-            continue
-        """
+        # if not page.canBeEdited():
+        #    pywikibot.output("%s is sysop-protected : this account can't edit "
+        #                     "it! Skipping..." % pagename)
+        #    continue
         restrictions = page.protection()
         try:
             editRestr = restrictions['edit']
