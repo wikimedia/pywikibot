@@ -26,7 +26,7 @@ def main(*args):
     env = None
     if args:
         import pywikibot
-        pywikibot.handle_args(*args)
+        pywikibot.handle_args(args)
         env = locals()
 
     import code
