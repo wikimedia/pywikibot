@@ -26,9 +26,14 @@ import codecs
 import itertools
 import re
 import time
+
 import pywikibot
 from pywikibot import date, config, i18n
-from pywikibot.tools import deprecated_args, DequeGenerator
+from pywikibot.tools import (
+    deprecated_args,
+    DequeGenerator,
+    intersect_generators,
+)
 from pywikibot.comms import http
 import pywikibot.data.wikidataquery as wdquery
 
@@ -36,11 +41,14 @@ if sys.version_info[0] > 2:
     basestring = (str, )
     unicode = str
 
+_logger = "pagegenerators"
+
 # ported from version 1 for backwards-compatibility
 # most of these functions just wrap a Site or Page method that returns
 # a generator
 
 parameterHelp = u"""\
+
 -cat              Work on all pages which are in a specific category.
                   Argument can also be given as "-cat:categoryname" or
                   as "-cat:categoryname|fromtitle" (using # instead of |
@@ -199,6 +207,7 @@ parameterHelp = u"""\
                   Case insensitive regular expressions will be used and
                   dot matches any character, including a newline.
 
+-intersect        Work on the intersection of all the provided generators.
 """
 
 docuReplacements = {'&params;': parameterHelp}
@@ -233,6 +242,7 @@ class GeneratorFactory(object):
         self.step = None
         self.limit = None
         self.articlefilter_list = []
+        self.intersect = False
         self._site = site
 
     @property
@@ -273,10 +283,18 @@ class GeneratorFactory(object):
             return None
         elif len(self.gens) == 1:
             gensList = self.gens[0]
+            dupfiltergen = gensList
+            if self.intersect:
+                pywikibot.input(u'Only one generator. '
+                                u'Param "-intersect" has no meaning or effect.')
         else:
-            gensList = CombinedPageGenerator(self.gens)
-
-        dupfiltergen = DuplicateFilterPageGenerator(gensList)
+            if self.intersect:
+                gensList = intersect_generators(self.gens)
+                # By definition no duplicates are possible.
+                dupfiltergen = gensList
+            else:
+                gensList = CombinedPageGenerator(self.gens)
+                dupfiltergen = DuplicateFilterPageGenerator(gensList)
 
         if self.articlefilter_list:
             return RegexBodyFilterPageGenerator(
@@ -572,6 +590,9 @@ class GeneratorFactory(object):
                 query = pywikibot.input(
                     u'Mysql query string:')
             gen = MySQLPageGenerator(query, site=self.site)
+        elif arg.startswith('-intersect'):
+            self.intersect = True
+            return True
 
         if gen:
             self.gens.append(gen)
