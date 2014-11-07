@@ -983,7 +983,7 @@ u"Page does not exist, using the first link in page %s."
             ignore_title[self.mysite.family.name][self.mylang] += [
                 u'%s:' % ns
                 for namespace in self.mysite.namespaces()
-                for ns in self.mysite.namespaces()[namespace]
+                for ns in self.mysite.namespaces[namespace]
             ]
 
         for disambPage in self.generator:

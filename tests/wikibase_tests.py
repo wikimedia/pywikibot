@@ -44,7 +44,7 @@ class TestGeneral(WikidataTestCase):
 
     def testWikibase(self):
         repo = self.get_repo()
-        item_namespace = repo.namespaces()[0]
+        item_namespace = repo.namespaces[0]
         self.assertEqual(item_namespace.defaultcontentmodel, 'wikibase-item')
         item = pywikibot.ItemPage.fromPage(self.mainpage)
         self.assertIsInstance(item, pywikibot.ItemPage)

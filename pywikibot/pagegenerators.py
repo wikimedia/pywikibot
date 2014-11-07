@@ -318,7 +318,7 @@ class GeneratorFactory(object):
         # Link.parse() when categoryname contains ":";
         # Part before ":" might be interpreted as an interwiki prefix
         prefix = categoryname.split(":", 1)[0]  # whole word if ":" not present
-        if prefix not in self.site.namespaces()[14]:
+        if prefix not in self.site.namespaces[14]:
             categoryname = u'{0}:{1}'.format(self.site.namespace(14),
                                              categoryname)
         cat = pywikibot.Category(pywikibot.Link(categoryname,

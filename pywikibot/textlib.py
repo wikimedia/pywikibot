@@ -890,7 +890,7 @@ def categoryFormat(categories, insite=None):
             category, separator, sortKey = category.strip('[]').partition('|')
             sortKey = sortKey if separator else None
             prefix = category.split(":", 1)[0]  # whole word if no ":" is present
-            if prefix not in insite.namespaces()[14]:
+            if prefix not in insite.namespaces[14]:
                 category = u'{0}:{1}'.format(insite.namespace(14), category)
             category = pywikibot.Category(pywikibot.Link(category,
                                                          insite,

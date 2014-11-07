@@ -4159,8 +4159,8 @@ class Link(ComparableMixin):
             raise pywikibot.InvalidTitle("The link does not contain a page "
                                          "title")
 
-        if hasattr(self._site.namespaces()[self._namespace], 'case'):
-            case = self._site.namespaces()[self._namespace].case
+        if hasattr(self._site.namespaces[self._namespace], 'case'):
+            case = self._site.namespaces[self._namespace].case
         else:
             case = self._site.case()
 
@@ -4241,8 +4241,8 @@ class Link(ComparableMixin):
 
         """
         ns_id = self.namespace
-        ns = self.site.namespaces()[ns_id]
-        ns_names = list(self.site.namespaces()[ns_id])
+        ns = self.site.namespaces[ns_id]
+        ns_names = list(ns)
 
         if onsite is None:
             namespace = ns.canonical_name
@@ -4254,7 +4254,7 @@ class Link(ComparableMixin):
             if onsite_ns is None:
                 raise pywikibot.Error(
                     u'No corresponding namespace found for namespace %s on %s.'
-                    % (self.site.namespaces()[ns_id], onsite))
+                    % (self.site.namespaces[ns_id], onsite))
             else:
                 namespace = onsite_ns.custom_name
 
