@@ -2183,8 +2183,8 @@ class APISite(BaseSite):
 
         """
         if all:
-            return self.namespaces()[num]
-        return self.namespaces()[num][0]
+            return self.namespaces[num]
+        return self.namespaces[num][0]
 
     @deprecated("version()")
     def live_version(self, force=False):

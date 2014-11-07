@@ -1501,9 +1501,9 @@ class TestWiktionarySite(TestCase):
     def testNamespaceCase(self):
         site = self.get_site()
 
-        main_namespace = site.namespaces()[0]
+        main_namespace = site.namespaces[0]
         self.assertEqual(main_namespace.case, 'case-sensitive')
-        user_namespace = site.namespaces()[2]
+        user_namespace = site.namespaces[2]
         self.assertEqual(user_namespace.case, 'first-letter')
 
 

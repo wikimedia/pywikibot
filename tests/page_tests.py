@@ -185,8 +185,8 @@ class TestPageObjectEnglish(TestCase):
         site = self.get_site()
         p1 = pywikibot.Page(site, u"Help:Test page#Testing")
         ns_name = u"Help"
-        if site.namespaces()[12][0] != ns_name:
-            ns_name = site.namespaces()[12][0]
+        if site.namespaces[12][0] != ns_name:
+            ns_name = site.namespaces[12][0]
         self.assertEqual(p1.title(),
                          ns_name + u":Test page#Testing")
         self.assertEqual(p1.title(underscore=True),
@@ -221,8 +221,8 @@ class TestPageObjectEnglish(TestCase):
         site = self.get_site()
         p2 = pywikibot.Page(site, u"File:Jean-Léon Gérôme 003.jpg")
         ns_name = u"File"
-        if site.namespaces()[6][0] != ns_name:
-            ns_name = site.namespaces()[6][0]
+        if site.namespaces[6][0] != ns_name:
+            ns_name = site.namespaces[6][0]
         self.assertEqual(p2.title(),
                          u"File:Jean-Léon Gérôme 003.jpg")
         self.assertEqual(p2.title(underscore=True),
