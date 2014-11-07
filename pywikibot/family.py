@@ -864,6 +864,12 @@ class Family(object):
                 myfamily = AutoFamily(fam, family_file)
                 Family._families[fam] = myfamily
                 return Family._families[fam]
+        elif fam == 'lockwiki':
+            raise UnknownFamily(
+                "Family 'lockwiki' has been removed as it not a public wiki.\n"
+                "You may install your own family file for this wiki, and a "
+                "old family file may be found at:\n"
+                "http://git.wikimedia.org/commitdiff/pywikibot%2Fcore.git/dfdc0c9150fa8e09829bb9d236")
 
         try:
             # Ignore warnings due to dots in family names.
