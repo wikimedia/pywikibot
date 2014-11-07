@@ -940,7 +940,7 @@ class checkImagesBot(object):
         commons_site = pywikibot.Site('commons', 'commons')
         regexOnCommons = r"\[\[:File:%s\]\] is also on '''Commons''': \[\[commons:File:.*?\]\](?: \(same name\)|)$" \
                          % re.escape(self.imageName)
-        hash_found = self.image.getHash()
+        hash_found = self.image.getFileSHA1Sum()
         if not hash_found:
             return  # Image deleted, no hash found. Skip the image.
 
@@ -1002,7 +1002,7 @@ class checkImagesBot(object):
         duplicateRegex = r'\[\[:File:%s\]\] has the following duplicates' \
                          % re.escape(self.convert_to_url(self.imageName))
         imagePage = pywikibot.FilePage(self.site, self.imageName)
-        hash_found = imagePage.getHash()
+        hash_found = imagePage.getFileSHA1Sum()
         duplicates = self.site.getFilesFromAnHash(hash_found)
 
         if not duplicates:
