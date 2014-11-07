@@ -696,6 +696,9 @@ class TestImageUsage(DefaultSiteTestCase):
         imagepage = self.imagepage
         for using in mysite.imageusage(imagepage, filterredir=False, total=5):
             self.assertIsInstance(using, pywikibot.Page)
+            if using.isRedirectPage():
+                print('{0} is a redirect, although just non-redirects were '
+                      'searched. See also bug 73120'.format(using))
             self.assertFalse(using.isRedirectPage())
 
 
