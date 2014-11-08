@@ -21,19 +21,24 @@ __version__ = '$Id$'
 __docformat__ = 'epytext'
 
 # standard python libraries
-import sys
 import re
+import sys
 import threading
 
 if sys.version_info[0] > 2:
     from http import cookiejar as cookielib
-    from urllib.parse import splittype, splithost, unquote
+    from urllib.parse import splittype, splithost, unquote, urlparse
+    unicode = str
 else:
     import cookielib
+    import urlparse
     from urllib import splittype, splithost, unquote
 
 import pywikibot
+
 from pywikibot import config
+
+from pywikibot.tools import UnicodeMixin
 
 _logger = "comm.threadedhttp"
 
@@ -300,7 +305,7 @@ class Http(httplib2.Http):
                 response, content)
 
 
-class HttpRequest(object):
+class HttpRequest(UnicodeMixin):
 
     """Object wrapper for HTTP requests that need to block origin thread.
 
@@ -321,6 +326,7 @@ class HttpRequest(object):
     <class 'httplib2.ServerNotFoundError'>
     >>> print(request.data)
     Unable to find the server at hostname.invalid
+    >>> queue.put(None)  # Stop the http processor thread
 
     C{request.lock.acquire()} will block until the data is available.
 
@@ -329,16 +335,117 @@ class HttpRequest(object):
     * an exception
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, uri, method="GET", body=None, headers=None,
+                 callbacks=None, **kwargs):
         """
         Constructor.
 
         See C{Http.request} for parameters.
         """
-        self.args = args
+        self.uri = uri
+        self.method = method
+        self.body = body
+        self.headers = headers
+
+        self.callbacks = callbacks
+
+        self.args = [uri, method, body, headers]
         self.kwargs = kwargs
-        self.data = None
+
+        self._parsed_uri = None
+        self._data = None
         self.lock = threading.Semaphore(0)
+
+    def _join(self):
+        """Block until response has arrived."""
+        self.lock.acquire(True)
+
+    @property
+    def data(self):
+        """Return the httplib2 response tuple."""
+        if not self._data:
+            self._join()
+
+        assert(self._data)
+        return self._data
+
+    @data.setter
+    def data(self, value):
+        """Set the httplib2 response and invoke each callback."""
+        self._data = value
+
+        if self.callbacks:
+            for callback in self.callbacks:
+                callback(self)
+
+    @property
+    def exception(self):
+        """Get the exception raised by httplib2, if any."""
+        if isinstance(self.data, Exception):
+            return self.data
+
+    @property
+    def response_headers(self):
+        """Return the response headers."""
+        if not self.exception:
+            return self.data[0]
+
+    @property
+    def raw(self):
+        """Return the raw response body."""
+        if not self.exception:
+            return self.data[1]
+
+    @property
+    def parsed_uri(self):
+        """Return the parsed requested uri."""
+        if not self._parsed_uri:
+            self._parsed_uri = urlparse(self.uri)
+        return self._parsed_uri
+
+    @property
+    def hostname(self):
+        """Return the host of the request."""
+        return self.parsed_uri.netloc
+
+    @property
+    def status(self):
+        """HTTP response status.
+
+        @rtype: int
+        """
+        return self.response_headers.status
+
+    @property
+    def encoding(self):
+        """Detect the response encoding."""
+        pos = self.response_headers['content-type'].find('charset=')
+        if pos >= 0:
+            pos += len('charset=')
+            encoding = self.response_headers['content-type'][pos:]
+        else:
+            encoding = 'ascii'
+            # Don't warn, many pages don't contain one
+            pywikibot.log(u"Http response doesn't contain a charset.")
+
+        return encoding
+
+    def decode(self, encoding):
+        """Return the decoded response."""
+        return self.raw.decode(encoding)
+
+    @property
+    def content(self):
+        """Return the response decoded by the detected encoding."""
+        return self.decode(self.encoding)
+
+    def __unicode__(self):
+        """Return the response decoded by the detected encoding."""
+        return self.content
+
+    def __bytes__(self):
+        """Return the undecoded response."""
+        return self.raw
 
 
 class HttpProcessor(threading.Thread):
