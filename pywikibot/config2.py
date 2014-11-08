@@ -138,11 +138,13 @@ def get_base_dir(test_directory=None):
 
     This is determined in the following order:
      1.  If the script was called with a -dir: argument, use the directory
-         provided in this argument
+         provided in this argument.
      2.  If the user has a PYWIKIBOT2_DIR environment variable, use the value
-         of it
-     3.  If user-config presents in current directory, use the current directory
-     4.  Use (and if necessary create) a 'pywikibot' folder under
+         of it.
+     3.  If user-config is present in current directory, use the current
+         directory.
+     4.  If user-config is present in pwb.py directory, use that directory
+     5.  Use (and if necessary create) a 'pywikibot' folder under
          'Application Data' or 'AppData\Roaming' (Windows) or
          '.pywikibot' directory (Unix and similar) under the user's home
          directory.
@@ -176,10 +178,14 @@ def get_base_dir(test_directory=None):
             base_dir = os.path.expanduser(base_dir)
             break
     else:
-        if 'PYWIKIBOT2_DIR' in os.environ:
-            base_dir = os.environ['PYWIKIBOT2_DIR']
+        if ('PYWIKIBOT2_DIR' in os.environ and
+                exists(os.path.abspath(os.environ['PYWIKIBOT2_DIR']))):
+            base_dir = os.path.abspath(os.environ['PYWIKIBOT2_DIR'])
         elif exists('.'):
-            return os.path.abspath('.')
+            base_dir = os.path.abspath('.')
+        elif ('PYWIKIBOT2_DIR_PWB' in os.environ and
+                exists(os.path.abspath(os.environ['PYWIKIBOT2_DIR_PWB']))):
+            base_dir = os.path.abspath(os.environ['PYWIKIBOT2_DIR_PWB'])
         else:
             base_dir_cand = []
             home = os.path.expanduser("~")
@@ -190,10 +196,11 @@ def get_base_dir(test_directory=None):
                     sub_dir = ["Application Data"]
                 elif win_version == 6:
                     sub_dir = ["AppData", "Roaming"]
+                else:
+                    raise WindowsError(u'Windows version %s not supported yet.'
+                                       % win_version)
                 base_dir_cand.extend([[home] + sub_dir + [DIRNAME_WIN],
                                      [home] + sub_dir + [DIRNAME_WIN_FBCK]])
-                #TODO: Throw exception otherwise to notify the user that the
-                #      version of Windows is not (yet) supported
             else:
                 base_dir_cand.append([home, DIRNAME_UNIX])
 
@@ -203,12 +210,14 @@ def get_base_dir(test_directory=None):
                     os.makedirs(dir, mode=0o700)
                 if exists(dir):
                     base_dir = dir
+                    break
 
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file
     if not os.path.isdir(base_dir):
         raise RuntimeError("Directory '%s' does not exist." % base_dir)
+    # check if user-config.py is in base_dir
     if not exists(base_dir):
         exc_text = "No user-config.py found in directory '%s'.\n" % base_dir
         if os.environ.get('PYWIKIBOT2_NO_USER_CONFIG', '0') == '1':
