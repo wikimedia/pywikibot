@@ -12,6 +12,7 @@ before_install:
 install:
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install ordereddict unittest2==0.6.0; fi
   - pip install six
+  - export GITHUB_USER=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 1`
   - mkdir ~/.pywikibot
   - mkdir ~/.python-eggs
   - chmod 700 ~/.python-eggs
@@ -20,15 +21,20 @@ install:
   - echo "import os" >> ~/.pywikibot/user-config.py
   - echo "mylang = '$LANGUAGE'" >> ~/.pywikibot/user-config.py
   - echo "family = '$FAMILY'" >> ~/.pywikibot/user-config.py
-  - echo "usernames['$FAMILY']['$LANGUAGE'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
-  - echo "usernames['wikipedia']['en'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
-  - echo "usernames['wikipedia']['test'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
-  - echo "usernames['wikidata']['test'] = 'Pywikibot-test'" >> ~/.pywikibot/user-config.py
+
   - echo "password_file = os.path.expanduser('~/.pywikibot/passwordfile')" >> ~/.pywikibot/user-config.py
+  - touch ~/.pywikibot/passwordfile
+
   - echo "max_retries = 2" >> ~/.pywikibot/user-config.py
 
-  - touch ~/.pywikibot/passwordfile
-  - echo "('Pywikibot-test', '"$USER_PASSWORD"')" > ~/.pywikibot/passwordfile
+  - if [[ "$GITHUB_USER" == "wikimedia" ]]; then PYWIKIBOT2_USERNAME="Pywikibot-test"; fi
+
+  - if [[ -n "$USER_PASSWORD" -a -n "$PYWIKIBOT2_USERNAME" ]]; then echo "usernames['$FAMILY']['$LANGUAGE'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py; fi
+  - if [[ -n "$USER_PASSWORD" -a -n "$PYWIKIBOT2_USERNAME" ]]; then echo "usernames['wikipedia']['en'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py; fi
+  - if [[ -n "$USER_PASSWORD" -a -n "$PYWIKIBOT2_USERNAME" ]]; then echo "usernames['wikipedia']['test'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py; fi
+  - if [[ -n "$USER_PASSWORD" -a -n "$PYWIKIBOT2_USERNAME" ]]; then echo "usernames['wikidata']['test'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py; fi
+
+  - if [[ -n "$USER_PASSWORD" -a -n "$PYWIKIBOT2_USERNAME" ]]; then echo "('$PYWIKIBOT2_USERNAME', '$USER_PASSWORD')" > ~/.pywikibot/passwordfile; fi
 
   - cd externals/httplib2
   - python setup.py install
@@ -37,7 +43,7 @@ install:
   - python -c "import setuptools; print(setuptools.__version__)"
 
 script:
-  - if [[ "$USE_NOSE" == "1" ]]; then nosetests -v -a '!site,!net' tests; else python setup.py test; fi
+  - if [[ "$USE_NOSE" == "1" ]]; then nosetests -v ; else python setup.py test; fi
 
 env:
   global:
