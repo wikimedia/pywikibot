@@ -601,7 +601,8 @@ class Request(MutableMapping):
                 continue
             if not isinstance(rawdata, unicode):
                 rawdata = rawdata.decode(self.site.encoding())
-            pywikibot.debug(u"API response received:\n" + rawdata, _logger)
+            pywikibot.debug((u"API response received from %s:\n" % self.site) +
+                            rawdata, _logger)
             if rawdata.startswith(u"unknown_action"):
                 raise APIError(rawdata[:14], rawdata[16:])
             try:
