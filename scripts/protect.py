@@ -99,7 +99,7 @@ class ProtectionRobot(Bot):
                 if choice == 'n':
                     continue
                 elif choice == 'a':
-                    self.option['always'] = True
+                    self.options['always'] = True
             applicable = page.applicable_protections()
             protections = dict(
                 [prot for prot in self.protections if prot[0] in applicable])
