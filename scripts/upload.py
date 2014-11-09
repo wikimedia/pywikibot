@@ -218,7 +218,11 @@ class UploadRobot:
                     default=not self.description):
                 from pywikibot import editor as editarticle
                 editor = editarticle.TextEditor()
-                newDescription = editor.edit(self.description)
+                try:
+                    newDescription = editor.edit(self.description)
+                except Exception as e:
+                    pywikibot.error(e)
+                    continue
                 # if user saved / didn't press Cancel
                 if newDescription:
                     self.description = newDescription

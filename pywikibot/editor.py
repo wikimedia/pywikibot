@@ -109,9 +109,19 @@ class TextEditor(object):
                     newcontent = temp_file.read()
                 os.unlink(tempFilename)
                 return self.restoreLinebreaks(newcontent)
-        else:
-            return self.restoreLinebreaks(
-                pywikibot.ui.editText(
-                    text,
-                    jumpIndex=jumpIndex,
-                    highlight=highlight))
+
+        try:
+            import gui  # noqa
+        except ImportError as e:
+            raise pywikibot.Error(
+                'Could not load GUI modules: %s\nNo editor available.\n'
+                'Set your favourite editor in user-config.py "editor", '
+                'or install python packages tkinter and idlelib, which '
+                'are typically part of Python but may be packaged separately '
+                'on your platform.\n' % e)
+
+        return self.restoreLinebreaks(
+            pywikibot.ui.editText(
+                text,
+                jumpIndex=jumpIndex,
+                highlight=highlight))
