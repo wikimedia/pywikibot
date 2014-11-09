@@ -29,6 +29,7 @@ __version__ = '$Id$'
         UITestCase:
             Not integrated; direct subclass of unittest.TestCase.
 """
+import collections
 import time
 import sys
 import os
@@ -132,6 +133,32 @@ class TestCaseBase(unittest.TestCase):
                                     % list(namespaces - set(page_namespaces)))
         else:
             self.assertEqual(set(page_namespaces), namespaces)
+
+    def assertPagelistTitles(self, gen, titles):
+        """
+        Test that pages in gen match expected titles.
+
+        If the expected titles is a tuple, assert that the generator yields
+        pages with the same number and order of titles.
+
+        @param gen: Page generator
+        @type gen: generator of Page
+        @param titles: Expected titles
+        @type titles: tuple or list
+        """
+        if isinstance(titles, tuple):
+            working_set = collections.deque(titles)
+
+        for page in gen:
+            title = page.title()
+            self.assertIn(title, titles)
+            if isinstance(titles, tuple):
+                self.assertIn(title, working_set)
+                self.assertEqual(title, working_set[0])
+                working_set.popleft()
+
+        if isinstance(titles, tuple):
+            self.assertEqual(working_set, collections.deque([]))
 
 
 class TestLoggingMixin(TestCaseBase):

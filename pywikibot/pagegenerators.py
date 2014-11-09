@@ -76,7 +76,8 @@ parameterHelp = u"""\
 -uncatfiles       Work on all files which are not categorised.
 
 -file             Read a list of pages to treat from the named text file.
-                  Page titles in the file must be enclosed with [[brackets]].
+                  Page titles in the file may be either enclosed with
+                  [[brackets]], or be separated by new lines.
                   Argument can also be given as "-file:filename".
 
 -filelinks        Work on all pages that use a certain image/media file.
