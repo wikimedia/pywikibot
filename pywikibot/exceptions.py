@@ -22,6 +22,7 @@ PageRelatedError: any exception which is caused by an operation on a Page.
   - IsRedirectPage: Page is a redirect page
   - IsNotRedirectPage: Page is not a redirect page
   - CircularRedirect: Page is a circular redirect
+  - InterwikiRedirectPage: Page is a redirect to another site.
   - SectionError: The section specified by # does not exist
 
 PageSaveRelatedError: page exceptions within the save operation on a Page
@@ -62,9 +63,11 @@ class Error(UnicodeMixin, Exception):  # noqa
 
     # NOTE: UnicodeMixin must be the first object Error class is derived from.
     def __init__(self, arg):
+        """Constructor."""
         self.unicode = arg
 
     def __unicode__(self):
+        """Return a unicode string representation."""
         return self.unicode
 
 
@@ -77,7 +80,7 @@ class PageRelatedError(Error):
     Page, and when a generic message can be written once for all.
     """
 
-    # Preformated UNICODE message where the page title will be inserted
+    # Preformatted UNICODE message where the page title will be inserted
     # Override this in subclasses.
     # u"Oh noes! Page %s is too funky, we should not delete it ;("
     message = None
@@ -105,6 +108,7 @@ class PageRelatedError(Error):
             super(PageRelatedError, self).__init__(self.message % page)
 
     def getPage(self):
+        """Return the page related to the exception."""
         return self.page
 
 
@@ -120,6 +124,7 @@ class PageSaveRelatedError(PageRelatedError):  # noqa
     # which could be printed
     @property
     def args(self):
+        """Expose args."""
         return unicode(self)
 
 
@@ -140,6 +145,7 @@ class OtherPageSaveError(PageSaveRelatedError):
 
     @property
     def args(self):
+        """Expose args."""
         return unicode(self.reason)
 
 
@@ -215,6 +221,30 @@ class CircularRedirect(PageRelatedError):
     """
 
     message = u"Page %s is a circular redirect."
+
+
+class InterwikiRedirectPage(PageRelatedError):
+
+    """
+    Page is a redirect to another site.
+
+    This is considered invalid in Pywikibot. See Bug 73184.
+
+    """
+
+    message = (u"Page redirects to a page on another Site.\n"
+               u"Page: %(page)s\n"
+               u"Target page: %(target_page)s on %(target_site)s.")
+
+    def __init__(self, page, target_page):
+        """ Constructor.
+
+        @param target_page: Target page of the redirect.
+        @type reason: Page
+        """
+        self.target_page = target_page
+        self.target_site = target_page.site
+        super(InterwikiRedirectPage, self).__init__(page)
 
 
 class InvalidTitle(Error):  # noqa
@@ -313,6 +343,7 @@ class SpamfilterError(PageSaveRelatedError):
     message = "Edit to page %(title)s rejected by spam filter due to content:\n%(url)s"
 
     def __init__(self, page, url):
+        """Constructor."""
         self.url = url
         super(SpamfilterError, self).__init__(page)
 
