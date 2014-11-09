@@ -47,9 +47,6 @@ This script understands the following command-line arguments:
 
 -url[:#]            Define the url where are the images
 
--untagged[:#]       Use daniel's tool as generator:
-                    https://toolserver.org/~daniel/WikiSense/UntaggedImages.php
-
 -nologerror         If given, this option will disable the error that is risen
                     when the log is full.
 
@@ -820,41 +817,6 @@ class checkImagesBot(object):
                 except pywikibot.UserActionRefuse:
                     pywikibot.output("User is not mailable, aborted")
                     return
-
-    def untaggedGenerator(self, untaggedProject, limit):
-        """
-        Generator that yield the files without license.
-
-        It's based on a tool of the toolserver.
-        """
-        lang = untaggedProject.split('.', 1)[0]
-        project = '.%s' % untaggedProject.split('.', 1)[1]
-
-        URL = u'https://toolserver.org/~daniel/WikiSense/UntaggedImages.php?'
-        if lang == 'commons':
-            link = (
-                URL +
-                'wikifam=commons.wikimedia.org&since=-100d&until=&img_user_text=&order=img_timestamp&max=100&order=img_timestamp&format=html'
-            )
-        else:
-            link = (
-                URL +
-                'wikilang=%s&wikifam=%s&order=img_timestamp&max=%s&ofs=0&max=%s'
-                % (lang, project, limit, limit)
-            )
-        text = self.site.getUrl(link, no_hostname=True)
-        results = re.findall(
-            r"<td valign='top' title='Name'><a href='http[s]?://.*?\.org/w/index\.php\?title=(.*?)'>.*?</a></td>",
-            text)
-        if results:
-            for result in results:
-                wikiPage = pywikibot.FilePage(self.site, result)
-                yield wikiPage
-        else:
-            pywikibot.output(link)
-            raise NothingFound(
-                u'Nothing found! Try to use the tool by yourself to be sure '
-                u'that it works!')
 
     def regexGenerator(self, regexp, textrun):
         """Find page to yield using regex to parse text."""
@@ -1771,7 +1733,6 @@ def main(*args):
     normal = False  # Check the new images or use another generator?
     urlUsed = False  # Use the url-related function instead of the new-pages
     regexGen = False  # Use the regex generator
-    untagged = False  # Use the untagged generator
     duplicatesActive = False  # Use the duplicate option
     duplicatesReport = False  # Use the duplicate-report option
     sendemailActive = False  # Use the send-email
@@ -1876,13 +1837,6 @@ def main(*args):
             generator = pg.ReferringPageGenerator(
                 pywikibot.Page(pywikibot.Site(), refName))
             repeat = False
-        elif arg.startswith('-untagged'):
-            untagged = True
-            if len(arg) == 9:
-                projectUntagged = str(pywikibot.input(
-                    u'In which project should I work?'))
-            elif len(arg) > 9:
-                projectUntagged = str(arg[10:])
 
     if not generator:
         normal = True
@@ -1909,9 +1863,6 @@ def main(*args):
         Bot = checkImagesBot(site, sendemailActive=sendemailActive,
                              duplicatesReport=duplicatesReport,
                              logFullError=logFullError)
-        if untagged:
-            generator = Bot.untaggedGenerator(projectUntagged, limit)
-            normal = False
         if normal:
             generator = pg.NewimagesPageGenerator(total=limit, site=site)
         # if urlUsed and regexGen, get the source for the generator
