@@ -296,6 +296,9 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         """Return the custom name with required colons."""
         return Namespace._colons(self.id, self.custom_name)
 
+    def __int__(self):
+        return self.id
+
     def __index__(self):
         return self.id
 
