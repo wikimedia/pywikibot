@@ -1560,6 +1560,8 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
     def undelete(self, comment=None):
         """Undelete revisions based on the markers set by previous calls.
 
+        NOT IMPLEMENTED.
+
         If no calls have been made since loadDeletedRevisions(), everything
         will be restored.
 
@@ -1579,12 +1581,8 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         @param comment: The undeletion edit summary.
         @type comment: basestring
         """
-        if comment is None:
-            pywikibot.output(u'Preparing to undelete %s.'
-                             % (self.title(asLink=True)))
-            comment = pywikibot.input(
-                u'Please enter a reason for the undeletion:')
-        return self.site.undelete(self, comment)
+        # FIXME: Site.undelete needs to be implemented.
+        raise NotImplementedError('Page.undelete is not implemented.')
 
     @deprecate_arg("throttle", None)
     def protect(self, edit=False, move=False, create=None, upload=None,
