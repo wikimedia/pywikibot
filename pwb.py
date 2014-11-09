@@ -151,7 +151,10 @@ if sys.version_info[0] == 2 and sys.version_info[1] == 6:
 
 # Search for user-config.py before creating one.
 try:
-    # user-config.py already exists
+    # If successful, user-config.py already exists in one of the candidate
+    # directories. See config2.py for details on search order.
+    # Use env var to communicate to config2.py pwb.py location (bug 72918).
+    os.environ['PYWIKIBOT2_DIR_PWB'] = os.path.split(__file__)[0]
     import pywikibot  # noqa
 except RuntimeError as err:
     # user-config.py to be created
