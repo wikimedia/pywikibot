@@ -7,7 +7,7 @@ It is run automatically when a bot first tries to save a page retrieved. The
 watchlist can be updated manually by running this script. The list will also
 be reloaded automatically once a month.
 
-Syntax: python watchlist [-all]
+Syntax: python watchlist [-all | -new]
 
 Command line options:
     -all  -  Reloads watchlists for all wikis where a watchlist is already
@@ -24,13 +24,11 @@ Command line options:
 __version__ = '$Id$'
 #
 
-import re
-import pickle
-import os.path
-import time
-
+import os
 import pywikibot
 from pywikibot import config
+from pywikibot.data.api import CachedRequest
+from scripts.maintenance.cache import CacheEntry
 
 cache = {}
 
@@ -43,23 +41,8 @@ def get(site=None):
         # Use cached copy if it exists.
         watchlist = cache[site]
     else:
-        fn = config.datafilepath('watchlists',
-                                 'watchlist-%s-%s.dat'
-                                 % (site.family.name, site.code))
-        try:
-            # find out how old our saved dump is (in seconds)
-            file_age = time.time() - os.path.getmtime(fn)
-            # if it's older than 1 month, reload it
-            if file_age > 30 * 24 * 60 * 60:
-                pywikibot.output(
-                    u'Copy of watchlist is one month old, reloading')
-                refresh(site)
-        except OSError:
-            # no saved watchlist exists yet, retrieve one
-            refresh(site)
-        with open(fn, 'rb') as f:
-            watchlist = pickle.load(f)
         # create cached copy
+        watchlist = refresh(site)
         cache[site] = watchlist
     return watchlist
 
@@ -86,7 +69,7 @@ def refresh(site, sysop=False):
     # pywikibot.put_throttle() # It actually is a get, but a heavy one.
     watchlist = []
     while True:
-        req = pywikibot.data.api.Request(**params)
+        req = CachedRequest(config.API_config_expiry, **params)
         data = req.submit()
         if 'error' in data:
             raise RuntimeError('ERROR: %s' % data)
@@ -96,41 +79,35 @@ def refresh(site, sysop=False):
             params.update(data['query-continue']['watchlistraw'])
         else:
             break
-
-    # Save the watchlist to disk
-    # The file is stored in the watchlists subdir. Create if necessary.
-    with open(config.datafilepath('watchlists',
-                                  'watchlist-%s-%s%s.dat'
-                                  % (site.family.name, site.code,
-                                     '-sysop' if sysop else '')),
-              'wb') as f:
-        pickle.dump(watchlist, f, protocol=config.pickle_protocol)
+    return watchlist
 
 
-def refresh_all(new=False, sysop=False):
-    """Fetch and locally cache several watchlists."""
-    if new:
-        pywikibot.output(
-            'Downloading all watchlists for your accounts in user-config.py')
-        for family in config.usernames:
-            for lang in config.usernames[family]:
-                refresh(pywikibot.Site(lang, family), sysop=sysop)
-        for family in config.sysopnames:
-            for lang in config.sysopnames[family]:
-                refresh(pywikibot.Site(lang, family), sysop=sysop)
+def refresh_all(sysop=False):
+    """Reload watchlists for all wikis where a watchlist is already present."""
+    cache_path = CachedRequest._get_cache_dir()
+    files = os.listdir(cache_path)
+    seen = []
+    for filename in files:
+        entry = CacheEntry(cache_path, filename)
+        entry._load_cache()
+        entry.parse_key()
+        entry._rebuild()
+        if entry.site not in seen:
+            if entry._data['watchlistraw']:
+                refresh(entry.site)
+                seen.append(entry.site)
 
-    else:
-        import dircache
-        filenames = dircache.listdir(
-            config.datafilepath('watchlists'))
-        watchlist_filenameR = re.compile('watchlist-([a-z\-:]+).dat')
-        for filename in filenames:
-            match = watchlist_filenameR.match(filename)
-            if match:
-                arr = match.group(1).split('-')
-                family = arr[0]
-                lang = '-'.join(arr[1:])
-                refresh(pywikibot.Site(lang, family))
+
+def refresh_new(sysop=False):
+    """Load watchlists of all wikis for accounts set in user-config.py."""
+    pywikibot.output(
+        'Downloading all watchlists for your accounts in user-config.py')
+    for family in config.usernames:
+        for lang in config.usernames[family]:
+            refresh(pywikibot.Site(lang, family), sysop=sysop)
+    for family in config.sysopnames:
+        for lang in config.sysopnames[family]:
+            refresh(pywikibot.Site(lang, family), sysop=sysop)
 
 
 def main(*args):
@@ -155,7 +132,7 @@ def main(*args):
     if all:
         refresh_all(sysop=sysop)
     elif new:
-        refresh_all(new, sysop=sysop)
+        refresh_new(sysop=sysop)
     else:
         site = pywikibot.Site()
         refresh(site, sysop=sysop)
