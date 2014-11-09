@@ -10,7 +10,9 @@ Arguments:
   -noverify     Do not ask for verification of the upload description if one
                 is given
   -abortonwarn: Abort upload on the specified warning type. If no warning type
-                is specified abort on all warnings.
+                is specified, aborts on any warning.
+  -ignorewarn:  Ignores specified upload warnings. If no warning type is
+                specified, ignores all warnings. Use with caution
   -chunked:     Upload the file in chunks (more overhead, but restartable). If
                 no value is specified the chunk size is 1 MiB. The value must
                 be a number which can be preceded by a suffix. The units are:
@@ -70,7 +72,8 @@ class UploadRobot:
 
         @param ignoreWarning: Set this to True if you want to upload even if
             another file would be overwritten or another mistake would be
-            risked.
+            risked. You can also set it to an array of warning codes to
+            selectively ignore specific warnings.
 
         """
         self.url = url
@@ -237,6 +240,13 @@ class UploadRobot:
         else:
             return warn_code in self.aborts
 
+    def ignore_on_warn(self, warn_code):
+        """Determine if the warning message should be ignored."""
+        if self.ignoreWarning is True:
+            return True
+        else:
+            return warn_code in self.ignoreWarning
+
     def upload_image(self, debug=False):
         """Upload the image at self.url to the target wiki.
 
@@ -254,24 +264,32 @@ class UploadRobot:
         pywikibot.output(u'Uploading file to %s via API....' % site)
 
         try:
+            apiIgnoreWarnings = False
+            if self.ignoreWarning is True:
+                apiIgnoreWarnings = True
             if self.uploadByUrl:
                 site.upload(imagepage, source_url=self.url,
-                            ignore_warnings=self.ignoreWarning)
+                            ignore_warnings=apiIgnoreWarnings)
             else:
                 if "://" in self.url:
                     temp = self.read_file_content()
                 else:
                     temp = self.url
                 site.upload(imagepage, source_filename=temp,
-                            ignore_warnings=self.ignoreWarning,
+                            ignore_warnings=apiIgnoreWarnings,
                             chunk_size=self.chunk_size)
 
         except pywikibot.data.api.UploadWarning as warn:
             pywikibot.output(
-                u'We got a warning message: {0}'.format(warn.message))
-            if (not self.abort_on_warn(warn.code) and
-                    pywikibot.input_yn(u"Do you want to ignore?",
-                                       default=False, automatic_quit=False)):
+                u'We got a warning message: {0} - {1}'.format(warn.code, warn.message))
+            if self.abort_on_warn(warn.code):
+                answer = False
+            elif self.ignore_on_warn(warn.code):
+                answer = True
+            else:
+                answer = pywikibot.input_yn(u"Do you want to ignore?",
+                                            default=False, automatic_quit=False)
+            if answer:
                 self.ignoreWarning = True
                 self.keepFilename = True
                 return self.upload_image(debug)
@@ -332,6 +350,7 @@ def main(*args):
     useFilename = None
     verifyDescription = True
     aborts = set()
+    ignorewarn = set()
     chunk_size = 0
     chunk_size_regex = r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$'
     chunk_size_regex = re.compile(chunk_size_regex, re.I)
@@ -351,6 +370,11 @@ def main(*args):
                     aborts.add(arg[len('-abortonwarn:'):])
                 else:
                     aborts = True
+            elif arg.startswith('-ignorewarn'):
+                if len(arg) > len('-ignorewarn:') and ignorewarn is not True:
+                    ignorewarn.add(arg[len('-ignorewarn:'):])
+                else:
+                    ignorewarn = True
             elif arg.startswith('-chunked'):
                 match = chunk_size_regex.match(arg)
                 if match:
@@ -383,7 +407,8 @@ def main(*args):
     bot = UploadRobot(url, description=description, useFilename=useFilename,
                       keepFilename=keepFilename,
                       verifyDescription=verifyDescription,
-                      aborts=aborts, chunk_size=chunk_size)
+                      aborts=aborts, ignoreWarning=ignorewarn,
+                      chunk_size=chunk_size)
     bot.run()
 
 if __name__ == "__main__":
