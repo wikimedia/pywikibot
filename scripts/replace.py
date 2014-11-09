@@ -720,11 +720,10 @@ LIMIT 200""" % (whereClause, exceptClause)
     pywikibot.Site().login()
     bot.run()
 
-    def display_edit_counter(bot):
-        pywikibot.output(u'\n%s pages changed.' % bot.changed_pages)
-
-    # Queue last request to display number of changed pages.
-    pywikibot.async_request(display_edit_counter, bot)
+    # Explicitly call pywikibot.stopme().
+    # It will make sure the callback is triggered before replace.py is unloaded.
+    pywikibot.stopme()
+    pywikibot.output(u'\n%s pages changed.' % bot.changed_pages)
 
 
 if __name__ == "__main__":
