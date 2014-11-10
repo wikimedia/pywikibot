@@ -194,13 +194,13 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         filename = os.path.join(_data_dir, 'pagelist-brackets.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
-        self.assertPagelistTitles(titles, self.expected_titles)
+        self.assertPagelistTitles(titles, self.expected_titles, site)
 
     def test_lines(self):
         filename = os.path.join(_data_dir, 'pagelist-lines.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
-        self.assertPagelistTitles(titles, self.expected_titles)
+        self.assertPagelistTitles(titles, self.expected_titles, site)
 
 
 class TestDequePreloadingGenerator(DefaultSiteTestCase):

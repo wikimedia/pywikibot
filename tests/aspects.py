@@ -134,7 +134,7 @@ class TestCaseBase(unittest.TestCase):
         else:
             self.assertEqual(set(page_namespaces), namespaces)
 
-    def assertPagelistTitles(self, gen, titles):
+    def assertPagelistTitles(self, gen, titles, site=None):
         """
         Test that pages in gen match expected titles.
 
@@ -146,18 +146,25 @@ class TestCaseBase(unittest.TestCase):
         @param titles: Expected titles
         @type titles: tuple or list
         """
-        if isinstance(titles, tuple):
+        is_tuple = isinstance(titles, tuple)
+        if site:
+            titles = [pywikibot.Link(title, site).canonical_title()
+                      for title in titles]
+            if is_tuple:
+                titles = tuple(titles)
+
+        if is_tuple:
             working_set = collections.deque(titles)
 
         for page in gen:
             title = page.title()
             self.assertIn(title, titles)
-            if isinstance(titles, tuple):
+            if is_tuple:
                 self.assertIn(title, working_set)
                 self.assertEqual(title, working_set[0])
                 working_set.popleft()
 
-        if isinstance(titles, tuple):
+        if is_tuple:
             self.assertEqual(working_set, collections.deque([]))
 
 
