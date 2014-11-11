@@ -1417,6 +1417,8 @@ def WikibaseItemFilterPageGenerator(generator, has_item=True,
                         '%s doesn\'t have a wikidata item.  Skipping.' % page)
                 continue
 
+        yield page
+
 
 # TODO below
 @deprecated_args(extension=None, number="total", repeat=None)
