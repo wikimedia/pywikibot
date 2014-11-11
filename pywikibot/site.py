@@ -597,6 +597,19 @@ class BaseSite(ComparableMixin):
         return [lang for lang in self.languages()
                 if lang[:1].upper() + lang[1:] not in nsnames]
 
+    def _cache_interwikimap(self, refresh=False):
+        """Cache the interwikimap with usable site instances."""
+        # _iw_sites is a local cache to return a APISite instance depending
+        # on the interwiki prefix of that site
+        if refresh or not hasattr(self, '_iw_sites'):
+            self._iw_sites = {}
+            for iw in self.siteinfo['interwikimap']:
+                try:
+                    site = (pywikibot.Site(url=iw['url']), 'local' in iw)
+                except Error:
+                    site = (None, False)
+                self._iw_sites[iw['prefix']] = site
+
     def interwiki(self, prefix):
         """
         Return the site for a corresponding interwiki prefix.
@@ -605,30 +618,39 @@ class BaseSite(ComparableMixin):
             doesn't match any of the existing families.
         @raise KeyError: if the prefix is not an interwiki prefix.
         """
-        # _iw_sites is a local cache to return a APISite instance depending
-        # on the interwiki prefix of that site
-        if not hasattr(self, '_iw_sites'):
-            self._iw_sites = {}
+        self._cache_interwikimap()
         if prefix in self._iw_sites:
             site = self._iw_sites[prefix]
-        else:
-            for interwiki in self.siteinfo['interwikimap']:
-                if interwiki['prefix'] == prefix:
-                    break
+            if site[0]:
+                return site[0]
             else:
-                raise KeyError(
-                    u"'{0}' is not an interwiki prefix.".format(prefix))
-            try:
-                site = (pywikibot.Site(url=interwiki['url']),
-                        'local' in interwiki)
-            except Error:
-                site = (None, False)
-            self._iw_sites[prefix] = site
-        if site[0]:
-            return site[0]
+                raise SiteDefinitionError(
+                    u"No family/site found for prefix '{0}'".format(prefix))
         else:
-            raise SiteDefinitionError(
-                u"No family/site found for prefix '{0}'".format(prefix))
+            raise KeyError(u"'{0}' is not an interwiki prefix.".format(prefix))
+
+    def interwiki_prefix(self, site):
+        """
+        Return the interwiki prefixes going to that site.
+
+        The interwiki prefixes are ordered first by length (shortest first)
+        and then alphabetically.
+
+        @param site: The targeted site, which might be it's own.
+        @type site: L{BaseSite}
+        @return: The interwiki prefixes
+        @rtype: list (guaranteed to be not empty)
+        @raise KeyError: if there is no interwiki prefix for that site.
+        """
+        assert(site is not None)
+        self._cache_interwikimap()
+        prefixes = set([prefix
+                        for prefix, cache_entry in self._iw_sites.items()
+                        if cache_entry[0] == site])
+        if not prefixes:
+            raise KeyError(
+                u"There is no interwiki prefix to '{0}'".format(site))
+        return sorted(prefixes, key=lambda p: (len(p), p))
 
     def local_interwiki(self, prefix):
         """
