@@ -1,5 +1,5 @@
 [[file]] [[bracket]]
 [[MediaWiki:Test|foo]] with
-[[under_score]]
+[[under_score]], [[Upper case]]
 and
 text.

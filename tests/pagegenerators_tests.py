@@ -250,19 +250,24 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
 
     dry = True
 
-    expected_titles = ('File', 'Bracket', 'MediaWiki:Test', 'Under score')
+    expected_titles = {
+        'case-sensitive': ('file', 'bracket', 'MediaWiki:Test',
+                           'under score', 'Upper case'),
+        'first-letter': ('File', 'Bracket', 'MediaWiki:Test', 'Under score',
+                         'Upper case'),
+    }
 
     def test_brackets(self):
         filename = os.path.join(_data_dir, 'pagelist-brackets.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
-        self.assertPagelistTitles(titles, self.expected_titles, site)
+        self.assertPagelistTitles(titles, self.expected_titles[site.case()])
 
     def test_lines(self):
         filename = os.path.join(_data_dir, 'pagelist-lines.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
-        self.assertPagelistTitles(titles, self.expected_titles, site)
+        self.assertPagelistTitles(titles, self.expected_titles[site.case()])
 
 
 class TestDequePreloadingGenerator(DefaultSiteTestCase):
