@@ -338,7 +338,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
             if not get_redirect:
                 raise
 
-        return self._revisions[self._revid].text
+        return self.latest_revision.text
 
     def _getInternals(self, sysop):
         """Helper function for get().
@@ -396,11 +396,24 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                   self.title(asUrl=True),
                   (oldid if oldid is not None else self.latestRevision()))
 
-    def latestRevision(self):
+    @property
+    def latest_revision_id(self):
         """Return the current revision id for this page."""
         if not hasattr(self, '_revid'):
             self.site.loadrevisions(self)
         return self._revid
+
+    def latestRevision(self):
+        """Return the current revision id for this page."""
+        return self.latest_revision_id
+
+    @property
+    def latest_revision(self):
+        """Return the current revision for this page."""
+        rev = self.latest_revision_id
+        if rev not in self._revisions:
+            self.site.loadrevisions(self)
+        return self._revisions[rev]
 
     @property
     def text(self):
@@ -491,20 +504,14 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
 
         @return: unicode
         """
-        rev = self.latestRevision()
-        if rev not in self._revisions:
-            self.site.loadrevisions(self)
-        return self._revisions[rev].user
+        return self.latest_revision.user
 
     def isIpEdit(self):
         """Return True if last editor was unregistered.
 
         @return: bool
         """
-        rev = self.latestRevision()
-        if rev not in self._revisions:
-            self.site.loadrevisions(self)
-        return self._revisions[rev].anon
+        return self.latest_revision.anon
 
     def lastNonBotUser(self):
         """Return name or IP address of last human/non-bot user to edit page.
@@ -529,17 +536,16 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
 
         return self._lastNonBotUser
 
+    @deprecated_args(datetime=None)
     def editTime(self):
         """Return timestamp of last revision to page.
 
-        @return: pywikibot.Timestamp
+        @rtype: pywikibot.Timestamp
         """
-        rev = self.latestRevision()
-        if rev not in self._revisions:
-            self.site.loadrevisions(self)
-        return self._revisions[rev].timestamp
+        return self.latest_revision.timestamp
 
-    def previousRevision(self):
+    @property
+    def previous_revision_id(self):
         """Return the revision id for the previous revision of this Page.
 
         If the page has only one revision, it shall return -1.
@@ -553,6 +559,9 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         else:
             return min(x.revid for x in history)
 
+    def previousRevision(self):
+        return self.previous_revision_id
+
     def exists(self):
         """Return True if page exists on the wiki, even if it's a redirect.
 
@@ -563,6 +572,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """
         return self.site.page_exists(self)
 
+    @property
     def oldest_revision(self):
         return self.getVersionHistory(reverseOrder=True, total=1)[0]
 

@@ -1149,7 +1149,7 @@ def EdittimeFilterPageGenerator(generator,
                 continue
 
         if do_first_edit:
-            first_edit = page.oldest_revision().timestamp
+            first_edit = page.oldest_revision.timestamp
 
             if first_edit < first_edit_start:
                 if show_filtered:
