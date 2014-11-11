@@ -130,7 +130,7 @@ class TestSiteObject(DefaultSiteTestCase):
                          'Site("%s", "%s")'
                          % (self.code, self.family))
         self.assertIsInstance(mysite.linktrail(), basestring)
-        self.assertIsInstance(mysite.redirect(default=True), basestring)
+        self.assertIsInstance(mysite.redirect(), basestring)
         try:
             dabcat = mysite.disambcategory()
         except pywikibot.Error as e:

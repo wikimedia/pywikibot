@@ -685,20 +685,18 @@ class BaseSite(ComparableMixin):
                                        old_name='normalizeNamespace',
                                        class_name='BaseSite')
 
-    def redirect(self, default=True):
-        """Return list of localized redirect tags for the site.
-
-        If default is True, falls back to 'REDIRECT' if the site has no
-        special redirect tag.
-
-        """
+    @deprecated_args(default=None)
+    def redirect(self):
+        """Return list of localized redirect tags for the site."""
         return [u"REDIRECT"]
 
-    def pagenamecodes(self, default=True):
+    @deprecated_args(default=None)
+    def pagenamecodes(self):
         """Return list of localized PAGENAME tags for the site."""
         return [u"PAGENAME"]
 
-    def pagename2codes(self, default=True):
+    @deprecated_args(default=None)
+    def pagename2codes(self):
         """Return list of localized PAGENAMEE tags for the site."""
         return [u"PAGENAMEE"]
 
@@ -1980,6 +1978,7 @@ class APISite(BaseSite):
             return pywikibot.Timestamp.fromtimestampformat(
                 self.expand_text("{{CURRENTTIMESTAMP}}"))
 
+    @need_version("1.14")
     def getmagicwords(self, word):
         """Return list of localized "word" magic words for the site."""
         if not hasattr(self, "_magicwords"):
@@ -1992,12 +1991,9 @@ class APISite(BaseSite):
         else:
             return [word]
 
-    def redirect(self, default=True):
-        """Return the preferred localized #REDIRECT keyword.
-
-        Argument is ignored (but maintained for backwards-compatibility).
-
-        """
+    @deprecated_args(default=None)
+    def redirect(self):
+        """Return the localized #REDIRECT keyword."""
         # return the magic word without the preceding '#' character
         return self.getmagicwords("redirect")[0].lstrip("#")
 
@@ -2018,11 +2014,13 @@ class APISite(BaseSite):
             pattern = None
         return BaseSite.redirectRegex(self, pattern)
 
-    def pagenamecodes(self, default=True):
+    @deprecated_args(default=None)
+    def pagenamecodes(self):
         """Return list of localized PAGENAME tags for the site."""
         return self.getmagicwords("pagename")
 
-    def pagename2codes(self, default=True):
+    @deprecated_args(default=None)
+    def pagename2codes(self):
         """Return list of localized PAGENAMEE tags for the site."""
         return self.getmagicwords("pagenamee")
 
