@@ -7,11 +7,14 @@
 # Distributed under the terms of the MIT license.
 __version__ = '$Id$'
 
+import datetime
 import os
 import sys
 
 import pywikibot
 from pywikibot import pagegenerators
+
+from pywikibot.pagegenerators import PagesFromTitlesGenerator
 
 from tests import _data_dir
 from tests.aspects import (
@@ -23,7 +26,28 @@ from tests.aspects import (
 from tests.thread_tests import GeneratorIntersectTestCase
 
 
-class TestPageGenerators(TestCase):
+en_wp_page_titles = (
+    # just a bunch of randomly selected titles for English Wikipedia tests
+    u"Eastern Sayan",
+    u"The Addams Family (pinball)",
+    u"Talk:Nowy Sącz",
+    u"Talk:Battle of Węgierska Górka",
+    u"Template:!",
+    u"Template:Template",
+)
+
+en_wp_nopage_titles = (
+    u"Cities in Burkina Faso",
+    u"Talk:Hispanic (U.S. Census)",
+    u"Talk:Stołpce",
+    u"Template:!/Doc",
+    u"Template:!/Meta",
+    u"Template:Template/Doc",
+    u"Template:Template/Meta",
+)
+
+
+class TestDryPageGenerators(TestCase):
 
     """Test pagegenerators methods."""
 
@@ -32,25 +56,10 @@ class TestPageGenerators(TestCase):
 
     dry = True
 
-    titles = (
-        # just a bunch of randomly selected titles
-        u"Cities in Burkina Faso",
-        u"Eastern Sayan",
-        u"The Addams Family (pinball)",
-        u"Talk:Hispanic (U.S. Census)",
-        u"Talk:Stołpce",
-        u"Talk:Nowy Sącz",
-        u"Talk:Battle of Węgierska Górka",
-        u"Template:!",
-        u"Template:!/Doc",
-        u"Template:!/Meta",
-        u"Template:Template",
-        u"Template:Template/Doc",
-        u"Template:Template/Meta",
-    )
+    titles = en_wp_page_titles + en_wp_nopage_titles
 
     def setUp(self):
-        super(TestPageGenerators, self).setUp()
+        super(TestDryPageGenerators, self).setUp()
         self.site = self.get_site()
 
     def assertFunction(self, obj):
@@ -113,8 +122,8 @@ class TestPageGenerators(TestCase):
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['template', '/meta'],
                                                       quantifier='any')
         self.assertPagelistTitles(gen,
-                                  ('Template:!/Meta',
-                                   'Template:Template',
+                                  ('Template:Template',
+                                   'Template:!/Meta',
                                    'Template:Template/Doc',
                                    'Template:Template/Meta'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles,
@@ -154,6 +163,59 @@ class TestPageGenerators(TestCase):
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), 'talk',
                                                           quantifier='none')
         self.assertEqual(len(tuple(gen)), 9)
+
+
+class EdittimeFilterPageGeneratorTestCase(TestCase):
+
+    """Test EdittimeFilterPageGenerator."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    titles = en_wp_page_titles
+
+    def test_first_edit(self):
+        expect = (
+            u'The Addams Family (pinball)',
+            u'Talk:Nowy Sącz',
+            u'Template:Template',
+        )
+        gen = PagesFromTitlesGenerator(self.titles, self.site)
+        gen = pagegenerators.EdittimeFilterPageGenerator(
+            gen, first_edit_end=datetime.datetime(2006, 1, 1))
+        self.assertPagelistTitles(gen, titles=expect, site=self.site)
+
+        gen = PagesFromTitlesGenerator(self.titles, self.site)
+        gen = pagegenerators.EdittimeFilterPageGenerator(
+            gen, first_edit_start=datetime.datetime(2006, 1, 1))
+        opposite_pages = list(gen)
+        self.assertTrue(all(isinstance(p, pywikibot.Page)
+                            for p in opposite_pages))
+        self.assertTrue(all(p.title not in expect for p in opposite_pages))
+
+    def test_last_edit(self):
+        two_days_ago = datetime.datetime.now() - datetime.timedelta(days=2)
+        nine_days_ago = datetime.datetime.now() - datetime.timedelta(days=9)
+
+        gen = PagesFromTitlesGenerator(['Wikipedia:Sandbox'], self.site)
+        gen = pagegenerators.EdittimeFilterPageGenerator(
+            gen, last_edit_start=two_days_ago)
+        self.assertEqual(len(list(gen)), 1)
+
+        gen = PagesFromTitlesGenerator(['Wikipedia:Sandbox'], self.site)
+        gen = pagegenerators.EdittimeFilterPageGenerator(
+            gen, last_edit_end=two_days_ago)
+        self.assertEqual(len(list(gen)), 0)
+
+        gen = PagesFromTitlesGenerator(['Template:Sidebox'], self.site)
+        gen = pagegenerators.EdittimeFilterPageGenerator(
+            gen, last_edit_end=nine_days_ago)
+        self.assertEqual(len(list(gen)), 1)
+
+        gen = PagesFromTitlesGenerator(['Template:Sidebox'], self.site)
+        gen = pagegenerators.EdittimeFilterPageGenerator(
+            gen, last_edit_start=nine_days_ago)
+        self.assertEqual(len(list(gen)), 0)
 
 
 class TestRepeatingGenerator(TestCase):

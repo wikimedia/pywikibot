@@ -21,10 +21,11 @@ These parameters are supported to specify which pages titles to print:
 __version__ = '$Id$'
 #
 
-import sys
 import codecs
+import datetime
 import itertools
 import re
+import sys
 import time
 
 import pywikibot
@@ -977,13 +978,30 @@ def PageTitleFilterPageGenerator(generator, ignore_list):
             yield page
 
 
-def RedirectFilterPageGenerator(generator, no_redirects=True):
-    """Yield pages from another generator that are redirects or not."""
-    for page in generator:
-        if not page.isRedirectPage() and no_redirects:
-            yield page
-        elif page.isRedirectPage() and not no_redirects:
-            yield page
+def RedirectFilterPageGenerator(generator, no_redirects=True,
+                                show_filtered=False):
+    """
+    Yield pages from another generator that are redirects or not.
+
+    @param no_redirects: Exclude redirects if True, else only include
+        redirects.
+    @param no_redirects: bool
+    @param show_filtered: Output a message for each page not yielded
+    @type show_filtered: bool
+    """
+    for page in generator or []:
+        if no_redirects:
+            if not page.isRedirectPage():
+                yield page
+            elif show_filtered:
+                pywikibot.output(u'%s is a redirect page. Skipping.' % page)
+
+        else:
+            if page.isRedirectPage():
+                yield page
+            elif show_filtered:
+                pywikibot.output(u'%s is not a redirect page. Skipping.'
+                                 % page)
 
 
 def DuplicateFilterPageGenerator(generator):
@@ -1079,6 +1097,74 @@ class RegexFilter(object):
 # name the generator methods
 RegexFilterPageGenerator = RegexFilter.titlefilter
 RegexBodyFilterPageGenerator = RegexFilter.contentfilter
+
+
+@deprecated_args(begintime='last_edit_start', endtime='last_edit_end')
+def EdittimeFilterPageGenerator(generator,
+                                last_edit_start=None,
+                                last_edit_end=None,
+                                first_edit_start=None,
+                                first_edit_end=None,
+                                show_filtered=False):
+    """
+    Wrap a generator to filter pages outside last or first edit range.
+
+    @param generator: A generator object
+    @param last_edit_start: Only yield pages last edited after this time
+    @type last_edit_start: datetime
+    @param last_edit_end: Only yield pages last edited before this time
+    @type last_edit_end: datetime
+    @param first_edit_start: Only yield pages first edited after this time
+    @type first_edit_start: datetime
+    @param first_edit_end: Only yield pages first edited before this time
+    @type first_edit_end: datetime
+    @param show_filtered: Output a message for each page not yielded
+    @type show_filtered: bool
+
+    """
+    do_last_edit = last_edit_start or last_edit_end
+    do_first_edit = first_edit_start or first_edit_end
+
+    last_edit_start = last_edit_start or datetime.datetime.min
+    last_edit_end = last_edit_end or datetime.datetime.max
+    first_edit_start = first_edit_start or datetime.datetime.min
+    first_edit_end = first_edit_end or datetime.datetime.max
+
+    for page in generator or []:
+        if do_last_edit:
+            last_edit = page.editTime()
+
+            if last_edit < last_edit_start:
+                if show_filtered:
+                    pywikibot.output(
+                        u'Last edit on %s was on %s.\nToo old. Skipping.'
+                        % (page, last_edit.isoformat()))
+                continue
+
+            if last_edit > last_edit_end:
+                if show_filtered:
+                    pywikibot.output(
+                        u'Last edit on %s was on %s.\nToo recent. Skipping.'
+                        % (page, last_edit.isoformat()))
+                continue
+
+        if do_first_edit:
+            first_edit = page.oldest_revision().timestamp
+
+            if first_edit < first_edit_start:
+                if show_filtered:
+                    pywikibot.output(
+                        u'First edit on %s was on %s.\nToo old. Skipping.'
+                        % (page, first_edit.isoformat()))
+
+            if first_edit > first_edit_end:
+                if show_filtered:
+                    pywikibot.output(
+                        u'First edit on %s was on %s.\nToo recent. Skipping.'
+                        % (page, first_edit.isoformat()))
+                continue
+
+        yield page
 
 
 def CombinedPageGenerator(generators):
@@ -1273,9 +1359,9 @@ def NewimagesPageGenerator(step=None, total=None, site=None):
         yield entry.title()
 
 
-def WikidataItemGenerator(gen):
+def WikibaseItemGenerator(gen):
     """
-    A wrapper generator used to yield Wikidata items of another generator.
+    A wrapper generator used to yield Wikibase items of another generator.
 
     @param gen: Generator to wrap.
     @type gen: generator
@@ -1286,11 +1372,50 @@ def WikidataItemGenerator(gen):
         if isinstance(page, pywikibot.ItemPage):
             yield page
         elif page.site.data_repository() == page.site:
-            # These are already items, just not item pages
+            # These are already items, as they have a DataSite in page.site.
+            # However generator is yielding Page, so convert to ItemPage.
             # FIXME: If we've already fetched content, we should retain it
             yield pywikibot.ItemPage(page.site, page.title())
         else:
             yield pywikibot.ItemPage.fromPage(page)
+
+
+WikidataItemGenerator = WikibaseItemGenerator
+
+
+def WikibaseItemFilterPageGenerator(generator, has_item=True,
+                                    show_filtered=False):
+    """
+    A wrapper generator used to exclude if page has a wikibase item or not.
+
+    @param gen: Generator to wrap.
+    @type gen: generator
+    @param has_item: Exclude pages without an item if True, or only
+        include pages without an item if False
+    @type has_item: bool
+    @param show_filtered: Output a message for each page not yielded
+    @type show_filtered: bool
+    @return: Wrapped generator
+    @rtype: generator
+    """
+    for page in generator or []:
+        try:
+            page_item = pywikibot.ItemPage.fromPage(page, lazy_load=False)
+        except pywikibot.NoPage:
+            page_item = None
+
+        if page_item:
+            if not has_item:
+                if show_filtered:
+                    pywikibot.output(
+                        '%s has a wikidata item.  Skipping.' % page)
+                continue
+        else:
+            if has_item:
+                if show_filtered:
+                    pywikibot.output(
+                        '%s doesn\'t have a wikidata item.  Skipping.' % page)
+                continue
 
 
 # TODO below

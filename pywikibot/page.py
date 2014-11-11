@@ -563,6 +563,9 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """
         return self.site.page_exists(self)
 
+    def oldest_revision(self):
+        return self.getVersionHistory(reverseOrder=True, total=1)[0]
+
     def isRedirectPage(self):
         """Return True if this is a redirect, False if not or not existing."""
         return self.site.page_isredirect(self)
