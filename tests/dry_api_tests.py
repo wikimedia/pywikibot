@@ -13,8 +13,9 @@ import datetime
 
 import pywikibot
 from pywikibot.data.api import (
-    Request,
     CachedRequest,
+    ParamInfo,
+    Request,
     QueryGenerator,
 )
 from pywikibot.family import Family
@@ -216,6 +217,136 @@ class MimeTests(DefaultDrySiteTestCase):
                       file='MP_sounds.png', mime=True,
                       filename=os.path.join(_data_dir, 'MP_sounds.png'))
         self.assertEqual(req.mime, True)
+
+
+class ParamInfoDictTests(DefaultDrySiteTestCase):
+
+    """Test extracting data from the ParamInfo."""
+
+    prop_info_param_data = {  # data from 1.25
+        "name": "info",
+        "classname": "ApiQueryInfo",
+        "path": "query+info",
+        "group": "prop",
+        "prefix": "in",
+        "parameters": [
+            {
+                "name": "prop",
+                "multi": "",
+                "limit": 500,
+                "lowlimit": 50,
+                "highlimit": 500,
+                "type": [
+                    "protection",
+                    "talkid",
+                    "watched",
+                    "watchers",
+                    "notificationtimestamp",
+                    "subjectid",
+                    "url",
+                    "readable",
+                    "preload",
+                    "displaytitle"
+                ]
+            },
+            {
+                "name": "token",
+                "deprecated": "",
+                "multi": "",
+                "limit": 500,
+                "lowlimit": 50,
+                "highlimit": 500,
+                "type": [
+                    "edit",
+                    "delete",
+                    "protect",
+                    "move",
+                    "block",
+                    "unblock",
+                    "email",
+                    "import",
+                    "watch"
+                ]
+            },
+            {
+                "name": "continue",
+                "type": "string"
+            }
+        ],
+        "querytype": "prop"
+    }
+
+    def test_new_format(self):
+        pi = self.get_site()._paraminfo
+        # Set it to the new limited set of keys.
+        pi.paraminfo_keys = frozenset(['modules'])
+
+        data = pi.normalize_paraminfo({
+            'paraminfo': {
+                'modules': [
+                    self.prop_info_param_data,
+                    {'name': 'edit'}
+                ]
+            }
+        })
+
+        pi._paraminfo.update(data)
+        self.assertIn('info', pi._paraminfo)
+        self.assertIn('edit', pi._paraminfo)
+
+    def test_old_format(self):
+        pi = self.get_site()._paraminfo
+        # Reset it to the complete set of possible keys defined in the class
+        pi.paraminfo_keys = ParamInfo.paraminfo_keys
+
+        data = pi.normalize_paraminfo({
+            'paraminfo': {
+                'querymodules': [self.prop_info_param_data],
+                'modules': [{'name': 'edit'}]
+            }
+        })
+
+        pi._paraminfo.update(data)
+        self.assertIn('info', pi._paraminfo)
+        self.assertIn('edit', pi._paraminfo)
+
+    def test_attribute(self):
+        pi = self.get_site()._paraminfo
+        # Reset it to the complete set of possible keys defined in the class
+        pi.paraminfo_keys = ParamInfo.paraminfo_keys
+
+        data = pi.normalize_paraminfo({
+            'paraminfo': {
+                'querymodules': [self.prop_info_param_data],
+            }
+        })
+
+        pi._paraminfo.update(data)
+
+        self.assertEqual(pi._paraminfo['info']['prefix'], 'in')
+        self.assertEqual(pi._paraminfo['info']['querytype'], 'prop')
+
+    def test_parameter(self):
+        pi = self.get_site()._paraminfo
+        # Reset it to the complete set of possible keys defined in the class
+        pi.paraminfo_keys = ParamInfo.paraminfo_keys
+
+        data = pi.normalize_paraminfo({
+            'paraminfo': {
+                'querymodules': [self.prop_info_param_data],
+            }
+        })
+
+        pi._paraminfo.update(data)
+
+        param = pi.parameter('info', 'token')
+        self.assertIsInstance(param, dict)
+
+        self.assertEqual(param['name'], 'token')
+        self.assertIn('deprecated', param)
+
+        self.assertIsInstance(param['type'], list)
+        self.assertIn('email', param['type'])
 
 
 class QueryGenTests(DefaultDrySiteTestCase):
