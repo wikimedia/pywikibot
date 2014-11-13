@@ -66,7 +66,9 @@ else:
     from urllib2 import quote
 
 from pywikibot import config
-from pywikibot.exceptions import FatalServerError, Server504Error
+from pywikibot.exceptions import (
+    FatalServerError, Server504Error, Server414Error
+)
 from pywikibot.comms import threadedhttp
 from pywikibot.tools import deprecate_arg
 import pywikibot.version
@@ -259,6 +261,9 @@ def request(site=None, uri=None, *args, **kwargs):
 
     if request.data[0].status == 504:
         raise Server504Error("Server %s timed out" % site.hostname())
+
+    if request.data[0].status == 414:
+        raise Server414Error('Too long GET request')
 
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.
