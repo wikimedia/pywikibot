@@ -3066,7 +3066,7 @@ class APISite(BaseSite):
             (default False)
 
         """
-        if not isinstance(namespace, int):
+        if not isinstance(namespace, (int, Namespace)):
             raise Error("allpages: only one namespace permitted.")
 
         if includeredirects is not None:
@@ -3135,7 +3135,7 @@ class APISite(BaseSite):
         """
         if unique and fromids:
             raise Error("alllinks: unique and fromids cannot both be True.")
-        if not isinstance(namespace, int):
+        if not isinstance(namespace, (int, Namespace)):
             raise Error("alllinks: only one namespace permitted.")
         algen = self._generator(api.ListGenerator, type_arg="alllinks",
                                 alnamespace=str(namespace), alfrom=start,
