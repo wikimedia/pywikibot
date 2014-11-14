@@ -247,8 +247,8 @@ ignore_title = {
             u'Wikipedy:Fangnet',
         ],
         'hu': [
-            #hu:Wikipédia:Kocsmafal (egyéb)#Hol nem kell egyértelműsíteni?
-            #2012-02-08
+            # hu:Wikipédia:Kocsmafal (egyéb)#Hol nem kell egyértelműsíteni?
+            # 2012-02-08
             u'Wikipédia:(?!Sportműhely/Eddigi cikkeink).*',
             u'.*\(egyértelműsítő lap\)$',
             u'.*[Vv]ita:.*',
@@ -417,7 +417,7 @@ class PrimaryIgnoreManager(object):
                 # remove trailing newlines and carriage returns
                 while line[-1] in ['\n', '\r']:
                     line = line[:-1]
-                #skip empty lines
+                # skip empty lines
                 if line != '':
                     self.ignorelist.append(line)
             f.close()
@@ -642,7 +642,7 @@ class DisambiguationRobot(Bot):
                 n += 1
                 # how many bytes should be displayed around the current link
                 context = 60
-                #there's a {{dn}} here already
+                # check if there's a {{dn}} here already
                 already_dn = text[m.end():m.end() + 8].find(dn_template_str[:4]) > -1
                 if already_dn and self.dnSkip:
                     continue
@@ -755,7 +755,7 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                         position_split = end_of_word_match.start(0)
                     else:
                         position_split = 0
-                    #insert dab needed template
+                    # insert dab needed template
                     text = (text[:m.end() + position_split] +
                             dn_template_str +
                             text[m.end() + position_split:])

@@ -181,9 +181,9 @@ class CosmeticChangesToolkit:
             self.cleanUpSectionHeaders,
             self.putSpacesInLists,
             self.translateAndCapitalizeNamespaces,
-##            self.translateMagicWords,
+# FIXME:    self.translateMagicWords,
             self.replaceDeprecatedTemplates,
-##            self.resolveHtmlEntities,
+# FIXME:    self.resolveHtmlEntities,
             self.validXhtml,
             self.removeUselessSpaces,
             self.removeNonBreakingSpaceBeforePercent,
@@ -340,10 +340,10 @@ class CosmeticChangesToolkit:
 
         # Adding categories
         if categories:
-            ##Sorting categories in alphabetic order. beta test only on Persian Wikipedia, TODO fix bug for sorting
-            #if self.site.code == 'fa':
-            #   categories.sort()
-            ##Taking main cats to top
+            # TODO: Sorting categories in alphabetic order.
+            # e.g. using categories.sort()
+
+            # TODO: Taking main cats to top
             #   for name in categories:
             #       if re.search(u"(.+?)\|(.{,1}?)",name.title()) or name.title()==name.title().split(":")[0]+title:
             #            categories.remove(name)
@@ -515,9 +515,9 @@ class CosmeticChangesToolkit:
                                                 label[len(titleWithSection):])
                     else:
                         # Try to capitalize the first letter of the title.
-                        # Maybe this feature is not useful for languages that
-                        # don't capitalize nouns...
-                        #if not self.site.nocapitalize:
+                        # Not useful for languages that don't capitalize nouns.
+                        # TODO: Determine which languages this is suitable for
+                        # perhaps using self.site.nocapitalize
                         if self.site.sitename() == 'wikipedia:de':
                             titleWithSection = (titleWithSection[0].upper() +
                                                 titleWithSection[1:])
@@ -660,17 +660,18 @@ class CosmeticChangesToolkit:
                     new, exceptions)
         return text
 
-    #from fixes.py
+    # from fixes.py
     def fixSyntaxSave(self, text):
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
         # link to the wiki working on
-        ## TODO: disable this for difflinks and titled links
-        ## https://de.wikipedia.org/w/index.php?title=Wikipedia%3aVandalismusmeldung&diff=103109563&oldid=103109271
-##        text = textlib.replaceExcept(text,
-##                                     r'\[https?://%s\.%s\.org/wiki/(?P<link>\S+)\s+(?P<title>.+?)\s?\]'
-##                                     % (self.site.code, self.site.family.name),
-##                                     r'[[\g<link>|\g<title>]]', exceptions)
+        # TODO: disable this for difflinks and titled links,
+        # to prevent edits like this:
+        # https://de.wikipedia.org/w/index.php?title=Wikipedia%3aVandalismusmeldung&diff=103109563&oldid=103109271
+#        text = textlib.replaceExcept(text,
+#                                     r'\[https?://%s\.%s\.org/wiki/(?P<link>\S+)\s+(?P<title>.+?)\s?\]'
+#                                     % (self.site.code, self.site.family.name),
+#                                     r'[[\g<link>|\g<title>]]', exceptions)
         # external link in double brackets
         text = textlib.replaceExcept(
             text,
@@ -730,13 +731,13 @@ class CosmeticChangesToolkit:
         return text
 
     def fixReferences(self, text):
-        #https://en.wikipedia.org/wiki/User:AnomieBOT/source/tasks/OrphanReferenceFixer.pm
+        # See also https://en.wikipedia.org/wiki/User:AnomieBOT/source/tasks/OrphanReferenceFixer.pm
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
 
         # it should be name = " or name=" NOT name   ="
         text = re.sub(r'(?i)<ref +name(= *| *=)"', r'<ref name="', text)
-        #remove empty <ref/>-tag
+        # remove empty <ref/>-tag
         text = textlib.replaceExcept(text,
                                      r'(?i)(<ref\s*/>|<ref *>\s*</ref>)',
                                      r'', exceptions)
@@ -783,8 +784,8 @@ class CosmeticChangesToolkit:
             'gallery',
             'hyperlink',
             'interwiki',
-            # but changes letters inside wikilinks
-            #'link',
+            # FIXME: but changes letters inside wikilinks
+            # 'link',
             'math',
             'pre',
             'template',
@@ -794,6 +795,7 @@ class CosmeticChangesToolkit:
             'startspace',
             'inputbox',
         ]
+        # FIXME: use textlib.NON_LATIN_DIGITS
         # valid digits
         digits = {
             'ckb': u'٠١٢٣٤٥٦٧٨٩',
@@ -809,7 +811,7 @@ class CosmeticChangesToolkit:
             u'\[\[(' + '|'.join(namespaces) +
             '):.+?\.\w+? *(\|((\[\[.*?\]\])|.)*)?\]\]',
             re.UNICODE)
-        #not to let bot edits in latin content
+        # not to let bot edits in latin content
         exceptions.append(re.compile(u"[^%(fa)s] *?\"*? *?, *?[^%(fa)s]"
                                      % {'fa': faChrs}))
         exceptions.append(pattern)
@@ -822,7 +824,10 @@ class CosmeticChangesToolkit:
             text = textlib.replaceExcept(text, u'ه', u'ھ', exceptions)
         text = textlib.replaceExcept(text, u'ك', u'ک', exceptions)
         text = textlib.replaceExcept(text, u'[ىي]', u'ی', exceptions)
+
         return text
+
+        # FIXME: split this function into two.
         # replace persian/arabic digits
         # deactivated due to bug 55185
         for i in range(0, 10):

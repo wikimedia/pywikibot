@@ -330,14 +330,13 @@ class CommonscatBot(Bot):
                                       checkedCommonscatTarget, LinkText, Note)
                 return True
             else:
-                #Commonscat link is wrong
+                # Commonscat link is wrong
                 commonscatLink = self.findCommonscatLink(page)
                 if (commonscatLink != u''):
                     self.changeCommonscat(page, currentCommonscatTemplate,
                                           currentCommonscatTarget,
                                           primaryCommonscat, commonscatLink)
-                #else
-                #Should i remove the commonscat link?
+                # TODO: if the commonsLink == u'', should it be removed?
 
         elif self.skipPage(page):
             pywikibot.output("Found a template in the skip list. Skipping %s"
@@ -361,7 +360,7 @@ class CommonscatBot(Bot):
                          description=u''):
         """ Change the current commonscat template and target. """
         if oldcat == '3=S' or linktitle == '3=S':
-            return  # additional param on de-wiki, TODO: to be handled
+            return  # TODO: handle additional param on de-wiki
         if not linktitle and (page.title().lower() in oldcat.lower() or
                               oldcat.lower() in page.title().lower()):
             linktitle = oldcat
@@ -432,7 +431,7 @@ class CommonscatBot(Bot):
                            ipage.title(), checkedCommonscat))
                     return checkedCommonscat
             except pywikibot.BadTitle:
-                #The interwiki was incorrect
+                # The interwiki was incorrect
                 return u''
         return u''
 
@@ -475,7 +474,7 @@ class CommonscatBot(Bot):
         pywikibot.log("getCommonscat: " + name)
         try:
             commonsSite = self.site.image_repository()
-            #This can throw a pywikibot.BadTitle
+            # This can throw a pywikibot.BadTitle
             commonsPage = pywikibot.Page(commonsSite, "Category:" + name)
 
             if not commonsPage.exists():

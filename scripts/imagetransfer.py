@@ -229,7 +229,6 @@ class ImageTransferBot:
     def showImageList(self, imagelist):
         for i in range(len(imagelist)):
             image = imagelist[i]
-            #sourceSite = sourceImagePage.site
             print("-" * 60)
             pywikibot.output(u"%s. Found image: %s"
                              % (i, image.title(asLink=True)))

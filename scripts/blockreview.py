@@ -144,8 +144,8 @@ Hallo %(admin)s,
                                                      self.parts)
                             adminText += note
                             self.save(adminText, adminPage, comment, False)
-                        ### test for pt-wiki
-                        ### just print all sysops talk pages
+                        # test for pt-wiki
+                        # just print all sysops talk pages
                         elif self.site.sitename() == 'wikipedia:pt':
                             from pywikibot import pagegenerators as pg
                             gen = pg.PreloadingGenerator(self.SysopGenerator())

@@ -215,10 +215,11 @@ class TestNeedVersion(DeprecationTestCase):
 
     def test_need_version_fail_with_deprecated(self):
         """Test order of combined version check and deprecation warning."""
+        # FIXME: The deprecation message should be:
+        #   __name__ + '.TestNeedVersion.deprecated_unavailable_method
         # The outermost decorator is the version check, so no deprecation message.
         self.assertRaisesRegex(
             NotImplementedError,
-            #__name__ + '.TestNeedVersion.deprecated_unavailable_method',
             'deprecated_unavailable_method',
             self.deprecated_unavailable_method)
         self.assertNoDeprecation()
@@ -226,7 +227,6 @@ class TestNeedVersion(DeprecationTestCase):
         # The deprecator is first, but the version check still raises exception.
         self.assertRaisesRegex(
             NotImplementedError,
-            #__name__ + '.TestNeedVersion.deprecated_unavailable_method2',
             'deprecated_unavailable_method2',
             self.deprecated_unavailable_method2)
         self.assertDeprecation(

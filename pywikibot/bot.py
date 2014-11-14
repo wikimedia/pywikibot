@@ -81,7 +81,6 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
                 sfn = "%s.%d%s" % (root, i, ext)
                 dfn = "%s.%d%s" % (root, i + 1, ext)
                 if os.path.exists(sfn):
-                    #print "%s -> %s" % (sfn, dfn)
                     if os.path.exists(dfn):
                         os.remove(dfn)
                     os.rename(sfn, dfn)
@@ -89,7 +88,6 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
             if os.path.exists(dfn):
                 os.remove(dfn)
             os.rename(self.baseFilename, dfn)
-            #print "%s -> %s" % (self.baseFilename, dfn)
         elif self.backupCount == -1:
             if not hasattr(self, '_lastNo'):
                 self._lastNo = 1
@@ -1189,7 +1187,7 @@ class WikidataBot(Bot):
                     if not treat_missing_item:
                         pywikibot.output(
                             '%s doesn\'t have a wikidata item.' % page)
-                        #TODO FIXME: Add an option to create the item
+                        # TODO: Add an option to create the item
                         continue
                 self.treat(page, item)
         except QuitKeyboardInterrupt:

@@ -529,12 +529,12 @@ category_with_licenses = {
 
 # Page where is stored the message to send as email to the users
 emailPageWithText = {
-    #'de': 'Benutzer:ABF/D3',
+    # 'de': 'Benutzer:ABF/D3',
 }
 
 # Title of the email
 emailSubject = {
-    #'de': 'Problemen mit Deinem Bild auf der Deutschen Wikipedia',
+    # 'de': 'Problemen mit Deinem Bild auf der Deutschen Wikipedia',
 }
 
 # Seems that uploaderBots aren't interested to get messages regarding the
@@ -556,9 +556,7 @@ serviceTemplates = {
 project_inserted = ['ar', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
                     'ko', 'ta', 'ur', 'zh']
 
-################################################################################
-# <--------------------------- Change only above! ---------------------------> #
-################################################################################
+# END OF CONFIGURATION.
 
 
 class LogIsFull(pywikibot.Error):
@@ -1016,12 +1014,8 @@ class checkImagesBot(object):
                             u'%s is a duplicate and has to be tagged...'
                             % duplicate)
                         images_to_tag_list.append(duplicate)
-##                        if duplicate != duplicates[-1]:
                         string += u"*[[:%s%s]]\n" % (self.image_namespace,
                                                      duplicate)
-##                        else:
-##                            string += "*[[:%s%s]]" \
-##                                      % (self.image_namespace, duplicate)
                     else:
                         pywikibot.output(
                             u"Already put the dupe-template in the files's page"
@@ -1230,17 +1224,6 @@ class checkImagesBot(object):
 
     def load_licenses(self):
         """Load the list of the licenses."""
-##        catName = i18n.translate(self.site, category_with_licenses)
-##        cat = pywikibot.Category(pywikibot.Site(), catName)
-##        categories = [page.title() for page in pagegenerators.SubCategoriesPageGenerator(cat)]
-##        categories.append(catName)
-##        list_licenses = list()
-##        pywikibot.output(u'\n\t...Loading the licenses allowed...\n')
-##        for catName in categories:
-##            cat = pywikibot.Category(pywikibot.Site(), catName)
-##            gen = pagegenerators.CategorizedPageGenerator(cat)
-##            pages = [page for page in gen]
-##            list_licenses.extend(pages)
         catName = i18n.translate(self.site, category_with_licenses)
         if not catName:
             raise pywikibot.Error(
@@ -1406,7 +1389,6 @@ class checkImagesBot(object):
                 else:
                     reported = self.report_image(self.imageName)
                 if reported:
-                    #if self.imagestatus_used:
                     self.report(self.mex_used, self.imageName, self.text_used,
                                 u"\n%s\n" % self.head_used, None,
                                 self.imagestatus_used, self.summary_used)
@@ -1482,7 +1464,11 @@ class checkImagesBot(object):
         imagesToSkip = 0
         # if normal, we can take as many images as "limit" has told us,
         # otherwise, sorry, nope.
-        if normal and False:
+        # TODO: remove this exception as part of bug 65136
+        raise NotImplementedError(
+            "The wait option is not available at core yet.")
+
+        if normal:
             printWithTimeZone(
                 u'Skipping the files uploaded less than %s seconds ago..'
                 % waitTime)
@@ -1537,11 +1523,9 @@ class checkImagesBot(object):
                 newGen.append(imageData[0])
             return newGen
         else:
-            #pywikibot.output(
-            #    u"The wait option is available only with the standard "
-            #    u"generator.")
             pywikibot.output(
-                u"The wait option is not available at core yet.")
+                u"The wait option is available only with the standard "
+                u"generator.")
             return generator
 
     def isTagged(self):
@@ -1670,10 +1654,6 @@ class checkImagesBot(object):
             if parl.lower() in extension.lower():
                 delete = True
         (license_found, hiddenTemplateFound) = self.smartDetection()
-        # If the image exists (maybe it has been deleting during the oder
-        # checking parts or something, who knows? ;-))
-        #if p.exists(): <-- improve thebot, better to make as
-        #                   less call to the server as possible
         # Here begins the check block.
         if brackets and license_found:
             # It works also without this... but i want only to be sure ^^
@@ -1776,14 +1756,15 @@ def main(*args):
             elif len(arg) > 5:
                 skip_number = int(arg[6:])
         elif arg.startswith('-wait'):
-            pywikibot.warning(
-                u'"-wait" option is not implemented yet in core. Sorry!\n')
-##            if len(arg) == 5:
-##                waitTime = int(pywikibot.input(
-##                    u'How many time do you want to wait before checking the '
-##                    u'files?'))
-##            elif len(arg) > 5:
-##                waitTime = int(arg[6:])
+            # FIXME: bug 65136
+            raise NotImplementedError(
+                "-wait option is not available at core yet. Sorry!")
+            if len(arg) == 5:
+                waitTime = int(pywikibot.input(
+                    u'How many time do you want to wait before checking the '
+                    u'files?'))
+            elif len(arg) > 5:
+                waitTime = int(arg[6:])
         elif arg.startswith('-start'):
             if len(arg) == 6:
                 firstPageTitle = pywikibot.input(
