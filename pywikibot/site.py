@@ -1436,6 +1436,7 @@ class APISite(BaseSite):
         self._msgcache = {}
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
         self._siteinfo = Siteinfo(self)
+        self._paraminfo = api.ParamInfo(self)
         self.tokens = TokenWallet(self)
 
     def __getstate__(self):

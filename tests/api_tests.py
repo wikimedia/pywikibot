@@ -10,6 +10,8 @@ __version__ = '$Id$'
 import datetime
 import pywikibot
 import pywikibot.data.api as api
+from pywikibot.tools import MediaWikiVersion
+
 from tests.aspects import (
     unittest,
     TestCase,
@@ -50,6 +52,191 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
         self.assertIn("test", req._encoded_items().values())
         for item in req.items():
             self.assertEqual(len(item), 2, item)
+
+
+class TestParamInfo(DefaultSiteTestCase):
+
+    """Test ParamInfo."""
+
+    def test_init(self):
+        site = self.get_site()
+        pi = api.ParamInfo(site)
+        self.assertEqual(len(pi), 0)
+        pi._init()
+
+        self.assertIn('main', pi)
+        self.assertIn('paraminfo', pi)
+        self.assertEqual(len(pi),
+                         len(pi.init_modules))
+
+        self.assertIn('info', pi._query_modules)
+
+    def test_init_pageset(self):
+        site = self.get_site()
+        self.assertNotIn('query', api.ParamInfo.init_modules)
+        pi = api.ParamInfo(site, set(['pageset']))
+        self.assertNotIn('query', api.ParamInfo.init_modules)
+        self.assertNotIn('query', pi.preloaded_modules)
+        self.assertEqual(len(pi), 0)
+        pi._init()
+
+        self.assertIn('main', pi)
+        self.assertIn('paraminfo', pi)
+        self.assertIn('pageset', pi)
+
+        if pi.modules_only_mode:
+            self.assertIn('query', pi.preloaded_modules)
+            self.assertIn('query', pi)
+            self.assertEqual(len(pi), 4)
+        else:
+            self.assertNotIn('query', pi.preloaded_modules)
+            self.assertNotIn('query', pi)
+            self.assertEqual(len(pi), 3)
+
+        self.assertEqual(len(pi),
+                         len(pi.preloaded_modules))
+
+        if MediaWikiVersion(site.version()) >= MediaWikiVersion("1.21"):
+            # 'generator' was added to 'pageset' in 1.21
+            generators_param = pi.parameter('pageset', 'generator')
+            self.assertGreater(len(generators_param['type']), 1)
+
+    def test_generators(self):
+        site = self.get_site()
+        pi = api.ParamInfo(site, set(['pageset', 'query']))
+        self.assertEqual(len(pi), 0)
+        pi._init()
+
+        self.assertIn('main', pi)
+        self.assertIn('paraminfo', pi)
+        self.assertIn('pageset', pi)
+        self.assertIn('query', pi)
+
+        if MediaWikiVersion(site.version()) >= MediaWikiVersion("1.21"):
+            # 'generator' was added to 'pageset' in 1.21
+            pageset_generators_param = pi.parameter('pageset', 'generator')
+            query_generators_param = pi.parameter('query', 'generator')
+
+            self.assertEqual(pageset_generators_param, query_generators_param)
+
+    def test_with_module_info(self):
+        site = self.get_site()
+        pi = api.ParamInfo(site)
+        self.assertEqual(len(pi), 0)
+        pi.fetch(['info'])
+        self.assertIn('info', pi)
+
+        self.assertIn('main', pi)
+        self.assertIn('paraminfo', pi)
+        self.assertEqual(len(pi),
+                         1 + len(pi.preloaded_modules))
+
+        self.assertEqual(pi['info']['prefix'], 'in')
+
+        param = pi.parameter('info', 'prop')
+        self.assertIsInstance(param, dict)
+
+        self.assertEqual(param['name'], 'prop')
+        self.assertNotIn('deprecated', param)
+
+        self.assertIsInstance(param['type'], list)
+        self.assertIn('protection', param['type'])
+
+    def test_with_module_revisions(self):
+        site = self.get_site()
+        pi = api.ParamInfo(site)
+        self.assertEqual(len(pi), 0)
+        pi.fetch(['revisions'])
+        self.assertIn('revisions', pi)
+
+        self.assertIn('main', pi)
+        self.assertIn('paraminfo', pi)
+        self.assertEqual(len(pi),
+                         1 + len(pi.preloaded_modules))
+
+        self.assertEqual(pi['revisions']['prefix'], 'rv')
+
+        param = pi.parameter('revisions', 'prop')
+        self.assertIsInstance(param, dict)
+
+        self.assertEqual(param['name'], 'prop')
+        self.assertNotIn('deprecated', param)
+
+        self.assertIsInstance(param['type'], list)
+        self.assertIn('user', param['type'])
+
+    def test_multiple_modules(self):
+        site = self.get_site()
+        pi = api.ParamInfo(site)
+        self.assertEqual(len(pi), 0)
+        pi.fetch(['info', 'revisions'])
+        self.assertIn('info', pi)
+        self.assertIn('revisions', pi)
+
+        self.assertIn('main', pi)
+        self.assertIn('paraminfo', pi)
+        self.assertEqual(len(pi),
+                         2 + len(pi.preloaded_modules))
+
+    def test_with_invalid_module(self):
+        site = self.get_site()
+        pi = api.ParamInfo(site)
+        self.assertEqual(len(pi), 0)
+        pi.fetch('foobar')
+        self.assertNotIn('foobar', pi)
+
+        self.assertIn('main', pi)
+        self.assertIn('paraminfo', pi)
+        self.assertEqual(len(pi),
+                         len(pi.preloaded_modules))
+
+    def test_query_modules_with_limits(self):
+        site = self.get_site()
+        pi = api.ParamInfo(site)
+        self.assertIn('revisions', pi.query_modules_with_limits)
+        self.assertNotIn('info', pi.query_modules_with_limits)
+
+    def test_modules(self):
+        """Test v1.8 modules exist."""
+        site = self.get_site()
+        pi = api.ParamInfo(site)
+        self.assertIn('revisions', pi.modules)
+        self.assertIn('help', pi.modules)
+        self.assertIn('allpages', pi.modules)
+
+    def test_prefixes(self):
+        """Test v1.8 module prefixes exist."""
+        site = self.get_site()
+        pi = api.ParamInfo(site)
+        self.assertIn('revisions', pi.prefixes)
+        self.assertIn('login', pi.prefixes)
+        self.assertIn('allpages', pi.prefixes)
+
+    def test_old_mode(self):
+        site = self.get_site()
+        pi = api.ParamInfo(site, modules_only_mode=False)
+        pi.fetch(['info'])
+        self.assertIn('info', pi)
+
+        self.assertIn('main', pi)
+        self.assertIn('paraminfo', pi)
+        self.assertEqual(len(pi),
+                         1 + len(pi.preloaded_modules))
+
+        self.assertIn('revisions', pi.prefixes)
+
+    def test_new_mode(self):
+        site = self.get_site()
+        pi = api.ParamInfo(site, modules_only_mode=True)
+        pi.fetch(['info'])
+        self.assertIn('info', pi)
+
+        self.assertIn('main', pi)
+        self.assertIn('paraminfo', pi)
+        self.assertEqual(len(pi),
+                         1 + len(pi.preloaded_modules))
+
+        self.assertIn('revisions', pi.prefixes)
 
 
 class TestPageGenerator(TestCase):

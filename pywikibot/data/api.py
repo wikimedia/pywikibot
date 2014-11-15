@@ -7,7 +7,7 @@
 #
 __version__ = '$Id$'
 
-from collections import MutableMapping
+from collections import Container, MutableMapping
 from pywikibot.comms import http
 from email.mime.nonmultipart import MIMENonMultipart
 import datetime
@@ -25,7 +25,7 @@ import time
 
 import pywikibot
 from pywikibot import config, login
-from pywikibot.tools import MediaWikiVersion as LV, deprecated
+from pywikibot.tools import MediaWikiVersion as LV, deprecated, itergroup
 from pywikibot.exceptions import Server504Error, FatalServerError, Error
 
 import sys
@@ -121,6 +121,321 @@ class APIMWException(APIError):
         self.mediawiki_exception_class_name = mediawiki_exception_class_name
         code = 'internal_api_error_' + mediawiki_exception_class_name
         super(APIMWException, self).__init__(code, info, **kwargs)
+
+
+class ParamInfo(Container):
+
+    """
+    API parameter information data object.
+
+    Provides cache aware fetching of parameter information.
+
+    TODO: establish a data structure in the class which prefills
+        the param information available for a site given its
+        version, using the API information available for each
+        API version.
+
+    TODO: module aliases: in 1.25wmf
+        list=deletedrevs becomes list=alldeletedrevisions
+        prop=deletedrevs becomes prop=deletedrevisions
+
+    TODO: share API parameter information between sites using
+        similar versions of the API, especially all sites in the
+        same family.
+    """
+
+    paraminfo_keys = frozenset(['modules', 'querymodules', 'formatmodules',
+                                'mainmodule', 'pagesetmodule'])
+
+    root_modules = frozenset(['main', 'pageset'])
+    root_module_keys = frozenset(['mainmodule', 'pagesetmodule'])
+
+    init_modules = frozenset(['main', 'paraminfo'])
+
+    def __init__(self, site, preloaded_modules=None, modules_only_mode=None):
+        """
+        Constructor.
+
+        @param preloaded_modules: API modules to preload
+        @type preloaded_modules: set of string
+        @param modules_only_mode: use the 'modules' only syntax for API request
+        @type: modules_only_mode: bool or None to only use default, which True
+            if the site is 1.25wm4+
+        """
+        self.site = site
+
+        # Keys are module names, values are the raw responses from the server.
+        self._paraminfo = {}
+
+        # Cached data.
+        self._prefixes = {}
+        self._with_limits = None
+
+        self._action_modules = None
+        self._query_modules = []  # filled in _init()
+        self._limit = None
+
+        self.preloaded_modules = self.init_modules
+        if preloaded_modules:
+            self.preloaded_modules |= set(preloaded_modules)
+        self.__inited = False
+
+        self.modules_only_mode = modules_only_mode
+        if self.modules_only_mode:
+            self.paraminfo_keys = frozenset(['modules'])
+
+    def _init(self):
+        # The paraminfo api deprecated the old request syntax of
+        # querymodules='info'; to avoid warnings sites with 1.25wmf4+
+        # must only use 'modules' parameter.
+        if self.modules_only_mode is None:
+            self.modules_only_mode = LV(self.site.version()) >= LV('1.25wmf4')
+            if self.modules_only_mode:
+                self.paraminfo_keys = frozenset(['modules'])
+            # Assume that by v1.26, it will be desirable to prefetch 'query'
+            if LV(self.site.version()) > LV('1.26'):
+                self.preloaded_modules |= set(['query'])
+
+        self.fetch(self.preloaded_modules, _init=True)
+        main_modules_param = self.parameter('main', 'action')
+
+        assert(main_modules_param)
+        assert('type' in main_modules_param)
+        self._action_modules = frozenset(main_modules_param['type'])
+
+        # While deprecated with warning in 1.25, paraminfo param 'querymodules'
+        # provides a list of all query modules. This will likely be removed
+        # from the API in the future, in which case the fallback is the use
+        # the same data available in the paraminfo for query.
+        query_modules_param = self.parameter('paraminfo', 'querymodules')
+
+        assert('limit' in query_modules_param)
+        self._limit = query_modules_param['limit']
+
+        if query_modules_param:
+            assert('type' in query_modules_param)
+            self._query_modules = frozenset(query_modules_param['type'])
+        else:
+            if 'query' not in self._paraminfo:
+                self.fetch(set(['query']), _init=True)
+
+            prop_param = self.parameter('query', 'prop')
+            list_param = self.parameter('query', 'list')
+            generator_param = self.parameter('query', 'generator')
+
+            assert(prop_param)
+            assert(list_param)
+            assert(generator_param)
+            assert('type' in prop_param)
+            assert('type' in list_param)
+            assert('type' in generator_param)
+
+            self._query_modules = frozenset(
+                prop_param['type'] + list_param['type'] +
+                generator_param['type']
+            )
+
+        self.__inited = True
+
+    def _emulate_pageset(self):
+        # pageset isnt a module in the new system, so it is emulated, with
+        # the paraminfo from the query module.
+        assert('query' in self._paraminfo)
+
+        self._paraminfo['pageset'] = {
+            'name': 'pageset',
+            'classname': 'ApiPageSet',
+            'prefix': '',
+            'readrights': '',
+            'helpurls': [],
+            'parameters': self._paraminfo['query']['parameters']
+        }
+
+    def fetch(self, modules, _init=False):
+        """
+        Fetch paraminfo for multiple modules.
+
+        @param modules: API modules to load
+        @type modules: set
+        @rtype: NoneType
+        """
+        # The first request should be 'paraminfo', so that
+        # query modules can be prefixed with 'query+'
+        # If _init is True, dont call _init().
+        if 'paraminfo' not in self._paraminfo and not _init:
+            self._init()
+
+        # Users will supply the wrong type, and expect it to work.
+        if not isinstance(modules, set):
+            if isinstance(modules, basestring):
+                modules = set(modules.split('|'))
+            else:
+                modules = set(modules)
+
+        modules -= set(self._paraminfo.keys())
+        if not modules:
+            return
+
+        assert(self._query_modules or _init)
+
+        # This can be further optimised, by grouping them in more stable
+        # subsets, which are unlikely to change. i.e. first request core
+        # modules which have been a stable part of the API for a long time.
+        # Also detecting extension based modules may help.
+        for module_batch in itergroup(sorted(modules), self._limit):
+            if self.modules_only_mode and 'pageset' in module_batch:
+                pywikibot.debug('paraminfo fetch: removed pageset', _logger)
+                module_batch.remove('pageset')
+                if 'query' not in self._paraminfo:
+                    pywikibot.debug('paraminfo batch: added query', _logger)
+                    module_batch.append('query')
+                # If this occurred during initialisation,
+                # also record it in the preloaded_modules.
+                # (at least so tests know an extra load was intentional)
+                if not self.__inited:
+                    self.preloaded_modules |= set(['query'])
+
+            params = {
+                'expiry': config.API_config_expiry,
+                'site': self.site,
+                'action': 'paraminfo',
+            }
+
+            if self.modules_only_mode:
+                params['modules'] = ['query+' + mod
+                                     if mod in self._query_modules
+                                     else mod
+                                     for mod in module_batch]
+            else:
+                params['modules'] = [mod for mod in module_batch
+                                     if mod not in self._query_modules
+                                     and mod not in self.root_modules]
+                params['querymodules'] = [mod for mod in module_batch
+                                          if mod in self._query_modules]
+
+                for mod in set(module_batch) & self.root_modules:
+                    params[mod + 'module'] = 1
+
+            request = CachedRequest(**params)
+            result = request.submit()
+
+            normalized_result = self.normalize_paraminfo(result)
+
+            self._paraminfo.update(normalized_result)
+
+        if self.modules_only_mode and 'pageset' in modules:
+            self._emulate_pageset()
+
+    @classmethod
+    def normalize_paraminfo(cls, data):
+        """Convert both old and new API JSON into a new-ish data structure."""
+        return dict([(mod_data['name'] if 'name' in mod_data else
+                      'main' if mod_data['classname'] == 'ApiMain' else
+                      'pageset' if mod_data['classname'] == 'ApiPageSet' else
+                      '<unknown>:' + mod_data['classname'],
+                      mod_data)
+                     for modules_data in
+                     [[modules_data] if paraminfo_key in cls.root_module_keys
+                      else modules_data
+                      for paraminfo_key, modules_data
+                      in data['paraminfo'].items()
+                      if modules_data and paraminfo_key in cls.paraminfo_keys]
+                     for mod_data in modules_data])
+
+    def __getitem__(self, key):
+        """Return a paraminfo property, caching it."""
+        self.fetch(set([key]))
+        return self._paraminfo[key]
+
+    def __contains__(self, key):
+        """Return whether the value is cached."""
+        return key in self._paraminfo
+
+    def __len__(self):
+        """Obtain length of the iterable."""
+        return len(self._paraminfo)
+
+    def parameter(self, module, param_name):
+        """
+        Get details about one modules parameter.
+
+        @param module: API module name
+        @type module: str
+        @param param_name: parameter name in the module
+        @type param_name: str
+        @return: metadata that describes how the parameter may be used
+        @rtype: dict
+        """
+        # TODO: the 'description' field of each parameter is not in the default
+        # output of v1.25, and cant removed from previous API versions.
+        # There should be an option to remove this verbose data from the cached
+        # version, for earlier versions of the API, and/or extract any useful
+        # data and discard the entire received paraminfo structure.  There are
+        # also params which are common to many modules, such as those provided
+        # by the ApiPageSet php class: titles, pageids, redirects, etc.
+        self.fetch(set([module]))
+        param_data = [param for param in self._paraminfo[module]['parameters']
+                      if param['name'] == param_name]
+        return param_data[0] if len(param_data) else None
+
+    @property
+    def modules(self):
+        """Set of all modules."""
+        if not self.__inited:
+            self._init()
+        return self._action_modules | self._query_modules
+
+    @property
+    def action_modules(self):
+        """Set of all action modules."""
+        if not self.__inited:
+            self._init()
+        return self._action_modules
+
+    @property
+    def query_modules(self):
+        """Set of all query modules."""
+        if not self.__inited:
+            self._init()
+        return self._query_modules
+
+    @property
+    def prefixes(self):
+        """
+        Mapping of module to its prefix for all modules with a prefix.
+
+        This loads paraminfo for all modules.
+        """
+        if not self._prefixes:
+            self._prefixes = self.module_attribute_map('prefix')
+        return self._prefixes
+
+    def module_attribute_map(self, attribute, modules=None):
+        """
+        Mapping of modules with an attribute to the attribute value.
+
+        @param attribute: attribute name
+        @type attribute: basestring
+        @param modules: modules to include (default: all modules)
+        @type modules: set
+        @rtype: dict
+        """
+        if modules is None:
+            modules = self.modules
+        self.fetch(modules)
+        return dict([(mod, self._paraminfo[mod][attribute])
+                     for mod in modules
+                     if self._paraminfo[mod][attribute]])
+
+    @property
+    def query_modules_with_limits(self):
+        """Set of all query modules which have limits."""
+        if not self._with_limits:
+            self.fetch(self.query_modules)
+            self._with_limits = frozenset(
+                [mod for mod in self.query_modules
+                 if self.parameter(mod, 'limit')])
+        return self._with_limits
 
 
 class TimeoutError(Error):
@@ -894,7 +1209,7 @@ class QueryGenerator(object):
         # make sure request type is valid, and get limit key if any
         for modtype in ("generator", "list", "prop", "meta"):
             if modtype in kwargs:
-                self.module = kwargs[modtype]
+                self.modules = kwargs[modtype].split('|')
                 break
         else:
             raise Error("%s: No query module name found in arguments."
@@ -910,17 +1225,41 @@ class QueryGenerator(object):
             # Explicitly enable the simplified continuation
             kwargs['continue'] = ''
         self.request = Request(**kwargs)
-        self.prefix = None
+
+        # This forces all paraminfo for all query modules to be bulk loaded.
+        limited_modules = (
+            set(self.modules) & self.site._paraminfo.query_modules_with_limits
+        )
+        if not limited_modules:
+            self.limited_module = None
+        elif len(limited_modules) == 1:
+            self.limited_module = limited_modules.pop()
+        else:
+            # Select the first limited module in the request.
+            for module in self.modules:
+                if module in self.site._paraminfo.query_modules_with_limits:
+                    self.limited_module = module
+                    break
+            pywikibot.log('%s: multiple requested query modules support limits'
+                          "; using the first such module '%s' of %r"
+                          % (self.__class__.__name__, self.limited_module,
+                             self.modules))
+
         self.api_limit = None
-        self.update_limit()  # sets self.prefix
+
+        if self.limited_module:
+            self.prefix = self.site._paraminfo[self.limited_module]['prefix']
+            self._update_limit()
+
         if self.api_limit is not None and "generator" in kwargs:
             self.prefix = "g" + self.prefix
+
         self.limit = None
         self.query_limit = self.api_limit
         if "generator" in kwargs:
             self.resultkey = "pages"        # name of the "query" subelement key
         else:                               # to look for when iterating
-            self.resultkey = self.module
+            self.resultkey = self.modules[0]
 
         # usually the (query-)continue key is the same as the querymodule,
         # but not always
@@ -930,54 +1269,7 @@ class QueryGenerator(object):
         #     "langlinks":{"llcontinue":"12188973|pt"},
         #     "templates":{"tlcontinue":"310820|828|Namespace_detect"}}
         # self.continuekey is a list
-        self.continuekey = self.module.split('|')
-
-    @property
-    def __modules(self):
-        """
-        Cache paraminfo in this request's Site object.
-
-        Hold the query data for paraminfo on
-        querymodule=self.module at self.site.
-
-        """
-        if not hasattr(self.site, "_modules"):
-            setattr(self.site, "_modules", dict())
-        return self.site._modules
-
-    @__modules.deleter
-    def __modules(self):
-        """Delete the instance cache - maybe we don't need it."""
-        if hasattr(self.site, "_modules"):
-            del self.site._modules
-
-    @property
-    def _modules(self):
-        """Query api on self.site for paraminfo on self.module."""
-        modules = self.module.split('|')
-        if not set(modules) <= set(self.__modules.keys()):
-            if LV(self.site.version()) < LV('1.25wmf4'):
-                key = 'querymodules'
-                value = self.module
-            else:
-                key = 'modules'
-                value = ['query+' + module for module in modules]
-            paramreq = CachedRequest(expiry=config.API_config_expiry,
-                                     site=self.site, action="paraminfo",
-                                     **{key: value})
-            data = paramreq.submit()
-            assert "paraminfo" in data
-            assert key in data["paraminfo"]
-            assert len(data["paraminfo"][key]) == len(modules)
-            for paraminfo in data["paraminfo"][key]:
-                assert paraminfo["name"] in self.module
-                if "missing" in paraminfo:
-                    raise Error("Invalid query module name '%s'." % self.module)
-                self.__modules[paraminfo["name"]] = paraminfo
-        _modules = {}
-        for m in modules:
-            _modules[m] = self.__modules[m]
-        return _modules
+        self.continuekey = self.modules
 
     def set_query_increment(self, value):
         """Set the maximum number of items to be retrieved per API query.
@@ -1011,22 +1303,17 @@ class QueryGenerator(object):
         """
         self.limit = int(value)
 
-    def update_limit(self):
+    def _update_limit(self):
         """Set query limit for self.module based on api response."""
-        for mod in self.module.split('|'):
-            for param in self._modules[mod].get("parameters", []):
-                if param["name"] == "limit":
-                    if self.site.logged_in() and self.site.has_right('apihighlimits'):
-                        self.api_limit = int(param["highmax"])
-                    else:
-                        self.api_limit = int(param["max"])
-                    if self.prefix is None:
-                        self.prefix = self._modules[mod]["prefix"]
-                    pywikibot.debug(u"%s: Set query_limit to %i."
-                                    % (self.__class__.__name__,
-                                       self.api_limit),
-                                    _logger)
-                    return
+        param = self.site._paraminfo.parameter(self.limited_module, 'limit')
+        if self.site.logged_in() and self.site.has_right('apihighlimits'):
+            self.api_limit = int(param["highmax"])
+        else:
+            self.api_limit = int(param["max"])
+        pywikibot.debug(u"%s: Set query_limit to %i."
+                        % (self.__class__.__name__,
+                           self.api_limit),
+                        _logger)
 
     def set_namespace(self, namespaces):
         """Set a namespace filter on this query.
@@ -1034,15 +1321,15 @@ class QueryGenerator(object):
         @param namespaces: Either an int or a list of ints
 
         """
+        assert(self.limited_module)  # some modules do not have a prefix
         if isinstance(namespaces, list):
             namespaces = "|".join(str(n) for n in namespaces)
         else:
             namespaces = str(namespaces)
-        for mod in self.module.split('|'):
-            for param in self._modules[mod].get("parameters", []):
-                if param["name"] == "namespace":
-                    self.request[self.prefix + "namespace"] = namespaces
-                    return
+
+        param = self.site._paraminfo.parameter(self.limited_module, 'namespace')
+        if param:
+            self.request[self.prefix + "namespace"] = namespaces
 
     def _query_continue(self):
         if all(key not in self.data[self.continue_name]
@@ -1186,7 +1473,7 @@ class QueryGenerator(object):
                 # self.resultkey not in data in last request.submit()
                 # only "(query-)continue" was retrieved.
                 previous_result_had_data = False
-            if self.module == "random" and self.limit:
+            if self.modules[0] == "random" and self.limit:
                 # "random" module does not return "(query-)continue"
                 # now we loop for a new random query
                 del self.data  # a new request is needed
