@@ -280,20 +280,6 @@ class TestSiteObject(DefaultSiteTestCase):
         if a:
             self.assertEqual(a[0], mainpage)
 
-    def testPreload(self):
-        """Test that preloading works."""
-        mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        count = 0
-        for page in mysite.preloadpages(mysite.pagelinks(mainpage, total=10)):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertTrue(hasattr(page, "_text"))
-            count += 1
-            if count >= 5:
-                break
-
     def testLinkMethods(self):
         """Test site methods for getting links to and from a page."""
         mysite = self.get_site()
@@ -1560,6 +1546,301 @@ class TestUploadEnabledSite(TestCase):
             self.assertFalse(site.is_uploaddisabled())
         else:
             self.assertTrue(site.is_uploaddisabled())
+
+
+class TestPagePreloading(DefaultSiteTestCase):
+
+    """Test site.preloadpages()."""
+
+    def test_pageids(self):
+        """Test basic preloading with pageids."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        links = mysite.pagelinks(mainpage, total=10)
+        # preloadpages will send the page ids,
+        # as they have already been loaded by pagelinks
+        for page in mysite.preloadpages(links):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+            if count >= 5:
+                break
+
+    def test_titles(self):
+        """Test basic preloading with titles."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        links = mysite.pagelinks(mainpage, total=10)
+
+        # remove the pageids that have already been loaded above by pagelinks
+        # so that preloadpages will use the titles instead
+        for page in links:
+            del page._pageid
+
+        for page in mysite.preloadpages(links):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+            if count >= 5:
+                break
+
+    def test_preload_continuation(self):
+        """Test preloading continuation works."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        links = mysite.pagelinks(mainpage, total=10)
+        for page in mysite.preloadpages(links, groupsize=5):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+            if count >= 6:
+                break
+
+    def test_preload_high_groupsize(self):
+        """Test preloading continuation with groupsize greater than total."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+
+        # Determine if there are enough links on the main page,
+        # for the test to be useful.
+        link_count = len(list(mysite.pagelinks(mainpage, total=10)))
+        if link_count < 2:
+            raise unittest.SkipTest('insufficient links on main page')
+
+        # get a fresh generator; we now know how many results it will have,
+        # if it is less than 10.
+        links = mysite.pagelinks(mainpage, total=10)
+        for page in mysite.preloadpages(links, groupsize=50):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+        self.assertEqual(count, link_count)
+
+    def test_preload_low_groupsize(self):
+        """Test preloading continuation with groupsize greater than total."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+
+        # Determine if there are enough links on the main page,
+        # for the test to be useful.
+        link_count = len(list(mysite.pagelinks(mainpage, total=10)))
+        if link_count < 2:
+            raise unittest.SkipTest('insufficient links on main page')
+
+        # get a fresh generator; we now know how many results it will have,
+        # if it is less than 10.
+        links = mysite.pagelinks(mainpage, total=10)
+        for page in mysite.preloadpages(links, groupsize=5):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+        self.assertEqual(count, link_count)
+
+    def test_preload_unexpected_titles_using_pageids(self):
+        """Test sending pageids with unnormalized titles, causing warnings."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        links = list(mysite.pagelinks(mainpage, total=10))
+        if len(links) < 2:
+            raise unittest.SkipTest('insufficient links on main page')
+
+        # change the title of the page, to test sametitle().
+        # preloadpages will send the page ids, as they have already been loaded
+        # by pagelinks, and preloadpages should complain the returned titles
+        # do not match any title in the pagelist.
+        for page in links:
+            page._link._text += ' '
+
+        gen = mysite.preloadpages(links, groupsize=5)
+        for page in gen:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertFalse(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 0)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+            if count > 5:
+                break
+
+    def test_preload_unexpected_titles_using_titles(self):
+        """Test sending unnormalized titles, causing warnings."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        links = list(mysite.pagelinks(mainpage, total=10))
+        if len(links) < 2:
+            raise unittest.SkipTest('insufficient links on main page')
+
+        # change the title of the page _and_ delete the pageids.
+        # preloadpages can only send the titles, and preloadpages should
+        # complain the returned titles do not match any title in the pagelist.
+        for page in links:
+            page._link._text += ' '
+            del page._pageid
+
+        gen = mysite.preloadpages(links, groupsize=5)
+        for page in gen:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertFalse(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 0)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+            if count > 5:
+                break
+
+    def test_preload_invalid_titles_without_pageids(self):
+        """Test sending invalid titles. No warnings issued, but it should."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        links = list(mysite.pagelinks(mainpage, total=10))
+        if len(links) < 2:
+            raise unittest.SkipTest('insufficient links on main page')
+
+        for page in links:
+            page._link._text += ' foobar'
+            del page._pageid
+
+        gen = mysite.preloadpages(links, groupsize=5)
+        for page in gen:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            self.assertFalse(page.exists())
+            count += 1
+            if count > 5:
+                break
+
+    @unittest.expectedFailure
+    def test_preload_langlinks_normal(self):
+        """Test preloading continuation works."""
+        # FIXME: test fails
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        links = mysite.pagelinks(mainpage, total=10)
+        for page in mysite.preloadpages(links, groupsize=5, langlinks=True):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+                self.assertTrue(hasattr(page, '_langlinks'))
+            count += 1
+            if count >= 6:
+                break
+
+    @unittest.expectedFailure
+    def test_preload_langlinks_count(self):
+        """Test preloading continuation works."""
+        # FIXME: test fails
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        links = mysite.pagelinks(mainpage, total=20)
+        pages = list(mysite.preloadpages(links, groupsize=5,
+                                         langlinks=True))
+        for page in pages:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+
+        self.assertEqual(len(links), count)
+
+    def _test_preload_langlinks_long(self):
+        """Test preloading continuation works."""
+        # FIXME: test fails.  It is disabled as it takes more
+        # than 10 minutes on travis for English Wikipedia
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        links = mainpage.backlinks(total=100)
+        for page in mysite.preloadpages(links, groupsize=50,
+                                        langlinks=True):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+                self.assertTrue(hasattr(page, '_langlinks'))
+            count += 1
+
+        self.assertEqual(len(links), count)
+
+    @unittest.expectedFailure
+    def test_preload_templates(self):
+        """Test preloading templates works."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        # Use backlinks, as any backlink has at least one link
+        links = mysite.pagelinks(mainpage, total=10)
+        for page in mysite.preloadpages(links, templates=True):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+                self.assertTrue(hasattr(page, '_templates'))
+            count += 1
+            if count >= 6:
+                break
+
+    @unittest.expectedFailure
+    def test_preload_templates_and_langlinks(self):
+        """Test preloading templates and langlinks works."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        count = 0
+        # Use backlinks, as any backlink has at least one link
+        links = mysite.pagebacklinks(mainpage, total=10)
+        for page in mysite.preloadpages(links, langlinks=True, templates=True):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+                self.assertTrue(hasattr(page, '_templates'))
+                self.assertTrue(hasattr(page, '_langlinks'))
+            count += 1
+            if count >= 6:
+                break
 
 
 class TestDataSitePreloading(WikidataTestCase):

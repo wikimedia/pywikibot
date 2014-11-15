@@ -2457,8 +2457,8 @@ class APISite(BaseSite):
                                 break
                         else:
                             pywikibot.warning(
-                                u"preloadpages: Query returned unexpected title"
-                                u"'%s'" % pagedata['title'])
+                                u"preloadpages: Query returned unexpected "
+                                u"title '%s'" % pagedata['title'])
                             continue
                 except KeyError:
                     pywikibot.debug(u"No 'title' in %s" % pagedata, _logger)
