@@ -3079,7 +3079,7 @@ class APISite(BaseSite):
                 filterredir = False
 
         apgen = self._generator(api.PageGenerator, type_arg="allpages",
-                                gapnamespace=str(namespace),
+                                gapnamespace=int(namespace),
                                 gapfrom=start, step=step, total=total,
                                 g_content=content)
         if prefix:
@@ -3138,7 +3138,7 @@ class APISite(BaseSite):
         if not isinstance(namespace, (int, Namespace)):
             raise Error("alllinks: only one namespace permitted.")
         algen = self._generator(api.ListGenerator, type_arg="alllinks",
-                                alnamespace=str(namespace), alfrom=start,
+                                alnamespace=int(namespace), alfrom=start,
                                 step=step, total=total)
         if prefix:
             algen.request["alprefix"] = prefix
