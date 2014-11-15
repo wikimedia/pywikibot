@@ -204,7 +204,11 @@ ignoreTemplates = {
     'nl': [u'Commons', u'Commonsklein', u'Commonscatklein', u'Catbeg',
            u'Catsjab', u'Catwiki'],
     'om': [u'Commons'],
-    'pt': [u'Correlatos'],
+    'pt': [u'Correlatos',
+           u'Commons',
+           u'Commons cat multi',
+           u'Commons1',
+           u'Commons2'],
     'simple': [u'Sisterlinks'],
     'ru': [u'Навигация', u'Навигация для категорий', u'КПР', u'КБР',
            u'Годы в России', u'commonscat-inline'],
@@ -240,6 +244,7 @@ class CommonscatBot(Bot):
     """Commons categorisation bot."""
 
     def __init__(self, generator, always, summary=None):
+        """Constructor."""
         super(CommonscatBot, self).__init__(always=always)
         self.generator = generator
         self.summary = summary
@@ -400,25 +405,32 @@ class CommonscatBot(Bot):
                 % (page.title(), error.url))
 
     def findCommonscatLink(self, page=None):
-        # In Pywikibot 2.0, page.interwiki() now returns Link objects, not Page objects
+        """Find CommonsCat template on interwiki pages.
+
+        In Pywikibot 2.0, page.interwiki() now returns Link objects,
+        not Page objects
+
+        @rtype: unicode, name of a valid commons category
+        """
         for ipageLink in page.langlinks():
             ipage = pywikibot.page.Page(ipageLink)
             pywikibot.log("Looking for template on %s" % (ipage.title()))
             try:
-                if(ipage.exists() and not ipage.isRedirectPage()
-                   and not ipage.isDisambig()):
-                    commonscatLink = self.getCommonscatLink(ipage)
-                    if commonscatLink:
-                        (currentTemplate,
-                         possibleCommonscat, linkText, Note) = commonscatLink
-                        checkedCommonscat = self.checkCommonscatLink(
-                            possibleCommonscat)
-                        if (checkedCommonscat != u''):
-                            pywikibot.output(
-                                u"Found link for %s at [[%s:%s]] to %s."
-                                % (page.title(), ipage.site.code,
-                                   ipage.title(), checkedCommonscat))
-                            return checkedCommonscat
+                if(not ipage.exists() or ipage.isRedirectPage()
+                   or ipage.isDisambig()):
+                    continue
+                commonscatLink = self.getCommonscatLink(ipage)
+                if not commonscatLink:
+                    continue
+                (currentTemplate,
+                 possibleCommonscat, linkText, Note) = commonscatLink
+                checkedCommonscat = self.checkCommonscatLink(possibleCommonscat)
+                if (checkedCommonscat != u''):
+                    pywikibot.output(
+                        u"Found link for %s at [[%s:%s]] to %s."
+                        % (page.title(), ipage.site.code,
+                           ipage.title(), checkedCommonscat))
+                    return checkedCommonscat
             except pywikibot.BadTitle:
                 #The interwiki was incorrect
                 return u''
@@ -427,7 +439,7 @@ class CommonscatBot(Bot):
     def getCommonscatLink(self, wikipediaPage=None):
         """Find CommonsCat template on page.
 
-        @rtype: tuple of (<templatename>, <target>)
+        @rtype: tuple of (<templatename>, <target>, <linktext>, <note>)
         """
         primaryCommonscat, commonscatAlternatives = self.getCommonscatTemplate(
             wikipediaPage.site.code)
@@ -457,7 +469,7 @@ class CommonscatBot(Bot):
         """ Return the name of a valid commons category.
 
         If the page is a redirect this function tries to follow it.
-        If the page doesnt exists the function will return an empty string
+        If the page doesn't exists the function will return an empty string
 
         """
         pywikibot.log("getCommonscat: " + name)
