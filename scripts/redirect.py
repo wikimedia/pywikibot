@@ -367,6 +367,8 @@ class RedirectGenerator:
             except pywikibot.NoPage:
                 # original title must have been deleted after move
                 continue
+            except pywikibot.CircularRedirect:
+                continue
 
 
 class RedirectRobot(Bot):
