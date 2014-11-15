@@ -274,7 +274,7 @@ class ParamInfo(Container):
             else:
                 modules = set(modules)
 
-        modules -= set(self._paraminfo.keys())
+        modules = modules - set(self._paraminfo.keys())
         if not modules:
             return
 
