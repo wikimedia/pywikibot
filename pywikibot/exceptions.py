@@ -338,6 +338,13 @@ class Server504Error(Error):  # noqa
     pass
 
 
+class Server414Error(Error):
+
+    """Server returned with HTTP 414 code."""
+
+    pass
+
+
 class BadTitle(Error):
 
     """Server responded with BadTitle."""

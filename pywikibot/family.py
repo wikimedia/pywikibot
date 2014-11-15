@@ -1086,6 +1086,9 @@ class Family(object):
         else:
             return code
 
+    def maximum_GET_length(self, code):
+        return config.maximum_GET_length
+
     def dbName(self, code):
         # returns the name of the MySQL database
         return '%s%s' % (code, self.name)

@@ -26,7 +26,9 @@ import time
 import pywikibot
 from pywikibot import config, login
 from pywikibot.tools import MediaWikiVersion as LV, deprecated, itergroup
-from pywikibot.exceptions import Server504Error, FatalServerError, Error
+from pywikibot.exceptions import (
+    Server504Error, Server414Error, FatalServerError, Error
+)
 
 import sys
 
@@ -297,6 +299,7 @@ class ParamInfo(Container):
 
             params = {
                 'expiry': config.API_config_expiry,
+                'use_get': True,  # Request need ParamInfo to determine use_get
                 'site': self.site,
                 'action': 'paraminfo',
             }
@@ -534,6 +537,9 @@ class Request(MutableMapping):
         @kwarg retry_wait: (optional) Minimum time to wait after an error,
                defaults to 5 seconds (doubles each retry until max of 120 is
                reached)
+        @kwarg use_get: (optional) Use HTTP GET request if possible. If False
+               it uses a POST request. If None, it'll try to determine via
+               action=paraminfo if the action requires a POST.
         @kwarg format: (optional) Defaults to "json"
         """
         try:
@@ -549,6 +555,7 @@ class Request(MutableMapping):
         else:
             self.mime = kwargs.pop('mime', False)
         self.throttle = kwargs.pop('throttle', True)
+        self.use_get = kwargs.pop('use_get', None)
         self.max_retries = kwargs.pop("max_retries", pywikibot.config.max_retries)
         self.retry_wait = kwargs.pop("retry_wait", pywikibot.config.retry_wait)
         self._params = {}
@@ -877,6 +884,27 @@ class Request(MutableMapping):
 
         """
         self._add_defaults()
+        if (not config.enable_GET_without_SSL and
+                self.site.protocol() != 'https'):
+            use_get = False
+        elif self.use_get is None:
+            if self.action == 'query':
+                # for queries check the query module
+                modules = set()
+                for mod_type_name in ('list', 'prop', 'generator'):
+                    modules.update(self._params.get(mod_type_name, []))
+            else:
+                modules = set([self.action])
+            if modules:
+                self.site._paraminfo.fetch(modules)
+                use_get = all(['mustbeposted' not in self.site._paraminfo[mod]
+                               for mod in modules])
+            else:
+                # If modules is empty, just 'meta' was given, which doesn't
+                # require POSTs, and is required for ParamInfo
+                use_get = True
+        else:
+            use_get = self.use_get
         while True:
             paramstring = self._http_param_string()
             simulate = self._simulate(self.action)
@@ -892,17 +920,35 @@ class Request(MutableMapping):
                 if self.mime:
                     (headers, body) = Request._build_mime_request(
                         self._encoded_items(), self.mime_params)
+                    use_get = False  # MIME requests require HTTP POST
                 else:
                     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-                    body = paramstring
+                    if (not self.site.maximum_GET_length() or
+                            self.site.maximum_GET_length() < len(paramstring)):
+                        use_get = False
+                    if use_get:
+                        uri = '{0}?{1}'.format(uri, paramstring)
+                        body = None  # default in httplib2
+                    else:
+                        body = paramstring
 
                 rawdata = http.request(
-                    self.site, uri, method="POST",
+                    self.site, uri, method='GET' if use_get else 'POST',
                     headers=headers, body=body)
             except Server504Error:
                 pywikibot.log(u"Caught HTTP 504 error; retrying")
                 self.wait()
                 continue
+            except Server414Error:
+                if use_get:
+                    pywikibot.log('Caught HTTP 414 error; retrying')
+                    use_get = False
+                    self.wait()
+                    continue
+                else:
+                    pywikibot.warning('Caught HTTP 414 error, although not '
+                                      'using GET.')
+                    raise
             except FatalServerError:
                 # This error is not going to be fixed by just waiting
                 pywikibot.error(traceback.format_exc())

@@ -89,6 +89,14 @@ site_interface = 'APISite'
 # number of days to cache namespaces, api configuration, etc.
 API_config_expiry = 30
 
+# The maximum number of bytes which uses a GET request, if not positive
+# it'll always use POST requests
+maximum_GET_length = 255
+# Some networks modify GET requests when they are not encrypted, to avoid
+# bug reports related to that disable those. If we are confident that bug
+# related to this are really because of the network this could be changed.
+enable_GET_without_SSL = False
+
 # Solve captchas in the webbrowser. Setting this to False will result in the
 # exception CaptchaError being thrown if a captcha is encountered.
 solve_captcha = True
