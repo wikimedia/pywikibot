@@ -35,6 +35,21 @@ __version__ = '$Id$'
 #
 
 import re
+import signal
+
+willstop = False
+
+
+def _signal_handler(signal, frame):
+    global willstop
+    if not willstop:
+        willstop = True
+        print("Received ctrl-c. Finishing current item; press ctrl-c again to abort.")
+    else:
+        raise KeyboardInterrupt
+
+signal.signal(signal.SIGINT, _signal_handler)
+
 import pywikibot
 from pywikibot import pagegenerators as pg, textlib, WikidataBot
 
@@ -111,6 +126,8 @@ class HarvestRobot(WikidataBot):
 
     def treat(self, page, item):
         """Process a single page/item."""
+        if willstop:
+            raise KeyboardInterrupt
         self.current_page = page
         item.get()
         if set(self.fields.values()) <= set(item.claims.keys()):
