@@ -57,16 +57,18 @@ class StatesRedirectBot(pywikibot.Bot):
             @param force: Don't ask whether to create pages, just create
             them.
         """
-        self.start = start
+        site = pywikibot.Site()
+        generator = site.allpages(start=start)
+        super(StatesRedirectBot, self).__init__(generator=generator)
+
         self.force = force
-        self.site = pywikibot.Site()
+
         # Created abbrev from pycountry data base
         self.abbrev = {}
         for subd in pycountry.subdivisions:
             # Used subd.code[3:] to extract the exact code for
             # subdivisional states(ignoring the country code).
             self.abbrev[subd.name] = subd.code[3:]
-        self.generator = self.site.allpages(start=self.start)
 
     def treat(self, page):
         """ Re-directing process.

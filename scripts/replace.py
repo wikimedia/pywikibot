@@ -280,6 +280,7 @@ class ReplaceRobot(Bot):
                 exceptionRegexes dictionary in textlib.replaceExcept().
 
         """
+        super(ReplaceRobot, self).__init__()
         self.generator = generator
         self.replacements = replacements
         self.exceptions = exceptions

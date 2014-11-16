@@ -470,6 +470,7 @@ class DisambiguationRobot(Bot):
 
     def __init__(self, always, alternatives, getAlternatives, dnSkip, generator,
                  primary, main_only, minimum=0):
+        super(DisambiguationRobot, self).__init__()
         self.always = always
         self.alternatives = alternatives
         self.getAlternatives = getAlternatives
