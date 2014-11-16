@@ -36,6 +36,8 @@ and arguments can be:
                If neither of -xml -fullscan -moves is given, info will be
                loaded from a special page of the live wiki.
 
+-page:title    Work on a single page
+
 -namespace:n   Namespace to process. Can be given multiple times, for several
                namespaces. If omitted, only the main (article) namespace is
                treated.
@@ -82,7 +84,7 @@ class RedirectGenerator:
 
     def __init__(self, xmlFilename=None, namespaces=[], offset=-1,
                  use_move_log=False, use_api=False, start=None, until=None,
-                 number=None, step=None):
+                 number=None, step=None, page_title=None):
         self.site = pywikibot.Site()
         self.xmlFilename = xmlFilename
         self.namespaces = namespaces
@@ -95,6 +97,7 @@ class RedirectGenerator:
         self.api_until = until
         self.api_number = number
         self.api_step = step
+        self.page_title = page_title
 
     def get_redirects_from_dump(self, alsoGetPageTitles=False):
         """
@@ -267,38 +270,22 @@ class RedirectGenerator:
                         count += 1
                         if count >= self.api_number:
                             break
-        elif not self.xmlFilename:
+        elif self.xmlFilename:
+            # retrieve information from XML dump
+            pywikibot.output(
+                u'Getting a list of all redirects and of all page titles...')
+            redirs, pageTitles = self.get_redirects_from_dump(
+                alsoGetPageTitles=True)
+            for (key, value) in redirs.items():
+                if value not in pageTitles:
+                    yield key
+        elif self.page_title:
+            yield self.page_title
+        else:
             # retrieve information from broken redirect special page
             pywikibot.output(u'Retrieving special page...')
             for redir_name in self.site.broken_redirects():
                 yield redir_name.title()
-
-# TODO: add XML dump support
-##        elif self.xmlFilename == None:
-##            # retrieve information from the live wiki's maintenance page
-##            # broken redirect maintenance page's URL
-##            path = self.site.broken_redirects_address(default_limit=False)
-##            pywikibot.output(u'Retrieving special page...')
-##            maintenance_txt = self.site.getUrl(path)
-##
-##            # regular expression which finds redirects which point to a
-##            # non-existing page inside the HTML
-##            Rredir = re.compile('\<li\>\<a href=".+?" title="(.*?)"')
-##
-##            redir_names = Rredir.findall(maintenance_txt)
-##            pywikibot.output(u'Retrieved %d redirects from special page.\n'
-##                             % len(redir_names))
-##            for redir_name in redir_names:
-##                yield redir_name
-##        else:
-##            # retrieve information from XML dump
-##            pywikibot.output(
-##                u'Getting a list of all redirects and of all page titles...')
-##            redirs, pageTitles = self.get_redirects_from_dump(
-##                                            alsoGetPageTitles=True)
-##            for (key, value) in redirs.items():
-##                if value not in pageTitles:
-##                    yield key
 
     def retrieve_double_redirects(self):
         if self.use_move_log:
@@ -326,6 +313,8 @@ class RedirectGenerator:
                     yield key
                     pywikibot.output(u'\nChecking redirect %i of %i...'
                                      % (num + 1, len(redict)))
+        elif self.page_title:
+            yield self.page_title
         else:
             # retrieve information from double redirect special page
             pywikibot.output(u'Retrieving special page...')
@@ -516,8 +505,8 @@ class RedirectRobot(Bot):
                                  u"Won't delete anything."
                                  % targetPage.title(asLink=True))
             else:
-                #we successfully get the target page, meaning that
-                #it exists and is not a redirect: no reason to touch it.
+                # we successfully get the target page, meaning that
+                # it exists and is not a redirect: no reason to touch it.
                 pywikibot.output(
                     u'Redirect target %s does exist! Won\'t delete anything.'
                     % targetPage.title(asLink=True))
@@ -753,6 +742,8 @@ def main(*args):
     until = ''
     number = None
     step = None
+    pagename = None
+
     for arg in pywikibot.handle_args(args):
         if arg == 'double' or arg == 'do':
             action = 'double'
@@ -796,6 +787,8 @@ def main(*args):
             number = int(arg[7:])
         elif arg.startswith('-step:'):
             step = int(arg[6:])
+        elif arg.startswith('-page:'):
+            pagename = arg[6:]
         elif arg == '-always':
             options['always'] = True
         elif arg == '-delete':
@@ -812,7 +805,7 @@ def main(*args):
     else:
         pywikibot.Site().login()
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
-                                fullscan, start, until, number, step)
+                                fullscan, start, until, number, step, pagename)
         bot = RedirectRobot(action, gen, number=number, **options)
         bot.run()
 
