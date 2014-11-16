@@ -164,7 +164,7 @@ class XmlDumpReplacePageGenerator(object):
                          constructor below.
     """
 
-    def __init__(self, xmlFilename, xmlStart, replacements, exceptions):
+    def __init__(self, xmlFilename, xmlStart, replacements, exceptions, site):
         """Constructor."""
         self.xmlFilename = xmlFilename
         self.replacements = replacements
@@ -178,7 +178,10 @@ class XmlDumpReplacePageGenerator(object):
         if "inside" in self.exceptions:
             self.excsInside += self.exceptions['inside']
         from pywikibot import xmlreader
-        self.site = pywikibot.Site()
+        if site:
+            self.site = site
+        else:
+            self.site = pywikibot.Site()
         dump = xmlreader.XmlDump(self.xmlFilename)
         self.parser = dump.parse()
 
@@ -287,9 +290,8 @@ class ReplaceRobot(Bot):
         self.acceptall = acceptall
         self.allowoverlap = allowoverlap
         self.recursive = recursive
-        self.site = site
-        if self.site is None:
-            self.site = pywikibot.Site()
+        if site:
+            self.site = site
         if addedCat:
             cat_ns = site.category_namespaces()[0]
             self.addedCat = pywikibot.Page(self.site,
@@ -576,6 +578,8 @@ def main(*args):
         else:
             commandline_replacements.append(arg)
 
+    site = pywikibot.Site()
+
     if (len(commandline_replacements) % 2):
         raise pywikibot.Error('require even number of replacements.')
     elif (len(commandline_replacements) == 2 and fix is None):
@@ -583,7 +587,7 @@ def main(*args):
                              commandline_replacements[1]))
         if not summary_commandline:
             edit_summary = i18n.twtranslate(
-                pywikibot.Site(), 'replace-replacing',
+                site, 'replace-replacing',
                 {'description': ' (-%s +%s)' % (commandline_replacements[0],
                                                 commandline_replacements[1])}
             )
@@ -598,7 +602,7 @@ def main(*args):
                          for i in range(0, len(commandline_replacements), 2)]
                 replacementsDescription = '(%s)' % ', '.join(
                     [('-' + pair[0] + ' +' + pair[1]) for pair in pairs])
-                edit_summary = i18n.twtranslate(pywikibot.Site(),
+                edit_summary = i18n.twtranslate(site,
                                                 'replace-replacing',
                                                 {'description':
                                                  replacementsDescription})
@@ -621,7 +625,7 @@ def main(*args):
             change += ' & -' + old + ' +' + new
             replacements.append((old, new))
         if not summary_commandline:
-            default_summary_message = i18n.twtranslate(pywikibot.Site(),
+            default_summary_message = i18n.twtranslate(site,
                                                        'replace-replacing',
                                                        {'description': change})
             pywikibot.output(u'The summary message will default to: %s'
@@ -645,10 +649,10 @@ def main(*args):
             regex = fix['regex']
         if "msg" in fix:
             if isinstance(fix['msg'], basestring):
-                edit_summary = i18n.twtranslate(pywikibot.Site(),
+                edit_summary = i18n.twtranslate(site,
                                                 str(fix['msg']))
             else:
-                edit_summary = i18n.translate(pywikibot.Site(),
+                edit_summary = i18n.translate(site,
                                               fix['msg'], fallback=True)
         if "exceptions" in fix:
             exceptions = fix['exceptions']
@@ -688,7 +692,7 @@ def main(*args):
         except NameError:
             xmlStart = None
         gen = XmlDumpReplacePageGenerator(xmlFilename, xmlStart,
-                                          replacements, exceptions)
+                                          replacements, exceptions, site)
     elif useSql:
         whereClause = 'WHERE (%s)' % ' OR '.join(
             ["old_text RLIKE '%s'" % prepareRegexForMySQL(old_regexp.pattern)
@@ -717,8 +721,9 @@ LIMIT 200""" % (whereClause, exceptClause)
 
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
     bot = ReplaceRobot(preloadingGen, replacements, exceptions, acceptall,
-                       allowoverlap, recursive, add_cat, sleep, edit_summary)
-    pywikibot.Site().login()
+                       allowoverlap, recursive, add_cat, sleep, edit_summary,
+                       site)
+    site.login()
     bot.run()
 
     # Explicitly call pywikibot.stopme().

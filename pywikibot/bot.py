@@ -1070,6 +1070,10 @@ class Bot(object):
         When Bot.run() is managing the generator and site property, this is
         set each time a page is on a site different from the previous page.
         """
+        if not site:
+            self._site = None
+            return
+
         if site not in self._sites:
             log(u'LOADING SITE %s VERSION: %s'
                 % (site, unicode(site.version())))
