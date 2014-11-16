@@ -258,10 +258,11 @@ def writelogheader():
 
     This may help the user to track errors or report bugs.
     """
-    # if site not available it's too early to print a header (work-a-round)
-    try:
-        site = pywikibot.Site()
-    except AttributeError:
+    # If a http thread is not available, it's too early to print a header
+    # that includes version information, which may need to query a server.
+    # The http module can't be imported due to circular dependencies.
+    http = sys.modules.get('pywikibot.comms.http', None)
+    if not http or not hasattr(http, 'threads') or not len(http.threads):
         return
 
     log(u'=== Pywikibot framework v2.0 -- Logging header ===')
@@ -321,8 +322,6 @@ def writelogheader():
 
     if config.log_pywiki_repo_version:
         log(u'PYWIKI REPO VERSION: %s' % unicode(version.getversion_onlinerepo()))
-
-    log(u'SITE VERSION: %s' % site.version())
 
     log(u'=== ' * 14)
 
@@ -888,7 +887,12 @@ class Bot(object):
         @param kwargs: bot options
         @type kwargs: dict
         """
+        if 'generator' in kwargs:
+            self.generator = kwargs.pop('generator')
+
         self.setOptions(**kwargs)
+        self._site = None
+        self._sites = set()
 
     def setOptions(self, **kwargs):
         """
@@ -1049,13 +1053,63 @@ class Bot(object):
         raise NotImplementedError('Method %s.treat() not implemented.'
                                   % self.__class__.__name__)
 
+    @property
+    def site(self):
+        """Site that the bot is using."""
+        if not self._site:
+            warning('Bot.site was not set before being retrieved.')
+            self.site = pywikibot.Site()
+            warning('Using the default site: %s' % self.site)
+        return self._site
+
+    @site.setter
+    def site(self, site):
+        """
+        Set the Site that the bot is using.
+
+        When Bot.run() is managing the generator and site property, this is
+        set each time a page is on a site different from the previous page.
+        """
+        if site not in self._sites:
+            log(u'LOADING SITE %s VERSION: %s'
+                % (site, unicode(site.version())))
+
+            self._sites.add(site)
+            if len(self._sites) == 2:
+                log('%s uses multiple sites' % self.__class__.__name__)
+        if self._site and self._site != site:
+            log('%s: changing site from %s to %s'
+                % (self.__class__.__name__, self._site, site))
+        self._site = site
+
     def run(self):
         """Process all pages in generator."""
         if not hasattr(self, 'generator'):
             raise NotImplementedError('Variable %s.generator not set.'
                                       % self.__class__.__name__)
+
+        # This check is to remove the possibility that the superclass changing
+        # self.site causes bugs in subclasses.
+        # If the subclass has set self.site before run(), it may be that the
+        # bot processes pages on sites other than self.site, and therefore
+        # this method cant alter self.site.  To use this functionality, don't
+        # set self.site in __init__, and use page.site in treat().
+        auto_update_site = not self._site
+        if not auto_update_site:
+            warning(
+                '%s.__init__ set the Bot.site property; this is only needed '
+                'when the Bot accesses many sites.' % self.__class__.__name__)
+        else:
+            log('Bot is managing the %s.site property in run()'
+                % self.__class__.__name__)
+
         try:
             for page in self.generator:
+                # When in auto update mode, set the site when it changes,
+                # so subclasses can hook onto changes to site.
+                if (auto_update_site and
+                        (not self._site or page.site != self.site)):
+                    self.site = page.site
                 self.treat(page)
         except QuitKeyboardInterrupt:
             pywikibot.output('\nUser quit %s bot run...' %

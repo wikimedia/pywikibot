@@ -59,27 +59,20 @@ class DeletionRobot(Bot):
         self.availableOptions.update({
             'undelete': False,
         })
-        super(DeletionRobot, self).__init__(**kwargs)
+        super(DeletionRobot, self).__init__(generator=generator, **kwargs)
 
-        self.generator = generator
         self.summary = summary
 
-    def run(self):
-        """
-        Run bot.
-
-        Loop through everything in the page generator and delete it.
-        """
-        for page in self.generator:
-            self.current_page = page
-
-            if self.getOption('undelete'):
-                page.undelete(self.summary)
+    def treat(self, page):
+        """Delete one page from the generator."""
+        self.current_page = page
+        if self.getOption('undelete'):
+            page.undelete(self.summary)
+        else:
+            if page.exists():
+                page.delete(self.summary, not self.getOption('always'))
             else:
-                if page.exists():
-                    page.delete(self.summary, not self.getOption('always'))
-                else:
-                    pywikibot.output(u'Skipping: %s does not exist.' % page)
+                pywikibot.output(u'Skipping: %s does not exist.' % page)
 
 
 def main(*args):
