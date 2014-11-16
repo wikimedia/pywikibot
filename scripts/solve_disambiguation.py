@@ -574,7 +574,7 @@ class DisambiguationRobot(Bot):
                                       'to %s?' % (refPage.title(), target),
                                       default=False, automatic_quit=False):
                     redir_text = '#%s [[%s]]' \
-                                 % (self.mysite.redirect(default=True), target)
+                                 % (self.mysite.redirect(), target)
                     try:
                         refPage.put_async(redir_text, comment=self.comment)
                     except pywikibot.PageNotSaved as error:

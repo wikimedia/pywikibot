@@ -662,7 +662,7 @@ class RedirectRobot(Bot):
                 targetlink = targetPage.title(asLink=True, textlink=True)
 
             text = self.site.redirectRegex().sub(
-                '#%s %s' % (self.site.redirect(True),
+                '#%s %s' % (self.site.redirect(),
                             targetlink),
                 oldText, 1)
             if redir.title() == targetPage.title() or text == oldText:
