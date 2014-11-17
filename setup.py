@@ -27,6 +27,9 @@ extra_deps = {
     'mwparserfromhell': ['mwparserfromhell>=0.3.3']
 }
 
+if sys.version_info[0] == 2:
+    extra_deps['wikistats-csv'] = ['unicodecsv']
+
 script_deps = {
     'script_wui.py': ['irc', 'lunatic-python', 'crontab'],
     # Note: None of the 'lunatic-python' repos on github support MS Windows.
