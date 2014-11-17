@@ -1945,6 +1945,10 @@ class APISite(BaseSite):
         @return: unicode
 
         """
+        if not isinstance(text, basestring):
+            raise ValueError('text must be a string')
+        if not text:
+            return ''
         req = api.Request(site=self, action='expandtemplates', text=text)
         if title is not None:
             req['title'] = title
