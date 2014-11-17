@@ -502,10 +502,15 @@ class RedirectRobot(Bot):
                                 targetPage.site,
                                 'redirect-broken-redirect-template'
                             ) + "\n" + content
-                            redir_page.put(content, reason)
+                            try:
+                                redir_page.put(content, reason)
+                            except pywikibot.PageSaveRelatedError as e:
+                                pywikibot.error(e)
                         else:
                             pywikibot.output(
                                 u'No speedy deletion template available')
+                else:
+                    pywikibot.output(u'Cannot fix or delete the broken redirect')
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u"Redirect target %s is also a redirect! "
                                  u"Won't delete anything."
@@ -516,7 +521,6 @@ class RedirectRobot(Bot):
                 pywikibot.output(
                     u'Redirect target %s does exist! Won\'t delete anything.'
                     % targetPage.title(asLink=True))
-        pywikibot.output(u'')
 
     def fix_double_redirects(self):
         for redir_name in self.generator.retrieve_double_redirects():
