@@ -3860,6 +3860,12 @@ class APISite(BaseSite):
                         return False
                 elif 'spamblacklist' in result['edit']:
                     raise SpamfilterError(page, result['edit']['spamblacklist'])
+                elif 'code' in result['edit'] and 'info' in result['edit']:
+                    self.unlock_page(page)
+                    pywikibot.error(
+                        u"editpage: %s\n%s, "
+                        % (result['edit']['code'], result['edit']['info']))
+                    return False
                 else:
                     self.unlock_page(page)
                     pywikibot.error(u"editpage: unknown failure reason %s"
