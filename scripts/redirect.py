@@ -12,13 +12,17 @@ Syntax:
 
 where action can be one of these:
 
-double         Fix redirects which point to other redirects
+double         Fix redirects which point to other redirects.
+do             Shortcut action command is "do".
+
 broken         Tries to fix broken redirect to the last moved target of the
-               destination page. If this fails and -delete option is given
+br             destination page. If this fails and -delete option is given
                it deletes redirects where targets don't exist if bot has
                admin rights otherwise it marks the page with a speedy deletion
-               template if available.
-both           Both of the above.
+               template if available. Shortcut action command is "br".
+
+both           Both of the above. Retrieves redirect pages from live wiki,
+               not from a special page.
 
 and arguments can be:
 
