@@ -37,6 +37,22 @@ class LoginManager:
 
     @deprecated_args(username="user", verbose=None)
     def __init__(self, password=None, sysop=False, site=None, user=None):
+        """
+        Constructor.
+
+        All parameters default to defaults in user-config.
+
+        @param site: Site object to log into
+        @type site: BaseSite
+        @param user: username to use
+        @type user: basestring
+        @param password: password to use
+        @type password: basestring
+        @param sysop: login as sysop account
+        @type sysop: bool
+
+        @raises NoUsername: No username is configured for the requested site.
+        """
         if site is not None:
             self.site = site
         else:
@@ -169,6 +185,14 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         password_f.close()
 
     def login(self, retry=False):
+        """
+        Attempt to log into the server.
+
+        @param retry: infinitely retry if the API returns an unknown error
+        @type retry: bool
+
+        @raises NoUsername: Username is not recognised by the site.
+        """
         if not self.password:
             # As we don't want the password to appear on the screen, we set
             # password = True
@@ -176,7 +200,6 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                 u'Password for user %(name)s on %(site)s (no characters will '
                 u'be shown):' % {'name': self.username, 'site': self.site},
                 password=True)
-#        self.password = self.password.encode(self.site.encoding())
 
         pywikibot.output(u"Logging in to %(site)s as %(name)s"
                          % {'name': self.username, 'site': self.site})
@@ -184,6 +207,13 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             cookiedata = self.getCookie()
         except pywikibot.data.api.APIError as e:
             pywikibot.error(u"Login failed (%s)." % e.code)
+            if e.code == 'NotExists':
+                raise NoUsername(u"Username '%s' does not exist on %s"
+                                 % (self.username, self.site))
+            elif e.code == 'Illegal':
+                raise NoUsername(u"Username '%s' is invalid on %s"
+                                 % (self.username, self.site))
+            # TODO: investigate other unhandled API codes (bug 73539)
             if retry:
                 self.password = None
                 return self.login(retry=True)

@@ -3,7 +3,7 @@
 Exception classes used throughout the framework.
 
 Error: Base class, all exceptions should the subclass of this class.
-  - NoUsername: Username is not in user-config.py
+  - NoUsername: Username is not in user-config.py, or it is invalid.
   - UserBlockedY: our username or IP has been blocked
   - AutoblockUser: requested action on a virtual autoblock user not valid
   - UserActionRefuse
