@@ -348,7 +348,7 @@ class CategoryAddBot(Bot):
         newcat = self.newcat
         if not self.current_page.site.nocapitalize:
             newcat = newcat[:1].upper() + newcat[1:]
-        catpl = pywikibot.Page(self.current_page.site, newcat, ns=14)
+        catpl = pywikibot.Category(self.current_page.site, newcat)
         if catpl in cats:
             pywikibot.output(u"%s is already in %s."
                              % (self.current_page.title(), catpl.title()))
