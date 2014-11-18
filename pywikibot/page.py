@@ -493,6 +493,10 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """
         if not hasattr(self, '_expanded_text') or (
                 self._expanded_text is None) or force:
+            if not self.text:
+                self._expanded_text = ''
+                return ''
+
             self._expanded_text = self.site.expand_text(
                 self.text,
                 title=self.title(withSection=False),
