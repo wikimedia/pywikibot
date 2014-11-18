@@ -55,7 +55,6 @@ failed_dep_script_list = [name
 
 unrunnable_script_list = [
     'script_wui',   # depends on lua compiling
-    'editarticle',  # requires a X DISPLAY
 ]
 
 deadlock_script_list = [
@@ -211,7 +210,13 @@ def execute(command, data_in=None, timeout=0, error=None):
         else:
             return stream
     env = os.environ.copy()
+    # sys.path may have been modified by the test runner to load dependencies.
     env['PYTHONPATH'] = ":".join(sys.path)
+    # Set EDITOR to an executable that ignores all arguments and does nothing.
+    if sys.platform == 'win32':
+        env['EDITOR'] = 'call'
+    else:
+        env['EDITOR'] = 'true'
     options = {
         'stdout': subprocess.PIPE,
         'stderr': subprocess.PIPE

@@ -54,7 +54,7 @@ class TextEditor(object):
             command += " -n%i" % (line + 1)  # seems not to support columns
 
         command += ' %s' % tempFilename
-        #print command
+        pywikibot.log(u'Running editor: %s' % command)
         return command
 
     def convertLinebreaks(self, text):
