@@ -1341,8 +1341,12 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         @return: a generator that yields Category objects.
 
         """
-        return self.site.pagecategories(self, withSortKey=withSortKey,
-                                        step=step, total=total, content=content)
+        # FIXME: bug 73561: withSortKey is ignored by Site.pagecategories
+        if withSortKey:
+            raise NotImplementedError('withSortKey is not implemented')
+
+        return self.site.pagecategories(self, step=step, total=total,
+                                        content=content)
 
     def extlinks(self, step=None, total=None):
         """Iterate all external URLs (not interwiki links) from this page.
