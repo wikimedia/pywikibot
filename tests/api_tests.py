@@ -239,9 +239,9 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('revisions', pi.prefixes)
 
 
-class TestPageGenerator(TestCase):
+class TestDryPageGenerator(TestCase):
 
-    """API PageGenerator object test class."""
+    """Dry API PageGenerator object test class."""
 
     family = 'wikipedia'
     code = 'en'
@@ -249,7 +249,7 @@ class TestPageGenerator(TestCase):
     dry = True
 
     def setUp(self):
-        super(TestPageGenerator, self).setUp()
+        super(TestDryPageGenerator, self).setUp()
         mysite = self.get_site()
         self.gen = api.PageGenerator(site=mysite,
                                      generator="links",
@@ -326,6 +326,134 @@ class TestPageGenerator(TestCase):
         self.gen.set_maximum_items(-1)
         results = [p for p in self.gen]
         self.assertEqual(len(results), 4)  # total=-1 but 4 expected
+
+
+class TestPropertyGenerator(TestCase):
+
+    """API PropertyGenerator object test class."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_info(self):
+        mainpage = self.get_mainpage()
+        links = list(self.site.pagelinks(mainpage, total=10))
+        titles = [l.title(withSection=False)
+                  for l in links]
+        gen = api.PropertyGenerator(site=self.site,
+                                    prop="info",
+                                    titles='|'.join(titles))
+
+        count = 0
+        for pagedata in gen:
+            self.assertIsInstance(pagedata, dict)
+            self.assertIn('pageid', pagedata)
+            self.assertIn('lastrevid', pagedata)
+            count += 1
+        self.assertEqual(len(links), count)
+
+    def test_one_continuation(self):
+        mainpage = self.get_mainpage()
+        links = list(self.site.pagelinks(mainpage, total=10))
+        titles = [l.title(withSection=False)
+                  for l in links]
+        gen = api.PropertyGenerator(site=self.site,
+                                    prop="revisions",
+                                    titles='|'.join(titles))
+        gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
+
+        count = 0
+        for pagedata in gen:
+            self.assertIsInstance(pagedata, dict)
+            self.assertIn('pageid', pagedata)
+            self.assertIn('revisions', pagedata)
+            self.assertIn('revid', pagedata['revisions'][0])
+            count += 1
+        self.assertEqual(len(links), count)
+
+    def test_two_continuations(self):
+        mainpage = self.get_mainpage()
+        links = list(self.site.pagelinks(mainpage, total=10))
+        titles = [l.title(withSection=False)
+                  for l in links]
+        gen = api.PropertyGenerator(site=self.site,
+                                    prop="revisions|coordinates",
+                                    titles='|'.join(titles))
+        gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
+
+        count = 0
+        for pagedata in gen:
+            self.assertIsInstance(pagedata, dict)
+            self.assertIn('pageid', pagedata)
+            self.assertIn('revisions', pagedata)
+            self.assertIn('revid', pagedata['revisions'][0])
+            count += 1
+        self.assertEqual(len(links), count)
+
+    @unittest.expectedFailure
+    def test_many_continuations_limited(self):
+        mainpage = self.get_mainpage()
+        links = list(self.site.pagelinks(mainpage, total=30))
+        titles = [l.title(withSection=False)
+                  for l in links]
+        gen = api.PropertyGenerator(site=self.site,
+                                    prop="revisions|info|categoryinfo|langlinks|templates",
+                                    rvprop="ids|flags|timestamp|user|comment|content",
+                                    titles='|'.join(titles))
+
+        # An APIError is raised if set_maximum_items is not called.
+        gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
+        # Force the generator into continuation mode
+        gen.set_query_increment(5)
+
+        count = 0
+        for pagedata in gen:
+            self.assertIsInstance(pagedata, dict)
+            self.assertIn('pageid', pagedata)
+            count += 1
+        self.assertEqual(len(links), count)
+        # FIXME: AssertionError: 30 != 6150
+
+    @unittest.expectedFailure
+    def test_two_continuations_limited(self):
+        # FIXME: test fails
+        mainpage = self.get_mainpage()
+        links = list(self.site.pagelinks(mainpage, total=30))
+        titles = [l.title(withSection=False)
+                  for l in links]
+        gen = api.PropertyGenerator(site=self.site,
+                                    prop="info|categoryinfo|langlinks|templates",
+                                    titles='|'.join(titles))
+        # Force the generator into continuation mode
+        gen.set_query_increment(5)
+
+        count = 0
+        for pagedata in gen:
+            self.assertIsInstance(pagedata, dict)
+            self.assertIn('pageid', pagedata)
+            count += 1
+        self.assertEqual(len(links), count)
+        # FIXME: AssertionError: 30 != 11550
+
+    # FIXME: test disabled as it takes longer than 10 minutes
+    def _test_two_continuations_limited_long_test(self):
+        """Long duration test, with total & step that are a real scenario."""
+        mainpage = self.get_mainpage()
+        links = list(mainpage.backlinks(total=300))
+        titles = [l.title(withSection=False)
+                  for l in links]
+        gen = api.PropertyGenerator(site=self.site,
+                                    prop="info|categoryinfo|langlinks|templates",
+                                    titles='|'.join(titles))
+        # Force the generator into continuation mode
+        gen.set_query_increment(50)
+
+        count = 0
+        for pagedata in gen:
+            self.assertIsInstance(pagedata, dict)
+            self.assertIn('pageid', pagedata)
+            count += 1
+        self.assertEqual(len(links), count)
 
 
 class TestCachedRequest(DefaultSiteTestCase):

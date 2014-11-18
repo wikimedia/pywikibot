@@ -14,7 +14,10 @@ import sys
 import pywikibot
 from pywikibot import pagegenerators
 
-from pywikibot.pagegenerators import PagesFromTitlesGenerator
+from pywikibot.pagegenerators import (
+    PagesFromTitlesGenerator,
+    PreloadingGenerator,
+)
 
 from tests import _data_dir
 from tests.aspects import (
@@ -268,6 +271,41 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
         self.assertPagelistTitles(titles, self.expected_titles[site.case()])
+
+
+class TestPreloadingGenerator(DefaultSiteTestCase):
+
+    """Test preloading generator on lists."""
+
+    def test_basic(self):
+        """Test PreloadingGenerator with a list of pages."""
+        mainpage = self.get_mainpage()
+        links = list(self.site.pagelinks(mainpage, total=10))
+        count = 0
+        for page in PreloadingGenerator(links, step=20):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+        self.assertEqual(len(links), count)
+
+    def test_low_step(self):
+        """Test PreloadingGenerator with a list of pages."""
+        mainpage = self.get_mainpage()
+        links = list(self.site.pagelinks(mainpage, total=20))
+        count = 0
+        for page in PreloadingGenerator(links, step=10):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            if page.exists():
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
+                self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+        self.assertEqual(len(links), count)
 
 
 class TestDequePreloadingGenerator(DefaultSiteTestCase):
