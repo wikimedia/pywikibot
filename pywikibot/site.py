@@ -597,11 +597,11 @@ class BaseSite(ComparableMixin):
         return [lang for lang in self.languages()
                 if lang[:1].upper() + lang[1:] not in nsnames]
 
-    def _cache_interwikimap(self, refresh=False):
+    def _cache_interwikimap(self, force=False):
         """Cache the interwikimap with usable site instances."""
         # _iw_sites is a local cache to return a APISite instance depending
         # on the interwiki prefix of that site
-        if refresh or not hasattr(self, '_iw_sites'):
+        if force or not hasattr(self, '_iw_sites'):
             self._iw_sites = {}
             for iw in self.siteinfo['interwikimap']:
                 try:
