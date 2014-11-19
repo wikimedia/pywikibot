@@ -963,6 +963,10 @@ def must_be(group=None, right=None):
             else:
                 raise Exception("Not implemented")
             return fn(self, *args, **kwargs)
+
+        if not __debug__:
+            return fn
+
         callee.__name__ = fn.__name__
         callee.__doc__ = fn.__doc__
         callee.__module__ = callee.__module__
@@ -990,6 +994,10 @@ def need_version(version):
                     u"isn't implemented in MediaWiki version < %s"
                     % (fn.__name__, version))
             return fn(self, *args, **kwargs)
+
+        if not __debug__:
+            return fn
+
         callee.__name__ = fn.__name__
         callee.__doc__ = fn.__doc__
         callee.__module__ = fn.__module__

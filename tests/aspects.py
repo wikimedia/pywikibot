@@ -915,7 +915,19 @@ class PwbTestCase(TestCase):
     user = True
 
 
-class DeprecationTestCase(TestCase):
+class DebugOnlyTestCase(TestCase):
+
+    """Test cases that only operate in debug mode."""
+
+    @classmethod
+    def setUpClass(cls):
+        if not __debug__:
+            raise unittest.SkipTest(
+                '%s is disabled when __debug__ is disabled.' % cls.__name__)
+        super(DebugOnlyTestCase, cls).setUpClass()
+
+
+class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     """Test cases for deprecation function in the tools module."""
 

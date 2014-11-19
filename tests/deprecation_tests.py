@@ -10,7 +10,7 @@ __version__ = '$Id$'
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, add_full_name
 )
-from tests.aspects import unittest, DeprecationTestCase, TestCase
+from tests.aspects import unittest, DeprecationTestCase
 
 
 @add_full_name
@@ -53,7 +53,7 @@ def decorated_func3():
     pass
 
 
-class DecoratorFullNameTestCase(TestCase):
+class DecoratorFullNameTestCase(DeprecationTestCase):
 
     """Class with methods deprecated."""
 
@@ -286,7 +286,6 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertDeprecation(
             __name__ + '.DeprecatedMethodClass.instance_method is deprecated.')
 
-    #@unittest.expectedFailure
     def test_deprecated_instance_method2(self):
         f = DeprecatedMethodClass()
 

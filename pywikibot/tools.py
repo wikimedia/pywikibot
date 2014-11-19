@@ -438,6 +438,7 @@ class DequeGenerator(collections.deque):
         """Python 3 iterator method."""
         return self.next()
 
+
 # Decorators
 #
 # Decorator functions without parameters are _invoked_ differently from
@@ -536,6 +537,9 @@ def add_full_name(obj):
         else:
             return inner_wrapper
 
+    if not __debug__:
+        return obj
+
     return outer_wrapper
 
 
@@ -571,6 +575,9 @@ def deprecated(*args, **kwargs):
                 warning(u"%s is deprecated." % (name))
             return obj(*args, **kwargs)
 
+        if not __debug__:
+            return obj
+
         wrapper.__doc__ = obj.__doc__
         wrapper.__name__ = obj.__name__
         wrapper.__module__ = obj.__module__
@@ -586,6 +593,9 @@ def deprecated(*args, **kwargs):
 
     # When called as @deprecated, return a replacement function
     if without_parameters:
+        if not __debug__:
+            return args[0]
+
         return decorator(args[0])
     # Otherwise return a decorator, which returns a replacement function
     else:
@@ -646,6 +656,9 @@ def deprecated_args(**arg_pairs):
                     del __kw[old_arg]
             return obj(*__args, **__kw)
 
+        if not __debug__:
+            return obj
+
         wrapper.__doc__ = obj.__doc__
         wrapper.__name__ = obj.__name__
         wrapper.__module__ = obj.__module__
@@ -704,6 +717,10 @@ def redirect_func(target, source_module=None, target_module=None,
                                        old=old_name or target.__name__,
                                        target=target_module,
                                        source=source_module)
+
+    if not __debug__:
+        return target
+
     return call
 
 
@@ -726,7 +743,9 @@ class ModuleDeprecationWrapper(object):
         super(ModuleDeprecationWrapper, self).__setattr__('_deprecated', {})
         super(ModuleDeprecationWrapper, self).__setattr__('_module', module)
         super(ModuleDeprecationWrapper, self).__setattr__('__doc__', module.__doc__)
-        sys.modules[module.__name__] = self
+
+        if __debug__:
+            sys.modules[module.__name__] = self
 
     def _add_deprecated_attr(self, name, replacement=None,
                              replacement_name=None):
