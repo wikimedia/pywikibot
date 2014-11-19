@@ -61,15 +61,16 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 #
 
-import sys
 import re
+import sys
 import webbrowser
 
 import pywikibot
+
 from pywikibot import i18n, Bot
 from pywikibot import pagegenerators as pg
-import image
-from imagetransfer import nowCommonsMessage
+
+from scripts.image import ImageRobot as ImageBot
 
 nowCommons = {
     '_default': [
@@ -318,7 +319,7 @@ class NowCommonsDeleteBot(Bot):
 
     def run(self):
         commons = pywikibot.Site('commons', 'commons')
-        comment = i18n.translate(self.site, nowCommonsMessage, fallback=True)
+        comment = i18n.twtranslate(self.site, 'imagetransfer-nowcommons_notice')
 
         for page in self.getPageGenerator():
             if self.getOption('use_hash'):
@@ -362,19 +363,19 @@ class NowCommonsDeleteBot(Bot):
                                     \"\03{lightgreen}%s\03{default}\".'
                                     % (localImagePage.title(withNamespace=False),
                                        commonsImagePage.title(withNamespace=False)))
-                                oImageRobot = image.ImageRobot(
+                                bot = ImageBot(
                                     pg.FileLinksGenerator(localImagePage),
                                     localImagePage.title(withNamespace=False),
                                     commonsImagePage.title(withNamespace=False),
                                     '', self.getOption('replacealways'),
                                     self.getOption('replaceloose'))
-                                oImageRobot.run()
+                                bot.run()
                                 # If the image is used with the urlname the
                                 # previous function won't work
                                 if len(list(pywikibot.FilePage(self.site,
                                                                 page.title()).usingPages())) > 0 and \
                                                                 self.getOption('replaceloose'):
-                                    oImageRobot = image.ImageRobot(
+                                    bot = ImageBot(
                                         pg.FileLinksGenerator(
                                             localImagePage),
                                         localImagePage.title(
@@ -383,7 +384,7 @@ class NowCommonsDeleteBot(Bot):
                                             withNamespace=False),
                                         '', self.getOption('replacealways'),
                                         self.getOption('replaceloose'))
-                                    oImageRobot.run()
+                                    bot.run()
                                 # refresh because we want the updated list
                                 usingPages = len(list(pywikibot.FilePage(
                                     self.site, page.title()).usingPages()))

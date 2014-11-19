@@ -64,9 +64,11 @@ __version__ = '$Id$'
 
 import re
 
-from add_text import add_text
 import pywikibot
+
 from pywikibot import i18n, pagegenerators, Bot
+
+from scripts.add_text import add_text
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp

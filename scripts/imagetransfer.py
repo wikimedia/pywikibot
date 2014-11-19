@@ -37,9 +37,12 @@ __version__ = '$Id$'
 
 import re
 import sys
+
 import pywikibot
-import upload
+
 from pywikibot import config, i18n, textlib
+
+from scripts import upload
 
 copy_message = {
     'ar': u"هذه الصورة تم نقلها من %s. الوصف الأصلي كان:\r\n\r\n%s",

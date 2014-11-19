@@ -23,9 +23,12 @@ __version__ = '$Id$'
 #
 
 import re
+
 import pywikibot
+
 from pywikibot import config2 as config
-import category
+
+from scripts.category import CategoryMoveRobot as CategoryMoveBot
 
 # The location of the CFD working page.
 cfdPage = u'Wikipedia:Categories for discussion/Working'
@@ -139,9 +142,10 @@ def main(*args):
                 pywikibot.output(summary, toStdout=True)
                 robot = None
             else:
-                robot = category.CategoryMoveRobot(oldcat=src, newcat=dest, batch=True,
-                                                   comment=summary, inplace=True, move_oldcat=True,
-                                                   delete_oldcat=True, deletion_comment=True)
+                robot = CategoryMoveBot(oldcat=src, newcat=dest, batch=True,
+                                        comment=summary, inplace=True,
+                                        move_oldcat=True, delete_oldcat=True,
+                                        deletion_comment=True)
         elif m.check(deletecat, line):
             src = m.result.group(1)
             # I currently don't see any reason to handle these two cases separately, though
@@ -153,8 +157,8 @@ def main(*args):
                     src, thisDay)
             else:
                 continue
-            robot = category.CategoryMoveRobot(oldcat=src, batch=True, comment=summary,
-                                                 deletion_comment=True, inplace=True)
+            robot = CategoryMoveBot(oldcat=src, batch=True, comment=summary,
+                                    deletion_comment=True, inplace=True)
         else:
             # This line does not fit any of our regular expressions, so ignore it.
             pass
