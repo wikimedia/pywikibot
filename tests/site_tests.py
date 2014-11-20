@@ -1685,6 +1685,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         # preloadpages will send the page ids, as they have already been loaded
         # by pagelinks, and preloadpages should complain the returned titles
         # do not match any title in the pagelist.
+        # However, APISite.sametitle now correctly links them.
         for page in links:
             page._link._text += ' '
 
@@ -1693,8 +1694,8 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertFalse(hasattr(page, "_text"))
-                self.assertEqual(len(page._revisions), 0)
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
             if count > 5:
@@ -1712,6 +1713,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         # change the title of the page _and_ delete the pageids.
         # preloadpages can only send the titles, and preloadpages should
         # complain the returned titles do not match any title in the pagelist.
+        # However, APISite.sametitle now correctly links them.
         for page in links:
             page._link._text += ' '
             del page._pageid
@@ -1721,8 +1723,8 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertFalse(hasattr(page, "_text"))
-                self.assertEqual(len(page._revisions), 0)
+                self.assertTrue(hasattr(page, "_text"))
+                self.assertEqual(len(page._revisions), 1)
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
             if count > 5:
