@@ -42,7 +42,9 @@ __version__ = '$Id$'
 #
 
 import re
+
 import pywikibot
+
 from pywikibot import i18n, pagegenerators, textlib, Bot
 
 # This is required for the text that is shown when you run this script
@@ -446,7 +448,7 @@ class XmlDumpNoReferencesPageGenerator:
         self.referencesR = re.compile('<references.*?/>', re.IGNORECASE)
 
     def __iter__(self):
-        import xmlreader
+        from pywikibot import xmlreader
         dump = xmlreader.XmlDump(self.xmlFilename)
         for entry in dump.parse():
             text = textlib.removeDisabledParts(entry.text)
