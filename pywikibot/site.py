@@ -4468,6 +4468,8 @@ class APISite(BaseSite):
         result = None
         file_page_title = filepage.title(withNamespace=False)
         if source_filename:
+            # TODO: Dummy value to allow also Unicode names, see bug 73661
+            mime_filename = 'FAKE-NAME'
             # upload local file
             # make sure file actually exists
             if not os.path.isfile(source_filename):
@@ -4491,7 +4493,7 @@ class APISite(BaseSite):
                                           mime_params={}, throttle=throttle)
                         req.mime_params['chunk'] = (chunk,
                                                     ("application", "octet-stream"),
-                                                    {'filename': file_page_title})
+                                                    {'filename': mime_filename})
                         if file_key:
                             req['filekey'] = file_key
                         try:
@@ -4526,7 +4528,7 @@ class APISite(BaseSite):
                         'mime_params': {
                             'file': (file_contents,
                                      filetype.split('/'),
-                                     {'filename': file_page_title})
+                                     {'filename': mime_filename})
                         }
                     }
             req = api.Request(site=self, action="upload", token=token,
