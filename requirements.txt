@@ -28,7 +28,7 @@ daemonize
 pydot
 
 # core pagegenerators
-yahoo
+pYsearch
 google
 
 # scripts/script_wui.py:
