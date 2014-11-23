@@ -41,9 +41,6 @@ argparse
 Pillow
 flickrapi
 
-# scripts/tests/test_data_ingestion.py
-test_utils
-
 # incomplete core component botirc
 irc
 
