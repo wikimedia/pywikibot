@@ -21,7 +21,7 @@ extra_deps = {
     'daemonize': ['daemonize'],
     'Graphviz':  ['pydot'],
     'MySQL': ['oursql'],
-    'Yahoo': ['yahoo'],
+    'Yahoo': ['pYsearch'],
     'Google': ['google'],
     'IRC': ['irc'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3']
