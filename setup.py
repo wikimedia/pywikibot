@@ -33,11 +33,19 @@ if sys.version_info[0] == 2:
 script_deps = {
     'script_wui.py': ['irc', 'lunatic-python', 'crontab'],
     # Note: None of the 'lunatic-python' repos on github support MS Windows.
-    'flickrripper.py': ['Pillow', 'flickrapi'],
-    # Note: 'PIL' is not available via pip2.7 on MS Windows,
-    #       however it is available with setuptools.
+    'flickrripper.py': ['Pillow'],
     'states_redirect.py': ['pycountry']
 }
+# flickrapi 1.4.4 installs a root logger in verbose mode; 1.4.5 fixes this.
+# The problem doesnt exist in flickrapi 2.x.
+# pywikibot accepts flickrapi 1.4.5+ on Python 2, as it has been stable for a
+# long time, and only depends on python-requests 1.x, whereas flickrapi 2.x
+# depends on python-requests 2.x, which is first packaged in Ubuntu 14.04
+# and will be first packaged for Fedora Core 21.
+# flickrapi 1.4.x does not run on Python 3, and setuptools can only
+# select flickrapi 2.x for Python 3 installs.
+script_deps['flickrripper.py'].append('flickrapi' if sys.version_info[0] > 2
+                                      else 'flickrapi>=1.4.5')
 
 dependency_links = [
     'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1',
@@ -63,8 +71,6 @@ if sys.version_info[0] == 3:
         print("ERROR: Python 3.3 or higher is required!")
         sys.exit(1)
 
-    dependency_links.append('hg+https://bitbucket.org/sybren/flickrapi#egg=flickrapi')
-
 if os.name != 'nt':
     # See bug 66010, Windows users will have issues
     # when trying to build the C modules.
@@ -80,7 +86,6 @@ extra_deps.update(script_deps)
 # so scripts can be compiled in test suite.
 if 'PYSETUP_TEST_EXTRAS' in os.environ:
     test_deps += list(itertools.chain(*(script_deps.values())))
-
 
 # late import of setuptools due to monkey-patching above
 from ez_setup import use_setuptools
