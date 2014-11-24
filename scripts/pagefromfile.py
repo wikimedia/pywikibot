@@ -16,6 +16,7 @@ end text in the page, if you want to include that text, use
 the -include option.
 
 Specific arguments:
+
 -start:xxx      Specify the text that marks the beginning of a page
 -end:xxx        Specify the text that marks the end of a page
 -file:xxx       Give the filename we are getting our material from
@@ -40,6 +41,7 @@ Specific arguments:
 -minor          set minor edit flag on page edits
 
 If the page to be uploaded already exists:
+
 -safe           do nothing (default)
 -appendtop      add the text to the top of it
 -appendbottom   add the text to the bottom of it
