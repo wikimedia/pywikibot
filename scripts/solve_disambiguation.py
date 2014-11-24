@@ -89,6 +89,7 @@ from pywikibot.bot import Bot, QuitKeyboardInterrupt
 # Disambiguation Needed template
 dn_template = {
     'en': u'{{dn}}',
+    'fr': u'{{Lien vers un homonyme}}',
 }
 
 # disambiguation page name format for "primary topic" disambiguations
