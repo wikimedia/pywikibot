@@ -3479,7 +3479,7 @@ class APISite(BaseSite):
 
         return rcgen
 
-    @deprecate_arg("number", "limit")
+    @deprecated_args(number="total")
     def search(self, searchstring, namespaces=None, where="text",
                getredirects=False, step=None, total=None, content=False):
         """Iterate Pages that contain the searchstring.
