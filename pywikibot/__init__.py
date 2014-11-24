@@ -112,6 +112,10 @@ class Timestamp(datetime.datetime):
 
     Use Timestamp.fromISOformat() and Timestamp.fromtimestampformat() to
     create Timestamp objects from MediaWiki string formats.
+    As these constructors are typically used to create objects using data
+    passed provided by site and page methods, some of which return a Timestamp
+    when previously they returned a MediaWiki string representation, these
+    methods also accept a Timestamp object, in which case they return a clone.
 
     Use Site.getcurrenttime() for the current time; this is more reliable
     than using Timestamp.utcnow().
@@ -124,11 +128,19 @@ class Timestamp(datetime.datetime):
     @classmethod
     def fromISOformat(cls, ts):
         """Convert an ISO 8601 timestamp to a Timestamp object."""
+        # If inadvertantly passed a Timestamp object, use replace()
+        # to create a clone.
+        if isinstance(ts, cls):
+            return ts.replace(microsecond=ts.microsecond)
         return cls.strptime(ts, cls.ISO8601Format)
 
     @classmethod
     def fromtimestampformat(cls, ts):
         """Convert a MediaWiki internal timestamp to a Timestamp object."""
+        # If inadvertantly passed a Timestamp object, use replace()
+        # to create a clone.
+        if isinstance(ts, cls):
+            return ts.replace(microsecond=ts.microsecond)
         return cls.strptime(ts, cls.mediawikiTSFormat)
 
     def toISOformat(self):
@@ -144,7 +156,8 @@ class Timestamp(datetime.datetime):
         return self.toISOformat()
 
     def __add__(self, other):
-        newdt = datetime.datetime.__add__(self, other)
+        """Perform addition, returning a Timestamp instead of datetime."""
+        newdt = super(Timestamp, self).__add__(other)
         if isinstance(newdt, datetime.datetime):
             return Timestamp(newdt.year, newdt.month, newdt.day, newdt.hour,
                              newdt.minute, newdt.second, newdt.microsecond,
@@ -153,7 +166,8 @@ class Timestamp(datetime.datetime):
             return newdt
 
     def __sub__(self, other):
-        newdt = datetime.datetime.__sub__(self, other)
+        """Perform substraction, returning a Timestamp instead of datetime."""
+        newdt = super(Timestamp, self).__sub__(other)
         if isinstance(newdt, datetime.datetime):
             return Timestamp(newdt.year, newdt.month, newdt.day, newdt.hour,
                              newdt.minute, newdt.second, newdt.microsecond,
