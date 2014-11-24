@@ -29,7 +29,7 @@ import pywikibot
 import pywikibot.family
 from pywikibot.tools import (
     itergroup, deprecated, deprecate_arg, UnicodeMixin, ComparableMixin,
-    redirect_func, add_decorated_full_name, deprecated_args,
+    redirect_func, add_decorated_full_name, deprecated_args, remove_last_args,
     SelfCallDict, SelfCallString, signature,
 )
 from pywikibot.tools import MediaWikiVersion as LV
@@ -707,17 +707,17 @@ class BaseSite(ComparableMixin):
                                        old_name='normalizeNamespace',
                                        class_name='BaseSite')
 
-    @deprecated_args(default=None)
+    @remove_last_args(('default', ))
     def redirect(self):
         """Return list of localized redirect tags for the site."""
         return [u"REDIRECT"]
 
-    @deprecated_args(default=None)
+    @remove_last_args(('default', ))
     def pagenamecodes(self):
         """Return list of localized PAGENAME tags for the site."""
         return [u"PAGENAME"]
 
-    @deprecated_args(default=None)
+    @remove_last_args(('default', ))
     def pagename2codes(self):
         """Return list of localized PAGENAMEE tags for the site."""
         return [u"PAGENAMEE"]
@@ -2015,7 +2015,7 @@ class APISite(BaseSite):
         else:
             return [word]
 
-    @deprecated_args(default=None)
+    @remove_last_args(('default', ))
     def redirect(self):
         """Return the localized #REDIRECT keyword."""
         # return the magic word without the preceding '#' character
@@ -2038,12 +2038,12 @@ class APISite(BaseSite):
             pattern = None
         return BaseSite.redirectRegex(self, pattern)
 
-    @deprecated_args(default=None)
+    @remove_last_args(('default', ))
     def pagenamecodes(self):
         """Return list of localized PAGENAME tags for the site."""
         return self.getmagicwords("pagename")
 
-    @deprecated_args(default=None)
+    @remove_last_args(('default', ))
     def pagename2codes(self):
         """Return list of localized PAGENAMEE tags for the site."""
         return self.getmagicwords("pagenamee")
