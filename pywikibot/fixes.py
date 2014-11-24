@@ -1,15 +1,15 @@
 # -*- coding: utf-8  -*-
 """File containing all standard fixes."""
-
 #
 # (C) Pywikibot team, 2008-2010
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
-#
 
-help = u"""
+parameter_help = u"""
+                  Currently available predefined fixes are:
+
                   * HTML        - Convert HTML tags to wiki syntax, and
                                   fix XHTML.
                   * isbn        - Fix badly formatted ISBNs.
@@ -31,8 +31,9 @@ help = u"""
                   * fckeditor   - Try to convert FCKeditor HTML tags to wiki
                                   syntax.
                                   https://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
-
 """
+
+__doc__ = __doc__ + parameter_help
 
 fixes = {
     # These replacements will convert HTML to wiki syntax where possible, and

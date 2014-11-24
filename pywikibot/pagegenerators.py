@@ -103,7 +103,7 @@ parameterHelp = u"""\
                   so check your edits!
 
 -limit:n          When used with any other argument that specifies a set
-                  of pages, work on no more than n pages in total
+                  of pages, work on no more than n pages in total.
 
 -links            Work on all pages that are linked from a certain page.
                   Argument can also be given as "-links:linkingpagetitle".
@@ -136,7 +136,7 @@ parameterHelp = u"""\
 
 -step:n           When used with any other argument that specifies a set
                   of pages, only retrieve n pages at a time from the wiki
-                  server
+                  server.
 
 -titleregex       Work on titles that match the given regular expression.
 
@@ -157,15 +157,15 @@ parameterHelp = u"""\
                   Argument can be given as "-unwatched:n" where
                   n is the maximum number of articles to work on.
 
--usercontribs     Work on all articles that were edited by a certain user :
-                  Example : -usercontribs:DumZiBoT
+-usercontribs     Work on all articles that were edited by a certain user.
+                  (Example : -usercontribs:DumZiBoT)
 
 -weblink          Work on all articles that contain an external link to
                   a given URL; may be given as "-weblink:url"
 
 -withoutinterwiki Work on all pages that don't have interlanguage links.
                   Argument can be given as "-withoutinterwiki:n" where
-                  n is some number (??).
+                  n is the total to fetch.
 
 -mysqlquery       Takes a Mysql query string like
                   "SELECT page_namespace, page_title, FROM page
@@ -199,7 +199,8 @@ parameterHelp = u"""\
                   config.py for instructions.
 
 -page             Work on a single page. Argument can also be given as
-                  "-page:pagetitle".
+                  "-page:pagetitle", and supplied multiple times for
+                  multiple pages.
 
 -grep             A regular expression that needs to match the article
                   otherwise the page won't be returned.

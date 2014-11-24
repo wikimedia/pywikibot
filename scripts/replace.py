@@ -10,15 +10,11 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
+Furthermore, the following command line parameters are supported:
+
 -xml              Retrieve information from a local XML dump (pages-articles
                   or pages-meta-current, see https://download.wikimedia.org).
                   Argument can also be given as "-xml:filename".
-
--page             Only edit a specific page.
-                  Argument can also be given as "-page:pagetitle". You can
-                  give this parameter multiple times to edit multiple pages.
-
-Furthermore, the following command line parameters are supported:
 
 -regex            Make replacements using regular expressions. If this argument
                   isn't given, the bot will make simple text replacements.
@@ -70,7 +66,7 @@ Furthermore, the following command line parameters are supported:
                   fixes.py and user-fixes.py.
                   The -regex and -nocase argument and given replacements will
                   be ignored if you use -fix.
-                  Currently available predefined fixes are:
+
 &fixes-help;
 
 -always           Don't prompt you for each replacement
@@ -143,7 +139,7 @@ if sys.version_info[0] > 2:
 # with the parameter -help.
 docuReplacements = {
     '&params;':     pagegenerators.parameterHelp,
-    '&fixes-help;': fixes.help,
+    '&fixes-help;': fixes.parameter_help,
 }
 
 
