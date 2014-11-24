@@ -457,6 +457,26 @@ class DequeGenerator(collections.deque):
 # a deprecator without any arguments.
 
 
+def signature(obj):
+    """
+    Safely return function Signature object (PEP 362).
+
+    inspect.signature was introduced in 3.3, however backports are available.
+    In Python 3.3, it does not support all types of callables, and should
+    not be relied upon.  Python 3.4 works correctly.
+
+    Any exception calling inspect.signature is ignored and None is returned.
+
+    @param obj: Function to inspect
+    @rtype obj: callable
+    @rtype: inpect.Signature or None
+    """
+    try:
+        return inspect.signature(obj)
+    except (AttributeError, ValueError):
+        return None
+
+
 def add_decorated_full_name(obj):
     """Extract full object name, including class, and store in __full_name__.
 
@@ -527,6 +547,7 @@ def add_full_name(obj):
         inner_wrapper.__doc__ = obj.__doc__
         inner_wrapper.__name__ = obj.__name__
         inner_wrapper.__module__ = obj.__module__
+        inner_wrapper.__signature__ = signature(obj)
 
         # The decorator being decorated may have args, so both
         # syntax need to be supported.
@@ -581,6 +602,7 @@ def deprecated(*args, **kwargs):
         wrapper.__doc__ = obj.__doc__
         wrapper.__name__ = obj.__name__
         wrapper.__module__ = obj.__module__
+        wrapper.__signature__ = signature(obj)
         return wrapper
 
     without_parameters = len(args) == 1 and len(kwargs) == 0 and callable(args[0])
@@ -662,6 +684,20 @@ def deprecated_args(**arg_pairs):
         wrapper.__doc__ = obj.__doc__
         wrapper.__name__ = obj.__name__
         wrapper.__module__ = obj.__module__
+        wrapper.__signature__ = signature(obj)
+        if wrapper.__signature__:
+            # Build a new signature with deprecated args added.
+            params = collections.OrderedDict()
+            for param in wrapper.__signature__.parameters.values():
+                params[param.name] = param.replace()
+            for old_arg, new_arg in arg_pairs.items():
+                params[old_arg] = inspect.Parameter(
+                    old_arg, kind=inspect._POSITIONAL_OR_KEYWORD,
+                    default='[deprecated name of ' + new_arg + ']'
+                    if new_arg not in [True, False, None]
+                    else NotImplemented)
+            wrapper.__signature__ = inspect.Signature()
+            wrapper.__signature__._parameters = params
         if not hasattr(obj, '__full_name__'):
             add_decorated_full_name(obj)
         wrapper.__full_name__ = obj.__full_name__

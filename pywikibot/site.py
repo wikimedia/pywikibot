@@ -30,7 +30,7 @@ import pywikibot.family
 from pywikibot.tools import (
     itergroup, deprecated, deprecate_arg, UnicodeMixin, ComparableMixin,
     redirect_func, add_decorated_full_name, deprecated_args,
-    SelfCallDict, SelfCallString,
+    SelfCallDict, SelfCallString, signature,
 )
 from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.throttle import Throttle
@@ -973,6 +973,7 @@ def must_be(group=None, right=None):
         if not hasattr(fn, '__full_name__'):
             add_decorated_full_name(fn)
         callee.__full_name__ = fn.__full_name__
+        callee.__signature__ = signature(fn)
         return callee
 
     return decorator
@@ -1001,6 +1002,7 @@ def need_version(version):
         callee.__name__ = fn.__name__
         callee.__doc__ = fn.__doc__
         callee.__module__ = fn.__module__
+        callee.__signature__ = signature(fn)
         if not hasattr(fn, '__full_name__'):
             add_decorated_full_name(fn)
         callee.__full_name__ = fn.__full_name__
