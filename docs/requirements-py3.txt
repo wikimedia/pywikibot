@@ -1,0 +1,8 @@
+# This is a PIP requirements file for building Sphinx documentation of pywikibot
+# using sphinx-1.3b1 on python3.4, and is used by readthedocs.org.
+
+sphinx==1.3.1
+sphinx-epytext>=0.0.3
+
+# mandatory; see README.conversion.txt
+httplib2>=0.9.0
