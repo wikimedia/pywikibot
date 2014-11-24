@@ -1689,7 +1689,7 @@ class LogEntryListGenerator(ListGenerator):
         ListGenerator.__init__(self, "logevents", **kwargs)
 
         from pywikibot import logentries
-        self.entryFactory = logentries.LogEntryFactory(logtype)
+        self.entryFactory = logentries.LogEntryFactory(self.site, logtype)
 
     def result(self, pagedata):
         return self.entryFactory.create(pagedata)

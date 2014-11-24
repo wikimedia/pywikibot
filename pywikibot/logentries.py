@@ -37,9 +37,10 @@ class LogEntry(object):
     # Overriden in subclasses.
     _expectedType = None
 
-    def __init__(self, apidata):
+    def __init__(self, apidata, site):
         """Initialize object from a logevent dict returned by MW API."""
         self.data = LogDict(apidata)
+        self.site = site
         if self._expectedType is not None and self._expectedType != self.type():
             raise Error("Wrong log type! Expecting %s, received %s instead."
                         % (self._expectedType, self.type()))
@@ -59,7 +60,7 @@ class LogEntry(object):
     def title(self):
         """Page on which action was performed."""
         if not hasattr(self, '_title'):
-            self._title = pywikibot.Page(pywikibot.Link(self.data['title']))
+            self._title = pywikibot.Page(self.site, self.data['title'])
         return self._title
 
     def type(self):
@@ -88,9 +89,9 @@ class BlockEntry(LogEntry):
 
     _expectedType = 'block'
 
-    def __init__(self, apidata):
+    def __init__(self, apidata, site):
         """Constructor."""
-        super(BlockEntry, self).__init__(apidata)
+        super(BlockEntry, self).__init__(apidata, site)
         # see en.wikipedia.org/w/api.php?action=query&list=logevents&letype=block&lelimit=1&lestart=2009-03-04T00:35:07Z
         # When an autoblock is removed, the "title" field is not a page title
         # ( https://bugzilla.wikimedia.org/show_bug.cgi?id=17781 )
@@ -205,7 +206,7 @@ class MoveEntry(LogEntry):
     def new_title(self):
         """Return page object of the new title."""
         if not hasattr(self, '_new_title'):
-            self._new_title = pywikibot.Page(pywikibot.Link(self.data['move']['new_title']))
+            self._new_title = pywikibot.Page(self.site, self.data['move']['new_title'])
         return self._new_title
 
     def suppressedredirect(self):
@@ -261,15 +262,18 @@ class LogEntryFactory(object):
         'newusers': NewUsersEntry
     }
 
-    def __init__(self, logtype=None):
+    def __init__(self, site, logtype=None):
         """
         Constructor.
 
+        @param site: The site on which the log entries are created.
+        @type site: BaseSite
         @param logtype: The log type of the log entries, if known in advance.
                         If None, the Factory will fetch the log entry from
                         the data to create each object.
         @type logtype: (letype) str : move/block/patrol/etc...
         """
+        self._site = site
         if logtype is None:
             self._creator = self._createFromData
         else:
@@ -286,7 +290,7 @@ class LogEntryFactory(object):
 
         @return: LogEntry object representing logdata
         """
-        return self._creator(logdata)
+        return self._creator(logdata, self._site)
 
     @staticmethod
     def _getEntryClass(logtype):
