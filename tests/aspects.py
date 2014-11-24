@@ -78,6 +78,18 @@ class TestCaseBase(unittest.TestCase):
             """
             return self.assertItemsEqual(*args, **kwargs)
 
+    def _addUnexpectedSuccess(self, result):
+        """Report and ignore."""
+        print(' unexpected success ', end='')
+        sys.stdout.flush()
+        result.addSuccess(self)
+
+    def _addExpectedFailure(self, result, exc_info=None):
+        """Report and ignore."""
+        print(' expected failure ', end='')
+        sys.stdout.flush()
+        result.addSuccess(self)
+
     def assertPageInNamespaces(self, page, namespaces):
         """
         Assert that Pages is in namespaces.
