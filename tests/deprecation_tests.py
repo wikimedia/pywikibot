@@ -8,7 +8,7 @@
 __version__ = '$Id$'
 
 from pywikibot.tools import (
-    deprecated, deprecate_arg, deprecated_args, add_full_name
+    deprecated, deprecate_arg, deprecated_args, add_full_name, remove_last_args
 )
 from tests.aspects import unittest, DeprecationTestCase
 
@@ -116,6 +116,16 @@ def deprecated_func_arg3(foo=None):
     return foo
 
 
+@remove_last_args(['foo', 'bar'])
+def deprecated_all():
+    return None
+
+
+@remove_last_args(['bar'])
+def deprecated_all2(foo):
+    return foo
+
+
 class DeprecatedMethodClass(object):
 
     """Class with methods deprecated."""
@@ -165,6 +175,14 @@ class DeprecatedMethodClass(object):
     @deprecated()
     def deprecated_instance_method_and_arg2(self, foo):
         self.foo = foo
+        return foo
+
+    @remove_last_args(['foo', 'bar'])
+    def deprecated_all(self):
+        return None
+
+    @remove_last_args(['bar'])
+    def deprecated_all2(self, foo):
         return foo
 
 
@@ -407,6 +425,135 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertDeprecation('old argument of ' + __name__ + '.deprecated_func_arg3 is deprecated.')
 
         DeprecatorTestCase._reset_messages()
+
+    def test_function_remove_last_args(self):
+        """Test @remove_last_args on functions."""
+        rv = deprecated_all()
+        self.assertEqual(rv, None)
+        self.assertNoDeprecation()
+
+        rv = deprecated_all(foo=42)
+        self.assertEqual(rv, None)
+        self.assertDeprecation("The trailing arguments ('foo', 'bar') of " + __name__ + ".deprecated_all are deprecated. The value(s) provided for 'foo' have been dropped.")
+
+        self._reset_messages()
+
+        rv = deprecated_all(42)
+        self.assertEqual(rv, None)
+        self.assertDeprecation("The trailing arguments ('foo', 'bar') of " + __name__ + ".deprecated_all are deprecated. The value(s) provided for 'foo' have been dropped.")
+
+        self._reset_messages()
+
+        rv = deprecated_all(foo=42, bar=47)
+        self.assertEqual(rv, None)
+        self.assertDeprecation("The trailing arguments ('foo', 'bar') of " + __name__ + ".deprecated_all are deprecated. The value(s) provided for 'foo', 'bar' have been dropped.")
+
+        self._reset_messages()
+
+        rv = deprecated_all(42, 47)
+        self.assertEqual(rv, None)
+        self.assertDeprecation("The trailing arguments ('foo', 'bar') of " + __name__ + ".deprecated_all are deprecated. The value(s) provided for 'foo', 'bar' have been dropped.")
+
+        self._reset_messages()
+
+        rv = deprecated_all2(foo=42)
+        self.assertEqual(rv, 42)
+        self.assertNoDeprecation()
+
+        rv = deprecated_all2(42)
+        self.assertEqual(rv, 42)
+        self.assertNoDeprecation()
+
+        rv = deprecated_all2(42, bar=47)
+        self.assertEqual(rv, 42)
+        self.assertDeprecation("The trailing arguments ('bar') of " + __name__ + ".deprecated_all2 are deprecated. The value(s) provided for 'bar' have been dropped.")
+
+        self._reset_messages()
+
+    def test_method_remove_last_args(self):
+        """Test @remove_last_args on functions."""
+        f = DeprecatedMethodClass()
+
+        rv = f.deprecated_all()
+        self.assertEqual(rv, None)
+        self.assertNoDeprecation()
+
+        rv = f.deprecated_all(foo=42)
+        self.assertEqual(rv, None)
+        self.assertDeprecation("The trailing arguments ('foo', 'bar') of " + __name__ + ".DeprecatedMethodClass.deprecated_all are deprecated. The value(s) provided for 'foo' have been dropped.")
+
+        self._reset_messages()
+
+        rv = f.deprecated_all(42)
+        self.assertEqual(rv, None)
+        self.assertDeprecation("The trailing arguments ('foo', 'bar') of " + __name__ + ".DeprecatedMethodClass.deprecated_all are deprecated. The value(s) provided for 'foo' have been dropped.")
+
+        self._reset_messages()
+
+        rv = f.deprecated_all(foo=42, bar=47)
+        self.assertEqual(rv, None)
+        self.assertDeprecation("The trailing arguments ('foo', 'bar') of " + __name__ + ".DeprecatedMethodClass.deprecated_all are deprecated. The value(s) provided for 'foo', 'bar' have been dropped.")
+
+        self._reset_messages()
+
+        rv = f.deprecated_all(42, 47)
+        self.assertEqual(rv, None)
+        self.assertDeprecation("The trailing arguments ('foo', 'bar') of " + __name__ + ".DeprecatedMethodClass.deprecated_all are deprecated. The value(s) provided for 'foo', 'bar' have been dropped.")
+
+        self._reset_messages()
+
+        rv = f.deprecated_all2(foo=42)
+        self.assertEqual(rv, 42)
+        self.assertNoDeprecation()
+
+        rv = f.deprecated_all2(42)
+        self.assertEqual(rv, 42)
+        self.assertNoDeprecation()
+
+        rv = f.deprecated_all2(42, bar=47)
+        self.assertEqual(rv, 42)
+        self.assertDeprecation("The trailing arguments ('bar') of " + __name__ + ".DeprecatedMethodClass.deprecated_all2 are deprecated. The value(s) provided for 'bar' have been dropped.")
+
+    def test_remove_last_args_invalid(self):
+        self.assertRaisesRegex(
+            TypeError,
+            r"(deprecated_all2\(\) missing 1 required positional argument: 'foo'|"  # Python 3
+            "deprecated_all2\(\) takes exactly 1 argument \(0 given\))",  # Python 2
+            deprecated_all2)
+
+        self.assertRaisesRegex(
+            TypeError,
+            r"deprecated_all2\(\) got an unexpected keyword argument 'hello'",
+            deprecated_all2,
+            hello='world')
+
+        self.assertRaisesRegex(
+            TypeError,
+            r'deprecated_all2\(\) takes (exactly )?1 (positional )?argument'
+            ' (but 2 were given|\(2 given\))',
+            deprecated_all2,
+            1, 2, 3)
+
+        f = DeprecatedMethodClass()
+
+        self.assertRaisesRegex(
+            TypeError,
+            r"(deprecated_all2\(\) missing 1 required positional argument: 'foo'|"  # Python 3
+            "deprecated_all2\(\) takes exactly 2 arguments \(1 given\))",  # Python 2
+            f.deprecated_all2)
+
+        self.assertRaisesRegex(
+            TypeError,
+            r"deprecated_all2\(\) got an unexpected keyword argument 'hello'",
+            f.deprecated_all2,
+            hello='world')
+
+        self.assertRaisesRegex(
+            TypeError,
+            r'deprecated_all2\(\) takes (exactly )?2 (positional )?arguments '
+            '(but 3 were given|\(3 given\))',
+            f.deprecated_all2,
+            1, 2, 3)
 
     def test_deprecated_instance_method_zero_arg(self):
         """Test @deprecate_arg with classes, without arguments."""

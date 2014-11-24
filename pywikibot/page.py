@@ -49,7 +49,8 @@ from pywikibot.exceptions import (
     SiteDefinitionError
 )
 from pywikibot.tools import (
-    ComparableMixin, deprecated, deprecate_arg, deprecated_args
+    ComparableMixin, deprecated, deprecate_arg, deprecated_args,
+    remove_last_args
 )
 from pywikibot import textlib
 
@@ -241,7 +242,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                 title = title.replace(forbidden, '_')
         return title
 
-    @deprecated_args(decode=None, underscore=None)
+    @remove_last_args(('decode', 'underscore'))
     def section(self):
         """Return the name of the section this Page refers to.
 
@@ -540,7 +541,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
 
         return self._lastNonBotUser
 
-    @deprecated_args(datetime=None)
+    @remove_last_args(('datetime', ))
     def editTime(self):
         """Return timestamp of last revision to page.
 

@@ -705,6 +705,74 @@ def deprecated_args(**arg_pairs):
     return decorator
 
 
+def remove_last_args(arg_names):
+    """
+    Decorator to declare all args additionally provided deprecated.
+
+    All positional arguments appearing after the normal arguments are marked
+    deprecated. It marks also all keyword arguments present in arg_names as
+    deprecated. Any arguments (positional or keyword) which are not present in
+    arg_names are forwarded. For example a call with 3 parameters and the
+    original function requests one and arg_names contain one name will result
+    in an error, because the function got called with 2 parameters.
+
+    The decorated function may not use *args or **kwargs.
+
+    @param arg_names: The names of all arguments.
+    @type arg_names: iterable; for the most explanatory message it should
+        retain the given order (so not a set for example).
+    """
+    def decorator(obj):
+        """Outer wrapper.
+
+        The outer wrapper is used to create the decorating wrapper.
+
+        @param obj: function being wrapped
+        @type obj: object
+        """
+        def wrapper(*__args, **__kw):
+            """Replacement function.
+
+            @param __args: args passed to the decorated function
+            @type __args: list
+            @param __kwargs: kwargs passed to the decorated function
+            @type __kwargs: dict
+            @return: the value returned by the decorated function
+            @rtype: any
+            """
+            name = obj.__full_name__
+            args, varargs, kwargs, _ = inspect.getargspec(wrapper.__wrapped__)
+            if varargs is not None and kwargs is not None:
+                raise ValueError(u'{1} may not have * or ** args.'.format(
+                    name))
+            deprecated = set(__kw) & set(arg_names)
+            if len(__args) > len(args):
+                deprecated.update(arg_names[:len(__args) - len(args)])
+            # remove at most |arg_names| entries from the back
+            new_args = tuple(__args[:max(len(args), len(__args) - len(arg_names))])
+            new_kwargs = dict((arg, val) for arg, val in __kw.items()
+                              if arg not in arg_names)
+
+            if deprecated:
+                # sort them according to arg_names
+                deprecated = [arg for arg in arg_names if arg in deprecated]
+                warning(u"The trailing arguments ('{0}') of {1} are "
+                        "deprecated. The value(s) provided for '{2}' have "
+                        "been dropped.".format("', '".join(arg_names), name,
+                                               "', '".join(deprecated)))
+            return obj(*new_args, **new_kwargs)
+
+        wrapper.__doc__ = obj.__doc__
+        wrapper.__name__ = obj.__name__
+        wrapper.__module__ = obj.__module__
+        if not hasattr(obj, '__full_name__'):
+            add_decorated_full_name(obj)
+        wrapper.__full_name__ = obj.__full_name__
+        wrapper.__wrapped__ = getattr(obj, '__wrapped__', obj)
+        return wrapper
+    return decorator
+
+
 def redirect_func(target, source_module=None, target_module=None,
                   old_name=None, class_name=None):
     """
