@@ -129,7 +129,7 @@ no_args_expected_results = {
     'interwiki': 'does not exist. Skipping.',  # 'Test page' does not exist
     'login': 'Logged in on ',
     'pagefromfile': 'Please enter the file name',
-    'replace': 'Press Enter to use this default message',
+    'replace': 'Press Enter to use this automatic message',
     'script_wui': 'Pre-loading all relevant page contents',
     'shell': 'Welcome to the',
     'spamremove': 'No spam site specified',
