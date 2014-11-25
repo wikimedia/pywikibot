@@ -279,7 +279,8 @@ class LogEntryFactory(object):
         else:
             # Bind a Class object to self._creator:
             # When called, it will initialize a new object of that class
-            self._creator = LogEntryFactory._getEntryClass(logtype)
+            logclass = LogEntryFactory._getEntryClass(logtype)
+            self._creator = lambda data: logclass(data, self._site)
 
     def create(self, logdata):
         """
@@ -290,7 +291,7 @@ class LogEntryFactory(object):
 
         @return: LogEntry object representing logdata
         """
-        return self._creator(logdata, self._site)
+        return self._creator(logdata)
 
     @staticmethod
     def _getEntryClass(logtype):
@@ -315,7 +316,7 @@ class LogEntryFactory(object):
         """
         try:
             logtype = logdata['type']
-            return LogEntryFactory._getEntryClass(logtype)(logdata)
+            return LogEntryFactory._getEntryClass(logtype)(logdata, self._site)
         except KeyError:
             pywikibot.debug(u"API log entry received:\n" + logdata,
                             _logger)
