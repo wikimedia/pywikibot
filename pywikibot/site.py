@@ -1831,22 +1831,19 @@ class APISite(BaseSite):
                 amlang=self.lang,
             )
 
+            for msg in msg_query:
+                if 'missing' not in msg:
+                    self._msgcache[msg['name']] = msg['*']
+
             # Return all messages
             if keys == u'*' or keys == [u'*']:
-                for msg in msg_query:
-                    if 'missing' not in msg:
-                        self._msgcache[msg['name']] = msg['*']
                 return self._msgcache
-            # Return only given keys
             else:
-                for _key in keys:
-                    for msg in msg_query:
-                        if msg['name'] == _key and 'missing' not in msg:
-                            self._msgcache[_key] = msg['*']
-                            break
-                    else:
-                        raise KeyError("Site %(self)s has no message '%(_key)s'"
-                                       % locals())
+                # Check requested keys
+                for key in keys:
+                    if key not in self._msgcache:
+                        raise KeyError("Site %s has no message '%s'"
+                                       % (self, key))
 
         return dict((_key, self._msgcache[_key]) for _key in keys)
 
