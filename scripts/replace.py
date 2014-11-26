@@ -178,7 +178,7 @@ class Replacement(object):
         self.edit_summary = edit_summary
         self.default_summary = default_summary
 
-    def compile(self, flags, use_regex):
+    def compile(self, use_regex, flags):
         # Set the regular aexpression flags
         flags |= re.UNICODE
 
