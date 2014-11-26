@@ -42,6 +42,9 @@ from pywikibot.exceptions import (
     PageCreatedConflict,
     PageDeletedConflict,
     ArticleExistsConflict,
+    IsNotRedirectPage,
+    CircularRedirect,
+    InterwikiRedirectPage,
     LockedPage,
     CascadeLockedPage,
     LockedNoPage,
@@ -52,6 +55,7 @@ from pywikibot.exceptions import (
     SpamfilterError,
     NoCreateError,
     UserBlocked,
+    EntityTypeUnknownException,
 )
 
 from pywikibot.echo import Notification
@@ -447,7 +451,7 @@ class BaseSite(ComparableMixin):
                         and oldcode == pywikibot.config.mylang:
                     pywikibot.config.mylang = self.__code
             else:
-                raise UnknownSite("Language %s does not exist in family %s"
+                raise UnknownSite("Language '%s' does not exist in family %s"
                                   % (self.__code, self.__family.name))
 
         self.nocapitalize = self.code in self.family.nocapitalize
@@ -2363,9 +2367,10 @@ class APISite(BaseSite):
     def getredirtarget(self, page):
         """Return Page object for the redirect target of page."""
         if not self.page_isredirect(page):
-            raise pywikibot.IsNotRedirectPage(page)
+            raise IsNotRedirectPage(page)
         if hasattr(page, '_redirtarget'):
             return page._redirtarget
+
         title = page.title(withSection=False)
         query = api.Request(site=self, action="query", prop="info",
                             inprop="protection|talkid|subjectid",
@@ -2376,35 +2381,64 @@ class APISite(BaseSite):
             raise RuntimeError(
                 "getredirtarget: No 'redirects' found for page %s."
                 % title.encode(self.encoding()))
+
         redirmap = dict((item['from'],
                          {'title': item['to'],
                           'section': u'#' + item['tofragment']
                           if 'tofragment' in item and item['tofragment']
                           else ''})
                         for item in result['query']['redirects'])
-        if 'normalized' in result['query']:
-            for item in result['query']['normalized']:
-                if item['from'] == title:
-                    title = item['to']
-                    break
+
+        # Normalize title
+        for item in result['query'].get('normalized', []):
+            if item['from'] == title:
+                title = item['to']
+                break
+
         if title not in redirmap:
             raise RuntimeError(
                 "getredirtarget: 'redirects' contains no key for page %s."
                 % title.encode(self.encoding()))
         target_title = u'%(title)s%(section)s' % redirmap[title]
-        if target_title == title or "pages" not in result['query']:
-            # no "pages" element indicates a circular redirect
-            raise pywikibot.CircularRedirect(page)
+
+        if self.sametitle(title, target_title):
+            raise CircularRedirect(page)
+
+        if "pages" not in result['query']:
+            # No "pages" element might indicate a circular redirect
+            # Check that a "to" link is also a "from" link in redirmap
+            for _from, _to in redirmap.items():
+                if _to['title'] in redirmap:
+                    raise CircularRedirect(page)
+            else:
+                target = pywikibot.Page(source=page.site, title=target_title)
+
+                # Check if target is on another site.
+                if target.site != page.site:
+                    raise InterwikiRedirectPage(page, target)
+                else:
+                    # Redirect to Special: & Media: pages, which do not work
+                    # like redirects, but are rendered like a redirect.
+                    page._redirtarget = target
+                    return page._redirtarget
+
         pagedata = list(result['query']['pages'].values())[0]
-        # there should be only one value in 'pages', and it is the target
+        # There should be only one value in 'pages' (the ultimate
+        # target, also in case of double redirects).
         if self.sametitle(pagedata['title'], target_title):
+            # target_title is the ultimate target
             target = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
             api.update_page(target, pagedata, ['info'])
             page._redirtarget = target
         else:
-            # double redirect; target is an intermediate redirect
+            # Target is an intermediate redirect -> double redirect.
+            # Do not bypass double-redirects and return the ultimate target;
+            # it would be impossible to detect and fix double-redirects.
+            # This handles also redirects to sections, as sametitle()
+            # does not ignore sections.
             target = pywikibot.Page(self, target_title)
             page._redirtarget = target
+
         return page._redirtarget
 
     def preloadpages(self, pagelist, groupsize=50, templates=False,
@@ -3294,12 +3328,12 @@ class APISite(BaseSite):
         if starttime and endtime:
             if reverse:
                 if starttime > endtime:
-                    raise pywikibot.Error(
+                    raise Error(
                         "blocks: "
                         "starttime must be before endtime with reverse=True")
             else:
                 if endtime > starttime:
-                    raise pywikibot.Error(
+                    raise Error(
                         "blocks: "
                         "endtime must be before starttime with reverse=False")
         bkgen = self._generator(api.ListGenerator, type_arg="blocks",
@@ -4024,7 +4058,7 @@ class APISite(BaseSite):
 
         """
         if len(page._revisions) < 2:
-            raise pywikibot.Error(
+            raise Error(
                 u"Rollback of %s aborted; load revision history first."
                 % page.title(asLink=True))
         last_rev = page._revisions[page.latestRevision()]
@@ -4034,7 +4068,7 @@ class APISite(BaseSite):
             if rev.user != last_user:
                 break
         else:
-            raise pywikibot.Error(
+            raise Error(
                 u"Rollback of %s aborted; only one user in revision history."
                 % page.title(asLink=True))
         token = self.tokens["rollback"]
@@ -4450,7 +4484,7 @@ class APISite(BaseSite):
 
         # check for required user right
         if "upload" not in self.userinfo["rights"]:
-            raise pywikibot.Error(
+            raise Error(
                 "User '%s' does not have upload rights on site %s."
                 % (self.user(), self))
         # check for required parameters
@@ -4540,7 +4574,7 @@ class APISite(BaseSite):
         else:
             # upload by URL
             if "upload_by_url" not in self.userinfo["rights"]:
-                raise pywikibot.Error(
+                raise Error(
                     "User '%s' is not authorized to upload by URL on site %s."
                     % (self.user(), self))
             req = api.Request(site=self, action="upload", token=token,
@@ -4932,7 +4966,7 @@ class DataSite(APISite):
         if isinstance(self._item_namespace, Namespace):
             return self._item_namespace
         else:
-            raise pywikibot.exceptions.EntityTypeUnknownException(
+            raise EntityTypeUnknownException(
                 '%r does not support entity type "item"'
                 % self)
 
@@ -4950,7 +4984,7 @@ class DataSite(APISite):
         if isinstance(self._property_namespace, Namespace):
             return self._property_namespace
         else:
-            raise pywikibot.exceptions.EntityTypeUnknownException(
+            raise EntityTypeUnknownException(
                 '%r does not support entity type "property"'
                 % self)
 
@@ -5154,7 +5188,7 @@ class DataSite(APISite):
             raise NotImplementedError
         if not claim.snak:
             # We need to already have the snak value
-            raise pywikibot.NoPage(claim)
+            raise NoPage(claim)
         params = dict(action='wbsetclaimvalue',
                       claim=claim.snak,
                       snaktype=snaktype,
