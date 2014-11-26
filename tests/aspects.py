@@ -169,6 +169,10 @@ class TestCaseBase(unittest.TestCase):
             working_set = collections.deque(titles)
 
         for page in gen:
+            self.assertIsInstance(page, pywikibot.Page)
+            if site:
+                self.assertEqual(page.site, site)
+
             title = page.title()
             self.assertIn(title, titles)
             if is_tuple:

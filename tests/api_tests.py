@@ -8,7 +8,8 @@
 __version__ = '$Id$'
 
 import datetime
-import pywikibot
+import types
+
 import pywikibot.data.api as api
 from pywikibot.tools import MediaWikiVersion
 
@@ -248,14 +249,21 @@ class TestDryPageGenerator(TestCase):
 
     dry = True
 
+    # api.py sorts 'pages' using the string key, which is not a
+    # numeric comparison.
+    titles = ("Broadcaster (definition)", "Wiktionary", "Broadcaster.com",
+              "Wikipedia:Disambiguation")
+
     def setUp(self):
         super(TestDryPageGenerator, self).setUp()
         mysite = self.get_site()
         self.gen = api.PageGenerator(site=mysite,
                                      generator="links",
                                      titles="User:R'n'B")
-        # following test data is copied from an actual api.php response
-        self.gen.data = {
+        # following test data is copied from an actual api.php response,
+        # but that query no longer matches this dataset.
+        # http://en.wikipedia.org/w/api.php?action=query&generator=links&titles=User:R%27n%27B
+        self.gen.request.submit = types.MethodType(lambda self: {
             "query": {"pages": {"296589": {"pageid": 296589,
                                            "ns": 0,
                                            "title": "Broadcaster.com"
@@ -274,58 +282,55 @@ class TestDryPageGenerator(TestCase):
                                           }
                                 }
                       }
-        }
+        }, self.gen.request)
 
         # On a dry site, the namespace objects only have canonical names.
         # Add custom_name for this site namespace, to match the live site.
         if 'Wikipedia' not in self.site._namespaces:
             self.site._namespaces[4].custom_name = 'Wikipedia'
 
-    def testGeneratorResults(self):
+    def test_results(self):
         """Test that PageGenerator yields pages with expected attributes."""
-        titles = ["Broadcaster.com", "Broadcaster (definition)",
-                  "Wiktionary", "Wikipedia:Disambiguation"]
-        mysite = self.get_site()
-        results = [p for p in self.gen]
-        self.assertEqual(len(results), 4)
-        for page in results:
-            self.assertEqual(type(page), pywikibot.Page)
-            self.assertEqual(page.site, mysite)
-            self.assertIn(page.title(), titles)
+        self.assertPagelistTitles(self.gen, self.titles)
 
     def test_initial_limit(self):
         self.assertEqual(self.gen.limit, None)  # limit is initally None
 
-    def test_limit_as_number(self):
+    def test_set_limit_as_number(self):
         for i in range(-2, 4):
             self.gen.set_maximum_items(i)
             self.assertEqual(self.gen.limit, i)
 
-    def test_limit_as_string(self):
+    def test_set_limit_as_string(self):
         for i in range(-2, 4):
             self.gen.set_maximum_items(str(i))
             self.assertEqual(self.gen.limit, i)
 
-    def test_wrong_limit_setting(self):
+    def test_set_limit_not_number(self):
         with self.assertRaisesRegex(
                 ValueError,
                 "invalid literal for int\(\) with base 10: 'test'"):
             self.gen.set_maximum_items('test')
 
-    def test_limits(self):
+    def test_limit_equal_total(self):
         """Test that PageGenerator yields the requested amount of pages."""
-        for i in range(4, 0, -1):
-            self.gen.set_maximum_items(i)  # set total amount of pages
-            results = [p for p in self.gen]
-            self.assertEqual(len(results), i)
+        self.gen.set_maximum_items(4)
+        self.assertPagelistTitles(self.gen, self.titles)
 
+    def test_limit_one(self):
+        """Test that PageGenerator yields the requested amount of pages."""
+        self.gen.set_maximum_items(1)
+        self.assertPagelistTitles(self.gen, self.titles[0:1])
+
+    def test_limit_zero(self):
+        """Test that a limit of zero is the same as limit None."""
         self.gen.set_maximum_items(0)
-        results = [p for p in self.gen]
-        self.assertEqual(len(results), 4)  # total=0 but 4 expected (really?)
+        self.assertPagelistTitles(self.gen, self.titles)
 
+    def test_limit_omit(self):
+        """Test that limit omitted is the same as limit None."""
         self.gen.set_maximum_items(-1)
-        results = [p for p in self.gen]
-        self.assertEqual(len(results), 4)  # total=-1 but 4 expected
+        self.assertPagelistTitles(self.gen, self.titles)
 
 
 class TestPropertyGenerator(TestCase):
