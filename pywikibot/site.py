@@ -818,11 +818,13 @@ class BaseSite(ComparableMixin):
         """
         def ns_split(title):
             """Separate the namespace from the name."""
-            if ':' not in title:
-                title = ':' + title
-            ns, _, name = title.partition(':')
-            ns = Namespace.lookup_name(ns, self.namespaces) or default_ns
-            return ns, name
+            ns, delim, name = title.partition(':')
+            if delim:
+                ns = Namespace.lookup_name(ns, self.namespaces)
+            if not delim or not ns:
+                return default_ns, title
+            else:
+                return ns, name
 
         if title1 == title2:
             return True

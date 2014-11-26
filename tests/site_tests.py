@@ -1905,7 +1905,7 @@ class TestDataSiteClientPreloading(DefaultWikidataClientTestCase):
         self.assertEqual(item.id, 'Q5296')
 
 
-class TestSameTitleSite(TestCase):
+class TestSametitleSite(TestCase):
 
     """Test APISite.sametitle on sites with known behaviour."""
 
@@ -1924,27 +1924,34 @@ class TestSameTitleSite(TestCase):
         }
     }
 
-    def check(self, site, case_sensitive):
-        self.assertEqual(site.sametitle('Foo', 'foo'), not case_sensitive)
-        self.assertTrue(site.sametitle('File:Foo', 'Image:Foo'))
-        self.assertTrue(site.sametitle(':Foo', 'Foo'))
-        self.assertFalse(site.sametitle('User:Foo', 'Foo'))
-
     def test_enwp(self):
-        self.check(self.get_site('enwp'), False)
+        self.assertTrue(self.get_site('enwp').sametitle('Foo', 'foo'))
         self.assertFalse(self.get_site('enwp').sametitle(
             'Template:Test template', 'Template:Test Template'))
 
     def test_dewp(self):
         site = self.get_site('dewp')
-        self.check(site, False)
+        self.assertTrue(site.sametitle('Foo', 'foo'))
         self.assertTrue(site.sametitle('Benutzer:Foo', 'User:Foo'))
         self.assertTrue(site.sametitle('Benutzerin:Foo', 'User:Foo'))
         self.assertTrue(site.sametitle('Benutzerin:Foo', 'Benutzer:Foo'))
 
     def test_enwt(self):
-        self.check(self.get_site('enwt'), True)
+        self.assertFalse(self.get_site('enwt').sametitle('Foo', 'foo'))
 
+    def test_general(self, code):
+        site = self.get_site(code)
+        self.assertTrue(site.sametitle('File:Foo', 'Image:Foo'))
+        self.assertTrue(site.sametitle(':Foo', 'Foo'))
+        self.assertFalse(site.sametitle('User:Foo', 'Foo'))
+        self.assertFalse(site.sametitle('User:Foo', 'Project:Foo'))
+
+        self.assertTrue(site.sametitle('Namespace:', 'Namespace:'))
+
+        self.assertFalse(site.sametitle('Invalid:Foo', 'Foo'))
+        self.assertFalse(site.sametitle('Invalid1:Foo', 'Invalid2:Foo'))
+        self.assertFalse(site.sametitle('Invalid:Foo', ':Foo'))
+        self.assertFalse(site.sametitle('Invalid:Foo', 'Invalid:foo'))
 
 if __name__ == '__main__':
     try:
