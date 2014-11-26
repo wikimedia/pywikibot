@@ -1519,7 +1519,7 @@ class QueryGenerator(object):
                 # self.resultkey not in data in last request.submit()
                 # only "(query-)continue" was retrieved.
                 previous_result_had_data = False
-            if self.modules[0] == "random" and self.limit:
+            if self.modules[0] == "random":
                 # "random" module does not return "(query-)continue"
                 # now we loop for a new random query
                 del self.data  # a new request is needed

@@ -1166,17 +1166,37 @@ class SiteRandomTestCase(DefaultSiteTestCase):
 
     """Test random methods of a site."""
 
-    def testRandompages(self):
-        """Test the site.randompages() method."""
+    def test_unlimited_small_step(self):
+        """Test site.randompages() without limit."""
+        mysite = self.get_site()
+        pages = []
+        for rndpage in mysite.randompages(step=5, total=None):
+            self.assertIsInstance(rndpage, pywikibot.Page)
+            self.assertNotIn(rndpage, pages)
+            pages.append(rndpage)
+            if len(pages) == 11:
+                break
+        self.assertEqual(len(pages), 11)
+
+    def test_limit_10(self):
+        """Test site.randompages() with limit."""
         mysite = self.get_site()
         rn = list(mysite.randompages(total=10))
         self.assertLessEqual(len(rn), 10)
         self.assertTrue(all(isinstance(a_page, pywikibot.Page)
                             for a_page in rn))
         self.assertFalse(all(a_page.isRedirectPage() for a_page in rn))
+
+    def test_redirects(self):
+        """Test site.randompages() with redirects."""
+        mysite = self.get_site()
         for rndpage in mysite.randompages(total=5, redirects=True):
             self.assertIsInstance(rndpage, pywikibot.Page)
             self.assertTrue(rndpage.isRedirectPage())
+
+    def test_namespaces(self):
+        """Test site.randompages() with namespaces."""
+        mysite = self.get_site()
         for rndpage in mysite.randompages(total=5, namespaces=[6, 7]):
             self.assertIsInstance(rndpage, pywikibot.Page)
             self.assertIn(rndpage.namespace(), [6, 7])
