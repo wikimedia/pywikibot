@@ -1276,20 +1276,35 @@ class QueryGenerator(object):
         limited_modules = (
             set(self.modules) & self.site._paraminfo.query_modules_with_limits
         )
+
         if not limited_modules:
             self.limited_module = None
         elif len(limited_modules) == 1:
             self.limited_module = limited_modules.pop()
         else:
             # Select the first limited module in the request.
+            # Query will continue as needed until limit (if any) for this module
+            # is reached.
             for module in self.modules:
                 if module in self.site._paraminfo.query_modules_with_limits:
                     self.limited_module = module
+                    limited_modules.remove(module)
                     break
             pywikibot.log('%s: multiple requested query modules support limits'
                           "; using the first such module '%s' of %r"
                           % (self.__class__.__name__, self.limited_module,
                              self.modules))
+
+            # Set limits for all remaining limited modules to max value.
+            # Default values will only cause more requests and make the query
+            # slower.
+            for module in limited_modules:
+                param = self.site._paraminfo.parameter(module, 'limit')
+                prefix = self.site._paraminfo[module]['prefix']
+                if self.site.logged_in() and self.site.has_right('apihighlimits'):
+                    self.request[prefix + 'limit'] = int(param['highmax'])
+                else:
+                    self.request[prefix + 'limit'] = int(param["max"])
 
         self.api_limit = None
 
