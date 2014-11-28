@@ -567,7 +567,7 @@ class WikidataQuery():
             data = json.loads(resp)
         except ValueError:
             pywikibot.warning(u"Data received from host but no JSON could be decoded")
-            raise pywikibot.ServerError
+            raise pywikibot.ServerError("Data received from host but no JSON could be decoded")
 
         return data
 
