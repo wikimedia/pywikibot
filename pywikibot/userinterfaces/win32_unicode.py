@@ -28,6 +28,9 @@ argv = sys.argv
 
 if sys.version_info[0] > 2:
     unicode = str
+    PY3 = True
+else:
+    PY3 = False
 
 if sys.platform == "win32":
     import codecs
@@ -137,7 +140,11 @@ if sys.platform == "win32":
                     result = ReadConsoleW(self._hConsole, self.buffer, maxnum, byref(numrecv), None)
                     if not result:
                         raise Exception("stdin failure")
-                    return self.buffer.value[:numrecv.value].encode(self.encoding)
+                    data = self.buffer.value[:numrecv.value]
+                    if not PY3:
+                        return data.encode(self.encoding)
+                    else:
+                        return data
 
         if real_stdout or real_stderr:
             # BOOL WINAPI WriteConsoleW(HANDLE hOutput, LPWSTR lpBuffer, DWORD nChars,
