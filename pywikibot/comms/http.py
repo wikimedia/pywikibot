@@ -241,6 +241,7 @@ def request(site=None, uri=None, *args, **kwargs):
                           site.ignore_certificate_error())
     else:
         baseuri = uri
+        host = urlparse.urlparse(uri).netloc
 
     format_string = kwargs.setdefault("headers", {}).get("user-agent")
     kwargs["headers"]["user-agent"] = user_agent(site, format_string)
@@ -260,7 +261,7 @@ def request(site=None, uri=None, *args, **kwargs):
         raise request.data
 
     if request.data[0].status == 504:
-        raise Server504Error("Server %s timed out" % site.hostname())
+        raise Server504Error("Server %s timed out" % host)
 
     if request.data[0].status == 414:
         raise Server414Error('Too long GET request')
