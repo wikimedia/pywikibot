@@ -17,8 +17,9 @@ Syntax: python cfd.py
 __version__ = '$Id$'
 #
 
-import pywikibot
 import re
+import pywikibot
+from pywikibot import config2 as config
 import category
 
 # The location of the CFD working page.
@@ -68,6 +69,10 @@ def main(*args):
     @type args: list of unicode
     """
     pywikibot.handle_args(args)
+
+    if config.family != 'wikipedia' or config.mylang != 'en':
+        pywikibot.warning('CFD does work only on the English Wikipedia.')
+        return
 
     page = pywikibot.Page(pywikibot.Site(), cfdPage)
 
