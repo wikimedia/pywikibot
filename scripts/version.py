@@ -20,6 +20,11 @@ try:
 except ImportError:
     httplib2 = {'__version__': 'n/a'}
 
+
+def check_environ(environ_name):
+    pywikibot.output('{0}: {1}'.format(environ_name, os.environ.get(environ_name, 'Not set')))
+
+
 if __name__ == '__main__':
     pywikibot.output('Pywikibot: %s' % getversion())
     pywikibot.output('Release version: %s' % pywikibot.__release__)
@@ -39,3 +44,17 @@ if __name__ == '__main__':
         pywikibot.output(u'  unicode test: triggers problem #3081100')
     else:
         pywikibot.output(u'  unicode test: ok')
+    check_environ('PYWIKIBOT2_DIR')
+    check_environ('PYWIKIBOT2_DIR_PWB')
+    check_environ('PYWIKIBOT2_NO_USER_CONFIG')
+    pywikibot.output('Config base dir: {0}'.format(pywikibot.config2.base_dir))
+    for family, usernames in pywikibot.config2.usernames.items():
+        if usernames:
+            pywikibot.output('Usernames for family "{0}":'.format(family))
+            for lang, username in usernames.items():
+                sysop_name = pywikibot.config2.sysopnames.get(family, {}).get(lang)
+                if not sysop_name:
+                    sysop_name = 'no sysop configured'
+                elif sysop_name == username:
+                    sysop_name = 'also sysop'
+                pywikibot.output('\t{0}: {1} ({2})'.format(lang, username, sysop_name))
