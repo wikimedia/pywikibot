@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+
 """
-Add or change categories on a number of pages.
+This script shows the categories on each page and lets you change them.
+
+For each page in the target wiki:
+* If the page contains no categories, you can specify a list of categories to
+  add to the page.
+* If the page already contains one or more categories, you can specify a new
+  list of categories to replace the current list of categories of the page.
 
 Usage:
     catall.py [start]
-
-Provides the categories on the page and asks whether to change them.
 
 If no starting name is provided, the bot starts at 'A'.
 
