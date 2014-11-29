@@ -1,0 +1,30 @@
+
+Release 2.0b3 (30 November 2014)
+
+Major changes include:
+- Library initialisation no longer connects to servers
+- generate_user_files.py rewritten
+- API Version 1.14 support
+- Support HTTPS for families with certificate validation errors (Python 2 only)
+- API HTTP(S) GET support
+- API simplified continuation support
+- Upload uses a fake filename to avoid various MIME encoding issues
+- API class ParamInfo inspects API modules
+- Several QueryGenerator efficiency improvements
+- Improved 'same title' detection and 'get redirect target' handling
+- Site interwiki methods now use dynamic Interwikimap
+- Site methods return Namespace object instead of int
+- New WikiStats module
+- New PatchManager module used for showDiff
+- New pagegenerators, including -intersect support
+- Several category_redirect.py improvements
+- archivebot: support more languages
+- reflinks: changed from GPL to MIT
+
+Release 2.0b2 (7 October 2014)
+
+TODO: add list of major changes
+
+Release 2.0b1 (26 August 2013)
+
+TODO: add high level description of changes from pywikibot 1.0

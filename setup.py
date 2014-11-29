@@ -94,7 +94,7 @@ use_setuptools()
 from setuptools import setup, find_packages
 
 name = 'pywikibot'
-version = '2.0b2'
+version = '2.0b3'
 github_url = 'https://github.com/wikimedia/pywikibot-core'
 download_url = github_url + '/archive/master.zip#egg=' + name + '-' + version
 
