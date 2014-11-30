@@ -232,6 +232,11 @@ class XmlDumpPageGenerator:
     __next__ = next
 
 
+class NotAnURLError(BaseException):
+
+    """The link is not an URL."""
+
+
 class LinkChecker(object):
 
     """
@@ -279,6 +284,8 @@ class LinkChecker(object):
             return httplib.HTTPConnection(self.host)
         elif self.scheme == 'https':
             return httplib.HTTPSConnection(self.host)
+        else:
+            raise NotAnURLError(self.url)
 
     def getEncodingUsedByServer(self):
         if not self.serverEncoding:
@@ -512,6 +519,12 @@ class LinkCheckThread(threading.Thread):
         linkChecker = LinkChecker(self.url, HTTPignore=self.HTTPignore)
         try:
             ok, message = linkChecker.check()
+        except NotAnURLError:
+            ok = False
+            message = i18n.twtranslate(pywikibot.page.site(),
+                                       'weblinkchecker-badurl_msg',
+                                       {'URL': self.url})
+
         except:
             pywikibot.output('Exception while processing URL %s in page %s'
                              % (self.url, self.page.title()))
