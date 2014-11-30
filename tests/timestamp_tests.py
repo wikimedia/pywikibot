@@ -7,6 +7,7 @@
 #
 __version__ = '$Id$'
 
+import calendar
 import datetime
 
 from pywikibot import Timestamp as T
@@ -55,7 +56,10 @@ class TestTimestamp(TestCase):
     def test_add_timedelta(self):
         t1 = T.utcnow()
         t2 = t1 + datetime.timedelta(days=1)
-        self.assertEqual(t1.day + 1, t2.day)
+        if t1.month != t2.month:
+            self.assertEqual(1, t2.day)
+        else:
+            self.assertEqual(t1.day + 1, t2.day)
         self.assertIsInstance(t2, T)
 
     def test_add_timedate(self):
@@ -74,7 +78,10 @@ class TestTimestamp(TestCase):
     def test_sub_timedelta(self):
         t1 = T.utcnow()
         t2 = t1 - datetime.timedelta(days=1)
-        self.assertEqual(t1.day - 1, t2.day)
+        if t1.month != t2.month:
+            self.assertEqual(calendar.monthrange(t2.year, t2.month)[1], t2.day)
+        else:
+            self.assertEqual(t1.day - 1, t2.day)
         self.assertIsInstance(t2, T)
 
     def test_sub_timedate(self):
