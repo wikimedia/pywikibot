@@ -16,6 +16,7 @@ else:
     from itertools import izip_longest as zip_longest
 
 import pywikibot
+from pywikibot.backports import format_range_unified  # introduced in 2.7.2
 
 
 class Hunk(object):
@@ -65,9 +66,9 @@ class Hunk(object):
 
     def get_header(self):
         """Provide header of unified diff."""
-        a_rng = difflib._format_range_unified(*self.a_rng)
-        b_rng = difflib._format_range_unified(*self.b_rng)
-        return '@@ -{} +{} @@{}'.format(a_rng, b_rng, '\n')
+        a_rng = format_range_unified(*self.a_rng)
+        b_rng = format_range_unified(*self.b_rng)
+        return '@@ -{0} +{1} @@\n'.format(a_rng, b_rng)
 
     def create_diff(self):
         """Generator of diff text for this hunk, without formatting."""
