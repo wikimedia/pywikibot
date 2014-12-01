@@ -68,9 +68,9 @@ fixes = {
             # Keep in mind that MediaWiki automatically converts <br> to <br />
             # when rendering pages, so you might comment the next two lines out
             # to save some time/edits.
-            #   (r'(?i)<br>',                      r'<br />'),
+            (r'(?i)<br *>',                      r'<br />'),
             # linebreak with attributes
-            #   (r'(?i)<br ([^>/]+?)>',            r'<br \1 />'),
+            (r'(?i)<br ([^>/]+?)>',            r'<br \1 />'),
             (r'(?i)<b>(.*?)</b>',              r"'''\1'''"),
             (r'(?i)<strong>(.*?)</strong>',    r"'''\1'''"),
             (r'(?i)<i>(.*?)</i>',              r"''\1''"),

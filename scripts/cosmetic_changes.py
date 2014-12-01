@@ -184,7 +184,6 @@ class CosmeticChangesToolkit:
 # FIXME:    self.translateMagicWords,
             self.replaceDeprecatedTemplates,
 # FIXME:    self.resolveHtmlEntities,
-            self.validXhtml,
             self.removeUselessSpaces,
             self.removeNonBreakingSpaceBeforePercent,
 
@@ -576,11 +575,6 @@ class CosmeticChangesToolkit:
         if self.template:
             ignore += [58]
         text = pywikibot.html2unicode(text, ignore=ignore)
-        return text
-
-    def validXhtml(self, text):
-        text = textlib.replaceExcept(text, r'(?i)<br[ /]*>', r'<br />',
-                                     ['comment', 'math', 'nowiki', 'pre'])
         return text
 
     def removeUselessSpaces(self, text):
