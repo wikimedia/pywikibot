@@ -672,7 +672,6 @@ class ReferencesRobot(Bot):
                         enc.append(tmp)
                 else:
                     pywikibot.output(u'No charset found for %s' % ref.link)
-##                    continue  # do not process pages without charset
                 if not contentType:
                     pywikibot.output(u'No content-type found for %s' % ref.link)
                     continue

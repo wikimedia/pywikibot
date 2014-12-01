@@ -160,7 +160,7 @@ template_good = {
     'nn': ['Link AA'],
     'no': ['Link AA'],
     'pt': ['Bom interwiki'],
-##    'tr': ['Link GA', 'Link KM'],
+    # 'tr': ['Link GA', 'Link KM'],
     'vi': [u'Liên kết bài chất lượng tốt'],
     'wo': ['Lien BA'],
 }

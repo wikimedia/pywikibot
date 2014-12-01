@@ -438,7 +438,7 @@ class RedirectRobot(Bot):
                 movedTarget = self.moved_page(targetPage)
                 if movedTarget:
                     if not movedTarget.exists():
-                        ### FIXME: Test to another move
+                        # FIXME: Test to another move
                         pywikibot.output(u'Target page %s does not exist'
                                          % (movedTarget))
                     elif redir_name == movedTarget.title():
@@ -494,8 +494,8 @@ class RedirectRobot(Bot):
                             pywikibot.output(u"No sysop in user-config.py, "
                                              u"put page to speedy deletion.")
                             content = redir_page.get(get_redirect=True)
-                            ### TODO: Add bot's signature if needed
-                            ###       Not supported via TW yet
+                            # TODO: Add bot's signature if needed
+                            #       Not supported via TW yet
                             content = i18n.twtranslate(
                                 targetPage.site,
                                 'redirect-broken-redirect-template'
@@ -606,31 +606,30 @@ class RedirectRobot(Bot):
                     pywikibot.warning(
                         u'Redirect target %s forms a redirect loop.'
                         % targetPage.title(asLink=True))
-                    break  # doesn't work. edits twice!
-##                    try:
-##                        content = targetPage.get(get_redirect=True)
-##                    except pywikibot.SectionError:
-##                        content = pywikibot.Page(
-##                                      targetPage.site,
-##                                      targetPage.title(withSection=False)
-##                                  ).get(get_redirect=True)
-##                    if i18n.twhas_key(
-##                        targetPage.site.lang,
-##                        'redirect-broken-redirect-template') and \
-##                        i18n.twhas_key(targetPage.site.lang,
-##                                       'redirect-remove-loop'):
-##                        pywikibot.output(u"Tagging redirect for deletion")
-##                        # Delete the two redirects
-##                        content = i18n.twtranslate(
-##                                      targetPage.site.lang,
-##                                      'redirect-broken-redirect-template'
-##                                      ) + "\n" + content
-##                        summ = i18n.twtranslate(
-##                                   targetPage.site.lang,
-##                                   'redirect-remove-loop')
-##                        targetPage.put(content, summ)
-##                        redir.put(content, summ)
-##                    break # TODO Better implement loop redirect
+                    break  # FIXME: doesn't work. edits twice!
+                    try:
+                        content = targetPage.get(get_redirect=True)
+                    except pywikibot.SectionError:
+                        content_page = pywikibot.Page(
+                            targetPage.site,
+                            targetPage.title(withSection=False))
+                        content = content_page.get(get_redirect=True)
+                    if i18n.twhas_key(
+                        targetPage.site.lang,
+                        'redirect-broken-redirect-template') and \
+                        i18n.twhas_key(targetPage.site.lang,
+                                       'redirect-remove-loop'):
+                        pywikibot.output(u"Tagging redirect for deletion")
+                        # Delete the two redirects
+                        content = i18n.twtranslate(
+                            targetPage.site.lang,
+                            'redirect-broken-redirect-template'
+                        ) + "\n" + content
+                        summ = i18n.twtranslate(targetPage.site.lang,
+                                                'redirect-remove-loop')
+                        targetPage.put(content, summ)
+                        redir.put(content, summ)
+                    break
                 else:  # redirect target found
                     if targetPage.isStaticRedirect():
                         pywikibot.output(
@@ -769,7 +768,7 @@ def main(*args):
             if ns == '':
                 # "-namespace:" does NOT yield -namespace:0 further down the road!
                 ns = i18n.input('pywikibot-enter-namespace-number')
-            # TODO! at least for some generators enter a namespace by its name
+            # TODO: at least for some generators enter a namespace by its name
             # or number
             if ns == '':
                 ns = '0'

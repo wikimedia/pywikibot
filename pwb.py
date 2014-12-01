@@ -82,7 +82,7 @@ def run_python_file(filename, argv, argvu):
         sys.path[0] = old_path0
         pwb.argvu = old_argvu
 
-#### end of snippet
+# end of snippet from coverage
 
 if sys.version_info[0] not in (2, 3):
     raise RuntimeError("ERROR: Pywikibot only runs under Python 2 "

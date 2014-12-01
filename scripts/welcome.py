@@ -426,7 +426,6 @@ class Global(object):
     queryLimit = 50         # number of users that the bot load to check
     quiet = False           # Prevents users without contributions are displayed
     quick = False           # Provide quick check by API bulk-retrieve user datas
-##    fileOption = False     # check if the user wants to use a file or the wikipage
 
 
 class WelcomeBot(object):
@@ -468,7 +467,7 @@ class WelcomeBot(object):
         if not globalvar.filtBadName:
             return False
 
-        #initialize blacklist
+        # initialize blacklist
         if not hasattr(self, '_blacklist') or force:
             elenco = [
                 ' ano', ' anus', 'anal ', 'babies', 'baldracca', 'balle', 'bastardo',
@@ -560,7 +559,7 @@ class WelcomeBot(object):
         return False
 
     def reportBadAccount(self, name=None, final=False):
-        #Queue process
+        # Queue process
         if name:
             if globalvar.confirm:
                 answer = pywikibot.input_choice(
@@ -643,7 +642,7 @@ class WelcomeBot(object):
         if logPage.exists():
             text = logPage.get()
         else:
-            #make new log page
+            # make new log page
             showStatus()
             pywikibot.output(
                 'Log page is not exist, getting information for page creation')
@@ -657,7 +656,7 @@ class WelcomeBot(object):
             luser = pywikibot.url2link(result.name(), self.site, self.site)
             text += u'\n{{WLE|user=%s|contribs=%d}}' % (
                 luser, result.editCount())
-        #update log page.
+        # update log page.
         while True:
             try:
                 logPage.put(text, i18n.twtranslate(self.site,
@@ -735,8 +734,6 @@ class WelcomeBot(object):
                     pywikibot.output(u'%s might be a global bot!'
                                      % users.name())
                     continue
-                #if globalvar.offset != 0 and time.strptime(users.registrationTime(), "%Y-%m-%dT%H:%M:%SZ") >= globalvar.offset:
-                #
                 if users.editCount() >= globalvar.attachEditCount:
                     showStatus(2)
                     pywikibot.output(u'%s has enough edits to be welcomed.'
@@ -771,7 +768,7 @@ class WelcomeBot(object):
                         welcome_comment = i18n.twtranslate(self.site,
                                                            'welcome-welcome')
                         try:
-                            #append welcomed, welcome_count++
+                            # append welcomed, welcome_count++
                             ustp.put(welcome_text, welcome_comment,
                                      minorEdit=False)
                             welcomed_count += 1
@@ -942,8 +939,8 @@ def main(*args):
             globalvar.confirm = True
         elif arg == '-filter':
             globalvar.filtBadName = True
-        #elif arg == '-savedata':
-        #    globalvar.saveSignIndex = True
+        elif arg == '-savedata':
+            globalvar.saveSignIndex = True
         elif arg == '-random':
             globalvar.randomSign = True
         elif arg == '-sul':

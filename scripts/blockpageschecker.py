@@ -71,9 +71,7 @@ docuReplacements = {
     '&params;':     pagegenerators.parameterHelp,
 }
 
-#######################################################
-#--------------------- PREFERENCES -------------------#
-################### -- Edit below! -- #################
+# PREFERENCES
 
 templateSemiProtection = {
     'en': None,
@@ -152,9 +150,7 @@ categoryToCheck = {
 # Check list to block the users that haven't set their preferences
 project_inserted = ['en', 'fr', 'it', 'ja', 'pt', 'zh']
 
-#######################################################
-#------------------ END PREFERENCES ------------------#
-################## -- Edit above! -- ##################
+# END PREFERENCES
 
 
 def understandBlock(text, TTP, TSP, TSMP, TTMP, TU):

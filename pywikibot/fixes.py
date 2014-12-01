@@ -68,9 +68,9 @@ fixes = {
             # Keep in mind that MediaWiki automatically converts <br> to <br />
             # when rendering pages, so you might comment the next two lines out
             # to save some time/edits.
-            #(r'(?i)<br>',                      r'<br />'),
+            #   (r'(?i)<br>',                      r'<br />'),
             # linebreak with attributes
-            #(r'(?i)<br ([^>/]+?)>',            r'<br \1 />'),
+            #   (r'(?i)<br ([^>/]+?)>',            r'<br \1 />'),
             (r'(?i)<b>(.*?)</b>',              r"'''\1'''"),
             (r'(?i)<strong>(.*?)</strong>',    r"'''\1'''"),
             (r'(?i)<i>(.*?)</i>',              r"''\1''"),
@@ -78,7 +78,7 @@ fixes = {
             # horizontal line without attributes in a single line
             (r'(?i)([\r\n])<hr[ /]*>([\r\n])', r'\1----\2'),
             # horizontal line without attributes with more text in the same line
-            #(r'(?i) +<hr[ /]*> +',             r'\r\n----\r\n'),
+            #   (r'(?i) +<hr[ /]*> +',             r'\r\n----\r\n'),
             # horizontal line with attributes; can't be done with wiki syntax
             # so we only make it XHTML compliant
             (r'(?i)<hr ([^>/]+?)>',            r'<hr \1 />'),
@@ -109,8 +109,8 @@ fixes = {
             'de': u'Bot: korrigiere Grammatik',
         },
         'replacements': [
-            #(u'([Ss]owohl) ([^,\.]+?), als auch',                                                            r'\1 \2 als auch'),
-            #(u'([Ww]eder) ([^,\.]+?), noch', r'\1 \2 noch'),
+            #   (u'([Ss]owohl) ([^,\.]+?), als auch',                                                            r'\1 \2 als auch'),
+            #   (u'([Ww]eder) ([^,\.]+?), noch', r'\1 \2 noch'),
             #
             # Vorsicht bei Substantiven, z. B. 3-Jähriger!
             (u'(\d+)(minütig|stündig|tägig|wöchig|jährig|minütlich|stündlich|täglich|wöchentlich|jährlich|fach|mal|malig|köpfig|teilig|gliedrig|geteilt|elementig|dimensional|bändig|eckig|farbig|stimmig)', r'\1-\2'),
@@ -129,7 +129,7 @@ fixes = {
             # Achtung bei Französisch: https://de.wikipedia.org/wiki/Plenk#Sonderfall_Franz.C3.B6sisch
             # Leerzeichen vor Doppelpunkt/Semikolon kann korrekt sein, nach irgendeiner Norm für Zitationen.
             (u'([a-zäöüß](\]\])?) ([,\.!\?]) ((\[\[)?[a-zäöüA-ZÄÖÜ])',                                                                          r'\1\3 \4'),
-            #(u'([a-z]\.)([A-Z])',                                                                             r'\1 \2'),
+            #   (u'([a-z]\.)([A-Z])',                                                                             r'\1 \2'),
         ],
         'exceptions': {
             'inside-tags': [
@@ -208,7 +208,7 @@ fixes = {
             # external link starting with double bracket
             (r'\[\[(?P<url>https?://.+?)\]',   r'[\g<url>]'),
             # external link with forgotten closing bracket
-            #(r'\[(?P<url>https?://[^\]\s]+)\r\n',  r'[\g<url>]\r\n'),
+            #   (r'\[(?P<url>https?://[^\]\s]+)\r\n',  r'[\g<url>]\r\n'),
             # external link ending with double bracket.
             # do not change weblinks that contain wiki links inside
             # inside the description
@@ -284,7 +284,7 @@ fixes = {
             # external link starting with double bracket
             (r'\[\[(?P<url>https?://.+?)\]',   r'[\g<url>]'),
             # external link with forgotten closing bracket
-            #(r'\[(?P<url>https?://[^\]\s]+)\r\n',   r'[\g<url>]\r\n'),
+            #   (r'\[(?P<url>https?://[^\]\s]+)\r\n',   r'[\g<url>]\r\n'),
             # external link and description separated by a dash, with
             # whitespace in front of the dash, so that it is clear that
             # the dash is not a legitimate part of the URL.
@@ -383,15 +383,15 @@ fixes = {
         },
         'replacements': [
             # space after birth sign w/ year
-            #(u'\(\*(\d{3,4})', u'(* \\1'),
-            ## space after death sign w/ year
-            #(u'†(\d{3,4})', u'† \\1'),
-            #(u'&dagger;(\d{3,4})', u'† \\1'),
-            ## space after birth sign w/ linked date
-            #(u'\(\*\[\[(\d)', u'(* [[\\1'),
-            ## space after death sign w/ linked date
-            #(u'†\[\[(\d)', u'† [[\\1'),
-            #(u'&dagger;\[\[(\d)', u'† [[\\1'),
+            #   (u'\(\*(\d{3,4})', u'(* \\1'),
+            # space after death sign w/ year
+            #   (u'†(\d{3,4})', u'† \\1'),
+            #   (u'&dagger;(\d{3,4})', u'† \\1'),
+            # space after birth sign w/ linked date
+            #   (u'\(\*\[\[(\d)', u'(* [[\\1'),
+            # space after death sign w/ linked date
+            #   (u'†\[\[(\d)', u'† [[\\1'),
+            #   (u'&dagger;\[\[(\d)', u'† [[\\1'),
             (u'\[\[(\d+\. (?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)) (\d{1,4})\]\]', u'[[\\1]] [[\\2]]'),
             # Keine führende Null beim Datum (ersteinmal nur bei denen, bei denen auch ein Leerzeichen fehlt)
             (u'0(\d+)\.(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)', r'\1. \2'),
@@ -459,7 +459,9 @@ fixes = {
             'ar': u'تدقيق إملائي',
         },
         'replacements': [
-            #(u' ,', u' ،'), # FIXME: Do not replace comma in non-Arabic text, interwiki, image links or <math> syntax.
+            # FIXME: Do not replace comma in non-Arabic text,
+            # interwiki, image links or <math> syntax.
+            #   (u' ,', u' ،'),
             (r'\b' + u'إمرأة' + r'\b', u'امرأة'),
             (r'\b' + u'الى' + r'\b', u'إلى'),
             (r'\b' + u'إسم' + r'\b', u'اسم'),

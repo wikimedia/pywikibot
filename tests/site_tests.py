@@ -1158,7 +1158,7 @@ class SiteUserTestCase2(DefaultSiteTestCase):
             if error.code == u'badtoken':
                 raise unittest.SkipTest(error)
         except pywikibot.Error as error:
-            #expected result
+            # expected result
             pass
 
 

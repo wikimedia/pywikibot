@@ -104,7 +104,6 @@ class GraphDrawer:
                 if isinstance(oppositeEdge, list):
                     # bugfix for pydot >= 1.0.3
                     oppositeEdge = oppositeEdge[0]
-                #oppositeEdge.set_arrowtail('normal')
                 oppositeEdge.set_dir('both')
             # workaround for bug [ 1722739 ]: prevent duplicate edges
             # (it is unclear why duplicate edges occur)

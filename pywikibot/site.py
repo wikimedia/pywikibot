@@ -4596,7 +4596,7 @@ class APISite(BaseSite):
             pywikibot.debug(result, _logger)
 
         if "warnings" in result and not ignore_warnings:
-            #TODO: Handle multiple warnings at the same time
+            # TODO: Handle multiple warnings at the same time
             warning = list(result["warnings"].keys())[0]
             message = result["warnings"][warning]
             raise pywikibot.UploadWarning(warning, upload_warnings[warning]

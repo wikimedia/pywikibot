@@ -143,7 +143,7 @@ def getCommonshelperCats(imagepage):
              'cl': hint_wiki,
              'w': lang})
     else:
-        #Cant handle other sites atm
+        # Cant handle other sites atm
         return [], [], []
 
     commonsenseRe = re.compile('^#COMMONSENSE(.*)#USAGE(\s)+\((?P<usagenum>(\d)+)\)\s(?P<usage>(.*))\s#KEYWORDS(\s)+\((?P<keywords>(\d)+)\)(.*)#CATEGORIES(\s)+\((?P<catnum>(\d)+)\)\s(?P<cats>(.*))\s#GALLERIES(\s)+\((?P<galnum>(\d)+)\)\s(?P<gals>(.*))\s(.*)#EOF$', re.MULTILINE + re.DOTALL)  # noqa
@@ -173,7 +173,6 @@ def getCommonshelperCats(imagepage):
             used = matches.group('usage').splitlines()
             for use in used:
                 usage = usage + getUsage(use)
-                #pywikibot.output(use)
         if matches.group('catnum') > 0:
             cats = matches.group('cats').splitlines()
             for cat in cats:
@@ -196,7 +195,7 @@ def getOpenStreetMapCats(latitude, longitude):
     result = []
     locationList = getOpenStreetMap(latitude, longitude)
     for i in range(0, len(locationList)):
-        #print 'Working on ' + locationList[i]
+        pywikibot.log(u'Working on %r' % locationList[i])
         if i <= len(locationList) - 3:
             category = getCategoryByName(name=locationList[i],
                                          parent=locationList[i + 1],
@@ -208,7 +207,6 @@ def getOpenStreetMapCats(latitude, longitude):
             category = getCategoryByName(name=locationList[i])
         if category and not category == u'':
             result.append(category)
-    #print result
     return result
 
 
@@ -235,7 +233,6 @@ def getOpenStreetMap(latitude, longitude):
     validParts = [u'hamlet', u'village', u'city', u'county', u'country']
     invalidParts = [u'path', u'road', u'suburb', u'state', u'country_code']
     addressparts = et.find('addressparts')
-    #xml.etree.ElementTree.dump(et)
 
     for addresspart in addressparts.getchildren():
         if addresspart.tag in validParts:
@@ -244,7 +241,6 @@ def getOpenStreetMap(latitude, longitude):
             pywikibot.output(u'Dropping %s, %s' % (addresspart.tag, addresspart.text))
         else:
             pywikibot.warning(u'%s, %s is not in addressparts lists' % (addresspart.tag, addresspart.text))
-    #print result
     return result
 
 
@@ -279,13 +275,10 @@ def getUsage(use):
     if matches:
         if matches.group('lang'):
             lang = matches.group('lang')
-            #pywikibot.output(lang)
         if matches.group('project'):
             project = matches.group('project')
-            #pywikibot.output(project)
         if matches.group('articles'):
             articles = matches.group('articles')
-            #pywikibot.output(articles)
     for article in articles.split():
         result.append((lang, project, article))
     return result
@@ -353,8 +346,8 @@ def filterCountries(categories):
         if cat.endswith(u'by country'):
             listByCountry.append(cat)
 
-        #If cat contains 'by country' add it to the list
-        #If cat contains the name of a country add it to the list
+        # If cat contains 'by country' add it to the list
+        # If cat contains the name of a country add it to the list
         else:
             for country in countries:
                 if country in cat:
@@ -386,11 +379,11 @@ def filterParents(categories):
         result = filterCategoriesRe.findall(
             filterCategoriesPage.read().decode('utf-8'))
     except IOError:
-        #Something is wrong, forget about this filter and just return the input
+        # Something is wrong, forget about this filter, and return the input
         return categories
 
     if not result:
-        #Is empty, dont want to remove all categories
+        # Is empty, dont want to remove all categories
         return categories
     return result
 

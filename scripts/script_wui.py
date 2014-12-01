@@ -21,7 +21,7 @@ Syntax example:
     python script_wui.py -dir:.
         Default operating mode.
 """
-## @package script_wui
+#  @package script_wui
 #  @brief   Script WikiUserInterface (WUI) Bot
 #
 #  @copyright Dr. Trigon, 2012
@@ -78,7 +78,8 @@ import re
 import lua
 # The crontab package is https://github.com/josiahcarlson/parse-crontab
 # version 0.20 installs a package called 'tests' which conflicts with our
-# test suite.  Use https://github.com/jayvdb/parse-crontab until it is fixed.
+# test suite.  The patch to fix this has been merged, but is not released.
+# TODO: Use https://github.com/jayvdb/parse-crontab until it is fixed.
 import crontab
 
 import pywikibot
@@ -129,8 +130,10 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         # - Lua -
         pywikibot.output(u'** Redirecting Lua print in order to catch it')
         lua.execute('__print = print')
-        #lua.execute('print = python.builtins().print')
         lua.execute('print = python.globals().pywikibot.output')
+        # It may be useful in debugging to install the 'print' builtin
+        # as the 'print' function in lua. To do this:
+        # lua.execute('print = python.builtins().print')
 
         # init constants
         templ = pywikibot.Page(self.site, bot_config['ConfCSSshell'])
@@ -155,7 +158,6 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         match = self.re_edit.match(e.arguments()[0])
         if not match:
             return
-        #print match.groups(), match.group('page'), match.group('user')
         user = match.group('user').decode(self.site.encoding())
         if user == bot_config['BotName']:
             return
@@ -187,7 +189,6 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
             entry = crontab.CronTab(timestmp)
             # find the delay from current minute (does not return 0.0 - but next)
             delay = entry.next(datetime.datetime.now().replace(second=0, microsecond=0) - datetime.timedelta(microseconds=1))
-            #pywikibot.output(u'CRON delay for execution: %.3f (<= %i)' % (delay, bot_config['CRONMaxDelay']))
 
             if (delay <= bot_config['CRONMaxDelay']):
                 pywikibot.output(u"CRONTAB: %s / %s / %s" % (page, rev, timestmp))
@@ -267,8 +268,10 @@ def main_script(page, rev=None, params=None):
 
 def wiki_logger(buffer, page, rev=None):
     """Log to wiki."""
+    # FIXME: what is this??
     # (might be a problem here for TS and SGE, output string has another encoding)
-    #buffer  = buffer.decode(config.console_encoding)
+    if False:
+        buffer = buffer.decode(pywikibot.config.console_encoding)
     buffer = re.sub("\03\{(.*?)\}(.*?)\03\{default\}", "\g<2>", buffer)
     if rev is None:
         rev = page.latestRevision()

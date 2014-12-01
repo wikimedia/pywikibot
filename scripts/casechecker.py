@@ -276,12 +276,6 @@ class CaseChecker(object):
                             for nn in self.FindBadWords(n['title'])]
 
                 self.knownWords = set(allWords)
-##                kw = set()
-##                for w in allWords:
-##                    if len(self.ProcessTitle(w)[1]) > 0:
-##                        kw.add(w)
-##                self.knownWords = kw
-
             else:
                 raise ValueError(u'The number of pageids is not 1')
 
@@ -381,9 +375,6 @@ class CaseChecker(object):
                     if self.replace:
                         if len(err[1]) == 1:
                             newTitle = err[1][0]
-##                            choice = pywikibot.input_yn(u'Move %s to %s?'
-##                                                        % (title, newTitle),
-##                                                        automatic_quit=False)
                             editSummary = i18n.twtranslate(
                                 self.site, "casechecker-rename")
                             dst = self.Page(newTitle)

@@ -51,8 +51,6 @@ class ArticleEditor(object):
         parser.add_option("-p", "--page", help="Page to edit")
         parser.add_option("-w", "--watch", action="store_true", default=False,
                           help="Watch article after edit")
-        #parser.add_option("-n", "--new_data", default="",
-        #                  help="Automatically generated content")
         (self.options, args) = parser.parse_args(args=my_args)
 
         # for convenience, if we have an arg, stuff it into the opt, so we

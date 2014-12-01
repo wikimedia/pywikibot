@@ -20,7 +20,7 @@ from datetime import timedelta
 import pywikibot
 from pywikibot import pagegenerators
 
-#Probably unneeded because these are hidden categories. Have to figure it out.
+# Probably unneeded because these are hidden categories. Have to figure it out.
 ignoreCategories = [u'[[Category:CC-BY-SA-3.0]]',
                     u'[[Category:GFDL]]',
                     u'[[Category:Media for cleanup]]',
@@ -29,7 +29,7 @@ ignoreCategories = [u'[[Category:CC-BY-SA-3.0]]',
                     u'[[Category:Media lacking a description]]',
                     u'[[Category:Self-published work]]']
 
-#Dont bother to put the template on a image with one of these templates
+# Dont bother to put the template on a image with one of these templates
 skipTemplates = [u'Delete',
                  u'Nocat',
                  u'No license',
@@ -39,7 +39,7 @@ skipTemplates = [u'Delete',
                  u'Uncategorized',
                  u'Uncat']
 
-#Ignore the templates in this really long list when looking for relevant categories
+# Ignore templates in this long list when looking for relevant categories
 ignoreTemplates = [u'1000Bit',
                    u'1922 cyc',
                    u'2MASS',
@@ -1283,7 +1283,7 @@ def isUncat(page):
             return False
 
     for templateWithTrail in page.templates():
-        #Strip of trailing garbage
+        # Strip of trailing garbage
         template = templateWithTrail.title().rstrip('\n').rstrip()
         if template in skipTemplates:
             # Already tagged with a template, skip it

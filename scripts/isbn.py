@@ -1277,11 +1277,8 @@ class ISBN10(ISBN):
         sum = 0
         for i in range(0, 9):
             sum += (i + 1) * int(self.digits()[i])
-        #print sum
         checksum = sum % 11
-        #print checksum
         lastDigit = self.digits()[-1]
-        #print lastDigit
         if not ((checksum == 10 and lastDigit in 'Xx') or
                 (lastDigit.isdigit() and checksum == int(lastDigit))):
             raise InvalidIsbnException('The ISBN checksum of %s is incorrect.'
@@ -1304,11 +1301,10 @@ class ISBN10(ISBN):
         Adds the GS1 prefix '978' and recalculates the checksum.
         The hyphenation structure is taken from the format of the original
         ISBN number.
+
+        @rtype: L{ISBN13}
         """
         code = '978-' + self.code[:-1]
-
-        #cs = self.calculateChecksum()
-        #code += str(cs)
         return ISBN13(code, checksumMissing=True)
 
     def format(self):

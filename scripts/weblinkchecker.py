@@ -368,7 +368,7 @@ class LinkChecker(object):
             else:
                 raise
         if self.response.status >= 300 and self.response.status <= 399:
-            #print response.getheaders()
+            # to debug, print response.getheaders()
             redirTarget = self.response.getheader('Location')
             if redirTarget:
                 try:
@@ -765,7 +765,7 @@ class WeblinkCheckerRobot:
     def __init__(self, generator, HTTPignore=None, day=7):
         self.generator = generator
         if config.report_dead_links_on_talk:
-            #pywikibot.output("Starting talk page thread")
+            pywikibot.log("Starting talk page thread")
             reportThread = DeadLinkReportThread()
             # thread dies when program terminates
             # reportThread.setDaemon(True)
