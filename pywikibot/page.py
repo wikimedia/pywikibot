@@ -1050,11 +1050,14 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                self.site.lang in config.cosmetic_changes_disable[family]))
         if not cc:
             return
+        try:
+            from scripts.cosmetic_changes import CosmeticChangesToolkit
+        except ImportError:
+            pywikibot.log(u'Cosmetic changes module not available.')
+            return
         old = self.text
         pywikibot.log(u'Cosmetic changes for %s-%s enabled.'
                       % (family, self.site.lang))
-        from scripts.cosmetic_changes import CosmeticChangesToolkit
-        from pywikibot import i18n
         ccToolkit = CosmeticChangesToolkit(self.site,
                                            redirect=self.isRedirectPage(),
                                            namespace=self.namespace(),
@@ -1063,6 +1066,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         if comment and \
            old.strip().replace('\r\n',
                                '\n') != self.text.strip().replace('\r\n', '\n'):
+            from pywikibot import i18n
             comment += i18n.twtranslate(self.site, 'cosmetic_changes-append')
             return comment
 
