@@ -203,7 +203,7 @@ class ImageTransferBot:
                                      urlEncoding=sourceSite.encoding(),
                                      keepFilename=self.keep_name,
                                      verifyDescription=not self.keep_name,
-                                     ignore_warning=self.ignore_warning)
+                                     ignoreWarning=self.ignore_warning)
             # try to upload
             targetFilename = bot.run()
             if targetFilename and self.targetSite.family.name == 'commons' and \
