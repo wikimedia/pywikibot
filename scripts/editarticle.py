@@ -8,6 +8,18 @@ Edit a Wikipedia article with your favourite editor.
        - minor edits
        - watch/unwatch
        - ...
+
+The following parameters are supported:
+
+-r                Edit redirect pages without following them
+--edit_redirect   automatically.
+--edit-redirect
+
+-p P              Choose which page to edit.
+--page P          This argument can be passed positionally.
+
+-w                Add the page to the user's watchlist after editing.
+--watch
 """
 #
 # (C) Gerrit Holl, 2004
@@ -19,7 +31,8 @@ __version__ = '$Id$'
 #
 
 import os
-import optparse
+import sys
+import argparse
 import tempfile
 
 import pywikibot
@@ -42,21 +55,22 @@ class ArticleEditor(object):
 
     def set_options(self, *args):
         """Parse commandline and set options attribute."""
-        my_args = []
-        for arg in pywikibot.handle_args(args):
-            my_args.append(arg)
-        parser = optparse.OptionParser()
-        parser.add_option("-r", "--edit_redirect", action="store_true",
-                          default=False, help="Ignore/edit redirects")
-        parser.add_option("-p", "--page", help="Page to edit")
-        parser.add_option("-w", "--watch", action="store_true", default=False,
-                          help="Watch article after edit")
-        (self.options, args) = parser.parse_args(args=my_args)
+        my_args = pywikibot.handle_args(args)
 
-        # for convenience, if we have an arg, stuff it into the opt, so we
-        # can act like a normal editor.
-        if (len(args) == 1):
-            self.options.page = args[0]
+        parser = argparse.ArgumentParser(add_help=False)
+        parser.add_argument("-r", "--edit_redirect", "--edit-redirect",
+                            action="store_true", help="Ignore/edit redirects")
+        parser.add_argument("-p", "--page", help="Page to edit")
+        parser.add_argument("-w", "--watch", action="store_true",
+                            help="Watch article after edit")
+        # convenience positional argument so we can act like a normal editor
+        parser.add_argument("wikipage", nargs="?", help="Page to edit")
+        self.options = parser.parse_args(my_args)
+
+        if self.options.page and self.options.wikipage:
+            pywikibot.error(u"Multiple pages passed. Please specify a single page to edit.")
+            sys.exit(1)
+        self.options.page = self.options.page or self.options.wikipage
 
     def setpage(self):
         """Set page and page title."""

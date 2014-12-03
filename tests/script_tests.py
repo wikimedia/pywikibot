@@ -34,6 +34,7 @@ script_deps = {
 }
 if sys.version_info < (2, 7):
     script_deps['replicate_wiki'] = ['argparse']
+    script_deps['editarticle'] = ['argparse']
 
 
 def check_script_deps(script_name):
