@@ -515,9 +515,9 @@ class MetaTestCaseClass(type):
 
         # Inherit superclass attributes
         for base in bases:
-            for key in ('pwb', 'net', 'site', 'wikibase', 'user', 'write',
+            for key in ('pwb', 'net', 'site', 'user', 'sysop', 'write',
                         'sites', 'family', 'code', 'dry',
-                        'cached', 'cacheinfo'):
+                        'cached', 'cacheinfo', 'wikibase'):
                 if hasattr(base, key) and key not in dct:
                     # print('%s has %s; copying to %s'
                     #       % (base.__name__, key, name))
