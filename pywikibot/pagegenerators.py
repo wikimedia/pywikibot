@@ -40,6 +40,7 @@ import pywikibot.data.wikidataquery as wdquery
 
 if sys.version_info[0] > 2:
     basestring = (str, )
+    unicode = str
 
 _logger = "pagegenerators"
 
@@ -1965,7 +1966,7 @@ def WikidataQueryPageGenerator(query, site=None):
 
     pywikibot.output(u'retrieved %d items' % data[u'status'][u'items'])
     for item in data[u'items']:
-        page = pywikibot.ItemPage(repo, u'Q{0}'.format(item))
+        page = pywikibot.ItemPage(repo, u'Q' + unicode(item))
         try:
             link = page.getSitelink(site)
         except pywikibot.NoPage:
