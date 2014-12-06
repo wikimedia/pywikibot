@@ -25,9 +25,8 @@ class RequestCacheTests(TestCase):
         self.assertIsInstance(entry.site, BaseSite)
         self.assertIsInstance(entry.site._loginstatus, int)
         self.assertIsInstance(entry.site._username, list)
-        print(entry.site._loginstatus, entry.site._username)
-        self.assertTrue(bool(entry.site._loginstatus < 1) !=
-                        bool(entry.site._username[0]))
+        if entry.site._loginstatus >= 1:
+            self.assertIsNotNone(entry.site._username[0])
         self.assertIsInstance(entry._params, dict)
         self.assertIsNotNone(entry._params)
         # TODO: more tests on entry._params, and possibly fixes needed
