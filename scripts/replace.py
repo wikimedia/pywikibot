@@ -158,24 +158,31 @@ def precompile_exceptions(exceptions, use_regex, flags):
             exceptions[exceptionCategory] = patterns
 
 
-class Replacement(object):
+class ReplacementBase(object):
 
     """The replacement instructions."""
 
-    def __init__(self, old, new, use_regex=None, exceptions=None,
-                 case_insensitive=None, edit_summary=None,
-                 default_summary=True):
+    def __init__(self, old, new, edit_summary=None, default_summary=True):
         self.old = old
         self.old_regex = None
         self.new = new
-        self.use_regex = use_regex
-        self.exceptions = exceptions
-        self.case_insensitive = case_insensitive
-        self.edit_summary = edit_summary
+        self._edit_summary = edit_summary
         self.default_summary = default_summary
 
+    @property
+    def edit_summary(self):
+        return self._edit_summary
+
+    def _compile(self, use_regex, flags):
+        # This does not update use_regex and flags depending on this instance
+        if not use_regex:
+            self.old_regex = re.escape(self.old)
+        else:
+            self.old_regex = self.old
+        self.old_regex = re.compile(self.old_regex, flags)
+
     def compile(self, use_regex, flags):
-        # Set the regular aexpression flags
+        # Set the regular expression flags
         flags |= re.UNICODE
 
         if self.case_insensitive is False:
@@ -185,12 +192,95 @@ class Replacement(object):
 
         if self.use_regex is not None:
             use_regex = self.use_regex  # this replacement overrides it
-        if not use_regex:
-            self.old_regex = re.escape(self.old)
-        else:
-            self.old_regex = self.old
-        self.old_regex = re.compile(self.old_regex, flags)
+        self._compile(use_regex, flags)
+
+
+class Replacement(ReplacementBase):
+
+    """A single replacement with it's own data."""
+
+    def __init__(self, old, new, use_regex=None, exceptions=None,
+                 case_insensitive=None, edit_summary=None,
+                 default_summary=True):
+        super(Replacement, self).__init__(old, new, edit_summary,
+                                          default_summary)
+        self._use_regex = use_regex
+        self.exceptions = exceptions
+        self._case_insensitive = case_insensitive
+
+    @property
+    def case_insensitive(self):
+        return self._case_insensitive
+
+    @property
+    def use_regex(self):
+        return self._use_regex
+
+    def _compile(self, use_regex, flags):
+        super(Replacement, self)._compile(use_regex, flags)
         precompile_exceptions(self.exceptions, use_regex, flags)
+
+
+class ReplacementList(list):
+
+    """
+    A list of replacements which all share some properties.
+
+    The shared properties are:
+    * use_regex
+    * exceptions
+    * case_insensitive
+
+    Each entry in this list should be a ReplacementListEntry. The exceptions
+    are compiled only once.
+    """
+
+    def __init__(self, use_regex, exceptions, case_insensitive, edit_summary):
+        super(ReplacementList, self).__init__()
+        self.use_regex = use_regex
+        self._exceptions = exceptions
+        self.exceptions = None
+        self.case_insensitive = case_insensitive
+        self.edit_summary = edit_summary
+
+    def _compile_exceptions(self, use_regex, flags):
+        if not self.exceptions and self._exceptions is not None:
+            self.exceptions = dict(self._exceptions)
+            precompile_exceptions(self.exceptions, use_regex, flags)
+
+
+class ReplacementListEntry(ReplacementBase):
+
+    """A replacement entry for ReplacementList."""
+
+    def __init__(self, old, new, fix_set, edit_summary=None,
+                 default_summary=True):
+        super(ReplacementListEntry, self).__init__(old, new, edit_summary,
+                                                   default_summary)
+        self.fix_set = fix_set
+
+    @property
+    def case_insensitive(self):
+        return self.fix_set.case_insensitive
+
+    @property
+    def use_regex(self):
+        return self.fix_set.use_regex
+
+    @property
+    def exceptions(self):
+        return self.fix_set.exceptions
+
+    @property
+    def edit_summary(self):
+        if self._edit_summary is None:
+            return self.fix_set.edit_summary
+        else:
+            return self._edit_summary
+
+    def _compile(self, use_regex, flags):
+        super(ReplacementListEntry, self)._compile(use_regex, flags)
+        self.fix_set._compile_exceptions(use_regex, flags)
 
 
 class XmlDumpReplacePageGenerator(object):
@@ -242,9 +332,12 @@ class XmlDumpReplacePageGenerator(object):
                 if not self.isTitleExcepted(entry.title) \
                         and not self.isTextExcepted(entry.text):
                     new_text = entry.text
-                    for old, new in self.replacements:
+                    for replacement in self.replacements:
+                        # This doesn't do an actual replacement but just
+                        # checks if at least one does apply
                         new_text = textlib.replaceExcept(
-                            new_text, old, new, self.excsInside, self.site)
+                            new_text, replacement.old_regex, replacement.new,
+                            self.excsInside, self.site)
                     if new_text != entry.text:
                         yield pywikibot.Page(self.site, entry.title)
         except KeyboardInterrupt:
@@ -713,15 +806,17 @@ def main(*args):
                 set_summary = i18n.translate(site, fix['msg'], fallback=True)
         else:
             set_summary = None
+        replacement_set = ReplacementList(fix.get('regex'),
+                                          fix.get('exceptions'),
+                                          fix.get('nocase'),
+                                          set_summary)
         for replacement in fix['replacements']:
-            summary = set_summary if len(replacement) < 3 else replacement[2]
-            replacements.append(Replacement(
+            summary = None if len(replacement) < 3 else replacement[2]
+            replacements.append(ReplacementListEntry(
                 old=replacement[0],
                 new=replacement[1],
-                use_regex=fix.get('regex'),
+                fix_set=replacement_set,
                 edit_summary=summary,
-                exceptions=fix.get('exceptions'),
-                case_insensitive=fix.get('nocase')
             ))
 
     # Set the regular expression flags
