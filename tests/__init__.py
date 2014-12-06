@@ -94,9 +94,6 @@ disabled_test_modules = [
     'ui',
 ]
 
-if os.environ.get('TRAVIS', 'false') == 'true':
-    disabled_test_modules.append('weblib')
-
 disabled_tests = {
     'textlib': [
         'test_interwiki_format',  # example; very slow test

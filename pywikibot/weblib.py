@@ -36,7 +36,7 @@ def getInternetArchiveURL(url, timestamp=None):
         query['timestamp'] = timestamp
 
     uri = uri + urlencode(query)
-    jsontext = http.request(uri=uri, site=None)
+    jsontext = http.fetch(uri).content
     if "closest" in jsontext:
         data = json.loads(jsontext)
         return data['archived_snapshots']['closest']['url']
@@ -65,7 +65,7 @@ def getWebCitationURL(url, timestamp=None):
         query['date'] = timestamp
 
     uri = uri + urlencode(query)
-    xmltext = http.request(uri=uri, site=None)
+    xmltext = http.fetch(uri).content
     if "success" in xmltext:
         data = ET.fromstring(xmltext)
         return data.find('.//webcite_url').text

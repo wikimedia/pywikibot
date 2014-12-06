@@ -27,10 +27,17 @@ class HttpTestCase(TestCase):
 
     """Tests for http module."""
 
-    net = True
+    sites = {
+        'www-wp': {
+            'hostname': 'www.wikipedia.org',
+        },
+        'www-wq': {
+            'hostname': 'www.wikiquote.org',
+        },
+    }
 
     def test_async(self):
-        """Test http request_async function."""
+        """Test http._enqueue using http://www.wikipedia.org/."""
         r = http._enqueue('http://www.wikipedia.org/')
         self.assertIsInstance(r, threadedhttp.HttpRequest)
         self.assertEqual(r.status, 200)
@@ -39,7 +46,7 @@ class HttpTestCase(TestCase):
         self.assertIsInstance(r.raw, bytes)
 
     def test_fetch(self):
-        """Test http fetch function."""
+        """Test http.fetch using http://www.wikipedia.org/."""
         r = http.fetch('http://www.wikipedia.org/')
         self.assertIsInstance(r, threadedhttp.HttpRequest)
         self.assertEqual(r.status, 200)
@@ -48,19 +55,49 @@ class HttpTestCase(TestCase):
         self.assertIsInstance(r.raw, bytes)
 
     def test_http(self):
-        """Test http request function."""
+        """Test http.request using http://www.wikipedia.org/."""
         r = http.request(site=None, uri='http://www.wikipedia.org/')
         self.assertIsInstance(r, unicode)
         self.assertIn('<html lang="mul"', r)
 
     def test_https(self):
-        """Test http request function using https."""
+        """Test http.request using https://www.wikiquote.org/."""
         r = http.request(site=None, uri='https://www.wikiquote.org/')
         self.assertIsInstance(r, unicode)
         self.assertIn('<html lang="mul"', r)
 
+
+class HttpServerProblemTestCase(TestCase):
+
+    """Test HTTP status 502 causes this test class to be skipped."""
+
+    sites = {
+        '502': {
+            'hostname': 'http://getstatuscode.com/502',
+        }
+    }
+
+    def test_502(self):
+        """Test a HTTP 502 response using http://getstatuscode.com/502."""
+        self.fail('The test framework should skip this test.')
+        pass
+
+
+class HttpsCertificateTestCase(TestCase):
+
+    """HTTPS certificate test."""
+
+    sites = {
+        'omegawiki': {
+            'hostname': 'www.omegawiki.org',
+        },
+        'vikidia': {
+            'hostname': 'en.vikidia.org',
+        },
+    }
+
     def test_https_cert_error(self):
-        """Test http request function fails on ssl bad certificate."""
+        """Test http.request fails on invalid omegawiki SSL certificate."""
         self.assertRaises(pywikibot.FatalServerError,
                           http.request,
                           site=None,
@@ -68,7 +105,7 @@ class HttpTestCase(TestCase):
 
     @expectedFailureIf(sys.version_info[0] > 2)  # bug 72236
     def test_https_ignore_cert_error(self):
-        """Test http request function ignoring ssl bad certificate."""
+        """Test http.request ignoring invalid vikidia SSL certificate."""
         # As the connection is cached, the above test will cause
         # subsequent requests to go to the existing, broken, connection.
         # So, this uses a different host, which hopefully hasnt been
@@ -80,7 +117,7 @@ class HttpTestCase(TestCase):
         self.assertIn('<title>Vikidia</title>', r)
 
     def test_https_cert_invalid(self):
-        """Verify certificate is bad."""
+        """Verify vikidia SSL certificate is invalid."""
         try:
             from pyasn1_modules import pem, rfc2459
             from pyasn1.codec.der import decoder
@@ -113,9 +150,17 @@ class ThreadedHttpTestCase(TestCase):
 
     """Tests for threadedhttp module Http class."""
 
-    net = True
+    sites = {
+        'www-wp': {
+            'hostname': 'www.wikipedia.org',
+        },
+        'wikidata': {
+            'hostname': 'test.wikidata.org',
+        },
+    }
 
     def test_http(self):
+        """Test threadedhttp.Http.request using http://www.wikipedia.org/."""
         o = threadedhttp.Http()
         r = o.request('http://www.wikipedia.org/')
         self.assertIsInstance(r, tuple)
@@ -130,6 +175,7 @@ class ThreadedHttpTestCase(TestCase):
         self.assertEqual(int(r[0]['content-length']), len(r[1]))
 
     def test_https(self):
+        """Test threadedhttp.Http.request using https://www.wikipedia.org/."""
         o = threadedhttp.Http()
         r = o.request('https://www.wikipedia.org/')
         self.assertIsInstance(r, tuple)
@@ -144,6 +190,7 @@ class ThreadedHttpTestCase(TestCase):
         self.assertEqual(int(r[0]['content-length']), len(r[1]))
 
     def test_gzip(self):
+        """Test threadedhttp.Http encodes using gzip."""
         o = threadedhttp.Http()
         r = o.request('http://www.wikipedia.org/')
         self.assertIsInstance(r, tuple)
@@ -159,11 +206,15 @@ class ThreadedHttpTestCase(TestCase):
         self.assertEqual(r[0]['-content-encoding'], 'gzip')
 
 
-class ThreadedHttpRequestTestCase(TestCase):
+class ThreadedHttpRequestQueueTestCase(TestCase):
 
     """Tests for threadedhttp module threaded HttpRequest."""
 
-    net = True
+    sites = {
+        'www-wp': {
+            'hostname': 'www.wikipedia.org',
+        },
+    }
 
     def test_threading(self):
         queue = Queue.Queue()

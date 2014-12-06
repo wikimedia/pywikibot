@@ -14,7 +14,15 @@ class TestPhoto(TestCase):
 
     """Test Photo class."""
 
-    net = True
+    sites = {
+        'wm-upload': {
+            'hostname': 'upload.wikimedia.org',
+        },
+        'commons': {
+            'family': 'commons',
+            'code': 'commons',
+        },
+    }
 
     def setUp(self):
         super(TestPhoto, self).setUp()
@@ -28,11 +36,14 @@ class TestPhoto(TestCase):
                                         )
 
     def test_downloadPhoto(self):
+        """Test download from http://upload.wikimedia.org/."""
         with open(os.path.join(_data_dir, 'MP_sounds.png'), 'rb') as f:
             self.assertEqual(f.read(), self.obj.downloadPhoto().read())
 
     def test_findDuplicateImages(self):
-        duplicates = self.obj.findDuplicateImages()
+        """Test finding duplicates on Wikimedia Commons."""
+        duplicates = self.obj.findDuplicateImages(
+            site=self.get_site('commons'))
         self.assertIn('MP sounds.png', [dup.replace("_", " ") for dup in duplicates])
 
     def test_getTitle(self):
