@@ -266,7 +266,7 @@ def writelogheader():
     log(u'=== Pywikibot framework v2.0 -- Logging header ===')
 
     # script call
-    log(u'COMMAND: %s' % unicode(sys.argv))
+    log(u'COMMAND: %s' % sys.argv)
 
     # script call time stamp
     log(u'DATE: %s UTC' % str(datetime.datetime.utcnow()))
@@ -280,7 +280,7 @@ def writelogheader():
 
     # system
     if hasattr(os, 'uname'):
-        log(u'SYSTEM: %s' % unicode(os.uname()))
+        log(u'SYSTEM: %s' % os.uname())
 
     # config file dir
     log(u'CONFIG FILE DIR: %s' % pywikibot.config2.base_dir)
@@ -319,7 +319,7 @@ def writelogheader():
             log(u'  %s' % ver)
 
     if config.log_pywiki_repo_version:
-        log(u'PYWIKI REPO VERSION: %s' % unicode(version.getversion_onlinerepo()))
+        log(u'PYWIKI REPO VERSION: %s' % version.getversion_onlinerepo())
 
     log(u'=== ' * 14)
 
@@ -1074,7 +1074,7 @@ class Bot(object):
 
         if site not in self._sites:
             log(u'LOADING SITE %s VERSION: %s'
-                % (site, unicode(site.version())))
+                % (site, site.version()))
 
             self._sites.add(site)
             if len(self._sites) == 2:
