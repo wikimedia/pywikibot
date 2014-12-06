@@ -8,7 +8,8 @@ user-*.py
 /*.egg
 /data*
 logs*
-*cache*
+*apicache*
+*pycache*
 .idea
 pywikibot.egg-info/
 pywikibot/families/

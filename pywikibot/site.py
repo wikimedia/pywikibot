@@ -4930,7 +4930,7 @@ class DataSite(APISite):
 
     """Wikibase data capable site."""
 
-    def __init__(self, code, fam, user, sysop):
+    def __init__(self, code, fam=None, user=None, sysop=None):
         """Constructor."""
         APISite.__init__(self, code, fam, user, sysop)
         self._item_namespace = None

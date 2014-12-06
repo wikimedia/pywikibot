@@ -87,6 +87,7 @@ script_test_modules = [
     'script',
     'archivebot',
     'data_ingestion',
+    'cache',
 ]
 
 disabled_test_modules = [
