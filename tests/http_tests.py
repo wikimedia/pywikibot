@@ -8,6 +8,7 @@
 __version__ = '$Id$'
 
 import sys
+
 import pywikibot
 from pywikibot.comms import http, threadedhttp
 from pywikibot import config2 as config
@@ -15,7 +16,11 @@ from tests.aspects import unittest, TestCase
 from tests.utils import expectedFailureIf
 
 if sys.version_info[0] > 2:
+    import queue as Queue
+
     unicode = str
+else:
+    import Queue
 
 
 class HttpTestCase(TestCase):
@@ -23,6 +28,24 @@ class HttpTestCase(TestCase):
     """Tests for http module."""
 
     net = True
+
+    def test_async(self):
+        """Test http request_async function."""
+        r = http._enqueue('http://www.wikipedia.org/')
+        self.assertIsInstance(r, threadedhttp.HttpRequest)
+        self.assertEqual(r.status, 200)
+        self.assertIn('<html lang="mul"', r.content)
+        self.assertIsInstance(r.content, unicode)
+        self.assertIsInstance(r.raw, bytes)
+
+    def test_fetch(self):
+        """Test http fetch function."""
+        r = http.fetch('http://www.wikipedia.org/')
+        self.assertIsInstance(r, threadedhttp.HttpRequest)
+        self.assertEqual(r.status, 200)
+        self.assertIn('<html lang="mul"', r.content)
+        self.assertIsInstance(r.content, unicode)
+        self.assertIsInstance(r.raw, bytes)
 
     def test_http(self):
         """Test http request function."""
@@ -88,7 +111,7 @@ class HttpTestCase(TestCase):
 
 class ThreadedHttpTestCase(TestCase):
 
-    """Tests for threadedhttp module."""
+    """Tests for threadedhttp module Http class."""
 
     net = True
 
@@ -102,7 +125,7 @@ class ThreadedHttpTestCase(TestCase):
         self.assertIsInstance(r[0]['status'], str)
         self.assertEqual(r[0]['status'], '200')
 
-        self.assertIsInstance(r[1], bytes if sys.version_info[0] > 2 else str)
+        self.assertIsInstance(r[1], bytes)
         self.assertIn(b'<html lang="mul"', r[1])
         self.assertEqual(int(r[0]['content-length']), len(r[1]))
 
@@ -116,7 +139,7 @@ class ThreadedHttpTestCase(TestCase):
         self.assertIsInstance(r[0]['status'], str)
         self.assertEqual(r[0]['status'], '200')
 
-        self.assertIsInstance(r[1], bytes if sys.version_info[0] > 2 else str)
+        self.assertIsInstance(r[1], bytes)
         self.assertIn(b'<html lang="mul"', r[1])
         self.assertEqual(int(r[0]['content-length']), len(r[1]))
 
@@ -134,6 +157,37 @@ class ThreadedHttpTestCase(TestCase):
         self.assertNotIsInstance(r[0], Exception)
         self.assertIn('-content-encoding', r[0])
         self.assertEqual(r[0]['-content-encoding'], 'gzip')
+
+
+class ThreadedHttpRequestTestCase(TestCase):
+
+    """Tests for threadedhttp module threaded HttpRequest."""
+
+    net = True
+
+    def test_threading(self):
+        queue = Queue.Queue()
+        cookiejar = threadedhttp.LockableCookieJar()
+        connection_pool = threadedhttp.ConnectionPool()
+        proc = threadedhttp.HttpProcessor(queue, cookiejar, connection_pool)
+        proc.setDaemon(True)
+        proc.start()
+        r = threadedhttp.HttpRequest('http://www.wikipedia.org/')
+        queue.put(r)
+
+        self.assertNotIsInstance(r.exception, Exception)
+        self.assertIsInstance(r.data, tuple)
+        self.assertIsInstance(r.response_headers, dict)
+        self.assertIn('status', r.response_headers)
+        self.assertIsInstance(r.response_headers['status'], str)
+        self.assertEqual(r.response_headers['status'], '200')
+        self.assertEqual(r.status, 200)
+
+        self.assertIsInstance(r.raw, bytes)
+        self.assertIn(b'<html lang="mul"', r.raw)
+        self.assertEqual(int(r.response_headers['content-length']), len(r.raw))
+
+        queue.put(None)  # Stop the http processor thread
 
 
 class UserAgentTestCase(TestCase):
