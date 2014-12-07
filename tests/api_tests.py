@@ -19,6 +19,7 @@ from tests.aspects import (
     DefaultSiteTestCase,
     DefaultDrySiteTestCase,
 )
+from tests.utils import allowed_failure
 
 
 class TestApiFunctions(DefaultSiteTestCase):
@@ -395,7 +396,7 @@ class TestPropertyGenerator(TestCase):
             count += 1
         self.assertEqual(len(links), count)
 
-    @unittest.expectedFailure
+    @allowed_failure
     def test_many_continuations_limited(self):
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=30))
@@ -419,7 +420,7 @@ class TestPropertyGenerator(TestCase):
         self.assertEqual(len(links), count)
         # FIXME: AssertionError: 30 != 6150
 
-    @unittest.expectedFailure
+    @allowed_failure
     def test_two_continuations_limited(self):
         # FIXME: test fails
         mainpage = self.get_mainpage()

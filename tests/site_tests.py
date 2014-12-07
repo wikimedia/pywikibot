@@ -19,7 +19,6 @@ from pywikibot import config
 from pywikibot.tools import MediaWikiVersion as LV
 from pywikibot.data import api
 
-from tests.utils import expectedFailureIf
 from tests.aspects import (
     unittest, TestCase,
     DefaultSiteTestCase,
@@ -27,6 +26,7 @@ from tests.aspects import (
     WikidataTestCase,
     DefaultWikidataClientTestCase,
 )
+from tests.utils import allowed_failure, allowed_failure_if
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -678,7 +678,7 @@ class TestImageUsage(DefaultSiteTestCase):
             self.assertIsInstance(using, pywikibot.Page)
             self.assertIn(imagepage, list(using.imagelinks()))
 
-    @expectedFailureIf(os.environ.get('TRAVIS', 'false') == 'true')
+    @allowed_failure_if(os.environ.get('TRAVIS', 'false') == 'true')
     def test_image_usage_in_redirects(self):
         """Test the site.imageusage() method on redirects only."""
         mysite = self.get_site()
@@ -1772,7 +1772,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count > 5:
                 break
 
-    @unittest.expectedFailure
+    @allowed_failure
     def test_preload_langlinks_normal(self):
         """Test preloading continuation works."""
         # FIXME: test fails
@@ -1792,7 +1792,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 6:
                 break
 
-    @unittest.expectedFailure
+    @allowed_failure
     def test_preload_langlinks_count(self):
         """Test preloading continuation works."""
         # FIXME: test fails
@@ -1834,7 +1834,7 @@ class TestPagePreloading(DefaultSiteTestCase):
 
         self.assertEqual(len(links), count)
 
-    @unittest.expectedFailure
+    @allowed_failure
     def test_preload_templates(self):
         """Test preloading templates works."""
         mysite = self.get_site()
@@ -1854,7 +1854,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 6:
                 break
 
-    @unittest.expectedFailure
+    @allowed_failure
     def test_preload_templates_and_langlinks(self):
         """Test preloading templates and langlinks works."""
         mysite = self.get_site()

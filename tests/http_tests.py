@@ -13,7 +13,7 @@ import pywikibot
 from pywikibot.comms import http, threadedhttp
 from pywikibot import config2 as config
 from tests.aspects import unittest, TestCase
-from tests.utils import expectedFailureIf
+from tests.utils import expected_failure_if
 
 if sys.version_info[0] > 2:
     import queue as Queue
@@ -66,7 +66,7 @@ class HttpTestCase(TestCase):
                           site=None,
                           uri='https://www.omegawiki.org/')
 
-    @expectedFailureIf(sys.version_info[0] > 2)  # bug 72236
+    @expected_failure_if(sys.version_info[0] > 2)  # bug 72236
     def test_https_ignore_cert_error(self):
         """Test http request function ignoring ssl bad certificate."""
         # As the connection is cached, the above test will cause

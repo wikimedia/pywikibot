@@ -8,6 +8,7 @@
 from __future__ import print_function
 __version__ = '$Id$'
 #
+
 import pywikibot
 from pywikibot.tools import SelfCallDict
 from pywikibot.site import Namespace
@@ -24,15 +25,48 @@ CachedTestCase = aspects.TestCase
 PywikibotTestCase = aspects.TestCase
 
 
-def expectedFailureIf(expect):
+def expected_failure_if(expect):
     """
-    Unit test decorator to expect/allow failure under conditions.
+    Unit test decorator to expect failure under conditions.
+
+    @param expect: Flag to check if failure is expected
+    @type expect: bool
+    """
+    if expect:
+        return unittest.expectedFailure
+    else:
+        return lambda orig: orig
+
+
+def allowed_failure(func):
+    """
+    Unit test decorator to allow failure.
+
+    Test runners each have different interpretations of what should be
+    the result of an @expectedFailure test if it succeeds.  Some consider
+    it to be a pass; others a failure.
+
+    This decorator runs the test and, if it is a failure, reports the result
+    and considers it a skipped test.
+    """
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception:
+            pywikibot.exception(tb=True)
+            raise unittest.SkipTest()
+    return wrapper
+
+
+def allowed_failure_if(expect):
+    """
+    Unit test decorator to allow failure under conditions.
 
     @param expect: Flag to check if failure is allowed
     @type expect: bool
     """
     if expect:
-        return unittest.expectedFailure
+        return allowed_failure
     else:
         return lambda orig: orig
 
