@@ -92,7 +92,6 @@ __version__ = '$Id$'
 import re
 import time
 import datetime
-import locale
 import sys
 
 import pywikibot
@@ -102,8 +101,6 @@ from pywikibot.family import Family
 
 if sys.version_info[0] > 2:
     basestring = (str, )
-
-locale.setlocale(locale.LC_ALL, '')
 
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#
@@ -572,14 +569,8 @@ class NothingFound(pywikibot.Error):
 def printWithTimeZone(message):
     """Print the messages followed by the TimeZone encoded correctly."""
     if message[-1] != ' ':
-        message = '%s ' % unicode(message)
-    if locale.getlocale()[1]:
-        time_zone = unicode(time.strftime(u"%d %b %Y %H:%M:%S (UTC)",
-                                          time.gmtime()),
-                            locale.getlocale()[1])
-    else:
-        time_zone = unicode(time.strftime(u"%d %b %Y %H:%M:%S (UTC)",
-                                          time.gmtime()))
+        message = u'%s ' % message
+    time_zone = time.strftime(u"%d %b %Y %H:%M:%S (UTC)", time.gmtime())
     pywikibot.output(u"%s%s" % (message, time_zone))
 
 
