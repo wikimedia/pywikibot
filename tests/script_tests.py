@@ -303,7 +303,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     if error:
                         self.assertIn(error, result['stderr'])
 
-                        self.assertIn(result['exit_code'], [0, -9])
+                        self.assertIn(result['exit_code'], [0, 1, 2, -9])
                     else:
                         if stderr_other == ['']:
                             stderr_other = None
@@ -335,7 +335,8 @@ class TestScriptMeta(MetaTestCaseClass):
                     # Specifically look for deprecated
                     self.assertNotIn('deprecated', result['stdout'].lower())
                     # But also complain if there is any stdout
-                    if result['stdout'] == '':
+                    # but ignore shell.py emiting a prompt
+                    if result['stdout'] in ['', '>>> ']:
                         result['stdout'] = None
                     self.assertIsNone(result['stdout'])
 
@@ -356,7 +357,6 @@ class TestScriptMeta(MetaTestCaseClass):
             dct[test_name] = test_execution(script_name, ['-help'])
             if script_name in ['version',
                                'data_ingestion',  # bug 68611
-                               'replicate_wiki',  # bug 68664
                                'script_wui',      # Failing on travis-ci
                                ] + failed_dep_script_list:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
@@ -383,13 +383,11 @@ class TestScriptMeta(MetaTestCaseClass):
                                'checkimages',     # bug 68613
                                'data_ingestion',  # bug 68611
                                'flickrripper',    # Requires a flickr api key
-                               'lonelypages',     # custom return codes
-                               'nowcommons',      # deprecation warning
-                               'replicate_wiki',  # custom return codes
+                               'lonelypages',     # uses exit code 1
                                'script_wui',      # Error on any user except DrTrigonBot
                                'upload',          # raises custom ValueError
                                ] + failed_dep_script_list or (
-                    ((config.family != 'wikipedia' or config.mylang != 'en') and script_name == 'cfd') or
+                    (config.family != 'wikipedia' and script_name == 'lonelypages') or
                     (config.family == 'wikipedia' and script_name == 'disambredir') or
                     (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])

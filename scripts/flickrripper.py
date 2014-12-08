@@ -71,7 +71,7 @@ except ImportError as e:
         'This script requires ImageTk from the Python Imaging Library (PIL).\n'
         'See: https://www.mediawiki.org/wiki/Manual:Pywikibot/flickrripper.py')
     print(e)
-    sys.exit()
+    sys.exit(1)
 
 try:
     import flickrapi                  # see: http://stuvel.eu/projects/flickrapi
@@ -79,7 +79,7 @@ except ImportError as e:
     print('This script requires the python flickrapi module. \n'
           'See: http://stuvel.eu/projects/flickrapi')
     print(e)
-    sys.exit()
+    sys.exit(1)
 
 import pywikibot
 

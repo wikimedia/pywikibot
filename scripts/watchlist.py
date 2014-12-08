@@ -56,7 +56,7 @@ def isWatched(pageName, site=None):
 def refresh(site, sysop=False):
     """Fetch the watchlist."""
     if not site.logged_in(sysop=sysop):
-        site.forceLogin(sysop=sysop)
+        site.login(sysop=sysop)
 
     params = {
         'action': 'query',

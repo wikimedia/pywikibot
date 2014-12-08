@@ -8,7 +8,7 @@ a given array of templates defined below.
 
 Files are downloaded and compared. If the files match, it can be deleted on
 the source wiki. If multiple versions of the file exist, the script will not
-delete. If the MD5 comparison is not equal, the script will not delete.
+delete. If the SHA1 comparison is not equal, the script will not delete.
 
 A sysop account on the local wiki is required if you want all features of
 this script to work properly.
@@ -325,7 +325,7 @@ class NowCommonsDeleteBot(Bot):
                 if localImagePage.fileIsShared():
                     pywikibot.output(u'File is already on Commons.')
                     continue
-                md5 = localImagePage.getFileMd5Sum()
+                sha1 = localImagePage.getFileSHA1Sum()
                 if self.getOption('use_hash'):
                     filenameOnCommons = images_list[1]
                 else:
@@ -395,7 +395,7 @@ class NowCommonsDeleteBot(Bot):
                             % localImagePage.title(withNamespace=False))
                 commonsText = commonsImagePage.get()
                 if self.getOption('replaceonly') is False:
-                    if md5 == commonsImagePage.getFileMd5Sum():
+                    if sha1 == commonsImagePage.getFileSHA1Sum():
                         pywikibot.output(
                             u'The image is identical to the one on Commons.')
                         if len(localImagePage.getFileVersionHistory()) > 1 and not self.getOption('use_hash'):

@@ -34,7 +34,7 @@ except ImportError:
     pywikibot.error('This script requires the python-pycountry module')
     pywikibot.error('See: https://pypi.python.org/pypi/pycountry')
     pywikibot.exception()
-    sys.exit()
+    sys.exit(1)
 
 msg = {
     'en': 'Creating state abbreviation redirect',

@@ -341,7 +341,6 @@ class CaseChecker(object):
                         batchStart:batchStart + batchSize]
                     for data in self.RunQuery(self.queryParams):
                         self.ProcessDataBlock(data)
-            print("*" * 29 + " Done")
         except:
             pywikibot.output(u'Exception at Title = %s, Next = %s'
                              % (self.currentTitle, self.apfrom))
