@@ -475,6 +475,25 @@ class RequireUserMixin(TestCaseBase):
             if not site.logged_in(sysop):
                 site.login(sysop)
 
+    def get_userpage(self, site=None):
+        """Create a User object for the user's userpage."""
+        if not site:
+            site = self.get_site()
+
+        if hasattr(self, '_userpage'):
+            # For multi-site test classes, or site is specified as a param,
+            # the cached userpage object may not be the desired site.
+            if self._userpage.site == site:
+                return self._userpage
+
+        sysop = hasattr(self, 'sysop') and self.sysop
+
+        userpage = pywikibot.User(site, site.username(sysop))
+
+        self._userpage = userpage
+
+        return userpage
+
 
 class MetaTestCaseClass(type):
 
