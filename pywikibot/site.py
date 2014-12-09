@@ -4354,9 +4354,7 @@ class APISite(BaseSite):
         if "watch" not in result:
             pywikibot.error(u"watchpage: Unexpected API response:\n%s" % result)
             return False
-        watched = result["watch"]
-        return ((unwatch and "unwatched" in watched)
-                or (not unwatch and "watched" in result))
+        return ('unwatched' if unwatch else 'watched') in result["watch"]
 
     @must_be(group='user')
     def purgepages(self, pages, **kwargs):
