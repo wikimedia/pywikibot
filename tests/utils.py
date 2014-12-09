@@ -55,6 +55,7 @@ def allowed_failure(func):
         except Exception:
             pywikibot.exception(tb=True)
             raise unittest.SkipTest()
+    wrapper.__name__ = func.__name__
     return wrapper
 
 
