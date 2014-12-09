@@ -1460,18 +1460,18 @@ class APISite(BaseSite):
                                 site=pywikibot.Site('meta', 'meta'),
                                 action='sitematrix')
         data = req.submit()
-        for num in data['sitematrix']:
-            if num == 'count':
+        for key, val in data['sitematrix'].items():
+            if key == 'count':
                 continue
-            if 'code' in data['sitematrix'][num]:
-                lang = data['sitematrix'][num]['code']
-                for site in data['sitematrix'][num]['site']:
+            if 'code' in val:
+                lang = val['code']
+                for site in val['site']:
                     if site['dbname'] == dbname:
                         if site['code'] == 'wiki':
                             site['code'] = 'wikipedia'
                         return APISite(lang, site['code'])
             else:
-                for site in data['sitematrix'][num]:
+                for site in val:
                     if site['dbname'] == dbname:
                         return APISite(site['code'], site['code'])
         raise ValueError("Cannot parse a site out of %s." % dbname)
