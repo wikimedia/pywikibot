@@ -1,3 +1,5 @@
+# See tests/README.rst for instructions for using travis with developer builds.
+
 language: python
 
 python:
@@ -59,10 +61,10 @@ script:
 
 env:
   global:
-    # This is the encrypted password, which can only be decrypted by Travis itself
-    # See http://docs.travis-ci.com/user/encryption-keys/
-    # And http://docs.travis-ci.com/user/build-configuration/#Secure-environment-variables
-    # Command use to generate: travis encrypt USER_PASSWORD=<pwd> -r wikimedia/pywikibot-core
+    # This is the encrypted password for Wikimedia SUL user 'Pywikibot-test',
+    # and is only decrypted by Travis when running builds of code merged into
+    # the github repository 'wikimedia/pywikibot-core'.
+    # See http://docs.travis-ci.com/user/encryption-keys/ for more information.
     - secure: kofInMlisiTBt9o/Ustc/vySlkKfxGzGCX2LwA1D2waym8sDTS0o5gMJ5LsrT/BUKwZbe1vLozPHqZrrkQvsdTml+DpZuotzdILs0m0f3BUoexEC6OON5IDljuxFyETrD1Ug44ih5Mc4lVFOdTcBzg501ZmswGwQrBvg/OyEFfE=
   matrix:
     - LANGUAGE=en FAMILY=wikipedia
