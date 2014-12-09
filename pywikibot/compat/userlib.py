@@ -15,5 +15,9 @@ __version__ = '$Id$'
 
 
 from pywikibot import User
+from pywikibot.tools import ModuleDeprecationWrapper
 
 __all__ = ('User',)
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('User', replacement_name='pywikibot.User')
