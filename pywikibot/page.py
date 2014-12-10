@@ -3089,7 +3089,7 @@ class ItemPage(WikibasePage):
     been looked up, the item is then defined by the qid.
     """
 
-    def __init__(self, site, title=None):
+    def __init__(self, site, title=None, ns=None):
         """
         Constructor.
 
@@ -3098,15 +3098,19 @@ class ItemPage(WikibasePage):
         @param title: id number of item, "Q###",
                       -1 or None for an empty item.
         @type title: str
+        @type ns: namespace
+        @type ns: Namespace instance, or int, or None
+            for default item_namespace
         """
+        if ns is None:
+            ns = site.item_namespace
         # Special case for empty item.
         if title is None or title == '-1':
-            super(ItemPage, self).__init__(site, u'-1', ns=site.item_namespace)
+            super(ItemPage, self).__init__(site, u'-1', ns=ns)
             self.id = u'-1'
             return
 
-        super(ItemPage, self).__init__(site, title,
-                                       ns=site.item_namespace)
+        super(ItemPage, self).__init__(site, title, ns=ns)
 
         # Link.__init__, called from Page.__init__, has cleaned the title
         # stripping whitespace and uppercasing the first letter according
@@ -3222,6 +3226,15 @@ class ItemPage(WikibasePage):
                 'sitelinks': self.sitelinks,
                 'claims': self.claims
                 }
+
+    def getRedirectTarget(self):
+        target = super(ItemPage, self).getRedirectTarget()
+        cmodel = target.content_model
+        if cmodel != 'wikibase-item':
+            raise pywikibot.Error(u'%s has redirect target %s with content '
+                                  u'model %s instead of wikibase-item' %
+                                  (self, target, cmodel))
+        return self.__class__(target.site, target.title(), target.namespace())
 
     def toJSON(self, diffto=None):
         data = super(ItemPage, self).toJSON(diffto=diffto)

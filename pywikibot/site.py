@@ -2364,7 +2364,20 @@ class APISite(BaseSite):
         return page._isredir
 
     def getredirtarget(self, page):
-        """Return Page object for the redirect target of page."""
+        """
+        Return page object for the redirect target of page.
+
+        @param page: page to search redirects for
+        @type page: BasePage
+        @return: redirect target of page
+        @rtype: BasePage
+
+        @raise IsNotRedirectPage: page is not a redirect
+        @raise RuntimeError: no redirects found
+        @raise CircularRedirect: page is a circular redirect
+        @raise InterwikiRedirectPage: the redirect target is
+            on another site
+        """
         if not self.page_isredirect(page):
             raise IsNotRedirectPage(page)
         if hasattr(page, '_redirtarget'):
