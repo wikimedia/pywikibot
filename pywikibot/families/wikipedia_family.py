@@ -132,33 +132,6 @@ class Family(family.WikimediaFamily):
                        u'分類跳轉',),
         }
 
-        self.disambiguationTemplates = {
-            # If no templates are given, retrieve names from  the live wiki
-            # ([[MediaWiki:Disambiguationspage]])
-            # first char must be in uppercase
-            '_default': [u'Disambig'],  # for default MediaWiki message only
-            'haw': [u'Huaʻōlelo puana like'],
-            'no':  [u'Peker', u'Etternavn', u'Disambig',
-                    u'Tobokstavsforkortelse', u'Trebokstavsforkortelse',
-                    u'Flertydig', u'Pekerside'],
-            'nov': [u'Desambig'],
-            'qu':  [u"Sut'ichana qillqa", u'Disambig', u'SJM'],
-            'rmy': [u'Dudalipen'],
-            'sk':  [u'Disambig', u'Rozlišovacia stránka', u'Disambiguation'],
-            'tg':  [u'Ибҳомзудоӣ', u'Disambig', u'Рафъи ибҳом',
-                    u'Disambiguation'],
-            'tr':  [u'Anlam ayrım', u'Disambig', u'Anlam ayrımı',
-                    u'Kişi adları (anlam ayrımı)',
-                    u'Yerleşim yerleri (anlam ayrımı)',
-                    u'kısaltmalar (anlam ayrımı)', u'Coğrafya (anlam ayrımı)',
-                    u'Yerleşim yerleri (anlam ayrımı)', u'Sayılar (anlam ayrımı)',
-                    u"ABD'deki iller (anlam ayrımı)"],
-            'wo':  [u'Bokktekki'],
-            'yi':  [u'באדייטען'],
-            'zea': [u'Dp', u'Deurverwiespagina'],
-            'zh-classical':  [u'釋義', u'消歧義', u'Disambig'],
-        }
-
         self.disambcatname = {
             'af':  u'dubbelsinnig',
             'als': u'Begriffsklärung',
