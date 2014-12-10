@@ -12,15 +12,16 @@ import os
 import sys
 import time
 import subprocess
+
 import pywikibot
 from pywikibot import config
-from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 
+from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
+from tests.utils import allowed_failure
 
 base_path = os.path.split(os.path.split(__file__)[0])[0]
 pwb_path = os.path.join(base_path, 'pwb.py')
 scripts_path = os.path.join(base_path, 'scripts')
-
 
 script_deps = {
     'script_wui': ['crontab', 'lua'],
@@ -391,6 +392,9 @@ class TestScriptMeta(MetaTestCaseClass):
                     (config.family == 'wikipedia' and script_name == 'disambredir') or
                     (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
+            elif script_name in ['watchlist',     # T77965
+                                 ]:
+                dct[test_name] = allowed_failure(dct[test_name])
             dct[test_name].__doc__ = \
                 'Test running ' + script_name + ' -simulate.'
             dct[test_name].__name__ = test_name
