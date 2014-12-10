@@ -314,7 +314,7 @@ class UI:
         @type text: unicode
         @param jumpIndex: position at which to put the caret
         @type jumpIndex: int
-        @param highlight: each occurence of this substring will be highlighted
+        @param highlight: each occurrence of this substring will be highlighted
         @type highlight: unicode
         @return: the modified text, or None if the user didn't save the text
             file in his text editor

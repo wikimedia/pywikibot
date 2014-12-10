@@ -677,7 +677,7 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
 #            'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
 # }
 #
-# to replace all occurences of 'Hoofdpagina' with 'Veurblaad' when writing to
+# to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
 # liwiki. Note that this does not take the origin wiki into account.
 replicate_replace = {}
 

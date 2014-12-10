@@ -1349,7 +1349,7 @@ class TimeStripper(object):
 
         # all fields matched -> date valid
         if all(g in dateDict for g in self.groups):
-            # remove 'time' key, now splitted in hour/minute and not needed by datetime
+            # remove 'time' key, now split in hour/minute and not needed by datetime
             del dateDict['time']
 
             # replace month name in original language with month number

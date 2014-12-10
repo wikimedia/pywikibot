@@ -34,7 +34,7 @@ class LogEntry(object):
 
     # Log type expected. None for every type, or one of the (letype) str :
     # block/patrol/etc...
-    # Overriden in subclasses.
+    # Overridden in subclasses.
     _expectedType = None
 
     def __init__(self, apidata, site):

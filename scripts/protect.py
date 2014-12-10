@@ -27,7 +27,7 @@ provided by some wikis.
 
 For all protection types (edit, move, etc.) it chooses the default protection
 level. This is "sysop" or "none" if -unprotect was selected. If multiple
--unprotect or -default are used, only the last occurence is applied.
+-unprotect or -default are used, only the last occurrence is applied.
 
 Usage: python protect.py <OPTIONS>
 

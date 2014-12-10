@@ -899,7 +899,7 @@ class Bot(object):
         @param kwargs: options
         @type kwargs: dict
         """
-        # contains the options overriden from defaults
+        # contains the options overridden from defaults
         self.options = {}
 
         validOptions = set(self.availableOptions)

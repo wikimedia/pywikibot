@@ -44,11 +44,11 @@ Furthermore, the following command line parameters are supported:
                   argument is given, XYZ will be regarded as a regular
                   expression.
 
--exceptinside:XYZ Skip occurences of the to-be-replaced text which lie
+-exceptinside:XYZ Skip occurrences of the to-be-replaced text which lie
                   within XYZ. If the -regex argument is given, XYZ will be
                   regarded as a regular expression.
 
--exceptinsidetag:XYZ Skip occurences of the to-be-replaced text which lie
+-exceptinsidetag:XYZ Skip occurrences of the to-be-replaced text which lie
                   within an XYZ tag.
 
 -summary:XYZ      Set the summary message text for the edit to XYZ, bypassing
@@ -74,7 +74,7 @@ Furthermore, the following command line parameters are supported:
 -recursive        Recurse replacement as long as possible. Be careful, this
                   might lead to an infinite loop.
 
--allowoverlap     When occurences of the pattern overlap, replace all of them.
+-allowoverlap     When occurrences of the pattern overlap, replace all of them.
                   Be careful, this might lead to an infinite loop.
 
 -fullsummary      Use one large summary for all command line replacements.
@@ -296,7 +296,7 @@ class XmlDumpReplacePageGenerator(object):
                          compiled regular expression) and replacement
                          text (as a string).
         * exceptions   - A dictionary which defines when to ignore an
-                         occurence. See docu of the ReplaceRobot
+                         occurrence. See docu of the ReplaceRobot
                          constructor below.
     """
 
@@ -395,7 +395,7 @@ class ReplaceRobot(Bot):
                              compiled regular expression) and replacement
                              text (as a string).
             * exceptions   - A dictionary which defines when not to change an
-                             occurence. See below.
+                             occurrence. See below.
             * acceptall    - If True, the user won't be prompted before changes
                              are made.
             * allowoverlap - If True, when matches overlap, all of them are
@@ -414,7 +414,7 @@ class ReplaceRobot(Bot):
                 contains a part which is matched by one of these regular
                 expressions are skipped.
             inside
-                A list of regular expressions. All occurences are skipped which
+                A list of regular expressions. All occurrences are skipped which
                 lie within a text region which is matched by one of these
                 regular expressions.
             inside-tags

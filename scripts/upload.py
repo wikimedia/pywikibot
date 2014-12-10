@@ -21,7 +21,7 @@ Arguments:
                   'M': Megabytes (1000000 B)
                   'Ki': Kibibytes (1024 B)
                   'Mi': Mebibytes (1024x1024 B)
-                The suffixes are case insenstive.
+                The suffixes are case insensitive.
 
 If any other arguments are given, the first is the URL or filename to upload,
 and the rest is a proposed description to go with the upload. If none of these

@@ -17,7 +17,7 @@ replicate_replace = {
     'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
 }
 
-to replace all occurences of 'Hoofdpagina' with 'Veurblaad' when writing to
+to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
 liwiki. Note that this does not take the origin wiki into account.
 
 The following parameters are supported:
