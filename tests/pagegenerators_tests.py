@@ -392,6 +392,62 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertPagesInNamespaces(gen, set([1, 3]))
 
 
+class TestLogeventsFactoryGenerator(DefaultSiteTestCase):
+
+    """Test GeneratorFactory with pagegenerators.LogeventsPageGenerator."""
+
+    user = True
+
+    @unittest.expectedFailure
+    def test_logevents_parse(self):
+        gf = pagegenerators.GeneratorFactory()
+        self.assertFalse(gf.handleArg("-log"))
+        self.assertFalse(gf.handleArg("-log:text_here"))
+        # TODO: Throw an error for incorrect logtypes
+        self.assertRaises(gf.handleArg("-this_will_never_be_a_typelog"),
+                          Exception)
+
+    def test_logevents_default(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        self.assertTrue(gf.handleArg('-newuserslog'))
+        gen = gf.getCombinedGenerator()
+        pages = set(gen)
+        self.assertLessEqual(len(pages), 500)
+        self.assertTrue(all(isinstance(item, pywikibot.Page) for item in pages))
+
+    def test_logevents_default_multi(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        self.assertTrue(gf.handleArg('-newuserslog:10'))
+        gen = gf.getCombinedGenerator()
+        pages = set(gen)
+        self.assertLessEqual(len(pages), 10)
+        self.assertTrue(all(isinstance(item, pywikibot.Page) for item in pages))
+
+    def test_logevents_ns(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-newuserslog:10')
+        gen = gf.getCombinedGenerator()
+        self.assertPagesInNamespaces(gen, 1)
+        self.assertTrue(all(isinstance(item, pywikibot.Page) for item in gen))
+
+    def test_logevents_user_multi(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        user = self.get_site().user()
+        self.assertTrue(gf.handleArg('-newuserslog:' + user + ';10'))
+        gen = gf.getCombinedGenerator()
+        pages = set(gen)
+
+        if not pages:
+            raise unittest.SkipTest('No user creation log entries for ' + user)
+
+        # TODO: Check if the pages generated correspond to the user
+        # (no easy way of checking from pages)
+
+        self.assertLessEqual(len(pages), 10)
+        self.assertTrue(all(isinstance(item, pywikibot.Page) for item in pages))
+
+
 class PageGeneratorIntersectTestCase(DefaultSiteTestCase,
                                      GeneratorIntersectTestCase):
 
