@@ -1163,10 +1163,6 @@ class Family(object):
     def __repr__(self):
         return 'Family("%s")' % self.name
 
-    def has_query_api(self, code):
-        """Check query.php installed in the wiki."""
-        return False
-
     def shared_image_repository(self, code):
         """Return the shared image repository, if any."""
         return (None, None)
