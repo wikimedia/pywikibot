@@ -1383,14 +1383,26 @@ class QueryGenerator(object):
 
         """
         assert(self.limited_module)  # some modules do not have a prefix
-        if isinstance(namespaces, list):
-            namespaces = "|".join(str(n) for n in namespaces)
-        else:
-            namespaces = str(namespaces)
-
         param = self.site._paraminfo.parameter(self.limited_module, 'namespace')
-        if param:
-            self.request[self.prefix + "namespace"] = namespaces
+        if not param:
+            pywikibot.warning(u'{0} module does not support a namespace '
+                              'parameter'.format(self.limited_module))
+            return
+
+        if isinstance(namespaces, basestring):
+            namespaces = namespaces.split('|')
+
+        try:
+            iter(namespaces)
+        except TypeError:
+            namespaces = [namespaces]
+
+        namespaces = [str(namespace) for namespace in namespaces]
+        if 'multi' not in param and len(namespaces) != 1:
+            raise pywikibot.Error(u'{0} module does not support multiple '
+                                  'namespaces.'.format(self.limited_module))
+
+        self.request[self.prefix + "namespace"] = namespaces
 
     def _query_continue(self):
         if all(key not in self.data[self.continue_name]
