@@ -554,6 +554,18 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertTrue(mysite.page_exists(impage))
             self.assertLessEqual(impage._imageinfo["size"], 2000)
 
+    def test_newfiles(self):
+        """Test the site.newfiles() method."""
+        my_site = self.get_site()
+        the_list = list(my_site.newfiles(total=10))
+        self.assertLessEqual(len(the_list), 10)
+        self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 4
+                            for tup in the_list))
+        self.assertTrue(all(isinstance(tup[0], pywikibot.FilePage) for tup in the_list))
+        self.assertTrue(all(isinstance(tup[1], pywikibot.Timestamp) for tup in the_list))
+        self.assertTrue(all(isinstance(tup[2], unicode) for tup in the_list))
+        self.assertTrue(all(isinstance(tup[3], unicode) for tup in the_list))
+
     def testBlocks(self):
         """Test the site.blocks() method."""
         mysite = self.get_site()
