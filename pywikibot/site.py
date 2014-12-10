@@ -285,11 +285,11 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
             return u'' + name + u':'
 
     def __str__(self):
-        """Return a the canonical string representation."""
+        """Return the canonical string representation."""
         return self.canonical_prefix()
 
     def __unicode__(self):
-        """Return a the custom string representation."""
+        """Return the custom string representation."""
         return self.custom_prefix()
 
     def canonical_prefix(self):
@@ -2091,7 +2091,7 @@ class APISite(BaseSite):
 
         Use L{has_extension} instead!
 
-        @param name: The extension to check for, case insenstive
+        @param name: The extension to check for, case insensitive
         @type name: str
         @param unknown: Old parameter which shouldn't be used anymore.
         @return: If the extension is loaded
@@ -2106,7 +2106,7 @@ class APISite(BaseSite):
     def has_extension(self, name):
         """ Determine whether extension `name` is loaded.
 
-        @param name: The extension to check for, case insenstive
+        @param name: The extension to check for, case insensitive
         @type name: str
         @return: If the extension is loaded
         @rtype: bool

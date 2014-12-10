@@ -189,7 +189,7 @@ CachedRequest._get_cache_dir = staticmethod(
 # of 'red' builds caused by intermittant server problems, while also avoiding
 # the builds taking a long time due to retries.
 # The following allows builds to retry twice, but higher default values are
-# overriden here to restrict retries to only 1, so developer builds fail more
+# overridden here to restrict retries to only 1, so developer builds fail more
 # frequently in code paths resulting from mishandled server problems.
 if config.max_retries > 2:
     print('max_retries reduced from %d to 1 for tests' % config.max_retries)

@@ -430,7 +430,7 @@ class PrimaryIgnoreManager(object):
 
     def ignore(self, refPage):
         if self.enabled:
-            # Skip this occurence next time.
+            # Skip this occurrence next time.
             filename = config.datafilepath(
                 'disambiguations',
                 self.disambPage.title(asUrl=True) + '.txt')
@@ -716,7 +716,7 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                     # skip this page
                     if self.primary:
                         # If run with the -primary argument, skip this
-                        # occurence next time.
+                        # occurrence next time.
                         self.primaryIgnoreManager.ignore(refPage)
                     return True
                 elif choice in ['q', 'Q']:

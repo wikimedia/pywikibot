@@ -250,7 +250,7 @@ def _extract_plural(code, message, parameters):
         if len(plural_items) > 1 and isinstance(parameters, (tuple, list)) and \
            len(plural_items) != len(parameters):
             raise ValueError("Length of parameter does not match PLURAL "
-                             "occurences.")
+                             "occurrences.")
         i = 0
         for selector, variants in plural_items:
             if isinstance(parameters, dict):

@@ -149,7 +149,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertTrue(mysite.sametitle('Test name', 'Test name'))
         self.assertFalse(mysite.sametitle('Test name', 'Test Name'))
         # User, MediaWiki (both since 1.16) and Special are always
-        # first-letter (== only first non-namespace letter is case insenstive)
+        # first-letter (== only first non-namespace letter is case insensitive)
         # See also: https://www.mediawiki.org/wiki/Manual:$wgCapitalLinks
         self.assertTrue(mysite.sametitle("Special:Always", "Special:always"))
         if LV(mysite.version()) >= LV('1.16'):

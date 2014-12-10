@@ -225,13 +225,13 @@ class TestTWNTranslate(TestTWN):
 
     def testMultipleWrongParameterLength(self):
         """Test wrong parameter length."""
-        with self.assertRaisesRegex(ValueError, "Length of parameter does not match PLURAL occurences"):
+        with self.assertRaisesRegex(ValueError, "Length of parameter does not match PLURAL occurrences"):
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals', (1, 2))
                 % {'action': u'Ändere', 'line': u'drei'},
                 u'Bot: Ändere drei Zeilen von mehreren Seiten.')
 
-        with self.assertRaisesRegex(ValueError, "Length of parameter does not match PLURAL occurences"):
+        with self.assertRaisesRegex(ValueError, "Length of parameter does not match PLURAL occurrences"):
             self.assertEqual(
                 i18n.twntranslate('de', 'test-multiple-plurals', ["321"])
                 % {'action': u'Ändere', 'line': u'dreihunderteinundzwanzig'},

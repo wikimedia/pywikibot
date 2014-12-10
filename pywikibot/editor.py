@@ -27,8 +27,8 @@ class TextEditor(object):
         """Return editor selected in user-config.py."""
         command = config.editor
         if jumpIndex:
-            # Some editors make it possible to mark occurences of substrings,
-            # or to jump to the line of the first occurence.
+            # Some editors make it possible to mark occurrences of substrings,
+            # or to jump to the line of the first occurrence.
             # TODO: Find a better solution than hardcoding these, e.g. a config
             # option.
             line = text[:jumpIndex].count('\n')
@@ -83,7 +83,7 @@ class TextEditor(object):
         @type text: unicode
         @param jumpIndex: position at which to put the caret
         @type jumpIndex: int
-        @param highlight: each occurence of this substring will be highlighted
+        @param highlight: each occurrence of this substring will be highlighted
         @type highlight: unicode
         @return: the modified text, or None if the user didn't save the text
             file in his text editor

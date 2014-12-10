@@ -13,7 +13,7 @@ them, and replace the template.
 
 Command line options:
 
--remove      Remove every occurence of the template from every article
+-remove      Remove every occurrence of the template from every article
 
 -subst       Resolves the template by putting its text directly into the
              article. This is done by changing {{...}} or {{msg:...}} into
@@ -147,7 +147,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False):
 class XmlDumpTemplatePageGenerator:
 
     """
-    Generator which yield Pages that transclude a template.
+    Generator which yields Pages that transclude a template.
 
     These pages will be retrieved from a local XML dump file
     (cur table), and may not still transclude the template.
@@ -194,7 +194,7 @@ class XmlDumpTemplatePageGenerator:
 
 class TemplateRobot(Bot):
 
-    """This bot will replace, remove or subst all occurences of a template."""
+    """This bot will replace, remove or subst all occurrences of a template."""
 
     def __init__(self, generator, templates, **kwargs):
         """

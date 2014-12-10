@@ -513,7 +513,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
     Site objects are cached and reused by this method.
 
-    By default rely on config settings. These defaults may all be overriden
+    By default rely on config settings. These defaults may all be overridden
     using the method parameters.
 
     @param code: language code (override config.mylang)

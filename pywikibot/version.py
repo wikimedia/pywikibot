@@ -35,7 +35,7 @@ def getversion(online=True):
 
     @param online: (optional) Include information obtained online
     """
-    data = dict(getversiondict())  # copy dict to prevent changes in 'chache'
+    data = dict(getversiondict())  # copy dict to prevent changes in 'cache'
     data['cmp_ver'] = 'n/a'
 
     if online:

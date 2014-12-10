@@ -196,17 +196,17 @@ class TextEditor(ScrolledText):
                 # start from the beginning (and when we come to the end, stop)
                 idx = '1.0'
                 while True:
-                    # find next occurence, exit loop if no more
+                    # find next occurrence, exit loop if no more
                     idx = self.search(s, idx, nocase=1, stopindex=Tkinter.END)
                     if not idx:
                         break
-                    # index right after the end of the occurence
+                    # index right after the end of the occurrence
                     lastidx = '%s+%dc' % (idx, len(s))
-                    # tag the whole occurence (start included, stop excluded)
+                    # tag the whole occurrence (start included, stop excluded)
                     self.tag_add('found', idx, lastidx)
-                    # prepare to search for next occurence
+                    # prepare to search for next occurrence
                     idx = lastidx
-                # use a red foreground for all the tagged occurences
+                # use a red foreground for all the tagged occurrences
                 self.tag_config('found', foreground='red')
                 found = self.tag_nextrange('found', 1.0)
                 if found:
@@ -336,7 +336,7 @@ class EditBoxWindow(Tkinter.Frame):
         @type text: unicode
         @param jumpIndex: position at which to put the caret
         @type jumpIndex: int
-        @param highlight: each occurence of this substring will be highlighted
+        @param highlight: each occurrence of this substring will be highlighted
         @type highlight: unicode
         @return: the modified text, or None if the user didn't save the text
             file in his text editor

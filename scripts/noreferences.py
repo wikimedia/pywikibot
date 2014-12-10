@@ -582,7 +582,7 @@ class NoReferencesBot(Bot):
         interwikiPattern = r'\[\[([a-zA-Z\-]+)\s?:([^\[\]\n]*)\]\]\s*'
         # won't work with nested templates
         # the negative lookahead assures that we'll match the last template
-        # occurence in the temp text.
+        # occurrence in the temp text.
         # FIXME:
         # {{commons}} or {{commonscat}} are part of Weblinks section
         # * {{template}} is mostly part of a section

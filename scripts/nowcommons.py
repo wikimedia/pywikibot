@@ -24,7 +24,7 @@ This script understands various command-line arguments:
     -replacealways  replace links if the files are equal and the file names
                     differ without asking for confirmation
 
-    -replaceloose   Do loose replacements.  This will replace all occurences
+    -replaceloose   Do loose replacements.  This will replace all occurrences
                     of the name of the image (and not just explicit image
                     syntax).  This should work to catch all instances of the
                     file, including where it is used as a template parameter

@@ -497,7 +497,7 @@ class CategoryMoveRobot(object):
     def run(self):
         """The main bot function that does all the work.
 
-        For readability it is splitted into several helper functions:
+        For readability it is split into several helper functions:
         - _movecat()
         - _movetalk()
         - _hist()

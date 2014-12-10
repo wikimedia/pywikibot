@@ -14,7 +14,7 @@ Command line options:
            surround it with single quotes, such as:
            -summary:'My edit summary'
 -always    Don't prompt to make changes, just do them.
--loose     Do loose replacements.  This will replace all occurences of the name
+-loose     Do loose replacements.  This will replace all occurrences of the name
            of the image (and not just explicit image syntax).  This should work
            to catch all instances of the image, including where it is used as a
            template parameter or in image galleries.  However, it can also make
@@ -48,7 +48,7 @@ import re
 
 class ImageRobot(Bot):
 
-    """This bot will replace or remove all occurences of an old image."""
+    """This bot will replace or remove all occurrences of an old image."""
 
     # Summary messages for replacing images
     msg_replace = {
