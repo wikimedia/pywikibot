@@ -114,6 +114,24 @@ class HttpTestCase(TestCase):
                           http.fetch,
                           uri='http://getstatuscode.com/504')
 
+    def test_follow_redirects(self):
+        """Test follow 301 redirects after an exception works correctly."""
+        # to be effective, this exception should be raised in httplib2
+        self.assertRaises(Exception,
+                          http.fetch,
+                          uri='invalid://url')
+
+        # The following will redirect from ' ' -> '_', and maybe to https://
+        r = http.fetch(uri='http://en.wikipedia.org/wiki/Main%20Page')
+        self.assertEqual(r.status, 200)
+        self.assertIn('//en.wikipedia.org/wiki/Main_Page',
+                      r.response_headers['content-location'])
+
+        r = http.fetch(uri='http://www.gandi.eu')
+        self.assertEqual(r.status, 200)
+        self.assertEqual(r.response_headers['content-location'],
+                         'http://www.gandi.net')
+
 
 class ThreadedHttpTestCase(TestCase):
 

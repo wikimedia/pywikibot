@@ -230,7 +230,8 @@ class Http(httplib2.Http):
         except Exception as e:  # what types?
             # return exception instance to be retrieved by the calling thread
             return e
-        self.follow_redirects = follow_redirects
+        finally:
+            self.follow_redirects = follow_redirects
 
         # return connection to pool
         self.connection_pool.push_connection(conn_key,
