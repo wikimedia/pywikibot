@@ -338,7 +338,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     # But also complain if there is any stdout
                     # but ignore shell.py emiting its '>>> ' prompt.
                     if ((script_name == 'shell' and
-                                set(result['stdout']) == set('> \n'))
+                                set(result['stdout']).issubset(set('> \n')))
                             or result['stdout'] == ''):
                         result['stdout'] = None
                     self.assertIsNone(result['stdout'])
