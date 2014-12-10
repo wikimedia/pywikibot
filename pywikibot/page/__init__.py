@@ -722,20 +722,18 @@ class BasePage(ComparableMixin):
         return self.site.page_isredirect(self)
 
     def isStaticRedirect(self, force: bool = False) -> bool:
-        """
-        Determine whether the page is a static redirect.
+        """Determine whether the page is a static redirect.
 
         A static redirect must be a valid redirect, and contain the magic
         word __STATICREDIRECT__.
 
+        .. versionchanged:: 7.0.0
+           __STATICREDIRECT__ can be transcluded
+
         :param force: Bypass local caching
         """
-        if self.isRedirectPage():
-            static_keys = self.site.getmagicwords('staticredirect')
-            text = self.get(get_redirect=True, force=force)
-            if static_keys:
-                return any(key in text for key in static_keys)
-        return False
+        return self.isRedirectPage() \
+            and 'staticredirect' in self.properties(force=force)
 
     def isCategoryRedirect(self) -> bool:
         """Return True if this is a category redirect page, False otherwise."""
