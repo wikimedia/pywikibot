@@ -27,11 +27,11 @@ import threading
 
 if sys.version_info[0] > 2:
     from http import cookiejar as cookielib
-    from urllib.parse import splittype, splithost, unquote, urlparse
+    from urllib.parse import splittype, splithost, unquote, urlparse, urljoin
     unicode = str
 else:
     import cookielib
-    import urlparse
+    from urlparse import urlparse, urljoin
     from urllib import splittype, splithost, unquote
 
 import pywikibot
@@ -277,7 +277,7 @@ class Http(httplib2.Http):
             (scheme, authority, path, query,
              fragment) = httplib2.parse_uri(location)
             if authority is None:
-                response['location'] = httplib2.urlparse.urljoin(uri, location)
+                response['location'] = urljoin(uri, location)
                 pywikibot.debug(u"Relative redirect: changed [%s] to [%s]"
                                 % (location, response['location']),
                                 _logger)

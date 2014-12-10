@@ -108,6 +108,12 @@ class HttpTestCase(TestCase):
 
         self.assertEqual(organisation, 'TuxFamily.org non-profit organization')
 
+    def test_http_504(self):
+        """Test that a HTTP 504 raises the correct exception."""
+        self.assertRaises(pywikibot.Server504Error,
+                          http.fetch,
+                          uri='http://getstatuscode.com/504')
+
 
 class ThreadedHttpTestCase(TestCase):
 
