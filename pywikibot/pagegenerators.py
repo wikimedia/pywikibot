@@ -235,6 +235,24 @@ parameterHelp = u"""\
                   Case insensitive regular expressions will be used and
                   dot matches any character, including a newline.
 
+-onlyif           A claim the page needs to contain, otherwise the item won't
+                  be returned.
+                  The format is property=value,qualifier=value. Multiple (or
+                  none) qualifiers can be passed, separated by commas.
+                  Examples: P1=Q2 (property P1 must contain value Q2),
+                  P3=Q4,P5=Q6,P6=Q7 (property P3 with value Q4 and
+                  qualifiers: P5 with value Q6 and P6 with value Q7).
+                  Value can be page ID, coordinate in format:
+                  latitude,longitude[,precision] (all values are in decimal
+                  degrees), year, or plain string.
+                  The argument can be provided multiple times and the item
+                  page will be returned only if all of the claims are present.
+                  Argument can be also given as "-onlyif:expression".
+
+-onlyifnot        A claim the page must not contain, otherwise the item won't
+                  be returned.
+                  For usage and examples, see -onlyif above.
+
 -intersect        Work on the intersection of all the provided generators.
 """
 
@@ -270,6 +288,7 @@ class GeneratorFactory(object):
         self.step = None
         self.limit = None
         self.articlefilter_list = []
+        self.claimfilter_list = []
         self.intersect = False
         self._site = site
 
@@ -353,6 +372,13 @@ class GeneratorFactory(object):
             else:
                 gensList = CombinedPageGenerator(self.gens)
                 dupfiltergen = DuplicateFilterPageGenerator(gensList)
+
+        if self.claimfilter_list:
+            dupfiltergen = PreloadingItemGenerator(dupfiltergen)
+            for claim in self.claimfilter_list:
+                dupfiltergen = ItemClaimFilterPageGenerator(dupfiltergen,
+                                                            claim[0], claim[1],
+                                                            claim[2], claim[3])
 
         if self.articlefilter_list:
             return RegexBodyFilterPageGenerator(
@@ -664,6 +690,20 @@ class GeneratorFactory(object):
                     u'Which pattern do you want to grep?'))
             else:
                 self.articlefilter_list.append(arg[6:])
+            return True
+        elif arg.startswith('-onlyif') or arg.startswith('-onlyifnot'):
+            ifnot = arg.startswith('-onlyifnot')
+            if (len(arg) == 7 and not ifnot) or (len(arg) == 10 and ifnot):
+                claim = pywikibot.input(u'Which claim do you want to filter?')
+            else:
+                claim = arg[11 if ifnot else 8:]
+
+            p = re.compile(r'(?<!\\),')  # Match "," only if there no "\" before
+            temp = []  # Array to store split argument
+            for arg in p.split(claim):
+                temp.append(arg.replace('\,', ',').split('='))
+            self.claimfilter_list.append((temp[0][0], temp[0][1],
+                                          dict(temp[1:]), ifnot))
             return True
         elif arg.startswith('-yahoo'):
             gen = YahooSearchPageGenerator(arg[7:], site=self.site)
@@ -1182,6 +1222,56 @@ def DuplicateFilterPageGenerator(generator):
         if page not in seenPages:
             seenPages[page] = True
             yield page
+
+
+class ItemClaimFilter(object):
+
+    """Item claim filter."""
+
+    @classmethod
+    def __filter_match(cls, page, prop, claim, qualifiers=None):
+        """
+        Return true if the page contains the claim given.
+
+        @param page: the page to check
+        @return: true if page contains the claim, false otherwise
+        @rtype: bool
+        """
+        if not isinstance(page, pywikibot.ItemPage):
+            pywikibot.output(u'%s is not an ItemPage. Skipping.' % page)
+            return False
+        for page_claim in page.get()['claims'][prop]:
+            if page_claim.target_equals(claim):
+                if not qualifiers:
+                    return True
+
+                for prop, val in qualifiers.items():
+                    if not page_claim.has_qualifier(prop, val):
+                        return False
+                return True
+
+    @classmethod
+    def filter(cls, generator, prop, claim, qualifiers=None, negate=False):
+        """
+        Yield all ItemPages which does contain certain claim in a property.
+
+        @param prop: property id to check
+        @type prop: str
+        @param claim: value of the property to check. Can be exact value (for
+            instance, ItemPage instance) or ItemPage ID string (e.g. 'Q37470').
+        @param qualifiers: dict of qualifiers that must be present, or None if
+            qualifiers are irrelevant
+        @type qualifiers: dict or None
+        @param negate: true if pages that does *not* contain specified claim
+            should be yielded, false otherwise
+        @type negate: bool
+        """
+        for page in generator:
+            if cls.__filter_match(page, prop, claim, qualifiers) and not negate:
+                yield page
+
+# name the generator methods
+ItemClaimFilterPageGenerator = ItemClaimFilter.filter
 
 
 class RegexFilter(object):
