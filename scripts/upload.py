@@ -23,17 +23,17 @@ Arguments:
                   'Mi': Mebibytes (1024x1024 B)
                 The suffixes are case insensitive.
 
-If any other arguments are given, the first is the URL or filename to upload,
-and the rest is a proposed description to go with the upload. If none of these
-are given, the user is asked for the file or URL to upload. The bot will then
-upload the image to the wiki.
+If any other arguments are given, the first is either URL, filename or directory
+to upload, and the rest is a proposed description to go with the upload. If none
+of these are given, the user is asked for the directory, file or URL to upload.
+The bot will then upload the image to the wiki.
 
-The script will ask for the location of an image, if not given as a parameter,
+The script will ask for the location of an image(s), if not given as a parameter,
 and for a description.
 """
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2014
+# (C) Pywikibot team, 2003-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,6 +50,9 @@ import sys
 import pywikibot
 import pywikibot.data.api
 from pywikibot import config
+from pywikibot.tools import (
+    deprecated
+)
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
@@ -70,13 +73,44 @@ class UploadRobot:
         """
         Constructor.
 
-        @param ignoreWarning: Set this to True if you want to upload even if
-            another file would be overwritten or another mistake would be
-            risked. You can also set it to an array of warning codes to
-            selectively ignore specific warnings.
+        @param url: path to url or local file (deprecated), or list of urls or
+            paths to local files.
+        @type url: string (deprecated) or list
+        @param description: Description of file for its page. If multiple files
+            are uploading the same description is used for every file.
+        @type description: string
+        @param useFilename: Specify title of the file's page. If multiple
+            files are uploading it asks to change the name for second, third,
+            etc. files, otherwise the last file will overwrite the other.
+        @type useFilename: string
+        @param keepFilename: Set to True to keep original names of urls and
+            files, otherwise it will ask to enter a name for each file.
+        @type keepFilename: bool
+        @param verifyDescription: Set to False to not proofread the description.
+        @type verifyDescription: bool
+        @param ignoreWarning: Set this to True to upload even if another file
+            would be overwritten or another mistake would be risked. Set it to
+            an array of warning codes to selectively ignore specific warnings.
+        @type ignoreWarning: bool or list
+        @param targetSite: Set the site to upload to. If target site is not
+            given it's taken from user-config.py.
+        @type targetSite: object
+        @param aborts: List of the warning types to abort upload on. Set to True
+            to abort on any warning.
+        @type aborts: bool or list
+        @param chunk_size: Upload the file in chunks (more overhead, but
+            restartable) specified in bytes. If no value is specified the file
+            will be uploaded as whole.
+        @type chunk_size: integer
+
+        @deprecated: Using upload_image() is deprecated, use upload_file() with
+            file_url param instead
 
         """
         self.url = url
+        if isinstance(self.url, basestring):
+            pywikibot.warning("url as string is deprecated. "
+                              "Use an iterable instead.")
         self.urlEncoding = urlEncoding
         self.description = description
         self.useFilename = useFilename
@@ -90,16 +124,21 @@ class UploadRobot:
                                                            'commons')
         else:
             self.targetSite = targetSite or pywikibot.Site()
-        self.targetSite.forceLogin()
+        self.targetSite.login()
         self.uploadByUrl = uploadByUrl
 
+    @deprecated()
     def urlOK(self):
-        """Return True if self.url is an URL or an existing local file."""
+        """Return True if self.url is a URL or an existing local file."""
         return "://" in self.url or os.path.exists(self.url)
 
-    def read_file_content(self):
+    def read_file_content(self, file_url=None):
         """Return name of temp file in which remote file is saved."""
-        pywikibot.output(u'Reading file %s' % self.url)
+        if not file_url:
+            file_url = self.url
+            pywikibot.warning("file_url is not given. "
+                              "Set to self.url by default.")
+        pywikibot.output(u'Reading file %s' % file_url)
         resume = False
         rlen = 0
         _contents = None
@@ -112,7 +151,7 @@ class UploadRobot:
                 pywikibot.output(u"Resume download...")
                 uo.addheader('Range', 'bytes=%s-' % rlen)
 
-            infile = uo.open(self.url)
+            infile = uo.open(file_url)
 
             if 'text/html' in infile.info().getheader('Content-Type'):
                 pywikibot.output(u"Couldn't download the image: "
@@ -150,56 +189,89 @@ class UploadRobot:
                 pywikibot.log(
                     u"WARNING: length check of retrieved data not possible.")
         handle, tempname = tempfile.mkstemp()
-        t = os.fdopen(handle, "wb")
-        t.write(_contents)
+        with os.fdopen(handle, "wb") as t:
+            t.write(_contents)
         t.close()
         return tempname
 
-    def process_filename(self):
-        """Return base filename portion of self.url."""
+    def process_filename(self, file_url=None):
+        """Return base filename portion of file_url."""
+        if not file_url:
+            file_url = self.url
+            pywikibot.warning("file_url is not given. "
+                              "Set to self.url by default.")
+
         # Isolate the pure name
-        filename = self.url
-        # Filename may be either a local file path or a URL
+        filename = file_url
+        # Filename may be either a URL or a local file path
         if "://" in filename:
             # extract the path portion of the URL
             filename = urlparse(filename).path
         filename = os.path.basename(filename)
-
         if self.useFilename:
             filename = self.useFilename
         if not self.keepFilename:
             pywikibot.output(
                 u"The filename on the target wiki will default to: %s"
                 % filename)
-            # FIXME: these 2 belong somewhere else, presumably in family
-            forbidden = '/'  # to be extended
-            allowed_formats = (u'gif', u'jpg', u'jpeg', u'mid', u'midi',
-                               u'ogg', u'png', u'svg', u'xcf', u'djvu',
-                               u'ogv', u'oga', u'tif', u'tiff')
-            # ask until it's valid
-            while True:
-                newfn = pywikibot.input(
-                    u'Enter a better name, or press enter to accept:')
-                if newfn == "":
-                    newfn = filename
-                    break
-                ext = os.path.splitext(newfn)[1].lower().strip('.')
-                # are any chars in forbidden also in newfn?
-                invalid = set(forbidden) & set(newfn)
-                if invalid:
-                    c = "".join(invalid)
-                    pywikibot.output(
-                        'Invalid character(s): %s. Please try again' % c)
-                    continue
-                if ext not in allowed_formats:
-                    if not pywikibot.input_yn(
-                            u"File format is not one of [%s], but %s. Continue?"
-                            % (u' '.join(allowed_formats), ext),
-                            default=False, automatic_quit=False):
-                        continue
-                break
-            if newfn != '':
+            newfn = pywikibot.input(
+                u'Enter a better name, or press enter to accept:')
+            if newfn != "":
                 filename = newfn
+        # FIXME: these 2 belong somewhere else, presumably in family
+        # forbidden characters are handled by pywikibot/page.py
+        forbidden = ':*?/\\'  # to be extended
+        allowed_formats = (u'gif', u'jpg', u'jpeg', u'mid', u'midi',
+                           u'ogg', u'png', u'svg', u'xcf', u'djvu',
+                           u'ogv', u'oga', u'tif', u'tiff')
+        # ask until it's valid
+        first_check = True
+        while True:
+            if not first_check:
+                filename = pywikibot.input(u'Enter a better name, '
+                                           'or press enter to skip:')
+                if not filename:
+                    return None
+            first_check = False
+            ext = os.path.splitext(filename)[1].lower().strip('.')
+            # are any chars in forbidden also in filename?
+            invalid = set(forbidden) & set(filename)
+            if invalid:
+                c = "".join(invalid)
+                pywikibot.output(
+                    'Invalid character(s): %s. Please try again' % c)
+                continue
+            if ext not in allowed_formats:
+                if not pywikibot.input_yn(
+                        u"File format is not one of [%s], but %s. Continue?"
+                        % (u' '.join(allowed_formats), ext),
+                        default=False, automatic_quit=False):
+                    continue
+            potential_file_page = pywikibot.FilePage(self.targetSite, filename)
+            if potential_file_page.exists():
+                if potential_file_page.canBeEdited():
+                    if pywikibot.input_yn(u"File with name %s already exists. "
+                                          "Would you like to change the name? "
+                                          "(Otherwise file will be overwritten.)"
+                                          % filename, default=True,
+                                          automatic_quit=False):
+                        continue
+                    else:
+                        break
+                else:
+                    pywikibot.output(u"File with name %s already exists and "
+                                     "cannot be overwritten." % filename)
+                    continue
+            else:
+                try:
+                    if potential_file_page.fileIsShared():
+                        pywikibot.output(u"File with name %s already exists in shared "
+                                         "repository and cannot be overwritten."
+                                         % filename)
+                        continue
+                except pywikibot.NoPage:
+                    break
+
         # A proper description for the submission.
         # Empty descriptions are not accepted.
         pywikibot.output(u'The suggested description is:\n%s'
@@ -247,34 +319,41 @@ class UploadRobot:
         else:
             return warn_code in self.ignoreWarning
 
+    @deprecated('UploadRobot.upload_file()')
     def upload_image(self, debug=False):
-        """Upload the image at self.url to the target wiki.
+        """Upload image."""
+        self.upload_file(self.url, debug)
+
+    def upload_file(self, file_url, debug=False):
+        """Upload the image at file_url to the target wiki.
 
         Return the filename that was used to upload the image.
         If the upload fails, ask the user whether to try again or not.
         If the user chooses not to retry, return null.
 
         """
-        filename = self.process_filename()
+        filename = self.process_filename(file_url)
+        if not filename:
+            return None
 
         site = self.targetSite
         imagepage = pywikibot.FilePage(site, filename)  # normalizes filename
         imagepage.text = self.description
 
-        pywikibot.output(u'Uploading file to %s via API....' % site)
+        pywikibot.output(u'Uploading file to %s via API...' % site)
 
         try:
             apiIgnoreWarnings = False
             if self.ignoreWarning is True:
                 apiIgnoreWarnings = True
             if self.uploadByUrl:
-                site.upload(imagepage, source_url=self.url,
+                site.upload(imagepage, source_url=file_url,
                             ignore_warnings=apiIgnoreWarnings)
             else:
-                if "://" in self.url:
-                    temp = self.read_file_content()
+                if "://" in file_url:
+                    temp = self.read_file_content(file_url)
                 else:
-                    temp = self.url
+                    temp = file_url
                 site.upload(imagepage, source_filename=temp,
                             ignore_warnings=apiIgnoreWarnings,
                             chunk_size=self.chunk_size)
@@ -307,7 +386,7 @@ class UploadRobot:
 
         else:
             # No warning, upload complete.
-            pywikibot.output(u"Upload successful.")
+            pywikibot.output(u"Upload of %s successful." % filename)
             return filename  # data['filename']
 
     def run(self):
@@ -325,14 +404,10 @@ class UploadRobot:
                 "User '%s' does not have upload rights on site %s."
                 % (self.targetSite.user(), self.targetSite))
             return
-
-        while not self.urlOK():
-            if not self.url:
-                pywikibot.output(u'No input filename given')
-            else:
-                pywikibot.output(u'Invalid input filename given. Try again.')
-            self.url = pywikibot.input(u'File or URL where image is now:')
-        return self.upload_image()
+        if isinstance(self.url, basestring):
+            return self.upload_file(self.url)
+        for file_url in self.url:
+            self.upload_file(file_url)
 
 
 def main(*args):
@@ -403,6 +478,20 @@ def main(*args):
                 url = arg
             else:
                 description.append(arg)
+    while not ("://" in url or os.path.exists(url)):
+        if not url:
+            pywikibot.output(u'No input filename given.')
+        else:
+            pywikibot.output(u'Invalid input filename given. Try again.')
+        url = pywikibot.input(u'URL, file or directory where files are now:')
+    if os.path.isdir(url):
+        file_list = []
+        for directory_info in os.walk(url):
+            for dir_file in directory_info[2]:
+                file_list.append(os.path.join(directory_info[0], dir_file))
+        url = file_list
+    else:
+        url = [url]
     description = u' '.join(description)
     bot = UploadRobot(url, description=description, useFilename=useFilename,
                       keepFilename=keepFilename,
