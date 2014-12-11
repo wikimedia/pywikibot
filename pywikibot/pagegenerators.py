@@ -31,6 +31,7 @@ import time
 import pywikibot
 from pywikibot import date, config, i18n
 from pywikibot.tools import (
+    deprecated,
     deprecated_args,
     DequeGenerator,
     intersect_generators,
@@ -85,6 +86,19 @@ parameterHelp = u"""\
 
 -search           Work on all pages that are found in a MediaWiki search
                   across all namespaces.
+
+-<logevent>log    Work on articles that were on a specified special:log.
+                  You have options for every type of logs given by the
+                 <logevent> parameter which could be one of the following:
+                      block, protect, rights, delete, upload, move, import,
+                      patrol, merge, suppress, review, stable, gblblock,
+                      renameuser, globalauth, gblrights, abusefilter, newusers
+                  Examples:
+                  -movelog gives 500 pages from move log (should be redirects)
+                  -deletelog:10 gives 10 pages from deletion log
+                  -protect:Dummy gives 500 pages from protect by user Dummy
+                  -patrol:Dummy;20 gives 20 pages patroled by user Dummy
+                  In some cases this must be written as -patrol:"Dummy;20"
 
 -namespaces       Filter the page generator to only yield pages in the
 -namespace        specified namespaces. Separate multiple namespace
@@ -595,6 +609,29 @@ class GeneratorFactory(object):
         elif arg.startswith('-intersect'):
             self.intersect = True
             return True
+        elif arg.startswith('-'):
+            mode, log, user = arg.partition('log')
+            # exclude -log, -nolog
+            if log == 'log' and mode not in ['-', '-no']:
+                total = 500
+                if not user:
+                    user = None
+                else:
+                    try:
+                        total = int(user[1:])
+                        user = None
+                    except ValueError:
+                        user = user[1:]
+                        result = user.split(';')
+                        user = result[0]
+                        try:
+                            total = int(result[1])
+                        except (ValueError, IndexError):
+                            pywikibot.error(
+                                u'Value specified after ";" not an int.')
+                            return False
+                    # TODO: Check if mode[1:] is one of the allowed log types
+                gen = LogeventsPageGenerator(mode[1:], user, total=total)
 
         if gen:
             self.gens.append(gen)
@@ -663,6 +700,55 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
     return site.allpages(prefix=title, namespace=namespace,
                          filterredir=filterredir, step=step, total=total,
                          content=content)
+
+
+@deprecated_args(number="total", mode="logtype", repeat=None)
+def LogeventsPageGenerator(logtype=None, user=None, site=None,
+                           namespace=0, total=None):
+    """
+    Generate Pages for specified modes of logevents.
+
+    @param logtype: Mode of logs to retrieve
+    @type logtype: basestring
+    @param user: User of logs retrieved
+    @type user: basestring
+    @param site: Site for generator results
+    @type site: L{pywikibot.site.BaseSite}
+    @param namespace: Namespace to retrieve logs from
+    @type namespace: int
+    @param total: Maximum number of pages to retrieve in total
+    @type total: int
+    """
+    if site is None:
+        site = pywikibot.Site()
+    for entry in site.logevents(total=total, logtype=logtype,
+                                user=user, namespace=namespace):
+        yield entry.title()
+
+
+@deprecated("LogeventsPageGenerator")
+@deprecated_args(number="total", mode="logtype", repeat=None)
+def LogpagesPageGenerator(total=500, logtype='', user=None,
+                          site=None, namespace=[]):
+    """
+    Generate Pages for specified modes of logevents.
+
+    This is the backwards compatible one.
+    See LogeventsPageGenerator
+
+    @param mode: Mode of logs to retrieve
+    @type mode: basestring
+    @param user: User of logs retrieved
+    @type user: basestring
+    @param site: Site for generator results
+    @type site: L{pywikibot.site.BaseSite}
+    @param namespace: Namespace to retrieve logs from
+    @type namespace: int
+    @param total: Maximum number of pages to retrieve in total
+    @type total: int
+    """
+    return LogeventsPageGenerator(total=total, logtype=logtype, user=user,
+                                  site=site, namespace=namespace)
 
 
 @deprecated_args(number="total", namespace="namespaces", repeat=None)

@@ -3388,7 +3388,7 @@ class APISite(BaseSite):
                                 total=total, g_content=content, **iuargs)
         return iugen
 
-    def logevents(self, logtype=None, user=None, page=None,
+    def logevents(self, logtype=None, user=None, page=None, namespace=None,
                   start=None, end=None, reverse=False, step=None, total=None):
         """Iterate all log entries.
 
@@ -3398,6 +3398,7 @@ class APISite(BaseSite):
             "patrol", "merge")
         @param user: only iterate entries that match this user name
         @param page: only iterate entries affecting this page
+        @param namespace: namespace to retrieve logevents from
         @param start: only iterate entries from and after this Timestamp
         @param end: only iterate entries up to and through this Timestamp
         @param reverse: if True, iterate oldest entries first (default: newest)
@@ -3420,6 +3421,8 @@ class APISite(BaseSite):
             legen.request["leend"] = str(end)
         if reverse:
             legen.request["ledir"] = "newer"
+        if namespace:
+            legen.request["lenamespace"] = namespace
         return legen
 
     def recentchanges(self, start=None, end=None, reverse=False,
