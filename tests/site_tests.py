@@ -478,10 +478,10 @@ class TestSiteObject(DefaultSiteTestCase):
         for cat in mysite.allcategories(total=5, prefix="Def"):
             self.assertIsInstance(cat, pywikibot.Category)
             self.assertTrue(cat.title(withNamespace=False).startswith("Def"))
-#        # Bug # 15985
-#        for cat in mysite.allcategories(total=5, start="Hij", reverse=True):
-#            self.assertIsInstance(cat, pywikibot.Category)
-#            self.assertLessEqual(cat.title(withNamespace=False), "Hij")
+        # Bug # 15985 - reverse and start combined; fixed in v 1.14
+        for cat in mysite.allcategories(total=5, start="Hij", reverse=True):
+            self.assertIsInstance(cat, pywikibot.Category)
+            self.assertLessEqual(cat.title(withNamespace=False), "Hij")
 
     def test_allusers(self):
         """Test the site.allusers() method."""
@@ -536,11 +536,11 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(mysite.page_exists(impage))
             self.assertGreaterEqual(impage.title(withNamespace=False), "Ba")
-#        # Bug # 15985
-#        for impage in mysite.allimages(start="Da", reverse=True, total=5):
-#            self.assertIsInstance(impage, pywikibot.FilePage)
-#            self.assertTrue(mysite.page_exists(impage))
-#            self.assertLessEqual(impage.title(), "Da")
+        # Bug # 15985 - reverse and start combined; fixed in v 1.14
+        for impage in mysite.allimages(start="Da", reverse=True, total=5):
+            self.assertIsInstance(impage, pywikibot.FilePage)
+            self.assertTrue(mysite.page_exists(impage))
+            self.assertLessEqual(impage.title(withNamespace=False), "Da")
         for impage in mysite.allimages(prefix="Ch", total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(mysite.page_exists(impage))
