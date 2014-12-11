@@ -5372,6 +5372,47 @@ class APISite(BaseSite):
             return self.allpages(namespace=namespaces[0], protect_level=level,
                                  protect_type=type, total=total)
 
+    @need_version("1.18")
+    def compare(self, old, diff):
+        """Corresponding method to the 'action=compare' API action.
+
+        See: https://en.wikipedia.org/w/api.php?action=help&modules=compare
+        Use pywikibot.diff's html_comparator() method to parse result.
+        @param old: starting revision ID, title, Page, or Revision
+        @type old: int, str, pywikibot.Page, or pywikibot.Page.Revision
+        @param diff: ending revision ID, title, Page, or Revision
+        @type diff: int, str, pywikibot.Page, or pywikibot.Page.Revision
+        @return: Returns an HTML string of a diff between two revisions.
+        @rtype: str
+        """
+        # check old and diff types
+        def get_param(item):
+            if isinstance(item, basestring):
+                return 'title', item
+            elif isinstance(item, pywikibot.Page):
+                return 'title', item.title()
+            elif isinstance(item, int):
+                return 'rev', item
+            elif isinstance(item, pywikibot.page.Revision):
+                return 'rev', item.revid
+            else:
+                return None
+
+        old = get_param(old)
+        if not old:
+            raise TypeError('old parameter is of invalid type')
+        diff = get_param(diff)
+        if not diff:
+            raise TypeError('diff parameter is of invalid type')
+
+        params = {'from{0}'.format(old[0]): old[1],
+                  'to{0}'.format(diff[0]): diff[1]}
+
+        req = api.Request(site=self, action='compare', **params)
+        data = req.submit()
+        comparison = data['compare']['*']
+        return comparison
+
 
 class DataSite(APISite):
 

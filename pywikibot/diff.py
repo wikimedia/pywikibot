@@ -14,6 +14,10 @@ if sys.version_info[0] > 2:
     from itertools import zip_longest
 else:
     from itertools import izip_longest as zip_longest
+try:
+    from bs4 import BeautifulSoup
+except ImportError as bserror:
+    BeautifulSoup = False
 
 import pywikibot
 from pywikibot.backports import format_range_unified  # introduced in 2.7.2
@@ -347,3 +351,29 @@ def cherry_pick(oldtext, newtext, n=0, by_letter=False):
     text = ''.join(text_list)
 
     return text
+
+
+def html_comparator(compare_string):
+    """List of added and deleted contexts from 'action=compare' html string.
+
+    This function is useful when combineds with site.py's "compare" method.
+    Site.compare() returns HTML that is useful for displaying on a page.
+    Here we use BeautifulSoup to get the un-HTML-ify the context of changes.
+    Finally we present the added and deleted contexts.
+    @param compare_string: HTML string from mediawiki API
+    @type compare_string: str
+    @return: deleted and added list of contexts
+    @rtype: dict
+    """
+    # check if BeautifulSoup imported
+    if not BeautifulSoup:
+        raise bserror  # should have been raised and stored earlier.
+
+    comparands = {'deleted-context': [], 'added-context': []}
+    soup = BeautifulSoup(compare_string)
+    for change_type, css_class in (('deleted-context', 'diff-deletedline'), ('added-context', 'diff-addedline')):
+        crutons = soup.find_all('td', class_=css_class)
+        for cruton in crutons:
+            cruton_string = ''.join(cruton.strings)
+            comparands[change_type].append(cruton_string)
+    return comparands
