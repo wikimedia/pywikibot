@@ -23,7 +23,6 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot.compat import query
 from pywikibot import i18n
 
 
@@ -245,20 +244,11 @@ Hallo %(admin)s,
             }
 
     def SysopGenerator(self):
-        params = {
-            'action':  'query',
-            'list':    'allusers',
-            'augroup': 'sysop',
-            'auprop':  'groups',
-            'aulimit': 500,
-        }
-        data = query.GetData(params, self.site)
-        for user in data['query']['allusers']:
+        for user in self.site.allusers(group='sysop'):
             # exclude sysop bots
             if 'bot' not in user['groups']:
                 # yield the sysop talkpage
-                yield pywikibot.Page(self.site, user['name'],
-                                     ns=3)
+                yield pywikibot.Page(self.site, user['name'], ns=3)
 
     def load(self, page):
         """Load the given page and return the page text."""
