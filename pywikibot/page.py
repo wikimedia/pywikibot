@@ -2196,7 +2196,7 @@ class Category(Page):
         if not hasattr(self, "_subcats"):
             self._subcats = []
             for member in self.site.categorymembers(
-                    self, namespaces=[14], step=step,
+                    self, member_type='subcat', step=step,
                     total=total, content=content):
                 subcat = Category(member)
                 self._subcats.append(subcat)
@@ -2231,7 +2231,7 @@ class Category(Page):
 
     @deprecate_arg("startFrom", "startsort")
     def articles(self, recurse=False, step=None, total=None,
-                 content=False, namespaces=None, sortby="",
+                 content=False, namespaces=None, sortby=None,
                  starttime=None, endtime=None, startsort=None,
                  endsort=None):
         """
@@ -2271,9 +2271,6 @@ class Category(Page):
         @type endsort: str
 
         """
-        if namespaces is None:
-            namespaces = [x for x in self.site.namespaces()
-                          if x >= 0 and x != 14]
         for member in self.site.categorymembers(self,
                                                 namespaces=namespaces,
                                                 step=step, total=total,
@@ -2281,7 +2278,8 @@ class Category(Page):
                                                 starttime=starttime,
                                                 endtime=endtime,
                                                 startsort=startsort,
-                                                endsort=endsort
+                                                endsort=endsort,
+                                                member_type=['page', 'file']
                                                 ):
             yield member
             if total is not None:

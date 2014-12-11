@@ -178,6 +178,7 @@ class TestNamespaceObject(TestCase):
         self.assertNotIn(8, [x, y, z])
 
     def testNamespaceNormalizeName(self):
+        """Test Namespace.normalize_name."""
         self.assertEqual(Namespace.normalize_name(u'File'), u'File')
         self.assertEqual(Namespace.normalize_name(u':File'), u'File')
         self.assertEqual(Namespace.normalize_name(u'File:'), u'File')
@@ -193,6 +194,7 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(Namespace.normalize_name(u'::File::'), False)
 
     def test_repr(self):
+        """Test Namespace.__repr__."""
         a = Namespace(id=0, canonical_name=u'Foo')
         s = repr(a)
         r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[])" \
@@ -215,6 +217,7 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(a, b)
 
     def test_resolve(self):
+        """Test Namespace.resolve."""
         namespaces = Namespace.builtin_namespaces(use_image_name=False)
         main_ns = namespaces[0]
         file_ns = namespaces[6]
@@ -270,6 +273,38 @@ class TestNamespaceObject(TestCase):
         self.assertRaisesRegex(KeyError,
                                r'Namespace identifier\(s\) not recognised: -10,-11',
                                Namespace.resolve, [-10, 0, -11])
+
+
+class TestNamespaceCollections(TestCase):
+
+    """Test how Namespace interact when in collections."""
+
+    net = False
+
+    def test_set(self):
+        """Test converting sequence of Namespace to a set."""
+        namespaces = Namespace.builtin_namespaces(use_image_name=False)
+
+        self.assertTrue(all(isinstance(x, int) for x in namespaces))
+        self.assertTrue(all(isinstance(x, int) for x in namespaces.keys()))
+        self.assertTrue(all(isinstance(x, Namespace)
+                            for x in namespaces.values()))
+
+        namespaces_set = set(namespaces)
+
+        self.assertEqual(len(namespaces), len(namespaces_set))
+        self.assertTrue(all(isinstance(x, int) for x in namespaces_set))
+
+    def test_set_minus(self):
+        """Test performing set minus operation on set of Namespace objects."""
+        namespaces = Namespace.builtin_namespaces(use_image_name=False)
+
+        excluded_namespaces = set([-1, -2])
+
+        positive_namespaces = set(namespaces) - excluded_namespaces
+
+        self.assertEqual(len(namespaces), len(positive_namespaces) +
+                                          len(excluded_namespaces))
 
 
 if __name__ == '__main__':
