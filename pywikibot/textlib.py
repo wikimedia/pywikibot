@@ -14,19 +14,14 @@ and return a unicode string.
 __version__ = '$Id$'
 #
 
-try:
-    import mwparserfromhell
-except ImportError:
-    mwparserfromhell = False
+import datetime
+import re
+import sys
 
 try:
     from collections import OrderedDict
 except ImportError:
     from ordereddict import OrderedDict
-
-import datetime
-import re
-import sys
 
 if sys.version_info[0] > 2:
     from html.parser import HTMLParser
@@ -966,17 +961,53 @@ def extract_templates_and_params(text):
     parameters, and if this results multiple parameters with the same name
     only the last value provided will be returned.
 
-    This uses a third party library (mwparserfromhell) if it is installed
-    and enabled in the user-config.py. Otherwise it falls back on a
-    regex based function defined below.
+    This uses the package L{mwparserfromhell} (mwpfh) if it is installed
+    and enabled by config.mwparserfromhell. Otherwise it falls back on a
+    regex based implementation.
+
+    There are minor differences between the two implementations.
+
+    The two implementations return nested templates in a different order.
+    i.e. for {{a|b={{c}}}}, mwpfh returns [a, c], whereas regex returns [c, a].
+
+    mwpfh preserves whitespace in parameter names and values.  regex excludes
+    anything between <!-- --> before parsing the text.
 
     @param text: The wikitext from which templates are extracted
     @type text: unicode or string
     @return: list of template name and params
     @rtype: list of tuple
     """
-    if not (config.use_mwparserfromhell and mwparserfromhell):
+    use_mwparserfromhell = config.use_mwparserfromhell
+    if use_mwparserfromhell:
+        try:
+            import mwparserfromhell  # noqa
+        except ImportError:
+            use_mwparserfromhell = False
+
+    if use_mwparserfromhell:
+        return extract_templates_and_params_mwpfh(text)
+    else:
         return extract_templates_and_params_regex(text)
+
+
+def extract_templates_and_params_mwpfh(text):
+    """
+    Extract templates with params using mwparserfromhell.
+
+    This function should not be called directly.
+
+    Use extract_templates_and_params, which will select this
+    mwparserfromhell implementation if based on whether the
+    mwparserfromhell package is installed and enabled by
+    config.mwparserfromhell.
+
+    @param text: The wikitext from which templates are extracted
+    @type text: unicode or string
+    @return: list of template name and params
+    @rtype: list of tuple
+    """
+    import mwparserfromhell
     code = mwparserfromhell.parse(text)
     result = []
     for template in code.filter_templates(recursive=True):
