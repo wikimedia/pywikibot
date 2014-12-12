@@ -15,9 +15,10 @@ if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') == '1':
         import tkinter as Tkinter
     else:
         import Tkinter
+    from scripts import flickrripper
+    from pywikibot.userinterfaces.gui import EditBoxWindow
+
 import pywikibot
-from scripts import flickrripper
-from pywikibot.userinterfaces.gui import EditBoxWindow
 
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
