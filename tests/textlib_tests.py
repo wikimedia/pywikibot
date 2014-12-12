@@ -18,6 +18,7 @@ import pywikibot
 import pywikibot.textlib as textlib
 from pywikibot import config
 
+from tests import OrderedDict
 from tests.aspects import unittest, TestCase, DefaultDrySiteTestCase
 
 files = {}
@@ -57,17 +58,19 @@ class TestSectionFunctions(TestCase):
         if not (pywikibot.config.use_mwparserfromhell and mwparserfromhell):
             raise unittest.SkipTest('mwparserfromhell not available or enabled')
         func = textlib.extract_templates_and_params  # It's really long.
-        self.assertEqual(func('{{a}}'), [('a', {})])
-        self.assertEqual(func('{{a|b=c}}'), [('a', {'b': 'c'})])
-        self.assertEqual(func('{{a|b|c=d}}'), [('a', {u'1': 'b', 'c': 'd'})])
-        self.assertEqual(func('{{a|b={{c}}}}'), [(u'a', {u'b': u'{{c}}'}), ('c', {})])
+        self.assertEqual(func('{{a}}'), [('a', OrderedDict())])
+        self.assertEqual(func('{{a|b=c}}'), [('a', OrderedDict((('b', 'c'), )))])
+        self.assertEqual(func('{{a|b|c=d}}'), [('a', OrderedDict((('1', 'b'), ('c', 'd'))))])
+        self.assertEqual(func('{{a|b={{c}}}}'), [('a', OrderedDict((('b', '{{c}}'), ))), ('c', OrderedDict())])
+        self.assertEqual(func('{{a|b=c|f=g|d=e|1=}}'), [('a', OrderedDict((('b', 'c'), ('f', 'g'), ('d', 'e'), ('1', ''))))])
 
     def testExtractTemplatesRegex(self):
         func = textlib.extract_templates_and_params_regex  # It's really long.
-        self.assertEqual(func('{{a}}'), [('a', {})])
-        self.assertEqual(func('{{a|b=c}}'), [('a', {'b': 'c'})])
-        self.assertEqual(func('{{a|b|c=d}}'), [('a', {u'1': 'b', 'c': 'd'})])
-        self.assertEqual(func('{{a|b={{c}}}}'), [('c', {}), (u'a', {u'b': u'{{c}}'})])
+        self.assertEqual(func('{{a}}'), [('a', OrderedDict())])
+        self.assertEqual(func('{{a|b=c}}'), [('a', OrderedDict((('b', 'c'), )))])
+        self.assertEqual(func('{{a|b|c=d}}'), [('a', OrderedDict((('1', 'b'), ('c', 'd'))))])
+        self.assertEqual(func('{{a|b={{c}}}}'), [('c', OrderedDict()), ('a', OrderedDict((('b', '{{c}}'), )))])
+        self.assertEqual(func('{{a|b=c|f=g|d=e|1=}}'), [('a', OrderedDict((('b', 'c'), ('f', 'g'), ('d', 'e'), ('1', ''))))])
 
     def testSpacesInSection(self):
         self.assertContains("enwiki_help_editing", u"Minor_edits")

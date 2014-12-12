@@ -18,6 +18,12 @@ try:
     import mwparserfromhell
 except ImportError:
     mwparserfromhell = False
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
+
 import datetime
 import re
 import sys
@@ -974,7 +980,7 @@ def extract_templates_and_params(text):
     code = mwparserfromhell.parse(text)
     result = []
     for template in code.filter_templates(recursive=True):
-        params = {}
+        params = OrderedDict()
         for param in template.params:
             params[unicode(param.name)] = unicode(param.value)
         result.append((unicode(template.name.strip()), params))
@@ -1104,7 +1110,7 @@ def extract_templates_and_params_regex(text):
 
             # Parameters
             paramString = m.group('params')
-            params = {}
+            params = OrderedDict()
             numbered_param = 1
             if paramString:
                 # Replace wikilinks with markers
