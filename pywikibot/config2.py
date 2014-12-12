@@ -544,9 +544,17 @@ max_external_links = 50
 report_dead_links_on_talk = False
 
 # ############# DATABASE SETTINGS ##############
+# Setting to connect the database or replica of the database of the wiki.
+# db_name_format can be used to manipulate the dbName of site.
+# Example for a pywikibot running on wmflabs:
+# db_hostname = 'enwiki.labsdb'
+# db_name_format = '{0}_p'
+# db_connect_file = '~/replica.my.cnf'
 db_hostname = 'localhost'
-db_username = 'wikiuser'
+db_username = ''
 db_password = ''
+db_name_format = '{0}'
+db_connect_file = None
 
 # ############# SEARCH ENGINE SETTINGS ##############
 
