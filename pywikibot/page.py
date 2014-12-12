@@ -1282,57 +1282,6 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         return self.site.pageimages(self, step=step, total=total,
                                     content=content)
 
-    @deprecate_arg("get_redirect", None)
-    def templatesWithParams(self):
-        """Iterate templates used on this Page.
-
-        @return: a generator that yields a tuple for each use of a template
-        in the page, with the template Page as the first entry and a list of
-        parameters as the second entry.
-
-        """
-        # WARNING: may not return all templates used in particularly
-        # intricate cases such as template substitution
-        titles = list(t.title() for t in self.templates())
-        templates = textlib.extract_templates_and_params(self.text)
-        # backwards-compatibility: convert the dict returned as the second
-        # element into a list in the format used by old scripts
-        result = []
-        for template in templates:
-            link = pywikibot.Link(template[0], self.site,
-                                  defaultNamespace=10)
-            try:
-                if link.canonical_title() not in titles:
-                    continue
-            except pywikibot.Error:
-                # this is a parser function or magic word, not template name
-                continue
-            args = template[1]
-            intkeys = {}
-            named = {}
-            positional = []
-            for key in sorted(args):
-                try:
-                    intkeys[int(key)] = args[key]
-                except ValueError:
-                    named[key] = args[key]
-            for i in range(1, len(intkeys) + 1):
-                # only those args with consecutive integer keys can be
-                # treated as positional; an integer could also be used
-                # (out of order) as the key for a named argument
-                # example: {{tmp|one|two|5=five|three}}
-                if i in intkeys:
-                    positional.append(intkeys[i])
-                else:
-                    for k in intkeys:
-                        if k < 1 or k >= i:
-                            named[str(k)] = intkeys[k]
-                    break
-            for name in named:
-                positional.append("%s=%s" % (name, named[name]))
-            result.append((pywikibot.Page(link, self.site), positional))
-        return result
-
     @deprecated_args(nofollow_redirects=None, get_redirect=None)
     def categories(self, withSortKey=False, step=None, total=None,
                    content=False):
@@ -1844,6 +1793,57 @@ class Page(BasePage):
                 raise ValueError(u'Title must be specified and not empty '
                                  'if source is a Site.')
         super(Page, self).__init__(source, title, ns)
+
+    @deprecate_arg("get_redirect", None)
+    def templatesWithParams(self):
+        """Iterate templates used on this Page.
+
+        @return: a generator that yields a tuple for each use of a template
+        in the page, with the template Page as the first entry and a list of
+        parameters as the second entry.
+
+        """
+        # WARNING: may not return all templates used in particularly
+        # intricate cases such as template substitution
+        titles = list(t.title() for t in self.templates())
+        templates = textlib.extract_templates_and_params(self.text)
+        # backwards-compatibility: convert the dict returned as the second
+        # element into a list in the format used by old scripts
+        result = []
+        for template in templates:
+            link = pywikibot.Link(template[0], self.site,
+                                  defaultNamespace=10)
+            try:
+                if link.canonical_title() not in titles:
+                    continue
+            except pywikibot.Error:
+                # this is a parser function or magic word, not template name
+                continue
+            args = template[1]
+            intkeys = {}
+            named = {}
+            positional = []
+            for key in sorted(args):
+                try:
+                    intkeys[int(key)] = args[key]
+                except ValueError:
+                    named[key] = args[key]
+            for i in range(1, len(intkeys) + 1):
+                # only those args with consecutive integer keys can be
+                # treated as positional; an integer could also be used
+                # (out of order) as the key for a named argument
+                # example: {{tmp|one|two|5=five|three}}
+                if i in intkeys:
+                    positional.append(intkeys[i])
+                else:
+                    for k in intkeys:
+                        if k < 1 or k >= i:
+                            named[str(k)] = intkeys[k]
+                    break
+            for name in named:
+                positional.append("%s=%s" % (name, named[name]))
+            result.append((pywikibot.Page(link, self.site), positional))
+        return result
 
 
 class FilePage(Page):
