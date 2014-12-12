@@ -439,18 +439,3 @@ class ListBoxWindow:
         self.listbox.config(height=laenge, width=maxbreite + 2)
         # wait for user to push a button which will destroy (close) the window
         return self.list
-
-
-if __name__ == "__main__":
-    import pywikibot
-    try:
-        root = Tkinter.Tk()
-        root.resizable(width=Tkinter.FALSE, height=Tkinter.FALSE)
-        root.title("pywikibot GUI")
-        page = pywikibot.Page(pywikibot.Site(), u'Main Page')
-        content = page.get()
-        myapp = EditBoxWindow(root)
-        myapp.bind("<Control-d>", myapp.debug)
-        v = myapp.edit(content, highlight=page.title())
-    finally:
-        pywikibot.stopme()
