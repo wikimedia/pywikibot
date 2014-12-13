@@ -367,7 +367,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertTrue(all(isinstance(el, basestring)
                             for el in mysite.page_extlinks(mainpage)))
 
-    def testAllPages(self):
+    def test_allpages(self):
         """Test the site.allpages() method."""
         mysite = self.get_site()
         fwd = list(mysite.allpages(total=10))
@@ -407,14 +407,26 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertTrue(mysite.page_exists(page))
             self.assertEqual(page.namespace(), 0)
             self.assertFalse(page.isRedirectPage())
-#        for page in mysite.allpages(filterlanglinks=True, total=5):
-#            self.assertIsInstance(page, pywikibot.Page)
-#            self.assertTrue(mysite.page_exists(page))
-#            self.assertEqual(page.namespace(), 0)
-#        for page in mysite.allpages(filterlanglinks=False, total=5):
-#            self.assertIsInstance(page, pywikibot.Page)
-#            self.assertTrue(mysite.page_exists(page))
-#            self.assertEqual(page.namespace(), 0)
+
+    @allowed_failure  # T78276
+    def test_allpages_langlinks_enabled(self):
+        mysite = self.get_site()
+        for page in mysite.allpages(filterlanglinks=True, total=5):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertTrue(mysite.page_exists(page))
+            self.assertEqual(page.namespace(), 0)
+            self.assertNotEqual(page.langlinks(), [])
+
+    def test_allpages_langlinks_disabled(self):
+        mysite = self.get_site()
+        for page in mysite.allpages(filterlanglinks=False, total=5):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertTrue(mysite.page_exists(page))
+            self.assertEqual(page.namespace(), 0)
+            self.assertEqual(page.langlinks(), [])
+
+    def test_allpages_pagesize(self):
+        mysite = self.get_site()
         for page in mysite.allpages(minsize=100, total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
@@ -427,6 +439,9 @@ class TestSiteObject(DefaultSiteTestCase):
                       % page)
                 continue
             self.assertLessEqual(len(page.text), 200)
+
+    def test_allpages_protection(self):
+        mysite = self.get_site()
         for page in mysite.allpages(protect_type="edit", total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
