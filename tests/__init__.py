@@ -218,6 +218,13 @@ class TestRequest(CachedRequest):
             cache_misses += 1
             return False
 
+        # tokens need careful management in the cache
+        # and cant be aggressively cached.
+        # FIXME: remove once 'badtoken' is reliably handled in api.py
+        if 'intoken' in self._uniquedescriptionstr():
+            self._data = None
+            return False
+
         if 'lgpassword' in self._uniquedescriptionstr():
             self._data = None
             return False
@@ -229,6 +236,9 @@ class TestRequest(CachedRequest):
 
     def _write_cache(self, data):
         """Write data except login details."""
+        if 'intoken' in self._uniquedescriptionstr():
+            return
+
         if 'lgpassword' in self._uniquedescriptionstr():
             return
 
