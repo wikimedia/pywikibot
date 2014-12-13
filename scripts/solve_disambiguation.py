@@ -1084,7 +1084,6 @@ def main(*args):
     getAlternatives = True
     dnSkip = False
     generator = None
-    pageTitle = None
     primary = False
     main_only = False
 
@@ -1092,6 +1091,8 @@ def main(*args):
     minimum = 0
 
     local_args = pywikibot.handle_args(args)
+    generator_factory = pagegenerators.GeneratorFactory(
+        positional_arg_name='page')
 
     for arg in local_args:
         if arg.startswith('-primary:'):
@@ -1102,13 +1103,6 @@ def main(*args):
             primary = True
         elif arg.startswith('-always:'):
             always = arg[8:]
-        elif arg.startswith('-file'):
-            if len(arg) == 5:
-                generator = pagegenerators.TextfilePageGenerator(
-                    filename=None)
-            else:
-                generator = pagegenerators.TextfilePageGenerator(
-                    filename=arg[6:])
         elif arg.startswith('-pos:'):
             if arg[5] != ':':
                 mysite = pywikibot.Site()
@@ -1139,14 +1133,12 @@ def main(*args):
             except pywikibot.NoPage:
                 pywikibot.output("Disambiguation category for your wiki is not known.")
                 raise
-        elif not pageTitle:
-            pageTitle = arg
+        else:
+            generator_factory.handleArg(arg)
 
     site = pywikibot.Site()
 
-    if pageTitle:
-        page = pywikibot.Page(pywikibot.Link(pageTitle, site))
-        generator = iter([page])
+    generator = generator_factory.getCombinedGenerator(generator)
 
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)

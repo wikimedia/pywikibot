@@ -339,12 +339,15 @@ class GeneratorFactory(object):
     # When not in intersect mode, _filter_unique could be:
     #   functools.partial(filter_unique, container=global_seen_list)
 
-    def __init__(self, site=None):
+    def __init__(self, site=None, positional_arg_name=None):
         """
         Constructor.
 
         @param site: Site for generator results.
         @type site: L{pywikibot.site.BaseSite}
+        @param positional_arg_name: generator to use for positional args,
+            which do not begin with a hyphen
+        @type positional_arg_name: basestring
         """
         self.gens = []
         self._namespaces = []
@@ -358,6 +361,7 @@ class GeneratorFactory(object):
         self.intersect = False
         self.subpage_max_depth = None
         self._site = site
+        self._positional_arg_name = positional_arg_name
 
     @property
     def site(self):
@@ -569,6 +573,10 @@ class GeneratorFactory(object):
         can try parsing the argument. Call getCombinedGenerator() after all
         arguments have been parsed to get the final output generator.
 
+        @param arg: Pywikibot argument consisting of -name:value
+        @type arg: basestring
+        @return: True if the argument supplied was recognised by the factory
+        @rtype: bool
         """
         def intNone(v):
             """Return None if v is None or '' else return int(v)."""
@@ -579,6 +587,8 @@ class GeneratorFactory(object):
             value = None
 
         gen = None
+        if not arg.startswith('-') and self._positional_arg_name:
+            arg = u'-{0}:{1}'.format(self._positional_arg_name, arg)
 
         if arg == '-filelinks':
             if not value:

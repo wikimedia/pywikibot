@@ -40,7 +40,7 @@ import sys
 
 import pywikibot
 
-from pywikibot import config, i18n, textlib
+from pywikibot import config, i18n, pagegenerators, textlib
 
 from scripts import upload
 
@@ -282,7 +282,6 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    pageTitle = None
     gen = None
 
     interwiki = False
@@ -291,6 +290,8 @@ def main(*args):
     targetFamily = None
 
     local_args = pywikibot.handle_args(args)
+    generator_factory = pagegenerators.GeneratorFactory(
+        positional_arg_name='page')
 
     for arg in local_args:
         if arg == '-interwiki':
@@ -301,13 +302,11 @@ def main(*args):
             targetLang = arg[8:]
         elif arg.startswith('-tofamily:'):
             targetFamily = arg[10:]
-        elif not pageTitle:
-            pageTitle = arg
+        else:
+            generator_factory.handleArg(arg)
 
-    if pageTitle:
-        page = pywikibot.Page(pywikibot.Site(), pageTitle)
-        gen = iter([page])
-    else:
+    gen = generator_factory.getCombinedGenerator()
+    if not gen:
         pywikibot.bot.suggest_help(missing_parameters=['page'])
         return False
 
