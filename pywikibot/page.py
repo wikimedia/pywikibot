@@ -162,6 +162,17 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """
         return self._link.namespace
 
+    @property
+    def content_model(self):
+        """Return the content model for this page.
+
+        If it cannot be reliably determined via the API,
+        None is returned.
+        """
+        if not hasattr(self, '_contentmodel'):
+            self.site.loadpageinfo(self)
+        return self._contentmodel
+
     @deprecated_args(decode=None, savetitle="asUrl")
     def title(self, underscore=False, withNamespace=True,
               withSection=True, asUrl=False, asLink=False,

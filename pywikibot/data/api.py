@@ -1795,6 +1795,7 @@ def update_page(page, pagedict, props=[]):
     else:
         raise AssertionError(
             "Page %s has neither 'pageid' nor 'missing' attribute" % pagedict['title'])
+    page._contentmodel = pagedict.get('contentmodel')  # can be None
     if 'info' in props:
         page._isredir = 'redirect' in pagedict
     if 'touched' in pagedict:
