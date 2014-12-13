@@ -199,6 +199,12 @@ parameterHelp = u"""\
 -wikidataquery    Takes a WikidataQuery query string like claim[31:12280]
                   and works on the resulting pages.
 
+-searchitem       Takes a search string and works on Wikibase pages that
+                  contain it.
+                  Argument can be given as "-searchitem:text", where text
+                  is the string to look for, or "-searchitem:lang:text", where
+                  lang is the langauge to search items in.
+
 -random           Work on random pages returned by [[Special:Random]].
                   Can also be given as "-random:n" where n is the number
                   of pages to be returned, otherwise the default is 10 pages.
@@ -668,6 +674,15 @@ class GeneratorFactory(object):
             imagelinksPage = pywikibot.Page(pywikibot.Link(imagelinkstitle,
                                                            self.site))
             gen = ImagesPageGenerator(imagelinksPage)
+        elif arg.startswith('-searchitem'):
+            text = arg[len('-searchitem:'):]
+            if not text:
+                text = pywikibot.input(u'Text to look for:')
+            params = text.split(':')
+            text = params[-1]
+            lang = params[0] if len(params) == 2 else None
+            gen = WikibaseSearchItemPageGenerator(text, language=lang,
+                                                  site=self.site)
         elif arg.startswith('-search'):
             mediawikiQuery = arg[8:]
             if not mediawikiQuery:
@@ -2256,6 +2271,33 @@ def WikidataQueryPageGenerator(query, site=None):
         except pywikibot.NoPage:
             continue
         yield pywikibot.Page(pywikibot.Link(link, site))
+
+
+def WikibaseSearchItemPageGenerator(text, language=None, total=None, site=None):
+    """
+    Generate pages that contain the provided text.
+
+    @param text: Text to look for.
+    @type text: str
+    @param language: Code of the language to search in. If not specified,
+        value from pywikibot.config.data_lang is used.
+    @type language: str
+    @param total: Maximum number of pages to retrieve in total, or None in
+        case of no limit.
+    @type total: int or None
+    @param site: Site for generator results.
+    @type site: L{pywikibot.site.BaseSite}
+    """
+    if site is None:
+        site = pywikibot.Site()
+    if language is None:
+        language = site.lang
+    repo = site.data_repository()
+
+    data = repo.search_entities(text, language, limit=total, site=site)
+    pywikibot.output(u'retrieved %d items' % len(list(data)))
+    for item in data:
+        yield pywikibot.ItemPage(repo, item['id'])
 
 
 if __name__ == "__main__":

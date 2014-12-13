@@ -2103,6 +2103,46 @@ class TestDataSiteClientPreloading(DefaultWikidataClientTestCase):
         self.assertEqual(item.id, 'Q5296')
 
 
+class TestDataSiteSearchEntities(WikidataTestCase):
+
+    """Test DataSite.search_entities."""
+
+    def test_general(self):
+        """Test basic search_entities functionality."""
+        datasite = self.get_repo()
+        pages = datasite.search_entities('abc', 'en', limit=50,
+                                         site=self.get_site())
+        self.assertGreater(len(list(pages)), 0)
+        self.assertLessEqual(len(list(pages)), 50)
+        pages = datasite.search_entities('alphabet', 'en', type='property',
+                                         limit=50, site=self.get_site())
+        self.assertGreater(len(list(pages)), 0)
+        self.assertLessEqual(len(list(pages)), 50)
+
+    def test_continue(self):
+        """Test that continue parameter in search_entities works."""
+        datasite = self.get_repo()
+        kwargs = {'limit': 50, 'site': self.get_site()}
+        pages = datasite.search_entities('Rembrandt', 'en', **kwargs)
+        kwargs['continue'] = 1
+        pages_continue = datasite.search_entities('Rembrandt', 'en', **kwargs)
+        self.assertNotEqual(list(pages), list(pages_continue))
+
+    def test_language_lists(self):
+        """Test that languages returned by paraminfo and MW are the same."""
+        site = self.get_site()
+        lang_codes = site._paraminfo.parameter('wbsearchentities',
+                                               'language')['type']
+        lang_codes2 = [lang['code'] for lang in site._siteinfo.get('languages')]
+        self.assertEqual(lang_codes, lang_codes2)
+
+    def test_invalid_language(self):
+        """Test behavior of search_entities with invalid language provided."""
+        datasite = self.get_repo()
+        self.assertRaises(ValueError, datasite.search_entities, 'abc',
+                          'invalidlanguage')
+
+
 class TestSametitleSite(TestCase):
 
     """Test APISite.sametitle on sites with known behaviour."""
