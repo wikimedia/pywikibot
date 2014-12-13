@@ -1,5 +1,11 @@
 # -*- coding: utf-8  -*-
-"""Test pwb.py."""
+"""
+Test pwb.py.
+
+If pwb.py does not load python files as expected, more tests from coverage
+should be added locally.
+https://bitbucket.org/ned/coveragepy/src/default/tests/test_execfile.py
+"""
 #
 # (C) Pywikibot team, 2007-2014
 #
@@ -9,24 +15,17 @@ __version__ = '$Id$'
 
 import os
 import sys
-import subprocess
-import pywikibot
 
-from tests.aspects import unittest, TestCase
+from tests import _tests_dir
+from tests.utils import execute, execute_pwb
+from tests.aspects import unittest, PwbTestCase
 
-pypath = sys.executable
-basepath = os.path.split(os.path.split(__file__)[0])[0]
-pwbpath = os.path.join(basepath, 'pwb.py')
-testbasepath = os.path.join(basepath, 'tests', 'pwb')
-
-
-def check_output(command):
-    """Execute and return the output of a command."""
-    return subprocess.Popen(command, stdout=subprocess.PIPE).communicate()[0]
+testbasepath = os.path.join(_tests_dir, 'pwb')
+print_locals_test_package = 'tests.pwb.print_locals'
+print_locals_test_script = os.path.join(testbasepath, 'print_locals.py')
 
 
-@unittest.skipIf(sys.version_info[0] > 2, "The mapping is different in Python 3")
-class TestPwb(TestCase):
+class TestPwb(PwbTestCase):
 
     """
     Test pwb.py functionality.
@@ -35,18 +34,11 @@ class TestPwb(TestCase):
     without a user-config.py
     """
 
-    pwb = True
-    net = True
-    site = True
-
-    def setUp(self):
-        self.oldenviron = os.environ.copy()
-        os.environ['PYWIKIBOT2_DIR'] = pywikibot.config.base_dir
-
-    def tearDown(self):
-        del os.environ['PYWIKIBOT2_DIR']
-        if 'PYWIKIBOT2_DIR' in self.oldenviron:
-            os.environ['PYWIKIBOT2_DIR'] = self.oldenviron['PYWIKIBOT2_DIR']
+    # site must be explicitly set for pwb tests. This test does not require
+    # network access, because tests/pwb/print_locals.py does not use
+    # handle_args, etc. so version.py doesnt talk on the network.
+    site = False
+    net = False
 
     def testScriptEnvironment(self):
         """
@@ -55,11 +47,10 @@ class TestPwb(TestCase):
         Make sure the environment is not contaminated, and is the same as
         the environment we get when directly running a script.
         """
-        test = os.path.join(testbasepath, 'print_locals.py')
-
-        direct = check_output([pypath, test])
-        vpwb = check_output([pypath, pwbpath, test])
-        self.assertEqual(direct, vpwb)
+        direct = execute([sys.executable, '-m', 'tests.pwb.print_locals'])
+        vpwb = execute_pwb([print_locals_test_script])
+        self.maxDiff = None
+        self.assertEqual(direct['stdout'], vpwb['stdout'])
 
 if __name__ == "__main__":
     unittest.main(verbosity=10)

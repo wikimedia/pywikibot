@@ -10,18 +10,14 @@ __version__ = '$Id$'
 
 import os
 import sys
-import time
-import subprocess
 
-import pywikibot
 from pywikibot import config
 
+from tests import _root_dir
 from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
-from tests.utils import allowed_failure
+from tests.utils import allowed_failure, execute_pwb
 
-base_path = os.path.split(os.path.split(__file__)[0])[0]
-pwb_path = os.path.join(base_path, 'pwb.py')
-scripts_path = os.path.join(base_path, 'scripts')
+scripts_path = os.path.join(_root_dir, 'scripts')
 
 script_deps = {
     'script_wui': ['crontab', 'lua'],
@@ -204,63 +200,6 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
     return collector(loader)
 
 
-def execute(command, data_in=None, timeout=0, error=None):
-    """Execute a command and capture outputs."""
-    def decode(stream):
-        if sys.version_info[0] > 2:
-            return stream.decode(config.console_encoding)
-        else:
-            return stream
-    env = os.environ.copy()
-    # sys.path may have been modified by the test runner to load dependencies.
-    env['PYTHONPATH'] = ":".join(sys.path)
-    # Set EDITOR to an executable that ignores all arguments and does nothing.
-    if sys.platform == 'win32':
-        env['EDITOR'] = 'call'
-    else:
-        env['EDITOR'] = 'true'
-    options = {
-        'stdout': subprocess.PIPE,
-        'stderr': subprocess.PIPE
-    }
-    if data_in is not None:
-        options['stdin'] = subprocess.PIPE
-
-    p = subprocess.Popen(command, env=env, **options)
-
-    if data_in is not None:
-        if sys.version_info[0] > 2:
-            data_in = data_in.encode(config.console_encoding)
-        p.stdin.write(data_in)
-        p.stdin.flush()  # _communicate() otherwise has a broken pipe
-
-    stderr_lines = b''
-    waited = 0
-    while (error or (waited < timeout)) and p.poll() is None:
-        # In order to kill 'shell' and others early, read only a single
-        # line per second, and kill the process as soon as the expected
-        # output has been seen.
-        # Additional lines will be collected later with p.communicate()
-        if error:
-            line = p.stderr.readline()
-            stderr_lines += line
-            if error in decode(line):
-                break
-        time.sleep(1)
-        waited += 1
-
-    if (timeout or error) and p.poll() is None:
-        p.kill()
-
-    if p.poll() is not None:
-        stderr_lines += p.stderr.read()
-
-    data_out = p.communicate()
-    return {'exit_code': p.returncode,
-            'stdout': decode(data_out[0]),
-            'stderr': decode(stderr_lines + data_out[1])}
-
-
 class TestScriptMeta(MetaTestCaseClass):
 
     """Test meta class."""
@@ -269,7 +208,7 @@ class TestScriptMeta(MetaTestCaseClass):
         """Create the new class."""
         def test_execution(script_name, args=[], expected_results=None):
             def testScript(self):
-                cmd = [sys.executable, pwb_path, script_name]
+                cmd = [script_name]
 
                 if args:
                     cmd += args
@@ -285,7 +224,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 else:
                     error = None
 
-                result = execute(cmd, data_in, timeout=timeout, error=error)
+                result = execute_pwb(cmd, data_in, timeout=timeout, error=error)
 
                 stderr = result['stderr'].split('\n')
                 stderr_sleep = [l for l in stderr
@@ -367,11 +306,9 @@ class TestScriptMeta(MetaTestCaseClass):
             dct[test_name].__name__ = test_name
 
             # Ideally all scripts should execute -help without
-            # connecting to a site.  However pywikibot always
-            # logs site.version() from live wiki.
-            # TODO: make logging version() optional, then set
-            #         dct[test_name].site = True
-            #       for only the tests which dont respond to -help
+            # connecting to a site.
+            # TODO: after bug 68611 and 68664 (and makecat), split -help
+            # execution to a separate test class which uses site=False.
 
             if script_name in deadlock_script_list:
                 dct[test_name].__test__ = False
@@ -420,26 +357,15 @@ class TestScript(DefaultSiteTestCase, PwbTestCase):
 
     """Test cases for scripts.
 
-    This class sets the nose 'site' attribute on each test
-    depending on whether it is in the auto_run_script_list.
+    This class sets the nose 'user' attribute on every test, thereby ensuring
+    that the test runner has a username for the default site, and so that
+    Site.login() is called in the test runner, which means that the scripts
+    run in pwb can automatically login using the saved cookies.
     """
 
     __metaclass__ = TestScriptMeta
 
-    def setUp(self):
-        """Prepare the environment for running the pwb.py script."""
-        super(TestScript, self).setUp()
-        self.old_pywikibot_dir = None
-        if 'PYWIKIBOT2_DIR' in os.environ:
-            self.old_pywikibot_dir = os.environ['PYWIKIBOT2_DIR']
-        os.environ['PYWIKIBOT2_DIR'] = pywikibot.config.base_dir
-
-    def tearDown(self):
-        """Restore the environment after running the pwb.py script."""
-        super(TestScript, self).tearDown()
-        del os.environ['PYWIKIBOT2_DIR']
-        if self.old_pywikibot_dir:
-            os.environ['PYWIKIBOT2_DIR'] = self.old_pywikibot_dir
+    user = True
 
 
 if sys.version_info[0] > 2:

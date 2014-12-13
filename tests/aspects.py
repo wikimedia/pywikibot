@@ -542,13 +542,6 @@ class MetaTestCaseClass(type):
                     #       % (base.__name__, key, name))
                     dct[key] = getattr(base, key)
 
-        if 'pwb' in dct and dct['pwb']:
-            dct['spawn'] = True
-            if 'site' not in dct:
-                raise Exception(
-                    '%s: Test classes using pwb must set "site"'
-                    % name)
-
         if 'net' in dct and dct['net'] is False:
             dct['site'] = False
 
@@ -577,6 +570,17 @@ class MetaTestCaseClass(type):
                 ('site' in dct and not dct['site'])):
             # Prevent use of pywikibot.Site
             bases = tuple([DisableSiteMixin] + list(bases))
+
+            # 'pwb' tests will _usually_ require a site.  To ensure the
+            # test class dependencies are declarative, this requires the
+            # test writer explicitly sets 'site=False' so code reviewers
+            # check that the script invoked by pwb will not load a site.
+            if 'pwb' in dct and dct['pwb']:
+                if 'site' not in dct:
+                    raise Exception(
+                        '%s: Test classes using pwb must set "site"; add '
+                        'site=False if the test script will not use a site'
+                        % name)
 
             # If the 'site' attribute is a false value,
             # remove it so it matches !site in nose.
@@ -939,15 +943,38 @@ class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
 
 class PwbTestCase(TestCase):
 
-    """Test cases use pwb.py to invoke scripts."""
+    """
+    Test cases use pwb.py to invoke scripts.
+
+    Test cases which use pwb typically also access a site, and use the network.
+    Even during initialisation, scripts may call pywikibot.handle_args, which
+    initialises loggers and uses the network to determine if the code is stale.
+
+    The flag 'pwb' is used by the TestCase metaclass to check that a test site
+    is set declared in the class properties, or that 'site = False' is added
+    to the class properties in the unlikely scenario that the test case
+    uses pwb in a way that doesnt use a site.
+
+    If a test class is marked as 'site = False', the metaclass will also check
+    that the 'net' flag is explicitly set.
+    """
 
     pwb = True
-    spawn = True
-    # pywikibot.handleArgs currently instantiates a Site object
-    # and tries to fetch the users messages.
-    site = True
-    net = True
-    user = True
+
+    def setUp(self):
+        """Prepare the environment for running the pwb.py script."""
+        super(PwbTestCase, self).setUp()
+        self.orig_pywikibot_dir = None
+        if 'PYWIKIBOT2_DIR' in os.environ:
+            self.orig_pywikibot_dir = os.environ['PYWIKIBOT2_DIR']
+        os.environ['PYWIKIBOT2_DIR'] = pywikibot.config.base_dir
+
+    def tearDown(self):
+        """Restore the environment after running the pwb.py script."""
+        super(PwbTestCase, self).tearDown()
+        del os.environ['PYWIKIBOT2_DIR']
+        if self.orig_pywikibot_dir:
+            os.environ['PYWIKIBOT2_DIR'] = self.orig_pywikibot_dir
 
 
 class DebugOnlyTestCase(TestCase):
