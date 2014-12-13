@@ -112,13 +112,13 @@ def main(*args):
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    gen = pagegenerators.GeneratorFactory()
+    generator_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if gen.handleArg(arg):
+        if generator_factory.handleArg(arg):
             continue
 
-    generator = gen.getCombinedGenerator()
+    generator = generator_factory.getCombinedGenerator()
 
     if generator:
         coordbot = CoordImportRobot(generator)

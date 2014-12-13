@@ -22,7 +22,8 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import pagegenerators as pg, WikidataBot
+
+from pywikibot import pagegenerators, WikidataBot
 
 docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
 
@@ -41,7 +42,7 @@ class IllustrateRobot(WikidataBot):
 
         """
         super(IllustrateRobot, self).__init__()
-        self.generator = pg.PreloadingGenerator(generator)
+        self.generator = pagegenerators.PreloadingGenerator(generator)
         self.wdproperty = wdproperty
         self.cacheSources()
 
@@ -97,7 +98,7 @@ def main(*args):
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    gen = pg.GeneratorFactory()
+    generator_factory = pagegenerators.GeneratorFactory()
 
     wdproperty = u'P18'
 
@@ -108,10 +109,10 @@ def main(*args):
                     u'Please enter the property you want to add:')
             else:
                 wdproperty = arg[10:]
-        elif gen.handleArg(arg):
-            continue
+        else:
+            generator_factory.handleArg(arg)
 
-    generator = gen.getCombinedGenerator()
+    generator = generator_factory.getCombinedGenerator()
     if not generator:
         pywikibot.output('I need a generator with pages to work on')
         return
