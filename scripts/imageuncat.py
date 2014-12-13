@@ -1343,8 +1343,8 @@ def main(*args):
             generator = recentChanges(site=site, delay=120)
         else:
             genFactory.handleArg(arg)
-    if not generator:
-        generator = genFactory.getCombinedGenerator()
+
+    generator = genFactory.getCombinedGenerator(gen=generator)
     if not generator:
         pywikibot.output(
             u'You have to specify the generator you want to use for the program!')
