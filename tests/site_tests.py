@@ -1228,9 +1228,6 @@ class SiteRandomTestCase(DefaultSiteTestCase):
             self.assertIsInstance(rndpage, pywikibot.Page)
             self.assertIn(rndpage.namespace(), [6, 7])
 
-    # TODO: test newimages, longpages, shortpages, ancientpages, unwatchedpages
-    #       and the other following methods in site.py
-
 
 class TestSiteTokens(DefaultSiteTestCase):
 
