@@ -13,8 +13,6 @@ These command line parameters can be used to specify which pages to work on:
 
 Furthermore, the following command line parameters are supported:
 
--page             Use a page as generator
-
 -talkpage         Put the text onto the talk page instead the generated on
 -talk
 
@@ -291,7 +289,6 @@ def main(*args):
     addText = None
     regexSkip = None
     regexSkipUrl = None
-    generator = None
     always = False
     textfile = None
     talkPage = False
@@ -323,13 +320,6 @@ def main(*args):
                 summary = pywikibot.input(u'What summary do you want to use?')
             else:
                 summary = arg[9:]
-        elif arg.startswith('-page'):
-            if len(arg) == 5:
-                generator = [pywikibot.Page(
-                    pywikibot.Site(),
-                    pywikibot.input(u'What page do you want to use?'))]
-            else:
-                generator = [pywikibot.Page(pywikibot.Site(), arg[6:])]
         elif arg.startswith('-excepturl'):
             if len(arg) == 10:
                 regexSkipUrl = pywikibot.input(u'What text should I skip?')
@@ -353,8 +343,7 @@ def main(*args):
     if textfile and not addText:
         with codecs.open(textfile, 'r', config.textfile_encoding) as f:
             addText = f.read()
-    if not generator:
-        generator = genFactory.getCombinedGenerator()
+    generator = genFactory.getCombinedGenerator()
     if not generator:
         pywikibot.showHelp()
         return
