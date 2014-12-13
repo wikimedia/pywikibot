@@ -11,12 +11,6 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
--namespace:n      Number or name of namespace to process. The parameter can be
-                  used multiple times. It works in combination with all other
-                  parameters, except for the -start parameter. If you e.g.
-                  want to iterate over all categories starting at M, use
-                  -start:Category:M.
-
 Furthermore, the following command line parameters are supported:
 
 -to13             Converts all ISBN-10 codes to ISBN-13.

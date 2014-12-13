@@ -1401,8 +1401,14 @@ class QueryGenerator(object):
     def set_namespace(self, namespaces):
         """Set a namespace filter on this query.
 
-        @param namespaces: Either an int or a list of ints
-
+        @param namespaces: namespace identifiers to limit query results
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool, or more than one namespace
+            if the API module does not support multiple namespaces
         """
         assert(self.limited_module)  # some modules do not have a prefix
         param = self.site._paraminfo.parameter(self.limited_module, 'namespace')
@@ -1414,15 +1420,13 @@ class QueryGenerator(object):
         if isinstance(namespaces, basestring):
             namespaces = namespaces.split('|')
 
-        try:
-            iter(namespaces)
-        except TypeError:
-            namespaces = [namespaces]
-
-        namespaces = [str(namespace) for namespace in namespaces]
+        # Use Namespace id (int) here; Request will cast int to str
+        namespaces = [ns.id for ns in
+                      pywikibot.site.Namespace.resolve(namespaces,
+                                                       self.site.namespaces)]
         if 'multi' not in param and len(namespaces) != 1:
-            raise pywikibot.Error(u'{0} module does not support multiple '
-                                  'namespaces.'.format(self.limited_module))
+            raise TypeError(u'{0} module does not support multiple namespaces'
+                            .format(self.limited_module))
 
         self.request[self.prefix + "namespace"] = namespaces
 

@@ -29,6 +29,7 @@ import sys
 import time
 
 import pywikibot
+
 from pywikibot import date, config, i18n
 from pywikibot.tools import (
     deprecated,
@@ -38,6 +39,7 @@ from pywikibot.tools import (
 )
 from pywikibot.comms import http
 import pywikibot.data.wikidataquery as wdquery
+from pywikibot.site import Namespace
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -106,7 +108,10 @@ parameterHelp = u"""\
 
 -namespaces       Filter the page generator to only yield pages in the
 -namespace        specified namespaces. Separate multiple namespace
--ns               numbers with commas. Example "-ns:0,2,4"
+-ns               numbers or names with commas.
+                  Examples:
+                  -ns:0,2,4
+                  -ns:Help,MediaWiki
                   If used with -newpages, -namepace/ns must be provided
                   before -newpages.
                   If used with -recentchanges, efficiency is improved if
@@ -258,7 +263,7 @@ class GeneratorFactory(object):
         @type site: L{pywikibot.site.BaseSite}
         """
         self.gens = []
-        self.namespaces = []
+        self._namespaces = []
         self.step = None
         self.limit = None
         self.articlefilter_list = []
@@ -270,12 +275,41 @@ class GeneratorFactory(object):
         """
         Generator site.
 
-        @return: Site given to constructor, otherwise the default Site.
+        The generator site should not be accessed until after the global
+        arguments have been handled, otherwise the default Site may be changed
+        by global arguments, which will cause this cached value to be stale.
+
+        @return: Site given to constructor, otherwise the default Site at the
+            time this property is first accessed.
         @rtype: L{pywikibot.site.BaseSite}
         """
         if not self._site:
             self._site = pywikibot.Site()
         return self._site
+
+    @property
+    def namespaces(self):
+        """
+        List of Namespace parameters.
+
+        Converts int or string namespaces to Namespace objects and
+        change the storage to immutable once it has been accessed.
+
+        The resolving and validation of namespace command line arguments
+        is performed in this method, as it depends on the site property
+        which is lazy loaded to avoid being cached before the global
+        arguments are handled.
+
+        @return: namespaces selected using arguments
+        @rtype: list of Namespace
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
+        """
+        if isinstance(self._namespaces, list):
+            self._namespaces = frozenset(
+                Namespace.resolve(self._namespaces, self.site.namespaces))
+        return self._namespaces
 
     def getCombinedGenerator(self, gen=None):
         """Return the combination of all accumulated generators.
@@ -296,7 +330,8 @@ class GeneratorFactory(object):
             else:
                 if self.namespaces:
                     self.gens[i] = NamespaceFilterPageGenerator(self.gens[i],
-                                                                self.namespaces)
+                                                                self.namespaces,
+                                                                self.site)
                 if self.limit:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
@@ -463,6 +498,11 @@ class GeneratorFactory(object):
                     u'Please enter the local file name:')
             gen = TextfilePageGenerator(textfilename, site=self.site)
         elif arg.startswith('-namespace') or arg.startswith('-ns'):
+            if isinstance(self._namespaces, frozenset):
+                pywikibot.warning('Cannot handle arg %s as namespaces can not '
+                                  'be altered after a generator is created.'
+                                  % arg)
+                return True
             value = None
             if arg.startswith('-ns:'):
                 value = arg[len('-ns:'):]
@@ -473,13 +513,7 @@ class GeneratorFactory(object):
             if not value:
                 value = pywikibot.input(
                     u'What namespace are you filtering on?')
-            try:
-                self.namespaces.extend(
-                    [int(ns) for ns in value.split(",")]
-                )
-            except ValueError:
-                pywikibot.output(u'Invalid namespaces argument: %s' % value)
-                return False
+            self._namespaces += value.split(",")
             return True
         elif arg.startswith('-step'):
             if len(arg) == len('-step'):
@@ -1046,35 +1080,36 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
     """
     A generator yielding pages from another generator in given namespaces.
 
-    The namespace list can contain both integers (namespace numbers) and
-    strings/unicode strings (namespace names).
+    If a site is provided, the namespaces are validated using the namespaces
+    of that site, otherwise the namespaces are validated using the default
+    site.
 
     NOTE: API-based generators that have a "namespaces" parameter perform
     namespace filtering more efficiently than this generator.
 
-    @param namespaces: list of namespace numbers to limit results
-    @type namespaces: list of int
-    @param site: Site for generator results, only needed if
-        namespaces contains namespace names.
+    @param namespaces: list of namespace identifiers to limit results
+    @type namespaces: iterable of basestring or Namespace key,
+        or a single instance of those types.
+    @param site: Site for generator results; mandatory if
+        namespaces contains namespace names.  Defaults to the default site.
     @type site: L{pywikibot.site.BaseSite}
+    @raises KeyError: a namespace identifier was not resolved
+    @raises TypeError: a namespace identifier has an inappropriate
+        type such as NoneType or bool, or more than one namespace
+        if the API module does not support multiple namespaces
     """
-    if isinstance(namespaces, (int, basestring)):
-        namespaces = [namespaces]
-    # convert namespace names to namespace numbers
-    for i in range(len(namespaces)):
-        ns = namespaces[i]
-        if isinstance(ns, basestring):
-            try:
-                # namespace might be given as str representation of int
-                index = int(ns)
-            except ValueError:
-                # FIXME: deprecate providing strings as namespaces
-                if site is None:
-                    site = pywikibot.Site()
-                index = site.getNamespaceIndex(ns)
-                if index is None:
-                    raise ValueError(u'Unknown namespace: %s' % ns)
-            namespaces[i] = index
+    # As site was only required if the namespaces contain strings, dont
+    # attempt to use the config selected site unless the initial attempt
+    # at resolving the namespaces fails.
+    try:
+        namespaces = Namespace.resolve(namespaces,
+                                       site.namespaces if site else
+                                       pywikibot.Site().namespaces)
+    except KeyError as e:
+        pywikibot.log('Failed resolving namespaces:')
+        pywikibot.exception(e)
+        raise
+
     for page in generator:
         if page.namespace() in namespaces:
             yield page

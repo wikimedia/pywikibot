@@ -2601,7 +2601,8 @@ def main(*args):
         hintlessPageGen = genFactory.getCombinedGenerator()
     if hintlessPageGen:
         if len(namespaces) > 0:
-            hintlessPageGen = pagegenerators.NamespaceFilterPageGenerator(hintlessPageGen, namespaces)
+            hintlessPageGen = pagegenerators.NamespaceFilterPageGenerator(
+                hintlessPageGen, namespaces, site)
         # we'll use iter() to create make a next() function available.
         bot.setPageGenerator(iter(hintlessPageGen), number=number, until=until)
     elif warnfile:

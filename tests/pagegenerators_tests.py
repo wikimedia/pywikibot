@@ -79,17 +79,23 @@ class TestDryPageGenerators(TestCase):
 
     def test_NamespaceFilterPageGenerator(self):
         self.assertFunction("NamespaceFilterPageGenerator")
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
-        gen = pagegenerators.NamespaceFilterPageGenerator(gen, 0)
+        site = self.site
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
+        gen = pagegenerators.NamespaceFilterPageGenerator(gen, 0, site)
         self.assertEqual(len(tuple(gen)), 3)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
-        gen = pagegenerators.NamespaceFilterPageGenerator(gen, 1)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
+        gen = pagegenerators.NamespaceFilterPageGenerator(gen, 1, site)
         self.assertEqual(len(tuple(gen)), 4)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
-        gen = pagegenerators.NamespaceFilterPageGenerator(gen, 10)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
+        gen = pagegenerators.NamespaceFilterPageGenerator(gen, 10, site)
         self.assertEqual(len(tuple(gen)), 6)
-        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
-        gen = pagegenerators.NamespaceFilterPageGenerator(gen, (1, 10))
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
+        gen = pagegenerators.NamespaceFilterPageGenerator(gen, (1, 10), site)
+        self.assertEqual(len(tuple(gen)), 10)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
+        gen = pagegenerators.NamespaceFilterPageGenerator(gen,
+                                                          ('Talk', 'Template'),
+                                                          site)
         self.assertEqual(len(tuple(gen)), 10)
 
     def test_RegexFilterPageGenerator(self):
@@ -343,6 +349,45 @@ class TestPreloadingItemGenerator(WikidataTestCase):
         ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page, total=5)
         gen = pagegenerators.PreloadingItemGenerator(ref_gen)
         self.assertTrue(all(isinstance(item, pywikibot.ItemPage) for item in gen))
+
+
+class DryFactoryGeneratorTest(TestCase):
+
+    """Dry tests for pagegenerators.GeneratorFactory."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def test_one_namespace(self):
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:2')
+        self.assertEqual(gf.namespaces, set([2]))
+
+    def test_two_namespaces(self):
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:2')
+        gf.handleArg('-ns:Talk')
+        self.assertEqual(gf.namespaces, set([2, 1]))
+
+    def test_two_named_namespaces(self):
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:Talk,File')
+        self.assertEqual(gf.namespaces, set([1, 6]))
+
+    def test_two_numeric_namespaces(self):
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:1,6')
+        self.assertEqual(gf.namespaces, set([1, 6]))
+
+    def test_immutable_namespaces_on_read(self):
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:1,6')
+        self.assertEqual(gf.namespaces, set([1, 6]))
+        self.assertIsInstance(gf.namespaces, frozenset)
+        gf.handleArg('-ns:0')
+        self.assertEqual(gf.namespaces, set([1, 6]))
 
 
 class TestFactoryGenerator(DefaultSiteTestCase):

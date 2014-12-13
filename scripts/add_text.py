@@ -358,7 +358,7 @@ def main(*args):
             if index % 2 == 1 and index > 0:
                 namespaces += [index]
         generator = pagegenerators.NamespaceFilterPageGenerator(
-            generator, namespaces)
+            generator, namespaces, site)
     for page in generator:
         (text, newtext, always) = add_text(page, addText, summary, regexSkip,
                                            regexSkipUrl, always, up, True,

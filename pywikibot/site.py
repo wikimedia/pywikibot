@@ -323,8 +323,6 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
             return self.id == other.id
         elif isinstance(other, basestring):
             return other in self
-        elif other is None:
-            return self.id == 0
 
     def __ne__(self, other):
         """Compare whether two namespace objects are not equal."""
@@ -396,9 +394,10 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
     @staticmethod
     def lookup_name(name, namespaces=None):
-        """Find the namespace for a name.
+        """Find the Namespace for a name.
 
         @param name: Name of the namespace.
+        @type name: basestring
         @param namespaces: namespaces to search
                            default: builtins only
         @type namespaces: dict of Namespace
@@ -417,6 +416,61 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
                 return namespace
 
         return None
+
+    @staticmethod
+    def resolve(identifiers, namespaces=None):
+        """
+        Resolve namespace identifiers to obtain Namespace objects.
+
+        Identifiers may be any value for which int() produces a valid
+        namespace id, except bool, or any string which Namespace.lookup_name
+        successfully finds.  A numerical string is resolved as an integer.
+
+        @param identifiers: namespace identifiers
+        @type identifiers: iterable of basestring or Namespace key,
+            or a single instance of those types
+        @param namespaces: namespaces to search (default: builtins only)
+        @type namespaces: dict of Namespace
+        @return: list of Namespace objects in the same order as the
+            identifiers
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
+        """
+        if not namespaces:
+            namespaces = Namespace.builtin_namespaces()
+
+        if isinstance(identifiers, (basestring, Namespace)):
+            identifiers = [identifiers]
+        else:
+            # convert non-iterators to single item list
+            try:
+                iter(identifiers)
+            except TypeError:
+                identifiers = [identifiers]
+
+        # lookup namespace names, and assume anything else is a key.
+        # int(None) raises TypeError; however, bool needs special handling.
+        result = [NotImplemented if isinstance(ns, bool) else
+                  Namespace.lookup_name(ns, namespaces)
+                  if isinstance(ns, basestring)
+                      and not ns.lstrip('-').isdigit() else
+                  namespaces[int(ns)] if int(ns) in namespaces
+                  else None
+                  for ns in identifiers]
+
+        if NotImplemented in result:
+            raise TypeError('identifiers contains inappropriate types: %r'
+                            % identifiers)
+
+        # Namespace.lookup_name returns None if the name is not recognised
+        if None in result:
+            raise KeyError(u'Namespace identifier(s) not recognised: %s'
+                           % u','.join([str(identifier) for identifier, ns
+                                        in zip(identifiers, result)
+                                        if ns is None]))
+
+        return result
 
 
 class BaseSite(ComparableMixin):
@@ -1512,13 +1566,19 @@ class APISite(BaseSite):
         @type type_arg: str
         @param namespaces: if not None, limit the query to namespaces in this
             list
-        @type namespaces: int, or list of ints
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param step: if not None, limit each API call to this many items
         @type step: int
         @param total: if not None, limit the generator to yielding this many
             items in total
         @type total: int
-
+        @return: iterable with parameters set
+        @rtype: QueryGenerator
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         if type_arg is not None:
             gen = gen_class(type_arg, site=self, **args)
@@ -2661,11 +2721,16 @@ class APISite(BaseSite):
             both (no filtering).
         @param namespaces: If present, only return links from the namespaces
             in this list.
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param step: Limit on number of pages to retrieve per API query.
         @param total: Maximum number of pages to retrieve in total.
         @param content: if True, load the current content of each iterated page
             (default False)
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         bltitle = page.title(withSection=False).encode(self.encoding())
         blargs = {"gbltitle": bltitle}
@@ -2714,9 +2779,14 @@ class APISite(BaseSite):
             None, return both (no filtering).
         @param namespaces: If present, only return links from the namespaces
             in this list.
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param content: if True, load the current content of each iterated page
             (default False)
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         eiargs = {"geititle":
                   page.title(withSection=False).encode(self.encoding())}
@@ -2731,7 +2801,18 @@ class APISite(BaseSite):
     def pagereferences(self, page, followRedirects=False, filterRedirects=None,
                        withTemplateInclusion=True, onlyTemplateInclusion=False,
                        namespaces=None, step=None, total=None, content=False):
-        """Convenience method combining pagebacklinks and page_embeddedin."""
+        """
+        Convenience method combining pagebacklinks and page_embeddedin.
+
+        @param namespaces: If present, only return links from the namespaces
+            in this list.
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
+        """
         if onlyTemplateInclusion:
             return self.page_embeddedin(page, namespaces=namespaces,
                                         filterRedirects=filterRedirects,
@@ -2756,12 +2837,16 @@ class APISite(BaseSite):
         """Iterate internal wikilinks contained (or transcluded) on page.
 
         @param namespaces: Only iterate pages in these namespaces (default: all)
-        @type namespaces: list of ints
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param follow_redirects: if True, yields the target of any redirects,
             rather than the redirect page
         @param content: if True, load the current content of each iterated page
             (default False)
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         plargs = {}
         if hasattr(page, "_pageid"):
@@ -2814,9 +2899,16 @@ class APISite(BaseSite):
                       content=False):
         """Iterate templates transcluded (not just linked) on the page.
 
+        @param namespaces: Only iterate pages in these namespaces
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param content: if True, load the current content of each iterated page
             (default False)
 
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         tltitle = page.title(withSection=False).encode(self.encoding())
         tlgen = self._generator(api.PageGenerator, type_arg="templates",
@@ -2836,7 +2928,9 @@ class APISite(BaseSite):
             subcategories, use namespaces=[6] to yield image files, etc. Note,
             however, that the iterated values are always Page objects, even
             if in the Category or Image namespace.
-        @type namespaces: list of ints
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param sortby: determines the order in which results are generated,
             valid values are "sortkey" (default, results ordered by category
             sort key) or "timestamp" (results ordered by time page was
@@ -2858,7 +2952,9 @@ class APISite(BaseSite):
         @type endsort: str
         @param content: if True, load the current content of each iterated page
             (default False)
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         if category.namespace() != 14:
             raise Error(
@@ -3115,7 +3211,7 @@ class APISite(BaseSite):
         @param start: Start at this title (page need not exist).
         @param prefix: Only yield pages starting with this string.
         @param namespace: Iterate pages from this (single) namespace
-           (default: 0)
+        @type namespace: int or Namespace.
         @param filterredir: if True, only yield redirects; if False (and not
             None), only yield non-redirects (default: yield both)
         @param filterlanglinks: if True, only yield pages with language links;
@@ -3135,11 +3231,10 @@ class APISite(BaseSite):
         @param includeredirects: DEPRECATED, use filterredir instead
         @param content: if True, load the current content of each iterated page
             (default False)
-
+        @raises KeyError: the namespace identifier was not resolved
+        @raises TypeError: the namespace identifier has an inappropriate
+            type such as bool, or an iterable with more than one namespace
         """
-        if not isinstance(namespace, (int, Namespace)):
-            raise Error("allpages: only one namespace permitted.")
-
         if includeredirects is not None:
             if includeredirects:
                 if includeredirects == "only":
@@ -3196,18 +3291,18 @@ class APISite(BaseSite):
         @param start: Start at this title (page need not exist).
         @param prefix: Only yield pages starting with this string.
         @param namespace: Iterate pages from this (single) namespace
-            (default: 0)
+        @type namespace: int or Namespace
         @param unique: If True, only iterate each link title once (default:
             iterate once for each linking page)
         @param fromids: if True, include the pageid of the page containing
             each link (default: False) as the '_fromid' attribute of the Page;
             cannot be combined with unique
-
+        @raises KeyError: the namespace identifier was not resolved
+        @raises TypeError: the namespace identifier has an inappropriate
+            type such as bool, or an iterable with more than one namespace
         """
         if unique and fromids:
             raise Error("alllinks: unique and fromids cannot both be True.")
-        if not isinstance(namespace, (int, Namespace)):
-            raise Error("alllinks: only one namespace permitted.")
         algen = self._generator(api.ListGenerator, type_arg="alllinks",
                                 alnamespace=int(namespace), alfrom=start,
                                 step=step, total=total)
@@ -3409,11 +3504,17 @@ class APISite(BaseSite):
         @param image: the image to search for (FilePage need not exist on
             the wiki)
         @type image: FilePage
+        @param namespaces: If present, only iterate pages in these namespaces
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param filterredir: if True, only yield redirects; if False (and not
             None), only yield non-redirects (default: yield both)
         @param content: if True, load the current content of each iterated page
             (default False)
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         iuargs = dict(giutitle=image.title(withSection=False))
         if filterredir is not None:
@@ -3435,10 +3536,13 @@ class APISite(BaseSite):
         @param user: only iterate entries that match this user name
         @param page: only iterate entries affecting this page
         @param namespace: namespace to retrieve logevents from
+        @type namespace: int or Namespace
         @param start: only iterate entries from and after this Timestamp
         @param end: only iterate entries up to and through this Timestamp
         @param reverse: if True, iterate oldest entries first (default: newest)
-
+        @raises KeyError: the namespace identifier was not resolved
+        @raises TypeError: the namespace identifier has an inappropriate
+            type such as bool, or an iterable with more than one namespace
         """
         if start and end:
             self.assert_valid_iter_params('logevents', start, end, reverse)
@@ -3474,6 +3578,10 @@ class APISite(BaseSite):
         @type end: pywikibot.Timestamp
         @param reverse: if True, start with oldest changes (default: newest)
         @type reverse: bool
+        @param namespaces: only iterate pages in these namespaces
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param pagelist: iterate changes to pages in this list only
         @param pagelist: list of Pages
         @param changetype: only iterate changes of this type ("edit" for
@@ -3502,7 +3610,9 @@ class APISite(BaseSite):
         @type user: basestring|list
         @param excludeuser: if not None, exclude edits by this user or users
         @type excludeuser: basestring|list
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         if start and end:
             self.assert_valid_iter_params('recentchanges', start, end, reverse)
@@ -3565,14 +3675,17 @@ class APISite(BaseSite):
         @type searchstring: unicode
         @param where: Where to search; value must be "text" or "titles" (many
             wikis do not support title search)
-        @param namespaces: search only in these namespaces (defaults to 0)
-        @type namespaces: list of ints, or an empty list to signal all
-            namespaces
+        @param namespaces: search only in these namespaces (defaults to all)
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param getredirects: if True, include redirects in results. Since
             version MediaWiki 1.23 it will always return redirects.
         @param content: if True, load the current content of each iterated page
             (default False)
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         if not searchstring:
             raise Error("search: searchstring cannot be empty")
@@ -3604,11 +3717,17 @@ class APISite(BaseSite):
         @param start: Iterate contributions starting at this Timestamp
         @param end: Iterate contributions ending at this Timestamp
         @param reverse: Iterate oldest contributions first (default: newest)
+        @param namespaces: only iterate pages in these namespaces
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param showMinor: if True, iterate only minor edits; if False and
             not None, iterate only non-minor edits (default: iterate both)
         @param top_only: if True, iterate only edits which are the latest
             revision
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         if not (user or userprefix):
             raise Error(
@@ -3647,13 +3766,19 @@ class APISite(BaseSite):
         @param start: Iterate revisions starting at this Timestamp
         @param end: Iterate revisions ending at this Timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
+        @param namespaces: only iterate pages in these namespaces
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param showMinor: if True, only list minor edits; if False (and not
             None), only list non-minor edits
         @param showBot: if True, only list bot edits; if False (and not
             None), only list non-bot edits
         @param showAnon: if True, only list anon edits; if False (and not
             None), only list non-anon edits
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         if start and end:
             self.assert_valid_iter_params('watchlist_revs', start, end, reverse)
@@ -3784,11 +3909,16 @@ class APISite(BaseSite):
 
         @param total: the maximum number of pages to iterate (default: 1)
         @param namespaces: only iterate pages in these namespaces.
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
         @param redirects: if True, include only redirect pages in results
             (default: include only non-redirects)
         @param content: if True, load the current content of each iterated page
             (default False)
-
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         rngen = self._generator(api.PageGenerator, type_arg="random",
                                 namespaces=namespaces, step=step, total=total,
@@ -4734,6 +4864,13 @@ class APISite(BaseSite):
         timestamp (unicode), length (int), an empty unicode string, username
         or IP address (str), comment (unicode).
 
+        @param namespaces: only iterate pages in these namespaces
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types.  May be a '|' separated
+            list of namespace identifiers.
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
         """
         # TODO: update docstring
 
