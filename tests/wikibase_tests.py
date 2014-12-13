@@ -538,20 +538,15 @@ class TestClaimSetValue(WikidataTestCase):
 
 class TestPageMethods(WikidataTestCase):
 
-    """Test cases to test methods of Page() behave correctly with Wikibase."""
+    """Test behavior of WikibasePage methods inherited from BasePage."""
 
     def test_page_methods(self):
-        """Test ItemPage methods inherited from superclass Page."""
+        """Test ItemPage methods inherited from superclass BasePage."""
         self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
         self.wdp.previousRevision()
         self.assertEqual(self.wdp.langlinks(), [])
         self.assertEqual(self.wdp.templates(), [])
         self.assertFalse(self.wdp.isCategoryRedirect())
-
-    def test_item_templates(self):
-        """Test templatesWithParams."""
-        self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
-        self.wdp.templatesWithParams()
 
     def test_item_bot_may_edit(self):
         """Test botMayEdit."""
