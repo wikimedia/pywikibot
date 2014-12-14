@@ -74,7 +74,7 @@ __version__ = '$Id$'
 #
 
 import re
-from pywikibot.tools import MediaWikiVersion as LV
+from pywikibot.tools import MediaWikiVersion
 import pywikibot
 import isbn
 from pywikibot import config, i18n, textlib, pagegenerators, Bot
@@ -383,7 +383,7 @@ class CosmeticChangesToolkit:
             thisNs = namespaces.pop(0)
             if nsNumber == 6 and family.name == 'wikipedia':
                 if self.site.code in ('en', 'fr') and \
-                   LV(self.site.version()) >= LV('1.14'):
+                   MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.14'):
                     # do not change "Image" on en-wiki and fr-wiki
                     assert u'Image' in namespaces
                     namespaces.remove(u'Image')

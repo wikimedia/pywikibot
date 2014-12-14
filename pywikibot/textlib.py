@@ -1118,8 +1118,8 @@ def extract_templates_and_params_regex(text):
 #            if self.site().isInterwikiLink(name):
 #                continue
 #            # {{DEFAULTSORT:...}}
-#            from pywikibot.tools import MediaWikiVersion as LV
-#            defaultKeys = LV(self.site.version()) > LV("1.13") and \
+#            from pywikibot.tools import MediaWikiVersion
+#            defaultKeys = MediaWikiVersion(self.site.version()) > MediaWikiVersion("1.13") and \
 #                          self.site().getmagicwords('defaultsort')
 #            # It seems some wikis does not have this magic key
 #            if defaultKeys:

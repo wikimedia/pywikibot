@@ -16,7 +16,7 @@ import re
 
 import pywikibot
 from pywikibot import config
-from pywikibot.tools import MediaWikiVersion as LV
+from pywikibot.tools import MediaWikiVersion
 from pywikibot.data import api
 
 from tests.aspects import (
@@ -152,7 +152,7 @@ class TestSiteObject(DefaultSiteTestCase):
         # first-letter (== only first non-namespace letter is case insensitive)
         # See also: https://www.mediawiki.org/wiki/Manual:$wgCapitalLinks
         self.assertTrue(mysite.sametitle("Special:Always", "Special:always"))
-        if LV(mysite.version()) >= LV('1.16'):
+        if MediaWikiVersion(mysite.version()) >= MediaWikiVersion('1.16'):
             self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
             self.assertTrue(mysite.sametitle('MediaWiki:Always', 'MediaWiki:always'))
 
@@ -847,7 +847,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
             prefix = title[:title.index(":")]
             self.assertIn(mysite.ns_index(prefix), [6, 7])
             self.assertIn(change["ns"], [6, 7])
-        if LV(mysite.version()) <= LV("1.14"):
+        if MediaWikiVersion(mysite.version()) <= MediaWikiVersion("1.14"):
             pagelist = [mainpage]
             if imagepage:
                 pagelist += [imagepage]
@@ -1238,7 +1238,7 @@ class TestSiteTokens(DefaultSiteTestCase):
     def setUp(self):
         """Store version."""
         self.mysite = self.get_site()
-        self._version = LV(self.mysite.version())
+        self._version = MediaWikiVersion(self.mysite.version())
         self.orig_version = self.mysite.version
 
     def tearDown(self):
@@ -1246,7 +1246,7 @@ class TestSiteTokens(DefaultSiteTestCase):
         self.mysite.version = self.orig_version
 
     def _test_tokens(self, version, test_version, in_tested, additional_token):
-        if version and self._version < LV(version):
+        if version and self._version < MediaWikiVersion(version):
             raise unittest.SkipTest(
                 u'Site %s version %s is too low for this tests.'
                 % (self.mysite, self._version))
