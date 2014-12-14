@@ -160,8 +160,7 @@ Hallo %(admin)s,
                                                      % self.parts)
 
                         # some test stuff
-                        if pywikibot.logger.isEnabledFor(pywikibot.DEBUG) \
-                           and self.site().loggedInAs() == u'Xqbot:':
+                        if self.site().user() == u'Xqbot':
                             testPage = pywikibot.Page(self.site,
                                                       'Benutzer:Xqt/Test')
                             test = testPage.get()
