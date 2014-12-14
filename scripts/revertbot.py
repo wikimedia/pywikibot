@@ -112,9 +112,11 @@ class BaseRevertBot(object):
             pywikibot.data.api.Request(action="rollback", title=page.title(), user=self.user,
                                            token=rev[4], markbot=1).submit()
         except pywikibot.data.api.APIError as e:
-            if e == "badtoken: Invalid token":
-                pywikibot.out("There is an issue for rollbacking the edit, Giving up")
-                return False
+            if e.code == 'badtoken':
+                pywikibot.error("There was an API token error rollbacking the edit")
+            else:
+                pywikibot.exception()
+            return False
         return u"The edit(s) made in %s by %s was rollbacked" % (page.title(), self.user)
 
     def log(self, msg):
