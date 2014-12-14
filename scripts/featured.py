@@ -96,7 +96,7 @@ def DATA(site, name, hide):
     dp = pywikibot.ItemPage(site.data_repository(), name)
     try:
         title = dp.getSitelink(site)
-    except pywikibot.PageNotFound:
+    except pywikibot.NoPage:
         return
     cat = pywikibot.Category(site, title)
     if isinstance(hide, dict):

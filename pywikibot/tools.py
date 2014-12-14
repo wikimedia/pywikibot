@@ -852,7 +852,7 @@ class ModuleDeprecationWrapper(object):
             sys.modules[module.__name__] = self
 
     def _add_deprecated_attr(self, name, replacement=None,
-                             replacement_name=None):
+                             replacement_name=None, warning_message=None):
         """
         Add the name to the local deprecated names dict.
 
@@ -866,6 +866,9 @@ class ModuleDeprecationWrapper(object):
         @param replacement_name: The name of the new replaced value. Required
             if C{replacement} is not None and it has no __name__ attribute.
         @type replacement_name: str
+        @param warning_message: The warning to display, with positional
+            variables: {0} = module, {1} = attribute name, {2} = replacement.
+        @type warning_message: basestring
         """
         if '.' in name:
             raise ValueError('Deprecated name "{0}" may not contain '
@@ -875,6 +878,7 @@ class ModuleDeprecationWrapper(object):
         if replacement is not None and hasattr(self._module, name):
             raise ValueError('Module has already an attribute named '
                              '"{0}".'.format(name))
+
         if replacement_name is None:
             if hasattr(replacement, '__name__'):
                 replacement_name = replacement.__module__
@@ -886,24 +890,28 @@ class ModuleDeprecationWrapper(object):
                 raise TypeError('Replacement must have a __name__ attribute '
                                 'or a replacement name must be set '
                                 'specifically.')
-        self._deprecated[name] = (replacement_name, replacement)
+
+        if not warning_message:
+            if replacement_name:
+                warning_message = u"{0}.{1} is DEPRECATED, use {2} instead."
+            else:
+                warning_message = u"{0}.{1} is DEPRECATED."
+
+        self._deprecated[name] = replacement_name, replacement, warning_message
 
     def __setattr__(self, attr, value):
-        """Set a the value of the wrapped module."""
+        """Set the value of the wrapped module."""
         setattr(self._module, attr, value)
 
     def __getattr__(self, attr):
         """Return the attribute with a deprecation warning if required."""
         if attr in self._deprecated:
-            if self._deprecated[attr][0]:
-                warning(u"{0}.{1} is DEPRECATED, use {2} instead.".format(
-                        self._module.__name__, attr,
-                        self._deprecated[attr][0]))
-                if self._deprecated[attr][1]:
-                    return self._deprecated[attr][1]
-            else:
-                warning(u"{0}.{1} is DEPRECATED.".format(
-                        self._module.__name__, attr))
+            warning_message = self._deprecated[attr][2]
+            warning(warning_message.format(self._module.__name__,
+                                           attr,
+                                           self._deprecated[attr][0]))
+            if self._deprecated[attr][1]:
+                return self._deprecated[attr][1]
         return getattr(self._module, attr)
 
 

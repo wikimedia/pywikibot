@@ -36,7 +36,7 @@ from pywikibot.bot import (
 from pywikibot.exceptions import (
     Error, InvalidTitle, BadTitle, NoPage, SectionError,
     SiteDefinitionError, NoSuchSite, UnknownSite, UnknownFamily,
-    NoUsername, UserBlocked,
+    NoUsername, UserBlocked, UserActionRefuse,
     PageRelatedError, IsRedirectPage, IsNotRedirectPage,
     PageSaveRelatedError, PageNotSaved, OtherPageSaveError,
     LockedPage, CascadeLockedPage, LockedNoPage, NoCreateError,
@@ -73,7 +73,7 @@ __all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
            'calledModuleName', 'Bot', 'WikidataBot',
            'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
            'SiteDefinitionError', 'NoSuchSite', 'UnknownSite', 'UnknownFamily',
-           'NoUsername', 'UserBlocked',
+           'NoUsername', 'UserBlocked', 'UserActionRefuse',
            'PageRelatedError', 'IsRedirectPage', 'IsNotRedirectPage',
            'PageSaveRelatedError', 'PageNotSaved', 'OtherPageSaveError',
            'LockedPage', 'CascadeLockedPage', 'LockedNoPage', 'NoCreateError',
@@ -716,3 +716,7 @@ _putthread.setDaemon(True)
 
 wrapper = pywikibot.tools.ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('ImagePage', FilePage)
+wrapper._add_deprecated_attr(
+    'PageNotFound', pywikibot.exceptions.DeprecatedPageNotFoundError,
+    warning_message=('{0}.{1} is deprecated, and no longer '
+                     'used by pywikibot; use http.fetch() instead.'))
