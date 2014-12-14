@@ -270,7 +270,7 @@ class CommonscatBot(Bot):
             self.addCommonscat(page)
 
     @classmethod
-    def getCommonscatTemplate(self, code=None):
+    def getCommonscatTemplate(cls, code=None):
         """Get the template name of a site. Expects the site code.
 
         Return as tuple containing the primary template and its alternatives.
@@ -360,7 +360,7 @@ class CommonscatBot(Bot):
 
     def changeCommonscat(self, page=None, oldtemplate=u'', oldcat=u'',
                          newtemplate=u'', newcat=u'', linktitle=u'',
-                         description=u''):
+                         description=NotImplemented):  # pylint: disable=unused-argument
         """ Change the current commonscat template and target. """
         if oldcat == '3=S' or linktitle == '3=S':
             return  # TODO: handle additional param on de-wiki

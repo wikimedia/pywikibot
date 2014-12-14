@@ -210,13 +210,13 @@ class TZoneUTC(datetime.tzinfo):
 
     """Class building a UTC tzinfo object."""
 
-    def utcoffset(self, dt):
+    def utcoffset(self, dt):  # pylint: disable=unused-argument
         return ZERO
 
-    def tzname(self, dt):
+    def tzname(self, dt):  # pylint: disable=unused-argument
         return 'UTC'
 
-    def dst(self, dt):
+    def dst(self, dt):  # pylint: disable=unused-argument
         return ZERO
 
     def __repr__(self):

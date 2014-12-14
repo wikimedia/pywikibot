@@ -493,8 +493,9 @@ class ReplaceRobot(Bot):
     def doReplacements(self, original_text):
         return self.apply_replacements(original_text, set())
 
-    def count_changes(self, page, err):
+    def count_changes(self, page, err):  # pylint: disable=unused-argument
         """Count succesfully changed pages."""
+        # This is an async put callback
         if not isinstance(err, Exception):
             self.changed_pages += 1
 
