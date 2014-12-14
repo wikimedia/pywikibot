@@ -87,18 +87,22 @@ parameterHelp = u"""\
 -search           Work on all pages that are found in a MediaWiki search
                   across all namespaces.
 
--<logevent>log    Work on articles that were on a specified special:log.
+-logevents        Work on articles that were on a specified Special:Log.
+                  The value may be a comma separated list of three values:
+                      logevent,username,total
+                  To use the default value, use an empty string.
                   You have options for every type of logs given by the
-                 <logevent> parameter which could be one of the following:
+                  log event parameter which could be one of the following:
                       block, protect, rights, delete, upload, move, import,
                       patrol, merge, suppress, review, stable, gblblock,
                       renameuser, globalauth, gblrights, abusefilter, newusers
+                  It uses the default number of pages 10.
                   Examples:
-                  -movelog gives 500 pages from move log (should be redirects)
-                  -deletelog:10 gives 10 pages from deletion log
-                  -protect:Dummy gives 500 pages from protect by user Dummy
-                  -patrol:Dummy;20 gives 20 pages patroled by user Dummy
-                  In some cases this must be written as -patrol:"Dummy;20"
+                  -logevents:move gives pages from move log (should be redirects)
+                  -logevents:delete,,20 gives 20 pages from deletion log
+                  -logevents:protect,Usr gives pages from protect by user Usr
+                  -logevents:patrol,Usr,20 gives 20 patroled pages by user Usr
+                  In some cases it must be written as -logevents:"patrol,Usr,20"
 
 -namespaces       Filter the page generator to only yield pages in the
 -namespace        specified namespaces. Separate multiple namespace
@@ -344,6 +348,35 @@ class GeneratorFactory(object):
                         start=startfrom,
                         recurse=recurse,
                         content=content)
+
+    def _parse_log_events(self, logtype, user=None, total=None):
+        """
+        Parse the -logevent argument information.
+
+        @param logtype: A valid logtype
+        @type logtype: str
+        @param user: A username associated to the log events. Ignored if
+            empty string or None.
+        @type user: str
+        @param total: The total amount of pages returned.
+        @type total: str (castable to int) or int (positive)
+        @return: The generator or None if invalid 'total' value.
+        @rtype: LogeventsPageGenerator
+        """
+        # TODO: Check if logtype is one of the allowed log types
+        # TODO: -*log used 500 as default total, also use with -logevents?
+        if total is not None:
+            try:
+                total = int(total)
+                if total <= 0:
+                    raise ValueError
+            except ValueError:
+                pywikibot.error(u'Total number of log ({0}) events must be a '
+                                'positive int.'.format(total))
+                return None
+        # 'user or None', because user might be an empty string when
+        # 'foo,,bar' was used.
+        return LogeventsPageGenerator(logtype, user or None, total=total)
 
     def handleArg(self, arg):
         """Parse one argument at a time.
@@ -609,29 +642,32 @@ class GeneratorFactory(object):
         elif arg.startswith('-intersect'):
             self.intersect = True
             return True
+        elif arg.startswith('-logevents:'):
+            gen = self._parse_log_events(*arg[len('-logevents:'):].split(','))
         elif arg.startswith('-'):
             mode, log, user = arg.partition('log')
             # exclude -log, -nolog
             if log == 'log' and mode not in ['-', '-no']:
+                mode = mode[1:]
+                user = user[1:]
                 total = 500
-                if not user:
-                    user = None
-                else:
+                if user:
                     try:
-                        total = int(user[1:])
+                        total = int(user)
+                    except:
+                        params = user.split(';')
+                        if len(params) == 2:
+                            user, total = params
+                        else:
+                            user = params[0]
+                    else:
                         user = None
-                    except ValueError:
-                        user = user[1:]
-                        result = user.split(';')
-                        user = result[0]
-                        try:
-                            total = int(result[1])
-                        except (ValueError, IndexError):
-                            pywikibot.error(
-                                u'Value specified after ";" not an int.')
-                            return False
-                    # TODO: Check if mode[1:] is one of the allowed log types
-                gen = LogeventsPageGenerator(mode[1:], user, total=total)
+                else:
+                    user = None
+                pywikibot.warning(u'The usage of "{0}" is discouraged. Use '
+                                  '-logevents "{1}" instead.'.format(
+                                  arg, ','.join((mode, user or '', str(total)))))
+                gen = self._parse_log_events(mode, user, total)
 
         if gen:
             self.gens.append(gen)
