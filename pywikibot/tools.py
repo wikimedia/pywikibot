@@ -73,6 +73,28 @@ class ComparableMixin(object):
         return other != self._cmpkey()
 
 
+def concat_options(message, line_length, options):
+    indent = len(message) + 2
+    line_length -= indent
+    option_msg = u''
+    option_line = u''
+    for option in options:
+        if option_line:
+            option_line += ', '
+        # +1 for ','
+        if len(option_line) + len(option) + 1 > line_length:
+            if option_msg:
+                option_msg += '\n' + ' ' * indent
+            option_msg += option_line[:-1]  # remove space
+            option_line = ''
+        option_line += option
+    if option_line:
+        if option_msg:
+            option_msg += '\n' + ' ' * indent
+        option_msg += option_line
+    return u'{0} ({1}):'.format(message, option_msg)
+
+
 class MediaWikiVersion(Version):
 
     """Version object to allow comparing 'wmf' versions with normal ones."""

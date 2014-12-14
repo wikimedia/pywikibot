@@ -83,6 +83,7 @@ import codecs
 
 import pywikibot
 from pywikibot import editor as editarticle
+from pywikibot.tools import concat_options
 from pywikibot import pagegenerators, config, i18n
 from pywikibot.bot import Bot, QuitKeyboardInterrupt
 
@@ -485,6 +486,8 @@ class DisambiguationRobot(Bot):
         self.mylang = self.mysite.language()
         self.comment = None
 
+        self.dn_template_str = i18n.translate(self.mysite, dn_template)
+
         self.setupRegexes()
 
     def checkContents(self, text):
@@ -555,7 +558,6 @@ class DisambiguationRobot(Bot):
         """
         # TODO: break this function up into subroutines!
 
-        dn_template_str = i18n.translate(self.mysite, dn_template)
         include = False
         unlink = False
         new_targets = []
@@ -643,9 +645,10 @@ class DisambiguationRobot(Bot):
                 n += 1
                 # how many bytes should be displayed around the current link
                 context = 60
-                # check if there's a {{dn}} here already
-                already_dn = text[m.end():m.end() + 8].find(dn_template_str[:4]) > -1
-                if already_dn and self.dnSkip:
+                # check if there's a dn-template here already
+                if (self.dnSkip and self.dn_template_str and
+                        self.dn_template_str[:-2] in text[m.end():m.end() +
+                                                          len(self.dn_template_str) + 8]):
                     continue
 
                 # This loop will run while the user doesn't choose an option
@@ -662,16 +665,18 @@ class DisambiguationRobot(Bot):
                                          + text[m.start():m.end()]
                                          + '\03{default}'
                                          + text[m.end():m.end() + context])
+                        options = ['#', 'r#', '[s]kip link', '[e]dit page',
+                                   '[n]ext page', '[u]nlink', '[q]uit']
+                        if self.dn_template_str:
+                            options.append(u'[t]ag template %s' % self.dn_template_str)
+                        options.append('[m]ore context')
+                        if not edited:
+                            options.append('show [d]isambiguation page')
+                        options += ['[l]ist', '[a]dd new']
                         if edited:
-                            choice = pywikibot.input(
-u"Option (#, r#, [s]kip link, [e]dit page, [n]ext page, [u]nlink, [q]uit,\n"
-u"        [t]ag template " + dn_template_str + ",\n"
-u"        [m]ore context, [l]ist, [a]dd new, x=save in this form):")
-                        else:
-                            choice = pywikibot.input(
-u"Option (#, r#, [s]kip link, [e]dit page, [n]ext page, [u]nlink, [q]uit,\n"
-u"        [t]ag template " + dn_template_str + ",\n"
-u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
+                            options += ['save in this form [x]']
+                        options = concat_options('Option', 72, options)
+                        choice = pywikibot.input(options)
                     else:
                         choice = self.always
                     if choice in ['a', 'A']:
@@ -746,7 +751,7 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                 if trailing_chars:
                     link_text += trailing_chars
                 # '?', '/' for old choice
-                if choice in ['t', 'T', '?', '/']:
+                if choice in ['t', 'T', '?', '/'] and self.dn_template_str:
                     # small chunk of text to search
                     search_text = text[m.end():m.end() + context]
                     # figure out where the link (and sentance) ends, put note
@@ -758,7 +763,7 @@ u"        [m]ore context, show [d]isambiguation page, [l]ist, [a]dd new):")
                         position_split = 0
                     # insert dab needed template
                     text = (text[:m.end() + position_split] +
-                            dn_template_str +
+                            self.dn_template_str +
                             text[m.end() + position_split:])
                     dn = True
                     continue
