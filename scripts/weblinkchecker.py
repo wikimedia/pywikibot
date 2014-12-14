@@ -521,7 +521,7 @@ class LinkCheckThread(threading.Thread):
             ok, message = linkChecker.check()
         except NotAnURLError:
             ok = False
-            message = i18n.twtranslate(pywikibot.page.site(),
+            message = i18n.twtranslate(self.page.site,
                                        'weblinkchecker-badurl_msg',
                                        {'URL': self.url})
 
@@ -715,7 +715,7 @@ class DeadLinkReportThread(threading.Thread):
 
                 if archiveURL:
                     archiveMsg = u'\n' + \
-                                 i18n.twtranslate(pywikibot.Site(),
+                                 i18n.twtranslate(containingPage.site,
                                                   'weblinkchecker-archive_msg',
                                                   {'URL': archiveURL})
                 else:
@@ -723,7 +723,7 @@ class DeadLinkReportThread(threading.Thread):
                 # The caption will default to "Dead link". But if there is
                 # already such a caption, we'll use "Dead link 2",
                 # "Dead link 3", etc.
-                caption = i18n.twtranslate(pywikibot.Site(),
+                caption = i18n.twtranslate(containingPage.site,
                                            'weblinkchecker-caption')
                 i = 1
                 count = u''
@@ -735,13 +735,13 @@ class DeadLinkReportThread(threading.Thread):
                 caption += count
                 content += '\n\n== %s ==\n\n%s\n\n%s%s--~~~~' % \
                            (caption,
-                            i18n.twtranslate(pywikibot.Site(),
+                            i18n.twtranslate(containingPage.site,
                                              'weblinkchecker-report'),
                             errorReport,
                             archiveMsg)
                 comment = u'[[%s#%s|→]] %s' % \
                           (talkPage.title(), caption,
-                           i18n.twtranslate(pywikibot.Site(),
+                           i18n.twtranslate(containingPage.site,
                                             'weblinkchecker-summary'))
                 try:
                     talkPage.put(content, comment)
