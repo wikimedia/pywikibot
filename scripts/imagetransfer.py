@@ -234,7 +234,7 @@ class ImageTransferBot:
                              % (i, image.title(asLink=True)))
             try:
                 # Show the image description page's contents
-                pywikibot.output(image.get(throttle=False))
+                pywikibot.output(image.get())
                 # look if page already exists with this name.
                 # TODO: consider removing this: a different image of the same
                 # name may exist on the target wiki, and the bot user may want
@@ -244,11 +244,11 @@ class ImageTransferBot:
                     targetTitle = '%s:%s' % (self.targetSite.image_namespace(),
                                              image.title().split(':', 1)[1])
                     targetImage = pywikibot.Page(self.targetSite, targetTitle)
-                    targetImage.get(throttle=False)
+                    targetImage.get()
                     pywikibot.output(u"Image with this name is already on %s."
                                      % self.targetSite)
                     print("-" * 60)
-                    pywikibot.output(targetImage.get(throttle=False))
+                    pywikibot.output(targetImage.get())
                     sys.exit()
                 except pywikibot.NoPage:
                     # That's the normal case

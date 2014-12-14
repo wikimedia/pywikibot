@@ -560,7 +560,7 @@ class DisambiguationRobot(Bot):
         unlink = False
         new_targets = []
         try:
-            text = refPage.get(throttle=False)
+            text = refPage.get()
             ignoreReason = self.checkContents(text)
             if ignoreReason:
                 pywikibot.output('\n\nSkipping %s because it contains %s.\n\n'
@@ -596,7 +596,7 @@ class DisambiguationRobot(Bot):
                         if not self.treat(refPage2, refPage):
                             break
                 elif choice == 'c':
-                    text = refPage.get(throttle=False, get_redirect=True)
+                    text = refPage.get(get_redirect=True)
                     include = "redirect"
         except pywikibot.NoPage:
             pywikibot.output(
