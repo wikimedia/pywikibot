@@ -22,7 +22,11 @@ class WikiStatsTestCase(TestCase):
 
     """Test WikiStats dump."""
 
-    net = True
+    sites = {
+        'wikistats': {
+            'hostname': 'wikistats.wmflabs.org',
+        },
+    }
 
     def test_sort(self):
         ws = WikiStats()

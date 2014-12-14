@@ -66,6 +66,7 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
     }
 
     def test_direct_non_local(self):
+        """Test translatewiki:Main Page on English Wikipedia."""
         link = Link('translatewiki:Main Page', self.get_site('wp'))
         link.parse()
         self.assertEqual(link.site, self.get_site('tw'))
@@ -73,6 +74,7 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
         self.assertEqual(link.namespace, 0)
 
     def test_indirect_non_local(self):
+        """Test en:translatewiki:Main Page on English Wikipedia."""
         link = Link('en:translatewiki:Main Page', self.get_site('wp'))
         link.parse()
         self.assertEqual(link.site, self.get_site('tw'))
@@ -80,6 +82,7 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
         self.assertEqual(link.namespace, 0)
 
     def test_via_local_non_local(self):
+        """Test de:translatewiki:Main Page on English Wikipedia."""
         link = Link('de:translatewiki:Main Page', self.get_site('wp'))
         self.assertRaisesRegex(
             InvalidTitle,

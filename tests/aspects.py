@@ -37,9 +37,10 @@ import inspect
 
 import pywikibot
 
-from pywikibot import config, log, Site
+from pywikibot import config, log, ServerError, Site
 from pywikibot.site import BaseSite
 from pywikibot.family import WikimediaFamily
+from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 
 import tests
@@ -382,6 +383,70 @@ class CacheInfoMixin(TestCaseBase):
         super(CacheInfoMixin, self).tearDown()
 
 
+class CheckHostnameMixin(TestCaseBase):
+
+    """Check the hostname is online before running tests."""
+
+    _checked_hostnames = {}
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up the test class.
+
+        Prevent tests running if the host is down.
+        """
+        super(CheckHostnameMixin, cls).setUpClass()
+
+        if not hasattr(cls, 'sites'):
+            return
+
+        for key, data in cls.sites.items():
+            if 'hostname' not in data:
+                raise Exception('%s: hostname not defined for %s'
+                                % (cls.__name__, key))
+            hostname = data['hostname']
+
+            if hostname in cls._checked_hostnames:
+                if isinstance(cls._checked_hostnames[hostname], Exception):
+                    raise unittest.SkipTest(
+                        '%s: hostname %s failed (cached): %s'
+                        % (cls.__name__, hostname,
+                           cls._checked_hostnames[hostname]))
+                elif cls._checked_hostnames[hostname] is False:
+                    raise unittest.SkipTest('%s: hostname %s failed (cached)'
+                                            % (cls.__name__, hostname))
+                else:
+                    continue
+
+            e = None
+            try:
+                if '://' not in hostname:
+                    hostname = 'http://' + hostname
+                r = http.fetch(uri=hostname,
+                               default_error_handling=False)
+                if r.exception:
+                    e = r.exception
+                else:
+                    if r.status not in [200, 301, 302, 303, 307, 308]:
+                        raise ServerError('HTTP status: %d' % r.status)
+                    r.content  # default decode may raise exception
+            except Exception as e2:
+                pywikibot.error('%s: accessing %s caused exception:'
+                                % (cls.__name__, hostname))
+                pywikibot.exception(e2, tb=True)
+                e = e2
+                pass
+
+            if e:
+                cls._checked_hostnames[hostname] = e
+                raise unittest.SkipTest(
+                    '%s: hostname %s failed: %s'
+                    % (cls.__name__, hostname, e))
+
+            cls._checked_hostnames[hostname] = True
+
+
 class SiteWriteMixin(TestCaseBase):
 
     """
@@ -614,6 +679,8 @@ class MetaTestCaseClass(type):
         if 'cached' in dct and dct['cached']:
             bases = tuple([ForceCacheMixin] + list(bases))
 
+        bases = tuple([CheckHostnameMixin] + list(bases))
+
         if 'write' in dct and dct['write']:
             bases = tuple([SiteWriteMixin] + list(bases))
 
@@ -688,16 +755,19 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
             interface = DrySite
 
         for data in cls.sites.values():
-            if 'site' not in data:
+            if 'site' not in data and 'code' in data and 'family' in data:
                 data['site'] = Site(data['code'], data['family'],
                                     interface=interface)
+            if 'hostname' not in data and 'site' in data:
+                data['hostname'] = data['site'].hostname()
 
         if not hasattr(cls, 'cached') or not cls.cached:
             pywikibot._sites = orig_sites
 
         if len(cls.sites) == 1:
             key = next(iter(cls.sites.keys()))
-            cls.site = cls.sites[key]['site']
+            if 'site' in cls.sites[key]:
+                cls.site = cls.sites[key]['site']
 
     @classmethod
     def get_site(cls, name=None):
@@ -853,19 +923,23 @@ class WikibaseTestCase(TestCase):
         """
         super(WikibaseTestCase, cls).setUpClass()
 
-        for site in cls.sites.values():
-            if not site['site'].has_data_repository:
+        for data in cls.sites.values():
+            if 'site' not in data:
+                continue
+
+            site = data['site']
+            if not site.has_data_repository:
                 raise unittest.SkipTest(
                     u'%s: %r does not have data repository'
-                    % (cls.__name__, site['site']))
+                    % (cls.__name__, site))
 
             if (hasattr(cls, 'repo') and
-                    cls.repo != site['site'].data_repository()):
+                    cls.repo != site.data_repository()):
                 raise Exception(
                     '%s: sites do not all have the same data repository'
                     % cls.__name__)
 
-            cls.repo = site['site'].data_repository()
+            cls.repo = site.data_repository()
 
     @classmethod
     def get_repo(cls):

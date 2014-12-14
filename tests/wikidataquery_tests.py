@@ -19,9 +19,11 @@ import os
 import time
 
 
-class TestApiFunctions(WikidataTestCase):
+class TestDryApiFunctions(TestCase):
 
     """Test WikiDataQuery API functions."""
+
+    net = False
 
     def testQueries(self):
         """
@@ -89,6 +91,13 @@ class TestApiFunctions(WikidataTestCase):
 
         q = query.HasClaim(99, query.Tree(1, [2, 5], [3, 90]))
         self.assertEqual(str(q), "claim[99:(tree[1][2,5][3,90])]")
+
+
+class TestLiveApiFunctions(WikidataTestCase):
+
+    """Test WikiDataQuery API functions."""
+
+    cached = True
 
     def testQueriesWDStructures(self):
         """Test queries using Wikibase page structures like ItemPage."""
@@ -217,7 +226,11 @@ class TestApiSlowFunctions(TestCase):
 
     """Test slow WikiDataQuery API functions."""
 
-    net = True
+    sites = {
+        'wdq': {
+            'hostname': 'wdq.wmflabs.org',
+        },
+    }
 
     def testQueryApiGetter(self):
         """Test that we can actually retreive data and that caching works."""
