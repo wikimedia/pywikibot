@@ -740,9 +740,9 @@ class BaseSite(ComparableMixin):
         """
         self._pagemutex.acquire()
         try:
-            while page in self._locked_pages:
+            while page.title(withSection=False) in self._locked_pages:
                 if not block:
-                    raise PageInUse
+                    raise PageInUse(page.title(withSection=False))
                 time.sleep(.25)
             self._locked_pages.append(page.title(withSection=False))
         finally:

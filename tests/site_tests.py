@@ -651,6 +651,18 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIsInstance(link, pywikibot.Page)
             self.assertIn(link.namespace(), (2, 3))
 
+    def test_lock_page(self):
+        """Test the site.lock_page() and site.unlock_page() method."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'Foo')
+
+        site.lock_page(page=p1, block=True)
+        self.assertRaises(pywikibot.site.PageInUse, site.lock_page, page=p1, block=False)
+        site.unlock_page(page=p1)
+        # verify it's unlocked
+        site.lock_page(page=p1, block=False)
+        site.unlock_page(page=p1)
+
 
 class TestImageUsage(DefaultSiteTestCase):
 
@@ -1136,6 +1148,87 @@ class SiteSysopTestCase(DefaultSiteTestCase):
                           page=mainpage, start="2008-09-03T23:59:59Z",
                           end="2008-09-03T00:00:01Z", reverse=True,
                           total=5)
+
+
+class SiteProtectTestCase(DefaultSiteTestCase):
+
+    """Test site protect / unprotect using a sysop account."""
+
+    family = 'test'
+    code = 'test'
+
+    write = True
+    sysop = True
+
+    @unittest.expectedFailure
+    def test_protect(self):
+        """Test the site.protect() method."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+
+        r = site.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
+                         page=p1,
+                         reason='Pywikibot unit test')
+        self.assertEqual(r, None)
+        self.assertEqual(site.page_restrictions(page=p1),
+                         {u'edit': (u'sysop', u'infinity'),
+                          u'move': (u'autoconfirmed', u'infinity')})
+
+        expiry = pywikibot.Timestamp.fromISOformat('2050-01-01T00:00:00Z')
+        site.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
+                     page=p1,
+                     expiry=expiry,
+                     reason='Pywikibot unit test')
+
+        self.assertEqual(site.page_restrictions(page=p1),
+                         {u'edit', (u'sysop', u'2050-01-01T00:00:00Z'),
+                          u'move', (u'autoconfirmed', u'2050-01-01T00:00:00Z')})
+
+        site.protect(protections={'edit': '', 'move': ''},
+                     page=p1,
+                     reason='Pywikibot unit test')
+        self.assertEqual(site.page_restrictions(page=p1), {})
+
+    def test_protect_alt(self):
+        """Test the site.protect() method, works around T78522."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+
+        r = site.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
+                         page=p1,
+                         reason='Pywikibot unit test')
+        self.assertEqual(r, None)
+        self.assertEqual(site.page_restrictions(page=p1),
+                         {u'edit': (u'sysop', u'infinity'),
+                          u'move': (u'autoconfirmed', u'infinity')})
+
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+        expiry = pywikibot.Timestamp.fromISOformat('2050-01-01T00:00:00Z')
+        site.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
+                     page=p1,
+                     expiry=expiry,
+                     reason='Pywikibot unit test')
+
+        self.assertEqual(site.page_restrictions(page=p1),
+                         {u'edit': (u'sysop', u'2050-01-01T00:00:00Z'),
+                          u'move': (u'autoconfirmed', u'2050-01-01T00:00:00Z')})
+
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+        site.protect(protections={'edit': '', 'move': ''},
+                     page=p1,
+                     reason='Pywikibot unit test')
+        self.assertEqual(site.page_restrictions(page=p1), {})
+
+    def test_protect_exception(self):
+        """Test that site.protect() throws an exception when passed invalid args."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+        self.assertRaises(pywikibot.Error, site.protect,
+                          protections={'anInvalidValue': 'sysop'},
+                          page=p1, reason='Pywikibot unit test')
+        self.assertRaises(pywikibot.Error, site.protect,
+                          protections={'edit': 'anInvalidValue'},
+                          page=p1, reason='Pywikibot unit test')
 
 
 class SiteUserTestCase2(DefaultSiteTestCase):

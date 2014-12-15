@@ -594,6 +594,62 @@ class TestPageUserAction(DefaultSiteTestCase):
         self.assertTrue(rv)
 
 
+class TestPageProtect(TestCase):
+
+    """Test page protect / unprotect actions."""
+
+    family = 'test'
+    code = 'test'
+
+    write = True
+    sysop = True
+
+    def test_applicable_protections(self):
+        """Test Page.applicable_protections."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/NonexistentPage')
+        p2 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+        p3 = pywikibot.Page(site, u'File:Wiki.png')
+
+        self.assertEqual(p1.applicable_protections(), set(['create']))
+        self.assertIn('edit', p2.applicable_protections())
+        self.assertNotIn('create', p2.applicable_protections())
+        self.assertNotIn('upload', p2.applicable_protections())
+        self.assertIn('upload', p3.applicable_protections())
+
+    @unittest.expectedFailure
+    def test_protect(self):
+        """Test Page.protect."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+
+        p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
+                   reason=u'Pywikibot unit test')
+        self.assertEqual(p1.protection(),
+                         {u'edit': (u'sysop', u'infinity'),
+                          u'move': (u'autoconfirmed', u'infinity')})
+
+        p1.protect(protections={'edit': '', 'move': ''},
+                   reason=u'Pywikibot unit test')
+        self.assertEqual(p1.protection(), {})
+
+    def test_protect_alt(self):
+        """Test of Page.protect that works around T78522."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+
+        p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
+                   reason=u'Pywikibot unit test')
+        self.assertEqual(p1.protection(),
+                         {u'edit': (u'sysop', u'infinity'),
+                          u'move': (u'autoconfirmed', u'infinity')})
+        # workaround
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+        p1.protect(protections={'edit': '', 'move': ''},
+                   reason=u'Pywikibot unit test')
+        self.assertEqual(p1.protection(), {})
+
+
 if __name__ == '__main__':
     try:
         unittest.main()
