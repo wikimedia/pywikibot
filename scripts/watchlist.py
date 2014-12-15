@@ -94,7 +94,7 @@ def refresh_all(sysop=False):
         entry._rebuild()
         if entry.site not in seen:
             if entry._data['watchlistraw']:
-                refresh(entry.site)
+                refresh(entry.site, sysop)
                 seen.append(entry.site)
 
 
