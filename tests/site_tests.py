@@ -1974,10 +1974,8 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 6:
                 break
 
-    @allowed_failure
     def test_preload_langlinks_count(self):
         """Test preloading continuation works."""
-        # FIXME: test fails
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         count = 0
@@ -1993,7 +1991,7 @@ class TestPagePreloading(DefaultSiteTestCase):
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
 
-        self.assertEqual(len(links), count)
+        self.assertEqual(len(pages), count)
 
     def _test_preload_langlinks_long(self):
         """Test preloading continuation works."""
