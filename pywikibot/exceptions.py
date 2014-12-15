@@ -6,12 +6,12 @@ Error: Base class, all exceptions should the subclass of this class.
   - NoUsername: Username is not in user-config.py, or it is invalid.
   - UserBlockedY: our username or IP has been blocked
   - AutoblockUser: requested action on a virtual autoblock user not valid
-  - UserActionRefuse
+  - UserActionRefuse: requested user action, such as email user, refused
   - BadTitle: Server responded with BadTitle
   - InvalidTitle: Invalid page title
-  - PageNotFound: Page not found in list
   - CaptchaError: Captcha is asked and config.solve_captcha == False
   - Server504Error: Server timed out with HTTP 504 code
+  - PageNotFound: Page not found (deprecated)
 
 SiteDefinitionError: Site loading problem
   - UnknownSite: Site does not exist in Family
@@ -394,13 +394,6 @@ class UserBlocked(Error):  # noqa
     pass
 
 
-class PageNotFound(Error):  # noqa
-
-    """Page not found in list"""
-
-    pass
-
-
 class CaptchaError(Error):
 
     """Captcha is asked and config.solve_captcha == False."""
@@ -450,5 +443,19 @@ class EntityTypeUnknownException(WikiBaseError):
 
 import pywikibot.data.api
 import pywikibot.tools
+
+
+@pywikibot.tools.deprecated
+class DeprecatedPageNotFoundError(Error):
+
+    """Page not found (deprecated)."""
+
+    pass
+
+
 wrapper = pywikibot.tools.ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('UploadWarning', pywikibot.data.api.UploadWarning)
+wrapper._add_deprecated_attr('PageNotFound', DeprecatedPageNotFoundError,
+                             warning_message='{0}.{1} is deprecated, and no '
+                                             'longer used by pywikibot; use '
+                                             'http.fetch() instead.')

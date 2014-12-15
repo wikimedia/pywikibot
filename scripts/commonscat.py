@@ -508,8 +508,6 @@ class CommonscatBot(Bot):
         except pywikibot.BadTitle:
             # Funky title so not correct
             return u''
-        except pywikibot.PageNotFound:
-            return u''
 
 
 def main(*args):
