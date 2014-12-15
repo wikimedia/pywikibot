@@ -243,11 +243,13 @@ class CommonscatBot(Bot):
 
     """Commons categorisation bot."""
 
-    def __init__(self, generator, always, summary=None):
+    def __init__(self, generator, **kwargs):
         """Constructor."""
-        super(CommonscatBot, self).__init__(always=always)
+        self.availableOptions.update({
+            'summary': None,
+        })
+        super(CommonscatBot, self).__init__(**kwargs)
         self.generator = generator
-        self.summary = summary
         self.site = pywikibot.Site()
 
     def treat(self, page):
@@ -271,7 +273,7 @@ class CommonscatBot(Bot):
     def getCommonscatTemplate(self, code=None):
         """Get the template name of a site. Expects the site code.
 
-        Return as tuple containing the primary template and it's alternatives
+        Return as tuple containing the primary template and its alternatives.
 
         """
         if code in commonscatTemplates:
@@ -349,8 +351,9 @@ class CommonscatBot(Bot):
                 else:
                     textToAdd = u'{{%s|%s}}' % (primaryCommonscat,
                                                 commonscatLink)
-                always = self.getOption('always')
-                rv = add_text(page, textToAdd, self.summary, always=always)
+                rv = add_text(page, textToAdd,
+                              self.getOption('summary'),
+                              always=self.getOption('always'))
                 self.options['always'] = rv[2]
                 return True
         return True
@@ -381,27 +384,16 @@ class CommonscatBot(Bot):
                              page.get())
         else:  # nothing left to do
             return
-        if self.summary:
-            comment = self.summary
+        if self.getOption('summary'):
+            comment = self.getOption('summary')
         else:
             comment = i18n.translate(page.site,
                                      msg_change,
                                      fallback=True) % {'oldcat': oldcat,
                                                        'newcat': newcat}
 
-        try:
-            self.userPut(page, page.text, newtext, comment=comment)
-        except pywikibot.LockedPage:
-            pywikibot.output(u"Page %s is locked; skipping."
-                             % page.title(asLink=True))
-        except pywikibot.EditConflict:
-            pywikibot.output(
-                u'Skipping %s because of edit conflict'
-                % (page.title()))
-        except pywikibot.SpamfilterError as error:
-            pywikibot.output(
-                u'Cannot change %s because of spam blacklist entry %s'
-                % (page.title(), error.url))
+        self.userPut(page, page.text, newtext, comment=comment,
+                     ignore_save_related_errors=True)
 
     def findCommonscatLink(self, page=None):
         """Find CommonsCat template on interwiki pages.
@@ -529,10 +521,9 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    summary = None
+    options = {}
     generator = None
     checkcurrent = False
-    always = False
     ns = []
     ns.append(14)
 
@@ -543,13 +534,13 @@ def main(*args):
     for arg in local_args:
         if arg.startswith('-summary'):
             if len(arg) == 8:
-                summary = pywikibot.input(u'What summary do you want to use?')
+                options['summary'] = pywikibot.input(u'What summary do you want to use?')
             else:
-                summary = arg[9:]
+                options['summary'] = arg[9:]
         elif arg.startswith('-checkcurrent'):
             checkcurrent = True
         elif arg == '-always':
-            always = True
+            options['always'] = True
         else:
             genFactory.handleArg(arg)
 
@@ -568,7 +559,7 @@ def main(*args):
 
     if generator:
         pregenerator = pagegenerators.PreloadingGenerator(generator)
-        bot = CommonscatBot(pregenerator, always, summary)
+        bot = CommonscatBot(pregenerator, **options)
         bot.run()
     else:
         pywikibot.showHelp()
