@@ -1181,8 +1181,8 @@ class SiteProtectTestCase(DefaultSiteTestCase):
                      reason='Pywikibot unit test')
 
         self.assertEqual(site.page_restrictions(page=p1),
-                         {u'edit', (u'sysop', u'2050-01-01T00:00:00Z'),
-                          u'move', (u'autoconfirmed', u'2050-01-01T00:00:00Z')})
+                         {u'edit': (u'sysop', u'2050-01-01T00:00:00Z'),
+                          u'move': (u'autoconfirmed', u'2050-01-01T00:00:00Z')})
 
         site.protect(protections={'edit': '', 'move': ''},
                      page=p1,
