@@ -834,7 +834,7 @@ Global arguments available for all bots:
     try:
         module = __import__('%s' % module_name)
         helpText = module.__doc__
-        if sys.version_info[0] < 3:
+        if sys.version_info[0] < 3 and isinstance(helpText, str):
             helpText = helpText.decode('utf-8')
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
