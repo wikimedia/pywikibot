@@ -62,7 +62,7 @@ and arguments can be:
 
 -delete        Enables deletion of broken redirects.
 
--always        Don't prompt you for each replacement.
+-always        Don't prompt you for each replacement/deletion.
 
 """
 #
