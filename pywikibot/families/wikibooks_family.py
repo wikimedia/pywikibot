@@ -87,7 +87,7 @@ class Family(family.WikimediaFamily):
             'qu': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikibooks
             'rm': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rumantsch_Wikibooks
             'se': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Sami_Wikibooks
-            'simple': 'en',  # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
+            'simple': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Simple_English_Wikibooks_(3)
             'su': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Basa_Sunda_Wikibooks_(2)
             'sw': None,   # https://bugzilla.wikimedia.org/show_bug.cgi?id=25170
             'tk': None,
