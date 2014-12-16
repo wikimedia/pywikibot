@@ -56,7 +56,6 @@ class Family(family.WikimediaFamily):
             'jp': 'ja',
             'minnan': 'zh-min-nan',
             'nb': 'no',
-            'tokipona': None,
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }
