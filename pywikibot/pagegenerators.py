@@ -1993,8 +1993,8 @@ def MySQLPageGenerator(query, site=None):
     MySQLdb <https://sourceforge.net/projects/mysql-python/>
 
     @param query: MySQL query to execute
-    @param site: Site object or raw database name
-    @type site: L{pywikibot.site.BaseSite} or str
+    @param site: Site object
+    @type site: L{pywikibot.site.BaseSite}
     @return: iterator of pywikibot.Page
     """
     try:
@@ -2003,14 +2003,13 @@ def MySQLPageGenerator(query, site=None):
         import MySQLdb as mysqldb
     if site is None:
         site = pywikibot.Site()
-    if isinstance(site, pywikibot.site.BaseSite):
-        # We want to let people to set a custom dbname
-        # since the master dbname might not be exactly
-        # equal to the name on the replicated site
-        site = site.dbName()
-    conn = mysqldb.connect(config.db_hostname, db=site,
-                           user=config.db_username,
-                           passwd=config.db_password)
+    if config.db_connect_file is None:
+        conn = mysqldb.connect(config.db_hostname, db=config.db_name_format.format(site.dbName()),
+                               user=config.db_username, passwd=config.db_password)
+    else:
+        conn = mysqldb.connect(config.db_hostname, db=config.db_name_format.format(site.dbName()),
+                               read_default_file=config.db_connect_file)
+
     cursor = conn.cursor()
     pywikibot.output(u'Executing query:\n%s' % query)
     query = query.encode(site.encoding())
