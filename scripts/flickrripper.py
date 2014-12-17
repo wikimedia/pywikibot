@@ -46,35 +46,7 @@ else:
     from urllib import urlencode, urlopen
 
 try:
-    if sys.version_info[0] > 2:
-        from tkinter import (
-            Tk, Label, Entry, Scrollbar, Text, Button,
-            END, VERTICAL, NORMAL, WORD
-        )
-    else:
-        from Tkinter import (
-            Tk, Label, Entry, Scrollbar, Text, Button,
-            END, VERTICAL, NORMAL, WORD
-        )
-except ImportError as e:
-    print(
-        'This script requires Tkinter, which is typically part of Python,\n'
-        'but may be packaged separately on your platform.\n'
-        'See: https://www.mediawiki.org/wiki/Manual:Pywikibot/flickrripper.py')
-    print(e)
-    sys.exit()
-
-try:
-    from PIL import Image, ImageTk
-except ImportError as e:
-    print(
-        'This script requires ImageTk from the Python Imaging Library (PIL).\n'
-        'See: https://www.mediawiki.org/wiki/Manual:Pywikibot/flickrripper.py')
-    print(e)
-    sys.exit(1)
-
-try:
-    import flickrapi                  # see: http://stuvel.eu/projects/flickrapi
+    import flickrapi                # see: http://stuvel.eu/projects/flickrapi
 except ImportError as e:
     print('This script requires the python flickrapi module. \n'
           'See: http://stuvel.eu/projects/flickrapi')
@@ -85,6 +57,9 @@ import pywikibot
 
 from pywikibot import config, textlib
 from scripts import upload
+
+from pywikibot.userinterfaces.gui import Tkdialog
+
 
 flickr_allowed_license = {
     0: False,  # All Rights Reserved
@@ -317,9 +292,14 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
                                                 removeCategories)
             # pywikibot.output(photoDescription)
             if not autonomous:
-                (newPhotoDescription, newFilename, skip) = Tkdialog(
+                try:
+                    (newPhotoDescription, newFilename, skip) = Tkdialog(
                     photoDescription, photo, filename).run()
-            else:
+                except ImportError as e:
+                    pywikibot.warning(e)
+                    pywikibot.warning('Switching to autonomous mode.')
+                    autonomous = True
+            if autonomous:
                 newPhotoDescription = photoDescription
                 newFilename = filename
                 skip = False
@@ -342,93 +322,6 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
     else:
         pywikibot.output(u'Invalid license')
     return 0
-
-
-class Tkdialog:
-
-    """ The user dialog. """
-
-    def __init__(self, photoDescription, photo, filename):
-        """Constructor."""
-        self.root = Tk()
-        # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
-        self.root.geometry("%ix%i+10-10" % (config.tkhorsize, config.tkvertsize))
-
-        self.root.title(filename)
-        self.photoDescription = photoDescription
-        self.filename = filename
-        self.photo = photo
-        self.skip = False
-        self.exit = False
-
-        # --Init of the widgets
-        # The image
-        self.image = self.getImage(self.photo, 800, 600)
-        self.imagePanel = Label(self.root, image=self.image)
-
-        self.imagePanel.image = self.image
-
-        # The filename
-        self.filenameLabel = Label(self.root, text=u"Suggested filename")
-        self.filenameField = Entry(self.root, width=100)
-        self.filenameField.insert(END, filename)
-
-        # The description
-        self.descriptionLabel = Label(self.root, text=u"Suggested description")
-        self.descriptionScrollbar = Scrollbar(self.root, orient=VERTICAL)
-        self.descriptionField = Text(self.root)
-        self.descriptionField.insert(END, photoDescription)
-        self.descriptionField.config(state=NORMAL, height=12, width=100, padx=0, pady=0, wrap=WORD, yscrollcommand=self.descriptionScrollbar.set)
-        self.descriptionScrollbar.config(command=self.descriptionField.yview)
-
-        # The buttons
-        self.okButton = Button(self.root, text="OK", command=self.okFile)
-        self.skipButton = Button(self.root, text="Skip", command=self.skipFile)
-
-        # --Start grid
-
-        # The image
-        self.imagePanel.grid(row=0, column=0, rowspan=11, columnspan=4)
-
-        # The buttons
-        self.okButton.grid(row=11, column=1, rowspan=2)
-        self.skipButton.grid(row=11, column=2, rowspan=2)
-
-        # The filename
-        self.filenameLabel.grid(row=13, column=0)
-        self.filenameField.grid(row=13, column=1, columnspan=3)
-
-        # The description
-        self.descriptionLabel.grid(row=14, column=0)
-        self.descriptionField.grid(row=14, column=1, columnspan=3)
-        self.descriptionScrollbar.grid(row=14, column=5)
-
-    def getImage(self, photo, width, height):
-        """Take the BytesIO object and build an imageTK thumbnail."""
-        image = Image.open(photo)
-        image.thumbnail((width, height))
-        imageTk = ImageTk.PhotoImage(image)
-        return imageTk
-
-    def okFile(self):
-        """ The user pressed the OK button. """
-        self.filename = self.filenameField.get()
-        self.photoDescription = self.descriptionField.get(0.0, END)
-        self.root.destroy()
-
-    def skipFile(self):
-        """ The user pressed the Skip button. """
-        self.skip = True
-        self.root.destroy()
-
-    def run(self):
-        """ Activate the dialog.
-
-        @return: new description, name, and if the image is skipped
-        @rtype: tuple of (unicode, unicode, bool)
-        """
-        self.root.mainloop()
-        return self.photoDescription, self.filename, self.skip
 
 
 def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',

@@ -23,9 +23,7 @@ script_deps = {
     'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
 
-    'flickrripper': ['PIL.ImageTk', 'flickrapi'],
-    # Note: 'PIL' is not available via pip2.7 on MS Windows,
-    #       however it is available with setuptools.
+    'flickrripper': ['flickrapi'],
 
     'states_redirect': ['pycountry'],
 }

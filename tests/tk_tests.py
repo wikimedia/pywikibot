@@ -7,6 +7,7 @@
 #
 __version__ = '$Id$'
 
+
 import os
 import sys
 
@@ -15,15 +16,14 @@ if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') == '1':
         import tkinter as Tkinter
     else:
         import Tkinter
-    from scripts import flickrripper
-    from pywikibot.userinterfaces.gui import EditBoxWindow
+    from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
 import pywikibot
 
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 
-class TestFlickrRipper(TestCase):
+class TestTkdialog(TestCase):
 
     """Test Tkdialog."""
 
@@ -32,12 +32,15 @@ class TestFlickrRipper(TestCase):
     @classmethod
     def setUpClass(cls):
         if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') != '1':
-            raise unittest.SkipTest('FlickrRipper tests are disabled on Travis-CI')
-        super(TestFlickrRipper, cls).setUpClass()
+            raise unittest.SkipTest('Tkdialog tests are disabled on Travis-CI')
+        super(TestTkdialog, cls).setUpClass()
 
     def testTkdialog(self):
-        box = flickrripper.Tkdialog('foo', 'tests/data/MP_sounds.png', 'MP_sounds.png')
-        box.run()
+        try:
+            box = Tkdialog('foo', 'tests/data/MP_sounds.png', 'MP_sounds.png')
+            box.show_dialog()
+        except ImportError as e:
+            pywikibot.warning(e)
 
 
 class TestTkinter(DefaultSiteTestCase):

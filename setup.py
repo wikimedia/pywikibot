@@ -24,7 +24,8 @@ extra_deps = {
     'Yahoo': ['pYsearch'],
     'Google': ['google'],
     'IRC': ['irc'],
-    'mwparserfromhell': ['mwparserfromhell>=0.3.3']
+    'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
+    'Tkinter': ['Pillow']
 }
 
 if sys.version_info[0] == 2:
