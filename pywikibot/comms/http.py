@@ -44,7 +44,6 @@ if StrictVersion(httplib2.__version__) < StrictVersion("0.6.0"):
 
 if sys.version_info[0] > 2:
     from ssl import SSLError as SSLHandshakeError
-    SSL_CERT_VERIFY_FAILED_MSG = "SSL: CERTIFICATE_VERIFY_FAILED"
     import queue as Queue
     import urllib.parse as urlparse
     from http import cookiejar as cookielib
@@ -54,11 +53,6 @@ else:
         from httplib2 import SSLHandshakeError
     elif httplib2.__version__ == '0.6.0':
         from httplib2 import ServerNotFoundError as SSLHandshakeError
-
-    # The OpenSSL error code for
-    #   certificate verify failed
-    # cf. `openssl errstr 14090086`
-    SSL_CERT_VERIFY_FAILED_MSG = ":14090086:"
 
     import Queue
     import urlparse
@@ -73,8 +67,17 @@ from pywikibot.comms import threadedhttp
 from pywikibot.tools import deprecate_arg
 import pywikibot.version
 
-_logger = "comm.http"
+if sys.version_info[:3] >= (2, 7, 9):
+    # Python 2.7.9 includes a backport of the ssl module from Python 3
+    # https://www.python.org/dev/peps/pep-0466/
+    SSL_CERT_VERIFY_FAILED_MSG = "SSL: CERTIFICATE_VERIFY_FAILED"
+else:
+    # The OpenSSL error code for
+    #   certificate verify failed
+    # cf. `openssl errstr 14090086`
+    SSL_CERT_VERIFY_FAILED_MSG = ":14090086:"
 
+_logger = "comm.http"
 
 # global variables
 
