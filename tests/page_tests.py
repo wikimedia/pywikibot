@@ -550,31 +550,6 @@ class TestPageRedirects(TestCase):
         self.assertRaises(pywikibot.exceptions.NoPage, p3.get)
 
 
-class TestCategoryObject(TestCase):
-
-    """Test Category object."""
-
-    family = 'wikipedia'
-    code = 'en'
-
-    cached = True
-
-    def test_isEmptyCategory(self):
-        """Test if category is empty or not."""
-        site = self.get_site()
-        cat_empty = pywikibot.Category(site, u'Category:foooooo')
-        cat_not_empty = pywikibot.Category(site, u'Category:Wikipedia categories')
-        self.assertTrue(cat_empty.isEmptyCategory())
-        self.assertFalse(cat_not_empty.isEmptyCategory())
-
-    def test_isHiddenCategory(self):
-        site = self.get_site()
-        cat_hidden = pywikibot.Category(site, u'Category:Hidden categories')
-        cat_not_hidden = pywikibot.Category(site, u'Category:Wikipedia categories')
-        self.assertTrue(cat_hidden.isHiddenCategory())
-        self.assertFalse(cat_not_hidden.isHiddenCategory())
-
-
 class TestPageUserAction(DefaultSiteTestCase):
 
     """Test page user actions."""
