@@ -45,8 +45,11 @@ from pywikibot.comms import http
 from pywikibot.family import Family
 from pywikibot.site import Namespace
 from pywikibot.exceptions import (
-    AutoblockUser, UserActionRefuse,
-    SiteDefinitionError
+    AutoblockUser,
+    _EmailUserError,
+    NotEmailableError,
+    SiteDefinitionError,
+    UserRightsError,
 )
 from pywikibot.tools import (
     UnicodeMixin, DotReadableDict,
@@ -2789,13 +2792,8 @@ class User(Page):
         return Page(Link(self.title(withNamespace=False) + subpage,
                          self.site, defaultNamespace=3))
 
-    def sendMail(self, subject, text, ccme=False):
+    def send_email(self, subject, text, ccme=False):
         """Send an email to this user via MediaWiki's email interface.
-
-        Return True on success, False otherwise.
-        This method can raise an UserActionRefuse exception in case this user
-        doesn't allow sending email to him or the currently logged in bot
-        doesn't have the right to send emails.
 
         @param subject: the subject header of the mail
         @type subject: unicode
@@ -2803,12 +2801,16 @@ class User(Page):
         @type text: unicode
         @param ccme: if True, sends a copy of this email to the bot
         @type ccme: bool
+        @raises NotEmailableError: the user of this User is not emailable
+        @raises UserRightsError: logged in user does not have 'sendemail' right
+        @return: operation successful indicator
+        @rtype: bool
         """
         if not self.isEmailable():
-            raise UserActionRefuse('This user is not mailable')
+            raise NotEmailableError('%s is not mailable' % self.username)
 
         if not self.site.has_right('sendemail'):
-            raise UserActionRefuse('You don\'t have permission to send mail')
+            raise UserRightsError('You don\'t have permission to send mail')
 
         params = {
             'action': 'emailuser',
@@ -2822,15 +2824,39 @@ class User(Page):
         mailrequest = pywikibot.data.api.Request(site=self.site, **params)
         maildata = mailrequest.submit()
 
-        if 'error' in maildata:
-            code = maildata['error']['code']
-            if code == u'usermaildisabled ':
-                pywikibot.output(u'User mail has been disabled')
-        elif 'emailuser' in maildata:
+        if 'emailuser' in maildata:
             if maildata['emailuser']['result'] == u'Success':
-                pywikibot.output(u'Email sent.')
                 return True
         return False
+
+    @deprecated('send_email')
+    def sendMail(self, subject, text, ccme=False):
+        """Send an email to this user via MediaWiki's email interface.
+
+        Outputs 'Email sent' if the email was sent.
+
+        @param subject: the subject header of the mail
+        @type subject: unicode
+        @param text: mail body
+        @type text: unicode
+        @param ccme: if True, sends a copy of this email to the bot
+        @type ccme: bool
+        @raises _EmailUserError: logged in user does not have 'sendemail' right
+            or the target has disabled receiving emails
+        @return: operation successful indicator
+        @rtype: bool
+        """
+        if not self.isEmailable():
+            raise _EmailUserError('This user is not mailable')
+
+        if not self.site.has_right('sendemail'):
+            raise _EmailUserError('You don\'t have permission to send mail')
+
+        if self.send_email(subject, text, ccme=ccme):
+            pywikibot.output('Email sent.')
+            return True
+        else:
+            return False
 
     def block(self, expiry, reason, anononly=True, nocreate=True,
               autoblock=True, noemail=False, reblock=False):
