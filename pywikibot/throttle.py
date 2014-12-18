@@ -39,6 +39,7 @@ class Throttle(object):
 
     def __init__(self, site, mindelay=None, maxdelay=None, writedelay=None,
                  multiplydelay=True):
+        """Constructor."""
         self.lock = threading.RLock()
         self.mysite = str(site)
         self.ctrlfilename = config.datafilepath('throttle.ctrl')

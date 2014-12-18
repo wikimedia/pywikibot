@@ -576,6 +576,13 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
             return min(x.revid for x in history)
 
     def previousRevision(self):
+        """
+        Return the revision id for the previous revision.
+
+        DEPRECATED: Use previous_revision_id instead.
+
+        @return: long
+        """
         return self.previous_revision_id
 
     def exists(self):
@@ -3276,6 +3283,7 @@ class ItemPage(WikibasePage):
                 }
 
     def getRedirectTarget(self):
+        """Return the redirect target for this page."""
         target = super(ItemPage, self).getRedirectTarget()
         cmodel = target.content_model
         if cmodel != 'wikibase-item':

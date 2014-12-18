@@ -90,6 +90,7 @@ class MediaWikiVersion(Version):
         self.version = tuple(components)
 
     def __str__(self):
+        """Return version number with optional "wmf" suffix."""
         vstring = '.'.join(str(v) for v in self.version)
         if self.wmf_version:
             vstring += 'wmf{0}'.format(self.wmf_version)
@@ -406,6 +407,7 @@ class SelfCallMixin(object):
     """Return self when called."""
 
     def __call__(self):
+        """Do nothing and just return itself."""
         return self
 
 

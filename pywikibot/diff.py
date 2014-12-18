@@ -158,6 +158,7 @@ class Hunk(object):
         return self.b[self.b_rng[0]:self.b_rng[1]]
 
     def __str__(self):
+        """Return the diff as plain text."""
         return u''.join(self.diff_plain_text)
 
     def __repr__(self):
@@ -238,6 +239,7 @@ class PatchManager(object):
         return blocks
 
     def print_hunks(self):
+        """Print the headers and diff texts of all hunks to the output."""
         for hunk in self.hunks:
             pywikibot.output(hunk.header + hunk.diff_text)
 

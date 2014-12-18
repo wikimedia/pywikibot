@@ -23,6 +23,11 @@ import io
 @deprecate_arg("retryCount", None)
 @deprecate_arg("encodeTitle", None)
 def GetData(request, site=None, back_response=False):
+    """
+    Query the server with the given request dict.
+
+    DEPRECATED: Use pywikibot.data.api.Request instead.
+    """
     if site:
         request['site'] = site
 
