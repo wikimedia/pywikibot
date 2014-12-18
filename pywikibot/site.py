@@ -4075,20 +4075,35 @@ class APISite(BaseSite):
         return iugen
 
     def logevents(self, logtype=None, user=None, page=None, namespace=None,
-                  start=None, end=None, reverse=False, step=None, total=None):
+                  start=None, end=None, reverse=False, tag=None,
+                  step=None, total=None):
         """Iterate all log entries.
 
         @param logtype: only iterate entries of this type (see wiki
             documentation for available types, which will include "block",
             "protect", "rights", "delete", "upload", "move", "import",
             "patrol", "merge")
+        @param logtype: basestring
         @param user: only iterate entries that match this user name
+        @type user: basestring
         @param page: only iterate entries affecting this page
+        @type page: Page or basestring
         @param namespace: namespace to retrieve logevents from
         @type namespace: int or Namespace
         @param start: only iterate entries from and after this Timestamp
+        @type start: Timestamp or ISO date string
         @param end: only iterate entries up to and through this Timestamp
+        @type end: Timestamp or ISO date string
         @param reverse: if True, iterate oldest entries first (default: newest)
+        @type reverse: bool
+        @param tag: only iterate entries tagged with this tag
+        @type tag: basestring
+        @param step: request batch size
+        @type step: int
+        @param total: maximum number of events to iterate
+        @type total: int
+        @rtype: iterable
+
         @raises KeyError: the namespace identifier was not resolved
         @raises TypeError: the namespace identifier has an inappropriate
             type such as bool, or an iterable with more than one namespace
@@ -4103,7 +4118,7 @@ class APISite(BaseSite):
         if user is not None:
             legen.request["leuser"] = user
         if page is not None:
-            legen.request["letitle"] = page.title(withSection=False)
+            legen.request["letitle"] = page
         if start is not None:
             legen.request["lestart"] = start
         if end is not None:
@@ -4112,14 +4127,43 @@ class APISite(BaseSite):
             legen.request["ledir"] = "newer"
         if namespace:
             legen.request["lenamespace"] = namespace
+        if tag:
+            # Supported in version 1.16+; earlier sites will cause APIError
+            legen.request['letag'] = tag
+
         return legen
 
     @deprecated('APISite.logevents()')
-    def logpages(self, number=50, mode='', title=None, user=None, repeat=False,
+    @deprecated_args(repeat=None)
+    def logpages(self, number=50, mode=None, title=None, user=None,
                  namespace=[], start=None, end=None, tag=None, newer=False,
                  dump=False, offset=None):
-        # TODO: implement using logevents
-        raise NotImplementedError
+        """
+        Iterate log pages. DEPRECATED.
+
+        When dump is enabled, the raw API dict is returned.
+
+        @rtype: tuple of Page, str, int, str
+        """
+        if offset:
+            assert not start
+            assert isinstance(offset, int)
+            offset = datetime.timedelta(hours=offset)
+            start = pywikibot.Timestamp.utcnow() - offset
+
+        gen = self.logevents(logtype=mode, page=title, tag=tag,
+                             user=user, namespace=namespace,
+                             start=start, end=end, reverse=newer,
+                             total=number)
+
+        for entry in gen:
+            if dump:
+                yield entry.data
+            else:
+                yield (entry.page(),
+                       entry.user(),
+                       int(entry.timestamp().totimestampformat()),
+                       entry.comment())
 
     @deprecated_args(returndict=None, nobots=None, rcshow=None, rcprop=None,
                      rctype='changetype', revision=None, repeat=None,
