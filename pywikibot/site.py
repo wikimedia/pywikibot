@@ -4231,16 +4231,18 @@ class APISite(BaseSite):
         "protectedtitle": LockedNoPage,
         "cascadeprotected": CascadeLockedPage,
     }
+    _ep_text_overrides = set(['appendtext', 'prependtext', 'undo'])
 
     @must_be(group='user')
-    def editpage(self, page, summary, minor=True, notminor=False,
+    def editpage(self, page, summary=None, minor=True, notminor=False,
                  bot=True, recreate=True, createonly=False, nocreate=False,
-                 watch=None):
-        """Submit an edited Page object to be saved to the wiki.
+                 watch=None, **kwargs):
+        """Submit an edit to be saved to the wiki.
 
-        @param page: The Page to be saved; its .text property will be used
+        @param page: The Page to be saved.
+            By default its .text property will be used
             as the new text to be saved to the wiki
-        @param summary: the edit summary (required!)
+        @param summary: the edit summary
         @param minor: if True (default), mark edit as minor
         @param notminor: if True, override account preferences to mark edit
             as non-minor
@@ -4257,18 +4259,53 @@ class APISite(BaseSite):
             * preferences: use the preference settings (default)
             * nochange: don't change the watchlist
         @param bot: if True, mark edit with bot flag
+        @kwarg text: Overrides Page.text
+        @type text: unicode
+        @kwarg section: Edit an existing numbered section or
+            a new section ('new')
+        @type section: int or str
+        @kwarg prependtext: Prepend text. Overrides Page.text
+        @type text: unicode
+        @kwarg appendtext: Append text. Overrides Page.text.
+        @type text: unicode
+        @kwarg undo: Revision id to undo. Overrides Page.text
+        @type undo: int
         @return: True if edit succeeded, False if it failed
-
+        @raises Error: No text to be saved
+        @raises NoPage: recreate is disabled and page does not exist
         """
-        text = page.text
-        if text is None:
-            raise Error("editpage: no text to be saved")
-        try:
-            lastrev = page.latest_revision
-        except NoPage:
-            lastrev = None
-            if not recreate:
-                raise
+        basetimestamp = True
+        text_overrides = self._ep_text_overrides.intersection(kwargs.keys())
+
+        if text_overrides:
+            if 'text' in kwargs:
+                raise ValueError('text can not be used with any of %s'
+                                 % ', '.join(text_overrides))
+            if len(text_overrides) > 1:
+                raise ValueError('Multiple text overrides used: %s'
+                                 % ', '.join(text_overrides))
+            text = None
+            basetimestamp = False
+        elif 'text' in kwargs:
+            text = kwargs.pop('text')
+            if 'section' in kwargs and kwargs['section'] == 'new':
+                basetimestamp = False
+        elif 'section' in kwargs:
+            raise ValueError('text must be used with section')
+        else:
+            text = page.text
+            if text is None:
+                raise Error("editpage: no text to be saved")
+
+        if basetimestamp or not recreate:
+            try:
+                lastrev = page.latest_revision
+                basetimestamp = lastrev.timestamp
+            except NoPage:
+                basetimestamp = False
+                if not recreate:
+                    raise
+
         token = self.tokens['edit']
         if bot is None:
             bot = ("bot" in self.userinfo["rights"])
@@ -4277,10 +4314,11 @@ class APISite(BaseSite):
                       text=text, token=token, summary=summary, bot=bot,
                       recreate=recreate, createonly=createonly,
                       nocreate=nocreate, minor=minor,
-                      notminor=not minor and notminor)
+                      notminor=not minor and notminor,
+                      **kwargs)
 
-        if lastrev is not None:
-            params['basetimestamp'] = lastrev.timestamp
+        if basetimestamp and 'basetimestamp' not in kwargs:
+            params['basetimestamp'] = basetimestamp
 
         watch_items = set(["watch", "unwatch", "preferences", "nochange"])
         if watch in watch_items:

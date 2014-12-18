@@ -60,6 +60,17 @@ class TestGeneralWrite(TestCase):
         self.assertEqual(p.text, ts)
         self.assertTrue(called_back)
 
+    def test_appendtext(self):
+        """Test writing to a page without preloading the .text."""
+        ts = str(time.time())
+        p = pywikibot.Page(self.site, 'User:John Vandenberg/appendtext test')
+        self.assertFalse(hasattr(p, '_text'))
+        p.site.editpage(p, appendtext=ts)
+        self.assertFalse(hasattr(p, '_text'))
+        p = pywikibot.Page(self.site, 'User:John Vandenberg/appendtext test')
+        self.assertTrue(p.text.endswith(ts))
+        self.assertTrue(p.text != ts)
+
 if __name__ == '__main__':
     try:
         unittest.main()
