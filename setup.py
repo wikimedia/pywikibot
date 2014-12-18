@@ -50,7 +50,6 @@ script_deps['flickrripper.py'].append('flickrapi' if sys.version_info[0] > 2
 dependency_links = [
     'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.8-pywikibot1',
     'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
-    'git+https://github.com/jayvdb/parse-crontab.git#egg=crontab',
 ]
 
 if sys.version_info[0] == 2:
