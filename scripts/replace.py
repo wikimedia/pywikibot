@@ -64,8 +64,11 @@ Furthermore, the following command line parameters are supported:
 -fix:XYZ          Perform one of the predefined replacements tasks, which are
                   given in the dictionary 'fixes' defined inside the files
                   fixes.py and user-fixes.py.
-                  The -regex and -nocase argument and given replacements will
-                  be ignored if you use -fix.
+
+-manualinput      Request manual replacements via the command line input even
+                  if replacements are already defined. If this option is set
+                  (or no replacements are defined via -fix or the arguments)
+                  it'll ask for additional replacements at start.
 
 &fixes-help;
 
@@ -692,6 +695,8 @@ def main(*args):
     # Between a regex and another (using -fix) sleep some time (not to waste
     # too much CPU
     sleep = None
+    # Request manual replacements even if replacements are already defined
+    manual_input = False
 
     # Read commandline parameters.
 
@@ -746,6 +751,8 @@ def main(*args):
             edit_summary = arg[9:]
         elif arg.startswith('-allowoverlap'):
             allowoverlap = True
+        elif arg.startswith('-manualinput'):
+            manual_input = True
         else:
             commandline_replacements.append(arg)
 
@@ -753,20 +760,14 @@ def main(*args):
 
     if (len(commandline_replacements) % 2):
         raise pywikibot.Error('require even number of replacements.')
-    if not commandline_replacements:
-        if fixes_set:
-            manual = pywikibot.input_yn('Replacements via -fix: set. Apply '
-                                        'also manual replacements?', default=False)
-        else:
-            manual = True
-        if manual:
-            old = pywikibot.input(u'Please enter the text that should be replaced:')
-            while old:
-                new = pywikibot.input(u'Please enter the new text:')
-                commandline_replacements += [old, new]
-                old = pywikibot.input(
-                    u'Please enter another text that should be replaced,' +
-                    u'\nor press Enter to start:')
+    if not(commandline_replacements or fixes_set) or manual_input:
+        old = pywikibot.input(u'Please enter the text that should be replaced:')
+        while old:
+            new = pywikibot.input(u'Please enter the new text:')
+            commandline_replacements += [old, new]
+            old = pywikibot.input(
+                'Please enter another text that should be replaced,'
+                '\nor press Enter to start:')
 
     single_summary = None
     for i in range(0, len(commandline_replacements), 2):
@@ -789,8 +790,8 @@ def main(*args):
             pywikibot.output('If a summary is defined for the fix, this '
                              'default summary won\'t be applied.')
         edit_summary = pywikibot.input(
-            u'Press Enter to use this automatic message, or enter a ' +
-            u'description of the\nchanges your bot will make:')
+            'Press Enter to use this automatic message, or enter a '
+            'description of the\nchanges your bot will make:')
 
     # Perform one of the predefined actions.
     for fix in fixes_set:
