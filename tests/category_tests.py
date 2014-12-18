@@ -11,7 +11,6 @@ import pywikibot
 import pywikibot.page
 
 from tests.aspects import unittest, TestCase
-from tests.utils import allowed_failure
 
 
 class TestCategoryObject(TestCase):
@@ -100,11 +99,8 @@ class TestCategoryObject(TestCase):
         subcategories_total = list(cat.subcategories(total=2))
         self.assertEqual(len(subcategories_total), 2)
 
-    @allowed_failure
     def test_subcategories_recurse(self):
         """Test the subcategories method with recurse=True."""
-        # FIXME: Broken, some subcategories are missing.
-        # See: T84860
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Wikipedians by gender')
         c1 = pywikibot.Category(site, 'Category:Female Wikipedians')

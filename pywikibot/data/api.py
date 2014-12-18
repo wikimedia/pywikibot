@@ -1483,14 +1483,7 @@ class QueryGenerator(object):
                     % self.__class__.__name__,
                     _logger)
                 return
-            if "query" not in self.data:
-                pywikibot.debug(
-                    u"%s: stopped iteration because 'query' not found in api "
-                    u"response." % self.__class__.__name__,
-                    _logger)
-                pywikibot.debug(unicode(self.data), _logger)
-                return
-            if self.resultkey in self.data["query"]:
+            if 'query' in self.data and self.resultkey in self.data["query"]:
                 resultdata = self.data["query"][self.resultkey]
                 if isinstance(resultdata, dict):
                     pywikibot.debug(u"%s received %s; limit=%s"
@@ -1538,6 +1531,10 @@ class QueryGenerator(object):
                 # self.resultkey in data in last request.submit()
                 previous_result_had_data = True
             else:
+                if 'query' not in self.data:
+                    pywikibot.log("%s: 'query' not found in api response." %
+                                  self.__class__.__name__)
+                    pywikibot.log(unicode(self.data))
                 # if (query-)continue is present, self.resultkey might not have
                 # been fetched yet
                 if self.continue_name not in self.data:
