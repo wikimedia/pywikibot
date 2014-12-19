@@ -2864,12 +2864,12 @@ class APISite(BaseSite):
             (starttime, endtime) = (endtime, starttime)
             (startsort, endsort) = (endsort, startsort)
         if starttime and sortby == "timestamp":
-            cmargs["gcmstart"] = str(starttime)
+            cmargs["gcmstart"] = starttime
         elif starttime:
             raise ValueError("categorymembers: "
                              "invalid combination of 'sortby' and 'starttime'")
         if endtime and sortby == "timestamp":
-            cmargs["gcmend"] = str(endtime)
+            cmargs["gcmend"] = endtime
         elif endtime:
             raise ValueError("categorymembers: "
                              "invalid combination of 'sortby' and 'endtime'")
@@ -2987,9 +2987,9 @@ class APISite(BaseSite):
         if endid:
             rvargs[u"rvendid"] = endid
         if starttime:
-            rvargs[u"rvstart"] = str(starttime)
+            rvargs[u"rvstart"] = starttime
         if endtime:
-            rvargs[u"rvend"] = str(endtime)
+            rvargs[u"rvend"] = endtime
         if user:
             rvargs[u"rvuser"] = user
         elif excludeuser:
@@ -3352,9 +3352,9 @@ class APISite(BaseSite):
                                 step=step, total=total)
         bkgen.request["bkprop"] = "id|user|by|timestamp|expiry|reason|range|flags"
         if starttime:
-            bkgen.request["bkstart"] = str(starttime)
+            bkgen.request["bkstart"] = starttime
         if endtime:
-            bkgen.request["bkend"] = str(endtime)
+            bkgen.request["bkend"] = endtime
         if reverse:
             bkgen.request["bkdir"] = "newer"
         if blockids:
@@ -3429,9 +3429,9 @@ class APISite(BaseSite):
         if page is not None:
             legen.request["letitle"] = page.title(withSection=False)
         if start is not None:
-            legen.request["lestart"] = str(start)
+            legen.request["lestart"] = start
         if end is not None:
-            legen.request["leend"] = str(end)
+            legen.request["leend"] = end
         if reverse:
             legen.request["ledir"] = "newer"
         if namespace:
@@ -3490,9 +3490,9 @@ class APISite(BaseSite):
                                 namespaces=namespaces, step=step,
                                 total=total)
         if start is not None:
-            rcgen.request["rcstart"] = str(start)
+            rcgen.request["rcstart"] = start
         if end is not None:
-            rcgen.request["rcend"] = str(end)
+            rcgen.request["rcend"] = end
         if reverse:
             rcgen.request["rcdir"] = "newer"
         if pagelist:
@@ -3641,9 +3641,9 @@ class APISite(BaseSite):
                                 step=step, total=total)
         # TODO: allow users to ask for "patrol" as well?
         if start is not None:
-            wlgen.request["wlstart"] = str(start)
+            wlgen.request["wlstart"] = start
         if end is not None:
-            wlgen.request["wlend"] = str(end)
+            wlgen.request["wlend"] = end
         if reverse:
             wlgen.request["wldir"] = "newer"
         filters = {'minor': showMinor,
@@ -3710,9 +3710,9 @@ class APISite(BaseSite):
             drgen.request['drprop'] = (drgen.request['drprop'] +
                                        "|content|token")
         if start is not None:
-            drgen.request["drstart"] = str(start)
+            drgen.request["drstart"] = start
         if end is not None:
-            drgen.request["drend"] = str(end)
+            drgen.request["drend"] = end
         if reverse:
             drgen.request["drdir"] = "newer"
         return drgen
@@ -4206,8 +4206,6 @@ class APISite(BaseSite):
                           protections=protectList,
                           reason=reason,
                           **kwargs)
-        if isinstance(expiry, pywikibot.Timestamp):
-            expiry = expiry.toISOformat()
         if expiry:
             req['expiry'] = expiry
         try:
@@ -4325,8 +4323,6 @@ class APISite(BaseSite):
                   autoblock=True, noemail=False, reblock=False):
 
         token = self.tokens['block']
-        if isinstance(expiry, pywikibot.Timestamp):
-            expiry = expiry.toISOformat()
         req = api.Request(site=self, action='block', user=user.username,
                           expiry=expiry, reason=reason, token=token)
         if anononly:

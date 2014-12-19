@@ -21,6 +21,12 @@ class TestTimestamp(TestCase):
 
     net = False
 
+    def test_clone(self):
+        t1 = T.utcnow()
+        t2 = t1.clone()
+        self.assertEqual(t1, t2)
+        self.assertIsInstance(t2, T)
+
     def test_instantiate_from_instance(self):
         """Test passing instance to factory methods works."""
         t1 = T.utcnow()
