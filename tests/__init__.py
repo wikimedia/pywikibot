@@ -73,6 +73,7 @@ library_test_modules = [
     'link',
     'interwiki_link',
     'page',
+    'category',
     'file',
     'edit_failure',
     'timestripper',
