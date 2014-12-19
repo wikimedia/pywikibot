@@ -4396,8 +4396,41 @@ class APISite(BaseSite):
     @must_be(group='sysop')
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
                   autoblock=True, noemail=False, reblock=False):
+        """
+        Block a user for certain amount of time and for a certain reason.
 
+        @param user: The username/IP to be blocked without a namespace.
+        @type user: User
+        @param expiry: The length or date/time when the block expires. If
+            'never', 'infinite', 'indefinite' it never does. If the value is
+            given as a basestring it's parsed by php's strtotime function:
+                http://php.net/manual/en/function.strtotime.php
+            The relative format is described there:
+                http://php.net/manual/en/datetime.formats.relative.php
+            It is recommended to not use a basestring if possible to be
+            independent of the API.
+        @type expiry: Timestamp/datetime (absolute),
+            basestring (relative/absolute) or False ('never')
+        @param reason: The reason for the block.
+        @type reason: basestring
+        @param anononly: Disable anonymous edits for this IP.
+        @type anononly: boolean
+        @param nocreate: Prevent account creation.
+        @type nocreate: boolean
+        @param autoblock: Automatically block the last used IP address and all
+            subsequent IP addresses from which this account logs in.
+        @type autoblock: boolean
+        @param noemail: Prevent user from sending email through the wiki.
+        @type noemail: boolean
+        @param reblock: If the user is already blocked, overwrite the existing
+            block.
+        @type reblock: boolean
+        @return: The data retrieved from the API request.
+        @rtype: dict
+        """
         token = self.tokens['block']
+        if expiry is False:
+            expiry = 'never'
         req = api.Request(site=self, action='block', user=user.username,
                           expiry=expiry, reason=reason, token=token)
         if anononly:
