@@ -43,9 +43,11 @@ class UnicodeMixin(object):
 
     if sys.version_info[0] > 2:
         def __str__(self):
+            """Return the unicode representation as the str representation."""
             return self.__unicode__()
     else:
         def __str__(self):
+            """Return the str representation of the UTF-8 encoded Unicode."""
             return self.__unicode__().encode('utf8')
 
 
@@ -55,21 +57,27 @@ class ComparableMixin(object):
     """Mixin class to allow comparing to other objects which are comparable."""
 
     def __lt__(self, other):
+        """Compare if other is less than self."""
         return other >= self._cmpkey()
 
     def __le__(self, other):
+        """Compare if other is less equals self."""
         return other > self._cmpkey()
 
     def __eq__(self, other):
+        """Compare if other is equal to self."""
         return other == self._cmpkey()
 
     def __ge__(self, other):
+        """Compare if other is greater equals self."""
         return other < self._cmpkey()
 
     def __gt__(self, other):
+        """Compare if other is greater than self."""
         return other <= self._cmpkey()
 
     def __ne__(self, other):
+        """Compare if other is not equal to self."""
         return other != self._cmpkey()
 
 

@@ -100,6 +100,7 @@ class LoginStatus(object):
 
     @classmethod
     def name(cls, search_value):
+        """Return the name of a LoginStatus by it's value."""
         for key, value in cls.__dict__.items():
             if key == key.upper() and value == search_value:
                 return key
@@ -107,9 +108,11 @@ class LoginStatus(object):
                        % search_value)
 
     def __init__(self, state):
+        """Constructor."""
         self.state = state
 
     def __repr__(self):
+        """Return internal representation."""
         return 'LoginStatus(%s)' % (LoginStatus.name(self.state))
 
 
@@ -301,12 +304,15 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         return Namespace._colons(self.id, self.custom_name)
 
     def __int__(self):
+        """Return the namespace id."""
         return self.id
 
     def __index__(self):
+        """Return the namespace id."""
         return self.id
 
     def __hash__(self):
+        """Return the namespace id."""
         return self.id
 
     def __eq__(self, other):
@@ -325,12 +331,15 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         return not self.__eq__(other)
 
     def __mod__(self, other):
+        """Apply modulo on the namespace id."""
         return self.id.__mod__(other)
 
     def __sub__(self, other):
+        """Apply subtraction on the namespace id."""
         return -(other) + self.id
 
     def __add__(self, other):
+        """Apply addition on the namespace id."""
         return other + self.id
 
     def _cmpkey(self):
@@ -560,6 +569,7 @@ class BaseSite(ComparableMixin):
             return self._username[False]
 
     def username(self, sysop=False):
+        """Return the username/sysopname used for the site."""
         return self._username[sysop]
 
     def __getattr__(self, attr):
@@ -853,21 +863,27 @@ class BaseSite(ComparableMixin):
     # namespace shortcuts for backwards-compatibility
 
     def special_namespace(self):
+        """Return local name for the Special: namespace."""
         return self.namespace(-1)
 
     def image_namespace(self):
+        """Return local name for the File namespace."""
         return self.namespace(6)
 
     def mediawiki_namespace(self):
+        """Return local name for the MediaWiki namespace."""
         return self.namespace(8)
 
     def template_namespace(self):
+        """Return local name for the Template namespace."""
         return self.namespace(10)
 
     def category_namespace(self):
+        """Return local name for the Category namespace."""
         return self.namespace(14)
 
     def category_namespaces(self):
+        """Return names for the Category namespace."""
         return self.namespace(14, all=True)
 
     # site-specific formatting preferences
@@ -1300,6 +1316,7 @@ class TokenWallet(object):
     """Container for tokens."""
 
     def __init__(self, site):
+        """Constructor."""
         self.site = site
         self._tokens = {}
         self.failed_cache = set()  # cache unavailable tokens.
@@ -1329,6 +1346,7 @@ class TokenWallet(object):
                     self.failed_cache.add((self.site.user(), key))
 
     def __getitem__(self, key):
+        """Get token value for the given key."""
         assert(self.site.user())
 
         user_tokens = self._tokens.setdefault(self.site.user(), {})
@@ -1357,12 +1375,15 @@ class TokenWallet(object):
                 .format(key, self.site.user(), self.site))
 
     def __contains__(self, key):
+        """Return True if the given token name is cached."""
         return key in self._tokens.setdefault(self.site.user(), {})
 
     def __str__(self):
+        """Return a str representation of the internal tokens dictionary."""
         return self._tokens.__str__()
 
     def __repr__(self):
+        """Return a representation of the internal tokens dictionary."""
         return self._tokens.__repr__()
 
 
@@ -2272,6 +2293,7 @@ class APISite(BaseSite):
         self._update_page(page, query, 'loadcoordinfo')
 
     def loadpageprops(self, page):
+        """Load page props for the given page."""
         title = page.title(withSection=False)
         query = self._generator(api.PropertyGenerator,
                                 type_arg="pageprops",
@@ -3744,6 +3766,11 @@ class APISite(BaseSite):
 
     @deprecated("Site.randompages()")
     def randomredirectpage(self):
+        """
+        DEPRECATED: Use Site.randompages() instead.
+
+        @return: Return a random redirect page
+        """
         return self.randompages(total=1, redirects=True)
 
     def randompages(self, step=None, total=10, namespaces=None,
@@ -4345,7 +4372,14 @@ class APISite(BaseSite):
 
     @must_be(group='sysop')
     def unblockuser(self, user, reason):
+        """
+        Remove the block for the user.
 
+        @param user: The username/IP without a namespace.
+        @type user: User
+        @param reason: Reason for the unblock.
+        @type reason: basestring
+        """
         token = self.tokens['block']
         req = api.Request(site=self, action='unblock', user=user.username,
                           reason=reason, token=token)
@@ -4691,6 +4725,11 @@ class APISite(BaseSite):
     @deprecated("Site().newfiles()")
     @deprecated_args(number=None, repeat=None)
     def newimages(self, *args, **kwargs):
+        """
+        Yield information about newly uploaded files.
+
+        DEPRECATED: Use newfiles() instead.
+        """
         return self.newfiles(*args, **kwargs)
 
     @deprecated_args(number=None, repeat=None)
@@ -4885,6 +4924,10 @@ class APISite(BaseSite):
     @deprecated("Site().unusedfiles()")
     @deprecated_args(number=None, repeat=None)
     def unusedimages(self, *args, **kwargs):
+        """Yield FilePage objects from Special:Unusedimages.
+
+        DEPRECATED: Use L{APISite.unusedfiles} instead.
+        """
         return self.unusedfiles(*args, **kwargs)
 
     @deprecated_args(number=None, repeat=None)
