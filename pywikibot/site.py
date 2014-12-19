@@ -4404,25 +4404,35 @@ class APISite(BaseSite):
         """Backwards-compatible interface to exturlusage()."""
         return self.exturlusage(siteurl, total=limit)
 
-    def getFilesFromAnHash(self, hash_found=None):
-        """Return all images that have the same hash.
-
-        Useful to find duplicates or nowcommons.
-
-        NOTE: it returns also the image itself, if you don't want it, just
-        filter the list returned.
-
-        NOTE 2: it returns the image title WITHOUT the image namespace.
-
-        """
+    def _get_titles_with_hash(self, hash_found=None):
+        """Helper for the deprecated method get(Files|Images)FromAnHash."""
+        # This should be removed with together with get(Files|Images)FromHash
         if hash_found is None:
+            # This makes absolutely NO sense.
+            pywikibot.warning(
+                'The "hash_found" parameter in "getFilesFromAnHash" and '
+                '"getImagesFromAnHash" are not optional.')
             return
         return [image.title(withNamespace=False)
                 for image in self.allimages(sha1=hash_found)]
 
-    @deprecated('Site().getFilesFromAnHash')
+    @deprecated('Site().allimages')
+    def getFilesFromAnHash(self, hash_found=None):
+        """
+        Return all files that have the same hash.
+
+        DEPRECATED: Use L{APISite.allimages} instead using 'sha1'.
+        """
+        return self._get_titles_with_hash(hash_found)
+
+    @deprecated('Site().allimages')
     def getImagesFromAnHash(self, hash_found=None):
-        return self.getFilesFromAnHash(hash_found)
+        """
+        Return all images that have the same hash.
+
+        DEPRECATED: Use L{APISite.allimages} instead using 'sha1'.
+        """
+        return self._get_titles_with_hash(hash_found)
 
     @must_be(group='user')
     def is_uploaddisabled(self):
