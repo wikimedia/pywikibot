@@ -166,6 +166,17 @@ def user_agent_username(username=None):
 
 
 def user_agent(site=None, format_string=None):
+    """
+    Generate the user agent string for a given site and format.
+
+    @param site: The site for which this user agent is intended. May be None.
+    @type site: BaseSite
+    @param format_string: The string to which the values will be added using
+        str.format. Is using config.user_agent_format when it is None.
+    @type format_string: basestring
+    @return: The formatted user agent
+    @rtype: unicode
+    """
     values = USER_AGENT_PRODUCTS.copy()
 
     # This is the Pywikibot revision; also map it to {version} at present.

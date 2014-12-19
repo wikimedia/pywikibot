@@ -20,6 +20,7 @@ from pywikibot.tools import ModuleDeprecationWrapper
 
 def change_category(article, oldCat, newCat, comment=None, sortKey=None,
                     inPlace=True):
+    """Change the category of the article."""
     return article.change_category(oldCat, newCat, comment, sortKey, inPlace)
 
 __all__ = ('Category', 'change_category',)

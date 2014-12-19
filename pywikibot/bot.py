@@ -1133,6 +1133,7 @@ class WikidataBot(Bot):
     """
 
     def __init__(self, **kwargs):
+        """Constructor."""
         super(WikidataBot, self).__init__(**kwargs)
         self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
