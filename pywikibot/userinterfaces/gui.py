@@ -30,6 +30,8 @@ from idlelib import SearchDialog, ReplaceDialog, configDialog
 from idlelib.configHandler import idleConf
 from idlelib.MultiCall import MultiCallCreator
 
+import pywikibot
+
 
 class TextEditor(ScrolledText):
 
@@ -439,3 +441,106 @@ class ListBoxWindow:
         self.listbox.config(height=laenge, width=maxbreite + 2)
         # wait for user to push a button which will destroy (close) the window
         return self.list
+
+
+class Tkdialog:
+
+    """ The dialog window for image info."""
+
+    def __init__(self, photo_description, photo, filename):
+        """Constructor."""
+        self.root = Tkinter.Tk()
+        # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
+        self.root.geometry("%ix%i+10-10" % (pywikibot.config.tkhorsize,
+                                            pywikibot.config.tkvertsize))
+
+        self.root.title(filename)
+        self.photo_description = photo_description
+        self.filename = filename
+        self.photo = photo
+        self.skip = False
+        self.exit = False
+
+        # --Init of the widgets
+        # The image
+        self.image = self.get_image(self.photo, 800, 600)
+        self.image_panel = Tkinter.Label(self.root, image=self.image)
+
+        self.image_panel.image = self.image
+
+        # The filename
+        self.filename_label = Tkinter.Label(self.root, text=u"Suggested filename")
+        self.filename_field = Tkinter.Entry(self.root, width=100)
+        self.filename_field.insert(Tkinter.END, filename)
+
+        # The description
+        self.description_label = Tkinter.Label(self.root,
+                                               text=u"Suggested description")
+        self.description_scrollbar = Tkinter.Scrollbar(self.root,
+                                                       orient=Tkinter.VERTICAL)
+        self.description_field = Tkinter.Text(self.root)
+        self.description_field.insert(Tkinter.END, photo_description)
+        self.description_field.config(state=Tkinter.NORMAL, height=12, width=100,
+                                      padx=0, pady=0, wrap=Tkinter.WORD,
+                                      yscrollcommand=self.description_scrollbar.set)
+        self.description_scrollbar.config(command=self.description_field.yview)
+
+        # The buttons
+        self.ok_button = Tkinter.Button(self.root, text="OK",
+                                        command=self.ok_file)
+        self.skip_button = Tkinter.Button(self.root, text="Skip",
+                                          command=self.skip_file)
+
+        # --Start grid
+
+        # The image
+        self.image_panel.grid(row=0, column=0, rowspan=11, columnspan=4)
+
+        # The buttons
+        self.ok_button.grid(row=11, column=1, rowspan=2)
+        self.skip_button.grid(row=11, column=2, rowspan=2)
+
+        # The filename
+        self.filename_label.grid(row=13, column=0)
+        self.filename_field.grid(row=13, column=1, columnspan=3)
+
+        # The description
+        self.description_label.grid(row=14, column=0)
+        self.description_field.grid(row=14, column=1, columnspan=3)
+        self.description_scrollbar.grid(row=14, column=5)
+
+    def get_image(self, photo, width, height):
+        """Take the BytesIO object and build an imageTK thumbnail."""
+        try:
+            from PIL import Image, ImageTk
+        except ImportError:
+            pywikibot.warning('This script requires ImageTk from the'
+                              'Python Imaging Library (PIL).\n'
+                              'See: https://www.mediawiki.org/wiki/'
+                              'Manual:Pywikibot/flickrripper.py')
+            raise
+
+        image = Image.open(photo)
+        image.thumbnail((width, height))
+        imageTk = ImageTk.PhotoImage(image)
+        return imageTk
+
+    def ok_file(self):
+        """ The user pressed the OK button. """
+        self.filename = self.filename_field.get()
+        self.photo_description = self.description_field.get(0.0, Tkinter.END)
+        self.root.destroy()
+
+    def skip_file(self):
+        """ The user pressed the Skip button. """
+        self.skip = True
+        self.root.destroy()
+
+    def show_dialog(self):
+        """ Activate the dialog.
+
+        @return: new description, name, and if the image is skipped
+        @rtype: tuple of (unicode, unicode, bool)
+        """
+        self.root.mainloop()
+        return self.photo_description, self.filename, self.skip
