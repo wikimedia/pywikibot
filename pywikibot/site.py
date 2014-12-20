@@ -1411,6 +1411,7 @@ class APISite(BaseSite):
                     'centralauth',
                     'delete',
                     'deleteglobalaccount',
+                    'undelete',
                     'edit',
                     'email',
                     'import',
@@ -3657,6 +3658,7 @@ class APISite(BaseSite):
             wlgen.request["wlshow"] = "|".join(wlshow)
         return wlgen
 
+    # TODO: T75370
     def deletedrevs(self, page, start=None, end=None, reverse=None,
                     get_text=False, step=None, total=None):
         """Iterate deleted revisions.
@@ -4114,23 +4116,64 @@ class APISite(BaseSite):
     _dl_errors = {
         "noapiwrite": "API editing not enabled on %(site)s wiki",
         "writeapidenied": "User %(user)s not allowed to edit through the API",
-        "permissiondenied": "User %(user)s not authorized to delete pages on %(site)s wiki.",
+        "permissiondenied": "User %(user)s not authorized to (un)delete "
+                            "pages on %(site)s wiki.",
         "cantdelete": "Could not delete [[%(title)s]]. Maybe it was deleted already.",
+        "cantundelete": "Could not undelete [[%(title)s]]. "
+                        "Revision may not exist or was already undeleted."
     }  # other errors shouldn't occur because of pre-submission checks
 
     @must_be(group='sysop')
-    def deletepage(self, page, summary):
+    @deprecate_arg("summary", "reason")
+    def deletepage(self, page, reason):
         """Delete page from the wiki. Requires appropriate privilege level.
 
         @param page: Page to be deleted.
-        @param summary: Edit summary (required!).
+        @type page: Page
+        @param reason: Deletion reason.
+        @type reason: basestring
 
         """
         token = self.tokens['delete']
         self.lock_page(page)
         req = api.Request(site=self, action="delete", token=token,
                           title=page.title(withSection=False),
-                          reason=summary)
+                          reason=reason)
+        try:
+            req.submit()
+        except api.APIError as err:
+            errdata = {
+                'site': self,
+                'title': page.title(withSection=False),
+                'user': self.user(),
+            }
+            if err.code in self._dl_errors:
+                raise Error(self._dl_errors[err.code] % errdata)
+            pywikibot.debug(u"delete: Unexpected error code '%s' received."
+                            % err.code,
+                            _logger)
+            raise
+        finally:
+            self.unlock_page(page)
+
+    @must_be(group='sysop')
+    @deprecate_arg("summary", "reason")
+    def undelete_page(self, page, reason, revisions=None):
+        """Undelete page from the wiki. Requires appropriate privilege level.
+
+        @param page: Page to be deleted.
+        @type page: Page
+        @param revisions: List of timestamps to restore. If None, restores all revisions.
+        @type revisions: list
+        @param reason: Undeletion reason.
+        @type reason: basestring
+
+        """
+        token = self.tokens['undelete']
+        self.lock_page(page)
+        req = api.Request(site=self, action="undelete", token=token,
+                          title=page.title(withSection=False),
+                          timestamps=revisions, reason=reason)
         try:
             req.submit()
         except api.APIError as err:
