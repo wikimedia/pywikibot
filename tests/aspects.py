@@ -901,7 +901,8 @@ class WikimediaDefaultSiteTestCase(DefaultSiteTestCase, WikimediaSiteTestCase):
                 cls.site: {
                     'family': 'wikipedia',
                     'code': 'en',
-                    'site': cls.site
+                    'site': cls.site,
+                    'hostname': cls.site.hostname(),
                 }
             }
 
