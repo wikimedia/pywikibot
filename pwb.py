@@ -77,7 +77,8 @@ def run_python_file(filename, argv, argvu, package=None):
 
     try:
         source = open(filename).read()
-        exec(compile(source, filename, "exec"), main_mod.__dict__)
+        exec(compile(source, filename, "exec", dont_inherit=True),
+             main_mod.__dict__)
     finally:
         # Restore the old __main__
         sys.modules['__main__'] = old_main_mod
