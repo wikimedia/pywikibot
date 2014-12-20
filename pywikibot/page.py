@@ -1532,10 +1532,8 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                 self.text = template + self.text
                 return self.save(comment=reason)
 
-    # all these DeletedRevisions methods need to be reviewed and harmonized
-    # with the new framework; they do not appear functional
     def loadDeletedRevisions(self, step=None, total=None):
-        """Retrieve all deleted revisions for this Page from Special/Undelete.
+        """Retrieve deleted revisions for this Page.
 
         Stores all revisions' timestamps, dates, editors and comments in
         self._deletedRevs attribute.
@@ -1576,21 +1574,18 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """Mark the revision identified by timestamp for undeletion.
 
         @param undelete: if False, mark the revision to remain deleted.
-
+        @type undelete: bool
         """
         if not hasattr(self, "_deletedRevs"):
             self.loadDeletedRevisions()
         if timestamp not in self._deletedRevs:
-            # TODO: Throw an exception?
-            return
-        self._deletedRevs[timestamp][4] = undelete
-        self._deletedRevsModified = True
+            raise ValueError(u'Timestamp %d is not a deleted revision' % timestamp)
+        self._deletedRevs[timestamp]['marked'] = undelete
 
-    @deprecate_arg("throttle", None)
-    def undelete(self, comment=None):
+    @deprecate_arg('throttle', None)
+    @deprecate_arg('comment', 'reason')
+    def undelete(self, reason=None):
         """Undelete revisions based on the markers set by previous calls.
-
-        NOT IMPLEMENTED.
 
         If no calls have been made since loadDeletedRevisions(), everything
         will be restored.
@@ -1608,11 +1603,17 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                     pg.markDeletedRevision(rev) #mark for undeletion
             pg.undelete('This will restore only selected revisions.')
 
-        @param comment: The undeletion edit summary.
-        @type comment: basestring
+        @param reason: Reason for the action.
+        @type reason: basestring
+
         """
-        # FIXME: Site.undelete needs to be implemented.
-        raise NotImplementedError('Page.undelete is not implemented.')
+        undelete_revs = [ts for ts, rev in self._deletedRevs.items()
+                         if 'marked' in rev and rev['marked']]
+        if reason is None:
+            pywikibot.warning('Not passing a reason for undelete() is deprecated.')
+            pywikibot.output(u'Undeleting %s.' % (self.title(asLink=True)))
+            reason = pywikibot.input(u'Please enter a reason for the undeletion:')
+        self.site.undelete_page(self, reason, undelete_revs)
 
     @deprecate_arg("throttle", None)
     def protect(self, edit=False, move=False, create=None, upload=None,

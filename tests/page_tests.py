@@ -575,6 +575,38 @@ class TestPageUserAction(DefaultSiteTestCase):
         self.assertTrue(rv)
 
 
+class TestPageDelete(TestCase):
+
+    """Test page delete / undelete actions."""
+
+    family = 'test'
+    code = 'test'
+
+    write = True
+    sysop = True
+
+    def test_delete(self):
+        """Test the site.delete and site.undelete method."""
+        site = self.get_site()
+        p = pywikibot.Page(site, u'User:Unicodesnowman/DeleteTest')
+        # Ensure the page exists
+        p.text = 'pywikibot unit test page'
+        p.save('unit test', botflag=True)
+        # Test deletion
+        p.delete(reason='pywikibot unit test', prompt=False, mark=False)
+        self.assertRaises(pywikibot.NoPage, p.get, force=True)
+        # Test undeleting last two revisions
+        del_revs = list(p.loadDeletedRevisions())
+        revid = p.getDeletedRevision(del_revs[-1])[u'revid']
+        p.markDeletedRevision(del_revs[-1])
+        p.markDeletedRevision(del_revs[-2])
+        self.assertRaises(ValueError, p.markDeletedRevision, 123)
+        p.undelete(reason='pywikibot unit test')
+        revs = list(p.getVersionHistory())
+        self.assertEqual(len(revs), 2)
+        self.assertEqual(revs[1].revid, revid)
+
+
 class TestPageProtect(TestCase):
 
     """Test page protect / unprotect actions."""
