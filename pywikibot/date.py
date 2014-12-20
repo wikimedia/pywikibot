@@ -11,6 +11,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import division
 __version__ = '$Id$'
 #
 
@@ -176,7 +177,7 @@ def encNoConv(i):
 
 def encDec0(i):
     # round to the nearest decade, decade starts with a '0'-ending year
-    return (i/10) * 10
+    return (i // 10) * 10
 
 
 def encDec1(i):
@@ -1145,7 +1146,7 @@ formats = {
         'hu': lambda m: multi(m, [
             (lambda v: dh_constVal(v, 1, u'0-s évek'), lambda p: p == 1),
             (lambda v: dh_decAD(v, u'%d-as évek'),
-             lambda p: (p % 100 / 10) in (0, 2, 3, 6, 8)),
+             lambda p: (p % 100 // 10) in (0, 2, 3, 6, 8)),
             (lambda v: dh_decAD(v, u'%d-es évek'), alwaysTrue)]),
         'io': lambda v: dh_decAD(v, u'%da yari'),
 
@@ -1161,18 +1162,18 @@ formats = {
 
         # 1970s => 'Decennium 198' (1971-1980)
         'la': lambda v: dh(v, u'Decennium %d',
-                           lambda i: encDec1(i)/10 + 1,
+                           lambda i: encDec1(i) // 10 + 1,
                            lambda ii: (ii[0]-1) * 10),
 
         # 1970s => 'XX amžiaus 8-as dešimtmetis' (1971-1980)
         'lt': lambda v: dh(v, u'%R amžiaus %d-as dešimtmetis',
-                           lambda i: (encDec1(i)/100 + 1,
-                                      encDec1(i) % 100/10 + 1),
+                           lambda i: (encDec1(i) // 100 + 1,
+                                      encDec1(i) % 100 // 10 + 1),
                            lambda v: (v[0]-1)*100 + (v[1]-1)*10),
 
         # 1970s => 'Ngahurutanga 198' (1971-1980)
         'mi': lambda v: dh(v, u'Ngahurutanga %d',
-                           lambda i: encDec0(i)/10 + 1,
+                           lambda i: encDec0(i) // 10 + 1,
                            lambda ii: (ii[0]-1) * 10),
 
         'mhr': lambda v: dh_decAD(v, u'%d ийла'),
@@ -1194,7 +1195,7 @@ formats = {
                           lambda i: (encDec0(i), encDec0(i) + 9), decSinglVal),
              lambda p: p % 100 >= 0 and p % 100 < 20),
             (lambda v: dh(v, u'Lata %d. %R wieku',
-                          lambda i: (encDec0(i) % 100, encDec0(i)/100 + 1),
+                          lambda i: (encDec0(i) % 100, encDec0(i) // 100 + 1),
                           lambda ii: (ii[1]-1)*100 + ii[0]),
              alwaysTrue)]),
         'pt': lambda v: dh_decAD(v, u'Década de %d'),
@@ -1209,7 +1210,7 @@ formats = {
 
         # 1970 => '70. roky 20. storočia'
         'sk': lambda v: dh(v, u'%d. roky %d. storočia',
-                           lambda i: (encDec0(i) % 100, encDec0(i)/100 + 1),
+                           lambda i: (encDec0(i) % 100, encDec0(i) // 100 + 1),
                            lambda ii: (ii[1]-1) * 100 + ii[0]),
 
         'sl': lambda v: dh_decAD(v, u'%d.'),
@@ -1254,7 +1255,7 @@ formats = {
             (lambda v: dh_constVal(v, 0, u'i. e. 0-s évek'),
              lambda p: p == 0),
             (lambda v: dh_decBC(v, u'i. e. %d-as évek'),
-             lambda p: (p % 100 / 10) in (0, 2, 3, 6, 8)),
+             lambda p: (p % 100 // 10) in (0, 2, 3, 6, 8)),
             (lambda v: dh_decBC(v, u'i. e. %d-es évek'), alwaysTrue)]),
         'it': lambda v: dh_decBC(v, u'Anni %d a.C.'),
         'ka': lambda v: dh_decBC(v, u'ძვ. წ. %d-ები'),
@@ -1518,14 +1519,14 @@ formats = {
         'cs': lambda v: dh_centuryAD(v, u'%d. století'),
         'da': lambda v: dh_centuryAD(v, u'%d. århundrede'),
         'no': lambda v: dh(v, u'%d-tallet',
-                           lambda i: (i-1) * 100, lambda ii: ii[0]/100 + 1),
+                           lambda i: (i-1) * 100, lambda ii: ii[0] // 100 + 1),
     },
 
     'CenturyBC_Cat': {
         'cs': lambda v: dh_centuryBC(v, u'%d. století př. n. l.'),
         'de': lambda v: dh_centuryBC(v, u'Jahr (%d. Jh. v. Chr.)'),
         'no': lambda v: dh(v, u'%d-tallet f.Kr.',
-                           lambda i: (i-1) * 100, lambda ii: ii[0]/100 + 1),
+                           lambda i: (i-1) * 100, lambda ii: ii[0] // 100 + 1),
     },
 
     'MillenniumAD': {

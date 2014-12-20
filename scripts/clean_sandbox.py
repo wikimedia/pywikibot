@@ -45,6 +45,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import division
 __version__ = '$Id$'
 #
 
@@ -253,7 +254,7 @@ class SandboxBot(Bot):
                                 u'Sandbox edited %.1f minutes ago...'
                                 % (edit_delta.seconds / 60.0))
                             pywikibot.output(u'Sleeping for %d minutes.'
-                                             % (delta.seconds / 60))
+                                             % (delta.seconds // 60))
                             time.sleep(delta.seconds)
                             wait = True
                 except pywikibot.EditConflict:
