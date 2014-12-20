@@ -200,7 +200,7 @@ def main(*args):
                         is_p_type = True
             if not is_p_type:
                 if not genFactory.handleArg(arg):
-                    raise ValueError('Unknown parameter "{}"'.format(arg))
+                    raise ValueError('Unknown parameter "{0}"'.format(arg))
                 found = arg.find(':') + 1
                 if found:
                     message_properties.update({'cat': arg[found:],
@@ -212,7 +212,7 @@ def main(*args):
                         message_type = default_summaries[generator_type]
                         if message_type == 'simple' or message_properties:
                             options['summary'] = i18n.twtranslate(
-                                site, 'protect-{}'.format(message_type),
+                                site, 'protect-{0}'.format(message_type),
                                 message_properties)
 
     generator = genFactory.getCombinedGenerator()

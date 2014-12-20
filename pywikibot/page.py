@@ -1645,11 +1645,11 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                 if value is not None:  # empty string is allowed
                     protections[arg_name] = value
                     pywikibot.bot.warning(u'"protections" argument of '
-                                          'protect() replaces "{}".'.format(arg_name))
+                                          'protect() replaces "{0}".'.format(arg_name))
             else:
                 if value:
                     pywikibot.bot.warning(u'"protections" argument of '
-                                          'protect() replaces "{}"; cannot '
+                                          'protect() replaces "{0}"; cannot '
                                           'use both.'.format(arg_name))
 
         # buffer that, because it might get changed
