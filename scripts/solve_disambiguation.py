@@ -626,6 +626,7 @@ class DisambiguationRobot(Bot):
                 try:
                     foundlink = pywikibot.Link(m.group('title'),
                                                disambPage.site)
+                    foundlink.parse()
                 except pywikibot.Error:
                     continue
                 # ignore interwiki links
