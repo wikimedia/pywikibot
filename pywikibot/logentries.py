@@ -25,7 +25,7 @@ class LogDict(dict):
     def __missing__(self, key):
         pywikibot.debug(u"API log entry received:\n" + repr(self),
                         _logger)
-        raise KeyError("Log entry has no '%s' key" % key, key)
+        raise KeyError("Log entry (%s) has no '%s' key" % (self._type, key))
 
 
 class LogEntry(object):
@@ -44,6 +44,7 @@ class LogEntry(object):
         if self._expectedType is not None and self._expectedType != self.type():
             raise Error("Wrong log type! Expecting %s, received %s instead."
                         % (self._expectedType, self.type()))
+        self.data._type = self.type()
 
     def __hash__(self):
         return self.logid()
