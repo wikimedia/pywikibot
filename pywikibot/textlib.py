@@ -379,7 +379,7 @@ def isDisabled(text, index, tags=['*']):
 
 
 def findmarker(text, startwith=u'@@', append=None):
-    # find a string which is not part of text
+    """Find a string which is not part of text."""
     if not append:
         append = u'@'
     mymarker = startwith
@@ -653,8 +653,8 @@ def interwikiFormat(links, insite=None):
     return s
 
 
-# Sort sites according to local interwiki sort logic
 def interwikiSort(sites, insite=None):
+    """Sort sites according to local interwiki sort logic."""
     if not sites:
         return []
     if insite is None:
@@ -1241,19 +1241,24 @@ class tzoneFixedOffset(datetime.tzinfo):
     """
 
     def __init__(self, offset, name):
+        """Constructor."""
         self.__offset = datetime.timedelta(minutes=offset)
         self.__name = name
 
     def utcoffset(self, dt):
+        """Return the offset to UTC."""
         return self.__offset
 
     def tzname(self, dt):
+        """Return the name of the timezone."""
         return self.__name
 
     def dst(self, dt):
+        """Return no daylight savings time."""
         return datetime.timedelta(0)
 
     def __repr__(self):
+        """Return the internal representation of the timezone."""
         return "%s(%s, %s)" % (
             self.__class__.__name__,
             self.__offset.days * 86400 + self.__offset.seconds,
@@ -1266,6 +1271,7 @@ class TimeStripper(object):
     """Find timestamp in page and return it as timezone aware datetime object."""
 
     def __init__(self, site=None):
+        """Constructor."""
         if site is None:
             self.site = pywikibot.Site()
         else:

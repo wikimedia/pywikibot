@@ -46,6 +46,12 @@ class UI:
     """Base for terminal user interfaces."""
 
     def __init__(self):
+        """
+        Initialize the UI.
+
+        This caches the std-streams locally so any attempts to monkey-patch the
+        streams later will not work.
+        """
         self.stdin = sys.stdin
         self.stdout = sys.stdout
         self.stderr = sys.stderr
@@ -98,7 +104,11 @@ class UI:
         root_logger.addHandler(warning_handler)
 
     def printNonColorized(self, text, targetStream):
-        # We add *** after the text as a whole if anything needed to be colorized.
+        """
+        Write the text non colorized to the target stream.
+
+        To each line which contains a color tag a ' ***' is added at the end.
+        """
         lines = text.split('\n')
         for i, line in enumerate(lines):
             if i > 0:
@@ -349,6 +359,7 @@ class UI:
                 u'What is the solution of the CAPTCHA at this url ?')
 
     def argvu(self):
+        """Return the decoded arguments from argv."""
         try:
             return [s.decode(self.encoding) for s in self.argv]
         except AttributeError:  # in python 3, self.argv is unicode and thus cannot be decoded
@@ -393,6 +404,7 @@ class TerminalHandler(logging.Handler):
         self.stream.flush()
 
     def emit(self, record):
+        """Emit the record formatted to the output and return it."""
         text = self.format(record)
         return self.UI.output(text, targetStream=self.stream)
 
@@ -414,9 +426,11 @@ class MaxLevelFilter(logging.Filter):
     """
 
     def __init__(self, level=None):
+        """Constructor."""
         self.level = level
 
     def filter(self, record):
+        """Return true if the level is below or equal to the set level."""
         if self.level:
             return record.levelno <= self.level
         else:

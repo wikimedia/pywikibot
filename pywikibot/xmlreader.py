@@ -52,6 +52,7 @@ class XmlEntry:
     def __init__(self, title, ns, id, text, username, ipedit, timestamp,
                  editRestriction, moveRestriction, revisionid, comment,
                  redirect):
+        """Constructor."""
         # TODO: there are more tags we can read.
         self.title = title
         self.ns = ns
@@ -80,11 +81,13 @@ class XmlParserThread(threading.Thread):
     """
 
     def __init__(self, filename, handler):
+        """Constructor."""
         threading.Thread.__init__(self)
         self.filename = filename
         self.handler = handler
 
     def run(self):
+        """Parse the file in a single thread."""
         xml.sax.parse(self.filename, self.handler)
 
 
@@ -102,6 +105,7 @@ class XmlDump(object):
     """
 
     def __init__(self, filename, allrevisions=False):
+        """Constructor."""
         self.filename = filename
         if allrevisions:
             self._parse = self._parse_all

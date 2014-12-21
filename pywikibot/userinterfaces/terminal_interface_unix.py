@@ -36,6 +36,7 @@ class UnixUI(terminal_interface_base.UI):
     """User interface for unix terminals."""
 
     def printColorized(self, text, targetStream):
+        """Print the text colorized using the Unix colors."""
         totalcount = 0
         for key, value in unixColors.items():
             ckey = '\03{%s}' % key
