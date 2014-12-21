@@ -1331,7 +1331,7 @@ class TokenWallet(object):
             in one request.
         @type all: bool
         """
-        assert(self.site.logged_in())
+        assert(self.site.user())
 
         self._tokens.setdefault(self.site.user(), {}).update(
             self.site.get_tokens(types, all=all))
