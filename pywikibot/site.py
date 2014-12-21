@@ -4198,9 +4198,14 @@ class APISite(BaseSite):
         """
         token = self.tokens['undelete']
         self.lock_page(page)
-        req = api.Request(site=self, action="undelete", token=token,
-                          title=page.title(withSection=False),
-                          timestamps=revisions, reason=reason)
+
+        if revisions is None:
+            req = api.Request(site=self, action='undelete', token=token,
+                              title=page.title(withSection=False), reason=reason)
+        else:
+            req = api.Request(site=self, action='undelete', token=token,
+                              title=page.title(withSection=False),
+                              timestamps=revisions, reason=reason)
         try:
             req.submit()
         except api.APIError as err:

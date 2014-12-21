@@ -1607,8 +1607,11 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         @type reason: basestring
 
         """
-        undelete_revs = [ts for ts, rev in self._deletedRevs.items()
-                         if 'marked' in rev and rev['marked']]
+        if hasattr(self, "_deletedRevs"):
+            undelete_revs = [ts for ts, rev in self._deletedRevs.items()
+                             if 'marked' in rev and rev['marked']]
+        else:
+            undelete_revs = []
         if reason is None:
             pywikibot.warning('Not passing a reason for undelete() is deprecated.')
             pywikibot.output(u'Undeleting %s.' % (self.title(asLink=True)))

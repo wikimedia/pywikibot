@@ -92,6 +92,7 @@ script_test_modules = [
     'script',
     'archivebot',
     'data_ingestion',
+    'deletionbot',
     'cache',
 ]
 

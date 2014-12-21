@@ -64,13 +64,17 @@ class DeletionRobot(Bot):
         self.summary = summary
 
     def treat(self, page):
-        """Delete one page from the generator."""
+        """Process one page from the generator."""
         self.current_page = page
         if self.getOption('undelete'):
-            page.undelete(self.summary)
+            if page.exists():
+                pywikibot.output(u'Skipping: %s already exists.' % page)
+            else:
+                page.undelete(self.summary)
         else:
             if page.exists():
-                page.delete(self.summary, not self.getOption('always'))
+                page.delete(self.summary, not self.getOption('always'),
+                            self.getOption('always'))
             else:
                 pywikibot.output(u'Skipping: %s does not exist.' % page)
 
@@ -95,6 +99,7 @@ def main(*args):
     mysite = pywikibot.Site()
 
     for arg in local_args:
+
         if arg == '-always':
             options['always'] = True
         elif arg.startswith('-summary'):
@@ -115,21 +120,23 @@ def main(*args):
                 pageName = arg[found:]
 
         if not summary:
+            un = 'un' if 'undelete' in options else ''
             if pageName:
                 if arg.startswith('-cat') or arg.startswith('-subcats'):
                     summary = i18n.twtranslate(mysite, 'delete-from-category',
                                                {'page': pageName})
                 elif arg.startswith('-links'):
-                    summary = i18n.twtranslate(mysite, 'delete-linked-pages',
+                    summary = i18n.twtranslate(mysite, un + 'delete-linked-pages',
                                                {'page': pageName})
                 elif arg.startswith('-ref'):
                     summary = i18n.twtranslate(mysite, 'delete-referring-pages',
                                                {'page': pageName})
                 elif arg.startswith('-imageused'):
-                    summary = i18n.twtranslate(mysite, 'delete-images',
+                    summary = i18n.twtranslate(mysite, un + 'delete-images',
                                                {'page': pageName})
             elif arg.startswith('-file'):
-                summary = i18n.twtranslate(mysite, 'delete-from-file')
+                summary = i18n.twtranslate(mysite, un + 'delete-from-file')
+
     generator = genFactory.getCombinedGenerator()
     # We are just deleting pages, so we have no need of using a preloading
     # page generator to actually get the text of those pages.

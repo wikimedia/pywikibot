@@ -1150,9 +1150,9 @@ class SiteSysopTestCase(DefaultSiteTestCase):
                           total=5)
 
 
-class SiteProtectTestCase(DefaultSiteTestCase):
+class TestSiteSysopWrite(TestCase):
 
-    """Test site protect / unprotect using a sysop account."""
+    """Test site sysop methods that require writing."""
 
     family = 'test'
     code = 'test'
@@ -1229,6 +1229,31 @@ class SiteProtectTestCase(DefaultSiteTestCase):
         self.assertRaises(pywikibot.Error, site.protect,
                           protections={'edit': 'anInvalidValue'},
                           page=p1, reason='Pywikibot unit test')
+
+    def test_delete(self):
+        """Test the site.deletepage() and site.undelete_page() methods."""
+        site = self.get_site()
+        p = pywikibot.Page(site, u'User:Unicodesnowman/DeleteTestSite')
+        # Verify state
+        if not p.exists():
+            site.undelete_page(p, 'pywikibot unit tests')
+
+        site.deletepage(p, reason='pywikibot unit tests')
+        self.assertRaises(pywikibot.NoPage, p.get, force=True)
+
+        site.undelete_page(p, 'pywikibot unit tests',
+                           revisions=[u'2014-12-21T06:07:47Z',
+                                      u'2014-12-21T06:07:31Z'])
+
+        revs = list(p.getVersionHistory())
+        self.assertEqual(len(revs), 2)
+        self.assertEqual(revs[0].revid, 219995)
+        self.assertEqual(revs[1].revid, 219994)
+
+        site.deletepage(p, reason='pywikibot unit tests')
+        site.undelete_page(p, 'pywikibot unit tests')
+        revs = list(p.getVersionHistory())
+        self.assertTrue(len(revs) > 2)
 
 
 class SiteUserTestCase2(DefaultSiteTestCase):
