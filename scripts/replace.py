@@ -519,7 +519,7 @@ class ReplaceRobot(Bot):
                 summary_messages.insert(0, self.summary)
             else:
                 default_summary = ', '.join(
-                    u'-{0} +{1}'.format(default_summary)
+                    u'-{0} +{1}'.format(*default_summary)
                     for default_summary in default_summaries)
                 summary_messages.insert(0, i18n.twtranslate(
                     pywikibot.Site(), 'replace-replacing',
