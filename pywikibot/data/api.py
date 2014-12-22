@@ -600,6 +600,24 @@ class Request(MutableMapping):
                 and self.site.family.name in config.available_ssl_project):
             self.site = EnableSSLSiteWrapper(self.site)
 
+    @classmethod
+    def _format_value(cls, value):
+        """
+        Format the MediaWiki API request parameter.
+
+        Converts from Python datatypes to MediaWiki API parameter values.
+
+        Supports:
+         * datetime.datetime
+
+        All other datatypes are converted to string using unicode() on Python 2
+        and str() on Python 3.
+        """
+        if isinstance(value, datetime.datetime):
+            return value.strftime(pywikibot.Timestamp.ISO8601Format)
+        else:
+            return unicode(value)
+
     # implement dict interface
     def __getitem__(self, key):
         return self._params[key]
@@ -609,9 +627,12 @@ class Request(MutableMapping):
 
         @param key: param key
         @type key: basestring
-        @param value: param value
-        @type value: list of unicode, unicode, or str in site encoding
-            Any string type may use a |-separated list
+        @param value: param value(s)
+        @type value: unicode or str in site encoding
+            (string types may be a |-separated list)
+            iterable, where items are converted to unicode
+            with special handling for datetime.datetime to convert it to a
+            string using the ISO 8601 format accepted by the MediaWiki API.
         """
         # Allow site encoded bytes (note: str is a subclass of bytes in py2)
         if isinstance(value, bytes):
@@ -622,11 +643,12 @@ class Request(MutableMapping):
 
         try:
             iter(value)
+            values = value
         except TypeError:
             # convert any non-iterable value into a single-element list
-            value = [unicode(value)]
+            values = [value]
 
-        self._params[key] = value
+        self._params[key] = [self._format_value(item) for item in values]
 
     def __delitem__(self, key):
         del self._params[key]
