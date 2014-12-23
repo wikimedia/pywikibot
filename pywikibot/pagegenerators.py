@@ -759,7 +759,13 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None,
         site = pywikibot.Site()
     for entry in site.logevents(total=total, logtype=logtype,
                                 user=user, namespace=namespace):
-        yield entry.title()
+        try:
+            yield entry.title()
+        except KeyError as e:
+            pywikibot.warning(u'LogeventsPageGenerator: '
+                              u'failed to load page for %r; skipping'
+                              % entry.data)
+            pywikibot.exception(e)
 
 
 @deprecated("LogeventsPageGenerator")
