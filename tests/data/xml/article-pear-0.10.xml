@@ -1,0 +1,318 @@
+<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.10/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mediawiki.org/xml/export-0.10/ http://www.mediawiki.org/xml/export-0.10.xsd" version="0.10" xml:lang="en">
+  <siteinfo>
+    <sitename>Wikipedia</sitename>
+    <dbname>enwiki</dbname>
+    <base>http://en.wikipedia.org/wiki/Main_Page</base>
+    <generator>MediaWiki 1.25wmf12</generator>
+    <case>first-letter</case>
+    <namespaces>
+      <namespace key="-2" case="first-letter">Media</namespace>
+      <namespace key="-1" case="first-letter">Special</namespace>
+      <namespace key="0" case="first-letter" />
+      <namespace key="1" case="first-letter">Talk</namespace>
+      <namespace key="2" case="first-letter">User</namespace>
+      <namespace key="3" case="first-letter">User talk</namespace>
+      <namespace key="4" case="first-letter">Wikipedia</namespace>
+      <namespace key="5" case="first-letter">Wikipedia talk</namespace>
+      <namespace key="6" case="first-letter">File</namespace>
+      <namespace key="7" case="first-letter">File talk</namespace>
+      <namespace key="8" case="first-letter">MediaWiki</namespace>
+      <namespace key="9" case="first-letter">MediaWiki talk</namespace>
+      <namespace key="10" case="first-letter">Template</namespace>
+      <namespace key="11" case="first-letter">Template talk</namespace>
+      <namespace key="12" case="first-letter">Help</namespace>
+      <namespace key="13" case="first-letter">Help talk</namespace>
+      <namespace key="14" case="first-letter">Category</namespace>
+      <namespace key="15" case="first-letter">Category talk</namespace>
+      <namespace key="100" case="first-letter">Portal</namespace>
+      <namespace key="101" case="first-letter">Portal talk</namespace>
+      <namespace key="108" case="first-letter">Book</namespace>
+      <namespace key="109" case="first-letter">Book talk</namespace>
+      <namespace key="118" case="first-letter">Draft</namespace>
+      <namespace key="119" case="first-letter">Draft talk</namespace>
+      <namespace key="446" case="first-letter">Education Program</namespace>
+      <namespace key="447" case="first-letter">Education Program talk</namespace>
+      <namespace key="710" case="first-letter">TimedText</namespace>
+      <namespace key="711" case="first-letter">TimedText talk</namespace>
+      <namespace key="828" case="first-letter">Module</namespace>
+      <namespace key="829" case="first-letter">Module talk</namespace>
+      <namespace key="2600" case="first-letter">Topic</namespace>
+    </namespaces>
+  </siteinfo>
+  <page>
+    <title>Pear</title>
+    <ns>0</ns>
+    <id>24278</id>
+    <revision>
+      <id>638548877</id>
+      <parentid>638548865</parentid>
+      <timestamp>2014-12-17T21:09:18Z</timestamp>
+      <contributor>
+        <username>ClueBot NG</username>
+        <id>13286072</id>
+      </contributor>
+      <minor/>
+      <comment>Reverting possible vandalism by [[Special:Contributions/Cutehammy|Cutehammy]] to version by Riversid. False positive? [[User:ClueBot NG/FalsePositives|Report it]]. Thanks, [[User:ClueBot NG|ClueBot NG]]. (2067875) (Bot)</comment>
+      <model>wikitext</model>
+      <format>text/x-wiki</format>
+      <text xml:space="preserve" bytes="25986">{{Redirect|Pyrus}}
+{{Other uses}}
+{{stack begin}}
+{{Taxobox
+| name = Pears
+| image = Pears.jpg
+| image_caption = [[European Pear]] branch with two pears
+| regnum = [[Plant]]ae
+| unranked_divisio = [[Angiosperms]]
+| unranked_classis = [[Eudicots]]
+| unranked_ordo = [[Rosids]]
+| ordo = [[Rosales]]
+| familia = [[Rosaceae]]
+| subfamilia = [[Amygdaloideae]]&lt;ref name=Potter&gt;{{cite journal | last1 = Potter | first1 = D. ''et al.'' | year = 2007 | title = Phylogeny and classification of Rosaceae | url = | journal = Plant Systematics and Evolution | volume = 266 | issue = 1–2| pages = 5–43 | doi=10.1007/s00606-007-0539-9 | last2 = Eriksson | first2 = T. | last3 = Evans | first3 = R. C. | last4 = Oh | first4 = S. | last5 = Smedmark | first5 = J. E. E. | last6 = Morgan | first6 = D. R. | last7 = Kerr | first7 = M. | last8 = Robertson | first8 = K. R. | last9 = Arsenault | first9 = M. | last10 = Dickinson | first10 = T. A. | last11 = Campbell | first11 = C. S.}} &lt;nowiki&gt;[Referring to the subfamily by the name &quot;Spiraeoideae&quot;]&lt;/nowiki&gt;&lt;/ref&gt;
+| tribus = [[Maleae]]
+| subtribus = [[Malinae]]
+| genus = '''''Pyrus'''''
+| genus_authority = [[Carolus Linnaeus|L.]]
+| subdivision_ranks = [[Species]]
+| subdivision = 
+About 30 species; see text.
+}}
+[[File:Pyrus pyrifolia.jpg|thumb|right|Many varieties, such as the [[Nashi pear]], are not &quot;[[pear-shaped]]&quot;]]
+{{stack end}}
+The '''pear''' is any of several tree and shrub [[species]] of [[genus]] '''''Pyrus''''' {{IPAc-en|ˈ|p|aɪ|r|ə|s}}, in the [[family]] Rosaceae. It is also the name of the [[pome|pomaceous]] fruit of these trees. Several species of pear are valued for their edible fruit, while others are cultivated as ornamental trees. The genus ''Pyrus'' is classified in subtribe [[Pyrinae]] within tribe [[Pyreae]].
+
+==Etymology==
+The English word “pear” is probably from Common West Germanic ''pera'', probably a [[loanword]] of [[Vulgar Latin]] ''pira'', the plural of ''pirum'', akin to Greek ἄπιος ''apios'' (from Mycenaean ''ápisos''),&lt;ref&gt;{{OEtymD|pear}}&lt;/ref&gt; which is of Semitic origin (Aramaic/Syriac &quot;pirâ&quot;, meaning &quot;fruit&quot;, from the verb &quot;pra&quot;, meaning &quot;to beget, multiply, bear fruit&quot;).  The [[Perry (disambiguation)#Places|place name ''Perry'']] can indicate the historical presence of pear trees. The term &quot;pyriform&quot; is sometimes used to describe something which is pear-shaped.
+
+==Description==
+[[File:PearBlossomsCalifornia.jpg|thumb|left|Pear blossoms]]
+
+The pear is [[native plant|native]] to coastal and mildly temperate regions of the Old World, from western Europe and north Africa east right across Asia. It is a medium-sized tree, reaching {{convert|10|–|17|m|ft}} tall, often with a tall, narrow crown; a few species are [[shrub]]by.
+
+The [[leaf|leaves]] are alternately arranged, simple, {{convert|2|–|12|cm|in}} long, glossy green on some species, densely silvery-hairy in some others; leaf shape varies from broad oval to narrow lanceolate. Most pears are [[deciduous]], but one or two species in southeast Asia are [[evergreen]]. Most are cold-hardy, withstanding temperatures between {{convert|−25|C|F}} and {{convert|−40|C|F}} in winter, except for the evergreen species, which only tolerate temperatures down to about {{convert|−15|C|F}}.
+
+The [[flower]]s are white, rarely tinted yellow or pink, {{convert|2|–|4|cm|in}} diameter, and have five petals.&lt;ref name=&quot;pearfruit&quot;&gt;[http://web.archive.org/web/20100916180243/http://bouquetoffruits.com/fruit-facts/pear-facts.html Pear Fruit Facts Page Information]. bouquetoffruits.com&lt;/ref&gt; Like that of the related [[apple]], the pear fruit is a [[pome]], in most wild species {{convert|1|–|4|cm|in}} diameter, but in some cultivated forms up to {{convert|18|cm|in}} long and {{convert|8|cm|in}} broad; the shape varies in most species from oblate or globose, to the classic pyriform  '[[pear shaped|pear-shape]]' of the [[European pear]] with an elongated basal portion and a bulbous end.
+
+The fruit is composed of the receptacle or upper end of the flower-stalk (the so-called [[calyx (botany)|calyx]] tube) greatly dilated. Enclosed within its cellular flesh is the true fruit: five [[cartilaginous]] [[carpels]], known colloquially as the &quot;core&quot;. From the upper rim of the receptacle are given off the five [[sepal]]s{{Vague|now you are talking about the §flower§ again|date=July 2009}}, the five [[petal]]s, and the very numerous [[stamen]]s.
+
+Pears and apples cannot always be distinguished by the form of the fruit; some pears look very much like some apples, e.g. the [[Pyrus pyrifolia|nashi pear]]. One major difference is that the flesh of pear fruit contains [[Sclereids|stone cells]] (also called &quot;grit&quot;).
+
+==History==
+
+The [[Pomology|cultivation]] of the pear in cool [[temperate climate]]s extends to the remotest antiquity, and there is evidence of its use as a food since prehistoric times. Many traces of it have been found in the [[Lake dwelling|Swiss lake-dwelling]]s. The word “pear”, or its equivalent, occurs in all the Celtic languages, while in Slavic and other dialects, differing appellations, still referring to the same thing, are found—a diversity and multiplicity of [[nomenclature]] which led [[Alphonse de Candolle]] to infer a very ancient cultivation of the tree from the shores of the Caspian to those of the Atlantic.
+
+The pear was also cultivated by the Romans, who ate the fruits raw or cooked, just like apples.&lt;ref name=&quot;Toussaint-Samat2009&quot;&gt;{{cite book|author=Toussaint-Samat, Maguelonne |title=A History of Food|url=http://books.google.com/books?id=QmevzbQ0AsIC&amp;pg=PA573|year= 2009|publisher=John Wiley &amp; Sons|isbn=978-1-4443-0514-2|page=573}}&lt;/ref&gt; [[Pliny's Natural History]] recommended stewing them with honey and noted three dozen varieties. The Roman cookbook attributed to [[Apicius]], ''[[De re coquinaria]]'', has a recipe for a spiced, stewed-pear ''patina'', or soufflé.&lt;ref&gt;{{cite book|title=Apicius (with an introd. and an Engl. transl.)|year=2006|publisher=Prospect Books|location=Blackawton, Totnes|isbn=978-1-903018-13-2|page=IV.2.35 |author=Grainger, Sally and Grocock, Christopher}}&lt;/ref&gt;
+
+A certain race of pears, with white down on the [[Epidermis (botany)|under surface]] of their leaves, is supposed to have originated from ''P. nivalis'', and their fruit is chiefly used in France in the manufacture of [[perry]] (see also [[cider]]). Other small-fruited pears, distinguished by their early ripening and apple-like fruit, may be referred to as ''P. cordata'', a species found wild in western France and southwestern England.  Pears have been cultivated in China for approximately 3000 years.
+
+The [[genus]] is thought to have originated in present-day western China in the foothills of the [[Tian Shan]], a mountain range of Central Asia, and to have spread to the north and south along mountain chains, evolving into a diverse group of over 20 widely recognized primary species {{Citation needed|date=December 2009}}.  The enormous number of varieties of the cultivated [[European pear]] (''Pyrus communis'' subsp. ''communis''), are without doubt derived from one or two wild [[subspecies]] (''P. communis'' subsp. ''pyraster'' and ''P. communis'' subsp. ''caucasica''), widely distributed throughout Europe, and sometimes forming part of the natural vegetation of the forests. Court accounts of Henry III of England record pears shipped from La Rochelle-Normande and presented to the King by the Sheriffs of the City of London. The French names of pears grown in English medieval gardens suggest that their reputation, at the least, was French; a favored variety in the accounts was named for Saint Rule or Regul', Bishop of Senlis.&lt;ref name=Cecil&gt;{{cite book|author=Cecil, Evelyn |title=A History of Gardening in England|url=http://books.google.com/books?id=Fk4KTrvZ8nMC|year= 2006|publisher=Kessinger Publishing|isbn=978-1-4286-3680-4|pages=35 ff}}&lt;/ref&gt;
+
+Asian species with medium to large edible fruit include ''P. pyrifolia'', ''P. ussuriensis'', ''P. × bretschneideri'', ''P. × sinkiangensis'', and ''P. pashia.''  Other small-fruited species are frequently used as [[rootstock]]s for the cultivated forms.
+
+===Major recognized taxa===
+[[File:Bradford 9288.JPG|right|thumb|[[Callery Pear]]s in flower]]
+
+{|
+|- valign=top
+|
+*''[[Pyrus amygdaliformis]]''—Almond-leaved pear
+*''[[Pyrus armeniacifolia]]''—Apricot-leaved pear
+*''[[Pyrus boissieriana]]''
+*''[[Pyrus bourgaeana]]''—Iberian pear
+*''[[Pyrus × bretschneideri]]''—Chinese white pear; also classified as a subspecies of ''Pyrus pyrifolia''
+*''[[Callery Pear|Pyrus calleryana]]''—Callery pear
+*''[[Pyrus communis]]'' – European pear
+**''[[Pyrus communis]]'' subsp. ''communis''—European pear (cultivars include [[d'Anjou|Beurre d'Anjou]], [[Williams pear|Bartlett]] and [[Bosc Pear|Beurre Bosc]])
+**''Pyrus communis '' subsp. ''caucasica'' ([[syn.]] ''P. caucasica'')
+**''[[Pyrus pyraster|Pyrus communis subsp. pyraster]]'' — Wild European Pear ([[syn.]] ''(Pyrus pyraster)'')
+*''[[Pyrus cordata]]''—Plymouth pear
+*''[[Pyrus cossonii]]''—Algerian pear
+*''[[Pyrus dimorphophylla]]''
+*''[[Pyrus elaeagrifolia]]''—Oleaster-leaved pear
+*''[[Pyrus fauriei]]''
+*''[[Pyrus gharbiana]]''
+*''[[Pyrus glabra]]''
+*''Pyrus hondoensis''
+*''[[Pyrus koehnei]]''—Evergreen pear of southern China and Taiwan
+*''[[Pyrus korshinskyi]]''
+*''[[Pyrus mamorensis]]''
+*''[[Pyrus nivalis]]''—Snow pear
+*''[[Pyrus pashia]]''—Afghan pear
+*''[[Pyrus ×phaeocarpa]]''
+*''[[Pyrus pseudopashia]]''
+*''[[Pyrus pyrifolia]]''—Nashi pear, ''Sha Li''; tree species native to China, Japan, and Korea, also known as the Asian pear
+*''[[Pyrus regelii]]''
+*''[[Pyrus salicifolia]]''—Willow-leaved pear
+*''[[Pyrus × serrulata]]''
+*''[[Pyrus × sinkiangensis]]''—thought to be an interspecific hybrid between ''P. ''×''bretschneideri'' and ''Pyrus communis''
+*''[[Pyrus syriaca]]''—Syrian pear
+*''[[Pyrus ussuriensis]]''—Siberian pear (also known as the '''Ussurian pear''', '''Harbin pear''', and '''Manchurian pear''')
+*''[[Pyrus xerophila]]''
+|}
+
+==Cultivation==
+[[File:Pear tree in Hamedan Iran.jpg|thumb|Pear tree in [[Hamedan]], [[Iran]]]]
+[[File:204VicarWinkfield.jpg|thumb|Vicar of Winkfield pear, a heritage variety, no longer commonly found, [[British Columbia]], [[Canada]]]]
+
+According to Pear Bureau Northwest, about 3000 known varieties of pears are grown worldwide.&lt;ref&gt;{{cite web|url=http://usapears.com/Recipes%20And%20Lifestyle/Now%20Serving/Pears%20and%20Varieties.aspx |title=Pear Varieties |publisher=Usapears.com |date= |accessdate=2014-08-09}}&lt;/ref&gt;
+The pear is normally propagated by [[grafting]] a selected variety onto a [[rootstock]], which may be of a pear variety or [[quince]].  Quince rootstocks produce smaller trees, which is often desirable in commercial orchards or domestic gardens. For new varieties the flowers can be [[Cross-breeding|cross-bred]] to preserve or combine desirable traits.  The fruit of the pear is produced on spurs, which appear on shoots more than one year old.&lt;ref&gt;RHS Fruit, Harry Baker, ISBN 1 85732 905 8, pp100-101.&lt;/ref&gt;
+
+Three species account for the vast majority of edible fruit production, the [[European pear]] ''Pyrus communis'' subsp. ''communis'' cultivated mainly in Europe and North America, the Chinese white pear (''bai li'') ''Pyrus ×bretschneideri'', and the [[Nashi pear]] ''Pyrus pyrifolia'' (also known as Asian pear or apple pear), both grown mainly in eastern Asia. There are thousands of [[cultivar]]s of these three species.  A species grown in western China, ''P. sinkiangensis'', and ''P. pashia'', grown in southern China and south Asia, are also produced to a lesser degree.
+
+Other species are used as [[rootstock]]s for European and Asian pears and as [[ornamental plant|ornamental trees]]. The Manchurian or Ussurian Pear, ''[[Pyrus ussuriensis]]'' (which produces [[unpalatable|unpalatable fruit]]) has been crossed with ''Pyrus communis'' to breed hardier pear cultivars. The Bradford pear (''[[Pyrus calleryana]]'' 'Bradford') in particular has become widespread in North America, and is used only as an ornamental tree, as well as a blight-resistant rootstock for ''Pyrus communis'' fruit orchards. The Willow-leaved pear (''[[Pyrus salicifolia]]'') is grown for its attractive, slender, densely silvery-hairy leaves.
+
+The following [[cultivars]] have gained the [[Royal Horticultural Society]]'s [[Award of Garden Merit]]:- 
+{|
+|- valign=top
+|
+*'Beth'&lt;ref&gt;{{cite web|url=http://apps.rhs.org.uk/plantselector/plant?plantid=1581 |title=RHS Plant Selector Pyrus communis 'Beth' (D) AGM / RHS Gardening |publisher=Apps.rhs.org.uk |date= |accessdate=2013-03-14}}&lt;/ref&gt;
+*'Concorde'&lt;ref&gt;{{cite web|url=http://apps.rhs.org.uk/plantselector/plant?plantid=1582 |title=RHS Plant Selector Pyrus communis 'Concorde' PBR (D) AGM / RHS Gardening |publisher=Apps.rhs.org.uk |date= |accessdate=2013-03-14}}&lt;/ref&gt;
+*'Conference'&lt;ref&gt;{{cite web|url=http://apps.rhs.org.uk/plantselector/plant?plantid=1583 |title=RHS Plant Selector Pyrus communis 'Conference' (D) AGM / RHS Gardening |publisher=Apps.rhs.org.uk |date= |accessdate=2013-03-14}}&lt;/ref&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+|
+*'Joséphine de Malines'&lt;ref&gt;{{cite web|url=http://apps.rhs.org.uk/plantselector/plant?plantid=5823 |title=RHS Plant Selector Pyrus communis 'Joséphine de Malines' (D) AGM / RHS Gardening |publisher=Apps.rhs.org.uk |date= |accessdate=2013-03-14}}&lt;/ref&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+*'Louise Bonne of Jersey'&lt;ref&gt;{{cite web|url=http://apps.rhs.org.uk/plantselector/plant?plantid=5995 |title=RHS Plant Selector Pyrus communis 'Louise Bonne of Jersey' (D) AGM / RHS Gardening |publisher=Apps.rhs.org.uk |date= |accessdate=2013-03-14}}&lt;/ref&gt;
+*'Onward'&lt;ref&gt;{{cite web|url=http://apps.rhs.org.uk/plantselector/plant?plantid=4517 |title=RHS Plant Selector Pyrus communis 'Onward' (D) AGM / RHS Gardening |publisher=Apps.rhs.org.uk |date= |accessdate=2013-03-14}}&lt;/ref&gt;
+|
+*'Williams' Bon Chrétien'&lt;ref&gt;{{cite web|url=http://apps.rhs.org.uk/plantselector/plant?plantid=1584 |title=RHS Plant Selector Pyrus communis 'Williams' Bon Chrétien' (D/C) AGM / RHS Gardening |publisher=Apps.rhs.org.uk |date= |accessdate=2013-03-14}}&lt;/ref&gt;
+|}
+
+===Harvest===
+Summer and autumn [[cultivar]]s of ''Pyrus communis'', being [[climacteric fruits]], are gathered before they are fully ripe, while they are still green, but snap off when lifted.  In the case of the 'Passe Crassane', long the favored winter pear in France,  the crop is traditionally gathered at three different times: the first a fortnight or more before it is ripe, the second a week or ten days after that, and the third when fully ripe. The first gathering will come into eating last, and thus the season of the fruit may be considerably prolonged.
+
+Nashi pears are allowed to ripen on the tree.
+
+===Diseases and pests===
+{{Main|List of pear diseases|List of Lepidoptera that feed on pear trees}}
+
+==Production==
+[[File:2005pear and quince.svg|300px|thumb|Pear and [[quince]] output in 2005]]
+{| class=&quot;sortable wikitable&quot; style=&quot;float:left;
+|+ Top ten pear producers &lt;br /&gt;(in metric tons)
+!Rank
+!Country
+!2009
+!2010
+!2011
+|-
+| 1 || {{CHN}} || 14,416,430 || 15,231,858 || 15,945,013
+|-
+| 2 || {{ITA}} || 872,368 || 736,646 || 926,542
+|-
+| 3 || {{USA}} || 868,357 || 738,085 || 876,086
+|-
+| 4 || {{ARG}} || 700,000 || 704,242 || 691,270
+|-
+| 5 || {{ESP}} || 463,969 || 476,686 || 502,234
+|-
+| 6 || {{TUR}} || 384,244 || 380,003 || 386,382
+|-
+| 7 || {{ZAF}} || 340,088 || 368,495 || 350,527
+|-
+| 8 || {{NLD}} || 295,000 || 274,000 || 336,000
+|-
+| 9 || {{IND}} || 308,487 || 336,049 || 334,774
+|-
+| 10 || {{JPN}} || 351,500 || 284,900 || 312,800
+|- style=&quot;background:#ccc;&quot;
+| — || ''World'' || 20,888,647 || 22,731,087 || 22,511,100
+|-
+|colspan=5 | ''Source: [[FAO|UN Food &amp; Agriculture Organization]]'' &lt;ref&gt;{{cite web|url=http://faostat.fao.org/site/339/default.aspx|publisher= [[FAO|UN Food &amp; Agriculture Organization]]|title=Production of Pears by countries|year=2011|accessdate=2013-08-26}}&lt;/ref&gt;
+|}
+
+==Storage==
+Pears may be stored at room temperature until ripe.&lt;ref name=cpma&gt;[http://web.archive.org/web/20100225202814/http://www.cpma.ca/en_hea_storage.asp Canadian Produce Marketing Association &gt; Home Storage Guide for Fresh Fruits &amp; Vegetables]. cpma.ca&lt;/ref&gt; Pears are ripe when the flesh around the stem gives to gentle pressure.&lt;ref name=cpma/&gt; Ripe pears are optimally stored refrigerated, uncovered in a single layer, where they have a shelf life of 2 to 3 days.&lt;ref name=cpma/&gt;
+
+==Uses==
+[[File:Pyrus communis gestoofde stoofpeer Gieser Wildeman.jpg|right|thumb|''Gieser Wildeman'' simmered in red wine.]]
+Pears are consumed fresh, canned, as [[juice]], and [[dried fruit|dried]]. The juice can also be used in [[Jelly (fruit preserves)|jellies]] and [[jam]]s, usually in combination with other fruits or berries. Fermented pear juice is called [[perry]] or pear cider.
+
+Pears ripen at room temperature. They will [[ethylene|ripen faster]] if placed next to [[banana]]s in a fruit bowl.&lt;ref&gt;{{cite web |url= http://extension.oregonstate.edu/gardening/pears-can-be-ripened-perfection |title=Pears can be ripened to perfection |work=extension.oregonstate.edu |year=2011 |author= Scott, Judy and Sugar, David  |accessdate=August 30, 2011}}&lt;/ref&gt;  Refrigeration will slow further ripening.  Pear Bureau Northwest offers tips on ripening and judging ripeness: Although the skin on Bartlett pears changes from green to yellow as they ripen, most varieties show little color change as they ripen.  Because pears ripen from the inside out, the best way to judge ripeness is to &quot;Check the Neck&quot;: apply gentle thumb pressure to the neck or stem end of the pear. If it yields to gentle pressure, then the pear is ripe, sweet, and juicy.  If it is firm, leave the pear at room temperature and check the neck daily for ripeness.&lt;ref&gt;{{cite web|url=http://www.usapears.org/Recipes%20And%20Lifestyle/Culinary%20Corner/Produce-Guide.aspx |title=Pear Bureau Northwest |publisher=Usapears.org |date= |accessdate=2013-03-14}}&lt;/ref&gt;
+
+The culinary or cooking pear is green but dry and hard, and only edible after several hours of cooking. Two Dutch cultivars are &quot;Gieser Wildeman&quot; (a sweet variety) and &quot;Saint Remy&quot; (slightly sour).&lt;ref name=&quot;Koene2005&quot;&gt;{{cite book|author=Koene, A. |title=Food Shopper's Guide to Holland: A Comprehensive Review of the Finest Local and International Food Products in the Dutch Marketplace|url=http://books.google.com/books?id=UgieKy9LsBAC&amp;pg=PA79|year= 2005|publisher=Eburon Uitgeverij B.V.|isbn=978-90-5972-092-3|page=79}}&lt;/ref&gt;
+
+Pear [[wood]] is one of the preferred materials in the manufacture of high-quality [[woodwind]] instruments and [[furniture]]. It is also used for wood carving, and as a [[firewood]] to produce aromatic smoke for smoking meat or [[tobacco]]. Pear wood is valued for kitchen spoons, scoops and stirrers, as it does not contaminate food with color, flavor or smell, and resists warping and splintering despite repeated soaking and drying cycles. Lincoln&lt;ref name=&quot;Lincoln, William 1986 pp. 33, 207&quot;&gt;Lincoln, William (1986). ''World Woods in Color''. Fresno, California, USA: Linden Publishing Co. Inc. pp. 33, 207. ISBN 0-941936-20-1.&lt;/ref&gt; describes it as &quot;a fairly tough, very stable wood... (used for) carving... brushbacks, umbrella handles, measuring instruments such as set squares and T-squares... recorders... violin and guitar fingerboards and piano keys... decorative veneering.&quot; Pearwood is the favored wood for architect's rulers because it does not warp.  It is similar to the wood of its relative, the apple tree, ''Pyrus malus'' (also called ''[[Malus domestica]]'') and used for many of the same purposes.&lt;ref name=&quot;Lincoln, William 1986 pp. 33, 207&quot;/&gt;
+
+Pear leaves were smoked in Europe before tobacco was introduced.&lt;ref&gt;[http://info-tabac.noname.fr/histoire-du-tabac.html Info Tabac: histoire du tabac], accessed 3 June 2010. {{fr icon}}&lt;/ref&gt;&lt;ref&gt;Dautzenberg, Bertrand [http://web.archive.org/web/20080208164528/http://tabac-net.aphp.fr/tab-connaitre/tc-article/tc-art-histoire.html Epidémiologie des maladies liées au tabac]. tabac-net.aphp.fr {{fr icon}}&lt;/ref&gt;
+
+==Health benefits==
+
+{{stack begin}}
+{{nutritional value
+| name=Pears, raw
+| image=[[File:Alexander Lucas 10.10.10.jpg|center|thumb|&lt;center&gt;Pear, 'Alexander Lucas'&lt;/center&gt;]]
+| kJ=239
+| protein=0.36 g
+| fat=0.14 g
+| carbs=15.23 g
+| fiber=3.1 g
+| sugars=9.75 g
+| calcium_mg=9
+| iron_mg=0.18
+| magnesium_mg=7
+| phosphorus_mg=12
+| potassium_mg=116
+| sodium_mg=1
+| zinc_mg=0.1
+| manganese_mg=0.048
+| vitC_mg=4.3
+| thiamin_mg=0.012
+| riboflavin_mg=0.026
+| niacin_mg=0.161
+| pantothenic_mg=0.049
+| vitB6_mg=0.029
+| folate_ug=7
+| choline_mg=5.1
+| vitE_mg=0.12
+| vitK_ug=4.4
+| source_usda = 1
+| note=[http://ndb.nal.usda.gov/ndb/search/list?qlookup=09252&amp;format=Full Link to USDA Database entry]
+}}
+{{stack end}}
+
+Pears are a good source of [[dietary fiber]] and a good source of [[vitamin C]]. Most of the vitamin C, as well as the dietary fiber, is contained within the skin of the fruit.&lt;ref&gt;{{cite book|author=Balch, Phyllis A. |title=Prescription for Dietary Wellness|url=http://books.google.com/books?id=Z_kueEFK0f0C&amp;pg=PA67|year=2003|publisher=Penguin|isbn=978-1-58333-147-7|pages=67–}}&lt;/ref&gt;
+
+Pears are less [[allergenic]] than many other fruits, and pear juice is therefore sometimes used as the first juice introduced to infants.&lt;ref&gt;{{cite web |url = http://www.freediets.com/fruits-vegetables/the-wonder-of-pears |title = The wonder of pears |publisher = FreeDiets }}&lt;/ref&gt; However, caution is recommended for all fruit juice consumption by infants, as studies have suggested a link between excessive fruit juice consumption and reduced nutrient intake, as well as a tendency towards obesity.&lt;ref&gt;{{cite book|author=Samour, Patricia Queen; Helm, Kathy King and Lang, Carol E. |title=Handbook of Pediatric Nutrition|url=http://books.google.com/books?id=1j_Tn-iXbMwC&amp;pg=PA89|year=1999|publisher=Jones &amp; Bartlett Learning|isbn=978-0-7637-3305-6|pages=89–}}&lt;/ref&gt; Pears are low in [[salicylates]] and [[benzoic acid|benzoates]], so are recommended in exclusion diets for allergy sufferers.&lt;ref&gt;{{cite journal|url=http://www.sswahs.nsw.gov.au/rpa/allergy/research/excldiet.pdf|title=An Australian exclusion diet|year= 1978|pmid=661687|journal=The Medical Journal of Australia |volume=1|pages=290–292|last1=Gibson|first1=AR|last2=Clancy|first2=RL|issue=5}}&lt;/ref&gt; Along with [[domestic sheep|lamb]] and [[rice]], pears may form part of the strictest exclusion diet for allergy sufferers.&lt;ref&gt;{{cite web|url=http://www.allergy-clinic.co.uk/food_allergy_for_public.htm |title=A Guide to Suspected Food Allergy|work=Surrey Allergy Clinic, UK|author=Morris, A. |year=2008|accessdate=2013-03-14}}&lt;/ref&gt;
+
+Most of the fiber is insoluble, making pears a good laxative.&lt;ref&gt;{{cite web|url=http://www.mayoclinic.com/health/infant-constipation/AN01089 |title=Infant constipation: How is it treated? |publisher=MayoClinic.com |date=2011-05-21 |accessdate=2012-08-17}}&lt;/ref&gt;
+
+==Cultural references==
+
+Pears grow in the sublime [[orchard]] of [[Alcinous]], in ''[[Odyssey]]'' vii: &quot;Therein grow trees, tall and luxuriant, pears and [[pomegranate]]s and [[apple]]-trees with their bright fruit, and sweet [[ficus|fig]]s, and luxuriant [[olive]]s. Of these the fruit perishes not nor fails in [[winter]] or in summer, but lasts throughout the year.&quot;
+
+'A [[Partridge]] in a Pear Tree' is the first gift in [[The Twelve Days of Christmas (song)|&quot;The Twelve Days of Christmas&quot;]] [[cumulative song]], this verse is repeated twelve times in the song.
+
+The pear tree was an object of particular veneration (as was the [[Walnut]]) in the [[Tree worship]] of the [[Nakh peoples]] of the [[North Caucasus]] - see [[Vainakh mythology]] and see also [[Ingushetia]] - the best-known of the Vainakh peoples today being the [[Chechens]] of [[Chechnya]] in the [[Russian Federation]].
+Pear and walnut trees were held to be the sacred abodes of beneficent spirits in pre-Islamic Chechen religion and,for this reason,it was forbidden to fell them.&lt;ref&gt;''The Chechens: A Handbook'' by Jaimoukha,Amjad. Published by Psychology Press 2005. ISBN 978-0-415-32328-4.&lt;/ref&gt;
+
+==See also==
+* [[List of culinary fruits]]
+* [[Pear-shaped]]
+
+==References==
+{{reflist|3}}
+{{EB1911}}
+
+==External links==
+{{Sister project links|wikt=pear|commons=Category:Pears|v=no|s=no|n=no|b=Horticulture/Pyrus|species=Pyrus}}
+{{Cookbook|Pear}}
+* [http://www.calpear.com/recipes/default.aspx California Pear Recipes] – Over one hundred pear recipes from California Pears.
+* [http://www.dpi.nsw.gov.au/agriculture/horticulture/pomes/euro-varieties European pear varieties] – description of Australian commercial pears
+* [http://www.mythencyclopedia.com/Fi-Go/Fruit-in-Mythology.html Fruit in mythology] – Symbolism of pears
+* [http://botany.metalibrary.net/books/bartrum/pearsandplums Handbook of Practical Gardening] – Gardening information on pears.
+* [http://www.hort.purdue.edu/newcrop/pearinhistory.pdf &quot;The Pear in History, Literature, Popular Culture, and Art&quot;]
+* [http://www.pearpanache.com Pear Panache] – a collection of pear recipes for chefs and by chefs
+* [http://www.usapears.org/Recipes%20And%20Lifestyle/Now%20Serving/Recipes.aspx Pear Recipes] – collection of pear recipes from Pear Bureau Northwest
+* [http://www.calpear.com/our-fruit/varieties-availability.aspx Pear Varieties] – Information about pear varieties grown in California.
+* [http://www.uga.edu/fruit/pear.html University of Georgia Pear Page] – History of cultivation and commerce.
+* [http://www.cirrusimage.com/tree_wild_pear.htm Wild Pear, ''Pyrus pyraster''] –  Diagnostic photos, [[Morton Arboretum]] specimens
+* [http://extension.oregonstate.edu/gardening/node/413 When to pick and how to ripen pears to perfection; Oregon State University Extension Service; July 2009]
+{{Pyrus}}
+
+[[Category:Pears| ]]
+[[Category:Flora of Asia]]
+[[Category:Flora of Europe]]
+[[Category:Pyrus| ]]</text>
+      <sha1>1ywwm7o751gkr3fj9l7rqpl0s8o87b1</sha1>
+    </revision>
+  </page>
+</mediawiki>

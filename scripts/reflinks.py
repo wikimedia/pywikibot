@@ -56,8 +56,10 @@ import sys
 import io
 
 import pywikibot
+
 from pywikibot import i18n, pagegenerators, textlib, xmlreader, Bot
-import noreferences
+
+from scripts import noreferences
 
 # TODO: Convert to httlib2
 if sys.version_info[0] > 2:
@@ -186,11 +188,11 @@ class XmlDumpPageGenerator:
 
     """Xml generator that yields pages containing bare references."""
 
-    def __init__(self, xmlFilename, xmlStart, namespaces):
+    def __init__(self, xmlFilename, xmlStart, namespaces, site=None):
         self.xmlStart = xmlStart
         self.namespaces = namespaces
         self.skipping = bool(xmlStart)
-        self.site = pywikibot.Site()
+        self.site = site or pywikibot.Site()
 
         dump = xmlreader.XmlDump(xmlFilename)
         self.parser = dump.parse()
