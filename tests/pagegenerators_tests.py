@@ -349,6 +349,81 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
     """Test pagegenerators.GeneratorFactory."""
 
+    def test_ns(self):
+        gf = pagegenerators.GeneratorFactory()
+        gf.handleArg('-ns:1')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNone(gen)
+
+    def test_allpages_default(self):
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handleArg('-start:!'))
+        gf.handleArg('-limit:10')
+        gf.handleArg('-step:5')
+        gen = gf.getCombinedGenerator()
+        pages = set(gen)
+        self.assertLessEqual(len(pages), 10)
+        for page in pages:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertEqual(page.namespace(), 0)
+
+    def test_allpages_ns(self):
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handleArg('-start:!'))
+        gf.handleArg('-limit:10')
+        gf.handleArg('-ns:1')
+        gen = gf.getCombinedGenerator()
+        pages = set(gen)
+        self.assertLessEqual(len(pages), 10)
+        self.assertPagesInNamespaces(gen, 1)
+
+    def test_regexfilter_default(self):
+        gf = pagegenerators.GeneratorFactory()
+        # Matches titles with the same two or more starting letters
+        self.assertTrue(gf.handleArg('-titleregex:^(.)\\1+'))
+        gf.handleArg('-limit:10')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 10)
+        for page in pages:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertRegex(page.title().lower(), '^(.)\\1+')
+
+    @unittest.expectedFailure
+    def test_regexfilter_ns(self):
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handleArg('-titleregex:.*'))
+        gf.handleArg('-limit:10')
+        gf.handleArg('-ns:1')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        # TODO: Fix RegexFilterPageGenerator to handle namespaces other than 0
+        # Bug: T85389
+        # Below should fail
+        self.assertGreater(len(pages), 0)
+        self.assertLessEqual(len(pages), 10)
+        self.assertPagesInNamespaces(gen, 1)
+
+    def test_prefixing_default(self):
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handleArg('-prefixindex:a'))
+        gf.handleArg('-limit:10')
+        gf.handleArg('-step:5')
+        gen = gf.getCombinedGenerator()
+        pages = set(gen)
+        self.assertLessEqual(len(pages), 10)
+        for page in pages:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertTrue(page.title().lower().startswith('a'))
+
+    def test_prefixing_ns(self):
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-prefixindex:a')
+        gf.handleArg("-limit:10")
+        gen = gf.getCombinedGenerator()
+        self.assertPagesInNamespaces(gen, 1)
+
     def test_newpages_default(self):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-newpages')
