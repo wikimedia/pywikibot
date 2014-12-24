@@ -229,6 +229,10 @@ class TestParamInfo(DefaultSiteTestCase):
 
     def test_new_mode(self):
         site = self.get_site()
+        if MediaWikiVersion(site.version()) < MediaWikiVersion('1.25wmf4'):
+            raise unittest.SkipTest(
+                "version %s doesn't support the new paraminfo api"
+                % site.version())
         pi = api.ParamInfo(site, modules_only_mode=True)
         pi.fetch(['info'])
         self.assertIn('info', pi)
