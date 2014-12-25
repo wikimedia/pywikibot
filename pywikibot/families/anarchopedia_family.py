@@ -4,6 +4,7 @@
 __version__ = '$Id$'
 
 from pywikibot import family
+from pywikibot.tools import deprecated
 
 
 # The Anarchopedia family
@@ -67,6 +68,7 @@ class Family(family.Family):
             'nob': None,
         }
 
+    @deprecated('APISite.version()')
     def version(self, code):
         """Return the version for this family."""
         return "1.14alpha"

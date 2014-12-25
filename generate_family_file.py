@@ -185,6 +185,7 @@ Please do not commit this to the Git repository!
 \"\"\"
 
 from pywikibot import family
+from pywikibot.tools import deprecated
 
 class Family(family.Family):
     def __init__(self):
@@ -210,6 +211,7 @@ class Family(family.Family):
         f.write("        }[code]\n")
         f.write("\n")
 
+        f.write("    @deprecated('APISite.version()')\n")
         f.write("    def version(self, code):\n")
         f.write("        return {\n")
         for w in self.wikis.values():
