@@ -58,6 +58,11 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         self.assertIsInstance(ver[2], basestring)
         self.assertDeprecation()
 
+    def test_getcurrenttime(self):
+        """Test live_version."""
+        self.assertEqual(self.site.getcurrenttime(), self.site.server_time())
+        self.assertDeprecation()
+
     def test_token(self):
         """Test ability to get page tokens."""
         # FIXME: deprecation filename is incorrect
@@ -296,7 +301,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertGreater(len(mysite.mediawiki_messages(['*'])), 10)
         self.assertNotIn('*', mysite.mediawiki_messages(['*']))
 
-        self.assertIsInstance(mysite.getcurrenttime(), pywikibot.Timestamp)
+        self.assertIsInstance(mysite.server_time(), pywikibot.Timestamp)
         ts = mysite.getcurrenttimestamp()
         self.assertIsInstance(ts, basestring)
         self.assertRegex(ts, r'(19|20)\d\d[0-1]\d[0-3]\d[0-2]\d[0-5]\d[0-5]\d')
@@ -1045,7 +1050,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertIn(hit.namespace(), [8, 9, 10])
             for hit in mysite.search("wiki", namespaces=0, total=10,
-                                     getredirects=True):
+                                     get_redirects=True):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertEqual(hit.namespace(), 0)
         except pywikibot.data.api.APIError as e:

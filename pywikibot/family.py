@@ -1355,14 +1355,14 @@ class Family(object):
         """Return the shared Wikibase repository, if any."""
         return (None, None)
 
-    @deprecated("Site.getcurrenttime()")
+    @deprecated("Site.server_time()")
     def server_time(self, code):
         """
-        DEPRECATED, use Site.getcurrenttime() instead.
+        DEPRECATED, use Site.server_time instead.
 
         Return a datetime object representing server time.
         """
-        return pywikibot.Site(code, self).getcurrenttime()
+        return pywikibot.Site(code, self).server_time()
 
     def isPublic(self, code):
         """Check the wiki require logging in before viewing it."""
