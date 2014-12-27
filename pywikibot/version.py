@@ -14,6 +14,7 @@ import os
 import time
 import datetime
 import subprocess
+import codecs
 
 import pywikibot.config2 as config
 
@@ -270,7 +271,7 @@ def getfileversion(filename):
     mtime = None
     fn = os.path.join(_program_dir, filename)
     if os.path.exists(fn):
-        with open(fn, 'r') as f:
+        with codecs.open(fn, 'r', "utf-8") as f:
             for line in f.readlines():
                 if line.find('__version__') == 0:
                     exec(line)
