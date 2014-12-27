@@ -1680,7 +1680,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             frgnSiteDone = False
 
             for siteCode in lclSite.family.languages_by_size:
-                site = pywikibot.Site(siteCode)
+                site = pywikibot.Site(siteCode, lclSite.family)
                 if (not lclSiteDone and site == lclSite) or \
                    (not frgnSiteDone and site != lclSite and site in new):
                     if site == lclSite:

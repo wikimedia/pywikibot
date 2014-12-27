@@ -624,11 +624,15 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
 def interwikiFormat(links, insite=None):
     """Convert interwiki link dict into a wikitext string.
 
-    'links' should be a dict with the Site objects as keys, and Page
-    or Link objects as values.
-
-    Return a unicode string that is formatted for inclusion in insite
-    (defaulting to the current site).
+    @param links: interwiki links to be formatted
+    @type links: dict with the Site objects as keys, and Page
+        or Link objects as values.
+    @param insite: site the interwiki links will be formatted for
+        (defaulting to the current site).
+    @type insite: BaseSite
+    @return: string including wiki links formatted for inclusion
+        in insite
+    @rtype: unicode
     """
     if insite is None:
         insite = pywikibot.Site()
@@ -644,7 +648,8 @@ def interwikiFormat(links, insite=None):
             link = title.replace('[[:', '[[')
             s.append(link)
         except AttributeError:
-            s.append(pywikibot.Site(code=site).linkto(links[site], othersite=insite))
+            s.append(pywikibot.Site(site, insite.family).linkto(
+                links[site], othersite=insite))
     if insite.lang in insite.family.interwiki_on_one_line:
         sep = u' '
     else:
