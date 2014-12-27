@@ -55,11 +55,12 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase):
         ttype = "edit"
         try:
             token = mysite.tokens[ttype]
-        except KeyError:
-            raise unittest.SkipTest(
-                "Testing '%s' token not possible with user on %s"
-                % (ttype, self.site))
-        self.assertEqual(token, mysite.token(mainpage, ttype))
+        except pywikibot.Error as error_msg:
+            self.assertRegex(
+                unicode(error_msg),
+                "Action '[a-z]+' is not allowed for user .* on .* wiki.")
+        else:
+            self.assertEqual(token, mysite.token(mainpage, ttype))
 
 
 class TestBaseSiteProperties(TestCase):
@@ -1369,36 +1370,41 @@ class TestSiteTokens(DefaultSiteTestCase):
         """Restore version."""
         self.mysite.version = self.orig_version
 
-    def _test_tokens(self, version, test_version, in_tested, additional_token):
+    def _test_tokens(self, version, test_version, additional_token):
         if version and self._version < MediaWikiVersion(version):
             raise unittest.SkipTest(
                 u'Site %s version %s is too low for this tests.'
                 % (self.mysite, self._version))
+
         self.mysite.version = lambda: test_version
+
         for ttype in ("edit", "move", additional_token):
+            tokentype = self.mysite.validate_tokens([ttype])
             try:
                 token = self.mysite.tokens[ttype]
             except pywikibot.Error as error_msg:
                 self.assertRegex(
                     unicode(error_msg),
                     "Action '[a-z]+' is not allowed for user .* on .* wiki.")
+                # test __contains__
+                self.assertNotIn(tokentype[0], self.mysite.tokens)
             else:
                 self.assertIsInstance(token, basestring)
                 self.assertEqual(token, self.mysite.tokens[ttype])
-        # test __contains__
-        self.assertIn(in_tested, self.mysite.tokens)
+                # test __contains__
+                self.assertIn(tokentype[0], self.mysite.tokens)
 
     def test_tokens_in_mw_119(self):
         """Test ability to get page tokens."""
-        self._test_tokens(None, '1.19', 'edit', 'delete')
+        self._test_tokens(None, '1.19', 'delete')
 
     def test_tokens_in_mw_120_124wmf18(self):
         """Test ability to get page tokens."""
-        self._test_tokens('1.20', '1.21', 'edit', 'deleteglobalaccount')
+        self._test_tokens('1.20', '1.21', 'deleteglobalaccount')
 
     def test_tokens_in_mw_124wmf19(self):
         """Test ability to get page tokens."""
-        self._test_tokens('1.24wmf19', '1.24wmf20', 'csrf', 'deleteglobalaccount')
+        self._test_tokens('1.24wmf19', '1.24wmf20', 'deleteglobalaccount')
 
     def testInvalidToken(self):
         self.assertRaises(pywikibot.Error, lambda t: self.mysite.tokens[t], "invalidtype")
