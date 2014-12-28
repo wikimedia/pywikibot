@@ -13,7 +13,6 @@ from pywikibot import xmlreader
 
 from tests import _data_dir
 from tests.aspects import unittest, TestCase
-from tests.utils import allowed_failure
 
 _xml_data_dir = os.path.join(_data_dir, 'xml')
 
@@ -90,34 +89,36 @@ class ExportDotTenTestCase(XmlReaderTestCase):
     def test_pair(self):
         entries = self._get_entries('pair-0.10.xml', allrevisions=True)
         self.assertEqual(4, len(entries))
-        self.assertTrue(all(entry.title.endswith(u"Çullu, Agdam")
-                            for entry in entries))
         self.assertTrue(all(entry.username == 'Carlossuarez46'
                             for entry in entries))
         self.assertTrue(all(entry.isredirect is False for entry in entries))
 
-        articles = [entry for entry in entries if entry.ns == "0"]
-        talks = [entry for entry in entries if entry.ns == "1"]
+        articles = entries[0:2]
+        talks = entries[2:4]
 
         self.assertEqual(2, len(articles))
         self.assertTrue(all(entry.id == "19252820" for entry in articles))
+        self.assertTrue(all(entry.title == u"Çullu, Agdam"
+                            for entry in articles))
         self.assertTrue(all(u'Çullu, Quzanlı' in entry.text
                             for entry in articles))
         self.assertEqual(articles[0].text, u'#REDIRECT [[Çullu, Quzanlı]]')
 
         self.assertEqual(2, len(talks))
         self.assertTrue(all(entry.id == "19252824" for entry in talks))
+        self.assertTrue(all(entry.title == u"Talk:Çullu, Agdam"
+                            for entry in talks))
         self.assertEqual(talks[1].text, '{{DisambigProject}}')
         self.assertEqual(talks[1].comment, 'proj')
 
-    @allowed_failure
     def test_edit_summary_decoding(self):
         """Test edit summaries are decoded."""
         entries = self._get_entries('pair-0.10.xml', allrevisions=True)
         articles = [entry for entry in entries if entry.ns == "0"]
 
+        # It does not decode the edit summary
         self.assertEqual(articles[0].comment,
-                         'moved [[Çullu, Agdam]] to [[Çullu, Quzanlı]]: dab')
+                         u'moved [[Çullu, Agdam]] to [[Çullu, Quzanlı]]:&#32;dab')
 
 
 if __name__ == '__main__':

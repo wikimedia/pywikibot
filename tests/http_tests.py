@@ -67,22 +67,6 @@ class HttpTestCase(TestCase):
         self.assertIn('<html lang="mul"', r)
 
 
-class HttpServerProblemTestCase(TestCase):
-
-    """Test HTTP status 502 causes this test class to be skipped."""
-
-    sites = {
-        '502': {
-            'hostname': 'http://getstatuscode.com/502',
-        }
-    }
-
-    def test_502(self):
-        """Test a HTTP 502 response using http://getstatuscode.com/502."""
-        self.fail('The test framework should skip this test.')
-        pass
-
-
 class HttpsCertificateTestCase(TestCase):
 
     """HTTPS certificate test."""

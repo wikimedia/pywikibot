@@ -29,11 +29,11 @@ __version__ = '$Id$'
         UITestCase:
             Not integrated; direct subclass of unittest.TestCase.
 """
-import collections
-import time
-import sys
-import os
 import inspect
+import itertools
+import os
+import sys
+import time
 
 import pywikibot
 
@@ -106,6 +106,56 @@ class TestCaseBase(unittest.TestCase):
         self.assertIn(page.namespace(), namespaces,
                       "%s not in namespace %r" % (page, namespaces))
 
+    def _get_gen_pages(self, gen, count=None, site=None):
+        """
+        Get pages from gen, asserting they are Page from site.
+
+        Iterates at most two greater than count, including the
+        Page after count if it exists, and then a Page with title '...'
+        if additional items are in the iterator.
+
+        @param gen: Page generator
+        @type gen: generator of Page
+        @param count: number of pages to get
+        @type titles: int
+        @param site: Site of expected pages
+        @type site: APISite
+        """
+        original_iter = iter(gen)
+
+        gen = itertools.islice(original_iter, 0, count)
+
+        gen_pages = list(gen)
+
+        try:
+            gen_pages.append(next(original_iter))
+            next(original_iter)
+            if not site:
+                site = gen_pages[0].site
+            gen_pages.append(pywikibot.Page(site, '...'))
+        except StopIteration:
+            pass
+
+        for page in gen_pages:
+            self.assertIsInstance(page, pywikibot.Page)
+            if site:
+                self.assertEqual(page.site, site)
+
+        return gen_pages
+
+    def _get_gen_titles(self, gen, count, site=None):
+        gen_pages = self._get_gen_pages(gen, count, site)
+        gen_titles = [page.title() for page in gen_pages]
+        return gen_titles
+
+    def _get_canonical_titles(self, titles, site=None):
+        if site:
+            titles = [pywikibot.Link(title, site).canonical_title()
+                      for title in titles]
+        elif not isinstance(titles, list):
+            titles = list(titles)
+        return titles
+
     def assertPagesInNamespaces(self, gen, namespaces):
         """
         Assert that generator returns Pages all in namespaces.
@@ -147,42 +197,41 @@ class TestCaseBase(unittest.TestCase):
         else:
             self.assertEqual(set(page_namespaces), namespaces)
 
-    def assertPagelistTitles(self, gen, titles, site=None):
+    def assertPageTitlesEqual(self, gen, titles, site=None):
         """
         Test that pages in gen match expected titles.
 
-        If the expected titles is a tuple, assert that the generator yields
-        pages with the same number and order of titles.
+        Only iterates to the length of titles plus two.
 
         @param gen: Page generator
         @type gen: generator of Page
         @param titles: Expected titles
-        @type titles: tuple or list
+        @type titles: iterator
+        @param site: Site of expected pages
+        @type site: APISite
         """
-        is_tuple = isinstance(titles, tuple)
-        if site:
-            titles = [pywikibot.Link(title, site).canonical_title()
-                      for title in titles]
-            if is_tuple:
-                titles = tuple(titles)
+        titles = self._get_canonical_titles(titles, site)
+        gen_titles = self._get_gen_titles(gen, len(titles), site)
+        self.assertEqual(gen_titles, titles)
 
-        if is_tuple:
-            working_set = collections.deque(titles)
+    def assertPageTitlesCountEqual(self, gen, titles, site=None):
+        """
+        Test that pages in gen match expected titles, regardless of order.
 
-        for page in gen:
-            self.assertIsInstance(page, pywikibot.Page)
-            if site:
-                self.assertEqual(page.site, site)
+        Only iterates to the length of titles plus two.
 
-            title = page.title()
-            self.assertIn(title, titles)
-            if is_tuple:
-                self.assertIn(title, working_set)
-                self.assertEqual(title, working_set[0])
-                working_set.popleft()
+        @param gen: Page generator
+        @type gen: generator of Page
+        @param titles: Expected titles
+        @type titles: iterator
+        @param site: Site of expected pages
+        @type site: APISite
+        """
+        titles = self._get_canonical_titles(titles, site)
+        gen_titles = self._get_gen_titles(gen, len(titles), site)
+        self.assertCountEqual(gen_titles, titles)
 
-        if is_tuple:
-            self.assertEqual(working_set, collections.deque([]))
+    assertPagelistTitles = assertPageTitlesEqual
 
 
 class TestLoggingMixin(TestCaseBase):

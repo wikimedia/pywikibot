@@ -28,7 +28,6 @@ from tests.aspects import (
 )
 from tests.thread_tests import GeneratorIntersectTestCase
 
-
 en_wp_page_titles = (
     # just a bunch of randomly selected titles for English Wikipedia tests
     u"Eastern Sayan",
@@ -116,11 +115,11 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'],
                                                       quantifier='all')
-        self.assertPagelistTitles(gen, ())
+        self.assertPagelistTitles(gen, [])
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['Template', '/meta'],
                                                       quantifier='all')
-        self.assertPagelistTitles(gen, ('Template:Template/Meta'))
+        self.assertPagelistTitles(gen, ('Template:Template/Meta', ))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['template', '/meta'],
                                                       quantifier='any')
