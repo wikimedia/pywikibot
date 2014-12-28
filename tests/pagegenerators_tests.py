@@ -548,21 +548,39 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertRegex(page.title().lower(), '(.)\\1+')
 
-    def test_regexfilter_ns(self):
-        raise unittest.SkipTest('This test takes over 10 minutes due to T85389')
+    def test_regexfilter_ns_after(self):
+        """Bug: T85389: -ns after -titleregex is ignored with a warning."""
         gf = pagegenerators.GeneratorFactory()
         self.assertTrue(gf.handleArg('-titleregex:.*'))
-        gf.handleArg('-limit:10')
         gf.handleArg('-ns:1')
+        gf.handleArg('-limit:10')
         gen = gf.getCombinedGenerator()
-        # The code below takes due to bug T85389
         pages = list(gen)
-        # TODO: Fix RegexFilterPageGenerator to handle namespaces other than 0
-        # Bug: T85389
-        # Below should fail
         self.assertGreater(len(pages), 0)
         self.assertLessEqual(len(pages), 10)
-        self.assertPagesInNamespaces(gen, 1)
+        self.assertPagesInNamespaces(pages, 0)
+
+    def test_regexfilter_ns_first(self):
+        gf = pagegenerators.GeneratorFactory()
+        # Workaround for Bug: T85389
+        # Give -ns before -titleregex (as for -newpages)
+        gf.handleArg('-ns:1')
+        self.assertTrue(gf.handleArg('-titleregex:.*'))
+        gf.handleArg('-limit:10')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        self.assertGreater(len(pages), 0)
+        self.assertLessEqual(len(pages), 10)
+        self.assertPagesInNamespaces(pages, 1)
+
+    def test_regexfilter_two_ns_first(self):
+        gf = pagegenerators.GeneratorFactory()
+        gf.handleArg('-ns:3,1')
+        self.assertRaisesRegex(
+            TypeError,
+            'allpages module does not support multiple namespaces',
+            gf.handleArg,
+            '-titleregex:.*')
 
     def test_prefixing_default(self):
         gf = pagegenerators.GeneratorFactory()
