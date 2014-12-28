@@ -389,13 +389,14 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertRegex(page.title().lower(), '^(.)\\1+')
 
-    @unittest.expectedFailure
     def test_regexfilter_ns(self):
+        raise unittest.SkipTest
         gf = pagegenerators.GeneratorFactory()
         self.assertTrue(gf.handleArg('-titleregex:.*'))
         gf.handleArg('-limit:10')
         gf.handleArg('-ns:1')
         gen = gf.getCombinedGenerator()
+        # The code below takes due to bug T85389
         pages = list(gen)
         # TODO: Fix RegexFilterPageGenerator to handle namespaces other than 0
         # Bug: T85389
