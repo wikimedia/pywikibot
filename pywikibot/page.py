@@ -3610,6 +3610,16 @@ class Claim(Property):
     Claims are standard claims as well as references.
     """
 
+    TARGET_CONVERTER = {
+        'wikibase-item': lambda value, site:
+            ItemPage(site, 'Q' + str(value['numeric-id'])),
+        'commonsMedia': lambda value, site:
+            FilePage(pywikibot.Site('commons', 'commons'), value),
+        'globe-coordinate': pywikibot.Coordinate.fromWikibase,
+        'time': lambda value, site: pywikibot.WbTime.fromWikibase(value),
+        'quantity': lambda value, site: pywikibot.WbQuantity.fromWikibase(value),
+    }
+
     def __init__(self, site, pid, snak=None, hash=None, isReference=False,
                  isQualifier=False, **kwargs):
         """
@@ -3661,19 +3671,9 @@ class Claim(Property):
         claim.snaktype = data['mainsnak']['snaktype']
         if claim.getSnakType() == 'value':
             value = data['mainsnak']['datavalue']['value']
-            if claim.type == 'wikibase-item':
-                claim.target = ItemPage(site, 'Q' + str(value['numeric-id']))
-            elif claim.type == 'commonsMedia':
-                claim.target = FilePage(site.image_repository(), value)
-            elif claim.type == 'globe-coordinate':
-                claim.target = pywikibot.Coordinate.fromWikibase(value, site)
-            elif claim.type == 'time':
-                claim.target = pywikibot.WbTime.fromWikibase(value)
-            elif claim.type == 'quantity':
-                claim.target = pywikibot.WbQuantity.fromWikibase(value)
-            else:
-                # This covers string, url types
-                claim.target = value
+            # The default covers string, url types
+            claim.target = Claim.TARGET_CONVERTER.get(
+                claim.type, lambda value, site: value)(value, site)
         if 'rank' in data:  # References/Qualifiers don't have ranks
             claim.rank = data['rank']
         if 'references' in data:

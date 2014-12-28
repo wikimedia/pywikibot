@@ -346,6 +346,12 @@ class DisconnectedSiteMixin(TestCaseBase):
         config.site_interface = SiteNotPermitted
 
         pywikibot.data.api.Request = tests.utils.DryRequest
+        from tests.utils import DrySite
+        self.old_convert = pywikibot.Claim.TARGET_CONVERTER['commonsMedia']
+        pywikibot.Claim.TARGET_CONVERTER['commonsMedia'] = (
+            lambda value, site: pywikibot.FilePage(
+                pywikibot.Site('commons', 'commons', interface=DrySite),
+                value))
 
         super(DisconnectedSiteMixin, self).setUp()
 
@@ -355,6 +361,7 @@ class DisconnectedSiteMixin(TestCaseBase):
 
         config.site_interface = self.old_config_interface
         pywikibot.data.api.Request = _original_Request
+        pywikibot.Claim.TARGET_CONVERTER['commonsMedia'] = self.old_convert
 
 
 class CacheInfoMixin(TestCaseBase):
