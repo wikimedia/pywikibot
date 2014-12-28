@@ -118,7 +118,7 @@ class FamilyFileGenerator(object):
             print(u' '.join(sorted([wiki[u'prefix'] for wiki in self.langs])))
         except HTTPError as e:
             self.langs = []
-            print (e, "; continuing...")
+            print(e, "; continuing...")
 
         if len([lang for lang in self.langs if lang['url'] == w.iwpath]) == 0:
             self.langs.append({u'language': w.lang,
