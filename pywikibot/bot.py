@@ -1133,7 +1133,17 @@ class WikidataBot(Bot):
     """
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """
+        Constructor of the WikidataBot.
+
+        @kwarg use_from_page: If True (default) it will apply ItemPage.fromPage
+            for every item. If False it assumes that the pages are actually
+            already ItemPage (page in treat will be None). If None it'll use
+            ItemPage.fromPage when the page is not in the site's item
+            namespace.
+        @kwtype use_from_page: bool, None
+        """
+        self.use_from_page = kwargs.pop('use_from_page', True)
         super(WikidataBot, self).__init__(**kwargs)
         self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
@@ -1180,10 +1190,26 @@ class WikidataBot(Bot):
             for page in self.generator:
                 if not page.exists():
                     pywikibot.output('%s doesn\'t exist.' % page)
-                try:
-                    item = pywikibot.ItemPage.fromPage(page)
-                except pywikibot.NoPage:
-                    item = None
+                # FIXME: Hack because 'is_data_repository' doesn't work if
+                #        site is the APISite. See T85483
+                data_site = page.site.data_repository()
+                if (data_site.family == page.site.family and
+                        data_site.code == page.site.code):
+                    is_item = page.namespace() == data_site.item_namespace.id
+                else:
+                    is_item = False
+                if self.use_from_page is not True and is_item:
+                    item = pywikibot.ItemPage(data_site, page.title())
+                    item.get()
+                elif self.use_from_page is False:
+                    pywikibot.error('{0} is not in the item namespace but '
+                                    'must be an item.'.format(page))
+                    continue
+                else:
+                    try:
+                        item = pywikibot.ItemPage.fromPage(page)
+                    except pywikibot.NoPage:
+                        item = None
                 if not item:
                     if not treat_missing_item:
                         pywikibot.output(
