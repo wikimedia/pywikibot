@@ -543,14 +543,16 @@ def main(*args):
             genFactory.handleArg(arg)
 
     if checkcurrent:
+        site = pywikibot.Site()
         primaryCommonscat, commonscatAlternatives = \
             CommonscatBot.getCommonscatTemplate(
-                pywikibot.Site().code)
+                site.code)
         generator = pagegenerators.NamespaceFilterPageGenerator(
             pagegenerators.ReferringPageGenerator(
-                pywikibot.Page(pywikibot.Site(),
-                               u'Template:' + primaryCommonscat),
-                onlyTemplateInclusion=True), ns)
+                pywikibot.Page(site, u'Template:' + primaryCommonscat),
+                onlyTemplateInclusion=True),
+            ns,
+            site)
 
     if not generator:
         generator = genFactory.getCombinedGenerator()

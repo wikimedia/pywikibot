@@ -143,7 +143,7 @@ class TestNamespaceObject(TestCase):
 
         self.assertEqual(a, 0)
         self.assertEqual(a, '')
-        self.assertEqual(a, None)
+        self.assertNotEqual(a, None)
 
         x = Namespace(id=6, custom_name=u'dummy', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'])
@@ -173,6 +173,9 @@ class TestNamespaceObject(TestCase):
         self.assertLess(a, x)
         self.assertGreater(x, a)
         self.assertGreater(z, x)
+
+        self.assertIn(6, [x, y, z])
+        self.assertNotIn(8, [x, y, z])
 
     def testNamespaceNormalizeName(self):
         self.assertEqual(Namespace.normalize_name(u'File'), u'File')
@@ -210,6 +213,63 @@ class TestNamespaceObject(TestCase):
 
         b = eval(repr(a))
         self.assertEqual(a, b)
+
+    def test_resolve(self):
+        namespaces = Namespace.builtin_namespaces(use_image_name=False)
+        main_ns = namespaces[0]
+        file_ns = namespaces[6]
+        special_ns = namespaces[-1]
+
+        self.assertEqual(Namespace.resolve([6]), [file_ns])
+        self.assertEqual(Namespace.resolve(['File']), [file_ns])
+        self.assertEqual(Namespace.resolve(['6']), [file_ns])
+        self.assertEqual(Namespace.resolve([file_ns]), [file_ns])
+
+        self.assertEqual(Namespace.resolve([file_ns, special_ns]),
+                                           [file_ns, special_ns])
+        self.assertEqual(Namespace.resolve([file_ns, file_ns]),
+                                           [file_ns, file_ns])
+
+        self.assertEqual(Namespace.resolve(6), [file_ns])
+        self.assertEqual(Namespace.resolve('File'), [file_ns])
+        self.assertEqual(Namespace.resolve('6'), [file_ns])
+        self.assertEqual(Namespace.resolve(file_ns), [file_ns])
+
+        self.assertEqual(Namespace.resolve(0), [main_ns])
+        self.assertEqual(Namespace.resolve('0'), [main_ns])
+
+        self.assertEqual(Namespace.resolve(-1), [special_ns])
+        self.assertEqual(Namespace.resolve('-1'), [special_ns])
+
+        self.assertEqual(Namespace.resolve('File:'), [file_ns])
+        self.assertEqual(Namespace.resolve(':File'), [file_ns])
+        self.assertEqual(Namespace.resolve(':File:'), [file_ns])
+
+        self.assertEqual(Namespace.resolve('Image:'), [file_ns])
+        self.assertEqual(Namespace.resolve(':Image'), [file_ns])
+        self.assertEqual(Namespace.resolve(':Image:'), [file_ns])
+
+        self.assertRaises(TypeError, Namespace.resolve, [True])
+        self.assertRaises(TypeError, Namespace.resolve, [False])
+        self.assertRaises(TypeError, Namespace.resolve, [None])
+        self.assertRaises(TypeError, Namespace.resolve, True)
+        self.assertRaises(TypeError, Namespace.resolve, False)
+        self.assertRaises(TypeError, Namespace.resolve, None)
+
+        self.assertRaises(KeyError, Namespace.resolve, -10)
+        self.assertRaises(KeyError, Namespace.resolve, '-10')
+        self.assertRaises(KeyError, Namespace.resolve, 'foo')
+        self.assertRaises(KeyError, Namespace.resolve, ['foo'])
+
+        self.assertRaisesRegex(KeyError,
+                               r'Namespace identifier\(s\) not recognised: -10',
+                               Namespace.resolve, [-10, 0])
+        self.assertRaisesRegex(KeyError,
+                               r'Namespace identifier\(s\) not recognised: foo',
+                               Namespace.resolve, [0, 'foo'])
+        self.assertRaisesRegex(KeyError,
+                               r'Namespace identifier\(s\) not recognised: -10,-11',
+                               Namespace.resolve, [-10, 0, -11])
 
 
 if __name__ == '__main__':
