@@ -53,8 +53,12 @@ WikiBaseError: any issue specific to Wikibase.
 #
 __version__ = '$Id$'
 
+import sys
 
 from pywikibot.tools import UnicodeMixin
+
+if sys.version_info[0] > 2:
+    unicode = str
 
 
 class Error(UnicodeMixin, Exception):  # noqa

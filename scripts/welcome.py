@@ -190,6 +190,9 @@ import pywikibot
 from pywikibot import i18n
 from pywikibot import config
 
+if sys.version_info[0] > 2:
+    unicode = str
+
 locale.setlocale(locale.LC_ALL, '')
 
 # Script uses the method i18n.translate() to find the right
@@ -835,8 +838,8 @@ class WelcomeBot(object):
                                           time.gmtime()),
                             locale.getlocale()[1])
                     else:
-                        strfstr = unicode(time.strftime(
-                            u"%d %b %Y %H:%M:%S (UTC)", time.gmtime()))
+                        strfstr = time.strftime(
+                            u"%d %b %Y %H:%M:%S (UTC)", time.gmtime())
                     pywikibot.output(u'Sleeping %d seconds before rerun. %s'
                                      % (globalvar.timeRecur, strfstr))
                     time.sleep(globalvar.timeRecur)

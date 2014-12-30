@@ -123,7 +123,7 @@ def check_protection_level(operation, level, levels, default=None):
                     first_char.append(c)
                     break
             else:
-                first_char.append(unicode(num))
+                first_char.append(str(num))
                 num += 1
             if level == default:
                 default_char = first_char[-1]

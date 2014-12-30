@@ -36,6 +36,7 @@ if sys.version_info[0] > 2:
     from urllib.parse import quote_from_bytes, unquote_to_bytes
     from urllib.request import urlopen
 else:
+    chr = unichr  # noqa
     import htmlentitydefs
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
     from urllib import urlopen
@@ -4512,7 +4513,7 @@ def html2unicode(text, ignore=None):
     entityR = re.compile(
         r'&(?:amp;)?(#(?P<decimal>\d+)|#x(?P<hex>[0-9a-fA-F]+)|(?P<name>[A-Za-z]+));')
     # These characters are Html-illegal, but sadly you *can* find some of
-    # these and converting them to unichr(decimal) is unsuitable
+    # these and converting them to chr(decimal) is unsuitable
     convertIllegalHtmlEntities = {
         128: 8364,  # €
         130: 8218,  # ‚
@@ -4543,7 +4544,7 @@ def html2unicode(text, ignore=None):
         159: 376    # Ÿ
     }
     # ensuring that illegal &#129; &#141; and &#157, which have no known values,
-    # don't get converted to unichr(129), unichr(141) or unichr(157)
+    # don't get converted to chr(129), chr(141) or chr(157)
     ignore = set(ignore) | set([129, 141, 157])
     result = u''
     i = 0
@@ -4568,14 +4569,12 @@ def html2unicode(text, ignore=None):
             except KeyError:
                 pass
             if unicodeCodepoint and unicodeCodepoint not in ignore:
-                if sys.version_info[0] > 2:
-                    result += chr(unicodeCodepoint)
-                elif unicodeCodepoint > sys.maxunicode:
+                if unicodeCodepoint > sys.maxunicode:
                     # solve narrow Python 2 build exception (UTF-16)
                     unicode_literal = lambda n: eval(r"u'\U%08x'" % n)
                     result += unicode_literal(unicodeCodepoint)
                 else:
-                    result += unichr(unicodeCodepoint)
+                    result += chr(unicodeCodepoint)
             else:
                 # Leave the entity unchanged
                 result += text[match.start():match.end()]

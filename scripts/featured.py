@@ -592,7 +592,7 @@ class FeaturedBot(pywikibot.Bot):
                 pywikibot.output(u"(already removed)")
         if changed:
             comment = i18n.twtranslate(tosite, 'featured-' + task,
-                                       {'page': unicode(source)})
+                                       {'page': source})
             try:
                 dest.put(text, comment)
             except pywikibot.LockedPage:
