@@ -35,6 +35,9 @@ from io import StringIO
 
 from tests.utils import unittest
 
+if sys.version_info[0] > 2:
+    unicode = str
+
 if os.name == "nt":
     from multiprocessing.managers import BaseManager
     import threading

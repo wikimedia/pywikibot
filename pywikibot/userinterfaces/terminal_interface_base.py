@@ -189,7 +189,7 @@ class UI:
         if sys.version_info[0] > 2:
             return input()
         else:
-            return raw_input()
+            return raw_input()  # noqa
 
     def input(self, question, password=False):
         """

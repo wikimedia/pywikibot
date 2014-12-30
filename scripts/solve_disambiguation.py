@@ -1004,7 +1004,7 @@ u"Page does not exist, using the first link in page %s."
             self.makeAlternativesUnique()
             # sort possible choices
             if config.sort_ignore_case:
-                self.alternatives.sort(lambda x, y: cmp(x.lower(), y.lower()))
+                self.alternatives.sort(key=lambda x: x.lower())
             else:
                 self.alternatives.sort()
             self.listAlternatives()

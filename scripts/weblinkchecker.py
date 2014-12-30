@@ -114,6 +114,7 @@ if sys.version_info[0] > 2:
     import urllib.request as urllib
     import http.client as httplib
     basestring = (str, )
+    unicode = str
 else:
     import urlparse
     import urllib
@@ -413,7 +414,7 @@ class LinkChecker(object):
             wasRedirected = self.resolveRedirect(useHEAD=useHEAD)
         except UnicodeError as error:
             return False, u'Encoding Error: %s (%s)' % (
-                error.__class__.__name__, unicode(error))
+                error.__class__.__name__, error)
         except httplib.error as error:
             return False, u'HTTP Error: %s' % error.__class__.__name__
         except socket.error as error:

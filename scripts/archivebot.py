@@ -635,7 +635,7 @@ def main(*args):
             for pg in generate_transclusions(site, a, ns):
                 pagelist.append(pg)
         if filename:
-            for pg in file(filename, 'r').readlines():
+            for pg in open(filename, 'r').readlines():
                 pagelist.append(pywikibot.Page(site, pg, ns=10))
         if pagename:
             pagelist.append(pywikibot.Page(site, pagename, ns=3))
