@@ -53,10 +53,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase):
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         ttype = "edit"
-        if ttype not in mysite.tokens:
-            raise unittest.SkipTest(
-                "Action '%s' not allowed for user %s on wiki %s"
-                % (ttype, mysite.user(), mysite))
         try:
             token = mysite.tokens[ttype]
         except KeyError:
@@ -1282,11 +1278,6 @@ class SiteUserTestCase2(DefaultSiteTestCase):
         """Test the site.patrol() method."""
         mysite = self.get_site()
 
-        if 'patrol' not in mysite.tokens:
-            raise unittest.SkipTest(
-                "Action patrol is not allowed for user {0} on wiki {1}"
-                .format(mysite.user(), mysite))
-
         rc = list(mysite.recentchanges(total=1))[0]
 
         # site.patrol() needs params
@@ -1377,14 +1368,7 @@ class TestSiteTokens(DefaultSiteTestCase):
             raise unittest.SkipTest(
                 u'Site %s version %s is too low for this tests.'
                 % (self.mysite, self._version))
-
-        if in_tested not in self.mysite.tokens:
-            raise unittest.SkipTest(
-                'Action %s is not allowed for user %s on wiki %s.'
-                % (in_tested, self.mysite.user(), self.mysite))
-
         self.mysite.version = lambda: test_version
-
         for ttype in ("edit", "move", additional_token):
             try:
                 token = self.mysite.tokens[ttype]
