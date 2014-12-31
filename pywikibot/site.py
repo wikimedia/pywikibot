@@ -3971,7 +3971,8 @@ class APISite(BaseSite):
             to one of "watch", "unwatch", "preferences", "nochange":
             * watch: add the page to the watchlist
             * unwatch: remove the page from the watchlist
-            * preferences: use the preference settings (Default)
+            The following settings are supported by mw >= 1.16 only
+            * preferences: use the preference settings (default)
             * nochange: don't change the watchlist
         @param bot: if True, mark edit with bot flag
         @return: True if edit succeeded, False if it failed
@@ -4007,8 +4008,14 @@ class APISite(BaseSite):
             params['createonly'] = ""
         if nocreate:
             params['nocreate'] = ""
-        if watch in ["watch", "unwatch", "preferences", "nochange"]:
-            params['watchlist'] = watch
+        watch_items = ["watch", "unwatch"]
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion("1.16"):
+            watch_items += ["preferences", "nochange"]
+        if watch in watch_items:
+            if MediaWikiVersion(self.version()) >= MediaWikiVersion("1.16"):
+                params['watchlist'] = watch
+            else:
+                params[watch] = ""
         elif watch:
             pywikibot.warning(
                 u"editpage: Invalid watch value '%(watch)s' ignored."
