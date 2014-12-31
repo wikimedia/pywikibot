@@ -362,6 +362,8 @@ class RedirectGenerator:
                 continue
             except pywikibot.CircularRedirect:
                 continue
+            except pywikibot.InterwikiRedirectPage:
+                continue
 
 
 class RedirectRobot(Bot):
