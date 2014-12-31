@@ -113,14 +113,21 @@ fixes = {
             #   (u'([Ww]eder) ([^,\.]+?), noch', r'\1 \2 noch'),
             #
             # Vorsicht bei Substantiven, z. B. 3-Jähriger!
-            (u'(\d+)(minütig|stündig|tägig|wöchig|jährig|minütlich|stündlich|täglich|wöchentlich|jährlich|fach|mal|malig|köpfig|teilig|gliedrig|geteilt|elementig|dimensional|bändig|eckig|farbig|stimmig)', r'\1-\2'),
+            (u'(\d+)(minütig|stündig|tägig|wöchig|jährig|minütlich|stündlich'
+             u'|täglich|wöchentlich|jährlich|fach|mal|malig|köpfig|teilig'
+             u'|gliedrig|geteilt|elementig|dimensional|bändig|eckig|farbig'
+             u'|stimmig)', r'\1-\2'),
             # zusammengesetztes Wort, Bindestrich wird durchgeschleift
-            (u'(?<!\w)(\d+|\d+[\.,]\d+)(\$|€|DM|£|¥|mg|g|kg|ml|cl|l|t|ms|min|µm|mm|cm|dm|m|km|ha|°C|kB|MB|GB|TB|W|kW|MW|GW|PS|Nm|eV|kcal|mA|mV|kV|Ω|Hz|kHz|MHz|GHz|mol|Pa|Bq|Sv|mSv)([²³]?-[\w\[])',           r'\1-\2\3'),
+            (u'(?<!\w)(\d+|\d+[\.,]\d+)(\$|€|DM|£|¥|mg|g|kg|ml|cl|l|t|ms|min'
+             u'|µm|mm|cm|dm|m|km|ha|°C|kB|MB|GB|TB|W|kW|MW|GW|PS|Nm|eV|kcal'
+             u'|mA|mV|kV|Ω|Hz|kHz|MHz|GHz|mol|Pa|Bq|Sv|mSv)([²³]?-[\w\[])', r'\1-\2\3'),
             # Größenangabe ohne Leerzeichen vor Einheit
             # weggelassen wegen vieler falsch Positiver: s, A, V, C, S, J, %
-            (u'(?<!\w)(\d+|\d+[\.,]\d+)(\$|€|DM|£|¥|mg|g|kg|ml|cl|l|t|ms|min|µm|mm|cm|dm|m|km|ha|°C|kB|MB|GB|TB|W|kW|MW|GW|PS|Nm|eV|kcal|mA|mV|kV|Ω|Hz|kHz|MHz|GHz|mol|Pa|Bq|Sv|mSv)(?=\W|²|³|$)',          r'\1 \2'),
+            (u'(?<!\w)(\d+|\d+[\.,]\d+)(\$|€|DM|£|¥|mg|g|kg|ml|cl|l|t|ms|min'
+             u'|µm|mm|cm|dm|m|km|ha|°C|kB|MB|GB|TB|W|kW|MW|GW|PS|Nm|eV|kcal'
+             u'|mA|mV|kV|Ω|Hz|kHz|MHz|GHz|mol|Pa|Bq|Sv|mSv)(?=\W|²|³|$)', r'\1 \2'),
             # Temperaturangabe mit falsch gesetztem Leerzeichen
-            (u'(?<!\w)(\d+|\d+[\.,]\d+)° C(?=\W|²|³|$)',          r'\1' + u' °C'),
+            (u'(?<!\w)(\d+|\d+[\.,]\d+)° C(?=\W|²|³|$)', r'\1' + u' °C'),
             # Kein Leerzeichen nach Komma
             (u'([a-zäöüß](\]\])?,)((\[\[)?[a-zäöüA-ZÄÖÜ])',                                                                          r'\1 \3'),
             # Leerzeichen und Komma vertauscht
@@ -430,10 +437,15 @@ fixes = {
             # and copying back the results.
 
             # ur'ISBN (978|979) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d)(?!\d)'
-            (u'ISBN (978|979) *[\\- \u2212\\.\u2010-\u2015] *(\\d+) *[\\- \u2212\\.\u2010-\u2015] *(\\d+) *[\\- \u2212\\.\u2010-\u2015] *(\\d+) *[\\- \u2212\\.\u2010-\u2015] *(\\d)(?!\\d)', r'ISBN \1-\2-\3-\4-\5'),  # ISBN-13
+            (u'ISBN (978|979) *[\\- \u2212\\.\u2010-\u2015] *(\\d+) *[\\- '
+             u'\u2212\\.\u2010-\u2015] *(\\d+) *[\\- \u2212\\.\u2010-\u2015] '
+             u'*(\\d+) *[\\- \u2212\\.\u2010-\u2015] *(\\d)(?!\\d)',
+             r'ISBN \1-\2-\3-\4-\5'),  # ISBN-13
 
             # ur'ISBN (\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d+) *[\- −\.‐-―] *(\d|X|x)(?!\d)'
-            (u'ISBN (\\d+) *[\\- \u2212\\.\u2010-\u2015] *(\\d+) *[\\- \u2212\\.\u2010-\u2015] *(\\d+) *[\\- \u2212\\.\u2010-\u2015] *(\\d|X|x)(?!\\d)', r'ISBN \1-\2-\3-\4'),  # ISBN-10
+            (u'ISBN (\\d+) *[\\- \u2212\\.\u2010-\u2015] *(\\d+) *[\\- '
+             u'\u2212\\.\u2010-\u2015] *(\\d+) *[\\- \u2212\\.\u2010-\u2015] '
+             '*(\\d|X|x)(?!\\d)', r'ISBN \1-\2-\3-\4'),  # ISBN-10
             # missing space before ISBN-10 or before ISBN-13,
             # or non-breaking space.
             (r'ISBN(|&nbsp;| )((\d(-?)){12}\d|(\d(-?)){9}[\dXx])', r'ISBN \2'),

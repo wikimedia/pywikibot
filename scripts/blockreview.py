@@ -32,24 +32,20 @@ class BlockreviewBot:
 
     # notes
     note_admin = {
-        'de': u"""
-
-== Sperrprüfungswunsch ==
-Hallo %(admin)s,
-
-[[%(user)s]] wünscht die Prüfung seiner/ihrer Sperre vom %(time)s über die Dauer von %(duration)s. Kommentar war ''%(comment)s''. Bitte äußere Dich dazu auf der [[%(usertalk)s#%(section)s|Diskussionsseite]]. -~~~~"""
+        'de': u"\n\n== Sperrprüfungswunsch ==\nHallo %(admin)s,\n\n[[%(user)s]]"
+              u" wünscht die Prüfung seiner/ihrer Sperre vom %(time)s über die "
+              u"Dauer von %(duration)s. Kommentar war ''%(comment)s''. "
+              u"Bitte äußere Dich dazu auf der [[%(usertalk)s#%(section)s|"
+              u"Diskussionsseite]]. -~~~~"""
     }
 
     note_project = {
-        'de': u"""
-
-== [[%(user)s]] ==
-* gesperrt am %(time)s durch {{Benutzer|%(admin)s}} für eine Dauer von %(duration)s.
-* Kommentar war ''%(comment)s''.
-* [[Benutzer:%(admin)s]] wurde [[Benutzer Diskussion:%(admin)s#Sperrprüfungswunsch|benachrichtigt]].
-* [[%(usertalk)s#%(section)s|Link zur Diskussion]]
-:<small>-~~~~</small>
-;Antrag entgegengenommen"""
+        'de': u"\n\n== [[%(user)s]] ==\n* gesperrt am %(time)s durch "
+              u"{{Benutzer|%(admin)s}} für eine Dauer von %(duration)s.\n"
+              u"* Kommentar war ''%(comment)s''.\n* [[Benutzer:%(admin)s]]"
+              u" wurde [[Benutzer Diskussion:%(admin)s#Sperrprüfungswunsch|"
+              u"benachrichtigt]].\n* [[%(usertalk)s#%(section)s|Link zur "
+              u"Diskussion]]\n\n:<small>-~~~~</small>\n\n;Antrag entgegengenommen"
     }
 
     # edit summaries

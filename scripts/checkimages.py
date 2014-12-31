@@ -331,8 +331,12 @@ bot_list = {
 # The message that the bot will add the second time that find another license
 # problem.
 second_message_without_license = {
-    'hu': u'\nSzia! Úgy tűnik a [[:Kép:%s]] képpel is hasonló a probléma, mint az előbbivel. Kérlek olvasd el a [[WP:KÉPLIC|feltölthető képek]]ről szóló oldalunk, és segítségért fordulj a [[WP:KF-JO|Jogi kocsmafalhoz]]. Köszönöm --~~~~',
-    'it': u':{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza licenza2|%s|__botnick__}} --~~~~',
+    'hu': u'\nSzia! Úgy tűnik a [[:Kép:%s]] képpel is hasonló a probléma, '
+          u'mint az előbbivel. Kérlek olvasd el a [[WP:KÉPLIC|feltölthető '
+          u'képek]]ről szóló oldalunk, és segítségért fordulj a [[WP:KF-JO|'
+          u'Jogi kocsmafalhoz]]. Köszönöm --~~~~',
+    'it': u':{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza'
+          u'licenza2|%s|__botnick__}} --~~~~',
 }
 
 # You can add some settings to a wiki page. In this way, you can change them
