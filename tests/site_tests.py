@@ -908,6 +908,9 @@ class SiteUserTestCase(DefaultSiteTestCase):
     def testSearch(self):
         """Test the site.search() method."""
         mysite = self.get_site()
+        if mysite.has_extension("Wikia Search"):
+            raise unittest.SkipTest(
+                'The site %r does not use MediaWiki search' % mysite)
         try:
             se = list(mysite.search("wiki", total=100))
             self.assertLessEqual(len(se), 100)
