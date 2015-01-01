@@ -4498,11 +4498,11 @@ class Link(ComparableMixin):
                 newsite = self._site.interwiki(prefix)
             except KeyError:
                 break  # text before : doesn't match any known prefix
-            except SiteDefinitionError:
+            except SiteDefinitionError as e:
                 raise SiteDefinitionError(
                     u'{0} is not a local page on {1}, and the interwiki prefix '
-                    '{2} is not supported by PyWikiBot!'.format(
-                    self._text, self._site, prefix))
+                    '{2} is not supported by PyWikiBot!:\n{3}'.format(
+                    self._text, self._site, prefix, e))
             else:
                 t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
                 if first_other_site:

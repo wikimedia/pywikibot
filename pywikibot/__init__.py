@@ -560,21 +560,25 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
                 code = cached[0]
                 fam = cached[1]
             else:
-                raise Error("Unknown URL '{0}'.".format(url))
+                raise SiteDefinitionError("Unknown URL '{0}'.".format(url))
         else:
             # Iterate through all families and look, which does apply to
             # the given URL
             for fam in config.family_files:
-                family = pywikibot.family.Family.load(fam)
-                code = family.from_url(url)
-                if code:
-                    _url_cache[url] = (code, fam)
-                    break
+                try:
+                    family = pywikibot.family.Family.load(fam)
+                    code = family.from_url(url)
+                    if code:
+                        _url_cache[url] = (code, fam)
+                        break
+                except Exception as e:
+                    pywikibot.warning('Error in Family(%s).from_url: %s'
+                                      % (fam, e))
             else:
                 _url_cache[url] = None
                 # TODO: As soon as AutoFamily is ready, try and use an
                 #       AutoFamily
-                raise Error("Unknown URL '{0}'.".format(url))
+                raise SiteDefinitionError("Unknown URL '{0}'.".format(url))
     else:
         # Fallback to config defaults
         code = code or config.mylang
