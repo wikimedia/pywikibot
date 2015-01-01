@@ -430,15 +430,18 @@ class TestSiteObject(DefaultSiteTestCase):
         for page in mysite.allpages(minsize=100, total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
-            self.assertGreaterEqual(len(page.text), 100)
+            self.assertGreaterEqual(len(page.text.encode(mysite.encoding())),
+                                    100)
         for page in mysite.allpages(maxsize=200, total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
-            if len(page.text) > 200 and mysite.data_repository() == mysite:
+            if (len(page.text.encode(mysite.encoding())) > 200 and
+                    mysite.data_repository() == mysite):
                 print('%s.text is > 200 bytes while raw JSON is <= 200'
                       % page)
                 continue
-            self.assertLessEqual(len(page.text), 200)
+            self.assertLessEqual(len(page.text.encode(mysite.encoding())),
+                                 200)
 
     def test_allpages_protection(self):
         mysite = self.get_site()
