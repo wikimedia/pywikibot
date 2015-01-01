@@ -12,7 +12,7 @@ import os
 import sys
 
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import pagegenerators, date
 
 from pywikibot.pagegenerators import (
     PagesFromTitlesGenerator,
@@ -276,6 +276,60 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
         self.assertPagelistTitles(titles, self.expected_titles[site.case()])
+
+
+class TestYearPageGenerator(DefaultSiteTestCase):
+
+    """Test the year page generator."""
+
+    dry = True
+
+    def test_basic(self):
+        site = self.get_site()
+        # Skip if its wikidata because T85645
+        if site.family == "wikidata":
+            raise unittest.SkipTest
+        start = -20
+        end = 2026
+
+        i = 0
+        for page in pagegenerators.YearPageGenerator(start, end, site):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertEqual(date.formatYear(site.lang, start + i), page.title())
+            self.assertNotEqual(page.title(), "0")
+            i += 1
+            if start + i == 0:
+                i += 1
+        self.assertEqual(start + i - 1, end)
+
+
+class TestDayPageGenerator(DefaultSiteTestCase):
+
+    """Test the day page generator."""
+
+    dry = True
+
+    def test_basic(self):
+        site = self.get_site()
+        # Skip if its wikidata because T85645
+        if site.family == "wikidata":
+            raise unittest.SkipTest
+        fd = date.FormatDate(site)
+        startMonth = 1
+        endMonth = 12
+
+        gen = pagegenerators.DayPageGenerator(startMonth, endMonth, site)
+
+        for page in pagegenerators.DayPageGenerator(startMonth, endMonth, site):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertTrue(page.isAutoTitle)
+
+        expected = []
+        for month in range(startMonth, endMonth + 1):
+            for day in range(1, date.getNumberOfDaysInMonth(month) + 1):
+                expected.append(fd(month, day))
+
+        self.assertPageTitlesEqual(gen, expected)
 
 
 class TestPreloadingGenerator(DefaultSiteTestCase):
