@@ -482,7 +482,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.assertRegex(page.title().lower(), '^(.)\\1+')
 
     def test_regexfilter_ns(self):
-        raise unittest.SkipTest
+        raise unittest.SkipTest('This test takes over 10 minutes due to T85389')
         gf = pagegenerators.GeneratorFactory()
         self.assertTrue(gf.handleArg('-titleregex:.*'))
         gf.handleArg('-limit:10')
