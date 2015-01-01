@@ -1843,7 +1843,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             raise SaveError(u'Page doesn\'t exist')
         if page.isEmpty() and not page.isCategory():
             pywikibot.output(u"Not editing %s: page is empty" % page)
-            raise SaveError
+            raise SaveError(u'Page is empty.')
 
         # clone original newPages dictionary, so that we can modify it to the
         # local page's needs
