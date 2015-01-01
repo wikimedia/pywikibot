@@ -4008,14 +4008,16 @@ class APISite(BaseSite):
             params['createonly'] = ""
         if nocreate:
             params['nocreate'] = ""
-        watch_items = ["watch", "unwatch"]
-        if MediaWikiVersion(self.version()) >= MediaWikiVersion("1.16"):
-            watch_items += ["preferences", "nochange"]
+        watch_items = set(["watch", "unwatch", "preferences", "nochange"])
         if watch in watch_items:
-            if MediaWikiVersion(self.version()) >= MediaWikiVersion("1.16"):
-                params['watchlist'] = watch
+            if MediaWikiVersion(self.version()) < MediaWikiVersion("1.16"):
+                if watch in ['preferences', 'nochange']:
+                    pywikibot.warning(u'The watch value {0} is not supported '
+                                      'by {1}'.format(watch, self))
+                else:
+                    params[watch] = ""
             else:
-                params[watch] = ""
+                params['watchlist'] = watch
         elif watch:
             pywikibot.warning(
                 u"editpage: Invalid watch value '%(watch)s' ignored."
