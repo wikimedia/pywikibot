@@ -551,7 +551,8 @@ class RedirectRobot(Bot):
                 pywikibot.warning(
                     u"Redirect target section %s doesn't exist."
                     % newRedir.title(asLink=True))
-            except pywikibot.CircularRedirect as e:
+            except (pywikibot.CircularRedirect,
+                    pywikibot.InterwikiRedirectPage) as e:
                 pywikibot.exception(e)
                 pywikibot.output(u"Skipping %s." % newRedir)
                 break
@@ -584,12 +585,6 @@ class RedirectRobot(Bot):
                 pywikibot.output(
                     u'   Links to: %s.'
                     % targetPage.title(asLink=True))
-                if targetPage.site != self.site:
-                    pywikibot.warning(
-                        u'redirect target (%s) is on a different site.'
-                        % targetPage.title(asLink=True))
-                    if self.getOption('always'):
-                        break  # skip if automatic
                 try:
                     mw_msg = targetPage.site.mediawiki_message(
                         'wikieditor-toolbar-tool-redirect-example')
