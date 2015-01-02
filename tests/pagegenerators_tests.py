@@ -288,7 +288,10 @@ class TestYearPageGenerator(DefaultSiteTestCase):
         site = self.get_site()
         # Skip if its wikidata because T85645
         if site.family == "wikidata":
-            raise unittest.SkipTest
+            raise unittest.SkipTest('date.py does not support wikidata')
+        # Some languages are missing (T85681)
+        if (site.language() not in date.formats['YearBC']) or (site.language() not in date.formats['YearAD']):
+            raise unittest.SkipTest('Date formats for this language are missing from date.py')
         start = -20
         end = 2026
 
