@@ -1025,6 +1025,9 @@ class Family(object):
     def nicepath(self, code):
         return '/wiki/'
 
+    def rcstream_host(self, code):
+        raise NotImplementedError("This family does not support RCStream")
+
     def nice_get_address(self, code, title):
         return '%s%s' % (self.nicepath(code), title)
 
@@ -1225,6 +1228,9 @@ class WikimediaFamily(Family):
     def protocol(self, code):
         """Return 'https' as the protocol."""
         return 'https'
+
+    def rcstream_host(self, code):
+        return 'stream.wikimedia.org'
 
 
 class AutoFamily(Family):

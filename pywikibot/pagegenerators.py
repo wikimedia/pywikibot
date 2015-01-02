@@ -130,6 +130,9 @@ parameterHelp = u"""\
 -links            Work on all pages that are linked from a certain page.
                   Argument can also be given as "-links:linkingpagetitle".
 
+-liverecentchanges Work on pages from the live recent changes feed. If used as
+                  -liverecentchanges:x, work on x recent changes.
+
 -imagesused       Work on all images that contained on a certain page.
                   Argument can also be given as "-imagesused:linkingpagetitle".
 
@@ -491,6 +494,11 @@ class GeneratorFactory(object):
                                                  total=60,
                                                  site=self.site)
             gen = DuplicateFilterPageGenerator(gen)
+        elif arg.startswith('-liverecentchanges'):
+            if len(arg) >= 19:
+                gen = LiveRCPageGenerator(self.site, total=int(arg[19:]))
+            else:
+                gen = LiveRCPageGenerator(self.site)
         elif arg.startswith('-file'):
             textfilename = arg[6:]
             if not textfilename:
@@ -1888,6 +1896,31 @@ def UntaggedPageGenerator(untaggedProject, limit=500, site=None):
     else:
         for result in results:
             yield pywikibot.Page(site, result)
+
+
+def LiveRCPageGenerator(site=None, total=None):
+    """
+    Yield pages from a socket.io RC stream.
+
+    Generates pages based on the socket.io recent changes stream.
+    The Page objects will have an extra property ._rcinfo containing the
+    literal rc data. This can be used to e.g. filter only new pages. See
+    `pywikibot.comms.rcstream.rc_listener` for details on the .rcinfo format.
+
+    @param site: site to return recent changes for
+    @type site: pywikibot.BaseSite
+    @param total: the maximum number of changes to return
+    @type total: int
+    """
+    if site is None:
+        site = pywikibot.Site()
+
+    from pywikibot.comms.rcstream import site_rc_listener
+
+    for entry in site_rc_listener(site, total=total):
+        page = pywikibot.Page(site, entry['title'], entry['namespace'])
+        page._rcinfo = entry
+        yield page
 
 
 # following classes just ported from version 1 without revision; not tested
