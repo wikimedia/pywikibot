@@ -29,6 +29,8 @@ extra_deps = {
     'rcstream': ['socketIO-client'],
 }
 
+test_deps.extend(extra_deps['rcstream'])
+
 if sys.version_info[0] == 2:
     extra_deps['wikistats-csv'] = ['unicodecsv']
 
