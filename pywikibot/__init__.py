@@ -42,7 +42,7 @@ from pywikibot.exceptions import (
     LockedPage, CascadeLockedPage, LockedNoPage, NoCreateError,
     EditConflict, PageDeletedConflict, PageCreatedConflict,
     ServerError, FatalServerError, Server504Error,
-    CaptchaError, SpamfilterError, CircularRedirect,
+    CaptchaError, SpamfilterError, CircularRedirect, InterwikiRedirectPage,
     WikiBaseError, CoordinateGlobeUnknownException,
 )
 from pywikibot.tools import UnicodeMixin, redirect_func
@@ -81,6 +81,7 @@ __all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
            'UploadWarning',
            'ServerError', 'FatalServerError', 'Server504Error',
            'CaptchaError', 'SpamfilterError', 'CircularRedirect',
+           'InterwikiRedirectPage',
            'WikiBaseError', 'CoordinateGlobeUnknownException',
            'QuitKeyboardInterrupt',
            )
