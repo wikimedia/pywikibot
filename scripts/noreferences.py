@@ -65,6 +65,13 @@ placeBeforeSections = {
         u'انظر أيضا',
         u'ملاحظات'
     ],
+    'ca': [
+        u'Bibliografia',
+        u'Bibliografia complementària',
+        u'Vegeu també',
+        u'Enllaços externs',
+        u'Enllaços',
+    ],
     'cs': [
         u'Externí odkazy',
         u'Poznámky',
@@ -220,6 +227,9 @@ referencesSections = {
         u'المراجع والمصادر',
         u'المصادر والمراجع',
     ],
+    'ca': [
+        u'Referències',
+    ],
     'cs': [
         u'Reference',
         u'Poznámky',
@@ -358,6 +368,9 @@ referencesTemplates = {
         'be': [u'Зноскі', u'Примечания', u'Reflist', u'Спіс заўваг',
                u'Заўвагі'],
         'be-x-old': [u'Зноскі'],
+        'ca': [u'Referències', u'Reflist', u'Listaref', u'Referència',
+               u'Referencies', u'Referències2',
+               u'Amaga', u'Amaga ref', u'Amaga Ref', u'Amaga Ref2', u'Apèndix'],
         'da': [u'Reflist'],
         'dsb': [u'Referency'],
         'en': [u'Reflist', u'Refs', u'FootnotesSmall', u'Reference',
