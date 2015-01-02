@@ -670,9 +670,18 @@ class LiveRCPageGeneratorTestCase(WikimediaDefaultSiteTestCase):
 
     length = 3
 
+    @classmethod
+    def setUpClass(cls):
+        super(LiveRCPageGeneratorTestCase, cls).setUpClass()
+        try:
+            import socketIO_client  # noqa
+        except ImportError:
+            raise unittest.SkipTest('socketIO_client not available')
+
     def test_RC_pagegenerator_result(self):
         site = self.get_site()
-        pagegenerator = pagegenerators.LiveRCPageGenerator(site, total=self.length)
+        pagegenerator = pagegenerators.LiveRCPageGenerator(site,
+                                                           total=self.length)
         entries = list(pagegenerator)
         self.assertEqual(len(entries), self.length)
 
