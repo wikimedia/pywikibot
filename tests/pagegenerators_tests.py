@@ -283,13 +283,8 @@ class TestYearPageGenerator(DefaultSiteTestCase):
 
     """Test the year page generator."""
 
-    dry = True
-
     def test_basic(self):
         site = self.get_site()
-        # Skip if its wikidata because T85645
-        if site.family == "wikidata":
-            raise unittest.SkipTest('date.py does not support wikidata')
         # Some languages are missing (T85681)
         if (site.language() not in date.formats['YearBC']) or (site.language() not in date.formats['YearAD']):
             raise unittest.SkipTest('Date formats for this language are missing from date.py')
@@ -311,13 +306,8 @@ class TestDayPageGenerator(DefaultSiteTestCase):
 
     """Test the day page generator."""
 
-    dry = True
-
     def test_basic(self):
         site = self.get_site()
-        # Skip if its wikidata because T85645
-        if site.family == "wikidata":
-            raise unittest.SkipTest
         fd = date.FormatDate(site)
         startMonth = 1
         endMonth = 12
