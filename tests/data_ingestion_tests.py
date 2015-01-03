@@ -6,6 +6,7 @@ __version__ = '$Id$'
 
 import os
 from tests import _data_dir
+from tests import _images_dir
 from tests.aspects import unittest, TestCase
 from scripts import data_ingestion
 
@@ -37,7 +38,7 @@ class TestPhoto(TestCase):
 
     def test_downloadPhoto(self):
         """Test download from http://upload.wikimedia.org/."""
-        with open(os.path.join(_data_dir, 'MP_sounds.png'), 'rb') as f:
+        with open(os.path.join(_images_dir, 'MP_sounds.png'), 'rb') as f:
             self.assertEqual(f.read(), self.obj.downloadPhoto().read())
 
     def test_findDuplicateImages(self):

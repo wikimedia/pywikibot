@@ -15,7 +15,7 @@ import os
 
 import pywikibot
 
-from tests import _data_dir
+from tests import _images_dir
 from tests.aspects import unittest, TestCase
 
 
@@ -31,7 +31,7 @@ class TestUpload(TestCase):
     def test_png(self):
         """Test uploading a png using Site.upload."""
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
-        local_filename = os.path.join(_data_dir, 'MP_sounds.png')
+        local_filename = os.path.join(_images_dir, 'MP_sounds.png')
         self.site.upload(page, source_filename=local_filename,
                          comment='pywikibot test',
                          ignore_warnings=True)
@@ -39,7 +39,7 @@ class TestUpload(TestCase):
     def test_png_chunked(self):
         """Test uploading a png in two chunks using Site.upload."""
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb-chunked.png')
-        local_filename = os.path.join(_data_dir, 'MP_sounds.png')
+        local_filename = os.path.join(_images_dir, 'MP_sounds.png')
         self.site.upload(page, source_filename=local_filename,
                          comment='pywikibot test',
                          ignore_warnings=True, chunk_size=1024)

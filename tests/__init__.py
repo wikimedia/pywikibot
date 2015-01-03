@@ -51,6 +51,7 @@ from pywikibot.data.api import CachedRequest
 _tests_dir = os.path.split(__file__)[0]
 _cache_dir = os.path.join(_tests_dir, 'apicache')
 _data_dir = os.path.join(_tests_dir, 'data')
+_images_dir = os.path.join(_data_dir, 'images')
 
 # Find the root directory of the checkout
 _root_dir = os.path.split(_tests_dir)[0]

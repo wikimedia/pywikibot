@@ -20,7 +20,7 @@ from pywikibot.data.api import (
 )
 from pywikibot.family import Family
 
-from tests import _data_dir
+from tests import _images_dir
 from tests.utils import DummySiteinfo
 from tests.aspects import unittest, TestCase, DefaultDrySiteTestCase
 
@@ -188,7 +188,7 @@ class DryMimeTests(TestCase):
 
     def test_mime_file_payload(self):
         """Test Request._generate_MIME_part loads binary as binary."""
-        local_filename = os.path.join(_data_dir, 'MP_sounds.png')
+        local_filename = os.path.join(_images_dir, 'MP_sounds.png')
         with open(local_filename, 'rb') as f:
             file_content = f.read()
         submsg = Request._generate_MIME_part(
@@ -197,7 +197,7 @@ class DryMimeTests(TestCase):
         self.assertEqual(file_content, submsg.get_payload(decode=True))
 
     def test_mime_file_container(self):
-        local_filename = os.path.join(_data_dir, 'MP_sounds.png')
+        local_filename = os.path.join(_images_dir, 'MP_sounds.png')
         with open(local_filename, 'rb') as f:
             file_content = f.read()
         body = Request._build_mime_request({}, {
@@ -215,7 +215,7 @@ class MimeTests(DefaultDrySiteTestCase):
         """Test Request object prepared to upload."""
         req = Request(site=self.get_site(), action="upload",
                       file='MP_sounds.png', mime=True,
-                      filename=os.path.join(_data_dir, 'MP_sounds.png'))
+                      filename=os.path.join(_images_dir, 'MP_sounds.png'))
         self.assertEqual(req.mime, True)
 
 
