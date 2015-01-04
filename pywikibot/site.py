@@ -1470,6 +1470,8 @@ class APISite(BaseSite):
 
     # Constants for token management.
     # For all MediaWiki versions prior to 1.20.
+    # 'patrol' is indirectly supported via 'edit' token or recentchanges.
+    # It will be converted in site.validate_tokens()/site.get_tokens().
     TOKENS_0 = set(['edit',
                     'delete',
                     'protect',
@@ -1479,6 +1481,7 @@ class APISite(BaseSite):
                     'email',
                     'import',
                     'watch',
+                    'patrol',
                     ])
 
     # For all MediaWiki versions, with 1.20 <= version < 1.24wmf19
@@ -2608,6 +2611,12 @@ class APISite(BaseSite):
         _version = MediaWikiVersion(self.version())
         if _version < MediaWikiVersion('1.20'):
             valid_types = [token for token in types if token in self.TOKENS_0]
+
+            # Pre 1.17, preload token was the same as the edit token.
+            if _version < MediaWikiVersion('1.17'):
+                if 'patrol' in types and 'edit' not in valid_types:
+                    valid_types.append('edit')
+
         elif _version < MediaWikiVersion('1.24wmf19'):
             valid_types = [token for token in types if token in self.TOKENS_1]
         else:
@@ -2630,13 +2639,19 @@ class APISite(BaseSite):
         system was introduced which reduced the amount of tokens available.
         Most of them were merged into the 'csrf' token. If the token type in
         the parameter is not known it will default to the 'csrf' token.
+
         The other token types available are:
          - deleteglobalaccount
-         - patrol
+         - patrol (*)
          - rollback
          - setglobalaccountstatus
          - userrights
          - watch
+
+         (*) Patrol was added in v1.14.
+             Until v1.16, the patrol token is same as the edit token.
+             For v1.17-19, the patrol token must be obtained from the query
+             list recentchanges.
 
         @param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
@@ -2659,6 +2674,9 @@ class APISite(BaseSite):
             if all:
                 types.extend(self.TOKENS_0)
             for tokentype in self.validate_tokens(types):
+                # 'patrol' token is done later on.
+                if tokentype == 'patrol':
+                    continue
                 query = api.PropertyGenerator('info',
                                               titles='Dummy page',
                                               intoken=tokentype,
@@ -2669,6 +2687,27 @@ class APISite(BaseSite):
                     pywikibot.debug(unicode(item), _logger)
                     if (tokentype + 'token') in item:
                         user_tokens[tokentype] = item[tokentype + 'token']
+
+            # patrol token require special handling.
+            # TODO: try to catch exceptions?
+            if 'patrol' in types:
+                if MediaWikiVersion('1.14') <= _version < MediaWikiVersion('1.17'):
+                    user_tokens['patrol'] = user_tokens['edit']
+                else:
+                    req = api.Request(site=self, action='query',
+                                      list='recentchanges',
+                                      rctoken='patrol', rclimit=1)
+
+                    req._warning_handler = warn_handler
+                    data = req.submit()
+
+                    if 'query' in data:
+                        data = data['query']
+                    if 'recentchanges' in data:
+                        item = data['recentchanges'][0]
+                        pywikibot.debug(unicode(item), _logger)
+                        if 'patroltoken' in item:
+                            user_tokens['patrol'] = item.get('patroltoken')
 
         else:
             if _version < MediaWikiVersion('1.24wmf19'):
