@@ -187,22 +187,29 @@ class ParamInfo(Container):
             self.paraminfo_keys = frozenset(['modules'])
 
     def _init(self):
+        _mw_ver = MediaWikiVersion(self.site.version())
         # The paraminfo api deprecated the old request syntax of
         # querymodules='info'; to avoid warnings sites with 1.25wmf4+
         # must only use 'modules' parameter.
         if self.modules_only_mode is None:
-            self.modules_only_mode = MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.25wmf4')
+            self.modules_only_mode = _mw_ver >= MediaWikiVersion('1.25wmf4')
             if self.modules_only_mode:
                 self.paraminfo_keys = frozenset(['modules'])
-            # Assume that by v1.26, it will be desirable to prefetch 'query'
-            if MediaWikiVersion(self.site.version()) > MediaWikiVersion('1.26'):
-                self.preloaded_modules |= set(['query'])
+
+        # v1.18 and earlier paraminfo doesnt include modules; must use 'query'
+        # Assume that by v1.26, it will be desirable to prefetch 'query'
+        if _mw_ver > MediaWikiVersion('1.26') or _mw_ver < MediaWikiVersion('1.19'):
+            self.preloaded_modules |= set(['query'])
 
         self.fetch(self.preloaded_modules, _init=True)
+
+        # paraminfo 'mainmodule' was added 1.15
+        assert('main' in self._paraminfo)
         main_modules_param = self.parameter('main', 'action')
 
         assert(main_modules_param)
         assert('type' in main_modules_param)
+        assert(isinstance(main_modules_param['type'], list))
         self._action_modules = frozenset(main_modules_param['type'])
 
         # While deprecated with warning in 1.25, paraminfo param 'querymodules'
@@ -214,26 +221,35 @@ class ParamInfo(Container):
         assert('limit' in query_modules_param)
         self._limit = query_modules_param['limit']
 
-        if query_modules_param:
-            assert('type' in query_modules_param)
-            self._query_modules = frozenset(query_modules_param['type'])
-        else:
+        if query_modules_param and 'type' in query_modules_param:
+            # 1.19+ 'type' is the list of modules; on 1.18, it is 'string'
+            if isinstance(query_modules_param['type'], list):
+                self._query_modules = frozenset(query_modules_param['type'])
+
+        if not self._query_modules:
             if 'query' not in self._paraminfo:
                 self.fetch(set(['query']), _init=True)
 
+            meta_param = self.parameter('query', 'meta')
             prop_param = self.parameter('query', 'prop')
             list_param = self.parameter('query', 'list')
             generator_param = self.parameter('query', 'generator')
 
+            assert(meta_param)
             assert(prop_param)
             assert(list_param)
             assert(generator_param)
+            assert('type' in meta_param)
             assert('type' in prop_param)
             assert('type' in list_param)
             assert('type' in generator_param)
+            assert(isinstance(meta_param['type'], list))
+            assert(isinstance(prop_param['type'], list))
+            assert(isinstance(list_param['type'], list))
+            assert(isinstance(generator_param['type'], list))
 
             self._query_modules = frozenset(
-                prop_param['type'] + list_param['type'] +
+                meta_param['type'] + prop_param['type'] + list_param['type'] +
                 generator_param['type']
             )
 
@@ -343,7 +359,8 @@ class ParamInfo(Container):
                       for paraminfo_key, modules_data
                       in data['paraminfo'].items()
                       if modules_data and paraminfo_key in cls.paraminfo_keys]
-                     for mod_data in modules_data])
+                     for mod_data in modules_data
+                     if 'missing' not in mod_data])
 
     def __getitem__(self, key):
         """Return a paraminfo property, caching it."""
@@ -377,7 +394,14 @@ class ParamInfo(Container):
         # also params which are common to many modules, such as those provided
         # by the ApiPageSet php class: titles, pageids, redirects, etc.
         self.fetch(set([module]))
-        param_data = [param for param in self._paraminfo[module]['parameters']
+        if module not in self._paraminfo:
+            raise ValueError("paraminfo for '%s' not loaded" % module)
+        if 'parameters' not in self._paraminfo[module]:
+            pywikibot.warning("module '%s' has no parameters" % module)
+            return
+
+        params = self._paraminfo[module]['parameters']
+        param_data = [param for param in params
                       if param['name'] == param_name]
         return param_data[0] if len(param_data) else None
 

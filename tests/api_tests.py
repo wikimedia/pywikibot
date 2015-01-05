@@ -69,16 +69,16 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi)
         self.assertIn('paraminfo', pi)
         self.assertEqual(len(pi),
-                         len(pi.init_modules))
+                         len(pi.preloaded_modules))
 
         self.assertIn('info', pi._query_modules)
+        self.assertIn('login', pi._action_modules)
 
     def test_init_pageset(self):
         site = self.get_site()
         self.assertNotIn('query', api.ParamInfo.init_modules)
         pi = api.ParamInfo(site, set(['pageset']))
         self.assertNotIn('query', api.ParamInfo.init_modules)
-        self.assertNotIn('query', pi.preloaded_modules)
         self.assertEqual(len(pi), 0)
         pi._init()
 
@@ -86,12 +86,10 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('paraminfo', pi)
         self.assertIn('pageset', pi)
 
-        if pi.modules_only_mode:
-            self.assertIn('query', pi.preloaded_modules)
+        if 'query' in pi.preloaded_modules:
             self.assertIn('query', pi)
             self.assertEqual(len(pi), 4)
         else:
-            self.assertNotIn('query', pi.preloaded_modules)
             self.assertNotIn('query', pi)
             self.assertEqual(len(pi), 3)
 
