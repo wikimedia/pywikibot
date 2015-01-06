@@ -1064,9 +1064,9 @@ class Family(object):
         """
         Return whether this family matches the given url.
 
-        The protocol must match, if it is present in the URL. It must match
-        URLs generated via C{self.langs} and L{Family.nice_get_address} or
-        L{Family.path}.
+        It must match URLs generated via C{self.langs} and
+        L{Family.nice_get_address} or L{Family.path}. If the protocol doesn't
+        match but is present in the interwikimap it'll log this.
 
         It uses L{Family._get_path_regex} to generate a regex defining the path
         after the domain.
@@ -1085,9 +1085,10 @@ class Family(object):
         else:
             return None
         if url_match.group(1) and url_match.group(1) != self.protocol(code):
-            return None
-        else:
-            return code
+            pywikibot.log('The entry in the interwikimap uses {0} but the '
+                          'family is configured to use {1}'.format(
+                url_match.group(1), self.protocol(code)))
+        return code
 
     def maximum_GET_length(self, code):
         return config.maximum_GET_length
