@@ -1006,19 +1006,36 @@ class Bot(object):
         if 'comment' in kwargs:
             pywikibot.output(u'Comment: %s' % kwargs['comment'])
 
+        page.text = newtext
+        self._save_page(page, page.save, **kwargs)
+
+    def _save_page(self, page, func, *args, **kwargs):
+        """
+        Helper function to handle page save-related option error handling.
+
+        @param page: currently edited page
+        @param func: the function to call
+        @param args: passed to the function
+        @param kwargs: passed to the function
+        @kwarg ignore_server_errors: if True, server errors will be reported
+          and ignored (default: False)
+        @kwtype ignore_server_errors: bool
+        @kwarg ignore_save_related_errors: if True, errors related to
+        page save will be reported and ignored (default: False)
+        @kwtype ignore_save_related_errors: bool
+        """
         if not self.user_confirm('Do you want to accept these changes?'):
             return
 
         if 'async' not in kwargs and self.getOption('always'):
             kwargs['async'] = True
 
-        page.text = newtext
-
-        ignore_save_related_errors = kwargs.pop('ignore_save_related_errors', False)
+        ignore_save_related_errors = kwargs.pop('ignore_save_related_errors',
+                                                False)
         ignore_server_errors = kwargs.pop('ignore_server_errors', False)
 
         try:
-            page.save(**kwargs)
+            func(*args, **kwargs)
         except pywikibot.PageSaveRelatedError as e:
             if not ignore_save_related_errors:
                 raise
@@ -1163,6 +1180,67 @@ class WikidataBot(Bot):
             for source_lang in family:
                 self.source_values[family_code][source_lang] = pywikibot.ItemPage(self.repo,
                                                                                   family[source_lang])
+
+    def get_property_by_name(self, property_name):
+        """
+        Find given property and return its ID.
+
+        Method first uses site.search() and if the property isn't found, then
+        asks user to provide the property ID.
+
+        @param property_name: property to find
+        @type property_name: str
+        """
+        ns = self.site.data_repository().property_namespace
+        for page in self.site.search(property_name, step=1, total=1,
+                                     namespaces=ns):
+            page = pywikibot.PropertyPage(self.site.data_repository(),
+                                          page.title())
+            pywikibot.output(u"Assuming that %s property is %s." %
+                             (property_name, page.id))
+            return page.id
+        return pywikibot.input(u'Property %s was not found. Please enter the '
+                               u'property ID (e.g. P123) of it:'
+                               % property_name).upper()
+
+    def user_edit_entity(self, item, data=None, **kwargs):
+        """
+        Edit entity with data provided, with user confirmation as required.
+
+        @param item: page to be edited
+        @type item: ItemPage
+        @param data: data to be saved, or None if the diff should be created
+          automatically
+        @kwarg summary: revision comment, passed to ItemPage.editEntity
+        @kwtype summary: str
+        @kwarg show_diff: show changes between oldtext and newtext (default:
+          True)
+        @kwtype show_diff: bool
+        @kwarg ignore_server_errors: if True, server errors will be reported
+          and ignored (default: False)
+        @kwtype ignore_server_errors: bool
+        @kwarg ignore_save_related_errors: if True, errors related to
+        page save will be reported and ignored (default: False)
+        @kwtype ignore_save_related_errors: bool
+        """
+        self.current_page = item
+
+        show_diff = kwargs.pop('show_diff', True)
+        if show_diff:
+            if data is None:
+                diff = item.toJSON(diffto=(
+                    item._content if hasattr(item, '_content') else None))
+            else:
+                diff = pywikibot.WikibasePage._normalizeData(data)
+            pywikibot.output(json.dumps(diff, indent=4, sort_keys=True))
+
+        if 'summary' in kwargs:
+            pywikibot.output(u'Change summary: %s' % kwargs['summary'])
+
+        # TODO async in editEntity should actually have some effect (bug T86074)
+        # TODO PageSaveRelatedErrors should be actually raised in editEntity
+        # (bug T86083)
+        self._save_page(item, item.editEntity, data, **kwargs)
 
     def getSource(self, site):
         """
