@@ -471,15 +471,15 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
     def test_regexfilter_default(self):
         gf = pagegenerators.GeneratorFactory()
-        # Matches titles with the same two or more starting letters
-        self.assertTrue(gf.handleArg('-titleregex:^(.)\\1+'))
+        # Matches titles with the same two or more continous characters
+        self.assertTrue(gf.handleArg('-titleregex:(.)\\1+'))
         gf.handleArg('-limit:10')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
         self.assertLessEqual(len(pages), 10)
         for page in pages:
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertRegex(page.title().lower(), '^(.)\\1+')
+            self.assertRegex(page.title().lower(), '(.)\\1+')
 
     def test_regexfilter_ns(self):
         raise unittest.SkipTest('This test takes over 10 minutes due to T85389')
