@@ -56,7 +56,10 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         self.api_url += '?action=query&meta=siteinfo&siprop=statistics&format=xml'
         self.api_found = re.compile(r'articles="(.*?)"')
         self.re_edit = re.compile(
-            r'^C14\[\[^C07(?P<page>.+?)^C14\]\]^C4 (?P<flags>.*?)^C10 ^C02(?P<url>.+?)^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C \(?^B?(?P<bytes>[+-]?\d+?)^B?\) ^C10(?P<summary>.*)^C'.replace('^B', '\002').replace('^C', '\003').replace('^U', '\037'))
+            r'^C14\[\[^C07(?P<page>.+?)^C14\]\]^C4 (?P<flags>.*?)^C10 ^C02'
+            r'(?P<url>.+?)^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C \(?^B?'
+            r'(?P<bytes>[+-]?\d+?)^B?\) ^C10(?P<summary>.*)^C'
+            .replace('^B', '\002').replace('^C', '\003').replace('^U', '\037'))
 
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
