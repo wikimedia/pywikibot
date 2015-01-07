@@ -40,6 +40,8 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | clean_sandbox.py       | This bot makes the cleaned of the page of tests.        |
     +------------------------+---------------------------------------------------------+
+    | commons_information.py | Insert a language template into the description field   |
+    +------------------------+---------------------------------------------------------+
     | coordinate_import.py   | Coordinate importing script.                            |
     +------------------------+---------------------------------------------------------+
     | cosmetic_changes.py    | Can do slight modifications to a wiki page source code  |
