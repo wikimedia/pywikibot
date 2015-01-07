@@ -8,12 +8,13 @@
 from __future__ import print_function
 __version__ = '$Id$'
 
+import collections
+import inspect
+import re
 import sys
 import threading
 import time
-import inspect
-import re
-import collections
+import types
 from distutils.version import Version
 
 if sys.version_info[0] > 2:
@@ -878,7 +879,7 @@ def redirect_func(target, source_module=None, target_module=None,
     return call
 
 
-class ModuleDeprecationWrapper(object):
+class ModuleDeprecationWrapper(types.ModuleType):
 
     """A wrapper for a module to deprecate classes or variables of it."""
 
