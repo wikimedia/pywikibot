@@ -34,13 +34,15 @@ from warnings import warn
 
 import pywikibot
 
-from pywikibot import date, config, i18n
 from pywikibot.tools import (
     deprecated,
     deprecated_args,
     DequeGenerator,
     intersect_generators,
+    filter_unique,
 )
+
+from pywikibot import date, config, i18n
 from pywikibot.comms import http
 from pywikibot.data import wikidataquery as wdquery
 from pywikibot.exceptions import ArgumentDeprecationWarning
@@ -289,6 +291,15 @@ class GeneratorFactory(object):
     that are used by many scripts and that determine which pages to work on.
     """
 
+    # This is the function that will be used to de-duplicate iterators.
+    # See the documentation in L{pywikibot.tools.filter_unique} for reasons
+    # why this should be changed to improve space and time of execution.
+    _filter_unique = staticmethod(filter_unique)
+    # The seen list can not yet be shared at present, due to `intersect` mode
+    # not being known until after all generators have been created.
+    # When not in intersect mode, _filter_unique could be:
+    #   functools.partial(filter_unique, container=global_seen_list)
+
     def __init__(self, site=None):
         """
         Constructor.
@@ -384,7 +395,7 @@ class GeneratorFactory(object):
                 dupfiltergen = gensList
             else:
                 gensList = CombinedPageGenerator(self.gens)
-                dupfiltergen = DuplicateFilterPageGenerator(gensList)
+                dupfiltergen = self._filter_unique(gensList)
 
         if self.claimfilter_list:
             dupfiltergen = PreloadingItemGenerator(dupfiltergen)
@@ -530,14 +541,13 @@ class GeneratorFactory(object):
                 gen = RandomPageGenerator(total=int(arg[8:]), site=self.site)
         elif arg.startswith('-recentchanges'):
             if len(arg) >= 15:
-                gen = RecentChangesPageGenerator(namespaces=self.namespaces,
-                                                 total=int(arg[15:]),
-                                                 site=self.site)
+                total = int(arg[15:])
             else:
-                gen = RecentChangesPageGenerator(namespaces=self.namespaces,
-                                                 total=60,
-                                                 site=self.site)
-            gen = DuplicateFilterPageGenerator(gen)
+                total = 60
+            gen = RecentChangesPageGenerator(namespaces=self.namespaces,
+                                             total=total,
+                                             site=self.site,
+                                             _filter_unique=self._filter_unique)
         elif arg.startswith('-liverecentchanges'):
             if len(arg) >= 19:
                 gen = LiveRCPageGenerator(self.site, total=int(arg[19:]))
@@ -942,9 +952,10 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                showBot=None, showAnon=None,
                                showRedirects=None, showPatrolled=None,
                                topOnly=False, step=None, total=None,
-                               user=None, excludeuser=None, site=None):
+                               user=None, excludeuser=None, site=None,
+                               _filter_unique=None):
     """
-    Generate pages that are in the recent changes list.
+    Generate pages that are in the recent changes list, including duplicates.
 
     @param start: Timestamp to start listing from
     @type start: pywikibot.Timestamp
@@ -986,18 +997,22 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
     """
     if site is None:
         site = pywikibot.Site()
-    for item in site.recentchanges(start=start, end=end, reverse=reverse,
-                                   namespaces=namespaces, pagelist=pagelist,
-                                   changetype=changetype, showMinor=showMinor,
-                                   showBot=showBot, showAnon=showAnon,
-                                   showRedirects=showRedirects,
-                                   showPatrolled=showPatrolled,
-                                   topOnly=topOnly, step=step, total=total,
-                                   user=user, excludeuser=excludeuser):
-        # The title in a log entry may have been suppressed
-        if 'title' not in item and item['type'] == 'log':
-            continue
-        yield pywikibot.Page(pywikibot.Link(item["title"], site))
+
+    gen = site.recentchanges(start=start, end=end, reverse=reverse,
+                             namespaces=namespaces, pagelist=pagelist,
+                             changetype=changetype, showMinor=showMinor,
+                             showBot=showBot, showAnon=showAnon,
+                             showRedirects=showRedirects,
+                             showPatrolled=showPatrolled,
+                             topOnly=topOnly, step=step, total=total,
+                             user=user, excludeuser=excludeuser)
+
+    gen = (pywikibot.Page(site, x['title'])
+           for x in gen if x['type'] != 'log' or 'title' in x)
+
+    if _filter_unique:
+        gen = _filter_unique(gen)
+    return gen
 
 
 def FileLinksGenerator(referredFilePage, step=None, total=None, content=False):
@@ -1143,7 +1158,8 @@ def PagesFromTitlesGenerator(iterable, site=None):
 
 @deprecated_args(number="total")
 def UserContributionsGenerator(username, namespaces=None, site=None,
-                               step=None, total=None):
+                               step=None, total=None,
+                               _filter_unique=filter_unique):
     """Yield unique pages edited by user:username.
 
     @param step: Maximum number of pages to retrieve per API query
@@ -1158,7 +1174,7 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
     """
     if site is None:
         site = pywikibot.Site()
-    return DuplicateFilterPageGenerator(
+    return _filter_unique(
         pywikibot.Page(pywikibot.Link(contrib["title"], source=site))
         for contrib in site.usercontribs(user=username, namespaces=namespaces,
                                          step=step, total=total)
@@ -1256,13 +1272,7 @@ def RedirectFilterPageGenerator(generator, no_redirects=True,
                                  % page)
 
 
-def DuplicateFilterPageGenerator(generator):
-    """Yield all unique pages from another generator, omitting duplicates."""
-    seenPages = {}
-    for page in generator:
-        if page not in seenPages:
-            seenPages[page] = True
-            yield page
+DuplicateFilterPageGenerator = filter_unique
 
 
 class ItemClaimFilter(object):

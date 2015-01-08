@@ -9,13 +9,17 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
+import collections
+import decimal
 import os.path
 import subprocess
+import sys
 
 from pywikibot import tools
 
 from tests import _data_dir
 from tests.aspects import unittest, TestCase
+from tests.utils import expected_failure_if
 
 _xml_data_dir = os.path.join(_data_dir, 'xml')
 
@@ -151,6 +155,257 @@ class MergeUniqueDicts(TestCase):
             ValueError, '42', tools.merge_unique_dicts, self.dct1, self.dct1)
         self.assertRaisesRegex(
             ValueError, '42', tools.merge_unique_dicts, self.dct1, **self.dct1)
+
+
+def passthrough(x):
+    """Return x."""
+    return x
+
+
+class SkipList(set):
+
+    """Container that ignores items."""
+
+    skip_list = [1, 3]
+
+    def __contains__(self, item):
+        """Override to not process some items."""
+        if item in self.skip_list:
+            return True
+        else:
+            return super(SkipList, self).__contains__(item)
+
+
+class ProcessAgainList(set):
+
+    """Container that keeps processing certain items."""
+
+    process_again_list = [1, 3]
+
+    def add(self, item):
+        """Override to not add some items."""
+        if item in self.process_again_list:
+            return
+        else:
+            return super(ProcessAgainList, self).add(item)
+
+
+class ContainsStopList(set):
+
+    """Container that stops when encountering items."""
+
+    stop_list = []
+
+    def __contains__(self, item):
+        """Override to stop on encountering items."""
+        if item in self.stop_list:
+            raise StopIteration
+        else:
+            return super(ContainsStopList, self).__contains__(item)
+
+
+class AddStopList(set):
+
+    """Container that stops when encountering items."""
+
+    stop_list = []
+
+    def add(self, item):
+        """Override to not continue on encountering items."""
+        if item in self.stop_list:
+            raise StopIteration
+        else:
+            super(AddStopList, self).add(item)
+
+
+class TestFilterUnique(TestCase):
+
+    """Test filter_unique."""
+
+    net = False
+
+    ints = [1, 3, 2, 1, 2, 1, 2, 4, 2]
+    strs = [str(i) for i in ints]
+    decs = [decimal.Decimal(i) for i in ints]
+
+    def _test_dedup_int(self, deduped, deduper, key=None):
+        """Test filter_unique results for int."""
+        if not key:
+            key = passthrough
+
+        self.assertEqual(len(deduped), 0)
+
+        self.assertEqual(next(deduper), 1)
+        self.assertEqual(next(deduper), 3)
+
+        if key in (hash, passthrough):
+            if isinstance(deduped, tools.OrderedDict):
+                self.assertEqual(list(deduped.keys()), [1, 3])
+            elif isinstance(deduped, collections.Mapping):
+                self.assertCountEqual(list(deduped.keys()), [1, 3])
+            else:
+                self.assertEqual(deduped, set([1, 3]))
+
+        self.assertEqual(next(deduper), 2)
+        self.assertEqual(next(deduper), 4)
+
+        if key in (hash, passthrough):
+            if isinstance(deduped, tools.OrderedDict):
+                self.assertEqual(list(deduped.keys()), [1, 3, 2, 4])
+            elif isinstance(deduped, collections.Mapping):
+                self.assertCountEqual(list(deduped.keys()), [1, 2, 3, 4])
+            else:
+                self.assertEqual(deduped, set([1, 2, 3, 4]))
+
+        self.assertRaises(StopIteration, next, deduper)
+
+    def _test_dedup_str(self, deduped, deduper, key=None):
+        """Test filter_unique results for str."""
+        if not key:
+            key = passthrough
+
+        self.assertEqual(len(deduped), 0)
+
+        self.assertEqual(next(deduper), '1')
+        self.assertEqual(next(deduper), '3')
+
+        if key in (hash, passthrough):
+            if isinstance(deduped, collections.Mapping):
+                self.assertEqual(deduped.keys(), [key('1'), key('3')])
+            else:
+                self.assertEqual(deduped, set([key('1'), key('3')]))
+
+        self.assertEqual(next(deduper), '2')
+        self.assertEqual(next(deduper), '4')
+
+        if key in (hash, passthrough):
+            if isinstance(deduped, collections.Mapping):
+                self.assertEqual(deduped.keys(), [key(i) for i in self.strs])
+            else:
+                self.assertEqual(deduped, set(key(i) for i in self.strs))
+
+        self.assertRaises(StopIteration, next, deduper)
+
+    def test_set(self):
+        """Test filter_unique with a set."""
+        deduped = set()
+        deduper = tools.filter_unique(self.ints, container=deduped)
+        self._test_dedup_int(deduped, deduper)
+
+    def test_dict(self):
+        """Test filter_unique with a dict."""
+        deduped = dict()
+        deduper = tools.filter_unique(self.ints, container=deduped)
+        self._test_dedup_int(deduped, deduper)
+
+    def test_OrderedDict(self):
+        """Test filter_unique with a OrderedDict."""
+        deduped = tools.OrderedDict()
+        deduper = tools.filter_unique(self.ints, container=deduped)
+        self._test_dedup_int(deduped, deduper)
+
+    def test_int_hash(self):
+        """Test filter_unique with ints using hash as key."""
+        deduped = set()
+        deduper = tools.filter_unique(self.ints, container=deduped, key=hash)
+        self._test_dedup_int(deduped, deduper, hash)
+
+    def test_int_id(self):
+        """Test filter_unique with ints using id as key."""
+        deduped = set()
+        deduper = tools.filter_unique(self.ints, container=deduped, key=id)
+        self._test_dedup_int(deduped, deduper, id)
+
+    def test_obj(self):
+        """Test filter_unique with objects."""
+        deduped = set()
+        deduper = tools.filter_unique(self.decs, container=deduped)
+        self._test_dedup_int(deduped, deduper)
+
+    def test_obj_hash(self):
+        """Test filter_unique with objects using hash as key."""
+        deduped = set()
+        deduper = tools.filter_unique(self.decs, container=deduped, key=hash)
+        self._test_dedup_int(deduped, deduper, hash)
+
+    @unittest.expectedFailure
+    def test_obj_id(self):
+        """Test filter_unique with objects using id as key, which fails."""
+        # Two objects which may be equal do not have the same id.
+        deduped = set()
+        deduper = tools.filter_unique(self.decs, container=deduped, key=id)
+        self._test_dedup_int(deduped, deduper, id)
+
+    def test_str(self):
+        """Test filter_unique with str."""
+        deduped = set()
+        deduper = tools.filter_unique(self.strs, container=deduped)
+        self._test_dedup_str(deduped, deduper)
+
+    def test_str_hash(self):
+        """Test filter_unique with str using hash as key."""
+        deduped = set()
+        deduper = tools.filter_unique(self.strs, container=deduped, key=hash)
+        self._test_dedup_str(deduped, deduper, hash)
+
+    @expected_failure_if(sys.version_info[0] >= 3)
+    def test_str_id(self):
+        """Test str using id as key fails on Python 3."""
+        # str in Python 3 behave like objects.
+        deduped = set()
+        deduper = tools.filter_unique(self.strs, container=deduped, key=id)
+        self._test_dedup_str(deduped, deduper, id)
+
+    def test_for_resumable(self):
+        """Test filter_unique is resumable after a for loop."""
+        gen2 = tools.filter_unique(self.ints)
+        deduped = []
+        for item in gen2:
+            deduped.append(item)
+            if len(deduped) == 3:
+                break
+        self.assertEqual(deduped, [1, 3, 2])
+        last = next(gen2)
+        self.assertEqual(last, 4)
+        self.assertRaises(StopIteration, next, gen2)
+
+    def test_skip(self):
+        """Test filter_unique with a container that skips items."""
+        deduped = SkipList()
+        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduped_out = list(deduper)
+        self.assertCountEqual(deduped, deduped_out)
+        self.assertEqual(deduped, set([2, 4]))
+
+    def test_process_again(self):
+        """Test filter_unique with an ignoring container."""
+        deduped = ProcessAgainList()
+        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduped_out = list(deduper)
+        self.assertEqual(deduped_out, [1, 3, 2, 1, 1, 4])
+        self.assertEqual(deduped, set([2, 4]))
+
+    def test_stop(self):
+        """Test filter_unique with an ignoring container."""
+        deduped = ContainsStopList()
+        deduped.stop_list = [2]
+        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduped_out = list(deduper)
+        self.assertCountEqual(deduped, deduped_out)
+        self.assertEqual(deduped, set([1, 3]))
+
+        # And it should not resume
+        self.assertRaises(StopIteration, next, deduper)
+
+        deduped = AddStopList()
+        deduped.stop_list = [4]
+        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduped_out = list(deduper)
+        self.assertCountEqual(deduped, deduped_out)
+        self.assertEqual(deduped, set([1, 2, 3]))
+
+        # And it should not resume
+        self.assertRaises(StopIteration, next, deduper)
 
 
 if __name__ == '__main__':
