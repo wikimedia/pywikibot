@@ -25,7 +25,7 @@ Expect the code to change a lot!
 """
 #
 # (c) Multichill, 2009
-# (c) pywikibot team, 2009-2015
+# (c) Pywikibot team, 2009-2015
 #
 # Distributed under the terms of the MIT license.
 #

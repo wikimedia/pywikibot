@@ -106,7 +106,7 @@ setup(
     version=version,
     description='Python MediaWiki Bot Framework',
     long_description=open('README.rst').read(),
-    maintainer='The pywikibot team',
+    maintainer='The Pywikibot team',
     maintainer_email='pywikipedia-l@lists.wikimedia.org',
     license='MIT License',
     packages=['pywikibot'] + [package
