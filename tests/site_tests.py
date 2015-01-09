@@ -1356,7 +1356,14 @@ class SiteRandomTestCase(DefaultSiteTestCase):
 
 class TestSiteTokens(DefaultSiteTestCase):
 
-    """Test cases for tokens in Site methods."""
+    """Test cases for tokens in Site methods.
+
+    Versions of sites are simulated if actual versions are higher than
+    needed by the test case.
+
+    Test is skipped if site version is not compatible.
+
+    """
 
     user = True
 
@@ -1372,6 +1379,11 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def _test_tokens(self, version, test_version, additional_token):
         if version and self._version < MediaWikiVersion(version):
+            raise unittest.SkipTest(
+                u'Site %s version %s is too low for this tests.'
+                % (self.mysite, self._version))
+
+        if version and self._version < MediaWikiVersion(test_version):
             raise unittest.SkipTest(
                 u'Site %s version %s is too low for this tests.'
                 % (self.mysite, self._version))
@@ -1394,13 +1406,25 @@ class TestSiteTokens(DefaultSiteTestCase):
                 # test __contains__
                 self.assertIn(tokentype[0], self.mysite.tokens)
 
+    def test_patrol_tokens_in_mw_116(self):
+        """Test ability to get patrol token on MW 1.16 wiki."""
+        self._test_tokens('1.14', '1.16', 'patrol')
+
     def test_tokens_in_mw_119(self):
         """Test ability to get page tokens."""
         self._test_tokens(None, '1.19', 'delete')
 
+    def test_patrol_tokens_in_mw_119(self):
+        """Test ability to get patrol token on MW 1.19 wiki."""
+        self._test_tokens('1.14', '1.19', 'patrol')
+
     def test_tokens_in_mw_120_124wmf18(self):
         """Test ability to get page tokens."""
         self._test_tokens('1.20', '1.21', 'deleteglobalaccount')
+
+    def test_patrol_tokens_in_mw_120(self):
+        """Test ability to get patrol token."""
+        self._test_tokens('1.14', '1.20', 'patrol')
 
     def test_tokens_in_mw_124wmf19(self):
         """Test ability to get page tokens."""
