@@ -19,12 +19,17 @@ from tests.utils import allowed_failure, execute_pwb
 
 scripts_path = os.path.join(_root_dir, 'scripts')
 
+# These dependencies are not always the package name which is in setup.py.
+# e.g. 'PIL.ImageTk' is a object provided by several different pypi packages,
+# and setup.py requests that 'Pillow' is installed to provide 'PIL.ImageTk'.
+# Here, it doesnt matter which pypi package was requested and installed.
+# Here, the name given to the module which will be imported is required.
 script_deps = {
     'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
 
     'flickrripper': ['flickrapi'],
-
+    'match_images': ['PIL.ImageTk'],
     'states_redirect': ['pycountry'],
 }
 if sys.version_info < (2, 7):
@@ -124,6 +129,7 @@ no_args_expected_results = {
     'imageuncat': 'You have to specify the generator ',
     'interwiki': 'does not exist. Skipping.',  # 'Test page' does not exist
     'login': 'Logged in on ',
+    'match_images': 'Require two images to work on.',
     'pagefromfile': 'Please enter the file name',
     'replace': 'Press Enter to use this automatic message',
     'script_wui': 'Pre-loading all relevant page contents',
