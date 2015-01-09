@@ -123,9 +123,13 @@ class CategoryRedirectBot(pywikibot.Bot):
                 newCat = pywikibot.Category(self.site,
                                             self.catprefix + newCatTitle)
 
-                oldCatLink = oldCat.title()
-                newCatLink = newCat.title()
-                comment = editSummary % locals()
+                param = {
+                    'oldCatLink': oldCat.title(),
+                    'oldCatTitle': oldCatTitle,
+                    'newCatLink': newCat.title(),
+                    'newCatTitle': newCatTitle,
+                }
+                comment = editSummary % param
                 # Move articles
                 found, moved = 0, 0
                 for article in oldCat.members():
@@ -228,7 +232,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                 # race condition: someone else removed the redirect while we
                 # were checking for it
                 continue
-            if target.namespace() == 14:
+            if target.isCategory():
                 # this is a hard-redirect to a category page
                 newtext = (u"{{%(template)s|%(cat)s}}"
                            % {'cat': target.title(withNamespace=False),
@@ -252,8 +256,6 @@ class CategoryRedirectBot(pywikibot.Bot):
 
     def run(self):
         """Run the bot."""
-        global destmap, catlist, catmap
-
         # validate L10N
         try:
             self.template_list = self.site.family.category_redirect_templates[
@@ -266,14 +268,13 @@ class CategoryRedirectBot(pywikibot.Bot):
             pywikibot.warning(u"No redirect category found for %s" % self.site)
             return
 
-        # user() invokes login()
-        user = self.site.user()
+        user = self.site.user()  # invokes login()
         newredirs = []
 
         l = time.localtime()
         today = "%04d-%02d-%02d" % l[:3]
         edit_request_page = pywikibot.Page(
-            self.site, u"User:%(user)s/category edit requests" % locals())
+            self.site, u"User:%s/category edit requests" % user)
         datafile = pywikibot.config.datafilepath("%s-catmovebot-data"
                                                  % self.site.dbName())
         try:
@@ -302,8 +303,8 @@ class CategoryRedirectBot(pywikibot.Bot):
         self.check_hard_redirect()
 
         comment = i18n.twtranslate(self.site.code, self.move_comment)
-        counts, destmap, catmap = {}, {}, {}
-        catlist, nonemptypages = [], []
+        counts = {}
+        nonemptypages = []
         redircat = pywikibot.Category(pywikibot.Link(self.cat_title, self.site))
 
         pywikibot.output(u"\nChecking %d category redirect pages"
@@ -344,8 +345,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                                   self.catprefix + cat_name) not in catpages:
                 del record[cat_name]
 
-        pywikibot.output(u"")
-        pywikibot.output(u"Moving pages out of %s redirected categories."
+        pywikibot.output(u"\nMoving pages out of %s redirected categories."
                          % len(nonemptypages))
 
         for cat in pagegenerators.PreloadingGenerator(nonemptypages):
