@@ -164,7 +164,7 @@ class CategoryDatabase:
         return hasattr(self, 'catContentDB') and hasattr(self, 'superclassDB')
 
     def _load(self):
-        if not self.is_loaded():
+        if not self.is_loaded:
             try:
                 f = bz2.BZ2File(self.filename, 'r')
                 pywikibot.output(u'Reading dump from %s'
