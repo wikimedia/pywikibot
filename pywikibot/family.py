@@ -713,6 +713,8 @@ class Family(object):
         # String used as separator between category links and the text
         self.category_text_separator = config.line_separator * 2
         # When both at the bottom should categories come after interwikilinks?
+        # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
+        # extension which puts categories last on all sites.  TO BE DEPRECATED!
         self.categories_last = []
 
         # Which languages have a special order for putting interlanguage
