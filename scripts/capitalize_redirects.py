@@ -20,7 +20,7 @@ Example: "python capitalize_redirects.py -start:B -always"
 """
 #
 # (C) Yrithinnd, 2006
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -45,6 +45,14 @@ class CapitalizeBot(Bot):
     """Capitalization Bot."""
 
     def __init__(self, generator, **kwargs):
+        """Constructor.
+
+        Parameters:
+            @param generator: The page generator that determines on which pages
+                              to work.
+            @kwarg titlecase: create a titlecased redirect page instead a
+                              capitalized one.
+        """
         self.availableOptions.update({
             'titlecase': False,
         })
@@ -53,6 +61,7 @@ class CapitalizeBot(Bot):
         self.generator = generator
 
     def treat(self, page):
+        """Load the given page and create capitalized redirects."""
         if not page.exists():
             return
         if page.isRedirectPage():
