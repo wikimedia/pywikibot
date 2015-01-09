@@ -185,6 +185,7 @@ def understandBlock(text, TTP, TSP, TSMP, TTMP, TU):
 
 
 def showQuest(page):
+    """Ask for an editor and invoke it."""
     quest = pywikibot.input_choice(
         u'Do you want to open the page?',
         [('with browser', 'b'), ('with gui', 'g'), ('no', 'n')], 'n',
