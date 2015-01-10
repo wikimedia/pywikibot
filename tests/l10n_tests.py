@@ -62,7 +62,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
 
 class TestValidTemplate(TestCase):
 
-    """Test cases for date library processed by unittest."""
+    """Test cases L10N message templates processed by unittest."""
 
     __metaclass__ = TestValidTemplateMeta
     net = True  # magic flag tells jenkins to not run the test.
