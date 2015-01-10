@@ -359,7 +359,8 @@ def twtranslate(code, twtitle, parameters=None):
     @param parameters: For passing parameters.
     """
     package = twtitle.split("-")[0]
-    transdict = getattr(__import__(messages_package_name, fromlist=[package]), package).msg
+    transdict = getattr(__import__(messages_package_name, fromlist=[package]),
+                        package).msg
 
     code_needed = False
     # If a site is given instead of a code, use its language
@@ -490,7 +491,8 @@ def twhas_key(code, twtitle):
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     """
     package = twtitle.split("-")[0]
-    transdict = getattr(__import__("i18n", fromlist=[package]), package).msg
+    transdict = getattr(__import__(messages_package_name, fromlist=[package]),
+                        package).msg
     # If a site is given instead of a code, use its language
     if hasattr(code, 'code'):
         code = code.code
