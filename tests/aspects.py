@@ -913,6 +913,35 @@ class DefaultSiteTestCase(TestCase):
     code = config.mylang
 
 
+class AlteredDefaultSiteTestCase(TestCase):
+
+    """Save and restore the config.mylang and config.family."""
+
+    def setUp(self):
+        """Prepare the environment for running main() in a script."""
+        self.original_family = pywikibot.config.family
+        self.original_code = pywikibot.config.mylang
+        super(AlteredDefaultSiteTestCase, self).setUp()
+
+    def tearDown(self):
+        """Restore the environment."""
+        pywikibot.config.family = self.original_family
+        pywikibot.config.mylang = self.original_code
+        super(AlteredDefaultSiteTestCase, self).tearDown()
+
+
+class ScenarioDefinedDefaultSiteTestCase(AlteredDefaultSiteTestCase):
+
+    """Tests that depend on the default site being set to the test site."""
+
+    def setUp(self):
+        """Prepare the environment for running main() in a script."""
+        super(ScenarioDefinedDefaultSiteTestCase, self).setUp()
+        site = self.get_site()
+        pywikibot.config.family = site.family
+        pywikibot.config.mylang = site.code
+
+
 class DefaultDrySiteTestCase(DefaultSiteTestCase):
 
     """Run tests using the config specified site in offline mode."""
@@ -1070,6 +1099,13 @@ class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
             raise unittest.SkipTest(
                 u'%s: %s is not connected to Wikidata.'
                 % (cls.__name__, cls.get_site()))
+
+
+class ScriptMainTestCase(ScenarioDefinedDefaultSiteTestCase):
+
+    """Test running a script main()."""
+
+    pass
 
 
 class PwbTestCase(TestCase):

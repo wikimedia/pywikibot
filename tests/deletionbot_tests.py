@@ -12,10 +12,10 @@ import pywikibot.page
 
 from scripts import delete
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, ScriptMainTestCase
 
 
-class TestDeletionBotWrite(TestCase):
+class TestDeletionBotWrite(ScriptMainTestCase):
 
     """Test deletionbot script."""
 
@@ -48,7 +48,7 @@ class TestDeletionBotWrite(TestCase):
                     '-undelete', '-summary=pywikibot unit tests')
 
 
-class TestDeletionBotUser(TestCase):
+class TestDeletionBotUser(ScriptMainTestCase):
 
     """Test deletionbot as a user (not sysop)."""
 
@@ -75,7 +75,7 @@ class TestDeletionBotUser(TestCase):
         p1.save('unit test', botflag=True)
 
 
-class TestDeletionBot(TestCase):
+class TestDeletionBot(ScriptMainTestCase):
 
     """Test deletionbot with patching to make it non-write."""
 

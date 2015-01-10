@@ -10,24 +10,20 @@ __version__ = '$Id$'
 from pywikibot import config2 as config
 from pywikibot.page import Link
 from pywikibot.exceptions import InvalidTitle
-from tests.aspects import unittest, TestCase
+from tests.aspects import (
+    unittest,
+    AlteredDefaultSiteTestCase as LinkTestCase,
+    TestCase,
+)
 
 
-class TestPartiallyQualifiedLinkDifferentCodeParser(TestCase):
+class TestPartiallyQualifiedLinkDifferentCodeParser(LinkTestCase):
 
     """Tests for interwiki links to local sites."""
 
     family = 'wikipedia'
     code = 'en'
     cached = True
-
-    def setUp(self):
-        self.old_lang = config.mylang
-        self.old_family = config.family
-
-    def tearDown(self):
-        config.mylang = self.old_lang
-        config.family = self.old_family
 
     def test_partially_qualified_NS0_family(self):
         """Test that Link uses config.family for namespace 0."""

@@ -9,12 +9,10 @@ __version__ = '$Id$'
 
 import os
 
-import pywikibot
-
 from scripts.reflinks import XmlDumpPageGenerator, ReferencesRobot, main
 
 from tests import _data_dir
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, ScriptMainTestCase
 
 _xml_data_dir = os.path.join(_data_dir, 'xml')
 
@@ -131,7 +129,7 @@ class TestXMLPageGenerator(TestCase):
                                   site=self.get_site())
 
 
-class TestReferencesBotConstructor(TestCase):
+class TestReferencesBotConstructor(ScriptMainTestCase):
 
     """
     Test reflinks with run() removed.
@@ -150,16 +148,10 @@ class TestReferencesBotConstructor(TestCase):
         self._original_run = ReferencesRobot.run
         ReferencesRobot.__init__ = dummy_constructor
         ReferencesRobot.run = lambda self: None
-        self.original_family = pywikibot.config.family
-        self.original_code = pywikibot.config.mylang
-        pywikibot.config.family = self.family
-        pywikibot.config.mylang = self.code
 
     def tearDown(self):
         ReferencesRobot.__init__ = self._original_constructor
         ReferencesRobot.run = self._original_run
-        pywikibot.config.family = self.original_family
-        pywikibot.config.mylang = self.original_code
         super(TestReferencesBotConstructor, self).tearDown()
 
     def test_xml_simple(self):
