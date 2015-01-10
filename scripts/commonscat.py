@@ -473,8 +473,8 @@ class CommonscatBot(Bot):
                 pywikibot.output(u'Commons category does not exist. Examining deletion log...')
                 logpages = commonsSite.logevents(logtype='delete', page=commonsPage)
                 for logitem in logpages:
-                    logitem = next(logpages)
-                    (logpage, loguser, logtimestamp, logcomment) = logitem
+                    loguser = logitem.user()
+                    logcomment = logitem.comment()
                     # Some logic to extract the target page.
                     regex = u'moved to \[\[\:?Category:(?P<newcat1>[^\|\}]+)(\|[^\}]+)?\]\]|Robot: Changing Category:(.+) to Category:(?P<newcat2>.+)'
                     m = re.search(regex, logcomment, flags=re.I)
@@ -485,9 +485,9 @@ class CommonscatBot(Bot):
                             return self.checkCommonscatLink(m.group('newcat2'))
                     else:
                         pywikibot.output(
-                            u'getCommonscat: Deleted by %s. Couldn\'t find '
+                            u'getCommonscat: %s deleted by %s. Couldn\'t find '
                             u'move target in "%s"'
-                            % (loguser, logcomment))
+                            % (commonsPage, loguser, logcomment))
                         return u''
                 return u''
             elif commonsPage.isRedirectPage():
