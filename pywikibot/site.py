@@ -2673,24 +2673,23 @@ class APISite(BaseSite):
         if _version < MediaWikiVersion('1.20'):
             if all:
                 types.extend(self.TOKENS_0)
-            for tokentype in self.validate_tokens(types):
-                # 'patrol' token is done later on.
-                if tokentype == 'patrol':
-                    continue
-                query = api.PropertyGenerator('info',
-                                              titles='Dummy page',
-                                              intoken=tokentype,
-                                              site=self)
-                query.request._warning_handler = warn_handler
+            valid_tokens = set(self.validate_tokens(types))
+            # don't request patrol
+            query = api.PropertyGenerator('info',
+                                          titles='Dummy page',
+                                          intoken=valid_tokens - set(['patrol']),
+                                          site=self)
+            query.request._warning_handler = warn_handler
 
-                for item in query:
-                    pywikibot.debug(unicode(item), _logger)
+            for item in query:
+                pywikibot.debug(unicode(item), _logger)
+                for tokentype in valid_tokens:
                     if (tokentype + 'token') in item:
                         user_tokens[tokentype] = item[tokentype + 'token']
 
             # patrol token require special handling.
             # TODO: try to catch exceptions?
-            if 'patrol' in types:
+            if 'patrol' in valid_tokens:
                 if MediaWikiVersion('1.14') <= _version < MediaWikiVersion('1.17'):
                     user_tokens['patrol'] = user_tokens['edit']
                 else:
@@ -2707,8 +2706,7 @@ class APISite(BaseSite):
                         item = data['recentchanges'][0]
                         pywikibot.debug(unicode(item), _logger)
                         if 'patroltoken' in item:
-                            user_tokens['patrol'] = item.get('patroltoken')
-
+                            user_tokens['patrol'] = item['patroltoken']
         else:
             if _version < MediaWikiVersion('1.24wmf19'):
                 if all is not False:
