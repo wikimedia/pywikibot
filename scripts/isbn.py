@@ -27,6 +27,13 @@ Furthermore, the following command line parameters are supported:
 
 -always           Don't prompt you for each replacement.
 
+-prop-isbn-10     Sets ISBN-10 property ID, so it's not tried to be found
+                  automatically.
+                  The usage is as follows: -prop-isbn-10:propid
+
+-prop-isbn-13     Sets ISBN-13 property ID. The format and purpose is the
+                  same as in -prop-isbn-10.
+
 """
 #
 # (C) Pywikibot team, 2009-2014
@@ -38,7 +45,7 @@ __version__ = '$Id$'
 
 import re
 import pywikibot
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators, Bot, WikidataBot
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -1415,6 +1422,89 @@ class IsbnBot(Bot):
             self.treat(page)
 
 
+class IsbnWikibaseBot(WikidataBot):
+
+    """ISBN bot to be run on Wikibase sites."""
+
+    def __init__(self, generator, **kwargs):
+        self.availableOptions.update({
+            'to13': False,
+            'format': False,
+        })
+        self.isbn_10_prop_id = kwargs.pop('prop-isbn-10', None)
+        self.isbn_13_prop_id = kwargs.pop('prop-isbn-13', None)
+
+        super(IsbnWikibaseBot, self).__init__(use_from_page=None, **kwargs)
+
+        self.generator = generator
+        if self.isbn_10_prop_id is None:
+            self.isbn_10_prop_id = self.get_property_by_name('ISBN-10')
+        if self.isbn_13_prop_id is None:
+            self.isbn_13_prop_id = self.get_property_by_name('ISBN-13')
+        self.comment = i18n.twtranslate(pywikibot.Site(), 'isbn-formatting')
+
+    def treat(self, page, item):
+        change_messages = []
+
+        if self.isbn_10_prop_id in item.claims:
+            for claim in item.claims[self.isbn_10_prop_id]:
+                try:
+                    isbn = getIsbn(claim.getTarget())
+                except InvalidIsbnException as e:
+                    pywikibot.output(e)
+                    continue
+
+                old_code = claim.getTarget()
+
+                if self.getOption('format'):
+                    isbn.format()
+
+                if self.getOption('to13'):
+                    isbn = isbn.toISBN13()
+
+                    item.claims[claim.getID()].remove(claim)
+                    claim = pywikibot.Claim(self.repo, self.isbn_13_prop_id)
+                    claim.setTarget(isbn.code)
+                    if self.isbn_13_prop_id in item.claims:
+                        item.claims[self.isbn_13_prop_id].append(claim)
+                    else:
+                        item.claims[self.isbn_13_prop_id] = [claim]
+                    change_messages.append('Changing %s (%s) to %s (%s)' %
+                                           (self.isbn_10_prop_id, old_code,
+                                            self.isbn_13_prop_id, isbn.code))
+                    continue
+
+                if old_code == isbn.code:
+                    continue
+                claim.setTarget(isbn.code)
+                change_messages.append('Changing %s (%s --> %s)' %
+                                       (self.isbn_10_prop_id, old_code,
+                                        isbn.code))
+
+        # -format is the only option that has any effect on ISBN13
+        if self.getOption('format') and self.isbn_13_prop_id in item.claims:
+            for claim in item.claims[self.isbn_13_prop_id]:
+                try:
+                    isbn = getIsbn(claim.getTarget())
+                except InvalidIsbnException as e:
+                    pywikibot.output(e)
+                    continue
+
+                old_code = claim.getTarget()
+                isbn.format()
+                if old_code == isbn.code:
+                    continue
+                change_messages.append(
+                    'Changing %s (%s --> %s)' % (self.isbn_13_prop_id,
+                                                 claim.getTarget(), isbn.code))
+                claim.setTarget(isbn.code)
+
+        if change_messages:
+            self.current_page = item
+            pywikibot.output('\n'.join(change_messages))
+            self.user_edit_entity(item, summary=self.comment)
+
+
 def main(*args):
     """
     Process command line arguments and invoke bot.
@@ -1430,8 +1520,20 @@ def main(*args):
     local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
 
+    # Check whether we're running on Wikibase site or not
+    # FIXME: See T85483 and run() in WikidataBot
+    site = pywikibot.Site()
+    data_site = site.data_repository()
+    use_wikibase = (data_site is not None and
+                    data_site.family == site.family and
+                    data_site.code == site.code)
+
     for arg in local_args:
-        if arg.startswith('-') and arg[1:] in ('always', 'to13', 'format'):
+        if arg.startswith('-prop-isbn-10:'):
+            options[arg[1:len('-prop-isbn-10')]] = arg[len('-prop-isbn-10:'):]
+        elif arg.startswith('-prop-isbn-13:'):
+            options[arg[1:len('-prop-isbn-13')]] = arg[len('-prop-isbn-13:'):]
+        elif arg.startswith('-') and arg[1:] in ('always', 'to13', 'format'):
             options[arg[1:]] = True
         else:
             genFactory.handleArg(arg)
@@ -1439,7 +1541,10 @@ def main(*args):
     gen = genFactory.getCombinedGenerator()
     if gen:
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = IsbnBot(preloadingGen, **options)
+        if use_wikibase:
+            bot = IsbnWikibaseBot(preloadingGen, **options)
+        else:
+            bot = IsbnBot(preloadingGen, **options)
         bot.run()
     else:
         pywikibot.showHelp()

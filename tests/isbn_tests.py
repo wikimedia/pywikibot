@@ -9,10 +9,15 @@ import pywikibot
 
 __version__ = '$Id$'
 
-from scripts.isbn import ISBN10, ISBN13, InvalidIsbnException as IsbnExc, \
-    getIsbn, hyphenateIsbnNumbers, convertIsbn10toIsbn13, main
-from tests.aspects import TestCase, unittest
-from pywikibot import Bot
+from scripts.isbn import (
+    ISBN10, ISBN13, InvalidIsbnException as IsbnExc,
+    getIsbn, hyphenateIsbnNumbers, convertIsbn10toIsbn13,
+    main
+)
+from tests.aspects import (
+    unittest, TestCase, WikibaseTestCase, ScriptMainTestCase
+)
+from pywikibot import Bot, Claim, ItemPage
 
 
 class TestIsbn(TestCase):
@@ -89,7 +94,7 @@ class TestIsbn(TestCase):
                                isbn.format)
 
 
-class TestIsbnBot(TestCase):
+class TestIsbnBot(ScriptMainTestCase):
 
     """Test isbnbot with non-write patching (if the testpage exists)."""
 
@@ -122,6 +127,65 @@ class TestIsbnBot(TestCase):
 def userPut_dummy(self, page, oldtext, newtext, **kwargs):
     TestIsbnBot.newtext = newtext
 
+
+class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase):
+
+    """Test isbnbot on Wikibase site with non-write patching."""
+
+    family = 'wikidata'
+    code = 'test'
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestIsbnWikibaseBot, cls).setUpClass()
+
+        # Check if the unit test item page and the property both exist
+        item_ns = cls.get_repo().item_namespace
+        for page in cls.get_site().search('IsbnWikibaseBotUnitTest', step=1,
+                                          total=1, namespaces=item_ns):
+            cls.test_page_qid = page.title()
+            item_page = ItemPage(cls.get_repo(), page.title())
+            for pid, claims in item_page.get()['claims'].items():
+                for claim in claims:
+                    prop_page = pywikibot.PropertyPage(cls.get_repo(),
+                                                       claim.getID())
+                    prop_page.get()
+                    if ('ISBN-10' in prop_page.labels.values() and
+                            claim.getTarget() == '097522980x'):
+                        return
+            raise unittest.SkipTest(
+                u'%s: "ISBN-10" property was not found in '
+                u'"IsbnWikibaseBotUnitTest" item page' % cls.__name__)
+        raise unittest.SkipTest(
+            u'%s: "IsbnWikibaseBotUnitTest" item page was not found'
+            % cls.__name__)
+
+    def setUp(self):
+        TestIsbnWikibaseBot._original_setTarget = Claim.setTarget
+        Claim.setTarget = setTarget_dummy
+        TestIsbnWikibaseBot._original_editEntity = ItemPage.editEntity
+        ItemPage.editEntity = editEntity_dummy
+        super(TestIsbnWikibaseBot, self).setUp()
+
+    def tearDown(self):
+        Claim.setTarget = TestIsbnWikibaseBot._original_setTarget
+        ItemPage.editEntity = TestIsbnWikibaseBot._original_editEntity
+        super(TestIsbnWikibaseBot, self).tearDown()
+
+    def test_isbn(self):
+        main('-page:' + self.test_page_qid, '-always', '-format')
+        self.assertEqual(self.setTarget_value, '0-9752298-0-X')
+        main('-page:' + self.test_page_qid, '-always', '-to13')
+        self.assertTrue(self.setTarget_value, '978-0975229804')
+
+
+def setTarget_dummy(self, value):
+    TestIsbnWikibaseBot.setTarget_value = value
+    TestIsbnWikibaseBot._original_setTarget(self, value)
+
+
+def editEntity_dummy(self, data=None, **kwargs):
+    pass
 
 if __name__ == "__main__":
     unittest.main()
