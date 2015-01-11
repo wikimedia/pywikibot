@@ -11,7 +11,6 @@
 __version__ = '$Id$'
 #
 
-import sys
 import os
 import tempfile
 import codecs
@@ -57,22 +56,6 @@ class TextEditor(object):
         pywikibot.log(u'Running editor: %s' % command)
         return command
 
-    def convertLinebreaks(self, text):
-        """Convert line-breaks."""
-        if sys.platform == 'win32':
-            return text.replace('\r\n', '\n')
-        # TODO: Mac OS handling
-        return text
-
-    def restoreLinebreaks(self, text):
-        """Restore line-breaks."""
-        if text is None:
-            return
-        if sys.platform == 'win32':
-            return text.replace('\n', '\r\n')
-        # TODO: Mac OS handling
-        return text
-
     def edit(self, text, jumpIndex=None, highlight=None):
         """
         Call the editor and thus allows the user to change the text.
@@ -89,7 +72,6 @@ class TextEditor(object):
             file in his text editor
         @rtype: unicode or None
         """
-        text = self.convertLinebreaks(text)
         if config.editor:
             tempFilename = '%s.%s' % (tempfile.mktemp(),
                                       config.editor_filename_extension)
@@ -108,7 +90,7 @@ class TextEditor(object):
                                  encoding=config.editor_encoding) as temp_file:
                     newcontent = temp_file.read()
                 os.unlink(tempFilename)
-                return self.restoreLinebreaks(newcontent)
+                return newcontent
 
         try:
             import gui  # noqa
@@ -120,8 +102,4 @@ class TextEditor(object):
                 'are typically part of Python but may be packaged separately '
                 'on your platform.\n' % e)
 
-        return self.restoreLinebreaks(
-            pywikibot.ui.editText(
-                text,
-                jumpIndex=jumpIndex,
-                highlight=highlight))
+        return pywikibot.ui.editText(text, jumpIndex=jumpIndex, highlight=highlight)
