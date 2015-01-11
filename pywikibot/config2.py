@@ -886,6 +886,17 @@ if transliteration_target == 'not set':
 elif transliteration_target in ('None', 'none'):
     transliteration_target = None
 
+if sys.platform == 'win32' and editor:
+    # single character string literals from
+    # https://docs.python.org/2/reference/lexical_analysis.html#string-literals
+    # encode('unicode-escape') also changes Unicode characters
+    if set(editor) & set('\a\b\f\n\r\t\v'):
+        print('WARNING: The editor path contains probably invalid escaped '
+              'characters. Make sure to use a raw-string (r"..." or r\'...\'), '
+              'forward slashs as a path delimiter or to escape the normal '
+              'path delimiter.')
+
+
 # Fix up default site
 if family == 'wikipedia' and mylang == 'language':
     print("WARNING: family and mylang are not set.\n"
