@@ -4,7 +4,7 @@
 
 #
 # (C) Gerrit Holl, 2004
-# (C) Pywikibot team, 2004-2014
+# (C) Pywikibot team, 2004-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -93,7 +93,7 @@ class TextEditor(object):
                 return newcontent
 
         try:
-            import gui  # noqa
+            import pywikibot.userinterfaces.gui  # noqa
         except ImportError as e:
             raise pywikibot.Error(
                 'Could not load GUI modules: %s\nNo editor available.\n'

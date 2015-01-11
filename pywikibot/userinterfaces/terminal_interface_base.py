@@ -331,7 +331,7 @@ class UI:
         @rtype: unicode or None
         """
         try:
-            import gui
+            from pywikibot.userinterfaces import gui
         except ImportError as e:
             print('Could not load GUI modules: %s' % e)
             return text
