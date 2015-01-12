@@ -118,7 +118,7 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 """
 #
 # (C) Daniel Herding, 2004-2012
-# (C) Pywikibot team, 2004-2014
+# (C) Pywikibot team, 2004-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -127,7 +127,6 @@ __version__ = '$Id$'
 
 import re
 import time
-import webbrowser
 import sys
 
 import pywikibot
@@ -593,11 +592,7 @@ class ReplaceRobot(Bot):
                         new_text = as_edited
                     continue
                 if choice == 'b':
-                    webbrowser.open("http://%s%s" % (
-                        page.site.hostname(),
-                        page.site.nice_get_address(page.title(asUrl=True))
-                    ))
-                    i18n.input('pywikibot-enter-finished-browser')
+                    pywikibot.bot.open_webbrowser(page)
                     try:
                         original_text = page.get(get_redirect=True, force=True)
                     except pywikibot.NoPage:

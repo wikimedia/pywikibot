@@ -64,7 +64,7 @@ or you need some help regarding this script, you can find us here:
 
 #
 # (C) Filnik, 2007-2010
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -72,7 +72,6 @@ __version__ = '$Id$'
 #
 
 import re
-import webbrowser
 import codecs
 import time
 
@@ -231,11 +230,7 @@ Match was: %s''' % result)
                 elif choice == 'n':
                     return (False, False, always)
                 elif choice == 'b':
-                    webbrowser.open("http://%s%s" % (
-                        site.hostname(),
-                        site.nice_get_address(page.title(asUrl=True))
-                    ))
-                    pywikibot.input("Press Enter when finished in browser.")
+                    pywikibot.bot.open_webbrowser(page)
             if always or choice == 'y':
                 try:
                     if always:

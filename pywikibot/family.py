@@ -15,9 +15,9 @@ import collections
 import imp
 
 if sys.version_info[0] > 2:
-    from urllib.parse import urlparse
+    import urllib.parse as urlparse
 else:
-    from urlparse import urlparse
+    import urlparse
 
 import pywikibot
 from pywikibot import config2 as config
@@ -1015,6 +1015,15 @@ class Family(object):
         # Override this ONLY if the wiki family requires a path prefix
         return ''
 
+    def base_url(self, code, uri):
+        protocol = self.protocol(code)
+        if protocol == 'https':
+            host = self.ssl_hostname(code)
+            uri = self.ssl_pathprefix(code) + uri
+        else:
+            host = self.hostname(code)
+        return urlparse.urljoin('{0}://{1}'.format(protocol, host), uri)
+
     def path(self, code):
         return '%s/index.php' % self.scriptpath(code)
 
@@ -1244,7 +1253,7 @@ class AutoFamily(Family):
         """Constructor."""
         super(AutoFamily, self).__init__()
         self.name = name
-        self.url = urlparse(url)
+        self.url = urlparse.urlparse(url)
         self.langs = {
             name: self.url.netloc
         }

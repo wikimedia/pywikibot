@@ -45,7 +45,6 @@ if StrictVersion(httplib2.__version__) < StrictVersion("0.6.0"):
 if sys.version_info[0] > 2:
     from ssl import SSLError as SSLHandshakeError
     import queue as Queue
-    import urllib.parse as urlparse
     from http import cookiejar as cookielib
     from urllib.parse import quote
 else:
@@ -55,7 +54,6 @@ else:
         from httplib2 import ServerNotFoundError as SSLHandshakeError
 
     import Queue
-    import urlparse
     import cookielib
     from urllib2 import quote
 
@@ -247,13 +245,7 @@ def request(site=None, uri=None, *args, **kwargs):
         r = fetch(uri, *args, **kwargs)
         return r.content
 
-    proto = site.protocol()
-    if proto == 'https':
-        host = site.ssl_hostname()
-        uri = site.ssl_pathprefix() + uri
-    else:
-        host = site.hostname()
-    baseuri = urlparse.urljoin("%s://%s" % (proto, host), uri)
+    baseuri = site.base_url(uri)
 
     kwargs.setdefault("disable_ssl_certificate_validation",
                       site.ignore_certificate_error())

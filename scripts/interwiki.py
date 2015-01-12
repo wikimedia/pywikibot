@@ -338,7 +338,7 @@ that you have to break it off, use "-continue" next time.
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
 # (C) xqt, 2009-2014
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -353,7 +353,6 @@ import datetime
 import codecs
 import pickle
 import socket
-import webbrowser
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph, titletranslate
 
@@ -1987,11 +1986,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                                                  ('Always', 'a')],
                                                 automatic_quit=False)
                 if answer == 'b':
-                    webbrowser.open("http://%s%s" % (
-                        page.site.hostname(),
-                        page.site.nice_get_address(page.title(asUrl=True))
-                    ))
-                    pywikibot.input(u"Press Enter when finished in browser.")
+                    pywikibot.bot.open_webbrowser(page)
                     return True
                 elif answer == 'a':
                     # don't ask for the rest of this subject

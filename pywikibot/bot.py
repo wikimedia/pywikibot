@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """User-interface related functions for building bots."""
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,11 +16,12 @@ import logging
 import logging.handlers
 # all output goes thru python std library "logging" module
 
-import os
-import sys
-import re
-import json
 import datetime
+import json
+import os
+import re
+import sys
+import webbrowser
 
 _logger = "bot"
 
@@ -845,6 +846,13 @@ Global arguments available for all bots:
             pywikibot.stdout(u'Sorry, no help available for %s' % module_name)
         pywikibot.log('showHelp:', exc_info=True)
     pywikibot.stdout(globalHelp)
+
+
+def open_webbrowser(page):
+    """Open the web browser displaying the page and wait for input."""
+    from pywikibot import i18n
+    webbrowser.open(page.full_url())
+    i18n.input('pywikibot-enter-finished-browser')
 
 
 class QuitKeyboardInterrupt(KeyboardInterrupt):

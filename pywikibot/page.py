@@ -10,19 +10,19 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
 #
 
-import sys
-import logging
-import re
-import unicodedata
 import collections
 import hashlib
+import logging
+import re
+import sys
+import unicodedata
 
 try:
     from collections import OrderedDict
@@ -292,6 +292,11 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         representation of an instance can not change after the construction.
         """
         return hash(unicode(self))
+
+    def full_url(self):
+        """Return the full URL."""
+        return self.site.base_url(self.site.nice_get_address(self.title(
+            asUrl=True)))
 
     def autoFormat(self):
         """Return L{date.getAutoFormat} dictName and value, if any.
