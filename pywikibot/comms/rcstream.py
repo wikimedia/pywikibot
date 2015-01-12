@@ -85,10 +85,6 @@ class RcListenerThread(threading.Thread):
                 debug('Received change %r' % change, _logger)
 
                 thread.count += 1
-                if thread.total is not None and thread.count > thread.total:
-                    thread.stop()
-                    return
-
                 thread.queue.put(change)
                 if thread.queue.qsize() > thread.warn_queue_length:
                     warning('%r queue length exceeded %i'
@@ -96,6 +92,10 @@ class RcListenerThread(threading.Thread):
                                thread.warn_queue_length),
                             _logger=_logger)
                     thread.warn_queue_length = thread.warn_queue_length + 100
+
+                if thread.total is not None and thread.count >= thread.total:
+                    thread.stop()
+                    return
 
             def on_connect(self):
                 debug('Connected to %r; subscribing to %s'
@@ -115,7 +115,7 @@ class RcListenerThread(threading.Thread):
     def run(self):
         """ Threaded function. Runs insided the thread when started with .start(). """
         self.running = True
-        while self.running:
+        while self.running and self.client.connected:
             self.client.wait(seconds=0.1)
         debug('Shut down event loop for %r' % self, _logger)
         self.client.disconnect()
