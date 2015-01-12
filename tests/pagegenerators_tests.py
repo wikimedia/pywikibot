@@ -669,6 +669,13 @@ class LiveRCPageGeneratorTestCase(WikimediaDefaultSiteTestCase):
             raise unittest.SkipTest('socketIO_client not available')
 
     def test_RC_pagegenerator_result(self):
+        import logging
+        lgr = logging.getLogger('socketIO_client')
+        lgr.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        lgr.addHandler(ch)
+
         site = self.get_site()
         pagegenerator = pagegenerators.LiveRCPageGenerator(site,
                                                            total=self.length)
