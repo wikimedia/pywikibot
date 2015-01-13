@@ -57,6 +57,7 @@ from pywikibot.tools import (
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
     from urllib.request import URLopener
+    basestring = (str,)
 else:
     from urlparse import urlparse
     from urllib import URLopener

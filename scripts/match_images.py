@@ -87,21 +87,23 @@ def match_image_pages(imagePageA, imagePageB):
     averageScore = (wholeScore + topleftScore + toprightScore +
                     bottomleftScore + bottomrightScore + centerScore) / 6
 
-    print (u'Whole image           ' + str(wholeScore))
-    print (u'Top left of image     ' + str(topleftScore))
-    print (u'Top right of image    ' + str(toprightScore))
-    print (u'Bottom left of image  ' + str(bottomleftScore))
-    print (u'Bottom right of image ' + str(bottomrightScore))
-    print (u'Center of image       ' + str(centerScore))
-    print (u'                      -------------')
-    print (u'Average               ' + str(averageScore))
+    pywikibot.output('Whole image           {0:>7.2%}\n'
+                     'Top left of image     {1:>7.2%}\n'
+                     'Top right of image    {2:>7.2%}\n'
+                     'Bottom left of image  {3:>7.2%}\n'
+                     'Bottom right of image {4:>7.2%}\n'
+                     'Center of image       {5:>7.2%}\n'
+                     '                      -------\n'
+                     'Average               {6:>7.2%}'.format(
+        wholeScore, topleftScore, toprightScore, bottomleftScore,
+        bottomrightScore, centerScore, averageScore))
 
     # Hard coded at 80%, change this later on.
     if averageScore > 0.8:
-        print (u'We have a match!')
+        pywikibot.output('We have a match!')
         return True
     else:
-        print (u'Not the same.')
+        pywikibot.output('Not the same.')
         return False
 
 
@@ -133,7 +135,7 @@ def match_images(imageA, imageB):
     if totalPixels == 0:
         return 0
 
-    return totalMatch / totalPixels * 100
+    return totalMatch / totalPixels
 
 
 def main(*args):
