@@ -1177,10 +1177,10 @@ class Siteinfo(Container):
                 site=self._site,
                 action='query',
                 meta='siteinfo',
-                siprop='|'.join(props))
+                siprop=props)
             # With 1.25wmf5 it'll require continue or rawcontinue. As we don't
             # continue anyway we just always use continue.
-            request['continue'] = ''
+            request['continue'] = True
             # warnings are handled later
             request._warning_handler = warn_handler
             data = request.submit()
@@ -2891,11 +2891,10 @@ class APISite(BaseSite):
         else:
             pltitle = page.title(withSection=False).encode(self.encoding())
             plargs['titles'] = pltitle
-        if follow_redirects:
-            plargs['redirects'] = ''
         plgen = self._generator(api.PageGenerator, type_arg="links",
                                 namespaces=namespaces, step=step, total=total,
-                                g_content=content, **plargs)
+                                g_content=content, redirects=follow_redirects,
+                                **plargs)
         return plgen
 
     @deprecate_arg("withSortKey", None)  # Sortkey doesn't work with generator
@@ -3342,11 +3341,9 @@ class APISite(BaseSite):
             raise Error("alllinks: unique and fromids cannot both be True.")
         algen = self._generator(api.ListGenerator, type_arg="alllinks",
                                 namespaces=namespace, alfrom=start,
-                                step=step, total=total)
+                                step=step, total=total, alunique=unique)
         if prefix:
             algen.request["alprefix"] = prefix
-        if unique:
-            algen.request["alunique"] = ""
         if fromids:
             algen.request["alprop"] = "title|ids"
         for link in algen:
@@ -3658,7 +3655,7 @@ class APISite(BaseSite):
                                 rcprop="user|comment|timestamp|title|ids"
                                        "|sizes|redirect|loginfo|flags",
                                 namespaces=namespaces, step=step,
-                                total=total)
+                                total=total, rctoponly=topOnly)
         if start is not None:
             rcgen.request["rcstart"] = start
         if end is not None:
@@ -3670,12 +3667,10 @@ class APISite(BaseSite):
                 pywikibot.warning(
                     u"recentchanges: pagelist option is disabled; ignoring.")
             else:
-                rcgen.request["rctitles"] = u"|".join(p.title(withSection=False)
-                                                      for p in pagelist)
+                rcgen.request["rctitles"] = (p.title(withSection=False)
+                                             for p in pagelist)
         if changetype:
             rcgen.request["rctype"] = changetype
-        if topOnly:
-            rcgen.request["rctoponly"] = ""
         filters = {'minor': showMinor,
                    'bot': showBot,
                    'anon': showAnon,
@@ -3685,12 +3680,8 @@ class APISite(BaseSite):
                 self.has_right('patrol') or self.has_right('patrolmarks')):
             rcgen.request['rcprop'] += ['patrolled']
             filters['patrolled'] = showPatrolled
-        rcshow = []
-        for item in filters:
-            if filters[item] is not None:
-                rcshow.append(filters[item] and item or ("!" + item))
-        if rcshow:
-            rcgen.request["rcshow"] = "|".join(rcshow)
+        rcgen.request['rcshow'] = api.OptionSet(self, 'recentchanges', 'show',
+                                                filters)
 
         if user:
             rcgen.request['rcuser'] = user
@@ -3737,8 +3728,8 @@ class APISite(BaseSite):
                                 gsrsearch=searchstring, gsrwhat=where,
                                 namespaces=namespaces, step=step,
                                 total=total, g_content=content)
-        if getredirects and MediaWikiVersion(self.version()) < MediaWikiVersion('1.23'):
-            srgen.request["gsrredirects"] = ""
+        if MediaWikiVersion(self.version()) < MediaWikiVersion('1.23'):
+            srgen.request['gsrredirects'] = getredirects
         return srgen
 
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
@@ -3776,7 +3767,7 @@ class APISite(BaseSite):
         ucgen = self._generator(api.ListGenerator, type_arg="usercontribs",
                                 ucprop="ids|title|timestamp|comment|flags",
                                 namespaces=namespaces, step=step,
-                                total=total)
+                                total=total, uctoponly=top_only)
         if user:
             ucgen.request["ucuser"] = user
         if userprefix:
@@ -3787,10 +3778,9 @@ class APISite(BaseSite):
             ucgen.request["ucend"] = str(end)
         if reverse:
             ucgen.request["ucdir"] = "newer"
-        if showMinor is not None:
-            ucgen.request["ucshow"] = showMinor and "minor" or "!minor"
-        if top_only:
-            ucgen.request["uctoponly"] = ""
+        option_set = api.OptionSet(self, 'usercontribs', 'show')
+        option_set['minor'] = showMinor
+        ucgen.request['ucshow'] = option_set
         return ucgen
 
     def watchlist_revs(self, start=None, end=None, reverse=False,
@@ -3834,12 +3824,8 @@ class APISite(BaseSite):
         filters = {'minor': showMinor,
                    'bot': showBot,
                    'anon': showAnon}
-        wlshow = []
-        for item in filters:
-            if filters[item] is not None:
-                wlshow.append(filters[item] and item or ("!" + item))
-        if wlshow:
-            wlgen.request["wlshow"] = "|".join(wlshow)
+        wlgen.request['wlshow'] = api.OptionSet(self, 'watchlist', 'show',
+                                                filters)
         return wlgen
 
     # TODO: T75370
@@ -3959,9 +3945,7 @@ class APISite(BaseSite):
         """
         rngen = self._generator(api.PageGenerator, type_arg="random",
                                 namespaces=namespaces, step=step, total=total,
-                                g_content=content)
-        if redirects:
-            rngen.request["grnredirect"] = ""
+                                g_content=content, grnredirect=redirects)
         return rngen
 
     # Catalog of editpage error codes, for use in generating messages.
@@ -4028,23 +4012,15 @@ class APISite(BaseSite):
         self.lock_page(page)
         params = dict(action="edit",
                       title=page.title(withSection=False),
-                      text=text, token=token, summary=summary)
-        if bot:
-            params['bot'] = ""
+                      text=text, token=token, summary=summary, bot=bot,
+                      recreate=recreate, createonly=createonly,
+                      nocreate=nocreate, minor=minor,
+                      notminor=not minor and notminor)
         if lastrev is not None:
             if lastrev not in page._revisions:
                 self.loadrevisions(page)
             params['basetimestamp'] = page._revisions[lastrev].timestamp
-        if minor:
-            params['minor'] = ""
-        elif notminor:
-            params['notminor'] = ""
-        if recreate:
-            params['recreate'] = ""
-        if createonly:
-            params['createonly'] = ""
-        if nocreate:
-            params['nocreate'] = ""
+
         watch_items = set(["watch", "unwatch", "preferences", "nochange"])
         if watch in watch_items:
             if MediaWikiVersion(self.version()) < MediaWikiVersion("1.16"):
@@ -4052,7 +4028,7 @@ class APISite(BaseSite):
                     pywikibot.warning(u'The watch value {0} is not supported '
                                       'by {1}'.format(watch, self))
                 else:
-                    params[watch] = ""
+                    params[watch] = True
             else:
                 params['watchlist'] = watch
         elif watch:
@@ -4198,12 +4174,9 @@ class APISite(BaseSite):
         token = self.tokens['move']
         self.lock_page(page)
         req = api.Request(site=self, action="move", to=newtitle,
-                          token=token, reason=summary)
+                          token=token, reason=summary, movetalk=movetalk,
+                          noredirect=noredirect)
         req['from'] = oldtitle  # "from" is a python keyword
-        if movetalk:
-            req['movetalk'] = ""
-        if noredirect:
-            req['noredirect'] = ""
         try:
             result = req.submit()
             pywikibot.debug(u"movepage response: %s" % result,
@@ -4575,17 +4548,10 @@ class APISite(BaseSite):
 
         token = self.tokens['block']
         req = api.Request(site=self, action='block', user=user.username,
-                          expiry=expiry, reason=reason, token=token)
-        if anononly:
-            req['anononly'] = ''
-        if nocreate:
-            req['nocreate'] = ''
-        if autoblock:
-            req['autoblock'] = ''
-        if noemail:
-            req['noemail'] = ''
-        if reblock:
-            req['reblock'] = ''
+                          expiry=expiry, reason=reason, token=token,
+                          anononly=anononly, nocreate=nocreate,
+                          autoblock=autoblock, noemail=noemail,
+                          reblock=reblock)
 
         data = req.submit()
         return data
@@ -4617,9 +4583,7 @@ class APISite(BaseSite):
         """
         token = self.tokens['watch']
         req = api.Request(action="watch", token=token,
-                          title=page.title(withSection=False))
-        if unwatch:
-            req["unwatch"] = ""
+                          title=page.title(withSection=False), unwatch=unwatch)
         result = req.submit()
         if "watch" not in result:
             pywikibot.error(u"watchpage: Unexpected API response:\n%s" % result)
@@ -4801,8 +4765,9 @@ class APISite(BaseSite):
                         f.seek(offset)
                         chunk = f.read(chunk_size)
                         req = api.Request(site=self, action='upload', token=token,
-                                          stash='1', offset=offset, filesize=filesize,
+                                          stash=True, offset=offset, filesize=filesize,
                                           filename=file_page_title,
+                                          ignorewarnings=ignore_warnings,
                                           mime_params={}, throttle=throttle)
                         req.mime_params['chunk'] = (chunk,
                                                     ("application", "octet-stream"),
@@ -4858,10 +4823,8 @@ class APISite(BaseSite):
                               filename=file_page_title,
                               url=source_url, comment=comment, text=text)
         if not result:
-            if watch:
-                req["watch"] = ""
-            if ignore_warnings:
-                req["ignorewarnings"] = ""
+            req['watch'] = watch
+            req['ignorewarnings'] = ignore_warnings
             try:
                 result = req.submit()
                 self._uploaddisabled = False
