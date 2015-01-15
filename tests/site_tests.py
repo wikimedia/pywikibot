@@ -16,6 +16,7 @@ import re
 
 import pywikibot
 from pywikibot import config
+from pywikibot.comms import http
 from pywikibot.tools import MediaWikiVersion
 from pywikibot.data import api
 
@@ -25,6 +26,7 @@ from tests.aspects import (
     WikimediaDefaultSiteTestCase,
     WikidataTestCase,
     DefaultWikidataClientTestCase,
+    AlteredDefaultSiteTestCase,
 )
 from tests.utils import allowed_failure, allowed_failure_if
 
@@ -173,10 +175,12 @@ class TestSiteObject(DefaultSiteTestCase):
         langs = mysite.languages()
         self.assertIsInstance(langs, list)
         self.assertIn(mysite.code, langs)
-        mysite.family.obsolete
+        self.assertIsInstance(mysite.obsolete, bool)
         ipf = mysite.interwiki_putfirst()
         if ipf:  # Not all languages use this
             self.assertIsInstance(ipf, list)
+        else:
+            self.assertIsNone(ipf)
 
         for item in mysite.validLanguageLinks():
             self.assertIn(item, langs)
@@ -2150,6 +2154,195 @@ class TestSametitleSite(TestCase):
         self.assertFalse(site.sametitle('Invalid1:Foo', 'Invalid2:Foo'))
         self.assertFalse(site.sametitle('Invalid:Foo', ':Foo'))
         self.assertFalse(site.sametitle('Invalid:Foo', 'Invalid:foo'))
+
+
+class TestObsoleteSite(TestCase):
+
+    """Test 'closed' and obsolete code sites."""
+
+    # hostname() fails, so it is provided here otherwise the
+    # test class fails with hostname not defined for mh.wikipedia.org
+    sites = {
+        'mhwp': {
+            'family': 'wikipedia',
+            'code': 'mh',
+            'hostname': 'mh.wikipedia.org',
+        },
+        # pywikibot should never attempt to access jp.wikipedia.org,
+        # however this entry ensures that there is a change in the builds
+        # if jp.wikipedia.org goes offline.
+        'jpwp': {
+            'family': 'wikipedia',
+            'code': 'jp',
+            'hostname': 'jp.wikipedia.org',
+        },
+        'jawp': {
+            'family': 'wikipedia',
+            'code': 'ja',
+        },
+    }
+
+    def test_locked_site(self):
+        """Test Wikimedia closed/locked site."""
+        site = self.get_site('mhwp')
+        self.assertEqual(site.code, 'mh')
+        self.assertIsInstance(site.obsolete, bool)
+        self.assertTrue(site.obsolete)
+        self.assertRaises(KeyError, site.hostname)
+        r = http.fetch(uri='http://mh.wikipedia.org/w/api.php',
+                       default_error_handling=False)
+        self.assertEqual(r.status, 200)
+
+    def test_removed_site(self):
+        """Test Wikimedia offline site."""
+        site = pywikibot.Site('ru-sib', 'wikipedia')
+        self.assertEqual(site.code, 'ru-sib')
+        self.assertIsInstance(site.obsolete, bool)
+        self.assertTrue(site.obsolete)
+        self.assertRaises(KeyError, site.hostname)
+        # See also http_tests, which tests that ru-sib.wikipedia.org is offline
+
+    def test_alias_code_site(self):
+        """Test Wikimedia site with an alias code."""
+        site = self.get_site('jpwp')
+        self.assertIsInstance(site.obsolete, bool)
+        self.assertEqual(site.code, 'ja')
+        self.assertFalse(site.obsolete)
+        self.assertEqual(site.hostname(), 'ja.wikipedia.org')
+        self.assertEqual(site.ssl_hostname(), 'ja.wikipedia.org')
+
+
+class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
+
+    """Test site without other production sites in its family."""
+
+    sites = {
+        'wikia': {
+            'family': 'wikia',
+            'code': 'wikia',
+        },
+        'lyricwiki': {
+            'family': 'lyricwiki',
+            'code': 'en',
+        },
+        'commons': {
+            'family': 'commons',
+            'code': 'commons',
+        },
+        'wikidata': {
+            'family': 'wikidata',
+            'code': 'wikidata',
+        },
+        'wikidatatest': {
+            'family': 'wikidata',
+            'code': 'test',
+        },
+    }
+
+    def test_wikia(self):
+        """Test www.wikia.com."""
+        site = self.get_site('wikia')
+        self.assertEqual(site.hostname(), 'www.wikia.com')
+        self.assertEqual(site.code, 'wikia')
+        self.assertIsInstance(site.namespaces, dict)
+        self.assertFalse(site.obsolete)
+        self.assertEqual(site.family.hostname('en'), 'www.wikia.com')
+        self.assertEqual(site.family.hostname('wikia'), 'www.wikia.com')
+        self.assertEqual(site.family.hostname('www'), 'www.wikia.com')
+
+        pywikibot.config.family = 'wikia'
+        pywikibot.config.mylang = 'de'
+
+        site2 = pywikibot.Site('www', 'wikia')
+        self.assertEqual(site2.code, 'wikia')
+        self.assertFalse(site2.obsolete)
+        self.assertEqual(site, site2)
+        self.assertEqual(pywikibot.config.mylang, 'de')
+
+        site2 = pywikibot.Site('really_invalid', 'wikia')
+        self.assertEqual(site2.code, 'wikia')
+        self.assertFalse(site2.obsolete)
+        self.assertEqual(site, site2)
+        self.assertEqual(pywikibot.config.mylang, 'de')
+
+        site2 = pywikibot.Site('de', 'wikia')
+        self.assertEqual(site2.code, 'wikia')
+        self.assertFalse(site2.obsolete)
+        self.assertEqual(site, site2)
+        # When the code is the same as config.mylang, Site() changes mylang
+        self.assertEqual(pywikibot.config.mylang, 'wikia')
+
+    def test_lyrics(self):
+        """Test lyrics.wikia.com."""
+        site = self.get_site('lyricwiki')
+        self.assertEqual(site.hostname(), 'lyrics.wikia.com')
+        self.assertEqual(site.code, 'en')
+        self.assertIsInstance(site.namespaces, dict)
+        self.assertFalse(site.obsolete)
+        self.assertEqual(site.family.hostname('en'), 'lyrics.wikia.com')
+
+        self.assertRaises(KeyError, site.family.hostname, 'lyrics')
+        self.assertRaises(KeyError, site.family.hostname, 'lyricwiki')
+
+        self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
+                          'lyricwiki', 'lyricwiki')
+
+        self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
+                          'de', 'lyricwiki')
+
+    def test_commons(self):
+        """Test Wikimedia Commons."""
+        site = self.get_site('commons')
+        self.assertEqual(site.hostname(), 'commons.wikimedia.org')
+        self.assertEqual(site.code, 'commons')
+        self.assertIsInstance(site.namespaces, dict)
+        self.assertFalse(site.obsolete)
+
+        self.assertRaises(KeyError, site.family.hostname, 'en')
+
+        pywikibot.config.family = 'commons'
+        pywikibot.config.mylang = 'de'
+
+        site2 = pywikibot.Site('en', 'commons')
+        self.assertEqual(site2.code, 'commons')
+        self.assertFalse(site2.obsolete)
+        self.assertEqual(site, site2)
+        self.assertEqual(pywikibot.config.mylang, 'de')
+
+        site2 = pywikibot.Site('really_invalid', 'commons')
+        self.assertEqual(site2.code, 'commons')
+        self.assertFalse(site2.obsolete)
+        self.assertEqual(site, site2)
+        self.assertEqual(pywikibot.config.mylang, 'de')
+
+        site2 = pywikibot.Site('de', 'commons')
+        self.assertEqual(site2.code, 'commons')
+        self.assertFalse(site2.obsolete)
+        self.assertEqual(site, site2)
+        # When the code is the same as config.mylang, Site() changes mylang
+        self.assertEqual(pywikibot.config.mylang, 'commons')
+
+    def test_wikidata(self):
+        """Test Wikidata family, with sites for test and production."""
+        site = self.get_site('wikidata')
+        self.assertEqual(site.hostname(), 'www.wikidata.org')
+        self.assertEqual(site.code, 'wikidata')
+        self.assertIsInstance(site.namespaces, dict)
+        self.assertFalse(site.obsolete)
+
+        self.assertRaises(KeyError, site.family.hostname, 'en')
+
+        pywikibot.config.family = 'wikidata'
+        pywikibot.config.mylang = 'en'
+
+        site2 = pywikibot.Site('test')
+        self.assertEqual(site2.hostname(), 'test.wikidata.org')
+        self.assertEqual(site2.code, 'test')
+
+        # Languages cant be used due to T71255
+        self.assertRaises(pywikibot.UnknownSite,
+                          pywikibot.Site, 'en', 'wikidata')
+
 
 if __name__ == '__main__':
     try:

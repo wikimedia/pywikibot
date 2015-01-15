@@ -815,7 +815,12 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
                 data['site'] = Site(data['code'], data['family'],
                                     interface=interface)
             if 'hostname' not in data and 'site' in data:
-                data['hostname'] = data['site'].hostname()
+                try:
+                    data['hostname'] = data['site'].hostname()
+                except KeyError:
+                    # The family has defined this as obsolete
+                    # without a mapping to a hostname.
+                    pass
 
         if not hasattr(cls, 'cached') or not cls.cached:
             pywikibot._sites = orig_sites

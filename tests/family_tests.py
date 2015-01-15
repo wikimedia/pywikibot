@@ -77,6 +77,17 @@ class TestFamily(TestCase):
         other = 'unknown'
         self.assertRaises(UnknownFamily, family.__eq__, other)
 
+    def test_obsolete(self):
+        """Test three types of obsolete codes."""
+        family = Family.load('wikipedia')
+        self.assertIsInstance(family.obsolete, dict)
+        # redirected code (see site tests test_alias_code_site)
+        self.assertEqual(family.obsolete['dk'], 'da')
+        # closed/locked site (see site tests test_locked_site)
+        self.assertEqual(family.obsolete['mh'], None)
+        # offline site (see site tests test_removed_site)
+        self.assertEqual(family.obsolete['ru-sib'], None)
+
 
 class TestOldFamilyMethod(DeprecationTestCase):
 
