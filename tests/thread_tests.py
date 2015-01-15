@@ -7,12 +7,6 @@
 #
 __version__ = '$Id$'
 
-import itertools
-import sys
-
-if sys.version_info[0] == 2:
-    from future_builtins import filter
-
 from tests.aspects import unittest, TestCase
 from pywikibot.tools import ThreadedGenerator, intersect_generators
 
@@ -50,17 +44,13 @@ class GeneratorIntersectTestCase(TestCase):
         # first otherwise the generator is empty the second time.
         datasets = [list(gen) for gen in gens]
 
-        itertools_result = set(
-            [item[0] for item in filter(
-                lambda lst: all([x == lst[0] for x in lst]),
-                itertools.product(*datasets))
-             ])
+        set_result = set(datasets[0]).intersection(*datasets[1:])
 
         result = list(intersect_generators(datasets))
 
         self.assertEqual(len(set(result)), len(result))
 
-        self.assertCountEqual(result, itertools_result)
+        self.assertCountEqual(result, set_result)
 
 
 class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
