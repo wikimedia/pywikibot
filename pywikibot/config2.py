@@ -554,7 +554,7 @@ db_hostname = 'localhost'
 db_username = ''
 db_password = ''
 db_name_format = '{0}'
-db_connect_file = None
+db_connect_file = os.path.expanduser('~/.my.cnf')
 
 # ############# SEARCH ENGINE SETTINGS ##############
 
