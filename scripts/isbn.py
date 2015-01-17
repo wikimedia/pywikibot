@@ -36,7 +36,7 @@ Furthermore, the following command line parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2009-2014
+# (C) Pywikibot team, 2009-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -46,6 +46,18 @@ __version__ = '$Id$'
 import re
 import pywikibot
 from pywikibot import i18n, pagegenerators, Bot, WikidataBot
+
+try:
+    import stdnum.isbn
+except ImportError:
+    try:
+        import isbnlib
+    except ImportError:
+        pass
+    try:
+        import isbn_hyphenate
+    except ImportError:
+        pass
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -1329,15 +1341,77 @@ def getIsbn(code):
     return i
 
 
+def is_valid(isbn):
+    """Check whether an ISBN 10 or 13 is valid."""
+    # isbnlib marks any ISBN10 with lowercase 'X' as invalid
+    isbn = isbn.upper()
+    try:
+        stdnum.isbn
+    except NameError:
+        pass
+    else:
+        try:
+            stdnum.isbn.validate(isbn)
+        except stdnum.isbn.InvalidFormat as e:
+            raise InvalidIsbnException(e)
+        except stdnum.isbn.InvalidChecksum as e:
+            raise InvalidIsbnException(e)
+        except stdnum.isbn.InvalidLength as e:
+            raise InvalidIsbnException(e)
+        return True
+
+    try:
+        isbnlib
+    except NameError:
+        pass
+    else:
+        if isbnlib.notisbn(isbn):
+            raise InvalidIsbnException('Invalid ISBN found')
+        return True
+
+    try:
+        getIsbn(isbn)
+    except InvalidIsbnException as e:
+        raise InvalidIsbnException(e)
+    return True
+
+
 def _hyphenateIsbnNumber(match):
     """Helper function to deal with a single ISBN."""
-    code = match.group('code')
+    isbn = match.group('code')
+    isbn = isbn.upper()
     try:
-        i = getIsbn(code)
-        i.format()
+        stdnum.isbn
+    except NameError:
+        pass
+    else:
+        try:
+            is_valid(isbn)
+        except InvalidIsbnException:
+            return isbn
+        i = stdnum.isbn.format(isbn)
+        return i
+
+    try:
+        isbn_hyphenate
+    except NameError:
+        pass
+    else:
+        try:
+            is_valid(isbn)
+            i = isbn_hyphenate.hyphenate(isbn)
+        except (InvalidIsbnException, isbn_hyphenate.IsbnMalformedError,
+                isbn_hyphenate.IsbnUnableToHyphenateError):
+            return isbn
+        return i
+
+    try:
+        is_valid(isbn)
     except InvalidIsbnException:
         # don't change
-        return code
+        return isbn
+    i = getIsbn(isbn)
+    i.format()
     return i.code
 
 
@@ -1350,13 +1424,45 @@ def hyphenateIsbnNumbers(text):
 
 def _isbn10toIsbn13(match):
     """Helper function to deal with a single ISBN."""
-    code = match.group('code')
+    isbn = match.group('code')
+    isbn = isbn.upper()
     try:
-        i = getIsbn(code)
+        stdnum.isbn
+    except NameError:
+        pass
+    else:
+        try:
+            is_valid(isbn)
+        except InvalidIsbnException:
+            return isbn
+        i = stdnum.isbn.to_isbn13(isbn)
+        return i
+
+    try:
+        isbnlib
+    except NameError:
+        pass
+    else:
+        try:
+            is_valid(isbn)
+        except InvalidIsbnException:
+            return isbn
+        # remove hyphenation, otherwise isbnlib.to_isbn13() returns None
+        i = isbnlib.canonical(isbn)
+        if i == isbn:
+            i13 = isbnlib.to_isbn13(i)
+            return i13
+        # add removed hyphenation
+        i13 = isbnlib.to_isbn13(i)
+        i13h = hyphenateIsbnNumbers('ISBN ' + i13)
+        return i13h[5:]
+
+    try:
+        is_valid(isbn)
     except InvalidIsbnException:
         # don't change
-        return code
-    i13 = i.toISBN13()
+        return isbn
+    i13 = getIsbn(isbn).toISBN13()
     return i13.code
 
 
@@ -1384,22 +1490,22 @@ class IsbnBot(Bot):
 
     def treat(self, page):
         try:
-            oldText = page.get()
-            for match in self.isbnR.finditer(oldText):
-                code = match.group('code')
+            old_text = page.get()
+            for match in self.isbnR.finditer(old_text):
+                isbn = match.group('code')
                 try:
-                    getIsbn(code)
+                    is_valid(isbn)
                 except InvalidIsbnException as e:
                     pywikibot.output(e)
 
-            newText = oldText
+            new_text = old_text
             if self.getOption('to13'):
-                newText = self.isbnR.sub(_isbn10toIsbn13, newText)
+                new_text = self.isbnR.sub(_isbn10toIsbn13, new_text)
 
             if self.getOption('format'):
-                newText = self.isbnR.sub(_hyphenateIsbnNumber, newText)
+                new_text = self.isbnR.sub(_hyphenateIsbnNumber, new_text)
             try:
-                self.userPut(page, page.text, newText, comment=self.comment)
+                self.userPut(page, page.text, new_text, comment=self.comment)
             except pywikibot.EditConflict:
                 pywikibot.output(u'Skipping %s because of edit conflict'
                                  % page.title())
@@ -1448,56 +1554,61 @@ class IsbnWikibaseBot(WikidataBot):
 
         if self.isbn_10_prop_id in item.claims:
             for claim in item.claims[self.isbn_10_prop_id]:
+                isbn = claim.getTarget()
                 try:
-                    isbn = getIsbn(claim.getTarget())
+                    is_valid(isbn)
                 except InvalidIsbnException as e:
                     pywikibot.output(e)
                     continue
 
-                old_code = claim.getTarget()
+                old_isbn = "ISBN " + isbn
 
                 if self.getOption('format'):
-                    isbn.format()
+                    new_isbn = hyphenateIsbnNumbers(old_isbn)
 
                 if self.getOption('to13'):
-                    isbn = isbn.toISBN13()
+                    new_isbn = convertIsbn10toIsbn13(old_isbn)
 
                     item.claims[claim.getID()].remove(claim)
                     claim = pywikibot.Claim(self.repo, self.isbn_13_prop_id)
-                    claim.setTarget(isbn.code)
+                    claim.setTarget(new_isbn)
                     if self.isbn_13_prop_id in item.claims:
                         item.claims[self.isbn_13_prop_id].append(claim)
                     else:
                         item.claims[self.isbn_13_prop_id] = [claim]
                     change_messages.append('Changing %s (%s) to %s (%s)' %
-                                           (self.isbn_10_prop_id, old_code,
-                                            self.isbn_13_prop_id, isbn.code))
+                                           (self.isbn_10_prop_id, old_isbn,
+                                            self.isbn_13_prop_id, new_isbn))
                     continue
 
-                if old_code == isbn.code:
+                if old_isbn == new_isbn:
                     continue
-                claim.setTarget(isbn.code)
+                # remove 'ISBN ' prefix
+                assert(new_isbn.startswith('ISBN '))
+                new_isbn = new_isbn[5:]
+                claim.setTarget(new_isbn)
                 change_messages.append('Changing %s (%s --> %s)' %
-                                       (self.isbn_10_prop_id, old_code,
-                                        isbn.code))
+                                       (self.isbn_10_prop_id, old_isbn,
+                                        new_isbn))
 
         # -format is the only option that has any effect on ISBN13
         if self.getOption('format') and self.isbn_13_prop_id in item.claims:
             for claim in item.claims[self.isbn_13_prop_id]:
+                isbn = claim.getTarget()
                 try:
-                    isbn = getIsbn(claim.getTarget())
+                    is_valid(isbn)
                 except InvalidIsbnException as e:
                     pywikibot.output(e)
                     continue
 
-                old_code = claim.getTarget()
-                isbn.format()
-                if old_code == isbn.code:
+                old_isbn = "ISBN " + isbn
+                new_isbn = hyphenateIsbnNumbers(old_isbn)
+                if old_isbn == new_isbn:
                     continue
                 change_messages.append(
                     'Changing %s (%s --> %s)' % (self.isbn_13_prop_id,
-                                                 claim.getTarget(), isbn.code))
-                claim.setTarget(isbn.code)
+                                                 claim.getTarget(), new_isbn))
+                claim.setTarget(new_isbn)
 
         if change_messages:
             self.current_page = item
