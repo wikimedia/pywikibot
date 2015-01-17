@@ -3931,6 +3931,72 @@ class Claim(Property):
         else:
             self.qualifiers[qualifier.getID()] = [qualifier]
 
+    def target_equals(self, value):
+        """
+        Check whether the Claim's target is equal to specified value.
+
+        The function checks for:
+        - ItemPage ID equality
+        - WbTime year equality
+        - Coordinate equality, regarding precision
+        - direct equality
+
+        @param value: the value to compare with
+        @return: true if the Claim's target is equal to the value provided,
+            false otherwise
+        @rtype: bool
+        """
+        if (isinstance(self.target, pywikibot.ItemPage) and
+                isinstance(value, str) and
+                self.target.id == value):
+            return True
+
+        if (isinstance(self.target, pywikibot.WbTime) and
+                not isinstance(value, pywikibot.WbTime) and
+                self.target.year == int(value)):
+            return True
+
+        if (isinstance(self.target, pywikibot.Coordinate) and
+                isinstance(value, str)):
+            coord_args = [float(x) for x in value.split(',')]
+            if len(coord_args) >= 3:
+                precision = coord_args[2]
+            else:
+                precision = 0.0001  # Default value (~10 m at equator)
+            try:
+                if self.target.precision is not None:
+                    precision = max(precision, self.target.precision)
+            except TypeError:
+                pass
+
+            if (abs(self.target.lat - coord_args[0]) <= precision and
+                    abs(self.target.lon - coord_args[1]) <= precision):
+                return True
+
+        if self.target == value:
+            return True
+
+        return False
+
+    def has_qualifier(self, qualifier_id, target):
+        """
+        Check whether Claim contains specified qualifier.
+
+        @param qualifier_id: id of the qualifier
+        @type qualifier_id: str
+        @param target: qualifier target to check presence of
+        @return: true if the qualifier was found, false otherwise
+        @rtype: bool
+        """
+        if self.isQualifier or self.isReference:
+            raise ValueError(u'Qualifiers and references cannot have '
+                             u'qualifiers.')
+
+        for qualifier in self.qualifiers.get(qualifier_id, []):
+            if qualifier.target_equals(target):
+                return True
+        return False
+
     def _formatValue(self):
         """
         Format the target into the proper JSON value that Wikibase wants.

@@ -437,6 +437,73 @@ class DryFactoryGeneratorTest(TestCase):
         self.assertEqual(gf.namespaces, set([1, 6]))
 
 
+class TestItemClaimFilterPageGenerator(WikidataTestCase):
+
+    """Test item claim filter page generator generator."""
+
+    def _simple_claim_test(self, prop, claim, qualifiers, valid):
+        """
+        Test given claim on sample (India) page.
+
+        @param prop: the property to check
+        @type prop: str
+        @param claim: the claim the property should contain
+        @param qualifiers: qualifiers to check or None
+        @type qualifiers: dict or None
+        @param valid: true if the page should be yielded by the generator,
+            false otherwise
+        @type valid: bool
+        """
+        item = pywikibot.ItemPage(self.get_repo(), 'Q668')
+        gen = pagegenerators.ItemClaimFilterPageGenerator([item], prop,
+                                                          claim, qualifiers)
+        pages = set(gen)
+        self.assertEqual(len(pages), 1 if valid else 0)
+
+    def _get_council_page(self):
+        """Return United Nations Security Council Wikidata page."""
+        site = self.get_site()
+        return pywikibot.Page(site, 'Q37470')
+
+    def test_valid_qualifiers(self):
+        """Test ItemClaimFilterPageGenerator on sample page using valid qualifiers."""
+        qualifiers = {
+            'P580': pywikibot.WbTime(1950, 1, 1, precision=9,
+                                     site=self.get_site()),
+            'P582': '1951',
+        }
+        self._simple_claim_test('P463', self._get_council_page(), qualifiers,
+                                True)
+
+    def test_invalid_qualifiers(self):
+        """Test ItemClaimFilterPageGenerator on sample page using invalid qualifiers."""
+        qualifiers = {
+            'P580': 1950,
+            'P582': pywikibot.WbTime(1960, 1, 1, precision=9,
+                                     site=self.site),
+        }
+        self._simple_claim_test('P463', self._get_council_page(), qualifiers,
+                                False)
+
+    def test_nonexisting_qualifiers(self):
+        """Test ItemClaimFilterPageGenerator on sample page using qualifiers the page doesn't have."""
+        qualifiers = {
+            'P370': pywikibot.WbTime(1950, 1, 1, precision=9,
+                                     site=self.get_site()),
+            'P232': pywikibot.WbTime(1960, 1, 1, precision=9,
+                                     site=self.get_site()),
+        }
+        self._simple_claim_test('P463', self._get_council_page(), qualifiers,
+                                False)
+
+    def test_no_qualifiers(self):
+        """Test ItemClaimFilterPageGenerator on sample page without qualifiers."""
+        self._simple_claim_test('P474', '+91', None, True)
+        self._simple_claim_test('P463', 'Q37470', None, True)
+        self._simple_claim_test('P625', '21,78', None, True)
+        self._simple_claim_test('P625', '21,78.05,0.01', None, False)
+
+
 class TestFactoryGenerator(DefaultSiteTestCase):
 
     """Test pagegenerators.GeneratorFactory."""
@@ -558,6 +625,37 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-recentchanges:10')
         gen = gf.getCombinedGenerator()
         self.assertPagesInNamespaces(gen, set([1, 3]))
+
+
+class TestFactoryGeneratorWikibase(WikidataTestCase):
+
+    """Test pagegenerators.GeneratorFactory on Wikibase site."""
+
+    def test_onlyif(self):
+        """Test -onlyif without qualifiers."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-page:Q15745378')
+        gf.handleArg('-onlyif:P357=International Journal of Minerals\, '
+                     'Metallurgy\, and Materials')
+        gen = gf.getCombinedGenerator()
+        self.assertEqual(len(set(gen)), 1)
+
+    def test_onlyifnot(self):
+        """Test -onlyifnot without qualifiers."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-page:Q15745378')
+        gf.handleArg('-onlyifnot:P357=International Journal of Minerals\, '
+                     'Metallurgy\, and Materials')
+        gen = gf.getCombinedGenerator()
+        self.assertEqual(len(set(gen)), 0)
+
+    def test_onlyif_qualifiers(self):
+        """Test -onlyif with qualifiers."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-page:Q668')
+        gf.handleArg('-onlyif:P47=Q837,P805=Q3088768')
+        gen = gf.getCombinedGenerator()
+        self.assertEqual(len(set(gen)), 1)
 
 
 class TestLogeventsFactoryGenerator(DefaultSiteTestCase):
