@@ -13,6 +13,51 @@ class Family(family.Family):
 
     """Family class for Anarchopedia wiki."""
 
+    interwiki_replacements = {
+        # ISO 639-2 -> ISO 639-1 mappings
+        'ara': 'ar',
+        'chi': 'zh',
+        'dan': 'da',
+        'deu': 'de',
+        'dut': 'nl',
+        'ell': 'el',
+        'eng': 'en',
+        'epo': 'eo',
+        'fas': 'fa',
+        'fin': 'fi',
+        'fra': 'fr',
+        'ger': 'de',
+        'gre': 'el',
+        'heb': 'he',
+        'hye': 'hy',
+        'ind': 'id',
+        'ita': 'it',
+        'jpn': 'ja',
+        'kor': 'ko',
+        'lav': 'lv',
+        'lit': 'lt',
+        'nno': 'no',
+        'nob': 'no',
+        'nor': 'no',
+        'pol': 'pl',
+        'por': 'pt',
+        'rum': 'ro',
+        'rus': 'ru',
+        'spa': 'es',
+        'srp': 'sr',
+        'sqi': 'sq',
+        'swe': 'sv',
+        'tur': 'tr',
+        'zho': 'zh',
+
+        # ISO 639-1 -> ISO 639-1 mappings
+        'bs': 'hr',
+
+        # Non-compliant mappings
+        'bos': 'hr',
+        'nsh': 'hr',
+    }
+
     def __init__(self):
         """Constructor."""
         family.Family.__init__(self)
@@ -28,51 +73,6 @@ class Family(family.Family):
             self.langs[l] = '%s.anarchopedia.org' % l
 
         self.nocapitalize = list(self.langs.keys())
-
-        self.obsolete = {
-            # ISO 639-2 -> ISO 639-1 mappings
-            'ara': 'ar',
-            'chi': 'zh',
-            'dan': 'da',
-            'deu': 'de',
-            'dut': 'nl',
-            'ell': 'el',
-            'eng': 'en',
-            'epo': 'eo',
-            'fas': 'fa',
-            'fin': 'fi',
-            'fra': 'fr',
-            'ger': 'de',
-            'gre': 'el',
-            'heb': 'he',
-            'hye': 'hy',
-            'ind': 'id',
-            'ita': 'it',
-            'jpn': 'ja',
-            'kor': 'ko',
-            'lav': 'lv',
-            'lit': 'lt',
-            'nno': 'no',
-            'nob': 'no',
-            'nor': 'no',
-            'pol': 'pl',
-            'por': 'pt',
-            'rum': 'ro',
-            'rus': 'ru',
-            'spa': 'es',
-            'srp': 'sr',
-            'sqi': 'sq',
-            'swe': 'sv',
-            'tur': 'tr',
-            'zho': 'zh',
-
-            # ISO 639-1 -> ISO 639-1 mappings
-            'bs': 'hr',
-
-            # Non-compliant mappings
-            'bos': 'hr',
-            'nsh': 'hr',
-        }
 
     @deprecated('APISite.version()')
     def version(self, code):

@@ -80,7 +80,7 @@ class TestFamily(TestCase):
         other = 'unknown'
         self.assertRaises(UnknownFamily, family.__eq__, other)
 
-    def test_obsolete(self):
+    def test_get_obsolete_wp(self):
         """Test three types of obsolete codes."""
         family = Family.load('wikipedia')
         self.assertIsInstance(family.obsolete, dict)
@@ -90,6 +90,38 @@ class TestFamily(TestCase):
         self.assertEqual(family.obsolete['mh'], None)
         # offline site (see site tests test_removed_site)
         self.assertEqual(family.obsolete['ru-sib'], None)
+
+    def test_get_obsolete_test(self):
+        """Test WikimediaFamily default obsolete."""
+        family = Family.load('test')
+        self.assertIn('dk', family.obsolete)
+        self.assertIn('dk', family.interwiki_replacements)
+        self.assertEqual(family.obsolete, family.interwiki_replacements)
+        self.assertEqual(family.interwiki_removals, set())
+
+    def test_set_obsolete(self):
+        """Test obsolete can be set."""
+        family = Family()
+        self.assertEqual(family.obsolete, {})
+        self.assertEqual(family.interwiki_replacements, {})
+        self.assertEqual(family.interwiki_removals, [])
+
+        family.obsolete = {'a': 'b', 'c': None}
+        self.assertEqual(family.obsolete, {'a': 'b', 'c': None})
+        self.assertEqual(family.interwiki_replacements, {'a': 'b'})
+        self.assertEqual(family.interwiki_removals, ['c'])
+
+    def test_obsolete_readonly(self):
+        """Test obsolete result not updatable."""
+        family = Family.load('test')
+        self.assertRaises(TypeError, family.obsolete.update, {})
+        self.assertRaises(TypeError, family.obsolete.__setitem__, 'a', 'b')
+
+    def test_WikimediaFamily_obsolete_readonly(self):
+        """Test WikimediaFamily obsolete is readonly."""
+        family = Family.load('test')
+        self.assertRaises(TypeError, family.__setattr__, 'obsolete',
+                          {'a': 'b', 'c': None})
 
 
 class TestFamilyUrlRegex(TestCase):

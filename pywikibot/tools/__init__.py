@@ -170,6 +170,37 @@ class DotReadableDict(UnicodeMixin):
         return repr(self.__dict__)
 
 
+class FrozenDict(dict):
+
+    """
+    Frozen dict, preventing write after initialisation.
+
+    Raises TypeError if write attempted.
+    """
+
+    def __init__(self, data=None, error=None):
+        """
+        Constructor.
+
+        @param data: mapping to freeze
+        @type data: mapping
+        @param error: error message
+        @type error: basestring
+        """
+        if data:
+            args = [data]
+        else:
+            args = []
+        super(FrozenDict, self).__init__(*args)
+        self._error = error or 'FrozenDict: not writable'
+
+    def update(self, *args, **kwargs):
+        """Prevent updates."""
+        raise TypeError(self._error)
+
+    __setitem__ = update
+
+
 def concat_options(message, line_length, options):
     """Concatenate options."""
     indent = len(message) + 2
