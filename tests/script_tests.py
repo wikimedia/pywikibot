@@ -28,6 +28,7 @@ script_deps = {
     'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
 
+    'data_ingestion': ['unicodecsv'],
     'flickrripper': ['flickrapi'],
     'match_images': ['PIL.ImageTk'],
     'states_redirect': ['pycountry'],
@@ -302,7 +303,6 @@ class TestScriptMeta(MetaTestCaseClass):
                 test_name = 'test_' + script_name + '_help'
             dct[test_name] = test_execution(script_name, ['-help'])
             if script_name in ['version',
-                               'data_ingestion',  # bug 68611
                                'script_wui',      # Failing on travis-ci
                                ] + failed_dep_script_list:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
@@ -325,7 +325,6 @@ class TestScriptMeta(MetaTestCaseClass):
                                             no_args_expected_results)
             if script_name in ['catall',          # stdout user interaction
                                'checkimages',     # bug 68613
-                               'data_ingestion',  # bug 68611
                                'flickrripper',    # Requires a flickr api key
                                'lonelypages',     # uses exit code 1
                                'script_wui',      # Error on any user except DrTrigonBot
