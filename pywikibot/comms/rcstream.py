@@ -104,7 +104,16 @@ class RcListenerThread(threading.Thread):
                 self.emit('subscribe', thread.wikihost)
                 debug('Subscribed to %s' % thread.wikihost, _logger)
 
+            def on_reconnect(self):
+                debug('Reconnected to %r' % (thread,), _logger)
+                self.on_connect()
+
+        class GlobalListener(socketIO_client.BaseNamespace):
+            def on_heartbeat(self):
+                self._transport.send_heartbeat()
+
         self.client.define(RCListener, rcpath)
+        self.client.define(GlobalListener)
 
     def __repr__(self):
         """ Return representation. """
@@ -115,7 +124,7 @@ class RcListenerThread(threading.Thread):
     def run(self):
         """ Threaded function. Runs insided the thread when started with .start(). """
         self.running = True
-        while self.running and self.client.connected:
+        while self.running:
             self.client.wait(seconds=0.1)
         debug('Shut down event loop for %r' % self, _logger)
         self.client.disconnect()
