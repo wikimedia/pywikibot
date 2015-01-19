@@ -15,18 +15,18 @@ Furthermore, the following command line parameters are supported:
                   the page selector. If no summary is supplied or couldn't
                   determine one from the selector it'll ask for one.
 
--unprotect        Acts like "default:none"
+-unprotect        Acts like "default:all"
 
 -default:         Sets the default protection level (default 'sysop'). If no
                   level is defined it doesn't change unspecified levels.
 
 -[type]:[level]   Set [type] protection level to [level]
 
-Usual values for [level] are: sysop, autoconfirmed, none; further levels may be
+Usual values for [level] are: sysop, autoconfirmed, all; further levels may be
 provided by some wikis.
 
 For all protection types (edit, move, etc.) it chooses the default protection
-level. This is "sysop" or "none" if -unprotect was selected. If multiple
+level. This is "sysop" or "all" if -unprotect was selected. If multiple
 -unprotect or -default are used, only the last occurrence is applied.
 
 Usage: python protect.py <OPTIONS>
@@ -82,29 +82,27 @@ class ProtectionRobot(Bot):
         self.generator = generator
         self.protections = protections
 
-    def run(self):
-        """Start the bot's action.
+    def treat(self, page):
+        """Run the bot's action on each page.
 
-        Loop through everything in the page generator and apply the
-        protections.
+        Bot.run() loops through everything in the page generator and applies
+        the protections using this function.
         """
-        for page in self.generator:
-            self.current_page = page
-            if not self.getOption('always'):
-                choice = pywikibot.input_choice(
-                    u'Do you want to change the protection level of %s?'
-                    % page.title(asLink=True, forceInterwiki=True),
-                    [('yes', 'y'), ('No', 'n'), ('all', 'a')],
-                    'n', automatic_quit=False)
-                if choice == 'n':
-                    continue
-                elif choice == 'a':
-                    self.options['always'] = True
-            applicable = page.applicable_protections()
-            protections = dict(
-                [prot for prot in self.protections if prot[0] in applicable])
-            page.protect(reason=self.getOption('summary'),
-                         protections=protections)
+        self.current_page = page
+        if not self.getOption('always'):
+            choice = pywikibot.input_choice(
+                u'Do you want to change the protection level of %s?'
+                % page.title(asLink=True, forceInterwiki=True),
+                [('yes', 'y'), ('No', 'n'), ('all', 'a')], 'n')
+            if choice == 'n':
+                return
+            elif choice == 'a':
+                self.options['always'] = True
+        applicable = page.applicable_protections()
+        protections = dict(
+            prot for prot in self.protections.items() if prot[0] in applicable)
+        page.protect(reason=self.getOption('summary'),
+                     protections=protections)
 
 
 def check_protection_level(operation, level, levels, default=None):
@@ -166,8 +164,7 @@ def main(*args):
     protection_levels = set(site.protection_levels())
     protection_types = site.protection_types()
     if '' in protection_levels:
-        protection_levels.remove('')
-        protection_levels.add('none')
+        protection_levels.add('all')
     for arg in local_args:
         if arg == '-always':
             options['always'] = True
@@ -182,7 +179,7 @@ def main(*args):
                              'Please use -imagelinks instead.\03{default}\n')
             local_args.append('-imagelinks' + arg[7:])
         elif arg.startswith('-unprotect'):
-            default_level = 'none'
+            default_level = 'all'
         elif arg.startswith('-default'):
             if len(arg) == len('-default'):
                 default_level = None
@@ -230,8 +227,9 @@ def main(*args):
         for p_type, level in protections.items():
             level = check_protection_level(p_type, level, protection_levels,
                                            default_level)
-            if level == 'none':
-                level = ''
+            # '' is equivalent to 'all'
+            if level == 'none' or level == '':
+                level = 'all'
             combined_protections[p_type] = level
         if not options.get('summary'):
             options['summary'] = pywikibot.input(
