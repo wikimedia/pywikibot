@@ -2228,13 +2228,15 @@ class APISite(BaseSite):
         This overwrites the corresponding family method for APISite class. Use
         L{pywikibot.tools.MediaWikiVersion} to compare MediaWiki versions.
         """
-        try:
-            version = self.siteinfo.get('generator', expiry=1).split(' ')[1]
-        except pywikibot.data.api.APIError:
-            # May occur if you are not logged in (no API read permissions).
-            pywikibot.exception(
-                'You have no API read permissions. Seems you are not logged in')
-            version = self.family.version(self.code)
+        version = self.force_version()
+        if not version:
+            try:
+                version = self.siteinfo.get('generator', expiry=1).split(' ')[1]
+            except pywikibot.data.api.APIError:
+                # May occur if you are not logged in (no API read permissions).
+                pywikibot.exception('You have no API read permissions. Seems '
+                                    'you are not logged in')
+                version = self.family.version(self.code)
         return version
 
     @property

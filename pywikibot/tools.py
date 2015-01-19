@@ -105,26 +105,51 @@ def concat_options(message, line_length, options):
 
 class MediaWikiVersion(Version):
 
-    """Version object to allow comparing 'wmf' versions with normal ones."""
+    """
+    Version object to allow comparing 'wmf' versions with normal ones.
 
-    MEDIAWIKI_VERSION = re.compile(r'(\d+(?:\.\d+)*)(?:wmf(\d+))?')
+    The version mainly consist of digits separated by periods. After that is a
+    suffix which may only be 'wmf<number>', 'alpha', 'beta<number>' or
+    '-rc.<number>' (the - and . are optional). They are considered from old to
+    new in that order with a version number without suffix is considered the
+    newest. This secondary difference is stored in an internal _dev_version
+    attribute.
+
+    Two versions are equal if their normal version and dev version are equal. A
+    version is greater if the normal version or dev version is greater. For
+    example:
+        1.24 < 1.24.1 < 1.25wmf1 < 1.25alpha < 1.25beta1 < 1.25beta2
+        < 1.25-rc-1 < 1.25-rc.2 < 1.25
+
+    Any other suffixes are considered invalid.
+    """
+
+    MEDIAWIKI_VERSION = re.compile(r'^(\d+(?:\.\d+)+)(wmf(\d+)|alpha|beta(\d+)|-?rc\.?(\d+))?$')
 
     def parse(self, vstring):
         version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(vstring)
         if not version_match:
-            raise ValueError('Invalid version number')
+            raise ValueError('Invalid version number "{0}"'.format(vstring))
         components = [int(n) for n in version_match.group(1).split('.')]
-        self.wmf_version = None
-        if version_match.group(2):  # wmf version
-            self.wmf_version = int(version_match.group(2))
+        # The _dev_version numbering scheme might change. E.g. if a stage
+        # between 'alpha' and 'beta' is added, 'beta', 'rc' and stable releases
+        # are reassigned (beta=3, rc=4, stable=5).
+        if version_match.group(3):  # wmf version
+            self._dev_version = (0, int(version_match.group(3)))
+        elif version_match.group(4):
+            self._dev_version = (2, int(version_match.group(4)))
+        elif version_match.group(5):
+            self._dev_version = (3, int(version_match.group(5)))
+        elif version_match.group(2) == 'alpha':
+            self._dev_version = (1, )
+        else:
+            self._dev_version = (4, )
+        self.suffix = version_match.group(2) or ''
         self.version = tuple(components)
 
     def __str__(self):
-        """Return version number with optional "wmf" suffix."""
-        vstring = '.'.join(str(v) for v in self.version)
-        if self.wmf_version:
-            vstring += 'wmf{0}'.format(self.wmf_version)
-        return vstring
+        """Return version number with optional suffix."""
+        return '.'.join(str(v) for v in self.version) + self.suffix
 
     def _cmp(self, other):
         if isinstance(other, basestring):
@@ -134,18 +159,11 @@ class MediaWikiVersion(Version):
             return 1
         if self.version < other.version:
             return -1
-        if self.wmf_version and other.wmf_version:
-            if self.wmf_version > other.wmf_version:
-                return 1
-            if self.wmf_version < other.wmf_version:
-                return -1
-            return 0
-        elif other.wmf_version:
+        if self._dev_version > other._dev_version:
             return 1
-        elif self.wmf_version:
+        if self._dev_version < other._dev_version:
             return -1
-        else:
-            return 0
+        return 0
 
     if sys.version_info[0] == 2:
         __cmp__ = _cmp

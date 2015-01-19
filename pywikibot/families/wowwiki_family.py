@@ -4,6 +4,7 @@
 __version__ = '$Id$'
 
 from pywikibot import family
+from pywikibot.tools import deprecated
 
 
 class Family(family.Family):
@@ -61,6 +62,7 @@ class Family(family.Family):
         """Return the script path for this family."""
         return ''
 
+    @deprecated('APISite.version()')
     def version(self, code):
         """Return the version for this family."""
         return '1.19.20'

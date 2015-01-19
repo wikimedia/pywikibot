@@ -1109,6 +1109,7 @@ class Family(object):
         return '%s%s' % (code, self.name)
 
     # Which version of MediaWiki is used?
+    @deprecated('APISite.version()')
     def version(self, code):
         """ Return MediaWiki version number as a string.
 
@@ -1117,7 +1118,27 @@ class Family(object):
         # Here we return the latest mw release for downloading
         return '1.24.1'
 
-    @deprecated("version()")
+    def force_version(self, code):
+        """
+        Return a manual version number.
+
+        The site is usually using the version number from the servers'
+        siteinfo, but if there is a problem with that it's possible to return
+        a non-empty string here representing another version number.
+
+        For example, L{pywikibot.tools.MediaWikiVersion} treats version
+        numbers ending with 'alpha', 'beta' or 'rc' as newer than any version
+        ending with 'wmf<number>'. But if that causes breakage it's possible
+        to override it here to a version number which doesn't cause breakage.
+
+        @return: A version number which can be parsed using
+            L{pywikibot.tools.MediaWikiVersion}. If empty/None it uses the
+            version returned via siteinfo.
+        @rtype: str
+        """
+        return None
+
+    @deprecated("APISite.version()")
     def versionnumber(self, code):
         """ DEPRECATED, use version() instead.
 
