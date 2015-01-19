@@ -161,6 +161,7 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
     site = pywikibot.Site()
 
+    generator_type = None
     protection_levels = set(site.protection_levels())
     protection_types = site.protection_types()
     if '' in protection_levels:
@@ -182,7 +183,7 @@ def main(*args):
             default_level = 'all'
         elif arg.startswith('-default'):
             if len(arg) == len('-default'):
-                default_level = None
+                default_level = 'sysop'
             else:
                 default_level = arg[len('-default:'):]
         else:
@@ -198,19 +199,25 @@ def main(*args):
             if not is_p_type:
                 if not genFactory.handleArg(arg):
                     raise ValueError('Unknown parameter "{0}"'.format(arg))
-                found = arg.find(':') + 1
+                found = arg.find(':')
                 if found:
-                    message_properties.update({'cat': arg[found:],
-                                               'page': arg[found:]})
+                    message_properties.update({'cat': arg[found + 1:],
+                                               'page': arg[found + 1:]})
 
                 if 'summary' not in options:
                     generator_type = arg[1:found] if found > 0 else arg[1:]
-                    if generator_type in default_summaries:
-                        message_type = default_summaries[generator_type]
-                        if message_type == 'simple' or message_properties:
-                            options['summary'] = i18n.twtranslate(
-                                site, 'protect-{0}'.format(message_type),
-                                message_properties)
+
+    if generator_type in default_summaries:
+        message_type = default_summaries[generator_type]
+        if message_type == 'simple' or message_properties:
+            if default_level == 'all':
+                options['summary'] = i18n.twtranslate(
+                    site, 'unprotect-{0}'.format(message_type),
+                    message_properties)
+            else:
+                options['summary'] = i18n.twtranslate(
+                    site, 'protect-{0}'.format(message_type),
+                    message_properties)
 
     generator = genFactory.getCombinedGenerator()
     # We are just protecting pages, so we have no need of using a preloading
