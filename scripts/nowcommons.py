@@ -271,11 +271,10 @@ class NowCommonsDeleteBot(Bot):
             nowCommonsTemplates = [pywikibot.Page(self.site, title,
                                                   ns=10)
                                    for title in self.ncTemplates()]
-            gens = [pg.ReferringPageGenerator(t, followRedirects=True,
-                                              onlyTemplateInclusion=True)
+            gens = [t.getReferences(followRedirects=True, namespaces=[6],
+                                    onlyTemplateInclusion=True)
                     for t in nowCommonsTemplates]
             gen = pg.CombinedPageGenerator(gens)
-            gen = pg.NamespaceFilterPageGenerator(gen, [6])
             gen = pg.DuplicateFilterPageGenerator(gen)
             gen = pg.PreloadingGenerator(gen)
         return gen

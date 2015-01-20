@@ -214,7 +214,7 @@ class XmlDumpPageGenerator:
                         continue
                     self.skipping = False
                 page = pywikibot.Page(self.site, entry.title)
-                if not self.namespaces == []:
+                if self.namespaces:
                     if page.namespace() not in self.namespaces:
                         continue
                 found = False
@@ -852,9 +852,6 @@ def main(*args):
     """
     gen = None
     xmlFilename = None
-    # Which namespaces should be processed?
-    # default to [] which means all namespaces will be processed
-    namespaces = []
     HTTPignore = []
     day = 7
 
@@ -867,11 +864,6 @@ def main(*args):
             config.report_dead_links_on_talk = True
         elif arg == '-notalk':
             config.report_dead_links_on_talk = False
-        elif arg.startswith('-namespace:'):
-            try:
-                namespaces.append(int(arg[11:]))
-            except ValueError:
-                namespaces.append(arg[11:])
         elif arg == '-repeat':
             gen = RepeatPageGenerator()
         elif arg.startswith('-ignore:'):
@@ -897,13 +889,11 @@ def main(*args):
             xmlStart
         except NameError:
             xmlStart = None
-        gen = XmlDumpPageGenerator(xmlFilename, xmlStart, namespaces)
+        gen = XmlDumpPageGenerator(xmlFilename, xmlStart, genFactory.namespaces)
 
     if not gen:
         gen = genFactory.getCombinedGenerator()
     if gen:
-        if namespaces != []:
-            gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
         # fetch at least 240 pages simultaneously from the wiki, but more if
         # a high thread number is set.
         pageNumber = max(240, config.max_external_links * 2)
