@@ -371,10 +371,13 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
                 (standard_lib is None and name in std_lib_packages):
             if 'ver' in info:
                 data[name] = info
+            else:
+                # Remove the entry from paths, so it isnt processed below
+                del paths[info['path']]
         else:
             data[name] = info
 
-    # Remove any sub-modules which were loaded with a different name.
+    # Remove any pywikibot sub-modules which were loaded as a package.
     # e.g. 'wikipedia_family.py' is loaded as 'wikipedia'
     _program_dir = _get_program_dir()
     for path, name in paths.items():
