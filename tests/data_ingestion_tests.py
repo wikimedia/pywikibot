@@ -7,7 +7,7 @@ __version__ = '$Id$'
 import os
 from tests import _data_dir
 from tests import _images_dir
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, ScriptMainTestCase
 from scripts import data_ingestion
 
 
@@ -33,8 +33,8 @@ class TestPhoto(TestCase):
                                                   'author': 'KDE artists | Silstor',
                                                   'license': 'LGPL',
                                                   'set': 'Crystal SVG icon set',
-                                                  'name': 'Sound icon'}
-                                        )
+                                                  'name': 'Sound icon'},
+                                        site=self.get_site('commons'))
 
     def test_downloadPhoto(self):
         """Test download from http://upload.wikimedia.org/."""
@@ -66,12 +66,14 @@ class TestCSVReader(TestCase):
 
     """Test CSVReader class."""
 
-    net = False
+    family = 'commons'
+    code = 'commons'
 
     def setUp(self):
         super(TestCSVReader, self).setUp()
         with open(os.path.join(_data_dir, 'csv_ingestion.csv')) as fileobj:
-            self.iterator = data_ingestion.CSVReader(fileobj, 'url')
+            self.iterator = data_ingestion.CSVReader(fileobj, 'url',
+                                                     site=self.get_site())
             self.obj = next(self.iterator)
 
     def test_PhotoURL(self):
@@ -91,6 +93,20 @@ class TestCSVReader(TestCase):
 |source=http://commons.wikimedia.org/wiki/File:Sound-icon.svg
 |url=http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png
 }}""")  # noqa
+
+
+class TestDataIngestionBot(ScriptMainTestCase):
+
+    """Test TestDataIngestionBot class."""
+
+    family = 'commons'
+    code = 'commons'
+
+    def test_existing_file(self):
+        """Test uploading a file that already exists."""
+        data_ingestion.main(
+            '-family:test', '-lang:test', '-csvdir:tests/data',
+            '-page:User:John_Vandenberg/data_ingestion_test_template')
 
 
 if __name__ == "__main__":

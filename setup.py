@@ -32,7 +32,8 @@ extra_deps = {
 test_deps.extend(extra_deps['rcstream'])
 
 if sys.version_info[0] == 2:
-    extra_deps['wikistats-csv'] = ['unicodecsv']
+    # csv is used by wikistats and script data_ingestion
+    extra_deps['csv'] = ['unicodecsv']
 
 script_deps = {
     'script_wui.py': ['irc', 'lunatic-python', 'crontab'],
