@@ -33,14 +33,15 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import FollowRedirectPageBot, ExistingPageBot
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
 
 
-class CapitalizeBot(Bot):
+class CapitalizeBot(FollowRedirectPageBot, ExistingPageBot):
 
     """Capitalization Bot."""
 
@@ -60,18 +61,14 @@ class CapitalizeBot(Bot):
         super(CapitalizeBot, self).__init__(**kwargs)
         self.generator = generator
 
-    def treat(self, page):
-        """Load the given page and create capitalized redirects."""
-        if not page.exists():
-            return
-        if page.isRedirectPage():
-            page = page.getRedirectTarget()
-        page_t = page.title()
-        self.current_page = page
+    def treat_page(self):
+        """Capitalize redirects of the current page."""
+        page_t = self.current_page.title()
+        site = self.current_page.site
         if self.getOption('titlecase'):
-            page_cap = pywikibot.Page(page.site, page_t.title())
+            page_cap = pywikibot.Page(site, page_t.title())
         else:
-            page_cap = pywikibot.Page(page.site, page_t.capitalize())
+            page_cap = pywikibot.Page(site, page_t.capitalize())
         if page_cap.exists():
             pywikibot.output(u'%s already exists, skipping...\n'
                              % page_cap.title(asLink=True))
@@ -86,12 +83,12 @@ class CapitalizeBot(Bot):
                     self.options['always'] = True
             if self.getOption('always') or choice == 'y':
                 comment = i18n.twtranslate(
-                    page.site,
+                    site,
                     'capitalize_redirects-create-redirect',
                     {'to': page_t})
-                page_cap.text = u"#%s %s" % (page.site.redirect(),
-                                             page.title(asLink=True,
-                                                        textlink=True))
+                page_cap.text = u"#%s %s" % (site.redirect(),
+                                             self.current_page.title(
+                                             asLink=True, textlink=True))
                 try:
                     page_cap.save(comment)
                 except:

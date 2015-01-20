@@ -1149,6 +1149,135 @@ class Bot(object):
                                  self.__class__.__name__)
 
 
+class CurrentPageBot(Bot):
+
+    """A bot which automatically sets 'current_page' on each treat()."""
+
+    ignore_save_related_errors = True
+    ignore_server_errors = False
+
+    def treat_page(self):
+        """Process one page (Abstract method)."""
+        raise NotImplementedError('Method %s.treat_page() not implemented.'
+                                  % self.__class__.__name__)
+
+    def treat(self, page):
+        """Set page to current page and treat that page."""
+        self.current_page = page
+        self.treat_page()
+
+    def put_current(self, new_text, ignore_save_related_errors=None,
+                    ignore_server_errors=None, **kwargs):
+        """
+        Call L{Bot.userPut} but use the current page.
+
+        It compares the new_text to the current page text.
+
+        @param new_text: The new text
+        @type new_text: basestring
+        @param ignore_save_related_errors: Ignore save related errors and
+            automatically print a message. If None uses this instances default.
+        @type ignore_save_related_errors: bool or None
+        @param ignore_server_errors: Ignore server errors and automatically
+            print a message. If None uses this instances default.
+        @type ignore_server_errors: bool or None
+        @param kwargs: Additional parameters directly given to L{Bot.userPut}.
+        @type kwargs: dict
+        """
+        if ignore_save_related_errors is None:
+            ignore_save_related_errors = self.ignore_save_related_errors
+        if ignore_server_errors is None:
+            ignore_server_errors = self.ignore_server_errors
+        self.userPut(self.current_page, self.current_page.text, new_text,
+                     ignore_save_related_errors=ignore_save_related_errors,
+                     ignore_server_errors=ignore_server_errors,
+                     **kwargs)
+
+
+class ExistingPageBot(CurrentPageBot):
+
+    """A CurrentPageBot class which only treats existing pages."""
+
+    def treat(self, page):
+        """Treat page if it exists and handle NoPage from it."""
+        if not page.exists():
+            pywikibot.warning('Page "{0}" does not exist on {1}.'.format(
+                page.title(), page.site))
+            return
+        try:
+            super(ExistingPageBot, self).treat(page)
+        except pywikibot.NoPage as e:
+            if e.page != page:
+                raise
+            pywikibot.warning(
+                'During handling of page "{0}" on {1} a NoPage exception was '
+                'raised.'.format(page.title(), page.site))
+
+
+class FollowRedirectPageBot(CurrentPageBot):
+
+    """A CurrentPageBot class which follows the redirect."""
+
+    def treat(self, page):
+        """Treat target if page is redirect and the page otherwise."""
+        if page.isRedirectPage():
+            page = page.getRedirectTarget()
+        super(FollowRedirectPageBot, self).treat(page)
+
+
+class CreatingPageBot(CurrentPageBot):
+
+    """A CurrentPageBot class which only treats not exisiting pages."""
+
+    def treat(self, page):
+        """Treat page if doesn't exist."""
+        if page.exists():
+            pywikibot.warning('Page "{0}" does already exist on {1}.'.format(
+                page.title(), page.site))
+            return
+        super(CreatingPageBot, self).treat(page)
+
+
+class RedirectPageBot(CurrentPageBot):
+
+    """A RedirectPageBot class which only treats redirects."""
+
+    def treat(self, page):
+        """Treat only redirect pages and handle IsNotRedirectPage from it."""
+        if not page.isRedirectPage():
+            pywikibot.warning('Page "{0}" on {1} is skipped because it is not '
+                              'a redirect'.format(page.title(), page.site))
+            return
+        try:
+            super(RedirectPageBot, self).treat(page)
+        except pywikibot.IsNotRedirectPage as e:
+            if e.page != page:
+                raise
+            pywikibot.warning(
+                'During handling of page "{0}" on {1} a IsNotRedirectPage '
+                'exception was raised.'.format(page.title(), page.site))
+
+
+class NoRedirectPageBot(CurrentPageBot):
+
+    """A NoRedirectPageBot class which only treats non-redirects."""
+
+    def treat(self, page):
+        """Treat only non-redirect pages and handle IsRedirectPage from it."""
+        if page.isRedirectPage():
+            pywikibot.warning('Page "{0}" on {1} is skipped because it is a '
+                              'redirect'.format(page.title(), page.site))
+            return
+        try:
+            super(NoRedirectPageBot, self).treat(page)
+        except pywikibot.IsRedirectPage as e:
+            if e.page != page:
+                raise
+            pywikibot.warning(
+                'During handling of page "{0}" on {1} a IsRedirectPage '
+                'exception was raised.'.format(page.title(), page.site))
+
+
 class WikidataBot(Bot):
 
     """
