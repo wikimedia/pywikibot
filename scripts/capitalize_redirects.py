@@ -58,8 +58,7 @@ class CapitalizeBot(FollowRedirectPageBot, ExistingPageBot):
             'titlecase': False,
         })
 
-        super(CapitalizeBot, self).__init__(**kwargs)
-        self.generator = generator
+        super(CapitalizeBot, self).__init__(generator=generator, **kwargs)
 
     def treat_page(self):
         """Capitalize redirects of the current page."""
