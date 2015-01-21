@@ -29,8 +29,6 @@ extra_deps = {
     'rcstream': ['socketIO-client'],
 }
 
-test_deps.extend(extra_deps['rcstream'])
-
 if sys.version_info[0] == 2:
     # csv is used by wikistats and script data_ingestion
     extra_deps['csv'] = ['unicodecsv']
@@ -86,10 +84,16 @@ if os.name == 'nt':
     test_deps += ['pywin32>=218', 'pywinauto>=0.4.0']
 
 extra_deps.update(script_deps)
-# Add script dependencies as test dependencies,
-# so scripts can be compiled in test suite.
+
+# Add all script dependencies as test dependencies,
+# so all scripts can be compiled for script_tests, etc.
 if 'PYSETUP_TEST_EXTRAS' in os.environ:
     test_deps += list(itertools.chain(*(script_deps.values())))
+
+# These extra dependencies enable some tests to run on all builds
+if sys.version_info[0] == 2:
+    test_deps += extra_deps['csv']
+test_deps += extra_deps['rcstream']
 
 # late import of setuptools due to monkey-patching above
 from ez_setup import use_setuptools
