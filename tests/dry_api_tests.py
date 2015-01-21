@@ -180,6 +180,40 @@ class MockCachedRequestKeyTests(TestCase):
         self.assertEqual(en_user_path, ar_user_path)
 
 
+class DryWriteAssertTests(DefaultDrySiteTestCase):
+
+    """Test client site write assert."""
+
+    def test_no_user(self):
+        """Test Request object when not a user."""
+        site = self.get_site()
+
+        del site._userinfo
+        self.assertRaisesRegex(pywikibot.Error, ' without userinfo',
+                               Request, site=site, action='edit')
+
+        site._userinfo = {'name': '1.2.3.4', 'groups': []}
+
+        self.assertRaisesRegex(pywikibot.Error, " as IP '1.2.3.4'",
+                               Request, site=site, action='edit')
+
+    def test_unexpected_user(self):
+        """Test Request object when username is not correct."""
+        site = self.get_site()
+        site._userinfo = {'name': 'other_username', 'groups': []}
+        site._username[0] = 'myusername'
+
+        Request(site=site, action='edit')
+
+    def test_normal(self):
+        """Test Request object when username is correct."""
+        site = self.get_site()
+        site._userinfo = {'name': 'myusername', 'groups': []}
+        site._username[0] = 'myusername'
+
+        Request(site=site, action='edit')
+
+
 class DryMimeTests(TestCase):
 
     """Test MIME request handling without a real site."""
@@ -197,6 +231,7 @@ class DryMimeTests(TestCase):
         self.assertEqual(file_content, submsg.get_payload(decode=True))
 
     def test_mime_file_container(self):
+        """Test Request._build_mime_request encodes binary."""
         local_filename = os.path.join(_images_dir, 'MP_sounds.png')
         with open(local_filename, 'rb') as f:
             file_content = f.read()
@@ -213,7 +248,11 @@ class MimeTests(DefaultDrySiteTestCase):
 
     def test_upload_object(self):
         """Test Request object prepared to upload."""
-        req = Request(site=self.get_site(), action="upload",
+        # fake write test needs the config username
+        site = self.get_site()
+        site._username[0] = 'myusername'
+        site._userinfo = {'name': 'myusername', 'groups': []}
+        req = Request(site=site, action="upload",
                       file='MP_sounds.png', mime=True,
                       filename=os.path.join(_images_dir, 'MP_sounds.png'))
         self.assertEqual(req.mime, True)

@@ -25,7 +25,7 @@ import time
 
 import pywikibot
 from pywikibot import config, login
-from pywikibot.tools import MediaWikiVersion, deprecated, itergroup
+from pywikibot.tools import MediaWikiVersion, deprecated, itergroup, ip
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, Error
 )
@@ -800,6 +800,22 @@ class Request(MutableMapping):
             "wbcreateclaim", "wbremoveclaims", "wbsetclaimvalue",
             "wbsetreference", "wbremovereferences"
         )
+        # Client side verification that the request is being performed
+        # by a logged in user, and warn if it isn't a config username.
+        if self.write:
+            if not hasattr(self.site, "_userinfo"):
+                raise Error(u"API write action attempted without userinfo")
+            assert('name' in self.site._userinfo)
+
+            if ip.is_IP(self.site._userinfo['name']):
+                raise Error(u"API write action attempted as IP %r"
+                            % self.site._userinfo['name'])
+
+            if not self.site.user():
+                pywikibot.warning(
+                    u"API write action by unexpected username commenced.\n"
+                    u"userinfo: %r" % self.site._userinfo)
+
         # MediaWiki 1.23 allows assertion for any action,
         # whereas earlier WMF wikis and others used an extension which
         # could only allow assert for action=edit.
