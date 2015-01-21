@@ -2587,7 +2587,10 @@ def main(*args):
                 pywikibot.output(u"Dump file is empty?! Starting at the beginning.")
                 nextPage = "!"
                 namespace = 0
-            hintlessPageGen = pagegenerators.CombinedPageGenerator([hintlessPageGen, pagegenerators.AllpagesPageGenerator(nextPage, namespace, includeredirects=False)])
+            gen2 = pagegenerators.AllpagesPageGenerator(
+                nextPage, namespace, includeredirects=False)
+            hintlessPageGen = pagegenerators.CombinedPageGenerator(
+                [hintlessPageGen, gen2])
 
     site.login()
     bot = InterwikiBot()

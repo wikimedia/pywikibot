@@ -139,7 +139,8 @@ ignorelist = [
 
     # Other special cases
     re.compile('.*[\./@]gso\.gbv\.de(/.*)?'),  # bot somehow can't handle their redirects
-    re.compile('.*[\./@]berlinonline\.de(/.*)?'),  # a de: user wants to fix them by hand and doesn't want them to be deleted, see [[de:Benutzer:BLueFiSH.as/BZ]].
+    re.compile('.*[\./@]berlinonline\.de(/.*)?'),
+    # above entry to be manually fixed per request at [[de:Benutzer:BLueFiSH.as/BZ]]
     re.compile('.*[\./@]bodo\.kommune\.no(/.*)?'),  # bot can't handle their redirects
     re.compile('.*[\./@]jpl\.nasa\.gov(/.*)?'),  # bot rejected on the site
     re.compile('.*[\./@]itis\.gov(/.*)?'),  # bot rejected on the site

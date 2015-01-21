@@ -129,14 +129,14 @@ fixes = {
             # Temperaturangabe mit falsch gesetztem Leerzeichen
             (u'(?<!\w)(\d+|\d+[\.,]\d+)° C(?=\W|²|³|$)', r'\1' + u' °C'),
             # Kein Leerzeichen nach Komma
-            (u'([a-zäöüß](\]\])?,)((\[\[)?[a-zäöüA-ZÄÖÜ])',                                                                          r'\1 \3'),
+            (u'([a-zäöüß](\]\])?,)((\[\[)?[a-zäöüA-ZÄÖÜ])', r'\1 \3'),
             # Leerzeichen und Komma vertauscht
-            (u'([a-zäöüß](\]\])?) ,((\[\[)?[a-zäöüA-ZÄÖÜ])',                                                                          r'\1, \3'),
+            (u'([a-zäöüß](\]\])?) ,((\[\[)?[a-zäöüA-ZÄÖÜ])', r'\1, \3'),
             # Plenks (d. h. Leerzeichen auch vor dem Komma/Punkt/Ausrufezeichen/Fragezeichen)
             # Achtung bei Französisch: https://de.wikipedia.org/wiki/Plenk#Sonderfall_Franz.C3.B6sisch
             # Leerzeichen vor Doppelpunkt/Semikolon kann korrekt sein, nach irgendeiner Norm für Zitationen.
-            (u'([a-zäöüß](\]\])?) ([,\.!\?]) ((\[\[)?[a-zäöüA-ZÄÖÜ])',                                                                          r'\1\3 \4'),
-            #   (u'([a-z]\.)([A-Z])',                                                                             r'\1 \2'),
+            (u'([a-zäöüß](\]\])?) ([,\.!\?]) ((\[\[)?[a-zäöüA-ZÄÖÜ])', r'\1\3 \4'),
+            #   (u'([a-z]\.)([A-Z])', r'\1 \2'),
         ],
         'exceptions': {
             'inside-tags': [
@@ -172,9 +172,11 @@ fixes = {
                 r'(?m)^;(.*?)$',    # Definitionslisten, dort gibt es oft absichtlich Leerzeichen vor Doppelpunkten
                 r'\d+h( |&nbsp;)\d+m',  # Schreibweise für Zeiten, vor allem in Film-Infoboxen. Nicht korrekt, aber dafür schön kurz.
                 r'(?i)\[\[(Bild|Image|Media):.+?\|',  # Dateinamen auslassen
-                r'{{bgc\|.*?}}',  # Hintergrundfarbe
+                r'{{bgc\|.*?}}',                      # Hintergrundfarbe
                 r'<sup>\d+m</sup>',                   # bei chemischen Formeln
-                r'\([A-Z][A-Za-z]*(,[A-Z][A-Za-z]*(<sup>.*?</sup>|<sub>.*?</sub>|))+\)'  # chemische Formel, z. B. AuPb(Pb,Sb,Bi)Te. Hier sollen keine Leerzeichen hinter die Kommata.
+                r'\([A-Z][A-Za-z]*(,[A-Z][A-Za-z]*(<sup>.*?</sup>|<sub>.*?</sub>|))+\)'
+                # chemische Formel, z. B. AuPb(Pb,Sb,Bi)Te.
+                # Hier sollen keine Leerzeichen hinter die Kommata.
             ],
             'title': [
                 r'Arsen',  # chemische Formel

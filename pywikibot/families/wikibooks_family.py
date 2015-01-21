@@ -54,7 +54,7 @@ class Family(family.WikimediaFamily):
         self.obsolete = {
             'aa': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikibooks
             'ak': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Akan_Wikibooks
-            'als': None,  # https://als.wikipedia.org/wiki/Wikipedia:Stammtisch/Archiv_2008-1#Afterwards.2C_closure_and_deletion_of_Wiktionary.2C_Wikibooks_and_Wikiquote_sites
+            'als': None,  # https://als.wikipedia.org/wiki/Special:PermaLink/603754#Closing_wt.2C_wb.2C_wq
             'as': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wikibooks
             'ast': None,
             'ay': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Aymar_Wikibooks

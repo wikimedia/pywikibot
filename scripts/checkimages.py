@@ -302,7 +302,9 @@ nothing_notification = {
     'en': u"{{subst:image source|File:%s}} --~~~~",
     'fa': u"{{جا:اخطار نگاره|%s}}",
     'ga': u"{{subst:Foinse na híomhá|File:%s}} --~~~~",
-    'hu': u"{{subst:adjforrást|Kép:%s}} \n Ezt az üzenetet ~~~ automatikusan helyezte el a vitalapodon, kérdéseddel fordulj a gazdájához, vagy a [[WP:KF|Kocsmafalhoz]]. --~~~~",
+    'hu': u"{{subst:adjforrást|Kép:%s}} \n Ezt az üzenetet ~~~ automatikusan "
+          u"helyezte el a vitalapodon, kérdéseddel fordulj a gazdájához, vagy "
+          u"a [[WP:KF|Kocsmafalhoz]]. --~~~~",
     'it': u"{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza licenza|%s|__botnick__}} --~~~~",
     'ja': u"\n{{subst:Image copyright|File:%s}}--~~~~",
     'ko': u'\n{{subst:User:Kwjbot IV/untagged|%s}} --~~~~',

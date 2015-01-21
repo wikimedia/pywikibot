@@ -760,12 +760,12 @@ class EnglishWikipediaPageGeneratorIntersectTestCase(GeneratorIntersectTestCase)
 
     def test_intersect_newpages_csd(self):
         site = self.get_site()
-        self.assertEqualItertools(
-            [pagegenerators.NewpagesPageGenerator(site=site, total=10),
-             pagegenerators.CategorizedPageGenerator(
-                pywikibot.Category(site,
-                                   'Category:Candidates_for_speedy_deletion'))
-             ])
+        self.assertEqualItertools([
+            pagegenerators.NewpagesPageGenerator(site=site, total=10),
+            pagegenerators.CategorizedPageGenerator(
+                pywikibot.Category(
+                    site, 'Category:Candidates_for_speedy_deletion'))]
+        )
 
 
 class LiveRCPageGeneratorTestCase(WikimediaDefaultSiteTestCase):

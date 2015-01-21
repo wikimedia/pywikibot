@@ -97,25 +97,24 @@ class StatesRedirectBot(pywikibot.Bot):
                             % goal)
                 except pywikibot.IsNotRedirectPage:
                     pywikibot.warning(
-                        u"Page %s already exists and is not a redirect\
-                        Please check page!"
+                        u"Page %s already exists and is not a redirect "
+                        u"Please check page!"
                         % pl.title())
                 except pywikibot.NoPage:
                     change = ''
                     if page.isRedirectPage():
                         p2 = page.getRedirectTarget()
-                        pywikibot.output(u'Note: goal page is redirect.\
-                        Creating redirect ' u'to "%s" to avoid double\
-                            redirect.' % p2.title())
+                        pywikibot.output(
+                            u'Note: goal page is redirect.\nCreating redirect '
+                            u'to "%s" to avoid double redirect.' % p2.title())
                     else:
                         p2 = page
                     if self.force:
                         change = 'y'
                     else:
-                        change = pywikibot.input_choice(u'Create redirect\
-                                                        %s?' % pl.title(),
-                                                        (('yes', 'y'),
-                                                        ('no', 'n')))
+                        change = pywikibot.input_choice(
+                            u'Create redirect %s?' % pl.title(),
+                            (('yes', 'y'), ('no', 'n')))
                     if change == 'y':
                         pl.text = '#REDIRECT [[%s]]' % p2.title()
                         pl.save(i18n.translate(self.site, msg))

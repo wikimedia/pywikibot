@@ -147,7 +147,9 @@ class ImageRobot(Bot):
         # Be careful, spaces and _ have been converted to '\ ' and '\_'
         escaped = re.sub('\\\\[_ ]', '[_ ]', escaped)
         if not self.getOption('loose') or not self.new_image:
-            image_regex = re.compile(r'\[\[ *(?:' + '|'.join(self.site.namespace(6, all=True)) + ')\s*:\s*' + escaped + ' *(?P<parameters>\|[^\n]+|) *\]\]')
+            image_regex = re.compile(
+                r'\[\[ *(?:%s)\s*:\s*%s *(?P<parameters>\|[^\n]+|) *\]\]'
+                % ('|'.join(self.site.namespace(6, all=True)), escaped))
         else:
             image_regex = re.compile(r'' + escaped)
 

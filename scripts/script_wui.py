@@ -262,7 +262,11 @@ def main_script(page, rev=None, params=NotImplemented):  # pylint: disable=unuse
     pywikibot.config.simulate = __simulate
     sys.argv = __sys_argv
 
-    pywikibot.output(u'environment: garbage; %s / memory; %s / members; %s' % (gc.collect(), resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * resource.getpagesize(), len(dir())))
+    pywikibot.output(
+        u'environment: garbage; %s / memory; %s / members; %s' % (
+            gc.collect(),
+            resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * resource.getpagesize(),
+            len(dir())))
     # 'len(dir())' is equivalent to 'len(inspect.getmembers(__main__))'
 
     # append result to output page
@@ -283,7 +287,9 @@ def wiki_logger(buffer, page, rev=None):
     # append to page
     outpage = pywikibot.Page(pywikibot.Site(), bot_config['ConfCSSoutput'])
     text = outpage.get()
-    outpage.put(text + u"\n== Simulation vom %s mit [%s code:%s] ==\n<pre>\n%s</pre>\n\n" % (pywikibot.Timestamp.now().isoformat(' '), link, rev, buffer))
+    outpage.put(
+        text + u"\n== Simulation vom %s mit [%s code:%s] ==\n<pre>\n%s</pre>\n\n"
+        % (pywikibot.Timestamp.now().isoformat(' '), link, rev, buffer))
 #                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
 
 
