@@ -56,8 +56,8 @@ November 2013
 
 #
 # (C) Multichill, 2008-2009
-# (C) Xqt, 2009-2014
-# (C) Pywikibot team, 2008-2014
+# (C) Xqt, 2009-2015
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -220,24 +220,6 @@ ignoreTemplates = {
            u'分类重定向', u'追蹤分類', u'共享資源', u'追蹤分類'],
 }
 
-msg_change = {
-    'be-x-old': u'Робат: зьмяніў шаблён [[:Commons:Category:%(oldcat)s|%(oldcat)s]] на [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'cs': u'Robot změnil šablonu Commonscat z [[:Commons:Category:%(oldcat)s|%(oldcat)s]] na [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'da': u'Robot: Ændrer commonscat link fra [[:Commons:Category:%(oldcat)s|%(oldcat)s]] til [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'de': u'Bot: Ändere commonscat link von [[:Commons:Category:%(oldcat)s|%(oldcat)s]] zu [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'en': u'Bot: Changing commonscat link from [[:Commons:Category:%(oldcat)s|%(oldcat)s]] to [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'fa': u'ربات: تغییر پیوند به انبار از [[:Commons:Category:%(oldcat)s|%(oldcat)s]] به [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'fr': u'Robot: Changé commonscat link de [[:Commons:Category:%(oldcat)s|%(oldcat)s]] à [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'frr': u'Bot: Feranere commonscat link faan [[:Commons:Category:%(oldcat)s|%(oldcat)s]] tu [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'is': u'Vélmenni: Breyti Commonscat tengli frá [[:Commons:Category:%(oldcat)s|%(oldcat)s]] í [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'pdc': u'Waddefresser: commonscat Gleecher vun [[:Commons:Category:%(oldcat)s|%(oldcat)s]] nooch [[:Commons:Category:%(newcat)s|%(newcat)s]] geennert',
-    'ru': u'Бот: Изменение commonscat-ссылки с [[:Commons:Category:%(oldcat)s|%(oldcat)s]] на [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'sk': u'Robot zmenil šablónu Commonscat z [[:Commons:Category:%(oldcat)s|%(oldcat)s]] na [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'uk': u'Бот: Зміна commonscat-посилання з [[:Commons:Category:%(oldcat)s|%(oldcat)s]] на [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'th': u'บอต: เปลี่ยนลิงก์หมวดหมู่คอมมอนส์จาก [[:Commons:Category:%(oldcat)s|%(oldcat)s]] เป็น [[:Commons:Category:%(newcat)s|%(newcat)s]]',
-    'zh': u'機器人：更改 commonscat 連結，從 %(oldcat)s 至 %(newcat)s',
-}
-
 
 class CommonscatBot(Bot):
 
@@ -387,10 +369,9 @@ class CommonscatBot(Bot):
         if self.getOption('summary'):
             comment = self.getOption('summary')
         else:
-            comment = i18n.translate(page.site,
-                                     msg_change,
-                                     fallback=True) % {'oldcat': oldcat,
-                                                       'newcat': newcat}
+            comment = i18n.twtranslate(page.site.code,
+                                       'commonscat-msg_change',
+                                       {'oldcat': oldcat, 'newcat': newcat})
 
         self.userPut(page, page.text, newtext, comment=comment,
                      ignore_save_related_errors=True)
