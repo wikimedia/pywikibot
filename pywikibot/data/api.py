@@ -1464,6 +1464,110 @@ class CachedRequest(Request):
         return self._data
 
 
+class APIGenerator(object):
+
+    """Iterator that handle API responses containing lists.
+
+    The iterator will iterate each item in the query response and use the
+    continue request parameter to retrieve the next portion of items
+    automatically. If the limit attribute is set, the iterator will stop
+    after iterating that many values.
+    """
+
+    def __init__(self, action, continue_name='continue', limit_name='limit',
+                 data_name='data', **kwargs):
+        """
+        Construct an APIGenerator object.
+
+        kwargs are used to create a Request object; see that object's
+        documentation for values.
+
+        @param action: API action name.
+        @type action: str
+        @param continue_name: Name of the continue API parameter.
+        @type continue_name: str
+        @param limit_name: Name of the limit API parameter.
+        @type limit_name: str
+        @param data_name: Name of the data in API response.
+        @type data_name: str
+        """
+        kwargs['action'] = action
+        try:
+            self.site = kwargs['site']
+        except KeyError:
+            self.site = pywikibot.Site()
+            kwargs['site'] = self.site
+
+        self.continue_name = continue_name
+        self.limit_name = limit_name
+        self.data_name = data_name
+
+        self.limit = None
+        self.starting_offset = kwargs.pop(self.continue_name, 0)
+        self.request = Request(**kwargs)
+        self.request[self.limit_name] = 50
+
+    def set_query_increment(self, value):
+        """
+        Set the maximum number of items to be retrieved per API query.
+
+        If not called, the default is 50.
+
+        @param value: The value of maximum number of items to be retrieved
+            per API request to set.
+        @type value: int
+        """
+        self.request[self.limit_name] = int(value)
+        pywikibot.debug(u"%s: Set query_limit to %i."
+                        % (self.__class__.__name__, int(value)), _logger)
+
+    def set_maximum_items(self, value):
+        """
+        Set the maximum number of items to be retrieved from the wiki.
+
+        If not called, most queries will continue as long as there is
+        more data to be retrieved from the API.
+
+        @param value: The value of maximum number of items to be retrieved
+            in total to set.
+        @type value: int
+        """
+        self.limit = int(value)
+        if self.limit < self.request[self.limit_name]:
+            self.request[self.limit_name] = self.limit
+
+    def __iter__(self):
+        """Submit request and iterate the response.
+
+        Continues response as needed until limit (if defined) is reached.
+        """
+        offset = self.starting_offset
+        n = 0
+        while True:
+            self.request[self.continue_name] = offset
+            pywikibot.debug(u"%s: Request: %s" % (self.__class__.__name__,
+                                                  self.request), _logger)
+            data = self.request.submit()
+
+            n_items = len(data[self.data_name])
+            pywikibot.debug(u"%s: Retrieved %d items" % (
+                self.__class__.__name__, n_items), _logger)
+            if n_items > 0:
+                for item in data[self.data_name]:
+                    yield item
+                    n += 1
+                    if self.limit is not None and n >= self.limit:
+                        pywikibot.debug(u"%s: Stopped iterating due to "
+                                        u"exceeding item limit." %
+                                        self.__class__.__name__, _logger)
+                        return
+                offset += n_items
+            else:
+                pywikibot.debug(u"%s: Stopped iterating due to empty list in "
+                                u"response." % self.__class__.__name__, _logger)
+                break
+
+
 class QueryGenerator(object):
 
     """Base class for iterators that handle responses to API action=query.

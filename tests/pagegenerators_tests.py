@@ -657,6 +657,25 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gen = gf.getCombinedGenerator()
         self.assertEqual(len(set(gen)), 1)
 
+    def test_searchitem(self):
+        """Test -searchitem."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-searchitem:abc')
+        gen = gf.getCombinedGenerator()
+        self.assertGreater(len(set(gen)), 0)
+
+    def test_searchitem_language(self):
+        """Test -searchitem with custom language specified."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-searchitem:pl:abc')
+        gen = gf.getCombinedGenerator()
+        pages = set(gen)
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-searchitem:en:abc')
+        gen = gf.getCombinedGenerator()
+        pages2 = set(gen)
+        self.assertNotEqual(pages, pages2)
+
 
 class TestLogeventsFactoryGenerator(DefaultSiteTestCase):
 
