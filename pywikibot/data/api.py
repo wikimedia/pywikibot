@@ -1502,10 +1502,11 @@ class APIGenerator(object):
         self.limit_name = limit_name
         self.data_name = data_name
 
+        self.query_increment = 50
         self.limit = None
         self.starting_offset = kwargs.pop(self.continue_name, 0)
         self.request = Request(**kwargs)
-        self.request[self.limit_name] = 50
+        self.request[self.limit_name] = self.query_increment
 
     def set_query_increment(self, value):
         """
@@ -1517,9 +1518,11 @@ class APIGenerator(object):
             per API request to set.
         @type value: int
         """
-        self.request[self.limit_name] = int(value)
-        pywikibot.debug(u"%s: Set query_limit to %i."
-                        % (self.__class__.__name__, int(value)), _logger)
+        self.query_increment = int(value)
+        self.request[self.limit_name] = self.query_increment
+        pywikibot.debug(u"%s: Set query_increment to %i."
+                        % (self.__class__.__name__, self.query_increment),
+                        _logger)
 
     def set_maximum_items(self, value):
         """
@@ -1533,8 +1536,12 @@ class APIGenerator(object):
         @type value: int
         """
         self.limit = int(value)
-        if self.limit < self.request[self.limit_name]:
+        if self.limit < self.query_increment:
             self.request[self.limit_name] = self.limit
+            pywikibot.debug(u"%s: Set request item limit to %i"
+                            % (self.__class__.__name__, self.limit), _logger)
+        pywikibot.debug(u"%s: Set limit (maximum_items) to %i."
+                        % (self.__class__.__name__, self.limit), _logger)
 
     def __iter__(self):
         """Submit request and iterate the response.
