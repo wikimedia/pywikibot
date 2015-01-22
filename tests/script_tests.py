@@ -28,14 +28,17 @@ script_deps = {
     'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
 
-    'data_ingestion': ['unicodecsv'],
     'flickrripper': ['flickrapi'],
     'match_images': ['PIL.ImageTk'],
     'states_redirect': ['pycountry'],
 }
+
 if sys.version_info < (2, 7):
     script_deps['replicate_wiki'] = ['argparse']
     script_deps['editarticle'] = ['argparse']
+
+if sys.version_info < (3, 0):
+    script_deps['data_ingestion'] = ['unicodecsv']
 
 
 def check_script_deps(script_name):
