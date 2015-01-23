@@ -21,6 +21,7 @@ __version__ = '$Id$'
 __docformat__ = 'epytext'
 
 # standard python libraries
+import codecs
 import re
 import sys
 import threading
@@ -28,7 +29,6 @@ import threading
 if sys.version_info[0] > 2:
     from http import cookiejar as cookielib
     from urllib.parse import splittype, splithost, unquote, urlparse, urljoin
-    unicode = str
 else:
     import cookielib
     from urlparse import urlparse, urljoin
@@ -337,7 +337,7 @@ class HttpRequest(UnicodeMixin):
     """
 
     def __init__(self, uri, method="GET", body=None, headers=None,
-                 callbacks=None, **kwargs):
+                 callbacks=None, charset=None, **kwargs):
         """
         Constructor.
 
@@ -347,6 +347,14 @@ class HttpRequest(UnicodeMixin):
         self.method = method
         self.body = body
         self.headers = headers
+        if isinstance(charset, codecs.CodecInfo):
+            self.charset = charset.name
+        elif charset:
+            self.charset = charset
+        elif headers and 'accept-charset' in headers:
+            self.charset = headers['accept-charset']
+        else:
+            self.charset = None
 
         self.callbacks = callbacks
 
@@ -418,22 +426,60 @@ class HttpRequest(UnicodeMixin):
         return self.response_headers.status
 
     @property
+    def header_encoding(self):
+        """Return charset given by the response header."""
+        if not hasattr(self, '_header_encoding'):
+            pos = self.response_headers['content-type'].find('charset=')
+            if pos >= 0:
+                pos += len('charset=')
+                encoding = self.response_headers['content-type'][pos:]
+                self._header_encoding = encoding
+            else:
+                self._header_encoding = None
+        return self._header_encoding
+
+    @property
     def encoding(self):
         """Detect the response encoding."""
-        pos = self.response_headers['content-type'].find('charset=')
-        if pos >= 0:
-            pos += len('charset=')
-            encoding = self.response_headers['content-type'][pos:]
-        else:
-            encoding = 'ascii'
-            # Don't warn, many pages don't contain one
-            pywikibot.log(u"Http response doesn't contain a charset.")
+        if not hasattr(self, '_encoding'):
+            if not self.charset and not self.header_encoding:
+                pywikibot.log(u"Http response doesn't contain a charset.")
+                charset = 'latin1'
+            else:
+                charset = self.charset
+            if (self.header_encoding and codecs.lookup(self.header_encoding) !=
+                    (codecs.lookup(charset) if charset else None)):
+                if charset:
+                    pywikibot.warning(u'Encoding "{0}" requested but "{1}" '
+                                       'received in the header.'.format(
+                        charset, self.header_encoding))
+                try:
+                    # TODO: Buffer decoded content, weakref does remove it too
+                    #       early (directly after this method)
+                    self.raw.decode(self.header_encoding)
+                except UnicodeError as e:
+                    self._encoding = e
+                else:
+                    self._encoding = self.header_encoding
+            else:
+                self._encoding = None
 
-        return encoding
+            if charset and (isinstance(self._encoding, Exception) or
+                            not self._encoding):
+                try:
+                    self.raw.decode(charset)
+                except UnicodeError as e:
+                    self._encoding = e
+                else:
+                    self._encoding = charset
+
+        if isinstance(self._encoding, Exception):
+            raise self._encoding
+        return self._encoding
 
     def decode(self, encoding):
         """Return the decoded response."""
-        return self.raw.decode(encoding)
+        return self.raw.decode(self.encoding)
 
     @property
     def content(self):

@@ -310,6 +310,74 @@ class DefaultUserAgentTestCase(TestCase):
         self.assertIn('Python/' + str(sys.version_info[0]), http.user_agent())
 
 
+class CharsetTestCase(TestCase):
+
+    """Test that HttpRequest correct handles the charsets given."""
+
+    net = False
+
+    STR = u'äöü'
+    LATIN1_BYTES = STR.encode('latin1')
+    UTF8_BYTES = STR.encode('utf8')
+
+    @staticmethod
+    def _create_request(charset=None, data=UTF8_BYTES):
+        req = threadedhttp.HttpRequest(None, charset=charset)
+        req._data = ({'content-type': 'charset=utf-8'}, data[:])
+        return req
+
+    def test_no_charset(self):
+        """Test decoding without explicit charset."""
+        req = threadedhttp.HttpRequest(None)
+        req._data = ({'content-type': ''}, CharsetTestCase.LATIN1_BYTES[:])
+        self.assertIsNone(req.charset)
+        self.assertEqual('latin1', req.encoding)
+        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.STR)
+
+    def test_server_charset(self):
+        """Test decoding with server explicit charset."""
+        req = CharsetTestCase._create_request()
+        self.assertIsNone(req.charset)
+        self.assertEqual('utf-8', req.encoding)
+        self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.STR)
+
+    def test_same_charset(self):
+        """Test decoding with explicit and equal charsets."""
+        req = CharsetTestCase._create_request('utf-8')
+        self.assertEqual('utf-8', req.charset)
+        self.assertEqual('utf-8', req.encoding)
+        self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.STR)
+
+    def test_header_charset(self):
+        """Test decoding with different charsets and valid header charset."""
+        req = CharsetTestCase._create_request('latin1')
+        self.assertEqual('latin1', req.charset)
+        self.assertEqual('utf-8', req.encoding)
+        self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.STR)
+
+    def test_code_charset(self):
+        """Test decoding with different charsets and invalid header charset."""
+        req = CharsetTestCase._create_request('latin1',
+                                              CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual('latin1', req.charset)
+        self.assertEqual('latin1', req.encoding)
+        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.STR)
+
+    def test_invalid_charset(self):
+        """Test decoding with different and invalid charsets."""
+        req = CharsetTestCase._create_request('utf16',
+                                              CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual('utf16', req.charset)
+        self.assertRaises(UnicodeDecodeError, lambda: req.encoding)
+        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertRaises(UnicodeDecodeError, lambda: req.content)
+
+
 if __name__ == '__main__':
     try:
         unittest.main()
