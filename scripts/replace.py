@@ -65,12 +65,12 @@ Furthermore, the following command line parameters are supported:
                   given in the dictionary 'fixes' defined inside the files
                   fixes.py and user-fixes.py.
 
+&fixes-help;
+
 -manualinput      Request manual replacements via the command line input even
                   if replacements are already defined. If this option is set
                   (or no replacements are defined via -fix or the arguments)
                   it'll ask for additional replacements at start.
-
-&fixes-help;
 
 -always           Don't prompt you for each replacement
 
