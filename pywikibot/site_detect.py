@@ -13,7 +13,6 @@ __version__ = '$Id$'
 import json
 import re
 
-from collections import defaultdict
 from distutils.version import LooseVersion as V
 
 from pywikibot.comms.http import fetch
@@ -131,10 +130,10 @@ class WikiHTMLPageParser(HTMLParser):
         self.generator = None
 
     def handle_starttag(self, tag, attrs):
-        attrs = defaultdict(lambda: None, attrs)
+        attrs = dict(attrs)
         if tag == "meta":
-            if attrs["name"] == "generator":
+            if attrs.get('name') == 'generator':
                 self.generator = attrs["content"]
         if tag == "link":
-            if attrs["rel"] == "EditURI":
+            if attrs.get('rel') == 'EditURI':
                 self.edituri = attrs["href"]
