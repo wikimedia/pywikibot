@@ -104,7 +104,7 @@ class TestFormatCategory(DefaultDrySiteTestCase):
     dry = True
 
     catresult = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
-                          % {'LS': config.LS})
+                 % {'LS': config.LS})
 
     def test_category_format_raw(self):
         self.assertEqual(self.catresult,

@@ -875,8 +875,7 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
 
         usernames = config.sysopnames if sysop else config.usernames
 
-        return code in usernames[family] or \
-           '*' in usernames[family]
+        return code in usernames[family] or '*' in usernames[family]
 
     def __init__(self, *args, **kwargs):
         """Constructor."""

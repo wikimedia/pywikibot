@@ -105,14 +105,13 @@ class TestLiveApiFunctions(WikidataTestCase):
         self.assertEqual(str(q), "claim[99]")
 
         q = query.HasClaim(PropertyPage(self.repo, "P99"),
-                            ItemPage(self.repo, "Q100"))
+                           ItemPage(self.repo, "Q100"))
         self.assertEqual(str(q), "claim[99:100]")
 
         q = query.HasClaim(99, [100, PropertyPage(self.repo, "P101")])
         self.assertEqual(str(q), "claim[99:100,101]")
 
-        q = query.StringClaim(PropertyPage(self.repo, "P99"),
-                                "Hello")
+        q = query.StringClaim(PropertyPage(self.repo, "P99"), "Hello")
         self.assertEqual(str(q), 'string[99:"Hello"]')
 
         q = query.Tree(ItemPage(self.repo, "Q92"), [1], 2)
