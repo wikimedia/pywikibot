@@ -96,8 +96,9 @@ def match_image_pages(imagePageA, imagePageB):
                      'Center of image       {5:>7.2%}\n'
                      '                      -------\n'
                      'Average               {6:>7.2%}'.format(
-        wholeScore, topleftScore, toprightScore, bottomleftScore,
-        bottomrightScore, centerScore, averageScore))
+                         wholeScore, topleftScore, toprightScore,
+                         bottomleftScore, bottomrightScore, centerScore,
+                         averageScore))
 
     # Hard coded at 80%, change this later on.
     if averageScore > 0.8:

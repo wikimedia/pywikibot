@@ -509,7 +509,7 @@ class imageFetcher(threading.Thread):
             source = u'{{Own}}'
 
         return source.strip() + u'<BR />Transferred from [http://%(lang)s.%(family)s.org %(lang)s.%(family)s]' \
-               % {u'lang': lang, u'family': family}
+            % {u'lang': lang, u'family': family}
 
     def getAuthorText(self, imagepage):
         """Get the original uploader to put in the author field of the new information template."""
@@ -887,13 +887,13 @@ class uploader(threading.Thread):
                 timestamp, u'%Y-%m-%dT%H:%M:%SZ').strftime('%Y-%m-%d %H:%M')
             result += (u'* %(date)s [[:%(lang)s:user:%(username)s|%(username)s]] %(resolution)s' +
                        u' (%(size)s bytes) \'\'<nowiki>%(comment)s</nowiki>\'\'\n' % {
-                u'lang': lang,
-                u'family': family,
-                u'date': date,
-                u'username': username,
-                u'resolution': resolution,
-                u'size': size,
-                u'comment': comment})
+                           u'lang': lang,
+                           u'family': family,
+                           u'date': date,
+                           u'username': username,
+                           u'resolution': resolution,
+                           u'size': size,
+                           u'comment': comment})
 
         return result
 

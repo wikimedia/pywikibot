@@ -616,10 +616,8 @@ class checkImagesBot(object):
         hiddentemplatesRaw = i18n.translate(self.site, HiddenTemplate)
         self.hiddentemplates = set([pywikibot.Page(self.site, tmp)
                                     for tmp in hiddentemplatesRaw])
-        self.pageHidden = i18n.translate(self.site,
-                                              PageWithHiddenTemplates)
-        self.pageAllowed = i18n.translate(self.site,
-                                               PageWithAllowedTemplates)
+        self.pageHidden = i18n.translate(self.site, PageWithHiddenTemplates)
+        self.pageAllowed = i18n.translate(self.site, PageWithAllowedTemplates)
         self.comment = i18n.translate(self.site, msg_comm, fallback=True)
         # Adding the bot's nickname at the notification text if needed.
         self.bots = i18n.translate(self.site, bot_list)
@@ -967,10 +965,8 @@ class checkImagesBot(object):
         dupRegex = i18n.translate(self.site, duplicatesRegex)
         dupTalkHead = i18n.translate(self.site, duplicate_user_talk_head)
         dupTalkText = i18n.translate(self.site, duplicates_user_talk_text)
-        dupComment_talk = i18n.translate(self.site,
-                                              duplicates_comment_talk)
-        dupComment_image = i18n.translate(self.site,
-                                               duplicates_comment_image)
+        dupComment_talk = i18n.translate(self.site, duplicates_comment_talk)
+        dupComment_image = i18n.translate(self.site, duplicates_comment_image)
         imagePage = pywikibot.FilePage(self.site, self.imageName)
         hash_found = imagePage.latest_file_info.sha1
         duplicates = list(self.site.allimages(sha1=hash_found))

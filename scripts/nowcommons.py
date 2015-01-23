@@ -346,13 +346,14 @@ class NowCommonsDeleteBot(Bot):
                     pywikibot.output(u'NowCommons template not found.')
                     continue
                 commonsImagePage = pywikibot.FilePage(commons, 'Image:%s'
-                                                       % filenameOnCommons)
-                if localImagePage.title(withNamespace=False) == \
-                 commonsImagePage.title(withNamespace=False) and self.getOption('use_hash'):
+                                                      % filenameOnCommons)
+                if (localImagePage.title(withNamespace=False) ==
+                        commonsImagePage.title(withNamespace=False) and
+                        self.getOption('use_hash')):
                     pywikibot.output(
                         u'The local and the commons images have the same name')
-                if localImagePage.title(withNamespace=False) != \
-                 commonsImagePage.title(withNamespace=False):
+                if (localImagePage.title(withNamespace=False) !=
+                        commonsImagePage.title(withNamespace=False)):
                     usingPages = list(localImagePage.usingPages())
                     if usingPages and usingPages != [localImagePage]:
                         pywikibot.output(color_format(
@@ -458,10 +459,7 @@ def main(*args):
     options = {}
 
     for arg in pywikibot.handle_args(args):
-        if arg.startswith('-') and \
-        arg[1:] in ('always', 'replace', 'replaceloose', 'replaceonly'):
-            options[arg[1:]] = True
-        elif arg == '-replacealways':
+        if arg == '-replacealways':
             options['replace'] = True
             options['replacealways'] = True
         elif arg == '-hash':
@@ -470,6 +468,10 @@ def main(*args):
             pywikibot.warning(u"The '-autonomous' argument is DEPRECATED,"
                               u" use '-always' instead.")
             options['always'] = True
+        elif arg.startswith('-'):
+            if arg[1:] in ('always', 'replace', 'replaceloose', 'replaceonly'):
+                options[arg[1:]] = True
+
     bot = NowCommonsDeleteBot(**options)
     bot.run()
 

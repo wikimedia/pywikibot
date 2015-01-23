@@ -938,7 +938,7 @@ or press enter to quit:""")
                                  for l in links]
                     except pywikibot.NoPage:
                         pywikibot.output(
-u"Page does not exist, using the first link in page %s."
+                            'Page does not exist; using first link in page %s.'
                             % disambPage.title())
                         links = disambPage.linkedPages()[:1]
                         links = [correctcap(l, disambPage.get())

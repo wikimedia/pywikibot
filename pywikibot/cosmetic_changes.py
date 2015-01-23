@@ -220,9 +220,11 @@ class CosmeticChangesToolkit(object):
             self.cleanUpSectionHeaders,
             self.putSpacesInLists,
             self.translateAndCapitalizeNamespaces,
-# FIXME:    self.translateMagicWords,
+            # FIXME: fix bugs and re-enable
+            # self.translateMagicWords,
             self.replaceDeprecatedTemplates,
-# FIXME:    self.resolveHtmlEntities,
+            # FIXME: fix bugs and re-enable
+            # self.resolveHtmlEntities,
             self.removeUselessSpaces,
             self.removeNonBreakingSpaceBeforePercent,
 

@@ -496,7 +496,7 @@ class ReferencesRobot(Bot):
                 new_text = page.get()
                 if not page.canBeEdited():
                     pywikibot.output(u"You can't edit page %s"
-                                      % page.title(asLink=True))
+                                     % page.title(asLink=True))
                     continue
             except pywikibot.NoPage:
                 pywikibot.output(u'Page %s not found' % page.title(asLink=True))

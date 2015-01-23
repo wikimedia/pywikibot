@@ -484,8 +484,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
             print('FAILURE wrt T92856:')
             print(u'Sym. difference: "{0}"'.format(
                   u'", "'.join(
-                  u'{0}@{1}'.format(link.namespace(), link.title(withNamespace=False))
-                  for link in namespace_links ^ links)))
+                      u'{0}@{1}'.format(link.namespace(), link.title(withNamespace=False))
+                      for link in namespace_links ^ links)))
         self.assertCountEqual(
             set(mysite.pagelinks(mainpage, namespaces=[0, 1])) - links, [])
         for target in mysite.preloadpages(mysite.pagelinks(mainpage,
