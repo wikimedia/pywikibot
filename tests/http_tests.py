@@ -9,9 +9,13 @@ __version__ = '$Id$'
 
 import sys
 
+import httplib2
+
 import pywikibot
-from pywikibot.comms import http, threadedhttp
+
 from pywikibot import config2 as config
+from pywikibot.comms import http, threadedhttp
+
 from tests.aspects import unittest, TestCase
 from tests.utils import expected_failure_if
 
@@ -129,16 +133,48 @@ class HttpsCertificateTestCase(TestCase):
 
         self.assertEqual(organisation, 'TuxFamily.org non-profit organization')
 
+
+class TestHttpStatus(TestCase):
+
+    """Test HTTP status code handling and errors."""
+
+    sites = {
+        'getstatuscode': {
+            'hostname': 'getstatuscode.com',
+        },
+        'enwp': {
+            'hostname': 'en.wikipedia.org',
+        },
+        'gandi': {
+            'hostname': 'www.gandi.eu',
+        },
+    }
+
     def test_http_504(self):
         """Test that a HTTP 504 raises the correct exception."""
         self.assertRaises(pywikibot.Server504Error,
                           http.fetch,
                           uri='http://getstatuscode.com/504')
 
+    def test_server_not_found(self):
+        """Test server not found exception."""
+        self.assertRaises(httplib2.ServerNotFoundError,
+                          http.fetch,
+                          uri='http://ru-sib.wikipedia.org/w/api.php',
+                          default_error_handling=True)
+
+    def test_invalid_scheme(self):
+        """Test invalid scheme."""
+        # A KeyError is raised within httplib2, in a different thread
+        self.assertRaises(KeyError,
+                          http.fetch,
+                          uri='invalid://url')
+
     def test_follow_redirects(self):
         """Test follow 301 redirects after an exception works correctly."""
-        # to be effective, this exception should be raised in httplib2
-        self.assertRaises(Exception,
+        # It doesnt matter what exception is raised here, provided it
+        # occurs within the httplib2 request method.
+        self.assertRaises(KeyError,
                           http.fetch,
                           uri='invalid://url')
 
