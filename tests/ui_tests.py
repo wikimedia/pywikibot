@@ -31,12 +31,28 @@ import logging
 import os
 import sys
 import time
-from io import StringIO
-
-from tests.utils import unittest
+import io
 
 if sys.version_info[0] > 2:
     unicode = str
+
+
+class Stream(object):
+
+    """Handler for a StrigIO or BytesIO instance able to patch itself."""
+
+    def __init__(self, name):
+        self._stream = io.StringIO() if sys.version_info[0] > 2 else io.BytesIO()
+        self._name = 'std{0}'.format(name)
+        self._original = getattr(sys, self._name)
+
+    def patch(self):
+        setattr(sys, self._name, self._stream)
+        self._stream.truncate(0)
+        self._stream.seek(0)
+
+    def unpatch(self):
+        setattr(sys, self._name, self._original)
 
 if os.name == "nt":
     from multiprocessing.managers import BaseManager
@@ -91,31 +107,33 @@ if os.name == "nt":
         s.serve_forever()
 
 if __name__ == "__main__":
-    oldstderr = sys.stderr
-    oldstdout = sys.stdout
-    oldstdin = sys.stdin
+    strout = Stream('out')
+    strerr = Stream('err')
+    strin = Stream('in')
 
-    newstdout = StringIO()
-    newstderr = StringIO()
-    newstdin = StringIO()
+    newstdout = strout._stream
+    newstderr = strerr._stream
+    newstdin = strin._stream
 
     def patch():
         """Patch standard terminal files."""
-        sys.stdout = newstdout
-        sys.stderr = newstderr
-        sys.stdin = newstdin
+        strout.patch()
+        strerr.patch()
+        strin.patch()
 
     def unpatch():
         """un-patch standard terminal files."""
-        sys.stdout = oldstdout
-        sys.stderr = oldstderr
-        sys.stdin = oldstdin
+        strout.unpatch()
+        strerr.unpatch()
+        strin.unpatch()
 
     try:
         patch()
         import pywikibot
     finally:
         unpatch()
+
+    from tests.utils import unittest
 
     from pywikibot.bot import DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
 
@@ -131,9 +149,6 @@ if __name__ == "__main__":
 
         def setUp(self):
             patch()
-            newstdout.truncate(0)
-            newstderr.truncate(0)
-            newstdin.truncate(0)
 
             pywikibot.config.colorized_output = True
             pywikibot.config.transliterate = False
@@ -525,6 +540,8 @@ if __name__ == "__main__":
         unpatch()
 
 else:
+    from tests.utils import unittest
+
     class TestTerminalUI(unittest.TestCase):
 
         """Class to show all tests skipped under unittest."""
