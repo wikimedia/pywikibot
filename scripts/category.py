@@ -152,6 +152,7 @@ class CategoryDatabase:
     """
 
     def __init__(self, rebuild=False, filename='category.dump.bz2'):
+        """Constructor."""
         if not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         self.filename = filename
@@ -182,6 +183,7 @@ class CategoryDatabase:
                 self.rebuild()
 
     def rebuild(self):
+        """Rebuild the dabatase."""
         self.catContentDB = {}
         self.superclassDB = {}
 
@@ -220,6 +222,7 @@ class CategoryDatabase:
             return articleset
 
     def getSupercats(self, subcat):
+        """Return the supercategory (or a set of) for a given subcategory."""
         self._load()
         # if we already know which subcategories exist here
         if subcat in self.superclassDB:
@@ -274,6 +277,7 @@ class CategoryAddBot(Bot):
     @deprecated_args(editSummary='comment', dry=None)
     def __init__(self, generator, newcat=None, sort_by_last_name=False,
                  create=False, comment='', follow_redirects=False):
+        """Constructor."""
         super(CategoryAddBot, self).__init__()
         self.generator = generator
         self.newcat = newcat
@@ -315,6 +319,7 @@ class CategoryAddBot(Bot):
             return pywikibot.Page(site, catlink.title())
 
     def treat(self, page):
+        """Process one page."""
         if page.isRedirectPage():
             # if it's a redirect use the redirect target instead
             redirTarget = page.getRedirectTarget()
@@ -716,6 +721,7 @@ class CategoryRemoveRobot(CategoryMoveRobot):
     def __init__(self, catTitle, batchMode=False, editSummary='',
                  useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
                  titleRegex=None, inPlace=False, pagesonly=False):
+        """Constructor."""
         super(CategoryRemoveRobot, self).__init__(
             oldcat=catTitle,
             batch=batchMode,
@@ -733,6 +739,7 @@ class CategoryListifyRobot:
     def __init__(self, catTitle, listTitle, editSummary, overwrite=False,
                  showImages=False, subCats=False, talkPages=False,
                  recurse=False):
+        """Constructor."""
         self.editSummary = editSummary
         self.overwrite = overwrite
         self.showImages = showImages
@@ -744,6 +751,7 @@ class CategoryListifyRobot:
         self.recurse = recurse
 
     def run(self):
+        """Start bot."""
         setOfArticles = set(self.cat.articles(recurse=self.recurse))
         if self.subCats:
             setOfArticles = setOfArticles.union(set(self.cat.subcategories()))
@@ -803,6 +811,7 @@ class CategoryTidyRobot:
     """
 
     def __init__(self, catTitle, catDB):
+        """Constructor."""
         self.catTitle = catTitle
         self.catDB = catDB
         self.site = pywikibot.Site()
@@ -925,6 +934,7 @@ class CategoryTidyRobot:
                 flag = True
 
     def run(self):
+        """Start bot."""
         cat = pywikibot.Category(self.site, self.catTitle)
 
         empty = True
@@ -955,6 +965,7 @@ class CategoryTreeRobot:
     """
 
     def __init__(self, catTitle, catDB, filename=None, maxDepth=10):
+        """Constructor."""
         self.catTitle = catTitle
         self.catDB = catDB
         if filename and not os.path.isabs(filename):
