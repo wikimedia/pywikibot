@@ -676,7 +676,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """
         if self.isCategoryRedirect():
             return Category(Link(self._catredirect, self.site))
-        raise pywikibot.IsNotRedirectPage(self.title())
+        raise pywikibot.IsNotRedirectPage(self)
 
     def isEmpty(self):
         """Return True if the page text has less than 4 characters.
