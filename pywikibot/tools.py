@@ -418,6 +418,13 @@ def intersect_generators(genlist):
     @param genlist: list of page generators
     @type genlist: list
     """
+    # If any generator is empty, no pages are going to be returned
+    for source in genlist:
+        if not source:
+            debug('At least one generator ({0!r}) is empty and execution was '
+                  'skipped immediately.'.format(source), 'intersect')
+            return
+
     # Item is cached to check that it is found n_gen
     # times before being yielded.
     cache = collections.defaultdict(set)
