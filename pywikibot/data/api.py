@@ -1740,7 +1740,8 @@ class QueryGenerator(object):
         @param namespaces: namespace identifiers to limit query results
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types.  May be a '|' separated
-            list of namespace identifiers.
+            list of namespace identifiers. An empty iterator clears any
+            namespace restriction.
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool, or more than one namespace
@@ -1760,11 +1761,15 @@ class QueryGenerator(object):
         namespaces = [ns.id for ns in
                       pywikibot.site.Namespace.resolve(namespaces,
                                                        self.site.namespaces)]
+
         if 'multi' not in param and len(namespaces) != 1:
             raise TypeError(u'{0} module does not support multiple namespaces'
                             .format(self.limited_module))
 
-        self.request[self.prefix + "namespace"] = namespaces
+        if namespaces:
+            self.request[self.prefix + 'namespace'] = namespaces
+        elif self.prefix + 'namespace' in self.request:
+            del self.request[self.prefix + 'namespace']
 
     def _query_continue(self):
         if all(key not in self.data[self.continue_name]
