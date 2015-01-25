@@ -785,7 +785,7 @@ class CategoryListifyRobot:
             self.list.put(listString, comment=self.editSummary)
 
 
-class CategoryTidyRobot:
+class CategoryTidyRobot(pywikibot.Bot):
 
     """Script to help by moving articles of the category into subcategories.
 
@@ -814,10 +814,14 @@ class CategoryTidyRobot:
         """Constructor."""
         self.catTitle = catTitle
         self.catDB = catDB
-        self.site = pywikibot.Site()
-        self.editSummary = i18n.twtranslate(self.site, 'category-changing',
-                                            {'oldcat': self.catTitle,
+        site = pywikibot.Site()
+        self.editSummary = i18n.twtranslate(site, 'category-changing',
+                                            {'oldcat': catTitle,
                                              'newcat': u''})
+        self.cat = pywikibot.Category(site, catTitle)
+        super(CategoryTidyRobot, self).__init__(
+            generator=pagegenerators.PreloadingGenerator(
+                self.cat.articles()))
 
     def move_to_category(self, article, original_cat, current_cat):
         """
@@ -935,19 +939,16 @@ class CategoryTidyRobot:
 
     def run(self):
         """Start bot."""
-        cat = pywikibot.Category(self.site, self.catTitle)
-
-        empty = True
-        preloadingGen = pagegenerators.PreloadingGenerator(cat.articles())
-        for article in preloadingGen:
-            empty = False
-            pywikibot.output('')
-            pywikibot.output(u'=' * 67)
-            self.move_to_category(article, cat, cat)
-
-        if empty:
+        super(CategoryTidyRobot, self).run()
+        if not self._treat_counter:
             pywikibot.output(u'There are no articles or files in category %s'
                              % self.catTitle)
+
+    def treat(self, page):
+        """Process page."""
+        pywikibot.output('')
+        pywikibot.output(u'=' * 67)
+        self.move_to_category(page, self.cat, self.cat)
 
 
 class CategoryTreeRobot:
