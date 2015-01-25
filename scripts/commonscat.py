@@ -91,7 +91,6 @@ commonscatTemplates = {
     'da': (u'Commonscat',
            [u'Commons cat', u'Commons category', u'Commonscat left',
             u'Commonscat2']),
-    'de': (u'Commonscat', [u'Commons cat']),
     'en': (u'Commons category',
            [u'Commoncat', u'Commonscat', u'Commons cat', u'Commons+cat',
             u'Commonscategory', u'Commons and category', u'Commonscat-inline',
