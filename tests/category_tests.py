@@ -132,6 +132,23 @@ class TestCategoryObject(TestCase):
         articles_total = list(cat.articles(total=2))
         self.assertEqual(len(articles_total), 2)
 
+    def test_redirects(self):
+        """Test the redirects method."""
+        site = self.get_site()
+        cat1 = pywikibot.Category(site, 'Category:Fonts')
+        cat2 = pywikibot.Category(site, 'Category:Typefaces')
+
+        self.assertTrue(cat1.isCategoryRedirect())
+        self.assertFalse(cat2.isCategoryRedirect())
+
+        # The correct target category if fetched.
+        tgt = cat1.getCategoryRedirectTarget()
+        self.assertEqual(tgt, cat2)
+
+        # Raise exception if target is fetched for non Category redirects.
+        self.assertRaises(pywikibot.IsNotRedirectPage,
+                          cat2.getCategoryRedirectTarget)
+
 
 class TestCategoryDryObject(TestCase):
 
