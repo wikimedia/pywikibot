@@ -59,6 +59,7 @@ _pwb_py = os.path.join(_root_dir, 'pwb.py')
 
 library_test_modules = [
     'deprecation',
+    'ui',
     'tests',
     'date',
     'mediawikiversion',
@@ -100,7 +101,6 @@ script_test_modules = [
 
 disabled_test_modules = [
     'tests',  # tests of the tests package
-    'ui',  # these tests havent been designed to be run in the test runner.
 ]
 
 disabled_tests = {

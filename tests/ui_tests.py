@@ -33,26 +33,40 @@ import sys
 import time
 import io
 
+import pywikibot
+from pywikibot.bot import (
+    ui, DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
+)
+from tests.utils import unittest
+
 if sys.version_info[0] > 2:
     unicode = str
 
 
 class Stream(object):
 
-    """Handler for a StrigIO or BytesIO instance able to patch itself."""
+    """Handler for a StringIO or BytesIO instance able to patch itself."""
 
-    def __init__(self, name):
+    def __init__(self, name, patched_streams):
+        """
+        Create a new stream with a StringIO or BytesIO instance.
+
+        @param name: The part after 'std' (e.g. 'err').
+        @type name: str
+        @param patched_streams: A mapping which maps the original stream to
+            the patched stream.
+        @type patched_streams: dict
+        """
         self._stream = io.StringIO() if sys.version_info[0] > 2 else io.BytesIO()
         self._name = 'std{0}'.format(name)
         self._original = getattr(sys, self._name)
+        patched_streams[self._original] = self._stream
 
-    def patch(self):
-        setattr(sys, self._name, self._stream)
+    def reset(self):
+        """Reset own stream."""
         self._stream.truncate(0)
         self._stream.seek(0)
 
-    def unpatch(self):
-        setattr(sys, self._name, self._original)
 
 if os.name == "nt":
     from multiprocessing.managers import BaseManager
@@ -106,36 +120,41 @@ if os.name == "nt":
         s = _manager.get_server()
         s.serve_forever()
 
-if __name__ == "__main__":
-    strout = Stream('out')
-    strerr = Stream('err')
-    strin = Stream('in')
+
+def patched_print(text, targetStream):
+    org_print(text, patched_streams[targetStream])
+
+
+def patched_input():
+    return strin._stream.readline().strip()
+
+
+# TODO: This complete section doesn't depend on __name__ == '__main__' anymore
+if True:
+    patched_streams = {}
+    strout = Stream('out', patched_streams)
+    strerr = Stream('err', patched_streams)
+    strin = Stream('in', {})
 
     newstdout = strout._stream
     newstderr = strerr._stream
     newstdin = strin._stream
 
+    org_print = ui._print
+    org_input = ui._raw_input
+
     def patch():
         """Patch standard terminal files."""
-        strout.patch()
-        strerr.patch()
-        strin.patch()
+        strout.reset()
+        strerr.reset()
+        strin.reset()
+        ui._print = patched_print
+        ui._raw_input = patched_input
 
     def unpatch():
         """un-patch standard terminal files."""
-        strout.unpatch()
-        strerr.unpatch()
-        strin.unpatch()
-
-    try:
-        patch()
-        import pywikibot
-    finally:
-        unpatch()
-
-    from tests.utils import unittest
-
-    from pywikibot.bot import DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
+        ui._print = org_print
+        ui._raw_input = org_input
 
     logger = logging.getLogger('pywiki')
     loggingcontext = {'caller_name': "ui_tests",
@@ -146,6 +165,8 @@ if __name__ == "__main__":
     class UITestCase(unittest.TestCase):
 
         """UI tests."""
+
+        net = False
 
         def setUp(self):
             patch()
@@ -265,7 +286,7 @@ if __name__ == "__main__":
             self.assertEqual(stderrlines[0], "ERROR: TestException: Testing Exception")
             self.assertEqual(stderrlines[1], "Traceback (most recent call last):")
             self.assertEqual(stderrlines[3], """    raise TestException("Testing Exception")""")
-            self.assertEqual(stderrlines[4], "TestException: Testing Exception")
+            self.assertTrue(stderrlines[4].endswith(': Testing Exception'))
 
             self.assertNotEqual(stderrlines[-1], "\n")
 
@@ -436,6 +457,12 @@ if __name__ == "__main__":
         """MS Windows terminal tests."""
 
         @classmethod
+        def setUpClass(cls):
+            if os.name != 'nt':
+                raise unittest.SkipTest('requires Windows console')
+            super(WindowsTerminalTestCase, cls).setUpClass()
+
+        @classmethod
         def setUpProcess(cls, command):
             import pywinauto
             import subprocess
@@ -504,6 +531,7 @@ if __name__ == "__main__":
 
         @classmethod
         def setUpClass(cls):
+            super(TestWindowsTerminalUnicode, cls).setUpClass()
             import inspect
             fn = inspect.getfile(inspect.currentframe())
             cls.setUpProcess(["python", "pwb.py", fn, "--run-as-slave-interpreter"])
@@ -553,6 +581,7 @@ if __name__ == "__main__":
 
         @classmethod
         def setUpClass(cls):
+            super(TestWindowsTerminalUnicodeArguments, cls).setUpClass()
             cls.setUpProcess(["cmd", "/k", "echo off"])
 
         @classmethod
@@ -571,6 +600,8 @@ if __name__ == "__main__":
             # empty line is the new command line
             self.assertEqual(lines, [u"Alpha", u"Bετα", u"Гамма", u"دلتا", u""])
 
+
+if __name__ == "__main__":
     try:
         try:
             unittest.main()
@@ -578,14 +609,3 @@ if __name__ == "__main__":
             pass
     finally:
         unpatch()
-
-else:
-    from tests.utils import unittest
-
-    class TestTerminalUI(unittest.TestCase):
-
-        """Class to show all tests skipped under unittest."""
-
-        @unittest.skip("Terminal UI tests can only be run by directly running tests/ui_tests.py")
-        def testCannotBeRun(self):
-            pass
