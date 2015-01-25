@@ -489,10 +489,8 @@ class RedirectRobot(Bot):
                         assert targetPage.site == self.site, (
                             u'target page is on different site %s'
                             % targetPage.site)
-                        if (self.has_valid_template(
-                            'redirect-broken-redirect-template') and
-                            i18n.twhas_key(targetPage.site,
-                                           'redirect-remove-broken')):
+                        if self.has_valid_template(
+                                'redirect-broken-redirect-template'):
                             pywikibot.output(u"No sysop in user-config.py, "
                                              u"put page to speedy deletion.")
                             content = redir_page.get(get_redirect=True)
