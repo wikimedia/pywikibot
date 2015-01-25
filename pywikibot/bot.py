@@ -899,6 +899,8 @@ class Bot(object):
         self.setOptions(**kwargs)
         self._site = None
         self._sites = set()
+        self._treat_counter = 0
+        self._save_counter = 0
 
     def setOptions(self, **kwargs):
         """
@@ -1044,6 +1046,7 @@ class Bot(object):
 
         try:
             func(*args, **kwargs)
+            self._save_counter += 1
         except pywikibot.PageSaveRelatedError as e:
             if not ignore_save_related_errors:
                 raise
@@ -1130,6 +1133,10 @@ class Bot(object):
             log('Bot is managing the %s.site property in run()'
                 % self.__class__.__name__)
 
+        maxint = 0
+        if sys.version_info[0] == 2:
+            maxint = sys.maxint
+
         try:
             for page in self.generator:
                 # When in auto update mode, set the site when it changes,
@@ -1137,7 +1144,17 @@ class Bot(object):
                 if (auto_update_site and
                         (not self._site or page.site != self.site)):
                     self.site = page.site
+
+                # Process the page
                 self.treat(page)
+
+                self._treat_counter += 1
+                if maxint and self._treat_counter == maxint:
+                    # Warn the user that the bot may not function correctly
+                    pywikibot.error(
+                        '\n%s: page count reached Python 2 sys.maxint (%d).\n'
+                        'Python 3 should be used to process very large batches'
+                        % (self.__class__.__name__, sys.maxint))
         except QuitKeyboardInterrupt:
             pywikibot.output('\nUser quit %s bot run...' %
                              self.__class__.__name__)
