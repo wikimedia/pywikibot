@@ -8,15 +8,16 @@
 __version__ = '$Id$'
 #
 
+import copy
+import json
 import os
-import sys
+
 import pywikibot
+
 from pywikibot import pagegenerators
 from pywikibot.tools import SelfCallDict
 from pywikibot.page import WikibasePage
 from pywikibot.site import Namespace
-import json
-import copy
 
 from tests.aspects import unittest, WikidataTestCase, TestCase
 
@@ -889,12 +890,6 @@ class TestJSON(WikidataTestCase):
     """Test cases to test toJSON() functions."""
 
     dry = True
-
-    @classmethod
-    def setUpClass(cls):
-        if not sys.version_info >= (2, 7):
-            raise unittest.SkipTest("Fails on Python 2.6")
-        super(TestJSON, cls).setUpClass()
 
     def setUp(self):
         super(TestJSON, self).setUp()

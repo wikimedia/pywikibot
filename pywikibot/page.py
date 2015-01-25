@@ -17,19 +17,14 @@ This module also includes objects:
 __version__ = '$Id$'
 #
 
-import collections
 import hashlib
 import logging
 import re
 import sys
 import unicodedata
 
+from collections import defaultdict, namedtuple
 from warnings import warn
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
 
 if sys.version_info[0] > 2:
     unicode = basestring = str
@@ -44,6 +39,7 @@ else:
     from urllib import urlopen
 
 import pywikibot
+
 from pywikibot import config
 from pywikibot.family import Family
 from pywikibot.site import Namespace
@@ -54,6 +50,7 @@ from pywikibot.exceptions import (
 from pywikibot.tools import (
     ComparableMixin, deprecated, deprecate_arg, deprecated_args,
     remove_last_args, _NotImplementedWarning,
+    OrderedDict, Counter,
 )
 from pywikibot import textlib
 
@@ -3096,8 +3093,8 @@ class WikibasePage(BasePage):
                 empty = len(diffto['aliases'][lang]) - len(strings)
                 if empty > 0:
                     strings += [''] * empty
-                elif collections.Counter(val['value'] for val in diffto['aliases'][lang]
-                                         ) == collections.Counter(strings):
+                elif Counter(val['value'] for val
+                             in diffto['aliases'][lang]) == Counter(strings):
                     del aliases[lang]
             if lang in aliases:
                 aliases[lang] = [{'language': lang, 'value': i} for i in strings]
@@ -4005,7 +4002,7 @@ class Claim(Property):
         @type claims: list of pywikibot.Claim
         """
         data = self.repo.editSource(self, claims, new=True, **kwargs)
-        source = collections.defaultdict(list)
+        source = defaultdict(list)
         for claim in claims:
             claim.hash = data['reference']['hash']
             self.on_item.lastrevid = data['pageinfo']['lastrevid']
@@ -4030,7 +4027,7 @@ class Claim(Property):
         """
         self.repo.removeSources(self, sources, **kwargs)
         for source in sources:
-            source_dict = collections.defaultdict(list)
+            source_dict = defaultdict(list)
             source_dict[source.getID()].append(source)
             self.sources.remove(source_dict)
 
@@ -4151,18 +4148,16 @@ class Revision(object):
 
     """A structure holding information about a single revision of a Page."""
 
-    HistEntry = collections.namedtuple('HistEntry',
-                                       ['revid',
-                                        'timestamp',
-                                        'user',
-                                        'comment'])
+    HistEntry = namedtuple('HistEntry', ['revid',
+                                         'timestamp',
+                                         'user',
+                                         'comment'])
 
-    FullHistEntry = collections.namedtuple('FullHistEntry',
-                                           ['revid',
-                                            'timestamp',
-                                            'user',
-                                            'text',
-                                            'rollbacktoken'])
+    FullHistEntry = namedtuple('FullHistEntry', ['revid',
+                                                 'timestamp',
+                                                 'user',
+                                                 'text',
+                                                 'rollbacktoken'])
 
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
                  text=None, minor=False, rollbacktoken=None):

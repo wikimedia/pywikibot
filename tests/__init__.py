@@ -11,32 +11,19 @@ import os
 import sys
 import warnings
 
-__all__ = ('httplib2', 'OrderedDict', '_cache_dir', 'TestRequest',
+__all__ = ('httplib2', '_cache_dir', 'TestRequest',
            'patch_request', 'unpatch_request')
 
 # Verify that the unit tests have a base working environment:
 # - httplib2 is mandatory
-# - ordereddict is only needed as a fallback for python 2.6
+# - ordereddict is needed as a fallback for python 2.6,
+#   however if unavailable this will fail on use; see pywikibot/tools.py
 # - mwparserfromhell is optional, so is only imported in textlib_tests
 try:
     import httplib2  # noqa
 except ImportError as e:
     print("ImportError: %s" % e)
     sys.exit(1)
-
-try:
-    from collections import OrderedDict  # noqa
-except ImportError:
-    try:
-        from ordereddict import OrderedDict  # noqa
-    except ImportError as e:
-        print("ImportError: %s" % e)
-        if sys.version_info[0] == 2 and sys.version_info[1] == 6:
-            print(
-                "pywikibot depends on module ordereddict in Python 2.6.\n"
-                "Run 'pip install ordereddict' to run these tests under "
-                "Python 2.6")
-        sys.exit(1)
 
 if sys.version_info < (2, 7):
     # Unittest2 is a backport of python 2.7s unittest module to python 2.6

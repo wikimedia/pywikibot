@@ -66,7 +66,7 @@ if sys.version_info[0] == 2:
             sys.modules['unittest'] = unittest2
 
         script_deps['replicate_wiki.py'] = ['argparse']
-        dependencies.append('ordereddict')
+        dependencies.append('future')  # provides collections backports
 
 if sys.version_info[0] == 3:
     if sys.version_info[1] < 3:
