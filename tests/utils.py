@@ -259,6 +259,19 @@ class DryDataSite(DrySite, pywikibot.site.DataSite):
             })
 
 
+class DryPage(pywikibot.Page):
+
+    """Dummy class that acts like a Page but avoids network activity."""
+
+    _pageid = 1
+    _disambig = False
+    _isredir = False
+
+    def isDisambig(self):
+        """Return disambig status stored in _disambig."""
+        return self._disambig
+
+
 def execute(command, data_in=None, timeout=0, error=None):
     """
     Execute a command and capture outputs.

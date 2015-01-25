@@ -1,6 +1,6 @@
 """Module with the Graphviz drawing calls."""
 #
-# (C) Pywikibot team, 2006-2010
+# (C) Pywikibot team, 2006-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,13 +11,17 @@ __version__ = '$Id$'
 
 import threading
 
-pydotfound = True
 try:
     import pydot
-except ImportError:
-    pydotfound = False
+except ImportError as e:
+    pydot = e
+
 import pywikibot
+
 from pywikibot import config2 as config
+
+# deprecated value
+pydotfound = not isinstance(pydot, ImportError)
 
 
 class GraphImpossible(Exception):
@@ -39,18 +43,76 @@ class GraphSavingThread(threading.Thread):
     """
 
     def __init__(self, graph, originPage):
+        """Constructor."""
         threading.Thread.__init__(self)
         self.graph = graph
         self.originPage = originPage
 
     def run(self):
+        """Write graphs to the data directory."""
         for format in config.interwiki_graph_formats:
-            filename = 'interwiki-graphs/' + getFilename(self.originPage,
-                                                         format)
+            filename = config.datafilepath(
+                'interwiki-graphs/' + getFilename(self.originPage, format))
             if self.graph.write(filename, prog='dot', format=format):
                 pywikibot.output(u'Graph saved as %s' % filename)
             else:
                 pywikibot.output(u'Graph could not be saved as %s' % filename)
+
+
+class Subject(object):
+
+    """Data about a page with translations on multiple wikis."""
+
+    def __init__(self, origin=None):
+        """Constructor.
+
+        @param originPage: the page on the 'origin' wiki
+        @type originPage: Page
+        """
+        # Remember the "origin page"
+        self._origin = origin
+
+        # Temporary variable to support git blame; do not use
+        originPage = origin
+
+        self.found_in = None
+
+        # foundIn is a dictionary where pages are keys and lists of
+        # pages are values. It stores where we found each page.
+        # As we haven't yet found a page that links to the origin page, we
+        # start with an empty list for it.
+        if originPage:
+            self.foundIn = {self.originPage: []}
+        else:
+            self.foundIn = {}
+
+    @property
+    def origin(self):
+        """Page on the origin wiki."""
+        return self._origin
+
+    @property
+    def originPage(self):
+        """Deprecated property for the origin page.
+
+        DEPRECATED.  Use origin.
+        """
+        # TODO: deprecate this property
+        return self.origin
+
+    @property
+    def foundIn(self):
+        """Mapping of pages to others pages interwiki linked to it.
+
+        DEPRECATED.  Use found_in.
+        """
+        # TODO: deprecate this property
+        return self.found_in
+
+    @foundIn.setter
+    def foundIn(self, value):
+        """Temporary property setter to support code migration."""
+        self.found_in = value
 
 
 class GraphDrawer:
@@ -58,17 +120,25 @@ class GraphDrawer:
     """Graphviz (dot) code creator."""
 
     def __init__(self, subject):
-        """Constructor."""
-        if not pydotfound:
-            raise GraphImpossible('pydot is not installed.')
+        """Constructor.
+
+        @param subject: page data to graph
+        @type subject: Subject
+
+        @raises GraphImpossible: pydot is not installed
+        """
+        if isinstance(pydot, ImportError):
+            raise GraphImpossible('pydot is not installed: %s.' % pydot)
         self.graph = None
         self.subject = subject
 
     def getLabel(self, page):
+        """Get label for page."""
         return (u'"%s:%s"' % (page.site.language(),
                               page.title())).encode('utf-8')
 
     def addNode(self, page):
+        """Add a node for page."""
         node = pydot.Node(self.getLabel(page), shape='rectangle')
         node.set_URL("\"http://%s%s\""
                      % (page.site.hostname(),
@@ -95,6 +165,7 @@ class GraphDrawer:
         self.graph.add_node(node)
 
     def addDirectedEdge(self, page, refPage):
+        """Add a directed edge from refPage to page."""
         # if page was given as a hint, referrers would be [None]
         if refPage is not None:
             sourceLabel = self.getLabel(refPage)
@@ -132,6 +203,7 @@ class GraphDrawer:
                 self.graph.add_edge(edge)
 
     def saveGraphFile(self):
+        """Write graphs to the data directory."""
         thread = GraphSavingThread(self.graph, self.subject.originPage)
         thread.start()
 
