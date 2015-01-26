@@ -21,13 +21,13 @@ Command line options:
 
 Examples:
 
-Counts how many times {{ref}} and {{note}} are transcluded in articles.
+Counts how many times {{ref}} and {{note}} are transcluded in articles:
 
-     python templatecount.py -count -namespace:0 ref note
+    templatecount.py -count -namespace:0 ref note
 
-Lists all the category pages that transclude {{cfd}} and {{cfdu}}.
+Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 
-     python templatecount.py -list -namespace:14 cfd cfdu
+    templatecount.py -list -namespace:14 cfd cfdu
 
 """
 #
@@ -97,14 +97,15 @@ class TemplateCountRobot:
         mysite = pywikibot.Site()
         # The names of the templates are the keys, and lists of pages
         # transcluding templates are the values.
-        mytpl = mysite.getNamespaceIndex(mysite.template_namespace())
+        mytpl = mysite.ns_index(mysite.template_namespace())
         for template in templates:
             transcludingArray = []
             gen = pagegenerators.ReferringPageGenerator(
                 pywikibot.Page(mysite, template, ns=mytpl),
                 onlyTemplateInclusion=True)
             if namespaces:
-                gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
+                gen = pagegenerators.NamespaceFilterPageGenerator(gen,
+                                                                  namespaces)
             for page in gen:
                 transcludingArray.append(page)
             yield template, transcludingArray
