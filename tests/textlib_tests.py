@@ -209,7 +209,8 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{ a }}'), [('a', OrderedDict())])
         self.assertEqual(func('{{a|b=c}}'), [('a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{a|b|c=d}}'), [('a', OrderedDict((('1', 'b'), ('c', 'd'))))])
-        self.assertEqual(func('{{a|b=c|f=g|d=e|1=}}'), [('a', OrderedDict((('b', 'c'), ('f', 'g'), ('d', 'e'), ('1', ''))))])
+        self.assertEqual(func('{{a|b=c|f=g|d=e|1=}}'),
+                         [('a', OrderedDict((('b', 'c'), ('f', 'g'), ('d', 'e'), ('1', ''))))])
         self.assertEqual(func('{{a|1=2|c=d}}'), [('a', OrderedDict((('1', '2'), ('c', 'd'))))])
         self.assertEqual(func('{{a|c=d|1=2}}'), [('a', OrderedDict((('c', 'd'), ('1', '2'))))])
         self.assertEqual(func('{{a|5=d|a=b}}'), [('a', OrderedDict((('5', 'd'), ('a', 'b'))))])
@@ -217,7 +218,8 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{a|=|}}'), [('a', OrderedDict((('', ''), ('1', ''))))])
         self.assertEqual(func('{{a||}}'), [('a', OrderedDict((('1', ''), ('2', ''))))])
         self.assertEqual(func('{{a|b={{{1}}}}}'), [('a', OrderedDict((('b', '{{{1}}}'), )))])
-        self.assertEqual(func('{{a|b=<noinclude>{{{1}}}</noinclude>}}'), [('a', OrderedDict((('b', '<noinclude>{{{1}}}</noinclude>'), )))])
+        self.assertEqual(func('{{a|b=<noinclude>{{{1}}}</noinclude>}}'),
+                         [('a', OrderedDict((('b', '<noinclude>{{{1}}}</noinclude>'), )))])
         self.assertEqual(func('{{subst:a|b=c}}'), [('subst:a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{safesubst:a|b=c}}'), [('safesubst:a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{msgnw:a|b=c}}'), [('msgnw:a', OrderedDict((('b', 'c'), )))])

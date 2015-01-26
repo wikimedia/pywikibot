@@ -972,14 +972,22 @@ u"Page does not exist, using the first link in page %s."
                     {'from': disambPage.title()}
                 )
             else:
-                self.comment = i18n.twtranslate(self.mysite, 'solve_disambiguation-redirect-resolved', {'from': disambPage.title(), 'to': targets})
+                self.comment = i18n.twtranslate(
+                    self.mysite, 'solve_disambiguation-redirect-resolved',
+                    {'from': disambPage.title(), 'to': targets})
         else:
             if unlink and not new_targets:
-                self.comment = i18n.twtranslate(self.mysite, 'solve_disambiguation-links-removed', {'from': disambPage.title()})
+                self.comment = i18n.twtranslate(
+                    self.mysite, 'solve_disambiguation-links-removed',
+                    {'from': disambPage.title()})
             elif dn and not new_targets:
-                self.comment = i18n.twtranslate(self.mysite, 'solve_disambiguation-adding-dn-template', {'from': disambPage.title()})
+                self.comment = i18n.twtranslate(
+                    self.mysite, 'solve_disambiguation-adding-dn-template',
+                    {'from': disambPage.title()})
             else:
-                self.comment = i18n.twtranslate(self.mysite, 'solve_disambiguation-links-resolved', {'from': disambPage.title(), 'to': targets})
+                self.comment = i18n.twtranslate(
+                    self.mysite, 'solve_disambiguation-links-resolved',
+                    {'from': disambPage.title(), 'to': targets})
 
     def run(self):
         if self.main_only:

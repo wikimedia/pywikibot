@@ -3956,12 +3956,16 @@ class APISite(BaseSite):
         "noapiwrite": "API editing not enabled on %(site)s wiki",
         "writeapidenied": "User %(user)s is not authorized to edit on %(site)s wiki",
         "cantcreate": "User %(user)s not authorized to create new pages on %(site)s wiki",
-        "cantcreate-anon": """Bot is not logged in, and anon users are not authorized to create new pages on %(site)s wiki""",
-        "noimageredirect-anon": """Bot is not logged in, and anon users are not authorized to create image redirects on %(site)s wiki""",
+        "cantcreate-anon":
+            "Bot is not logged in, and anon users are not authorized to create "
+            "new pages on %(site)s wiki",
+        "noimageredirect-anon":
+            "Bot is not logged in, and anon users are not authorized to create "
+            "image redirects on %(site)s wiki",
         "noimageredirect": "User %(user)s not authorized to create image redirects on %(site)s wiki",
         "filtered": "%(info)s",
         "contenttoobig": "%(info)s",
-        "noedit-anon": """Bot is not logged in, and anon users are not authorized to edit on %(site)s wiki""",
+        "noedit-anon": "Bot is not logged in, and anon users are not authorized to edit on %(site)s wiki",
         "noedit": "User %(user)s not authorized to edit pages on %(site)s wiki",
 
         "missingtitle": NoCreateError,

@@ -7,10 +7,12 @@ Usage:
 
 python coordinate_import.py -lang:en -family:wikipedia -cat:Category:Coordinates_not_on_Wikidata
 
-This will work on all pages in the category "coordinates not on Wikidata" and will import the coordinates on these pages to Wikidata.
+This will work on all pages in the category "coordinates not on Wikidata" and
+will import the coordinates on these pages to Wikidata.
 
-The data from the "GeoData" extension (https://www.mediawiki.org/wiki/Extension:GeoData) is used so that extension has to be setup properly.
-You can look at the [[Special:Nearby]] page on your local Wiki to see if it's populated.
+The data from the "GeoData" extension (https://www.mediawiki.org/wiki/Extension:GeoData)
+is used so that extension has to be setup properly. You can look at the
+[[Special:Nearby]] page on your local Wiki to see if it's populated.
 
 You can use any typical pagegenerator to provide with a list of pages:
 

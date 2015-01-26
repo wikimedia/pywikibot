@@ -109,7 +109,7 @@ fixes = {
             'de': u'Bot: korrigiere Grammatik',
         },
         'replacements': [
-            #   (u'([Ss]owohl) ([^,\.]+?), als auch',                                                            r'\1 \2 als auch'),
+            #   (u'([Ss]owohl) ([^,\.]+?), als auch', r'\1 \2 als auch'),
             #   (u'([Ww]eder) ([^,\.]+?), noch', r'\1 \2 noch'),
             #
             # Vorsicht bei Substantiven, z. B. 3-Jähriger!
@@ -170,7 +170,9 @@ fixes = {
                 r'/\w(,\w)*/',      # Laut-Aufzählung in der Linguistik
                 r'[xyz](,[xyz])+',  # Variablen in der Mathematik (unklar, ob Leerzeichen hier Pflicht sind)
                 r'(?m)^;(.*?)$',    # Definitionslisten, dort gibt es oft absichtlich Leerzeichen vor Doppelpunkten
-                r'\d+h( |&nbsp;)\d+m',  # Schreibweise für Zeiten, vor allem in Film-Infoboxen. Nicht korrekt, aber dafür schön kurz.
+                r'\d+h( |&nbsp;)\d+m',
+                # Schreibweise für Zeiten, vor allem in Film-Infoboxen.
+                # Nicht korrekt, aber dafür schön kurz.
                 r'(?i)\[\[(Bild|Image|Media):.+?\|',  # Dateinamen auslassen
                 r'{{bgc\|.*?}}',                      # Hintergrundfarbe
                 r'<sup>\d+m</sup>',                   # bei chemischen Formeln
@@ -301,7 +303,8 @@ fixes = {
             # dash in external link, where the correct end of the URL can
             # be detected from the file extension. It is very unlikely that
             # this will cause mistakes.
-            (r'\[(?P<url>https?://[^\|\] ]+?(\.pdf|\.html|\.htm|\.php|\.asp|\.aspx|\.jsp)) *\| *(?P<label>[^\|\]]+?)\]', r'[\g<url> \g<label>]'),
+            (r'\[(?P<url>https?://[^\|\] ]+?(\.pdf|\.html|\.htm|\.php|\.asp|\.aspx|\.jsp)) *\|'
+             r' *(?P<label>[^\|\]]+?)\]', r'[\g<url> \g<label>]'),
         ],
         'exceptions': {
             'inside-tags': [
@@ -401,13 +404,17 @@ fixes = {
             # space after death sign w/ linked date
             #   (u'†\[\[(\d)', u'† [[\\1'),
             #   (u'&dagger;\[\[(\d)', u'† [[\\1'),
-            (u'\[\[(\d+\. (?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)) (\d{1,4})\]\]', u'[[\\1]] [[\\2]]'),
+            (u'\[\[(\d+\. (?:Januar|Februar|März|April|Mai|Juni|Juli|August|'
+             u'September|Oktober|November|Dezember)) (\d{1,4})\]\]', u'[[\\1]] [[\\2]]'),
             # Keine führende Null beim Datum (ersteinmal nur bei denen, bei denen auch ein Leerzeichen fehlt)
-            (u'0(\d+)\.(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)', r'\1. \2'),
+            (u'0(\d+)\.(Januar|Februar|März|April|Mai|Juni|Juli|August|'
+             u'September|Oktober|November|Dezember)', r'\1. \2'),
             # Kein Leerzeichen zwischen Tag und Monat
-            (u'(\d+)\.(Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)', r'\1. \2'),
+            (u'(\d+)\.(Januar|Februar|März|April|Mai|Juni|Juli|August|'
+             u'September|Oktober|November|Dezember)', r'\1. \2'),
             # Kein Punkt vorm Jahr
-            (u'(\d+)\. (Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\.(\d{1,4})', r'\1. \2 \3'),
+            (u'(\d+)\. (Januar|Februar|März|April|Mai|Juni|Juli|August|'
+             u'September|Oktober|November|Dezember)\.(\d{1,4})', r'\1. \2 \3'),
         ],
         'exceptions': {
             'inside': [

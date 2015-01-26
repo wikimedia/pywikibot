@@ -86,7 +86,8 @@ def main(*args):
         elif arg == "-all":
             logall = True
         elif arg == "-force":
-            pywikibot.output(u"To force a re-login, please delete the revelant lines from '%s' (or the entire file) and try again." %
+            pywikibot.output(u"To force a re-login, please delete the revelant "
+                             u"lines from '%s' (or the entire file) and try again." %
                              join(config.base_dir, 'pywikibot.lwp'))
         elif arg == "-logout":
             logout = True

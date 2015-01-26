@@ -66,7 +66,8 @@ def treat(text, linkedPage, targetPage):
     linktrail = mysite.linktrail()
 
     # make a backup of the original text so we can show the changes later
-    linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?(\|(?P<label>[^\]]*))?\]\](?P<linktrail>' + linktrail + ')')
+    linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?'
+                       r'(\|(?P<label>[^\]]*))?\]\](?P<linktrail>' + linktrail + ')')
     curpos = 0
     # This loop will run until we have finished the current page
     while True:

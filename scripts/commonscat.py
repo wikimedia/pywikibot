@@ -456,7 +456,9 @@ class CommonscatBot(Bot):
                     loguser = logitem.user()
                     logcomment = logitem.comment()
                     # Some logic to extract the target page.
-                    regex = u'moved to \[\[\:?Category:(?P<newcat1>[^\|\}]+)(\|[^\}]+)?\]\]|Robot: Changing Category:(.+) to Category:(?P<newcat2>.+)'
+                    regex = (
+                        r'moved to \[\[\:?Category:(?P<newcat1>[^\|\}]+)(\|[^\}]+)?\]\]|'
+                        r'Robot: Changing Category:(.+) to Category:(?P<newcat2>.+)')
                     m = re.search(regex, logcomment, flags=re.I)
                     if m:
                         if m.group('newcat1'):

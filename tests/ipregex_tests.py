@@ -197,8 +197,10 @@ class PyWikiIpRegexCase(TestCase):
         self.ipv6test(False, "1.2.3.4::")
 
         # Testing IPv4 addresses represented as dotted-quads
-        # Leading zero's in IPv4 addresses not allowed: some systems treat the leading "0" in ".086" as the start of an octal number
-        # Update: The BNF in RFC-3986 explicitly defines the dec-octet (for IPv4 addresses) not to have a leading zero
+        # Leading zero's in IPv4 addresses not allowed: some systems treat the
+        # leading "0" in ".086" as the start of an octal number
+        # Update: The BNF in RFC-3986 explicitly defines the dec-octet
+        # (for IPv4 addresses) not to have a leading zero
         self.ipv6test(False, "fe80:0000:0000:0000:0204:61ff:254.157.241.086")
         self.ipv6test(True, "::ffff:192.0.2.128")   # but this is OK, since there's a single digit
         self.ipv6test(False, "XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:1.2.3.4")

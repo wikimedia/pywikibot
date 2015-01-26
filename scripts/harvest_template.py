@@ -5,11 +5,8 @@ Template harvesting script.
 
 Usage:
 
-python harvest_template.py -transcludes:"..." template_parameter PID [template_parameter PID]
-
-   or
-
-python harvest_template.py [generators] -template:"..." template_parameter PID [template_parameter PID]
+* harvest_template.py -transcludes:"..." template_parameter PID [template_parameter PID]
+* harvest_template.py [generators] -template:"..." template_parameter PID [template_parameter PID]
 
 This will work on all pages that transclude the template in the article
 namespace
@@ -20,7 +17,7 @@ These command line parameters can be used to specify which pages to work on:
 
 Examples:
 
-python harvest_template.py -lang:nl -cat:Sisoridae -template:"Taxobox straalvinnige" -namespace:0 orde P70 familie P71 geslacht P74
+* harvest_template.py -lang:nl -cat:Sisoridae -template:"Taxobox straalvinnige" -namespace:0 orde P70 familie P71 geslacht P74
 
 """
 #
@@ -147,7 +144,9 @@ class HarvestRobot(WikidataBot):
                                 # Try to extract a valid page
                                 match = re.search(pywikibot.link_regex, value)
                                 if not match:
-                                    pywikibot.output(u'%s field %s value %s isnt a wikilink. Skipping' % (claim.getID(), field, value))
+                                    pywikibot.output(
+                                        u'%s field %s value %s isnt a wikilink. Skipping'
+                                        % (claim.getID(), field, value))
                                     continue
 
                                 link_text = match.group(1)
