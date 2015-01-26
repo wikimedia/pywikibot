@@ -31,7 +31,7 @@ __version__ = '$Id$'
 import re
 import pywikibot
 from pywikibot.editor import TextEditor
-from pywikibot import pagegenerators, i18n, Bot
+from pywikibot import i18n, Bot
 
 
 class UnlinkBot(Bot):
@@ -49,10 +49,8 @@ class UnlinkBot(Bot):
         self.pageToUnlink = pageToUnlink
         linktrail = self.pageToUnlink.site.linktrail()
 
-        gen = pagegenerators.ReferringPageGenerator(pageToUnlink)
-        if self.getOption('namespaces') != []:
-            gen = pagegenerators.NamespaceFilterPageGenerator(gen, self.getOption('namespaces'))
-        self.generator = pagegenerators.PreloadingGenerator(gen)
+        self.generator = pageToUnlink.getReferences(
+            namespaces=self.getOption('namespaces'), content=True)
         # The regular expression which finds links. Results consist of four
         # groups:
         #

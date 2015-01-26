@@ -34,7 +34,7 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import pagegenerators, i18n
+from pywikibot import i18n
 from pywikibot.editor import TextEditor
 
 
@@ -67,10 +67,7 @@ def main(*args):
         return
 
     mysite = pywikibot.Site()
-    pages = mysite.exturlusage(spamSite)
-    if namespaces:
-        pages = pagegenerators.NamespaceFilterPageGenerator(pages, namespaces)
-    pages = pagegenerators.PreloadingGenerator(pages)
+    pages = mysite.exturlusage(spamSite, namespaces=namespaces, content=True)
 
     summary = i18n.twtranslate(mysite, 'spamremove-remove',
                                {'url': spamSite})

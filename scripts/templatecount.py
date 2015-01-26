@@ -40,7 +40,6 @@ __version__ = '$Id$'
 
 import datetime
 import pywikibot
-from pywikibot import pagegenerators
 
 templates = ['ref', 'note', 'ref label', 'note label', 'reflist']
 
@@ -100,12 +99,8 @@ class TemplateCountRobot:
         mytpl = mysite.ns_index(mysite.template_namespace())
         for template in templates:
             transcludingArray = []
-            gen = pagegenerators.ReferringPageGenerator(
-                pywikibot.Page(mysite, template, ns=mytpl),
-                onlyTemplateInclusion=True)
-            if namespaces:
-                gen = pagegenerators.NamespaceFilterPageGenerator(gen,
-                                                                  namespaces)
+            gen = pywikibot.Page(mysite, template, ns=mytpl).getReferences(
+                namespaces=namespaces, onlyTemplateInclusion=True)
             for page in gen:
                 transcludingArray.append(page)
             yield template, transcludingArray

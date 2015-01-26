@@ -218,8 +218,7 @@ def main(*args):
     if featured:
         featuredList = i18n.translate(mysite, featured_articles)
         ref = pywikibot.Page(pywikibot.Site(), featuredList)
-        gen = pagegenerators.ReferringPageGenerator(ref)
-        gen = pagegenerators.NamespaceFilterPageGenerator(gen, [0])
+        gen = ref.getReferences(namespaces=[0])
     if not gen:
         gen = genFactory.getCombinedGenerator()
     if gen:

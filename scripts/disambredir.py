@@ -156,7 +156,6 @@ def main(*args):
     """
     local_args = pywikibot.handle_args(args)
 
-    generator = None
     start = local_args[0] if local_args else '!'
 
     mysite = pywikibot.Site()
@@ -164,17 +163,13 @@ def main(*args):
         mysite.disambcategory()
     except pywikibot.Error as e:
         pywikibot.output(e)
-    else:
-        generator = pagegenerators.CategorizedPageGenerator(
-            mysite.disambcategory(), start=start)
-
-    if not generator:
         pywikibot.showHelp()
         return
 
+    generator = pagegenerators.CategorizedPageGenerator(
+        mysite.disambcategory(), start=start, content=True, namespaces=[0])
+
     # only work on articles
-    generator = pagegenerators.NamespaceFilterPageGenerator(generator, [0])
-    generator = pagegenerators.PreloadingGenerator(generator)
     pagestodo = []
     pagestoload = []
     for page in generator:

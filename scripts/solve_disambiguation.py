@@ -1098,15 +1098,9 @@ def main(*args):
             minimum = int(arg[5:])
         elif arg.startswith('-start'):
             try:
-                if len(arg) <= len('-start:'):
-                    generator = pagegenerators.CategorizedPageGenerator(
-                        pywikibot.Site().disambcategory())
-                else:
-                    generator = pagegenerators.CategorizedPageGenerator(
-                        pywikibot.Site().disambcategory(),
-                        start=arg[7:])
-                generator = pagegenerators.NamespaceFilterPageGenerator(
-                    generator, [0])
+                generator = pagegenerators.CategorizedPageGenerator(
+                    pywikibot.Site().disambcategory(),
+                    start=arg[7:], namespaces=[0])
             except pywikibot.NoPage:
                 pywikibot.output("Disambiguation category for your wiki is not known.")
                 raise

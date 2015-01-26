@@ -1770,7 +1770,7 @@ def main(*args):
                 firstPageTitle = arg[7:]
             firstPageTitle = firstPageTitle.split(":")[1:]
             generator = pywikibot.Site().allpages(start=firstPageTitle,
-                                                     namespace=6)
+                                                  namespace=6)
             repeat = False
         elif arg.startswith('-page'):
             if len(arg) == 5:
@@ -1804,7 +1804,7 @@ def main(*args):
                 catName = str(arg[5:])
             catSelected = pywikibot.Category(pywikibot.Site(),
                                              'Category:%s' % catName)
-            generator = pg.CategorizedPageGenerator(catSelected)
+            generator = catSelected.articles(namespaces=[6])
             repeat = False
         elif arg.startswith('-ref'):
             if len(arg) == 4:
@@ -1812,8 +1812,8 @@ def main(*args):
                     u'The references of what page should I parse?'))
             elif len(arg) > 4:
                 refName = str(arg[5:])
-            generator = pg.ReferringPageGenerator(
-                pywikibot.Page(pywikibot.Site(), refName))
+            ref = pywikibot.Page(pywikibot.Site(), refName)
+            generator = ref.getReferences(namespaces=[6])
             repeat = False
 
     if not generator:
@@ -1862,7 +1862,6 @@ def main(*args):
         Bot.takesettings()
         if waitTime:
             generator = Bot.wait(waitTime, generator, normal, limit)
-        generator = pg.NamespaceFilterPageGenerator(generator, 6, site)
         for image in generator:
             # Setting the image for the main class
             Bot.setParameters(image.title(withNamespace=False))

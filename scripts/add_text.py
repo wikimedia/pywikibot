@@ -288,7 +288,6 @@ def main(*args):
     textfile = None
     talkPage = False
     reorderEnabled = True
-    namespaces = []
 
     # Put the text above or below the text?
     up = False
@@ -346,14 +345,7 @@ def main(*args):
         pywikibot.error("The text to add wasn't given.")
         return
     if talkPage:
-        generator = pagegenerators.PageWithTalkPageGenerator(generator)
-        site = pywikibot.Site()
-        for namespace in site.namespaces():
-            index = site.getNamespaceIndex(namespace)
-            if index % 2 == 1 and index > 0:
-                namespaces += [index]
-        generator = pagegenerators.NamespaceFilterPageGenerator(
-            generator, namespaces, site)
+        generator = pagegenerators.PageWithTalkPageGenerator(generator, True)
     for page in generator:
         (text, newtext, always) = add_text(page, addText, summary, regexSkip,
                                            regexSkipUrl, always, up, True,

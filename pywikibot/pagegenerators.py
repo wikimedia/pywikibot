@@ -1010,7 +1010,8 @@ def ReferringPageGenerator(referredPage, followRedirects=False,
 
 
 def CategorizedPageGenerator(category, recurse=False, start=None,
-                             step=None, total=None, content=False):
+                             step=None, total=None, content=False,
+                             namespaces=None):
     """Yield all pages in a specific category.
 
     If recurse is True, pages in subcategories are included as well; if
@@ -1026,7 +1027,7 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
 
     """
     kwargs = dict(recurse=recurse, step=step, total=total,
-                  content=content)
+                  content=content, namespaces=namespaces)
     if start:
         kwargs['sortby'] = 'sortkey'
         kwargs['startsort'] = start
@@ -1473,7 +1474,7 @@ def FileGenerator(generator):
 ImageGenerator = FileGenerator
 
 
-def PageWithTalkPageGenerator(generator):
+def PageWithTalkPageGenerator(generator, return_talk_only=False):
     """Yield pages and associated talk pages from another generator.
 
     Only yields talk pages if the original generator yields a non-talk page,
@@ -1481,7 +1482,8 @@ def PageWithTalkPageGenerator(generator):
 
     """
     for page in generator:
-        yield page
+        if not return_talk_only or page.isTalkPage():
+            yield page
         if not page.isTalkPage():
             yield page.toggleTalkPage()
 

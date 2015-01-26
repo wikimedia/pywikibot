@@ -502,10 +502,7 @@ def main(*args):
     @type args: list of unicode
     """
     options = {}
-    generator = None
     checkcurrent = False
-    ns = []
-    ns.append(14)
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
@@ -529,14 +526,10 @@ def main(*args):
         primaryCommonscat, commonscatAlternatives = \
             CommonscatBot.getCommonscatTemplate(
                 site.code)
-        generator = pagegenerators.NamespaceFilterPageGenerator(
-            pagegenerators.ReferringPageGenerator(
-                pywikibot.Page(site, u'Template:' + primaryCommonscat),
-                onlyTemplateInclusion=True),
-            ns,
-            site)
-
-    if not generator:
+        template_page = pywikibot.Page(site, u'Template:' + primaryCommonscat)
+        generator = template_page.getReferences(namespaces=14,
+                                                onlyTemplateInclusion=True)
+    else:
         generator = genFactory.getCombinedGenerator()
 
     if generator:
