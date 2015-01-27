@@ -601,8 +601,8 @@ class ReferencesRobot(Bot):
                         # XXX: small issue here: the whole page is downloaded
                         # through f.read(). It might fetch big files/pages.
                         # However, truncating an encoded gzipped stream is not
-                        # an option, for unzipping will fail.
-                        compressed = io.StringIO(f.read())
+                        # an option, or unzipping will fail.
+                        compressed = io.BytesIO(f.read())
                         f = gzip.GzipFile(fileobj=compressed)
 
                     # Read the first 1,000,000 bytes (0.95 MB)
