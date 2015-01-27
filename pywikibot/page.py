@@ -1782,16 +1782,17 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                                  u'required.' % self.title(asLink=True))
         return False
 
+    @deprecated('Page.is_flow_page()')
     def isFlowPage(self):
-        """Whether the given title is a Flow page.
+        return self.isFlowPage()
 
-        @return: bool
+    def is_flow_page(self):
         """
-        if not self.site.has_extension('Flow'):
-            return False
-        if not hasattr(self, '_flowinfo'):
-            self.site.loadflowinfo(self)
-        return 'enabled' in self._flowinfo
+        Whether a page is a Flow page.
+
+        @rtype: bool
+        """
+        return self.content_model == 'flow-board'
 
 # ####### DEPRECATED METHODS ########
 

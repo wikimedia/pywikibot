@@ -2399,6 +2399,7 @@ class APISite(BaseSite):
             return (pageitem['imageinfo']
                     if history else pageitem['imageinfo'][0])
 
+    @deprecated('Check the content model instead')
     def loadflowinfo(self, page):
         """
         Load Flow-related information about a given page.
