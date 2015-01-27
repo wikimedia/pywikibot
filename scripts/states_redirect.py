@@ -120,10 +120,16 @@ class StatesRedirectBot(pywikibot.Bot):
                         pl.save(i18n.translate(self.site, msg))
 
 
-def main():
-    """Process command line arguments and invoke UsStatesBot."""
-    # Process global arguments to determine desired site
-    local_args = pywikibot.handleArgs()
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
+    local_args = pywikibot.handle_args(args)
     start = None
     force = False
 

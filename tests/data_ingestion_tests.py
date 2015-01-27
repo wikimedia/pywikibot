@@ -43,8 +43,7 @@ class TestPhoto(TestCase):
 
     def test_findDuplicateImages(self):
         """Test finding duplicates on Wikimedia Commons."""
-        duplicates = self.obj.findDuplicateImages(
-            site=self.get_site('commons'))
+        duplicates = self.obj.findDuplicateImages()
         self.assertIn('MP sounds.png', [dup.replace("_", " ") for dup in duplicates])
 
     def test_getTitle(self):

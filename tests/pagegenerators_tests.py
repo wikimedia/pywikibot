@@ -23,6 +23,7 @@ from tests import _data_dir
 from tests.aspects import (
     unittest,
     TestCase,
+    DeprecationTestCase,
     WikidataTestCase,
     DefaultSiteTestCase,
     WikimediaDefaultSiteTestCase,
@@ -695,7 +696,8 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         self.assertNotEqual(pages, pages2)
 
 
-class TestLogeventsFactoryGenerator(DefaultSiteTestCase):
+class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
+                                    DeprecationTestCase):
 
     """Test GeneratorFactory with pagegenerators.LogeventsPageGenerator."""
 
@@ -713,6 +715,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase):
     def test_logevents_default(self):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         self.assertTrue(gf.handleArg('-newuserslog'))
+        self.assertDeprecation('The usage of "-newuserslog" is deprecated.'
+                               ' Use -logevents "newusers,,500" instead')
         gen = gf.getCombinedGenerator()
         pages = set(gen)
         self.assertLessEqual(len(pages), 500)

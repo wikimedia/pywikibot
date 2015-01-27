@@ -139,7 +139,7 @@ class CaseChecker(object):
 
     def __init__(self):
 
-        for arg in pywikibot.handleArgs():
+        for arg in pywikibot.handle_args():
             if arg.startswith('-from'):
                 if arg.startswith('-from:'):
                     self.apfrom = arg[6:]

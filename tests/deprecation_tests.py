@@ -160,7 +160,10 @@ class DeprecatedMethodClass(object):
 
     @deprecate_arg('bah', 'foo')
     @deprecate_arg('bah2', 'foo2')
-    def deprecated_instance_method_args(self, foo, foo2):
+    @deprecate_arg('bah3', 'foo3')
+    @deprecate_arg('bah4', 'foo4')
+    def deprecated_instance_method_args(self, foo, foo2, foo3=None, foo4=None):
+        """Method with many decorators to verify wrapping depth formula."""
         self.foo = foo
         self.foo2 = foo2
         return (foo, foo2)
@@ -229,7 +232,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertDeprecation(
             __name__ + '.deprecated_func is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = deprecated_func(1)
         self.assertEqual(rv, 1)
@@ -243,7 +246,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertDeprecation(
             __name__ + '.deprecated_func2 is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = deprecated_func2(1)
         self.assertEqual(rv, 1)
@@ -263,21 +266,21 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertDeprecation(
             __name__ + '.deprecated_func_bad_args is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = deprecated_func_bad_args('a')
         self.assertEqual(rv, 'a')
         self.assertDeprecation(
             __name__ + '.deprecated_func_bad_args is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = deprecated_func_bad_args(1)
         self.assertEqual(rv, 1)
         self.assertDeprecation(
             __name__ + '.deprecated_func_bad_args is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         f = DeprecatedMethodClass()
         rv = deprecated_func_bad_args(f)
@@ -294,7 +297,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertDeprecation(
             __name__ + '.DeprecatedMethodClass.instance_method is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.instance_method('a')
         self.assertEqual(rv, 'a')
@@ -302,7 +305,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertDeprecation(
             __name__ + '.DeprecatedMethodClass.instance_method is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.instance_method(1)
         self.assertEqual(rv, 1)
@@ -326,14 +329,14 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertDeprecation(
             __name__ + '.DeprecatedMethodClass.class_method is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = DeprecatedMethodClass.class_method('a')
         self.assertEqual(rv, 'a')
         self.assertDeprecation(
             __name__ + '.DeprecatedMethodClass.class_method is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = DeprecatedMethodClass.class_method(1)
         self.assertEqual(rv, 1)
@@ -352,7 +355,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(rv, 'a')
         self.assertDeprecation(__name__ + '.DeprecatedMethodClass.static_method is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = DeprecatedMethodClass.static_method(1)
         self.assertEqual(rv, 1)
@@ -364,7 +367,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(df.__doc__, 'Deprecated class.')
         self.assertDeprecation(__name__ + '.DeprecatedClassNoInit is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         df = DeprecatedClass()
         self.assertEqual(df.foo, None)
@@ -390,7 +393,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             self.assertEqual(rv, 'b')
             self.assertDeprecation('bah argument of ' + __name__ + '.' + func.__name__ + ' is deprecated; use foo instead.')
 
-            DeprecatorTestCase._reset_messages()
+            self._reset_messages()
 
             rv = func(foo=1)
             self.assertEqual(rv, 1)
@@ -402,7 +405,7 @@ class DeprecatorTestCase(DeprecationTestCase):
                 func,
                 'a', bah='b'
             )
-            DeprecatorTestCase._reset_messages()
+            self._reset_messages()
 
         tests(deprecated_func_arg)
         tests(deprecated_func_arg2)
@@ -414,23 +417,23 @@ class DeprecatorTestCase(DeprecationTestCase):
 
         rv = deprecated_func_arg3(foo=1, silent=42)
         self.assertEqual(rv, 1)
-        self.assertNoDeprecation()
+        self.assertDeprecationClass(PendingDeprecationWarning)
 
         rv = deprecated_func_arg3(2)
         self.assertEqual(rv, 2)
-        self.assertNoDeprecation()
+        self.assertDeprecationClass(PendingDeprecationWarning)
 
         rv = deprecated_func_arg3(3, loud='3')
         self.assertEqual(rv, 3)
         self.assertDeprecation('loud argument of ' + __name__ + '.deprecated_func_arg3 is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = deprecated_func_arg3(4, old='4')
         self.assertEqual(rv, 4)
         self.assertDeprecation('old argument of ' + __name__ + '.deprecated_func_arg3 is deprecated.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
     def test_function_remove_last_args(self):
         """Test @remove_last_args on functions."""
@@ -616,7 +619,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'bah argument of %s.DeprecatedMethodClass.deprecated_instance_'
             'method_arg is deprecated; use foo instead.' % __name__)
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_arg(foo=1)
         self.assertEqual(rv, 1)
@@ -640,7 +643,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'bah2 argument of ' + __name__ + '.DeprecatedMethodClass.'
             'deprecated_instance_method_args is deprecated; use foo2 instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_args(foo='b', bah2='c')
         self.assertEqual(rv, ('b', 'c'))
@@ -651,7 +654,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'bah2 argument of ' + __name__ + '.DeprecatedMethodClass.'
             'deprecated_instance_method_args is deprecated; use foo2 instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_args(foo2='c', bah='b')
         self.assertEqual(rv, ('b', 'c'))
@@ -662,7 +665,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'bah2 argument of ' + __name__ + '.DeprecatedMethodClass.'
             'deprecated_instance_method_args is deprecated; use foo2 instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_args(foo=1, foo2=2)
         self.assertEqual(rv, (1, 2))
@@ -687,7 +690,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'deprecated_instance_method_args_multi is deprecated; '
             'use foo2 instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_args_multi(foo='b', bah2='c')
         self.assertEqual(rv, ('b', 'c'))
@@ -700,7 +703,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'deprecated_instance_method_args_multi is deprecated; '
             'use foo2 instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_args_multi(foo2='c', bah='b')
         self.assertEqual(rv, ('b', 'c'))
@@ -713,7 +716,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'deprecated_instance_method_args_multi is deprecated; '
             'use foo2 instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_args_multi(foo=1, foo2=2)
         self.assertEqual(rv, (1, 2))
@@ -732,7 +735,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'bah argument of ' + __name__ + '.DeprecatedMethodClass.'
             'deprecated_instance_method_and_arg is deprecated; use foo instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_and_arg(bah='b')
         self.assertEqual(rv, 'b')
@@ -743,7 +746,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'bah argument of ' + __name__ + '.DeprecatedMethodClass.'
             'deprecated_instance_method_and_arg is deprecated; use foo instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_and_arg(foo=1)
         self.assertEqual(rv, 1)
@@ -767,7 +770,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'bah argument of ' + __name__ + '.DeprecatedMethodClass.'
             'deprecated_instance_method_and_arg2 is deprecated; use foo instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_and_arg2(bah='b')
         self.assertEqual(rv, 'b')
@@ -778,7 +781,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             'bah argument of ' + __name__ + '.DeprecatedMethodClass.'
             'deprecated_instance_method_and_arg2 is deprecated; use foo instead.')
 
-        DeprecatorTestCase._reset_messages()
+        self._reset_messages()
 
         rv = f.deprecated_instance_method_and_arg2(foo=1)
         self.assertEqual(rv, 1)

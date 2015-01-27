@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 """
-Exception classes used throughout the framework.
+Exception and warning classes used throughout the framework.
 
 Error: Base class, all exceptions should the subclass of this class.
   - NoUsername: Username is not in user-config.py, or it is invalid.
@@ -45,6 +45,20 @@ WikiBaseError: any issue specific to Wikibase.
   - CoordinateGlobeUnknownException: globe is not implemented yet.
   - EntityTypeUnknownException: entity type is not available on the site.
 
+DeprecationWarning: old functionality replaced by new functionality
+
+PendingDeprecationWarning: problematic code which has not yet been
+    fully deprecated, possibly because a replacement is not available
+
+RuntimeWarning: problems developers should have fixed, and users need to
+    be aware of its status.
+  - tools._NotImplementedWarning: do not use
+  - NotImplementedWarning: functionality not implemented
+
+UserWarning: warnings targetted at users
+  - config2._ConfigurationDeprecationWarning: user configuration file problems
+  - ArgumentDeprecationWarning: command line argument problems
+  - FamilyMaintenanceWarning: missing information in family definition
 """
 #
 # (C) Pywikibot team, 2008
@@ -55,10 +69,31 @@ __version__ = '$Id$'
 
 import sys
 
-from pywikibot.tools import UnicodeMixin
+from pywikibot.tools import UnicodeMixin, _NotImplementedWarning
 
 if sys.version_info[0] > 2:
     unicode = str
+
+
+class NotImplementedWarning(_NotImplementedWarning):
+
+    """Feature that is no longer implemented."""
+
+    pass
+
+
+class ArgumentDeprecationWarning(UserWarning):
+
+    """Command line argument that is no longer supported."""
+
+    pass
+
+
+class FamilyMaintenanceWarning(UserWarning):
+
+    """Family class is missing definitions."""
+
+    pass
 
 
 class Error(UnicodeMixin, Exception):  # noqa

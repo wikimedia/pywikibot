@@ -18,19 +18,21 @@ import itertools
 import os
 import re
 import sys
-from collections import Iterable, Container, namedtuple
 import threading
 import time
 import json
 import copy
 import mimetypes
 
+from collections import Iterable, Container, namedtuple
+from warnings import warn
+
 import pywikibot
 import pywikibot.family
 from pywikibot.tools import (
-    itergroup, deprecated, deprecate_arg, UnicodeMixin, ComparableMixin,
-    redirect_func, add_decorated_full_name, deprecated_args, remove_last_args,
-    SelfCallDict, SelfCallString, signature,
+    itergroup, UnicodeMixin, ComparableMixin, SelfCallDict, SelfCallString,
+    deprecated, deprecate_arg, deprecated_args, remove_last_args,
+    redirect_func, manage_wrapping,
 )
 from pywikibot.tools import MediaWikiVersion
 from pywikibot.throttle import Throttle
@@ -51,6 +53,7 @@ from pywikibot.exceptions import (
     NoPage,
     UnknownSite,
     SiteDefinitionError,
+    FamilyMaintenanceWarning,
     NoUsername,
     SpamfilterError,
     NoCreateError,
@@ -585,15 +588,16 @@ class BaseSite(ComparableMixin):
                     # should it just raise an Exception and fail?
                     # this will help to check the dictionary ...
                     except KeyError:
-                        pywikibot.warning(
-                            u"Site {0} has no language defined in doc_subpages dict in {1}_family.py file"
-                            .format(self, self.family.name))
+                        warn(u"Site {0} has no language defined in "
+                             u"doc_subpages dict in {1}_family.py file"
+                             .format(self, self.family.name),
+                             FamilyMaintenanceWarning, 2)
             # doc_subpages not defined in x_family.py file
             except AttributeError:
                 doc = ()  # default
-                pywikibot.warning(
-                    u"Site {0} has no doc_subpages dict in {1}_family.py file"
-                    .format(self, self.family.name))
+                warn(u"Site {0} has no doc_subpages dict in {1}_family.py file"
+                     .format(self, self.family.name),
+                     FamilyMaintenanceWarning, 2)
             self._doc_subpage = doc
 
         return self._doc_subpage
@@ -1043,13 +1047,8 @@ def must_be(group=None, right=None):
         if not __debug__:
             return fn
 
-        callee.__name__ = fn.__name__
-        callee.__doc__ = fn.__doc__
-        callee.__module__ = callee.__module__
-        if not hasattr(fn, '__full_name__'):
-            add_decorated_full_name(fn)
-        callee.__full_name__ = fn.__full_name__
-        callee.__signature__ = signature(fn)
+        manage_wrapping(callee, fn)
+
         return callee
 
     return decorator
@@ -1075,13 +1074,7 @@ def need_version(version):
         if not __debug__:
             return fn
 
-        callee.__name__ = fn.__name__
-        callee.__doc__ = fn.__doc__
-        callee.__module__ = fn.__module__
-        callee.__signature__ = signature(fn)
-        if not hasattr(fn, '__full_name__'):
-            add_decorated_full_name(fn)
-        callee.__full_name__ = fn.__full_name__
+        manage_wrapping(callee, fn)
 
         return callee
     return decorator

@@ -33,7 +33,11 @@ Delete everything in the category "To delete" without prompting.
 __version__ = '$Id$'
 #
 
+from warnings import warn
+
 import pywikibot
+
+from pywikibot import exceptions
 from pywikibot import i18n, pagegenerators, CurrentPageBot
 
 # This is required for the text that is shown when you run this script
@@ -110,8 +114,8 @@ def main(*args):
             else:
                 summary = arg[len('-summary:'):]
         elif arg.startswith('-images'):
-            pywikibot.output('\n\03{lightred}-image option is deprecated. '
-                             'Please use -imageused instead.\03{default}\n')
+            warn('-image option is deprecated. Please use -imageused instead.',
+                 exceptions.ArgumentDeprecationWarning)
             local_args.append('-imageused' + arg[7:])
         elif arg.startswith('-undelete'):
             options['undelete'] = True

@@ -22,9 +22,20 @@ build paths relative to base_dir:
 __version__ = '$Id$'
 #
 
+import collections
 import os
 import sys
-import collections
+
+from warnings import warn
+
+
+class _ConfigurationDeprecationWarning(UserWarning):
+
+    """Feature that is no longer supported."""
+
+    pass
+
+
 # Please keep _imported_modules in sync with the imports above
 _imported_modules = ('os', 'sys', 'collections')
 
@@ -40,7 +51,7 @@ _imported_modules = ('os', 'sys', 'collections')
 
 _private_values = ['authenticate', 'proxy', 'db_password']
 _deprecated_variables = ['use_SSL_onlogin', 'use_SSL_always',
-                         'available_ssl_project_comment']
+                         'available_ssl_project']
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -863,8 +874,9 @@ for _key in _modified:
     globals()[_key] = _uc[_key]
 
     if _key in _deprecated_variables:
-        print("WARNING: '%s' is no longer a supported configuration variable."
-              "\nPlease inform the maintainers if you depend on it." % _key)
+        warn("'%s' is no longer a supported configuration variable.\n"
+             "Please inform the maintainers if you depend on it." % _key,
+             _ConfigurationDeprecationWarning)
 
 # Fix up default console_encoding
 if console_encoding is None:

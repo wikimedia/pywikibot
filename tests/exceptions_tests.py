@@ -33,7 +33,7 @@ class TestDeprecatedExceptions(DeprecationTestCase):
         cls = pywikibot.exceptions.UploadWarning
 
         self.assertDeprecation(
-            'pywikibot.exceptions.UploadWarning is DEPRECATED, '
+            'pywikibot.exceptions.UploadWarning is deprecated, '
             'use pywikibot.data.api.UploadWarning instead.')
 
         self._reset_messages()

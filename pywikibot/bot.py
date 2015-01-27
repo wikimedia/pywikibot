@@ -11,16 +11,16 @@ __version__ = '$Id$'
 # class definition that can be subclassed to create new, functional bot
 # scripts, instead of writing each one from scratch.
 
-
-import logging
-import logging.handlers
-# all output goes thru python std library "logging" module
+# Note: all output goes thru python std library "logging" module
 
 import datetime
 import json
+import logging
+import logging.handlers
 import os
 import re
 import sys
+import warnings
 import webbrowser
 
 _logger = "bot"
@@ -32,6 +32,8 @@ VERBOSE = 18
 INPUT = 25
 
 import pywikibot
+
+from pywikibot import backports
 from pywikibot import config
 from pywikibot import version
 from pywikibot.tools import deprecated
@@ -103,6 +105,29 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
     def format(self, record):
         """Strip trailing newlines before outputting text to file."""
+        # Warnings captured from the warnings system are not processed by
+        # logoutput(), so the 'context' variables are missing.
+        # The same context details are provided by Python 2.7, but need to
+        # be extracted from the warning message for Python 2.6.
+        if record.name == 'py.warnings' and 'caller_file' not in record.__dict__:
+            assert(len(record.args) == 1)
+            msg = record.args[0]
+
+            if sys.version_info < (2, 7):
+                record.pathname = msg.partition(':')[0]
+                record.lineno = msg.partition(':')[2].partition(':')[0]
+                record.module = msg.rpartition('/')[2].rpartition('.')[0]
+            else:
+                assert(msg.startswith(record.pathname + ':'))
+
+            record.__dict__['caller_file'] = record.pathname
+            record.__dict__['caller_name'] = record.module
+            record.__dict__['caller_line'] = record.lineno
+
+            # Remove the path and the line number, and strip the extra space
+            msg = msg.partition(':')[2].partition(':')[2].lstrip()
+            record.args = (msg,)
+
         text = logging.handlers.RotatingFileHandler.format(self, record)
         return text.rstrip("\r\n")
 
@@ -208,8 +233,20 @@ def init_handlers(strm=None):
 
     root_logger = logging.getLogger("pywiki")
     root_logger.setLevel(DEBUG + 1)  # all records except DEBUG go to logger
-    if hasattr(root_logger, 'captureWarnings'):
-        root_logger.captureWarnings(True)  # introduced in Python >= 2.7
+
+    warnings_logger = logging.getLogger("py.warnings")
+    warnings_logger.setLevel(DEBUG)
+
+    if hasattr(logging, 'captureWarnings'):
+        logging.captureWarnings(True)  # introduced in Python >= 2.7
+    else:
+        backports.captureWarnings(True)
+
+    if config.debug_log or 'deprecation' in config.log:
+        warnings.filterwarnings("always")
+    elif config.verbose_output:
+        warnings.filterwarnings("module")
+
     root_logger.handlers = []  # remove any old handlers
 
     # configure handler(s) for display to user interface
@@ -243,10 +280,11 @@ def init_handlers(strm=None):
             debuglogger.setLevel(DEBUG)
             debuglogger.addHandler(file_handler)
 
+        warnings_logger.addHandler(file_handler)
+
     _handlers_initialized = True
 
     pywikibot.tools.debug = debug
-    pywikibot.tools.warning = warning
 
     writelogheader()
 
@@ -760,6 +798,7 @@ def handle_args(args=None, do_help=True):
     return nonGlobalArgs
 
 
+@deprecated
 def handleArgs(*args):
     """DEPRECATED. Use handle_args()."""
     return handle_args(args)

@@ -13,6 +13,7 @@ import logging
 import re
 import collections
 import imp
+import warnings
 
 if sys.version_info[0] > 2:
     import urllib.parse as urlparse
@@ -20,6 +21,7 @@ else:
     import urlparse
 
 import pywikibot
+
 from pywikibot import config2 as config
 from pywikibot.tools import deprecated, deprecate_arg
 from pywikibot.exceptions import UnknownFamily, Error
@@ -875,7 +877,8 @@ class Family(object):
 
         try:
             # Ignore warnings due to dots in family names.
-            import warnings
+            # TODO: use more specific filter, so that family classes can use
+            #     RuntimeWarning's while loading.
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", RuntimeWarning)
                 myfamily = imp.load_source(fam, config.family_files[fam])

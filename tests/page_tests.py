@@ -409,7 +409,7 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertIsInstance(mainpage.canBeEdited(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
         self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
-        self.assertIsInstance(mainpage.previousRevision(), int)
+        self.assertIsInstance(mainpage.previous_revision_id, int)
         self.assertIsInstance(mainpage.permalink(), basestring)
 
     def test_talk_page(self):

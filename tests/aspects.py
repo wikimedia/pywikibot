@@ -34,6 +34,7 @@ import itertools
 import os
 import sys
 import time
+import warnings
 
 import pywikibot
 
@@ -1165,38 +1166,55 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     """Test cases for deprecation function in the tools module."""
 
-    deprecation_messages = []
+    def __init__(self, *args, **kwargs):
+        super(DeprecationTestCase, self).__init__(*args, **kwargs)
+        self.warning_log = []
 
-    @staticmethod
-    def _record_messages(msg, *args, **kwargs):
-        DeprecationTestCase.deprecation_messages.append(msg)
+        self.expect_warning_filename = inspect.getfile(self.__class__)
+        if self.expect_warning_filename.endswith((".pyc", ".pyo")):
+            self.expect_warning_filename = self.expect_warning_filename[:-1]
 
-    @staticmethod
-    def _reset_messages():
-        DeprecationTestCase.deprecation_messages = []
+        self._do_test_warning_filename = True
+
+        self.context_manager = warnings.catch_warnings(record=True)
+
+    def _reset_messages(self):
+        self._do_test_warning_filename = True
+        del self.warning_log[:]
+
+    @property
+    def deprecation_messages(self):
+        messages = [str(item.message) for item in self.warning_log]
+        return messages
 
     def assertDeprecation(self, msg):
-        self.assertIn(msg, DeprecationTestCase.deprecation_messages)
+        self.assertIn(msg, self.deprecation_messages)
+        if self._do_test_warning_filename:
+            self.assertDeprecationFile(self.expect_warning_filename)
 
     def assertNoDeprecation(self, msg=None):
         if msg:
-            self.assertNotIn(msg, DeprecationTestCase.deprecation_messages)
+            self.assertNotIn(msg, self.deprecation_messages)
         else:
-            self.assertEqual([], DeprecationTestCase.deprecation_messages)
+            self.assertEqual([], self.deprecation_messages)
+
+    def assertDeprecationClass(self, cls):
+        self.assertTrue(all(isinstance(item.message, cls)
+                            for item in self.warning_log))
+
+    def assertDeprecationFile(self, filename):
+        for item in self.warning_log:
+            self.assertEqual(item.filename, filename)
 
     def setUp(self):
-        self.tools_warning = pywikibot.tools.warning
-        self.tools_debug = pywikibot.tools.debug
-
-        pywikibot.tools.warning = DeprecationTestCase._record_messages
-        pywikibot.tools.debug = DeprecationTestCase._record_messages
-
         super(DeprecationTestCase, self).setUp()
 
-        DeprecationTestCase._reset_messages()
+        self.warning_log = self.context_manager.__enter__()
+        warnings.simplefilter("always")
+
+        self._reset_messages()
 
     def tearDown(self):
-        pywikibot.tools.warning = self.tools_warning
-        pywikibot.tools.debug = self.tools_warning
+        self.context_manager.__exit__()
 
         super(DeprecationTestCase, self).tearDown()

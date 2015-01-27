@@ -15,6 +15,9 @@ import sys
 import threading
 import time
 import types
+
+from warnings import warn
+
 from distutils.version import Version
 
 if sys.version_info[0] > 2:
@@ -24,11 +27,21 @@ else:
     import Queue
 
 
-# These variables are functions debug(str) and warning(str)
-# which are initially the builtin print function.
-# They exist here as the deprecators in this module rely only on them.
-# pywikibot updates these function variables in bot.init_handlers()
-debug = warning = print
+def print_debug(msg, *args, **kwargs):
+    """Simple debug routine."""
+    print(msg)
+
+
+# This variable uses the builtin print function.
+# pywikibot updates it to use logging in bot.init_handlers()
+debug = print_debug
+
+
+class _NotImplementedWarning(RuntimeWarning):
+
+    """Feature that is no longer implemented."""
+
+    pass
 
 
 def empty_iterator():
@@ -83,6 +96,7 @@ class ComparableMixin(object):
 
 
 def concat_options(message, line_length, options):
+    """Concatenate options."""
     indent = len(message) + 2
     line_length -= indent
     option_msg = u''
@@ -128,6 +142,7 @@ class MediaWikiVersion(Version):
     MEDIAWIKI_VERSION = re.compile(r'^(\d+(?:\.\d+)+)(wmf(\d+)|alpha|beta(\d+)|-?rc\.?(\d+))?$')
 
     def parse(self, vstring):
+        """Parse version string."""
         version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(vstring)
         if not version_match:
             raise ValueError('Invalid version number "{0}"'.format(vstring))
@@ -334,15 +349,16 @@ class ThreadList(list):
             time.sleep(2)
         super(ThreadList, self).append(thd)
         thd.start()
+        debug("thread started: %r" % thd, self._logger)
 
     def stop_all(self):
         """Stop all threads the pool."""
         if self:
-            debug(u'EARLY QUIT: Threads: %d' % len(self), ThreadList._logger)
+            debug(u'EARLY QUIT: Threads: %d' % len(self), self._logger)
         for thd in self:
             thd.stop()
             debug(u'EARLY QUIT: Queue size left in %s: %s'
-                  % (thd, thd.queue.qsize()), ThreadList._logger)
+                  % (thd, thd.queue.qsize()), self._logger)
 
 
 def intersect_generators(genlist):
@@ -361,8 +377,6 @@ def intersect_generators(genlist):
     @param genlist: list of page generators
     @type genlist: list
     """
-    _logger = ""
-
     # Item is cached to check that it is found n_gen
     # times before being yielded.
     cache = collections.defaultdict(set)
@@ -375,7 +389,6 @@ def intersect_generators(genlist):
     for source in genlist:
         threaded_gen = ThreadedGenerator(name=repr(source), target=source)
         thrlist.append(threaded_gen)
-        debug("INTERSECT: thread started: %r" % threaded_gen, _logger)
 
     while True:
         # Get items from queues in a round-robin way.
@@ -528,7 +541,7 @@ def signature(obj):
         return None
 
 
-def add_decorated_full_name(obj):
+def add_decorated_full_name(obj, stacklevel=1):
     """Extract full object name, including class, and store in __full_name__.
 
     This must be done on all decorators that are chained together, otherwise
@@ -536,13 +549,15 @@ def add_decorated_full_name(obj):
 
     @param obj: A object being decorated
     @type obj: object
+    @param stacklevel: level to use
+    @type stacklevel: int
     """
     if hasattr(obj, '__full_name__'):
         return
     # The current frame is add_decorated_full_name
     # The next frame is the decorator
     # The next frame is the object being decorated
-    frame = inspect.currentframe().f_back.f_back
+    frame = sys._getframe(stacklevel + 1)
     class_name = frame.f_code.co_name
     if class_name and class_name != '<module>':
         obj.__full_name__ = (obj.__module__ + '.' +
@@ -551,6 +566,36 @@ def add_decorated_full_name(obj):
     else:
         obj.__full_name__ = (obj.__module__ + '.' +
                              obj.__name__)
+
+
+def manage_wrapping(wrapper, obj):
+    """Add attributes to wrapper and wrapped functions."""
+    wrapper.__doc__ = obj.__doc__
+    wrapper.__name__ = obj.__name__
+    wrapper.__module__ = obj.__module__
+    wrapper.__signature__ = signature(obj)
+
+    if not hasattr(obj, '__full_name__'):
+        add_decorated_full_name(obj, 2)
+    wrapper.__full_name__ = obj.__full_name__
+
+    # Use the previous wrappers depth, if it exists
+    wrapper.__depth__ = getattr(obj, '__depth__', 0) + 1
+
+    # Obtain the wrapped object from the previous wrapper
+    wrapped = getattr(obj, '__wrapped__', obj)
+    wrapper.__wrapped__ = wrapped
+
+    # Increment the number of wrappers
+    if hasattr(wrapped, '__wrappers__'):
+        wrapped.__wrappers__ += 1
+    else:
+        wrapped.__wrappers__ = 1
+
+
+def get_wrapper_depth(wrapper):
+    """Return depth of wrapper function."""
+    return wrapper.__wrapped__.__wrappers__ + (1 - wrapper.__depth__)
 
 
 def add_full_name(obj):
@@ -641,19 +686,20 @@ def deprecated(*args, **kwargs):
             @rtype: any
             """
             name = obj.__full_name__
+            depth = get_wrapper_depth(wrapper) + 1
             if instead:
-                warning(u"%s is deprecated, use %s instead." % (name, instead))
+                warn(u"%s is deprecated, use %s instead." % (name, instead),
+                     DeprecationWarning, depth)
             else:
-                warning(u"%s is deprecated." % (name))
+                warn(u"%s is deprecated." % name,
+                     _NotImplementedWarning, depth)
             return obj(*args, **kwargs)
 
         if not __debug__:
             return obj
 
-        wrapper.__doc__ = obj.__doc__
-        wrapper.__name__ = obj.__name__
-        wrapper.__module__ = obj.__module__
-        wrapper.__signature__ = signature(obj)
+        manage_wrapping(wrapper, obj)
+
         return wrapper
 
     without_parameters = len(args) == 1 and len(kwargs) == 0 and callable(args[0])
@@ -688,8 +734,6 @@ def deprecated_args(**arg_pairs):
         None it drops the value and prints a warning. If False it just drops
         the value.
     """
-    _logger = ""
-
     def decorator(obj):
         """Outer wrapper.
 
@@ -709,33 +753,44 @@ def deprecated_args(**arg_pairs):
             @rtype: any
             """
             name = obj.__full_name__
+            depth = get_wrapper_depth(wrapper) + 1
             for old_arg, new_arg in arg_pairs.items():
+                output_args = {
+                    'name': name,
+                    'old_arg': old_arg,
+                    'new_arg': new_arg,
+                }
                 if old_arg in __kw:
                     if new_arg not in [True, False, None]:
                         if new_arg in __kw:
-                            warning(u"%(new_arg)s argument of %(name)s "
-                                    "replaces %(old_arg)s; cannot use both."
-                                    % locals())
+                            warn(u"%(new_arg)s argument of %(name)s "
+                                 u"replaces %(old_arg)s; cannot use both."
+                                 % output_args,
+                                 RuntimeWarning, depth)
                         else:
                             # If the value is positionally given this will
                             # cause a TypeError, which is intentional
-                            warning(u"%(old_arg)s argument of %(name)s "
-                                    "is deprecated; use %(new_arg)s instead."
-                                    % locals())
+                            warn(u"%(old_arg)s argument of %(name)s "
+                                 u"is deprecated; use %(new_arg)s instead."
+                                 % output_args,
+                                 DeprecationWarning, depth)
                             __kw[new_arg] = __kw[old_arg]
-                    elif new_arg is not False:
-                        debug(u"%(old_arg)s argument of %(name)s is "
-                              "deprecated." % locals(), _logger)
+                    else:
+                        if new_arg is False:
+                            cls = PendingDeprecationWarning
+                        else:
+                            cls = DeprecationWarning
+                        warn(u"%(old_arg)s argument of %(name)s is deprecated."
+                             % output_args,
+                             cls, depth)
                     del __kw[old_arg]
             return obj(*__args, **__kw)
 
         if not __debug__:
             return obj
 
-        wrapper.__doc__ = obj.__doc__
-        wrapper.__name__ = obj.__name__
-        wrapper.__module__ = obj.__module__
-        wrapper.__signature__ = signature(obj)
+        manage_wrapping(wrapper, obj)
+
         if wrapper.__signature__:
             # Build a new signature with deprecated args added.
             params = collections.OrderedDict()
@@ -749,9 +804,7 @@ def deprecated_args(**arg_pairs):
                     else NotImplemented)
             wrapper.__signature__ = inspect.Signature()
             wrapper.__signature__._parameters = params
-        if not hasattr(obj, '__full_name__'):
-            add_decorated_full_name(obj)
-        wrapper.__full_name__ = obj.__full_name__
+
         return wrapper
     return decorator
 
@@ -792,6 +845,7 @@ def remove_last_args(arg_names):
             @rtype: any
             """
             name = obj.__full_name__
+            depth = get_wrapper_depth(wrapper) + 1
             args, varargs, kwargs, _ = inspect.getargspec(wrapper.__wrapped__)
             if varargs is not None and kwargs is not None:
                 raise ValueError(u'{1} may not have * or ** args.'.format(
@@ -807,19 +861,16 @@ def remove_last_args(arg_names):
             if deprecated:
                 # sort them according to arg_names
                 deprecated = [arg for arg in arg_names if arg in deprecated]
-                warning(u"The trailing arguments ('{0}') of {1} are "
-                        "deprecated. The value(s) provided for '{2}' have "
-                        "been dropped.".format("', '".join(arg_names), name,
-                                               "', '".join(deprecated)))
+                warn(u"The trailing arguments ('{0}') of {1} are deprecated. "
+                     u"The value(s) provided for '{2}' have been dropped.".
+                     format("', '".join(arg_names),
+                            name,
+                            "', '".join(deprecated)),
+                     DeprecationWarning, depth)
             return obj(*new_args, **new_kwargs)
 
-        wrapper.__doc__ = obj.__doc__
-        wrapper.__name__ = obj.__name__
-        wrapper.__module__ = obj.__module__
-        if not hasattr(obj, '__full_name__'):
-            add_decorated_full_name(obj)
-        wrapper.__full_name__ = obj.__full_name__
-        wrapper.__wrapped__ = getattr(obj, '__wrapped__', obj)
+        manage_wrapping(wrapper, obj)
+
         return wrapper
     return decorator
 
@@ -852,7 +903,7 @@ def redirect_func(target, source_module=None, target_module=None,
     @rtype: callable
     """
     def call(*a, **kw):
-        warning(warn_message)
+        warn(warn_message, DeprecationWarning, 2)
         return target(*a, **kw)
     if target_module is None:
         target_module = target.__module__
@@ -867,7 +918,7 @@ def redirect_func(target, source_module=None, target_module=None,
     if class_name:
         target_module += class_name + '.'
         source_module += class_name + '.'
-    warn_message = ('{source}{old} is DEPRECATED, use {target}{new} '
+    warn_message = ('{source}{old} is deprecated, use {target}{new} '
                     'instead.').format(new=target.__name__,
                                        old=old_name or target.__name__,
                                        target=target_module,
@@ -944,9 +995,9 @@ class ModuleDeprecationWrapper(types.ModuleType):
 
         if not warning_message:
             if replacement_name:
-                warning_message = u"{0}.{1} is DEPRECATED, use {2} instead."
+                warning_message = u"{0}.{1} is deprecated, use {2} instead."
             else:
-                warning_message = u"{0}.{1} is DEPRECATED."
+                warning_message = u"{0}.{1} is deprecated."
 
         self._deprecated[name] = replacement_name, replacement, warning_message
 
@@ -958,9 +1009,9 @@ class ModuleDeprecationWrapper(types.ModuleType):
         """Return the attribute with a deprecation warning if required."""
         if attr in self._deprecated:
             warning_message = self._deprecated[attr][2]
-            warning(warning_message.format(self._module.__name__,
-                                           attr,
-                                           self._deprecated[attr][0]))
+            warn(warning_message.format(self._module.__name__, attr,
+                                        self._deprecated[attr][0]),
+                 DeprecationWarning, 2)
             if self._deprecated[attr][1]:
                 return self._deprecated[attr][1]
         return getattr(self._module, attr)

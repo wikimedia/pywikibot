@@ -24,6 +24,8 @@ import re
 import sys
 import unicodedata
 
+from warnings import warn
+
 try:
     from collections import OrderedDict
 except ImportError:
@@ -51,7 +53,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import (
     ComparableMixin, deprecated, deprecate_arg, deprecated_args,
-    remove_last_args
+    remove_last_args, _NotImplementedWarning,
 )
 from pywikibot import textlib
 
@@ -412,7 +414,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                % (self.site.hostname(),
                   self.site.scriptpath(),
                   self.title(asUrl=True),
-                  (oldid if oldid is not None else self.latestRevision()))
+                  (oldid if oldid is not None else self.latest_revision_id))
 
     @property
     def latest_revision_id(self):
@@ -421,6 +423,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
             self.site.loadrevisions(self)
         return self._revid
 
+    @deprecated('latest_revision_id')
     def latestRevision(self):
         """Return the current revision id for this page."""
         return self.latest_revision_id
@@ -581,6 +584,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         else:
             return min(x.revid for x in history)
 
+    @deprecated('previous_revision_id')
     def previousRevision(self):
         """
         Return the revision id for the previous revision.
@@ -1619,7 +1623,8 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         else:
             undelete_revs = []
         if reason is None:
-            pywikibot.warning('Not passing a reason for undelete() is deprecated.')
+            warn('Not passing a reason for undelete() is deprecated.',
+                 DeprecationWarning)
             pywikibot.output(u'Undeleting %s.' % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the undeletion:')
         self.site.undelete_page(self, reason, undelete_revs)
@@ -1643,7 +1648,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                        Defaults to protections is None
         @type  prompt: bool
         """
-        def deprecated(value, arg_name):
+        def process_deprecated_arg(value, arg_name):
             # if protections was set and value is None, don't interpret that
             # argument. But otherwise warn that the parameter was set
             # (even implicit)
@@ -1654,38 +1659,39 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
                     value = ""
                 if value is not None:  # empty string is allowed
                     protections[arg_name] = value
-                    pywikibot.bot.warning(u'"protections" argument of '
-                                          'protect() replaces "{0}".'.format(arg_name))
+                    warn(u'"protections" argument of protect() replaces "{0}"'
+                         .format(arg_name),
+                         DeprecationWarning)
             else:
                 if value:
-                    pywikibot.bot.warning(u'"protections" argument of '
-                                          'protect() replaces "{0}"; cannot '
-                                          'use both.'.format(arg_name))
+                    warn(u'"protections" argument of protect() replaces "{0}";'
+                         u' cannot use both.'.format(arg_name),
+                         RuntimeWarning)
 
         # buffer that, because it might get changed
         called_using_deprecated_arg = protections is None
         if called_using_deprecated_arg:
             protections = {}
-        deprecated(edit, "edit")
-        deprecated(move, "move")
-        deprecated(create, "create")
-        deprecated(upload, "upload")
+        process_deprecated_arg(edit, "edit")
+        process_deprecated_arg(move, "move")
+        process_deprecated_arg(create, "create")
+        process_deprecated_arg(upload, "upload")
 
         if reason is None:
             pywikibot.output(u'Preparing to protection change of %s.'
                              % (self.title(asLink=True)))
             reason = pywikibot.input(u'Please enter a reason for the action:')
         if unprotect:
-            pywikibot.bot.warning(u'"unprotect" argument of protect() is '
-                                  'deprecated')
+            warn(u'"unprotect" argument of protect() is deprecated',
+                 DeprecationWarning, 2)
             protections = dict(
                 [(p_type, "") for p_type in self.applicable_protections()])
         answer = 'y'
         if called_using_deprecated_arg and prompt is None:
             prompt = True
         if prompt:
-            pywikibot.bot.warning(u'"prompt" argument of protect() is '
-                                  'deprecated')
+            warn(u'"prompt" argument of protect() is deprecated',
+                 DeprecationWarning, 2)
         if prompt and not hasattr(self.site, '_noProtectPrompt'):
             answer = pywikibot.input_choice(
                 u'Do you want to change the protection level of %s?'
@@ -1838,12 +1844,14 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
 
     def removeImage(self, image, put=False, summary=None, safe=True):
         """Old method to remove all instances of an image from page."""
-        pywikibot.warning(u"Page.removeImage() is no longer supported.")
+        warn('Page.removeImage() is no longer supported.',
+             _NotImplementedWarning, 2)
 
     def replaceImage(self, image, replacement=None, put=False, summary=None,
                      safe=True):
         """Old method to replace all instances of an image with another."""
-        pywikibot.warning(u"Page.replaceImage() is no longer supported.")
+        warn('Page.replaceImage() is no longer supported.',
+             _NotImplementedWarning, 2)
 
 
 class Page(BasePage):
@@ -3066,7 +3074,8 @@ class WikibasePage(BasePage):
 
         return self.id
 
-    def latestRevision(self):
+    @property
+    def latest_revision_id(self):
         """
         Get the revision identifier for the most recent revision of the entity.
 

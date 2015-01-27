@@ -28,6 +28,8 @@ import re
 import sys
 import time
 
+from warnings import warn
+
 import pywikibot
 
 from pywikibot import date, config, i18n
@@ -38,7 +40,8 @@ from pywikibot.tools import (
     intersect_generators,
 )
 from pywikibot.comms import http
-import pywikibot.data.wikidataquery as wdquery
+from pywikibot.data import wikidataquery as wdquery
+from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.site import Namespace
 
 if sys.version_info[0] > 2:
@@ -541,9 +544,10 @@ class GeneratorFactory(object):
             gen = TextfilePageGenerator(textfilename, site=self.site)
         elif arg.startswith('-namespace') or arg.startswith('-ns'):
             if isinstance(self._namespaces, frozenset):
-                pywikibot.warning('Cannot handle arg %s as namespaces can not '
-                                  'be altered after a generator is created.'
-                                  % arg)
+                warn('Cannot handle arg %s as namespaces can not '
+                     'be altered after a generator is created.'
+                     % arg,
+                     ArgumentDeprecationWarning, 2)
                 return True
             value = None
             if arg.startswith('-ns:'):
@@ -771,9 +775,10 @@ class GeneratorFactory(object):
                         user = None
                 else:
                     user = None
-                pywikibot.warning(u'The usage of "{0}" is discouraged. Use '
-                                  '-logevents "{1}" instead.'.format(
-                                  arg, ','.join((mode, user or '', str(total)))))
+                warn(u'The usage of "{0}" is deprecated. Use -logevents '
+                     u'"{1}" instead'.format(
+                         arg, ','.join((mode, user or '', str(total)))),
+                     ArgumentDeprecationWarning, 2)
                 gen = self._parse_log_events(mode, user, total)
 
         if gen:

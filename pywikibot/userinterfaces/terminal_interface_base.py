@@ -103,6 +103,9 @@ class UI:
             TerminalFormatter(fmt="%(levelname)s: %(message)s%(newline)s"))
         root_logger.addHandler(warning_handler)
 
+        warnings_logger = logging.getLogger("py.warnings")
+        warnings_logger.addHandler(warning_handler)
+
     def printNonColorized(self, text, targetStream):
         """
         Write the text non colorized to the target stream.
@@ -405,6 +408,24 @@ class TerminalHandler(logging.Handler):
 
     def emit(self, record):
         """Emit the record formatted to the output and return it."""
+        if record.name == 'py.warnings':
+            # Each warning appears twice
+            # the second time it has a 'message'
+            if 'message' in record.__dict__:
+                return
+
+            # Remove the last line, if it appears to be the warn() call
+            msg = record.args[0]
+            is_useless_source_output = any(
+                s in msg for s in
+                ('warn(', 'exceptions.', 'Warning)', 'Warning,'))
+
+            if is_useless_source_output:
+                record.args = ('\n'.join(record.args[0].splitlines()[0:-1]),)
+
+            if 'newline' not in record.__dict__:
+                record.__dict__['newline'] = '\n'
+
         text = self.format(record)
         return self.UI.output(text, targetStream=self.stream)
 

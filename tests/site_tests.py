@@ -21,7 +21,7 @@ from pywikibot.tools import MediaWikiVersion
 from pywikibot.data import api
 
 from tests.aspects import (
-    unittest, TestCase,
+    unittest, TestCase, DeprecationTestCase,
     DefaultSiteTestCase,
     WikimediaDefaultSiteTestCase,
     WikidataTestCase,
@@ -35,7 +35,7 @@ if sys.version_info[0] > 2:
     unicode = str
 
 
-class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase):
+class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase):
 
     """Test cases for Site deprecated methods."""
 
@@ -63,6 +63,8 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase):
                 "Action '[a-z]+' is not allowed for user .* on .* wiki.")
         else:
             self.assertEqual(token, mysite.token(mainpage, ttype))
+            self.assertDeprecation("pywikibot.site.APISite.token is deprecated"
+                                   ", use the 'tokens' property instead.")
 
 
 class TestBaseSiteProperties(TestCase):

@@ -16,9 +16,13 @@ __version__ = '$Id$'
 import sys
 import re
 import locale
+import warnings
+
 from pywikibot import Error
 from .plural import plural_rules
+
 import pywikibot
+
 from . import config2 as config
 
 if sys.version_info[0] > 2:
@@ -236,6 +240,18 @@ class TranslationError(Error):
     pass
 
 
+def _get_messages_bundle(name):
+    """Load all translation messages for a bundle name."""
+    with warnings.catch_warnings():
+        # Ignore 'missing __init__.py' as import looks at the JSON
+        # directories before loading the python file.
+        warnings.simplefilter("ignore", ImportWarning)
+        transdict = getattr(__import__(messages_package_name,
+                                       fromlist=[name]),
+                            name).msg
+    return transdict
+
+
 def _extract_plural(code, message, parameters):
     """Check for the plural variants in message and replace them.
 
@@ -364,9 +380,7 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
     @type fallback: boolean
     """
     package = twtitle.split("-")[0]
-    transdict = getattr(__import__(messages_package_name, fromlist=[package]),
-                        package).msg
-
+    transdict = _get_messages_bundle(package)
     code_needed = False
     # If a site is given instead of a code, use its language
     if hasattr(code, 'code'):
@@ -498,8 +512,7 @@ def twhas_key(code, twtitle):
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     """
     package = twtitle.split("-")[0]
-    transdict = getattr(__import__(messages_package_name, fromlist=[package]),
-                        package).msg
+    transdict = _get_messages_bundle(package)
     # If a site is given instead of a code, use its language
     if hasattr(code, 'code'):
         code = code.code
@@ -513,8 +526,7 @@ def twget_keys(twtitle):
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     """
     package = twtitle.split("-")[0]
-    transdict = getattr(__import__(messages_package_name, fromlist=[package]),
-                        package).msg
+    transdict = _get_messages_bundle(package)
     return (lang for lang in sorted(transdict.keys()) if lang != 'qqq')
 
 

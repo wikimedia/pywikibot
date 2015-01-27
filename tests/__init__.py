@@ -9,6 +9,7 @@ __version__ = '$Id$'
 
 import os
 import sys
+import warnings
 
 __all__ = ('httplib2', 'OrderedDict', '_cache_dir', 'TestRequest',
            'patch_request', 'unpatch_request')
@@ -203,6 +204,8 @@ if config.max_retries > 2:
 
 cache_misses = 0
 cache_hits = 0
+
+warnings.filterwarnings("always")
 
 
 class TestRequest(CachedRequest):
