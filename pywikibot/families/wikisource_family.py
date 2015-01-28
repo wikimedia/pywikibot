@@ -21,7 +21,7 @@ class Family(family.WikimediaFamily):
             'sr', 'vi', 'sa', 'el', 'hr', 'no', 'th', 'bn', 'hy', 'is', 'nl',
             'gu', 'la', 'ja', 'br', 'vec', 'uk', 'eo', 'tr', 'mk', 'yi', 'ta',
             'az', 'id', 'be', 'da', 'li', 'et', 'as', 'mr', 'bg', 'bs', 'sah',
-            'kn', 'gl', 'lt', 'cy', 'sk', 'zh-min-nan', 'fo',
+            'kn', 'gl', 'lt', 'cy', 'sk', 'zh-min-nan', 'fo', 'or',
         ]
 
         self.langs = dict([(lang, '%s.wikisource.org' % lang)
