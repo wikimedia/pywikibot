@@ -116,6 +116,8 @@ parameterHelp = u"""\
                   before -newpages.
                   If used with -recentchanges, efficiency is improved if
                   -namepace/ns is provided before -recentchanges.
+                  If used with -titleregex, -namepace/ns must be provided
+                  before -titleregex and shall contain only one value.
 
 -interwiki        Work on the given page and all equivalent pages in other
                   languages. This can, for example, be used to fight
@@ -698,7 +700,15 @@ class GeneratorFactory(object):
                 regex = pywikibot.input(u'What page names are you looking for?')
             else:
                 regex = arg[12:]
-            gen = RegexFilterPageGenerator(self.site.allpages(), regex)
+            # partial workaround for bug T85389
+            # to use -namespace/ns with -newpages, -ns must be given
+            # before -titleregex, otherwise default namespace is 0.
+            # allpages only accepts a single namespace, and will raise a
+            # TypeError if self.namespaces contains more than one namespace.
+            namespaces = self.namespaces or 0
+            gen = RegexFilterPageGenerator(
+                self.site.allpages(namespace=namespaces),
+                regex)
         elif arg.startswith('-grep'):
             if len(arg) == 5:
                 self.articlefilter_list.append(pywikibot.input(
