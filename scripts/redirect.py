@@ -71,8 +71,8 @@ and arguments can be:
 #
 # (C) Daniel Herding, 2004
 # (C) Purodha Blissenbach, 2009
-# (C) xqt, 2009-2014
-# (C) Pywikibot team, 2004-2014
+# (C) xqt, 2009-2015
+# (C) Pywikibot team, 2004-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -82,9 +82,13 @@ __version__ = '$Id$'
 #
 
 import re
+import sys
 import datetime
 import pywikibot
 from pywikibot import i18n, xmlreader, Bot
+
+if sys.version_info[0] > 2:
+    basestring = (str, )
 
 
 def space_to_underscore(link):
@@ -292,8 +296,8 @@ class RedirectGenerator:
         else:
             # retrieve information from broken redirect special page
             pywikibot.output(u'Retrieving special page...')
-            for redir_name in self.site.broken_redirects():
-                yield redir_name.title()
+            for page in self.site.preloadpages(self.site.broken_redirects()):
+                yield page
 
     def retrieve_double_redirects(self):
         if self.use_move_log:
@@ -326,8 +330,8 @@ class RedirectGenerator:
         else:
             # retrieve information from double redirect special page
             pywikibot.output(u'Retrieving special page...')
-            for redir_name in self.site.double_redirects():
-                yield redir_name.title()
+            for page in self.site.preloadpages(self.site.double_redirects()):
+                yield page
 
     def get_moved_pages_redirects(self):
         """Generate redirects to recently-moved pages."""
@@ -424,7 +428,10 @@ class RedirectRobot(Bot):
             return lastmove.new_title()
 
     def delete_1_broken_redirect(self, redir_name):
-        redir_page = pywikibot.Page(self.site, redir_name)
+        if isinstance(redir_name, basestring):
+            redir_page = pywikibot.Page(self.site, redir_name)
+        else:
+            redir_page = redir_name
         # Show the title of the page we're working on.
         # Highlight the title in purple.
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
@@ -531,7 +538,10 @@ class RedirectRobot(Bot):
             self.fix_1_double_redirect(redir_name)
 
     def fix_1_double_redirect(self,  redir_name):
-        redir = pywikibot.Page(self.site, redir_name)
+        if isinstance(redir_name, basestring):
+            redir = pywikibot.Page(self.site, redir_name)
+        else:
+            redir = redir_name
         # Show the title of the page we're working on.
         # Highlight the title in purple.
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
