@@ -52,6 +52,7 @@ if sys.version_info[0] > 2:
         """Workaround for bug in python 3 email handling of CTE binary."""
 
         def __init__(self, *args, **kwargs):
+            """Constructor."""
             super(CTEBinaryBytesGenerator, self).__init__(*args, **kwargs)
             self._writeBody = self._write_body
 
@@ -95,10 +96,12 @@ class APIError(Error):
         self.unicode = unicode(self.__str__())
 
     def __repr__(self):
+        """Return internal representation."""
         return '{name}("{code}", "{info}", {other})'.format(
             name=self.__class__.__name__, **self.__dict__)
 
     def __str__(self):
+        """Return a string representation."""
         return "%(code)s: %(info)s" % self.__dict__
 
 
@@ -107,10 +110,12 @@ class UploadWarning(APIError):
     """Upload failed with a warning message (passed as the argument)."""
 
     def __init__(self, code, message):
+        """Constructor."""
         super(UploadWarning, self).__init__(code, message)
 
     @property
     def message(self):
+        """Return warning message."""
         return self.info
 
 
@@ -663,18 +668,23 @@ class EnableSSLSiteWrapper(object):
     """Wrapper to change the site protocol to https."""
 
     def __init__(self, site):
+        """Constructor."""
         self._site = site
 
     def __repr__(self):
+        """Return internal representation."""
         return repr(self._site)
 
     def __eq__(self, other):
+        """Compare two objects."""
         return self._site == other
 
     def __getattr__(self, attr):
+        """Access object's site attributes."""
         return getattr(self._site, attr)
 
     def protocol(self):
+        """Return protocol."""
         return 'https'
 
 
@@ -830,8 +840,8 @@ class Request(MutableMapping):
         else:
             return unicode(value)
 
-    # implement dict interface
     def __getitem__(self, key):
+        """Implement dict interface."""
         return self._params[key]
 
     def __setitem__(self, key, value):
@@ -865,21 +875,27 @@ class Request(MutableMapping):
                 self._params[key] = list(value)
 
     def __delitem__(self, key):
+        """Implement dict interface."""
         del self._params[key]
 
     def keys(self):
+        """Implement dict interface."""
         return list(self._params.keys())
 
     def __contains__(self, key):
+        """Implement dict interface."""
         return self._params.__contains__(key)
 
     def __iter__(self):
+        """Implement dict interface."""
         return self._params.__iter__()
 
     def __len__(self):
+        """Implement dict interface."""
         return len(self._params)
 
     def iteritems(self):
+        """Implement dict interface."""
         return iter(self._params.items())
 
     def items(self):
@@ -1014,14 +1030,17 @@ class Request(MutableMapping):
         return urlencode(self._encoded_items())
 
     def __str__(self):
+        """Return a string representation."""
         return unquote(self.site.scriptpath()
                               + "/api.php?"
                               + self._http_param_string())
 
     def __repr__(self):
+        """Return internal representation."""
         return "%s.%s<%s->%r>" % (self.__class__.__module__, self.__class__.__name__, self.site, str(self))
 
     def _simulate(self, action):
+        """Simualte action."""
         if action and config.simulate and (self.write or action in config.actions_to_block):
             pywikibot.output(
                 u'\03{lightyellow}SIMULATION: %s action blocked.\03{default}'
@@ -1455,6 +1474,7 @@ class CachedRequest(Request):
             pickle.dump(data, f, protocol=config.pickle_protocol)
 
     def submit(self):
+        """Submit cached request."""
         cached_available = self._load_cache()
         if not cached_available:
             self._data = super(CachedRequest, self).submit()
@@ -1985,6 +2005,7 @@ class CategoryPageGenerator(PageGenerator):
     """Like PageGenerator, but yields Category objects instead of Pages."""
 
     def result(self, pagedata):
+        """Convert page dict entry from api to Page object."""
         p = PageGenerator.result(self, pagedata)
         return pywikibot.Category(p)
 
@@ -1994,6 +2015,7 @@ class ImagePageGenerator(PageGenerator):
     """Like PageGenerator, but yields FilePage objects instead of Pages."""
 
     def result(self, pagedata):
+        """Convert page dict entry from api to Page object."""
         p = PageGenerator.result(self, pagedata)
         filepage = pywikibot.FilePage(p)
         if 'imageinfo' in pagedata:
@@ -2083,6 +2105,7 @@ class LogEntryListGenerator(ListGenerator):
         self.entryFactory = logentries.LogEntryFactory(self.site, logtype)
 
     def result(self, pagedata):
+        """Instatiate LogEntry from data from api."""
         return self.entryFactory.create(pagedata)
 
 
@@ -2135,7 +2158,7 @@ class LoginManager(login.LoginManager):
         raise APIError(code=login_result["login"]["result"], info="")
 
     def storecookiedata(self, data):
-        # ignore data; cookies are set by threadedhttp module
+        """Ignore data; cookies are set by threadedhttp module."""
         pywikibot.cookie_jar.save()
 
 
