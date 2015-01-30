@@ -1993,7 +1993,7 @@ class TestPagePreloading(DefaultSiteTestCase):
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
 
-        self.assertEqual(len(links), count)
+        self.assertEqual(len(list(links)), count)
 
     def _test_preload_langlinks_long(self):
         """Test preloading continuation works."""
