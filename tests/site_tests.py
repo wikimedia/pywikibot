@@ -1323,12 +1323,15 @@ class SiteRandomTestCase(DefaultSiteTestCase):
     """Test random methods of a site."""
 
     def test_unlimited_small_step(self):
-        """Test site.randompages() without limit."""
+        """Test site.randompages() continuation.
+
+        Note that uniqueness is not guaranteed if multiple requests are
+        performed, so we also don't test this here.
+        """
         mysite = self.get_site()
         pages = []
         for rndpage in mysite.randompages(step=5, total=None):
             self.assertIsInstance(rndpage, pywikibot.Page)
-            self.assertNotIn(rndpage, pages)
             pages.append(rndpage)
             if len(pages) == 11:
                 break
