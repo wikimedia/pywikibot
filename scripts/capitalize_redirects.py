@@ -85,13 +85,8 @@ class CapitalizeBot(FollowRedirectPageBot, ExistingPageBot):
                     site,
                     'capitalize_redirects-create-redirect',
                     {'to': page_t})
-                page_cap.text = u"#%s %s" % (site.redirect(),
-                                             self.current_page.title(
-                                             asLink=True, textlink=True))
-                try:
-                    page_cap.save(comment)
-                except:
-                    pywikibot.output(u"An error occurred, skipping...")
+                page_cap.set_redirect_target(self.current_page, create=True,
+                                             summary=comment)
 
 
 def main(*args):

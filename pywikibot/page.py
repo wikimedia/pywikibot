@@ -1911,6 +1911,63 @@ class Page(BasePage):
             result.append((pywikibot.Page(link, self.site), positional))
         return result
 
+    def set_redirect_target(self, target_page, create=False, force=False,
+                            keep_section=False, **kwargs):
+        """
+        Change the page's text to point to the redirect page.
+
+        @param target_page: target of the redirect, this argument is required.
+        @type target_page: pywikibot.Page or string
+        @param summary: The edit summary which must be set if the page should
+            be saved too. If omitted the page won't be saved.
+        @type summary: string
+        @param create: if true, it creates the redirect even if the page
+            doesn't exist.
+        @type create: bool
+        @param force: if true, it set the redirect target even the page
+            doesn't exist or it's not redirect.
+        @type force: bool
+        @param keep_section: if the old redirect links to a section
+            and the new one doesn't it uses the old redirect's section.
+        @type keep_section: bool
+        @param kwargs: Arguments which are used for saving the page directly
+            afterwards. If none are provided the page isn't saved.
+        """
+        if isinstance(target_page, basestring):
+            target_page = pywikibot.Page(self.site, target_page)
+        elif self.site != target_page.site:
+            raise pywikibot.InterwikiRedirectPage(self, target_page)
+        if not self.exists() and not (create or force):
+            raise pywikibot.NoPage(self)
+        if self.exists() and not self.isRedirectPage() and not force:
+            raise pywikibot.IsNotRedirectPage(self)
+        redirect_regex = self.site.redirectRegex()
+        if self.exists():
+            old_text = self.get(get_redirect=True)
+        else:
+            old_text = u''
+        result = redirect_regex.search(old_text)
+        if result:
+            oldlink = result.group(1)
+            if keep_section and '#' in oldlink and target_page.section() is None:
+                sectionlink = oldlink[oldlink.index('#'):]
+                target_page = pywikibot.Page(
+                    self.site,
+                    target_page.title() + sectionlink
+                )
+            prefix = self.text[:result.start()]
+            suffix = self.text[result.end():]
+        else:
+            prefix = ''
+            suffix = ''
+
+        target_link = target_page.title(asLink=True, textlink=True,
+                                        allowInterwiki=False)
+        target_link = '#{0} {1}'.format(self.site.redirect(), target_link)
+        self.text = prefix + target_link + suffix
+        if kwargs:
+            self.save(**kwargs)
+
 
 class FilePage(Page):
 
