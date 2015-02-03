@@ -1784,7 +1784,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
 
     @deprecated('Page.is_flow_page()')
     def isFlowPage(self):
-        return self.isFlowPage()
+        return self.is_flow_page()
 
     def is_flow_page(self):
         """
