@@ -362,10 +362,10 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
                % (self.__class__.__name__, self.id, self.custom_name,
                   self.canonical_name, self.aliases, kwargs)
 
-    @staticmethod
-    def builtin_namespaces(use_image_name=False):
+    @classmethod
+    def builtin_namespaces(cls, use_image_name=False):
         """Return a dict of the builtin namespaces."""
-        return dict([(i, Namespace(i, use_image_name=use_image_name))
+        return dict([(i, cls(i, use_image_name=use_image_name))
                      for i in range(-2, 16)])
 
     @staticmethod
@@ -392,8 +392,8 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
             return parts[0].strip()
         return False
 
-    @staticmethod
-    def lookup_name(name, namespaces=None):
+    @classmethod
+    def lookup_name(cls, name, namespaces=None):
         """Find the Namespace for a name.
 
         @param name: Name of the namespace.
@@ -404,9 +404,9 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         @return: Namespace or None
         """
         if not namespaces:
-            namespaces = Namespace.builtin_namespaces()
+            namespaces = cls.builtin_namespaces()
 
-        name = Namespace.normalize_name(name)
+        name = cls.normalize_name(name)
         if name is False:
             return None
         name = name.lower()
@@ -1532,8 +1532,8 @@ class APISite(BaseSite):
         super(APISite, self).__setstate__(attrs)
         self.tokens = TokenWallet(self)
 
-    @staticmethod
-    def fromDBName(dbname):
+    @classmethod
+    def fromDBName(cls, dbname):
         # TODO this only works for some WMF sites
         req = api.CachedRequest(datetime.timedelta(days=10),
                                 site=pywikibot.Site('meta', 'meta'),
@@ -1548,11 +1548,11 @@ class APISite(BaseSite):
                     if site['dbname'] == dbname:
                         if site['code'] == 'wiki':
                             site['code'] = 'wikipedia'
-                        return APISite(lang, site['code'])
+                        return cls(lang, site['code'])
             else:
                 for site in val:
                     if site['dbname'] == dbname:
-                        return APISite(site['code'], site['code'])
+                        return cls(site['code'], site['code'])
         raise ValueError("Cannot parse a site out of %s." % dbname)
 
     def _generator(self, gen_class, type_arg=None, namespaces=None,
@@ -5200,9 +5200,9 @@ class DataSite(APISite):
 
     """Wikibase data capable site."""
 
-    def __init__(self, code, fam=None, user=None, sysop=None):
+    def __init__(self, *args, **kwargs):
         """Constructor."""
-        APISite.__init__(self, code, fam, user, sysop)
+        super(DataSite, self).__init__(*args, **kwargs)
         self._item_namespace = None
         self._property_namespace = None
 

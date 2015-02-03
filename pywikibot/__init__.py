@@ -268,8 +268,8 @@ class Coordinate(object):
                 'precision': self.precision,
                 }
 
-    @staticmethod
-    def fromWikibase(data, site):
+    @classmethod
+    def fromWikibase(cls, data, site):
         """Constructor to create an object from Wikibase's JSON output."""
         globes = {}
         for k in site.globes():
@@ -282,9 +282,9 @@ class Coordinate(object):
             # Default to earth or should we use None here?
             globe = 'earth'
 
-        return Coordinate(data['latitude'], data['longitude'],
-                          data['altitude'], data['precision'],
-                          globe, site=site, entity=data['globe'])
+        return cls(data['latitude'], data['longitude'],
+                   data['altitude'], data['precision'],
+                   globe, site=site, entity=data['globe'])
 
     @property
     def precision(self):
@@ -395,17 +395,17 @@ class WbTime(object):
             else:
                 raise ValueError('Invalid precision: "%s"' % precision)
 
-    @staticmethod
-    def fromTimestr(datetimestr, precision=14, before=0, after=0, timezone=0,
-                    calendarmodel=None, site=None):
+    @classmethod
+    def fromTimestr(cls, datetimestr, precision=14, before=0, after=0,
+                    timezone=0, calendarmodel=None, site=None):
         match = re.match('([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
                          datetimestr)
         if not match:
             raise ValueError(u"Invalid format: '%s'" % datetimestr)
         t = match.groups()
-        return WbTime(long(t[0]), int(t[1]), int(t[2]),
-                      int(t[3]), int(t[4]), int(t[5]),
-                      precision, before, after, timezone, calendarmodel, site)
+        return cls(long(t[0]), int(t[1]), int(t[2]),
+                   int(t[3]), int(t[4]), int(t[5]),
+                   precision, before, after, timezone, calendarmodel, site)
 
     def toTimestr(self):
         """
@@ -431,11 +431,11 @@ class WbTime(object):
                 }
         return json
 
-    @staticmethod
-    def fromWikibase(ts):
-        return WbTime.fromTimestr(ts[u'time'], ts[u'precision'],
-                                  ts[u'before'], ts[u'after'],
-                                  ts[u'timezone'], ts[u'calendarmodel'])
+    @classmethod
+    def fromWikibase(cls, ts):
+        return cls.fromTimestr(ts[u'time'], ts[u'precision'],
+                               ts[u'before'], ts[u'after'],
+                               ts[u'timezone'], ts[u'calendarmodel'])
 
     def __str__(self):
         return json.dumps(self.toWikibase(), indent=4, sort_keys=True,
@@ -493,8 +493,8 @@ class WbQuantity(object):
                 }
         return json
 
-    @staticmethod
-    def fromWikibase(wb):
+    @classmethod
+    def fromWikibase(cls, wb):
         """
         Create a WbQuanity from the JSON data given by the Wikibase API.
 
@@ -504,7 +504,7 @@ class WbQuantity(object):
         upperBound = eval(wb['upperBound'])
         lowerBound = eval(wb['lowerBound'])
         error = (upperBound - amount, amount - lowerBound)
-        return WbQuantity(amount, wb['unit'], error)
+        return cls(amount, wb['unit'], error)
 
     def __str__(self):
         return json.dumps(self.toWikibase(), indent=4, sort_keys=True,

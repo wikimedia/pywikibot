@@ -294,8 +294,8 @@ class LogEntryFactory(object):
         """
         return self._creator(logdata)
 
-    @staticmethod
-    def _getEntryClass(logtype):
+    @classmethod
+    def _getEntryClass(cls, logtype):
         """
         Return the class corresponding to the @logtype string parameter.
 
@@ -303,7 +303,7 @@ class LogEntryFactory(object):
         @rtype: class
         """
         try:
-            return LogEntryFactory._logtypes[logtype]
+            return cls._logtypes[logtype]
         except KeyError:
             return LogEntry
 

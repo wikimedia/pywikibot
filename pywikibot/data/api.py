@@ -1089,8 +1089,8 @@ class Request(MutableMapping):
         submsg.set_payload(content)
         return submsg
 
-    @staticmethod
-    def _build_mime_request(params, mime_params):
+    @classmethod
+    def _build_mime_request(cls, params, mime_params):
         """Construct a MIME multipart form post.
 
         @param params: HTTP request params
@@ -1103,10 +1103,10 @@ class Request(MutableMapping):
         # construct a MIME message containing all API key/values
         container = MIMEMultipart(_subtype='form-data')
         for key, value in params.items():
-            submsg = Request._generate_MIME_part(key, value)
+            submsg = cls._generate_MIME_part(key, value)
             container.attach(submsg)
         for key, value in mime_params.items():
-            submsg = Request._generate_MIME_part(key, *value)
+            submsg = cls._generate_MIME_part(key, *value)
             container.attach(submsg)
 
         # strip the headers to get the HTTP message body
@@ -1366,8 +1366,8 @@ class CachedRequest(Request):
         self._data = None
         self._cachetime = None
 
-    @staticmethod
-    def _get_cache_dir():
+    @classmethod
+    def _get_cache_dir(cls):
         """Return the base directory path for cache entries.
 
         The directory will be created if it does not already exist.
@@ -1375,7 +1375,7 @@ class CachedRequest(Request):
         @return: basestring
         """
         path = os.path.join(pywikibot.config2.base_dir, 'apicache')
-        CachedRequest._make_dir(path)
+        cls._make_dir(path)
         return path
 
     @staticmethod
