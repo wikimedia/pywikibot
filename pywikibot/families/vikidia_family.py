@@ -12,6 +12,7 @@ class Family(family.Family):
     name = 'vikidia'
 
     langs = {
+        'ca': 'ca.vikidia.org',
         'en': 'en.vikidia.org',
         'es': 'es.vikidia.org',
         'fr': 'fr.vikidia.org',
