@@ -13,6 +13,8 @@ import subprocess
 import sys
 import time
 
+from warnings import warn
+
 import pywikibot
 from pywikibot.tools import SelfCallDict
 from pywikibot.site import Namespace
@@ -27,6 +29,13 @@ NoSiteTestCase = aspects.TestCase
 SiteTestCase = aspects.TestCase
 CachedTestCase = aspects.TestCase
 PywikibotTestCase = aspects.TestCase
+
+
+class DrySiteNote(RuntimeWarning):
+
+    """Information regarding dry site."""
+
+    pass
 
 
 def expected_failure_if(expect):
@@ -74,6 +83,41 @@ def allowed_failure_if(expect):
         return allowed_failure
     else:
         return lambda orig: orig
+
+
+class DryParamInfo(dict):
+
+    """Dummy class to use instead of L{pywikibot.data.api.ParamInfo}."""
+
+    @property
+    def modules(self):
+        """Empty set."""
+        return set()
+
+    @property
+    def action_modules(self):
+        """Empty set."""
+        return set()
+
+    @property
+    def query_modules(self):
+        """Empty set."""
+        return set()
+
+    @property
+    def query_modules_with_limits(self):
+        """Empty set."""
+        return set()
+
+    @property
+    def prefixes(self):
+        """Empty set."""
+        return set()
+
+    def parameter(self, module, param_name):
+        """Prevented method."""
+        raise Exception(u'DryParamInfo.parameter(%r, %r) prevented'
+                        % (module, param_name))
 
 
 class DummySiteinfo():
@@ -147,16 +191,26 @@ class DrySite(pywikibot.site.APISite):
         """Constructor."""
         super(DrySite, self).__init__(code, fam, user, sysop)
         self._userinfo = pywikibot.tools.EMPTY_DEFAULT
+        self._paraminfo = DryParamInfo()
         self._siteinfo = DummySiteinfo({})
         self._siteinfo._cache['lang'] = (code, True)
         self._namespaces = SelfCallDict(Namespace.builtin_namespaces())
+
+    def __repr__(self):
+        """Override default so warnings and errors indicate test is dry."""
+        return "%s(%r, %r)" % (self.__class__.__name__,
+                               self.code,
+                               self.family.name)
 
     @property
     def userinfo(self):
         return self._userinfo
 
     def version(self):
-        return self.family.version(self.code)
+        """Dummy version, with warning to show the callers context."""
+        warn('%r returning version 1.24; override if unsuitable.'
+             % self, DrySiteNote, stacklevel=2)
+        return '1.24'
 
     def case(self):
         if self.family.name == 'wiktionary':

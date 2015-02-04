@@ -195,6 +195,10 @@ def process_entries(cache_path, func, use_accesstime=None):
     if not cache_path:
         cache_path = os.path.join(pywikibot.config2.base_dir, 'apicache')
 
+    if not os.path.exists(cache_path):
+        pywikibot.error('%s: no such file or directory' % cache_path)
+        return
+
     if os.path.isdir(cache_path):
         filenames = [os.path.join(cache_path, filename)
                      for filename in os.listdir(cache_path)]

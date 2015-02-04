@@ -276,6 +276,12 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         "querytype": "prop"
     }
 
+    def setUp(self):
+        """Add a real ParamInfo to the DrySite."""
+        super(ParamInfoDictTests, self).setUp()
+        site = self.get_site()
+        site._paraminfo = ParamInfo(site)
+
     def test_new_format(self):
         pi = self.get_site()._paraminfo
         # Set it to the new limited set of keys.
@@ -338,6 +344,8 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         })
 
         pi._paraminfo.update(data)
+        # Pretend that paraminfo has been loaded
+        pi._paraminfo['paraminfo'] = {}
 
         param = pi.parameter('info', 'token')
         self.assertIsInstance(param, dict)
