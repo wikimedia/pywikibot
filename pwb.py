@@ -23,6 +23,7 @@ __version__ = '$Id$'
 # [3] https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
 import os
+import re
 import sys
 import types
 
@@ -176,7 +177,7 @@ except RuntimeError as err:
     sys.exit(1)
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1 and not re.match('-{1,2}help', sys.argv[1]):
         file_package = None
         tryimport_pwb()
         filename = sys.argv[1]
