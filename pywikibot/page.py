@@ -2095,6 +2095,15 @@ class FilePage(Page):
         """Return the file's SHA1 checksum."""
         return self.latest_file_info.sha1
 
+    @deprecated("FilePage.oldest_file_info.user")
+    def getFirstUploader(self):
+        """Return a list with first uploader of the FilePage and timestamp.
+
+        For compatibility with compat only.
+
+        """
+        return [self.oldest_file_info.user, self.oldest_file_info.timestamp]
+
     @deprecated("FilePage.latest_file_info.user")
     def getLatestUploader(self):
         """Return a list with latest uploader of the FilePage and timestamp.
