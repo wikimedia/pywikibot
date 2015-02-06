@@ -914,8 +914,8 @@ class BaseSite(ComparableMixin):
         # If the namespace has a case definition it's overriding the site's
         # case definition
         if (ns1_obj.case if hasattr(ns1_obj, 'case') else self.case()) == 'first-letter':
-            name1 = name1[0].upper() + name1[1:]
-            name2 = name2[0].upper() + name2[1:]
+            name1 = name1[:1].upper() + name1[1:]
+            name2 = name2[:1].upper() + name2[1:]
         return name1 == name2
 
     # namespace shortcuts for backwards-compatibility
