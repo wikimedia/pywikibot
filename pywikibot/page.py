@@ -1425,6 +1425,20 @@ class BasePage(UnicodeMixin, ComparableMixin):
                                           step=step, total=total)
                 ]
 
+    def contributors(self, step=None, total=None):
+        """
+        Compile contributors of this page with edit counts.
+
+        @param step: limit each API call to this number of revisions
+        @param total: iterate no more than this number of revisions in total
+
+        @return: number of edits for each username
+        @rtype: L{collections.Counter}
+        """
+        return Counter(rev.user for rev in
+                       self.revisions(step=step, total=total))
+
+    @deprecated('contributors()')
     def contributingUsers(self, step=None, total=None):
         """Return a set of usernames (or IPs) of users who edited this page.
 
@@ -1432,8 +1446,23 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param total: iterate no more than this number of revisions in total
 
         """
-        return set(entry.user for entry in self.revisions(step=step,
-                                                          total=total))
+        return self.contributors(step=step, total=total).keys()
+
+    def revision_count(self, contributors=None):
+        """
+        Determine number of edits from a set of contributors.
+
+        @param contributors: contributor usernames
+        @type contributors: iterable of str
+
+        @return: number of edits for all provided usernames
+        @rtype: int
+        """
+        if not contributors:
+            return len(list(self.revisions()))
+
+        cnt = self.contributors()
+        return sum(cnt[username] for username in contributors)
 
     @deprecated('oldest_revision')
     def getCreator(self):
@@ -1446,7 +1475,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         result = self.oldest_revision
         return result.user, result.timestamp
 
-    @deprecated('revisions')
+    @deprecated('contributors() or revisions()')
     @deprecated_args(limit="total")
     def getLatestEditors(self, total=1):
         """Get a list of revision informations of the last total edits.
