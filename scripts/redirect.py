@@ -453,19 +453,15 @@ class RedirectRobot(Bot):
                                                   {'to': movedTarget.title(
                                                       asLink=True)})
                         content = redir_page.get(get_redirect=True)
-                        text = self.site.redirectRegex().sub(
-                            '#%s %s' % (self.site.redirect(),
-                                        movedTarget.title(asLink=True,
-                                                          textlink=True)),
-                            content)
-                        pywikibot.showDiff(content, text)
+                        redir_page.set_redirect_target(
+                            movedTarget, keep_section=True)
+                        pywikibot.showDiff(content, redir_page.text)
                         pywikibot.output(u'Summary - %s' % reason)
                         if self.user_confirm(
                                 u'Redirect target %s has been moved to %s.\n'
                                 u'Do you want to fix %s?'
                                 % (targetPage, movedTarget, redir_page)):
                             try:
-                                redir_page.text = text
                                 redir_page.save(reason)
                             except pywikibot.NoUsername:
                                 pywikibot.output(u"Page [[%s]] not saved; "
@@ -642,31 +638,14 @@ class RedirectRobot(Bot):
             except pywikibot.BadTitle:
                 pywikibot.output(u"Bad Title Error")
                 break
-            oldlink = self.site.redirectRegex().search(oldText).group(1)
-            if "#" in oldlink and targetPage.section() is None:
-                sectionlink = oldlink[oldlink.index("#"):]
-                targetlink = pywikibot.Page(
-                    self.site,
-                    targetPage.title() + sectionlink
-                ).title(asLink=True, textlink=True)
-            else:
-                targetlink = targetPage.title(asLink=True, textlink=True)
-
-            text = self.site.redirectRegex().sub(
-                '#%s %s' % (self.site.redirect(),
-                            targetlink),
-                oldText, 1)
-            if redir.title() == targetPage.title() or text == oldText:
-                pywikibot.output(u"Note: Nothing left to do on %s"
-                                 % redir.title(asLink=True))
-                break
+            redir.set_redirect_target(targetPage, keep_section=True)
             summary = i18n.twtranslate(self.site, 'redirect-fix-double',
                                        {'to': targetPage.title(asLink=True)}
                                        )
-            pywikibot.showDiff(oldText, text)
+            pywikibot.showDiff(oldText, redir.text)
             if self.user_confirm(u'Do you want to accept the changes?'):
                 try:
-                    redir.put(text, summary)
+                    redir.save(summary)
                 except pywikibot.LockedPage:
                     pywikibot.output(u'%s is locked.' % redir.title())
                 except pywikibot.SpamfilterError as error:

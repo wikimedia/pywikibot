@@ -116,8 +116,9 @@ class StatesRedirectBot(pywikibot.Bot):
                             u'Create redirect %s?' % pl.title(),
                             (('yes', 'y'), ('no', 'n')))
                     if change == 'y':
-                        pl.text = '#REDIRECT [[%s]]' % p2.title()
-                        pl.save(i18n.translate(self.site, msg))
+                        pl.set_redirect_target(
+                            p2, create=True,
+                            summary=i18n.translate(self.site, msg))
 
 
 def main(*args):
