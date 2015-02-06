@@ -1996,10 +1996,17 @@ class PageGenerator(QueryGenerator):
 
         """
         p = pywikibot.Page(self.site, pagedata['title'], pagedata['ns'])
+        ns = pagedata['ns']
+        # Upcast to proper Page subclass.
+        if ns == 6:
+            p = pywikibot.FilePage(p)
+        elif ns == 14:
+            p = pywikibot.Category(p)
         update_page(p, pagedata, self.props)
         return p
 
 
+@deprecated("PageGenerator")
 class CategoryPageGenerator(PageGenerator):
 
     """Like PageGenerator, but yields Category objects instead of Pages."""
@@ -2010,6 +2017,7 @@ class CategoryPageGenerator(PageGenerator):
         return pywikibot.Category(p)
 
 
+@deprecated("PageGenerator")
 class ImagePageGenerator(PageGenerator):
 
     """Like PageGenerator, but yields FilePage objects instead of Pages."""
@@ -2209,6 +2217,12 @@ def update_page(page, pagedict, props=[]):
         page._revid = pagedict['lastrevid']
         if page._revid in page._revisions:
             page._text = page._revisions[page._revid].text
+
+    if 'imageinfo' in pagedict:
+        assert(isinstance(page, pywikibot.FilePage))
+        for file_rev in pagedict['imageinfo']:
+            file_revision = pywikibot.page.FileInfo(file_rev)
+            page._file_revisions[file_revision.timestamp] = file_revision
 
     if "categoryinfo" in pagedict:
         page._catinfo = pagedict["categoryinfo"]

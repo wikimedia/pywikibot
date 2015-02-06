@@ -98,7 +98,7 @@ warnings = (
      'MediaWiki one'),
     ('.getFileMd5Sum(',
      'FilePage.getFileMd5Sum() is deprecated should be replaced by '
-     'getFileSHA1Sum()'),
+     'FilePage.latest_file_info.sha1'),
     (' wikipedia.',
      '"wikipedia" library has been changed to "pywikibot".'),
     ('from wikipedia import',

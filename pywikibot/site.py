@@ -2376,21 +2376,25 @@ class APISite(BaseSite):
                                         "url", "size", "sha1", "mime",
                                         "metadata", "archivename"],
                                 **args)
+        # kept for backward compatibility
+        # TODO: when backward compatibility can be broken, adopt
+        # self._update_page() pattern and remove return
         for pageitem in query:
             if not self.sametitle(pageitem['title'], title):
                 raise Error(
                     u"loadimageinfo: Query on %s returned data on '%s'"
                     % (page, pageitem['title']))
             api.update_page(page, pageitem, query.props)
+
             if "imageinfo" not in pageitem:
                 if "missing" in pageitem:
                     raise NoPage(page)
-
                 raise PageRelatedError(
                     page,
                     u"loadimageinfo: Query on %s returned no imageinfo")
-            return (pageitem['imageinfo']
-                    if history else pageitem['imageinfo'][0])
+
+        return (pageitem['imageinfo']
+                if history else pageitem['imageinfo'][0])
 
     @deprecated('Check the content model instead')
     def loadflowinfo(self, page):
