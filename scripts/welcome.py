@@ -242,7 +242,7 @@ netext = {
         'fr': u'{{subst:Discussion Projet:Aide/Bienvenue}} %s',
         'ga': u'{{subst:fáilte}} %s',
         'he': u'{{ס:ברוך הבא}} %s',
-        'id': u'{{sdbot|%s}}',
+        'id': u'{{subst:sdbot2}}\n%s',
         'it': u'<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n%s',
         'ja': u'{{subst:Welcome/intro}}\n{{subst:welcome|%s}}',
         'ka': u'{{ახალი მომხმარებელი}}--%s',
