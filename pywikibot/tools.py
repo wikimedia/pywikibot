@@ -57,6 +57,11 @@ if sys.version_info < (2, 7):
     try:
         from future.backports.misc import Counter, OrderedDict
     except ImportError:
+        warn("""
+pywikibot support of Python 2.6 relies on package future for many features.
+Please upgrade to Python 2.7+ or Python 3.3+, or run:
+    "pip install future"
+""", RuntimeWarning)
         try:
             from ordereddict import OrderedDict
         except ImportError:
@@ -829,6 +834,7 @@ def deprecated_args(**arg_pairs):
 
         if wrapper.__signature__:
             # Build a new signature with deprecated args added.
+            # __signature__ is only available in Python 3 which has OrderedDict
             params = OrderedDict()
             for param in wrapper.__signature__.parameters.values():
                 params[param.name] = param.replace()

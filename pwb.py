@@ -150,16 +150,6 @@ if StrictVersion(httplib2.__version__) < StrictVersion("0.6.0"):
 
 del httplib2
 
-if sys.version_info[0] == 2 and sys.version_info[1] == 6:
-    try:
-        import ordereddict
-        del ordereddict
-    except ImportError as e:
-        print("ImportError: %s" % e)
-        print("pywikibot depends on module ordereddict in Python 2.6.")
-        print("Upgrade to Python 2.7, or run 'pip install ordereddict'")
-        sys.exit(1)
-
 # Search for user-config.py before creating one.
 try:
     # If successful, user-config.py already exists in one of the candidate

@@ -16,7 +16,7 @@ __all__ = ('httplib2', '_cache_dir', 'TestRequest',
 
 # Verify that the unit tests have a base working environment:
 # - httplib2 is mandatory
-# - ordereddict is needed as a fallback for python 2.6,
+# - future is needed as a fallback for python 2.6,
 #   however if unavailable this will fail on use; see pywikibot/tools.py
 # - mwparserfromhell is optional, so is only imported in textlib_tests
 try:
