@@ -18,11 +18,6 @@ import datetime
 import re
 import sys
 
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
-
 if sys.version_info[0] > 2:
     from html.parser import HTMLParser
     basestring = (str,)
@@ -30,10 +25,11 @@ if sys.version_info[0] > 2:
 else:
     from HTMLParser import HTMLParser
 
-from pywikibot import config2 as config
 import pywikibot
-from pywikibot.family import Family
 
+from pywikibot import config2 as config
+from pywikibot.family import Family
+from pywikibot.tools import OrderedDict
 
 TEMP_REGEX = re.compile(
     '{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')

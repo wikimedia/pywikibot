@@ -12,9 +12,10 @@ import os
 
 import pywikibot
 import pywikibot.textlib as textlib
-from pywikibot import config
 
-from tests import OrderedDict
+from pywikibot import config
+from pywikibot.tools import OrderedDict
+
 from tests.aspects import unittest, TestCase, DefaultDrySiteTestCase
 
 files = {}
