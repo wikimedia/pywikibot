@@ -417,7 +417,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
     def latest_revision_id(self):
         """Return the current revision id for this page."""
         if not hasattr(self, '_revid'):
-            self.site.loadrevisions(self)
+            self.revisions(self)
         return self._revid
 
     @deprecated('latest_revision_id')
@@ -428,10 +428,7 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
     @property
     def latest_revision(self):
         """Return the current revision for this page."""
-        rev = self.latest_revision_id
-        if rev not in self._revisions:
-            self.site.loadrevisions(self)
-        return self._revisions[rev]
+        return next(self.revisions(content=True, total=1))
 
     @property
     def text(self):
@@ -1368,68 +1365,63 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         """
         return self.site.getredirtarget(self)
 
-    def revisions(self, reverseOrder=False, step=None, total=None):
+    @deprecated_args(getText='content', reverseOrder='reverse')
+    def revisions(self, reverse=False, step=None, total=None, content=False,
+                  rollback=False):
         """Generator which loads the version history as Revision instances."""
         # TODO: Only request uncached revisions
-        self.site.loadrevisions(self, getText=False, rvdir=reverseOrder,
-                                step=step, total=total)
+        self.site.loadrevisions(self, getText=content, rvdir=reverse,
+                                step=step, total=total, rollback=rollback)
         return (self._revisions[rev] for rev in
-                sorted(self._revisions, reverse=not reverseOrder)[:total])
+                sorted(self._revisions, reverse=not reverse)[:total])
 
     # BREAKING CHANGE: in old framework, default value for getVersionHistory
     #                  returned no more than 500 revisions; now, it iterates
     #                  all revisions unless 'total' argument is used
-    @deprecated_args(forceReload=None, revCount="total", getAll=None)
-    def getVersionHistory(self, reverseOrder=False, step=None, total=None):
+    @deprecated('Page.revisions()')
+    @deprecated_args(forceReload=None, revCount='total', getAll=None,
+                     reverseOrder='reverse')
+    def getVersionHistory(self, reverse=False, step=None, total=None):
         """Load the version history page and return history information.
 
         Return value is a list of tuples, where each tuple represents one
         edit and is built of revision id, edit date/time, user name, and
         edit summary. Starts with the most current revision, unless
-        reverseOrder is True.
+        reverse is True.
 
         @param step: limit each API call to this number of revisions
         @param total: iterate no more than this number of revisions in total
 
         """
-        self.site.loadrevisions(self, getText=False, rvdir=reverseOrder,
-                                step=step, total=total)
-
         return [rev.hist_entry()
-                for revid, rev in sorted(self._revisions.items(),
-                                         reverse=not reverseOrder)
-                ][:total]
+                for rev in self.revisions(reverse=reverse,
+                                          step=step, total=total)
+                ]
 
-    @deprecated_args(forceReload=None)
-    def getVersionHistoryTable(self, reverseOrder=False, step=None, total=None):
+    @deprecated_args(forceReload=None, reverseOrder='reverse')
+    def getVersionHistoryTable(self, reverse=False, step=None, total=None):
         """Return the version history as a wiki table."""
         result = '{| class="wikitable"\n'
         result += '! oldid || date/time || username || edit summary\n'
-        for entry in self.getVersionHistory(reverseOrder=reverseOrder,
-                                            step=step, total=total):
+        for entry in self.revisions(reverse=reverse, step=step, total=total):
             result += '|----\n'
-            result += '| %s || %s || %s || <nowiki>%s</nowiki>\n' % entry
+            result += ('| {r.revid} || {r.timestamp} || {r.user} || '
+                       '<nowiki>{r.comment}</nowiki>\n'.format(r=entry))
         result += '|}\n'
         return result
 
-    def fullVersionHistory(self, reverseOrder=False, step=None,
-                           total=None, rollback=False):
+    @deprecated("Page.revisions(content=True)")
+    @deprecated_args(reverseOrder='reverse', rollback=None)
+    def fullVersionHistory(self, reverse=False, step=None, total=None):
         """Iterate previous versions including wikitext.
 
         Takes same arguments as getVersionHistory.
 
-        @param rollback: Returns rollback token.
-        @return: A generator that yields tuples consisting of revision ID,
-            edit date/time, user name and content
-
         """
-        self.site.loadrevisions(self, getText=True, rvdir=reverseOrder,
-                                step=step, total=total, rollback=rollback)
-
-        return [rev.hist_entry()
-                for revid, rev in sorted(self._revisions.items(),
-                                         reverse=not reverseOrder)
-                ][:total]
+        return [rev.full_hist_entry()
+                for rev in self.revisions(content=True, reverse=reverse,
+                                          step=step, total=total)
+                ]
 
     def contributingUsers(self, step=None, total=None):
         """Return a set of usernames (or IPs) of users who edited this page.
@@ -1438,9 +1430,8 @@ class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
         @param total: iterate no more than this number of revisions in total
 
         """
-        history = self.getVersionHistory(step=step, total=total)
-        users = set(entry.user for entry in history)
-        return users
+        return set(entry.user for entry in self.revisions(step=step,
+                                                          total=total))
 
     @deprecated('oldest_revision')
     def getCreator(self):
@@ -4201,6 +4192,17 @@ class Revision(object):
         """Return a namedtuple with a Page full history record."""
         return Revision.FullHistEntry(self.revid, self.timestamp, self.user,
                                       self.text, self.rollbacktoken)
+
+    def __getitem__(self, key):
+        """Give access to Revision class values by key.
+
+        Revision class may also give access to its values by keys
+        e.g. revid parameter may be assigned by revision['revid']
+        as well as revision.revid. This makes formatting strings with
+        % operator easier.
+
+        """
+        return getattr(self, key)
 
 
 class FileInfo(pywikibot.UnicodeMixin):
