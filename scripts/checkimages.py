@@ -82,7 +82,7 @@ right parameter.
 # (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
 # (C) Siebrand Mazeland, 2007-2010
 # (C) Filnik, 2007-2011
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -875,20 +875,10 @@ class checkImagesBot(object):
 
     def countEdits(self, pagename, userlist):
         """Function to count the edit of a user or a list of users in a page."""
-        # self.botolist
         if isinstance(userlist, basestring):
             userlist = [userlist]
         page = pywikibot.Page(self.site, pagename)
-        history = page.getVersionHistory()
-        user_list = list()
-
-        for data in history:
-            user_list.append(data.user)
-        number_edits = 0
-
-        for username in userlist:
-            number_edits += user_list.count(username)
-        return number_edits
+        return sum(1 for rev in page.revisions() if rev.user in userlist)
 
     def checkImageOnCommons(self):
         """Checking if the file is on commons."""
