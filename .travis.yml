@@ -8,8 +8,8 @@ python:
   - '2.6'
 
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y liblua5.1-dev
+  - if [[ "$PYSETUP_TEST_EXTRAS" == "1" ]]; then sudo apt-get update -qq; fi
+  - if [[ "$PYSETUP_TEST_EXTRAS" == "1" ]]; then sudo apt-get install -y liblua5.1-dev; fi
 
 install:
   - if [[ "$SITE_ONLY" == '1' ]]; then export USE_NOSE=1; fi
