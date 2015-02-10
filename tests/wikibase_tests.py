@@ -69,7 +69,7 @@ class TestGeneral(WikidataTestCase):
         self.assertEqual(claim._formatValue(), {'entity-type': 'item', 'numeric-id': 1})
 
     def test_cmp(self):
-        """ Test WikibasePage.__cmp__. """
+        """Test WikibasePage.__cmp__."""
         self.assertEqual(pywikibot.ItemPage.fromPage(self.mainpage),
                          pywikibot.ItemPage(self.get_repo(), 'q5296'))
 

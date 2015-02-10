@@ -445,7 +445,7 @@ class ListBoxWindow:
 
 class Tkdialog:
 
-    """ The dialog window for image info."""
+    """The dialog window for image info."""
 
     def __init__(self, photo_description, photo, filename):
         """Constructor."""
@@ -526,18 +526,18 @@ class Tkdialog:
         return imageTk
 
     def ok_file(self):
-        """ The user pressed the OK button. """
+        """The user pressed the OK button."""
         self.filename = self.filename_field.get()
         self.photo_description = self.description_field.get(0.0, Tkinter.END)
         self.root.destroy()
 
     def skip_file(self):
-        """ The user pressed the Skip button. """
+        """The user pressed the Skip button."""
         self.skip = True
         self.root.destroy()
 
     def show_dialog(self):
-        """ Activate the dialog.
+        """Activate the dialog.
 
         @return: new description, name, and if the image is skipped
         @rtype: tuple of (unicode, unicode, bool)

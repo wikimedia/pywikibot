@@ -42,7 +42,7 @@ def firstcap(string):
 
 
 def treat(text, linkedPage, targetPage):
-    """ Based on the method of the same name in solve_disambiguation.py. """
+    """Based on the method of the same name in solve_disambiguation.py."""
     # make a backup of the original text so we can show the changes later
     mysite = pywikibot.Site()
     linktrail = mysite.linktrail()

@@ -2508,7 +2508,7 @@ class User(Page):
 
     @property
     def username(self):
-        """ The username.
+        """The username.
 
         Convenience method that returns the title of the page with
         namespace prefix omitted, which is the username.
@@ -2521,7 +2521,7 @@ class User(Page):
             return self.title(withNamespace=False)
 
     def isRegistered(self, force=False):
-        """ Determine if the user is registered on the site.
+        """Determine if the user is registered on the site.
 
         It is possible to have a page named User:xyz and not have
         a corresponding user with username xyz.
@@ -2540,14 +2540,14 @@ class User(Page):
             return self.getprops(force).get('missing') is None
 
     def isAnonymous(self):
-        """ Determine if the user is editing as an IP address.
+        """Determine if the user is editing as an IP address.
 
         @return: bool
         """
         return ip_regexp.match(self.username) is not None
 
     def getprops(self, force=False):
-        """ Return a properties about the user.
+        """Return a properties about the user.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
@@ -2567,7 +2567,7 @@ class User(Page):
 
     @deprecated('User.registration()')
     def registrationTime(self, force=False):
-        """ DEPRECATED. Fetch registration date for this user.
+        """DEPRECATED. Fetch registration date for this user.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
@@ -2580,7 +2580,7 @@ class User(Page):
             return 0
 
     def registration(self, force=False):
-        """ Fetch registration date for this user.
+        """Fetch registration date for this user.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
@@ -2592,7 +2592,7 @@ class User(Page):
             return pywikibot.Timestamp.fromISOformat(reg)
 
     def editCount(self, force=False):
-        """ Return edit count for a registered user.
+        """Return edit count for a registered user.
 
         Always returns 0 for 'anonymous' users.
 
@@ -2607,7 +2607,7 @@ class User(Page):
             return 0
 
     def isBlocked(self, force=False):
-        """ Determine whether the user is currently blocked.
+        """Determine whether the user is currently blocked.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
@@ -2617,7 +2617,7 @@ class User(Page):
         return 'blockedby' in self.getprops(force)
 
     def isEmailable(self, force=False):
-        """ Determine whether emails may be send to this user through MediaWiki.
+        """Determine whether emails may be send to this user through MediaWiki.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
@@ -2627,7 +2627,7 @@ class User(Page):
         return 'emailable' in self.getprops(force)
 
     def groups(self, force=False):
-        """ Return a list of groups to which this user belongs.
+        """Return a list of groups to which this user belongs.
 
         The list of groups may be empty.
 
@@ -2642,7 +2642,7 @@ class User(Page):
             return []
 
     def getUserPage(self, subpage=u''):
-        """ Return a Page object relative to this user's main page.
+        """Return a Page object relative to this user's main page.
 
         @param subpage: subpage part to be appended to the main
                             page title (optional)
@@ -2658,7 +2658,7 @@ class User(Page):
         return Page(Link(self.title() + subpage, self.site))
 
     def getUserTalkPage(self, subpage=u''):
-        """ Return a Page object relative to this user's main talk page.
+        """Return a Page object relative to this user's main talk page.
 
         @param subpage: subpage part to be appended to the main
                             talk page title (optional)
@@ -2675,7 +2675,7 @@ class User(Page):
                          self.site, defaultNamespace=3))
 
     def sendMail(self, subject, text, ccme=False):
-        """ Send an email to this user via MediaWiki's email interface.
+        """Send an email to this user via MediaWiki's email interface.
 
         Return True on success, False otherwise.
         This method can raise an UserActionRefuse exception in case this user
@@ -2750,7 +2750,7 @@ class User(Page):
     @deprecated("contributions")
     @deprecate_arg("limit", "total")  # To be consistent with rest of framework
     def editedPages(self, total=500):
-        """ DEPRECATED. Use contributions().
+        """DEPRECATED. Use contributions().
 
         Yields pywikibot.Page objects that this user has
         edited, with an upper bound of 'total'. Pages returned are not
@@ -2765,7 +2765,7 @@ class User(Page):
     @deprecate_arg("limit", "total")  # To be consistent with rest of framework
     @deprecate_arg("namespace", "namespaces")
     def contributions(self, total=500, namespaces=[]):
-        """ Yield tuples describing this user edits.
+        """Yield tuples describing this user edits.
 
         Each tuple is composed of a pywikibot.Page object,
         the revision id (int), the edit timestamp (as a pywikibot.Timestamp
@@ -2788,7 +2788,7 @@ class User(Page):
 
     @deprecate_arg("number", "total")
     def uploadedImages(self, total=10):
-        """ Yield tuples describing files uploaded by this user.
+        """Yield tuples describing files uploaded by this user.
 
         Each tuple is composed of a pywikibot.Page, the timestamp (str in
         ISO8601 format), comment (unicode) and a bool for pageid > 0.
@@ -2817,7 +2817,7 @@ class WikibasePage(BasePage):
     """
 
     def __init__(self, site, title=u"", **kwargs):
-        """ Constructor.
+        """Constructor.
 
         If title is provided, either ns or entity_type must also be provided,
         and will be checked against the title parsed using the Page
@@ -3250,7 +3250,7 @@ class WikibasePage(BasePage):
 
 class ItemPage(WikibasePage):
 
-    """ Wikibase entity of type 'item'.
+    """Wikibase entity of type 'item'.
 
     A Wikibase item may be defined by either a 'Q' id (qid),
     or by a site & title.

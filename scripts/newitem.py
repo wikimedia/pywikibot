@@ -34,7 +34,7 @@ from datetime import timedelta
 
 class NewItemRobot(WikidataBot):
 
-    """ A bot to create new items. """
+    """A bot to create new items."""
 
     def __init__(self, generator, **kwargs):
         """Only accepts options defined in availableOptions."""
@@ -59,7 +59,7 @@ class NewItemRobot(WikidataBot):
                          % (self.lastEdit, self.lastEditBefore.isoformat()))
 
     def treat(self, page, item):
-        """ Treat page/item. """
+        """Treat page/item."""
         if item and item.exists():
             pywikibot.output(u'%s already has an item: %s.' % (page, item))
             if self.getOption('touch'):

@@ -58,7 +58,7 @@ class RcListenerThread(threading.Thread):
     """
 
     def __init__(self, wikihost, rchost, rcport=80, rcpath='/rc', total=None):
-        """ Constructor for RcListenerThread. """
+        """Constructor for RcListenerThread."""
         super(RcListenerThread, self).__init__()
         self.rchost = rchost
         self.rcport = rcport
@@ -116,13 +116,13 @@ class RcListenerThread(threading.Thread):
         self.client.define(GlobalListener)
 
     def __repr__(self):
-        """ Return representation. """
+        """Return representation."""
         return "<rcstream for socketio://%s@%s:%s%s>" % (
                self.wikihost, self.rchost, self.rcport, self.rcpath
         )
 
     def run(self):
-        """ Threaded function. Runs insided the thread when started with .start(). """
+        """Threaded function. Runs insided the thread when started with .start()."""
         self.running = True
         while self.running:
             self.client.wait(seconds=0.1)
@@ -132,12 +132,12 @@ class RcListenerThread(threading.Thread):
         self.queue.put(None)
 
     def stop(self):
-        """ Stop the thread. """
+        """Stop the thread."""
         self.running = False
 
 
 def rc_listener(wikihost, rchost, rcport=80, rcpath='/rc', total=None):
-    """ RC Changes Generator. Yields changes received from RCstream.
+    """RC Changes Generator. Yields changes received from RCstream.
 
     @param wikihost: the hostname of the wiki we want to get changes for. This
                      is passed to rcstream using a 'subscribe' command. Pass
@@ -191,7 +191,7 @@ def rc_listener(wikihost, rchost, rcport=80, rcpath='/rc', total=None):
 
 
 def site_rc_listener(site, total=None):
-    """ RC Changes Generator. Yields changes received from RCstream.
+    """RC Changes Generator. Yields changes received from RCstream.
 
     @param site: the Pywikibot.Site object to yield live recent changes for
     @type site: Pywikibot.BaseSite

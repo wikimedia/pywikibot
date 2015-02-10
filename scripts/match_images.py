@@ -108,7 +108,7 @@ def match_image_pages(imagePageA, imagePageB):
 
 
 def get_image_from_image_page(imagePage):
-    """ Get the image object to work based on an imagePage object. """
+    """Get the image object to work based on an imagePage object."""
     imageBuffer = None
     imageURL = imagePage.fileUrl()
     imageURLopener = http.fetch(imageURL)
@@ -118,7 +118,7 @@ def get_image_from_image_page(imagePage):
 
 
 def match_images(imageA, imageB):
-    """ Match two image objects. Return the ratio of pixels that match. """
+    """Match two image objects. Return the ratio of pixels that match."""
     histogramA = imageA.histogram()
     histogramB = imageB.histogram()
 
@@ -139,7 +139,7 @@ def match_images(imageA, imageB):
 
 
 def main(*args):
-    """ Extracting file page information of images to work on and initiate matching. """
+    """Extracting file page information of images to work on and initiate matching."""
     images = []
     other_family = u''
     other_lang = u''

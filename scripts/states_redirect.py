@@ -71,7 +71,7 @@ class StatesRedirectBot(pywikibot.Bot):
             self.abbrev[subd.name] = subd.code[3:]
 
     def treat(self, page):
-        """ Re-directing process.
+        """Re-directing process.
 
         Check if pages are in the given form Something, State, and
         if so, create a redirect from Something, ST..

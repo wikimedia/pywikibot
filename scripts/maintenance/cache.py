@@ -59,7 +59,7 @@ from pywikibot.page import User  # noqa
 
 class ParseError(Exception):
 
-    """ Error parsing. """
+    """Error parsing."""
 
 
 class CacheEntry(api.CachedRequest):
@@ -67,7 +67,7 @@ class CacheEntry(api.CachedRequest):
     """A Request cache entry."""
 
     def __init__(self, directory, filename):
-        """ Constructor. """
+        """Constructor."""
         self.directory = directory
         self.filename = filename
 
@@ -78,11 +78,11 @@ class CacheEntry(api.CachedRequest):
         return self._cachefile_path()
 
     def _create_file_name(self):
-        """ Filename of the cached entry. """
+        """Filename of the cached entry."""
         return self.filename
 
     def _get_cache_dir(self):
-        """ Directory of the cached entry. """
+        """Directory of the cached entry."""
         return self.directory
 
     def _cachefile_path(self):
@@ -90,13 +90,13 @@ class CacheEntry(api.CachedRequest):
                             self._create_file_name())
 
     def _load_cache(self):
-        """ Load the cache entry. """
+        """Load the cache entry."""
         with open(self._cachefile_path(), 'rb') as f:
             self.key, self._data, self._cachetime = pickle.load(f)
         return True
 
     def parse_key(self):
-        """ Parse the key loaded from the cache entry. """
+        """Parse the key loaded from the cache entry."""
         # find the start of the first parameter
         start = self.key.index('(')
         # find the end of the first object
@@ -153,7 +153,7 @@ class CacheEntry(api.CachedRequest):
         return self._parsed_key
 
     def _rebuild(self):
-        """ Reconstruct the original Request from the key. """
+        """Reconstruct the original Request from the key."""
         if hasattr(self, '_parsed_key'):
             (site, username, login_status, params) = self._parsed_key
         else:
@@ -171,7 +171,7 @@ class CacheEntry(api.CachedRequest):
         self._params = dict(eval(params))
 
     def _delete(self):
-        """ Delete the cache entry. """
+        """Delete the cache entry."""
         os.remove(self._cachefile_path())
 
 
@@ -248,25 +248,25 @@ def process_entries(cache_path, func, use_accesstime=None):
 
 
 def has_password(entry):
-    """ Entry has a password in the entry. """
+    """Entry has a password in the entry."""
     if 'lgpassword' in entry._uniquedescriptionstr():
         return entry
 
 
 def is_logout(entry):
-    """ Entry is a logout entry. """
+    """Entry is a logout entry."""
     if not entry._data and 'logout' in entry.key:
         return entry
 
 
 def empty_response(entry):
-    """ Entry has no data. """
+    """Entry has no data."""
     if not entry._data and 'logout' not in entry.key:
         return entry
 
 
 def not_accessed(entry):
-    """ Entry has never been accessed. """
+    """Entry has never been accessed."""
     if not hasattr(entry, 'stinfo'):
         return
 

@@ -334,7 +334,7 @@ class DefaultUserAgentTestCase(TestCase):
         config.user_agent_format = self.orig_format
 
     def test_default_user_agent(self):
-        """ Config defined format string test. """
+        """Config defined format string test."""
         self.assertTrue(http.user_agent().startswith(
             pywikibot.calledModuleName()))
         self.assertIn('Pywikibot/' + pywikibot.__release__, http.user_agent())

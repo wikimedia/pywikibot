@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-""" Script to create user files (user-config.py, user-fixes.py). """
+"""Script to create user files (user-config.py, user-fixes.py)."""
 #
 # (C) Pywikibot team, 2010-2014
 #

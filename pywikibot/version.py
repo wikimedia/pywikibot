@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-""" Module to determine the pywikibot version (tag, revision and date). """
+"""Module to determine the pywikibot version (tag, revision and date)."""
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2014
 # (C) xqt, 2010-2014
@@ -285,7 +285,7 @@ def getfileversion(filename):
 
 
 def package_versions(modules=None, builtins=False, standard_lib=None):
-    """ Retrieve package version information.
+    """Retrieve package version information.
 
     When builtins or standard_lib are None, they will be included only
     if a version was found in the package.

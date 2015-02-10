@@ -1001,7 +1001,7 @@ class Bot(object):
                 stdout(msg)
 
     def user_confirm(self, question):
-        """ Obtain user response if bot option 'always' not enabled. """
+        """Obtain user response if bot option 'always' not enabled."""
         if self.getOption('always'):
             return True
 

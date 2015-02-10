@@ -408,7 +408,7 @@ class TestTerminalOutputColorUnix(UITestCase):
             '\x1b[0m normal text\n\x1b[0m')
 
     def testOutputColorCascade_incorrect(self):
-        """ Test incorrect behavior of testOutputColorCascade. """
+        """Test incorrect behavior of testOutputColorCascade."""
         pywikibot.output(self.str2)
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(

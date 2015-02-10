@@ -63,7 +63,7 @@ docuReplacements = {
 
 class ProtectionRobot(Bot):
 
-    """ This bot allows protection of pages en masse. """
+    """This bot allows protection of pages en masse."""
 
     def __init__(self, generator, protections, **kwargs):
         """

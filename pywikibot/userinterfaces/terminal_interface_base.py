@@ -403,7 +403,7 @@ class TerminalHandler(logging.Handler):
         self.UI = UI
 
     def flush(self):
-        """Flush the stream. """
+        """Flush the stream."""
         self.stream.flush()
 
     def emit(self, record):

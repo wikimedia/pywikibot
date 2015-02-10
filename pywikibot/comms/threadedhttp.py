@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-""" Httplib2 threaded cookie layer.
+"""Httplib2 threaded cookie layer.
 
 This class extends httplib2, adding support for:
     - Cookies, guarded for cross-site redirects

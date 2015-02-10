@@ -234,7 +234,7 @@ class CommonscatBot(Bot):
         self.site = pywikibot.Site()
 
     def treat(self, page):
-        """ Load the given page, do some changes, and save it. """
+        """Load the given page, do some changes, and save it."""
         if not page.exists():
             pywikibot.output(u'Page %s does not exist. Skipping.'
                              % page.title(asLink=True))
@@ -342,7 +342,7 @@ class CommonscatBot(Bot):
     def changeCommonscat(self, page=None, oldtemplate=u'', oldcat=u'',
                          newtemplate=u'', newcat=u'', linktitle=u'',
                          description=NotImplemented):  # pylint: disable=unused-argument
-        """ Change the current commonscat template and target. """
+        """Change the current commonscat template and target."""
         if oldcat == '3=S' or linktitle == '3=S':
             return  # TODO: handle additional param on de-wiki
         if not linktitle and (page.title().lower() in oldcat.lower() or
@@ -437,7 +437,7 @@ class CommonscatBot(Bot):
         return None
 
     def checkCommonscatLink(self, name=""):
-        """ Return the name of a valid commons category.
+        """Return the name of a valid commons category.
 
         If the page is a redirect this function tries to follow it.
         If the page doesn't exists the function will return an empty string

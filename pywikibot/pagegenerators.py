@@ -1339,7 +1339,7 @@ class RegexFilter(object):
     @deprecated_args(inverse="quantifier")
     def titlefilter(cls, generator, regex, quantifier='any',
                     ignore_namespace=True):
-        """ Yield pages from another generator whose title matches regex.
+        """Yield pages from another generator whose title matches regex.
 
         Uses regex option re.IGNORECASE depending on the quantifier parameter.
 
@@ -2074,7 +2074,7 @@ class YahooSearchPageGenerator:
         self.site = site
 
     def queryYahoo(self, query):
-        """ Perform a query using python package 'pYsearch'. """
+        """Perform a query using python package 'pYsearch'."""
         try:
             from yahoo.search.web import WebSearch
         except ImportError:

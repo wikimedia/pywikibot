@@ -83,7 +83,7 @@ class PageInUse(pywikibot.Error):
 
 class LoginStatus(object):
 
-    """ Enum for Login statuses.
+    """Enum for Login statuses.
 
     >>> LoginStatus.NOT_ATTEMPTED
     -3
@@ -126,7 +126,7 @@ Family = redirect_func(pywikibot.family.Family.load,
 
 class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
-    """ Namespace site data object.
+    """Namespace site data object.
 
     This is backwards compatible with the structure of entries
     in site._namespaces which were a list of::
@@ -607,7 +607,7 @@ class BaseSite(ComparableMixin):
         return (self.family.name, self.code)
 
     def __getstate__(self):
-        """ Remove Lock based classes before pickling. """
+        """Remove Lock based classes before pickling."""
         new = self.__dict__.copy()
         del new['_pagemutex']
         if '_throttle' in new:
@@ -615,7 +615,7 @@ class BaseSite(ComparableMixin):
         return new
 
     def __setstate__(self, attrs):
-        """ Restore things removed in __getstate__. """
+        """Restore things removed in __getstate__."""
         self.__dict__.update(attrs)
         self._pagemutex = threading.Lock()
 
@@ -1019,7 +1019,7 @@ class BaseSite(ComparableMixin):
 
 
 def must_be(group=None, right=None):
-    """ Decorator to require a certain user status when method is called.
+    """Decorator to require a certain user status when method is called.
 
     @param group: The group the logged in user should belong to
                   this parameter can be overridden by
@@ -1055,7 +1055,7 @@ def must_be(group=None, right=None):
 
 
 def need_version(version):
-    """ Decorator to require a certain MediaWiki version number.
+    """Decorator to require a certain MediaWiki version number.
 
     @param version: the mw version number required
     @type version: str
@@ -1678,7 +1678,7 @@ class APISite(BaseSite):
                                class_name='APISite')
 
     def logout(self):
-        """ Logout of the site and load details for the logged out user.
+        """Logout of the site and load details for the logged out user.
 
         Also logs out of the global account if linked to the user.
         """
@@ -2020,7 +2020,7 @@ class APISite(BaseSite):
 
     @need_version("1.12")
     def expand_text(self, text, title=None, includecomments=None):
-        """ Parse the given text for preprocessing and rendering.
+        """Parse the given text for preprocessing and rendering.
 
         e.g expand templates and strip comments if includecomments
         parameter is not True. Keeps text inside
@@ -2165,7 +2165,7 @@ class APISite(BaseSite):
     @need_version("1.14")
     @deprecated("has_extension")
     def hasExtension(self, name, unknown=None):
-        """ Determine whether extension `name` is loaded.
+        """Determine whether extension `name` is loaded.
 
         Use L{has_extension} instead!
 
@@ -2182,7 +2182,7 @@ class APISite(BaseSite):
 
     @need_version("1.14")
     def has_extension(self, name):
-        """ Determine whether extension `name` is loaded.
+        """Determine whether extension `name` is loaded.
 
         @param name: The extension to check for, case insensitive
         @type name: str
@@ -3388,7 +3388,7 @@ class APISite(BaseSite):
         return self.allcategories(total=limit)
 
     def isBot(self, username):
-        """Return True is username is a bot user. """
+        """Return True is username is a bot user."""
         return username in [userdata['name'] for userdata in self.botusers()]
 
     def botusers(self, step=None, total=None):

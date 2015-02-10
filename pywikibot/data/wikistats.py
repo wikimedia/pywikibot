@@ -235,6 +235,6 @@ class WikiStats(object):
                       reverse=True)
 
     def languages_by_size(self, table):
-        """ Return ordered list of languages by size from WikiStats. """
+        """Return ordered list of languages by size from WikiStats."""
         # This assumes they appear in order of size in the WikiStats dump.
         return [d['prefix'] for d in self.get(table)]

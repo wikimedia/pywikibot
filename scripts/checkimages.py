@@ -638,7 +638,7 @@ class checkImagesBot(object):
 
     def report(self, newtext, image_to_report, notification=None, head=None,
                notification2=None, unver=True, commTalk=None, commImage=None):
-        """ Function to make the reports easier. """
+        """Function to make the reports easier."""
         self.image_to_report = image_to_report
         self.newtext = newtext
         self.head = head or u''
@@ -744,7 +744,7 @@ class checkImagesBot(object):
         return True
 
     def put_mex_in_talk(self):
-        """ Function to put the warning in talk page of the uploader."""
+        """Function to put the warning in talk page of the uploader."""
         commento2 = i18n.translate(self.site, msg_comm2, fallback=True)
         emailPageName = i18n.translate(self.site, emailPageWithText)
         emailSubj = i18n.translate(self.site, emailSubject)
@@ -937,7 +937,7 @@ class checkImagesBot(object):
         return True
 
     def checkImageDuplicated(self, duplicates_rollback):
-        """ Function to check the duplicated files. """
+        """Function to check the duplicated files."""
         dupText = i18n.translate(self.site, duplicatesText)
         dupRegex = i18n.translate(self.site, duplicatesRegex)
         dupTalkHead = i18n.translate(self.site, duplicate_user_talk_head)
@@ -1093,7 +1093,7 @@ class checkImagesBot(object):
 
     def report_image(self, image_to_report, rep_page=None, com=None,
                      rep_text=None, addings=True, regex=None):
-        """ Report the files to the report page when needed. """
+        """Report the files to the report page when needed."""
         if not rep_page:
             rep_page = self.rep_page
 
@@ -1149,7 +1149,7 @@ class checkImagesBot(object):
         return reported
 
     def takesettings(self):
-        """ Function to take the settings from the wiki. """
+        """Function to take the settings from the wiki."""
         settingsPage = i18n.translate(self.site, page_with_settings)
         try:
             if not settingsPage:
@@ -1404,7 +1404,7 @@ class checkImagesBot(object):
         return (self.license_found, self.whiteTemplatesFound)
 
     def load(self, raw):
-        """ Load a list of objects from a string using regex. """
+        """Load a list of objects from a string using regex."""
         list_loaded = []
         # I search with a regex how many user have not the talk page
         # and i put them in a list (i find it more easy and secure)
@@ -1417,7 +1417,7 @@ class checkImagesBot(object):
         return list_loaded
 
     def skipImages(self, skip_number, limit):
-        """ Given a number of files, skip the first -number- files. """
+        """Given a number of files, skip the first -number- files."""
         # If the images to skip are more the images to check, make them the
         # same number
         if skip_number == 0:
@@ -1516,7 +1516,7 @@ class checkImagesBot(object):
             return generator
 
     def isTagged(self):
-        """ Understand if a file is already tagged or not. """
+        """Understand if a file is already tagged or not."""
         # Is the image already tagged? If yes, no need to double-check, skip
         for i in i18n.translate(self.site, txt_find):
             # If there are {{ use regex, otherwise no (if there's not the

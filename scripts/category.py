@@ -953,7 +953,7 @@ class CategoryTidyRobot(pywikibot.Bot):
 
 class CategoryTreeRobot:
 
-    """ Robot to create tree overviews of the category structure.
+    """Robot to create tree overviews of the category structure.
 
     Parameters:
         * catTitle - The category which will be the tree's root.
@@ -976,7 +976,7 @@ class CategoryTreeRobot:
         self.site = pywikibot.Site()
 
     def treeview(self, cat, currentDepth=0, parent=None):
-        """ Return a tree view of all subcategories of cat.
+        """Return a tree view of all subcategories of cat.
 
         The multi-line string contains a tree view of all subcategories of cat,
         up to level maxDepth. Recursively calls itself.

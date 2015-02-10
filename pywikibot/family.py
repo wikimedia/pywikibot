@@ -1114,7 +1114,7 @@ class Family(object):
     # Which version of MediaWiki is used?
     @deprecated('APISite.version()')
     def version(self, code):
-        """ Return MediaWiki version number as a string.
+        """Return MediaWiki version number as a string.
 
         Use L{pywikibot.tools.MediaWikiVersion} to compare version strings.
         """
@@ -1143,7 +1143,7 @@ class Family(object):
 
     @deprecated("APISite.version()")
     def versionnumber(self, code):
-        """ DEPRECATED, use version() instead.
+        """DEPRECATED, use version() instead.
 
         Use L{pywikibot.tools.MediaWikiVersion} to compare version strings.
         Return an int identifying MediaWiki version.

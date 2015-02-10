@@ -62,12 +62,12 @@ class BasicBot:
         self.summary = i18n.twtranslate(site, 'basic-changing')
 
     def run(self):
-        """ Process each page from the generator. """
+        """Process each page from the generator."""
         for page in self.generator:
             self.treat(page)
 
     def treat(self, page):
-        """ Load the given page, does some changes, and saves it. """
+        """Load the given page, does some changes, and saves it."""
         text = self.load(page)
         if not text:
             return
@@ -84,7 +84,7 @@ class BasicBot:
             pywikibot.output(u'Page %s not saved.' % page.title(asLink=True))
 
     def load(self, page):
-        """ Load the text of the given page. """
+        """Load the text of the given page."""
         try:
             # Load the page
             text = page.get()
@@ -100,7 +100,7 @@ class BasicBot:
 
     def save(self, text, page, comment=None, minorEdit=True,
              botflag=True):
-        """ Update the given page with new text. """
+        """Update the given page with new text."""
         # only save if something was changed
         if text != page.get():
             # Show the title of the page we're working on.

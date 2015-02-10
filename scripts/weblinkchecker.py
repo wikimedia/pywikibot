@@ -501,7 +501,7 @@ class LinkChecker(object):
 
 class LinkCheckThread(threading.Thread):
 
-    """ A thread responsible for checking one URL.
+    """A thread responsible for checking one URL.
 
     After checking the page, it will die.
     """
@@ -654,7 +654,7 @@ class History:
             return False
 
     def save(self):
-        """ Save the .dat file to disk. """
+        """Save the .dat file to disk."""
         with open(self.datfilename, 'wb') as f:
             pickle.dump(self.historyDict, f, protocol=config.pickle_protocol)
 

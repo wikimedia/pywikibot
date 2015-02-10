@@ -498,7 +498,7 @@ class FeaturedBot(pywikibot.Bot):
         return add_templates, remove_templates
 
     def featuredWithInterwiki(self, fromsite, task):
-        """ Read featured articles and find the corresponding pages.
+        """Read featured articles and find the corresponding pages.
 
         Find corresponding pages on other sites, place the template and
         remember the page in the cache dict.

@@ -131,7 +131,7 @@ def downloadPhoto(photoUrl=''):
 
 def findDuplicateImages(photo=None,
                         site=pywikibot.Site(u'commons', u'commons')):
-    """ Find duplicate images.
+    """Find duplicate images.
 
     Take the photo, calculate the SHA1 hash and ask the MediaWiki api
     for a list of duplicates.
@@ -168,7 +168,7 @@ def getFlinfoDescription(photo_id=0):
 
 
 def getFilename(photoInfo=None, site=None, project=u'Flickr'):
-    """ Build a good filename for the upload based on the username and title.
+    """Build a good filename for the upload based on the username and title.
 
     Prevents naming collisions.
 
@@ -210,7 +210,7 @@ def getFilename(photoInfo=None, site=None, project=u'Flickr'):
 
 
 def cleanUpTitle(title):
-    """ Clean up the title of a potential MediaWiki page.
+    """Clean up the title of a potential MediaWiki page.
 
     Otherwise the title of the page might not be allowed by the software.
 
@@ -238,7 +238,7 @@ def cleanUpTitle(title):
 
 def buildDescription(flinfoDescription=u'', flickrreview=False, reviewer=u'',
                      override=u'', addCategory=u'', removeCategories=False):
-    """ Build the final description for the image.
+    """Build the final description for the image.
 
     The description is based on the info from flickrinfo and improved.
 
@@ -333,7 +333,7 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
 
 def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
               start_id='', end_id='', tags=u''):
-    """ Loop over a set of Flickr photos. """
+    """Loop over a set of Flickr photos."""
     found_start_id = not start_id
 
     # https://www.flickr.com/services/api/flickr.groups.pools.getPhotos.html

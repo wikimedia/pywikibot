@@ -1,1 +1,1 @@
-""" Test i18n data package. """
+"""Test i18n data package."""

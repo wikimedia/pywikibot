@@ -792,7 +792,7 @@ class EnglishWikipediaPageGeneratorIntersectTestCase(GeneratorIntersectTestCase)
 
 class LiveRCPageGeneratorTestCase(WikimediaDefaultSiteTestCase):
 
-    """ Test case for Live Recent Changes pagegenerator.
+    """Test case for Live Recent Changes pagegenerator.
 
     Works best on a busy site, as three changes are requested
     """

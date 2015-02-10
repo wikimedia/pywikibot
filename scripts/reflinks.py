@@ -472,7 +472,7 @@ class ReferencesRobot(Bot):
                          % (err_num, link, pagetitleaslink), toStdout=True)
 
     def getPDFTitle(self, ref, f):
-        """ Use pdfinfo to retrieve title from a PDF.
+        """Use pdfinfo to retrieve title from a PDF.
 
         FIXME: Unix-only, I'm afraid.
 

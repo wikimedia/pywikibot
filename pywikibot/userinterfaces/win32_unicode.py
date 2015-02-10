@@ -1,4 +1,4 @@
-""" Stdout, stderr and argv support for unicode. """
+"""Stdout, stderr and argv support for unicode."""
 ##############################################
 # Support for unicode in windows cmd.exe
 # Posted on Stack Overflow [1], available under CC-BY-SA [2]

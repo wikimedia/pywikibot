@@ -174,7 +174,7 @@ class OtherPageSaveError(PageSaveRelatedError):
     message = "Edit to page %(title)s failed:\n%(reason)s"
 
     def __init__(self, page, reason):
-        """ Constructor.
+        """Constructor.
 
         @param reason: Details of the problem
         @type reason: Exception or basestring
@@ -276,7 +276,7 @@ class InterwikiRedirectPage(PageRelatedError):
                u"Target page: %(target_page)s on %(target_site)s.")
 
     def __init__(self, page, target_page):
-        """ Constructor.
+        """Constructor.
 
         @param target_page: Target page of the redirect.
         @type reason: Page

@@ -49,7 +49,7 @@ docuReplacements = {
 
 class DeletionRobot(CurrentPageBot):
 
-    """ This robot allows deletion of pages en masse. """
+    """This robot allows deletion of pages en masse."""
 
     def __init__(self, generator, summary, **kwargs):
         """

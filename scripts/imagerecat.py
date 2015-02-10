@@ -74,7 +74,7 @@ def initLists():
 
 
 def categorizeImages(generator, onlyFilter, onlyUncat):
-    """ Loop over all images in generator and try to categorize them.
+    """Loop over all images in generator and try to categorize them.
 
     Get category suggestions from CommonSense.
 
@@ -113,7 +113,7 @@ def getCurrentCats(imagepage):
 
 
 def getCommonshelperCats(imagepage):
-    """ Get category suggestions from CommonSense.
+    """Get category suggestions from CommonSense.
 
     @rtype: list of unicode
 
@@ -290,7 +290,7 @@ def getUsage(use):
 
 
 def applyAllFilters(categories):
-    """ Apply all filters on categories. """
+    """Apply all filters on categories."""
     result = []
     result = filterDisambiguation(categories)
     result = followRedirects(result)
@@ -301,7 +301,7 @@ def applyAllFilters(categories):
 
 
 def filterBlacklist(categories):
-    """ Filter out categories which are on the blacklist. """
+    """Filter out categories which are on the blacklist."""
     result = []
     for cat in categories:
         cat = cat.replace('_', ' ')
@@ -311,7 +311,7 @@ def filterBlacklist(categories):
 
 
 def filterDisambiguation(categories):
-    """ Filter out disambiguation categories. """
+    """Filter out disambiguation categories."""
     result = []
     for cat in categories:
         if (not pywikibot.Page(pywikibot.Site(u'commons', u'commons'),
@@ -321,7 +321,7 @@ def filterDisambiguation(categories):
 
 
 def followRedirects(categories):
-    """ If a category is a redirect, replace the category with the target. """
+    """If a category is a redirect, replace the category with the target."""
     result = []
     for cat in categories:
         categoryPage = pywikibot.Page(pywikibot.Site(u'commons', u'commons'),
@@ -336,7 +336,7 @@ def followRedirects(categories):
 
 
 def filterCountries(categories):
-    """ Try to filter out ...by country categories.
+    """Try to filter out ...by country categories.
 
     First make a list of any ...by country categories and try to find some
     countries. If a by country category has a subcategoy containing one of the
@@ -369,7 +369,7 @@ def filterCountries(categories):
 
 
 def filterParents(categories):
-    """ Remove all parent categories from the set to prevent overcategorization. """
+    """Remove all parent categories from the set to prevent overcategorization."""
     result = []
     toFilter = u''
     for cat in categories:
@@ -394,7 +394,7 @@ def filterParents(categories):
 
 
 def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
-    """ Remove the old categories and add the new categories to the image. """
+    """Remove the old categories and add the new categories to the image."""
     newtext = textlib.removeCategoryLinks(imagepage.text, imagepage.site)
     if not onlyFilter:
         newtext = removeTemplates(newtext)

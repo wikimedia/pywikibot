@@ -1,4 +1,4 @@
-""" Module with the Graphviz drawing calls. """
+"""Module with the Graphviz drawing calls."""
 #
 # (C) Pywikibot team, 2006-2010
 #
