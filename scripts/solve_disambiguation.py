@@ -776,7 +776,7 @@ class DisambiguationRobot(Bot):
                 else:
                     if len(choice) > 0 and choice[0] == 'r':
                         # we want to throw away the original link text
-                        replaceit = True
+                        replaceit = link_text == page_title
                         choice = choice[1:]
                     elif include == "redirect":
                         replaceit = True
