@@ -7,6 +7,7 @@
 #
 __version__ = '$Id$'
 
+import os
 import sys
 
 import httplib2
@@ -16,6 +17,7 @@ import pywikibot
 from pywikibot import config2 as config
 from pywikibot.comms import http, threadedhttp
 
+from tests import _images_dir
 from tests.aspects import unittest, TestCase
 from tests.utils import expected_failure_if
 
@@ -412,6 +414,45 @@ class CharsetTestCase(TestCase):
         self.assertRaises(UnicodeDecodeError, lambda: req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
         self.assertRaises(UnicodeDecodeError, lambda: req.content)
+
+
+class BinaryTestCase(TestCase):
+
+    """Get binary file using httplib2 and pywikibot."""
+
+    net = True
+
+    url = 'https://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png'
+
+    @classmethod
+    def setUpClass(cls):
+        super(BinaryTestCase, cls).setUpClass()
+
+        with open(os.path.join(_images_dir, 'MP_sounds.png'), 'rb') as f:
+            cls.png = f.read()
+
+    def test_httplib2(self):
+        """Test with httplib2, underlying package."""
+        h = httplib2.Http()
+        r = h.request(uri=self.url)
+
+        self.assertEqual(r[0]['content-type'], 'image/png')
+        self.assertEqual(r[1], self.png)
+
+        next(iter(h.connections.values())).close()
+
+    def test_threadedhttp(self):
+        """Test with threadedhttp, internal layer on top of httplib2."""
+        r = threadedhttp.Http().request(uri=self.url)
+
+        self.assertEqual(r[0]['content-type'], 'image/png')
+        self.assertEqual(r[1], self.png)
+
+    def test_http(self):
+        """Test with http, standard http interface for pywikibot."""
+        r = http.fetch(uri=self.url)
+
+        self.assertEqual(r.raw, self.png)
 
 
 if __name__ == '__main__':
