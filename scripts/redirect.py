@@ -436,6 +436,9 @@ class RedirectRobot(Bot):
                     u'Redirect target %s is not a valid page title.'
                     % str(e)[10:])
                 pass
+            except pywikibot.InvalidTitle:
+                pywikibot.exception()
+                pass
             except pywikibot.NoPage:
                 movedTarget = self.moved_page(targetPage)
                 if movedTarget:
