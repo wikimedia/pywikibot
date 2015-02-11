@@ -1959,7 +1959,7 @@ class Page(BasePage):
 
         target_link = target_page.title(asLink=True, textlink=True,
                                         allowInterwiki=False)
-        target_link = '#{0} {1}'.format(self.site.redirect(), target_link)
+        target_link = u'#{0} {1}'.format(self.site.redirect(), target_link)
         self.text = prefix + target_link + suffix
         if kwargs:
             self.save(**kwargs)
