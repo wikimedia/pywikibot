@@ -131,7 +131,7 @@ class myRevertBot(BaseRevertBot):
         if 'top' in item:
             page = pywikibot.Page(self.site, item['title'])
             text = page.get(get_redirect=True)
-            pattern = re.compile(u'\[\[.+?:.+?\..+?\]\]', re.UNICODE)
+            pattern = re.compile(r'\[\[.+?:.+?\..+?\]\]', re.UNICODE)
             return pattern.search(text) >= 0
         return False
 

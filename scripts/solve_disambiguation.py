@@ -202,7 +202,7 @@ ignore_title = {
         'en': [
             u'Wikipedia:Links to disambiguating pages',
             u'Wikipedia:Disambiguation pages with links',
-            u'Wikipedia:Multiple-place names \([A-Z]\)',
+            u'Wikipedia:Multiple-place names \\([A-Z]\\)',
             u'Wikipedia:Non-unique personal name',
             u"User:Jerzy/Disambiguation Pages i've Editted",
             u'User:Gareth Owen/inprogress',
@@ -252,7 +252,7 @@ ignore_title = {
             # hu:Wikipédia:Kocsmafal (egyéb)#Hol nem kell egyértelműsíteni?
             # 2012-02-08
             u'Wikipédia:(?!Sportműhely/Eddigi cikkeink).*',
-            u'.*\(egyértelműsítő lap\)$',
+            u'.*\\(egyértelműsítő lap\\)$',
             u'.*[Vv]ita:.*',
             u'Szerkesztő:[^/]+$',
         ],
@@ -293,7 +293,7 @@ ignore_title = {
             u'Overleg Wikipedia:Logboek.*',
             u'Wikipedia:Logboek.*',
             u'Overleg gebruiker:Sybren/test.*',
-            u'Overleg gebruiker:[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?',
+            u'Overleg gebruiker:([0-9][0-9]?[0-9]?\\.){3}[0-9][0-9]?[0-9]?',
             u'Overleg:Lage Landen (staatkunde)',
             u'Wikipedia:.*[aA]rchief.*',
             u'Wikipedia:Doorverwijspagina',
@@ -757,7 +757,7 @@ class DisambiguationRobot(Bot):
                     search_text = text[m.end():m.end() + context]
                     # figure out where the link (and sentance) ends, put note
                     # there
-                    end_of_word_match = re.search("\s", search_text)
+                    end_of_word_match = re.search(r'\s', search_text)
                     if end_of_word_match:
                         position_split = end_of_word_match.start(0)
                     else:

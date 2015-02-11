@@ -117,7 +117,7 @@ class CaseChecker(object):
     latClrFnt = u'<font color=brown>'
     suffixClr = u'</font>'
 
-    wordBreaker = re.compile(u'[ _\-/\|#[\]():]')
+    wordBreaker = re.compile(r'[ _\-/\|#[\]():]')
     stripChars = u' \t,'
 
     titles = True

@@ -265,11 +265,11 @@ class TemplateRobot(Bot):
 
             if self.getOption('subst') and self.getOption('remove'):
                 replacements.append((templateRegex,
-                                     '{{subst:%s\g<parameters>}}' % new))
+                                     r'{{subst:%s\g<parameters>}}' % new))
                 exceptions['inside-tags'] = ['ref', 'gallery']
             elif self.getOption('subst'):
                 replacements.append((templateRegex,
-                                     '{{subst:%s\g<parameters>}}' % old))
+                                     r'{{subst:%s\g<parameters>}}' % old))
                 exceptions['inside-tags'] = ['ref', 'gallery']
             elif self.getOption('remove'):
                 replacements.append((templateRegex, ''))
@@ -281,7 +281,7 @@ class TemplateRobot(Bot):
                                               default=False, automatic_quit=False):
                         continue
                 replacements.append((templateRegex,
-                                     '{{%s\g<parameters>}}' % new))
+                                     r'{{%s\g<parameters>}}' % new))
 
         replaceBot = replace.ReplaceRobot(self.generator, replacements,
                                           exceptions, acceptall=self.getOption('always'),

@@ -280,7 +280,7 @@ def wiki_logger(buffer, page, rev=None):
     # (might be a problem here for TS and SGE, output string has another encoding)
     if False:
         buffer = buffer.decode(pywikibot.config.console_encoding)
-    buffer = re.sub("\03\{(.*?)\}(.*?)\03\{default\}", "\g<2>", buffer)
+    buffer = re.sub(r'\03\{(.*?)\}(.*?)\03\{default\}', r'\g<2>', buffer)
     if rev is None:
         rev = page.latestRevision()
         link = page.permalink(oldid=rev)

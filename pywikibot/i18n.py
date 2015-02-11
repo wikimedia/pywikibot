@@ -28,7 +28,7 @@ from . import config2 as config
 if sys.version_info[0] > 2:
     basestring = (str, )
 
-PLURAL_PATTERN = '{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
+PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
 # Package name for the translation messages
 messages_package_name = 'scripts.i18n'

@@ -3296,7 +3296,7 @@ class ItemPage(WikibasePage):
         # to the namespace case=first-letter.
 
         # Validate the title is 'Q' and a positive integer.
-        if not re.match('^Q[1-9]\d*$', self._link.title):
+        if not re.match(r'^Q[1-9]\d*$', self._link.title):
             raise pywikibot.InvalidTitle(
                 u"'%s' is not a valid item page title"
                 % self._link.title)

@@ -275,7 +275,7 @@ def getUsage(use):
     project = ''
     article = ''
     usageRe = re.compile(
-        '^(?P<lang>([\w-]+))\.(?P<project>([\w]+))\.org:(?P<articles>\s(.*))')
+        r'^(?P<lang>([\w-]+))\.(?P<project>([\w]+))\.org:(?P<articles>\s(.*))')
     matches = usageRe.search(use)
     if matches:
         if matches.group('lang'):
@@ -377,7 +377,7 @@ def filterParents(categories):
         toFilter = toFilter + "[[Category:" + cat + "]]\n"
     parameters = urlencode({'source': toFilter.encode('utf-8'),
                                    'bot': '1'})
-    filterCategoriesRe = re.compile('\[\[Category:([^\]]*)\]\]')
+    filterCategoriesRe = re.compile(r'\[\[Category:([^\]]*)\]\]')
     try:
         filterCategoriesPage = urlopen(
             "https://toolserver.org/~multichill/filtercats.php?%s" % parameters)
@@ -416,10 +416,11 @@ def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
 def removeTemplates(oldtext=u''):
     """Remove {{Uncategorized}} and {{Check categories}} templates."""
     result = re.sub(
-        u'\{\{\s*([Uu]ncat(egori[sz]ed( image)?)?|[Nn]ocat|[Nn]eedscategory)[^}]*\}\}', u'', oldtext)
+        r'{{\s*([Uu]ncat(egori[sz]ed( image)?)?|[Nn]ocat|[Nn]eedscategory)[^}]*}}',
+        u'', oldtext)
     result = re.sub(u'<!-- Remove this line once you have added categories -->',
                     u'', result)
-    result = re.sub(u'\{\{\s*[Cc]heck categories[^}]*\}\}', u'', result)
+    result = re.sub(r'\{\{\s*[Cc]heck categories[^}]*\}\}', u'', result)
     return result
 
 

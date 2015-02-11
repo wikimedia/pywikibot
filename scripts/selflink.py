@@ -53,7 +53,7 @@ class SelflinkBot(Bot):
         self.linkR = re.compile(
             r'\[\[(?P<title>[^\]\|#]*)'
             r'(?P<section>#[^\]\|]*)?'
-            '(\|(?P<label>[^\]]*))?\]\]'
+            r'(\|(?P<label>[^\]]*))?\]\]'
             r'(?P<linktrail>' + linktrail + ')')
 
     def handleNextLink(self, page, match, context=100):

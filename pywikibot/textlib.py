@@ -32,7 +32,8 @@ from pywikibot.family import Family
 from pywikibot.tools import OrderedDict
 
 TEMP_REGEX = re.compile(
-    '{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')
+    r'{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')
+
 NON_LATIN_DIGITS = {
     'ckb': u'٠١٢٣٤٥٦٧٨٩',
     'fa': u'۰۱۲۳۴۵۶۷۸۹',
@@ -174,8 +175,8 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         marker1 = findmarker(text)
         marker2 = findmarker(text, u'##', u'#')
         Rvalue = re.compile('{{{.+?}}}')
-        Rmarker1 = re.compile('%(mark)s(\d+)%(mark)s' % {'mark': marker1})
-        Rmarker2 = re.compile('%(mark)s(\d+)%(mark)s' % {'mark': marker2})
+        Rmarker1 = re.compile(r'%(mark)s(\d+)%(mark)s' % {'mark': marker1})
+        Rmarker2 = re.compile(r'%(mark)s(\d+)%(mark)s' % {'mark': marker2})
         # hide the flat template marker
         dontTouchRegexes.append(Rmarker1)
         origin = text
@@ -600,9 +601,9 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                     # Do we have a noinclude at the end of the template?
                     parts = s2.split(includeOff)
                     lastpart = parts[-1]
-                    if re.match('\s*%s' % marker, lastpart):
+                    if re.match(r'\s*%s' % marker, lastpart):
                         # Put the langlinks back into the noinclude's
-                        regexp = re.compile('%s\s*%s' % (includeOff, marker))
+                        regexp = re.compile(r'%s\s*%s' % (includeOff, marker))
                         newtext = regexp.sub(s + includeOff, s2)
                     else:
                         # Put the langlinks at the end, inside noinclude's
@@ -734,7 +735,7 @@ def removeCategoryLinks(text, site=None, marker=''):
                          site=site)
     if marker:
         # avoid having multiple linefeeds at the end of the text
-        text = re.sub('\s*%s' % re.escape(marker), config.LS + marker,
+        text = re.sub(r'\s*%s' % re.escape(marker), config.LS + marker,
                       text.strip())
     return text.strip()
 
@@ -920,12 +921,12 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     # Note: While allowing dots inside URLs, MediaWiki will regard
     # dots at the end of the URL as not part of that URL.
     # The same applies to comma, colon and some other characters.
-    notAtEnd = '\]\s\.:;,<>"\|\)'
+    notAtEnd = r'\]\s\.:;,<>"\|\)'
     # So characters inside the URL can be anything except whitespace,
     # closing squared brackets, quotation marks, greater than and less
     # than, and the last character also can't be parenthesis or another
     # character disallowed by MediaWiki.
-    notInside = '\]\s<>"'
+    notInside = r'\]\s<>"'
     # The first half of this regular expression is required because '' is
     # not allowed inside links. For example, in this wiki text:
     #       ''Please see https://www.example.org.''
@@ -1216,7 +1217,7 @@ def does_text_contain_section(pagetext, section):
 
     """
     # match preceding colon for text links
-    section = re.sub(r'\\\[\\\[(\\:)?', '\[\[\:?', re.escape(section))
+    section = re.sub(r'\\\[\\\[(\\:)?', r'\[\[\:?', re.escape(section))
     # match underscores and white spaces
     section = re.sub(r'\\?[ _]', '[ _]', section)
     m = re.search("=+[ ']*%s[ ']*=+" % section, pagetext)
