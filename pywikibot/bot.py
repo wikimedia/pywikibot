@@ -107,13 +107,13 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         """Strip trailing newlines before outputting text to file."""
         # Warnings captured from the warnings system are not processed by
         # logoutput(), so the 'context' variables are missing.
-        # The same context details are provided by Python 2.7, but need to
-        # be extracted from the warning message for Python 2.6.
+        # The same context details are provided by Python 3.X, but need to
+        # be extracted from the warning message for Python <= 2.7.
         if record.name == 'py.warnings' and 'caller_file' not in record.__dict__:
             assert(len(record.args) == 1)
             msg = record.args[0]
 
-            if sys.version_info < (2, 7):
+            if sys.version_info[0] < 3:
                 record.pathname = msg.partition(':')[0]
                 record.lineno = msg.partition(':')[2].partition(':')[0]
                 record.module = msg.rpartition('/')[2].rpartition('.')[0]
