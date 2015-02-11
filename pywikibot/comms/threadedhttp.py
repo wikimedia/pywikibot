@@ -477,9 +477,9 @@ class HttpRequest(UnicodeMixin):
             raise self._encoding
         return self._encoding
 
-    def decode(self, encoding):
+    def decode(self, encoding, errors='strict'):
         """Return the decoded response."""
-        return self.raw.decode(self.encoding)
+        return self.raw.decode(encoding, errors)
 
     @property
     def content(self):
