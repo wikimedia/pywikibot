@@ -626,7 +626,7 @@ class TestPageDelete(TestCase):
         p.markDeletedRevision(del_revs[-2])
         self.assertRaises(ValueError, p.markDeletedRevision, 123)
         p.undelete(reason='pywikibot unit test')
-        revs = list(p.getVersionHistory())
+        revs = list(p.revisions())
         self.assertEqual(len(revs), 2)
         self.assertEqual(revs[1].revid, revid)
 

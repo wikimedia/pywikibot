@@ -1258,14 +1258,14 @@ class TestSiteSysopWrite(TestCase):
                            revisions=[u'2014-12-21T06:07:47Z',
                                       u'2014-12-21T06:07:31Z'])
 
-        revs = list(p.getVersionHistory())
+        revs = list(p.revisions())
         self.assertEqual(len(revs), 2)
         self.assertEqual(revs[0].revid, 219995)
         self.assertEqual(revs[1].revid, 219994)
 
         site.deletepage(p, reason='pywikibot unit tests')
         site.undelete_page(p, 'pywikibot unit tests')
-        revs = list(p.getVersionHistory())
+        revs = list(p.revisions())
         self.assertTrue(len(revs) > 2)
 
 

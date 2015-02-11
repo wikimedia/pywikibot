@@ -198,12 +198,12 @@ class CategoryRedirectBot(pywikibot.Bot):
                 sorted(log_items.items(), reverse=True)[:LOG_SIZE - 1]]
         log_text = "\n".join("\n".join(line for line in text) for text in keep)
         # get permalink to older logs
-        history = self.log_page.getVersionHistory(total=LOG_SIZE)
+        history = list(self.log_page.revisions(total=LOG_SIZE))
         # get the id of the newest log being archived
-        rotate_revid = history[LOG_SIZE - 1][0]
+        rotate_revid = history[-1].revid
         # append permalink
-        log_text = log_text + ("\n\n'''[%s Older logs]'''"
-                               % self.log_page.permalink(oldid=rotate_revid))
+        log_text += ("\n\n'''[%s Older logs]'''"
+                     % self.log_page.permalink(oldid=rotate_revid))
         return log_text
 
     def check_hard_redirect(self):
