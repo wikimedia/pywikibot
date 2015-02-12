@@ -2446,6 +2446,74 @@ class Category(Page):
         """
         return self.site.categoryinfo(self)
 
+    def newest_pages(self, total=None):
+        """
+        Return pages in a category ordered by the creation date.
+
+        If two or more pages are created at the same time, the pages are
+        returned in the order they were added to the category. The most recently
+        added page is returned first.
+
+        It only allows to return the pages ordered from newest to oldest, as it
+        is impossible to determine the oldest page in a category without
+        checking all pages. But it is possible to check the category in order
+        with the newly added first and it yields all pages which were created
+        after the currently checked page was added (and thus there is no page
+        created after any of the cached but added before the currently checked).
+
+        @param total: The total number of pages queried.
+        @type total: int
+        @return: A page generator of all pages in a category ordered by the
+            creation date. From newest to oldest. Note: It currently only
+            returns Page instances and not a subclass of it if possible. This
+            might change so don't expect to only get Page instances.
+        @rtype: generator
+        """
+        def check_cache(latest):
+            """Return the cached pages in order and not more than total."""
+            cached = []
+            for timestamp in sorted((ts for ts in cache if ts > latest),
+                                    reverse=True):
+                # The complete list can be removed, it'll either yield all of
+                # them, or only a portion but will skip the rest anyway
+                cached += cache.pop(timestamp)[:None if total is None else
+                                                total - len(cached)]
+                if total and len(cached) >= total:
+                    break  # already got enough
+            assert(total is None or len(cached) <= total)
+            return cached
+
+        # all pages which have been checked but where created before the
+        # current page was added, at some point they will be created after
+        # the current page was added. It saves all pages via the creation
+        # timestamp. Be prepared for multiple pages.
+        cache = defaultdict(list)
+        # TODO: Make site.categorymembers is usable as it returns pages
+        # There is no total defined, as it's not known how many pages need to be
+        # checked before the total amount of new pages was found. In worst case
+        # all pages of a category need to be checked.
+        for member in pywikibot.data.api.QueryGenerator(
+                site=self.site, list='categorymembers', cmsort='timestamp',
+                cmdir='older', cmprop='timestamp|title',
+                cmtitle=self.title()):
+            # TODO: Upcast to suitable class
+            page = pywikibot.Page(self.site, member['title'])
+            assert(page.namespace() == member['ns'])
+            cached = check_cache(pywikibot.Timestamp.fromISOformat(
+                member['timestamp']))
+            for cached_page in cached:
+                yield cached_page
+            if total is not None:
+                total -= len(cached)
+                if total <= 0:
+                    break
+            cache[page.oldest_revision.timestamp] += [page]
+        else:
+            # clear cache
+            assert(total is None or total > 0)
+            for cached_page in check_cache(pywikibot.Timestamp.min):
+                yield cached_page
+
 # ### DEPRECATED METHODS ####
     @deprecated("list(Category.subcategories(...))")
     def subcategoriesList(self, recurse=False):
