@@ -128,26 +128,30 @@ ignorelist = [
     # Officially reserved for testing, documentation, etc. in
     # https://tools.ietf.org/html/rfc2606#page-2
     # top-level domains:
-    re.compile('.*[\./@]test(/.*)?'),
-    re.compile('.*[\./@]example(/.*)?'),
-    re.compile('.*[\./@]invalid(/.*)?'),
-    re.compile('.*[\./@]localhost(/.*)?'),
+    re.compile(r'.*[\./@]test(/.*)?'),
+    re.compile(r'.*[\./@]example(/.*)?'),
+    re.compile(r'.*[\./@]invalid(/.*)?'),
+    re.compile(r'.*[\./@]localhost(/.*)?'),
     # second-level domains:
-    re.compile('.*[\./@]example\.com(/.*)?'),
-    re.compile('.*[\./@]example\.net(/.*)?'),
-    re.compile('.*[\./@]example\.org(/.*)?'),
+    re.compile(r'.*[\./@]example\.com(/.*)?'),
+    re.compile(r'.*[\./@]example\.net(/.*)?'),
+    re.compile(r'.*[\./@]example\.org(/.*)?'),
 
     # Other special cases
-    re.compile('.*[\./@]gso\.gbv\.de(/.*)?'),  # bot somehow can't handle their redirects
-    re.compile('.*[\./@]berlinonline\.de(/.*)?'),
+    # bot somehow can't handle their redirects:
+    re.compile(r'.*[\./@]gso\.gbv\.de(/.*)?'),
+    re.compile(r'.*[\./@]berlinonline\.de(/.*)?'),
     # above entry to be manually fixed per request at [[de:Benutzer:BLueFiSH.as/BZ]]
-    re.compile('.*[\./@]bodo\.kommune\.no(/.*)?'),  # bot can't handle their redirects
-    re.compile('.*[\./@]jpl\.nasa\.gov(/.*)?'),  # bot rejected on the site
-    re.compile('.*[\./@]itis\.gov(/.*)?'),  # bot rejected on the site
-    re.compile('.*[\./@]cev\.lu(/.*)?'),  # bot rejected on the site
-    re.compile('.*[\./@]science\.ksc\.nasa\.gov(/.*)?'),  # very slow response resulting in bot error
-    re.compile('.*[\./@]britannica\.com(/.*)?'),  # HTTP redirect loop
-    re.compile('.*[\./@]quickfacts\.census\.gov(/.*)?'),  # bot rejected on the site
+    # bot can't handle their redirects:
+    re.compile(r'.*[\./@]bodo\.kommune\.no(/.*)?'),
+    re.compile(r'.*[\./@]jpl\.nasa\.gov(/.*)?'),  # bot rejected on the site
+    re.compile(r'.*[\./@]itis\.gov(/.*)?'),  # bot rejected on the site
+    re.compile(r'.*[\./@]cev\.lu(/.*)?'),  # bot rejected on the site
+    # very slow response resulting in bot error:
+    re.compile(r'.*[\./@]science\.ksc\.nasa\.gov(/.*)?'),
+    re.compile(r'.*[\./@]britannica\.com(/.*)?'),  # HTTP redirect loop
+    # bot rejected on the site:
+    re.compile(r'.*[\./@]quickfacts\.census\.gov(/.*)?'),
 ]
 
 

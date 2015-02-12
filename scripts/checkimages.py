@@ -561,6 +561,17 @@ project_inserted = ['ar', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
 
 # END OF CONFIGURATION.
 
+SETTINGS_REGEX = re.compile(r"""
+<-------\ ------->\n
+\*[Nn]ame\ ?=\ ?['"](.*?)['"]\n
+\*([Ff]ind|[Ff]indonly)\ ?=\ ?(.*?)\n
+\*[Ii]magechanges\ ?=\ ?(.*?)\n
+\*[Ss]ummary\ ?=\ ?['"](.*?)['"]\n
+\*[Hh]ead\ ?=\ ?['"](.*?)['"]\n
+\*[Tt]ext\ ?=\ ?['"](.*?)['"]\n
+\*[Mm]ex\ ?=\ ?['"]?([^\n]*?)['"]?\n
+""", re.UNICODE | re.DOTALL | re.VERBOSE)
+
 
 class LogIsFull(pywikibot.Error):
 
@@ -603,7 +614,7 @@ class checkImagesBot(object):
         self.comment = i18n.translate(self.site, msg_comm, fallback=True)
         # Adding the bot's nickname at the notification text if needed.
         botolist = i18n.translate(self.site, bot_list)
-        project = pywikibot.Site().family.name
+        project = site.family.name
         self.project = project
         bot = config.usernames[project]
         try:
@@ -1159,19 +1170,9 @@ class checkImagesBot(object):
                 self.settingsData = list()
                 try:
                     testo = wikiPage.get()
-                    r = re.compile(
-                        r"<------- ------->\n"
-                        "\*[Nn]ame ?= ?['\"](.*?)['\"]\n"
-                        "\*([Ff]ind|[Ff]indonly)=(.*?)\n"
-                        "\*[Ii]magechanges=(.*?)\n"
-                        "\*[Ss]ummary=['\"](.*?)['\"]\n"
-                        "\*[Hh]ead=['\"](.*?)['\"]\n"
-                        "\*[Tt]ext ?= ?['\"](.*?)['\"]\n"
-                        "\*[Mm]ex ?= ?['\"]?([^\n]*?)['\"]?\n",
-                        re.UNICODE | re.DOTALL)
                     number = 1
 
-                    for m in r.finditer(testo):
+                    for m in SETTINGS_REGEX.finditer(testo):
                         name = str(m.group(1))
                         find_tipe = str(m.group(2))
                         find = str(m.group(3))
@@ -1185,7 +1186,7 @@ class checkImagesBot(object):
                         self.settingsData += [tupla]
                         number += 1
 
-                    if self.settingsData == list():
+                    if not self.settingsData:
                         pywikibot.output(
                             u"You've set wrongly your settings, please take a "
                             u"look to the relative page. (run without them)")

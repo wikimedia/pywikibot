@@ -303,7 +303,7 @@ class CategoryAddBot(Bot):
         site = pagelink.site
         # regular expression that matches a name followed by a space and
         # disambiguation brackets. Group 1 is the name without the rest.
-        bracketsR = re.compile('(.*) \(.+?\)')
+        bracketsR = re.compile(r'(.*) \(.+?\)')
         match_object = bracketsR.match(page_name)
         if match_object:
             page_name = match_object.group(1)

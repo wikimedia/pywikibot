@@ -398,7 +398,7 @@ class WbTime(object):
     @classmethod
     def fromTimestr(cls, datetimestr, precision=14, before=0, after=0,
                     timezone=0, calendarmodel=None, site=None):
-        match = re.match('([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
+        match = re.match(r'([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
                          datetimestr)
         if not match:
             raise ValueError(u"Invalid format: '%s'" % datetimestr)

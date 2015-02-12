@@ -627,9 +627,9 @@ class ReplaceRobot(Bot):
 
 def prepareRegexForMySQL(pattern):
     """Convert regex to MySQL syntax."""
-    pattern = pattern.replace('\s', '[:space:]')
-    pattern = pattern.replace('\d', '[:digit:]')
-    pattern = pattern.replace('\w', '[:alnum:]')
+    pattern = pattern.replace(r'\s', '[:space:]')
+    pattern = pattern.replace(r'\d', '[:digit:]')
+    pattern = pattern.replace(r'\w', '[:alnum:]')
 
     pattern = pattern.replace("'", "\\" + "'")
     # pattern = pattern.replace('\\', '\\\\')

@@ -155,7 +155,10 @@ class ImageRobot(Bot):
 
         if self.new_image:
             if not self.getOption('loose'):
-                replacements.append((image_regex, '[[' + self.site.image_namespace() + ':' + self.new_image + '\g<parameters>]]'))
+                replacements.append((image_regex,
+                                     u'[[%s:%s\\g<parameters>]]'
+                                     % (self.site.image_namespace(),
+                                        self.new_image)))
             else:
                 replacements.append((image_regex, self.new_image))
         else:

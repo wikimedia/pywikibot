@@ -122,7 +122,7 @@ dirIndex = re.compile(
 # Extracts the domain name
 domain = re.compile(r'^(\w+)://(?:www.|)([^/]+)')
 
-globalbadtitles = """
+globalbadtitles = r"""
 # is
 (test|
 # starts with
@@ -304,11 +304,11 @@ class DuplicateReferences:
     def __init__(self):
         # Match references
         self.REFS = re.compile(
-            u'(?i)<ref(?P<params>[^>/]*)>(?P<content>.*?)</ref>')
+            r'(?i)<ref(?P<params>[^>/]*)>(?P<content>.*?)</ref>')
         self.NAMES = re.compile(
-            u'(?i).*name\s*=\s*(?P<quote>"?)\s*(?P<name>.+)\s*(?P=quote).*')
+            r'(?i).*name\s*=\s*(?P<quote>"?)\s*(?P<name>.+)\s*(?P=quote).*')
         self.GROUPS = re.compile(
-            u'(?i).*group\s*=\s*(?P<quote>"?)\s*(?P<group>.+)\s*(?P=quote).*')
+            r'(?i).*group\s*=\s*(?P<quote>"?)\s*(?P<group>.+)\s*(?P=quote).*')
         self.autogen = i18n.twtranslate(pywikibot.Site(), 'reflinks-autogen')
 
     def process(self, text):
@@ -401,7 +401,7 @@ class DuplicateReferences:
             if v[1]:
                 name = u'"%s"' % name
             text = re.sub(
-                u'<ref name\s*=\s*(?P<quote>"?)\s*%s\s*(?P=quote)\s*/>' % k,
+                u'<ref name\\s*=\\s*(?P<quote>"?)\\s*%s\\s*(?P=quote)\\s*/>' % k,
                 u'<ref name=%s />' % name, text)
         return text
 
@@ -662,7 +662,7 @@ class ReferencesRobot(Bot):
                         s = self.CHARSET.search(tag)
                 if s:
                     tmp = s.group('enc').strip("\"' ").lower()
-                    naked = re.sub('[ _\-]', '', tmp)
+                    naked = re.sub(r'[ _\-]', '', tmp)
                     # Convert to python correct encoding names
                     if naked == "gb2312":
                         enc.append("gbk")

@@ -186,7 +186,7 @@ def str2size(string):
     'B' (bytes) or 'T' (threads).
 
     """
-    r = re.search('(\d+) *([BkKMT]?)', string)
+    r = re.search(r'(\d+) *([BkKMT]?)', string)
     val, unit = (int(r.group(1)), r.group(2))
     if unit == 'M':
         val *= 1024

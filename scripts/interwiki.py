@@ -1850,7 +1850,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         interwikis = [pywikibot.Page(l) for l in page.iterlanglinks()]
 
         # remove interwiki links to ignore
-        for iw in re.finditer('<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
+        for iw in re.finditer(r'<!-- *\[\[(.*?:.*?)\]\] *-->', pagetext):
             try:
                 ignorepage = pywikibot.Page(page.site, iw.groups()[0])
                 if (new[ignorepage.site] == ignorepage) and \

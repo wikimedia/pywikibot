@@ -143,10 +143,10 @@ moved_links = {
 deprecatedTemplates = {
     'wikipedia': {
         'de': [
-            (u'Belege', u'Belege fehlen\g<parameters>'),
-            (u'Quelle', u'Belege fehlen\g<parameters>'),
-            (u'Quellen', u'Belege fehlen\g<parameters>'),
-            (u'Quellen fehlen', u'Belege fehlen\g<parameters>'),
+            (u'Belege', u'Belege fehlen\\g<parameters>'),
+            (u'Quelle', u'Belege fehlen\\g<parameters>'),
+            (u'Quellen', u'Belege fehlen\\g<parameters>'),
+            (u'Quellen fehlen', u'Belege fehlen\\g<parameters>'),
         ],
     }
 }
@@ -337,7 +337,7 @@ class CosmeticChangesToolkit:
             # Removing the stars' issue
             starstext = textlib.removeDisabledParts(text)
             for star in starsList:
-                regex = re.compile('(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
+                regex = re.compile(r'(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
                                    % star, re.I)
                 found = regex.findall(starstext)
                 if found != []:
@@ -431,8 +431,8 @@ class CosmeticChangesToolkit:
                 text = textlib.replaceExcept(
                     text,
                     r'\[\[(?P<left>.+?:.+?\..+?\|) *(' + '|'.join(aliases) +
-                    ') *(?P<right>(\|.*?)?\]\])',
-                    r'[[\g<left>' + aliases[0] + '\g<right>', exceptions)
+                    r') *(?P<right>(\|.*?)?\]\])',
+                    r'[[\g<left>' + aliases[0] + r'\g<right>', exceptions)
         return text
 
     def cleanUpLinks(self, text):
@@ -637,7 +637,7 @@ class CosmeticChangesToolkit:
             text = textlib.replaceExcept(
                 text,
                 r'(?m)^(?P<bullet>[:;]*(\*+|#+)[:;\*#]*)(?P<char>[^\s\*#:;].+?)',
-                '\g<bullet> \g<char>',
+                r'\g<bullet> \g<char>',
                 exceptions)
         return text
 
@@ -809,8 +809,8 @@ class CosmeticChangesToolkit:
         # do not change inside file links
         namespaces = list(self.site.namespace(6, all=True))
         pattern = re.compile(
-            u'\[\[(' + '|'.join(namespaces) +
-            '):.+?\.\w+? *(\|((\[\[.*?\]\])|.)*)?\]\]',
+            u'\\[\\[(%s):.+?\\.\\w+? *(\\|((\\[\\[.*?\\]\\])|.)*)?\\]\\]'
+            % u'|'.join(namespaces),
             re.UNICODE)
         # not to let bot edits in latin content
         exceptions.append(re.compile(u"[^%(fa)s] *?\"*? *?, *?[^%(fa)s]"
@@ -834,7 +834,7 @@ class CosmeticChangesToolkit:
         for i in range(0, 10):
             text = textlib.replaceExcept(text, old[i], new[i], exceptions)
         # do not change digits in class, style and table params
-        pattern = re.compile(u'\w+=(".+?"|\d+)', re.UNICODE)
+        pattern = re.compile(r'\w+=(".+?"|\d+)', re.UNICODE)
         exceptions.append(pattern)
         # do not change digits inside html-tags
         pattern = re.compile(u'<[/]*?[^</]+?[/]*?>', re.UNICODE)

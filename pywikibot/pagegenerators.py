@@ -730,7 +730,7 @@ class GeneratorFactory(object):
             p = re.compile(r'(?<!\\),')  # Match "," only if there no "\" before
             temp = []  # Array to store split argument
             for arg in p.split(claim):
-                temp.append(arg.replace('\,', ',').split('='))
+                temp.append(arg.replace(r'\,', ',').split('='))
             self.claimfilter_list.append((temp[0][0], temp[0][1],
                                           dict(temp[1:]), ifnot))
             return True
