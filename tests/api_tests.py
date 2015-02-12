@@ -321,6 +321,7 @@ class TestDryPageGenerator(TestCase):
               "Wikipedia:Disambiguation")
 
     def setUp(self):
+        """Set up test case."""
         super(TestDryPageGenerator, self).setUp()
         mysite = self.get_site()
         self.gen = api.PageGenerator(site=mysite,
@@ -352,8 +353,8 @@ class TestDryPageGenerator(TestCase):
 
         # On a dry site, the namespace objects only have canonical names.
         # Add custom_name for this site namespace, to match the live site.
-        if 'Wikipedia' not in self.site._namespaces:
-            self.site._namespaces[4].custom_name = 'Wikipedia'
+        if 'Wikipedia' not in self.site.namespaces:
+            self.site.namespaces[4].custom_name = 'Wikipedia'
 
     def test_results(self):
         """Test that PageGenerator yields pages with expected attributes."""
@@ -398,6 +399,12 @@ class TestDryPageGenerator(TestCase):
         self.gen.set_maximum_items(-1)
         self.assertPagelistTitles(self.gen, self.titles)
 
+    def test_namespace(self):
+        """Test PageGenerator set_namespace."""
+        self.assertRaises(AssertionError, self.gen.set_namespace, 0)
+        self.assertRaises(AssertionError, self.gen.set_namespace, 1)
+        self.assertRaises(AssertionError, self.gen.set_namespace, None)
+
 
 class TestPropertyGenerator(TestCase):
 
@@ -407,6 +414,7 @@ class TestPropertyGenerator(TestCase):
     code = 'en'
 
     def test_info(self):
+        """Test PropertyGenerator with prop 'info'."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
         titles = [l.title(withSection=False)
@@ -424,6 +432,7 @@ class TestPropertyGenerator(TestCase):
         self.assertEqual(len(links), count)
 
     def test_one_continuation(self):
+        """Test PropertyGenerator with prop 'revisions'."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
         titles = [l.title(withSection=False)
@@ -443,6 +452,7 @@ class TestPropertyGenerator(TestCase):
         self.assertEqual(len(links), count)
 
     def test_two_continuations(self):
+        """Test PropertyGenerator with prop 'revisions' and 'coordinates'."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
         titles = [l.title(withSection=False)
@@ -463,6 +473,7 @@ class TestPropertyGenerator(TestCase):
 
     @allowed_failure
     def test_many_continuations_limited(self):
+        """Test PropertyGenerator with many limited props."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=30))
         titles = [l.title(withSection=False)
@@ -487,6 +498,7 @@ class TestPropertyGenerator(TestCase):
 
     @allowed_failure
     def test_two_continuations_limited(self):
+        """Test PropertyGenerator with many limited props and continuations."""
         # FIXME: test fails
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=30))
@@ -525,6 +537,36 @@ class TestPropertyGenerator(TestCase):
             self.assertIn('pageid', pagedata)
             count += 1
         self.assertEqual(len(links), count)
+
+
+class TestDryListGenerator(TestCase):
+
+    """Test ListGenerator."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def setUp(self):
+        """Set up test case."""
+        super(TestDryListGenerator, self).setUp()
+        mysite = self.get_site()
+        mysite._paraminfo['allpages'] = {
+            'prefix': 'ap',
+            'limit': {'max': 10},
+            'namespace': {'multi': True}
+        }
+        mysite._paraminfo.query_modules_with_limits = set(['allpages'])
+        self.gen = api.ListGenerator(listaction="allpages", site=mysite)
+
+    def test_namespace_none(self):
+        """Test ListGenerator set_namespace with None."""
+        self.assertRaises(TypeError, self.gen.set_namespace, None)
+
+    def test_namespace_zero(self):
+        """Test ListGenerator set_namespace with 0."""
+        self.gen.set_namespace(0)
 
 
 class TestCachedRequest(DefaultSiteTestCase):

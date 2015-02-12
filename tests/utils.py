@@ -89,35 +89,23 @@ class DryParamInfo(dict):
 
     """Dummy class to use instead of L{pywikibot.data.api.ParamInfo}."""
 
-    @property
-    def modules(self):
-        """Empty set."""
-        return set()
+    def __init__(self, *args, **kwargs):
+        """Constructor."""
+        super(DryParamInfo, self).__init__(*args, **kwargs)
+        self.modules = set()
+        self.action_modules = set()
+        self.query_modules = set()
+        self.query_modules_with_limits = set()
+        self.prefixes = set()
 
-    @property
-    def action_modules(self):
-        """Empty set."""
-        return set()
-
-    @property
-    def query_modules(self):
-        """Empty set."""
-        return set()
-
-    @property
-    def query_modules_with_limits(self):
-        """Empty set."""
-        return set()
-
-    @property
-    def prefixes(self):
-        """Empty set."""
-        return set()
+    def fetch(self, modules, _init=False):
+        """Prevented method."""
+        raise Exception(u'DryParamInfo.fetch(%r, %r) prevented'
+                        % (modules, _init))
 
     def parameter(self, module, param_name):
-        """Prevented method."""
-        raise Exception(u'DryParamInfo.parameter(%r, %r) prevented'
-                        % (module, param_name))
+        """Load dry data."""
+        return self[module][param_name]
 
 
 class DummySiteinfo():
@@ -125,15 +113,19 @@ class DummySiteinfo():
     """Dummy class to use instead of L{pywikibot.site.Siteinfo}."""
 
     def __init__(self, cache):
+        """Constructor."""
         self._cache = dict((key, (item, False)) for key, item in cache.items())
 
     def __getitem__(self, key):
+        """Get item."""
         return self.get(key, False)
 
     def __setitem__(self, key, value):
+        """Set item."""
         self._cache[key] = (value, False)
 
     def get(self, key, get_default=True, cache=True, expiry=False):
+        """Return dry data."""
         # Default values are always expired, so only expiry=False doesn't force
         # a reload
         force = expiry is not False
@@ -152,12 +144,15 @@ class DummySiteinfo():
             raise KeyError(key)
 
     def __contains__(self, key):
+        """Return False."""
         return False
 
     def is_recognised(self, key):
+        """Return None."""
         return None
 
     def get_requested_time(self, key):
+        """Return False."""
         return False
 
 
@@ -166,6 +161,7 @@ class DryRequest(CachedRequest):
     """Dummy class to use instead of L{pywikibot.data.api.Request}."""
 
     def __init__(self, *args, **kwargs):
+        """Constructor."""
         _original_Request.__init__(self, *args, **kwargs)
 
     def _expired(self, dt):
@@ -177,6 +173,7 @@ class DryRequest(CachedRequest):
         return
 
     def submit(self):
+        """Prevented method."""
         raise Exception(u'DryRequest rejecting request: %r'
                         % self._params)
 
@@ -204,6 +201,7 @@ class DrySite(pywikibot.site.APISite):
 
     @property
     def userinfo(self):
+        """Return dry data."""
         return self._userinfo
 
     def version(self):
@@ -213,6 +211,7 @@ class DrySite(pywikibot.site.APISite):
         return '1.24'
 
     def case(self):
+        """Return case-sensitive if wiktionary."""
         if self.family.name == 'wiktionary':
             return 'case-sensitive'
         else:

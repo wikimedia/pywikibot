@@ -298,6 +298,25 @@ class TestSiteObject(DefaultSiteTestCase):
         if a:
             self.assertEqual(a[0], mainpage)
 
+
+class TestSiteGenerators(DefaultSiteTestCase):
+
+    """Test cases for Site methods."""
+
+    cached = True
+
+    def test_generator_namespace(self):
+        """Test site._generator with namespaces."""
+        site = self.get_site()
+        gen = site._generator(pywikibot.data.api.PageGenerator,
+                              type_arg='backlinks',
+                              namespaces=None)
+        self.assertTrue('gblnamespace' not in gen.request)
+        gen = site._generator(pywikibot.data.api.PageGenerator,
+                              type_arg='backlinks',
+                              namespaces=1)
+        self.assertEqual(gen.request['gblnamespace'], [1])
+
     def testLinkMethods(self):
         """Test site methods for getting links to and from a page."""
         mysite = self.get_site()

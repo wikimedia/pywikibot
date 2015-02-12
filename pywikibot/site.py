@@ -32,9 +32,8 @@ import pywikibot.family
 from pywikibot.tools import (
     itergroup, UnicodeMixin, ComparableMixin, SelfCallDict, SelfCallString,
     deprecated, deprecate_arg, deprecated_args, remove_last_args,
-    redirect_func, manage_wrapping,
+    redirect_func, manage_wrapping, MediaWikiVersion,
 )
-from pywikibot.tools import MediaWikiVersion
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -2952,18 +2951,16 @@ class APISite(BaseSite):
                                 step=step, total=total, g_content=content)
         return tlgen
 
-    def categorymembers(self, category, namespaces=None, sortby="",
+    def categorymembers(self, category, namespaces=None, sortby=None,
                         reverse=False, starttime=None, endtime=None,
                         startsort=None, endsort=None, step=None, total=None,
-                        content=False):
+                        content=False, member_type=None):
         """Iterate members of specified category.
 
         @param category: The Category to iterate.
         @param namespaces: If present, only return category members from
-            these namespaces. For example, use namespaces=[14] to yield
-            subcategories, use namespaces=[6] to yield image files, etc. Note,
-            however, that the iterated values are always Page objects, even
-            if in the Category or Image namespace.
+            these namespaces. To yield subcategories or files, use
+            parameter member_type instead.
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types.  May be a '|' separated
             list of namespace identifiers.
@@ -2988,6 +2985,12 @@ class APISite(BaseSite):
         @type endsort: str
         @param content: if True, load the current content of each iterated page
             (default False)
+        @type content: bool
+        @param member_type: member type; if member_type includes 'page' and is
+            used in conjunction with sortby="timestamp", the API may limit
+            results to only pages in the first 50 namespaces.
+        @type member_type: str or iterable of str; values: page, subcat, file
+
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -3004,14 +3007,61 @@ class APISite(BaseSite):
             cmargs["gcmsort"] = sortby
         elif sortby:
             raise ValueError(
-                "categorymembers: invalid sortby value '%(sortby)s'"
-                % locals())
+                "categorymembers: invalid sortby value '%s'"
+                % sortby)
         if starttime and endtime and starttime > endtime:
             raise ValueError(
                 "categorymembers: starttime must be before endtime")
         if startsort and endsort and startsort > endsort:
             raise ValueError(
                 "categorymembers: startsort must be less than endsort")
+
+        if isinstance(member_type, basestring):
+            member_type = set([member_type])
+
+        if (member_type and
+                (sortby == 'timestamp' or
+                 MediaWikiVersion(self.version()) < MediaWikiVersion("1.12"))):
+            # Retrofit cmtype/member_type, available on MW API 1.12+,
+            # to use namespaces available on earlier versions.
+
+            # Covert namespaces to a known type
+            namespaces = set(Namespace.resolve(namespaces or [],
+                                               self.namespaces()))
+
+            if 'page' in member_type:
+                excluded_namespaces = set()
+                if 'file' not in member_type:
+                    excluded_namespaces.add(6)
+                if 'subcat' not in member_type:
+                    excluded_namespaces.add(14)
+
+                if namespaces:
+                    if excluded_namespaces.intersect(namespaces):
+                        raise ValueError(
+                            'incompatible namespaces %r and member_type %r'
+                            % (namespaces, member_type))
+                    # All excluded namespaces are not present in `namespaces`.
+                else:
+                    # If the number of namespaces is greater than permitted by
+                    # the API, it will issue a warning and use the namespaces
+                    # up until the limit, which will usually be sufficient.
+                    # TODO: QueryGenerator should detect when the number of
+                    # namespaces requested is higher than available, and split
+                    # the request into several batches.
+                    excluded_namespaces.add([-1, -2])
+                    namespaces = set(self.namespaces()) - excluded_namespaces
+            else:
+                if 'file' in member_type:
+                    namespaces.add(6)
+                if 'subcat' in member_type:
+                    namespaces.add(14)
+
+            member_type = None
+
+        if member_type:
+            cmargs['gcmtype'] = member_type
+
         if reverse:
             cmargs["gcmdir"] = "desc"
             # API wants start/end params in opposite order if using descending
