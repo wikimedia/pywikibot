@@ -229,18 +229,31 @@ def concat_options(message, line_length, options):
 
 class LazyRegex(object):
 
-    """Regex object that compiles the regex on usage."""
+    """
+    Regex object that obtains and compiles the regex on usage.
 
-    def __init__(self):
-        """Constructor."""
-        self._raw = None
-        self._flags = None
-        self._compiled = None
+    Instances behave like the object created using L{re.compile}.
+    """
+
+    def __init__(self, pattern, flags=0):
+        """
+        Constructor.
+
+        @param pattern: L{re} regex pattern
+        @type pattern: str or callable
+        @param flags: L{re.compile} flags
+        @type flags: int
+        """
+        self.raw = pattern
+        self.flags = flags
         super(LazyRegex, self).__init__()
 
     @property
     def raw(self):
         """Get raw property."""
+        if callable(self._raw):
+            self._raw = self._raw()
+
         return self._raw
 
     @raw.setter
@@ -264,7 +277,7 @@ class LazyRegex(object):
         """Compile the regex and delegate all attribute to the regex."""
         if self._raw:
             if not self._compiled:
-                self._compiled = re.compile(self._raw, self._flags)
+                self._compiled = re.compile(self.raw, self.flags)
 
             if hasattr(self._compiled, attr):
                 return getattr(self._compiled, attr)
@@ -273,6 +286,34 @@ class LazyRegex(object):
                                  % (self.__class__.__name__, attr))
         else:
             raise AttributeError('%s.raw not set' % self.__class__.__name__)
+
+
+class DeprecatedRegex(LazyRegex):
+
+    """Regex object that issues a deprecation notice."""
+
+    def __init__(self, pattern, flags=0, name=None, instead=None):
+        """
+        Constructor.
+
+        If name is None, the regex pattern will be used as part of
+        the deprecation warning.
+
+        @param name: name of the object that is deprecated
+        @type name: str or None
+        @param instead: if provided, will be used to specify the replacement
+            of the deprecated name
+        @type instead: str
+        """
+        super(DeprecatedRegex, self).__init__(pattern, flags)
+        self._name = name or self.raw
+        self._instead = instead
+
+    def __getattr__(self, attr):
+        """Issue deprecation warning."""
+        issue_deprecation_warning(
+            self._name, self._instead, 2)
+        return super(DeprecatedRegex, self).__getattr__(attr)
 
 
 def first_lower(string):

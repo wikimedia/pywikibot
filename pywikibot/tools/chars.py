@@ -56,10 +56,9 @@ _category_cf = frozenset([
 # At the moment we've only added the characters from the Cf category
 _invisible_chars = frozenset(_category_cf)
 
-# TODO: Is that complex and a lazy regex justified?
-invisible_regex = LazyRegex()
-invisible_regex.raw = '[' + ''.join(_invisible_chars) + ']'
-invisible_regex.flags = 0
+invisible_regex = LazyRegex(
+    lambda: '[' + ''.join(_invisible_chars) + ']'
+)
 
 
 def contains_invisible(text):

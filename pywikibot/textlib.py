@@ -28,18 +28,64 @@ if sys.version_info[0] > 2:
 else:
     from HTMLParser import HTMLParser
 
+try:
+    import mwparserfromhell
+except ImportError as e:
+    mwparserfromhell = e
+
 import pywikibot
 
 from pywikibot import config2 as config
 from pywikibot.exceptions import InvalidTitle
 from pywikibot.family import Family
-from pywikibot.tools import OrderedDict
+from pywikibot.tools import OrderedDict, DeprecatedRegex
 
 # cache for replaceExcept to avoid recompile or regexes each call
 _regex_cache = {}
 
-TEMP_REGEX = re.compile(
-    r'{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')
+# This regex is only for use by extract_templates_and_params_regex.
+# It does not support template variables consisting of nested templates,
+# system variables like {{CURRENTYEAR}}, or template variables like {{{1}}}.
+_ETP_REGEX = re.compile(
+    r'{{(?:msg:)?(?P<name>[^{\|]+?)'
+    r'(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?)?)?}}')
+
+# This template is a more inclusive template matching algorithm
+# that allows system variables, but does not match nested templates.
+# It exists for backwards compatibility to the old 'TEMP_REGEX'
+# which was the _ETP_REGEX.
+TEMP_REGEX = DeprecatedRegex(r"""
+{{\s*(?:msg:)?\s*
+  (?P<name>[^{\|]+?)\s*
+  (?:\|(?P<params>[^{]*
+        (?:(?:{}|{{[A-Z]+(?:\:[^}])?}}|{{{[^}]+}}}) [^{]*)*
+       )?
+  )?
+}}
+""", re.VERBOSE, 'textlib.TEMP_REGEX', 'textlib.NESTED_TEMPLATE_REGEX')
+
+# The regex below collects nested templates, providing simpler
+# identification of templates used at the top-level of wikitext.
+# It doesnt match {{{1|...}}}, however it also does not match templates
+# with a numerical name. e.g. {{1|..}}. It will correctly match {{{x}} as
+# being {{x}} with leading '{' left in the wikitext.
+# Prefix msg: is not included in the 'name' group, but all others are
+# included for backwards compatibility with TEMP_REGEX.
+# Only parser functions using # are excluded.
+NESTED_TEMPLATE_REGEX = re.compile(r"""
+{{\s*(?:msg:)?\s*
+  (?P<name>[^{\|#0-9][^{\|#0-9]*?)\s*
+  (?:\|(?P<params>[^{]*
+          (({{{[^}]+}}}
+           |{{[^}|]+\|?[^}]*}}
+           |{}
+           ) [^{]*
+          )*
+       )?
+  )?
+}}
+""", re.VERBOSE)
+
 
 NON_LATIN_DIGITS = {
     'ckb': u'٠١٢٣٤٥٦٧٨٩',
@@ -95,6 +141,7 @@ def _create_default_regexes():
         'source':       re.compile(r'(?is)<source .*?</source>'),
         # inline references
         'ref':          re.compile(r'(?ism)<ref[ >].*?</ref>'),
+        'template':     NESTED_TEMPLATE_REGEX,
         # lines that start with a space are shown in a monospace font and
         # have whitespace preserved.
         'startspace':   re.compile(r'(?m)^ (.*?)$'),
@@ -151,9 +198,6 @@ def _get_regexes(keys, site):
                     result.append(_regex_cache[(exc, site)])
                 else:
                     result.append(_regex_cache[exc])
-            elif exc == 'template':
-                # template is not supported by this method.
-                pass
             else:
                 # nowiki, noinclude, includeonly, timeline, math ond other
                 # extensions
@@ -208,50 +252,6 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
 
     dontTouchRegexes = _get_regexes(exceptions, site)
 
-    except_templates = 'template' in exceptions
-
-    # mark templates
-    # don't care about mw variables and parser functions
-    if except_templates:
-        marker1 = findmarker(text)
-        marker2 = findmarker(text, u'##', u'#')
-        Rvalue = re.compile('{{{.+?}}}')
-        Rmarker1 = re.compile(r'%(mark)s(\d+)%(mark)s' % {'mark': marker1})
-        Rmarker2 = re.compile(r'%(mark)s(\d+)%(mark)s' % {'mark': marker2})
-        # hide the flat template marker
-        dontTouchRegexes.append(Rmarker1)
-        origin = text
-        values = {}
-        count = 0
-        for m in Rvalue.finditer(text):
-            count += 1
-            # If we have digits between brackets, restoring from dict may fail.
-            # So we need to change the index. We have to search in the origin.
-            while u'}}}%d{{{' % count in origin:
-                count += 1
-            item = m.group()
-            text = text.replace(item, '%s%d%s' % (marker2, count, marker2))
-            values[count] = item
-        inside = {}
-        seen = set()
-        count = 0
-        while TEMP_REGEX.search(text) is not None:
-            for m in TEMP_REGEX.finditer(text):
-                item = m.group()
-                if item in seen:
-                    continue  # speed up
-                seen.add(item)
-                count += 1
-                while u'}}%d{{' % count in origin:
-                    count += 1
-                text = text.replace(item, '%s%d%s' % (marker1, count, marker1))
-
-                # Make sure stored templates don't contain markers
-                for m2 in Rmarker1.finditer(item):
-                    item = item.replace(m2.group(), inside[int(m2.group(1))])
-                for m2 in Rmarker2.finditer(item):
-                    item = item.replace(m2.group(), values[int(m2.group(1))])
-                inside[count] = item
     index = 0
     markerpos = len(text)
     while True:
@@ -330,12 +330,6 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                 index += 1
             markerpos = match.start() + len(replacement)
     text = text[:markerpos] + marker + text[markerpos:]
-
-    if except_templates:  # restore templates from dict
-        for m2 in Rmarker1.finditer(text):
-            text = text.replace(m2.group(), inside[int(m2.group(1))])
-        for m2 in Rmarker2.finditer(text):
-            text = text.replace(m2.group(), values[int(m2.group(1))])
     return text
 
 
@@ -1217,7 +1211,7 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
 # Functions dealing with templates
 # --------------------------------
 
-def extract_templates_and_params(text):
+def extract_templates_and_params(text, remove_disabled_parts=None):
     """Return a list of templates found in text.
 
     Return value is a list of tuples. There is one tuple for each use of a
@@ -1242,20 +1236,28 @@ def extract_templates_and_params(text):
 
     @param text: The wikitext from which templates are extracted
     @type text: unicode or string
+    @param remove_disabled_parts: Remove disabled wikitext such as comments
+        and pre.  If None (default), this is enabled when mwparserfromhell
+        is not available or is disabled in the config, and disabled if
+        mwparserfromhell is present and enabled in the config.
+    @type remove_disabled_parts: bool or None
     @return: list of template name and params
     @rtype: list of tuple
     """
-    use_mwparserfromhell = config.use_mwparserfromhell
+    use_mwparserfromhell = (config.use_mwparserfromhell and
+                            not isinstance(mwparserfromhell, Exception))
+
     if use_mwparserfromhell:
-        try:
-            import mwparserfromhell  # noqa
-        except ImportError:
-            use_mwparserfromhell = False
+        if remove_disabled_parts is None:
+            remove_disabled_parts = False
+
+    if remove_disabled_parts:
+        text = removeDisabledParts(text)
 
     if use_mwparserfromhell:
         return extract_templates_and_params_mwpfh(text)
     else:
-        return extract_templates_and_params_regex(text)
+        return extract_templates_and_params_regex(text, False)
 
 
 def extract_templates_and_params_mwpfh(text):
@@ -1274,7 +1276,6 @@ def extract_templates_and_params_mwpfh(text):
     @return: list of template name and params
     @rtype: list of tuple
     """
-    import mwparserfromhell
     code = mwparserfromhell.parse(text)
     result = []
     for template in code.filter_templates(recursive=True):
@@ -1285,9 +1286,9 @@ def extract_templates_and_params_mwpfh(text):
     return result
 
 
-def extract_templates_and_params_regex(text):
+def extract_templates_and_params_regex(text, remove_disabled_parts=True):
     """
-    Extract templates with params using a regex.
+    Extract templates with params using a regex with additional processing.
 
     This function should not be called directly.
 
@@ -1301,7 +1302,10 @@ def extract_templates_and_params_regex(text):
     @rtype: list of tuple
     """
     # remove commented-out stuff etc.
-    thistxt = removeDisabledParts(text)
+    if remove_disabled_parts:
+        thistxt = removeDisabledParts(text)
+    else:
+        thistxt = text
 
     # marker for inside templates or parameters
     marker1 = findmarker(thistxt)
@@ -1347,8 +1351,8 @@ def extract_templates_and_params_regex(text):
     inside = {}
     seen = set()
     count = 0
-    while TEMP_REGEX.search(thistxt) is not None:
-        for m in TEMP_REGEX.finditer(thistxt):
+    while _ETP_REGEX.search(thistxt) is not None:
+        for m in _ETP_REGEX.finditer(thistxt):
             # Make sure it is not detected again
             item = m.group()
             if item in seen:
@@ -1445,8 +1449,54 @@ def extract_templates_and_params_regex(text):
                                                       values[int(m2.group(1))])
                     params[param_name.strip()] = param_val.strip()
 
+            # Special case for {{a|}} which has an undetected parameter
+            if not params and '|' in m.group(0):
+                params = OrderedDict({'1': ''})
+
             # Add it to the result
             result.append((name, params))
+
+    return result
+
+
+def extract_templates_and_params_regex_simple(text):
+    """
+    Extract top-level templates with params using only a simple regex.
+
+    This function uses only a single regex, and returns
+    an entry for each template called at the top-level of the wikitext.
+    Nested templates are included in the argument values of the top-level
+    template.
+
+    This method will incorrectly split arguments when an
+    argument value contains a '|', such as {{template|a={{b|c}} }}.
+
+    @param text: The wikitext from which templates are extracted
+    @type text: unicode or string
+    @return: list of template name and params
+    @rtype: list of tuple of name and OrderedDict
+    """
+    result = []
+
+    for match in NESTED_TEMPLATE_REGEX.finditer(text):
+        name, params = match.group(1), match.group(2)
+
+        # Special case for {{a}}
+        if params is None:
+            params = []
+        else:
+            params = params.split('|')
+
+        numbered_param_identifiers = iter(range(1, len(params) + 1))
+
+        params = OrderedDict(
+            arg.split('=', 1)
+            if '=' in arg
+            else (str(next(numbered_param_identifiers)), arg)
+            for arg in params)
+
+        result.append((name, params))
+
     return result
 
 
