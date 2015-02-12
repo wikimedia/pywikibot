@@ -209,6 +209,28 @@ class TestCategoryDryObject(TestCase):
         self.assertEqual(cat.aslink(sortKey='Foo'), '[[Category:Wikipedia categories|Foo]]')
 
 
+class CategoryNewestPages(TestCase):
+
+    """Test newest_pages feature on French Wikinews."""
+
+    family = 'wikinews'
+    code = 'fr'
+
+    cached = True
+
+    def test_newest_pages(self):
+        """Test that the pages are getting older."""
+        cat = pywikibot.Category(self.get_site(), u'Catégorie:Yukon Quest 2015')
+        last = pywikibot.Timestamp.max
+        count = 0
+        for page in cat.newest_pages():
+            creation_stamp = page.oldest_revision.timestamp
+            self.assertLessEqual(creation_stamp, last)
+            last = creation_stamp
+            count += 1
+        self.assertEqual(count, cat.categoryinfo['size'])
+
+
 if __name__ == '__main__':
     try:
         unittest.main()
