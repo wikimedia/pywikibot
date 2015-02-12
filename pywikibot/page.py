@@ -4144,7 +4144,7 @@ class Claim(Property):
                 }
 
 
-class Revision(object):
+class Revision(pywikibot.UnicodeMixin):
 
     """A structure holding information about a single revision of a Page."""
 
@@ -4212,6 +4212,16 @@ class Revision(object):
 
         """
         return getattr(self, key)
+
+    def __unicode__(self):
+        """Return string representation."""
+        _content = u', '.join(
+            u'{0}: {1}'.format(k, v) for k, v in self.__dict__.items())
+        return u'{{{0}}}'.format(_content)
+
+    def __repr__(self):
+        """Return a more complete string representation."""
+        return self.__dict__.__repr__()
 
 
 class FileInfo(pywikibot.UnicodeMixin):
