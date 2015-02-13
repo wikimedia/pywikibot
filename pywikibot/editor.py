@@ -17,8 +17,14 @@ import subprocess
 import tempfile
 
 import pywikibot
+
 from pywikibot import config
 from pywikibot.tools import deprecated
+
+try:
+    from pywikibot.userinterfaces import gui  # noqa
+except ImportError as e:
+    gui = e
 
 
 class TextEditor(object):
@@ -107,14 +113,12 @@ class TextEditor(object):
             finally:
                 os.unlink(tempFilename)
 
-        try:
-            import pywikibot.userinterfaces.gui  # noqa
-        except ImportError as e:
+        if isinstance(gui, ImportError):
             raise pywikibot.Error(
                 'Could not load GUI modules: %s\nNo editor available.\n'
                 'Set your favourite editor in user-config.py "editor", '
                 'or install python packages tkinter and idlelib, which '
                 'are typically part of Python but may be packaged separately '
-                'on your platform.\n' % e)
+                'on your platform.\n' % gui)
 
         return pywikibot.ui.editText(text, jumpIndex=jumpIndex, highlight=highlight)
