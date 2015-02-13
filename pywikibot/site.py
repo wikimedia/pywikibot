@@ -4057,7 +4057,7 @@ class APISite(BaseSite):
         if text is None:
             raise Error("editpage: no text to be saved")
         try:
-            lastrev = page.latestRevision()
+            lastrev = page.latest_revision
         except NoPage:
             lastrev = None
             if not recreate:
@@ -4070,10 +4070,6 @@ class APISite(BaseSite):
                       recreate=recreate, createonly=createonly,
                       nocreate=nocreate, minor=minor,
                       notminor=not minor and notminor)
-        if lastrev is not None:
-            if lastrev not in page._revisions:
-                self.loadrevisions(page)
-            params['basetimestamp'] = page._revisions[lastrev].timestamp
 
         watch_items = set(["watch", "unwatch", "preferences", "nochange"])
         if watch in watch_items:
@@ -4314,7 +4310,7 @@ class APISite(BaseSite):
             raise Error(
                 u"Rollback of %s aborted; load revision history first."
                 % page.title(asLink=True))
-        last_rev = page._revisions[page.latestRevision()]
+        last_rev = page.latest_revision
         last_user = last_rev.user
         for rev in sorted(list(page._revisions.keys()), reverse=True):
             # start with most recent revision first
@@ -5469,7 +5465,7 @@ class DataSite(APISite):
 
         params = dict(action='wbcreateclaim',
                       entity=item.getID(),
-                      baserevid=item.latestRevision(),
+                      baserevid=item.latest_revision_id,
                       snaktype=claim.getSnakType(),
                       property=claim.getID(),
                       )
