@@ -6,10 +6,9 @@ __version__ = '$Id$'
 from pywikibot import family
 
 
-# The wikis of Chapters of the Wikimedia Foundation living at a xy.wikimedia.org url
 class Family(family.Family):
 
-    """Family class for Wikimedia chapter wikis."""
+    """Family for Wikimedia chapters hosted on wikimedia.org."""
 
     def __init__(self):
         """Constructor."""
