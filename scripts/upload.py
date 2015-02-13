@@ -6,7 +6,7 @@ Script to upload images to wikipedia.
 Arguments:
 
   -keep         Keep the filename as is
-  -filename     Target filename
+  -filename     Target filename without the namespace prefix
   -noverify     Do not ask for verification of the upload description if one
                 is given
   -abortonwarn: Abort upload on the specified warning type. If no warning type
@@ -229,8 +229,8 @@ class UploadRobot:
         first_check = True
         while True:
             if not first_check:
-                filename = pywikibot.input(u'Enter a better name, '
-                                           'or press enter to skip:')
+                filename = pywikibot.input('Enter a better name, or press '
+                                           'enter to skip the file:')
                 if not filename:
                     return None
             first_check = False
@@ -270,6 +270,8 @@ class UploadRobot:
                                          "repository and cannot be overwritten."
                                          % filename)
                         continue
+                    else:
+                        break
                 except pywikibot.NoPage:
                     break
 
@@ -372,7 +374,7 @@ class UploadRobot:
             if answer:
                 self.ignoreWarning = True
                 self.keepFilename = True
-                return self.upload_image(debug)
+                return self.upload_file(file_url, debug)
             else:
                 pywikibot.output(u"Upload aborted.")
                 return
