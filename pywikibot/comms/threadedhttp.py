@@ -223,6 +223,9 @@ class Http(httplib2.Http):
              connection_type),
         ), _logger)
         try:
+            if authority in config.authenticate:
+                self.add_credentials(*config.authenticate[authority])
+
             (response, content) = httplib2.Http.request(
                 self, uri, method, body, headers,
                 max_redirects, connection_type
