@@ -21,6 +21,8 @@ if sys.version_info[0] > 2:
 else:
     from Queue import Queue
 
+from warnings import warn
+
 # Use pywikibot. prefix for all in-package imports; this is to prevent
 # confusion with similarly-named modules in version 1 framework, for users
 # who want to continue using both
@@ -601,6 +603,11 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
         _sites[key] = interface(code=code, fam=fam, user=user, sysop=sysop)
         debug(u"Instantiated %s object '%s'"
               % (interface.__name__, _sites[key]), _logger)
+
+        if _sites[key].code != code:
+            warn('Site %s instantiated using different code "%s"'
+                 % (_sites[key], code), UserWarning, 2)
+
     return _sites[key]
 
 

@@ -493,7 +493,15 @@ class BaseSite(ComparableMixin):
         @type sysop: str
 
         """
-        self.__code = code.lower()
+        if code.lower() != code:
+            # Note the Site function in __init__ also emits a UserWarning
+            # for this condition, showing the callers file and line no.
+            pywikibot.log(u'BaseSite: code "%s" converted to lowercase' % code)
+            code = code.lower()
+        if not all(x in pywikibot.family.CODE_CHARACTERS for x in str(code)):
+            pywikibot.log(u'BaseSite: code "%s" contains invalid characters'
+                          % code)
+        self.__code = code
         if isinstance(fam, basestring) or fam is None:
             self.__family = pywikibot.family.Family.load(fam)
         else:
@@ -504,19 +512,27 @@ class BaseSite(ComparableMixin):
         if self.__code in self.__family.obsolete:
             if self.__family.obsolete[self.__code] is not None:
                 self.__code = self.__family.obsolete[self.__code]
+                # Note the Site function in __init__ emits a UserWarning
+                # for this condition, showing the callers file and line no.
+                pywikibot.log(u'Site %s instantiated using code %s'
+                              % (self, code))
             else:
                 # no such language anymore
                 self.obsolete = True
+                pywikibot.log(u'Site %s instantiated and marked "obsolete" '
+                              u'to prevent access' % self)
         elif self.__code not in self.languages():
             if self.__family.name in list(self.__family.langs.keys()) and \
                len(self.__family.langs) == 1:
-                oldcode = self.__code
                 self.__code = self.__family.name
                 if self.__family == pywikibot.config.family \
-                        and oldcode == pywikibot.config.mylang:
+                        and code == pywikibot.config.mylang:
                     pywikibot.config.mylang = self.__code
+                    warn(u'Global configuration variable "mylang" changed to '
+                         u'"%s" while instantiating site %s'
+                         % (self.__code, self), UserWarning)
             else:
-                raise UnknownSite("Language '%s' does not exist in family %s"
+                raise UnknownSite(u"Language '%s' does not exist in family %s"
                                   % (self.__code, self.__family.name))
 
         self.nocapitalize = self.code in self.family.nocapitalize
