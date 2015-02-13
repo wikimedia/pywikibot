@@ -48,6 +48,7 @@ from pywikibot.exceptions import (
     SiteDefinitionError
 )
 from pywikibot.tools import (
+    UnicodeMixin, DotReadableDict,
     ComparableMixin, deprecated, deprecate_arg, deprecated_args,
     remove_last_args, _NotImplementedWarning,
     OrderedDict, Counter,
@@ -64,7 +65,7 @@ reNamespace = re.compile("^(.+?) *: *(.*)$")
 # Note: Link objects (defined later on) represent a wiki-page's title, while
 # Page objects (defined here) represent the page itself, including its contents.
 
-class BasePage(pywikibot.UnicodeMixin, ComparableMixin):
+class BasePage(UnicodeMixin, ComparableMixin):
 
     """BasePage: Base object for a MediaWiki page.
 
@@ -4210,7 +4211,7 @@ class Claim(Property):
                 }
 
 
-class Revision(pywikibot.UnicodeMixin):
+class Revision(DotReadableDict):
 
     """A structure holding information about a single revision of a Page."""
 
@@ -4268,29 +4269,8 @@ class Revision(pywikibot.UnicodeMixin):
         return Revision.FullHistEntry(self.revid, self.timestamp, self.user,
                                       self.text, self.rollbacktoken)
 
-    def __getitem__(self, key):
-        """Give access to Revision class values by key.
 
-        Revision class may also give access to its values by keys
-        e.g. revid parameter may be assigned by revision['revid']
-        as well as revision.revid. This makes formatting strings with
-        % operator easier.
-
-        """
-        return getattr(self, key)
-
-    def __unicode__(self):
-        """Return string representation."""
-        _content = u', '.join(
-            u'{0}: {1}'.format(k, v) for k, v in self.__dict__.items())
-        return u'{{{0}}}'.format(_content)
-
-    def __repr__(self):
-        """Return a more complete string representation."""
-        return self.__dict__.__repr__()
-
-
-class FileInfo(pywikibot.UnicodeMixin):
+class FileInfo(DotReadableDict):
 
     """A structure holding imageinfo of latest rev. of FilePage.
 
@@ -4316,23 +4296,9 @@ class FileInfo(pywikibot.UnicodeMixin):
         self.__dict__.update(file_revision)
         self.timestamp = pywikibot.Timestamp.fromISOformat(self.timestamp)
 
-    def __getitem__(self, key):
-        """Access attributes also with dict.like keys."""
-        return getattr(self, key)
-
     def __eq__(self, other):
         """Test if two File_info objects are equal."""
         return self.__dict__ == other.__dict__
-
-    def __unicode__(self):
-        """Return string representation."""
-        _content = u', '.join(
-            u'{0}: {1}'.format(k, v) for k, v in self.__dict__.items())
-        return u'{{{0}}}'.format(_content)
-
-    def __repr__(self):
-        """Return a more complete string representation."""
-        return self.__dict__.__repr__()
 
 
 class Link(ComparableMixin):
