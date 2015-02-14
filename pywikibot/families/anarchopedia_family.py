@@ -18,10 +18,10 @@ class Family(family.Family):
         self.name = 'anarchopedia'
 
         self.languages_by_size = [
-            'ar', 'en', 'ger', 'de', 'nl', 'el', 'it', 'fa', 'fi', 'fr', 'he',
-            'es', 'hy', 'id', 'meta', 'ja', 'ko', 'lv', 'lit', 'no', 'hrv',
-            'pl', 'pt', 'ro', 'ru', 'sr', 'sq', 'da', 'sv', 'tr', 'zh', 'gre',
-            'chi',
+            'ar', 'en', 'de', 'nl', 'el', 'it', 'fa', 'fi', 'fr', 'he',
+            'es', 'hy', 'id', 'meta', 'ja', 'ko', 'lv', 'lt', 'no', 'hr',
+            'pl', 'pt', 'ro', 'ru', 'sr', 'sq', 'da', 'sv', 'tr', 'zh',
+            'eo',
         ]
         for l in self.languages_by_size:
             self.langs[l] = '%s.anarchopedia.org' % l
@@ -29,9 +29,9 @@ class Family(family.Family):
         self.nocapitalize = list(self.langs.keys())
 
         self.obsolete = {
+            # ISO 639-2 -> ISO 639-1 mappings
             'ara': 'ar',
-            'bos': 'bs',
-            'zho': 'zh',
+            'chi': 'zh',
             'dan': 'da',
             'deu': 'de',
             'dut': 'nl',
@@ -39,33 +39,38 @@ class Family(family.Family):
             'eng': 'en',
             'epo': 'eo',
             'fas': 'fa',
-            'fra': 'fr',
             'fin': 'fi',
+            'fra': 'fr',
+            'ger': 'de',
+            'gre': 'el',
             'heb': 'he',
+            'hye': 'hy',
             'ind': 'id',
             'ita': 'it',
             'jpn': 'ja',
-            'lit': 'lt',
+            'kor': 'ko',
             'lav': 'lv',
+            'lit': 'lt',
+            'nno': 'no',
+            'nob': 'no',
             'nor': 'no',
-            'nsh': 'sh',
             'pol': 'pl',
             'por': 'pt',
             'rum': 'ro',
             'rus': 'ru',
             'spa': 'es',
             'srp': 'sr',
-            'srp': 'hr',
-            'swe': 'sv',
-            'kor': 'ko',
             'sqi': 'sq',
-            'hye': 'hy',
+            'swe': 'sv',
             'tur': 'tr',
+            'zho': 'zh',
 
-            'ell': 'gre',
-            'srp': 'hrv',
-            'nno': None,
-            'nob': None,
+            # ISO 639-1 -> ISO 639-1 mappings
+            'bs': 'hr',
+
+            # Non-compliant mappings
+            'bos': 'hr',
+            'nsh': 'hr',
         }
 
     @deprecated('APISite.version()')
