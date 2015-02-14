@@ -518,24 +518,37 @@ class SiteWriteMixin(TestCaseBase):
         """
         Set up the test class.
 
-        Prevent test classes to write to the site and also cache results.
+        Reject write test classes configured with non-test wikis, or caching.
 
-        Skip the test class if environment variable PYWIKIBOT2_TEST_WRITE
-        does not equal 1.
+        Prevent test classes from writing to the site by default.
+
+        If class attribute 'write' is -1, the test class is skipped unless
+        environment variable PYWIKIBOT2_TEST_WRITE_FAIL is set to 1.
+
+        Otherwise the test class is skipped unless environment variable
+        PYWIKIBOT2_TEST_WRITE is set to 1.
         """
-        if os.environ.get('PYWIKIBOT2_TEST_WRITE', '0') != '1':
+        super(SiteWriteMixin, cls).setUpClass()
+
+        site = cls.get_site()
+        assert('test' in (site.family.name, site.code))
+
+        if cls.write == -1:
+            env_var = 'PYWIKIBOT2_TEST_WRITE_FAIL'
+        else:
+            env_var = 'PYWIKIBOT2_TEST_WRITE'
+
+        if os.environ.get(env_var, '0') != '1':
             raise unittest.SkipTest(
                 '%r write tests disabled. '
-                'Set PYWIKIBOT2_TEST_WRITE=1 to enable.'
-                % cls.__name__)
+                'Set %s=1 to enable.'
+                % (cls.__name__, env_var))
 
         if issubclass(cls, ForceCacheMixin):
             raise Exception(
                 '%s can not be a subclass of both '
                 'SiteEditTestCase and ForceCacheMixin'
                 % cls.__name__)
-
-        super(SiteWriteMixin, cls).setUpClass()
 
 
 class RequireUserMixin(TestCaseBase):

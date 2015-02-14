@@ -83,7 +83,7 @@ published at travis-ci.org/wikimedia/pywikibot-core/builds .  These tests
 use the Wikimedia global (SUL) account 'Pywikibot-test', which has a password
 securely stored in .travis.yml . See section env:global:secure.
 
-Anyone can run these tests on travis-ci.org using their own account, with
+Anyone can run these tests on travis-ci.org using their own github account, with
 code changes that have not been merged into the main repository.  To do this:
 
 1. create a github and travis-ci account
@@ -103,8 +103,34 @@ a username and password to travis:
 2. Add a new variable named PYWIKIBOT2_USERNAME and a value of a valid
    Wikimedia SUL username
 3. Add another variable named USER_PASSWORD, with the private password for
-   the Wikimedia SUL username used in step 2
+   the Wikimedia SUL username used in step 2.  Check that this
+   environment variable has "Display value in build logs" set to OFF, so
+   the password does not leak into the build logs.
 4. The next build should run tests that require a logged in user
+
+While passwords in travis-ci environment variables are not leaked in normal
+operations, you are responsible for your own passwords.
+
+It is strongly recommended that an untrusted bot account is created for
+travis tests, using a password that is not shared with trusted accounts.
+
+There are a set of 'edit failure' tests, which attempt to write to the wikis
+and **should** fail.  If there is a bug in pywikibot or MediaWiki, these
+tests **may** actually perform a write operation.
+
+These 'edit failure' tests are disabled by default for the 'wikimedia' builds,
+but are enabled by default on builds by any other github account.
+
+To disable 'edit failure' tests in travis, add PYWIKIBOT2_TEST_WRITE_FAIL=0
+
+There are also several other 'write' tests which also attempt to perform
+write operations successfully.  These **will** write to the wikis, and they
+should always only write to 'test' wikis.
+
+These 'write' tests are disabled in travis builds, and currently can not be
+run on travis as they require interaction using a terminal.
+
+To enable 'write' tests in travis, add PYWIKIBOT2_TEST_WRITE=1
 
 Contributing tests
 ==================
