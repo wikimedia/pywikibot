@@ -598,6 +598,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     if not issubclass(interface, pywikibot.site.BaseSite):
         warning('Site called with interface=%s' % interface.__name__)
 
+    user = pywikibot.tools.normalize_username(user)
     key = '%s:%s:%s:%s' % (interface.__name__, fam, code, user)
     if key not in _sites or not isinstance(_sites[key], interface):
         _sites[key] = interface(code=code, fam=fam, user=user, sysop=sysop)

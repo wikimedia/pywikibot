@@ -241,6 +241,14 @@ class LazyRegex(object):
             raise AttributeError('%s.raw not set' % self.__class__.__name__)
 
 
+def normalize_username(username):
+    """Normalize the username."""
+    if not username:
+        return None
+    username = re.sub('[_ ]+', ' ', username).strip()
+    return username[0].upper() + username[1:]
+
+
 class MediaWikiVersion(Version):
 
     """

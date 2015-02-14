@@ -32,7 +32,7 @@ import pywikibot.family
 from pywikibot.tools import (
     itergroup, UnicodeMixin, ComparableMixin, SelfCallDict, SelfCallString,
     deprecated, deprecate_arg, deprecated_args, remove_last_args,
-    redirect_func, manage_wrapping, MediaWikiVersion,
+    redirect_func, manage_wrapping, MediaWikiVersion, normalize_username,
 )
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
@@ -536,16 +536,7 @@ class BaseSite(ComparableMixin):
                                   % (self.__code, self.__family.name))
 
         self.nocapitalize = self.code in self.family.nocapitalize
-        if not self.nocapitalize:
-            if user:
-                user = user[0].upper() + user[1:]
-            if sysop:
-                sysop = sysop[0].upper() + sysop[1:]
-        if user:
-            user = user.replace('_', ' ')
-        if sysop:
-            sysop = sysop.replace('_', ' ')
-        self._username = [user, sysop]
+        self._username = [normalize_username(user), normalize_username(sysop)]
 
         self.use_hard_category_redirects = (
             self.code in self.family.use_hard_category_redirects)

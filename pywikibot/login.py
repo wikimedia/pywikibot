@@ -14,7 +14,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.tools import deprecated_args
+from pywikibot.tools import deprecated_args, normalize_username
 from pywikibot.exceptions import NoUsername
 
 
@@ -189,8 +189,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                 warn('The length of tuple should be 2 to 4 (%s given)'
                      % len(entry), _PasswordFileWarning)
                 continue
-            username = entry[-2]
-            username = username[0].upper() + username[1:]
+            username = normalize_username(entry[-2])
             if len(entry) == 4:         # for userinfo included code and family
                 if entry[0] == self.site.code and \
                    entry[1] == self.site.family.name and \
