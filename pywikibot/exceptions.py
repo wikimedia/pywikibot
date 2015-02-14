@@ -57,6 +57,7 @@ RuntimeWarning: problems developers should have fixed, and users need to
 
 UserWarning: warnings targetted at users
   - config2._ConfigurationDeprecationWarning: user configuration file problems
+  - login._PasswordFileWarning: password file problems
   - ArgumentDeprecationWarning: command line argument problems
   - FamilyMaintenanceWarning: missing information in family definition
 """

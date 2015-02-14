@@ -3,18 +3,27 @@
 """Library to log the bot in to a wiki account."""
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2012
+# (C) Pywikibot team, 2003-2015
 #
 # Distributed under the terms of the MIT license.
 #
 __version__ = '$Id$'
 #
 import codecs
+from warnings import warn
 
 import pywikibot
 from pywikibot import config
 from pywikibot.tools import deprecated_args
 from pywikibot.exceptions import NoUsername
+
+
+class _PasswordFileWarning(UserWarning):
+
+    """The format of password file is incorrect."""
+
+    pass
+
 
 _logger = "wiki.login"
 
@@ -169,18 +178,30 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         for line in password_f:
             if not line.strip():
                 continue
-            entry = eval(line)
+            try:
+                entry = eval(line)
+            except SyntaxError:
+                entry = None
+            if type(entry) is not tuple:
+                warn('Invalid tuple', _PasswordFileWarning)
+                continue
+            if not 2 <= len(entry) <= 4:
+                warn('The length of tuple should be 2 to 4 (%s given)'
+                     % len(entry), _PasswordFileWarning)
+                continue
+            username = entry[-2]
+            username = username[0].upper() + username[1:]
             if len(entry) == 4:         # for userinfo included code and family
                 if entry[0] == self.site.code and \
                    entry[1] == self.site.family.name and \
-                   entry[2] == self.username:
+                   username == self.username:
                     self.password = entry[3]
             elif len(entry) == 3:       # for userinfo included family
                 if entry[0] == self.site.family.name and \
-                   entry[1] == self.username:
+                   username == self.username:
                     self.password = entry[2]
             elif len(entry) == 2:       # for default userinfo
-                if entry[0] == self.username:
+                if username == self.username:
                     self.password = entry[1]
         password_f.close()
 
