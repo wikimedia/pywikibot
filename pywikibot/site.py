@@ -367,8 +367,8 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
     @classmethod
     def builtin_namespaces(cls, use_image_name=False):
         """Return a dict of the builtin namespaces."""
-        return dict([(i, cls(i, use_image_name=use_image_name))
-                     for i in range(-2, 16)])
+        return dict((i, cls(i, use_image_name=use_image_name, case='first-letter'))
+                     for i in range(-2, 16))
 
     @staticmethod
     def normalize_name(name):
@@ -535,7 +535,6 @@ class BaseSite(ComparableMixin):
                 raise UnknownSite(u"Language '%s' does not exist in family %s"
                                   % (self.__code, self.__family.name))
 
-        self.nocapitalize = self.code in self.family.nocapitalize
         self._username = [normalize_username(user), normalize_username(sysop)]
 
         self.use_hard_category_redirects = (
@@ -544,6 +543,11 @@ class BaseSite(ComparableMixin):
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Lock()
         self._locked_pages = []
+
+    @property
+    @deprecated("APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'")
+    def nocapitalize(self):
+        return self.siteinfo['case'] == 'case-sensitive'
 
     @property
     def throttle(self):
@@ -919,7 +923,7 @@ class BaseSite(ComparableMixin):
         name2 = name2.strip()
         # If the namespace has a case definition it's overriding the site's
         # case definition
-        if (ns1_obj.case if hasattr(ns1_obj, 'case') else self.case()) == 'first-letter':
+        if ns1_obj.case == 'first-letter':
             name1 = name1[:1].upper() + name1[1:]
             name2 = name2[:1].upper() + name2[1:]
         return name1 == name2
@@ -2155,6 +2159,9 @@ class APISite(BaseSite):
                 if is_mw114:
                     canonical_name = nsdata.pop('canonical')
 
+            if 'case' not in nsdata:
+                nsdata['case'] = self.siteinfo['case']
+
             namespace = Namespace(ns, canonical_name, custom_name,
                                   use_image_name=not is_mw114,
                                   **nsdata)
@@ -2205,8 +2212,11 @@ class APISite(BaseSite):
         """Site information dict."""
         return self._siteinfo
 
+    @deprecated('use siteinfo or Namespace instance')
     def case(self):
         """Return this site's capitalization rule."""
+        # This is the global setting via $wgCapitalLinks, it is used whenever
+        # the namespaces don't propagate the namespace specific value.
         return self.siteinfo['case']
 
     def dbName(self):

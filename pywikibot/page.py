@@ -4537,12 +4537,7 @@ class Link(ComparableMixin):
             raise pywikibot.InvalidTitle("The link does not contain a page "
                                          "title")
 
-        if hasattr(self._site.namespaces[self._namespace], 'case'):
-            case = self._site.namespaces[self._namespace].case
-        else:
-            case = self._site.case()
-
-        if case == 'first-letter':
+        if self._site.namespaces[self._namespace].case == 'first-letter':
             t = t[:1].upper() + t[1:]
 
         self._title = t

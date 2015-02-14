@@ -173,11 +173,10 @@ class XmlDumpTemplatePageGenerator:
         # regular expression to find the original template.
         # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
         # The old syntax, {{msg:vfd}}, will also be found.
-        # TODO: check site.nocapitalize()
         templatePatterns = []
         for template in self.templates:
             templatePattern = template.title(withNamespace=False)
-            if not pywikibot.Site().nocapitalize:
+            if mysite.namespaces[10].case == 'first-letter':
                 templatePattern = '[%s%s]%s' % (templatePattern[0].upper(),
                                                 templatePattern[0].lower(),
                                                 templatePattern[1:])
@@ -250,7 +249,7 @@ class TemplateRobot(Bot):
         site = pywikibot.Site()
         for old, new in self.templates.items():
             namespaces = list(site.namespace(10, all=True))
-            if not site.nocapitalize:
+            if site.namespaces[10].case == 'first-letter':
                 pattern = '[' + \
                           re.escape(old[0].upper()) + \
                           re.escape(old[0].lower()) + \

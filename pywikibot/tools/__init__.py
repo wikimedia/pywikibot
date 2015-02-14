@@ -798,6 +798,16 @@ def add_full_name(obj):
     return outer_wrapper
 
 
+def issue_deprecation_warning(name, instead, depth):
+    """Issue a deprecation warning."""
+    if instead:
+        warn(u'{0} is deprecated, use {1} instead.'.format(name, instead),
+             DeprecationWarning, depth + 1)
+    else:
+        warn(u'{0} is deprecated.'.format(name), _NotImplementedWarning,
+             depth + 1)
+
+
 @add_full_name
 def deprecated(*args, **kwargs):
     """Decorator to output a deprecation warning.
@@ -825,12 +835,7 @@ def deprecated(*args, **kwargs):
             """
             name = obj.__full_name__
             depth = get_wrapper_depth(wrapper) + 1
-            if instead:
-                warn(u"%s is deprecated, use %s instead." % (name, instead),
-                     DeprecationWarning, depth)
-            else:
-                warn(u"%s is deprecated." % name,
-                     _NotImplementedWarning, depth)
+            issue_deprecation_warning(name, instead, depth)
             return obj(*args, **kwargs)
 
         if not __debug__:
@@ -1042,7 +1047,7 @@ def redirect_func(target, source_module=None, target_module=None,
     @rtype: callable
     """
     def call(*a, **kw):
-        warn(warn_message, DeprecationWarning, 2)
+        issue_deprecation_warning(old_name, new_name, 2)
         return target(*a, **kw)
     if target_module is None:
         target_module = target.__module__
@@ -1057,11 +1062,8 @@ def redirect_func(target, source_module=None, target_module=None,
     if class_name:
         target_module += class_name + '.'
         source_module += class_name + '.'
-    warn_message = ('{source}{old} is deprecated, use {target}{new} '
-                    'instead.').format(new=target.__name__,
-                                       old=old_name or target.__name__,
-                                       target=target_module,
-                                       source=source_module)
+    old_name = source_module + (old_name or target.__name__)
+    new_name = target_module + target.__name__
 
     if not __debug__:
         return target
