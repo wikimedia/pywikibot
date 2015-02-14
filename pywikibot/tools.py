@@ -136,6 +136,40 @@ class ComparableMixin(object):
         return other != self._cmpkey()
 
 
+class DotReadableDict(UnicodeMixin):
+
+    """Parent class of Revision() and FileInfo().
+
+    Provide:
+    - __getitem__(), __unicode__() and __repr__().
+
+    """
+
+    def __getitem__(self, key):
+        """Give access to class values by key.
+
+        Revision class may also give access to its values by keys
+        e.g. revid parameter may be assigned by revision['revid']
+        as well as revision.revid. This makes formatting strings with
+        % operator easier.
+
+        """
+        return getattr(self, key)
+
+    def __unicode__(self):
+        """Return string representation."""
+        if sys.version_info[0] > 2:
+            return repr(self.__dict__)
+        else:
+            _content = u', '.join(
+                u'{0}: {1}'.format(k, v) for k, v in self.__dict__.items())
+            return u'{{{0}}}'.format(_content)
+
+    def __repr__(self):
+        """Return a more complete string representation."""
+        return repr(self.__dict___)
+
+
 def concat_options(message, line_length, options):
     """Concatenate options."""
     indent = len(message) + 2
