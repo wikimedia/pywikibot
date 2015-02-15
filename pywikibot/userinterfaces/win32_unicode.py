@@ -1,7 +1,7 @@
 """Stdout, stderr and argv support for unicode."""
 ##############################################
 # Support for unicode in windows cmd.exe
-# Posted on Stack Overflow [1], available under CC-BY-SA [2]
+# Posted on Stack Overflow [1], available under CC-BY-SA 3.0 [2]
 #
 # Question: "Windows cmd encoding change causes Python crash" [3] by Alex [4],
 # Answered [5] by David-Sarah Hopwood [6].
@@ -15,8 +15,8 @@
 #
 ################################################
 #
-# stdin support added by Merlijn van Deen <valhallasw@gmail.com>, march 2012
-# Licensed under both CC-BY-SA as the MIT license.
+# stdin support added by Merlijn van Deen <valhallasw@gmail.com>, March 2012
+# Licensed under both CC-BY-SA and the MIT license.
 #
 ################################################
 from __future__ import print_function
