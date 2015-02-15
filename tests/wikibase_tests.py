@@ -54,7 +54,7 @@ class TestGeneral(WikidataTestCase):
         self.assertIn('en', item.labels)
         self.assertTrue(item.labels['en'].lower().endswith('main page'))
         self.assertIn('en', item.aliases)
-        self.assertIn('HomePage', item.aliases['en'])
+        self.assertIn('Home page', item.aliases['en'])
         self.assertEqual(item.namespace(), 0)
         item2 = pywikibot.ItemPage(repo, 'q5296')
         self.assertEqual(item2.getID(), 'Q5296')
