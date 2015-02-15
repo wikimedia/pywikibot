@@ -1,16 +1,14 @@
 # -*- coding: utf-8  -*-
 """Installer script for Pywikibot 2.0 framework."""
 #
-# (C) Pywikibot team, 2009-2013
+# (C) Pywikibot team, 2009-2015
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
-#
 
-import sys
-import os
 import itertools
+import os
+import sys
 
 test_deps = []
 

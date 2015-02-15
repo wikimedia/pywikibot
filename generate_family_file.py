@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 #
 # (C) Merlijn van Deen, 2010-2013
-# (C) Pywikibot team, 2010-2014
+# (C) Pywikibot team, 2010-2015
 #
 # Distributed under the terms of the MIT license
 #

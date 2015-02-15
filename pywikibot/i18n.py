@@ -6,7 +6,7 @@ Helper functions for both the internal translation system
 and for TranslateWiki-based translations.
 """
 #
-# (C) Pywikibot team, 2004-2014
+# (C) Pywikibot team, 2004-2015
 #
 # Distributed under the terms of the MIT license.
 #
