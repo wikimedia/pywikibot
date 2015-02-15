@@ -42,8 +42,8 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.editLabels({'en': 'Test123'})
         item.editLabels({'fa': 'Test123'})
         item.get(force=True)
-        self.assertTrue('en' in item.labels.keys())
-        self.assertTrue('fa' in item.labels.keys())
+        self.assertIn('en', item.labels.keys())
+        self.assertIn('fa', item.labels.keys())
 
         # This should remove the 'fa' label
         item.editLabels({'en': 'Test123', 'fa': ''})
@@ -51,7 +51,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         # Check 'fa' label is removed
         item = pywikibot.ItemPage(testsite, 'Q68')
         item.get()
-        self.assertFalse('fa' in item.labels.keys())
+        self.assertNotIn('fa', item.labels.keys())
 
     def test_alias_set(self):
         testsite = self.get_repo()

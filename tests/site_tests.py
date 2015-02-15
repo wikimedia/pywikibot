@@ -359,7 +359,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         gen = site._generator(pywikibot.data.api.PageGenerator,
                               type_arg='backlinks',
                               namespaces=None)
-        self.assertTrue('gblnamespace' not in gen.request)
+        self.assertNotIn('gblnamespace', gen.request)
         gen = site._generator(pywikibot.data.api.PageGenerator,
                               type_arg='backlinks',
                               namespaces=1)
@@ -400,7 +400,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertIsInstance(ei, pywikibot.Page)
             self.assertIn(ei, refs)
         for ref in refs:
-            self.assertTrue(ref in backlinks or ref in embedded)
+            self.assertIn(ref, backlinks | embedded)
         # test embeddedin arguments
         self.assertTrue(embedded.issuperset(
             set(mysite.page_embeddedin(mainpage, filterRedirects=True,
@@ -625,7 +625,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertTrue(user["name"].startswith("D"))
             self.assertIn("editcount", user)
             self.assertIn("registration", user)
-            self.assertTrue("groups" in user and "sysop" in user["groups"])
+            self.assertIn('groups' in user)
+            self.assertIn('sysop' in user['groups'])
 
     def testAllImages(self):
         """Test the site.allimages() method."""
@@ -980,7 +981,8 @@ class SiteUserTestCase(DefaultSiteTestCase):
                           end=pywikibot.Timestamp.fromISOformat("2008-02-03T00:00:01Z"), reverse=True, total=5)
         for change in mysite.recentchanges(namespaces=[6, 7], total=5):
             self.assertIsInstance(change, dict)
-            self.assertTrue("title" in change and "ns" in change)
+            self.assertIn('title', change)
+            self.assertIn('ns', change)
             title = change['title']
             self.assertIn(":", title)
             prefix = title[:title.index(":")]
@@ -1179,7 +1181,8 @@ class SiteUserTestCase(DefaultSiteTestCase):
                           end="2008-09-03T00:00:01Z", reverse=True, total=5)
         for rev in mysite.watchlist_revs(namespaces=[6, 7], total=5):
             self.assertIsInstance(rev, dict)
-            self.assertTrue("title" in rev and "ns" in rev)
+            self.assertIn('title', rev)
+            self.assertIn('ns', rev)
             title = rev['title']
             self.assertIn(":", title)
             prefix = title[:title.index(":")]
@@ -1676,7 +1679,7 @@ class TestSiteinfoAsync(DefaultSiteTestCase):
 
     def test_async_request(self):
         self.assertTrue(page_put_queue.empty())
-        self.assertTrue('statistics' not in self.site.siteinfo)
+        self.assertNotIn('statistics', self.site.siteinfo)
         async_request(self.site.siteinfo.get, 'statistics')
         page_put_queue.join()
         self.assertIn('statistics', self.site.siteinfo)

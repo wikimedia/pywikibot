@@ -43,7 +43,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                     if template:
                         # check whether site is valid
                         site = pywikibot.Site('en', 'wikipedia')
-                        self.assertTrue(code in site.languages())
+                        self.assertIn(code, site.languages())
 
                         # check whether template exists
                         title = template[0]
