@@ -68,9 +68,9 @@ deadlock_script_list = [
 
 script_list = (['login'] +
                [name[0:-3] for name in os.listdir(scripts_path)  # strip '.py'
-                if name.endswith('.py')
-                and not name.startswith('_')  # skip __init__.py and _*
-                and name != 'login.py'        # this is moved to be first
+                if name.endswith('.py') and
+                not name.startswith('_') and  # skip __init__.py and _*
+                name != 'login.py'        # this is moved to be first
                 ]
                )
 
@@ -181,17 +181,17 @@ def collector(loader=unittest.loader.defaultTestLoader):
     tests = (['test__login_help'] +
              ['test_' + name + '_help'
               for name in sorted(script_list)
-              if name != 'login'
-              and name not in deadlock_script_list] +
+              if name != 'login' and
+              name not in deadlock_script_list] +
              ['test__login_simulate'])
 
     tests += ['test_' + name + '_simulate'
               for name in sorted(script_list)
-              if name != 'login'
-              and name not in deadlock_script_list
-              and name not in failed_dep_script_list
-              and name not in unrunnable_script_list
-              and (enable_autorun_tests or name not in auto_run_script_list)]
+              if name != 'login' and
+              name not in deadlock_script_list and
+              name not in failed_dep_script_list and
+              name not in unrunnable_script_list and
+              (enable_autorun_tests or name not in auto_run_script_list)]
 
     test_list = ['tests.script_tests.TestScript.' + name
                  for name in tests]
@@ -285,8 +285,8 @@ class TestScriptMeta(MetaTestCaseClass):
                     # But also complain if there is any stdout
                     # but ignore shell.py emiting its '>>> ' prompt.
                     if ((script_name == 'shell' and
-                                set(result['stdout']).issubset(set('> \n')))
-                            or result['stdout'] == ''):
+                                set(result['stdout']).issubset(set('> \n'))) or
+                            result['stdout'] == ''):
                         result['stdout'] = None
                     self.assertIsNone(result['stdout'])
 

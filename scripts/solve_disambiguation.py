@@ -660,12 +660,10 @@ class DisambiguationRobot(Bot):
                     if not self.always:
                         # at the beginning of the link, start red color.
                         # at the end of the link, reset the color to default
-                        pywikibot.output(text[max(0, m.start() - context):
-                                              m.start()]
-                                         + '\03{lightred}'
-                                         + text[m.start():m.end()]
-                                         + '\03{default}'
-                                         + text[m.end():m.end() + context])
+                        pywikibot.output(
+                            text[max(0, m.start() - context):m.start()] +
+                            '\03{lightred}' + text[m.start():m.end()] +
+                            '\03{default}' + text[m.end():m.end() + context])
                         options = ['#', 'r#', '[s]kip link', '[e]dit page',
                                    '[n]ext page', '[u]nlink', '[q]uit']
                         if self.dn_template_str:
@@ -804,8 +802,8 @@ class DisambiguationRobot(Bot):
                     new_page_title = self.alternatives[choice]
                     repPl = pywikibot.Page(pywikibot.Link(new_page_title,
                                                           disambPage.site))
-                    if (new_page_title[0].isupper()
-                            or link_text[0].isupper()):
+                    if (new_page_title[0].isupper() or
+                            link_text[0].isupper()):
                         new_page_title = repPl.title()
                     else:
                         new_page_title = repPl.title()
@@ -817,8 +815,8 @@ class DisambiguationRobot(Bot):
                         newlink = "[[%s%s]]%s" % (new_page_title,
                                                   section,
                                                   trailing_chars)
-                    elif replaceit or (new_page_title == link_text
-                                       and not section):
+                    elif replaceit or (new_page_title == link_text and
+                                       not section):
                         newlink = "[[%s]]" % new_page_title
                     # check if we can create a link with trailing characters
                     # instead of a pipelink
@@ -856,8 +854,8 @@ class DisambiguationRobot(Bot):
 
     def findAlternatives(self, disambPage):
         if disambPage.isRedirectPage() and not self.primary:
-            if (disambPage.site.lang in self.primary_redir_template
-                and self.primary_redir_template[disambPage.site.lang]
+            if (disambPage.site.lang in self.primary_redir_template and
+                    self.primary_redir_template[disambPage.site.lang]
                     in disambPage.templates(get_redirect=True)):
                 baseTerm = disambPage.title()
                 for template in disambPage.templatesWithParams(

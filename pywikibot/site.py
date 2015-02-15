@@ -455,8 +455,8 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         # int(None) raises TypeError; however, bool needs special handling.
         result = [NotImplemented if isinstance(ns, bool) else
                   Namespace.lookup_name(ns, namespaces)
-                  if isinstance(ns, basestring)
-                      and not ns.lstrip('-').isdigit() else
+                  if isinstance(ns, basestring) and
+                      not ns.lstrip('-').isdigit() else
                   namespaces[int(ns)] if int(ns) in namespaces
                   else None
                   for ns in identifiers]
@@ -1702,10 +1702,9 @@ class APISite(BaseSite):
           - blockinfo: present if user is blocked (dict)
 
         """
-        if (not hasattr(self, "_userinfo")
-                or "rights" not in self._userinfo
-                or self._userinfo['name']
-                   != self._username["sysop" in self._userinfo["groups"]]):
+        if (not hasattr(self, '_userinfo') or
+                'rights' not in self._userinfo or
+                self._userinfo['name'] != self._username['sysop' in self._userinfo['groups']]):
             uirequest = api.Request(
                 site=self,
                 action="query",
@@ -1788,8 +1787,8 @@ class APISite(BaseSite):
         @rtype: C{set} of L{Namespace}
         """
         # TODO: Integrate into _userinfo
-        if (force or not hasattr(self, "_useroptions")
-                or self.user() != self._useroptions['_name']):
+        if (force or not hasattr(self, '_useroptions') or
+                self.user() != self._useroptions['_name']):
             uirequest = api.Request(
                 site=self,
                 action="query",
@@ -1806,8 +1805,8 @@ class APISite(BaseSite):
             self._useroptions['_name'] = (
                 None if 'anon' in uidata['query']['userinfo'] else
                 uidata['query']['userinfo']['name'])
-        return set(ns for ns in self.namespaces().values() if ns.id >= 0
-                   and self._useroptions['searchNs{0}'.format(ns.id)] in ['1', True])
+        return set(ns for ns in self.namespaces().values() if ns.id >= 0 and
+                   self._useroptions['searchNs{0}'.format(ns.id)] in ['1', True])
 
     def assert_valid_iter_params(self, msg_prefix, start, end, reverse):
         """Validate iterating API parameters."""
@@ -3337,13 +3336,12 @@ class APISite(BaseSite):
         if prefix:
             apgen.request["gapprefix"] = prefix
         if filterredir is not None:
-            apgen.request["gapfilterredir"] = (filterredir
-                                               and "redirects"
-                                               or "nonredirects")
+            apgen.request['gapfilterredir'] = ('redirects' if filterredir else
+                                               'nonredirects')
         if filterlanglinks is not None:
-            apgen.request["gapfilterlanglinks"] = (filterlanglinks
-                                                   and "withlanglinks"
-                                                   or "withoutlanglinks")
+            apgen.request['gapfilterlanglinks'] = ('withlanglinks'
+                                                   if filterlanglinks else
+                                                   'withoutlanglinks')
         if isinstance(minsize, int):
             apgen.request["gapminsize"] = str(minsize)
         if isinstance(maxsize, int):
@@ -3602,8 +3600,8 @@ class APISite(BaseSite):
         """
         iuargs = dict(giutitle=image.title(withSection=False))
         if filterredir is not None:
-            iuargs["giufilterredir"] = (filterredir and "redirects"
-                                        or "nonredirects")
+            iuargs['giufilterredir'] = ('redirects' if filterredir else
+                                        'nonredirects')
         iugen = self._generator(api.PageGenerator, type_arg="imageusage",
                                 namespaces=namespaces, step=step,
                                 total=total, g_content=content, **iuargs)
@@ -4893,8 +4891,8 @@ class APISite(BaseSite):
                             break
                 else:  # not chunked upload
                     file_contents = f.read()
-                    filetype = (mimetypes.guess_type(source_filename)[0]
-                                or 'application/octet-stream')
+                    filetype = (mimetypes.guess_type(source_filename)[0] or
+                                'application/octet-stream')
                     additional_parameters = {
                         'mime_params': {
                             'file': (file_contents,

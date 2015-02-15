@@ -316,8 +316,8 @@ class Tree(Query):
         if not self.isOrContainsOnlyTypes(item, [int, ItemPage]):
             raise TypeError("The item paramter must contain or be integer IDs "
                             "or page.ItemPages")
-        elif (not self.isOrContainsOnlyTypes(forward, [int, PropertyPage])
-                or not self.isOrContainsOnlyTypes(reverse, [int, PropertyPage])):
+        elif (not self.isOrContainsOnlyTypes(forward, [int, PropertyPage]) or
+                not self.isOrContainsOnlyTypes(reverse, [int, PropertyPage])):
             raise TypeError("The forward and reverse parameters must contain "
                             "or be integer IDs or page.PropertyPages")
 

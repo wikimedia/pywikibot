@@ -332,8 +332,8 @@ class ParamInfo(Container):
                                      for mod in module_batch]
             else:
                 params['modules'] = [mod for mod in module_batch
-                                     if mod not in self._query_modules
-                                     and mod not in self.root_modules]
+                                     if mod not in self._query_modules and
+                                        mod not in self.root_modules]
                 params['querymodules'] = [mod for mod in module_batch
                                           if mod in self._query_modules]
 
@@ -818,8 +818,8 @@ class Request(MutableMapping):
             self["assert"] = 'user'  # make sure user is logged in
 
         if (self.site.protocol() == 'http' and (config.use_SSL_always or (
-                self.action == 'login' and config.use_SSL_onlogin))
-                and self.site.family.name in config.available_ssl_project):
+                self.action == 'login' and config.use_SSL_onlogin)) and
+                self.site.family.name in config.available_ssl_project):
             self.site = EnableSSLSiteWrapper(self.site)
 
     @classmethod
@@ -1031,9 +1031,9 @@ class Request(MutableMapping):
 
     def __str__(self):
         """Return a string representation."""
-        return unquote(self.site.scriptpath()
-                              + "/api.php?"
-                              + self._http_param_string())
+        return unquote(self.site.scriptpath() +
+                       '/api.php?' +
+                       self._http_param_string())
 
     def __repr__(self):
         """Return internal representation."""
@@ -1267,10 +1267,10 @@ class Request(MutableMapping):
                     else:
                         self.site._userinfo = result['query']['userinfo']
                 status = self.site._loginstatus  # save previous login status
-                if (("error" in result
-                     and result["error"]["code"].endswith("limit"))
-                    or (status >= 0
-                        and self.site._userinfo['name'] != self.site._username[status])):
+                if (('error' in result and
+                     result['error']['code'].endswith('limit')) or
+                    (status >= 0 and
+                        self.site._userinfo['name'] != self.site._username[status])):
                     # user is no longer logged in (session expired?)
                     # reset userinfo, then make user log in again
                     del self.site._userinfo

@@ -99,9 +99,9 @@ class UnlinkBot(Bot):
                 choice = 'a'
             else:
                 pywikibot.output(
-                    text[max(0, match.start() - context):match.start()]
-                    + '\03{lightred}' + text[match.start():match.end()]
-                    + '\03{default}' + text[match.end():match.end() + context])
+                    text[max(0, match.start() - context):match.start()] +
+                    '\03{lightred}' + text[match.start():match.end()] +
+                    '\03{default}' + text[match.end():match.end() + context])
                 choice = pywikibot.input_choice(
                     u'\nWhat shall be done with this link?\n',
                     [('unlink', 'u'), ('skip', 's'), ('edit', 'e'),

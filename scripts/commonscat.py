@@ -387,8 +387,8 @@ class CommonscatBot(Bot):
             ipage = pywikibot.page.Page(ipageLink)
             pywikibot.log("Looking for template on %s" % (ipage.title()))
             try:
-                if(not ipage.exists() or ipage.isRedirectPage()
-                   or ipage.isDisambig()):
+                if (not ipage.exists() or ipage.isRedirectPage() or
+                        ipage.isDisambig()):
                     continue
                 commonscatLink = self.getCommonscatLink(ipage)
                 if not commonscatLink:

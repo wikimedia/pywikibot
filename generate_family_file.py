@@ -143,8 +143,8 @@ class FamilyFileGenerator(object):
                     print(wiki['prefix'], wiki['url'])
                 do_langs = raw_input("Which languages do you want: ")
                 self.langs = [wiki for wiki in self.langs
-                              if wiki['prefix'] in do_langs
-                              or wiki['url'] == w.iwpath]
+                              if wiki['prefix'] in do_langs or
+                              wiki['url'] == w.iwpath]
             else:
                 self.langs = [wiki for wiki in self.langs
                               if wiki[u'url'] == w.iwpath]

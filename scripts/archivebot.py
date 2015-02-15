@@ -422,8 +422,8 @@ class PageArchiver(object):
         self.attributes[attr] = [value, out]
 
     def saveables(self):
-        return [a for a in self.attributes if self.attributes[a][1]
-                and a != 'maxage']
+        return [a for a in self.attributes if self.attributes[a][1] and
+                a != 'maxage']
 
     def attr2text(self):
         return '{{%s\n%s\n}}' \

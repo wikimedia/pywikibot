@@ -971,8 +971,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
         self.assertLessEqual(len(uc), 10)
         self.assertTrue(all(isinstance(contrib, dict)
                             for contrib in uc))
-        self.assertTrue(all("user" in contrib
-                            and contrib["user"] == mysite.user()
+        self.assertTrue(all('user' in contrib and contrib['user'] == mysite.user()
                             for contrib in uc))
         for contrib in mysite.usercontribs(userprefix="John", total=5):
             self.assertIsInstance(contrib, dict)

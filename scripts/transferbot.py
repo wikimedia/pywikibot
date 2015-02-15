@@ -134,8 +134,7 @@ def main(*args):
     for page in gen:
         summary = "Moved page from %s" % page.title(asLink=True)
         targetpage = pywikibot.Page(tosite, prefix + page.title())
-        edithistpage = pywikibot.Page(tosite, prefix + page.title()
-                                      + "/edithistory")
+        edithistpage = pywikibot.Page(tosite, prefix + page.title() + '/edithistory')
 
         if targetpage.exists() and not overwrite:
             pywikibot.output(

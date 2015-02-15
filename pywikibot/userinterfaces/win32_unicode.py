@@ -83,8 +83,8 @@ if sys.platform == "win32":
         def not_a_console(handle):
             if handle == INVALID_HANDLE_VALUE or handle is None:
                 return True
-            return ((GetFileType(handle) & ~FILE_TYPE_REMOTE) != FILE_TYPE_CHAR
-                    or GetConsoleMode(handle, byref(DWORD())) == 0)
+            return ((GetFileType(handle) & ~FILE_TYPE_REMOTE) != FILE_TYPE_CHAR or
+                    GetConsoleMode(handle, byref(DWORD())) == 0)
 
         old_stdin_fileno = None
         old_stdout_fileno = None

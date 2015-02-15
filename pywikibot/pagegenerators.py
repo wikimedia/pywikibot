@@ -469,8 +469,7 @@ class GeneratorFactory(object):
             if not fileLinksPageTitle:
                 fileLinksPageTitle = i18n.input(
                     'pywikibot-enter-file-links-processing')
-            if fileLinksPageTitle.startswith(self.site.namespace(6)
-                                             + ":"):
+            if fileLinksPageTitle.startswith(self.site.namespace(6) + ':'):
                 fileLinksPage = pywikibot.FilePage(self.site,
                                                    fileLinksPageTitle)
             else:
