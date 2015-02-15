@@ -83,6 +83,9 @@ class RcListenerThread(threading.Thread):
         class RCListener(socketIO_client.BaseNamespace):
             def on_change(self, change):
                 debug('Received change %r' % change, _logger)
+                if not thread.running:
+                    debug('Thread in shutdown mode; ignoring change.', _logger)
+                    return
 
                 thread.count += 1
                 thread.queue.put(change)
