@@ -167,7 +167,7 @@ class DotReadableDict(UnicodeMixin):
 
     def __repr__(self):
         """Return a more complete string representation."""
-        return repr(self.__dict___)
+        return repr(self.__dict__)
 
 
 def concat_options(message, line_length, options):
