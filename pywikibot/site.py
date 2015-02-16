@@ -4085,6 +4085,9 @@ class APISite(BaseSite):
                       nocreate=nocreate, minor=minor,
                       notminor=not minor and notminor)
 
+        if lastrev is not None:
+            params['basetimestamp'] = lastrev.timestamp
+
         watch_items = set(["watch", "unwatch", "preferences", "nochange"])
         if watch in watch_items:
             if MediaWikiVersion(self.version()) < MediaWikiVersion("1.16"):
