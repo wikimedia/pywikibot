@@ -13,6 +13,7 @@ import logging
 import re
 import collections
 import imp
+import string
 import warnings
 
 if sys.version_info[0] > 2:
@@ -20,13 +21,19 @@ if sys.version_info[0] > 2:
 else:
     import urlparse
 
+from warnings import warn
+
 import pywikibot
 
 from pywikibot import config2 as config
 from pywikibot.tools import deprecated, deprecate_arg
-from pywikibot.exceptions import UnknownFamily, Error
+from pywikibot.exceptions import Error, UnknownFamily, FamilyMaintenanceWarning
 
 logger = logging.getLogger("pywiki.wiki.family")
+
+# Legal characters for Family.name and Family.langs keys
+NAME_CHARACTERS = string.ascii_letters + string.digits
+CODE_CHARACTERS = string.ascii_lowercase + string.digits + '-'
 
 
 class Family(object):
@@ -858,6 +865,9 @@ class Family(object):
         """
         if fam is None:
             fam = config.family
+
+        assert(all(x in NAME_CHARACTERS for x in fam))
+
         if fam in Family._families:
             return Family._families[fam]
 
@@ -881,11 +891,26 @@ class Family(object):
             #     RuntimeWarning's while loading.
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", RuntimeWarning)
-                myfamily = imp.load_source(fam, config.family_files[fam])
+                mod = imp.load_source(fam, config.family_files[fam])
         except (ImportError, KeyError):
-            raise UnknownFamily("Family %s does not exist" % fam)
-        Family._families[fam] = myfamily.Family()
-        return Family._families[fam]
+            raise UnknownFamily(u'Family %s does not exist' % fam)
+        cls = mod.Family()
+        if cls.name != fam:
+            warn(u'Family name %s does not match family module name %s'
+                 % (cls.name, fam), FamilyMaintenanceWarning)
+        # Family 'name' and the 'langs' codes must be ascii, and the
+        # codes must be lower-case due to the Site loading algorithm.
+        if not all(x in NAME_CHARACTERS for x in cls.name):
+            warn(u'Family name %s contains non-ascii characters' % cls.name,
+                 FamilyMaintenanceWarning)
+        # FIXME: wikisource uses code '-' for www.wikisource.org
+        if not all(all(x in CODE_CHARACTERS for x in code) and
+                   (cls.name == 'wikisource' or code[0] != '-')
+                   for code in cls.langs.keys()):
+            warn(u'Family %s codes contains non-ascii characters',
+                 FamilyMaintenanceWarning)
+        Family._families[fam] = cls
+        return cls
 
     @property
     def iwkeys(self):

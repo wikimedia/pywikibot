@@ -26,6 +26,8 @@ class Family(family.WikimediaFamily):
 
         self.langs = dict([(lang, '%s.wikisource.org' % lang)
                            for lang in self.languages_by_size])
+        # FIXME: '-' is invalid at the beginning of a hostname, and
+        # '-' is not a valid subdomain.
         self.langs['-'] = 'wikisource.org'
 
         # Global bot allowed languages on https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
