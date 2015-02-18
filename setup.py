@@ -68,6 +68,13 @@ if sys.version_info[0] == 2:
         script_deps['replicate_wiki.py'] = ['argparse']
         dependencies.append('future')  # provides collections backports
 
+    # tools.ip does not depend on an ipaddress module, as it falls back to
+    # using regexes if not available, however the pywikibot package should use
+    # the functional backport of py3 ipaddress, which is:
+    # https://pypi.python.org/pypi/ipaddress
+    # Other backports are likely broken.
+    dependencies.append('ipaddress')
+
 if sys.version_info[0] == 3:
     if sys.version_info[1] < 3:
         print("ERROR: Python 3.3 or higher is required!")

@@ -41,6 +41,7 @@ else:
 import pywikibot
 
 from pywikibot import config
+from pywikibot.comms import http
 from pywikibot.family import Family
 from pywikibot.site import Namespace
 from pywikibot.exceptions import (
@@ -53,6 +54,8 @@ from pywikibot.tools import (
     remove_last_args, _NotImplementedWarning,
     OrderedDict, Counter,
 )
+from pywikibot.tools.ip import ip_regexp  # noqa & deprecated
+from pywikibot.tools.ip import is_IP
 from pywikibot import textlib
 
 
@@ -2031,7 +2034,6 @@ class FilePage(Page):
         same FilePage object, the page will only be downloaded once.
         """
         if not hasattr(self, '_imagePageHtml'):
-            from pywikibot.comms import http
             path = "%s/index.php?title=%s" \
                    % (self.site.scriptpath(), self.title(asUrl=True))
             self._imagePageHtml = http.request(self.site, path)
@@ -2537,15 +2539,6 @@ class Category(Page):
         return sorted(list(set(self.categories())))
 
 
-ip_regexp = re.compile(r'^(?:(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}'
-                       r'(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|'
-                       r'(((?=(?=(.*?(::)))\3(?!.+\4)))\4?|[\dA-F]{1,4}:)'
-                       r'([\dA-F]{1,4}(\4|:\b)|\2){5}'
-                       r'(([\dA-F]{1,4}(\4|:\b|$)|\2){2}|'
-                       r'(((2[0-4]|1\d|[1-9])?\d|25[0-5])\.?\b){4}))\Z',
-                       re.IGNORECASE)
-
-
 class User(Page):
 
     """A class that represents a Wiki user.
@@ -2620,7 +2613,7 @@ class User(Page):
 
         @return: bool
         """
-        return ip_regexp.match(self.username) is not None
+        return is_IP(self.username)
 
     def getprops(self, force=False):
         """Return a properties about the user.

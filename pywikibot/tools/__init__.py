@@ -193,6 +193,54 @@ def concat_options(message, line_length, options):
     return u'{0} ({1}):'.format(message, option_msg)
 
 
+class LazyRegex(object):
+
+    """Regex object that compiles the regex on usage."""
+
+    def __init__(self):
+        """Constructor."""
+        self._raw = None
+        self._flags = None
+        self._compiled = None
+        super(LazyRegex, self).__init__()
+
+    @property
+    def raw(self):
+        """Get raw property."""
+        return self._raw
+
+    @raw.setter
+    def raw(self, value):
+        """Set raw property."""
+        self._raw = value
+        self._compiled = None
+
+    @property
+    def flags(self):
+        """Get flags property."""
+        return self._flags
+
+    @flags.setter
+    def flags(self, value):
+        """Set flags property."""
+        self._flags = value
+        self._compiled = None
+
+    def __getattr__(self, attr):
+        """Compile the regex and delegate all attribute to the regex."""
+        if self._raw:
+            if not self._compiled:
+                self._compiled = re.compile(self._raw, self._flags)
+
+            if hasattr(self._compiled, attr):
+                return getattr(self._compiled, attr)
+
+            raise AttributeError('%s: attr %s not recognised'
+                                 % (self.__class__.__name__, attr))
+        else:
+            raise AttributeError('%s.raw not set' % self.__class__.__name__)
+
+
 class MediaWikiVersion(Version):
 
     """
