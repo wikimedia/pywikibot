@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+from datetime import datetime
 
 from pywikibot import date
 from tests.aspects import unittest, MetaTestCaseClass, TestCase
@@ -58,6 +58,34 @@ class TestDate(TestCase):
     __metaclass__ = TestDateMeta
 
     net = False
+
+
+class TestMonthDelta(TestCase):
+
+    """Tests for adding months to a date and getting the months between two."""
+
+    net = False
+
+    def test_apply_positive_delta(self):
+        """Test adding months to a date."""
+        self.assertEqual(datetime(2012, 3, 10), date.apply_month_delta(datetime(2012, 1, 10), 2))
+        self.assertEqual(datetime(2012, 3, 31), date.apply_month_delta(datetime(2012, 1, 31), 2))
+        self.assertEqual(datetime(2012, 2, 29), date.apply_month_delta(datetime(2012, 1, 31)))
+        self.assertEqual(datetime(2012, 3, 2), date.apply_month_delta(datetime(2012, 1, 31), add_overlap=True))
+
+    def test_apply_negative_delta(self):
+        """Test adding months to a date."""
+        self.assertEqual(datetime(2012, 1, 10), date.apply_month_delta(datetime(2012, 3, 10), -2))
+        self.assertEqual(datetime(2012, 1, 31), date.apply_month_delta(datetime(2012, 3, 31), -2))
+        self.assertEqual(datetime(2012, 2, 29), date.apply_month_delta(datetime(2012, 3, 31), -1))
+        self.assertEqual(datetime(2012, 3, 2), date.apply_month_delta(datetime(2012, 3, 31), -1, add_overlap=True))
+
+    def test_get_delta(self):
+        """Test that the delta is calculated correctly."""
+        self.assertEqual(date.get_month_delta(datetime(2012, 1, 31), datetime(2012, 3, 31)), 2)
+        self.assertEqual(date.get_month_delta(datetime(2012, 3, 31), datetime(2012, 1, 31)), -2)
+        self.assertEqual(date.get_month_delta(datetime(2012, 3, 31), datetime(2013, 1, 31)), 10)
+        self.assertEqual(date.get_month_delta(datetime(2014, 3, 31), datetime(2013, 3, 31)), -12)
 
 
 if __name__ == '__main__':

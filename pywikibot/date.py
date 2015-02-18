@@ -15,6 +15,8 @@ from __future__ import division
 __version__ = '$Id$'
 #
 
+import calendar
+import datetime
 import re
 import sys
 
@@ -2362,6 +2364,53 @@ def formatYear(lang, year):
         return formats['YearBC'][lang](-year)
     else:
         return formats['YearAD'][lang](year)
+
+
+def apply_month_delta(date, month_delta=1, add_overlap=False):
+    """
+    Add or subtract months from the date.
+
+    By default if the new month has less days then the day of the date it
+    chooses the last day in the new month. For example a date in the March 31st
+    added by one month will result in April 30th.
+
+    When the overlap is enabled, and there is overlap, then the new_date will be
+    one month off and get_month_delta will report a number one higher.
+
+    It does only work on calendars with 12 months per year, and where the months
+    are numbered consecutively beginning by 1.
+
+    @param date: The starting date
+    @type date: date
+    @param month_delta: The amount of months added or subtracted.
+    @type month_delta: int
+    @param add_overlap: Add any missing days to the date, increasing the month
+        once more.
+    @type add_overlap: bool
+    @return: The end date
+    @rtype: type of date
+    """
+    if int(month_delta) != month_delta:
+        raise ValueError('Month delta must be an integer')
+    month = (date.month - 1) + month_delta
+    year = date.year + month // 12
+    month = month % 12 + 1
+    day = min(date.day, calendar.monthrange(year, month)[1])
+    new_date = date.replace(year, month, day)
+    if add_overlap and day != date.day:
+        assert(date.day > day)
+        new_date += datetime.timedelta(days=date.day - day)
+    return new_date
+
+
+def get_month_delta(date1, date2):
+    """
+    Return the difference between to dates in months.
+
+    It does only work on calendars with 12 months per year, and where the months
+    are consecutive and non-negative numbers.
+    """
+    return date2.month - date1.month + (date2.year - date1.year) * 12
 
 
 if __name__ == "__main__":
