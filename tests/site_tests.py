@@ -692,6 +692,43 @@ class TestSiteGenerators(DefaultSiteTestCase):
         site.lock_page(page=p1, block=False)
         site.unlock_page(page=p1)
 
+    def test_protectedpages_create(self):
+        """Test that protectedpages returns protected page titles."""
+        pages = list(self.get_site().protectedpages(type='create', total=10))
+        for page in pages:
+            self.assertFalse(page.exists())
+        self.assertLessEqual(len(pages), 10)
+
+    def test_protectedpages_edit(self):
+        """Test that protectedpages returns protected pages."""
+        site = self.get_site()
+        pages = list(site.protectedpages(type='edit', total=10))
+        for page in pages:
+            self.assertTrue(page.exists())
+            self.assertIn('edit', page.protection())
+        self.assertLessEqual(len(pages), 10)
+
+    def test_protectedpages_edit_level(self):
+        site = self.get_site()
+        levels = set()
+        all_levels = site.protection_levels().difference([''])
+        for level in all_levels:
+            if list(site.protectedpages(type='edit', level=level, total=1)):
+                levels.add(level)
+        # select one level which won't yield all pages from above
+        level = next(iter(levels))
+        if len(levels) == 1:
+            # if only one level found, then use any other except that
+            level = next(iter(all_levels.difference([level])))
+        invalid_levels = all_levels.difference([level])
+        pages = list(site.protectedpages(type='edit', level=level, total=10))
+        for page in pages:
+            self.assertTrue(page.exists())
+            self.assertIn('edit', page.protection())
+            self.assertEqual(page.protection()['edit'][0], level)
+            self.assertNotIn(page.protection()['edit'][0], invalid_levels)
+        self.assertLessEqual(len(pages), 10)
+
 
 class TestImageUsage(DefaultSiteTestCase):
 
@@ -1459,6 +1496,10 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def testInvalidToken(self):
         self.assertRaises(pywikibot.Error, lambda t: self.mysite.tokens[t], "invalidtype")
+
+    def test_deprecated_token(self):
+        self.assertEqual(self.mysite.getToken(), self.mysite.tokens['edit'])
+        self.assertEqual(self.mysite.getPatrolToken(), self.mysite.tokens['patrol'])
 
 
 class TestSiteExtensions(WikimediaDefaultSiteTestCase):

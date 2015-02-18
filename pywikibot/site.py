@@ -2758,6 +2758,31 @@ class APISite(BaseSite):
         """
         return self.tokens[tokentype]
 
+    @deprecated("the 'tokens' property")
+    def getToken(self, getalways=True, getagain=False, sysop=False):
+        """DEPRECATED: Get edit token."""
+        if self.username(sysop) != self.user():
+            raise ValueError('The token for {0} was requested but only the '
+                             'token for {1} can be retrieved.'.format(
+                             self.username(sysop), self.user()))
+        if not getalways:
+            raise ValueError('In pywikibot/core getToken does not support the '
+                             'getalways parameter.')
+        token = self.validate_tokens(['edit'])[0]
+        if getagain and token in self.tokens:
+            # invalidate token
+            del self.tokens._tokens[self.user()][token]
+        return self.tokens[token]
+
+    @deprecated("the 'tokens' property")
+    def getPatrolToken(self, sysop=False):
+        """DEPRECATED: Get patrol token."""
+        if self.username(sysop) != self.user():
+            raise ValueError('The token for {0} was requested but only the '
+                             'token for {1} can be retrieved.'.format(
+                             self.username(sysop), self.user()))
+        return self.tokens['patrol']
+
     # following group of methods map more-or-less directly to API queries
 
     def pagebacklinks(self, page, followRedirects=False, filterRedirects=None,
@@ -5287,6 +5312,35 @@ class APISite(BaseSite):
                                 gqppage="Listredirects",
                                 step=step, total=total)
         return lrgen
+
+    @deprecated_args(lvl='level')
+    def protectedpages(self, namespace=0, type='edit', level=False, total=None):
+        """
+        Return protected pages depending on protection level and type.
+
+        For protection types which aren't 'create' it uses L{APISite.allpages},
+        while it uses for 'create' the 'query+protectedtitles' module.
+
+        @param namespaces: The searched namespace.
+        @type namespaces: int or Namespace or str
+        @param type: The protection type to search for (default 'edit').
+        @type type: str
+        @param level: The protection level (like 'autoconfirmed'). If False it
+            shows all protection levels.
+        @type level: str or False
+        @return: The pages which are protected.
+        @rtype: generator of Page
+        """
+        namespaces = Namespace.resolve(namespace, self.namespaces)
+        # always assert that, so we are be sure that type could be 'create'
+        assert('create' in self.protection_types())
+        if type == 'create':
+            return self._generator(
+                api.PageGenerator, type_arg='protectedtitles',
+                namespaces=namespaces, gptlevel=level, total=total)
+        else:
+            return self.allpages(namespace=namespaces[0], protect_level=level,
+                                 protect_type=type, total=total)
 
 
 class DataSite(APISite):
