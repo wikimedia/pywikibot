@@ -535,8 +535,9 @@ class PageArchiver(object):
                 self.archives[a].update(comment)
 
             # Save the page itself
-            rx = re.compile(r"{{(?:%s)?\:?%s\n.*?\n}}" % (u'|'.join(
-                set(self.site.namespaces[self.tpl.namespace()])),
+            marker = '?' if self.tpl.namespace() == 10 else ''
+            rx = re.compile(r"\{\{(?:(?:%s):)%s%s\s*?\n.*?\n\}\}" % (u'|'.join(
+                set(self.site.namespaces[self.tpl.namespace()])), marker,
                 re.escape(self.tpl.title(withNamespace=False))), re.DOTALL)
             if not rx.search(self.page.header):
                 pywikibot.error("Couldn't find the template in the header")
