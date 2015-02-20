@@ -428,8 +428,8 @@ class PageArchiver(object):
     def attr2text(self):
         return '{{%s\n%s\n}}' \
                % (self.tpl.title(withNamespace=(self.tpl.namespace() != 10)),
-                  '\n'.join(['|%s = %s' % (a, self.get_attr(a))
-                             for a in self.saveables()]))
+                  '\n'.join('|%s = %s' % (a, self.get_attr(a))
+                            for a in self.saveables()))
 
     def key_ok(self):
         s = md5()
@@ -455,7 +455,7 @@ class PageArchiver(object):
 
         If it doesn't exist yet, create it.
         If archive name is an empty string (or None),
-        discard the thread (/dev/null).
+        discard the thread.
         Also checks for security violations.
 
         """
@@ -544,12 +544,11 @@ class PageArchiver(object):
                 return
             self.page.header = rx.sub(self.attr2text(), self.page.header)
             self.comment_params['count'] = self.archived_threads
+            comma = self.site.mediawiki_message('comma-separator')
             self.comment_params['archives'] \
-                = ', '.join(['[[' + a.title() + ']]'
-                             for a in self.archives.values()])
-            if not self.comment_params['archives']:
-                self.comment_params['archives'] = '/dev/null'
-            self.comment_params['why'] = ', '.join(whys)
+                = comma.join(a.title(asLink=True)
+                             for a in self.archives.values())
+            self.comment_params['why'] = comma.join(whys)
             comment = i18n.twntranslate(self.site.code,
                                         'archivebot-page-summary',
                                         self.comment_params)
