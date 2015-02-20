@@ -397,10 +397,10 @@ class PageArchiver(object):
             'counter': ['1', False],
             'key': ['', False],
         }
-        self.tpl = tpl
         self.salt = salt
         self.force = force
         self.site = page.site
+        self.tpl = pywikibot.Page(self.site, tpl)
         self.timestripper = TimeStripper(site=self.site)
         self.page = DiscussionPage(page, self)
         self.load_config()
@@ -427,7 +427,7 @@ class PageArchiver(object):
 
     def attr2text(self):
         return '{{%s\n%s\n}}' \
-               % (self.tpl,
+               % (self.tpl.title(),
                   '\n'.join(['|%s = %s' % (a, self.get_attr(a))
                              for a in self.saveables()]))
 
@@ -438,9 +438,9 @@ class PageArchiver(object):
         return self.get_attr('key') == s.hexdigest()
 
     def load_config(self):
-        pywikibot.output(u'Looking for: {{%s}} in %s' % (self.tpl, self.page))
+        pywikibot.output(u'Looking for: {{%s}} in %s' % (self.tpl.title(), self.page))
         for tpl in self.page.templatesWithParams():
-            if tpl[0] == pywikibot.Page(self.site, self.tpl, ns=10):
+            if tpl[0] == pywikibot.Page(self.site, self.tpl.title(), ns=10):
                 for param in tpl[1]:
                     item, value = param.split('=', 1)
                     self.set_attr(item.strip(), value.strip())
@@ -535,7 +535,12 @@ class PageArchiver(object):
                 self.archives[a].update(comment)
 
             # Save the page itself
-            rx = re.compile('{{' + self.tpl + '\n.*?\n}}', re.DOTALL)
+            rx = re.compile(r"{{(?:%s)?\:?%s\n.*?\n}}" % (u'|'.join(
+                set(self.site.namespaces[self.tpl.namespace()])),
+                re.escape(self.tpl.title(withNamespace=False))), re.DOTALL)
+            if not rx.search(self.page.header):
+                pywikibot.error("Couldn't find the template in the header")
+                return
             self.page.header = rx.sub(self.attr2text(), self.page.header)
             self.comment_params['count'] = self.archived_threads
             self.comment_params['archives'] \
@@ -627,6 +632,7 @@ def main(*args):
 
     for a in args:
         pagelist = []
+        a = pywikibot.Page(site, a, ns=10).title()
         if not filename and not pagename:
             if namespace is not None:
                 ns = [str(namespace)]
