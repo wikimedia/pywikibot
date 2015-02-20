@@ -559,7 +559,7 @@ class DisambiguationRobot(Bot):
         # TODO: break this function up into subroutines!
 
         include = False
-        unlink = False
+        unlink_counter = 0
         new_targets = []
         try:
             text = refPage.get()
@@ -769,7 +769,7 @@ class DisambiguationRobot(Bot):
                 elif choice in ['u', 'U']:
                     # unlink - we remove the section if there's any
                     text = text[:m.start()] + link_text + text[m.end():]
-                    unlink = True
+                    unlink_counter += 1
                     continue
                 else:
                     if len(choice) > 0 and choice[0] == 'r':
@@ -843,7 +843,8 @@ class DisambiguationRobot(Bot):
                 pywikibot.showDiff(original_text, text)
                 pywikibot.output(u'')
                 # save the page
-                self.setSummaryMessage(disambPage, new_targets, unlink, dn)
+                self.setSummaryMessage(disambPage, new_targets, unlink_counter,
+                                       dn)
                 try:
                     refPage.put_async(text, comment=self.comment)
                 except pywikibot.LockedPage:
@@ -927,17 +928,16 @@ u"Page does not exist, using the first link in page %s."
             self.alternatives += links
         return True
 
-    def setSummaryMessage(self, disambPage, new_targets=[], unlink=False,
+    def setSummaryMessage(self, disambPage, new_targets=[], unlink_counter=0,
                           dn=False):
         # make list of new targets
-        targets = ''
-        for page_title in new_targets:
-            targets += u'[[%s]], ' % page_title
-        # remove last comma
-        targets = targets[:-2]
+        comma = self.mysite.mediawiki_message(u"comma-separator")
+        targets = comma.join(u'[[%s]]' % page_title
+                             for page_title in new_targets)
 
         if not targets:
-            targets = i18n.twtranslate(self.mysite, 'solve_disambiguation-unknown-page')
+            targets = i18n.twtranslate(self.mysite,
+                                       'solve_disambiguation-unknown-page')
 
         # first check whether user has customized the edit comment
         if (self.mysite.family.name in config.disambiguation_comment and
@@ -957,27 +957,29 @@ u"Page does not exist, using the first link in page %s."
                     fallback=True) % disambPage.title()
         elif disambPage.isRedirectPage():
             # when working on redirects, there's another summary message
-            if unlink and not new_targets:
+            if unlink_counter and not new_targets:
                 self.comment = i18n.twtranslate(
                     self.mysite,
                     'solve_disambiguation-redirect-removed',
-                    {'from': disambPage.title()}
-                )
+                    {'from': disambPage.title(),
+                     'count': unlink_counter})
             elif dn and not new_targets:
                 self.comment = i18n.twtranslate(
                     self.mysite,
                     'solve_disambiguation-redirect-adding-dn-template',
-                    {'from': disambPage.title()}
-                )
+                    {'from': disambPage.title()})
             else:
                 self.comment = i18n.twtranslate(
                     self.mysite, 'solve_disambiguation-redirect-resolved',
-                    {'from': disambPage.title(), 'to': targets})
+                    {'from': disambPage.title(),
+                     'to': targets,
+                     'count': len(new_targets)})
         else:
-            if unlink and not new_targets:
+            if unlink_counter and not new_targets:
                 self.comment = i18n.twtranslate(
                     self.mysite, 'solve_disambiguation-links-removed',
-                    {'from': disambPage.title()})
+                    {'from': disambPage.title(),
+                     'count': unlink_counter})
             elif dn and not new_targets:
                 self.comment = i18n.twtranslate(
                     self.mysite, 'solve_disambiguation-adding-dn-template',
@@ -985,7 +987,9 @@ u"Page does not exist, using the first link in page %s."
             else:
                 self.comment = i18n.twtranslate(
                     self.mysite, 'solve_disambiguation-links-resolved',
-                    {'from': disambPage.title(), 'to': targets})
+                    {'from': disambPage.title(),
+                     'to': targets,
+                     'count': len(new_targets)})
 
     def run(self):
         if self.main_only:
