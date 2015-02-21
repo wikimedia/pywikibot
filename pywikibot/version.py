@@ -274,7 +274,10 @@ def getfileversion(filename):
         with codecs.open(fn, 'r', "utf-8") as f:
             for line in f.readlines():
                 if line.find('__version__') == 0:
-                    exec(line)
+                    try:
+                        exec(line)
+                    except:
+                        pass
                     break
         stat = os.stat(fn)
         mtime = datetime.datetime.fromtimestamp(stat.st_mtime).isoformat(' ')
