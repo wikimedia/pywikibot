@@ -352,10 +352,12 @@ def writelogheader():
 
     # imported modules
     log(u'MODULES:')
-    for item in list(all_modules):
-        ver = version.getfileversion('%s.py' % item.replace('.', '/'))
-        if ver:
-            log(u'  %s' % ver)
+    for module in sys.modules.values():
+        filename = version.get_module_filename(module)
+        ver = version.get_module_version(module)
+        mtime = version.get_module_mtime(module)
+        if filename and ver and mtime:
+            log(u'  {0} {1} {2}'.format(filename, ver[:7], mtime.isoformat(' ')))
 
     if config.log_pywiki_repo_version:
         log(u'PYWIKI REPO VERSION: %s' % version.getversion_onlinerepo())
