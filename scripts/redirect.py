@@ -82,6 +82,12 @@ import pywikibot
 from pywikibot import i18n, xmlreader, Bot
 
 
+def space_to_underscore(link):
+    """Convert spaces to underscore."""
+    # previous versions weren't expecting spaces but underscores
+    return link.canonical_title().replace(' ', '_')
+
+
 class RedirectGenerator:
 
     """Redirect generator."""
@@ -130,45 +136,36 @@ class RedirectGenerator:
                         not in self.namespaces:
                     continue
             if alsoGetPageTitles:
-                pageTitles.add(entry.title.replace(' ', '_'))
+                pageTitles.add(space_to_underscore(pywikibot.Link(entry.title, self.site)))
 
             m = redirR.match(entry.text)
             if m:
                 target = m.group(1)
                 # There might be redirects to another wiki. Ignore these.
-                for code in self.site.family.langs.keys():
-                    if target.startswith('%s:' % code) \
-                            or target.startswith(':%s:' % code):
-                        if code == self.site.language():
-                            # link to our wiki, but with the lang prefix
-                            target = target[(len(code) + 1):]
-                            if target.startswith(':'):
-                                target = target[1:]
-                        else:
-                            pywikibot.output(
-                                u'NOTE: Ignoring %s which is a redirect to %s:'
-                                % (entry.title, code))
-                            target = None
-                            break
+                target_link = pywikibot.Link(target, self.site)
+                try:
+                    target_link.parse()
+                except pywikibot.SiteDefinitionError as e:
+                    pywikibot.log(e)
+                    pywikibot.output(
+                        u'NOTE: Ignoring {0} which is a redirect ({1}) to an '
+                        u'unknown site.'.format(entry.title, target))
+                    target_link = None
+                else:
+                    if target_link.site != self.site:
+                        pywikibot.output(
+                            u'NOTE: Ignoring {0} which is a redirect to '
+                            u'another site {1}.'.format(entry.title, target_link.site))
+                        target_link = None
                 # if the redirect does not link to another wiki
-                if target:
-                    source = entry.title.replace(' ', '_')
-                    target = target.replace(' ', '_')
-                    # remove leading and trailing whitespace
-                    target = target.strip('_')
-                    # capitalize the first letter
-                    if not pywikibot.Site().nocapitalize:
-                        source = source[:1].upper() + source[1:]
-                        target = target[:1].upper() + target[1:]
-                    if '#' in target:
-                        target = target[:target.index('#')].rstrip("_")
-                    if '|' in target:
+                if target_link and target_link.title:
+                    source = pywikibot.Link(entry.title, self.site)
+                    if target_link.anchor:
                         pywikibot.output(
                             u'HINT: %s is a redirect with a pipelink.'
                             % entry.title)
-                        target = target[:target.index('|')].rstrip("_")
-                    if target:  # in case preceding steps left nothing
-                        redict[source] = target
+                    redict[space_to_underscore(source)] = (
+                        space_to_underscore(target_link))
         if alsoGetPageTitles:
             return redict, pageTitles
         else:
