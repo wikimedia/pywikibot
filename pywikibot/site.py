@@ -4068,6 +4068,8 @@ class APISite(BaseSite):
             if not recreate:
                 raise
         token = self.tokens['edit']
+        if bot is None:
+            bot = ("bot" in self.userinfo["rights"])
         self.lock_page(page)
         params = dict(action="edit",
                       title=page.title(withSection=False),

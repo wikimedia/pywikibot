@@ -1026,8 +1026,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not force and not self.botMayEdit():
             raise pywikibot.OtherPageSaveError(
                 self, "Editing restricted by {{bots}} template")
-        if botflag is None:
-            botflag = ("bot" in self.site.userinfo["rights"])
         if async:
             pywikibot.async_request(self._save, comment=comment, minor=minor,
                                     watchval=watchval, botflag=botflag,
