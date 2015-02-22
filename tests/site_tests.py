@@ -1327,9 +1327,13 @@ class SiteUserTestCase2(DefaultSiteTestCase):
         result = result[0]
         self.assertIsInstance(result, dict)
 
+        params = {'rcid': 0}
+        if mysite.version() >= MediaWikiVersion('1.22'):
+            params['revid'] = [0, 1]
+
         try:
             # no such rcid, revid or too old revid
-            result = list(mysite.patrol(rcid=0, revid=[0, 1]))
+            result = list(mysite.patrol(**params))
         except api.APIError as error:
             if error.code == u'badtoken':
                 raise unittest.SkipTest(error)
