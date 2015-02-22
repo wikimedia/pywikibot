@@ -116,19 +116,15 @@ class ImageRobot(Bot):
         super(ImageRobot, self).__init__(**kwargs)
 
         self.generator = generator
-        self.site = pywikibot.Site()
         self.old_image = old_image
         self.new_image = new_image
 
         if not self.getOption('summary'):
-            if self.new_image:
-                self.options['summary'] = i18n.translate(self.site, self.msg_replace,
-                                                         fallback=True) \
-                % (self.old_image, self.new_image)
-            else:
-                self.options['summary'] = i18n.translate(self.site, self.msg_remove,
-                                                         fallback=True) \
-                % self.old_image
+            self.options['summary'] = i18n.translate(
+                self.site, self.msg_replace,
+                (self.old_image, self.new_image) if self.new_image
+                else self.old_image,
+                fallback=True)
 
     def run(self):
         """Start the bot's action."""
@@ -140,7 +136,8 @@ class ImageRobot(Bot):
 
         replacements = []
 
-        if self.site.namespaces[6].case == 'first-letter':
+        namespace = self.site.namespaces[6]
+        if namespace.case == 'first-letter':
             case = re.escape(self.old_image[0].upper() +
                              self.old_image[0].lower())
             escaped = '[' + case + ']' + re.escape(self.old_image[1:])
@@ -152,7 +149,7 @@ class ImageRobot(Bot):
         if not self.getOption('loose') or not self.new_image:
             image_regex = re.compile(
                 r'\[\[ *(?:%s)\s*:\s*%s *(?P<parameters>\|[^\n]+|) *\]\]'
-                % ('|'.join(self.site.namespace(6, all=True)), escaped))
+                % ('|'.join(namespace), escaped))
         else:
             image_regex = re.compile(r'' + escaped)
 

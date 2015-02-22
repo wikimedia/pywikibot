@@ -146,7 +146,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
             pywikibot.output(u'Skipping %s' % page.title(asLink=True))
 
 
-class XmlDumpTemplatePageGenerator:
+class XmlDumpTemplatePageGenerator(object):
 
     """
     Generator which yields Pages that transclude a template.
@@ -248,10 +248,9 @@ class TemplateRobot(Bot):
 
         replacements = []
         exceptions = {}
-        site = pywikibot.Site()
+        namespace = self.site.namespaces[10]
         for old, new in self.templates.items():
-            namespaces = list(site.namespace(10, all=True))
-            if site.namespaces[10].case == 'first-letter':
+            if namespace.case == 'first-letter':
                 pattern = '[' + \
                           re.escape(old[0].upper()) + \
                           re.escape(old[0].lower()) + \
@@ -259,7 +258,7 @@ class TemplateRobot(Bot):
             else:
                 pattern = re.escape(old)
             pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-            templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces) +
+            templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespace) +
                                        r':|[mM][sS][gG]:)?' + pattern +
                                        r'(?P<parameters>\s*\|.+?|) *}}',
                                        re.DOTALL)
@@ -275,7 +274,7 @@ class TemplateRobot(Bot):
             elif self.getOption('remove'):
                 replacements.append((templateRegex, ''))
             else:
-                template = pywikibot.Page(site, new, ns=10)
+                template = pywikibot.Page(self.site, new, ns=10)
                 if not template.exists():
                     pywikibot.warning(u'Template "%s" does not exist.' % new)
                     if not pywikibot.input_yn('Do you want to proceed anyway?',
@@ -311,6 +310,7 @@ def main(*args):
 
     # read command line parameters
     local_args = pywikibot.handle_args(args)
+    site = pywikibot.Site()
     genFactory = pagegenerators.GeneratorFactory()
     for arg in local_args:
         if arg == '-remove':
@@ -340,10 +340,8 @@ def main(*args):
             timestamp = arg[len('-timestamp:'):]
         else:
             if not genFactory.handleArg(arg):
-                templateNames.append(
-                    pywikibot.Page(pywikibot.Site(), arg,
-                                   ns=10
-                                   ).title(withNamespace=False))
+                templateName = pywikibot.Page(site, arg, ns=10)
+                templateNames.append(templateName.title(withNamespace=False))
 
     if not templateNames:
         pywikibot.showHelp()
@@ -357,14 +355,13 @@ def main(*args):
             for i in range(0, len(templateNames), 2):
                 templates[templateNames[i]] = templateNames[i + 1]
         except IndexError:
-            pywikibot.output(
-u'Unless using solely -subst or -remove, you must give an even number of template names.')
+            pywikibot.output('Unless using solely -subst or -remove, '
+                             'you must give an even number of template names.')
             return
 
     oldTemplates = []
     for templateName in templates.keys():
-        oldTemplate = pywikibot.Page(pywikibot.Site(), templateName,
-                                     ns=10)
+        oldTemplate = pywikibot.Page(site, templateName, ns=10)
         oldTemplates.append(oldTemplate)
 
     if xmlfilename:
