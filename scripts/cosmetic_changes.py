@@ -522,8 +522,9 @@ class CosmeticChangesToolkit:
                     else:
                         # Try to capitalize the first letter of the title.
                         # Not useful for languages that don't capitalize nouns.
-                        # TODO: Determine which languages this is suitable for
-                        # perhaps using self.site.nocapitalize
+                        # TODO: Add a configuration variable for each site,
+                        # which determines if the link target is written in
+                        # uppercase
                         if self.site.sitename() == 'wikipedia:de':
                             titleWithSection = (titleWithSection[0].upper() +
                                                 titleWithSection[1:])
@@ -653,7 +654,7 @@ class CosmeticChangesToolkit:
                     new = ''
                 else:
                     new = '{{%s}}' % new
-                if not self.site.nocapitalize:
+                if self.namespaces[10].case == 'first-letter':
                     old = '[' + old[0].upper() + old[0].lower() + ']' + old[1:]
                 text = textlib.replaceExcept(
                     text,

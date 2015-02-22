@@ -779,7 +779,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
     # title might contain regex special characters
     title = re.escape(title)
     # title might not be capitalized correctly on the wiki
-    if title[0].isalpha() and not site.nocapitalize:
+    if title[0].isalpha() and site.namespaces[14].case == 'first-letter':
         title = "[%s%s]" % (title[0].upper(), title[0].lower()) + title[1:]
     # spaces and underscores in page titles are interchangeable and collapsible
     title = title.replace(r"\ ", "[ _]+").replace(r"\_", "[ _]+")

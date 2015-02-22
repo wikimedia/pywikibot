@@ -26,7 +26,7 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated, deprecate_arg
+from pywikibot.tools import deprecated, deprecate_arg, issue_deprecation_warning
 from pywikibot.exceptions import Error, UnknownFamily, FamilyMaintenanceWarning
 
 logger = logging.getLogger("pywiki.wiki.family")
@@ -701,8 +701,8 @@ class Family(object):
         # 'en': "Disambiguation"
         self.disambcatname = {}
 
-        # On most wikis page names must start with a capital letter, but some
-        # languages don't use this.
+        # DEPRECATED, stores the code of the site which have a case sensitive
+        # main namespace. Use the Namespace given from the Site instead
         self.nocapitalize = []
 
         # attop is a list of languages that prefer to have the interwiki
@@ -852,6 +852,20 @@ class Family(object):
         #   }
 
     _families = {}
+
+    def __getattribute__(self, name):
+        """
+        Check if attribute is deprecated and warn accordingly.
+
+        This is necessary as subclasses could prevent that message by using a
+        class variable. Only penalize getting it because it must be set so that
+        the backwards compatibility is still available.
+        """
+        if name == 'nocapitalize':
+            issue_deprecation_warning('nocapitalize',
+                                      "APISite.siteinfo['case'] or "
+                                      "Namespace.case == 'case-sensitive'", 2)
+        return super(Family, self).__getattribute__(name)
 
     @staticmethod
     @deprecate_arg('fatal', None)

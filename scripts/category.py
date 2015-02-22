@@ -351,7 +351,7 @@ class CategoryAddBot(Bot):
         for cat in cats:
             pywikibot.output(u"* %s" % cat.title())
         newcat = self.newcat
-        if not self.current_page.site.nocapitalize:
+        if self.namespaces[14].case == 'first-letter':
             newcat = newcat[:1].upper() + newcat[1:]
         catpl = pywikibot.Category(self.current_page.site, newcat)
         if catpl in cats:
