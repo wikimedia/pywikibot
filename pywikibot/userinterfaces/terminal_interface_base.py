@@ -7,10 +7,12 @@
 #
 __version__ = '$Id$'
 
-from . import transliteration
+import getpass
+import logging
 import re
 import sys
-import logging
+
+from . import transliteration
 import pywikibot
 from pywikibot import config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
@@ -210,7 +212,9 @@ class UI:
         self.output(question + ' ')
         try:
             if password:
-                import getpass
+                # Python 3 requires that stderr gets flushed, otherwise is the
+                # message only visible after the query.
+                self.stderr.flush()
                 text = getpass.getpass('')
             else:
                 text = self._raw_input()
