@@ -10,6 +10,9 @@
 __version__ = '$Id$'
 #
 import codecs
+import os
+import stat
+
 from warnings import warn
 
 import pywikibot
@@ -174,6 +177,13 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         (u"wikipedia", u"my_wikipedia_user", u"my_wikipedia_pass")
         (u"en", u"wikipedia", u"my_en_wikipedia_user", u"my_en_wikipedia_pass")
         """
+        # We fix password file permission first,
+        # lift upper permission (regular file) from st_mode
+        # to compare it with private_files_permission.
+        if os.stat(config.password_file).st_mode - stat.S_IFREG \
+                != config.private_files_permission:
+            os.chmod(config.password_file, config.private_files_permission)
+
         password_f = codecs.open(config.password_file, encoding='utf-8')
         for line in password_f:
             if not line.strip():

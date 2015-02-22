@@ -24,6 +24,7 @@ __version__ = '$Id$'
 
 import collections
 import os
+import stat
 import sys
 
 from warnings import warn
@@ -37,7 +38,7 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 
 # Please keep _imported_modules in sync with the imports above
-_imported_modules = ('os', 'sys', 'collections')
+_imported_modules = ('collections', 'os', 'stat', 'sys')
 
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
@@ -151,6 +152,27 @@ password_file = None
 #          relevant summary for bot edits
 default_edit_summary = u'Pywikibot v.2'
 
+# What permissions to use to set private files to it
+# such as password file.
+#
+# stat.S_IRWXU 0o700 mask for owner permissions
+# stat.S_IRUSR 0o400 read permission for owner
+# stat.S_IWUSR 0o200 write permission for owner
+# stat.S_IXUSR 0o100 execute permission for owner
+# stat.S_IRWXG 0o070 mask for group permissions
+# stat.S_IRGRP 0o040 read permission for group
+# stat.S_IWGRP 0o020 write permission for group
+# stat.S_IXGRP 0o010 execute permission for group
+# stat.S_IRWXO 0o007 mask for others permissions
+# stat.S_IROTH 0o004 read permission for others
+# stat.S_IWOTH 0o002 write permission for others
+# stat.S_IXOTH 0o001 execute permission for others
+private_files_permission = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
+
+# Allow user to stop warnings about file security
+# by setting this to true.
+ignore_file_security_warnings = False
+
 
 def get_base_dir(test_directory=None):
     r"""Return the directory in which user-specific information is stored.
@@ -226,7 +248,7 @@ def get_base_dir(test_directory=None):
             for dir in base_dir_cand:
                 dir = os.path.join(*dir)
                 if not os.path.isdir(dir):
-                    os.makedirs(dir, mode=0o700)
+                    os.makedirs(dir, mode=private_files_permission)
                 if exists(dir):
                     base_dir = dir
                     break
@@ -915,6 +937,17 @@ if family == 'wikipedia' and mylang == 'language':
     print("WARNING: family and mylang are not set.\n"
           "Defaulting to family='test' and mylang='test'.")
     family = mylang = 'test'
+
+# SECURITY WARNINGS
+if (not ignore_file_security_warnings and
+        private_files_permission & (stat.S_IRWXG | stat.S_IRWXO) != 0):
+    print("CRITICAL SECURITY WARNING: 'private_files_permission' is set"
+          " to allow access from the group/others which"
+          " could give them access to the sensitive files."
+          " To avoid giving others access to sensitive files, pywikibot"
+          " won't run with this setting. Choose a more restrictive"
+          " permission or set 'ignore_file_security_warnings' to true.")
+    sys.exit(1)
 
 #
 # When called as main program, list all configuration variables
