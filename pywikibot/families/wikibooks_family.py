@@ -102,3 +102,7 @@ class Family(family.WikimediaFamily):
             'zh-cn': 'zh',
             'zu': None,   # https://bugzilla.wikimedia.org/show_bug.cgi?id=25425
         }
+
+    def shared_data_repository(self, code, transcluded=False):
+        """Return the shared data repository for this family."""
+        return ('wikidata', 'wikidata')
