@@ -201,10 +201,10 @@ class TemplateRobot(Bot):
 
         @param generator: the pages to work on
         @type  generator: iterable
-        @param replacements: a dictionary which maps old template names to
+        @param templates: a dictionary which maps old template names to
             their replacements. If remove or subst is True, it maps the
             names of the templates that should be removed/resolved to None.
-        @type  replacements: dict
+        @type  templates: dict
         """
         self.availableOptions.update({
             'subst': False,
