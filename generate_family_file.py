@@ -189,6 +189,7 @@ Please do not commit this to the Git repository!
 from pywikibot import family
 from pywikibot.tools import deprecated
 
+
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)
@@ -201,8 +202,6 @@ class Family(family.Family):
                     % {'lang': w.lang, 'hostname': urlparse(w.server).netloc})
 
         f.write("        }\n\n")
-
-        f.write("\n\n")
 
         f.write("    def scriptpath(self, code):\n")
         f.write("        return {\n")
