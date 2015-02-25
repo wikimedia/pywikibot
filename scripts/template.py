@@ -100,8 +100,8 @@ pages:
 #
 # (C) Daniel Herding, 2004
 # (C) Rob W.W. Hooft, 2003-2005
-# (C) xqt, 2009-2014
-# (C) Pywikibot team, 2004-2014
+# (C) xqt, 2009-2015
+# (C) Pywikibot team, 2004-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -114,31 +114,31 @@ from pywikibot import i18n, pagegenerators, xmlreader, Bot
 from scripts import replace
 
 
-def UserEditFilterGenerator(generator, username, timestamp=None, skip=False):
+def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
+                            max_revision_depth=None):
     """
     Generator which will yield Pages modified by username.
 
-    It only looks at the last 100 editors.
+    It only looks at the last editors given by max_revision_depth.
     If timestamp is set in MediaWiki format JJJJMMDDhhmmss, older edits are
-    ignored
+    ignored.
     If skip is set, pages edited by the given user are ignored otherwise only
-    pages edited by this user are given back
-
+    pages edited by this user are given back.
     """
     if timestamp:
         ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
+    else:
+        ts = pywikibot.Timestamp.min
     for page in generator:
-        editors = page.getLatestEditors(limit=100)
         found = False
-        for ed in editors:
-            uts = pywikibot.Timestamp.fromISOformat(ed['timestamp'])
-            if not timestamp or uts >= ts:
-                if username == ed['user']:
+        for ed in page.revisions(total=max_revision_depth):
+            if ed.timestamp >= ts:
+                if username == ed.user:
                     found = True
                     break
             else:
                 break
-        if found and not skip or not found and skip:
+        if found != bool(skip):  # xor operation
             yield page
         else:
             pywikibot.output(u'Skipping %s' % page.title(asLink=True))
@@ -377,7 +377,8 @@ u'Unless using solely -subst or -remove, you must give an even number of templat
         gen = pagegenerators.CombinedPageGenerator(gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
     if user:
-        gen = UserEditFilterGenerator(gen, user, timestamp, skip)
+        gen = UserEditFilterGenerator(gen, user, timestamp, skip,
+                                      max_revision_depth=100)
 
     if not genFactory.gens:
         # make sure that proper namespace filtering etc. is handled
