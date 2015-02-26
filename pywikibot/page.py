@@ -1875,13 +1875,14 @@ class Page(BasePage):
         # element into a list in the format used by old scripts
         result = []
         for template in templates:
-            link = pywikibot.Link(template[0], self.site,
-                                  defaultNamespace=10)
             try:
+                link = pywikibot.Link(template[0], self.site,
+                                      defaultNamespace=10)
                 if link.canonical_title() not in titles:
                     continue
             except pywikibot.Error:
                 # this is a parser function or magic word, not template name
+                # the template name might also contain invalid parts
                 continue
             args = template[1]
             intkeys = {}
