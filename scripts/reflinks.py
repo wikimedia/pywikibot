@@ -184,7 +184,7 @@ linksInRef = re.compile(
 listof404pages = '404-links.txt'
 
 
-class XmlDumpPageGenerator:
+class XmlDumpPageGenerator(object):
 
     """Xml generator that yields pages containing bare references."""
 
@@ -220,7 +220,7 @@ class XmlDumpPageGenerator:
     __next__ = next
 
 
-class RefLink:
+class RefLink(object):
 
     """Container to handle a single bare reference."""
 
@@ -293,7 +293,7 @@ class RefLink:
             self.title = self.title.title()
 
 
-class DuplicateReferences:
+class DuplicateReferences(object):
 
     """Helper to de-duplicate references in text.
 
@@ -446,7 +446,7 @@ class ReferencesRobot(Bot):
         self.norefbot = noreferences.NoReferencesBot(None, verbose=False)
         self.deduplicator = DuplicateReferences()
         try:
-            self.stopPageRevId = self.stopPage.latestRevision()
+            self.stopPageRevId = self.stopPage.latest_revision_id
         except pywikibot.NoPage:
             pywikibot.output(u'The stop page %s does not exist'
                              % self.stopPage.title(asLink=True))
@@ -770,7 +770,7 @@ class ReferencesRobot(Bot):
             if editedpages % 20 == 0:
                 pywikibot.output(
                     '\03{lightgreen}Checking stop page...\03{default}')
-                actualRev = self.stopPage.latestRevision()
+                actualRev = self.stopPage.latest_revision_id
                 if actualRev != self.stopPageRevId:
                     pywikibot.output(
                         u'[[%s]] has been edited : Someone wants us to stop.'
