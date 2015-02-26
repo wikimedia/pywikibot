@@ -912,9 +912,7 @@ class checkImagesBot(object):
                         return True  # continue with the check-part
 
             pywikibot.output(u'%s is on commons!' % self.imageName)
-            on_commons_text = self.image.getImagePageHtml()
-            if re.search(r"\<div class\=(?:'|\")sharedUploadNotice(?:'|\")\>",
-                         on_commons_text):
+            if self.image.fileIsShared():
                 pywikibot.output(
                     u"But, the file doesn't exist on your project! Skip...")
                 # We have to skip the check part for that image because

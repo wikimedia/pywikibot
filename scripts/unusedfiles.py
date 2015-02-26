@@ -42,10 +42,6 @@ template_to_the_user = {
     'fa': u'\n\n{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}--~~~~',
     'it': u'\n\n{{Utente:Filbot/Immagine orfana}}',
 }
-except_text = {
-    'en': u'<table id="mw_metadata" class="mw_metadata">',
-    'it': u'<table id="mw_metadata" class="mw_metadata">',
-}
 
 
 class UnusedFilesBot(Bot):
@@ -63,9 +59,8 @@ class UnusedFilesBot(Bot):
                                         template_to_the_image)
         template_user = i18n.translate(self.site,
                                        template_to_the_user)
-        except_text_translated = i18n.translate(self.site, except_text)
         summary = i18n.translate(self.site, comment, fallback=True)
-        if not all([template_image, template_user, except_text_translated, comment]):
+        if not all([template_image, template_user, comment]):
             raise pywikibot.Error(u'This script is not localized for %s site.'
                                   % self.site)
         self.summary = summary
@@ -76,8 +71,9 @@ class UnusedFilesBot(Bot):
                 pywikibot.output(u"File '%s' does not exist (see bug 69133)."
                                  % image.title())
                 continue
-            if (except_text_translated.encode('utf-8')
-                    not in image.getImagePageHtml() and
+            # Use fileUrl() and fileIsShared() to confirm it is local media
+            # rather than a local page with the same name as shared media.
+            if (image.fileUrl() and not image.fileIsShared() and
                     u'http://' not in image.text):
                 if template_image in image.text:
                     pywikibot.output(u"%s done already"
