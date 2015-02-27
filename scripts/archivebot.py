@@ -206,6 +206,29 @@ def generate_transclusions(site, template, namespaces=[]):
                                            namespaces=namespaces)
 
 
+def template_title_regex(tpl_page):
+    """
+    Return a regex that matches to variations of the template title.
+
+    It supports the transcluding variant as well as localized namespaces and
+    case-insensitivity depending on the namspace.
+
+    @param tpl_page: The template page
+    @type tpl_page: Page
+    """
+    ns = tpl_page.site.namespaces[tpl_page.namespace()]
+    marker = '?' if ns.id == 10 else ''
+    title = tpl_page.title(withNamespace=False)
+    if ns.case != 'case-sensitive':
+        title = '[%s%s]%s' % (re.escape(title[0].upper()),
+                              re.escape(title[0].lower()),
+                              re.escape(title[1:]))
+    else:
+        title = re.escape(title)
+
+    return re.compile(r'(?:(?:{0}):){1}{2}'.format(u'|'.join(ns), marker, title))
+
+
 class TZoneUTC(datetime.tzinfo):
 
     """Class building a UTC tzinfo object."""
@@ -535,10 +558,8 @@ class PageArchiver(object):
                 self.archives[a].update(comment)
 
             # Save the page itself
-            marker = '?' if self.tpl.namespace() == 10 else ''
-            rx = re.compile(r"\{\{(?:(?:%s):)%s%s\s*?\n.*?\n\}\}" % (u'|'.join(
-                set(self.site.namespaces[self.tpl.namespace()])), marker,
-                re.escape(self.tpl.title(withNamespace=False))), re.DOTALL)
+            rx = re.compile(r'\{\{%s\s*?\n.*?\n\}\}'
+                            % (template_title_regex(self.tpl).pattern), re.DOTALL)
             if not rx.search(self.page.header):
                 pywikibot.error("Couldn't find the template in the header")
                 return
