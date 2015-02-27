@@ -427,7 +427,7 @@ class PageArchiver(object):
 
     def attr2text(self):
         return '{{%s\n%s\n}}' \
-               % (self.tpl.title(),
+               % (self.tpl.title(withNamespace=(self.tpl.namespace() != 10)),
                   '\n'.join(['|%s = %s' % (a, self.get_attr(a))
                              for a in self.saveables()]))
 
