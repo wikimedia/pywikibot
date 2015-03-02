@@ -5291,6 +5291,16 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return lrgen
 
+    def compare(self, fromrev, torev):
+        """Implementation of the 'action=compare' API method
+        which will show a diff between to revision."""
+        params = dict(action = 'compare',
+                      fromrev = fromrev,
+                      torev = torev)
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        return data
+
 
 class DataSite(APISite):
 
