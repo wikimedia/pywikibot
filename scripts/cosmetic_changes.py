@@ -654,7 +654,7 @@ class CosmeticChangesToolkit:
                     new = ''
                 else:
                     new = '{{%s}}' % new
-                if self.namespaces[10].case == 'first-letter':
+                if self.site.namespaces[10].case == 'first-letter':
                     old = '[' + old[0].upper() + old[0].lower() + ']' + old[1:]
                 text = textlib.replaceExcept(
                     text,
