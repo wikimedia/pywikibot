@@ -250,6 +250,9 @@ class UploadRobot:
                     continue
             potential_file_page = pywikibot.FilePage(self.targetSite, filename)
             if potential_file_page.exists():
+                if self.aborts is True:
+                    pywikibot.output("File exists and you asked to abort. Skipping.")
+                    return None
                 if potential_file_page.canBeEdited():
                     if pywikibot.input_yn(u"File with name %s already exists. "
                                           "Would you like to change the name? "
