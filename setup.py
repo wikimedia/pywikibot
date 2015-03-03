@@ -14,6 +14,9 @@ test_deps = []
 
 dependencies = ['httplib2>=0.9']
 
+# the irc module has no Python 2.6 support since 10.0
+irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'
+
 extra_deps = {
     # Core library dependencies
     'daemonize': ['daemonize'],
@@ -21,7 +24,7 @@ extra_deps = {
     'MySQL': ['oursql'],
     'Yahoo': ['pYsearch'],
     'Google': ['google'],
-    'IRC': ['irc'],
+    'IRC': [irc_dep],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
     'Tkinter': ['Pillow'],
     'rcstream': ['socketIO-client'],
@@ -32,7 +35,7 @@ if sys.version_info[0] == 2:
     extra_deps['csv'] = ['unicodecsv']
 
 script_deps = {
-    'script_wui.py': ['irc', 'lunatic-python', 'crontab'],
+    'script_wui.py': [irc_dep, 'lunatic-python', 'crontab'],
     # Note: None of the 'lunatic-python' repos on github support MS Windows.
     'flickrripper.py': ['Pillow'],
     'states_redirect.py': ['pycountry']
