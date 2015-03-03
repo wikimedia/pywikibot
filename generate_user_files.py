@@ -79,7 +79,7 @@ def change_base_dir():
             break
         else:
             try:
-                os.mkdir(new_base, 0o700)
+                os.mkdir(new_base, pywikibot.config2.private_files_permission)
             except Exception:
                 pywikibot.error("ERROR: directory creation failed")
                 continue
