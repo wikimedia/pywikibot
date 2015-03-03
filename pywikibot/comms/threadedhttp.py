@@ -254,10 +254,12 @@ class Http(httplib2.Http):
                                   method in ["GET", "HEAD"]))
         if (self.follow_redirects and (max_redirects > 0) and
                 redirectable_response):
-            (response, content) = self._follow_redirect(
+            # Return directly and not unpack the values in case the result was
+            # an exception, which can't be unpacked
+            return self._follow_redirect(
                 uri, method, body, headers, response, content, max_redirects)
-
-        return response, content
+        else:
+            return response, content
 
     def _follow_redirect(self, uri, method, body, headers, response,
                          content, max_redirects):
