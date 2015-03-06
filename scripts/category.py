@@ -630,10 +630,10 @@ class CategoryMoveRobot(object):
         # Some preparing
         pywikibot.output('Moving text from %s to %s.' % (
                          self.oldcat.title(), self.newcat.title()))
-        authors = ', '.join(self.oldcat.contributingUsers())
+        comma = self.site.mediawiki_message('comma-separator')
+        authors = comma.join(self.oldcat.contributingUsers())
         template_vars = (self.oldcat.title(), authors)
-        comment = i18n.twtranslate(self.site,
-                                   'category-renamed') % template_vars
+        comment = i18n.twtranslate(self.site, 'category-renamed', template_vars)
         self.newcat.text = self.oldcat.text
         # Replace stuff
         REGEX = r"<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->"
@@ -995,19 +995,19 @@ class CategoryTreeRobot:
         if currentDepth < self.maxDepth // 2:
             # noisy dots
             pywikibot.output('.', newline=False)
-        # Find out which other cats are supercats of the current cat
-        supercat_names = []
-        for cat in self.catDB.getSupercats(cat):
-            # create a list of wiki links to the supercategories
-            if cat != parent:
-                supercat_names.append(cat.title(asLink=True,
-                                                textlink=True,
-                                                withNamespace=False))
+        # Create a list of other cats which are supercats of the current cat
+        supercat_names = [super_cat.title(asLink=True,
+                                          textlink=True,
+                                          withNamespace=False)
+                          for super_cat in self.catDB.getSupercats(cat)
+                          if super_cat != parent]
+
         if supercat_names:
             # print this list, separated with commas, using translations
-            # given in also_in_cats
+            # given in 'category-also-in'
+            comma = self.site.mediawiki_message('comma-separator')
             result += ' ' + i18n.twtranslate(self.site, 'category-also-in',
-                                             {'alsocat': ', '.join(
+                                             {'alsocat': comma.join(
                                                  supercat_names)})
         del supercat_names
         result += '\n'

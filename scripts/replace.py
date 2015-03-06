@@ -517,15 +517,16 @@ class ReplaceRobot(Bot):
             if self.summary:
                 summary_messages.insert(0, self.summary)
             else:
-                default_summary = ', '.join(
+                comma = self.site.mediawiki_message('comma-separator')
+                default_summary = comma.join(
                     u'-{0} +{1}'.format(*default_summary)
                     for default_summary in default_summaries)
                 summary_messages.insert(0, i18n.twtranslate(
-                    pywikibot.Site(), 'replace-replacing',
-                    {'description':
-                     u' ({0})'.format(default_summary)}
+                    self.site, 'replace-replacing',
+                    {'description': u' ({0})'.format(default_summary)}
                 ))
-        return u'; '.join(summary_messages)
+        semicolon = self.site.mediawiki_message('semicolon-separator')
+        return semicolon.join(summary_messages)
 
     def run(self):
         """Start the bot."""

@@ -2397,21 +2397,20 @@ def compareLanguages(old, new, insite):
         useFrom = False
 
     if adding or removing or modifying:
-        # Version info marks bots without unicode error
-        # This also prevents abuse filter blocking on de-wiki
-
-        # if not pywikibot.unicode_error:
-        #     mcomment += u'r%s) (' % sys.version.split()[0]
-
         mcomment += globalvar.summary
+        comma = insite.mediawiki_message('comma-separator')
 
-        changes = {'adding':    ', '.join([fmt(new, x) for x in adding]),
-                   'removing':  ', '.join([fmt(old, x) for x in removing]),
-                   'modifying': ', '.join([fmt(new, x) for x in modifying]),
+        changes = {'adding':    comma.join(fmt(new, x) for x in adding),
+                   'removing':  comma.join(fmt(old, x) for x in removing),
+                   'modifying': comma.join(fmt(new, x) for x in modifying),
                    'from': u'' if not useFrom else old[modifying[0]]}
+        en_changes = {'adding':    ', '.join(fmt(new, x) for x in adding),
+                      'removing':  ', '.join(fmt(old, x) for x in removing),
+                      'modifying': ', '.join(fmt(new, x) for x in modifying),
+                      'from': u'' if not useFrom else old[modifying[0]]}
 
-        mcomment += i18n.twtranslate(insite.lang, commentname) % changes
-        mods = i18n.twtranslate('en', commentname) % changes
+        mcomment += i18n.twtranslate(insite.lang, commentname, changes)
+        mods = i18n.twtranslate('en', commentname, en_changes)
 
     return mods, mcomment, adding, removing, modifying
 
