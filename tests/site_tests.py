@@ -2493,6 +2493,46 @@ class TestNonMWAPISite(TestCase):
             site.attr
 
 
+class TestSiteProofreadinfo(DefaultSiteTestCase):
+
+    """Test proofreadinfo information."""
+
+    sites = {
+        'en.ws': {
+            'family': 'wikisource',
+            'code': 'en',
+        },
+        'en.wp': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+    }
+
+    cached = True
+
+    def test_cache_proofreadinfo_on_site_with_ProofreadPage(self):
+        """Test Site._cache_proofreadinfo()."""
+        site = self.get_site('en.ws')
+        ql_res = {0: u'Without text', 1: u'Not proofread', 2: u'Problematic',
+                  3: u'Proofread', 4: u'Validated'}
+
+        site._cache_proofreadinfo()
+        self.assertEqual(site.namespaces[106], site.proofread_index_ns)
+        self.assertEqual(site.namespaces[104], site.proofread_page_ns)
+        self.assertEqual(site.proofread_levels, ql_res)
+        self.assertEqual(site.namespaces[106], site.proofread_index_ns)
+        del site._proofread_page_ns  # Check that property reloads.
+        self.assertEqual(site.namespaces[104], site.proofread_page_ns)
+
+    def test_cache_proofreadinfo_on_site_without_ProofreadPage(self):
+        """Test Site._cache_proofreadinfo()."""
+        site = self.get_site('en.wp')
+        self.assertRaises(pywikibot.UnknownExtension, site._cache_proofreadinfo)
+        self.assertRaises(pywikibot.UnknownExtension, lambda x: x.proofread_index_ns, site)
+        self.assertRaises(pywikibot.UnknownExtension, lambda x: x.proofread_page_ns, site)
+        self.assertRaises(pywikibot.UnknownExtension, lambda x: x.proofread_levels, site)
+
+
 if __name__ == '__main__':
     try:
         unittest.main()

@@ -235,6 +235,13 @@ class UnknownFamily(SiteDefinitionError):  # noqa
     pass
 
 
+class UnknownExtension(SiteDefinitionError):  # noqa
+
+    """Extension is not defined for this site."""
+
+    pass
+
+
 class IsRedirectPage(PageRelatedError):  # noqa
 
     """Page is a redirect page"""

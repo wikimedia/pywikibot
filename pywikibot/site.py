@@ -54,6 +54,7 @@ from pywikibot.exceptions import (
     LockedNoPage,
     NoPage,
     UnknownSite,
+    UnknownExtension,
     FamilyMaintenanceWarning,
     NoUsername,
     SpamfilterError,
@@ -2297,6 +2298,77 @@ class APISite(BaseSite):
         # 'title' is expected to be URL-encoded already
         return self.siteinfo["articlepath"].replace("$1", title)
 
+    @need_version('1.21')
+    def _cache_proofreadinfo(self, expiry=False):
+        """Retrieve proofreadinfo from site and cache response.
+
+        Applicable only to sites with ProofreadPage extension installed.
+
+        The following info is returned by the query and cached:
+        - self._proofread_index_ns: Index Namespace
+        - self._proofread_page_ns: Page Namespace
+        - self._proofread_levels: a dictionary with:
+                keys: int in the range [0, 1, ..., 4]
+                values: category name corresponding to the 'key' quality level
+            e.g. on en.wikisource:
+            {0: u'Without text', 1: u'Not proofread', 2: u'Problematic',
+             3: u'Proofread', 4: u'Validated'}
+
+        @param expiry: either a number of days or a datetime.timedelta object
+        @type expiry: int (days), L{datetime.timedelta}, False (config)
+        @return: A tuple containing _proofread_index_ns, self._proofread_page_ns
+            and self._proofread_levels.
+        @rtype: Namespace, Namespace, dict
+
+        """
+        if not self.has_extension('ProofreadPage'):
+            raise UnknownExtension('ProofreadPage extension is not installed on %s'
+                                    % self)
+
+        if (not hasattr(self, '_proofread_index_ns') or
+                not hasattr(self, '_proofread_page_ns') or
+                not hasattr(self, '_proofread_levels')):
+
+            pirequest = api.CachedRequest(
+                site=self,
+                expiry=pywikibot.config.API_config_expiry if expiry is False else expiry,
+                action='query',
+                meta='proofreadinfo',
+                piprop='namespaces|qualitylevels'
+            )
+
+            pidata = pirequest.submit()
+            ns_id = pidata['query']['proofreadnamespaces']['index']['id']
+            self._proofread_index_ns = self.namespaces[ns_id]
+
+            ns_id = pidata['query']['proofreadnamespaces']['page']['id']
+            self._proofread_page_ns = self.namespaces[ns_id]
+
+            self._proofread_levels = {}
+            for ql in pidata['query']['proofreadqualitylevels']:
+                self._proofread_levels[ql['id']] = ql['category']
+
+    @property
+    def proofread_index_ns(self):
+        """Return Index namespace for the ProofreadPage extension."""
+        if not hasattr(self, '_proofread_index_ns'):
+            self._cache_proofreadinfo()
+        return self._proofread_index_ns
+
+    @property
+    def proofread_page_ns(self):
+        """Return Page namespace for the ProofreadPage extension."""
+        if not hasattr(self, '_proofread_page_ns'):
+            self._cache_proofreadinfo()
+        return self._proofread_page_ns
+
+    @property
+    def proofread_levels(self):
+        """Return Quality Levels for the ProofreadPage extension."""
+        if not hasattr(self, '_proofread_levels'):
+            self._cache_proofreadinfo()
+        return self._proofread_levels
+
     @property
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
@@ -3226,7 +3298,10 @@ class APISite(BaseSite):
                 raise ValueError(
                     "loadrevisions: endid > startid with rvdir=False")
 
-        rvargs = dict(type_arg=u"info|revisions")
+        if self.has_extension('ProofreadPage'):
+            rvargs = {'type_arg': 'info|revisions|proofread'}
+        else:
+            rvargs = {'type_arg': 'info|revisions'}
 
         if getText:
             rvargs[u"rvprop"] = u"ids|flags|timestamp|user|comment|content"

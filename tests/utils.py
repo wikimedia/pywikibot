@@ -203,6 +203,10 @@ class DrySite(pywikibot.site.APISite):
         self._namespaces = SelfCallDict(
             Namespace.builtin_namespaces(
                 case=self.siteinfo['case']))
+        extensions = []
+        if self.family.name == 'wikisource':
+            extensions.append({'name': 'ProofreadPage'})
+        self._siteinfo._cache['extensions'] = (extensions, True)
 
     def __repr__(self):
         """Override default so warnings and errors indicate test is dry."""

@@ -2369,6 +2369,7 @@ class PageGenerator(QueryGenerator):
             version of each Page (default False)
 
         """
+        # If possible, use self.request after __init__ instead of appendParams
         def appendParams(params, key, value):
             if key in params:
                 params[key] += '|' + value
@@ -2383,9 +2384,15 @@ class PageGenerator(QueryGenerator):
         if not ('inprop' in kwargs and 'protection' in kwargs['inprop']):
             appendParams(kwargs, 'inprop', 'protection')
         appendParams(kwargs, 'iiprop', 'timestamp|user|comment|url|size|sha1|metadata')
-        self.props = kwargs['prop'].split('|')
         QueryGenerator.__init__(self, generator=generator, **kwargs)
         self.resultkey = "pages"  # element to look for in result
+
+        # TODO: Bug T91912 when using step > 50 with proofread, with queries
+        # returning Pages from Page ns.
+        if self.site.has_extension('ProofreadPage'):
+            self.request['prop'].append('proofread')
+
+        self.props = self.request['prop']
 
     def result(self, pagedata):
         """Convert page dict entry from api to Page object.
@@ -2581,6 +2588,11 @@ def update_page(page, pagedict, props=[]):
         raise AssertionError(
             "Page %s has neither 'pageid' nor 'missing' attribute" % pagedict['title'])
     page._contentmodel = pagedict.get('contentmodel')  # can be None
+    if (page._contentmodel and
+            page._contentmodel == 'proofread-page' and
+            'proofread' in pagedict):
+        page._quality = pagedict['proofread']['quality']
+        page._quality_text = pagedict['proofread']['quality_text']
     if 'info' in props:
         page._isredir = 'redirect' in pagedict
     if 'touched' in pagedict:
