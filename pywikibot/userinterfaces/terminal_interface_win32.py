@@ -8,6 +8,7 @@
 __version__ = '$Id$'
 
 import re
+import sys
 from . import terminal_interface_base
 
 try:
@@ -72,7 +73,10 @@ class Win32CtypesUI(Win32BaseUI):
             tagM = colorTagR.search(text)
             if tagM:
                 # print the text up to the tag.
-                targetStream.write(text[:tagM.start()].encode(self.encoding, 'replace'))
+                text_before_tag = text[:tagM.start()]
+                if sys.version_info[0] == 2:
+                    text_before_tag = text_before_tag.encode(self.encoding, 'replace')
+                targetStream.write(text_before_tag)
                 newColor = tagM.group('name')
                 if newColor == 'default':
                     if len(colorStack) > 0:
@@ -88,7 +92,9 @@ class Win32CtypesUI(Win32BaseUI):
                     ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors[newColor])
                 text = text[tagM.end():]
         # print the rest of the text
-        targetStream.write(text.encode(self.encoding, 'replace'))
+        if sys.version_info[0] == 2:
+            text = text.encode(self.encoding, 'replace')
+        targetStream.write(text)
         # just to be sure, reset the color
         ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors['default'])
 
