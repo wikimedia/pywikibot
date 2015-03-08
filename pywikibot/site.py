@@ -34,6 +34,7 @@ from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, remove_last_args,
     redirect_func, manage_wrapping, MediaWikiVersion, normalize_username,
 )
+from pywikibot.tools.ip import is_IP
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -3577,6 +3578,12 @@ class APISite(BaseSite):
         if blockids:
             bkgen.request["bkids"] = blockids
         if users:
+            if isinstance(users, basestring):
+                users = users.split('|')
+            # actual IPv6 addresses (anonymous users) are uppercase, but they
+            # have never a :: in the username (so those are registered users)
+            users = [user.upper() if is_IP(user) and '::' not in user else user
+                     for user in users]
             bkgen.request["bkusers"] = users
         return bkgen
 
