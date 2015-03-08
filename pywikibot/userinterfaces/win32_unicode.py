@@ -20,6 +20,7 @@
 #
 ################################################
 from __future__ import print_function
+from io import UnsupportedOperation
 import sys
 stdin = sys.stdin
 stdout = sys.stdout
@@ -86,16 +87,19 @@ if sys.platform == "win32":
             return ((GetFileType(handle) & ~FILE_TYPE_REMOTE) != FILE_TYPE_CHAR or
                     GetConsoleMode(handle, byref(DWORD())) == 0)
 
-        old_stdin_fileno = None
-        old_stdout_fileno = None
-        old_stderr_fileno = None
+        def old_fileno(std_name):
+            # some environments like IDLE don't support the fileno operation
+            # handle those like std streams which don't have fileno at all
+            std = getattr(sys, 'std{0}'.format(std_name))
+            if hasattr(std, 'fileno'):
+                try:
+                    return std.fileno()
+                except UnsupportedOperation:
+                    pass
 
-        if hasattr(sys.stdin, 'fileno'):
-            old_stdin_fileno = sys.stdin.fileno()
-        if hasattr(sys.stdout, 'fileno'):
-            old_stdout_fileno = sys.stdout.fileno()
-        if hasattr(sys.stderr, 'fileno'):
-            old_stderr_fileno = sys.stderr.fileno()
+        old_stdin_fileno = old_fileno('in')
+        old_stdout_fileno = old_fileno('out')
+        old_stderr_fileno = old_fileno('err')
 
         STDIN_FILENO = 0
         STDOUT_FILENO = 1
