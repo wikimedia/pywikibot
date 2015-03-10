@@ -350,10 +350,7 @@ class CategoryAddBot(Bot):
         pywikibot.output(u"Current categories:")
         for cat in cats:
             pywikibot.output(u"* %s" % cat.title())
-        newcat = self.newcat
-        if self.namespaces[14].case == 'first-letter':
-            newcat = newcat[:1].upper() + newcat[1:]
-        catpl = pywikibot.Category(self.current_page.site, newcat)
+        catpl = pywikibot.Category(self.current_page.site, self.newcat)
         if catpl in cats:
             pywikibot.output(u"%s is already in %s."
                              % (self.current_page.title(), catpl.title()))
@@ -368,7 +365,7 @@ class CategoryAddBot(Bot):
             if not comment:
                 comment = i18n.twtranslate(self.current_page.site,
                                            'category-adding',
-                                           {'newcat': newcat})
+                                           {'newcat': catpl.title(withNamespace=False)})
             try:
                 self.userPut(self.current_page, old_text, text,
                              comment=comment, minor=True, botflag=True)
