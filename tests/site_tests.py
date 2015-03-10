@@ -715,6 +715,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for level in all_levels:
             if list(site.protectedpages(type='edit', level=level, total=1)):
                 levels.add(level)
+        if not levels:
+            raise unittest.SkipTest('The site "{0}" has no protected pages in '
+                                    'main namespace.'.format(site))
         # select one level which won't yield all pages from above
         level = next(iter(levels))
         if len(levels) == 1:
