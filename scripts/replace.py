@@ -125,6 +125,7 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 __version__ = '$Id$'
 #
 
+import collections
 import re
 import time
 import sys
@@ -209,6 +210,15 @@ class Replacement(ReplacementBase):
         self._use_regex = use_regex
         self.exceptions = exceptions
         self._case_insensitive = case_insensitive
+
+    @classmethod
+    def from_compiled(cls, old_regex, new, **kwargs):
+        """Create instance from already compiled regex."""
+        if kwargs.get('use_regex', True) is not True:
+            raise ValueError('The use_regex parameter can only be True.')
+        repl = cls(old_regex.pattern, new, **kwargs)
+        repl.old_regex = old_regex
+        return repl
 
     @property
     def case_insensitive(self):
@@ -393,9 +403,10 @@ class ReplaceRobot(Bot):
 
         Arguments:
             * generator    - A generator that yields Page objects.
-            * replacements - A list of 2-tuples of original text (as a
-                             compiled regular expression) and replacement
-                             text (as a string).
+            * replacements - A list of Replacement instances or sequences of
+                             length 2 with the  original text (as a compiled
+                             regular expression) and replacement text (as a
+                             string).
             * exceptions   - A dictionary which defines when not to change an
                              occurrence. See below.
             * acceptall    - If True, the user won't be prompted before changes
@@ -424,8 +435,16 @@ class ReplaceRobot(Bot):
                 exceptionRegexes dictionary in textlib.replaceExcept().
 
         """
-        super(ReplaceRobot, self).__init__()
-        self.generator = generator
+        super(ReplaceRobot, self).__init__(generator=generator)
+        for i, replacement in enumerate(replacements):
+            if isinstance(replacement, collections.Sequence):
+                if len(replacement) != 2:
+                    raise ValueError('Replacement number {0} does not have '
+                                     'exactly two elements: {1}'.format(
+                                     i, replacement))
+                # Replacement assumes it gets strings but it's already compiled
+                replacements[i] = Replacement.from_compiled(replacement[0],
+                                                            replacement[1])
         self.replacements = replacements
         self.exceptions = exceptions
         self.acceptall = acceptall
