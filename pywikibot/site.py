@@ -3609,7 +3609,7 @@ class APISite(BaseSite):
             bkgen.request["bkusers"] = users
         return bkgen
 
-    def exturlusage(self, url, protocol="http", namespaces=None,
+    def exturlusage(self, url=None, protocol="http", namespaces=None,
                     step=None, total=None, content=False):
         """Iterate Pages that contain links to the given URL.
 
