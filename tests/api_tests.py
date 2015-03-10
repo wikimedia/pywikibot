@@ -11,6 +11,8 @@ import datetime
 import types
 
 import pywikibot.data.api as api
+import pywikibot.family
+import pywikibot.site
 from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import (
@@ -631,6 +633,27 @@ class TestCachedRequest(DefaultSiteTestCase):
         self.assertIsNotNone(req._cachetime)
         self.assertGreater(req._cachetime, now)
         self.assertEqual(req._data, data)
+
+
+class TestLazyLogin(TestCase):
+
+    """
+    Test that it tries to login when read API access is denied.
+
+    Because there is no such family configured it creates an AutoFamily and
+    BaseSite on it's own. It's testing against steward.wikimedia.org.
+    """
+
+    net = True
+    hostname = 'steward.wikimedia.org'
+
+    def test_access_denied(self):
+        """Test the query."""
+        fam = pywikibot.family.AutoFamily(
+            'steward', 'https://steward.wikimedia.org/w/api.php')
+        site = pywikibot.site.APISite('steward', fam)
+        req = api.Request(site=site, action='query')
+        self.assertRaises(pywikibot.NoUsername, req.submit)
 
 
 if __name__ == '__main__':

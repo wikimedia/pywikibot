@@ -1327,6 +1327,10 @@ class Request(MutableMapping):
                self._is_wikibase_error_retryable(result["error"]):
                 self.wait()
                 continue
+            # If readapidenied is returned try to login
+            if code == 'readapidenied' and self.site._loginstatus in (-3, -1):
+                self.site.login()
+                continue
             # raise error
             try:
                 pywikibot.log(u"API Error: query=\n%s"
