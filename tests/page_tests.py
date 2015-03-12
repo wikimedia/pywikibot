@@ -785,6 +785,24 @@ class TestPageProtect(TestCase):
         self.assertEqual(p1.protection(), {})
 
 
+class HtmlEntity(TestCase):
+
+    """Test that HTML entities are correctly decoded."""
+
+    net = False
+
+    def test_valid_entities(self):
+        """Test valid entities."""
+        self.assertEqual(pywikibot.page.html2unicode('A&amp;O'), 'A&O')
+        self.assertEqual(pywikibot.page.html2unicode('&#x70;&#x79;'), 'py')
+        self.assertEqual(pywikibot.page.html2unicode('&#x10000;'), u'\U00010000')
+
+    @unittest.expectedFailure
+    def test_recursive_entities(self):
+        """Test recursive entities."""
+        self.assertEqual(pywikibot.page.html2unicode('A&amp;amp;O'), 'A&amp;O')
+
+
 if __name__ == '__main__':
     try:
         unittest.main()
