@@ -64,12 +64,13 @@ from pywikibot.exceptions import (
 from pywikibot.echo import Notification
 
 if sys.version_info[0] > 2:
-    from urllib.parse import urlencode
+    from urllib.parse import urlencode, urlparse
     basestring = (str,)
     unicode = str
     from itertools import zip_longest
 else:
     from urllib import urlencode
+    from urlparse import urlparse
     from itertools import izip_longest as zip_longest
 
 
@@ -1443,6 +1444,25 @@ class TokenWallet(object):
     def __repr__(self):
         """Return a representation of the internal tokens dictionary."""
         return self._tokens.__repr__()
+
+
+class NonMWAPISite(BaseSite):
+
+    """API interface to non MediaWiki sites."""
+
+    def __init__(self, url):
+        """Constructor."""
+        self.netloc = urlparse(url).netloc
+
+    def __getattribute__(self, attr):
+        """Return attribute if present else raise NotImplementedError."""
+        whitelist = ['__getattribute__', 'netloc']
+        if attr in whitelist:
+            return super(NonMWAPISite, self).__getattribute__(attr)
+        else:
+            raise NotImplementedError('The attribute %s has not been on '
+                                      'site %s implemented yet.'
+                                      % (attr, self.netloc))
 
 
 class APISite(BaseSite):
