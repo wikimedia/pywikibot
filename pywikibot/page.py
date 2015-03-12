@@ -4814,42 +4814,33 @@ def html2unicode(text, ignore=None):
     # ensuring that illegal &#129; &#141; and &#157, which have no known values,
     # don't get converted to chr(129), chr(141) or chr(157)
     ignore = set(ignore) | set([129, 141, 157])
-    result = u''
-    i = 0
-    found = True
-    while found:
-        text = text[i:]
-        match = entityR.search(text)
-        if match:
-            unicodeCodepoint = None
-            if match.group('decimal'):
-                unicodeCodepoint = int(match.group('decimal'))
-            elif match.group('hex'):
-                unicodeCodepoint = int(match.group('hex'), 16)
-            elif match.group('name'):
-                name = match.group('name')
-                if name in htmlentitydefs.name2codepoint:
-                    # We found a known HTML entity.
-                    unicodeCodepoint = htmlentitydefs.name2codepoint[name]
-            result += text[:match.start()]
-            try:
-                unicodeCodepoint = convertIllegalHtmlEntities[unicodeCodepoint]
-            except KeyError:
-                pass
-            if unicodeCodepoint and unicodeCodepoint not in ignore:
-                if unicodeCodepoint > sys.maxunicode:
-                    # solve narrow Python 2 build exception (UTF-16)
-                    result += eval(r"u'\U{:08x}'".format(unicodeCodepoint))
-                else:
-                    result += chr(unicodeCodepoint)
+
+    def handle_entity(match):
+        if match.group('decimal'):
+            unicodeCodepoint = int(match.group('decimal'))
+        elif match.group('hex'):
+            unicodeCodepoint = int(match.group('hex'), 16)
+        elif match.group('name'):
+            name = match.group('name')
+            if name in htmlentitydefs.name2codepoint:
+                # We found a known HTML entity.
+                unicodeCodepoint = htmlentitydefs.name2codepoint[name]
             else:
-                # Leave the entity unchanged
-                result += text[match.start():match.end()]
-            i = match.end()
+                unicodeCodepoint = False
+        try:
+            unicodeCodepoint = convertIllegalHtmlEntities[unicodeCodepoint]
+        except KeyError:
+            pass
+        if unicodeCodepoint and unicodeCodepoint not in ignore:
+            if unicodeCodepoint > sys.maxunicode:
+                # solve narrow Python 2 build exception (UTF-16)
+                return eval(r"u'\U{:08x}'".format(unicodeCodepoint))
+            else:
+                return chr(unicodeCodepoint)
         else:
-            result += text
-            found = False
-    return result
+            # Leave the entity unchanged
+            return match.group(0)
+    return entityR.sub(handle_entity, text)
 
 
 def UnicodeToAsciiHtml(s):
