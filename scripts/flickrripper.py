@@ -297,7 +297,7 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
             if Tkdialog is not None and not autonomous:
                 try:
                     (newPhotoDescription, newFilename, skip) = Tkdialog(
-                    photoDescription, photo, filename).run()
+                    photoDescription, photo, filename).show_dialog()
                 except ImportError as e:
                     pywikibot.warning(e)
                     pywikibot.warning('Switching to autonomous mode.')
