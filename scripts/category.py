@@ -48,6 +48,12 @@ Options for "move" action:
                   target page (and talk page, if -allowsplit is not set)
                   doesn't exist.
 
+Options for "tidy" action:
+ * -namespaces    Filter the arcitles in the specified namespaces. Separate
+   -namespace     multiple namespace numbers or names with commas. Examples:
+   -ns            -ns:0,2,4
+                  -ns:Help,MediaWiki
+
 Options for several actions:
  * -rebuild     - reset the database
  * -from:       - The category to move from (for the move option)
@@ -807,7 +813,7 @@ class CategoryTidyRobot(pywikibot.Bot):
 
     """
 
-    def __init__(self, catTitle, catDB):
+    def __init__(self, catTitle, catDB, namespaces=None):
         """Constructor."""
         self.catTitle = catTitle
         self.catDB = catDB
@@ -818,7 +824,7 @@ class CategoryTidyRobot(pywikibot.Bot):
         self.cat = pywikibot.Category(site, catTitle)
         super(CategoryTidyRobot, self).__init__(
             generator=pagegenerators.PreloadingGenerator(
-                self.cat.articles()))
+                self.cat.articles(namespaces=namespaces)))
 
     def move_to_category(self, article, original_cat, current_cat):
         """
@@ -1203,7 +1209,7 @@ def main(*args):
                                 move_together=move_together)
     elif action == 'tidy':
         catTitle = pywikibot.input(u'Which category do you want to tidy up?')
-        bot = CategoryTidyRobot(catTitle, catDB)
+        bot = CategoryTidyRobot(catTitle, catDB, genFactory.namespaces)
     elif action == 'tree':
         catTitle = pywikibot.input(
             u'For which category do you want to create a tree view?')
