@@ -402,7 +402,9 @@ class GeneratorFactory(object):
         """Return generator based on Category defined by arg and gen_func."""
         categoryname = arg.partition(':')[2]
         if not categoryname:
-            categoryname = i18n.input('pywikibot-enter-category-name')
+            categoryname = i18n.input(
+                'pywikibot-enter-category-name',
+                fallback_prompt='Please enter the category name:')
         categoryname = categoryname.replace('#', '|')
 
         categoryname, sep, startfrom = categoryname.partition('|')
@@ -468,7 +470,9 @@ class GeneratorFactory(object):
             fileLinksPageTitle = arg[11:]
             if not fileLinksPageTitle:
                 fileLinksPageTitle = i18n.input(
-                    'pywikibot-enter-file-links-processing')
+                    'pywikibot-enter-file-links-processing',
+                    fallback_prompt='Links to which file page should be '
+                                    'processed?')
             if fileLinksPageTitle.startswith(self.site.namespace(6) + ':'):
                 fileLinksPage = pywikibot.FilePage(self.site,
                                                    fileLinksPageTitle)
@@ -505,7 +509,9 @@ class GeneratorFactory(object):
         elif arg.startswith('-interwiki'):
             title = arg[11:]
             if not title:
-                title = i18n.input('pywikibot-enter-page-processing')
+                title = i18n.input(
+                    'pywikibot-enter-page-processing',
+                    fallback_prompt='Which page should be processed?')
             page = pywikibot.Page(pywikibot.Link(title,
                                                  self.site))
             gen = InterwikiPageGenerator(page)

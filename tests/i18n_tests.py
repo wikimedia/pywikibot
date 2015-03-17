@@ -7,9 +7,16 @@
 #
 __version__ = '$Id$'
 
-from pywikibot import i18n
+import sys
 
-from tests.aspects import unittest, TestCase
+import pywikibot
+
+from pywikibot import i18n, bot
+
+from tests.aspects import unittest, TestCase, DefaultSiteTestCase, PwbTestCase
+
+if sys.version_info[0] == 3:
+    basestring = (str, )
 
 
 class TestTranslate(TestCase):
@@ -76,25 +83,64 @@ class TestTranslate(TestCase):
                          u'test-no-english JA')
 
 
-class TestTWN(TestCase):
+class UserInterfaceLangTestCase(TestCase):
+
+    """Base class for tests using config.userinterface_lang."""
+
+    def setUp(self):
+        super(UserInterfaceLangTestCase, self).setUp()
+        self.orig_userinterface_lang = pywikibot.config.userinterface_lang
+        pywikibot.config.userinterface_lang = self.get_site().code
+
+    def tearDown(self):
+        pywikibot.config.userinterface_lang = self.orig_userinterface_lang
+        super(UserInterfaceLangTestCase, self).tearDown()
+
+
+class TWNSetMessagePackageBase(TestCase):
+
+    """Partial base class for TranslateWiki tests."""
+
+    message_package = None
+
+    def setUp(self):
+        self.orig_messages_package_name = i18n._messages_package_name
+        i18n.set_messages_package(self.message_package)
+        super(TWNSetMessagePackageBase, self).setUp()
+
+    def tearDown(self):
+        super(TWNSetMessagePackageBase, self).tearDown()
+        i18n.set_messages_package(self.orig_messages_package_name)
+
+
+class TWNTestCaseBase(TWNSetMessagePackageBase):
 
     """Base class for TranslateWiki tests."""
 
-    net = False
+    @classmethod
+    def setUpClass(cls):
+        if not isinstance(cls.message_package, basestring):
+            raise TypeError('%s.message_package must be a package name'
+                            % cls.__name__)
+        # Th call to set_messages_package below exists only to confirm
+        # that the package exists and messages are available, so
+        # that tests can be skipped if the i18n data doesnt exist.
+        cls.orig_messages_package_name = i18n._messages_package_name
+        i18n.set_messages_package(cls.message_package)
+        has_messages = i18n.messages_available()
+        i18n._messages_package_name = cls.orig_messages_package_name
+        if not has_messages:
+            raise unittest.SkipTest("i18n messages package '%s' not available."
+                                    % cls.message_package)
+        super(TWNTestCaseBase, cls).setUpClass()
 
-    def setUp(self):
-        self.orig_messages_package_name = i18n.messages_package_name
-        i18n.messages_package_name = 'tests.i18n'
-        super(TestTWN, self).setUp()
 
-    def tearDown(self):
-        super(TestTWN, self).tearDown()
-        i18n.messages_package_name = self.orig_messages_package_name
-
-
-class TestTWTranslate(TestTWN):
+class TestTWTranslate(TWNTestCaseBase):
 
     """Test twtranslate method."""
+
+    net = False
+    message_package = 'tests.i18n'
 
     def testLocalized(self):
         self.assertEqual(i18n.twtranslate('en', 'test-localized'),
@@ -123,12 +169,16 @@ class TestTWTranslate(TestTWN):
                          u'test-non-localized EN')
 
     def testNoEnglish(self):
-        self.assertRaises(i18n.TranslationError, i18n.twtranslate, 'en', 'test-no-english')
+        self.assertRaises(i18n.TranslationError, i18n.twtranslate,
+                          'en', 'test-no-english')
 
 
-class TestTWNTranslate(TestTWN):
+class TestTWNTranslate(TWNTestCaseBase):
 
     """Test {{PLURAL:}} support."""
+
+    net = False
+    message_package = 'tests.i18n'
 
     def testNumber(self):
         """Use a number."""
@@ -258,6 +308,83 @@ class TestTWNTranslate(TestTWN):
                                   {'line': 1, 'page': 1})
                 % {'action': u'Ändere'},
                 u'Bot: Ändere 1 Zeile von einer Seite.')
+
+
+class ScriptMessagesTestCase(TWNTestCaseBase):
+
+    """Real messages test."""
+
+    net = False
+    message_package = 'scripts.i18n'
+
+    def test_basic(self):
+        """Verify that real messages are able to be loaded."""
+        self.assertEqual(i18n.twntranslate('en', 'pywikibot-enter-new-text'),
+                         'Please enter the new text:')
+
+    def test_missing(self):
+        """Test a missing message from a real message bundle."""
+        self.assertRaises(i18n.TranslationError,
+                          i18n.twntranslate, 'en', 'pywikibot-missing-key')
+
+
+class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
+
+    """Test i18n.input."""
+
+    family = 'wikipedia'
+    code = 'arz'
+
+    message_package = 'scripts.i18n'
+
+    @classmethod
+    def setUpClass(cls):
+        if cls.code in i18n.twget_keys('pywikibot-enter-category-name'):
+            raise unittest.SkipTest(
+                '%s has a translation for %s'
+                % (cls.code, 'pywikibot-enter-category-name'))
+
+        super(InputTestCase, cls).setUpClass()
+
+    def test_pagegen_i18n_input(self):
+        """Test i18n.input via ."""
+        result = self._execute(args=['listpages', '-cat'],
+                               data_in='non-existant-category\n',
+                               timeout=5)
+
+        self.assertIn('Please enter the category name:', result['stderr'])
+
+
+class MissingPackageTestCase(TWNSetMessagePackageBase,
+                             UserInterfaceLangTestCase,
+                             DefaultSiteTestCase):
+
+    """Test misssing messages package."""
+
+    message_package = 'scripts.foobar.i18n'
+
+    def _capture_output(self, text, *args, **kwargs):
+        self.output_text = text
+
+    def setUp(self):
+        super(MissingPackageTestCase, self).setUp()
+        self.output_text = ''
+        self.orig_raw_input = bot.ui._raw_input
+        self.orig_output = bot.ui.output
+        bot.ui._raw_input = lambda *args, **kwargs: 'dummy input'
+        bot.ui.output = self._capture_output
+
+    def tearDown(self):
+        bot.ui._raw_input = self.orig_raw_input
+        bot.ui.output = self.orig_output
+        super(MissingPackageTestCase, self).tearDown()
+
+    def test_pagegen_i18n_input(self):
+        """Test i18n.input falls back with missing message package."""
+        rv = i18n.input('pywikibot-enter-category-name',
+                        fallback_prompt='dummy output')
+        self.assertEqual(rv, 'dummy input')
+        self.assertIn('dummy output ', self.output_text)
 
 
 if __name__ == '__main__':
