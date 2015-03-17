@@ -226,7 +226,7 @@ def template_title_regex(tpl_page):
     else:
         title = re.escape(title)
 
-    return re.compile(r'(?:(?:{0}):){1}{2}'.format(u'|'.join(ns), marker, title))
+    return re.compile(r'(?:(?:%s):)%s%s' % (u'|'.join(ns), marker, title))
 
 
 class TZoneUTC(datetime.tzinfo):
