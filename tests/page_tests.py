@@ -796,11 +796,19 @@ class HtmlEntity(TestCase):
         self.assertEqual(pywikibot.page.html2unicode('A&amp;O'), 'A&O')
         self.assertEqual(pywikibot.page.html2unicode('&#x70;&#x79;'), 'py')
         self.assertEqual(pywikibot.page.html2unicode('&#x10000;'), u'\U00010000')
+        self.assertEqual(pywikibot.page.html2unicode('&#x70;&amp;&#x79;'), 'p&y')
 
     @unittest.expectedFailure
     def test_recursive_entities(self):
         """Test recursive entities."""
         self.assertEqual(pywikibot.page.html2unicode('A&amp;amp;O'), 'A&amp;O')
+
+    def test_invalid_entities(self):
+        """Test texts with invalid entities."""
+        self.assertEqual(pywikibot.page.html2unicode('A&notaname;O'), 'A&notaname;O')
+        self.assertEqual(pywikibot.page.html2unicode('A&#7f;O'), 'A&#7f;O')
+        self.assertEqual(pywikibot.page.html2unicode('&#7f'), '&#7f')
+        self.assertEqual(pywikibot.page.html2unicode('&#x70&#x79;'), '&#x70y')
 
 
 if __name__ == '__main__':
