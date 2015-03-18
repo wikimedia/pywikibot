@@ -29,16 +29,17 @@ import sys
 
 from warnings import warn
 
+# This frozen set should contain all imported modules/variables, so it must
+# occur directly after the imports. At that point globals() only contains the
+# names and some magic variables (like __name__)
+_imports = frozenset(name for name in globals() if not name.startswith('_'))
+
 
 class _ConfigurationDeprecationWarning(UserWarning):
 
     """Feature that is no longer supported."""
 
     pass
-
-
-# Please keep _imported_modules in sync with the imports above
-_imported_modules = ('collections', 'os', 'stat', 'sys')
 
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
@@ -816,7 +817,7 @@ def shortpath(path):
 # System-level and User-level changes.
 # Store current variables and their types.
 _glv = dict((_key, _val) for _key, _val in globals().items()
-             if _key[0] != '_' and _key not in _imported_modules)
+             if _key[0] != '_' and _key not in _imports)
 _gl = list(_glv.keys())
 _tp = {}
 for _key in _gl:
@@ -865,7 +866,7 @@ for _filename in _fns:
 for _key, _val in list(_uc.items()):
     if _key.startswith('_'):
         pass
-    elif _key in _imported_modules:
+    elif _key in _imports:
         pass
     elif _key in _gl:
         nt = type(_val)
