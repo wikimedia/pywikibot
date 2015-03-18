@@ -620,6 +620,49 @@ class TestPageBotMayEdit(TestCase):
                         % (page.text, page.botMayEdit(), user))
 
 
+class TestPageHistory(DefaultSiteTestCase):
+
+    """Test history related functionality."""
+
+    cached = True
+
+    def test_revisions(self):
+        """Test Page.revisions()."""
+        mp = self.get_mainpage()
+        revs = mp.revisions()
+        revs = iter(revs)  # implicit assertion
+        revs = list(revs)
+        self.assertGreater(len(revs), 1)
+
+    def test_contributors(self):
+        """Test Page.contributors()."""
+        mp = self.get_mainpage()
+        cnt = mp.contributors()
+        self.assertIsInstance(cnt, dict)
+        self.assertGreater(len(cnt), 1)
+
+    def test_revision_count(self):
+        """Test Page.edit_count()."""
+        mp = self.get_mainpage()
+        rev_count = len(list(mp.revisions()))
+        self.assertEqual(rev_count, mp.revision_count())
+        cnt = mp.contributors()
+        self.assertEqual(rev_count, sum(cnt.values()))
+
+        top_two = cnt.most_common(2)
+        self.assertIsInstance(top_two, list)
+        self.assertEqual(len(top_two), 2)
+        self.assertIsInstance(top_two[0], tuple)
+        self.assertIsInstance(top_two[0][0], basestring)
+        self.assertIsInstance(top_two[0][1], int)
+        top_two_usernames = set([top_two[0][0], top_two[1][0]])
+        self.assertEqual(len(top_two_usernames), 2)
+        top_two_counts = ([top_two[0][1], top_two[1][1]])
+        top_two_edit_count = mp.revision_count(top_two_usernames)
+        self.assertIsInstance(top_two_edit_count, int)
+        self.assertEqual(top_two_edit_count, sum(top_two_counts))
+
+
 class TestPageRedirects(TestCase):
 
     """Test redirects."""

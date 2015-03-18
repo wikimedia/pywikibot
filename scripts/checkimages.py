@@ -93,9 +93,11 @@ import time
 import sys
 
 import pywikibot
+
 from pywikibot import pagegenerators as pg
-from pywikibot import config, i18n
+from pywikibot import i18n
 from pywikibot.family import Family
+from pywikibot.tools import deprecated
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -312,7 +314,7 @@ nothing_notification = {
 }
 
 # This is a list of what bots used this script in your project.
-# NOTE: YOUR Botnick is automatically added. It's not required to add it twice.
+# NOTE: YOUR Bot username will be automatically added.
 bot_list = {
     'commons': [u'Siebot', u'CommonsDelinker', u'Filbot', u'John Bot',
                 u'Sz-iwbot', u'ABFbot'],
@@ -611,20 +613,11 @@ class checkImagesBot(object):
                                                PageWithAllowedTemplates)
         self.comment = i18n.translate(self.site, msg_comm, fallback=True)
         # Adding the bot's nickname at the notification text if needed.
-        botolist = i18n.translate(self.site, bot_list)
-        project = site.family.name
-        self.project = project
-        bot = config.usernames[project]
-        try:
-            botnick = bot[self.site.code]
-        except KeyError:
-            raise pywikibot.NoUsername(
-                u"You have to specify an username for your bot in this project "
-                u"in the user-config.py file.")
-
-        self.botnick = botnick
-        botolist.append(botnick)
-        self.botolist = botolist
+        self.bots = i18n.translate(self.site, bot_list)
+        if self.bots:
+            self.bots.append(site.username())
+        else:
+            self.bots = [site.username()]
 
         self.sendemailActive = sendemailActive
         self.skip_list = []
@@ -633,6 +626,26 @@ class checkImagesBot(object):
         self.image_namespace = u"File:"
         # Load the licenses only once, so do it once
         self.list_licenses = self.load_licenses()
+
+    @property
+    @deprecated
+    def project(self):
+        return self.site.family.name
+
+    @property
+    @deprecated
+    def botolist(self):
+        return self.bots
+
+    @botolist.setter
+    @deprecated
+    def botolist(self, value):
+        self.bots = value
+
+    @property
+    @deprecated
+    def botnick(self):
+        return self.site.username()
 
     def setParameters(self, imageName):
         """
@@ -655,10 +668,10 @@ class checkImagesBot(object):
         self.notification2 = notification2
 
         if self.notification:
-            self.notification = re.sub(r'__botnick__', self.botnick,
+            self.notification = re.sub(r'__botnick__', self.site.username(),
                                        notification)
         if self.notification2:
-            self.notification2 = re.sub(r'__botnick__', self.botnick,
+            self.notification2 = re.sub(r'__botnick__', self.site.username(),
                                         notification2)
         self.commTalk = commTalk
         self.commImage = commImage or self.comment
@@ -771,13 +784,12 @@ class checkImagesBot(object):
             pywikibot.output(
                 u'The latest user that has written something is: %s'
                 % latest_user)
-            for i in self.botolist:
-                if latest_user == i:
-                    second_text = True
-                    # A block to prevent the second message if the bot also
-                    # welcomed users...
-                    if history[0]['timestamp'] == history[-1]['timestamp']:
-                        second_text = False
+            if latest_user in self.bots:
+                second_text = True
+                # A block to prevent the second message if the bot also
+                # welcomed users...
+                if history[0]['timestamp'] == history[-1]['timestamp']:
+                    second_text = False
         except pywikibot.IsRedirectPage:
             pywikibot.output(
                 u'The user talk is a redirect, trying to get the right talk...')
@@ -878,12 +890,13 @@ class checkImagesBot(object):
             if not not_the_oldest:
                 return imageName
 
+    @deprecated('Page.revision_count()')
     def countEdits(self, pagename, userlist):
         """Function to count the edit of a user or a list of users in a page."""
         if isinstance(userlist, basestring):
             userlist = [userlist]
         page = pywikibot.Page(self.site, pagename)
-        return sum(1 for rev in page.revisions() if rev.user in userlist)
+        return page.revision_count(userlist)
 
     def checkImageOnCommons(self):
         """Checking if the file is on commons."""
@@ -1040,8 +1053,8 @@ class checkImagesBot(object):
                 # (the last)
                 if len(images_to_tag_list) > 1:
                     for image_to_tag in images_to_tag_list[:-1]:
-                        already_reported_in_past = self.countEdits(
-                            u'File:%s' % image_to_tag, self.botolist)
+                        fp = pywikibot.FilePage(self.site, image_to_tag)
+                        already_reported_in_past = fp.revision_count(self.bots)
                         # if you want only one edit, the edit found should be
                         # more than 0 -> num - 1
                         if already_reported_in_past > duplicates_rollback - 1:
@@ -1056,8 +1069,8 @@ class checkImagesBot(object):
                                     commImage=dupComment_image, unver=True)
 
                 if len(images_to_tag_list) != 0 and not only_report:
-                    already_reported_in_past = self.countEdits(
-                        u'File:%s' % images_to_tag_list[-1], self.botolist)
+                    fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
+                    already_reported_in_past = fp.revision_count(self.bots)
                     from_regex = (r'\n\*\[\[:File:%s\]\]'
                                   % re.escape(self.image.title(asUrl=True)))
                     # Delete the image in the list where we're write on
