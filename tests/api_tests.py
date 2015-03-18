@@ -68,8 +68,8 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertEqual(len(pi), 0)
         pi._init()
 
-        self.assertIn('main', pi)
-        self.assertIn('paraminfo', pi)
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('paraminfo', pi._paraminfo)
         self.assertEqual(len(pi),
                          len(pi.preloaded_modules))
 
@@ -84,15 +84,15 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertEqual(len(pi), 0)
         pi._init()
 
-        self.assertIn('main', pi)
-        self.assertIn('paraminfo', pi)
-        self.assertIn('pageset', pi)
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('paraminfo', pi._paraminfo)
+        self.assertIn('pageset', pi._paraminfo)
 
         if 'query' in pi.preloaded_modules:
-            self.assertIn('query', pi)
+            self.assertIn('query', pi._paraminfo)
             self.assertEqual(len(pi), 4)
         else:
-            self.assertNotIn('query', pi)
+            self.assertNotIn('query', pi._paraminfo)
             self.assertEqual(len(pi), 3)
 
         self.assertEqual(len(pi),
@@ -109,10 +109,10 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertEqual(len(pi), 0)
         pi._init()
 
-        self.assertIn('main', pi)
-        self.assertIn('paraminfo', pi)
-        self.assertIn('pageset', pi)
-        self.assertIn('query', pi)
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('paraminfo', pi._paraminfo)
+        self.assertIn('pageset', pi._paraminfo)
+        self.assertIn('query', pi._paraminfo)
 
         if MediaWikiVersion(site.version()) >= MediaWikiVersion("1.21"):
             # 'generator' was added to 'pageset' in 1.21
@@ -126,10 +126,10 @@ class TestParamInfo(DefaultSiteTestCase):
         pi = api.ParamInfo(site)
         self.assertEqual(len(pi), 0)
         pi.fetch(['info'])
-        self.assertIn('info', pi)
+        self.assertIn('query+info', pi._paraminfo)
 
-        self.assertIn('main', pi)
-        self.assertIn('paraminfo', pi)
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('paraminfo', pi._paraminfo)
         self.assertEqual(len(pi),
                          1 + len(pi.preloaded_modules))
 
@@ -149,10 +149,10 @@ class TestParamInfo(DefaultSiteTestCase):
         pi = api.ParamInfo(site)
         self.assertEqual(len(pi), 0)
         pi.fetch(['revisions'])
-        self.assertIn('revisions', pi)
+        self.assertIn('query+revisions', pi._paraminfo)
 
-        self.assertIn('main', pi)
-        self.assertIn('paraminfo', pi)
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('paraminfo', pi._paraminfo)
         self.assertEqual(len(pi),
                          1 + len(pi.preloaded_modules))
 
@@ -172,11 +172,11 @@ class TestParamInfo(DefaultSiteTestCase):
         pi = api.ParamInfo(site)
         self.assertEqual(len(pi), 0)
         pi.fetch(['info', 'revisions'])
-        self.assertIn('info', pi)
-        self.assertIn('revisions', pi)
+        self.assertIn('query+info', pi._paraminfo)
+        self.assertIn('query+revisions', pi._paraminfo)
 
-        self.assertIn('main', pi)
-        self.assertIn('paraminfo', pi)
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('paraminfo', pi._paraminfo)
         self.assertEqual(len(pi),
                          2 + len(pi.preloaded_modules))
 
@@ -185,10 +185,10 @@ class TestParamInfo(DefaultSiteTestCase):
         pi = api.ParamInfo(site)
         self.assertEqual(len(pi), 0)
         pi.fetch('foobar')
-        self.assertNotIn('foobar', pi)
+        self.assertNotIn('foobar', pi._paraminfo)
 
-        self.assertIn('main', pi)
-        self.assertIn('paraminfo', pi)
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('paraminfo', pi._paraminfo)
         self.assertEqual(len(pi),
                          len(pi.preloaded_modules))
 
@@ -218,10 +218,10 @@ class TestParamInfo(DefaultSiteTestCase):
         site = self.get_site()
         pi = api.ParamInfo(site, modules_only_mode=False)
         pi.fetch(['info'])
-        self.assertIn('info', pi)
+        self.assertIn('query+info', pi._paraminfo)
 
-        self.assertIn('main', pi)
-        self.assertIn('paraminfo', pi)
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('paraminfo', pi._paraminfo)
         self.assertEqual(len(pi),
                          1 + len(pi.preloaded_modules))
 
@@ -235,10 +235,10 @@ class TestParamInfo(DefaultSiteTestCase):
                 % site.version())
         pi = api.ParamInfo(site, modules_only_mode=True)
         pi.fetch(['info'])
-        self.assertIn('info', pi)
+        self.assertIn('query+info', pi._paraminfo)
 
-        self.assertIn('main', pi)
-        self.assertIn('paraminfo', pi)
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('paraminfo', pi._paraminfo)
         self.assertEqual(len(pi),
                          1 + len(pi.preloaded_modules))
 
