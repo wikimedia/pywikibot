@@ -167,8 +167,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         to set a default password for an username. The last matching entry will
         be used, so default usernames should occur above specific usernames.
 
-        If the username or password contain non-ASCII characters, they
-        should be stored using the utf-8 encoding.
+        The file must be either encoded in ASCII or UTF-8.
 
         Example:
 
@@ -185,7 +184,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             os.chmod(config.password_file, config.private_files_permission)
 
         password_f = codecs.open(config.password_file, encoding='utf-8')
-        for line in password_f:
+        for line_nr, line in enumerate(password_f):
             if not line.strip():
                 continue
             try:
@@ -193,25 +192,24 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             except SyntaxError:
                 entry = None
             if type(entry) is not tuple:
-                warn('Invalid tuple', _PasswordFileWarning)
+                warn('Invalid tuple in line {0}'.format(line_nr),
+                     _PasswordFileWarning)
                 continue
             if not 2 <= len(entry) <= 4:
-                warn('The length of tuple should be 2 to 4 (%s given)'
-                     % len(entry), _PasswordFileWarning)
+                warn('The length of tuple in line {0} should be 2 to 4 ({1} '
+                     'given)'.format(line_nr, entry), _PasswordFileWarning)
                 continue
-            username = normalize_username(entry[-2])
-            if len(entry) == 4:         # for userinfo included code and family
-                if entry[0] == self.site.code and \
-                   entry[1] == self.site.family.name and \
-                   username == self.username:
-                    self.password = entry[3]
-            elif len(entry) == 3:       # for userinfo included family
-                if entry[0] == self.site.family.name and \
-                   username == self.username:
-                    self.password = entry[2]
-            elif len(entry) == 2:       # for default userinfo
-                if username == self.username:
-                    self.password = entry[1]
+
+            # When the tuple is inverted the default family and code can be
+            # easily appended which makes the next condition easier as it does
+            # not need to know if it's using the default value or not.
+            entry = list(entry[::-1]) + [self.site.family.name,
+                                         self.site.code][len(entry) - 2:]
+
+            if (normalize_username(entry[1]) == self.username and
+                    entry[2] == self.site.family.name and
+                    entry[3] == self.site.code):
+                self.password = entry[0]
         password_f.close()
 
     def login(self, retry=False):
