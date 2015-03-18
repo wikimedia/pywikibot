@@ -548,6 +548,13 @@ class PageArchiver(object):
                              % (self.archived_threads, mintoarchive))
             return
         if whys:
+            # Search for the marker template
+            rx = re.compile(r'\{\{%s\s*?\n.*?\n\}\}'
+                            % (template_title_regex(self.tpl).pattern), re.DOTALL)
+            if not rx.search(self.page.header):
+                pywikibot.error("Couldn't find the template in the header")
+                return
+
             pywikibot.output(u'Archiving %d thread(s).' % self.archived_threads)
             # Save the archives first (so that bugs don't cause a loss of data)
             for a in sorted(self.archives.keys()):
@@ -558,11 +565,6 @@ class PageArchiver(object):
                 self.archives[a].update(comment)
 
             # Save the page itself
-            rx = re.compile(r'\{\{%s\s*?\n.*?\n\}\}'
-                            % (template_title_regex(self.tpl).pattern), re.DOTALL)
-            if not rx.search(self.page.header):
-                pywikibot.error("Couldn't find the template in the header")
-                return
             self.page.header = rx.sub(self.attr2text(), self.page.header)
             self.comment_params['count'] = self.archived_threads
             comma = self.site.mediawiki_message('comma-separator')
