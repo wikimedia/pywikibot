@@ -996,8 +996,8 @@ class Request(MutableMapping):
                     value = values[0]
                     if value is True:
                         values = ['']
-                    elif value is False:
-                        # False booleans are not in the http URI
+                    elif value is False or value is None:
+                        # False and None are not included in the http URI
                         continue
                 iterator = iter(values)
             value = u'|'.join(self._format_value(value) for value in iterator)
