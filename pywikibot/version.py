@@ -11,11 +11,14 @@ __version__ = '$Id$'
 #
 
 import os
+import sys
 import time
 import datetime
 import subprocess
 import codecs
 
+import pywikibot
+from pywikibot.tools import deprecated
 import pywikibot.config2 as config
 
 cache = None
@@ -68,18 +71,11 @@ def getversiondict():
             (tag, rev, date, hsh) = getversion_nightly()
         except Exception:
             try:
-                version = getfileversion('pywikibot/__init__.py')
-                if not version:
-                    # fall-back in case everything breaks (should not be used)
-                    import pywikibot
-                    version = getfileversion(pywikibot.__file__[:-1])
+                hsh = get_module_version(pywikibot)
+                date = get_module_mtime(pywikibot)
 
-                file, hsh_short, date, ts = version.split(' ')
                 tag = 'pywikibot/__init__.py'
                 rev = '-1 (unknown)'
-                ts = ts.split('.')[0]
-                date = time.strptime('%sT%s' % (date, ts), '%Y-%m-%dT%H:%M:%S')
-                hsh = hsh_short + ('?' * 33)   # enhance the short hash w. '?'
             except:
                 # nothing worked; version unknown (but suppress exceptions)
                 # the value is most likely '$Id' + '$', it means that
@@ -254,6 +250,7 @@ def getversion_onlinerepo(repo=None):
     return hsh
 
 
+@deprecated('get_module_version, get_module_filename and get_module_mtime')
 def getfileversion(filename):
     """Retrieve revision number of file.
 
@@ -284,6 +281,55 @@ def getfileversion(filename):
         return None
 
 
+def get_module_version(module):
+    """
+    Retrieve __version__ variable from an imported module.
+
+    @param module: The module instance.
+    @type module: module
+    @return: The version hash without the surrounding text. If not present None.
+    @rtype: str or None
+    """
+    if hasattr(module, '__version__'):
+        return module.__version__[5:-1]
+
+
+def get_module_filename(module):
+    """
+    Retrieve filename from an imported pywikibot module.
+
+    It uses the __file__ attribute of the module. If it's file extension ends
+    with py and another character the last character is discarded when the py
+    file exist.
+
+    @param module: The module instance.
+    @type module: module
+    @return: The filename if it's a pywikibot module otherwise None.
+    @rtype: str or None
+    """
+    if hasattr(module, '__file__') and os.path.exists(module.__file__):
+        filename = module.__file__
+        if filename[-4:-1] == '.py' and os.path.exists(filename[:-1]):
+            filename = filename[:-1]
+        program_dir = _get_program_dir()
+        if filename[:len(program_dir)] == program_dir:
+            return filename
+
+
+def get_module_mtime(module):
+    """
+    Retrieve the modification time from an imported module.
+
+    @param module: The module instance.
+    @type module: module
+    @return: The modification time if it's a pywikibot module otherwise None.
+    @rtype: datetime or None
+    """
+    filename = get_module_filename(module)
+    if filename:
+        return datetime.datetime.fromtimestamp(os.stat(filename).st_mtime)
+
+
 def package_versions(modules=None, builtins=False, standard_lib=None):
     """Retrieve package version information.
 
@@ -297,8 +343,6 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
     @param standard_lib: Include standard library packages
     @type standard_lib: Boolean, or None for automatic selection
     """
-    import sys
-
     if not modules:
         modules = sys.modules.keys()
 
