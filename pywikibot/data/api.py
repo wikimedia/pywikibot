@@ -961,6 +961,11 @@ class Request(MutableMapping):
                     'rawcontinue' not in self._params and
                     MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.25wmf5')):
                 self._params['rawcontinue'] = ['']
+        elif (self.action == 'help'
+                and MediaWikiVersion(self.site.version())
+                > MediaWikiVersion('1.24')):
+            self._params['wrap'] = ['']
+
         if "maxlag" not in self._params and config.maxlag:
             self._params["maxlag"] = [str(config.maxlag)]
         if "format" not in self._params:
