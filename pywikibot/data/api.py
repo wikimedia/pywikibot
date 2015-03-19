@@ -1296,6 +1296,12 @@ class Request(MutableMapping):
                         u"Pausing due to database lag: " + info)
                     self.site.throttle.lag(int(lag.group("lag")))
                     continue
+            elif code == 'help' and self.action == 'help':
+                # The help module returns an error result with the complete
+                # API information.  As this data was requested, return the
+                # data instead of raising an exception.
+                return {'help': {'mime': 'text/plain',
+                                 'help': result['error']['help']}}
 
             if code.startswith(u'internal_api_error_'):
                 class_name = code[len(u'internal_api_error_'):]
