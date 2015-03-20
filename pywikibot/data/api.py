@@ -1785,8 +1785,8 @@ class QueryGenerator(object):
             # Default values will only cause more requests and make the query
             # slower.
             for module in limited_modules:
-                param = self.site._paraminfo.parameter(module, 'limit')
-                prefix = self.site._paraminfo[module]['prefix']
+                param = self.site._paraminfo.parameter('query+' + module, 'limit')
+                prefix = self.site._paraminfo['query+' + module]['prefix']
                 if self.site.logged_in() and self.site.has_right('apihighlimits'):
                     self.request[prefix + 'limit'] = int(param['highmax'])
                 else:
@@ -1795,7 +1795,7 @@ class QueryGenerator(object):
         self.api_limit = None
 
         if self.limited_module:
-            self.prefix = self.site._paraminfo[self.limited_module]['prefix']
+            self.prefix = self.site._paraminfo['query+' + self.limited_module]['prefix']
             self._update_limit()
 
         if self.api_limit is not None and "generator" in kwargs:
@@ -1852,7 +1852,8 @@ class QueryGenerator(object):
 
     def _update_limit(self):
         """Set query limit for self.module based on api response."""
-        param = self.site._paraminfo.parameter(self.limited_module, 'limit')
+        param = self.site._paraminfo.parameter('query+' + self.limited_module,
+                                               'limit')
         if self.site.logged_in() and self.site.has_right('apihighlimits'):
             self.api_limit = int(param["highmax"])
         else:
@@ -1876,7 +1877,8 @@ class QueryGenerator(object):
             if the API module does not support multiple namespaces
         """
         assert(self.limited_module)  # some modules do not have a prefix
-        param = self.site._paraminfo.parameter(self.limited_module, 'namespace')
+        param = self.site._paraminfo.parameter('query+' + self.limited_module,
+                                               'namespace')
         if not param:
             pywikibot.warning(u'{0} module does not support a namespace '
                               'parameter'.format(self.limited_module))
