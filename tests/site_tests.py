@@ -369,6 +369,13 @@ class TestSiteGenerators(DefaultSiteTestCase):
         # TODO: There have been build failures because the following assertion
         # wasn't true. Bug: T92856
         # Example: https://travis-ci.org/wikimedia/pywikibot-core/jobs/54552081#L505
+        namespace_links = set(mysite.pagelinks(mainpage, namespaces=[0, 1]))
+        if namespace_links - links:
+            print('FAILURE wrt T92856:')
+            print(u'Sym. difference: "{0}"'.format(
+                  u'", "'.join(
+                  u'{0}@{1}'.format(link.namespace, link.title)
+                  for link in namespace_links ^ links)))
         self.assertCountEqual(
             set(mysite.pagelinks(mainpage, namespaces=[0, 1])) - links, [])
         for target in mysite.preloadpages(mysite.pagelinks(mainpage,
