@@ -1492,50 +1492,6 @@ class APISite(BaseSite):
 #    Pages; see method docs for details) --
 #
 
-    # Constants for token management.
-    # For all MediaWiki versions prior to 1.20.
-    # 'patrol' is indirectly supported via 'edit' token or recentchanges.
-    # It will be converted in site.validate_tokens()/site.get_tokens().
-    TOKENS_0 = set(['edit',
-                    'delete',
-                    'protect',
-                    'move',
-                    'block',
-                    'unblock',
-                    'email',
-                    'import',
-                    'watch',
-                    'patrol',
-                    ])
-
-    # For all MediaWiki versions, with 1.20 <= version < 1.24wmf19
-    TOKENS_1 = set(['block',
-                    'centralauth',
-                    'delete',
-                    'deleteglobalaccount',
-                    'undelete',
-                    'edit',
-                    'email',
-                    'import',
-                    'move',
-                    'options',
-                    'patrol',
-                    'protect',
-                    'setglobalaccountstatus',
-                    'unblock',
-                    'watch',
-                    ])
-
-    # For all MediaWiki versions >= 1.24wmf19
-    TOKENS_2 = set(['csrf',
-                    'deleteglobalaccount',
-                    'patrol',
-                    'rollback',
-                    'setglobalaccountstatus',
-                    'userrights',
-                    'watch',
-                    ])
-
     def __init__(self, code, fam=None, user=None, sysop=None):
         """Constructor."""
         BaseSite.__init__(self, code, fam, user, sysop)
@@ -2646,7 +2602,10 @@ class APISite(BaseSite):
         """
         _version = MediaWikiVersion(self.version())
         if _version < MediaWikiVersion('1.20'):
-            valid_types = [token for token in types if token in self.TOKENS_0]
+            types_wiki = self._paraminfo.parameter('query+info',
+                                                   'token')['type']
+            types_wiki.append('patrol')
+            valid_types = [token for token in types if token in types_wiki]
 
             # Pre 1.17, preload token was the same as the edit token.
             if _version < MediaWikiVersion('1.17'):
@@ -2654,16 +2613,22 @@ class APISite(BaseSite):
                     valid_types.append('edit')
 
         elif _version < MediaWikiVersion('1.24wmf19'):
-            valid_types = [token for token in types if token in self.TOKENS_1]
+            types_wiki = self._paraminfo.parameter('tokens',
+                                                   'type')['type']
+            valid_types = [token for token in types if token in types_wiki]
         else:
-            valid_types = []
+            types_wiki_old = self._paraminfo.parameter('query+info',
+                                                       'token')['type']
+            types_wiki_action = self._paraminfo.parameter('tokens',
+                                                          'type')['type']
+            types_wiki = self._paraminfo.parameter('query+tokens',
+                                                   'type')['type']
+            valid_types = [token for token in types if token in types_wiki]
             for token in types:
-                if ((token in self.TOKENS_0 or token in self.TOKENS_1) and
-                        token not in self.TOKENS_2):
-                    token = 'csrf'
-                if token in self.TOKENS_2:
-                    valid_types.append(token)
-
+                if (token not in valid_types and
+                        (token in types_wiki_old or
+                         token in types_wiki_action)):
+                    valid_types.append('csrf')
         return valid_types
 
     def get_tokens(self, types, all=False):
@@ -2708,7 +2673,9 @@ class APISite(BaseSite):
         _version = MediaWikiVersion(self.version())
         if _version < MediaWikiVersion('1.20'):
             if all:
-                types.extend(self.TOKENS_0)
+                types_wiki = self._paraminfo.parameter('query+info',
+                                                       'token')['type']
+                types.extend(types_wiki)
             valid_tokens = set(self.validate_tokens(types))
             # don't request patrol
             query = api.PropertyGenerator('info',
@@ -2746,12 +2713,16 @@ class APISite(BaseSite):
         else:
             if _version < MediaWikiVersion('1.24wmf19'):
                 if all is not False:
-                    types.extend(self.TOKENS_1)
+                    types_wiki = self._paraminfo.parameter('action+tokens',
+                                                           'type')['type']
+                    types.extend(types_wiki)
                 req = api.Request(site=self, action='tokens',
                                    type='|'.join(self.validate_tokens(types)))
             else:
                 if all is not False:
-                    types.extend(self.TOKENS_2)
+                    types_wiki = self._paraminfo.parameter('query+tokens',
+                                                           'type')['type']
+                    types.extend(types_wiki)
 
                 req = api.Request(site=self, action='query', meta='tokens',
                                    type='|'.join(self.validate_tokens(types)))
