@@ -2713,7 +2713,7 @@ class APISite(BaseSite):
         else:
             if _version < MediaWikiVersion('1.24wmf19'):
                 if all is not False:
-                    types_wiki = self._paraminfo.parameter('action+tokens',
+                    types_wiki = self._paraminfo.parameter('tokens',
                                                            'type')['type']
                     types.extend(types_wiki)
                 req = api.Request(site=self, action='tokens',

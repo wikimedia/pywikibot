@@ -1469,11 +1469,16 @@ class TestSiteTokens(DefaultSiteTestCase):
             try:
                 token = self.mysite.tokens[ttype]
             except pywikibot.Error as error_msg:
-                self.assertRegex(
-                    unicode(error_msg),
-                    "Action '[a-z]+' is not allowed for user .* on .* wiki.")
-                # test __contains__
-                self.assertNotIn(tokentype[0], self.mysite.tokens)
+                if tokentype:
+                    self.assertRegex(
+                        unicode(error_msg),
+                        "Action '[a-z]+' is not allowed for user .* on .* wiki.")
+                    # test __contains__
+                    self.assertNotIn(tokentype[0], self.mysite.tokens)
+                else:
+                    self.assertRegex(
+                        unicode(error_msg),
+                        "Requested token '[a-z]+' is invalid on .* wiki.")
             else:
                 self.assertIsInstance(token, basestring)
                 self.assertEqual(token, self.mysite.tokens[ttype])
