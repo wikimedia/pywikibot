@@ -276,11 +276,23 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         "querytype": "prop"
     }
 
+    edit_action_param_data = {
+        'name': 'edit',
+        'path': 'edit'
+    }
+
     def setUp(self):
         """Add a real ParamInfo to the DrySite."""
         super(ParamInfoDictTests, self).setUp()
         site = self.get_site()
         site._paraminfo = ParamInfo(site)
+        # Pretend that paraminfo has been loaded
+        for mod in site._paraminfo.init_modules:
+            site._paraminfo._paraminfo[mod] = {}
+        site._paraminfo._query_modules = ['info']
+        site._paraminfo._action_modules = ['edit']
+        # TODO: remove access of this private member of ParamInfo
+        site._paraminfo._ParamInfo__inited = True
 
     def test_new_format(self):
         pi = self.get_site()._paraminfo
@@ -291,14 +303,16 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
             'paraminfo': {
                 'modules': [
                     self.prop_info_param_data,
-                    {'name': 'edit'}
+                    self.edit_action_param_data,
                 ]
             }
         })
 
         pi._paraminfo.update(data)
-        self.assertIn('info', pi._paraminfo)
         self.assertIn('edit', pi._paraminfo)
+        self.assertIn('query+info', pi._paraminfo)
+        self.assertIn('edit', pi)
+        self.assertIn('info', pi)
 
     def test_old_format(self):
         pi = self.get_site()._paraminfo
@@ -308,13 +322,15 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         data = pi.normalize_paraminfo({
             'paraminfo': {
                 'querymodules': [self.prop_info_param_data],
-                'modules': [{'name': 'edit'}]
+                'modules': [self.edit_action_param_data],
             }
         })
 
         pi._paraminfo.update(data)
-        self.assertIn('info', pi._paraminfo)
         self.assertIn('edit', pi._paraminfo)
+        self.assertIn('query+info', pi._paraminfo)
+        self.assertIn('edit', pi)
+        self.assertIn('info', pi)
 
     def test_attribute(self):
         pi = self.get_site()._paraminfo
@@ -329,8 +345,8 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
 
         pi._paraminfo.update(data)
 
-        self.assertEqual(pi._paraminfo['info']['prefix'], 'in')
-        self.assertEqual(pi._paraminfo['info']['querytype'], 'prop')
+        self.assertEqual(pi._paraminfo['query+info']['querytype'], 'prop')
+        self.assertEqual(pi['info']['prefix'], 'in')
 
     def test_parameter(self):
         pi = self.get_site()._paraminfo
@@ -344,8 +360,6 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         })
 
         pi._paraminfo.update(data)
-        # Pretend that paraminfo has been loaded
-        pi._paraminfo['paraminfo'] = {}
 
         param = pi.parameter('info', 'token')
         self.assertIsInstance(param, dict)
