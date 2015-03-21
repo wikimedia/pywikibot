@@ -213,6 +213,7 @@ def main(*args):
 
     gen = genFactory.getCombinedGenerator()
     if gen:
+        i = 0
         for i, page in enumerate(gen, start=1):
             if not notitle:
                 page_fmt = Formatter(page, outputlang)
@@ -227,6 +228,7 @@ def main(*args):
                 pywikibot.output(u'Saving %s to %s' % (page.title(), filename))
                 with open(filename, mode='wb') as f:
                     f.write(page.text.encode(encoding))
+        pywikibot.output(u"%i page(s) found" % i)
     else:
         pywikibot.showHelp()
 
