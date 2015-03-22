@@ -3519,12 +3519,10 @@ class ItemPage(WikibasePage):
         for dbName in sitelinks:
             sitelinks[dbName] = {'site': dbName, 'title': sitelinks[dbName]}
 
-        claims = self.claims.copy()
-        for prop in claims.keys():
-            if len(claims[prop]) > 0:
-                claims[prop] = [claim.toJSON() for claim in claims[prop]]
-            else:
-                del claims[prop]
+        claims = {}
+        for prop in self.claims:
+            if len(self.claims[prop]) > 0:
+                claims[prop] = [claim.toJSON() for claim in self.claims[prop]]
 
         if diffto and 'claims' in diffto:
             temp = {}
