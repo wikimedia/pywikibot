@@ -554,7 +554,7 @@ class TestDryListGenerator(TestCase):
         """Set up test case."""
         super(TestDryListGenerator, self).setUp()
         mysite = self.get_site()
-        mysite._paraminfo['allpages'] = {
+        mysite._paraminfo['query+allpages'] = {
             'prefix': 'ap',
             'limit': {'max': 10},
             'namespace': {'multi': True}
