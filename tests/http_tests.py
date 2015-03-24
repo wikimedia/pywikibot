@@ -304,7 +304,7 @@ class UserAgentTestCase(TestCase):
         self.assertEqual('', http.user_agent(format_string='{lang}'))
 
         self.assertEqual('Pywikibot/' + pywikibot.__release__,
-                          http.user_agent(format_string='{pwb}'))
+                         http.user_agent(format_string='{pwb}'))
         self.assertNotIn(' ', http.user_agent(format_string=' {pwb} '))
 
         self.assertIn('Pywikibot/' + pywikibot.__release__,

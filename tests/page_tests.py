@@ -551,8 +551,8 @@ class TestPageBotMayEdit(TestCase):
         # Ban all compliant bots not in the list, syntax for de wp.
         page.text = '{{nobots|HagermanBot,Werdnabot}}'
         self.assertTrue(page.botMayEdit(),
-                         u'%s: %s but user=%s'
-                         % (page.text, page.botMayEdit(), user))
+                        u'%s: %s but user=%s'
+                        % (page.text, page.botMayEdit(), user))
 
         # Ban all compliant bots not in the list, syntax for de wp.
         page.text = '{{nobots|%s, HagermanBot,Werdnabot}}' % user

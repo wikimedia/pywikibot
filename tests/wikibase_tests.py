@@ -435,8 +435,8 @@ class TestItemLoad(WikidataTestCase):
         # and that exception should refer to the source title 'Test page'
         # not the Item being created.
         self.assertRaisesRegex(pywikibot.NoPage, 'Test page',
-                                pywikibot.ItemPage.fromPage,
-                                page, lazy_load=False)
+                               pywikibot.ItemPage.fromPage,
+                               page, lazy_load=False)
 
         item = pywikibot.ItemPage.fromPage(page, lazy_load=True)
 
@@ -643,26 +643,16 @@ class TestWriteNormalizeData(TestCase):
 
     def setUp(self):
         super(TestWriteNormalizeData, self).setUp()
-        self.data_out = {'aliases':
-                         {'en':
-                            [
-                                {'language': 'en',
-                                 'value': 'Bah'}
-                            ],
-                          },
-                         'labels':
-                          {'en':
-                             {'language': 'en',
-                              'value': 'Foo'},
-                           }
-                         }
+        self.data_out = {
+            'aliases': {'en': [{'language': 'en', 'value': 'Bah'}]},
+            'labels': {'en': {'language': 'en', 'value': 'Foo'}},
+        }
 
     def test_normalize_data(self):
-        data_in = {'aliases':
-                   {'en': ['Bah']},
-                   'labels':
-                   {'en': 'Foo'},
-                   }
+        data_in = {
+            'aliases': {'en': ['Bah']},
+            'labels': {'en': 'Foo'},
+        }
 
         response = WikibasePage._normalizeData(data_in)
         self.assertEqual(response, self.data_out)
@@ -881,8 +871,8 @@ class TestUnconnectedClient(TestCase):
         self.assertRaises(pywikibot.WikiBaseError,
                           pywikibot.ItemPage.fromPage, self.wdp)
         self.assertRaisesRegex(pywikibot.WikiBaseError,
-                                'no transcluded data',
-                                self.wdp.data_item)
+                               'no transcluded data',
+                               self.wdp.data_item)
 
 
 class TestJSON(WikidataTestCase):

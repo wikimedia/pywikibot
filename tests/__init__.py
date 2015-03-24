@@ -139,9 +139,9 @@ def collector(loader=unittest.loader.defaultTestLoader):
               % disabled_tests)
 
     modules = [module
-               for module in library_test_modules +
-                             extra_test_modules +
-                             script_test_modules
+               for module in (library_test_modules +
+                              extra_test_modules +
+                              script_test_modules)
                if module not in disabled_test_modules]
 
     test_list = []

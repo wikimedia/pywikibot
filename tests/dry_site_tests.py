@@ -53,7 +53,7 @@ class TestDrySite(DefaultDrySiteTestCase):
         x._username = ('foo', None)
 
         self.assertEqual('Pywikibot/' + pywikibot.__release__,
-                          user_agent(x, format_string='{pwb}'))
+                         user_agent(x, format_string='{pwb}'))
 
         self.assertEqual(x.family.name,
                          user_agent(x, format_string='{family}'))

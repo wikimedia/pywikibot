@@ -229,9 +229,9 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(Namespace.resolve([file_ns]), [file_ns])
 
         self.assertEqual(Namespace.resolve([file_ns, special_ns]),
-                                           [file_ns, special_ns])
+                         [file_ns, special_ns])
         self.assertEqual(Namespace.resolve([file_ns, file_ns]),
-                                           [file_ns, file_ns])
+                         [file_ns, file_ns])
 
         self.assertEqual(Namespace.resolve(6), [file_ns])
         self.assertEqual(Namespace.resolve('File'), [file_ns])
@@ -303,8 +303,8 @@ class TestNamespaceCollections(TestCase):
 
         positive_namespaces = set(namespaces) - excluded_namespaces
 
-        self.assertEqual(len(namespaces), len(positive_namespaces) +
-                                          len(excluded_namespaces))
+        self.assertEqual(len(namespaces),
+                         len(positive_namespaces) + len(excluded_namespaces))
 
 
 if __name__ == '__main__':
