@@ -917,10 +917,10 @@ class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
         """Treat page with the cosmetic toolkit."""
         try:
             ccToolkit = CosmeticChangesToolkit.from_page(
-                self.current_page, True, self.getOption('ignore'))
+                self.current_page, False, self.getOption('ignore'))
             changedText = ccToolkit.change(self.current_page.get())
             if changedText is not False:
-                self.put_current(newtext=changedText,
+                self.put_current(new_text=changedText,
                                  comment=self.getOption('comment'),
                                  async=self.getOption('async'))
         except pywikibot.LockedPage:
