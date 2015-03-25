@@ -70,8 +70,9 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertEqual(len(pi),
-                         len(pi.preloaded_modules))
+        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion("1.12"):
+            self.assertEqual(len(pi),
+                             len(pi.preloaded_modules))
 
         self.assertIn('info', pi._query_modules)
         self.assertIn('login', pi._action_modules)
@@ -87,6 +88,9 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
         self.assertIn('pageset', pi._paraminfo)
+
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+            return
 
         if 'query' in pi.preloaded_modules:
             self.assertIn('query', pi._paraminfo)
@@ -130,8 +134,9 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertEqual(len(pi),
-                         1 + len(pi.preloaded_modules))
+        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion("1.12"):
+            self.assertEqual(len(pi),
+                             1 + len(pi.preloaded_modules))
 
         self.assertEqual(pi['info']['prefix'], 'in')
 
@@ -142,6 +147,10 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertNotIn('deprecated', param)
 
         self.assertIsInstance(param['type'], list)
+
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+            return
+
         self.assertIn('protection', param['type'])
 
     def test_with_module_revisions(self):
@@ -153,8 +162,9 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertEqual(len(pi),
-                         1 + len(pi.preloaded_modules))
+        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion("1.12"):
+            self.assertEqual(len(pi),
+                             1 + len(pi.preloaded_modules))
 
         self.assertEqual(pi['revisions']['prefix'], 'rv')
 
@@ -165,6 +175,10 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertNotIn('deprecated', param)
 
         self.assertIsInstance(param['type'], list)
+
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+            return
+
         self.assertIn('user', param['type'])
 
     def test_multiple_modules(self):
@@ -177,6 +191,10 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
+
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+            return
+
         self.assertEqual(len(pi),
                          2 + len(pi.preloaded_modules))
 
@@ -187,8 +205,14 @@ class TestParamInfo(DefaultSiteTestCase):
         pi.fetch('foobar')
         self.assertNotIn('foobar', pi._paraminfo)
 
+        self.assertRaises(KeyError, pi.__getitem__, 'foobar')
+
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
+
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+            return
+
         self.assertEqual(len(pi),
                          len(pi.preloaded_modules))
 
@@ -222,8 +246,10 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertEqual(len(pi),
-                         1 + len(pi.preloaded_modules))
+
+        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion("1.12"):
+            self.assertEqual(len(pi),
+                             1 + len(pi.preloaded_modules))
 
         self.assertIn('revisions', pi.prefixes)
 
@@ -239,6 +265,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
+
         self.assertEqual(len(pi),
                          1 + len(pi.preloaded_modules))
 
