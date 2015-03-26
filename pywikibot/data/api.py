@@ -363,8 +363,8 @@ class ParamInfo(Container):
         meta_modules = help_text[start:end].split(', ')
 
         start = help_text.find('Use the output of a list as the input')
-        start = help_text.find(query_help_list_prefix, start)
-        start += len(query_help_list_prefix)
+        start = help_text.find('One value: ', start)
+        start += len('One value: ')
         end = help_text.find('\n', start)
 
         gen_modules = help_text[start:end].split(', ')
