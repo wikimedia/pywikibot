@@ -368,7 +368,7 @@ class Between(Query):
     to be in UTC, timezones are not supported by the API
 
     @param prop: the property
-    @param begin: WbTime object representign the beginning of the period
+    @param begin: WbTime object representing the beginning of the period
     @param end: WbTime object representing the end of the period
     """
 
