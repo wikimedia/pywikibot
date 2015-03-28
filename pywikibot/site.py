@@ -1226,7 +1226,8 @@ class Siteinfo(Container):
         elif not cache_date:  # default values are always expired
             return True
         else:
-            return cache_date + expire >= datetime.datetime.utcnow()
+            # cached date + expiry are in the past if it's expired
+            return cache_date + expire < datetime.datetime.utcnow()
 
     def _get_general(self, key, expiry):
         """
