@@ -430,6 +430,7 @@ class ParamInfo(Container):
                 start = help_text.find(mod_begin_string)
                 assert(start)
                 start += len(mod_begin_string)
+                end = help_text.find('\n*', start)
 
                 if help_text[start + 1] == '(' and help_text[start + 4] == ')':
                     prefix = help_text[start + 2:start + 4]
@@ -490,6 +491,9 @@ class ParamInfo(Container):
                         }
 
                 self._paraminfo[path]['parameters'] = params.values()
+                if (help_text.find('\n\nThis module only accepts POST '
+                                   'requests.\n', start) < end):
+                    self._paraminfo[path]['mustbeposted'] = ''
 
         self._emulate_pageset()
 
