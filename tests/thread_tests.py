@@ -48,7 +48,7 @@ class GeneratorIntersectTestCase(TestCase):
 
         result = list(intersect_generators(datasets))
 
-        self.assertEqual(len(set(result)), len(result))
+        self.assertCountEqual(set(result), result)
 
         self.assertCountEqual(result, set_result)
 
