@@ -1723,7 +1723,7 @@ class CachedRequest(Request):
         super(CachedRequest, self).__init__(*args, **kwargs)
         if not isinstance(expiry, datetime.timedelta):
             expiry = datetime.timedelta(expiry)
-        self.expiry = expiry
+        self.expiry = min(expiry, datetime.timedelta(config.API_config_expiry))
         self._data = None
         self._cachetime = None
 
