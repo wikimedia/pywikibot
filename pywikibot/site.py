@@ -2944,7 +2944,7 @@ class APISite(BaseSite):
         else:
             clargs['titles'] = page.title(
                 withSection=False).encode(self.encoding())
-        clgen = self._generator(api.CategoryPageGenerator,
+        clgen = self._generator(api.PageGenerator,
                                 type_arg="categories", step=step, total=total,
                                 g_content=content, **clargs)
         return clgen
@@ -2958,7 +2958,7 @@ class APISite(BaseSite):
 
         """
         imtitle = page.title(withSection=False).encode(self.encoding())
-        imgen = self._generator(api.ImagePageGenerator, type_arg="images",
+        imgen = self._generator(api.PageGenerator, type_arg="images",
                                 titles=imtitle, step=step, total=total,
                                 g_content=content)
         return imgen
@@ -3451,7 +3451,7 @@ class APISite(BaseSite):
             description page, not the pages that are members of the category
 
         """
-        acgen = self._generator(api.CategoryPageGenerator,
+        acgen = self._generator(api.PageGenerator,
                                 type_arg="allcategories", gacfrom=start,
                                 step=step, total=total, g_content=content)
         if prefix:
@@ -3538,7 +3538,7 @@ class APISite(BaseSite):
             description page, not the image itself
 
         """
-        aigen = self._generator(api.ImagePageGenerator,
+        aigen = self._generator(api.PageGenerator,
                                 type_arg="allimages", gaifrom=start,
                                 step=step, total=total, g_content=content)
         if prefix:
@@ -5163,7 +5163,7 @@ class APISite(BaseSite):
         @param step: request batch size
         @param total: number of pages to return
         """
-        wcgen = self._generator(api.CategoryPageGenerator,
+        wcgen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Wantedcategories",
                                 step=step, total=total)
 
@@ -5177,7 +5177,7 @@ class APISite(BaseSite):
         @param step: request batch size
         @param total: number of pages to return
         """
-        ucgen = self._generator(api.CategoryPageGenerator,
+        ucgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedcategories",
                                 step=step, total=total)
@@ -5191,7 +5191,7 @@ class APISite(BaseSite):
         @param step: request batch size
         @param total: number of pages to return
         """
-        uigen = self._generator(api.ImagePageGenerator,
+        uigen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedimages",
                                 step=step, total=total)
@@ -5235,7 +5235,7 @@ class APISite(BaseSite):
         @param step: request batch size
         @param total: number of pages to return
         """
-        ucgen = self._generator(api.CategoryPageGenerator,
+        ucgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Unusedcategories",
                                 step=step, total=total)
@@ -5247,7 +5247,7 @@ class APISite(BaseSite):
         @param step: request batch size
         @param total: number of pages to return
         """
-        uigen = self._generator(api.ImagePageGenerator,
+        uigen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Unusedimages",
                                 step=step, total=total)
