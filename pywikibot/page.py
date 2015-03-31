@@ -3080,10 +3080,8 @@ class WikibasePage(BasePage):
          - ItemPage.setSitelinks
 
         @param data: Data to be saved
-        @type data: dict (must be not None for python 2.6; bug 70707)
+        @type data: dict, or None to save the current content of the entity.
         """
-        assert(sys.version_info >= (2, 7) or data is not None)
-
         if hasattr(self, 'lastrevid'):
             baserevid = self.lastrevid
         else:
