@@ -2168,20 +2168,25 @@ class APISite(BaseSite):
         if unknown is not None:
             pywikibot.debug(u'unknown argument of hasExtension is deprecated.',
                             _logger)
-        return self.has_extension(name)
+        extensions = self.siteinfo['extensions']
+        name = name.lower()
+        for ext in extensions:
+            if ext['name'].lower() == name:
+                return True
+        return False
 
     @need_version("1.14")
     def has_extension(self, name):
         """Determine whether extension `name` is loaded.
 
-        @param name: The extension to check for, case insensitive
+        @param name: The extension to check for, case sensitive
         @type name: str
         @return: If the extension is loaded
         @rtype: bool
         """
         extensions = self.siteinfo['extensions']
         for ext in extensions:
-            if ext['name'].lower() == name.lower():
+            if ext['name'] == name:
                 return True
         return False
 

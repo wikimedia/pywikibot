@@ -1531,7 +1531,7 @@ class TestSiteExtensions(WikimediaDefaultSiteTestCase):
         self.assertTrue(mysite.has_extension('Disambiguator'))
 
         # test case-sensitivity
-        self.assertTrue(mysite.has_extension('disambiguator'))
+        self.assertFalse(mysite.has_extension('disambiguator'))
 
         self.assertFalse(mysite.has_extension('ThisExtensionDoesNotExist'))
 
