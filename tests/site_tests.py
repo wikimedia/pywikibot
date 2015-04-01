@@ -595,11 +595,11 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for impage in mysite.allimages(minsize=100, total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(mysite.page_exists(impage))
-            self.assertGreaterEqual(impage._imageinfo["size"], 100)
+            self.assertGreaterEqual(impage.latest_file_info["size"], 100)
         for impage in mysite.allimages(maxsize=2000, total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(mysite.page_exists(impage))
-            self.assertLessEqual(impage._imageinfo["size"], 2000)
+            self.assertLessEqual(impage.latest_file_info["size"], 2000)
 
     def test_newfiles(self):
         """Test the site.newfiles() method."""

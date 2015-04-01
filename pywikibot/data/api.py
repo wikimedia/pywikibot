@@ -2374,10 +2374,7 @@ class CategoryPageGenerator(PageGenerator):
 
     """Like PageGenerator, but yields Category objects instead of Pages."""
 
-    def result(self, pagedata):
-        """Convert page dict entry from api to Page object."""
-        p = PageGenerator.result(self, pagedata)
-        return pywikibot.Category(p)
+    pass
 
 
 @deprecated("PageGenerator")
@@ -2385,13 +2382,7 @@ class ImagePageGenerator(PageGenerator):
 
     """Like PageGenerator, but yields FilePage objects instead of Pages."""
 
-    def result(self, pagedata):
-        """Convert page dict entry from api to Page object."""
-        p = PageGenerator.result(self, pagedata)
-        filepage = pywikibot.FilePage(p)
-        if 'imageinfo' in pagedata:
-            filepage._imageinfo = pagedata['imageinfo'][0]
-        return filepage
+    pass
 
 
 class PropertyGenerator(QueryGenerator):
@@ -2583,9 +2574,7 @@ def update_page(page, pagedict, props=[]):
 
     if 'imageinfo' in pagedict:
         assert(isinstance(page, pywikibot.FilePage))
-        for file_rev in pagedict['imageinfo']:
-            file_revision = pywikibot.page.FileInfo(file_rev)
-            page._file_revisions[file_revision.timestamp] = file_revision
+        page._load_file_revisions(pagedict['imageinfo'])
 
     if "categoryinfo" in pagedict:
         page._catinfo = pagedict["categoryinfo"]

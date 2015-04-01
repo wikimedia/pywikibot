@@ -2012,6 +2012,11 @@ class FilePage(Page):
         if self.namespace() != 6:
             raise ValueError(u"'%s' is not in the file namespace!" % title)
 
+    def _load_file_revisions(self, imageinfo):
+        for file_rev in imageinfo:
+            file_revision = FileInfo(file_rev)
+            self._file_revisions[file_revision.timestamp] = file_revision
+
     @property
     def latest_file_info(self):
         """Retrieve and store information of latest Image rev. of FilePage.

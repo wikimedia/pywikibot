@@ -4982,7 +4982,7 @@ class APISite(BaseSite):
             # If we receive a nochange, that would mean we're in simulation
             # mode, don't attempt to access imageinfo
             if "nochange" not in result:
-                filepage._imageinfo = result["imageinfo"]
+                filepage._load_file_revisions(result["imageinfo"])
             return
 
     @deprecated_args(number="step",
