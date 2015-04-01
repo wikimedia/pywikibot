@@ -329,15 +329,14 @@ class TestScriptMeta(MetaTestCaseClass):
             if script_name in ['catall',          # stdout user interaction
                                'checkimages',     # bug 68613
                                'flickrripper',    # Requires a flickr api key
-                               'lonelypages',     # uses exit code 1
                                'script_wui',      # Error on any user except DrTrigonBot
                                'upload',          # raises custom ValueError
                                ] + failed_dep_script_list or (
-                    (config.family != 'wikipedia' and script_name == 'lonelypages') or
                     (config.family == 'wikipedia' and script_name == 'disambredir') or
-                    (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):
+                    (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):  # T94681
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             elif script_name in ['watchlist',     # T77965
+                                 'lonelypages',   # uses exit code 1; T94680
                                  ]:
                 dct[test_name] = allowed_failure(dct[test_name])
             dct[test_name].__doc__ = \
