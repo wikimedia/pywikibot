@@ -2,8 +2,8 @@
 """
 Program to batch create categories.
 
-The program expects a generator containing a list of page titles to be used as
-base.
+The program expects a generator of page titles to be used as
+suffix for creating new categories with a different base.
 
 The following command line parameters are supported:
 
@@ -22,6 +22,10 @@ create_categories.py
     -links:User:Multichill/Wallonia
     -parent:"Cultural heritage monuments in Wallonia"
     -basename:"Cultural heritage monuments in"
+
+The page 'User:Multichill/Wallonia' on commons contains
+page links like [[Category:Hensies]], causing this script
+to create [[Category:Cultural heritage monuments in Hensies]].
 
 """
 __version__ = '$Id$'
