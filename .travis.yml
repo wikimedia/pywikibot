@@ -59,9 +59,9 @@ script:
   - if [[ "$USE_NOSE" == "1" ]]; then
       if [[ "$SITE_ONLY" == "1" ]]; then
         echo "Running site tests only code ${LANGUAGE} on family ${FAMILY}" ;
-        python setup.py nosetests --tests tests -v -a "family=$FAMILY,code=$LANGUAGE" ;
+        python setup.py nosetests --tests tests --verbosity=2 -a "family=$FAMILY,code=$LANGUAGE" ;
       else
-        python setup.py nosetests --tests tests -v ;
+        python setup.py nosetests --tests tests --verbosity=2 ;
       fi ;
     else
       python setup.py test ;
