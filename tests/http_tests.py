@@ -191,6 +191,12 @@ class TestHttpStatus(TestCase):
         self.assertEqual(r.response_headers['content-location'],
                          'http://www.gandi.net')
 
+    def test_maximum_redirects(self):
+        """Test that maximum redirect exception doesn't hang up."""
+        self.assertRaises(httplib2.RedirectLimit,
+                          http.fetch,
+                          uri='http://getstatuscode.com/300')
+
 
 class ThreadedHttpTestCase(TestCase):
 

@@ -356,6 +356,7 @@ def fetch(uri, method="GET", body=None, headers=None,
     """
     request = _enqueue(uri, method, body, headers, **kwargs)
     request._join()  # wait for it
+    assert(request._data)  # if there's no data in the answer we're in trouble
     # Run the error handling callback in the callers thread so exceptions
     # may be caught.
     if default_error_handling:
