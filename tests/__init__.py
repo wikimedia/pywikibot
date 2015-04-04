@@ -32,6 +32,7 @@ else:
     import unittest
 
 from pywikibot import config
+from pywikibot import i18n
 import pywikibot.data.api
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.data.api import CachedRequest
@@ -90,6 +91,8 @@ script_test_modules = [
 disabled_test_modules = [
     'tests',  # tests of the tests package
 ]
+if not i18n.messages_available():
+    disabled_test_modules.append('l10n')
 
 disabled_tests = {
     'textlib': [

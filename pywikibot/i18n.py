@@ -301,6 +301,7 @@ class TranslationError(Error, ImportError):
 def _get_messages_bundle(name):
     """Load all translation messages for a bundle name."""
     exception_message = 'Unknown problem'
+    transdict = {}
 
     with warnings.catch_warnings():
         # Ignore 'missing __init__.py' as import looks at the JSON
