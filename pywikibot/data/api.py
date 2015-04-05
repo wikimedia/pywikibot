@@ -1638,8 +1638,8 @@ class Request(MutableMapping):
             if "*" in result["error"]:
                 # help text returned
                 result['error']['help'] = result['error'].pop("*")
-            code = result["error"].pop("code", "Unknown")
-            info = result["error"].pop("info", None)
+            code = result['error'].setdefault('code', 'Unknown')
+            info = result['error'].setdefault('info', None)
             if code == "maxlag":
                 lag = lagpattern.search(info)
                 if lag:
@@ -1695,7 +1695,7 @@ class Request(MutableMapping):
                 pywikibot.log(u"           response=\n%s"
                               % result)
 
-                raise APIError(code, info, **result["error"])
+                raise APIError(**result['error'])
             except TypeError:
                 raise RuntimeError(result)
 
