@@ -40,7 +40,6 @@ script_deps = {
     # Note: None of the 'lunatic-python' repos on github support MS Windows.
     'flickrripper.py': ['Pillow'],
     'states_redirect.py': ['pycountry'],
-    'patrol': ['mwlib'],
 }
 # flickrapi 1.4.4 installs a root logger in verbose mode; 1.4.5 fixes this.
 # The problem doesnt exist in flickrapi 2.x.
@@ -77,6 +76,9 @@ if sys.version_info[0] == 2:
     # https://pypi.python.org/pypi/ipaddress
     # Other backports are likely broken.
     dependencies.append('ipaddress')
+
+    # mwlib is not available for py3
+    script_deps['patrol'] = ['mwlib']
 
 if sys.version_info[0] == 3:
     if sys.version_info[1] < 3:
