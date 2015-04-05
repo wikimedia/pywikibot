@@ -1688,6 +1688,39 @@ class Request(MutableMapping):
             if code == 'readapidenied' and self.site._loginstatus in (-3, -1):
                 self.site.login()
                 continue
+            if code == 'badtoken':
+                user_tokens = self.site.tokens._tokens[self.site.user()]
+                # all token values mapped to their type
+                tokens = dict((token, t_type)
+                              for t_type, token in user_tokens.items())
+                # determine which tokens are bad
+                invalid_param = {}
+                for name, param in self._params.items():
+                    if len(param) == 1 and param[0] in tokens:
+                        invalid_param[name] = tokens[param[0]]
+                # doesn't care about the cache so can directly load them
+                if invalid_param:
+                    pywikibot.log(
+                        u'Bad token error for {0}. Tokens for "{1}" used in '
+                        u'request; invalidated them.'.format(
+                            self.site.user(),
+                            '", "'.join(sorted(set(invalid_param.values())))))
+                    self.site.tokens.load_tokens(set(invalid_param.values()))
+                    # fix parameters; lets hope that it doesn't mistake actual
+                    # parameters as tokens
+                    for name, t_type in invalid_param.items():
+                        self[name] = self.site.tokens[t_type]
+                    continue
+                else:
+                    # otherwise couldn't find any … weird there is nothing what
+                    # can be done here because it doesn't know which parameters
+                    # to fix
+                    pywikibot.log(
+                        u'Bad token error for {0} but no parameter is using a '
+                        u'token. Current tokens: {1}'.format(
+                            self.site.user(),
+                            ', '.join('{0}: {1}'.format(*e)
+                                      for e in user_tokens.items())))
             # raise error
             try:
                 pywikibot.log(u"API Error: query=\n%s"
