@@ -39,7 +39,8 @@ script_deps = {
     'script_wui.py': [irc_dep, 'lunatic-python', 'crontab'],
     # Note: None of the 'lunatic-python' repos on github support MS Windows.
     'flickrripper.py': ['Pillow'],
-    'states_redirect.py': ['pycountry']
+    'states_redirect.py': ['pycountry'],
+    'patrol': ['mwlib'],
 }
 # flickrapi 1.4.4 installs a root logger in verbose mode; 1.4.5 fixes this.
 # The problem doesnt exist in flickrapi 2.x.

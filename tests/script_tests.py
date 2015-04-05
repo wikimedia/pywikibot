@@ -31,6 +31,7 @@ script_deps = {
     'flickrripper': ['flickrapi'],
     'match_images': ['PIL.ImageTk'],
     'states_redirect': ['pycountry'],
+    'patrol': ['mwlib'],
 }
 
 if sys.version_info < (2, 7):
@@ -108,6 +109,7 @@ auto_run_script_list = [
     'revertbot',
     'noreferences',
     'nowcommons',
+    'patrol',
     'script_wui',
     'shell',
     'states_redirect',
