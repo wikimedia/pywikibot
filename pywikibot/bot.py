@@ -13,6 +13,7 @@ __version__ = '$Id$'
 
 # Note: all output goes thru python std library "logging" module
 
+import codecs
 import datetime
 import json
 import logging
@@ -20,6 +21,7 @@ import logging.handlers
 import os
 import re
 import sys
+import time
 import warnings
 import webbrowser
 
@@ -774,6 +776,7 @@ def handle_args(args=None, do_help=True):
         config.usernames[config.family][config.mylang] = username
 
     init_handlers()
+    writeToCommandLogFile()
 
     if config.verbose_output:
         # Please don't change the regular expression here unless you really
@@ -887,6 +890,30 @@ Global arguments available for all bots:
             pywikibot.stdout(u'Sorry, no help available for %s' % module_name)
         pywikibot.log('showHelp:', exc_info=True)
     pywikibot.stdout(globalHelp)
+
+
+def writeToCommandLogFile():
+    """
+    Save name of the called module along with all parameters to logs/commands.log.
+
+    This can be used by user later to track errors or report bugs.
+    """
+    modname = calledModuleName()
+    # put quotation marks around all parameters
+    args = [modname] + [u'"%s"' % s for s in pywikibot.argvu[1:]]
+    command_log_filename = config.datafilepath('logs', 'commands.log')
+    try:
+        command_log_file = codecs.open(command_log_filename, 'a', 'utf-8')
+    except IOError:
+        command_log_file = codecs.open(command_log_filename, 'w', 'utf-8')
+    # add a timestamp in ISO 8601 formulation
+    isoDate = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    command_log_file.write('%s r%s Python %s '
+                           % (isoDate, version.getversiondict()['rev'],
+                              sys.version.split()[0]))
+    s = u' '.join(args)
+    command_log_file.write(s + os.linesep)
+    command_log_file.close()
 
 
 def open_webbrowser(page):
