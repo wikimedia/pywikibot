@@ -22,7 +22,7 @@ else:
             ' falling back to using the larger XML datasets.')
         csv = None
 
-from pywikibot.comms import threadedhttp
+from pywikibot.comms import http
 
 
 class WikiStats(object):
@@ -110,11 +110,8 @@ class WikiStats(object):
         if table in self.FAMILY_MAPPING:
             table = self.FAMILY_MAPPING[table]
 
-        o = threadedhttp.Http()
-        r = o.request(uri=URL % (table, format))
-        if isinstance(r, Exception):
-            raise r
-        return r[1]
+        r = http.fetch(URL % (table, format))
+        return r.raw
 
     def raw_cached(self, table, format):
         """

@@ -2013,7 +2013,7 @@ def UntaggedPageGenerator(untaggedProject, limit=500, site=None):
     else:
         wiki = 'wikilang=%s&wikifam=.%s' % (lang, project)
     link = '%s&%s&max=%d&order=img_timestamp' % (URL, wiki, limit)
-    results = re.findall(REGEXP, http.request(site=None, uri=link))
+    results = re.findall(REGEXP, http.fetch(link))
     if not results:
         raise pywikibot.Error(
             u'Nothing found at %s! Try to use the tool by yourself to be sure '

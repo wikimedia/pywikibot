@@ -1550,8 +1550,8 @@ class Request(MutableMapping):
                         body = paramstring
 
                 rawdata = http.request(
-                    self.site, uri, method='GET' if use_get else 'POST',
-                    headers=headers, body=body)
+                    site=self.site, uri=uri, method='GET' if use_get else 'POST',
+                    body=body, headers=headers)
             except Server504Error:
                 pywikibot.log(u"Caught HTTP 504 error; retrying")
                 self.wait()
