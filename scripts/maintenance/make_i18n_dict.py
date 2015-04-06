@@ -15,6 +15,11 @@ If you have more than one message dictionary, give all these names to the bot:
 
 If you have the messages as instance constants you may call the bot as follows:
 >>> bot = i18nBot('<scriptname>.<class instance>', '<msg dict1>', '<msg dict2>')
+
+It's also possible to make json files too by using to_json method:
+>>> from scripts.maintenance.make_i18n_dict import i18nBot
+>>> bot = i18nBot('disambredir', 'msg')
+>>> bot.to_json()
 """
 #
 # (C) xqt, 2013-2014
@@ -24,6 +29,12 @@ If you have the messages as instance constants you may call the bot as follows:
 #
 __version__ = '$Id$'
 #
+
+import os
+import json
+import codecs
+
+from pywikibot import config
 
 
 class i18nBot(object):
@@ -88,5 +99,25 @@ class i18nBot(object):
             self.read(msg)
         self.print_all()
 
-if __name__ == "__main__":
+    def to_json(self):
+        if not self.dict:
+            self.run()
+        json_dir = os.path.join(
+            config.base_dir, 'scripts/i18n', self.scriptname)
+        if not os.path.exists(json_dir):
+            os.makedirs(json_dir)
+        for lang in self.dict:
+            file_name = os.path.join(json_dir, '%s.json' % lang)
+            if os.path.isfile(file_name):
+                with codecs.open(file_name, 'r', 'utf-8') as json_file:
+                    new_dict = json.loads(json_file.read())
+            else:
+                new_dict = {}
+            new_dict['@metadata'] = new_dict.get('@metadata', {'authors': []})
+            with codecs.open(file_name, 'w', 'utf-8') as json_file:
+                new_dict.update(self.dict[lang])
+                json.dump(new_dict, json_file, ensure_ascii=False,
+                          sort_keys=True, indent=4, separators=(',', ': '))
+
+if __name__ == '__main__':
     print(__doc__)
