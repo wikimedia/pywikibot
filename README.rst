@@ -1,5 +1,5 @@
-Pywikibot Framework
-===================
+Pywikibot
+=========
 
 The Pywikibot framework is a Python library that interfaces with the
 `MediaWiki API <https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page>`_
