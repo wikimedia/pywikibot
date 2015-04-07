@@ -72,6 +72,11 @@ Furthermore, the following command line parameters are supported:
                   (or no replacements are defined via -fix or the arguments)
                   it'll ask for additional replacements at start.
 
+-replacementfile  Lines from the given file name(s) will be read as replacement
+                  arguments. i.e. a file containing lines "a" and "b", used as
+                  python replace.py -page:X -replacementfile:file c d
+                  will replace 'a' with 'b' and 'c' with 'd'.
+
 -always           Don't prompt you for each replacement
 
 -recursive        Recurse replacement as long as possible. Be careful, this
@@ -127,6 +132,7 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 #
 
+import codecs
 import collections
 import re
 import time
@@ -714,6 +720,9 @@ def main(*args):
     sleep = None
     # Request manual replacements even if replacements are already defined
     manual_input = False
+    # Replacements loaded from a file
+    replacement_file = None
+    replacement_file_arg_misplaced = False
 
     # Read commandline parameters.
 
@@ -770,13 +779,48 @@ def main(*args):
             allowoverlap = True
         elif arg.startswith('-manualinput'):
             manual_input = True
+        elif arg.startswith('-replacementfile'):
+            if len(commandline_replacements) % 2:
+                replacement_file_arg_misplaced = True
+
+            if arg == '-replacementfile':
+                replacement_file = pywikibot.input(
+                    u'Please enter the filename to read replacements from:')
+            else:
+                replacement_file = arg[len('-replacementfile:'):]
         else:
             commandline_replacements.append(arg)
 
     site = pywikibot.Site()
 
-    if (len(commandline_replacements) % 2):
-        raise pywikibot.Error('require even number of replacements.')
+    if len(commandline_replacements) % 2:
+        pywikibot.error('Incomplete command line pattern replacement pair.')
+        return False
+
+    if replacement_file_arg_misplaced:
+        pywikibot.error(
+            '-replacementfile used between a pattern replacement pair.')
+        return False
+
+    if replacement_file:
+        try:
+            with codecs.open(replacement_file, 'r', 'utf-8') as f:
+                file_replacements = f.readlines()
+        except (IOError, OSError) as e:
+            pywikibot.error(u'Error loading {0}: {1}'.format(
+                replacement_file, e))
+            return False
+
+        if len(file_replacements) % 2:
+            pywikibot.error(
+                '{0} contains an incomplete pattern replacement pair.'.format(
+                    replacement_file))
+            return False
+
+        # Strip BOM from first line
+        file_replacements[0].lstrip(u'\uFEFF')
+        commandline_replacements.extend(file_replacements)
+
     if not(commandline_replacements or fixes_set) or manual_input:
         old = pywikibot.input(u'Please enter the text that should be replaced:')
         while old:
