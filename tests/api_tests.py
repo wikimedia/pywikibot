@@ -683,6 +683,24 @@ class TestLazyLogin(TestCase):
         self.assertRaises(pywikibot.NoUsername, req.submit)
 
 
+class TestBadTokenRecovery(TestCase):
+
+    """Test that the request recovers from bad tokens."""
+
+    family = 'wikipedia'
+    code = 'test'
+
+    write = True
+
+    def test_bad_token(self):
+        site = self.get_site()
+        site.tokens._tokens.setdefault(site.user(), {})['edit'] = 'INVALID'
+        page = pywikibot.Page(site, 'Pywikibot bad token test')
+        page.text = ('This page is testing whether pywikibot-core rerequests '
+                     'a token when a badtoken error was received.')
+        page.save(comment='Bad token test')
+
+
 if __name__ == '__main__':
     try:
         unittest.main()
