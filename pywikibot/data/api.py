@@ -1391,7 +1391,7 @@ class Request(MutableMapping):
         return "%s.%s<%s->%r>" % (self.__class__.__module__, self.__class__.__name__, self.site, str(self))
 
     def _simulate(self, action):
-        """Simualte action."""
+        """Simulate action."""
         if action and config.simulate and (self.write or action in config.actions_to_block):
             pywikibot.output(
                 u'\03{lightyellow}SIMULATION: %s action blocked.\03{default}'
@@ -1485,7 +1485,7 @@ class Request(MutableMapping):
                     text = warning['html']['*']
                 else:
                     pywikibot.warning(
-                        u'API warning ({0})of unknown format: {1}'.
+                        u'API warning ({0}) of unknown format: {1}'.
                         format(mod, warning))
                     continue
                 # multiple warnings are in text separated by a newline
