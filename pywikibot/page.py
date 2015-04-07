@@ -427,6 +427,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """Return the current revision id for this page."""
         return self.latest_revision_id
 
+    @deprecated('latest_revision_id')
+    def pageAPInfo(self):
+        """Return the current revision id for this page."""
+        return self.latest_revision_id
+
     @property
     def latest_revision(self):
         """Return the current revision for this page."""
