@@ -1,6 +1,5 @@
 #!usr/bin/python
 # -*- coding: utf-8  -*-
-
 """Create country sub-division redirect pages.
 
 Check if they are in the form Something, State, and if so, create a redirect
@@ -20,6 +19,8 @@ PRE-REQUISITE : Need to install python-pycountry library.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

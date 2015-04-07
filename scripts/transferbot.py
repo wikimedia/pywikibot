@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-
 """
 This script transfers pages from a source wiki to a target wiki.
 
@@ -25,6 +24,8 @@ Example commands:
 
 # Transfer all pages in category "Query service" from the Toolserver wiki to
 # wikitech, adding Nova_Resource:Tools/Tools/ as prefix
+from __future__ import unicode_literals
+
 transferbot.py -v -family:toolserver -tofamily:wikitech -cat:"Query service" -prefix:Nova_Resource:Tools/Tools/
 
 # Copy the template "Query service" from the Toolserver wiki to wikitech

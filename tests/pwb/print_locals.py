@@ -1,4 +1,5 @@
 """Script that forms part of pwb_tests."""
+from __future__ import unicode_literals
 
 import os.path
 

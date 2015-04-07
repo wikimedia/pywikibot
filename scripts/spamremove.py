@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 """
 Script to remove links that are being or have been spammed.
 
@@ -23,12 +22,13 @@ Command line options:
                   multiple times it will search all given namespaces
 
 """
-
 #
 # (C) Pywikibot team, 2007-2014
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 #

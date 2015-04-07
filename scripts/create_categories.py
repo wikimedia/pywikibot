@@ -28,6 +28,8 @@ page links like [[Category:Hensies]], causing this script
 to create [[Category:Cultural heritage monuments in Hensies]].
 
 """
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 # (C) Multichill, 2011

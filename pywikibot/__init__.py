@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __release__ = '2.0b3'
 __version__ = '$Id$'
 

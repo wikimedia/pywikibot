@@ -20,12 +20,13 @@ are taken into account.
 Usage: category_redirect.py [options]
 
 """
-
 #
 # (C) Pywikibot team, 2008-2014
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 import sys

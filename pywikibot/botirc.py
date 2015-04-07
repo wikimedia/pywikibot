@@ -11,6 +11,8 @@ http://python-irclib.sourceforge.net/
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 # Note: the intention is to develop this module (at some point) into a Bot

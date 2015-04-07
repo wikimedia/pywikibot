@@ -14,6 +14,8 @@ This module also includes objects:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 
@@ -271,8 +273,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     def __repr__(self):
         """Return a more complete string representation."""
-        return "%s(%s)" % (self.__class__.__name__,
-                           self.title().encode(config.console_encoding))
+        title = self.title().encode(config.console_encoding).decode('unicode-escape')
+        return '{0}({1})'.format(self.__class__.__name__, title)
 
     def _cmpkey(self):
         """
@@ -4145,7 +4147,7 @@ class Claim(Property):
         @rtype: bool
         """
         if (isinstance(self.target, pywikibot.ItemPage) and
-                isinstance(value, str) and
+                isinstance(value, basestring) and
                 self.target.id == value):
             return True
 
@@ -4155,7 +4157,7 @@ class Claim(Property):
             return True
 
         if (isinstance(self.target, pywikibot.Coordinate) and
-                isinstance(value, str)):
+                isinstance(value, basestring)):
             coord_args = [float(x) for x in value.split(',')]
             if len(coord_args) >= 3:
                 precision = coord_args[2]
@@ -4859,7 +4861,7 @@ def html2unicode(text, ignore=None):
         if unicodeCodepoint and unicodeCodepoint not in ignore:
             if unicodeCodepoint > sys.maxunicode:
                 # solve narrow Python 2 build exception (UTF-16)
-                return eval(r"u'\U{:08x}'".format(unicodeCodepoint))
+                return eval("'\\U{:08x}'".format(unicodeCodepoint))
             else:
                 return chr(unicodeCodepoint)
         else:

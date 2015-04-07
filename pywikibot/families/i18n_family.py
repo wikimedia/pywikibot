@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
 """Family module for Translate Wiki."""
+from __future__ import unicode_literals
 
 __version__ = '$Id$'
 

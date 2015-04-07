@@ -5,7 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-
 # NOTE FOR RUNNING WINDOWS UI TESTS
 #
 # Windows UI tests have to be run using the tests\ui_tests.bat helper script.
@@ -25,6 +24,8 @@
 #     easy_install --upgrade https://pywinauto.googlecode.com/files/pywinauto-0.4.2.zip
 #
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 import logging
@@ -137,6 +138,19 @@ strin = Stream('in', {})
 newstdout = strout._stream
 newstderr = strerr._stream
 newstdin = strin._stream
+
+if sys.version_info[0] == 2:
+    # In Python 2 the sys.std* streams use bytes instead of unicode
+    # But this module is using unicode_literals so '…' will generate unicode
+    # So it'll convert those back into bytes
+    original_write = newstdin.write
+
+    def encoded_write(text):
+        if isinstance(text, unicode):
+            text = text.encode('utf8')
+        original_write(text)
+
+    newstdin.write = encoded_write
 
 org_print = ui._print
 org_input = ui._raw_input

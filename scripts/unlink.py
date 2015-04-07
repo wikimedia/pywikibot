@@ -25,6 +25,8 @@ python unlink.py "Foo bar" -namespace:0 -namespace:6
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

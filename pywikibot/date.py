@@ -11,7 +11,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import division
+from __future__ import division, unicode_literals
 __version__ = '$Id$'
 #
 

@@ -29,6 +29,8 @@ Example: "python capitalize_redirects.py -start:B -always"
 #
 # Automatically converted from compat branch by compat2core.py script
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

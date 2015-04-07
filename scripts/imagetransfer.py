@@ -30,6 +30,8 @@ used on a page reachable via interwiki links.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 import re

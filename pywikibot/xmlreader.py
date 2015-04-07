@@ -13,6 +13,8 @@ XmlEntry objects which can be used by other bots.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 
@@ -131,7 +133,10 @@ class XmlDump(object):
             # assume it's an uncompressed XML file
             source = open(self.filename, 'rb')
         try:
-            context = iterparse(source, events=("start", "end", "start-ns"))
+            # iterparse's event must be a str but they are unicode with
+            # unicode_literals in Python 2
+            context = iterparse(source, events=(str('start'), str('end'),
+                                                str('start-ns')))
             self.root = None
 
             for event, elem in context:

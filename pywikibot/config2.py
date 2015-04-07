@@ -19,6 +19,8 @@ build paths relative to base_dir:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 
@@ -28,6 +30,8 @@ import stat
 import sys
 
 from warnings import warn
+
+from pywikibot.tools import default_encoding
 
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
@@ -903,11 +907,7 @@ for _key in _modified:
              _ConfigurationDeprecationWarning)
 
 # Fix up default console_encoding
-if console_encoding is None:
-    if sys.platform == 'win32':
-        console_encoding = 'cp850'
-    else:
-        console_encoding = 'iso-8859-1'
+console_encoding = default_encoding(console_encoding)
 
 # Fix up transliteration_target
 if transliteration_target == 'not set':

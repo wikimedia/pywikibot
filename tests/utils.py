@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 __version__ = '$Id$'
 #
 import os
@@ -16,7 +16,7 @@ import time
 from warnings import warn
 
 import pywikibot
-from pywikibot.tools import SelfCallDict
+from pywikibot.tools import SelfCallDict, stream_encoding
 from pywikibot.site import Namespace
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
@@ -258,11 +258,6 @@ def execute(command, data_in=None, timeout=0, error=None):
     @param command: executable to run and arguments to use
     @type command: list of unicode
     """
-    def decode(stream):
-        if sys.version_info[0] > 2:
-            return stream.decode(pywikibot.config.console_encoding)
-        else:
-            return stream
     env = os.environ.copy()
     # sys.path may have been modified by the test runner to load dependencies.
     env['PYTHONPATH'] = ":".join(sys.path)
@@ -283,10 +278,12 @@ def execute(command, data_in=None, timeout=0, error=None):
 
     p = subprocess.Popen(command, env=env, **options)
 
+    stdin_encoding = stream_encoding(p.stdin)
+    stdout_encoding = stream_encoding(p.stdout)
+    stderr_encoding = stream_encoding(p.stderr)
+
     if data_in is not None:
-        if sys.version_info[0] > 2:
-            data_in = data_in.encode(pywikibot.config.console_encoding)
-        p.stdin.write(data_in)
+        p.stdin.write(data_in.encode(stdin_encoding))
         p.stdin.flush()  # _communicate() otherwise has a broken pipe
 
     stderr_lines = b''
@@ -299,7 +296,7 @@ def execute(command, data_in=None, timeout=0, error=None):
         if error:
             line = p.stderr.readline()
             stderr_lines += line
-            if error in decode(line):
+            if error in line.decode(stdout_encoding):
                 break
         time.sleep(1)
         waited += 1
@@ -312,8 +309,8 @@ def execute(command, data_in=None, timeout=0, error=None):
 
     data_out = p.communicate()
     return {'exit_code': p.returncode,
-            'stdout': decode(data_out[0]),
-            'stderr': decode(stderr_lines + data_out[1])}
+            'stdout': data_out[0].decode(stdout_encoding),
+            'stderr': (stderr_lines + data_out[1]).decode(stderr_encoding)}
 
 
 def execute_pwb(args, data_in=None, timeout=0, error=None):

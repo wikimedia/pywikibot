@@ -41,6 +41,7 @@ Furthermore, the following command line parameters are supported:
 # This is a script to add a template to the top of the pages with
 # category:catname
 # Warning! Put it in one line, otherwise it won't work correctly.
+from __future__ import unicode_literals
 
 python add_text.py -cat:catname -summary:"Bot: Adding a template"
 -text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up

@@ -38,6 +38,8 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 import pywikibot

@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 __version__ = '$Id$'
 
 import os
@@ -306,6 +306,8 @@ class TestScriptMeta(MetaTestCaseClass):
                 test_name = 'test__' + script_name + '_help'
             else:
                 test_name = 'test_' + script_name + '_help'
+            # it's explicitly using str() because __name__ must be str
+            test_name = str(test_name)
             dct[test_name] = test_execution(script_name, ['-help'])
             if script_name in ['version',
                                'script_wui',      # Failing on travis-ci
@@ -326,6 +328,8 @@ class TestScriptMeta(MetaTestCaseClass):
                 test_name = 'test__' + script_name + '_simulate'
             else:
                 test_name = 'test_' + script_name + '_simulate'
+            # it's explicitly using str() because __name__ must be str
+            test_name = str(test_name)
             dct[test_name] = test_execution(script_name, ['-simulate'],
                                             no_args_expected_results)
             if script_name in ['catall',          # stdout user interaction
