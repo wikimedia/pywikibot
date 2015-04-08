@@ -306,7 +306,7 @@ class Http(httplib2.Http):
                                 headers=headers,
                                 max_redirects=max_redirects - 1)
         else:
-            raise httplib2.RedirectLimit(
+            return httplib2.RedirectLimit(
                 "Redirected more times than redirection_limit allows.",
                 response, content)
 
@@ -539,6 +539,8 @@ class HttpProcessor(threading.Thread):
             finally:
                 if item.lock:
                     item.lock.release()
+                # if data wasn't set others might hang; but wait on lock release
+                assert(item._data)
 
 
 # Metaweb Technologies, Inc. License:
