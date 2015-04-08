@@ -430,6 +430,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
     @deprecated('latest_revision_id')
     def pageAPInfo(self):
         """Return the current revision id for this page."""
+        if self.isRedirectPage():
+            raise pywikibot.IsRedirectPage(self)
         return self.latest_revision_id
 
     @property
