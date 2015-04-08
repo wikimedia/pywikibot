@@ -521,6 +521,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-limit:10')
         gf.handleArg('-step:5')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertLessEqual(len(pages), 10)
         for page in pages:
@@ -533,6 +534,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-limit:10')
         gf.handleArg('-ns:1')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertLessEqual(len(pages), 10)
         self.assertPagesInNamespaces(gen, 1)
@@ -543,6 +545,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertTrue(gf.handleArg('-titleregex:(.)\\1+'))
         gf.handleArg('-limit:10')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = list(gen)
         self.assertLessEqual(len(pages), 10)
         for page in pages:
@@ -569,6 +572,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertTrue(gf.handleArg('-titleregex:.*'))
         gf.handleArg('-limit:10')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = list(gen)
         self.assertGreater(len(pages), 0)
         self.assertLessEqual(len(pages), 10)
@@ -589,6 +593,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-limit:10')
         gf.handleArg('-step:5')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertLessEqual(len(pages), 10)
         for page in pages:
@@ -601,12 +606,14 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-prefixindex:a')
         gf.handleArg("-limit:10")
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
 
     def test_newpages_default(self):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-newpages')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertGreater(len(pages), 0)
         self.assertLessEqual(len(pages), 60)
@@ -615,6 +622,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-newpages:10')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 0)
 
     def test_newpages_ns(self):
@@ -622,12 +630,14 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-ns:1')
         gf.handleArg('-newpages:10')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
 
     def test_recentchanges_ns_default(self):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-recentchanges:50')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertPagesInNamespacesAll(gen, set([0, 1, 2]), skip=True)
 
     def test_recentchanges_ns(self):
@@ -635,6 +645,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-ns:1')
         gf.handleArg('-recentchanges:10')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
 
     def test_recentchanges_ns_multi(self):
@@ -643,6 +654,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-ns:3')
         gf.handleArg('-recentchanges:10')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, set([1, 3]))
 
 
@@ -657,6 +669,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf.handleArg('-onlyif:P357=International Journal of Minerals\, '
                      'Metallurgy\, and Materials')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertEqual(len(set(gen)), 1)
 
     def test_onlyifnot(self):
@@ -666,6 +679,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf.handleArg('-onlyifnot:P357=International Journal of Minerals\, '
                      'Metallurgy\, and Materials')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertEqual(len(set(gen)), 0)
 
     def test_onlyif_qualifiers(self):
@@ -674,6 +688,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf.handleArg('-page:Q668')
         gf.handleArg('-onlyif:P47=Q837,P805=Q3088768')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertEqual(len(set(gen)), 1)
 
     def test_searchitem(self):
@@ -681,6 +696,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-searchitem:abc')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertGreater(len(set(gen)), 0)
 
     def test_searchitem_language(self):
@@ -688,10 +704,12 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-searchitem:pl:abc')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = set(gen)
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-searchitem:en:abc')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages2 = set(gen)
         self.assertNotEqual(pages, pages2)
 
@@ -718,6 +736,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         self.assertDeprecation('The usage of "-newuserslog" is deprecated.'
                                ' Use -logevents "newusers,,500" instead')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertLessEqual(len(pages), 500)
         self.assertTrue(all(isinstance(item, pywikibot.Page) for item in pages))
@@ -726,6 +745,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         gf = pagegenerators.GeneratorFactory(site=self.site)
         self.assertTrue(gf.handleArg('-newuserslog:10'))
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertLessEqual(len(pages), 10)
         self.assertTrue(all(isinstance(item, pywikibot.Page) for item in pages))
@@ -735,6 +755,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         gf.handleArg('-ns:1')
         gf.handleArg('-newuserslog:10')
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
         self.assertTrue(all(isinstance(item, pywikibot.Page) for item in gen))
 
@@ -743,6 +764,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         user = self.get_site().user()
         self.assertTrue(gf.handleArg('-newuserslog:' + user + ';10'))
         gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
         pages = set(gen)
 
         if not pages:
