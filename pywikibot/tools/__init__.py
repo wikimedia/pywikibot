@@ -555,9 +555,9 @@ def intersect_generators(genlist):
                 # TODO: evaluate if True and timeout is necessary.
                 item = t.queue.get(True, 0.1)
 
-                # Cache entry is a set of tuples (item, thread).
+                # Cache entry is a set of thread.
                 # Duplicates from same thread are not counted twice.
-                cache[item].add((item, t))
+                cache[item].add(t)
                 if len(cache[item]) == n_gen:
                     yield item
                     # Remove item from cache.
