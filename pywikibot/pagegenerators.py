@@ -375,8 +375,8 @@ class GeneratorFactory(object):
             gensList = self.gens[0]
             dupfiltergen = gensList
             if self.intersect:
-                pywikibot.input(u'Only one generator. '
-                                u'Param "-intersect" has no meaning or effect.')
+                pywikibot.warning(
+                    '"-intersect" ignored as only one generator is specified.')
         else:
             if self.intersect:
                 gensList = intersect_generators(self.gens)
