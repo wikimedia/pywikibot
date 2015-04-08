@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 This script shows the categories on each page and lets you change them.
 
@@ -23,6 +22,8 @@ Options:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

@@ -77,6 +77,8 @@ Custom format can be applied to the following items extrapolated from a
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

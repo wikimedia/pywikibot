@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-
 """
 This bot goes over multiple pages of a wiki, and edits them without changes.
 
@@ -21,6 +20,8 @@ This script understands various command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

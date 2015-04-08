@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-
 """
 This bot searches for selflinks and allows removing them.
 
@@ -16,6 +15,7 @@ These command line parameters can be used to specify which pages to work on:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
 
 import re
 import pywikibot

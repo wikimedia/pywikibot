@@ -12,7 +12,7 @@ search paths so the package does not need to be installed, etc.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 __version__ = '$Id$'
 
 # The following snippet was developed by Ned Batchelder (and others)
@@ -57,7 +57,8 @@ def run_python_file(filename, argv, argvu, package=None):
 
     # Create a module to serve as __main__
     old_main_mod = sys.modules['__main__']
-    main_mod = types.ModuleType('__main__')
+    # it's explicitly using str() to bypass unicode_literals in Python 2
+    main_mod = types.ModuleType(str('__main__'))
     sys.modules['__main__'] = main_mod
     main_mod.__file__ = filename
     if sys.version_info[0] > 2:
@@ -65,7 +66,8 @@ def run_python_file(filename, argv, argvu, package=None):
     else:
         main_mod.__builtins__ = sys.modules['__builtin__']
     if package:
-        main_mod.__package__ = package
+        # it's explicitly using str() to bypass unicode_literals in Python 2
+        main_mod.__package__ = str(package)
 
     # Set sys.argv and the first path element properly.
     old_argv = sys.argv

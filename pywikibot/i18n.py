@@ -21,6 +21,8 @@ messages.  See L{twntranslate} for more information on the messages.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 
@@ -73,7 +75,8 @@ def messages_available():
         # directories before loading the python file.
         try:
             warnings.simplefilter("ignore", ImportWarning)
-            module = __import__(_messages_package_name, fromlist=['pywikibot'])
+            # it's explicitly using str() to bypass unicode_literals in Python 2
+            module = __import__(_messages_package_name, fromlist=[str('pywikibot')])
         except ImportError:
             _messages_available = False
             return False
@@ -308,8 +311,9 @@ def _get_messages_bundle(name):
         # directories before loading the python file.
         warnings.simplefilter("ignore", ImportWarning)
         try:
+            # it's explicitly using str() to bypass unicode_literals in Python 2
             transdict = getattr(__import__(_messages_package_name,
-                                           fromlist=[name]),
+                                           fromlist=[str(name)]),
                                 name).msg
         except ImportError as e:
             exception_message = str(e)

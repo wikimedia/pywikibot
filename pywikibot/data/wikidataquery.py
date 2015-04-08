@@ -4,11 +4,13 @@
 # (C) Pywikibot team, 2013
 #
 # Distributed under the terms of the MIT license.
+from __future__ import unicode_literals
 
 import json
 import sys
 if sys.version_info[0] > 2:
     from urllib.parse import quote
+    basestring = (str, )
 else:
     from urllib2 import quote
 import pickle
@@ -294,7 +296,7 @@ class StringClaim(HasClaim):
         return '"%s"' % x
 
     def validate(self):
-        return self.isOrContainsOnlyTypes(self.items, str)
+        return self.isOrContainsOnlyTypes(self.items, basestring)
 
 
 class Tree(Query):
@@ -408,7 +410,7 @@ class Link(Query):
         self.validateOrRaise()
 
     def validate(self):
-        return self.isOrContainsOnlyTypes(self.link, str)
+        return self.isOrContainsOnlyTypes(self.link, basestring)
 
     def __str__(self):
         return "%s[%s]" % (self.queryType, self.formatList(self.link))

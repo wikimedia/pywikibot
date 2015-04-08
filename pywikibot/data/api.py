@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 from collections import Container, MutableMapping
@@ -1144,7 +1146,7 @@ class Request(MutableMapping):
 
             if ip.is_IP(self.site._userinfo['name']):
                 raise Error(u"API write action attempted as IP %r"
-                            % self.site._userinfo['name'])
+                            % str(self.site._userinfo['name']))
 
             if not self.site.user():
                 pywikibot.warning(
@@ -1463,10 +1465,9 @@ class Request(MutableMapping):
         # strip the headers to get the HTTP message body
         if sys.version_info[0] > 2:
             body = container.as_bytes()
-            marker = b"\n\n"  # separates headers from body
         else:
             body = container.as_string()
-            marker = "\n\n"  # separates headers from body
+        marker = b'\n\n'  # separates headers from body
         eoh = body.find(marker)
         body = body[eoh + len(marker):]
         # retrieve the headers from the MIME object

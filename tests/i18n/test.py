@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test i18n data."""
+from __future__ import unicode_literals
+
 msg = {
     'de': {
         'test-plural': u'Bot: Ändere %(num)d {{PLURAL:num|Seite|Seiten}}.',

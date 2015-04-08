@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 from collections import Iterable
@@ -203,14 +205,14 @@ class TestNamespaceObject(TestCase):
 
         a.defaultcontentmodel = 'bar'
         s = repr(a)
-        r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], defaultcontentmodel='bar')" \
-            % (unicode('Foo'), unicode('Foo'))
+        r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], defaultcontentmodel=%r)" \
+            % (unicode('Foo'), unicode('Foo'), unicode('bar'))
         self.assertEqual(s, r)
 
         a.case = 'upper'
         s = repr(a)
-        r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], case='upper', defaultcontentmodel='bar')" \
-            % (unicode('Foo'), unicode('Foo'))
+        r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], case=%r, defaultcontentmodel=%r)" \
+            % (unicode('Foo'), unicode('Foo'), unicode('upper'), unicode('bar'))
         self.assertEqual(s, r)
 
         b = eval(repr(a))

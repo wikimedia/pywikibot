@@ -11,6 +11,8 @@ function/method instead.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 import pywikibot
 from pywikibot.data import api
 from pywikibot.tools import deprecated, deprecate_arg

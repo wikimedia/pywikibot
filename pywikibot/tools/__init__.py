@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 __version__ = '$Id$'
 
 import collections
@@ -403,6 +403,26 @@ class ThreadedGenerator(threading.Thread):
         while not self.finished.isSet() and not self.queue.empty():
             time.sleep(0.25)
         self.stop()
+
+
+def stream_encoding(stream):
+    """Get encoding of the stream and use a default if not existent/None."""
+    try:
+        encoding = stream.encoding
+    except AttributeError:
+        encoding = None
+    return default_encoding(encoding)
+
+
+def default_encoding(encoding):
+    """Return an encoding even if it's originally None."""
+    if encoding is None:
+        if sys.platform == 'win32':
+            return 'cp850'
+        else:
+            return 'iso-8859-1'
+    else:
+        return encoding
 
 
 def itergroup(iterable, size):

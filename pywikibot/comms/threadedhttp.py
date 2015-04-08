@@ -8,6 +8,7 @@ This class extends httplib2, adding support for:
     - HttpRequest object
 
 """
+from __future__ import unicode_literals
 
 # (C) Pywikibot team, 2007-2014
 # (C) Httplib 2 team, 2006

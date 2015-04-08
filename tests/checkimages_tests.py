@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """Unit tests for checkimages script."""
+from __future__ import unicode_literals
 
 from scripts import checkimages
 

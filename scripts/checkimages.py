@@ -76,7 +76,6 @@ right parameter.
 * Add a report for the image tagged.
 
 """
-
 #
 # (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
 # (C) Siebrand Mazeland, 2007-2010
@@ -85,6 +84,8 @@ right parameter.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

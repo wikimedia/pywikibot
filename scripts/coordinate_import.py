@@ -26,6 +26,8 @@ python coordinate_import.py -lang:it -family:wikipedia -transcludes:Infobox_staz
 #
 # Distributed under the terms of MIT License.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 import pywikibot

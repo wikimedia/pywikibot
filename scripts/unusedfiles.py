@@ -8,7 +8,6 @@ Parameters:
 -always     Don't be asked every time.
 
 """
-
 #
 # (C) Leonardo Gregianin, 2007
 # (C) Filnik, 2008
@@ -17,6 +16,8 @@ Parameters:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

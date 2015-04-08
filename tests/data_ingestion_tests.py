@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-
 """Unit tests for data_ingestion.py script."""
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 import os

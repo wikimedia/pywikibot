@@ -15,6 +15,7 @@ Tool to copy a flickr stream to Commons.
 #**Add a nice hotcat lookalike for the adding of categories
 #**Filter the categories
 #*Upload the image
+from __future__ import unicode_literals
 
 Todo:
 *Check if the image is already uploaded (SHA hash)

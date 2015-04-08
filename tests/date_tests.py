@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from pywikibot import date
@@ -45,7 +47,8 @@ class TestDateMeta(MetaTestCaseClass):
             return testMapEntry
 
         for formatname in date.formats:
-            test_name = "test_" + formatname
+            # it's explicitly using str() because __name__ must be str
+            test_name = str('test_' + formatname)
             dct[test_name] = test_method(formatname)
             dct[test_name].__name__ = test_name
         return type.__new__(cls, name, bases, dct)

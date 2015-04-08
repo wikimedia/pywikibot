@@ -13,13 +13,14 @@ The script takes a single parameter:
 -filename: the filename to read the freebase-wikidata mappings from;
            default: fb2w.nt.gz
 """
-
 #
 # (C) Denny Vrandecic, 2013
 # (C) Pywikibot team, 2013-2014
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

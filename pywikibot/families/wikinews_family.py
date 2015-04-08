@@ -1,5 +1,6 @@
 # -*- coding: utf-8  -*-
 """Family module for Wikinews."""
+from __future__ import unicode_literals
 
 from pywikibot import family
 

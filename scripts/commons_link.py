@@ -29,7 +29,7 @@ and pagegenerator can be one of these:
 # Ported by Geoffrey "GEOFBOT" Mon for Google Code-In 2013
 # User:Sn1per
 #
-
+from __future__ import unicode_literals
 
 __version__ = '$Id$'
 

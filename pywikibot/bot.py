@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 # Note: the intention is to develop this module (at some point) into a Bot
@@ -359,7 +361,9 @@ def writelogheader():
         ver = version.get_module_version(module)
         mtime = version.get_module_mtime(module)
         if filename and ver and mtime:
-            log(u'  {0} {1} {2}'.format(filename, ver[:7], mtime.isoformat(' ')))
+            # it's explicitly using str() to bypass unicode_literals in Python 2
+            # isoformat expects a char not a unicode in Python 2
+            log(u'  {0} {1} {2}'.format(filename, ver[:7], mtime.isoformat(str(' '))))
 
     if config.log_pywiki_repo_version:
         log(u'PYWIKI REPO VERSION: %s' % version.getversion_onlinerepo())

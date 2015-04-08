@@ -27,6 +27,8 @@ It's also possible to make json files too by using to_json method:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 

@@ -1,5 +1,7 @@
 # -*- coding: utf-8  -*-
 """Family module for Wikiversity."""
+from __future__ import unicode_literals
+
 from pywikibot import family
 
 __version__ = '$Id$'

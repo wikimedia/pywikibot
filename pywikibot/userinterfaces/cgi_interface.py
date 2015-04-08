@@ -1,4 +1,6 @@
 """CGI user interface."""
+from __future__ import unicode_literals
+
 import sys
 
 

@@ -1,5 +1,7 @@
 # -*- coding: utf-8  -*-
 """Family module for Wikidata."""
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 from pywikibot import family

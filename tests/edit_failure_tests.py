@@ -12,6 +12,8 @@ These tests use special code 'write = -1' for edit failures.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 
 import pywikibot
