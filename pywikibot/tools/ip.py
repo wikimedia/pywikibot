@@ -35,7 +35,7 @@ try:
         # https://pypi.python.org/pypi/ipaddress
         # However while it rejects u'1111', it will consider '1111' valid
         try:
-            ip_address('1111')
+            ip_address(b'1111')
             warn('ipaddress backport is defective; patching.', ImportWarning)
             orig_ip_address = ip_address
             # force all input to be a unicode object so it validates correctly
