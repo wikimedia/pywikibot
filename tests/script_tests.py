@@ -100,6 +100,7 @@ auto_run_script_list = [
     'catall',
     'category_redirect',
     'cfd',
+    'checkimages',
     'clean_sandbox',
     'disambredir',
     'imagerecat',
@@ -333,12 +334,12 @@ class TestScriptMeta(MetaTestCaseClass):
             dct[test_name] = test_execution(script_name, ['-simulate'],
                                             no_args_expected_results)
             if script_name in ['catall',          # stdout user interaction
-                               'checkimages',     # bug 68613
                                'flickrripper',    # Requires a flickr api key
                                'script_wui',      # Error on any user except DrTrigonBot
                                'upload',          # raises custom ValueError
                                ] + failed_dep_script_list or (
                     (config.family == 'wikipedia' and script_name == 'disambredir') or
+                    (config.family != 'wikidata' and script_name == 'checkimages') or
                     (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):  # T94681
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             elif script_name in ['watchlist',     # T77965
