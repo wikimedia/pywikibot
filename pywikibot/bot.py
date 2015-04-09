@@ -807,7 +807,7 @@ def handle_args(args=None, do_help=True):
     return nonGlobalArgs
 
 
-@deprecated
+@deprecated("handle_args")
 def handleArgs(*args):
     """DEPRECATED. Use handle_args()."""
     return handle_args(args)
