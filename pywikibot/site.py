@@ -367,9 +367,9 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
                   self.canonical_name, self.aliases, kwargs)
 
     @classmethod
-    def builtin_namespaces(cls, use_image_name=False):
+    def builtin_namespaces(cls, use_image_name=False, case='first-letter'):
         """Return a dict of the builtin namespaces."""
-        return dict((i, cls(i, use_image_name=use_image_name, case='first-letter'))
+        return dict((i, cls(i, use_image_name=use_image_name, case=case))
                      for i in range(-2, 16))
 
     @staticmethod

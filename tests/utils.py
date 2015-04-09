@@ -191,7 +191,11 @@ class DrySite(pywikibot.site.APISite):
         self._paraminfo = DryParamInfo()
         self._siteinfo = DummySiteinfo({})
         self._siteinfo._cache['lang'] = (code, True)
-        self._namespaces = SelfCallDict(Namespace.builtin_namespaces())
+        self._namespaces = SelfCallDict(
+            Namespace.builtin_namespaces(
+                case='case-sensitive'
+                     if self.family.name == 'wiktionary'
+                     else 'first-letter'))
 
     def __repr__(self):
         """Override default so warnings and errors indicate test is dry."""
@@ -209,13 +213,6 @@ class DrySite(pywikibot.site.APISite):
         warn('%r returning version 1.24; override if unsuitable.'
              % self, DrySiteNote, stacklevel=2)
         return '1.24'
-
-    def case(self):
-        """Return case-sensitive if wiktionary."""
-        if self.family.name == 'wiktionary':
-            return 'case-sensitive'
-        else:
-            return 'first-letter'
 
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
