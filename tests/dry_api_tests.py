@@ -194,7 +194,9 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
         self.assertRaisesRegex(pywikibot.Error, ' without userinfo',
                                Request, site=site, action='edit')
 
-        site._userinfo = {'name': '1.2.3.4', 'groups': []}
+        # Explicitly using str as the test expects it to be str (without the
+        # u-prefix) in Python 2 and this module is using unicode_literals
+        site._userinfo = {'name': str('1.2.3.4'), 'groups': []}
 
         self.assertRaisesRegex(pywikibot.Error, " as IP '1.2.3.4'",
                                Request, site=site, action='edit')
