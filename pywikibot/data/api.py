@@ -1146,7 +1146,7 @@ class Request(MutableMapping):
 
             if ip.is_IP(self.site._userinfo['name']):
                 raise Error(u"API write action attempted as IP %r"
-                            % str(self.site._userinfo['name']))
+                            % self.site._userinfo['name'])
 
             if not self.site.user():
                 pywikibot.warning(
