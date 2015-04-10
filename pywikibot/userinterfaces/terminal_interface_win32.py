@@ -102,7 +102,9 @@ class Win32CtypesUI(Win32BaseUI):
 
     def _raw_input(self):
         data = self.stdin.readline()
-        if '\x1a' in data:
+        # data is in both Python versions str but '\x1a' is unicode in Python 2
+        # so explicitly convert into str as it otherwise tries to decode data
+        if str('\x1a') in data:
             raise EOFError()
         return data.strip()
 
