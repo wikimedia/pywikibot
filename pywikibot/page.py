@@ -3173,6 +3173,17 @@ class WikibasePage(BasePage):
             data[type_key] = source
 
     def toJSON(self, diffto=None):
+        """
+        Create JSON suitable for Wikibase API.
+
+        When diffto is provided, JSON representing differences
+        to the provided data is created.
+
+        @param diffto: JSON containing claim data
+        @type diffto: dict
+
+        @return: dict
+        """
         data = {}
         self._diff_to('labels', 'language', 'value', diffto, data)
 
@@ -3507,6 +3518,17 @@ class ItemPage(WikibasePage):
         return self.__class__(target.site, target.title(), target.namespace())
 
     def toJSON(self, diffto=None):
+        """
+        Create JSON suitable for Wikibase API.
+
+        When diffto is provided, JSON representing differences
+        to the provided data is created.
+
+        @param diffto: JSON containing claim data
+        @type diffto: dict
+
+        @return: dict
+        """
         data = super(ItemPage, self).toJSON(diffto=diffto)
 
         self._diff_to('sitelinks', 'site', 'title', diffto, data)
@@ -3517,23 +3539,24 @@ class ItemPage(WikibasePage):
                 claims[prop] = [claim.toJSON() for claim in self.claims[prop]]
 
         if diffto and 'claims' in diffto:
-            temp = {}
+            temp = defaultdict(list)
+            claim_ids = set()
+
+            diffto_claims = diffto['claims']
+
             for prop in claims:
                 for claim in claims[prop]:
-                    if (prop not in diffto['claims'] or
-                            claim not in diffto['claims'][prop]):
-                        if prop not in temp:
-                            temp[prop] = []
+                    if (prop not in diffto_claims or
+                            claim not in diffto_claims[prop]):
                         temp[prop].append(claim)
-            for prop in diffto['claims']:
-                if prop not in claims:
-                    claims[prop] = []
-                for claim1 in diffto['claims'][prop]:
-                    if 'id' in claim1 and claim1['id'] not in \
-                    [claim2['id'] for claim2 in claims[prop] if 'id' in claim2]:
-                        if prop not in temp:
-                            temp[prop] = []
-                        temp[prop].append({'id': claim1['id'], 'remove': ''})
+
+                    claim_ids.add(claim['id'])
+
+            for prop, prop_claims in diffto_claims.items():
+                for claim in prop_claims:
+                    if 'id' in claim and claim['id'] not in claim_ids:
+                        temp[prop].append({'id': claim['id'], 'remove': ''})
+
             claims = temp
 
         if claims:
