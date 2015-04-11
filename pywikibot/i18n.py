@@ -28,7 +28,6 @@ __version__ = '$Id$'
 
 import sys
 import re
-import locale
 import warnings
 
 from pywikibot import Error
@@ -617,9 +616,8 @@ def input(twtitle, parameters=None, password=False, fallback_prompt=None):
     """
     Ask the user a question, return the user's answer.
 
-    The prompt message is retrieved via L{twtranslate} and either uses the
-    config variable 'userinterface_lang' or the default locale as the language
-    code.
+    The prompt message is retrieved via L{twtranslate} and uses the
+    config variable 'userinterface_lang'.
 
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     @param parameters: The values which will be applied to the translated text
@@ -635,8 +633,7 @@ def input(twtitle, parameters=None, password=False, fallback_prompt=None):
         else:
             prompt = fallback_prompt
     else:
-        code = config.userinterface_lang or \
-            locale.getdefaultlocale()[0].split('_')[0]
+        code = config.userinterface_lang
 
         prompt = twtranslate(code, twtitle, parameters)
     return pywikibot.input(prompt, password)
