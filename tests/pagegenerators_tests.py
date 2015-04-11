@@ -232,30 +232,37 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
         self.assertEqual(len(list(gen)), 0)
 
 
-class TestRepeatingGenerator(TestCase):
+class TestRepeatingGenerator(WikimediaDefaultSiteTestCase):
 
     """Test RepeatingGenerator."""
 
-    family = 'wikipedia'
-    code = 'en'
+    # site.recentchanges() includes external edits from wikidata,
+    # except on wiktionaries which are not linked to wikidata
+    # so total=3 should not be too high for most sites.
+    length = 3
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestRepeatingGenerator, cls).setUpClass()
+
+        if cls.get_site().code == 'test':
+            cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
 
     def test_RepeatingGenerator(self):
-        # site.recentchanges() includes external edits (from wikidata),
-        # so total=4 is not too high
         items = list(
             pagegenerators.RepeatingGenerator(self.site.recentchanges,
                                               key_func=lambda x: x['revid'],
                                               sleep_duration=10,
                                               reverse=True,
                                               namespaces=[0],
-                                              total=4)
+                                              total=self.length)
         )
-        self.assertEqual(len(items), 4)
+        self.assertEqual(len(items), self.length)
         timestamps = [pywikibot.Timestamp.fromISOformat(item['timestamp'])
                       for item in items]
         self.assertEqual(sorted(timestamps), timestamps)
         self.assertTrue(all(item['ns'] == 0 for item in items))
-        self.assertEqual(len(set(item['revid'] for item in items)), 4)
+        self.assertEqual(len(set(item['revid'] for item in items)), self.length)
 
 
 class TestTextfilePageGenerator(DefaultSiteTestCase):
@@ -837,6 +844,9 @@ class LiveRCPageGeneratorTestCase(WikimediaDefaultSiteTestCase):
             raise unittest.SkipTest(
                 'socketIO_client %s not supported by Wikimedia-Stream'
                 % socketIO_client.__version__)
+
+        if cls.get_site().code == 'test':
+            cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
 
     def test_RC_pagegenerator_result(self):
         import logging
