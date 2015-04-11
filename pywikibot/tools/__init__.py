@@ -500,7 +500,8 @@ class ThreadList(list):
             time.sleep(2)
         super(ThreadList, self).append(thd)
         thd.start()
-        debug("thread started: %r" % thd, self._logger)
+        debug("thread %d ('%s') started" % (len(self), type(thd)),
+              self._logger)
 
     def stop_all(self):
         """Stop all threads the pool."""
