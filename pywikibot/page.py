@@ -1744,6 +1744,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param sortKey: sortKey to use for the added category.
             Unused if newCat is None, or if inPlace=True
+            If sortKey=True, the sortKey used for oldCat will be used.
 
         @param inPlace: if True, change categories in place rather than
                       rearranging them.
@@ -1764,9 +1765,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
             if cat not in cats:
                 cats.append(cat)
 
-        if not sortKey:
-            sortKey = oldCat.sortKey
-
         if not self.canBeEdited():
             pywikibot.output(u"Can't edit %s, skipping it..."
                              % self.title(asLink=True))
@@ -1781,17 +1779,21 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if newCat in cats:
             newCat = None
 
+        oldtext = self.text
         if inPlace or self.namespace() == 10:
-            oldtext = self.get(get_redirect=True)
             newtext = textlib.replaceCategoryInPlace(oldtext, oldCat, newCat,
                                                      site=self.site)
         else:
+            old_cat_pos = cats.index(oldCat)
             if newCat:
-                cats[cats.index(oldCat)] = Category(self.site, newCat.title(),
-                                                    sortKey=sortKey)
+                if sortKey is True:
+                    # Fetch sortKey from oldCat in current page.
+                    sortKey = cats[old_cat_pos].sortKey
+                cats[old_cat_pos] = Category(self.site, newCat.title(),
+                                             sortKey=sortKey)
             else:
-                cats.pop(cats.index(oldCat))
-            oldtext = self.get(get_redirect=True)
+                cats.pop(old_cat_pos)
+
             try:
                 newtext = textlib.replaceCategoryLinks(oldtext, cats)
             except ValueError:
