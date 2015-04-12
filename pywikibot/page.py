@@ -273,8 +273,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     def __repr__(self):
         """Return a more complete string representation."""
-        title = self.title().encode(config.console_encoding).decode('unicode-escape')
-        return '{0}({1})'.format(self.__class__.__name__, title)
+        title = self.title().encode(config.console_encoding)
+        return str('{0}({1})').format(self.__class__.__name__, title)
 
     def _cmpkey(self):
         """
