@@ -256,15 +256,17 @@ def execute(command, data_in=None, timeout=0, error=None):
     @param command: executable to run and arguments to use
     @type command: list of unicode
     """
+    # Any environment variables added on Windows must be of type
+    # str() on Python 2.
     env = os.environ.copy()
     # sys.path may have been modified by the test runner to load dependencies.
     env['PYTHONPATH'] = ":".join(sys.path)
     # LC_ALL is used by i18n.input as an alternative for userinterface_lang
     if pywikibot.config.userinterface_lang:
-        env['LC_ALL'] = pywikibot.config.userinterface_lang
+        env['LC_ALL'] = str(pywikibot.config.userinterface_lang)
     # Set EDITOR to an executable that ignores all arguments and does nothing.
     if sys.platform == 'win32':
-        env['EDITOR'] = 'call'
+        env['EDITOR'] = str('call')
     else:
         env['EDITOR'] = 'true'
     options = {
