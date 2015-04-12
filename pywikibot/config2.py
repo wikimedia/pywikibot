@@ -219,7 +219,7 @@ def get_base_dir(test_directory=None):
 
     base_dir = ""
     for arg in sys.argv[1:]:
-        if arg.startswith("-dir:"):
+        if arg.startswith(str('-dir:')):
             base_dir = arg[5:]
             base_dir = os.path.expanduser(base_dir)
             break
