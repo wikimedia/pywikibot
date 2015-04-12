@@ -191,11 +191,12 @@ class DrySite(pywikibot.site.APISite):
         self._paraminfo = DryParamInfo()
         self._siteinfo = DummySiteinfo({})
         self._siteinfo._cache['lang'] = (code, True)
+        self._siteinfo._cache['case'] = (
+            'case-sensitive' if self.family.name == 'wiktionary' else
+            'first-letter', True)
         self._namespaces = SelfCallDict(
             Namespace.builtin_namespaces(
-                case='case-sensitive'
-                     if self.family.name == 'wiktionary'
-                     else 'first-letter'))
+                case=self.siteinfo['case']))
 
     def __repr__(self):
         """Override default so warnings and errors indicate test is dry."""
