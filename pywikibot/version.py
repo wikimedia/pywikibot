@@ -74,7 +74,7 @@ def getversiondict():
         except Exception:
             try:
                 hsh = get_module_version(pywikibot)
-                date = get_module_mtime(pywikibot)
+                date = get_module_mtime(pywikibot).timetuple()
 
                 tag = 'pywikibot/__init__.py'
                 rev = '-1 (unknown)'
