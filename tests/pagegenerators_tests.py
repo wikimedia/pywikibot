@@ -264,24 +264,36 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
 
     dry = True
 
-    expected_titles = {
-        'case-sensitive': ('file', 'bracket', 'MediaWiki:Test',
-                           'under score', 'Upper case'),
-        'first-letter': ('File', 'Bracket', 'MediaWiki:Test', 'Under score',
-                         'Upper case'),
+    title_columns = {
+        'case-sensitive': 0,
+        'first-letter': 1,
     }
+
+    expected_titles = (
+        ('file', 'File'),
+        ('bracket', 'Bracket'),
+        ('MediaWiki:Test', 'MediaWiki:Test'),
+        ('under score', 'Under score'),
+        ('Upper case', 'Upper case'),
+    )
 
     def test_brackets(self):
         filename = os.path.join(_data_dir, 'pagelist-brackets.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
-        self.assertPagelistTitles(titles, self.expected_titles[site.case()])
+        self.assertEqual(len(titles), len(self.expected_titles))
+        expected_titles = [expected_title[self.title_columns[site.namespaces[page.namespace()].case]]
+                           for expected_title, page in zip(self.expected_titles, titles)]
+        self.assertPageTitlesEqual(titles, expected_titles)
 
     def test_lines(self):
         filename = os.path.join(_data_dir, 'pagelist-lines.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
-        self.assertPagelistTitles(titles, self.expected_titles[site.case()])
+        self.assertEqual(len(titles), len(self.expected_titles))
+        expected_titles = [expected_title[self.title_columns[site.namespaces[page.namespace()].case]]
+                           for expected_title, page in zip(self.expected_titles, titles)]
+        self.assertPageTitlesEqual(titles, expected_titles)
 
 
 class TestYearPageGenerator(DefaultSiteTestCase):
