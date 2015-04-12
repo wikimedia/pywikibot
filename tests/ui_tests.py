@@ -116,7 +116,9 @@ if os.name == "nt":
         pass
 
     pywikibotManager.register(str('pywikibot'), pywikibotWrapper)
-    _manager = pywikibotManager(address=("127.0.0.1", 47228), authkey="4DJSchgwy5L5JxueZEWbxyeG")
+    _manager = pywikibotManager(
+        address=('127.0.0.1', 47228),
+        authkey=b'4DJSchgwy5L5JxueZEWbxyeG')
     if len(sys.argv) > 1 and sys.argv[1] == "--run-as-slave-interpreter":
         s = _manager.get_server()
         s.serve_forever()
