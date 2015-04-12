@@ -930,6 +930,23 @@ class DefaultSiteTestCase(TestCase):
     family = config.family
     code = config.mylang
 
+    @classmethod
+    def override_default_site(cls, site):
+        print('%s using %s instead of %s:%s.'
+              % (cls.__name__, site, cls.family, cls.code))
+        cls.site = site
+        cls.family = site.family.name
+        cls.code = site.code
+
+        cls.sites = {
+            cls.site: {
+                'family': cls.family,
+                'code': cls.code,
+                'site': cls.site,
+                'hostname': cls.site.hostname(),
+            }
+        }
+
 
 class AlteredDefaultSiteTestCase(TestCase):
 
@@ -995,19 +1012,7 @@ class WikimediaDefaultSiteTestCase(DefaultSiteTestCase, WikimediaSiteTestCase):
         site = cls.get_site()
 
         if not isinstance(site.family, WikimediaFamily):
-            print('%s using English Wikipedia instead of non-WMF config.family %s.'
-                  % (cls.__name__, cls.family))
-            cls.family = 'wikipedia'
-            cls.code = 'en'
-            cls.site = pywikibot.Site('en', 'wikipedia')
-            cls.sites = {
-                cls.site: {
-                    'family': 'wikipedia',
-                    'code': 'en',
-                    'site': cls.site,
-                    'hostname': cls.site.hostname(),
-                }
-            }
+            cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
 
 
 class WikibaseTestCase(TestCase):
