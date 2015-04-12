@@ -13,6 +13,8 @@ import datetime
 import os
 import sys
 
+from distutils.version import LooseVersion
+
 import pywikibot
 from pywikibot import pagegenerators, date
 
@@ -830,6 +832,11 @@ class LiveRCPageGeneratorTestCase(WikimediaDefaultSiteTestCase):
             import socketIO_client  # noqa
         except ImportError:
             raise unittest.SkipTest('socketIO_client not available')
+
+        if LooseVersion(socketIO_client.__version__) >= LooseVersion('0.6.1'):
+            raise unittest.SkipTest(
+                'socketIO_client %s not supported by Wikimedia-Stream'
+                % socketIO_client.__version__)
 
     def test_RC_pagegenerator_result(self):
         import logging
