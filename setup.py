@@ -36,8 +36,6 @@ if sys.version_info[0] == 2:
     extra_deps['csv'] = ['unicodecsv']
 
 script_deps = {
-    'script_wui.py': [irc_dep, 'lunatic-python', 'crontab'],
-    # Note: None of the 'lunatic-python' repos on github support MS Windows.
     'flickrripper.py': ['Pillow'],
     'states_redirect.py': ['pycountry'],
 }
@@ -51,6 +49,10 @@ script_deps = {
 # select flickrapi 2.x for Python 3 installs.
 script_deps['flickrripper.py'].append('flickrapi' if sys.version_info[0] > 2
                                       else 'flickrapi>=1.4.5')
+
+# lunatic-python is only available for Linux
+if sys.platform.startswith('linux'):
+    script_deps['script_wui.py'] = [irc_dep, 'lunatic-python', 'crontab']
 
 dependency_links = [
     'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.9+pywikibot2',
