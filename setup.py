@@ -55,7 +55,6 @@ if sys.platform.startswith('linux'):
     script_deps['script_wui.py'] = [irc_dep, 'lunatic-python', 'crontab']
 
 dependency_links = [
-    'https://git.wikimedia.org/zip/?r=pywikibot/externals/httplib2.git&format=gz#egg=httplib2-0.9+pywikibot2',
     'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
 ]
 
