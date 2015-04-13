@@ -29,7 +29,6 @@ import os
 import stat
 import sys
 
-from locale import getdefaultlocale
 from warnings import warn
 
 from pywikibot.tools import default_encoding
@@ -909,9 +908,6 @@ for _key in _modified:
 
 # Fix up default console_encoding
 console_encoding = default_encoding(console_encoding)
-
-if userinterface_lang is None:
-    userinterface_lang = getdefaultlocale()[0].split('_')[0]
 
 # Fix up transliteration_target
 if transliteration_target == 'not set':
