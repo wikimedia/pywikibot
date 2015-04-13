@@ -1039,6 +1039,8 @@ _check_user_config_types(_uc, _glv, _imports)
 _modified = [_key for _key in _gl
              if _uc[_key] != globals()[_key] or
              _key in ('usernames', 'sysopnames', 'disambiguation_comment')]
+# Retain the list of modified key names
+__modified__ = _modified
 
 if ('user_agent_format' in _modified):
     _right_user_agent_format = re.sub(r'{httplib2(:|})', r'{http_backend\1',

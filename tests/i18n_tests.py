@@ -357,27 +357,35 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
     """Test i18n.input."""
 
     family = 'wikipedia'
-    code = 'arz'
+    code = 'nn'
+    alt_code = 'nb'
 
     message_package = 'scripts.i18n'
+    message = 'pywikibot-enter-category-name'
 
     @classmethod
     def setUpClass(cls):
         """Verify that a translation does not yet exist."""
+        if 'userinterface_lang' in pywikibot.config.__modified__:
+            raise unittest.SkipTest(
+                'user-config has a modified userinterface_lang')
+
         super(InputTestCase, cls).setUpClass()
 
-        if cls.code in i18n.twget_keys('pywikibot-enter-category-name'):
+        if cls.code in i18n.twget_keys(cls.message):
             raise unittest.SkipTest(
                 '%s has a translation for %s'
-                % (cls.code, 'pywikibot-enter-category-name'))
+                % (cls.code, cls.message))
 
     def test_pagegen_i18n_input(self):
-        """Test i18n.input via ."""
-        result = self._execute(args=['listpages', '-cat'],
-                               data_in='non-existant-category\n',
-                               timeout=5)
+        """Test i18n.input fallback via pwb and LC_ALL."""
+        expect = i18n.twtranslate(self.alt_code, self.message, fallback=False)
 
-        self.assertIn('Please enter the category name:', result['stderr'])
+        result = self._execute(args=['listpages', '-cat'],
+                               data_in='non-existant-category\r\n',
+                               timeout=20)
+
+        self.assertIn(expect, result['stderr'])
 
 
 class MissingPackageTestCase(TWNSetMessagePackageBase,
