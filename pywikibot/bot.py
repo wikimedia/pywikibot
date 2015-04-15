@@ -241,15 +241,17 @@ def init_handlers(strm=None):
     warnings_logger = logging.getLogger("py.warnings")
     warnings_logger.setLevel(DEBUG)
 
-    if hasattr(logging, 'captureWarnings'):
-        logging.captureWarnings(True)  # introduced in Python >= 2.7
-    else:
-        backports.captureWarnings(True)
+    # If there are command line warnings options, do not override them
+    if not sys.warnoptions:
+        if hasattr(logging, 'captureWarnings'):
+            logging.captureWarnings(True)  # introduced in Python >= 2.7
+        else:
+            backports.captureWarnings(True)
 
-    if config.debug_log or 'deprecation' in config.log:
-        warnings.filterwarnings("always")
-    elif config.verbose_output:
-        warnings.filterwarnings("module")
+        if config.debug_log or 'deprecation' in config.log:
+            warnings.filterwarnings("always")
+        elif config.verbose_output:
+            warnings.filterwarnings("module")
 
     root_logger.handlers = []  # remove any old handlers
 
@@ -531,7 +533,7 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
 # User input functions
 
 
-def input(question, password=False):
+def input(question, password=False, default='', force=False):
     """Ask the user a question, return the user's answer.
 
     @param question: a string that will be shown to the user. Don't add a
@@ -539,18 +541,24 @@ def input(question, password=False):
     @type question: unicode
     @param password: if True, hides the user's input (for password entry).
     @type password: bool
+    @param default: The default answer if none was entered. None to require
+        an answer.
+    @type default: basestring
+    @param force: Automatically use the default
+    @type force: bool
+    @rtype: unicode
     @rtype: unicode
     """
     # make sure logging system has been initialized
     if not _handlers_initialized:
         init_handlers()
 
-    data = ui.input(question, password)
+    data = ui.input(question, password=password, default=default, force=force)
     return data
 
 
 def input_choice(question, answers, default=None, return_shortcut=True,
-                 automatic_quit=True):
+                 automatic_quit=True, force=False):
     """
     Ask the user the question and return one of the valid answers.
 
@@ -569,6 +577,8 @@ def input_choice(question, answers, default=None, return_shortcut=True,
     @param automatic_quit: Adds the option 'Quit' ('q') and throw a
             L{QuitKeyboardInterrupt} if selected.
     @type automatic_quit: bool
+    @param force: Automatically use the default
+    @type force: bool
     @return: The selected answer shortcut or index. Is -1 if the default is
         selected, it does not return the shortcut and the default is not a
         valid shortcut.
@@ -579,10 +589,10 @@ def input_choice(question, answers, default=None, return_shortcut=True,
         init_handlers()
 
     return ui.input_choice(question, answers, default, return_shortcut,
-                           automatic_quit)
+                           automatic_quit=automatic_quit, force=force)
 
 
-def input_yn(question, default=None, automatic_quit=True):
+def input_yn(question, default=None, automatic_quit=True, force=False):
     """
     Ask the user a yes/no question and returns the answer as a bool.
 
@@ -594,6 +604,8 @@ def input_yn(question, default=None, automatic_quit=True):
     @param automatic_quit: Adds the option 'Quit' ('q') and throw a
             L{QuitKeyboardInterrupt} if selected.
     @type automatic_quit: bool
+    @param force: Automatically use the default
+    @type force: bool
     @return: Return True if the user selected yes and False if the user
         selected no. If the default is not None it'll return True if default
         is True or 'y' and False if default is False or 'n'.
@@ -607,7 +619,7 @@ def input_yn(question, default=None, automatic_quit=True):
     assert default in ['y', 'Y', 'n', 'N', None]
 
     return input_choice(question, [('Yes', 'y'), ('No', 'n')], default,
-                        automatic_quit=automatic_quit) == 'y'
+                        automatic_quit=automatic_quit, force=force) == 'y'
 
 
 @deprecated('input_choice')
@@ -637,6 +649,30 @@ def inputChoice(question, answers, hotkeys, default=None):
     return ui.input_choice(question=question, options=zip(answers, hotkeys),
                            default=default, return_shortcut=True,
                            automatic_quit=False)
+
+
+def input_list_choice(question, answers, default=None,
+                      automatic_quit=True, force=False):
+    """
+    Ask the user the question and return one of the valid answers.
+
+    @param question: The question asked without trailing spaces.
+    @type question: basestring
+    @param answers: The valid answers each containing a full length answer.
+    @type answers: Iterable of basestring
+    @param default: The result if no answer was entered. It must not be in the
+        valid answers and can be disabled by setting it to None.
+    @type default: basestring
+    @param force: Automatically use the default
+    @type force: bool
+    @return: The selected answer.
+    @rtype: basestring
+    """
+    if not _handlers_initialized:
+        init_handlers()
+
+    return ui.input_list_choice(question, answers, default=default,
+                                force=force)
 
 
 # Command line parsing and help

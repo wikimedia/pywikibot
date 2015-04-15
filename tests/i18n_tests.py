@@ -386,7 +386,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         rv = i18n.input('pywikibot-enter-category-name',
                         fallback_prompt='dummy output')
         self.assertEqual(rv, 'dummy input')
-        self.assertIn('dummy output ', self.output_text)
+        self.assertIn('dummy output: ', self.output_text)
 
 
 if __name__ == '__main__':
