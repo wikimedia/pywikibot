@@ -16,7 +16,9 @@ import time
 from warnings import warn
 
 import pywikibot
-from pywikibot.tools import SelfCallDict, stream_encoding
+
+from pywikibot import config
+from pywikibot.tools import SelfCallDict
 from pywikibot.site import Namespace
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
@@ -259,16 +261,24 @@ def execute(command, data_in=None, timeout=0, error=None):
     # Any environment variables added on Windows must be of type
     # str() on Python 2.
     env = os.environ.copy()
+
+    # Prevent output by test package; e.g. 'max_retries reduced from x to y'
+    env[str('PYWIKIBOT_TEST_QUIET')] = str('1')
+
     # sys.path may have been modified by the test runner to load dependencies.
-    env['PYTHONPATH'] = ":".join(sys.path)
+    pythonpath = os.pathsep.join(sys.path)
+    if sys.platform == 'win32' and sys.version_info[0] < 3:
+        pythonpath = str(pythonpath)
+    env[str('PYTHONPATH')] = pythonpath
+    env[str('PYTHONIOENCODING')] = str(config.console_encoding)
+
     # LC_ALL is used by i18n.input as an alternative for userinterface_lang
     if pywikibot.config.userinterface_lang:
-        env['LC_ALL'] = str(pywikibot.config.userinterface_lang)
+        env[str('LC_ALL')] = str(pywikibot.config.userinterface_lang)
+
     # Set EDITOR to an executable that ignores all arguments and does nothing.
-    if sys.platform == 'win32':
-        env['EDITOR'] = str('call')
-    else:
-        env['EDITOR'] = 'true'
+    env[str('EDITOR')] = str('call' if sys.platform == 'win32' else 'true')
+
     options = {
         'stdout': subprocess.PIPE,
         'stderr': subprocess.PIPE
@@ -276,14 +286,27 @@ def execute(command, data_in=None, timeout=0, error=None):
     if data_in is not None:
         options['stdin'] = subprocess.PIPE
 
-    p = subprocess.Popen(command, env=env, **options)
-
-    stdin_encoding = stream_encoding(p.stdin)
-    stdout_encoding = stream_encoding(p.stdout)
-    stderr_encoding = stream_encoding(p.stderr)
+    try:
+        p = subprocess.Popen(command, env=env, **options)
+    except TypeError:
+        # Generate a more informative error
+        if sys.platform == 'win32' and sys.version_info[0] < 3:
+            unicode_env = [(k, v) for k, v in os.environ.items()
+                           if not isinstance(k, str) or
+                           not isinstance(v, str)]
+            if unicode_env:
+                raise TypeError('os.environ must contain only str: %r'
+                                % unicode_env)
+            child_unicode_env = [(k, v) for k, v in env.items()
+                                 if not isinstance(k, str) or
+                                 not isinstance(v, str)]
+            if child_unicode_env:
+                raise TypeError('os.environ must contain only str: %r'
+                                % child_unicode_env)
+        raise
 
     if data_in is not None:
-        p.stdin.write(data_in.encode(stdin_encoding))
+        p.stdin.write(data_in.encode(config.console_encoding))
         p.stdin.flush()  # _communicate() otherwise has a broken pipe
 
     stderr_lines = b''
@@ -296,7 +319,7 @@ def execute(command, data_in=None, timeout=0, error=None):
         if error:
             line = p.stderr.readline()
             stderr_lines += line
-            if error in line.decode(stdout_encoding):
+            if error in line.decode(config.console_encoding):
                 break
         time.sleep(1)
         waited += 1
@@ -309,8 +332,8 @@ def execute(command, data_in=None, timeout=0, error=None):
 
     data_out = p.communicate()
     return {'exit_code': p.returncode,
-            'stdout': data_out[0].decode(stdout_encoding),
-            'stderr': (stderr_lines + data_out[1]).decode(stderr_encoding)}
+            'stdout': data_out[0].decode(config.console_encoding),
+            'stderr': (stderr_lines + data_out[1]).decode(config.console_encoding)}
 
 
 def execute_pwb(args, data_in=None, timeout=0, error=None):

@@ -1157,14 +1157,17 @@ class PwbTestCase(TestCase):
         self.orig_pywikibot_dir = None
         if 'PYWIKIBOT2_DIR' in os.environ:
             self.orig_pywikibot_dir = os.environ['PYWIKIBOT2_DIR']
-        os.environ['PYWIKIBOT2_DIR'] = pywikibot.config.base_dir
+        base_dir = pywikibot.config.base_dir
+        if sys.platform == 'win32' and sys.version_info[0] < 3:
+            base_dir = str(base_dir)
+        os.environ[str('PYWIKIBOT2_DIR')] = base_dir
 
     def tearDown(self):
         """Restore the environment after running the pwb.py script."""
         super(PwbTestCase, self).tearDown()
         del os.environ['PYWIKIBOT2_DIR']
         if self.orig_pywikibot_dir:
-            os.environ['PYWIKIBOT2_DIR'] = self.orig_pywikibot_dir
+            os.environ[str('PYWIKIBOT2_DIR')] = self.orig_pywikibot_dir
 
     def _execute(self, args, data_in=None, timeout=0, error=None):
         from tests.utils import execute_pwb

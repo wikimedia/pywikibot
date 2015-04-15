@@ -46,8 +46,6 @@ import sys
 
 from warnings import warn
 
-from pywikibot.tools import default_encoding
-
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
 # names and some magic variables (like __name__)
@@ -346,7 +344,10 @@ ignore_bot_templates = False
 # This default code should work fine, so you don't have to think about it.
 # TODO: consider getting rid of this config variable.
 try:
-    console_encoding = sys.stdout.encoding
+    if sys.version_info[0] > 2 or not sys.stdout.encoding:
+        console_encoding = sys.stdout.encoding
+    else:
+        console_encoding = sys.stdout.encoding.decode('ascii')
 except:
     # When using pywikibot inside a daemonized twisted application,
     # we get "StdioOnnaStick instance has no attribute 'encoding'"
@@ -933,7 +934,11 @@ for _key in _modified:
              _ConfigurationDeprecationWarning)
 
 # Fix up default console_encoding
-console_encoding = default_encoding(console_encoding)
+if console_encoding is None:
+    if sys.platform == 'win32':
+        console_encoding = 'cp850'
+    else:
+        console_encoding = 'iso-8859-1'
 
 # Fix up transliteration_target
 if transliteration_target == 'not set':

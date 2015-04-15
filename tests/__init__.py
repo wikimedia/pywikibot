@@ -191,7 +191,8 @@ CachedRequest._get_cache_dir = classmethod(
 # overridden here to restrict retries to only 1, so developer builds fail more
 # frequently in code paths resulting from mishandled server problems.
 if config.max_retries > 2:
-    print('max_retries reduced from %d to 1 for tests' % config.max_retries)
+    if 'PYWIKIBOT_TEST_QUIET' not in os.environ:
+        print('tests: max_retries reduced from %d to 1' % config.max_retries)
     config.max_retries = 1
 
 cache_misses = 0

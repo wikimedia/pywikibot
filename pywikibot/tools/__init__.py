@@ -405,26 +405,6 @@ class ThreadedGenerator(threading.Thread):
         self.stop()
 
 
-def stream_encoding(stream):
-    """Get encoding of the stream and use a default if not existent/None."""
-    try:
-        encoding = stream.encoding
-    except AttributeError:
-        encoding = None
-    return default_encoding(encoding)
-
-
-def default_encoding(encoding):
-    """Return an encoding even if it's originally None."""
-    if encoding is None:
-        if sys.platform == 'win32':
-            return 'cp850'
-        else:
-            return 'iso-8859-1'
-    else:
-        return encoding
-
-
 def itergroup(iterable, size):
     """Make an iterator that returns lists of (up to) size items from iterable.
 
