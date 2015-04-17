@@ -11,6 +11,7 @@ __version__ = '$Id$'
 
 import getpass
 import logging
+import math
 import re
 import sys
 
@@ -198,20 +199,56 @@ class UI:
         else:
             return raw_input()  # noqa
 
-    def input(self, question, password=False):
+    def input(self, question, password=False, default='', force=False):
         """
         Ask the user a question and return the answer.
 
         Works like raw_input(), but returns a unicode string instead of ASCII.
 
-        Unlike raw_input, this function automatically adds a space after the
-        question.
+        Unlike raw_input, this function automatically adds a colon and space
+        after the question if they are not already present.  Also recognises
+        a trailing question mark.
+
+        @param question: The question, without trailing whitespace.
+        @type question: basestring
+        @param password: if True, hides the user's input (for password entry).
+        @type password: bool
+        @param default: The default answer if none was entered. None to require
+            an answer.
+        @type default: basestring
+        @param force: Automatically use the default
+        @type force: bool
+        @rtype: unicode
         """
+        assert(not password or not default)
+        end_marker = ':'
+        question = question.strip()
+        if question[-1] == ':':
+            question = question[:-1]
+        elif question[-1] == '?':
+            question = question[:-1]
+            end_marker = '?'
+        if default:
+            question = question + ' (default: %s)' % default
+        question = question + end_marker
+        if force:
+            self.output(question + '\n')
+            return default
         # sound the terminal bell to notify the user
         if config.ring_bell:
             sys.stdout.write('\07')
         # TODO: make sure this is logged as well
-        self.output(question + ' ')
+        while True:
+            self.output(question + ' ')
+            text = self._input_reraise_cntl_c(password)
+            if text:
+                return text
+
+            if default is not None:
+                return default
+
+    def _input_reraise_cntl_c(self, password):
+        """Input and decode, and re-raise Control-C."""
         try:
             if password:
                 # Python 3 requires that stderr gets flushed, otherwise is the
@@ -227,7 +264,7 @@ class UI:
         return text
 
     def input_choice(self, question, options, default=None, return_shortcut=True,
-                     automatic_quit=True):
+                     automatic_quit=True, force=False):
         """
         Ask the user and returns a value from the options.
 
@@ -248,6 +285,8 @@ class UI:
             doesn't add the option but throw the exception when the option was
             selected.
         @type automatic_quit: bool or int
+        @param force: Automatically use the default
+        @type force: bool
         @return: If return_shortcut the shortcut of options or the value of
             default (if it's not None). Otherwise the index of the answer in
             options. If default is not a shortcut, it'll return -1.
@@ -295,7 +334,10 @@ class UI:
         question = u'{0} ({1})'.format(question, ', '.join(formatted_options))
         answer = None
         while answer is None:
-            answer = self.input(question)
+            if force:
+                self.output(question + '\n')
+            else:
+                answer = self.input(question)
             if default and not answer:  # nothing entered
                 answer = default_index
             else:
@@ -323,6 +365,31 @@ class UI:
         return self.input_choice(question=question, options=zip(options, hotkeys),
                                  default=default, return_shortcut=True,
                                  automatic_quit=False)
+
+    def input_list_choice(self, question, answers, default=None, force=False):
+        """Ask the user to select one entry from a list of entries."""
+        message = question
+        clist = answers
+
+        line_template = u"{{0: >{0}}}: {{1}}".format(int(math.log10(len(clist)) + 1))
+        for n, i in enumerate(clist):
+            pywikibot.output(line_template.format(n + 1, i))
+
+        while True:
+            choice = self.input(message, default=default, force=force)
+            try:
+                choice = int(choice) - 1
+            except ValueError:
+                try:
+                    choice = clist.index(choice)
+                except IndexError:
+                    choice = -1
+
+            # User typed choice number
+            if 0 <= choice < len(clist):
+                return clist[choice]
+            else:
+                pywikibot.error("Invalid response")
 
     def editText(self, text, jumpIndex=None, highlight=None):
         """Return the text as edited by the user.

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -318,7 +318,7 @@ class TestTerminalInput(UITestCase):
 
     """Terminal input tests."""
 
-    input_choice_output = 'question ([A]nswer 1, a[n]swer 2, an[s]wer 3) '
+    input_choice_output = 'question ([A]nswer 1, a[n]swer 2, an[s]wer 3): '
 
     def testInput(self):
         newstdin.write('input to read\n')
@@ -327,7 +327,7 @@ class TestTerminalInput(UITestCase):
         returned = pywikibot.input('question')
 
         self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'question ')
+        self.assertEqual(newstderr.getvalue(), 'question: ')
 
         self.assertIsInstance(returned, unicode)
         self.assertEqual(returned, u'input to read')
@@ -455,7 +455,7 @@ class TestTerminalUnicodeUnix(UITestCase):
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(
             newstderr.getvalue(),
-            self._encode(u'Википедию?  ', 'utf-8'))
+            self._encode(u'Википедию? ', 'utf-8'))
 
         self.assertIsInstance(returned, unicode)
         self.assertEqual(returned, u'Заглавная_страница')
