@@ -34,6 +34,11 @@ import sys
 import time
 import io
 
+try:
+    import pywinauto
+except ImportError:
+    pywinauto = None
+
 import pywikibot
 from pywikibot.bot import (
     ui, DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
@@ -488,11 +493,12 @@ class WindowsTerminalTestCase(UITestCase):
     def setUpClass(cls):
         if os.name != 'nt':
             raise unittest.SkipTest('requires Windows console')
+        if not pywinauto:
+            raise unittest.SkipTest('requires Windows package pywinauto')
         super(WindowsTerminalTestCase, cls).setUpClass()
 
     @classmethod
     def setUpProcess(cls, command):
-        import pywinauto
         import subprocess
         si = subprocess.STARTUPINFO()
         si.dwFlags = subprocess.STARTF_USESTDHANDLES
@@ -503,7 +509,12 @@ class WindowsTerminalTestCase(UITestCase):
         cls._app.connect_(process=cls._process.pid)
 
         # set truetype font (Lucida Console, hopefully)
-        cls._app.window_().TypeKeys('% {UP}{ENTER}^L{HOME}L{ENTER}', with_spaces=True)
+        try:
+            cls._app.window_().TypeKeys('% {UP}{ENTER}^L{HOME}L{ENTER}', with_spaces=True)
+        except:
+            # occurs if pywinauto is installed without pywin32.
+            raise unittest.SkipTest('Windows package pywinauto not functional; '
+                                    'maybe pywin32 isnt installed')
 
     @classmethod
     def tearDownProcess(cls):
