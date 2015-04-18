@@ -357,6 +357,7 @@ import pickle
 import socket
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph, titletranslate
+from pywikibot.tools import first_upper
 
 if sys.version_info[0] > 2:
     unicode = str
@@ -2215,7 +2216,7 @@ class InterwikiBot(object):
                 if self.generateUntil:
                     until = self.generateUntil
                     if page.site.lang not in page.site.family.nocapitalize:
-                        until = until[0].upper() + until[1:]
+                        until = first_upper(until)
                     if page.title(withNamespace=False) > until:
                         raise StopIteration
                 self.add(page, hints=globalvar.hints)

@@ -28,6 +28,7 @@ import sys
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot import i18n
+from pywikibot.tools import first_lower, first_upper as firstcap
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -56,10 +57,6 @@ featured_articles = {
     'vi': u'Wikipedia:Bài_viết_chọn_lọc',
     'zh': u'Wikipedia:特色条目',
 }
-
-
-def firstcap(string):
-    return string[0].upper() + string[1:]
 
 
 def treat(text, linkedPage, targetPage):
@@ -118,8 +115,7 @@ def treat(text, linkedPage, targetPage):
         if link_text[0].isupper():
             new_page_title = targetPage.title()
         else:
-            new_page_title = targetPage.title()[0].lower() + \
-            targetPage.title()[1:]
+            new_page_title = first_lower(targetPage.title())
 
         # remove preleading ":"
         if new_page_title[0] == ':':

@@ -34,7 +34,7 @@ import pywikibot.family
 from pywikibot.tools import (
     itergroup, UnicodeMixin, ComparableMixin, SelfCallDict, SelfCallString,
     deprecated, deprecate_arg, deprecated_args, remove_last_args,
-    redirect_func, manage_wrapping, MediaWikiVersion, normalize_username,
+    redirect_func, manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
 )
 from pywikibot.tools.ip import is_IP
 from pywikibot.throttle import Throttle
@@ -681,7 +681,7 @@ class BaseSite(ComparableMixin):
         """Return list of language codes that can be used in interwiki links."""
         nsnames = [name for name in self.namespaces().values()]
         return [lang for lang in self.languages()
-                if lang[:1].upper() + lang[1:] not in nsnames]
+                if first_upper(lang) not in nsnames]
 
     def _cache_interwikimap(self, force=False):
         """Cache the interwikimap with usable site instances."""
@@ -928,8 +928,8 @@ class BaseSite(ComparableMixin):
         # If the namespace has a case definition it's overriding the site's
         # case definition
         if ns1_obj.case == 'first-letter':
-            name1 = name1[:1].upper() + name1[1:]
-            name2 = name2[:1].upper() + name2[1:]
+            name1 = first_upper(name1)
+            name2 = first_upper(name2)
         return name1 == name2
 
     # namespace shortcuts for backwards-compatibility

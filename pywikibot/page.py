@@ -51,7 +51,7 @@ from pywikibot.exceptions import (
 from pywikibot.tools import (
     UnicodeMixin, DotReadableDict,
     ComparableMixin, deprecated, deprecate_arg, deprecated_args,
-    remove_last_args, _NotImplementedWarning,
+    first_upper, remove_last_args, _NotImplementedWarning,
     OrderedDict, Counter,
 )
 from pywikibot.tools.ip import ip_regexp  # noqa & deprecated
@@ -784,20 +784,19 @@ class BasePage(UnicodeMixin, ComparableMixin):
                         regex = re.compile('\(\((.+?)\)\)')
                         content = disambigpages.get()
                         for index in regex.findall(content):
-                            indexes.add(index[:1].upper() + index[1:])
+                            indexes.add(first_upper(index))
                         self.site._indextemplates = indexes
                 else:
                     message = self.site.mediawiki_message(
                         'disambiguationspage').split(':', 1)[1]
                     # add the default template(s) for default mw message
                     # only
-                    disambigs = set([message[:1].upper() +
-                                     message[1:]]) | default
+                    disambigs = set([first_upper(message)]) | default
                 self.site._disambigtemplates = disambigs
             else:
                 # Normalize template capitalization
                 self.site._disambigtemplates = set(
-                    t[:1].upper() + t[1:] for t in distl
+                    first_upper(t) for t in distl
                 )
         templates = set(tl.title(withNamespace=False)
                         for tl in self.templates())
@@ -4575,7 +4574,7 @@ class Link(ComparableMixin):
                                          "title")
 
         if self._site.namespaces[self._namespace].case == 'first-letter':
-            t = t[:1].upper() + t[1:]
+            t = first_upper(t)
 
         self._title = t
 
