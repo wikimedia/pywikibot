@@ -1013,6 +1013,7 @@ u"Page does not exist, using the first link in page %s."
             if not self.findAlternatives(disambPage):
                 continue
 
+            pywikibot.output('\nAlternatives for %s' % disambPage)
             self.makeAlternativesUnique()
             # sort possible choices
             if config.sort_ignore_case:
