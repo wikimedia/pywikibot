@@ -163,6 +163,53 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
         config.line_separator = sep
         self.assertEqual(old, new)
 
+    def test_in_place_replace(self):
+        """Test in-place category change is reversible."""
+        dummy = pywikibot.Category(self.site, 'foo')
+        dummy.sortKey = 'bah'
+
+        cats = textlib.getCategoryLinks(self.old, site=self.site)
+
+        # Sanity checking
+        temp = textlib.replaceCategoryInPlace(self.old, cats[0], dummy, site=self.site)
+        self.assertNotEqual(temp, self.old)
+        new = textlib.replaceCategoryInPlace(temp, dummy, cats[0], site=self.site)
+        self.assertEqual(self.old, new)
+
+        temp = textlib.replaceCategoryInPlace(self.old, cats[1], dummy, site=self.site)
+        self.assertNotEqual(temp, self.old)
+        new = textlib.replaceCategoryInPlace(temp, dummy, cats[1], site=self.site)
+        self.assertEqual(self.old, new)
+
+        temp = textlib.replaceCategoryInPlace(self.old, cats[2], dummy, site=self.site)
+        self.assertNotEqual(temp, self.old)
+        new = textlib.replaceCategoryInPlace(temp, dummy, cats[2], site=self.site)
+        self.assertEqual(self.old, new)
+
+        temp = textlib.replaceCategoryInPlace(self.old, cats[3], dummy, site=self.site)
+        self.assertNotEqual(temp, self.old)
+        new = textlib.replaceCategoryInPlace(temp, dummy, cats[3], site=self.site)
+        self.assertEqual(self.old, new)
+
+        new_cats = textlib.getCategoryLinks(new, site=self.site)
+        self.assertEqual(cats, new_cats)
+
+    def test_in_place_retain_sort(self):
+        """Test in-place category change does not alter the sortkey."""
+        # sort key should be retained when the new cat sortKey is None
+        dummy = pywikibot.Category(self.site, 'foo')
+        self.assertIsNone(dummy.sortKey)
+
+        cats = textlib.getCategoryLinks(self.old, site=self.site)
+
+        self.assertEqual(cats[3].sortKey, 'key')
+        orig_sortkey = cats[3].sortKey
+        temp = textlib.replaceCategoryInPlace(self.old, cats[3], dummy, site=self.site)
+        self.assertNotEqual(self.old, temp)
+        new_dummy = textlib.getCategoryLinks(temp, site=self.site)[3]
+        self.assertIsNotNone(new_dummy.sortKey)
+        self.assertEqual(orig_sortkey, new_dummy.sortKey)
+
 
 class TestTemplatesInCategory(TestCase):
 

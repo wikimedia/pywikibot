@@ -795,14 +795,17 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
         # an entire line, if the category is the only thing on that line (this
         # prevents blank lines left over in category lists following a removal.)
         text = replaceExcept(oldtext, categoryRN, '',
-                             ['nowiki', 'comment', 'math', 'pre', 'source'])
+                             ['nowiki', 'comment', 'math', 'pre', 'source'],
+                             site=site)
         text = replaceExcept(text, categoryR, '',
-                             ['nowiki', 'comment', 'math', 'pre', 'source'])
+                             ['nowiki', 'comment', 'math', 'pre', 'source'],
+                             site=site)
     else:
         text = replaceExcept(oldtext, categoryR,
                              '[[%s:%s\\2' % (site.namespace(14),
                                              newcat.title(withNamespace=False)),
-                             ['nowiki', 'comment', 'math', 'pre', 'source'])
+                             ['nowiki', 'comment', 'math', 'pre', 'source'],
+                             site=site)
     return text
 
 
