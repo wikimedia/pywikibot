@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: UTF-8 -*-
 """
 This bot takes as its argument the name of a new or existing category.
