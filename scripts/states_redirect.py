@@ -1,4 +1,4 @@
-#!usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8  -*-
 """Create country sub-division redirect pages.
 
