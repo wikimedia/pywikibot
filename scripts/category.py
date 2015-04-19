@@ -101,10 +101,10 @@ This will move all pages in the category US to the category United States.
 # (C) Daniel Herding, 2004
 # (C) Wikipedian, 2004-2008
 # (C) leogregianin, 2004-2008
-# (C) Cyde, 2006-2010
+# (C) Ben McIlwain (CydeWeys), 2006-2015
 # (C) Anreas J Schwab, 2007
-# (C) xqt, 2009-2014
-# (C) Pywikibot team, 2008-2014
+# (C) xqt, 2009-2015
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -533,8 +533,10 @@ class CategoryMoveRobot(object):
             if self.can_move_cats:
                 if can_move_page:
                     oldcattitle = self.oldcat.title()
-                    self.oldcat.move(self.newcat.title(), reason=self.comment,
-                                     movetalkpage=can_move_talk)
+                    self.newcat = self.oldcat.move(self.newcat.title(),
+                                                   reason=self.comment,
+                                                   movetalkpage=can_move_talk)
+                    self._strip_cfd_templates()
                     self.oldcat = pywikibot.Category(self.oldcat.site,
                                                      oldcattitle)
             else:
@@ -628,7 +630,12 @@ class CategoryMoveRobot(object):
         return move_possible
 
     def _movecat(self):
-        """Private function to move the category page.
+        """Private function to move the category page by copying its contents.
+
+        Note that this method of moving category pages by copying over the raw
+        text been deprecated by the addition of true category moving (analogous
+        to page moving) in MediaWiki, and so the raw text method is no longer
+        the default.
 
         Do not use this function from outside the class.
         """
@@ -640,17 +647,30 @@ class CategoryMoveRobot(object):
         template_vars = (self.oldcat.title(), authors)
         comment = i18n.twtranslate(self.site, 'category-renamed', template_vars)
         self.newcat.text = self.oldcat.text
-        # Replace stuff
+        self._strip_cfd_templates(comment)
+
+    def _strip_cfd_templates(self, comment=None):
+        """Private function to strip out CFD templates from the new category.
+
+        The new category is saved.
+
+        Do not use this function from outside the class.
+        """
+        # Remove all substed CFD templates
         REGEX = r"<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->"
         match = re.compile(REGEX,
                            re.IGNORECASE | re.MULTILINE | re.DOTALL)
         self.newcat.text = match.sub('', self.newcat.text)
+        # Remove all language-specified, non substed CFD templates
         site_templates = i18n.translate(self.site, cfd_templates) or ()
         for template_name in site_templates:
             match = re.compile(r"{{%s.*?}}" % template_name, re.IGNORECASE)
             self.newcat.text = match.sub('', self.newcat.text)
         # Remove leading whitespace
         self.newcat.text = self.newcat.text.lstrip()
+        if not comment:
+            comment = i18n.twtranslate(self.site,
+                                       'category-strip-cfd-templates')
         self.newcat.save(comment)
 
     def _movetalk(self):
