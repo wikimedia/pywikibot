@@ -454,14 +454,14 @@ class ReferencesRobot(Bot):
             raise
 
         # Regex to grasp content-type meta HTML tag in HTML source
-        self.META_CONTENT = re.compile(r'(?i)<meta[^>]*content\-type[^>]*>')
+        self.META_CONTENT = re.compile(br'(?i)<meta[^>]*content\-type[^>]*>')
         # Extract the encoding from a charset property (from content-type !)
-        self.CHARSET = re.compile(r'(?i)charset\s*=\s*(?P<enc>[^\'",;>/]*)')
+        self.CHARSET = re.compile(br'(?i)charset\s*=\s*(?P<enc>[^\'",;>/]*)')
         # Extract html title from page
         self.TITLE = re.compile(r'(?is)(?<=<title>).*?(?=</title>)')
         # Matches content inside <script>/<style>/HTML comments
         self.NON_HTML = re.compile(
-            r'(?is)<script[^>]*>.*?</script>|<style[^>]*>.*?</style>|<!--.*?-->|<!\[CDATA\[.*?\]\]>')
+            br'(?is)<script[^>]*>.*?</script>|<style[^>]*>.*?</style>|<!--.*?-->|<!\[CDATA\[.*?\]\]>')
 
         # Authorized mime types for HTML pages
         self.MIME = re.compile(
@@ -555,7 +555,10 @@ class ReferencesRobot(Bot):
                         f = urlopen(ref.url)
                     # Try to get Content-Type from server
                     headers = f.info()
-                    contentType = headers.getheader('Content-Type')
+                    if sys.version_info[0] > 2:
+                        contentType = headers.get_content_type()
+                    else:
+                        contentType = headers.getheader('Content-Type')
                     if contentType and not self.MIME.search(contentType):
                         if ref.link.lower().endswith('.pdf') and \
                            not self.getOption('ignorepdf'):
@@ -645,7 +648,7 @@ class ReferencesRobot(Bot):
                         f.close()
 
                 # remove <script>/<style>/comments/CDATA tags
-                linkedpagetext = self.NON_HTML.sub('', linkedpagetext)
+                linkedpagetext = self.NON_HTML.sub(b'', linkedpagetext)
 
                 meta_content = self.META_CONTENT.search(linkedpagetext)
                 enc = []
