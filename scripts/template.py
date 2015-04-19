@@ -111,9 +111,12 @@ __version__ = '$Id$'
 #
 
 import re
+
 import pywikibot
+
 from pywikibot import i18n, pagegenerators, xmlreader, Bot
-from scripts import replace
+
+from scripts.replace import ReplaceRobot as ReplaceBot
 
 
 def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
@@ -193,7 +196,7 @@ class XmlDumpTemplatePageGenerator(object):
                 yield page
 
 
-class TemplateRobot(Bot):
+class TemplateRobot(ReplaceBot):
 
     """This bot will replace, remove or subst all occurrences of a template."""
 
@@ -214,20 +217,19 @@ class TemplateRobot(Bot):
             'summary': None,
             'addedCat': None,
         })
-        super(TemplateRobot, self).__init__(**kwargs)
 
-        self.generator = generator
+        Bot.__init__(self, generator=generator, **kwargs)
+
         self.templates = templates
-        site = pywikibot.Site()
-        if self.getOption('addedCat'):
-            self.options['addedCat'] = pywikibot.Category(site, self.getOption('addedCat'))
-
-        comma = site.mediawiki_message('comma-separator')
 
         # get edit summary message if it's empty
         if not self.getOption('summary'):
+            comma = self.site.mediawiki_message('comma-separator')
             params = {'list': comma.join(self.templates.keys()),
                       'num': len(self.templates)}
+
+            site = self.site
+
             if self.getOption('remove'):
                 self.options['summary'] = i18n.twntranslate(
                     site, 'template-removing', params)
@@ -238,8 +240,6 @@ class TemplateRobot(Bot):
                 self.options['summary'] = i18n.twntranslate(
                     site, 'template-changing', params)
 
-    def run(self):
-        """Start the robot's action."""
         # regular expression to find the original template.
         # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
         # The old syntax, {{msg:vfd}}, will also be found.
@@ -283,11 +283,11 @@ class TemplateRobot(Bot):
                 replacements.append((templateRegex,
                                      r'{{%s\g<parameters>}}' % new))
 
-        replaceBot = replace.ReplaceRobot(self.generator, replacements,
-                                          exceptions, acceptall=self.getOption('always'),
-                                          addedCat=self.getOption('addedCat'),
-                                          summary=self.getOption('summary'))
-        replaceBot.run()
+        super(TemplateRobot, self).__init__(
+            generator, replacements, exceptions,
+            always=self.getOption('always'),
+            addedCat=self.getOption('addedCat'),
+            summary=self.getOption('summary'))
 
 
 def main(*args):

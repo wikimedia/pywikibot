@@ -35,7 +35,7 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 
 """
 #
-# (C) Pywikibot team, 2013-2014
+# (C) Pywikibot team, 2013-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -43,13 +43,16 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 #
-import pywikibot
-import replace
-from pywikibot import i18n, pagegenerators, Bot
 import re
 
+import pywikibot
 
-class ImageRobot(Bot):
+from pywikibot import i18n, pagegenerators, Bot
+
+from scripts.replace import ReplaceRobot as ReplaceBot
+
+
+class ImageRobot(ReplaceBot):
 
     """This bot will replace or remove all occurrences of an old image."""
 
@@ -113,9 +116,9 @@ class ImageRobot(Bot):
             'summary': None,
             'loose': False,
         })
-        super(ImageRobot, self).__init__(**kwargs)
 
-        self.generator = generator
+        Bot.__init__(self, generator=generator, **kwargs)
+
         self.old_image = old_image
         self.new_image = new_image
 
@@ -126,8 +129,6 @@ class ImageRobot(Bot):
                 else self.old_image,
                 fallback=True)
 
-    def run(self):
-        """Start the bot's action."""
         # regular expression to find the original template.
         # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
         # The old syntax, {{msg:vfd}}, will also be found.
@@ -164,10 +165,9 @@ class ImageRobot(Bot):
         else:
             replacements.append((image_regex, ''))
 
-        replaceBot = replace.ReplaceRobot(self.generator, replacements,
-                                          acceptall=self.getOption('always'),
-                                          summary=self.getOption('summary'))
-        replaceBot.run()
+        super(ImageRobot, self).__init__(self.generator, replacements,
+                                         always=self.getOption('always'),
+                                         summary=self.getOption('summary'))
 
 
 def main(*args):

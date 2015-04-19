@@ -1004,9 +1004,13 @@ class Bot(object):
         if 'generator' in kwargs:
             self.generator = kwargs.pop('generator')
 
+        # TODO: add warning if site is specified and generator
+        # contains pages from a different site.
+        self._site = kwargs.pop('site', None)
+        self._sites = set([self._site] if self._site else [])
+
         self.setOptions(**kwargs)
-        self._site = None
-        self._sites = set()
+
         self._treat_counter = 0
         self._save_counter = 0
 
@@ -1193,6 +1197,7 @@ class Bot(object):
         """Site that the bot is using."""
         if not self._site:
             warning('Bot.site was not set before being retrieved.')
+            # TODO: peak at a page from the generator to determine the site
             self.site = pywikibot.Site()
             warning('Using the default site: %s' % self.site)
         return self._site
