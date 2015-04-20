@@ -253,7 +253,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     if error:
                         self.assertIn(error, result['stderr'])
 
-                        self.assertIn(result['exit_code'], [0, 1, 2, -9])
+                        exit_codes = [0, 1, 2, -9]
                     else:
                         if stderr_other == ['']:
                             stderr_other = None
@@ -261,10 +261,10 @@ class TestScriptMeta(MetaTestCaseClass):
                         self.assertIn('Global arguments available for all',
                                       result['stdout'])
 
-                        self.assertEqual(result['exit_code'], 0)
+                        exit_codes = [0]
                 else:
                     # auto-run
-                    self.assertIn(result['exit_code'], [0, -9])
+                    exit_codes = [0, -9]
 
                     if (not result['stdout'] and not result['stderr']):
                         print(' auto-run script unresponsive after %d seconds'
@@ -291,6 +291,8 @@ class TestScriptMeta(MetaTestCaseClass):
                             result['stdout'] == ''):
                         result['stdout'] = None
                     self.assertIsNone(result['stdout'])
+
+                self.assertIn(result['exit_code'], exit_codes)
 
                 sys.stdout.flush()
 
