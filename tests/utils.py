@@ -9,9 +9,11 @@ from __future__ import print_function, unicode_literals
 __version__ = '$Id$'
 #
 import os
+import re
 import subprocess
 import sys
 import time
+import traceback
 
 from warnings import warn
 
@@ -67,9 +69,17 @@ def allowed_failure(func):
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
+        except AssertionError:
+            tb = traceback.extract_tb(sys.exc_info()[2])
+            for depth, line in enumerate(tb):
+                if re.match('^assert[A-Z]', line[2]):
+                    break
+            tb = traceback.format_list(tb[:depth])
+            pywikibot.error('\n' + ''.join(tb)[:-1])  # remove \n at the end
+            raise unittest.SkipTest('Test is allowed to fail.')
         except Exception:
             pywikibot.exception(tb=True)
-            raise unittest.SkipTest()
+            raise unittest.SkipTest('Test is allowed to fail.')
     wrapper.__name__ = func.__name__
     return wrapper
 
