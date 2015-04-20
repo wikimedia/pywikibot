@@ -1593,7 +1593,8 @@ class TestSiteInfo(WikimediaDefaultSiteTestCase):
         self.assertRegex(mysite.siteinfo['timezone'], "([A-Z]{3,4}|[A-Z][a-z]+/[A-Z][a-z]+)")
         self.assertIsInstance(datetime.strptime(mysite.siteinfo['time'], "%Y-%m-%dT%H:%M:%SZ"), datetime)
         self.assertGreater(mysite.siteinfo['maxuploadsize'], 0)
-        self.assertIn(mysite.case(), ["first-letter", "case-sensitive"])
+        self.assertIn(mysite.siteinfo['case'], ["first-letter", "case-sensitive"])
+        self.assertEqual(mysite.case(), mysite.siteinfo['case'])
         self.assertEqual(re.findall("\$1", mysite.siteinfo['articlepath']), ["$1"])
 
         def entered_loop(iterable):
