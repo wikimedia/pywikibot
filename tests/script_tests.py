@@ -17,6 +17,9 @@ from tests import _root_dir
 from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import allowed_failure, execute_pwb
 
+if sys.version_info[0] > 2:
+    basestring = (str, )
+
 scripts_path = os.path.join(_root_dir, 'scripts')
 
 # These dependencies are not always the package name which is in setup.py.
@@ -139,9 +142,10 @@ no_args_expected_results = {
     'pagefromfile': 'Please enter the file name',
     'replace': 'Press Enter to use this automatic message',
     'script_wui': 'Pre-loading all relevant page contents',
-    'shell': 'Welcome to the',
+    'shell': ('>>> ', 'Welcome to the'),
     'spamremove': 'No spam site specified',
     'transferbot': 'Target site not different from source site',  # Bug 68662
+    'unusedfiles': ('Working on', None),
     'version': 'unicode test: ',
     'watchlist': 'Retrieving watchlist',
 
@@ -231,7 +235,12 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 if expected_results and script_name in expected_results:
                     error = expected_results[script_name]
+                    if isinstance(error, basestring):
+                        stdout = None
+                    else:
+                        stdout, error = error
                 else:
+                    stdout = None
                     error = None
 
                 result = execute_pwb(cmd, data_in, timeout=timeout, error=error)
@@ -284,13 +293,13 @@ class TestScriptMeta(MetaTestCaseClass):
                 if 'Global arguments available for all' not in result['stdout']:
                     # Specifically look for deprecated
                     self.assertNotIn('deprecated', result['stdout'].lower())
-                    # But also complain if there is any stdout
-                    # but ignore shell.py emiting its '>>> ' prompt.
-                    if ((script_name == 'shell' and
-                            set(result['stdout']).issubset(set('> \n'))) or
-                            result['stdout'] == ''):
+                    if result['stdout'] == '':
                         result['stdout'] = None
-                    self.assertIsNone(result['stdout'])
+                    # But also complain if there is any stdout
+                    if stdout is not None and result['stdout'] is not None:
+                        self.assertIn(stdout, result['stdout'])
+                    else:
+                        self.assertIsNone(result['stdout'])
 
                 self.assertIn(result['exit_code'], exit_codes)
 
