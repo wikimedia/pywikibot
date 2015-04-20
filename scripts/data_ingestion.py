@@ -32,16 +32,15 @@ else:
 import pywikibot
 
 from pywikibot import pagegenerators
+from pywikibot.comms.http import fetch
 from pywikibot.tools import deprecated, deprecated_args
 
 from scripts import upload
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
-    from urllib.request import urlopen
 else:
     from urlparse import urlparse
-    from urllib import urlopen
 
 
 class Photo(pywikibot.FilePage):
@@ -85,7 +84,7 @@ class Photo(pywikibot.FilePage):
         TODO: Add exception handling
         """
         if not self.contents:
-            imageFile = urlopen(self.URL).read()
+            imageFile = fetch(self.URL).raw
             self.contents = io.BytesIO(imageFile)
         return self.contents
 
