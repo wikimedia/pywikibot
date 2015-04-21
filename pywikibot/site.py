@@ -368,10 +368,22 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
                % (self.__class__.__name__, self.id, self.custom_name,
                   self.canonical_name, self.aliases, kwargs)
 
+    @staticmethod
+    def default_case(id, default_case=None):
+        """Return the default fixed case value for the namespace ID."""
+        # https://www.mediawiki.org/wiki/Manual:$wgCapitalLinkOverrides#Warning
+        if id > 0 and id % 2 == 1:  # the talk ns has the non-talk ns case
+            id -= 1
+        if id in (-1, 2, 8):
+            return 'first-letter'
+        else:
+            return default_case
+
     @classmethod
     def builtin_namespaces(cls, use_image_name=False, case='first-letter'):
         """Return a dict of the builtin namespaces."""
-        return dict((i, cls(i, use_image_name=use_image_name, case=case))
+        return dict((i, cls(i, use_image_name=use_image_name,
+                            case=cls.default_case(i, case)))
                      for i in range(-2, 16))
 
     @staticmethod
@@ -2139,8 +2151,11 @@ class APISite(BaseSite):
                 if is_mw114:
                     canonical_name = nsdata.pop('canonical')
 
+            default_case = Namespace.default_case(ns)
             if 'case' not in nsdata:
-                nsdata['case'] = self.siteinfo['case']
+                nsdata['case'] = default_case or self.siteinfo['case']
+            elif default_case is not None:
+                assert(default_case == nsdata['case'])
 
             namespace = Namespace(ns, canonical_name, custom_name,
                                   use_image_name=not is_mw114,
