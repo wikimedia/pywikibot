@@ -85,7 +85,7 @@ import codecs
 
 import pywikibot
 from pywikibot import editor as editarticle
-from pywikibot.tools import concat_options
+from pywikibot.tools import concat_options, first_lower, first_upper as firstcap
 from pywikibot import pagegenerators, config, i18n
 from pywikibot.bot import Bot, QuitKeyboardInterrupt
 
@@ -341,15 +341,11 @@ ignore_title = {
 }
 
 
-def firstcap(string):
-    return string[0].upper() + string[1:]
-
-
 def correctcap(link, text):
     # If text links to a page with title link uncapitalized, uncapitalize link,
     # otherwise capitalize it
     linkupper = link.title()
-    linklower = linkupper[0].lower() + linkupper[1:]
+    linklower = first_lower(linkupper)
     if "[[%s]]" % linklower in text or "[[%s|" % linklower in text:
         return linklower
     else:
@@ -809,8 +805,7 @@ class DisambiguationRobot(Bot):
                         new_page_title = repPl.title()
                     else:
                         new_page_title = repPl.title()
-                        new_page_title = (new_page_title[0].lower() +
-                                          new_page_title[1:])
+                        new_page_title = first_lower(new_page_title)
                     if new_page_title not in new_targets:
                         new_targets.append(new_page_title)
                     if replaceit and trailing_chars:

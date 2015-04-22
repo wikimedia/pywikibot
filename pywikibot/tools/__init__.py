@@ -241,12 +241,30 @@ class LazyRegex(object):
             raise AttributeError('%s.raw not set' % self.__class__.__name__)
 
 
+def first_lower(string):
+    """
+    Return a string with the first character uncapitalized.
+
+    Empty strings are supported. The original string is not changed.
+    """
+    return string[:1].lower() + string[1:]
+
+
+def first_upper(string):
+    """
+    Return a string with the first character capitalized.
+
+    Empty strings are supported. The original string is not changed.
+    """
+    return string[:1].upper() + string[1:]
+
+
 def normalize_username(username):
     """Normalize the username."""
     if not username:
         return None
     username = re.sub('[_ ]+', ' ', username).strip()
-    return username[0].upper() + username[1:]
+    return first_upper(username)
 
 
 class MediaWikiVersion(Version):

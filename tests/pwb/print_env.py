@@ -5,10 +5,11 @@ from __future__ import unicode_literals
 
 import os
 import sys
+from pywikibot.tools import first_upper
 
 _pwb_dir = os.path.abspath(os.path.join(
     os.path.split(__file__)[0], '..', '..'))
-_pwb_dir = _pwb_dir[0].upper() + _pwb_dir[1:]
+_pwb_dir = first_upper(_pwb_dir)
 
 print('os.environ:')
 for k, v in sorted(os.environ.items()):
@@ -25,7 +26,7 @@ for path in sys.path:
     if path == '' or path.startswith('.'):
         continue
     # Normalise DOS drive letter
-    path = path[0].upper() + path[1:]
+    path = first_upper(path)
     if path.startswith(_pwb_dir):
         continue
     print(path)

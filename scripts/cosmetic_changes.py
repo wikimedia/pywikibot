@@ -82,7 +82,7 @@ import isbn
 from pywikibot import config, i18n, textlib, pagegenerators
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
 from pywikibot.page import url2unicode
-from pywikibot.tools import deprecate_arg
+from pywikibot.tools import deprecate_arg, first_lower, first_upper
 
 warning = """
 ATTENTION: You can run this script as a stand-alone for testing purposes.
@@ -408,7 +408,7 @@ class CosmeticChangesToolkit:
                 item = namespaces[i].replace(' ', '[ _]')
                 item = u'[%s%s]' % (item[0], item[0].lower()) + item[1:]
                 namespaces[i] = item
-            namespaces.append(thisNs[0].lower() + thisNs[1:])
+            namespaces.append(first_lower(thisNs))
             if thisNs and namespaces:
                 text = textlib.replaceExcept(
                     text,
@@ -510,8 +510,7 @@ class CosmeticChangesToolkit:
                         label += trailingChars
 
                     if titleWithSection == label or \
-                       titleWithSection[0].lower() + \
-                       titleWithSection[1:] == label:
+                       first_lower(titleWithSection) == label:
                         newLink = "[[%s]]" % label
                     # Check if we can create a link with trailing characters
                     # instead of a pipelink
@@ -528,8 +527,7 @@ class CosmeticChangesToolkit:
                         # which determines if the link target is written in
                         # uppercase
                         if self.site.sitename() == 'wikipedia:de':
-                            titleWithSection = (titleWithSection[0].upper() +
-                                                titleWithSection[1:])
+                            titleWithSection = first_upper(titleWithSection)
                         newLink = "[[%s|%s]]" % (titleWithSection, label)
                     # re-add spaces that were pulled out of the link.
                     # Examples:

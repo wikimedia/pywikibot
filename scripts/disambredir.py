@@ -22,6 +22,7 @@ __version__ = '$Id$'
 import re
 import pywikibot
 from pywikibot import i18n, pagegenerators
+from pywikibot.tools import first_lower, first_upper as firstcap
 
 msg = {
     'ar': u'تغيير التحويلات في صفحة توضيح',
@@ -37,10 +38,6 @@ msg = {
     'uk': u'Зміна перенаправлень на сторінці багатозначності',
     'zh': u'機器人: 修改消歧義頁中的重定向連結',
 }
-
-
-def firstcap(string):
-    return string[0].upper() + string[1:]
 
 
 def treat(text, linkedPage, targetPage):
@@ -109,8 +106,7 @@ def treat(text, linkedPage, targetPage):
         if link_text[0].isupper():
             new_page_title = targetPage.title()
         else:
-            new_page_title = (targetPage.title()[0].lower() +
-                              targetPage.title()[1:])
+            new_page_title = first_lower(targetPage.title())
         if choice == 'r' and trailing_chars:
             newlink = "[[%s%s]]%s" % (new_page_title, section, trailing_chars)
         elif choice == 'r' or (new_page_title == link_text and not section):

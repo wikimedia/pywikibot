@@ -16,6 +16,7 @@ import codecs
 import pywikibot
 from pywikibot import i18n
 from pywikibot.data import api
+from pywikibot.tools import first_lower, first_upper
 
 if sys.version_info[0] > 2:
     xrange = range
@@ -805,10 +806,8 @@ class CaseChecker(object):
             if len(frmParts[i]) != len(toParts[i]):
                 raise ValueError(u'Splitting parts do not match word length')
             if len(frmParts[i]) > 0:
-                text = text.replace(frmParts[i][0].lower() + frmParts[i][1:],
-                                    toParts[i][0].lower() + toParts[i][1:])
-                text = text.replace(frmParts[i][0].upper() + frmParts[i][1:],
-                                    toParts[i][0].upper() + toParts[i][1:])
+                text = text.replace(first_lower(frmParts[i]), first_lower(toParts[i]))
+                text = text.replace(first_upper(frmParts[i]), first_upper(toParts[i]))
         return text
 
 

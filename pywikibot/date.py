@@ -20,6 +20,8 @@ import datetime
 import re
 import sys
 
+from pywikibot.tools import first_lower, first_upper
+
 if sys.version_info[0] > 2:
     unicode = str
     basestring = (str,)
@@ -1982,9 +1984,9 @@ def makeMonthNamedList(lang, pattern, makeUpperCase=None):
     if makeUpperCase is None:
         f = lambda s: s
     elif makeUpperCase:
-        f = lambda s: s[0].upper() + s[1:]
+        f = first_upper
     else:
-        f = lambda s: s[0].lower() + s[1:]
+        f = first_lower
     return [pattern % f(monthName(lang, m)) for m in range(1, 13)]
 
 #
@@ -2337,9 +2339,9 @@ def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
     if ignoreFirstLetterCase:
         try:
             if title[0].isupper():
-                title = title[0].lower() + title[1:]
+                title = first_lower(title)
             else:
-                title = title[0].upper() + title[1:]
+                title = first_upper(title)
             return getAutoFormat(lang, title, ignoreFirstLetterCase=False)
         except:
             pass
