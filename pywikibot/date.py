@@ -2413,7 +2413,3 @@ def get_month_delta(date1, date2):
     are consecutive and non-negative numbers.
     """
     return date2.month - date1.month + (date2.year - date1.year) * 12
-
-
-if __name__ == "__main__":
-    print(__doc__)
