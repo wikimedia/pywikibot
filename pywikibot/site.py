@@ -1757,22 +1757,29 @@ class APISite(BaseSite):
     globaluserinfo = property(fget=getglobaluserinfo, doc=getuserinfo.__doc__)
 
     def is_blocked(self, sysop=False):
-        """Return true if and only if user is blocked.
+        """
+        Return True when logged in user is blocked.
+
+        To check whether a user can perform an action,
+        the method has_right should be used.
 
         @param sysop: If true, log in to sysop account (if available)
-
+        @type sysop: bool
+        @rtype: bool
         """
         if not self.logged_in(sysop):
             self.login(sysop)
         return 'blockinfo' in self._userinfo
 
-    @deprecated('is_blocked()')
-    def isBlocked(self, sysop=False):
-        """DEPRECATED."""
-        return self.is_blocked(sysop)
-
+    @deprecated('has_right() or is_blocked()')
     def checkBlocks(self, sysop=False):
-        """Check if the user is blocked, and raise an exception if so."""
+        """
+        Raise an exception when the user is blocked. DEPRECATED.
+
+        @param sysop: If true, log in to sysop account (if available)
+        @type sysop: bool
+        @raises UserBlocked: The logged in user/sysop account is blocked.
+        """
         if self.is_blocked(sysop):
             # User blocked
             raise UserBlocked('User is blocked in site %s' % self)
@@ -1835,11 +1842,6 @@ class APISite(BaseSite):
         if not self.logged_in(sysop):
             self.login(sysop)
         return right.lower() in self._userinfo['rights']
-
-    @deprecated("Site.has_right()")
-    def isAllowed(self, right, sysop=False):
-        """DEPRECATED."""
-        return self.has_right(right, sysop)
 
     def has_group(self, group, sysop=False):
         """Return true if and only if the user is a member of specified group.
@@ -5407,6 +5409,12 @@ class APISite(BaseSite):
         comparison = data['compare']['*']
         return comparison
 
+    # aliases for backwards compatibility
+    isBlocked = redirect_func(is_blocked, old_name='isBlocked',
+                              class_name='APISite')
+    isAllowed = redirect_func(has_right, old_name='isAllowed',
+                              class_name='APISite')
+
 
 class DataSite(APISite):
 
@@ -5950,6 +5958,9 @@ class DataSite(APISite):
 
     # deprecated APISite methods
     def isBlocked(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def checkBlocks(self, *args, **kwargs):
         raise NotImplementedError
 
     def isAllowed(self, *args, **kwargs):
