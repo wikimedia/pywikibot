@@ -1946,15 +1946,12 @@ class Page(BasePage):
         return result
 
     def set_redirect_target(self, target_page, create=False, force=False,
-                            keep_section=False, **kwargs):
+                            keep_section=False, save=True, **kwargs):
         """
         Change the page's text to point to the redirect page.
 
         @param target_page: target of the redirect, this argument is required.
         @type target_page: pywikibot.Page or string
-        @param summary: The edit summary which must be set if the page should
-            be saved too. If omitted the page won't be saved.
-        @type summary: string
         @param create: if true, it creates the redirect even if the page
             doesn't exist.
         @type create: bool
@@ -1964,8 +1961,10 @@ class Page(BasePage):
         @param keep_section: if the old redirect links to a section
             and the new one doesn't it uses the old redirect's section.
         @type keep_section: bool
+        @param save: if true, it saves the page immediately.
+        @type save: bool
         @param kwargs: Arguments which are used for saving the page directly
-            afterwards. If none are provided the page isn't saved.
+            afterwards, like 'summary' for edit summary.
         """
         if isinstance(target_page, basestring):
             target_page = pywikibot.Page(self.site, target_page)
@@ -1999,7 +1998,7 @@ class Page(BasePage):
                                         allowInterwiki=False)
         target_link = u'#{0} {1}'.format(self.site.redirect(), target_link)
         self.text = prefix + target_link + suffix
-        if kwargs:
+        if save:
             self.save(**kwargs)
 
 

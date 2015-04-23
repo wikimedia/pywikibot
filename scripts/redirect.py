@@ -456,7 +456,7 @@ class RedirectRobot(Bot):
                                                       asLink=True)})
                         content = redir_page.get(get_redirect=True)
                         redir_page.set_redirect_target(
-                            movedTarget, keep_section=True)
+                            movedTarget, keep_section=True, save=False)
                         pywikibot.showDiff(content, redir_page.text)
                         pywikibot.output(u'Summary - %s' % reason)
                         if self.user_confirm(
@@ -640,7 +640,7 @@ class RedirectRobot(Bot):
             except pywikibot.BadTitle:
                 pywikibot.output(u"Bad Title Error")
                 break
-            redir.set_redirect_target(targetPage, keep_section=True)
+            redir.set_redirect_target(targetPage, keep_section=True, save=False)
             summary = i18n.twtranslate(self.site, 'redirect-fix-double',
                                        {'to': targetPage.title(asLink=True)}
                                        )
