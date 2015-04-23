@@ -99,13 +99,13 @@ class TestDataIngestionBot(ScriptMainTestCase):
 
     """Test TestDataIngestionBot class."""
 
-    family = 'commons'
-    code = 'commons'
+    family = 'test'
+    code = 'test'
 
     def test_existing_file(self):
         """Test uploading a file that already exists."""
         data_ingestion.main(
-            '-family:test', '-lang:test', '-csvdir:tests/data',
+            '-csvdir:tests/data',
             '-page:User:John_Vandenberg/data_ingestion_test_template')
 
 
