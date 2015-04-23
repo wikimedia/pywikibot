@@ -33,6 +33,9 @@ from pywikibot import config2 as config
 from pywikibot.family import Family
 from pywikibot.tools import OrderedDict
 
+# cache for replaceExcept to avoid recompile or regexes each call
+_regex_cache = {}
+
 TEMP_REGEX = re.compile(
     r'{{(?:msg:)?(?P<name>[^{\|]+?)(?:\|(?P<params>[^{]+?(?:{[^{]+?}[^{]*?)?))?}}')
 
@@ -79,6 +82,94 @@ def unescape(s):
     return s
 
 
+def _create_default_regexes():
+    """Fill (and possibly overwrite) _regex_cache with default regexes."""
+    _regex_cache.update({
+        'comment':      re.compile(r'(?s)<!--.*?-->'),
+        # section headers
+        'header':       re.compile(r'\r?\n=+.+=+ *\r?\n'),
+        # preformatted text
+        'pre':          re.compile(r'(?ism)<pre>.*?</pre>'),
+        'source':       re.compile(r'(?is)<source .*?</source>'),
+        # inline references
+        'ref':          re.compile(r'(?ism)<ref[ >].*?</ref>'),
+        # lines that start with a space are shown in a monospace font and
+        # have whitespace preserved.
+        'startspace':   re.compile(r'(?m)^ (.*?)$'),
+        # tables often have whitespace that is used to improve wiki
+        # source code readability.
+        # TODO: handle nested tables.
+        'table':        re.compile(r'(?ims)^{\|.*?^\|}|<table>.*?</table>'),
+        'hyperlink':    compileLinkR(),
+        'gallery':      re.compile(r'(?is)<gallery.*?>.*?</gallery>'),
+        # this matches internal wikilinks, but also interwiki, categories, and
+        # images.
+        'link':         re.compile(r'\[\[[^\]\|]*(\|[^\]]*)?\]\]'),
+        # also finds links to foreign sites with preleading ":"
+        'interwiki':    (r'(?i)\[\[:?(%s)\s?:[^\]]*\]\][\s]*',
+                         lambda site: '|'.join(
+                             site.validLanguageLinks() +
+                             list(site.family.obsolete.keys()))),
+        # Wikibase property inclusions
+        'property':     re.compile(r'(?i)\{\{\s*#property:\s*p\d+\s*\}\}'),
+        # Module invocations (currently only Lua)
+        'invoke':       re.compile(r'(?i)\{\{\s*#invoke:.*?}\}'),
+        # categories
+        'category':     ('\[\[ *(?:%s)\s*:.*?\]\]',
+                         lambda site: '|'.join(site.namespaces[14])),
+        # files
+        'file':         ('\[\[ *(?:%s)\s*:.*?\]\]',
+                         lambda site: '|'.join(site.namespaces[6])),
+    })
+
+
+def _get_regexes(keys, site):
+    """Fetch compiled regexes."""
+    if site is None:
+        site = pywikibot.Site()
+
+    if not _regex_cache:
+        _create_default_regexes()
+
+    result = []
+    # 'dontTouchRegexes' exist to reduce git blame only.
+    dontTouchRegexes = result
+
+    for exc in keys:
+        if isinstance(exc, basestring):
+            # assume the string is a reference to a standard regex above,
+            # which may not yet have a site specific re compiled.
+            if exc in _regex_cache:
+                if type(_regex_cache[exc]) is tuple:
+                    if (exc, site) not in _regex_cache:
+                        re_text, re_var = _regex_cache[exc]
+                        _regex_cache[(exc, site)] = re.compile(
+                            re_text % re_var(site))
+
+                    result.append(_regex_cache[(exc, site)])
+                else:
+                    result.append(_regex_cache[exc])
+            elif exc == 'template':
+                # template is not supported by this method.
+                pass
+            else:
+                # nowiki, noinclude, includeonly, timeline, math ond other
+                # extensions
+                if exc not in _regex_cache:
+                    _regex_cache[exc] = re.compile(r'(?is)<%s>.*?</%s>'
+                                                    % (exc, exc))
+                result.append(_regex_cache[exc])
+            # handle alias
+            if exc == 'source':
+                dontTouchRegexes.append(re.compile(
+                    r'(?is)<syntaxhighlight .*?</syntaxhighlight>'))
+        else:
+            # assume it's a regular expression
+            dontTouchRegexes.append(exc)
+
+    return result
+
+
 def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                   allowoverlap=False, marker='', site=None):
     """
@@ -102,45 +193,6 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         if nothing is changed, it is added at the end
 
     """
-    if site is None:
-        site = pywikibot.Site()
-
-    exceptionRegexes = {
-        'comment':      re.compile(r'(?s)<!--.*?-->'),
-        # section headers
-        'header':       re.compile(r'\r?\n=+.+=+ *\r?\n'),
-        # preformatted text
-        'pre':          re.compile(r'(?ism)<pre>.*?</pre>'),
-        'source':       re.compile(r'(?is)<source .*?</source>'),
-        # inline references
-        'ref':          re.compile(r'(?ism)<ref[ >].*?</ref>'),
-        # lines that start with a space are shown in a monospace font and
-        # have whitespace preserved.
-        'startspace':   re.compile(r'(?m)^ (.*?)$'),
-        # tables often have whitespace that is used to improve wiki
-        # source code readability.
-        # TODO: handle nested tables.
-        'table':        re.compile(r'(?ims)^{\|.*?^\|}|<table>.*?</table>'),
-        'hyperlink':    compileLinkR(),
-        'gallery':      re.compile(r'(?is)<gallery.*?>.*?</gallery>'),
-        # this matches internal wikilinks, but also interwiki, categories, and
-        # images.
-        'link':         re.compile(r'\[\[[^\]\|]*(\|[^\]]*)?\]\]'),
-        # also finds links to foreign sites with preleading ":"
-        'interwiki':    re.compile(r'(?i)\[\[:?(%s)\s?:[^\]]*\]\][\s]*'
-                                   % '|'.join(site.validLanguageLinks() +
-                                              list(site.family.obsolete.keys()))),
-        # Wikibase property inclusions
-        'property':     re.compile(r'(?i)\{\{\s*#property:\s*p\d+\s*\}\}'),
-        # Module invocations (currently only Lua)
-        'invoke':       re.compile(r'(?i)\{\{\s*#invoke:.*?}\}'),
-        # categories
-        'category':     re.compile(u'\[\[ *(?:%s)\s*:.*?\]\]' % u'|'.join(site.namespace(14, all=True))),
-        # files
-        'file':         re.compile(u'\[\[ *(?:%s)\s*:.*?\]\]' % u'|'.join(site.namespace(6, all=True))),
-
-    }
-
     # if we got a string, compile it as a regular expression
     if isinstance(old, basestring):
         if caseInsensitive:
@@ -148,28 +200,13 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         else:
             old = re.compile(old)
 
-    dontTouchRegexes = []
-    except_templates = False
-    for exc in exceptions:
-        if isinstance(exc, basestring):
-            # assume it's a reference to the exceptionRegexes dictionary
-            # defined above.
-            if exc in exceptionRegexes:
-                dontTouchRegexes.append(exceptionRegexes[exc])
-            elif exc == 'template':
-                except_templates = True
-            else:
-                # nowiki, noinclude, includeonly, timeline, math ond other
-                # extensions
-                dontTouchRegexes.append(re.compile(r'(?is)<%s>.*?</%s>'
-                                                   % (exc, exc)))
-            # handle alias
-            if exc == 'source':
-                dontTouchRegexes.append(re.compile(
-                    r'(?is)<syntaxhighlight .*?</syntaxhighlight>'))
-        else:
-            # assume it's a regular expression
-            dontTouchRegexes.append(exc)
+    # early termination if not relevant
+    if not old.search(text):
+        return text + marker
+
+    dontTouchRegexes = _get_regexes(exceptions, site)
+
+    except_templates = 'template' in exceptions
 
     # mark templates
     # don't care about mw variables and parser functions
