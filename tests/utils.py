@@ -25,14 +25,8 @@ from pywikibot.site import Namespace
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 
-from tests import aspects, _pwb_py
+from tests import _pwb_py
 from tests import unittest  # noqa
-
-BaseTestCase = aspects.TestCase
-NoSiteTestCase = aspects.TestCase
-SiteTestCase = aspects.TestCase
-CachedTestCase = aspects.TestCase
-PywikibotTestCase = aspects.TestCase
 
 
 class DrySiteNote(RuntimeWarning):

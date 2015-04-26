@@ -36,6 +36,9 @@ import sys
 import time
 import warnings
 
+if sys.version_info[0] > 2:
+    import six
+
 import pywikibot
 
 from pywikibot import config, log, ServerError, Site
@@ -45,7 +48,9 @@ from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 
 import tests
+
 from tests import unittest, patch_request, unpatch_request
+from tests.utils import execute_pwb, DrySite, DryRequest
 
 
 class TestCaseBase(unittest.TestCase):
@@ -395,8 +400,7 @@ class DisconnectedSiteMixin(TestCaseBase):
         #       as the default, to show a useful error message.
         config.site_interface = SiteNotPermitted
 
-        pywikibot.data.api.Request = tests.utils.DryRequest
-        from tests.utils import DrySite
+        pywikibot.data.api.Request = DryRequest
         self.old_convert = pywikibot.Claim.TARGET_CONVERTER['commonsMedia']
         pywikibot.Claim.TARGET_CONVERTER['commonsMedia'] = (
             lambda value, site: pywikibot.FilePage(
@@ -820,8 +824,6 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
 
         interface = None  # defaults to 'APISite'
         if hasattr(cls, 'dry') and cls.dry:
-            # Delay load to avoid cyclic import
-            from tests.utils import DrySite
             interface = DrySite
 
         for data in cls.sites.values():
@@ -919,7 +921,6 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
 
 
 if sys.version_info[0] > 2:
-    import six
     TestCase = six.add_metaclass(MetaTestCaseClass)(TestCase)
 
 
@@ -1170,8 +1171,6 @@ class PwbTestCase(TestCase):
             os.environ[str('PYWIKIBOT2_DIR')] = self.orig_pywikibot_dir
 
     def _execute(self, args, data_in=None, timeout=0, error=None):
-        from tests.utils import execute_pwb
-
         site = self.get_site()
 
         args = args + ['-family:' + site.family.name,
