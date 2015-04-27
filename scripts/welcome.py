@@ -658,8 +658,7 @@ class WelcomeBot(object):
             showStatus()
             pywikibot.output(
                 'Log page is not exist, getting information for page creation')
-            text = i18n.translate(self.site, logpage_header,
-                                  fallback=i18n.DEFAULT_FALLBACK)
+            text = i18n.translate(self.site, logpage_header)
             text += u'\n!%s' % self.site.namespace(2)
             text += u'\n!%s' % str.capitalize(
                 self.site.mediawiki_message('contribslink'))

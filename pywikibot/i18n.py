@@ -365,9 +365,6 @@ def _extract_plural(code, message, parameters):
     return message
 
 
-DEFAULT_FALLBACK = ('_default', )
-
-
 def translate(code, xdict, parameters=None, fallback=False):
     """Return the most appropriate translation from a translation dict.
 
@@ -378,9 +375,8 @@ def translate(code, xdict, parameters=None, fallback=False):
 
     The language itself is always checked first, then languages that
     have been defined to be alternatives, and finally English. If none of
-    the options gives result, we just take the one language from xdict which may
-    not be always the same. When fallback is iterable it'll return None if no
-    code applies (instead of returning one).
+    the options gives result, we just take the first language in the
+    list.
 
     For PLURAL support have a look at the twntranslate method
 
@@ -393,9 +389,9 @@ def translate(code, xdict, parameters=None, fallback=False):
     @type xdict: dict, string, unicode
     @param parameters: For passing (plural) parameters
     @type parameters: dict, string, unicode, int
-    @param fallback: Try an alternate language code. If it's iterable it'll
-        also try those entries and choose the first match.
-    @type fallback: boolean or iterable
+    @param fallback: Try an alternate language code
+    @type fallback: boolean
+
     """
     family = pywikibot.config.family
     # If a site is given instead of a code, use its language
@@ -411,28 +407,20 @@ def translate(code, xdict, parameters=None, fallback=False):
             xdict = xdict['wikipedia']
 
     # Get the translated string
+    trans = None
     if not isinstance(xdict, dict):
         trans = xdict
-    elif not xdict:
-        trans = None
-    else:
-        codes = [code]
-        if fallback is True:
-            codes += _altlang(code) + ['_default', 'en']
-        elif fallback is not False:
-            codes += list(fallback)
-        for code in codes:
-            if code in xdict:
-                trans = xdict[code]
+    elif code in xdict:
+        trans = xdict[code]
+    elif fallback:
+        for alt in _altlang(code) + ['_default', 'en']:
+            if alt in xdict:
+                trans = xdict[alt]
+                code = alt
                 break
         else:
-            if fallback is not False and fallback is not True:
-                # future versions shouldn't simply return "any one" code but
-                # no translation as this is not very deterministic. When
-                # fallback is iterable it's a new mode previously not supported
-                return
+            trans = list(xdict.values())[0]
             code = list(xdict.keys())[0]
-            trans = xdict[code]
     if trans is None:
         return  # return None if we have no translation found
     if parameters is None:
