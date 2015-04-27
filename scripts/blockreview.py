@@ -122,7 +122,7 @@ class BlockreviewBot:
         # saveAdmin = saveProject = False
         talkComment = None
         for templates in userPage.templatesWithParams():
-            if templates[0] == unblock_tpl:
+            if templates[0].title() == unblock_tpl:
                 self.getInfo(user)
                 # Step 1
                 # a new template is set on blocked users talk page.
