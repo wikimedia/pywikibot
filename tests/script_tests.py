@@ -163,14 +163,15 @@ else:
     no_args_expected_results['replicate_wiki'] = 'error: too few arguments'
 
 
+enable_autorun_tests = (
+    os.environ.get('PYWIKIBOT2_TEST_AUTORUN', '0') == '1')
+
+
 def collector(loader=unittest.loader.defaultTestLoader):
     """Load the default tests."""
     # Note: Raising SkipTest during load_tests will
     # cause the loader to fallback to its own
     # discover() ordering of unit tests.
-
-    enable_autorun_tests = (
-        os.environ.get('PYWIKIBOT2_TEST_AUTORUN', '0') == '1')
 
     if deadlock_script_list:
         print('Skipping deadlock scripts:\n  %s'
@@ -222,6 +223,13 @@ class TestScriptMeta(MetaTestCaseClass):
     def __new__(cls, name, bases, dct):
         """Create the new class."""
         def test_execution(script_name, args=[], expected_results=None):
+            is_autorun = '-help' not in args and script_name in auto_run_script_list
+
+            def test_skip_script(self):
+                raise unittest.SkipTest(
+                    'Skipping execution of auto-run scripts (set '
+                    'PYWIKIBOT2_TEST_AUTORUN=1 to enable) "{0}"'.format(script_name))
+
             def testScript(self):
                 cmd = [script_name]
 
@@ -231,7 +239,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 data_in = script_input.get(script_name)
 
                 timeout = 0
-                if '-help' not in args and script_name in auto_run_script_list:
+                if is_autorun:
                     timeout = 5
 
                 if expected_results and script_name in expected_results:
@@ -306,6 +314,8 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 sys.stdout.flush()
 
+            if not enable_autorun_tests and is_autorun:
+                return test_skip_script
             return testScript
 
         for script_name in script_list:
