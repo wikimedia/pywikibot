@@ -18,8 +18,9 @@ The following parameters are supported:
                   the predefined message texts with original and replacements
                   inserted.
 
--ignore:          Ignores if an error occured and either skips the page or
-                  only that method. It can be set to 'page' or 'method'.
+-ignore:          Ignores if an error occured and skip either the page, or
+                  only that method, or only an instance of the problem in the
+                  page text. It can be set to 'page', 'method', or 'match'.
 
 &warning;
 
@@ -66,7 +67,7 @@ or by adding a list to the given one:
 """
 #
 # (C) xqt, 2009-2013
-# (C) Pywikibot team, 2006-2014
+# (C) Pywikibot team, 2006-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -76,13 +77,28 @@ __version__ = '$Id$'
 #
 
 import re
-from pywikibot.tools import MediaWikiVersion
+
+from warnings import warn
+
+try:
+    import stdnum.isbn as stdnum_isbn
+    scripts_isbn = None
+except ImportError:
+    stdnum_isbn = None
+    # Old dependency
+    try:
+        import scripts.isbn as scripts_isbn
+    except ImportError:
+        scripts_isbn = None
+
 import pywikibot
-import isbn
+
 from pywikibot import config, i18n, textlib, pagegenerators
 from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
 from pywikibot.page import url2unicode
 from pywikibot.tools import deprecate_arg, first_lower, first_upper
+from pywikibot.tools import MediaWikiVersion
+
 
 warning = """
 ATTENTION: You can run this script as a stand-alone for testing purposes.
@@ -153,10 +169,54 @@ deprecatedTemplates = {
     }
 }
 
-
 CANCEL_ALL = False
 CANCEL_PAGE = 1
 CANCEL_METHOD = 2
+CANCEL_MATCH = 3
+
+
+def _format_isbn_match(match, strict=True):
+    """Helper function to validate and format a single matched ISBN."""
+    isbn = match.group('code')
+    if stdnum_isbn:
+        try:
+            stdnum_isbn.validate(isbn)
+        except stdnum_isbn.ValidationError as e:
+            if strict:
+                raise
+            pywikibot.log('ISBN "%s" validation error: %s' % (isbn, e))
+            return isbn
+
+        return stdnum_isbn.format(isbn)
+    else:
+        try:
+            scripts_isbn.is_valid(isbn)
+        except scripts_isbn.InvalidIsbnException as e:
+            if strict:
+                raise
+            pywikibot.log('ISBN "%s" validation error: %s' % (isbn, e))
+            return isbn
+
+        isbn = scripts_isbn.getIsbn(isbn)
+        isbn.format()
+        return isbn.code
+
+
+def _reformat_ISBNs(text, strict=True):
+    """Helper function to normalise ISBNs in text.
+
+    @raises Exception: Invalid ISBN encountered when strict enabled
+    """
+    if not stdnum_isbn:
+        if not scripts_isbn:
+            raise NotImplementedError(
+                'ISBN functionality not available.  Install stdnum package.')
+
+        warn('package stdnum.isbn not found; using scripts.isbn',
+             ImportWarning)
+
+    return textlib.reformat_ISBNs(
+        text, lambda match: _format_isbn_match(match, strict=strict))
 
 
 class CosmeticChangesToolkit:
@@ -196,6 +256,7 @@ class CosmeticChangesToolkit:
             self.fixTypo,
 
             self.fixArabicLetters,
+            self.fix_ISBN,
         )
 
     @classmethod
@@ -218,20 +279,10 @@ class CosmeticChangesToolkit:
                 raise
         return text if result is None else result
 
-    @staticmethod
-    def isbn_execute(text):
-        """Hyphenate ISBN numbers and catch 'InvalidIsbnException'."""
-        try:
-            return isbn.hyphenateIsbnNumbers(text)
-        except isbn.InvalidIsbnException as error:
-            pywikibot.log(u"ISBN error: %s" % error)
-            return None
-
     def _change(self, text):
         """Execute all clean up methods."""
         for method in self.common_methods:
             text = self.safe_execute(method, text)
-        text = self.safe_execute(CosmeticChangesToolkit.isbn_execute, text)
         return text
 
     def change(self, text):
@@ -898,6 +949,11 @@ class CosmeticChangesToolkit:
             r'\1== {{int:license-header}} ==', exceptions, True)
         return text
 
+    def fix_ISBN(self, text):
+        """Hyphenate ISBN numbers."""
+        return _reformat_ISBNs(
+            text, strict=False if self.ignore == CANCEL_MATCH else True)
+
 
 class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
 
@@ -959,6 +1015,8 @@ def main(*args):
                 options['ignore'] = CANCEL_METHOD
             elif ignore_mode == 'page':
                 options['ignore'] = CANCEL_PAGE
+            elif ignore_mode == 'match':
+                options['ignore'] = CANCEL_MATCH
             else:
                 raise ValueError('Unknown ignore mode "{0}"!'.format(ignore_mode))
         else:

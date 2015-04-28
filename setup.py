@@ -19,6 +19,7 @@ irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'
 
 extra_deps = {
     # Core library dependencies
+    'isbn': ['python-stdnum'],
     'daemonize': ['daemonize'],
     'Graphviz':  ['pydot'],
     'MySQL': ['oursql'],

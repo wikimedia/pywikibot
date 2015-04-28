@@ -1234,6 +1234,21 @@ def does_text_contain_section(pagetext, section):
     return bool(m)
 
 
+def reformat_ISBNs(text, match_func):
+    """Reformat ISBNs.
+
+    @param text: text containing ISBNs
+    @type text: str
+    @param match_func: function to reformat matched ISBNs
+    @type match_func: callable
+    @return: reformatted text
+    @rtype: str
+    """
+    isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[\dXx])')
+    text = isbnR.sub(match_func, text)
+    return text
+
+
 # ---------------------------------------
 # Time parsing functionality (Archivebot)
 # ---------------------------------------

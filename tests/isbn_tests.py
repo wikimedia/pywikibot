@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for isbn script."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,15 +11,48 @@ import pywikibot
 
 __version__ = '$Id$'
 
+from pywikibot import Bot, Claim, ItemPage
+
+from scripts.cosmetic_changes import CosmeticChangesToolkit, CANCEL_MATCH
+
 from scripts.isbn import (
     ISBN10, ISBN13, InvalidIsbnException as IsbnExc,
     getIsbn, hyphenateIsbnNumbers, convertIsbn10toIsbn13,
     main
 )
 from tests.aspects import (
-    unittest, TestCase, WikibaseTestCase, ScriptMainTestCase
+    unittest, TestCase, DefaultDrySiteTestCase,
+    WikibaseTestCase, ScriptMainTestCase,
 )
-from pywikibot import Bot, Claim, ItemPage
+
+
+class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
+
+    """Test CosmeticChanges ISBN fix."""
+
+    def test_valid_isbn(self):
+        """Test ISBN."""
+        cc = CosmeticChangesToolkit(self.site, namespace=0)
+
+        text = cc.fix_ISBN(' ISBN 097522980x ')
+        self.assertEqual(text, ' ISBN 0-9752298-0-X ')
+
+        text = cc.fix_ISBN(' ISBN 9780975229804 ')
+        self.assertEqual(text, ' ISBN 978-0-9752298-0-4 ')
+
+    def test_invalid_isbn(self):
+        cc = CosmeticChangesToolkit(self.site, namespace=0)
+
+        self.assertRaises(Exception, cc.fix_ISBN, 'ISBN 0975229LOL')  # Invalid characters
+        self.assertRaises(Exception, cc.fix_ISBN, 'ISBN 0975229801')  # Invalid checksum
+        self.assertRaises(Exception, cc.fix_ISBN, 'ISBN 09752298')  # Invalid length
+        self.assertRaises(Exception, cc.fix_ISBN, 'ISBN 09752X9801')  # X in the middle
+
+    def test_ignore_invalid_isbn(self):
+        cc = CosmeticChangesToolkit(self.site, namespace=0, ignore=CANCEL_MATCH)
+
+        text = cc.fix_ISBN(' ISBN 0975229LOL ISBN 9780975229804 ')
+        self.assertEqual(text, ' ISBN 0975229LOL ISBN 978-0-9752298-0-4 ')
 
 
 class TestIsbn(TestCase):
