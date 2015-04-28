@@ -1382,14 +1382,15 @@ def _hyphenateIsbnNumber(match):
     isbn = match.group('code')
     isbn = isbn.upper()
     try:
+        is_valid(isbn)
+    except InvalidIsbnException:
+        return isbn
+
+    try:
         stdnum.isbn
     except NameError:
         pass
     else:
-        try:
-            is_valid(isbn)
-        except InvalidIsbnException:
-            return isbn
         i = stdnum.isbn.format(isbn)
         return i
 
@@ -1399,18 +1400,12 @@ def _hyphenateIsbnNumber(match):
         pass
     else:
         try:
-            is_valid(isbn)
             i = isbn_hyphenate.hyphenate(isbn)
-        except (InvalidIsbnException, isbn_hyphenate.IsbnMalformedError,
+        except (isbn_hyphenate.IsbnMalformedError,
                 isbn_hyphenate.IsbnUnableToHyphenateError):
             return isbn
         return i
 
-    try:
-        is_valid(isbn)
-    except InvalidIsbnException:
-        # don't change
-        return isbn
     i = getIsbn(isbn)
     i.format()
     return i.code
