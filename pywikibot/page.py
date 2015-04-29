@@ -1057,7 +1057,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
             else:
                 pywikibot.output(u"Page %s saved" % link)
         # TODO: other "expected" error types to catch?
-        except pywikibot.Error as err:
+        except pywikibot.Error as edit_err:
+            err = edit_err  # edit_err will be deleted in the end of the scope
             pywikibot.log(u"Error saving page %s (%s)\n" % (link, err),
                           exc_info=True)
             if not callback and not async:
