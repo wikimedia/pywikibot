@@ -376,7 +376,7 @@ class CategoryAddBot(Bot):
                                            {'newcat': catpl.title(withNamespace=False)})
             try:
                 self.userPut(self.current_page, old_text, text,
-                             comment=comment, minor=True, botflag=True)
+                             summary=comment, minor=True, botflag=True)
             except pywikibot.PageSaveRelatedError as error:
                 pywikibot.output(u'Page %s not saved: %s'
                                  % (self.current_page.title(asLink=True),
@@ -807,7 +807,7 @@ class CategoryListifyRobot:
             pywikibot.output(u'Page %s already exists, aborting.'
                              % self.list.title())
         else:
-            self.list.put(listString, comment=self.editSummary)
+            self.list.put(listString, summary=self.editSummary)
 
 
 class CategoryTidyRobot(pywikibot.Bot):

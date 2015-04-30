@@ -758,7 +758,7 @@ class ReferencesRobot(Bot):
 
             new_text = self.deduplicator.process(new_text)
 
-            self.userPut(page, page.text, new_text, comment=self.msg,
+            self.userPut(page, page.text, new_text, summary=self.msg,
                          ignore_save_related_errors=True,
                          ignore_server_errors=True)
 

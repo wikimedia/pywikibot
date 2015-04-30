@@ -277,7 +277,7 @@ class BlockreviewBot:
                     page.text = text
                     try:
                         # Save the page
-                        page.save(comment=comment, minorEdit=minorEdit,
+                        page.save(summary=comment, minorEdit=minorEdit,
                                   botflag=botflag)
                     except pywikibot.LockedPage:
                         pywikibot.output(u"Page %s is locked; skipping."

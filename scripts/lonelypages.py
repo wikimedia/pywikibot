@@ -189,7 +189,7 @@ class LonelyPagesBot(Bot):
                 # Ok, the page need the template. Let's put it there!
                 # Adding the template in the text
                 newtxt = u"%s\n%s" % (self.template, oldtxt)
-                self.userPut(page, oldtxt, newtxt, comment=self.comment)
+                self.userPut(page, oldtxt, newtxt, summary=self.comment)
 
 
 def main(*args):

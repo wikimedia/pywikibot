@@ -105,7 +105,7 @@ class PiperBot(ExistingPageBot, NoRedirectPageBot):
             text = self.pipe(program, text)
 
         # only save if something was changed
-        self.put_current(text, comment=self.getOption('comment'))
+        self.put_current(text, summary=self.getOption('comment'))
 
 
 def main(*args):

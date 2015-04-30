@@ -76,7 +76,7 @@ def make_categories(page, list, site=None):
         pllist.append(pywikibot.Page(site, cattitle))
     page.put_async(textlib.replaceCategoryLinks(page.get(), pllist,
                                                 site=page.site),
-                   comment=i18n.twtranslate(site.code, 'catall-changing'))
+                   summary=i18n.twtranslate(site.code, 'catall-changing'))
 
 
 def main(*args):

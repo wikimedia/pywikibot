@@ -160,10 +160,10 @@ def main(*args):
         historytable = page.getVersionHistoryTable()
 
         pywikibot.log("Putting page text.")
-        targetpage.put(text, comment=summary)
+        targetpage.put(text, summary=summary)
 
         pywikibot.log("Putting edit history.")
-        edithistpage.put(historytable, comment=summary)
+        edithistpage.put(historytable, summary=summary)
 
 
 if __name__ == "__main__":

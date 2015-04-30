@@ -2006,9 +2006,9 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             while True:
                 try:
                     if globalvar.async:
-                        page.put_async(newtext, comment=mcomment)
+                        page.put_async(newtext, summary=mcomment)
                     else:
-                        page.put(newtext, comment=mcomment)
+                        page.put(newtext, summary=mcomment)
                 except pywikibot.LockedPage:
                     pywikibot.output(u'Page %s is locked. Skipping.' % page)
                     raise SaveError(u'Locked')

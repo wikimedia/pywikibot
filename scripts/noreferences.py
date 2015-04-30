@@ -663,7 +663,7 @@ class NoReferencesBot(Bot):
             if self.lacksReferences(text):
                 newText = self.addReferences(text)
                 try:
-                    self.userPut(page, page.text, newText, comment=self.comment)
+                    self.userPut(page, page.text, newText, summary=self.comment)
                 except pywikibot.EditConflict:
                     pywikibot.output(u'Skipping %s because of edit conflict'
                                      % page.title())

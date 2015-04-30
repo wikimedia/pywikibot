@@ -1498,7 +1498,7 @@ class IsbnBot(Bot):
             if self.getOption('format'):
                 new_text = self.isbnR.sub(_hyphenateIsbnNumber, new_text)
             try:
-                self.userPut(page, page.text, new_text, comment=self.comment)
+                self.userPut(page, page.text, new_text, summary=self.comment)
             except pywikibot.EditConflict:
                 pywikibot.output(u'Skipping %s because of edit conflict'
                                  % page.title())

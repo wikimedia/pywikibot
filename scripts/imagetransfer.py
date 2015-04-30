@@ -227,7 +227,7 @@ class ImageTransferBot:
                     sourceImagePage.put(sourceImagePage.get() + '\n\n' +
                                         nowCommonsTemplate[sourceSite.lang]
                                         % targetFilename,
-                                        comment=nowCommonsMessage[sourceSite.lang])
+                                        summary=nowCommonsMessage[sourceSite.lang])
 
     def showImageList(self, imagelist):
         for i in range(len(imagelist)):

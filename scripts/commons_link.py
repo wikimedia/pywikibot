@@ -91,7 +91,7 @@ class CommonsLinkBot(Bot):
                                                        'commons_link%s-template-added'
                                                        % ('', '-cat')[catmode])
                             try:
-                                self.userPut(page, oldText, text, comment=comment)
+                                self.userPut(page, oldText, text, summary=comment)
                             except pywikibot.EditConflict:
                                 pywikibot.output(
                                     u'Skipping %s because of edit conflict'
