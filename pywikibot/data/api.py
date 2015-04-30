@@ -1676,7 +1676,8 @@ class Request(MutableMapping):
                     self.wait()
                     continue
 
-                raise APIMWException(class_name, info, **result["error"])
+                del result['error']['code']  # is added via class_name
+                raise APIMWException(class_name, **result['error'])
 
             # bugs 46535, 62126, 64494, 66619
             # maybe removed when it 46535 is solved
