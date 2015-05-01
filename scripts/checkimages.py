@@ -754,15 +754,15 @@ class checkImagesBot(object):
                               repme)
             return
         upBots = i18n.translate(self.site, uploadBots)
-        luser = pywikibot.url2link(nick, self.site, self.site)
+        user = pywikibot.User(self.site, nick)
+        luser = user.title(asUrl=True)
 
         if upBots:
             for upBot in upBots:
                 if upBot[0] == luser:
                     luser = self.uploadBotChangeFunction(reportPageText, upBot)
-        talk_page = pywikibot.Page(self.site,
-                                   u"%s:%s" % (self.site.namespace(3), luser))
-        self.talk_page = talk_page
+                    user = pywikibot.User(self.site, luser)
+        self.talk_page = user.getUserTalkPage()
         self.luser = luser
         return True
 
@@ -1290,15 +1290,11 @@ class checkImagesBot(object):
                 break
         if not self.license_found:
             for template in self.licenses_found:
-                try:
-                    template.pageAPInfo()
-                except pywikibot.IsRedirectPage:
+                if template.isRedirectPage():
                     template = template.getRedirectTarget()
                     result = self.miniTemplateCheck(template)
                     if result:
                         break
-                except pywikibot.NoPage:
-                    continue
 
     def smartDetection(self):
         """
@@ -1352,17 +1348,10 @@ class checkImagesBot(object):
             self.templateInList()
 
             if not self.license_found and self.allLicenses:
-                # If only iterlist = self.AllLicenses if I remove something
-                # from iterlist it will be remove from self.AllLicenses too
-                iterlist = list(self.allLicenses)
-
-                for template in iterlist:
-                    try:
-                        template.pageAPInfo()
-                    except pywikibot.IsRedirectPage:
-                        template = template.getRedirectTarget()
-                    except pywikibot.NoPage:
-                        self.allLicenses.remove(template)
+                self.allLicenses = [
+                    template.getRedirectTarget()
+                    if template.isRedirectPage() else template
+                    for template in self.allLicenses if template.exists()]
 
                 if self.allLicenses:
                     self.license_found = self.allLicenses[0].title()
