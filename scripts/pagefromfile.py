@@ -160,7 +160,7 @@ class PageFromFileRobot(Bot):
                 config.default_edit_summary = ''
 
         self.userPut(page, page.text, contents,
-                     comment=comment,
+                     summary=comment,
                      minor=self.getOption('minor'),
                      show_diff=False,
                      ignore_save_related_errors=True)

@@ -578,7 +578,7 @@ class DisambiguationRobot(Bot):
                     redir_text = '#%s [[%s]]' \
                                  % (self.mysite.redirect(), target)
                     try:
-                        refPage.put_async(redir_text, comment=self.comment)
+                        refPage.put_async(redir_text, summary=self.comment)
                     except pywikibot.PageNotSaved as error:
                         pywikibot.output(u'Page not saved: %s' % error.args)
             else:
@@ -843,7 +843,7 @@ class DisambiguationRobot(Bot):
                 self.setSummaryMessage(disambPage, new_targets, unlink_counter,
                                        dn)
                 try:
-                    refPage.put_async(text, comment=self.comment)
+                    refPage.put_async(text, summary=self.comment)
                 except pywikibot.LockedPage:
                     pywikibot.output(u'Page not saved: page is locked')
                 except pywikibot.PageNotSaved as error:

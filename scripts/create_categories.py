@@ -67,7 +67,7 @@ class CreateCategoriesBot(Bot):
         if not newpage.exists():
             pywikibot.output(newpage.title())
             try:
-                self.userPut(newpage, '', newtext, comment=self.comment)
+                self.userPut(newpage, '', newtext, summary=self.comment)
             except pywikibot.EditConflict:
                 pywikibot.output(u'Skipping %s due to edit conflict' % newpage.title())
             except pywikibot.ServerError:

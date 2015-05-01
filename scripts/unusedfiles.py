@@ -101,7 +101,7 @@ class UnusedFilesBot(Bot):
 
         oldtext = text
         text += apptext
-        self.userPut(page, oldtext, text, comment=self.summary)
+        self.userPut(page, oldtext, text, summary=self.summary)
 
 
 def main(*args):

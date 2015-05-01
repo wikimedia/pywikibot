@@ -735,7 +735,7 @@ class checkImagesBot(object):
             pywikibot.output(self.commImage)
             try:
                 reportPageObject.put(self.newtext + "\n" + reportPageText,
-                                     comment=self.commImage)
+                                     summary=self.commImage)
             except pywikibot.LockedPage:
                 pywikibot.output(u'File is locked. Skipping.')
                 return
@@ -815,7 +815,7 @@ class checkImagesBot(object):
             newText = testoattuale + self.head + self.notification
 
         try:
-            self.talk_page.put(newText, comment=commentox, minorEdit=False)
+            self.talk_page.put(newText, summary=commentox, minorEdit=False)
         except pywikibot.LockedPage:
             pywikibot.output(u'Talk page blocked, skip.')
 
@@ -1165,7 +1165,7 @@ class checkImagesBot(object):
             if addings:
                 # Adding the name of the image in the report if not done already
                 rep_text = rep_text % image_to_report
-            another_page.put(text_get + rep_text, comment=com, force=True,
+            another_page.put(text_get + rep_text, summary=com, force=True,
                              minorEdit=False)
             pywikibot.output(u"...Reported...")
             reported = True

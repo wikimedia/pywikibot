@@ -369,7 +369,7 @@ class CommonscatBot(Bot):
                                        'commonscat-msg_change',
                                        {'oldcat': oldcat, 'newcat': newcat})
 
-        self.userPut(page, page.text, newtext, comment=comment,
+        self.userPut(page, page.text, newtext, summary=comment,
                      ignore_save_related_errors=True)
 
     def findCommonscatLink(self, page=None):

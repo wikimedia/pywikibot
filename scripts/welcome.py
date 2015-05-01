@@ -625,7 +625,7 @@ class WelcomeBot(object):
 
             com = i18n.twtranslate(self.site, 'welcome-bad_username')
             if rep_text != '':
-                rep_page.put(text_get + rep_text, comment=com, force=True,
+                rep_page.put(text_get + rep_text, summary=com, force=True,
                              minorEdit=True)
                 showStatus(5)
                 pywikibot.output(u'Reported')

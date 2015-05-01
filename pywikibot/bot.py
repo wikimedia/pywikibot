@@ -40,7 +40,7 @@ import pywikibot
 from pywikibot import backports
 from pywikibot import config
 from pywikibot import version
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, deprecated_args
 
 if sys.version_info[0] > 2:
     unicode = str
@@ -1092,6 +1092,7 @@ class Bot(object):
 
         return True
 
+    @deprecated_args(comment='summary')
     def userPut(self, page, oldtext, newtext, **kwargs):
         """
         Save a new revision of a page, with user confirmation as required.
@@ -1104,7 +1105,7 @@ class Bot(object):
 
         Keyword args used:
         * 'async' - passed to page.save
-        * 'comment' - passed to page.save
+        * 'summary' - passed to page.save
         * 'show_diff' - show changes between oldtext and newtext (enabled)
         * 'ignore_save_related_errors' - report and ignore (disabled)
         * 'ignore_server_errors' - report and ignore (disabled)
@@ -1121,8 +1122,8 @@ class Bot(object):
         if show_diff:
             pywikibot.showDiff(oldtext, newtext)
 
-        if 'comment' in kwargs:
-            pywikibot.output(u'Comment: %s' % kwargs['comment'])
+        if 'summary' in kwargs:
+            pywikibot.output(u'Edit summary: %s' % kwargs['summary'])
 
         page.text = newtext
         self._save_page(page, page.save, **kwargs)
@@ -1291,6 +1292,7 @@ class CurrentPageBot(Bot):
         self.current_page = page
         self.treat_page()
 
+    @deprecated_args(comment='summary')
     def put_current(self, new_text, ignore_save_related_errors=None,
                     ignore_server_errors=None, **kwargs):
         """

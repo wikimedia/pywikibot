@@ -993,14 +993,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # no restricting template found
         return True
 
-    @deprecate_arg('sysop', None)
-    def save(self, comment=None, watch=None, minor=True, botflag=None,
+    @deprecated_args(comment='summary', sysop=None)
+    def save(self, summary=None, watch=None, minor=True, botflag=None,
              force=False, async=False, callback=None, **kwargs):
         """Save the current contents of page's text to the wiki.
 
-        @param comment: The edit summary for the modification (optional, but
+        @param summary: The edit summary for the modification (optional, but
             most wikis strongly encourage its use)
-        @type comment: unicode
+        @type summary: unicode
         @param watch: if True, add or if False, remove this Page to/from bot
             user's watchlist; if None (default), follow bot account's default
             settings
@@ -1021,8 +1021,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
             successful.
 
         """
-        if not comment:
-            comment = config.default_edit_summary
+        if not summary:
+            summary = config.default_edit_summary
         if watch is None:
             watchval = None
         elif watch:
@@ -1033,23 +1033,23 @@ class BasePage(UnicodeMixin, ComparableMixin):
             raise pywikibot.OtherPageSaveError(
                 self, "Editing restricted by {{bots}} template")
         if async:
-            pywikibot.async_request(self._save, comment=comment, minor=minor,
+            pywikibot.async_request(self._save, summary=summary, minor=minor,
                                     watchval=watchval, botflag=botflag,
                                     async=async, callback=callback, **kwargs)
         else:
-            self._save(comment=comment, minor=minor, watchval=watchval,
+            self._save(summary=summary, minor=minor, watchval=watchval,
                        botflag=botflag, async=async, callback=callback,
                        **kwargs)
 
-    def _save(self, comment, minor, watchval, botflag, async, callback,
+    def _save(self, summary, minor, watchval, botflag, async, callback,
               **kwargs):
         """Helper function for save()."""
         err = None
         link = self.title(asLink=True)
         if config.cosmetic_changes:
-            comment = self._cosmetic_changes_hook(comment) or comment
+            summary = self._cosmetic_changes_hook(summary) or summary
         try:
-            done = self.site.editpage(self, summary=comment, minor=minor,
+            done = self.site.editpage(self, summary=summary, minor=minor,
                                       watch=watchval, bot=botflag, **kwargs)
             if not done:
                 pywikibot.warning(u"Page %s not saved" % link)
@@ -1106,7 +1106,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
             comment += i18n.twtranslate(self.site, 'cosmetic_changes-append')
             return comment
 
-    def put(self, newtext, comment=u'', watchArticle=None, minorEdit=True,
+    @deprecated_args(comment='summary')
+    def put(self, newtext, summary=u'', watchArticle=None, minorEdit=True,
             botflag=None, force=False, async=False, callback=None, **kwargs):
         """Save the page with the contents of the first argument as the text.
 
@@ -1119,11 +1120,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         """
         self.text = newtext
-        self.save(comment=comment, watch=watchArticle, minor=minorEdit,
+        self.save(summary=summary, watch=watchArticle, minor=minorEdit,
                   botflag=botflag, force=force, async=async, callback=callback,
                   **kwargs)
 
-    def put_async(self, newtext, comment=u'', watchArticle=None,
+    @deprecated_args(comment='summary')
+    def put_async(self, newtext, summary=u'', watchArticle=None,
                   minorEdit=True, botflag=None, force=False, callback=None,
                   **kwargs):
         """Put page on queue to be saved to wiki asynchronously.
@@ -1134,7 +1136,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         backwards-compatibility.
 
         """
-        self.put(newtext, comment=comment, watchArticle=watchArticle,
+        self.put(newtext, summary=summary, watchArticle=watchArticle,
                  minorEdit=minorEdit, botflag=botflag, force=force, async=True,
                  callback=callback, **kwargs)
 
@@ -1566,7 +1568,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             if answer == 'y':
                 template = '{{delete|1=%s}}\n' % reason
                 self.text = template + self.text
-                return self.save(comment=reason)
+                return self.save(summary=reason)
 
     def loadDeletedRevisions(self, step=None, total=None):
         """Retrieve deleted revisions for this Page.

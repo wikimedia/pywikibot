@@ -119,7 +119,7 @@ class BasicBot:
                     try:
                         page.text = text
                         # Save the page
-                        page.save(comment=comment or self.comment,
+                        page.save(summary=comment or self.comment,
                                   minor=minorEdit, botflag=botflag)
                     except pywikibot.LockedPage:
                         pywikibot.output(u"Page %s is locked; skipping."

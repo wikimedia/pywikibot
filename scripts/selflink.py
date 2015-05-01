@@ -162,7 +162,7 @@ class SelflinkBot(Bot):
             else:
                 pywikibot.showDiff(oldText, page.text)
                 comment = i18n.twtranslate(page.site, "selflink-remove")
-                page.save(async=True, comment=comment)
+                page.save(async=True, summary=comment)
         except pywikibot.NoPage:
             pywikibot.output(u"Page %s does not exist."
                              % page.title(asLink=True))

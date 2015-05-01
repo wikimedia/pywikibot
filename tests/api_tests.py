@@ -700,7 +700,7 @@ class TestBadTokenRecovery(TestCase):
         page = pywikibot.Page(site, 'Pywikibot bad token test')
         page.text = ('This page is testing whether pywikibot-core rerequests '
                      'a token when a badtoken error was received.')
-        page.save(comment='Bad token test')
+        page.save(summary='Bad token test')
 
 
 if __name__ == '__main__':

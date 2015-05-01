@@ -977,7 +977,7 @@ class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
             changedText = ccToolkit.change(self.current_page.get())
             if changedText is not False:
                 self.put_current(new_text=changedText,
-                                 comment=self.getOption('comment'),
+                                 summary=self.getOption('comment'),
                                  async=self.getOption('async'))
         except pywikibot.LockedPage:
             pywikibot.output("Page %s is locked?!"
