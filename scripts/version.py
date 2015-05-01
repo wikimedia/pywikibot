@@ -22,8 +22,11 @@ try:
 except ImportError:
     httplib2 = {'__version__': 'n/a'}
 
+WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
+
 
 def check_environ(environ_name):
+    """Print environment variable."""
     pywikibot.output('{0}: {1}'.format(environ_name, os.environ.get(environ_name, 'Not set')))
 
 
@@ -31,16 +34,25 @@ if __name__ == '__main__':
     pywikibot.output('Pywikibot: %s' % getversion())
     pywikibot.output('Release version: %s' % pywikibot.__release__)
     pywikibot.output('httplib2 version: %s' % httplib2.__version__)
-    if not hasattr(httplib2, 'CA_CERTS'):
-        httplib2.CA_CERTS = ''
-    pywikibot.output('  cacerts: %s' % httplib2.CA_CERTS)
+
     has_wikimedia_cert = False
-    if os.path.isfile(httplib2.CA_CERTS):
+    if not hasattr(httplib2, 'CA_CERTS') or not httplib2.CA_CERTS:
+        pywikibot.output('  cacerts: not defined')
+    elif not os.path.isfile(httplib2.CA_CERTS):
+        pywikibot.output('  cacerts: %s (missing)' % httplib2.CA_CERTS)
+    else:
+        pywikibot.output('  cacerts: %s' % httplib2.CA_CERTS)
+
         with open(httplib2.CA_CERTS, 'r') as cert_file:
             text = cert_file.read()
-            if 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs' in text:
+            if WMF_CACERT in text:
                 has_wikimedia_cert = True
-    pywikibot.output(u'    certificate test: %s' % ('ok' if has_wikimedia_cert else 'not ok'))
+        pywikibot.output(u'    certificate test: %s'
+                         % ('ok' if has_wikimedia_cert else 'not ok'))
+    if not has_wikimedia_cert:
+        pywikibot.output(
+            '  Please reinstall httplib2 or run git submodules update!')
+
     pywikibot.output('Python: %s' % sys.version)
     normalize_text = u'\u092e\u093e\u0930\u094d\u0915 \u091c\u093c\u0941\u0915\u0947\u0930\u092c\u0930\u094d\u0917'
 
