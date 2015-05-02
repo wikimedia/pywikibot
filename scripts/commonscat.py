@@ -476,7 +476,7 @@ class CommonscatBot(Bot):
             elif "Category redirect" in commonsPage.templates():
                 pywikibot.log(u"getCommonscat: The category is a category redirect")
                 for template in commonsPage.templatesWithParams():
-                    if (template[0] == "Category redirect" and
+                    if (template[0].title(withNamespace=False) == "Category redirect" and
                             len(template[1]) > 0):
                         return self.checkCommonscatLink(template[1][0])
             elif commonsPage.isDisambig():

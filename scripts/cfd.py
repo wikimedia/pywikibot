@@ -179,7 +179,7 @@ def findDay(pageTitle, oldDay):
         # Try to parse day link from CFD template parameters.
         templates = page.templatesWithParams()
         for template in templates:
-            if template[0] in cfdTemplates:
+            if template[0].title() in cfdTemplates:
                 params = template[1]
                 (day, month, year) = [None, None, None]
                 for param in params:
