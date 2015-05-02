@@ -66,7 +66,7 @@ or by adding a list to the given one:
     cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
 """
 #
-# (C) xqt, 2009-2013
+# (C) xqt, 2009-2015
 # (C) Pywikibot team, 2006-2015
 #
 # Distributed under the terms of the MIT license.
@@ -198,7 +198,12 @@ def _format_isbn_match(match, strict=True):
             return isbn
 
         isbn = scripts_isbn.getIsbn(isbn)
-        isbn.format()
+        try:
+            isbn.format()
+        except scripts_isbn.InvalidIsbnException as e:
+            if strict:
+                raise
+            pywikibot.log('ISBN "%s" validation error: %s' % (isbn, e))
         return isbn.code
 
 
