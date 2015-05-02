@@ -20,7 +20,7 @@ class Family(family.Family):
         self.name = u'wikia'
 
         self.langs = {
-            u'wikia': None,
+            'wikia': 'www.wikia.com',
         }
 
     def hostname(self, code):
