@@ -1211,7 +1211,7 @@ class ISBN:
         # Determine the publisher
         for (start, end) in publisherRanges:
             length = len(start)  # NOTE: start and end always have equal length
-            if rest[:length] > start and rest[:length] <= end:
+            if rest[:length] >= start and rest[:length] <= end:
                 result += rest[:length] + '-'
                 rest = rest[length:]
                 break
