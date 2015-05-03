@@ -4872,7 +4872,7 @@ def html2unicode(text, ignore=None):
         if unicodeCodepoint and unicodeCodepoint not in ignore:
             if unicodeCodepoint > sys.maxunicode:
                 # solve narrow Python 2 build exception (UTF-16)
-                return eval("'\\U{:08x}'".format(unicodeCodepoint))
+                return eval("'\\U{0:08x}'".format(unicodeCodepoint))
             else:
                 return chr(unicodeCodepoint)
         else:

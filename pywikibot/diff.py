@@ -334,21 +334,21 @@ def cherry_pick(oldtext, newtext, n=0, by_letter=False):
 
     """
     patch = PatchManager(oldtext, newtext, n=n, by_letter=by_letter)
-    pywikibot.output('\03{{lightpurple}}\n{:*^50}\03{{default}}\n'.format('  ALL CHANGES  '))
+    pywikibot.output('\03{{lightpurple}}\n{0:*^50}\03{{default}}\n'.format('  ALL CHANGES  '))
 
     for hunk in patch.hunks:
         pywikibot.output(hunk.diff_text)
-    pywikibot.output('\03{{lightpurple}}\n{:*^50}\03{{default}}\n'.format('  REVIEW CHANGES  '))
+    pywikibot.output('\03{{lightpurple}}\n{0:*^50}\03{{default}}\n'.format('  REVIEW CHANGES  '))
 
     text_list = patch.apply()
-    pywikibot.output('\03{{lightpurple}}\n{:*^50}\03{{default}}\n'.format('  APPROVED CHANGES  '))
+    pywikibot.output('\03{{lightpurple}}\n{0:*^50}\03{{default}}\n'.format('  APPROVED CHANGES  '))
 
     if any(hunk.reviewed == hunk.APPR for hunk in patch.hunks):
         for hunk in patch.hunks:
             if hunk.reviewed == hunk.APPR:
                 pywikibot.output(hunk.diff_text)
     else:
-        pywikibot.output('\03{{lightpurple}}{:^50}\03{{default}}'.format('None.'))
+        pywikibot.output('\03{{lightpurple}}{0:^50}\03{{default}}'.format('None.'))
 
     text = ''.join(text_list)
 
