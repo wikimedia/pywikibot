@@ -68,6 +68,10 @@ class Stream(object):
         self._original = getattr(sys, self._name)
         patched_streams[self._original] = self._stream
 
+    def __repr__(self):
+        return '<patched %s %r wrapping %r>' % (
+            self._name, self._stream, self._original)
+
     def reset(self):
         """Reset own stream."""
         self._stream.truncate(0)
@@ -130,7 +134,13 @@ if os.name == "nt":
 
 
 def patched_print(text, targetStream):
-    org_print(text, patched_streams[targetStream])
+    try:
+        stream = patched_streams[targetStream]
+    except KeyError:
+        assert(isinstance(targetStream, pywikibot.userinterfaces.win32_unicode.UnicodeOutput))
+        assert(targetStream._stream)
+        stream = patched_streams[targetStream._stream]
+    org_print(text, stream)
 
 
 def patched_input():
