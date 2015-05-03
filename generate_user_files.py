@@ -117,10 +117,8 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
     fam = pywikibot.family.Family.load(fam)
     if hasattr(fam, "langs"):
         if hasattr(fam, "languages_by_size"):
-            key = {lang: i for i, lang in enumerate(fam.languages_by_size)}.get
-            by_size = sorted(
-                set(fam.langs.keys()).intersection(fam.languages_by_size),
-                key=key)
+            by_size = [code for code in fam.languages_by_size
+                       if code in fam.langs.keys()]
         else:
             by_size = []
         known_langs = by_size + sorted(
