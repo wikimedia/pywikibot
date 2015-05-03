@@ -4426,14 +4426,17 @@ class Link(ComparableMixin):
         return "pywikibot.page.Link(%r, %r)" % (self.title, self.site)
 
     def parse_site(self):
-        """Parse only enough text to determine which site the link points to.
+        """
+        Parse only enough text to determine which site the link points to.
 
         This method does not parse anything after the first ":"; links
         with multiple interwiki prefixes (such as "wikt:fr:Parlais") need
         to be re-parsed on the first linked wiki to get the actual site.
 
-        @return: tuple of (family-name, language-code) for the linked site.
-
+        @return: The family name and site code for the linked site. If the site
+            is not supported by the configured families it returns None instead
+            of a str.
+        @rtype: str or None, str or None
         """
         t = self._text
         fam = self._source.family
@@ -4453,16 +4456,14 @@ class Link(ComparableMixin):
             if prefix in fam.langs:
                 # prefix is a language code within the source wiki family
                 return (fam.name, prefix)
-            known = fam.get_known_families(site=self._source)
-            if prefix in known:
-                if known[prefix] == fam.name:
-                    # interwiki prefix links back to source family
-                    t = t[t.index(u":") + 1:].lstrip(u" ")
-                    # strip off the prefix and retry
-                    continue
-                # prefix is a different wiki family
-                return (known[prefix], code)
-            break
+            try:
+                newsite = self._source.interwiki(prefix)
+            except KeyError:
+                break  # text before : doesn't match any known prefix
+            except SiteDefinitionError:
+                return (None, None)
+            else:
+                return (newsite.family.name, newsite.code)
         return (fam.name, code)  # text before : doesn't match any known prefix
 
     def parse(self):
