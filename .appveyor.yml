@@ -44,6 +44,7 @@ test_script:
   - echo console_encoding = 'utf8' >> "%PYWIKIBOT2_DIR%\\user-config.py"
   - echo transliteration_target = None >> "%PYWIKIBOT2_DIR%\\user-config.py"
 
+  - set PYSETUP_TEST_NO_UI=1
   - "%WITH_COMPILER% %PYTHON%\\python setup.py test"
 
 artifacts:

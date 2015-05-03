@@ -28,21 +28,39 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
+import inspect
+import io
 import logging
 import os
+import subprocess
 import sys
 import time
-import io
 
-try:
-    import pywinauto
-except ImportError:
-    pywinauto = None
+if os.name == "nt":
+    from multiprocessing.managers import BaseManager
+    import threading
+
+    try:
+        import win32api
+    except ImportError:
+        win32api = None
+
+    try:
+        import pywinauto
+    except ImportError:
+        pywinauto = None
+
+    try:
+        import win32clipboard
+    except ImportError:
+        win32clipboard = None
 
 import pywikibot
+
 from pywikibot.bot import (
     ui, DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
 )
+
 from tests.utils import unittest
 
 if sys.version_info[0] > 2:
@@ -79,23 +97,18 @@ class Stream(object):
 
 
 if os.name == "nt":
-    from multiprocessing.managers import BaseManager
-    import threading
 
     class pywikibotWrapper(object):
 
         """pywikibot wrapper class."""
 
         def init(self):
-            import pywikibot  # noqa
             pywikibot.version._get_program_dir()
 
         def output(self, *args, **kwargs):
-            import pywikibot  # noqa
             return pywikibot.output(*args, **kwargs)
 
         def request_input(self, *args, **kwargs):
-            import pywikibot  # noqa
             self.input = None
 
             def threadedinput():
@@ -108,11 +121,9 @@ if os.name == "nt":
             return self.input
 
         def set_config(self, key, value):
-            import pywikibot  # noqa
             setattr(pywikibot.config, key, value)
 
         def set_ui(self, key, value):
-            import pywikibot  # noqa
             setattr(pywikibot.ui, key, value)
 
         def cls(self):
@@ -503,28 +514,46 @@ class WindowsTerminalTestCase(UITestCase):
     def setUpClass(cls):
         if os.name != 'nt':
             raise unittest.SkipTest('requires Windows console')
+        if not win32api:
+            raise unittest.SkipTest('requires Windows package pywin32')
+        if not win32clipboard:
+            raise unittest.SkipTest('requires Windows package win32clipboard')
         if not pywinauto:
             raise unittest.SkipTest('requires Windows package pywinauto')
+        try:
+            # pywinauto 0.5.0
+            cls._app = pywinauto.Application()
+        except AttributeError as e1:
+            try:
+                cls._app = pywinauto.application.Application()
+            except AttributeError as e2:
+                raise unittest.SkipTest('pywinauto Application failed: %s\n%s'
+                                        % (e1, e2))
         super(WindowsTerminalTestCase, cls).setUpClass()
 
     @classmethod
     def setUpProcess(cls, command):
-        import subprocess
         si = subprocess.STARTUPINFO()
         si.dwFlags = subprocess.STARTF_USESTDHANDLES
         cls._process = subprocess.Popen(command,
                                         creationflags=subprocess.CREATE_NEW_CONSOLE)
 
-        cls._app = pywinauto.application.Application()
         cls._app.connect_(process=cls._process.pid)
 
         # set truetype font (Lucida Console, hopefully)
         try:
-            cls._app.window_().TypeKeys('% {UP}{ENTER}^L{HOME}L{ENTER}', with_spaces=True)
-        except:
-            # occurs if pywinauto is installed without pywin32.
-            raise unittest.SkipTest('Windows package pywinauto not functional; '
-                                    'maybe pywin32 isnt installed')
+            window = cls._app.window_()
+        except Exception as e:
+            cls.tearDownProcess()
+            raise unittest.SkipTest('Windows package pywinauto could not locate window: %r'
+                                    % e)
+
+        try:
+            window.TypeKeys('% {UP}{ENTER}^L{HOME}L{ENTER}', with_spaces=True)
+        except Exception as e:
+            cls.tearDownProcess()
+            raise unittest.SkipTest('Windows package pywinauto could not use window TypeKeys: %r'
+                                    % e)
 
     @classmethod
     def tearDownProcess(cls):
@@ -552,15 +581,11 @@ class WindowsTerminalTestCase(UITestCase):
             time.sleep(0.01)
 
     def setclip(self, text):
-        import win32clipboard
-
         win32clipboard.OpenClipboard()
         win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT, unicode(text))
         win32clipboard.CloseClipboard()
 
     def getclip(self):
-        import win32clipboard
-
         win32clipboard.OpenClipboard()
         data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
         win32clipboard.CloseClipboard()
@@ -582,7 +607,6 @@ class TestWindowsTerminalUnicode(WindowsTerminalTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestWindowsTerminalUnicode, cls).setUpClass()
-        import inspect
         fn = inspect.getfile(inspect.currentframe())
         cls.setUpProcess(['python', 'pwb.py', fn, '--run-as-slave-interpreter'])
 

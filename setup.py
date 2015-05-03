@@ -55,8 +55,15 @@ script_deps['flickrripper.py'].append('flickrapi' if sys.version_info[0] > 2
 if sys.platform.startswith('linux'):
     script_deps['script_wui.py'] = [irc_dep, 'lunatic-python', 'crontab']
 
+# The main pywin32 repository contains a Python 2 only setup.py with a small
+# wrapper setup3.py for Python 3.
+# http://pywin32.hg.sourceforge.net:8000/hgroot/pywin32/pywin32
+# The main pywinauto repository doesnt support Python 3.
+# The repositories used below have a Python 3 compliant setup.py
 dependency_links = [
     'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
+    'hg+https://bitbucket.org/TJG/pywin32#egg=pywin32',
+    'git+https://github.com/vasily-v-ryabov/pywinauto-64#egg=pywinauto',
 ]
 
 if sys.version_info[0] == 2:
@@ -92,12 +99,20 @@ if os.name != 'nt':
     # when trying to build the C modules.
     dependencies += extra_deps['mwparserfromhell']
 
-# setup can't detect or install pywin32, which pywinauto depends on.
-# appveyor builds do not install pywin32
-if os.name == 'nt':
+# Some of the ui_tests depend on accessing the console window's menu
+# to set the console font and copy and paste, achieved using pywinauto
+# which depends on pywin32.
+# These tests may be disabled because pywin32 depends on VC++, is time
+# comsuming to build, and the console window cant be accessed during appveyor
+# builds.
+# Microsoft makes available a compiler for Python 2.7
+# http://www.microsoft.com/en-au/download/details.aspx?id=44266
+# If you set up your own compiler for Python 3, on 3.3 two demo files
+# packaged with pywin32 may fail.  Remove com/win32com/demos/ie*.py
+if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
     # FIXME: tests/ui_tests.py suggests pywinauto 0.4.2
     # which isnt provided on pypi.
-    test_deps += ['pywinauto>=0.4.0']
+    test_deps += ['pywin32', 'pywinauto>=0.4.0']
 
 extra_deps.update(script_deps)
 
