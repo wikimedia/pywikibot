@@ -729,6 +729,8 @@ def handle_args(args=None, do_help=True):
     for arg in args:
         if do_help is not False and arg == '-help':
             do_help = True
+        elif arg.startswith('-dir:'):
+            pass
         elif arg.startswith('-family:'):
             config.family = arg[len("-family:"):]
         elif arg.startswith('-lang:'):
