@@ -871,6 +871,9 @@ class Family(object):
             issue_deprecation_warning('nocapitalize',
                                       "APISite.siteinfo['case'] or "
                                       "Namespace.case == 'case-sensitive'", 2)
+        elif name == 'known_families':
+            issue_deprecation_warning('known_families',
+                                      'APISite.interwiki(prefix)', 2)
         return super(Family, self).__getattribute__(name)
 
     @staticmethod
