@@ -16,25 +16,22 @@ before_install:
   - if [[ "$PYSETUP_TEST_EXTRAS" == "1" ]]; then sudo apt-get install -y liblua5.1-dev; fi
 
 install:
+
   - if [[ "$SITE_ONLY" == '1' ]]; then export USE_NOSE=1; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2==0.8.0; fi
   - pip install six
   - export GITHUB_USER=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 1`
-  - mkdir ~/.pywikibot
   - mkdir ~/.python-eggs
   - chmod 700 ~/.python-eggs
 
-  - touch ~/.pywikibot/user-config.py
-  - echo "import os" >> ~/.pywikibot/user-config.py
-  - echo "mylang = '$LANGUAGE'" >> ~/.pywikibot/user-config.py
-  - echo "family = '$FAMILY'" >> ~/.pywikibot/user-config.py
+  # httplib2 is needed to run generate_user_files
+  - if [[ "$EXTERNALS_HTTPLIB2" == "1" ]]; then
+      (cd externals/httplib2 && python setup.py install) ;
+    else
+      rm -rf externals/httplib2 ;
+      pip install httplib2 ;
+    fi
 
-  - echo "password_file = os.path.expanduser('~/.pywikibot/passwordfile')" >> ~/.pywikibot/user-config.py
-  - touch ~/.pywikibot/passwordfile
-
-  - echo "max_retries = 2" >> ~/.pywikibot/user-config.py
-  - echo "maximum_GET_length = 5000" >> ~/.pywikibot/user-config.py
-  - echo "console_encoding = 'utf8'" >> ~/.pywikibot/user-config.py
 
   - if [[ "$GITHUB_USER" == "wikimedia" ]]; then
       PYWIKIBOT2_USERNAME="Pywikibot-test" ;
@@ -42,20 +39,22 @@ install:
       export PYWIKIBOT2_TEST_WRITE_FAIL=1 ;
     fi
 
+  - mkdir ~/.pywikibot
+  - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT2_USERNAME"
+
   - if [[ -n "$USER_PASSWORD" && -n "$PYWIKIBOT2_USERNAME" ]]; then
-      echo "usernames['$FAMILY']['$LANGUAGE'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py ;
       echo "usernames['wikipedia']['en'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py ;
       echo "usernames['wikipedia']['test'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py ;
       echo "usernames['wikidata']['test'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py ;
       echo "usernames['commons']['commons'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py ;
       echo "('$PYWIKIBOT2_USERNAME', '$USER_PASSWORD')" > ~/.pywikibot/passwordfile ;
+      echo "import os" >> ~/.pywikibot/user-config.py ;
+      echo "password_file = os.path.expanduser('~/.pywikibot/passwordfile')" >> ~/.pywikibot/user-config.py ;
     fi
 
-  - if [[ "$EXTERNALS_HTTPLIB2" == "1" ]]; then
-      (cd externals/httplib2 && python setup.py install) ;
-    else
-      rm -rf externals/httplib2 ;
-    fi
+  - echo "max_retries = 2" >> ~/.pywikibot/user-config.py
+  - echo "maximum_GET_length = 5000" >> ~/.pywikibot/user-config.py
+  - echo "console_encoding = 'utf8'" >> ~/.pywikibot/user-config.py
 
   - python -c "import setuptools; print(setuptools.__version__)"
 
