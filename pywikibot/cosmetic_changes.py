@@ -5,24 +5,7 @@ This module can do slight modifications to tidy a wiki page's source code.
 
 The changes are not supposed to change the look of the rendered wiki page.
 
-The following parameters are supported:
-
-&params;
-
--always           Don't prompt you for each replacement. Warning (see below)
-                  has not to be confirmed. ATTENTION: Use this with care!
-
--async            Put page on queue to be saved to wiki asynchronously.
-
--summary:XYZ      Set the summary message text for the edit to XYZ, bypassing
-                  the predefined message texts with original and replacements
-                  inserted.
-
--ignore:          Ignores if an error occured and skip either the page, or
-                  only that method, or only an instance of the problem in the
-                  page text. It can be set to 'page', 'method', or 'match'.
-
-&warning;
+If you wish to run this as an stand-alone script, use scripts/cosmetic_changes.py
 
 For regular use, it is recommended to put this line into your user-config.py:
 
@@ -93,8 +76,7 @@ except ImportError:
 
 import pywikibot
 
-from pywikibot import config, i18n, textlib, pagegenerators
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
+from pywikibot import config, textlib, pagegenerators
 from pywikibot.page import url2unicode
 from pywikibot.tools import deprecate_arg, first_lower, first_upper
 from pywikibot.tools import MediaWikiVersion
@@ -958,93 +940,3 @@ class CosmeticChangesToolkit:
         """Hyphenate ISBN numbers."""
         return _reformat_ISBNs(
             text, strict=False if self.ignore == CANCEL_MATCH else True)
-
-
-class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
-
-    """Cosmetic changes bot."""
-
-    def __init__(self, generator, **kwargs):
-        self.availableOptions.update({
-            'async': False,
-            'comment': u'Robot: Cosmetic changes',
-            'ignore': CANCEL_ALL,
-        })
-        super(CosmeticChangesBot, self).__init__(**kwargs)
-
-        self.generator = generator
-
-    def treat_page(self):
-        """Treat page with the cosmetic toolkit."""
-        try:
-            ccToolkit = CosmeticChangesToolkit.from_page(
-                self.current_page, False, self.getOption('ignore'))
-            changedText = ccToolkit.change(self.current_page.get())
-            if changedText is not False:
-                self.put_current(new_text=changedText,
-                                 summary=self.getOption('comment'),
-                                 async=self.getOption('async'))
-        except pywikibot.LockedPage:
-            pywikibot.output("Page %s is locked?!"
-                             % self.current_page.title(asLink=True))
-        except pywikibot.EditConflict:
-            pywikibot.output("An edit conflict has occured at %s."
-                             % self.current_page.title(asLink=True))
-
-
-def main(*args):
-    """
-    Process command line arguments and invoke bot.
-
-    If args is an empty list, sys.argv is used.
-
-    @param args: command line arguments
-    @type args: list of unicode
-    """
-    options = {}
-
-    # Process global args and prepare generator args parser
-    local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
-
-    for arg in local_args:
-        if arg.startswith('-summary:'):
-            options['comment'] = arg[len('-summary:'):]
-        elif arg == '-always':
-            options['always'] = True
-        elif arg == '-async':
-            options['async'] = True
-        elif arg.startswith('-ignore:'):
-            ignore_mode = arg[len('-ignore:'):].lower()
-            if ignore_mode == 'method':
-                options['ignore'] = CANCEL_METHOD
-            elif ignore_mode == 'page':
-                options['ignore'] = CANCEL_PAGE
-            elif ignore_mode == 'match':
-                options['ignore'] = CANCEL_MATCH
-            else:
-                raise ValueError('Unknown ignore mode "{0}"!'.format(ignore_mode))
-        else:
-            genFactory.handleArg(arg)
-
-    site = pywikibot.Site()
-
-    if 'comment' not in options or not options['comment']:
-        # Load default summary message.
-        options['comment'] = i18n.twtranslate(site,
-                                              'cosmetic_changes-standalone')
-
-    gen = genFactory.getCombinedGenerator()
-    if gen:
-        if options.get('always') or pywikibot.input_yn(
-                warning + '\nDo you really want to continue?',
-                default=False, automatic_quit=False):
-            site.login()
-            preloadingGen = pagegenerators.PreloadingGenerator(gen)
-            bot = CosmeticChangesBot(preloadingGen, **options)
-            bot.run()
-    else:
-        pywikibot.showHelp()
-
-if __name__ == "__main__":
-    main()
