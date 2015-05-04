@@ -1,3 +1,5 @@
+DO NOT CLOSE THIS PULL REQUEST. I AM TESTING SOMETHING.
+
 Pywikibot
 =========
 
