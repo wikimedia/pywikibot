@@ -341,9 +341,6 @@ def main(*args):
     @type args: list of unicode
     """
     global base_dir
-    # Force default
-    if config.family == 'wikipedia' and config.mylang == 'language':
-        config.mylang = 'en'
 
     default_args = (config.family, config.mylang, None)
 
@@ -360,6 +357,10 @@ def main(*args):
         pywikibot.output(u'Automatically generating user-config.py')
     else:
         force = False
+
+    # Force default
+    if config.family == 'wikipedia' and config.mylang == 'language':
+        args = ('wikipedia', 'en', username)
 
     while not force or config.verbose_output:
         pywikibot.output(u'\nYour default user directory is "%s"' % base_dir)
