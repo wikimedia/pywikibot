@@ -329,6 +329,15 @@ class UserAgentTestCase(TestCase):
 
         self.assertEqual('%E2%81%82', http.user_agent_username(u'⁂'))
 
+    def test_version(self):
+        pywikibot.version.cache = None
+        http.user_agent(format_string='version does not appear')
+        self.assertIsNone(pywikibot.version.cache)
+        pywikibot.version.cache = {'rev': 'dummy'}
+        self.assertEqual(http.user_agent(format_string='{version} does appear'),
+                         'dummy does appear')
+        self.assertIsNotNone(pywikibot.version.cache)
+
 
 class DefaultUserAgentTestCase(TestCase):
 
