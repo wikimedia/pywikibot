@@ -361,6 +361,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         return self.latest_revision.text
 
+    def _latest_cached_revision(self):
+        """Get the latest revision if cached and has text, otherwise None."""
+        if (hasattr(self, '_revid') and self._revid in self._revisions and
+                self._revisions[self._revid].text is not None):
+            return self._revisions[self._revid]
+        else:
+            return None
+
     def _getInternals(self, sysop):
         """Helper function for get().
 
@@ -374,9 +382,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             raise self._getexception
 
         # If not already stored, fetch revision
-        if not hasattr(self, "_revid") \
-                or self._revid not in self._revisions \
-                or self._revisions[self._revid].text is None:
+        if self._latest_cached_revision() is None:
             try:
                 self.site.loadrevisions(self, getText=True, sysop=sysop)
             except (pywikibot.NoPage, pywikibot.SectionError) as e:
@@ -439,6 +445,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
     @property
     def latest_revision(self):
         """Return the current revision for this page."""
+        rev = self._latest_cached_revision()
+        if rev is not None:
+            return rev
         return next(self.revisions(content=True, total=1))
 
     @property
