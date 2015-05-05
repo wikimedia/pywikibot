@@ -297,15 +297,18 @@ class FeaturedBot(pywikibot.Bot):
 
     def hastemplate(self, task):
         add_tl, remove_tl = self.getTemplateList(self.site.code, task)
-        for tl in add_tl:
+        for i, tl in enumerate(add_tl):
             tp = pywikibot.Page(self.site, tl, ns=10)
-            if not tp.exists():
-                return
-        for tl in remove_tl:
-            tp = pywikibot.Page(self.site, tl, ns=10)
-            if not tp.exists():
-                return
-        return True
+            if tp.exists():
+                return True
+            else:
+                pywikibot.output(tl + ' does not exist')
+                # The first item is the default template to be added.
+                # It must exist. Otherwise the script must not run.
+                if i == 0:
+                    return
+        else:
+            return
 
     def readcache(self, task):
         if self.getOption('count') or self.getOption('nocache') is True:
