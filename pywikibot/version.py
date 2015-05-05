@@ -359,7 +359,8 @@ def getversion_onlinerepo(repo=None):
     from pywikibot.comms import http
 
     url = repo or 'https://git.wikimedia.org/feed/pywikibot/core'
-    buf = http.fetch(url).content.splitlines()
+    buf = http.fetch(uri=url,
+                     headers={'user-agent': '{pwb}'}).content.splitlines()
     try:
         hsh = buf[13].split('/')[5][:-1]
         return hsh

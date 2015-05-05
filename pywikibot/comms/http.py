@@ -27,6 +27,7 @@ import sys
 import time
 
 from distutils.version import StrictVersion
+from string import Formatter
 from warnings import warn
 
 # Verify that a working httplib2 is present.
@@ -137,6 +138,22 @@ USER_AGENT_PRODUCTS = {
 }
 
 
+class _UserAgentFormatter(Formatter):
+
+    """User-agent formatter to load version/revision only if necessary."""
+
+    def get_value(self, key, args, kwargs):
+        """Get field as usual except for version and revision."""
+        # This is the Pywikibot revision; also map it to {version} at present.
+        if key == 'version' or key == 'revision':
+            return pywikibot.version.getversiondict()['rev']
+        else:
+            return super(_UserAgentFormatter, self).get_value(key, args, kwargs)
+
+
+_USER_AGENT_FORMATTER = _UserAgentFormatter()
+
+
 def user_agent_username(username=None):
     """
     Reduce username to a representation permitted in HTTP headers.
@@ -180,13 +197,6 @@ def user_agent(site=None, format_string=None):
     """
     values = USER_AGENT_PRODUCTS.copy()
 
-    # This is the Pywikibot revision; also map it to {version} at present.
-    if pywikibot.version.cache:
-        values['revision'] = pywikibot.version.cache['rev']
-    else:
-        values['revision'] = ''
-    values['version'] = values['revision']
-
     values['script'] = pywikibot.calledModuleName()
 
     # TODO: script_product should add the script version, if known
@@ -216,7 +226,7 @@ def user_agent(site=None, format_string=None):
     if not format_string:
         format_string = config.user_agent_format
 
-    formatted = format_string.format(**values)
+    formatted = _USER_AGENT_FORMATTER.format(format_string, **values)
     # clean up after any blank components
     formatted = formatted.replace(u'()', u'').replace(u'  ', u' ').strip()
     return formatted
