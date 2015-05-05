@@ -1106,7 +1106,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         ccToolkit = CosmeticChangesToolkit(self.site,
                                            redirect=self.isRedirectPage(),
                                            namespace=self.namespace(),
-                                           pageTitle=self.title())
+                                           pageTitle=self.title(),
+                                           ignore=3)  # CANCEL_MATCH
         self.text = ccToolkit.change(old)
         if comment and \
            old.strip().replace('\r\n',
