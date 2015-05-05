@@ -32,10 +32,7 @@ install:
       pip install httplib2 ;
     fi
 
-
-  - if [[ "$GITHUB_USER" == "wikimedia" ]]; then
-      PYWIKIBOT2_USERNAME="Pywikibot-test" ;
-    else
+  - if [[ "$GITHUB_USER" != "wikimedia" ]]; then
       export PYWIKIBOT2_TEST_WRITE_FAIL=1 ;
     fi
 
