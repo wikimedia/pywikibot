@@ -30,7 +30,7 @@ from tests.aspects import (
     DeprecationTestCase,
     WikidataTestCase,
     DefaultSiteTestCase,
-    WikimediaDefaultSiteTestCase,
+    RecentChangesTestCase,
 )
 from tests.thread_tests import GeneratorIntersectTestCase
 
@@ -232,21 +232,9 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
         self.assertEqual(len(list(gen)), 0)
 
 
-class TestRepeatingGenerator(WikimediaDefaultSiteTestCase):
+class TestRepeatingGenerator(RecentChangesTestCase):
 
     """Test RepeatingGenerator."""
-
-    # site.recentchanges() includes external edits from wikidata,
-    # except on wiktionaries which are not linked to wikidata
-    # so total=3 should not be too high for most sites.
-    length = 3
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestRepeatingGenerator, cls).setUpClass()
-
-        if cls.get_site().code == 'test':
-            cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
 
     def test_RepeatingGenerator(self):
         items = list(
@@ -835,14 +823,9 @@ class EnglishWikipediaPageGeneratorIntersectTestCase(GeneratorIntersectTestCase)
         )
 
 
-class LiveRCPageGeneratorTestCase(WikimediaDefaultSiteTestCase):
+class LiveRCPageGeneratorTestCase(RecentChangesTestCase):
 
-    """Test case for Live Recent Changes pagegenerator.
-
-    Works best on a busy site, as three changes are requested
-    """
-
-    length = 3
+    """Test case for Live Recent Changes pagegenerator."""
 
     @classmethod
     def setUpClass(cls):
@@ -856,9 +839,6 @@ class LiveRCPageGeneratorTestCase(WikimediaDefaultSiteTestCase):
             raise unittest.SkipTest(
                 'socketIO_client %s not supported by Wikimedia-Stream'
                 % socketIO_client.__version__)
-
-        if cls.get_site().code == 'test':
-            cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
 
     def test_RC_pagegenerator_result(self):
         import logging

@@ -1186,6 +1186,26 @@ class PwbTestCase(TestCase):
         return execute_pwb(args, data_in, timeout, error)
 
 
+class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
+
+    """Test cases for tests that use recent change."""
+
+    # site.recentchanges() includes external edits from wikidata,
+    # except on wiktionaries which are not linked to wikidata
+    # so total=3 should not be too high for most sites.
+    length = 3
+
+    @classmethod
+    def setUpClass(cls):
+        if os.environ.get('PYWIKIBOT2_TEST_NO_RC', '0') == '1':
+            raise unittest.SkipTest('RecentChanges tests disabled.')
+
+        super(RecentChangesTestCase, cls).setUpClass()
+
+        if cls.get_site().code == 'test':
+            cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
+
+
 class DebugOnlyTestCase(TestCase):
 
     """Test cases that only operate in debug mode."""
