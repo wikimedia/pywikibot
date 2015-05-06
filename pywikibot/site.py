@@ -5876,6 +5876,25 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
+    def set_redirect_target(self, from_item, to_item):
+        """
+        Make a redirect to another item.
+
+        @param to_item: title of target item.
+        @type to_item: pywikibot.ItemPage
+        @param from_item: Title of the item to be redirected.
+        @type from_item: pywikibot.ItemPage
+        """
+        params = {
+            'action': 'wbcreateredirect',
+            'from': from_item.getID(),
+            'to': to_item.getID(),
+            'token': self.tokens['edit']
+        }
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        return data
+
     def createNewItemFromPage(self, page, bot=True, **kwargs):
         """
         Create a new Wikibase item for a provided page.
