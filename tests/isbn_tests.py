@@ -12,8 +12,7 @@ import pywikibot
 __version__ = '$Id$'
 
 from pywikibot import Bot, Claim, ItemPage
-
-from scripts.cosmetic_changes import CosmeticChangesToolkit, CANCEL_MATCH
+from pywikibot.cosmetic_changes import CosmeticChangesToolkit, CANCEL_MATCH
 
 from scripts.isbn import (
     ISBN10, ISBN13, InvalidIsbnException as IsbnExc,

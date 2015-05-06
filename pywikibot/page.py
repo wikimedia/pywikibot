@@ -1095,11 +1095,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
                self.site.lang in config.cosmetic_changes_disable[family]))
         if not cc:
             return
-        try:
-            from scripts.cosmetic_changes import CosmeticChangesToolkit
-        except ImportError:
-            pywikibot.log(u'Cosmetic changes module not available.')
-            return
+
+        # cc depends on page directly and via several other imports
+        from pywikibot.cosmetic_changes import CosmeticChangesToolkit  # noqa
         old = self.text
         pywikibot.log(u'Cosmetic changes for %s-%s enabled.'
                       % (family, self.site.lang))
