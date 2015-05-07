@@ -28,6 +28,8 @@ import re
 import sys
 import types
 
+from warnings import warn
+
 pwb = None
 
 
@@ -182,7 +184,9 @@ except RuntimeError as err:
                     [])
     sys.exit(1)
 
-if __name__ == "__main__":
+
+def main():
+    """Command line entry point."""
     if len(sys.argv) > 1 and not re.match('-{1,2}help', sys.argv[1]):
         file_package = None
         tryimport_pwb()
@@ -223,9 +227,14 @@ if __name__ == "__main__":
             try:
                 __import__(file_package)
             except ImportError as e:
-                print('Parent module %s not found: %s'
-                      % (file_package, e), file=sys.stderr)
+                warn('Parent module %s not found: %s'
+                     % (file_package, e), ImportWarning)
 
         run_python_file(filename, argv, argvu, file_package)
+        return True
     else:
+        return False
+
+if __name__ == '__main__':
+    if not main():
         print(__doc__)
