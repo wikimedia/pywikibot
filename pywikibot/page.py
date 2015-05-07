@@ -2819,7 +2819,7 @@ class User(Page):
         }
         if ccme:
             params['ccme'] = 1
-        mailrequest = pywikibot.data.api.Request(**params)
+        mailrequest = pywikibot.data.api.Request(site=self.site, **params)
         maildata = mailrequest.submit()
 
         if 'error' in maildata:

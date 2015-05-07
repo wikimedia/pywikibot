@@ -4734,6 +4734,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data
 
+    @must_be(group='user')
     def watchpage(self, page, unwatch=False):
         """Add or remove page from watchlist.
 
@@ -4743,7 +4744,7 @@ class APISite(BaseSite):
 
         """
         token = self.tokens['watch']
-        req = api.Request(action="watch", token=token,
+        req = api.Request(site=self, action='watch', token=token,
                           title=page.title(withSection=False), unwatch=unwatch)
         result = req.submit()
         if "watch" not in result:

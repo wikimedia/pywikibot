@@ -1105,6 +1105,7 @@ class Request(MutableMapping):
             self.site = kwargs.pop("site")
         except KeyError:
             self.site = pywikibot.Site()
+            warn('Request() invoked without a site', RuntimeWarning, 2)
         if 'mime_params' in kwargs:
             self.mime_params = kwargs.pop('mime_params')
             # mime may not be different from mime_params

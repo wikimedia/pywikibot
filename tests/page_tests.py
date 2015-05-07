@@ -16,7 +16,7 @@ from pywikibot import InvalidTitle
 import pywikibot.page
 
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase
-from tests.utils import allowed_failure, expected_failure_if
+from tests.utils import expected_failure_if
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -755,12 +755,10 @@ class TestPageUserAction(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         self.assertIsInstance(mainpage.purge(), bool)
 
-    @allowed_failure
     def test_watch(self):
         """Test Page.watch, with and without unwatch enabled."""
         # Note: this test uses the userpage, so that it is unwatched and
         # therefore is not listed by script_tests test_watchlist_simulate.
-        # FIXME: T77965: fails on ar.wp and test.wd, but not en.wp and fr.wikt
         userpage = self.get_userpage()
         rv = userpage.watch()
         self.assertIsInstance(rv, bool)
