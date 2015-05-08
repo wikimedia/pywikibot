@@ -131,16 +131,22 @@ def downloadPhoto(photoUrl=''):
     return io.BytesIO(imageFile)
 
 
-def findDuplicateImages(photo=None,
-                        site=pywikibot.Site(u'commons', u'commons')):
+def findDuplicateImages(photo, site=None):
     """Find duplicate images.
 
     Take the photo, calculate the SHA1 hash and ask the MediaWiki api
     for a list of duplicates.
 
-    TODO: Add exception handling, fix site thing
+    TODO: Add exception handling.
 
+    @param photo: Photo
+    @type photo: io.BytesIO
+    @param site: Site to search for duplicates.
+        Defaults to using Wikimedia Commons if not supplied.
+    @type site: APISite or None
     """
+    if not site:
+        site = pywikibot.Site('commons', 'commons')
     hashObject = hashlib.sha1()
     hashObject.update(photo.getvalue())
     return site.getFilesFromAnHash(base64.b16encode(hashObject.digest()))

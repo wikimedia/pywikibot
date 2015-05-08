@@ -29,6 +29,8 @@ if sys.version_info[0] > 2:
 else:
     import unicodecsv as csv
 
+from warnings import warn
+
 import pywikibot
 
 from pywikibot import pagegenerators
@@ -71,7 +73,7 @@ class Photo(pywikibot.FilePage):
         self.contents = None
 
         if not site:
-            site = pywikibot.Site(u'commons', u'commons')
+            site = pywikibot.Site('commons', 'commons')
 
         # default title
         super(Photo, self).__init__(site,
@@ -151,15 +153,43 @@ class DataIngestionBot(pywikibot.Bot):
     """Data ingestion bot."""
 
     def __init__(self, reader, titlefmt, pagefmt,
-                 site=pywikibot.Site(u'commons', u'commons')):
-        """Constructor."""
-        super(DataIngestionBot, self).__init__(generator=reader)
-        self.reader = reader
+                 site='deprecated_default_commons'):
+        """
+        Constructor.
+
+        @param reader: Generator of Photos to process.
+        @type reader: Photo page generator
+        @param titlefmt: Title format
+        @type titlefmt: basestring
+        @param pagefmt: Page format
+        @type pagefmt: basestring
+        @param site: Target site for image upload.
+            Use None to determine the site from the pages treated.
+            Defaults to 'deprecated_default_commons' to use Wikimedia Commons
+            for backwards compatibility reasons. Deprecated.
+        @type site: APISite, 'deprecated_default_commons' or None
+        """
+        if site == 'deprecated_default_commons':
+            warn('site=\'deprecated_default_commons\' is deprecated; '
+                 'please specify a site or use site=None',
+                 DeprecationWarning, 2)
+            site = pywikibot.Site('commons', 'commons')
+        super(DataIngestionBot, self).__init__(generator=reader, site=site)
+
         self.titlefmt = titlefmt
         self.pagefmt = pagefmt
 
-        if site:
-            self.site = site
+    @property
+    @deprecated('generator')
+    def reader(self):
+        """Get generator. Deprecated."""
+        return self.generator
+
+    @reader.setter
+    @deprecated('generator')
+    def reader(self, value):
+        """Set generator. Deprecated."""
+        self.generator = value
 
     def treat(self, photo):
         """Process each page."""
