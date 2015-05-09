@@ -13,6 +13,7 @@ Error: Base class, all exceptions should the subclass of this class.
   - Server504Error: Server timed out with HTTP 504 code
   - PageNotFound: Page not found (deprecated)
   - i18n.TranslationError: i18n/l10n message not available
+  - UnknownExtension: Extension is not defined for this site
 
 SiteDefinitionError: Site loading problem
   - UnknownSite: Site does not exist in Family
@@ -235,9 +236,9 @@ class UnknownFamily(SiteDefinitionError):  # noqa
     pass
 
 
-class UnknownExtension(SiteDefinitionError):  # noqa
+class UnknownExtension(Error, NotImplementedError):
 
-    """Extension is not defined for this site."""
+    """Extension is not defined."""
 
     pass
 
