@@ -24,10 +24,12 @@ from tests.aspects import unittest, TestCase
 from tests.utils import expected_failure_if
 
 if sys.version_info[0] > 2:
+    from http import cookiejar as cookielib
     import queue as Queue
 
     unicode = str
 else:
+    import cookielib
     import Queue
 
 
@@ -271,8 +273,9 @@ class ThreadedHttpRequestQueueTestCase(TestCase):
     }
 
     def test_threading(self):
+        """Test using threadedhttp."""
         queue = Queue.Queue()
-        cookiejar = threadedhttp.LockableCookieJar()
+        cookiejar = cookielib.CookieJar()
         connection_pool = threadedhttp.ConnectionPool()
         proc = threadedhttp.HttpProcessor(queue, cookiejar, connection_pool)
         proc.setDaemon(True)
