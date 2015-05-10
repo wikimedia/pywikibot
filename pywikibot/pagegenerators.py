@@ -105,7 +105,7 @@ parameterHelp = u"""\
                       renameuser, globalauth, gblrights, abusefilter, newusers
                   It uses the default number of pages 10.
                   Examples:
-                  -logevents:move gives pages from move log (should be redirects)
+                  -logevents:move gives pages from move log (usually redirects)
                   -logevents:delete,,20 gives 20 pages from deletion log
                   -logevents:protect,Usr gives pages from protect by user Usr
                   -logevents:patrol,Usr,20 gives 20 patroled pages by user Usr
