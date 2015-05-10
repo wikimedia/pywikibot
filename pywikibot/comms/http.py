@@ -89,7 +89,7 @@ threads = []
 connection_pool = threadedhttp.ConnectionPool()
 http_queue = Queue.Queue()
 
-cookie_jar = threadedhttp.LockableCookieJar(
+cookie_jar = cookielib.LWPCookieJar(
     config.datafilepath("pywikibot.lwp"))
 try:
     cookie_jar.load()

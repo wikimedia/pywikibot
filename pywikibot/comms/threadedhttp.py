@@ -3,7 +3,7 @@
 
 This class extends httplib2, adding support for:
     - Cookies, guarded for cross-site redirects
-    - Thread safe ConnectionPool and LockableCookieJar classes
+    - Thread safe ConnectionPool class
     - HttpProcessor thread class
     - HttpRequest object
 
@@ -125,15 +125,6 @@ class ConnectionPool(object):
             self.lock.release()
 
 
-class LockableCookieJar(cookielib.LWPCookieJar):
-
-    """CookieJar with integrated Lock object."""
-
-    def __init__(self, *args, **kwargs):
-        cookielib.LWPCookieJar.__init__(self, *args, **kwargs)
-        self.lock = threading.Lock()
-
-
 class Http(httplib2.Http):
 
     """Subclass of httplib2.Http that stores cookies.
@@ -159,7 +150,8 @@ class Http(httplib2.Http):
         try:
             self.cookiejar = kwargs.pop('cookiejar')
         except KeyError:
-            self.cookiejar = LockableCookieJar()
+            self.cookiejar = cookielib.CookieJar()
+
         try:
             self.connection_pool = kwargs.pop('connection_pool')
         except KeyError:
@@ -195,11 +187,8 @@ class Http(httplib2.Http):
         # Prepare headers
         headers.pop('cookie', None)
         req = DummyRequest(uri, headers)
-        self.cookiejar.lock.acquire()
-        try:
-            self.cookiejar.add_cookie_header(req)
-        finally:
-            self.cookiejar.lock.release()
+        self.cookiejar.add_cookie_header(req)
+
         headers = req.headers
 
         # Wikimedia squids: add connection: keep-alive to request headers
@@ -243,11 +232,7 @@ class Http(httplib2.Http):
         del self.connections[conn_key]
 
         # First write cookies
-        self.cookiejar.lock.acquire()
-        try:
-            self.cookiejar.extract_cookies(DummyResponse(response), req)
-        finally:
-            self.cookiejar.lock.release()
+        self.cookiejar.extract_cookies(DummyResponse(response), req)
 
         # Check for possible redirects
         redirectable_response = ((response.status == 303) or
@@ -320,7 +305,7 @@ class HttpRequest(UnicodeMixin):
 
     >>> from .http import Queue
     >>> queue = Queue.Queue()
-    >>> cookiejar = LockableCookieJar()
+    >>> cookiejar = cookielib.CookieJar()
     >>> connection_pool = ConnectionPool()
     >>> proc = HttpProcessor(queue, cookiejar, connection_pool)
     >>> proc.setDaemon(True)
@@ -511,7 +496,7 @@ class HttpProcessor(threading.Thread):
 
         @param queue: The C{Queue.Queue} object that contains L{HttpRequest}
                objects.
-        @param cookiejar: The C{LockableCookieJar} cookie object to share among
+        @param cookiejar: The C{cookielib.CookieJar} cookie object to share among
                requests.
         @param connection_pool: The C{ConnectionPool} object which contains
                connections to share among requests.
