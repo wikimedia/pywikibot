@@ -702,7 +702,7 @@ class ContextManagerWrapper(object):
         setattr(self._wrapped, name, value)
 
 
-def open_compressed(filename):
+def open_compressed(filename, use_extension=False):
     """
     Open a file and uncompress it if needed.
 
@@ -731,11 +731,27 @@ def open_compressed(filename):
         else:
             return wrapped
 
-    if filename.endswith('.bz2'):
+    if use_extension:
+        # if '.' not in filename, it'll be 1 character long but otherwise
+        # contain the period
+        extension = filename[filename.rfind('.'):][1:]
+    else:
+        with open(filename, 'rb') as f:
+            magic_number = f.read(8)
+        if magic_number.startswith(b'BZh'):
+            extension = 'bz2'
+        elif magic_number.startswith(b'\x1F\x8B\x08'):
+            extension = 'gz'
+        elif magic_number.startswith(b"7z\xBC\xAF'\x1C"):
+            extension = '7z'
+        else:
+            extension = ''
+
+    if extension == 'bz2':
         return wrap(bz2.BZ2File(filename))
-    elif filename.endswith('.gz'):
+    elif extension == 'gz':
         return wrap(gzip.open(filename))
-    elif filename.endswith('.7z'):
+    elif extension == '7z':
         try:
             process = subprocess.Popen(['7za', 'e', '-bd', '-so', filename],
                                        stdout=subprocess.PIPE,

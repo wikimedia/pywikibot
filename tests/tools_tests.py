@@ -87,6 +87,7 @@ class OpenCompressedTestCase(TestCase):
         self.assertEqual(self._get_content(self.base_file), self.original_content)
         self.assertEqual(self._get_content(self.base_file + '.bz2'), self.original_content)
         self.assertEqual(self._get_content(self.base_file + '.gz'), self.original_content)
+        self.assertEqual(self._get_content(self.base_file + '.bz2', True), self.original_content)
 
     def test_open_compressed_7z(self):
         """Test open_compressed with 7za if installed."""
@@ -95,7 +96,7 @@ class OpenCompressedTestCase(TestCase):
         except OSError:
             raise unittest.SkipTest('7za not installed')
         self.assertEqual(self._get_content(self.base_file + '.7z'), self.original_content)
-        self.assertRaises(OSError, self._get_content, self.base_file + '_invalid.7z')
+        self.assertRaises(OSError, self._get_content, self.base_file + '_invalid.7z', True)
 
 
 if __name__ == '__main__':
