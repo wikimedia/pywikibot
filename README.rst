@@ -35,6 +35,13 @@ If you wish to write your own script it's very easy to get started:
     page.text = page.text.replace('foo', 'bar')
     page.save('Replacing "foo" with "bar"')  # Saves the page
 
+Required external programms
+---------------------------
+
+It may require the following programs to function properly:
+
+* `7za`: To extract 7z files
+
 Contributing
 ------------
 

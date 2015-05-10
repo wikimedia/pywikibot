@@ -8,9 +8,12 @@
 from __future__ import print_function, unicode_literals
 __version__ = '$Id$'
 
+import bz2
 import collections
+import gzip
 import inspect
 import re
+import subprocess
 import sys
 import threading
 import time
@@ -658,6 +661,101 @@ class DequeGenerator(collections.deque):
     def __next__(self):
         """Python 3 iterator method."""
         return self.next()
+
+
+class ContextManagerWrapper(object):
+
+    """
+    Wraps an object in a context manager.
+
+    It is redirecting all access to the wrapped object and executes 'close' when
+    used as a context manager in with-statements. In such statements the value
+    set via 'as' is directly the wrapped object. For example:
+
+     wrapped = ContextManagerWrapper(an_object)
+     with wrapped as another_object:
+         assert(another_object is an_object)
+
+    It does not subclass the object though, so isinstance checks will fail
+    outside a with-statement.
+    """
+
+    def __init__(self, wrapped):
+        """Create a new wrapper."""
+        super(ContextManagerWrapper, self).__init__()
+        super(ContextManagerWrapper, self).__setattr__('_wrapped', wrapped)
+
+    def __enter__(self):
+        """Enter a context manager and use the wrapped object directly."""
+        return self._wrapped
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Call close on the wrapped object when exiting a context manager."""
+        self._wrapped.close()
+
+    def __getattr__(self, name):
+        """Get the attribute from the wrapped object."""
+        return getattr(self._wrapped, name)
+
+    def __setattr__(self, name, value):
+        """Set the attribute in the wrapped object."""
+        setattr(self._wrapped, name, value)
+
+
+def open_compressed(filename):
+    """
+    Open a file and uncompress it if needed.
+
+    This function supports bzip2, gzip and 7zip as compression containers. It
+    uses the packages available in the standard library for bzip2 and gzip so
+    they are always available. 7zip is only available when a 7za program is
+    available.
+
+    The compression is selected via the file ending.
+
+    @param filename: The filename.
+    @type filename: str
+    @raises ValueError: When 7za is not available.
+    @raises OSError: When it's not a 7z archive but the file extension is 7z.
+        It is also raised by bz2 when its content is invalid. gzip does not
+        immediately raise that error but only on reading it.
+    @return: A file like object returning the uncompressed data in binary mode.
+        Before Python 2.7 it's wrapping the object returned by BZ2File and gzip
+        in a ContextManagerWrapper so it's advantages/disadvantages apply there.
+    @rtype: file like object
+    """
+    def wrap(wrapped):
+        """Wrap in a wrapper when this is below Python version 2.7."""
+        if sys.version_info < (2, 7):
+            return ContextManagerWrapper(wrapped)
+        else:
+            return wrapped
+
+    if filename.endswith('.bz2'):
+        return wrap(bz2.BZ2File(filename))
+    elif filename.endswith('.gz'):
+        return wrap(gzip.open(filename))
+    elif filename.endswith('.7z'):
+        try:
+            process = subprocess.Popen(['7za', 'e', '-bd', '-so', filename],
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE,
+                                       bufsize=65535)
+        except OSError:
+            raise ValueError('7za is not installed and can not '
+                             'uncompress "{0}"'.format(filename))
+        else:
+            stderr = process.stderr.read()
+            process.stderr.close()
+            if b'Everything is Ok' not in stderr:
+                process.stdout.close()
+                # OSError is also raised when bz2 is invalid
+                raise OSError('Invalid 7z archive.')
+            else:
+                return process.stdout
+    else:
+        # assume it's an uncompressed XML file
+        return open(filename, 'rb')
 
 
 # Decorators

@@ -23,6 +23,8 @@ import re
 from xml.etree.cElementTree import iterparse
 import xml.sax
 
+from pywikibot.tools import open_compressed
+
 
 def parseRestrictions(restrictions):
     """
@@ -116,23 +118,7 @@ class XmlDump(object):
 
     def parse(self):
         """Generator using cElementTree iterparse function."""
-        if self.filename.endswith('.bz2'):
-            import bz2
-            source = bz2.BZ2File(self.filename)
-        elif self.filename.endswith('.gz'):
-            import gzip
-            source = gzip.open(self.filename)
-        elif self.filename.endswith('.7z'):
-            import subprocess
-            source = subprocess.Popen('7za e -bd -so %s 2>/dev/null'
-                                      % self.filename,
-                                      shell=True,
-                                      stdout=subprocess.PIPE,
-                                      bufsize=65535).stdout
-        else:
-            # assume it's an uncompressed XML file
-            source = open(self.filename, 'rb')
-        try:
+        with open_compressed(self.filename) as source:
             # iterparse's event must be a str but they are unicode with
             # unicode_literals in Python 2
             context = iterparse(source, events=(str('start'), str('end'),
@@ -148,8 +134,6 @@ class XmlDump(object):
                     continue
                 for rev in self._parse(event, elem):
                     yield rev
-        finally:
-            source.close()
 
     def _parse_only_latest(self, event, elem):
         """Parser that yields only the latest revision."""
