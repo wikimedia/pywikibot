@@ -47,6 +47,10 @@ Options for "move" action:
  * -mvtogether  - Only move the pages/subcategories of a category, if the
                   target page (and talk page, if -allowsplit is not set)
                   doesn't exist.
+ * -keepsortkey - Use sortKey of the old category also for the new category.
+                  If not specified, sortKey is removed.
+                  An alternative method to keep sortKey is to use -inplace
+                  option.
 
 Options for "tidy" action:
  * -namespaces    Filter the arcitles in the specified namespaces. Separate
@@ -406,7 +410,8 @@ class CategoryMoveRobot(object):
                  inplace=False, move_oldcat=True, delete_oldcat=True,
                  title_regex=None, history=False, pagesonly=False,
                  deletion_comment=DELETION_COMMENT_AUTOMATIC,
-                 wikibase=True, allow_split=False, move_together=False):
+                 wikibase=True, allow_split=False, move_together=False,
+                 keep_sortkey=None):
         """Store all given parameters in the objects attributes.
 
         @param oldcat: The move source.
@@ -460,6 +465,7 @@ class CategoryMoveRobot(object):
         self.wikibase = wikibase and self.site.has_data_repository
         self.allow_split = allow_split
         self.move_together = move_together
+        self.keep_sortkey = keep_sortkey
 
         if not self.can_move_cats:
             repo = self.site.data_repository()
@@ -590,7 +596,8 @@ class CategoryMoveRobot(object):
 
                 page.change_category(self.oldcat, self.newcat,
                                      comment=self.comment,
-                                     inPlace=self.inplace)
+                                     inPlace=self.inplace,
+                                     sortKey=self.keep_sortkey)
 
                 # Categories for templates can be included in <includeonly> section
                 # of Template:Page/doc subpage.
@@ -610,7 +617,8 @@ class CategoryMoveRobot(object):
                     doc_page.change_category(self.oldcat, self.newcat,
                                              comment=self.comment,
                                              inPlace=self.inplace,
-                                             include=['includeonly'])
+                                             include=['includeonly'],
+                                             sortKey=self.keep_sortkey)
 
     @staticmethod
     def check_move(name, old_page, new_page):
@@ -1096,6 +1104,7 @@ def main(*args):
     rebuild = False
     allow_split = False
     move_together = False
+    keep_sortkey = None
     depth = 5
 
     # Process global args and prepare generator args parser
@@ -1167,6 +1176,8 @@ def main(*args):
             withHistory = True
         elif arg.startswith('-depth:'):
             depth = int(arg[len('-depth:'):])
+        elif arg == '-keepsortkey':
+            keep_sortkey = True
         else:
             genFactory.handleArg(arg)
 
@@ -1229,7 +1240,8 @@ def main(*args):
                                 deletion_comment=deletion_comment,
                                 wikibase=wikibase,
                                 allow_split=allow_split,
-                                move_together=move_together)
+                                move_together=move_together,
+                                keep_sortkey=keep_sortkey)
     elif action == 'tidy':
         catTitle = pywikibot.input(u'Which category do you want to tidy up?')
         bot = CategoryTidyRobot(catTitle, catDB, genFactory.namespaces)
