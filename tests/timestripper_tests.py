@@ -97,6 +97,7 @@ class TestTimeStripperWithDigitsAsMonths(TestCase):
     cached = True
 
     def setUp(self):
+        """Setup a timestripper for the configured site."""
         super(TestTimeStripperWithDigitsAsMonths, self).setUp()
         self.ts = TimeStripper(self.get_site())
 

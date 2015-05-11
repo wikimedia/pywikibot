@@ -48,6 +48,7 @@ class CreateCategoriesBot(Bot):
     """Category creator bot."""
 
     def __init__(self, generator, parent, basename, **kwargs):
+        """Constructor."""
         super(CreateCategoriesBot, self).__init__(**kwargs)
         self.generator = generator
         self.parent = parent

@@ -36,6 +36,7 @@ class TestLink(DefaultDrySiteTestCase):
     """
 
     def test_valid(self):
+        """Test that valid titles are correctly normalized."""
         self.assertEqual(Link('Sandbox', self.get_site()).title, 'Sandbox')
         self.assertEqual(Link('A "B"', self.get_site()).title, 'A "B"')
         self.assertEqual(Link('A \'B\'', self.get_site()).title, 'A \'B\'')
@@ -68,6 +69,7 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertEqual(l.section, 'B')
 
     def test_invalid(self):
+        """Test that invalid titles raise InvalidTitle exception."""
         self.assertRaises(InvalidTitle, Link('', self.get_site()).parse)
         self.assertRaises(InvalidTitle, Link(':', self.get_site()).parse)
         self.assertRaises(InvalidTitle, Link('__  __', self.get_site()).parse)

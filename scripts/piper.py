@@ -109,6 +109,7 @@ class PiperBot(ExistingPageBot, NoRedirectPageBot):
 
 
 def main(*args):
+    """Create and run a PiperBot instance from the given command arguments."""
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.

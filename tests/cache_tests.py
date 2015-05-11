@@ -24,6 +24,7 @@ class RequestCacheTests(TestCase):
     net = False
 
     def _check_cache_entry(self, entry):
+        """Assert validity of the cache entry."""
         self.assertIsInstance(entry.site, BaseSite)
         self.assertIsInstance(entry.site._loginstatus, int)
         self.assertIsInstance(entry.site._username, list)
@@ -35,6 +36,7 @@ class RequestCacheTests(TestCase):
         # to make it closely replicate the original object.
 
     def test_cache(self):
+        """Test the apicache by doing _check_cache_entry over each entry."""
         cache.process_entries(_cache_dir, self._check_cache_entry)
 
 

@@ -41,6 +41,7 @@ class UnlinkBot(Bot):
     """Page unlinking bot."""
 
     def __init__(self, pageToUnlink, **kwargs):
+        """Initialize a UnlinkBot instance with the given page to unlink."""
         self.availableOptions.update({
             'namespaces': [],
             # Which namespaces should be processed?
@@ -132,6 +133,7 @@ class UnlinkBot(Bot):
             return text[:match.start()] + new + text[match.end():], False
 
     def treat(self, page):
+        """Remove links pointing to the configured page from the given page."""
         self.current_page = page
         try:
             oldText = page.get()

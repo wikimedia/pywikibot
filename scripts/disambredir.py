@@ -127,6 +127,7 @@ def treat(text, linkedPage, targetPage):
 
 
 def workon(page, links):
+    """Execute treat for the given page which is linking to the given links."""
     text = page.get()
     # Show the title of the page we're working on.
     # Highlight the title in purple.
